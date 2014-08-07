@@ -44,22 +44,22 @@ class User < ActiveRecord::Base
   end
 
   def bookmark_rated?(bmapping_id)
-    BmappingRatings.find(:first, :conditions => ["bmapping_id = #{bmapping_id} AND user_id = #{self.id}"])
+    BmappingRatings.where(["bmapping_id = #{bmapping_id} AND user_id = #{self.id}"]).first
   end
 
   def bookmark_added?(bmapping_id)
-    Bmapping.find(:first, :conditions => ["id = #{bmapping_id} AND user_id = #{self.id}"])
+    Bmapping.where(["id = #{bmapping_id} AND user_id = #{self.id}"]).first
   end
 
 
 
   def list_mine(object_type, user_id)
-    object_type.all(:conditions => ["instructor_id = ?", user_id])
+    object_type.where(["instructor_id = ?", user_id])
   end
 
   def get_available_users(name)
     lesser_roles = role.get_parents
-    all_users = User.all(:conditions => ['name LIKE ?', "#{name}%"], :limit => 20) # higher limit, since we're filtering
+    all_users = User.where(['name LIKE ?', "#{name}%"] ).limit(20) # higher limit, since we're filtering
     visible_users = all_users.select{|user| lesser_roles.include? user.role}
     return visible_users[0,10] # the first 10
   end
@@ -159,7 +159,7 @@ class User < ActiveRecord::Base
     if user == nil
       items = login.split("@")
       shortName = items[0]
-      userList = User.all({:conditions=> ["name =?",shortName]})
+      userList = User.where(["name =?",shortName])
       if userList != nil && userList.length == 1
         user = userList.first
       end

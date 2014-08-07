@@ -74,7 +74,7 @@ class SignUpTopic < ActiveRecord::Base
     assignment = Assignment.find(assignment_id)
 
     #making sure that the drop date deadline hasn't passed
-    dropDate = DueDate.find(:first, :conditions => {:assignment_id => assignment.id, :deadline_type_id => '6'})
+    dropDate = DueDate.where([:assignment_id => assignment.id, :deadline_type_id => '6']).first
     if (!dropDate.nil? && dropDate.due_at < Time.now)
       #flash[:error] = "You cannot drop this topic because the drop deadline has passed."
     else
@@ -101,7 +101,7 @@ class SignUpTopic < ActiveRecord::Base
             #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
             # to treat all assignments as team assignments
 
-            user_id = TeamsUser.find(:first, :conditions => {:team_id => first_waitlisted_user.creator_id}).user_id
+            user_id = TeamsUser.where([ :team_id => first_waitlisted_user.creator_id ]).first.user_id
             participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
 
             participant.update_topic_id(topic_id)
@@ -123,14 +123,14 @@ class SignUpTopic < ActiveRecord::Base
     num_of_users_promotable = max_choosers.to_i - self.max_choosers.to_i
 
     num_of_users_promotable.times {
-      next_wait_listed_user = SignedUpUser.find(:first, :conditions => {:topic_id => self.id, :is_waitlisted => true})
+      next_wait_listed_user = SignedUpUser.where({:topic_id => self.id, :is_waitlisted => true}).first
       if !next_wait_listed_user.nil?
         next_wait_listed_user.is_waitlisted = false
         next_wait_listed_user.save
 
         #update participants
         assignment = Assignment.find(self.assignment_id)
-        user_id = TeamsUser.find(:first, :conditions => {:team_id => next_wait_listed_user.creator_id}).user_id
+        user_id = TeamsUser.where({:team_id => next_wait_listed_user.creator_id}).user_id.first
         participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
 
         participant.update_topic_id(self.id)

@@ -6,7 +6,7 @@ class MenuItem < ActiveRecord::Base
   validates_uniqueness_of :name
 
   def delete
-    children = MenuItem.all(:conditions => ['parent_id = ?',self.id])
+    children = MenuItem.where(['parent_id = ?',self.id])
     children.each {|child| child.delete }
     self.destroy
   end
@@ -20,8 +20,7 @@ class MenuItem < ActiveRecord::Base
         ["parent_id is null and seq = ?", self.seq - 1]
     end
 
-    return MenuItem.find(:first,
-                         :conditions => conditions)
+    return MenuItem.where(conditions).first
   end
 
 
@@ -34,20 +33,15 @@ class MenuItem < ActiveRecord::Base
         ["parent_id is null and seq = ?", self.seq + 1]
     end
 
-    return MenuItem.find(:first,
-                         :conditions => conditions)
+    return MenuItem.where(conditions).first
   end
 
 
   def MenuItem.repack(repack_id)
     if repack_id
-      items = MenuItem.find(:all,
-                            :conditions => "parent_id = #{repack_id}",
-                            :order => 'seq')
+      items = MenuItem.where("parent_id = #{repack_id}").order('seq')
     else
-      items = MenuItem.find(:all,
-                            :conditions => "parent_id is null",
-                            :order => 'seq')
+      items = MenuItem.where("parent_id is null").order('seq')
     end
 
     seq = 1

@@ -2,7 +2,7 @@
 <%@myuser%>
 <%@id%>
 <%@this_reviewer%>
-<%@sc = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?",@myuser, @qid  ])%>
+<%@sc = ScoreCache.where(["reviewee_id = ? and object_type = ?",@myuser, @qid  ]).first %>
 
 
 <% #########################################    %>

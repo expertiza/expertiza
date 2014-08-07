@@ -13,10 +13,10 @@ class Leaderboard < ActiveRecord::Base
 
   ### This methodreturns unaffiliiated assignments - assignments not affiliated to any course
   def self.getIndependantAssignments(user_id)
-    userAssignments = AssignmentParticipant.all(:conditions =>["user_id = ? ", user_id])
+    userAssignments = AssignmentParticipant.where(["user_id = ? ", user_id])
     noCourseAssignments = Array.new
     for ua in userAssignments
-      noCA = Assignment.find(:first, :conditions =>["id = ? and course_id is NULL", ua.parent_id])
+      noCA = Assignment.where(["id = ? and course_id is NULL", ua.parent_id]).first
       if noCA != nil
         noCourseAssignments<< noCA
       end
@@ -26,8 +26,7 @@ class Leaderboard < ActiveRecord::Base
 
 
   def self.getAssignmentsInCourses(courseArray)
-    assignmentList = Assignment.find(:all,
-                                     :conditions => ["course_id in (?)", courseArray])
+    assignmentList = Assignment.where(["course_id in (?)", courseArray])
   end
 
   # This method gets all tuples in the Participants table associated
@@ -72,7 +71,7 @@ class Leaderboard < ActiveRecord::Base
       end
       @revqids = []
       differentQuestionnaires = Hash.new
-      @revqids = AssignmentQuestionnaire.all(:conditions => ["assignment_id = ?",assgt.id])
+      @revqids = AssignmentQuestionnaire.where(["assignment_id = ?",assgt.id])
       @revqids.each do |rqid|
         rtype = Questionnaire.find(rqid.questionnaire_id).type
         if( rtype == 'ReviewQuestionnaire')
@@ -100,17 +99,12 @@ class Leaderboard < ActiveRecord::Base
 # end of first for
 
 
-participantList = AssignmentParticipant.find(:all,
-                                             :select => "id, user_id, parent_id",
-                                             :conditions => ["parent_id in (?)", assignmentList])
+    participantList = AssignmentParticipant.select("id, user_id, parent_id").where(["parent_id in (?)", assignmentList])
 #Creating an participant id to [user id, Assignment id] hash
 partAssHash = Hash.new
 for part in participantList
   partAssHash[part.id] = [part.user_id, part.parent_id]
 end
-# csEntries = ComputedScore.find(:all,
-#                             :conditions => ["participant_id in (?)", participantList])
-
 
 csEntries = Array.new
 #####Computation of csEntries
@@ -129,10 +123,8 @@ for assgt in assignmentList
 
 
 
-  participants_for_assgt = AssignmentParticipant.find(:all,
-                                                      :conditions =>["parent_id = ? and type =?", assgt.id, 'AssignmentParticipant'])
-  fMTEntries = ScoreCache.find(:all,
-                               :conditions =>["reviewee_id in (?) and object_type in (?)", participants_for_assgt, argList])
+  participants_for_assgt = AssignmentParticipant.where(["parent_id = ? and type =?", assgt.id, 'AssignmentParticipant'])
+  fMTEntries = ScoreCache.where(["reviewee_id in (?) and object_type in (?)", participants_for_assgt, argList])
   for fMTEntry in fMTEntries
     csEntry = CsEntriesAdaptor.new
     csEntry.participant_id = fMTEntry.reviewee_id
@@ -149,8 +141,7 @@ for assgt in assignmentList
   ######## done with metareviews and feedbacksfor this assgt##############
   ##########now putting stuff in reviews based on if the assignment is a team assignment or not###################
   if assTeamHash[assgt.id] == "indie"
-    participant_entries = ScoreCache.find(:all,
-                                          :conditions =>["reviewee_id in (?) and object_type = ?", participants_for_assgt, 'ParticipantReviewResponseMap' ])
+    participant_entries = ScoreCache.where(["reviewee_id in (?) and object_type = ?", participants_for_assgt, 'ParticipantReviewResponseMap' ])
     for participant_entry in participant_entries
       csEntry = CsEntriesAdaptor.new
       csEntry.participant_id = participant_entry.reviewee_id
@@ -159,17 +150,13 @@ for assgt in assignmentList
       csEntries << csEntry
     end
   else
-    assignment_teams = Team.find(:all,
-                                 :conditions => ["parent_id = ? and type = ?", assgt.id, 'AssignmentTeam'])
-    team_entries = ScoreCache.find(:all,
-                                   :conditions =>["reviewee_id in (?) and object_type = ?", assignment_teams, 'TeamReviewResponseMap'])
+    assignment_teams = Team.where(["parent_id = ? and type = ?", assgt.id, 'AssignmentTeam'])
+    team_entries = ScoreCache.where(["reviewee_id in (?) and object_type = ?", assignment_teams, 'TeamReviewResponseMap'])
     for team_entry in team_entries
-      team_users = TeamsUser.find(:all,
-                                  :conditions => ["team_id = ?",team_entry.reviewee_id])
+      team_users = TeamsUser.where(["team_id = ?",team_entry.reviewee_id])
 
       for team_user in team_users
-        team_participant = AssignmentParticipant.find(:first,
-                                                      :conditions =>["user_id = ? and parent_id = ?", team_user.user_id, assgt.id])
+        team_participant = AssignmentParticipant.where(["user_id = ? and parent_id = ?", team_user.user_id, assgt.id]).first
         csEntry = CsEntriesAdaptor.new
         csEntry.participant_id = team_participant.id
         csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Review"]

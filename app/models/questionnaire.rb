@@ -75,9 +75,7 @@ class Questionnaire < ActiveRecord::Base
       errors.add(:min_question_score, "The minimum question score must be less than the maximum")
     end
 
-    results = Questionnaire.find(:all,
-                                 :conditions => ["id <> ? and name = ? and instructor_id = ?",
-                                                 id, name, instructor_id])
+    results = Questionnaire.where(["id <> ? and name = ? and instructor_id = ?", id, name, instructor_id])
     errors.add(:name, "Questionnaire names must be unique.") if results != nil and results.length > 0
   end
   end

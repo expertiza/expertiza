@@ -38,7 +38,7 @@ class CourseTeam < Team
 
   def export_participants
     userNames = Array.new
-    participants = TeamsUser.all(:conditions => ['team_id = ?', self.id])
+    participants = TeamsUser.where(['team_id = ?', self.id])
     participants.each do |participant|
       userNames.push(participant.name)
       userNames.push(" ")
@@ -88,7 +88,7 @@ class CourseTeam < Team
 
       if options[:has_column_names] == "true"
         name = row[0].to_s.strip
-        team = find(:first, :conditions => ["name =? and parent_id =?", name, course_id])
+        team = where(["name =? and parent_id =?", name, course_id]).first
         team_exists = !team.nil?
         name = handle_duplicate(team, name, course_id, options[:handle_dups])
         index = 1
@@ -145,7 +145,7 @@ class CourseTeam < Team
           teamUsers = Array.new
           tcsv.push(team.name)
           if (options["team_name"] == "true")
-            teamMembers = TeamsUser.all(:conditions => ['team_id = ?', team.id])
+            teamMembers = TeamsUser.where(['team_id = ?', team.id])
             teamMembers.each do |user|
               teamUsers.push(user.name)
               teamUsers.push(" ")

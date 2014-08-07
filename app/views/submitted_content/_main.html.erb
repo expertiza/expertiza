@@ -28,9 +28,9 @@
 <% if @assignment.require_quiz? %>
   <!-- Setting the uid to team id for a team assignment and participant id for an individual assignment -->
   <%# if @assignment.team_assignment?%>
-  <%    teams = TeamsUser.find(:all, :conditions => ["user_id = ?", session[:user].id])%>
+  <%    teams = TeamsUser.where(["user_id = ?", session[:user].id])%>
   <%     for t in teams do
-    if team = Team.find(:first, :conditions => ["id = ? and parent_id = ?", t.team_id, @assignment.id])
+    if team = Team.where(["id = ? and parent_id = ?", t.team_id, @assignment.id]).first
       break
     end
   end
@@ -44,7 +44,7 @@ end
 
   <% if (controller.action_name != "view_my_scores" and !(@map and @map.reviewer_id != session[:user].id)) %>
     <br/><b>Quiz:</b><br/><br/>
-    <% if questionnaire = Questionnaire.find(:first, :conditions => ["instructor_id = ?", uid]) %>
+    <% if questionnaire = Questionnaire.where(["instructor_id = ?", uid]).first %>
       <%= link_to 'View Quiz', :controller => :questionnaires, :action => :view_quiz, :id => questionnaire.id, :pid => participant.id %>
       <br/><br/>
       <% if @assignment.submission_allowed(participant.topic_id) %>

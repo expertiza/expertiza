@@ -3,6 +3,6 @@ class Suggestion < ActiveRecord::Base
   has_many :suggestion_comments
 
   def find_all_by_assignment_id(assignment_id)
-    all(:conditions => ["assignment_id = ?", assignment_id])
+    where(["assignment_id = ?", assignment_id])
   end
 end

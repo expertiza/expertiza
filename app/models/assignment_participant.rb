@@ -95,15 +95,14 @@ class AssignmentParticipant < Participant
   # Evaluates whether this participant contribution was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object
   def reviewed_by?(reviewer)
-    ParticipantReviewResponseMap.count(:conditions => ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',
-                                                       self.id, reviewer.id, assignment.id]) > 0
+    ParticipantReviewResponseMap.where(['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', self.id, reviewer.id, assignment.id]).count > 0
   end
 
 
   def quiz_taken_by?(contributor, reviewer)
     quiz_id = QuizQuestionnaire.find_by_instructor_id(contributor.id)
-    return QuizResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?',
-                                                 self.id, reviewer.id, quiz_id]) > 0
+    return QuizResponseMap.where(['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?',
+                                  self.id, reviewer.id, quiz_id]).count > 0
   end
 
   def has_submissions?
@@ -124,7 +123,7 @@ class AssignmentParticipant < Participant
       rmaps = ResponseMap.all(conditions: ["reviewer_id = #{self.id} && type = 'TeamReviewResponseMap'"])
         rmaps.each { |rm| reviewees.concat(AssignmentTeam.find(rm.reviewee_id).participants) }
     else
-      rmaps = ResponseMap.all(:conditions => ["reviewer_id = #{self.id} && type = 'ParticipantReviewResponseMap'"])
+      rmaps = ResponseMap.where(["reviewer_id = #{self.id} && type = 'ParticipantReviewResponseMap'"])
         rmaps.each {|rm| reviewees.push(AssignmentParticipant.find(rm.reviewee_id))}
     end
 
@@ -135,9 +134,9 @@ class AssignmentParticipant < Participant
   def get_reviewers
     reviewers = []
     if self.assignment.team_assignment? && self.team
-      rmaps = ResponseMap.all(:conditions => ["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponseMap'"])
+      rmaps = ResponseMap.where(["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponseMap'"])
     else
-      rmaps = ResponseMap.all(:conditions => ["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
+      rmaps = ResponseMap.where(["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
     end
     rmaps.each do |rm|
       reviewers.push(AssignmentParticipant.find(rm.reviewer_id))

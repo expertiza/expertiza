@@ -1,6 +1,6 @@
 <h1>View Bookmark</h1>
 <br/>
-<% @check_mapping = Bmapping.find(:first, :conditions =>["bookmark_id = ? and user_id = ?",@bookmark_mapping.bookmark_id, session[:user].id ])
+<% @check_mapping = Bmapping.where(["bookmark_id = ? and user_id = ?",@bookmark_mapping.bookmark_id, session[:user].id ]).first
 if (@check_mapping == nil ) %> <b>You don't have this bookmark in your repository</b>.
 <% else %> <b> Bookmark in your repository: </b>
   <%= link_to('  Edit', :controller => 'bookmarks', :action => 'edit_bookmark_form', :id => @check_mapping.id) %>

@@ -20,15 +20,15 @@ class SuperAdministrator < User
                 ['All private assignments','list_all_private']]
 
   def get(object_type, id, user_id)
-    object_type.find(:first, :conditions => ["id = ?", id])
+    object_type.where(["id = ?", id]).first
   end
 
   def list_all(object_type, user_id)
-    object_type.all(:conditions => "private = 0")
+    object_type.where("private = 0")
   end
 
   def list_all_private(object_type, user_id)
-    object_type.all(:conditions => "private = 1")
+    object_type.where("private = 1")
   end
 
   def list_admins(object_type, user_id)
@@ -52,7 +52,6 @@ class SuperAdministrator < User
   end
 
   def get(object_type, id, user_id)
-    object_type.find(:first,
-                     :conditions => ["id = ?", id])
+    object_type.where(["id = ?", id]).first
   end
 end

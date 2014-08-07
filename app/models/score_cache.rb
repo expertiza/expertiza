@@ -22,8 +22,8 @@ class ScoreCache < ActiveRecord::Base
       tm_id=@contributor_id
     else
       get_participant_score()
-      part = Participant.find(:first, :conditions => ["id = ?", @rm.reviewee_id])
-      tm_user=TeamsUser.find(:first, :conditions => ["user_id = ?", part.user_id])
+      part = Participant.where(["id = ?", @rm.reviewee_id])
+      tm_user=TeamsUser.where(["user_id = ?", part.user_id]).first
       tm_id=tm_user.team_id
     end
     update_score_cache()
@@ -31,16 +31,16 @@ class ScoreCache < ActiveRecord::Base
                                             # From here on to the end of this method is the algorithm of
                                             # score redistribution, for detailed algorithm, please check
                                             # the project documentation
-    tm_user_ct = TeamsUser.count(:all, :conditions => ["team_id = ?", tm_id])
-    tm_rv_ct = ScoreCache.count(:all, :conditions => ["reviewee_id = ? and object_type = ?", tm_id, "TeammateReviewResponseMap"])
-    sc_proj = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", tm_id, "TeamReviewResponseMap"])
+    tm_user_ct = TeamsUser.where(["team_id = ?", tm_id])
+    tm_rv_ct = ScoreCache.where(["reviewee_id = ? and object_type = ?", tm_id, "TeammateReviewResponseMap"]).count
+    sc_proj = ScoreCache.where(["reviewee_id = ? and object_type = ?", tm_id, "TeamReviewResponseMap"]).first
 
     if tm_user_ct == tm_rv_ct and sc_proj != nil
 
-      sc_cls = ScoreCache.all(:conditions => ["object_type = ?", "TeammateReviewResponseMap"])
-      ct_cls = ScoreCache.count(:all, :conditions => ["object_type = ?", "TeammateReviewResponseMap"])
+      sc_cls = ScoreCache.where(["object_type = ?", "TeammateReviewResponseMap"])
+      ct_cls = ScoreCache.where(["object_type = ?", "TeammateReviewResponseMap"]).count
 
-      tm_rv_all = ScoreCache.all(:conditions => ["reviewee_id = ? and object_type = ?", tm_id, "TeammateReviewResponseMap"])
+      tm_rv_all = ScoreCache.where(["reviewee_id = ? and object_type = ?", tm_id, "TeammateReviewResponseMap"])
 
 
       avg_cls = 0
@@ -65,19 +65,19 @@ class ScoreCache < ActiveRecord::Base
       rate = 0.5 # each point below threshold - offset will deduct the team review score of the student by 'rate'
       max_deduct = 10 # maximum deducted score a student could have
       use_cls = 0  # if the class average of teammate review score is used as the hardline
-      if sc_th = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", @assignment1.id,"HardLine"])
+      if sc_th = ScoreCache.where(["reviewee_id = ? and object_type = ?", @assignment1.id,"HardLine"]).first
         hardline = sc_th.score
       end
-      if sc_off = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", @assignment1.id,"Threshold"])
+      if sc_off = ScoreCache.where(["reviewee_id = ? and object_type = ?", @assignment1.id,"Threshold"]).first
         offset = sc_off.score
       end
-      if sc_rate = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", @assignment1.id,"RedisFactor"])
+      if sc_rate = ScoreCache.where(["reviewee_id = ? and object_type = ?", @assignment1.id,"RedisFactor"]).first
         rate = sc_rate.score
       end
-      if sc_max = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", @assignment1.id,"MaxDeduct"])
+      if sc_max = ScoreCache.where(["reviewee_id = ? and object_type = ?", @assignment1.id,"MaxDeduct"])
         max_deduct = sc_max.score
       end
-      if sc_ifcls = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?", @assignment1.id,"IfClass"])
+      if sc_ifcls = ScoreCache.where(["reviewee_id = ? and object_type = ?", @assignment1.id,"IfClass"]).first
         use_cls = sc_ifcls.score
       end
 
@@ -95,7 +95,7 @@ class ScoreCache < ActiveRecord::Base
       tm_rv_all.each do |item|
         teamrvsc = item.score
         if teamrvsc < (threshold - offset)
-          sc_mod = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and reviewee_id = ? and object_type = ?", tm_id, item.reviewee_id, "ModifiedAssignmentScore"])
+          sc_mod = ScoreCache.where(["reviewee_id = ? and reviewee_id = ? and object_type = ?", tm_id, item.reviewee_id, "ModifiedAssignmentScore"]).first
           if sc_mod == nil
             sc_mod = ScoreCache.new
           end
@@ -116,7 +116,7 @@ class ScoreCache < ActiveRecord::Base
         elsif teamrvsc > threshold
           total_plus += (teamrvsc - threshold)
         else
-          sc_mod = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and reviewee_id = ? and object_type = ?", tm_id, item.reviewee_id, "ModifiedAssignmentScore"])
+          sc_mod = ScoreCache.where(["reviewee_id = ? and reviewee_id = ? and object_type = ?", tm_id, item.reviewee_id, "ModifiedAssignmentScore"]).first
           if sc_mod == nil
             sc_mod = ScoreCache.new
           end
@@ -132,7 +132,7 @@ class ScoreCache < ActiveRecord::Base
       tm_rv_all.each do |item|
         teamrvsc = item.score
         if teamrvsc > threshold
-          sc_mod = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and reviewee_id = ? and object_type = ?", tm_id, item.reviewee_id, "ModifiedAssignmentScore"])
+          sc_mod = ScoreCache.where(["reviewee_id = ? and reviewee_id = ? and object_type = ?", tm_id, item.reviewee_id, "ModifiedAssignmentScore"]).first
           if sc_mod == nil
             sc_mod = ScoreCache.new
           end
@@ -148,15 +148,15 @@ class ScoreCache < ActiveRecord::Base
 
     end
 
-    score_all = ScoreCache.all(:conditions => ["reviewee_id = ? and object_type = ?", tm_id, "ModifiedAssignmentScore"])
+    score_all = ScoreCache.where(["reviewee_id = ? and object_type = ?", tm_id, "ModifiedAssignmentScore"])
     ##################end###########################
   end
 
   def self.get_team_score()
     @ass_id = @rm.reviewed_object_id
     @assignment1 = Assignment.find(@ass_id)
-    @teammember =  TeamsUser.find(:first, :conditions => ["team_id = ?",@rm.reviewee_id])  #team which is being reviewed
-    @participant1 = AssignmentParticipant.find(:first, :conditions =>["user_id = ? and parent_id = ?", @teammember.user_id, @ass_id])
+    @teammember =  TeamsUser.where(["team_id = ?",@rm.reviewee_id]).first  #team which is being reviewed
+    @participant1 = AssignmentParticipant.where(["user_id = ? and parent_id = ?", @teammember.user_id, @ass_id]).first
     @contributor_id = @teammember.team_id
     @questions = Hash.new
     questionnaires = @assignment1.questionnaires
@@ -192,7 +192,7 @@ class ScoreCache < ActiveRecord::Base
     @p_min = @scorehash[:min]
     @p_max = @scorehash[:max]
 
-    sc = ScoreCache.find(:first,:conditions =>["reviewee_id = ? and object_type = ?",  @contributor_id, @map_type ])
+    sc = ScoreCache.where(["reviewee_id = ? and object_type = ?",  @contributor_id, @map_type ]).first
     if sc == nil
       @msgs = "first entry"
       sc = ScoreCache.new
@@ -339,7 +339,7 @@ class ScoreCache < ActiveRecord::Base
     @participant = AssignmentParticipant.find(pid)
     @assignment_id = @participant.parent_id
 
-    assignment_num_reviews = ResponseMap.find(:all,:conditions => ["reviewed_object_id=? AND type=?", @assignment_id, 'TeamReviewResponseMap'])
+    assignment_num_reviews = ResponseMap.where(["reviewed_object_id=? AND type=?", @assignment_id, 'TeamReviewResponseMap'])
     @assignment_participants = AssignmentParticipant.find_all_by_parent_id(@assignment_id)
 
     count = 0
@@ -354,7 +354,7 @@ class ScoreCache < ActiveRecord::Base
   def self.get_metareviews_average(pid)
     @participant = AssignmentParticipant.find(pid)
     @assignment_id = @participant.parent_id
-    assignment_num_metareviews = ResponseMap.find(:all,:conditions => ["reviewed_object_id=? AND type=?", @assignment_id, 'MetareviewResponseMap'])
+    assignment_num_metareviews = ResponseMap.where(["reviewed_object_id=? AND type=?", @assignment_id, 'MetareviewResponseMap'])
     @assignment_participants = AssignmentParticipant.find_all_by_parent_id(@assignment_id)
 
     count = 0
@@ -370,7 +370,7 @@ class ScoreCache < ActiveRecord::Base
     @assignment_id = @participant.parent_id
 
     #@num_of_reviews = ResponseMap.where("reviewed_object_id=? AND reviewer_id = ? AND type=?", @assignment_id, @participant.id, 'TeamReviewResponseMap')
-    @num_of_reviews = ResponseMap.find(:all,:conditions => ["reviewed_object_id=? AND reviewer_id = ? AND type=?", @assignment_id, @participant.id, 'TeamReviewResponseMap'])
+    @num_of_reviews = ResponseMap.where(["reviewed_object_id=? AND reviewer_id = ? AND type=?", @assignment_id, @participant.id, 'TeamReviewResponseMap'])
 
     reviews_remaining = Array.new
     threshold = 2
@@ -386,7 +386,7 @@ class ScoreCache < ActiveRecord::Base
     @participant = AssignmentParticipant.find(pid)
     @assignment_id = @participant.parent_id
 
-    @num_of_metareviews = ResponseMap.find(:all,:conditions => ["reviewed_object_id=? AND reviewer_id = ? AND type=?", @assignment_id, @participant.id, 'MetareviewResponseMap'])
+    @num_of_metareviews = ResponseMap.where(["reviewed_object_id=? AND reviewer_id = ? AND type=?", @assignment_id, @participant.id, 'MetareviewResponseMap'])
 
     metaReviews_remaining = Array.new
     threshold=1

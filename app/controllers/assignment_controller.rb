@@ -403,7 +403,8 @@ class AssignmentController < ApplicationController
     end
 
     def define_instructor_notification_limit(assignment_id, questionnaire_id, limit)
-      existing = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?',session[:user].id,assignment_id,questionnaire_id])
+      existing = NotificationLimit
+        .where(['user_id = ? and assignment_id = ? and questionnaire_id = ?', session[:user].id, assignment_id,questionnaire_id ]).first
       if existing.nil?
         NotificationLimit.create(:user_id => session[:user].id,
                                  :assignment_id => assignment_id,
@@ -803,7 +804,7 @@ class AssignmentController < ApplicationController
       #  !!!NO usages found
       #--------------------------------------------------------------------------------------------------------------------
       def define_instructor_notification_limit(assignment_id, questionnaire_id, limit)
-        existing = NotificationLimit.find(:first, :conditions => ['user_id = ? and assignment_id = ? and questionnaire_id = ?',session[:user].id,assignment_id,questionnaire_id])
+        existing = NotificationLimit.where(['user_id = ? and assignment_id = ? and questionnaire_id = ?',session[:user].id,assignment_id,questionnaire_id]).first
         if existing.nil?
           NotificationLimit.create(:user_id => session[:user].id,
                                    :assignment_id => assignment_id,

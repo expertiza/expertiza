@@ -6,6 +6,7 @@ gem 'rails'
 
 ## Gems in Alphabetical Order
 
+gem 'activerecord-session_store'
 gem 'bind-it'
 gem 'bootstrap-sass'
 gem 'capistrano'

@@ -9,7 +9,7 @@ class TeamsParticipantsController < ApplicationController
   def list
     @team = Team.find_by_id(params[:id])
     @assignment = Assignment.find(@team.assignment_id)
-    @teams_participants = TeamsParticipant.paginate(:page => params[:page], :per_page => 10, :conditions => ["team_id = ?", params[:id]])
+    @teams_participants = TeamsParticipant.page(page => params[:page]).per_page(10).where(["team_id = ?", params[:id]])
   end
 
   def new

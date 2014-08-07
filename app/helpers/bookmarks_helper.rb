@@ -3,7 +3,7 @@ module BookmarksHelper
   def self.find_tags(tags_array)
     @tags = Array.new
     for each_of_my_tag in tags_array
-      this_tag_tuple= Tag.find(:first, :conditions=>["tagname = ?",each_of_my_tag])
+      this_tag_tuple= Tag.where(["tagname = ?",each_of_my_tag]).first
       unless this_tag_tuple.nil?
         @tags << this_tag_tuple
       else

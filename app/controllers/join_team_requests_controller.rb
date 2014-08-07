@@ -45,7 +45,7 @@ class JoinTeamRequestsController < ApplicationController
   #create a new join team request entry for join_team_request table and add it to the table
   def create
     #check if the advertisement is from a team member and if so disallow requesting invitations
-    team_member=TeamsUser.all(:conditions => ['team_id =? and user_id =?', params[:team_id],session[:user][:id]])
+    team_member=TeamsUser.where(['team_id =? and user_id =?', params[:team_id],session[:user][:id]])
     if (team_member.size > 0)
       flash[:note] = "You are already a member of team."
     else

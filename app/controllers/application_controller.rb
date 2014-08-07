@@ -2,9 +2,10 @@ require 'goldberg_filters'
 
 class ApplicationController < ActionController::Base
   include AccessHelper
+  session ||= Hash.new
 
   helper_method :current_user_session, :current_user, :current_user_role?
-  protect_from_forgery unless Rails.env.test?
+  protect_from_forgery with: :exception
   before_filter :set_time_zone
   before_filter :authorize
 
@@ -23,7 +24,7 @@ class ApplicationController < ActionController::Base
 
   def user_for_paper_trail
     if session[:user]
-      session[:user].id
+      session[:user].try :id
     else
       nil
     end

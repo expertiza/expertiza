@@ -64,7 +64,7 @@ module SubmittedContentHelper
       end
       ret += "<input type=hidden id='filenames_#{index}' name='filenames[#{index}]' value='"+File.dirname(disp)+"/" +File.basename(path)+"'>"
       if File.ftype( disp ) == "directory"
-        ret += "<a title='Expand/Collapse' href='#' onclick='javascript:collapseSubDirectory(#{index}); return false;'><img id='expand.#{index}' alt='Expand/Collapse' title='Expand/Collapse' src='/images/up.png'></a>&nbsp;"
+        ret += "<a title='Expand/Collapse' href='#' onclick='javascript:collapseSubDirectory(#{index}); return false;'><img id='expand.#{index}' alt='Expand/Collapse' title='Expand/Collapse' src='/assets/up.png'></a>&nbsp;"
           ret += link_to path, :controller=>'submitted_content', :action => 'edit', :id => participant.id, :download => File.basename(path), "current_folder[name]" =>  File.dirname(disp)
         ret += "</li>"
         ret += list_sub_directories(disp, participant)

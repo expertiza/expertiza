@@ -43,11 +43,11 @@ padding:15px 20px 5px;
 
 /*** Custom List Formatting ***/
 ul.roles_list {  
-list-style-image: url("/images/role.png");
+list-style-image: url("/assets/role.png");
 }
 
 ul.permissions_list {  
-list-style-image: url("/images/permission.png");
+list-style-image: url("/assets/permission.png");
 }
 
 

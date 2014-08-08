@@ -25,6 +25,7 @@ class AuthController < ApplicationController
         session[:user] = user
         AuthController.set_current_role(user.role_id, session)
 
+        binding.pry
         redirect_to :controller => AuthHelper::get_home_controller(session[:user]), :action => AuthHelper::get_home_action(session[:user])
       else
         logger.warn "Failed login attempt"

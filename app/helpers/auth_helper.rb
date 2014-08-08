@@ -1,12 +1,12 @@
 module AuthHelper
   def self.get_home_action(user)
-    user.role.try(:get_home_action)
+    user.role.get_home_action
   rescue
     'drill'
   end
 
   def self.get_home_controller(user)
-    user.role.try(:get_home_controller)
+    user.role.get_home_controller
   rescue
     'tree_display'
   end

@@ -521,7 +521,7 @@ class SignUpSheetController < ApplicationController
           node = 'topic_name'
           dg = build_dependency_graph(topics, node) # rebuild with new node name
 
-          graph_output_path = 'public/images/staggered_deadline_assignment_graph'
+          graph_output_path = 'public/assets/staggered_deadline_assignment_graph'
           FileUtils::mkdir_p graph_output_path
           dg.write_to_graphic_file('jpg', "#{graph_output_path}/graph_#{params[:assignment_id]}")
 

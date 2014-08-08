@@ -15,9 +15,9 @@ function collapseSubDirectory(row) {
     }
   }
   if (visible) {
-    image.src="/images/up.png"
+    image.src="/assets/up.png"
   } else {
-    image.src="/images/down.png"
+    image.src="/assets/down.png"
   }
 }
 function createNewFolder(){

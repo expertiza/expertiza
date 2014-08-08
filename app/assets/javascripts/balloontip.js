@@ -4,7 +4,7 @@
 var disappeardelay=250  //tooltip disappear delay (in miliseconds)
 var verticaloffset=0 //vertical offset of tooltip from anchor link, if any
 var enablearrowhead=1 //0 or 1, to disable or enable the arrow image
-var arrowheadimg=["/images/arrowdown.gif", "/images/arrowup.gif"] //path to down and up arrow images
+var arrowheadimg=["/assets/arrowdown.gif", "/assets/arrowup.gif"] //path to down and up arrow images
 var arrowheadheight=11 //height of arrow image (amount to reveal)
 
 /////No further editting needed

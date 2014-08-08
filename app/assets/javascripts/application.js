@@ -10,18 +10,18 @@
 // WARNING: THE FIRST BLANK LINE MARKS THE END OF WHAT'S TO BE PROCESSED, ANY BLANK LINE SHOULD
 // GO AFTER THE REQUIRES BELOW.
 //
-//= require superfish
-//= require hoverIntent
 //= require turbolinks
 //= require jquery
 //= require jquery_ujs
+//= require hoverIntent
+//= require superfish
 //= require bootstrap
 //= require jquery.ui.all
-//= require_tree .
 //= require_self
+//= require_tree .
 
 $(document).on('ready page:load', function() {
-  $(this).trigger('turbo:ready');
+  jQuery(this).trigger('turbo:ready');
 });
 
 function capitalize(str) {

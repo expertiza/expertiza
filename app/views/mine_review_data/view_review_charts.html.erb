@@ -43,7 +43,7 @@
                   <% if course and !course.empty? %>
                     <tr>
                       <td style="width:10em"><%= @controller.get_course_name(course) %></td>
-                      <td><a id="<%= index %>Link" name="<%= index %>Link" href="#" <% if assignments.length > 0  %>onclick="toggleList('<%= index %>',<%= assignments.length ==0? 0:1 %>);alternate('theTable');return false;"><img src="/images/expand.png"><% else %>onclick="return false;"><img src="/images/noaction.png"><% end %></a></td>
+                      <td><a id="<%= index %>Link" name="<%= index %>Link" href="#" <% if assignments.length > 0  %>onclick="toggleList('<%= index %>',<%= assignments.length ==0? 0:1 %>);alternate('theTable');return false;"><img src="/assets/expand.png"><% else %>onclick="return false;"><img src="/assets/noaction.png"><% end %></a></td>
 
                       <td id="<%= index %>_1" name="<%= index %>_1"  style="display: none;">
                         <table><tr>

@@ -8,7 +8,7 @@
           jQuery('#assignment_review_assignment_strategy').on('change', function() {reviewStrategyChanged();});
       </script>
 
-      <img src="/images/info.png" title="- Instructor-Selected: Instructor decides who reviews whom
+      <img src="/assets/info.png" title="- Instructor-Selected: Instructor decides who reviews whom
       - Student-Selected: Students choose from a list of assignments or topics to review.
       - Auto-Selected: When a student is about to begin a review, Expertiza assigns that student a particular review.">
     </td>
@@ -18,7 +18,7 @@
     <td>
       <%= label_tag('assignment[review_topic_threshold]', 'Review topic threshold(k):') %>
       <%= text_field_tag('assignment[review_topic_threshold]', @assignment.review_topic_threshold) %>
-      <img src="/images/info.png" title="A topic is reviewable if the minimum number of reviews already done for the submissions
+      <img src="/assets/info.png" title="A topic is reviewable if the minimum number of reviews already done for the submissions
       on that topic is within k of the minimum number of reviews done on the least-reviewed submission on any topic.">
     </td>
   </tr>

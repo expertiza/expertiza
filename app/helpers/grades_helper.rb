@@ -73,9 +73,9 @@ table_hash
     case ques_type.q_type
     when "Checkbox"
       if is_view
-        view_output = "<img src=\"/images/delete_icon.png\">" + question.txt + "<br/>"
+        view_output = "<img src=\"/assets/delete_icon.png\">" + question.txt + "<br/>"
         if score.comments == "1"
-          view_output = "<img src=\"/images/Check-icon.png\">" + question.txt + "<br/>"
+          view_output = "<img src=\"/assets/Check-icon.png\">" + question.txt + "<br/>"
         end
       end
       param1 = "response/checkbox"

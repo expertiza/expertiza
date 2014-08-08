@@ -58,10 +58,10 @@ function toggleList(elementId,listSize) {
   var objLinks = document.getElementsByName(elementId+'Link')
     for (var i = 0; i < objLinks.length; i++) {
       if (obj.style.display != 'none') {		    
-        objLinks[i].innerHTML = '<img src="/images/collapse.png">'
+        objLinks[i].innerHTML = '<img src="/assets/collapse.png">'
       }
       else {		    
-        objLinks[i].innerHTML = '<img src="/images/expand.png">'
+        objLinks[i].innerHTML = '<img src="/assets/expand.png">'
       }
     }
 }

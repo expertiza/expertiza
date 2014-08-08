@@ -132,9 +132,9 @@ module ResponseHelper
         #check to see if rendering view
         view_output = nil
         if is_view
-          view_output = "<img src=\"/images/delete_icon.png\">" + question.txt + "<br/>"
+          view_output = "<img src=\"/assets/delete_icon.png\">" + question.txt + "<br/>"
           if @review_scores && @review_scores[q_number].comments == "1"
-            view_output = "<img src=\"/images/Check-icon.png\">" + question.txt + "<br/>"
+            view_output = "<img src=\"/assets/Check-icon.png\">" + question.txt + "<br/>"
           end
         end
 

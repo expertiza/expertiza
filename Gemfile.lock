@@ -44,6 +44,8 @@ GEM
     addressable (2.3.6)
     ansi (1.4.3)
     arel (5.0.1.20140414130214)
+    awesome_nested_set (3.0.0)
+      activerecord (>= 4.0.0, < 5)
     bind-it (0.2.7)
       rjb (~> 1.4.3)
     bootstrap-sass (3.2.0.0)
@@ -325,6 +327,7 @@ PLATFORMS
 DEPENDENCIES
   RedCloth
   activerecord-session_store
+  awesome_nested_set
   bind-it
   bootstrap-sass
   capistrano

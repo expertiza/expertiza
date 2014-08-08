@@ -1,6 +1,6 @@
 var ddajaxtabssettings={}
 ddajaxtabssettings.bustcachevar=1  //bust potential caching of external pages after initial request? (1=yes, 0=no)
-ddajaxtabssettings.loadstatustext="<img src='/images/loading.gif' /> Requesting content..." 
+ddajaxtabssettings.loadstatustext="<img src='/assets/loading.gif' /> Requesting content..." 
 
 
 

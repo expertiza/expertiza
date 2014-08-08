@@ -25,7 +25,7 @@ a:hover {
 }
 
 .wrapper {
- background: white url('/images/column_200_1.png') repeat-y right ;
+ background: white url('/assets/column_200_1.png') repeat-y right ;
 }
 
 .header * {
@@ -100,7 +100,7 @@ a:hover {
 }
 
 #suckerfish li ul li a.daddy {
-  background-image: url("/images/daddy_rightarrow.gif") ;
+  background-image: url("/assets/daddy_rightarrow.gif") ;
   background-position: right center ;
   background-repeat: no-repeat ;
 }
@@ -178,7 +178,7 @@ a:hover {
 }
 #actionmenu li.daddy {  
   width: 9em;
-  background-image: url("/images/action_img.png") ;
+  background-image: url("/assets/action_img.png") ;
   background-position: center center;
   background-repeat: no-repeat ;
 }
@@ -206,7 +206,7 @@ a:hover {
 
 .container {
   width: 100%;
-  background: white url('/images/column_200_1.png') repeat-y right ;
+  background: white url('/assets/column_200_1.png') repeat-y right ;
   float: left ;
   margin-right: -200px ;
 }

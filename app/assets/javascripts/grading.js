@@ -8,7 +8,7 @@
   
   function collapseObj(obj, atag){
 	obj.style.display = 'none';
-  	atag.innerHTML = '<img src="/images/expand.png">';  	    	
+  	atag.innerHTML = '<img src="/assets/expand.png">';  	    	
   	   	
   	files = document.getElementById(obj.id+'_files');
   	if (files) {
@@ -45,7 +45,7 @@
   	    var obj = document.getElementById(elementId+"_"+sublistsize);
   	    if (hidden) {
   	    	obj.style.display = '';
-  	    	atag.innerHTML = '<img src="/images/collapse.png">';}
+  	    	atag.innerHTML = '<img src="/assets/collapse.png">';}
   	    else {
   	    	collapseObj(obj, atag);  	    	  	       
   	    }  	    
@@ -66,7 +66,7 @@
   	  }
   	  else {
   	    obj.style.display = '';
-  	  	atag.innerHTML = '<img src="/images/collapse.png">';  	    	    
+  	  	atag.innerHTML = '<img src="/assets/collapse.png">';  	    	    
   	  }  	    
   	  sublistsize += 1;  
   	  var obj = document.getElementById(elementId+"_"+sublistsize);	    

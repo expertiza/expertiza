@@ -156,7 +156,7 @@ function addElement() {
       '<TD ALIGN=LEFT WIDTH=20%> '+submission_var+' </TD>'+
       '<TD ALIGN=CENTER WIDTH=20%>' +
       '<input type="text" id="additional_submit_deadline_'+j+'_due_at" name ="additional_submit_deadline['+j+'][due_at]" value='+submit_due+' >' +
-      '<img src="/images/cal.gif" onClick=\"NewCal(\'additional_submit_deadline_'+j+'_due_at\',\'YYYYMMDD\',true,24); return false;">' +
+      '<img src="/assets/cal.gif" onClick=\"NewCal(\'additional_submit_deadline_'+j+'_due_at\',\'YYYYMMDD\',true,24); return false;">' +
       '</TD>'+
 
 
@@ -217,7 +217,7 @@ function addElement() {
 
       //'<TD ALIGN=CENTER WIDTH=5%><input type="text" id="additional_review_deadline_'+j+'_due_at" name ="additional_review_deadline['+j+'][due_at]" onClick="NewCal(\'additional_review_deadline_'+j+'_due_at\',\'YYYYMMDD\',true,24); return false;"/></TD>'+
       '<TD ALIGN=CENTER WIDTH=20%><input type="text" id="additional_review_deadline_'+j+'_due_at" name ="additional_review_deadline['+j+'][due_at]" value='+review_due+'>' +
-      ' <img src="/images/cal.gif" onClick=\"NewCal(\'additional_review_deadline_'+j+'_due_at\',\'YYYYMMDD\',true,24); return false;"></TD>'+
+      ' <img src="/assets/cal.gif" onClick=\"NewCal(\'additional_review_deadline_'+j+'_due_at\',\'YYYYMMDD\',true,24); return false;"></TD>'+
 
       '<TD ALIGN=CENTER WIDTH=10%><select id="additional_review_deadline_'+j+'_submission_allowed_id" name ="additional_review_deadline['+j+'][submission_allowed_id]">'+
       '<option id="rev_sa_select2_'+i+'" value=2>Late</option>' +

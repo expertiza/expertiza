@@ -6,7 +6,7 @@
 
 # change access permission from public to private or vice versa
 class CourseController < ApplicationController
-  auto_complete_for :user, :name
+  autocomplete :user, :name
   require 'fileutils'
 
   def action_allowed?

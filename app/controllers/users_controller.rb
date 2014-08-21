@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  auto_complete_for :user, :name
+  autocomplete :user, :name
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
     :redirect_to => { :action => :list }

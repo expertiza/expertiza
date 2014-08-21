@@ -1,5 +1,5 @@
 class StudentTeamController < ApplicationController
-  auto_complete_for :user, :name
+  autocomplete :user, :name
 
   def action_allowed?
     current_role_name.eql?("Student")

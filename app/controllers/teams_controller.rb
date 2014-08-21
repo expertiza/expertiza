@@ -1,5 +1,5 @@
 class TeamsController < ApplicationController
-  auto_complete_for :user, :name
+  autocomplete :user, :name
 
 
   def action_allowed?

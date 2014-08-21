@@ -1,5 +1,5 @@
 class AssignmentsController < ApplicationController
-  auto_complete_for :user, :name
+  autocomplete :user, :name
   before_filter :authorize
 
   def action_allowed?

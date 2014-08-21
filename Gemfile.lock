@@ -368,7 +368,6 @@ DEPENDENCIES
   rspec-rails
   rubyzip
   rwordnet
-  sass
   sass-rails (~> 4.0.2)
   seer
   selenium-webdriver

@@ -1,5 +1,5 @@
 class ParticipantsController < ApplicationController
-  auto_complete_for :user, :name
+  autocomplete :user, :name
 
   def action_allowed?
     case params[:action]

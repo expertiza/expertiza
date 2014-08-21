@@ -1,5 +1,5 @@
 class AssignmentController < ApplicationController
-  auto_complete_for :user, :name
+  autocomplete :user, :name
   before_filter :authorize
   #-------------------------------------------------------------------------------------------------------------------
   # COPY

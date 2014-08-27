@@ -11,6 +11,8 @@ gem 'awesome_nested_set'
 gem 'bind-it'
 gem 'bootstrap-sass'
 gem 'capistrano'
+gem "capistrano-db-tasks", require: false
+gem 'capistrano-rails'
 gem 'coveralls', require: false
 gem 'delayed_job_active_record'
 gem 'edavis10-ruby-web-search'

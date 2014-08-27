@@ -1,7 +1,7 @@
 class ScrubDatabase
   def self.run!
     puts "Scrubbing #{User.count} users"
-    User.all.each do |user|
+    User.find_each do |user|
       user.name = "user#{user.id}"
       user.fullname = "#{user.id}, #{user.role.name}"
       user.email = "expertiza@mailinator.com"

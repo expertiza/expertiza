@@ -1,6 +1,6 @@
 class CreateFolderNodes < ActiveRecord::Migration
   def self.up
-    folders = TreeFolder.find(:all)
+    folders = TreeFolder.all
     folders.each {
       |folder|
       FolderNode.create(:node_object_id => folder.id, :parent_id => nil)
@@ -8,7 +8,7 @@ class CreateFolderNodes < ActiveRecord::Migration
   end
 
   def self.down
-    nodes = FolderNode.find(:all)
+    nodes = FolderNode.all
     nodes.each { |node| node.destroy }    
   end
 end

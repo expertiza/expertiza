@@ -6,7 +6,7 @@ class CleanupAssignmentIndices < ActiveRecord::Migration
     change_column :assignments, :review_strategy_id, :integer, :null => true
     change_column :assignments, :mapping_strategy_id, :integer, :null => true
     
-    Assignment.find(:all).each{
+    Assignment.find_each{
       | assignment |
       if assignment.course_id.nil? or assignment.course_id == 0 or Course.find(assignment.course_id).nil?
         assignment.update_attribute('course_id',nil)

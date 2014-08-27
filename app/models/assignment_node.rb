@@ -46,7 +46,7 @@ class AssignmentNode < Node
     else
       find_conditions = [conditions, values]
     end
-    self.include(:assignment)where(find_conditions).order("assignments.#{sortvar} #{sortorder}")
+    self.includes(:assignment).where(find_conditions).order("assignments.#{sortvar} #{sortorder}")
 
   end
 

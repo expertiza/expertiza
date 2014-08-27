@@ -9,6 +9,7 @@ class Node < ActiveRecord::Base
   acts_as_nested_set
 
   belongs_to :parent, :class_name => 'Node', :foreign_key => 'parent_id'
+  has_many :children, class_name: Node, foreign_key: 'parent_id'
 
   # Retrieves the nodes of this type
   def self.get(sortvar = nil,sortorder =nil,user_id = nil,show = nil, parent_id = nil,search=nil)

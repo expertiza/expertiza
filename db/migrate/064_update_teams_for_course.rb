@@ -13,7 +13,7 @@ class UpdateTeamsForCourse < ActiveRecord::Migration
     rename_column :teams, :assignment_id, :parent_id
     add_column :teams, :type, :string
     
-    teams = Team.find(:all)
+    teams = Team.all
     teams.each{ 
       | team | 
       team.type = 'AssignmentTeam'
@@ -22,7 +22,7 @@ class UpdateTeamsForCourse < ActiveRecord::Migration
   end
 
   def self.down
-    teams = Team.find(:all)
+    teams = Team.all
     teams.each{ 
       | team | 
       if team.type == 'CourseTeam'

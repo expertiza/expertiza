@@ -80,8 +80,7 @@ class MenuItem < ActiveRecord::Base
     # List of items to return
     items = []
 
-    menu_items = self.find(:all,
-                           :order => 'parent_id, seq, id')
+    menu_items = self.all.order('parent_id, seq, id')
     for item in menu_items do
       if item.controller_action_id.to_i > 0
         item.controller_action =

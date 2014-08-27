@@ -9,7 +9,7 @@ class LatePoliciesAddColumns < ActiveRecord::Migration
     add_column :late_policies, :policy_name, :string, :null => false
 
     index = 1
-    LatePolicy.find(:all).each do |f|
+    LatePolicy.find_each do |f|
       f.update_attribute :instructor_id, 2
       f.update_attribute :policy_name, 'Default Policy ' + index.to_s
       index += 1

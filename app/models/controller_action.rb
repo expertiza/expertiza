@@ -54,7 +54,7 @@ class ControllerAction < ActiveRecord::Base
       end
     end
 
-    actions = ControllerAction.find(:all)
+    actions = ControllerAction.all
     for action in actions do
       if action.permission_id
         if perms.has_key?(action.permission_id)
@@ -75,10 +75,10 @@ class ControllerAction < ActiveRecord::Base
   end
 
   def self.find_for_permission(p_ids)
-    if p_ids and p_ids.length > 0
-      return where(['permission_id in (?)', p_ids].order('name')
+    if p_ids && p_ids.length > 0
+      where(['permission_id in (?)', p_ids]).order('name')
     else
-      return Array.new
+      Array.new
     end
   end
 

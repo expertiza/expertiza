@@ -26,7 +26,7 @@ class CreateAssignmentQuestionnaires < ActiveRecord::Migration
              ADD CONSTRAINT fk_aq_questionnaire_id
              FOREIGN KEY (questionnaire_id) REFERENCES questionnaires(id)'    
     
-    Assignment.find(:all).each{
+             Assignment.find_each{
       | assignment |
       
       make_association('ReviewQuestionnaire',         assignment, assignment.review_questionnaire_id)

@@ -1,6 +1,5 @@
 class LatePolicy < ActiveRecord::Base
 
-  attr_accessible :policy_name, :instructor_id, :max_penalty, :penalty_per_unit, :penalty_unit
   belongs_to :user
 
   has_many :assignments

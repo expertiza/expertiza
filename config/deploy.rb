@@ -1,67 +1,78 @@
-require 'capistrano/ext/multistage'
-require 'bundler/capistrano'
+# config valid only for Capistrano 3.1
+lock '3.2.1'
 
-set :application, "expertiza"
-set :repository,  "git://github.com/expertiza/expertiza.git"
-set :use_sudo, false
+# CapistranoDbTasks (https://github.com/sgruhier/capistrano-db-tasks)
+require 'capistrano-db-tasks'
 
-set :scm, :git
-#set :git_enable_submodules, 1
-set :branch do
-  branch = Capistrano::CLI.ui.ask "Branch to deploy (make sure to push first) [#{default_branch}]: "
-  branch = default_branch if branch.empty?
-  branch
-end
+# if you haven't already specified
+set :rails_env, "production"
 
-set :bundle_without,  [:development, :test]
+# if you want to remove the local dump file after loading
+set :db_local_clean, true
 
-set :deploy_to, "/local/rails/expertiza"
-set :runner, "www-data"
-set :user do
-  puts "\033[32mYou need to log in. This is generally your Unity ID.\033[0m"
-  user = Capistrano::CLI.ui.ask "Login: "
-end
+# if you want to remove the dump file from the server after downloading
+set :db_remote_clean, true
+
+# If you want to import assets, you can change default asset dir (default = system)
+# This directory must be in your shared directory on the server
+set :assets_dir, %w(public/assets public/att)
+set :local_assets_dir, %w(public/assets public/att)
+
+# if you want to work on a specific local environment (default = ENV['RAILS_ENV'] || 'development')
+set :locals_rails_env, "production"
+
+
+set :application, 'expertiza'
+set :repo_url, 'git@github.com.com:expertiza/expertiza.git'
+
+# Default branch is :master
+# ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
+
+# Default deploy_to directory is /var/www/my_app
+# set :deploy_to, '/var/www/my_app'
+
+# Default value for :scm is :git
+# set :scm, :git
+
+# Default value for :format is :pretty
+# set :format, :pretty
+
+# Default value for :log_level is :debug
+# set :log_level, :debug
+
+# Default value for :pty is false
+# set :pty, true
+
+# Default value for :linked_files is []
+set :linked_files, %w{config/database.yml log pg_data}
+
+# Default value for linked_dirs is []
+# set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
+
+# Default value for default_env is {}
+# set :default_env, { path: "/opt/ruby/bin:$PATH" }
+
+# Default value for keep_releases is 5
+# set :keep_releases, 5
 
 namespace :deploy do
-  task :stop do; end
-  task :start do; end
 
-  desc "Restart the application."
+  desc 'Restart application'
   task :restart do
-    run "touch #{current_path}/tmp/restart.txt"
+    on roles(:app), in: :sequence, wait: 5 do
+      execute :touch, release_path.join('tmp/restart.txt')
+    end
   end
 
-  desc "Symlink shared files into the current deploy directory."
-  task :symlink_shared do
-    run "ln -s #{shared_path}/pg_data #{release_path}"
-    run "ln -sf #{shared_path}/database.yml #{release_path}/config/database.yml"
+  after :publishing, :restart
+
+  after :restart, :clear_cache do
+    on roles(:web), in: :groups, limit: 3, wait: 10 do
+      # Here we can do anything such as:
+      # within release_path do
+      #   execute :rake, 'cache:clear'
+      # end
+    end
   end
+
 end
-
-after "deploy:update_code", "deploy:symlink_shared"
-
-desc "Load data into the local development database."
-task :load_data, :roles => :db, :only => { :primary => true } do
-  require 'yaml'
- 
-  database = YAML::load_file('config/database.yml')
-  filename = "dump.#{Time.now.strftime '%Y-%m-%d_%H:%M:%S'}.sql.gz"
-  command = "mysqldump -u #{database['production']['username']} --password=#{database['production']['password']} #{database['production']['database']} --add-drop-table | gzip > /tmp/#{filename}"
- 
-  on_rollback { delete "/tmp/#{filename}" }
-  run command do |channel, stream, data|
-    puts data
-  end
-
-  on_rollback { system " rm -f #{filename}" }
-  get "/tmp/#{filename}", filename
-
-  logger.info 'Dropping and recreating database'
-  system 'rake db:drop && rake db:create'
-
-  logger.info 'Importing production database into local development database'
-  system "gunzip -c #{filename} | mysql -u #{database['development']['username']} --password=#{database['development']['password']} #{database['development']['database']} && rm -f #{filename}"
-end
-
-set :default_environment, 'JAVA_HOME' => "/etc/alternatives/java_sdk/"
-# set :default_environment, 'JAVA_HOME' => "/usr/lib/jvm/java-6-openjdk/"

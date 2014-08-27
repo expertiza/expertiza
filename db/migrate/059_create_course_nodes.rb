@@ -1,6 +1,6 @@
 class CreateCourseNodes < ActiveRecord::Migration
   def self.up
-     courses = Course.find(:all)
+    courses = Course.all
      
      folder = TreeFolder.find_by_name('Courses')
      parent = FolderNode.find_by_node_object_id(folder.id)
@@ -12,7 +12,7 @@ class CreateCourseNodes < ActiveRecord::Migration
   end
 
   def self.down
-    nodes = CourseNode.find(:all)
+    nodes = CourseNode.all
     nodes.each {|node| node.destroy }
   end
 end

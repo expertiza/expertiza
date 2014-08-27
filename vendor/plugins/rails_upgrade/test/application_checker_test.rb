@@ -47,14 +47,14 @@ class ApplicationCheckerTest < ActiveSupport::TestCase
   end
 
   def test_check_ar_methods_in_controller
-    make_file("app/controllers", "post_controller.rb", "Post.find(:all)")
+    make_file("app/controllers", "post_controller.rb", "Post.all")
     @checker.check_ar_methods
 
     assert @checker.alerts.has_key?("Soon-to-be-deprecated ActiveRecord calls")
   end
 
   def test_check_ar_methods_in_models
-    make_file("app/models", "post.rb", "Post.find(:all)")
+    make_file("app/models", "post.rb", "Post.all")
     @checker.check_ar_methods
 
     key = "Soon-to-be-deprecated ActiveRecord calls"
@@ -63,7 +63,7 @@ class ApplicationCheckerTest < ActiveSupport::TestCase
   end
   
   def test_check_svn_subdirs_are_not_included
-    make_file("app/models/.svn/text-base", "foo.rb.tmp", "Post.find(:all)")
+    make_file("app/models/.svn/text-base", "foo.rb.tmp", "Post.all")
     @checker.check_ar_methods
     assert @checker.alerts.empty?
   end

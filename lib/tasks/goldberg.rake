@@ -52,7 +52,7 @@ end
 
 def dump_for_class(klass, dest)
   filename = "#{dest}/#{klass.to_s}.yml"
-  records = klass.find(:all)
+  records = klass.all
   File.open(filename, 'w') do |out|  
     YAML.dump(records, out)
   end

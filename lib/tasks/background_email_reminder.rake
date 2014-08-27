@@ -2,7 +2,7 @@ desc "Send email reminders to all students with upcoming assignment deadlines"
 task :send_email_reminders => :environment do
         #puts "~~~~~~~~~~Spawn Running, time.now is #{Time.now}\n"
         # find all assignments in database                
-        #allAssign = Assignment.find(:all)
+  #allAssign = Assignment.al
         #query to pick only those assignments that were created in the last 2 weeks - to avoid picking all assignments
         allAssign = Assignment.find(:all, :include => {:participants => :user}, :conditions => ["created_at >= ? AND created_at <= ?", Time.now - 1209600, Time.now]) 
         for assign in allAssign

@@ -16,14 +16,14 @@ class UpdateParticipantTypes < ActiveRecord::Migration
     
     rename_column :participants, :assignment_id, :parent_id
     
-    participants = Participant.find(:all)
+    participants = Participant.all
     participants.each{
       |participant|
       participant.type = 'AssignmentParticipant'
       participant.save
     }
     
-    course_users = CoursesUsers.find(:all)
+    course_users = CoursesUsers.all
     course_users.each{
       |user|
       CourseParticipant.create(:user_id => user.user_id, :parent_id => user.course_id)
@@ -38,7 +38,7 @@ class UpdateParticipantTypes < ActiveRecord::Migration
       t.column :active, :boolean
     end
     
-    course_users = CourseParticipant.find(:all)
+    course_users = CourseParticipant.all
     course_users.each{
       |user|
       CoursesUser.create(:user_id => user.user_id, :course_id => user.parent_id)

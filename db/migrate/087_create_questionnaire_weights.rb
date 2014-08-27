@@ -7,7 +7,7 @@ class CreateQuestionnaireWeights < ActiveRecord::Migration
       t.column :type, :string
     end
     
-    Assignment.find(:all).each{
+    Assignment.find_each{
       |assignment|
       if assignment.review_questionnaire_id != nil && assignment.review_questionnaire_id != 0
         qweight = ReviewWeight.create(
@@ -51,7 +51,7 @@ class CreateQuestionnaireWeights < ActiveRecord::Migration
 
   def self.down
     add_column :assignments, :review_weight,:float
-    ReviewWeight.find(:all).each{
+    ReviewWeight.find_each{
       |item|
       assignment = Assignment.find(item.assignment_id)
       assignment.review_weight = item.weight

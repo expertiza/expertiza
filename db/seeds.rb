@@ -327,7 +327,7 @@ Node.create(:parent_id => n1.id, :node_object_id => TreeFolder.find_by_name('Glo
 Node.create(:parent_id => n1.id, :node_object_id => TreeFolder.find_by_name('Course Evaluation').id)
 # For some odd reason, setting :type => 'FolderNode' does not work in the create statements. So each
 # of the node entries is manually getting its type set.
-Node.all.each do |n|
+Node.find_each do |n|
   n.type = "FolderNode"
   n.save
 end

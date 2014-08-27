@@ -63,7 +63,7 @@ class CreateTeammateReviewMappings < ActiveRecord::Migration
     add_column :teammate_reviews, :reviewee_id, :integer, :null => false
     add_column :teammate_reviews, :assignment_id, :integer, :null => false
     
-    TeammateReview.find(:all).each{
+    TeammateReview.find_each{
       | review |
       map = TeammateReviewMapping.find(review.mapping_id)
       review.reviewer_id = map.reviewer_id

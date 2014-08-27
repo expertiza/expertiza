@@ -381,7 +381,7 @@ newer_version_comments = ReviewComment.find_all_by_review_file_id(files[:@newer_
 
   def render_error_page(exception = nil)
     redirect_to :controller => 'content_pages', :action => 'show',
-      :id => SystemSettings.find(:first).not_found_page_id
+      :id => SystemSettings.first.not_found_page_id
 
   end
 

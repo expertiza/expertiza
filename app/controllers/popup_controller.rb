@@ -9,7 +9,7 @@ class PopupController < ApplicationController
     @assignment = Assignment.find(@team.parent_id)
     @assignment_id = @assignment.id
     #  @teamname = Team.find(params[:id]).name
-    @teamusers = TeamsUser.find_all_by_team_id(params[:id])
+    @teamusers = TeamsUser.where(team_id: params[:id])
 
     if(params[:id2] == nil)
       #  if(@reviewid == nil)
@@ -19,7 +19,7 @@ class PopupController < ApplicationController
       @pid = ResponseMap.find(params[:id2]).reviewer_id
       @reviewer_id = Participant.find(@pid).user_id
 
-      @scores = Score.find_all_by_response_id(@reviewid)
+      @scores = Score.where(response_id: @reviewid)
 
       ##3
       @revqids = AssignmentQuestionnaire.where(["assignment_id = ?",@assignment.id])
@@ -105,7 +105,7 @@ class PopupController < ApplicationController
 
       # @maxscore = Questionnaire.find(@assignment.review_questionnaire_id).max_question_score
 
-      @scores = Score.find_all_by_response_id(@reviewid)
+      @scores = Score.where(response_id: @reviewid)
       @scores.each do |s|
         @sum = @sum + s.score
         @temp = @temp + s.score
@@ -125,7 +125,7 @@ class PopupController < ApplicationController
 
   def view_review_scores_popup
     @reviewid = params[:id]
-    @scores = Score.find_all_by_instance_id(@reviewid)
+    @scores = Score.where(instance_id: @reviewid)
 
 
   end

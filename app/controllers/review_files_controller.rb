@@ -78,11 +78,11 @@ class ReviewFilesController < ApplicationController
 
     if @participant.assignment.team_assignment
       @participant.team.get_participants.each_with_index { |member,index|
-        all_review_files += ReviewFile.find_all_by_author_participant_id(member.id)
+        all_review_files += ReviewFile.where(author_participant_id: member.id)
 
       }
     else
-      all_review_files = ReviewFile.find_all_by_author_participant_id(@participant.id)
+      all_review_files = ReviewFile.where(author_participant_id: @participant.id)
     end
 
     auth=Hash.new
@@ -140,12 +140,12 @@ end
      @current_review_file = ReviewFile.find(params[:review_file_id])
      review_file=nil
 
-     newer_version_comments = ReviewComment.find_all_by_review_file_id(@current_review_file.id)
+     newer_version_comments = ReviewComment.where(review_file_id: @current_review_file.id)
 
      @version_fileId_map = Hash.new
      params[:versions].each do |each_version|
 
-       get_files_with_the_current_version = ReviewFile.find_all_by_version_number(each_version)
+       get_files_with_the_current_version = ReviewFile.where(version_number: each_version)
        get_files_with_the_current_version.each {|file|
          if File.basename(file.filepath) == File.basename(@current_review_file.filepath)
            review_file = file.id
@@ -181,7 +181,7 @@ def show_code_file
 
   review_file=nil
 
-  newer_version_comments = ReviewComment.find_all_by_review_file_id(@current_review_file.id)
+  newer_version_comments = ReviewComment.where(review_file_id: @current_review_file.id)
 
   @version_fileId_map = Hash.new
   params[:versions].each do |each_version|
@@ -279,8 +279,8 @@ def show_code_file_diff
 
 end
 
-older_version_comments = ReviewComment.find_all_by_review_file_id(files[:@older_file].id)
-newer_version_comments = ReviewComment.find_all_by_review_file_id(files[:@newer_file].id)
+older_version_comments = ReviewComment.where(review_file_id: files[:@older_file].id)
+newer_version_comments = ReviewComment.where(review_file_id: files[:@newer_file].id)
 
 @shareObj = Hash.new()
 @shareObj['linearray1'] = processor.first_file_array
@@ -330,8 +330,8 @@ newer_version_comments = ReviewComment.find_all_by_review_file_id(files[:@newer_
     i=0
     authorflag = 0 # used to identify whether the reply to the comment button should be displayed
 
-    newobj =  ReviewComment.find_all_by_review_file_id(params[:file_id]);
-    ReviewComment.find_all_by_review_file_id(params[:file_id]).sort_by {|tempcomment| tempcomment[:initial_line_number]}.each {|comment|
+    newobj =  ReviewComment.where(review_file_id: params[:file_id]);
+    ReviewComment.where(review_file_id: params[:file_id]).sort_by {|tempcomment| tempcomment[:initial_line_number]}.each {|comment|
       if (comment[:initial_line_number] <= ((params[:initial_line_number]).to_i ) and comment[:last_line_number] >= ((params[:final_line_number]).to_i)) or
         (comment[:initial_line_number] >= ((params[:initial_line_number]).to_i ) and comment[:initial_line_number] <= ((params[:final_line_number]).to_i)) or
         (comment[:initial_line_number] <= ((params[:initial_line_number]).to_i ) and comment[:last_line_number] <= ((params[:final_line_number]).to_i) and comment[:last_line_number] >= ((params[:initial_line_number]).to_i))

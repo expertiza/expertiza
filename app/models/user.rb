@@ -184,7 +184,7 @@ class User < ActiveRecord::Base
   end
 
   def set_courses_to_assignment
-    @courses = Course.find_all_by_instructor_id(self.id, :order => 'name')
+    @courses = Course.where(instructor_id: self.id, :order => 'name')
   end
 
   # generate a new RSA public/private key pair and create our own X509 digital certificate which we
@@ -201,7 +201,7 @@ class User < ActiveRecord::Base
 
     # when replacing an existing key, update any digital signatures made previously with the new key
     if (replacing_key)
-      participants = AssignmentParticipant.find_all_by_user_id(self.id)
+      participants = AssignmentParticipant.where(user_id: self.id)
       for participant in participants
         if (participant.permission_granted)
           AssignmentParticipant.grant_publishing_rights(new_key.to_pem, [ participant ])

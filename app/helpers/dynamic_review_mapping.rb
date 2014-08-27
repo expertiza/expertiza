@@ -425,7 +425,7 @@ module DynamicReviewMapping
           end
 
           contributors.each { |contributor|
-            team_users = TeamsUser.find_all_by_team_id(contributor)
+            team_users = TeamsUser.where(team_id: contributor)
             team_users.each { |team_user|
               users.push(team_user['user_id'])
             }
@@ -621,7 +621,7 @@ module DynamicReviewMapping
           end
               rescue Exception => exc
                 #revert the mapping
-                response_mappings = TeamReviewResponseMap.find_all_by_reviewed_object_id(@assignment.id)
+                response_mappings = TeamReviewResponseMap.where(reviewed_object_id: @assignment.id)
                 if !response_mappings.nil?
                   response_mappings.each {|response_mapping|
                     response_mapping.delete
@@ -653,7 +653,7 @@ module DynamicReviewMapping
             end
 
             #contributors.each { |contributor|
-            #   team_users = TeamsUser.find_all_by_team_id(contributor)
+            #   team_users = TeamsUser.where(team_id: contributor)
             #   team_users.each { |team_user|
             #        users.push(team_user['user_id'])
             #   }
@@ -700,7 +700,7 @@ module DynamicReviewMapping
 
               topic_user_id = Hash.new
               temp_contributors.each {|contributor|
-                participant = Participant.find_all_by_user_id_and_parent_id(contributor, @assignment.id)
+                participant = Participant.where(user_id: contributor, parent_id: @assignment.id)
                 topic_user_id[contributor] = participant[0].topic_id
               }
 
@@ -874,7 +874,7 @@ module DynamicReviewMapping
 
               @assignment = assignment
               number_of_reviews = num_review_of_reviews.to_i
-              contributors = TeamReviewResponseMap.find_all_by_reviewed_object_id(@assignment.id)
+              contributors = TeamReviewResponseMap.where(reviewed_object_id: @assignment.id)
               users = Array.new
               mappings = Hash.new
               reviews_per_user = 0
@@ -887,7 +887,7 @@ module DynamicReviewMapping
               end
 
               #contributors.each { |contributor|
-              #   team_users = TeamsUser.find_all_by_team_id(contributor)
+              #   team_users = TeamsUser.where(team_id: contributor)
               #   team_users.each { |team_user|
               #        users.push(team_user['user_id'])
               #   }
@@ -941,7 +941,7 @@ module DynamicReviewMapping
                     map = ResponseMap.find(contributor)
                     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
                     # to treat all assignments as team assignments
-                    team_members = TeamsUser.find_all_by_team_id(map.reviewee_id)
+                    team_members = TeamsUser.where(team_id: map.reviewee_id)
                     if !team_members.nil?
                       team_members.each{|team_member|
                         if team_member.user_id == user
@@ -958,11 +958,11 @@ module DynamicReviewMapping
                 topic_user_id = Hash.new
                 temp_contributors.each {|contributor|
                   map = ResponseMap.find(contributor)
-                  #participant = Participant.find_all_by_user_id_and_parent_id(map.reviewee_id, @assignment.id)
+                  #participant = Participant.where(user_id: map.reviewee_id, parent_id: @assignment.id)
                   #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
                   # to treat all assignments as team assignments
                   #We would have just one member for an individual assignment.
-                  team_members = TeamsUser.find_all_by_team_id(map.reviewee_id)
+                  team_members = TeamsUser.where(team_id: map.reviewee_id)
                   if !team_members.nil?
                     participant = Participant.find_by_parent_id_and_user_id(@assignment.id, team_members[0].user_id)
                     topic_user_id[contributor] = participant.topic_id
@@ -1061,7 +1061,7 @@ module DynamicReviewMapping
 
               #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
               # to treat all assignments as team assignments
-              team_members = TeamsUser.find_all_by_team_id(map.reviewee_id)
+              team_members = TeamsUser.where(team_id: map.reviewee_id)
 
               team_members.each {|team_member|
                 if team_member.user_id == users[random_index]
@@ -1140,7 +1140,7 @@ module DynamicReviewMapping
         end
             rescue Exception => exc
               #revert the mapping
-              response_mappings = MetareviewResponseMap.find_all_by_reviewed_object_id(@assignment.id)
+              response_mappings = MetareviewResponseMap.where(reviewed_object_id: @assignment.id)
               if !response_mappings.nil?
                 response_mappings.each {|response_mapping|
                   response_mapping.delete

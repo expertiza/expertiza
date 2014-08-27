@@ -16,7 +16,7 @@ class QuestionnairesController < ApplicationController
   # questions. The name and creator are updated.
   def copy
     orig_questionnaire = Questionnaire.find(params[:id])
-    questions = Question.find_all_by_questionnaire_id(params[:id])
+    questions = Question.where(questionnaire_id: params[:id])
     @questionnaire = orig_questionnaire.clone
     @questionnaire.instructor_id = session[:user].instructor_id  ## Why was TA-specific code removed here?  See Project E713.
       @questionnaire.name = 'Copy of ' + orig_questionnaire.name
@@ -153,7 +153,7 @@ class QuestionnairesController < ApplicationController
         @question = Question.find_by_id(qid)
         @question.update_attributes(params[:new_question][qid])
         @question_type = QuestionType.find_by_question_id(qid)
-        @quiz_question_choices = QuizQuestionChoice.find_all_by_question_id(qid)
+        @quiz_question_choices = QuizQuestionChoice.where(question_id: qid)
         i=1
         for quiz_question_choice in @quiz_question_choices
           if  @question_type.q_type!="Essay"
@@ -228,7 +228,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
       @questionnaire.section = "Quiz"
       print "=====create_questionnaire========="
       @assignment = Assignment.find_by_id(params[:aid])
-      teams = TeamsUser.find_all_by_user_id(session[:user].id)
+      teams = TeamsUser.where(user_id: session[:user].id)
       for t in teams do
         if Team.find_by_id_and_parent_id(t.team_id, @assignment.id)
           if team = Team.find_by_id_and_parent_id(t.team_id, @assignment.id)
@@ -534,7 +534,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
   #only for quiz questionnaire
   def save_choices(questionnaire_id)
     if params[:new_question] and params[:new_choices]
-      questions = Question.find_all_by_questionnaire_id(questionnaire_id)
+      questions = Question.where(questionnaire_id: questionnaire_id)
       questionnum = 1
 
       for question in questions

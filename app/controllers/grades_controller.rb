@@ -61,7 +61,7 @@ class GradesController < ApplicationController
     }
     ## When user clicks on the notification, it should go away
     #deleting all review notifications
-    rmaps = ParticipantReviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(@participant.id, @participant.assignment.id)
+    rmaps = ParticipantReviewResponseMap.where(reviewee_id: @participant.id, reviewed_object_id: @participant.assignment.id)
     for rmap in rmaps
       rmap.notification_accepted = true
       rmap.save
@@ -69,9 +69,9 @@ class GradesController < ApplicationController
     ############
 
     #deleting all metareview notifications
-    rmaps = ParticipantReviewResponseMap.find_all_by_reviewer_id_and_reviewed_object_id(@participant.id, @participant.parent_id)
+    rmaps = ParticipantReviewResponseMap.where reviewer_id: @participant.id, reviewed_object_id: @participant.parent_id
     for rmap in rmaps
-      mmaps = MetareviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(rmap.reviewer_id, rmap.map_id)
+      mmaps = MetareviewResponseMap.where reviewee_id: rmap.reviewer_id, reviewed_object_id: rmap.map_id
       if !mmaps.nil?
         for mmap in mmaps
           mmap.notification_accepted = true
@@ -280,7 +280,7 @@ class GradesController < ApplicationController
       if @assignment.is_penalty_calculated == false
         calculate_for_participants = true
       end
-      Participant.find_all_by_parent_id(assignment_id).each do |participant|
+      Participant.where(parent_id: assignment_id).each do |participant|
         penalties = calculate_penalty(participant.id)
         @total_penalty =0
         if(penalties[:submission] != 0 || penalties[:review] != 0 || penalties[:meta_review] != 0)

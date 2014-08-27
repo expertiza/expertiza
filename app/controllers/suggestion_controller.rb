@@ -28,7 +28,7 @@ class SuggestionController < ApplicationController
     :redirect_to => { :action => :list }
 
   def list
-    @suggestions = Suggestion.find_all_by_assignment_id(params[:id])
+    @suggestions = Suggestion.where(assignment_id: params[:id])
     @assignment = Assignment.find(params[:id])
   end
 

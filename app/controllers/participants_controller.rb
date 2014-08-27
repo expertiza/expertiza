@@ -165,7 +165,7 @@ class ParticipantsController < ApplicationController
     return unless current_user_id?(@participant.user_id)
 
     if params[:participant] != nil
-      if AssignmentParticipant.find_all_by_parent_id_and_handle(@participant.parent_id, params[:participant][:handle]).length > 0
+      if AssignmentParticipant.where(parent_id: @participant.parent_id, handle: params[:participant][:handle]).length > 0
         flash[:error] = "<b>#{params[:participant][:handle]}</b> is already in use for this assignment. Please select a different handle."
         redirect_to :controller => 'participants', :action => 'change_handle', :id => @participant
       else

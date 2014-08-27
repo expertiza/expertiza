@@ -1,7 +1,7 @@
 class Assessment360Controller < ApplicationController
   # Added the @instructor to display the instrucor name in the home page of the 360 degree assessment
   def index
-    @courses = Course.find_all_by_instructor_id(session[:user].id)
+    @courses = Course.where(instructor_id: session[:user].id)
     @instructor_id = session[:user].id
     @instructor = User.find_by_id(@instructor_id)
   end
@@ -10,7 +10,7 @@ class Assessment360Controller < ApplicationController
     #@REVIEW_TYPES = ["ParticipantReviewResponseMap", "FeedbackResponseMap", "TeammateReviewResponseMap", "MetareviewResponseMap"]
     @REVIEW_TYPES = ["TeammateReviewResponseMap"]
     @course = Course.find_by_id(params[:course_id])
-    @assignments = Assignment.find_all_by_course_id(@course)
+    @assignments = Assignment.where(course_id: @course)
     @assignments.reject! {|assignment| assignment.get_total_reviews_assigned_by_type(@REVIEW_TYPES.first) == 0 }
 
     @assignment_pie_charts = Hash.new
@@ -89,7 +89,7 @@ class Assessment360Controller < ApplicationController
 
   def all_assignments_all_students
     @course = Course.find_by_id(params[:course_id]);
-    @assignments = Assignment.find_all_by_course_id(@course)
+    @assignments = Assignment.where(course_id: @course)
   end
 
   def one_assignment_all_students
@@ -120,7 +120,7 @@ class Assessment360Controller < ApplicationController
   def all_students_all_reviews
     @course = Course.find_by_id(params[:course_id])
     @students = @course.get_participants()
-    @assignments = Assignment.find_all_by_course_id(@course.id);
+    @assignments = Assignment.where(course_id: @course.id);
   end
 
   # Find all the assignments for a given student pertaining to the course. This data is given a graphical display using bar charts. Individual teammate and metareview scores are displayed along with their aggregate
@@ -134,7 +134,7 @@ class Assessment360Controller < ApplicationController
         break
       end
     }
-    @assignments = Assignment.find_all_by_course_id(@course.id);
+    @assignments = Assignment.where(course_id: @course.id);
 
     colors = Array.new
     colors << '0000ff'

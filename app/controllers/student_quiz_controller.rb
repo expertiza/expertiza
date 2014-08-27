@@ -8,7 +8,7 @@ class StudentQuizController < ApplicationController
     # Find the current phase that the assignment is in.
     @quiz_phase = @assignment.get_current_stage(AssignmentParticipant.find(params[:id]).topic_id)
 
-    @quiz_mappings = QuizResponseMap.find_all_by_reviewer_id(@participant.id)
+    @quiz_mappings = QuizResponseMap.where(reviewer_id: @participant.id)
 
     # Calculate the number of quizzes that the user has completed so far.
     @num_quizzes_total = @quiz_mappings.size
@@ -37,7 +37,7 @@ class StudentQuizController < ApplicationController
   def finished_quiz
     @response = Response.find_by_map_id(params[:map_id])
     @response_map = ResponseMap.find_by_id(params[:map_id])
-    @questions = Question.find_all_by_questionnaire_id(@response_map.reviewed_object_id)
+    @questions = Question.where(questionnaire_id: @response_map.reviewed_object_id)
 
     essay_not_graded = false
     quiz_score = 0.0
@@ -63,10 +63,10 @@ class StudentQuizController < ApplicationController
     @quizzes = Array.new
     reviewer = Participant.find_by_user_id_and_parent_id(reviewer_id,assignment_id)
     @assignment = Assignment.find_by_id(assignment_id)
-    teams = TeamsUser.find_all_by_user_id(reviewer_id)
-    Team.find_all_by_parent_id(assignment_id).each do |quiz_creator|
+    teams = TeamsUser.where(user_id: reviewer_id)
+    Team.where(parent_id: assignment_id).each do |quiz_creator|
       unless TeamsUser.find_by_team_id(quiz_creator.id).user_id == reviewer_id
-        Questionnaire.find_all_by_instructor_id(quiz_creator.id).each do |questionnaire|
+        Questionnaire.where(instructor_id: quiz_creator.id).each do |questionnaire|
           if !@assignment.team_assignment?
             unless QuizResponseMap.find_by_reviewed_object_id_and_reviewer_id(questionnaire.id, reviewer.id)
               @quizzes.push(questionnaire)
@@ -93,7 +93,7 @@ def record_response
   scores = Array.new
   new_scores = Array.new
   valid = 0
-  questions = Question.find_all_by_questionnaire_id @questionnaire.id
+  questions = Question.where(questionnaire_id: @questionnaire.id)
   questions.each do |question|
     score = 0
     if (QuestionType.find_by_question_id question.id).q_type == 'MCC'
@@ -101,7 +101,7 @@ def record_response
       if params["#{question.id}"] == nil
         valid = 1
       else
-        correct_answer = QuizQuestionChoice.find_all_by_question_id_and_iscorrect(question.id, 1)
+        correct_answer = QuizQuestionChoice.where(question_id: question.id, iscorrect: 1)
         params["#{question.id}"].each do |choice|
 
           correct_answer.each do |correct|
@@ -170,7 +170,7 @@ def submit_essay_grades
 end
 
 def grade_essays
-  scores = Score.find_all_by_score(-1)
+  scores = Score.where(score: -1)
   @questions = Array.new
   @answers = Hash.new()
   @questionnaires = Array.new

@@ -68,7 +68,7 @@ class LatePoliciesController < ApplicationController
       is_number = false
     end
 
-    @policy = LatePolicy.find_all_by_policy_name(params[:late_policy][:policy_name])
+    @policy = LatePolicy.where(policy_name: params[:late_policy][:policy_name])
     if(@policy != nil && !@policy.empty?)
       @policy.each do |p|
         if p.instructor_id == user_id
@@ -113,7 +113,7 @@ def update
   issue_name = false
   #if name has changed then only check for this
   if params[:late_policy][:policy_name] != @penalty_policy.policy_name
-    @policy = LatePolicy.find_all_by_policy_name(params[:late_policy][:policy_name])
+    @policy = LatePolicy.where(policy_name: params[:late_policy][:policy_name])
     if(@policy != nil && !@policy.empty?)
       @policy.each do |p|
         if p.instructor_id == user_id

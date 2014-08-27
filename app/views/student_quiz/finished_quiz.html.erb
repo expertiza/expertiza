@@ -8,7 +8,7 @@
 
 
   <% if(question_type.q_type == 'MCR')  %>
-    <% QuizQuestionChoice.find_all_by_question_id(question.id).each do |answer|  %>
+    <% QuizQuestionChoice.where(question_id: question.id).each do |answer|  %>
       <% if(answer.iscorrect) %>
         Correct answer is: <b><%= p answer.txt  %></b>
       <% end %>
@@ -19,7 +19,7 @@
   <% elsif(question_type.q_type == 'MCC') %>
     <%= p 'Correct answer is: '%>
     <br>
-    <% QuizQuestionChoice.find_all_by_question_id(question.id).each do |answer|  %>
+    <% QuizQuestionChoice.where(question_id: question.id).each do |answer|  %>
       <% if(answer.iscorrect) %>
         <b><%= p answer.txt  %></b>
         <br>
@@ -27,7 +27,7 @@
     <% end %><br>
 
     Your answer is:<br/>
-    <% Score.find_all_by_response_id_and_question_id(@response.id, question.id).each do |answer| %>
+    <% Score.where(response_id: @response.id, question_id: question.id).each do |answer| %>
       <b><%= p answer.comments %></b><br>
     <% end %><br>
 

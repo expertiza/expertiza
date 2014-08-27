@@ -170,9 +170,9 @@ class UsersController < ApplicationController
         def destroy
           begin
             @user = User.find(params[:id])
-            AssignmentParticipant.find_all_by_user_id(@user.id).each{|participant| participant.delete}
-            TeamsUser.find_all_by_user_id(@user.id).each{|teamuser| teamuser.delete}
-            AssignmentQuestionnaire.find_all_by_user_id(@user.id).each{|aq| aq.destroy}
+            AssignmentParticipant.where(user_id: @user.id).each{|participant| participant.delete}
+            TeamsUser.where(user_id: @user.id).each{|teamuser| teamuser.delete}
+            AssignmentQuestionnaire.where(user_id: @user.id).each{|aq| aq.destroy}
             @user.destroy
             undo_link("User \"#{@user.name}\" has been deleted successfully. ")
           rescue

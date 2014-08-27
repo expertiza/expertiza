@@ -4,9 +4,9 @@ num_choices = 1;
 choice_id = 1;
 
 var aMail = new Array();
-<% questionnaires = Questionnaire.find_all_by_type(@questionnaire.type) %>
+<% questionnaires = Questionnaire.where(type: @questionnaire.type) %>
 <% for que in questionnaires %>
- <% all_questions = Question.find_all_by_questionnaire_id(que.id).map {|n| n.txt} %>
+ <% all_questions = Question.where(questionnaire_id: que.id).map {|n| n.txt} %>
 <% for q in all_questions %>
  aMail.push(<%= q.to_json.html_safe %>);
 <% end %>

@@ -14,7 +14,7 @@ class TeamsController < ApplicationController
 
   def delete_all
     parent = Object.const_get(session[:team_type]).find(params[:id])
-    @teams = Team.find_all_by_parent_id(parent.id)
+    @teams = Team.where(parent_id: parent.id)
     @teams.each do |t|
       t.destroy
     end

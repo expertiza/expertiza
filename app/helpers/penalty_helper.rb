@@ -76,9 +76,9 @@ module PenaltyHelper
 
       #reviews
       if @assignment.team_assignment
-        review_mappings = TeamReviewResponseMap.find_all_by_reviewer_id(@participant.id)
+        review_mappings = TeamReviewResponseMap.where(reviewer_id: @participant.id)
       else
-        review_mappings = ParticipantReviewResponseMap.find_all_by_reviewer_id(@participant.id)
+        review_mappings = ParticipantReviewResponseMap.where(reviewer_id: @participant.id)
       end
 
       review_due_date = DueDate.find_by_deadline_type_id_and_assignment_id(@review_deadline_type_id, @assignment.id)
@@ -95,7 +95,7 @@ module PenaltyHelper
     num_of_meta_reviews_required = @assignment.num_review_of_reviews
     if (num_of_meta_reviews_required > 0)
 
-      meta_review_mappings = MetareviewResponseMap.find_all_by_reviewer_id(@participant.id)
+      meta_review_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
 
       meta_review_due_date = DueDate.find_by_deadline_type_id_and_assignment_id(@meta_review_deadline_type_id, @assignment.id)
 

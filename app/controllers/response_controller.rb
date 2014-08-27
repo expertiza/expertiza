@@ -10,7 +10,7 @@ class ResponseController < ApplicationController
   def latestResponseVersion
     #get all previous versions of responses for the response map.
     @review_scores=Array.new
-    @prev=Response.find_all_by_map_id(@map.id)
+    @prev=Response.where(map_id: @map.id)
     for element in @prev
       @review_scores << element
     end

@@ -269,7 +269,7 @@ class AssignmentParticipant < Participant
 
     # for all quiz questionnaires (quizzes) taken by the participant
     quiz_responses = Array.new
-    quiz_response_mappings = QuizResponseMap.find_all_by_reviewer_id(self.id)
+    quiz_response_mappings = QuizResponseMap.where(reviewer_id: self.id)
     quiz_response_mappings.each do |qmapping|
       if (qmapping.response)
         quiz_responses << qmapping.response
@@ -478,7 +478,7 @@ class AssignmentParticipant < Participant
 
   # provide export functionality for Assignment Participants
   def self.export(csv,parent_id,options)
-    find_all_by_parent_id(parent_id).each do |part|
+    where(parent_id: parent_id).each do |part|
       user = part.user
       csv << [
         user.name,
@@ -530,7 +530,7 @@ class AssignmentParticipant < Participant
     def set_handle
       if self.user.handle == nil or self.user.handle == ""
         self.handle = self.user.name
-      elsif AssignmentParticipant.find_all_by_parent_id_and_handle(self.assignment.id, self.user.handle).length > 0
+      elsif AssignmentParticipant.where(parent_id: self.assignment.id, handle: self.user.handle).length > 0
         self.handle = self.user.name
       else
         self.handle = self.user.handle
@@ -577,7 +577,7 @@ class AssignmentParticipant < Participant
 
 
     def review_response_maps
-      ParticipantReviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(id, assignment.id)
+      ParticipantReviewResponseMap.where(reviewee_id: id, reviewed_object_id: assignment.id)
     end
 
     def get_topic_string

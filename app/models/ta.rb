@@ -47,7 +47,7 @@ class Ta < User
   
   def self.get_mapped_instructor_ids(user_id)
     ids = Array.new
-    mappings = TaMapping.find_all_by_ta_id(user_id)
+    mappings = TaMapping.where(ta_id: user_id)
     mappings.each{
       |map|
       ids << map.course.instructor.id
@@ -57,7 +57,7 @@ class Ta < User
   
   def self.get_mapped_courses(user_id)
     ids = Array.new
-    mappings = TaMapping.find_all_by_ta_id(user_id)
+    mappings = TaMapping.where(ta_id: user_id)
     mappings.each{
       |map|
       ids << map.course.id

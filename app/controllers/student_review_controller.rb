@@ -13,8 +13,8 @@ class StudentReviewController < ApplicationController
     @review_phase = @assignment.get_current_stage(AssignmentParticipant.find(params[:id]).topic_id)
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    @review_mappings = TeamReviewResponseMap.find_all_by_reviewer_id(@participant.id)
-    @metareview_mappings = MetareviewResponseMap.find_all_by_reviewer_id(@participant.id)
+    @review_mappings = TeamReviewResponseMap.where(reviewer_id: @participant.id)
+    @metareview_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
     # Calculate the number of reviews that the user has completed so far.
     @num_reviews_total       = @review_mappings.size
     @num_reviews_completed   = 0

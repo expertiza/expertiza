@@ -317,7 +317,7 @@ class Assignment < ActiveRecord::Base
   def review_mappings
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    TeamReviewResponseMap.find_all_by_reviewed_object_id(self.id)
+    TeamReviewResponseMap.where(reviewed_object_id: self.id)
     end
 
   def metareview_mappings
@@ -339,7 +339,7 @@ class Assignment < ActiveRecord::Base
 
       # for all quiz questionnaires (quizzes) taken by the participant
       quiz_responses = Array.new
-      quiz_response_mappings = QuizResponseMap.find_all_by_reviewer_id(participant.id)
+      quiz_response_mappings = QuizResponseMap.where(reviewer_id: participant.id)
       quiz_response_mappings.each do |qmapping|
         if (qmapping.response)
           quiz_responses << qmapping.response
@@ -456,21 +456,21 @@ class Assignment < ActiveRecord::Base
 
   def delete(force = nil)
     begin
-      maps = ParticipantReviewResponseMap.find_all_by_reviewed_object_id(self.id)
+      maps = ParticipantReviewResponseMap.where(reviewed_object_id: self.id)
       maps.each { |map| map.delete(force) }
     rescue
       raise "At least one review response exists for #{self.name}."
     end
 
     begin
-      maps = TeamReviewResponseMap.find_all_by_reviewed_object_id(self.id)
+      maps = TeamReviewResponseMap.where(reviewed_object_id: self.id)
       maps.each { |map| map.delete(force) }
     rescue
       raise "At least one review response exists for #{self.name}."
     end
 
     begin
-      maps = TeammateReviewResponseMap.find_all_by_reviewed_object_id(self.id)
+      maps = TeammateReviewResponseMap.where(reviewed_object_id: self.id)
       maps.each { |map| map.delete(force) }
     rescue
       raise "At least one teammate review response exists for #{self.name}."
@@ -537,7 +537,7 @@ class Assignment < ActiveRecord::Base
   # available to them.
   #ajbudlon, sept 07, 2007
   def get_review_number(mapping)
-    reviewer_mappings = ResponseMap.find_all_by_reviewer_id(mapping.reviewer.id)
+    reviewer_mappings = ResponseMap.where(reviewer_id: mapping.reviewer.id)
     review_num = 1
     reviewer_mappings.each do |rm|
       (rm.reviewee.id != mapping.reviewee.id) ? review_num += 1 : break
@@ -620,7 +620,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def get_review_rounds
-    due_dates = DueDate.find_all_by_assignment_id(self.id)
+    due_dates = DueDate.where(assignment_id: self.id)
     rounds = 0
     0 .. due_dates.length-1.each do |i|
       deadline_type = DeadlineType.find(due_dates[i].deadline_type_id)
@@ -819,7 +819,7 @@ class Assignment < ActiveRecord::Base
   #   old method only works after the assignment is created
   #   cover corner case where assignment have not yet been created
   def duplicate_name?
-    assignments = Assignment.find_all_by_name(self.name)
+    assignments = Assignment.where(name: self.name)
     assignments.select { |x| x.instructor_id == self.instructor_id } unless self.instructor_id.nil?
     assignments.select { |x| x.course_id == self.course_id } unless self.course_id.nil?
 
@@ -834,7 +834,7 @@ class Assignment < ActiveRecord::Base
 
     # If this is an assignment with quiz required
     if (self.require_quiz?)
-      signups = SignedUpUser.find_all_by_creator_id(contributor.id)
+      signups = SignedUpUser.where(creator_id: contributor.id)
       for signup in signups do
         signuptopic = SignUpTopic.find_by_id(signup.topic_id)
         if (signuptopic.assignment_id == self.id)

@@ -93,7 +93,7 @@ class MetareviewResponseMap < ResponseMap
             raise ImportError, "No review mapping was found for contributor, "+contributor.name+", and reviewee, "+row[1].to_s+"."
           end
 
-          existing_mappings = MetareviewResponseMap.find_all_by_reviewee_id_and_reviewer_id_and_reviewed_object_id(reviewee.id, reviewer.id, reviewmapping.map_id)
+          existing_mappings = MetareviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id: reviewer.id, reviewed_object_id: reviewmapping.map_id)
           # if no mappings have already been imported for this combination
           # create it.
 

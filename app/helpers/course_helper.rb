@@ -12,11 +12,11 @@ module CourseHelper
 
       #instructors should be able to see their own courses
     when Role.instructor.id
-      courses = Course.find_all_by_instructor_id(user.id)
+      courses = Course.where(instructor_id: user.id)
 
       #ta should be able to see all the course they are ta-ing
     when Role.ta.id
-      ta_mappings = TaMapping.find_all_by_ta_id(user.id)
+      ta_mappings = TaMapping.where(ta_id: user.id)
       course_id_list = Array.new
       ta_mappings.each do |ta_mapping|
         course_id_list << ta_mapping.course_id
@@ -34,19 +34,19 @@ module CourseHelper
     when Role.student.id
       #find all course that the student participate in
       course_id_list = Array.new
-      course_participant_list = CourseParticipant.find_all_by_user_id(user.id)
+      course_participant_list = CourseParticipant.where(user_id: user.id)
       course_participant_list.each do |course_participant|
         course_id_list << course_participant.course.id
       end
       #find all assignment the student participated in
-      assignment_participant_list = AssignmentParticipant.find_all_by_user_id(user.id)
+      assignment_participant_list = AssignmentParticipant.where(user_id: user.id)
       assignment_participant_list.each do |assignment_participant|
         if !assignment_participant.assignment.course.nil?
           course_id_list << assignment_participant.assignment.course.id
         end
       end
       #find all teams the student participated in
-      teams_users = TeamsUser.find_all_by_user_id(user.id)
+      teams_users = TeamsUser.where(user_id: user.id)
       teams_users.each do |teams_user|
         team = Team.find(teams_user.team_id)
         if team.is_a?(AssignmentTeam)

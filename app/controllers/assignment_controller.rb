@@ -93,7 +93,7 @@ class AssignmentController < ApplicationController
 
     # this function finds all the due_dates for a given assignment and calculates the time when the reminder for these deadlines needs to be sent. Enqueues them in the delayed_jobs table
     def add_to_delayed_queue
-      duedates = DueDate::find_all_by_assignment_id(@assignment.id)
+      duedates = DueDate::where(assignment_id: @assignment.id)
       for i in (0 .. duedates.length-1)
         deadline_type = DeadlineType.find(duedates[i].deadline_type_id).name
         due_at = duedates[i].due_at.to_datetime.to_s(:db)
@@ -345,7 +345,7 @@ class AssignmentController < ApplicationController
 
     # this function finds all the due_dates for a given assignment and calculates the time when the reminder for these deadlines needs to be sent. Enqueues them in the delayed_jobs table
     def add_to_delayed_queue
-      duedates = DueDate::find_all_by_assignment_id(@assignment.id)
+      duedates = DueDate::where(assignment_id: @assignment.id)
       for i in (0 .. duedates.length-1)
         deadline_type = DeadlineType.find(duedates[i].deadline_type_id).name
         due_at = duedates[i].due_at(:db).to_s
@@ -515,7 +515,7 @@ class AssignmentController < ApplicationController
         end
       end
 
-      @aqs = AssignmentQuestionnaire.find_all_by_assignment_id(@assignment.id)
+      @aqs = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
       for aq in @aqs
         should_delete = true
         params[:questionnaires].each do |key,value|
@@ -632,7 +632,7 @@ class AssignmentController < ApplicationController
 
           @late_policy.update_attribute(:times_used, @late_policy.times_used + 1)
 
-          participants = AssignmentParticipant.find_all_by_parent_id(@assignment.id)
+          participants = AssignmentParticipant.where(parent_id: @assignment.id)
           participants.each do |p|
             @penalties = calculate_penalty(p.id)
             if(@penalties[:submission] != 0 || @penalties[:review] != 0 || @penalties[:meta_review] != 0)

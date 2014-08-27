@@ -1,4 +1,4 @@
-<% @join_team_requests = JoinTeamRequest.find_all_by_team_id(team_id) %>
+<% @join_team_requests = JoinTeamRequest.where(team_id: team_id) %>
 <h2>Received Requests</h2>
 <table>
   <tr>

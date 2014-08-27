@@ -11,7 +11,7 @@ class Course < ActiveRecord::Base
   # Author: ajbudlon
   # Date: 7/21/2008
   def get_teams
-    return CourseTeam.find_all_by_parent_id(self.id)
+    return CourseTeam.where(parent_id: self.id)
   end
 
   #Returns this object's submission directory
@@ -23,11 +23,11 @@ class Course < ActiveRecord::Base
   end
 
   def get_participants
-    CourseParticipant.find_all_by_parent_id(self.id)
+    CourseParticipant.where(parent_id: self.id)
   end
 
   def get_participant (user_id)
-    CourseParticipant.find_all_by_parent_id_and_user_id(self.id, user_id)
+    CourseParticipant.where(parent_id: self.id, user_id: user_id)
   end
 
   def add_participant(user_name)
@@ -42,7 +42,7 @@ class Course < ActiveRecord::Base
   end
 
   def copy_participants(assignment_id)
-    participants = AssignmentParticipant.find_all_by_parent_id(assignment_id)
+    participants = AssignmentParticipant.where(parent_id: assignment_id)
     errors = Array.new
     error_msg = String.new
     participants.each {

@@ -2,9 +2,9 @@
 
 <TABLE>
   <TR>
-    <%= form_tag :action => 'impersonate' do %>
+    <%= form_tag action: 'impersonate' do %>
       <TD>Enter user account: <%= text_field :user, :name, {:size => 41, :autocomplete => "off"} %></TD>
-      <TD><input type='submit' value='Impersonate'/></TD>
+      <TD><%= submit_tag 'Impersonate' %></TD>
     <% end %>
   </TR>
 </TABLE>

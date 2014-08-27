@@ -159,7 +159,7 @@ class User < ActiveRecord::Base
     if user == nil
       items = login.split("@")
       shortName = items[0]
-      userList = User.all({:conditions=> ["name =?",shortName]})
+      userList = User.where ["name =?",shortName]
       if userList != nil && userList.length == 1
         user = userList.first
       end

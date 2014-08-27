@@ -3,7 +3,7 @@ module QuestionnaireAnalytic
   #return all possible questionnaire types
   def self.types
     type_list = Array.new
-    self.all.each do |questionnaire|
+    self.find_each do |questionnaire|
       if !type_list.include?(questionnaire.type)
         type_list << questionnaire.type
       end

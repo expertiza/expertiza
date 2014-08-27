@@ -105,7 +105,7 @@ class CreateFeedbackMappings < ActiveRecord::Migration
     add_column :review_feedbacks, :team_id, :integer, :null => false
     add_column :review_feedbacks, :assignment_id, :integer, :null => false
     
-    ReviewFeedback.find(:all).each{
+    ReviewFeedback.find_each{
       | feedback |
       map = FeedbackMapping.find(feedback.mapping_id)
       

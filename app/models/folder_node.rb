@@ -25,6 +25,7 @@ class FolderNode < Node
   end
 
   def get_children(sortvar = nil,sortorder =nil,user_id = nil,show = nil, parent_id = nil , search = nil)
+    return children
     if self.folder.parent_id != nil
       parent_id = self.folder.id
     end

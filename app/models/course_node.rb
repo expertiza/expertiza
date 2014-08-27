@@ -25,9 +25,9 @@ class CourseNode < Node
       else
         search = "%"+search+"%"
       end
-      self.include(:course).where([get_course_query_conditions(show, user_id)+ " and courses.name LIKE ?" , get_courses_managed_by_user(user_id), search].order("courses.#{sortvar} #{sortorder}")
+      self.includes(:course).where([get_course_query_conditions(show, user_id)+ " and courses.name LIKE ?" , get_courses_managed_by_user(user_id), search]).order("courses.#{sortvar} #{sortorder}")
     else
-      self.include(:course)where([get_course_query_conditions(show, user_id) , get_courses_managed_by_user(user_id)]).order("courses.#{sortvar} #{sortorder}")
+      self.includes(:course).where([get_course_query_conditions(show, user_id) , get_courses_managed_by_user(user_id)]).order("courses.#{sortvar} #{sortorder}")
       end
   end
 

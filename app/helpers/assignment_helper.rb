@@ -12,7 +12,7 @@ module AssignmentHelper
 
   def wiki_type_options
     wiki_type_options = Array.new
-    WikiType.all.each do |wiki_type|
+    WikiType.find_each do |wiki_type|
       if wiki_type.name == 'No'
         wiki_type_options << ['------', wiki_type.id]
       else

@@ -109,7 +109,7 @@ module AssignmentAnalytic
 
   #helper function do to verify the assumption made above
   def self.questionnaire_unique?
-    self.all.each do |assignment|
+    self.find_each do |assignment|
       assignment.questionnaire_types.each do |questionnaire_type|
         questionnaire_list = Array.new
         assignment.questionnaires.each do |questionnaire|

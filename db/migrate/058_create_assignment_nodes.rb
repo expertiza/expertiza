@@ -1,6 +1,6 @@
 class CreateAssignmentNodes < ActiveRecord::Migration
   def self.up
-     assignments = Assignment.find(:all)
+    assignments = Assignment.all
      
      folder = TreeFolder.find_by_name('Assignments')
      parent = FolderNode.find_by_node_object_id(folder.id)
@@ -12,7 +12,7 @@ class CreateAssignmentNodes < ActiveRecord::Migration
   end
 
   def self.down
-    nodes = AssignmentNode.find(:all)
+    nodes = AssignmentNode.all
     nodes.each { |node| node.destroy }
   end
 end

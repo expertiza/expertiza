@@ -1,6 +1,6 @@
 class CreateTeamNodes < ActiveRecord::Migration
   def self.up
-    teams = Team.find(:all)
+    teams = Team.all
     teams.each{
       | team |
       parent = AssignmentNode.find_by_node_object_id(team.parent_id)
@@ -11,7 +11,7 @@ class CreateTeamNodes < ActiveRecord::Migration
   end
 
   def self.down
-    nodes = TeamNode.find(:all)
+    nodes = TeamNode.all
     nodes.each{
       |node|
       node.destroy

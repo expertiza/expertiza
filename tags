@@ -436,6 +436,7 @@ AddActionGradesViewMyScores	db/migrate/111_add_action_grades_view_my_scores.rb	/
 AddAvailabilityFlagToAssignments	db/migrate/20111130230523_add_availability_flag_to_assignments.rb	/^class AddAvailabilityFlagToAssignments < ActiveRecord::Migration$/;"	c
 AddBookmarkRatingRubricIdToSignupTopic	db/migrate/20121204121644_add_bookmark_rating_rubric_id_to_signup_topic.rb	/^class AddBookmarkRatingRubricIdToSignupTopic < ActiveRecord::Migration$/;"	c
 AddBookmarkratingFolderNodes	db/migrate/20121127013927_add_bookmarkrating_folder_nodes.rb	/^class AddBookmarkratingFolderNodes < ActiveRecord::Migration$/;"	c
+AddCategories	db/migrate/20140808212437_add_categories.rb	/^class AddCategories < ActiveRecord::Migration$/;"	c
 AddChangeHandleAction	db/migrate/092_add_change_handle_action.rb	/^class AddChangeHandleAction < ActiveRecord::Migration$/;"	c
 AddColumnAllowSuggestionsToAssignments	db/migrate/123_add_column_allow_suggestions_to_assignments.rb	/^class AddColumnAllowSuggestionsToAssignments < ActiveRecord::Migration$/;"	c
 AddCommentsAdvertiseForPartnersToTeam	db/migrate/20111122004447_add_comments_advertise_for_partners_to_team.rb	/^class AddCommentsAdvertiseForPartnersToTeam < ActiveRecord::Migration$/;"	c
@@ -536,9 +537,6 @@ AuthorFeedback	db/migrate/032_author_feedback.rb	/^class AuthorFeedback < Active
 AuthorFeedbackQuestionnaire	app/models/author_feedback_questionnaire.rb	/^class AuthorFeedbackQuestionnaire < Questionnaire$/;"	c
 AuthorFeedbackQuestionnaireTest	test/unit/author_feedback_questionnaire_test.rb	/^class AuthorFeedbackQuestionnaireTest < ActiveSupport::TestCase$/;"	c
 Authority	app/models/authority.rb	/^class Authority$/;"	c
-AutoComplete	vendor/plugins/auto_complete/lib/auto_complete.rb	/^module AutoComplete      $/;"	m
-AutoCompleteMacrosHelper	vendor/plugins/auto_complete/lib/auto_complete_macros_helper.rb	/^module AutoCompleteMacrosHelper      $/;"	m
-AutoCompleteTest	vendor/plugins/auto_complete/test/auto_complete_test.rb	/^class AutoCompleteTest < Test::Unit::TestCase$/;"	c
 AutomatedMetareviewsController	app/controllers/automated_metareviews_controller.rb	/^class AutomatedMetareviewsController < ApplicationController$/;"	c
 BackLinkedDirectedGraph	vendor/plugins/graphr-0-1-9/lib/graph/directed_graph.rb	/^class BackLinkedDirectedGraph < DirectedGraph$/;"	c
 Backtrace	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/backtrace.rb	/^  class Backtrace$/;"	c	class:HoptoadNotifier
@@ -630,7 +628,6 @@ ChartsHelper	app/helpers/charts_helper.rb	/^module ChartsHelper$/;"	m
 Class.Methods.addMethods	app/assets/javascripts/prototype.js	/^  addMethods: function(source) {$/;"	m
 Class.create	app/assets/javascripts/prototype.js	/^  create: function() {$/;"	m
 ClassMethods	vendor/plugins/acts_as_nested_set/lib/active_record/acts/nested_set.rb	/^      module ClassMethods$/;"	m	class:ActiveRecord.Acts.NestedSet
-ClassMethods	vendor/plugins/auto_complete/lib/auto_complete.rb	/^  module ClassMethods$/;"	m	class:AutoComplete
 ClassMethods	vendor/plugins/gc4r/lib/gc4r.rb	/^    module ClassMethods$/;"	m	class:GC4R.GoogleChartsModule
 ClassMethods	vendor/plugins/verification/lib/action_controller/verification.rb	/^    module ClassMethods$/;"	m	class:ActionController.Verification
 CleanUpQuestionnaires	db/migrate/113_clean_up_questionnaires.rb	/^class CleanUpQuestionnaires < ActiveRecord::Migration$/;"	c
@@ -1758,8 +1755,6 @@ associate_assignment_to_course	app/controllers/assignments_controller.rb	/^    d
 associated_courses	app/helpers/course_helper.rb	/^  def associated_courses(user)$/;"	f	class:CourseHelper
 authorised	app/controllers/auth_controller.rb	/^  def self.authorised?(session, params)$/;"	F	class:AuthController
 authorize	app/helpers/access_helper.rb	/^  def authorize$/;"	f	class:AccessHelper
-auto_complete_field	vendor/plugins/auto_complete/lib/auto_complete_macros_helper.rb	/^  def auto_complete_field(field_id, options = {})$/;"	f	class:AutoCompleteMacrosHelper
-auto_complete_for	vendor/plugins/auto_complete/lib/auto_complete.rb	/^    def auto_complete_for(object, method, options = {})$/;"	f	class:AutoComplete.ClassMethods
 auto_complete_for_user_name	app/controllers/course_controller.rb	/^  def auto_complete_for_user_name$/;"	f	class:CourseController
 auto_complete_for_user_name	app/controllers/impersonate_controller.rb	/^  def auto_complete_for_user_name$/;"	f	class:ImpersonateController
 auto_complete_for_user_name	app/controllers/invitation_controller.rb	/^  def auto_complete_for_user_name$/;"	f	class:InvitationController
@@ -1767,8 +1762,6 @@ auto_complete_for_user_name	app/controllers/review_mapping_controller.rb	/^  def
 auto_complete_for_user_name	app/controllers/teams_participants_controller.rb	/^  def auto_complete_for_user_name$/;"	f	class:TeamsParticipantsController
 auto_complete_for_user_name	app/controllers/teams_users_controller.rb	/^  def auto_complete_for_user_name$/;"	f	class:TeamsUsersController
 auto_complete_for_user_name	app/controllers/users_controller.rb	/^  def auto_complete_for_user_name$/;"	f	class:UsersController
-auto_complete_result	vendor/plugins/auto_complete/lib/auto_complete_macros_helper.rb	/^  def auto_complete_result(entries, field, phrase = nil)$/;"	f	class:AutoCompleteMacrosHelper
-auto_complete_stylesheet	vendor/plugins/auto_complete/lib/auto_complete_macros_helper.rb	/^    def auto_complete_stylesheet$/;"	f	class:AutoCompleteMacrosHelper
 automatic_reviewer_mapping	app/controllers/review_mapping_controller.rb	/^  def automatic_reviewer_mapping$/;"	f	class:ReviewMappingController
 average_assignment_score	app/models/analytic/course_analytic.rb	/^  def average_assignment_score$/;"	f	class:CourseAnalytic
 average_character_count	app/models/analytic/questionnaire_analytic.rb	/^  def average_character_count$/;"	f	class:QuestionnaireAnalytic
@@ -2460,6 +2453,7 @@ down	db/migrate/20131205203433_create_bids.rb	/^  def self.down$/;"	F	class:Crea
 down	db/migrate/20131206231914_drop_quiz_response_table.rb	/^  def self.down$/;"	F	class:DropQuizResponseTable
 down	db/migrate/20140321025833_update_response_maps.rb	/^  def self.down$/;"	F	class:UpdateResponseMaps
 down	db/migrate/20140331120322_remove_fks.rb	/^  def self.down$/;"	F	class:RemoveFks
+down	db/migrate/20140808212437_add_categories.rb	/^  def self.down$/;"	F	class:AddCategories
 down	db/migrate_save/001_initial_setup.rb	/^  def self.down$/;"	F	class:InitialSetup
 down	db/migrate_save/002_menu_rest_items_users_cached_content_pages.rb	/^  def self.down$/;"	F	class:MenuRestItemsUsersCachedContentPages
 down	db/migrate_save/003_create_courses.rb	/^  def self.down$/;"	F	class:CreateCourses
@@ -3085,7 +3079,6 @@ included	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/rails/action_co
 included	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/rails/error_lookup.rb	/^      def self.included(base) #:nodoc:$/;"	F	class:HoptoadNotifier.Rails.ErrorLookup
 included	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/rails/javascript_notifier.rb	/^      def self.included(base) #:nodoc:$/;"	F	class:HoptoadNotifier.Rails.JavascriptNotifier
 included	vendor/plugins/acts_as_nested_set/lib/active_record/acts/nested_set.rb	/^      def self.included(base)$/;"	F	class:ActiveRecord.Acts.NestedSet
-included	vendor/plugins/auto_complete/lib/auto_complete.rb	/^  def self.included(base)$/;"	F	class:AutoComplete
 included	vendor/plugins/gc4r/lib/gc4r.rb	/^    def self.included(mod)$/;"	F	class:GC4R.GoogleChartsModule
 includes?	app/models/assignment_participant.rb	/^  def includes?(participant)$/;"	f	class:AssignmentParticipant
 includes?	app/models/assignment_team.rb	/^    def includes?(participant)$/;"	f	class:AssignmentTeam
@@ -3218,6 +3211,8 @@ is_team_empty	app/models/teams_user.rb	/^  def self.is_team_empty(team_id)$/;"	F
 is_valid_for_score_calculation?	app/models/response.rb	/^  def is_valid_for_score_calculation?(resubmission_times, latest_review_phase_start_time)$/;"	f	class:Response
 is_wiki_assignment	app/models/assignment.rb	/^  def is_wiki_assignment$/;"	f	class:Assignment
 items_for_permissions	app/models/menu_item.rb	/^  def MenuItem.items_for_permissions(permission_ids = nil)$/;"	F	class:MenuItem.repack
+jQuery.fn.railsAutocomplete.handler	public/javascripts/autocomplete-rails.js	/^(function(jQuery){var self=null;var options={};jQuery.fn.railsAutocomplete=function(){var handler=function(){if(!this.railsAutoCompleter){this.railsAutoCompleter=new jQuery.railsAutocomplete(this)}};options[this.selector.replace("#","")]=arguments[0];if(jQuery.fn.on!==undefined){return $(document).on("focus",this.selector,handler)}else{return this.live("focus",handler)}};jQuery.railsAutocomplete=function(e){_e=e;this.init(_e)};jQuery.railsAutocomplete.fn=jQuery.railsAutocomplete.prototype={railsAutocomplete:"0.0.1"};jQuery.railsAutocomplete.fn.extend=jQuery.railsAutocomplete.extend=jQuery.extend;jQuery.railsAutocomplete.fn.extend({init:function(e){e.delimiter=jQuery(e).attr("data-delimiter")||null;function split(val){return val.split(e.delimiter)}function extractLast(term){return split(term).pop().replace(\/^\\s+\/,"")}jQuery(e).autocomplete($.extend({source:function(request,response){jQuery.getJSON(jQuery(e).attr("data-autocomplete"),{term:extractLast(request.term)},function(){if(arguments[0].length==0){arguments[0]=[];arguments[0][0]={id:"",label:"no existing match"}}jQuery(arguments[0]).each(function(i,el){var obj={};obj[el.id]=el;jQuery(e).data(obj)});response.apply(null,arguments)})},change:function(event,ui){if(jQuery(jQuery(this).attr("data-id-element")).val()==""){return}jQuery(jQuery(this).attr("data-id-element")).val(ui.item?ui.item.id:"");var update_elements=jQuery.parseJSON(jQuery(this).attr("data-update-elements"));var data=ui.item?jQuery(this).data(ui.item.id.toString()):{};if(update_elements&&jQuery(update_elements.id).val()==""){return}for(var key in update_elements){jQuery(update_elements[key]).val(ui.item?data[key]:"")}},search:function(){var term=extractLast(this.value);if(term.length<2){return false}},focus:function(){return false},select:function(event,ui){var terms=split(this.value);terms.pop();terms.push(ui.item.value);if(e.delimiter!=null){terms.push("");this.value=terms.join(e.delimiter)}else{this.value=terms.join("");if(jQuery(this).attr("data-id-element")){jQuery(jQuery(this).attr("data-id-element")).val(ui.item.id)}if(jQuery(this).attr("data-update-elements")){var data=jQuery(this).data(ui.item.id.toString());var update_elements=jQuery.parseJSON(jQuery(this).attr("data-update-elements"));for(var key in update_elements){jQuery(update_elements[key]).val(data[key])}}}var remember_string=this.value;jQuery(this).bind("keyup.clearId",function(){if(jQuery(this).val().trim()!=remember_string.trim()){jQuery(jQuery(this).attr("data-id-element")).val("");jQuery(this).unbind("keyup.clearId")}});jQuery(e).trigger("railsAutocomplete.select",ui);return false}},options[e.id]))}});jQuery(document).ready(function(){jQuery("input[data-autocomplete]").railsAutocomplete()})})(jQuery);$/;"	f
+jQuery.railsAutocomplete	public/javascripts/autocomplete-rails.js	/^(function(jQuery){var self=null;var options={};jQuery.fn.railsAutocomplete=function(){var handler=function(){if(!this.railsAutoCompleter){this.railsAutoCompleter=new jQuery.railsAutocomplete(this)}};options[this.selector.replace("#","")]=arguments[0];if(jQuery.fn.on!==undefined){return $(document).on("focus",this.selector,handler)}else{return this.live("focus",handler)}};jQuery.railsAutocomplete=function(e){_e=e;this.init(_e)};jQuery.railsAutocomplete.fn=jQuery.railsAutocomplete.prototype={railsAutocomplete:"0.0.1"};jQuery.railsAutocomplete.fn.extend=jQuery.railsAutocomplete.extend=jQuery.extend;jQuery.railsAutocomplete.fn.extend({init:function(e){e.delimiter=jQuery(e).attr("data-delimiter")||null;function split(val){return val.split(e.delimiter)}function extractLast(term){return split(term).pop().replace(\/^\\s+\/,"")}jQuery(e).autocomplete($.extend({source:function(request,response){jQuery.getJSON(jQuery(e).attr("data-autocomplete"),{term:extractLast(request.term)},function(){if(arguments[0].length==0){arguments[0]=[];arguments[0][0]={id:"",label:"no existing match"}}jQuery(arguments[0]).each(function(i,el){var obj={};obj[el.id]=el;jQuery(e).data(obj)});response.apply(null,arguments)})},change:function(event,ui){if(jQuery(jQuery(this).attr("data-id-element")).val()==""){return}jQuery(jQuery(this).attr("data-id-element")).val(ui.item?ui.item.id:"");var update_elements=jQuery.parseJSON(jQuery(this).attr("data-update-elements"));var data=ui.item?jQuery(this).data(ui.item.id.toString()):{};if(update_elements&&jQuery(update_elements.id).val()==""){return}for(var key in update_elements){jQuery(update_elements[key]).val(ui.item?data[key]:"")}},search:function(){var term=extractLast(this.value);if(term.length<2){return false}},focus:function(){return false},select:function(event,ui){var terms=split(this.value);terms.pop();terms.push(ui.item.value);if(e.delimiter!=null){terms.push("");this.value=terms.join(e.delimiter)}else{this.value=terms.join("");if(jQuery(this).attr("data-id-element")){jQuery(jQuery(this).attr("data-id-element")).val(ui.item.id)}if(jQuery(this).attr("data-update-elements")){var data=jQuery(this).data(ui.item.id.toString());var update_elements=jQuery.parseJSON(jQuery(this).attr("data-update-elements"));for(var key in update_elements){jQuery(update_elements[key]).val(data[key])}}}var remember_string=this.value;jQuery(this).bind("keyup.clearId",function(){if(jQuery(this).val().trim()!=remember_string.trim()){jQuery(jQuery(this).attr("data-id-element")).val("");jQuery(this).unbind("keyup.clearId")}});jQuery(e).trigger("railsAutocomplete.select",ui);return false}},options[e.id]))}});jQuery(document).ready(function(){jQuery("input[data-autocomplete]").railsAutocomplete()})})(jQuery);$/;"	c
 javascript_tag	vendor/gems/hoptoad_notifier-2.4.4/test/javascript_notifier_test.rb	/^    def javascript_tag(text)$/;"	f	class:JavascriptNotifierTest.FakeRenderer
 join_tags	app/helpers/bookmarks_helper.rb	/^  def self.join_tags(my_tag_array)$/;"	F	class:BookmarksHelper
 js_notifier=	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/configuration.rb	/^    def js_notifier=(*args)$/;"	f	class:HoptoadNotifier.Configuration
@@ -3833,7 +3828,6 @@ setup	vendor/gems/hoptoad_notifier-2.4.4/test/helper.rb	/^  def setup$/;"	f	clas
 setup	vendor/gems/hoptoad_notifier-2.4.4/test/notifier_test.rb	/^  def setup$/;"	f	class:NotifierTest
 setup	vendor/gems/hoptoad_notifier-2.4.4/test/sender_test.rb	/^  def setup$/;"	f	class:SenderTest
 setup	vendor/plugins/acts_as_nested_set/test/nested_set_test.rb	/^  def setup$/;"	f	class:NestedSet.NestedSetWithStringScope.NestedSetWithSymbolScope.NestedSetSuperclass.MixinNestedSetTest
-setup	vendor/plugins/auto_complete/test/auto_complete_test.rb	/^  def setup$/;"	f	class:AutoCompleteTest
 setup	vendor/plugins/dynamic_form/test/dynamic_form_i18n_test.rb	/^  def setup$/;"	f	class:DynamicFormI18nTest
 setup	vendor/plugins/dynamic_form/test/dynamic_form_test.rb	/^  def setup$/;"	f
 setup	vendor/plugins/graphr-0-1-9/tests/utest_directed_graph.rb	/^  def setup$/;"	f	class:TestDirectedGraph
@@ -4036,8 +4030,6 @@ test_assessment_validity_with_due_dates	test/unit/score_test.rb	/^  def test_ass
 test_assign_preference_priority_number	test/unit/signed_up_user_test.rb	/^  def test_assign_preference_priority_number$/;"	f	class:SignedUpUserTest
 test_assignment_id	test/unit/sign_up_topic_test.rb	/^  def test_assignment_id$/;"	f	class:SignUpTopicTest
 test_authorized	test/functional/auth_controller_test.rb	/^  def test_authorized$/;"	f	class:AuthControllerTest
-test_auto_complete_field	vendor/plugins/auto_complete/test/auto_complete_test.rb	/^  def test_auto_complete_field$/;"	f	class:AutoCompleteTest
-test_auto_complete_result	vendor/plugins/auto_complete/test/auto_complete_test.rb	/^  def test_auto_complete_result$/;"	f	class:AutoCompleteTest
 test_bar_chart	vendor/plugins/gc4r/test/gc4r_test.rb	/^  def test_bar_chart$/;"	f	class:GoogleChartsTest
 test_bar_chart_with_title	vendor/plugins/gc4r/test/gc4r_test.rb	/^  def test_bar_chart_with_title$/;"	f	class:GoogleChartsTest
 test_boolean_question	test/unit/rubric_test.rb	/^  def test_boolean_question$/;"	f	class:QuestionaireTest
@@ -4453,7 +4445,6 @@ test_submmit_first_hyperlink	test/unit/assignment_participant_test.rb	/^  def te
 test_symbol_scope	vendor/plugins/acts_as_nested_set/test/nested_set_test.rb	/^  def test_symbol_scope$/;"	f	class:NestedSet.NestedSetWithStringScope.NestedSetWithSymbolScope.NestedSetSuperclass.MixinNestedSetTest
 test_team_assignment	test/functional/student_task_controller_test.rb	/^  def test_team_assignment$/;"	f	class:StudentTaskControllerTest
 test_text_area_with_errors	vendor/plugins/dynamic_form/test/dynamic_form_test.rb	/^  def test_text_area_with_errors$/;"	f
-test_text_field_with_auto_complete	vendor/plugins/auto_complete/test/auto_complete_test.rb	/^  def test_text_field_with_auto_complete$/;"	f	class:AutoCompleteTest
 test_text_field_with_errors	vendor/plugins/dynamic_form/test/dynamic_form_test.rb	/^  def test_text_field_with_errors$/;"	f
 test_the_truth	test/functional/student_task_controller_test.rb	/^  def test_the_truth$/;"	f	class:StudentTaskControllerTest
 test_this_plugin	vendor/plugins/redbox/test/redbox_test.rb	/^  def test_this_plugin$/;"	f	class:RedboxTest
@@ -4516,7 +4507,6 @@ test_validate_weight_no_numbers	test/unit/question_test.rb	/^  def test_validate
 test_verify_rounds	test/functional/student_review_controller_test.rb	/^    def test_verify_rounds$/;"	f	class:StudentReviewControllerTest
 test_verify_team_review_response	test/functional/student_review_controller_test.rb	/^  def test_verify_team_review_response$/;"	f	class:StudentReviewControllerTest
 test_view	test/functional/grade_controller_test.rb	/^  def test_view$/;"	f	class:GradesControllerTest
-text_field_with_auto_complete	vendor/plugins/auto_complete/lib/auto_complete_macros_helper.rb	/^  def text_field_with_auto_complete(object, method, tag_options = {}, completion_options = {})$/;"	f	class:AutoCompleteMacrosHelper
 that	db/goldberg_db_mysql.sql	/^INSERT INTO `content_pages` VALUES (4,'Permission Denied!','denied',1,'h1. Permission Denied\\r\\n\\r\\nSorry, but you don\\'t have permission to view that page.\\r\\n\\r\\nPlease contact your system administrator.',3,'2006-06-11 14:34:30','2006-10-01 13:41:24');$/;"	V
 this.return	app/assets/javascripts/highcharts.js	/^"opacity"],function(a,b){var e=d,k,m;b==="cur"?e=c.prototype:b==="_default"&&f&&(e=g[b],b="set");(k=e[b])&&(e[b]=function(c){c=a?c:this;m=c.elem;return m.attr?m.attr(c.prop,b==="cur"?x:c.now):k.apply(this,arguments)})});e=function(a){var c=a.elem,d;if(!a.started)d=b.init(c,c.d,c.toD),a.start=d[0],a.end=d[1],a.started=!0;c.attr("d",b.step(a.start,a.end,a.pos,c.toD))};f?g.d={set:e}:d.d=e;this.each=Array.prototype.forEach?function(a,b){return Array.prototype.forEach.call(a,b)}:function(a,b){for(var c=$/;"	c
 this.this.return.forEach	app/assets/javascripts/highcharts.js	/^"opacity"],function(a,b){var e=d,k,m;b==="cur"?e=c.prototype:b==="_default"&&f&&(e=g[b],b="set");(k=e[b])&&(e[b]=function(c){c=a?c:this;m=c.elem;return m.attr?m.attr(c.prop,b==="cur"?x:c.now):k.apply(this,arguments)})});e=function(a){var c=a.elem,d;if(!a.started)d=b.init(c,c.d,c.toD),a.start=d[0],a.end=d[1],a.started=!0;c.attr("d",b.step(a.start,a.end,a.pos,c.toD))};f?g.d={set:e}:d.d=e;this.each=Array.prototype.forEach?function(a,b){return Array.prototype.forEach.call(a,b)}:function(a,b){for(var c=$/;"	m
@@ -4818,6 +4808,7 @@ up	db/migrate/20131205203433_create_bids.rb	/^  def self.up$/;"	F	class:CreateBi
 up	db/migrate/20131206231914_drop_quiz_response_table.rb	/^  def self.up$/;"	F	class:DropQuizResponseTable
 up	db/migrate/20140321025833_update_response_maps.rb	/^  def self.up$/;"	F	class:UpdateResponseMaps
 up	db/migrate/20140331120322_remove_fks.rb	/^  def self.up$/;"	F	class:RemoveFks
+up	db/migrate/20140808212437_add_categories.rb	/^  def self.up$/;"	F	class:AddCategories
 up	db/migrate_save/001_initial_setup.rb	/^  def self.up$/;"	F	class:InitialSetup
 up	db/migrate_save/002_menu_rest_items_users_cached_content_pages.rb	/^  def self.up$/;"	F	class:MenuRestItemsUsersCachedContentPages
 up	db/migrate_save/003_create_courses.rb	/^  def self.up$/;"	F	class:CreateCourses
@@ -4900,7 +4891,6 @@ upload_users	app/helpers/participants_helper.rb	/^  def self.upload_users(filena
 url	app/models/content_page.rb	/^  def url$/;"	f	class:ContentPage
 url	app/models/controller_action.rb	/^  def url$/;"	f	class:ControllerAction
 url	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/sender.rb	/^    def url$/;"	f	class:HoptoadNotifier.Sender
-url_for	vendor/plugins/auto_complete/test/auto_complete_test.rb	/^      def url_for(options)$/;"	f	class:AutoCompleteTest.setup
 url_for	vendor/plugins/dynamic_form/test/dynamic_form_test.rb	/^  def url_for(options)$/;"	f
 url_from_request	vendor/gems/hoptoad_notifier-2.4.4/test/catcher_test.rb	/^  def url_from_request(request)$/;"	f	class:ActionControllerCatcherTest
 url_to_id_string	vendor/plugins/redbox/lib/redbox_helper.rb	/^  def url_to_id_string(value)$/;"	f	class:RedboxHelper

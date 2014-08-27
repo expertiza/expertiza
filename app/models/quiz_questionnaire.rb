@@ -1,9 +1,4 @@
 class QuizQuestionnaire < Questionnaire
-
-  #attr_accessible :quiz_question_type
-
-  #validates_presence_of :quiz_question_type
-
   after_initialize :post_initialization
   def post_initialization
     self.display_type = 'Quiz'

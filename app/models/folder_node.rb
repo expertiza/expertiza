@@ -3,9 +3,7 @@ class FolderNode < Node
   belongs_to :node_object, :class_name => "TreeFolder"
 
   def self.get(sortvar = nil,sortorder =nil,user_id = nil,show = nil,parent_id = nil,search=nil)
-
-    joins(:folder).where(['type = ? and tree_folders.parent_id is NULL',self.to_s])
-
+    includes(:tree_folders).where(['type = ? and tree_folders.parent_id is NULL',self.to_s])
   end
 
   def get_name
@@ -25,7 +23,6 @@ class FolderNode < Node
   end
 
   def get_children(sortvar = nil,sortorder =nil,user_id = nil,show = nil, parent_id = nil , search = nil)
-    return children
     if self.folder.parent_id != nil
       parent_id = self.folder.id
     end

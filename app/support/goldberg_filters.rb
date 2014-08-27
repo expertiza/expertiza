@@ -4,7 +4,7 @@
 module GoldbergFilters
 
   def goldberg_security_filter
-    @settings = SystemSettings.find(:first)
+    @settings = SystemSettings.first
 
     if @settings
       make_public = false  # Going to check if we need to

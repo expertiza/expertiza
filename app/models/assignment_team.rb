@@ -101,7 +101,7 @@ class AssignmentTeam < Team
 
       if options[:has_column_names] == "true"
         name = row[0].to_s.strip
-        team = find(:first, conditions: ["name =? && parent_id =?", name, assignment_id])
+        team = where(["name =? && parent_id =?", name, assignment_id]).first
         team_exists = !team.nil?
         name = handle_duplicate(team, name, assignment_id, options[:handle_dups])
         index = 1
@@ -182,7 +182,7 @@ class AssignmentTeam < Team
         team = nil
         teams_users = TeamsUser.find_all_by_user_id(participant.user_id)
         teams_users.each do |tuser|
-          fteam = Team.find(:first, conditions: ['parent_id = ? && id = ?', participant.parent_id, tuser.team_id])
+          fteam = Team.where(['parent_id = ? && id = ?', participant.parent_id, tuser.team_id]).first
           team = fteam if fteam
         end
         team

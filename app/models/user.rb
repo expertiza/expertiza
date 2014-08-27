@@ -44,17 +44,17 @@ class User < ActiveRecord::Base
   end
 
   def bookmark_rated?(bmapping_id)
-    BmappingRatings.find(:first, :conditions => ["bmapping_id = #{bmapping_id} AND user_id = #{self.id}"])
+    BmappingRatings.where(["bmapping_id = #{bmapping_id} AND user_id = #{self.id}"]).first
   end
 
   def bookmark_added?(bmapping_id)
-    Bmapping.find(:first, :conditions => ["id = #{bmapping_id} AND user_id = #{self.id}"])
+    Bmapping.where(["id = #{bmapping_id} AND user_id = #{self.id}"]).first
   end
 
 
 
   def list_mine(object_type, user_id)
-    object_type.all(:conditions => ["instructor_id = ?", user_id])
+    object_type.where(["instructor_id = ?", user_id])
   end
 
   def get_available_users(name)

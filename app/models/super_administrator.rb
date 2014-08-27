@@ -33,21 +33,17 @@ class SuperAdministrator < User
 
   def list_admins(object_type, user_id)
     if (object_type != SignUpSheet)
-      object_type.find(:all,
-                       :joins => "inner join users on " + object_type.to_s.pluralize + ".instructor_id = users.id AND users.parent_id = " + user_id.to_s)
+      object_type.joins("inner join users on " + object_type.to_s.pluralize + ".instructor_id = users.id AND users.parent_id = " + user_id.to_s)
     else
-      object_type.find(:all,
-                       :joins => "inner join users on instructor_id = users.id AND users.parent_id = " + user_id.to_s)
+      object_type.joins("inner join users on instructor_id = users.id AND users.parent_id = " + user_id.to_s)
     end
   end
 
   def list_instructors(object_type, user_id)
     if (object_type != SignUpSheet)
-      object_type.find(:all,
-                       :joins => "inner join users on " + object_type.to_s.pluralize + ".instructor_id = users.id AND users.parent_id = " + user_id.to_s)
+      object_type.joins("inner join users on " + object_type.to_s.pluralize + ".instructor_id = users.id AND users.parent_id = " + user_id.to_s)
     else
-      object_type.find(:all,
-                       :joins => "inner join users on instructor_id = users.id AND users.parent_id = " + user_id.to_s)
+      object_type.joins("inner join users on instructor_id = users.id AND users.parent_id = " + user_id.to_s)
     end
   end
 

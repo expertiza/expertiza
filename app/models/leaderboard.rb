@@ -255,8 +255,7 @@ qtypeHash
   def self.extractPersonalAchievements(csHash, courseList, userID)
     # Get all the possible accomplishments from Leaderboard table
 
-    accompList = Leaderboard.find(:all,
-                                  :select => 'qtype')
+    accompList = Leaderboard.select :qtype
     # New hash for courses and accomplishments
     courseAccHash = Hash.new
     # Go through each course-accomplishment combo

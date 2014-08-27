@@ -1,12 +1,12 @@
 <%
     current_topic = nil
-questions = Question.find_all_by_questionnaire_id(@questionnaire.id)
+questions = Question.where(questionnaire_id: @questionnaire.id)
 questions.each { | question |
   i = 0
   # Get score given by the reviewer for each question in this review
   score = Score.find_by_response_id_and_question_id(review.id, question.id)
   if !score.nil?
-    ques_type = QuestionType.find_all_by_question_id(question.id)%>
+    ques_type = QuestionType.where(question_id: question.id)%>
   <%-# Render accordion title -%>
   <%= get_accordion_title(current_topic, ques_type[0].parameters.split("::")[0]) %>
   <%-# Render question, score and response -%>

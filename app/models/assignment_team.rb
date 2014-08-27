@@ -170,7 +170,7 @@ class AssignmentTeam < Team
         scores[:team] = self # This doesn't appear to be used anywhere
         assignment.questionnaires.each do |questionnaire|
           scores[questionnaire.symbol] = Hash.new
-          scores[questionnaire.symbol][:assessments] = TeamReviewResponseMap.find_all_by_reviewee_id(self.id)
+          scores[questionnaire.symbol][:assessments] = TeamReviewResponseMap.where(reviewee_id: self.id)
           scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
         end
         scores[:total_score] = assignment.compute_total_score(scores)
@@ -180,7 +180,7 @@ class AssignmentTeam < Team
 
       def self.get_team(participant)
         team = nil
-        teams_users = TeamsUser.find_all_by_user_id(participant.user_id)
+        teams_users = TeamsUser.where(user_id: participant.user_id)
         teams_users.each do |tuser|
           fteam = Team.where(['parent_id = ? && id = ?', participant.parent_id, tuser.team_id]).first
           team = fteam if fteam

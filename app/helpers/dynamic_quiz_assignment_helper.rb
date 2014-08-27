@@ -86,10 +86,10 @@ module DynamicQuizAssignmentHelper
     #  wasting time on submissions that have no content as well as avoiding duplicate reviews
     #  of team submissions.
     #if @questionnaire_id.blank?
-    submissions_in_current_cycle = AssignmentParticipant.find_all_by_parent_id(@assignment_id)
+    submissions_in_current_cycle = AssignmentParticipant.where(parent_id: @assignment_id)
     #else
-    #  submissions_in_current_cycle = AssignmentParticipant.find_all_by_questionnaire_id_and_parent_id(@questionnaire_id ,
-    #                                                                                          @assignment_id)
+    #  submissions_in_current_cycle = AssignmentParticipant.where(questionnaire_id: @questionnaire_id,
+    #                                                                                          parent_id: @assignment_id)
     #end
     #submissions_in_current_cycle.reject! { |submission| !submission.has_submissions? }
 
@@ -98,7 +98,7 @@ module DynamicQuizAssignmentHelper
     @submission_quiz_count = Hash.new
     submissions_in_current_cycle.each do |submission|
       # Each 'ResponseMap' entry indicates a review has been performed or is in progress.
-      existing_maps = ResponseMap.find_all_by_reviewee_id_and_reviewed_object_id( submission.id, @assignment_id )
+      existing_maps = ResponseMap.where(reviewee_id:  submission.id, reviewed_object_id: @assignment_id )
       if existing_maps.nil?
         @submission_quiz_count[submission.id] = 0 # There are no reviews in progress (potential or completed).
       else

@@ -8,9 +8,9 @@ class SurveyDeploymentController < ApplicationController
   end
 
   def new
-    @surveys=Questionnaire.find_all_by_type('CourseEvaluationQuestionnaire').map{|u| [u.name, u.id] }
-    @course = Course.find_all_by_instructor_id(session[:user].id).map{|u| [u.name, u.id] }
-    @total_students = CourseParticipant.find_all_by_parent_id(@course[0][1]).count
+    @surveys=Questionnaire.where(type: 'CourseEvaluationQuestionnaire').map{|u| [u.name, u.id] }
+    @course = Course.where(instructor_id: session[:user].id).map{|u| [u.name, u.id] }
+    @total_students = CourseParticipant.where(parent_id: @course[0][1]).count
   end
 
   def create
@@ -18,16 +18,16 @@ class SurveyDeploymentController < ApplicationController
 
     @survey_deployment=SurveyDeployment.new(survey_deployment)
     if(params[:random_subset]["value"]=="1")
-      @survey_deployment.num_of_students=User.find_all_by_role_id(Role.student.id).length * rand
+      @survey_deployment.num_of_students=User.where(role_id: Role.student.id).length * rand
     end
 
     if(@survey_deployment.save)
       add_participants(@survey_deployment.num_of_students,@survey_deployment.id)
       redirect_to :action=>'list'
     else
-      @surveys=Questionnaire.find_all_by_type('CourseEvaluationQuestionnaire').map{|u| [u.name, u.id] }
-      @course = Course.find_all_by_instructor_id(session[:user].id).map{|u| [u.name, u.id] }
-      @total_students = CourseParticipant.find_all_by_parent_id(@course[0][1]).count
+      @surveys=Questionnaire.where(type: 'CourseEvaluationQuestionnaire').map{|u| [u.name, u.id] }
+      @course = Course.where(instructor_id: session[:user].id).map{|u| [u.name, u.id] }
+      @total_students = CourseParticipant.where(parent_id: @course[0][1]).count
       render(:action=>'new')
     end
   end
@@ -44,17 +44,17 @@ class SurveyDeploymentController < ApplicationController
 
   def delete
     SurveyDeployment.find(params[:id]).destroy
-    SurveyParticipant.find_all_by_survey_deployment_id(params[:id]).each do |sp|
+    SurveyParticipant.where(survey_deployment_id: params[:id]).each do |sp|
       sp.destroy
     end
-    SurveyResponse.find_all_by_survey_deployment_id(params[:id]).each do |sr|
+    SurveyResponse.where(survey_deployment_id: params[:id]).each do |sr|
       sr.destroy
     end
     redirect_to :action=>'list'
   end
 
   def add_participants(num_of_participants,survey_deployment_id) #Add participants
-    users=User.find_all_by_role_id(Role.student.id)
+    users=User.where(role_id: Role.student.id)
     users_rand=users.sort_by{rand} #randomize user list
     num_of_participants.times do |i|
       survey_participant=SurveyParticipant.new

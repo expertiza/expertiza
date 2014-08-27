@@ -18,7 +18,7 @@ class DueDateController < ApplicationController
       return #TODO: add error message
     end
 
-    @due_dates = DueDate.find_all_by_assignment_id(params[:assignment_id])
+    @due_dates = DueDate.where(assignment_id: params[:assignment_id])
     @due_dates.each do |due_date|
       due_date.delete
     end

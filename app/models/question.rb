@@ -35,7 +35,7 @@ class Question < ActiveRecord::Base
   attr_accessor :checked
 
   def delete
-    QuestionAdvice.find_all_by_question_id(self.id).each{|advice| advice.destroy}
+    QuestionAdvice.where(question_id: self.id).each{|advice| advice.destroy}
     self.destroy
   end
 end

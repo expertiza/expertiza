@@ -137,7 +137,7 @@ class TreeDisplayController < ApplicationController
     if filter_node == 'QAN'
       assignment = Assignment.find_by_name(search)
       if assignment
-        assignment_questionnaires = AssignmentQuestionnaire.find_all_by_assignment_id(assignment.id)
+        assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment.id)
         if assignment_questionnaires
           assignment_questionnaires.each { |q|  qid << "#{q.questionnaire_id.to_s}+" }
           session[:root] = 1

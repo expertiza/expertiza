@@ -69,7 +69,7 @@ class AssignmentsController < ApplicationController
       return
     end
 
-    @due_dates = DueDate.find_all_by_assignment_id(params[:assignment_id])
+    @due_dates = DueDate.where(assignment_id: params[:assignment_id])
     @due_dates.each do |due_date|
       due_date.delete
     end
@@ -108,7 +108,7 @@ class AssignmentsController < ApplicationController
       return
     end
 
-    @assignment_questionnaires = AssignmentQuestionnaire.find_all_by_assignment_id(params[:assignment_id])
+    @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:assignment_id])
     @assignment_questionnaires.each do |assignment_questionnaire|
       assignment_questionnaire.delete
     end
@@ -240,7 +240,7 @@ class AssignmentsController < ApplicationController
   end
 
   def add_to_delayed_queue
-    duedates = DueDate::find_all_by_assignment_id(@assignment.id)
+    duedates = DueDate::where(assignment_id: @assignment.id)
     for i in (0 .. duedates.length-1)
       deadline_type = DeadlineType.find(duedates[i].deadline_type_id).name
       due_at = duedates[i].due_at.to_s(:db)

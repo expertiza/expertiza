@@ -12,7 +12,7 @@
     <th>Sent at</th>
   </tr>
   <% participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
-  requests=JoinTeamRequest.find_all_by_participant_id(participant.id) %>
+  requests=JoinTeamRequest.where(participant_id: participant.id) %>
 <% if requests != nil %>
 
   <% requests.each do |request| %>

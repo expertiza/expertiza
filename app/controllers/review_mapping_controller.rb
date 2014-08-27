@@ -121,7 +121,7 @@ class ReviewMappingController < ApplicationController
   #  Looks up the team from the submission.
   def get_team_from_submission(submission)
     # Get the list of teams for this assignment.
-    teams = AssignmentTeam.find_all_by_parent_id( submission.parent_id)
+    teams = AssignmentTeam.where(parent_id:  submission.parent_id)
 
     teams.each do |team|
       team.teams_users.each do |team_member|
@@ -313,7 +313,7 @@ class ReviewMappingController < ApplicationController
 
   def delete_all_metareviewers
     mapping = ResponseMap.find(params[:id])
-    mmappings = MetareviewResponseMap.find_all_by_reviewed_object_id(mapping.map_id)
+    mmappings = MetareviewResponseMap.where(reviewed_object_id: mapping.map_id)
 
     failedCount = ResponseMap.delete_mappings(mmappings, params[:force])
     if failedCount > 0
@@ -443,7 +443,7 @@ class ReviewMappingController < ApplicationController
     @assignment = Assignment.find(params[:id])
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    @items = AssignmentTeam.find_all_by_parent_id(@assignment.id)
+    @items = AssignmentTeam.where(parent_id: @assignment.id)
     @items.sort!{|a,b| a.name <=> b.name}
     end
 
@@ -453,11 +453,11 @@ class ReviewMappingController < ApplicationController
     index = 0
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    contributors = AssignmentTeam.find_all_by_parent_id(@assignment.id)
+    contributors = AssignmentTeam.where(parent_id: @assignment.id)
     contributors.sort!{|a,b| a.name <=> b.name}
     contributors.each{
       |contrib|
-      review_mappings = ResponseMap.find_all_by_reviewed_object_id_and_reviewee_id(@assignment.id,contrib.id)
+      review_mappings = ResponseMap.where(reviewed_object_id: @assignment.id, reviewee_id: contrib.id)
 
       if review_mappings.length == 0
         single = Array.new
@@ -470,7 +470,7 @@ class ReviewMappingController < ApplicationController
         review_mappings.sort!{|a,b| a.reviewer.name <=> b.reviewer.name}
         review_mappings.each{
           |review_map|
-          metareview_mappings = MetareviewResponseMap.find_all_by_reviewed_object_id(review_map.map_id)
+          metareview_mappings = MetareviewResponseMap.where(reviewed_object_id: review_map.map_id)
           if metareview_mappings.length == 0
             single = Array.new
             single[0] = contrib.name
@@ -573,7 +573,7 @@ class ReviewMappingController < ApplicationController
     @scores = [0,0,0,0,0,0,0,0,0,0]
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    teams = Team.find_all_by_parent_id(params[:id])
+    teams = Team.where(parent_id: params[:id])
     objtype = "TeamReviewResponseMap"
 
     teams.each do |team|

@@ -48,7 +48,7 @@ class Participant < ActiveRecord::Base
 
 
     def force_delete(maps)
-      times = ResubmissionTime.find_all_by_participant_id(self.id);
+      times = ResubmissionTime.where(participant_id: self.id);
 
       if times
         times.each { |time| time.destroy }
@@ -119,7 +119,7 @@ class Participant < ActiveRecord::Base
                               WHERE t.parent_id = " + assignment.id.to_s + " and t.id = u.team_id and u.user_id = " + self.user_id.to_s )
 
       team_id = team[0]["team_id"]
-      team_members = TeamsUser.find_all_by_team_id(team_id)
+      team_members = TeamsUser.where(team_id: team_id)
 
       team_members.each { |team_member|
         participant = Participant.find_by_user_id_and_parent_id(team_member.user_id,assignment.id)

@@ -55,7 +55,7 @@ class SignUpTopic < ActiveRecord::Base
 
   def self.slotAvailable?(topic_id)
     topic = SignUpTopic.find(topic_id)
-    no_of_students_who_selected_the_topic = SignedUpUser.find_all_by_topic_id_and_is_waitlisted(topic_id, false)
+    no_of_students_who_selected_the_topic = SignedUpUser.where(topic_id: topic_id, is_waitlisted: false)
 
     if !no_of_students_who_selected_the_topic.nil?
       if topic.max_choosers > no_of_students_who_selected_the_topic.size

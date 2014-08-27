@@ -87,7 +87,7 @@ class DelayedMailer
         else
           for signedUser in signedUpUsers
             teamid  = signedUser.creator_id
-            team_members = TeamsUser.find_all_by_team_id(teamid)
+            team_members = TeamsUser.where(team_id: teamid)
             for team_member in team_members
               user = User.find(team_member.user_id)
               emails << user.email

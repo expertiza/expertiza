@@ -48,7 +48,7 @@ class CourseParticipant < Participant
 
   # provide export functionality for Assignment Participants
   def self.export(csv, parent_id, options)
-    find_all_by_parent_id(parent_id).each {
+    where(parent_id: parent_id).each {
       |part|
       tcsv = Array.new
       user = part.user

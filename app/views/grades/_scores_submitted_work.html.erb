@@ -4,7 +4,7 @@
     var question;
     <%
         review = rscore[:assessments][0]
-    Score.find_all_by_response_id(review.response_id).each {
+    Score.where(response_id: review.response_id).each {
       |reviewScore|
       question = Question.find_by_id(reviewScore.question_id)
     %>
@@ -32,7 +32,7 @@
     review.comments = [];
 
     <%
-        Score.find_all_by_response_id(review.response_id).each{ |reviewScore|
+        Score.where(response_id: review.response_id).each{ |reviewScore|
     %>
     review.scores.push('<%= reviewScore.score.to_s %>'.trim());
           review.comments.push('<%= reviewScore.comments.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim());

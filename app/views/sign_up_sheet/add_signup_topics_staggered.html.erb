@@ -46,7 +46,7 @@
           <%= render :partial => 'num_waiting', :locals => {:topic=>topic}  %>
 
           <td align="center">
-            <% topic_identifier = SignUpTopic.find_all_by_assignment_id(@assignment.id).map {|u| [u.topic_identifier, u.id] } %>
+            <% topic_identifier = SignUpTopic.where(assignment_id: @assignment.id).map {|u| [u.topic_identifier, u.id] } %>
             <% topic_identifier.delete([topic.topic_identifier, topic.id]) %>
             <% select = TopicDependency.find_by_topic_id(topic.id)%>
             <% selected = Array.new%>

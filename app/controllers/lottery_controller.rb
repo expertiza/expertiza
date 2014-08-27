@@ -64,7 +64,7 @@ class LotteryController < ApplicationController
     # First, we need to gather all of the Participants for a topic
     # Once we have this, we can pull the teams off of each individual and build an array of teams to return
     teams_to_return = Array.new
-    all_participants = Participant.find_all_by_topic_id(topic.id)
+    all_participants = Participant.where(topic_id: topic.id)
     all_participants.each do |participant|
       teams_to_return += TeamsUser.find_by_user_id(participant.user_id).team
     end
@@ -216,7 +216,7 @@ class LotteryController < ApplicationController
   def run_intelligent_bid
     assignment = Assignment.find(params[:id]) unless params[:id].blank?
 
-    sign_up_topics = SignUpTopic.find_all_by_assignment_id(params[:id])
+    sign_up_topics = SignUpTopic.where(assignment_id: params[:id])
 
     # TODO - provide a seed IF same results are required everytime with same input
     # our assumption - algorithm is random, running twice on same input may result in different allocations.
@@ -225,7 +225,7 @@ class LotteryController < ApplicationController
     #to keep track of the max slots for a topic
     current_max_slots = Hash.new
     sign_up_topics.each do |topic|
-      assignments_for_topic = SignedUpUser.find_all_by_topic_id_and_is_waitlisted(topic.id,0)
+      assignments_for_topic = SignedUpUser.where(topic_id: topic.id, is_waitlisted: 0)
       current_max_slots[topic.id] = topic.max_choosers - assignments_for_topic.size
     end
 
@@ -238,11 +238,11 @@ class LotteryController < ApplicationController
           # if there are any requests available for the topic
           if topic.signed_up_users.size != 0
             #get the teams to which topic has been assigned
-            assignments_for_topic = SignedUpUser.find_all_by_topic_id_and_is_waitlisted(topic.id,0)
+            assignments_for_topic = SignedUpUser.where(topic_id: topic.id, is_waitlisted: 0)
             #if slots are still available
             if assignments_for_topic.size < topic.max_choosers
               #get the users who have requested the topic
-              bids = SignedUpUser.find_all_by_topic_id_and_is_waitlisted(topic.id,1, :order => "preference_priority_number")
+              bids = SignedUpUser.where(topic_id: topic.id, is_waitlisted: 1).order("preference_priority_number")
 
               if bids.size == 0
               else if bids.size == 1
@@ -260,7 +260,7 @@ class LotteryController < ApplicationController
                   highest_priority[0] = 0
                 end
                 # get the candidates who have assigned highest priority for the topic
-                candidates =  SignedUpUser.find_all_by_topic_id_and_is_waitlisted_and_preference_priority_number(topic.id,1,highest_priority[0].preference_priority_number)
+                candidates =  SignedUpUser.where(topic_id: topic.id, is_waitlisted: 1, preference_priority_number: highest_priority[0].preference_priority_number)
 
                 if candidates.size == 1
                   alloted = allot_topic_to_user_if_possible(params[:id],candidates[0],topic,current_max_slots)

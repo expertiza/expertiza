@@ -65,7 +65,7 @@ class SignedUpUser < ActiveRecord::Base
   #If a signup sheet exists then release topics that the given team has selected for the given assignment.
   def self.release_topics_selected_by_team_for_assignment(team_id, assignment_id)
     #Get all the signups for the team
-    old_teams_signups = SignedUpUser.find_all_by_creator_id(team_id)
+    old_teams_signups = SignedUpUser.where(creator_id: team_id)
 
     #If the team has signed up for the topic and they are on the waitlist then remove that team from the waitlist.
     if !old_teams_signups.nil?

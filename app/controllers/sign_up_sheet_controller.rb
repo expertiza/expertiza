@@ -108,7 +108,7 @@ class SignUpSheetController < ApplicationController
 
       #if this assignment has staggered deadlines then destroy the dependencies as well
       if Assignment.find(params[:assignment_id])['staggered_deadline'] == true
-        dependencies = TopicDependency.find_all_by_topic_id(params[:id])
+        dependencies = TopicDependency.where(topic_id: params[:id])
         unless dependencies.nil?
           dependencies.each { |dependency| dependency.destroy }
         end
@@ -165,7 +165,7 @@ class SignUpSheetController < ApplicationController
         load_add_signup_topics(params[:id])
 
         @review_rounds = Assignment.find(params[:id]).get_review_rounds
-        @topics = SignUpTopic.find_all_by_assignment_id(params[:id])
+        @topics = SignUpTopic.where(assignment_id: params[:id])
 
         #Use this until you figure out how to initialize this array
         @duedates = SignUpTopic.find_by_sql("SELECT s.id as topic_id FROM sign_up_topics s WHERE s.assignment_id = " + params[:id].to_s)
@@ -186,7 +186,7 @@ class SignUpSheetController < ApplicationController
                 @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
               else
                 #the topic is new. so copy deadlines from assignment
-                set_of_due_dates = DueDate.find_all_by_assignment_id(params[:id])
+                set_of_due_dates = DueDate.where(assignment_id: params[:id])
                 set_of_due_dates.each { |due_date|
                   create_topic_deadline(due_date, 0, topic.id)
                 }
@@ -495,7 +495,7 @@ class SignUpSheetController < ApplicationController
           # Prevent injection attacks - we're using this in a system() call later
           params[:assignment_id] = params[:assignment_id].to_i.to_s
 
-          topics = SignUpTopic.find_all_by_assignment_id(params[:assignment_id])
+          topics = SignUpTopic.where(assignment_id: params[:assignment_id])
           topics = topics.collect { |topic|
             #if there is no dependency for a topic then there wont be a post for that tag.
             #if this happens store the dependency as "0"
@@ -608,7 +608,7 @@ class SignUpSheetController < ApplicationController
             end
             @results.each { |result|
               @team_members = ""
-              TeamsUser.find_all_by_team_id(result[:team_id]).each { |teamuser|
+              TeamsUser.where(team_id: result[:team_id]).each { |teamuser|
                 @team_members+=User.find(teamuser.user_id).name+" "
               }
             }

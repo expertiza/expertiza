@@ -16,7 +16,7 @@ class ResponseMap < ActiveRecord::Base
       @sort_to=Array.new
 
       #get all the versions
-      maps = find_all_by_reviewee_id(participant.id)
+      maps = where(reviewee_id: participant.id)
       maps.each { |map|
         if map.response
           @all_resp=Response.all
@@ -39,8 +39,8 @@ class ResponseMap < ActiveRecord::Base
 
   # return latest versions of the response given by reviewer
   def self.get_reviewer_assessments_for(participant, reviewer)
-    map = find_all_by_reviewee_id_and_reviewer_id(participant.id, reviewer.id)
-    return Response.find_all_by_map_id(map).sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }[0]
+    map = where(reviewee_id: participant.id, reviewer_id: reviewer.id)
+    return Response.where(map_id: map).sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }[0]
   end
 
   # Placeholder method, override in derived classes if required.
@@ -63,7 +63,7 @@ class ResponseMap < ActiveRecord::Base
   # Evaluates whether this response_map was metareviewed by metareviewer
   # @param[in] metareviewer AssignmentParticipant object
   def metareviewed_by?(metareviewer)
-    MetareviewResponseMap.find_all_by_reviewee_id_and_reviewer_id_and_reviewed_object_id(self.reviewer.id, metareviewer.id, self.id).count() > 0
+    MetareviewResponseMap.where(reviewee_id: self.reviewer.id, reviewer_id: metareviewer.id, reviewed_object_id: self.id).count() > 0
   end
 
   # Assigns a metareviewer to this review (response)

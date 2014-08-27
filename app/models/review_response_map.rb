@@ -10,9 +10,9 @@ class ReviewResponseMap < ResponseMap
   end
 
   def delete(force = nil)
-    fmaps = FeedbackResponseMap.find_all_by_reviewed_object_id(self.response.response_id)
+    fmaps = FeedbackResponseMap.where(reviewed_object_id: self.response.response_id)
     fmaps.each { |fmap| fmap.delete(true) }
-    maps = MetareviewResponseMap.find_all_by_reviewed_object_id(self.id)
+    maps = MetareviewResponseMap.where(reviewed_object_id: self.id)
     maps.each { |map| map.delete(force) }
     self.destroy
   end
@@ -23,7 +23,7 @@ class ReviewResponseMap < ResponseMap
   end
 
   def self.export(csv, parent_id, options)
-    mappings = find_all_by_reviewed_object_id(parent_id)
+    mappings = where(reviewed_object_id: parent_id)
     mappings.sort! { |a, b| a.reviewee.name <=> b.reviewee.name }
     mappings.each {
       |map|
@@ -89,7 +89,7 @@ class ReviewResponseMap < ResponseMap
 
   # This method adds a new entry in the ResponseMap
   def self.add_reviewer(contributor_id, reviewer_id, assignment_id)
-    if find_all_by_reviewee_id_and_reviewer_id(contributor_id, reviewer_id).count > 0
+    if where(reviewee_id: contributor_id, reviewer_id: reviewer_id).count > 0
       create(:reviewee_id => contributor_id,
              :reviewer_id => reviewer_id,
              :reviewed_object_id => assignment_id)

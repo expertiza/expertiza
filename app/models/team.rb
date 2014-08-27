@@ -7,7 +7,7 @@ class Team < ActiveRecord::Base
   has_paper_trail
 
   def get_participants
-    Participant.find_all_by_id users.map(&:id)
+    Participant.where(id users.map: &:id)
   end
 
   def delete
@@ -82,7 +82,7 @@ class Team < ActiveRecord::Base
   end
 
   def copy_members(new_team)
-    members = TeamsUser.find_all_by_team_id(self.id)
+    members = TeamsUser.where(team_id: self.id)
     members.each{
       | member |
       t_user = TeamsUser.create(:team_id => new_team.id, :user_id => member.user_id)

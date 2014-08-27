@@ -118,7 +118,7 @@ class CourseTeam < Team
         raise ImportError, "The course with id \""+course_id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this course?"
       end
 
-      teams = CourseTeam.find_all_by_parent_id(parent_id)
+      teams = CourseTeam.where(parent_id: parent_id)
       teams.each do |team|
         csv << team.export(options[:team_name])
       end
@@ -138,7 +138,7 @@ class CourseTeam < Team
     #      it should either belong to course class or assignment team class
     def self.export_all_assignment_team_related_to_course(csv, parent_id, options)
       course = Course.find(parent_id)
-      assignmentList = Assignment.find_all_by_course_id(parent_id)
+      assignmentList = Assignment.where(course_id: parent_id)
       assignmentList.each do |currentAssignment|
         currentAssignment.teams.each { |team|
           tcsv = Array.new

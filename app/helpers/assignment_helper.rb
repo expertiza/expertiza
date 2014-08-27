@@ -1,7 +1,7 @@
 module AssignmentHelper
 
   def course_options(instructor)
-    courses = Course.find_all_by_instructor_id(instructor.id)
+    courses = Course.where(instructor_id: instructor.id)
     options = Array.new
     options << ['-----------', nil]
     courses.each do |course|

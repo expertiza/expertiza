@@ -32,10 +32,10 @@
           <td > <%= text_area "new_question[]", 'txt', :size=>80 %></td>
         <% end %>
         <%#  if @questionnaire.type == 'QuizQuestionnaire' %>
-        <%  @quiz_question_choices = QuizQuestionChoice.find_all_by_question_id(@new_question.id) %>
+        <%  @quiz_question_choices = QuizQuestionChoice.where(question_id: @new_question.id) %>
         <%# else
           i=1
-        @question_advices = QuestionAdvice.find_all_by_question_id(@new_question.id)
+        @question_advices = QuestionAdvice.where(question_id: @new_question.id)
         for @question_advice in @question_advices
           if @question_advice.score == 1
             @new_question.weight = i

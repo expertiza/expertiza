@@ -289,7 +289,7 @@ class ScoreCache < ActiveRecord::Base
     @participant = AssignmentParticipant.find(pid)
     @participant_assignment_id = @participant.parent_id
     @all_participants = Hash.new
-    @all_participants = AssignmentParticipant.find_all_by_parent_id(@participant_assignment_id)
+    @all_participants = AssignmentParticipant.where(parent_id: @participant_assignment_id)
 
 
 
@@ -340,7 +340,7 @@ class ScoreCache < ActiveRecord::Base
     @assignment_id = @participant.parent_id
 
     assignment_num_reviews = ResponseMap.where(["reviewed_object_id=? AND type=?", @assignment_id, 'TeamReviewResponseMap'])
-    @assignment_participants = AssignmentParticipant.find_all_by_parent_id(@assignment_id)
+    @assignment_participants = AssignmentParticipant.where(parent_id: @assignment_id)
 
     count = 0
     @assignment_participants.each{count = count + 1}
@@ -355,7 +355,7 @@ class ScoreCache < ActiveRecord::Base
     @participant = AssignmentParticipant.find(pid)
     @assignment_id = @participant.parent_id
     assignment_num_metareviews = ResponseMap.where(["reviewed_object_id=? AND type=?", @assignment_id, 'MetareviewResponseMap'])
-    @assignment_participants = AssignmentParticipant.find_all_by_parent_id(@assignment_id)
+    @assignment_participants = AssignmentParticipant.where(parent_id: @assignment_id)
 
     count = 0
     @assignment_participants.each{count = count + 1}

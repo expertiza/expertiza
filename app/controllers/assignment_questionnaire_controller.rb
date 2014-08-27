@@ -9,7 +9,7 @@ class AssignmentQuestionnaireController < ApplicationController
       return #TODO: add error message
     end
 
-    @assignment_questionnaires = AssignmentQuestionnaire.find_all_by_assignment_id(params[:assignment_id])
+    @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:assignment_id])
     @assignment_questionnaires.each do |assignment_questionnaire|
       assignment_questionnaire.delete
     end

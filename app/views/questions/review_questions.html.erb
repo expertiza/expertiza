@@ -11,7 +11,7 @@
     <% elsif question_type == 'Multiple Choice - Radio' %>
       <% correct_answer = '' %>
       Answer Options:<br>
-      <% QuizQuestionChoice.find_all_by_question_id(question.id).each do |choice| %>
+      <% QuizQuestionChoice.where(question_id: question.id).each do |choice| %>
         <% if choice.iscorrect == true  %>
           <% correct_answer = choice.txt %>
         <% end %>
@@ -22,7 +22,7 @@
     <% elsif question_type == 'Multiple Choice - Checked' %>
       <% correct_answers = Array.new %>
       Answer Options:<br>
-      <% QuizQuestionChoice.find_all_by_question_id(question.id).each do |choice| %>
+      <% QuizQuestionChoice.where(question_id: question.id).each do |choice| %>
         <% if choice.iscorrect == true  %>
           <% correct_answers.push choice.txt %>
         <% end %>

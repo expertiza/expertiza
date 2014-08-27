@@ -12,7 +12,7 @@ class StatisticsController < ApplicationController
 
   def list #list deployments for the survey
     @survey_id = params[:id]
-    @deployment = SurveyDeployment.find_all_by_course_evaluation_id(@survey_id).map{|u| [u.start_date.to_s+" - "+u.end_date.to_s,u.id] }
+    @deployment = SurveyDeployment.where(course_evaluation_id: @survey_id).map{|u| [u.start_date.to_s+" - "+u.end_date.to_s,u.id] }
   end
   def view_responses
     sd_id1=params[:statistics]["survey_deployment_id1"]
@@ -23,14 +23,14 @@ class StatisticsController < ApplicationController
     @deployment_date2=SurveyDeployment.find(sd_id2).start_date.strftime('%A %B %d %Y, %I:%M%p') + "-" + SurveyDeployment.find(sd_id2).end_date.strftime('%A %B %d %Y, %I:%M%p')
 
     @survey=Questionnaire.find(survey_id1)
-    @questions=Question.find_all_by_questionnaire_id(survey_id1)
+    @questions=Question.where(questionnaire_id: survey_id1)
 
     @num_responses1=Hash.new
     @num_responses2=Hash.new
     @t_score=Hash.new
     @questions.each do |q| # calculate number of responses for each question
       @num_responses1[q.id]=Hash.new
-      total_question_response=SurveyResponse.find_all_by_survey_deployment_id_and_question_id(sd_id1,q.id).length
+      total_question_response=SurveyResponse.where(survey_deployment_id: sd_id1, question_id: q.id).length
       for i in @survey.min_question_score..@survey.max_question_score
         if(total_question_response>0)
           @num_responses1[q.id][i]=(SurveyResponse.where(["survey_deployment_id=? and question_id=? and score=?",sd_id1,q.id,i]).length.to_f/total_question_response)
@@ -40,7 +40,7 @@ class StatisticsController < ApplicationController
       end
 
       @num_responses2[q.id]=Hash.new
-      total_question_response=SurveyResponse.find_all_by_survey_deployment_id_and_question_id(sd_id2,q.id).length
+      total_question_response=SurveyResponse.where(survey_deployment_id: sd_id2, question_id: q.id).length
       for i in @survey.min_question_score..@survey.max_question_score
         if(total_question_response>0)
           @num_responses2[q.id][i]=(SurveyResponse.where(["survey_deployment_id=? and question_id=? and score=?",sd_id2,q.id,i]).length.to_f/total_question_response)

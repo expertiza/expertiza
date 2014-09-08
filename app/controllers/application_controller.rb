@@ -17,7 +17,11 @@ class ApplicationController < ActionController::Base
   end
 
   def current_role_name
-    current_user.role.name
+    current_role.name
+  end
+
+  def current_role
+    current_user.role
   end
 
   helper_method :current_user_role?

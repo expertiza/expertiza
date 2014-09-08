@@ -18,7 +18,7 @@ class InvitationController < ApplicationController
     if !user
       flash[:note] = "\"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
     else
-      participant= AssignmentParticipant.first.where(['user_id =? and parent_id =?', user.id, student.parent_id])
+      participant= AssignmentParticipant.where('user_id =? and parent_id =?', user.id, student.parent_id).first
       #check if the user is a participant of the assignment
       if !participant
         flash[:note] = "\"#{params[:user][:name].strip}\" is not a participant of this assignment."

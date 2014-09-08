@@ -81,7 +81,7 @@ module SubmittedContentHelper
   # restart the server
   def self.unzip_file(file_name, unzip_dir, should_delete)
     #begin
-    Zip::ZipFile::open(file_name) {
+    Zip::File.open(file_name) {
       |zf| zf.each { |e|
         safename = FileHelper::sanitize_filename(e.name);
         fpath = File.join(unzip_dir, safename)

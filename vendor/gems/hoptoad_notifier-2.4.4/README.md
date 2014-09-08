@@ -38,7 +38,7 @@ Add the hoptoad_notifier gem to your Gemfile.  In Gemfile:
 
     gem "hoptoad_notifier", "~> 2.3"
 
-Then from your project's RAILS_ROOT, run:
+Then from your project's Rails.root, run:
 
     bundle install
     script/rails generate hoptoad --api-key your_key_here
@@ -51,7 +51,7 @@ Add the hoptoad_notifier gem to your app. In config/environment.rb:
 
     config.gem 'hoptoad_notifier'
 
-Then from your project's RAILS_ROOT, run:
+Then from your project's Rails.root, run:
 
     rake gems:install
     rake gems:unpack GEM=hoptoad_notifier
@@ -76,7 +76,7 @@ And then add the following to the Rails::Initializer.run do |config|
 block in environment.rb so that the vendored gem is loaded.
 
     # Add the vendor/gems/*/lib directories to the LOAD_PATH
-    config.load_paths += Dir.glob(File.join(RAILS_ROOT, 'vendor', 'gems', '*', 'lib'))
+    config.load_paths += Dir.glob(File.join(Rails.root, 'vendor', 'gems', '*', 'lib'))
 
 Next add something like this at the bottom of your config/environment.rb:
 
@@ -87,7 +87,7 @@ Next add something like this at the bottom of your config/environment.rb:
     end
 
 You will also need to copy the hoptoad_notifier_tasks.rake file into your
-RAILS_ROOT/lib/tasks directory in order for the rake hoptoad:test task to work:
+Rails.root/lib/tasks directory in order for the rake hoptoad:test task to work:
 
     cp vendor/gems/hoptoad_notifier-*/generators/hoptoad/templates/hoptoad_notifier_tasks.rake lib/tasks
 
@@ -122,7 +122,7 @@ column, you'll see an "Edit this project" button. Click on that to get your
 project's API. (If you accidentally use your personal API auth_token, you won't
 be able to install the gem.)
 
-Then from your project's RAILS_ROOT, run:
+Then from your project's Rails.root, run:
 
     rake gems:install
     script/generate hoptoad --api-key your_key_here
@@ -155,7 +155,7 @@ framework).
 ### Testing it out
 
 You can test that Hoptoad is working in your production environment by using
-this rake task (from RAILS_ROOT):
+this rake task (from Rails.root):
 
     rake hoptoad:test
 

@@ -1,5 +1,3 @@
-require 'zip/zip'
-
 class SubmittedContentController < ApplicationController
   helper :wiki
 

@@ -30,7 +30,7 @@ module HoptoadNotifier
       HoptoadNotifier.configure(true) do |config|
         config.logger = rails_logger
         config.environment_name = RAILS_ENV  if defined?(RAILS_ENV)
-        config.project_root     = RAILS_ROOT if defined?(RAILS_ROOT)
+        config.project_root     = Rails.root if defined?(Rails.root)
         config.framework        = "Rails: #{::Rails::VERSION::STRING}" if defined?(::Rails::VERSION)
       end
     end

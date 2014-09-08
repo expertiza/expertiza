@@ -12,7 +12,7 @@ caused by what environments, so your staging errors don't get mixed in with
 your production errors.)
 
 You can test that Hoptoad is working in your production environment by using 
-this rake task (from RAILS_ROOT):
+this rake task (from Rails.root):
 
   rake hoptoad:test
 
@@ -22,4 +22,4 @@ which will be visible immediately.
 NOTE FOR RAILS 1.2.* USERS:
 
 You will need to copy the hoptoad_notifier_tasks.rake file into your
-RAILS_ROOT/lib/tasks directory in order for the rake hoptoad:test task to work.
+Rails.root/lib/tasks directory in order for the rake hoptoad:test task to work.

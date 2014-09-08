@@ -24,4 +24,8 @@ module ApplicationHelper
       "<div class='flash_#{type.to_s}'>#{flash[type]}</div>".html_safe
     end
   end
+
+  def text_field_with_auto_complete model, field, options
+    text_field_tag "#{model}[#{field}]", "", options
+  end
 end

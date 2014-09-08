@@ -40,7 +40,7 @@ class MoveFiles < ActiveRecord::Migration
       | assignment |
       directories = Assignment.find_all_by_directory_path(assignment.directory_path)
       if directories.length ==  1
-         oldpath = RAILS_ROOT + "/pg_data/"+ assignment.directory_path
+        oldpath = Rails.root + "/pg_data/"+ assignment.directory_path
          if assignment.name == 'Another assignment'
             puts assignment.directory_path
             puts assignment.directory_path.length

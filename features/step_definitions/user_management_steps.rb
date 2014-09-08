@@ -21,7 +21,7 @@ end
 
 Given /I import a CSV with (invalid|valid) data for 3 new users/ do |validity| 
   step "I choose \"delim_type_comma\""
-  step "I attach the file \"#{File.join(RAILS_ROOT,'features','upload_files','new_users_'+validity+'.csv')}\" to \"file\""
+  step "I attach the file \"#{File.join(Rails.root,'features','upload_files','new_users_'+validity+'.csv')}\" to \"file\""
   step "I press \"Import\""
 end
 

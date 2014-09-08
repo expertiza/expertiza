@@ -44,7 +44,7 @@ class ImportFileControllerTest < ActionController::TestCase
     
     @request.session[:return_to] = 'http://test:host'
     post :import, :model      => 'AssignmentParticipant',
-                  :file       => File.new(RAILS_ROOT+'/test/roster.txt'),
+      :file       => File.new(Rails.root+'/test/roster.txt'),
                   :id         => assignment.id,
                   :delim_type => 'other',
                   :other_char => '*'
@@ -61,7 +61,7 @@ class ImportFileControllerTest < ActionController::TestCase
     user_count = User.count  
     @request.session[:return_to] = 'http://test:host'
     post :import, :model      => 'User',
-                  :file       => File.new(RAILS_ROOT+'/test/user_import.csv'),
+      :file       => File.new(Rails.root+'/test/user_import.csv'),
                   :delim_type => 'comma'
     assert_equal user_count + 1, User.count
     assert_equal User.last.name, 'edwards34'

@@ -65,7 +65,7 @@ module ParticipantsHelper
 
   def self.get_config
     config = {}
-    cfgdir = RAILS_ROOT + "/config/"
+    cfgdir = Rails.root + "/config/"
     File.open(cfgdir+"roster_config", "r") do |infile|
       while (line = infile.gets)
         store_item(line,"dlm",config)

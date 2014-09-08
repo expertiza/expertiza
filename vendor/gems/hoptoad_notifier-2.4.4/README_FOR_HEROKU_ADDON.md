@@ -23,7 +23,7 @@ Add the hoptoad_notifier and heroku gems to your Gemfile.  In Gemfile:
     gem 'hoptoad_notifier'
     gem 'heroku'
 
-Then from your project's RAILS_ROOT, run:
+Then from your project's Rails.root, run:
 
     $ bundle install
     $ script/rails generate hoptoad --heroku
@@ -38,7 +38,7 @@ Add the hoptoad_notifier gem to your app. In config/environment.rb:
 
     config.gem 'hoptoad_notifier'
 
-Then from your project's RAILS_ROOT, run:
+Then from your project's Rails.root, run:
 
     $ rake gems:install
     $ rake gems:unpack GEM=hoptoad_notifier

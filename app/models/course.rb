@@ -19,7 +19,7 @@ class Course < ActiveRecord::Base
     if self.instructor_id == nil
       raise "Path can not be created. The course must be associated with an instructor."
     end
-    return RAILS_ROOT + "/pg_data/" + FileHelper.clean_path(User.find(self.instructor_id).name)+ "/" + FileHelper.clean_path(self.directory_path) + "/"
+    return Rails.root + "/pg_data/" + FileHelper.clean_path(User.find(self.instructor_id).name)+ "/" + FileHelper.clean_path(self.directory_path) + "/"
   end
 
   def get_participants

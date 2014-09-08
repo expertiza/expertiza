@@ -3,6 +3,7 @@ class QuizResponseMap < ResponseMap
   belongs_to :contributor, :class_name => 'Participant', :foreign_key => 'reviewee_id'
   belongs_to :quiz_questionnaire, :class_name => 'QuizQuestionnaire', :foreign_key => 'reviewed_object_id'
   belongs_to :assignment, :class_name => 'Assignment'
+  has_many :quiz_responses, foreign_key: :map_id
 
   def questionnaire
     self.quiz_questionnaire

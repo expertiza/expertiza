@@ -231,7 +231,7 @@ function submit_due_dates() {
 <div style='padding: 5px' id='review_round'>
 <%= label_tag('assignment[rounds_of_reviews]', 'Number of Review Rounds:') %>
 <%= text_field_tag('assignment[rounds_of_reviews]', @assignment.rounds_of_reviews, :style => 'width:50px') %>
-<%= button_to_function('Set', 'changeReviewRounds()') %>
+<%= button_tag 'Set', onclick: 'changeReviewRounds()' %>
 </div>
 
 <table class='exp' id='due_dates_table' style='padding:10px'>

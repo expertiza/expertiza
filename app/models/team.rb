@@ -7,7 +7,7 @@ class Team < ActiveRecord::Base
   has_paper_trail
 
   def get_participants
-    Participant.where(id users.map: &:id)
+    Participant.where id: users.map(&:id)
   end
 
   def delete

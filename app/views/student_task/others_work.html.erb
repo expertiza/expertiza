@@ -1,4 +1,4 @@
-<% session[:return_to] = request.request_uri %>
+<% session[:return_to] = request.url %>
 <% if flash[:notice] != nil and flash[:notice].strip != "" %>
        <div class="flash_error">
        <%= flash[:notice] %>

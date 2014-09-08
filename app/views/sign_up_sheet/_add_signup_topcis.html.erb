@@ -31,7 +31,7 @@
   </div>
 <% end %>
 
-<% session[:return_to] = request.request_uri %>
+<% session[:return_to] = request.url %>
 <br/><br/>
 
 <%= render :partial => 'add_topics' %>

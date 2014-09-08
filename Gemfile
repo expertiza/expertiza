@@ -25,6 +25,7 @@ gem 'font-awesome-rails'
 gem 'gchart'
 gem 'gchartrb', :require => 'google_chart'
 gem 'gdata', :require => false
+gem 'haml-rails'
 gem 'hoptoad_notifier'
 gem 'jquery-rails'
 gem 'jquery-ui-sass-rails'

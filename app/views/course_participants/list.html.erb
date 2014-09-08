@@ -14,7 +14,7 @@
                         <br/>
 
                         <%
-                            session[:return_to] = request.request_uri
+                            session[:return_to] = request.url
                           %>
                         <%= link_to 'Import '+@title+' Participants',
                           :controller=>'import_file',

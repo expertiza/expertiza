@@ -1,5 +1,4 @@
 class GradesController < ApplicationController
-  use_google_charts
   helper :file
   helper :submitted_content
   helper :penalty
@@ -33,7 +32,6 @@ class GradesController < ApplicationController
   end
 
   def view_my_scores
-
     @participant = AssignmentParticipant.find(params[:id])
 
     @average_score_results = Array.new
@@ -251,7 +249,7 @@ class GradesController < ApplicationController
           end
         end
       else
-        reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, @participant.assignment.id)
+        reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id: @participant.assignment.id).first
         return true unless current_user_id?(reviewer.user_id)
       end
       return false

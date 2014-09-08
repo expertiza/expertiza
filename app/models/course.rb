@@ -1,5 +1,6 @@
 class Course < ActiveRecord::Base
   has_many :ta_mappings,:dependent => :destroy
+  has_many :tas, through: :ta_mappings
   validates_presence_of :name
   has_many :assignments, :dependent => :destroy
   belongs_to :instructor, :class_name => 'User', :foreign_key => 'instructor_id'

@@ -66,7 +66,7 @@ class ActionControllerCatcherTest < Test::Unit::TestCase
       url << ":#{request.port}"
     end
 
-    url << request.request_uri
+    url << request.url
     url
   end
 

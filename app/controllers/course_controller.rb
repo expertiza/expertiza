@@ -130,9 +130,6 @@ class CourseController < ApplicationController
   def view_teaching_assistants
     @course = Course.find(params[:id])
     @ta_mappings = @course.ta_mappings
-    for mapping in @ta_mappings
-      mapping[:name] = mapping.ta.name
-    end
   end
 
   def add_ta

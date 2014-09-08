@@ -27,7 +27,7 @@
   <% end %>
 </table>
 
-<% session[:return_to] = request.request_uri %>
+<% session[:return_to] = request.url %>
 <br/><br/>
 
 <a href="javascript:history.back()">Back</a>

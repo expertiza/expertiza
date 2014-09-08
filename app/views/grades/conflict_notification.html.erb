@@ -1,5 +1,5 @@
 <h1>Email <%= @rowlabel %>s</h1>
-<% session[:return_to] = request.request_uri %>
+<% session[:return_to] = request.url %>
 
 <% if flash[:notice] %>
        <div class="flash_note"><%= flash[:notice] %></div>

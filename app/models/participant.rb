@@ -12,6 +12,8 @@ class Participant < ActiveRecord::Base
 
   validates_numericality_of :grade, :allow_nil => true
 
+  delegate :course, to: :assignment
+
   has_paper_trail
 
   def get_current_stage

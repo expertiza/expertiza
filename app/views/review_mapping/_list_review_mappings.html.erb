@@ -145,7 +145,7 @@
   <% } %>
 </table>
 <%
-    session[:return_to] = request.request_uri
+    session[:return_to] = request.url
   %>
 
 <% if !assignment.dynamic_reviewer_assignment? %>

@@ -4,7 +4,7 @@
 
 
 <%
-    session[:return_to] = request.request_uri
+    session[:return_to] = request.url
   %>
 <BR/>
 <%= link_to 'Create Team', :action => 'new', :id=> @root_node.node_object_id, :model => @model %>

@@ -5,7 +5,7 @@ module LeaderboardHelper
   # associated with a course, and the course name provided
   # is "Unaffiliated Assignments"
   def self.getCourseName(courseID)
-    if courseID == 0
+    if courseID.nil? || courseID.zero?
       courseName = "Unaffiliated Assignments"
     else
       courseName = Course.find(courseID).name
@@ -16,8 +16,7 @@ module LeaderboardHelper
   # This method converts the questionnaire_type to a
   # sensible string for the Leaderboard table.
   def self.getAchieveName(qtype)
-    achieveName = Leaderboard.where([ "qtype like ?",qtype]).first.name
-
+    Leaderboard.where("qtype like ?",qtype).first.try :name
   end
 
   # This method gets the name for an assignment. If for some unexpected
@@ -38,9 +37,9 @@ module LeaderboardHelper
   # If the requesterID is a TA, instructor, or admin, the privacy
   # setting is disregarded.
   def self.getUserName(requesterID, userID)
-    user = User.find(userID)
+    user = User.find(userID) if userID
     instructor = userIsInstructor?(requesterID)
-    if user.leaderboard_privacy and requesterID != userID and !instructor
+    if user.try(:leaderboard_privacy) and requesterID != userID and !instructor
       userName = "*****"
     elsif requesterID == userID
       userName = "You!"

@@ -99,10 +99,10 @@ class Leaderboard < ActiveRecord::Base
 # end of first for
 
 
-    participantList = AssignmentParticipant.select("id, user_id, parent_id").where(["parent_id in (?)", assignmentList])
+    participantList = AssignmentParticipant.select("id, user_id, parent_id").where(parent_id: assignmentList.pluck(:id))
 #Creating an participant id to [user id, Assignment id] hash
 partAssHash = Hash.new
-for part in participantList
+participantList.find_each do |part|
   partAssHash[part.id] = [part.user_id, part.parent_id]
 end
 
@@ -123,8 +123,8 @@ for assgt in assignmentList
 
 
 
-  participants_for_assgt = AssignmentParticipant.where(["parent_id = ? and type =?", assgt.id, 'AssignmentParticipant'])
-  fMTEntries = ScoreCache.where(["reviewee_id in (?) and object_type in (?)", participants_for_assgt, argList])
+  participants_for_assgt = AssignmentParticipant.where("parent_id = ? and type =?", assgt.id, 'AssignmentParticipant').pluck(:id)
+  fMTEntries = ScoreCache.where("reviewee_id in (?) and object_type in (?)", participants_for_assgt, argList)
   for fMTEntry in fMTEntries
     csEntry = CsEntriesAdaptor.new
     csEntry.participant_id = fMTEntry.reviewee_id
@@ -150,15 +150,15 @@ for assgt in assignmentList
       csEntries << csEntry
     end
   else
-    assignment_teams = Team.where(["parent_id = ? and type = ?", assgt.id, 'AssignmentTeam'])
-    team_entries = ScoreCache.where(["reviewee_id in (?) and object_type = ?", assignment_teams, 'TeamReviewResponseMap'])
-    for team_entry in team_entries
+    assignment_teams = Team.where("parent_id = ? and type = ?", assgt.id, 'AssignmentTeam')
+    team_entries = ScoreCache.where("reviewee_id in (?) and object_type = ?", assignment_teams.pluck(:id), 'TeamReviewResponseMap')
+    team_entries.each do |team_entry|
       team_users = TeamsUser.where(["team_id = ?",team_entry.reviewee_id])
 
       for team_user in team_users
         team_participant = AssignmentParticipant.where(["user_id = ? and parent_id = ?", team_user.user_id, assgt.id]).first
         csEntry = CsEntriesAdaptor.new
-        csEntry.participant_id = team_participant.id
+        csEntry.participant_id = team_participant.try :id
         csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Review"]
         csEntry.total_score = team_entry.score
 
@@ -168,24 +168,18 @@ for assgt in assignmentList
     end
   end
 end
-#for csEntry in csEntries
-#end
-####################### end of Code Abhishek #############
-#qtype => course => user => score
 
-qtypeHash = Hash.new
+    qtypeHash = Hash.new
 
+    csEntries.each do |csEntry|
+      qtype = Questionnaire.find(csEntry.questionnaire_id).type.to_s if csEntry.questionnaire_id
+      courseid = assCourseHash[partAssHash[csEntry.participant_id].try(:[], 1)]
+      userid = partAssHash[csEntry.participant_id].try(:first)
 
-for csEntry in csEntries
+      addEntryToCSHash(qtypeHash, qtype, userid, csEntry, courseid)
+    end
 
-  qtype = Questionnaire.find(csEntry.questionnaire_id).type.to_s
-  courseid = assCourseHash[partAssHash[csEntry.participant_id][1]]
-  userid = partAssHash[csEntry.participant_id][0]
-
-  addEntryToCSHash(qtypeHash, qtype, userid, csEntry, courseid)
-end
-
-qtypeHash
+    qtypeHash
   end
 
   # This method adds an entry from the Computed_Scores table into a hash

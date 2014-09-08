@@ -52,7 +52,7 @@
         jQuery("#tabs").tabs();
       });
     </script>
-    <%= button_to_function 'Save', 'submit_form()' %>| <%= render :partial => '/shared_scripts/back' %>
+    <%= button_tag 'Save', onclick: 'submit_form()' %>| <%= render :partial => '/shared_scripts/back' %>
   <% end %>
 
   <br/>

@@ -64,7 +64,7 @@ class QuestionnaireNode < Node
         end
 
     else
-      all().includes(:questionnaire).conditions([conditions,values]) .order("questionnaires.#{sortvar} #{sortorder}")
+      self.includes(:questionnaire).where([conditions,values]).order("questionnaires.#{sortvar} #{sortorder}")
     end
   end
 

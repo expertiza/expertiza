@@ -8,7 +8,7 @@ class QuestionnaireTypeNode < FolderNode
 
   def self.get(sortvar = nil,sortorder =nil,user_id = nil,show = nil,parent_id = nil,search=nil)
     parent = TreeFolder.find_by_name("Questionnaires")
-    folders = TreeFolder.where(parent_id: parent_id)
+    folders = TreeFolder.where(parent_id: parent.id)
     nodes = Array.new
     folders.each do |folder|
       node = FolderNode.find_by_node_object_id(folder.id)

@@ -1,10 +1,10 @@
 <H3>Impersonate User</H3>
 
-<TABLE>
-  <TR>
-    <%= form_tag action: 'impersonate' do %>
-      <TD>Enter user account: <%= text_field :user, :name, {:size => 41, :autocomplete => "off"} %></TD>
+<%= form_for :user, url: 'impersonate' do |f| %>
+  <TABLE>
+    <TR>
+      <TD>Enter user account: <%= f.text_field :name, {:size => 41, :autocomplete => "off"} %></TD>
       <TD><%= submit_tag 'Impersonate' %></TD>
-    <% end %>
-  </TR>
-</TABLE>
+    </TR>
+  </TABLE>
+<% end %>

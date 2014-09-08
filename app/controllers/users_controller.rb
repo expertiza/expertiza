@@ -77,14 +77,8 @@ class UsersController < ApplicationController
     # Get the users list to show on current page
     @users = paginate_list(role, user.id, letter)
 
-    all_users.each {
-      | userObj |
-      first = userObj.name[0,1].downcase
-      if not @letters.include?(first)
-        @letters << first
-      end
-    }
-    end
+    @letters = ('A'..'Z').to_a
+  end
 
     def show_selection
       @user = User.find_by_name(params[:user][:name])

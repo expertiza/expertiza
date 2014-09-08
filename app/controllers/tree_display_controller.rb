@@ -108,9 +108,6 @@ class TreeDisplayController < ApplicationController
     if display
       @sortvar = display[:sortvar]
       @sortorder = display[:sortorder]
-      @show = (display[:check] == '1') ? nil : true
-    else
-      @show = true
     end
 
     @sortvar ||= 'created_at'

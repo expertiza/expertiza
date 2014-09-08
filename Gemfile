@@ -47,6 +47,7 @@ gem 'stanford-core-nlp'
 gem 'superfish-rails'
 gem 'turbolinks'
 gem 'will_paginate'
+gem 'zip-zip'
 
 group :development do
   gem 'daemons'

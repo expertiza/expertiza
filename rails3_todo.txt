@@ -70,7 +70,7 @@
 [33m	- app//models/super_administrator.rb
 [0m
 [31m[1mDeprecated constant(s)[0m
-[37mConstants like RAILS_ENV, RAILS_ROOT, and RAILS_DEFAULT_LOGGER are now deprecated.
+[37mConstants like RAILS_ENV, Rails.root, and RAILS_DEFAULT_LOGGER are now deprecated.
 [1mMore information:[0m [36mhttp://litanyagainstfear.com/blog/2010/02/03/the-rails-module/
 
 [37mThe culprits: 

@@ -43,3 +43,5 @@ server 'expertiza.ncsu.edu', user: 'rails', roles: %w{web app}
 #     auth_methods: %w(publickey password)
 #     # password: 'please use keys'
 #   }
+
+config.active_record.whitelist_attributes = false

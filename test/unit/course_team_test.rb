@@ -149,6 +149,6 @@ class CourseTeamTest < ActiveSupport::TestCase
   #
   ### test method dir_path
   ##def test_add_participant
-  ##  assert_equal RAILS_ROOT + '/pg_data/instructor3/csc110/',@course0.dir_path
+  ##  assert_equal Rails.root + '/pg_data/instructor3/csc110/',@course0.dir_path
   ##end
 end

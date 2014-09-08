@@ -35,7 +35,7 @@ namespace :upg_rails_2_2 do
 
     deprecated.each do |key, warning|
       puts '--> ' + key
-      output = `cd '#{File.expand_path('app', RAILS_ROOT)}' && grep -n --exclude=*.svn* -r '#{key}' *`
+      output = `cd '#{File.expand_path('app', Rails.root)}' && grep -n --exclude=*.svn* -r '#{key}' *`
       unless output =~ /^$/
         puts "  !! " + warning + " !!"
         puts '  ' + '.' * (warning.length + 6)

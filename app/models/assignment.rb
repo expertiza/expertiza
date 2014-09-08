@@ -396,7 +396,7 @@ class Assignment < ActiveRecord::Base
     raise PathError, 'No path needed' if self.wiki_type_id != 1
     (self.course_id != nil && self.course_id > 0) ?
       path = Course.find(self.course_id).get_path :
-      path = RAILS_ROOT + '/pg_data/' + FileHelper.clean_path(User.find(self.instructor_id).name) + '/'
+      path = Rails.root + '/pg_data/' + FileHelper.clean_path(User.find(self.instructor_id).name) + '/'
     path + FileHelper.clean_path(self.directory_path)
   end
 
@@ -484,14 +484,14 @@ class Assignment < ActiveRecord::Base
     # The size of an empty directory is 2
     # Delete the directory if it is empty
     begin
-      directory = Dir.entries(RAILS_ROOT + '/pg_data/' + self.directory_path)
+      directory = Dir.entries(Rails.root + '/pg_data/' + self.directory_path)
     rescue
       # directory is empty
     end
 
     if !is_wiki_assignment and !self.directory_path.empty? and !directory.nil?
       if directory.size == 2
-        Dir.delete(RAILS_ROOT + '/pg_data/' + self.directory_path)
+        Dir.delete(Rails.root + '/pg_data/' + self.directory_path)
       else
         raise 'Assignment directory is not empty'
       end

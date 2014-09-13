@@ -150,8 +150,7 @@ GEM
       powerbar
     multi_json (1.7.7)
     multi_test (0.0.2)
-    mysql (2.9.1)
-    mysql (2.9.1-x86-mingw32)
+    mysql2 (0.2.23)
     net-scp (1.1.2)
       net-ssh (>= 2.6.5)
     net-sftp (2.1.2)
@@ -307,7 +306,7 @@ DEPENDENCIES
   launchy
   minitest
   minitest-reporters (>= 0.5.0)
-  mysql
+  mysql2 (< 0.3)
   nokogiri
   open-uri-cached
   paper_trail

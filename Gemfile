@@ -21,7 +21,7 @@ gem 'gchartrb', :require => 'google_chart'
 gem 'gdata', :require => false
 gem 'hoptoad_notifier'
 gem 'jquery-rails'
-gem 'mysql'
+gem 'mysql2', '< 0.3'
 gem 'nokogiri'
 gem 'open-uri-cached'
 gem 'paper_trail'

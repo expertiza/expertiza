@@ -36,7 +36,7 @@ class Course < ActiveRecord::Base
     if (user == nil)
       raise "No user account exists with the name "+user_name+". Please <a href='"+url_for(:controller => 'users', :action => 'new')+"'>create</a> the user first."
     end
-    participant = CourseParticipant.find_by_parent_id_and_user_id(self.id, user.id)
+    participant = CourseParticipant.where(parent_id: self.id, user_id:  user.id).first
     unless participant # If there is already a participant, it has already been added. done. Otherwise, create it
       CourseParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted)
     end

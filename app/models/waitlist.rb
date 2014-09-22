@@ -29,7 +29,7 @@ class Waitlist < ActiveRecord::Base
           sign_up.is_waitlisted = false
 
           #Update topic_id in participant table with the topic_id
-          participant = Participant.find_by_user_id_and_parent_id( user_id , assignment_id)
+          participant = Participant.where(user_id:  user_id , parent_id:  assignment_id).first
 
           participant.update_topic_id(topic_id)
         else
@@ -62,7 +62,7 @@ class Waitlist < ActiveRecord::Base
             cancel_all_waitlists(creator_id, assignment_id)
             sign_up.is_waitlisted = false
             sign_up.save
-            participant = Participant.find_by_user_id_and_parent_id( user_id , assignment_id)
+            participant = Participant.where(user_id:  user_id , parent_id:  assignment_id).first
             participant.update_topic_id(topic_id)
             result = true
           end

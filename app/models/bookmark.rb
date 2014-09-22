@@ -291,7 +291,7 @@ class Bookmark < ActiveRecord::Base
 
         # Bookmark with the same url exists.
       else
-        bmapping = Bmapping.find_by_bookmark_id_and_user_id(bookmark_resource.id,session_user.id)
+        bmapping = Bmapping.where(bookmark_id: bookmark_resource.id, user_id: session_user.id).first
         # Bookmark with the same user - bmapping exists.
         if ( !bmapping.nil? )
           topic = SignUpTopic.find(topicid)

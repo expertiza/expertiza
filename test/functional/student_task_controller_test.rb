@@ -211,7 +211,7 @@ class StudentTaskControllerTest < ActionController::TestCase
   # for a given user id and for a particular assignments, return the current due date based on the current stage the assignment is in, test this functionality
   def test_review_due_date
     participant=Participant.find(participants(:par5))
-    assertresult2 =TopicDeadline.find_by_topic_id_and_deadline_type_id(participant.topic_id, 2)
+    assertresult2 =TopicDeadline.where(topic_id: participant.topic_id, deadline_type_id:  2).first
     due_date_result= assertresult2.due_at
     due_date_assert= '2012-10-20 23:31:27'
     assert_equal(due_date_assert.to_s,due_date_result.to_s.sub(' UTC',''))

@@ -503,7 +503,7 @@ module DynamicReviewMapping
 
                                                teams_to_assigned = Array.new
                                                #check whether it's the user's topic
-                                               users_topic_id = Participant.find_by_parent_id_and_user_id(@assignment.id, user)['topic_id']
+                                               users_topic_id = Participant.where(parent_id: @assignment.id, user_id:  user).first['topic_id']
 
                                                if (topic[0].to_i == users_topic_id.to_i && number_of_reviews < topic[1]) || topic[0].to_i != users_topic_id.to_i
                                                  #go thru team reviewers and find the team which worked on this topic
@@ -558,7 +558,7 @@ module DynamicReviewMapping
                 random_index = rand(users.size-1)
 
                 #check whether this guy is not part of the team
-                team = TeamsUser.find_by_team_id_and_user_id(mapping[0], users[random_index])
+                team = TeamsUser.where(team_id: mapping[0], user_id:  users[random_index]).first
                 #if team is nil then this user is not part of the team
                 #Also check whether this user has not yet been assigned to review this team
                 if team.nil? && mapping[1].index(users[random_index]).nil?
@@ -579,14 +579,14 @@ module DynamicReviewMapping
         user_review_count.each{|user|
           if user[1] > 0
             #reviewer_assignment_success = false
-            message_participant = Participant.find_by_parent_id_and_user_id(@assignment.id, user[0])
+            message_participant = Participant.where(parent_id: @assignment.id, user_id:  user[0]).first
             users_fullname = message_participant.fullname
             users_name = message_participant.name
             message = message + "<li>" + users_fullname + "("+ users_name.to_s + "): -" + user[1].to_i.abs.to_s + "</li>"
             @show_message = true
           elsif user[1] < 0
             @show_message = true
-            message_participant = Participant.find_by_parent_id_and_user_id(@assignment.id, user[0])
+            message_participant = Participant.where(parent_id: @assignment.id, user_id:  user[0]).first
             users_fullname = message_participant.fullname
             users_name = message_participant.name
             message = message + "<li>" +users_fullname + "("+ users_name.to_s + "): +" + user[1].to_i.abs.to_s + "</li>"
@@ -603,7 +603,7 @@ module DynamicReviewMapping
             reviewers = mapping[1]
 
             reviewers.each{|reviewer|
-              participant = Participant.find_by_parent_id_and_user_id(@assignment.id, reviewer)
+              participant = Participant.where(parent_id: @assignment.id, user_id:  reviewer).first
               #reviewer, and hence participant could be nil when algo couldn't find someone to review somebody's work
               if !participant.nil?
                 reviewer_id = participant.id
@@ -730,7 +730,7 @@ module DynamicReviewMapping
 
                 users_to_be_assigned = Array.new
                 #check whether it's the user's topic
-                users_topic_id = Participant.find_by_parent_id_and_user_id(@assignment.id, user)['topic_id']
+                users_topic_id = Participant.where(parent_id: @assignment.id, user_id:  user)['topic_id']
 
                 if (topic[0].to_i == users_topic_id.to_i && number_of_reviews < topic[1]) || topic[0].to_i != users_topic_id.to_i
 
@@ -808,14 +808,14 @@ module DynamicReviewMapping
           user_review_count.each{|user|
             if user[1] > 0
               #reviewer_assignment_success = false
-              message_participant = Participant.find_by_parent_id_and_user_id(@assignment.id, user[0])
+              message_participant = Participant.where(parent_id: @assignment.id, user_id:  user[0]).first
               users_fullname = message_participant.fullname
               users_name = message_participant.name
               message = message + "<li>" + users_fullname + "("+ users_name.to_s + "): -" + user[1].to_i.abs.to_s + "</li>"
               @show_message = true
             elsif user[1] < 0
               @show_message = true
-              message_participant = Participant.find_by_parent_id_and_user_id(@assignment.id, user[0])
+              message_participant = Participant.where(parent_id: @assignment.id, user_id:  user[0]).first
               users_fullname = message_participant.fullname
               users_name = message_participant.name
               message = message + "<li>" +users_fullname + "("+ users_name.to_s + "): +" + user[1].to_i.abs.to_s + "</li>"
@@ -831,11 +831,11 @@ module DynamicReviewMapping
               reviewee = mapping[0]
               reviewers = mapping[1]
 
-              reviewee_participant = Participant.find_by_parent_id_and_user_id(@assignment.id, reviewee)
+              reviewee_participant = Participant.where(parent_id: @assignment.id, user_id:  reviewee).first
 
               if !reviewee_participant.nil?
                 reviewers.each{|reviewer|
-                  participant = Participant.find_by_parent_id_and_user_id(@assignment.id, reviewer)
+                  participant = Participant.where(parent_id: @assignment.id, user_id:  reviewer).first
                   #reviewer, and hence participant could be nil when algo couldn't find someone to review somebody's work
                   if !participant.nil?
                     reviewer_id = participant.id
@@ -855,7 +855,7 @@ module DynamicReviewMapping
             end
           rescue Exception => exc
             #revert the mapping
-            response_mappings = ResponseMap.find_by_reviewed_object_id_and_type(@assignment.id, "ParticipantReviewResponseMap")
+            response_mappings = ResponseMap.where(reviewed_object_id: @assignment.id, type:  "ParticipantReviewResponseMap").first
             if !response_mappings.nil?
               response_mappings.each {|response_mapping|
                 response_mapping.delete
@@ -935,7 +935,7 @@ module DynamicReviewMapping
                 #randomly select a user from the list
                 user = temp_users[(rand(temp_users.size)).round]
                 temp_contributors = contributors.clone
-                participant = Participant.find_by_parent_id_and_user_id(@assignment.id, user)
+                participant = Participant.where(parent_id: @assignment.id, user_id:  user).first
                 if !participant.nil?
                   contributors.each {|contributor|
                     map = ResponseMap.find(contributor)
@@ -964,7 +964,7 @@ module DynamicReviewMapping
                   #We would have just one member for an individual assignment.
                   team_members = TeamsUser.where(team_id: map.reviewee_id)
                   if !team_members.nil?
-                    participant = Participant.find_by_parent_id_and_user_id(@assignment.id, team_members[0].user_id)
+                    participant = Participant.where(parent_id: @assignment.id, user_id:  team_members[0].user_id).first
                     topic_user_id[contributor] = participant.topic_id
                   end
                 }
@@ -993,7 +993,7 @@ module DynamicReviewMapping
 
                   users_to_be_assigned = Array.new
                   #check whether it's the user's topic
-                  users_topic_id = Participant.find_by_parent_id_and_user_id(@assignment.id, user)['topic_id']
+                  users_topic_id = Participant.where(parent_id: @assignment.id, user_id:  user).first['topic_id']
 
                   #go thru reviewers and find the reviewers who worked on this topic
 
@@ -1055,7 +1055,7 @@ module DynamicReviewMapping
 
               #check whether this randomly picked user is not the contributor
               #Also check whether this user has not yet been assigned to review this team/user
-              participant = Participant.find_by_parent_id_and_user_id(@assignment.id, users[random_index])
+              participant = Participant.where(parent_id: @assignment.id, user_id:  users[random_index]).first
 
               map = ResponseMap.find(mapping[0])
 
@@ -1092,14 +1092,14 @@ module DynamicReviewMapping
       user_review_count.each{|user|
         if user[1] > 0
           #reviewer_assignment_success = false
-          message_participant = Participant.find_by_parent_id_and_user_id(@assignment.id, user[0])
+          message_participant = Participant.where(parent_id: @assignment.id, user_id:  user[0]).first
           users_fullname = message_participant.fullname
           users_name = message_participant.name
           message = message + "<li>" + users_fullname + "("+ users_name.to_s + "): -" + user[1].to_i.abs.to_s + "</li>"
           @show_message = true
         elsif user[1] < 0
           @show_message = true
-          message_participant = Participant.find_by_parent_id_and_user_id(@assignment.id, user[0])
+          message_participant = Participant.where(parent_id: @assignment.id, user_id:  user[0]).first
           users_fullname = message_participant.fullname
           users_name = message_participant.name
           message = message + "<li>" +users_fullname + "("+ users_name.to_s + "): +" + user[1].to_i.abs.to_s + "</li>"
@@ -1119,7 +1119,7 @@ module DynamicReviewMapping
 
 
           reviewers.each{|reviewer|
-            participant = Participant.find_by_parent_id_and_user_id(@assignment.id, reviewer)
+            participant = Participant.where(parent_id: @assignment.id, user_id:  reviewer).first
             #reviewer, and hence participant could be nil when algo couldn't find someone to review somebody's work
             if !participant.nil?
               reviewer_id = participant.id

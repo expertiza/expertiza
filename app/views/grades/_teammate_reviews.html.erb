@@ -15,16 +15,10 @@
 <BR/>
 <HR/>
 
-<%= stylesheet_link_tag 'jquery-ui-timepicker-addon' %>
-<%= stylesheet_link_tag 'jquery-ui-1.10.3.custom.min' %>
-<script src="/javascripts/jquery-ui-1.10.3.custom.min.js"></script>
-<script src="/javascripts/jquery-ui-timepicker-addon.js"></script>
-
 <%= form_for @assignment, html: {id: 'teamreview_form'} do %>
 
   <div id="teamreviewtabs">
     <ul>
-
 
       <% for i in 1..rscore[:assessments].length %>
         <li id="tab<%= i %>"><a href="#teamreviewtabs-<%= i %>">Review <%= i %></a></li>

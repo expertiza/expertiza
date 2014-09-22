@@ -58,7 +58,7 @@ class QuestionnairesController < ApplicationController
       }
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
       parent = FolderNode.find_by_node_object_id(pFolder.id)
-      if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,@questionnaire.id) == nil
+      if QuestionnaireNode.where(parent_id: parent.id, node_object_id: @questionnaire.id) == nil
         QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
       end
       undo_link("Copy of questionnaire #{orig_questionnaire.name} has been created successfully. ")
@@ -386,7 +386,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
       if @questionnaire.type != "QuizQuestionnaire"
         pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
         parent = FolderNode.find_by_node_object_id(pFolder.id)
-        if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,@questionnaire.id) == nil
+        if QuestionnaireNode.where(parent_id: parent.id, node_object_id: @questionnaire.id) == nil
           QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
         end
       end
@@ -641,7 +641,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
       parent = FolderNode.find_by_node_object_id(pFolder.id)
 
-      if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id, @questionnaire.id) == nil
+      if QuestionnaireNode.where(parent_id: parent.id, node_object_id:  @questionnaire.id) == nil
         QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
       end
 

@@ -5,7 +5,7 @@ class PermissionForAdvertiseForPartners < ActiveRecord::Migration
     SiteController.create :name => 'join_team_requests', :permission_id => do_assignments_id
     controller_id = SiteController.find_by_name('sign_up_sheet').id
     action = 'team_details'
-    unless ControllerAction.find_by_site_controller_id_and_name(controller_id, action)
+    unless ControllerAction.where(site_controller_id: controller_id, name:  action).first
       ControllerAction.create :site_controller_id => controller_id, :name => action, :permission_id => do_assignments_id, :url_to_use => ''
     end
     Role.rebuild_cache

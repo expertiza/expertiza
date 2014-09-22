@@ -188,8 +188,6 @@ Expertiza::Application.routes.draw do
   end
 
   resources :participants do
-    resources :scores
-
     collection do
       get :add
       post :add

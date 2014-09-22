@@ -27,7 +27,7 @@ class StudentQuizController < ApplicationController
         end
 
         if !participant.nil? and !participant.topic_id.nil?
-          quiz_due_date = TopicDeadline.find_by_topic_id_and_deadline_type_id(participant.topic_id,1)
+          quiz_due_date = TopicDeadline.where(topic_id: participant.topic_id, deadline_type_id: 1).first
         end
       }
       deadline_type_id = DeadlineType.find_by_name('quiz').id
@@ -43,7 +43,7 @@ class StudentQuizController < ApplicationController
     quiz_score = 0.0
 
     @questions.each do |question|
-      score = Score.find_by_response_id_and_question_id(@response.id, question.id)
+      score = Score.where(response_id: @response.id, question_id:  question.id).first
       if score.score == -1
         essay_not_graded = true
       else
@@ -61,17 +61,17 @@ class StudentQuizController < ApplicationController
 
   def self.take_quiz assignment_id , reviewer_id
     @quizzes = Array.new
-    reviewer = Participant.find_by_user_id_and_parent_id(reviewer_id,assignment_id)
+    reviewer = Participant.where(user_id: reviewer_id, parent_id: assignment_id).first
     @assignment = Assignment.find(assignment_id)
     teams = TeamsUser.where(user_id: reviewer_id)
     Team.where(parent_id: assignment_id).each do |quiz_creator|
       unless TeamsUser.find_by_team_id(quiz_creator.id).user_id == reviewer_id
         Questionnaire.where(instructor_id: quiz_creator.id).each do |questionnaire|
           if !@assignment.team_assignment?
-            unless QuizResponseMap.find_by_reviewed_object_id_and_reviewer_id(questionnaire.id, reviewer.id)
+            unless QuizResponseMap.where(reviewed_object_id: questionnaire.id, reviewer_id:  reviewer.id).first
               @quizzes.push(questionnaire)
             end
-          else unless QuizResponseMap.find_by_reviewed_object_id_and_reviewer_id(questionnaire.id, reviewer_id)
+          else unless QuizResponseMap.where(reviewed_object_id: questionnaire.id, reviewer_id:  reviewer_id).first
             @quizzes.push(questionnaire)
           end
         end
@@ -130,7 +130,7 @@ def record_response
       end
     else
       score = 0
-      correct_answer = QuizQuestionChoice.find_by_question_id_and_iscorrect(question.id, 1)
+      correct_answer = QuizQuestionChoice.where(question_id: question.id, iscorrect:  1).first
       if (QuestionType.find_by_question_id question.id).q_type == 'Essay'
         score = -1
       elsif  correct_answer and params["#{question.id}"] == correct_answer.txt
@@ -161,7 +161,7 @@ def submit_essay_grades
   question_id = params[:question_id]
   score = params[question_id][:score]
   if score !=  ' '
-    updated_score = Score.find_by_question_id_and_response_id(question_id, response_id)
+    updated_score = Score.where(question_id: question_id, response_id:  response_id).first
     updated_score.update_attributes(:score => score)
   else
     flash[:error] =  "Question was not graded. You must choose a score before submitting for grading."
@@ -184,7 +184,7 @@ def grade_essays
 end
 
 def graded?(response, question)
-  if Score.find_by_question_id_and_response_id(question.id, response.id)
+  if Score.where(question_id: question.id, response_id:  response.id).first
     return true
   else
     return false

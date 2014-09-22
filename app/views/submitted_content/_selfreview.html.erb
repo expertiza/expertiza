@@ -3,7 +3,7 @@
 
 it won't show for the previous assignments for which the questionnaire was not present -->
 <% if !@assignment.selfreview_questionnaire_id.nil? %>
-    <% response_map_id = ResponseMap.find_by_reviewed_object_id_and_reviewer_id_and_reviewee_id(@assignment.id, @participant.user_id, @participant.user_id) %>
+    <% response_map_id = ResponseMap.where(reviewed_object_id: @assignment.id, reviewer_id: @participant.user_id, reviewee_id: @participant.user_id).first %>
 
     <% if response_map_id %>
         Self Review <td><%= link_to 'View', { :controller => 'submitted_content', :action => 'view_selfreview',

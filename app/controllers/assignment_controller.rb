@@ -436,7 +436,11 @@ class AssignmentController < ApplicationController
         user_id = session[:user].id
       end
 
-      default = AssignmentQuestionnaire.find_by_user_id_and_assignment_id_and_questionnaire_id(user_id,nil,nil)
+      default = AssignmentQuestionnaire.where(
+        user_id: user_id,
+        assignment_id: nil,
+        questionnaire_id: nil,
+      ).first
 
       if default.nil?
         default_limit_value = 15
@@ -458,7 +462,7 @@ class AssignmentController < ApplicationController
 
       @assignment.questionnaires.each{
         | questionnaire |
-        aq = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id)
+        aq = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
         @limits[questionnaire.symbol] = aq.notification_limit
         @weights[questionnaire.symbol] = aq.questionnaire_weight
       }
@@ -471,12 +475,12 @@ class AssignmentController < ApplicationController
         user_id = session[:user].id
       end
 
-      default = AssignmentQuestionnaire.find_by_user_id_and_assignment_id_and_questionnaire_id(user_id,nil,nil)
+      default = AssignmentQuestionnaire.where(user_id: user_id, assignment_id: nil, questionnaire_id: nil).first
 
       @assignment.questionnaires.each{
         | questionnaire |
 
-        aq = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id)
+        aq = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
         if params[:limits][questionnaire.symbol].length > 0
           aq.update_attribute('notification_limit',params[:limits][questionnaire.symbol])
         else
@@ -496,11 +500,11 @@ class AssignmentController < ApplicationController
       end
 
       # update assignment questionnaires, if assignment questionnaire doesn't exist, create one
-      default = AssignmentQuestionnaire.find_by_user_id_and_assignment_id_and_questionnaire_id(user_id,nil,nil)
+      default = AssignmentQuestionnaire.where(user_id: user_id, assignment_id: nil, questionnaire_id: nil).first
       params[:questionnaires].each do |key,value|
         if value.to_i > 0 and (@q = Questionnaire.find(value))
-          if AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id,@q.id)
-            @aq = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id,@q.id)
+          if AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: @q.id).first
+            @aq = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: @q.id).first
           else
             @aq = AssignmentQuestionnaire.new(:assignment_id => @assignment.id,:questionnaire_id=> @q.id)
           end

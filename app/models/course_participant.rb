@@ -4,7 +4,7 @@ class CourseParticipant < Participant
 
   # Copy this participant to an assignment
   def copy(assignment_id)
-    part = AssignmentParticipant.find_by_user_id_and_parent_id(self.user_id,assignment_id)
+    part = AssignmentParticipant.where(user_id: self.user_id, parent_id: assignment_id).first
     if part.nil?
       part = AssignmentParticipant.create(:user_id => self.user_id, :parent_id => assignment_id)
       part.set_handle()

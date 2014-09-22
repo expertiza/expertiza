@@ -386,6 +386,7 @@ class AssignmentsController < ApplicationController
       @assignments=super(Assignment)
       #    @assignment_pages, @assignments = paginate :assignments, :per_page => 10
     end
+    alias_method :index, :list
 
 
     #--------------------------------------------------------------------------------------------------------------------
@@ -423,10 +424,6 @@ class AssignmentsController < ApplicationController
       redirect_to :controller => 'tree_display', :action => 'list'
     end
 
-
-
-  end
-
   def copy_assignment_questionnaire (old_assign, new_assign)
     old_assign.assignment_questionnaires.each do |aq|
       AssignmentQuestionnaire.create(
@@ -438,3 +435,4 @@ class AssignmentsController < ApplicationController
       )
     end
   end
+end

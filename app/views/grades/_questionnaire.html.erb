@@ -4,7 +4,7 @@ questions = Question.where(questionnaire_id: @questionnaire.id)
 questions.each { | question |
   i = 0
   # Get score given by the reviewer for each question in this review
-  score = Score.find_by_response_id_and_question_id(review.id, question.id)
+  score = Score.where(response_id: review.id, question_id:  question.id).first
   if !score.nil?
     ques_type = QuestionType.where(question_id: question.id)%>
   <%-# Render accordion title -%>

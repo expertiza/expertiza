@@ -52,7 +52,9 @@ gem 'zip-zip'
 
 group :development do
   gem 'daemons'
-  gem 'pry-rails'
+  gem 'pry'
+  gem 'pry-remote'
+  gem 'pry-nav'
   gem 'sqlite3-ruby', :require => 'sqlite3'
   gem 'selenium-webdriver'
 end

@@ -26,7 +26,7 @@ TeamsUser.where(team_id: result[:team_id]).each{|teamuser|
       <td align="center" width="500"><%= result[:name] %></td>
       <td align="center" width="500"><%= team_members  %></td>
       <td align="center" width="500"><%= result[:comments_for_advertisement] %></td>
-      <% if  Participant.find_by_parent_id_and_user_id(result[:assignment_id],session[:user].id)!=nil %>
+      <% if  Participant.where(parent_id: result[:assignment_id], user_id: session[:user].id).first!=nil %>
         <td align="center"><%= link_to "Request invitation", :controller => 'join_team_requests', :action => 'new',
           :assignment_id=>result[:assignment_id],
           :topic_id=>result[:topic_id],

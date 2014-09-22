@@ -43,7 +43,7 @@ module PenaltyHelper
   def calculate_submission_penalty
     penalty = 0
     # penalty_unit = @late_policy.penalty_unit
-    submission_due_date = DueDate.find_by_deadline_type_id_and_assignment_id(@submission_deadline_type_id, @assignment.id).due_at
+    submission_due_date = DueDate.where(deadline_type_id: @submission_deadline_type_id, assignment_id:  @assignment.id).first.due_at
 
     resubmission_times = @participant.resubmission_times
     if(resubmission_times.any?)
@@ -81,7 +81,7 @@ module PenaltyHelper
         review_mappings = ParticipantReviewResponseMap.where(reviewer_id: @participant.id)
       end
 
-      review_due_date = DueDate.find_by_deadline_type_id_and_assignment_id(@review_deadline_type_id, @assignment.id)
+      review_due_date = DueDate.where(deadline_type_id: @review_deadline_type_id, assignment_id:  @assignment.id).first
 
       if(review_due_date != nil)
         penalty = compute_penalty_on_reviews(review_mappings, review_due_date.due_at, num_of_reviews_required)
@@ -97,7 +97,7 @@ module PenaltyHelper
 
       meta_review_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
 
-      meta_review_due_date = DueDate.find_by_deadline_type_id_and_assignment_id(@meta_review_deadline_type_id, @assignment.id)
+      meta_review_due_date = DueDate.where(deadline_type_id: @meta_review_deadline_type_id, assignment_id:  @assignment.id).first
 
       if(meta_review_due_date != nil)
         penalty = compute_penalty_on_reviews(meta_review_mappings, meta_review_due_date.due_at, num_of_meta_reviews_required)

@@ -25,7 +25,7 @@ class SignUpTopic < ActiveRecord::Base
       raise ArgumentError, "CSV File expects the format: Topic identifier, Topic name, Max choosers, Topic Category"
     end
 
-    topic = SignUpTopic.find_by_topic_name_and_assignment_id(row[1],session[:assignment_id])
+    topic = SignUpTopic.where(topic_name: row[1], assignment_id: session[:assignment_id]).first
 
     if topic == nil
       attributes = ImportTopicsHelper::define_attributes(row)
@@ -83,13 +83,13 @@ class SignUpTopic < ActiveRecord::Base
       # to treat all assignments as team assignments
       #users_team will contain the team id of the team to which the user belongs
       users_team = SignedUpUser.find_team_users(assignment_id, session_user_id)
-      signup_record = SignedUpUser.find_by_topic_id_and_creator_id(topic_id, users_team[0].t_id)
+      signup_record = SignedUpUser.where(topic_id: topic_id, creator_id:  users_team[0].t_id).first
       assignment = Assignment.find(assignment_id)
       #if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
       if(!assignment.is_intelligent?)
         if signup_record.is_waitlisted == false
           #find the first wait listed user if exists
-          first_waitlisted_user = SignedUpUser.find_by_topic_id_and_is_waitlisted(topic_id, true)
+          first_waitlisted_user = SignedUpUser.where(topic_id: topic_id, is_waitlisted:  true).first
 
           if !first_waitlisted_user.nil?
             # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
@@ -102,7 +102,7 @@ class SignUpTopic < ActiveRecord::Base
             # to treat all assignments as team assignments
 
             user_id = TeamsUser.where([ :team_id => first_waitlisted_user.creator_id ]).first.user_id
-            participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
+            participant = Participant.where(user_id: user_id, parent_id: assignment.id).first
 
             participant.update_topic_id(topic_id)
 
@@ -111,7 +111,7 @@ class SignUpTopic < ActiveRecord::Base
         end
       end
       if !signup_record.nil?
-        participant = Participant.find_by_user_id_and_parent_id(session_user_id, assignment_id)
+        participant = Participant.where(user_id: session_user_id, parent_id:  assignment_id).first
         #update participant's topic id to nil
         participant.update_topic_id(nil)
         signup_record.destroy
@@ -131,7 +131,7 @@ class SignUpTopic < ActiveRecord::Base
         #update participants
         assignment = Assignment.find(self.assignment_id)
         user_id = TeamsUser.where({:team_id => next_wait_listed_user.creator_id}).user_id.first
-        participant = Participant.find_by_user_id_and_parent_id(user_id,assignment.id)
+        participant = Participant.where(user_id: user_id, parent_id: assignment.id).first
 
         participant.update_topic_id(self.id)
       end

@@ -36,7 +36,7 @@ class StudentReviewController < ApplicationController
         participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
 
         if !participant.nil? and !participant.topic_id.nil?
-          review_due_date = TopicDeadline.find_by_topic_id_and_deadline_type_id(participant.topic_id,1)
+          review_due_date = TopicDeadline.where(topic_id: participant.topic_id, deadline_type_id: 1).first
           #The logic here is that if the user has at least one reviewee to review then @reviewee_topic_id should
           #not be nil. Enabling and disabling links to individual reviews are handled at the rhtml
           if review_due_date.due_at < Time.now
@@ -55,7 +55,7 @@ class StudentReviewController < ApplicationController
           participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
           end
         if participant && participant.topic_id
-          meta_review_due_date = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(participant.topic_id,deadline_type_id,review_rounds)
+          meta_review_due_date = TopicDeadline.where(topic_id: participant.topic_id, deadline_type_id:deadline_type_id, round:review_rounds).first
           if meta_review_due_date.due_at < Time.now
             @meta_reviewee_topic_id = participant.topic_id
           end

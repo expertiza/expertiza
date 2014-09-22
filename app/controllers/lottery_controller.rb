@@ -165,7 +165,7 @@ class LotteryController < ApplicationController
           sign_up.is_waitlisted = false
 
           #Update topic_id in participant table with the topic_id
-          participant = AssignmentParticipant.find_by_user_id_and_parent_id(user_id, assignment_id)
+          participant = AssignmentParticipant.where(user_id: user_id, parent_id:  assignment_id).first
 
           participant.update_topic_id(topic_id)
         else
@@ -198,7 +198,7 @@ class LotteryController < ApplicationController
             sign_up.is_waitlisted = false
             sign_up.save
 
-            participant = Participant.find_by_user_id_and_parent_id(user_id, assignment_id)
+            participant = Participant.where(user_id: user_id, parent_id:  assignment_id).first
             participant.update_topic_id(topic_id)
             result = true
           end
@@ -315,7 +315,7 @@ def allot_topic_to_user_if_possible(assignment_id, signed_up_user_entry,topic,cu
   if(high_prio_topics == false)
     current_max_slots[topic.id] =  current_max_slots[topic.id] -1
     signed_up_user_entry.update_attribute('is_waitlisted',0)
-    participant = Participant.find_by_user_id_and_parent_id(Team.find(signed_up_user_entry.creator_id).users[0].id, assignment_id)
+    participant = Participant.where(user_id: Team.find(signed_up_user_entry.creator_id).users[0].id, parent_id:  assignment_id).first
     participant.update_topic_id(topic.id)
     delete_other_bids(assignment_id, signed_up_user_entry.creator_id)
     return true

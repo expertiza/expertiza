@@ -171,7 +171,7 @@ class StandardizeReviewMappings < ActiveRecord::Migration
     if user_id.to_i > 0
       user = User.find(user_id)
       if user
-        participant = AssignmentParticipant.find_by_user_id_and_parent_id(user_id,assignment_id)
+        participant = AssignmentParticipant.where(user_id: user_id, parent_id: assignment_id).first
         
         if participant.nil?       
           participant = AssignmentParticipant.create(:user_id => user_id, :parent_id => assignment_id)
@@ -191,7 +191,7 @@ class StandardizeReviewMappings < ActiveRecord::Migration
      
      # create a participant for this user, all users have to be a participant in order to interact with an assignment
      user = User.find(mapping["author_id"])     
-     if AssignmentParticipant.find_by_user_id_and_parent_id(mapping["author_id"], mapping["reviewed_object_id"]).nil?
+     if AssignmentParticipant.where(user_id: mapping["author_id"], parent_id:  mapping["reviewed_object_id"]).first.nil?
         make_participant(mapping["author_id"], mapping["reviewed_object_id"])
      end
      

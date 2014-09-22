@@ -15,7 +15,7 @@ class AdvertiseForPartnerController < ApplicationController
     team.save
 
     assignment=Assignment.find(Team.find(params[:team_id]).parent_id)
-    participant=AssignmentParticipant.find_by_parent_id_and_user_id(assignment.id,session[:user].id)
+    participant=AssignmentParticipant.where(parent_id: assignment.id, user_id: session[:user].id).first
     redirect_to :controller => 'student_team', :action => 'view' , :id => participant.id
   end
 
@@ -27,7 +27,7 @@ class AdvertiseForPartnerController < ApplicationController
     team.save
 
     assignment=Assignment.find(Team.find(params[:id]).parent_id)
-    participant=AssignmentParticipant.find_by_parent_id_and_user_id(assignment.id,session[:user].id)
+    participant=AssignmentParticipant.where(parent_id: assignment.id, user_id: session[:user].id).first
     redirect_to :controller => 'student_team', :action => 'view' , :id => participant.id
   end
 
@@ -37,7 +37,7 @@ class AdvertiseForPartnerController < ApplicationController
     #@team.comments_for_advertisement = params[:comments_for_advertisement]
     Team.update(params[:id], :comments_for_advertisement => params[:comments_for_advertisement])
     assignment=Assignment.find(Team.find(params[:id]).parent_id)
-    participant=AssignmentParticipant.find_by_parent_id_and_user_id(assignment.id,session[:user].id)
+    participant=AssignmentParticipant.where(parent_id: assignment.id, user_id: session[:user].id).first
     if @team.save
       flash[:notice]='Advertisement updated successfully!'
       redirect_to :controller => 'student_team', :action => 'view' , :id => participant.id

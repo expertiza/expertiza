@@ -21,7 +21,7 @@ end
 
 Given /^I have created an advertisement$/  do
   parent_id= Assignment.find_by_name('my_assignment')
-  team= Team.find_by_name_and_parent_id('my_team',parent_id)
+  team= Team.where(name: 'my_team', parent_id: parent_id).first
   team.advertise_for_partner=1
   team.comments_for_advertisement= "This is my ad."
   team.save
@@ -55,9 +55,9 @@ end
 Given /^I sent (a|several) join_team requests? to ad "([^"]*)"$/ do |amount, ad|
   request= JoinTeamRequest.new
   assignment_id= Assignment.find_by_name('my_assignment').id
-  participant = Participant.find_by_user_id_and_parent_id(User.find_by_name('student').id, assignment_id)
+  participant = Participant.where(user_id: User.find_by_name('student').id, parent_id:  assignment_id).first
   request.participant_id= participant.id
-  request.team_id= Team.find_by_name_and_parent_id('test_team',assignment_id)
+  request.team_id= Team.where(name: 'test_team', parent_id: assignment_id).first
   request.status='P'
   request.save
   if amount== "several"
@@ -101,7 +101,7 @@ Given /^student "([^"]*)" sent me (a|several) join_team requests?$/ do |people, 
 
   request= JoinTeamRequest.new
   request.participant_id= participant.id
-  request.team_id= Team.find_by_name_and_parent_id('my_team',assignment_id)
+  request.team_id= Team.where(name: 'my_team', parent_id: assignment_id).first
   request.status='P'
   request.comments= "I want to join your team."
   request.save
@@ -109,7 +109,7 @@ Given /^student "([^"]*)" sent me (a|several) join_team requests?$/ do |people, 
   if (amount== "several")
     request_2= JoinTeamRequest.new
     request_2.participant_id= participant.id
-    request_2.team_id= Team.find_by_name_and_parent_id('my_team',assignment_id)
+    request_2.team_id= Team.where(name: 'my_team', parent_id: assignment_id).first
     request_2.status='P'
     request_2.comments= "This is my 2nd request."
     request_2.save
@@ -122,7 +122,7 @@ But /^my team is full$/ do
   assignment.save
 
   parent_id= assignment.id
-  t= Team.find_by_name_and_parent_id('my_team',parent_id)
+  t= Team.where(name: 'my_team', parent_id: parent_id).first
   tu= TeamsUser.new
   tu.team_id= t.id
   tu.user_id= User.find_by_name('student2').id

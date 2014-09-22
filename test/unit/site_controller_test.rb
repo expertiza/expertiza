@@ -11,7 +11,7 @@ class SiteControllerTest < ActiveSupport::TestCase
   end
 
    def test_permission
-     @permission = Permission.find_by_id(site_controllers(:site_controller_permissions).permission_id)
+     @permission = Permission.find(site_controllers(:site_controller_permissions).permission_id)
       assert_equal "administer goldberg", @permission.name
    end
 

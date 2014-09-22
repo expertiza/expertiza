@@ -54,8 +54,8 @@ class Response < ActiveRecord::Base
     Score.where(response_id: self.response_id).each {
       |reviewScore|
       count += 1
-      code += '<big><b>Question '+count.to_s+":</b> <I>"+Question.find_by_id(reviewScore.question_id).txt+"</I></big><BR/><BR/>"
-      code += '<TABLE CELLPADDING="5"><TR><TD valign="top"><B>Score:</B></TD><TD><FONT style="BACKGROUND-COLOR:gold">'+reviewScore.score.to_s+"</FONT> out of <B>"+Question.find_by_id(reviewScore.question_id).questionnaire.max_question_score.to_s+"</B></TD></TR>"
+      code += '<big><b>Question '+count.to_s+":</b> <I>"+Question.find(reviewScore.question_id).txt+"</I></big><BR/><BR/>"
+      code += '<TABLE CELLPADDING="5"><TR><TD valign="top"><B>Score:</B></TD><TD><FONT style="BACKGROUND-COLOR:gold">'+reviewScore.score.to_s+"</FONT> out of <B>"+Question.find(reviewScore.question_id).questionnaire.max_question_score.to_s+"</B></TD></TR>"
       if reviewScore.comments != nil
         code += '<TR><TD valign="top"><B>Response:</B></TD><TD>' + reviewScore.comments.gsub("<", "&lt;").gsub(">", "&gt;").gsub(/\n/, '<BR/>')
       end

@@ -90,8 +90,8 @@ class Participant < ActiveRecord::Base
 
     # email does not work. It should be made to work in the future
     def email(pw, home_page)
-      user = User.find_by_id(self.user_id)
-      assignment = Assignment.find_by_id(self.assignment_id)
+      user = User.find(self.user_id)
+      assignment = Assignment.find(self.assignment_id)
 
       Mailer.deliver_message(
         {:recipients => user.email,

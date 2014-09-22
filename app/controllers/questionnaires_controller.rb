@@ -104,7 +104,7 @@ class QuestionnairesController < ApplicationController
   #View a quiz questionnaire
   def view_quiz
     @questionnaire = Questionnaire.find(params[:id])
-    @participant = Participant.find_by_id(params[:pid]) #creating an instance variable since it needs to be sent to submitted_content/edit
+    @participant = Participant.find(params[:pid]) #creating an instance variable since it needs to be sent to submitted_content/edit
     render :view
   end
 
@@ -145,12 +145,12 @@ class QuestionnairesController < ApplicationController
     if params['save']
       @questionnaire.update_attributes(params[:questionnaire])
       for qtypeid in params[:question_type].keys
-        @question_type = QuestionType.find_by_id(qtypeid)
+        @question_type = QuestionType.find(qtypeid)
         @question_type.update_attributes(params[:question_type][qtypeid])
       end
       questionnum=1
       for qid in params[:new_question].keys
-        @question = Question.find_by_id(qid)
+        @question = Question.find(qid)
         @question.update_attributes(params[:new_question][qid])
         @question_type = QuestionType.find_by_question_id(qid)
         @quiz_question_choices = QuizQuestionChoice.where(question_id: qid)
@@ -227,11 +227,11 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
       @questionnaire.max_question_score = 1
       @questionnaire.section = "Quiz"
       print "=====create_questionnaire========="
-      @assignment = Assignment.find_by_id(params[:aid])
+      @assignment = Assignment.find(params[:aid])
       teams = TeamsUser.where(user_id: session[:user].id)
       for t in teams do
-        if Team.find_by_id_and_parent_id(t.team_id, @assignment.id)
-          if team = Team.find_by_id_and_parent_id(t.team_id, @assignment.id)
+        if Team.find(t.team_id, @assignment.id)
+          if team = Team.find(t.team_id, @assignment.id)
             break
           end
         end
@@ -424,7 +424,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
           if @questionnaire.type == "QuizQuestionnaire"
             save_new_question_parameters(q.id, question_key)
           end
-          questionnaire = Questionnaire.find_by_id(questionnaire_id)
+          questionnaire = Questionnaire.find(questionnaire_id)
           if questionnaire.section == "Custom"
             for i in (questionnaire.min_question_score .. questionnaire.max_question_score)
               a = QuestionAdvice.new(:score => i, :advice => nil)
@@ -457,7 +457,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
         for advice in question.question_advices
           advice.destroy
         end
-        if Questionnaire.find_by_id(questionnaire_id).section == "Custom"
+        if Questionnaire.find(questionnaire_id).section == "Custom"
           question_type = QuestionType.find_by_question_id(question.id)
           question_type.destroy
         end
@@ -504,7 +504,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
         begin
           if params[:question][question_key][:txt].strip.empty?
             # question text is empty, delete the question
-            if Questionnaire.find_by_id(questionnaire_id).section == "Custom"
+            if Questionnaire.find(questionnaire_id).section == "Custom"
               QuestionType.find_by_question_id(question_key).delete
             end
             Question.delete(question_key)
@@ -521,7 +521,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
           # ignored
         end
       end
-      if Questionnaire.find_by_id(questionnaire_id).section == "Custom"
+      if Questionnaire.find(questionnaire_id).section == "Custom"
         for question_type_key in params[:q].keys
           update_question_type(question_type_key)
         end

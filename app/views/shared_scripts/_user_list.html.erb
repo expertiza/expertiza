@@ -11,7 +11,7 @@
     <td ><%= user.fullname %></td>
     <td ><%= user.email %></td>
     <td ><%= link_to user.role.name, :controller => 'roles', :action => 'show', :id => user.role.id %></td>
-    <td  align="center"><%= (User.find_by_id(user.parent_id)).name %></td>
+    <td  align="center"><%= (User.find(user.parent_id)).name %></td>
     <td ><%= User.yesorno(user.email_on_review) %></td>
     <td ><%= User.yesorno(user.email_on_submission) %></td>
     <td ><%= User.yesorno(user.email_on_review_of_review) %></td>    

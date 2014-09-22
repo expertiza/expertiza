@@ -12,7 +12,7 @@
 
   <!-- TODO : Pagination / showing files if any -->
 
-  <% @assignment = Assignment.find_by_id(params[:assignment_id])%>
+  <% @assignment = Assignment.find(params[:assignment_id])%>
   <% #@stage = @assignment.get_current_stage(@assignment.id)%>
 
   <% if !@available_quizzes.nil? && @available_quizzes.size > 0 %>

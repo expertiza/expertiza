@@ -48,7 +48,7 @@ class StudentReviewController < ApplicationController
       deadline_type_id = DeadlineType.find_by_name('review').id
 
       @metareview_mappings.each do |metareview_mapping|
-        review_mapping = ResponseMap.find_by_id(metareview_mapping.reviewed_object_id)
+        review_mapping = ResponseMap.find(metareview_mapping.reviewed_object_id)
         if review_mapping
           #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
           # to treat all assignments as team assignments

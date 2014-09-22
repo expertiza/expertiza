@@ -170,7 +170,7 @@ class AssignmentController < ApplicationController
         end
       elsif (@assignment.save)
         # increment times_used for setting default policy while display. (in late_policies table)
-        @late_policy = LatePolicy.find_by_id(@assignment.late_policy_id)
+        @late_policy = LatePolicy.find(@assignment.late_policy_id)
         @late_policy.update_attribute(:times_used, @late_policy.times_used + 1)
         #set_questionnaires
         #set_limits_and_weights
@@ -263,7 +263,7 @@ class AssignmentController < ApplicationController
         @Resubmission_deadline = DeadlineType.find_by_name("resubmission").id
         for resubmit_duedate_key in params[:additional_submit_deadline].keys
           if (!params[:additional_submit_deadline][resubmit_duedate_key][:id].blank?)
-            due_date_temp = DueDate.find_by_id(params[:additional_submit_deadline][resubmit_duedate_key][:id])
+            due_date_temp = DueDate.find(params[:additional_submit_deadline][resubmit_duedate_key][:id])
             due_date_temp.update_attributes(params[:additional_submit_deadline][resubmit_duedate_key])
             return_string += "Please enter a valid Resubmission deadline </br>" if due_date_temp.errors.length > 0
           elsif (!params[:additional_submit_deadline][resubmit_duedate_key][:due_at].blank?)
@@ -278,7 +278,7 @@ class AssignmentController < ApplicationController
         @Rereview_deadline = DeadlineType.find_by_name("rereview").id
         for rereview_duedate_key in params[:additional_review_deadline].keys
           if (!params[:additional_review_deadline][rereview_duedate_key][:id].blank?)
-            due_date_temp = DueDate.find_by_id(params[:additional_review_deadline][rereview_duedate_key][:id])
+            due_date_temp = DueDate.find(params[:additional_review_deadline][rereview_duedate_key][:id])
             due_date_temp.update_attributes(params[:additional_review_deadline][rereview_duedate_key])
             return_string += "Please enter a valid Rereview deadline </br>" if due_date_temp.errors.length > 0
           elsif (!params[:additional_review_deadline][rereview_duedate_key][:due_at].blank?)
@@ -303,9 +303,9 @@ class AssignmentController < ApplicationController
       #Update/Create all deadlines
       param_deadline.each_with_index do |type, index|
         if (!index[0].nil?)
-          type_name = DeadlineType.find_by_id(type).name.capitalize
+          type_name = DeadlineType.find(type).name.capitalize
           if ( params["#{index[0]}"] && !params["#{index[0]}"][:id].blank?)
-            due_date_temp = DueDate.find_by_id(params["#{index[0]}"][:id])
+            due_date_temp = DueDate.find(params["#{index[0]}"][:id])
             due_date_temp.update_attributes(params["#{index[0]}"])
             (return_string += "Please enter a valid #{type_name} deadline </br>") if due_date_temp.errors.length > 0
           elsif (params["#{index[0]}"] && !params["#{index[0]}"][:due_at].blank?)
@@ -498,7 +498,7 @@ class AssignmentController < ApplicationController
       # update assignment questionnaires, if assignment questionnaire doesn't exist, create one
       default = AssignmentQuestionnaire.find_by_user_id_and_assignment_id_and_questionnaire_id(user_id,nil,nil)
       params[:questionnaires].each do |key,value|
-        if value.to_i > 0 and (@q = Questionnaire.find_by_id(value))
+        if value.to_i > 0 and (@q = Questionnaire.find(value))
           if AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id,@q.id)
             @aq = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id,@q.id)
           else
@@ -608,14 +608,14 @@ class AssignmentController < ApplicationController
         late_policy_set = set_late_policy(params)
 
         if @assignment.calculate_penalty == true && params[:assignment][:calculate_penalty] == "false"
-          @late_policy = LatePolicy.find_by_id(params[:assignment][:late_policy_id])
+          @late_policy = LatePolicy.find(params[:assignment][:late_policy_id])
           @late_policy.update_attribute(:times_used, @late_policy.times_used - 1)
 
           # delete corresponding rows from Calculated_penalties
           @penaltyObjs = CalculatedPenalty.all
 
           @penaltyObjs.each do |pen|
-            @participant = Participant.find_by_id(pen.participant_id)
+            @participant = Participant.find(pen.participant_id)
             if @participant.parent_id == @assignment.id
               #@penalties = calculate_penalty(pen.participant_id)
               #@total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
@@ -628,7 +628,7 @@ class AssignmentController < ApplicationController
         elsif @assignment.calculate_penalty == false && params[:assignment][:calculate_penalty] == "true"
           # add rows in calculated_penalties
 
-          @late_policy = LatePolicy.find_by_id(params[:assignment][:late_policy_id])
+          @late_policy = LatePolicy.find(params[:assignment][:late_policy_id])
 
           @late_policy.update_attribute(:times_used, @late_policy.times_used + 1)
 
@@ -653,18 +653,18 @@ class AssignmentController < ApplicationController
         # Update the penalties in calculated_penalties table.
         if @assignment.late_policy_id != params[:assignment][:late_policy_id]
           #policy changed so we change the times used field for proper ordering of policies in the dropdown
-          @late_policy = LatePolicy.find_by_id(@assignment.late_policy_id)
+          @late_policy = LatePolicy.find(@assignment.late_policy_id)
           if (@late_policy.times_used.to_i > 0)
             @late_policy.update_attribute(:times_used, @late_policy.times_used - 1)
           end
 
-          @late_policy = LatePolicy.find_by_id(params[:assignment][:late_policy_id])
+          @late_policy = LatePolicy.find(params[:assignment][:late_policy_id])
           @late_policy.update_attribute(:times_used, @late_policy.times_used + 1)
 
           @penaltyObjs = CalculatedPenalty.all
 
           @penaltyObjs.each do |pen|
-            @participant = Participant.find_by_id(pen.participant_id)
+            @participant = Participant.find(pen.participant_id)
             if @participant.parent_id == @assignment.id
               @penalties = calculate_penalty(pen.participant_id)
               @total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])

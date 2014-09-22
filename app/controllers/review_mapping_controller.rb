@@ -80,7 +80,7 @@ class ReviewMappingController < ApplicationController
       flash[:error] = "You have already taken that quiz"
     else
       @map = QuizResponseMap.new
-      @map.reviewee_id = Questionnaire.find_by_id(params[:questionnaire_id]).instructor_id
+      @map.reviewee_id = Questionnaire.find(params[:questionnaire_id]).instructor_id
       @map.reviewer_id = params[:participant_id]
       @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
       @map.save
@@ -92,7 +92,7 @@ class ReviewMappingController < ApplicationController
   def add_self_reviewer
     assignment = Assignment.find(params[:assignment_id])
     reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
-    submission = AssignmentParticipant.find_by_id_and_parent_id(params[:submission_id],assignment.id)
+    submission = AssignmentParticipant.find(params[:submission_id],assignment.id)
 
     if submission.nil?
       flash[:error] = "Could not find a submission to review for the specified topic, please choose another topic to continue."
@@ -175,14 +175,14 @@ class ReviewMappingController < ApplicationController
     begin
       assignment = Assignment.find(params[:assignment_id])
       reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
-      #topic_id = Participant.find_by_id(Questionnaire.find_by_id(params[:questionnaire_id]).instructor_id).topic_id
+      #topic_id = Participant.find(Questionnaire.find(params[:questionnaire_id]).instructor_id).topic_id
       unless params[:i_dont_care]
         #topic = (topic_id.nil?) ? nil : SignUpTopic.find(topic_id)
         if ResponseMap.find_by_reviewed_object_id_and_reviewer_id(params[:questionnaire_id], params[:participant_id])
           flash[:error] = "You have already taken that quiz"
         else
           @map = QuizResponseMap.new
-          @map.reviewee_id = Questionnaire.find_by_id(params[:questionnaire_id]).instructor_id
+          @map.reviewee_id = Questionnaire.find(params[:questionnaire_id]).instructor_id
           @map.reviewer_id = params[:participant_id]
           @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
           @map.save

@@ -19,7 +19,7 @@ class ControllerAction < ActiveRecord::Base
   def permission
     if not @permission
       if self.permission_id
-        @permission = Permission.find_by_id(self.permission_id)
+        @permission = Permission.find(self.permission_id)
       else
         @permission = Permission.new(:id => nil,
                                      :name => "(default -- #{self.controller.permission.name})")

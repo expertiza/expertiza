@@ -38,7 +38,7 @@ class AssignmentSignupsController < ApplicationController
     @assignment_signup.signup_id = params[:signup_id]
 
     if @assignment_signup.save
-      @assignments = Assignment.find_by_id(params[:assignment_id])
+      @assignments = Assignment.find(params[:assignment_id])
       flash[:notice] = 'Assignment Signup was successfully created for assignment '+@assignments.name
       redirect_to :controller => 'signup_sheets', :action => 'list'
     else

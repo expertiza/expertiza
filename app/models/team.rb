@@ -119,7 +119,7 @@ class Team < ActiveRecord::Base
   def self.randomize_all_by_parent(parent, team_type, team_size)
     participants = Participant.where(["parent_id = ? AND type = ?", parent.id, parent.class.to_s + "Participant"])
     participants = participants.sort{rand(3) - 1}
-    users = participants.map{|p| User.find_by_id(p.user_id)}
+    users = participants.map{|p| User.find(p.user_id)}
     #users = users.uniq
 
     Team.delete_all_by_parent(parent)

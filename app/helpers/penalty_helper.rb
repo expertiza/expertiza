@@ -9,9 +9,9 @@ module PenaltyHelper
     @participant = AssignmentParticipant.find(participant_id)
     @assignment = @participant.assignment
     if @assignment.late_policy_id
-      @penalty_per_unit = LatePolicy.find_by_id(@assignment.late_policy_id).penalty_per_unit
-      @max_penalty_for_no_submission = LatePolicy.find_by_id(@assignment.late_policy_id).max_penalty
-      @penalty_unit = LatePolicy.find_by_id(@assignment.late_policy_id).penalty_unit
+      @penalty_per_unit = LatePolicy.find(@assignment.late_policy_id).penalty_per_unit
+      @max_penalty_for_no_submission = LatePolicy.find(@assignment.late_policy_id).max_penalty
+      @penalty_unit = LatePolicy.find(@assignment.late_policy_id).penalty_unit
     end
 
     penalties = Hash.new(0)

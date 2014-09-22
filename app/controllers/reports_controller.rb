@@ -46,7 +46,7 @@ class ReportsController < ApplicationController
 
   def create
     @next_action = "view"
-    @map = Response.find_by_id(params[:id])     #assignment/review/metareview id is in params id
+    @map = Response.find(params[:id])     #assignment/review/metareview id is in params id
     @res = 0
     msg = ""
     error_msg = ""
@@ -66,7 +66,7 @@ class ReportsController < ApplicationController
       @version=1
     end
 
-    @response = Response.find_by_id(params[:id])
+    @response = Response.find(params[:id])
     @response.additional_comment = params[:review][:comments]
     @response.version_num = @version
     @response.save

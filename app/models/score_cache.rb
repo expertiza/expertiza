@@ -269,56 +269,23 @@ class ScoreCache < ActiveRecord::Base
 
 
   def self.get_class_scores(pid)
-=begin
-   take average score of every student for that assignment
-   find min and max from these
-   calculate average class score for that assignment from this
-
-   get number of reviews by each student for that assignment
-   calculate the average from the above data
-
-   get number of metareviews by each student for that assignment
-   calculate the average from the above data
-
-   1. participant_id  from the view
-   2. participant ka parent_id (which is assignment_id) from participant table for that participant
-   3. get all participants from participant table for that parent_id
-   4. get scores for all tuples in score_caches where rewiewee_id == participants_ids from step 3 --- mapped to score_caches ka reviewee_id
-=end
-
     @participant = AssignmentParticipant.find(pid)
     @participant_assignment_id = @participant.parent_id
-    @all_participants = Hash.new
     @all_participants = AssignmentParticipant.where(parent_id: @participant_assignment_id)
-
-
-
 
     individual_score = 0
     average_score = 0
     participant_count = 0
-    min_score = 101
-    max_score = -1
-    minmax_hash = Array.new
+    minmax_hash = []
 
-
-    for participant in @all_participants
+    @all_participants.find_each do |participant|
       individual_score = ScoreCache.find_by_reviewee_id(participant.id)
-      if(individual_score)
-
+      if individual_score
         average_score = average_score+individual_score.score
-
-
         i = individual_score.score
         minmax_hash << i
         participant_count = participant_count + 1
       end
-      #if individual_score < min_score
-      #  min_score = individual_score
-      #end
-      #if individual_score > max_score
-      #  max_score = individual_score
-      #end
   end
 
   average_score /= participant_count if participant_count != 0

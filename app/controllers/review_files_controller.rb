@@ -107,7 +107,7 @@ class ReviewFilesController < ApplicationController
     @latest_version_number = 0
     @file_version_map.each do |base_filename, versions|
 
-      code_review_dir = ReviewFilesHelper::get_code_review_file_dir(AssignmentParticipant.find_by_id(auth[base_filename][versions.sort.last]))
+      code_review_dir = ReviewFilesHelper::get_code_review_file_dir(AssignmentParticipant.find(auth[base_filename][versions.sort.last]))
       file_path = ReviewFile.get_file(code_review_dir, versions.sort.last,base_filename)
       all_review_files.each {|file|
 
@@ -336,7 +336,7 @@ newer_version_comments = ReviewComment.where(review_file_id: files[:@newer_file]
         (comment[:initial_line_number] >= ((params[:initial_line_number]).to_i ) and comment[:initial_line_number] <= ((params[:final_line_number]).to_i)) or
         (comment[:initial_line_number] <= ((params[:initial_line_number]).to_i ) and comment[:last_line_number] <= ((params[:final_line_number]).to_i) and comment[:last_line_number] >= ((params[:initial_line_number]).to_i))
 
-        assignmentparticipant = AssignmentParticipant.find_by_id(params[:participant_id])
+        assignmentparticipant = AssignmentParticipant.find(params[:participant_id])
         current_participant = AssignmentParticipant.find_by_parent_id_and_user_id(assignmentparticipant[:parent_id],session[:user].id)
 
         if current_participant.id.to_s == params[:participant_id]

@@ -23,8 +23,8 @@ class CoursesUsers < ActiveRecord::Base
   end
 
   def email(pw, home_page)
-    user = User.find_by_id(self.user_id)
-    course = Course.find_by_id(self.course_id)
+    user = User.find(self.user_id)
+    course = Course.find(self.course_id)
     Mailer.deliver_message(
       {:recipients => user.email,
        :subject => "You have been registered as a participant in #{course.title}",

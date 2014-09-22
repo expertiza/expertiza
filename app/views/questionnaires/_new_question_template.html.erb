@@ -1,4 +1,4 @@
-<% (1..Assignment.find_by_id(@assignment_id).num_quiz_questions).each do |i| %>
+<% (1..Assignment.find(@assignment_id).num_quiz_questions).each do |i| %>
   <div id="question<%= i %>">
     <label for="text_area">Question <%= i %>: <br></label>
     <textarea name="new_question[#{i}]" id="text_area" placeholder='Enter question...' cols = "60" rows = "8"></textarea>

@@ -836,7 +836,7 @@ class Assignment < ActiveRecord::Base
     if (self.require_quiz?)
       signups = SignedUpUser.where(creator_id: contributor.id)
       for signup in signups do
-        signuptopic = SignUpTopic.find_by_id(signup.topic_id)
+        signuptopic = SignUpTopic.find(signup.topic_id)
         if (signuptopic.assignment_id == self.id)
           contributors_signup_topic = signuptopic
           return contributors_signup_topic
@@ -848,7 +848,7 @@ class Assignment < ActiveRecord::Base
     (!Team.find_by_name_and_id(contributor.name, contributor.id).nil?) ?
       contributors_topic = SignedUpUser.find_by_creator_id(contributor.id) :
       contributors_topic = SignedUpUser.find_by_creator_id(contributor.user_id)
-    contributors_signup_topic = SignUpTopic.find_by_id(contributors_topic.topic_id) if !contributors_topic.nil?
+    contributors_signup_topic = SignUpTopic.find(contributors_topic.topic_id) if !contributors_topic.nil?
     end
 
     def self.export(csv, parent_id, options)

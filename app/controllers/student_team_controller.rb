@@ -39,13 +39,13 @@ class StudentTeamController < ApplicationController
   end
 
   def edit
-    @team = AssignmentTeam.find_by_id(params[:team_id])
+    @team = AssignmentTeam.find(params[:team_id])
     @student = AssignmentParticipant.find(params[:student_id])
     return unless current_user_id?(@student.user_id)
   end
 
   def update
-    @team = AssignmentTeam.find_by_id(params[:team_id])
+    @team = AssignmentTeam.find(params[:team_id])
     check = AssignmentTeam.where( ["name =? and parent_id =?", params[:team][:name], @team.parent_id])
     if (check.length == 0)
       if @team.update_attributes(params[:team])
@@ -155,7 +155,7 @@ class StudentTeamController < ApplicationController
     end
 
   def review
-    @assignment = Assignment.find_by_id(params[:assignment_id])
+    @assignment = Assignment.find(params[:assignment_id])
     redirect_to :controller =>'questionnaire', :action => 'view_questionnaire', :id => @assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire').id
   end
 end

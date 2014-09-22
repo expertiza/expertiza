@@ -11,7 +11,7 @@ module AccessHelper
   end
 
   def all_actions_allowed?
-    if current_role.super_admin?
+    if current_user && current_role.super_admin?
       true
     else
       action_allowed?

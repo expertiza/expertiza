@@ -6,7 +6,7 @@ class PublishingController < ApplicationController
 
 
   def view
-    @user = User.find_by_id(session[:user].id) # Find again, because the user's certificate may have changed since login
+    @user = User.find(session[:user].id) # Find again, because the user's certificate may have changed since login
     @participants = AssignmentParticipant.where(user_id: session[:user].id)
   end
 
@@ -44,7 +44,7 @@ class PublishingController < ApplicationController
     if (!params[:id].nil?)
       @participant = AssignmentParticipant.find(params[:id])
     end
-    @user = User.find_by_id(session[:user].id) # Find again, because the user's certificate may have changed since login
+    @user = User.find(session[:user].id) # Find again, because the user's certificate may have changed since login
     end
 
   # Grant publishing rights using the private key supplied by the student

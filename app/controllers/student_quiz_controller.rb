@@ -36,7 +36,7 @@ class StudentQuizController < ApplicationController
 
   def finished_quiz
     @response = Response.find_by_map_id(params[:map_id])
-    @response_map = ResponseMap.find_by_id(params[:map_id])
+    @response_map = ResponseMap.find(params[:map_id])
     @questions = Question.where(questionnaire_id: @response_map.reviewed_object_id)
 
     essay_not_graded = false
@@ -62,7 +62,7 @@ class StudentQuizController < ApplicationController
   def self.take_quiz assignment_id , reviewer_id
     @quizzes = Array.new
     reviewer = Participant.find_by_user_id_and_parent_id(reviewer_id,assignment_id)
-    @assignment = Assignment.find_by_id(assignment_id)
+    @assignment = Assignment.find(assignment_id)
     teams = TeamsUser.where(user_id: reviewer_id)
     Team.where(parent_id: assignment_id).each do |quiz_creator|
       unless TeamsUser.find_by_team_id(quiz_creator.id).user_id == reviewer_id
@@ -89,7 +89,7 @@ def record_response
   @response.updated_at = DateTime.current
   @response.save
 
-  @questionnaire = Questionnaire.find_by_id(@map.reviewed_object_id)
+  @questionnaire = Questionnaire.find(@map.reviewed_object_id)
   scores = Array.new
   new_scores = Array.new
   valid = 0

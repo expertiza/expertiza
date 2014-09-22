@@ -71,7 +71,7 @@ class SignedUpUser < ActiveRecord::Base
     if !old_teams_signups.nil?
       for old_teams_signup in old_teams_signups
         if old_teams_signup.is_waitlisted == false # i.e., if the old team was occupying a slot, & thus is releasing a slot ...
-          first_waitlisted_signup = SignedUpUser.find_by_topic_id_and_is_waitlisted(old_teams_signup.topic_id, true)
+          first_waitlisted_signup = SignedUpUser.where(topic_id: old_teams_signup.topic_id, is_waitlisted:  true).first
           if !first_waitlisted_signup.nil?
             Invitation.remove_waitlists_for_team(old_teams_signup.topic_id, assignment_id)
           end

@@ -49,16 +49,16 @@ class ReviewResponseMap < ResponseMap
       if user.nil?
         raise ImportError, "The user account for the reviewer \"#{row[index]}\" was not found. <a href='/users/new'>Create</a> this user?"
       end
-      reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(user.id, assignment.id)
+      reviewer = AssignmentParticipant.where(user_id: user.id, parent_id:  assignment.id).first
       if reviewer == nil
         raise ImportError, "The reviewer \"#{row[index]}\" is not a participant in this assignment. <a href='/users/new'>Register</a> this user as a participant?"
       end
       if assignment.team_assignment
-        reviewee = AssignmentTeam.find_by_name_and_parent_id(row[0].to_s.strip, assignment.id)
+        reviewee = AssignmentTeam.where(name: row[0].to_s.strip, parent_id:  assignment.id).first
         if reviewee == nil
           raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"
         end
-        existing = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
+        existing = TeamReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
         if existing.nil?
           TeamReviewResponseMap.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => assignment.id)
         end
@@ -67,11 +67,11 @@ class ReviewResponseMap < ResponseMap
         if user == nil
           raise ImportError, "The user account for the reviewee \"#{row[0]}\" was not found. <a href='/users/new'>Create</a> this user?"
         end
-        reviewee = AssignmentParticipant.find_by_user_id_and_parent_id(puser.id, assignment.id)
+        reviewee = AssignmentParticipant.where(user_id: puser.id, parent_id:  assignment.id).first
         if reviewee == nil
           raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"
         end
-        existing = ParticipantReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
+        existing = ParticipantReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
         if existing.nil?
           ParticipantReviewResponseMap.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => assignment.id)
         end

@@ -67,7 +67,7 @@ class ReviewMappingController < ApplicationController
   # Get all the available submissions
   def show_available_submissions
     assignment = Assignment.find(params[:assignment_id])
-    reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
+    reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
     requested_topic_id = params[:topic_id]
     @available_submissions =  Hash.new
     @available_submissions = DynamicReviewAssignmentHelper::review_assignment(assignment.id ,
@@ -76,7 +76,7 @@ class ReviewMappingController < ApplicationController
                                                                               Assignment::RS_STUDENT_SELECTED)
   end
   def add_quiz_response_map
-    if ResponseMap.find_by_reviewed_object_id_and_reviewer_id(params[:questionnaire_id], params[:participant_id])
+    if ResponseMap.where(reviewed_object_id: params[:questionnaire_id], reviewer_id:  params[:participant_id]).first
       flash[:error] = "You have already taken that quiz"
     else
       @map = QuizResponseMap.new
@@ -91,7 +91,7 @@ class ReviewMappingController < ApplicationController
   # Assign self to a submission
   def add_self_reviewer
     assignment = Assignment.find(params[:assignment_id])
-    reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
+    reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
     submission = AssignmentParticipant.find(params[:submission_id],assignment.id)
 
     if submission.nil?
@@ -139,7 +139,7 @@ class ReviewMappingController < ApplicationController
   def assign_reviewer_dynamically
     begin
       assignment = Assignment.find(params[:assignment_id])
-      reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
+      reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
 
       unless params[:i_dont_care]
         topic = (params[:topic_id].nil?) ? nil : SignUpTopic.find(params[:topic_id])
@@ -159,7 +159,7 @@ class ReviewMappingController < ApplicationController
   def assign_metareviewer_dynamically
     begin
       assignment   = Assignment.find(params[:assignment_id])
-      metareviewer = AssignmentParticipant.find_by_user_id_and_parent_id(params[:metareviewer_id], assignment.id)
+      metareviewer = AssignmentParticipant.where(user_id: params[:metareviewer_id], parent_id:  assignment.id).first
 
       assignment.assign_metareviewer_dynamically(metareviewer)
 
@@ -174,11 +174,11 @@ class ReviewMappingController < ApplicationController
   def assign_quiz_dynamically
     begin
       assignment = Assignment.find(params[:assignment_id])
-      reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
+      reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
       #topic_id = Participant.find(Questionnaire.find(params[:questionnaire_id]).instructor_id).topic_id
       unless params[:i_dont_care]
         #topic = (topic_id.nil?) ? nil : SignUpTopic.find(topic_id)
-        if ResponseMap.find_by_reviewed_object_id_and_reviewer_id(params[:questionnaire_id], params[:participant_id])
+        if ResponseMap.where(reviewed_object_id: params[:questionnaire_id], reviewer_id:  params[:participant_id]).first
           flash[:error] = "You have already taken that quiz"
         else
           @map = QuizResponseMap.new
@@ -224,7 +224,7 @@ class ReviewMappingController < ApplicationController
   def assign_metareviewer_dynamically
     begin
       assignment   = Assignment.find(params[:assignment_id])
-      metareviewer = AssignmentParticipant.find_by_user_id_and_parent_id(params[:metareviewer_id], assignment.id)
+      metareviewer = AssignmentParticipant.where(user_id: params[:metareviewer_id], parent_id:  assignment.id).first
 
       assignment.assign_metareviewer_dynamically(metareviewer)
 
@@ -250,7 +250,7 @@ class ReviewMappingController < ApplicationController
   end
 
   def get_reviewer(user,assignment,reg_url)
-    reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(user.id,assignment.id)
+    reviewer = AssignmentParticipant.where(user_id: user.id, parent_id: assignment.id).first
     if reviewer.nil?
       raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue."
     end

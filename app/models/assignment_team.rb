@@ -143,7 +143,7 @@ class AssignmentTeam < Team
         users = self.users
         participants = Array.new
         users.each do |user|
-          participant = AssignmentParticipant.find_by_user_id_and_parent_id(user.id,self.parent_id)
+          participant = AssignmentParticipant.where(user_id: user.id, parent_id: self.parent_id).first
           participants << participant if participant != nil
         end
         participants
@@ -158,7 +158,7 @@ class AssignmentTeam < Team
       end
 
       def add_participant(assignment_id, user)
-        AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted) if AssignmentParticipant.find_by_parent_id_and_user_id(assignment_id, user.id) == nil
+        AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted) if AssignmentParticipant.where(parent_id: assignment_id, user_id:  user.id).first == nil
       end
 
       def assignment

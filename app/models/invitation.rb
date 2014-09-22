@@ -3,7 +3,7 @@ class Invitation < ActiveRecord::Base
   belongs_to :from_user, :class_name => "User", :foreign_key => "from_id"
 
   def self.remove_waitlists_for_team(topic_id, assignment_id)
-    first_waitlisted_signup = SignedUpUser.find_by_topic_id_and_is_waitlisted(topic_id, true)
+    first_waitlisted_signup = SignedUpUser.where(topic_id: topic_id, is_waitlisted:  true).first
 
     #As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
     first_waitlisted_signup.is_waitlisted = false
@@ -13,7 +13,7 @@ class Invitation < ActiveRecord::Base
     #of the users on the new team
     user_id = TeamsUser.first_by_team_id(first_waitlisted_signup.creator_id).user_id
     #Obtain this users entry in the participants table for this assignment
-    participant = Participant.find_by_user_id_and_parent_id(user_id, assignment_id)
+    participant = Participant.where(user_id: user_id, parent_id:  assignment_id).first
     #Update the users topic id to that of the team they are joining in the Participants table
     participant.update_topic_id(topic_id)
     #Cancel all topics the user is waitlisted for
@@ -30,9 +30,9 @@ class Invitation < ActiveRecord::Base
 
   #After a users accepts an invite to join a team their topic id needs to be updated.
   def self.update_users_topic_after_invite_accept(invitee_user_id, invited_user_id, assignment_id)
-    participant = Participant.find_by_user_id_and_parent_id(invited_user_id, assignment_id)
+    participant = Participant.where(user_id: invited_user_id, parent_id:  assignment_id).first
     #Find the topic id that the user who sent the invite is assigned to
-    new_topic_id = Participant.find_by_user_id_and_parent_id(invitee_user_id, assignment_id).topic_id
+    new_topic_id = Participant.where(user_id: invitee_user_id, parent_id:  assignment_id).first.topic_id
     #Update topic id of users who accepted the invite
     participant.update_topic_id(new_topic_id)
   end

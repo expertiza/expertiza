@@ -39,10 +39,10 @@ module ResponseHelper
     new_score = curr_item.get_total_score.to_f*weights
     existing_score = (total.to_f/count).to_f*weights
 
-    aq = AssignmentQuestionnaire.find_by_user_id_and_assignment_id_and_questionnaire_id(assignment.instructor_id, assignment.id, questionnaire.id)
+    aq = AssignmentQuestionnaire.where(user_id: assignment.instructor_id, assignment_id: assignment.id, questionnaire_id: questionnaire.id).first
 
     unless aq
-      aq = AssignmentQuestionnaire.find_by_user_id_and_assignment_id_and_questionnaire_id(assignment.instructor_id, nil, nil)
+      aq = AssignmentQuestionnaire.where(user_id: assignment.instructor_id, assignment_id: nil, questionnaire_id: nil).first
     end
 
     if aq

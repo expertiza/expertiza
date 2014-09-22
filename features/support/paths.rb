@@ -35,7 +35,7 @@ module NavigationHelpers
     when /Your Work/
         user_id = User.find_by_name("student").id
         assignment_id = Assignment.find_by_name("my_assignment").id
-        participant = Participant.find_by_user_id_and_parent_id(user_id, assignment_id)
+        participant = Participant.where(user_id: user_id, parent_id:  assignment_id).first
         "submitted_content/view?id=#{participant.id}"
 
     else

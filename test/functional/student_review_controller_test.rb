@@ -85,7 +85,7 @@ class StudentReviewControllerTest < ActionController::TestCase
 
     participant = Participant.find(participants(:par5))
     assignment = Assignment.find(:first, :conditions => ["id=?", participant.parent_id])
-    topic_id = TopicDeadline.find_by_topic_id_and_deadline_type_id(participant.topic_id,1)
+    topic_id = TopicDeadline.where(topic_id: participant.topic_id, deadline_type_id: 1).first
     result = 1
     printf(topic_id.inspect)
     assert_equal(result, topic_id.review_allowed_id)
@@ -97,7 +97,7 @@ class StudentReviewControllerTest < ActionController::TestCase
 
     participant = Participant.find(participants(:par5))
     assignment = Assignment.find(:first, :conditions => ["id=?", participant.parent_id])
-    topic_id = TopicDeadline.find_by_topic_id_and_deadline_type_id(participant.topic_id,1)
+    topic_id = TopicDeadline.where(topic_id: participant.topic_id, deadline_type_id: 1).first
     result = 1
     printf(topic_id.inspect)
     assert_equal(result, topic_id.review_allowed_id)

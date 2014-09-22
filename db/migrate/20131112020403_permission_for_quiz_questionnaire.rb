@@ -4,7 +4,7 @@ class PermissionForQuizQuestionnaire < ActiveRecord::Migration
     do_assignments_id = Permission.find_by_name("do assignments").id
     actions = ['new_quiz', 'create_quiz_questionnaire', 'update_quiz', 'edit_quiz', 'view_quiz']
     for action in actions do
-      unless ControllerAction.find_by_site_controller_id_and_name(controller_id, action)
+      unless ControllerAction.where(site_controller_id: controller_id, name:  action).first
         ControllerAction.create :site_controller_id => controller_id, :name => action, :permission_id => do_assignments_id, :url_to_use => ''
       end
     end

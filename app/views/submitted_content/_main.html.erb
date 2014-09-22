@@ -1,5 +1,5 @@
 <% if participant.get_hyperlinks.try(:length) || 0 > 0 %>
-  <%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant} %>
+  <%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => @participant, stage: @stage} %>
 <% end %>
 <% if stage != "Complete" and controller.controller_name == 'submitted_content' %>
   <%= form_tag :action => 'submit_hyperlink', :id => participant.id do %>
@@ -10,7 +10,7 @@
 <% end %>
 
 <% if participant.assignment.wiki_type_id == 1 %>
-  <%= render :partial => 'submitted_files', :locals => {:participant => participant, :stage => stage} %>
+  <%= render partial: 'submitted_content/submitted_files', locals: {participant: @participant, stage: @stage} %>
   <br/><br/><br/><b>
     <% if participant.assignment.is_coding_assignment%>
       <%= link_to "Code Review Dashboard", :controller => 'review_files',
@@ -29,7 +29,7 @@
   <!-- Setting the uid to team id for a team assignment and participant id for an individual assignment -->
   <%# if @assignment.team_assignment?%>
   <%    teams = TeamsUser.where(["user_id = ?", session[:user].id])%>
-  <%     for t in teams do
+  <%     teams.find_each do |t|
     if team = Team.where(["id = ? and parent_id = ?", t.team_id, @assignment.id]).first
       break
     end

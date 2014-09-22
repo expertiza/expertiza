@@ -31,7 +31,7 @@ class StudentTaskController < ApplicationController
         participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
 
         if participant && participant.topic
-          review_due_date = TopicDeadline.find_by_topic_id_and_deadline_type_id(participant.topic_id, 1)
+          review_due_date = TopicDeadline.where(topic_id: participant.topic_id, deadline_type_id:  1).first
 
           if review_due_date.due_at < Time.now && @assignment.get_current_stage(participant.topic_id) != 'Complete'
             @reviewee_topic_id = participant.topic_id

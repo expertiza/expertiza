@@ -11,7 +11,7 @@
     <th>Status</th>
     <th>Sent at</th>
   </tr>
-  <% participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
+  <% participant = Participant.where(user_id: session[:user].id, parent_id:  assignment_id).first
   requests=JoinTeamRequest.where(participant_id: participant.id) %>
 <% if requests != nil %>
 

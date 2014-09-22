@@ -88,7 +88,7 @@ class StandardizeReviewOfReviewMappings < ActiveRecord::Migration
     if user_id.to_i > 0
       user = User.find(user_id)
       if user
-        participant = AssignmentParticipant.find_by_user_id_and_parent_id(user_id,assignment_id)
+        participant = AssignmentParticipant.where(user_id: user_id, parent_id: assignment_id).first
         
         if participant.nil?       
           participant = AssignmentParticipant.create(:user_id => user_id, :parent_id => assignment_id)

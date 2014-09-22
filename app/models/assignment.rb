@@ -591,7 +591,7 @@ class Assignment < ActiveRecord::Base
   def add_participant(user_name)
     user = User.find_by_name(user_name)
     raise "The user account with the name #{user_name} does not exist. Please <a href='" + url_for(:controller => 'users', :action => 'new') + "'>create</a> the user first." if user.nil?
-    participant = AssignmentParticipant.find_by_parent_id_and_user_id(self.id, user.id)
+    participant = AssignmentParticipant.where(parent_id: self.id, user_id:  user.id).first
     if participant
       raise "The user #{user.name} is already a participant."
     else
@@ -845,7 +845,7 @@ class Assignment < ActiveRecord::Base
     end
 
     # Look for the topic_id where the creator_id equals the contributor id (contributor is a team or a participant)
-    (!Team.find_by_name_and_id(contributor.name, contributor.id).nil?) ?
+    (!Team.where(name: contributor.name, id:  contributor.id).first.nil?) ?
       contributors_topic = SignedUpUser.find_by_creator_id(contributor.id) :
       contributors_topic = SignedUpUser.find_by_creator_id(contributor.user_id)
     contributors_signup_topic = SignUpTopic.find(contributors_topic.topic_id) if !contributors_topic.nil?

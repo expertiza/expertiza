@@ -31,7 +31,7 @@ class CourseTeam < Team
 
   #deprecated: the functionality belongs to course
   def add_participant(course_id, user)
-    if CourseParticipant.find_by_parent_id_and_user_id(course_id, user.id) == nil
+    if CourseParticipant.where(parent_id: course_id, user_id:  user.id).first == nil
       CourseParticipant.create(:parent_id => course_id, :user_id => user.id, :permission_granted => user.master_permission_granted)
     end
   end

@@ -11,12 +11,12 @@ class CreateTeammateReviewMappings < ActiveRecord::Migration
       
     records.each{
        | review |
-       reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(review["reviewer_id"], review["assignment_id"])
+       reviewer = AssignmentParticipant.where(user_id: review["reviewer_id"], parent_id:  review["assignment_id"]).first
        if reviewer.nil?
          reviewer = AssignmentParticipant.create(:user_id => review["reviewer_id"], :parent_id => review["assignment_id"])
          reviewer.set_handle()
        end
-       reviewee = AssignmentParticipant.find_by_user_id_and_parent_id(review["reviewer_id"], review["assignment_id"])
+       reviewee = AssignmentParticipant.where(user_id: review["reviewer_id"], parent_id:  review["assignment_id"]).first
        if reviewee.nil?
          reviewee = AssignmentParticipant.create(:user_id => review["reviewer_id"], :parent_id => review["assignment_id"])
          reviewee.set_handle()

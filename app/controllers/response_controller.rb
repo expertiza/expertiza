@@ -17,13 +17,16 @@ class ResponseController < ApplicationController
   end
 
   def get_scores
-    @review_scores = Array.new
-    @question_type = Array.new
-    @questions.each {
-        |question|
-      @review_scores << Score.find_by_response_id_and_question_id(@response.id, question.id)
+    @review_scores = []
+    @question_type = []
+    @questions.each do |question|
+      @review_scores << Score
+        .where(
+          response_id: @response.id,
+          question_id:  question.id
+        ).first
       @question_type << QuestionType.find_by_question_id(question.id)
-    }
+    end
   end
 
   def delete
@@ -83,7 +86,7 @@ class ResponseController < ApplicationController
       @header = "Edit"
       @next_action = "update"
       @return = params[:return]
-      @response = Response.find_by_map_id_and_version_num(params[:id], @largest_version_num.version_num)
+      @response = Response.where(map_id: params[:id], version_num:  @largest_version_num.version_num).first
       return if redirect_when_disallowed(@response)
       @modified_object = @response.response_id
       @map = @response.map
@@ -91,7 +94,7 @@ class ResponseController < ApplicationController
       @review_scores = Array.new
       @questions.each {
           |question|
-        @review_scores << Score.find_by_response_id_and_question_id(@response.response_id, question.id)
+          @review_scores << Score.where(response_id: @response.response_id, question_id:  question.id).first
       }
       #**********************
       # Check whether this is Jen's assgt. & if so, use her rubric
@@ -156,16 +159,15 @@ class ResponseController < ApplicationController
       @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
       @largest_version_num=@sorted[0]
     end
-    @response = Response.find_by_map_id_and_version_num(@map.map_id, @largest_version_num.version_num)
+    @response = Response.where(map_id: @map.map_id, version_num:  @largest_version_num.version_num).first
     @modified_object = @response.response_id
     get_content
     @review_scores = Array.new
     @question_type = Array.new
-    @questions.each {
-        |question|
-      @review_scores << Score.find_by_response_id_and_question_id(@response.response_id, question.id)
+    @questions.each do |question|
+      @review_scores << Score.where(response_id: @response.response_id, question_id:  question.id).first
       @question_type << QuestionType.find_by_question_id(question.id)
-    }
+    end
     # Check whether this is a custom rubric
     if @map.questionnaire.section.eql? "Custom"
       @next_action = "custom_update"
@@ -191,7 +193,7 @@ class ResponseController < ApplicationController
       @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
       @largest_version_num=@sorted[0]
     end
-    @response = Response.find_by_map_id_and_version_num(@map.id, @largest_version_num)
+    @response = Response.where(map_id: @map.id, version_num:  @largest_version_num).first
     #@modified_object = @response.id
     #get_content()
     #get_scores()
@@ -219,7 +221,7 @@ class ResponseController < ApplicationController
 
       params[:responses].each_pair do |k, v|
 
-        score = Score.find_by_response_id_and_question_id(@response.id, questions[k.to_i].id)
+        score = Score.where(response_id: @response.id, question_id:  questions[k.to_i].id).first
         unless score
           score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
         end
@@ -244,8 +246,8 @@ class ResponseController < ApplicationController
   def new_feedback
     review = Response.find(params[:id])
     if review
-      reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, review.map.assignment.id)
-      map = FeedbackResponseMap.find_by_reviewed_object_id_and_reviewer_id(review.id, reviewer.id)
+      reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id:  review.map.assignment.id).first
+      map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id:  reviewer.id).first
       if map.nil?
         map = FeedbackResponseMap.create(:reviewed_object_id => review.id, :reviewer_id => reviewer.id, :reviewee_id => review.map.reviewer.id)
       end
@@ -262,11 +264,10 @@ class ResponseController < ApplicationController
     get_content
     @review_scores = Array.new
     @question_type = Array.new
-    @questions.each {
-        |question|
-      @review_scores << Score.find_by_response_id_and_question_id(@map.response_id, question.id)
+    @questions.each do |question|
+      @review_scores << Score.where(response_id: @map.response_id, question_id:  question.id).first
       @question_type << QuestionType.find_by_question_id(question.id)
-    }
+    end
   end
 
   def new
@@ -289,7 +290,7 @@ class ResponseController < ApplicationController
       if !@map.contributor.nil?
         team_member = TeamsUser.find_by_team_id(@map.contributor).user_id
         # Bug: @topic_id is set only in new, not in edit.  So this appears only the 1st time the review is done.-efg
-        @topic_id = Participant.find_by_parent_id_and_user_id(@map.assignment.id, team_member).topic_id
+        @topic_id = Participant.where(parent_id: @map.assignment.id, user_id:  team_member).first.topic_id
       end
       if !@topic_id.nil?
         @signedUpTopic = SignUpTopic.find(@topic_id).topic_name
@@ -305,8 +306,8 @@ class ResponseController < ApplicationController
   def new_feedback
     review = Response.find(params[:id])
     if review
-      reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, review.map.assignment.id)
-      map = FeedbackResponseMap.find_by_reviewed_object_id_and_reviewer_id(review.id, reviewer.id)
+      reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id:  review.map.assignment.id).first
+      map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id:  reviewer.id).first
       if map.nil?
         #if no feedback exists by dat user den only create for dat particular response/review
         map = FeedbackResponseMap.create(:reviewed_object_id => review.id, :reviewer_id => reviewer.id, :reviewee_id => review.map.reviewer.id)

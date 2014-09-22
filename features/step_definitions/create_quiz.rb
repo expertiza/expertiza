@@ -2,7 +2,7 @@ And /^I am participating in an assignment with quiz enabled$/ do
     steps %{
        Given I am participating in team assignment \"my_assignment\"
     }
-   a = Assignment.find_by_name_and_team_assignment('my_assignment', 1)
+    a = Assignment.where(name: 'my_assignment', team_assignment:  1).first
    a.require_quiz = true
    a.num_quiz_questions =2
 

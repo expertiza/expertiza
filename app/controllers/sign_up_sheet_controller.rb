@@ -47,7 +47,7 @@ class SignUpSheetController < ApplicationController
   #that assignment id will virtually be the signup sheet id as well as we have assumed
   #that every assignment will have only one signup sheet
   def create
-    topic = SignUpTopic.find_by_topic_name_and_assignment_id(params[:topic][:topic_name], params[:id])
+    topic = SignUpTopic.where(topic_name: params[:topic][:topic_name], assignment_id:  params[:id]).first
 
     #if the topic already exists then update
     if topic != nil
@@ -179,8 +179,8 @@ class SignUpSheetController < ApplicationController
             @duedates[i]['topic_name'] = topic.topic_name
 
             for j in 1..@review_rounds
-              duedate_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, DeadlineType.find_by_name('submission').id)
-              duedate_rev = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, DeadlineType.find_by_name('review').id)
+              duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('submission').id).first
+              duedate_rev = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('review').id).first
               if !duedate_subm.nil? && !duedate_rev.nil?
                 @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
                 @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
@@ -196,7 +196,7 @@ class SignUpSheetController < ApplicationController
               end
 
             end
-            duedate_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(topic.id, DeadlineType.find_by_name('metareview').id)
+            duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('metareview').id).first
             @duedates[i]['submission_'+ (@review_rounds+1).to_s] = !(duedate_subm.nil?)?(DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")):nil
             i = i + 1
           }
@@ -337,7 +337,7 @@ class SignUpSheetController < ApplicationController
                 sign_up.is_waitlisted = false
 
                 #Update topic_id in participant table with the topic_id
-                participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
+                participant = Participant.where(user_id: session[:user].id, parent_id:  assignment_id).first
 
                 participant.update_topic_id(topic_id)
               else
@@ -369,7 +369,7 @@ class SignUpSheetController < ApplicationController
                   Waitlist.cancel_all_waitlists(creator_id, assignment_id)
                   sign_up.is_waitlisted = false
                   sign_up.save
-                  participant = Participant.find_by_user_id_and_parent_id(session[:user].id, assignment_id)
+                  participant = Participant.where(user_id: session[:user].id, parent_id:  assignment_id).first
                   participant.update_topic_id(topic_id)
                   result = true
                 end
@@ -422,7 +422,7 @@ class SignUpSheetController < ApplicationController
                   sign_up.is_waitlisted = false
 
                   #Update topic_id in participant table with the topic_id
-                  participant = Participant.find_by_user_id_and_parent_id( @user_id , assignment_id)
+                  participant = Participant.where(user_id:  @user_id , parent_id:  assignment_id).first
 
                   participant.update_topic_id(topic_id)
                 else
@@ -462,7 +462,7 @@ class SignUpSheetController < ApplicationController
        cancel_all_waitlists(creator_id, assignment_id)
        sign_up.is_waitlisted = false
        sign_up.save
-       participant = Participant.find_by_user_id_and_parent_id( @user_id , assignment_id)
+       participant = Participant.where(user_id:  @user_id , parent_id:  assignment_id).first
        participant.update_topic_id(topic_id)
        result = true
      end
@@ -478,7 +478,7 @@ class SignUpSheetController < ApplicationController
           users_team = SignedUpUser.find_team_users(params[:assignment_id].to_s, @user_id)
           check = SignedUpUser.find_by_sql(["SELECT su.* FROM signed_up_users su , sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.creator_id = ? AND su.preference_priority_number = ?",params[:assignment_id].to_s,users_team[0].t_id,params[:priority].to_s])
           if check.size == 0
-            signUp = SignedUpUser.find_by_topic_id_and_creator_id(params[:id], users_team[0].t_id)
+            signUp = SignedUpUser.where(topic_id: params[:id], creator_id:  users_team[0].t_id).first
             #signUp.preference_priority_number = params[:priority].to_s
             if params[:priority].to_s.to_f > 0
               signUp.update_attribute('preference_priority_number' , params[:priority].to_s)
@@ -542,16 +542,16 @@ class SignUpSheetController < ApplicationController
               topic_deadline_type_subm = DeadlineType.find_by_name('submission').id
               topic_deadline_type_rev = DeadlineType.find_by_name('review').id
 
-              topic_deadline_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(due_date['t_id'].to_i, topic_deadline_type_subm, i)
+              topic_deadline_subm = TopicDeadline.where(topic_id: due_date['t_id'].to_i, deadline_type_id: topic_deadline_type_subm, round: i).first
               topic_deadline_subm.update_attributes({'due_at' => due_date['submission_' + i.to_s]})
               flash[:error] = "Please enter a valid " + (i > 1 ? "Resubmission deadline " + (i-1).to_s : "Submission deadline") if topic_deadline_subm.errors.length > 0
 
-              topic_deadline_rev = TopicDeadline.find_by_topic_id_and_deadline_type_id_and_round(due_date['t_id'].to_i, topic_deadline_type_rev,i)
+              topic_deadline_rev = TopicDeadline.where(topic_id: due_date['t_id'].to_i, deadline_type_id: topic_deadline_type_rev, round:i).first
               topic_deadline_rev.update_attributes({'due_at' => due_date['review_' + i.to_s]})
               flash[:error] = "Please enter a valid Review deadline " + (i > 1 ? (i-1).to_s : "") if topic_deadline_rev.errors.length > 0
             end
 
-            topic_deadline_subm = TopicDeadline.find_by_topic_id_and_deadline_type_id(due_date['t_id'], DeadlineType.find_by_name('metareview').id)
+            topic_deadline_subm = TopicDeadline.where(topic_id: due_date['t_id'], deadline_type_id:  DeadlineType.find_by_name('metareview').id).first
             topic_deadline_subm.update_attributes({'due_at' => due_date['submission_' + (review_rounds+1).to_s]})
             flash[:error] = "Please enter a valid Meta review deadline" if topic_deadline_subm.errors.length > 0
           }

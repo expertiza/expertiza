@@ -45,7 +45,7 @@ class GradesController < ApplicationController
 
     return if redirect_when_disallowed
     @assignment = @participant.assignment
-    @questions = Hash.new
+    @questions = {}
     questionnaires = @assignment.questionnaires
     questionnaires.each do |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
@@ -53,14 +53,14 @@ class GradesController < ApplicationController
 
     rmaps = ParticipantReviewResponseMap.where(reviewee_id: @participant.id, reviewed_object_id: @participant.assignment.id)
     rmaps.find_each do |rmap|
-      rmap.update_attribute notification_accepted, true
+      rmap.update_attribute :notification_accepted, true
     end
 
     rmaps = ParticipantReviewResponseMap.where reviewer_id: @participant.id, reviewed_object_id: @participant.parent_id
     rmaps.find_each do |rmap|
       mmaps = MetareviewResponseMap.where reviewee_id: rmap.reviewer_id, reviewed_object_id: rmap.map_id
       mmaps.find_each do |mmap|
-        mmap.update_attribute notification_accepted, true
+        mmap.update_attribute :notification_accepted, true
       end
     end
 
@@ -85,7 +85,7 @@ class GradesController < ApplicationController
   def instructor_review
     participant = AssignmentParticipant.find(params[:id])
 
-    reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, participant.assignment.id)
+    reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id:  participant.assignment.id).first
     if reviewer.nil?
       reviewer = AssignmentParticipant.create(:user_id => session[:user].id, :parent_id => participant.assignment.id)
       reviewer.set_handle()
@@ -95,7 +95,7 @@ class GradesController < ApplicationController
 
     if participant.assignment.team_assignment?
       reviewee = participant.team
-      review_mapping = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
+      review_mapping = TeamReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
 
       if review_mapping.nil?
         review_exists = false
@@ -193,7 +193,7 @@ class GradesController < ApplicationController
       participant = AssignmentParticipant.find(params[:id])
       total_score = params[:total_score]
       if sprintf("%.2f", total_score) != params[:participant][:grade]
-        participant.update_attribute('grade', params[:participant][:grade])
+        participant.update_attribute(:grade, params[:participant][:grade])
         if participant.grade.nil?
           message = "The computed score will be used for "+participant.user.name
         else
@@ -291,13 +291,13 @@ class GradesController < ApplicationController
             CalculatedPenalty.create(penalty_attr3)
           end
         end
-        @all_penalties[participant.id] = Hash.new
+        @all_penalties[participant.id] = {}
         @all_penalties[participant.id][:submission] = penalties[:submission]
         @all_penalties[participant.id][:review] = penalties[:review]
         @all_penalties[participant.id][:meta_review] = penalties[:meta_review]
         @all_penalties[participant.id][:total_penalty] = @total_penalty
       end
-      if @assignment.is_penalty_calculated == false
+      unless @assignment.is_penalty_calculated
         @assignment.update_attribute(:is_penalty_calculated, true)
       end
     end

@@ -109,16 +109,10 @@ class ReviewFilesController < ApplicationController
 
       code_review_dir = ReviewFilesHelper::get_code_review_file_dir(AssignmentParticipant.find(auth[base_filename][versions.sort.last]))
       file_path = ReviewFile.get_file(code_review_dir, versions.sort.last,base_filename)
-      all_review_files.each {|file|
-
-        #if file.filepath == file_path and file.version_number == versions.sort.last
+      all_review_files.each do |file|
         @file_id_map[base_filename] = file.id
-        #end
-      }
+      end
 
-      # review_file = ReviewFile.find_by_filepath_and_author_participant_id_and_version_number(file_path,auth[base_filename][versions.sort.last],versions.sort.last)
-
-      #    @file_id_map[base_filename] = review_file ? review_file.id : nil
       @file_version_map[base_filename] =  versions.sort
       @latest_version_number = (@file_version_map[base_filename][-1] >
                                 @latest_version_number) ? @file_version_map[base_filename][-1] :
@@ -311,7 +305,7 @@ newer_version_comments = ReviewComment.where(review_file_id: files[:@newer_file]
     @comment.initial_line_number = params[:first_line]
     assignmentparticipant = AssignmentParticipant.find(params[:participant_id])
 
-    current_participant = AssignmentParticipant.find_by_parent_id_and_user_id(assignmentparticipant[:parent_id],session[:user].id)
+    current_participant = AssignmentParticipant.where(parent_id: assignmentparticipant[:parent_id], user_id: session[:user].id).first
 
 
     @comment.reviewer_participant_id = current_participant.id
@@ -337,7 +331,7 @@ newer_version_comments = ReviewComment.where(review_file_id: files[:@newer_file]
         (comment[:initial_line_number] <= ((params[:initial_line_number]).to_i ) and comment[:last_line_number] <= ((params[:final_line_number]).to_i) and comment[:last_line_number] >= ((params[:initial_line_number]).to_i))
 
         assignmentparticipant = AssignmentParticipant.find(params[:participant_id])
-        current_participant = AssignmentParticipant.find_by_parent_id_and_user_id(assignmentparticipant[:parent_id],session[:user].id)
+        current_participant = AssignmentParticipant.where(parent_id: assignmentparticipant[:parent_id], user_id: session[:user].id).first
 
         if current_participant.id.to_s == params[:participant_id]
           authorflag = 1

@@ -124,7 +124,7 @@ class Participant < ActiveRecord::Base
       team_members = TeamsUser.where(team_id: team_id)
 
       team_members.each { |team_member|
-        participant = Participant.find_by_user_id_and_parent_id(team_member.user_id,assignment.id)
+        participant = Participant.where(user_id: team_member.user_id, parent_id: assignment.id).first
         participant.update_attribute(:topic_id, topic_id)
       }
     end
@@ -134,18 +134,15 @@ class Participant < ActiveRecord::Base
 
     # Return scores that this participant for the given questions
     def get_scores(questions)
-
-      scores = Hash.new
+      scores = {}
       scores[:participant] = self
       self.assignment.questionnaires.each do |questionnaire|
-        scores[questionnaire.symbol] = Hash.new
+        scores[questionnaire.symbol] = {}
         scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
-
         scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
       end
-
       scores[:total_score] = assignment.compute_total_score(scores)
-      return scores
-    end
 
+      scores
+    end
   end

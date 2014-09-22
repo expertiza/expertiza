@@ -55,7 +55,7 @@ class JoinTeamRequestsController < ApplicationController
       @join_team_request.status = 'P'
       @join_team_request.team_id = params[:team_id]
 
-      participant = Participant.find_by_user_id_and_parent_id(session[:user][:id],params[:assignment_id])
+      participant = Participant.where(user_id: session[:user][:id], parent_id: params[:assignment_id]).first
       @join_team_request.participant_id= participant.id
       respond_to do |format|
         if @join_team_request.save

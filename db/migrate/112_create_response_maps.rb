@@ -145,7 +145,7 @@ class CreateResponseMaps < ActiveRecord::Migration
       score_found = false      
       questions.each{
         | question |
-        score = Score.find_by_instance_id_and_question_id(review['id'].to_i, question.id) 
+        score = Score.where(instance_id: review['id'].to_i, question_id:  question.id).first 
         if score != nil
           score_found = true
           score.update_attribute('response_id',response.id)

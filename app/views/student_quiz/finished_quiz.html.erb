@@ -14,7 +14,7 @@
       <% end %>
     <% end %>
     <br>
-    Your answer is: <b><%= p Score.find_by_response_id_and_question_id(@response.id, question.id).comments  %></b><br><br>
+    Your answer is: <b><%= p Score.where(response_id: @response.id, question_id:  question.id).first.comments  %></b><br><br>
 
   <% elsif(question_type.q_type == 'MCC') %>
     <%= p 'Correct answer is: '%>
@@ -33,11 +33,11 @@
 
   <% elsif(question_type.q_type == 'TF') %>
     Correct Answer is: <b><%=QuizQuestionChoice.find_by_question_id(question.id).txt%></b><br/>
-    Your answer is: <b><%= p Score.find_by_response_id_and_question_id(@response.id, question.id).comments %></b><br><br>
+    Your answer is: <b><%= p Score.where(response_id: @response.id, question_id:  question.id).first.comments %></b><br><br>
 
 
   <% elsif(question_type.q_type == 'Essay') %>
-    Your Answer is: <b><%= p Score.find_by_response_id_and_question_id(@response.id, question.id).comments %></b><br><br>
+    Your Answer is: <b><%= p Score.where(response_id: @response.id, question_id:  question.id).first.comments %></b><br><br>
 
   <% end %><hr>
   <% i += 1 %>

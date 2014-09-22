@@ -90,7 +90,7 @@ class AssignmentParticipant < Participant
   end
 
   def assign_quiz(contributor,reviewer,topic)
-    participant_id=AssignmentParticipant.find_by_topic_id_and_parent_id(topic, contributor.parent_id).id
+    participant_id=AssignmentParticipant.where(topic_id: topic, parent_id:  contributor.parent_id).first.id
 
     quiz = QuizQuestionnaire.find_by_instructor_id(contributor.id)
     QuizResponseMap.create(:reviewed_object_id => quiz.id,:reviewee_id => contributor.id, :reviewer_id => reviewer.id,
@@ -349,7 +349,7 @@ class AssignmentParticipant < Participant
 
   #Copy this participant to a course
   def copy(course_id)
-    part = CourseParticipant.find_by_user_id_and_parent_id(self.user_id,course_id)
+    part = CourseParticipant.where(user_id: self.user_id, parent_id: course_id).first
     CourseParticipant.create(:user_id => self.user_id, :parent_id => course_id) if part.nil?
   end
 

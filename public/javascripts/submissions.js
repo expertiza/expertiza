@@ -1,3 +1,4 @@
+$ = jQuery
 function collapseSubDirectory(row) {
   var image = $('expand.'+row);
   var index = 0;

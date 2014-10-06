@@ -193,3 +193,4 @@ db/expertiza_scrubbed_2013_10_17.sql
 db/expertiza_scrubbed_2013_10_17.sql.gz
 .projectile
 .ruby-gemset
+.ruby-version

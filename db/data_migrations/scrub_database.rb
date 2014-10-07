@@ -9,7 +9,7 @@ class ScrubDatabase
       user.password = "password"
       user.password_confirmation = "password"
 
-      user.save(false)
+      user.save(validate: false)
       print "." if user.id % 100 == 0
     end
     puts "Done!"

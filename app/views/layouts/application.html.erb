@@ -23,7 +23,7 @@
           <% if session[:user].nil? %>
           <% else %>
             <% if session[:user].role_id ==4  %>
-              <a href="/versions/index">Manage Versions Table</a>
+              <%= link_to "Manage Versions Table", Version %></a>
             <% end %>
           <% end %>
         </div>

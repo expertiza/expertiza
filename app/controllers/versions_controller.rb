@@ -4,21 +4,17 @@ class VersionsController < ApplicationController
     @versions = Version.all
   end
 
+  def destroy_all
+    Version.destroy_all
+    redirect_to versions_path, notice: "All versions have been deleted"
+  end
+
   def destroy
-    @version = Version.find(params[:id])
-    @version.destroy
-    redirect_to versions_path, :notice => "Your version has been deleted"
+    Version.find(params[:id]).destroy
+    redirect_to versions_path, notice: "Your version has been deleted"
   end
 
-  def deleteAll
-    versions = Version.all
-    versions.each do |v|
-      v.destroy
-    end
-    redirect_to versions_path, :notice => "Your versions table has been cleaned"
-  end
-
-  before_filter :conflict? , :except => [:index,:destroy, :deleteAll]
+  before_filter :conflict? , :except => [:index,:destroy, :destroy_all]
   # test if someone else has edited the same item to undo
 
   def conflict?

@@ -21,12 +21,11 @@ class GradesController < ApplicationController
   #in the scores of all the reviews.
   def view
     @assignment = Assignment.find(params[:id])
-    @questions = Hash.new
-    questionnaires = @assignment.questionnaires
-    questionnaires.each {
-      |questionnaire|
+    @questions = {}
+    questionnaires = @assignment.questionnaires_with_questions
+    questionnaires.each do |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
-    }
+    end
     @scores = @assignment.get_scores(@questions)
     calculate_all_penalties(@assignment.id)
   end

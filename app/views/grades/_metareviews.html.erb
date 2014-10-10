@@ -1,62 +1,29 @@
-<!-- METAREVIEWS -->
+<!-- METAREVIEWS --> 
 <% if rscore and rscore[:assessments].length > 0 %>
   <BR/>
   <%= render :partial => 'grades/review_table',
-    :locals => {
-    :ctrl => 'review_of_review',
-    :caction => 'view',
-    :symbol => "metareview".to_sym,
-    :prefix => prefix,
-    :assignment => participant.assignment,
-    :reviews => rscore[:assessments],
-    :collabel => "Metareview",
-    :rowlabel => "Metareviewer",
-  } %>
-<BR/>
-<HR/>
-
-<%= form_for @assignment, html: {id: 'metareview_form'} do %>
-
-  <div id="metareviewtabs">
-    <ul>
-
-
-      <% for i in 1..rscore[:assessments].length %>
-        <li id="tab<%= i %>"><a href="#metareviewtabs-<%= i %>">Review <%= i %></a></li>
-      <% end %>
-    </ul>
-
-
-    <% count = 0 %>
-    <% for metareview in rscore[:assessments] %>
-      <% count = count + 1 %>
-
-
-      <% if controller.action_name != "view_my_scores" %>
-        <div id="metareviewtabs-<%= count %>">
-          <a name="<%= prefix+"_"+metareview.map.reviewer.name %>"></a><%= metareview.display_as_html(prefix) %>
-      </div>
-      <BR/><BR/>
+           :locals => {
+           :ctrl => 'review_of_review',
+           :caction => 'view',
+           :symbol => "metareview".to_sym,
+           :prefix => prefix,
+           :assignment => participant.assignment,
+           :reviews => rscore[:assessments],
+           :collabel => "Metareview",
+           :rowlabel => "Metareviewer",                      
+           }%>
+  <BR/>         
+  <HR/> 
+  <% count = 0 %>
+  <% for metareview in rscore[:assessments] %>
+    <% count = count + 1 %>
+    <% if controller.action_name != "view_my_scores" %>
+      <a name="<%=prefix+"_"+metareview.map.reviewer.name%>"></a><%= metareview.display_as_html(prefix) %><BR/><BR/> 
     <% else %>
-
-      <div id="metareviewtabs-<%= count %>">
-        <%= metareview.display_as_html(nil, count) %>
-      </div>
-      <BR/><BR/>
-    <% end %>
+      <%= metareview.display_as_html(nil,count) %><BR/><BR/>
+    <% end %>        
   <% end %>
-
-</div>
-
-
-<script>
-  jQuery(document).ready(function () {
-    jQuery("#metareviewtabs").tabs();
-  });
-</script>
-
-    <% end %>
-  <% else %>
-    <i>No metareviews have been completed for this user's reviews.</i>
-  <% end %>
-  <!-- END METAREVIEWS -->
+<% else %>
+  <i>No metareviews have been completed for this user's reviews.</i>
+<% end %>
+<!-- END METAREVIEWS -->

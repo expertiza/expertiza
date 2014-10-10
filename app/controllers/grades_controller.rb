@@ -64,6 +64,7 @@ class GradesController < ApplicationController
       end
     end
 
+    @topic = @participant.topic
     @pscore = @participant.get_scores(@questions)
     @stage = @participant.assignment.get_current_stage(@participant.topic_id)
     calculate_all_penalties(@assignment.id)

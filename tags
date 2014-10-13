@@ -1291,6 +1291,7 @@ ScoreCache	app/models/score_cache.rb	/^class ScoreCache < ActiveRecord::Base$/;"
 ScoreCacheTest	test/unit/score_cache_test.rb	/^class ScoreCacheTest < ActiveSupport::TestCase$/;"	c
 ScoreTest	test/unit/score_test.rb	/^class ScoreTest < ActiveSupport::TestCase$/;"	c
 ScoreView	app/models/score_view.rb	/^class ScoreView < ActiveRecord::Base$/;"	c
+ScoresController	app/controllers/scores_controller.rb	/^class ScoresController < ApplicationController$/;"	c
 ScrubDatabase	db/data_migrations/scrub_database.rb	/^class ScrubDatabase$/;"	c
 SelDateColor	app/assets/javascripts/datetimepicker.js	/^var SelDateColor="#FFFF99";\/\/Backgrond color of selected date in textbox.$/;"	v
 Sender	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/sender.rb	/^  class Sender$/;"	c	class:HoptoadNotifier
@@ -1526,7 +1527,7 @@ V.return	app/assets/javascripts/highcharts.js	/^"object"}function Ba(a){return O
 Verification	vendor/plugins/verification/lib/action_controller/verification.rb	/^  module Verification #:nodoc:$/;"	m	class:ActionController
 VerificationTest	vendor/plugins/verification/test/verification_test.rb	/^class VerificationTest < ActionController::TestCase$/;"	c
 VerificationTestController	vendor/plugins/verification/test/verification_test.rb	/^class VerificationTestController < ActionController::Base$/;"	c
-Version	app/models/version.rb	/^class Version < ActiveRecord::Base$/;"	c
+Version	app/models/version.rb	/^class Version < PaperTrail::Version$/;"	c
 VersionsController	app/controllers/versions_controller.rb	/^class VersionsController < ApplicationController$/;"	c
 Waitlist	app/models/waitlist.rb	/^class Waitlist < ActiveRecord::Base$/;"	c
 WaitlistsController	app/controllers/waitlists_controller.rb	/^class WaitlistsController < ApplicationController$/;"	c
@@ -1588,6 +1589,7 @@ action_allowed?	app/controllers/questionnaires_controller.rb	/^  def action_allo
 action_allowed?	app/controllers/response_controller.rb	/^  def action_allowed?$/;"	f	class:ResponseController
 action_allowed?	app/controllers/review_mapping_controller.rb	/^  def action_allowed?$/;"	f	class:ReviewMappingController
 action_allowed?	app/controllers/roles_controller.rb	/^  def action_allowed?$/;"	f	class:RolesController
+action_allowed?	app/controllers/scores_controller.rb	/^  def action_allowed?$/;"	f	class:ScoresController
 action_allowed?	app/controllers/sign_up_sheet_controller.rb	/^  def action_allowed?$/;"	f	class:SignUpSheetController
 action_allowed?	app/controllers/site_controllers_controller.rb	/^  def action_allowed?$/;"	f	class:SiteControllersController
 action_allowed?	app/controllers/statistics_controller.rb	/^  def action_allowed?$/;"	f	class:StatisticsController
@@ -1670,6 +1672,7 @@ advance_pointer!	app/helpers/diff_helper.rb	/^    def advance_pointer!$/;"	f	cla
 advertise_for_partners	app/controllers/student_team_controller.rb	/^  def advertise_for_partners$/;"	f	class:StudentTeamController
 alert	vendor/plugins/rails_upgrade/lib/application_checker.rb	/^      def alert(title, text, more_info_url, culprits)$/;"	f
 alert	vendor/plugins/rails_upgrade/test/application_checker_test.rb	/^      def alert(title, text, more_info_url, culprits)$/;"	f	class:Rails.Upgrading.ApplicationChecker
+all_actions_allowed?	app/helpers/access_helper.rb	/^  def all_actions_allowed?$/;"	f	class:AccessHelper
 all_assignments_all_students	app/controllers/assessment360_controller.rb	/^  def all_assignments_all_students$/;"	f
 all_assignments_one_student	app/controllers/assessment360_controller.rb	/^  def all_assignments_one_student$/;"	f
 all_children	vendor/plugins/acts_as_nested_set/lib/active_record/acts/nested_set.rb	/^        def all_children$/;"	f	class:ActiveRecord.Acts.NestedSet.ClassMethods.acts_as_nested_set.left_col_name.InstanceMethods
@@ -1741,7 +1744,6 @@ assign_team_topic	app/controllers/lottery_controller.rb	/^  def assign_team_topi
 assign_topic_deadline	app/models/due_date.rb	/^  def self.assign_topic_deadline(due_date,offset,topic_id)$/;"	F	class:DueDate
 assignment	app/models/assignment_team.rb	/^      def assignment$/;"	f	class:AssignmentTeam
 assignment	app/models/feedback_response_map.rb	/^  def assignment$/;"	f	class:FeedbackResponseMap
-assignment	app/models/metareview_response_map.rb	/^  def assignment$/;"	f	class:MetareviewResponseMap
 assignment_average_scores	app/models/analytic/course_analytic.rb	/^  def assignment_average_scores$/;"	f	class:CourseAnalytic
 assignment_id	app/models/course_team.rb	/^  def assignment_id$/;"	f	class:CourseTeam
 assignment_list	app/controllers/analytic_controller.rb	/^  def assignment_list$/;"	f	class:AnalyticController
@@ -1833,6 +1835,7 @@ button_to_close_redbox	vendor/plugins/redbox/lib/redbox_helper.rb	/^  def button
 c	app/assets/javascripts/highcharts.js	/^a:[a]}function o(){var a=arguments,b,c,d=a.length;for(b=0;b<d;b++)if(c=a[b],typeof c!=="undefined"&&c!==null)return c}function L(a,b){if(Da&&b&&b.opacity!==x)b.filter="alpha(opacity="+b.opacity*100+")";v(a.style,b)}function U(a,b,c,d,e){a=z.createElement(a);b&&v(a,b);e&&L(a,{padding:0,border:S,margin:0});c&&L(a,c);d&&d.appendChild(a);return a}function ea(a,b){var c=function(){};c.prototype=new a;v(c.prototype,b);return c}function Na(a,b,c,d){var e=N.lang,f=b===-1?((a||0).toString().split(".")[1]||$/;"	c
 calc_masks	vendor/plugins/graphr-0-1-9/lib/graph/directed_graph.rb	/^def calc_masks(start, stop, masks = Array.new)$/;"	f
 calculate_all_penalties	app/controllers/grades_controller.rb	/^    def calculate_all_penalties(assignment_id)$/;"	f	class:GradesController
+calculate_all_penalties	app/controllers/scores_controller.rb	/^  def calculate_all_penalties(assignment_id)$/;"	f	class:ScoresController
 calculate_author_feedback_penalty	app/helpers/penalty_helper.rb	/^  def calculate_author_feedback_penalty$/;"	f	class:PenaltyHelper
 calculate_meta_review_penalty	app/helpers/penalty_helper.rb	/^  def calculate_meta_review_penalty()$/;"	f	class:PenaltyHelper
 calculate_penalty	app/helpers/penalty_helper.rb	/^  def calculate_penalty(participant_id)$/;"	f	class:PenaltyHelper
@@ -1984,7 +1987,7 @@ copy	app/models/assignment_team.rb	/^      def copy(course_id)$/;"	f	class:Assig
 copy	app/models/course_participant.rb	/^  def copy(assignment_id)$/;"	f	class:CourseParticipant
 copy	app/models/course_team.rb	/^  def copy(assignment_id)$/;"	f	class:CourseTeam
 copy	app/models/due_date.rb	/^  def self.copy(old_assignment_id, new_assignment_id)$/;"	F	class:DueDate
-copy_assignment_questionnaire	app/controllers/assignments_controller.rb	/^  def copy_assignment_questionnaire (old_assign, new_assign)$/;"	f	class:AssignmentsController
+copy_assignment_questionnaire	app/controllers/assignments_controller.rb	/^  def copy_assignment_questionnaire (old_assign, new_assign)$/;"	f	class:AssignmentsController.copy
 copy_members	app/models/team.rb	/^  def copy_members(new_team)$/;"	f	class:Team
 copy_participants	app/models/course.rb	/^  def copy_participants(assignment_id)$/;"	f	class:Course
 copy_participants_from_course	app/controllers/assignment_controller.rb	/^      def copy_participants_from_course$/;"	f	class:AssignmentController
@@ -2077,6 +2080,7 @@ crumbs	app/models/menu.rb	/^  def crumbs$/;"	f	class:Menu.initialize
 cumulative_rating	app/models/bmapping.rb	/^  def cumulative_rating$/;"	f	class:Bmapping
 current_line	app/helpers/diff_helper.rb	/^    def current_line$/;"	f	class:DiffHelper.InputFile
 current_parent	vendor/plugins/rails_upgrade/lib/routes_upgrader.rb	/^      def current_parent$/;"	f	class:Rails.Upgrading.RouteRedrawer
+current_role	app/controllers/application_controller.rb	/^  def current_role$/;"	f	class:ApplicationController
 current_role_name	app/controllers/application_controller.rb	/^  def current_role_name$/;"	f	class:ApplicationController
 current_user	app/controllers/application_controller.rb	/^  def current_user$/;"	f	class:ApplicationController
 current_user_id?	app/controllers/application_controller.rb	/^  def current_user_id?(user_id)$/;"	f	class:ApplicationController
@@ -2142,7 +2146,6 @@ delete	app/models/teams_participant.rb	/^  def delete$/;"	f	class:TeamsParticipa
 delete	app/models/teams_user.rb	/^  def delete$/;"	f	class:TeamsUser
 delete	db/migrate/099_standardize_review_of_review_mappings.rb	/^  def self.delete(mapping, reason)$/;"	F	class:StandardizeReviewOfReviewMappings
 delete	db/migrate/102_standardize_review_mappings.rb	/^  def self.delete(mapping, reason)$/;"	F	class:StandardizeReviewMappings
-deleteAll	app/controllers/versions_controller.rb	/^  def deleteAll$/;"	f	class:VersionsController
 delete_all	app/controllers/assignment_questionnaire_controller.rb	/^  def delete_all$/;"	f	class:AssignmentQuestionnaireController
 delete_all	app/controllers/due_date_controller.rb	/^  def delete_all$/;"	f	class:DueDateController
 delete_all	app/controllers/teams_controller.rb	/^  def delete_all$/;"	f	class:TeamsController
@@ -2200,6 +2203,7 @@ destroy	app/controllers/system_settings_controller.rb	/^  def destroy$/;"	f	clas
 destroy	app/controllers/users_controller.rb	/^        def destroy$/;"	f	class:UsersController
 destroy	app/controllers/versions_controller.rb	/^  def destroy$/;"	f	class:VersionsController
 destroy	app/controllers/waitlists_controller.rb	/^  def destroy$/;"	f	class:WaitlistsController
+destroy_all	app/controllers/versions_controller.rb	/^  def destroy_all$/;"	f	class:VersionsController
 determine_api_key	vendor/gems/hoptoad_notifier-2.4.4/generators/hoptoad/hoptoad_generator.rb	/^  def determine_api_key$/;"	f
 determine_api_key	vendor/gems/hoptoad_notifier-2.4.4/lib/rails/generators/hoptoad/hoptoad_generator.rb	/^  def determine_api_key$/;"	f
 dir_path	app/models/assignment_participant.rb	/^  def dir_path$/;"	f	class:AssignmentParticipant
@@ -2595,7 +2599,6 @@ filter	app/controllers/tree_display_controller.rb	/^  def filter$/;"	f	class:Tre
 filter	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/notice.rb	/^    def filter(hash)$/;"	f
 filter_backtrace	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/configuration.rb	/^    def filter_backtrace(&block)$/;"	f	class:HoptoadNotifier.Configuration
 filter_key?	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/notice.rb	/^    def filter_key?(key)$/;"	f
-find_all_by_assignment_id	app/models/suggestion.rb	/^  def find_all_by_assignment_id(assignment_id)$/;"	f	class:Suggestion
 find_all_for_role	app/models/permission.rb	/^  def Permission.find_all_for_role(role)$/;"	F	class:Permission
 find_by_login	app/models/user.rb	/^  def self.find_by_login(login)$/;"	F	class:User
 find_current_line_in	app/helpers/diff_helper.rb	/^    def find_current_line_in(other)$/;"	f	class:DiffHelper.InputFile
@@ -2749,7 +2752,7 @@ get_assessments_for	app/models/teammate_review_questionnaire.rb	/^  def get_asse
 get_assigned_surveys	app/helpers/survey_helper.rb	/^  def self.get_assigned_surveys(assignment_id)$/;"	F	class:SurveyHelper
 get_author_name	app/models/team.rb	/^  def get_author_name$/;"	f	class:Team
 get_author_name	app/models/user.rb	/^  def get_author_name$/;"	f	class:User
-get_available_roles	app/models/role.rb	/^    def get_available_roles$/;"	f	class:Role.rebuild_cache
+get_available_roles	app/models/role.rb	/^  def get_available_roles$/;"	f	class:Role
 get_available_users	app/models/user.rb	/^  def get_available_users(name)$/;"	f	class:User
 get_average_score	app/models/assignment.rb	/^  def get_average_score$/;"	f	class:Assignment
 get_average_score	app/models/response.rb	/^  def get_average_score()$/;"	f	class:Response
@@ -2864,7 +2867,7 @@ get_param	vendor/plugins/gc4r/lib/gc4r.rb	/^    def get_param$/;"	f	class:GC4R.G
 get_parent_id	app/models/course_node.rb	/^  def self.get_parent_id$/;"	F	class:CourseNode
 get_parent_model	app/models/assignment_team.rb	/^      def get_parent_model$/;"	f	class:AssignmentTeam
 get_parent_model	app/models/course_team.rb	/^  def get_parent_model$/;"	f	class:CourseTeam
-get_parents	app/models/role.rb	/^    def get_parents$/;"	f	class:Role.rebuild_cache
+get_parents	app/models/role.rb	/^  def get_parents$/;"	f	class:Role
 get_partial_name	app/models/folder_node.rb	/^  def get_partial_name$/;"	f	class:FolderNode
 get_partial_name	app/models/node.rb	/^  def get_partial_name$/;"	f	class:Node
 get_partial_name	app/models/questionnaire_type_node.rb	/^  def get_partial_name$/;"	f	class:QuestionnaireTypeNode
@@ -3474,7 +3477,7 @@ otherConfirmedTopicforUser	app/controllers/lottery_controller.rb	/^  def otherCo
 otherConfirmedTopicforUser	app/controllers/sign_up_sheet_controller.rb	/^        def otherConfirmedTopicforUser(assignment_id, creator_id)$/;"	f	class:SignUpSheetController
 other_confirmed_topic_for_user	app/controllers/sign_up_sheet_controller.rb	/^        def self.other_confirmed_topic_for_user(assignment_id, creator_id)$/;"	F	class:SignUpSheetController
 other_confirmed_topic_for_user	app/controllers/signup_controller.rb	/^    def other_confirmed_topic_for_user(assignment_id, creator_id)$/;"	f	class:SignupController
-other_roles	app/models/role.rb	/^    def other_roles$/;"	f	class:Role.rebuild_cache
+other_roles	app/models/role.rb	/^  def other_roles$/;"	f	class:Role
 others_work	app/controllers/student_task_controller.rb	/^  def others_work$/;"	f	class:StudentTaskController
 output	vendor/plugins/rails_upgrade/lib/gemfile_generator.rb	/^      def output$/;"	f	class:Rails.Upgrading.GemfileGenerator
 paginate_list	app/controllers/users_controller.rb	/^        def paginate_list(role, user_id, letter)$/;"	f	class:UsersController
@@ -3568,8 +3571,8 @@ readonly?	app/models/score_view.rb	/^  def readonly?$/;"	f	class:ScoreView
 rearrange_questions	app/helpers/response_helper.rb	/^  def rearrange_questions(questions)$/;"	f	class:ResponseHelper
 reassign_topic	app/models/sign_up_topic.rb	/^  def self.reassign_topic(session_user_id, assignment_id, topic_id)$/;"	F	class:SignUpTopic
 rebuild_cache	app/models/role.rb	/^  def Role.rebuild_cache$/;"	F	class:Role
-rebuild_credentials	app/models/role.rb	/^    def rebuild_credentials$/;"	f	class:Role.rebuild_cache
-rebuild_menu	app/models/role.rb	/^    def rebuild_menu$/;"	f	class:Role.rebuild_cache
+rebuild_credentials	app/models/role.rb	/^  def rebuild_credentials$/;"	f	class:Role
+rebuild_menu	app/models/role.rb	/^  def rebuild_menu$/;"	f	class:Role
 record_not_found	app/controllers/application_controller.rb	/^  def record_not_found$/;"	f	class:ApplicationController
 record_response	app/controllers/student_quiz_controller.rb	/^def record_response$/;"	f
 recurse_cyclic?	vendor/plugins/graphr-0-1-9/lib/graph/directed_graph.rb	/^  def recurse_cyclic?(node, visited)$/;"	f	class:DirectedGraph
@@ -3859,6 +3862,7 @@ show	app/controllers/questionnaires_controller.rb	/^  def show$/;"	f	class:Quest
 show	app/controllers/questions_controller.rb	/^  def show$/;"	f	class:QuestionsController
 show	app/controllers/roles_controller.rb	/^  def show$/;"	f	class:RolesController
 show	app/controllers/roles_permissions_controller.rb	/^  def show$/;"	f	class:RolesPermissionsController
+show	app/controllers/scores_controller.rb	/^  def show$/;"	f	class:ScoresController
 show	app/controllers/site_controllers_controller.rb	/^  def show$/;"	f	class:SiteControllersController
 show	app/controllers/suggestion_controller.rb	/^  def show$/;"	f	class:SuggestionController
 show	app/controllers/system_settings_controller.rb	/^  def show$/;"	f	class:SystemSettingsController
@@ -4507,6 +4511,7 @@ test_validate_weight_no_numbers	test/unit/question_test.rb	/^  def test_validate
 test_verify_rounds	test/functional/student_review_controller_test.rb	/^    def test_verify_rounds$/;"	f	class:StudentReviewControllerTest
 test_verify_team_review_response	test/functional/student_review_controller_test.rb	/^  def test_verify_team_review_response$/;"	f	class:StudentReviewControllerTest
 test_view	test/functional/grade_controller_test.rb	/^  def test_view$/;"	f	class:GradesControllerTest
+text_field_with_auto_complete	app/helpers/application_helper.rb	/^  def text_field_with_auto_complete model, field, options$/;"	f	class:ApplicationHelper
 that	db/goldberg_db_mysql.sql	/^INSERT INTO `content_pages` VALUES (4,'Permission Denied!','denied',1,'h1. Permission Denied\\r\\n\\r\\nSorry, but you don\\'t have permission to view that page.\\r\\n\\r\\nPlease contact your system administrator.',3,'2006-06-11 14:34:30','2006-10-01 13:41:24');$/;"	V
 this.return	app/assets/javascripts/highcharts.js	/^"opacity"],function(a,b){var e=d,k,m;b==="cur"?e=c.prototype:b==="_default"&&f&&(e=g[b],b="set");(k=e[b])&&(e[b]=function(c){c=a?c:this;m=c.elem;return m.attr?m.attr(c.prop,b==="cur"?x:c.now):k.apply(this,arguments)})});e=function(a){var c=a.elem,d;if(!a.started)d=b.init(c,c.d,c.toD),a.start=d[0],a.end=d[1],a.started=!0;c.attr("d",b.step(a.start,a.end,a.pos,c.toD))};f?g.d={set:e}:d.d=e;this.each=Array.prototype.forEach?function(a,b){return Array.prototype.forEach.call(a,b)}:function(a,b){for(var c=$/;"	c
 this.this.return.forEach	app/assets/javascripts/highcharts.js	/^"opacity"],function(a,b){var e=d,k,m;b==="cur"?e=c.prototype:b==="_default"&&f&&(e=g[b],b="set");(k=e[b])&&(e[b]=function(c){c=a?c:this;m=c.elem;return m.attr?m.attr(c.prop,b==="cur"?x:c.now):k.apply(this,arguments)})});e=function(a){var c=a.elem,d;if(!a.started)d=b.init(c,c.d,c.toD),a.start=d[0],a.end=d[1],a.started=!0;c.attr("d",b.step(a.start,a.end,a.pos,c.toD))};f?g.d={set:e}:d.d=e;this.each=Array.prototype.forEach?function(a,b){return Array.prototype.forEach.call(a,b)}:function(a,b){for(var c=$/;"	m
@@ -4961,6 +4966,7 @@ waitlist_teams	app/models/waitlist.rb	/^  def waitlist_teams (param_id, user_id,
 warn	vendor/gems/hoptoad_notifier-2.4.4/test/helper.rb	/^  def warn(*args);  end$/;"	f	class:FakeLogger
 weight	lib/hamer.rb	/^      def weight$/;"	f	class:Hamer.Test.Reviewer
 weighted_score	lib/hamer.rb	/^      def weighted_score$/;"	f	class:Hamer.Test.Submission
+where	app/models/suggestion.rb	/^  def where(assignment_id: assignment_id)$/;"	f	class:Suggestion
 wiki_type_options	app/helpers/assignment_helper.rb	/^  def wiki_type_options$/;"	f	class:AssignmentHelper
 winCal	app/assets/javascripts/datetimepicker.js	/^var winCal;$/;"	v
 window.onload	app/assets/javascripts/textareasizer.js	/^    window.onload = function() {$/;"	f

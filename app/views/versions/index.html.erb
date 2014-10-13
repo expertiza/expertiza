@@ -1,6 +1,6 @@
 <h1> Version Table </h1>
 <hr/>
-<%= link_to "Delete All", "/versions/deleteAll", :confirm => "Are you sure you want to delete all the versions?", :method => :post, :action => :deleteAll %>
+<%= link_to "Delete All", Version, confirm: "Are you sure you want to delete all the versions?", method: :delete %>
 <table>
   <% @versions.each do |version| %>
 

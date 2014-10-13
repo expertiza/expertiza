@@ -18,7 +18,7 @@
         <tr><td><input id="impersonate_name" name="impersonate[name]" size="12"
             title="Enter a user account to impersonate" type="text"
             onKeyUp="UpdateButton();" /></td></tr>
-        <tr><td><input name="commit" id="revert_button" type="submit" value="Revert" /></td></tr>
+        <tr><td><%= submit_tag "Revert", name: "commit", id: "revert_button" %></td></tr>
       <% end %>
     <% else %>
       <%= form_tag :controller => 'auth', :action => 'logout' do %>

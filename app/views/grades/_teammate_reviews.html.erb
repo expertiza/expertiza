@@ -1,65 +1,29 @@
-<!-- TeammateReviewS -->
+<!-- TeammateReviewS --> 
 <% if rscore and rscore[:assessments].length > 0 %>
   <BR/>
   <%= render :partial => 'grades/review_table',
-    :locals => {
-    :ctrl => 'teammate_review',
-    :caction => 'view',
-    :symbol => "teammate".to_sym,
-    :prefix => prefix,
-    :assignment => participant.assignment,
-    :reviews => rscore[:assessments],
-    :collabel => "Feedback",
-    :rowlabel => "Author"
-  } %>
-<BR/>
-<HR/>
-
-<%= form_for @assignment, html: {id: 'teamreview_form'} do %>
-
-  <div id="teamreviewtabs">
-    <ul>
-
-      <% for i in 1..rscore[:assessments].length %>
-        <li id="tab<%= i %>"><a href="#teamreviewtabs-<%= i %>">Review <%= i %></a></li>
-      <% end %>
-    </ul>
-
-
-    <% count = 0 %>
-    <% for review in rscore[:assessments] %>
-      <% count = count + 1 %>
-
-      <div id="teamreviewtabs-<%= count %>">
-
-        <% if controller.action_name != "view_my_scores" %>
-          <a name="<%= prefix+"_"+review.map.reviewer.name %>"></a><%= review.display_as_html(prefix) %>
-        <BR/><BR/>
-
-      </div>
+           :locals => {
+           :ctrl => 'teammate_review',
+           :caction => 'view',
+           :symbol => "teammate".to_sym,
+           :prefix => prefix,
+           :assignment => participant.assignment,
+           :reviews => rscore[:assessments],
+           :collabel => "Feedback",
+           :rowlabel => "Author"
+           }%>
+  <BR/>         
+  <HR/> 
+  <% count = 0 %>
+  <% for review in rscore[:assessments] %>
+    <% count = count + 1 %>
+    <% if controller.action_name != "view_my_scores" %>
+      <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a><%= review.display_as_html(prefix) %><BR/><BR/>
     <% else %>
-
-      <div id="teamreviewtabs-<%= count %>">
-
-        <%= review.display_as_html(nil, count) %>
-        <BR/><BR/>
-
-      </div>
-    <% end %>
+      <%= review.display_as_html(nil,count) %><BR/><BR/>
+    <% end %>    
   <% end %>
-
-</div>
-
-
-<script>
-  jQuery(document).ready(function () {
-    jQuery("#teamreviewtabs").tabs();
-  });
-</script>
-
-    <% end %>
-
-  <% else %>
-    <i>No Team mate reviews have been provided for this user's reviews.</i>
-  <% end %>
-  <!-- END TeammateReviews -->
+<% else %>
+  <i>No author feedback has been provided for this user's reviews.</i>
+<% end %>
+<!-- END TeammateReviews -->

@@ -65,11 +65,6 @@ class StudentTeamController < ApplicationController
 
   def advertise_for_partners
     Team.update_all("advertise_for_partner=true",:id=>params[:team_id])
-    #respond_to do |format|
-    #  format.html #  index.html.erb
-    #format.xml  { render :xml => @log_entries }
-    #end
-    #redirect_to :controller => 'student_team', :action => 'advertise_for_partners' , :id => params[:team_id]
   end
   def remove
     Team.update_all("advertise_for_partner=false",:id=>params[:team_id])

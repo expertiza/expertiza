@@ -1,4 +1,4 @@
-class StudentTeamController < ApplicationController
+class StudentTeamsController < ApplicationController
   autocomplete :user, :name
 
   def action_allowed?
@@ -31,10 +31,10 @@ class StudentTeamController < ApplicationController
 
       undo_link("Team \"#{@team.name}\" has been created successfully. ")
 
-      redirect_to :controller => 'student_team', :action => 'view' , :id=> @student.id
+      redirect_to :controller => 'student_teams', :action => 'view' , :id=> @student.id
     else
       flash[:notice] = 'Team name is already in use.'
-      redirect_to :controller => 'student_team', :action => 'view' , :id=> @student.id
+      redirect_to :controller => 'student_teams', :action => 'view' , :id=> @student.id
     end
   end
 
@@ -51,15 +51,15 @@ class StudentTeamController < ApplicationController
       if @team.update_attributes(params[:team])
         undo_link("Team \"#{@team.name}\" has been updated successfully. ")
 
-        redirect_to :controller => 'student_team', :action => 'view', :id => params[:student_id]
+        redirect_to :controller => 'student_teams', :action => 'view', :id => params[:student_id]
       end
     elsif (check.length == 1 && (check[0].name <=> @team.name) == 0)
       undo_link("Team \"#{@team.name}\" has been updated successfully. ")
 
-      redirect_to :controller => 'student_team', :action => 'view', :id => params[:student_id]
+      redirect_to :controller => 'student_teams', :action => 'view', :id => params[:student_id]
     else
       flash[:notice] = 'Team name is already in use.'
-      redirect_to :controller =>'student_team', :action => 'edit', :team_id =>params[:team_id], :student_id => params[:student_id]
+      redirect_to :controller => 'student_teams', :action => 'edit', :team_id =>params[:team_id], :student_id => params[:student_id]
     end
   end
 
@@ -69,12 +69,12 @@ class StudentTeamController < ApplicationController
     #  format.html #  index.html.erb
     #format.xml  { render :xml => @log_entries }
     #end
-    #redirect_to :controller => 'student_team', :action => 'advertise_for_partners' , :id => params[:team_id]
+    #redirect_to :controller => 'student_teams', :action => 'advertise_for_partners' , :id => params[:team_id]
   end
   def remove
     Team.update_all("advertise_for_partner=false",:id=>params[:team_id])
 
-    redirect_to :controller => 'student_team', :action => 'view' , :id => params[:team_id]
+    redirect_to :controller => 'student_teams', :action => 'view' , :id => params[:team_id]
   end
 
   def leave
@@ -151,7 +151,7 @@ class StudentTeamController < ApplicationController
     @student.directory_num = nil
     @student.save
 
-    redirect_to :controller => 'student_team', :action => 'view' , :id => @student.id
+    redirect_to :controller => 'student_teams', :action => 'view' , :id => @student.id
     end
 
   def review

@@ -314,8 +314,9 @@ TreeFolder.create(:name => 'Survey', :child_type => 'QuestionnaireNode')
 TreeFolder.create(:name => 'Global Survey', :child_type => 'QuestionnaireNode')
 TreeFolder.create(:name => 'Course Evaluation', :child_type => 'QuestionnaireNode')
 
-###### nodes
+##nodesself.table_name=
 n1 = Node.create!(:parent_id => nil, :node_object_id => TreeFolder.find_by_name('Questionnaires').id)
+#Node.create(:parent_id => nil, :node_object_id => TreeFolder.find_by_name('Questionnaires').id)
 Node.create(:parent_id => nil, :node_object_id => TreeFolder.find_by_name('Courses').id)
 Node.create(:parent_id => nil, :node_object_id => TreeFolder.find_by_name('Assignments').id)
 Node.create(:parent_id => n1.id, :node_object_id => TreeFolder.find_by_name('Review').id)

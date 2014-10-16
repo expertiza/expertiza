@@ -439,7 +439,7 @@ Expertiza::Application.routes.draw do
 
   resources :users, constraints: {id: /\d+/} do
     collection do
-      get :list
+      get :index
       post ':id', action: :update
       get :show_selection
       get :auto_complete_for_user_name
@@ -454,14 +454,14 @@ Expertiza::Application.routes.draw do
   end
 
   get '/users/show_selection', controller: :users, action: :show_selection
-  get '/users/list', controller: :users, action: :list
+  get '/users/list', controller: :users, action: :index
   get '/menu/*name', controller: :menu_items, action: :link
   get ':page_name', controller: :content_pages, action: :view, method: :get
   get '/submitted_content/submit_hyperlink' => 'submitted_content#submit_hyperlink'
 
   root to: 'content_pages#view', page_name: 'home'
 
-  get 'users/list', :to => 'users#list'
+  get 'users/index', :to => 'users#index'
 
   get '/submitted_content/remove_hyperlink', :to => 'submitted_content#remove_hyperlink'
   get '/submitted_content/submit_hyperlink', :to => 'submitted_content#submit_hyperlink'

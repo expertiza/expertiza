@@ -1,5 +1,5 @@
 <div style="float: left;">
-  <%= form_tag :controller => 'users', :action => 'list', :letter => session[:letter], :search_by => @search_by, :paginate_show => '1' do %>
+  <%= form_tag :controller => 'users', :action => 'index', :letter => session[:letter], :search_by => @search_by, :paginate_show => '1' do %>
 
     Users per page:
     <%= select_tag :num_users, options_for_select([['all', 4], ['25', 1], ['50', 2], ['100', 3]], @per_page.to_i) %>

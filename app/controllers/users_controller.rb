@@ -2,7 +2,7 @@ class UsersController < ApplicationController
   autocomplete :user, :name
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
-    :redirect_to => { :action => :list }
+    :redirect_to => { :action => :index }
 
 
   def action_allowed?
@@ -19,14 +19,14 @@ class UsersController < ApplicationController
 
 
 
-  def index
-    if (current_user_role? == "Student")
-      redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user]))
-    else
-      list
-      render :action => 'list'
-    end
-  end
+  # def index
+  #   if (current_user_role? == "Student")
+  #     redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user]))
+  #   else
+  #     list
+  #     render :action => 'list'
+  #   end
+  # end
 
   def self.participants_in(assignment_id)
     users = Array.new
@@ -45,7 +45,10 @@ class UsersController < ApplicationController
   end
 
   #for displaying the list of users
-  def list
+  def index
+    if (current_user_role? == "Student")
+      redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user]))
+    else
     user = session[:user]
     role = Role.find(user.role_id)
     all_users = User.order('name').where( ['role_id in (?) or id = ?', role.get_available_roles, user.id])
@@ -78,6 +81,7 @@ class UsersController < ApplicationController
     @users = paginate_list(role, user.id, letter)
 
     @letters = ('A'..'Z').to_a
+    end
   end
 
     def show_selection
@@ -88,11 +92,11 @@ class UsersController < ApplicationController
           render :action => 'show'
         else
           flash[:note] = 'The specified user is not available for editing.'
-          redirect_to :action => 'list'
+          redirect_to :action => 'index'
         end
       else
         flash[:note] = params[:user][:name]+' does not exist.'
-        redirect_to :action => 'list'
+        redirect_to :action => 'index'
       end
     end
 
@@ -134,7 +138,7 @@ class UsersController < ApplicationController
           AssignmentQuestionnaire.create(:user_id => @user.id)
         end
         undo_link("User \"#{@user.name}\" has been created successfully. ")
-        redirect_to :action => 'list'
+        redirect_to :action => 'index'
         else
           foreign
           render :action => 'new'
@@ -173,7 +177,7 @@ class UsersController < ApplicationController
             flash[:error] = $!
           end
 
-          redirect_to :action => 'list'
+          redirect_to :action => 'index'
         end
 
         def keys

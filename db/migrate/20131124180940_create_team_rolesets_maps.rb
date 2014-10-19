@@ -1,7 +1,7 @@
 class CreateTeamRolesetsMaps < ActiveRecord::Migration
   def self.up
     create_table :team_rolesets_maps   do |t|
-      t.integer :id
+      #t.integer :id
       t.integer :team_rolesets_id
       t.integer :team_role_id
       t.timestamps

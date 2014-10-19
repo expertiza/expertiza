@@ -15,7 +15,8 @@ class UpdateControllersTeammateReview < ActiveRecord::Migration
     action = ControllerAction.create(:site_controller_id => controller.id, :name => 'goto_teammate_reviews')
     
     item = MenuItem.find_by_name('manage/questionnaires')    
-    maxseq = MenuItem.find_all_by_parent_id(item.id).length
+    #maxseq = MenuItem.find_all_by_parent_id(item.id).length
+    maxseq = MenuItem.where(parent_id: item.id).length
     MenuItem.create(:name => 'manage/questionnaires/teammate reviews', :label => 'Teammate Review', :parent_id => item.id, :seq => maxseq+1, :controller_action_id => action.id)
         
     Role.rebuild_cache 

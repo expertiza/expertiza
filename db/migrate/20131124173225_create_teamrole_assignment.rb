@@ -1,7 +1,7 @@
 class CreateTeamroleAssignment < ActiveRecord::Migration
   def self.up
     create_table "teamrole_assignment", :force => true do |t|
-      t.integer "id"
+      #t.integer "id"
       t.integer "team_roleset_id"
       t.integer "assignment_id"
     end

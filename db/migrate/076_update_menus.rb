@@ -38,7 +38,8 @@ class UpdateMenus < ActiveRecord::Migration
     assignments_action.site_controller_id = site_controller.id
     assignments_action.save    
     
-    MenuItem.find(:all, :conditions => ['parent_id is null and seq >= 3']).each{
+    #MenuItem.find(:all, :conditions => ['parent_id is null and seq >= 3']).each{
+    MenuItem.where('parent_id = null and seq >= 3').each{
       |item|
       item.seq += 1
       item.save
@@ -75,7 +76,7 @@ class UpdateMenus < ActiveRecord::Migration
     admin_item = MenuItem.find_by_label('Administration')
     admin_item.controller_action_id = nil
     content_page = ContentPage.find_by_name('site_admin')
-    content_page.permission_id = Permission.find_by_name('administer goldberg')
+    content_page.permission_id = Permission.find_by_name('administer goldberg').id
     content_page.save
     admin_item.content_page_id = content_page.id
     admin_item.save

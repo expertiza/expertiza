@@ -22,6 +22,10 @@ class Permission < ActiveRecord::Base
     return find_for_role(roles)
   end
 
+  def self.find_or_create_by_name (params)
+    Permission.find_or_create_by(name: params)
+  end
+
 
   # Find Permissions that are not already associated with the given
   # Role ID.

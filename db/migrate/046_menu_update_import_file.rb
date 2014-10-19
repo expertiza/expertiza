@@ -1,7 +1,7 @@
 class MenuUpdateImportFile < ActiveRecord::Migration
   def self.up
      permission1 = Permission.find_by_name('administer assignments')
-     site_controller = SiteController.find_or_create_by_name('import_file')
+     site_controller = SiteController.find_or_create_by(name: 'import_file')
      site_controller.permission_id = permission1.id
      site_controller.builtin = 0
      site_controller.save

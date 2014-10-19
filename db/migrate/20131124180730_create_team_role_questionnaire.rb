@@ -1,7 +1,7 @@
 class CreateTeamRoleQuestionnaire < ActiveRecord::Migration
   def self.up
     create_table "team_role_questionnaire", :force  => true do |t|
-      t.integer :id
+      #t.integer :id
       t.integer :team_roles_id
       t.integer :questionnaire_id
       t.timestamps

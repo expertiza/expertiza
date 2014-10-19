@@ -1,7 +1,7 @@
 class CreateSuggestions < ActiveRecord::Migration
   def self.up
     create_table :suggestions do |t|
-     t.column  :id,                 :int
+     #t.column  :id,                 :int
      t.column  :assignment_id,      :int
      t.column  :title,              :string
      t.column  :description,        :string, :limit=>750

@@ -9,7 +9,7 @@ class CreateParticipants < ActiveRecord::Migration
     t.column "submitted_at", :datetime
     t.column "topic", :string
     t.column "permission_granted", :boolean
-    t.column "penalty_accumulated", :integer, :limit => 10, :default => 0, :null => false
+    t.column "penalty_accumulated", :integer, :limit => 8, :default => 0, :null => false
     t.column "submitted_hyperlink", :string, :limit => 500
   end
 

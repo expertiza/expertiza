@@ -2,7 +2,7 @@ class MenuUpdateReviewMapping < ActiveRecord::Migration
   def self.up
      permission1 = Permission.find_by_name('administer assignments');
      menuParent = MenuItem.find_by_label('Assignment Creation')
-     site_controller = SiteController.find_or_create_by_name('review_mapping')
+     site_controller = SiteController.find_or_create_by(name: 'review_mapping')
      site_controller.permission_id = permission1.id
      site_controller.builtin = 0
      site_controller.save

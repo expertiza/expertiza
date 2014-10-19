@@ -19,7 +19,6 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.integer "user_id"
     t.integer "notification_limit",   default: 15, null: false
     t.integer "questionnaire_weight", default: 0,  null: false
-    t.integer "used_in_round"
   end
 
   add_index "assignment_questionnaires", ["assignment_id"], name: "fk_aq_assignments_id", using: :btree
@@ -58,13 +57,13 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.boolean  "copy_flag",                         default: false
     t.integer  "rounds_of_reviews",                 default: 1
     t.boolean  "microtask",                         default: false
-    t.integer  "selfreview_questionnaire_id"
-    t.integer  "managerreview_questionnaire_id"
-    t.integer  "readerreview_questionnaire_id"
     t.boolean  "require_quiz"
     t.integer  "num_quiz_questions",                default: 0,     null: false
     t.boolean  "is_coding_assignment"
     t.boolean  "is_intelligent"
+    t.integer  "selfreview_questionnaire_id"
+    t.integer  "managerreview_questionnaire_id"
+    t.integer  "readerreview_questionnaire_id"
     t.boolean  "calculate_penalty",                 default: false, null: false
     t.integer  "late_policy_id"
     t.boolean  "is_penalty_calculated",             default: false, null: false
@@ -251,8 +250,6 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.boolean  "flag",                        default: false
     t.integer  "threshold",                   default: 1
     t.integer  "delayed_job_id"
-    t.string   "deadline_name"
-    t.string   "description_url"
     t.integer  "quiz_allowed_id"
   end
 
@@ -293,17 +290,15 @@ ActiveRecord::Schema.define(version: 20140808212437) do
   end
 
   create_table "late_policies", force: true do |t|
-    t.integer "penalty_period_in_minutes"
-    t.float   "penalty_per_unit",          limit: 24
-    t.boolean "expressed_as_percentage"
-    t.integer "max_penalty",                          default: 0, null: false
-    t.string  "penalty_unit",                                     null: false
-    t.integer "times_used",                           default: 0, null: false
-    t.integer "instructor_id",                                    null: false
-    t.string  "policy_name",                                      null: false
+    t.float   "penalty_per_unit", limit: 24
+    t.integer "max_penalty",                 default: 0, null: false
+    t.string  "penalty_unit",                            null: false
+    t.integer "times_used",                  default: 0, null: false
+    t.integer "instructor_id",                           null: false
+    t.string  "policy_name",                             null: false
   end
 
-  add_index "late_policies", ["penalty_period_in_minutes"], name: "penalty_period_length_unit", using: :btree
+  add_index "late_policies", ["instructor_id"], name: "fk_instructor_id", using: :btree
 
   create_table "leaderboards", force: true do |t|
     t.integer "questionnaire_type_id"
@@ -437,7 +432,6 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.integer  "reviewee_id",           default: 0,     null: false
     t.string   "type",                  default: "",    null: false
     t.boolean  "notification_accepted", default: false
-    t.integer  "round"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

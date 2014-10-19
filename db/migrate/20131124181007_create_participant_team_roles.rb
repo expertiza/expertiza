@@ -1,7 +1,7 @@
 class CreateParticipantTeamRoles < ActiveRecord::Migration
   def self.up
     create_table :participant_team_roles do |t|
-      t.integer :id
+      #t.integer :id
       t.integer :role_assignment_id
       t.integer :participant_id
       t.timestamps

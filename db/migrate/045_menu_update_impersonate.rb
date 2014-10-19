@@ -6,12 +6,12 @@ class MenuUpdateImpersonate < ActiveRecord::Migration
     if site_controller == nil
        site_controller = SiteController.create(:name => 'impersonate', :permission_id => permission1.id, :builtin => 0)
     end
-    action = ControllerAction.find(:first, :conditions => ['name = "start" and site_controller_id = ?',site_controller.id])
+    action = ControllerAction.where(:site_controller_id=>site_controller.id, :name=>'start').first
     if action == nil
       action = ControllerAction.create(:name => 'start', :site_controller_id => site_controller.id)
     end
     
-    action2 = ControllerAction.find(:first, :conditions => ['name = "restore" and site_controller_id = ?',site_controller.id])
+    action2 = ControllerAction.where(:site_controller_id=>site_controller.id, :name=>'restore').first
     if action2 == nil
       action2 = ControllerAction.create(:name => 'restore', :site_controller_id => site_controller.id, :permission_id => permission2.id)
     end

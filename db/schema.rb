@@ -332,6 +332,8 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.integer "parent_id"
     t.integer "node_object_id"
     t.string  "type"
+    t.integer "lft"
+    t.integer "rgt"
   end
 
   create_table "participant_score_views", id: false, force: true do |t|

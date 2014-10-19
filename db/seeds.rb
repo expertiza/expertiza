@@ -277,17 +277,17 @@ RolesPermission.create(:role_id => Role.find_by_name('Super-Administrator').id, 
 
 puts 'RolesPermission'
 ###### system_settings
-# SystemSettings.create(:site_name => 'Expertiza', 
-#                      :site_subtitle => 'Reusable learning objects through peer review', 
-#                      :footer_message => '<a href="http://research.csc.ncsu.edu/efg/expertiza/papers">Expertiza</a>', 
-#                      :public_role_id => Role.find_by_name('Student').id,
-#                      :session_timeout => 7200,
-#                      :default_markup_style_id => MarkupStyle.find_by_name('Textile').id,
-#                      :site_default_page_id => ContentPage.find_by_name('home').id,
-#                      :not_found_page_id => ContentPage.find_by_name('notfound').id,
-#                      :permission_denied_page_id => ContentPage.find_by_name('denied').id,
-#                      :session_expired_page_id => ContentPage.find_by_name('expired').id,
-#                      :menu_depth => 3)
+ SystemSettings.create(:site_name => 'Expertiza',
+                      :site_subtitle => 'Reusable learning objects through peer review',
+                      :footer_message => '<a href="http://research.csc.ncsu.edu/efg/expertiza/papers">Expertiza</a>',
+                      :public_role_id => Role.find_by_name('Student').id,
+                      :session_timeout => 7200,
+                      :default_markup_style_id => MarkupStyle.find_by_name('Textile').id,
+                      :site_default_page_id => ContentPage.find_by_name('home').id,
+                      :not_found_page_id => ContentPage.find_by_name('notfound').id,
+                      :permission_denied_page_id => ContentPage.find_by_name('denied').id,
+                      :session_expired_page_id => ContentPage.find_by_name('expired').id,
+                      :menu_depth => 3)
 
 puts 'SystemSettings'
 ###### users

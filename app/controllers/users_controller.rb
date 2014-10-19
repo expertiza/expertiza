@@ -3,7 +3,25 @@ class UsersController < ApplicationController
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
     :redirect_to => { :action => :index }
+    helper_method :per_page, :get_role, :foreign
 
+    def per_page
+     per_page = 1
+
+      # Check if the "Show" button for pagination is clicked
+      # If yes, set @per_page to the value of the selection dropdown
+      # Else, if the request is from one of the letter links on the top
+      # set @per_page to 1 (25 names per page).
+      # Else, set @per_page to the :num_users param passed in from
+      # the will_paginate method from the 'pagination' partial.
+      if params[:paginate_show]
+       per_page = params[:num_users]
+      elsif params[:from_letter]
+        per_page = 1
+      else
+        per_page = params[:num_users]
+      end
+    end
 
   def action_allowed?
     case params[:action]
@@ -19,14 +37,6 @@ class UsersController < ApplicationController
 
 
 
-  # def index
-  #   if (current_user_role? == "Student")
-  #     redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user]))
-  #   else
-  #     list
-  #     render :action => 'list'
-  #   end
-  # end
 
   def self.participants_in(assignment_id)
     users = Array.new
@@ -61,21 +71,21 @@ class UsersController < ApplicationController
     logger.info "#{letter}"
     @letters = Array.new
 
-    @per_page = 1
-
-    # Check if the "Show" button for pagination is clicked
-    # If yes, set @per_page to the value of the selection dropdown
-    # Else, if the request is from one of the letter links on the top
-    # set @per_page to 1 (25 names per page).
-    # Else, set @per_page to the :num_users param passed in from
-    # the will_paginate method from the 'pagination' partial.
-    if params[:paginate_show]
-      @per_page = params[:num_users]
-    elsif params[:from_letter]
-      @per_page = 1
-    else
-      @per_page = params[:num_users]
-    end
+    # @per_page = 1
+    #
+    # # Check if the "Show" button for pagination is clicked
+    # # If yes, set @per_page to the value of the selection dropdown
+    # # Else, if the request is from one of the letter links on the top
+    # # set @per_page to 1 (25 names per page).
+    # # Else, set @per_page to the :num_users param passed in from
+    # # the will_paginate method from the 'pagination' partial.
+    # if params[:paginate_show]
+    #   @per_page = params[:num_users]
+    # elsif params[:from_letter]
+    #   @per_page = 1
+    # else
+    #   @per_page = params[:num_users]
+    # end
 
     # Get the users list to show on current page
     @users = paginate_list(role, user.id, letter)
@@ -87,8 +97,8 @@ class UsersController < ApplicationController
     def show_selection
       @user = User.find_by_name(params[:user][:name])
       if @user != nil
-        get_role
-        if @role.parent_id == nil || @role.parent_id < (session[:user]).role_id || @user.id == (session[:user]).id
+        role=get_role
+        if role.parent_id == nil || role.parent_id< (session[:user]).role_id || @user.id == (session[:user]).id
           render :action => 'show'
         else
           flash[:note] = 'The specified user is not available for editing.'
@@ -105,13 +115,13 @@ class UsersController < ApplicationController
         redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user]))
       else
         @user = User.find(params[:id])
-        get_role
+        #get_role
       end
     end
 
     def new
       @user = User.new
-      foreign
+     # foreign
     end
 
     def create
@@ -140,7 +150,7 @@ class UsersController < ApplicationController
         undo_link("User \"#{@user.name}\" has been created successfully. ")
         redirect_to :action => 'index'
         else
-          foreign
+          # foreign
           render :action => 'new'
         end
         end
@@ -148,8 +158,8 @@ class UsersController < ApplicationController
 
         def edit
           @user = User.find(params[:id])
-          get_role
-          foreign
+          #get_role
+         # foreign
         end
 
         def update
@@ -159,7 +169,7 @@ class UsersController < ApplicationController
             undo_link("User \"#{@user.name}\" has been updated successfully. ")
             redirect_to @user
           else
-            foreign
+          #  foreign
             render :action => 'edit'
           end
         end
@@ -193,17 +203,19 @@ class UsersController < ApplicationController
 
         def foreign
           role = Role.find((session[:user]).role_id)
-          @all_roles = Role.where( ['id in (?) or id = ?',role.get_available_roles,role.id])
+          all_roles = Role.where( ['id in (?) or id = ?',role.get_available_roles,role.id])
+          all_roles
         end
 
         private
 
         def get_role
           if @user && @user.role_id
-            @role = Role.find(@user.role_id)
+            role = Role.find(@user.role_id)
           elsif @user
-            @role = Role.new(:id => nil, :name => '(none)')
+            role = Role.new(:id => nil, :name => '(none)')
           end
+          return role
         end
 
         # For filtering the users list with proper search and pagination.
@@ -231,16 +243,13 @@ class UsersController < ApplicationController
             search_filter = '%' + letter + '%'
           end
 
-          if (paginate_options["#{@per_page}"].nil?) #displaying all - no pagination
+          if (paginate_options["#{per_page}"].nil?) #displaying all - no pagination
             users = User.order('name').where( [condition, role.get_available_roles, user_id, search_filter]).paginate(:page => params[:page], :per_page => User.count)
           else #some pagination is active - use the per_page
-            users = User.page(params[:page]).order('name').per_page(paginate_options["#{@per_page}"]).where([condition, role.get_available_roles, user_id, search_filter])
+            users = User.page(params[:page]).order('name').per_page(paginate_options["#{per_page}"]).where([condition, role.get_available_roles, user_id, search_filter])
           end
           users
           end
 
-        # generate the undo link
-        #def undo_link
-        #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @user.versions.last.id)}>undo</a>"
-        #end
+
       end

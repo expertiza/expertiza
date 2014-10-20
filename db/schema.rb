@@ -756,7 +756,7 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.boolean "email_on_submission"
     t.boolean "email_on_review_of_review"
     t.boolean "is_new_user",                           default: true,  null: false
-    t.integer "master_permission_granted", limit: 1,   default: 0
+    t.integer "master_permission_granted",             default: 0
     t.string  "handle"
     t.boolean "leaderboard_privacy",                   default: false
     t.text    "digital_certificate"

@@ -50,7 +50,7 @@ class SignupController < ApplicationController
 
       #find the assignment to which user is signing up
       @assignment = Assignment.find(params[:assignment_id])
-      if @assignment.team_assignment == true
+      if @assignment.team_assignment
         #check whether the user already has a team for this assignment
         @users_team = SignedUpUser.find_team_users(params[:assignment_id],(session[:user].id))
 

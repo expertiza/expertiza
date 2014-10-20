@@ -19,6 +19,7 @@
     <% count = count + 1 %>
     <% if controller.action_name != "view_my_scores" %>
       <a name="<%=prefix+"_"+feedback.map.reviewer.name%>"></a><%= feedback.display_as_html(prefix) %><BR/><BR/>
+            <%=button_to 'email' %>
     <% else %>
       <%= feedback.display_as_html(nil,count) %><BR/><BR/>
     <% end %>      

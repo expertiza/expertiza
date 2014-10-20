@@ -37,8 +37,8 @@
    	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",s_min) %>% - <%= sprintf("%.0f",s_max) %>% 
    	<% if controller.action_name != "view_my_scores" %>
    	  <BR/><FONT SIZE="-1"><%= link_to 'email reviewers', :action => 'conflict_notification', :id => participant.id, :submission => 'review' %></FONT>
-   	<% end %>  	 
-   	</TD>
+   	<% end %>
+    </TD>
     <% else %>
    	<TD ALIGN="CENTER">---</TD>
     <TD ALIGN="CENTER">---</TD>

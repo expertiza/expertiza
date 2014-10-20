@@ -35,18 +35,6 @@ class UsersController < ApplicationController
     end
   end
 
-
-
-
-  def self.participants_in(assignment_id)
-    users = Array.new
-    participants = AssignmentParticipant.find_by_parent_id(assignment_id)
-    participants.each{
-      |participant|
-      users << User.find(participant.user_id)
-    }
-  end
-
   def auto_complete_for_user_name
     user = session[:user]
     role = Role.find(user.role_id)
@@ -69,23 +57,7 @@ class UsersController < ApplicationController
       letter = all_users.first.name[0,1].downcase
     end
     logger.info "#{letter}"
-    @letters = Array.new
-
-    # @per_page = 1
-    #
-    # # Check if the "Show" button for pagination is clicked
-    # # If yes, set @per_page to the value of the selection dropdown
-    # # Else, if the request is from one of the letter links on the top
-    # # set @per_page to 1 (25 names per page).
-    # # Else, set @per_page to the :num_users param passed in from
-    # # the will_paginate method from the 'pagination' partial.
-    # if params[:paginate_show]
-    #   @per_page = params[:num_users]
-    # elsif params[:from_letter]
-    #   @per_page = 1
-    # else
-    #   @per_page = params[:num_users]
-    # end
+    @letters =[]
 
     # Get the users list to show on current page
     @users = paginate_list(role, user.id, letter)
@@ -95,7 +67,7 @@ class UsersController < ApplicationController
   end
 
     def show_selection
-      @user = User.find_by_name(params[:user][:name])
+      @user = User.where(name: params[:user][:name]).take
       if @user != nil
         role=get_role
         if role.parent_id.eql? nil || role.parent_id< (session[:user]).role_id || @user.id.eql?(session[:user]).id
@@ -115,19 +87,17 @@ class UsersController < ApplicationController
         redirect_to(action: AuthHelper::get_home_action(session[:user]), controller: AuthHelper::get_home_controller(session[:user]))
       else
         @user = User.find(params[:id])
-        #get_role
       end
     end
 
     def new
       @user = User.new
-     # foreign
     end
 
     def create
 
       # if the user name already exists, register the user by email address
-      check = User.find_by_name(params[:user][:name])
+      check = User.where(name: params[:user][:name]).take
       if check != nil
         params[:user][:name] = params[:user][:email]
       end
@@ -150,7 +120,6 @@ class UsersController < ApplicationController
         undo_link("User \"#{@user.name}\" has been created successfully. ")
         redirect_to users_path
         else
-          # foreign
           render action: 'new'
         end
         end
@@ -158,8 +127,6 @@ class UsersController < ApplicationController
 
         def edit
           @user = User.find(params[:id])
-          #get_role
-         # foreign
         end
 
         def update
@@ -169,7 +136,6 @@ class UsersController < ApplicationController
             undo_link("User \"#{@user.name}\" has been updated successfully. ")
             redirect_to user_path(@user)
           else
-          #  foreign
             render action: 'edit'
           end
         end
@@ -231,17 +197,17 @@ class UsersController < ApplicationController
 
           #The type of condition for the search depends on what the user has selected from the search_by dropdown
           condition = "(role_id in (?) or id = ?) and name like ?" #default used when clicking on letters
-          search_filter = letter + '%'
+          search_filter = "#{letter}%"
           @search_by = params[:search_by]
           if @search_by.eql? '1'  #search by user name
             condition = "(role_id in (?) or id = ?) and name like ?"
-            search_filter = '%' + letter + '%'
+            search_filter = "%#{letter}%"
           elsif @search_by.eql? '2' # search by full name
             condition = "(role_id in (?) or id = ?) and fullname like ?"
-            search_filter = '%' + letter + '%'
+            search_filter = "%#{letter}%"
           elsif @search_by.eql? '3' # search by email
             condition = "(role_id in (?) or id = ?) and email like ?"
-            search_filter = '%' + letter + '%'
+            search_filter = "%#{letter}%"
           end
 
           if (paginate_options["#{per_page}"].nil?) #displaying all - no pagination

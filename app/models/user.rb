@@ -80,6 +80,9 @@ class User < ActiveRecord::Base
     role.name == 'Super-Administrator'
   end
 
+  delegate :admin?, :student?, to: :role
+
+=begin
   def admin?
     role.admin?
   end
@@ -87,7 +90,7 @@ class User < ActiveRecord::Base
   def student?
     role.student?
   end
-
+=end
   def is_creator_of?(user)
     self == user.creator
   end
@@ -225,7 +228,7 @@ class User < ActiveRecord::Base
   def self.export(csv, parent_id, options)
     users = User.all
     users.each {|user|
-      tcsv = Array.new
+      tcsv = []
       if (options["personal_details"] == "true")
         tcsv.push(user.name, user.fullname, user.email)
       end
@@ -250,7 +253,7 @@ class User < ActiveRecord::Base
   end
 
   def self.get_export_fields(options)
-    fields = Array.new
+    fields = []
     if (options["personal_details"] == "true")
       fields.push("name", "full name", "email")
     end

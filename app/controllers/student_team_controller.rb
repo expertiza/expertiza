@@ -43,7 +43,7 @@ class StudentTeamController < ApplicationController
     @student = AssignmentParticipant.find(params[:student_id])
     return unless current_user_id?(@student.user_id)
   end
-
+#kevin up to here
   def update
     @team = AssignmentTeam.find(params[:team_id])
     check = AssignmentTeam.where( ["name =? and parent_id =?", params[:team][:name], @team.parent_id])
@@ -72,46 +72,66 @@ class StudentTeamController < ApplicationController
     redirect_to :controller => 'student_team', :action => 'view' , :id => params[:team_id]
   end
 
-  def leave
-    @student = AssignmentParticipant.find(params[:student_id])
-    return unless current_user_id?(@student.user_id)
+  def remove_participant
+    participant = AssignmentParticipant.find(params[:student_id])
+    return unless current_user_id?(participant.user_id)
     #remove the topic_id from participants
-    @student.update_topic_id(nil)
+    #>participant should belong to a team, and a team should have topic
+    #>then this call becomes participant.update_assigment_team(nil)
+    #>Correctly doing the relationship should handle the rest
+    #>TeamsUser appears to be a model that captures a relationship. Should be replaced with a
+    #>has_a relationship with assignment_team, and a has_and_belongs_to_many relationship in  assignment_participant
+    #>the new code here would be
+    #>assignment_team=AssignmentTeam.find(params[:team_id])#same as old_team below
+    #>participant = AssignmentParticipant.find(params[:student_id])
+    #>assignment_team.assignment_participants.delete(participant)
+    participant.update_topic_id(nil)
+
 
     #remove the entry from teams_users
-    user = TeamsUser.where(["team_id =? and user_id =?", params[:team_id], @student.user_id]).first
-    if user
-      user.destroy
 
-      undo_link("User \"#{user.name}\" has been removed from the team successfully. ")
+    #>Relationship which would remove the following block
+    participant = TeamsUser.where(["team_id =? and user_id =?", params[:team_id], participant.user_id]).first
+
+    if participant
+      participant.destroy
+
+      undo_link("User \"#{participant.name}\" has been removed from the team successfully. ")
     end
 
+    #>This whole block should be in the models. The controller shouldn't be handling book-keeping like this
+
     #if your old team does not have any members, delete the entry for the team
-    other_members = TeamsUser.where( ['team_id = ?', params[:team_id]])
-    if other_members.count == 0
+    #>could happen with a callback in assignment_team.assignment_participant.delete(participant)
+    if TeamsUser.where( ['team_id = ?', params[:team_id]]).count.zero?
       old_team = AssignmentTeam.where( ['id = ?', params[:team_id]])
-      if old_team
+      if old_team#> how on earth could this be null?
         old_team.destroy_all
         #if assignment has signup sheet then the topic selected by the team has to go back to the pool
         #or to the first team in the waitlist
-        signups = SignedUpUser.where( {:creator_id => params[:team_id]})
-        signups.each {|signup|
+
+        #>Again, a correctly performed has_a relationship with a callback should cover this!
+        #>CROSSING THE BARIER OF DEMETER
+        #>If (a big if) not controlled by a model, it should ATLEAST be moved with ALL OTHER signup management to
+        #>a child class of the ApplicationController
+        sign_ups = SignedUpUser.where( {:creator_id => params[:team_id]})
+        sign_ups.each {|sign_up|
           #get the topic_id
-          signup_topic_id = signup.topic_id
+          sign_up_topic_id = sign_up.topic_id
           #destroy the signup
-          signup.destroy
+          sign_up.destroy
 
           #get the number of non-waitlisted users signed up for this topic
-          non_waitlisted_users = SignedUpUser.where( {:topic_id => signup_topic_id, :is_waitlisted => false})
+          non_waitlisted_users = SignedUpUser.where( {:topic_id => sign_up_topic_id, :is_waitlisted => false})
           #get the number of max-choosers for the topic
-          max_choosers = SignUpTopic.where( {:id => signup_topic_id}).first.max_choosers
+          max_choosers = SignUpTopic.where( {:id => sign_up_topic_id}).first.max_choosers
 
           #check if this number is less than the max choosers
           if non_waitlisted_users.length < max_choosers
-            first_waitlisted_user = SignedUpUser.where( {:topic_id => signup_topic_id, :is_waitlisted => true}).first
+            first_waitlisted_user = SignedUpUser.where( {:topic_id => sign_up_topic_id, :is_waitlisted => true}).first
 
             #moving the waitlisted user into the confirmed signed up users list
-            if !first_waitlisted_user.nil?
+            if first_waitlisted_user
               first_waitlisted_user.is_waitlisted = false
               first_waitlisted_user.save
 
@@ -119,22 +139,21 @@ class StudentTeamController < ApplicationController
               #waitlisted_team_user could be nil since the team the student left could have been the one waitlisted on the topic
               #and teams_users for the team has been deleted in one of the earlier lines of code
 
-              if !waitlisted_team_user.nil?
+              if waitlisted_team_user
                 user_id = waitlisted_team_user.user_id
-                if !user_id.nil?
+                if user_id
                   participant = Participant.find_by_user_id(user_id)
                   participant.update_topic_id(nil)
                 end
               end
             end
           end
-          #signup.destroy
         }
       end
     end
 
     #remove all the sent invitations
-    old_invs = Invitation.where( ['from_id = ? and assignment_id = ?', @student.user_id, @student.parent_id])
+    old_invs = Invitation.where( ['from_id = ? and assignment_id = ?', participant.user_id, participant.parent_id])
     for old_inv in old_invs
       old_inv.destroy
     end
@@ -143,11 +162,11 @@ class StudentTeamController < ApplicationController
     #per EFG:
     #the participant is responsible for resubmitting their work
     #no restriction is placed on when a participant can leave
-    @student.directory_num = nil
-    @student.save
+    participant.directory_num = nil
+    participant.save
 
-    redirect_to :controller => 'student_team', :action => 'view' , :id => @student.id
-    end
+    redirect_to :controller => 'student_team', :action => 'view' , :id => participant.id
+  end
 
   def review
     @assignment = Assignment.find(params[:assignment_id])

@@ -119,7 +119,7 @@ class StudentTeamController < ApplicationController
         sign_ups.each {|sign_up|
           #get the topic_id
           sign_up_topic_id = sign_up.topic_id
-          #destroy the signup
+          #destroy the sign_up
           sign_up.destroy
 
           #get the number of non-waitlisted users signed up for this topic
@@ -158,19 +158,19 @@ class StudentTeamController < ApplicationController
     #>either way, it should be a has_many relationship
     #>Then it would be either
     #>
-    old_invs = Invitation.where( ['from_id = ? and assignment_id = ?', team_user.user_id, team_user.parent_id])
-    for old_inv in old_invs
-      old_inv.destroy
-    end
+    old_invites = Invitation.where( ['from_id = ? and assignment_id = ?', team_user.user_id, team_user.parent_id])
+
+    old_invites.each{|old_invite| old_invite.destroy}
 
     #reset the participants submission directory to nil
     #per EFG:
     #the participant is responsible for resubmitting their work
     #no restriction is placed on when a participant can leave
     participant.directory_num = nil
+
     participant.save
 
-    redirect_to :controller => 'student_team', :action => 'view' , :id => participant.id
+    redirect_to controller: 'student_team', action: 'view' , id: participant.id
   end
 
   def review

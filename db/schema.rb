@@ -164,14 +164,6 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.integer "penalty_points"
   end
 
-  create_table "categories", force: true do |t|
-    t.string  "name"
-    t.integer "parent_id"
-    t.integer "lft"
-    t.integer "rgt"
-    t.integer "depth"
-  end
-
   create_table "comments", force: true do |t|
     t.integer "participant_id", default: 0,     null: false
     t.boolean "private",        default: false, null: false
@@ -332,6 +324,10 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.integer "parent_id"
     t.integer "node_object_id"
     t.string  "type"
+    t.string  "name"
+    t.integer "lft"
+    t.integer "rgt"
+    t.integer "depth"
   end
 
   create_table "participant_score_views", id: false, force: true do |t|

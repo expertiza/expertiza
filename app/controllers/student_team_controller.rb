@@ -88,33 +88,34 @@ class StudentTeamController < ApplicationController
     participant.update_topic_id(nil)
 
 
+
     #remove the entry from teams_users
 
     #>Relationship which would remove the following block
-    participant = TeamsUser.where(["team_id =? and user_id =?", params[:team_id], participant.user_id]).first
+    team_user = TeamsUser.find_by team_id: params[:team_id], user_id: team_user.user_id
 
-    if participant
-      participant.destroy
+    if team_user
+      team_user.destroy
 
-      undo_link("User \"#{participant.name}\" has been removed from the team successfully. ")
+      undo_link("User \"#{team_user.name}\" has been removed from the team successfully. ")
     end
 
     #>This whole block should be in the models. The controller shouldn't be handling book-keeping like this
 
     #if your old team does not have any members, delete the entry for the team
     #>could happen with a callback in assignment_team.assignment_participant.delete(participant)
-    if TeamsUser.where( ['team_id = ?', params[:team_id]]).count.zero?
-      old_team = AssignmentTeam.where( ['id = ?', params[:team_id]])
+    unless TeamsUser.where(team_id: params[:team_id]).empty?
+      old_team = AssignmentTeam.find params[:team_id]
       if old_team#> how on earth could this be null?
         old_team.destroy_all
         #if assignment has signup sheet then the topic selected by the team has to go back to the pool
         #or to the first team in the waitlist
 
         #>Again, a correctly performed has_a relationship with a callback should cover this!
-        #>CROSSING THE BARIER OF DEMETER
+        #>CROSSING THE BARRIER OF DEMETER
         #>If (a big if) not controlled by a model, it should ATLEAST be moved with ALL OTHER signup management to
         #>a child class of the ApplicationController
-        sign_ups = SignedUpUser.where( {:creator_id => params[:team_id]})
+        sign_ups = SignedUpUser.where creator_id: params[:team_id]
         sign_ups.each {|sign_up|
           #get the topic_id
           sign_up_topic_id = sign_up.topic_id
@@ -122,28 +123,28 @@ class StudentTeamController < ApplicationController
           sign_up.destroy
 
           #get the number of non-waitlisted users signed up for this topic
-          non_waitlisted_users = SignedUpUser.where( {:topic_id => sign_up_topic_id, :is_waitlisted => false})
+          non_waitlisted_users = SignedUpUser.where topic_id: sign_up_topic_id, is_waitlisted: false
           #get the number of max-choosers for the topic
-          max_choosers = SignUpTopic.where( {:id => sign_up_topic_id}).first.max_choosers
+          max_choosers = SignUpTopic.find(sign_up_topic_id).max_choosers
 
           #check if this number is less than the max choosers
           if non_waitlisted_users.length < max_choosers
-            first_waitlisted_user = SignedUpUser.where( {:topic_id => sign_up_topic_id, :is_waitlisted => true}).first
+            first_waitlisted_user = SignedUpUser.find_by topic_id: sign_up_topic_id, is_waitlisted: true#<order?
 
             #moving the waitlisted user into the confirmed signed up users list
             if first_waitlisted_user
               first_waitlisted_user.is_waitlisted = false
               first_waitlisted_user.save
 
-              waitlisted_team_user = TeamsUser.where( {:team_id => first_waitlisted_user.creator_id}).first
+              waitlisted_team_user = TeamsUser.find_by team_id: first_waitlisted_user.creator_id #<this relationship is weird
               #waitlisted_team_user could be nil since the team the student left could have been the one waitlisted on the topic
               #and teams_users for the team has been deleted in one of the earlier lines of code
 
               if waitlisted_team_user
-                user_id = waitlisted_team_user.user_id
-                if user_id
-                  participant = Participant.find_by_user_id(user_id)
-                  participant.update_topic_id(nil)
+                user_id = waitlisted_team_user.user_id#<a relationship could be used have waitlisted_team_user.participant
+                if user_id#<again, how could this be null?
+                  waitlisted_participant = Participant.find_by_user_id(user_id)
+                  waitlisted_participant.update_topic_id(nil)
                 end
               end
             end
@@ -153,7 +154,11 @@ class StudentTeamController < ApplicationController
     end
 
     #remove all the sent invitations
-    old_invs = Invitation.where( ['from_id = ? and assignment_id = ?', participant.user_id, participant.parent_id])
+    #>shouldn't invites belong to the team not AssignmentParticipant?
+    #>either way, it should be a has_many relationship
+    #>Then it would be either
+    #>
+    old_invs = Invitation.where( ['from_id = ? and assignment_id = ?', team_user.user_id, team_user.parent_id])
     for old_inv in old_invs
       old_inv.destroy
     end

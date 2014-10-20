@@ -372,7 +372,7 @@ Expertiza::Application.routes.draw do
     collection do
       get :view
       get :edit
-      get :leave
+      get :remove_participant
       get :auto_complete_for_user_name
     end
   end

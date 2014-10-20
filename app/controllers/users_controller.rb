@@ -51,13 +51,13 @@ class UsersController < ApplicationController
     user = session[:user]
     role = Role.find(user.role_id)
     @users = User.where( ['name LIKE ? and (role_id in (?) or id = ?)', "#{params[:user][:name]}%",role.get_available_roles, user.id])
-    render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
+    render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
 
   #for displaying the list of users
   def index
-    if (current_user_role? == "Student")
-      redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user]))
+    if (current_user_role.eql? "Student")
+      redirect_to(action: AuthHelper::get_home_action(session[:user]), controller: AuthHelper::get_home_controller(session[:user]))
     else
     user = session[:user]
     role = Role.find(user.role_id)
@@ -65,7 +65,7 @@ class UsersController < ApplicationController
 
     letter = params[:letter]
     session[:letter] = letter
-    if letter == nil
+    if letter.eql? nil
       letter = all_users.first.name[0,1].downcase
     end
     logger.info "#{letter}"
@@ -98,21 +98,21 @@ class UsersController < ApplicationController
       @user = User.find_by_name(params[:user][:name])
       if @user != nil
         role=get_role
-        if role.parent_id == nil || role.parent_id< (session[:user]).role_id || @user.id == (session[:user]).id
-          render :action => 'show'
+        if role.parent_id.eql? nil || role.parent_id< (session[:user]).role_id || @user.id.eql?(session[:user]).id
+          render action: 'show'
         else
           flash[:note] = 'The specified user is not available for editing.'
-          redirect_to :action => 'index'
+          redirect_to users_path
         end
       else
         flash[:note] = params[:user][:name]+' does not exist.'
-        redirect_to :action => 'index'
+        redirect_to users_path
       end
     end
 
     def show
-      if (params[:id].nil?) || ((current_user_role? == "Student") &&  (session[:user].id != params[:id].to_i))
-        redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user]))
+      if (params[:id].nil?) || ((current_user_role.eql? "Student") &&  (session[:user].id != params[:id].to_i))
+        redirect_to(action: AuthHelper::get_home_action(session[:user]), controller: AuthHelper::get_home_controller(session[:user]))
       else
         @user = User.find(params[:id])
         #get_role
@@ -144,14 +144,14 @@ class UsersController < ApplicationController
         # ensures that these users have a default value of 15% for notifications.
         #TAs and Students do not need a default. TAs inherit the default from the instructor,
         # Students do not have any checks for this information.
-        if @user.role.name == "Instructor" or @user.role.name == "Administrator"
-          AssignmentQuestionnaire.create(:user_id => @user.id)
+        if @user.role.name.eql? "Instructor" or @user.role.name.eql? "Administrator"
+          AssignmentQuestionnaire.create(user_id: @user.id)
         end
         undo_link("User \"#{@user.name}\" has been created successfully. ")
-        redirect_to :action => 'index'
+        redirect_to users_path
         else
           # foreign
-          render :action => 'new'
+          render action: 'new'
         end
         end
 
@@ -167,10 +167,10 @@ class UsersController < ApplicationController
 
           if @user.update_attributes(params[:user])
             undo_link("User \"#{@user.name}\" has been updated successfully. ")
-            redirect_to @user
+            redirect_to user_path(@user)
           else
           #  foreign
-            render :action => 'edit'
+            render action: 'edit'
           end
         end
 
@@ -187,12 +187,12 @@ class UsersController < ApplicationController
             flash[:error] = $!
           end
 
-          redirect_to :action => 'index'
+          redirect_to users_path
         end
 
         def keys
-          if (params[:id].nil?) || ((current_user_role? == "Student") &&  (session[:user].id != params[:id].to_i))
-            redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user]))
+          if (params[:id].nil?) || ((current_user_role.eql? "Student") &&  (session[:user].id != params[:id].to_i))
+            redirect_to(action: AuthHelper::get_home_action(session[:user]), controller: AuthHelper::get_home_controller(session[:user]))
           else
             @user = User.find(params[:id])
             @private_key = @user.generate_keys
@@ -202,6 +202,7 @@ class UsersController < ApplicationController
         protected
 
         def foreign
+
           role = Role.find((session[:user]).role_id)
           all_roles = Role.where( ['id in (?) or id = ?',role.get_available_roles,role.id])
           all_roles
@@ -213,14 +214,14 @@ class UsersController < ApplicationController
           if @user && @user.role_id
             role = Role.find(@user.role_id)
           elsif @user
-            role = Role.new(:id => nil, :name => '(none)')
+            role = Role.new(id: nil, name: '(none)')
           end
           return role
         end
 
         # For filtering the users list with proper search and pagination.
         def paginate_list(role, user_id, letter)
-          paginate_options = {"1" => 25, "2" => 50, "3" => 100}
+          paginate_options = Hash["1" ,25 , "2", 50, "3", 100]
 
           # If the above hash does not have a value for the key,
           # it means that we need to show all the users on the page
@@ -232,19 +233,19 @@ class UsersController < ApplicationController
           condition = "(role_id in (?) or id = ?) and name like ?" #default used when clicking on letters
           search_filter = letter + '%'
           @search_by = params[:search_by]
-          if @search_by == '1'  #search by user name
+          if @search_by.eql? '1'  #search by user name
             condition = "(role_id in (?) or id = ?) and name like ?"
             search_filter = '%' + letter + '%'
-          elsif @search_by == '2' # search by full name
+          elsif @search_by.eql? '2' # search by full name
             condition = "(role_id in (?) or id = ?) and fullname like ?"
             search_filter = '%' + letter + '%'
-          elsif @search_by == '3' # search by email
+          elsif @search_by.eql? '3' # search by email
             condition = "(role_id in (?) or id = ?) and email like ?"
             search_filter = '%' + letter + '%'
           end
 
           if (paginate_options["#{per_page}"].nil?) #displaying all - no pagination
-            users = User.order('name').where( [condition, role.get_available_roles, user_id, search_filter]).paginate(:page => params[:page], :per_page => User.count)
+            users = User.order('name').where( [condition, role.get_available_roles, user_id, search_filter]).paginate(page: params[:page], per_page: User.count)
           else #some pagination is active - use the per_page
             users = User.page(params[:page]).order('name').per_page(paginate_options["#{per_page}"]).where([condition, role.get_available_roles, user_id, search_filter])
           end

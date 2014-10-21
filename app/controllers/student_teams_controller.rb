@@ -1,65 +1,51 @@
 class StudentTeamsController < ApplicationController
 
-  before_action :set_student, only: [:view, :create, :edit, :leave]
+  before_action :set_student, only: [:view, :update, :edit]
+  before_action :set_team, only: [:edit, :update]
   before_action Proc.new {return unless current_user_id?(@student.user_id)}, only: [:view, :create, :edit, :leave]
 
   autocomplete :user, :name
 
   def action_allowed?
-    current_role_name.eql?("Student")
+    current_role_name.eql? ("Student")
   end
 
   def view
 
-    #@student = AssignmentParticipant.find(params[:id])
-    #return unless current_user_id?(@student.user_id)
-
-
-    @send_invs = Invitation.where( ['from_id = ? and assignment_id = ?', @student.user.id, @student.assignment.id])
-    @received_invs = Invitation.where( ['to_id = ? and assignment_id = ? and reply_status = "W"', @student.user.id, @student.assignment.id])
+    @send_invs = Invitation.where from_id: @student.user.id, assignment_id: @student.assignment.id
+    @received_invs = Invitation.where to_id: @student.user.id, assignment_id: @student.assignment.id, reply_status: 'W'
   end
 
   def create
 
-    #@student = AssignmentParticipant.find(params[:id])
-    #return unless current_user_id?(@student.user_id)
-
-
-    check = AssignmentTeam.where( ["name =? and parent_id =?", params[:team][:name], @student.parent_id])
+    check = AssignmentTeam.where name: params[:team][:name], parent_id: @student.parent_id
 
     #check if the team name is in use
-    if (check.length == 0)
-      @team = AssignmentTeam.new(params[:team])
+    if check.length.empty?
+      @team = AssignmentTeam.new params[:team]
       @team.parent_id = @student.parent_id
       @team.save
       parent = AssignmentNode.find_by_node_object_id(@student.parent_id)
-      TeamNode.create(:parent_id => parent.id, :node_object_id => @team.id)
-      user = User.find(@student.user_id)
-      @team.add_member(user, @team.parent_id)
+      TeamNode.create parent_id: parent.id, node_object_id: @team.id
+      user = User.find @student.user_id
+      @team.add_member (user, @team.parent_id)
 
       undo_link("Team \"#{@team.name}\" has been created successfully. ")
 
 
-      #redirect_to :controller => 'student_teams', :action => 'view' , :id=> @student.id
-      redirect_to view_student_teams_path :id => @student.id
+           redirect_to view_student_teams_path id: @student.id
     else
       flash[:notice] = 'Team name is already in use.'
-      redirect_to view_student_teams_path :id => @student.id
-      # redirect_to :controller => 'student_teams', :action => 'view' , :id=> @student.id
+      redirect_to view_student_teams_path id: @student.id
 
     end
   end
 
   def edit
-    @team = AssignmentTeam.find(params[:team_id])
-
-    #@student = AssignmentParticipant.find(params[:student_id])
-    return unless current_user_id?(@student.user_id)
   end
 
 #kevin up to here
   def update
-    @team = AssignmentTeam.find(params[:team_id])
     check = AssignmentTeam.where( ["name =? and parent_id =?", params[:team][:name], @team.parent_id])
     if (check.length.zero?)
       if @team.update_attributes(params[:team])
@@ -206,6 +192,9 @@ class StudentTeamsController < ApplicationController
     redirect_to view_student_teams_path :id => @student.id
     end
 
+  def set_team
+    @team = AssignmentTeam.find(params[:team_id])
+  end
   def set_student
     if ["edit", "leave"].include? params[:action]
       student_id = params[:student_id]

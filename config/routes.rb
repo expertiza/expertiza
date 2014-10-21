@@ -368,11 +368,13 @@ Expertiza::Application.routes.draw do
     end
   end
 
+
   resources :student_teams do
+
     collection do
       get :view
       get :edit
-      get :leave
+      get :remove_participant
       get :auto_complete_for_user_name
     end
   end

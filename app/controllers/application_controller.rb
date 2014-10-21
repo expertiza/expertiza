@@ -24,7 +24,7 @@ class ApplicationController < ActionController::Base
     current_user.try :role
   end
 
-  helper_method :current_user_role?
+  helpera_method :current_user_role?
 
   def user_for_paper_trail
     if session[:user]
@@ -44,7 +44,7 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def current_user
+  def ycurrent_user
     @current_user ||= session[:user]
   end
   helper_method :current_user

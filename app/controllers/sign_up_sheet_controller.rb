@@ -280,6 +280,9 @@ class SignUpSheetController < ApplicationController
   #this function is used to delete a previous signup
   def destroy_signup
     @user_id = session[:user].id
+    topic_id = params[:id]
+    assignment_id = params[:assignment_id]
+
     SignUpTopic.reassign_topic(@user_id,assignment_id, topic_id)
     redirect_to :action => 'index', :id => params[:assignment_id]
   end

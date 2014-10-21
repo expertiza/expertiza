@@ -86,8 +86,8 @@ class StudentTeamsController < ApplicationController
   end
 
   def remove_participant
-    participant = AssignmentParticipant.find(params[:student_id])
-    return unless current_user_id?(participant.user_id)
+    participant = AssignmentParticipant.find params[:student_id]
+    return unless current_user_id? participant.user_id
     #remove the topic_id from participants
     #>participant should belong to a team, and a team should have topic
     #>then this call becomes participant.update_assigment_team(nil)
@@ -98,7 +98,7 @@ class StudentTeamsController < ApplicationController
     #>assignment_team=AssignmentTeam.find(params[:team_id])#same as old_team below
     #>participant = AssignmentParticipant.find(params[:student_id])
     #>assignment_team.assignment_participants.delete(participant)
-    participant.update_topic_id(nil)
+    participant.update_topic_id nil
 
 
 
@@ -110,7 +110,7 @@ class StudentTeamsController < ApplicationController
     if team_user
       team_user.destroy
 
-      undo_link("User \"#{team_user.name}\" has been removed from the team successfully. ")
+      undo_link "User \"#{team_user.name}\" has been removed from the team successfully. "
     end
 
     #>This whole block should be in the models. The controller shouldn't be handling book-keeping like this
@@ -156,8 +156,8 @@ class StudentTeamsController < ApplicationController
               if waitlisted_team_user
                 user_id = waitlisted_team_user.user_id#<a relationship could be used have waitlisted_team_user.participant
                 if user_id#<again, how could this be null?
-                  waitlisted_participant = Participant.find_by_user_id(user_id)
-                  waitlisted_participant.update_topic_id(nil)
+                  waitlisted_participant = Participant.find_by_user_id user_id
+                  waitlisted_participant.update_topic_id nil
 
                 end
               end
@@ -173,7 +173,7 @@ class StudentTeamsController < ApplicationController
     #>either way, it should be a has_many relationship
     #>Then it would be either
     #>
-    old_invites = Invitation.where( ['from_id = ? and assignment_id = ?', team_user.user_id, team_user.parent_id])
+    old_invites = Invitation.where from_id: team_user.user_id, assignment_id: team_user.parent_id
 
     old_invites.each{|old_invite| old_invite.destroy}
 
@@ -190,7 +190,7 @@ class StudentTeamsController < ApplicationController
 
     #redirect_to :controller => 'student_teams', :action => 'view' , :id => @student.id
     redirect_to view_student_teams_path :id => @student.id
-    end
+  end
 
   def set_team
     @team = AssignmentTeam.find(params[:team_id])

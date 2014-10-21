@@ -47,13 +47,13 @@ class StudentTeamsController < ApplicationController
   def update
     @team = AssignmentTeam.find(params[:team_id])
     check = AssignmentTeam.where( ["name =? and parent_id =?", params[:team][:name], @team.parent_id])
-    if (check.length == 0)
+    if (check.length.zero?)
       if @team.update_attributes(params[:team])
         undo_link("Team \"#{@team.name}\" has been updated successfully. ")
 
         redirect_to :controller => 'student_teams', :action => 'view', :id => params[:student_id]
       end
-    elsif (check.length == 1 && (check[0].name <=> @team.name) == 0)
+    elsif (check.length.one? && (check[0].name <=> @team.name).zero?)
       undo_link("Team \"#{@team.name}\" has been updated successfully. ")
 
       redirect_to :controller => 'student_teams', :action => 'view', :id => params[:student_id]
@@ -65,6 +65,11 @@ class StudentTeamsController < ApplicationController
 
   def advertise_for_partners
     Team.update_all("advertise_for_partner=true",:id=>params[:team_id])
+    #respond_to do |format|
+    #  format.html #  index.html.erb
+    #format.xml  { render :xml => @log_entries }
+    #end
+    #redirect_to :controller => 'student_team', :action => 'advertise_for_partners' , :id => params[:team_id]
   end
   def remove
     Team.update_all("advertise_for_partner=false",:id=>params[:team_id])
@@ -175,6 +180,6 @@ class StudentTeamsController < ApplicationController
 
   def review
     @assignment = Assignment.find(params[:assignment_id])
-    redirect_to :controller =>'questionnaire', :action => 'view_questionnaire', :id => @assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire').id
+    redirect_to controller: 'questionnaire', :action => 'view_questionnaire', :id => @assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire').id
   end
 end

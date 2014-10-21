@@ -30,7 +30,7 @@ class StudentTeamsController < ApplicationController
       user = User.find @student.user_id
       @team.add_member (user, @team.parent_id)
 
-      undo_link("Team \"#{@team.name}\" has been created successfully. ")
+           team_created_successfully
 
 
            redirect_to view_student_teams_path id: @student.id
@@ -46,43 +46,35 @@ class StudentTeamsController < ApplicationController
 
 #kevin up to here
   def update
-    check = AssignmentTeam.where( ["name =? and parent_id =?", params[:team][:name], @team.parent_id])
+
+    check = AssignmentTeam.where name: params[:team][:name], parent_id: @team.parent_id
     if (check.length.zero?)
       if @team.update_attributes(params[:team])
-        undo_link("Team \"#{@team.name}\" has been updated successfully. ")
 
-        #redirect_to :controller => 'student_teams', :action => 'view', :id => params[:student_id]
-        redirect_to view_student_teams_path (:id => params[:student_id])
+          team_created_successfully
+
+          redirect_to view_student_teams_path id: params[:student_id]
       end
     elsif (check.length.one? && (check[0].name <=> @team.name).zero?)
-      undo_link("Team \"#{@team.name}\" has been updated successfully. ")
 
-      #redirect_to :controller => 'student_teams', :action => 'view', :id => params[:student_id]
-      redirect_to view_student_teams_path :id => params[:student_id]
+          team_created_successfully
+
+           redirect_to view_student_teams_path id: params[:student_id]
     else
       flash[:notice] = 'Team name is already in use.'
-      # redirect_to :controller => 'student_teams', :action => 'edit', :team_id =>params[:team_id], :student_id => params[:student_id]
-      redirect_to edit_student_teams_path :team_id => params[:team_id], :student_id => params[:student_id]
+
+      redirect_to edit_student_teams_path team_id: params[:team_id], student_id: params[:student_id]
 
     end
   end
 
   def advertise_for_partners
-    Team.update_all("advertise_for_partner=true",:id=>params[:team_id])
-    #respond_to do |format|
-    #  format.html #  index.html.erb
-    #format.xml  { render :xml => @log_entries }
-    #end
-
-    #redirect_to :controller => 'student_teams', :action => 'advertise_for_partners' , :id => params[:team_id]
-
+    Team.update_all("advertise_for_partner=true", id: params[:team_id])
   end
-  def remove
-    Team.update_all("advertise_for_partner=false",:id=>params[:team_id])
 
-   #redirect_to :controller => 'student_teams', :action => 'view' , :id => params[:team_id]
-    redirect_to view_student_teams_path :id => params[:team_id]
-
+  def remove_advertisement
+    Team.update_all("advertise_for_partner=false", id: params[:team_id])
+    redirect_to view_student_teams_path id: params[:team_id]
   end
 
   def remove_participant
@@ -192,6 +184,10 @@ class StudentTeamsController < ApplicationController
     redirect_to view_student_teams_path :id => @student.id
   end
 
+  def team_created_successfully
+    undo_link("Team \"#{@team.name}\" has been updated successfully. ")
+  end
+
   def set_team
     @team = AssignmentTeam.find(params[:team_id])
   end
@@ -206,7 +202,6 @@ class StudentTeamsController < ApplicationController
 
   def review
     @assignment = Assignment.find(params[:assignment_id])
-    redirect_to controller: 'questionnaire', :action => 'view_questionnaire', :id => @assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire').id
-
+    redirect_to view_questionnaires_path id:  @assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire').id
   end
 end

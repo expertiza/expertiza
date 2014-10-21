@@ -5,7 +5,6 @@ branches:
   only:
     - master
     - production
-    - rails4
 before_install:
     - uname -a
     - lsb_release -a

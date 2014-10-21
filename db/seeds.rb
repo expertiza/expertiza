@@ -51,7 +51,7 @@ SiteController.create(:name => 'participant_choices', :builtin => false, :permis
 SiteController.create(:name => 'survey_deployment', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
 SiteController.create(:name => 'statistics', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
 SiteController.create(:name => 'tree_display', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
-SiteController.create(:name => 'student_team', :builtin => false, :permission_id => Permission.find_by_name('do assignments').id)
+SiteController.create(:name => 'student_teams', :builtin => false, :permission_id => Permission.find_by_name('do assignments').id)
 SiteController.create(:name => 'invitation', :builtin => false, :permission_id => Permission.find_by_name('do assignments').id)
 SiteController.create(:name => 'survey', :builtin => false, :permission_id => Permission.find_by_name('administer assignments').id)
 SiteController.create(:name => 'password_retrieval', :builtin => false, :permission_id => Permission.find_by_name('public actions - execute').id)
@@ -314,8 +314,9 @@ TreeFolder.create(:name => 'Survey', :child_type => 'QuestionnaireNode')
 TreeFolder.create(:name => 'Global Survey', :child_type => 'QuestionnaireNode')
 TreeFolder.create(:name => 'Course Evaluation', :child_type => 'QuestionnaireNode')
 
-###### nodes
+##nodesself.table_name=
 n1 = Node.create!(:parent_id => nil, :node_object_id => TreeFolder.find_by_name('Questionnaires').id)
+#Node.create(:parent_id => nil, :node_object_id => TreeFolder.find_by_name('Questionnaires').id)
 Node.create(:parent_id => nil, :node_object_id => TreeFolder.find_by_name('Courses').id)
 Node.create(:parent_id => nil, :node_object_id => TreeFolder.find_by_name('Assignments').id)
 Node.create(:parent_id => n1.id, :node_object_id => TreeFolder.find_by_name('Review').id)

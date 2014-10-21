@@ -15,7 +15,7 @@ class SignUpSheetController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'signup_topics', 'sign_up', 'destroy_signup', 'list', 'show_team'
+    when 'signup_topics', 'sign_up', 'destroy_signup', 'index', 'show_team'
       current_role_name.eql? 'Student'
     else
       ['Instructor',
@@ -31,7 +31,7 @@ class SignUpSheetController < ApplicationController
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [:destroy, :create, :update],
-    :redirect_to => {:action => :list}
+    :redirect_to => {:action => :index}
 
   # Prepares the form for adding a new topic. Used in conjuntion with create
   def new
@@ -247,7 +247,7 @@ class SignUpSheetController < ApplicationController
     (assignment.staggered_deadline == true)?(redirect_to :action => 'add_signup_topics_staggered', :id => assignment_id):(redirect_to :action => 'add_signup_topics', :id => assignment_id)
   end
 
-  def list
+  def index
     @assignment_id = params[:id]
     @sign_up_topics = SignUpTopic.where( ['assignment_id = ?', params[:id]]).all
     @slots_filled = SignUpTopic.find_slots_filled(params[:id])
@@ -281,7 +281,7 @@ class SignUpSheetController < ApplicationController
   def destroy_signup
     @user_id = session[:user].id
     SignUpTopic.reassign_topic(@user_id,assignment_id, topic_id)
-    redirect_to :action => 'list', :id => params[:assignment_id]
+    redirect_to :action => 'index', :id => params[:assignment_id]
   end
 
   def sign_up
@@ -294,7 +294,7 @@ class SignUpSheetController < ApplicationController
     #s = Signupsheet.new
     #check whether the user already has a team for this assignment
     signup_team(@assignment.id, @user_id, params[:id])
-    redirect_to :action => 'list', :id => params[:assignment_id]
+    redirect_to :action => 'index', :id => params[:assignment_id]
   end
 
   def signup_team(assignment_id, user_id, topic_id)
@@ -457,7 +457,7 @@ class SignUpSheetController < ApplicationController
       end
     end
 
-    redirect_to :action => 'list', :id => params[:assignment_id]
+    redirect_to :action => 'index', :id => params[:assignment_id]
   end
 
   #this function is used to prevent injection attacks.  A topic *dependent* on another topic cannot be

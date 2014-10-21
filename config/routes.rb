@@ -329,7 +329,6 @@ Expertiza::Application.routes.draw do
       get :add_signup_topics
       get :add_signup_topics_staggered
       get :edit
-      get :list
       get :signup_topics
       get :signup
       get :sign_up

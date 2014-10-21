@@ -46,7 +46,7 @@
     </table>
     <br>
     <%= link_to "Leave Team",
-      {:controller => 'student_team', :action => 'leave', :student_id => @student.id, :team_id => @student.team.id} %>
+      {:controller => 'student_team', :action => 'remove_participant', :student_id => @student.id, :team_id => @student.team.id} %>
   <% end %>
 
   <% if @student.team != nil %>

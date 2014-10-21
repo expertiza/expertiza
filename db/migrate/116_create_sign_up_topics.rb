@@ -5,7 +5,7 @@ class CreateSignUpTopics < ActiveRecord::Migration
       t.column :assignment_id, :integer, :null => false
       t.column :max_choosers, :integer, :null => false
       t.column :category, :text
-      t.column :topic_identifier, :string, :limit => 10
+      t.column :topic_identifier, :string, :limit => 8
       t.column :start_date, :datetime
       t.column :due_date, :datetime
     end

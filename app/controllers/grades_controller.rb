@@ -26,6 +26,7 @@ class GradesController < ApplicationController
     questionnaires.each do |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     end
+
     @scores = @assignment.get_scores(@questions)
     calculate_all_penalties(@assignment.id)
   end
@@ -64,8 +65,11 @@ class GradesController < ApplicationController
   #   end
 
   def view_my_scores
+    time1 = Time.now
+    puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Current Time1 : " + time1.inspect
     @participant = AssignmentParticipant.find(params[:id])
-
+    time2 = Time.now
+    puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Current Time2 : " + time2.inspect
     return if redirect_when_disallowed
     @assignment = @participant.assignment
     @questions = {}
@@ -73,6 +77,9 @@ class GradesController < ApplicationController
     questionnaires.each do |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     end
+
+    time3 = Time.now
+    puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Current Time3 : " + time3.inspect
 
     rmaps = ParticipantReviewResponseMap.where(reviewee_id: @participant.id, reviewed_object_id: @participant.assignment.id)
     rmaps.find_each do |rmap|
@@ -87,10 +94,18 @@ class GradesController < ApplicationController
       end
     end
 
+    time4 = Time.now
+    puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Current Time4 : " + time4.inspect
+
     @topic = @participant.topic
     @pscore = @participant.get_scores(@questions)
     @stage = @participant.assignment.get_current_stage(@participant.topic_id)
+
+    time5 = Time.now
+    puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Current Time5 : " + time5.inspect
     calculate_all_penalties(@assignment.id)
+    time6 = Time.now
+    puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Current Time6 : " + time6.inspect
   end
 
   def edit

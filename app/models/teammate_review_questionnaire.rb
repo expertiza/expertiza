@@ -9,7 +9,11 @@ class TeammateReviewQuestionnaire < Questionnaire
   end
 
   def get_assessments_for(participant)
+    time1 = Time.now
+    puts "####################################     teammate_reviews Current Time1 : " + time1.inspect
     participant.teammate_reviews()
+    # time2 = Time.now
+    # puts "####################################     teammate_reviews Current Time2 : " + time2.inspect
   end
 
 

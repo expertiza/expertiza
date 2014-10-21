@@ -20,7 +20,8 @@ end
 
 Rails::Generator::Commands::Destroy.class_eval do
   def append_to(file, line)
-    logger.remove "#{line} removed from #{file}"
+    logger.remove_advertisement "#{line} removed from #{file}"
+    #navid
     unless options[:pretend]
       gsub_file file, "\n#{line}", ''
     end

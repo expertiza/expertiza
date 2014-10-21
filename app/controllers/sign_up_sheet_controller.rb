@@ -15,7 +15,7 @@ class SignUpSheetController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'signup_topics', 'sign_up', 'delete_signup', 'list', 'show_team'
+    when 'signup_topics', 'sign_up', 'destroy_signup', 'list', 'show_team'
       current_role_name.eql? 'Student'
     else
       ['Instructor',
@@ -278,14 +278,10 @@ class SignUpSheetController < ApplicationController
   end
 
   #this function is used to delete a previous signup
-  def delete_signup
-    delete_signup_for_topic(params[:assignment_id], params[:id])
-    redirect_to :action => 'list', :id => params[:assignment_id]
-  end
-
-  def delete_signup_for_topic(assignment_id, topic_id)
+  def destroy_signup
     @user_id = session[:user].id
     SignUpTopic.reassign_topic(@user_id,assignment_id, topic_id)
+    redirect_to :action => 'list', :id => params[:assignment_id]
   end
 
   def sign_up

@@ -9,8 +9,6 @@ class AuthorFeedbackQuestionnaire < Questionnaire
   end
 
   def get_assessments_for(participant)
-    time1 = Time.now
-    puts "####################################     get_assessments_for Current Time1 : " + time1.inspect
     participant.feedback()
   end
 

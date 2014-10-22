@@ -17,46 +17,35 @@ class ResponseMap < ActiveRecord::Base
       @array_sort=Array.new
       @sort_to=Array.new
       @test = Array.new
+      counter = 0
 
       #get all the versions
       maps = where(reviewee_id: participant.id)
-      time1 = Time.now
-      # puts "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$     get_assessments_for1 Current Time1 : " + time1.inspect
       maps.each { |map|
+        counter += 1
         if map.response
-          time10 = Time.now
-          puts "**********************************     get_assessments_for1 Current Time10 : " + time10.inspect
-          @all_resp=Response.all
 
-          time11 = Time.now
-          puts "**********************************     get_assessments_for1 Current Time11 : " + time11.inspect
-          for element in @all_resp
-            # puts "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& #{@map.map_id}"
-            if (element.map_id == map.map_id)
-              # puts element.map_id
-              # puts map.map_id
-              @array_sort << element
-              @test << map
-              # puts "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& #{@array_sort}"
-              # puts "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& #{@map.map_id}"
-            end
-          end
-          time12 = Time.now
-          puts "**********************************     get_assessments_for1 Current Time12 : " + time12.inspect
+          @all_resp=Response.find_by_map_id(map.map_id)
+          @array_sort << @all_resp
+          @test << map
+
+          # for element in @all_resp
+          #   if (element.map_id == map.map_id)
+          #     # puts element.map_id
+          #     # puts map.map_id
+          #     @array_sort << element
+          #     @test << map
+          #   end
+          # end
           #sort all versions in descending order and get the latest one.
           @sort_to=@array_sort.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
           responses << @sort_to[0]
-          # puts "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&00 #{@array_sort[0]}"
           @array_sort.clear
           @sort_to.clear
         end
       }
-      # time2 = Time.now
-      # puts "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$     get_assessments_for1 Current Time2 : " + time2.inspect
       responses.sort! { |a, b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }
     end
-    time3 = Time.now
-    puts "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$     get_assessments_for1 Current Time3 : " + time3.inspect
     return responses
   end
 

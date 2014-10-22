@@ -18,8 +18,8 @@ class SignUpSheetControllerTest < ActionController::TestCase
     AuthController.set_current_role(users(:admin).role_id,@request.session)
   end
 
-  test "should_show_add_signup_topics_staggered" do
-    get :add_signup_topics_staggered, :id => assignments(:assignment2).id
+  test "should_show_add_signup_topics" do
+    get :add_signup_topics, :id => assignments(:assignment2).id
     assert_response :success
   end
 

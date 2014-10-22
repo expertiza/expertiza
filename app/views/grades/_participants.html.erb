@@ -1,35 +1,13 @@
-<!-- PARTICIPANTS -->
+<!-- PARTICIPANTS --> 
 <%= render :partial => 'participant_title', :locals => {:prefix => nil}  %>
-<% index = 0
-max_penalty = 0
-total_penalty_for_all = 0 %>
+<% index = 0 %>
 <% @assignment.participants.each{
-  | participant | %>
-<%= render :partial => 'grades/participant',
-  :locals => {:prefix => 'user_'+index.to_s,
-              :team => false,
-              :pscore => @scores[:participants][participant.id.to_s.to_sym]} %>
-            <%
-                total_penalty = @all_penalties[participant.id][:total_penalty]
-            if(max_penalty < total_penalty)
-              max_penalty = total_penalty
-            end
-            total_penalty_for_all += total_penalty
-            index += 1
-}
-avg_penalty = total_penalty_for_all / index
-%>
-
-<table>
-  <tr>
-    <td>
-      Average Penalty : <%= avg_penalty %>
-  </td>
-</tr>
-<tr>
-  <td>
-    Maximum Penalty : <%= max_penalty %>
-</td>
-  </tr>
-</table>
-<!-- END PARTICIPANTS -->
+    | participant | %>   
+     <%= render :partial => 'grades/participant',
+                :locals => {:prefix => 'user_'+index.to_s,
+                            :team => false,
+                            :pscore => @scores[:participants][participant.id.to_s.to_sym]} %>                                                                                   
+<% 
+     index += 1
+    } %> 
+<!-- END PARTICIPANTS --> 

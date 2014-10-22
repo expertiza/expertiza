@@ -1,21 +1,21 @@
-<% session[:return_to] = request.url %>
-<%= render :partial => 'submitted_content/main', :locals => {:participant => participant, :stage => stage} %>
-<% if controller.action_name != "view_my_scores" %>
-  <% reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id:  @assignment.id).first
-  #ACS Map the reviewee to a team or an individual depending on whether the team size is greater than or equal to 1
-  if reviewer != nil && participant.assignment.max_team_size > 1
-    reviewee = participant.team
-    map = TeamReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
-  elsif reviewer != nil
-    reviewee = participant
-    map = ParticipantReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
-  end
+<%= render :partial => 'submitted_content/main', :locals => {:participant => participant, :stage => participant.assignment.get_current_stage(participant.topic_id)} %>
 
-  if map != nil and map.response != nil
-    display = "Edit Review"
-  else
-    display = "Create Review"
-  end
-%>
-      <%= link_to display, :action => "instructor_review", :id => participant.id %>
-    <% end %>
+<% if controller.action_name != "view_my_scores" %>
+   <% reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, @assignment.id)
+      #ACS Map the reviewee to a team or an individual depending on whether the team size is greater than or equal to 1
+      if reviewer != nil and participant.assignment.max_team_size > 1
+         reviewee = participant.team  
+         map = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)        
+      elsif reviewer != nil
+         reviewee = participant
+         map = ParticipantReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
+      end       
+            
+      if map != nil and map.response != nil
+      	display = "Edit Review"
+      else
+        display = "Create Review"
+      end
+   %>      
+      <%= link_to display, :action => "instructor_review", :id => participant.id %> 
+<% end %>   	     

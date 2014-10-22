@@ -129,9 +129,6 @@ class Participant < ActiveRecord::Base
       }
     end
 
-
-
-
     # Return scores that this participant for the given questions
     def get_scores(questions)
       scores = {}

@@ -9,26 +9,25 @@ class ResponseMap < ActiveRecord::Base
   # return latest versions of the responses
   def self.get_assessments_for(participant)
 
-
     responses = Array.new
     stime=Time.now
-    if participant
 
+    if participant
       @array_sort=Array.new
       @sort_to=Array.new
       @test = Array.new
-      counter = 0
 
       #get all the versions
       maps = where(reviewee_id: participant.id)
       maps.each { |map|
-        counter += 1
         if map.response
-
+          # new method to find all response
           @all_resp=Response.find_by_map_id(map.map_id)
           @array_sort << @all_resp
           @test << map
 
+          # the original method to find all response
+          # @all_resp=Response.all
           # for element in @all_resp
           #   if (element.map_id == map.map_id)
           #     # puts element.map_id
@@ -37,6 +36,7 @@ class ResponseMap < ActiveRecord::Base
           #     @test << map
           #   end
           # end
+
           #sort all versions in descending order and get the latest one.
           @sort_to=@array_sort.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
           responses << @sort_to[0]

@@ -1,8 +1,8 @@
 <H1>Score for <%= @assignment.name %></H1>
-
+   
 <TABLE class="grades" >
-  <%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>
-  <%= render :partial => 'grades/participant', :locals => {:prefix => 'user',  :team => false, :pscore => @pscore} %>
+<%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>                      
+<%= render :partial => 'grades/participant', :locals => {:prefix => 'user',  :team => false, :pscore => @pscore} %>                                                                                   
 </TABLE>
 <BR/>
 <a href="javascript:window.history.back()">Back</a>

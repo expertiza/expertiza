@@ -31,7 +31,7 @@ class SignUpSheetControllerTest < ActionController::TestCase
   end
 
   test "should_delete_signup_topic_for_assignment" do
-    post :delete, :id=> sign_up_topics(:Topic1).id, :assignment_id => assignments(:assignment_project1)
+    post :destroy, :id=> sign_up_topics(:Topic1).id, :assignment_id => assignments(:assignment_project1)
     newTopic = SignUpTopic.find_by_assignment_id(assignments(:assignment_project1).id)
     assert_nil newTopic
   end

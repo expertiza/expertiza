@@ -93,7 +93,7 @@ class SignUpSheetController < ApplicationController
   end
 
   #This method is used to delete signup topics
-  def delete
+  def destroy
     @topic = SignUpTopic.find(params[:id])
 
     if @topic

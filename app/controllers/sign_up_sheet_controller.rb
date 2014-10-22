@@ -15,7 +15,7 @@ class SignUpSheetController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'signup_topics', 'sign_up', 'destroy_signup', 'index', 'show_team'
+    when 'signup_topics', 'create_signup', 'destroy_signup', 'index', 'show_team'
       current_role_name.eql? 'Student'
     else
       ['Instructor',
@@ -277,26 +277,26 @@ class SignUpSheetController < ApplicationController
     end
   end
 
-  #this function is used to delete a previous signup
-  def destroy_signup
-    @user_id = session[:user].id
-    topic_id = params[:id]
+  # Sign a user up for a topic
+  def create_signup
+    #find the assignment to which user is signing up
+    user = session[:user]
     assignment_id = params[:assignment_id]
+    topic_id = params[:id]
 
-    SignUpTopic.reassign_topic(@user_id,assignment_id, topic_id)
+    signup_team(assignment_id, user.id, topic_id)
+
     redirect_to :action => 'index', :id => params[:assignment_id]
   end
 
-  def sign_up
-    #find the assignment to which user is signing up
-    @assignment = Assignment.find(params[:assignment_id])
-    @user_id = session[:user].id
+  # This function is used to delete a previous signup
+  def destroy_signup
+    user = session[:user]
+    assignment_id = params[:assignment_id]
+    topic_id = params[:id]
 
-    #check whether team assignment. This is to decide whether a team_id or user_id should be the creator_id
-    #Always use team_id ACS
-    #s = Signupsheet.new
-    #check whether the user already has a team for this assignment
-    signup_team(@assignment.id, @user_id, params[:id])
+    SignUpTopic.reassign_topic(user.id, assignment_id, topic_id)
+
     redirect_to :action => 'index', :id => params[:assignment_id]
   end
 

@@ -31,6 +31,36 @@ class GradesController < ApplicationController
     calculate_all_penalties(@assignment.id)
   end
 
+  def view_my_scores
+    @participant = AssignmentParticipant.find(params[:id])
+    return if redirect_when_disallowed
+    @assignment = @participant.assignment
+    @questions = {}
+    questionnaires = @assignment.questionnaires
+    questionnaires.each do |questionnaire|
+      @questions[questionnaire.symbol] = questionnaire.questions
+    end
+
+    rmaps = ParticipantReviewResponseMap.where(reviewee_id: @participant.id, reviewed_object_id: @participant.assignment.id)
+    rmaps.find_each do |rmap|
+      rmap.update_attribute :notification_accepted, true
+    end
+
+    rmaps = ParticipantReviewResponseMap.where reviewer_id: @participant.id, reviewed_object_id: @participant.parent_id
+    rmaps.find_each do |rmap|
+      mmaps = MetareviewResponseMap.where reviewee_id: rmap.reviewer_id, reviewed_object_id: rmap.map_id
+      mmaps.find_each do |mmap|
+        mmap.update_attribute :notification_accepted, true
+      end
+    end
+
+    @topic = @participant.topic
+    @pscore = @participant.get_scores(@questions)
+    @stage = @participant.assignment.get_current_stage(@participant.topic_id)
+
+    calculate_all_penalties(@assignment.id)
+  end
+
   # def view_my_scores
   #   @participant = AssignmentParticipant.find(params[:id])
   #   # @average_score_results = ScoreCache.get_class_scores(@participant.id)
@@ -63,36 +93,12 @@ class GradesController < ApplicationController
   #       mmap.update_attribute :notification_accepted, true
   #     end
   #   end
-
-  def view_my_scores
-    @participant = AssignmentParticipant.find(params[:id])
-    return if redirect_when_disallowed
-    @assignment = @participant.assignment
-    @questions = {}
-    questionnaires = @assignment.questionnaires
-    questionnaires.each do |questionnaire|
-      @questions[questionnaire.symbol] = questionnaire.questions
-    end
-
-    rmaps = ParticipantReviewResponseMap.where(reviewee_id: @participant.id, reviewed_object_id: @participant.assignment.id)
-    rmaps.find_each do |rmap|
-      rmap.update_attribute :notification_accepted, true
-    end
-
-    rmaps = ParticipantReviewResponseMap.where reviewer_id: @participant.id, reviewed_object_id: @participant.parent_id
-    rmaps.find_each do |rmap|
-      mmaps = MetareviewResponseMap.where reviewee_id: rmap.reviewer_id, reviewed_object_id: rmap.map_id
-      mmaps.find_each do |mmap|
-        mmap.update_attribute :notification_accepted, true
-      end
-    end
-
-    @topic = @participant.topic
-    @pscore = @participant.get_scores(@questions)
-    @stage = @participant.assignment.get_current_stage(@participant.topic_id)
-
-    calculate_all_penalties(@assignment.id)
-  end
+  # @topic = @participant.topic
+  # @pscore = @participant.get_scores(@questions)
+  # @stage = @participant.assignment.get_current_stage(@participant.topic_id)
+  #
+  # calculate_all_penalties(@assignment.id)
+  # end
 
   def edit
     @participant = AssignmentParticipant.find(params[:id])

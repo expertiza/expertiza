@@ -6,12 +6,14 @@ class MenuUpdateImpersonate < ActiveRecord::Migration
     if site_controller == nil
        site_controller = SiteController.create(:name => 'impersonate', :permission_id => permission1.id, :builtin => 0)
     end
-    action = ControllerAction.find(:first, :conditions => ['name = "start" and site_controller_id = ?',site_controller.id])
+    #action = ControllerAction.find(:first, :conditions => ['name = "start" and site_controller_id = ?',site_controller.id])
+    action = ControllerAction.where(:site_controller_id=>site_controller.id, :name=>'start').first
     if action == nil
       action = ControllerAction.create(:name => 'start', :site_controller_id => site_controller.id)
     end
     
-    action2 = ControllerAction.find(:first, :conditions => ['name = "restore" and site_controller_id = ?',site_controller.id])
+    #action2 = ControllerAction.find(:first, :conditions => ['name = "restore" and site_controller_id = ?',site_controller.id])
+    action2 = ControllerAction.where(:site_controller_id=>site_controller.id, :name=>'restore').first
     if action2 == nil
       action2 = ControllerAction.create(:name => 'restore', :site_controller_id => site_controller.id, :permission_id => permission2.id)
     end
@@ -24,7 +26,8 @@ class MenuUpdateImpersonate < ActiveRecord::Migration
   def self.down
     site_controller = SiteController.find_by_name('impersonate')
     if site_controller 
-    controllers = ControllerAction.find(:all, :conditions => ['site_controller_id = ?',site_controller.id])
+    #controllers = ControllerAction.find(:all, :conditions => ['site_controller_id = ?',site_controller.id])
+    controllers = ControllerAction.where(:site_controller_id=>site_controller.id).all
     controllers.each {|controller|
        if controller 
         menuItem = MenuItem.find_by_controller_action_id(controller.id)

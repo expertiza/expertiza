@@ -31,6 +31,16 @@ class GradesController < ApplicationController
     calculate_all_penalties(@assignment.id)
   end
 
+  def show_review
+    #
+    @prefix=params[:prefix]
+    @score=params[:score]
+    @participant=params[:participant]
+    respond_to do |format|
+      format.js
+    end
+  end
+
   def view_my_scores
     @participant = AssignmentParticipant.find(params[:id])
     return if redirect_when_disallowed
@@ -288,78 +298,81 @@ class GradesController < ApplicationController
     end
 
     def calculate_all_penalties(assignment_id)
-#      @all_penalties = {}
-#      @assignment = Assignment.find(assignment_id)
-#      unless @assignment.is_penalty_calculated
-#        calculate_for_participants = true
-#      end
-#      Participant.where(parent_id: assignment_id).each do |participant|
-#        penalties = calculate_penalty(participant.id)
-#        @total_penalty = 0
-#        if(penalties[:submission] != 0 || penalties[:review] != 0 || penalties[:meta_review] != 0)
-#          unless penalties[:submission]
-#            penalties[:submission] = 0
-#          end
-#          unless penalties[:review]
-#            penalties[:review] = 0
-#          end
-#          unless penalties[:meta_review]
-#            penalties[:meta_review] = 0
-#          end
-#          @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
-#          l_policy = LatePolicy.find(@assignment.late_policy_id)
-#          if(@total_penalty > l_policy.max_penalty)
-#            @total_penalty = l_policy.max_penalty
-#          end
-#          if calculate_for_participants == true
-#            penalty_attr1 = {:deadline_type_id => 1,:participant_id => @participant.id, :penalty_points => penalties[:submission]}
-#            CalculatedPenalty.create(penalty_attr1)
-#
-#            penalty_attr2 = {:deadline_type_id => 2,:participant_id => @participant.id, :penalty_points => penalties[:review]}
-#            CalculatedPenalty.create(penalty_attr2)
-#
-#            penalty_attr3 = {:deadline_type_id => 5,:participant_id => @participant.id, :penalty_points => penalties[:meta_review]}
-#            CalculatedPenalty.create(penalty_attr3)
-#          end
-#        end
-#        @all_penalties[participant.id] = {}
-#        @all_penalties[participant.id][:submission] = penalties[:submission]
-#        @all_penalties[participant.id][:review] = penalties[:review]
-#        @all_penalties[participant.id][:meta_review] = penalties[:meta_review]
-#        @all_penalties[participant.id][:total_penalty] = @total_penalty
-#      end
-#      unless @assignment.is_penalty_calculated
-#        @assignment.update_attribute(:is_penalty_calculated, true)
-#      end
-        @all_penalties = {}
-        @assignment = Assignment.find(assignment_id)
-        unless @assignment.is_penalty_calculated
-            calculate_for_participants = true
-            @assignment.update_attribute(:is_penalty_calculated, true)
-        end
-        Participant.where(parent_id: assignment_id).each do |participant|
-            penalties = calculate_penalty(participant.id)
-            @total_penalty = 0
-            if(penalties[:submission] != 0 || penalties[:review] != 0 || penalties[:meta_review] != 0)
-                penalties[:submission] = 0 if penalties[:submission]==nil
-                penalties[:review] = 0 if penalties[:review]==nil
-                penalties[:meta_review] = 0 if penalties[:meta_review]==nil
-                @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
-                l_policy = LatePolicy.find(@assignment.late_policy_id)
-                @total_penality=[l_policy.max_penalty,@total_penality].min
-                deadline_type=[1,2,5],penalty_type=[:submission,:review,:meta_review]
-                if calculate_for_participants
-                    for i in 0..2
-                        penalty_attr={:deadline_type_id =>deadline_type[i],:participant_id => @participant.id, :penalty_points => penalties[penalty_type[i]]}
-                        CalculatedPenalty.create(penalty_attr)
-                    end
-                end
-            end
-            @all_penalties[participant.id] = {}
-            for i in 0..2
-                @all_penalties[participant.id][penalty_type[i]] = penalties[penalty_type[i]]
-            end
-            @all_penalties[participant.id][:total_penalty] = @total_penalty
-        end
-    end
+     @all_penalties = {}
+     @assignment = Assignment.find(assignment_id)
+     unless @assignment.is_penalty_calculated
+       calculate_for_participants = true
+     end
+     Participant.where(parent_id: assignment_id).each do |participant|
+       penalties = calculate_penalty(participant.id)
+       @total_penalty = 0
+       if(penalties[:submission] != 0 || penalties[:review] != 0 || penalties[:meta_review] != 0)
+         unless penalties[:submission]
+           penalties[:submission] = 0
+         end
+         unless penalties[:review]
+           penalties[:review] = 0
+         end
+         unless penalties[:meta_review]
+           penalties[:meta_review] = 0
+         end
+         @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
+         l_policy = LatePolicy.find(@assignment.late_policy_id)
+         if(@total_penalty > l_policy.max_penalty)
+           @total_penalty = l_policy.max_penalty
+         end
+         if calculate_for_participants == true
+           penalty_attr1 = {:deadline_type_id => 1,:participant_id => @participant.id, :penalty_points => penalties[:submission]}
+           CalculatedPenalty.create(penalty_attr1)
+
+           penalty_attr2 = {:deadline_type_id => 2,:participant_id => @participant.id, :penalty_points => penalties[:review]}
+           CalculatedPenalty.create(penalty_attr2)
+
+           penalty_attr3 = {:deadline_type_id => 5,:participant_id => @participant.id, :penalty_points => penalties[:meta_review]}
+           CalculatedPenalty.create(penalty_attr3)
+         end
+       end
+       @all_penalties[participant.id] = {}
+       @all_penalties[participant.id][:submission] = penalties[:submission]
+       @all_penalties[participant.id][:review] = penalties[:review]
+       @all_penalties[participant.id][:meta_review] = penalties[:meta_review]
+       @all_penalties[participant.id][:total_penalty] = @total_penalty
+     end
+     unless @assignment.is_penalty_calculated
+       @assignment.update_attribute(:is_penalty_calculated, true)
+     end
   end
+
+    #     @all_penalties = {}
+    #     @assignment = Assignment.find(assignment_id)
+    #     unless @assignment.is_penalty_calculated
+    #         calculate_for_participants = true
+    #         @assignment.update_attribute(:is_penalty_calculated, true)
+    #     end
+    #     Participant.where(parent_id: assignment_id).each do |participant|
+    #         penalties = calculate_penalty(participant.id)
+    #         @total_penalty = 0
+    #         if(penalties[:submission] != 0 || penalties[:review] != 0 || penalties[:meta_review] != 0)
+    #             penalties[:submission] = 0 if penalties[:submission]==nil
+    #             penalties[:review] = 0 if penalties[:review]==nil
+    #             penalties[:meta_review] = 0 if penalties[:meta_review]==nil
+    #             @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
+    #             l_policy = LatePolicy.find(@assignment.late_policy_id)
+    #             @total_penality=[l_policy.max_penalty,@total_penality].min
+    #             deadline_type=[1,2,5]
+    #             penalty_type=[:submission,:review,:meta_review]
+    #             if calculate_for_participants
+    #                 for i in 0..2
+    #                     penalty_attr={:deadline_type_id =>deadline_type[i],:participant_id => @participant.id, :penalty_points => penalties[penalty_type[i]]}
+    #                     CalculatedPenalty.create(penalty_attr)
+    #                 end
+    #             end
+    #         end
+    #         @all_penalties[participant.id] = {}
+    #         for i in 0..2
+    #             @all_penalties[participant.id][penalty_type[i]] = penalties[penalty_type[i]]
+    #         end
+    #         @all_penalties[participant.id][:total_penalty] = @total_penalty
+    #     end
+    # end
+end

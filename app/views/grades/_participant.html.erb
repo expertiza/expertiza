@@ -32,6 +32,8 @@
     
     <% if s_avg %>
   	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",s_avg) %>%
+      <BR/><FONT SIZE="-1"><%= link_to "show reviews (#{pscore[:review][:assessments].size})" , controller: "grades", action: "show_review" ,score: pscore[:review] ,participant: participant,prefix: prefix, remote: true %></FONT>
+
   	<BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_reviewsLink" name="<%=prefix%>_reviewsLink" onClick="toggleElement('<%=prefix%>_reviews','reviews');return false;">show reviews</a> (<%= pscore[:review][:assessments].size %>)</FONT>
   	</TD>
    	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",s_min) %>% - <%= sprintf("%.0f",s_max) %>% 
@@ -145,8 +147,8 @@
 <TR  class="row" id="<%= prefix %>_files" style="display:none">
   <TD COLSPAN="9"><%= render :partial=>'grades/submissions', :locals => {:participant => participant} %></TD>
 </TR>
-<TR  class="row" id="<%= prefix %>_reviews" style="display:none">
-  <TD COLSPAN="9"><%= render :partial=>'grades/reviews', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:review]} %></TD>
+<TR  class="row" id="<%= prefix %>_reviews">
+  <!--<TD COLSPAN="9"><%#= render :partial=>'grades/reviews', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:review]} %></TD>-->
 </TR>
 <TR  class="row" id="<%= prefix %>_mreviews" style="display:none">
   <TD COLSPAN="9"><%= render :partial=>'grades/metareviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:metareview]} %></TD>

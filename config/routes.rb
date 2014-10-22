@@ -130,8 +130,11 @@ Expertiza::Application.routes.draw do
       get :instructor_review
       post :remove_hyperlink
       get :conflict_notification
+      get :show_review
     end
   end
+
+  get 'grades/show_review'
 
   resources :impersonate do
     collection do

@@ -21,7 +21,7 @@ Expertiza::Application.routes.draw do
   resources :advertise_for_partner do
     collection do
       get :edit
-      get :remove_advertisement
+      get :remove
       post ':id', action: :update
     end
   end

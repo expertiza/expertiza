@@ -88,86 +88,94 @@ class Leaderboard < ActiveRecord::Base
         elsif( rtype == 'TeammateReviewQuestionnaire')
           differentQuestionnaires["Teamreview"] = rqid.questionnaire_id
         end # end of elsif block
-        end # end of each.do block
+      end # end of each.do block
 
-    assQuestionnaires[assgt.id] = differentQuestionnaires
+      assQuestionnaires[assgt.id] = differentQuestionnaires
 
-    #ACS Everything is a team now
-    #removed check to see if it is a team assignment
-    assTeamHash[assgt.id] = "team"
-  end
-# end of first for
+      #ACS Everything is a team now
+      #removed check to see if it is a team assignment
+      assTeamHash[assgt.id] = "team"
+    end
+    # end of first for
 
 
     participantList = AssignmentParticipant.select("id, user_id, parent_id").where(parent_id: assignmentList.pluck(:id))
-#Creating an participant id to [user id, Assignment id] hash
-partAssHash = Hash.new
-participantList.find_each do |part|
-  partAssHash[part.id] = [part.user_id, part.parent_id]
-end
-
-csEntries = Array.new
-#####Computation of csEntries
-
-
-##The next part of the program expects csEntries to be a array of [participant_id, questionnaire_id, total_score] values
-## The adaptor class given generates the expected csEntries values using the score_cache table
-## for all assignments, hadling ,metareviews, feedbacks and teammate reviews, participant_id is the same as reviewee_id, questionnaire_id is the one used for this assignment, and total_score is same as score in the score_cache table
-## for team assignments, we look up team numbers from the score_cache table, find the participants within the team, for each team member make a new csEntry with the respective participant_id, questionnaire_id, and total_score
-## code :Abhishek
-
-
-argList = ['MetareviewResponseMap', 'FeedbackResponseMap','TeammateReviewResponseMap']
-
-for assgt in assignmentList
-
-
-
-  participants_for_assgt = AssignmentParticipant.where("parent_id = ? and type =?", assgt.id, 'AssignmentParticipant').pluck(:id)
-  fMTEntries = ScoreCache.where("reviewee_id in (?) and object_type in (?)", participants_for_assgt, argList)
-  for fMTEntry in fMTEntries
-    csEntry = CsEntriesAdaptor.new
-    csEntry.participant_id = fMTEntry.reviewee_id
-    if (fMTEntry.object_type == 'FeedbackResponseMap')
-      csEntry.questionnaire_id = assQuestionnaires[assgt.id]["AuthorFeedback"]
-    elsif (fMTEntry.object_type == 'MetareviewResponseMap')
-      csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Metareview"]
-    elsif (fMTEntry.object_type == 'TeammateReviewResponseMap')
-      csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Teamreview"]
+    #Creating an participant id to [user id, Assignment id] hash
+    partAssHash = Hash.new
+    participantList.find_each do |part|
+      partAssHash[part.id] = [part.user_id, part.parent_id]
     end
-    csEntry.total_score = fMTEntry.score
-    csEntries << csEntry
-  end
-  ######## done with metareviews and feedbacksfor this assgt##############
-  ##########now putting stuff in reviews based on if the assignment is a team assignment or not###################
-  if assTeamHash[assgt.id] == "indie"
-    participant_entries = ScoreCache.where(["reviewee_id in (?) and object_type = ?", participants_for_assgt, 'ParticipantReviewResponseMap' ])
-    for participant_entry in participant_entries
-      csEntry = CsEntriesAdaptor.new
-      csEntry.participant_id = participant_entry.reviewee_id
-      csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Review"]
-      csEntry.total_score = participant_entry.score
-      csEntries << csEntry
-    end
-  else
-    assignment_teams = Team.where("parent_id = ? and type = ?", assgt.id, 'AssignmentTeam')
-    team_entries = ScoreCache.where("reviewee_id in (?) and object_type = ?", assignment_teams.pluck(:id), 'TeamReviewResponseMap')
-    team_entries.each do |team_entry|
-      team_users = TeamsUser.where(["team_id = ?",team_entry.reviewee_id])
 
-      for team_user in team_users
-        team_participant = AssignmentParticipant.where(["user_id = ? and parent_id = ?", team_user.user_id, assgt.id]).first
+    csEntries = Array.new
+    #####Computation of csEntries
+
+
+    ##The next part of the program expects csEntries to be a array of 
+    # [participant_id, questionnaire_id, total_score] values.
+    # The adaptor class given generates the expected csEntries values using 
+    # the score_cache table for all assignments.
+    # Handles metareviews, feedbacks and teammate reviews.
+    # Participant_id is the same as reviewee_id.
+    # Questionnaire_id is the one used for this assignment.
+    # Total_score is same as score in the score_cache table.
+    # for team assignments, we look up team numbers from the score_cache table, 
+    # find the participants within the team.
+    # for each team member make a new csEntry with the respective participant_id, 
+    # questionnaire_id, and total_score
+    ## code :Abhishek
+
+
+    argList = ['MetareviewResponseMap', 'FeedbackResponseMap','TeammateReviewResponseMap']
+
+    for assgt in assignmentList
+
+
+
+      participants_for_assgt = AssignmentParticipant.where("parent_id = ? and type =?", assgt.id, 'AssignmentParticipant').pluck(:id)
+      fMTEntries = ScoreCache.where("reviewee_id in (?) and object_type in (?)", participants_for_assgt, argList)
+      for fMTEntry in fMTEntries
         csEntry = CsEntriesAdaptor.new
-        csEntry.participant_id = team_participant.try :id
-        csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Review"]
-        csEntry.total_score = team_entry.score
-
+        csEntry.participant_id = fMTEntry.reviewee_id
+        if (fMTEntry.object_type == 'FeedbackResponseMap')
+          csEntry.questionnaire_id = assQuestionnaires[assgt.id]["AuthorFeedback"]
+        elsif (fMTEntry.object_type == 'MetareviewResponseMap')
+          csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Metareview"]
+        elsif (fMTEntry.object_type == 'TeammateReviewResponseMap')
+          csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Teamreview"]
+        end
+        csEntry.total_score = fMTEntry.score
         csEntries << csEntry
       end
+      ######## done with metareviews and feedbacksfor this assgt##############
+      ##########now putting stuff in reviews based on if the assignment is a team assignment or not###################
+      if assTeamHash[assgt.id] == "indie"
+        participant_entries = ScoreCache.where(["reviewee_id in (?) and object_type = ?", participants_for_assgt, 'ParticipantReviewResponseMap' ])
+        for participant_entry in participant_entries
+          csEntry = CsEntriesAdaptor.new
+          csEntry.participant_id = participant_entry.reviewee_id
+          csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Review"]
+          csEntry.total_score = participant_entry.score
+          csEntries << csEntry
+        end
+      else
+        assignment_teams = Team.where("parent_id = ? and type = ?", assgt.id, 'AssignmentTeam')
+        team_entries = ScoreCache.where("reviewee_id in (?) and object_type = ?", assignment_teams.pluck(:id), 'TeamReviewResponseMap')
+        team_entries.each do |team_entry|
+          team_users = TeamsUser.where(["team_id = ?",team_entry.reviewee_id])
 
+          for team_user in team_users
+            team_participant = AssignmentParticipant.where(["user_id = ? and parent_id = ?", team_user.user_id, assgt.id]).first
+            csEntry = CsEntriesAdaptor.new
+            csEntry.participant_id = team_participant.try :id
+            csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Review"]
+            csEntry.total_score = team_entry.score
+
+            csEntries << csEntry
+          end
+
+        end
+      end
     end
-  end
-end
 
     qtypeHash = Hash.new
 

@@ -25,12 +25,12 @@ module NavigationHelpers
     when /manage my team/
         pending # session variables with cucumber are not implemented to pass authentication 
         user = User.find_by_name("student")
-        "student_teams/view/#{user.id}"
+        "student_team/view/#{user.id}"
 
     when /edit my team/
         pending # There must exist a team 
         team = AssignmentTeam.first.id
-       "student_teams/edit/#{team}"
+       "student_team/edit/#{team}"
 
     when /Your Work/
         user_id = User.find_by_name("student").id

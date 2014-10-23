@@ -50,8 +50,11 @@ class SignupController < ApplicationController
 
       #find the assignment to which user is signing up
       @assignment = Assignment.find(params[:assignment_id])
+      # TODO: This will be always be true now. (Dropped the == true)
+      # TODO: Everything is a team assignment.  Everyone gets a team.
       if @assignment.team_assignment
         #check whether the user already has a team for this assignment
+        #TODO: Probably need to leave this in.  There are places where people won't have a team.
         @users_team = SignedUpUser.find_team_users(params[:assignment_id],(session[:user].id))
 
         if @users_team.size == 0
@@ -84,12 +87,15 @@ class SignupController < ApplicationController
 
 
 
+    # TODO: TOO LONG.
+    # TODO: Need comments for this method.
     def confirm_topic(creator_id, topic_id, assignment_id)
       #check whether user has signed up already
       user_signup = other_confirmed_topic_for_user(assignment_id, creator_id)
 
       sign_up = SignedUpUser.new
       sign_up.topic_id = params[:id]
+      # TODO: Creator is always a team.
       sign_up.creator_id = creator_id
 
       result = false
@@ -101,6 +107,8 @@ class SignupController < ApplicationController
             sign_up.is_waitlisted = false
 
             #Update topic_id in participant table with the topic_id
+            # TODO: If can try to move this to the signed_up_user model.
+            # TODO: If we can this should be removed.
             participant = Participant.where(user_id: session[:user].id, parent_id:  assignment_id).first
 
             participant.update_topic_id(topic_id)
@@ -123,6 +131,7 @@ class SignupController < ApplicationController
           # Using a DB transaction to ensure atomic inserts
           ActiveRecord::Base.transaction do
             #check whether user is clicking on a topic which is not going to place him in the waitlist
+            # TODO: Find out how we associtate this with a team.
             if !slotAvailable?(topic_id)
               sign_up.is_waitlisted = true
               if sign_up.save
@@ -170,6 +179,8 @@ class SignupController < ApplicationController
         users_team = SignedUpUser.find_team_users(assignment_id,(session[:user].id))
         signup_record = SignedUpUser.where(topic_id: topic_id, creator_id:  users_team[0].t_id).first
 
+        # TODO: This should be a model function.  Taking someone off a wait list and push them into a topic.
+        # TODO: Move this to signed_up_user.  consider changing the model name to signed_up_team.
         #if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
         if signup_record.is_waitlisted == false
           #find the first wait listed user if exists

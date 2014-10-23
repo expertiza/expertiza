@@ -1,4 +1,4 @@
-class StudentQuizController < ApplicationController
+class StudentQuizzesController < ApplicationController
   def list
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
@@ -147,7 +147,7 @@ def record_response
     scores.each do |score|
       score.save
     end
-    redirect_to :controller => 'student_quiz', :action => 'finished_quiz', :map_id => @map.id
+    redirect_to :controller => 'student_quizzes', :action => 'finished_quiz', :map_id => @map.id
   else
     flash[:error] = "Please answer every question."
     redirect_to :action => :take_quiz, :assignment_id => params[:assignment_id], :questionnaire_id => @questionnaire.id

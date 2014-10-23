@@ -49,7 +49,7 @@
             <%= link_to image_tag('/assets/tree_view/assign-reviewers-24.png', :title => 'Assign reviewers'), {:controller => 'review_mapping', :action => 'list_mappings', :id => node.node_object_id}, {:title => 'Assign reviewers'} %>
             <%= link_to image_tag('/assets/tree_view/assign-survey-24.png', :title => 'Assign surveys'), {:controller => 'survey', :action => 'assign', :id => node.node_object_id}, {:title => 'Assign surveys'} %>
             <%= link_to image_tag('/assets/tree_view/view-survey-24.png', :title => 'View quiz questions'), {:controller => 'questions', :action => 'review_questions', :id => node.node_object_id}, {:title => 'View quiz questions'} %>
-            <%= link_to image_tag('/assets/tree_view/grade-essay-icon-24.png', :title => 'Grade Essay Questions'), {:controller => 'student_quiz', :action => 'grade_essays'} %>
+            <%= link_to image_tag('/assets/tree_view/grade-essay-icon-24.png', :title => 'Grade Essay Questions'), {:controller => 'student_quizzes', :action => 'grade_essays'} %>
           </div>
           <div>
             <%= link_to image_tag('/assets/tree_view/view-scores-24.png', :title => 'View scores'), {:controller => 'grades', :action => 'view', :id => node.node_object_id}, {:title => 'View scores'} %>

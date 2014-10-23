@@ -29,6 +29,14 @@ class Chart
     @@header = true
   end
 
+  def self.set_Template_Optional_Params(template)
+    template[:title][:text] = ""
+    template.delete(:subtitle)
+    template.delete(:yAxis)
+    template.delete(:xAxis)
+    template
+  end
+
   def self.dataAdapter(type,data,optionalConf)
     template = data_template[type];
     if (type == :pie) then
@@ -38,46 +46,45 @@ class Chart
       template[:series] = data
     end
     if optionalConf.nil? then
-      template[:title][:text] = ""
-      template.delete(:subtitle)
-      template.delete(:yAxis)
-      template.delete(:xAxis)
+      template = self.class.set_Template_optional_Params(template)
     else
-      if template[:subtitle].nil? then
-        template[:subtitle]={}
-      end
       if optionalConf[:title].nil? then
         template[:title][:text] = ""
       else
         template[:title][:text] = optionalConf[:title]
       end
-      if optionalConf[:subtitle].nil? then
-        template.delete(:subtitle)
-      else
-        template[:subtitle][:text]=optionalConf[:subtitle]
-      end
-
-      if optionalConf[:y_axis].nil? then
-        template.delete(:yAxis)
-      else
-        template[:yAxis][:title][:text]=optionalConf[:y_axis]
-      end
-
-      if optionalConf[:x_axis].nil? then
-        template[:xAxis].delete(:title)
-      else
-        template[:xAxis][:title][:text] = optionalConf[:x_axis]
-      end
-
-      if optionalConf[:x_axis_categories].nil? then
-        template[:xAxis].delete(:categories)
-      else
-        template[:xAxis][:categories]=optionalConf[:x_axis_categories]
-      end
+    template=self.class.validate_optional_conf(optionalConf,template)
     end
     template
   end
 
+  def self.validate_optional_conf(optionalConf,template)
+    if optionalConf[:subtitle].nil? then
+      template.delete(:subtitle)
+    else
+      template[:subtitle]={}
+      template[:subtitle][:text]=optionalConf[:subtitle]
+    end
+
+    if optionalConf[:y_axis].nil? then
+      template.delete(:yAxis)
+    else
+      template[:yAxis][:title][:text]=optionalConf[:y_axis]
+    end
+
+    if optionalConf[:x_axis].nil? then
+      template[:xAxis].delete(:title)
+    else
+      template[:xAxis][:title][:text] = optionalConf[:x_axis]
+    end
+
+    if optionalConf[:x_axis_categories].nil? then
+      template[:xAxis].delete(:categories)
+    else
+      template[:xAxis][:categories]=optionalConf[:x_axis_categories]
+    end
+    template
+  end
 
   def self.data_template()
     {

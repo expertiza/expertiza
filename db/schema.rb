@@ -22,60 +22,60 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.integer "used_in_round"
   end
 
-  add_index "assignment_questionnaires", ["assignment_id"], name: "fk_aq_assignments_id"
-  add_index "assignment_questionnaires", ["questionnaire_id"], name: "fk_aq_questionnaire_id"
-  add_index "assignment_questionnaires", ["user_id"], name: "fk_aq_user_id"
+  add_index "assignment_questionnaires", ["assignment_id"], name: "fk_aq_assignments_id", using: :btree
+  add_index "assignment_questionnaires", ["questionnaire_id"], name: "fk_aq_questionnaire_id", using: :btree
+  add_index "assignment_questionnaires", ["user_id"], name: "fk_aq_user_id", using: :btree
 
   create_table "assignments", force: true do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "name"
-    t.string   "directory_path"
-    t.integer  "submitter_count",                   default: 0,     null: false
-    t.integer  "course_id",                         default: 0
-    t.integer  "instructor_id",                     default: 0
-    t.boolean  "private",                           default: false, null: false
-    t.integer  "num_reviews",                       default: 0,     null: false
-    t.integer  "num_review_of_reviews",             default: 0,     null: false
-    t.integer  "num_review_of_reviewers",           default: 0,     null: false
-    t.integer  "review_questionnaire_id"
-    t.integer  "review_of_review_questionnaire_id"
-    t.integer  "teammate_review_questionnaire_id"
-    t.boolean  "reviews_visible_to_all"
-    t.integer  "wiki_type_id",                      default: 0,     null: false
-    t.boolean  "require_signup"
-    t.integer  "num_reviewers",                     default: 0,     null: false
-    t.text     "spec_location"
-    t.integer  "author_feedback_questionnaire_id"
-    t.integer  "max_team_size",                     default: 0,     null: false
-    t.boolean  "staggered_deadline"
     t.boolean  "allow_suggestions"
-    t.integer  "days_between_submissions"
-    t.string   "review_assignment_strategy"
-    t.integer  "max_reviews_per_submission"
-    t.integer  "review_topic_threshold",            default: 0
     t.boolean  "availability_flag"
+    t.boolean  "calculate_penalty",                 default: false, null: false
     t.boolean  "copy_flag",                         default: false
-    t.integer  "rounds_of_reviews",                 default: 1
-    t.boolean  "microtask",                         default: false
-    t.integer  "selfreview_questionnaire_id"
-    t.integer  "managerreview_questionnaire_id"
-    t.integer  "readerreview_questionnaire_id"
-    t.boolean  "require_quiz"
-    t.integer  "num_quiz_questions",                default: 0,     null: false
     t.boolean  "is_coding_assignment"
     t.boolean  "is_intelligent"
-    t.boolean  "calculate_penalty",                 default: false, null: false
-    t.integer  "late_policy_id"
     t.boolean  "is_penalty_calculated",             default: false, null: false
+    t.boolean  "microtask",                         default: false
+    t.boolean  "private",                           default: false, null: false
+    t.boolean  "require_quiz"
+    t.boolean  "require_signup"
+    t.boolean  "reviews_visible_to_all"
+    t.boolean  "staggered_deadline"
+    t.integer  "author_feedback_questionnaire_id"
+    t.integer  "course_id",                         default: 0
+    t.integer  "days_between_submissions"
+    t.integer  "instructor_id",                     default: 0
+    t.integer  "late_policy_id"
+    t.integer  "managerreview_questionnaire_id"
+    t.integer  "max_reviews_per_submission"
+    t.integer  "max_team_size",                     default: 0,     null: false
+    t.integer  "num_quiz_questions",                default: 0,     null: false
+    t.integer  "num_review_of_reviewers",           default: 0,     null: false
+    t.integer  "num_review_of_reviews",             default: 0,     null: false
+    t.integer  "num_reviewers",                     default: 0,     null: false
+    t.integer  "num_reviews",                       default: 0,     null: false
+    t.integer  "readerreview_questionnaire_id"
+    t.integer  "review_of_review_questionnaire_id"
+    t.integer  "review_questionnaire_id"
+    t.integer  "review_topic_threshold",            default: 0
+    t.integer  "rounds_of_reviews",                 default: 1
+    t.integer  "selfreview_questionnaire_id"
+    t.integer  "submitter_count",                   default: 0,     null: false
+    t.integer  "teammate_review_questionnaire_id"
+    t.integer  "wiki_type_id",                      default: 0,     null: false
+    t.string   "directory_path"
+    t.string   "name"
+    t.string   "review_assignment_strategy"
+    t.text     "spec_location"
   end
 
-  add_index "assignments", ["course_id"], name: "fk_assignments_courses"
-  add_index "assignments", ["instructor_id"], name: "fk_assignments_instructors"
-  add_index "assignments", ["late_policy_id"], name: "fk_late_policy_id"
-  add_index "assignments", ["review_of_review_questionnaire_id"], name: "fk_assignments_review_of_review_questionnaires"
-  add_index "assignments", ["review_questionnaire_id"], name: "fk_assignments_review_questionnaires"
-  add_index "assignments", ["wiki_type_id"], name: "fk_assignments_wiki_types"
+  add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
+  add_index "assignments", ["instructor_id"], name: "fk_assignments_instructors", using: :btree
+  add_index "assignments", ["late_policy_id"], name: "fk_late_policy_id", using: :btree
+  add_index "assignments", ["review_of_review_questionnaire_id"], name: "fk_assignments_review_of_review_questionnaires", using: :btree
+  add_index "assignments", ["review_questionnaire_id"], name: "fk_assignments_review_questionnaires", using: :btree
+  add_index "assignments", ["wiki_type_id"], name: "fk_assignments_wiki_types", using: :btree
 
   create_table "automated_metareviews", force: true do |t|
     t.float    "relevance",         limit: 24
@@ -93,7 +93,7 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.datetime "updated_at"
   end
 
-  add_index "automated_metareviews", ["response_id"], name: "fk_automated_metareviews_responses_id"
+  add_index "automated_metareviews", ["response_id"], name: "fk_automated_metareviews_responses_id", using: :btree
 
   create_table "bids", force: true do |t|
     t.integer  "topic_id"
@@ -164,14 +164,6 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.integer "penalty_points"
   end
 
-  create_table "categories", force: true do |t|
-    t.string  "name"
-    t.integer "parent_id"
-    t.integer "lft"
-    t.integer "rgt"
-    t.integer "depth"
-  end
-
   create_table "comments", force: true do |t|
     t.integer "participant_id", default: 0,     null: false
     t.boolean "private",        default: false, null: false
@@ -189,8 +181,8 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.text     "content_cache"
   end
 
-  add_index "content_pages", ["markup_style_id"], name: "fk_content_page_markup_style_id"
-  add_index "content_pages", ["permission_id"], name: "fk_content_page_permission_id"
+  add_index "content_pages", ["markup_style_id"], name: "fk_content_page_markup_style_id", using: :btree
+  add_index "content_pages", ["permission_id"], name: "fk_content_page_permission_id", using: :btree
 
   create_table "controller_actions", force: true do |t|
     t.integer "site_controller_id", default: 0,  null: false
@@ -199,8 +191,8 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.string  "url_to_use"
   end
 
-  add_index "controller_actions", ["permission_id"], name: "fk_controller_action_permission_id"
-  add_index "controller_actions", ["site_controller_id"], name: "fk_controller_action_site_controller_id"
+  add_index "controller_actions", ["permission_id"], name: "fk_controller_action_permission_id", using: :btree
+  add_index "controller_actions", ["site_controller_id"], name: "fk_controller_action_site_controller_id", using: :btree
 
   create_table "courses", force: true do |t|
     t.string   "name"
@@ -212,7 +204,7 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.boolean  "private",        default: false, null: false
   end
 
-  add_index "courses", ["instructor_id"], name: "fk_course_users"
+  add_index "courses", ["instructor_id"], name: "fk_course_users", using: :btree
 
   create_table "deadline_rights", force: true do |t|
     t.string "name", limit: 32
@@ -236,7 +228,7 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.string   "queue"
   end
 
-  add_index "delayed_jobs", ["priority", "run_at"], name: "delayed_jobs_priority"
+  add_index "delayed_jobs", ["priority", "run_at"], name: "delayed_jobs_priority", using: :btree
 
   create_table "due_dates", force: true do |t|
     t.datetime "due_at"
@@ -256,13 +248,13 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.integer  "quiz_allowed_id"
   end
 
-  add_index "due_dates", ["assignment_id"], name: "fk_due_dates_assignments"
-  add_index "due_dates", ["deadline_type_id"], name: "fk_deadline_type_due_date"
-  add_index "due_dates", ["rereview_allowed_id"], name: "fk_due_date_rereview_allowed"
-  add_index "due_dates", ["resubmission_allowed_id"], name: "fk_due_date_resubmission_allowed"
-  add_index "due_dates", ["review_allowed_id"], name: "fk_due_date_review_allowed"
-  add_index "due_dates", ["review_of_review_allowed_id"], name: "fk_due_date_review_of_review_allowed"
-  add_index "due_dates", ["submission_allowed_id"], name: "fk_due_date_submission_allowed"
+  add_index "due_dates", ["assignment_id"], name: "fk_due_dates_assignments", using: :btree
+  add_index "due_dates", ["deadline_type_id"], name: "fk_deadline_type_due_date", using: :btree
+  add_index "due_dates", ["rereview_allowed_id"], name: "fk_due_date_rereview_allowed", using: :btree
+  add_index "due_dates", ["resubmission_allowed_id"], name: "fk_due_date_resubmission_allowed", using: :btree
+  add_index "due_dates", ["review_allowed_id"], name: "fk_due_date_review_allowed", using: :btree
+  add_index "due_dates", ["review_of_review_allowed_id"], name: "fk_due_date_review_of_review_allowed", using: :btree
+  add_index "due_dates", ["submission_allowed_id"], name: "fk_due_date_submission_allowed", using: :btree
 
   create_table "institutions", force: true do |t|
     t.string "name", default: "", null: false
@@ -275,9 +267,9 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.string  "reply_status",  limit: 1
   end
 
-  add_index "invitations", ["assignment_id"], name: "fk_invitation_assignments"
-  add_index "invitations", ["from_id"], name: "fk_invitationfrom_users"
-  add_index "invitations", ["to_id"], name: "fk_invitationto_users"
+  add_index "invitations", ["assignment_id"], name: "fk_invitation_assignments", using: :btree
+  add_index "invitations", ["from_id"], name: "fk_invitationfrom_users", using: :btree
+  add_index "invitations", ["to_id"], name: "fk_invitationto_users", using: :btree
 
   create_table "join_team_requests", force: true do |t|
     t.integer  "participant_id"
@@ -303,7 +295,7 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.string  "policy_name",                                      null: false
   end
 
-  add_index "late_policies", ["penalty_period_in_minutes"], name: "penalty_period_length_unit"
+  add_index "late_policies", ["penalty_period_in_minutes"], name: "penalty_period_length_unit", using: :btree
 
   create_table "leaderboards", force: true do |t|
     t.integer "questionnaire_type_id"
@@ -324,14 +316,18 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.integer "content_page_id"
   end
 
-  add_index "menu_items", ["content_page_id"], name: "fk_menu_item_content_page_id"
-  add_index "menu_items", ["controller_action_id"], name: "fk_menu_item_controller_action_id"
-  add_index "menu_items", ["parent_id"], name: "fk_menu_item_parent_id"
+  add_index "menu_items", ["content_page_id"], name: "fk_menu_item_content_page_id", using: :btree
+  add_index "menu_items", ["controller_action_id"], name: "fk_menu_item_controller_action_id", using: :btree
+  add_index "menu_items", ["parent_id"], name: "fk_menu_item_parent_id", using: :btree
 
   create_table "nodes", force: true do |t|
     t.integer "parent_id"
     t.integer "node_object_id"
     t.string  "type"
+    t.string  "name"
+    t.integer "lft"
+    t.integer "rgt"
+    t.integer "depth"
   end
 
   create_table "participant_score_views", id: false, force: true do |t|
@@ -352,8 +348,8 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.datetime "updated_at"
   end
 
-  add_index "participant_team_roles", ["participant_id"], name: "fk_participant_id"
-  add_index "participant_team_roles", ["role_assignment_id"], name: "fk_role_assignment_id"
+  add_index "participant_team_roles", ["participant_id"], name: "fk_participant_id", using: :btree
+  add_index "participant_team_roles", ["role_assignment_id"], name: "fk_role_assignment_id", using: :btree
 
   create_table "participants", force: true do |t|
     t.boolean  "submit_allowed",                  default: true
@@ -374,7 +370,7 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.string   "special_role"
   end
 
-  add_index "participants", ["user_id"], name: "fk_participant_users"
+  add_index "participants", ["user_id"], name: "fk_participant_users", using: :btree
 
   create_table "permissions", force: true do |t|
     t.string "name", default: "", null: false
@@ -391,7 +387,7 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.text    "advice"
   end
 
-  add_index "question_advices", ["question_id"], name: "fk_question_question_advices"
+  add_index "question_advices", ["question_id"], name: "fk_question_question_advices", using: :btree
 
   create_table "question_types", force: true do |t|
     t.string  "q_type",      default: "", null: false
@@ -399,7 +395,7 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.integer "question_id", default: 1,  null: false
   end
 
-  add_index "question_types", ["question_id"], name: "fk_question_type_question"
+  add_index "question_types", ["question_id"], name: "fk_question_type_question", using: :btree
 
   create_table "questionnaires", force: true do |t|
     t.string   "name",                limit: 64
@@ -423,7 +419,7 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.integer "questionnaire_id"
   end
 
-  add_index "questions", ["questionnaire_id"], name: "fk_question_questionnaires"
+  add_index "questions", ["questionnaire_id"], name: "fk_question_questionnaires", using: :btree
 
   create_table "quiz_question_choices", force: true do |t|
     t.integer "question_id"
@@ -442,7 +438,7 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.datetime "updated_at"
   end
 
-  add_index "response_maps", ["reviewer_id"], name: "fk_response_map_reviewer"
+  add_index "response_maps", ["reviewer_id"], name: "fk_response_map_reviewer", using: :btree
 
   create_table "responses", force: true do |t|
     t.integer  "map_id",             default: 0, null: false
@@ -452,14 +448,14 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.integer  "version_num"
   end
 
-  add_index "responses", ["map_id"], name: "fk_response_response_map"
+  add_index "responses", ["map_id"], name: "fk_response_response_map", using: :btree
 
   create_table "resubmission_times", force: true do |t|
     t.integer  "participant_id"
     t.datetime "resubmitted_at"
   end
 
-  add_index "resubmission_times", ["participant_id"], name: "fk_resubmission_times_participants"
+  add_index "resubmission_times", ["participant_id"], name: "fk_resubmission_times_participants", using: :btree
 
   create_table "review_comments", force: true do |t|
     t.integer  "review_file_id"
@@ -490,16 +486,16 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.datetime "updated_at"
   end
 
-  add_index "roles", ["default_page_id"], name: "fk_role_default_page_id"
-  add_index "roles", ["parent_id"], name: "fk_role_parent_id"
+  add_index "roles", ["default_page_id"], name: "fk_role_default_page_id", using: :btree
+  add_index "roles", ["parent_id"], name: "fk_role_parent_id", using: :btree
 
   create_table "roles_permissions", force: true do |t|
     t.integer "role_id",       default: 0, null: false
     t.integer "permission_id", default: 0, null: false
   end
 
-  add_index "roles_permissions", ["permission_id"], name: "fk_roles_permission_permission_id"
-  add_index "roles_permissions", ["role_id"], name: "fk_roles_permission_role_id"
+  add_index "roles_permissions", ["permission_id"], name: "fk_roles_permission_permission_id", using: :btree
+  add_index "roles_permissions", ["role_id"], name: "fk_roles_permission_role_id", using: :btree
 
   create_table "score_caches", force: true do |t|
     t.integer "reviewee_id"
@@ -543,8 +539,8 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.integer "response_id"
   end
 
-  add_index "scores", ["question_id"], name: "fk_score_questions"
-  add_index "scores", ["response_id"], name: "fk_score_response"
+  add_index "scores", ["question_id"], name: "fk_score_questions", using: :btree
+  add_index "scores", ["response_id"], name: "fk_score_response", using: :btree
 
   create_table "sessions", force: true do |t|
     t.string   "session_id",                  default: "", null: false
@@ -553,8 +549,8 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.datetime "updated_at"
   end
 
-  add_index "sessions", ["session_id"], name: "index_sessions_on_session_id"
-  add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at"
+  add_index "sessions", ["session_id"], name: "index_sessions_on_session_id", using: :btree
+  add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
 
   create_table "sign_up_topics", force: true do |t|
     t.text    "topic_name",                                       null: false
@@ -566,7 +562,7 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.integer "bookmark_rating_rubric_id"
   end
 
-  add_index "sign_up_topics", ["assignment_id"], name: "fk_sign_up_categories_sign_up_topics"
+  add_index "sign_up_topics", ["assignment_id"], name: "fk_sign_up_categories_sign_up_topics", using: :btree
 
   create_table "signed_up_users", force: true do |t|
     t.integer "topic_id",                   default: 0,     null: false
@@ -575,7 +571,7 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.integer "preference_priority_number"
   end
 
-  add_index "signed_up_users", ["topic_id"], name: "fk_signed_up_users_sign_up_topics"
+  add_index "signed_up_users", ["topic_id"], name: "fk_signed_up_users_sign_up_topics", using: :btree
 
   create_table "site_controllers", force: true do |t|
     t.string  "name",          default: "", null: false
@@ -583,7 +579,7 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.integer "builtin",       default: 0
   end
 
-  add_index "site_controllers", ["permission_id"], name: "fk_site_controller_permission_id"
+  add_index "site_controllers", ["permission_id"], name: "fk_site_controller_permission_id", using: :btree
 
   create_table "suggestion_comments", force: true do |t|
     t.text     "comments"
@@ -640,19 +636,19 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.integer "menu_depth",                default: 0,  null: false
   end
 
-  add_index "system_settings", ["not_found_page_id"], name: "fk_system_settings_not_found_page_id"
-  add_index "system_settings", ["permission_denied_page_id"], name: "fk_system_settings_permission_denied_page_id"
-  add_index "system_settings", ["public_role_id"], name: "fk_system_settings_public_role_id"
-  add_index "system_settings", ["session_expired_page_id"], name: "fk_system_settings_session_expired_page_id"
-  add_index "system_settings", ["site_default_page_id"], name: "fk_system_settings_site_default_page_id"
+  add_index "system_settings", ["not_found_page_id"], name: "fk_system_settings_not_found_page_id", using: :btree
+  add_index "system_settings", ["permission_denied_page_id"], name: "fk_system_settings_permission_denied_page_id", using: :btree
+  add_index "system_settings", ["public_role_id"], name: "fk_system_settings_public_role_id", using: :btree
+  add_index "system_settings", ["session_expired_page_id"], name: "fk_system_settings_session_expired_page_id", using: :btree
+  add_index "system_settings", ["site_default_page_id"], name: "fk_system_settings_site_default_page_id", using: :btree
 
   create_table "ta_mappings", force: true do |t|
     t.integer "ta_id"
     t.integer "course_id"
   end
 
-  add_index "ta_mappings", ["course_id"], name: "fk_ta_mappings_course_id"
-  add_index "ta_mappings", ["ta_id"], name: "fk_ta_mappings_ta_id"
+  add_index "ta_mappings", ["course_id"], name: "fk_ta_mappings_course_id", using: :btree
+  add_index "ta_mappings", ["ta_id"], name: "fk_ta_mappings_ta_id", using: :btree
 
   create_table "tags", force: true do |t|
     t.string "tagname", null: false
@@ -665,15 +661,15 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.datetime "updated_at"
   end
 
-  add_index "team_role_questionnaire", ["questionnaire_id"], name: "fk_questionnaire_id"
-  add_index "team_role_questionnaire", ["team_roles_id"], name: "fk_team_roles_id"
+  add_index "team_role_questionnaire", ["questionnaire_id"], name: "fk_questionnaire_id", using: :btree
+  add_index "team_role_questionnaire", ["team_roles_id"], name: "fk_team_roles_id", using: :btree
 
   create_table "team_roles", force: true do |t|
     t.string  "role_names"
     t.integer "questionnaire_id"
   end
 
-  add_index "team_roles", ["questionnaire_id"], name: "fk_team_roles_questionnaire"
+  add_index "team_roles", ["questionnaire_id"], name: "fk_team_roles_questionnaire", using: :btree
 
   create_table "team_rolesets", force: true do |t|
     t.string "roleset_name"
@@ -686,16 +682,16 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.datetime "updated_at"
   end
 
-  add_index "team_rolesets_maps", ["team_role_id"], name: "fk_team_role_id"
-  add_index "team_rolesets_maps", ["team_rolesets_id"], name: "fk_team_rolesets_id"
+  add_index "team_rolesets_maps", ["team_role_id"], name: "fk_team_role_id", using: :btree
+  add_index "team_rolesets_maps", ["team_rolesets_id"], name: "fk_team_rolesets_id", using: :btree
 
   create_table "teamrole_assignment", force: true do |t|
     t.integer "team_roleset_id"
     t.integer "assignment_id"
   end
 
-  add_index "teamrole_assignment", ["assignment_id"], name: "fk_teamrole_assignment_assignments"
-  add_index "teamrole_assignment", ["team_roleset_id"], name: "fk_teamrole_assignment_team_rolesets"
+  add_index "teamrole_assignment", ["assignment_id"], name: "fk_teamrole_assignment_assignments", using: :btree
+  add_index "teamrole_assignment", ["team_roleset_id"], name: "fk_teamrole_assignment_team_rolesets", using: :btree
 
   create_table "teams", force: true do |t|
     t.string  "name"
@@ -710,8 +706,8 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.integer "user_id"
   end
 
-  add_index "teams_users", ["team_id"], name: "fk_users_teams"
-  add_index "teams_users", ["user_id"], name: "fk_teams_users"
+  add_index "teams_users", ["team_id"], name: "fk_users_teams", using: :btree
+  add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 
   create_table "topic_deadlines", force: true do |t|
     t.datetime "due_at"
@@ -726,14 +722,14 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.integer  "round"
   end
 
-  add_index "topic_deadlines", ["deadline_type_id"], name: "fk_deadline_type_topic_deadlines"
-  add_index "topic_deadlines", ["late_policy_id"], name: "fk_topic_deadlines_late_policies"
-  add_index "topic_deadlines", ["rereview_allowed_id"], name: "idx_rereview_allowed"
-  add_index "topic_deadlines", ["resubmission_allowed_id"], name: "idx_resubmission_allowed"
-  add_index "topic_deadlines", ["review_allowed_id"], name: "idx_review_allowed"
-  add_index "topic_deadlines", ["review_of_review_allowed_id"], name: "idx_review_of_review_allowed"
-  add_index "topic_deadlines", ["submission_allowed_id"], name: "idx_submission_allowed"
-  add_index "topic_deadlines", ["topic_id"], name: "fk_topic_deadlines_topics"
+  add_index "topic_deadlines", ["deadline_type_id"], name: "fk_deadline_type_topic_deadlines", using: :btree
+  add_index "topic_deadlines", ["late_policy_id"], name: "fk_topic_deadlines_late_policies", using: :btree
+  add_index "topic_deadlines", ["rereview_allowed_id"], name: "idx_rereview_allowed", using: :btree
+  add_index "topic_deadlines", ["resubmission_allowed_id"], name: "idx_resubmission_allowed", using: :btree
+  add_index "topic_deadlines", ["review_allowed_id"], name: "idx_review_allowed", using: :btree
+  add_index "topic_deadlines", ["review_of_review_allowed_id"], name: "idx_review_of_review_allowed", using: :btree
+  add_index "topic_deadlines", ["submission_allowed_id"], name: "idx_submission_allowed", using: :btree
+  add_index "topic_deadlines", ["topic_id"], name: "fk_topic_deadlines_topics", using: :btree
 
   create_table "topic_dependencies", force: true do |t|
     t.integer "topic_id",     default: 0,  null: false
@@ -760,7 +756,7 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.boolean "email_on_submission"
     t.boolean "email_on_review_of_review"
     t.boolean "is_new_user",                           default: true,  null: false
-    t.integer "master_permission_granted", limit: 1,   default: 0
+    t.integer "master_permission_granted",             default: 0
     t.string  "handle"
     t.boolean "leaderboard_privacy",                   default: false
     t.text    "digital_certificate"
@@ -770,7 +766,7 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.boolean "copy_of_emails",                        default: false
   end
 
-  add_index "users", ["role_id"], name: "fk_user_role_id"
+  add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree
 
   create_table "versions", force: true do |t|
     t.string   "item_type",  null: false
@@ -781,7 +777,7 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.datetime "created_at"
   end
 
-  add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
+  add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
 
   create_table "wiki_types", force: true do |t|
     t.string "name", default: "", null: false

@@ -85,7 +85,7 @@ class ReviewMappingController < ApplicationController
       @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
       @map.save
     end
-    redirect_to :controller => 'student_quizzes', :action => 'index', :id => params[:participant_id]
+    redirect_to :controller => 'student_quizzes', :action => 'list', :id => params[:participant_id]
   end
 
   # Assign self to a submission
@@ -120,7 +120,7 @@ class ReviewMappingController < ApplicationController
 
   #  Looks up the team from the submission.
   def get_team_from_submission(submission)
-    # Get the index of teams for this assignment.
+    # Get the list of teams for this assignment.
     teams = AssignmentTeam.where(parent_id:  submission.parent_id)
 
     teams.each do |team|
@@ -197,7 +197,7 @@ class ReviewMappingController < ApplicationController
     rescue Exception => e
       flash[:alert] = (e.nil?) ? $! : e
     end
-    redirect_to :controller => 'student_quizzes', :action => 'index', :id => reviewer.id
+    redirect_to :controller => 'student_quizzes', :action => 'list', :id => reviewer.id
 
   end
 

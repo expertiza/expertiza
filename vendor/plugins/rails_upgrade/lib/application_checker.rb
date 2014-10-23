@@ -237,9 +237,9 @@ module Rails
         end
       end
 
-      # Checks a index of known broken plugins and gems
+      # Checks a list of known broken plugins and gems
       def check_plugins
-        # This index is off the wiki; will need to be updated often, esp. since RSpec is working on it
+        # This list is off the wiki; will need to be updated often, esp. since RSpec is working on it
         bad_plugins = ["rspec", "rspec-rails", "hoptoad", "authlogic", "nifty-generators",
            "restful_authentication", "searchlogic", "cucumber", "cucumber-rails", "devise",
            "inherited_resources"]
@@ -366,7 +366,7 @@ module Rails
         unless files.empty?
           alert(
             "Deprecated filter_parameter_logging calls",
-            "The index of filtered parameters are now stored in /config/application.rb. For example: config.filter_parameters += [:password]",
+            "The list of filtered parameters are now stored in /config/application.rb. For example: config.filter_parameters += [:password]",
             "http://asciicasts.com/episodes/224-controllers-in-rails-3",
             files
           )

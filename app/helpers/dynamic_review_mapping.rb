@@ -458,10 +458,10 @@ module DynamicReviewMapping
           temp_users = users.clone
 
           for i in 1..users.size
-            #randomly select a user from the index
+            #randomly select a user from the list
             user = temp_users[(rand(temp_users.size)).round]
 
-            #create a index of team_ids this user can review
+            #create a list of team_ids this user can review
             users_team_id = Team.find_by_sql("SELECT t.id
                                              FROM teams t, teams_users u
                                              WHERE t.parent_id = #{@assignment.id.to_s}  and t.id = u.team_id and u.user_id = #{user.to_s}")
@@ -532,7 +532,7 @@ module DynamicReviewMapping
                                                  #don't assign anything.
                                                end
 
-                                               #remove that topic from the index
+                                               #remove that topic from the list
                                                temp_topic_count.each {|temp_topic|
                                                  if temp_topic[0] == topic[0]
                                                    temp_topic_count.delete(temp_topic)
@@ -688,9 +688,9 @@ module DynamicReviewMapping
             temp_users = users.clone
 
             for n in 1..users.size
-              #randomly select a user from the index
+              #randomly select a user from the list
               user = temp_users[(rand(temp_users.size)).round]
-              #create a index of user_ids this user can review
+              #create a list of user_ids this user can review
               #users_team_id = Team.find_by_sql("SELECT t.id
               #                                  FROM teams t, teams_users u
               #                                  WHERE t.parent_id = #{@assignment.id.to_s}  and t.id = u.team_id and u.user_id = #{user.to_s}")
@@ -761,7 +761,7 @@ module DynamicReviewMapping
                   #don't assign anything.
                 end
 
-                #remove that topic from the index
+                #remove that topic from the list
                 temp_topic_count.each {|temp_topic|
                   if temp_topic[0] == topic[0]
                     temp_topic_count.delete(temp_topic)
@@ -932,7 +932,7 @@ module DynamicReviewMapping
               temp_users = users.clone
 
               for i in 1..users.size
-                #randomly select a user from the index
+                #randomly select a user from the list
                 user = temp_users[(rand(temp_users.size)).round]
                 temp_contributors = contributors.clone
                 participant = Participant.where(parent_id: @assignment.id, user_id:  user).first
@@ -1025,7 +1025,7 @@ module DynamicReviewMapping
                   #don't assign anything.
                   #end
 
-                  #remove that topic from the index
+                  #remove that topic from the list
                   temp_topic_count.each {|temp_topic|
                     if temp_topic[0] == topic[0]
                       temp_topic_count.delete(temp_topic)

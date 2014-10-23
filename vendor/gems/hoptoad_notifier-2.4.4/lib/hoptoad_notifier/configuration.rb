@@ -41,23 +41,23 @@ module HoptoadNotifier
     # The password to use when logging into your proxy server (if using a proxy)
     attr_accessor :proxy_pass
 
-    # A index of parameters that should be filtered out of what is sent to Hoptoad.
+    # A list of parameters that should be filtered out of what is sent to Hoptoad.
     # By default, all "password" attributes will have their contents replaced.
     attr_reader :params_filters
 
-    # A index of filters for cleaning and pruning the backtrace. See #filter_backtrace.
+    # A list of filters for cleaning and pruning the backtrace. See #filter_backtrace.
     attr_reader :backtrace_filters
 
-    # A index of filters for ignoring exceptions. See #ignore_by_filter.
+    # A list of filters for ignoring exceptions. See #ignore_by_filter.
     attr_reader :ignore_by_filters
 
-    # A index of exception classes to ignore. The array can be appended to.
+    # A list of exception classes to ignore. The array can be appended to.
     attr_reader :ignore
 
-    # A index of user agents that are being ignored. The array can be appended to.
+    # A list of user agents that are being ignored. The array can be appended to.
     attr_reader :ignore_user_agent
 
-    # A index of environments in which notifications should not be sent.
+    # A list of environments in which notifications should not be sent.
     attr_accessor :development_environments
 
     # +true+ if you want to check for production errors matching development errors, +false+ otherwise.
@@ -137,7 +137,7 @@ module HoptoadNotifier
       @user_information         = 'Hoptoad Error {{error_id}}'
     end
 
-    # Takes a block and adds it to the index of backtrace filters. When the filters
+    # Takes a block and adds it to the list of backtrace filters. When the filters
     # run, the block will be handed each line of the backtrace and can modify
     # it as necessary.
     #
@@ -152,7 +152,7 @@ module HoptoadNotifier
       self.backtrace_filters << block
     end
 
-    # Takes a block and adds it to the index of ignore filters.
+    # Takes a block and adds it to the list of ignore filters.
     # When the filters run, the block will be handed the exception.
     # @example
     #   config.ignore_by_filter do |exception_data|
@@ -166,16 +166,16 @@ module HoptoadNotifier
       self.ignore_by_filters << block
     end
 
-    # Overrides the index of default ignored errors.
+    # Overrides the list of default ignored errors.
     #
-    # @param [Array<Exception>] names A index of exceptions to ignore.
+    # @param [Array<Exception>] names A list of exceptions to ignore.
     def ignore_only=(names)
       @ignore = [names].flatten
     end
 
-    # Overrides the index of default ignored user agents
+    # Overrides the list of default ignored user agents
     #
-    # @param [Array<String>] A index of user agents to ignore
+    # @param [Array<String>] A list of user agents to ignore
     def ignore_user_agent_only=(names)
       @ignore_user_agent = [names].flatten
     end

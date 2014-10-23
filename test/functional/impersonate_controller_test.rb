@@ -74,7 +74,7 @@ class ImpersonateControllerTest < ActionController::TestCase
   end
   
 # def test_restore
-#   @request.env['HTTP_REFERER'] = "http://localhost:3000/index/student1"
+#   @request.env['HTTP_REFERER'] = "http://localhost:3000/list/student1"    
 #   post :impersonate, :user => {:name => users(:student1).name}
 #   assert !session[:super_user].nil?
 #   post :restore

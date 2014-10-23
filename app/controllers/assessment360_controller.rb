@@ -116,7 +116,7 @@ class Assessment360Controller < ApplicationController
     end
   end
 
-  # Find the index of all students and assignments pertaining to the course. This data is used to compute the metareview and teammate review scores. This information is used in the view.
+  # Find the list of all students and assignments pertaining to the course. This data is used to compute the metareview and teammate review scores. This information is used in the view.
   def all_students_all_reviews
     @course = Course.find(params[:course_id])
     @students = @course.get_participants()

@@ -21,7 +21,7 @@ class InstitutionsControllerTest < ActionController::TestCase
     number_of_institution = Institution.count
     post :create, :institution => { :name => 'Biomedical Engineering'}
     assert_equal flash[:notice], 'Institution was successfully created.'
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :action => 'list'
     assert_equal Institution.count, number_of_institution+1
     assert Institution.find(:all, :conditions => "name = 'Biomedical Engineering'");
   end
@@ -77,7 +77,7 @@ class InstitutionsControllerTest < ActionController::TestCase
   def test_delete_institution
     number_of_institution = Institution.count
     post :destroy,:id => institutions(:institution1)
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :action => 'list'
     assert_equal number_of_institution-1, Institution.count
     assert_raise(ActiveRecord::RecordNotFound){ Institution.find(1) }
   end

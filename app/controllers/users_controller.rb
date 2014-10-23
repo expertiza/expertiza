@@ -2,7 +2,7 @@ class UsersController < ApplicationController
   autocomplete :user, :name
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
-    :redirect_to => { :action => :index }
+    :redirect_to => { :action => :list }
 
 
   def action_allowed?
@@ -44,7 +44,7 @@ class UsersController < ApplicationController
     render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
   end
 
-  #for displaying the index of users
+  #for displaying the list of users
   def list
     user = session[:user]
     role = Role.find(user.role_id)
@@ -74,7 +74,7 @@ class UsersController < ApplicationController
       @per_page = params[:num_users]
     end
 
-    # Get the users index to show on current page
+    # Get the users list to show on current page
     @users = paginate_list(role, user.id, letter)
 
     @letters = ('A'..'Z').to_a
@@ -202,7 +202,7 @@ class UsersController < ApplicationController
           end
         end
 
-        # For filtering the users index with proper search and pagination.
+        # For filtering the users list with proper search and pagination.
         def paginate_list(role, user_id, letter)
           paginate_options = {"1" => 25, "2" => 50, "3" => 100}
 

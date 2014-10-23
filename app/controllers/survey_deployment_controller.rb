@@ -55,7 +55,7 @@ class SurveyDeploymentController < ApplicationController
 
   def add_participants(num_of_participants,survey_deployment_id) #Add participants
     users=User.where(role_id: Role.student.id)
-    users_rand=users.sort_by{rand} #randomize user index
+    users_rand=users.sort_by{rand} #randomize user list
     num_of_participants.times do |i|
       survey_participant=SurveyParticipant.new
       survey_participant.user_id=users_rand[i].id

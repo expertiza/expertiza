@@ -64,7 +64,7 @@ module LeaderboardHelper
     instructor
   end
 
-  # Returns index of course ids in which the student has an assignment
+  # Returns list of course ids in which the student has an assignment
   def self.studentInWhichCourses(userid)
     # Get all entries in Participant table for user
     assignPartList = AssignmentParticipant.where(["user_id =?",userid])

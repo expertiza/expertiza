@@ -1,7 +1,7 @@
 
 class Student < User
   def get_home_action
-    "index"
+    "list"
   end
 
   def get_home_controller

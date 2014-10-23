@@ -351,7 +351,7 @@ class AssignmentsController < ApplicationController
     def delete
       assignment = Assignment.find(params[:id])
 
-      # If the assignment is already deleted, go back to the index of assignments
+      # If the assignment is already deleted, go back to the list of assignments
       if assignment
         begin
           #delete from delayed_jobs queue
@@ -386,7 +386,7 @@ class AssignmentsController < ApplicationController
       @assignments=super(Assignment)
       #    @assignment_pages, @assignments = paginate :assignments, :per_page => 10
     end
-    alias_method :index, :index
+    alias_method :index, :list
 
 
     #--------------------------------------------------------------------------------------------------------------------

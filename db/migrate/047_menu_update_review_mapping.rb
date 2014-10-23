@@ -6,7 +6,7 @@ class MenuUpdateReviewMapping < ActiveRecord::Migration
      site_controller.permission_id = permission1.id
      site_controller.builtin = 0
      site_controller.save
-     action = ControllerAction.create(:name => 'index',:site_controller_id => site_controller.id)
+     action = ControllerAction.create(:name => 'list',:site_controller_id => site_controller.id)
      action.save
      mitem = MenuItem.create(:name =>'assign_reviewers', :label => 'Assign Reviewers',:seq => 1, :controller_action_id => action.id, :parent_id => menuParent.id )
      mitem.save

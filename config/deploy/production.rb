@@ -12,7 +12,7 @@ role :db,  %w{rails@expertiza.ncsu.edu}
 # Extended Server Syntax
 # ======================
 # This can be used to drop a more detailed server definition into the
-# server index. The second argument is a, or duck-types, Hash and is
+# server list. The second argument is a, or duck-types, Hash and is
 # used to set extended properties on the server.
 
 server 'expertiza.ncsu.edu', user: 'rails', roles: %w{web app}

@@ -71,7 +71,7 @@ Expertiza::Application.routes.draw do
 
   resources :content_pages do
     collection do
-      get :index
+      get :list
       get ':page_name', action: :view
     end
   end
@@ -82,7 +82,7 @@ Expertiza::Application.routes.draw do
 
   resources :controller_actions do
     collection do
-      get 'index'
+      get 'list'
       post ':id', action: :update
       get 'new_for'
     end
@@ -102,7 +102,7 @@ Expertiza::Application.routes.draw do
 
   resources :course_evaluation do
     collection do
-      get :index
+      get :list
     end
   end
 
@@ -183,7 +183,7 @@ Expertiza::Application.routes.draw do
       get :move_up
       get :new_for
       get :link
-      get :index
+      get :list
     end
   end
 
@@ -193,7 +193,7 @@ Expertiza::Application.routes.draw do
       post :add
       get :auto_complete_for_user_name
       get :delete_assignment_participant
-      get :index
+      get :list
       get :change_handle
       get :inherit
       get :bequeath_all
@@ -214,7 +214,7 @@ Expertiza::Application.routes.draw do
 
   resources :permissions, constraints: {id: /\d+/} do
     collection do
-      get :index
+      get :list
       get ':id', action: :show
       post ':id', action: :update
       delete ':id', action: :destroy
@@ -243,7 +243,7 @@ Expertiza::Application.routes.draw do
     collection do
       get :copy
       get :edit
-      get :index
+      get :list
       post :list_questionnaires
       get :new_quiz
       post :select_questionnaire_type
@@ -312,7 +312,7 @@ Expertiza::Application.routes.draw do
 
   resources :roles do
     collection do
-      get :index
+      get :list
       post ':id', action: :update
     end
   end
@@ -331,7 +331,7 @@ Expertiza::Application.routes.draw do
       get :add_signup_topics_staggered
       get :delete_signup
       get :edit
-      get :index
+      get :list
       get :signup_topics
       get :signup
       get :sign_up
@@ -342,7 +342,7 @@ Expertiza::Application.routes.draw do
 
   resources :site_controllers do
     collection do
-      get 'index'
+      get 'list'
       get 'new_called'
     end
   end
@@ -350,20 +350,20 @@ Expertiza::Application.routes.draw do
   resources :statistics do
     collection do
       get :list_surveys
-      get :index
+      get :list
       get :view_responses
     end
   end
 
   resources :student_review do
     collection do
-      get :index
+      get :list
     end
   end
 
   resources :student_task do
     collection do
-      get :index
+      get :list
       get :view
     end
   end
@@ -393,7 +393,7 @@ Expertiza::Application.routes.draw do
 
   resources :suggestion do
     collection do
-      get :index
+      get :list
     end
   end
 
@@ -405,7 +405,7 @@ Expertiza::Application.routes.draw do
 
   resources :survey_deployment do
     collection do
-      get :index
+      get :list
       get :delete
       get :reminder_thread
     end
@@ -419,13 +419,13 @@ Expertiza::Application.routes.draw do
 
   resources :system_settings do
     collection do
-      get :index
+      get :list
     end
   end
 
   resources :teams do
     collection do
-      get :index
+      get :list
       post ':id', action: :update
     end
   end
@@ -433,13 +433,13 @@ Expertiza::Application.routes.draw do
   resources :tree_display do
     collection do
       get ':action'
-      post 'index'
+      post 'list'
     end
   end
 
   resources :users, constraints: {id: /\d+/} do
     collection do
-      get :index
+      get :list
       post ':id', action: :update
       get :show_selection
       get :auto_complete_for_user_name
@@ -454,14 +454,14 @@ Expertiza::Application.routes.draw do
   end
 
   get '/users/show_selection', controller: :users, action: :show_selection
-  get '/users/index', controller: :users, action: :index
+  get '/users/list', controller: :users, action: :list
   get '/menu/*name', controller: :menu_items, action: :link
   get ':page_name', controller: :content_pages, action: :view, method: :get
   get '/submitted_content/submit_hyperlink' => 'submitted_content#submit_hyperlink'
 
   root to: 'content_pages#view', page_name: 'home'
 
-  get 'users/index', :to => 'users#index'
+  get 'users/list', :to => 'users#list'
 
   get '/submitted_content/remove_hyperlink', :to => 'submitted_content#remove_hyperlink'
   get '/submitted_content/submit_hyperlink', :to => 'submitted_content#submit_hyperlink'

@@ -285,7 +285,7 @@ module WikiHelper
                   #select the line containing the URL for the page
                   pageArray = urls[3].split("\"")
                   # select the URL itself from the line of text
-                  # if it exists within the pages index, we don't need it
+                  # if it exists within the pages list, we don't need it
                   # otherwise include it in the kept lines
                   if !pages.index(pageArray[0])
                     line_items_kept << item

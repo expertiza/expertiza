@@ -97,7 +97,7 @@ class MenuItemsController < ApplicationController
     if params[:parent_id] != @menu_item.parent_id
       do_repack = true
       repack_for = @menu_item.parent_id
-      # Put at the end of new parent's index
+      # Put at the end of new parent's list
       params[:menu_item][:seq] = MenuItem.next_seq(params[:menu_item][:parent_id])
   else
     do_repack = false

@@ -28,7 +28,7 @@ class StudentTaskControllerTest < ActionController::TestCase
     @request.session[:user] = User.find(users(:student1).id)
     user = User.find(users(:student1).id)
     if @request.session[:user].is_new_user = true
-      post :index, { :id => users(:student1).id }
+      post :list, { :id => users(:student1).id }
       assert_redirected_to  'eula/display'
     end
   end
@@ -225,20 +225,20 @@ class StudentTaskControllerTest < ActionController::TestCase
   def test_valid_newstudent_student_list
     @request.session[:user] = User.find(users(:student2).id)
     @participant = AssignmentParticipant.find(participants(:par2).id)
-    get :index
+    get :list
     assert_redirected_to "/eula/display"
   end
 
   #FN: JM - 02
   #Here the test case goes down the Happy path and checks that the logged in user is not a first time user
-  # and if so then should display the correct index of tasks. This is asserted by checking for the known html
+  # and if so then should display the correct list of tasks. This is asserted by checking for the known html 
   #elements that get rendered
   def test_valid_oldstudent_student_list
     @request.session[:user] = User.find(users(:student1).id)
     @participant = AssignmentParticipant.find(participants(:par1).id)
-    get :index
-    assert_template :index
-    assert_select "title","student_task | index"
+    get :list
+    assert_template :list
+    assert_select "title","student_task | list"
   end
 
   #FN: JM - 03

@@ -5,7 +5,7 @@ class QuestionsController < ApplicationController
   # based on either a numeric value or a true/false
   # state.
 
-  # Default action, same as index
+  # Default action, same as list
   def index
     list
     render :action => 'list'
@@ -13,7 +13,7 @@ class QuestionsController < ApplicationController
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
-    :redirect_to => { :action => :index }
+    :redirect_to => { :action => :list }
 
 
   # List all questions in paginated view
@@ -80,7 +80,7 @@ class QuestionsController < ApplicationController
   end
 
   # Remove question from database and
-  # return to index
+  # return to list
   def destroy
     Question.find(params[:id]).destroy
     redirect_to :action => 'list'

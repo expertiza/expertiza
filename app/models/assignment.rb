@@ -96,7 +96,7 @@ class Assignment < ActiveRecord::Base
     # (using the fact that each contributor is associated with a topic)
     contributor_set=reject_by_least_reviewed(contributor_set)
 
-    # Add topics for all remaining submissions to a index of available topics for review
+    # Add topics for all remaining submissions to a list of available topics for review
     candidate_topics = Set.new
     contributor_set.each { |contributor|
       candidate_topics.add(signed_up_topic(contributor))
@@ -177,7 +177,7 @@ class Assignment < ActiveRecord::Base
     end
     raise "There are no more submissions to take quiz on for this #{work}." if contributor_set.empty?
     #flash[:error] = "There are no more submissions to take quiz on for this #{work}."
-    #redirect_to :controller => 'student_review', :action => 'index', :id => reviewer.id
+    #redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
     #return
     #end
     # Reviewer/quiz taker can take quiz for each submission only once

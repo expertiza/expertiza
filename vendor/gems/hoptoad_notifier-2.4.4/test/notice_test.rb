@@ -303,7 +303,7 @@ class NoticeTest < Test::Unit::TestCase
     assert notice.ignore?
   end
 
-  should "not raise without an ignore index" do
+  should "not raise without an ignore list" do
     notice = build_notice(:ignore => nil, :ignore_by_filters => nil)
     assert_nothing_raised do
       notice.ignore?

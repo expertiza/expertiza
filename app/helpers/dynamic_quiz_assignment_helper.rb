@@ -77,7 +77,7 @@ module DynamicQuizAssignmentHelper
   def self.find_submissions_in_current_cycle()
 
     #
-    #  If the user selected a topic, then filter by that topic first to get a index of all
+    #  If the user selected a topic, then filter by that topic first to get a list of all
     #  submissions that have been made for this particular assignment. The 'AssignmentParticipant'
     #  model represents a submission for an assignment (among other things).
     #
@@ -106,7 +106,7 @@ module DynamicQuizAssignmentHelper
         end
     end
 
-    # Sort and return the index of submissions by the number of reviews that they have.
+    # Sort and return the list of submissions by the number of reviews that they have.
     sorted_quiz_count =  @submission_quiz_count.sort {|a, b| a[1]<=>b[1]}
     return sorted_quiz_count
   end

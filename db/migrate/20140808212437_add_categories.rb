@@ -13,3 +13,4 @@ class AddCategories < ActiveRecord::Migration
     remove_column :nodes, :depth
    end
  end
+

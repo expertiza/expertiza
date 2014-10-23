@@ -15,7 +15,7 @@ class SignUpSheetController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'signup_topics', 'create_signup', 'destroy_signup', 'index', 'show_team'
+    when 'index_signup', 'create_signup', 'destroy_signup', 'show_team'
       current_role_name.eql? 'Student'
     else
       ['Instructor',
@@ -31,7 +31,7 @@ class SignUpSheetController < ApplicationController
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [:destroy, :create, :update],
-    :redirect_to => {:action => :index}
+    :redirect_to => {:action => :index_signup}
 
   # Prepares the form for adding a new topic. Used in conjuntion with create
   def new
@@ -159,7 +159,7 @@ class SignUpSheetController < ApplicationController
   #Contains links that let an admin or Instructor edit, delete, view enrolled/waitlisted members for each topic
   #Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics
   #can have different deadlines.
-  def add_signup_topics
+  def index
     load_add_signup_topics(params[:id])
 
     if @assignment.staggered_deadline
@@ -197,7 +197,8 @@ class SignUpSheetController < ApplicationController
     @assignment = Assignment.find(params[:id])
   end
 
-  def index
+  # Shows a list of topics to the student and provides links so they can sign up for one
+  def index_signup
     @assignment_id = params[:id]
     @sign_up_topics = SignUpTopic.where( ['assignment_id = ?', params[:id]]).all
     @slots_filled = SignUpTopic.find_slots_filled(params[:id])
@@ -236,7 +237,7 @@ class SignUpSheetController < ApplicationController
 
     signup_team(assignment_id, user.id, topic_id)
 
-    redirect_to :action => 'index', :id => params[:assignment_id]
+    redirect_to :action => 'index_signup', :id => params[:assignment_id]
   end
 
   # This function is used to delete a previous signup
@@ -247,7 +248,7 @@ class SignUpSheetController < ApplicationController
 
     SignUpTopic.reassign_topic(user.id, assignment_id, topic_id)
 
-    redirect_to :action => 'index', :id => params[:assignment_id]
+    redirect_to :action => 'index_signup', :id => params[:assignment_id]
   end
 
   def signup_team(assignment_id, user_id, topic_id)
@@ -410,7 +411,7 @@ class SignUpSheetController < ApplicationController
       end
     end
 
-    redirect_to :action => 'index', :id => params[:assignment_id]
+    redirect_to :action => 'index_signup', :id => params[:assignment_id]
   end
 
   #this function is used to prevent injection attacks.  A topic *dependent* on another topic cannot be
@@ -574,7 +575,7 @@ class SignUpSheetController < ApplicationController
 
 private
   def redirect_to_sign_up(assignment_id)
-    redirect_to :action => :add_signup_topics, :id => assignment_id
+    redirect_to :action => :index, :id => assignment_id
   end
 
   def get_staggered_deadlines(assignment)

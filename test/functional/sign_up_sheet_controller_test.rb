@@ -19,7 +19,7 @@ class SignUpSheetControllerTest < ActionController::TestCase
   end
 
   test "should_show_add_signup_topics" do
-    get :add_signup_topics, :id => assignments(:assignment2).id
+    get :index, :id => assignments(:assignment2).id
     assert_response :success
   end
 

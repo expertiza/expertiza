@@ -1,0 +1,49 @@
+<h1>Signup sheet for <%= Assignment.find(params[:id]).name %> assignment</h1>
+<% @assignment = Assignment.find(params[:id]) %>
+<table class="general">
+  <tr><%= render :partial => 'table_header' %></tr>
+
+  <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
+    <b>Your topic(s):</b>
+    <% for selected_topic in @selected_topics %>
+      <br/><%= selected_topic.topic_name %>
+    <% if selected_topic.is_waitlisted == true %>
+      <font color='red'>(waitlisted)</font>
+    <% end %>
+  <% end %>
+<% end %>
+<br/><br/>
+
+<% i=1 %>
+<% for topic in @sign_up_topics %>
+  <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
+    <% for selected_topic in @selected_topics %>
+      <% if selected_topic.topic_id == topic.id and !selected_topic.is_waitlisted %>
+        <tr bgcolor="yellow">
+        <% elsif selected_topic.topic_id == topic.id and selected_topic.is_waitlisted%>
+          <tr bgcolor="lightgray">
+          <% else %>
+            <tr>
+            <% end %>
+          <% end %>
+        <% else %>
+          <tr>
+          <% end %>
+
+          <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic} %>
+
+
+        </tr>
+        <% i=i+1 %>
+      <% end %>
+
+    </table>
+
+
+
+    <%
+        session[:return_to] = request.url
+      %>
+    <br/><br/>
+    <a href="javascript:history.back()">Back</a>
+    <br/>

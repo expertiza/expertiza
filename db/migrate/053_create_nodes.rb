@@ -1,4 +1,4 @@
-class CreateNodes < ActiveRecord::Migration
+dddddddddddddclass CreateNodes < ActiveRecord::Migration
   def self.up
     create_table :nodes do |t|
       t.column :parent_id, :integer

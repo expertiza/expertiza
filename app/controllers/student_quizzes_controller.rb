@@ -184,10 +184,6 @@ def grade_essays
 end
 
 def graded?(response, question)
-  if Score.where(question_id: question.id, response_id:  response.id).first
-    return true
-  else
-    return false
-  end
+  return (Score.where(question_id: question.id, response_id:  response.id).first)
 end
 end

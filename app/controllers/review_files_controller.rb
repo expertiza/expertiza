@@ -65,7 +65,7 @@ class ReviewFilesController < ApplicationController
   end
 
 
-  # This method computes the list of all files submitted by the participant along
+  # This method computes the index of all files submitted by the participant along
   # with all the versions the files are present in. This method needs the following
   # two parameters:
   # params[:participant_id], Needs params[:stage]
@@ -86,7 +86,7 @@ class ReviewFilesController < ApplicationController
     end
 
     auth=Hash.new
-    # For each file in the above list find out the various versions in which it occurs
+    # For each file in the above index find out the various versions in which it occurs
     @file_version_map = Hash.new
     all_review_files.each_with_index do |each_file,index|
       @file_version_map[File.basename(each_file.filepath)] = Array.new unless

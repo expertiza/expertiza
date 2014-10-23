@@ -19,7 +19,7 @@ class SignupControllerTest < ActionController::TestCase
   end
 
   test "should_be_able_to_view_signup_topics" do
-    get :list, :id => assignments(:assignment1).id
+    get :index, :id => assignments(:assignment1).id
     assert_response :success
   end
 
@@ -27,12 +27,12 @@ class SignupControllerTest < ActionController::TestCase
     get :delete_signup, {:id => sign_up_topics(:Topic1).id,:assignment_id => assignments(:assignment_project1).id }
     assert_response :redirect
     get :sign_up, {:id => sign_up_topics(:Topic1).id,:assignment_id => assignments(:assignment_project1).id }
-    assert_redirected_to :action => "list", :id =>  assignments(:assignment_project1).id
+    assert_redirected_to :action => "index", :id =>  assignments(:assignment_project1).id
   end
 
   test "should_be_able_to_drop_topic" do
     get :delete_signup, {:id => sign_up_topics(:Topic1).id,:assignment_id => assignments(:assignment_project1).id }
-    assert_redirected_to :action => "list", :id =>  assignments(:assignment_project1).id
+    assert_redirected_to :action => "index", :id =>  assignments(:assignment_project1).id
   end
 
 end

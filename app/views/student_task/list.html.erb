@@ -29,7 +29,7 @@
           if selected_topics.nil? || selected_topics.length == 0
             # there is a signup sheet and user/team hasn't signed up yet, produce a link to do so
             controller = "sign_up_sheet"
-            action = "list"
+            action = "index"
             id = participant.parent_id
             stage = "signup"
             end
@@ -39,7 +39,7 @@
           action = "edit"
         elsif stage == "review" or stage == "rereview" or stage == "metareview"
           controller = "student_review"
-          action = "list"
+          action = "index"
         end
       %>
 
@@ -61,7 +61,7 @@
       action = "edit"
     elsif stage == "review" or stage == "rereview" or stage == "metareview"
       controller = "student_review"
-      action = "list"
+      action = "index"
     end
   %>
 

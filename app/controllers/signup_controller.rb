@@ -170,7 +170,7 @@ class SignupController < ApplicationController
         users_team = SignedUpUser.find_team_users(assignment_id,(session[:user].id))
         signup_record = SignedUpUser.where(topic_id: topic_id, creator_id:  users_team[0].t_id).first
 
-        #if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
+        #if a confirmed slot is deleted then push the first waiting index member to confirmed slot if someone is on the waitlist
         if signup_record.is_waitlisted == false
           #find the first wait listed user if exists
           first_waitlisted_user = SignedUpUser.where(topic_id: topic_id, is_waitlisted:  true).first

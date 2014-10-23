@@ -17,7 +17,7 @@ class AssignmentNode < Node
   #   user_id: instructor id for assignment
   #   parent_id: course_id if subset
 
-  # returns: list of AssignmentNodes based on query
+  # returns: index of AssignmentNodes based on query
   def self.get(sortvar = nil, sortorder =nil, user_id = nil, show = nil, parent_id = nil, search=nil)
     if show
       if User.find(user_id).role.name != "Teaching Assistant"

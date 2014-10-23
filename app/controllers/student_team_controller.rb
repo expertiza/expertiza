@@ -115,7 +115,7 @@ class StudentTeamController < ApplicationController
           if non_waitlisted_users.length < max_choosers
             first_waitlisted_user = SignedUpUser.where( {:topic_id => signup_topic_id, :is_waitlisted => true}).first
 
-            #moving the waitlisted user into the confirmed signed up users list
+            #moving the waitlisted user into the confirmed signed up users index
             if !first_waitlisted_user.nil?
               first_waitlisted_user.is_waitlisted = false
               first_waitlisted_user.save

@@ -85,7 +85,7 @@ class SignUpTopic < ActiveRecord::Base
       users_team = SignedUpUser.find_team_users(assignment_id, session_user_id)
       signup_record = SignedUpUser.where(topic_id: topic_id, creator_id:  users_team[0].t_id).first
       assignment = Assignment.find(assignment_id)
-      #if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
+      #if a confirmed slot is deleted then push the first waiting index member to confirmed slot if someone is on the waitlist
       if(!assignment.is_intelligent?)
         if signup_record.is_waitlisted == false
           #find the first wait listed user if exists

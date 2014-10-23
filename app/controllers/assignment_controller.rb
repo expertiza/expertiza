@@ -754,7 +754,7 @@ class AssignmentController < ApplicationController
       def delete
         @assignment = Assignment.find(params[:id])
 
-        # If the assignment is already deleted, go back to the list of assignments
+        # If the assignment is already deleted, go back to the index of assignments
         if @assignment
           begin
             #delete from delayed_jobs queue

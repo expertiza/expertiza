@@ -1,5 +1,5 @@
 class StudentQuizzesController < ApplicationController
-  def list
+  def index
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
 

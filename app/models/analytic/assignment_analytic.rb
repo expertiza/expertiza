@@ -77,13 +77,13 @@ module AssignmentAnalytic
   #return students that are participating in the assignment
   #assumptions: all team_participant for all of the teams are in assignment participant
   #def students
-  #  list = Array.new
+  #  index = Array.new
   #  self.participants.each do |participant|
   #    if participant.user.role_id == Role.student.id
-  #      list << participant
+  #      index << participant
   #    end
   #  end
-  #  list
+  #  index
   #end
 
   #return all questionnaire types associated this assignment
@@ -137,14 +137,14 @@ module AssignmentAnalytic
   #====unused in version 1=========#
   #========== word count ==========#
   #def review_word_counts
-  #  list = Array.new
+  #  index = Array.new
   #  self.teams.each do |team|
-  #    list << team.total_word_count
+  #    index << team.total_word_count
   #  end
-  #  if (list.empty?)
+  #  if (index.empty?)
   #    [0]
   #  else
-  #    list
+  #    index
   #  end
   #end
   #
@@ -169,14 +169,14 @@ module AssignmentAnalytic
 
   #========== character count ==========#
   #def review_character_counts
-  #  list = Array.new
+  #  index = Array.new
   #  self.teams.each do |team|
-  #    list << team.total_character_count
+  #    index << team.total_character_count
   #  end
-  #  if (list.empty?)
+  #  if (index.empty?)
   #    [0]
   #  else
-  #    list
+  #    index
   #  end
   #end
   #

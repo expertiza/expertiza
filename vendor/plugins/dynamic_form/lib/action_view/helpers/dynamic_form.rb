@@ -149,7 +149,7 @@ module ActionView
       #   or an empty string to avoid the header message altogether. (Default: "X errors
       #   prohibited this object from being saved").
       # * <tt>:message</tt> - The explanation message after the header message and before
-      #   the error list.  Pass +nil+ or an empty string to avoid the explanation message
+      #   the error index.  Pass +nil+ or an empty string to avoid the explanation message
       #   altogether. (Default: "There were problems with the following fields:").
       #
       # To specify the display for one object, you simply provide its name as a parameter.
@@ -165,7 +165,7 @@ module ActionView
       # this is a MyKlass::User object, this will use "user" as the name in the String. This
       # is taken from MyKlass::User.model_name.human, which can be overridden.
       #
-      # To specify more than one object, you simply list them; optionally, you can add an extra <tt>:object_name</tt> parameter, which
+      # To specify more than one object, you simply index them; optionally, you can add an extra <tt>:object_name</tt> parameter, which
       # will be the name used in the header message:
       #
       #   error_messages_for 'user_common', 'user', :object_name => 'user'

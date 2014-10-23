@@ -10,7 +10,7 @@ class StatisticsController < ApplicationController
     @surveys = SurveyQuestionnaire.all
   end
 
-  def list #list deployments for the survey
+  def list #index deployments for the survey
     @survey_id = params[:id]
     @deployment = SurveyDeployment.where(course_evaluation_id: @survey_id).map{|u| [u.start_date.to_s+" - "+u.end_date.to_s,u.id] }
   end

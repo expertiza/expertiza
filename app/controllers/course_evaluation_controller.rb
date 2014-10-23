@@ -3,7 +3,7 @@ class CourseEvaluationController < ApplicationController
     current_role_name.eql?("Student")
   end
 
-  def list #list course evaluations for a user
+  def list #index course evaluations for a user
     unless session[:user] #Check for a valid user
       redirect_to '/'
       return

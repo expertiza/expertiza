@@ -15,7 +15,7 @@ class  Rubric < Questionnaire
   validates_numericality_of :min_question_score
 
   def update_mapping
-    redirect_to :action => 'list' ,:type_id=> type_id
+    redirect_to :action => 'index' ,:type_id=> type_id
   end
 
   end

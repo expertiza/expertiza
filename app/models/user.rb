@@ -226,19 +226,19 @@ class User < ActiveRecord::Base
     users = User.all
     users.each {|user|
       tcsv = Array.new
-      if (options["personal_details"])
+      if (options["personal_details"] == "true")
         tcsv.push(user.name, user.fullname, user.email)
       end
-      if (options["role"])
+      if (options["role"] == "true")
         tcsv.push(user.role.name)
       end
-      if (options["parent"])
+      if (options["parent"] == "true")
         tcsv.push(user.parent.name)
       end
-      if (options["email_options"])
+      if (options["email_options"] == "true")
         tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails)
       end
-      if (options["handle"])
+      if (options["handle"] == "true")
         tcsv.push(user.handle)
       end
       csv << tcsv
@@ -251,19 +251,19 @@ class User < ActiveRecord::Base
 
   def self.get_export_fields(options)
     fields = Array.new
-    if (options["personal_details"])
+    if (options["personal_details"] == "true")
       fields.push("name", "full name", "email")
     end
-    if (options["role"])
+    if (options["role"] == "true")
       fields.push("role")
     end
-    if (options["parent"])
+    if (options["parent"] == "true")
       fields.push("parent")
     end
-    if (options["email_options"])
+    if (options["email_options"] == "true")
       fields.push("email on submission", "email on review", "email on metareview")
     end
-    if (options["handle"])
+    if (options["handle"] == "true")
       fields.push("handle")
     end
     return fields

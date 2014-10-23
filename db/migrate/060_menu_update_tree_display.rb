@@ -21,9 +21,9 @@ class MenuUpdateTreeDisplay < ActiveRecord::Migration
      site_controller = SiteController.find_or_create_by_name('survey_deployment')
      site_controller.permission_id = permission1.id
      site_controller.save
-     action = ControllerAction.find(:first, :conditions => ['site_controller_id = ? and name = ?',site_controller.id,'list'])  
+     action = ControllerAction.find(:first, :conditions => ['site_controller_id = ? and name = ?',site_controller.id,'index'])
      if action == nil
-       action = ControllerAction.create(:name => 'list', :site_controller_id => site_controller.id)
+       action = ControllerAction.create(:name => 'index', :site_controller_id => site_controller.id)
      end
      menuParent = MenuItem.create(:parent_id => nil, :name => 'Survey Deployments', :label => 'Survey Deployments', :seq => 3, :controller_action_id =>action.id )
      
@@ -40,7 +40,7 @@ class MenuUpdateTreeDisplay < ActiveRecord::Migration
      site_controller.permission_id = permission1.id
      site_controller.builtin = 0
      site_controller.save
-     action = ControllerAction.create(:name => 'list',:site_controller_id => site_controller.id)
+     action = ControllerAction.create(:name => 'index',:site_controller_id => site_controller.id)
      action.save
      
      menu = MenuItem.find_by_label('Administration')
@@ -65,7 +65,7 @@ class MenuUpdateTreeDisplay < ActiveRecord::Migration
     Role.rebuild_cache
     
     site_controller = SiteController.find_by_name('assignment')
-    action = ControllerAction.find(:first, :conditions => ['site_controller_id = ? and name = "list"',site_controller.id])    
+    action = ControllerAction.find(:first, :conditions => ['site_controller_id = ? and name = "index"',site_controller.id])
     menuParent = MenuItem.create(:name=> 'assignments', :label => 'Assignment Creation', :controller_action_id => action.id, :seq => 4)
     menuParent.save
   end

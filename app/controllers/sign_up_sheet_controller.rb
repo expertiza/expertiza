@@ -16,7 +16,7 @@ class SignUpSheetController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'signup_topics', 'sign_up', 'delete_signup', 'list', 'show_team'
+    when 'signup_topics', 'sign_up', 'delete_signup', 'index', 'show_team'
       current_role_name.eql? 'Student'
     else
       ['Instructor',
@@ -32,7 +32,7 @@ class SignUpSheetController < ApplicationController
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [:destroy, :create, :update],
-    :redirect_to => {:action => :list}
+    :redirect_to => {:action => :index}
 
   # Prepares the form for adding a new topic. Used in conjuntion with create
   def new
@@ -212,7 +212,7 @@ class SignUpSheetController < ApplicationController
       end
 
       #Seems like this function is similar to the above function> we are not quite sure what publishing rights mean. Seems like
-      #the values for the last column in http://expertiza.ncsu.edu/student_task/list are sourced from here
+      #the values for the last column in http://expertiza.ncsu.edu/student_task/index are sourced from here
       def view_publishing_rights
         load_add_signup_topics(params[:id])
       end

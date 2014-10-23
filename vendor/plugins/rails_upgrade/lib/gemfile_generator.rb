@@ -42,7 +42,7 @@ module Rails
         @gems = []
       end
       
-      # Receive a call to add a gem to the list
+      # Receive a call to add a gem to the index
       def gem(name, options={})
         data = {}
         

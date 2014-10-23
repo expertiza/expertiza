@@ -67,7 +67,7 @@ namespace :rails do
       end
 
       puts
-      puts "This is a list of the files analyzed and backed up (if they existed);\nyou will probably not want the generator to replace them since\nyou probably modified them (but now they're safe if you accidentally do!)."
+      puts "This is a index of the files analyzed and backed up (if they existed);\nyou will probably not want the generator to replace them since\nyou probably modified them (but now they're safe if you accidentally do!)."
       puts
 
       files.each do |f|

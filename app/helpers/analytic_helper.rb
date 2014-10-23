@@ -1,4 +1,4 @@
-#these 4 helpers consist of the list of plot options that are available for the graph type
+#these 4 helpers consist of the index of plot options that are available for the graph type
 module LineGraphHelper
   #development note
   # 1)method for generate the data packet has already been - completed: helpers/chart.rb

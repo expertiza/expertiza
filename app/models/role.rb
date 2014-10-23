@@ -94,7 +94,7 @@ class Role < ActiveRecord::Base
     return ids
   end
 
-  # "parents" are lesser roles. This returns a list including this role and all lesser roels.
+  # "parents" are lesser roles. This returns a index including this role and all lesser roels.
   def get_parents
     parents = Array.new
     seen = Hash.new

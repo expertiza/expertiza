@@ -78,7 +78,7 @@ class UsersControllerTest < ActionController::TestCase
     numUsers = User.count
     post :destroy,:id => user.id, :force => 1
     assert_response :redirect
-    assert_redirected_to :action => 'list'
+    assert_redirected_to :action => 'index'
     assert_equal numUsers-1, User.count
   end
   
@@ -92,7 +92,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   def test_should_get_data_and_index
-    get :list, :letter => 's', :page => 2, :num_users => 1
+    get :index, :letter => 's', :page => 2, :num_users => 1
 
     assert_response :success
     assert assigns(:users)
@@ -100,7 +100,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   def test_should_not_show_pagination_links_if_all_users_are_shown
-    get :list, :letter => 's', :num_users => 4
+    get :index, :letter => 's', :num_users => 4
 
     assert_response :success
     assert assigns(:users)
@@ -109,13 +109,13 @@ class UsersControllerTest < ActionController::TestCase
 
   def test_search_by_username
     #search for something that is there
-    get :list, :letter => 'tud10', :num_users => 4, :search_by => 1
+    get :index, :letter => 'tud10', :num_users => 4, :search_by => 1
     assert_response :success
     assert assigns(:users)
     assert_not_equal assigns(:users).size, 0
 
     #search for something that is not there
-    get :list, :letter => 'tgdfgdfsdafa0', :num_users => 4, :search_by => 1
+    get :index, :letter => 'tgdfgdfsdafa0', :num_users => 4, :search_by => 1
     assert_response :success
     assert assigns(:users)
     assert_equal assigns(:users).size, 0
@@ -123,13 +123,13 @@ class UsersControllerTest < ActionController::TestCase
 
   def test_search_by_fullname
     #search for something that is there
-    get :list, :letter => '9_ful', :num_users => 4, :search_by => 2
+    get :index, :letter => '9_ful', :num_users => 4, :search_by => 2
     assert_response :success
     assert assigns(:users)
     assert_not_equal assigns(:users).size, 0
 
     #search for something that is not there
-    get :list, :letter => 'sdgfbfvrs', :num_users => 4, :search_by => 2
+    get :index, :letter => 'sdgfbfvrs', :num_users => 4, :search_by => 2
     assert_response :success
     assert assigns(:users)
     assert_equal assigns(:users).size, 0
@@ -137,13 +137,13 @@ class UsersControllerTest < ActionController::TestCase
 
   def test_search_by_email
     #search for something that is there
-    get :list, :letter => '9@mailinator.com', :num_users => 4, :search_by => 3
+    get :index, :letter => '9@mailinator.com', :num_users => 4, :search_by => 3
     assert_response :success
     assert assigns(:users)
     assert_not_equal assigns(:users).size, 0
 
     #search for something that is not there
-    get :list, :letter => 'fsfgdfvxzcff', :num_users => 4, :search_by => 3
+    get :index, :letter => 'fsfgdfvxzcff', :num_users => 4, :search_by => 3
     assert_response :success
     assert assigns(:users)
     assert_equal assigns(:users).size, 0

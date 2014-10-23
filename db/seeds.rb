@@ -97,25 +97,25 @@ ContentPage.create(:title => 'Credits and License', :name => 'credits', :markup_
 ###### controller_actions
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('content_pages').id, :name => 'view_default', :permission_id => Permission.find_by_name('public pages - view').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('content_pages').id, :name => 'view', :permission_id => Permission.find_by_name('public pages - view').id, :url_to_use => '')
-ControllerAction.create(:site_controller_id => SiteController.find_by_name('content_pages').id, :name => 'list', :permission_id => nil, :url_to_use => '')
-ControllerAction.create(:site_controller_id => SiteController.find_by_name('controller_actions').id, :name => 'list', :permission_id => nil, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('content_pages').id, :name => 'index', :permission_id => nil, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('controller_actions').id, :name => 'index', :permission_id => nil, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('auth').id, :name => 'login', :permission_id => Permission.find_by_name('public actions - execute').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('auth').id, :name => 'logout', :permission_id => Permission.find_by_name('public actions - execute').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('auth').id, :name => 'login_failed', :permission_id => Permission.find_by_name('public actions - execute').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('menu_items').id, :name => 'link', :permission_id => Permission.find_by_name('public actions - execute').id, :url_to_use => '')
-ControllerAction.create(:site_controller_id => SiteController.find_by_name('menu_items').id, :name => 'list', :permission_id => nil, :url_to_use => '')
-ControllerAction.create(:site_controller_id => SiteController.find_by_name('permissions').id, :name => 'list', :permission_id => nil, :url_to_use => '')
-ControllerAction.create(:site_controller_id => SiteController.find_by_name('roles').id, :name => 'list', :permission_id => nil, :url_to_use => '')
-ControllerAction.create(:site_controller_id => SiteController.find_by_name('site_controllers').id, :name => 'list', :permission_id => nil, :url_to_use => '')
-ControllerAction.create(:site_controller_id => SiteController.find_by_name('system_settings').id, :name => 'list', :permission_id => nil, :url_to_use => '')
-ControllerAction.create(:site_controller_id => SiteController.find_by_name('users').id, :name => 'list', :permission_id => Permission.find_by_name('administer assignments').id, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('menu_items').id, :name => 'index', :permission_id => nil, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('permissions').id, :name => 'index', :permission_id => nil, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('roles').id, :name => 'index', :permission_id => nil, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('site_controllers').id, :name => 'index', :permission_id => nil, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('system_settings').id, :name => 'index', :permission_id => nil, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('users').id, :name => 'index', :permission_id => Permission.find_by_name('administer assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('users').id, :name => 'keys', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('admin').id, :name => 'list_instructors', :permission_id => Permission.find_by_name('administer instructors').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('admin').id, :name => 'list_administrators', :permission_id => Permission.find_by_name('administer pg').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('admin').id, :name => 'list_super_administrators', :permission_id => Permission.find_by_name('administer goldberg').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('course').id, :name => 'list_folders', :permission_id => Permission.find_by_name('administer assignments').id, :url_to_use => '')
-ControllerAction.create(:site_controller_id => SiteController.find_by_name('assignment').id, :name => 'list', :permission_id => Permission.find_by_name('administer assignments').id, :url_to_use => '')
-ControllerAction.create(:site_controller_id => SiteController.find_by_name('questionnaire').id, :name => 'list', :permission_id => Permission.find_by_name('administer assignments').id, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('assignment').id, :name => 'index', :permission_id => Permission.find_by_name('administer assignments').id, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('questionnaire').id, :name => 'index', :permission_id => Permission.find_by_name('administer assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('questionnaire').id, :name => 'create_questionnaire', :permission_id => Permission.find_by_name('administer assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('questionnaire').id, :name => 'edit_questionnaire', :permission_id => Permission.find_by_name('administer assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('questionnaire').id, :name => 'copy_questionnaire', :permission_id => Permission.find_by_name('administer assignments').id, :url_to_use => '')
@@ -126,26 +126,26 @@ ControllerAction.create(:site_controller_id => SiteController.find_by_name('part
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('participants').id, :name => 'list_courses', :permission_id => Permission.find_by_name('administer assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('participants').id, :name => 'list_assignments', :permission_id => Permission.find_by_name('administer assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('participants').id, :name => 'change_handle', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
-ControllerAction.create(:site_controller_id => SiteController.find_by_name('institution').id, :name => 'list', :permission_id => Permission.find_by_name('administer pg').id, :url_to_use => '')
-ControllerAction.create(:site_controller_id => SiteController.find_by_name('student_task').id, :name => 'list', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('institution').id, :name => 'index', :permission_id => Permission.find_by_name('administer pg').id, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('student_task').id, :name => 'index', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('profile').id, :name => 'edit', :permission_id => nil, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('survey_response').id, :name => 'create', :permission_id => Permission.find_by_name('public actions - execute').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('survey_response').id, :name => 'submit', :permission_id => nil, :url_to_use => '')
-ControllerAction.create(:site_controller_id => SiteController.find_by_name('team').id, :name => 'list', :permission_id => nil, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('team').id, :name => 'index', :permission_id => nil, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('team').id, :name => 'list_assignments', :permission_id => nil, :url_to_use => '')
-ControllerAction.create(:site_controller_id => SiteController.find_by_name('teams_users').id, :name => 'list', :permission_id => nil, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('teams_users').id, :name => 'index', :permission_id => nil, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('impersonate').id, :name => 'start', :permission_id => nil, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('impersonate').id, :name => 'impersonate', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
-ControllerAction.create(:site_controller_id => SiteController.find_by_name('review_mapping').id, :name => 'list', :permission_id => nil, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('review_mapping').id, :name => 'index', :permission_id => nil, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('review_mapping').id, :name => 'add_dynamic_reviewer', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('review_mapping').id, :name => 'release_reservation', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('review_mapping').id, :name => 'show_available_submissions', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('review_mapping').id, :name => 'assign_reviewer_dynamically', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('review_mapping').id, :name => 'assign_metareviewer_dynamically', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('grades').id, :name => 'view_my_scores', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
-ControllerAction.create(:site_controller_id => SiteController.find_by_name('survey_deployment').id, :name => 'list', :permission_id => nil, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('survey_deployment').id, :name => 'index', :permission_id => nil, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('statistics').id, :name => 'list_surveys', :permission_id => nil, :url_to_use => '')
-ControllerAction.create(:site_controller_id => SiteController.find_by_name('tree_display').id, :name => 'list', :permission_id => nil, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('tree_display').id, :name => 'index', :permission_id => nil, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('tree_display').id, :name => 'drill', :permission_id => nil, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('tree_display').id, :name => 'goto_questionnaires', :permission_id => nil, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('tree_display').id, :name => 'goto_author_feedbacks', :permission_id => nil, :url_to_use => '')
@@ -158,7 +158,7 @@ ControllerAction.create(:site_controller_id => SiteController.find_by_name('tree
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('tree_display').id, :name => 'goto_teammate_reviews', :permission_id => nil, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('tree_display').id, :name => 'goto_metareview_rubrics', :permission_id => nil, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('tree_display').id, :name => 'goto_teammatereview_rubrics', :permission_id => nil, :url_to_use => '')
-ControllerAction.create(:site_controller_id => SiteController.find_by_name('sign_up_sheet').id, :name => 'list', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('sign_up_sheet').id, :name => 'index', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('sign_up_sheet').id, :name => 'signup', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('sign_up_sheet').id, :name => 'delete_signup', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('suggestion').id, :name => 'create', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
@@ -188,9 +188,9 @@ MenuItem.create(:parent_id => nil, :name => 'admin', :label => 'Administration',
 MenuItem.create(:parent_id => nil, :name => 'manage instructor content', :label => 'Manage...', :seq => 3, :content_page_id => nil, 
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('tree_display').id, name:  'drill').first.id)
 MenuItem.create(:parent_id => nil, :name => 'Survey Deployments', :label => 'Survey Deployments', :seq => 4, :content_page_id => nil, 
-                :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('survey_deployment').id, name:  'list').first.id)
+                :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('survey_deployment').id, name:  'index').first.id)
 MenuItem.create(:parent_id => nil, :name => 'student_task', :label => 'Assignments', :seq => 8, :content_page_id => nil, 
-                :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('student_task').id, name:  'list').first.id)
+                :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('student_task').id, name:  'index').first.id)
 MenuItem.create(:parent_id => nil, :name => 'profile', :label => 'Profile', :seq => 9, :content_page_id => nil, 
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('profile').id, name:  'edit').first.id)
 MenuItem.create(:parent_id => nil, :name => 'contact_us', :label => 'Contact Us', :seq => 10, :content_page_id => ContentPage.find_by_name('contact_us').id, 
@@ -202,23 +202,23 @@ MenuItem.create(:parent_id => MenuItem.find_by_name('contact_us').id, :name => '
 MenuItem.create(:parent_id => MenuItem.find_by_name('admin').id, :name => 'setup', :label => 'Setup', :seq => 1, :content_page_id => ContentPage.find_by_name('site_admin').id, 
   :controller_action_id => nil)
 MenuItem.create(:parent_id => MenuItem.find_by_name('admin').id, :name => 'show', :label => 'Show...', :seq => 2, :content_page_id => nil, 
-                :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('users').id, name:  'list').first.id)
+                :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('users').id, name:  'index').first.id)
 MenuItem.create(:parent_id => MenuItem.find_by_name('setup').id, :name => 'setup/roles', :label => 'Roles', :seq => 2, :content_page_id => nil, 
-                :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('roles').id, name:  'list').first.id)
+                :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('roles').id, name:  'index').first.id)
 MenuItem.create(:parent_id => MenuItem.find_by_name('setup').id, :name => 'setup/permissions', :label => 'Permissions', :seq => 3, :content_page_id => nil, 
-                :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('permissions').id, name:  'list').first.id)
+                :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('permissions').id, name:  'index').first.id)
 MenuItem.create(:parent_id => MenuItem.find_by_name('setup').id, :name => 'setup/controllers', :label => 'Controllers / Actions', :seq => 4, :content_page_id => nil, 
-                :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('site_controllers').id, name:  'list').first.id)
+                :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('site_controllers').id, name:  'index').first.id)
 MenuItem.create(:parent_id => MenuItem.find_by_name('setup').id, :name => 'setup/pages', :label => 'Content Pages', :seq => 5, :content_page_id => nil, 
-                :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('content_pages').id, name:  'list').first.id)
+                :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('content_pages').id, name:  'index').first.id)
 MenuItem.create(:parent_id => MenuItem.find_by_name('setup').id, :name => 'setup/menus', :label => 'Menu Editor', :seq => 6, :content_page_id => nil, 
-                :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('menu_items').id, name:  'list').first.id)
+                :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('menu_items').id, name:  'index').first.id)
 MenuItem.create(:parent_id => MenuItem.find_by_name('setup').id, :name => 'setup/system_settings', :label => 'System Settings', :seq => 7, :content_page_id => nil, 
-                :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('system_settings').id, name:  'list').first.id)
+                :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('system_settings').id, name:  'index').first.id)
 MenuItem.create(:parent_id => MenuItem.find_by_name('Survey Deployments').id, :name => 'Statistical Test', :label => 'Statistical Test', :seq => 3, :content_page_id => nil, 
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('statistics').id, name:  'list_surveys').first.id)
 MenuItem.create(:parent_id => MenuItem.find_by_name('manage instructor content').id, :name => 'manage/users', :label => 'Users', :seq => 1, :content_page_id => nil, 
-                :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('users').id, name:  'list').first.id)
+                :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('users').id, name:  'index').first.id)
 MenuItem.create(:parent_id => MenuItem.find_by_name('manage instructor content').id, :name => 'manage/questionnaires', :label => 'Questionnaires', :seq => 2, :content_page_id => nil, 
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('tree_display').id, name:  'goto_questionnaires').first.id)
 MenuItem.create(:parent_id => MenuItem.find_by_name('manage instructor content').id, :name => 'manage/courses', :label => 'Courses', :seq => 3, :content_page_id => nil, 
@@ -242,7 +242,7 @@ MenuItem.create(:parent_id => MenuItem.find_by_name('manage/questionnaires').id,
 MenuItem.create(:parent_id => MenuItem.find_by_name('manage/questionnaires').id, :name => 'manage/questionnaires/course evaluations', :label => 'Course evaluations', :seq => 7, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('tree_display').id, name:  'goto_surveys').first.id)
 MenuItem.create(:parent_id => MenuItem.find_by_name('show').id, :name => 'show/institutions', :label => 'Institutions', :seq => 1, :content_page_id => nil, 
-                :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('institution').id, name:  'list').first.id)
+                :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('institution').id, name:  'index').first.id)
 MenuItem.create(:parent_id => MenuItem.find_by_name('show').id, :name => 'show/super-administrators', :label => 'Super-Administrators', :seq => 2, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('admin').id, name:  'list_super_administrators').first.id)
 MenuItem.create(:parent_id => MenuItem.find_by_name('show').id, :name => 'show/administrators', :label => 'Administrators', :seq => 3, :content_page_id => nil,

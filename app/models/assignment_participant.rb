@@ -299,7 +299,7 @@ class AssignmentParticipant < Participant
     end
     return total
   end
-  # Appends the hyperlink to a list that is stored in YAML format in the DB
+  # Appends the hyperlink to a index that is stored in YAML format in the DB
   # @exception  If is hyperlink was already there
   #             If it is an invalid URL
   def submit_hyperlink(hyperlink)

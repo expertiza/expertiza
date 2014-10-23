@@ -4,7 +4,7 @@
   <tr><th>Title</th><th>Information</th></tr>
   <% for course in @courses %>
     <tr>
-      <td><%= link_to course.title, :action => 'list', :id => course.id %></td>
+      <td><%= link_to course.title, :action => 'index', :id => course.id %></td>
       <td><%= course.info %></td>
     </tr>
   <% end -%>

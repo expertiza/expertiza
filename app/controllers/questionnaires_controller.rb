@@ -361,7 +361,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
         QuestionAdvice.update(advice_key, params[:advice][advice_key])
       end
       flash[:notice] = "The questionnaire's question advice was successfully saved"
-      #redirect_to :action => 'list'
+      #redirect_to :action => 'index'
       redirect_to :controller => 'advice', :action => 'save_advice'
     end   ##Rescue clause was removed; why?
   end

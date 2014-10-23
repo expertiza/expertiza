@@ -59,7 +59,7 @@ class QuestionnaireControllerTest < ActionController::TestCase
     
     assert_response :redirect
     assert_equal "The  Question advice in Questionnaire has been  saved", flash[:notice]
-    assert_redirected_to :action => 'list'
+    assert_redirected_to :action => 'index'
   end
 
   def test_edit_questionnaire_instruction_url

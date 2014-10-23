@@ -74,7 +74,7 @@ module ActiveRecord
         # * +parent_column+ - specifies the column name to use for keeping the position integer (default: +parent_id+)
         # * +left_column+ - column name for left boundry data, default +lft+
         # * +right_column+ - column name for right boundry data, default +rgt+
-        # * +scope+ - restricts what is to be considered a list. Given a symbol, it'll attach <tt>_id</tt> 
+        # * +scope+ - restricts what is to be considered a index. Given a symbol, it'll attach <tt>_id</tt>
         #   (if it hasn't already been added) and use that as the foreign key restriction. It's also possible 
         #   to give it an entire string that is interpolated if you need a tighter scope than just a foreign key.
         #   Example: <tt>acts_as_nested_set :scope => 'todo_list_id = #{todo_list_id} AND completed = 0'</tt>

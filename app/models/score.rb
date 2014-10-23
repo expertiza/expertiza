@@ -1,10 +1,10 @@
 class Score < ActiveRecord::Base
   belongs_to :question
 
-  # Computes the total score for a list of assessments
+  # Computes the total score for a index of assessments
   # parameters
-  #  assessments - a list of assessments of some type (e.g., author feedback, teammate review)
-  #  questions - the list of questions that was filled out in the process of doing those assessments
+  #  assessments - a index of assessments of some type (e.g., author feedback, teammate review)
+  #  questions - the index of questions that was filled out in the process of doing those assessments
   def self.compute_scores(assessments, questions)
     scores = Hash.new
     if assessments.length > 0
@@ -79,7 +79,7 @@ class Score < ActiveRecord::Base
     # Computes the total score for an assessment
     # params
     #  assessment - specifies the assessment for which the total score is being calculated
-    #  questions  - specifies the list of questions being evaluated in the assessment
+    #  questions  - specifies the index of questions being evaluated in the assessment
 
     def self.get_total_score(params)
       @response = params[:response]

@@ -107,7 +107,7 @@ Given /^add "(\S+)" to this "(\S+)"$/ do |username, assignment_name|
 end
 
 =begin
-  Check if the team assignment is seen under the list of assignments
+  Check if the team assignment is seen under the index of assignments
 =end
 
 Then /^I should find "(\S+)" under list of assignments$/  do |assignment|

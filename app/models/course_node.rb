@@ -13,7 +13,7 @@ class CourseNode < Node
   #   user_id: instructor id for Course
   #   parent_id: not used for this type of object
 
-  # returns: list of CourseNodes based on query
+  # returns: index of CourseNodes based on query
   # the get method will return all courses meeting the criteria, but the method name is necessary due to polymorphism
   def self.get(sortvar = 'name',sortorder ='ASC',user_id = nil,show = nil, parent_id = nil,search = nil)
     sortvar = 'created_at'

@@ -17,13 +17,13 @@ class TeamControllerTest < ActionController::TestCase
     assert_not_nil assigns(:parent)
   end
 
-  test "delete_all should redirect to list" do
+  test "delete_all should redirect to index" do
     sessionVars = session_for(users(:superadmin))
     sessionVars[:team_type] = "Course"
     nodeId = nodes(:node23).node_object_id
 
     get :delete_all, {'id' => nodeId}, sessionVars
-    assert_redirected_to "/team/list/#{nodeId}"
+    assert_redirected_to "/team/index/#{nodeId}"
   end
 
   test "delete_all should delete team" do
@@ -36,15 +36,15 @@ class TeamControllerTest < ActionController::TestCase
     end
   end
 
-  test "list should accept course_node" do
-    get :list, {'id' => nodes(:node23).node_object_id, 'type' => 'Course'}, session_for(users(:superadmin))
+  test "index should accept course_node" do
+    get :index, {'id' => nodes(:node23).node_object_id, 'type' => 'Course'}, session_for(users(:superadmin))
     assert_response :success
     assert_not_nil assigns(:root_node)
     assert_not_nil assigns(:child_nodes)
   end
 
-  test "list should accept assignment_node" do
-    get :list, {'id' => nodes(:node11).node_object_id, 'type' => 'Assignment'}, session_for(users(:superadmin))
+  test "index should accept assignment_node" do
+    get :index, {'id' => nodes(:node11).node_object_id, 'type' => 'Assignment'}, session_for(users(:superadmin))
     assert_response :success
     assert_not_nil assigns(:root_node)
     assert_not_nil assigns(:child_nodes)
@@ -77,23 +77,23 @@ class TeamControllerTest < ActionController::TestCase
     end
   end
 
-  test "create should redirect to list" do
+  test "create should redirect to index" do
     sessionVars = session_for(users(:superadmin))
     sessionVars[:team_type] = "Course"
     nodeId = nodes(:node23).node_object_id
 
     post :create, {'id' => nodeId, 'team' => {'name' => "SomeTeamName"}}, sessionVars
-    assert_redirected_to "/team/list/#{nodeId}"
+    assert_redirected_to "/team/index/#{nodeId}"
   end
 
-  test "update should redirect to list" do
+  test "update should redirect to index" do
     sessionVars = session_for(users(:superadmin))
     sessionVars[:team_type] = "Course"
     nodeId = nodes(:node23).node_object_id
     teamId = teams(:team2).id
 
     post :update, {'id' => teamId, 'team' => {'name' => "SomeTeamName"}}, sessionVars
-    assert_redirected_to "/team/list/#{nodeId}"
+    assert_redirected_to "/team/index/#{nodeId}"
   end
 
   test "update should raise RecordNotFound" do
@@ -125,30 +125,30 @@ class TeamControllerTest < ActionController::TestCase
     end
   end
 
-  test "delete should redirect to list" do
+  test "delete should redirect to index" do
     sessionVars = session_for(users(:superadmin))
     sessionVars[:team_type] = "Course"
     nodeId = nodes(:node23).node_object_id
     teamId = teams(:team2).id
 
     get :delete, {'id' => teamId}, sessionVars
-    assert_redirected_to "/team/list/#{nodeId}"
+    assert_redirected_to "/team/index/#{nodeId}"
   end
 
-  test "inherit should redirect to list" do
+  test "inherit should redirect to index" do
     sessionVars = session_for(users(:superadmin))
     assignmentId = assignments(:assignment2).id
 
     post :inherit, {'id' => assignmentId}, sessionVars
-    assert_redirected_to "/team/list/#{assignmentId}"
+    assert_redirected_to "/team/index/#{assignmentId}"
   end
 
-  test "bequeath should redirect to list" do
+  test "bequeath should redirect to index" do
     sessionVars = session_for(users(:superadmin))
     teamId = teams(:team4).id
     assignmentId = assignments(:assignment2).id
 
     post :bequeath, {'id' => teamId}, sessionVars
-    assert_redirected_to "/team/list/#{assignmentId}"
+    assert_redirected_to "/team/index/#{assignmentId}"
   end
 end

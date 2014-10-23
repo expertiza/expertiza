@@ -13,7 +13,7 @@ SimpleNavigation::Configuration.run do |navigation|
   # active navigation items. Defaults to 'simple-navigation-active-leaf'
   # navigation.active_leaf_class = 'your_active_leaf_class'
 
-  # Item keys are normally added to list items as id.
+  # Item keys are normally added to index items as id.
   # This setting turns that off
   # navigation.autogenerate_item_ids = false
 

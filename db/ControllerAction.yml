@@ -13,13 +13,13 @@
     site_controller_id: "1"
 - !ruby/object:ControllerAction 
   attributes: 
-    name: list
+    name: index
     permission_id: 
     id: "3"
     site_controller_id: "7"
 - !ruby/object:ControllerAction 
   attributes: 
-    name: list
+    name: index
     permission_id: 
     id: "4"
     site_controller_id: "6"
@@ -43,31 +43,31 @@
     site_controller_id: "5"
 - !ruby/object:ControllerAction 
   attributes: 
-    name: list
+    name: index
     permission_id: 
     id: "8"
     site_controller_id: "1"
 - !ruby/object:ControllerAction 
   attributes: 
-    name: list
+    name: index
     permission_id: 
     id: "9"
     site_controller_id: "8"
 - !ruby/object:ControllerAction 
   attributes: 
-    name: list
+    name: index
     permission_id: 
     id: "10"
     site_controller_id: "2"
 - !ruby/object:ControllerAction 
   attributes: 
-    name: list
+    name: index
     permission_id: 
     id: "11"
     site_controller_id: "5"
 - !ruby/object:ControllerAction 
   attributes: 
-    name: list
+    name: index
     permission_id: 
     id: "12"
     site_controller_id: "9"
@@ -85,7 +85,7 @@
     site_controller_id: "3"
 - !ruby/object:ControllerAction 
   attributes: 
-    name: list
+    name: index
     permission_id: 
     id: "15"
     site_controller_id: "10"

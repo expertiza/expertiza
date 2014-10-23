@@ -368,7 +368,9 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :StudentTeamsController do
+
+  resources :student_teams do
+
     collection do
       get :view
       get :edit

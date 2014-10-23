@@ -21,7 +21,7 @@ Expertiza::Application.routes.draw do
   resources :advertise_for_partner do
     collection do
       get :edit
-      get :remove
+      get :remove_advertisement
       post ':id', action: :update
     end
   end
@@ -368,11 +368,13 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :student_team do
+
+  resources :student_teams do
+
     collection do
       get :view
       get :edit
-      get :leave
+      get :remove_participant
       get :auto_complete_for_user_name
     end
   end

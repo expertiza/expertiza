@@ -1,6 +1,6 @@
 questionnaire0:
  name: questionnaire0
- instructor_id: <%= Fixtures.identify(:instructor1) %>
+ instructor_id: <%= ActiveRecord::FixtureSet.identify(:instructor1) %>
  private: 0
  min_question_score: 0
  max_question_score: 5
@@ -9,7 +9,7 @@ questionnaire0:
 
 questionnaire1:
  name: questionnaire1
- instructor_id: <%= Fixtures.identify(:instructor1) %>
+ instructor_id: <%= ActiveRecord::FixtureSet.identify(:instructor1) %>
  private: 0
  min_question_score: 0
  max_question_score: 5
@@ -18,7 +18,7 @@ questionnaire1:
  
 questionnaire2:
  name: questionnaire2
- instructor_id: <%= Fixtures.identify(:instructor2) %>
+ instructor_id: <%= ActiveRecord::FixtureSet.identify(:instructor2) %>
  private: 0
  min_question_score: 0
  max_question_score: 5
@@ -28,7 +28,7 @@ questionnaire2:
 
 questionnaire3:
  name: questionnaire3
- instructor_id: <%= Fixtures.identify(:instructor2) %>
+ instructor_id: <%= ActiveRecord::FixtureSet.identify(:instructor2) %>
  private: 0
  min_question_score: 0
  max_question_score: 5
@@ -37,7 +37,7 @@ questionnaire3:
 
 questionnaire4:
  name: questionnaire4
- instructor_id: <%= Fixtures.identify(:instructor3) %>
+ instructor_id: <%= ActiveRecord::FixtureSet.identify(:instructor3) %>
  private: 0
  min_question_score: 0
  max_question_score: 5
@@ -46,7 +46,7 @@ questionnaire4:
  
 peer_review_questionnaire:
  name: questionnaire5
- instructor_id: <%= Fixtures.identify(:instructor3) %>
+ instructor_id: <%= ActiveRecord::FixtureSet.identify(:instructor3) %>
  private: 0
  min_question_score: 0
  max_question_score: 5
@@ -55,7 +55,7 @@ peer_review_questionnaire:
 
 teammate_review_questionnaire:
  name: questionnaire6
- instructor_id: <%= Fixtures.identify(:instructor3) %>
+ instructor_id: <%= ActiveRecord::FixtureSet.identify(:instructor3) %>
  private: 0
  min_question_score: 0
  max_question_score: 5
@@ -64,7 +64,7 @@ teammate_review_questionnaire:
 
 global_survey_questionnaire:
  name: questionnaire7
- instructor_id: <%= Fixtures.identify(:instructor3) %>
+ instructor_id: <%= ActiveRecord::FixtureSet.identify(:instructor3) %>
  private: 0
  min_question_score: 0
  max_question_score: 5
@@ -73,7 +73,7 @@ global_survey_questionnaire:
 
 questionnaire_c0:
  name: questionnaire_c0
- instructor_id: <%= Fixtures.identify(:instructor1) %>
+ instructor_id: <%= ActiveRecord::FixtureSet.identify(:instructor1) %>
  private: 0
  min_question_score: 0
  max_question_score: 5

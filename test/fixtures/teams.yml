@@ -1,31 +1,31 @@
 # Teams for the intelligent assignment
 IntelligentTeam1:
   name: IntelligentTeam1
-  parent_id: <%= Fixtures.identify(:Intelligent_assignment) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:Intelligent_assignment) %>
   type: AssignmentTeam
 
 IntelligentTeam2:
   name: IntelligentTeam2
-  parent_id: <%= Fixtures.identify(:Intelligent_assignment) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:Intelligent_assignment) %>
   type: AssignmentTeam
 
 IntelligentTeam3:
   name: IntelligentTeam3
-  parent_id: <%= Fixtures.identify(:Intelligent_assignment) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:Intelligent_assignment) %>
   type: AssignmentTeam
 
 # Teams for the lottery assignment
 lottery_team1:
   name: LotteryTeam1
-  parent_id: <%= Fixtures.identify(:lottery_assignment) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:lottery_assignment) %>
   type: AssignmentTeam
 
 lottery_team2:
   name: LotteryTeam2
-  parent_id: <%= Fixtures.identify(:lottery_assignment) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:lottery_assignment) %>
   type: AssignmentTeam
 
 lottery_team3:
   name: LotteryTeam3
-  parent_id: <%= Fixtures.identify(:lottery_assignment) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:lottery_assignment) %>
   type: AssignmentTeam

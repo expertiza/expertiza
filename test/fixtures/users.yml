@@ -1,10 +1,10 @@
 superadmin:
   name: suadmin
-  parent_id: <%= Fixtures.identify(:superadmin) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:superadmin) %>
   crypted_password: <%= Digest::SHA1.hexdigest("suadmin") %>
   email: suadmin@mailinator.com
   password_salt:
-  role_id: <%= Fixtures.identify(:SuperAdministrator_role) %>
+  role_id: <%= ActiveRecord::FixtureSet.identify(:SuperAdministrator_role) %>
   email_on_review: 1
   email_on_submission: 1
   email_on_review: 1
@@ -12,59 +12,59 @@ superadmin:
 
 admin:
   name: admin
-  parent_id: <%= Fixtures.identify(:admin) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:admin) %>
   crypted_password: <%= Digest::SHA1.hexdigest("admin") %>
   password_salt: ""
   email: admin@mailinator.com
-  role_id: <%= Fixtures.identify(:Administrator_role) %>
+  role_id: <%= ActiveRecord::FixtureSet.identify(:Administrator_role) %>
   email_on_review: 1
   email_on_submission: 1
   email_on_review: 1
  
 instructor1:
   name: instructor1
-  parent_id: <%= Fixtures.identify(:admin) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:admin) %>
   fullname: instructor1_fullname
   crypted_password: <%= Digest::SHA1.hexdigest("instructor1") %>
   password_salt: ""
   email: instr1@mailinator.com
-  role_id: <%= Fixtures.identify(:Instructor_role) %>
+  role_id: <%= ActiveRecord::FixtureSet.identify(:Instructor_role) %>
   email_on_review: 1
   email_on_submission: 1
   email_on_review: 1
 
 instructor2:
   name: instructor2
-  parent_id: <%= Fixtures.identify(:admin) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:admin) %>
   fullname: instructor2_fullname
   crypted_password: <%= Digest::SHA1.hexdigest("instructor2") %>
   password_salt: ""
   email: instr2@mailinator.com
-  role_id: <%= Fixtures.identify(:Instructor_role) %>
+  role_id: <%= ActiveRecord::FixtureSet.identify(:Instructor_role) %>
   email_on_review: 1
   email_on_submission: 1
   email_on_review: 1
 
 instructor3:
   name: instructor3
-  parent_id: <%= Fixtures.identify(:admin) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:admin) %>
   fullname: instructor3_fullname
   crypted_password: <%= Digest::SHA1.hexdigest("instructor3") %>
   password_salt: ""
   email: instr3@mailinator.com
-  role_id: <%= Fixtures.identify(:Instructor_role) %>
+  role_id: <%= ActiveRecord::FixtureSet.identify(:Instructor_role) %>
   email_on_review: 1
   email_on_submission: 1
   email_on_review: 1
 
 ta1:
   name: ta1
-  parent_id: <%= Fixtures.identify(:instructor1) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:instructor1) %>
   fullname: teaching_assistant1
   crypted_password: <%= Digest::SHA1.hexdigest("ta1") %>
   password_salt:  ""
   email: ta1@mailinator.com
-  role_id: <%= Fixtures.identify(:Teaching_Assistant_role) %>
+  role_id: <%= ActiveRecord::FixtureSet.identify(:Teaching_Assistant_role) %>
   email_on_review: 1
   email_on_submission: 1
   email_on_review: 1
@@ -73,12 +73,12 @@ ta1:
 
 ta2:
   name: ta2
-  parent_id: <%= Fixtures.identify(:instructor2) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:instructor2) %>
   fullname: teaching_assistant2
   crypted_password: <%= Digest::SHA1.hexdigest("ta2") %>
   password_salt: ""
   email: ta2@mailinator.com
-  role_id: <%= Fixtures.identify(:Teaching_Assistant_role) %>
+  role_id: <%= ActiveRecord::FixtureSet.identify(:Teaching_Assistant_role) %>
   email_on_review: 1
   email_on_submission: 1
   email_on_review: 1
@@ -87,12 +87,12 @@ ta2:
 
 ta3:
   name: ta3
-  parent_id: <%= Fixtures.identify(:instructor3) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:instructor3) %>
   fullname: teaching_assistant3
   crypted_password: <%= Digest::SHA1.hexdigest("ta3") %>
   password_salt: ""
   email: ta3@mailinator.com
-  role_id: <%= Fixtures.identify(:Teaching_Assistant_role) %>
+  role_id: <%= ActiveRecord::FixtureSet.identify(:Teaching_Assistant_role) %>
   email_on_review: 1
   email_on_submission: 1
   email_on_review: 1
@@ -101,12 +101,12 @@ ta3:
 
 ta4:
   name: ta4
-  parent_id: <%= Fixtures.identify(:instructor1) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:instructor1) %>
   fullname: teaching_assistant4
   crypted_password: <%= Digest::SHA1.hexdigest("ta4") %>
   password_salt:   ""
   email: ta4@mailinator.com
-  role_id: <%= Fixtures.identify(:Teaching_Assistant_role) %>
+  role_id: <%= ActiveRecord::FixtureSet.identify(:Teaching_Assistant_role) %>
   email_on_review: 1
   email_on_submission: 1
   email_on_review: 1
@@ -116,12 +116,12 @@ ta4:
 
 student1:
   name: student1
-  parent_id: <%= Fixtures.identify(:instructor1) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:instructor1) %>
   fullname: last,first
   crypted_password: <%= Digest::SHA1.hexdigest("student1") %>
   password_salt: ""
   email: student1@mailinator.com
-  role_id: <%= Fixtures.identify(:Student_role) %>
+  role_id: <%= ActiveRecord::FixtureSet.identify(:Student_role) %>
   email_on_review: 1
   email_on_submission: 1
   email_on_review: 1
@@ -131,13 +131,13 @@ student1:
 
   
 student2:
-  parent_id: <%= Fixtures.identify(:instructor1) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:instructor1) %>
   name: student2
   fullname: student2_fullname
   crypted_password: <%= Digest::SHA1.hexdigest("student2") %>
   password_salt:   ""
   email: student2@mailinator.com
-  role_id: <%= Fixtures.identify(:Student_role) %>
+  role_id: <%= ActiveRecord::FixtureSet.identify(:Student_role) %>
   email_on_review: 0
   email_on_submission: 1
   email_on_review: 1
@@ -147,12 +147,12 @@ student2:
 
 student3:
   name: student3
-  parent_id: <%= Fixtures.identify(:instructor1) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:instructor1) %>
   fullname: student3_fullname
   crypted_password: <%= Digest::SHA1.hexdigest("student3") %>
   password_salt: ""
   email: student3@mailinator.com
-  role_id: <%= Fixtures.identify(:Student_role) %>
+  role_id: <%= ActiveRecord::FixtureSet.identify(:Student_role) %>
   email_on_review: 1
   email_on_submission: 0
   email_on_review: 1
@@ -161,12 +161,12 @@ student3:
 
 student4:
   name: student4
-  parent_id: <%= Fixtures.identify(:admin) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:admin) %>
   fullname: student4_fullname
   crypted_password: <%= Digest::SHA1.hexdigest("student4") %>
   password_salt:   ""
   email: student4@mailinator.com
-  role_id: <%= Fixtures.identify(:Student_role) %>
+  role_id: <%= ActiveRecord::FixtureSet.identify(:Student_role) %>
   email_on_review: 1
   email_on_submission: 0
   email_on_review: 1
@@ -174,24 +174,24 @@ student4:
 
 student5:
   name: student5
-  parent_id: <%= Fixtures.identify(:admin) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:admin) %>
   fullname: student5_fullname
   crypted_password: <%= Digest::SHA1.hexdigest("student5") %>
   password_salt:   ""
   email: student5@mailinator.com
-  role_id: <%= Fixtures.identify(:Student_role) %>
+  role_id: <%= ActiveRecord::FixtureSet.identify(:Student_role) %>
   email_on_review: 1
   email_on_submission: 0
   email_on_review_of_review: 1
 
 student6:
   name: student6
-  parent_id: <%= Fixtures.identify(:admin) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:admin) %>
   fullname: student6_fullname
   crypted_password: <%= Digest::SHA1.hexdigest("student6") %>
   password_salt:   ""
   email: student6@mailinator.com
-  role_id: <%= Fixtures.identify(:Student_role) %>
+  role_id: <%= ActiveRecord::FixtureSet.identify(:Student_role) %>
   email_on_review: 1
   email_on_submission: 1
   email_on_review: 1
@@ -199,11 +199,11 @@ student6:
 
 student7:
   name: student7
-  parent_id: <%= Fixtures.identify(:admin) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:admin) %>
   fullname: student7_fullname
   crypted_password: <%= Digest::SHA1.hexdigest("student7") %>
   password_salt:   ""
-  role_id: <%= Fixtures.identify(:Student_role) %>
+  role_id: <%= ActiveRecord::FixtureSet.identify(:Student_role) %>
   email: student7@mailinator.com
   email_on_review: 1
   email_on_submission: 1
@@ -212,12 +212,12 @@ student7:
 
 student8:
   name: student8
-  parent_id: <%= Fixtures.identify(:admin) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:admin) %>
   fullname: student8_fullname
   crypted_password: <%= Digest::SHA1.hexdigest("student8") %>
   password_salt: ""
   email: student8@mailinator.com
-  role_id: <%= Fixtures.identify(:Student_role) %>
+  role_id: <%= ActiveRecord::FixtureSet.identify(:Student_role) %>
   email_on_review: 1
   email_on_submission: 1
   email_on_review_of_review: 1   
@@ -225,12 +225,12 @@ student8:
 
 student9:
   name: student9
-  parent_id: <%= Fixtures.identify(:admin) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:admin) %>
   fullname: student9_fullname
   crypted_password: <%= Digest::SHA1.hexdigest("student9") %>
   password_salt: ""
   email: student9@mailinator.com
-  role_id: <%= Fixtures.identify(:Student_role) %>
+  role_id: <%= ActiveRecord::FixtureSet.identify(:Student_role) %>
   email_on_review: 1
   email_on_submission: 1
   email_on_review_of_review: 1   
@@ -239,12 +239,12 @@ student9:
 <% (10..50).each do |i| %>
 student<%= i %>:
   name: stud<%= i %>
-  parent_id: <%= Fixtures.identify(:admin) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:admin) %>
   fullname: student<%= i %>_fullname
   crypted_password: <%= Digest::SHA1.hexdigest("student") %>
   password_salt: ""
   email: student<%= i %>@mailinator.com
-  role_id: <%= Fixtures.identify(:Student_role) %>
+  role_id: <%= ActiveRecord::FixtureSet.identify(:Student_role) %>
   email_on_review: 1
   email_on_submission: 1
   email_on_review_of_review: 1
@@ -255,12 +255,11 @@ student<%= i %>:
 
 admin_test:
   name: admin_test
-  parent_id: <%= Fixtures.identify(:admin) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:admin) %>
   crypted_password: <%= Digest::SHA1.hexdigest("admin_test") %>
   email: admin_test@mailinator.com
   password_salt:   ""
-  role_id: <%= Fixtures.identify(:Administrator_role) %>
+  role_id: <%= ActiveRecord::FixtureSet.identify(:Administrator_role) %>
   email_on_review: 1
   email_on_submission: 1
   email_on_review: 1
-  

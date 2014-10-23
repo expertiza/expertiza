@@ -1,4 +1,4 @@
-# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+# Read about ActiveRecord::FixtureSet at http://ar.rubyonrails.org/classes/ActiveRecord::FixtureSet.html
 
 # This model initially had no columns defined.  If you add columns to the
 # model remove the '{}' from the fixture names and add the columns immediately
@@ -8,46 +8,46 @@
 one:
   q_type: "Checkbox"
   parameters: nil
-  question_id: <%= Fixtures.identify(:question1) %>
+  question_id: <%= ActiveRecord::FixtureSet.identify(:question1) %>
 # column: value
 #
 two:
   q_type: "Checkbox"
   parameters: nil
-  question_id: <%= Fixtures.identify(:question2) %>
+  question_id: <%= ActiveRecord::FixtureSet.identify(:question2) %>
 #  column: value
 
 qt_1:
   q_type: "Rating"
   parameters: "section::1|2"
-  question_id: <%= Fixtures.identify(:question_c1) %>
+  question_id: <%= ActiveRecord::FixtureSet.identify(:question_c1) %>
 
 qt_2:
   q_type: "Comment"
   parameters: "section::1|2"
-  question_id: <%= Fixtures.identify(:question_c2) %>
+  question_id: <%= ActiveRecord::FixtureSet.identify(:question_c2) %>
 
 questiontype1:
  q_type: Checkbox
  parameters: 1
- question_id: <%= Fixtures.identify(:question1) %>
+ question_id: <%= ActiveRecord::FixtureSet.identify(:question1) %>
 
 questiontype2:
  q_type: TextArea
  parameters: 1
- question_id: <%= Fixtures.identify(:question3) %>
+ question_id: <%= ActiveRecord::FixtureSet.identify(:question3) %>
 
 questiontype3:
  q_type: UploadFile
  parameters: 1
- question_id: <%= Fixtures.identify(:question2) %>
+ question_id: <%= ActiveRecord::FixtureSet.identify(:question2) %>
 
 questiontype4:
  q_type: Rating
  parameters: 1
- question_id: <%= Fixtures.identify(:question4) %>
+ question_id: <%= ActiveRecord::FixtureSet.identify(:question4) %>
 
 questiontype5:
  q_type: DropDown
  parameters: 1
- question_id: <%= Fixtures.identify(:question1) %>
+ question_id: <%= ActiveRecord::FixtureSet.identify(:question1) %>

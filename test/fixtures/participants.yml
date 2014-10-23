@@ -1,9 +1,9 @@
-# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+# Read about ActiveRecord::FixtureSet at http://ar.rubyonrails.org/classes/ActiveRecord::FixtureSet.html
 par0:
   submit_allowed: 1
   review_allowed: 0
-  user_id: <%= Fixtures.identify(:student1) %>
-  parent_id: <%= Fixtures.identify(:assignment0) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student1) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:assignment0) %>
   topic: Research EPA
   penalty_accumulated: 0
   type : AssignmentParticipant
@@ -14,8 +14,8 @@ par0:
 par1:
   submit_allowed: 1
   review_allowed: 1
-  user_id: <%= Fixtures.identify(:student1) %>
-  parent_id: <%= Fixtures.identify(:assignment1) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student1) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:assignment1) %>
   topic: Research Communication
   penalty_accumulated: 0
   type : AssignmentParticipant
@@ -26,8 +26,8 @@ par1:
 par2:
   submit_allowed: 1
   review_allowed: 0
-  user_id: <%= Fixtures.identify(:student2) %>
-  parent_id: <%= Fixtures.identify(:assignment2) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student2) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:assignment2) %>
   penalty_accumulated: 0
   type : AssignmentParticipant
   handle: "par2"
@@ -36,8 +36,8 @@ par2:
 par3:
   submit_allowed: 1
   review_allowed: 0
-  user_id: <%= Fixtures.identify(:student3) %>
-  parent_id: <%= Fixtures.identify(:assignment2) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student3) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:assignment2) %>
   penalty_accumulated: 0
   type : AssignmentParticipant
   handle: "par3"
@@ -46,8 +46,8 @@ par3:
 par4:
   submit_allowed: 1
   review_allowed: 0
-  user_id: <%= Fixtures.identify(:student5) %>
-  parent_id: <%= Fixtures.identify(:assignment2) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student5) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:assignment2) %>
   penalty_accumulated: 0
   type : AssignmentParticipant
   handle: "par4"
@@ -55,8 +55,8 @@ par4:
 par5:
   submit_allowed: 1
   review_allowed: 0
-  user_id: <%= Fixtures.identify(:student6) %>
-  parent_id: <%= Fixtures.identify(:course0) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student6) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:course0) %>
   penalty_accumulated: 0
   type : CourseParticipant
   handle: "par5"
@@ -64,8 +64,8 @@ par5:
 par6:
   submit_allowed: 1
   review_allowed: 0
-  user_id: <%= Fixtures.identify(:student7) %>
-  parent_id: <%= Fixtures.identify(:course0) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student7) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:course0) %>
   penalty_accumulated: 0
   type : CourseParticipant
   handle: "par6"
@@ -73,8 +73,8 @@ par6:
 par7:
   submit_allowed: 1
   review_allowed: 0
-  user_id: <%= Fixtures.identify(:student8) %>
-  parent_id: <%= Fixtures.identify(:course0) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student8) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:course0) %>
   penalty_accumulated: 0
   type : CourseParticipant
   handle: "par7"
@@ -82,8 +82,8 @@ par7:
 par8:
   submit_allowed: 1
   review_allowed: 0
-  user_id: <%= Fixtures.identify(:student8) %>
-  parent_id: <%= Fixtures.identify(:course0) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student8) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:course0) %>
   penalty_accumulated: 0
   type : CourseParticipant
   handle: "par8"
@@ -91,8 +91,8 @@ par8:
 par9:
   submit_allowed: 1
   review_allowed: 0
-  user_id: <%= Fixtures.identify(:student1) %>
-  parent_id: <%= Fixtures.identify(:assignment_review0) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student1) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:assignment_review0) %>
   topic: Research EPA
   penalty_accumulated: 0
   type : AssignmentParticipant
@@ -101,8 +101,8 @@ par9:
 par10:
   submit_allowed: 0
   review_allowed: 1
-  user_id: <%= Fixtures.identify(:student2) %>
-  parent_id: <%= Fixtures.identify(:assignment_review0) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student2) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:assignment_review0) %>
   topic: Research EPA
   penalty_accumulated: 0
   type : AssignmentParticipant
@@ -111,8 +111,8 @@ par10:
 par11:
   submit_allowed: 0
   review_allowed: 1
-  user_id: <%= Fixtures.identify(:student3) %>
-  parent_id: <%= Fixtures.identify(:assignment_review0) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student3) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:assignment_review0) %>
   topic: Research EPA
   penalty_accumulated: 0
   type : AssignmentParticipant
@@ -121,8 +121,8 @@ par11:
 par12:
   submit_allowed: 0
   review_allowed: 1
-  user_id: <%= Fixtures.identify(:student4) %>
-  parent_id: <%= Fixtures.identify(:assignment_review0) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student4) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:assignment_review0) %>
   topic: Research EPA
   penalty_accumulated: 0
   type : AssignmentParticipant
@@ -132,8 +132,8 @@ par12:
 par13:
   submit_allowed: 1
   review_allowed: 1
-  user_id: <%= Fixtures.identify(:student1) %>
-  parent_id: <%= Fixtures.identify(:assignment7) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student1) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:assignment7) %>
   topic: Research Communication
   penalty_accumulated: 0
   type : AssignmentParticipant
@@ -142,8 +142,8 @@ par13:
 par14:
   submit_allowed: 1
   review_allowed: 1
-  user_id: <%= Fixtures.identify(:student2) %>
-  parent_id: <%= Fixtures.identify(:assignment7) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student2) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:assignment7) %>
   topic: Research Communication
   penalty_accumulated: 0
   type : AssignmentParticipant
@@ -152,8 +152,8 @@ par14:
 par15:
   submit_allowed: 1
   review_allowed: 1
-  user_id: <%= Fixtures.identify(:student3) %>
-  parent_id: <%= Fixtures.identify(:assignment7) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student3) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:assignment7) %>
   topic: Research Communication
   penalty_accumulated: 0
   type : AssignmentParticipant
@@ -162,8 +162,8 @@ par15:
 par16:
   submit_allowed: 1
   review_allowed: 1
-  user_id: <%= Fixtures.identify(:student4) %>
-  parent_id: <%= Fixtures.identify(:assignment7) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student4) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:assignment7) %>
   topic: Research Communication
   penalty_accumulated: 0
   type : AssignmentParticipant
@@ -172,8 +172,8 @@ par16:
 par17:
   submit_allowed: 1
   review_allowed: 1
-  user_id: <%= Fixtures.identify(:student5) %>
-  parent_id: <%= Fixtures.identify(:assignment_project1) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student5) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:assignment_project1) %>
   penalty_accumulated: 0
   type : AssignmentParticipant
   handle: "par17"
@@ -181,8 +181,8 @@ par17:
 par18:
   submit_allowed: 1
   review_allowed: 1
-  user_id: <%= Fixtures.identify(:student1) %>
-  parent_id: <%= Fixtures.identify(:assignment_project1) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student1) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:assignment_project1) %>
   penalty_accumulated: 0
   type : AssignmentParticipant
   handle: "par18"
@@ -190,8 +190,8 @@ par18:
 par19:
   submit_allowed: 1
   review_allowed: 1
-  user_id: <%= Fixtures.identify(:student2) %>
-  parent_id: <%= Fixtures.identify(:assignment_project1) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student2) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:assignment_project1) %>
   penalty_accumulated: 0
   type : AssignmentParticipant
   handle: "par19"
@@ -200,8 +200,8 @@ par19:
 par20:
   submit_allowed: 1
   review_allowed: 0
-  user_id: <%= Fixtures.identify(:student9) %>
-  parent_id: <%= Fixtures.identify(:Intelligent_assignment) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student9) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:Intelligent_assignment) %>
   penalty_accumulated: 0
   type : AssignmentParticipant
   handle: "par20"
@@ -209,8 +209,8 @@ par20:
 par21:
    submit_allowed: 1
    review_allowed: 0
-   user_id: <%= Fixtures.identify(:student8) %>
-   parent_id: <%= Fixtures.identify(:Intelligent_assignment) %>
+   user_id: <%= ActiveRecord::FixtureSet.identify(:student8) %>
+   parent_id: <%= ActiveRecord::FixtureSet.identify(:Intelligent_assignment) %>
    penalty_accumulated: 0
    type : AssignmentParticipant
    handle: "par21"
@@ -218,8 +218,8 @@ par21:
 par22:
   submit_allowed: 1
   review_allowed: 0
-  user_id: <%= Fixtures.identify(:student7) %>
-  parent_id: <%= Fixtures.identify(:Intelligent_assignment) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student7) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:Intelligent_assignment) %>
   penalty_accumulated: 0
   type : AssignmentParticipant
   handle: "par22"
@@ -227,8 +227,8 @@ par22:
 par23:
   submit_allowed: 1
   review_allowed: 0
-  user_id: <%= Fixtures.identify(:student6) %>
-  parent_id: <%= Fixtures.identify(:Intelligent_assignment) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student6) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:Intelligent_assignment) %>
   penalty_accumulated: 0
   type : AssignmentParticipant
   handle: "par23"

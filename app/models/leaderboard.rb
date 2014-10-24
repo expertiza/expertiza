@@ -13,33 +13,23 @@ class Leaderboard < ActiveRecord::Base
 
   ### This methodreturns unaffiliiated assignments - assignments not affiliated to any course
   def self.getIndependantAssignments(user_id)
-    userAssignments = AssignmentParticipant.where(["user_id = ? ", user_id])
-    noCourseAssignments = Array.new
-    for ua in userAssignments
-      noCA = Assignment.where(["id = ? and course_id is NULL", ua.parent_id]).first
-      if noCA != nil
-        noCourseAssignments<< noCA
-      end
-    end
-    return noCourseAssignments
+    assignmentIds = AssignmentParticipant.where(:user_id => user_id).pluck(:parent_id)
+    noCourseAssignments = Assignment.where(:id => assignmentIds, :course_id => !nil?)
   end
 
 
   def self.getAssignmentsInCourses(courseArray)
-    assignmentList = Assignment.where(["course_id in (?)", courseArray])
+    assignmentList = Assignment.where(:course_id => courseArray)
   end
 
   # This method gets all tuples in the Participants table associated
   # hierarchy (qtype => course => user => score)
 
-
-
   def self.getParticipantEntriesInCourses(courseArray, user_id)
     assignmentList = getAssignmentsInCourses(courseArray)
     independantAssignments = getIndependantAssignments(user_id)
-    for iA in independantAssignments
-      assignmentList << iA
-    end
+    assignmentList = assignmentList + independantAssignments
+
     questionnaireHash = getParticipantEntriesInAssignmentList(assignmentList)
   end
 
@@ -244,13 +234,6 @@ class Leaderboard < ActiveRecord::Base
     }
     qtypeHash
   end
-
-
-
-
-
-
-
 
   # This method takes the sorted computed score hash structure and mines
   # it for personal achievement information.

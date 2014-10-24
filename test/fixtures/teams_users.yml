@@ -1,33 +1,33 @@
 # Teams users for intelligent assignment
 intelligent_teams_users1:
-  team_id: <%= Fixtures.identify(:IntelligentTeam1) %>
-  user_id: <%= Fixtures.identify(:student9) %>
+  team_id: <%= ActiveRecord::FixtureSet.identify(:IntelligentTeam1) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student9) %>
 
 intelligent_teams_users2:
-  team_id: <%= Fixtures.identify(:IntelligentTeam1) %>
-  user_id: <%= Fixtures.identify(:student8) %>
+  team_id: <%= ActiveRecord::FixtureSet.identify(:IntelligentTeam1) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student8) %>
 
 intelligent_teams_users3:
-  team_id: <%= Fixtures.identify(:IntelligentTeam2) %>
-  user_id: <%= Fixtures.identify(:student7) %>
+  team_id: <%= ActiveRecord::FixtureSet.identify(:IntelligentTeam2) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student7) %>
 
 intelligent_teams_users4:
-  team_id: <%= Fixtures.identify(:IntelligentTeam3) %>
-  user_id: <%= Fixtures.identify(:student6) %>
+  team_id: <%= ActiveRecord::FixtureSet.identify(:IntelligentTeam3) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student6) %>
 
 # Teams users for lottery assignment
 lottery_teams_users1:
-  team_id: <%= Fixtures.identify(:lottery_team1) %>
-  user_id: <%= Fixtures.identify(:student1) %>
+  team_id: <%= ActiveRecord::FixtureSet.identify(:lottery_team1) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student1) %>
 
 lottery_teams_users2:
-  team_id: <%= Fixtures.identify(:lottery_team1) %>
-  user_id: <%= Fixtures.identify(:student2) %>
+  team_id: <%= ActiveRecord::FixtureSet.identify(:lottery_team1) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student2) %>
 
 lottery_teams_users3:
-  team_id: <%= Fixtures.identify(:lottery_team2) %>
-  user_id: <%= Fixtures.identify(:student3) %>
+  team_id: <%= ActiveRecord::FixtureSet.identify(:lottery_team2) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student3) %>
 
 lottery_teams_users4:
-  team_id: <%= Fixtures.identify(:lottery_team3) %>
-  user_id: <%= Fixtures.identify(:student4) %>
+  team_id: <%= ActiveRecord::FixtureSet.identify(:lottery_team3) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student4) %>

@@ -19,7 +19,7 @@ class SignupControllerTest < ActionController::TestCase
   end
 
   test "should_be_able_to_view_signup_topics" do
-    get :index, :id => assignments(:assignment1).id
+    get :index_signup, :id => assignments(:assignment1).id
     assert_response :success
   end
 

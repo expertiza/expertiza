@@ -81,7 +81,7 @@ class StudentQuizzesController < ApplicationController
   return @quizzes
 end
 
-def record_response
+  def record_response
   @map = ResponseMap.find(params[:map_id])
   @response = Response.new()
   @response.map_id = params[:map_id]

@@ -14,7 +14,7 @@ class Leaderboard < ActiveRecord::Base
   ### This methodreturns unaffiliiated assignments - assignments not affiliated to any course
   def self.getIndependantAssignments(user_id)
     assignmentIds = AssignmentParticipant.where(:user_id => user_id).pluck(:parent_id)
-    noCourseAssignments = Assignment.where(:id => assignmentIds, :course_id => !nil?)
+    noCourseAssignments = Assignment.where(:id => assignmentIds, :course_id => nil)
   end
 
 
@@ -26,9 +26,10 @@ class Leaderboard < ActiveRecord::Base
   # hierarchy (qtype => course => user => score)
 
   def self.getParticipantEntriesInCourses(courseArray, user_id)
+    assignmentList = Array.new
     assignmentList = getAssignmentsInCourses(courseArray)
     independantAssignments = getIndependantAssignments(user_id)
-    assignmentList = assignmentList + independantAssignments
+    assignmentList.concat(independantAssignments)
 
     questionnaireHash = getParticipantEntriesInAssignmentList(assignmentList)
   end

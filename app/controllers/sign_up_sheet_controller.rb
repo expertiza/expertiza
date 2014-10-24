@@ -7,12 +7,13 @@
 #The way it works is that assignments have their own id's, so do topics. A topic has a foreign key dependecy on the assignment_id
 #Hence each topic has a field called assignment_id which points which can be used to identify the assignment that this topic belongs
 #to
-
 class SignUpSheetController < ApplicationController
   require 'rgl/adjacency'
   require 'rgl/dot'
   require 'rgl/topsort'
 
+
+  # Check action permissions against user role.
   def action_allowed?
     case params[:action]
     when 'index_signup', 'create_signup', 'destroy_signup', 'show_team'
@@ -24,14 +25,17 @@ class SignUpSheetController < ApplicationController
     end
   end
 
+
   #Includes functions for team management. Refer /app/helpers/ManageTeamHelper
   include ManageTeamHelper
   #Includes functions for Dead line management. Refer /app/helpers/DeadLineHelper
   include DeadlineHelper
 
+
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [:destroy, :create, :update],
     :redirect_to => {:action => :index_signup}
+
 
   # Prepares the form for adding a new topic. Used in conjuntion with create
   def new
@@ -40,6 +44,7 @@ class SignUpSheetController < ApplicationController
     @sign_up_topic.assignment = Assignment.find(params[:id])
     @topic = @sign_up_topic
   end
+
 
   #This method is used to create signup topics
   #In this code params[:id] is the assignment id and not topic id. The intuition is
@@ -92,6 +97,7 @@ class SignUpSheetController < ApplicationController
     end
   end
 
+
   #This method is used to delete signup topics
   def destroy
     @topic = SignUpTopic.find(params[:id])
@@ -115,13 +121,15 @@ class SignUpSheetController < ApplicationController
     redirect_to_sign_up(params[:assignment_id])
   end
 
+
   #prepares the page. shows the form which can be used to enter new values for the different properties of an assignment
   def edit
     @topic = SignUpTopic.find(params[:id])
     @assignment_id = params[:assignment_id]
   end
 
-  #updates the database tables to reflect the new values for the assignment. Used in conjuntion with edit
+
+  #updates the database tables to reflect the new values for the assignment. Used in conjunction with edit
   def update
     @topic = SignUpTopic.find(params[:id])
 
@@ -155,6 +163,7 @@ class SignUpSheetController < ApplicationController
     redirect_to_sign_up(params[:assignment_id])
   end
 
+
   #This displays a page that lists all the available topics for an assignment.
   #Contains links that let an admin or Instructor edit, delete, view enrolled/waitlisted members for each topic
   #Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics
@@ -167,11 +176,13 @@ class SignUpSheetController < ApplicationController
     end
   end
 
+
   #Seems like this function is similar to the above function> we are not quite sure what publishing rights mean. Seems like
   #the values for the last column in http://expertiza.ncsu.edu/student_task/list are sourced from here
   def view_publishing_rights
     load_add_signup_topics(params[:id])
   end
+
 
   #retrieves all the data associated with the given assignment. Includes all topics,
   #participants(people who are doing this assignment) and signed up users (people who have chosen a topic (confirmed or waitlisted)
@@ -187,6 +198,7 @@ class SignUpSheetController < ApplicationController
     @participants = SignedUpUser.find_team_participants(assignment_id)
   end
 
+
   def set_values_for_new_topic
     @sign_up_topic = SignUpTopic.new
     @sign_up_topic.topic_identifier = params[:topic][:topic_identifier]
@@ -196,6 +208,7 @@ class SignUpSheetController < ApplicationController
     @sign_up_topic.assignment_id = params[:id]
     @assignment = Assignment.find(params[:id])
   end
+
 
   # Shows a list of topics to the student and provides links so they can sign up for one
   def index_signup
@@ -228,6 +241,7 @@ class SignUpSheetController < ApplicationController
     end
   end
 
+
   # Sign a user up for a topic
   def create_signup
     #find the assignment to which user is signing up
@@ -240,6 +254,7 @@ class SignUpSheetController < ApplicationController
     redirect_to :action => 'index_signup', :id => params[:assignment_id]
   end
 
+
   # This function is used to delete a previous signup
   def destroy_signup
     user = session[:user]
@@ -251,6 +266,8 @@ class SignUpSheetController < ApplicationController
     redirect_to :action => 'index_signup', :id => params[:assignment_id]
   end
 
+
+  # This function is used to sign up a team for a topic.
   def signup_team(assignment_id, user_id, topic_id)
     users_team = SignedUpUser.find_team_users(assignment_id, user_id)
 
@@ -265,83 +282,68 @@ class SignUpSheetController < ApplicationController
     end
   end
 
+
+  # This function is used to assign a topic to the user. It confirms whether the
+  # function was successful.  A function may not be successful if the user has
+  # already signed up for a topic.  It should be noted however that being waitlisted
+  # for a topic is not a failure.
   def confirmTopic(creator_id, topic_id, assignment_id)
     #check whether user has signed up already
     user_signup = otherConfirmedTopicforUser(assignment_id, creator_id)
 
     sign_up = SignedUpUser.new
     sign_up.topic_id = params[:id]
+    # NOTE: Creator is always a team.
     sign_up.creator_id = creator_id
+
+    # Initialize the return value.
     result = false
 
-    if user_signup.size == 0
-      # Using a DB transaction to ensure atomic inserts
-      ActiveRecord::Base.transaction do
-        #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
-        if slotAvailable?(topic_id)
-          sign_up.is_waitlisted = false
-
-          #Update topic_id in participant table with the topic_id
-          participant = Participant.where(user_id: session[:user].id, parent_id:  assignment_id).first
-
-          participant.update_topic_id(topic_id)
-        else
-          sign_up.is_waitlisted = true
-        end
-
-        if sign_up.save
-          result = true
-        end
-      end
-    else
-      #If all the topics choosen by the user are waitlisted,
+    if user_signup > 0
+      # Check that all the topics chosen by the user are waitlisted
+      # otherwise don't let them choose another topic.
       for user_signup_topic in user_signup
         if user_signup_topic.is_waitlisted == false
           flash[:error] = "You have already signed up for a topic."
           return false
         end
       end
+    end
 
-      # Using a DB transaction to ensure atomic inserts
-      ActiveRecord::Base.transaction do
-        #check whether user is clicking on a topic which is not going to place him in the waitlist
-        if !slotAvailable?(topic_id)
-          sign_up.is_waitlisted = true
-
-          if sign_up.save
-            result = true
-          end
-
-        else
-          #if slot exist, then confirm the topic for the user and delete all the waitlist for this user
-          Waitlist.cancel_all_waitlists(creator_id, assignment_id)
-          sign_up.is_waitlisted = false
-          sign_up.save
-          participant = Participant.where(user_id: session[:user].id, parent_id:  assignment_id).first
-          participant.update_topic_id(topic_id)
-          result = true
-        end
-      end
+    # Using a DB transaction to ensure atomic inserts
+    ActiveRecord::Base.transaction do
+      # NOTE: This is likely not checking if the user is on a team that
+      #       already has this topic assigned to it.
+      sign_up.sign_up_for_topic(session[:user].id, topic_id)
+      result = sign_up.save
     end
 
     result
   end
 
+
+  # This function returns a SignedUpUser object for the specified user id and
+  # assignment id.
   def otherConfirmedTopicforUser(assignment_id, creator_id)
     user_signup = SignedUpUser.find_user_signup_topics(assignment_id, creator_id)
     user_signup
   end
+
 
   # When using this method when creating fields, update race conditions by using db transactions
   def slotAvailable?(topic_id)
     SignUpTopic.slotAvailable?(topic_id)
   end
 
+
+  # TODO: Make pass-thru method until this can be DRY'ed out more by changing
+  # the references to from this function to the one called in this function.
   def self.other_confirmed_topic_for_user(assignment_id, creator_id)
-    user_signup = SignedUpUser.find_user_signup_topics(assignment_id, creator_id)
-    user_signup
+    otherConfirmedTopicforUser(assignment_id, creator_id)
   end
 
+
+  # TODO: This method appears to not be used any more.  Confirm and remove.
   def confirm_topic(creator_id, topic_id, assignment_id)
     @user_id = session[:user].id
 
@@ -395,6 +397,8 @@ class SignUpSheetController < ApplicationController
     result
   end
 
+
+  # This function is used to set the preference priority number.
   def set_priority
     @user_id = session[:user].id
     users_team = SignedUpUser.find_team_users(params[:assignment_id].to_s, @user_id)
@@ -413,6 +417,7 @@ class SignUpSheetController < ApplicationController
 
     redirect_to :action => 'index_signup', :id => params[:assignment_id]
   end
+
 
   #this function is used to prevent injection attacks.  A topic *dependent* on another topic cannot be
   # attempted until the other topic has been completed..
@@ -452,6 +457,7 @@ class SignUpSheetController < ApplicationController
     redirect_to_sign_up(params[:assignment_id])
   end
 
+
   #If the instructor needs to explicitly change the start/due dates of the topics
   #This is true in case of a staggered deadline type assignment. Individual deadlines can
   # be set on a per topic  and per round basis
@@ -481,11 +487,13 @@ class SignUpSheetController < ApplicationController
     redirect_to_sign_up(params[:assignment_id])
   end
 
+
   #used by save_topic_dependencies. The dependency graph is a partial ordering of topics ... some topics need to be done
   # before others can be attempted.
   def build_dependency_graph(topics,node)
     SignUpSheet.create_dependency_graph(topics,node)
   end
+
 
   #used by save_topic_dependencies. Do not know how this works
   def create_common_start_time_topics(dg)
@@ -511,15 +519,18 @@ class SignUpSheetController < ApplicationController
     set_of_topics
   end
 
+
   def create_topic_deadline(due_date, offset, topic_id)
     DueDate.assign_topic_deadline(due_date,offset,topic_id)
   end
+
 
   def set_start_due_date(assignment_id, set_of_topics)
     DueDate.assign_start_due_date(assignment_id, set_of_topics)
   end
 
-  #gets team_details to show it on team_details view for a given assignment
+
+  # Gets team_details to show it on team_details view for a given assignment
   def show_team
     if !(assignment = Assignment.find(params[:assignment_id])).nil? and !(topic = SignUpTopic.find(params[:id])).nil?
       @results =ad_info(assignment.id, topic.id)
@@ -573,6 +584,7 @@ class SignUpSheetController < ApplicationController
     end
   end
 
+
 private
   def redirect_to_sign_up(assignment_id)
     redirect_to :action => :index, :id => assignment_id
@@ -617,5 +629,4 @@ private
       end
     end
   end
-
 end

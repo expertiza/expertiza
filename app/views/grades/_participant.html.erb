@@ -36,7 +36,7 @@
   	</TD>
    	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",s_min) %>% - <%= sprintf("%.0f",s_max) %>% 
    	<% if controller.action_name != "view_my_scores" %>
-   	  <BR/><FONT SIZE="-1"><%= link_to 'email reviewers', :action => 'conflict_notification', :id => participant.id, :submission => 'review' %></FONT>
+   	  <BR/><FONT SIZE="-1"><%= link_to 'email reviewers', :action => 'conflict_email', :id => participant.id, :submission => 'review' %></FONT>
    	<% end %>
     </TD>
     <% else %>
@@ -50,7 +50,7 @@
     </TD>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",r_min) %>% - <%= sprintf("%.0f",r_max) %>%
     <% if controller.action_name != "view_my_scores" %>
-      <BR/><FONT SIZE="-1"><%= link_to 'email metareviewers', :action => 'conflict_notification', :id => participant.id, :submission => 'review_of_review' %></FONT>
+      <BR/><FONT SIZE="-1"><%= link_to 'email metareviewers', :action => 'conflict_email', :id => participant.id, :submission => 'review_of_review' %></FONT>
     <% end %>  	    
     </TD>
     <% else %>
@@ -65,7 +65,7 @@
 
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",f_min) %>% - <%= sprintf("%.0f",f_max) %>%
     <% if controller.action_name != "view_my_scores" %>
-      <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => 'review_feedback' %></FONT>
+      <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_email', :id => participant.id, :submission => 'review_feedback' %></FONT>
     <% end %>  	    
     </TD>
     <% else %>
@@ -83,7 +83,7 @@
     </TD>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",tr_min) %>% - <%= sprintf("%.0f",tr_max) %>%
     <% if controller.action_name != "view_my_scores" %>
-      <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => 'teammate_review' %></FONT>
+      <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_email', :id => participant.id, :submission => 'teammate_review' %></FONT>
     <% end %>  	    
     </TD>
     <% else %>

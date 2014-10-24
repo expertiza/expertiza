@@ -10,10 +10,6 @@ class GradesController < ApplicationController
       current_role_name.eql? 'Student'
     when 'show_reviews'
         true
-    when 'show_review'
-        true
-    when 'show_feed_backs'
-        true
     else
       ['Instructor',
        'Teaching Assistant',
@@ -22,7 +18,7 @@ class GradesController < ApplicationController
   end
 
   #the view grading report provides the instructor with an overall view of all the grades for
-  #an assignment. It lists all participants of an assignment and all the reviews they received.
+  #an assignment. It lists all participants of an assignment
   #It also gives a final score, which is an average of all the reviews and greatest difference
   #in the scores of all the reviews.
   def view
@@ -37,16 +33,7 @@ class GradesController < ApplicationController
     calculate_all_penalties(@assignment.id)
   end
 
- def show_review
-
-    @prefix=params[:prefix]
-    @score=params[:score]
-    @participant=params[:participant]
-    respond_to do |format|
-     format.js
-    end
-  end
-
+  #the show_reviews action lists all the reviews they received.
   def show_reviews
     @partial='grades/'+params[:path]
     @prefix=params[:prefix]
@@ -184,76 +171,24 @@ class GradesController < ApplicationController
   end
 
 
-  def send_grading_conflict_email
-    email_form = params[:mailer]
-    assignment = Assignment.find(email_form[:assignment])
-    recipient = User.where(["email = ?", email_form[:recipients]]).first
-
-    body_text = email_form[:body_text]
-    body_text["##[recipient_name]"] = recipient.fullname
-    body_text["##[recipients_grade]"] = email_form[recipient.fullname+"_grade"]+"%"
-    body_text["##[assignment_name]"] = assignment.name
-
-    Mailer.deliver_message(
-      {:recipients => email_form[:recipients],
-       :subject => email_form[:subject],
-       :from => email_form[:from],
-       :body => {
-         :body_text => body_text,
-         :partial_name => "grading_conflict"
-       }
-    }
-    )
-
-    flash[:notice] = "Your email to " + email_form[:recipients] + " has been sent. If you would like to send an email to another student please do so now, otherwise click Back"
-    redirect_to :action => 'conflict_email_form',
-      :assignment => email_form[:assignment],
-      :author => email_form[:author]
-    end
 
     # the grading conflict email form provides the instructor a way of emailing
     # the reviewers of a submission if he feels one of the reviews was unfair or inaccurate.
-    def conflict_notification
+    def conflict_email
       if session[:user].role_id !=6
         @instructor = session[:user]
       else
         @instructor = Ta.get_my_instructor(session[:user].id)
       end
       recipient=User.find(params[:reviewer_id])
+
       participant = AssignmentParticipant.find(params[:participant_id])
-      ConflictMailer.send_conflict_email(@instructor,recipient,participant,params[:submission]).deliver
-
-      @assignment = Assignment.find(@participant.parent_id)
-
-
-      @questions = Hash.new
-      questionnaires = @assignment.questionnaires
-      questionnaires.each {
-        |questionnaire|
-        @questions[questionnaire.symbol] = questionnaire.questions
-      }
-
-      @reviewers_email_hash = Hash.new
-
-      @caction = "view"
-      @submission = params[:submission]
-      if @submission == "review"
-        @caction = "view_review"
-        @symbol = "review"
-        process_response("Review", "Reviewer", @participant.reviews, "ReviewQuestionnaire")
-      elsif @submission == "review_of_review"
-        @symbol = "metareview"
-        process_response("Metareview", "Metareviewer", @participant.metareviews, "MetareviewQuestionnaire")
-      elsif @submission == "review_feedback"
-        @symbol = "feedback"
-        process_response("Feedback", "Author", @participant.feedback, "AuthorFeedbackQuestionnaire")
-      elsif @submission == "teammate_review"
-        @symbol = "teammate"
-        process_response("Teammate Review", "Reviewer", @participant.teammate_reviews, "TeammateReviewQuestionnaire")
+      score=params[:score]
+      ConflictMailer.send_conflict_email(@instructor,recipient,participant,score).deliver
+      #respond with ajax, Alert that email has been successfully sent
+      respond_to do |format|
+        format.js
       end
-
-      @subject = " Your "+@collabel.downcase+" score for " + @assignment.name + " conflicts with another "+@rowlabel.downcase+"'s score."
-      @body = get_body_text(params[:submission])
 
     end
 
@@ -275,19 +210,6 @@ class GradesController < ApplicationController
 
     private
 
-    def process_response(collabel, rowlabel, responses, questionnaire_type)
-      @collabel = collabel
-      @rowlabel = rowlabel
-      @reviews = responses
-      @reviews.each {
-        |response|
-        user = response.map.reviewer.user
-        @reviewers_email_hash[user.fullname.to_s+" <"+user.email.to_s+">"] = user.email.to_s
-      }
-      @reviews.sort! { |a, b| a.map.reviewer.user.fullname <=> b.map.reviewer.user.fullname }
-      @questionnaire = @assignment.questionnaires.find_by_type(questionnaire_type)
-      @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)
-    end
 
     def redirect_when_disallowed
       # For author feedback, participants need to be able to read feedback submitted by other teammates.
@@ -310,20 +232,7 @@ class GradesController < ApplicationController
       return false
     end
 
-    def get_body_text(submission)
-      if submission
-        role = "reviewer"
-        item = "submission"
-      else
-        role = "metareviewer"
-        item = "review"
-      end
-      "Hi ##[recipient_name],
 
-        You submitted a score of ##[recipients_grade] for assignment ##[assignment_name] that varied greatly from another "+role+"'s score for the same "+item+".
-
-        The Expertiza system has brought this to my attention."
-    end
 
   #   def calculate_all_penalties(assignment_id)
   #    @all_penalties = {}

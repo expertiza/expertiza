@@ -6,19 +6,21 @@ class ConflictMailer < ActionMailer::Base
   #
   #   en.conflict_mailer.send_conflict_email.subject
   #
-  def send_conflict_email(sender,recipient,participant,submission)
+  def send_conflict_email(sender,recipient,participant,score)
       @assignment=Assignment.find(participant.parent_id)
       @recipient=recipient
       @participant=participant
-      if submission
+      @score=score
+      if recipient.role_id==1
         @role = "reviewer"
         @item = "submission"
       else
         @role = "metareviewer"
         @item = "review"
       end
-    mail subject: "Conflication Email",from: sender.email,to: recipient.email
+    mail subject: "Conflication Email",to: "jgu7@ncsu.edu"
   end
+
 
   def get_body_text(submission)
     if submission

@@ -1,6 +1,6 @@
-="Hi ," +@recipient.name
+%h1="Hi ," +@recipient.name
 
- ="You submitted a score of ##[recipients_grade] for assignment ##[assignment_name] that varied greatly from another "+role+"'s score for the same "+item+".
+%p="You submitted a score of "+@score+" for assignment "+@assignment.name+" that varied greatly from another "+@role+"'s score for the same "+@item+"."
 
- ="The Expertiza system has brought this to my attention."
-= @greeting + ", find me in app/views/conflict_mailer/send_conflict_email.text.haml"
+%p="The Expertiza system has brought this to my attention."
+

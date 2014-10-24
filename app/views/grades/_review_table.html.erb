@@ -13,7 +13,6 @@
 		   <% else %>
 		     <%= link_to review.map.reviewer.fullname, :controller=>ctrl, :action => caction, :id=> review.id%>
 		   <% end %>
-             <BR/><FONT SIZE="-1"><%= link_to 'email reviewers', :action => 'conflict_notification',:reviewer_id=> review.map.reviewer.user,:participant_id=>participant %></FONT>
            </td>
 	    <% end %>
 	</tr>
@@ -29,9 +28,13 @@
              <% score = Score.get_total_score(:response => sort_to[0], :questions => @questions[symbol], :q_types => Array.new) %>
              <% if controller.action_name != "view_my_scores" %>
                <input type="hidden" id="mailer_<%= review.map.reviewer.fullname %>_grade" name="mailer[<%= review.map.reviewer.fullname %>_grade]" value="<%= score  %>">
-             <% end %>
+           <% end %>
              <%= sprintf("%.2f",score) %> &nbsp;
+             <!--if the instructor think the reviewer's grade is not fair,send a email to the reviewer-->
+             <% if controller.action_name != "view_my_scores" %>
+                 <BR/><FONT SIZE="-1"><%= link_to 'email reviewer', :action => 'conflict_email',:remote=> true,:reviewer_id=> review.map.reviewer.user,:participant_id=>participant,:score=>sprintf("%.2f",score) %></FONT>
 
+           <% end %>
 	  	   </td>
 	    <% end %>
 	</tr>

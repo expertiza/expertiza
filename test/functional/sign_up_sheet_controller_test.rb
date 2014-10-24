@@ -8,25 +8,31 @@ class SignUpSheetControllerTest < ActionController::TestCase
 
   def setup
     @admin = users(:admin)
+    @student1 = users(:student1)
     @assignment2 = assignments(:assignment2)
-
-#    Role.rebuild_cache
-#    AuthController.set_current_role(users(:admin).role_id,@request.session)
   end
 
-  test "admin_should_show_add_signup_topics" do
-    session[:user] = @admin
+  test "admin should view index" do
+    set_user @admin
 
     get :index, :id => @assignment2
     assert_response :success
   end
 
-  # test "should_create_new_topic_for_assignment" do
-  #   post :create, :topic =>{:topic_identifier=>"t1",:topic_name=>"t1",:category=>"t1",:max_choosers=>3}, :id=>assignments(:assignment2).id
-  #   newTopic = SignUpTopic.find_by_topic_name("t1")
-  #   puts newTopic.assignment_id
-  #   assert_equal(assignments(:assignment2).id,newTopic.assignment_id)
-  # end
+  test "admin should create new topic for assignment" do
+    set_user @admin
+
+    get :create,
+        :topic => {
+          :topic_identifier=>"t1",
+          :topic_name=>"t1",
+          :category=>"t1",
+          :max_choosers=>3
+        }, :id => @assignment2
+    assert_redirected_to :action => :index, :id => @assignment2
+
+    assert_not_nil SignUpTopic.find_by_topic_name("t1")
+  end
 
   # test "should_delete_signup_topic_for_assignment" do
   #   post :destroy, :id=> sign_up_topics(:Topic1).id, :assignment_id => assignments(:assignment_project1)
@@ -72,5 +78,24 @@ class SignUpSheetControllerTest < ActionController::TestCase
   #   assert SignUpTopic.find(:all, :conditions => ["topic_name = 'mt_topic_test' AND micropayment = 2"])
   # end
 
-end
+  test "student should view signup index" do
+    set_user @student1
 
+    get :index_signup, :id => @assignment2
+    assert_response :success
+  end
+
+  # test "student should sign up for topic" do
+  #   set_user @student1
+  #
+  #   get :create_signup, :id => @topic1, :assignment_id => @assignment2
+  #   assert_redirected_to :action => :index_signup, :id => @assignment2
+  # end
+
+private
+  # Sets the user for the current session
+  def set_user(user)
+    session[:user] = user
+  end
+
+end

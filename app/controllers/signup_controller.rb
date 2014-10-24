@@ -1,14 +1,15 @@
 #Signup controller has all the functions related to signup for a topic and droppng a selected
-#topic. These are all actions that a user performs. The following is a brief explanation of what each method does.
+#topic. These are all actions that a user performs. The following is a brief explanation 
+#of what each method does.
 
 class SignupController < ApplicationController
-  # The manage team helper is used to update the create new teams, update teams, delete teams etc. For more information refer
-  # /app/helpers/ManageTeamHelper
+  # The manage team helper is used to update the create new teams, update teams, 
+  # delete teams etc. For more information refer /app/helpers/ManageTeamHelper
   include ManageTeamHelper
 
 
-  #Displays all the topics available for an assignment, including number of people who can choose the topic, number of
-  #people who have already chosen the topic, etc
+  #Displays all the topics available for an assignment, including number of people 
+  #who can choose the topic, number of people who have already chosen the topic, etc.
   def list
     @assignment_id = params[:id]
     @sign_up_topics = SignUpTopic.where( ['assignment_id = ?', params[:id]])
@@ -16,7 +17,7 @@ class SignupController < ApplicationController
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:id])
     @show_actions = true
 
-    #find whether assignment is team assignment
+    #Find whether assignment is team assignment.
     assignment = Assignment.find(params[:id])
 
     if !assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(DeadlineType.find_by_name("submission").id).due_at < Time.now
@@ -37,110 +38,76 @@ class SignupController < ApplicationController
   end
 
 
-  #This function lets the user choose a particular topic. This function is invoked when the user clicks the green check mark in
-  #the signup sheet
+  #This function lets the user choose a particular topic. This function is invoked when 
+  #the user clicks the green check mark in the signup sheet
   def signup
-    #find the assignment to which user is signing up
+    #Find the assignment to which user is signing up.
     @assignment = Assignment.find(params[:assignment_id])
 
-    # TODO: This will be always be true now. (Dropped the == true)
-    # TODO: Everything is a team assignment.  Everyone gets a team.
-    if @assignment.team_assignment
-      #check whether the user already has a team for this assignment
-      #TODO: Probably need to leave this in.  There are places where people won't have a team.
-      @users_team = SignedUpUser.find_team_users(params[:assignment_id],(session[:user].id))
+    #Everything is a team assignment.  Everyone gets a team.
+    #Check whether the user already has a team for this assignment.
+    #There are likely paths that will allow the user to get to here without
+    #having an assigned team.
+    @users_team = SignedUpUser.find_team_users(params[:assignment_id],(session[:user].id))
 
-      if @users_team.size == 0
-        #if team is not yet created, create new team.
-        @team = AssignmentTeam.create_team_and_node(params[:assignment_id])
-        @user = User.find(session[:user].id)
-        @teamuser = create_team_users(user, team.id)
-        @confirmationStatus = confirm_topic(team.id, params[:id], params[:assignment_id])
-      else
-        @confirmationStatus = confirm_topic(users_team[0].t_id, params[:id], params[:assignment_id])
-      end
-
-      redirect_to :action => 'list', :id => params[:assignment_id]
+    if @users_team.size == 0
+      #If team is not yet created, create new team.
+      @team = AssignmentTeam.create_team_and_node(params[:assignment_id])
+      @user = User.find(session[:user].id)
+      @teamuser = create_team_users(user, team.id)
+      @confirmationStatus = confirm_topic(team.id, params[:id], params[:assignment_id])
+    else
+      @confirmationStatus = confirm_topic(users_team[0].t_id, params[:id], params[:assignment_id])
     end
+
+    redirect_to :action => 'list', :id => params[:assignment_id]
   end
 
 
-  # When using this method when creating fields, update race conditions by using db transactions
+  # When using this method when creating fields, update race conditions by 
+  # using db transactions
   def slotAvailable?(topic_id)
     SignUpTopic.slotAvailable?(topic_id)
   end
 
 
-  #checks for other topics a user may have already signed up for. These include both confirmed as well as waitlisted topics
+  # Checks for other topics a user may have already signed up for. 
+  # These include both confirmed as well as waitlisted topics.
   def other_confirmed_topic_for_user(assignment_id, creator_id)
     user_signup = SignedUpUser.find_user_signup_topics(assignment_id,creator_id)
     user_signup
   end
 
 
-  # TODO: TOO LONG.
-  # TODO: Need comments for this method.
   def confirm_topic(creator_id, topic_id, assignment_id)
-    #check whether user has signed up already
+    # Check whether user has signed up already.
     user_signup = other_confirmed_topic_for_user(assignment_id, creator_id)
 
     sign_up = SignedUpUser.new
     sign_up.topic_id = params[:id]
-    # TODO: Creator is always a team.
+    # NOTE: Creator is always a team.
     sign_up.creator_id = creator_id
 
+    # Initialize the return value.
     result = false
-    if user_signup.size == 0
-      # Using a DB transaction to ensure atomic inserts
-      ActiveRecord::Base.transaction do
-        #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
-        if slotAvailable?(topic_id)
-          sign_up.is_waitlisted = false
 
-          #Update topic_id in participant table with the topic_id
-          # TODO: If can try to move this to the signed_up_user model.
-          # TODO: If we can this should be removed.
-          participant = Participant.where(user_id: session[:user].id, parent_id:  assignment_id).first
-
-          participant.update_topic_id(topic_id)
-        else
-          sign_up.is_waitlisted = true
-        end
-        if sign_up.save
-          result = true
-        end
-      end
-    else
-      #If all the topics choosen by the user are waitlisted,
+    if user_signup > 0
+      # Check that all the topics chosen by the user are waitlisted
+      # otherwise don't let them choose another topic.
       for user_signup_topic in user_signup
         if user_signup_topic.is_waitlisted == false
           flash[:error] = "You have already signed up for a topic."
           return false
         end
       end
+    end
 
-      # Using a DB transaction to ensure atomic inserts
-      ActiveRecord::Base.transaction do
-        #check whether user is clicking on a topic which is not going to place him in the waitlist
-        # TODO: Find out how we associtate this with a team.
-        if !slotAvailable?(topic_id)
-          sign_up.is_waitlisted = true
-          if sign_up.save
-            result = true
-          end
-        else
-          #if slot exist, then confirm the topic for the user and delete all the waitlist for this user
-          Waitlist.cancel_all_waitlists(creator_id, assignment_id)
-          sign_up.is_waitlisted = false
-          sign_up.save
-
-          participant = Participant.where(user_id: session[:user].id, parent_id:  assignment_id).first
-
-          participant.update_topic_id(topic_id)
-          participant = Participant.where(user_id: session[:user].id, parent_id:  assignment_id).first
-          result = true
-        end
-      end
+    # Using a DB transaction to ensure atomic inserts
+    ActiveRecord::Base.transaction do
+      # NOTE: This is likely not checking if the user is on a team that
+      #       already has this topic assigned to it.
+      sign_up.sign_up_for_topic(session[:user].id, topic_id)
+      result = sign_up.save
     end
 
     result
@@ -155,9 +122,10 @@ class SignupController < ApplicationController
   end
 
 
-  #used by delete_signup function above. This functions updates all the database tables when the user drops the topic
+  # Used by delete_signup function above. This functions updates all the database tables 
+  # when the user drops the topic.
   def delete_signup_for_topic(assignment_id,topic_id)
-    #find whether assignment is team assignment
+    # Find whether assignment is team assignment
     assignment = Assignment.find(assignment_id)
 
     # TODO: Does nothing?

@@ -68,7 +68,7 @@ class QuestionnairesController < ApplicationController
       redirect_to action: 'list', controller: 'tree_display'
     end
   end
-s
+
   # Remove a given questionnaire
   def delete
     @questionnaire = Questionnaire.find(params[:id])

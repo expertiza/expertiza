@@ -29,15 +29,7 @@ class Chart
     @@header = true
   end
 
-  def self.set_Template_Optional_Params(template)
-    template[:title][:text] = ""
-    template.delete(:subtitle)
-    template.delete(:yAxis)
-    template.delete(:xAxis)
-    template
-  end
-
-  def self.dataAdapter(type,data,optionalConf)
+    def self.dataAdapter(type,data,optionalConf)
     template = data_template[type];
     if (type == :pie) then
       data[:type] = 'pie';
@@ -46,15 +38,23 @@ class Chart
       template[:series] = data
     end
     if optionalConf.nil? then
-      template = self.class.set_Template_optional_Params(template)
+      template = self.class.set_template_optional_params(template)
     else
       if optionalConf[:title].nil? then
         template[:title][:text] = ""
       else
         template[:title][:text] = optionalConf[:title]
       end
-    template=self.class.validate_optional_conf(optionalConf,template)
+      template=validate_optional_conf(optionalConf,template)
     end
+    template
+  end
+
+  def self.set_template_optional_params(template)
+    template[:title][:text] = ""
+    template.delete(:subtitle)
+    template.delete(:yAxis)
+    template.delete(:xAxis)
     template
   end
 

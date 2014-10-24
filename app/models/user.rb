@@ -7,24 +7,24 @@ class User < ActiveRecord::Base
     Authlogic::CryptoProviders::Sha1.stretches = 1
   end
 
-  has_many :participants, :class_name => 'Participant', :foreign_key => 'user_id', :dependent => :destroy
-  has_many :assignment_participants, :class_name => 'AssignmentParticipant', :foreign_key => 'user_id', :dependent => :destroy
-  has_many :assignments, :through => :participants
+  has_many :participants, class_name: 'Participant', foreign_key: 'user_id', dependent: :destroy
+  has_many :assignment_participants, class_name: 'AssignmentParticipant', foreign_key: 'user_id', dependent: :destroy
+  has_many :assignments, through: :participants
 
-  has_many :teams_users, :dependent => :destroy
-  has_many :teams, :through => :teams_users
+  has_many :teams_users, dependent: :destroy
+  has_many :teams, through: :teams_users
   has_many :sent_invitations, class_name: 'Invitation', foreign_key: 'from_id', dependent: :destroy
   has_many :received_invitations, class_name: 'Invitation', foreign_key: 'to_id', dependent: :destroy
 
-  has_many :children, class_name: 'User', :foreign_key => 'parent_id'
+  has_many :children, class_name: 'User', foreign_key: 'parent_id'
   belongs_to :parent, class_name: 'User'
   belongs_to :role
 
   validates_presence_of :name
   validates_uniqueness_of :name
 
-  validates_presence_of :email, :message => "can't be blank"
-  validates_format_of :email, :with => /\A[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\z/i, :allow_blank => true
+  validates_presence_of :email, message: "can't be blank"
+  validates_format_of :email, :with => /\A[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\z/i, allow_blank: true
 
   before_validation :randomize_password, :if => lambda { |user| user.new_record? && user.password.blank? } # AuthLogic
   after_create :email_welcome
@@ -59,7 +59,7 @@ class User < ActiveRecord::Base
 
   def get_available_users(name)
     lesser_roles = role.get_parents
-    all_users = User.all(:conditions => ['name LIKE ?', "#{name}%"], :limit => 20) # higher limit, since we're filtering
+    all_users = User.all(conditions: ['name LIKE ?', "#{name}%"], limit: 20) # higher limit, since we're filtering
     visible_users = all_users.select{|user| lesser_roles.include? user.role}
     return visible_users[0,10] # the first 10
   end
@@ -145,7 +145,7 @@ class User < ActiveRecord::Base
   end
 
   def self.yesorno(elt)
-    if elt==true
+    if elt
       "yes"
     elsif elt ==false
       "no"
@@ -163,7 +163,7 @@ class User < ActiveRecord::Base
       items = login.split("@")
       shortName = items[0]
       userList = User.where ["name =?",shortName]
-      if userList != nil && userList.length == 1
+      if userList != nil && userList.one?
         user = userList.first
       end
     end
@@ -187,7 +187,7 @@ class User < ActiveRecord::Base
   end
 
   def set_courses_to_assignment
-    @courses = Course.where(instructor_id: self.id, :order => 'name')
+    @courses = Course.where(instructor_id: self.id, order: 'name')
   end
 
   # generate a new RSA public/private key pair and create our own X509 digital certificate which we
@@ -279,7 +279,7 @@ class User < ActiveRecord::Base
       user = User.find_by_name(params[:user][:name])
     end
     if user.nil?
-      newuser = url_for :controller => 'users', :action => 'new'
+      newuser = url_for controller: 'users', action: 'new'
       raise "Please <a href='#{newuser}'>create an account</a> for this user to continue."
     end
     return user

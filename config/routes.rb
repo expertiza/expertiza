@@ -1,4 +1,7 @@
 Expertiza::Application.routes.draw do
+  get 'grades/show_reviews'
+  get 'grades/show_feedbacks'
+
   resources :bookmark_tags
   resources :books
   resources :bookmarks
@@ -133,8 +136,6 @@ Expertiza::Application.routes.draw do
       get :show_review
     end
   end
-
-  get 'grades/show_review'
 
   resources :impersonate do
     collection do

@@ -1,0 +1,3 @@
+%h1 Grades#show_reviews
+%p Find me in app/views/grades/show_reviews.html.haml
+<%= render :partial=>'grades/reviews', :locals => {:prefix => 'user', :participant => @participant, :rscore => @score} )%>

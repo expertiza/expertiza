@@ -4,7 +4,7 @@
 			<th><%= collabel %>&nbsp;<%=i+1%></th>
 		<% end %>
 	</tr>
-	<% if controller.action_name == "view_my_scores" %>
+	<% if controller.action_name != "view_my_scores" %>
 	<tr class="head"><td align="right"><b><%= rowlabel %></b></td>	    	
 		<% for review in reviews %>
            <td align="center">                       
@@ -13,7 +13,7 @@
 		   <% else %>
 		     <%= link_to review.map.reviewer.fullname, :controller=>ctrl, :action => caction, :id=> review.id%>
 		   <% end %>
-             <BR/><FONT SIZE="-1"><%= link_to 'email reviewers', :action => 'conflict_notification',:id=>review.map.reviewer %></FONT>
+             <BR/><FONT SIZE="-1"><%= link_to 'email reviewers', :action => 'conflict_notification',:reviewer_id=> review.map.reviewer.user,:participant_id=>participant %></FONT>
            </td>
 	    <% end %>
 	</tr>
@@ -30,7 +30,7 @@
              <% if controller.action_name != "view_my_scores" %>
                <input type="hidden" id="mailer_<%= review.map.reviewer.fullname %>_grade" name="mailer[<%= review.map.reviewer.fullname %>_grade]" value="<%= score  %>">
              <% end %>
-             <%= sprintf("%.2f",score) %>% &nbsp;
+             <%= sprintf("%.2f",score) %> &nbsp;
 
 	  	   </td>
 	    <% end %>

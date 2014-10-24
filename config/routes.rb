@@ -128,7 +128,7 @@ Expertiza::Application.routes.draw do
   resources :grades do
     collection do
       get :view
-      get :view_my_scores
+      get :grades_show
       get :view_my_scores_new
       get :instructor_review
       post :remove_hyperlink

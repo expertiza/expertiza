@@ -66,7 +66,7 @@ class GradesController < ApplicationController
   end
 
 
-  def view_my_scores
+  def grades_show
     @participant = AssignmentParticipant.find(params[:id])
     return if redirect_when_disallowed
     @assignment = @participant.assignment

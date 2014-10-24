@@ -150,7 +150,7 @@ class ReportsController < ApplicationController
 
     @map = ResponseMap.find(params[:id])
     if params[:return] == "feedback"
-      redirect_to :controller => 'grades', :action => 'view_my_scores', :id => @map.reviewer.id
+      redirect_to :controller => 'grades', :action => 'grades_show', :id => @map.reviewer.id
     elsif params[:return] == "teammate"
       redirect_to :controller => 'student_team', :action => 'view', :id => @map.reviewer.id
     elsif params[:return] == "instructor"

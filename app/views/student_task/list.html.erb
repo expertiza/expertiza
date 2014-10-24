@@ -74,7 +74,7 @@
 
 <% @notifications.each do |student_task| %>
   <span class="notification">&nbsp; &raquo; <%= link_to student_task.assignment.name + ": " +
-    student_task.current_stage + " submitted", :controller => :grades, :action => :view_my_scores, :id => student_task.participant.id %></span><br/>
+    student_task.current_stage + " submitted", :controller => :grades, :action => :grades_show, :id => student_task.participant.id %></span><br/>
 <% end %>
 </div>
 </div>

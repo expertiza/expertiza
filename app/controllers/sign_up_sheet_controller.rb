@@ -159,55 +159,12 @@ class SignUpSheetController < ApplicationController
   #Contains links that let an admin or Instructor edit, delete, view enrolled/waitlisted members for each topic
   #Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics
   #can have different deadlines.
-  def add_signup_topic
-    load_add_signup_topics(params[:id])
-
-    @review_rounds = Assignment.find(params[:id]).get_review_rounds
-    @topics = SignUpTopic.where(assignment_id: params[:id])
-
-    #Use this until you figure out how to initialize this array
-    @duedates = SignUpTopic.find_by_sql("SELECT s.id as topic_id FROM sign_up_topics s WHERE s.assignment_id = " + params[:id].to_s)
-
-    unless @topics.nil?
-      i=0
-      @topics.each { |topic|
-
-      @duedates[i]['t_id'] = topic.id
-      @duedates[i]['topic_identifier'] = topic.topic_identifier
-      @duedates[i]['topic_name'] = topic.topic_name
-
-      for j in 1..@review_rounds
-        duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('submission').id).first
-        duedate_rev = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('review').id).first
-        if !duedate_subm.nil? && !duedate_rev.nil?
-          @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
-          @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
-        else
-          #the topic is new. so copy deadlines from assignment
-          set_of_due_dates = DueDate.where(assignment_id: params[:id])
-          set_of_due_dates.each { |due_date|
-            create_topic_deadline(due_date, 0, topic.id)
-          }
-
-          @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
-          @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
-        end
-      end
-
-      duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('metareview').id).first
-      @duedates[i]['submission_'+ (@review_rounds+1).to_s] = !(duedate_subm.nil?)?(DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")):nil
-        i = i + 1
-      }
-    end
-  end
-
-  def add_signup_topics_staggered
-    add_signup_topic
-  end
-
-  #similar to the above function except that all the topics and review/submission rounds have the similar deadlines
   def add_signup_topics
     load_add_signup_topics(params[:id])
+
+    if @assignment.staggered_deadline
+      get_staggered_deadlines @assignment
+    end
   end
 
   #Seems like this function is similar to the above function> we are not quite sure what publishing rights mean. Seems like
@@ -238,13 +195,6 @@ class SignUpSheetController < ApplicationController
     @sign_up_topic.category = params[:topic][:category]
     @sign_up_topic.assignment_id = params[:id]
     @assignment = Assignment.find(params[:id])
-  end
-
-  #simple function that redirects ti the /add_signup_topics or the /add_signup_topics_staggered page depending on assignment type
-  #staggered means that different topics can have different deadlines.
-  def redirect_to_sign_up(assignment_id)
-    assignment = Assignment.find(assignment_id)
-    (assignment.staggered_deadline == true)?(redirect_to :action => 'add_signup_topics_staggered', :id => assignment_id):(redirect_to :action => 'add_signup_topics', :id => assignment_id)
   end
 
   def index
@@ -619,6 +569,51 @@ class SignUpSheetController < ApplicationController
       redirect_to_sign_up(assignment_id)
     else
       render :action => 'new', :id => assignment_id
+    end
+  end
+
+private
+  def redirect_to_sign_up(assignment_id)
+    redirect_to :action => :add_signup_topics, :id => assignment_id
+  end
+
+  def get_staggered_deadlines(assignment)
+    @review_rounds = assignment.get_review_rounds
+    @topics = SignUpTopic.where(assignment_id: assignment.id)
+
+    #Use this until you figure out how to initialize this array
+    @duedates = SignUpTopic.find_by_sql("SELECT s.id as topic_id FROM sign_up_topics s WHERE s.assignment_id = " + assignment.id.to_s)
+
+    unless @topics.nil?
+      i=0
+      @topics.each do |topic|
+
+        @duedates[i]['t_id'] = topic.id
+        @duedates[i]['topic_identifier'] = topic.topic_identifier
+        @duedates[i]['topic_name'] = topic.topic_name
+
+        for j in 1..@review_rounds
+          duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('submission').id).first
+          duedate_rev = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('review').id).first
+          if !duedate_subm.nil? && !duedate_rev.nil?
+            @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
+            @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
+          else
+            #the topic is new. so copy deadlines from assignment
+            set_of_due_dates = DueDate.where(assignment_id: assignment.id)
+            set_of_due_dates.each { |due_date|
+              create_topic_deadline(due_date, 0, topic.id)
+            }
+
+            @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
+            @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
+          end
+        end
+
+        duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('metareview').id).first
+        @duedates[i]['submission_'+ (@review_rounds+1).to_s] = !(duedate_subm.nil?)?(DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")):nil
+        i = i + 1
+      end
     end
   end
 

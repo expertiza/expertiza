@@ -15,7 +15,7 @@ class SignUpSheetController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'signup_topics', 'sign_up', 'delete_signup', 'list', 'show_team'
+    when 'signup_topics', 'create_signup', 'destroy_signup', 'index', 'show_team'
       current_role_name.eql? 'Student'
     else
       ['Instructor',
@@ -31,7 +31,7 @@ class SignUpSheetController < ApplicationController
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [:destroy, :create, :update],
-    :redirect_to => {:action => :list}
+    :redirect_to => {:action => :index}
 
   # Prepares the form for adding a new topic. Used in conjuntion with create
   def new
@@ -93,7 +93,7 @@ class SignUpSheetController < ApplicationController
   end
 
   #This method is used to delete signup topics
-  def delete
+  def destroy
     @topic = SignUpTopic.find(params[:id])
 
     if @topic
@@ -247,7 +247,7 @@ class SignUpSheetController < ApplicationController
     (assignment.staggered_deadline == true)?(redirect_to :action => 'add_signup_topics_staggered', :id => assignment_id):(redirect_to :action => 'add_signup_topics', :id => assignment_id)
   end
 
-  def list
+  def index
     @assignment_id = params[:id]
     @sign_up_topics = SignUpTopic.where( ['assignment_id = ?', params[:id]]).all
     @slots_filled = SignUpTopic.find_slots_filled(params[:id])
@@ -277,24 +277,27 @@ class SignUpSheetController < ApplicationController
     end
   end
 
-  #this function is used to delete a previous signup
-  def destroy_signup
-    @user_id = session[:user].id
-    SignUpTopic.reassign_topic(@user_id,assignment_id, topic_id)
-    redirect_to :action => 'list', :id => params[:assignment_id]
+  # Sign a user up for a topic
+  def create_signup
+    #find the assignment to which user is signing up
+    user = session[:user]
+    assignment_id = params[:assignment_id]
+    topic_id = params[:id]
+
+    signup_team(assignment_id, user.id, topic_id)
+
+    redirect_to :action => 'index', :id => params[:assignment_id]
   end
 
-  def sign_up
-    #find the assignment to which user is signing up
-    @assignment = Assignment.find(params[:assignment_id])
-    @user_id = session[:user].id
+  # This function is used to delete a previous signup
+  def destroy_signup
+    user = session[:user]
+    assignment_id = params[:assignment_id]
+    topic_id = params[:id]
 
-    #check whether team assignment. This is to decide whether a team_id or user_id should be the creator_id
-    #Always use team_id ACS
-    #s = Signupsheet.new
-    #check whether the user already has a team for this assignment
-    signup_team(@assignment.id, @user_id, params[:id])
-    redirect_to :action => 'list', :id => params[:assignment_id]
+    SignUpTopic.reassign_topic(user.id, assignment_id, topic_id)
+
+    redirect_to :action => 'index', :id => params[:assignment_id]
   end
 
   def signup_team(assignment_id, user_id, topic_id)
@@ -457,7 +460,7 @@ class SignUpSheetController < ApplicationController
       end
     end
 
-    redirect_to :action => 'list', :id => params[:assignment_id]
+    redirect_to :action => 'index', :id => params[:assignment_id]
   end
 
   #this function is used to prevent injection attacks.  A topic *dependent* on another topic cannot be

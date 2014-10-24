@@ -53,7 +53,6 @@ gem 'turbolinks'
 gem 'will_paginate'
 gem 'zip-zip'
 gem 'fsm'
-gem 'graphr'
 
 group :development do
   gem 'daemons'

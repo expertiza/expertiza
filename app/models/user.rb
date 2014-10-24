@@ -39,9 +39,9 @@ class User < ActiveRecord::Base
 
   has_paper_trail
 
-  def salt_first?
-    true
-  end
+  #def salt_first? Commenting the function as it is not being called anywhere
+  #  true
+  #end
 
   def bookmark_rated?(bmapping_id)
     BmappingRatings.where(["bmapping_id = #{bmapping_id} AND user_id = #{self.id}"]).first
@@ -144,7 +144,7 @@ class User < ActiveRecord::Base
   def self.yesorno(elt)
     if elt
       "yes"
-    elsif elt ==false
+    elsif !elt
       "no"
     else
       ""

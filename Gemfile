@@ -27,8 +27,8 @@ gem 'nokogiri'
 gem 'seer'
 gem 'gchart'
 group :development do
-  gem 'mongrel'
-  gem 'ruby-debug'
+  gem "mongrel", ">= 1.2.0.pre2"
+  gem 'ruby-debug19'
 end
 
 group :test do

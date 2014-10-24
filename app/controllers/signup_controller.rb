@@ -119,6 +119,7 @@ class SignupController < ApplicationController
   # when the user drops the topic.
   def delete_signup_for_topic(assignment_id,topic_id)
     # Find whether assignment is team assignment
+    # All assignments are team assignments now.
     assignment = Assignment.find(assignment_id)
 
     # Making sure that the drop date deadline hasn't passed
@@ -127,16 +128,17 @@ class SignupController < ApplicationController
     if(!dropDate.nil? && dropDate.due_at < Time.now)
       flash[:error] = "You cannot drop this topic because the drop deadline has passed."
     else
-      #if team assignment find the creator id from teamusers table and teams
-      #users_team will contain the team id of the team to which the user belongs
+      # If team assignment find the creator id from teamusers table and teams.
+      # Users_team will contain the team id of the team to which the user belongs.
       users_team = SignedUpUser.find_team_users(assignment_id,(session[:user].id))
       signup_record = SignedUpUser.where(topic_id: topic_id, creator_id:  users_team[0].t_id).first
 
       # TODO: This should be a model function.  Taking someone off a wait list and push them into a topic.
-      # TODO: Move this to signed_up_user.  consider changing the model name to signed_up_team.
-      #if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
+      # TODO: Move this to signed_up_user.  Consider changing the model name to signed_up_team.
+      # If a confirmed slot is deleted then push the first waiting list member
+      # to confirmed slot if someone is on the waitlist.
       if signup_record.is_waitlisted == false
-        #find the first wait listed user if exists
+        # Find the first wait listed user if exists
         first_waitlisted_user = SignedUpUser.where(topic_id: topic_id, is_waitlisted:  true).first
 
         if !first_waitlisted_user.nil?

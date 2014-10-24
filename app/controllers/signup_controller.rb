@@ -64,13 +64,6 @@ class SignupController < ApplicationController
   end
 
 
-  # When using this method when creating fields, update race conditions by 
-  # using db transactions
-  def slotAvailable?(topic_id)
-    SignUpTopic.slotAvailable?(topic_id)
-  end
-
-
   # Checks for other topics a user may have already signed up for. 
   # These include both confirmed as well as waitlisted topics.
   def other_confirmed_topic_for_user(assignment_id, creator_id)
@@ -127,10 +120,6 @@ class SignupController < ApplicationController
   def delete_signup_for_topic(assignment_id,topic_id)
     # Find whether assignment is team assignment
     assignment = Assignment.find(assignment_id)
-
-    # TODO: Does nothing?
-    if SignedUpUser.find_by_creator_id(session[:user].id).nil?
-    end
 
     # Making sure that the drop date deadline hasn't passed
     dropDate = DueDate.where( {:assignment_id => assignment.id, :deadline_type_id => '6'}).first

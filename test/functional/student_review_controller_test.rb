@@ -17,7 +17,7 @@ class StudentReviewControllerTest < ActionController::TestCase
   def test_get_current_user_id_and_verify
 
     participant=Participant.find(participants(:par1))
-    assignment=Assignment.find(:first,:conditions => ["id=?",participant.parent_id] )
+    assignment=Assignment.find(first,conditions => ["id=?",participant.parent_id] )
     session[:user] = @user
     printf(assignment.inspect)
     participant_user_id = participant.user_id
@@ -32,7 +32,7 @@ class StudentReviewControllerTest < ActionController::TestCase
   def test_false_current_user_id_and_verify
 
     participant=Participant.find(participants(:par1))
-    assignment=Assignment.find(:first,:conditions => ["id=?",participant.parent_id] )
+    assignment=Assignment.find(participant.parent_id)
     session[:user].id = 5
     printf(assignment.inspect)
     participant_user_id = participant.user_id
@@ -46,7 +46,7 @@ class StudentReviewControllerTest < ActionController::TestCase
   def test_get_current_stage
 
     participant=Participant.find(participants(:par0))
-    assignment=Assignment.find(:first,:conditions => ["id=?",participant.parent_id] )
+    assignment=Assignment.find(participant.parent_id)
     session[:user] = @user
     current_stage = assignment.get_current_stage(participant.topic_id)
     result = "rereview"
@@ -62,8 +62,8 @@ class StudentReviewControllerTest < ActionController::TestCase
     participant=Participant.find(participants(:par14))
     response_map14 = ResponseMap.find(response_maps(:response_maps3))
     session[:user] = @user
-    review_mapping = ParticipantReviewResponseMap.find_all_by_reviewer_id(participant.id)
-    assert_equal(response_map14.to_a, review_mapping.to_a)
+    review_mapping = ParticipantReviewResponseMap.where(:reviewer_id=> participant.id)
+    assert_equal(response_map14, review_mapping)
 
   end
 
@@ -72,7 +72,7 @@ class StudentReviewControllerTest < ActionController::TestCase
     def test_verify_rounds
 
     participant = Participant.find(participants(:par0))
-    assignment = Assignment.find(:first, :conditions => ["id=?", participant.parent_id])
+    assignment = Assignment.find(participant.parent_id)
     review_rounds = assignment.get_review_rounds
     result = 2
     assert_equal(result, review_rounds)
@@ -84,7 +84,7 @@ class StudentReviewControllerTest < ActionController::TestCase
   def test_review_allowed_id
 
     participant = Participant.find(participants(:par5))
-    assignment = Assignment.find(:first, :conditions => ["id=?", participant.parent_id])
+    assignment = Assignment.find(participant.parent_id)
     topic_id = TopicDeadline.where(topic_id: participant.topic_id, deadline_type_id: 1).first
     result = 1
     printf(topic_id.inspect)
@@ -96,7 +96,7 @@ class StudentReviewControllerTest < ActionController::TestCase
   def test_rereview_allowed_id
 
     participant = Participant.find(participants(:par5))
-    assignment = Assignment.find(:first, :conditions => ["id=?", participant.parent_id])
+    assignment = Assignment.find(participant.parent_id)
     topic_id = TopicDeadline.where(topic_id: participant.topic_id, deadline_type_id: 1).first
     result = 1
     printf(topic_id.inspect)
@@ -109,8 +109,8 @@ class StudentReviewControllerTest < ActionController::TestCase
 
     participant = Participant.find(participants(:par2))
     response_map = ResponseMap.find(response_maps(:response_maps0))
-    assignment = Assignment.find(:first, :conditions => ["id=?", participant.parent_id])
-    review_mapping = TeamReviewResponseMap.find_by_reviewer_id(participant.id)
+    assignment = Assignment.find(participant.parent_id)
+    review_mapping = TeamReviewResponseMap.where(:reviewer_id=>participant.id)
     assert_equal(response_map.to_a, review_mapping.to_a)
 
   end
@@ -121,7 +121,7 @@ class StudentReviewControllerTest < ActionController::TestCase
     participant=Participant.find(participants(:par15))
     response_map15 = ResponseMap.find(response_maps(:response_map8))
     session[:user] = @user
-    review_mapping = MetareviewResponseMap.find_all_by_reviewer_id(participant.id)
+    review_mapping = MetareviewResponseMap.where(reviewer_id: participant.id)
     assert_equal(response_map15.to_a, review_mapping.to_a)
 
   end

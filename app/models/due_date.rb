@@ -2,6 +2,7 @@ class DueDate < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :deadline_type
   validate :due_at_is_valid_datetime
+  scope :search_assignment_id, ->(id){where("assignment_id = ?", "%#{id}%") }
 
   def self.default_permission(deadline_type, permission_type)
     permission_id = Hash.new
@@ -90,4 +91,8 @@ class DueDate < ActiveRecord::Base
     topic_deadline.save
   end
 
+  def self.sort_deadlines(due_dates)
+    @sorted_deadlines=Array.new
+    @sorted_deadlines= due_dates.sort { |m1, m2| (m1.due_at and m2.due_at) ? m1.due_at <=> m2.due_at : (m1.due_at ? -1 : 1) }
+  end
 end

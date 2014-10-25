@@ -282,6 +282,7 @@ Expertiza::Application.routes.draw do
       get :add_self_reviewer
       get :add_user_to_assignment
       get :assign_metareviewer_dynamically
+     # post :assign_metareviewer_dynamically
       get :assign_reviewer_dynamically
       post :assign_reviewer_dynamically
       get :auto_complete_for_user_name

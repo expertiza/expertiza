@@ -59,18 +59,18 @@ class ResponseTest < ActiveSupport::TestCase
   def test_response_valid_in_this_phase
     response = Response.new
 
-    response.updated_at = Time.parse("2012-12-02 06:00:00 UTC")
+    response.updated_at = Time.parse("2015-12-02 06:00:00 UTC")
 
     #resubmission_time3 after the response time
     #but it is after the current review phase
-    latest_review_phase_start_time = Time.parse("2012-12-02 07:00:00 UTC")
+    latest_review_phase_start_time = Time.parse("2015-12-02 07:00:00 UTC")
 
     resubmission_time1 = ResubmissionTime.new
-    resubmission_time1.resubmitted_at = Time.parse("2012-12-02 04:00:00 UTC")
+    resubmission_time1.resubmitted_at = Time.parse("2015-12-02 04:00:00 UTC")
     resubmission_time2 = ResubmissionTime.new
-    resubmission_time2.resubmitted_at = Time.parse("2012-12-02 05:00:00 UTC")
+    resubmission_time2.resubmitted_at = Time.parse("2015-12-02 05:00:00 UTC")
     resubmission_time3 = ResubmissionTime.new
-    resubmission_time3.resubmitted_at = Time.parse("2012-12-02 08:00:00 UTC")
+    resubmission_time3.resubmitted_at = Time.parse("2015-12-02 08:00:00 UTC")
 
     resubmission_times = [resubmission_time3, resubmission_time2, resubmission_time1]
 

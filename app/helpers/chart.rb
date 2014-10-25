@@ -165,8 +165,6 @@ class Chart
         :subtitle => {
             :text => 'Title'
         },
-        :xAxis => {},
-        :yAxis => {},
         :tooltip => {
             :pointFormat => '{series.name}: <b>{point.percentage}%</b>',
             :percentageDecimals => 1

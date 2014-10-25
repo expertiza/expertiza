@@ -52,6 +52,7 @@ gem 'therubyracer'
 gem 'turbolinks'
 gem 'will_paginate'
 gem 'zip-zip'
+gem 'fsm'
 
 group :development do
   gem 'daemons'

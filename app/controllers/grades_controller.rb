@@ -6,7 +6,7 @@ class GradesController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'view_my_scores'
+    when 'grades_show'
       current_role_name.eql? 'Student'
     when 'show_reviews'
         true
@@ -83,7 +83,7 @@ class GradesController < ApplicationController
     calculate_all_penalties(@assignment.id)
   end
 
-  # def view_my_scores
+  # def grades_show
   #   @participant = AssignmentParticipant.find(params[:id])
   #   # @average_score_results = ScoreCache.get_class_scores(@participant.id)
   #   #

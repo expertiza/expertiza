@@ -1,5 +1,5 @@
 <% stage = participant.assignment.get_current_stage(participant.topic_id) %>
-<% if controller.action_name == 'view' or controller.action_name == "view_my_scores" %>
+<% if controller.action_name == 'view' or controller.action_name == "grades_show" %>
 
   <% if stage == "Complete" %>
     <% if participant.grade
@@ -10,7 +10,7 @@
       title = nil
     end %>
   <div <% if title %>title="<%=title%>" style="color:#0033FF"<% end %>><%= sprintf("%.2f",total_score) %><%= score_postfix %></div>
-  <% if controller.action_name != "view_my_scores" %>
+  <% if controller.action_name != "grades_show" %>
     <BR/><FONT SIZE="-1"><%= link_to 'edit score', :action => 'edit', :id => participant.id %></FONT>
   <% end %>
 <% else %>

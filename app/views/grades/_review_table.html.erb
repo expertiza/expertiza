@@ -4,7 +4,7 @@
 			<th><%= collabel %>&nbsp;<%=i+1%></th>
 		<% end %>
 	</tr>
-	<% if controller.action_name != "view_my_scores" %>
+	<% if controller.action_name != "grades_show" %>
 	<tr class="head"><td align="right"><b><%= rowlabel %></b></td>	    	
 		<% for review in reviews %>
            <td align="center">                       
@@ -26,12 +26,12 @@
              <% sort_to=all_resp.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)} %>
 
              <% score = Score.get_total_score(:response => sort_to[0], :questions => @questions[symbol], :q_types => Array.new) %>
-             <% if controller.action_name != "view_my_scores" %>
+             <% if controller.action_name != "grades_show" %>
                <input type="hidden" id="mailer_<%= review.map.reviewer.fullname %>_grade" name="mailer[<%= review.map.reviewer.fullname %>_grade]" value="<%= score  %>">
            <% end %>
              <%= sprintf("%.2f",score) %> &nbsp;
              <!--if the instructor think the reviewer's grade is not fair,send a email to the reviewer-->
-             <% if controller.action_name != "view_my_scores" %>
+             <% if controller.action_name != "grades_show" %>
                  <BR/><FONT SIZE="-1"><%= link_to 'email reviewer', :action => 'conflict_email',:remote=> true,:reviewer_id=> review.map.reviewer.user,:participant_id=>participant,:score=>sprintf("%.2f",score) %></FONT>
 
            <% end %>

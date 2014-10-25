@@ -42,7 +42,7 @@ end
 
   <!-- If quiz is required for the assignment, find out if the quiz has already been created -->
 
-  <% if (controller.action_name != "view_my_scores" and !(@map and @map.reviewer_id != session[:user].id)) %>
+  <% if (controller.action_name != "grades_show" and !(@map and @map.reviewer_id != session[:user].id)) %>
     <br/><b>Quiz:</b><br/><br/>
     <% if questionnaire = Questionnaire.where(["instructor_id = ?", uid]).first %>
       <%= link_to 'View Quiz', :controller => :questionnaires, :action => :view_quiz, :id => questionnaire.id, :pid => participant.id %>

@@ -38,7 +38,7 @@
     end
     %>
 
-    <% if controller.action_name == "view_my_scores" %>
+    <% if controller.action_name == "grades_show" %>
         <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a><%= review.display_as_html(prefix) %>
         <% if @questionnaire.section.eql? "Custom" %>
           <%= render :partial => 'questionnaire', :locals => {:file_url => file_url, :review => review} %>

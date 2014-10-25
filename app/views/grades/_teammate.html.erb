@@ -29,7 +29,7 @@ end
 <% if @assignment.max_team_size > 1 %>
   <% if tr_avg %>
     <TD ALIGN="CENTER" VALIGN="TOP">
-      <%if controller.action_name != "view_my_scores"%>
+      <%if controller.action_name != "grades_show"%>
         <%= sprintf("%.2f",tr_avg) %>
       <% end %>
     </TD>

@@ -142,7 +142,7 @@ ControllerAction.create(:site_controller_id => SiteController.find_by_name('revi
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('review_mapping').id, :name => 'show_available_submissions', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('review_mapping').id, :name => 'assign_reviewer_dynamically', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('review_mapping').id, :name => 'assign_metareviewer_dynamically', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
-ControllerAction.create(:site_controller_id => SiteController.find_by_name('grades').id, :name => 'view_my_scores', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
+ControllerAction.create(:site_controller_id => SiteController.find_by_name('grades').id, :name => 'grades_show', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('survey_deployment').id, :name => 'list', :permission_id => nil, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('statistics').id, :name => 'list_surveys', :permission_id => nil, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('tree_display').id, :name => 'list', :permission_id => nil, :url_to_use => '')

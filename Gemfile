@@ -28,7 +28,7 @@ gem 'seer'
 gem 'gchart'
 group :development do
   gem "mongrel", ">= 1.2.0.pre2"
-  gem 'ruby-debug19'
+  gem 'ruby-debug'
 end
 
 group :test do

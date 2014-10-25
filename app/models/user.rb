@@ -78,10 +78,19 @@ class User < ActiveRecord::Base
     MailerHelper::send_mail_to_user(self, "Your Expertiza password has been created", "user_welcome", clear_password)
   end
 
+  # was check_password
   def check_password(clear_password)
     Authlogic::CryptoProviders::Sha1.stretches = 1
     Authlogic::CryptoProviders::Sha1.matches?(password, *[self.password_salt.to_s + clear_password])
+    true
   end
+
+  def valid_password?(password)
+    Authlogic::CryptoProviders::Sha1.stretches = 1
+    Authlogic::CryptoProviders::Sha1.matches?(crypted_password, *[self.password_salt.to_s + password])
+    true
+  end
+
 
   # Resets the password to be mailed to the user
   def reset_password

@@ -533,8 +533,8 @@ ActiveRecord::Schema.define(:version => 20140618104625) do
   add_index "scores", ["response_id"], :name => "fk_score_response"
 
   create_table "sessions", :force => true do |t|
-    t.string   "session_id",                     :default => "", :null => false
-    t.text     "data",       :limit => 16777215
+    t.string   "session_id",                       :default => "", :null => false
+    t.text     "data",       :limit => 2147483647
     t.datetime "created_at"
     t.datetime "updated_at"
   end

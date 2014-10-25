@@ -19,6 +19,45 @@ class SignUpTopic < ActiveRecord::Base
   #  return find_by_sql("select t.id from teams t,teams_users u where t.id=u.team_id and u.user_id = 5");
   #end
 
+  # This function is used to assign a topic to the user. It confirms whether the
+  # function was successful.  A function may not be successful if the user has
+  # already signed up for a topic.  It should be noted however that being waitlisted
+  # for a topic is not a failure.
+  def confirmTopic(creator_id, topic_id, assignment_id)
+    #check whether user has signed up already
+    user_signup = SignedUpUser.find_user_signup_topics(assignment_id, creator_id)
+
+    sign_up = SignedUpUser.new
+    sign_up.topic_id = params[:id]
+    # NOTE: Creator is always a team.
+    sign_up.creator_id = creator_id
+
+    # Initialize the return value.
+    result = false
+
+    if user_signup.any?
+      # Check that all the topics chosen by the user are waitlisted
+      # otherwise don't let them choose another topic.
+      for user_signup_topic in user_signup
+        if user_signup_topic.is_waitlisted == false
+          flash[:error] = "You have already signed up for a topic."
+          return false
+        end
+      end
+    end
+
+    # Using a DB transaction to ensure atomic inserts
+    ActiveRecord::Base.transaction do
+      # NOTE: This is likely not checking if the user is on a team that
+      #       already has this topic assigned to it.
+      sign_up.sign_up_for_topic(session[:user].id, topic_id)
+      result = sign_up.save
+    end
+
+    result
+  end
+
+
   def self.import(row,session,id = nil)
 
     if row.length != 4

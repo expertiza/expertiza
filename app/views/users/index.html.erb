@@ -3,7 +3,7 @@
 <br/>
 <%= form_tag( {:action => 'show_selection'}, {method: :get}) do %>
   View user - enter exact login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
-<input type='submit' value='Edit'/>
+<input type='submit' value='Show'/>
 <% end %>
 
 <%= form_tag( {:action => 'index', :paginate_show => '1', :num_users => per_page},{method: :get}) do %>

@@ -10,6 +10,7 @@
 
 <%= render :partial => '/sign_up_sheet/num_waiting', :locals => {:topic=>topic} %>
 <td align="center"><%= render :partial => '/sign_up_sheet/actions', :locals => {:i=>i,:topic=>topic} %></td>
+<td align="center"><%= link_to 'Edit', edit_sign_up_sheet_path(topic.id) %>|<%= link_to 'Delete', sign_up_sheet_path(topic.id), method: :delete, data: {confirm: "Are you sure?"} %></td>
 
 <% if @assignment.has_partner_ads?(params[:id]) %>
   <td align="center">

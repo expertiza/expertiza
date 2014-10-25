@@ -83,7 +83,7 @@ class InvitationController < ApplicationController
       flash[:error]= "The team already has the maximum number of members."
     end
 
-    redirect_to view_student_teams_path id: Participant.find(params[:student_id]).id
+    redirect_to view_student_teams_path id: params[:student_id]
 
   end
 

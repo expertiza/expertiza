@@ -65,7 +65,7 @@ class QuestionnairesController < ApplicationController
       redirect_to :back
     rescue
       flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.'+$!
-      redirect_to :action => 'list', :controller => 'tree_display'
+      redirect_to tree_display_index_path
     end
   end
 
@@ -94,7 +94,7 @@ class QuestionnairesController < ApplicationController
       end
     end
 
-    redirect_to :action => 'list', :controller => 'tree_display'
+    redirect_to tree_display_index_path
   end
 
   def view
@@ -254,7 +254,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
       end
       save
 
-      redirect_to :controller => 'tree_display', :action => 'list'
+      redirect_to tree_display_index_path
     end
   end
 
@@ -333,7 +333,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
       @questionnaire.instructor_id = session[:user].id
     end
     save
-    redirect_to :controller => 'tree_display', :action => 'list'
+    redirect_to tree_display_index_path
   end
 
   def update
@@ -345,7 +345,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
     end
 
     if @questionnaire.update_attributes(params[:questionnaire])
-      redirect_to :controller => 'tree_display', :action => 'list'
+      redirect_to tree_display_index_path
     else
       render 'edit'
     end
@@ -373,7 +373,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
     @questionnaire.save
     @access = @questionnaire.private == true ? "private" : "public"
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been made #{@access} successfully. ")
-    redirect_to :controller => 'tree_display', :action => 'list'
+    redirect_to tree_display_index_path
   end
 
   private
@@ -651,7 +651,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
     rescue
 
       flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.'+$!
-      redirect_to :action => 'list', :controller => 'tree_display'
+      redirect_to tree_display_index_path
     end
   end
 end

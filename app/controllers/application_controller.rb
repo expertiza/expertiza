@@ -110,7 +110,7 @@ class ApplicationController < ActionController::Base
 
   private
   def record_not_found
-    redirect_to :controller => :tree_display,:action => :list
+    redirect_to tree_display_index_path
   end
 
 end

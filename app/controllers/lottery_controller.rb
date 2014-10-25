@@ -10,9 +10,9 @@ class LotteryController < ApplicationController
   #This method is called for assignments which have their is_intelligent property set to 1. It runs a stable match algorithm and assigns topics
   #to strongest contenders (team strength, priority of bids)
   def run_intelligent_bid
-    if(!Assignment.find_by_id(params[:id]).is_intelligent)     # if the assignment is intelligent then redirect to the tree display list
+    if(!Assignment.find_by_id(params[:id]).is_intelligent)     # if the assignment is intelligent then redirect to the tree display index
       flash[:error]  = "Action not allowed. The assignment "+Assignment.find_by_id(params[:id]).name+ " is not enabled for intelligent assignment"
-      redirect_to :controller => 'tree_display', :action => 'list'
+      redirect_to tree_display_index_path
       return
     end
 
@@ -73,7 +73,7 @@ class LotteryController < ApplicationController
     assignment.update_attribute(:is_intelligent,false)
 
     flash[:notice] = 'Intelligent assignment successfully completed for ' + assignment.name + '.'
-    redirect_to :controller => 'tree_display', :action => 'list'
+    redirect_to tree_display_index_path
   end
 
   #This method is called to automerge smaller teams to teams which were assigned topics through intelligent assignment

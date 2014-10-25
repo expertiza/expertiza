@@ -14,7 +14,7 @@ class AssignmentsController < ApplicationController
     assignment = Assignment.find(params[:id])
     assignment.private = !assignment.private
     assignment.save
-    redirect_to :controller => 'tree_display', :action => 'list'
+    redirect_to tree_display_index_path
   end
 
   def new
@@ -39,7 +39,7 @@ class AssignmentsController < ApplicationController
       # flash[:success] = 'Assignment was successfully created.'
       # redirect_to controller: :assignments, action: :edit, id: @assignment.id
       #AAD#
-      redirect_to :controller => 'tree_display', :action => 'list'
+      redirect_to tree_display_index_path
       undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
       #AAD#
     else
@@ -120,7 +120,7 @@ class AssignmentsController < ApplicationController
       redirect_to :action => 'edit', :id => new_assign_id
     else
       flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'
-      redirect_to :action => 'list', :controller => 'tree_display'
+      redirect_to tree_display_index_path
     end
   end
 
@@ -145,7 +145,7 @@ class AssignmentsController < ApplicationController
           error = $!
           flash[:error] = error.to_s + " Delete this assignment anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
       end
-      redirect_to :controller => 'tree_display', :action => 'list'
+      redirect_to tree_display_index_path
     end
 
     def list
@@ -188,7 +188,7 @@ class AssignmentsController < ApplicationController
       assignment.save
       newpath = assignment.get_path rescue nil
       FileHelper.update_file_location(oldpath, newpath)
-      redirect_to :controller => 'tree_display', :action => 'list'
+      redirect_to tree_display_index_path
     end
 
 end

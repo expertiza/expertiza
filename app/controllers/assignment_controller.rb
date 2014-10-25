@@ -41,7 +41,7 @@ class AssignmentController < ApplicationController
       redirect_to :action => 'edit', :id => @assignment.id
       else
         flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'
-        redirect_to :action => 'list', :controller => 'tree_display'
+        redirect_to tree_display_index_path
       end
     end
 
@@ -71,7 +71,7 @@ class AssignmentController < ApplicationController
       assignment.private = !assignment.private
       assignment.save
 
-      redirect_to :controller => 'tree_display', :action => 'list'
+      redirect_to tree_display_index_path
     end
 
     # This functions finds the epoch time in seconds of the due_at parameter and finds the difference of it
@@ -778,7 +778,7 @@ class AssignmentController < ApplicationController
           end
         end
         undo_link("Assignment: \"#{@assignment.name}\" has deleted successfully. ")
-        redirect_to :controller => 'tree_display', :action => 'list'
+        redirect_to tree_display_index_path
       end
 
       #--------------------------------------------------------------------------------------------------------------------
@@ -800,7 +800,7 @@ class AssignmentController < ApplicationController
         @assignment.private = !@assignment.private
         @assignment.save
         undo_link("Assignment \"#{@assignment.name}\" has been made private successfully. ")
-        redirect_to :controller => 'tree_display', :action => 'list'
+        redirect_to tree_display_index_path
       end
 
       #--------------------------------------------------------------------------------------------------------------------
@@ -843,7 +843,7 @@ class AssignmentController < ApplicationController
         newpath = assignment.get_path rescue nil
         FileHelper.update_file_location(oldpath,newpath)
         undo_link("Assignment \"#{@assignment.name}\" has been removed from course successfully. ")
-        redirect_to :controller => 'tree_display', :action => 'list'
+        redirect_to tree_display_index_path
       end
 
       :private

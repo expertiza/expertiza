@@ -32,22 +32,23 @@ class Chart
     def self.dataAdapter(type,data,optionalConf)
     template = data_template[type];
     if (type == :pie) then
-      data[:type] = 'pie';
-      template[:series] = [data]
-     # Cool code to prevent exception if pie is selected as a chart type
-     #  template[:series][0][:data] = [data]
-     #  template[:series][0][:data][0].each do |obj|
-     #    temp = Array.new
-     #    obj.each do |val|
-     #      if(val.kind_of?(Array))
-     #        temp << val[0]
-     #      else
-     #        temp << val
-     #      end
-     #    end
-     #    obj = temp
-     #  end
-     # template[:series][0][:type] = 'pie'
+      # data[:type] = 'pie';
+      # template[:series] = [data]
+      #Cool code to prevent exception if pie is selected as a chart type
+      template[:series][0][:data] = [data]
+      baseData = Array.new
+      template[:series][0][:data][0].each do |obj|
+      temp = Array.new
+      temp << obj[:name]
+      if(!obj[:data].nil?)
+        temp << obj[:data][0]
+      else
+        temp << 0
+      end
+      baseData << temp
+      end
+      template[:series][0][:data][0] = baseData
+      template[:series][0][:type] = 'pie'
     else
       template[:series] = data
     end
@@ -176,8 +177,9 @@ class Chart
                 :cursor => 'pointer',
                 :dataLabels => {
                     :enabled => true,
-                    :color => '#000000',
-                    :connectorColor => '#000000',
+                    style: {
+                        color: 'black'
+                    },
                     :format => "<b>{point.name}</b>: {percentage:.2f} %"
                 }
             }

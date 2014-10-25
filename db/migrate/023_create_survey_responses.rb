@@ -1,11 +1,11 @@
 class CreateSurveyResponses < ActiveRecord::Migration
   def self.up
   create_table "survey_responses", :force => true do |t|
-    t.column "score", :integer, :limit => 10
+    t.column "score", :integer, :limit => 8
     t.column "comments", :text
-    t.column "assignment_id", :integer, :limit => 10, :default => 0, :null => false
-    t.column "question_id", :integer, :limit => 10, :default => 0, :null => false
-    t.column "survey_id", :integer, :limit => 10, :default => 0, :null => false
+    t.column "assignment_id", :integer, :limit => 8, :default => 0, :null => false
+    t.column "question_id", :integer, :limit => 8, :default => 0, :null => false
+    t.column "survey_id", :integer, :limit => 8, :default => 0, :null => false
     t.column "email", :string
   end
   

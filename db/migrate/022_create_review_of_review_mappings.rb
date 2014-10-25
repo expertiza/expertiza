@@ -4,7 +4,7 @@ class CreateReviewOfReviewMappings < ActiveRecord::Migration
     t.column "review_mapping_id", :integer
     t.column "review_reviewer_id", :integer
     t.column "review_id", :integer
-    t.column "assignment_id", :integer, :limit => 10
+    t.column "assignment_id", :integer, :limit => 8
   end
 
   add_index "review_of_review_mappings", ["review_id"], :name => "fk_review_of_review_mapping_reviews"

@@ -5,11 +5,17 @@
   <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
     <% for selected_topic in @selected_topics %>
       <% if selected_topic.topic_id == topic.id and !selected_topic.is_waitlisted%>
-        <td align="center"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'destroy_signup', :id => topic.id, :assignment_id => params[:id] %></td>
+        <td align="center">
+          <%= link_to destroy_signup_sign_up_sheet_index_path(:id => topic.id, :assignment_id => params[:id]), :method=> :delete do %>
+            <%= image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle') %>
+          <% end %>
+        </td>
         <% action_symbol_added = true %>
       <% elsif selected_topic.topic_id == topic.id and selected_topic.is_waitlisted%>
         <td align="center">
-          <%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'destroy_signup', :id => topic.id, :assignment_id => params[:id] %>
+          <%= link_to destroy_signup_sign_up_sheet_index_path(:id => topic.id, :assignment_id => params[:id]), :method=> :delete do %>
+            <%= image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle') %>
+          <% end %>
           <% if @assignment.is_intelligent %>
             <%= form_tag({:controller=>"sign_up_sheet", :action=>"set_priority",:id => topic.id,:assignment_id => params[:id]}, method: :post) do %>
               <%= number_field_tag :priority, selected_topic.preference_priority_number %>
@@ -24,7 +30,11 @@
     <% end %>
   <% end %>
   <% if action_symbol_added == false %>
-    <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'create_signup', :id => topic.id, :assignment_id => params[:id] %></td>
+    <td align="center">
+      <%= link_to create_signup_sign_up_sheet_index_path(:id => topic.id, :assignment_id => params[:id]), :method=> :post do %>
+        <%= image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle')  %>
+      <% end %>
+    </td>
   <% end %>
 
 <% end %>

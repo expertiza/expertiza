@@ -326,8 +326,8 @@ Expertiza::Application.routes.draw do
   resources :sign_up_sheet do
     collection do
       get :index_signup
-      get :create_signup
-      get :destroy_signup
+      post :create_signup
+      delete :destroy_signup
       get :view_publishing_rights
     end
   end

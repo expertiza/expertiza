@@ -32,11 +32,6 @@ class SignUpSheetController < ApplicationController
   include DeadlineHelper
 
 
-  # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
-  verify :method => :post, :only => [:destroy, :create, :update],
-    :redirect_to => {:action => :index_signup}
-
-
   # Prepares the form for adding a new topic. Used in conjuntion with create
   def new
     @id = params[:id]
@@ -299,7 +294,7 @@ class SignUpSheetController < ApplicationController
     # Initialize the return value.
     result = false
 
-    if user_signup > 0
+    if user_signup.any?
       # Check that all the topics chosen by the user are waitlisted
       # otherwise don't let them choose another topic.
       for user_signup_topic in user_signup

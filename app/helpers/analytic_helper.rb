@@ -45,6 +45,36 @@ module AnalyticHelper
     Chart.new(:bar, data_point, option).data
   end
 
+  def line_graph_data(object_type, object_id_list, data_type_list)
+    data_point = Array.new
+    object_model = Object.const_get(object_type.capitalize)
+    object_id_list.each do |object_id|
+      object = object_model.find(object_id)
+      object_data = Hash.new
+      object_data[:name] = object.name
+      object_data[:data] = gather_data(object, data_type_list)
+      data_point << object_data
+    end
+    option = Hash.new
+    option[:x_axis_categories] =data_type_list
+    Chart.new(:line, data_point, option).data
+  end
+
+  def pie_chart_data(object_type, object_id_list, data_type_list)
+    data_point = Array.new
+    object_model = Object.const_get(object_type.capitalize)
+    object_id_list.each do |object_id|
+      object = object_model.find(object_id)
+      object_data = Hash.new
+      object_data[:name] = object.name
+      object_data[:data] = gather_data(object, data_type_list)
+      data_point << object_data
+    end
+    # option = Hash.new
+    # option[:x_axis_categories] =data_type_list
+    Chart.new(:pie, data_point).data
+  end
+
   def gather_data(object, data_type_array)
     data_array = Array.new
     data_type_array.each do |data_method|

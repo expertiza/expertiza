@@ -8,7 +8,7 @@
   <b>Team Name: </b><%= @student.team.name %>
 
 <%= link_to "Edit Name",
-   edit_student_teams_path team_id: @student.team.id, student_id: @student.id %><table>
+   edit_student_teams_path(team_id: @student.team.id, student_id: @student.id) %><table>
   <tr>
     <td><b>Username &nbsp</b></td>
     <td><b>Full Name &nbsp</b></td>
@@ -45,7 +45,7 @@
     </table>
     <br>
     <%= link_to "Leave Team",
-                remove_participant_student_teams_path student_id: @student.id, team_id: @student.team.id %>
+                remove_participant_student_teams_path(student_id: @student.id, team_id: @student.team.id) %>
   <% end %>
 
   <% if @student.team != nil %>

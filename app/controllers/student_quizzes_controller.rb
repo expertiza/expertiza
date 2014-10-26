@@ -8,7 +8,7 @@ class StudentQuizzesController < ApplicationController
   end
 
   def finished_quiz
-    @response = Response.find_by_map_id(params[:map_id])
+    @response = Response.where(map_id: params[:map_id])
     @response_map = ResponseMap.find(params[:map_id])
     @questions = Question.where(questionnaire_id: @response_map.reviewed_object_id)
 
@@ -17,7 +17,7 @@ class StudentQuizzesController < ApplicationController
 
     @questions.each do |question|
       score = Score.where(response_id: @response.id, question_id:  question.id).first
-      if score.score == -1
+      if score.score.eql? -1
         essay_not_graded = true
       else
         quiz_score += score.score
@@ -27,7 +27,7 @@ class StudentQuizzesController < ApplicationController
     question_count = @questions.length
 
     @quiz_score = (quiz_score/question_count) * 100
-    if essay_not_graded == true
+    if essay_not_graded
       flash.now[:note] = "Some essay questions in this quiz have not yet been graded."
     end
   end

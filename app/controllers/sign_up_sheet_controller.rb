@@ -480,11 +480,12 @@ private
     @topics = SignUpTopic.where(assignment_id: assignment.id)
 
     #Use this until you figure out how to initialize this array
-    @duedates = SignUpTopic.find_by_sql("SELECT s.id as topic_id FROM sign_up_topics s WHERE s.assignment_id = " + assignment.id.to_s)
+    @duedates = []
 
     unless @topics.nil?
       i=0
       @topics.each do |topic|
+        @duedates[i] = {}
 
         @duedates[i]['t_id'] = topic.id
         @duedates[i]['topic_identifier'] = topic.topic_identifier

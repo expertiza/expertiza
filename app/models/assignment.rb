@@ -625,7 +625,7 @@ class Assignment < ActiveRecord::Base
   def get_review_rounds
     due_dates = DueDate.where(assignment_id: self.id)
     rounds = 0
-    0 .. due_dates.length-1.each do |i|
+    (0 .. (due_dates.length-1)) .each do |i|
       deadline_type = DeadlineType.find(due_dates[i].deadline_type_id)
       rounds = rounds + 1 if deadline_type.name == 'review'
     end

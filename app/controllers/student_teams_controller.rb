@@ -2,14 +2,17 @@ class StudentTeamsController < ApplicationController
   autocomplete :user, :name
 
   before_action :set_team, only: [:edit, :update]
-  before_action :set_student, only: [:view, :update, :edit, :create]
+  before_action :set_student, only: [:view, :update, :edit, :create, :remove_participant]
   def action_allowed?
     #note, this code replaces the following line that cannot be called before action allowed?
     set_team if %w[edit update].include? action_name
     set_student if %w[view update edit].include? action_name
 
     if current_role_name.eql? ("Student")
-      return !current_user_id?(@student.user_id) if %w[view update edit create].include? action_name
+      #make sure the student is the owner if they are trying to create it
+      return !current_user_id?(@student.user_id) if %w[create].include? action_name
+      #make sure the student belongs to the group before allowed them to try and edit or update
+      return @team.get_participants.map{|p| p.user_id}.include? current_user.id if %[edit update].include? action_name
       return true
     else
       return false
@@ -17,6 +20,12 @@ class StudentTeamsController < ApplicationController
   end
 
   def view
+    #View will check if send_invs and recieved_invs are set before showing
+    #only the owner should be able to see those.
+    #> Note: this design duplicates permission management between the InvitationsController, and forces this weird
+    #> game-of-telephone communications of permissions between the controller and the view...
+    return unless current_user_id?(@student.user_id)
+
     @send_invs = Invitation.where from_id: @student.user.id, assignment_id: @student.assignment.id
     @received_invs = Invitation.where to_id: @student.user.id, assignment_id: @student.assignment.id, reply_status: 'W'
   end
@@ -76,24 +85,22 @@ class StudentTeamsController < ApplicationController
   end
 
   def remove_participant
-    participant = AssignmentParticipant.find params[:student_id]
-    return unless current_user_id? participant.user_id
     #remove the topic_id from participants
-    #>participant should belong to a team, and a team should have topic
-    #>then this call becomes participant.update_assigment_team(nil)
+    #>@student should belong to a team, and a team should have topic
+    #>then this call becomes @student.update_assigment_team(nil)
     #>Correctly doing the relationship should handle the rest
     #>TeamsUser appears to be a model that captures a relationship. Should be replaced with a
     #>has_a relationship with assignment_team, and a has_and_belongs_to_many relationship in  assignment_participant
     #>the new code here would be
     #>assignment_team=AssignmentTeam.find(params[:team_id])#same as old_team below
-    #>participant = AssignmentParticipant.find(params[:student_id])
-    #>assignment_team.assignment_participants.delete(participant)
-    participant.update_topic_id nil
+    #>@student = AssignmentParticipant.find(params[:student_id])
+    #>assignment_team.assignment_participants.delete(@student)
+    @student.update_topic_id nil
 
     #remove the entry from teams_users
 
     #>Relationship which would remove the following block
-    team_user = TeamsUser.find_by team_id: params[:team_id], user_id: participant.user_id
+    team_user = TeamsUser.find_by team_id: params[:team_id], user_id: @student.user_id
 
     if team_user
       team_user.destroy
@@ -104,7 +111,7 @@ class StudentTeamsController < ApplicationController
     #>This whole block should be in the models. The controller shouldn't be handling book-keeping like this
 
     #if your old team does not have any members, delete the entry for the team
-    #>could happen with a callback in assignment_team.assignment_participant.delete(participant)
+    #>could happen with a callback in assignment_team.assignment_participant.delete(@student)
     if TeamsUser.where(team_id: params[:team_id]).empty?
       old_team = AssignmentTeam.find params[:team_id]
       if old_team#> how on earth could this be null?
@@ -167,12 +174,12 @@ class StudentTeamsController < ApplicationController
 
     #reset the participants submission directory to nil
     #per EFG:
-    #the participant is responsible for resubmitting their work
-    #no restriction is placed on when a participant can leave
+    #the student is responsible for resubmitting their work
+    #no restriction is placed on when a student can leave
 
-    participant.directory_num = nil
+    @student.directory_num = nil
 
-    participant.save
+    @student.save
 
     redirect_to view_student_teams_path id: @student.id
   end
@@ -184,13 +191,14 @@ class StudentTeamsController < ApplicationController
   def set_team
     @team = AssignmentTeam.find(params[:team_id])
   end
+  
   def set_student
-    if ['edit', 'leave'].include? action_name
+    if ['edit', 'remove_participant'].include? action_name
       student_id = params[:student_id]
     else
       student_id = params[:id]
     end
-      @student = AssignmentParticipant.find student_id
+    @student = AssignmentParticipant.find student_id
   end
 
   def review

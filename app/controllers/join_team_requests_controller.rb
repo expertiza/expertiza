@@ -102,6 +102,6 @@ class JoinTeamRequestsController < ApplicationController
     @join_team_request = JoinTeamRequest.find(params[:id])
     @join_team_request.status = 'D'
     @join_team_request.save
-    redirect_to view_student_teams_path id: params[:teams_user_id]
+    redirect_to view_student_teams_path student_id: params[:teams_user_id]
   end
 end

@@ -62,7 +62,7 @@
   <% end %>
 
   <%= render :partial => 'join_team_requests/list_sent',
-    :locals =>{:teams_user_id=>params[:id],
+    :locals =>{:teams_user_id=>params[:student_id],
                :assignment_id => @student.assignment.id
   } %>
 
@@ -71,7 +71,7 @@
 
   <%= render :partial => 'join_team_requests/list_received',
     :locals =>{:team_id=>@student.team.id,
-               :teams_user_id=>params[:id],
+               :teams_user_id=>params[:student_id],
                :assignment_id => @student.assignment.id} %>
            <% end %>
 

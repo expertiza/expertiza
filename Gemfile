@@ -14,6 +14,7 @@ gem 'capistrano'
 gem "capistrano-db-tasks", require: false
 gem 'capistrano-rails'
 gem 'coveralls', require: false
+gem 'daemons'
 gem 'delayed_job_active_record'
 gem 'dynamic_form'
 gem 'edavis10-ruby-web-search'

@@ -22,7 +22,7 @@ class StudentTeamsController < ApplicationController
   end
 
   def create
-    check = AssignmentTeam.where name: params[:team][:name], parent_id: @student.parent_id
+    check = AssignmentTeam.where( name: params[:team][:name], parent_id: @student.parent_id)
 
     #check if the team name is in use
     if check.length.empty?

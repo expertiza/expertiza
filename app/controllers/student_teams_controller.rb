@@ -3,6 +3,7 @@ class StudentTeamsController < ApplicationController
 
   before_action :set_team, only: [:edit, :update]
   before_action :set_student, only: [:view, :update, :edit, :create, :remove_participant]
+
   def action_allowed?
     #note, this code replaces the following line that cannot be called before action allowed?
     set_team if %w[edit update].include? action_name
@@ -44,10 +45,10 @@ class StudentTeamsController < ApplicationController
       @team.add_member(user, @team.parent_id)
            team_created_successfully
 
-           redirect_to view_student_teams_path id: @student.id
+           redirect_to view_student_teams_path student_id: @student.id
     else
       flash[:notice] = 'Team name is already in use.'
-      redirect_to view_student_teams_path id: @student.id
+      redirect_to view_student_teams_path student_id: @student.id
     end
   end
 
@@ -60,13 +61,13 @@ class StudentTeamsController < ApplicationController
       if @team.update_attributes(params[:team])
           team_created_successfully
           
-          redirect_to view_student_teams_path id: params[:student_id]
+          redirect_to view_student_teams_path student_id: params[:student_id]
       end
     elsif (matching_teams.length.one? && (matching_teams[0].name <=> @team.name).zero?)
 
           team_created_successfully
 
-           redirect_to view_student_teams_path id: params[:student_id]
+           redirect_to view_student_teams_path student_id: params[:student_id]
     else
       flash[:notice] = 'Team name is already in use.'
 
@@ -81,7 +82,7 @@ class StudentTeamsController < ApplicationController
 
   def remove_advertisement
     Team.update_all("advertise_for_partner=false", id: params[:team_id])
-    redirect_to view_student_teams_path id: params[:team_id]
+    redirect_to view_student_teams_path student_id: params[:team_id]
   end
 
   def remove_participant
@@ -181,7 +182,7 @@ class StudentTeamsController < ApplicationController
 
     @student.save
 
-    redirect_to view_student_teams_path id: @student.id
+    redirect_to view_student_teams_path student_id: @student.id
   end
 
   def team_created_successfully
@@ -193,12 +194,7 @@ class StudentTeamsController < ApplicationController
   end
   
   def set_student
-    if ['edit', 'remove_participant'].include? action_name
-      student_id = params[:student_id]
-    else
-      student_id = params[:id]
-    end
-    @student = AssignmentParticipant.find student_id
+    @student = AssignmentParticipant.find(params[:student_id])
   end
 
   def review

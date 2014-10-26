@@ -34,8 +34,8 @@ function changeReviewRounds() {
         if (new_round_count >= original_round_count && current_round_count < original_round_count) {
           //make sure all the rounds are already displayed
           <% for i in 1..@assignment.rounds_of_reviews %>
-                 addDueDateTableElement('submission', <%=i%>, <%= due_date(@assignment,'submission', i-1).to_json.html_safe %>.due_date);
-                 addDueDateTableElement('review', <%=i%>, <%= due_date(@assignment,'review', i-1).to_json.html_safe %>.due_date);
+                 addDueDateTableElement('submission', <%=i%>, <%= due_date(@assignment,'submission', i-1).to_json.html_safe %>);
+                 addDueDateTableElement('review', <%=i%>, <%= due_date(@assignment,'review', i-1).to_json.html_safe %>);
                <% end %> //use ruby because i need the i variable... @_@ unfortunate but dunno how to get around
                //dont worry the addDueDateTableElement function check to see if it exist first before doing anything
         }
@@ -50,8 +50,8 @@ function changeReviewRounds() {
 
             if (new_round_count > current_round_count) {
               for (i = original_round_count + 1; i <= new_round_count; i++) {
-                addDueDateTableElement('submission', i, <%= due_date(@assignment,'submission', -1).to_json.html_safe %>.due_date);
-                addDueDateTableElement('review', i, <%= due_date(@assignment,'review', -1).to_json.html_safe %>.due_date);
+                addDueDateTableElement('submission', i, <%= due_date(@assignment,'submission', -1).to_json.html_safe %>);
+                addDueDateTableElement('review', i, <%= due_date(@assignment,'review', -1).to_json.html_safe %>);
               }
             }
 }
@@ -249,10 +249,10 @@ function submit_due_dates() {
   <script>
     jQuery(document).ready(function () {
       <% for i in 1..@assignment.rounds_of_reviews %>
- addDueDateTableElement('submission', <%=i%>, <%= due_date(@assignment, 'submission', i-1).to_json.html_safe %>.due_date);
-          addDueDateTableElement('review', <%=i%>, <%= due_date(@assignment, 'review', i-1).to_json.html_safe %>.due_date);
+ addDueDateTableElement('submission', <%=i%>, <%= due_date(@assignment, 'submission', i-1).to_json.html_safe %>);
+          addDueDateTableElement('review', <%=i%>, <%= due_date(@assignment, 'review', i-1).to_json.html_safe %>);
     <% end %>
-          addDueDateTableElement('metareview', 0, <%= due_date(@assignment, 'metareview').to_json.html_safe %>.due_date);
+          addDueDateTableElement('metareview', 0, <%= due_date(@assignment, 'metareview').to_json.html_safe %>);
     }());
   </script>
 </table>

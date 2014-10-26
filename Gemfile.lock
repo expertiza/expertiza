@@ -123,6 +123,7 @@ GEM
     font-awesome-rails (4.2.0.0)
       railties (>= 3.2, < 5.0)
     formatador (0.2.5)
+    fsm (0.0.0)
     gchart (1.0.0)
     gchartrb (0.8)
     gdata (1.1.2)
@@ -376,6 +377,7 @@ DEPENDENCIES
   fastercsv
   ffi-aspell
   font-awesome-rails
+  fsm
   gchart
   gchartrb
   gdata

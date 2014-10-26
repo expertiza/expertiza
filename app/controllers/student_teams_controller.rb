@@ -190,7 +190,7 @@ class StudentTeamsController < ApplicationController
     else
       student_id = params[:id]
     end
-      @student = AssignmentParticipant.find(params[:student_id])
+      @student = AssignmentParticipant.find student_id
   end
 
   def review

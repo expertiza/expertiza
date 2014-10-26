@@ -72,7 +72,7 @@ class UsersController < ApplicationController
         role=get_role
         if role.parent_id.eql? nil
           render action: 'show'
-        elsif  role.parent_id < (session[:user]).role_id || @user.id.eql?(session[:user]).id
+        elsif  role.parent_id < (session[:user]).role_id || (@user.id).eql?((session[:user]).id)
           render action: 'show'
         else
           flash[:note] = 'The specified user is not available for editing.'

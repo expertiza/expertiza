@@ -29,26 +29,10 @@ class Chart
     @@header = true
   end
 
-    def self.dataAdapter(type,data,optionalConf)
+  def self.dataAdapter(type,data,optionalConf)
     template = data_template[type];
     if (type == :pie) then
-      # data[:type] = 'pie';
-      # template[:series] = [data]
-      #Cool code to prevent exception if pie is selected as a chart type
-      template[:series][0][:data] = [data]
-      baseData = Array.new
-      template[:series][0][:data][0].each do |obj|
-      temp = Array.new
-      temp << obj[:name]
-      if(!obj[:data].nil?)
-        temp << obj[:data][0]
-      else
-        temp << 0
-      end
-      baseData << temp
-      end
-      template[:series][0][:data][0] = baseData
-      template[:series][0][:type] = 'pie'
+      template = set_pie_data(data,template)
     else
       template[:series] = data
     end
@@ -154,10 +138,10 @@ class Chart
 
   def self.get_pie_template()
     {
-        :chart => {
-            :plotBackgroundColor => nil,
-            :plotBorderWidth => 1,
-            :plotShadow => false
+      :chart => {
+        :plotBackgroundColor => nil,
+        :plotBorderWidth => 1,
+        :plotShadow => false
     },
         :title => {
         :text => 'Title'
@@ -165,30 +149,32 @@ class Chart
         :tooltip => {
         :pointFormat => '{series.name}: <b>{point.percentage:.1f}%</b>'
     },
-        :plotOptions => {
-        :pie => {
+        :plotOptions=> {
+        :pie=> {
             :allowPointSelect => true,
             :cursor => 'pointer',
-            :dataLabels => {
-                :enabled => true,
-                :format => '<b>{point.name}</b>: {point.percentage:.1f} %',
+            :dataLabels=> {
+                :enabled=> true,
+                :format=> '<b>{point.name}</b>: {point.percentage:.1f} %',
                 :style => {
-                    :color => 'black'
+                    :color=> 'black'
                 }
             }
         }
     },
         :series => [{
                      :type => 'pie',
-                     :name => 'XXX pie',
+                     :name => 'Total share',
                      :data => [
-                         ['part 1',45.0],
-                         ['part 2',26.8],
-                         ['part 3',8.5],
-                         ['part 4',6.2],
-                         ['part 5',0.7]
+                         ['Firefox',   45.0],
+                         ['IE',       26.8],
+                         ['Chrome',   12.8],
+                         ['Safari',    8.5],
+                         ['Opera',     6.2],
+                         ['Others',   0.7]
                      ]
-                 }]
+                 },
+                  ]
     }
   end
 
@@ -280,6 +266,22 @@ class Chart
                           [180.3, 83.2], [180.3, 83.2]]
             }]
     }
+  end
+
+  def self.set_pie_data(data, template)
+    template[:series][0][:data] = Array.new
+    data.each do |obj|
+      temp = Array.new
+      temp << obj[:name]
+      if(!obj[:data].nil?)
+        temp << obj[:data][0]
+      else
+        temp << 0
+      end
+      template[:series][0][:data] << temp
+    end
+    template[:series][0][:type] = 'pie'
+    template
   end
 
   def self.test_data()

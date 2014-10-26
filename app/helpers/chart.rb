@@ -156,45 +156,39 @@ class Chart
     {
         :chart => {
             :plotBackgroundColor => nil,
-            :plotBorderWidth => nil,
+            :plotBorderWidth => 1,
             :plotShadow => false
-        },
+    },
         :title => {
-            :text => 'Title'
-        },
-        :subtitle => {
-            :text => 'Title'
-        },
+        :text => 'Title'
+    },
         :tooltip => {
-            :pointFormat => '{series.name}: <b>{point.percentage}%</b>',
-            :percentageDecimals => 1
-        },
+        :pointFormat => '{series.name}: <b>{point.percentage:.1f}%</b>'
+    },
         :plotOptions => {
-            :pie => {
-                :allowPointSelect => true,
-                :cursor => 'pointer',
-                :dataLabels => {
-                    :enabled => true,
-                    style: {
-                        color: 'black'
-                    },
-                    :format => "<b>{point.name}</b>: {percentage:.2f} %"
+        :pie => {
+            :allowPointSelect => true,
+            :cursor => 'pointer',
+            :dataLabels => {
+                :enabled => true,
+                :format => '<b>{point.name}</b>: {point.percentage:.1f} %',
+                :style => {
+                    :color => 'black'
                 }
             }
-        },
-        :series => [
-            {
-                :type => 'pie',
-                :name => 'XXX pie',
-                :data => [
-                    ['part 1',45.0],
-                    ['part 2',26.8],
-                    ['part 3',8.5],
-                    ['part 4',6.2],
-                    ['part 5',0.7]
-                ]
-            }
-        ]
+        }
+    },
+        :series => [{
+                     :type => 'pie',
+                     :name => 'XXX pie',
+                     :data => [
+                         ['part 1',45.0],
+                         ['part 2',26.8],
+                         ['part 3',8.5],
+                         ['part 4',6.2],
+                         ['part 5',0.7]
+                     ]
+                 }]
     }
   end
 

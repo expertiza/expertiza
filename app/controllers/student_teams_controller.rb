@@ -1,15 +1,15 @@
 class StudentTeamsController < ApplicationController
   autocomplete :user, :name
 
+  before_action :set_team, only: [:edit, :update]
+  before_action :set_student, only: [:view, :update, :edit]
   def action_allowed?
     #note, this code replaces the following line that cannot be called before action allowed?
-    #before_action :set_team, only: [:edit, :update]
-    #before_action :set_student, only: [:view, :update, :edit]
     set_team if %w[edit update].include? action_name
     set_student if %w[view update edit].include? action_name
 
     if current_role_name.eql? ("Student")
-      return !current_user_id?(@student.user_id) if %w[view create edit leave].include? action_name
+      return !current_user_id?(@student.user_id) if %w[view update edit].include? action_name
       return true
     else
       return false
@@ -32,7 +32,7 @@ class StudentTeamsController < ApplicationController
       parent = AssignmentNode.find_by_node_object_id(@student.parent_id)
       TeamNode.create parent_id: parent.id, node_object_id: @team.id
       user = User.find @student.user_id
-      @team.add_member (user, @team.parent_id)
+      @team.add_member(user, @team.parent_id)
            team_created_successfully
 
            redirect_to view_student_teams_path id: @student.id

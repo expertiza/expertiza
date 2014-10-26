@@ -8,11 +8,11 @@ class StudentTeamsController < ApplicationController
     set_team if %w[edit update].include? action_name
     set_student if %w(view update edit create remove_participant).include? action_name
 
-    if current_role_name.eql? ("Student")
+    if current_role_name.eql? 'Student'
       #make sure the student is the owner if they are trying to create it
-      return current_user_id?(@student.user_id) if %w[create].include? action_name
+      return current_user_id? @student.user_id if %w[create].include? action_name
       #make sure the student belongs to the group before allowed them to try and edit or update
-      return @team.get_participants.map{|p| p.user_id}.include? current_user.id if %[edit update].include? action_name
+      return @team.get_participants.map{|p| p.user_id}.include? current_user.id if %w(edit update).include? action_name
       return true
     else
       return false
@@ -24,27 +24,27 @@ class StudentTeamsController < ApplicationController
     #only the owner should be able to see those.
     #> Note: this design duplicates permission management between the InvitationsController, and forces this weird
     #> game-of-telephone communications of permissions between the controller and the view...
-    return unless current_user_id?(@student.user_id)
+    return unless current_user_id? @student.user_id
 
     @send_invs = Invitation.where from_id: @student.user.id, assignment_id: @student.assignment.id
     @received_invs = Invitation.where to_id: @student.user.id, assignment_id: @student.assignment.id, reply_status: 'W'
   end
 
   def create
-    existing_assignments = AssignmentTeam.where( name: params[:team][:name], parent_id: @student.parent_id)
+    existing_assignments = AssignmentTeam.where name: params[:team][:name], parent_id: @student.parent_id
 
     #check if the team name is in use
-    if (existing_assignments.empty?)
+    if existing_assignments.empty?
       @team = AssignmentTeam.new params[:team]
       @team.parent_id = @student.parent_id
       @team.save
-      parent = AssignmentNode.find_by_node_object_id(@student.parent_id)
+      parent = AssignmentNode.find_by_node_object_id @student.parent_id
       TeamNode.create parent_id: parent.id, node_object_id: @team.id
       user = User.find @student.user_id
-      @team.add_member(user, @team.parent_id)
-           team_created_successfully
+      @team.add_member user, @team.parent_id
+      team_created_successfully
 
-           redirect_to view_student_teams_path id: @student.id
+      redirect_to view_student_teams_path id: @student.id
     else
       flash[:notice] = 'Team name is already in use.'
       redirect_to view_student_teams_path id: @student.id
@@ -56,17 +56,17 @@ class StudentTeamsController < ApplicationController
 
   def update
     matching_teams = AssignmentTeam.where name: params[:team][:name], parent_id: @team.parent_id
-    if (matching_teams.length.zero?)
-      if @team.update_attributes(params[:team])
-          team_created_successfully
+    if matching_teams.length.zero?
+      if @team.update_attributes params[:team]
+        team_created_successfully
           
-          redirect_to view_student_teams_path id: params[:student_id]
+        redirect_to view_student_teams_path id: params[:student_id]
       end
-    elsif (matching_teams.length.one? && (matching_teams[0].name <=> @team.name).zero?)
+    elsif matching_teams.length.one? && (matching_teams[0].name <=> @team.name).zero?
 
-          team_created_successfully
+      team_created_successfully
 
-           redirect_to view_student_teams_path id: params[:student_id]
+      redirect_to view_student_teams_path id: params[:student_id]
     else
       flash[:notice] = 'Team name is already in use.'
 
@@ -76,11 +76,11 @@ class StudentTeamsController < ApplicationController
   end
 
   def advertise_for_partners
-    Team.update_all("advertise_for_partner=true", id: params[:team_id])
+    Team.update_all advertise_for_partner: true, id: params[:team_id]
   end
 
   def remove_advertisement
-    Team.update_all("advertise_for_partner=false", id: params[:team_id])
+    Team.update_all advertise_for_partner: false, id: params[:team_id]
     redirect_to view_student_teams_path id: params[:team_id]
   end
 
@@ -167,10 +167,9 @@ class StudentTeamsController < ApplicationController
     #>shouldn't invites belong to the team not AssignmentParticipant?
     #>Having a "Dependent Destroy" would take care of this block
     #>either way, it should be a has_many relationship
-    old_invites = Invitation.where from_id: team_user.user_id, assignment_id: team_user.parent_id
+    old_invites = Invitation.where from_id: @student.user_id, assignment_id: @student.parent_id
 
     old_invites.each{|old_invite| old_invite.destroy}
-
 
     #reset the participants submission directory to nil
     #per EFG:
@@ -185,15 +184,15 @@ class StudentTeamsController < ApplicationController
   end
 
   def team_created_successfully
-    undo_link("Team \"#{@team.name}\" has been updated successfully. ")
+    undo_link "Team \"#{@team.name}\" has been updated successfully. "
   end
 
   def set_team
-    @team = AssignmentTeam.find(params[:team_id])
+    @team = AssignmentTeam.find params[:team_id]
   end
   
   def set_student
-    if ['edit', 'remove_participant'].include? action_name
+    if %w[edit remove_participant update].include? action_name
       student_id = params[:student_id]
     else
       student_id = params[:id]
@@ -202,7 +201,7 @@ class StudentTeamsController < ApplicationController
   end
 
   def review
-    @assignment = Assignment.find(params[:assignment_id])
-    redirect_to view_questionnaires_path id:  @assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire').id
+    @assignment = Assignment.find params[:assignment_id]
+    redirect_to view_questionnaires_path id: @assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire').id
   end
 end

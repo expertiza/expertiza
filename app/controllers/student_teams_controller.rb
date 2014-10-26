@@ -2,14 +2,14 @@ class StudentTeamsController < ApplicationController
   autocomplete :user, :name
 
   before_action :set_team, only: [:edit, :update]
-  before_action :set_student, only: [:view, :update, :edit]
+  before_action :set_student, only: [:view, :update, :edit, :create]
   def action_allowed?
     #note, this code replaces the following line that cannot be called before action allowed?
     set_team if %w[edit update].include? action_name
     set_student if %w[view update edit].include? action_name
 
     if current_role_name.eql? ("Student")
-      return !current_user_id?(@student.user_id) if %w[view update edit].include? action_name
+      return !current_user_id?(@student.user_id) if %w[view update edit create].include? action_name
       return true
     else
       return false

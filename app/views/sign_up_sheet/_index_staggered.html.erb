@@ -18,7 +18,7 @@
 </script>
 
 <% @assignment = Assignment.find(params[:id]) %>
-<%= form_tag({:action => 'save_topic_dependencies', :id => 'dependency', :assignment_id => @assignment.id}, { :id => 'dependency' }) do %>
+<%= form_tag(save_topic_dependencies_sign_up_sheet_index_path(:id=> 'dependency', :assignment_id=> @assignment.id), { :id => 'dependency' }) do %>
   <h1>Signup sheet for <%= @assignment.name %> assignment</h1>
 
   <% if flash[:notice] %>

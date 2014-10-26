@@ -405,16 +405,6 @@ class SignUpSheetController < ApplicationController
   end
 
 
-  def create_topic_deadline(due_date, offset, topic_id)
-    DueDate.assign_topic_deadline(due_date,offset,topic_id)
-  end
-
-
-  def set_start_due_date(assignment_id, set_of_topics)
-    DueDate.assign_start_due_date(assignment_id, set_of_topics)
-  end
-
-
   # Gets team_details to show it on team_details view for a given assignment
   def show_team
     if !(assignment = Assignment.find(params[:assignment_id])).nil? and !(topic = SignUpTopic.find(params[:id])).nil?
@@ -485,7 +475,7 @@ private
     unless @topics.nil?
       i=0
       @topics.each do |topic|
-        @duedates[i] = {}
+        @duedates[i] = OpenStruct.new
 
         @duedates[i]['t_id'] = topic.id
         @duedates[i]['topic_identifier'] = topic.topic_identifier

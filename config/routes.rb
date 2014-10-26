@@ -329,6 +329,7 @@ Expertiza::Application.routes.draw do
       post :create_signup
       delete :destroy_signup
       get :view_publishing_rights
+      post :save_topic_dependencies
     end
   end
 

@@ -412,14 +412,15 @@ class Assignment < ActiveRecord::Base
     self.staggered_deadline? ?
       topic_id ?
       next_due_dates = TopicDeadline
-      .where( ['topic_id = ? && due_at >= ? && deadline_type_id <> ?', topic_id, Time.now, drop_topic_deadline_id])
-      .order('due_at') :
+      .order(:due_at)
+      .where( ['topic_id = ? && due_at >= ? && deadline_type_id <> ?', topic_id, Time.now, drop_topic_deadline_id]) :
     next_due_dates = TopicDeadline
+      .order(:due_at)
       .where( ['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id])
-      .joins( {:topic => :assignment}, :order => 'due_at') :
+      .joins( {:topic => :assignment}) :
     next_due_dates = DueDate
+      .order(:due_at)
       .where( ['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id])
-      .order('due_at')
     next_due_date = next_due_dates.first
 
     return false if next_due_date.nil?
@@ -633,7 +634,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_current_stage(topic_id=nil)
-    due_dates = self.staggered_deadline? ?  TopicDeadline.where( ['topic_id = ?', topic_id], :order => 'due_at DESC') : DueDate.where( ['assignment_id = ?', self.id]).order('due_at DESC')
+    due_dates = self.staggered_deadline? ?  TopicDeadline.order(:due_at => :desc).where(:topic_id => topic_id) : DueDate.order(:due_at => :desc).where(:assignment_id => self.id)
     if due_dates != nil && due_dates.size > 0
       if Time.now > due_dates[0].due_at
         return 'Finished'

@@ -1,8 +1,34 @@
 # Methods for dynamic review mapping
 # called from Assignment class
-
+# This code was supposed to make sure that the last
+# reviewer to select a submission didn't have to review
+# their own team.  However, this is a solution in search
+# of a problem.  We never had that problem, so the code is
+# not used.
 module DynamicReviewMapping
-  def init()
+
+  def myFunction
+    user_review_count.each{|user|
+      if user[1] > 0
+        #reviewer_assignment_success = false
+        message_participant = Participant.where(parent_id: @assignment.id, user_id:  user.first).first
+        users_fullname = message_participant.fullname
+        users_name = message_participant.name
+        message = message + "<li>" + users_fullname + "("+ users_name.to_s + "): -" + user[1].to_i.abs.to_s + "</li>"
+        @show_message = true
+      elsif user[1] < 0
+        @show_message = true
+        message_participant = Participant.where(parent_id: @assignment.id, user_id:  user.first).first
+        users_fullname = message_participant.fullname
+        users_name = message_participant.name
+        message = message + "<li>" +users_fullname + "("+ users_name.to_s + "): +" + user[1].to_i.abs.to_s + "</li>"
+      else
+        #do nothing
+      end
+    }
+  end
+
+  def init
     teams = self.teams
     @num_teams = teams.size # indicates the num of teams
     students = self.participants
@@ -21,15 +47,15 @@ module DynamicReviewMapping
     end
 
     # calculates the ones and zeros in each row and column
-    populate_row_matrices()
-    populate_column_matrices()
+    populate_row_matrices
+    populate_column_matrices
   end
 
   def assign_individual_reviewer(round_num)
     stride = 1
     authors = self.participants
     reviewers = self.participants
-    if self.participants.size == 0
+    if self.participants.size.zero?
       raise "No participants available for assignment"
     end
 
@@ -44,9 +70,9 @@ module DynamicReviewMapping
     end
 
     def assign_reviewers_for_team(round_num)
-      init()
+      init
       for i in 0..@num_students-1 do
-        if (row_enough_ones(i) == 1)
+        if (row_enough_ones(i).one?)
           break
         end
         for j in 0..@num_teams-1 do
@@ -58,7 +84,7 @@ module DynamicReviewMapping
             @team_review[i][j] = 1
             @rows_ones[i] += 1
             @columns_ones[j] += 1
-            if (col_enough_ones(j) == 1) #
+            if (col_enough_ones(j).one?) #
               if (toggle_col(j))
                 failed_mapping_col_wise = false
               end
@@ -76,13 +102,13 @@ module DynamicReviewMapping
               failed_mapping_col_wise = false
             end
 
-            if ((row_enough_ones(i) == 1))
+            if ((row_enough_ones(i).one?))
               # backup the cells which may be needed to restore later if choice is invalid
               for k in 0..@num_teams-1 do # for each remaining -1 in this row
                 if (@team_review[i][k]==-1)
                   change_cell(i, k, 0);
                   # if we do this assignment, will it force some students to do 1 too many reviews
-                  if (col_enough_zeros(k) == 1)
+                  if (col_enough_zeros(k).one?)
                     if (!toggle_zeros_col(k))
                       failed_mapping_row_wise = true
                     end
@@ -118,7 +144,7 @@ module DynamicReviewMapping
             | reviewer |
             self.teams.each{
               | reviewee |
-              if @team_review[i][j] == 1
+              if @team_review[i][j].one?
                 TeamReviewResponseMap.create(:reviewer_id => reviewer.id, :reviewed_object_id => self.id, :reviewee_id => reviewee.id)
             end
             j += 1
@@ -164,7 +190,7 @@ module DynamicReviewMapping
           # populating row wise
           for i in 0..@num_students-1 do
             for j in 0..@num_teams-1 do
-              if (@team_review[i][j] == 0)
+              if (@team_review[i][j].zero?)
                 @rows_zeros[i] += 1
               else
                 @rows_ones[i] += 1
@@ -180,7 +206,7 @@ module DynamicReviewMapping
           # populating column wise
           for j in 0..@num_teams-1 do
             for i in 0..@num_students-1 do
-              if (@team_review[i][j] == 0)
+              if (@team_review[i][j].zero?)
                 @columns_zeros[j] += 1
               else
                 @columns_ones[j] += 1
@@ -202,10 +228,10 @@ module DynamicReviewMapping
         def change_cell(row, column, value)
           old_value = @team_review[row][column]
           @team_review[row][column] = value;
-          if (value == 0)
+          if (value.zero?)
             @rows_zeros[row]+=1;
             @columns_zeros[column]+=1;
-          elsif(value == 1)
+          elsif(value.one?)
             @rows_ones[row]+=1;
             @columns_ones[column]+=1;
           end
@@ -255,7 +281,7 @@ module DynamicReviewMapping
           end
 
           max_allowed_to_have_min_reviewers = @num_teams-@num_max
-          max_allowed_to_have_min_reviewers = @num_max if (max_allowed_to_have_min_reviewers == 0)
+          max_allowed_to_have_min_reviewers = @num_max if (max_allowed_to_have_min_reviewers.zero?)
           if (count == max_allowed_to_have_min_reviewers)
             if (@columns_zeros[position] == (@num_students-@max))
               return 1
@@ -317,7 +343,7 @@ module DynamicReviewMapping
               change_cell(position, j, 1)
               if (col_enough_ones(j) == -1)
                 return false
-              elsif (col_enough_ones(j) == 1)
+              elsif (col_enough_ones(j).one?)
                 val = toggle_col(j)
                 if (!val)
                   return false
@@ -336,7 +362,7 @@ module DynamicReviewMapping
               change_cell(i, position, 1);
               if (row_enough_ones(position) == -1)
                 return false
-              elsif (row_enough_ones(position) == 1)
+              elsif (row_enough_ones(position).one?)
                 val = toggle_row(position)
                 if (!val)
                   return false
@@ -356,7 +382,7 @@ module DynamicReviewMapping
               change_cell(position, j, 0)
               if (col_enough_zeros(j) == -1)
                 return false
-              elsif (col_enough_zeros(j) == 1)
+              elsif (col_enough_zeros(j).one?)
                 val = toggle_zeros_col(j)
                 if (!val)
                   return false
@@ -376,7 +402,7 @@ module DynamicReviewMapping
               change_cell(i, position, 0)
               if (row_enough_zeros(position) == -1)
                 return false
-              elsif (row_enough_zeros(position) == 1)
+              elsif (row_enough_zeros(position).one?)
                 val = toggle_zeros_row(position)
                 if (!val)
                   return false
@@ -418,7 +444,7 @@ module DynamicReviewMapping
           mappings = Hash.new
           reviews_per_team = 0
           #convert to just an array of contributors(team_ids). Topics which needs review.
-          if !contributors.nil?
+          unless contributors.nil?
             contributors.collect! {|contributor| contributor['creator_id'].to_i}
           else
             #TODO: Give up, no work to review ..
@@ -467,14 +493,14 @@ module DynamicReviewMapping
                                              WHERE t.parent_id = #{@assignment.id.to_s}  and t.id = u.team_id and u.user_id = #{user.to_s}")
 
             temp_contributors = contributors.clone
-                                             temp_contributors.delete(users_team_id[0].id)
+                                             temp_contributors.delete(users_team_id.first.id)
 
                                              topic_team_id = Hash.new
                                              temp_contributors.each {|contributor|
                                                participant = Participant
                                                  .joins( "INNER JOIN teams_users ON participants.user_id = teams_users.user_id")
                                                  .where( "teams_users.team_id = #{contributor} AND participants.parent_id = #{@assignment.id}")
-                                               topic_team_id[contributor] = participant[0].topic_id
+                                               topic_team_id[contributor] = participant.first.topic_id
                                              }
 
 
@@ -493,7 +519,7 @@ module DynamicReviewMapping
                                              temp_topic_count = topic_count.sort {|a, b| a[1]<=>b[1]}
 
                                              while user_review_count[user] != 0
-                                               #pick the last one (max count); topic[0] -> topic_id and topic[1] -> count
+                                               #pick the last one (max count); topic.first -> topic_id and topic[1] -> count
                                                topic = temp_topic_count.last
 
                                                #if there are no topics this user can review move on to next user
@@ -505,24 +531,24 @@ module DynamicReviewMapping
                                                #check whether it's the user's topic
                                                users_topic_id = Participant.where(parent_id: @assignment.id, user_id:  user).first['topic_id']
 
-                                               if (topic[0].to_i == users_topic_id.to_i && number_of_reviews < topic[1]) || topic[0].to_i != users_topic_id.to_i
+                                               if (topic.first.to_i == users_topic_id.to_i && number_of_reviews < topic[1]) || topic.first.to_i != users_topic_id.to_i
                                                  #go thru team reviewers and find the team which worked on this topic
                                                  topic_team_id.each {|topic_team|
-                                                   if topic_team[1].to_i == topic[0].to_i
+                                                   if topic_team[1].to_i == topic.first.to_i
                                                      #Also before pushing check whether this user is assigned to review this topic earlier
-                                                     if mappings[topic_team[0]].index(user).nil?
-                                                       teams_to_assigned.push(topic_team[0])
+                                                     if mappings[topic_team.first].index(user).nil?
+                                                       teams_to_assigned.push(topic_team.first)
                                                      end
                                                    end
                                                  }
                                                  #here update the mappings datastructure which will be later used to update mappings table
                                                  teams_to_assigned.each {|team|
-                                                   if team_reviewers_count[team] != 0 && user_review_count[user] != 0
+                                                   unless team_reviewers_count[team].zero? || user_review_count[user].zero?
                                                      mappings[team][(team_reviewers_count[team].to_i) -1] = user
                                                      team_reviewers_count[team] = (team_reviewers_count[team].to_i) - 1
                                                      user_review_count[user] = user_review_count[user] - 1
                                                    else
-                                                     if user_review_count[user] == 0
+                                                     if user_review_count[user].zero?
                                                        #We are done with this user
                                                        break
                                                      end
@@ -534,7 +560,7 @@ module DynamicReviewMapping
 
                                                #remove that topic from the list
                                                temp_topic_count.each {|temp_topic|
-                                                 if temp_topic[0] == topic[0]
+                                                 if temp_topic.first == topic.first
                                                    temp_topic_count.delete(temp_topic)
                                                  end
                                                }
@@ -550,7 +576,7 @@ module DynamicReviewMapping
         end
 
         mappings.each {|mapping|
-          #mapping[0]=team_id and mapping[1]=users(array) assigned for reviewing this team
+          #mapping.first=team_id and mapping[1]=users(array) assigned for reviewing this team
           for i in 0..mapping[1].size-1
             if mapping[1][i].nil?
               #*try* double the number of users to assign a reviewer to this topic
@@ -558,12 +584,12 @@ module DynamicReviewMapping
                 random_index = rand(users.size-1)
 
                 #check whether this guy is not part of the team
-                team = TeamsUser.where(team_id: mapping[0], user_id:  users[random_index]).first
+                team = TeamsUser.where(team_id: mapping.first, user_id:  users[random_index]).first
                 #if team is nil then this user is not part of the team
                 #Also check whether this user has not yet been assigned to review this team
                 if team.nil? && mapping[1].index(users[random_index]).nil?
                   mapping[1][i] = users[random_index]
-                  team_reviewers_count[mapping[0]] = (team_reviewers_count[mapping[0]].to_i) - 1
+                  team_reviewers_count[mapping.first] = (team_reviewers_count[mapping.first].to_i) - 1
                   user_review_count[users[random_index]] = user_review_count[users[random_index]] - 1
                   break
                 end
@@ -576,36 +602,18 @@ module DynamicReviewMapping
 
         #reviewer_assignment_success = true
 
-        user_review_count.each{|user|
-          if user[1] > 0
-            #reviewer_assignment_success = false
-            message_participant = Participant.where(parent_id: @assignment.id, user_id:  user[0]).first
-            users_fullname = message_participant.fullname
-            users_name = message_participant.name
-            message = message + "<li>" + users_fullname + "("+ users_name.to_s + "): -" + user[1].to_i.abs.to_s + "</li>"
-            @show_message = true
-          elsif user[1] < 0
-            @show_message = true
-            message_participant = Participant.where(parent_id: @assignment.id, user_id:  user[0]).first
-            users_fullname = message_participant.fullname
-            users_name = message_participant.name
-            message = message + "<li>" +users_fullname + "("+ users_name.to_s + "): +" + user[1].to_i.abs.to_s + "</li>"
-          else
-            #do nothing
-            end
-        }
-
+        myFunction
 
         begin
           #Actual mapping
           mappings.each {|mapping|
-            team_id = mapping[0]
+            team_id = mapping.first
             reviewers = mapping[1]
 
             reviewers.each{|reviewer|
               participant = Participant.where(parent_id: @assignment.id, user_id:  reviewer).first
               #reviewer, and hence participant could be nil when algo couldn't find someone to review somebody's work
-              if !participant.nil?
+              unless participant.nil?
                 reviewer_id = participant.id
                 if TeamReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?', team_id, reviewer_id]).first.nil?
                   TeamReviewResponseMap.create(:reviewee_id => team_id, :reviewer_id => reviewer_id, :reviewed_object_id => @assignment.id)
@@ -616,13 +624,13 @@ module DynamicReviewMapping
               end
             }
           }
-          if @show_message == true
+          if @show_message
             return message
           end
               rescue Exception => exc
                 #revert the mapping
                 response_mappings = TeamReviewResponseMap.where(reviewed_object_id: @assignment.id)
-                if !response_mappings.nil?
+                unless response_mappings.nil?
                   response_mappings.each {|response_mapping|
                     response_mapping.delete
                   }
@@ -633,242 +641,7 @@ module DynamicReviewMapping
 
           end
 
-          def assign_reviewers_individual(num_reviews)
-            @assignment = self
-            @show_message = false
-            number_of_reviews = num_reviews.to_i
-
-            contributors = SignUpTopic.find_by_sql("SELECT creator_id
-                                                   FROM sign_up_topics as t,signed_up_users as u
-                                                   WHERE t.assignment_id =" + @assignment.id.to_s + " and u.topic_id = t.id")
-
-            users = Array.new
-            mappings = Hash.new
-            reviews_per_user = 0
-            #convert to just an array of contributors(user_ids). Topics which needs review.
-            if !contributors.nil?
-              contributors.collect! {|contributor| contributor['creator_id'].to_i}
-            else
-              #TODO: Give up, no work to review ..
-            end
-
-            #contributors.each { |contributor|
-            #   team_users = TeamsUser.where(team_id: contributor)
-            #   team_users.each { |team_user|
-            #        users.push(team_user['user_id'])
-            #   }
-            #}
-
-            users = contributors.clone
-
-            if users.size != 0
-              reviews_per_user = ((users.size.to_f * number_of_reviews.to_f)/contributors.size.to_f).ceil
-            else
-              #TODO: Give up, no work to reviewers ..
-            end
-
-            contributors.each { |contributor|
-              #initialize mappings
-              mappings[contributor] = Array.new(reviews_per_user)
-            }
-
-
-            #-------------initialize user_review_count----------------
-            user_review_count = Hash.new
-            users.each {|user|
-              user_review_count[user] = number_of_reviews
-            }
-
-            #-------------initialize team_reviewers_count-------------
-            user_reviewers_count = Hash.new
-            contributors.each {|contributor|
-              user_reviewers_count[contributor] = reviews_per_user
-            }
-
-            temp_users = users.clone
-
-            for n in 1..users.size
-              #randomly select a user from the list
-              user = temp_users[(rand(temp_users.size)).round]
-              #create a list of user_ids this user can review
-              #users_team_id = Team.find_by_sql("SELECT t.id
-              #                                  FROM teams t, teams_users u
-              #                                  WHERE t.parent_id = #{@assignment.id.to_s}  and t.id = u.team_id and u.user_id = #{user.to_s}")
-
-              temp_contributors = contributors.clone
-              temp_contributors.delete(user)
-
-              topic_user_id = Hash.new
-              temp_contributors.each {|contributor|
-                participant = Participant.where(user_id: contributor, parent_id: @assignment.id)
-                topic_user_id[contributor] = participant[0].topic_id
-              }
-
-
-              #Get topic count.
-              topic_count = Hash.new
-              topic_user_id.each {|record|
-                if (topic_count.has_key?(record[1]))
-                  topic_count[record[1]] = topic_count[record[1]] + 1
-                else
-                  topic_count[record[1]] = 1
-                end
-              }
-
-              i=0
-              #sort topic on count(this will be in ascending)
-              temp_topic_count = topic_count.sort {|a, b| a[1]<=>b[1]}
-
-              while user_review_count[user] != 0
-                #pick the last one (max count); topic[0] -> topic_id and topic[1] -> count
-                topic = temp_topic_count.last
-
-                #if there are no topics this user can review move on to next user
-                if topic.nil?
-                  break
-                end
-
-                users_to_be_assigned = Array.new
-                #check whether it's the user's topic
-                users_topic_id = Participant.where(parent_id: @assignment.id, user_id:  user)['topic_id']
-
-                if (topic[0].to_i == users_topic_id.to_i && number_of_reviews < topic[1]) || topic[0].to_i != users_topic_id.to_i
-
-
-                  #go thru reviewers and find the reviewers who worked on this topic
-                  topic_user_id.each {|topic_user|
-                    if topic_user[1].to_i == topic[0].to_i
-                      #Also before pushing check whether this user is assigned to review this topic earlier
-                      if mappings[topic_user[0]].index(user).nil?
-                        users_to_be_assigned.push(topic_user[0])
-                      end
-                    end
-                  }
-                  #here update the mappings datastructure which will be later used to update mappings table
-                  users_to_be_assigned.each {|reviewer|
-                    if user_reviewers_count[reviewer] != 0 && user_review_count[user] != 0
-                      mappings[reviewer][(user_reviewers_count[reviewer].to_i) -1] = user
-                      user_reviewers_count[reviewer] = (user_reviewers_count[reviewer].to_i) - 1
-                      user_review_count[user] = user_review_count[user] - 1
-                    else
-                      if user_review_count[user] == 0
-                        #We are done with this user
-                        break
-                      end
-                    end
-                  }
-                else
-                  #don't assign anything.
-                end
-
-                #remove that topic from the list
-                temp_topic_count.each {|temp_topic|
-                  if temp_topic[0] == topic[0]
-                    temp_topic_count.delete(temp_topic)
-                  end
-                }
-
-                #just in case if this loop runs infinitely; can be removed once code stabilizes
-                #if (i>user_review_count[user]+10)
-                #  break
-                #else
-                #  i= i + 1
-                #end
-            end
-            temp_users.delete(user)
-          end
-
-
-
-          mappings.each {|mapping|
-            #mapping[0]=team_id and mapping[1]=users(array) assigned for reviewing this team
-            for i in 0..mapping[1].size-1
-              if mapping[1][i].nil?
-                #*try* double the number of users times to assign a reviewer to this topic
-                for j in (1..users.size*2)
-                  random_index = rand(users.size-1)
-
-                  #check whether this randomly picked user is not the contributor
-                  #Also check whether this user has not yet been assigned to review this team
-                  if mapping[0].to_i != users[random_index].to_i && mapping[1].index(users[random_index]).nil?
-                    mapping[1][i] = users[random_index]
-                    user_reviewers_count[mapping[0]] = (user_reviewers_count[mapping[0]].to_i) - 1
-                    user_review_count[users[random_index]] = user_review_count[users[random_index]] - 1
-                    break
-                  end
-                end
-              end
-            end
-          }
-
-          message = "<b>Some students have been assigned more/less than #{number_of_reviews} review(s). </b><br\>"
-
-          #reviewer_assignment_success = true
-
-          user_review_count.each{|user|
-            if user[1] > 0
-              #reviewer_assignment_success = false
-              message_participant = Participant.where(parent_id: @assignment.id, user_id:  user[0]).first
-              users_fullname = message_participant.fullname
-              users_name = message_participant.name
-              message = message + "<li>" + users_fullname + "("+ users_name.to_s + "): -" + user[1].to_i.abs.to_s + "</li>"
-              @show_message = true
-            elsif user[1] < 0
-              @show_message = true
-              message_participant = Participant.where(parent_id: @assignment.id, user_id:  user[0]).first
-              users_fullname = message_participant.fullname
-              users_name = message_participant.name
-              message = message + "<li>" +users_fullname + "("+ users_name.to_s + "): +" + user[1].to_i.abs.to_s + "</li>"
-            else
-              #do nothing
-              end
-          }
-
-
-          begin
-            #Actual mapping
-            mappings.each {|mapping|
-              reviewee = mapping[0]
-              reviewers = mapping[1]
-
-              reviewee_participant = Participant.where(parent_id: @assignment.id, user_id:  reviewee).first
-
-              if !reviewee_participant.nil?
-                reviewers.each{|reviewer|
-                  participant = Participant.where(parent_id: @assignment.id, user_id:  reviewer).first
-                  #reviewer, and hence participant could be nil when algo couldn't find someone to review somebody's work
-                  if !participant.nil?
-                    reviewer_id = participant.id
-                    if ParticipantReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?', reviewee_participant.id, reviewer_id]).first.nil?
-                      ParticipantReviewResponseMap.create(:reviewee_id => reviewee_participant.id, :reviewer_id => reviewer_id, :reviewed_object_id => @assignment.id)
-                    else
-                      #if there is such a review mapping just skip it. Or it can be handled by informing
-                      #the instructor(TODO:)
-                    end
-                  end
-                }
-                  end
-            }
-
-            if @show_message == true
-              return message
-            end
-          rescue Exception => exc
-            #revert the mapping
-            response_mappings = ResponseMap.where(reviewed_object_id: @assignment.id, type:  "ParticipantReviewResponseMap").first
-            if !response_mappings.nil?
-              response_mappings.each {|response_mapping|
-                response_mapping.delete
-              }
-            end
-            return "Automatic assignment failed! Please try again with different number of reviews."
-            # include "#{exc.message}" to the above message to find what the error was.."
-          end
-
-
-            end
-
-            def assign_metareviewers(num_review_of_reviews, assignment)
+          def assign_metareviewers(num_review_of_reviews, assignment)
 
               @show_message = false
 
@@ -880,7 +653,7 @@ module DynamicReviewMapping
               reviews_per_user = 0
 
               #convert to just an array of contributors(user_ids). Topics which needs review.
-              if !contributors.nil?
+              unless contributors.nil?
                 contributors.collect! {|contributor| contributor['id'].to_i}
               else
                 #TODO: Give up, no work to review ..
@@ -906,7 +679,7 @@ module DynamicReviewMapping
                 return "<br/><b>Insufficient metareviewers!</b>"
               end
 
-              if users.size != 0
+              if users.size !=
                 reviews_per_user = ((users.size.to_f * number_of_reviews.to_f)/contributors.size.to_f).ceil
               else
                 #TODO: Give up, no reviewers ..
@@ -935,14 +708,15 @@ module DynamicReviewMapping
                 #randomly select a user from the list
                 user = temp_users[(rand(temp_users.size)).round]
                 temp_contributors = contributors.clone
+
                 participant = Participant.where(parent_id: @assignment.id, user_id:  user).first
-                if !participant.nil?
+                unless participant.nil?
                   contributors.each {|contributor|
                     map = ResponseMap.find(contributor)
                     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
                     # to treat all assignments as team assignments
                     team_members = TeamsUser.where(team_id: map.reviewee_id)
-                    if !team_members.nil?
+                    unless team_members.nil?
                       team_members.each{|team_member|
                         if team_member.user_id == user
                           temp_contributors.delete(contributor)
@@ -954,7 +728,7 @@ module DynamicReviewMapping
                       temp_contributors.delete(contributor)
                     end
                   }
-                    end
+                end
                 topic_user_id = Hash.new
                 temp_contributors.each {|contributor|
                   map = ResponseMap.find(contributor)
@@ -963,8 +737,8 @@ module DynamicReviewMapping
                   # to treat all assignments as team assignments
                   #We would have just one member for an individual assignment.
                   team_members = TeamsUser.where(team_id: map.reviewee_id)
-                  if !team_members.nil?
-                    participant = Participant.where(parent_id: @assignment.id, user_id:  team_members[0].user_id).first
+                  unless team_members.nil?
+                    participant = Participant.where(parent_id: @assignment.id, user_id:  team_members.first.user_id).first
                     topic_user_id[contributor] = participant.topic_id
                   end
                 }
@@ -984,7 +758,7 @@ module DynamicReviewMapping
                 temp_topic_count = topic_count.sort {|a, b| a[1]<=>b[1]}
 
                 while user_review_count[user] != 0
-                  #pick the last one (max count); topic[0] -> topic_id and topic[1] -> count
+                  #pick the last one (max count); topic.first -> topic_id and topic[1] -> count
                   topic = temp_topic_count.last
                   #if there are no topics this user can review move on to next user
                   if topic.nil?
@@ -999,10 +773,10 @@ module DynamicReviewMapping
 
                   topic_user_id.each {|topic_user|
 
-                    if topic_user[1].to_i == topic[0].to_i
+                    if topic_user[1].to_i == topic.first.to_i
                       #Also before pushing check whether this user is assigned to review this reviewer earlier
-                      if mappings[topic_user[0]].index(user).nil?
-                        users_to_be_assigned.push(topic_user[0])
+                      if mappings[topic_user.first].index(user).nil?
+                        users_to_be_assigned.push(topic_user.first)
 
                       end
                     end
@@ -1015,7 +789,7 @@ module DynamicReviewMapping
                       user_reviewers_count[reviewer] = (user_reviewers_count[reviewer].to_i) - 1
                       user_review_count[user] = user_review_count[user] - 1
                     else
-                      if user_review_count[user] == 0
+                      if user_review_count[user].zero?
                         #We are done with this user
                         break
                       end
@@ -1027,7 +801,7 @@ module DynamicReviewMapping
 
                   #remove that topic from the list
                   temp_topic_count.each {|temp_topic|
-                    if temp_topic[0] == topic[0]
+                    if temp_topic.first == topic.first
                       temp_topic_count.delete(temp_topic)
                     end
                   }
@@ -1044,7 +818,7 @@ module DynamicReviewMapping
       end
 
       mappings.each {|mapping|
-        #mapping[0]=team_id and mapping[1]=users(array) assigned for reviewing this team
+        #mapping.first=team_id and mapping[1]=users(array) assigned for reviewing this team
         for i in 0..mapping[1].size-1
 
           if mapping[1][i].nil?
@@ -1057,7 +831,7 @@ module DynamicReviewMapping
               #Also check whether this user has not yet been assigned to review this team/user
               participant = Participant.where(parent_id: @assignment.id, user_id:  users[random_index]).first
 
-              map = ResponseMap.find(mapping[0])
+              map = ResponseMap.find(mapping.first)
 
               #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
               # to treat all assignments as team assignments
@@ -1072,10 +846,10 @@ module DynamicReviewMapping
                 user_can_review = false
               end
 
-              if user_can_review == true && mapping[1].index(users[random_index]).nil?
+              if user_can_review && mapping[1].index(users[random_index]).nil?
 
                 mapping[1][i] = users[random_index]
-                user_reviewers_count[mapping[0]] = (user_reviewers_count[mapping[0]].to_i) - 1
+                user_reviewers_count[mapping.first] = (user_reviewers_count[mapping.first].to_i) - 1
                 user_review_count[users[random_index]] = user_review_count[users[random_index]] - 1
                 break
 
@@ -1089,42 +863,25 @@ module DynamicReviewMapping
 
       #reviewer_assignment_success = true
 
-      user_review_count.each{|user|
-        if user[1] > 0
-          #reviewer_assignment_success = false
-          message_participant = Participant.where(parent_id: @assignment.id, user_id:  user[0]).first
-          users_fullname = message_participant.fullname
-          users_name = message_participant.name
-          message = message + "<li>" + users_fullname + "("+ users_name.to_s + "): -" + user[1].to_i.abs.to_s + "</li>"
-          @show_message = true
-        elsif user[1] < 0
-          @show_message = true
-          message_participant = Participant.where(parent_id: @assignment.id, user_id:  user[0]).first
-          users_fullname = message_participant.fullname
-          users_name = message_participant.name
-          message = message + "<li>" +users_fullname + "("+ users_name.to_s + "): +" + user[1].to_i.abs.to_s + "</li>"
-        else
-          #do nothing
-          end
-      }
+      myFunction
 
 
       begin
         #Actual mapping
         mappings.each {|mapping|
-          #reviewee = mapping[0]
+          #reviewee = mapping.first
           reviewers = mapping[1]
 
-          map = ResponseMap.find(mapping[0])
+          map = ResponseMap.find(mapping.first)
 
 
           reviewers.each{|reviewer|
             participant = Participant.where(parent_id: @assignment.id, user_id:  reviewer).first
             #reviewer, and hence participant could be nil when algo couldn't find someone to review somebody's work
-            if !participant.nil?
+            unless participant.nil?
               reviewer_id = participant.id
-              if MetareviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ? and reviewed_object_id = ?', map.reviewer_id, reviewer_id,mapping[0]]).first.nil?
-                MetareviewResponseMap.create(:reviewee_id => map.reviewer_id, :reviewer_id => reviewer_id, :reviewed_object_id => mapping[0])
+              if MetareviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ? and reviewed_object_id = ?', map.reviewer_id, reviewer_id,mapping.first]).first.nil?
+                MetareviewResponseMap.create(:reviewee_id => map.reviewer_id, :reviewer_id => reviewer_id, :reviewed_object_id => mapping.first)
               else
                 #if there is such a review mapping just skip it. Or it can be handled by informing
                 #the instructor(TODO:..)
@@ -1135,13 +892,13 @@ module DynamicReviewMapping
         }
         temp_message = ""
 
-        if @show_message == true
+        if @show_message
           return message + temp_message
         end
             rescue Exception => exc
               #revert the mapping
               response_mappings = MetareviewResponseMap.where(reviewed_object_id: @assignment.id)
-              if !response_mappings.nil?
+              unless response_mappings.nil?
                 response_mappings.each {|response_mapping|
                   response_mapping.delete
                 }

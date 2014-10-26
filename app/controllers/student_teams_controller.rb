@@ -25,7 +25,7 @@ class StudentTeamsController < ApplicationController
     check = AssignmentTeam.where( name: params[:team][:name], parent_id: @student.parent_id)
 
     #check if the team name is in use
-    if (check.length == 0)
+    if (check.length.zero?)
       @team = AssignmentTeam.new params[:team]
       @team.parent_id = @student.parent_id
       @team.save

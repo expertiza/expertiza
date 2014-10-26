@@ -13,12 +13,12 @@
 
 <% if @sign_up_topics.size != 0 %>
   <table class="general">
-    <tr><%= render :partial => 'table_header' %></tr>
+    <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
 
     <% i=1 %>
     <% for topic in @sign_up_topics %>
       <tr>
-        <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic} %>
+        <%= render :partial => '/sign_up_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
       </tr>
       <% i=i+1 %>
     <% end %>
@@ -34,5 +34,5 @@
 <% session[:return_to] = request.url %>
 <br/><br/>
 
-<%= render :partial => 'add_topics' %>
+<%= render :partial => '/sign_up_sheet/add_topics' %>
 <a href="javascript:history.back()">Back</a>

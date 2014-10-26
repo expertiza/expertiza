@@ -155,7 +155,7 @@
      <% if @student.team == nil %>
        <h2>Create Team</h2>
        <%= form_tag :controller => 'student_teams', :action => 'create' do %>
-         <%= hidden_field_tag 'id', @student.id %>
+         <%= hidden_field_tag 'student_id', @student.id %>
          <label for="team_name">Team Name:</label>&nbsp;
          <%= text_field 'team', 'name' %>
          <%= submit_tag "Create Team" %>

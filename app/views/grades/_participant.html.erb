@@ -34,10 +34,7 @@
   	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",s_avg) %>%
       <BR/><FONT SIZE="-1"><%= link_to "show reviews(#{pscore[:review][:assessments].size})",action:'show_reviews',score: pscore[:review] ,participant: participant,prefix: prefix, path: 'reviews'%></FONT>
   	</TD>
-   	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",s_min) %>% - <%= sprintf("%.0f",s_max) %>% 
-   	<% if controller.action_name != "grades_show" %>
-   	  <BR/><FONT SIZE="-1"><%= link_to 'email reviewers', :action => 'conflict_email', :id => participant.id, :submission => 'review' %></FONT>
-   	<% end %>
+   	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",s_min) %>% - <%= sprintf("%.0f",s_max) %>%
     </TD>
     <% else %>
    	<TD ALIGN="CENTER">---</TD>
@@ -49,9 +46,7 @@
       <BR/><FONT SIZE="-1"><%= link_to "metareviews(#{pscore[:review][:assessments].size})",action:'show_reviews',score: pscore[:metareview] ,participant: participant,prefix: prefix,path:'metareviews'%></FONT>
     </TD>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",r_min) %>% - <%= sprintf("%.0f",r_max) %>%
-    <% if controller.action_name != "grades_show" %>
-      <BR/><FONT SIZE="-1"><%= link_to 'email metareviewers', :action => 'conflict_email', :id => participant.id, :submission => 'review_of_review' %></FONT>
-    <% end %>  	    
+
     </TD>
     <% else %>
     <TD ALIGN="CENTER">---</TD>
@@ -64,9 +59,6 @@
     </TD>
 
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",f_min) %>% - <%= sprintf("%.0f",f_max) %>%
-    <% if controller.action_name != "grades_show" %>
-      <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_email', :id => participant.id, :submission => 'review_feedback' %></FONT>
-    <% end %>  	    
     </TD>
     <% else %>
     <TD ALIGN="CENTER">---</TD>
@@ -78,13 +70,10 @@
     <TD ALIGN="CENTER" VALIGN="TOP">
     	<%if controller.action_name != "grades_show"%>
     		<%= sprintf("%.2f",tr_avg) %>
-          <BR/><FONT SIZE="-1"><%= link_to "teammate reviews(#{pscore[:teammate][:assessments].size})",action:'show_reviews',score: pscore[:teammate] ,participant: participant,prefix: prefix,path:'teammate_reviews'%></FONT>
     	<% end %>
     </TD>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",tr_min) %>% - <%= sprintf("%.0f",tr_max) %>%
-    <% if controller.action_name != "grades_show" %>
-      <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_email', :id => participant.id, :submission => 'teammate_review' %></FONT>
-    <% end %>  	    
+
     </TD>
     <% else %>
     <TD ALIGN="CENTER">---</TD>

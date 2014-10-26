@@ -9,8 +9,6 @@ class MetareviewQuestionnaire < Questionnaire
   end
 
   def get_assessments_for(participant)
-    time1 = Time.now
-    puts "####################################     metareviews Current Time1 : " + time1.inspect
     participant.metareviews()
   end
 

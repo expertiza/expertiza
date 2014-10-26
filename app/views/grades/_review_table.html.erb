@@ -31,7 +31,7 @@
            <% end %>
              <%= sprintf("%.2f",score) %> &nbsp;
              <!--if the instructor think the reviewer's grade is not fair,send a email to the reviewer-->
-             <% if controller.action_name != "grades_show" %>
+             <% if session[:user].role_id != 1 %>
                  <BR/><FONT SIZE="-1"><%= link_to 'email reviewer', :action => 'conflict_email',:remote=> true,:reviewer_id=> review.map.reviewer.user,:participant_id=>participant,:score=>sprintf("%.2f",score) %></FONT>
 
            <% end %>

@@ -425,7 +425,7 @@ class ResponseController < ApplicationController
     if params[:return] == "feedback"
       redirect_to :controller => 'grades', :action => 'view_my_scores', :id => @map.reviewer.id
     elsif params[:return] == "teammate"
-      redirect_to view_student_teams_path id: @map.reviewer.id
+      redirect_to view_student_teams_path student_id: @map.reviewer.id
     elsif params[:return] == "instructor"
       redirect_to :controller => 'grades', :action => 'view', :id => @map.assignment.id
     else

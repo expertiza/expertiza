@@ -45,7 +45,7 @@ class InvitationController < ApplicationController
 
     update_join_team_request user,student
 
-    redirect_to view_student_teams_path id: student.id
+    redirect_to view_student_teams_path student_id: student.id
 
   end
 
@@ -83,7 +83,7 @@ class InvitationController < ApplicationController
       flash[:error]= "The team already has the maximum number of members."
     end
 
-    redirect_to view_student_teams_path id: params[:student_id]
+    redirect_to view_student_teams_path student_id: params[:student_id]
 
   end
 
@@ -92,12 +92,12 @@ class InvitationController < ApplicationController
     @inv.reply_status = 'D'
     @inv.save
     student = Participant.find(params[:student_id])
-    redirect_to view_student_teams_path id: student.id
+    redirect_to view_student_teams_path student_id: student.id
   end
 
   def cancel
     Invitation.find(params[:inv_id]).destroy
-    redirect_to view_student_teams_path id: params[:student_id]
+    redirect_to view_student_teams_path student_id: params[:student_id]
   end
 
 end

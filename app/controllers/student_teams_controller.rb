@@ -93,7 +93,7 @@ class StudentTeamsController < ApplicationController
     #remove the entry from teams_users
 
     #>Relationship which would remove the following block
-    team_user = TeamsUser.find_by team_id: params[:team_id], user_id: team_user.user_id
+    team_user = TeamsUser.find_by team_id: params[:team_id], user_id: participant.user_id
 
     if team_user
       team_user.destroy
@@ -105,7 +105,7 @@ class StudentTeamsController < ApplicationController
 
     #if your old team does not have any members, delete the entry for the team
     #>could happen with a callback in assignment_team.assignment_participant.delete(participant)
-    unless TeamsUser.where(team_id: params[:team_id]).empty?
+    if TeamsUser.where(team_id: params[:team_id]).empty?
       old_team = AssignmentTeam.find params[:team_id]
       if old_team#> how on earth could this be null?
         old_team.destroy_all
@@ -174,7 +174,7 @@ class StudentTeamsController < ApplicationController
 
     participant.save
 
-    redirect_to view_student_teams_path :id => @student.id
+    redirect_to view_student_teams_path id: @student.id
   end
 
   def team_created_successfully

@@ -6,11 +6,11 @@ class StudentTeamsController < ApplicationController
   def action_allowed?
     #note, this code replaces the following line that cannot be called before action allowed?
     set_team if %w[edit update].include? action_name
-    set_student if %w[view update edit].include? action_name
+    set_student if %w(view update edit create remove_participant).include? action_name
 
     if current_role_name.eql? ("Student")
       #make sure the student is the owner if they are trying to create it
-      return !current_user_id?(@student.user_id) if %w[create].include? action_name
+      return current_user_id?(@student.user_id) if %w[create].include? action_name
       #make sure the student belongs to the group before allowed them to try and edit or update
       return @team.get_participants.map{|p| p.user_id}.include? current_user.id if %[edit update].include? action_name
       return true
@@ -31,10 +31,10 @@ class StudentTeamsController < ApplicationController
   end
 
   def create
-    check = AssignmentTeam.where( name: params[:team][:name], parent_id: @student.parent_id)
+    existing_assignments = AssignmentTeam.where( name: params[:team][:name], parent_id: @student.parent_id)
 
     #check if the team name is in use
-    if (check.length.zero?)
+    if (existing_assignments.empty?)
       @team = AssignmentTeam.new params[:team]
       @team.parent_id = @student.parent_id
       @team.save

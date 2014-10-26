@@ -23,12 +23,12 @@ class SignUpTopic < ActiveRecord::Base
   # function was successful.  A function may not be successful if the user has
   # already signed up for a topic.  It should be noted however that being waitlisted
   # for a topic is not a failure.
-  def confirmTopic(creator_id, topic_id, assignment_id)
+  def self.confirmTopic(creator_id, user, topic_id, assignment_id)
     #check whether user has signed up already
     user_signup = SignedUpUser.find_user_signup_topics(assignment_id, creator_id)
 
     sign_up = SignedUpUser.new
-    sign_up.topic_id = params[:id]
+    sign_up.topic_id = topic_id
     # NOTE: Creator is always a team.
     sign_up.creator_id = creator_id
 
@@ -50,7 +50,7 @@ class SignUpTopic < ActiveRecord::Base
     ActiveRecord::Base.transaction do
       # NOTE: This is likely not checking if the user is on a team that
       #       already has this topic assigned to it.
-      sign_up.sign_up_for_topic(session[:user].id, topic_id)
+      sign_up.sign_up_for_topic(user.id, assignment_id)
       result = sign_up.save
     end
 

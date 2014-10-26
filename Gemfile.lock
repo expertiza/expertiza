@@ -182,10 +182,10 @@ GEM
     mail (2.6.1)
       mime-types (>= 1.16, < 3)
     method_source (0.8.2)
-    mime-types (2.4.2)
+    mime-types (2.4.3)
     mini_portile (0.6.0)
     minitest (5.4.2)
-    minitest-reporters (1.0.6)
+    minitest-reporters (1.0.7)
       ansi
       builder
       minitest (>= 5.0)

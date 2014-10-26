@@ -23,7 +23,7 @@ class SignUpTopic < ActiveRecord::Base
   # function was successful.  A function may not be successful if the user has
   # already signed up for a topic.  It should be noted however that being waitlisted
   # for a topic is not a failure.
-  def self.confirmTopic(creator_id, user, topic_id, assignment_id)
+  def self.confirmTopic(creator_id, user, topic_id, assignment_id, flash)
     #check whether user has signed up already
     user_signup = SignedUpUser.find_user_signup_topics(assignment_id, creator_id)
 
@@ -113,7 +113,7 @@ class SignUpTopic < ActiveRecord::Base
     assignment = Assignment.find(assignment_id)
 
     #making sure that the drop date deadline hasn't passed
-    dropDate = DueDate.where([:assignment_id => assignment.id, :deadline_type_id => '6']).first
+    dropDate = DueDate.where(:assignment_id => assignment.id, :deadline_type_id => '6').first
     if (!dropDate.nil? && dropDate.due_at < Time.now)
       #flash[:error] = "You cannot drop this topic because the drop deadline has passed."
     else
@@ -140,7 +140,7 @@ class SignUpTopic < ActiveRecord::Base
             #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
             # to treat all assignments as team assignments
 
-            user_id = TeamsUser.where([ :team_id => first_waitlisted_user.creator_id ]).first.user_id
+            user_id = TeamsUser.where(:team_id => first_waitlisted_user.creator_id).first.user_id
             participant = Participant.where(user_id: user_id, parent_id: assignment.id).first
 
             participant.update_topic_id(topic_id)
@@ -182,7 +182,7 @@ class SignUpTopic < ActiveRecord::Base
       @selected_topics = nil
     else
       #TODO: fix this; cant use 0
-      @selected_topics = SignUpSheetController.other_confirmed_topic_for_user(assignment_id, users_team[0].t_id)
+      @selected_topics = SignedUpUser.find_user_signup_topics(assignment_id, users_team[0].t_id)
     end
   end
 end

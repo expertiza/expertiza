@@ -229,7 +229,7 @@ class SignUpSheetController < ApplicationController
         @selected_topics = nil
       else
         #TODO: fix this; cant use 0
-        @selected_topics = SignUpSheetController.other_confirmed_topic_for_user(params[:id], users_team[0].t_id)
+        @selected_topics = SignedUpUser.find_user_signup_topics(params[:id], users_team[0].t_id)
       end
 
       SignUpTopic.remove_team(users_team, @assignment_id)
@@ -271,9 +271,9 @@ class SignUpSheetController < ApplicationController
       team = AssignmentTeam.create_team_and_node(assignment_id)
       user = User.find(user_id)
       teamuser = create_team_users(user, team.id)
-      confirmationStatus = SignUpTopic.confirmTopic(team.id, session[:user], topic_id, assignment_id)
+      confirmationStatus = SignUpTopic.confirmTopic(team.id, session[:user], topic_id, assignment_id, flash)
     else
-      confirmationStatus = SignUpTopic.confirmTopic(users_team[0].t_id, session[:user], topic_id, assignment_id)
+      confirmationStatus = SignUpTopic.confirmTopic(users_team[0].t_id, session[:user], topic_id, assignment_id, flash)
     end
   end
 

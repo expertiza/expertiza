@@ -64,7 +64,7 @@ class StudentTeamsController < ApplicationController
           redirect_to view_student_teams_path student_id: params[:student_id]
 
       end
-    elsif matching_teams.length.one? && (matching_teams[0].name <=> @team.name).zero?
+    elsif matching_teams.length == 1 && (matching_teams[0].name <=> @team.name).zero?
 
       team_created_successfully
       redirect_to view_student_teams_path student_id: params[:student_id]

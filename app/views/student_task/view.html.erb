@@ -14,8 +14,8 @@
 <!--ACS Here we need to know the size of the team to decide whether or not
 to display the label "Your team" in the student assignment tasks-->
   <%if @assignment.team_assignment? %>
-    <li> <%= link_to 'Your team', view_student_teams_path id: @participant.id %>
-	 (View and manage your team)
+    <li> <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.parent_id%>
+      (View and manage your team)
     </li>
   <%end%>
     <li>

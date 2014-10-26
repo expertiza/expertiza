@@ -28,6 +28,7 @@ gem 'gdata', :require => false
 gem 'graphr'
 gem 'haml-rails'
 gem 'hoptoad_notifier'
+gem 'jquery-datetimepicker-rails'
 gem 'jquery-rails'
 gem 'jquery-ui-sass-rails'
 gem 'mysql2'

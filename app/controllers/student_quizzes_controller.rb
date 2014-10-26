@@ -33,26 +33,19 @@ class StudentQuizzesController < ApplicationController
   end
 
   def self.take_quiz assignment_id , reviewer_id
-    @quizzes = Array.new
+    quizzes = Array.new
     reviewer = Participant.where(user_id: reviewer_id, parent_id: assignment_id).first
-    @assignment = Assignment.find(assignment_id)
-    teams = TeamsUser.where(user_id: reviewer_id)
     Team.where(parent_id: assignment_id).each do |quiz_creator|
       unless TeamsUser.find_by_team_id(quiz_creator.id).user_id == reviewer_id
         Questionnaire.where(instructor_id: quiz_creator.id).each do |questionnaire|
-          if !@assignment.team_assignment?
-            unless QuizResponseMap.where(reviewed_object_id: questionnaire.id, reviewer_id:  reviewer.id).first
-              @quizzes.push(questionnaire)
-            end
-          else unless QuizResponseMap.where(reviewed_object_id: questionnaire.id, reviewer_id:  reviewer_id).first
-            @quizzes.push(questionnaire)
+          unless QuizResponseMap.where(reviewed_object_id: questionnaire.id, reviewer_id:  reviewer.id).first
+            quizzes.push(questionnaire)
           end
         end
       end
     end
+    return quizzes
   end
-  return @quizzes
-end
 
   def record_response
   @map = ResponseMap.find(params[:map_id])

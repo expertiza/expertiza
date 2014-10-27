@@ -55,7 +55,7 @@
     
     <% if f_avg %>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",f_avg) %>%
-      <BR/><FONT SIZE="-1"><%= link_to "author feedback(#{pscore[:feedback][:assessments].size})",action:'show_reviews',score: pscore[:feedback] ,participant: participant,prefix: prefix,path:'author_feedback'%></FONT>
+      <BR/><FONT SIZE="-1"><%= link_to "author feedback(#{pscore[:feedback][:assessments].size})",action:'show_reviews',score: pscore[:feedback] ,participant: participant,prefix: prefix,path:'author_feedbacks'%></FONT>
     </TD>
 
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",f_min) %>% - <%= sprintf("%.0f",f_max) %>%

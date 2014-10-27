@@ -24,31 +24,30 @@ class LeaderboardController < ApplicationController
 
       @courseAccomp = Hash.new
       if !@instructorQuery
-
+        @user = current_user
         @courseAccomp = Leaderboard.extractPersonalAchievements(@csHash, @courseList, current_user.id)
       else
         @csHash = Leaderboard.sortHash(@csHash)
       end
 
       # Setup top 3 leaderboards for easier consumption by view
-      @top3LeaderBoards = Array.new
+      @leaderboards = Array.new
 
-      @csHash.each_pair{|qtype, courseHash|
-
+      @csHash.each { |qType, courseHash|
         courseHash.each_pair{|course, userGradeArray|
           courseName = LeaderboardHelper.getCourseName(course)
-          achieveName = LeaderboardHelper.getAchieveName(qtype)
+          achieveName = LeaderboardHelper.getAchieveName(qType)
 
           leaderboardHash = Hash.new
           leaderboardHash = {:achievement => achieveName,
                              :courseName => courseName,
                              :sortedGrades => userGradeArray}
 
-          @top3LeaderBoards << leaderboardHash
+          @leaderboards << leaderboardHash
         }
       }
 
-      @top3LeaderBoards.sort!{|x,y| x[:courseName] <=> y[:courseName]}
+      @leaderboards.sort!{|x,y| x[:courseName] <=> y[:courseName]}
       # Setup personal achievement leaderboards for easier consumption by view
       @achievementLeaderBoards = Array.new
       if !@instructorQuery

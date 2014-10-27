@@ -5,7 +5,7 @@ describe 'Submission deadline reminder email' do
   it 'should send reminder email for submission deadline to signed-up users ' do
     #Delayed::Worker.delay_jobs = false
     id = 2
-    @name = Assignment.find(id).name
+    @name = "user"
 
     #due_at = DateTime.now + 120
     #seconds_until_due = due_at - Time.now
@@ -18,6 +18,7 @@ describe 'Submission deadline reminder email' do
     curr_time=DateTime.now.to_s(:db)
     curr_time=Time.parse(curr_time)
     time_in_min=((due_at1 - curr_time).to_i/60) *60
+    Delayed::Job.delete_all
     Delayed::Job.count.should == 0
 
     dj = Delayed::Job.enqueue(DelayedMailer.new(id, "submission", due_at), 1, time_in_min)
@@ -35,13 +36,14 @@ describe 'Resubmission deadline reminder email' do
   it 'should send reminder email for resubmission deadline to reviewers ' do
 
     id = 2
-    @name = Assignment.find(id).name
+    @name = "user"
     due_at = DateTime.now.advance(:minutes => +2)
 
     due_at1 = Time.parse(due_at.to_s(:db))
     curr_time=DateTime.now.to_s(:db)
     curr_time=Time.parse(curr_time)
     time_in_min=((due_at1 - curr_time).to_i/60) *60
+    Delayed::Job.delete_all
     Delayed::Job.count.should == 0
 
     dj = Delayed::Job.enqueue(DelayedMailer.new(id, "resubmission", due_at), 1, time_in_min)
@@ -56,13 +58,14 @@ describe 'Review deadline reminder email' do
   it 'should send reminder email for review deadline to reviewers ' do
 
     id = 2
-    @name = Assignment.find(id).name
+    @name = "user"
     due_at = DateTime.now.advance(:minutes => +2)
 
     due_at1 = Time.parse(due_at.to_s(:db))
     curr_time=DateTime.now.to_s(:db)
     curr_time=Time.parse(curr_time)
     time_in_min=((due_at1 - curr_time).to_i/60) *60
+    Delayed::Job.delete_all
     Delayed::Job.count.should == 0
 
     dj = Delayed::Job.enqueue(DelayedMailer.new(id, "review", due_at), 1, time_in_min)
@@ -77,13 +80,14 @@ describe 'Metareview deadline reminder email' do
 
   it 'should send reminder email for Metareview deadline to reviewers ' do
     id = 2
-    @name = Assignment.find(id).name
+    @name = "user"
     due_at = DateTime.now.advance(:minutes => +2)
 
     due_at1 = Time.parse(due_at.to_s(:db))
     curr_time=DateTime.now.to_s(:db)
     curr_time=Time.parse(curr_time)
     time_in_min=((due_at1 - curr_time).to_i/60) *60
+    Delayed::Job.delete_all
     Delayed::Job.count.should == 0
 
     dj = Delayed::Job.enqueue(DelayedMailer.new(id, "metareview", due_at), 1, time_in_min)
@@ -98,13 +102,14 @@ describe 'Drop Topic deadline reminder email' do
 
   it 'should send reminder email for drop topic deadline to reviewers ' do
     id = 2
-    @name = Assignment.find(id).name
+    @name = "user"
     due_at = DateTime.now.advance(:minutes => +2)
 
     due_at1 = Time.parse(due_at.to_s(:db))
     curr_time=DateTime.now.to_s(:db)
     curr_time=Time.parse(curr_time)
     time_in_min=((due_at1 - curr_time).to_i/60) *60
+    Delayed::Job.delete_all
     Delayed::Job.count.should == 0
 
     dj = Delayed::Job.enqueue(DelayedMailer.new(id, "drop_topic", due_at), 1, time_in_min)
@@ -119,13 +124,14 @@ describe 'Signup deadline reminder email' do
   it 'should send reminder email for signup deadline to reviewers ' do
 
     id = 2
-    @name = Assignment.find(id).name
+    @name = "user"
     due_at = DateTime.now.advance(:minutes => +2)
 
     due_at1 = Time.parse(due_at.to_s(:db))
     curr_time=DateTime.now.to_s(:db)
     curr_time=Time.parse(curr_time)
     time_in_min=((due_at1 - curr_time).to_i/60) *60
+    Delayed::Job.delete_all
     Delayed::Job.count.should == 0
 
     dj = Delayed::Job.enqueue(DelayedMailer.new(id, "signup", due_at), 1, time_in_min)
@@ -140,13 +146,14 @@ describe 'Team formation deadline reminder email' do
   it 'should send reminder email for team formation deadline to reviewers ' do
 
     id = 2
-    @name = Assignment.find(id).name
+    @name = "user"
     due_at = DateTime.now.advance(:minutes => +2)
 
     due_at1 = Time.parse(due_at.to_s(:db))
     curr_time=DateTime.now.to_s(:db)
     curr_time=Time.parse(curr_time)
     time_in_min=((due_at1 - curr_time).to_i/60) *60
+    Delayed::Job.delete_all
     Delayed::Job.count.should == 0
 
     dj = Delayed::Job.enqueue(DelayedMailer.new(id, "team_formation", due_at), 1, time_in_min)

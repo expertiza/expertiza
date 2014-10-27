@@ -1,3 +1,21 @@
+# == Schema Information
+#
+# Table name: system_settings
+#
+#  id                        :integer          not null, primary key
+#  site_name                 :string(255)      default(""), not null
+#  site_subtitle             :string(255)
+#  footer_message            :string(255)      default("")
+#  public_role_id            :integer          default(0), not null
+#  session_timeout           :integer          default(0), not null
+#  default_markup_style_id   :integer          default(0)
+#  site_default_page_id      :integer          default(0), not null
+#  not_found_page_id         :integer          default(0), not null
+#  permission_denied_page_id :integer          default(0), not null
+#  session_expired_page_id   :integer          default(0), not null
+#  menu_depth                :integer          default(0), not null
+#
+
 class SystemSettings < ActiveRecord::Base
   set_table_name 'system_settings'
 

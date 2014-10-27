@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: responses
+#
+#  id                 :integer          not null, primary key
+#  map_id             :integer          default(0), not null
+#  additional_comment :text
+#  created_at         :datetime
+#  updated_at         :datetime
+#  version_num        :integer
+#
+
 class Response < ActiveRecord::Base
   belongs_to :map, :class_name => 'ResponseMap', :foreign_key => 'map_id'
   has_many :scores, :class_name => 'Score', :foreign_key => 'response_id', :dependent => :destroy

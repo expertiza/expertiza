@@ -1,3 +1,12 @@
+# == Schema Information
+#
+# Table name: ta_mappings
+#
+#  id        :integer          not null, primary key
+#  ta_id     :integer
+#  course_id :integer
+#
+
 class TaMapping < ActiveRecord::Base
   belongs_to :course
   belongs_to :ta

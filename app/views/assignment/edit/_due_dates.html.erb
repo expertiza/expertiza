@@ -168,6 +168,13 @@
                 '<option value="96">96</option>' +
                 '</select></td>';
 
+        html += '<td style='padding:5px'><%= text_field_tag('assignment[spec_location]', @assignment.spec_location, :style => 'width:250px') %></td>';
+
+        html += '<td align="center" class="due_date_due_at" width="25%">' +
+                '<input id="datetimepicker_' + element_id +
+                '" name="due_date[due_at]" style="width: 200px" type="text" value="' +
+                due_at + '">' + '</td>';
+
         previous_element.after(html);
 
         jQuery('#due_date_submission_allowed_id').val(due_date.submission_allowed_id).attr('id', '');

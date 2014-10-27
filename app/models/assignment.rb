@@ -1,3 +1,51 @@
+# == Schema Information
+#
+# Table name: assignments
+#
+#  id                                :integer          not null, primary key
+#  created_at                        :datetime
+#  updated_at                        :datetime
+#  name                              :string(255)
+#  directory_path                    :string(255)
+#  submitter_count                   :integer          default(0), not null
+#  course_id                         :integer          default(0)
+#  instructor_id                     :integer          default(0)
+#  private                           :boolean          default(FALSE), not null
+#  num_reviews                       :integer          default(0), not null
+#  num_review_of_reviews             :integer          default(0), not null
+#  num_review_of_reviewers           :integer          default(0), not null
+#  review_questionnaire_id           :integer
+#  review_of_review_questionnaire_id :integer
+#  teammate_review_questionnaire_id  :integer
+#  reviews_visible_to_all            :boolean
+#  wiki_type_id                      :integer          default(0), not null
+#  require_signup                    :boolean
+#  num_reviewers                     :integer          default(0), not null
+#  spec_location                     :text
+#  author_feedback_questionnaire_id  :integer
+#  max_team_size                     :integer          default(0), not null
+#  staggered_deadline                :boolean
+#  allow_suggestions                 :boolean
+#  days_between_submissions          :integer
+#  review_assignment_strategy        :string(255)
+#  max_reviews_per_submission        :integer
+#  review_topic_threshold            :integer          default(0)
+#  availability_flag                 :boolean
+#  copy_flag                         :boolean          default(FALSE)
+#  rounds_of_reviews                 :integer          default(1)
+#  microtask                         :boolean          default(FALSE)
+#  require_quiz                      :boolean
+#  num_quiz_questions                :integer          default(0), not null
+#  is_coding_assignment              :boolean
+#  is_intelligent                    :boolean
+#  selfreview_questionnaire_id       :integer
+#  managerreview_questionnaire_id    :integer
+#  readerreview_questionnaire_id     :integer
+#  calculate_penalty                 :boolean          default(FALSE), not null
+#  late_policy_id                    :integer
+#  is_penalty_calculated             :boolean          default(FALSE), not null
+#
+
 class Assignment < ActiveRecord::Base
   require 'models/analytic/assignment_analytic'
   include AssignmentAnalytic

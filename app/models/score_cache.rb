@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: score_caches
+#
+#  id          :integer          not null, primary key
+#  reviewee_id :integer
+#  score       :float            default(0.0), not null
+#  range       :string(255)      default("")
+#  object_type :string(255)      default(""), not null
+#
+
 class ScoreCache < ActiveRecord::Base
   
   ## makes an entry into score_cache table whenever a response is given/edited.

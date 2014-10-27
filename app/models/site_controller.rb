@@ -1,3 +1,13 @@
+# == Schema Information
+#
+# Table name: site_controllers
+#
+#  id            :integer          not null, primary key
+#  name          :string(255)      default(""), not null
+#  permission_id :integer          default(0), not null
+#  builtin       :integer          default(0)
+#
+
 class SiteController < ActiveRecord::Base
 
   validates_presence_of :name

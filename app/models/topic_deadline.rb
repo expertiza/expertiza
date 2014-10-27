@@ -1,3 +1,20 @@
+# == Schema Information
+#
+# Table name: topic_deadlines
+#
+#  id                          :integer          not null, primary key
+#  due_at                      :datetime
+#  deadline_type_id            :integer
+#  topic_id                    :integer
+#  late_policy_id              :integer
+#  submission_allowed_id       :integer
+#  review_allowed_id           :integer
+#  resubmission_allowed_id     :integer
+#  rereview_allowed_id         :integer
+#  review_of_review_allowed_id :integer
+#  round                       :integer
+#
+
 class TopicDeadline < ActiveRecord::Base
   belongs_to :topic, :class_name => 'SignUpTopic'
 

@@ -136,6 +136,31 @@ class AssignmentController < ApplicationController
 
   def edit
     @assignment = Assignment.find(params[:id])
+    @assignment_questionnaires = AssignmentQuestionnaire.find_all_by_assignment_id(params[:id])
+    @check = nil
+    @review_check = nil
+    @metareview_check= nil
+    @author_check = nil
+    @teammate_check = nil
+
+    @assignment_questionnaires.each do  |aq|
+      if(!(aq.used_in_round.nil?))
+        @check = 1
+        @q_id = aq.questionnaire_id
+        @qn = Questionnaire.find(@q_id)
+
+        if(@qn.display_type.eql?"Review")
+          @review_check = 1
+        elsif(@qn.display_type.eql?"Metareview")
+          @metareview_check=1
+        elsif(@qn.display_type.eql?"Author Feedback")
+          @author_check = 1
+        elsif(@qn.display_type.eql?"Teammate Review")
+          @teammate_check = 1
+        end
+      end
+    end
+
     set_up
   end
 

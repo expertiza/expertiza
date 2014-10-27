@@ -1,3 +1,17 @@
+# == Schema Information
+#
+# Table name: courses
+#
+#  id             :integer          not null, primary key
+#  name           :string(255)
+#  instructor_id  :integer
+#  directory_path :string(255)
+#  info           :text
+#  created_at     :datetime
+#  updated_at     :datetime
+#  private        :boolean          default(FALSE), not null
+#
+
 class Course < ActiveRecord::Base
   has_many :ta_mappings
   validates_presence_of :name

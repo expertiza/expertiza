@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: invitations
+#
+#  id            :integer          not null, primary key
+#  assignment_id :integer
+#  from_id       :integer
+#  to_id         :integer
+#  reply_status  :string(1)
+#
+
 class Invitation < ActiveRecord::Base
   belongs_to :to_user, :class_name => "User", :foreign_key => "to_id"
   belongs_to :from_user, :class_name => "User", :foreign_key => "from_id"

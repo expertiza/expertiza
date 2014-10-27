@@ -1,3 +1,17 @@
+# == Schema Information
+#
+# Table name: sign_up_topics
+#
+#  id                        :integer          not null, primary key
+#  topic_name                :text             default(""), not null
+#  assignment_id             :integer          default(0), not null
+#  max_choosers              :integer          default(0), not null
+#  category                  :text
+#  topic_identifier          :string(10)
+#  micropayment              :integer          default(0)
+#  bookmark_rating_rubric_id :integer
+#
+
 class SignUpTopic < ActiveRecord::Base
   has_many :signed_up_users, :foreign_key => 'topic_id', :dependent => :destroy
   has_many :topic_dependencies, :foreign_key => 'topic_id', :dependent => :destroy

@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: scores
+#
+#  id          :integer          not null, primary key
+#  question_id :integer          default(0), not null
+#  score       :integer
+#  comments    :text
+#  response_id :integer
+#
+
 class Score < ActiveRecord::Base
   belongs_to :question
 

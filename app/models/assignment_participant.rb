@@ -1,3 +1,26 @@
+# == Schema Information
+#
+# Table name: participants
+#
+#  id                   :integer          not null, primary key
+#  submit_allowed       :boolean          default(TRUE)
+#  review_allowed       :boolean          default(TRUE)
+#  user_id              :integer
+#  parent_id            :integer
+#  directory_num        :integer
+#  submitted_at         :datetime
+#  permission_granted   :boolean
+#  penalty_accumulated  :integer          default(0), not null
+#  submitted_hyperlinks :text
+#  grade                :float
+#  type                 :string(255)
+#  handle               :string(255)
+#  topic_id             :integer
+#  time_stamp           :datetime
+#  digital_signature    :text
+#  special_role         :string(255)
+#
+
 require 'uri'
 require 'yaml'
 

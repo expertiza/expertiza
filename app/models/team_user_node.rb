@@ -1,3 +1,13 @@
+# == Schema Information
+#
+# Table name: nodes
+#
+#  id             :integer          not null, primary key
+#  parent_id      :integer
+#  node_object_id :integer
+#  type           :string(255)
+#
+
 class TeamUserNode < Node
   def self.table
     "teams_users"

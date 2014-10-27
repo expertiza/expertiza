@@ -1,3 +1,11 @@
+# == Schema Information
+#
+# Table name: wiki_types
+#
+#  id   :integer          not null, primary key
+#  name :string(255)      default(""), not null
+#
+
 class WikiType < ActiveRecord::Base
  has_many :assignments
  require 'open-uri'

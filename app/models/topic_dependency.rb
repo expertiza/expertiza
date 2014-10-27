@@ -1,3 +1,12 @@
+# == Schema Information
+#
+# Table name: topic_dependencies
+#
+#  id           :integer          not null, primary key
+#  topic_id     :integer          default(0), not null
+#  dependent_on :string(255)      default(""), not null
+#
+
 class TopicDependency < ActiveRecord::Base
   serialize :dependent_on
 

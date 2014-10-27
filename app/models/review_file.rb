@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: review_files
+#
+#  id                    :integer          not null, primary key
+#  filepath              :string(255)
+#  author_participant_id :integer
+#  version_number        :integer
+#  created_at            :datetime
+#  updated_at            :datetime
+#
+
 class ReviewFile < ActiveRecord::Base
   # Associate the author (participant) with the file
   belongs_to :participant, :class_name => 'Participant',

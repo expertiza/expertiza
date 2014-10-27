@@ -1,3 +1,18 @@
+# == Schema Information
+#
+# Table name: content_pages
+#
+#  id              :integer          not null, primary key
+#  title           :string(255)
+#  name            :string(255)      default(""), not null
+#  markup_style_id :integer
+#  content         :text
+#  permission_id   :integer          default(0), not null
+#  created_at      :datetime
+#  updated_at      :datetime
+#  content_cache   :text
+#
+
 require 'redcloth'
 
 class ContentPage < ActiveRecord::Base

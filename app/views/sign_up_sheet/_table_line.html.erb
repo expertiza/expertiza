@@ -10,7 +10,7 @@
 
 <%= render :partial => '/sign_up_sheet/num_waiting', :locals => {:topic=>topic} %>
 <td align="center"><%= render :partial => '/sign_up_sheet/actions', :locals => {:i=>i,:topic=>topic} %></td>
-<% if ['Instructor', 'Teaching Assistant', 'Administrator'].include? current_user_role?.name %>
+<% if ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include? current_user_role?.name %>
 <td align="center"><%= link_to 'Edit', edit_sign_up_sheet_path(topic.id) %>|<%= link_to 'Delete', sign_up_sheet_path(topic.id), method: :delete, data: {confirm: "Are you sure?"} %></td>
 <%end%>
 

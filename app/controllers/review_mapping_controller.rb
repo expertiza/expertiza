@@ -85,7 +85,7 @@ class ReviewMappingController < ApplicationController
       @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
       @map.save
     end
-    redirect_to :controller => 'student_quizzes', :action => 'index', :id => params[:participant_id]
+    redirect_to student_quizzes_path(:id => params[:participant_id])
   end
 
   # Assign self to a submission
@@ -197,7 +197,7 @@ class ReviewMappingController < ApplicationController
     rescue Exception => e
       flash[:alert] = (e.nil?) ? $! : e
     end
-    redirect_to :controller => 'student_quizzes', :action => 'index', :id => reviewer.id
+    redirect_to student_quizzes_path(:id => reviewer.id)
 
   end
 

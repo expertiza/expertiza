@@ -39,10 +39,6 @@ class User < ActiveRecord::Base
 
   has_paper_trail
 
-  #def salt_first? Commenting the function as it is not being called anywhere
-  #  true
-  #end
-
   def bookmark_rated?(bmapping_id)
     BmappingRatings.where(["bmapping_id = #{bmapping_id} AND user_id = #{self.id}"]).first
   end
@@ -50,8 +46,6 @@ class User < ActiveRecord::Base
   def bookmark_added?(bmapping_id)
     Bmapping.where(["id = #{bmapping_id} AND user_id = #{self.id}"]).first
   end
-
-
 
   def list_mine(object_type, user_id)
     object_type.where(["instructor_id = ?", user_id])
@@ -68,7 +62,7 @@ class User < ActiveRecord::Base
     user &&
       self == user || # can impersonate self
       self.is_teaching_assistant_for?(user) || #TAs can impersonate their students
-      self.is_creator_of?(user) ||
+      self.is_creator_of?(user) || #User who created can impersonate
       can_impersonate?(user.parent) # recursive
   end
 
@@ -80,17 +74,9 @@ class User < ActiveRecord::Base
     role.name == 'Super-Administrator'
   end
 
+  #Delegating below functions to role because we want the exact same implementation
   delegate :admin?, :student?, to: :role
 
-=begin
-  def admin?
-    role.admin?
-  end
-
-  def student?
-    role.student?
-  end
-=end
   def is_creator_of?(user)
     self == user.creator
   end

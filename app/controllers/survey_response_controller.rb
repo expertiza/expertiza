@@ -42,7 +42,7 @@ class SurveyResponseController < ApplicationController
         @scores = params[:score]
         @comments = params[:comments]
         for question in @submit_questions
-          SurveyResponsesHelper.get_survey_response( params[:id], params[:survey_id], question.id, params[:email])
+          SurveyResponse.get_survey_response( params[:id], params[:survey_id], question.id, params[:email])
         end
       end
 
@@ -69,9 +69,9 @@ def submit
     @new.assignment_id = @assignment_id
     @new.survey_deployment_id=params[:survey_deployment_id]
     @new.email = params[:email]
-   # @new.score = @scores[question.id.to_s]
-   # @new.comments = @comments[question.id.to_s]
-   # @new.save
+    #@new.score = @scores[question.id.to_s]
+    #@new.comments = @comments[question.id.to_s]
+    #@new.save
   end
 
   if !params[:survey_deployment_id]
@@ -107,9 +107,9 @@ def view_responses
     this_response_survey[:max] = max
     if !params[:course_eval]
 
-      survey_list = SurveyResponsesHelper::get_survey_list(params[:id], survey.id)
+      survey_list = SurveyResponse.get_survey_list(params[:id], survey.id)
     else
-      survey_list = SurveyResponsesHelper::get_survey_list_with_deploy_id( params[:id], survey.id)
+      survey_list = SurveyResponse.get_survey_list_with_deploy_id( params[:id], survey.id)
     end
     if survey_list.length > 0
       @empty = false
@@ -126,9 +126,9 @@ def view_responses
       for i in min..max
         if !question.true_false? || i == min || i == max
           if !params[:course_eval]
-            list = SurveyResponsesHelper::get_survey_list_with_score(params[:id], survey.id, question.id, i)
+            list = SurveyResponse.get_survey_list_with_score(params[:id], survey.id, question.id, i)
           elsif params[:course_eval]
-            list = SurveyResponsesHelper::get_survey_list_with_deploy_id_and_score(params[:id], survey.id, question.id, i)
+            list = SurveyResponse.get_survey_list_with_deploy_id_and_score(params[:id], survey.id, question.id, i)
           end
           if question.true_false?
             if i == min
@@ -144,9 +144,9 @@ def view_responses
         end
       end
       if !params[:course_eval]
-        no_of_question = SurveyResponsesHelper::get_no_of_questions_with_assignment_id(params[:id], survey.id, question.id)
+        no_of_question = SurveyResponse.get_no_of_questions_with_assignment_id(params[:id], survey.id, question.id)
       else
-        no_of_question = SurveyResponsesHelper::get_no_of_questions_with_deployment_id(params[:id], survey.id, question.id)
+        no_of_question = SurveyResponse.get_no_of_questions_with_deployment_id(params[:id], survey.id, question.id)
       end
       this_response_question[:count] = no_of_question.length
 
@@ -165,9 +165,9 @@ end
 
 def comments
   unless params[:course_eval] # Check if survey is a course evaluation
-    @responses = SurveyResponsesHelper::get_responses_comments_with_assignment_id(params[:assignment_id], params[:survey_id], params[:question_id])
+    @responses = SurveyResponse.get_responses_comments_with_assignment_id(params[:assignment_id], params[:survey_id], params[:question_id])
   else
-    @responses = SurveyResponsesHelper::get_responses_comments_with_deployment_id(params[:assignment_id], params[:survey_id], params[:question_id])
+    @responses = SurveyResponse.get_responses_comments_with_deployment_id(params[:assignment_id], params[:survey_id], params[:question_id])
     @course_eval="1"
   end
 

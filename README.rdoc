@@ -40,7 +40,7 @@ This class lists the grades of all the participants for an assignments and also 
 
 9. Search for the key reasons which lead to huge waiting time for getting score.
 
-10. Refactor get_assessments_for method in response_map.rb and lead to more than 90\% off the current waiting time.
+10. Refactor get_assessments_for method in response_map.rb and lead to more than 90\% off the original viewing scores' running time.
 
 11. Eliminate the search for reviews and meta reviews during the grades_show method.
 
@@ -48,7 +48,7 @@ This class lists the grades of all the participants for an assignments and also 
 
 =====Extra Credits:
 
-1. Refactor get_assessments_for method in response_map.rb and lead to more than 90\% off the current waiting time.
+1. Refactor get_assessments_for method in response_map.rb and lead to more than 90\% off the original viewing scores' running time.
 
 2. Use Design Pattern Delegation in ConflictMailer.
 

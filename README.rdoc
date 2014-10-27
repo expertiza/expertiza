@@ -48,6 +48,8 @@ This class lists the grades of all the participants for an assignments and also 
 
 ====Current System (After Refactoring Grades_controller): 
 
+======Note: In order to compare test results between current system and original system. You'd better test it in the current system and original system.
+
 http://152.46.18.10:3000/
 
    Instructor: user6                     Password: test
@@ -55,9 +57,6 @@ http://152.46.18.10:3000/
    Student: user1600 and user1601        Password: test
 
 ====Original System (Before Refactoring Grades_controller):
-
-======Note: In order to compare test results between current system and original system. You'd better test it in the current system and original system.
-
 
 http://152.1.13.97:3000/
 

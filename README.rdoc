@@ -12,9 +12,9 @@ This class lists the grades of all the participants for an assignments and also 
 
 ====What needs to be done:
 
-1.Modify calculate_all_penalties method which is too complex and long.
+1. Modify calculate_all_penalties method which is too complex and long.
 
-2.Put the get_body_text method in a mailer rather than in the grades_controller.
+2. Put the get_body_text method in a mailer rather than in the grades_controller.
 
 3.Refactor conflict_nofication method to conflict_email and make it delegated to the mailer.
 

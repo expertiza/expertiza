@@ -16,31 +16,31 @@ This class lists the grades of all the participants for an assignments and also 
 
 2. Put the get_body_text method in a mailer rather than in the grades_controller.
 
-3.Refactor conflict_nofication method to conflict_email and make it delegated to the mailer.
+3. Refactor conflict_nofication method to conflict_email and make it delegated to the mailer.
 
-4.Refactor view_my_scores method to grades_show and delete the unnecessary variables.
+4. Refactor view_my_scores method to grades_show and delete the unnecessary variables.
 
-5.Try not to query for reviews and meta reviews in grades_show method.
+5. Try not to query for reviews and meta reviews in grades_show method.
 
 ====What we have done:
 
-*Modify calculate_all_penalties method.
+1. Modify calculate_all_penalties method.
 
-*Refactor the conflict_notification method to conflict_email method.
+2. Refactor the conflict_notification method to conflict_email method.
 
-Simplify sending email function and make it delegated to the mailer.
+3. Simplify sending email function and make it delegated to the mailer.
 
-Send a conflict email to the reviewer automatically when instructor click the button "email reviewer".
+4. Send a conflict email to the reviewer automatically when instructor click the button "email reviewer".
+ 
+5. Remove get_body_text and send_grading_email method from grades_controller.
 
-Remove get_body_text and send_grading_email method from grades_controller.
+6. Refactor conflict_nofication method to conflict_email and make it delegated to the mailer.
 
-Refactor conflict_nofication method to conflict_email and make it delegated to the mailer.
+7. Refactor view_my_scores method to grades_show method.
 
-Refactor view_my_scores method to grades_show method.
+8. Search for the key reasons which lead to huge waiting time for getting score.
 
-Search for the key reasons which lead to huge waiting time for getting score.
+9. Refactor get_assessments_for method in response_map.rb and lead to more than 90% off the current waiting time.
 
-Refactor get_assessments_for method in response_map.rb and lead to more than 90% off the current waiting time.
-
-Eliminat the search for reviews and meta reviews during the grades_show method.
-Delete unnecessary instance Variables.
+10. Eliminat the search for reviews and meta reviews during the grades_show method.
+11. Delete unnecessary instance Variables.

@@ -4,7 +4,7 @@ class StudentQuizzesController < ApplicationController
     participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(participant.user_id)
     @assignment = Assignment.find(participant.parent_id)
-    @quiz_mappings = QuizResponseMap.where(reviewer_id: participant.id)
+    @quiz_mappings = QuizResponseMap.get_mappings_for_reviewer(participant.id)
   end
 
   def finished_quiz

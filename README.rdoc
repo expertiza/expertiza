@@ -7,10 +7,10 @@ The Website link for DireWolf is 152.46.18.73:3000
 ===Project Description
 
 Classes involved: grades_controller.rb
-What it does:
+====What it does:
 This class lists the grades of all the participants for an assignments and also their reviews. Instructor can edit scores, calculate penalties and send emails for conflicts.
 
-What needs to be done:
+====What needs to be done:
 
 Modify calculate_all_penalties method which is too complex and long.
 
@@ -22,7 +22,7 @@ Refactor view_my_scores method to grades_show and delete the unnecessary variabl
 
 Try not to query for reviews and meta reviews in grades_show method.
 
-What we have done:
+====What we have done:
 
 *Modify calculate_all_penalties method.
 

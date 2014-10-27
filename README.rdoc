@@ -1,6 +1,6 @@
 == README
 
-This README would normally document whatever steps are necessary to get the application up and running.
+This README would normally document whatever steps are necessary to get the test results.
 
 ===Project Description
 
@@ -46,9 +46,9 @@ This class lists the grades of all the participants for an assignments and also 
 
 ===The Website link for our team's work: 
 
-====Current System (After Refactoring Grades_controller): 
-
 ======Note: In order to compare test results between current system and original system. You'd better test it in the current system and original system.
+
+====Current System (After Refactoring Grades_controller): 
 
 http://152.46.18.10:3000/
 

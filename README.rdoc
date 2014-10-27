@@ -64,9 +64,9 @@ http://152.1.13.97:3000/
 
 All our test result based on the following test cases on expertiza, please follow these step to get it.
 
-Instructor: 
+Instructor: (Searching "Program 2" using "Ctrl + F" will be convinient for you.)
 
-=====Login -> Assignments->Program 2 style ->view scores. (Searching "Program 2" using "Ctrl + F" will be convinient for you.)
+=====Login -> Assignments->Program 2 style ->view scores. 
 
 Student:
 

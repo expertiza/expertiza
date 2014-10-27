@@ -164,6 +164,7 @@ class User < ActiveRecord::Base
     self.id
   end
 
+  #Return current user ID if role is Instructor or the Instructor name if role is TA
   def instructor_id
     case role.name
     when 'Instructor' then id
@@ -172,6 +173,7 @@ class User < ActiveRecord::Base
     end
   end
 
+  # Misleading method name, it should be get_courses_to_assignment
   def set_courses_to_assignment
     @courses = Course.where(instructor_id: self.id, order: 'name')
   end
@@ -271,6 +273,7 @@ class User < ActiveRecord::Base
     return user
   end
 
+  # Check if the current user is a TA for the student passed in the arguement
   def is_teaching_assistant_for?(student)
     return false unless is_teaching_assistant?
     return false if student.role.name != 'Student'
@@ -284,6 +287,8 @@ class User < ActiveRecord::Base
     end
   end
 
+  # Check if the user is teaching assistant or not. The same function is defined in other models/controllers
+  # where true / false is returned based on the context
   def is_teaching_assistant?
     false
   end

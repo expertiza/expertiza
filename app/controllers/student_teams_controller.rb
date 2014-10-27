@@ -23,8 +23,6 @@ class StudentTeamsController < ApplicationController
   def view
     #View will check if send_invs and recieved_invs are set before showing
     #only the owner should be able to see those.
-    #> Note: this design duplicates permission management between the InvitationsController, and forces this weird
-    #> game-of-telephone communications of permissions between the controller and the view...
     return unless current_user_id? @student.user_id
 
     @send_invs = Invitation.where from_id: @student.user.id, assignment_id: @student.assignment.id
@@ -88,20 +86,10 @@ class StudentTeamsController < ApplicationController
 
   def remove_participant
     #remove the topic_id from participants
-    #>@student should belong to a team, and a team should have topic
-    #>then this call becomes @student.update_assigment_team(nil)
-    #>Correctly doing the relationship should handle the rest
-    #>TeamsUser appears to be a model that captures a relationship. Should be replaced with a
-    #>has_a relationship with assignment_team, and a has_and_belongs_to_many relationship in  assignment_participant
-    #>the new code here would be
-    #>assignment_team=AssignmentTeam.find(params[:team_id])#same as old_team below
-    #>@student = AssignmentParticipant.find(params[:student_id])
-    #>assignment_team.assignment_participants.delete(@student)
     @student.update_topic_id nil
 
     #remove the entry from teams_users
 
-    #>Relationship which would remove the following block
     team_user = TeamsUser.find_by team_id: params[:team_id], user_id: @student.user_id
 
     if team_user
@@ -110,21 +98,14 @@ class StudentTeamsController < ApplicationController
       undo_link "User \"#{team_user.name}\" has been removed from the team successfully. "
     end
 
-    #>This whole block should be in the models. The controller shouldn't be handling book-keeping like this
-
     #if your old team does not have any members, delete the entry for the team
-    #>could happen with a callback in assignment_team.assignment_participant.delete(@student)
     if TeamsUser.where(team_id: params[:team_id]).empty?
       old_team = AssignmentTeam.find params[:team_id]
-      if old_team#> how on earth could this be null?
+      if old_team
         old_team.destroy
         #if assignment has signup sheet then the topic selected by the team has to go back to the pool
         #or to the first team in the waitlist
 
-        #>Again, a correctly performed has_a relationship with a callback should cover this!
-        #>CROSSING THE BARRIER OF DEMETER
-        #>If (a big if) not controlled by a model, it should ATLEAST be moved with ALL OTHER signup management to
-        #>a child class of the ApplicationController
         sign_ups = SignedUpUser.where creator_id: params[:team_id]
         sign_ups.each {|sign_up|
           #get the topic_id
@@ -151,8 +132,8 @@ class StudentTeamsController < ApplicationController
               #and teams_users for the team has been deleted in one of the earlier lines of code
 
               if waitlisted_team_user
-                user_id = waitlisted_team_user.user_id#<a relationship could be used have waitlisted_team_user.participant
-                if user_id#<again, how could this be null?
+                user_id = waitlisted_team_user.user_id
+                if user_id
                   waitlisted_participant = Participant.find_by_user_id user_id
                   waitlisted_participant.update_topic_id nil
 
@@ -166,9 +147,6 @@ class StudentTeamsController < ApplicationController
     end
 
     #remove all the sent invitations
-    #>shouldn't invites belong to the team not AssignmentParticipant?
-    #>Having a "Dependent Destroy" would take care of this block
-    #>either way, it should be a has_many relationship
     old_invites = Invitation.where from_id: @student.user_id, assignment_id: @student.parent_id
 
     old_invites.each{|old_invite| old_invite.destroy}

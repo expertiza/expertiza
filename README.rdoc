@@ -63,9 +63,10 @@ http://152.1.13.97:3000/
    Student: user1600 and user1601        Password: test
 
 All our test result based on the following test cases on expertiza, please follow these step to get it.
+
 Instructor: 
 
-Login -> Assignments->Program 2 style ->view scores. ====(Searching "Program 2" by "Ctrl + F" will be convinient for you.)
+Login -> Assignments->Program 2 style ->view scores. (Searching "Program 2" using "Ctrl + F" will be convinient for you.)
 
 Student:
 

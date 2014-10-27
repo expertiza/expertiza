@@ -49,18 +49,18 @@ This class lists the grades of all the participants for an assignments and also 
 ====Current System (After Refactoring Grades_controller): 
 
 http://152.46.18.10:3000/
-Instructor: user6
-Password: test
-Student: user1600 and user1601
-Password: test
+
+   Instructor: user6                     Password: test
+   
+   Student: user1600 and user1601        Password: test
 
 ====Original System (Before Refactoring Grades_controller):
 
 http://152.1.13.97:3000/
-   Instructor: user6
-   Password: test
-   Student: user1600 and user1601
-   Password: test
+
+   Instructor: user6                     Password: test
+   
+   Student: user1600 and user1601        Password: test
 
 All our test result based on the following test cases on expertiza, please follow these step to get it.
 Instructor: 

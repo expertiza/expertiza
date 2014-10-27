@@ -56,6 +56,9 @@ http://152.46.18.10:3000/
 
 ====Original System (Before Refactoring Grades_controller):
 
+======Note: In order to compare test results between current system and original system. You'd better test it in the current system and original system.
+
+
 http://152.1.13.97:3000/
 
    Instructor: user6                     Password: test
@@ -72,4 +75,3 @@ Student:
 
 =====Steps: Login -> Assignments->Program 2 style ->Your scores.
 
-====Note: In order to compare test results between current system and original system. You'd better test it in the current system and original system.

@@ -6,7 +6,7 @@
     <th align=left> Due Date </th></tr>
   <% i=0 %>
   <% @surveys.each do |s| %>
-    <tr><td align = left><%= link_to Course.find(s[3]).title ,:controller=>'survey_response',:action=>'create' ,:id=> s[1],:questionnaire_id=>s[0].id, :course_eval=>'1', :course_id=> s[3] %>&nbsp &nbsp</td>
+    <tr><td align = left><%= link_to Course.find(s[3]).name ,:controller=>'survey_response',:action=>'submit' ,:id=> s[1],:questionnaire_id=>s[0].id, :course_eval=>'1', :course_id=> s[3] , :survey_id=> s[0].id%>&nbsp &nbsp</td>
       <td align = left><%= s[2].strftime('%A %B %d %Y, %I:%M%p') %></td></tr>
   <% end %>
 <% else %>

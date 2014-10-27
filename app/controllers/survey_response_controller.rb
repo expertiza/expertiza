@@ -43,20 +43,7 @@ class SurveyResponseController < ApplicationController
         @scores = params[:score]
         @comments = params[:comments]
         for question in @submit_questions
-          list = []
-          list = SurveyResponse.where( ["assignment_id = ? and survey_id = ? and question_id = ? and email = ?", params[:id], params[:survey_id], question.id, params[:email]]) if params[:email]
-          if list.length > 0
-            @new = list[0]
-          else
-            @new = SurveyResponse.new
-          end
-          @new.survey_id = params[:survey_id]
-          @new.question_id = question.id
-          @new.assignment_id = params[:id]
-          @new.email = params[:email]
-          @new.score = @scores[question.id.to_s]
-          @new.comments = @comments[question.id.to_s]
-          @new.save
+          SurveyResponsesHelper.get_survey_response( params[:id], params[:survey_id], question.id, params[:email])
         end
       end
 
@@ -88,9 +75,9 @@ def submit
     @new.assignment_id = @assignment_id
     @new.survey_deployment_id=params[:survey_deployment_id]
     @new.email = params[:email]
-    @new.score = @scores[question.id.to_s]
-    @new.comments = @comments[question.id.to_s]
-    @new.save
+   # @new.score = @scores[question.id.to_s]
+   # @new.comments = @comments[question.id.to_s]
+   # @new.save
   end
 
   if !params[:survey_deployment_id]
@@ -112,42 +99,45 @@ def view_responses
     @assignment = Assignment.find(params[:id])
     @surveys = SurveyHelper::get_all_available_surveys(params[:id], session[:user].role_id)
   end
-  @responses = Array.new
+  @responses = []
   @empty = true
   for survey in @surveys
     min = survey.min_question_score
     max = survey.max_question_score
-    this_response_survey = Hash.new
+    this_response_survey = {}
     this_response_survey[:name] = survey.name
     this_response_survey[:id] = survey.id
-    this_response_survey[:questions] = Array.new
+    this_response_survey[:questions] = []
     this_response_survey[:empty] = true
-    this_response_survey[:avg_labels] = Array.new
-    this_response_survey[:avg_values] = Array.new
+    this_response_survey[:avg_labels] = []
+    this_response_survey[:avg_values] = []
     this_response_survey[:max] = max
     if !params[:course_eval]
-      surveylist = SurveyResponse.where( ["assignment_id = ? and survey_id = ?", params[:id], survey.id])
+
+      survey_list = SurveyResponsesHelper::get_survey_list(params[:id], survey.id)
     else
-      surveylist = SurveyResponse.where( ["survey_deployment_id = ? and survey_id = ?", params[:id], survey.id])
+      survey_list = SurveyResponsesHelper::get_survey_list_with_deploy_id( params[:id], survey.id)
     end
-    if surveylist.length > 0
+    if survey_list.length > 0
       @empty = false
       this_response_survey[:empty] = false
     end
     for question in survey.questions
-      this_response_question = Hash.new
+      this_response_question = {}
       this_response_question[:name] = question.txt
       this_response_question[:id] = question.id
-      this_response_question[:labels] = Array.new
-      this_response_question[:values] = Array.new
+      this_response_question[:labels] = []
+      this_response_question[:values] = []
       this_response_question[:count] = 0
       this_response_question[:average] = 0
       for i in min..max
         if !question.true_false? || i == min || i == max
           if !params[:course_eval]
-            list = SurveyResponse.where( ["assignment_id = ? and survey_id = ? and question_id = ? and score = ?", params[:id], survey.id, question.id, i])
+            list = SurveyResponsesHelper::get_survey_list_with_score(params[:id], survey.id, question.id, i)
+         #   list = SurveyResponse.where( ["assignment_id = ? and survey_id = ? and question_id = ? and score = ?", params[:id], survey.id, question.id, i])
           elsif params[:course_eval]
-            list = SurveyResponse.where( ["survey_deployment_id = ? and survey_id = ? and question_id = ? and score = ?", params[:id], survey.id, question.id, i]);
+            list = SurveyResponsesHelper::get_survey_list_with_deploy_id_and_score(params[:id], survey.id, question.id, i)
+           # list = SurveyResponse.where( ["survey_deployment_id = ? and survey_id = ? and question_id = ? and score = ?", params[:id], survey.id, question.id, i]);
           end
           if question.true_false?
             if i == min
@@ -163,9 +153,11 @@ def view_responses
         end
       end
       if !params[:course_eval]
-        no_of_question = SurveyResponse.where( ["assignment_id = ? and survey_id = ? and question_id = ?", params[:id], survey.id, question.id])
+        no_of_question = SurveyResponsesHelper::get_no_of_questions_with_assignment_id(params[:id], survey.id, question.id)
+       # no_of_question = SurveyResponse.where( ["assignment_id = ? and survey_id = ? and question_id = ?", params[:id], survey.id, question.id])
       else
-        no_of_question = SurveyResponse.where( ["survey_deployment_id = ? and survey_id = ? and question_id = ?", params[:id], survey.id, question.id])
+        no_of_question = SurveyResponsesHelper::get_no_of_questions_with_deployment_id(params[:id], survey.id, question.id)
+       # no_of_question = SurveyResponse.where( ["survey_deployment_id = ? and survey_id = ? and question_id = ?", params[:id], survey.id, question.id])
       end
       this_response_question[:count] = no_of_question.length
 
@@ -184,9 +176,11 @@ end
 
 def comments
   unless params[:course_eval] # Check if survey is a course evaluation
-    @responses = SurveyResponse.where( ["assignment_id = ? and survey_id = ? and question_id = ?", params[:assignment_id], params[:survey_id], params[:question_id]]).order("score")
+    @responses = SurveyResponsesHelper::get_responses_comments_with_assignment_id(params[:assignment_id], params[:survey_id], params[:question_id])
+  #  @responses = SurveyResponse.where( ["assignment_id = ? and survey_id = ? and question_id = ?", params[:assignment_id], params[:survey_id], params[:question_id]]).order("score")
   else
-    @responses = SurveyResponse.where( ["survey_deployment_id = ? and survey_id = ? and question_id = ?", params[:assignment_id], params[:survey_id], params[:question_id]]).order("score")
+    @responses = SurveyResponsesHelper::get_responses_comments_with_deployment_id(params[:assignment_id], params[:survey_id], params[:question_id])
+   # @responses = SurveyResponse.where( ["survey_deployment_id = ? and survey_id = ? and question_id = ?", params[:assignment_id], params[:survey_id], params[:question_id]]).order("score")
     @course_eval="1"
   end
 

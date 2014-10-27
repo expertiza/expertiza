@@ -4,7 +4,7 @@ This README would normally document whatever steps are necessary to get the appl
 
 The Website link for DireWolf is 152.46.18.73:3000
 
-Project Description
+===Project Description
 
 Classes involved: grades_controller.rb
 What it does:

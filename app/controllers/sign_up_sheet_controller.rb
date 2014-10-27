@@ -119,7 +119,8 @@ class SignUpSheetController < ApplicationController
     #prepares the page. shows the form which can be used to enter new values for the different properties of an assignment
     def edit
       @topic = SignUpTopic.find(params[:id])
-      @assignment_id = params[:assignment_id]
+      #@assignment_id = params[:assignment_id]
+      @assignment_id = @topic.assignment_id
     end
 
     #updates the database tables to reflect the new values for the assignment. Used in conjuntion with edit

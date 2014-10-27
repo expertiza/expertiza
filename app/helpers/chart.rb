@@ -1,5 +1,6 @@
-#TODO: rename to ChartDataPacket
-#TODO: find a fitting place for this file maybe in module
+#TODO: rename to ChartDataPacket [OSS project, Fall 2014_Team2 comment: We retained the name as the file creates a chart object which can be rendered]
+#TODO: find a fitting place for this file maybe in module [OSS project, Fall 2014_Team2 comment: Helper folder seems to be the right place 
+                                                          # as this is a helper file which converts given data into a chart object]
 class Chart
   @@chart_index = 0
   @@header = false

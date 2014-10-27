@@ -21,7 +21,7 @@ class SignUpSheetController < ApplicationController
     else
       ['Instructor',
        'Teaching Assistant',
-       'Administrator'].include? current_role_name
+       'Administrator', 'Super-Administrator'].include? current_role_name
     end
   end
 
@@ -96,9 +96,11 @@ class SignUpSheetController < ApplicationController
     end
 
     #This method is used to delete signup topics
-    def delete
+    #Renaming delete method to destroy for rails 4 compatible
+    #def delete
+    def destroy
       @topic = SignUpTopic.find(params[:id])
-
+      params[:assignment_id] = @topic.assignment_id
       if @topic
         @topic.destroy
         undo_link("Topic: \"#{@topic.topic_name}\" has been deleted successfully. ")

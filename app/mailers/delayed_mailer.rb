@@ -162,8 +162,8 @@ class DelayedMailer
       body += "Author feedback is optional. However, if you want to give author feedback then the deadline is #{self.due_at}."
       end
 
-      emails<<"vikas.023@gmail.com"
-      emails<<"vsharma4@ncsu.edu"
+      #emails<<"vikas.023@gmail.com"
+      #emails<<"vsharma4@ncsu.edu"
       @@count = @@count+1
       Rails.logger.info "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
       Rails.logger.info deadlineType
@@ -176,7 +176,7 @@ class DelayedMailer
           emails<< assignment.instructor.email
         end
 
-        emails<< "expertiza-support@lists.ncsu.edu"
+        #emails<< "expertiza-support@lists.ncsu.edu"
       end
 
       emails.each do |mail|

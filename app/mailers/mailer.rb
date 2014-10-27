@@ -22,7 +22,7 @@ class Mailer < ActionMailer::Base
     @body = defn[:body]
     @partial_name = defn[:body][:partial_name]
     mail(subject: defn[:subject],
-         content_type: "text/html",
+         #content_type: "text/html",
          to: defn[:to])
 
   end

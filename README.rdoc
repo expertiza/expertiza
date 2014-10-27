@@ -2,9 +2,6 @@
 
 This README would normally document whatever steps are necessary to get the application up and running.
 
-The Website link for our team's work is: 
-
-
 ===Project Description
 
 Classes involved: grades_controller.rb
@@ -47,15 +44,18 @@ This class lists the grades of all the participants for an assignments and also 
 
 11. Delete unnecessary instance Variables.
 
-===The Website link for our team's work is: 
-Current System(After Refactoring Grades_controller): 
+===The Website link for our team's work: 
+
+====Current System (After Refactoring Grades_controller): 
+
 http://152.46.18.10:3000/
 Instructor: user6
 Password: test
 Student: user1600 and user1601
 Password: test
 
-Original System(Before Refactoring Grades_controller):
+====Original System (Before Refactoring Grades_controller):
+
 http://152.1.13.97:3000/
 Instructor: user6
 Password: test
@@ -64,7 +64,7 @@ Password: test
 
 All our test result based on the following test cases on expertiza, please follow these step to get it.
 Instructor: 
-Login -> Assignments->Program 2 style ->view scores. 
+Login -> Assignments->Program 2 style ->view scores. (Searching "Program 2" by "Ctrl + F" will be convinient for you.)
 Student:
 Login -> Assignments->Program 2 style ->Your scores.
 

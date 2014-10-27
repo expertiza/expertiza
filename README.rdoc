@@ -67,11 +67,11 @@ http://152.1.13.97:3000/
 
 All our test result based on the following test cases on expertiza, please follow these step to get it.
 
-Instructor: (Searching "Program 2" using "Ctrl + F" will be convinient for you.)
+====Instructor: (Searching "Program 2" using "Ctrl + F" will be convinient for you.)
 
-=====Steps: Login -> Assignments->Program 2 style ->view scores. 
+======Steps: Login -> Assignments->Program 2 style ->view scores. 
 
-Student:
+====Student:
 
-=====Steps: Login -> Assignments->Program 2 style ->Your scores.
+======Steps: Login -> Assignments->Program 2 style ->Your scores.
 

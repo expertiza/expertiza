@@ -12,15 +12,15 @@ This class lists the grades of all the participants for an assignments and also 
 
 ====What needs to be done:
 
-Modify calculate_all_penalties method which is too complex and long.
+1.Modify calculate_all_penalties method which is too complex and long.
 
-Put the get_body_text method in a mailer rather than in the grades_controller.
+2.Put the get_body_text method in a mailer rather than in the grades_controller.
 
-Refactor conflict_nofication method to conflict_email and make it delegated to the mailer.
+3.Refactor conflict_nofication method to conflict_email and make it delegated to the mailer.
 
-Refactor view_my_scores method to grades_show and delete the unnecessary variables.
+4.Refactor view_my_scores method to grades_show and delete the unnecessary variables.
 
-Try not to query for reviews and meta reviews in grades_show method.
+5.Try not to query for reviews and meta reviews in grades_show method.
 
 ====What we have done:
 

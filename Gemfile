@@ -57,7 +57,6 @@ gem 'zip-zip'
 gem 'fsm'
 
 group :development do
-  gem 'daemons'
   gem 'pry'
   gem 'pry-remote'
   gem 'pry-nav'

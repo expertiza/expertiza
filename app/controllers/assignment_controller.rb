@@ -348,12 +348,12 @@ class AssignmentController < ApplicationController
       duedates = DueDate::where(assignment_id: @assignment.id)
       for i in (0 .. duedates.length-1)
         deadline_type = DeadlineType.find(duedates[i].deadline_type_id).name
-        due_at = duedates[i].due_at(:db).to_s
+        due_at = duedates[i].due_at.to_s(:db)
         Time.parse(due_at)
         due_at= Time.parse(due_at)
         mi=find_min_from_now(due_at)
         diff = mi-(duedates[i].threshold)*60
-        dj=Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type, duedates[i].due_at(:db).to_s) , 1, diff.minutes.from_now)
+        dj=Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type, duedates[i].due_at.to_s(:db)) , 1, diff.minutes.from_now)
         duedates[i].update_attribute(:delayed_job_id, dj.id)
       end
     end
@@ -369,7 +369,7 @@ class AssignmentController < ApplicationController
     # This functions finds the epoch time in seconds of the due_at parameter and finds the difference of it
     # from the current time and returns this difference in minutes
     def find_min_from_now(due_at)
-      curr_time=DateTime.now(:db).to_s
+      curr_time=DateTime.now.to_s(:db)
       curr_time=Time.parse(curr_time)
       time_in_min=((due_at - curr_time).to_i/60)
 

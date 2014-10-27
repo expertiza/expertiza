@@ -44,7 +44,7 @@ class CourseControllerTest < ActionController::TestCase
     assert !Course.find_by_name('Built Course').nil?    
 #    What we really want to test is to see if we got where get_home_controller says we should've gotten, but we are cheating for now
 #    assert_redirected_to :controller => AuthHelper::get_home_controller(session[:user]), :action => AuthHelper::get_home_action(session[:user])    
-    assert_redirected_to :controller => 'tree_display', :action => 'list'
+    assert_redirected_to tree_display_index_path
     assert flash.empty?
   end
  
@@ -68,7 +68,7 @@ class CourseControllerTest < ActionController::TestCase
     assert_equal 'Blah Blah', Course.find_by_name('Built Course').info
     # What we really want to test is to see if we got where get_home_controller says we should've gotten, but we are cheating for now
     #assert_redirected_to :controller => AuthHelper::get_home_controller(session[:user]), :action => AuthHelper::get_home_action(session[:user])      
-    assert_redirected_to :controller => 'tree_display', :action => 'list'
+    assert_redirected_to tree_display_index_path
   end
 
   # Verify successful copy (new object id) of course
@@ -95,7 +95,7 @@ class CourseControllerTest < ActionController::TestCase
     assert Course.find_by_name('Built Course').nil?
 #    What we really want to test is to see if we got where get_home_controller says we should've gotten, but we are cheating for now
 #    assert_redirected_to :controller => AuthHelper::get_home_controller(session[:user]), :action => AuthHelper::get_home_action(session[:user])      
-    assert_redirected_to :controller => 'tree_display', :action => 'list'
+    assert_redirected_to tree_display_index_path
   end
  
   # Verify successful change from public to private
@@ -107,6 +107,6 @@ class CourseControllerTest < ActionController::TestCase
     assert !Course.find_by_name(name).private
 #    What we really want to test is to see if we got where get_home_controller says we should've gotten, but we are cheating for now
 #    assert_redirected_to :controller => AuthHelper::get_home_controller(session[:user]), :action => AuthHelper::get_home_action(session[:user])      
-    assert_redirected_to :controller => 'tree_display', :action => 'list'
+    assert_redirected_to tree_display_index_path
   end
 end

@@ -80,28 +80,30 @@ module LeaderboardHelper
 
   #
   # This method is not consumed anywhere and is a dead code. We should probably remove it.
+  # Commenting it. Please remove it when required.
   #
   # This method gets the display data needed to show the Top 3 leaderboard
-  def self.getTop3Leaderboards(userid, assignmentid)
-    courseList = LeaderboardHelper.studentInWhichCourses(userid)
-    csHash = Leaderboard.getParticipantEntriesInAssignment(assignmentid)
-    csHash = Leaderboard.sortHash(csHash)
-
-    # Setup top 3 leaderboards for easier consumption by view
-    top3LeaderBoards = Array.new
-    csHash.each_pair{|qtype, courseHash|
-      courseHash.each_pair{|course, userGradeArray|
-        assignmentName = LeaderboardHelper.getAssignmentName(assignmentid)
-        achieveName = LeaderboardHelper.getAchieveName(qtype)
-        leaderboardHash = Hash.new
-        leaderboardHash = {:achievement => achieveName,
-                           :courseName => assignmentName,
-                           :sortedGrades => userGradeArray}
-        top3LeaderBoards << leaderboardHash
-      }
-    }
-    top3LeaderBoards
-  end
+  #
+  # def self.getTop3Leaderboards(userid, assignmentid)
+  #   courseList = LeaderboardHelper.studentInWhichCourses(userid)
+  #   csHash = Leaderboard.getParticipantEntriesInAssignment(assignmentid)
+  #   csHash = Leaderboard.sortHash(csHash)
+  #
+  #   # Setup top 3 leaderboards for easier consumption by view
+  #   top3LeaderBoards = Array.new
+  #   csHash.each_pair{|qtype, courseHash|
+  #     courseHash.each_pair{|course, userGradeArray|
+  #       assignmentName = LeaderboardHelper.getAssignmentName(assignmentid)
+  #       achieveName = LeaderboardHelper.getAchieveName(qtype)
+  #       leaderboardHash = Hash.new
+  #       leaderboardHash = {:achievement => achieveName,
+  #                          :courseName => assignmentName,
+  #                          :sortedGrades => userGradeArray}
+  #       top3LeaderBoards << leaderboardHash
+  #     }
+  #   }
+  #   top3LeaderBoards
+  # end
 
   # This method is only provided for diagnostic purposes. It can be executed from
   # script/console to see what's in the Computed Scores table, in case there is

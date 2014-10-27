@@ -17,7 +17,7 @@
            column_definitions << {:name => 'Type', :type => 'fetch', :column => 'type_id', :model => 'QuestionnaireType', :field => 'name'}
            column_definitions << {:name => 'Edit', :action => 'edit_questionnaire', :controller => 'questionnaire'}
            column_definitions << {:name => 'Copy', :action => 'copy_questionnaire', :controller => 'questionnaire'}
-           column_definitions << {:name => 'Advice', :action => 'edit_advice', :controller => 'questionnaire' }
+           # column_definitions << {:name => 'Advice', :action => 'edit_advice', :controller => 'questionnaire' }
            column_definitions << {:name => 'Delete', :action => 'delete_questionnaire', :controller => 'questionnaire' }
 
            delete_options = {:enabled => false}

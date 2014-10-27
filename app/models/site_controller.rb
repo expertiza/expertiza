@@ -12,6 +12,9 @@ class SiteController < ActiveRecord::Base
     @actions ||= controller_actions.order(:name)
   end
 
+  def self.find_or_create_by_name (params)
+    SiteController.find_or_create_by(name: params)
+  end
 
   def self.classes
     classes = Hash.new

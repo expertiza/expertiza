@@ -47,109 +47,110 @@ class StudentQuizzesController < ApplicationController
     return quizzes
   end
 
-  def record_response
-  @map = ResponseMap.find(params[:map_id])
-  @response = Response.new()
-  @response.map_id = params[:map_id]
-  @response.created_at = DateTime.current
-  @response.updated_at = DateTime.current
-  @response.save
-
-  @questionnaire = Questionnaire.find(@map.reviewed_object_id)
-  scores = Array.new
-  new_scores = Array.new
-  valid = 0
-  questions = Question.where(questionnaire_id: @questionnaire.id)
-  questions.each do |question|
-    score = 0
-    if (QuestionType.find_by_question_id question.id).q_type == 'MCC'
+  def calculate_score map, response
+    questionnaire = Questionnaire.find(map.reviewed_object_id)
+    scores = Array.new
+    valid = true
+    questions = Question.where(questionnaire_id: questionnaire.id)
+    questions.each do |question|
       score = 0
-      if params["#{question.id}"] == nil
-        valid = 1
-      else
-        correct_answer = QuizQuestionChoice.where(question_id: question.id, iscorrect: 1)
-        params["#{question.id}"].each do |choice|
-
-          correct_answer.each do |correct|
-            if choice == correct.txt
-              score += 1
-            end
-
-          end
-          new_score = Score.new :comments => choice, :question_id => question.id, :response_id => @response.id
-
-          unless new_score.valid?
-            valid = 1
-          end
-          new_scores.push(new_score)
-
-        end
-        unless score == correct_answer.count
-          score = 0
+      correct_answers = QuizQuestionChoice.where(question_id: question.id, iscorrect: true)
+      ques_type = (QuestionType.where( question_id: question.id)).q_type
+      if ques_type.eql? 'MCC'
+        if params["#{question.id}"].nil?
+          valid = false
         else
+          params["#{question.id}"].each do |choice|
+
+            correct_answers.each do |correct|
+              if choice.eql? correct.txt
+                score += 1
+              end
+
+            end
+            new_score = Score.new comments: choice, question_id: question.id, response_id: response.id
+
+            unless new_score.valid?
+              valid = false
+            end
+            scores.push(new_score)
+
+          end
+          if score.eql? correct_answers.count && score == params["#{question.id}"].count
+            score = 1
+          else
+            score = 0
+          end
+          scores.each do |score_update|
+            score_update.score = score
+          end
+        end
+      else
+        correct_answer = correct_answers.first
+        if ques_type.eql? 'Essay'
+          score = -1
+        elsif  correct_answer && params["#{question.id}"]== correct_answer.txt
           score = 1
         end
-        new_scores.each do |score_update|
-          score_update.score = score
-          scores.push(score_update)
+        new_score = Score.new :comments => params["#{question.id}"], :question_id => question.id, :response_id => response.id, :score => score
+        if new_score.comments.empty? || new_score.comments.nil?
+          valid = false
         end
+        scores.push(new_score)
       end
+    end
+    if valid
+      scores.each do |score|
+        score.save
+      end
+      redirect_to :controller => 'student_quizzes', :action => 'finished_quiz', :map_id => map.id
     else
-      score = 0
-      correct_answer = QuizQuestionChoice.where(question_id: question.id, iscorrect:  1).first
-      if (QuestionType.find_by_question_id question.id).q_type == 'Essay'
-        score = -1
-      elsif  correct_answer and params["#{question.id}"] == correct_answer.txt
-        score = 1
-      end
-      new_score = Score.new :comments => params["#{question.id}"], :question_id => question.id, :response_id => @response.id, :score => score
-      unless new_score.comments != "" && new_score.comments
-        valid = 1
-      end
-      scores.push(new_score)
+      flash[:error] = "Please answer every question."
+      redirect_to :action => :take_quiz, :assignment_id => params[:assignment_id], :questionnaire_id => questionnaire.id
     end
   end
-  if valid == 0
+
+  def record_response
+    map = ResponseMap.find(params[:map_id])
+    response = Response.new
+    response.map_id = params[:map_id]
+    response.created_at = DateTime.current
+    response.updated_at = DateTime.current
+    response.save
+
+    calculate_score map,response
+
+  end
+
+  def submit_essay_grades
+    params.inspect
+    response_id = params[:response_id]
+    question_id = params[:question_id]
+    score = params[question_id][:score]
+    if score !=  ' '
+      updated_score = Score.where(question_id: question_id, response_id:  response_id).first
+      updated_score.update_attributes(:score => score)
+    else
+      flash[:error] =  "Question was not graded. You must choose a score before submitting for grading."
+    end
+    redirect_to :action => :grade_essays
+  end
+
+  def grade_essays
+    scores = Score.where(score: -1)
+    @questions = Array.new
+    @answers = Hash.new()
+    @questionnaires = Array.new
     scores.each do |score|
-      score.save
+      question = Question.find(score.question_id)
+      @questions << question
+      @questionnaires << QuizQuestionnaire.find(question.questionnaire_id)
+      @answers = @answers.merge({Question.find(score.question_id) => score})
     end
-    redirect_to :controller => 'student_quizzes', :action => 'finished_quiz', :map_id => @map.id
-  else
-    flash[:error] = "Please answer every question."
-    redirect_to :action => :take_quiz, :assignment_id => params[:assignment_id], :questionnaire_id => @questionnaire.id
+    @questionnaires = @questionnaires.uniq
   end
 
-end
-
-def submit_essay_grades
-  params.inspect
-  response_id = params[:response_id]
-  question_id = params[:question_id]
-  score = params[question_id][:score]
-  if score !=  ' '
-    updated_score = Score.where(question_id: question_id, response_id:  response_id).first
-    updated_score.update_attributes(:score => score)
-  else
-    flash[:error] =  "Question was not graded. You must choose a score before submitting for grading."
+  def graded?(response, question)
+    return (Score.where(question_id: question.id, response_id:  response.id).first)
   end
-  redirect_to :action => :grade_essays
-end
-
-def grade_essays
-  scores = Score.where(score: -1)
-  @questions = Array.new
-  @answers = Hash.new()
-  @questionnaires = Array.new
-  scores.each do |score|
-    question = Question.find(score.question_id)
-    @questions << question
-    @questionnaires << QuizQuestionnaire.find(question.questionnaire_id)
-    @answers = @answers.merge({Question.find(score.question_id) => score})
-  end
-  @questionnaires = @questionnaires.uniq
-end
-
-def graded?(response, question)
-  return (Score.where(question_id: question.id, response_id:  response.id).first)
-end
 end

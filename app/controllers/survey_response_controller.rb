@@ -24,7 +24,6 @@ class SurveyResponseController < ApplicationController
       @survey = Questionnaire.find(params[:questionnaire_id])
       @questions = @survey.questions
       @course_eval=params[:course_eval]
-      #@assigned_surveys = SurveyHelper::get_course_surveys(params[:course_id], 1)
       return
     end
 
@@ -46,11 +45,6 @@ class SurveyResponseController < ApplicationController
           SurveyResponsesHelper.get_survey_response( params[:id], params[:survey_id], question.id, params[:email])
         end
       end
-
-      #      if params[:count].to_i == @assigned_surveys.length
-      #        redirect_to(:action =>'submit', :survey_id=>params[:survey_id], :score=>@scores, :assignment_id=>params[:id])
-      #        return
-      #      end
 
       @survey = @assigned_surveys[params[:count].to_i]
       @questions = @survey.questions
@@ -90,7 +84,6 @@ def view_responses
   if params[:course_eval] # Check if this is a course evaluation
     survey_id=SurveyDeployment.find(params[:id]).course_evaluation_id
     @surveys = Questionnaire.where(["id=?", survey_id])
-    #Temprorary Assignment object
     @assignment=Assignment.new
     @assignment.name="Course Evaluation"
     @assignment.id=params[:id]
@@ -134,10 +127,8 @@ def view_responses
         if !question.true_false? || i == min || i == max
           if !params[:course_eval]
             list = SurveyResponsesHelper::get_survey_list_with_score(params[:id], survey.id, question.id, i)
-         #   list = SurveyResponse.where( ["assignment_id = ? and survey_id = ? and question_id = ? and score = ?", params[:id], survey.id, question.id, i])
           elsif params[:course_eval]
             list = SurveyResponsesHelper::get_survey_list_with_deploy_id_and_score(params[:id], survey.id, question.id, i)
-           # list = SurveyResponse.where( ["survey_deployment_id = ? and survey_id = ? and question_id = ? and score = ?", params[:id], survey.id, question.id, i]);
           end
           if question.true_false?
             if i == min
@@ -154,10 +145,8 @@ def view_responses
       end
       if !params[:course_eval]
         no_of_question = SurveyResponsesHelper::get_no_of_questions_with_assignment_id(params[:id], survey.id, question.id)
-       # no_of_question = SurveyResponse.where( ["assignment_id = ? and survey_id = ? and question_id = ?", params[:id], survey.id, question.id])
       else
         no_of_question = SurveyResponsesHelper::get_no_of_questions_with_deployment_id(params[:id], survey.id, question.id)
-       # no_of_question = SurveyResponse.where( ["survey_deployment_id = ? and survey_id = ? and question_id = ?", params[:id], survey.id, question.id])
       end
       this_response_question[:count] = no_of_question.length
 
@@ -177,10 +166,8 @@ end
 def comments
   unless params[:course_eval] # Check if survey is a course evaluation
     @responses = SurveyResponsesHelper::get_responses_comments_with_assignment_id(params[:assignment_id], params[:survey_id], params[:question_id])
-  #  @responses = SurveyResponse.where( ["assignment_id = ? and survey_id = ? and question_id = ?", params[:assignment_id], params[:survey_id], params[:question_id]]).order("score")
   else
     @responses = SurveyResponsesHelper::get_responses_comments_with_deployment_id(params[:assignment_id], params[:survey_id], params[:question_id])
-   # @responses = SurveyResponse.where( ["survey_deployment_id = ? and survey_id = ? and question_id = ?", params[:assignment_id], params[:survey_id], params[:question_id]]).order("score")
     @course_eval="1"
   end
 

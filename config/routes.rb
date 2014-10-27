@@ -415,7 +415,6 @@ Expertiza::Application.routes.draw do
     collection do
       get :view_responses
 	post :begin_survey
-	post :submit
 	get :comments
     end
   end

@@ -24,9 +24,9 @@ Try not to query for reviews and meta reviews in grades_show method.
 
 What we have done:
 
-Modify calculate_all_penalties method.
+*Modify calculate_all_penalties method.
 
-Refactor the conflict_notification method to conflict_email method.
+*Refactor the conflict_notification method to conflict_email method.
 
 Simplify sending email function and make it delegated to the mailer.
 

@@ -56,7 +56,7 @@ This class lists the grades of all the participants for an assignments and also 
 
 ===The Website link for our team's work: 
 
-======Note: In order to compare test results between current system and original system. You'd better test it in the current system and original system.
+======Note: In order to compare test results between current system and original system. You'd better test both system.
 
 ====Current System (After Refactoring Grades_controller): 
 

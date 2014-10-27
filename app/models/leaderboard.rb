@@ -130,7 +130,7 @@ class Leaderboard < ActiveRecord::Base
   # This method creates a mapping of participant and team with corresponding assignment.
   # "participant" => {participantId => {"self" => <ParticipantRecord>, "assignment" => <AssignmentRecord>}}
   # "team" => {teamId => <AssignmentRecord>}
-  def self.getAssignmentMapping(assignmentList, participantList, teamList)
+   def self.getAssignmentMapping(assignmentList, participantList, teamList)
     resultHash = {"participant" => {}, "team" => {}}
     assignmentHash = Hash.new
     # Hash all the assignments for later fetching them by assignment.id
@@ -153,184 +153,192 @@ class Leaderboard < ActiveRecord::Base
 
   # This method gets all tuples in the Participants table associated
   # structure hierarchy (qtype => course => user => score).
-  def self.getParticipantEntriesInAssignmentList(assignmentList)
-
-    #Creating an assignment id to course id hash
-    assCourseHash = Hash.new
-    assTeamHash = Hash.new
-    assQuestionnaires = Hash.new
-
-    for assgt in assignmentList
-
-      if assgt.course_id != nil
-        assCourseHash[assgt.id] = assgt.course_id
-      else
-        assCourseHash[assgt.id] = 0
-      end
-      @revqids = []
-      differentQuestionnaires = Hash.new
-      @revqids = AssignmentQuestionnaire.where(["assignment_id = ?",assgt.id])
-      @revqids.each do |rqid|
-        rtype = Questionnaire.find(rqid.questionnaire_id).type
-        if( rtype == 'ReviewQuestionnaire')
-
-
-          differentQuestionnaires["Review"] = rqid.questionnaire_id
-
-        elsif( rtype == 'MetareviewQuestionnaire')
-
-          differentQuestionnaires["Metareview"] = rqid.questionnaire_id
-        elsif( rtype == 'AuthorFeedbackQuestionnaire')
-          differentQuestionnaires["AuthorFeedback"] = rqid.questionnaire_id
-
-        elsif( rtype == 'TeammateReviewQuestionnaire')
-          differentQuestionnaires["Teamreview"] = rqid.questionnaire_id
-        end # end of elsif block
-      end # end of each.do block
-
-      assQuestionnaires[assgt.id] = differentQuestionnaires
-
-      #ACS Everything is a team now
-      #removed check to see if it is a team assignment
-      assTeamHash[assgt.id] = "team"
-    end
-    # end of first for
-
-
-    participantList = AssignmentParticipant.select("id, user_id, parent_id").where(parent_id: assignmentList.pluck(:id))
-    #Creating an participant id to [user id, Assignment id] hash
-    partAssHash = Hash.new
-    participantList.find_each do |part|
-      partAssHash[part.id] = [part.user_id, part.parent_id]
-    end
-
-    csEntries = Array.new
-    #####Computation of csEntries
-
-
-    ##The next part of the program expects csEntries to be a array of 
-    # [participant_id, questionnaire_id, total_score] values.
-    # The adaptor class given generates the expected csEntries values using 
-    # the score_cache table for all assignments.
-    # Handles metareviews, feedbacks and teammate reviews.
-    # Participant_id is the same as reviewee_id.
-    # Questionnaire_id is the one used for this assignment.
-    # Total_score is same as score in the score_cache table.
-    # for team assignments, we look up team numbers from the score_cache table, 
-    # find the participants within the team.
-    # for each team member make a new csEntry with the respective participant_id, 
-    # questionnaire_id, and total_score
-    ## code :Abhishek
-
-
-    argList = ['MetareviewResponseMap', 'FeedbackResponseMap','TeammateReviewResponseMap']
-
-    for assgt in assignmentList
-
-
-
-      participants_for_assgt = AssignmentParticipant.where("parent_id = ? and type =?", assgt.id, 'AssignmentParticipant').pluck(:id)
-      fMTEntries = ScoreCache.where("reviewee_id in (?) and object_type in (?)", participants_for_assgt, argList)
-      for fMTEntry in fMTEntries
-        csEntry = CsEntriesAdaptor.new
-        csEntry.participant_id = fMTEntry.reviewee_id
-        if (fMTEntry.object_type == 'FeedbackResponseMap')
-          csEntry.questionnaire_id = assQuestionnaires[assgt.id]["AuthorFeedback"]
-        elsif (fMTEntry.object_type == 'MetareviewResponseMap')
-          csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Metareview"]
-        elsif (fMTEntry.object_type == 'TeammateReviewResponseMap')
-
-          csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Teamreview"]
-        end
-        csEntry.total_score = fMTEntry.score
-        csEntries << csEntry
-      end
-      ######## done with metareviews and feedbacksfor this assgt##############
-      ##########now putting stuff in reviews based on if the assignment is a team assignment or not###################
-      if assTeamHash[assgt.id] == "indie"
-        participant_entries = ScoreCache.where(["reviewee_id in (?) and object_type = ?", participants_for_assgt, 'ParticipantReviewResponseMap' ])
-        for participant_entry in participant_entries
-          csEntry = CsEntriesAdaptor.new
-          csEntry.participant_id = participant_entry.reviewee_id
-          csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Review"]
-          csEntry.total_score = participant_entry.score
-          csEntries << csEntry
-        end
-      else
-        assignment_teams = Team.where("parent_id = ? and type = ?", assgt.id, 'AssignmentTeam')
-        team_entries = ScoreCache.where("reviewee_id in (?) and object_type = ?", assignment_teams.pluck(:id), 'TeamReviewResponseMap')
-        team_entries.each do |team_entry|
-          team_users = TeamsUser.where(["team_id = ?",team_entry.reviewee_id])
-
-          for team_user in team_users
-            team_participant = AssignmentParticipant.where(["user_id = ? and parent_id = ?", team_user.user_id, assgt.id]).first
-            csEntry = CsEntriesAdaptor.new
-            csEntry.participant_id = team_participant.try :id
-            csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Review"]
-            csEntry.total_score = team_entry.score
-
-            csEntries << csEntry
-          end
-
-        end
-      end
-    end
-
-    qtypeHash = Hash.new
-
-    csEntries.each do |csEntry|
-      qtype = Questionnaire.find(csEntry.questionnaire_id).type.to_s if csEntry.questionnaire_id
-      courseid = assCourseHash[partAssHash[csEntry.participant_id].try(:[], 1)]
-      userid = partAssHash[csEntry.participant_id].try(:first)
-
-      addEntryToCSHash(qtypeHash, qtype, userid, csEntry, courseid)
-    end
-
-    qtypeHash
-  end
+  #
+  # This method is commented as it will be replaced by refactored method "getParticipantsScore".
+  # Please remove it when totally not required.
+  #
+  # def self.getParticipantEntriesInAssignmentList(assignmentList)
+  #
+  #   #Creating an assignment id to course id hash
+  #   assCourseHash = Hash.new
+  #   assTeamHash = Hash.new
+  #   assQuestionnaires = Hash.new
+  #
+  #   for assgt in assignmentList
+  #
+  #     if assgt.course_id != nil
+  #       assCourseHash[assgt.id] = assgt.course_id
+  #     else
+  #       assCourseHash[assgt.id] = 0
+  #     end
+  #     @revqids = []
+  #     differentQuestionnaires = Hash.new
+  #     @revqids = AssignmentQuestionnaire.where(["assignment_id = ?",assgt.id])
+  #     @revqids.each do |rqid|
+  #       rtype = Questionnaire.find(rqid.questionnaire_id).type
+  #       if( rtype == 'ReviewQuestionnaire')
+  #
+  #
+  #         differentQuestionnaires["Review"] = rqid.questionnaire_id
+  #
+  #       elsif( rtype == 'MetareviewQuestionnaire')
+  #
+  #         differentQuestionnaires["Metareview"] = rqid.questionnaire_id
+  #       elsif( rtype == 'AuthorFeedbackQuestionnaire')
+  #         differentQuestionnaires["AuthorFeedback"] = rqid.questionnaire_id
+  #
+  #       elsif( rtype == 'TeammateReviewQuestionnaire')
+  #         differentQuestionnaires["Teamreview"] = rqid.questionnaire_id
+  #       end # end of elsif block
+  #     end # end of each.do block
+  #
+  #     assQuestionnaires[assgt.id] = differentQuestionnaires
+  #
+  #     #ACS Everything is a team now
+  #     #removed check to see if it is a team assignment
+  #     assTeamHash[assgt.id] = "team"
+  #   end
+  #   # end of first for
+  #
+  #
+  #   participantList = AssignmentParticipant.select("id, user_id, parent_id").where(parent_id: assignmentList.pluck(:id))
+  #   #Creating an participant id to [user id, Assignment id] hash
+  #   partAssHash = Hash.new
+  #   participantList.find_each do |part|
+  #     partAssHash[part.id] = [part.user_id, part.parent_id]
+  #   end
+  #
+  #   csEntries = Array.new
+  #   #####Computation of csEntries
+  #
+  #
+  #   ##The next part of the program expects csEntries to be a array of
+  #   # [participant_id, questionnaire_id, total_score] values.
+  #   # The adaptor class given generates the expected csEntries values using
+  #   # the score_cache table for all assignments.
+  #   # Handles metareviews, feedbacks and teammate reviews.
+  #   # Participant_id is the same as reviewee_id.
+  #   # Questionnaire_id is the one used for this assignment.
+  #   # Total_score is same as score in the score_cache table.
+  #   # for team assignments, we look up team numbers from the score_cache table,
+  #   # find the participants within the team.
+  #   # for each team member make a new csEntry with the respective participant_id,
+  #   # questionnaire_id, and total_score
+  #   ## code :Abhishek
+  #
+  #
+  #   argList = ['MetareviewResponseMap', 'FeedbackResponseMap','TeammateReviewResponseMap']
+  #
+  #   for assgt in assignmentList
+  #
+  #
+  #
+  #     participants_for_assgt = AssignmentParticipant.where("parent_id = ? and type =?", assgt.id, 'AssignmentParticipant').pluck(:id)
+  #     fMTEntries = ScoreCache.where("reviewee_id in (?) and object_type in (?)", participants_for_assgt, argList)
+  #     for fMTEntry in fMTEntries
+  #       csEntry = CsEntriesAdaptor.new
+  #       csEntry.participant_id = fMTEntry.reviewee_id
+  #       if (fMTEntry.object_type == 'FeedbackResponseMap')
+  #         csEntry.questionnaire_id = assQuestionnaires[assgt.id]["AuthorFeedback"]
+  #       elsif (fMTEntry.object_type == 'MetareviewResponseMap')
+  #         csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Metareview"]
+  #       elsif (fMTEntry.object_type == 'TeammateReviewResponseMap')
+  #
+  #         csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Teamreview"]
+  #       end
+  #       csEntry.total_score = fMTEntry.score
+  #       csEntries << csEntry
+  #     end
+  #     ######## done with metareviews and feedbacksfor this assgt##############
+  #     ##########now putting stuff in reviews based on if the assignment is a team assignment or not###################
+  #     if assTeamHash[assgt.id] == "indie"
+  #       participant_entries = ScoreCache.where(["reviewee_id in (?) and object_type = ?", participants_for_assgt, 'ParticipantReviewResponseMap' ])
+  #       for participant_entry in participant_entries
+  #         csEntry = CsEntriesAdaptor.new
+  #         csEntry.participant_id = participant_entry.reviewee_id
+  #         csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Review"]
+  #         csEntry.total_score = participant_entry.score
+  #         csEntries << csEntry
+  #       end
+  #     else
+  #       assignment_teams = Team.where("parent_id = ? and type = ?", assgt.id, 'AssignmentTeam')
+  #       team_entries = ScoreCache.where("reviewee_id in (?) and object_type = ?", assignment_teams.pluck(:id), 'TeamReviewResponseMap')
+  #       team_entries.each do |team_entry|
+  #         team_users = TeamsUser.where(["team_id = ?",team_entry.reviewee_id])
+  #
+  #         for team_user in team_users
+  #           team_participant = AssignmentParticipant.where(["user_id = ? and parent_id = ?", team_user.user_id, assgt.id]).first
+  #           csEntry = CsEntriesAdaptor.new
+  #           csEntry.participant_id = team_participant.try :id
+  #           csEntry.questionnaire_id = assQuestionnaires[assgt.id]["Review"]
+  #           csEntry.total_score = team_entry.score
+  #
+  #           csEntries << csEntry
+  #         end
+  #
+  #       end
+  #     end
+  #   end
+  #
+  #   qtypeHash = Hash.new
+  #
+  #   csEntries.each do |csEntry|
+  #     qtype = Questionnaire.find(csEntry.questionnaire_id).type.to_s if csEntry.questionnaire_id
+  #     courseid = assCourseHash[partAssHash[csEntry.participant_id].try(:[], 1)]
+  #     userid = partAssHash[csEntry.participant_id].try(:first)
+  #
+  #     addEntryToCSHash(qtypeHash, qtype, userid, csEntry, courseid)
+  #   end
+  #
+  #   qtypeHash
+  # end
 
   # This method adds an entry from the Computed_Scores table into a hash
   # structure that is used to in creating the leaderboards.
-  def self.addEntryToCSHash(qtypeHash, qtype, userid, csEntry, courseid)
-    #If there IS NOT any course for the particular course type
-    if qtypeHash[qtype] == nil
-      partHash = Hash.new
-      partHash[userid] = [csEntry.total_score, 1]
-      courseHash = Hash.new
-      courseHash[courseid] = partHash
-      qtypeHash[qtype] = courseHash
-    else
-      #There IS at least one course under the particular qtype
-      #If the particular course IS NOT present in existing course hash
-      if qtypeHash[qtype][courseid] == nil
-        courseHash = qtypeHash[qtype]
-        partHash = Hash.new
-        partHash[userid] = [csEntry.total_score, 1]
-        courseHash[courseid] = partHash
-        qtypeHash[qtype] = courseHash
-      else
-        #The particular course is present
-        #If the particular user IS NOT present in the existing user hash
-        if qtypeHash[qtype][courseid][userid] == nil
-          partHash = qtypeHash[qtype][courseid]
-          partHash[userid] = [csEntry.total_score, 1]
-          qtypeHash[qtype][courseid] = partHash
-        else
-          #User is present, update score
-          current_score = qtypeHash[qtype][courseid][userid][0]
-          count = qtypeHash[qtype][courseid][userid][1]
-          final_score = ((current_score * count) + csEntry.total_score) / (count + 1)
-          count +=(1)
-          qtypeHash[qtype][courseid][userid] = [final_score, count]
-        end
-      end
-    end
-    if qtypeHash[qtype][courseid][userid] == nil
-      partHash[userid] = [csEntry.total_score, 1]
-      courseHash[courseid] = partHash
-      qtypeHash[qtype] = courseHash
-    end
-  end
+  #
+  # This method is commented as it will be replaced by refactored method "addScoreToResultantHash".
+  # Please remove it when totally not required.
+  #
+  # def self.addEntryToCSHash(qtypeHash, qtype, userid, csEntry, courseid)
+  #   #If there IS NOT any course for the particular course type
+  #   if qtypeHash[qtype] == nil
+  #     partHash = Hash.new
+  #     partHash[userid] = [csEntry.total_score, 1]
+  #     courseHash = Hash.new
+  #     courseHash[courseid] = partHash
+  #     qtypeHash[qtype] = courseHash
+  #   else
+  #     #There IS at least one course under the particular qtype
+  #     #If the particular course IS NOT present in existing course hash
+  #     if qtypeHash[qtype][courseid] == nil
+  #       courseHash = qtypeHash[qtype]
+  #       partHash = Hash.new
+  #       partHash[userid] = [csEntry.total_score, 1]
+  #       courseHash[courseid] = partHash
+  #       qtypeHash[qtype] = courseHash
+  #     else
+  #       #The particular course is present
+  #       #If the particular user IS NOT present in the existing user hash
+  #       if qtypeHash[qtype][courseid][userid] == nil
+  #         partHash = qtypeHash[qtype][courseid]
+  #         partHash[userid] = [csEntry.total_score, 1]
+  #         qtypeHash[qtype][courseid] = partHash
+  #       else
+  #         #User is present, update score
+  #         current_score = qtypeHash[qtype][courseid][userid][0]
+  #         count = qtypeHash[qtype][courseid][userid][1]
+  #         final_score = ((current_score * count) + csEntry.total_score) / (count + 1)
+  #         count +=(1)
+  #         qtypeHash[qtype][courseid][userid] = [final_score, count]
+  #       end
+  #     end
+  #   end
+  #   if qtypeHash[qtype][courseid][userid] == nil
+  #     partHash[userid] = [csEntry.total_score, 1]
+  #     courseHash[courseid] = partHash
+  #     qtypeHash[qtype] = courseHash
+  #   end
+  # end
 
   # This method does a destructive sort on the computed scores hash so
   # that it can be mined for personal achievement information

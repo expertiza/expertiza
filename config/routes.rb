@@ -246,7 +246,7 @@ Expertiza::Application.routes.draw do
       get :list
       post :list_questionnaires
       get :new_quiz
-      post :select_questionnaire_type
+      post :set_questionnaire_content
       post :toggle_access
       get :view
     end
@@ -471,7 +471,7 @@ Expertiza::Application.routes.draw do
   get "/review_mapping/assign_metareviewer_dynamically", :to => 'review_mapping#assign_metareviewer_dynamically'
   get 'response/', :to => 'response#saving'
 
-  get 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
+  get 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'set_questionnaire_content'
   get ':controller/service.wsdl', :action => 'wsdl'
 
   get ':controller(/:action(/:id))(.:format)'

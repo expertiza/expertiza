@@ -3,7 +3,9 @@ class CreateNodes < ActiveRecord::Migration
     create_table :nodes do |t|
       t.column :parent_id, :integer
       t.column :node_object_id, :integer
-      t.column :type, :string            
+      t.column :type, :string
+      t.integer :lft
+      t.integer :rgt
     end           
   end
 

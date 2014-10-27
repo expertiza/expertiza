@@ -1,6 +1,12 @@
 class SystemSettings < ActiveRecord::Base
+<<<<<<< HEAD
+  #set_table_name 'system_settings'
+  self.table_name = 'system_settings'
+  
+=======
   self.table_name = 'system_settings'
 
+>>>>>>> efd344a45229673d6434372e07fbe188b1a63f65
   attr_accessor :public_role, :default_markup_style
   attr_accessor :site_default_page, :not_found_page, :permission_denied_page,
     :session_expired_page

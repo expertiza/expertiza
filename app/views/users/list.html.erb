@@ -28,7 +28,7 @@
         <td><%= link_to user.name, :action => 'show', :id => user.id %></td>
         <td><%= user.fullname %></td>
         <td><%= user.email %></td>
-        <td><%= link_to user.role.name, :controller => 'roles', :action => 'show', :id => user.role.id %></td>
+        <td><%= link_to user.role.name, role_path(user.role.id) %></td>
         <td align="center"><%= user.parent.try :name %></td>
         <td><%= User.yesorno(user.email_on_review) %></td>
         <td><%= User.yesorno(user.email_on_submission) %></td>
@@ -50,7 +50,7 @@
       session[:return_to] = "#{request.protocol}#{request.host_with_port}#{request.fullpath}"
     %>
 
-  <%= link_to 'New User', :action => 'new' %> |
+  <%= link_to 'New User', new_user_path %> |
   <%= link_to 'Import Users', :controller=>'import_file', :action=>'start', :model => 'User', :expected_fields => 'username, full name (first[ middle] last), e-mail address, password' %>|
   <%= link_to 'Export Users', :controller=>'export_file',:action=>'start',:model=> 'User',:id=> 1 %>
 

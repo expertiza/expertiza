@@ -8,5 +8,5 @@
   <%= submit_tag 'Edit' %>
 <% end %>
 
-<%= link_to 'Show', :action => 'show', :id => @user %> |
-<%= link_to 'Back', :action => 'list' %>
+<%= link_to 'Show', edit_role_path(@user) %> |
+<%= link_to 'Back', users_list_path %>

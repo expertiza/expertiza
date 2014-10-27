@@ -11,18 +11,16 @@
   </tr>
 
   <tr><th>Role:</th>
-    <td><%= link_to @role.name, :controller => 'roles',
-      :action => 'show', :id => @role.id %></td>
+    <td><%= link_to @role.name, role_path(@role.id) %></td>
   </tr>
 
 </table>
 
 <% unless current_user_role? == "Student" %>
   <hr/>
-  <p><%= link_to 'Edit', :action => 'edit', :id => @user %> |
-    <%= link_to 'Delete', {:action => 'destroy', :id => @user},
-    :confirm => 'Delete this user?', :method => :post %>
+  <p><%= link_to 'Edit', edit_role_path(@role.id) %> |
+    <%= link_to 'Delete', {:action => 'destroy', :id => @user}, :confirm => 'Delete this user?', :method => :delete %>
 </p>
 
-<p><%= link_to 'Back', :action => 'list' %> to Users list</p>
+<p><%= link_to 'Back', users_list_path %> to Users list</p>
 <% end %>

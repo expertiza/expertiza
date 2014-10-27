@@ -8,7 +8,7 @@ class AssignmentTeam < Team
     # START of contributor methods, shared with AssignmentParticipant
 
     # Whether this team includes a given participant or not
-    def includes?(participant)
+    def has_participant(participant)
       participants.include?(participant)
     end
 
@@ -62,16 +62,16 @@ class AssignmentTeam < Team
 
   def get_hyperlinks
     links = Array.new
-    self.get_participants.each { |team_member| links.concat(team_member.get_hyperlinks_array) }
+    self.participants.each { |team_member| links.concat(team_member.get_hyperlinks_array) }
     links
   end
 
   def get_path
-    self.get_participants.first.dir_path
+    self.participants.first.dir_path
   end
 
   def get_submitted_files
-    self.get_participants.first.submitted_files
+    self.participants.first.submitted_files
   end
   alias_method :submitted_files, :get_submitted_files
 
@@ -139,18 +139,8 @@ class AssignmentTeam < Team
         self.name
       end
 
-      def get_participants
-        users = self.users
-        participants = Array.new
-        users.each do |user|
-          participant = AssignmentParticipant.where(user_id: user.id, parent_id: self.parent_id).first
-          participants << participant if participant != nil
-        end
-        participants
-      end
-
       def copy(course_id)
-        new_team = CourseTeam.create_team_and_node(course_id)
+        new_team = CourseTeam.create(course_id)
         new_team.name = name
         new_team.save
         #new_team = CourseTeam.create({:name => self.name, :parent_id => course_id})
@@ -224,7 +214,7 @@ class AssignmentTeam < Team
       end
 
       #Remove a team given the team id
-      def self.remove_team_by_id(id)
+      def self.delete(id)
         old_team = AssignmentTeam.find(id)
         if old_team != nil
           old_team.destroy

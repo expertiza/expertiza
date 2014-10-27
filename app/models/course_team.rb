@@ -100,7 +100,7 @@ class CourseTeam < Team
       # handle_dups == "rename" ||" replace"
       # create new team for the team to be inserted
       if name
-        team=CourseTeam.create_team_and_node(course_id)
+        team=CourseTeam.create(course_id)
         team.name = name
         team.save
       end
@@ -159,7 +159,7 @@ class CourseTeam < Team
       end
     end
 
-    def self.create_team_and_node(course_id)
+    def self.create(course_id)
       course = Course.find(course_id)
       teamname = Team.generate_team_name(course.name)
       team = CourseTeam.create(:name=>teamname, :parent_id => course_id)

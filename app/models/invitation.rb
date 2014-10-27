@@ -49,7 +49,7 @@ class Invitation < ActiveRecord::Base
       #Release topics for the team has selected by the invited users empty team
       SignedUpUser.release_topics_selected_by_team_for_assignment(team_id, assignment_id)
 
-      AssignmentTeam.remove_team_by_id(team_id)
+      AssignmentTeam.delete(team_id)
     end
 
     #If you change your team, remove all your invitations that you send to other people

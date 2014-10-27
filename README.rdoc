@@ -2,7 +2,8 @@
 
 This README would normally document whatever steps are necessary to get the application up and running.
 
-The Website link for DireWolf is 152.46.18.73:3000
+The Website link for our team's work is: 
+
 
 ===Project Description
 
@@ -40,7 +41,8 @@ This class lists the grades of all the participants for an assignments and also 
 
 8. Search for the key reasons which lead to huge waiting time for getting score.
 
-9. Refactor get_assessments_for method in response_map.rb and lead to more than 90% off the current waiting time.
+9. Refactor get_assessments_for method in response_map.rb and lead to more than 90\% off the current waiting time.
 
 10. Eliminat the search for reviews and meta reviews during the grades_show method.
+
 11. Delete unnecessary instance Variables.

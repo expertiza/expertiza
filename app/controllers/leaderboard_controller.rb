@@ -21,14 +21,11 @@ class LeaderboardController < ApplicationController
 
       @csHash= Leaderboard.getParticipantEntriesInCourses @courseList, current_user.id
 
-
-      @courseAccomp = Hash.new
       if !@instructorQuery
         @user = current_user
         @courseAccomp = Leaderboard.extractPersonalAchievements(@csHash, @courseList, current_user.id)
-      else
-        @csHash = Leaderboard.sortHash(@csHash)
       end
+      @csHash = Leaderboard.sortHash(@csHash)
 
       # Setup top 3 leaderboards for easier consumption by view
       @leaderboards = Array.new
@@ -48,6 +45,7 @@ class LeaderboardController < ApplicationController
       }
 
       @leaderboards.sort!{|x,y| x[:courseName] <=> y[:courseName]}
+
       # Setup personal achievement leaderboards for easier consumption by view
       @achievementLeaderBoards = Array.new
       if !@instructorQuery

@@ -25,14 +25,14 @@ class LeaderboardController < ApplicationController
         @user = current_user
         @courseAccomp = Leaderboard.extractPersonalAchievements(@csHash, @courseList, current_user.id)
       end
-      @csHash = Leaderboard.sortHash(@csHash)
 
-      # Setup top 3 leaderboards for easier consumption by view
+      @csHash = Leaderboard.sortHash(@csHash)
+      # Setup leaderboard for easier consumption by view
       @leaderboards = Array.new
 
       @csHash.each { |qType, courseHash|
-        courseHash.each_pair{|course, userGradeArray|
-          courseName = LeaderboardHelper.getCourseName(course)
+        courseHash.each_pair{|courseId, userGradeArray|
+          courseName = LeaderboardHelper.getCourseName(courseId)
           achieveName = LeaderboardHelper.getAchieveName(qType)
 
           leaderboardHash = Hash.new

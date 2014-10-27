@@ -335,13 +335,17 @@ class Leaderboard < ActiveRecord::Base
   # This method does a destructive sort on the computed scores hash so
   # that it can be mined for personal achievement information
   def self.sortHash(qTypeHash)
-    qTypeHash.each { |qType, courseHash|
+    result = Hash.new
+    # Deep-copy of Hash
+    result = Marshal.load(Marshal.dump(qTypeHash))
+
+    result.each { |qType, courseHash|
       courseHash.each { |courseId, userScoreHash|
         userScoreSortArray = userScoreHash.sort { |a, b| b[1][0] <=> a[1][0]}
-        qTypeHash[qType][courseId] = userScoreSortArray
+        result[qType][courseId] = userScoreSortArray
       }
     }
-    qTypeHash
+    result
   end
 
   # This method takes the sorted computed score hash structure and mines
@@ -357,6 +361,8 @@ class Leaderboard < ActiveRecord::Base
       accomplishmentMap[leaderboardRecord.qtype] = leaderboardRecord.name
     end
 
+    csSortedHash = Leaderboard.sortHash(csHash)
+
     for courseId in courseIdList
       for accomplishment in accomplishmentMap.keys
         # Get score for current questionnaireType/accomplishment, courseId and userId from csHash
@@ -366,8 +372,8 @@ class Leaderboard < ActiveRecord::Base
             courseAccomplishmentHash[courseId] = Array.new
           end
           # Calculate rank of current user
-          rank = 1 + csHash[accomplishment][courseId].keys.index(userId)
-          total = csHash[accomplishment][courseId].length
+          rank = 1 + csSortedHash[accomplishment][courseId].index([userId, score])
+          total = csSortedHash[accomplishment][courseId].length
 
           courseAccomplishmentHash[courseId] << {:accomp => accomplishmentMap[accomplishment],
                                                  :score => score[0],

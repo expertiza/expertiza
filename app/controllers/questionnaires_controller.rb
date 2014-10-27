@@ -107,7 +107,6 @@ class QuestionnairesController < ApplicationController
       @questionnaire.min_question_score = 0
       @questionnaire.max_question_score = 1
       @questionnaire.section = "Quiz"
-      # print "=====create_questionnaire========="
       @assignment = Assignment.find(params[:aid])
       teams = TeamsUser.where(user_id: session[:user].id)
       for t in teams do
@@ -119,11 +118,8 @@ class QuestionnairesController < ApplicationController
       @questionnaire.instructor_id = team.id    #for a team assignment, set the instructor id to the team_id
 
       @successful_create = true
-      # print "=====save in create_questionnaire begin========="
       save
-      # print "=====save in create_questionnaire over========="
       save_choices @questionnaire.id
-      # print "=====save_choice in create_questionnaire over========="
       if @successful_create == true
         flash[:note] = "Quiz was successfully created"
       end
@@ -185,21 +181,7 @@ class QuestionnairesController < ApplicationController
     end
   end
 
-  #Present in advice_controller.rb
-  # def edit_advice  ##Code used to be in this class, was removed.  I have not checked the other class.
-  #   redirect_to :controller => 'advice', :action => 'edit_advice'
-  # end
-
-  # def save_advice
-  #   begin
-  #     for advice_key in params[:advice].keys
-  #       QuestionAdvice.update(advice_key, params[:advice][advice_key])
-  #     end
-  #     flash[:notice] = "The questionnaire's question advice was successfully saved"
-  #     #redirect_to :action => 'list'
-  #     redirect_to :controller => 'advice', :action => 'save_advice'
-  #   end   ##Rescue clause was removed; why?
-  # end
+  #edit_advice moved to advice controller
 
   # Toggle the access permission for this assignment from public to private, or vice versa
   def toggle_access
@@ -335,7 +317,6 @@ class QuestionnairesController < ApplicationController
 
     if params[:question]
       for question_key in params[:question].keys
-        # print question_key
         begin
           if params[:question][question_key][:txt].strip.empty?
             # question text is empty, delete the question
@@ -374,8 +355,6 @@ class QuestionnairesController < ApplicationController
         q_type = params[:question_type][questionnum.to_s][:type]
         if(q_type!="Essay")
           for choice_key in params[:new_choices][questionnum.to_s][q_type].keys
-            # print "=====choice_key="+choice_key+"======="
-
             if params[:new_choices][questionnum.to_s][q_type][choice_key]["weight"] == 1.to_s
               score = 1
             else

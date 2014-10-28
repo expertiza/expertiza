@@ -1,19 +1,29 @@
 class StudentTeamsController < ApplicationController
   autocomplete :user, :name
 
-  before_action :set_team, only: [:edit, :update]
-  before_action :set_student, only: [:view, :update, :edit, :create, :remove_participant]
+  def team
+    @team ||= AssignmentTeam.find params[:team_id]
+  end
+  def team=(value)
+    @team = value
+  end
+
+  def student
+    @student ||= AssignmentParticipant.find(params[:student_id])
+  end
+
+  def student=(value)
+    @student = value
+  end
+
 
   def action_allowed?
     #note, this code replaces the following line that cannot be called before action allowed?
-    set_team if %w[edit update].include? action_name
-    set_student if %w(view update edit create remove_participant).include? action_name
-
     if current_role_name.eql? 'Student'
       #make sure the student is the owner if they are trying to create it
-      return current_user_id? @student.user_id if %w[create].include? action_name
+      return current_user_id? student.user_id if %w[create].include? action_name
       #make sure the student belongs to the group before allowed them to try and edit or update
-      return @team.get_participants.map{|p| p.user_id}.include? current_user.id if %w(edit update).include? action_name
+      return team.get_participants.map{|p| p.user_id}.include? current_user.id if %w(edit update).include? action_name
       return true
     else
       return false
@@ -23,30 +33,30 @@ class StudentTeamsController < ApplicationController
   def view
     #View will check if send_invs and recieved_invs are set before showing
     #only the owner should be able to see those.
-    return unless current_user_id? @student.user_id
+    return unless current_user_id? student.user_id
 
-    @send_invs = Invitation.where from_id: @student.user.id, assignment_id: @student.assignment.id
-    @received_invs = Invitation.where to_id: @student.user.id, assignment_id: @student.assignment.id, reply_status: 'W'
+    @send_invs = Invitation.where from_id: student.user.id, assignment_id: student.assignment.id
+    @received_invs = Invitation.where to_id: student.user.id, assignment_id: student.assignment.id, reply_status: 'W'
   end
 
   def create
-    existing_assignments = AssignmentTeam.where name: params[:team][:name], parent_id: @student.parent_id
+    existing_assignments = AssignmentTeam.where name: params[:team][:name], parent_id: student.parent_id
 
     #check if the team name is in use
     if existing_assignments.empty?
-      @team = AssignmentTeam.new params[:team]
-      @team.parent_id = @student.parent_id
-      @team.save
-      parent = AssignmentNode.find_by_node_object_id @student.parent_id
-      TeamNode.create parent_id: parent.id, node_object_id: @team.id
-      user = User.find @student.user_id
-      @team.add_member user, @team.parent_id
+      team = AssignmentTeam.new params[:team]
+      team.parent_id = student.parent_id
+      team.save
+      parent = AssignmentNode.find_by_node_object_id student.parent_id
+      TeamNode.create parent_id: parent.id, node_object_id: team.id
+      user = User.find student.user_id
+      team.add_member user, team.parent_id
       team_created_successfully
-      redirect_to view_student_teams_path student_id: @student.id
+      redirect_to view_student_teams_path student_id: student.id
 
     else
       flash[:notice] = 'Team name is already in use.'
-      redirect_to view_student_teams_path student_id: @student.id
+      redirect_to view_student_teams_path student_id: student.id
     end
   end
 
@@ -54,15 +64,15 @@ class StudentTeamsController < ApplicationController
   end
 
   def update
-    matching_teams = AssignmentTeam.where name: params[:team][:name], parent_id: @team.parent_id
+    matching_teams = AssignmentTeam.where name: params[:team][:name], parent_id: team.parent_id
     if matching_teams.length.zero?
-      if @team.update_attributes params[:team]
+      if team.update_attributes params[:team]
         team_created_successfully
 
           redirect_to view_student_teams_path student_id: params[:student_id]
 
       end
-    elsif matching_teams.length == 1 && (matching_teams[0].name <=> @team.name).zero?
+    elsif matching_teams.length == 1 && (matching_teams[0].name <=> team.name).zero?
 
       team_created_successfully
       redirect_to view_student_teams_path student_id: params[:student_id]
@@ -86,11 +96,11 @@ class StudentTeamsController < ApplicationController
 
   def remove_participant
     #remove the topic_id from participants
-    @student.update_topic_id nil
+    student.update_topic_id nil
 
     #remove the entry from teams_users
 
-    team_user = TeamsUser.find_by team_id: params[:team_id], user_id: @student.user_id
+    team_user = TeamsUser.find_by team_id: params[:team_id], user_id: student.user_id
 
     if team_user
       team_user.destroy
@@ -147,7 +157,7 @@ class StudentTeamsController < ApplicationController
     end
 
     #remove all the sent invitations
-    old_invites = Invitation.where from_id: @student.user_id, assignment_id: @student.parent_id
+    old_invites = Invitation.where from_id: student.user_id, assignment_id: student.parent_id
 
     old_invites.each{|old_invite| old_invite.destroy}
 
@@ -156,24 +166,18 @@ class StudentTeamsController < ApplicationController
     #the student is responsible for resubmitting their work
     #no restriction is placed on when a student can leave
 
-    @student.directory_num = nil
+    student.directory_num = nil
 
-    @student.save
+    student.save
 
-    redirect_to view_student_teams_path student_id: @student.id
+    redirect_to view_student_teams_path student_id: student.id
   end
 
   def team_created_successfully
-    undo_link "Team \"#{@team.name}\" has been updated successfully. "
+    undo_link "Team \"#{team.name}\" has been updated successfully. "
   end
 
-  def set_team
-    @team = AssignmentTeam.find params[:team_id]
-  end
-  
-  def set_student
-    @student = AssignmentParticipant.find(params[:student_id])
-  end
+
 
   def review
     @assignment = Assignment.find params[:assignment_id]

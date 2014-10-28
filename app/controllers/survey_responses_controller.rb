@@ -63,17 +63,8 @@ def submit
   @comments = params[:comments]
   @assignment_id = params[:assignment_id]
   for question in @questions
-    @new = SurveyResponse.new
-    @new.survey_id = @survey_id
-    @new.question_id = question.id
-    @new.assignment_id = @assignment_id
-    @new.survey_deployment_id=params[:survey_deployment_id]
-    @new.email = params[:email]
-    @new.score = @scores[question.id.to_s]
-    @new.comments = @comments[question.id.to_s]
-    @new.save
+    SurveyResponseHelper::persist_survey(@survey_id, question.id, @assignment_id, params[:survey_deployment_id], params[:email])
   end
-
   if !params[:survey_deployment_id]
     surveys = SurveyHelper::get_assigned_surveys(@assignment_id)
   end

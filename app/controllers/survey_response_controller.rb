@@ -62,20 +62,13 @@ def submit
   @scores = params[:score]
   @comments = params[:comments]
   @assignment_id = params[:assignment_id]
-  for question in @questions
-    @new = SurveyResponse.new
-    @new.survey_id = @survey_id
-    @new.question_id = question.id
-    @new.assignment_id = @assignment_id
-    @new.survey_deployment_id=params[:survey_deployment_id]
-    @new.email = params[:email]
-    #@new.score = @scores[question.id.to_s]
-    #@new.comments = @comments[question.id.to_s]
-    #@new.save
-  end
+    for question in @questions
+      SurveyResponseHelper::persist_survey(@survey_id, question.id, @assignment_id, params[:survey_deployment_id], params[:email])
+    end
+
 
   if !params[:survey_deployment_id]
-    @surveys = SurveyHelper::get_assigned_surveys(@assignment_id)
+    surveys = SurveyHelper::get_assigned_surveys(@assignment_id)
   end
 end
 
@@ -83,18 +76,18 @@ def view_responses
 
   if params[:course_eval] # Check if this is a course evaluation
     survey_id=SurveyDeployment.find(params[:id]).course_evaluation_id
-    @surveys = Questionnaire.where(["id=?", survey_id])
+    surveys = Questionnaire.where(["id=?", survey_id])
     @assignment=Assignment.new
     @assignment.name="Course Evaluation"
     @assignment.id=params[:id]
     @course_eval=params[:course_eval]
   else
     @assignment = Assignment.find(params[:id])
-    @surveys = SurveyHelper::get_all_available_surveys(params[:id], session[:user].role_id)
+    surveys = SurveyHelper::get_all_available_surveys(params[:id], session[:user].role_id)
   end
   @responses = []
   @empty = true
-  for survey in @surveys
+  for survey in surveys
     min = survey.min_question_score
     max = survey.max_question_score
     this_response_survey = {}

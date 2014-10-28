@@ -8,7 +8,7 @@ class TeamsUsersController < ApplicationController
 
   def auto_complete_for_user_name
     team = Team.find(session[:team_id])
-    @users = team.get_possible_team_members(params[:user][:name])
+    @users = team.get_possible_participants(params[:user][:name])
     render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
   end
 
@@ -31,7 +31,7 @@ class TeamsUsersController < ApplicationController
 
     team = Team.find(params[:id])
 
-    add_member_return=team.add_member(user, team.parent_id)
+    add_member_return=team.add_participant(user, team.parent_id)
     if add_member_return==false
       flash[:error]= "The team already has the maximum number of members."
     end

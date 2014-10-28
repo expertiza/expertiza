@@ -445,7 +445,7 @@ class AssignmentParticipant < Participant
     #ACS Check if the team count is greater than one(team assignment)
     if self.assignment.max_team_size > 1 && self.assignment.wiki_type.name == "MediaWiki"
       submissions = Array.new
-      self.team.get_participants.each do |user|
+      self.team.participants.each do |user|
         val = WikiType.review_mediawiki_group(self.assignment.directory_path, current_time, user.handle)
         submissions << val if val != nil
       end if self.team
@@ -560,7 +560,7 @@ class AssignmentParticipant < Participant
         self.update_attribute('directory_num',dir_num)
         #ACS Get participants irrespective of the number of participants in the team
         #removed check to see if it is a team assignment
-        self.team.get_participants.each do | member |
+        self.team.participants.each do | member |
           if member.directory_num == nil or member.directory_num < 0
             member.directory_num = self.directory_num
             member.save

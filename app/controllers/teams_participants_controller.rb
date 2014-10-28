@@ -2,7 +2,7 @@ class TeamsParticipantsController < ApplicationController
 
   def auto_complete_for_user_name
     team = Team.find(session[:team_id])
-    @users = team.get_possible_team_members(params[:user][:name])
+    @users = team.get_possible_participants(params[:user][:name])
     render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
   end
 
@@ -24,7 +24,7 @@ class TeamsParticipantsController < ApplicationController
     end
     team = Team.find(params[:id])
 
-    team.add_member(user, team.parent_id)
+    team.add_participant(user, team.parent_id)
 
     #  flash[:error] = $!
     #end

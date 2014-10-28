@@ -21,7 +21,7 @@ class StudentQuizController < ApplicationController
     if @assignment.staggered_deadline?
       @quiz_mappings.each { |quiz_mapping|
         if @assignment.team_assignment?
-          participant = AssignmentTeam.get_first_member(quiz_mapping.reviewee_id)
+          participant = AssignmentTeam.get_first_participant(quiz_mapping.reviewee_id)
         else
           participant = quiz_mapping.reviewee
         end

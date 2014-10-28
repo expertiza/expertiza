@@ -22,7 +22,7 @@ class AssignmentParticipantTest < ActiveSupport::TestCase
     TeamNode.create(:parent_id => parent.id, :node_object_id => currTeam.id)
 
 
-    currTeam.add_member(users(:student1));
+    currTeam.add_participant(users(:student1));
     assert currTeam.has_user(users(:student1))
   end
   def test_add_participant()

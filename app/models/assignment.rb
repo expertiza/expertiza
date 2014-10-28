@@ -177,7 +177,7 @@ class Assignment < ActiveRecord::Base
     # 3) remove contributors that have not submitted work yet
     contributor_set.reject! do |contributor|
       signed_up_topic(contributor) != topic or # both will be nil for assignments with no signup sheet
-        contributor.includes?(reviewer) ###or !contributor.has_quiz?
+        contributor.has_participant(reviewer) ###or !contributor.has_quiz?
     end
     raise "There are no more submissions to take quiz on for this #{work}." if contributor_set.empty?
     #flash[:error] = "There are no more submissions to take quiz on for this #{work}."
@@ -233,7 +233,7 @@ class Assignment < ActiveRecord::Base
     # 3) remove contributors that have not submitted work yet
     contributor_set.reject! do |contributor|
       signed_up_topic(contributor) != topic || # both will be nil for assignments with no signup sheet
-        contributor.includes?(reviewer) ||
+        contributor.has_participant(reviewer) ||
         !contributor.has_submissions?
     end
     raise "There are no more submissions to review on this #{work}." if contributor_set.empty?
@@ -281,7 +281,7 @@ class Assignment < ActiveRecord::Base
 
     # Reject reviews where the meta_reviewer was the reviewer or the contributor
     response_map_set.reject! do |response_map|
-      (response_map.reviewee == metareviewer) or (response_map.reviewer.includes?(metareviewer))
+      (response_map.reviewee == metareviewer) or (response_map.reviewer.has_participant(metareviewer))
     end
     raise 'There are no more reviews to metareview for this assignment.' if response_map_set.empty?
 
@@ -865,7 +865,7 @@ class Assignment < ActiveRecord::Base
 
       for index in 0 .. @scores[:teams].length - 1
         team = @scores[:teams][index.to_s.to_sym]
-        for participant in team[:team].get_participants
+        for participant in team[:team].participants
           pscore = @scores[:participants][participant.id.to_s.to_sym]
           tcsv = Array.new
           tcsv << 'team'+index.to_s

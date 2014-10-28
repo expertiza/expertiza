@@ -126,7 +126,7 @@ class BookmarksController < ApplicationController
 
     @review_mappings.each do | map |
       if @assignment.team_assignment?
-        participant = AssignmentTeam.get_first_member(map.reviewee_id)
+        participant = AssignmentTeam.get_first_participant(map.reviewee_id)
       else
         participant = map.reviewee
       end

@@ -5,9 +5,9 @@
       <%- # removed code that handles team and individual assignments differently  -%>
       <% if map.type.to_s == "MetareviewResponseMap" %>
           <% review_mapping = Response.find(map.reviewed_object_id) %>
-          <% participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id) %>
+          <% participant = AssignmentTeam.get_first_participant(review_mapping.reviewee_id) %>
       <% else %>
-          <% participant = AssignmentTeam.get_first_member(map.reviewee_id) %>
+          <% participant = AssignmentTeam.get_first_participant(map.reviewee_id) %>
       <% end %>
 
       <% if participant %>

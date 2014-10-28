@@ -88,7 +88,10 @@ class SignUpSheetController < ApplicationController
         if @sign_up_topic.save
           #NotificationLimit.create(:topic_id => @sign_up_topic.id)
           undo_link("Topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. ")
-          redirect_to_sign_up(params[:id])
+          #redirect_to_sign_up(params[:id])
+
+          #changing the redirection url to topics tab in edit assignment view.
+          redirect_to edit_assignment_path(@sign_up_topic.assignment_id) + "#tabs-5"
         else
           render :action => 'new', :id => params[:id]
         end

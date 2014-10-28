@@ -8,11 +8,11 @@ We have refactored the DynamicReviewMapping controller (helper). As a part of th
 5. Changed " == 0" expression to ".zero?"
 6. Used `if (var)` instead of `if (var == true)`
 7. We have used array checking and made changes according to the follwing rules:
-    a. Use [].empty? instead of [].length == 0 or [].length.zero?
-    b. Use [:foo].any? instead of [:foo].length > 0
-    c. Use [:foo].one? instead of [:foo].length == 1
-    d. Use [:foo].first instead of [:foo][0]
-    e. Use [:foo].last instead of [:foo][-1]
+    * Use [].empty? instead of [].length == 0 or [].length.zero?
+    * Use [:foo].any? instead of [:foo].length > 0
+    * Use [:foo].one? instead of [:foo].length == 1
+    * Use [:foo].first instead of [:foo][0]
+    * Use [:foo].last instead of [:foo][-1]
 
 8. We have used `&&` and `||` rather than `and` and `or` to keep boolean precedence.
 

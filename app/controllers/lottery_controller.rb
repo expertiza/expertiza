@@ -284,7 +284,7 @@ class LotteryController < ApplicationController
   end
   flash[:notice] = "Please go to the topics section of edit assignment, to check if the assignments were done"
 end
-redirect_to :controller => 'tree_display', :action => 'list'
+    redirect_to tree_display_index_path
 end
 
 #delete all the waitlist entries for the user

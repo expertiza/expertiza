@@ -215,7 +215,7 @@ class AssignmentControllerTest < ActionController::TestCase
     number_of_duedate = DueDate.count
     id = Assignment.first(:conditions => {:instructor_id => users(:instructor3).id}).id
     post :delete, :id => id
-    assert_redirected_to :controller => 'tree_display', :action => 'list'
+    assert_redirected_to tree_display_index_path
     assert_equal number_of_assignment-1, Assignment.count
     assert_raise(ActiveRecord::RecordNotFound){ Assignment.find(id) }
 

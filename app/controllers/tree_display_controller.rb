@@ -5,85 +5,16 @@ class TreeDisplayController < ApplicationController
     true
   end
 
-  # direct access to questionnaires
-  def goto_questionnaires
-    node_object = TreeFolder.find_by_name('Questionnaires')
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to tree_display_index_path
-  end
-
-  # direct access to review rubrics
-  def goto_review_rubrics
-    node_object = TreeFolder.find_by_name('Review')
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to tree_display_index_path
-  end
-
-  # direct access to metareview rubrics
-  def goto_metareview_rubrics
-    node_object = TreeFolder.find_by_name('Metareview')
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to tree_display_index_path
-  end
-
-  # direct access to teammate review rubrics
-  def goto_teammatereview_rubrics
-    node_object = TreeFolder.find_by_name('Teammate Review')
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to tree_display_index_path
-  end
-
-  # direct access to author feedbacks
-  def goto_author_feedbacks
-    node_object = TreeFolder.find_by_name('Author Feedback')
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to tree_display_index_path
-  end
-
-  # direct access to global survey
-  def goto_global_survey
-    node_object = TreeFolder.find_by_name('Global Survey')
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to tree_display_index_path
-  end
-
-  # direct access to surveys
-  def goto_surveys
-    node_object = TreeFolder.find_by_name('Survey')
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to tree_display_index_path
-  end
-
-  # direct access to course evaluations
-  def goto_course_evaluations
-    node_object = TreeFolder.find_by_name('Course Evaluation')
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to tree_display_index_path
-  end
-
-  # direct access to courses
-  def goto_courses
-    node_object = TreeFolder.find_by_name('Courses')
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to tree_display_index_path
-  end
-
-  def goto_bookmarkrating_rubrics
-    node_object = TreeFolder.find_by_name('Bookmarkrating')
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to tree_display_index_path
-  end
-
-  # direct access to assignments
-  def goto_assignments
-    node_object = TreeFolder.find_by_name('Assignments')
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to tree_display_index_path
-  end
-
   # called when the display is requested
-  # ajbudlon, July 3rd 2008
   def index
+    group = getGroup session[:menu]
+    session[:root] = params[root] if not params[:root].blank?
+
+    node_object = TreeFolder.find_by_name(group)
+    if not group.blank? and not node_object.blank?
+      session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
+    end
+
     redirect_to controller: :student_task, action: :list if current_user.student?
     if params[:commit] == 'Search'
       search_node_root = {'Q' => 1, 'C' => 2, 'A' => 3}
@@ -121,10 +52,7 @@ class TreeDisplayController < ApplicationController
     end
   end
 
-  def drill
-    session[:root] = params[:root]
-    redirect_to tree_display_index_path
-  end
+private
 
   def filter
     search = params[:filter_string]
@@ -147,4 +75,11 @@ class TreeDisplayController < ApplicationController
     return qid
   end
 
+  def getGroup menu
+    if menu and menu.selected
+      # first menu item is most specific/nested menu selected item in dropdown menus
+      menu_item_label= MenuItem.where(name: menu.selected).first.label
+    end
+    menu_item_label
   end
+end

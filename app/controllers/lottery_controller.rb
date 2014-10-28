@@ -112,7 +112,7 @@ class LotteryController < ApplicationController
 
   def merge_teams(team_a, team_b)
     # This method is intended to take team B and merge its members into team A
-    team_b.copy_members(team_a)
+    team_b.copy_participants(team_a)
     team_b.delete
   end
 

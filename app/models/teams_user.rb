@@ -50,7 +50,7 @@ class TeamsUser < ActiveRecord::Base
     for team in users_teams
       new_team = AssignmentTeam.where(['id = ? and parent_id = ?', team.team_id, assignment_id]).first
       if new_team != nil
-        can_add_member = new_team.add_member(User.find(invited_user_id), assignment_id)
+        can_add_member = new_team.add_participant(User.find(invited_user_id), assignment_id)
       end
     end
     return can_add_member

@@ -16,6 +16,9 @@ class StudentTeamsController < ApplicationController
     @student = value
   end
 
+  before_action :team, only: [:edit, :update]
+  before_action :student, only: [:view, :update, :edit, :create, :remove_participant]
+
 
   def action_allowed?
     #note, this code replaces the following line that cannot be called before action allowed?

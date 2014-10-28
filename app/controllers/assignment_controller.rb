@@ -250,6 +250,21 @@ class AssignmentController < ApplicationController
   def update
     @assignment = Assignment.find(params[:id])
     params[:assignment][:wiki_type_id] = 1 unless params[:assignment_wiki_assignment]
+    @assignment_questionnaires = AssignmentQuestionnaire.find_all_by_assignment_id(params[:id])
+
+    #10/27/2014 update used_in_round in assignment_questionaire
+    checkbox1 = params[:assignment_questionnaire][:used_in_round]  #is this the value from the form?
+    checked=checkbox1=="true"?true:false
+    @assignment_questionnaires.each do  |aq|
+      if checked
+        aq.update_attributes({'used_in_round'=> 1})
+      else
+        aq.update_attributes({'used_in_round'=>nil})
+      end
+   end
+    assign_questionnaire=AssignmentQuestionnaire.find_by_assignment_id(params[:id])
+
+
 
     #TODO: require params[:assignment][:directory_path] to be not null
     #TODO: insert warning if directory_path is duplicated

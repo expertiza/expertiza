@@ -1,10 +1,11 @@
-===Project Description
+Project Description
 
 Classes involved: grades_controller.rb
-====What it does:
+
+**What it does:**
 This class lists the grades of all the participants for an assignments and also their reviews. Instructor can edit scores, calculate penalties and send emails for conflicts.
 
-====What needs to be done:
+**What needs to be done:**
 
 1. Modify calculate_all_penalties method which is too complex and long.
 
@@ -16,7 +17,7 @@ This class lists the grades of all the participants for an assignments and also 
 
 5. Try not to query for reviews and meta reviews in grades_show method.
 
-====What we have done:
+**What we have done:**
 
 1. Modify calculate_all_penalties method.
 
@@ -42,7 +43,7 @@ This class lists the grades of all the participants for an assignments and also 
 
 12. Delete unnecessary instance Variables.
 
-=====Extra Credits:
+**Extra Credits:**
 
 1. Refactor get_assessments_for method in response_map.rb and lead to more than 90\% off the original view scores' running time.
 
@@ -50,35 +51,35 @@ This class lists the grades of all the participants for an assignments and also 
 
 3. Send a conflict email to the reviewer automatically when instructor click the button "email reviewer".
 
-===The Website link for our team's work: 
+<strong> The Website link for our team's work: </strong>
 
-======Note: In order to compare test results between current system and original system. You'd better test both system.
+<strong>Note: In order to compare test results between current system and original system. You'd better test both system. </strong>
 
-====Current System (After Refactoring Grades_controller): 
+<strong> Current System (After Refactoring Grades_controller): </strong>
 
 http://152.46.18.10:3000/
 
-   Instructor: user6                     Password: test
-   
-   Student: user1600 and user1601        Password: test
+<code> Instructor: user6                     Password: test</code>
 
-====Original System (Before Refactoring Grades_controller):
+<code>Student: user1600 and user1601        Password: test</code>
+
+<strong> Original System (Before Refactoring Grades_controller): </strong>
 
 http://152.1.13.97:3000/
 
-   Instructor: user6                     Password: test
-   
-   Student: user1600 and user1601        Password: test
+<code> Instructor: user6                     Password: test</code>
+
+<code>Student: user1600 and user1601        Password: test</code>
 
 All our test result based on the following test cases on expertiza, please follow these step to get it.
 
-====Instructor: (Searching "Program 2" using "Ctrl + F" will be convinient for you.)
+<em>Instructor: (Searching "Program 2" using "Ctrl + F" will be convinient for you.)</em>
 
-======Steps: Login -> Assignments->Program 2 style ->view scores. 
+<em>Steps: Login -> Assignments->Program 2 style ->view scores. </em>
 
-====Student:
+<em>Student:</em>
 
-======Steps: Login -> Assignments->Program 2 style ->Your scores.
+<em>Steps: Login -> Assignments->Program 2 style ->Your scores.</em>
 
 Expertiza
 =========

@@ -115,7 +115,10 @@ class SignUpSheetController < ApplicationController
           dependencies.each { |dependency| dependency.destroy }
         end
       end
-      redirect_to_sign_up(params[:assignment_id])
+      #redirect_to_sign_up(params[:assignment_id])
+
+      #changing the redirection url to topics tab in edit assignment view.
+      redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
     end
 
     #prepares the page. shows the form which can be used to enter new values for the different properties of an assignment
@@ -156,7 +159,10 @@ class SignUpSheetController < ApplicationController
         else
           flash[:error] = "Topic could not be updated"
         end
-        redirect_to_sign_up(params[:assignment_id])
+        #redirect_to_sign_up(params[:assignment_id])
+
+        #changing the redirection url to topics tab in edit assignment view.
+        redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
       end
 
 

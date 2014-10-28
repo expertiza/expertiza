@@ -1,3 +1,25 @@
+We have refactored the DynamicReviewMapping controller (helper). As a part of this assignment we carried out the following tasks:
+
+
+1. The code block between line 808 to 825 was duplicated in 3 places in this file. We have refactored the code to remove this bad smell. We have created a method called create_message to avoid duplication in the code.
+2. Method assign_metareviewers, assign_reviewers_team were too long. We have made two new methods (check_assignment_for_review and show_message_for_review_count) that does just one task and does it perfectly instead of large methods to do multiple tasks.
+3. Method assign_reviewers_individual was not used anymore. We have checked for its functionality and deleted it since it did not play any role in the final application.
+4. We have changed if to unless wherever necessary.
+5. Changed " == 0" expression to ".zero?"
+6. Used `if (var)` instead of `if (var == true)`
+7. We have used array checking and made changes according to the follwing rules:
+    a. Use [].empty? instead of [].length == 0 or [].length.zero?
+    b. Use [:foo].any? instead of [:foo].length > 0
+    c. Use [:foo].one? instead of [:foo].length == 1
+    d. Use [:foo].first instead of [:foo][0]
+    e. Use [:foo].last instead of [:foo][-1]
+
+8. We have used `&&` and `||` rather than `and` and `or` to keep boolean precedence.
+
+
+This really isn't any different from refactoring projects, which don't change functionality. In our case, we have removed some classes, and the reviewers can verify that the functionality associated with reviews still works.
+
+
 Expertiza
 =========
 

@@ -406,7 +406,7 @@ class AssignmentsController < ApplicationController
       end
     end
 
-    def associate_assignment_to_course
+    def associate_assignment_with_course
       @assignment = Assignment.find(params[:id])
       @assignment.inspect
       @user = ApplicationHelper::get_user_role(session[:user])

@@ -1,15 +1,20 @@
 <% @assignment = Assignment.find(params[:id]) %>
-<h1>Signup sheet for <%= @assignment.name %> assignment</h1>
+<h1>Topics sheet for <%= @assignment.name %> assignment</h1>
 
-<!--
-<%= link_to 'View all Bookmarks', :controller=>'bookmarks', :action=> 'view_bookmarks' %> <br/>
-<%= link_to 'Manage all Bookmarks', :controller => 'bookmarks', :action => 'manage_bookmarks' %> -->
+
+<%#<%= link_to 'View all Bookmarks', :controller=>'bookmarks', :action=> 'view_bookmarks' %> <%#<br/>
+<%= link_to 'Manage all Bookmarks', :controller => 'bookmarks', :action => 'manage_bookmarks' %>
 
 
 
 <% if flash[:notice] %>
   <div class="flash_note"><%= flash_message :notice %></div>
 <% end %>
+
+<% @sign_up_topics = SignUpTopic.where(['assignment_id = ?', @assignment.id]) %>
+<% @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)  %>
+<% @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id) %>
+<% @participants = SignedUpUser.find_team_participants(@assignment.id)  %>
 
 <% if @sign_up_topics.size != 0 %>
   <table class="general">

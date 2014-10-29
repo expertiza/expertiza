@@ -100,21 +100,7 @@ class User < ActiveRecord::Base
 
   # Function which has a MailerHelper which sends the mail welcome email to the user after signing up
   def email_welcome
-    #MailerHelper::send_mail_to_user(self, "Your Expertiza password has been created", "user_welcome", password)
-
-    #added by Mark Luo because MailerHelper is deprecated
-    Mailer.generic_message(
-        {:to => self.email,
-         :subject => "Your Expertiza account has been created",
-         :body => {
-             :user => self,
-             :password => '<Hidden for security reason>',
-             :type => 'welcome',
-             :first_name => ApplicationHelper::get_user_first_name(self),
-             :partial_name => 'user_welcome'
-         }
-        }
-    ).deliver
+    MailerHelper::send_mail_to_user(self, "Your Expertiza password has been created", "user_welcome", password)
   end
 
   def valid_password?(password)

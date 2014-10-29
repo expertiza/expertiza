@@ -262,7 +262,7 @@ class AssignmentController < ApplicationController
         aq.update_attributes({'used_in_round'=>nil})
       end
    end
-    assign_questionnaire=AssignmentQuestionnaire.find_by_assignment_id(params[:id])
+    #assign_questionnaire=AssignmentQuestionnaire.find_by_assignment_id(params[:id])
 
 
 

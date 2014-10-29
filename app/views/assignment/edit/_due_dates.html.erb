@@ -232,6 +232,35 @@
             jQuery.get("/assignment/set_due_date" + para);
         }
     }
+
+
+
+//    2014.10.28 Add submit_assignment_questionnaires()
+//    need to add set_assignment_questionnaires()
+    function submit_assignment_questionnaires() {
+        var data, para, fields, i, j;
+        //delete old assignment_questionnaires
+        jQuery.get("/assignment/delete_all_assignment_questionnaires?assignment_id=" + <%= @assignment.id %>);
+        //create the new assignment_questionnaires
+        data = jQuery('#assignment_questionnaire_table>tbody>tr:not(.heading)');
+
+    //need to modify below: 2014.10.28pm
+
+
+
+        for (i = 0; i < data.length; i++) {
+            fields = jQuery(data[i]).find('input,select');
+            para = "?";
+            for (j = 0; j < fields.length; j++) {
+                para += "&" + (fields[j].name + "=" + fields[j].value);
+            }
+            jQuery.get("/assignment/set_questionnaire" + para);
+        }
+    }
+
+
+
+
 </script>
 
 <div style="font-size:large;">

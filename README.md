@@ -1,5 +1,11 @@
 We have refactored the DynamicReviewMapping controller (helper). As a part of this assignment we carried out the following tasks:
 
+The code was designed to be used to assign reviewers to work more "intelligently" by making sure that a person does not get his own work to review. But the conditions for the problem targeted made the following assumptions:
+The person does not select what to review
+Any person can give only 2 reviews.
+
+The review rules have since been changed, and the code is not used anywhere in the entire project. It has been maintained, just in case it is desired to go back to the old rules.
+Thus, there is no way to test the code.
 
 1. The code block between line 808 to 825 was duplicated in 3 places in this file. We have refactored the code to remove this bad smell. We have created a method called create_message to avoid duplication in the code.
 2. Method assign_metareviewers, assign_reviewers_team were too long. We have made two new methods (check_assignment_for_review and show_message_for_review_count) that does just one task and does it perfectly instead of large methods to do multiple tasks.
@@ -19,6 +25,7 @@ We have refactored the DynamicReviewMapping controller (helper). As a part of th
 
 This really isn't any different from refactoring projects, which don't change functionality. In our case, we have removed some classes, and the reviewers can verify that the functionality associated with reviews still works.
 
+We have also refactored the ReportsController, in that, we have removed it completely. This code was also not used, and was actually simply copied from ResponseController. The original purpose of the controller could not been determined, and it was removed to prevent further confusion regarding it.
 
 Expertiza
 =========

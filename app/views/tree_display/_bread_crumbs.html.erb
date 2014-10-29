@@ -1,12 +1,12 @@
 <BR/>
 <% if @root_node %>
-  <%= link_to "Return to top", drill_tree_display_index_path %>
+  <%= link_to "Return to top", tree_display_index_path %>
   <%
       curr_node = @root_node
   while curr_node.parent_id
     curr_node = Node.find(curr_node.parent_id) %>
   &nbsp;&nbsp;
-  <%= link_to curr_node.get_name, drill_tree_display_index_path(:root => curr_node.id) %>
+  <%= link_to curr_node.get_name, tree_display_index_path, :root => curr_node.id %>
 <% end %>
 &nbsp;&nbsp;<%= @root_node.get_name %><%
 end %>

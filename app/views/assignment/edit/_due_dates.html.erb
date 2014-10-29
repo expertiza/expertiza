@@ -106,12 +106,23 @@
         if (due_at == null) {
             due_at = '';
         }
+
+        var due_name = due_date.deadline_name;
+        if (due_name == null){
+            due_name = '';
+        }
+
         html += '<td align="center" class="due_date_due_at" width="25%">' +
                 '<input id="datetimepicker_' + element_id +
                 '" name="due_date[due_at]" style="width: 200px" type="text" value="' +
                 due_at + '">' + '</td>';
 
-        html += '<td align="center" class="due_date_submission_allowed_id" width="10%">' +
+        html += '<td  align="center" class="due_date_name" width="15%">';
+        html += '<input id="due_date_name" type="text" name="due_date[deadline_name]" value="'+due_date.deadline_name+'">'+'</td>';
+
+
+
+        html += '<td align="center" class="due_date_due_at" width="10%">' +
                 '<select id="due_date_submission_allowed_id" name="due_date[submission_allowed_id]">' +
                 '<option value="">---</option>' +
                 '<option value="1">No</option>' +
@@ -126,22 +137,6 @@
                 '<option value="2">Late</option>' +
                 '<option value="3">Yes</option>' +
                 '</select></td>';
-
-//        html += '<td align="center" class="due_date_resubmission_allowed_id" width="10%">' +
-//                '<select id="due_date_resubmission_allowed_id" name="due_date[resubmission_allowed_id]">' +
-//                '<option value="">---</option>' +
-//                '<option value="1">No</option>' +
-//                '<option value="2">Late</option>' +
-//                '<option value="3">Yes</option>' +
-//                '</select></td>';
-
-//        html += '<td align="center" class="due_date_rereview_allowed_id" width="10%">' +
-//                '<select id="due_date_rereview_allowed_id" name="due_date[rereview_allowed_id]">' +
-//                '<option value="">---</option>' +
-//                '<option value="1">No</option>' +
-//                '<option value="2">Late</option>' +
-//                '<option value="3">Yes</option>' +
-//                '</select></td>';
 
         html += '<td align="center" class="due_date_review_of_review_allowed_id" width="10%">' +
                 '<select id="due_date_review_of_review_allowed_id" name="due_date[review_of_review_allowed_id]">' +
@@ -168,20 +163,34 @@
                 '<option value="96">96</option>' +
                 '</select></td>';
 
+        html += '<td  align="center" class="due_date_description_url" width="15%">';
+        html += '<input id="due_date_description_url" type="text" name="due_date[description_url]" value="'+due_date.description_url+'">'+'</td>';
 
-        html += '<td align="center" class="due_date_due_at" width="25%">' +
-                '<input id="datetimepicker_' + element_id +
-                '" name="due_date[due_at]" style="width: 200px" type="text" value="' +
-                due_at + '">' + '</td>';
+
+
+
+
+
 
         previous_element.after(html);
 
+        <!--submission allowed-->
         jQuery('#due_date_submission_allowed_id').val(due_date.submission_allowed_id).attr('id', '');
         jQuery('#due_date_resubmission_allowed_id').val(due_date.resubmission_allowed_id).attr('id', '');
+
+        jQuery('#due_date_name').val(due_date.deadline_name).attr('id', '');
+        <!--Review allowed-->
         jQuery('#due_date_review_allowed_id').val(due_date.review_allowed_id).attr('id', '');
         jQuery('#due_date_rereview_allowed_id').val(due_date.rereview_allowed_id).attr('id', '');
+
+        <!--Metareview allowed-->
         jQuery('#due_date_review_of_review_allowed_id').val(due_date.review_of_review_allowed_id).attr('id', '');
+
+
+        <!--Reminder-->
         jQuery('#due_date_threshold').val(due_date.threshold).attr('id', '');
+
+        jQuery('#due_date_description_url').val(due_date.description_url).attr('id', '');
 
         jQuery('#datetimepicker_' + element_id).datetimepicker({
             dateFormat: 'yy/mm/dd',
@@ -239,12 +248,14 @@
   <tr id='due_date_heading'>
     <th width=15%>Deadline type</th>
     <th width=25%>Date & time</th>
+    <th width=10%>Due Date Name</th>
     <th width=10%>Submission allowed</th>
     <th width=10%>Review allowed</th>
     <!--<th width=10%>Resubmission Allowed</th>-->
     <!--<th width=10%>Re-Review Allowed</th>-->
     <th width=10%>Meta-review allowed</th>
     <th width=10%>Reminder(hrs)</th>
+    <th width=10%>Description URL</th>
   </tr>
   <script>
       jQuery(document).ready(function () {

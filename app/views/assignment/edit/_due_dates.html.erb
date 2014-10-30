@@ -57,7 +57,7 @@
     }
 
     <!--javascript functions that create and remove the entry of the set_due_date table-->
-    function addDueDateTableElement(deadline_type, round_no, due_date,q_options) {
+    function addDueDateTableElement(deadline_type, round_no, due_date,questionnaire,assignment_questionnaire,q_options) {
 //round_no = 0 for submission and review is not possible
 //round_no = 0 is used for other deadlines
         var element_id;
@@ -166,21 +166,15 @@
         html += '<td  align="center" class="due_date_description_url" width="10%">';
         html += '<input id="due_date_description_url" type="text" name="due_date[description_url]" value="'+due_date.description_url+'">'+'</td>';
 
-
-        html += '<td align="center" width="10%">' +
-
-                '<select name="assignment_questionnaire[questionnaire_id]" >' +
+        if (deadline_type == 'review') {
+        html += '<td align="center" width="10%" >' +
+                 '<select id="questionnaire_id" name="due_date[questionnaire_id]">' +
                 '<option value="">--None--</option>';
-
-
-
         for (i = 0; i < q_options.length; i++) {
             html += '<option value="' + q_options[i][1] + '">' + q_options[i][0] + '</option>'
         }
-
-
         html += '</select></td>';
-
+        }
 
 
 
@@ -219,6 +213,9 @@
                 { value: -480, label: 'Pacific' }
             ]
         });
+
+        //2014.10.28 This will make setting rounds button ineffective
+        jQuery('#questionnaire_id').val(questionnaire.id).attr('id', '');
     }
     function removeDueDateTableElement(deadline_type, round_no) {
         var element_id;
@@ -233,7 +230,7 @@
     <!--javascript function that goes through the due_dates_table and submit the data line by line -->
     <!--ruby method that response to the get request is set_due_date-->
     function submit_due_dates() {
-        var data, para, fields, i, j;
+        var data, para, fields, i, j,data2;
         //delete old due_dates
         jQuery.get("/assignment/delete_all_due_dates?assignment_id=" + <%= @assignment.id %>);
         //create the new due_dates
@@ -246,6 +243,8 @@
             }
             jQuery.get("/assignment/set_due_date" + para);
         }
+
+
     }
 
 
@@ -299,11 +298,12 @@
   </tr>
   <script>
       jQuery(document).ready(function () {
+
           <% for i in 1..@assignment.rounds_of_reviews %>
-          addDueDateTableElement('submission', <%=i%>, <%= due_date(@assignment, 'submission', i-1).to_json %>,<%= questionnaire_options(@assignment, nil).to_json %>);
-          addDueDateTableElement('review', <%=i%>, <%= due_date(@assignment, 'review', i-1).to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
+          addDueDateTableElement('submission', <%=i%>, <%= due_date(@assignment, 'submission', i-1).to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>); // or use questionnaire_options(@assignment, nil).to_json
+          addDueDateTableElement('review', <%=i%>, <%= due_date(@assignment, 'review', i-1).to_json %>, <%= questionnaire(@assignment, 'ReviewQuestionnaire').to_json %>,<%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire').to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
           <% end %>
-          addDueDateTableElement('metareview', 0, <%= due_date(@assignment, 'metareview').to_json %>,<%= questionnaire_options(@assignment, nil).to_json %>);
+          addDueDateTableElement('metareview', 0, <%= due_date(@assignment, 'metareview').to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
       }());
   </script>
 </table>

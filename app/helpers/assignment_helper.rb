@@ -22,7 +22,7 @@ module AssignmentHelper
     wiki_type_options
   end
 
-  def questionnaire_options(assignment, type)
+  def questionnaire_options(assignment, type,round = 0)
     questionnaires = Questionnaire.find(:all, :conditions => ['private = 0 or instructor_id = ?', assignment.instructor_id], :order => 'name')
     options = Array.new
     questionnaires.select { |x| x.type == type }.each do |questionnaire|

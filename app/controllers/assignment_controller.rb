@@ -202,10 +202,16 @@ class AssignmentController < ApplicationController
     @due_date = DueDate.new(params[:due_date])
     @due_date.save
 
+    # 2014.10.28 Not successful
+    @assignment_questionnaire=AssignmentQuestionnaire.new({"assignment_id"=>params[:due_date][:assignment_id],"questionnaire_id"=>params[:due_date][:questionnaire_id]})
+    @assignment_questionnaire.save
     respond_to do |format|
       format.json { render :json => @due_date }
+      format.json { render :json => @assignment_questionnaire }
     end
   end
+
+
 
   def delete_all_questionnaires
     assignment = Assignment.find(params[:assignment_id])

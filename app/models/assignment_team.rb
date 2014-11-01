@@ -19,7 +19,9 @@ class AssignmentTeam < Team
   # Evaluates whether any contribution by this team was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object
   def reviewed_by?(reviewer)
-    TeamReviewResponseMap.count(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id]) > 0
+    #TeamReviewResponseMap.count(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id]) > 0
+    count = TeamReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id).count
+    return count > 0
   end
 
   # Topic picked by the team
@@ -34,7 +36,8 @@ class AssignmentTeam < Team
 
   # Whether the team has submitted work or not
   def has_submissions?
-    participants.each { |participant| return true if participant.has_submissions? }
+    list_of_users = participants;
+    list_of_users.each { |participant| return true if participant.has_submissions? }
     false
   end
 
@@ -45,7 +48,11 @@ class AssignmentTeam < Team
   # END of contributor methods
 
   def participants
-    @participants ||= AssignmentParticipant.all(conditions: ['parent_id = ? && user_id IN (?)', parent_id, users])
+    #@participants ||= AssignmentParticipant.all(conditions: ['parent_id = ? && user_id IN (?)', parent_id, users])
+    users.each {|user|
+      @participants ||= AssignmentParticipant.where('parent_id = ? && user_id = ?', parent_id, user.id)
+    }
+    return @participants
   end
 
   def delete

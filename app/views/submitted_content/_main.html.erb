@@ -1,5 +1,5 @@
 <% if participant.get_hyperlinks.try(:length) || 0 > 0 %>
-  <%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => @participant, stage: @stage} %>
+  <%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant, stage: @stage} %>
 <% end %>
 <% if stage != "Complete" and controller.controller_name == 'submitted_content' %>
   <%= form_tag :action => 'submit_hyperlink', :id => participant.id do %>

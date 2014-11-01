@@ -190,10 +190,12 @@ class ResponseController < ApplicationController
     @questionnaire = @response.questionnaire
     latestResponseVersion()
     if @prev.present?
-      @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
+      #@sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
+      @sorted=@review_scores.sort
       @largest_version_num=@sorted[0]
     end
-    @response = Response.where(map_id: @map.id, version_num:  @largest_version_num).first
+    #@response = Response.where(map_id: @map.id, version_num:  @largest_version_num).first
+    @response = Response.where(map_id: @map.id).first
     #@modified_object = @response.id
     #get_content()
     #get_scores()
@@ -338,15 +340,15 @@ class ResponseController < ApplicationController
       @review_scores << element
     end
     #if previous responses exist increment the version number.
-    if @prev.present?
-      @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
-      @largest_version_num=@sorted[0]
-      @version=@largest_version_num.version_num+1
+    #if @prev.present?
+    #  @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
+    #  @largest_version_num=@sorted[0]
+    #  @version=@largest_version_num.version_num+1
       #if no previous version is available then initial version number is 1
-    else
-      @version=1
-    end
-    @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:version_num=>@version)
+    #else
+    #  @version=1
+    #end
+    @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments])#,:version_num=>@version)
     #@response = Response.find_by_map_id(@map.id)
     #@response.additional_comment = params[:review][:comments]
     #@response.version_num = @version
@@ -355,8 +357,10 @@ class ResponseController < ApplicationController
       @res = @response.response_id
       @questionnaire = @map.questionnaire
       questions = @questionnaire.questions
-      params[:responses].each_pair do |k, v|
-        score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
+      if params[:responses]
+        params[:responses].each_pair do |k, v|
+          score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
+        end
       end
     #else
     #rescue

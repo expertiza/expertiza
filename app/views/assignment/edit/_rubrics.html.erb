@@ -1,45 +1,68 @@
 <script type="text/javascript">
-    function addQuestionnaireTableRow(questionnaire_type, questionnaire, assignment_questionnaire, questionnaire_options) {
+    function addQuestionnaireTableRow(questionnaire_type,round_no,questionnaire, assignment_questionnaire, questionnaire_options) {
         var questionnaire_table = jQuery('#assignment_questionnaire_table>tbody>tr');
         var row_id = 'questionnaire_table_' + questionnaire_type;
         var i = 0;
         var html;
-        html += '<tr id="' + row_id + '">' +
-                '<input name="assignment_questionnaire[assignment_id]" type="hidden" value="' + <%= @assignment.id %> +'">';
+        if (round_no ==0) {
+            html += '<tr id="' + row_id + '">' +
+                    '<input name="assignment_questionnaire[assignment_id]" type="hidden" value="' + <%= @assignment.id %> +'">';
 
-        html += '<td><label for="questionnaire_id">' + questionnaire.display_type + ':</label></td>' +
-                '<td align="center">' +
-                '<select id="questionnaire_id" name="assignment_questionnaire[questionnaire_id]" style="width:300px">' +
-                '<option value="">--None--</option>';
 
-        for (i = 0; i < questionnaire_options.length; i++) {
-            html += '<option value="' + questionnaire_options[i][1] + '">' + questionnaire_options[i][0] + '</option>'
+
+
+
+
+
+            html += '<td><label for="questionnaire_id">' + questionnaire.display_type + ':</label></td>' +
+                    '<td align="center">' +
+                    '<select id="questionnaire_id" name="assignment_questionnaire[questionnaire_id]" style="width:300px">' +
+                    '<option value="">--None--</option>';
+
+            for (i = 0; i < questionnaire_options.length; i++) {
+                html += '<option value="' + questionnaire_options[i][1] + '">' + questionnaire_options[i][0] + '</option>'
+            }
+
+            html += '</select></td>';
+
+            html += '<td align="center"><input name="assignment_questionnaire[questionnaire_weight]" style="width:40px" type="text" value="' + assignment_questionnaire.questionnaire_weight + '">% </td>' +
+                    '<td align="center"><input name="assignment_questionnaire[notification_limit]" style="width:40px" type="text" value="' + assignment_questionnaire.notification_limit + '">% </td>';
+
+            if (questionnaire.display_type == "Review")
+
+                html += '<td align="center"><input name="assignment_questionnaires[used_in_round]" type="hidden" value="false"><%= check_box_tag('assignment_questionnaires[used_in_round]', 'true', @review_check ) %><%= label_tag('assignment_questionnaires[used_in_round]', 'Review rubric vary by round?') %> </td>' +
+                        '</tr>';
+
+            else if (questionnaire.display_type == "Metareview")
+
+                html += '<td align="center"><input name="assignment_questionnaires[used_in_round]" type="hidden" value="false"><%= check_box_tag('assignment_questionnaires[used_in_round]', 'true', @metareview_check) %><%= label_tag('assignment_questionnaires[used_in_round]', 'Review rubric vary by round?') %> </td>' +
+                        '</tr>';
+
+            else if (questionnaire.display_type == "Author Feedback")
+
+                html += '<td align="center"><input name="assignment_questionnaires[used_in_round]" type="hidden" value="false"><%= check_box_tag('assignment_questionnaires[used_in_round]', 'true', @author_check) %><%= label_tag('assignment_questionnaires[used_in_round]', 'Review rubric vary by round?') %> </td>' +
+                        '</tr>';
+
+            else if (questionnaire.display_type == "Teammate Review")
+
+                html += '<td align="center"><input name="assignment_questionnaires[used_in_round]" type="hidden" value="false"><%= check_box_tag('assignment_questionnaires[used_in_round]', 'true', @teammate_check) %><%= label_tag('assignment_questionnaires[used_in_round]', 'Review rubric vary by round?') %> </td>' +
+                        '</tr>';
         }
+        else{
 
-        html += '</select></td>';
 
-        html += '<td align="center"><input name="assignment_questionnaire[questionnaire_weight]" style="width:40px" type="text" value="' + assignment_questionnaire.questionnaire_weight + '">% </td>' +
-                '<td align="center"><input name="assignment_questionnaire[notification_limit]" style="width:40px" type="text" value="' + assignment_questionnaire.notification_limit + '">% </td>';
 
-        if(questionnaire.display_type == "Review")
 
-        html += '<td align="center"><input name="assignment_questionnaires[used_in_round]" type="hidden" value="false"><%= check_box_tag('assignment_questionnaires[used_in_round]', 'true', @review_check ) %><%= label_tag('assignment_questionnaires[used_in_round]', 'Review rubric vary by round?') %> </td>'+
-                '</tr>';
 
-        else if(questionnaire.display_type == "Metareview")
 
-            html += '<td align="center"><input name="assignment_questionnaires[used_in_round]" type="hidden" value="false"><%= check_box_tag('assignment_questionnaires[used_in_round]', 'true', @metareview_check) %><%= label_tag('assignment_questionnaires[used_in_round]', 'Review rubric vary by round?') %> </td>'+
-                    '</tr>';
 
-        else if(questionnaire.display_type == "Author Feedback")
 
-            html += '<td align="center"><input name="assignment_questionnaires[used_in_round]" type="hidden" value="false"><%= check_box_tag('assignment_questionnaires[used_in_round]', 'true', @author_check) %><%= label_tag('assignment_questionnaires[used_in_round]', 'Review rubric vary by round?') %> </td>'+
-                    '</tr>';
 
-        else if(questionnaire.display_type == "Teammate Review")
 
-            html += '<td align="center"><input name="assignment_questionnaires[used_in_round]" type="hidden" value="false"><%= check_box_tag('assignment_questionnaires[used_in_round]', 'true', @teammate_check) %><%= label_tag('assignment_questionnaires[used_in_round]', 'Review rubric vary by round?') %> </td>'+
-                    '</tr>';
+
+
+
+        }
 
 
         questionnaire_table.last().after(html);
@@ -96,10 +119,12 @@
   </tr>
   <script>
       jQuery(document).ready(function () {
-          addQuestionnaireTableRow('ReviewQuestionnaire', <%= questionnaire(@assignment, 'ReviewQuestionnaire').to_json %>, <%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire').to_json %>, <%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
-          addQuestionnaireTableRow('MetareviewQuestionnaire', <%= questionnaire(@assignment, 'MetareviewQuestionnaire').to_json %>, <%= assignment_questionnaire(@assignment, 'MetareviewQuestionnaire').to_json %>, <%= questionnaire_options(@assignment, 'MetareviewQuestionnaire').to_json %>);
-          addQuestionnaireTableRow('AuthorFeedbackQuestionnaire', <%= questionnaire(@assignment, 'AuthorFeedbackQuestionnaire').to_json %>, <%= assignment_questionnaire(@assignment, 'AuthorFeedbackQuestionnaire').to_json %>, <%= questionnaire_options(@assignment, 'AuthorFeedbackQuestionnaire').to_json %>);
-          addQuestionnaireTableRow('TeammateReviewQuestionnaire', <%= questionnaire(@assignment, 'TeammateReviewQuestionnaire').to_json %>, <%= assignment_questionnaire(@assignment, 'TeammateReviewQuestionnaire').to_json %>, <%= questionnaire_options(@assignment, 'TeammateReviewQuestionnaire').to_json %>);
+          <% for i in 1..@assignment.rounds_of_reviews %>
+          addQuestionnaireTableRow('ReviewQuestionnaire',0, <%= questionnaire(@assignment, 'ReviewQuestionnaire').to_json %>, <%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire').to_json %>, <%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
+          <% end %>
+          addQuestionnaireTableRow('MetareviewQuestionnaire', 0, <%= questionnaire(@assignment, 'MetareviewQuestionnaire').to_json %>, <%= assignment_questionnaire(@assignment, 'MetareviewQuestionnaire').to_json %>, <%= questionnaire_options(@assignment, 'MetareviewQuestionnaire').to_json %>);
+          addQuestionnaireTableRow('AuthorFeedbackQuestionnaire', 0,<%= questionnaire(@assignment, 'AuthorFeedbackQuestionnaire').to_json %>, <%= assignment_questionnaire(@assignment, 'AuthorFeedbackQuestionnaire').to_json %>, <%= questionnaire_options(@assignment, 'AuthorFeedbackQuestionnaire').to_json %>);
+          addQuestionnaireTableRow('TeammateReviewQuestionnaire',0, <%= questionnaire(@assignment, 'TeammateReviewQuestionnaire').to_json %>, <%= assignment_questionnaire(@assignment, 'TeammateReviewQuestionnaire').to_json %>, <%= questionnaire_options(@assignment, 'TeammateReviewQuestionnaire').to_json %>);
 
       }());
   </script>

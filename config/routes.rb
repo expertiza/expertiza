@@ -443,7 +443,6 @@ Expertiza::Application.routes.draw do
   resources :tree_display do
     collection do
       get ':action'
-      get :drill
     end
   end
 

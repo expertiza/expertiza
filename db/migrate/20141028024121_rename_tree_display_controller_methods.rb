@@ -7,24 +7,21 @@ class RenameTreeDisplayControllerMethods < ActiveRecord::Migration
     site_controller.builtin = 0
     site_controller.save
 
-    action = ControllerAction.where(name: 'list', site_controller_id: site_controller.id).first
-    action.update(name: 'index')
+    index_action = ControllerAction.create(name: 'index', site_controller_id: site_controller.id)
+    index_action.save
 
     # Get rid of old controller actions associated with tree_display if they exist
     # and update associations
     ControllerAction.where(site_controller_id: site_controller.id).find_each do |controller_action|
-      if controller_action.id != action.id
+      if controller_action.id != index_action.id
         MenuItem.where(controller_action_id: controller_action.id).find_each do |menu_item|
-          menu_item.update(controller_action_id: action.id)
+          menu_item.update(controller_action_id: index_action.id)
         end
+        say "Deleting controller action with id: #{controller_action.id}, index_action.id: #{index_action.id}"
         controller_action.destroy
       end
     end
 
-    # Clear cache and rebuild
-    Role.all.find_each do |role|
-      role.update(cache: nil)
-    end
     Role.rebuild_cache
   end
 

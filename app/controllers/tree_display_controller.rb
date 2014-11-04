@@ -1,6 +1,21 @@
 class TreeDisplayController < ApplicationController
   helper :application
 
+  # Database group names - used to translate from session variable string syntax to database label syntax
+  @@Groups = {
+      'Questionnaires'          => 'Questionnaires',
+      'Review rubrics'          => 'Review',
+      'Metareview rubrics'      => 'Metareview',
+      'Teammate review rubrics' => 'Teammate Review',
+      'Author feedbacks'        => 'Author Feedback',
+      'Global survey'           => 'Global Survey',
+      'Surveys'                 => 'Survey',
+      'Course evaluations'      => 'Course Evaluation',
+      'Courses'                 => 'Courses',
+      'Bookmarkrating'          => 'Bookmarkrating',
+      'Assignments'             => 'Assignments'
+  }
+
   def action_allowed?
     true
   end
@@ -11,6 +26,7 @@ class TreeDisplayController < ApplicationController
     session[:root] = params[root] if not params[:root].blank?
 
     node_object = TreeFolder.find_by_name(group)
+    # raise "#{group.blank?} #{node_object.blank?} #{group}"
     if not group.blank? and not node_object.blank?
       session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
     end
@@ -80,6 +96,6 @@ private
       # first menu item is most specific/nested menu selected item in dropdown menus
       menu_item_label= MenuItem.where(name: menu.selected).first.label
     end
-    menu_item_label
+    @@Groups[menu_item_label]
   end
 end

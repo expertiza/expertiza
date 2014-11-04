@@ -13,7 +13,7 @@
       end
     %>
   <!-- Start Listing -->
-  <%= render :partial=> '/tree_display/entry', :locals => {:search => @search, :node => node, :prefix => node.node_object_id.to_s+"_"+index.to_s, :depth => 0, :rowtype => rowtype} %>
+  <%= render partial: '/tree_display/entry', locals: {search: @search, node: node, prefix: node.node_object_id.to_s+"_"+index.to_s, depth: 0, rowtype: rowtype} %>
   <!-- End Listing -->
   <%
       index+=1

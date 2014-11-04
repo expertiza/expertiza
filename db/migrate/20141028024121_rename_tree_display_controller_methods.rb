@@ -28,13 +28,3 @@ class RenameTreeDisplayControllerMethods < ActiveRecord::Migration
   def self.down
   end
 end
-
-
-
-
-
-
-
-
-
-

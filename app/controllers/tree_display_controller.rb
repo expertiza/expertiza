@@ -22,11 +22,10 @@ class TreeDisplayController < ApplicationController
 
   # called when the display is requested
   def index
+    session[:root] = params[:root]
     group = getGroup session[:menu]
-    session[:root] = params[root] if not params[:root].blank?
 
     node_object = TreeFolder.find_by_name(group)
-    # raise "#{group.blank?} #{node_object.blank?} #{group}"
     if not group.blank? and not node_object.blank?
       session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
     end
@@ -51,7 +50,7 @@ class TreeDisplayController < ApplicationController
 
     @search = search_string
 
-    display = params[:display] #|| session[:display]
+    display = params[:display]
     if display
       @sortvar = display[:sortvar]
       @sortorder = display[:sortorder]

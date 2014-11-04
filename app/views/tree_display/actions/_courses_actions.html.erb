@@ -5,7 +5,7 @@
         <%= render :partial => '/tree_display/actions/shared_actions', :locals => {:model => 'Course', :controller => 'course', :node => node, :owner_id => owner_id} %>
         <% if is_available(session[:user],owner_id)%>
           <div>
-            <%= link_to image_tag('/assets/tree_view/add-ta-24.png', :title => 'Add TA'), add_ta_course_index_path(:id => node.node_object_id, :model => 'Course')%>
+            <%= link_to image_tag('/assets/tree_view/add-ta-24.png', :title => 'Add TA'), view_teaching_assistants_course_index_path(:id => node.node_object_id, :model => 'Course')%>
             <%= link_to image_tag('/assets/tree_view/add-assignment-24.png', :title => 'Create assignment'), new_assignment_path(:parent_id => node.node_object_id) %>
             <%= link_to image_tag('/assets/tree_view/add-participant-24.png', :title => 'Add participants'),list_participants_path(:id => node.node_object_id, :model => 'Course')%>
             <%= link_to image_tag('/assets/tree_view/create-teams-24.png', :title => 'Create teams'),list_teams_path(:id => node.node_object_id, :type => 'Course') %>

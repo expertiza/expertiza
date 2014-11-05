@@ -5,6 +5,8 @@ User:
 * Admin: user2
 * Teacher: user6
 * Student: userxxxx
+* Password: password
+
 
 
 ==========
@@ -31,14 +33,14 @@ User:
 2. Install java: 
 http://www.mkyong.com/java/how-to-install-java-jdk-on-ubuntu-linux/
 
-1. Install ruby 1.9.3
+1. Install ruby 1.8.7
   1. https://gorails.com/setup/ubuntu/14.04
   2. sudo apt-get install libgdbm-dev libncurses5-dev automake libtool bison libffi-dev
   3. curl -L https://get.rvm.io | bash -s stable
   4. source ~/.rvm/scripts/rvm
   5. echo "source ~/.rvm/scripts/rvm" >> ~/.bashrc
-  6. rvm install 1.9.3
-  7. rvm use 1.9.3 --default
+  6. rvm install 1.8.7
+  7. rvm use 1.8.7 --default
   8. ruby -v
 
 
@@ -65,7 +67,7 @@ http://www.mkyong.com/java/how-to-install-java-jdk-on-ubuntu-linux/
  * Error:rake development database is not configured
   Solution: config/database.yml :
 
-7. Set config file:
+7. Set config/database.yml file:
   development:
   adapter: mysql
   database: pg_developmen
@@ -73,4 +75,5 @@ http://www.mkyong.com/java/how-to-install-java-jdk-on-ubuntu-linux/
   password:
   host: localhost
 
-8. mysql -h localhost -uroot -proot pg_development< /home/xshao2/Desktop/expertiza_scrubbed_2014_03_14.sql
+8. Import database file:
+  mysql -h localhost -uroot -proot pg_development< /home/xshao2/Desktop/expertiza_scrubbed_2014_03_14.sql

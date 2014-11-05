@@ -2,75 +2,75 @@ Expertiza
 =========
 
 User:
-Admin: user2
-Teacher: user6
-Student: userxxxx
-
-
-
-
-
-
-
-
-
+* Admin: user2
+* Teacher: user6
+* Student: userxxxx
 
 
 ==========
-[![Build Status](https://travis-ci.org/expertiza/expertiza.png?branch=master)](https://travis-ci.org/expertiza/expertiza)
-[![Code Climate](https://codeclimate.com/github/expertiza/expertiza.png)](https://codeclimate.com/github/expertiza/expertiza)
+###What needs to be done:
+* checkbox “Review rubrics vary by round” should be added to the “General” tab in the view of creating/editing assignment
+* 4 checkboxes “Review rubrics vary by round” should be added on the “rubrics” tab
+* There should be a editable “deadline name” for each due date on “due date” panel if this type of review is specified to be “varying by rounds” in the “rubrics” tab.
+* Another “description URL” text box should be editable when this type of review is specified to be “varying by rounds” in the “rubrics” tab.
+* A drop-down box which help instructor to select review rubric should be added for a review round when this type of review is specified to be “varying by rounds” in the “rubrics” tab  (the input should be recorded in assignments_questionnaires table)
 
-#### Peer review system
 
-Expertiza is a web application where students can submit and peer-review learning objects (articles, code, web sites, etc). It is used in select courses at NC State and by professors at several other colleges and universities.
+###Our Changes:
+* A checkbox "Review rubric vary by round" has been added to the "General" tab in the view of creating/editing assignment as    well as "rubric" tab.By selecting this box, you can specify if the assignment reiview varies by round or not.
+* Under "rubric" tab, there are four types of rubric: review, metareview, author feedback and teammate review. The instructor   can set how many review he/she wants to use for the assignment by setting the round under "due date" tab
+* Under "due date" panel, "deadline name" textfield has been added. 
+* Under "due date" panel, "description URL" textfield has been added. 
 
-Setup
------
+==========
+###How to build our environment
 
-### NCSU VCL image
+1. Install JDK: 
+    sudo apt-get install openjdk-6-jdk
 
-The expertiza environment is already set up in [NC State's VCL](https://vcl.ncsu.edu) image "Ruby on Rails".
-If you have access, this is quickest way to get a development environment running for Expertiza.
-See the Expertiza wiki on [developing Expertiza on the VCL](http://wikis.lib.ncsu.edu/index.php/Developing_Expertiza_on_the_VCL).
+2. Install java: 
+http://www.mkyong.com/java/how-to-install-java-jdk-on-ubuntu-linux/
 
-Using the VCL is the quickest way to get started, but you may find it awkward developing on a remote machine
-with network lag and having to reinstall gems every time you connect. Installing locally can be a pain though too.
-Life is full of tradeoffs. :-) The good news is that you can start on one environment, push your work to git,
-and switch to another environment if you don't like the one you started with.
+1. Install ruby 1.9.3
+  1. https://gorails.com/setup/ubuntu/14.04
+  2. sudo apt-get install libgdbm-dev libncurses5-dev automake libtool bison libffi-dev
+  3. curl -L https://get.rvm.io | bash -s stable
+  4. source ~/.rvm/scripts/rvm
+  5. echo "source ~/.rvm/scripts/rvm" >> ~/.bashrc
+  6. rvm install 1.9.3
+  7. rvm use 1.9.3 --default
+  8. ruby -v
 
-### Installing locally
 
-See the Expertiza wiki for setup instructions. Please update the wiki with corrections or additional helpful information.
+4. Bundle install
+  *  Error: gem install linecache -v ‘0.46’ fails
+  Solution:debug19
+  *  Error:mongrel 1.1.5
+  Solution:change gemfile: gem "mongrel", ">= 1.2.0.pre2"
+  *  Error: mysql2
+  Solution: comment mysql2 in gemfile.lock
 
- * [OSX](http://wikis.lib.ncsu.edu/index.php/Creating_a_Mac_OS_X_Development_Environment_for_the_Expertiza_Application)
- * [Linux](http://wikis.lib.ncsu.edu/index.php/Creating_a_Linux_Development_Environment_for_the_Expertiza_Application)
- * [Windows](http://wikis.lib.ncsu.edu/index.php/Creating_a_Windows_Development_Environment_for_the_Expertiza_Application)
+5. sudo apt-get install libmysql-ruby libmysqlclient-dev
 
-Contributing
-------------
+6. gem install mysql2
+  1. sudo apt-get install mysql-server mysql-client 
+  2. mysql -uroot -proot
+  3. mysql > show databases;
+  4. create database db_development
+  5. mysql -h localhost -uroot -proot pg_development< /home/xshao2/Desktop/expertiza_scrubbed_2014_03_14.sql
 
- * [Fork](http://help.github.com/fork-a-repo/) the expertiza project
- * [Create a new branch](http://progit.org/book) for your contribution with a descriptive name
- * [Commit and push](http://progit.org/book) until you are happy with your contribution - follow the style guidelines below
- * Make sure to add tests for it; the tests should fail before your contribution/fix and pass afterward
- * [Send a pull request](http://help.github.com/send-pull-requests) to have your code reviewed for merging back into Expertiza
+6. rake db:migrate
+ * Error:undefined method `source_index' for Gem:Module
+  Solution:gem update --system 1.8.25
+ * Error:rake development database is not configured
+  Solution: config/database.yml :
 
-Style Guidelines
-----------------
+7. Set config file:
+  development:
+  adapter: mysql
+  database: pg_developmen
+  username: root
+  password:
+  host: localhost
 
-We've had many contributors in the past who have used a wide variety of ruby coding styles. It's a mess, and we're trying to unify it.
-
-All new files/contributions should:
-
- * Use unix line endings (Windows users: configure git to use [autocrlf](http://help.github.com/line-endings))
- * Indent with 2 spaces (no tabs; configure your editor) both in ruby and erb
- * Follow the [Ruby Style Guide](https://github.com/bbatsov/ruby-style-guide) style for syntax, formatting, and naming
-
-When editing existing files:
-
- * Keep the existing tabbing (use tabs instead of spaces in files that already use tabs everywhere; otherwise use spaces)
- * Keep the existing line ending style (dos/unix)
- * Follow the Ruby style Guide on code you add or edit, as above
-
-Please do no go crazy changing old code to match these guidelines; it will just create lots of potential merge conflicts.
-Applying style guidelines to code you add and modify is good enough. :-)
+8. mysql -h localhost -uroot -proot pg_development< /home/xshao2/Desktop/expertiza_scrubbed_2014_03_14.sql

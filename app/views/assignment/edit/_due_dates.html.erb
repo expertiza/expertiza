@@ -251,21 +251,21 @@
 
 //    2014.10.28 Add submit_assignment_questionnaires()
 //    need to add set_assignment_questionnaires()
-    function submit_assignment_questionnaires() {
-        var data, para, fields, i, j;
-        //delete old assignment_questionnaires
-        jQuery.get("/assignment/delete_all_assignment_questionnaires?assignment_id=" + <%= @assignment.id %>);    //create the new assignment_questionnaires
-        data = jQuery('#due_date_name'); //Want to select the questionnaire ID and save it to the assignment_questionnaires table
-
-        for (i = 0; i < data.length; i++) {
-            fields = jQuery(data[i]).find('input,select');
-            para = "?"
-            j = fields.length
-            para += "&" + (fields[j].name + "=" + fields[j].value);//assume the last field is questionnaire id
-
-            jQuery.get("/assignment/set_questionnaire" + para);
-        }
-    }
+//    function submit_assignment_questionnaires() {
+//        var data, para, fields, i, j;
+//        //delete old assignment_questionnaires
+//        jQuery.get("/assignment/delete_all_assignment_questionnaires?assignment_id=" + <%= @assignment.id %>);    //create the new assignment_questionnaires
+//        data = jQuery('#due_date_name'); //Want to select the questionnaire ID and save it to the assignment_questionnaires table
+//
+//        for (i = 0; i < data.length; i++) {
+//            fields = jQuery(data[i]).find('input,select');
+//            para = "?"
+//            j = fields.length
+//            para += "&" + (fields[j].name + "=" + fields[j].value);//assume the last field is questionnaire id
+//
+//            jQuery.get("/assignment/set_questionnaire" + para);
+//        }
+//    }
 
 
 
@@ -301,7 +301,7 @@
 
           <% for i in 1..@assignment.rounds_of_reviews %>
           addDueDateTableElement('submission', <%=i%>, <%= due_date(@assignment, 'submission', i-1).to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>); // or use questionnaire_options(@assignment, nil).to_json
-          addDueDateTableElement('review', <%=i%>, <%= due_date(@assignment, 'review', i-1).to_json %>, <%= questionnaire(@assignment, 'ReviewQuestionnaire').to_json %>,<%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire').to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
+          addDueDateTableElement('review', <%=i%>, <%= due_date(@assignment, 'review', i-1).to_json %>, <%= questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>,<%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
           <% end %>
           addDueDateTableElement('metareview', 0, <%= due_date(@assignment, 'metareview').to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
       }());

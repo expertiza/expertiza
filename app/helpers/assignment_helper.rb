@@ -78,8 +78,17 @@ module AssignmentHelper
   end
 
 
-  def questionnaire(assignment, type)
-    questionnaire = assignment.questionnaires.find_by_type(type)
+  def questionnaire(assignment, type,number)
+
+    if number.nil?
+      questionnaire=assignment.questionnaires.find_by_type(type)
+    else
+      ass_ques=assignment.assignment_questionnaires.find_by_used_in_round(number)
+      temp_num=ass_ques.questionnaire_id
+      questionnaire = assignment.questionnaires.find_by_id(temp_num)
+    end
+
+
     if questionnaire.nil?
       questionnaire = Object.const_get(type).new
       questionnaire
@@ -88,8 +97,9 @@ module AssignmentHelper
     end
   end
 
-  def assignment_questionnaire(assignment, type)
+  def assignment_questionnaire(assignment, type,number)
     questionnaire = assignment.questionnaires.find_by_type(type)
+
 
     if questionnaire.nil?
       default_weight = Hash.new
@@ -111,7 +121,11 @@ module AssignmentHelper
       aq.assignment = @assignment
       aq
     else
+      if number.nil?
       assignment.assignment_questionnaires.find_by_questionnaire_id(questionnaire.id)
+      else
+        assignment.assignment_questionnaires.find_by_used_in_round(number)
+      end
     end
   end
 

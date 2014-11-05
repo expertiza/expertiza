@@ -166,15 +166,18 @@
         html += '<td  align="center" class="due_date_description_url" width="10%">';
         html += '<input id="due_date_description_url" type="text" name="due_date[description_url]" value="'+due_date.description_url+'">'+'</td>';
 
-        if (deadline_type == 'review') {
-        html += '<td align="center" width="10%" >' +
-                 '<select id="questionnaire_id" name="due_date[questionnaire_id]">' +
-                '<option value="">--None--</option>';
-        for (i = 0; i < q_options.length; i++) {
-            html += '<option value="' + q_options[i][1] + '">' + q_options[i][0] + '</option>'
-        }
-        html += '</select></td>';
-        }
+
+
+//        Removed the rubrics back to Rubrics partial tab by Xiaoqiang Shao
+//        if (deadline_type == 'review') {
+//        html += '<td align="center" width="10%" >' +
+//                 '<select id="questionnaire_id" name="due_date[questionnaire_id]">' +
+//                '<option value="">--None--</option>';
+//        for (i = 0; i < q_options.length; i++) {
+//            html += '<option value="' + q_options[i][1] + '">' + q_options[i][0] + '</option>'
+//        }
+//        html += '</select></td>';
+//        }
 
 
 
@@ -291,10 +294,10 @@
     <th width=10%>Review allowed</th>
     <!--<th width=10%>Resubmission Allowed</th>-->
     <!--<th width=10%>Re-Review Allowed</th>-->
-    <th width=5%>Meta-review allowed</th>
-    <th width=5%>Reminder(hrs)</th>
-    <th width=5%>Description URL</th>
-    <th width=15%>Questionnaires</th>
+    <th width=10%>Meta-review allowed</th>
+    <th width=10%>Reminder(hrs)</th>
+    <th width=10%>Description URL</th>
+
   </tr>
   <script>
       jQuery(document).ready(function () {

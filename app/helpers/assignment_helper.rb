@@ -84,8 +84,11 @@ module AssignmentHelper
       questionnaire=assignment.questionnaires.find_by_type(type)
     else
       ass_ques=assignment.assignment_questionnaires.find_by_used_in_round(number)
+      # make sure the assignment_questionnaire record is not empty
+      if !ass_ques.nil?
       temp_num=ass_ques.questionnaire_id
       questionnaire = assignment.questionnaires.find_by_id(temp_num)
+      end
     end
 
 
@@ -124,7 +127,14 @@ module AssignmentHelper
       if number.nil?
       assignment.assignment_questionnaires.find_by_questionnaire_id(questionnaire.id)
       else
-        assignment.assignment_questionnaires.find_by_used_in_round(number)
+        assignment_by_usedinround=assignment.assignment_questionnaires.find_by_used_in_round(number)
+        # make sure the assignment found by used in round is not empty
+        if assignment_by_usedinround.nil?
+          assignment.assignment_questionnaires.find_by_questionnaire_id(questionnaire.id)
+        else
+          assignment_by_usedinround
+        end
+
       end
     end
   end

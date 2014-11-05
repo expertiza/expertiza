@@ -48,7 +48,8 @@
 //                html += '<td align="center"><input name="assignment_questionnaires[used_in_round]" type="hidden" value="false"><%= check_box_tag('assignment_questionnaires[used_in_round]', 'true', @teammate_check) %><%= label_tag('assignment_questionnaires[used_in_round]', 'Review rubric vary by round?') %> </td>' +
 //                        '</tr>';
         //try to add used_in_round id
-        html+='<td align="center"><input name="assignment_questionnaire[used_in_round]" style="width:30px" type="text" value="' + assignment_questionnaire.used_in_round + '"> </td>';
+//        html+='<td align="center"><input name="assignment_questionnaire[used_in_round]" style="width:30px" type="text" value="' + assignment_questionnaire.used_in_round + '"> </td>';
+        html+='<td align="center"><input name="assignment_questionnaire[used_in_round]" style="width:30px" type="text" value="' + round_no + '"> </td>';
 
         questionnaire_table.last().after(html);
         jQuery('#questionnaire_id').val(questionnaire.id).attr('id', '');

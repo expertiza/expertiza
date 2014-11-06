@@ -47,7 +47,7 @@ class CourseController < ApplicationController
     end
     @course.update_attributes(params[:course])
     undo_link("Course \"#{@course.name}\" has been updated successfully. ")
-    redirect_to :controller => 'tree_display', :action => 'list'
+    redirect_to tree_display_index_path
   end
 
   def copy
@@ -69,7 +69,7 @@ class CourseController < ApplicationController
 
     rescue
       flash[:error] = 'The course was not able to be copied: '+$!
-      redirect_to :controller => 'tree_display', :action => 'list'
+      redirect_to tree_display_index_path
     end
   end
 
@@ -88,7 +88,7 @@ class CourseController < ApplicationController
       end
       FileHelper.create_directory(@course)
       undo_link("Course \"#{@course.name}\" has been created successfully. ")
-      redirect_to :controller => 'tree_display', :action => 'list'
+      redirect_to tree_display_index_path
     rescue
       flash[:error] = $! #"The following error occurred while saving the course: #"+
         redirect_to :action => 'new'
@@ -111,7 +111,7 @@ class CourseController < ApplicationController
     #}
     @course.destroy
     undo_link("Course \"#{@course.name}\" has been deleted successfully. ")
-    redirect_to :controller => 'tree_display', :action => 'list'
+    redirect_to tree_display_index_path
   end
 
   def toggle_access
@@ -124,7 +124,7 @@ class CourseController < ApplicationController
     end
     @access = @course.private == true ? "private" : "public"
     undo_link("Course \"#{@course.name}\" has been made #{@access} successfully. ")
-    redirect_to :controller => 'tree_display', :action => 'list'
+    redirect_to tree_display_index_path
   end
 
   def view_teaching_assistants

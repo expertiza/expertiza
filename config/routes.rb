@@ -433,7 +433,6 @@ Expertiza::Application.routes.draw do
   resources :tree_display do
     collection do
       get ':action'
-      post 'list'
     end
   end
 

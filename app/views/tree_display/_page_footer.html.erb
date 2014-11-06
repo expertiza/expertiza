@@ -1,11 +1,11 @@
-<% if @child_nodes.length > 0 %>
+<% if child_nodes.length > 0 %>
   <BR/>
   <BR/>
   <TABLE WIDTH="80%" CELLPADDING="5" ID="theTable">
     <TR ID="header"><TH COLSPAN="5" WIDTH="70%">Details</TH><TH WIDTH="10%">Actions</TH></TR>
     <%
         index = 1
-    for node in @child_nodes
+    for node in child_nodes
       if index % 2 == 0
         rowtype = "odd"
       else
@@ -13,7 +13,16 @@
       end
     %>
   <!-- Start Listing -->
-  <%= render :partial=> '/tree_display/entry', :locals => {:search => @search, :node => node, :prefix => node.node_object_id.to_s+"_"+index.to_s, :depth => 0, :rowtype => rowtype} %>
+  <%= render partial: '/tree_display/entry', locals: {
+          search: search,
+          node: node,
+          prefix: node.node_object_id.to_s+"_"+index.to_s,
+          depth: 0,
+          rowtype: rowtype,
+          sortorder: sortorder,
+          sortvar: sortvar,
+
+  } %>
   <!-- End Listing -->
   <%
       index+=1

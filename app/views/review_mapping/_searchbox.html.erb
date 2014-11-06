@@ -7,9 +7,9 @@
     <p> <%= link_to_function("Search", "Element.show('searchform')") %>
     | <%= link_to "Show all", :action => 'review_report', :id => @id %>
   | <%= link_to "Distribution", :action => 'distribution', :id => @id%>
-| <%= link_to 'Back', :controller=> 'tree_display', :action=>'list', :id => @userid%>
+| <%= link_to 'Back', tree_display_index_path, :id => @userid%>
 
-  </p>
+    </p>
 </div>
 
 

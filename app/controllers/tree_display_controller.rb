@@ -48,28 +48,28 @@ class TreeDisplayController < ApplicationController
     search_string = filter if params[:commit] == 'Filter'
     search_string = nil if params[:commit] == 'Reset'
 
-    @search = search_string
+    search = search_string
 
     display = params[:display]
     if display
-      @sortvar = display[:sortvar]
-      @sortorder = display[:sortorder]
+      sortvar = display[:sortvar]
+      sortorder = display[:sortorder]
     end
 
-    @sortvar ||= 'created_at'
-    @sortorder ||= 'desc'
+    sortvar ||= 'created_at'
+    sortorder ||= 'desc'
 
     if session[:root]
-      @root_node = Node.find(session[:root])
-      @child_nodes = @root_node.get_children(@sortvar,@sortorder,session[:user].id,@show,nil,@search)
+      root_node = Node.find(session[:root])
+      child_nodes = root_node.get_children(sortvar,sortorder,session[:user].id,@show,nil,search)
     else
-      @child_nodes = FolderNode.get()
+      child_nodes = FolderNode.get()
     end
-    locals  search:       @search,
-            sortvar:      @sortvar,
-            sortorder:    @sortorder,
-            root_node:    @root_node,
-            child_nodes:  @child_nodes,
+    locals  search:       search,
+            sortvar:      sortvar,
+            sortorder:    sortorder,
+            root_node:    root_node,
+            child_nodes:  child_nodes,
             filternode:   params[:filternode],
             searchnode:   params[:searchnode]
   end

@@ -49,6 +49,8 @@ class Chart
     end
     template
   end
+  
+# Separate function to initializee optional parameters field. Supports Separation of responsibility.
 
   def self.set_template_optional_params(template)
     template[:title][:text] = ""
@@ -57,6 +59,8 @@ class Chart
     template.delete(:xAxis)
     template
   end
+
+#Separate function to validate optional parametrs field which supports separation of responsibility and reduces code duplication.
 
   def self.validate_optional_conf(optionalConf,template)
     if optionalConf[:subtitle].nil? then
@@ -94,6 +98,8 @@ class Chart
       :scatter => get_scatter_template
     }
   end
+  
+  # Generic template to set up bar and line graphs
 
   def self.get_generic_template() #Currently used for bar and line graphs
     {
@@ -136,6 +142,8 @@ class Chart
         ]
     }
   end
+  
+  # Template to set up pie charts
 
   def self.get_pie_template()
     {
@@ -178,6 +186,8 @@ class Chart
                   ]
     }
   end
+  
+  # Bar and line templates basically use the generic template to orient themselves
 
   def self.get_bar_template()
     generic_template = get_generic_template  #Adding :chart object to the generic template

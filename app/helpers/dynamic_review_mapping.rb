@@ -694,7 +694,7 @@ module DynamicReviewMapping
   mappings.each {|mapping|
     #mapping.first=team_id and mapping[1]=users(array) assigned for reviewing this team
 
-    check_assignment_for_review(mapping, user_review_count, user_reviewers_count, users)
+    assign_all_randomly(mapping, user_review_count, user_reviewers_count, users)
   }
 
   message = "<br/> <b>Some students have been assigned more/less than #{number_of_reviews} metareview(s). </b><br/>"
@@ -748,7 +748,8 @@ module DynamicReviewMapping
 
     end
 
-  def check_assignment_for_review(mapping, user_review_count, user_reviewers_count, users)
+  #creates a random mapping
+  def assign_all_randomly(mapping, user_review_count, user_reviewers_count, users)
     for i in 0..mapping[1].size-1
 
       if mapping[1][i].nil?

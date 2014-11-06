@@ -177,6 +177,7 @@ class ResponseController < ApplicationController
       #**********************
       render :action => 'response'
     end
+    @response.email("update")
   end
 
   def edit
@@ -371,7 +372,7 @@ class ResponseController < ApplicationController
     ScoreCache.update_cache(@res)
     #@map.save
     msg = "Your response was successfully saved."
-
+    @response.email();
     redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]
   end
 

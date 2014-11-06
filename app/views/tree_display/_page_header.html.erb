@@ -6,29 +6,29 @@
         Sort by:
         <select name='display[sortvar]' style="width: 10em">
           <option value='name'
-          <% if @sortvar == 'name' %>selected
+          <% if sortvar == 'name' %>selected
           <% end %>>name
           </option>
           <option value='created_at'
-          <% if @sortvar == 'created_at' %>selected
+          <% if sortvar == 'created_at' %>selected
           <% end %>>date created
           </option>
           <option value='updated_at'
-          <% if @sortvar == 'updated_at' %>selected
+          <% if sortvar == 'updated_at' %>selected
           <% end %>>date updated
           </option>
           <option value='directory_path'
-          <% if @sortvar == 'directory_path' %>selected
+          <% if sortvar == 'directory_path' %>selected
           <% end %>>directory path
           </option>
         </select>
         <select name='display[sortorder]' style="width: 10em">
           <option value='desc'
-          <% if @sortorder == 'desc' %>selected
+          <% if sortorder == 'desc' %>selected
           <% end %>>descending
           </option>
           <option value='asc'
-          <% if @sortorder == 'asc' %>selected
+          <% if sortorder == 'asc' %>selected
           <% end %>>ascending
           </option>
         </select>
@@ -43,15 +43,15 @@
 
     <select name='searchnode' style="width: 10em">
       <option value='Q'
-      <% if @searchnode == 'Q' %>selected
+      <% if searchnode == 'Q' %>selected
       <% end %>>Questionnare
       </option>
       <option value='C'
-      <% if @searchnode == 'C' %>selected
+      <% if searchnode == 'C' %>selected
       <% end %>>Courses
       </option>
       <option value='A'
-      <% if @searchnode == 'A' %>selected
+      <% if searchnode == 'A' %>selected
       <% end %>>Assignments
       </option>
     </select>
@@ -65,11 +65,11 @@
     Filter: &nbsp
     <select name='filternode' style="width: 17em">
       <option value='ACN'
-      <% if @filternode == 'ACN' %>selected
+      <% if filternode == 'ACN' %>selected
       <% end %>>Assignment by course name
       </option>
       <option value='QAN'
-      <% if @filternode == 'QAN' %>selected
+      <% if filternode == 'QAN' %>selected
       <% end %>>Questionnare by assignment name
       </option>
     </select>
@@ -79,7 +79,4 @@
     &nbsp &nbsp
     <%= submit_tag("Filter") %>
   </TABLE>
-  <% if @root %>
-    <%= hidden_field_tag('root', @root_node.id) %>
-  <% end %>
 <% end %>

@@ -65,9 +65,22 @@ class TreeDisplayController < ApplicationController
     else
       @child_nodes = FolderNode.get()
     end
+    locals  search:       @search,
+            sortvar:      @sortvar,
+            sortorder:    @sortorder,
+            root_node:    @root_node,
+            child_nodes:  @child_nodes,
+            filternode:   params[:filternode],
+            searchnode:   params[:searchnode]
   end
 
 private
+
+  # render local variable hash for view
+  # reference: http://thepugautomatic.com/2013/05/locals/
+  def locals(values)
+    render locals: values
+  end
 
   def filter
     search = params[:filter_string]

@@ -1,4 +1,18 @@
 <h1>Manage content</h1>
-<%= render partial: 'page_header' %>
-<%= render partial: 'bread_crumbs' %>
-<%=  render partial: 'page_footer' %>
+<%= render partial: 'page_header', locals: {
+      sortvar:    sortvar,
+      sortorder:  sortorder,
+      root_node:  root_node,
+      search:     search,
+      filternode: filternode,
+      searchnode: searchnode
+} %>
+<%= render partial: 'bread_crumbs', locals: { root_node: root_node } %>
+<%= render partial: 'page_footer', locals: {
+      child_nodes:  child_nodes,
+      search:       search,
+      sortvar:      sortvar,
+      sortorder:    sortorder,
+
+
+} %>

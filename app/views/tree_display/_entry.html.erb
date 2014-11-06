@@ -1,12 +1,12 @@
-<% child_nodes = node.get_children(@sortvar,@sortorder,session[:user].id,@show,@search) %>
+<% child_nodes = node.get_children(sortvar,sortorder,session[:user].id,@show,search) %>
 
 <%= render partial: '/tree_display/row_header',
   locals: {
-  depth: depth,
-  prefix: prefix,
-  rowtype: rowtype,
-  parent_node: node,
-  child_nodes: child_nodes
+  depth:        depth,
+  prefix:       prefix,
+  rowtype:      rowtype,
+  parent_node:  node,
+  child_nodes:  child_nodes
 } %>
 <% if node.get_partial_name %>
   <%if node.get_partial_name == 'courses_folder_actions' && session[:user].role_id == 6 %>
@@ -19,9 +19,12 @@
 <% end %>
 <%= render partial: '/tree_display/row_footer',
   locals: {
-  depth: depth,
-  prefix: prefix,
-  parent_node: node,
-  child_nodes: child_nodes,
-  rowtype: nil
+  depth:        depth,
+  prefix:       prefix,
+  parent_node:  node,
+  child_nodes:  child_nodes,
+  rowtype:      nil,
+  sortvar:      sortvar,
+  sortorder:    sortorder,
+  search:       search
 } %>

@@ -1,4 +1,4 @@
-#ruby '2.1.0'
+#ruby '2.1.2'
 
 source 'http://rubygems.org'
 
@@ -57,7 +57,7 @@ group :development do
   gem 'pry'
   gem 'pry-remote'
   gem 'pry-nav'
-  gem 'sqlite3-ruby', :require => 'sqlite3'
+  #gem 'sqlite3-ruby', :require => 'sqlite3'
   gem 'selenium-webdriver'
 end
 

@@ -218,7 +218,7 @@
         });
 
         //2014.10.28 This will make setting rounds button ineffective
-        jQuery('#questionnaire_id').val(questionnaire.id).attr('id', '');
+        //jQuery('#questionnaire_id').val(questionnaire.id).attr('id', '');
     }
     function removeDueDateTableElement(deadline_type, round_no) {
         var element_id;
@@ -301,7 +301,6 @@
   </tr>
   <script>
       jQuery(document).ready(function () {
-
           <% for i in 1..@assignment.rounds_of_reviews %>
           addDueDateTableElement('submission', <%=i%>, <%= due_date(@assignment, 'submission', i-1).to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>); // or use questionnaire_options(@assignment, nil).to_json
           addDueDateTableElement('review', <%=i%>, <%= due_date(@assignment, 'review', i-1).to_json %>, <%= questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>,<%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);

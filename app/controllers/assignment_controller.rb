@@ -137,15 +137,16 @@ class AssignmentController < ApplicationController
   def edit
     @assignment = Assignment.find(params[:id])
     @assignment_questionnaires = AssignmentQuestionnaire.find_all_by_assignment_id(params[:id])
-    @check = nil
+    @reviewvarycheck = nil
     @review_check = nil
+    @avoidrepeatsign = 0
     @metareview_check= nil
     @author_check = nil
     @teammate_check = nil
 
     @assignment_questionnaires.each do  |aq|
       if(!(aq.used_in_round.nil?))
-        @check = 1
+        @reviewvarycheck = 1
         @q_id = aq.questionnaire_id
         @qn = Questionnaire.find(@q_id)
 
@@ -259,8 +260,8 @@ class AssignmentController < ApplicationController
     @assignment_questionnaires = AssignmentQuestionnaire.find_all_by_assignment_id(params[:id])
 
     #10/27/2014 update used_in_round in assignment_questionaire
-    checkbox1 = params[:assignment_questionnaire][:used_in_round]  #is this the value from the form?
-    checked=checkbox1=="true"?true:false
+    # checkbox1 = params[:assignment_questionnaire][:used_in_round]
+    # checked=checkbox1=="true"?true:false
 
    # @assignment_questionnaires.each do  |aq|
    #    if checked

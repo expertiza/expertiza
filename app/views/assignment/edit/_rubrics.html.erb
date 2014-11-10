@@ -7,8 +7,9 @@
 
             html += '<tr id="' + row_id + '">' +
                     '<input name="assignment_questionnaire[assignment_id]" type="hidden" value="' + <%= @assignment.id %> +'">';
-        if (round_no ==0) {
+        if (round_no ==null) {
             html += '<td><label for="questionnaire_id">' + questionnaire.display_type + ':</label></td>';
+     //       html+='<td><input name="assignment_questionnaire[used_in_round]"  type="hidden" value="' + null + '"> </td>';
         }
         else {
             html += '<td><label for="questionnaire_id">' + questionnaire.display_type + round_no + ':</label></td>'
@@ -28,29 +29,33 @@
             html += '<td align="center"><input name="assignment_questionnaire[questionnaire_weight]" style="width:40px" type="text" value="' + assignment_questionnaire.questionnaire_weight + '">% </td>' +
                     '<td align="center"><input name="assignment_questionnaire[notification_limit]" style="width:40px" type="text" value="' + assignment_questionnaire.notification_limit + '">% </td>';
 
-            if (questionnaire.display_type == "Review")
-
-                html += '<td align="center"><input name="assignment_questionnaires[used_in_round]" type="hidden" value="false"><%= check_box_tag('assignment_questionnaires[used_in_round]', 'true', @review_check ) %><%= label_tag('assignment_questionnaires[used_in_round]', 'Review rubric vary by round?') %> </td>' +
-                        '</tr>';
-
-            else if (questionnaire.display_type == "Metareview")
-
-                html += '<td align="center"><input name="assignment_questionnaires[used_in_round]" type="hidden" value="false"><%= check_box_tag('assignment_questionnaires[used_in_round]', 'true', @metareview_check) %><%= label_tag('assignment_questionnaires[used_in_round]', 'Review rubric vary by round?') %> </td>' +
-                        '</tr>';
-
-            else if (questionnaire.display_type == "Author Feedback")
-
-                html += '<td align="center"><input name="assignment_questionnaires[used_in_round]" type="hidden" value="false"><%= check_box_tag('assignment_questionnaires[used_in_round]', 'true', @author_check) %><%= label_tag('assignment_questionnaires[used_in_round]', 'Review rubric vary by round?') %> </td>' +
-                        '</tr>';
-
-            else if (questionnaire.display_type == "Teammate Review")
-
-                html += '<td align="center"><input name="assignment_questionnaires[used_in_round]" type="hidden" value="false"><%= check_box_tag('assignment_questionnaires[used_in_round]', 'true', @teammate_check) %><%= label_tag('assignment_questionnaires[used_in_round]', 'Review rubric vary by round?') %> </td>' +
-                        '</tr>';
+//            if (questionnaire.display_type == "Review")
+//
+//                html += '<td align="center"><input name="assignment_questionnaires[used_in_round]" type="hidden" value="false"><%= check_box_tag('assignment_questionnaires[used_in_round]', 'true', @review_check ) %><%= label_tag('assignment_questionnaires[used_in_round]', 'Review rubric vary by round?') %> </td>' +
+//                        '</tr>';
+//
+//            else if (questionnaire.display_type == "Metareview")
+//
+//                html += '<td align="center"><input name="assignment_questionnaires[used_in_round]" type="hidden" value="false"><%= check_box_tag('assignment_questionnaires[used_in_round]', 'true', @metareview_check) %><%= label_tag('assignment_questionnaires[used_in_round]', 'Review rubric vary by round?') %> </td>' +
+//                        '</tr>';
+//
+//            else if (questionnaire.display_type == "Author Feedback")
+//
+//                html += '<td align="center"><input name="assignment_questionnaires[used_in_round]" type="hidden" value="false"><%= check_box_tag('assignment_questionnaires[used_in_round]', 'true', @author_check) %><%= label_tag('assignment_questionnaires[used_in_round]', 'Review rubric vary by round?') %> </td>' +
+//                        '</tr>';
+//
+//            else if (questionnaire.display_type == "Teammate Review")
+//
+//                html += '<td align="center"><input name="assignment_questionnaires[used_in_round]" type="hidden" value="false"><%= check_box_tag('assignment_questionnaires[used_in_round]', 'true', @teammate_check) %><%= label_tag('assignment_questionnaires[used_in_round]', 'Review rubric vary by round?') %> </td>' +
+//                        '</tr>';
         //try to add used_in_round id
 //        html+='<td align="center"><input name="assignment_questionnaire[used_in_round]" style="width:30px" type="text" value="' + assignment_questionnaire.used_in_round + '"> </td>';
-        html+='<td align="center"><input name="assignment_questionnaire[used_in_round]" style="width:30px" type="hidden" value="' + round_no + '"> </td>';
-
+        if (round_no ==null) {
+            html += '<td align="center"><input name="assignment_questionnaire[used_in_round]" style="width:30px" type="hidden" value=" "' + '"> </td>';
+        }
+        else{
+            html += '<td align="center"><input name="assignment_questionnaire[used_in_round]" style="width:30px" type="hidden" value="' + round_no + '"> </td>';
+        }
         questionnaire_table.last().after(html);
         jQuery('#questionnaire_id').val(questionnaire.id).attr('id', '');
     }
@@ -78,7 +83,12 @@
 
 
 
+
+
 </script>
+
+
+
 
 <script type="text/javascript">
     function metareview_due_date() {
@@ -93,7 +103,79 @@
             metareview.style.display = "none";
         }
     }
+
+    function handleCheckReviewVary(checkvalue) {
+        var state = checkvalue.checked;
+        var round_count = <%= @assignment.rounds_of_reviews%>;
+        if (state == true && round_count >1){
+            //Make it display rounds
+            var element_id;
+            element_id = 'questionnaire_table_' + 'ReviewQuestionnaire';
+            jQuery('#' + element_id).remove();
+            element_id = 'questionnaire_table_' + 'MetareviewQuestionnaire';
+            jQuery('#' + element_id).remove();
+            element_id = 'questionnaire_table_' + 'AuthorFeedbackQuestionnaire';
+            jQuery('#' + element_id).remove();
+            element_id = 'questionnaire_table_' + 'TeammateReviewQuestionnaire';
+            jQuery('#' + element_id).remove();
+            if (<%=@avoidrepeatsign%>==0) {
+                for (i = 1; i <= round_count; i++) {
+                    addQuestionnaireTableRow('ReviewQuestionnaire', i, <%= questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>, <%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>, <%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
+                }
+            }
+            else {
+                return
+            }
+            addQuestionnaireTableRow('MetareviewQuestionnaire', null, <%= questionnaire(@assignment, 'MetareviewQuestionnaire',nil).to_json %>, <%= assignment_questionnaire(@assignment, 'MetareviewQuestionnaire',nil).to_json %>, <%= questionnaire_options(@assignment, 'MetareviewQuestionnaire').to_json %>);
+            addQuestionnaireTableRow('AuthorFeedbackQuestionnaire', null,<%= questionnaire(@assignment, 'AuthorFeedbackQuestionnaire',nil).to_json %>, <%= assignment_questionnaire(@assignment, 'AuthorFeedbackQuestionnaire',nil).to_json %>, <%= questionnaire_options(@assignment, 'AuthorFeedbackQuestionnaire').to_json %>);
+            addQuestionnaireTableRow('TeammateReviewQuestionnaire',null, <%= questionnaire(@assignment, 'TeammateReviewQuestionnaire',nil).to_json %>, <%= assignment_questionnaire(@assignment, 'TeammateReviewQuestionnaire',nil).to_json %>, <%= questionnaire_options(@assignment, 'TeammateReviewQuestionnaire').to_json %>);
+            <%@avoidrepeatsign=1%>;
+        }
+        if (state == false && round_count>1){
+            //Make it display as usual
+
+            //Trial 1, but failed:
+//           var prev= jQuery('#assignment_questionnaire_table>tbody>tr>.heading');
+//           prev.nextAll().remove();
+
+            //Trial 2, succeed:
+            //Delete all the previous ones
+            var element_id;
+            for (i=1;i<=round_count+1;i++) {
+                element_id = 'questionnaire_table_' + 'ReviewQuestionnaire';
+                jQuery('#' + element_id).remove();
+            }
+            element_id = 'questionnaire_table_' + 'MetareviewQuestionnaire';
+            jQuery('#' + element_id).remove();
+            element_id = 'questionnaire_table_' + 'AuthorFeedbackQuestionnaire';
+            jQuery('#' + element_id).remove();
+            element_id = 'questionnaire_table_' + 'TeammateReviewQuestionnaire';
+            jQuery('#' + element_id).remove();
+            //And display original ones
+            addQuestionnaireTableRow('ReviewQuestionnaire',null, <%= questionnaire(@assignment, 'ReviewQuestionnaire',1).to_json %>, <%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire', 1).to_json %>, <%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
+            addQuestionnaireTableRow('MetareviewQuestionnaire', null, <%= questionnaire(@assignment, 'MetareviewQuestionnaire',nil).to_json %>, <%= assignment_questionnaire(@assignment, 'MetareviewQuestionnaire',nil).to_json %>, <%= questionnaire_options(@assignment, 'MetareviewQuestionnaire').to_json %>);
+            addQuestionnaireTableRow('AuthorFeedbackQuestionnaire', null,<%= questionnaire(@assignment, 'AuthorFeedbackQuestionnaire',nil).to_json %>, <%= assignment_questionnaire(@assignment, 'AuthorFeedbackQuestionnaire',nil).to_json %>, <%= questionnaire_options(@assignment, 'AuthorFeedbackQuestionnaire').to_json %>);
+            addQuestionnaireTableRow('TeammateReviewQuestionnaire',null, <%= questionnaire(@assignment, 'TeammateReviewQuestionnaire',nil).to_json %>, <%= assignment_questionnaire(@assignment, 'TeammateReviewQuestionnaire',nil).to_json %>, <%= questionnaire_options(@assignment, 'TeammateReviewQuestionnaire').to_json %>);
+        }
+
+    }
+    function displayfordebug(msg) {
+        var p = document.createElement('p');
+        p.innerHTML = msg;
+        document.body.appendChild(p);
+    }
+
+
 </script>
+
+
+
+<input name="assignment_questionnaire[used_in_round]" type="hidden" value="false" />
+<%= check_box_tag('assignment_questionnaire[used_in_round]', 'true', @reviewvarycheck,:onclick=>"handleCheckReviewVary(this)" ) %>
+<%= label_tag('assignment_questionnaire[used_in_round]', 'Review Varies By Round?') %>
+
+
+
 
 <table class='exp' id='assignment_questionnaire_table' style='padding:10px'>
   <tr class='heading'>
@@ -103,17 +185,20 @@
     <th align='center' width="15%">Notification Limit
       <img src="/images/info.png" title="If two reviews differ by more than this amount, the instructor will be notified by e-mail.">
     </th>
-    <th align='center' width="15%">Review Rubric By Round</th>
-    <th width='30%'></th>
   </tr>
   <script>
       jQuery(document).ready(function () {
+          <% if @reviewvarycheck==1%>
           <% for i in 1..@assignment.rounds_of_reviews %>
           addQuestionnaireTableRow('ReviewQuestionnaire',<%=i%>, <%= questionnaire(@assignment, 'ReviewQuestionnaire',i).to_json %>, <%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire', i).to_json %>, <%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
+         <% end %>
+          <% else %>
+          addQuestionnaireTableRow('ReviewQuestionnaire',null, <%= questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>, <%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire', nil).to_json %>, <%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
           <% end %>
-          addQuestionnaireTableRow('MetareviewQuestionnaire', 0, <%= questionnaire(@assignment, 'MetareviewQuestionnaire',nil).to_json %>, <%= assignment_questionnaire(@assignment, 'MetareviewQuestionnaire',nil).to_json %>, <%= questionnaire_options(@assignment, 'MetareviewQuestionnaire').to_json %>);
-          addQuestionnaireTableRow('AuthorFeedbackQuestionnaire', 0,<%= questionnaire(@assignment, 'AuthorFeedbackQuestionnaire',nil).to_json %>, <%= assignment_questionnaire(@assignment, 'AuthorFeedbackQuestionnaire',nil).to_json %>, <%= questionnaire_options(@assignment, 'AuthorFeedbackQuestionnaire').to_json %>);
-          addQuestionnaireTableRow('TeammateReviewQuestionnaire',0, <%= questionnaire(@assignment, 'TeammateReviewQuestionnaire',nil).to_json %>, <%= assignment_questionnaire(@assignment, 'TeammateReviewQuestionnaire',nil).to_json %>, <%= questionnaire_options(@assignment, 'TeammateReviewQuestionnaire').to_json %>);
+   //       addQuestionnaireTableRow('ReviewQuestionnaire',0, <%= questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>, <%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>, <%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
+          addQuestionnaireTableRow('MetareviewQuestionnaire', null, <%= questionnaire(@assignment, 'MetareviewQuestionnaire',nil).to_json %>, <%= assignment_questionnaire(@assignment, 'MetareviewQuestionnaire',nil).to_json %>, <%= questionnaire_options(@assignment, 'MetareviewQuestionnaire').to_json %>);
+          addQuestionnaireTableRow('AuthorFeedbackQuestionnaire', null,<%= questionnaire(@assignment, 'AuthorFeedbackQuestionnaire',nil).to_json %>, <%= assignment_questionnaire(@assignment, 'AuthorFeedbackQuestionnaire',nil).to_json %>, <%= questionnaire_options(@assignment, 'AuthorFeedbackQuestionnaire').to_json %>);
+          addQuestionnaireTableRow('TeammateReviewQuestionnaire',null, <%= questionnaire(@assignment, 'TeammateReviewQuestionnaire',nil).to_json %>, <%= assignment_questionnaire(@assignment, 'TeammateReviewQuestionnaire',nil).to_json %>, <%= questionnaire_options(@assignment, 'TeammateReviewQuestionnaire').to_json %>);
 
       }());
   </script>

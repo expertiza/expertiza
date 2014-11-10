@@ -29,7 +29,7 @@ module ScatterPlotHelper
 end
 
 module AnalyticHelper
-  #====== generating chart data ================#
+  #====== generic method to generate chart data (chart_type decides which chart to render) ================#
   def get_chart_data(chart_type, object_type, object_id_list, data_type_list)
     data_point = Array.new
     object_model = Object.const_get(object_type.capitalize)
@@ -40,6 +40,7 @@ module AnalyticHelper
       object_data[:data] = gather_data(object, data_type_list)
       data_point << object_data
     end
+    # Formatting the optional parameters field ( pie charts do not support optional parameters )
     if(chart_type !="pie")
       option = Hash.new
       option[:x_axis_categories] =data_type_list

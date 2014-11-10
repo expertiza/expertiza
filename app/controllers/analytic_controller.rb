@@ -3,7 +3,8 @@ class AnalyticController < ApplicationController
   include AnalyticHelper
 
   before_filter :init
-  # List of supported data fields used by all charts (when enabled)
+  # List of supported data fields used by all charts (when enabled). Currently pulled from Bar chart. 
+  # To do: Confirm if Pie charts and Line graphs support the entire same set. If not, eliminate the rest
   def generic_supported_types
     [
       #general

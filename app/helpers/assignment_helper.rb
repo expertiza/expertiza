@@ -75,10 +75,9 @@ module AssignmentHelper
     questionnaire = assignment.questionnaires.find_by_type(type)
     if questionnaire.nil?
       questionnaire = Object.const_get(type).new
-      questionnaire
-    else
-      questionnaire
     end
+
+    questionnaire
   end
 
   def assignment_questionnaire(assignment, type)

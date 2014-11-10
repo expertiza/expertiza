@@ -3,7 +3,7 @@ class AnalyticController < ApplicationController
   include AnalyticHelper
 
   before_filter :init
-
+  # List of supported data fields used by all charts (when enabled)
   def generic_supported_types
     [
       #general
@@ -69,6 +69,7 @@ class AnalyticController < ApplicationController
     #data type by chart type
     @available_data_types[:bar] = generic_supported_types
     @available_data_types[:scatter] = []
+    # Linking the supportd data types to pie chart and line graph so that they can be generated
     @available_data_types[:line] = generic_supported_types
     @available_data_types[:pie] = generic_supported_types
   end
@@ -100,7 +101,7 @@ class AnalyticController < ApplicationController
       end
       return
     end
-
+   # removed conditional statemets to use one generic function to generate charts
     chart_data = get_chart_data(params[:type],params[:scope], params[:id], params[:data_type])
 
     respond_to do |format|

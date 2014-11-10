@@ -117,10 +117,6 @@
                 '" name="due_date[due_at]" style="width: 200px" type="text" value="' +
                 due_at + '">' + '</td>';
 
-        html += '<td  align="center" class="due_date_name" width="15%">';
-        html += '<input id="due_date_name" type="text" name="due_date[deadline_name]" value="'+due_date.deadline_name+'">'+'</td>';
-
-
 
         html += '<td align="center" class="due_date_due_at" width="10%">' +
                 '<select id="due_date_submission_allowed_id" name="due_date[submission_allowed_id]">' +
@@ -163,25 +159,11 @@
                 '<option value="96">96</option>' +
                 '</select></td>';
 
-        html += '<td  align="center" class="due_date_description_url" width="10%">';
+        html += '<td  align="center" id="specialname" class="due_date_name" width="15%">';
+        html += '<input id="due_date_name" type="text" name="due_date[deadline_name]" value="'+due_date.deadline_name+'">'+'</td>';
+
+        html += '<td  align="center" id="due_date_url_col" class="due_date_description_url" width="10%">';
         html += '<input id="due_date_description_url" type="text" name="due_date[description_url]" value="'+due_date.description_url+'">'+'</td>';
-
-
-
-//        Removed the rubrics back to Rubrics partial tab by Xiaoqiang Shao
-//        if (deadline_type == 'review') {
-//        html += '<td align="center" width="10%" >' +
-//                 '<select id="questionnaire_id" name="due_date[questionnaire_id]">' +
-//                '<option value="">--None--</option>';
-//        for (i = 0; i < q_options.length; i++) {
-//            html += '<option value="' + q_options[i][1] + '">' + q_options[i][0] + '</option>'
-//        }
-//        html += '</select></td>';
-//        }
-
-
-
-
 
 
         previous_element.after(html);
@@ -220,6 +202,7 @@
         //2014.10.28 This will make setting rounds button ineffective
         //jQuery('#questionnaire_id').val(questionnaire.id).attr('id', '');
     }
+
     function removeDueDateTableElement(deadline_type, round_no) {
         var element_id;
         if (round_no == 0) {
@@ -246,32 +229,19 @@
             }
             jQuery.get("/assignment/set_due_date" + para);
         }
-
-
     }
-
-
-
-//    2014.10.28 Add submit_assignment_questionnaires()
-//    need to add set_assignment_questionnaires()
-//    function submit_assignment_questionnaires() {
-//        var data, para, fields, i, j;
-//        //delete old assignment_questionnaires
-//        jQuery.get("/assignment/delete_all_assignment_questionnaires?assignment_id=" + <%= @assignment.id %>);    //create the new assignment_questionnaires
-//        data = jQuery('#due_date_name'); //Want to select the questionnaire ID and save it to the assignment_questionnaires table
-//
-//        for (i = 0; i < data.length; i++) {
-//            fields = jQuery(data[i]).find('input,select');
-//            para = "?"
-//            j = fields.length
-//            para += "&" + (fields[j].name + "=" + fields[j].value);//assume the last field is questionnaire id
-//
-//            jQuery.get("/assignment/set_questionnaire" + para);
-//        }
-//    }
-
-
-
+    //trying to add a function to change dispalying status of due_date_name and description_url, but it can't change the style of <td> element.
+    function hideshow(which1){
+        if (!document.getElementById) {
+            return;
+        }
+        if(which1.style.visibility=="hidden"){
+            which1.style.visibility="visible";
+        }
+        else {
+            which1.style.visibility="hidden";
+        }
+    }
 
 </script>
 
@@ -285,20 +255,22 @@
   <%= button_to_function('Set', 'changeReviewRounds()') %>
 </div>
 
-<table class='exp' id='due_dates_table' style='padding:10px'>
+<table class='exp' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden;'>
+
   <tr id='due_date_heading'>
     <th width=15%>Deadline type</th>
     <th width=25%>Date & time</th>
-    <th width=10%>Due Date Name</th>
     <th width=10%>Submission allowed</th>
     <th width=10%>Review allowed</th>
     <!--<th width=10%>Resubmission Allowed</th>-->
     <!--<th width=10%>Re-Review Allowed</th>-->
     <th width=10%>Meta-review allowed</th>
     <th width=10%>Reminder(hrs)</th>
-    <th width=10%>Description URL</th>
+    <th width=10% id="due_date_name_column">Due Date Name</th>
+    <th width=10% id="due_date_url_column">Description URL</th>
 
   </tr>
+  <tr id='blank' style='display: hidden'></tr>
   <script>
       jQuery(document).ready(function () {
           <% for i in 1..@assignment.rounds_of_reviews %>

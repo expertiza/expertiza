@@ -51,14 +51,7 @@ module AssignmentHelper
   #retrive or create a due_date
   # use in views/assignment/edit.html.erb
   def due_date(assignment, type, round = 0)
-
-
     due_dates = assignment.find_due_dates(type)
-    if type == 'submission'
-      due_dates += assignment.find_due_dates('resubmission')
-    elsif type == 'review'
-      due_dates += assignment.find_due_dates('rereview')
-    end
 
     due_dates.delete_if { |due_date| due_date.due_at.nil? }
     due_dates.sort! { |x, y| x.due_at <=> y.due_at }

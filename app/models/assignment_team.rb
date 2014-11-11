@@ -44,10 +44,6 @@ class AssignmentTeam < Team
 
   # END of contributor methods
 
-  def participants
-    @participants ||= AssignmentParticipant.all(conditions: ['parent_id = ? && user_id IN (?)', parent_id, users])
-  end
-
   def delete
     if read_attribute(:type) == 'AssignmentTeam'
       sign_up = SignedUpUser.find_team_participants(parent_id.to_s).select{|p| p.creator_id == self.id}

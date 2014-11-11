@@ -47,8 +47,13 @@ class AssignmentTeam < Team
   def delete
     if read_attribute(:type) == 'AssignmentTeam'
       sign_up = SignedUpUser.find_team_participants(parent_id.to_s).select{|p| p.creator_id == self.id}
-      sign_up.each &:destroy
+      sign_up.each(&:destroy)
     end
+    super
+  end
+
+  def destroy
+    response_maps.each(&:destroy)
     super
   end
 

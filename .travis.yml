@@ -17,7 +17,6 @@ before_install:
     - sudo apt-get install graphviz
     - unset RAILS_ENV
     - rvm rubygems 1.8.23
-    - gem install debugger
     - gem install raspell -- --with-ruby-include=$rvm_path/src/ruby-1.9.3-head/
     - bundle config build.raspell --with-opt-dir=
 before_script:

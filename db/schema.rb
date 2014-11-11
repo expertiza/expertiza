@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140808212437) do
+ActiveRecord::Schema.define(version: 20141111010259) do
 
   create_table "assignment_questionnaires", force: true do |t|
     t.integer "assignment_id"
@@ -29,45 +29,45 @@ ActiveRecord::Schema.define(version: 20140808212437) do
   create_table "assignments", force: true do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "name"
+    t.string   "directory_path"
+    t.integer  "submitter_count",                   default: 0,     null: false
+    t.integer  "course_id",                         default: 0
+    t.integer  "instructor_id",                     default: 0
+    t.boolean  "private",                           default: false, null: false
+    t.integer  "num_reviews",                       default: 0,     null: false
+    t.integer  "num_review_of_reviews",             default: 0,     null: false
+    t.integer  "num_review_of_reviewers",           default: 0,     null: false
+    t.integer  "review_questionnaire_id"
+    t.integer  "review_of_review_questionnaire_id"
+    t.integer  "teammate_review_questionnaire_id"
+    t.boolean  "reviews_visible_to_all"
+    t.integer  "wiki_type_id",                      default: 0,     null: false
+    t.boolean  "require_signup"
+    t.integer  "num_reviewers",                     default: 0,     null: false
+    t.text     "spec_location"
+    t.integer  "author_feedback_questionnaire_id"
+    t.integer  "max_team_size",                     default: 0,     null: false
+    t.boolean  "staggered_deadline"
     t.boolean  "allow_suggestions"
+    t.integer  "days_between_submissions"
+    t.string   "review_assignment_strategy"
+    t.integer  "max_reviews_per_submission"
+    t.integer  "review_topic_threshold",            default: 0
     t.boolean  "availability_flag"
-    t.boolean  "calculate_penalty",                 default: false, null: false
     t.boolean  "copy_flag",                         default: false
+    t.integer  "rounds_of_reviews",                 default: 1
+    t.boolean  "microtask",                         default: false
+    t.integer  "selfreview_questionnaire_id"
+    t.integer  "managerreview_questionnaire_id"
+    t.integer  "readerreview_questionnaire_id"
+    t.boolean  "require_quiz"
+    t.integer  "num_quiz_questions",                default: 0,     null: false
     t.boolean  "is_coding_assignment"
     t.boolean  "is_intelligent"
-    t.boolean  "is_penalty_calculated",             default: false, null: false
-    t.boolean  "microtask",                         default: false
-    t.boolean  "private",                           default: false, null: false
-    t.boolean  "require_quiz"
-    t.boolean  "require_signup"
-    t.boolean  "reviews_visible_to_all"
-    t.boolean  "staggered_deadline"
-    t.integer  "author_feedback_questionnaire_id"
-    t.integer  "course_id",                         default: 0
-    t.integer  "days_between_submissions"
-    t.integer  "instructor_id",                     default: 0
+    t.boolean  "calculate_penalty",                 default: false, null: false
     t.integer  "late_policy_id"
-    t.integer  "managerreview_questionnaire_id"
-    t.integer  "max_reviews_per_submission"
-    t.integer  "max_team_size",                     default: 0,     null: false
-    t.integer  "num_quiz_questions",                default: 0,     null: false
-    t.integer  "num_review_of_reviewers",           default: 0,     null: false
-    t.integer  "num_review_of_reviews",             default: 0,     null: false
-    t.integer  "num_reviewers",                     default: 0,     null: false
-    t.integer  "num_reviews",                       default: 0,     null: false
-    t.integer  "readerreview_questionnaire_id"
-    t.integer  "review_of_review_questionnaire_id"
-    t.integer  "review_questionnaire_id"
-    t.integer  "review_topic_threshold",            default: 0
-    t.integer  "rounds_of_reviews",                 default: 1
-    t.integer  "selfreview_questionnaire_id"
-    t.integer  "submitter_count",                   default: 0,     null: false
-    t.integer  "teammate_review_questionnaire_id"
-    t.integer  "wiki_type_id",                      default: 0,     null: false
-    t.string   "directory_path"
-    t.string   "name"
-    t.string   "review_assignment_strategy"
-    t.text     "spec_location"
+    t.boolean  "is_penalty_calculated",             default: false, null: false
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -438,7 +438,10 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.datetime "updated_at"
   end
 
+  add_index "response_maps", ["reviewed_object_id"], name: "index_response_maps_on_reviewed_object_id", using: :btree
+  add_index "response_maps", ["reviewee_id"], name: "index_response_maps_on_reviewee_id", using: :btree
   add_index "response_maps", ["reviewer_id"], name: "fk_response_map_reviewer", using: :btree
+  add_index "response_maps", ["reviewer_id"], name: "index_response_maps_on_reviewer_id", using: :btree
 
   create_table "responses", force: true do |t|
     t.integer  "map_id",             default: 0, null: false
@@ -449,6 +452,7 @@ ActiveRecord::Schema.define(version: 20140808212437) do
   end
 
   add_index "responses", ["map_id"], name: "fk_response_response_map", using: :btree
+  add_index "responses", ["map_id"], name: "index_responses_on_map_id", using: :btree
 
   create_table "resubmission_times", force: true do |t|
     t.integer  "participant_id"
@@ -503,6 +507,8 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.string  "range",                  default: ""
     t.string  "object_type",            default: "",  null: false
   end
+
+  add_index "score_caches", ["reviewee_id"], name: "index_score_caches_on_reviewee_id", using: :btree
 
   create_table "score_views", id: false, force: true do |t|
     t.integer  "question_weight"
@@ -708,6 +714,7 @@ ActiveRecord::Schema.define(version: 20140808212437) do
 
   add_index "teams_users", ["team_id"], name: "fk_users_teams", using: :btree
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
+  add_index "teams_users", ["user_id"], name: "index_teams_users_on_user_id", using: :btree
 
   create_table "topic_deadlines", force: true do |t|
     t.datetime "due_at"
@@ -756,7 +763,7 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.boolean "email_on_submission"
     t.boolean "email_on_review_of_review"
     t.boolean "is_new_user",                           default: true,  null: false
-    t.integer "master_permission_granted",             default: 0
+    t.integer "master_permission_granted", limit: 1,   default: 0
     t.string  "handle"
     t.boolean "leaderboard_privacy",                   default: false
     t.text    "digital_certificate"

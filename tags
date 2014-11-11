@@ -487,6 +487,7 @@ AddDynamicReviewFieldsToAssignments	db/migrate/20101116184602_add_dynamic_review
 AddFlagThreToDueDates	db/migrate/125_add_flag_thre_to_due_dates.rb	/^class AddFlagThreToDueDates < ActiveRecord::Migration$/;"	c
 AddHandleToParticipants	db/migrate/090_add_handle_to_participants.rb	/^class AddHandleToParticipants < ActiveRecord::Migration$/;"	c
 AddHandleToUsers	db/migrate/089_add_handle_to_users.rb	/^class AddHandleToUsers < ActiveRecord::Migration$/;"	c
+AddIndexToResponseMaps	db/migrate/20141111010259_add_index_to_response_maps.rb	/^class AddIndexToResponseMaps < ActiveRecord::Migration$/;"	c
 AddInitialAndFinalLineNumberToReviewComments	db/migrate/20131117022508_add_initial_and_final_line_number_to_review_comments.rb	/^class AddInitialAndFinalLineNumberToReviewComments < ActiveRecord::Migration$/;"	c
 AddInstructionLocToQuestionnaire	db/migrate/20111201222103_add_instruction_loc_to_questionnaire.rb	/^class AddInstructionLocToQuestionnaire < ActiveRecord::Migration$/;"	c
 AddIsLotteryToAssignments	db/migrate/20131120032234_add_is_lottery_to_assignments.rb	/^class AddIsLotteryToAssignments < ActiveRecord::Migration$/;"	c
@@ -1057,6 +1058,7 @@ Libraries	coverage/cucumber/index.html	/^  <a name="Libraries"><\/a>$/;"	a
 Line	app/helpers/diff_helper.rb	/^    class Line < String$/;"	c	class:DiffHelper.OutputFile
 Line	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/backtrace.rb	/^    class Line$/;"	c	class:HoptoadNotifier.Backtrace
 LineGraphHelper	app/helpers/analytic_helper.rb	/^module LineGraphHelper$/;"	m
+LogInHelper	spec/features/helpers/login_helper.rb	/^module LogInHelper$/;"	m
 LoggerTest	vendor/gems/hoptoad_notifier-2.4.4/test/logger_test.rb	/^class LoggerTest < Test::Unit::TestCase$/;"	c
 LotteryController	app/controllers/lottery_controller.rb	/^class LotteryController < ApplicationController$/;"	c
 LotteryControllerTest	test/functional/lottery_controller_test.rb	/^class LotteryControllerTest < ActionController::TestCase$/;"	c
@@ -1637,6 +1639,7 @@ action_allowed?	app/controllers/import_file_controller.rb	/^  def action_allowed
 action_allowed?	app/controllers/institutions_controller.rb	/^  def action_allowed?$/;"	f	class:InstitutionsController
 action_allowed?	app/controllers/invitation_controller.rb	/^  def action_allowed?$/;"	f	class:InvitationController
 action_allowed?	app/controllers/join_team_requests_controller.rb	/^  def action_allowed?$/;"	f	class:JoinTeamRequestsController
+action_allowed?	app/controllers/late_policies_controller.rb	/^  def action_allowed?$/;"	f	class:LatePoliciesController
 action_allowed?	app/controllers/leaderboard_controller.rb	/^  def action_allowed?$/;"	f	class:LeaderboardController
 action_allowed?	app/controllers/markup_styles_controller.rb	/^  def action_allowed?$/;"	f	class:MarkupStylesController
 action_allowed?	app/controllers/menu_items_controller.rb	/^  def action_allowed?$/;"	f	class:MenuItemsController
@@ -1813,7 +1816,7 @@ assignment_questionnaire	app/helpers/assignment_helper.rb	/^  def assignment_que
 assignment_review_counts	app/models/analytic/course_analytic.rb	/^  def assignment_review_counts$/;"	f	class:CourseAnalytic
 assignment_team_counts	app/models/analytic/course_analytic.rb	/^  def assignment_team_counts$/;"	f	class:CourseAnalytic
 associate_assignment_to_course	app/controllers/assignment_controller.rb	/^      def associate_assignment_to_course$/;"	f	class:AssignmentController
-associate_assignment_to_course	app/controllers/assignments_controller.rb	/^    def associate_assignment_to_course$/;"	f	class:AssignmentsController.copy
+associate_assignment_with_course	app/controllers/assignments_controller.rb	/^    def associate_assignment_with_course$/;"	f	class:AssignmentsController.copy
 associated_courses	app/helpers/course_helper.rb	/^  def associated_courses(user)$/;"	f	class:CourseHelper
 authorised	app/controllers/auth_controller.rb	/^  def self.authorised?(session, params)$/;"	F	class:AuthController
 authorize	app/helpers/access_helper.rb	/^  def authorize$/;"	f	class:AccessHelper
@@ -1912,6 +1915,7 @@ candidate_topics_for_quiz	app/models/assignment.rb	/^  def candidate_topics_for_
 candidate_topics_to_review	app/models/assignment.rb	/^  def candidate_topics_to_review(reviewer)$/;"	f	class:Assignment
 capistrano_hook	vendor/gems/hoptoad_notifier-2.4.4/generators/hoptoad/hoptoad_generator.rb	/^  def capistrano_hook$/;"	f
 capitalize	app/assets/javascripts/application.js	/^function capitalize(str) {$/;"	f
+change	db/migrate/20141111010259_add_index_to_response_maps.rb	/^  def change$/;"	f	class:AddIndexToResponseMaps
 change_cell	app/helpers/dynamic_review_mapping.rb	/^        def change_cell(row, column, value)$/;"	f	class:DynamicReviewMapping.assign_reviewers_for_team.restore.populate_row_matrices.populate_column_matrices
 change_handle	app/controllers/participants_controller.rb	/^  def change_handle$/;"	f	class:ParticipantsController
 character_count	app/models/analytic/question_analytic.rb	/^  def character_count$/;"	f	class:QuestionAnalytic
@@ -2081,7 +2085,7 @@ create	app/controllers/institution_controller.rb	/^  def create$/;"	f	class:Inst
 create	app/controllers/institutions_controller.rb	/^  def create$/;"	f	class:InstitutionsController
 create	app/controllers/invitation_controller.rb	/^  def create$/;"	f	class:InvitationController
 create	app/controllers/join_team_requests_controller.rb	/^  def create$/;"	f	class:JoinTeamRequestsController
-create	app/controllers/late_policies_controller.rb	/^  def create$/;"	f	class:LatePoliciesController
+create	app/controllers/late_policies_controller.rb	/^  def create$/;"	f
 create	app/controllers/markup_styles_controller.rb	/^  def create$/;"	f	class:MarkupStylesController
 create	app/controllers/menu_items_controller.rb	/^  def create$/;"	f	class:MenuItemsController
 create	app/controllers/permissions_controller.rb	/^  def create$/;"	f	class:PermissionsController
@@ -2250,7 +2254,7 @@ destroy	app/controllers/controller_actions_controller.rb	/^  def destroy$/;"	f	c
 destroy	app/controllers/institution_controller.rb	/^  def destroy$/;"	f	class:InstitutionController
 destroy	app/controllers/institutions_controller.rb	/^  def destroy$/;"	f	class:InstitutionsController
 destroy	app/controllers/join_team_requests_controller.rb	/^  def destroy$/;"	f	class:JoinTeamRequestsController
-destroy	app/controllers/late_policies_controller.rb	/^def destroy$/;"	f	class:LatePoliciesController
+destroy	app/controllers/late_policies_controller.rb	/^def destroy$/;"	f
 destroy	app/controllers/markup_styles_controller.rb	/^  def destroy$/;"	f	class:MarkupStylesController
 destroy	app/controllers/menu_items_controller.rb	/^def destroy$/;"	f	class:MenuItemsController
 destroy	app/controllers/permissions_controller.rb	/^  def destroy$/;"	f	class:PermissionsController
@@ -2263,6 +2267,7 @@ destroy	app/controllers/system_settings_controller.rb	/^  def destroy$/;"	f	clas
 destroy	app/controllers/users_controller.rb	/^        def destroy$/;"	f	class:UsersController
 destroy	app/controllers/versions_controller.rb	/^  def destroy$/;"	f	class:VersionsController
 destroy	app/controllers/waitlists_controller.rb	/^  def destroy$/;"	f	class:WaitlistsController
+destroy	app/models/assignment_team.rb	/^  def destroy$/;"	f	class:AssignmentTeam
 destroy_all	app/controllers/versions_controller.rb	/^  def destroy_all$/;"	f	class:VersionsController
 determine_api_key	vendor/gems/hoptoad_notifier-2.4.4/generators/hoptoad/hoptoad_generator.rb	/^  def determine_api_key$/;"	f
 determine_api_key	vendor/gems/hoptoad_notifier-2.4.4/lib/rails/generators/hoptoad/hoptoad_generator.rb	/^  def determine_api_key$/;"	f
@@ -2572,7 +2577,7 @@ edit	app/controllers/grades_controller.rb	/^  def edit$/;"	f	class:GradesControl
 edit	app/controllers/institution_controller.rb	/^  def edit$/;"	f	class:InstitutionController
 edit	app/controllers/institutions_controller.rb	/^  def edit$/;"	f	class:InstitutionsController
 edit	app/controllers/join_team_requests_controller.rb	/^  def edit$/;"	f	class:JoinTeamRequestsController
-edit	app/controllers/late_policies_controller.rb	/^  def edit$/;"	f	class:LatePoliciesController
+edit	app/controllers/late_policies_controller.rb	/^  def edit$/;"	f
 edit	app/controllers/markup_styles_controller.rb	/^  def edit$/;"	f	class:MarkupStylesController
 edit	app/controllers/menu_items_controller.rb	/^  def edit$/;"	f	class:MenuItemsController
 edit	app/controllers/permissions_controller.rb	/^  def edit$/;"	f	class:PermissionsController
@@ -2939,7 +2944,6 @@ get_participant_type	app/models/assignment_team.rb	/^      def get_participant_t
 get_participant_type	app/models/course_team.rb	/^  def get_participant_type$/;"	f	class:CourseTeam
 get_participants	app/models/assignment_team.rb	/^      def get_participants$/;"	f	class:AssignmentTeam
 get_participants	app/models/course.rb	/^  def get_participants$/;"	f	class:Course
-get_participants	app/models/team.rb	/^  def get_participants$/;"	f	class:Team
 get_path	app/controllers/assignment_controller.rb	/^      def get_path$/;"	f	class:AssignmentController
 get_path	app/controllers/assignments_controller.rb	/^  def get_path$/;"	f	class:AssignmentsController
 get_path	app/models/assignment.rb	/^  def get_path$/;"	f	class:Assignment
@@ -3161,7 +3165,7 @@ index	app/controllers/controller_actions_controller.rb	/^  def index$/;"	f	class
 index	app/controllers/institution_controller.rb	/^  def index$/;"	f	class:InstitutionController
 index	app/controllers/institutions_controller.rb	/^  def index$/;"	f	class:InstitutionsController
 index	app/controllers/join_team_requests_controller.rb	/^  def index$/;"	f	class:JoinTeamRequestsController
-index	app/controllers/late_policies_controller.rb	/^  def index$/;"	f	class:LatePoliciesController
+index	app/controllers/late_policies_controller.rb	/^  def index$/;"	f
 index	app/controllers/leaderboard_controller.rb	/^  def index$/;"	f	class:LeaderboardController
 index	app/controllers/markup_styles_controller.rb	/^  def index$/;"	f	class:MarkupStylesController
 index	app/controllers/menu_items_controller.rb	/^  def index$/;"	f	class:MenuItemsController
@@ -3247,6 +3251,7 @@ inspect	vendor/plugins/graphr-0-1-9/lib/graph/directed_graph.rb	/^  def inspect$
 install	vendor/gems/hoptoad_notifier-2.4.4/lib/rails/generators/hoptoad/hoptoad_generator.rb	/^  def install$/;"	f	class:HoptoadGenerator
 install	vendor/plugins/graphr-0-1-9/install.rb	/^def install$/;"	f
 instructor	app/models/role.rb	/^  def self.instructor$/;"	F	class:Role
+instructor	spec/features/helpers/login_helper.rb	/^  def instructor$/;"	f	class:LogInHelper
 instructorCourses	app/helpers/leaderboard_helper.rb	/^  def self.instructorCourses(userid)$/;"	F	class:LeaderboardHelper
 instructor_id	app/models/user.rb	/^  def instructor_id$/;"	f	class:User
 instructor_review	app/controllers/grades_controller.rb	/^  def instructor_review$/;"	f	class:GradesController
@@ -3264,7 +3269,7 @@ is_leaf	app/models/node.rb	/^  def is_leaf$/;"	f	class:Node
 is_leaf	app/models/questionnaire_node.rb	/^  def is_leaf$/;"	f	class:QuestionnaireNode.get
 is_leaf	app/models/team_user_node.rb	/^  def is_leaf$/;"	f	class:TeamUserNode
 is_microtask?	app/models/assignment.rb	/^  def is_microtask?$/;"	f	class:Assignment
-is_numeric?	app/controllers/late_policies_controller.rb	/^def is_numeric?(obj)$/;"	f	class:LatePoliciesController
+is_numeric?	app/controllers/late_policies_controller.rb	/^def is_numeric?(obj)$/;"	f
 is_other_topic_of_higher_priority	app/controllers/lottery_controller.rb	/^def is_other_topic_of_higher_priority(assignment_id, team_id, priority,current_max_slots)$/;"	f	class:LotteryController
 is_submission_possible	app/models/assignment.rb	/^  def self.is_submission_possible (assignment)$/;"	F	class:Assignment
 is_teaching_assistant?	app/models/ta.rb	/^  def is_teaching_assistant?$/;"	f	class:Ta
@@ -3365,6 +3370,7 @@ load_add_signup_topics	app/controllers/sign_up_sheet_controller.rb	/^      def l
 local_request?	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/tasks.rb	/^      def local_request?$/;"	f	class:ApplicationController
 local_request?	vendor/gems/hoptoad_notifier-2.4.4/test/catcher_test.rb	/^      def local_request?$/;"	f	class:ActionControllerCatcherTest.process_action
 log	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/sender.rb	/^    def log(level, message, response = nil)$/;"	f	class:HoptoadNotifier.Sender
+log_in	spec/features/helpers/login_helper.rb	/^  def log_in(name, password)$/;"	f	class:LogInHelper
 logged_in?	app/controllers/application_controller.rb	/^  def logged_in?$/;"	f	class:ApplicationController
 logger	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier.rb	/^    def logger$/;"	f	class:HoptoadNotifier
 logger	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/rails3_tasks.rb	/^      def logger$/;"	f	class:ApplicationController
@@ -3471,7 +3477,7 @@ new	app/controllers/institution_controller.rb	/^  def new$/;"	f	class:Institutio
 new	app/controllers/institutions_controller.rb	/^  def new$/;"	f	class:InstitutionsController
 new	app/controllers/invitation_controller.rb	/^  def new$/;"	f	class:InvitationController
 new	app/controllers/join_team_requests_controller.rb	/^  def new$/;"	f	class:JoinTeamRequestsController
-new	app/controllers/late_policies_controller.rb	/^  def new$/;"	f	class:LatePoliciesController
+new	app/controllers/late_policies_controller.rb	/^  def new$/;"	f
 new	app/controllers/markup_styles_controller.rb	/^  def new$/;"	f	class:MarkupStylesController
 new	app/controllers/menu_items_controller.rb	/^  def new$/;"	f	class:MenuItemsController
 new	app/controllers/permissions_controller.rb	/^  def new$/;"	f	class:PermissionsController
@@ -3547,7 +3553,7 @@ parse	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/backtrace.rb	/^   
 parse	vendor/gems/hoptoad_notifier-2.4.4/lib/hoptoad_notifier/backtrace.rb	/^    def self.parse(ruby_backtrace, opts = {})$/;"	F	class:HoptoadNotifier.Backtrace
 parseDate	app/assets/javascripts/CalendarPopup.js	/^function parseDate(val){var preferEuro=(arguments.length==2)?arguments[1]:false;generalFormats=new Array('y-M-d','MMM d, y','MMM d,y','y-MMM-d','d-MMM-y','MMM d');monthFirst=new Array('M\/d\/y','M-d-y','M.d.y','MMM-d','M\/d','M-d');dateFirst =new Array('d\/M\/y','d-M-y','d.M.y','d-MMM','d\/M','d-M');var checkList=new Array('generalFormats',preferEuro?'dateFirst':'monthFirst',preferEuro?'monthFirst':'dateFirst');var d=null;for(var i=0;i<checkList.length;i++){var l=window[checkList[i]];for(var j=0;j<l.length;j++){d=getDateFromFormat(val,l[j]);if(d!=0){return new Date(d);}}}return null;}$/;"	f
 parse_line	app/controllers/import_file_controller.rb	/^  def parse_line(line, delimiter)$/;"	f
-participants	app/models/assignment_team.rb	/^  def participants$/;"	f	class:AssignmentTeam
+participants	app/models/team.rb	/^  def participants$/;"	f	class:Team
 participants_in	app/controllers/users_controller.rb	/^  def self.participants_in(assignment_id)$/;"	F	class:UsersController
 participants_popup	app/controllers/popup_controller.rb	/^  def participants_popup$/;"	f	class:PopupController
 path_to	features/support/paths.rb	/^  def path_to(page_name)$/;"	f	class:NavigationHelpers
@@ -3702,6 +3708,8 @@ resources	vendor/plugins/rails_upgrade/lib/routes_upgrader.rb	/^      def resour
 response_id	app/models/response.rb	/^  def response_id$/;"	f	class:Response
 response_map_to_metareview	app/models/assignment.rb	/^  def response_map_to_metareview(metareviewer)$/;"	f	class:Assignment
 response_maps	app/models/student_task.rb	/^  def response_maps$/;"	f	class:StudentTask.from_user
+responses	app/models/participant.rb	/^  def responses$/;"	f	class:Participant
+responses	app/models/team.rb	/^  def responses$/;"	f	class:Team
 restore	app/helpers/dynamic_review_mapping.rb	/^        def restore()$/;"	f	class:DynamicReviewMapping.assign_reviewers_for_team
 revert	app/controllers/versions_controller.rb	/^  def revert$/;"	f	class:VersionsController
 review	app/controllers/student_team_controller.rb	/^  def review$/;"	f	class:StudentTeamController
@@ -3914,7 +3922,7 @@ show	app/controllers/controller_actions_controller.rb	/^  def show$/;"	f	class:C
 show	app/controllers/institution_controller.rb	/^  def show$/;"	f	class:InstitutionController
 show	app/controllers/institutions_controller.rb	/^  def show$/;"	f	class:InstitutionsController
 show	app/controllers/join_team_requests_controller.rb	/^  def show$/;"	f	class:JoinTeamRequestsController
-show	app/controllers/late_policies_controller.rb	/^  def show$/;"	f	class:LatePoliciesController
+show	app/controllers/late_policies_controller.rb	/^  def show$/;"	f
 show	app/controllers/markup_styles_controller.rb	/^  def show$/;"	f	class:MarkupStylesController
 show	app/controllers/menu_items_controller.rb	/^  def show$/;"	f	class:MenuItemsController
 show	app/controllers/permissions_controller.rb	/^  def show$/;"	f	class:PermissionsController
@@ -4916,7 +4924,7 @@ update	app/controllers/grades_controller.rb	/^    def update$/;"	f	class:GradesC
 update	app/controllers/institution_controller.rb	/^  def update$/;"	f	class:InstitutionController
 update	app/controllers/institutions_controller.rb	/^  def update$/;"	f	class:InstitutionsController
 update	app/controllers/join_team_requests_controller.rb	/^  def update$/;"	f	class:JoinTeamRequestsController
-update	app/controllers/late_policies_controller.rb	/^def update$/;"	f	class:LatePoliciesController
+update	app/controllers/late_policies_controller.rb	/^def update$/;"	f
 update	app/controllers/markup_styles_controller.rb	/^  def update$/;"	f	class:MarkupStylesController
 update	app/controllers/menu_items_controller.rb	/^  def update$/;"	f	class:MenuItemsController
 update	app/controllers/permissions_controller.rb	/^  def update$/;"	f	class:PermissionsController

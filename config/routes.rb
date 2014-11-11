@@ -165,7 +165,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  get 'late_policies', controller: :late_policies, action: :index
+  resources 'late_policies'
 
   resources :leaderboard, constraints: {id: /\d+/} do
     collection do

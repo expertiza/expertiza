@@ -62,9 +62,7 @@ class AssignmentTeam < Team
   end
 
   def get_hyperlinks
-    links = Array.new
-    self.get_participants.each { |team_member| links.concat(team_member.get_hyperlinks_array) }
-    links
+    get_participants.flat_map(&:get_hyperlinks_array).uniq
   end
 
   def get_path
@@ -138,16 +136,6 @@ class AssignmentTeam < Team
 
       def fullname
         self.name
-      end
-
-      def get_participants
-        users = self.users
-        participants = Array.new
-        users.each do |user|
-          participant = AssignmentParticipant.where(user_id: user.id, parent_id: self.parent_id).first
-          participants << participant if participant != nil
-        end
-        participants
       end
 
       def copy(course_id)

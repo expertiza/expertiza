@@ -1807,6 +1807,7 @@ assign_team_topic	app/controllers/lottery_controller.rb	/^  def assign_team_topi
 assign_topic_deadline	app/models/due_date.rb	/^  def self.assign_topic_deadline(due_date,offset,topic_id)$/;"	F	class:DueDate
 assignment	app/models/assignment_team.rb	/^      def assignment$/;"	f	class:AssignmentTeam
 assignment	app/models/feedback_response_map.rb	/^  def assignment$/;"	f	class:FeedbackResponseMap
+assignment	app/models/team.rb	/^  def assignment$/;"	f	class:Team
 assignment_average_scores	app/models/analytic/course_analytic.rb	/^  def assignment_average_scores$/;"	f	class:CourseAnalytic
 assignment_id	app/models/course_team.rb	/^  def assignment_id$/;"	f	class:CourseTeam
 assignment_list	app/controllers/analytic_controller.rb	/^  def assignment_list$/;"	f	class:AnalyticController
@@ -2942,7 +2943,6 @@ get_participant_reviewer	db/migrate/102_standardize_review_mappings.rb	/^  def s
 get_participant_score	app/models/score_cache.rb	/^  def self.get_participant_score()$/;"	F	class:ScoreCache
 get_participant_type	app/models/assignment_team.rb	/^      def get_participant_type$/;"	f	class:AssignmentTeam
 get_participant_type	app/models/course_team.rb	/^  def get_participant_type$/;"	f	class:CourseTeam
-get_participants	app/models/assignment_team.rb	/^      def get_participants$/;"	f	class:AssignmentTeam
 get_participants	app/models/course.rb	/^  def get_participants$/;"	f	class:Course
 get_path	app/controllers/assignment_controller.rb	/^      def get_path$/;"	f	class:AssignmentController
 get_path	app/controllers/assignments_controller.rb	/^  def get_path$/;"	f	class:AssignmentsController
@@ -4058,6 +4058,7 @@ table_name	vendor/plugins/acts_as_nested_set/test/nested_set_test.rb	/^  def sel
 table_name	vendor/plugins/acts_as_nested_set/test/nested_set_test.rb	/^  def self.table_name() "mixins" end$/;"	F	class:NestedSet.NestedSetWithStringScope.NestedSetWithSymbolScope.NestedSetSuperclass
 take_quiz	app/controllers/student_quiz_controller.rb	/^  def self.take_quiz assignment_id , reviewer_id$/;"	F	class:StudentQuizController
 team	app/models/assignment_participant.rb	/^  def team$/;"	f	class:AssignmentParticipant
+team	app/models/participant.rb	/^  def team$/;"	f	class:Participant
 team_assignment	app/models/assignment.rb	/^  def team_assignment$/;"	f	class:Assignment
 team_assignment?	app/models/assignment.rb	/^  def team_assignment?$/;"	f	class:Assignment
 team_has_user?	app/models/response.rb	/^  def team_has_user?(user)$/;"	f	class:Response

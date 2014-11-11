@@ -1,0 +1,14 @@
+<h1> List of all Sections for Question Type</h1>
+<table border="1">
+  <th>Id</th>
+  <th>Section Name</th>
+  <th>Description</th>
+<%@sections.each do |section|%>
+  <tr>
+    <td><%=section.id%></td>
+    <td><%=section.name%></td>
+    <td><%=section.desc_text%></td>
+  </tr>
+<% end %>
+</table>
+<p><%= link_to 'Add Section', :action => 'new' %></p>

@@ -1,0 +1,17 @@
+<H1>Add a new section</H1>
+
+<p> Enter the name and a small description for the section</p>
+
+<%= form_tag :action => 'create' do %>
+<p>
+    Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:<%= text_field 'section', 'name' %>
+<br>
+<br>
+    Description:<%=text_field 'section','desc_text' %>
+</p>
+<br>
+    <%= submit_tag "Add" %>
+
+<% end %>
+
+<p><%= link_to 'Back', :action => 'index' %></p>

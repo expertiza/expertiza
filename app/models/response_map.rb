@@ -26,16 +26,8 @@ class ResponseMap < ActiveRecord::Base
           @array_sort << @all_resp
           @test << map
 
-          # the original method to find all response
-          # @all_resp=Response.all
-          # for element in @all_resp
-          #   if (element.map_id == map.map_id)
-          #     # puts element.map_id
-          #     # puts map.map_id
-          #     @array_sort << element
-          #     @test << map
-          #   end
-          # end
+          # the original method get all response back and then filter the map_id
+          # we modified that and using the query to find the exact response which are useful, saves 90% the time on doing filtering.
 
           #sort all versions in descending order and get the latest one.
           @sort_to=@array_sort.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }

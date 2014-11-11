@@ -180,27 +180,7 @@ class AssignmentController < ApplicationController
       end
     end
     set_up
-    puts "==================empty or not==================================="
-    puts "==================empty or not==================================="
-    puts "==================empty or not==================================="
-    puts "==================empty or not==================================="
-    puts "==================empty or not==================================="
-    puts "==================empty or not==================================="
-    puts "==================empty or not==================================="
-    puts "==================empty or not==================================="
-    puts "==================empty or not==================================="
-    puts @due_date_nameurl_notempty
   end
-
-  def set_rounds
-    puts "==================in set_rounds==================================="
-    puts params
-    #@newsetroundnum = params[:roundnum].to_i
-
-   # @assignment.rounds_of_reviews=params[:roundnum].to_i
-  end
-
-
 
   def delete_all_due_dates
     if params[:assignment_id].nil?
@@ -294,25 +274,9 @@ class AssignmentController < ApplicationController
 
 
   def update
-    puts "======================================================================================================="
     @assignment = Assignment.find(params[:id])
     params[:assignment][:wiki_type_id] = 1 unless params[:assignment_wiki_assignment]
     @assignment_questionnaires = AssignmentQuestionnaire.find_all_by_assignment_id(params[:id])
-
-    #10/27/2014 update used_in_round in assignment_questionaire
-    # checkbox1 = params[:assignment_questionnaire][:used_in_round]
-    # checked=checkbox1=="true"?true:false
-
-   # @assignment_questionnaires.each do  |aq|
-   #    if checked
-   #      aq.update_attributes({'used_in_round'=> 1})
-   #    else
-   #      aq.update_attributes({'used_in_round'=>nil})
-   #    end
-   # end
-   #  assign_questionnaire=AssignmentQuestionnaire.find_by_assignment_id(params[:id])
-
-
 
     #TODO: require params[:assignment][:directory_path] to be not null
     #TODO: insert warning if directory_path is duplicated
@@ -348,9 +312,9 @@ class AssignmentController < ApplicationController
   def set_up
     set_up_defaults
 
-    submissions = @assignment.find_due_dates('submission') + @assignment.find_due_dates('resubmission')
-    reviews = @assignment.find_due_dates('review') + @assignment.find_due_dates('rereview')
-    @assignment.rounds_of_reviews = [@assignment.rounds_of_reviews, submissions.count, reviews.count].max
+  #  submissions = @assignment.find_due_dates('submission') + @assignment.find_due_dates('resubmission')
+  #  reviews = @assignment.find_due_dates('review') + @assignment.find_due_dates('rereview')
+  #  @assignment.rounds_of_reviews = [@assignment.rounds_of_reviews, submissions.count, reviews.count].max
 
     if @assignment.directory_path.try :empty?
       @assignment.directory_path = nil

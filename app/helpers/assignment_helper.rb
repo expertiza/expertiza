@@ -57,7 +57,7 @@ module AssignmentHelper
     if type == 'submission'
       due_dates += assignment.find_due_dates('resubmission')
     elsif type == 'review'
-      due_dates += assignment.find_due_dates('review')
+      due_dates += assignment.find_due_dates('rereview')
     end
 
     due_dates.delete_if { |due_date| due_date.due_at.nil? }
@@ -76,23 +76,6 @@ module AssignmentHelper
       due_dates[round]
     end
   end
-
-  # def due_date_nameurl(assignment,round_no)
-  #   # return true if the name or url in the form is not empty
-  #   due_date_nameurl_review=assignment.find_due_dates('review')
-  #   due_date_nameurl_resubmission=assignment.find_due_dates('resubmission')
-  #   @sign = false
-  #   i=0
-  #   while i < round_no  do
-  #
-  #
-  #
-  #
-  #
-  #
-  #   end
-  # end
-
 
   def questionnaire(assignment, type, round_number)
 

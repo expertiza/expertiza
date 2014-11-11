@@ -6,7 +6,6 @@
 <!--3. actually pretty much rewrote the whole thing...-->
 
 <script type="text/javascript">
-  //  <!--javascript functions that create and remove the entry of the set_due_date table-->
     function addDueDateTableElement(addnameurl,deadline_type, round_no, due_date,questionnaire,assignment_questionnaire,q_options) {
 //round_no = 0 for submission and review is not possible
 //round_no = 0 is used for other deadlines
@@ -157,9 +156,6 @@
                 { value: -480, label: 'Pacific' }
             ]
         });
-
-        //2014.10.28 This will make setting rounds button ineffective
-        //jQuery('#questionnaire_id').val(questionnaire.id).attr('id', '');
     }
 
     function removeDueDateTableElement(deadline_type, round_no) {
@@ -187,18 +183,6 @@
                 para += "&" + (fields[j].name + "=" + fields[j].value);
             }
             jQuery.get("/assignment/set_due_date" + para);
-        }
-    }
-    //trying to add a function to change dispalying status of due_date_name and description_url, but it can't change the style of <td> element.
-    function hideshow(which1){
-        if (!document.getElementById) {
-            return;
-        }
-        if(which1.style.visibility=="hidden"){
-            which1.style.visibility="visible";
-        }
-        else {
-            which1.style.visibility="hidden";
         }
     }
 
@@ -255,20 +239,17 @@
           }
       }
 
-//      var para = "?";
-//      para += "&" + "roundnum" + "=" + new_round_count;
-  //    jQuery.get("/assignment/set_rounds" + para);
       jQuery.get("/assignment/update");
       jQuery('#assignment_form').submit();
   }
-    function handleChangenameurl(checkvalue,which1,which2){
+    function handleChangenameurl(checkvalue,due_date_name_column,due_date_url_column){
         var state = checkvalue;
         var round_count = <%= @assignment.rounds_of_reviews%>;
         if (!document.getElementById) {
             return;
         }
         if (state == false && round_count >1){
-            //Make it display rounds
+            //hide name and url colomns
             for (i =1; i <= round_count; i++) {
                 removeDueDateTableElement('submission', i);
                 removeDueDateTableElement('review', i);
@@ -279,14 +260,12 @@
                 addDueDateTableElement(null,'review', i, <%= due_date(@assignment, 'review', 0).to_json %>, <%= questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>,<%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
             }
             addDueDateTableElement(null,'metareview',0,<%= due_date(@assignment,'metareview', 0).to_json%>);
-
-//            which1.style.visibility="hidden";
-//            which2.style.visibility="hidden";
             due_date_name_column.style.display="none";
             due_date_url_column.style.display="none";
 
         }
         if (state == true && round_count >1){
+            //display name and url colomns
             for (i =1; i <= round_count; i++) {
                 removeDueDateTableElement('submission', i);
                 removeDueDateTableElement('review', i);
@@ -297,18 +276,13 @@
                 addDueDateTableElement(1,'review',i, <%= due_date(@assignment, 'review', 0).to_json %>, <%= questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>,<%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
             }
             addDueDateTableElement(1,'metareview',0,<%= due_date(@assignment,'metareview', 0).to_json%>);
-//            which1.style.visibility="visible";
-//            which2.style.visibility="visible";
             due_date_name_column.removeAttribute("style");
-//            due_date_name_column.style.wid;
             due_date_url_column.removeAttribute("style");
         }
         else{
             return;
         }
-
 }
-
 </script>
 
 <div style="font-size:large;">
@@ -321,13 +295,10 @@
   <%= button_to_function('Set', 'changeReviewRounds()') %>
 </div>
 
+<!--Add a change name or url checkbox. By: Xiaoqiang Shao-->
 <input name="changenameurl" type="hidden" value="false" />
 <%= check_box_tag('changenameurl', 'true', @due_date_nameurl_notempty_checkbox,:onclick=>"handleChangenameurl(this.checked,due_date_name_column,due_date_url_column)" ) %>
 <%= label_tag('changenameurl', 'Change name and description url?') %>
-
-
-
-
 
 <table class='exp' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden;'>
 
@@ -352,13 +323,12 @@
           addDueDateTableElement(<%= @due_date_nameurl_notempty %>,'review', <%=i%>, <%= due_date(@assignment, 'review', i-1).to_json %>, <%= questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>,<%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
           <% end %>
           addDueDateTableElement(<%= @due_date_nameurl_notempty %>,'metareview', 0, <%= due_date(@assignment, 'metareview').to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
-
+          //after webpage refreshes, hide or display name and url according to whether names and urls are empty in DB
           var due_date_name_column=document.getElementById("due_date_name_column");
           var due_date_url_column=document.getElementById("due_date_url_column");
           <% if @due_date_nameurl_notempty =="null" %>
           due_date_name_column.style.visibility="hidden";
           due_date_url_column.style.visibility="hidden";
-
           <% end %>
       }());
   </script>

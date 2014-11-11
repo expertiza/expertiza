@@ -287,8 +287,7 @@ puts "Find or create admin user with password 'admin'"
 tu = User.find_by_name('admin') || User.new
 tu.attributes = {:name => 'admin',
              :email => 'anything@mailinator.com',
-             :password => 'admin',
-             :password_confirmation => 'admin',
+             crypted_password: 'd033e22ae348aeb5660fc2140aec35850c4da997', # admin
              :role_id => Role.find_by_name('Super-Administrator').id, 
              :email_on_review => true, 
              :email_on_submission => true, 
@@ -296,7 +295,7 @@ tu.attributes = {:name => 'admin',
              :is_new_user => false,
              :master_permission_granted => false}
 tu.parent_id = tu.id
-tu.save!
+tu.save(validate: false)
 
 
 ###########################################################################

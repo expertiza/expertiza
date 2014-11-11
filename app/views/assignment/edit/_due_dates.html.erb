@@ -6,58 +6,8 @@
 <!--3. actually pretty much rewrote the whole thing...-->
 
 <script type="text/javascript">
-    function changeReviewRounds() {
-        var new_round_count = parseInt(jQuery('#assignment_rounds_of_reviews').val());
-        if (new_round_count <= 0) {
-            alert('ERROR: number of rounds of review cannot be less than 0');
-            return
-        }
-
-        var i;
-        var due_dates_table_element_list = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)');
-        var current_round_count = 0;
-        var round_no;
-        for (i = 0; i < due_dates_table_element_list.length; i++) {
-            round_no = parseInt(due_dates_table_element_list[i].id.split('_').last());
-            if (!isNaN(round_no)) {
-                if (current_round_count < round_no) {
-                    current_round_count = round_no;
-                }
-            }
-        }
-        var original_round_count = <%= @assignment.rounds_of_reviews%>;
-
-        if (new_round_count == current_round_count) {
-            return
-        }
-
-        if (new_round_count >= original_round_count && current_round_count < original_round_count) {
-            //make sure all the rounds are already displayed
-            <% for i in 1..@assignment.rounds_of_reviews %>
-            addDueDateTableElement('submission', <%=i%>, <%= due_date(@assignment,'submission', i-1).to_json %>);
-            addDueDateTableElement('review', <%=i%>, <%= due_date(@assignment,'review', i-1).to_json %>);
-            <% end %> //use ruby because i need the i variable... @_@ unfortunate but dunno how to get around
-            //dont worry the addDueDateTableElement function check to see if it exist first before doing anything
-        }
-
-        if (new_round_count < current_round_count) {
-            for (i = new_round_count + 1; i <= current_round_count; i++) {
-                removeDueDateTableElement('submission', i);
-                removeDueDateTableElement('review', i);
-            }
-            return
-        }
-
-        if (new_round_count > current_round_count) {
-            for (i = original_round_count + 1; i <= new_round_count; i++) {
-                addDueDateTableElement('submission', i, <%= due_date(@assignment,'submission', -1).to_json%>);
-                addDueDateTableElement('review', i, <%= due_date(@assignment,'review', -1).to_json%>);
-            }
-        }
-    }
-
-    <!--javascript functions that create and remove the entry of the set_due_date table-->
-    function addDueDateTableElement(deadline_type, round_no, due_date,questionnaire,assignment_questionnaire,q_options) {
+  //  <!--javascript functions that create and remove the entry of the set_due_date table-->
+    function addDueDateTableElement(addnameurl,deadline_type, round_no, due_date,questionnaire,assignment_questionnaire,q_options) {
 //round_no = 0 for submission and review is not possible
 //round_no = 0 is used for other deadlines
         var element_id;
@@ -89,6 +39,7 @@
             return
         }
         var html = '<tr id=' + element_id + '>';
+
 
         html += '<input class="due_date_assignment_id" name="due_date[assignment_id]" type="hidden" value="' + <%= @assignment.id %> + '">' +
                 '<input class="due_date_round" name="due_date[round]" type="hidden" value="' + round_no + '">' +
@@ -158,15 +109,19 @@
                 '<option value="88">88</option>' +
                 '<option value="96">96</option>' +
                 '</select></td>';
-
-        html += '<td  align="center" id="specialname" class="due_date_name" width="15%">';
+        var html2 = html;
+        html += '<td  align="center" id="specialname" class="due_date_name" width="10%">';
         html += '<input id="due_date_name" type="text" name="due_date[deadline_name]" value="'+due_date.deadline_name+'">'+'</td>';
 
         html += '<td  align="center" id="due_date_url_col" class="due_date_description_url" width="10%">';
         html += '<input id="due_date_description_url" type="text" name="due_date[description_url]" value="'+due_date.description_url+'">'+'</td>';
 
-
-        previous_element.after(html);
+        if (addnameurl==null){
+            previous_element.after(html2);
+        }
+        else{
+            previous_element.after(html);
+        }
 
         <!--submission allowed-->
         jQuery('#due_date_submission_allowed_id').val(due_date.submission_allowed_id).attr('id', '');
@@ -185,6 +140,7 @@
         jQuery('#due_date_threshold').val(due_date.threshold).attr('id', '');
 
         jQuery('#due_date_description_url').val(due_date.description_url).attr('id', '');
+        jQuery('#due_date_deadline_name').val(due_date.deadline_name).attr('id', '');
 
         jQuery('#datetimepicker_' + element_id).datetimepicker({
             dateFormat: 'yy/mm/dd',
@@ -243,6 +199,105 @@
         }
     }
 
+  function changeReviewRounds() {
+      var new_round_count = parseInt(jQuery('#assignment_rounds_of_reviews').val());
+      if (new_round_count <= 0) {
+          alert('ERROR: number of rounds of review cannot be less than 0');
+          return
+      }
+
+      var i;
+      var due_dates_table_element_list = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)');
+      var current_round_count = 0;
+      var round_no;
+      for (i = 0; i < due_dates_table_element_list.length; i++) {
+          round_no = parseInt(due_dates_table_element_list[i].id.split('_').last());
+          if (!isNaN(round_no)) {
+              if (current_round_count < round_no) {
+                  current_round_count = round_no;
+              }
+          }
+      }
+      var original_round_count = <%= @assignment.rounds_of_reviews%>;
+
+      if (new_round_count == current_round_count) {
+          return
+      }
+
+      if (new_round_count >= original_round_count && current_round_count < original_round_count) {
+          //make sure all the rounds are already displayed
+          <% for i in 1..@assignment.rounds_of_reviews %>
+          addDueDateTableElement(null,'submission', <%=i%>, <%= due_date(@assignment,'submission', i-1).to_json %>);
+          addDueDateTableElement(null,'review', <%=i%>, <%= due_date(@assignment,'review', i-1).to_json %>);
+          <% end %> //use ruby because i need the i variable... @_@ unfortunate but dunno how to get around
+          //dont worry the addDueDateTableElement function check to see if it exist first before doing anything
+      }
+
+      if (new_round_count < current_round_count) {
+          for (i = new_round_count + 1; i <= current_round_count; i++) {
+              removeDueDateTableElement('submission', i);
+              removeDueDateTableElement('review', i);
+          }
+
+      }
+
+      if (new_round_count > current_round_count) {
+          for (i = original_round_count + 1; i <= new_round_count; i++) {
+              addDueDateTableElement(null,'submission', i, <%= due_date(@assignment,'submission', -1).to_json%>);
+              addDueDateTableElement(null,'review', i, <%= due_date(@assignment,'review', -1).to_json%>);
+          }
+      }
+
+//      var para = "?";
+//      para += "&" + "roundnum" + "=" + new_round_count;
+  //    jQuery.get("/assignment/set_rounds" + para);
+      jQuery.get("/assignment/update");
+      jQuery('#assignment_form').submit();
+  }
+
+    function handleChangenameurl(checkvalue,which1,which2){
+        var state = checkvalue;
+        var round_count = <%= @assignment.rounds_of_reviews%>;
+        if (!document.getElementById) {
+            return;
+        }
+        if (state == false && round_count >1){
+            //Make it display rounds
+            for (i =1; i <= round_count; i++) {
+                removeDueDateTableElement('submission', i);
+                removeDueDateTableElement('review', i);
+            }
+            removeDueDateTableElement('metareview', 0);
+            for (i =1; i <= round_count; i++) {
+                addDueDateTableElement(null,'submission',i, <%= due_date(@assignment, 'submission', 0).to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>); // or use questionnaire_options(@assignment, nil).to_json
+                addDueDateTableElement(null,'review', i, <%= due_date(@assignment, 'review', 0).to_json %>, <%= questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>,<%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
+            }
+            addDueDateTableElement(null,'metareview',0,<%= due_date(@assignment,'metareview', 0).to_json%>);
+
+            which1.style.visibility="hidden";
+            which2.style.visibility="hidden";
+
+        }
+        if (state == true && round_count >1){
+            for (i =1; i <= round_count; i++) {
+                removeDueDateTableElement('submission', i);
+                removeDueDateTableElement('review', i);
+            }
+            removeDueDateTableElement('metareview', 0);
+            for (i =1; i <= round_count; i++) {
+                addDueDateTableElement(1,'submission', i, <%= due_date(@assignment, 'submission', 0).to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>); // or use questionnaire_options(@assignment, nil).to_json
+                addDueDateTableElement(1,'review',i, <%= due_date(@assignment, 'review', 0).to_json %>, <%= questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>,<%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
+            }
+            addDueDateTableElement(1,'metareview',0,<%= due_date(@assignment,'metareview', 0).to_json%>);
+            which1.style.visibility="visible";
+            which2.style.visibility="visible";
+        }
+        else{
+            return;
+        }
+
+}
+
 </script>
 
 <div style="font-size:large;">
@@ -254,6 +309,14 @@
   <%= text_field_tag('assignment[rounds_of_reviews]', @assignment.rounds_of_reviews, :style => 'width:50px') %>
   <%= button_to_function('Set', 'changeReviewRounds()') %>
 </div>
+
+<input name="changenameurl" type="hidden" value="false" />
+<%= check_box_tag('changenameurl', 'true', @due_date_nameurl_notempty_checkbox,:onclick=>"handleChangenameurl(this.checked,due_date_name_column,due_date_url_column)" ) %>
+<%= label_tag('changenameurl', 'Change name and description url?') %>
+
+
+
+
 
 <table class='exp' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden;'>
 
@@ -274,10 +337,17 @@
   <script>
       jQuery(document).ready(function () {
           <% for i in 1..@assignment.rounds_of_reviews %>
-          addDueDateTableElement('submission', <%=i%>, <%= due_date(@assignment, 'submission', i-1).to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>); // or use questionnaire_options(@assignment, nil).to_json
-          addDueDateTableElement('review', <%=i%>, <%= due_date(@assignment, 'review', i-1).to_json %>, <%= questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>,<%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
+          addDueDateTableElement(<%= @due_date_nameurl_notempty %>,'submission', <%=i%>, <%= due_date(@assignment, 'submission', i-1).to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>); // or use questionnaire_options(@assignment, nil).to_json
+          addDueDateTableElement(<%= @due_date_nameurl_notempty %>,'review', <%=i%>, <%= due_date(@assignment, 'review', i-1).to_json %>, <%= questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>,<%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
           <% end %>
-          addDueDateTableElement('metareview', 0, <%= due_date(@assignment, 'metareview').to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
+          addDueDateTableElement(<%= @due_date_nameurl_notempty %>,'metareview', 0, <%= due_date(@assignment, 'metareview').to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
+          var due_date_name_column=document.getElementById("due_date_name_column");
+          var due_date_url_column=document.getElementById("due_date_url_column");
+
+          <% if @due_date_nameurl_notempty =="null" %>
+          due_date_name_column.style.visibility="hidden";
+          due_date_url_column.style.visibility="hidden";
+          <% end %>
       }());
   </script>
 </table>

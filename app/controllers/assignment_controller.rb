@@ -137,13 +137,31 @@ class AssignmentController < ApplicationController
   def edit
     @assignment = Assignment.find(params[:id])
     @assignment_questionnaires = AssignmentQuestionnaire.find_all_by_assignment_id(params[:id])
+    @due_date_all = DueDate.find_all_by_assignment_id(params[:id])
     @reviewvarycheck = nil
+    @newsetroundnum = 2
+    @due_date_nameurl_notempty = "null"
+    @due_date_nameurl_notempty_checkbox = false
     @review_check = nil
-    @avoidrepeatsign = 0
     @metareview_check= nil
     @author_check = nil
     @teammate_check = nil
 
+    # Add by Xiaoqiang Shao, check if name and url in database is empty before webpage displays
+    @due_date_all.each do |dd|
+      if(!(dd.deadline_name.nil?))
+      if(dd.deadline_name.length>=1)
+        @due_date_nameurl_notempty = 1
+        @due_date_nameurl_notempty_checkbox = true
+      end
+      end
+      if(!(dd.description_url.nil?))
+      if(dd.description_url.length>=1)
+        @due_date_nameurl_notempty = 1
+        @due_date_nameurl_notempty_checkbox = true
+      end
+      end
+    end
     @assignment_questionnaires.each do  |aq|
       if(!(aq.used_in_round.nil?))
         @reviewvarycheck = 1
@@ -161,9 +179,28 @@ class AssignmentController < ApplicationController
         end
       end
     end
-
     set_up
+    puts "==================empty or not==================================="
+    puts "==================empty or not==================================="
+    puts "==================empty or not==================================="
+    puts "==================empty or not==================================="
+    puts "==================empty or not==================================="
+    puts "==================empty or not==================================="
+    puts "==================empty or not==================================="
+    puts "==================empty or not==================================="
+    puts "==================empty or not==================================="
+    puts @due_date_nameurl_notempty
   end
+
+  def set_rounds
+    puts "==================in set_rounds==================================="
+    puts params
+    #@newsetroundnum = params[:roundnum].to_i
+
+   # @assignment.rounds_of_reviews=params[:roundnum].to_i
+  end
+
+
 
   def delete_all_due_dates
     if params[:assignment_id].nil?
@@ -184,6 +221,8 @@ class AssignmentController < ApplicationController
       format.json { render :json => @due_dates }
     end
   end
+
+
 
   def set_due_date
     if params[:due_date][:assignment_id].nil?
@@ -255,6 +294,7 @@ class AssignmentController < ApplicationController
 
 
   def update
+    puts "======================================================================================================="
     @assignment = Assignment.find(params[:id])
     params[:assignment][:wiki_type_id] = 1 unless params[:assignment_wiki_assignment]
     @assignment_questionnaires = AssignmentQuestionnaire.find_all_by_assignment_id(params[:id])

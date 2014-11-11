@@ -12,7 +12,7 @@
      //       html+='<td><input name="assignment_questionnaire[used_in_round]"  type="hidden" value="' + null + '"> </td>';
         }
         else {
-            html += '<td><label for="questionnaire_id">' + questionnaire.display_type + round_no + ':</label></td>'
+            html += '<td><label for="questionnaire_id">' + questionnaire.display_type + ' Round '+ round_no + ':</label></td>'
         }
 
         html +=     '<td align="center">' +
@@ -107,6 +107,7 @@
     function handleCheckReviewVary(checkvalue) {
         var state = checkvalue.checked;
         var round_count = <%= @assignment.rounds_of_reviews%>;
+
         if (state == true && round_count >1){
             //Make it display rounds
             var element_id;
@@ -118,14 +119,11 @@
             jQuery('#' + element_id).remove();
             element_id = 'questionnaire_table_' + 'TeammateReviewQuestionnaire';
             jQuery('#' + element_id).remove();
-            if (<%=@avoidrepeatsign%>==0) {
+
                 for (i = 1; i <= round_count; i++) {
                     addQuestionnaireTableRow('ReviewQuestionnaire', i, <%= questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>, <%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>, <%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
                 }
-            }
-            else {
-                return
-            }
+
             addQuestionnaireTableRow('MetareviewQuestionnaire', null, <%= questionnaire(@assignment, 'MetareviewQuestionnaire',nil).to_json %>, <%= assignment_questionnaire(@assignment, 'MetareviewQuestionnaire',nil).to_json %>, <%= questionnaire_options(@assignment, 'MetareviewQuestionnaire').to_json %>);
             addQuestionnaireTableRow('AuthorFeedbackQuestionnaire', null,<%= questionnaire(@assignment, 'AuthorFeedbackQuestionnaire',nil).to_json %>, <%= assignment_questionnaire(@assignment, 'AuthorFeedbackQuestionnaire',nil).to_json %>, <%= questionnaire_options(@assignment, 'AuthorFeedbackQuestionnaire').to_json %>);
             addQuestionnaireTableRow('TeammateReviewQuestionnaire',null, <%= questionnaire(@assignment, 'TeammateReviewQuestionnaire',nil).to_json %>, <%= assignment_questionnaire(@assignment, 'TeammateReviewQuestionnaire',nil).to_json %>, <%= questionnaire_options(@assignment, 'TeammateReviewQuestionnaire').to_json %>);
@@ -172,7 +170,7 @@
 <!--//Add a review varies by round checkbox. By: Xiaoqiang Shao-->
 <input name="assignment_questionnaire[used_in_round]" type="hidden" value="false" />
 <%= check_box_tag('assignment_questionnaire[used_in_round]', 'true', @reviewvarycheck,:onclick=>"handleCheckReviewVary(this)" ) %>
-<%= label_tag('assignment_questionnaire[used_in_round]', 'Review Varies By Round?') %>
+<%= label_tag('assignment_questionnaire[used_in_round]', 'Review rubric varies by round?') %>
 
 
 

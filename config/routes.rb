@@ -440,6 +440,7 @@ Expertiza::Application.routes.draw do
   resources :users, constraints: {id: /\d+/} do
     collection do
       get :list
+      post :list
       post ':id', action: :update
       get :show_selection
       get :auto_complete_for_user_name

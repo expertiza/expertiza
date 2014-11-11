@@ -18,16 +18,19 @@
             if (jQuery('#' + element_id).length != 0) {
                 return
             }
-        } else {
+        }
+        else {
             if (deadline_type == 'submission') {
                 if (round_no == 1) {
                     previous_element = jQuery('#due_date_heading');
                 } else {
                     previous_element = jQuery('#review_round_' + (round_no - 1));
                 }
-            } else if (deadline_type == 'review') {
+            }
+            else if (deadline_type == 'review') {
                 previous_element = jQuery('#submission_round_' + round_no);
-            } else {
+            }
+            else {
                 console.log('error: addDueDateTableElement');
             }
             element_id = deadline_type + '_round_' + round_no;
@@ -205,6 +208,10 @@
           alert('ERROR: number of rounds of review cannot be less than 0');
           return
       }
+      if (new_round_count == 1) {
+          alert('ERROR: number of rounds of review shoud be larger than 1');
+          return
+      }
 
       var i;
       var due_dates_table_element_list = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)');
@@ -254,7 +261,6 @@
       jQuery.get("/assignment/update");
       jQuery('#assignment_form').submit();
   }
-
     function handleChangenameurl(checkvalue,which1,which2){
         var state = checkvalue;
         var round_count = <%= @assignment.rounds_of_reviews%>;
@@ -274,8 +280,10 @@
             }
             addDueDateTableElement(null,'metareview',0,<%= due_date(@assignment,'metareview', 0).to_json%>);
 
-            which1.style.visibility="hidden";
-            which2.style.visibility="hidden";
+//            which1.style.visibility="hidden";
+//            which2.style.visibility="hidden";
+            due_date_name_column.style.display="none";
+            due_date_url_column.style.display="none";
 
         }
         if (state == true && round_count >1){
@@ -289,8 +297,11 @@
                 addDueDateTableElement(1,'review',i, <%= due_date(@assignment, 'review', 0).to_json %>, <%= questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>,<%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
             }
             addDueDateTableElement(1,'metareview',0,<%= due_date(@assignment,'metareview', 0).to_json%>);
-            which1.style.visibility="visible";
-            which2.style.visibility="visible";
+//            which1.style.visibility="visible";
+//            which2.style.visibility="visible";
+            due_date_name_column.removeAttribute("style");
+//            due_date_name_column.style.wid;
+            due_date_url_column.removeAttribute("style");
         }
         else{
             return;
@@ -341,12 +352,13 @@
           addDueDateTableElement(<%= @due_date_nameurl_notempty %>,'review', <%=i%>, <%= due_date(@assignment, 'review', i-1).to_json %>, <%= questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>,<%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire',nil).to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
           <% end %>
           addDueDateTableElement(<%= @due_date_nameurl_notempty %>,'metareview', 0, <%= due_date(@assignment, 'metareview').to_json %>,<%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json %>);
+
           var due_date_name_column=document.getElementById("due_date_name_column");
           var due_date_url_column=document.getElementById("due_date_url_column");
-
           <% if @due_date_nameurl_notempty =="null" %>
           due_date_name_column.style.visibility="hidden";
           due_date_url_column.style.visibility="hidden";
+
           <% end %>
       }());
   </script>

@@ -359,9 +359,7 @@ class AssignmentController < ApplicationController
     #drop_topic_deadine = @assignment.find_due_dates('drop_topic')
     #signup_deadline = @assignment.find_due_dates('signup')
     #sign_ups = SignUpTopic.find_all_by_assignment_id(@assignment.id)
-
     #@assignment.require_signup = !(drop_topic_deadine + signup_deadline + sign_ups).empty?
-
   end
 
   #NOTE: unfortunately this method is needed due to bad data in db @_@

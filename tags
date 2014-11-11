@@ -1102,7 +1102,6 @@ MonthYearColor	app/assets/javascripts/datetimepicker.js	/^var MonthYearColor="#c
 MoveFiles	db/migrate/069_move_files.rb	/^class MoveFiles < ActiveRecord::Migration$/;"	c
 MyApplication	vendor/plugins/rails_upgrade/test/new_configuration_generator_test.rb	/^module MyApplication$/;"	m	class:NewConfigurationGeneratorTest
 N.colors	app/assets/javascripts/highcharts.js	/^Ka=M.map,J=M.addEvent,ba=M.removeEvent,D=M.fireEvent,Pb=M.washMouseEvent,vb=M.animate,Ta=M.stop,M={enabled:!0,align:"center",x:0,y:15,style:{color:"#666",cursor:"default",fontSize:"11px",lineHeight:"14px"}};N={colors:"#2f7ed8,#0d233a,#8bbc21,#910000,#1aadce,#492970,#f28f43,#77a1e5,#c42525,#a6c96a".split(","),symbols:["circle","diamond","square","triangle","triangle-down"],lang:{loading:"Loading...",months:"January,February,March,April,May,June,July,August,September,October,November,December".split(","),$/;"	p
-NavigationHelpers	features/support/paths.rb	/^module NavigationHelpers$/;"	m
 NestedSet	vendor/plugins/acts_as_nested_set/lib/active_record/acts/nested_set.rb	/^    module NestedSet #:nodoc:$/;"	m	class:ActiveRecord.Acts
 NestedSet	vendor/plugins/acts_as_nested_set/test/nested_set_test.rb	/^class NestedSet < Mixin$/;"	c
 NestedSetSubclass	vendor/plugins/acts_as_nested_set/test/nested_set_test.rb	/^class NestedSetSubclass < NestedSetSuperclass$/;"	c	class:NestedSet.NestedSetWithStringScope.NestedSetWithSymbolScope.NestedSetSuperclass
@@ -2884,7 +2883,6 @@ get_home_action	app/helpers/auth_helper.rb	/^  def self.get_home_action(user)$/;
 get_home_action	app/models/student.rb	/^  def get_home_action$/;"	f	class:Student
 get_home_controller	app/helpers/auth_helper.rb	/^  def self.get_home_controller(user)$/;"	F	class:AuthHelper
 get_home_controller	app/models/student.rb	/^  def get_home_controller$/;"	f	class:Student
-get_hyperlinks	app/models/assignment_participant.rb	/^  def get_hyperlinks$/;"	f	class:AssignmentParticipant
 get_hyperlinks	app/models/assignment_team.rb	/^  def get_hyperlinks$/;"	f	class:AssignmentTeam
 get_hyperlinks_array	app/models/assignment_participant.rb	/^  def get_hyperlinks_array$/;"	f	class:AssignmentParticipant
 get_id_str	app/helpers/chart.rb	/^  def get_id_str()$/;"	f	class:Chart
@@ -3556,7 +3554,6 @@ parse_line	app/controllers/import_file_controller.rb	/^  def parse_line(line, de
 participants	app/models/team.rb	/^  def participants$/;"	f	class:Team
 participants_in	app/controllers/users_controller.rb	/^  def self.participants_in(assignment_id)$/;"	F	class:UsersController
 participants_popup	app/controllers/popup_controller.rb	/^  def participants_popup$/;"	f	class:PopupController
-path_to	features/support/paths.rb	/^  def path_to(page_name)$/;"	f	class:NavigationHelpers
 perform	app/mailers/delayed_mailer.rb	/^  def perform$/;"	f	class:DelayedMailer
 permission	app/models/controller_action.rb	/^  def permission$/;"	f	class:ControllerAction
 permission_denied_page	app/models/system_settings.rb	/^  def permission_denied_page$/;"	f	class:SystemSettings

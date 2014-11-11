@@ -4,6 +4,7 @@ include LogInHelper
 feature 'Users' do
   before(:each) do
     instructor.save
+    student.save
   end
 
   scenario 'are searched by username by an instructor' do

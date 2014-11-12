@@ -10,30 +10,35 @@ User:
 
 
 ==========
-###What needs to be done:
-* checkbox “Review rubrics vary by round” should be added to the “General” tab in the view of creating/editing assignment
-* 4 checkboxes “Review rubrics vary by round” should be added on the “rubrics” tab
-* There should be a editable “deadline name” for each due date on “due date” panel if this type of review is specified to be “varying by rounds” in the “rubrics” tab.
-* Another “description URL” text box should be editable when this type of review is specified to be “varying by rounds” in the “rubrics” tab.
-* A drop-down box which help instructor to select review rubric should be added for a review round when this type of review is specified to be “varying by rounds” in the “rubrics” tab  (the input should be recorded in assignments_questionnaires table)
+###Project Description:
+Classes involved:controllers/assignment_controller.rb (488 lines)
+views/assignment/edit.html.erb (55 lines) in production branch (not in master branch)
 
-
-###Our Changes:
-* A checkbox "Review rubric vary by round" has been added to the "General" tab in the view of creating/editing assignment as    well as "rubric" tab.By selecting this box, you can specify if the assignment reiview varies by round or not.
-* Under "rubric" tab, there are four types of rubric: review, metareview, author feedback and teammate review. The instructor   can set how many review he/she wants to use for the assignment by setting the round under "due date" tab
-* Under "due date" panel, "deadline name" textfield has been added. 
-* Under "due date" panel, "description URL" textfield has been added. 
+What needs to be done:
+* A checkbox “Review rubrics vary by round” should be added to the “Rubric” tab in the view of creating/editing assignment. No corresponding field in “assignments” table is necessary. We can tell if this checkbox should be checked by checking “assignments_questionnaires” table by current assignment_id. If there is no record with a non-null value in “used_in_round” field, this assignment is not using this feature and the checkbox should not be checked. (if one assignment has 2 rounds but they are using the same set of rubrics, for each type of rubric there should be only one entry with “used_in_round” field null)R
+* There should be a editable “deadline name” for each due date on “due date” panel if this type of review is specified to be “varying by rounds” in the “rubrics” tab (the input should be recorded in deadline_name field in due_dates table)
+* Another “description URL” text box should be editable when this type of review is specified to be “varying by rounds” in the “rubrics” tab (the input should be recorded in description_url field in due_dates table)
+* The "deadline_name" and "description URL" could be hidden when you change the status of the checkbox in Due_Date tab
+* A drop-down box which help instructor to select review rubric should be added for a review round when this type of review is specified to be “varying by rounds” in the “rubrics” tab (the input should be recorded in assignments_questionnaires table)
+* There are no tests for the code. Create appropriate functional and integration tests.
 
 ==========
-###How to build our environment
+###Different Environment for this branch!!! (especially different from Rails4)
 
+* Ruby: 1.8.7
+* Rails: 2.3.15
+* Java: 1.6
+* Openjdk: 6.0
+* Database: expertiza_scrubbed_2014_03_14.sql
+
+Installation tips:
 1. Install JDK: 
     sudo apt-get install openjdk-6-jdk
 
 2. Install java: 
 http://www.mkyong.com/java/how-to-install-java-jdk-on-ubuntu-linux/
 
-1. Install ruby 1.8.7
+3. Install ruby 1.8.7
   1. https://gorails.com/setup/ubuntu/14.04
   2. sudo apt-get install libgdbm-dev libncurses5-dev automake libtool bison libffi-dev
   3. curl -L https://get.rvm.io | bash -s stable
@@ -77,3 +82,13 @@ http://www.mkyong.com/java/how-to-install-java-jdk-on-ubuntu-linux/
 
 8. Import database file:
   mysql -h localhost -uroot -proot pg_development< /home/xshao2/Desktop/expertiza_scrubbed_2014_03_14.sql
+
+==========
+###Main changes
+* Change "Rubric" Tab of Assignment
+* Change "Due_date" Tab of Assignment
+* Make slight changes to existing methods/codes
+
+More detailed changes could be seen in Github files changes.
+
+More detailed description on this project, please visit our wiki page: http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2014/OSS_E1450_cxm#Exampls

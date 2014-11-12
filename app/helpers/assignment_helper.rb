@@ -51,8 +51,6 @@ module AssignmentHelper
   #retrive or create a due_date
   # use in views/assignment/edit.html.erb
   def due_date(assignment, type, round = 0)
-
-
     due_dates = assignment.find_due_dates(type)
     if type == 'submission'
       due_dates += assignment.find_due_dates('resubmission')
@@ -78,7 +76,6 @@ module AssignmentHelper
   end
 
   def questionnaire(assignment, type, round_number)
-
     if round_number.nil?
       questionnaire=assignment.questionnaires.find_by_type(type)
     else
@@ -89,8 +86,6 @@ module AssignmentHelper
       questionnaire = assignment.questionnaires.find_by_id(temp_num)
       end
     end
-
-
     if questionnaire.nil?
       questionnaire = Object.const_get(type).new
       questionnaire

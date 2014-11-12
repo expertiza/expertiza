@@ -1,7 +1,7 @@
 Expertiza
 =========
 
-User:
+Account info you need:
 * Admin: user2
 * Teacher: user6
 * Student: userxxxx
@@ -23,7 +23,7 @@ What needs to be done:
 * There are no tests for the code. Create appropriate functional and integration tests.
 
 ==========
-###Different Environment for this branch!!! (especially different from Rails4)
+###Different Environment for this branch!!! 
 
 * Ruby: 1.8.7
 * Rails: 2.3.15
@@ -32,6 +32,7 @@ What needs to be done:
 * Database: expertiza_scrubbed_2014_03_14.sql
 
 Installation tips:
+
 1. Install JDK: 
     sudo apt-get install openjdk-6-jdk
 
@@ -89,6 +90,7 @@ http://www.mkyong.com/java/how-to-install-java-jdk-on-ubuntu-linux/
 * Change "Due_date" Tab of Assignment
 * Make slight changes to existing methods/codes
 
+==========
 More detailed changes could be seen in Github files changes.
 
 More detailed description on this project, please visit our wiki page: http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2014/OSS_E1450_cxm#Exampls

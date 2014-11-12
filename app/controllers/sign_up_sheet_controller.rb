@@ -619,7 +619,8 @@ class SignUpSheetController < ApplicationController
         # get info related to the ad for partners so that it can be displayed when an assignment_participant
         # clicks to see ads related to a topic
         def ad_info(assignment_id, topic_id)
-          query = "select t.id as team_id,t.comments_for_advertisement,t.name,su.assignment_id from teams t, signed_up_users s,sign_up_topics su where s.topic_id='"+topic_id.to_s+"' and s.creator_id=t.id and s.topic_id = su.id;    "
+          query = "select t.id as team_id,t.comments_for_advertisement,t.name,su.assignment_id, t.advertise_for_partner from teams t, signed_up_users s,sign_up_topics su "+
+                  "where s.topic_id='"+topic_id.to_s+"' and s.creator_id=t.id and s.topic_id = su.id;    "
           SignUpTopic.find_by_sql(query)
         end
 

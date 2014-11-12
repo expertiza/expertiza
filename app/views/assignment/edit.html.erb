@@ -17,10 +17,13 @@
             jQuery.ajaxSetup({async: false});
             submit_due_dates();
             submit_questionnaires();
+        //    submit_assignment_questionnaires();
             jQuery('#assignment_form').submit();
         }
     }
+
 </script>
+
 
 <% form_tag({:action => 'update', :id => @assignment.id}, {:id => 'assignment_form'}) do %>
     <div id="tabs">

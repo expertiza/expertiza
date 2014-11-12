@@ -136,6 +136,49 @@ class AssignmentController < ApplicationController
 
   def edit
     @assignment = Assignment.find(params[:id])
+    @assignment_questionnaires = AssignmentQuestionnaire.find_all_by_assignment_id(params[:id])
+    @due_date_all = DueDate.find_all_by_assignment_id(params[:id])
+    @reviewvarycheck = nil
+    @newsetroundnum = 2
+    @due_date_nameurl_notempty = "null"
+    @due_date_nameurl_notempty_checkbox = false
+    @review_check = nil
+    @metareview_check= nil
+    @author_check = nil
+    @teammate_check = nil
+
+    # Add by Xiaoqiang Shao, check if name and url in database is empty before webpage displays
+    @due_date_all.each do |dd|
+      if(!(dd.deadline_name.nil?))
+      if(dd.deadline_name.length>=1)
+        @due_date_nameurl_notempty = 1
+        @due_date_nameurl_notempty_checkbox = true
+      end
+      end
+      if(!(dd.description_url.nil?))
+      if(dd.description_url.length>=1)
+        @due_date_nameurl_notempty = 1
+        @due_date_nameurl_notempty_checkbox = true
+      end
+      end
+    end
+    @assignment_questionnaires.each do  |aq|
+      if(!(aq.used_in_round.nil?))
+        @reviewvarycheck = 1
+        @q_id = aq.questionnaire_id
+        @qn = Questionnaire.find(@q_id)
+
+        if(@qn.display_type.eql?"Review")
+          @review_check = 1
+        elsif(@qn.display_type.eql?"Metareview")
+          @metareview_check=1
+        elsif(@qn.display_type.eql?"Author Feedback")
+          @author_check = 1
+        elsif(@qn.display_type.eql?"Teammate Review")
+          @teammate_check = 1
+        end
+      end
+    end
     set_up
   end
 
@@ -159,6 +202,8 @@ class AssignmentController < ApplicationController
     end
   end
 
+
+
   def set_due_date
     if params[:due_date][:assignment_id].nil?
       return 
@@ -177,10 +222,16 @@ class AssignmentController < ApplicationController
     @due_date = DueDate.new(params[:due_date])
     @due_date.save
 
+    # 2014.10.28 Not successful
+    @assignment_questionnaire=AssignmentQuestionnaire.new({"assignment_id"=>params[:due_date][:assignment_id],"questionnaire_id"=>params[:due_date][:questionnaire_id]})
+    @assignment_questionnaire.save
     respond_to do |format|
       format.json { render :json => @due_date }
+      format.json { render :json => @assignment_questionnaire }
     end
   end
+
+
 
   def delete_all_questionnaires
     assignment = Assignment.find(params[:assignment_id])
@@ -225,6 +276,7 @@ class AssignmentController < ApplicationController
   def update
     @assignment = Assignment.find(params[:id])
     params[:assignment][:wiki_type_id] = 1 unless params[:assignment_wiki_assignment]
+    @assignment_questionnaires = AssignmentQuestionnaire.find_all_by_assignment_id(params[:id])
 
     #TODO: require params[:assignment][:directory_path] to be not null
     #TODO: insert warning if directory_path is duplicated
@@ -244,6 +296,7 @@ class AssignmentController < ApplicationController
       redirect_to :action => 'edit', :id => @assignment.id
     end
 
+
     #respond_to do |format|
     #  format.json { render :json => params }
     #end
@@ -259,9 +312,9 @@ class AssignmentController < ApplicationController
   def set_up
     set_up_defaults
 
-    submissions = @assignment.find_due_dates('submission') + @assignment.find_due_dates('resubmission')
-    reviews = @assignment.find_due_dates('review') + @assignment.find_due_dates('rereview')
-    @assignment.rounds_of_reviews = [@assignment.rounds_of_reviews, submissions.count, reviews.count].max
+  #  submissions = @assignment.find_due_dates('submission') + @assignment.find_due_dates('resubmission')
+  #  reviews = @assignment.find_due_dates('review') + @assignment.find_due_dates('rereview')
+  #  @assignment.rounds_of_reviews = [@assignment.rounds_of_reviews, submissions.count, reviews.count].max
 
     if @assignment.directory_path.try :empty?
       @assignment.directory_path = nil
@@ -270,9 +323,7 @@ class AssignmentController < ApplicationController
     #drop_topic_deadine = @assignment.find_due_dates('drop_topic')
     #signup_deadline = @assignment.find_due_dates('signup')
     #sign_ups = SignUpTopic.find_all_by_assignment_id(@assignment.id)
-
     #@assignment.require_signup = !(drop_topic_deadine + signup_deadline + sign_ups).empty?
-
   end
 
   #NOTE: unfortunately this method is needed due to bad data in db @_@

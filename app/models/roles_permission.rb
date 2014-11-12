@@ -1,12 +1,3 @@
-# == Schema Information
-#
-# Table name: roles_permissions
-#
-#  id            :integer          not null, primary key
-#  role_id       :integer          default(0), not null
-#  permission_id :integer          default(0), not null
-#
-
 class RolesPermission < ActiveRecord::Base
 
   def RolesPermission.find_for_role(role_ids)

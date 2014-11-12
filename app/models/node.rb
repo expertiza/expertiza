@@ -1,13 +1,3 @@
-# == Schema Information
-#
-# Table name: nodes
-#
-#  id             :integer          not null, primary key
-#  parent_id      :integer
-#  node_object_id :integer
-#  type           :string(255)
-#
-
 #Base Node class
 #Provides common method definitions, but minimal functoinality.
 #Must be subclassed for use in tree_display code

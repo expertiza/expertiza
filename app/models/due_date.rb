@@ -1,25 +1,3 @@
-# == Schema Information
-#
-# Table name: due_dates
-#
-#  id                          :integer          not null, primary key
-#  due_at                      :datetime
-#  deadline_type_id            :integer
-#  assignment_id               :integer
-#  submission_allowed_id       :integer
-#  review_allowed_id           :integer
-#  resubmission_allowed_id     :integer
-#  rereview_allowed_id         :integer
-#  review_of_review_allowed_id :integer
-#  round                       :integer
-#  flag                        :boolean          default(FALSE)
-#  threshold                   :integer          default(1)
-#  delayed_job_id              :integer
-#  quiz_allowed_id             :integer
-#  deadline_name               :string(255)
-#  description_url             :string(255)
-#
-
 class DueDate < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :deadline_type

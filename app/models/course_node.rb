@@ -1,13 +1,3 @@
-# == Schema Information
-#
-# Table name: nodes
-#
-#  id             :integer          not null, primary key
-#  parent_id      :integer
-#  node_object_id :integer
-#  type           :string(255)
-#
-
 #Node type for Courses
 
 #Author: ajbudlon

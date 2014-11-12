@@ -1,12 +1,3 @@
-# == Schema Information
-#
-# Table name: teams_users
-#
-#  id      :integer          not null, primary key
-#  team_id :integer
-#  user_id :integer
-#
-
 class TeamsUser < ActiveRecord::Base  
   belongs_to :user
   belongs_to :team

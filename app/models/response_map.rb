@@ -1,16 +1,3 @@
-# == Schema Information
-#
-# Table name: response_maps
-#
-#  id                    :integer          not null, primary key
-#  reviewed_object_id    :integer          default(0), not null
-#  reviewer_id           :integer          default(0), not null
-#  reviewee_id           :integer          default(0), not null
-#  type                  :string(255)      default(""), not null
-#  notification_accepted :boolean          default(FALSE)
-#  round                 :integer
-#
-
 class ResponseMap < ActiveRecord::Base
   belongs_to :reviewer, :class_name => 'Participant', :foreign_key => 'reviewer_id'
   has_one :response, :class_name => 'Response', :foreign_key => 'map_id'

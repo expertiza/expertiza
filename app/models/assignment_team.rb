@@ -1,15 +1,3 @@
-# == Schema Information
-#
-# Table name: teams
-#
-#  id                         :integer          not null, primary key
-#  name                       :string(255)
-#  parent_id                  :integer
-#  type                       :string(255)
-#  comments_for_advertisement :text
-#  advertise_for_partner      :boolean
-#
-
 class AssignmentTeam < Team
 
   belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'

@@ -1,17 +1,3 @@
-# == Schema Information
-#
-# Table name: roles
-#
-#  id              :integer          not null, primary key
-#  name            :string(255)      default(""), not null
-#  parent_id       :integer
-#  description     :string(255)      default(""), not null
-#  default_page_id :integer
-#  cache           :text
-#  created_at      :datetime
-#  updated_at      :datetime
-#
-
 require "credentials"
 require "menu"
 

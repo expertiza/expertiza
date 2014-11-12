@@ -1,14 +1,3 @@
-# == Schema Information
-#
-# Table name: questions
-#
-#  id               :integer          not null, primary key
-#  txt              :text
-#  true_false       :boolean
-#  weight           :integer
-#  questionnaire_id :integer
-#
-
 class Question < ActiveRecord::Base
     belongs_to :questionnaire # each question belongs to a specific questionnaire
     belongs_to :review_score  # each review_score pertains to a particular question

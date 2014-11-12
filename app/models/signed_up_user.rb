@@ -1,14 +1,3 @@
-# == Schema Information
-#
-# Table name: signed_up_users
-#
-#  id                         :integer          not null, primary key
-#  topic_id                   :integer          default(0), not null
-#  creator_id                 :integer          default(0), not null
-#  is_waitlisted              :boolean          default(FALSE), not null
-#  preference_priority_number :integer
-#
-
 class SignedUpUser < ActiveRecord::Base
   belongs_to :topic, :class_name => 'SignUpTopic'
 

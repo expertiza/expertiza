@@ -1,16 +1,3 @@
-# == Schema Information
-#
-# Table name: survey_deployments
-#
-#  id                   :integer          not null, primary key
-#  course_evaluation_id :integer
-#  start_date           :datetime
-#  end_date             :datetime
-#  num_of_students      :integer
-#  last_reminder        :datetime
-#  course_id            :integer          default(0), not null
-#
-
 class SurveyDeployment < ActiveRecord::Base
   validates_numericality_of :num_of_students
   validates_presence_of :num_of_students

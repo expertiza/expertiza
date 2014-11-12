@@ -1,13 +1,3 @@
-# == Schema Information
-#
-# Table name: nodes
-#
-#  id             :integer          not null, primary key
-#  parent_id      :integer
-#  node_object_id :integer
-#  type           :string(255)
-#
-
 class QuestionnaireNode < Node 
   belongs_to :questionnaire, :class_name => "Questionnaire", :foreign_key => "node_object_id"
   

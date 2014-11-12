@@ -1,23 +1,3 @@
-# == Schema Information
-#
-# Table name: automated_metareviews
-#
-#  id                :integer          not null, primary key
-#  relevance         :float
-#  content_summative :float
-#  content_problem   :float
-#  content_advisory  :float
-#  tone_positive     :float
-#  tone_negative     :float
-#  tone_neutral      :float
-#  quantity          :integer
-#  plagiarism        :integer
-#  version_num       :integer
-#  response_id       :integer
-#  created_at        :datetime
-#  updated_at        :datetime
-#
-
 require 'automated_metareview/text_preprocessing'
 require 'automated_metareview/predict_class'
 require 'automated_metareview/degree_of_relevance'

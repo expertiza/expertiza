@@ -1,11 +1,3 @@
-# == Schema Information
-#
-# Table name: permissions
-#
-#  id   :integer          not null, primary key
-#  name :string(255)      default(""), not null
-#
-
 class Permission < ActiveRecord::Base
 
   validates_presence_of :name

@@ -1,14 +1,3 @@
-# == Schema Information
-#
-# Table name: controller_actions
-#
-#  id                 :integer          not null, primary key
-#  site_controller_id :integer          default(0), not null
-#  name               :string(255)      default(""), not null
-#  permission_id      :integer
-#  url_to_use         :string(255)
-#
-
 class ControllerAction < ActiveRecord::Base
 
   validates_presence_of :name

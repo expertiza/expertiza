@@ -1,16 +1,3 @@
-# == Schema Information
-#
-# Table name: menu_items
-#
-#  id                   :integer          not null, primary key
-#  parent_id            :integer
-#  name                 :string(255)      default(""), not null
-#  label                :string(255)      default(""), not null
-#  seq                  :integer
-#  controller_action_id :integer
-#  content_page_id      :integer
-#
-
 class MenuItem < ActiveRecord::Base
 
   attr_accessor :controller_action, :content_page

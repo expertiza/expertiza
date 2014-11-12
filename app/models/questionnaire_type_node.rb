@@ -1,13 +1,3 @@
-# == Schema Information
-#
-# Table name: nodes
-#
-#  id             :integer          not null, primary key
-#  parent_id      :integer
-#  node_object_id :integer
-#  type           :string(255)
-#
-
 class QuestionnaireTypeNode < FolderNode  
   belongs_to :table, :class_name => "TreeFolder", :foreign_key => "node_object_id"
   

@@ -1,13 +1,3 @@
-# == Schema Information
-#
-# Table name: leaderboards
-#
-#  id                    :integer          not null, primary key
-#  questionnaire_type_id :integer
-#  name                  :string(255)
-#  qtype                 :string(255)
-#
-
 # Currently this is a repository for a lot of static class methods.
 # Many of the methods were moved to leaderboard_helper.rb and more
 # probably should be moved.

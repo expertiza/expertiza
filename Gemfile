@@ -29,6 +29,7 @@ gem 'haml-rails'
 gem 'hoptoad_notifier'
 gem 'jquery-rails'
 gem 'jquery-ui-sass-rails'
+gem 'jquery-datetimepicker-rails'
 gem 'mysql2', :platform => :ruby
 gem 'nokogiri'
 gem 'open-uri-cached'

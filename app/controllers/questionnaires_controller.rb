@@ -337,6 +337,8 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
   end
 
   def update
+    puts params[:questionnaire]
+
     @questionnaire = Questionnaire.find(params[:id])
     if current_user.role == Role.ta
       @questionnaire.instructor_id = Ta.get_my_instructor(current_user.id)

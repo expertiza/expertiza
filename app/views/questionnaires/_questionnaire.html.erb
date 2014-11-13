@@ -134,6 +134,7 @@
                                                        <td align=center width=100>Parameters</td>
                                                      <%end%>
                                                      <td align=left>Weight</td>
+                                                     <td align=left>Section_Type</td>
                                                    </tr>
                                                    <% #end %>
                                                    <% 	i = 1   %>
@@ -170,6 +171,7 @@
                                                          <% end%>
 
                                                          <td><%= select("question[]", :weight, Question::WEIGHTS)%></td>
+                                                       <td><%= select("question[]", :sections_id, Question::SECTIONS)%></td>
                                                        </tr>
                                                        <% 	i += 1 %>
                                                      <% end %>

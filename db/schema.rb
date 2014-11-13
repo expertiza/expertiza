@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141111022147) do
+ActiveRecord::Schema.define(version: 20141112233949) do
 
   create_table "assignment_questionnaires", force: true do |t|
     t.integer "assignment_id"
@@ -567,6 +567,7 @@ ActiveRecord::Schema.define(version: 20141111022147) do
     t.boolean "true_false"
     t.integer "weight"
     t.integer "questionnaire_id"
+    t.integer "sections_id"
   end
 
   add_index "questions", ["questionnaire_id"], name: "fk_question_questionnaires", using: :btree
@@ -771,10 +772,11 @@ ActiveRecord::Schema.define(version: 20141111022147) do
   add_index "scores", ["response_id"], name: "fk_score_response", using: :btree
 
   create_table "sections", force: true do |t|
-    t.string   "name",       null: false
+    t.string   "name",         null: false
     t.text     "desc_text"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "questions_id"
   end
 
   create_table "sessions", force: true do |t|

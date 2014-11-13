@@ -77,26 +77,26 @@
       jQuery(document).ready(function () {
         addQuestionnaireTableRow(
           'ReviewQuestionnaire',
-          <%= questionnaire(@assignment, 'ReviewQuestionnaire').to_json.html_safe %>.review_questionnaire,
-          <%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire').to_json.html_safe %>.assignment_questionnaire,
+          <%= questionnaire(@assignment, 'ReviewQuestionnaire').to_json.html_safe %>,
+          <%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire').to_json.html_safe %>,
           <%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json.html_safe %>
         );
         addQuestionnaireTableRow(
           'MetareviewQuestionnaire',
-          <%= questionnaire(@assignment, 'MetareviewQuestionnaire').to_json.html_safe %>.metareview_questionnaire,
-          <%= assignment_questionnaire(@assignment, 'MetareviewQuestionnaire').to_json.html_safe %>.assignment_questionnaire,
+          <%= questionnaire(@assignment, 'MetareviewQuestionnaire').to_json.html_safe %>,
+          <%= assignment_questionnaire(@assignment, 'MetareviewQuestionnaire').to_json.html_safe %>,
           <%= questionnaire_options(@assignment, 'MetareviewQuestionnaire').to_json.html_safe %>
         );
         addQuestionnaireTableRow(
           'AuthorFeedbackQuestionnaire',
-          <%= questionnaire(@assignment, 'AuthorFeedbackQuestionnaire').to_json.html_safe %>.author_feedback_questionnaire,
-          <%= assignment_questionnaire(@assignment, 'AuthorFeedbackQuestionnaire').to_json.html_safe %>.assignment_questionnaire,
+          <%= questionnaire(@assignment, 'AuthorFeedbackQuestionnaire').to_json.html_safe %>,
+          <%= assignment_questionnaire(@assignment, 'AuthorFeedbackQuestionnaire').to_json.html_safe %>,
           <%= questionnaire_options(@assignment, 'AuthorFeedbackQuestionnaire').to_json.html_safe %>
         );
         addQuestionnaireTableRow(
           'TeammateReviewQuestionnaire',
-          <%= questionnaire(@assignment, 'TeammateReviewQuestionnaire').to_json.html_safe %>.teammate_review_questionnaire,
-          <%= assignment_questionnaire(@assignment, 'TeammateReviewQuestionnaire').to_json.html_safe %>.assignment_questionnaire,
+          <%= questionnaire(@assignment, 'TeammateReviewQuestionnaire').to_json.html_safe %>,
+          <%= assignment_questionnaire(@assignment, 'TeammateReviewQuestionnaire').to_json.html_safe %>,
           <%= questionnaire_options(@assignment, 'TeammateReviewQuestionnaire').to_json.html_safe %>
         );
       }());

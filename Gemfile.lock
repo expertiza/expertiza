@@ -115,6 +115,11 @@ GEM
     engtagger (0.2.0)
     erubis (2.7.0)
     execjs (2.2.1)
+    factory_girl (4.5.0)
+      activesupport (>= 3.0.0)
+    factory_girl_rails (4.5.0)
+      factory_girl (~> 4.5.0)
+      railties (>= 3.0.0)
     fastercsv (1.5.5)
     ffi (1.9.3)
     ffi (1.9.3-x86-mingw32)
@@ -444,6 +449,7 @@ DEPENDENCIES
   edavis10-ruby-web-search
   engtagger
   expertiza-authlogic!
+  factory_girl_rails
   fastercsv
   ffi-aspell
   font-awesome-rails

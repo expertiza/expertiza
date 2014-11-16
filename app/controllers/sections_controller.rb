@@ -12,6 +12,9 @@ class SectionsController < ApplicationController
     @sections = Section.all
   end
 
+  def send_to_sec_page
+    redirect_to section_path
+  end
   # GET /sections/1
   def show
   end

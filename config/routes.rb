@@ -1,10 +1,17 @@
 Expertiza::Application.routes.draw do
-  resources :sections
+
 
   resources :bookmark_tags
   resources :books
   resources :bookmarks
   resources :join_team_requests
+
+
+  resources :sections do
+    collection do
+      get :send_to_sec_page
+    end
+  end
 
   resources :admin do
     collection do

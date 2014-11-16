@@ -351,6 +351,9 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
     else
       render 'edit'
     end
+
+    ####################
+    save
   end
 
   def edit_advice  ##Code used to be in this class, was removed.  I have not checked the other class.

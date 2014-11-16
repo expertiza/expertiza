@@ -7,18 +7,18 @@ Teaching_Assistant_role:
   name: "Teaching Assistant"
   default_page_id:
   description: ""
-  parent_id: <%= Fixtures.identify(:Student_role) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:Student_role) %>
 Instructor_role:
   name: "Instructor"
   default_page_id:
   description: ""
-  parent_id: <%= Fixtures.identify(:Teaching_Assistant_role) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:Teaching_Assistant_role) %>
 Administrator_role:
   name: "Administrator"
   default_page_id:
   description: ""
-  parent_id: <%= Fixtures.identify(:Instructor_role) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:Instructor_role) %>
 SuperAdministrator_role:
   name: "Super-Administrator"
   description: ""
-  parent_id: <%= Fixtures.identify(:Administrator_role) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:Administrator_role) %>

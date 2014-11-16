@@ -1,13 +1,12 @@
 class Response < ActiveRecord::Base
-  belongs_to :response_map, :class_name => 'ResponseMap', :foreign_key => 'map_id'
+  belongs_to :map, :class_name => 'ResponseMap', :foreign_key => 'map_id', dependent: :destroy
   has_many :scores, :class_name => 'Score', :foreign_key => 'response_id', :dependent => :destroy
   has_many :metareview_response_maps, :class_name => 'MetareviewResponseMap', :foreign_key => 'reviewed_object_id', dependent: :destroy
 
-  alias_method :map, :response_map
-
   attr_accessor :difficulty_rating
 
-  delegate :questionnaire, :reviewee, :reviewer, :to => :map
+  delegate :questionnaire, :reviewee, :reviewer,
+    :to => :map
 
   def response_id
     id
@@ -175,22 +174,12 @@ class Response < ActiveRecord::Base
     is_valid
   end
 
-  def self.getAllResponseVersions
-    #get all previous versions of responses for the response map.
-    @review_scores=Array.new
-    @prev=Response.where(map_id: @map.id)
-
-    @prev.each do |element|
-      @review_scores << element
-    end
-
-    return @review_scores
-  end
-
   def self.get_largest_version_number(review_scores)
     @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
     @largest_version_num=@sorted[0]
   end
+
+
   require 'analytic/response_analytic'
   include ResponseAnalytic
   end

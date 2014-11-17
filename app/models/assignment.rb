@@ -38,6 +38,10 @@ class Assignment < ActiveRecord::Base
 
   DEFAULT_MAX_REVIEWERS = 3
 
+  def questionnaires_with_questions
+    questionnaires.includes(:questions).joins(:questions)
+  end
+
   def team_assignment?
     max_team_size > 1
   end
@@ -336,7 +340,6 @@ class Assignment < ActiveRecord::Base
     self.participants.each do |participant|
       scores[:participants][participant.id.to_s.to_sym] = participant.get_scores(questions)
 
-
       # for all quiz questionnaires (quizzes) taken by the participant
       quiz_responses = Array.new
       quiz_response_mappings = QuizResponseMap.where(reviewer_id: participant.id)
@@ -372,7 +375,7 @@ class Assignment < ActiveRecord::Base
       index = index + 1
     end
     scores
-    end
+  end
 
   def get_contributor(contrib_id)
     AssignmentTeam.find(contrib_id)

@@ -1,64 +1,29 @@
-<!-- FEEDBACKS -->
+<!-- FEEDBACKS --> 
 <% if rscore and rscore[:assessments].length > 0 %>
   <BR/>
   <%= render :partial => 'grades/review_table',
-    :locals => {
-    :ctrl => 'review_feedback',
-    :caction => 'view',
-    :symbol => "feedback".to_sym,
-    :prefix => prefix,
-    :assignment => participant.assignment,
-    :reviews => rscore[:assessments],
-    :collabel => "Feedback",
-    :rowlabel => "Author"
-  } %>
-<BR/>
-<HR/>
-<% count = 0 %>
-
-<%= form_for @assignment, html: {id: 'author_form'} do %>
-
-  <div id="authreviewtabs">
-    <ul>
-
-
-      <% for i in 1..rscore[:assessments].length %>
-        <li id="tab<%= i %>"><a href="#authreviewtabs-<%= i %>">Review <%= i %></a></li>
-      <% end %>
-    </ul>
-
-
-    <% for feedback in rscore[:assessments] %>
-      <% count = count + 1 %>
-      <% if controller.action_name != "view_my_scores" %>
-        <div id="authreviewtabs-<%= count %>">
-
-          <a name="<%= prefix+"_"+feedback.map.reviewer.name %>"></a><%= feedback.display_as_html(prefix) %>
-        <BR/><BR/>
-
-      </div>
+           :locals => {
+           :ctrl => 'review_feedback',
+           :caction => 'view',
+           :symbol => "feedback".to_sym,
+           :prefix => prefix,
+           :assignment => participant.assignment,
+           :reviews => rscore[:assessments],
+           :collabel => "Feedback",
+           :rowlabel => "Author"
+           }%>
+  <BR/>         
+  <HR/> 
+  <% count = 0 %>
+  <% for feedback in rscore[:assessments] %>
+    <% count = count + 1 %>
+    <% if controller.action_name != "view_my_scores" %>
+      <a name="<%=prefix+"_"+feedback.map.reviewer.name%>"></a><%= feedback.display_as_html(prefix) %><BR/><BR/>
     <% else %>
-      <div id="authreviewtabs-<%= count %>">
-
-        <%= feedback.display_as_html(nil, count) %>
-        <BR/><BR/>
-
-      </div>
-    <% end %>
+      <%= feedback.display_as_html(nil,count) %><BR/><BR/>
+    <% end %>      
   <% end %>
-
-</div>
-
-
-<script>
-  jQuery(document).ready(function () {
-    jQuery("#authreviewtabs").tabs();
-  });
-</script>
-
-    <% end %>
-
-  <% else %>
-    <i>No author feedback has been provided for this user's reviews.</i>
-  <% end %>
-  <!-- END FEEDBACKS -->
+<% else %>
+  <i>No author feedback has been provided for this user's reviews.</i>
+<% end %>
+<!-- END FEEDBACKS -->

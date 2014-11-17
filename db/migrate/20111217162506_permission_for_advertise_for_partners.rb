@@ -16,7 +16,7 @@ class PermissionForAdvertiseForPartners < ActiveRecord::Migration
     SiteController.find_by_name('join_team_requests').destroy
     controller_id = SiteController.find_by_name('sign_up_sheet').id
     action = 'team_details'
-    ControllerAction.find_all_by_site_controller_id_and_name(controller_id, action).each &:destroy
+    ControllerAction.where(site_controller_id: controller_id, name: action).find_each(&:destroy)
     Role.rebuild_cache
   end
 end

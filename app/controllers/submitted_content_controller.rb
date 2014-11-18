@@ -47,14 +47,10 @@ end
 
 # Note: This is not used yet in the view until we all decide to do so
 def remove_hyperlink
-  @participant = AssignmentParticipant.find(params[:id])
+  @participant = AssignmentParticipant.find(params[:hyperlinks][:participant_id])
   return unless current_user_id?(@participant.user_id)
 
-  begin
-    @participant.remove_hyperlink(params['chk_links'].to_i)
-  rescue
-    flash[:error] = $!
-  end
+  @participant.remove_hyperlink(params[:hyperlinks]['chk_links'].to_i)
   undo_link("Link has been removed successfully. ")
   redirect_to :action => 'edit', :id => @participant.id
 end

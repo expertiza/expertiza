@@ -1,7 +1,7 @@
 class ControllerUpdateCoursesUsers < ActiveRecord::Migration
   def self.up
-     permission1 = Permission.find_or_create_by_name('administer courses')
-     site_controller = SiteController.find_or_create_by_name('courses_users')
+     permission1 = Permission.find_or_create_by(name: 'administer courses')
+     site_controller = SiteController.find_or_create_by(name: 'courses_users')
      site_controller.permission_id = permission1.id     
      site_controller.save
      Role.rebuild_cache     
@@ -10,9 +10,9 @@ class ControllerUpdateCoursesUsers < ActiveRecord::Migration
   def self.down
     site_controller = SiteController.find_by_name('courses_users')
     if site_controller != nil
-      actions = ControllerAction.find(:all, :conditions => ['site_controller_id = ?',site_controller.id])
+      actions = ControllerAction.where(['site_controller_id = ?',site_controller.id])
       actions.each {|action| 
-        menuItems = MenuItem.find(:all, :conditions => ['controller_action_id = ?',action.id])
+        menuItems = MenuItem.where(['controller_action_id = ?',action.id])
         menuItems.each{ |item| item.destroy}
         action.destroy
       }

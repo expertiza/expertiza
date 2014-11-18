@@ -1,7 +1,7 @@
 #these 4 helpers consist of the list of plot options that are available for the graph type
 module LineGraphHelper
   #development note
-  # 1)method for generate the data packet has already been - completed: helpers/chart.rb
+  # 1)method for generate the data packet has already been - completed: helpers/chart_helper.rb
   # 2)javascript for rendering the chart - partially completed
   #   currently value x axis can not be independently set
   # 3)data mining method for gathering data - partially completed
@@ -14,7 +14,7 @@ end
 
 module PieChartHelper
   #only for single object compaireson meaning
-  # 1)method for generate the data packet has already been - completed: helpers/chart.rb
+  # 1)method for generate the data packet has already been - completed: helpers/chart_helper.rb
   # 2)javascript for rendering the chart - completed
 
   # good for showing grade distributions
@@ -22,13 +22,14 @@ module PieChartHelper
 end
 
 module ScatterPlotHelper
-  # 1)method for generate the data packet has already been - completed: helpers/chart.rb
+  # 1)method for generate the data packet has already been - completed: helpers/chart_helper.rb
   # 2)javascript for rendering the chart - completed
 
 
 end
 
 module AnalyticHelper
+  include ChartHelper
   #====== generic method to generate chart data (chart_type decides which chart to render) ================#
   def get_chart_data(chart_type, object_type, object_id_list, data_type_list)
     data_point = Array.new

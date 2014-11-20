@@ -62,8 +62,8 @@ class AssignmentTeam < Team
 
   def get_hyperlinks
     links = Array.new
-    self.get_participants.each { |team_member| links.concat(team_member.get_hyperlinks_array) }
-    links
+    self.get_participants.each { |team_member| links.concat(team_member.get_hyperlinks_array)}
+    links.uniq
   end
 
   def get_path

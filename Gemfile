@@ -30,7 +30,7 @@ gem 'hoptoad_notifier'
 gem 'jquery-rails'
 gem 'jquery-ui-sass-rails'
 gem 'jquery-datetimepicker-rails'
-gem 'mysql2', :platform => :ruby
+gem 'mysql2'
 gem 'nokogiri'
 gem 'open-uri-cached'
 gem 'paper_trail'
@@ -48,11 +48,11 @@ gem 'seer'
 gem 'sprockets'
 gem 'stanford-core-nlp'
 gem 'superfish-rails'
-gem 'therubyracer', :platform => :ruby
+gem 'therubyracer'
 gem 'turbolinks'
 gem 'will_paginate'
 gem 'zip-zip'
-gem 'tzinfo-data'
+
 group :development do
   gem 'daemons'
   gem 'pry'
@@ -81,3 +81,4 @@ group :development, :test do
   gem 'capybara'
   gem 'simplecov', :require => false
 end
+

@@ -9,7 +9,7 @@ class ControllerUpdatePasswords < ActiveRecord::Migration
     end
     
     permission = Permission.find_by_name('public actions - execute') 
-    controller = SiteController.find_or_create_by_name('password_retrieval')
+    controller = SiteController.find_or_create_by(name: 'password_retrieval')
     controller.permission_id = permission.id
     controller.save
     

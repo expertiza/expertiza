@@ -6,9 +6,9 @@ class CleanUpQuestionnaires < ActiveRecord::Migration
       LEFT JOIN assignments a ON a.id = aq.assignment_id
       WHERE a.id is NULL and type not in ('SurveyQuestionnaire','CourseEvaluationQuestionnaire','GlobalSurveyQuestionnaire')").each{
        | questionnaire |
-       Question.find_all_by_questionnaire_id(questionnaire.id).each{
+       Question.where(questionnaire_id: questionnaire.id).each{
           | question |
-          QuestionAdvice.find_all_by_question_id(question.id).each{
+          QuestionAdvice.where(question_id: question.id).each{
             | advice |
             advice.destroy
           }

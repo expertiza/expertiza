@@ -165,7 +165,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  get 'late_policies', controller: :late_policies, action: :index
+  resources 'late_policies'
 
   resources :leaderboard, constraints: {id: /\d+/} do
     collection do
@@ -387,7 +387,6 @@ Expertiza::Application.routes.draw do
       get :submit_file
       post :submit_hyperlink
       get :submit_hyperlink
-      get :remove_hyperlink
       get :view
     end
   end
@@ -441,6 +440,7 @@ Expertiza::Application.routes.draw do
   resources :users, constraints: {id: /\d+/} do
     collection do
       get :list
+      post :list
       post ':id', action: :update
       get :show_selection
       get :auto_complete_for_user_name

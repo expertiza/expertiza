@@ -35,8 +35,8 @@
           </div>
             <!-- E726 Changes Begin -->
             <div>
-              <%= link_to image_tag('/assets/image_for_manager.gif', :title => 'Add Manager'), {:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment', :special_role => 'Manager'}, {:title => 'Add Manager'} %>
-              <%= link_to image_tag('/assets/image_for_reader.gif', :title => 'Add Reader'), {:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment', :special_role => 'Reader'}, {:title => 'Add Reader'} %>
+              <%= link_to fa_icon('building', title: 'Add Manager'), {:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment', :special_role => 'Manager'}, {:title => 'Add Manager'} %>
+              <%= link_to fa_icon('book', title: 'Add Reader'), {:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment', :special_role => 'Reader'}, {:title => 'Add Reader'} %>
             </div>
             <!-- E726 Changes End -->
 

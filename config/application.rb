@@ -19,6 +19,8 @@ module Expertiza
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password, :password_confirmation, :password, :password_confirmation]
 
+    config.active_record.whitelist_attributes = false
+
     config.autoload_paths += Dir[Rails.root.join('lib', '{**}')]
   end
 end

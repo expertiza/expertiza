@@ -2,25 +2,17 @@
 <% 
   participant = pscore[:participant]
   if pscore[:review]
-  	s_max = pscore[:review][:scores][:max]
-  	s_min = pscore[:review][:scores][:min] 
-  	s_avg = pscore[:review][:scores][:avg] 
+    @rscore_review=Rscore.new(pscore,:review)
   end
   if pscore[:metareview]
-    r_max = pscore[:metareview][:scores][:max]
-  	r_min = pscore[:metareview][:scores][:min] 
-  	r_avg = pscore[:metareview][:scores][:avg]
-  end 
+    @rscore_metareview=Rscore.new(pscore,:metareview)
+  end
   if pscore[:feedback]
-  	f_max = pscore[:feedback][:scores][:max]
-  	f_min = pscore[:feedback][:scores][:min] 
-  	f_avg = pscore[:feedback][:scores][:avg]
+    @rscore_feedback=Rscore.new(pscore,:feedback)
   end
   if pscore[:teammate]
-  	tr_max = pscore[:teammate][:scores][:max]
-  	tr_min = pscore[:teammate][:scores][:min] 
-  	tr_avg = pscore[:teammate][:scores][:avg]   
-  end  	
+    @rscore_teammate=Rscore.new(pscore,:teammate)
+  end
 %>
 
 <TR class="row" <% if team %> id="<%= prefix %>" style="display:none" <% end %>>
@@ -30,11 +22,11 @@
 	</FONT>  	
     </TD>
     
-    <% if s_avg %>
-  	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",s_avg) %>%
+    <% if @rscore_review.my_avg %>
+  	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",@rscore_review.my_avg) %>%
   	<BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_reviewsLink" name="<%=prefix%>_reviewsLink" onClick="toggleElement('<%=prefix%>_reviews','reviews');return false;">show reviews</a> (<%= pscore[:review][:assessments].size %>)</FONT>
   	</TD>    
-   	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",s_min) %>% - <%= sprintf("%.0f",s_max) %>% 
+   	<TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",@rscore_review.my_min) %>% - <%= sprintf("%.0f",@rscore_review.my_max) %>%
    	<% if controller.action_name != "view_my_scores" %>
    	  <BR/><FONT SIZE="-1"><%= link_to 'email reviewers', :action => 'conflict_notification', :id => participant.id, :submission => 'review' %></FONT>
    	<% end %>  	 
@@ -44,11 +36,11 @@
     <TD ALIGN="CENTER">---</TD>
     <% end %>
     
-    <% if r_avg %>
-    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",r_avg) %>%
+    <% if @rscore_metareview.my_avg %>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",@rscore_metareview.my_avg) %>%
     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_mreviewsLink" name="<%=prefix%>_mreviewsLink" onClick="toggleElement('<%=prefix%>_mreviews','metareviews');return false;">show metareviews</a> (<%= pscore[:metareview][:assessments].size %>)</FONT>
     </TD>
-    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",r_min) %>% - <%= sprintf("%.0f",r_max) %>%
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",@rscore_metareview.my_min) %>% - <%= sprintf("%.0f",@rscore_metareview.my_max) %>%
     <% if controller.action_name != "view_my_scores" %>
       <BR/><FONT SIZE="-1"><%= link_to 'email metareviewers', :action => 'conflict_notification', :id => participant.id, :submission => 'review_of_review' %></FONT>
     <% end %>  	    
@@ -58,12 +50,12 @@
     <TD ALIGN="CENTER">---</TD>
     <% end %>
     
-    <% if f_avg %>
-    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",f_avg) %>%
+    <% if @rscore_feedback.my_avg %>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",@rscore_feedback.my_avg) %>%
     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_feedbackLink" name="<%=prefix%>_feedbackLink" onClick="toggleElement('<%=prefix%>_feedback','author feedbacks');return false;">show author feedbacks</a> (<%= pscore[:feedback][:assessments].size %>)</FONT>
     </TD>
 
-    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",f_min) %>% - <%= sprintf("%.0f",f_max) %>%
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",@rscore_feedback.my_min) %>% - <%= sprintf("%.0f",@rscore_feedback.my_max) %>%
     <% if controller.action_name != "view_my_scores" %>
       <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => 'review_feedback' %></FONT>
     <% end %>  	    
@@ -74,14 +66,14 @@
     <% end %>
   <!--ACS Teammate review needs to be done only if there are more than one person in the team-->
   <% if @assignment.max_team_size > 1 %>
-    <% if tr_avg %>
+    <% if @rscore_teammate.my_avg %>
     <TD ALIGN="CENTER" VALIGN="TOP">
     	<%if controller.action_name != "view_my_scores"%>
-    		<%= sprintf("%.2f",tr_avg) %>
+    		<%= sprintf("%.2f",@rscore_teammate.my_avg) %>
     		<BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_teammate_reviewsLink" name="<%=prefix%>_teammate_reviewsLink" onClick="toggleElement('<%=prefix%>_teammate_reviews','teammate reviews');return false;">show teammate reviews</a> (<%= pscore[:teammate][:assessments].size %>)</FONT>
     	<% end %>
     </TD>
-    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",tr_min) %>% - <%= sprintf("%.0f",tr_max) %>%
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",@rscore_teammate.my_min) %>% - <%= sprintf("%.0f",@rscore_teammate.my_max) %>%
     <% if controller.action_name != "view_my_scores" %>
       <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => 'teammate_review' %></FONT>
     <% end %>  	    
@@ -112,12 +104,13 @@
             <% hardline = 85
                # if tr_avg > hardline
                if true
+               # if @rscore_teammate.my_avg > hardline
                  total_score = total_score + 0.05*total_score
 
-               elsif tr_avg < hardline and (hardline -tr_avg) > 40
+               elsif @rscore_teammate.my_avg < hardline and (hardline - @rscore_teammate.my_avg) > 40
                   total_score = total_score - 10
-               elsif tr_avg < hardline and (hardline -tr_avg) > 20
-                 total_score = total_score - (hardline -tr_avg)*0.5
+               elsif @rscore_teammate.my_avg < hardline and (hardline -@rscore_teammate.my_avg) > 20
+                 total_score = total_score - (hardline -@rscore_teammate.my_avg)*0.5
 
             %>
              <%end%>

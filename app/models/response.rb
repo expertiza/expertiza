@@ -52,12 +52,12 @@ class Response < ActiveRecord::Base
     count = 0
     #self.scores.each {
     Score.where(response_id: self.response_id).each {
-      |reviewScore|
+      |review_score|
       count += 1
-      code += '<big><b>Question '+count.to_s+":</b> <I>"+Question.find(reviewScore.question_id).txt+"</I></big><BR/><BR/>"
-      code += '<TABLE CELLPADDING="5"><TR><TD valign="top"><B>Score:</B></TD><TD><FONT style="BACKGROUND-COLOR:gold">'+reviewScore.score.to_s+"</FONT> out of <B>"+Question.find(reviewScore.question_id).questionnaire.max_question_score.to_s+"</B></TD></TR>"
-      if reviewScore.comments != nil
-        code += '<TR><TD valign="top"><B>Response:</B></TD><TD>' + reviewScore.comments.gsub("<", "&lt;").gsub(">", "&gt;").gsub(/\n/, '<BR/>')
+      code += '<big><b>Question '+count.to_s+":</b> <I>"+Question.find(review_score.question_id).txt+"</I></big><BR/><BR/>"
+      code += '<TABLE CELLPADDING="5"><TR><TD valign="top"><B>Score:</B></TD><TD><FONT style="BACKGROUND-COLOR:gold">'+review_score.score.to_s+"</FONT> out of <B>"+Question.find(review_score.question_id).questionnaire.max_question_score.to_s+"</B></TD></TR>"
+      if review_score.comments != nil
+        code += '<TR><TD valign="top"><B>Response:</B></TD><TD>' + review_score.comments.gsub("<", "&lt;").gsub(">", "&gt;").gsub(/\n/, '<BR/>')
       end
       code += '</TD></TR></TABLE><BR/>'
     }

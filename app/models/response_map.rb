@@ -22,7 +22,7 @@ class ResponseMap < ActiveRecord::Base
 
           @all_resp=Response.find_by_map_id(map.map_id)
           @array_sort << @all_resp
-          @test << map
+          # @test << map
 
           # new method to find all response
           # @all_resp=Response.all
@@ -31,7 +31,7 @@ class ResponseMap < ActiveRecord::Base
           #     @array_sort << element
           #   end
           # end
-          
+
           #sort all versions in descending order and get the latest one.
           @sort_to=@array_sort.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
           responses << @sort_to[0]

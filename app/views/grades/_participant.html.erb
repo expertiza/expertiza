@@ -110,7 +110,8 @@
         end %>
 
             <% hardline = 85
-               if tr_avg > hardline
+               # if tr_avg > hardline
+               if true
                  total_score = total_score + 0.05*total_score
 
                elsif tr_avg < hardline and (hardline -tr_avg) > 40

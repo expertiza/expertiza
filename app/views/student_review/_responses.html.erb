@@ -68,7 +68,7 @@
                 <% if @assignment.staggered_deadline? %>
                     <% if map.type.to_s == "MetareviewResponseMap" %>
                         <% if @assignment.get_current_stage(participant.topic_id) == 'metareview' %>
-                            <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
+                            <td><%=link_to "Begin", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
                         <% else %>
                             <td>Begin</td>
                             <td> (Work has not yet been submitted)</td>
@@ -89,7 +89,7 @@
                         <% end %>
                     <% end %>
                     <% else %>
-                        <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
+                        <td><%= link_to "Section Selection", {:controller => 'sections', :action => 'select_section', :id => map.id,:assignment_id => @assignment.id} %></td>
                         <td>&nbsp;&nbsp;</td>
                         <%-# Display link for code review if 'any' code review files -%>
                         <%-# have been uploaded i.e. files present in code review dir-%>

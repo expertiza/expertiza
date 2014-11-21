@@ -1,11 +1,12 @@
 <!-- PARTICIPANT -->
 <%
     participant = pscore[:participant]
-if pscore[:teammate]
-  tr_max = pscore[:teammate][:scores][:max]
-  tr_min = pscore[:teammate][:scores][:min]
-  tr_avg = pscore[:teammate][:scores][:avg]
-end
+# if pscore[:teammate]
+#  ######change!!
+#   tr_max = pscore[:teammate][:scores][:max]
+#   tr_min = pscore[:teammate][:scores][:min]
+#   tr_avg = pscore[:teammate][:scores][:avg]
+# end
 
 %>
 
@@ -27,13 +28,13 @@ end
   </FONT>
 </TD>
 <% if @assignment.max_team_size > 1 %>
-  <% if tr_avg %>
+  <% if @rscore_teammate.my_avg %>
     <TD ALIGN="CENTER" VALIGN="TOP">
       <%if controller.action_name != "view_my_scores"%>
-        <%= sprintf("%.2f",tr_avg) %>
+        <%= sprintf("%.2f",@rscore_teammate.my_avg) %>
       <% end %>
     </TD>
-    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",tr_min) %>% - <%= sprintf("%.0f",tr_max) %>%
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",@rscore_teammate.my_min) %>% - <%= sprintf("%.0f",@rscore_teammate.my_max) %>%
 
     </TD>
   <% else %>

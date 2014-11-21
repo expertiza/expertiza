@@ -48,7 +48,7 @@ class Team < ActiveRecord::Base
     query = "select users.* from users, participants"
     query = query + " where users.id = participants.user_id"
     query = query + " and participants.type = '"+self.get_participant_type+"'"
-    query = query + " and participants.parent_id = #{self.parent_id}"
+    query = query + " and poarticipants.parent_id = #{self.parent_id}"
       query = query + " and users.name like '#{name}%'"
     query = query + " order by users.name"
     User.find_by_sql(query)
@@ -67,7 +67,7 @@ class Team < ActiveRecord::Base
       can_add_member=true
     else
       max_team_members=Assignment.find(assignment_id).max_team_size
-      curr_team_size= TeamsUser.where(["team_id = ?", self.id])
+      curr_team_size= TeamsUser.where(["team_id = ?", self.id]).size
       can_add_member = (curr_team_size < max_team_members)
     end
 

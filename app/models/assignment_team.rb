@@ -39,13 +39,14 @@ class AssignmentTeam < Team
   end
 
   def reviewed_contributor?(contributor)
-    TeamReviewResponseMap.all(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', contributor.id, self.id, assignment.id]).empty? == false
+    TeamReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', contributor.id, self.id, assignment.id).empty? == false
   end
 
   # END of contributor methods
 
   def participants
-    @participants ||= AssignmentParticipant.all(conditions: ['parent_id = ? && user_id IN (?)', parent_id, users])
+    user_ids=self.users.ids
+    @participants ||= AssignmentParticipant.where('parent_id = ? AND user_id IN (?)', parent_id,user_ids)
   end
 
   def delete
@@ -196,7 +197,7 @@ class AssignmentTeam < Team
           team_users = Array.new
           tcsv.push(team.name)
           if options["team_name"] == "false"
-            team_members = TeamsUser.all(conditions: ['team_id = ?', team.id])
+            team_members = TeamsUser.where('team_id = ?', team.id)
             team_members.each do |user|
               team_users.push(user.name)
               team_users.push(" ")
@@ -219,7 +220,7 @@ class AssignmentTeam < Team
         assignment = Assignment.find(assignment_id)
         team_name = Team.generate_team_name(assignment.name)
         team = AssignmentTeam.create(name: team_name, parent_id: assignment_id)
-        TeamNode.create(parent_id: assignment_id, node_object_id: team.id)
+        TeamNode.create({parent_id: assignment_id, node_object_id: team.id})
         team
       end
 

@@ -1,12 +1,14 @@
 <!-- PARTICIPANT -->
 <%
     participant = pscore[:participant]
+# if pscore[:metareview]
+#   r_max = pscore[:metareview][:scores][:max]
+#   r_min = pscore[:metareview][:scores][:min]
+#   r_avg = pscore[:metareview][:scores][:avg]
+# end
 if pscore[:metareview]
-  r_max = pscore[:metareview][:scores][:max]
-  r_min = pscore[:metareview][:scores][:min]
-  r_avg = pscore[:metareview][:scores][:avg]
+  @rscore_metareview=Rscore.new(pscore,:metareview)
 end
-
 %>
 
 
@@ -26,10 +28,10 @@ end
     <% if participant.topic %> (<%= participant.topic.topic_identifier %>)<% end %>
   </FONT>
 </TD>
-<% if r_avg %>
-  <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",r_avg) %>%
+<% if @rscore_metareview.my_avg %>
+  <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",@rscore_metareview.my_avg) %>%
   </TD>
-  <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",r_min) %>% - <%= sprintf("%.0f",r_max) %>%
+  <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",@rscore_metareview.my_min) %>% - <%= sprintf("%.0f",@rscore_metareview.my_max) %>%
 
   </TD>
 <% else %>

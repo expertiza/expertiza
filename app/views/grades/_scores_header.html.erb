@@ -1,5 +1,6 @@
 <%
     participant = pscore[:participant]
+<%if false%>
 if pscore[:review]
   s_max = pscore[:review][:scores][:max]
   s_min = pscore[:review][:scores][:min]
@@ -20,6 +21,7 @@ if pscore[:teammate]
   tr_min = pscore[:teammate][:scores][:min]
   tr_avg = pscore[:teammate][:scores][:avg]
 end
+<%end%>
 %>
 
 <div class="row">
@@ -60,57 +62,57 @@ end
             submission</a>
         </td>
         <td>
-          <% if s_avg %>
-            <%= sprintf("%.2f", s_avg) %>%
+          <% if @rscore_review.my_avg %>
+            <%= sprintf("%.2f", my_avg) %>%
           <% else %>
             ---
           <% end %>
         </td>
         <td>
-          <% if s_avg %>
-            <%= sprintf("%.0f", s_min) %>% - <%= sprintf("%.0f", s_max) %>%
+          <% if @rscore_review.my_avg %>
+            <%= sprintf("%.0f", my_min) %>% - <%= sprintf("%.0f", my_max) %>%
           <% else %>
             ---
           <% end %>
         </td>
         <td>
-          <% if r_avg %>
-            <%= sprintf("%.2f", r_avg) %>%
+          <% if @rscore_metareview.my_avg %>
+            <%= sprintf("%.2f", my_avg) %>%
           <% else %>
             ---
           <% end %>
         </td>
         <td>
-          <% if r_avg %>
-            <%= sprintf("%.0f", r_min) %>% - <%= sprintf("%.0f", r_max) %>%
+          <% if @rscore_metareview.my_avg %>
+            <%= sprintf("%.0f", my_min) %>% - <%= sprintf("%.0f", my_max) %>%
           <% else %>
             ---
           <% end %>
         </td>
         <td>
-          <% if f_avg %>
-            <%= sprintf("%.2f", f_avg) %>%
+          <% if @rscore_feedback.my_avg %>
+            <%= sprintf("%.2f", my_avg) %>%
           <% else %>
             ---
           <% end %>
         </td>
         <td>
-          <% if f_avg %>
-            <%= sprintf("%.0f", f_min) %>% - <%= sprintf("%.0f", f_max) %>%
+          <% if @rscore_feedback.my_avg %>
+            <%= sprintf("%.0f", my_min) %>% - <%= sprintf("%.0f", my_max) %>%
           <% else %>
             ---
           <% end %>
         </td>
         <td>
-          <% if tr_avg %>
-            <%= sprintf("%.2f", tr_avg) %>
+          <% if @rscore_teammate.my_avg %>
+            <%= sprintf("%.2f", my_avg) %>
           <% else %>
             ---
           <% end %>
         </td>
         <td>
-          <% if tr_avg %>
-            <%= sprintf("%.0f", tr_min) %>% - <%= sprintf("%.0f", tr_max) %>%
+          <% if @rscore_teammate.my_avg %>
+            <%= sprintf("%.0f", my_min) %>% - <%= sprintf("%.0f", my_max) %>%
           <% else %>
             ---
           <% end %>

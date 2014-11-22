@@ -1,6 +1,7 @@
 <!-- PARTICIPANT -->
 <%
     participant = pscore[:participant]
+<%if false%>
 if pscore[:review]
   s_max = pscore[:review][:scores][:max]
   s_min = pscore[:review][:scores][:min]
@@ -21,6 +22,7 @@ if pscore[:teammate]
   tr_min = pscore[:teammate][:scores][:min]
   tr_avg = pscore[:teammate][:scores][:avg]
 end
+<%end%>
 %>
 <TR  class="row" id="<%= prefix %>_mreviews" style="display:none">
   <TD COLSPAN="9"><%= render :partial=>'grades/metareviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:metareview]} %></TD>

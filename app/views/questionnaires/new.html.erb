@@ -10,7 +10,7 @@
           <%= hidden_field 'questionnaire', 'min_question_score' %>
           <%= hidden_field 'questionnaire', 'max_question_score' %>
           <%= select 'questionnaire' , 'section' ,
-            [['Regular',"Regular"], ['Extra Credit', "Extra"],['Custom Rubric', "Custom"]] %>
+            [['Regular',"Regular"], ['Extra Credit', "Extra"],['Custom Rubric', "Custom"],['Specialised Rubric',"SpecialisedRubric"]] %>
           <%= submit_tag "Select", :name=>"select_questionnaire_type" %>
         <% end %>
       </td>

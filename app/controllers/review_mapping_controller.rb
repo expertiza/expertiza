@@ -1,6 +1,11 @@
+
 class ReviewMappingController < ApplicationController
   autocomplete :user, :name
+  #include GoogleChartsModule
+  #ClassMethods::
+  #include GoogleChartsModule
   #use_google_charts
+
   helper :dynamic_review_assignment
   helper :submitted_content
 

@@ -5,7 +5,7 @@ class SectionsController < ApplicationController
     ['Super-Administrator',
      'Administrator',
      'Instructor',
-     'Teaching Assistant'].include? current_role_name
+     'Teaching Assistant','Student'].include? current_role_name
   end
   # GET /sections
   def index
@@ -39,6 +39,18 @@ class SectionsController < ApplicationController
     end
   end
 
+  def select_section
+
+      response_map=ResponseMap.find(params[:id])
+      assignment=Assignment.find(params[:assignment_id])
+      questionnaire= Questionnaire.find(assignment.review_questionnaire_id)
+      questions=questionnaire.questions
+      @sections=[]
+      questions.each { |question| @sections<< (Section.find(question.sections_id)).name }
+      @sections.uniq!
+
+
+  end
   # PATCH/PUT /sections/1
   def update
     if @section.update(section_params)

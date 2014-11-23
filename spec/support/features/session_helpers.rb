@@ -3,7 +3,7 @@ require 'rspec/rails'
 module Features
   module SessionHelpers
     # Navigates to the root url and logs in as the specified user
-    def log_in(user)
+    def log_in_as_user(user)
       visit root_path
 
       fill_in 'login_name', with: user.name

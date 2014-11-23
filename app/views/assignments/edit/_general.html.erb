@@ -3,8 +3,8 @@ function requireSignUpChanged() {
   var msg = 'Warning! Unchecking this box will remove all topics and the reservations of everyone who is sign up for them';
 
   if (jQuery('#assignment_require_signup').is(':checked')) {
-    addDueDateTableElement('signup', 0, <%= due_date(@assignment, 'signup').to_json.html_safe %>.due_date);
-    addDueDateTableElement('drop_topic', 0, <%= due_date(@assignment, 'drop_topic').to_json.html_safe %>.due_date)
+    addDueDateTableElement('signup', 0, <%= due_date(@assignment, 'signup').to_json.html_safe %>);
+    addDueDateTableElement('drop_topic', 0, <%= due_date(@assignment, 'drop_topic').to_json.html_safe %>)
   } else {
     if (confirm(msg)) {
       removeDueDateTableElement('signup', 0);
@@ -20,7 +20,7 @@ function teamAssignmentChanged() {
 
   if (jQuery('#assignment_team_assignment').is(':checked')) {
     jQuery('#assignment_team_count_field').removeAttr('hidden');
-    addDueDateTableElement('team_formation', 0, <%= due_date(@assignment, 'team_formation').to_json.html_safe %>.due_date)
+    addDueDateTableElement('team_formation', 0, <%= due_date(@assignment, 'team_formation').to_json.html_safe %>)
   } else {
     if (confirm(msg)) {
       jQuery('#assignment_team_count_field').attr('hidden', true);
@@ -115,8 +115,8 @@ function is_coding_assignmentChanged(){
   <% if @assignment.require_signup? %>
     <script>
       jQuery(document).ready(function () {
-        addDueDateTableElement('signup', 0, <%= due_date(@assignment, 'signup').to_json.html_safe %>.due_date);
-              addDueDateTableElement('drop_topic', 0, <%= due_date(@assignment, 'drop_topic').to_json.html_safe %>.due_date)
+        addDueDateTableElement('signup', 0, <%= due_date(@assignment, 'signup').to_json.html_safe %>);
+              addDueDateTableElement('drop_topic', 0, <%= due_date(@assignment, 'drop_topic').to_json.html_safe %>)
       });
     </script>
   <% end %>
@@ -214,8 +214,8 @@ function is_coding_assignmentChanged(){
         var checkbox = jQuery('#assignment_require_signup');
 
         if (checkbox.is(':checked')) {
-          addDueDateTableElement('signup', 0, <%= due_date(@assignment, 'signup').to_json.html_safe %>.due_date);
-            addDueDateTableElement('drop_topic', 0, <%= due_date(@assignment, 'drop_topic').to_json.html_safe %>.due_date);
+          addDueDateTableElement('signup', 0, <%= due_date(@assignment, 'signup').to_json.html_safe %>);
+            addDueDateTableElement('drop_topic', 0, <%= due_date(@assignment, 'drop_topic').to_json.html_safe %>);
         } else {
           if (<%= @assignment.has_topics? %>) {
             if (confirm(msg)) {
@@ -238,7 +238,7 @@ function is_coding_assignmentChanged(){
 
         if (checkbox.is(':checked')) {
           team_count_field.removeAttr('hidden');
-            addDueDateTableElement('team_formation', 0, <%= due_date(@assignment, 'team_formation').to_json.html_safe %>.due_date)
+            addDueDateTableElement('team_formation', 0, <%= due_date(@assignment, 'team_formation').to_json.html_safe %>)
         } else {
           if (<%= @assignment.has_teams?%>) {
             if (confirm(msg)) {

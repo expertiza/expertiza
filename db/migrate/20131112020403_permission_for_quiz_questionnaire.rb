@@ -15,7 +15,7 @@ class PermissionForQuizQuestionnaire < ActiveRecord::Migration
     controller_id = SiteController.find_by_name('questionnaire').id
     actions = ['new_quiz', 'create_quiz_questionnaire', 'update_quiz', 'edit_quiz', 'view_quiz']
     for action in actions do
-      ControllerAction.find_all_by_site_controller_id_and_name(controller_id, action).each &:destroy
+      ControllerAction.where(site_controller_id: controller_id, name: action).find_each(&:destroy)
     end
     Role.rebuild_cache
   end

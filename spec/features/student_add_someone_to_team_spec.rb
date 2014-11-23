@@ -9,12 +9,8 @@ describe 'Student adds someone to team', :type => :feature do
 
     topic = FactoryGirl.create :sign_up_topic, assignment: assignment
 
-    visit root_path
-
     # Log in as student1
-    fill_in 'login_name', with: student1.name
-    fill_in 'login_password', with: student1.password
-    click_on 'Login'
+    log_in(student1)
 
     # Navigate to the assignment
     click_link assignment.name

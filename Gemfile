@@ -1,4 +1,4 @@
-#ruby '2.1.0'
+#ruby '2.1.2'
 
 source 'http://rubygems.org'
 
@@ -30,6 +30,7 @@ gem 'haml-rails'
 gem 'hoptoad_notifier'
 gem 'jquery-rails'
 gem 'jquery-ui-sass-rails'
+gem 'jquery-datetimepicker-rails'
 gem 'mysql2'
 gem 'nokogiri'
 gem 'open-uri-cached'
@@ -58,7 +59,7 @@ group :development do
   gem 'pry'
   gem 'pry-remote'
   gem 'pry-nav'
-  gem 'sqlite3-ruby', :require => 'sqlite3'
+  #gem 'sqlite3-ruby', :require => 'sqlite3'
   gem 'selenium-webdriver'
 end
 

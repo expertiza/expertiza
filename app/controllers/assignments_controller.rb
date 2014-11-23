@@ -19,11 +19,14 @@ class AssignmentsController < ApplicationController
 
   def new
     @assignment = Assignment.new
+    if params[:parent_id] then
     @assignment.course = Course.find(params[:parent_id]) if params[:parent_id]
 
     @assignment.instructor = @assignment.course.instructor if @assignment.course
+    else
+    @assignment.course = nil
     @assignment.instructor ||= current_user
-
+    end
     @assignment.wiki_type_id = 1 #default no wiki type
     @assignment.max_team_size = 1
   end

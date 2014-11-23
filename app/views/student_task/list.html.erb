@@ -100,7 +100,7 @@
           <td><%= student_task.course.try :name %></td>
           <td><%= student_task.topic_name %></td>
           <td><%= participant.assignment.get_current_stage(participant.topic_id) %></td>
-          <td><%= student_task.stage_deadline %></td>
+          <td><%= student_task.stage_deadline.in_time_zone(session[:user].timezonepref) %></td>
           <td align=center>
             <% if participant.permission_granted %>granted
             <% else %>denied

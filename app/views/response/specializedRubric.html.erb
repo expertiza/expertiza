@@ -1,6 +1,6 @@
 <SCRIPT LANGUAGE="JavaScript">
-    function makevisibleDiv(checked,Tableid) {
-        var div= document.getElementById(Tableid)
+    function makevisibleDiv(checked,id) {
+        var div= document.getElementById(id)
         if (checked==1) {
             div.style.display = '';
         } else {
@@ -8,8 +8,6 @@
         }
     }
 </SCRIPT>
-
-
 
 <h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
 
@@ -31,18 +29,23 @@
 <% @responses_versions = @map.get_all_versions() %>
 
 <% if @responses_versions.empty? %>
-    "<I>No previous review was performed.</I><br/>
-    <hr/><br/>"
+    <I>No previous review was performed.</I><br/>
+    <hr/><br/>
 <% else %>
     <%= render :partial => 'review', :locals => {:versions => @responses_versions} %>
 <% end %>
 
 <% rearrangedQuestions= @questions.sort_by {|question| [question.sections_id,question.id]} %>
+
+
 <%= form_tag :action => @next_action, :id => @modified_object do %>
+
    <% @unique_sections.each do |section_no| %>
         <% @section=Section.find(section_no)%>
-        <input id="attempt<%=section_no%>" name="attempt<%=section_no%>" value="<%= @section.name %>" type="checkbox" onchange="makevisibleDiv(this.checked,<%=section_no%>);">
-        <%= @section.name %></input>
+        <!--<input id="attempt<%=section_no%>" name="attempt<%=section_no%>" value="<%= @section.name %>" type="checkbox" checked="true" onchange="makevisibleDiv(this.checked,<%=section_no%>);">-->
+        <input id="attempt<%=section_no%>" name="attempt[]" value="<%= @section.name %>" type="checkbox" checked="true" onchange="makevisibleDiv(this.checked,<%=section_no%>);">
+
+        Uncheck to Skip <%= @section.name %> Section</input>
         </BR>
         <div id=<%=section_no%> >
 

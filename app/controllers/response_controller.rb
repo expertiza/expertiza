@@ -282,6 +282,12 @@ class ResponseController < ApplicationController
 
     # Check whether this is a custom rubric
     if @map.questionnaire.section.eql? "Custom"
+
+      @qtn_sections=[]
+      @questions.each {|question| @qtn_sections<<question.sections_id}
+      @unique_sections=@qtn_sections.uniq
+      @unique_sections.sort!
+
       @question_type = Array.new
       @questions.each {
           |question|
@@ -338,6 +344,7 @@ class ResponseController < ApplicationController
 
   def create
     @map = ResponseMap.find(params[:id]) #assignment/review/metareview id is in params id
+    puts params[:attempt]
     @res = 0
     msg = ""
     error_msg = ""

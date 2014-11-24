@@ -282,6 +282,10 @@ class ResponseController < ApplicationController
 
     # Check whether this is a custom rubric
     if @map.questionnaire.section.eql? "Custom"
+      @qtn_sections=[]
+      @questions.each {|question| @qtn_sections<<question.sections_id}
+      @unique_sections=@qtn_sections.uniq
+      @unique_sections.sort!
       @question_type = Array.new
       @questions.each {
           |question|
@@ -336,10 +340,24 @@ class ResponseController < ApplicationController
     get_scores
   end
 
+  def filter_questions
+    attempt=[]
+    attempt=params[:attempt]
+    params[:responses].each_pair do |k,v|
+      puts v[:section]
+     unless v[:section].in?attempt
+       params[:responses].delete(k)
+     end
+    end
+  end
+
   def create
     @map = ResponseMap.find(params[:id]) #assignment/review/metareview id is in params id
     @res = 0
     msg = ""
+    if @map.questionnaire.section.eql? "Specialised Rubric"
+      filter_questions
+    end
     error_msg = ""
     latestResponseVersion
     @review_scores=Array.new

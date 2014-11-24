@@ -39,14 +39,16 @@
 
 <% rearrangedQuestions= @questions.sort_by {|question| [question.sections_id,question.id]} %>
 <%= form_tag :action => @next_action, :id => @modified_object do %>
-   <% @unique_sections.each do |section_no| %>
+    <%i = 0
+   @unique_sections.each do |section_no| %>
         <% @section=Section.find(section_no)%>
-        <input id="attempt<%=section_no%>" name="attempt<%=section_no%>" value="<%= @section.name %>" type="checkbox" onchange="makevisibleDiv(this.checked,<%=section_no%>);">
+        <!--<input id="attempt<%=section_no%>" name="attempt<%=section_no%>" value="<%= @section.name %>" type="checkbox" onchange="makevisibleDiv(this.checked,<%=section_no%>);">-->
+        <input id="attempt<%=section_no%>" name="attempt[]" value="<%= @section.id %>" type="checkbox" onchange="makevisibleDiv(this.checked,<%=section_no%>);">
         <%= @section.name %></input>
         </BR>
         <div id=<%=section_no%> >
 
-    <% i = 0
+    <%
 
        sectionquestions=[]
        rearrangedQuestions.each {|question| sectionquestions<<question if question.sections_id == section_no}
@@ -54,6 +56,7 @@
                |question| %>
 
         <%= question.txt %><BR/>
+        <input id="responses_<%= i %>_section" name="responses[<%= i %>][section]" type="hidden" value="<%=@section.id%>">
         <% if controller.action_name != 'new' and @review_scores[i] != nil and @review_scores[i].comments != nil %>
             <% text = @review_scores[i].comments.gsub(/\"/, '&quot;').lstrip %>
             <textarea cols="70" rows="1" id="responses_<%= i %>_comments" name="responses[<%= i %>][comment]" style="overflow:hidden;" onkeyup="checkRows(this)"><%= text %></textarea>

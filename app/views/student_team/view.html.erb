@@ -121,7 +121,6 @@
                </tr>
              <% else %>
                <% for inv in @received_invs %>
-                 <!-->
                  <% if inv.reply_status == 'W' %>
                    <tr>
                      <td><%= inv.from_user.name %></td>
@@ -142,12 +141,11 @@
                      %>
                    <%= link_to "Accept",
                      {:controller => 'invitation', :action => 'accept', :inv_id => inv.id, :student_id => @student.id, :team_id => @team_id} %>
-                   |
+
                    <%= link_to "Decline",
                    {:controller => 'invitation', :action => 'decline', :inv_id => inv.id, :student_id => @student.id} %>
                </td>
              </tr>
-             <!-->
            <% end %>
          <% end %>
        <% end %>

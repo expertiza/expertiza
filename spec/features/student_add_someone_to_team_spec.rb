@@ -9,23 +9,21 @@ describe 'Student adds someone to team', :type => :feature do
 
     topic = FactoryGirl.create :sign_up_topic, assignment: assignment
 
-    visit root_path
+    team_name = 'TestTeamName'
 
     # Log in as student1
-    fill_in 'login_name', with: student1.name
-    fill_in 'login_password', with: student1.password
-    click_on 'Login'
+    log_in_as_user(student1)
 
-    # Navigate to the assignment
+    # Navigate to the assignment team page
     click_link assignment.name
     click_link 'Your team'
 
     # Create a team
-    fill_in 'team_name', with: 'TestTeamName'
+    fill_in 'team_name', with: team_name
     click_on 'Create Team'
 
     # Expect team name to be displayed
-    expect(page).to have_content('TestTeamName')
+    expect(page).to have_content(team_name)
 
     # Invite student2 to the team
     fill_in 'user_name', with: student2.name
@@ -33,5 +31,22 @@ describe 'Student adds someone to team', :type => :feature do
 
     # Expect student2 to show up under 'Sent Invitations'
     expect(page).to have_content(student2.name)
+
+    # Switch to student2
+    log_out
+    log_in_as_user(student2)
+
+    # Navigate to the assignment team page
+    click_link assignment.name
+    click_link 'Your team'
+
+    # Expect team name to be displayed under 'Received Invitations'
+    expect(page).to have_content(team_name)
+
+    # Accept the team invitation
+    click_link 'Accept'
+
+    # Expect team name to be displayed under 'Team members'
+    expect(page).to have_content(team_name)
   end
 end

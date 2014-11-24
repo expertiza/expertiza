@@ -93,27 +93,17 @@
     <% if controller.action_name == 'view' or controller.action_name == "view_my_scores" %>
     	<TD ALIGN="CENTER">
     	<% if stage == "Finished" %>
+
         <% if participant.grade
           total_score = participant.grade
           title = "A score in blue indicates that the value was overwritten by the instructor or teaching assistant."
         else
-          total_score = pscore[:total_score] 
+          total_score = pscore[:total_score]
           title = nil
         end %>
 
-            <% hardline = 85
-               if @rscore_teammate.my_avg.to_f > hardline
-                 total_score = total_score + 0.05*total_score
-               elsif @rscore_teammate.my_avg.to_f < hardline and (hardline - @rscore_teammate.my_avg.to_f) > 40
-                  total_score = total_score - 10
-               elsif @rscore_teammate.my_avg.to_f < hardline and (hardline -@rscore_teammate.my_avg.to_f) > 20
-                 total_score = total_score - (hardline -@rscore_teammate.my_avg.to_f)*0.5
-            %>
-             <%end%>
-              <% if total_score>100
-              total_score = 100
-              %>
-              <%end%>
+
+
         <div <% if title %>title="<%=title%>" style="color:#0033FF"<% end %>><%= sprintf("%.2f",total_score) %><%= score_postfix %></div>
         <% if controller.action_name != "view_my_scores" %> 
           <BR/><FONT SIZE="-1"><%= link_to 'edit score', :action => 'edit', :id => participant.id %></FONT>

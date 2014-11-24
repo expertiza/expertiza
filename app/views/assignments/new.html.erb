@@ -1,13 +1,13 @@
 <h1>New Assignment</h1>
 
-<%= form_tag @assignment do %>
-  <%= hidden_field_tag('assignment[instructor_id]', @assignment.instructor_id) %>
-  <%= hidden_field_tag('assignment[course_id]', @assignment.course_id) %>
-  <%= hidden_field_tag('assignment[wiki_type_id]', @assignment.wiki_type_id) %>
-  <%= hidden_field_tag('assignment[max_team_size]', @assignment.max_team_size) %>
+<%= form_tag("/assignments/create", :method => "post") do %>
+  <%= hidden_field_tag('assignment_form[assignment][instructor_id]', @assignment_form.assignment.instructor_id) %>
+  <%= hidden_field_tag('assignment_form[assignment][course_id]', @assignment_form.assignment.course_id) %>
+  <%= hidden_field_tag('assignment_form[assignment][wiki_type_id]', @assignment_form.assignment.wiki_type_id) %>
+  <%= hidden_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size) %>
 
-  <%= label_tag('assignment[name]', 'Name:') %>
-  <%= text_field_tag('assignment[name]') %>
+  <%= label_tag('assignment_form[assignment][name]', 'Name:') %>
+  <%= text_field_tag('assignment_form[assignment][name]') %>
   <br/><br/>
 
   <%= submit_tag 'Create' %> |

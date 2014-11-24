@@ -18,18 +18,18 @@ class AssignmentsController < ApplicationController
   end
 
   def new
-    @assignment = Assignment.new
-    @assignment.course = Course.find(params[:parent_id]) if params[:parent_id]
+    @assignment_form = AssignmentForm.new
+    @assignment_form.assignment.course = Course.find(params[:parent_id]) if params[:parent_id]
 
-    @assignment.instructor = @assignment.course.instructor if @assignment.course
-    @assignment.instructor ||= current_user
+    @assignment_form.assignment.instructor = @assignment_form.assignment.course.instructor if @assignment_form.assignment.course
+    @assignment_form.assignment.instructor ||= current_user
 
-    @assignment.wiki_type_id = 1 #default no wiki type
-    @assignment.max_team_size = 1
+    @assignment_form.assignment.wiki_type_id = 1 #default no wiki type
+    @assignment_form.assignment.max_team_size = 1
   end
 
   def create
-    @assignment = Assignment.new(params[:assignment])
+    @assignment_form = AssignmentForm.new(params[:assignment_form])
     #This one is working
     #       emails = Array.new
     #      #emails<<"vikas.023@gmail.com"
@@ -40,13 +40,13 @@ class AssignmentsController < ApplicationController
     #    :partial_name => 'update'
     #    }).deliver
 
-    if @assignment.save
-      @assignment.create_node
+    if @assignment_form.save
+      @assignment_form.assignment.create_node
       # flash[:success] = 'Assignment was successfully created.'
       # redirect_to controller: :assignments, action: :edit, id: @assignment.id
       #AAD#
       redirect_to :controller => 'tree_display', :action => 'list'
-      undo_link("Assignment \"#{@assignment.name}\" has been created successfully. ")
+      undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
       #AAD#
     else
       render 'new'
@@ -54,7 +54,11 @@ class AssignmentsController < ApplicationController
   end
 
   def edit
+    @assignment_form =  AssignmentForm.createFormObject(params[:id])
+
+    #Remove this line once you change all the views
     @assignment = Assignment.find(params[:id])
+
     @user = current_user
     set_up_assignment_review
   end
@@ -142,15 +146,17 @@ class AssignmentsController < ApplicationController
   end
 
   def update
-    @assignment = Assignment.find(params[:id])
-    params[:assignment][:wiki_type_id] = 1 unless params[:assignment_wiki_assignment]
+
+    print '-----------------------In update -------'
+    @assignment_form= AssignmentForm.createFormObject(params[:id])
+    params[:assignment_form][:assignment][:wiki_type_id] = 1 unless params[:assignment_wiki_assignment]
 
     #TODO: require params[:assignment][:directory_path] to be not null
     #TODO: insert warning if directory_path is duplicated
 
-    @hash1 = Hash.new(params[:assignment])
-    if  @hash1[:assignment][:late_policy_id].to_i > 0
-      if @assignment.update_attributes(params[:assignment])
+    @hash1 = Hash.new(params[:assignment_form])
+    if  @hash1[:assignment_form][:assignment][:late_policy_id].to_i > 0
+      if @assignment_form.update_attributes(params[:assignment_form])
         flash[:note] = 'Assignment was successfully saved.'
         #TODO: deal with submission path change
         # Need to rename the bottom-level directory and/or move intermediate directories on the path to an
@@ -159,30 +165,30 @@ class AssignmentsController < ApplicationController
         #  - rename an assgt. -- implemented by renaming a directory
         #  - assigning an assignment to a course -- implemented by moving a directory.
 
-        undo_link("Assignment \"#{@assignment.name}\" has been edited successfully. ")
+        undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been edited successfully. ")
 
         if params[:due_date]
           # delete the previous jobs from the delayed_jobs table
-          djobs = Delayed::Job.where(['handler LIKE "%assignment_id: ?%"', @assignment.id])
+          djobs = Delayed::Job.where(['handler LIKE "%assignment_id: ?%"', @assignment_form.assignment.id])
           for dj in djobs
             delete_from_delayed_queue(dj.id)
           end
 
           add_to_delayed_queue
         end
-        redirect_to :action => 'edit', :id => @assignment.id
+        redirect_to :action => 'edit', :id => @assignment_form.assignment.id
       else
-        flash[:error] = "Assignment save failed: #{@assignment.errors.full_messages.join(' ')}"
-          redirect_to :action => 'edit', :id => @assignment.id
+        flash[:error] = "Assignment save failed: #{@assignment_form.errors.full_messages.join(' ')}"
+          redirect_to :action => 'edit', :id => @assignment_form.assignment.id
       end
     else
 
-      @hash1[:assignment][:late_policy_id] = nil
-      if @assignment.update_attributes(@hash1[:assignment])
-        redirect_to :action => 'edit', :id => @assignment.id
+      @hash1[:@assignment_form][:assignment][:late_policy_id] = nil
+      if @assignment_form.update_attributes(@hash1[:assignment_form])
+        redirect_to :action => 'edit', :id => @assignment_form.assignment.id
       else
         flash[:error] = "Assignment save failed: #{@assignment.errors.full_messages.join(' ')}"
-          redirect_to :action => 'edit', :id => @assignment.id
+          redirect_to :action => 'edit', :id => @assignment_form.assignment.id
       end
     end
   end

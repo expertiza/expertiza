@@ -21,7 +21,8 @@ class SignUpSheetController < ApplicationController
     else
       ['Instructor',
        'Teaching Assistant',
-       'Administrator'].include? current_role_name
+       'Administrator',
+       'Super-Administrator'].include? current_role_name
     end
   end
 
@@ -88,7 +89,8 @@ class SignUpSheetController < ApplicationController
         if @sign_up_topic.save
           #NotificationLimit.create(:topic_id => @sign_up_topic.id)
           undo_link("Topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. ")
-          redirect_to_sign_up(params[:id])
+          #changing the redirection url to topics tab in edit assignment view.
+          redirect_to edit_assignment_path(@sign_up_topic.assignment_id) + "#tabs-5"
         else
           render :action => 'new', :id => params[:id]
         end
@@ -96,9 +98,10 @@ class SignUpSheetController < ApplicationController
     end
 
     #This method is used to delete signup topics
-    def delete
+    #Renaming delete method to destroy for rails 4 compatible
+    def destroy
       @topic = SignUpTopic.find(params[:id])
-
+      params[:assignment_id] = @topic.assignment_id
       if @topic
         @topic.destroy
         undo_link("Topic: \"#{@topic.topic_name}\" has been deleted successfully. ")
@@ -113,13 +116,14 @@ class SignUpSheetController < ApplicationController
           dependencies.each { |dependency| dependency.destroy }
         end
       end
-      redirect_to_sign_up(params[:assignment_id])
+      #changing the redirection url to topics tab in edit assignment view.
+      redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
     end
 
     #prepares the page. shows the form which can be used to enter new values for the different properties of an assignment
     def edit
       @topic = SignUpTopic.find(params[:id])
-      @assignment_id = params[:assignment_id]
+      @assignment_id = @topic.assignment_id
     end
 
     #updates the database tables to reflect the new values for the assignment. Used in conjuntion with edit
@@ -153,7 +157,8 @@ class SignUpSheetController < ApplicationController
         else
           flash[:error] = "Topic could not be updated"
         end
-        redirect_to_sign_up(params[:assignment_id])
+        #changing the redirection url to topics tab in edit assignment view.
+        redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
       end
 
 

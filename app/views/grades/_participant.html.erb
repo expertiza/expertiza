@@ -102,14 +102,12 @@
         end %>
 
             <% hardline = 85
-               if true
-               # if @rscore_teammate.my_avg > hardline
+               if @rscore_teammate.my_avg.to_i > hardline
                  total_score = total_score + 0.05*total_score
-
-               elsif @rscore_teammate.my_avg < hardline and (hardline - @rscore_teammate.my_avg) > 40
+               elsif @rscore_teammate.my_avg.to_i < hardline and (hardline - @rscore_teammate.my_avg.to_i) > 40
                   total_score = total_score - 10
-               elsif @rscore_teammate.my_avg < hardline and (hardline -@rscore_teammate.my_avg) > 20
-                 total_score = total_score - (hardline -@rscore_teammate.my_avg)*0.5
+               elsif @rscore_teammate.my_avg.to_i < hardline and (hardline -@rscore_teammate.my_avg.to_i) > 20
+                 total_score = total_score - (hardline -@rscore_teammate.my_avg.to_i)*0.5
 
             %>
              <%end%>

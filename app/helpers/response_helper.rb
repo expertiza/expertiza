@@ -272,6 +272,9 @@ module ResponseHelper
 
   # Rearrange questions shown to a reviewer based on response count
   # for each question and accordion panel of previous reviews for that submission
+
+
+
   def rearrange_questions(questions)
     if (check_threshold)
       return questions

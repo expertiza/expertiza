@@ -297,6 +297,16 @@ class ResponseController < ApplicationController
       end
       @next_action = "custom_create"
       render :action => 'custom_response'
+      #add call to specialized rubric
+
+    elsif @map.questionnaire.section.eql? "Specialised Rubric"
+      @qtn_sections=[]
+      @questions.each {|question| @qtn_sections<<question.sections_id}
+      @unique_sections=@qtn_sections.uniq
+      @unique_sections.sort!
+
+      render :action => 'specializedRubric'
+
     else
       render :action => 'response'
     end

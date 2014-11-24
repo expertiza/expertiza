@@ -1,11 +1,11 @@
 <!-- PARTICIPANT -->
 <%
     participant = pscore[:participant]
-if pscore[:review]
-  s_max = pscore[:review][:scores][:max]
-  s_min = pscore[:review][:scores][:min]
-  s_avg = pscore[:review][:scores][:avg]
-end
+# if pscore[:review]
+#   s_max = pscore[:review][:scores][:max]
+#   s_min = pscore[:review][:scores][:min]
+#   s_avg = pscore[:review][:scores][:avg]
+# end
 
 %>
 
@@ -26,11 +26,11 @@ end
     <% if participant.topic %> (<%= participant.topic.topic_identifier %>)<% end %>
   </FONT>
 </TD>
-<% if s_avg %>
-  <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",s_avg) %>%
+<% if @rscore_review.my_avg %>
+  <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",@rscore_review.my_avg) %>%
 
   </TD>
-  <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",s_min) %>% - <%= sprintf("%.0f",s_max) %>%
+  <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",@rscore_review.my_min) %>% - <%= sprintf("%.0f",@rscore_review.my_max) %>%
     <% if controller.action_name != "view_my_scores" %>
       <BR/><FONT SIZE="-1"><%= link_to 'email reviewers', :action => 'conflict_notification', :id => participant.id, :submission => 'review' %></FONT>
     <% end %>

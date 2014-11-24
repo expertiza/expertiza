@@ -7,4 +7,4 @@
   <%= submit_tag "Update"%>
 <% end %>
 
-<%= link_to 'Back', :action => 'add_signup_topics', :id => params[:assignment_id]%>
+<%= link_to 'Back', edit_assignment_path(@assignment_id, anchor: 'tabs-5') %>

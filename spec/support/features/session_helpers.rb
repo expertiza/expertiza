@@ -11,5 +11,12 @@ module Features
       click_on 'Login'
     end
 
+    # Logs the current user out
+    def log_out
+      visit root_path
+
+      click_on 'Logout'
+    end
+
   end
 end

@@ -32,6 +32,8 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  post  '/assignments/create', :controller => 'assignments', :action => 'create'
+
   resources :assignments do
     collection do
       get :associate_assignment_with_course

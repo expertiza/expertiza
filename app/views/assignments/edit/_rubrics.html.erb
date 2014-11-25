@@ -43,6 +43,7 @@
             for (j = 0; j < fields.length; j++) {
               para += "&" + (fields[j].name + "=" + fields[j].value);
             }
+            para.print;
             jQuery.get("/assignments/set_questionnaire" + para);
         }
     }

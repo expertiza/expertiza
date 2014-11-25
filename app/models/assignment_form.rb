@@ -6,14 +6,14 @@ class AssignmentForm
 
     if attributes.nil? then
 
-        @assignment = Assignment.new
-        @assignment_questionnaires = AssignmentQuestionnaire.new
-        @due_dates = DueDate.new
+      @assignment = Assignment.new
+      @assignment_questionnaires = AssignmentQuestionnaire.new
+      @due_dates = DueDate.new
 
     else
-        @assignment = Assignment.new(attributes[:assignment])
-        @assignment_questionnaires = AssignmentQuestionnaire.new(attributes[:assignment_questionnaires])
-        @due_dates = DueDate.new(attributes[:due_dates])
+      @assignment = Assignment.new(attributes[:assignment])
+      @assignment_questionnaires = AssignmentQuestionnaire.new(attributes[:assignment_questionnaires])
+      @due_dates = DueDate.new(attributes[:due_dates])
     end
 
   end
@@ -23,6 +23,7 @@ class AssignmentForm
   def self.createFormObject(assignment_id)
     assignment_form = AssignmentForm.new
     assignment_form.assignment = Assignment.find(assignment_id)
+    assignment_form.assignment_questionnaires = AssignmentQuestionnaire.find_by_assignment_id(assignment_id)
     return assignment_form
   end
 

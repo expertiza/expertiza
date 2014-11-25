@@ -123,21 +123,21 @@ class AssignmentsController < ApplicationController
   end
 
   def set_questionnaire
-    if params[:assignment_questionnaire][:assignment_id].nil? or params[:assignment_questionnaire][:questionnaire_id].nil?
+    if params[:assignment_form][:assignment_questionnaire][:assignment_id].nil? or params[:assignment_form][:assignment_questionnaire][:questionnaire_id].nil?
       return
     end
 
-    assignment = Assignment.find(params[:assignment_questionnaire][:assignment_id])
+    assignment = Assignment.find(params[:assignment_form][:assignment_questionnaire][:assignment_id])
     if assignment.nil?
       return
     end
 
-    questionnaire = Questionnaire.find(params[:assignment_questionnaire][:questionnaire_id])
+    questionnaire = Questionnaire.find(params[:assignment_form][:assignment_questionnaire][:questionnaire_id])
     if questionnaire.nil?
       return
     end
 
-    @assignment_questionnaire = AssignmentQuestionnaire.new(params[:assignment_questionnaire])
+    @assignment_questionnaire = AssignmentQuestionnaire.new(params[:assignment_form][:assignment_questionnaire])
     @assignment_questionnaire.save
 
     respond_to do |format|

@@ -5,24 +5,24 @@
         var i = 0;
         var html = '';
         html += '<tr id="' + row_id + '">' +
-                '<input name="assignment_questionnaire[assignment_id]" type="hidden" value="' + <%= @assignment.id %> +'">';
+                '<input name="assignment_form[assignment_questionnaire][assignment_id]" type="hidden" value="' + <%= @assignment_form.assignment.id %> +'">';
 
-        html += '<td><label for="questionnaire_id">' + questionnaire.display_type + ':</label></td>' +
-                '<td align="center">' +
-                '<select id="questionnaire_id" name="assignment_questionnaire[questionnaire_id]" style="width:300px">' +
-                '<option value="">--None--</option>';
+      html += '<td><label for="questionnaire_id">' + questionnaire.display_type + ':</label></td>' +
+              '<td align="center">' +
+              '<select id="questionnaire_id" name="assignment_form[assignment_questionnaire][questionnaire_id]" style="width:300px">' +
+              '<option value="">--None--</option>';
 
-        for (i = 0; i < questionnaire_options.length; i++) {
+      for (i = 0; i < questionnaire_options.length; i++) {
           html += '<option value="' + questionnaire_options[i][1] + '">' + questionnaire_options[i][0] + '</option>'
         }
 
         html += '</select></td>';
 
-        html += '<td align="center"><input name="assignment_questionnaire[questionnaire_weight]" style="width:40px" type="text" value="' + assignment_questionnaire.questionnaire_weight + '">% </td>' +
-                '<td align="center"><input name="assignment_questionnaire[notification_limit]" style="width:40px" type="text" value="' + assignment_questionnaire.notification_limit + '">% </td>' +
-                '</tr>';
+      html += '<td align="center"><input name="assignment_form[assignment_questionnaire][questionnaire_weight]" style="width:40px" type="text" value="' + assignment_questionnaire.questionnaire_weight + '">% </td>' +
+              '<td align="center"><input name="assignment_form[assignment_questionnaire][notification_limit]" style="width:40px" type="text" value="' + assignment_questionnaire.notification_limit + '">% </td>' +
+              '</tr>';
 
-        questionnaire_table.last().after(html);
+      questionnaire_table.last().after(html);
         jQuery('#questionnaire_id').val(questionnaire.id).attr('id', '');
   }
 
@@ -34,7 +34,7 @@
     function submit_questionnaires() {
       var data, para, fields, i, j;
         //delete old assignment_questionnaires
-        jQuery.get("/assignments/delete_all_questionnaires?assignment_id=" + <%= @assignment.id %>);
+        jQuery.get("/assignments/delete_all_questionnaires?assignment_id=" + <%= @assignment_form.assignment.id %>);
         //create the new assignment_questionnaires
         data = jQuery('#assignment_questionnaire_table>tbody>tr:not(.heading)');
         for (i = 0; i < data.length; i++) {
@@ -77,27 +77,27 @@
       jQuery(document).ready(function () {
         addQuestionnaireTableRow(
           'ReviewQuestionnaire',
-          <%= questionnaire(@assignment, 'ReviewQuestionnaire').to_json.html_safe %>,
-          <%= assignment_questionnaire(@assignment, 'ReviewQuestionnaire').to_json.html_safe %>,
-          <%= questionnaire_options(@assignment, 'ReviewQuestionnaire').to_json.html_safe %>
+                <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire').to_json.html_safe %>,
+                <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire').to_json.html_safe %>,
+                <%= questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire').to_json.html_safe %>
         );
         addQuestionnaireTableRow(
           'MetareviewQuestionnaire',
-          <%= questionnaire(@assignment, 'MetareviewQuestionnaire').to_json.html_safe %>,
-          <%= assignment_questionnaire(@assignment, 'MetareviewQuestionnaire').to_json.html_safe %>,
-          <%= questionnaire_options(@assignment, 'MetareviewQuestionnaire').to_json.html_safe %>
+                <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire').to_json.html_safe %>,
+                <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire').to_json.html_safe %>,
+                <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire').to_json.html_safe %>
         );
         addQuestionnaireTableRow(
           'AuthorFeedbackQuestionnaire',
-          <%= questionnaire(@assignment, 'AuthorFeedbackQuestionnaire').to_json.html_safe %>,
-          <%= assignment_questionnaire(@assignment, 'AuthorFeedbackQuestionnaire').to_json.html_safe %>,
-          <%= questionnaire_options(@assignment, 'AuthorFeedbackQuestionnaire').to_json.html_safe %>
+                <%= questionnaire(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire').to_json.html_safe %>,
+                <%= assignment_questionnaire(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire').to_json.html_safe %>,
+                <%= questionnaire_options(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire').to_json.html_safe %>
         );
         addQuestionnaireTableRow(
           'TeammateReviewQuestionnaire',
-          <%= questionnaire(@assignment, 'TeammateReviewQuestionnaire').to_json.html_safe %>,
-          <%= assignment_questionnaire(@assignment, 'TeammateReviewQuestionnaire').to_json.html_safe %>,
-          <%= questionnaire_options(@assignment, 'TeammateReviewQuestionnaire').to_json.html_safe %>
+                <%= questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire').to_json.html_safe %>,
+                <%= assignment_questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire').to_json.html_safe %>,
+                <%= questionnaire_options(@assignment_form.assignment, 'TeammateReviewQuestionnaire').to_json.html_safe %>
         );
       }());
     </script>

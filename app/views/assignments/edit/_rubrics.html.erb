@@ -5,11 +5,18 @@
         var i = 0;
         var html = '';
         html += '<tr id="' + row_id + '">' +
-                '<input name="assignment_form[assignment_questionnaire][assignment_id]" type="hidden" value="' + <%= @assignment_form.assignment.id %> +'">';
+                '<input name="assignment_form[assignment_questionnaire][][assignment_id]" type="hidden" value="' + <%= @assignment_form.assignment.id %> +'">';
+
+      var id = assignment_questionnaire.id
+      if(id == null){
+          id='';
+      }
+      html +=
+              '<input name="assignment_form[assignment_questionnaire][][id]" type="hidden" value="' + id +'">';
 
       html += '<td><label for="questionnaire_id">' + questionnaire.display_type + ':</label></td>' +
               '<td align="center">' +
-              '<select id="questionnaire_id" name="assignment_form[assignment_questionnaire][questionnaire_id]" style="width:300px">' +
+              '<select id="questionnaire_id" name="assignment_form[assignment_questionnaire][][questionnaire_id]" style="width:300px">' +
               '<option value="">--None--</option>';
 
       for (i = 0; i < questionnaire_options.length; i++) {
@@ -18,8 +25,8 @@
 
         html += '</select></td>';
 
-      html += '<td align="center"><input name="assignment_form[assignment_questionnaire][questionnaire_weight]" style="width:40px" type="text" value="' + assignment_questionnaire.questionnaire_weight + '">% </td>' +
-              '<td align="center"><input name="assignment_form[assignment_questionnaire][notification_limit]" style="width:40px" type="text" value="' + assignment_questionnaire.notification_limit + '">% </td>' +
+      html += '<td align="center"><input name="assignment_form[assignment_questionnaire][][questionnaire_weight]" style="width:40px" type="text" value="' + assignment_questionnaire.questionnaire_weight + '">% </td>' +
+              '<td align="center"><input name="assignment_form[assignment_questionnaire][][notification_limit]" style="width:40px" type="text" value="' + assignment_questionnaire.notification_limit + '">% </td>' +
               '</tr>';
 
       questionnaire_table.last().after(html);
@@ -31,22 +38,6 @@
         jQuery('#' + row_id).remove();
     }
 
-    function submit_questionnaires() {
-      var data, para, fields, i, j;
-        //delete old assignment_questionnaires
-        jQuery.get("/assignments/delete_all_questionnaires?assignment_id=" + <%= @assignment_form.assignment.id %>);
-        //create the new assignment_questionnaires
-        data = jQuery('#assignment_questionnaire_table>tbody>tr:not(.heading)');
-        for (i = 0; i < data.length; i++) {
-          fields = jQuery(data[i]).find('input,select');
-            para = "?";
-            for (j = 0; j < fields.length; j++) {
-              para += "&" + (fields[j].name + "=" + fields[j].value);
-            }
-            para.print;
-            jQuery.get("/assignments/set_questionnaire" + para);
-        }
-    }
   </script>
 
   <script type="text/javascript">

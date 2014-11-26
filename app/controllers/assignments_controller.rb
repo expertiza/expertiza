@@ -106,48 +106,8 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  def delete_all_questionnaires
-    assignment = Assignment.find(params[:assignment_id])
-    if assignment.nil?
-      return
-    end
-
-    @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:assignment_id])
-    @assignment_questionnaires.each do |assignment_questionnaire|
-      assignment_questionnaire.delete
-    end
-
-    respond_to do |format|
-      format.json { render :json => @assignment_questionnaires }
-    end
-  end
-
-  def set_questionnaire
-    if params[:assignment_form][:assignment_questionnaire][:assignment_id].nil? or params[:assignment_form][:assignment_questionnaire][:questionnaire_id].nil?
-      return
-    end
-
-    assignment = Assignment.find(params[:assignment_form][:assignment_questionnaire][:assignment_id])
-    if assignment.nil?
-      return
-    end
-
-    questionnaire = Questionnaire.find(params[:assignment_form][:assignment_questionnaire][:questionnaire_id])
-    if questionnaire.nil?
-      return
-    end
-
-    @assignment_questionnaire = AssignmentQuestionnaire.new(params[:assignment_form][:assignment_questionnaire])
-    @assignment_questionnaire.save
-
-    respond_to do |format|
-      format.json { render :json => @assignment_questionnaire }
-    end
-  end
-
   def update
 
-    print '-----------------------In update -------'
     @assignment_form= AssignmentForm.createFormObject(params[:id])
     params[:assignment_form][:assignment][:wiki_type_id] = 1 unless params[:assignment_wiki_assignment]
 
@@ -191,7 +151,20 @@ class AssignmentsController < ApplicationController
           redirect_to :action => 'edit', :id => @assignment_form.assignment.id
       end
     end
-  end
+
+    #logic to update the assignment questionnaires
+    i =0 ;
+    while i < params[:assignment_form][:assignment_questionnaire].length
+      if params[:assignment_form][:assignment_questionnaire][i][:id].nil? or params[:assignment_form][:assignment_questionnaire][i][:id].blank?
+        @assignment_questionnaire = AssignmentQuestionnaire.new(params[:assignment_form][:assignment_questionnaire][i])
+        @assignment_questionnaire.save
+      else
+        @assignment_questionnaire = AssignmentQuestionnaire.find(params[:assignment_form][:assignment_questionnaire][i][:id])
+        @assignment_questionnaire.update_attributes(params[:assignment_form][:assignment_questionnaire][i]);
+      end
+      i=i+1;
+    end
+     end
 
   def show
     @assignment = Assignment.find(params[:id])

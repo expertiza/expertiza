@@ -2,17 +2,24 @@ class AssignmentForm
 
   attr_accessor :assignment, :assignment_questionnaires, :due_dates
 
+
   def initialize(attributes=nil)
 
     if attributes.nil? then
 
       @assignment = Assignment.new
-      @assignment_questionnaires = AssignmentQuestionnaire.new
-      @due_dates = DueDate.new
+      @assignment_questionnaires = []
+      @due_dates = []
 
     else
+
       @assignment = Assignment.new(attributes[:assignment])
-      @assignment_questionnaires = AssignmentQuestionnaire.new(attributes[:assignment_questionnaires])
+
+      @assignment_questionnaires=[]
+      attributes[:assignment_questionnaires].each do |assignment_questionnaire|
+          @assignment_questionnaires << AssignmentQuestionnaire.new(assignment_questionnaire)
+      end
+
       @due_dates = DueDate.new(attributes[:due_dates])
     end
 
@@ -23,7 +30,7 @@ class AssignmentForm
   def self.createFormObject(assignment_id)
     assignment_form = AssignmentForm.new
     assignment_form.assignment = Assignment.find(assignment_id)
-    assignment_form.assignment_questionnaires = AssignmentQuestionnaire.find_by_assignment_id(assignment_id)
+    assignment_form.assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment_id)
 
     assignment_form.set_up_assignment_review
 
@@ -32,7 +39,34 @@ class AssignmentForm
 
   # handle assignmentquessionaire and duedate
   def update_attributes(attributes)
-    @assignment.update_attributes(attributes[:assignment])
+
+   has_errors = false;
+   unless @assignment.update_attributes(attributes[:assignment])
+      @errors =@errors + @assignment.errors
+      has_errors = true;
+   end
+
+   #code to save assigment questionaires
+    i =0 ;
+    while i < attributes[:assignment_questionnaire].length
+      if attributes[:assignment_questionnaire][i][:id].nil? or attributes[:assignment_questionnaire][i][:id].blank?
+        assignment_questionnaire = AssignmentQuestionnaire.new(attributes[:assignment_questionnaire][i])
+        unless assignment_questionnaire.save
+          @errors =@errors + @assignment.errors
+          has_errors = true;0
+        end
+      else
+        assignment_questionnaire = AssignmentQuestionnaire.find(attributes[:assignment_questionnaire][i][:id])
+        unless assignment_questionnaire.update_attributes(attributes[:assignment_questionnaire][i]);
+          @errors =@errors + @assignment.errors
+          has_errors = true;
+        end
+      end
+      i=i+1;
+    end
+
+    return !has_errors;
+
   end
 
   #Save the assignment
@@ -40,7 +74,6 @@ class AssignmentForm
   def save
     @assignment.save
   end
-
 
   #NOTE: many of these functions actually belongs to other models
   #====setup methods for new and edit method=====#

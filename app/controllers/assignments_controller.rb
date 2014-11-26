@@ -147,24 +147,11 @@ class AssignmentsController < ApplicationController
       if @assignment_form.update_attributes(@hash1[:assignment_form])
         redirect_to :action => 'edit', :id => @assignment_form.assignment.id
       else
-        flash[:error] = "Assignment save failed: #{@assignment.errors.full_messages.join(' ')}"
+        flash[:error] = "Assignment save failed: #{@assignment_form.errors.full_messages.join(' ')}"
           redirect_to :action => 'edit', :id => @assignment_form.assignment.id
       end
     end
-
-    #logic to update the assignment questionnaires
-    i =0 ;
-    while i < params[:assignment_form][:assignment_questionnaire].length
-      if params[:assignment_form][:assignment_questionnaire][i][:id].nil? or params[:assignment_form][:assignment_questionnaire][i][:id].blank?
-        @assignment_questionnaire = AssignmentQuestionnaire.new(params[:assignment_form][:assignment_questionnaire][i])
-        @assignment_questionnaire.save
-      else
-        @assignment_questionnaire = AssignmentQuestionnaire.find(params[:assignment_form][:assignment_questionnaire][i][:id])
-        @assignment_questionnaire.update_attributes(params[:assignment_form][:assignment_questionnaire][i]);
-      end
-      i=i+1;
-    end
-     end
+end
 
   def show
     @assignment = Assignment.find(params[:id])

@@ -10,7 +10,7 @@ function changeReviewRounds() {
   var new_round_count = parseInt(jQuery('#assignment_rounds_of_reviews').val());
   if (new_round_count <= 0) {
     alert('ERROR: number of rounds of review cannot be less than 0');
-    return
+    return false;
   }
 
     var i;
@@ -28,7 +28,7 @@ function changeReviewRounds() {
       var original_round_count = <%= @assignment.rounds_of_reviews%>;
 
       if (new_round_count == current_round_count) {
-        return
+        return false;
       }
 
         if (new_round_count >= original_round_count && current_round_count < original_round_count) {
@@ -45,7 +45,7 @@ function changeReviewRounds() {
               removeDueDateTableElement('submission', i);
               removeDueDateTableElement('review', i);
             }
-              return
+              return false;
           }
 
             if (new_round_count > current_round_count) {
@@ -54,6 +54,7 @@ function changeReviewRounds() {
                 addDueDateTableElement('review', i, <%= due_date(@assignment,'review', -1).to_json.html_safe %>);
               }
             }
+    return false;
 }
 
 <!--javascript functions that create and remove the entry of the set_due_date table-->
@@ -231,7 +232,7 @@ function submit_due_dates() {
 <div style='padding: 5px' id='review_round'>
 <%= label_tag('assignment[rounds_of_reviews]', 'Number of Review Rounds:') %>
 <%= text_field_tag('assignment[rounds_of_reviews]', @assignment.rounds_of_reviews, :style => 'width:50px') %>
-<%= button_tag 'Set', onclick: 'changeReviewRounds()' %>
+<%= button_tag 'Set', onclick: 'return changeReviewRounds();'%>
 </div>
 
 <table class='exp' id='due_dates_table' style='padding:10px'>

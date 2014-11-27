@@ -170,15 +170,19 @@ class ResponseController < ApplicationController
     end
     # Check whether this is a custom rubric
     if @map.questionnaire.section.eql? "Custom"
+      get_unique_section
       @next_action = "custom_update"
       render :action => 'custom_response'
-    else
-      # end of special code (except for the end below, to match the if above)
+    elsif @map.questionnaire.section.eql? "Specialised Rubric"
+      get_unique_section
+      render :action => 'specializedRubric'
+    else# end of special code (except for the end below, to match the if above)
       #**********************
       render :action => 'response'
     end
   end
 
+=begin
   def edit
     @header = "Edit"
     @next_action = "update"
@@ -193,7 +197,7 @@ class ResponseController < ApplicationController
       @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
       @largest_version_num=@sorted[0]
     end
-    @response = Response.where(map_id: @map.id, version_num:  @largest_version_num).first
+    @response = Response.where(map_id: @map.id, version_num:  @largest_version_num.version_num).first
     #@modified_object = @response.id
     #get_content()
     #get_scores()
@@ -205,6 +209,7 @@ class ResponseController < ApplicationController
       render :action => 'response'
     end
   end
+=end
 
   def update ###-### Seems like this method may no longer be used -- not in E806 version of the file
     @response = Response.find(params[:id])
@@ -282,10 +287,7 @@ class ResponseController < ApplicationController
 
     # Check whether this is a custom rubric
     if @map.questionnaire.section.eql? "Custom"
-      @qtn_sections=[]
-      @questions.each {|question| @qtn_sections<<question.sections_id}
-      @unique_sections=@qtn_sections.uniq
-      @unique_sections.sort!
+      get_unique_section
       @question_type = Array.new
       @questions.each {
           |question|
@@ -304,10 +306,7 @@ class ResponseController < ApplicationController
       #add call to specialized rubric
 
     elsif @map.questionnaire.section.eql? "Specialised Rubric"
-      @qtn_sections=[]
-      @questions.each {|question| @qtn_sections<<question.sections_id}
-      @unique_sections=@qtn_sections.uniq
-      @unique_sections.sort!
+      get_unique_section
 
       render :action => 'specializedRubric'
 
@@ -344,7 +343,6 @@ class ResponseController < ApplicationController
     attempt=[]
     attempt=params[:attempt]
     params[:responses].each_pair do |k,v|
-      puts v[:section]
      unless v[:section].in?attempt
        params[:responses].delete(k)
      end
@@ -353,9 +351,10 @@ class ResponseController < ApplicationController
 
   def create
     @map = ResponseMap.find(params[:id]) #assignment/review/metareview id is in params id
+    puts params[:attempt]
     @res = 0
     msg = ""
-    if @map.questionnaire.section.eql? "Specialised Rubric"
+    if @map.questionnaire.section.eql? "Specialised Rubric" or @map.questionnaire.section.eql? "Custom"
       filter_questions
     end
     error_msg = ""
@@ -487,5 +486,12 @@ class ResponseController < ApplicationController
       response.map.read_attribute(:type)
     end
     !current_user_id?(response.map.reviewer.user_id)
+  end
+
+  def get_unique_section
+    @qtn_sections=[]
+    @questions.each {|question| @qtn_sections<<question.sections_id}
+    @unique_sections=@qtn_sections.uniq
+    @unique_sections.sort!
   end
 end

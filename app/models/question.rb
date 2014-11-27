@@ -33,7 +33,11 @@ class Question < ActiveRecord::Base
   ANSWERS_TRUE_FALSE = [['1',1],['2',2]]
   ANSWERS_MCQ_CHECKED = [['1',1],['0',2]]
   RATINGS = [['Very Easy',1],['Easy',2],['Medium',3],['Difficult',4],['Very Difficult',5]]
-  SECTIONS = [['Security',1],['Testing',2],['Grammar',3]]
+  SECTIONS = []
+
+  @sections=Section.all
+  @sections.each { |section| SECTIONS<<[section.name,section.id]}
+
   attr_accessor :checked
 
   def delete

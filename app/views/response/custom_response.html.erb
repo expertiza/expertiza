@@ -2,6 +2,18 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
 
+
+<SCRIPT LANGUAGE="JavaScript">
+    function makevisibleDiv(checked,id) {
+        var div= document.getElementById(id)
+        if (checked==1) {
+            div.style.display = '';
+        } else {
+            div.style.display = 'none';
+        }
+    }
+</SCRIPT>
+
 <script>
     $(document).ready(function () {
         $("#accordion").accordion({ autoHeight: false });
@@ -29,17 +41,38 @@
 <%= @map.show_review() %>
 
 <%= form_tag :action => @next_action, :id => @modified_object %>
+<%rearrangedQuestions= @questions.sort_by {|question| [question.sections_id,question.id]} %>
 
-<%
+  <% #rearrangedQuestions=rearrange_questions(rearrangedQuestions) %>
+
+    <% @unique_sections.each do |section_no| %>
+    <% @section=Section.find(section_no)%>
+
+    <input id="attempt<%=section_no%>" name="attempt[]" value="<%= @section.name %>" type="checkbox" checked="true" onchange="makevisibleDiv(this.checked,<%=section_no%>);">
+
+    <%= @section.name %> :: Uncheck to Skip Section</input>
+    </BR>
+
+    <div id=<%=section_no%> >
+
+   <%
    i = 0
+
+   sectionquestions=[]
+   rearrangedQuestions.each {|question| sectionquestions<<question if question.sections_id == section_no}
+
    current_topic = nil
-   questions = @questionnaire.questions
-   rearrangedQuestions=rearrange_questions(questions)
-   rearrangedQuestions.each {
+
+
+
+   sectionquestions.each {
            |question| %>
     <% question_type=question.question_type %>
-    <%= get_accordion_title(current_topic, question_type.parameters.split("::")[0]) %>
+
+
+    <!--<%= get_accordion_title(current_topic, question_type.parameters.split("::")[0]) %>-->
     <%= find_question_type(question, question_type, i, false, nil, nil, (@questionnaire.min_question_score..@questionnaire.max_question_score).to_a) %>
+
     <% current_topic = question_type.parameters.split("::")[0]
        advices = QuestionAdvice.where(question_id: question.id)
        advices = remove_empty_advice(advices) %>
@@ -48,6 +81,13 @@
     <% end %>
     <% i += 1
        } %>
+
+    </div>
+
+    </BR>
+<%end%>
+
+
 
 </p>
 </div>

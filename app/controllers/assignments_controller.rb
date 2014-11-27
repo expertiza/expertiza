@@ -84,17 +84,20 @@ class AssignmentsController < ApplicationController
   end
 
   def set_due_date
+
+    if params[:due_date][:due_at].blank?
+      respond_to do |format|
+        format.json { render :json => nil }
+      end
+      return
+    end
+
     if params[:due_date][:assignment_id].nil?
       return
     end
 
     assignment = Assignment.find(params[:due_date][:assignment_id])
     if assignment.nil?
-      return
-    end
-
-    due_at = DateTime.parse(params[:due_date][:due_at])
-    if due_at.nil?
       return
     end
 

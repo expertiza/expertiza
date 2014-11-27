@@ -142,7 +142,7 @@ function is_coding_assignmentChanged(){
 
     <td style='padding:5px' id='assignment_wiki_type_field' <%= 'hidden' unless @assignment_form.assignment.wiki_type.name != 'No' %>>
       <%= label_tag('assignment_form[assignment][wiki_type_id]', 'Wiki type:') %>
-      <%= select('assignment', 'wiki_type_id', wiki_type_options, :selected => @assignment_form.assignment.wiki_type_id) %>
+      <%= select('assignment_form[assignment]', 'wiki_type_id', wiki_type_options, :selected => @assignment_form.assignment.wiki_type_id) %>
     </td>
   </tr>
   <!--staggered_deadlin-->

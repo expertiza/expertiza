@@ -69,6 +69,7 @@ class GradesController < ApplicationController
 
     @topic = @participant.topic
     @pscore = @participant.get_scores(@questions)
+
     @stage = @participant.assignment.get_current_stage(@participant.topic_id)
     calculate_all_penalties(@assignment.id)
     @assignment_id = @participant.parent_id
@@ -95,13 +96,37 @@ class GradesController < ApplicationController
       @scores[index] =  @scores[index] + 1
     }
 
+    @class_scores = []
 
+    @reviews = @pscore[:review][:assessments]
+    for review in @reviews
+      all_resp=Response.where(map_id: review.map_id)
+      sort_to=all_resp.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)}
 
+      @class_scores << Score.get_total_score(:response => sort_to[0], :questions => @questions[:review], :q_types => Array.new)
+	  end
 
-    @chart1 = GoogleChart::BarChart.new("600x300", "Vertical Bar Graph",:vertical, false) do |bc|
-      bc.data "FirstResult Bar", @scores, '9A0000'
+    class_score_statistics = [0]*10
+    @class_scores.each do |score|
+        index = (score/10).to_i
+        if (index >= 10)
+          index = 9
+        end
+        class_score_statistics[index] = class_score_statistics[index] + 1
+    end
+
+    @chart1 = GoogleChart::BarChart.new('350x300', 'Class statistics',:vertical, false) do |bc|
+      bc.data 'FirstResult Bar', @scores, '9A0000'
       bc.axis :x
       bc.axis :y, :labels => (0..@scores.max).to_a
+      bc.show_legend = false
+      bc.data_encoding = :extended
+    end
+
+    @chart2 = GoogleChart::BarChart.new('350x300','Your review scores', :vertical, false) do |bc|
+      bc.data "SecondResult Bar",class_score_statistics,'9A0000'
+      bc.axis :x
+      bc.axis :y, :labels => (0..class_score_statistics.max).to_a
       bc.show_legend = false
       bc.data_encoding = :extended
     end

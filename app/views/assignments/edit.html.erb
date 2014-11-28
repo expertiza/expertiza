@@ -8,9 +8,7 @@
     function submit_form() {
       //validating the form
         if (validate()) {
-          //submit the due dates and questionnaires before submitting the rest of the form
             jQuery.ajaxSetup({async: false});
-            submit_due_dates();
 
             jQuery('#assignment_form').submit();
         }

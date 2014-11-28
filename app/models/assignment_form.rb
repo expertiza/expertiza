@@ -20,7 +20,12 @@ class AssignmentForm
           @assignment_questionnaires << AssignmentQuestionnaire.new(assignment_questionnaire)
       end
 
-      @due_dates = DueDate.new(attributes[:due_dates])
+      @due_dates=[]
+      attributes[:due_dates].each do |due_date|
+        @due_dates << DueDate.new(due_date)
+      end
+
+      #@due_dates = DueDate.new(attributes[:due_dates])
     end
 
   end
@@ -31,6 +36,7 @@ class AssignmentForm
     assignment_form = AssignmentForm.new
     assignment_form.assignment = Assignment.find(assignment_id)
     assignment_form.assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment_id)
+    assignment_form.due_dates = DueDate.where(assignment_id: assignment_id)
 
     assignment_form.set_up_assignment_review
 
@@ -65,11 +71,34 @@ class AssignmentForm
       i=i+1;
     end
 
-    return !has_errors;
-
+  #code to save due dates
+  i =0 ;
+  while i < attributes[:due_date].length
+    if attributes[:due_date][i][:id].nil? or attributes[:due_date][i][:id].blank?
+      if attributes[:due_date][i][:due_at].blank? then
+        i=i+1;
+        next
+      end
+      due_date = DueDate.new(attributes[:due_date][i])
+      unless due_date.save
+        @errors =@errors + @assignment.errors
+        has_errors = true;
+      end
+    else
+      due_date = DueDate.find(attributes[:due_date][i][:id])
+      unless due_date.update_attributes(attributes[:due_date][i]);
+        @errors =@errors + @assignment.errors
+        has_errors = true;
+      end
+    end
+    i=i+1;
   end
 
-  #Save the assignment
+  return !has_errors;
+
+end
+
+#Save the assignment
   # handle assignmentquesionnaire and duedate
   def save
     @assignment.save

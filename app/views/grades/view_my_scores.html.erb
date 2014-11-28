@@ -1,8 +1,107 @@
 <H1>Score for <%= @assignment.name %></H1>
-   
+
 <TABLE class="grades" >
-<%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>                      
-<%= render :partial => 'grades/participant', :locals => {:prefix => 'user',  :team => false, :pscore => @pscore} %>                                                                                   
+  <%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>
+<%= render :partial => 'grades/participant', :locals => {:prefix => 'user',  :team => false, :pscore => @pscore} %>
 </TABLE>
 <BR/>
-<a href="javascript:window.history.back()">Back</a>
+<hr/>
+<h2>Class Statistics</h2>
+<hr/>
+<br/>
+<TABLE class='grades'>
+  <tr>
+    <%col_width = 3%>
+    <th colspan="3" style="width:<%=3*col_width%>cm;"> <b>Class Scores</b></th>
+    <th rowspan="2" style="width: <%=col_width%>cm;">  <b>Average No. of Reviews</b></th>
+    <th rowspan="2" style="width: <%=col_width%>cm;">  <b>Average No. of Meta Reviews</b></th>
+    <th colspan="2" style="width: <%=2*col_width%>cm;">  <b>Reviews</b></th>
+    <th colspan="2" style="width: <%=2*col_width%>cm;">  <b>MetaReviews</b></th>
+  </tr>
+  <tr>
+    <th style="width: <%=col_width%>cm;">Average</th>
+    <th style="width: <%=col_width%>cm;">Low</th>
+    <th style="width: <%=col_width%>cm;">High</th>
+    <th style="width: <%=col_width%>cm;">Done</th>
+    <th style="width: <%=col_width%>cm;">Remaining</th>
+    <th style="width: <%=col_width%>cm;">Done</th>
+    <th style="width: <%=col_width%>cm;">Remaining</th>
+  </tr>
+  <tr class="row">
+    <td style="text-align: center;">
+      <%= @statistics[0].round(2)%>
+    </td>
+    <td style="text-align: center;">
+      <%= @statistics[1]%>
+    </td>
+    <td style="text-align: center;">
+      <%= @statistics[2]%>
+    </td>
+    <td style="text-align: center;">
+      <div id="test2"><%= @average_reviews %></div>
+    </td>
+    <td style="text-align: center;">
+      <div id="test3"><%= @average_metareviews %></div>
+    </td>
+
+
+    <% for x in @my_reviews %>
+        <% if x < 0 %>
+            <td style="text-align: center;">     <div id="test4"><%= 0 %></div></td>
+        <% else %>
+            <td style="text-align: center;">
+              <div id="test4"><%= x %></div>
+            </td>
+        <% end %>
+    <% end %>
+
+    <% for x in @my_metareviews %>
+        <% if x < 0 %>
+            <td style="text-align: center;">     <div id="test4"><%= 0 %></div></td>
+        <% else %>
+            <td style="text-align: center;">
+              <div id="test5"><%= x %></div>
+            </td>
+        <% end %>
+    <% end %>
+  </tr>
+</TABLE>
+
+
+<hr>
+<div> <h2>Grade Distribution</h2></div>
+<hr>
+<div>
+  <img src= "<%= @chart1.to_url << "&chxr=0,0,100,10" %>" style = "float: left; width:100%"/>
+  <img src= "<%= @chart1.to_url << "&chxr=0,0,100,10" %>" style = "float: right; width:100%"/>
+</div>
+
+<br />
+<div>
+  <%j=0%>
+  <table cellspacing="0" cellpadding="3" border="1" style = "font-size:small;">
+    <tr bgcolor="#cccccc">
+      <th> Range </th>
+      <%@scores.each do |s|%>
+          <% if s != 0%>
+              <td align = "center">(<%= j*10 %>-<%=(j+1) * 10 %>)%</td>
+          <% end %>
+          <% j+= 1%>
+      <%end%>
+
+    </tr>
+
+    <tr>
+      <th> Count </th>
+      <%@scores.each do |s|%>
+          <% if  s != 0%>
+              <td align = "center"><%= s %></td>
+          <% end %>
+      <%end%>
+    </tr>
+
+  </table>
+</div>
+
+
+<a href="javascript:window.history.back()">Back</a>   

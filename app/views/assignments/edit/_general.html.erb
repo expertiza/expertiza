@@ -66,7 +66,7 @@ function is_coding_assignmentChanged(){
 
 <tr>
 <td style='padding:5px'><%= label_tag('assignment_form[assignment][course_id]', 'Course:') %></td>
-<td style='padding:5px'><%= select('assignment', 'course_id', course_options(@assignment_form.assignment.instructor), :selected => @assignment_form.assignment.course_id) %></td>
+<td style='padding:5px'><%= select('assignment_form[assignment]', 'course_id', course_options(@assignment_form.assignment.instructor), :selected => @assignment_form.assignment.course_id) %></td>
 </tr>
 
 <tr>

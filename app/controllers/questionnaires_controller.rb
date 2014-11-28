@@ -654,4 +654,18 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
       redirect_to :action => 'list', :controller => 'tree_display'
     end
   end
+
+  # List questionnaires based on a course
+  def course_questionnaires
+    @course_id = params[:id]
+    @questionnaires = []
+    Assignment.where(:course_id => @course_id ).each do |asmt|
+      AssignmentQuestionnaire.where( :assignment_id => asmt.id ).each do |assq|
+        @questionnaires +=Questionnaire.where(:id => assq.questionnaire_id).to_a
+      end
+    end
+    @questionnaires
+    redirect_to :action => 'list', :controller => 'tree_display'
+  end
+
 end

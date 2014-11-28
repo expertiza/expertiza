@@ -100,18 +100,6 @@ class QuestionsController < ApplicationController
   end
 
 
-# List questions based on a course
-  def course_questions
-    @course_id = params[:id]
-    @questions = Array.new
- Team.where(parent_id: params[:id]).each do |quiz_creator|
-   Questionnaire.where(instructor_id: quiz_creator.id).each do |questionnaire|
-    questions = Question.where(questionnaire_id: questionnaire.id)
-    questions.each do |question|
-     @questions.push question
 end
- end
- end
-  end
 
-end
+

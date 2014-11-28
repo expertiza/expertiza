@@ -244,6 +244,7 @@ Expertiza::Application.routes.draw do
       get :copy
       get :edit
       get :list
+      get :course_questionnaires
       post :list_questionnaires
       get :new_quiz
       post :select_questionnaire_type

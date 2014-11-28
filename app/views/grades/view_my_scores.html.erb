@@ -12,11 +12,11 @@
 <TABLE class='grades'>
   <tr>
     <%col_width = 3%>
-    <th colspan="3" style="width:<%=3*col_width%>cm;"> <b>Class Scores</b></th>
-    <th rowspan="2" style="width: <%=col_width%>cm;">  <b>Average No. of Reviews</b></th>
-    <th rowspan="2" style="width: <%=col_width%>cm;">  <b>Average No. of Meta Reviews</b></th>
+    <th colspan="3" style="width:<%=3*col_width%>cm;"> <b>Class scores</b></th>
+    <th rowspan="2" style="width: <%=col_width%>cm;">  <b>Average no. of reviews</b></th>
+    <th rowspan="2" style="width: <%=col_width%>cm;">  <b>Average no. of metareviews</b></th>
     <th colspan="2" style="width: <%=2*col_width%>cm;">  <b>Reviews</b></th>
-    <th colspan="2" style="width: <%=2*col_width%>cm;">  <b>MetaReviews</b></th>
+    <th colspan="2" style="width: <%=2*col_width%>cm;">  <b>Metareviews</b></th>
   </tr>
   <tr>
     <th style="width: <%=col_width%>cm;">Average</th>
@@ -72,8 +72,9 @@
 <div> <h2>Grade Distribution</h2></div>
 <hr>
 <div>
-  <img src= "<%= @chart1.to_url << "&chxr=0,0,100,10" %>" style = "float: left; width:100%"/>
-  <img src= "<%= @chart1.to_url << "&chxr=0,0,100,10" %>" style = "float: right; width:100%"/>
+  <img src= "<%= @chart1.to_url << "&chxr=0,0,100,10" %>" style = "float: left; width:40%; max-width: 10cm; margin-left: 10%"/>
+  <img src= "<%= @chart2.to_url << "&chxr=0,0,100,10" %>" style = "float: right; width:40%; max-width: 10cm; margin-right:10%;"/>
+  <p style="clear:both;"/>
 </div>
 
 <br />

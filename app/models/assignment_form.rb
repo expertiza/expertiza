@@ -59,7 +59,7 @@ class AssignmentForm
         assignment_questionnaire = AssignmentQuestionnaire.new(attributes[:assignment_questionnaire][i])
         unless assignment_questionnaire.save
           @errors =@errors + @assignment.errors
-          has_errors = true;0
+          has_errors = true;
         end
       else
         assignment_questionnaire = AssignmentQuestionnaire.find(attributes[:assignment_questionnaire][i][:id])

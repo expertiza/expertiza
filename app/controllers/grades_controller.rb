@@ -4,6 +4,7 @@ class GradesController < ApplicationController
   helper :penalty
   include PenaltyHelper
 
+
   def action_allowed?
     case params[:action]
     when 'view_my_scores'
@@ -50,11 +51,14 @@ class GradesController < ApplicationController
       @questions[questionnaire.symbol] = questionnaire.questions
     end
 
+    ## When user clicks on the notification, it should go away
+    #deleting all review notifications
     rmaps = ParticipantReviewResponseMap.where(reviewee_id: @participant.id, reviewed_object_id: @participant.assignment.id)
     rmaps.find_each do |rmap|
       rmap.update_attribute :notification_accepted, true
     end
 
+    #deleting all metareview notifications
     rmaps = ParticipantReviewResponseMap.where reviewer_id: @participant.id, reviewed_object_id: @participant.parent_id
     rmaps.find_each do |rmap|
       mmaps = MetareviewResponseMap.where reviewee_id: rmap.reviewer_id, reviewed_object_id: rmap.map_id
@@ -67,6 +71,109 @@ class GradesController < ApplicationController
     @pscore = @participant.get_scores(@questions)
     @stage = @participant.assignment.get_current_stage(@participant.topic_id)
     calculate_all_penalties(@assignment.id)
+    @assignment_id = @participant.parent_id
+    @score_cache = Array.new
+
+    assignment_participants = AssignmentParticipant.where(:parent_id => @assignment_id).to_a
+
+    @scores = [0,0,0,0,0,0,0,0,0,0]
+
+    for ap in assignment_participants
+      sc = ScoreCache.find_by_reviewee_id(ap.id)
+      if !sc.is_a?(NilClass)
+        @score_cache <<  sc.score
+      end
+    end
+
+
+    #  for x ion score_cache
+    @score_cache.each{|x|
+      index=(x/10).to_i
+      if(index>=10)
+        index=9
+      end
+      @scores[index] =  @scores[index] + 1
+    }
+
+
+
+
+    @chart1 = GoogleChart::BarChart.new("600x300", "Vertical Bar Graph",:vertical, false) do |bc|
+      bc.data "FirstResult Bar", @scores, '9A0000'
+      bc.axis :x
+      bc.axis :y, :labels => (0..@scores.max).to_a
+      bc.show_legend = false
+      bc.data_encoding = :extended
+    end
+
+
+    #data_array_1 = [1, 4, 3, 5, 9]
+    #data_array_2 = [4, 2, 10, 4, 7]
+
+    #@chart2= Gchart.bar(:data => [1,2,4,67,100,41,234], :max_value => 300)
+
+    #@chart3 = bar_chart = Gchart.new(
+    # :type => 'bar'
+    # :size =>
+    # )
+
+
+   # @chart1.axis([GoogleChartAxis::BOTTOM, GoogleChartAxis::LEFT])
+
+    #dataset = GoogleChartDataset.new :data => @scores, :color => '9A0000'
+    #data = GoogleChartData.new :datasets => [dataset]
+    #axis = GoogleChartAxis.new :axis  => [GoogleChartAxis::BOTTOM, GoogleChartAxis::LEFT]
+    #@chart1 = GoogleBarChart.new :width => 500, :height => 200
+    #@chart1.data = data
+    #@chart1.axis = axis
+
+
+=begin
+
+    ###################### Second Graph ####################
+
+    max_score = 0
+    @review_distribution =[0,0,0,0,0,0,0,0,0,0]
+    ### For every responsemapping for this assgt, find the reviewer_id and reviewee_id #####
+    @reviews_not_done = 0
+
+    if(@assignment.team_assignment)
+      objtype = "TeamReviewResponseMap"
+    else
+      objtype = "ParticipantReviewResponseMap"
+    end
+
+    response_maps =  ResponseMap.where("reviewed_object_id = ? and type = ?", @assignment.id, objtype)
+    review_report = @assignment.compute_reviews_hash
+    for response_map in response_maps
+      score_for_this_review = review_report[response_map.reviewer_id][response_map.reviewee_id]
+      if(score_for_this_review != 0)
+        @review_distribution[(score_for_this_review/10-1).to_i] = @review_distribution[(score_for_this_review/10-1).to_i] + 1
+        if (@review_distribution[(score_for_this_review/10-1).to_i] > max_score)
+          max_score = @review_distribution[(score_for_this_review/10-1).to_i]
+        end
+      else
+        @reviews_not_done +=1
+      end
+    end
+
+    #dataset2 = GoogleChartDataset.new :data => @review_distribution, :color => '9A0000'
+    #data2 = GoogleChartData.new :datasets => [dataset2]
+    #axis2 = GoogleChartAxis.new :axis  => [GoogleChartAxis::BOTTOM, GoogleChartAxis::LEFT]
+
+    #@chart2 = GoogleBarChart.new :width => 500, :height => 200
+    #@chart2.data = data2
+    #@chart2.axis = axis2
+
+    @chart2 = GoogleChart::BarChart.new("600x300", "Vertical Bar Graph",:vertical, false) do |bc|
+      bc.data "FirstResult Bar", @review_distribution, '9A0000'
+      bc.axis :x
+      bc.axis :y, :labels => (0..@scores.max).to_a
+      bc.show_legend = false
+      bc.data_encoding = :extended
+    end
+=end
+
   end
 
   def edit
@@ -101,6 +208,8 @@ class GradesController < ApplicationController
         review_exists = false
         if participant.assignment.team_assignment?
           review_mapping = TeamReviewResponseMap.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
+      else
+        review_mapping = ParticipantReviewResponseMap.create(:reviewee_id => participant.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
         end
         review = Response.find_by_map_id(review_mapping.map_id)
 
@@ -157,7 +266,7 @@ class GradesController < ApplicationController
       @assignment = Assignment.find(@participant.parent_id)
 
 
-      @questions = Hash.new
+      @questions = {}
       questionnaires = @assignment.questionnaires
       questionnaires.each {
         |questionnaire|
@@ -212,93 +321,159 @@ class GradesController < ApplicationController
       @reviews = responses
       @reviews.each {
         |response|
-        user = response.map.reviewer.user
-        @reviewers_email_hash[user.fullname.to_s+" <"+user.email.to_s+">"] = user.email.to_s
-      }
-      @reviews.sort! { |a, b| a.map.reviewer.user.fullname <=> b.map.reviewer.user.fullname }
+      user = response.map.reviewer.user
+      @reviewers_email_hash[user.fullname.to_s+" <"+user.email.to_s+">"] = user.email.to_s
+    }
+    @reviews.sort! { |a, b| a.map.reviewer.user.fullname <=> b.map.reviewer.user.fullname }
       @questionnaire = @assignment.questionnaires.find_by_type(questionnaire_type)
-      @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)
-    end
+    @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)
+  end
 
-    def redirect_when_disallowed
-      # For author feedback, participants need to be able to read feedback submitted by other teammates.
-      # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
-      ## This following code was cloned from response_controller.
+  def redirect_when_disallowed
+    # For author feedback, participants need to be able to read feedback submitted by other teammates.
+    # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
+    ## This following code was cloned from response_controller.
 
       #ACS Check if team count is more than 1 instead of checking if it is a team assignment
       if @participant.assignment.max_team_size > 1
-        team = @participant.team
-        if (!team.nil?)
-          unless team.has_user session[:user]
-            redirect_to '/denied?reason=You are not on the team that wrote this feedback'
-            return true
-          end
+      team = @participant.team
+      if(!team.nil?)
+        unless team.has_user session[:user]
+          redirect_to '/denied?reason=You are not on the team that wrote this feedback'
+          return true
         end
-      else
+      end
+    else
         reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id: @participant.assignment.id).first
-        return true unless current_user_id?(reviewer.user_id)
-      end
-      return false
+      return true unless current_user_id?(reviewer.user_id)
+    end
+    return false
+  end
+
+  def get_body_text(submission)
+    if submission
+      role = "reviewer"
+      item = "submission"
+    else
+      role = "metareviewer"
+      item = "review"
+    end
+    "Hi ##[recipient_name], 
+    
+You submitted a score of ##[recipients_grade] for assignment ##[assignment_name] that varied greatly from another "+role+"'s score for the same "+item+". 
+    
+The Expertiza system has brought this to my attention."
+  end
+
+=begin
+  def distribution(pid)
+    @participant = AssignmentParticipant.find(pid)
+    @assignment_id = @participant.parent_id
+    @assignment = Assignment.find(@assignment_id)
+
+    @scores = [0,0,0,0,0,0,0,0,0,0]
+    if(@assignment.team_assignment)
+      teams = Team.find_all_by_parent_id(params[:id])
+      objtype = "TeamReviewResponseMap"
+    else
+      teams = Participant.find_all_by_parent_id(params[:id])
+      objtype = "ParticipantReviewResponseMap"
     end
 
-    def get_body_text(submission)
-      if submission
-        role = "reviewer"
-        item = "submission"
-      else
-        role = "metareviewer"
-        item = "review"
+    teams.each do |team|
+      score_cache = ScoreCache.find(:first, :conditions => ["reviewee_id = ? and object_type = ?",team.id,  objtype])
+      t_score = 0
+      if score_cache!= nil
+        t_score = score_cache.score
       end
-      "Hi ##[recipient_name],
-
-        You submitted a score of ##[recipients_grade] for assignment ##[assignment_name] that varied greatly from another "+role+"'s score for the same "+item+".
-
-        The Expertiza system has brought this to my attention."
+      if (t_score != 0)
+        @scores[(t_score/10).to_i] =  @scores[(t_score/10).to_i] + 1
+      end
     end
 
-    def calculate_all_penalties(assignment_id)
-      @all_penalties = {}
-      @assignment = Assignment.find(assignment_id)
-      unless @assignment.is_penalty_calculated
-        calculate_for_participants = true
-      end
-      Participant.where(parent_id: assignment_id).each do |participant|
-        penalties = calculate_penalty(participant.id)
-        @total_penalty = 0
-        if(penalties[:submission] != 0 || penalties[:review] != 0 || penalties[:meta_review] != 0)
-          unless penalties[:submission]
-            penalties[:submission] = 0
-          end
-          unless penalties[:review]
-            penalties[:review] = 0
-          end
-          unless penalties[:meta_review]
-            penalties[:meta_review] = 0
-          end
-          @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
-          l_policy = LatePolicy.find(@assignment.late_policy_id)
-          if(@total_penalty > l_policy.max_penalty)
-            @total_penalty = l_policy.max_penalty
-          end
-          if calculate_for_participants == true
-            penalty_attr1 = {:deadline_type_id => 1,:participant_id => @participant.id, :penalty_points => penalties[:submission]}
-            CalculatedPenalty.create(penalty_attr1)
 
-            penalty_attr2 = {:deadline_type_id => 2,:participant_id => @participant.id, :penalty_points => penalties[:review]}
-            CalculatedPenalty.create(penalty_attr2)
+    dataset = GoogleChartDataset.new :data => @scores, :color => '9A0000'
+    data = GoogleChartData.new :datasets => [dataset]
+    axis = GoogleChartAxis.new :axis  => [GoogleChartAxis::BOTTOM, GoogleChartAxis::LEFT]
+    @chart1 = GoogleBarChart.new :width => 500, :height => 200
+    @chart1.data = data
+    @chart1.axis = axis
 
-            penalty_attr3 = {:deadline_type_id => 5,:participant_id => @participant.id, :penalty_points => penalties[:meta_review]}
-            CalculatedPenalty.create(penalty_attr3)
-          end
+
+    ###################### Second Graph ####################
+
+    max_score = 0
+    @review_distribution =[0,0,0,0,0,0,0,0,0,0]
+    ### For every responsemapping for this assgt, find the reviewer_id and reviewee_id #####
+    @reviews_not_done = 0
+    response_maps =  ResponseMap.find(:all, :conditions =>["reviewed_object_id = ? and type = ?", @assignment.id, objtype])
+    review_report = @assignment.compute_reviews_hash
+    for response_map in response_maps
+      score_for_this_review = review_report[response_map.reviewer_id][response_map.reviewee_id]
+      if(score_for_this_review != 0)
+        @review_distribution[(score_for_this_review/10-1).to_i] = @review_distribution[(score_for_this_review/10-1).to_i] + 1
+        if (@review_distribution[(score_for_this_review/10-1).to_i] > max_score)
+          max_score = @review_distribution[(score_for_this_review/10-1).to_i]
         end
-        @all_penalties[participant.id] = {}
-        @all_penalties[participant.id][:submission] = penalties[:submission]
-        @all_penalties[participant.id][:review] = penalties[:review]
-        @all_penalties[participant.id][:meta_review] = penalties[:meta_review]
-        @all_penalties[participant.id][:total_penalty] = @total_penalty
+      else
+        @reviews_not_done +=1
       end
-      unless @assignment.is_penalty_calculated
-        @assignment.update_attribute(:is_penalty_calculated, true)
+    end
+
+    dataset2 = GoogleChartDataset.new :data => @review_distribution, :color => '9A0000'
+    data2 = GoogleChartData.new :datasets => [dataset2]
+    axis2 = GoogleChartAxis.new :axis  => [GoogleChartAxis::BOTTOM, GoogleChartAxis::LEFT]
+
+    @chart2 = GoogleBarChart.new :width => 500, :height => 200
+    @chart2.data = data2
+    @chart2.axis = axis2
+
+  end
+=end
+
+  def calculate_all_penalties(assignment_id)
+    @all_penalties = {}
+    @assignment = Assignment.find(assignment_id)
+    unless @assignment.is_penalty_calculated
+      calculate_for_participants = true
+    end
+    Participant.where(parent_id: assignment_id).each do |participant|
+      penalties = calculate_penalty(participant.id)
+      @total_penalty = 0
+      if(penalties[:submission] != 0 || penalties[:review] != 0 || penalties[:meta_review] != 0)
+        unless penalties[:submission]
+          penalties[:submission] = 0
+        end
+        unless penalties[:review]
+          penalties[:review] = 0
+        end
+        unless penalties[:meta_review]
+          penalties[:meta_review] = 0
+        end
+        @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
+        l_policy = LatePolicy.find(@assignment.late_policy_id)
+        if(@total_penalty > l_policy.max_penalty)
+          @total_penalty = l_policy.max_penalty
+        end
+        if calculate_for_participants == true
+          penalty_attr1 = {:deadline_type_id => 1,:participant_id => @participant.id, :penalty_points => penalties[:submission]}
+          CalculatedPenalty.create(penalty_attr1)
+
+          penalty_attr2 = {:deadline_type_id => 2,:participant_id => @participant.id, :penalty_points => penalties[:review]}
+          CalculatedPenalty.create(penalty_attr2)
+
+          penalty_attr3 = {:deadline_type_id => 5,:participant_id => @participant.id, :penalty_points => penalties[:meta_review]}
+          CalculatedPenalty.create(penalty_attr3)
+        end
       end
+      @all_penalties[participant.id] = {}
+      @all_penalties[participant.id][:submission] = penalties[:submission]
+      @all_penalties[participant.id][:review] = penalties[:review]
+      @all_penalties[participant.id][:meta_review] = penalties[:meta_review]
+      @all_penalties[participant.id][:total_penalty] = @total_penalty
+    end
+    unless @assignment.is_penalty_calculated
+      @assignment.update_attribute(:is_penalty_calculated, true)
     end
   end
+end

@@ -29,45 +29,45 @@ ActiveRecord::Schema.define(version: 20140808212437) do
   create_table "assignments", force: true do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "name"
+    t.string   "directory_path"
+    t.integer  "submitter_count",                   default: 0,     null: false
+    t.integer  "course_id",                         default: 0
+    t.integer  "instructor_id",                     default: 0
+    t.boolean  "private",                           default: false, null: false
+    t.integer  "num_reviews",                       default: 0,     null: false
+    t.integer  "num_review_of_reviews",             default: 0,     null: false
+    t.integer  "num_review_of_reviewers",           default: 0,     null: false
+    t.integer  "review_questionnaire_id"
+    t.integer  "review_of_review_questionnaire_id"
+    t.integer  "teammate_review_questionnaire_id"
+    t.boolean  "reviews_visible_to_all"
+    t.integer  "wiki_type_id",                      default: 0,     null: false
+    t.boolean  "require_signup"
+    t.integer  "num_reviewers",                     default: 0,     null: false
+    t.text     "spec_location"
+    t.integer  "author_feedback_questionnaire_id"
+    t.integer  "max_team_size",                     default: 0,     null: false
+    t.boolean  "staggered_deadline"
     t.boolean  "allow_suggestions"
+    t.integer  "days_between_submissions"
+    t.string   "review_assignment_strategy"
+    t.integer  "max_reviews_per_submission"
+    t.integer  "review_topic_threshold",            default: 0
     t.boolean  "availability_flag"
-    t.boolean  "calculate_penalty",                 default: false, null: false
     t.boolean  "copy_flag",                         default: false
+    t.integer  "rounds_of_reviews",                 default: 1
+    t.boolean  "microtask",                         default: false
+    t.integer  "selfreview_questionnaire_id"
+    t.integer  "managerreview_questionnaire_id"
+    t.integer  "readerreview_questionnaire_id"
+    t.boolean  "require_quiz"
+    t.integer  "num_quiz_questions",                default: 0,     null: false
     t.boolean  "is_coding_assignment"
     t.boolean  "is_intelligent"
-    t.boolean  "is_penalty_calculated",             default: false, null: false
-    t.boolean  "microtask",                         default: false
-    t.boolean  "private",                           default: false, null: false
-    t.boolean  "require_quiz"
-    t.boolean  "require_signup"
-    t.boolean  "reviews_visible_to_all"
-    t.boolean  "staggered_deadline"
-    t.integer  "author_feedback_questionnaire_id"
-    t.integer  "course_id",                         default: 0
-    t.integer  "days_between_submissions"
-    t.integer  "instructor_id",                     default: 0
+    t.boolean  "calculate_penalty",                 default: false, null: false
     t.integer  "late_policy_id"
-    t.integer  "managerreview_questionnaire_id"
-    t.integer  "max_reviews_per_submission"
-    t.integer  "max_team_size",                     default: 0,     null: false
-    t.integer  "num_quiz_questions",                default: 0,     null: false
-    t.integer  "num_review_of_reviewers",           default: 0,     null: false
-    t.integer  "num_review_of_reviews",             default: 0,     null: false
-    t.integer  "num_reviewers",                     default: 0,     null: false
-    t.integer  "num_reviews",                       default: 0,     null: false
-    t.integer  "readerreview_questionnaire_id"
-    t.integer  "review_of_review_questionnaire_id"
-    t.integer  "review_questionnaire_id"
-    t.integer  "review_topic_threshold",            default: 0
-    t.integer  "rounds_of_reviews",                 default: 1
-    t.integer  "selfreview_questionnaire_id"
-    t.integer  "submitter_count",                   default: 0,     null: false
-    t.integer  "teammate_review_questionnaire_id"
-    t.integer  "wiki_type_id",                      default: 0,     null: false
-    t.string   "directory_path"
-    t.string   "name"
-    t.string   "review_assignment_strategy"
-    t.text     "spec_location"
+    t.boolean  "is_penalty_calculated",             default: false, null: false
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -162,6 +162,14 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.integer "participant_id"
     t.integer "deadline_type_id"
     t.integer "penalty_points"
+  end
+
+  create_table "categories", force: true do |t|
+    t.string  "name"
+    t.integer "parent_id"
+    t.integer "lft"
+    t.integer "rgt"
+    t.integer "depth"
   end
 
   create_table "comments", force: true do |t|
@@ -324,10 +332,6 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.integer "parent_id"
     t.integer "node_object_id"
     t.string  "type"
-    t.string  "name"
-    t.integer "lft"
-    t.integer "rgt"
-    t.integer "depth"
   end
 
   create_table "participant_score_views", id: false, force: true do |t|
@@ -756,7 +760,7 @@ ActiveRecord::Schema.define(version: 20140808212437) do
     t.boolean "email_on_submission"
     t.boolean "email_on_review_of_review"
     t.boolean "is_new_user",                           default: true,  null: false
-    t.integer "master_permission_granted",             default: 0
+    t.integer "master_permission_granted", limit: 1,   default: 0
     t.string  "handle"
     t.boolean "leaderboard_privacy",                   default: false
     t.text    "digital_certificate"

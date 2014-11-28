@@ -55,12 +55,7 @@ class AssignmentsController < ApplicationController
 
   def edit
     @assignment_form =  AssignmentForm.createFormObject(params[:id])
-
-    #Remove this line once you change all the views
-    @assignment = Assignment.find(params[:id])
-
     @user = current_user
-
   end
 
   def update

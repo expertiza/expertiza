@@ -63,52 +63,6 @@ class AssignmentsController < ApplicationController
 
   end
 
-  def delete_all_due_dates
-    if params[:assignment_id].nil?
-      return
-    end
-
-    assignment = Assignment.find(params[:assignment_id])
-    if assignment.nil?
-      return
-    end
-
-    @due_dates = DueDate.where(assignment_id: params[:assignment_id])
-    @due_dates.each do |due_date|
-      due_date.delete
-    end
-
-    respond_to do |format|
-      format.json { render :json => @due_dates }
-    end
-  end
-
-  def set_due_date
-
-    if params[:due_date][:due_at].blank?
-      respond_to do |format|
-        format.json { render :json => nil }
-      end
-      return
-    end
-
-    if params[:due_date][:assignment_id].nil?
-      return
-    end
-
-    assignment = Assignment.find(params[:due_date][:assignment_id])
-    if assignment.nil?
-      return
-    end
-
-    @due_date = DueDate.new(params[:due_date])
-    @due_date.save
-
-    respond_to do |format|
-      format.json { render :json => @due_date }
-    end
-  end
-
   def update
 
     @assignment_form= AssignmentForm.createFormObject(params[:id])

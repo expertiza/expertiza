@@ -1,16 +1,19 @@
 describe 'Student logs in', :type => :feature do
-  it 'with valid username and password' do
-    student1 = FactoryGirl.create :student
-    student2 = FactoryGirl.create :student
+  # Student test users used in following scenarios.
+  student1 = FactoryGirl.create :student
+  student2 = FactoryGirl.create :alt_student
 
+  scenario 'with valid username and password' do
     visit root_path
 
     # Log in as student1
-    fill_in 'login_name', with: student1.name
-    fill_in 'login_password', with: student1.password
-    click_on 'Login'
-    click_on 'Logout'
+      fill_in 'login_name', with: student1.name
+      fill_in 'login_password', with: student1.password
+      click_on 'Login'
 
+      expect(page).to have_content(studen1.name)
+
+      click_on 'Logout'
 
     # Create a team
 #    fill_in 'team_name', with: 'TestTeamName'
@@ -25,6 +28,31 @@ describe 'Student logs in', :type => :feature do
 #
 #    # Expect student2 to show up under 'Sent Invitations'
 #    expect(page).to have_content(student2.name)
+  end
+
+  scenario 'Student logs in with invalid user name' do
+    # Attempt to log in as an invalid student.
+    fill_in 'login_name', with: 'bogus'
+    fill_in 'login_password', with: student1.password
+    click_on 'Login'
+
+    expect(page).to have_content('Incorrect Name/Password')
+  end
+
+  scenario 'Student logs in with valid user name and invalid password' do
+    fill_in 'login_name', with: student1.name
+    fill_in 'login_password', with: 'bogus'
+    click_on 'Login'
+
+    expect(page).to have_content('Incorrect Name/Password')
+  end
+
+  scenario "Student logs in with valid user name and another user's password" do
+    fill_in 'login_name', with: student1.name
+    fill_in 'login_password', with: student2.password
+    click_on 'Login'
+
+    expect(page).to have_content('Incorrect Name/Password')
   end
 end
 

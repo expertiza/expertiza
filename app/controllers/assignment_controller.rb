@@ -536,9 +536,9 @@ class AssignmentController < ApplicationController
       # GET_PATH (Helper function for CREATE and UPDATE)
       #  return the file location if there is any for the assignment
       #--------------------------------------------------------------------------------------------------------------------
-      def get_path
+      def path
         begin
-          file_path = @assignment.get_path
+          file_path = @assignment.path
         rescue
           file_path = nil
         end
@@ -586,7 +586,7 @@ class AssignmentController < ApplicationController
         end
         @assignment = Assignment.find(params[:id])
         begin
-          oldpath = @assignment.get_path
+          oldpath = @assignment.path
         rescue
           oldpath = nil
         end
@@ -699,7 +699,7 @@ class AssignmentController < ApplicationController
           end
 
           begin
-            newpath = @assignment.get_path
+            newpath = @assignment.path
           rescue
             newpath = nil
           end
@@ -837,10 +837,10 @@ class AssignmentController < ApplicationController
       #--------------------------------------------------------------------------------------------------------------------
       def remove_assignment_from_course
         @assignment = Assignment.find(params[:id])
-        oldpath = assignment.get_path rescue nil
+        oldpath = assignment.path rescue nil
         @assignment.course_id = nil
         @assignment.save
-        newpath = assignment.get_path rescue nil
+        newpath = assignment.path rescue nil
         FileHelper.update_file_location(oldpath,newpath)
         undo_link("Assignment \"#{@assignment.name}\" has been removed from course successfully. ")
         redirect_to :controller => 'tree_display', :action => 'list'

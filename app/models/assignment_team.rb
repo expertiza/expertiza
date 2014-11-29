@@ -60,22 +60,21 @@ class AssignmentTeam < Team
     find(team_id).participants.first
   end
 
-  def get_hyperlinks
+  def hyperlinks
     links = Array.new
-    self.get_participants.each { |team_member| links.concat(team_member.get_hyperlinks_array) }
+    self.get_participants.each { |team_member| links.concat(team_member.hyperlinks_array) }
     links
   end
 
-  def get_path
+  def path
     self.get_participants.first.dir_path
   end
 
-  def get_submitted_files
+  def submitted_files
     self.get_participants.first.submitted_files
   end
-  alias_method :submitted_files, :get_submitted_files
 
-  def get_review_map_type
+  def review_map_type
     'TeamReviewResponseMap'
   end
 
@@ -121,13 +120,13 @@ class AssignmentTeam < Team
 
       # insert team members into team unless team was pre-existing & we ignore duplicate teams
       team.import_team_members(index, row) if !(team_exists && options[:handle_dups] == "ignore")
-      end
+    end
 
       def email
         self.get_team_users.first.email
       end
 
-      def get_participant_type
+      def participant_type
         "AssignmentParticipant"
       end
 
@@ -166,7 +165,7 @@ class AssignmentTeam < Team
       end
 
       # return a hash of scores that the team has received for the questions
-      def get_scores(questions)
+      def scores(questions)
         scores = Hash.new
         scores[:team] = self # This doesn't appear to be used anywhere
         assignment.questionnaires.each do |questionnaire|
@@ -177,9 +176,9 @@ class AssignmentTeam < Team
         scores[:total_score] = assignment.compute_total_score(scores)
         scores
       end
-      alias_method :scores, :get_scores
+     
 
-      def self.get_team(participant)
+      def self.get_teascoresant)
         team = nil
         teams_users = TeamsUser.where(user_id: participant.user_id)
         teams_users.each do |tuser|
@@ -208,7 +207,7 @@ class AssignmentTeam < Team
         end
       end
 
-      def self.get_export_fields(options)
+      def self.export_fields(options)
         fields = Array.new
         fields.push("Team Name")
         fields.push("Team members") if options["team_name"] == "false"

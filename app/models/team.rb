@@ -47,7 +47,7 @@ class Team < ActiveRecord::Base
   def get_possible_team_members(name)
     query = "select users.* from users, participants"
     query = query + " where users.id = participants.user_id"
-    query = query + " and participants.type = '"+self.get_participant_type+"'"
+    query = query + " and participants.type = '"+self.participant_type+"'"
     query = query + " and participants.parent_id = #{self.parent_id}"
       query = query + " and users.name like '#{name}%'"
     query = query + " order by users.name"

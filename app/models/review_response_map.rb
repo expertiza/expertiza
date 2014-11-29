@@ -17,7 +17,7 @@ class ReviewResponseMap < ResponseMap
     self.destroy
   end
 
-  def self.get_export_fields(options)
+  def self.export_fields(options)
     fields = ["contributor", "reviewed by"]
     return fields
   end

@@ -72,7 +72,7 @@ def submit_file
     @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
   end
 
-  curr_directory = participant.get_path.to_s + @current_folder.name
+  curr_directory = participant.path.to_s + @current_folder.name
 
 
   if !File.exists? curr_directory
@@ -154,7 +154,7 @@ def custom_submit_file
       @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
     end
 
-    curr_directory = participant.assignment.get_path.to_s+ "/" +params[:map].to_s + @current_folder.name
+    curr_directory = participant.assignment.path.to_s+ "/" +params[:map].to_s + @current_folder.name
     if !File.exists? curr_directory
       FileUtils.mkdir_p(curr_directory)
     else

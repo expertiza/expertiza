@@ -16,7 +16,7 @@ class Course < ActiveRecord::Base
   end
 
   #Returns this object's submission directory
-  def get_path
+  def path
     if self.instructor_id == nil
       raise "Path can not be created. The course must be associated with an instructor."
     end

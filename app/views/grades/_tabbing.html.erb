@@ -8,7 +8,7 @@
       <li id="tab5"><a href="#tabs-5">Team-mate Review</a></li>
     </ul>
     <div id="tabs-1">
-      <%= render 'grades/reviewTabs', :locals => {:prefix => 'user',  :team => false, :pscore => @participant.get_scores(@questions)} %>
+      <%= render 'grades/reviewTabs', :locals => {:prefix => 'user',  :team => false, :pscore => @participant.scores(@questions)} %>
     </div>
     <div id="tabs-2">
       <p>test1</p>

@@ -48,7 +48,7 @@ class StudentTask
   end
 
   def hyperlinks
-    @hyperlinks ||= participant.get_hyperlinks
+    @hyperlinks ||= participant.hyperlinks
   end
 
   def incomplete?

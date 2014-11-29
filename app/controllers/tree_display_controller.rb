@@ -9,6 +9,7 @@ class TreeDisplayController < ApplicationController
   def goto_questionnaires
     node_object = TreeFolder.find_by_name('Questionnaires')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
+    session[:course_id] = nil
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -16,6 +17,7 @@ class TreeDisplayController < ApplicationController
   def goto_review_rubrics
     node_object = TreeFolder.find_by_name('Review')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
+    session[:course_id] = nil
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -23,6 +25,7 @@ class TreeDisplayController < ApplicationController
   def goto_metareview_rubrics
     node_object = TreeFolder.find_by_name('Metareview')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
+    session[:course_id] = nil
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -30,6 +33,7 @@ class TreeDisplayController < ApplicationController
   def goto_teammatereview_rubrics
     node_object = TreeFolder.find_by_name('Teammate Review')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
+    session[:course_id] = nil
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -37,6 +41,7 @@ class TreeDisplayController < ApplicationController
   def goto_author_feedbacks
     node_object = TreeFolder.find_by_name('Author Feedback')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
+    session[:course_id] = nil
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -44,6 +49,7 @@ class TreeDisplayController < ApplicationController
   def goto_global_survey
     node_object = TreeFolder.find_by_name('Global Survey')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
+    session[:course_id] = nil
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -51,6 +57,7 @@ class TreeDisplayController < ApplicationController
   def goto_surveys
     node_object = TreeFolder.find_by_name('Survey')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
+    session[:course_id] = nil
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -58,6 +65,7 @@ class TreeDisplayController < ApplicationController
   def goto_course_evaluations
     node_object = TreeFolder.find_by_name('Course Evaluation')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
+    session[:course_id] = nil
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -65,12 +73,14 @@ class TreeDisplayController < ApplicationController
   def goto_courses
     node_object = TreeFolder.find_by_name('Courses')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
+    session[:course_id] = nil
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
   def goto_bookmarkrating_rubrics
     node_object = TreeFolder.find_by_name('Bookmarkrating')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
+    session[:course_id] = nil
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -78,6 +88,7 @@ class TreeDisplayController < ApplicationController
   def goto_assignments
     node_object = TreeFolder.find_by_name('Assignments')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
+    session[:course_id] = nil
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -104,6 +115,13 @@ class TreeDisplayController < ApplicationController
 
     @search = search_string
 
+    if search_node == 'Q' || session[:course_id]
+      @search = {}
+      session[:root] = 1
+      @search[:course_id] = session[:course_id]
+      @search[:search_string] = search_string
+    end
+
     display = params[:display] #|| session[:display]
     if display
       @sortvar = display[:sortvar]
@@ -123,6 +141,7 @@ class TreeDisplayController < ApplicationController
 
   def drill
     session[:root] = params[:root]
+    session[:course_id] = nil
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -147,4 +166,4 @@ class TreeDisplayController < ApplicationController
     return qid
   end
 
-  end
+end

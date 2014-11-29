@@ -7,13 +7,39 @@ class QuestionnaireTypeNode < FolderNode
   end
 
   def self.get(sortvar = nil,sortorder =nil,user_id = nil,show = nil,parent_id = nil,search=nil)
-    parent = TreeFolder.find_by_name("Questionnaires")
-    folders = TreeFolder.where(parent_id: parent.id)
-    nodes = Array.new
-    folders.each do |folder|
-      node = FolderNode.find_by_node_object_id(folder.id)
-      if node
-        nodes << node
+    nodes = []
+    if (!search)
+      parent = TreeFolder.find_by_name("Questionnaires")
+      folders = TreeFolder.where(parent_id: parent.id)
+      folders.each do |folder|
+        node = FolderNode.find_by_node_object_id(folder.id)
+        if node
+          nodes << node
+        end
+      end
+    else
+      @questionnaires = []
+      if search[:course_id]
+        Assignment.where(:course_id => search[:course_id].to_i).each do |assignment|
+          AssignmentQuestionnaire.where( :assignment_id => assignment.id ).each do |assignment|
+            @questionnaires +=Questionnaire.where(:id => assignment.questionnaire_id).to_a
+          end
+        end
+      else
+        @questionnaires = Questionnaire.all
+      end
+
+      if search[:search_string]
+        remove_list = []
+        @questionnaires.each do |questionnaire|
+          remove_list << questionnaire unless questionnaire.name =~ /#{'(.*)' + search[:search_string] + '(.*)'}/i
+        end
+        @questionnaires -=remove_list
+      end
+
+
+      @questionnaires.uniq.each do |questionnaire|
+        nodes += Node.where("node_object_id = ? and type='QuestionnaireNode'",questionnaire.id ).to_a
       end
     end
     return nodes

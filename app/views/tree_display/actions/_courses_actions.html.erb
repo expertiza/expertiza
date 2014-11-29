@@ -9,7 +9,7 @@
             <%= link_to image_tag('/assets/tree_view/add-assignment-24.png', :title => 'Create assignment'),:controller=>'assignments', :action=>'new', :parent_id => node.node_object_id %>
             <%= link_to image_tag('/assets/tree_view/add-participant-24.png', :title => 'Add participants'),:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Course'%>
             <%= link_to image_tag('/assets/tree_view/create-teams-24.png', :title => 'Create teams'),:controller=>'teams', :action=>'list', :id => node.node_object_id, :type => 'Course' %>
-            <%= link_to image_tag('/assets/tree_view/view-survey-96.png', :title => 'QUESTIONAIRE 123!'), :controller => 'questionnaires', :action => 'blah', :id => node.node_object_id, :model => 'Course'%>
+            <%= link_to image_tag('/assets/tree_view/view-survey-96.png', :title => 'QUESTIONAIRE 123!'), :controller => 'questionnaires', :action => 'course_questionnaires', :id => node.node_object_id, :model => 'Course'%>
 
             <%#= link_to image_tag('/assets/tree_view/view-survey-24.png', :title => 'View quiz questions'), {:controller => 'questions', :action => 'list'}, {:title => 'View quiz questions'} %>
 

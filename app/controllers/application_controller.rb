@@ -2,6 +2,9 @@ require 'goldberg_filters'
 
 class ApplicationController < ActionController::Base
   include AccessHelper
+
+  force_ssl
+
   session ||= Hash.new
 
   helper_method :current_user_session, :current_user, :current_user_role?

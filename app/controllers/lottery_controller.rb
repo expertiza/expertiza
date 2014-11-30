@@ -323,5 +323,56 @@ def allot_topic_to_user_if_possible(assignment_id, signed_up_user_entry,topic,cu
   return false
 end
 
+  def run_theReal_intelligent_bid
+    #finalUserTopics = Hash.new
+    finalTeamTopics = Hash.new #Hashmap (Team,Topic)
+    sign_up_topics = SignUpTopic.where(assignment_id: params[:id])
+    #initializing all topics with bidder rankings
+    sign_up_topics.each do |topic|
+      topic.sortedBids = topic.bids.sort_by {|b| [(b.team.users.size * -1), b.priority, rand(100)]} #If strength and priority are equal, then randomize
+    end
+
+
+    while (sign_up_topics.size != 0)
+      currentTopic = sign_up_topics[0]
+      canRemoveTopic = false
+      if(currentTopic.bidders.nil? || currentTopic.bidders.size == 0)
+        canRemoveTopic = true
+      else
+        currentBestBid = currentTopic.sortedBids[0]
+        if(!finalTeamTopics.has_key?(currentBestBid.team.id))
+          finalTeamTopics[currentBestBid.team.id]=currentTopic
+          canRemoveTopic = true
+        else
+          prevTeamTopic = finalTeamTopics[currentBestBid.team.id]
+          otherBid = currentBestBid.team.bids.where(:topic_id => prevTeamTopic.id).first
+          if(currentBestBid.priority < otherBid.priority) #The team prefers the current topic
+            finalTeamTopics[currentBestBid.team.id] = currentTopic
+            prevTeamTopic.sortedBids.delete(0)
+            sign_up_topics << prevTeamTopic
+            canRemoveTopic = true
+          else
+            currentTopic.sortedBids.delete(0)
+          end
+        end
+      end
+      if(canRemoveTopic)
+        if(currentTopic.maxChoosers == 0)
+          sign_up_topics.delete(0) #Unsure if it works
+        else
+          currentTopic.maxChoosers=currentTopic.maxChoosers-1
+        end
+      end
+    end
+
+    finalTeamTopics.get_keys.each do |team_id|
+      SignedUpUser.create(:creator_id=>team_id,:topic_id => finalTeamTopics[team_id].id)
+    end
+
+  end
+
+  def initialize(topic)
+
+  end
 end
 

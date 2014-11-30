@@ -6,6 +6,13 @@
 <!--3. actually pretty much rewrote the whole thing...-->
 
 <script type="text/javascript">
+    jQuery(document).ready(function() {
+    jQuery("#set_rounds").click(function () {
+        changeReviewRounds();
+        event.preventDefault(); // Prevent link from following its href
+    });
+    });
+
 function changeReviewRounds() {
   var new_round_count = parseInt(jQuery('#assignment_form_assignment_rounds_of_reviews').val());
   if (new_round_count <= 0) {
@@ -225,7 +232,7 @@ function removeDueDateTableElement(deadline_type, round_no) {
 <div style='padding: 5px' id='review_round'>
 <%= label_tag('assignment_form[assignment][rounds_of_reviews]', 'Number of Review Rounds:') %>
 <%= text_field_tag('assignment_form[assignment][rounds_of_reviews]', @assignment_form.assignment.rounds_of_reviews, :style => 'width:50px') %>
-<%= button_tag 'Set', onclick: 'return changeReviewRounds();' , remote: true%>
+  <button type="button" id="set_rounds">Set</button>
 </div>
 
 <table class='exp' id='due_dates_table' style='padding:10px'>

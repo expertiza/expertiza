@@ -50,7 +50,7 @@ describe 'Student retrieves password', :type => :feature do
 
     expect(page).to have_content('Forgotten Your Password?')
 
-    # NOTE: The behavior of an improperly formatted and a non-existent 
+    # NOTE: The behavior of an improperly formatted and a non-existent
     # e-mail address is the same.
     fill_in 'user_email', with: 'bogus'
 

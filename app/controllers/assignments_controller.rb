@@ -54,13 +54,13 @@ class AssignmentsController < ApplicationController
   end
 
   def edit
-    @assignment_form =  AssignmentForm.createFormObject(params[:id])
+    @assignment_form = AssignmentForm.create_form_object(params[:id])
     @user = current_user
   end
 
   def update
 
-    @assignment_form= AssignmentForm.createFormObject(params[:id])
+    @assignment_form= AssignmentForm.create_form_object(params[:id])
     params[:assignment_form][:assignment][:wiki_type_id] = 1 unless params[:assignment_wiki_assignment]
 
     #TODO: require params[:assignment][:directory_path] to be not null

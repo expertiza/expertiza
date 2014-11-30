@@ -316,7 +316,7 @@ class AssignmentsController < ApplicationController
     Assignment.record_timestamps = false
     old_assign = Assignment.find(params[:id])
     new_assign = old_assign.clone
-    @user = ApplicationHelper::get_user_role(session[:user])
+   # @user = ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]
     @user.set_instructor(new_assign)
     new_assign.update_attribute('name', 'Copy of ' + new_assign.name)

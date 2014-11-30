@@ -3,34 +3,25 @@ describe 'Student logs in', :type => :feature do
   student1 = FactoryGirl.create :student
   student2 = FactoryGirl.create :alt_student
 
+
   scenario 'with valid username and password' do
     visit root_path
 
     # Log in as student1
-      fill_in 'login_name', with: student1.name
-      fill_in 'login_password', with: student1.password
-      click_on 'Login'
+    fill_in 'login_name', with: student1.name
+    fill_in 'login_password', with: student1.password
+    click_on 'Login'
 
-      expect(page).to have_content(studen1.name)
+    expect(page).to have_content(student1.name)
 
-      click_on 'Logout'
-
-    # Create a team
-#    fill_in 'team_name', with: 'TestTeamName'
-#    click_on 'Create Team'
-#
-#    # Expect team name to be displayed
-#    expect(page).to have_content('TestTeamName')
-#
-#    # Invite student2 to the team
-#    fill_in 'user_name', with: student2.name
-#    click_on 'Invite'
-#
-#    # Expect student2 to show up under 'Sent Invitations'
-#    expect(page).to have_content(student2.name)
+    # Leave system in state that doesn't mess up other tests.
+    click_on 'Logout'
   end
 
+
   scenario 'Student logs in with invalid user name' do
+    visit root_path
+
     # Attempt to log in as an invalid student.
     fill_in 'login_name', with: 'bogus'
     fill_in 'login_password', with: student1.password
@@ -39,7 +30,10 @@ describe 'Student logs in', :type => :feature do
     expect(page).to have_content('Incorrect Name/Password')
   end
 
+
   scenario 'Student logs in with valid user name and invalid password' do
+    visit root_path
+
     fill_in 'login_name', with: student1.name
     fill_in 'login_password', with: 'bogus'
     click_on 'Login'
@@ -47,9 +41,23 @@ describe 'Student logs in', :type => :feature do
     expect(page).to have_content('Incorrect Name/Password')
   end
 
+
   scenario "Student logs in with valid user name and another user's password" do
+    visit root_path
+
     fill_in 'login_name', with: student1.name
     fill_in 'login_password', with: student2.password
+    click_on 'Login'
+
+    expect(page).to have_content('Incorrect Name/Password')
+  end
+
+
+  scenario 'Student logs in with a blank password' do
+    visit root_path
+
+    fill_in 'login_name', with: student1.name
+    fill_in 'login_password', with: ''
     click_on 'Login'
 
     expect(page).to have_content('Incorrect Name/Password')

@@ -18,14 +18,8 @@ class AssignmentsController < ApplicationController
   end
 
   def new
-    @assignment_form = AssignmentForm.new
-    @assignment_form.assignment.course = Course.find(params[:parent_id]) if params[:parent_id]
-
-    @assignment_form.assignment.instructor = @assignment_form.assignment.course.instructor if @assignment_form.assignment.course
+    @assignment_form = AssignmentForm.new(params)
     @assignment_form.assignment.instructor ||= current_user
-
-    @assignment_form.assignment.wiki_type_id = 1 #default no wiki type
-    @assignment_form.assignment.max_team_size = 1
   end
 
   def create
@@ -41,7 +35,7 @@ class AssignmentsController < ApplicationController
     #    }).deliver
 
     if @assignment_form.save
-      @assignment_form.assignment.create_node
+      @assignment_form.create_assignment_node
       # flash[:success] = 'Assignment was successfully created.'
       # redirect_to controller: :assignments, action: :edit, id: @assignment.id
       #AAD#

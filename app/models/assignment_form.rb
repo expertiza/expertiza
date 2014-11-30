@@ -3,31 +3,30 @@ class AssignmentForm
   attr_accessor :assignment, :assignment_questionnaires, :due_dates
 
 
-  def initialize(attributes=nil)
+  def initialize(attributes={})
+    @assignment = Assignment.new(attributes[:assignment])
 
-    if attributes.nil? then
+    #code for new assignment creation
+    if attributes[:assignment].nil?
+      @assignment.course = Course.find(attributes[:parent_id]) if attributes[:parent_id]
+      @assignment.instructor = @assignment.course.instructor if @assignment.course
+      @assignment.wiki_type_id = 1 #default no wiki type
+      @assignment.max_team_size = 1
+    end
 
-      @assignment = Assignment.new
-      @assignment_questionnaires = []
-      @due_dates = []
-
-    else
-
-      @assignment = Assignment.new(attributes[:assignment])
-
-      @assignment_questionnaires=[]
+    @assignment_questionnaires=[]
+    unless attributes[:assignment_questionnaires].nil?
       attributes[:assignment_questionnaires].each do |assignment_questionnaire|
-          @assignment_questionnaires << AssignmentQuestionnaire.new(assignment_questionnaire)
+        @assignment_questionnaires << AssignmentQuestionnaire.new(assignment_questionnaire)
       end
+    end
 
-      @due_dates=[]
+    @due_dates=[]
+    unless attributes[:due_dates].nil?
       attributes[:due_dates].each do |due_date|
         @due_dates << DueDate.new(due_date)
       end
-
-      #@due_dates = DueDate.new(attributes[:due_dates])
     end
-
   end
 
   #create a form object for this assignment_id
@@ -102,6 +101,12 @@ end
   # handle assignmentquesionnaire and duedate
   def save
     @assignment.save
+  end
+
+  def create_assignment_node
+    if !@assignment.nil?
+     @assignment.create_node
+    end
   end
 
   #NOTE: many of these functions actually belongs to other models

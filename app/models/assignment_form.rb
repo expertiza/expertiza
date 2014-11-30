@@ -149,6 +149,7 @@ end
     end
   end
 
+
   def is_coding_assignment
   if @assignment.is_coding_assignment .nil?
       @assignment.is_coding_assignment  = false

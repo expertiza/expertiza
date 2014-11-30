@@ -32,8 +32,8 @@ class AssignmentForm
 
   #create a form object for this assignment_id
   #handle assignment quessionaire and duedate
-  def self.createFormObject(assignment_id)
-    assignment_form = AssignmentForm.new
+  def self.create_form_object(assignment_id)
+  assignment_form = AssignmentForm.new
     assignment_form.assignment = Assignment.find(assignment_id)
     assignment_form.assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment_id)
     assignment_form.due_dates = DueDate.where(assignment_id: assignment_id)
@@ -118,37 +118,73 @@ end
     end
   end
 
-  #NOTE: unfortunately this method is needed due to bad data in db @_@
-  def set_up_defaults
-    if @assignment.require_signup.nil?
+  def require_sign_up
+  if @assignment.require_signup.nil?
       @assignment.require_signup = false
     end
-    if @assignment.wiki_type.nil?
+  end
+
+  def wiki_type
+  if @assignment.wiki_type.nil?
       @assignment.wiki_type = WikiType.find_by_name('No')
     end
-    if @assignment.staggered_deadline.nil?
+  end
+
+  def staggered_deadline
+  if @assignment.staggered_deadline.nil?
       @assignment.staggered_deadline = false
       @assignment.days_between_submissions = 0
     end
-    if @assignment.availability_flag.nil?
+  end
+
+  def availability_flag
+  if @assignment.availability_flag.nil?
       @assignment.availability_flag = false
     end
-    if @assignment.microtask.nil?
+  end
+
+  def micro_task
+  if @assignment.microtask.nil?
       @assignment.microtask = false
     end
-    if @assignment.is_coding_assignment .nil?
+  end
+
+  def is_coding_assignment
+  if @assignment.is_coding_assignment .nil?
       @assignment.is_coding_assignment  = false
     end
-    if @assignment.reviews_visible_to_all.nil?
+  end
+
+  def reviews_visible_to_all
+  if @assignment.reviews_visible_to_all.nil?
       @assignment.reviews_visible_to_all = false
     end
-    if @assignment.review_assignment_strategy.nil?
+  end
+
+  def review_assignment_strategy
+  if @assignment.review_assignment_strategy.nil?
       @assignment.review_assignment_strategy = ''
     end
-    if @assignment.require_quiz.nil?
+  end
+
+  def require_quiz
+  if @assignment.require_quiz.nil?
       @assignment.require_quiz =  false
       @assignment.num_quiz_questions =  0
     end
+  end
+
+  #NOTE: unfortunately this method is needed due to bad data in db @_@
+  def set_up_defaults
+    require_sign_up
+    wiki_type
+    staggered_deadline
+    availability_flag
+    micro_task
+    is_coding_assignment
+    reviews_visible_to_all
+    review_assignment_strategy
+    require_quiz
   end
 
 

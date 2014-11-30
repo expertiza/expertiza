@@ -1,5 +1,8 @@
 class LotteryController < ApplicationController
 
+  def action_allowed?
+    true
+  end
   # Kick off the lottery selection process.
   # Although this method COULD be put in the AssignmentController,
   # but we want to encapsulate the logic here
@@ -328,37 +331,41 @@ end
     finalTeamTopics = Hash.new #Hashmap (Team,Topic)
     sign_up_topics = SignUpTopic.where(assignment_id: params[:id])
     #initializing all topics with bidder rankings
+    topicsBidsArray = Array.new #Hashmap (Topic, sortedBids)
+
     sign_up_topics.each do |topic|
-      topic.sortedBids = topic.bids.sort_by {|b| [(b.team.users.size * -1), b.priority, rand(100)]} #If strength and priority are equal, then randomize
+      topicsBidsArray << [topic, topic.bids.sort_by {|b| [(b.team.users.size * -1), b.priority, rand(100)]} ]#If strength and priority are equal, then randomize
     end
 
 
-    while (sign_up_topics.size != 0)
-      currentTopic = sign_up_topics[0]
+    while (topicsBidsArray.size != 0)
+      currentTopic = topicsBidsArray[0][0]
+      sortedBids = topicsBidsArray[0][1]
       canRemoveTopic = false
-      if(currentTopic.bidders.nil? || currentTopic.bidders.size == 0)
+      if(sortedBids.nil? || sortedBids.size == 0)
         canRemoveTopic = true
       else
-        currentBestBid = currentTopic.sortedBids[0]
+        currentBestBid = sortedBids[0]
         if(!finalTeamTopics.has_key?(currentBestBid.team.id))
-          finalTeamTopics[currentBestBid.team.id]=currentTopic
+          finalTeamTopics[currentBestBid.team.id]=[currentTopic,sortedBids]
           canRemoveTopic = true
         else
-          prevTeamTopic = finalTeamTopics[currentBestBid.team.id]
+          prevTeamTopic = finalTeamTopics[currentBestBid.team.id][0]
+          prevSortedBids = finalTeamTopics[currentBestBid.team.id][1]
           otherBid = currentBestBid.team.bids.where(:topic_id => prevTeamTopic.id).first
           if(currentBestBid.priority < otherBid.priority) #The team prefers the current topic
-            finalTeamTopics[currentBestBid.team.id] = currentTopic
-            prevTeamTopic.sortedBids.delete(0)
-            sign_up_topics << prevTeamTopic
+            finalTeamTopics[currentBestBid.team.id] = [currentTopic,sortedBids]
+            prevSortedBids.delete(0)
+            topicsBidsArray << [prevTeamTopic,prevSortedBids]
             canRemoveTopic = true
           else
-            currentTopic.sortedBids.delete(0)
+            sortedBids.delete(0)
           end
         end
       end
       if(canRemoveTopic)
         if(currentTopic.maxChoosers == 0)
-          sign_up_topics.delete(0) #Unsure if it works
+          topicsBidsArray.delete(0) #Unsure if it works
         else
           currentTopic.maxChoosers=currentTopic.maxChoosers-1
         end

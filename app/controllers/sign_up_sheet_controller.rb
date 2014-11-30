@@ -101,7 +101,6 @@ class SignUpSheetController < ApplicationController
     #Renaming delete method to destroy for rails 4 compatible
     def destroy
       @topic = SignUpTopic.find(params[:id])
-      params[:assignment_id] = @topic.assignment_id
       if @topic
         @topic.destroy
         undo_link("Topic: \"#{@topic.topic_name}\" has been deleted successfully. ")

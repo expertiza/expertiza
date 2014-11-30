@@ -1,7 +1,9 @@
 class LotteryController < ApplicationController
 
   def action_allowed?
-    true
+    ['Instructor',
+       'Teaching Assistant',
+       'Administrator'].include? current_role_name
   end
   # Kick off the lottery selection process.
   # Although this method COULD be put in the AssignmentController,
@@ -355,31 +357,29 @@ end
           otherBid = currentBestBid.team.bids.where(:topic_id => prevTeamTopic.id).first
           if(currentBestBid.priority < otherBid.priority) #The team prefers the current topic
             finalTeamTopics[currentBestBid.team.id] = [currentTopic,sortedBids]
-            prevSortedBids.delete(0)
+            prevSortedBids.delete_at(0)
             topicsBidsArray << [prevTeamTopic,prevSortedBids]
             canRemoveTopic = true
           else
-            sortedBids.delete(0)
+            sortedBids.delete_at(0)
           end
         end
       end
       if(canRemoveTopic)
-        if(currentTopic.maxChoosers == 0)
-          topicsBidsArray.delete(0) #Unsure if it works
+        if(currentTopic.max_choosers == 1)
+          topicsBidsArray.delete_at(0) #Unsure if it works
         else
-          currentTopic.maxChoosers=currentTopic.maxChoosers-1
+          currentTopic.max_choosers=currentTopic.max_choosers-1
         end
       end
     end
 
-    finalTeamTopics.get_keys.each do |team_id|
-      SignedUpUser.create(:creator_id=>team_id,:topic_id => finalTeamTopics[team_id].id)
+    finalTeamTopics.keys.each do |team_id|
+      SignedUpUser.create(:creator_id=>team_id,:topic_id => finalTeamTopics[team_id][0].id)
     end
 
-  end
-
-  def initialize(topic)
-
+    flash[:notice] = 'Intelligent assignment done'
+    redirect_to :controller => 'tree_display', :action => 'list'
   end
 end
 

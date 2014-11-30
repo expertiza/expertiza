@@ -340,6 +340,7 @@ end
 
     while (topicsBidsArray.size != 0)
       currentTopic = topicsBidsArray[0][0]
+     puts "CurrentTopic"+currentTopic.id.to_s
       sortedBids = topicsBidsArray[0][1]
       canRemoveTopic = false
       if(sortedBids.nil? || sortedBids.size == 0)
@@ -351,9 +352,13 @@ end
           canRemoveTopic = true
         else
           prevTeamTopic = finalTeamTopics[currentBestBid.team.id][0]
+         puts "prevTeamTopic"+prevTeamTopic.id.to_s
           prevSortedBids = finalTeamTopics[currentBestBid.team.id][1]
-          otherBid = currentBestBid.team.bids.where(:topic_id => prevTeamTopic.id).first
-          if(currentBestBid.priority < otherBid.priority) #The team prefers the current topic
+          puts "CurrentBestBid"+currentBestBid.id.to_s
+          
+	otherBid = currentBestBid.team.bids.where(:topic_id => prevTeamTopic.id).first
+        puts "OtherBIdId"+otherBid.id.to_s
+	  if(currentBestBid.priority < otherBid.priority) #The team prefers the current topic
             finalTeamTopics[currentBestBid.team.id] = [currentTopic,sortedBids]
             prevSortedBids.delete(0)
             topicsBidsArray << [prevTeamTopic,prevSortedBids]
@@ -364,10 +369,12 @@ end
         end
       end
       if(canRemoveTopic)
-        if(currentTopic.maxChoosers == 0)
-          topicsBidsArray.delete(0) #Unsure if it works
+        if(currentTopic.max_choosers.nil? || currentTopic.max_choosers == 0)
+          puts "Before"+topicsBidsArray.size.to_s
+          topicsBidsArray.delete(0)
+          puts "After"+topicsBidsArray.size.to_s #Unsure if it works
         else
-          currentTopic.maxChoosers=currentTopic.maxChoosers-1
+          currentTopic.max_choosers = currentTopic.max_choosers - 1
         end
       end
     end
@@ -378,8 +385,5 @@ end
 
   end
 
-  def initialize(topic)
-
-  end
 end
 

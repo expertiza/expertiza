@@ -1,9 +1,5 @@
-class AddPriorityToBids < ActiveRecord::Migration
-  def self.up
-    add_column :bids, :priority, :integer, :default => nil
-  end
-
-  def self.down
-    remove_column :bids, :priority
+class AddColumnPriorityToBids < ActiveRecord::Migration
+  def change
+    add_column :bids, :priority, :integer
   end
 end

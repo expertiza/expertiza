@@ -6,7 +6,12 @@
   <a href="<%= @assignment.spec_location %>" target="new">Assignment Description</a>
 <% end %>
 <ul>
-  <%if SignUpTopic.find_by_assignment_id(@assignment.id)%>
+  <%if SignUpTopic.find_by_assignment_id(@assignment.id) && @assignment.is_intelligent%>
+    <li> <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'intelligent_sign_up', :id => @participant.parent_id%>
+    (Sign up for a topic)
+  </li>
+<%end%>
+  <%if SignUpTopic.find_by_assignment_id(@assignment.id) && !@assignment.is_intelligent%>
     <li> <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.parent_id%>
     (Sign up for a topic)
   </li>

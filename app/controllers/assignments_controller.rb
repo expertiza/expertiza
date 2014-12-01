@@ -59,10 +59,7 @@ class AssignmentsController < ApplicationController
 
     #TODO: require params[:assignment][:directory_path] to be not null
     #TODO: insert warning if directory_path is duplicated
-
-    @hash1 = Hash.new(params[:assignment_form])
-    if  @hash1[:assignment_form][:assignment][:late_policy_id].to_i > 0
-      if @assignment_form.update_attributes(params[:assignment_form])
+    if @assignment_form.update_attributes(params[:assignment_form])
         flash[:note] = 'Assignment was successfully saved.'
         #TODO: deal with submission path change
         # Need to rename the bottom-level directory and/or move intermediate directories on the path to an
@@ -71,72 +68,19 @@ class AssignmentsController < ApplicationController
         #  - rename an assgt. -- implemented by renaming a directory
         #  - assigning an assignment to a course -- implemented by moving a directory.
 
-        undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been edited successfully. ")
 
-        if params[:due_date]
-          # delete the previous jobs from the delayed_jobs table
-          djobs = Delayed::Job.where(['handler LIKE "%assignment_id: ?%"', @assignment_form.assignment.id])
-          for dj in djobs
-            delete_from_delayed_queue(dj.id)
-          end
-
-          add_to_delayed_queue
-        end
-        redirect_to :action => 'edit', :id => @assignment_form.assignment.id
       else
         flash[:error] = "Assignment save failed: #{@assignment_form.errors.full_messages.join(' ')}"
-          redirect_to :action => 'edit', :id => @assignment_form.assignment.id
-      end
-    else
-
-      @hash1[:@assignment_form][:assignment][:late_policy_id] = nil
-      if @assignment_form.update_attributes(@hash1[:assignment_form])
-        redirect_to :action => 'edit', :id => @assignment_form.assignment.id
-      else
-        flash[:error] = "Assignment save failed: #{@assignment_form.errors.full_messages.join(' ')}"
-          redirect_to :action => 'edit', :id => @assignment_form.assignment.id
-      end
     end
+
+    redirect_to :action => 'edit', :id => @assignment_form.assignment.id
+
 end
 
   def show
     @assignment = Assignment.find(params[:id])
   end
 
-  def add_to_delayed_queue
-    duedates = DueDate::where(assignment_id: @assignment.id)
-    for i in (0 .. duedates.length-1)
-      deadline_type = DeadlineType.find(duedates[i].deadline_type_id).name
-      due_at = duedates[i].due_at.to_s(:db)
-      Time.parse(due_at)
-      due_at= Time.parse(due_at)
-      mi=find_min_from_now(due_at)
-      diff = mi-(duedates[i].threshold)*60
-      if diff>0
-        dj=Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type, duedates[i].due_at.to_s(:db)),
-                                1, diff.minutes.from_now)
-        duedates[i].update_attribute(:delayed_job_id, dj.id)
-      end
-    end
-  end
-
-  # This functions finds the epoch time in seconds of the due_at parameter and finds the difference of it
-  # from the current time and returns this difference in minutes
-  def find_min_from_now(due_at)
-
-    curr_time=DateTime.now.to_s(:db)
-    curr_time=Time.parse(curr_time)
-    time_in_min=((due_at - curr_time).to_i/60)
-    return time_in_min
-  end
-
-  # Deletes the job with id equal to "delayed_job_id" from the delayed_jobs queue
-  def delete_from_delayed_queue(delayed_job_id)
-    dj=Delayed::Job.find(delayed_job_id)
-    if (dj != nil && dj.id != nil)
-      dj.delete
-    end
-  end
 
   #--------------------------------------------------------------------------------------------------------------------
   # GET_PATH (Helper function for CREATE and UPDATE)

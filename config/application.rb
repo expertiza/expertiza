@@ -13,6 +13,8 @@ module Expertiza
 
     config.time_zone = 'UTC'
 
+    config.use_ssl = false
+
     # Configure the default encoding used in templates for Ruby 1.9.
     config.encoding = "utf-8"
 

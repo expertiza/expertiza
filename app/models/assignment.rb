@@ -492,7 +492,7 @@ class Assignment < ActiveRecord::Base
       # directory is empty
     end
 
-    if !is_wiki_assignment and !self.directory_path.empty? and !directory.nil?
+    if !is_wiki_assignment and !(self.directory_path.nil? or self.directory_path.empty?) and !directory.nil?
       if directory.size == 2
         Dir.delete(Rails.root + '/pg_data/' + self.directory_path)
       else

@@ -157,33 +157,24 @@ end
     # TODO: not been cleanup yep
     #--------------------------------------------------------------------------------------------------------------------
     def delete
-      assignment = Assignment.find(params[:id])
 
-      # If the assignment is already deleted, go back to the list of assignments
-      if assignment
-        begin
-          #delete from delayed_jobs queue
-          djobs = Delayed::Job.where(['handler LIKE "%assignment_id: ?%"', assignment.id])
-          for dj in djobs
-            delete_from_delayed_queue(dj.id)
-          end
+      begin
+        @assignment_form = AssignmentForm.create_form_object(params[:id])
 
-          @user = session[:user]
-          id = @user.get_instructor
-          if (id != assignment.instructor_id)
-            raise "Not authorised to delete this assignment"
-          end
-          assignment.delete(params[:force])
-          @a = Node.where(['node_object_id = ? and type = ?', params[:id], 'AssignmentNode'])
-
-          @a.destroy
-          flash[:notice] = "The assignment is deleted"
-        rescue
+        @user = session[:user]
+        id = @user.get_instructor
+        if (id != @assignment_form.assignment.instructor_id)
+         raise "Not authorised to delete this assignment"
+        else
+         @assignment_form.delete(params[:force])
+         flash[:notice] = "The assignment is deleted"
+      end
+      rescue
           url_yes = url_for :action => 'delete', :id => params[:id], :force => 1
           url_no = url_for :action => 'delete', :id => params[:id]
           error = $!
           flash[:error] = error.to_s + " Delete this assignment anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
-        end
+
       end
 
       redirect_to :controller => 'tree_display', :action => 'list'

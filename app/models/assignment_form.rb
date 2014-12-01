@@ -145,6 +145,23 @@ class AssignmentForm
     end
   end
 
+  def delete(force=nil)
+    # If the assignment is already deleted, go back to the list of assignments
+
+        #delete from delayed_jobs queue
+        djobs = Delayed::Job.where(['handler LIKE "%assignment_id: ?%"', assignment.id])
+        for dj in djobs
+          delete_from_delayed_queue(dj.id)
+        end
+
+        @assignment.delete(force)
+
+        nodes = Node.where(['node_object_id = ? and type = ?', @assignment.id, 'AssignmentNode'])
+        for node in nodes
+          node.destroy
+        end
+
+      end
   # This functions finds the epoch time in seconds of the due_at parameter and finds the difference of it
   # from the current time and returns this difference in minutes
   def find_min_from_now(due_at)

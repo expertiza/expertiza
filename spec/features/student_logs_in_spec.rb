@@ -1,10 +1,9 @@
 describe 'Student logs in', :type => :feature do
-  # Student test users used in following scenarios.
-  student1 = FactoryGirl.create :student
-  student2 = FactoryGirl.create :alt_student
-
 
   scenario 'with valid username and password' do
+    # Student test users used in following scenarios.
+    student1 = FactoryGirl.create :student
+
     visit root_path
 
     # Log in as student1
@@ -20,6 +19,9 @@ describe 'Student logs in', :type => :feature do
 
 
   scenario 'Student logs in with invalid user name' do
+    # Student test users used in following scenarios.
+    student1 = FactoryGirl.create :student
+
     visit root_path
 
     # Attempt to log in as an invalid student.
@@ -32,6 +34,9 @@ describe 'Student logs in', :type => :feature do
 
 
   scenario 'Student logs in with valid user name and invalid password' do
+    # Student test users used in following scenarios.
+    student1 = FactoryGirl.create :student
+
     visit root_path
 
     fill_in 'login_name', with: student1.name
@@ -43,6 +48,10 @@ describe 'Student logs in', :type => :feature do
 
 
   scenario "Student logs in with valid user name and another user's password" do
+    # Student test users used in following scenarios.
+    student1 = FactoryGirl.create :student
+    student2 = FactoryGirl.create :alt_student
+
     visit root_path
 
     fill_in 'login_name', with: student1.name
@@ -54,6 +63,9 @@ describe 'Student logs in', :type => :feature do
 
 
   scenario 'Student logs in with a blank password' do
+    # Student test users used in following scenarios.
+    student1 = FactoryGirl.create :student
+
     visit root_path
 
     fill_in 'login_name', with: student1.name

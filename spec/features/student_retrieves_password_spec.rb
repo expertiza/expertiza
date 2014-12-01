@@ -1,7 +1,4 @@
 describe 'Student retrieves password', :type => :feature do
-  # Student test users used in following scenarios.
-  student1 = FactoryGirl.create :student
-
 
   scenario 'access by link' do
     visit root_path
@@ -14,6 +11,9 @@ describe 'Student retrieves password', :type => :feature do
 
 
   scenario 'access after failed login' do
+    # Student test users used in following scenarios.
+    student1 = FactoryGirl.create :student
+
     visit root_path
 
     # Fail to log in as student1
@@ -27,6 +27,9 @@ describe 'Student retrieves password', :type => :feature do
 
 
   scenario 'with valid e-mail' do
+    # Student test users used in following scenarios.
+    student1 = FactoryGirl.create :student
+
     visit forgotten_path
 
     expect(page).to have_content('Forgotten Your Password?')
@@ -40,6 +43,9 @@ describe 'Student retrieves password', :type => :feature do
 
 
   scenario 'with invalid e-mail' do
+    # Student test users used in following scenarios.
+    student1 = FactoryGirl.create :student
+
     visit forgotten_path
 
     expect(page).to have_content('Forgotten Your Password?')

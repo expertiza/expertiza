@@ -378,7 +378,12 @@ end
       SignedUpUser.create(:creator_id=>team_id,:topic_id => finalTeamTopics[team_id][0].id)
     end
 
-    flash[:notice] = 'Intelligent assignment done'
+    assignment = Assignment.find(params[:id])
+    assignment.is_intelligent = false;
+    assignment.save
+	
+
+    flash[:notice] = 'Intelligent assignment completed successfully.'
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 end

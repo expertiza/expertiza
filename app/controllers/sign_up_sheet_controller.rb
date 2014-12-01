@@ -1,5 +1,4 @@
-#contains all functions related to management of the signup sheet for an assignment
-#functions to add new topics to an assignment, edit properties of a particular topic, delete a topic, etc
+
 #are included here
 
 #A point to be taken into consideration is that :id (except when explicitly stated) here means topic id and not assignment id
@@ -11,7 +10,7 @@
 class SignUpSheetController < ApplicationController
   require 'rgl/adjacency'
   require 'rgl/dot'
-  require 'graph/graphviz_dot'
+#  require 'graph/graphviz_dot'
   require 'rgl/topsort'
 
   def action_allowed?

@@ -27,10 +27,7 @@ describe 'Student retrieves password', :type => :feature do
 
 
   scenario 'with valid e-mail' do
-    visit root_path
-
-    # Traverse to the password retrieval page by way of the link.
-    click_link 'Forgotten your password?'
+    visit forgotten_path
 
     expect(page).to have_content('Forgotten Your Password?')
 
@@ -43,10 +40,7 @@ describe 'Student retrieves password', :type => :feature do
 
 
   scenario 'with invalid e-mail' do
-    visit root_path
-
-    # Traverse to the password retrieval page by way of the link.
-    click_link 'Forgotten your password?'
+    visit forgotten_path
 
     expect(page).to have_content('Forgotten Your Password?')
 

@@ -19,11 +19,14 @@ class AssignmentsController < ApplicationController
 
   def new
     @assignment = Assignment.new
+    if params[:parent_id] then
     @assignment.course = Course.find(params[:parent_id]) if params[:parent_id]
 
     @assignment.instructor = @assignment.course.instructor if @assignment.course
+    else
+    @assignment.course = nil
     @assignment.instructor ||= current_user
-
+    end
     @assignment.wiki_type_id = 1 #default no wiki type
     @assignment.max_team_size = 1
   end
@@ -313,7 +316,7 @@ class AssignmentsController < ApplicationController
     Assignment.record_timestamps = false
     old_assign = Assignment.find(params[:id])
     new_assign = old_assign.clone
-    @user = ApplicationHelper::get_user_role(session[:user])
+   # @user = ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]
     @user.set_instructor(new_assign)
     new_assign.update_attribute('name', 'Copy of ' + new_assign.name)

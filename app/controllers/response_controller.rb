@@ -351,7 +351,6 @@ class ResponseController < ApplicationController
 
   def create
     @map = ResponseMap.find(params[:id]) #assignment/review/metareview id is in params id
-    puts params[:attempt]
     @res = 0
     msg = ""
     if @map.questionnaire.section.eql? "Specialised Rubric" or @map.questionnaire.section.eql? "Custom"

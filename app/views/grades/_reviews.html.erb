@@ -10,7 +10,7 @@
       <% count = count + 1 %>
 
     <% file_url = nil
-    review_questionnaire = @assignment.questionnaires.select {|x| x.display_type == 'Review'}
+    review_questionnaire = @score[:assignment].questionnaires.select {|x| x.display_type == 'Review'}
     @questionnaire = Questionnaire.find(review_questionnaire.first.id)
     if @questionnaire.section.eql? "Custom"
         @current_folder = DisplayOption.new

@@ -51,9 +51,10 @@ class GradesController < ApplicationController
     @score[:scores]=params[:score][:scores]
     participant=AssignmentParticipant.find(params[:participant])
     @score[:participant] = participant
-    @assignment = participant.assignment
+    assignment = participant.assignment
+    @score[:assignment] = assignment
     @questions = {}
-    questionnaires = @assignment.questionnaires
+    questionnaires = assignment.questionnaires
     questionnaires.each do |questionnaire|
       @questions[questionnaire.symbol] = questionnaire.questions
     end

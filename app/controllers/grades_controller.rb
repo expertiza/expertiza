@@ -39,16 +39,19 @@ class GradesController < ApplicationController
 
   #the show_reviews action lists all the reviews they received.
   def show_reviews
-    @partial='grades/'+params[:path]
-    @prefix=params[:prefix]
+    partial='grades/'+params[:path]
+    prefix=params[:prefix]
     @score=Hash.new
+    @score[:partial]= partial
+    @score[:prefix] = prefix
     @score[:assessments]=Array.new
     params[:score][:assessments].each do |assessment|
         @score[:assessments]<<Response.find(assessment)
     end
     @score[:scores]=params[:score][:scores]
-    @participant=AssignmentParticipant.find(params[:participant])
-    @assignment = @participant.assignment
+    participant=AssignmentParticipant.find(params[:participant])
+    @score[:participant] = participant
+    @assignment = participant.assignment
     @questions = {}
     questionnaires = @assignment.questionnaires
     questionnaires.each do |questionnaire|

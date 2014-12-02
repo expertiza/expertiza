@@ -1,0 +1,95 @@
+#Bids used for testing lottery signup(using Intelligent assignment)
+Bid1:
+  topic_id: <%=Fixtures.identify(:ITopic3) %>
+  team_id: <%= Fixtures.identify(:IntelligentTeam1) %>
+  priority: 1
+
+Bid2:
+  topic_id: <%=Fixtures.identify(:ITopic1) %>
+  team_id: <%= Fixtures.identify(:IntelligentTeam1) %>
+  priority: 2
+
+Bid3:
+  topic_id: <%=Fixtures.identify(:ITopic2) %>
+  team_id: <%= Fixtures.identify(:IntelligentTeam1) %>
+  priority: 3
+
+Bid4:
+  topic_id: <%=Fixtures.identify(:ITopic2) %>
+  team_id: <%= Fixtures.identify(:IntelligentTeam2) %>
+  priority: 1
+
+Bid5:
+  topic_id: <%=Fixtures.identify(:ITopic1) %>
+  team_id: <%= Fixtures.identify(:IntelligentTeam2) %>
+  priority: 2
+
+Bid6:
+  topic_id: <%=Fixtures.identify(:ITopic4) %>
+  team_id: <%= Fixtures.identify(:IntelligentTeam3) %>
+  priority: 1
+
+Bid7:
+  topic_id: <%=Fixtures.identify(:ITopic2) %>
+  team_id: <%= Fixtures.identify(:IntelligentTeam3) %>
+  priority: 2
+
+Bid8:
+  topic_id: <%=Fixtures.identify(:ITopic3) %>
+  team_id: <%= Fixtures.identify(:IntelligentTeam3) %>
+  priority: 3
+
+Bid9:
+  topic_id: <%=Fixtures.identify(:ITopic1) %>
+  team_id: <%= Fixtures.identify(:IntelligentTeam4) %>
+  priority: 1
+
+Bid10:
+  topic_id: <%=Fixtures.identify(:ITopic3) %>
+  team_id: <%= Fixtures.identify(:IntelligentTeam4) %>
+  priority: 2
+
+Bid11:
+  topic_id: <%=Fixtures.identify(:ITopic3) %>
+  team_id: <%= Fixtures.identify(:IntelligentTeam5) %>
+  priority: 1
+
+Bid12:
+  topic_id: <%=Fixtures.identify(:ITopic4) %>
+  team_id: <%= Fixtures.identify(:IntelligentTeam5) %>
+  priority: 2
+
+Bid13:
+  topic_id: <%=Fixtures.identify(:ITopic4) %>
+  team_id: <%= Fixtures.identify(:IntelligentTeam5) %>
+  priority: 3
+
+Bid14:
+  topic_id: <%=Fixtures.identify(:ITopic4) %>
+  team_id: <%= Fixtures.identify(:IntelligentTeam6) %>
+  priority: 1
+
+Bid15:
+  topic_id: <%=Fixtures.identify(:ITopic1) %>
+  team_id: <%= Fixtures.identify(:IntelligentTeam6) %>
+  priority: 2
+
+Bid16:
+  topic_id: <%=Fixtures.identify(:ITopic3) %>
+  team_id: <%= Fixtures.identify(:IntelligentTeam6) %>
+  priority: 3
+
+Bid17:
+  topic_id: <%=Fixtures.identify(:ITopic1) %>
+  team_id: <%= Fixtures.identify(:IntelligentTeam7) %>
+  priority: 1
+
+Bid18:
+  topic_id: <%=Fixtures.identify(:ITopic2) %>
+  team_id: <%= Fixtures.identify(:IntelligentTeam7) %>
+  priority: 2
+
+Bid19:
+  topic_id: <%=Fixtures.identify(:ITopic4) %>
+  team_id: <%= Fixtures.identify(:IntelligentTeam7) %>
+  priority: 3

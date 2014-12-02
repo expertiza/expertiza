@@ -28,15 +28,3 @@ ITopic5:
   assignment_id: <%= Fixtures.identify(:Intelligent_assignment) %>
   max_choosers: 2
   topic_identifier: A105
-
-LotteryTopic1:
- topic_name: LoteryTopic1
- assignment_id: <%= Fixtures.identify(:lottery_assignment) %>
- max_choosers: 1
- topic_identifier: 1
-
-LotteryTopic2:
- topic_name: LoteryTopic2
- assignment_id: <%= Fixtures.identify(:lottery_assignment) %>
- max_choosers: 1
- topic_identifier: 2

@@ -1,19 +1,59 @@
 # Teams users for intelligent assignment
 intelligent_teams_users1:
   team_id: <%= Fixtures.identify(:IntelligentTeam1) %>
-  user_id: <%= Fixtures.identify(:student9) %>
+  user_id: <%= Fixtures.identify(:student1) %>
 
 intelligent_teams_users2:
   team_id: <%= Fixtures.identify(:IntelligentTeam1) %>
-  user_id: <%= Fixtures.identify(:student8) %>
+  user_id: <%= Fixtures.identify(:student2) %>
 
 intelligent_teams_users3:
-  team_id: <%= Fixtures.identify(:IntelligentTeam2) %>
-  user_id: <%= Fixtures.identify(:student7) %>
+  team_id: <%= Fixtures.identify(:IntelligentTeam1) %>
+  user_id: <%= Fixtures.identify(:student3) %>
 
 intelligent_teams_users4:
+  team_id: <%= Fixtures.identify(:IntelligentTeam2) %>
+  user_id: <%= Fixtures.identify(:student4) %>
+
+intelligent_teams_users5:
+  team_id: <%= Fixtures.identify(:IntelligentTeam2) %>
+  user_id: <%= Fixtures.identify(:student5) %>
+
+intelligent_teams_users6:
   team_id: <%= Fixtures.identify(:IntelligentTeam3) %>
   user_id: <%= Fixtures.identify(:student6) %>
+
+intelligent_teams_users7:
+  team_id: <%= Fixtures.identify(:IntelligentTeam4) %>
+  user_id: <%= Fixtures.identify(:student7) %>
+
+intelligent_teams_users8:
+  team_id: <%= Fixtures.identify(:IntelligentTeam4) %>
+  user_id: <%= Fixtures.identify(:student8) %>
+
+intelligent_teams_users9:
+  team_id: <%= Fixtures.identify(:IntelligentTeam5) %>
+  user_id: <%= Fixtures.identify(:student9) %>
+
+intelligent_teams_users10:
+  team_id: <%= Fixtures.identify(:IntelligentTeam5) %>
+  user_id: <%= Fixtures.identify(:student10) %>
+
+intelligent_teams_users11:
+  team_id: <%= Fixtures.identify(:IntelligentTeam6) %>
+  user_id: <%= Fixtures.identify(:student11) %>
+
+intelligent_teams_users12:
+  team_id: <%= Fixtures.identify(:IntelligentTeam6) %>
+  user_id: <%= Fixtures.identify(:student12) %>
+
+intelligent_teams_users13:
+  team_id: <%= Fixtures.identify(:IntelligentTeam6) %>
+  user_id: <%= Fixtures.identify(:student13) %>
+
+intelligent_teams_users14:
+  team_id: <%= Fixtures.identify(:IntelligentTeam7) %>
+  user_id: <%= Fixtures.identify(:student14) %>
 
 # Teams users for lottery assignment
 lottery_teams_users1:

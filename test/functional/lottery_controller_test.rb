@@ -2,11 +2,16 @@ require 'test_helper'
 
 class LotteryControllerTest < ActionController::TestCase
 
-  fixtures :assignments, :sign_up_topics, :signed_up_users, :teams, :teams_users, :users
+  fixtures :assignments, :sign_up_topics, :signed_up_users, :teams, :teams_users, :users, :bids
 
   def setup
     @lotteryController = LotteryController.new
     @signupSheetController = SignUpSheetController.new
+    @request    = ActionController::TestRequest.new
+    @response   = ActionController::TestResponse.new
+
+    @request.session[:user] = User.find(users(:instructor1).id )
+
   end
 
   test "delete_other_bids" do
@@ -32,22 +37,31 @@ class LotteryControllerTest < ActionController::TestCase
     assert !result
   end
 
-  test "run_intelligent_assignment" do
-    initTopics = SignUpTopics.where(:parent_id=>assignments(:Intelligent_assignment).id)
-    #Make sure that no topic has any signed up user currently
-    initTopics.each do |t|
-      SignedUpUser.where(:topic_id=>t.id).delete
-    end
-    @lotteryController.run_intelligent_bid
-    #Assert to see if some of the topics have been assigned teams
-    if Bids.Topics.where(:parent_id=>assignments(:Intelligent_assignment).id).size > 0
-      assert_not_equal(SignUpUser.Topics.where(:parent_id=>assignments(:Intelligent_assignment).id).size,0,"Topic bids still left unassigned")
-    else
-      assert_equal(SignUpUser.Topics.where(:parent_id=>assignments(:Intelligent_assignment).id).size,0,"Topic got assigned with 0 bids")
-    end
+  test "run_intelligent_assignment for topic with bids" do
+    assignment = assignments(:Intelligent_assignment)
 
+    SignedUpUser.delete_all(:topic=>SignUpTopic.where(:assignment_id=>assignment.id))
+    #Make sure that no topic has any signed up user currently
+    assert_equal(SignedUpUser.where(:topic=>SignUpTopic.where(:assignment_id=>assignment.id)).size,0,"Topic still has users assigned")
+
+    get :run_intelligent_bid, :id => assignment.id
+    #Assert to see if some of the topics have been assigned teams
+    assert_not_equal(SignedUpUser.where(:topic=>SignUpTopic.where(:assignment_id=>assignment.id)).size,0,"Topic bids still left unassigned")
   end
 
+  test "run_intelligent_assignment for topic with no bids" do
+    assignment = assignments(:Intelligent_assignment)
 
+    #delete all bids
+    Bid.where(:topic=>SignUpTopic.delete_all(:assignment_id=>assignment.id))
+
+    SignedUpUser.delete_all(:topic=>SignUpTopic.where(:assignment_id=>assignment.id))
+    #Make sure that no topic has any signed up user currently
+    assert_equal(SignedUpUser.where(:topic=>SignUpTopic.where(:assignment_id=>assignment.id)).size,0,"Topic still has users assigned")
+
+    get :run_intelligent_bid, :id => assignment.id
+    #Assert to see that no topic has been accidently assigned
+    assert_equal(SignedUpUser.where(:topic=>SignUpTopic.where(:assignment_id=>assignment.id)).size,0,"Topic still got assigned with 0 bids")
+  end
 
 end

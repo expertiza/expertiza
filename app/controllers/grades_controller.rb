@@ -4,9 +4,9 @@ class GradesController < ApplicationController
   helper :penalty
   include PenaltyHelper
 
-  $submission_ddl_type = 1             # global variables submission_ddl_type
-  $review_ddl_type = 2                 # global variables review_ddl_type
-  $meta_review_ddl_type = 5            # global variables meta_review_ddl_type
+  @submission_ddl_type = 1             # global variables submission_ddl_type
+  @review_ddl_type = 2                 # global variables review_ddl_type
+  @meta_review_ddl_type = 5            # global variables meta_review_ddl_type
 
   def action_allowed?
     case params[:action]
@@ -225,7 +225,7 @@ class GradesController < ApplicationController
                 @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
                 l_policy = LatePolicy.find(@assignment.late_policy_id)
                 @total_penality=[l_policy.max_penalty,@total_penality].min #using max/min function rather than using if loop
-                deadline_type=[$submission_ddl_type,$review_ddl_type,$meta_review_ddl_type]#submission deadline type,review deadline type,meta_review_deadline type
+                deadline_type=[@submission_ddl_type,@review_ddl_type,@meta_review_ddl_type]#submission deadline type,review deadline type,meta_review_deadline type
                 penalty_type=[:submission,:review,:meta_review]
                 if calculate_for_participants
                     for i in 0..2

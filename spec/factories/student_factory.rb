@@ -56,6 +56,7 @@ FactoryGirl.define do
     num_quiz_questions      0
     calculate_penalty       0
     is_penalty_calculated   0
+    review_assignment_strategy  "Auto-Selected"
 
     # Need to create a node after creating an assignment
     after(:create) do |assignment|

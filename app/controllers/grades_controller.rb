@@ -4,6 +4,10 @@ class GradesController < ApplicationController
   helper :penalty
   include PenaltyHelper
 
+  $submission_ddl_type = 1             # global variables submission_ddl_type
+  $review_ddl_type = 2                 # global variables review_ddl_type
+  $meta_review_ddl_type = 5            # global variables meta_review_ddl_type
+
   def action_allowed?
     case params[:action]
     when 'grades_show'
@@ -54,6 +58,7 @@ class GradesController < ApplicationController
 
 
   def grades_show
+    #deleted unnecessary instance variables
     @participant = AssignmentParticipant.find(params[:id])
     return if redirect_when_disallowed
     @assignment = @participant.assignment
@@ -209,13 +214,14 @@ class GradesController < ApplicationController
             penalties = calculate_penalty(participant.id)
             @total_penalty = 0
             if(penalties[:submission] != 0 || penalties[:review] != 0 || penalties[:meta_review] != 0)
+              #simplify the if loop
                 penalties[:submission] = 0 if penalties[:submission].nil?
                 penalties[:review] = 0 if penalties[:review].nil?
                 penalties[:meta_review] = 0 if penalties[:meta_review].nil?
                 @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
                 l_policy = LatePolicy.find(@assignment.late_policy_id)
-                @total_penality=[l_policy.max_penalty,@total_penality].min
-                deadline_type=[1,2,5]
+                @total_penality=[l_policy.max_penalty,@total_penality].min #using max/min function rather than using if loop
+                deadline_type=[$submission_ddl_type,$review_ddl_type,$meta_review_ddl_type]#submission deadline type,review deadline type,meta_review_deadline type
                 penalty_type=[:submission,:review,:meta_review]
                 if calculate_for_participants
                     for i in 0..2

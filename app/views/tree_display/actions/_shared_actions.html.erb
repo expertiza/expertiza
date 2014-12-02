@@ -16,5 +16,5 @@
     <% end %>
   <% end %>
   <%= link_to image_tag('/assets/tree_view/Copy-icon-24.png', :title => 'Copy ' + model.downcase),
-    assets: controller, action: 'copy', id: node.node_object %>
+    :controller => controller, :action=> 'copy', :id => node.node_object_id %>
 </div>

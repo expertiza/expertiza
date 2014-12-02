@@ -61,7 +61,7 @@ class LotteryController < ApplicationController
     assignment.save
 	
 
-    flash[:notice] = 'Intelligent assignment of successfully completed for ' + assignment.name + '.'
+    flash[:notice] = 'Intelligent assignment successfully completed for ' + assignment.name + '.'
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 end

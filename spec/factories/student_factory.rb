@@ -29,6 +29,16 @@ FactoryGirl.define do
     end
   end
 
+  factory :due_date do
+    assignment
+    due_at                      { Date.tomorrow }
+    deadline_type               { DeadlineType.find_by_name('submission') }
+    submission_allowed_id       { DeadlineRight.find_by_name('OK').id }
+    review_allowed_id           { DeadlineRight.find_by_name('OK').id }
+    review_of_review_allowed_id { DeadlineRight.find_by_name('OK').id }
+    quiz_allowed_id             { DeadlineRight.find_by_name('OK').id }
+  end
+
   factory :assignment do
     name                    "assignment"
     directory_path          { "#{name}_path" }
@@ -52,7 +62,12 @@ FactoryGirl.define do
     is_penalty_calculated   0
 
     # Need to create a node after creating an assignment
-    after(:create) { |assignment| assignment.create_node  }
+    after(:create) do |assignment|
+      assignment.create_node
+
+      # Assign due dates to the assignment
+      FactoryGirl.create :due_date, assignment: assignment
+    end
   end
 
   factory :sign_up_topic do

@@ -14,26 +14,18 @@ describe 'Student can select topics', :type => :feature do
     visit root_path
 
     # Log in as student1
-    fill_in 'login_name', with: student1.name
-    fill_in 'login_password', with: student1.password
+    fill_in 'login_name', with: student.name
+    fill_in 'login_password', with: student.password
     click_on 'Login'
 
-    # Navigate to the assignment
+    # Navigate to the signup sheet
     click_link assignment.name
     click_link 'Signup sheet'
 
-    # Create a team
-    fill_in 'team_name', with: 'TestTeamName'
-    click_on 'Create Team'
+    # Click on sign up
+    find(:xpath, "//a[@href='/sign_up_sheet/sign_up?assignment_id=#{topic1.assignment.id}&id=#{topic1.id}']").click
 
-    # Expect team name to be displayed
-    expect(page).to have_content('TestTeamName')
-
-    # Invite student2 to the team
-    fill_in 'user_name', with: student2.name
-    click_on 'Invite'
-
-    # Expect student2 to show up under 'Sent Invitations'
-    expect(page).to have_content(student2.name)
+    # Expect topic to be selected.  Look for a div with id "topic_name"
+    expect(find('#selected_topic')).to have_content(topic1.topic_name)
   end
 end

@@ -42,7 +42,7 @@
     <%i = 0
    @unique_sections.each do |section_no| %>
         <% @section=Section.find(section_no)%>
-        <input id="attempt<%=section_no%>" name="attempt[]" value="<%= @section.id %>" type="checkbox" onchange="makevisibleDiv(this.checked,<%=section_no%>);">
+        <input id="attempt<%=section_no%>" name="attempt[]" value="<%= @section.id %>" type="checkbox" checked="true" onchange="makevisibleDiv(this.checked,<%=section_no%>);">
         Uncheck to Skip <%= @section.name %> Section</input>
         </BR>
         <div id=<%=section_no%> >

@@ -14,6 +14,26 @@ IntelligentTeam3:
   parent_id: <%= Fixtures.identify(:Intelligent_assignment) %>
   type: AssignmentTeam
 
+IntelligentTeam4:
+  name: IntelligentTeam4
+  parent_id: <%= Fixtures.identify(:Intelligent_assignment) %>
+  type: AssignmentTeam
+
+IntelligentTeam5:
+  name: IntelligentTeam5
+  parent_id: <%= Fixtures.identify(:Intelligent_assignment) %>
+  type: AssignmentTeam
+
+IntelligentTeam6:
+  name: IntelligentTeam6
+  parent_id: <%= Fixtures.identify(:Intelligent_assignment) %>
+  type: AssignmentTeam
+
+IntelligentTeam7:
+  name: IntelligentTeam7
+  parent_id: <%= Fixtures.identify(:Intelligent_assignment) %>
+  type: AssignmentTeam
+
 # Teams for the lottery assignment
 lottery_team1:
   name: LotteryTeam1

@@ -7,7 +7,7 @@
   <%= render :partial => 'submitted_content/hyperlink', :locals => {:assignment_participant => assignment_participant, stage: stage} %>
 <% end %>
 <% if stage != "Complete" and controller.controller_name == 'submitted_content' %>
-  <%= form_tag :action => 'submit_hyperlink', :id => participant.id do %>
+  <%= form_tag :action => 'submit_hyperlink', :id => assignment_participant.id do %>
     <b>Submit a hyperlink:</b><BR/>
     <input type="text" name="submission" size=40 value="http://">
     <input type="submit" name="upload_link" value="Upload link"/>
@@ -20,7 +20,7 @@
     <% if assignment_participant.assignment.is_coding_assignment%>
       <%= link_to "Code Review Dashboard", :controller => 'review_files',
         :action => 'show_all_submitted_files',
-        :participant_id => participant[1].id,
+        :participant_id => assignment_participant.id,
         :stage => stage %>
     </b><br/>
   <% end %>

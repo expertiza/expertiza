@@ -15,17 +15,13 @@ FactoryGirl.define do
       sequence(:name) { |n| "student#{n}" }
       email           { "#{name}@mailinator.com" }
       role            { Role.find_by_name('student') }
-    end
 
-    # Create a student with unique password for testing password scenarios.
-    factory :alt_student do
-      sequence(:name) { |n| "student#{n}" }
-      email           { "#{name}@mailinator.com" }
-      role            { Role.find_by_name('student') }
-
-      # Overwrite the standard factory password.
-      password              "alt_password"
-      password_confirmation "alt_password"
+      # Create a student with unique password for testing password scenarios.
+      factory :alt_student do
+        # Overwrite the standard factory password.
+        password              "alt_password"
+        password_confirmation "alt_password"
+      end
     end
   end
 

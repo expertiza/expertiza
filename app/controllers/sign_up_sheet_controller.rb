@@ -11,12 +11,54 @@
 class SignUpSheetController < ApplicationController
   require 'rgl/adjacency'
   require 'rgl/dot'
-  require 'graph/graphviz_dot'
+ # require 'graph/graphviz_dot'
   require 'rgl/topsort'
+
+  def intelligent_sign_up
+    @assignment_id = params[:id]
+    @sign_up_topics = SignUpTopic.where( ['assignment_id = ?', params[:id]]).all
+    @slots_filled = SignUpTopic.find_slots_filled(params[:id])
+    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:id])
+    @show_actions = true
+    @priority = 0
+    assignment=Assignment.find(params[:id])
+
+    @users_team_id = SignedUpUser.find_team_users(params[:id],(session[:user].id))[0].t_id
+    bid_topic_ids = Bid.where(:team_id => @users_team_id ).order(:priority).pluck(:topic_id)
+    bid_topics = SignUpTopic.where(:assignment_id => params[:id], :id => bid_topic_ids)
+
+    @sorted_bid_topics=Array.new
+    @topic_bid_count = Hash.new(0)
+    bid_topic_ids.each do |bid_topic_id|
+      @topic_bid_count[bid_topic_id] = Bid.where(:topic_id => bid_topic_id).length
+      @sorted_bid_topics << bid_topics.find{|bid_topic| bid_topic.id==bid_topic_id}
+    end
+
+   render :intelligent_signup_sheet
+  end
+
+
+  def intelligent_save
+    team_id = params[:team_id]
+    topic_ids = params[:topic_id]
+    Bid.where(:team_id => team_id).delete_all
+    if !topic_ids.nil?
+      i = 1
+      topic_ids.each  do |topic_id|
+        @new_bid = Bid.new(:team_id => team_id, :topic_id => topic_id[1], :priority => i)
+        @new_bid.save
+        i += 1
+      end
+    end
+
+    flash[:notice] = "Bids successfully saved"
+    redirect_to "/sign_up_sheet/intelligent_sign_up/?id=" + params[:id]
+  end
+
 
   def action_allowed?
     case params[:action]
-    when 'signup_topics', 'sign_up', 'delete_signup', 'list', 'show_team'
+    when 'signup_topics', 'sign_up', 'delete_signup', 'list', 'show_team', 'intelligent_sign_up' , 'intelligent_save'
       current_role_name.eql? 'Student'
     else
       ['Instructor',

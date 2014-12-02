@@ -30,7 +30,7 @@ describe 'Student retrieves password', :type => :feature do
     # Student test users used in following scenarios.
     student1 = FactoryGirl.create :student
 
-    visit forgotten_path
+    visit forgotten_password_retrieval_index_path
 
     expect(page).to have_content('Forgotten Your Password?')
 
@@ -38,25 +38,39 @@ describe 'Student retrieves password', :type => :feature do
 
     click_on 'Request password'
 
-    expect(page).to have_content('A new password has been sent to your email address.')
+    expect(page).to have_content('A new password has been sent to your e-mail address.')
   end
 
 
   scenario 'with invalid e-mail' do
-    # Student test users used in following scenarios.
-    student1 = FactoryGirl.create :student
-
-    visit forgotten_path
+    visit forgotten_password_retrieval_index_path
 
     expect(page).to have_content('Forgotten Your Password?')
 
+    bogus_email = 'bogus'
+
     # NOTE: The behavior of an improperly formatted and a non-existent
     # e-mail address is the same.
-    fill_in 'user_email', with: 'bogus'
+    fill_in 'user_email', with: bogus_email
 
     click_on 'Request password'
 
-    expect(page).to have_content('No account is associated with the address, "' + student1.email + '". Please try again.')
+    expect(page).to have_content('No account is associated with the address, "' + bogus_email + '". Please try again.')
+  end
+
+
+  scenario 'with blank e-mail' do
+    visit forgotten_password_retrieval_index_path
+
+    expect(page).to have_content('Forgotten Your Password?')
+
+    blank_email = ''
+
+    fill_in 'user_email', with: blank_email
+
+    click_on 'Request password'
+
+    expect(page).to have_content('Please enter an e-mail address')
   end
 end
 

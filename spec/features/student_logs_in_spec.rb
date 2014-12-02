@@ -18,7 +18,7 @@ describe 'Student logs in', :type => :feature do
   end
 
 
-  scenario 'Student logs in with invalid user name' do
+  scenario 'with invalid user name' do
     # Student test users used in following scenarios.
     student1 = FactoryGirl.create :student
 
@@ -33,7 +33,7 @@ describe 'Student logs in', :type => :feature do
   end
 
 
-  scenario 'Student logs in with valid user name and invalid password' do
+  scenario 'with valid user name and invalid password' do
     # Student test users used in following scenarios.
     student1 = FactoryGirl.create :student
 
@@ -47,7 +47,7 @@ describe 'Student logs in', :type => :feature do
   end
 
 
-  scenario "Student logs in with valid user name and another user's password" do
+  scenario "with valid user name and another user's password" do
     # Student test users used in following scenarios.
     student1 = FactoryGirl.create :student
     student2 = FactoryGirl.create :alt_student
@@ -62,7 +62,7 @@ describe 'Student logs in', :type => :feature do
   end
 
 
-  scenario 'Student logs in with a blank password' do
+  scenario 'with a blank password' do
     # Student test users used in following scenarios.
     student1 = FactoryGirl.create :student
 

@@ -7,16 +7,14 @@ class LotteryController < ApplicationController
   end
 
   def run_intelligent_bid
-    #finalUserTopics = Hash.new
-    finalTeamTopics = Hash.new #Hashmap (Team,Topic)
-    sign_up_topics = SignUpTopic.where(assignment_id: params[:id])
-    #initializing all topics with bidder rankings
-    topicsBidsArray = Array.new #Hashmap (Topic, sortedBids)
 
+    finalTeamTopics = Hash.new #Hashmap (Team,Topic)
+    sign_up_topics = SignUpTopic.where("assignment_id = ? and max_choosers > 0", params[:id])
+    #initializing all topics with bidder rankings
+    topicsBidsArray = Array.new #Array of [Topic, sortedBids]
     sign_up_topics.each do |topic|
       topicsBidsArray << [topic, topic.bids.sort_by {|b| [(b.team.users.size * -1), b.priority, rand(100)]} ]#If strength and priority are equal, then randomize
     end
-
 
     while (topicsBidsArray.size != 0)
       currentTopic = topicsBidsArray[0][0]
@@ -59,7 +57,6 @@ class LotteryController < ApplicationController
     assignment = Assignment.find(params[:id])
     assignment.is_intelligent = false
     assignment.save
-	
 
     flash[:notice] = 'Intelligent assignment successfully completed for ' + assignment.name + '.'
     redirect_to :controller => 'tree_display', :action => 'list'

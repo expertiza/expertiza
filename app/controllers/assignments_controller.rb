@@ -118,38 +118,19 @@ end
   # TODO: need to be tested
   #-------------------------------------------------------------------------------------------------------------------
   def copy
-    Assignment.record_timestamps = false
-    old_assign = Assignment.find(params[:id])
-    new_assign = old_assign.clone
     @user = ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]
-    @user.set_instructor(new_assign)
-    new_assign.update_attribute('name', 'Copy of ' + new_assign.name)
-    new_assign.update_attribute('created_at', Time.now)
-    new_assign.update_attribute('updated_at', Time.now)
-
-    if new_assign.directory_path.present?
-      new_assign.update_attribute('directory_path', new_assign.directory_path + '_copy')
-    end
-
     session[:copy_flag] = true
-    new_assign.copy_flag = true
+    new_assign_id=AssignmentForm.copy(params[:id],@user)
 
-    if new_assign.save
-      Assignment.record_timestamps = true
-      copy_assignment_questionnaire(old_assign,new_assign)
-
-      DueDate.copy(old_assign.id, new_assign.id)
-      new_assign.create_node()
-
+    if !new_assign_id.nil?
       flash[:note] = 'Warning: The submission directory for the copy of this assignment will be the same as the submission directory for the existing assignment, which will allow student submissions to one assignment to overwrite submissions to the other assignment.  If you do not want this to happen, change the submission directory in the new copy of the assignment.'
-
-      redirect_to :action => 'edit', :id => new_assign.id
-      else
-        flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'
-        redirect_to :action => 'list', :controller => 'tree_display'
-      end
+      redirect_to :action => 'edit', :id => new_assign_id
+    else
+      flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'
+      redirect_to :action => 'list', :controller => 'tree_display'
     end
+  end
 
 
     #--------------------------------------------------------------------------------------------------------------------
@@ -223,15 +204,4 @@ end
       redirect_to :controller => 'tree_display', :action => 'list'
     end
 
-  def copy_assignment_questionnaire (old_assign, new_assign)
-    old_assign.assignment_questionnaires.each do |aq|
-      AssignmentQuestionnaire.create(
-        :assignment_id => new_assign.id,
-        :questionnaire_id => aq.questionnaire_id,
-        :user_id => session[:user].id,
-        :notification_limit => aq.notification_limit,
-        :questionnaire_weight => aq.questionnaire_weight
-      )
-    end
-  end
 end

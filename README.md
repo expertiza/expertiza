@@ -1,96 +1,60 @@
 Expertiza
 =========
 
-Account info you need:
-* Admin: user2
-* Teacher: user6
-* Student: userxxxx
-* Password: password
+[![Build Status](https://travis-ci.org/expertiza/expertiza.png?branch=master)](https://travis-ci.org/expertiza/expertiza)
+[![Code Climate](https://codeclimate.com/github/expertiza/expertiza.png)](https://codeclimate.com/github/expertiza/expertiza)
 
+#### Peer review system
 
+Expertiza is a web application where students can submit and peer-review learning objects (articles, code, web sites, etc). It is used in select courses at NC State and by professors at several other colleges and universities.
 
-==========
-###Project Description:
-Classes involved:controllers/assignment_controller.rb (488 lines)
-views/assignment/edit.html.erb (55 lines) in production branch (not in master branch)
+Setup
+-----
 
-What needs to be done:
-* A checkbox “Review rubrics vary by round” should be added to the “Rubric” tab in the view of creating/editing assignment. No corresponding field in “assignments” table is necessary. We can tell if this checkbox should be checked by checking “assignments_questionnaires” table by current assignment_id. If there is no record with a non-null value in “used_in_round” field, this assignment is not using this feature and the checkbox should not be checked. (if one assignment has 2 rounds but they are using the same set of rubrics, for each type of rubric there should be only one entry with “used_in_round” field null)R
-* There should be a editable “deadline name” for each due date on “due date” panel if this type of review is specified to be “varying by rounds” in the “rubrics” tab (the input should be recorded in deadline_name field in due_dates table)
-* Another “description URL” text box should be editable when this type of review is specified to be “varying by rounds” in the “rubrics” tab (the input should be recorded in description_url field in due_dates table)
-* The "deadline_name" and "description URL" could be hidden when you change the status of the checkbox in Due_Date tab
-* A drop-down box which help instructor to select review rubric should be added for a review round when this type of review is specified to be “varying by rounds” in the “rubrics” tab (the input should be recorded in assignments_questionnaires table)
-* There are no tests for the code. Create appropriate functional and integration tests.
+### NCSU VCL image
 
-==========
-###Different Environment for this branch!!! 
+The expertiza environment is already set up in [NC State's VCL](https://vcl.ncsu.edu) image "Ruby on Rails".
+If you have access, this is quickest way to get a development environment running for Expertiza.
+See the Expertiza wiki on [developing Expertiza on the VCL](http://wikis.lib.ncsu.edu/index.php/Developing_Expertiza_on_the_VCL).
 
-* Ruby: 1.8.7
-* Rails: 2.3.15
-* Java: 1.6
-* Openjdk: 6.0
-* Database: expertiza_scrubbed_2014_03_14.sql
+Using the VCL is the quickest way to get started, but you may find it awkward developing on a remote machine
+with network lag and having to reinstall gems every time you connect. Installing locally can be a pain though too.
+Life is full of tradeoffs. :-) The good news is that you can start on one environment, push your work to git,
+and switch to another environment if you don't like the one you started with.
 
-Installation tips:
+### Installing locally
 
-1. Install JDK: 
-    sudo apt-get install openjdk-6-jdk
+See the Expertiza wiki for setup instructions. Please update the wiki with corrections or additional helpful information.
 
-2. Install java: 
-http://www.mkyong.com/java/how-to-install-java-jdk-on-ubuntu-linux/
+ * [OSX](http://wikis.lib.ncsu.edu/index.php/Creating_a_Mac_OS_X_Development_Environment_for_the_Expertiza_Application)
+ * [Linux](http://wikis.lib.ncsu.edu/index.php/Creating_a_Linux_Development_Environment_for_the_Expertiza_Application)
+ * [Windows](http://wikis.lib.ncsu.edu/index.php/Creating_a_Windows_Development_Environment_for_the_Expertiza_Application)
 
-3. Install ruby 1.8.7
-  1. https://gorails.com/setup/ubuntu/14.04
-  2. sudo apt-get install libgdbm-dev libncurses5-dev automake libtool bison libffi-dev
-  3. curl -L https://get.rvm.io | bash -s stable
-  4. source ~/.rvm/scripts/rvm
-  5. echo "source ~/.rvm/scripts/rvm" >> ~/.bashrc
-  6. rvm install 1.8.7
-  7. rvm use 1.8.7 --default
-  8. ruby -v
+Contributing
+------------
 
+ * [Fork](http://help.github.com/fork-a-repo/) the expertiza project
+ * [Create a new branch](http://progit.org/book) for your contribution with a descriptive name
+ * [Commit and push](http://progit.org/book) until you are happy with your contribution - follow the style guidelines below
+ * Make sure to add tests for it; the tests should fail before your contribution/fix and pass afterward
+ * [Send a pull request](http://help.github.com/send-pull-requests) to have your code reviewed for merging back into Expertiza
 
-4. Bundle install
-  *  Error: gem install linecache -v ‘0.46’ fails
-  Solution:debug19
-  *  Error:mongrel 1.1.5
-  Solution:change gemfile: gem "mongrel", ">= 1.2.0.pre2"
-  *  Error: mysql2
-  Solution: comment mysql2 in gemfile.lock
+Style Guidelines
+----------------
 
-5. sudo apt-get install libmysql-ruby libmysqlclient-dev
+We've had many contributors in the past who have used a wide variety of ruby coding styles. It's a mess, and we're trying to unify it.
 
-6. gem install mysql2
-  1. sudo apt-get install mysql-server mysql-client 
-  2. mysql -uroot -proot
-  3. mysql > show databases;
-  4. create database db_development
-  5. mysql -h localhost -uroot -proot pg_development< /home/xshao2/Desktop/expertiza_scrubbed_2014_03_14.sql
+All new files/contributions should:
 
-6. rake db:migrate
- * Error:undefined method `source_index' for Gem:Module
-  Solution:gem update --system 1.8.25
- * Error:rake development database is not configured
-  Solution: config/database.yml :
+ * Use unix line endings (Windows users: configure git to use [autocrlf](http://help.github.com/line-endings))
+ * Indent with 2 spaces (no tabs; configure your editor) both in ruby and erb
+ * Follow the [Ruby Style Guide](https://github.com/bbatsov/ruby-style-guide) style for syntax, formatting, and naming
 
-7. Set config/database.yml file:
-  development:
-  adapter: mysql
-  database: pg_developmen
-  username: root
-  password:
-  host: localhost
+When editing existing files:
 
-8. Import database file:
-  mysql -h localhost -uroot -proot pg_development< /home/xshao2/Desktop/expertiza_scrubbed_2014_03_14.sql
+ * Keep the existing tabbing (use tabs instead of spaces in files that already use tabs everywhere; otherwise use spaces)
+ * Keep the existing line ending style (dos/unix)
+ * Follow the Ruby style Guide on code you add or edit, as above
 
-==========
-###Main changes
-* Change "Rubric" Tab of Assignment
-* Change "Due_date" Tab of Assignment
-* Make slight changes to existing methods/codes
-
-==========
-More detailed changes could be seen in Github files changes.
-
-More detailed description on this project, please visit our wiki page: http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2014/OSS_E1450_cxm#Exampls
+Please do no go crazy changing old code to match these guidelines; it will just create lots of potential merge conflicts.
+Applying style guidelines to code you add and modify is good enough. :-)

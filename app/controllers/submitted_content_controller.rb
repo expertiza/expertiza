@@ -6,7 +6,6 @@ class SubmittedContentController < ApplicationController
   end
 
   def edit
-    binding.pry
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
 
@@ -26,7 +25,6 @@ class SubmittedContentController < ApplicationController
 end
 
 def view
-  binding.pry
   @participant = AssignmentParticipant.find(params[:id])
   return unless current_user_id?(@participant.user_id)
 
@@ -49,7 +47,6 @@ end
 
 # Note: This is not used yet in the view until we all decide to do so
 def remove_hyperlink
-  binding.pry 
   @participant = AssignmentParticipant.find(params[:id])
   @participant = AssignmentParticipant.find(params[:id])
   @participant = AssignmentParticipant.find(params[:hyperlinks][:participant_id])

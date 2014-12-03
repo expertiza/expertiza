@@ -1,6 +1,6 @@
 <% current_folder = DisplayOption.new
 current_folder.name = "" %>
-<% files = participant.get_files(participant.get_path.to_s + current_folder.name) %>
+<% files = participant.files(participant.path.to_s + current_folder.name) %>
 or<br/><br/>
 <b>Submit a file:</b><BR/>
 <% if files.length > 0 or stage != "Complete"  %>

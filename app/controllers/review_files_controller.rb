@@ -38,7 +38,7 @@ class ReviewFilesController < ApplicationController
       SubmittedContentHelper::unzip_file(full_filename, version_dir, true)
     end
     # For all files in the version_dir, add entries in the review_file table
-    participant.get_files(version_dir).each do |each_file|
+    participant.files(version_dir).each do |each_file|
       @review_file = ReviewFile.new
       @review_file.filepath               = each_file.to_s
       @review_file.version_number         = new_version_number

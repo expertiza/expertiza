@@ -12,7 +12,7 @@
   <a href="#" id="urlLink" name="urlLink" onClick="toggleElement('url','links');return false;">hide links</a><br/>
   <div id="url" style="">
     <ul>
-      <% participant.get_hyperlinks.each_with_index {
+      <% participant.hyperlinks.each_with_index {
         |link, index| %>
       <% if stage != "Complete" %>
         <% if index == 0 %>

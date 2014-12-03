@@ -16,15 +16,13 @@ class Participant < ActiveRecord::Base
 
   has_paper_trail
 
-  def get_current_stage
-    assignment.try :get_current_stage, topic_id
+  def current_stage
+    assignment.try :current_stage, topic_id
   end
-  alias_method :current_stage, :get_current_stage
 
-  def get_stage_deadline
-    assignment.get_stage_deadline topic_id
+  def stage_deadline
+    assignment.stage_deadline topic_id
   end
-  alias_method :stage_deadline, :get_stage_deadline
 
   def name
     User.find(self.user_id).name
@@ -130,7 +128,7 @@ class Participant < ActiveRecord::Base
     end
 
     # Return scores that this participant for the given questions
-    def get_scores(questions)
+    def scores(questions)
       scores = {}
       scores[:participant] = self
       self.assignment.questionnaires.each do |questionnaire|

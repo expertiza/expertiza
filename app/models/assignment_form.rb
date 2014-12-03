@@ -103,7 +103,7 @@ class AssignmentForm
     i=i+1;
   end
 
-   #delete the old queued items and recreate new ones.
+   #delete the old queued items and recreate new ones if the assignment has late policy.
    if attributes[:due_date] and !has_errors and has_late_policy
 
      # delete the previous jobs from the delayed_jobs table
@@ -268,5 +268,46 @@ class AssignmentForm
     require_quiz
   end
 
+  #Copies the inputted assignment into new one and returns the new assignment id
+  def self.copy(assignment_id,user)
+
+    Assignment.record_timestamps = false
+    old_assign = Assignment.find(assignment_id)
+    new_assign = old_assign.dup
+
+    user.set_instructor(new_assign)
+    new_assign.update_attribute('name', 'Copy of ' + new_assign.name)
+    new_assign.update_attribute('created_at', Time.now)
+    new_assign.update_attribute('updated_at', Time.now)
+
+    if new_assign.directory_path.present?
+      new_assign.update_attribute('directory_path', new_assign.directory_path + '_copy')
+    end
+
+    new_assign.copy_flag = true
+
+    if new_assign.save
+      Assignment.record_timestamps = true
+      copy_assignment_questionnaire(old_assign,new_assign)
+      DueDate.copy(old_assign.id, new_assign.id)
+      new_assign.create_node()
+      new_assign_id=new_assign.id
+    else
+      new_assign_id=nil
+    end
+    return new_assign_id
+  end
+
+  def self.copy_assignment_questionnaire (old_assign, new_assign)
+    old_assign.assignment_questionnaires.each do |aq|
+      AssignmentQuestionnaire.create(
+          :assignment_id => new_assign.id,
+          :questionnaire_id => aq.questionnaire_id,
+          :user_id => session[:user].id,
+          :notification_limit => aq.notification_limit,
+          :questionnaire_weight => aq.questionnaire_weight
+      )
+    end
+  end
 
 end

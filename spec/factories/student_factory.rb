@@ -75,4 +75,29 @@ FactoryGirl.define do
     topic_identifier      1
     micropayment          0
   end
+
+  factory :questionnaire do
+    sequence(:name)     { |n| "questionnaire#{n}" }
+    instructor
+    private             0
+    min_question_score  1
+    max_question_score  5
+    default_num_choices 1
+
+    after(:create) do |questionnaire|
+      FactoryGirl.create :question, questionnaire: questionnaire
+    end
+  end
+
+  factory :question do
+    txt           'Testing question text.'
+    true_false    0
+    weight        1
+    questionnaire
+  end
+
+  factory :assignment_questionnaires do
+    assignment
+    questionnaire
+  end
 end

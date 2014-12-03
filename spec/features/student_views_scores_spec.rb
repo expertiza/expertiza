@@ -1,11 +1,22 @@
 describe 'Student views scores', :type => :feature do
-  # TODO: Add FactoryGirl code here to create an assignment
-  #     for student1 that is already scored.
-
 
   scenario 'viewing student scores' do
     # Student test users used in following scenarios.
     student1 = FactoryGirl.create :student
+
+    # This student is used as the reviewer.
+    student2 = FactoryGirl.create :student
+
+    # Create an assignment that will be reviewed.
+    assignment = FactoryGirl.create :assignment
+
+    # Use the assignment object to add the student as a participant.
+    assignment.add_participant student1.name
+
+    # Create the questionnaire.
+    questionnaire = FactoryGirl.create :questionnaire, assignment: assignment
+
+    topic1 = FactoryGirl.create :sign_up_topic, assignment: assignment
 
     visit root_path
 

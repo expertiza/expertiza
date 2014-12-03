@@ -314,7 +314,7 @@ class AssignmentsController < ApplicationController
   def copy
     Assignment.record_timestamps = false
     old_assign = Assignment.find(params[:id])
-    new_assign = old_assign.clone
+    new_assign = old_assign.dup
    # @user = ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]
     @user.set_instructor(new_assign)
@@ -330,6 +330,7 @@ class AssignmentsController < ApplicationController
     new_assign.copy_flag = true
 
     if new_assign.save
+
       Assignment.record_timestamps = true
       copy_assignment_questionnaire(old_assign,new_assign)
 

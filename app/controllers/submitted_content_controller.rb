@@ -49,14 +49,11 @@ end
 
 # Note: This is not used yet in the view until we all decide to do so
 def remove_hyperlink
-<<<<<<< HEAD
   binding.pry 
   @participant = AssignmentParticipant.find(params[:id])
-||||||| merged common ancestors
   @participant = AssignmentParticipant.find(params[:id])
-=======
   @participant = AssignmentParticipant.find(params[:hyperlinks][:participant_id])
->>>>>>> cf52045b91ea8314802513094ca5ceef1282ecb0
+
   return unless current_user_id?(@participant.user_id)
 
   @participant.remove_hyperlink(params[:hyperlinks]['chk_links'].to_i)

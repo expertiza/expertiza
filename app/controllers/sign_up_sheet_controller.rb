@@ -25,7 +25,17 @@ class SignUpSheetController < ApplicationController
 
     @max_bids = assignment.max_bids
 
-    @users_team_id = SignedUpUser.find_team_users(params[:id],(session[:user].id))[0].t_id
+    users_team = SignedUpUser.find_team_users(params[:id],(session[:user].id))[0]
+    if users_team.nil?
+      team = AssignmentTeam.create_team_and_node(params[:id])
+      user = User.find(session[:user].id)
+      teamuser = create_team_users(user, team.id)
+      @users_team_id = team.id
+    else 
+      @users_team_id = users_team.t_id
+    end
+
+
     bid_topic_ids = Bid.where(:team_id => @users_team_id ).order(:priority).pluck(:topic_id)
     bid_topics = SignUpTopic.where(:assignment_id => params[:id], :id => bid_topic_ids)
 

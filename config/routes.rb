@@ -484,5 +484,5 @@ Expertiza::Application.routes.draw do
   get ':controller/service.wsdl', :action => 'wsdl'
 
   get ':controller(/:action(/:id))(.:format)'
-  post '/response/:id(.:format)', :to=> 'response#create'
+  post '/response/:id(.:format)', :to=> 'response#update'
 end

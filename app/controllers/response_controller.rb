@@ -220,7 +220,9 @@ class ResponseController < ApplicationController
       @myid = @response.response_id
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
-
+      if @map.questionnaire.section.eql? "Specialised Rubric" or @map.questionnaire.section.eql? "Custom"
+        filter_questions
+      end
       @questionnaire = @map.questionnaire
       questions = @questionnaire.questions
 

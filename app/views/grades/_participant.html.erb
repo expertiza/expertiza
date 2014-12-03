@@ -19,7 +19,7 @@
     <TD><%= participant.fullname %>
     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_filesLink" name="<%=prefix%>_filesLink" onClick="toggleElement('<%=prefix%>_files','submission');return false;">show submission</a>
 	<% if @topic %> (<%= @topic.topic_identifier %>)<% end %>
-	</FONT>  	
+	</FONT>
     </TD>
     
     <% if @rscore_review.my_avg %>
@@ -101,8 +101,6 @@
           total_score = pscore[:total_score]
           title = nil
         end %>
-
-
 
         <div <% if title %>title="<%=title%>" style="color:#0033FF"<% end %>><%= sprintf("%.2f",total_score) %><%= score_postfix %></div>
         <% if controller.action_name != "view_my_scores" %> 

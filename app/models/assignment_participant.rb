@@ -296,7 +296,7 @@ class AssignmentParticipant < Participant
       total_score = scores[:total_score]
       hardline = 85
       if scores[:teammate][:scores][:avg].to_f > hardline
-        total_score = total_score + 0.05*total_score
+            total_score = total_score + 0.05*total_score
       elsif scores[:teammate][:scores][:avg].to_f < hardline and (hardline - scores[:teammate][:scores][:avg].to_f) > 40
              total_score = total_score - 10
       elsif scores[:teammate][:scores][:avg].to_f < hardline and (hardline - scores[:teammate][:scores][:avg].to_f) > 20

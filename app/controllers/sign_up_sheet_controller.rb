@@ -23,6 +23,8 @@ class SignUpSheetController < ApplicationController
     @priority = 0
     assignment=Assignment.find(params[:id])
 
+    @max_bids = assignment.max_bids
+
     @users_team_id = SignedUpUser.find_team_users(params[:id],(session[:user].id))[0].t_id
     bid_topic_ids = Bid.where(:team_id => @users_team_id ).order(:priority).pluck(:topic_id)
     bid_topics = SignUpTopic.where(:assignment_id => params[:id], :id => bid_topic_ids)

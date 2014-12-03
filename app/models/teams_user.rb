@@ -40,7 +40,7 @@ class TeamsUser < ActiveRecord::Base
 
   #Determines whether a team is empty of not
   def self.is_team_empty(team_id)
-    team_members = TeamsUser.first_by_team_id(team_id)
+    team_members = TeamsUser.where("team_id = ?", team_id)
     return team_members.nil? || team_members.length == 0
   end
 

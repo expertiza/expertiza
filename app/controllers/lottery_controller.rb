@@ -7,14 +7,14 @@ class LotteryController < ApplicationController
   end
 
   def run_intelligent_bid
-
     if(!Assignment.find_by_id(params[:id]).is_intelligent)     # if the assignment is intelligent then redirect to the tree display list
       flash[:error]  = "Action not allowed. The assignment "+Assignment.find_by_id(params[:id]).name+ " is not enabled for intelligent assignment"
       redirect_to :controller => 'tree_display', :action => 'list'
       return
     end
-    finalTeamTopics = Hash.new #Hashmap (Team,Topic)
-    sign_up_topics = SignUpTopic.where("assignment_id = ? and max_choosers > 0", params[:id])
+    finalTeamTopics = Hash.new #Hashmap (Team,Topic) to store teams which have been assigned topics
+    unassignedTeams = Bid.where(:topic=>SignUpTopic.where(:assignment_id=>params[:id])).uniq.pluck(:team_id)
+    sign_up_topics = SignUpTopic.where("assignment_id = ? and max_choosers > 0", params[:id]) #Getting only
     #initializing all topics with bidder rankings
     topicsBidsArray = Array.new #Array of [Topic, sortedBids]
     sign_up_topics.each do |topic|
@@ -57,7 +57,10 @@ class LotteryController < ApplicationController
 
     finalTeamTopics.keys.each do |team_id|
       SignedUpUser.create(:creator_id=>team_id,:topic_id => finalTeamTopics[team_id][0].id)
+      unassignedTeams.delete(team_id)
     end
+
+    auto_merge_teams unassignedTeams,finalTeamTopics
 
     assignment = Assignment.find(params[:id])
     assignment.is_intelligent = false
@@ -66,6 +69,18 @@ class LotteryController < ApplicationController
     flash[:notice] = 'Intelligent assignment successfully completed for ' + assignment.name + '.'
     redirect_to :controller => 'tree_display', :action => 'list'
   end
+
+  def auto_merge_teams(unassignedTeams,finalTeamTopics)
+    @assignment = Assignment.find(params[:id])
+    unassignedTeams = Team.where(:id=>unassignedTeams).sort_by { |t| !t.users.size }
+    unassignedTeams.each do |team|
+      sortedBids = Bid.where(:team_id => team.id).sort_by {|p| p.priority }
+      sortedBids.each do |b|
+        if(TeamsUser.where(:team_id=>Team.where(:id=>SignedUpUser.where(:topic=>b.topic_id).first.creator_id)).size + team.users.size <=@assignment.max_team_size)
+          SignedUpUser.create(:creator_id=>team.id,:topic_id => b.topic_id)
+          break;
+        end
+      end
+    end
+  end
 end
-
-

@@ -1,5 +1,5 @@
 <script type="text/javascript">
-    var selectedList_limit = 3;
+    var selectedList_limit = <%= @max_bids %>;
     jQuery(document).ready(initialize);
 
     function initialize() {
@@ -33,7 +33,6 @@
                 } else {
                     alert('You have already bid for this topic. Please choose a different topic.');
                 }
-                // updateValues();
             }
         }).sortable({
             axis: "y",
@@ -41,16 +40,11 @@
             items: "li:not(.placeholder)",
             sort: function() {
                 jQuery(this).removeClass("listActive");
-            },
-            update: function() {
-                // updateValues();
             }
         }).on("click", ".dismiss", function(event) {
             event.preventDefault();
             jQuery(this).parent().parent().remove();
-            // updateValues();
         });
-
 
         jQuery("#save-bid-form").submit(function(event){
             jQuery(".selected-list li.topic").each(function(index) {

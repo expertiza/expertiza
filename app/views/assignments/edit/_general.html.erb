@@ -85,12 +85,13 @@ function is_coding_assignmentChanged(){
 
 <table id='assignment_general_setting_table'>
 <tr class='heading'>
-<th width=30%></th>
-<th width=70%></th>
-  </tr>
+    <th width=30%></th>
+    <th width=40%></th>
+    <th width=30%></th>
+</tr>
 
   <tr>
-    <td style='padding:5px' id='assignment_private_field'>
+    <td style='padding:5px' id='assignment_private_field' colspan="3">
       <input name="assignment[private]" type="hidden" value="false"/>
       <%= check_box_tag('assignment[private]', 'true', @assignment.private?) %>
       <%= label_tag('assignment[private]', 'Private?') %>
@@ -99,16 +100,18 @@ function is_coding_assignmentChanged(){
 
   <tr>
     <td style='padding:5px' id='assignment_require_signup_field'>
-      <input name="assignment[require_signup]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment[require_signup]', 'true', @assignment.require_signup?, {:onChange => 'hasTopicsChanged()'}) %>
+      <%= check_box_tag('assignment[require_signup]', 'true', (@assignment.require_signup != 'No'), :onChange => 'hasTopicsChanged()') %>
       <%= label_tag('assignment[require_signup]', 'Has topics?') %>
     </td>
-    <td style='padding:5px' id='assignment_is_intelligent_field'>
+
+    <td style='padding:5px' id='assignment_is_intelligent_field' <%= 'hidden' unless @assignment.require_signup != 'No' %>>
       <%= label_tag('assignment[is_intelligent]', 'Intelligent Topic Selection:') %>
-      <select id="assignment_is_intelligent_field" name="assignment[is_intelligent]">
-        <option value=false style="width:75px">No</option>
-        <option value=true style="width:75px" <% if @assignment.is_intelligent %>SELECTED<%end%>>Yes</option>
-      </select>
+      <%= select('assignment', 'is_intelligent', is_intelligent_options, {}, {:onChange => 'isIntelligentChanged()'}) %>
+    </td>
+
+    <td style='padding:5px;' id='assignment_topic_max_bids_field' <%= 'hidden' unless  @assignment.is_intelligent != false %>>
+      <%= label_tag('assignment[max_bids]', 'Maximum number of bids:') %>
+      <%= text_field_tag('assignment[max_bids]', @assignment.max_bids, :style => 'width:20px') %>
     </td>
   </tr>
 
@@ -127,7 +130,7 @@ function is_coding_assignmentChanged(){
       <%= label_tag('team_assignment', 'Has teams?') %>
     </td>
 
-    <td style='padding:5px' id='assignment_team_count_field' <%= 'hidden' unless @assignment.team_assignment? %>>
+    <td style='padding:5px' id='assignment_team_count_field' colspan="2" <%= 'hidden' unless @assignment.team_assignment? %>>
       <%= label_tag('assignment[max_team_size]', 'Maximum number of members per team:') %>
       <%= text_field_tag('assignment[max_team_size]', @assignment.max_team_size, {:style => 'width:20px'}) %>
     </td>
@@ -140,7 +143,7 @@ function is_coding_assignmentChanged(){
       <%= label_tag('assignment_wiki_assignment', 'Wiki assignment?') %>
     </td>
 
-    <td style='padding:5px' id='assignment_wiki_type_field' <%= 'hidden' unless @assignment.wiki_type.name != 'No' %>>
+    <td style='padding:5px' id='assignment_wiki_type_field' colspan="2" <%= 'hidden' unless @assignment.wiki_type.name != 'No' %>>
       <%= label_tag('assignment[wiki_type_id]', 'Wiki type:') %>
       <%= select('assignment', 'wiki_type_id', wiki_type_options, :selected => @assignment.wiki_type_id) %>
     </td>
@@ -152,14 +155,14 @@ function is_coding_assignmentChanged(){
       <%= check_box_tag('assignment[staggered_deadline]', 'true', @assignment.staggered_deadline, {:onChange => 'staggeredDeadlineChanged()'}) %>
       <%= label_tag('assignment[staggered_deadline]', 'Staggered deadline assignment?') %>
     </td>
-    <td style='padding:5px' id='assignment_days_between_submissions_field' <%= 'hidden' unless @assignment.staggered_deadline %>>
+    <td style='padding:5px' id='assignment_days_between_submissions_field' colspan="2" <%= 'hidden' unless @assignment.staggered_deadline %>>
       <%= label_tag('assignment[days_between_submissions]', 'Days between chapters:') %>
       <%= text_field_tag('assignment[days_between_submissions]', @assignment.days_between_submissions, {:onChange => 'daysBetweenSubmissionsChanged()', :style => 'width:20px'}) %>
     </td>
   </tr>
 
   <tr>
-    <td style='padding:5px' id='assignment_microtask_field'>
+    <td style='padding:5px' id='assignment_microtask_field' colspan="3">
       <input name="assignment[microtask]" type="hidden" value="false"/>
       <%= check_box_tag('assignment[microtask]', 'true', @assignment.microtask, {:onchange => 'microtaskChanged()'}) %>
       <%= label_tag('assignment[microtask]', 'Micro-task assignment?') %>
@@ -169,7 +172,7 @@ function is_coding_assignmentChanged(){
 
 
   <tr>
-    <td style='padding:5px' id='assignment_review_visible_to_all_field'>
+    <td style='padding:5px' id='assignment_review_visible_to_all_field' colspan="3">
       <input name="assignment[reviews_visible_to_all]" type="hidden" value="false"/>
       <%= check_box_tag('assignment[reviews_visible_to_all]', 'true', @assignment.reviews_visible_to_all) %>
       <%= label_tag('assignment[reviews_visible_to_all]', 'Reviews visible to all other reviewers?') %>
@@ -177,7 +180,7 @@ function is_coding_assignmentChanged(){
   </tr>
 
   <tr>
-    <td style='padding:5px' id='assignment_allow_suggestion_field'>
+    <td style='padding:5px' id='assignment_allow_suggestion_field' colspan="3">
       <input name="assignment[allow_suggestions]" type="hidden" value="false"/>
       <%= check_box_tag('assignment[allow_suggestions]', 'true', @assignment.allow_suggestions) %>
       <%= label_tag('assignment[reviews_visible_to_all]', 'Allow topic suggestions from students?') %>
@@ -185,7 +188,7 @@ function is_coding_assignmentChanged(){
   </tr>
 
   <tr>
-    <td style='padding:5px' id='assignment_availability_flag_field'>
+    <td style='padding:5px' id='assignment_availability_flag_field' colspan="3">
       <input name="assignment[availability_flag]" type="hidden" value="false"/>
       <%= check_box_tag('assignment[availability_flag]', 'true', @assignment.availability_flag) %>
       <%= label_tag('assignment[availability_flag]', 'Available to students?') %>
@@ -199,7 +202,7 @@ function is_coding_assignmentChanged(){
       <%= check_box_tag('assignment[is_coding_assignment]', 'true', @assignment.is_coding_assignment, {:onchange => 'is_coding_assignmentChanged()'}) %>
       <%= label_tag('assignment[is_coding_assignment]', 'Is code submission required?') %>
     </td>
-    <td style='padding:5px' id='assignment_numbers_of_quiz_field' <%= 'hidden' unless @assignment.require_quiz %>>
+    <td style='padding:5px' id='assignment_numbers_of_quiz_field' colspan="2" <%= 'hidden' unless @assignment.require_quiz %>>
       <%= label_tag('assignment[num_quiz_questions]', 'Number of Quiz questions:') %>
       <%= text_field_tag('assignment[num_quiz_questions]', @assignment.num_quiz_questions, { :style => 'width:20px'}) %>
     </td>
@@ -209,24 +212,37 @@ function is_coding_assignmentChanged(){
 
 
 <script>
+  function isIntelligentChanged() {
+      if (jQuery('#assignment_is_intelligent').val() == 'true') {
+          jQuery('#assignment_topic_max_bids_field').removeAttr('hidden');
+      } else {
+          jQuery('#assignment_topic_max_bids_field').attr('hidden', true);
+          jQuery('#assignment_max_bids').val('0');
+      }
+  }
+
   function hasTopicsChanged() {
     var msg = 'Warning! Unchecking this box will remove all topics and the reservations of everyone who is signed up for them';
         var checkbox = jQuery('#assignment_require_signup');
+        var is_intelligent = jQuery('#assignment_is_intelligent_field');
 
         if (checkbox.is(':checked')) {
+          is_intelligent.removeAttr('hidden');
           addDueDateTableElement('signup', 0, <%= due_date(@assignment, 'signup').to_json.html_safe %>);
-            addDueDateTableElement('drop_topic', 0, <%= due_date(@assignment, 'drop_topic').to_json.html_safe %>);
+          addDueDateTableElement('drop_topic', 0, <%= due_date(@assignment, 'drop_topic').to_json.html_safe %>);
         } else {
           if (<%= @assignment.has_topics? %>) {
             if (confirm(msg)) {
+              is_intelligent.attr('hidden', true);
               removeDueDateTableElement('signup', 0);
-                    removeDueDateTableElement('drop_topic', 0);
+              removeDueDateTableElement('drop_topic', 0);
             } else {
               checkbox.prop('checked', true);
             }
           } else {
+            is_intelligent.attr('hidden', true);
             removeDueDateTableElement('signup', 0);
-                removeDueDateTableElement('drop_topic', 0);
+            removeDueDateTableElement('drop_topic', 0);
           }
         }
   }
@@ -238,18 +254,18 @@ function is_coding_assignmentChanged(){
 
         if (checkbox.is(':checked')) {
           team_count_field.removeAttr('hidden');
-            addDueDateTableElement('team_formation', 0, <%= due_date(@assignment, 'team_formation').to_json.html_safe %>)
+          addDueDateTableElement('team_formation', 0, <%= due_date(@assignment, 'team_formation').to_json.html_safe %>)
         } else {
           if (<%= @assignment.has_teams?%>) {
             if (confirm(msg)) {
               team_count_field.attr('hidden', true);
-                    removeDueDateTableElement('team_formation', 0);
+              removeDueDateTableElement('team_formation', 0);
             } else {
               checkbox.prop('checked', true);
             }
           } else {
             team_count_field.attr('hidden', true);
-                removeDueDateTableElement('team_formation', 0);
+            removeDueDateTableElement('team_formation', 0);
           }
         }
     }

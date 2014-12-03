@@ -69,7 +69,7 @@ class StudentTaskControllerTest < ActionController::TestCase
   # for a given user id and for a particular assignment, return the URLS the user has submitted for the particular the assignment 
   def test_get_url
     participant = Participant.find(participants(:student))
-    url_result = participant.get_hyperlinks
+    url_result = participant.hyperlinks
     url_assert = participant.submitted_hyperlinks
     assert_equal(url_assert ,url_result )
   end

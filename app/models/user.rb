@@ -250,7 +250,7 @@ class User < ActiveRecord::Base
     parent
   end
 
-  def self.get_export_fields(options)
+  def self.export_fields(options)
     fields = Array.new
     if (options["personal_details"] == "true")
       fields.push("name", "full name", "email")

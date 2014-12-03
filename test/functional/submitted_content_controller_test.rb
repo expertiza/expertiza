@@ -12,14 +12,14 @@ class SubmittedContentControllerTest < ActionController::TestCase
 
     participant = AssignmentParticipant.find(participants(:par1).id)
     count1 = 0
-    participant.get_hyperlinks.each do
+    participant.hyperlinks.each do
       count1 += 1
     end
     post :remove_hyperlink, :id => participants(:par1).id, :chk_links => '1'
 
     count2 = 0
     participant = AssignmentParticipant.find((participants(:par1).id))
-    participant.get_hyperlinks.each do
+    participant.hyperlinks.each do
       count2 += 1
     end
     assert_equal count1 - 1, count2

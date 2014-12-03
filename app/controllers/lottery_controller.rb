@@ -86,7 +86,8 @@ class LotteryController < ApplicationController
     unassignedTeams.each do |team|
       sortedBids = Bid.where(:team_id => team.id).sort_by {|p| p.priority } #Get priority for each unassignmed team
       sortedBids.each do |b|
-        winningTeam = Team.where(:id=>SignedUpUser.where(:topic=>b.topic_id).first.creator_id)
+        #SignedUpUser.where(:topic=>b.topic_id).first.creator_id
+        winningTeam = SignedUpUser.where(:topic=>b.topic_id).first.creator_id
         if(TeamsUser.where(:team_id=>winningTeam).size + team.users.size <=@assignment.max_team_size) #If the team can be merged to a bigger team
           TeamsUser.where(:team_id=>team.id).update_all(:team_id=>winningTeam)
           Team.delete(team.id)

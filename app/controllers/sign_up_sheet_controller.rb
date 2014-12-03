@@ -295,7 +295,6 @@ class SignUpSheetController < ApplicationController
       end
 
       def list
-
         @assignment_id = params[:id]
         if(Assignment.find_by_id(@assignment_id).is_intelligent)
           intelligent_sign_up

@@ -8,6 +8,11 @@ class LotteryController < ApplicationController
 
   def run_intelligent_bid
 
+    if(!Assignment.find_by_id(params[:id]).is_intelligent)     # if the assignment is intelligent then redirect to the tree display list
+      flash[:error]  = "Action not allowed. The assignment "+Assignment.find_by_id(params[:id]).name+ " is not set as intelligent assignment"
+      redirect_to :controller => 'tree_display', :action => 'list'
+      return
+    end
     finalTeamTopics = Hash.new #Hashmap (Team,Topic)
     sign_up_topics = SignUpTopic.where("assignment_id = ? and max_choosers > 0", params[:id])
     #initializing all topics with bidder rankings

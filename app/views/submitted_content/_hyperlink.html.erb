@@ -1,11 +1,13 @@
 <%= form_for :hyperlinks, url: '/submitted_content/remove_hyperlink' do |f| %>
   <% if stage != "Complete" %>
-    <b>Hyperlink Actions:</b><BR/>
+    <% if @current_user.name == assignment_participant.handle %>
+      <b>Hyperlink Actions:</b><BR/>
+      </br>
+      <%= f.submit 'Delete selected hyperlink' %>
+    <% end  %>
     </br>
 
-    <%= f.hidden_field :participant_id, value: participant.id %>
-    <%= f.submit 'Delete selected hyperlink' %>
-    </br>
+    <%= f.hidden_field :participant_id, value: assignment_participant.id %>
     </br>
   <% end %>
 
@@ -13,7 +15,7 @@
   <a href="#" id="urlLink" name="urlLink" onClick="toggleElement('url','links');return false;">hide links</a><br/>
   <div id="url" style="">
     <ul>
-      <% participant.get_hyperlinks.each_with_index do |link, index| %>
+      <% assignment_participant.get_hyperlinks.each_with_index do |link, index| %>
         <% if stage != "Complete" %>
           <% if index == 0 %>
             <%= f.radio_button :chk_links, index, checked: true %>

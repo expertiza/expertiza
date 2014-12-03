@@ -1,6 +1,8 @@
 class ReviewMappingController < ApplicationController
+  include GC4R
   autocomplete :user, :name
   use_google_charts
+  
   helper :dynamic_review_assignment
   helper :submitted_content
 

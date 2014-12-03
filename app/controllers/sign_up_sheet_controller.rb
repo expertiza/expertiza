@@ -293,7 +293,12 @@ class SignUpSheetController < ApplicationController
       end
 
       def list
+
         @assignment_id = params[:id]
+        if(Assignment.find_by_id(@assignment_id).is_intelligent)
+          intelligent_sign_up
+          return
+        end
         @sign_up_topics = SignUpTopic.where( ['assignment_id = ?', params[:id]]).all
         @slots_filled = SignUpTopic.find_slots_filled(params[:id])
         @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:id])

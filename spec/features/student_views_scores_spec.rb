@@ -4,9 +4,6 @@ describe 'Student views scores', :type => :feature do
     # Student test users used in following scenarios.
     student1 = FactoryGirl.create :student
 
-    # This student is used as the reviewer.
-    student2 = FactoryGirl.create :student
-
     # Create an assignment that will be reviewed.
     assignment = FactoryGirl.create :assignment
 
@@ -14,20 +11,24 @@ describe 'Student views scores', :type => :feature do
     assignment.add_participant student1.name
 
     # Create the questionnaire.
-    questionnaire = FactoryGirl.create :questionnaire, assignment: assignment
+    #questionnaire = FactoryGirl.create :questionnaire, assignment: assignment
 
-    topic1 = FactoryGirl.create :sign_up_topic, assignment: assignment
+    #topic1 = FactoryGirl.create :sign_up_topic, assignment: assignment
+    scoreCache = FactoryGirl.create :score_cache, reviewee_id: student1.id
 
     visit root_path
 
-    fill_in 'login_name', with: student1.name
-    fill_in 'login_password', with: 'bogus'
-    click_on 'Login'
+    log_in_as_user(student1)
 
     expect(page).to have_content(student1.name)
 
-    # TODO: Need to make sure that this assignment exists in test data.
-    click_on 'assignment'
+    # NOTE: Need to make sure that this assignment exists in test data.
+    click_link assignment.name
+
+    click_link 'Your scores'
+
+    #expect(page).to have_content('87.65')
+    expect(page).to have_content('Score for')
   end
 end
 

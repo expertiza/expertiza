@@ -18,9 +18,16 @@ FactoryGirl.define do
 
       # Create a student with unique password for testing password scenarios.
       factory :alt_student do
+        name = 'test_student'
         # Overwrite the standard factory password.
         password              "alt_password"
         password_confirmation "alt_password"
+      end
+
+      factory :student_with_score_cache do
+        after(:create) do |user|
+          create :score_cache, user: user
+        end
       end
     end
   end
@@ -36,7 +43,7 @@ FactoryGirl.define do
   end
 
   factory :assignment do
-    name                    "assignment"
+    sequence(:name)         { |n| "assignment#{n}" }
     directory_path          { "#{name}_path" }
     submitter_count         0
     course_id               0
@@ -64,6 +71,8 @@ FactoryGirl.define do
 
       # Assign due dates to the assignment
       FactoryGirl.create :due_date, assignment: assignment
+
+      FactoryGirl.create :score_cache
     end
   end
 
@@ -99,5 +108,11 @@ FactoryGirl.define do
   factory :assignment_questionnaires do
     assignment
     questionnaire
+  end
+
+  factory :score_cache do |reviewee_id|
+    reviewee_id
+    score           87.65
+    range           '0 - 100'
   end
 end

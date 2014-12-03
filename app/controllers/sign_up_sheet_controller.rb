@@ -31,6 +31,8 @@ class SignUpSheetController < ApplicationController
       user = User.find(session[:user].id)
       teamuser = create_team_users(user, team.id)
       @users_team_id = team.id
+    else 
+      @users_team_id = users_team.t_id
     end
 
 

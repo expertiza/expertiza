@@ -70,8 +70,7 @@ class LotteryController < ApplicationController
 
     #Remove is_intelligent property from assignment so that it can revert to the default signup state
     assignment = Assignment.find(params[:id])
-    assignment.is_intelligent = false
-    assignment.save
+    assignment.update_attribute(:is_intelligent,false)
 
     flash[:notice] = 'Intelligent assignment successfully completed for ' + assignment.name + '.'
     redirect_to :controller => 'tree_display', :action => 'list'
@@ -79,7 +78,7 @@ class LotteryController < ApplicationController
 
   #This method is called to automerge smaller teams to teams which were assigned topics through intelligent assignment
   def auto_merge_teams(unassignedTeams,finalTeamTopics)
-    @assignment = Assignment.find(params[:id])
+    assignment = Assignment.find(params[:id])
 
     #Sort unassigned
     unassignedTeams = Team.where(:id=>unassignedTeams).sort_by { |t| !t.users.size }
@@ -88,9 +87,10 @@ class LotteryController < ApplicationController
       sortedBids.each do |b|
         #SignedUpUser.where(:topic=>b.topic_id).first.creator_id
         winningTeam = SignedUpUser.where(:topic=>b.topic_id).first.creator_id
-        if(TeamsUser.where(:team_id=>winningTeam).size + team.users.size <=@assignment.max_team_size) #If the team can be merged to a bigger team
+        if(TeamsUser.where(:team_id=>winningTeam).size + team.users.size <=assignment.max_team_size) #If the team can be merged to a bigger team
           TeamsUser.where(:team_id=>team.id).update_all(:team_id=>winningTeam)
-          Team.delete(team.id)
+          Bid.delete_all(:team_id=>team.id)
+	  Team.delete(team.id)
           break;
         end
       end

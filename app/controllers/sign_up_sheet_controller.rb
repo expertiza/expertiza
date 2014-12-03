@@ -27,7 +27,7 @@ class SignUpSheetController < ApplicationController
 
     users_team = SignedUpUser.find_team_users(params[:id],(session[:user].id))[0]
     if users_team.nil?
-      team = AssignmentTeam.create_team_and_node(assignment_id)
+      team = AssignmentTeam.create_team_and_node(params[:id])
       user = User.find(user_id)
       teamuser = create_team_users(user, team.id)
       @users_team_id = team.id

@@ -1,8 +1,8 @@
 <h1>Editing late policy</h1>
 
-<% form_tag :action => 'update', :id => @penalty_policy do %>
-  <%= render :partial => 'form' %>
-  <%= submit_tag 'Edit' %>
+<%= form_for @penalty_policy do |f| %>
+  <%= render partial: 'form', locals: { f: f } %>
+  <%= f.submit 'Save' %>
 <% end %>
 
 <br>

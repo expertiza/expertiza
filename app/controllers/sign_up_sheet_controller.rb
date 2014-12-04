@@ -11,7 +11,6 @@
 class SignUpSheetController < ApplicationController
   require 'rgl/adjacency'
   require 'rgl/dot'
-  require 'graph/graphviz_dot'
   require 'rgl/topsort'
 
   def action_allowed?

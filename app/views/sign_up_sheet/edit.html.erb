@@ -1,11 +1,9 @@
-<h1>Edit Bookmark</h1>
+<h1>Edit Topic</h1>
 
-<% form_tag :action => 'update'do %>
-
-
+<%= form_tag url_for(:action => 'update'), method: "put" do %>
   <%= render :partial => 'topic' %>
   <%= hidden_field_tag('id', params[:id]) %>
-  <%= hidden_field_tag('assignment_id', params[:assignment_id]) %>
+  <%= hidden_field_tag('assignment_id', @assignment_id) %>
   <%= submit_tag "Update"%>
 <% end %>
 

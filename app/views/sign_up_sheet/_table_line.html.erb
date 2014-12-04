@@ -11,6 +11,7 @@
 <%= render :partial => '/sign_up_sheet/num_waiting', :locals => {:topic=>topic} %>
 <td align="center"><%= render :partial => '/sign_up_sheet/actions', :locals => {:i=>i,:topic=>topic} %></td>
 
+
 <% if @assignment.has_partner_ads?(params[:id]) %>
   <td align="center">
     <% signed_up_team =SignedUpUser.find_by_topic_id(topic.id)%>

@@ -7,7 +7,7 @@
 <% end %>
 
 <%= form_tag :action => 'list', :paginate_show => '1', :num_users => @per_page do %>
-  Search users: <%= text_field_tag(:letter,params[:letter]) %>
+  <%= label_tag :letter, 'Search users: ' %><%= text_field_tag(:letter,params[:letter]) %>
 <%= select_tag(:search_by, options_for_select([['Username', 1], ['Full name', 2], ['Email', 3]])) %>
 <%= submit_tag("Search") %>
 <% end %>

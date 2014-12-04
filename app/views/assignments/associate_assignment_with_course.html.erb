@@ -2,13 +2,13 @@
 
 Select a course to which the assignment will belong:
 <BR/><BR/>
-<%= form_tag :action => 'update', :id => @assignment.id do %>
-  <% for course in @courses %>
-    <%= radio_button_tag 'assignment[course_id]',course.id %><%= course.name %><br/>
+<%= form_for @assignment do |f| %>
+  <% @courses.each do |course| %>
+    <%= f.radio_button :course_id, course.id %><%= course.name %><br/>
   <% end %>
 
   <BR/>
-  <input type='submit' value='Save' />
+  <%= f.submit "Save" %>
 <% end %>
 
 <BR/>

@@ -6,6 +6,7 @@ class ApplicationController < ActionController::Base
   if Rails.env.production?
     #forcing SSL only in the production mode
     force_ssl
+  end
 
   session ||= Hash.new
 

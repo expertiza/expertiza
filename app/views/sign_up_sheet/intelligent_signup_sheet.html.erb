@@ -1,5 +1,5 @@
 <script type="text/javascript">
-    var selectedList_limit = <%= @max_bids %>;
+    var selectedList_limit = <%= @max_bids.nil? ? 0 : @max_bids %>;
     jQuery(document).ready(initialize);
 
     function initialize() {
@@ -212,7 +212,7 @@
         width: 80px;
         padding: 4px 0;
     }
-    .bid-count, .available-count {
+    .bid-count, .total-count {
         float: right;
         height: 20px;
         width: 20px;
@@ -228,7 +228,7 @@
         background-color: #73A2EF !important;
         color: #fff !important;
     }
-    .available-count-color {
+    .total-count-color {
         background-color: #FF7563 !important;
         color: #fff !important;
     }
@@ -241,12 +241,12 @@
     <span><strong>Legend</strong></span>
     <ul>
       <li>
-        <div class="legend-circle bid-count-color" title="Total bids"></div>
-        <div class="legend-text">Total bids on a topic</div>
+        <div class="legend-circle bid-count-color" title="Total bids: Total number of bids currently placed on a particular topic."></div>
+        <div class="legend-text"><strong>Total bids:</strong> Total number of bids currently placed on a particular topic.</div>
       </li>
       <li>
-        <div class="legend-circle available-count-color" title="Available slots"></div>
-        <div class="legend-text">Available slots for a topic</div>
+        <div class="legend-circle total-count-color" title="Total slots: Maximum number of teams that can be assigned a particular topic."></div>
+        <div class="legend-text"><strong>Total slots:</strong> Maximum number of teams that can be assigned a particular topic.</div>
       </li>
     </ul>
   </div>
@@ -258,7 +258,7 @@
             <div class="topic-content-wrapper">
               <div class="topic-number"><%= topic.topic_identifier%></div>
               <div class="counter-data">
-                <div class="available-count available-count-color" title="Available slots"><%= topic.max_choosers%></div>
+                <div class="total-count total-count-color" title="Total slots"><%= topic.max_choosers%></div>
                 <div class="bid-count bid-count-color" title="Total bids"><%= Bid.where(:topic_id=>topic.id).size %></div>
               </div>
               <div class="topic-name"><%=topic.topic_name%></div>
@@ -276,7 +276,7 @@
               <div class="dismiss"><a href="#" title="Remove bid">x</a></div>
               <div class="topic-number"><%= topic.topic_identifier%></div>
               <div class="counter-data">
-                <div class="available-count available-count-color" title="Available slots"><%= topic.max_choosers%></div>
+                <div class="total-count total-count-color" title="Total slots"><%= topic.max_choosers%></div>
                 <div class="bid-count bid-count-color" title="Total bids"><%= Bid.where(:topic=>topic.id).size %></div>
               </div>
               <div class="topic-name"><%=topic.topic_name%></div>

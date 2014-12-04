@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141203001749) do
+ActiveRecord::Schema.define(version: 20141204022200) do
 
   create_table "assignment_questionnaires", force: true do |t|
     t.integer "assignment_id"
@@ -103,6 +103,9 @@ ActiveRecord::Schema.define(version: 20141203001749) do
     t.datetime "updated_at"
     t.integer  "priority"
   end
+
+  add_index "bids", ["team_id"], name: "index_bids_on_team_id", using: :btree
+  add_index "bids", ["topic_id"], name: "index_bids_on_topic_id", using: :btree
 
   create_table "bmapping_ratings", force: true do |t|
     t.integer  "bmapping_id", null: false
@@ -579,6 +582,7 @@ ActiveRecord::Schema.define(version: 20141203001749) do
   end
 
   add_index "sign_up_topics", ["assignment_id"], name: "fk_sign_up_categories_sign_up_topics", using: :btree
+  add_index "sign_up_topics", ["assignment_id"], name: "index_sign_up_topics_on_assignment_id", using: :btree
 
   create_table "signed_up_users", force: true do |t|
     t.integer "topic_id",                   default: 0,     null: false
@@ -723,6 +727,7 @@ ActiveRecord::Schema.define(version: 20141203001749) do
   end
 
   add_index "teams_users", ["team_id"], name: "fk_users_teams", using: :btree
+  add_index "teams_users", ["team_id"], name: "index_teams_users_on_team_id", using: :btree
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
   add_index "teams_users", ["user_id"], name: "index_teams_users_on_user_id", using: :btree
 

@@ -18,7 +18,7 @@ class LotteryController < ApplicationController
 
     finalTeamTopics = Hash.new #Hashmap (Team,Topic) to store teams which have been assigned topics
     unassignedTeams = Bid.where(:topic=>SignUpTopic.where(:assignment_id=>params[:id])).uniq.pluck(:team_id) #Get all unassigned teams,. Will be used for merging
-    sign_up_topics = SignUpTopic.where("assignment_id = ? and max_choosers > 0", params[:id]) #Getting signuptopics with max_choosers > 0
+    sign_up_topics = SignUpTopic.includes({bids: [{team: [:users]}]}).where("assignment_id = ? and max_choosers > 0", params[:id]) #Getting signuptopics with max_choosers > 0
 
     #initializing all topics with bidder rankings(team strength, priority)
     topicsBidsArray = Array.new #Array of [Topic, sortedBids]

@@ -447,6 +447,8 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  get '/versions/search', controller: :versions, action: :search
+
   resources :versions do
     collection do
       delete '', action: :destroy_all
@@ -468,7 +470,7 @@ Expertiza::Application.routes.draw do
   get '/submitted_content/submit_file', :to => 'submitted_content#submit_file'
   get '/review_mapping/show_available_submissions', :to => 'review_mapping#show_available_submissions'
   get '/review_mapping/assign_reviewer_dynamically', :to => 'review_mapping#assign_reviewer_dynamically'
-  get "/review_mapping/assign_metareviewer_dynamically", :to => 'review_mapping#assign_metareviewer_dynamically'
+  get '/review_mapping/assign_metareviewer_dynamically', :to => 'review_mapping#assign_metareviewer_dynamically'
   get 'response/', :to => 'response#saving'
 
   get 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'

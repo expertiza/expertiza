@@ -63,4 +63,17 @@ class AuthControllerTest < ActionController::TestCase
     params = {:controller => 'impersonate', :action => 'start'}
     assert_equal AuthController.authorised?(@response.session, params), false    
   end
+
+  # Test to redirect to google login page
+  def test_google_login
+    get "auth#google_login"
+    assert_response :success
+  end
+
+  # Test for checking https protocol usage in URL
+  def test_https
+    https!
+    get "auth#login"
+    assert_response :success
+  end
 end

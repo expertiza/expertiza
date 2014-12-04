@@ -11,9 +11,9 @@
 
 </script>
 <%= form_tag :controller => 'review_mapping',
-             :action => 'show_available_submissions',
-             :assignment_id => assignment.id,
-             :reviewer_id => session[:user].id do %>
+               :action => 'show_available_submissions',
+               :assignment_id => assignment.id,
+               :reviewer_id => session[:user].id do %>
     <% if assignment.sign_up_topics.count > 0 %>
         <p><b>Select a topic below to begin a new review:</b></p>
 
@@ -23,5 +23,5 @@
         <br />
     <% end %>
 
-    <input type='submit' value='Select a Topic to Review' id="submitStudentReviewButton"/>
+    <input type='submit'  value='Select a Topic to Review' id="submitStudentReviewButton"/>
 <% end %>

@@ -19,7 +19,8 @@ class AssignmentTeam < Team
   # Evaluates whether any contribution by this team was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object
   def reviewed_by?(reviewer)
-    TeamReviewResponseMap.count(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id]) > 0
+    #TeamReviewResponseMap.count(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id]) > 0
+    TeamReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id).count > 0
   end
 
   # Topic picked by the team

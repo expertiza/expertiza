@@ -43,7 +43,7 @@ class AuthController < ApplicationController
     Rails.logger.debug("email : #{auth_info.info.email}")
     user = User.find_by_email(auth_info.info.email)
     if user.nil?
-      flash[:error] = "This email is not authorized to use expertiza..!!"
+      flash[:error] = "This email is not authorized to use expertiza!"
       redirect_to root_path
     else
      after_login(user)

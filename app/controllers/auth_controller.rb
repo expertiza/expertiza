@@ -42,9 +42,9 @@ class AuthController < ApplicationController
 
   # Login functionality for google login feature using omniAuth2
   def google_login
-    auth_info = env['omniauth.auth']
-    Rails.logger.debug("email : #{auth_info.info.email}")
-    user = User.find_by_email(auth_info.info.email)
+    g_email = env['omniauth.auth'].info.email
+    Rails.logger.debug("email : #{g_email}")
+    user = User.find_by_email(g_email)
     if user.nil?
       flash[:error] = "This email is not authorized to use expertiza!"
       redirect_to root_path

@@ -11,7 +11,7 @@
 class SignUpSheetController < ApplicationController
   require 'rgl/adjacency'
   require 'rgl/dot'
-  require 'graph/graphviz_dot'
+  #removed graph/graphviz_dot since the gem is removed from Gemfile.
   require 'rgl/topsort'
 
   def action_allowed?

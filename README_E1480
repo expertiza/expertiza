@@ -1,0 +1,17 @@
+E1480 - Test the student interface
+
+This project focused on writing tests using Capybara and Rspec to test the
+student interface. That is these tests are integration tests and therefore
+the tests will all be modeled from the perspective of the student user.
+
+In order to run the tests:
+After pulling in the new changes run bundle install.
+Make sure that the database is in good order:
+    rake db:drop
+    rake db:reset
+    rake db:reset RAILS_ENV=test
+
+Run the tests:
+rspec -fd
+
+

@@ -1,59 +1,24 @@
 <h1>Summary report for <%= @assignment.name %></h1>
 <BR/>
-<%   if session[:user].role.name == "Teaching Assistant" || session[:user].role.name =="Instructor" %>
-  <% if @scores[:teams] %>
-    <a href="#" onClick="toggleAll(<%= @scores[:teams].length %>);return false;" id="teamAll" name="teamAll">Show all teams</a>
+<% if @scores[:teams] %>
+	<a href="#" onClick="toggleAll(<%= @scores[:teams].length %>);return false;" id="teamAll" name="teamAll">Show all teams</a>
     <BR/><BR/>
-  <% end %>
-  <TABLE class="grades" width="100%">
-    <!--ACS Render the appropriate partial for displaying the scores depending on the team size -->
-    <% if @scores[:teams].length > 0 %>
-      <%= render :partial => 'teams' %>
-    <% else %>
-      <TR><TD>No teams are defined for this assignment</TD></TR>
-    <% end %>
-  </TABLE>
-  <BR/><BR/>
-  <%= link_to 'Export '+'Grades',
-    :controller=>'export_file',
-    :action=>'start',
-    :model=>'Assignment',
-    :id=>@assignment.id %> <BR/><BR/>
+<% end %>
+<TABLE class="grades" width="100%">
+  <!--ACS Render the appropriate partial for displaying the scores depending on the team size -->
+<% if @assignment.team_assignment? && @scores[:teams].length > 0 %>
+  <%= render :partial => 'teams' %>
+<% else %>
+  <TR><TD>No <%if @assignment.team_assignment? %>teams<%else%>participants<%end%> are defined for this assignment</TD></TR>
+<% end %>
+</TABLE>
+<BR/><BR/>
+<%= link_to 'Export '+'Grades',
+            :controller=>'export_file',
+            :action=>'start',
+            :model=>'Assignment',
+            :id=>@assignment.id %> <BR/><BR/>
+<a href="javascript:window.history.back()">Back</a>
 
-    <% index = 0
-    max_penalty = 0
-    total_penalty_for_all = 0 %>
-  <% @assignment.participants.each{
-    | participant | %>
-
-  <%
-      total_penalty = @all_penalties[participant.id][:total_penalty]
-  if(max_penalty < total_penalty)
-    max_penalty = total_penalty
-  end
-  total_penalty_for_all += total_penalty
-  index += 1
-  }
-  avg_penalty = total_penalty_for_all / index
-%>
-
-<table>
-  <tr>
-    <td>
-      Average Penalty : <%= avg_penalty %>
-  </td>
-</tr>
-<tr>
-  <td>
-    Maximum Penalty : <%= max_penalty %>
-</td>
-      </tr>
-    </table>
-    <!-- END PARTICIPANTS -->
-  <% else %>
-    You do not have privileges to view this page
-  <% end %>
-
-  <a href="javascript:window.history.back()">Back</a>
 
 

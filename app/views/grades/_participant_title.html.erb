@@ -2,33 +2,27 @@
 <% colwidth = 7  %>
 
 <TR <% if prefix %>id='<%= prefix %>_1' style="display:none"<% end %>>
-  <TH WIDTH="<%= namecolwidth %>%">&nbsp;</TH>
-  <TH COLSPAN="3" WIDTH="<%= colwidth*3 %>%">Submitted work</TH>
-  <TH COLSPAN="4" WIDTH="<%= colwidth*4 %>%">Reviewing</TH>
-  <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Author Feedback</TH>
-  <% if @assignment.team_assignment? %>
-    <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Teammate Review</TH>
-  <% end %>
-  <TH WIDTH="<%= colwidth %>%">&nbsp;</TH>
+<TH WIDTH="<%= namecolwidth %>%">&nbsp;</TH>
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Submitted work</TH>
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Reviewing</TH>
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Author Feedback</TH>
+<% if @assignment.team_assignment? %>
+  <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Teammate Review</TH>
+<% end %>
+<TH WIDTH="<%= colwidth %>%">&nbsp;</TH></TR>           
 
-  <TH WIDTH="<%= colwidth %>%"> </TH></TR>
 <TR <% if prefix %>id='<%= prefix %>_2' style="display:none"<% end %>>
-  <TH WIDTH="<%= namecolwidth %>%" ALIGN="LEFT">Contributor</TH>
-  <TH WIDTH="<%= colwidth %>%">Average</TH>
-  <TH WIDTH="<%= colwidth %>%">Range</TH>
-  <TH WIDTH="<%= colwidth %>%">Submission Penalty</TH>
-  <TH WIDTH="<%= colwidth %>%">Average</TH>
-  <TH WIDTH="<%= colwidth %>%">Range </TH>
-  <TH WIDTH="<%= colwidth %>%">Review Penalty</TH>
-  <TH WIDTH="<%= colwidth %>%">Meta-review Penalty</TH>
-  <TH WIDTH="<%= colwidth %>%">Average</TH>
-  <TH WIDTH="<%= colwidth %>%">Range </TH>
+<TH WIDTH="<%= namecolwidth %>%" ALIGN="LEFT">Contributor</TH>
+<TH WIDTH="<%= colwidth %>%">Average</TH>
+<TH WIDTH="<%= colwidth %>%">Range</TH>
+<TH WIDTH="<%= colwidth %>%">Average</TH>
+<TH WIDTH="<%= colwidth %>%">Range </TH>
+<TH WIDTH="<%= colwidth %>%">Average</TH>
+<TH WIDTH="<%= colwidth %>%">Range </TH>
   <!--ACS Display teammate review ratings only for teams with size greater than 1-->
   <% if @assignment.max_team_size > 1 %>
-    <TH WIDTH="<%= colwidth %>%">Average</TH>
-    <TH WIDTH="<%= colwidth %>%">Range </TH>
-  <% end %>
-  <TH WIDTH="<%= colwidth %>%">Total Penalty</TH>
-  <TH WIDTH="<%= colwidth %>%">Total Score</TH>
-  <TH WIDTH="<%= colwidth %>%">Final Score</TH></TR>
-
+  <TH WIDTH="<%= colwidth %>%">Average</TH>
+  <TH WIDTH="<%= colwidth %>%">Range </TH>
+<% end %>   
+<TH WIDTH="<%= colwidth %>%">Final Score</TH></TR>    
+    

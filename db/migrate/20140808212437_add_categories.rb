@@ -1,15 +1,15 @@
 class AddCategories < ActiveRecord::Migration
   def self.up
-    create_table :categories do |t|
-      t.string :name
-      t.integer :parent_id
-      t.integer :lft
-      t.integer :rgt
-      t.integer :depth # this is optional.
-    end
+    # add_column :nodes, :name, :string
+    # add_column :nodes, :lft, :integer
+    # add_column :nodes, :rgt, :integer
+    # add_column :nodes, :depth, :integer
   end
 
   def self.down
-    drop_table :categories
+    # remove_column :nodes, :name
+    # remove_column :nodes, :lft
+    # remove_column :nodes, :rgt
+    # remove_column :nodes, :depth
   end
 end

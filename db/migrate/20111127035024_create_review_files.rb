@@ -10,40 +10,40 @@ class CreateReviewFiles < ActiveRecord::Migration
 
     permission = Permission.find_by_name("do assignments")
 
-    site_controller = SiteController.find_or_create_by_name("review_files")
+    site_controller = SiteController.find_or_create_by(name: "review_files")
     if site_controller
       site_controller.permission_id = permission.id
       site_controller.save
 
-      action = ControllerAction.find_or_create_by_name("show_code_file")
+      action = ControllerAction.find_or_create_by(name: "show_code_file")
       if action != nil
         action.site_controller_id = site_controller.id
         action.permission_id = permission.id
         action.save
       end
 
-      action = ControllerAction.find_or_create_by_name("show_code_file_diff")
+      action = ControllerAction.find_or_create_by(name: "show_code_file_diff")
       if action != nil
         action.site_controller_id = site_controller.id
         action.permission_id = permission.id
         action.save
       end
 
-      action = ControllerAction.find_or_create_by_name("show_all_submitted_files")
+      action = ControllerAction.find_or_create_by(name: "show_all_submitted_files")
       if action != nil
         action.site_controller_id = site_controller.id
         action.permission_id = permission.id
         action.save
       end
 
-      action = ControllerAction.find_or_create_by_name("submit_comment")
+      action = ControllerAction.find_or_create_by(name: "submit_comment")
       if action != nil
         action.site_controller_id = site_controller.id
         action.permission_id = permission.id
         action.save
       end
 
-      action = ControllerAction.find_or_create_by_name("submit_review_file")
+      action = ControllerAction.find_or_create_by(name: "submit_review_file")
       if action != nil
         action.site_controller_id = site_controller.id
         action.permission_id = permission.id

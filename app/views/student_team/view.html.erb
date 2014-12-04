@@ -142,7 +142,7 @@
                      %>
                    <%= link_to "Accept",
                      {:controller => 'invitation', :action => 'accept', :inv_id => inv.id, :student_id => @student.id, :team_id => @team_id},
-                     {:onClick => "javascript: confirm('Your topics and bids on topics will be dropped if you accept the invitation. Do you want to continue?')"}
+                     {:onClick => "javascript: return confirm('Your topics and bids on topics will be dropped if you accept the invitation. Do you want to continue?');"}
                    %>
                    |
                    <%= link_to "Decline",

@@ -46,7 +46,7 @@ class CourseTest < ActiveSupport::TestCase
 
   # test method get_participants
   def test_get_participants
-    @participants = @course0.get_participants
+    @participants = @course0.participants
     assert_equal 4, @participants.count
   end
 

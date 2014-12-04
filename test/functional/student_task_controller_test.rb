@@ -200,7 +200,7 @@ class StudentTaskControllerTest < ActionController::TestCase
   # check if the current assignment is team assignment, if yes return the first team member of the team handle
   def test_first_member_negative
     participant=''
-    maps_result = AssignmentTeam.get_first_member(-1)
+    maps_result = AssignmentTeam.first_member(-1)
     assert_equal(participant.to_a,maps_result.to_a)
   end
 

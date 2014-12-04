@@ -77,7 +77,7 @@ class ReviewFilesController < ApplicationController
     all_review_files = []
 
     if @participant.assignment.team_assignment
-      @participant.team.get_participants.each_with_index { |member,index|
+      @participant.team.participants.each_with_index { |member,index|
         all_review_files += ReviewFile.where(author_participant_id: member.id)
 
       }
@@ -339,7 +339,7 @@ newer_version_comments = ReviewComment.where(review_file_id: files[:@newer_file]
 
         member = []
         if assignmentparticipant.assignment.team_assignment
-          assignmentparticipant.team.get_participants.each_with_index {|member1, index|
+          assignmentparticipant.team.participants.each_with_index {|member1, index|
 
             member[index] = member1.id
           }

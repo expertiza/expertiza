@@ -28,7 +28,7 @@
           <% end %>
           <div>
             <% if !current_user %>
-                <%= link_to "Sign in with Google", "/auth/google_oauth2", id: "sign_in" %>
+                <%= link_to image_tag("google.png", size: "150x50"), "/auth/google_oauth2" %>
             <% end %>
           </div>
         </div>

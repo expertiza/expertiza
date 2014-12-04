@@ -30,14 +30,17 @@ class AuthController < ApplicationController
     end
   end  #def login
 
+  # function to handle common functionality for conventional user login and google login
   def after_login (user)
     logger.info "User #{user.name} successfully logged in"
     session[:user] = user
     AuthController.set_current_role(user.role_id, session)
 
-    redirect_to :controller => AuthHelper::get_home_controller(session[:user]), :action => AuthHelper::get_home_action(session[:user])
+    redirect_to :controller => AuthHelper::get_home_controller(session[:user]),
+                :action => AuthHelper::get_home_action(session[:user])
   end
 
+  # Login functionality for google login feature using omniAuth2
   def google_login
     auth_info = env['omniauth.auth']
     Rails.logger.debug("email : #{auth_info.info.email}")

@@ -3,7 +3,9 @@ require 'goldberg_filters'
 class ApplicationController < ActionController::Base
   include AccessHelper
 
-  force_ssl
+  if Rails.env.production?
+    #forcing SSL only in the production mode
+    force_ssl
 
   session ||= Hash.new
 

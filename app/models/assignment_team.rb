@@ -56,22 +56,22 @@ class AssignmentTeam < Team
     super
   end
 
-  def self.get_first_member(team_id)
+  def self.first_member(team_id)
     find(team_id).participants.first
   end
 
   def hyperlinks
     links = Array.new
-    self.get_participants.each { |team_member| links.concat(team_member.hyperlinks_array) }
+    self.participants.each { |team_member| links.concat(team_member.hyperlinks_array) }
     links
   end
 
   def path
-    self.get_participants.first.dir_path
+    self.participants.first.dir_path
   end
 
   def submitted_files
-    self.get_participants.first.submitted_files
+    self.participants.first.submitted_files
   end
 
   def review_map_type
@@ -130,7 +130,7 @@ class AssignmentTeam < Team
         "AssignmentParticipant"
       end
 
-      def get_parent_model
+      def parent_model
         "Assignment"
       end
 
@@ -138,7 +138,7 @@ class AssignmentTeam < Team
         self.name
       end
 
-      def get_participants
+      def participants
         users = self.users
         participants = Array.new
         users.each do |user|
@@ -178,7 +178,7 @@ class AssignmentTeam < Team
       end
      
 
-      def self.get_teascoresant)
+      def self.team(participant)
         team = nil
         teams_users = TeamsUser.where(user_id: participant.user_id)
         teams_users.each do |tuser|

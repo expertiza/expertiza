@@ -16,8 +16,8 @@ class Participant < ActiveRecord::Base
 
   has_paper_trail
 
-  def current_stage
-    assignment.try :current_stage, topic_id
+  def get_current_stage
+    assignment.try :get_current_stage, topic_id
   end
 
   def stage_deadline

@@ -59,8 +59,8 @@ class Assignment < ActiveRecord::Base
     contributor_set.reject! { |contributor| signed_up_topic(contributor).nil? }
     #####contributor_set.reject! { |contributor| !contributor.has_quiz? }
     # Reject contributions of topics whose deadline has passed
-    contributor_set.reject! { |contributor| contributor.assignment.current_stage(signed_up_topic(contributor).id) == "Complete" or
-                              contributor.assignment.current_stage(signed_up_topic(contributor).id) == "submission" }
+    contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "Complete" or
+                              contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "submission" }
 
     # Filter the contributors with the least number of reviews
     # (using the fact that each contributor is associated with a topic)
@@ -126,7 +126,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def reject_by_deadline(contributor_set)
-    contributor_set.reject! { |contributor| contributor.assignment.current_stage(signed_up_topic(contributor).id) == 'Complete' or
+    contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'Complete' or
         !contributor.assignment.review_allowed(signed_up_topic(contributor).id) }
     return contributor_set
   end
@@ -610,7 +610,7 @@ class Assignment < ActiveRecord::Base
     node.save
   end
 
-  def current_stage(topic_id=nil)
+  def get_current_stage(topic_id=nil)
     return 'Unknown' if topic_id.nil? if self.staggered_deadline?
     due_date = find_current_stage(topic_id)
     (due_date == nil || due_date == COMPLETE) ? COMPLETE : DeadlineType.find(due_date.deadline_type_id).name
@@ -865,7 +865,7 @@ class Assignment < ActiveRecord::Base
 
       for index in 0 .. @scores[:teams].length - 1
         team = @scores[:teams][index.to_s.to_sym]
-        for participant in team[:team].get_participants
+        for participant in team[:team].participants
           pscore = @scores[:participants][participant.id.to_s.to_sym]
           tcsv = Array.new
           tcsv << 'team'+index.to_s

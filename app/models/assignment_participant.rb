@@ -440,7 +440,7 @@ class AssignmentParticipant < Participant
     #ACS Check if the team count is greater than one(team assignment)
     if self.assignment.max_team_size > 1 && self.assignment.wiki_type.name == "MediaWiki"
       submissions = Array.new
-      self.team.get_participants.each do |user|
+      self.team.participants.each do |user|
         val = WikiType.review_mediawiki_group(self.assignment.directory_path, current_time, user.handle)
         submissions << val if val != nil
       end if self.team
@@ -455,7 +455,7 @@ class AssignmentParticipant < Participant
   end
 
   def team
-    AssignmentTeam.get_team(self)
+    AssignmentTeam.team(self)
   end
 
   # provide import functionality for Assignment Participants
@@ -499,7 +499,7 @@ class AssignmentParticipant < Participant
 
   # generate a hash string that we can digitally sign, consisting of the
   # assignment name, user name, and time stamp passed in.
-  def hash(time_stamp)
+  def get_hash(time_stamp)
     # first generate a hash from the assignment name itself
     hash_data = Digest::SHA1.digest(self.assignment.name.to_s)
 
@@ -553,7 +553,7 @@ class AssignmentParticipant < Participant
         self.update_attribute('directory_num',dir_num)
         #ACS Get participants irrespective of the number of participants in the team
         #removed check to see if it is a team assignment
-        self.team.get_participants.each do | member |
+        self.team.participants.each do | member |
           if member.directory_num == nil or member.directory_num < 0
             member.directory_num = self.directory_num
             member.save
@@ -563,7 +563,7 @@ class AssignmentParticipant < Participant
     end
 
     def current_stage
-      assignment.try :current_stage, topic_id
+      assignment.try :get_current_stage, topic_id
     end
 
 

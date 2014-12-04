@@ -18,7 +18,7 @@ class CourseTeamTest < ActiveSupport::TestCase
     assert_equal teams(:team2).id, @course_team.id
     assert_equal teams(:team2).parent_id, @course_team.parent_id
     assert_equal @course_team.participant_type, 'CourseParticipant'
-    assert_equal @course_team.get_parent_model, 'Course'
+    assert_equal @course_team.parent_model, 'Course'
     assert_equal @course_team.get_node_type, 'TeamNode'
   end
 

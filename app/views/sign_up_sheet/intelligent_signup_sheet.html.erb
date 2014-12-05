@@ -10,7 +10,30 @@
             cursor: 'move',
             revert: 'invalid',
             helper: "clone"
+        }).on("click", function(event){
+            event.preventDefault();
+            addTopicToSelectedList(jQuery(this));
         });
+
+        function addTopicToSelectedList(topic) {
+            var topicId = topic.attr('topic-id');
+            if(jQuery(".selected-list").find("li[topic-id='" + topicId + "']").length == 0) {
+                if(jQuery(".selected-list").children().length < selectedList_limit){
+                    var link = jQuery("<div class='dismiss'>" +
+                                        "<a href='#' title='Remove bid'>" +
+                                            '<%= image_tag ('delete_icon.png') %>' +
+                                        "</a></div>");
+                    var list = jQuery("<li class='topic'></li>").html(topic.html());
+                    jQuery(list).attr('topic-id', topicId);
+                    jQuery(list).find('div.topic-content-wrapper').prepend(link);
+                    jQuery(list).appendTo(".selected-list");
+                } else {
+                    alert('Maximum number of bids reached. Please remove any bid to continue with subsequent bids.');
+                }
+            } else {
+                alert('You have already bid for this topic. Please choose a different topic.');
+            }
+        }
 
         jQuery(".selected-list").droppable({
             addClasses: false,
@@ -19,20 +42,7 @@
             tolerance: "touch",
             drop: function(event, ui) {
                 jQuery(this).find(".placeholder").remove();
-                var topicId = ui.draggable.attr('topic-id');
-                if(jQuery(this).find("li[topic-id='" + topicId + "']").length == 0) {
-                    if(jQuery(this).children().length < selectedList_limit){
-                        var link = jQuery("<div class='dismiss'><a href='#' title='Remove bid'>x</a></div>");
-                        var list = jQuery("<li class='topic'></li>").html(ui.draggable.html());
-                        jQuery(list).attr('topic-id', topicId);
-                        jQuery(list).find('div.topic-content-wrapper').prepend(link);
-                        jQuery(list).appendTo(this);
-                    } else {
-                        alert('Maximum number of bids reached. Please remove any bid to continue with subsequent bids.');
-                    }
-                } else {
-                    alert('You have already bid for this topic. Please choose a different topic.');
-                }
+                addTopicToSelectedList(ui.draggable);
             }
         }).sortable({
             axis: "y",
@@ -73,7 +83,6 @@
         content: "";
         height: 20px;
         width: 20px;
-        /*padding: 2px;*/
         margin: 5px;
         border-radius: 20px;
         -moz-border-radius: 20px;
@@ -122,6 +131,7 @@
         background-color: #fcf8e3;
         border: 1px solid #fbeed5;
         color: #c09853;
+        cursor: pointer;
     }
     .selected-list li {
         background-color: #ebf5e6;
@@ -176,15 +186,8 @@
     }
     .dismiss {
         float: right;
-    }
-    .dismiss a {
-        position: relative;
-        top: -5px;
-        line-height: 20px;
-        font-size: 12px;
-        font-weight: bold;
-        text-decoration: none !important;
-        color: #f00;
+        padding: 4px;
+        margin-top: 4px;
     }
     .topic-content-wrapper {
         overflow: auto;
@@ -192,7 +195,7 @@
     }
 
     .topic-number, .topic-name {
-        margin-top: 1px;
+        margin-top: 3px;
         padding: 5px;
     }
     .topic-number {
@@ -201,7 +204,9 @@
         border-radius: 4px;
         -moz-border-radius: 4px;
         -webkit-border-radius: 4px;
-        background-color: #eee !important;
+        background-color: #8e8e8e !important;
+        color: #FFF;
+        font-weight: bold;
     }
     .topic-name {
         margin:0 auto;
@@ -219,18 +224,19 @@
         padding: 2px;
         margin-right: 5px;
         border-radius: 20px;
+        border: 1px solid #000;
         -moz-border-radius: 20px;
         -webkit-border-radius: 20px;
         text-align: center;
         font-weight: bold;
     }
     .bid-count-color {
-        background-color: #73A2EF !important;
-        color: #fff !important;
+        background-color: #6699FF !important;
+        color: #FFF !important;
     }
     .total-count-color {
         background-color: #FF7563 !important;
-        color: #fff !important;
+        color: #FFF !important;
     }
 </style>
 <h1>Signup sheet for <%= Assignment.find(params[:id]).name %> assignment</h1>

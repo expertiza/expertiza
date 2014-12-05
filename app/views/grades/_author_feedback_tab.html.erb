@@ -1,18 +1,6 @@
 <!-- PARTICIPANT -->
 <%
 participant = pscore[:participant]
-if pscore[:review]
-  @rscore_review=Rscore.new(pscore,:review)
-end
-if pscore[:metareview]
-  @rscore_metareview=Rscore.new(pscore,:metareview)
-end
-if pscore[:feedback]
-  @rscore_feedback=Rscore.new(pscore,:feedback)
-end
-if pscore[:teammate]
-  @rscore_teammate=Rscore.new(pscore,:teammate)
-end
 %>
 <TR  class="row" id="<%= prefix %>_feedback" style="display:none">
   <TD COLSPAN="9"><%= render :partial=>'grades/author_feedbacks', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:feedback]} %></TD>

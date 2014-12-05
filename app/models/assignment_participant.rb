@@ -282,7 +282,6 @@ class AssignmentParticipant < Participant
 
     scores[:total_score] = assignment.compute_total_score(scores)
     scores[:total_score] += compute_quiz_scores(scores)
-    # scores
 
     # move lots of calculation from view(_participant.html.erb) to model
     if self.grade

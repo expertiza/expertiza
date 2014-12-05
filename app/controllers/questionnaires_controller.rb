@@ -168,29 +168,29 @@ class QuestionnairesController < ApplicationController
                 quiz_question_choice.update_attributes(:iscorrect => '0',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
               end
             else if (@question_type.q_type=="MCR")
-                   if  params[:quiz_question_choices][questionnum.to_s][@question_type.q_type][1.to_s][:iscorrect]== i.to_s
-                     quiz_question_choice.update_attributes(:iscorrect => '1',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
-                   else
-                     quiz_question_choice.update_attributes(:iscorrect => '0',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
-                   end
-                 else if (@question_type.q_type=="TF")
-                        if  params[:quiz_question_choices][questionnum.to_s][@question_type.q_type][1.to_s][:iscorrect]== 1.to_s
-                          quiz_question_choice.update_attributes(:iscorrect => '1',:txt=>"True")
-                        else
-                          quiz_question_choice.update_attributes(:iscorrect => '1',:txt=>"False")
-                        end
-                      end
-                 end
+              if  params[:quiz_question_choices][questionnum.to_s][@question_type.q_type][1.to_s][:iscorrect]== i.to_s
+                quiz_question_choice.update_attributes(:iscorrect => '1',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
+              else
+                quiz_question_choice.update_attributes(:iscorrect => '0',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
+              end
+            else if (@question_type.q_type=="TF")
+              if  params[:quiz_question_choices][questionnum.to_s][@question_type.q_type][1.to_s][:iscorrect]== 1.to_s
+                quiz_question_choice.update_attributes(:iscorrect => '1',:txt=>"True")
+              else
+                quiz_question_choice.update_attributes(:iscorrect => '1',:txt=>"False")
+              end
             end
-            i+=1
           end
         end
-        questionnum+=1
+        i+=1
       end
-      # save
-      #save_choices @questionnaire.id
     end
-    redirect_to :controller => 'submitted_content', :action => 'edit', :id => params[:pid]
+    questionnum+=1
+  end
+  # save
+  #save_choices @questionnaire.id
+end
+redirect_to :controller => 'submitted_content', :action => 'edit', :id => params[:pid]
   end
 
   # Define a new questionnaire
@@ -564,27 +564,27 @@ class QuestionnairesController < ApplicationController
                 q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "false",:question_id => question.id)
               end
             else  if(q_type=="TF")
-                    if (params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect]==choice_key)
-                      q = QuizQuestionChoice.new(:txt => "True", :iscorrect => "true",:question_id => question.id)
-                    else
-                      q = QuizQuestionChoice.new(:txt => "False", :iscorrect => "false",:question_id => question.id)
-                    end
-                  else
-                    if (params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect]==choice_key)
-                      q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "true",:question_id => question.id)
-                    else
-                      q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "false",:question_id => question.id)
-                    end
-                  end
+              if (params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect]==choice_key)
+                q = QuizQuestionChoice.new(:txt => "True", :iscorrect => "true",:question_id => question.id)
+              else
+                q = QuizQuestionChoice.new(:txt => "False", :iscorrect => "false",:question_id => question.id)
+              end
+            else
+              if (params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect]==choice_key)
+                q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "true",:question_id => question.id)
+              else
+                q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "false",:question_id => question.id)
+              end
             end
-            q.save
           end
+          q.save
         end
-        questionnum += 1
-        question.weight = 1
-        question.true_false = false
       end
+      questionnum += 1
+      question.weight = 1
+      question.true_false = false
     end
+  end
   end
 
   private

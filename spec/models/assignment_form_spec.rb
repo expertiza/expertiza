@@ -47,8 +47,6 @@ describe AssignmentForm do
   describe "#create_assignment_node" do
     it "creates an assignment node" do
       expect(Assignment).to receive(:new).and_return assignment
-      expect(AssignmentQuestionnaire).to receive(:new).and_return assignment_questionnaire
-      expect(DueDate).to receive(:new).and_return due_date
       expect(assignment).to receive(:create_node)
       assignment_form.create_assignment_node
     end
@@ -57,8 +55,6 @@ describe AssignmentForm do
   describe ".set_up_defaults" do
     it "sets up default values" do
       expect(Assignment).to receive(:new).and_return assignment
-      expect(AssignmentQuestionnaire).to receive(:new).and_return assignment_questionnaire
-      expect(DueDate).to receive(:new).and_return due_date
       expect(assignment).to receive(:require_signup).and_return false
       expect(assignment).to receive(:wiki_type)
       expect(WikiType).to receive(:find_by_name)
@@ -86,8 +82,6 @@ describe AssignmentForm do
   describe "#set_up_assignment_review" do
     it "set up assignment review" do
       expect(Assignment).to receive(:new).and_return assignment
-      expect(AssignmentQuestionnaire).to receive(:new).and_return assignment_questionnaire
-      expect(DueDate).to receive(:new).and_return due_date
       expect(assignment).to receive(:require_signup).and_return false
       expect(assignment).to receive(:wiki_type)
       expect(WikiType).to receive(:find_by_name)

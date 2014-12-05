@@ -1,12 +1,6 @@
 <!-- PARTICIPANT -->
 <%
     participant = pscore[:participant]
-# if pscore[:review]
-#   s_max = pscore[:review][:scores][:max]
-#   s_min = pscore[:review][:scores][:min]
-#   s_avg = pscore[:review][:scores][:avg]
-# end
-
 %>
 
 
@@ -24,7 +18,6 @@
   <TR class="row" <% if team %> id="<%= prefix %>" style="display:none" <% end %>>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= participant.fullname %>
     <% if participant.topic %> (<%= participant.topic.topic_identifier %>)<% end %>
-      <%= "AAAAAAAAAAA" %>
   </FONT>
 </TD>
 <% if @rscore_review.my_avg %>

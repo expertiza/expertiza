@@ -2,182 +2,149 @@ class AssignmentForm
 
   attr_accessor :assignment, :assignment_questionnaires, :due_dates
 
+  DEFAULT_MAX_TEAM_SIZE = 1
+  DEFAULT_WIKI_TYPE_ID = 1
 
-  def initialize(attributes={})
-    @assignment = Assignment.new(attributes[:assignment])
-
-    #code for new assignment creation
-    if attributes[:assignment].nil?
-      @assignment.course = Course.find(attributes[:parent_id]) if attributes[:parent_id]
+  def initialize(args={})
+    @assignment = Assignment.new(args[:assignment])
+    if args[:assignment].nil?
+      @assignment.course = Course.find(args[:parent_id]) if args[:parent_id]
       @assignment.instructor = @assignment.course.instructor if @assignment.course
-      @assignment.wiki_type_id = 1 #default no wiki type
-      @assignment.max_team_size = 1
+      @assignment.wiki_type_id = DEFAULT_WIKI_TYPE_ID
+      @assignment.max_team_size = DEFAULT_MAX_TEAM_SIZE
     end
-
-    @assignment_questionnaires=[]
-    unless attributes[:assignment_questionnaires].nil?
-      attributes[:assignment_questionnaires].each do |assignment_questionnaire|
-        @assignment_questionnaires << AssignmentQuestionnaire.new(assignment_questionnaire)
-      end
-    end
-
-    @due_dates=[]
-    unless attributes[:due_dates].nil?
-      attributes[:due_dates].each do |due_date|
-        @due_dates << DueDate.new(due_date)
-      end
-    end
+    @assignment_questionnaires=Array(args[:assignment_questionnaires])
+    @due_dates=Array(args[:due_dates])
   end
 
   #create a form object for this assignment_id
-  #handle assignment quessionaire and duedate
   def self.create_form_object(assignment_id)
     assignment_form = AssignmentForm.new
     assignment_form.assignment = Assignment.find(assignment_id)
     assignment_form.assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment_id)
     assignment_form.due_dates = DueDate.where(assignment_id: assignment_id)
-
     assignment_form.set_up_assignment_review
-
-    return assignment_form
+    assignment_form
   end
 
-
-  def update_attributes(attributes)
-
-    has_errors = false;
+  def update(attributes)
+    @has_errors = false;
     has_late_policy = false;
-
-
     if attributes[:assignment][:late_policy_id].to_i > 0
       has_late_policy=true
     else
       attributes[:assignment][:late_policy_id] = nil
     end
-
-    #Code to update values of assignments
-    unless @assignment.update_attributes(attributes[:assignment])
-      @errors =@errors + @assignment.errors
-      has_errors = true;
+    update_assignment(attributes[:assignment])
+    update_assignment_questionnaires(attributes[:assignment_questionnaire])
+    update_due_dates(attributes[:due_date])
+    #delete the old queued items and recreate new ones if the assignment has late policy.
+    if attributes[:due_date] and !@has_errors and has_late_policy
+      delete_from_delayed_queue
+      add_to_delayed_queue
     end
-
-   #code to save assigment questionaires
-    i =0 ;
-    while i < attributes[:assignment_questionnaire].length
-      if attributes[:assignment_questionnaire][i][:id].nil? or attributes[:assignment_questionnaire][i][:id].blank?
-        assignment_questionnaire = AssignmentQuestionnaire.new(attributes[:assignment_questionnaire][i])
-        unless assignment_questionnaire.save
-          @errors =@errors + @assignment.errors
-          has_errors = true;
-        end
-      else
-        assignment_questionnaire = AssignmentQuestionnaire.find(attributes[:assignment_questionnaire][i][:id])
-        unless assignment_questionnaire.update_attributes(attributes[:assignment_questionnaire][i]);
-          @errors =@errors + @assignment.errors
-          has_errors = true;
-        end
-      end
-      i=i+1;
-    end
-
-  #code to save due dates
-  i =0 ;
-  while i < attributes[:due_date].length
-    if attributes[:due_date][i][:id].nil? or attributes[:due_date][i][:id].blank?
-      if attributes[:due_date][i][:due_at].blank? then
-        i=i+1;
-        next
-      end
-      due_date = DueDate.new(attributes[:due_date][i])
-      unless due_date.save
-        @errors =@errors + @assignment.errors
-        has_errors = true;
-      end
-    else
-      due_date = DueDate.find(attributes[:due_date][i][:id])
-      unless due_date.update_attributes(attributes[:due_date][i]);
-        @errors =@errors + @assignment.errors
-        has_errors = true;
-      end
-    end
-    i=i+1;
+    !@has_errors;
   end
 
-   #delete the old queued items and recreate new ones if the assignment has late policy.
-   if attributes[:due_date] and !has_errors and has_late_policy
+  alias update_attributes update
 
-     # delete the previous jobs from the delayed_jobs table
-     djobs = Delayed::Job.where(['handler LIKE "%assignment_id: ?%"', @assignment.id])
-     for dj in djobs
-       delete_from_delayed_queue(dj.id)
-     end
+  #Code to update values of assignment
+  def update_assignment(attributes)
+    if !@assignment.update_attributes(attributes)
+      @errors =@errors + @assignment.errors
+      @has_errors = true;
+    end
+  end
 
-     add_to_delayed_queue
-   end
+  #code to save assignment questionnaires
+  def update_assignment_questionnaires(attributes)
+    attributes.each do |assignment_questionnaire|
+      if assignment_questionnaire[:id].nil? or assignment_questionnaire[:id].blank?
+        aq = AssignmentQuestionnaire.new(assignment_questionnaire)
+        if !aq.save
+          @errors =@errors + @assignment.errors
+          @has_errors = true;
+        end
+      else
+        aq = AssignmentQuestionnaire.find(assignment_questionnaire[:id])
+        if !aq.update_attributes(assignment_questionnaire);
+          @errors =@errors + @assignment.errors
+          @has_errors = true;
+        end
+      end
+      end
+  end
 
-  return !has_errors;
-
+  #code to save due dates
+  def update_due_dates(attributes)
+    attributes.each do |due_date|
+      if due_date[:id].nil? or due_date[:id].blank?
+        if due_date[:due_at].blank? then
+          next
+        end
+        dd = DueDate.new(due_date)
+        if !dd.save
+          @errors =@errors + @assignment.errors
+          @has_errors = true;
+        end
+      else
+        dd = DueDate.find(due_date[:id])
+        if !dd.update_attributes(due_date);
+          @errors =@errors + @assignment.errors
+          @has_errors = true;
+        end
+      end
+    end
   end
 
   #Adds items to delayed_jobs queue for this assignment
   def add_to_delayed_queue
     duedates = DueDate::where(assignment_id: @assignment.id)
-    for i in (0 .. duedates.length-1)
-      deadline_type = DeadlineType.find(duedates[i].deadline_type_id).name
-      due_at = duedates[i].due_at.to_s(:db)
+    duedates.each do |due_date|
+      deadline_type = DeadlineType.find(due_date.deadline_type_id).name
+      due_at = due_date.due_at.to_s(:db)
       Time.parse(due_at)
       due_at= Time.parse(due_at)
       mi=find_min_from_now(due_at)
-      diff = mi-(duedates[i].threshold)*60
+      diff = mi-(due_date.threshold)*60
       if diff>0
-        dj=Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type, duedates[i].due_at.to_s(:db)),
+        dj=Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type, due_date.due_at.to_s(:db)),
                                 1, diff.minutes.from_now)
-        duedates[i].update_attribute(:delayed_job_id, dj.id)
+        due_date.update_attribute(:delayed_job_id, dj.id)
       end
     end
   end
 
   # Deletes the job with id equal to "delayed_job_id" from the delayed_jobs queue
-  def delete_from_delayed_queue(delayed_job_id)
-    dj=Delayed::Job.find(delayed_job_id)
-    if (dj != nil && dj.id != nil)
-      dj.delete
+  def delete_from_delayed_queue
+    djobs = Delayed::Job.where(['handler LIKE "%assignment_id: ?%"', @assignment.id])
+    for dj in djobs
+      dj=Delayed::Job.find(delayed_job_id)
+      if (dj != nil && dj.id != nil)
+        dj.delete
+      end
     end
   end
 
   def delete(force=nil)
-    # If the assignment is already deleted, go back to the list of assignments
-
-        #delete from delayed_jobs queue
-        djobs = Delayed::Job.where(['handler LIKE "%assignment_id: ?%"', assignment.id])
-        for dj in djobs
-          delete_from_delayed_queue(dj.id)
-        end
-
+        #delete from delayed_jobs queue related to this assignment
+        delete_from_delayed_queue
         @assignment.delete(force)
-
-        nodes = Node.where(['node_object_id = ? and type = ?', @assignment.id, 'AssignmentNode'])
-        for node in nodes
-          node.destroy
-        end
-
-      end
+  end
   # This functions finds the epoch time in seconds of the due_at parameter and finds the difference of it
   # from the current time and returns this difference in minutes
   def find_min_from_now(due_at)
-
     curr_time=DateTime.now.to_s(:db)
     curr_time=Time.parse(curr_time)
     time_in_min=((due_at - curr_time).to_i/60)
-    return time_in_min
+    time_in_min
   end
 
-#Save the assignment
-  # handle assignmentquesionnaire and duedate
+  #Save the assignment
   def save
     @assignment.save
   end
-
+  #create a node for the assignment
   def create_assignment_node
     if !@assignment.nil?
      @assignment.create_node
@@ -229,7 +196,6 @@ class AssignmentForm
     end
   end
 
-
   def is_coding_assignment
   if @assignment.is_coding_assignment .nil?
       @assignment.is_coding_assignment  = false
@@ -270,32 +236,27 @@ class AssignmentForm
 
   #Copies the inputted assignment into new one and returns the new assignment id
   def self.copy(assignment_id,user)
-
     Assignment.record_timestamps = false
     old_assign = Assignment.find(assignment_id)
     new_assign = old_assign.dup
-
     user.set_instructor(new_assign)
     new_assign.update_attribute('name', 'Copy of ' + new_assign.name)
     new_assign.update_attribute('created_at', Time.now)
     new_assign.update_attribute('updated_at', Time.now)
-
     if new_assign.directory_path.present?
       new_assign.update_attribute('directory_path', new_assign.directory_path + '_copy')
     end
-
     new_assign.copy_flag = true
-
     if new_assign.save
       Assignment.record_timestamps = true
       copy_assignment_questionnaire(old_assign,new_assign)
       DueDate.copy(old_assign.id, new_assign.id)
-      new_assign.create_node()
+      new_assign.create_node
       new_assign_id=new_assign.id
     else
       new_assign_id=nil
     end
-    return new_assign_id
+    new_assign_id
   end
 
   def self.copy_assignment_questionnaire (old_assign, new_assign)

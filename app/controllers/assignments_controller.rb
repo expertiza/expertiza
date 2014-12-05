@@ -18,7 +18,7 @@ class AssignmentsController < ApplicationController
   end
 
   def new
-    @assignment_form = AssignmentForm.new(params)
+    @assignment_form = AssignmentForm.new
     @assignment_form.assignment.instructor ||= current_user
   end
 
@@ -53,7 +53,6 @@ class AssignmentsController < ApplicationController
   end
 
   def update
-
     @assignment_form= AssignmentForm.create_form_object(params[:id])
     params[:assignment_form][:assignment][:wiki_type_id] = 1 unless params[:assignment_wiki_assignment]
 
@@ -67,20 +66,15 @@ class AssignmentsController < ApplicationController
         # Probably there are 2 different operations:
         #  - rename an assgt. -- implemented by renaming a directory
         #  - assigning an assignment to a course -- implemented by moving a directory.
-
-
       else
         flash[:error] = "Assignment save failed: #{@assignment_form.errors.full_messages.join(' ')}"
     end
-
     redirect_to :action => 'edit', :id => @assignment_form.assignment.id
-
-end
+  end
 
   def show
     @assignment = Assignment.find(params[:id])
   end
-
 
   #--------------------------------------------------------------------------------------------------------------------
   # GET_PATH (Helper function for CREATE and UPDATE)
@@ -95,7 +89,6 @@ end
     end
     return file_path
   end
-
 
   #--------------------------------------------------------------------------------------------------------------------
   # COPY_PARTICIPANTS_FROM_COURSE
@@ -122,7 +115,6 @@ end
     @user = session[:user]
     session[:copy_flag] = true
     new_assign_id=AssignmentForm.copy(params[:id],@user)
-
     if !new_assign_id.nil?
       flash[:note] = 'Warning: The submission directory for the copy of this assignment will be the same as the submission directory for the existing assignment, which will allow student submissions to one assignment to overwrite submissions to the other assignment.  If you do not want this to happen, change the submission directory in the new copy of the assignment.'
       redirect_to :action => 'edit', :id => new_assign_id
@@ -132,16 +124,13 @@ end
     end
   end
 
-
     #--------------------------------------------------------------------------------------------------------------------
     # DELETE
     # TODO: not been cleanup yep
     #--------------------------------------------------------------------------------------------------------------------
     def delete
-
       begin
         @assignment_form = AssignmentForm.create_form_object(params[:id])
-
         @user = session[:user]
         id = @user.get_instructor
         if (id != @assignment_form.assignment.instructor_id)
@@ -155,9 +144,7 @@ end
           url_no = url_for :action => 'delete', :id => params[:id]
           error = $!
           flash[:error] = error.to_s + " Delete this assignment anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
-
       end
-
       redirect_to :controller => 'tree_display', :action => 'list'
     end
 

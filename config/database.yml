@@ -12,19 +12,19 @@ test:
   adapter: mysql2
   database: expertiza_test
   username: root
-  password: 
+  password:
   host: localhost
 
 cucumber:
   adapter: mysql
   database: expertiza_cucumber
   username: root
-  password: 
+  password:
   host: localhost
 
 production:
   adapter: mysql
   database: expertiza_production
   username: expertiza
-  password: 
+  password:
   host: localhost

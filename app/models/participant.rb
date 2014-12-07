@@ -139,7 +139,7 @@ class Participant < ActiveRecord::Base
         scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
       end
       scores[:total_score] = assignment.compute_total_score(scores)
-      
+
       scores
     end
   end

@@ -2,7 +2,7 @@ development:
   adapter: mysql2
   database: expertiza_development
   username: root
-  password: 12345678
+  password:
   host: localhost
 
 # Warning: The database defined as 'test' will be erased and
@@ -12,14 +12,14 @@ test:
   adapter: mysql2
   database: expertiza_test
   username: root
-  password: 12345678
+  password:
   host: localhost
 
 cucumber:
   adapter: mysql
   database: expertiza_cucumber
   username: root
-  password: 12345678
+  password:
   host: localhost
 
 production:

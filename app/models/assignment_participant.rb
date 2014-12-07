@@ -271,7 +271,7 @@ class AssignmentParticipant < Participant
         scores[:max_pts_available] = topic.micropayment
       end
     end
-    
+
     # for all quiz questionnaires (quizzes) taken by the participant
     quiz_responses = Array.new
     quiz_response_mappings = QuizResponseMap.where(reviewer_id: self.id)
@@ -387,7 +387,7 @@ class AssignmentParticipant < Participant
   def get_quizzes_taken
     return QuizResponseMap.get_assessments_for(self)
   end
-  
+
   def metareviews
     MetareviewResponseMap.get_assessments_for(self)
   end

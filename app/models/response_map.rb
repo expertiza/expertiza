@@ -8,8 +8,8 @@ class ResponseMap < ActiveRecord::Base
 
   # return latest versions of the responses
   def self.get_assessments_for(participant)
-
     responses = Array.new
+    stime=Time.now
 
     if participant
       @array_sort=Array.new

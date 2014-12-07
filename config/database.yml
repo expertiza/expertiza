@@ -26,5 +26,5 @@ production:
   adapter: mysql
   database: expertiza_production
   username: expertiza
-  password: 
+  password:
   host: localhost

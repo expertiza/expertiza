@@ -15,7 +15,6 @@ class ResponseMap < ActiveRecord::Base
     if participant
       @array_sort=Array.new
       @sort_to=Array.new
-      @test = Array.new
 
       #get all the versions
       maps = where(reviewee_id: participant.id)
@@ -24,7 +23,6 @@ class ResponseMap < ActiveRecord::Base
           # new method to find all response
           @all_resp=Response.find_by_map_id(map.map_id)
           @array_sort << @all_resp
-          @test << map
 
           # the original method get all response back and then filter the map_id
           # we modified that and using the query to find the exact response which are useful, saves 90% the time on doing filtering.

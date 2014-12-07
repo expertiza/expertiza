@@ -226,7 +226,6 @@ GEM
     rack (1.5.2)
     rack-test (0.6.2)
       rack (>= 1.0)
-    railroady (1.2.0)
     rails (4.1.5)
       actionmailer (= 4.1.5)
       actionpack (= 4.1.5)
@@ -469,7 +468,6 @@ DEPENDENCIES
   pry
   pry-nav
   pry-remote
-  railroady
   rails
   rails4-autocomplete
   rake

@@ -1,4 +1,4 @@
-<% if session[:user].role.name == "Teaching Assistant" and TaMapping.find_by_ta_id(session[:user])
+<% if session[:user].role.name == "Teaching Assistant" && TaMapping.find_by_ta_id(session[:user])
      user_id = Ta.get_my_instructor(session[:user].id)
 else
   user_id = session[:user].id

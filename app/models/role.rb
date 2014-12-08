@@ -43,8 +43,6 @@ class Role < ActiveRecord::Base
     @@superadministrator_role ||= find_by_name 'Super-Administrator'
   end
 
-
-
   def super_admin?
     name['Super-Administrator']
   end

@@ -57,14 +57,14 @@ describe 'Student can bring up review form', :type => :feature do
     expect(page).to have_content('Your work')
 	  click_link 'Your work'
 	
-  #fill in the submission with a valid URL and upload it
-  fill_in 'submission', with: 'https://github.com/goldsy/expertiza'
+    #fill in the submission with a valid URL and upload it
+    fill_in 'submission', with: 'https://github.com/goldsy/expertiza'
     click_on 'Upload link'
     expect(page).to have_content('https://github.com/goldsy/expertiza') 
-	  log_out
+    log_out
      
-#Log in with third user to review the submission 
-log_in_as_user(student3)
+    #Log in with third user to review the submission 
+    log_in_as_user(student3)
     click_link assignment.name
     expect(page).to have_content("Others' work")
     click_link "Others' work"
@@ -72,6 +72,8 @@ log_in_as_user(student3)
     
     #A bug in the ReviewMappingController class is preventing the topic to be selected for review
     #click_on 'Request a new submission to review'
-	  # expect(page).to have_content('Begin')
+    # expect(page).to have_content('Begin')
+    # click_link 'Begin'
+    # expect(page).to have_content('Question')
  end
 end

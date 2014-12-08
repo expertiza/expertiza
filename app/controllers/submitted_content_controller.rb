@@ -47,7 +47,7 @@ end
 
 # Note: This is not used yet in the view until we all decide to do so
 def remove_hyperlink
-  @participant = AssignmentParticipant.find(params[:id])
+
   @participant = AssignmentParticipant.find(params[:id])
   @participant = AssignmentParticipant.find(params[:hyperlinks][:participant_id])
 

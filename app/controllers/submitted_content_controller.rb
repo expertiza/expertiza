@@ -47,7 +47,10 @@ end
 
 # Note: This is not used yet in the view until we all decide to do so
 def remove_hyperlink
+<<<<<<< HEAD
 
+=======
+>>>>>>> 00694ae84acf8e585d0d7c33ac19217dac0b99da
   @participant = AssignmentParticipant.find(params[:id])
   @participant = AssignmentParticipant.find(params[:hyperlinks][:participant_id])
 

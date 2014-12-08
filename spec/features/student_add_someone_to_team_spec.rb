@@ -48,5 +48,17 @@ describe 'Student adds someone to team', :type => :feature do
 
     # Expect team name to be displayed under 'Team members'
     expect(page).to have_content(team_name)
+    
+    # Switch to student1
+    log_out
+    log_in_as_user(student1)
+    
+    # Navigate to the assignment team page
+    click_link assignment.name
+    click_link 'Your team'
+
+    # Expect student2 name to be displayed under 'Team Members'
+    expect(page).to have_content(student2.name)
+
   end
 end

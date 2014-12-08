@@ -62,9 +62,6 @@ class AssignmentTeam < Team
   end
 
   def get_hyperlinks
-   # links = Array.new
-   # self.get_participants.each { |team_member| links.concat(team_member.get_hyperlinks_array)}
-    #links.uniq
     get_participants.flat_map(&:get_hyperlinks_array).uniq
   end
 

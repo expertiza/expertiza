@@ -54,23 +54,28 @@ describe 'Student can fill up review form', :type => :feature do
     # Log in with first user to create a submission
     log_in_as_user(student1)
     click_link assignment.name
-	  expect(page).to have_content('Your work')
-	  click_link 'Your work'
+    expect(page).to have_content('Your work')
+    click_link 'Your work'
 	
-	 #fill in the submission with a valid URL and upload it
-	 fill_in 'submission', with: 'https://github.com/goldsy/expertiza'
-   click_on 'Upload link'
-   expect(page).to have_content('https://github.com/goldsy/expertiza') 
-	 log_out
+    #fill in the submission with a valid URL and upload it
+    fill_in 'submission', with: 'https://github.com/goldsy/expertiza'
+    click_on 'Upload link'
+    expect(page).to have_content('https://github.com/goldsy/expertiza') 
+    log_out
      
-	 #Log in with third user to review the submission 
-	 log_in_as_user(student3)
-   click_link assignment.name
-   expect(page).to have_content("Others' work")
-   click_link "Others' work"
-   check 'i_dont_care'
-   #A bug in the ReviewMappingController class is preventing the topic to be selected for review
-   #click_on 'Request a new submission to review'
-	 # expect(page).to have_content('Begin')
+    #Log in with third user to review the submission 
+    log_in_as_user(student3)
+    click_link assignment.name
+    expect(page).to have_content("Others' work")
+    click_link "Others' work"
+    check 'i_dont_care'
+   
+    #A bug in the ReviewMappingController class is preventing the topic to be selected for review
+    #click_on 'Request a new submission to review'
+    # expect(page).to have_content('Begin')
+    # click_link 'Begin'
+    # expect(page).to have_content('Question')
+    # fill_in 'responses[0][comment]', with:"test"
+    # click_on 'save'
  end
  end

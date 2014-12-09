@@ -71,9 +71,9 @@ describe 'Student can bring up review form', :type => :feature do
     check 'i_dont_care'
     
     #A bug in the ReviewMappingController class is preventing the topic to be selected for review
-    #click_on 'Request a new submission to review'
-    # expect(page).to have_content('Begin')
-    # click_link 'Begin'
-    # expect(page).to have_content('Question')
+    click_on 'Request a new submission to review'
+    expect(page).to have_content('Begin')
+    click_link 'Begin'
+    expect(page).to have_content('Question')
  end
 end

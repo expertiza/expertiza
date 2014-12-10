@@ -58,7 +58,7 @@
           gradingTypes = "<select id=question_" + id + "_true_false name=question_type["+id+"][type]>"
 
             <% for type in Question::GRADING_TYPES_CUSTOM %>
- <%= "gradingTypes += '<option value=" + type[0].to_s + ">" + type[0].to_s + "</option>';"%>
+ <%= ("gradingTypes += '<option value=" + type[0].to_s + ">" + type[0].to_s + "</option>';").html_safe%>
 
             <% end %>
             //gradingTypes += "<option selected=selected value="+type_str+">"+type_str+"</option>";
@@ -66,7 +66,7 @@
         }else{
           gradingTypes = "<select id=question_" + id + "_true_false name=new_question[" + id + "][true_false]>";
             <% for type in Question::GRADING_TYPES %>
- <%= "gradingTypes += '<option value=" + type[1].to_s + ">" + type[0].to_s + "</option>';"%>
+ <%= ("gradingTypes += '<option value=" + type[1].to_s + ">" + type[0].to_s + "</option>';").html_safe%>
             <% end %>
         }
         gradingTypes += "</select>"
@@ -82,7 +82,7 @@
         column = document.createElement("td");
         weights = "<select id=new_question_" + id + "_weight name=new_question[" + id +"][weight]>";
         <% for weight in Question::WEIGHTS %>
- <%= "weights += '<option value=" + weight[1].to_s + ">" + weight[0].to_s + "</option>';"%>
+ <%= ("weights += '<option value=" + weight[1].to_s + ">" + weight[0].to_s + "</option>';").html_safe%>
         <% end %>
         weights = weights + "</select>";
         column.innerHTML = weights;

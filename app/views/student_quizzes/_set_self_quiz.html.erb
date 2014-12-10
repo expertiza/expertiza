@@ -1,0 +1,22 @@
+<% form_tag :controller => 'review_mapping',
+  :action => 'add_quiz_response_map',
+  :assignment_id => assignment.id,
+  :reviewer_id => session[:user].id,
+  :participant_id => @participant.id do %>
+
+  <% if assignment.sign_up_topics.count > 0 %>
+    <p><b>Select a quiz to begin:</b></p>
+    <%= hidden_field_tag :assignment_id, assignment.id%>
+    <% quizzes = StudentQuizzesController.take_quiz(assignment.id, session[:user].id) %>
+    <% if quizzes.count > 0 %>
+      <% quizzes.each do |quiz| #StudentQuizzesController.take_quiz(assignment.id, session[:user].id).each do |questionnaire| %>
+        <%= radio_button_tag :questionnaire_id, quiz.id %> <%= quiz.id %>: <%=h quiz.name %><br>
+      <% end %><br><br>
+      <input type='submit' value='Select Quiz'/>
+    <% else %>
+      <%= "There are no more available quizzes"%>
+      <br>
+    <% end %>
+    <br />
+  <% end %>
+<% end %>

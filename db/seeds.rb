@@ -12,11 +12,13 @@ Permission.create(:name => 'administer assignments')
 Permission.create(:name => 'do assignments')
 Permission.create(:name => 'administer instructors')
 Permission.create(:name => 'administer courses')
+puts 'permissions'
 
 ###### markup_styles
 MarkupStyle.create(:name => 'Textile')
 MarkupStyle.create(:name => 'Markdown')
 
+puts 'markup'
 ###### site_controllers
 SiteController.create(:name => 'content_pages', :builtin => true, :permission_id => Permission.find_by_name('administer goldberg').id)
 SiteController.create(:name => 'controller_actions', :builtin => true, :permission_id => Permission.find_by_name('administer goldberg').id)
@@ -68,6 +70,7 @@ SiteController.create(:name => 'delete_object', :builtin => false, :permission_i
 SiteController.create(:name => 'advertise_for_partner', :builtin => false, :permission_id => Permission.find_by_name('do assignments').id)
 SiteController.create(:name => 'join_team_requests', :builtin => false, :permission_id => Permission.find_by_name('do assignments').id)
 
+puts 'SiteController'
 ###### content_pages
 ContentPage.create(:title => 'Home Page', :name => 'home', :markup_style_id => MarkupStyle.find_by_name('Textile').id, :permission_id => Permission.find_by_name('public pages - view').id,
   :content => "<h1>Welcome to Expertiza</h1> <p> The Expertiza project is a system for using peer review to create reusable learning objects.  Students do different assignments; then peer review selects the best work in each category, and assembles it to create a single unit.</p>",
@@ -94,6 +97,7 @@ ContentPage.create(:title => 'Credits and License', :name => 'credits', :markup_
   :content => "h1. Credits and License\n\nGoldberg contains original material and third-party material from various sources.\n\nAll original material is (p) Public Domain, No Rights Reserved.  Goldberg comes with no warranty whatsoever.\n\nThe copyright for any third party material remains with the original author, and the material is distributed here under the original terms.  \n\nMaterial has been selected from sources with licensing terms and conditions that allow use and redistribution for both personal and business purposes.  These licences include public domain, BSD-style licences, and Creative Commons licences (but *not* Creative Commons Non-Commercial).\n\nIf you are an author and you believe your copyrighted material has been included in Goldberg in breach of your licensing terms and conditions, please contact Dave Nelson (urbanus at 240gl dot org).\n\n\nh2. Layouts\n\nGoldberg comes with a choice of layouts, adapted from various sources.\n\nh3. The Default\n\nThe default layout is a modified version of Andreas09 by Anreas Viklund.  Andreas09 is distributed under free/unlicensed terms, with an informal request that credit be given to the original author.  The original template can be obtained from \"Open Source Web Design\":http://www.oswd.org/design/preview/id/2493/.\n\nAuthor''s website: \"andreasviklund.com\":http://andreasviklund.com/.\n\n\nh3. \"Earth Wind and Fire\"\n\nOriginally designed by Brett Hillesheim (brett7481 at msn dot com) and distributed under free terms (from the MadSeason website: \"Every template we create is completely open source, meaning you can take it and do whatever you want with it\").  The original template can be obtained from \"Open Source Web Design\":http://www.oswd.org/design/preview/id/2453/.\n\nAuthor''s website: \"www.madseason.co.uk\":http://www.madseason.co.uk/.\n\n\nh3. \"Snooker\"\n\n\"Snooker\" is an original design and is therefore Public Domain.  It incorporates dynamic two-column layout techniques described on the \"A List Apart\":http://alistapart.com/articles/negativemargins website.\n\n\nh3. \"Spoiled Brat\"\n\nOriginally designed by \"Rayk Web Design\":http://www.raykdesign.net/ and distributed under the terms of the \"Creative Commons Attribution Share Alike\":http://creativecommons.org/licenses/by-sa/2.5/legalcode licence.  The original template can be obtained from \"Open Web Design\":http://www.openwebdesign.org/viewdesign.phtml?id=2894/.\n\nAuthor''s website: \"www.csstinderbox.com\":http://www.csstinderbox.com/.\n\n\nh2. Other Features\n\nGoldberg also contains some miscellaneous code and techniques from other sources.\n\nh3. Suckerfish Menus\n\nThe three templates \"Earth Wind and Fire\", \"Snooker\" and \"Spoiled Brat\" have all been configured to use Suckerfish menus.  This technique of using a combination of CSS and Javascript to implement dynamic menus was first described by \"A List Apart\":http://www.alistapart.com/articles/dropdowns/.  Goldberg''s implementation also incorporates techniques described by \"HTMLDog\":http://www.htmldog.com/articles/suckerfish/dropdowns/.\n\nh3. Tabbed Panels\n\nGoldberg''s implementation of tabbed panels was adapted from \n\"InternetConnection\":http://support.internetconnection.net/CODE_LIBRARY/Javascript_Show_Hide.shtml.\n",
   :content_cache => "<h1>Credits and Licence</h1>\n\n\n  <p>Goldberg contains original material and third party material from various sources.</p>\n\n\n <p>All original material is (p) Public Domain, No Rights Reserved.  Goldberg comes with no warranty whatsoever.</p>\n\n\n <p>The copyright for any third party material remains with the original author, and the material is distributed here under the original terms.</p>\n\n\n  <p>Material has been selected from sources with licensing terms and conditions that allow use and redistribution for both personal and business purposes.  These licences include public domain, <span class=\"caps\">BSD</span>-style licences, and Creative Commons licences (but <strong>not</strong> Creative Commons Non-Commercial).</p>\n\n\n  <p>If you are an author and you believe your copyrighted material has been included in Goldberg in breach of your licensing terms and conditions, please contact Dave Nelson (urbanus at 240gl dot org).</p>\n\n\n  <h2>Layouts</h2>\n\n\n  <p>Goldberg comes with a choice of layouts, adapted from various sources.</p>\n\n\n <h3>The Default</h3>\n\n\n  <p>The default layout is a modified version of Andreas09 by Anreas Viklund.  Andreas09 is distributed under free/unlicensed terms, with an informal request that credit be given to the original author.  The original template can be obtained from <a href=\"http://www.oswd.org/design/preview/id/2493/\">Open Source Web Design</a>.</p>\n\n\n  <p>Author&#8217;s website: <a href=\"http://andreasviklund.com/\">andreasviklund.com</a>.</p>\n\n\n <h3>&#8220;Earth Wind and Fire&#8221;</h3>\n\n\n  <p>Originally designed by Brett Hillesheim (brett7481 at msn dot com) and distributed under free terms (from the MadSeason website: &#8220;Every template we create is completely open source, meaning you can take it and do whatever you want with it&#8221;).  The original template can be obtained from <a href=\"http://www.oswd.org/design/preview/id/2453/\">Open Source Web Design</a>.</p>\n\n\n  <p>Author&#8217;s website: <a href=\"http://www.madseason.co.uk/\">www.madseason.co.uk</a>.</p>\n\n\n <h3>&#8220;Snooker&#8221;</h3>\n\n\n  <p>&#8220;Snooker&#8221; is an original design and is therefore Public Domain.  It incorporates dynamic two-column layout techniques described on the <a href=\"http://alistapart.com/articles/negativemargins\">A List Apart</a> website.</p>\n\n\n  <h3>&#8220;Spoiled Brat&#8221;</h3>\n\n\n <p>Originally designed by <a href=\"http://www.raykdesign.net/\">Rayk Web Design</a> and distributed under the terms of the <a href=\"http://creativecommons.org/licenses/by-sa/2.5/legalcode\">Creative Commons Attribution Share Alike</a> licence.  The original template can be obtained from <a href=\"http://www.openwebdesign.org/viewdesign.phtml?id=2894/\">Open Web Design</a>.</p>\n\n\n <p>Author&#8217;s website: <a href=\"http://www.csstinderbox.com/\">www.csstinderbox.com</a>.</p>\n\n\n <h2>Other Features</h2>\n\n\n <p>Goldberg also contains some miscellaneous code and techniques from other sources.</p>\n\n\n  <h3>Suckerfish Menus</h3>\n\n\n <p>The three templates &#8220;Earth Wind and Fire&#8221;, &#8220;Snooker&#8221; and &#8220;Spoiled Brat&#8221; have all been configured to use Suckerfish menus.  This technique of using a combination of <span class=\"caps\">CSS</span> and Javascript to implement dynamic menus was first described by <a href=\"http://www.alistapart.com/articles/dropdowns/\">A List Apart</a>.  Goldberg&#8217;s implementation also incorporates techniques described by <a href=\"http://www.htmldog.com/articles/suckerfish/dropdowns/\">HTMLDog</a>.</p>\n\n\n <h3>Tabbed Panels</h3>\n\n\n  <p>Goldberg&#8217;s implementation of tabbed panels was adapted from \n<a href=\"http://support.internetconnection.net/CODE_LIBRARY/Javascript_Show_Hide.shtml\">InternetConnection</a>.</p>")
 
+puts 'ContentPage'
 ###### controller_actions
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('content_pages').id, :name => 'view_default', :permission_id => Permission.find_by_name('public pages - view').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('content_pages').id, :name => 'view', :permission_id => Permission.find_by_name('public pages - view').id, :url_to_use => '')
@@ -180,6 +184,7 @@ ControllerAction.create(:site_controller_id => SiteController.find_by_name('join
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('join_team_requests').id, :name => 'show', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 ControllerAction.create(:site_controller_id => SiteController.find_by_name('join_team_requests').id, :name => 'update', :permission_id => Permission.find_by_name('do assignments').id, :url_to_use => '')
 
+puts 'ControllerAction'
 ###### menu_items
 MenuItem.create(:parent_id => nil, :name => 'home', :label => 'Home', :seq => 1, :content_page_id => ContentPage.find_by_name('home').id, 
   :controller_action_id => nil)
@@ -250,6 +255,7 @@ MenuItem.create(:parent_id => MenuItem.find_by_name('show').id, :name => 'show/a
 MenuItem.create(:parent_id => MenuItem.find_by_name('show').id, :name => 'show/instructors', :label => 'Instructors', :seq => 4, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('admin').id, name:  'list_instructors').first.id)
 
+puts 'MenuItem'
 ###### roles
 Role.create(:name => 'Student', :parent_id => nil)
 Role.create(:name => 'Teaching Assistant', :parent_id => Role.find_by_name('Student').id)
@@ -257,6 +263,7 @@ Role.create(:name => 'Instructor', :parent_id => Role.find_by_name('Teaching Ass
 Role.create(:name => 'Administrator', :parent_id => Role.find_by_name('Instructor').id)
 Role.create(:name => 'Super-Administrator', :parent_id => Role.find_by_name('Administrator').id)
 
+puts 'Role'
 ###### roles_permissions
 RolesPermission.create(:role_id => Role.find_by_name('Student').id, :permission_id => Permission.find_by_name('public pages - view').id)
 RolesPermission.create(:role_id => Role.find_by_name('Student').id, :permission_id => Permission.find_by_name('public actions - execute').id)
@@ -268,10 +275,11 @@ RolesPermission.create(:role_id => Role.find_by_name('Super-Administrator').id, 
 RolesPermission.create(:role_id => Role.find_by_name('Super-Administrator').id, :permission_id => Permission.find_by_name('administer assignments').id)
 RolesPermission.create(:role_id => Role.find_by_name('Super-Administrator').id, :permission_id => Permission.find_by_name('administer instructors').id)
 
+puts 'RolesPermission'
 ###### system_settings
-SystemSettings.create(:site_name => 'Expertiza', 
-                      :site_subtitle => 'Reusable learning objects through peer review', 
-                      :footer_message => '<a href="http://research.csc.ncsu.edu/efg/expertiza/papers">Expertiza</a>', 
+ SystemSettings.create(:site_name => 'Expertiza',
+                      :site_subtitle => 'Reusable learning objects through peer review',
+                      :footer_message => '<a href="http://research.csc.ncsu.edu/efg/expertiza/papers">Expertiza</a>',
                       :public_role_id => Role.find_by_name('Student').id,
                       :session_timeout => 7200,
                       :default_markup_style_id => MarkupStyle.find_by_name('Textile').id,
@@ -281,6 +289,7 @@ SystemSettings.create(:site_name => 'Expertiza',
                       :session_expired_page_id => ContentPage.find_by_name('expired').id,
                       :menu_depth => 3)
 
+puts 'SystemSettings'
 ###### users
 # Default administrator
 puts "Find or create admin user with password 'admin'"
@@ -298,6 +307,7 @@ tu.parent_id = tu.id
 tu.save(validate: false)
 
 
+puts 'Users'
 ###########################################################################
 # Display tables
 ###########################################################################
@@ -313,6 +323,7 @@ TreeFolder.create(:name => 'Survey', :child_type => 'QuestionnaireNode')
 TreeFolder.create(:name => 'Global Survey', :child_type => 'QuestionnaireNode')
 TreeFolder.create(:name => 'Course Evaluation', :child_type => 'QuestionnaireNode')
 
+puts 'TreeFolder'
 ###### nodes
 n1 = Node.create!(:parent_id => nil, :node_object_id => TreeFolder.find_by_name('Questionnaires').id)
 Node.create(:parent_id => nil, :node_object_id => TreeFolder.find_by_name('Courses').id)
@@ -331,6 +342,7 @@ Node.find_each do |n|
   n.save
 end
 
+puts 'Node'
 ###### extra stuff
 # Rebuild the role cache.
 Role.rebuild_cache
@@ -351,5 +363,7 @@ DeadlineRight.create(:name => 'No')
 DeadlineRight.create(:name => 'Late')
 DeadlineRight.create(:name => 'OK')
 
+puts 'Deadline'
 ###### WikiType
 WikiType.create(:name => 'No')
+puts 'WikiType'

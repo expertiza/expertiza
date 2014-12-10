@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(version: 20141111010259) do
     t.integer "user_id"
     t.integer "notification_limit",   default: 15, null: false
     t.integer "questionnaire_weight", default: 0,  null: false
+    t.integer "used_in_round"
   end
 
   add_index "assignment_questionnaires", ["assignment_id"], name: "fk_aq_assignments_id", using: :btree
@@ -163,14 +164,6 @@ ActiveRecord::Schema.define(version: 20141111010259) do
     t.integer "penalty_points"
   end
 
-  create_table "categories", force: true do |t|
-    t.string  "name"
-    t.integer "parent_id"
-    t.integer "lft"
-    t.integer "rgt"
-    t.integer "depth"
-  end
-
   create_table "comments", force: true do |t|
     t.integer "participant_id", default: 0,     null: false
     t.boolean "private",        default: false, null: false
@@ -251,6 +244,8 @@ ActiveRecord::Schema.define(version: 20141111010259) do
     t.integer  "threshold",                   default: 1
     t.integer  "delayed_job_id"
     t.integer  "quiz_allowed_id"
+    t.string   "deadline_name"
+    t.string   "description_url"
   end
 
   add_index "due_dates", ["assignment_id"], name: "fk_due_dates_assignments", using: :btree
@@ -327,10 +322,6 @@ ActiveRecord::Schema.define(version: 20141111010259) do
     t.integer "parent_id"
     t.integer "node_object_id"
     t.string  "type"
-    t.string  "name"
-    t.integer "lft"
-    t.integer "rgt"
-    t.integer "depth"
   end
 
   create_table "participant_score_views", id: false, force: true do |t|
@@ -436,6 +427,7 @@ ActiveRecord::Schema.define(version: 20141111010259) do
     t.integer  "reviewee_id",           default: 0,     null: false
     t.string   "type",                  default: "",    null: false
     t.boolean  "notification_accepted", default: false
+    t.integer  "round"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

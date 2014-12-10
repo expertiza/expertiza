@@ -1,0 +1,2 @@
+module StudentQuizzesHelper
+end

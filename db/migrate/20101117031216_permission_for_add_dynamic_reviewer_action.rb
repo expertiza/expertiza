@@ -10,7 +10,7 @@ class PermissionForAddDynamicReviewerAction < ActiveRecord::Migration
 
   def self.down
     ['add_dynamic_reviewer', 'release_reservation'].each do |action|
-      ControllerAction.find_all_by_name(action).each &:destroy
+      ControllerAction.where(name: action).each &:destroy
     end
     Role.rebuild_cache
   end

@@ -67,7 +67,7 @@ class CreateResponseMaps < ActiveRecord::Migration
        end
        rmap, response = create_response_map(map,"reviews",map_type, "ReviewQuestionnaire",assignment)
        
-       MetareviewResponseMap.find_all_by_reviewed_object_id(map['id'].to_i).each{
+       MetareviewResponseMap.where(reviewed_object_id: map['id'].to_i).each{
          | metamap |
          if rmap != nil
            metamap.update_attribute('reviewed_object_id',rmap.id)

@@ -9,6 +9,7 @@
                 <%= render :partial => 'set_dynamic_review', :locals => {:assignment => @assignment} %>
             <% elsif @assignment.review_assignment_strategy == Assignment::RS_STUDENT_SELECTED %>
                 <%= render :partial => 'set_student_review', :locals => {:assignment => @assignment} %>
+            <!--To add a elsif for Assignment::RS_INSTRUCTOR_SELECTED review strategy. We dont know yet what topics get listed in Instructor.Selected mode-->
             <% end %>
         <% else%>
         <br><br>

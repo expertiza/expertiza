@@ -59,6 +59,10 @@ class AssignmentsController < ApplicationController
     set_up_assignment_review
   end
 
+  def review_strategy_advanced_options
+    @assignment = Assignment.find(params[:id])
+  end
+
   def delete_all_due_dates
     if params[:assignment_id].nil?
       return

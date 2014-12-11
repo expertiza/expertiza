@@ -16,8 +16,8 @@ describe 'Tests mailer' do
         }
     ).deliver
 
-    expect(email.from[0]).to eql("expertiza-support@lists.ncsu.edu")
-    expect(email.to[0]).to eql('tluo@ncsu.edu')
+    expect(email.from[0]).to eql("expertiza.development@gmail.com")
+    expect(email.to[0]).to eql('expertiza.development@gmail.com')
     expect(email.subject).to eql('Test')
     #assert_equal read_fixture('invite').join, email.body.to_s
   end

@@ -11,6 +11,14 @@ class ControllerAction < ActiveRecord::Base
     joins('left outer join site_controllers on site_controller_id = site_controllers.id').
     order('site_controllers.name, name')
   }
+  
+  def self.find_all_by_site_controller_id (id)
+    ControllerAction.where(site_controller_id: id)
+  end
+
+  def self.find_or_create_by_name (params)
+    ControllerAction.find_or_create_by(name: params)
+  end
 
   def controller
     @controller ||= SiteController.find(self.site_controller_id)

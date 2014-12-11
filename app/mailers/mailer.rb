@@ -1,5 +1,10 @@
 class Mailer < ActionMailer::Base
-  default from: 'expertiza-support@lists.ncsu.edu'
+
+  if Rails.env.development? || Rails.env.test?
+    default from: 'expertiza.development@gmail.com'
+  else
+    default from: 'expertiza-support@lists.ncsu.edu'
+  end
 
   def generic_message(defn)
     @partial_name = defn[:body][:partial_name]
@@ -10,8 +15,9 @@ class Mailer < ActionMailer::Base
     @avg_pct = defn[:body][:avg_pct]
     @assignment = defn[:body][:assignment]
 
-    defn[:to] = 'expertiza@mailinator.com' if Rails.env.development? || Rails.env.test?
-
+    if Rails.env.development? || Rails.env.test?
+      defn[:to] = 'expertiza.development@gmail.com'
+    end
     mail(subject: defn[:subject],
          to: defn[:to],
          bcc: defn[:bcc])
@@ -20,9 +26,16 @@ class Mailer < ActionMailer::Base
   def sync_message(defn)
 
     @body = defn[:body]
+    @type = defn[:body][:type]
+    @obj_name = defn[:body][:obj_name]
+    @first_name = defn[:body][:first_name]
     @partial_name = defn[:body][:partial_name]
+
+    if Rails.env.development? || Rails.env.test?
+      defn[:to] = 'expertiza.development@gmail.com'
+    end
     mail(subject: defn[:subject],
-         content_type: "text/html",
+         #content_type: "text/html",
          to: defn[:to])
 
   end

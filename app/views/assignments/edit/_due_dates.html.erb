@@ -248,11 +248,11 @@ function submit_due_dates() {
   </tr>
   <script>
     jQuery(document).ready(function () {
-      <% 1.upto @assignment.rounds_of_reviews do |i| %>
-        addDueDateTableElement('submission', <%=i%>, <%= due_date(@assignment, 'submission', i-1).to_json.html_safe %>);
-        addDueDateTableElement('review', <%=i%>, <%= due_date(@assignment, 'review', i-1).to_json.html_safe %>);
-      <% end %>
-      addDueDateTableElement('metareview', 0, <%= due_date(@assignment, 'metareview').to_json.html_safe %>);
+      <% for i in 1..@assignment.rounds_of_reviews %>
+ addDueDateTableElement('submission', <%=i%>, <%= due_date(@assignment, 'submission', i-1).to_json.html_safe %>);
+          addDueDateTableElement('review', <%=i%>, <%= due_date(@assignment, 'review', i-1).to_json.html_safe %>);
+    <% end %>
+          addDueDateTableElement('metareview', 0, <%= due_date(@assignment, 'metareview').to_json.html_safe %>);
     }());
   </script>
 </table>

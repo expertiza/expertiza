@@ -1,8 +1,8 @@
 class CreateQuestionnaireFolderNodes < ActiveRecord::Migration
   def self.up
-    add_column :tree_folders, :parent_id, :integer, :null => true
+    #add_column :tree_folders, :parent_id, :integer, :null => true
     
-    Node.where(['type in ("QuestionnaireTypeNode","QuestionnaireNode")']).find_each{
+    Node.where('type in ("QuestionnaireTypeNode","QuestionnaireNode")').each{
       | node |
       node.destroy
     }      

@@ -21,9 +21,10 @@
       <%@i += 1%>
       <tr>
         <td>
-          <% participant =  Participant.find(map[0],params[:assignment_id]) %>
+          <!--% participant =  Participant.find(map[0],params[:assignment_id]) %--!>
+          <% participant =  Participant.find(map[0]) %>
           <% is_disabled = false %>
-          <% if participant!= nil && participant.submit_allowed%>
+          <% if participant != nil && participant.submit_allowed%>
             <% if (map[1] == 0) %>
               <% is_disabled = false %>
             <% elsif (map[1] == 1) %>

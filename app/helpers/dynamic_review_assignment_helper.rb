@@ -88,7 +88,7 @@ module DynamicReviewAssignmentHelper
     else
       submissions_in_current_cycle = AssignmentParticipant.where(topic_id: @topic_id, parent_id: @assignment_id)
     end
-    submissions_in_current_cycle.reject! { |submission| !submission.has_submissions? }
+    submissions_in_current_cycle = submissions_in_current_cycle.reject { |submission| !submission.has_submissions? }
 
     #  Create a new Hash to store the number of reviews that have already been done (or are in progress) for
     #  each submission.

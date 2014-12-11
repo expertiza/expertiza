@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(version: 20141111010259) do
     t.integer "user_id"
     t.integer "notification_limit",   default: 15, null: false
     t.integer "questionnaire_weight", default: 0,  null: false
+    t.integer "used_in_round"
   end
 
   add_index "assignment_questionnaires", ["assignment_id"], name: "fk_aq_assignments_id", using: :btree
@@ -244,6 +245,8 @@ ActiveRecord::Schema.define(version: 20141111010259) do
     t.integer  "threshold",                   default: 1
     t.integer  "delayed_job_id"
     t.integer  "quiz_allowed_id"
+    t.string   "deadline_name"
+    t.string   "description_url"
   end
 
   add_index "due_dates", ["assignment_id"], name: "fk_due_dates_assignments", using: :btree
@@ -429,6 +432,7 @@ ActiveRecord::Schema.define(version: 20141111010259) do
     t.integer  "reviewee_id",                           null: false
     t.string   "type",                                  null: false
     t.boolean  "notification_accepted", default: false
+    t.integer  "round"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

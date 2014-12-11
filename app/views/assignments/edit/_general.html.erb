@@ -198,7 +198,13 @@ function is_coding_assignmentChanged(){
       <input name="assignment[is_coding_assignment]" type="hidden" value="false"/>
       <%= check_box_tag('assignment[is_coding_assignment]', 'true', @assignment.is_coding_assignment, {:onchange => 'is_coding_assignmentChanged()'}) %>
       <%= label_tag('assignment[is_coding_assignment]', 'Is code submission required?') %>
+
+    <td style='padding:5px' id='assignment_require_quiz_field'>
+      <input name="assignment[require_quiz]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment[require_quiz]', 'true', @assignment.require_quiz, {:onChange => 'hasQuizChanged()'}) %>
+      <%= label_tag('assignment[require_quiz]', 'Has Quiz?') %>
     </td>
+
     <td style='padding:5px' id='assignment_numbers_of_quiz_field' <%= 'hidden' unless @assignment.require_quiz %>>
       <%= label_tag('assignment[num_quiz_questions]', 'Number of Quiz questions:') %>
       <%= text_field_tag('assignment[num_quiz_questions]', @assignment.num_quiz_questions, { :style => 'width:20px'}) %>

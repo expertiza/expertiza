@@ -1,11 +1,11 @@
 <h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
 
 <% if !@map.contributor.nil? %>
-    <% if @map.assignment.team_assignment?
-         team_member = TeamsUser.find_by_team_id(@map.contributor).user_id
-         topic_id = Participant.where(parent_id: @map.assignment.id, user_id:  team_member).first.topic_id
-       else %>
-        <% topic_id = Participant.find(@map.contributor).topic_id %>
+       <% if @map.assignment.team_assignment? %>
+             <% team_member = TeamsUser.find_by_team_id(@map.contributor).user_id%>
+             <% topic_id = Participant.where(parent_id: @map.assignment.id, user_id:  team_member).first.topic_id %>
+      <% else %>
+        <% topic_id = Participant.find(TeamsUser.find_by_team_id(@map.contributor).user_id).topic_id %>
     <% end %>
     <% if !topic_id.nil? %>
         <h2>You are reviewing <%= SignUpTopic.find(topic_id).topic_name %></h2>

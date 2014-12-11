@@ -11,6 +11,11 @@ class Role < ActiveRecord::Base
 
   attr_reader :student,:ta,:instructor,:administrator,:superadministrator
 
+  def self.find_or_create_by_name (params)
+    Role.find_or_create_by(name: params)
+  end
+
+
   def self.student
     @@student_role ||= find_by_name 'Student'
   end

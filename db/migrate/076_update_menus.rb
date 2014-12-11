@@ -38,7 +38,8 @@ class UpdateMenus < ActiveRecord::Migration
     assignments_action.site_controller_id = site_controller.id
     assignments_action.save    
     
-    MenuItem.where(['parent_id is null and seq >= 3']).find_each{ |item|
+    MenuItem.where('parent_id = null and seq >= 3').each{
+      |item|
       item.seq += 1
       item.save
     }

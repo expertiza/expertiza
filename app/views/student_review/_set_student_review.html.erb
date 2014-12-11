@@ -10,10 +10,9 @@
     }
 
 </script>
-<%= form_tag :controller => 'review_mapping',
-             :action => 'show_available_submissions',
-             :assignment_id => assignment.id,
-             :reviewer_id => session[:user].id do %>
+<%= form_tag "/review_mapping/show_available_submissions", {method: "get"} do %>
+    <%= hidden_field_tag 'assignment_id', assignment.id %>
+    <%= hidden_field_tag 'reviewer_id', session[:user].id %>
     <% if assignment.sign_up_topics.count > 0 %>
         <p><b>Select a topic below to begin a new review:</b></p>
 

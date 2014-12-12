@@ -20,8 +20,7 @@ class AssignmentTeam < Team
   # @param[in] reviewer AssignmentParticipant object
   def reviewed_by?(reviewer)
     #TeamReviewResponseMap.count(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id]) > 0
-    count = TeamReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id).count
-    return count > 0
+    TeamReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id).count > 0
   end
 
   # Topic picked by the team

@@ -4,14 +4,11 @@
                  :assignment_id => assignment.id,
                  :reviewer_id => session[:user].id do %>
 
-<<<<<<< HEAD
-=======
 </script>
 <%= form_tag "/review_mapping/show_available_submissions", {method: "get"} do %>
     <%= hidden_field_tag 'assignment_id', assignment.id %>
     <%= hidden_field_tag 'reviewer_id', session[:user].id %>
     <% if assignment.sign_up_topics.count > 0 %>
->>>>>>> rails4
         <p><b>Select a topic below to begin a new review:</b></p>
 
         <table cellpadding="0" id="topic_list">
@@ -38,10 +35,4 @@
     <% end %>
 
     <input type='submit' value='Select a Topic to Review' id="submitStudentReviewButton"/>
-<<<<<<< HEAD
-<% else %>
-<p>No topics available for review</p>
 <% end %>
-=======
-<% end %>
->>>>>>> rails4

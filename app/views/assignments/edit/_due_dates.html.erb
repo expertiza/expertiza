@@ -111,6 +111,9 @@ function addDueDateTableElement(deadline_type, round_no, due_date) {
         '" name="due_date[due_at]" style="width: 200px" type="text" value="' +
         due_at + '">' + '</td>';
 
+     // html+= '<td align="center" class="time_zone_picker" width="20%">' +
+      //      '<select id="time_zone_picker" name="due_date[time_zone]">';
+
       html += '<td align="center" class="due_date_submission_allowed_id" width="10%">' +
         '<select id="due_date_submission_allowed_id" name="due_date[submission_allowed_id]">' +
         '<option value="">---</option>' +
@@ -170,7 +173,11 @@ function addDueDateTableElement(deadline_type, round_no, due_date) {
         '<option value="96">96</option>' +
         '</select></td>';
 
-      previous_element.after(html);
+
+
+
+
+    previous_element.after(html);
 
       jQuery('#due_date_submission_allowed_id').val(due_date.submission_allowed_id).attr('id', '');
       jQuery('#due_date_resubmission_allowed_id').val(due_date.resubmission_allowed_id).attr('id', '');
@@ -228,16 +235,26 @@ function submit_due_dates() {
 <b><label id="staggered_label" style="display:none">Deadlines for chapter 1</label></b>
 </div>
 
-<div style='padding: 5px' id='review_round'>
+<div style="padding:5px;">
+<div style="width:50%;Text-align:left;float:left;">
 <%= label_tag('assignment[rounds_of_reviews]', 'Number of Review Rounds:') %>
 <%= text_field_tag('assignment[rounds_of_reviews]', @assignment.rounds_of_reviews, :style => 'width:50px') %>
 <%= button_tag 'Set', onclick: 'changeReviewRounds()' %>
+</div>
+
+<div style="width:50%;Text-align:right;float:right;">
+  <label >Current Time Zone:
+    <input type="text" readonly value="<%= session[:user].timezonepref %>">
+  </label>
+</div>
+
 </div>
 
 <table class='exp' id='due_dates_table' style='padding:10px'>
 <tr id='due_date_heading'>
 <th width=15%>Deadline type</th>
 <th width=20%>Date & time</th>
+<!--<th width=20%>Timezone</th>-->
 <th width=10%>Submission allowed</th>
 <th width=8%>Review allowed</th>
 <!--<th width=10%>Resubmission Allowed</th>-->

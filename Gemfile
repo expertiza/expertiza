@@ -14,8 +14,6 @@ gem 'capistrano'
 gem "capistrano-db-tasks", require: false
 gem 'capistrano-rails'
 gem 'coveralls', require: false
-gem 'daemons'
-gem 'protected_attributes'
 gem 'delayed_job_active_record'
 gem 'dynamic_form'
 gem 'edavis10-ruby-web-search'
@@ -27,16 +25,18 @@ gem 'font-awesome-rails'
 gem 'gchart'
 gem 'gchartrb', :require => 'google_chart'
 gem 'gdata', :require => false
-gem 'graphr'
 gem 'haml-rails'
 gem 'hoptoad_notifier'
-gem 'jquery-datetimepicker-rails'
 gem 'jquery-rails'
 gem 'jquery-ui-sass-rails'
+gem 'jquery-datetimepicker-rails'
 gem 'mysql2'
 gem 'nokogiri'
+gem 'omniauth-google-oauth2', '~> 0.2.6'
 gem 'open-uri-cached'
 gem 'paper_trail'
+gem 'protected_attributes'
+gem 'rails_12factor', group: :production
 gem 'rails4-autocomplete'
 gem 'rake'
 gem 'rb-readline'
@@ -51,12 +51,13 @@ gem 'sprockets'
 gem 'stanford-core-nlp'
 gem 'superfish-rails'
 gem 'therubyracer'
+gem 'thin'
 gem 'turbolinks'
 gem 'will_paginate'
 gem 'zip-zip'
-gem 'fsm'
 
 group :development do
+  gem 'daemons'
   gem 'pry'
   gem 'pry-remote'
   gem 'pry-nav'
@@ -65,10 +66,8 @@ group :development do
 end
 
 group :test do
-  gem 'cucumber-rails', require: false
   gem 'database_cleaner'
   gem 'gherkin'
-  gem 'guard-cucumber'
   gem 'guard-rails'
   gem 'guard-rspec'
   gem 'launchy'

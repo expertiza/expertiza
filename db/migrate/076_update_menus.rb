@@ -2,51 +2,49 @@ class UpdateMenus < ActiveRecord::Migration
   def self.up
     site_controller = SiteController.find_by_name('tree_display')
     
-    drill_action = ControllerAction.find_or_create_by_name('drill')
+    drill_action = ControllerAction.find_or_create_by(name: 'drill')
     drill_action.site_controller_id = site_controller.id
     drill_action.save   
     
-    questionnaires_action = ControllerAction.find_or_create_by_name('goto_questionnaires')
+    questionnaires_action = ControllerAction.find_or_create_by(name: 'goto_questionnaires')
     questionnaires_action.site_controller_id = site_controller.id
     questionnaires_action.save
     
-    author_feedbacks_action = ControllerAction.find_or_create_by_name('goto_author_feedbacks')
+    author_feedbacks_action = ControllerAction.find_or_create_by(name: 'goto_author_feedbacks')
     author_feedbacks_action.site_controller_id = site_controller.id
     author_feedbacks_action.save
     
-    review_rubrics_action = ControllerAction.find_or_create_by_name('goto_review_rubrics')
+    review_rubrics_action = ControllerAction.find_or_create_by(name: 'goto_review_rubrics')
     review_rubrics_action.site_controller_id = site_controller.id
     review_rubrics_action.save
     
-    global_survey_action = ControllerAction.find_or_create_by_name('goto_global_survey')
+    global_survey_action = ControllerAction.find_or_create_by(name: 'goto_global_survey')
     global_survey_action.site_controller_id = site_controller.id
     global_survey_action.save    
     
-    surveys_action = ControllerAction.find_or_create_by_name('goto_surveys')
+    surveys_action = ControllerAction.find_or_create_by(name: 'goto_surveys')
     surveys_action.site_controller_id = site_controller.id
     surveys_action.save
     
-    course_evaluations_action = ControllerAction.find_or_create_by_name('goto_course_evaluations')
+    course_evaluations_action = ControllerAction.find_or_create_by(name: 'goto_course_evaluations')
     course_evaluations_action.site_controller_id = site_controller.id
     course_evaluations_action.save
     
-    courses_action = ControllerAction.find_or_create_by_name('goto_courses')
+    courses_action = ControllerAction.find_or_create_by(name: 'goto_courses')
     courses_action.site_controller_id = site_controller.id
     courses_action.save
     
-    assignments_action = ControllerAction.find_or_create_by_name('goto_assignments')
+    assignments_action = ControllerAction.find_or_create_by(name: 'goto_assignments')
     assignments_action.site_controller_id = site_controller.id
     assignments_action.save    
     
-    #MenuItem.find(:all, :conditions => ['parent_id is null and seq >= 3']).each{
-    MenuItem.where('parent_id = null and seq >= 3').each{
-      |item|
+    MenuItem.where(['parent_id is null and seq >= 3']).find_each{ |item|
       item.seq += 1
       item.save
     }
     
     
-    manage_item = MenuItem.find_or_create_by_name('manage instructor content')    
+    manage_item = MenuItem.find_or_create_by(name: 'manage instructor content')    
     manage_item.label = 'Manage...'
     manage_item.seq = 3
     manage_item.controller_action_id = drill_action.id

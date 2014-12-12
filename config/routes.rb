@@ -339,6 +339,8 @@ Expertiza::Application.routes.draw do
       get :sign_up
       get :team_details
       get :view_publishing_rights
+      get :intelligent_sign_up
+      get :intelligent_save
     end
   end
 
@@ -483,4 +485,6 @@ Expertiza::Application.routes.draw do
   get ':controller/service.wsdl', :action => 'wsdl'
 
   get ':controller(/:action(/:id))(.:format)'
+
+ # get 'sign_up_sheet/intelligent_signup_sheet.html_erb' => 'sign_up_sheet#intelligentPage'
 end

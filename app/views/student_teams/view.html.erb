@@ -8,8 +8,7 @@
   <b>Team Name: </b><%= @student.team.name %>
 
 <%= link_to "Edit Name",
-  {:controller => 'student_team', :action => 'edit', :team_id => @student.team.id, :student_id => @student.id} %>
-<table>
+   edit_student_teams_path(team_id: @student.team.id, student_id: @student.id) %><table>
   <tr>
     <td><b>Username &nbsp</b></td>
     <td><b>Full Name &nbsp</b></td>
@@ -46,7 +45,7 @@
     </table>
     <br>
     <%= link_to "Leave Team",
-      {:controller => 'student_team', :action => 'leave', :student_id => @student.id, :team_id => @student.team.id} %>
+                remove_participant_student_teams_path(student_id: @student.id, team_id: @student.team.id) %>
   <% end %>
 
   <% if @student.team != nil %>
@@ -63,7 +62,7 @@
   <% end %>
 
   <%= render :partial => 'join_team_requests/list_sent',
-    :locals =>{:teams_user_id=>params[:id],
+    :locals =>{:teams_user_id=>params[:student_id],
                :assignment_id => @student.assignment.id
   } %>
 
@@ -72,7 +71,7 @@
 
   <%= render :partial => 'join_team_requests/list_received',
     :locals =>{:team_id=>@student.team.id,
-               :teams_user_id=>params[:id],
+               :teams_user_id=>params[:student_id],
                :assignment_id => @student.assignment.id} %>
            <% end %>
 
@@ -155,8 +154,8 @@
 
      <% if @student.team == nil %>
        <h2>Create Team</h2>
-       <%= form_tag :controller => 'student_team', :action => 'create' do %>
-         <%= hidden_field_tag 'id', @student.id %>
+       <%= form_tag :controller => 'student_teams', :action => 'create' do %>
+         <%= hidden_field_tag 'student_id', @student.id %>
          <label for="team_name">Team Name:</label>&nbsp;
          <%= text_field 'team', 'name' %>
          <%= submit_tag "Create Team" %>

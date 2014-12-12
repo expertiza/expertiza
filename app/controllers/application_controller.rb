@@ -1,5 +1,3 @@
-require 'goldberg_filters'
-
 class ApplicationController < ActionController::Base
   include AccessHelper
 

@@ -6,7 +6,7 @@
 #Date: 7/18/2008
 class Node < ActiveRecord::Base
   has_paper_trail
-  acts_as_nested_set
+  #acts_as_nested_set
 
   belongs_to :parent, :class_name => 'Node', :foreign_key => 'parent_id'
   has_many :children, class_name: Node, foreign_key: 'parent_id'

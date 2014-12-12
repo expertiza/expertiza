@@ -23,8 +23,16 @@
                 <%= link_to image_tag('/assets/tree_view/edit-signup-sheet-24.png', :title => 'Edit signup sheet'), {:controller => 'sign_up_sheet', :action => 'add_signup_topics', :id => node.node_object_id}, {:title => 'Edit signup sheet'} %>
               <% end %>
               <% if @assignment.is_intelligent %>
-                <%= link_to image_tag('/assets/tree_view/run-lottery.png', :title => 'Run Intelligent Topic Assignment'), :controller => 'lottery', :action => 'run_intelligent_bid', :id => @assignment.id %>
+                <%= link_to image_tag('/assets/tree_view/run-lottery.png', :title => 'Assign teams intelligently', :onClick => "showIntelligentAssignmentDialog()"), :controller => 'lottery', :action => 'run_intelligent_bid', :id => @assignment.id %>
               <% end %>
+              <script type="text/javascript">
+                function showIntelligentAssignmentDialog() {
+                    jQuery( "#intelligent_assignment_dialog" ).dialog({ closeText: "hide", modal: true, resizable: false, width: 500 });
+                }
+              </script>
+              <div id="intelligent_assignment_dialog" title="Running intelligent assignment" style="display: none;">
+                <p>Intelligent Assignment is running. Please wait for the action to be completed.</p>
+              </div>
             <% else %>
               <% if @assignment.staggered_deadline == true %>
                 <%= link_to image_tag('/assets/tree_view/add-signup-sheet-24.png', :title => 'Add signup sheet'), {:controller => 'sign_up_sheet', :action => 'add_signup_topics_staggered', :id => node.node_object_id}, {:title => 'Add signup sheet'} %>

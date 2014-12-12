@@ -1,5 +1,4 @@
 Expertiza
-** Use the file README Student Quiz Controller OSS.pdf  
 =========
 
 [![Build Status](https://travis-ci.org/expertiza/expertiza.png?branch=master)](https://travis-ci.org/expertiza/expertiza)

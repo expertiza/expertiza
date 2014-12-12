@@ -51,11 +51,8 @@ module LeaderboardHelper
   # Identify whether user is considered instructor
   def self.userIsInstructor?(userID)
     # For now, we'll consider Instructors, Admins, Super-Admins, and TAs as instructors
-    instructorRoles = Array.new
-    instructorRoles << Role.find_by_name("Instructor").id
-    instructorRoles << Role.find_by_name("Administrator").id
-    instructorRoles << Role.find_by_name("Super-Administrator").id
-    instructorRoles << Role.find_by_name("Teaching Assistant").id
+    instructorNames = ["Instructor", "Administrator", "Super-Administrator", "Teaching Assistant"];
+    instructorRoles = Role.where(:name => instructorNames).pluck(:id)
     user = User.find(userID)
     instructor = false
     if instructorRoles.index(user.role_id)
@@ -64,60 +61,49 @@ module LeaderboardHelper
     instructor
   end
 
-  # Returns list of course ids in which the student has an assignment
-  def self.studentInWhichCourses(userid)
-    # Get all entries in Participant table for user
-    assignPartList = AssignmentParticipant.where(["user_id =?",userid])
-    @courseList = Array.new
+  # Returns list of course ids in which the student participated in an assignment
+  def self.studentInWhichCourses(studentUserId)
+    # Get all assignments of participants corresponding to given userId and having an associated courseId
+    assignmentRecords = Assignment.joins(:participants).where("participants.user_id = ? AND course_id IS NOT NULL", studentUserId)
 
-    for participantEntry in assignPartList
-
-      ## get the ass in quesstion, get the course in question
-      assgt = Assignment.find(participantEntry.parent_id)
-      if assgt.course_id == nil
-        @courseList << 0
-      else
-        @courseList << assgt.course_id
-      end
-    end
-
-    @courseList.uniq!
-
-    @courseList
+    # Fetch all courses associated with assignments participated by the student
+    courseList = assignmentRecords.pluck(:course_id).uniq
   end
 
   # This methods gets all the courses that an instructor has been assigned.
   # This method assumes the instructor_id in the Courses table indicates
   # the courses an instructor is managing.
-  def self.instructorCourses(userid)
-    courseTuples = Course.where( ['instructor_id = ?', userid])
-
-    @courseList = Array.new
-    courseTuples.each { |course| @courseList << course.id }
-    @courseList
+  def self.instructorCourses(userId)
+    courseList = Array.new
+    courseList = Course.where(:instructor_id => userId).pluck(:id)
   end
 
+  #
+  # This method is not consumed anywhere and is a dead code. We should probably remove it.
+  # Commenting it. Please remove it when required.
+  #
   # This method gets the display data needed to show the Top 3 leaderboard
-  def self.getTop3Leaderboards(userid, assignmentid)
-    courseList = LeaderboardHelper.studentInWhichCourses(userid)
-    csHash = Leaderboard.getParticipantEntriesInAssignment(assignmentid)
-    csHash = Leaderboard.sortHash(csHash)
-
-    # Setup top 3 leaderboards for easier consumption by view
-    top3LeaderBoards = Array.new
-    csHash.each_pair{|qtype, courseHash|
-      courseHash.each_pair{|course, userGradeArray|
-        assignmentName = LeaderboardHelper.getAssignmentName(assignmentid)
-        achieveName = LeaderboardHelper.getAchieveName(qtype)
-        leaderboardHash = Hash.new
-        leaderboardHash = {:achievement => achieveName,
-                           :courseName => assignmentName,
-                           :sortedGrades => userGradeArray}
-        top3LeaderBoards << leaderboardHash
-      }
-    }
-    top3LeaderBoards
-  end
+  #
+  # def self.getTop3Leaderboards(userid, assignmentid)
+  #   courseList = LeaderboardHelper.studentInWhichCourses(userid)
+  #   csHash = Leaderboard.getParticipantEntriesInAssignment(assignmentid)
+  #   csHash = Leaderboard.sortHash(csHash)
+  #
+  #   # Setup top 3 leaderboards for easier consumption by view
+  #   top3LeaderBoards = Array.new
+  #   csHash.each_pair{|qtype, courseHash|
+  #     courseHash.each_pair{|course, userGradeArray|
+  #       assignmentName = LeaderboardHelper.getAssignmentName(assignmentid)
+  #       achieveName = LeaderboardHelper.getAchieveName(qtype)
+  #       leaderboardHash = Hash.new
+  #       leaderboardHash = {:achievement => achieveName,
+  #                          :courseName => assignmentName,
+  #                          :sortedGrades => userGradeArray}
+  #       top3LeaderBoards << leaderboardHash
+  #     }
+  #   }
+  #   top3LeaderBoards
+  # end
 
   # This method is only provided for diagnostic purposes. It can be executed from
   # script/console to see what's in the Computed Scores table, in case there is

@@ -1,7 +1,7 @@
 <% if ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include? current_user_role?.name %>
     <td align="center">
       <%= link_to image_tag('edit_icon.png', :border => 0, :title => 'Edit Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'edit', :id => topic.id %>
-      <%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Delete Topic', :align => 'middle'), sign_up_sheet_path(topic.id), method: :delete, data: {confirm: 'Are you sure?'} %>
+      <%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Delete Topic', :align => 'middle'), sign_up_sheet_path(:id=>topic.id, :assignment_id => params[:id]), method: :delete, data: {confirm: 'Are you sure?'} %>
 <%elsif @show_actions %>
 
     <% action_symbol_added = false %>

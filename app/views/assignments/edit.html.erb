@@ -1,29 +1,7 @@
 <h1>Editing Assignment</h1>
 
-<script>
-  function validate() {
-    if(!(jQuery("#assignment_max_bids").val() > 0)) {
-        alert("The value of 'Maximum number of bids' should be greater than 0.");
-        return false;
-    }
-    return true;
-  }
 
-    function submit_form() {
-      //validating the form
-        if (validate()) {
-          //submit the due dates and questionnaires before submitting the rest of the form
-            jQuery.ajaxSetup({async: false});
-            submit_due_dates();
-            submit_questionnaires();
-            return true;
-        } else {
-            return false;
-        }
-    }
-  </script>
-
-  <%= form_for @assignment, html: { id: 'assignment_form', onsubmit: 'return submit_form();' } do %>
+  <%= form_for @assignment_form.assignment, html: { id: 'assignment_form' } do %>
     <div id="tabs">
       <ul>
         <li><a href="#tabs-1">General</a></li>
@@ -53,7 +31,7 @@
         jQuery("#tabs").tabs();
       });
     </script>
-    <%= submit_tag 'Save' %>| <%= render :partial => '/shared_scripts/back' %>
+    <%= button_tag 'Save'%>| <%= render :partial => '/shared_scripts/back' %>
   <% end %>
 
   <br/>

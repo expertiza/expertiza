@@ -11,65 +11,12 @@
 class SignUpSheetController < ApplicationController
   require 'rgl/adjacency'
   require 'rgl/dot'
+  #removed graph/graphviz_dot since the gem is removed from Gemfile.
   require 'rgl/topsort'
-
-  def intelligent_sign_up
-    @assignment_id = params[:id]
-    @sign_up_topics = SignUpTopic.where( ['assignment_id = ?', params[:id]]).all
-    @slots_filled = SignUpTopic.find_slots_filled(params[:id])
-    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:id])
-    @show_actions = true
-    @priority = 0
-    assignment=Assignment.find(params[:id])
-
-    @max_bids = assignment.max_bids
-
-    users_team = SignedUpUser.find_team_users(params[:id],(session[:user].id))[0]
-    if users_team.nil?
-      team = AssignmentTeam.create_team_and_node(params[:id])
-      user = User.find(session[:user].id)
-      teamuser = create_team_users(user, team.id)
-      @users_team_id = team.id
-    else 
-      @users_team_id = users_team.t_id
-    end
-
-
-    bid_topic_ids = Bid.where(:team_id => @users_team_id ).order(:priority).pluck(:topic_id)
-    bid_topics = SignUpTopic.where(:assignment_id => params[:id], :id => bid_topic_ids)
-
-    @sorted_bid_topics=Array.new
-    @topic_bid_count = Hash.new(0)
-    bid_topic_ids.each do |bid_topic_id|
-      @topic_bid_count[bid_topic_id] = Bid.where(:topic_id => bid_topic_id).length
-      @sorted_bid_topics << bid_topics.find{|bid_topic| bid_topic.id==bid_topic_id}
-    end
-
-   render :intelligent_signup_sheet
-  end
-
-
-  def intelligent_save
-    team_id = params[:team_id]
-    topic_ids = params[:topic_id]
-    Bid.where(:team_id => team_id).delete_all
-    if !topic_ids.nil?
-      i = 1
-      topic_ids.each  do |topic_id|
-        @new_bid = Bid.new(:team_id => team_id, :topic_id => topic_id[1], :priority => i)
-        @new_bid.save
-        i += 1
-      end
-    end
-
-    flash[:notice] = "Bids successfully saved"
-    redirect_to "/sign_up_sheet/intelligent_sign_up/?id=" + params[:id]
-  end
-
 
   def action_allowed?
     case params[:action]
-    when 'signup_topics', 'sign_up', 'delete_signup', 'list', 'show_team', 'intelligent_sign_up' , 'intelligent_save'
+    when 'signup_topics', 'sign_up', 'delete_signup', 'list', 'show_team'
       current_role_name.eql? 'Student'
     else
       ['Instructor',
@@ -154,7 +101,6 @@ class SignUpSheetController < ApplicationController
     #Renaming delete method to destroy for rails 4 compatible
     def destroy
       @topic = SignUpTopic.find(params[:id])
-      params[:assignment_id] = @topic.assignment_id
       if @topic
         @topic.destroy
         undo_link("Topic: \"#{@topic.topic_name}\" has been deleted successfully. ")
@@ -176,7 +122,6 @@ class SignUpSheetController < ApplicationController
     #prepares the page. shows the form which can be used to enter new values for the different properties of an assignment
     def edit
       @topic = SignUpTopic.find(params[:id])
-      @assignment_id = @topic.assignment_id
     end
 
     #updates the database tables to reflect the new values for the assignment. Used in conjuntion with edit
@@ -310,10 +255,6 @@ class SignUpSheetController < ApplicationController
 
       def list
         @assignment_id = params[:id]
-        if(Assignment.find_by_id(@assignment_id).is_intelligent)
-          intelligent_sign_up
-          return
-        end
         @sign_up_topics = SignUpTopic.where( ['assignment_id = ?', params[:id]]).all
         @slots_filled = SignUpTopic.find_slots_filled(params[:id])
         @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:id])

@@ -6,11 +6,18 @@
 <!--3. actually pretty much rewrote the whole thing...-->
 
 <script type="text/javascript">
+    jQuery(document).ready(function() {
+    jQuery("#set_rounds").click(function () {
+        changeReviewRounds();
+        event.preventDefault(); // Prevent link from following its href
+    });
+    });
+
 function changeReviewRounds() {
-  var new_round_count = parseInt(jQuery('#assignment_rounds_of_reviews').val());
+  var new_round_count = parseInt(jQuery('#assignment_form_assignment_rounds_of_reviews').val());
   if (new_round_count <= 0) {
     alert('ERROR: number of rounds of review cannot be less than 0');
-    return
+    return false;
   }
 
     var i;
@@ -25,17 +32,17 @@ function changeReviewRounds() {
         }
       }
     }
-      var original_round_count = <%= @assignment.rounds_of_reviews%>;
+      var original_round_count = <%= @assignment_form.assignment.rounds_of_reviews%>;
 
       if (new_round_count == current_round_count) {
-        return
+        return false;
       }
 
         if (new_round_count >= original_round_count && current_round_count < original_round_count) {
           //make sure all the rounds are already displayed
-          <% for i in 1..@assignment.rounds_of_reviews %>
-                 addDueDateTableElement('submission', <%=i%>, <%= due_date(@assignment,'submission', i-1).to_json.html_safe %>);
-                 addDueDateTableElement('review', <%=i%>, <%= due_date(@assignment,'review', i-1).to_json.html_safe %>);
+          <% for i in 1..@assignment_form.assignment.rounds_of_reviews %>
+                 addDueDateTableElement('submission', <%=i%>, <%= due_date(@assignment_form.assignment,'submission', i-1).to_json.html_safe %>);
+                 addDueDateTableElement('review', <%=i%>, <%= due_date(@assignment_form.assignment,'review', i-1).to_json.html_safe %>);
                <% end %> //use ruby because i need the i variable... @_@ unfortunate but dunno how to get around
                //dont worry the addDueDateTableElement function check to see if it exist first before doing anything
         }
@@ -45,15 +52,16 @@ function changeReviewRounds() {
               removeDueDateTableElement('submission', i);
               removeDueDateTableElement('review', i);
             }
-              return
+              return false;
           }
 
             if (new_round_count > current_round_count) {
               for (i = original_round_count + 1; i <= new_round_count; i++) {
-                addDueDateTableElement('submission', i, <%= due_date(@assignment,'submission', -1).to_json.html_safe %>);
-                addDueDateTableElement('review', i, <%= due_date(@assignment,'review', -1).to_json.html_safe %>);
+                addDueDateTableElement('submission', i, <%= due_date(@assignment_form.assignment,'submission', -1).to_json.html_safe %>);
+                addDueDateTableElement('review', i, <%= due_date(@assignment_form.assignment,'review', -1).to_json.html_safe %>);
               }
             }
+    return false;
 }
 
 <!--javascript functions that create and remove the entry of the set_due_date table-->
@@ -62,6 +70,9 @@ function addDueDateTableElement(deadline_type, round_no, due_date) {
   //round_no = 0 is used for other deadlines
   var element_id;
   var previous_element;
+
+
+
   if (round_no == 0) {
     previous_element = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').last();
     element_id = deadline_type;
@@ -90,9 +101,16 @@ function addDueDateTableElement(deadline_type, round_no, due_date) {
   }
     var html = '<tr id=' + element_id + '>';
 
-    html += '<input class="due_date_assignment_id" name="due_date[assignment_id]" type="hidden" value="' + <%= @assignment.id %> + '">' +
-      '<input class="due_date_round" name="due_date[round]" type="hidden" value="' + round_no + '">' +
-      '<input class="due_date_deadline_type_id" name="due_date[deadline_type_id]" type="hidden" value="' + due_date.deadline_type_id + '">';
+    var id = due_date.id
+    if(id == null){
+        id='';
+    }
+    html +=
+            '<input name="assignment_form[due_date][][id]" type="hidden" value="' + id +'">';
+
+    html += '<input class="due_date_assignment_id" name="assignment_form[due_date][][assignment_id]" type="hidden" value="' + <%= @assignment_form.assignment.id %> + '">' +
+      '<input class="due_date_round" name="assignment_form[due_date][][round]" type="hidden" value="' + round_no + '">' +
+      '<input class="due_date_deadline_type_id" name="assignment_form[due_date][][deadline_type_id]" type="hidden" value="' + due_date.deadline_type_id + '">';
 
     html += '<td class="due_date_name" width="15%">';
     if (round_no != 0) {
@@ -108,14 +126,11 @@ function addDueDateTableElement(deadline_type, round_no, due_date) {
     }
       html += '<td align="center" class="due_date_due_at" width="25%">' +
         '<input id="datetimepicker_' + element_id +
-        '" name="due_date[due_at]" style="width: 200px" type="text" value="' +
+        '" name="assignment_form[due_date][][due_at]" style="width: 200px" type="text" value="' +
         due_at + '">' + '</td>';
 
-     // html+= '<td align="center" class="time_zone_picker" width="20%">' +
-      //      '<select id="time_zone_picker" name="due_date[time_zone]">';
-
       html += '<td align="center" class="due_date_submission_allowed_id" width="10%">' +
-        '<select id="due_date_submission_allowed_id" name="due_date[submission_allowed_id]">' +
+        '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]">' +
         '<option value="">---</option>' +
         '<option value="1">No</option>' +
         '<option value="2">Late</option>' +
@@ -123,7 +138,7 @@ function addDueDateTableElement(deadline_type, round_no, due_date) {
         '</select></td>';
 
       html += '<td align="center" class="due_date_review_allowed_id" width="10%">' +
-        '<select id="due_date_review_allowed_id" name="due_date[review_allowed_id]">' +
+        '<select id="due_date_review_allowed_id" name="assignment_form[due_date][][review_allowed_id]">' +
         '<option value="">---</option>' +
         '<option value="1">No</option>' +
         '<option value="2">Late</option>' +
@@ -141,7 +156,7 @@ function addDueDateTableElement(deadline_type, round_no, due_date) {
 
 
       html += '<td align="center" class="due_date_review_of_review_allowed_id" width="10%">' +
-        '<select id="due_date_review_of_review_allowed_id" name="due_date[review_of_review_allowed_id]">' +
+        '<select id="due_date_review_of_review_allowed_id" name="assignment_form[due_date][][review_of_review_allowed_id]">' +
         '<option value="">---</option>' +
         '<option value="1">No</option>' +
         '<option value="2">Late</option>' +
@@ -149,7 +164,7 @@ function addDueDateTableElement(deadline_type, round_no, due_date) {
         '</select></td>';
 
       html += '<td align="center" class="due_date_quiz_allowed_id" width="10%">' +
-        '<select id="due_date_quiz_allowed_id" name="due_date[quiz_allowed_id]">' +
+        '<select id="due_date_quiz_allowed_id" name="assignment_form[due_date][][quiz_allowed_id]">' +
         '<option value="">---</option>' +
         '<option value="1">No</option>' +
         '<option value="2">Late</option>' +
@@ -157,7 +172,7 @@ function addDueDateTableElement(deadline_type, round_no, due_date) {
         '</select></td>';
 
       html += '<td align="center" class="due_date_threshold" width="10%">' +
-        '<select id="due_date_threshold" name="due_date[threshold]">' +
+        '<select id="due_date_threshold" name="assignment_form[due_date][][threshold]">' +
         '<option value="">---</option>' +
         '<option value="8">8</option>' +
         '<option value="16">16</option>' +
@@ -173,11 +188,7 @@ function addDueDateTableElement(deadline_type, round_no, due_date) {
         '<option value="96">96</option>' +
         '</select></td>';
 
-
-
-
-
-    previous_element.after(html);
+      previous_element.after(html);
 
       jQuery('#due_date_submission_allowed_id').val(due_date.submission_allowed_id).attr('id', '');
       jQuery('#due_date_resubmission_allowed_id').val(due_date.resubmission_allowed_id).attr('id', '');
@@ -188,8 +199,8 @@ function addDueDateTableElement(deadline_type, round_no, due_date) {
       jQuery('#due_date_threshold').val(due_date.threshold).attr('id', '');
 
       jQuery('#datetimepicker_' + element_id).datetimepicker({
-        dateFormat: 'yy/mm/dd',
-        timeFormat: 'HH:mm z',
+        dateFormat: 'yy:mm:dd',
+        timeFormat: 'HH:mm:ss z',
         controlType: 'select',
         timezoneList: [{value:'<%=Time.zone_offset(@user.timezonepref || '')%>', label: '<%=@user.timezonepref.try(:split, "\s").try(:[], 0)%>'}]
 
@@ -212,49 +223,22 @@ function removeDueDateTableElement(deadline_type, round_no) {
   jQuery(element_id).remove();
 }
 
-<!--javascript function that goes through the due_dates_table and submit the data line by line -->
-<!--ruby method that response to the get request is set_due_date-->
-function submit_due_dates() {
-  var data, para, fields, i, j;
-  //delete old due_dates
-  jQuery.get("/assignments/delete_all_due_dates?assignment_id=" + <%= @assignment.id %>);
-  //create the new due_dates
-  data = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)');
-  for (i = 0; i < data.length; i++) {
-    fields = jQuery(data[i]).find('input,select');
-    para = "?";
-    for (j = 0; j < fields.length; j++) {
-      para += "&" + (fields[j].name + "=" + fields[j].value);
-    }
-      jQuery.get("/assignments/set_due_date" + para);
-  }
-}
 </script>
 
 <div style="font-size:large;">
 <b><label id="staggered_label" style="display:none">Deadlines for chapter 1</label></b>
 </div>
 
-<div style="padding:5px;">
-<div style="width:50%;Text-align:left;float:left;">
-<%= label_tag('assignment[rounds_of_reviews]', 'Number of Review Rounds:') %>
-<%= text_field_tag('assignment[rounds_of_reviews]', @assignment.rounds_of_reviews, :style => 'width:50px') %>
-<%= button_tag 'Set', onclick: 'changeReviewRounds()' %>
-</div>
-
-<div style="width:50%;Text-align:right;float:right;">
-  <label >Current Time Zone:
-    <input type="text" readonly value="<%= session[:user].timezonepref %>">
-  </label>
-</div>
-
+<div style='padding: 5px' id='review_round'>
+<%= label_tag('assignment_form[assignment][rounds_of_reviews]', 'Number of Review Rounds:') %>
+<%= text_field_tag('assignment_form[assignment][rounds_of_reviews]', @assignment_form.assignment.rounds_of_reviews, :style => 'width:50px') %>
+  <button type="button" id="set_rounds">Set</button>
 </div>
 
 <table class='exp' id='due_dates_table' style='padding:10px'>
 <tr id='due_date_heading'>
 <th width=15%>Deadline type</th>
 <th width=20%>Date & time</th>
-<!--<th width=20%>Timezone</th>-->
 <th width=10%>Submission allowed</th>
 <th width=8%>Review allowed</th>
 <!--<th width=10%>Resubmission Allowed</th>-->
@@ -265,11 +249,11 @@ function submit_due_dates() {
   </tr>
   <script>
     jQuery(document).ready(function () {
-      <% for i in 1..@assignment.rounds_of_reviews %>
- addDueDateTableElement('submission', <%=i%>, <%= due_date(@assignment, 'submission', i-1).to_json.html_safe %>);
-          addDueDateTableElement('review', <%=i%>, <%= due_date(@assignment, 'review', i-1).to_json.html_safe %>);
-    <% end %>
-          addDueDateTableElement('metareview', 0, <%= due_date(@assignment, 'metareview').to_json.html_safe %>);
+      <% 1.upto @assignment_form.assignment.rounds_of_reviews do |i| %>
+        addDueDateTableElement('submission', <%=i%>, <%= due_date(@assignment_form.assignment, 'submission', i-1).to_json.html_safe %>);
+        addDueDateTableElement('review', <%=i%>, <%= due_date(@assignment_form.assignment, 'review', i-1).to_json.html_safe %>);
+      <% end %>
+      addDueDateTableElement('metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
     }());
   </script>
 </table>

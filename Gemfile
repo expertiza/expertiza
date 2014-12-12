@@ -1,8 +1,7 @@
-#ruby '2.1.2'
+#ruby '2.1.0'
 
 source 'http://rubygems.org'
 
-# gem 'rails'
 gem 'rails'
 
 ## Gems in Alphabetical Order
@@ -36,6 +35,7 @@ gem 'nokogiri'
 gem 'open-uri-cached'
 gem 'paper_trail'
 gem 'protected_attributes'
+gem 'rails_12factor', group: :production
 gem 'rails4-autocomplete'
 gem 'rake'
 gem 'rb-readline'
@@ -59,6 +59,7 @@ group :development do
   gem 'pry'
   gem 'pry-remote'
   gem 'pry-nav'
+  gem 'sqlite3-ruby', :require => 'sqlite3'
   gem 'selenium-webdriver'
 end
 

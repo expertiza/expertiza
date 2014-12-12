@@ -1,4 +1,8 @@
 Expertiza::Application.routes.draw do
+
+  get 'auth/:provider/callback', to: 'auth#google_login'
+  get 'auth/failure', to: 'content_pages#view'
+
   resources :bookmark_tags
   resources :books
   resources :bookmarks

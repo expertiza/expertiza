@@ -19,5 +19,9 @@ class QuizResponseMap < ResponseMap
     end
     self.destroy
   end
+
+  def self.get_mappings_for_reviewer(participant_id)
+    return QuizResponseMap.where(reviewer_id: participant_id)
+  end
 end
 

@@ -239,6 +239,11 @@ GEM
       sprockets-rails (~> 2.0)
     rails4-autocomplete (1.1.1)
       rails (>= 3.0)
+    rails_12factor (0.0.2)
+      rails_serve_static_assets
+      rails_stdout_logging
+    rails_serve_static_assets (0.0.2)
+    rails_stdout_logging (0.0.3)
     railties (4.1.5)
       actionpack (= 4.1.5)
       activesupport (= 4.1.5)
@@ -472,6 +477,7 @@ DEPENDENCIES
   pry-remote
   rails
   rails4-autocomplete
+  rails_12factor
   rake
   rb-readline
   rgl

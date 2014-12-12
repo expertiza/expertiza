@@ -4,7 +4,7 @@
 <B>Created at:</B> <%= @questionnaire.created_at %><BR/>
 <B>Last modified at:</B> <%= @questionnaire.updated_at %>
 <BR/><BR/>
-<%= render :partial => 'student_quiz/quiz_form', :locals => { :questionnaire_id => @questionnaire.id } %></br>
+<%= render :partial => 'student_quizzes/quiz_form', :locals => { :questionnaire_id => @questionnaire.id } %></br>
 
 <TABLE>
   <% if (@questionnaire.section == "Custom") %>

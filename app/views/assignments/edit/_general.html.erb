@@ -3,8 +3,8 @@ function requireSignUpChanged() {
   var msg = 'Warning! Unchecking this box will remove all topics and the reservations of everyone who is sign up for them';
 
   if (jQuery('#assignment_require_signup').is(':checked')) {
-    addDueDateTableElement('signup', 0, <%= due_date(@assignment, 'signup').to_json.html_safe %>);
-    addDueDateTableElement('drop_topic', 0, <%= due_date(@assignment, 'drop_topic').to_json.html_safe %>)
+    addDueDateTableElement('signup', 0, <%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
+    addDueDateTableElement('drop_topic', 0, <%= due_date(@assignment_form.assignment, 'drop_topic').to_json.html_safe %>)
   } else {
     if (confirm(msg)) {
       removeDueDateTableElement('signup', 0);
@@ -20,7 +20,7 @@ function teamAssignmentChanged() {
 
   if (jQuery('#assignment_team_assignment').is(':checked')) {
     jQuery('#assignment_team_count_field').removeAttr('hidden');
-    addDueDateTableElement('team_formation', 0, <%= due_date(@assignment, 'team_formation').to_json.html_safe %>)
+    addDueDateTableElement('team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>)
   } else {
     if (confirm(msg)) {
       jQuery('#assignment_team_count_field').attr('hidden', true);
@@ -55,28 +55,28 @@ function is_coding_assignmentChanged(){
 <th width=70%></th>
 </tr>
 
-<%= hidden_field_tag('assignment[instructor_id]', @assignment.instructor_id) %>
-<%= hidden_field_tag('assignment[course_id]', @assignment.course_id) %>
-<%= hidden_field_tag('assignment[id]', @assignment.id) %>
+<%= hidden_field_tag('assignment_form[assignment][instructor_id]', @assignment_form.assignment.instructor_id) %>
+<%= hidden_field_tag('assignment_form[assignment][course_id]', @assignment_form.assignment.course_id) %>
+<%= hidden_field_tag('assignment_form[assignment][id]', @assignment_form.assignment.id) %>
 
 <tr>
-<td style='padding:5px'><%= label_tag('assignment[name]', 'Assignment name:') %></td>
-<td style='padding:5px'><%= text_field_tag('assignment[name]', @assignment.name, :style => 'width:250px') %></td>
+<td style='padding:5px'><%= label_tag('assignment_form[assignment][name]', 'Assignment name:') %></td>
+<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][name]', @assignment_form.assignment.name, :style => 'width:250px') %></td>
 </tr>
 
 <tr>
-<td style='padding:5px'><%= label_tag('assignment[course_id]', 'Course:') %></td>
-<td style='padding:5px'><%= select('assignment', 'course_id', course_options(@assignment.instructor), :selected => @assignment.course_id) %></td>
+<td style='padding:5px'><%= label_tag('assignment_form[assignment][course_id]', 'Course:') %></td>
+<td style='padding:5px'><%= select('assignment_form[assignment]', 'course_id', course_options(@assignment_form.assignment.instructor), :selected => @assignment_form.assignment.course_id) %></td>
 </tr>
 
 <tr>
-<td style='padding:5px'><%= label_tag('assignment[directory_path]', 'Submission directory:') %></td>
-<td style='padding:5px'><%= text_field_tag('assignment[directory_path]', @assignment.directory_path, :style => 'width:250px') %></td>
+<td style='padding:5px'><%= label_tag('assignment_form[assignment][directory_path]', 'Submission directory:') %></td>
+<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][directory_path]', @assignment_form.assignment.directory_path, :style => 'width:250px') %></td>
 </tr>
 
 <tr>
-<td style='padding:5px'><%= label_tag('assignment[spec_location]', 'Description URL: ') %></td>
-<td style='padding:5px'><%= text_field_tag('assignment[spec_location]', @assignment.spec_location, :style => 'width:250px') %></td>
+<td style='padding:5px'><%= label_tag('assignment_form[assignment][spec_location]', 'Description URL: ') %></td>
+<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][spec_location]', @assignment_form.assignment.spec_location, :style => 'width:250px') %></td>
 </tr>
 </table>
 
@@ -91,78 +91,78 @@ function is_coding_assignmentChanged(){
 
   <tr>
     <td style='padding:5px' id='assignment_private_field'>
-      <input name="assignment[private]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment[private]', 'true', @assignment.private?) %>
-      <%= label_tag('assignment[private]', 'Private?') %>
+      <input name="assignment_form[assignment][private]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][private]', 'true', @assignment_form.assignment.private?) %>
+      <%= label_tag('assignment_form[assignment][private]', 'Private?') %>
     </td>
   </tr>
 
   <tr>
     <td style='padding:5px' id='assignment_require_signup_field'>
-      <input name="assignment[require_signup]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment[require_signup]', 'true', @assignment.require_signup?, {:onChange => 'hasTopicsChanged()'}) %>
-      <%= label_tag('assignment[require_signup]', 'Has topics?') %>
+      <input name="assignment_form[assignment][require_signup]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment[require_signup]', 'true', @assignment_form.assignment.require_signup?, {:onChange => 'hasTopicsChanged()'}) %>
+      <%= label_tag('assignment_form[assignment][require_signup]', 'Has topics?') %>
     </td>
     <td style='padding:5px' id='assignment_is_intelligent_field'>
-      <%= label_tag('assignment[is_intelligent]', 'Intelligent Topic Selection:') %>
-      <select id="assignment_is_intelligent_field" name="assignment[is_intelligent]">
+      <%= label_tag('assignment_form[assignment][is_intelligent]', 'Intelligent Topic Selection:') %>
+      <select id="assignment_is_intelligent_field" name="assignment_form[assignment][is_intelligent]">
         <option value=false style="width:75px">No</option>
-        <option value=true style="width:75px" <% if @assignment.is_intelligent %>SELECTED<%end%>>Yes</option>
+        <option value=true style="width:75px" <% if @assignment_form.assignment.is_intelligent %>SELECTED<%end%>>Yes</option>
       </select>
     </td>
   </tr>
 
-  <% if @assignment.require_signup? %>
+  <% if @assignment_form.assignment.require_signup? %>
     <script>
       jQuery(document).ready(function () {
-        addDueDateTableElement('signup', 0, <%= due_date(@assignment, 'signup').to_json.html_safe %>);
-              addDueDateTableElement('drop_topic', 0, <%= due_date(@assignment, 'drop_topic').to_json.html_safe %>)
+        addDueDateTableElement('signup', 0, <%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
+              addDueDateTableElement('drop_topic', 0, <%= due_date(@assignment_form.assignment, 'drop_topic').to_json.html_safe %>)
       });
     </script>
   <% end %>
 
   <tr>
     <td style='padding:5px' id='assignment_team_assignment_field'>
-      <%= check_box_tag('team_assignment', 'true', @assignment.team_assignment?, {:onChange => 'hasTeamsChanged()'}) %>
+      <%= check_box_tag('team_assignment', 'true', @assignment_form.assignment.team_assignment?, {:onChange => 'hasTeamsChanged()'}) %>
       <%= label_tag('team_assignment', 'Has teams?') %>
     </td>
 
-    <td style='padding:5px' id='assignment_team_count_field' <%= 'hidden' unless @assignment.team_assignment? %>>
-      <%= label_tag('assignment[max_team_size]', 'Maximum number of members per team:') %>
-      <%= text_field_tag('assignment[max_team_size]', @assignment.max_team_size, {:style => 'width:20px'}) %>
+    <td style='padding:5px' id='assignment_team_count_field' <%= 'hidden' unless @assignment_form.assignment.team_assignment? %>>
+      <%= label_tag('assignment_form[assignment][max_team_size]', 'Maximum number of members per team:') %>
+      <%= text_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size, {:style => 'width:20px'}) %>
     </td>
   </tr>
 
 
   <tr>
     <td style='padding:5px' id='assignment_wiki_assignment_field'>
-      <%= check_box_tag('assignment_wiki_assignment', 'true', (@assignment.wiki_type.name != 'No'), :onChange => 'wikiAssignmentChanged()') %>
+      <%= check_box_tag('assignment_wiki_assignment', 'true', (@assignment_form.assignment.wiki_type.name != 'No'), :onChange => 'wikiAssignmentChanged()') %>
       <%= label_tag('assignment_wiki_assignment', 'Wiki assignment?') %>
     </td>
 
-    <td style='padding:5px' id='assignment_wiki_type_field' <%= 'hidden' unless @assignment.wiki_type.name != 'No' %>>
-      <%= label_tag('assignment[wiki_type_id]', 'Wiki type:') %>
-      <%= select('assignment', 'wiki_type_id', wiki_type_options, :selected => @assignment.wiki_type_id) %>
+    <td style='padding:5px' id='assignment_wiki_type_field' <%= 'hidden' unless @assignment_form.assignment.wiki_type.name != 'No' %>>
+      <%= label_tag('assignment_form[assignment][wiki_type_id]', 'Wiki type:') %>
+      <%= select('assignment_form[assignment]', 'wiki_type_id', wiki_type_options, :selected => @assignment_form.assignment.wiki_type_id) %>
     </td>
   </tr>
   <!--staggered_deadlin-->
   <tr>
     <td style='padding:5px' id='assignment_staggered_deadline_field'>
-      <input name="assignment[staggered_deadline]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment[staggered_deadline]', 'true', @assignment.staggered_deadline, {:onChange => 'staggeredDeadlineChanged()'}) %>
-      <%= label_tag('assignment[staggered_deadline]', 'Staggered deadline assignment?') %>
+      <input name="assignment_form[assignment][staggered_deadline]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][staggered_deadline]', 'true', @assignment_form.assignment.staggered_deadline, {:onChange => 'staggeredDeadlineChanged()'}) %>
+      <%= label_tag('assignment_form[assignment][staggered_deadline]', 'Staggered deadline assignment?') %>
     </td>
-    <td style='padding:5px' id='assignment_days_between_submissions_field' <%= 'hidden' unless @assignment.staggered_deadline %>>
-      <%= label_tag('assignment[days_between_submissions]', 'Days between chapters:') %>
-      <%= text_field_tag('assignment[days_between_submissions]', @assignment.days_between_submissions, {:onChange => 'daysBetweenSubmissionsChanged()', :style => 'width:20px'}) %>
+    <td style='padding:5px' id='assignment_days_between_submissions_field' <%= 'hidden' unless @assignment_form.assignment.staggered_deadline %>>
+      <%= label_tag('assignment_form[assignment][days_between_submissions]', 'Days between chapters:') %>
+      <%= text_field_tag('assignment_form[assignment][days_between_submissions]', @assignment_form.assignment.days_between_submissions, {:onChange => 'daysBetweenSubmissionsChanged()', :style => 'width:20px'}) %>
     </td>
   </tr>
 
   <tr>
     <td style='padding:5px' id='assignment_microtask_field'>
-      <input name="assignment[microtask]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment[microtask]', 'true', @assignment.microtask, {:onchange => 'microtaskChanged()'}) %>
-      <%= label_tag('assignment[microtask]', 'Micro-task assignment?') %>
+      <input name="assignment_form[assignment][microtask]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][microtask]', 'true', @assignment_form.assignment.microtask, {:onchange => 'microtaskChanged()'}) %>
+      <%= label_tag('assignment_form[assignment][microtask]', 'Micro-task assignment?') %>
     </td>
   </tr>
 
@@ -170,38 +170,38 @@ function is_coding_assignmentChanged(){
 
   <tr>
     <td style='padding:5px' id='assignment_review_visible_to_all_field'>
-      <input name="assignment[reviews_visible_to_all]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment[reviews_visible_to_all]', 'true', @assignment.reviews_visible_to_all) %>
-      <%= label_tag('assignment[reviews_visible_to_all]', 'Reviews visible to all other reviewers?') %>
+      <input name="assignment_form[assignment][reviews_visible_to_all]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][reviews_visible_to_all]', 'true', @assignment_form.assignment.reviews_visible_to_all) %>
+      <%= label_tag('assignment_form[assignment][reviews_visible_to_all]', 'Reviews visible to all other reviewers?') %>
     </td>
   </tr>
 
   <tr>
     <td style='padding:5px' id='assignment_allow_suggestion_field'>
-      <input name="assignment[allow_suggestions]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment[allow_suggestions]', 'true', @assignment.allow_suggestions) %>
-      <%= label_tag('assignment[reviews_visible_to_all]', 'Allow topic suggestions from students?') %>
+      <input name="assignment_form[assignment][allow_suggestions]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][allow_suggestions]', 'true', @assignment_form.assignment.allow_suggestions) %>
+      <%= label_tag('assignment_form[assignment][reviews_visible_to_all]', 'Allow topic suggestions from students?') %>
     </td>
   </tr>
 
   <tr>
     <td style='padding:5px' id='assignment_availability_flag_field'>
-      <input name="assignment[availability_flag]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment[availability_flag]', 'true', @assignment.availability_flag) %>
-      <%= label_tag('assignment[availability_flag]', 'Available to students?') %>
+      <input name="assignment_form[assignment][availability_flag]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][availability_flag]', 'true', @assignment_form.assignment.availability_flag) %>
+      <%= label_tag('assignment_form[assignment][availability_flag]', 'Available to students?') %>
     </td>
   </tr>
   <!--Quiz fields-->
 
   <tr>
     <td style='padding:5px' id='assignment_is_coding_assignment_field'>
-      <input name="assignment[is_coding_assignment]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment[is_coding_assignment]', 'true', @assignment.is_coding_assignment, {:onchange => 'is_coding_assignmentChanged()'}) %>
-      <%= label_tag('assignment[is_coding_assignment]', 'Is code submission required?') %>
+      <input name="assignment_form[assignment][is_coding_assignment]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][is_coding_assignment]', 'true', @assignment_form.assignment.is_coding_assignment, {:onchange => 'is_coding_assignmentChanged()'}) %>
+      <%= label_tag('assignment_form[assignment][is_coding_assignment]', 'Is code submission required?') %>
     </td>
-    <td style='padding:5px' id='assignment_numbers_of_quiz_field' <%= 'hidden' unless @assignment.require_quiz %>>
-      <%= label_tag('assignment[num_quiz_questions]', 'Number of Quiz questions:') %>
-      <%= text_field_tag('assignment[num_quiz_questions]', @assignment.num_quiz_questions, { :style => 'width:20px'}) %>
+    <td style='padding:5px' id='assignment_numbers_of_quiz_field' <%= 'hidden' unless @assignment_form.assignment.require_quiz %>>
+      <%= label_tag('assignment_form[assignment][num_quiz_questions]', 'Number of Quiz questions:') %>
+      <%= text_field_tag('assignment_form[assignment][num_quiz_questions]', @assignment_form.assignment.num_quiz_questions, { :style => 'width:20px'}) %>
     </td>
   </tr>
 
@@ -214,10 +214,10 @@ function is_coding_assignmentChanged(){
         var checkbox = jQuery('#assignment_require_signup');
 
         if (checkbox.is(':checked')) {
-          addDueDateTableElement('signup', 0, <%= due_date(@assignment, 'signup').to_json.html_safe %>);
-            addDueDateTableElement('drop_topic', 0, <%= due_date(@assignment, 'drop_topic').to_json.html_safe %>);
+          addDueDateTableElement('signup', 0, <%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
+            addDueDateTableElement('drop_topic', 0, <%= due_date(@assignment_form.assignment, 'drop_topic').to_json.html_safe %>);
         } else {
-          if (<%= @assignment.has_topics? %>) {
+          if (<%= @assignment_form.assignment.has_topics? %>) {
             if (confirm(msg)) {
               removeDueDateTableElement('signup', 0);
                     removeDueDateTableElement('drop_topic', 0);
@@ -238,9 +238,9 @@ function is_coding_assignmentChanged(){
 
         if (checkbox.is(':checked')) {
           team_count_field.removeAttr('hidden');
-            addDueDateTableElement('team_formation', 0, <%= due_date(@assignment, 'team_formation').to_json.html_safe %>)
+            addDueDateTableElement('team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>)
         } else {
-          if (<%= @assignment.has_teams?%>) {
+          if (<%= @assignment_form.assignment.has_teams?%>) {
             if (confirm(msg)) {
               team_count_field.attr('hidden', true);
                     removeDueDateTableElement('team_formation', 0);
@@ -277,7 +277,7 @@ function is_coding_assignmentChanged(){
     }
 
    function reviewStrategyChanged() {
-     var val = jQuery('#assignment_review_assignment_strategy').val();
+     var val = jQuery('#assignment_form_assignment_review_assignment_strategy').val();
         if (val == 'Student-Selected' || val == 'Auto-Selected') {
           jQuery('#assignment_review_topic_threshold_row').removeAttr('hidden');
         } else {

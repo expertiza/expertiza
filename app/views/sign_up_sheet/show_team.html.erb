@@ -20,7 +20,7 @@
 TeamsUser.where(team_id: result[:team_id]).each{|teamuser|
   team_members+=User.find(teamuser.user_id).name+" "
 }
-
+      if result[:advertise_for_partner] == 1
       %>
     <tr>
       <td align="center" width="500"><%= result[:name] %></td>
@@ -37,7 +37,8 @@ TeamsUser.where(team_id: result[:team_id]).each{|teamuser|
     </td>
   <%else%>
     <td></td>
-  <% end %>
+  <% end
+  end %>
 
 </tr>
   <% } %>

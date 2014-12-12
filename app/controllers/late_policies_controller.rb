@@ -1,6 +1,34 @@
 class LatePoliciesController < ApplicationController
   helper :penalty
   include PenaltyHelper
+
+  def action_allowed?
+    case params[:action]
+    when 'new', 'create', 'index'
+      ['Super-Administrator',
+       'Administrator',
+       'Instructor',
+       'Teaching Assistant'].include? current_role_name
+    when 'edit', 'update', 'destroy'
+      [
+        'Super-Administrator',
+        'Administrator',
+        'Instructor',
+        'Teaching Assistant'
+      ].include?(current_role_name) &&
+      current_user.instructor_id == instructor_id
+    end
+  end
+
+  private def instructor_id
+    late_policy.try(:instructor_id) ||
+    current_user.instructor_id
+  end
+
+  private def late_policy
+    @penalty_policy ||= @late_policy || LatePolicy.find(params[:id]) if params[:id]
+  end
+
   # GET /late_policies
   # GET /late_policies.xml
   def index
@@ -46,12 +74,6 @@ class LatePoliciesController < ApplicationController
 
     is_number = true
 
-    if session[:user].role.name == "Teaching Assistant"
-      user_id = Ta.get_my_instructor(session[:user].id)
-    else
-      user_id = session[:user].id
-    end
-
     #if(!is_numeric?(params[:late_policy][:penalty_per_unit]))
     #  flash[:error] = "Penalty points per unit should be a numeric value"
     #  is_number = false
@@ -68,10 +90,10 @@ class LatePoliciesController < ApplicationController
       is_number = false
     end
 
-    @policy = LatePolicy.where(policy_name: params[:late_policy][:policy_name])
-    if(@policy != nil && !@policy.empty?)
-      @policy.each do |p|
-        if p.instructor_id == user_id
+    @late_policy = LatePolicy.where(policy_name: params[:late_policy][:policy_name])
+    if(@late_policy != nil && !@late_policy.empty?)
+      @late_policy.each do |p|
+        if p.instructor_id == instructor_id
           flash[:error] = "A policy with same name already exists"
           is_number = false
           break
@@ -80,7 +102,7 @@ class LatePoliciesController < ApplicationController
     end
     if (is_number)
       @late_policy = LatePolicy.new(params[:late_policy])
-      @late_policy.instructor_id = user_id
+      @late_policy.instructor_id = instructor_id
 
       begin
         @late_policy.save!
@@ -100,11 +122,6 @@ end
 def update
 
   @penalty_policy = LatePolicy.find(params[:id])
-  if session[:user].role.name == "Teaching Assistant"
-    user_id = TA.get_my_instructor(session[:user]).id
-  else
-    user_id = session[:user].id
-  end
   issue_number = false
   if (params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i)
     flash[:error] = "Max penalty cannot be less than penalty per unit."
@@ -116,7 +133,7 @@ def update
     @policy = LatePolicy.where(policy_name: params[:late_policy][:policy_name])
     if(@policy != nil && !@policy.empty?)
       @policy.each do |p|
-        if p.instructor_id == user_id
+        if p.instructor_id == instructor_id
           flash[:error] = "Cannot edit the policy. A policy with same name already exists"
           issue_name = true
           break
@@ -125,35 +142,29 @@ def update
     end
   end
   if (issue_name == false && issue_number == false)
-    begin
-      @penalty_policy.update_attributes(params[:late_policy][:penalty_unit])
-      @penalty_policy.update_attributes(params[:late_policy])
-      @penalty_policy.save!
-      @penaltyObjs = CalculatedPenalty.all
-      @penaltyObjs.each do |pen|
-        @participant = AssignmentParticipant.find(pen.participant_id)
-        @assignment = @participant.assignment
-        if @assignment.late_policy_id == @penalty_policy.id
-          @penalties = calculate_penalty(pen.participant_id)
-          @total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
-          if pen.deadline_type_id.to_i == 1
-            penalty_attr1 = {:penalty_points => @penalties[:submission]}
-            pen.update_attribute(:penalty_points, @penalties[:submission])
-          elsif pen.deadline_type_id.to_i == 2
-            penalty_attr2 = {:penalty_points => @penalties[:review]}
-            pen.update_attribute(:penalty_points, @penalties[:review])
-          elsif pen.deadline_type_id.to_i == 5
-            penalty_attr3 = {:penalty_points => @penalties[:meta_review]}
-            pen.update_attribute(:penalty_points, @penalties[:meta_review])
-          end
+    @penalty_policy.update_attributes(params[:late_policy])
+    @penalty_policy.save!
+    @penaltyObjs = CalculatedPenalty.all
+    @penaltyObjs.each do |pen|
+      @participant = AssignmentParticipant.find(pen.participant_id)
+      @assignment = @participant.assignment
+      if @assignment.late_policy_id == @penalty_policy.id
+        @penalties = calculate_penalty(pen.participant_id)
+        @total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
+        if pen.deadline_type_id.to_i == 1
+          {:penalty_points => @penalties[:submission]}
+          pen.update_attribute(:penalty_points, @penalties[:submission])
+        elsif pen.deadline_type_id.to_i == 2
+          {:penalty_points => @penalties[:review]}
+          pen.update_attribute(:penalty_points, @penalties[:review])
+        elsif pen.deadline_type_id.to_i == 5
+          {:penalty_points => @penalties[:meta_review]}
+          pen.update_attribute(:penalty_points, @penalties[:meta_review])
         end
       end
-      flash[:notice] = "Late policy was successfully updated."
-      redirect_to :action => 'index'
-    rescue
-      flash[:error] = "The following error occurred while updating the penalty policy: "
-      redirect_to :action => 'edit', :id => params[:id]
     end
+    flash[:notice] = "Late policy was successfully updated."
+    redirect_to :action => 'index'
   elsif issue_number == true
     flash[:error] = "Cannot edit the policy. Maximum penalty cannot be less than penalty per unit."
     redirect_to :action => 'edit', :id => params[:id]

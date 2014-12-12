@@ -1,7 +1,7 @@
 #these 4 helpers consist of the list of plot options that are available for the graph type
 module LineGraphHelper
   #development note
-  # 1)method for generate the data packet has already been - completed: helpers/chart.rb
+  # 1)method for generate the data packet has already been - completed: helpers/chart_helper.rb
   # 2)javascript for rendering the chart - partially completed
   #   currently value x axis can not be independently set
   # 3)data mining method for gathering data - partially completed
@@ -14,7 +14,7 @@ end
 
 module PieChartHelper
   #only for single object compaireson meaning
-  # 1)method for generate the data packet has already been - completed: helpers/chart.rb
+  # 1)method for generate the data packet has already been - completed: helpers/chart_helper.rb
   # 2)javascript for rendering the chart - completed
 
   # good for showing grade distributions
@@ -22,15 +22,16 @@ module PieChartHelper
 end
 
 module ScatterPlotHelper
-  # 1)method for generate the data packet has already been - completed: helpers/chart.rb
+  # 1)method for generate the data packet has already been - completed: helpers/chart_helper.rb
   # 2)javascript for rendering the chart - completed
 
 
 end
 
 module AnalyticHelper
-  #====== generating chart data ================#
-  def bar_chart_data(object_type, object_id_list, data_type_list)
+  include ChartHelper
+  #====== generic method to generate chart data (chart_type decides which chart to render) ================#
+  def get_chart_data(chart_type, object_type, object_id_list, data_type_list)
     data_point = Array.new
     object_model = Object.const_get(object_type.capitalize)
     object_id_list.each do |object_id|
@@ -40,9 +41,14 @@ module AnalyticHelper
       object_data[:data] = gather_data(object, data_type_list)
       data_point << object_data
     end
-    option = Hash.new
-    option[:x_axis_categories] =data_type_list
-    Chart.new(:bar, data_point, option).data
+    # Formatting the optional parameters field ( pie charts do not support optional parameters )
+    if(chart_type !="pie")
+      option = Hash.new
+      option[:x_axis_categories] =data_type_list
+    else
+      option = nil
+    end
+    Chart.new(chart_type.to_sym, data_point, option).data
   end
 
   def gather_data(object, data_type_array)

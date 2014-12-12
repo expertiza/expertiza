@@ -1,0 +1,12 @@
+<h2>Questions</h2>
+<% form_tag :controller => 'student_quizzes', :action => 'record_response',
+  :assignment_id => params[:assignment_id],
+  :participant_id => params[:participant_id],
+  :map_id => params[:map_id] do %>
+  <% @map = ResponseMap.find(params[:map_id]) %>
+  <% @questionnaire = Questionnaire.find(@map.reviewed_object_id) %>
+  <%= hidden_field_tag :questionnaire_id, "#{@questionnaire.id}" %>
+  <%= hidden_field_tag :assignment_id, "#{params[:assignment_id]}" %>
+  <%= render :partial => 'quiz_form', :locals => { :questionnaire_id => @questionnaire.id } %>
+  <%= submit_tag "Submit Quiz", :name=>"save" %>
+<% end %>

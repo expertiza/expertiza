@@ -22,10 +22,15 @@
           <%= render :partial => 'auth/login' %><br/>
           <% if session[:user].nil? %>
           <% else %>
-            <% if session[:user].role_id ==4  %>
-              <%= link_to "Manage Versions Table", Version %></a>
+            <% if session[:user].role_id == 4 || session[:user].role_id == 3 || session[:user].role_id == 2 %>
+              <%= link_to "Search Audit Data", Version %></a>
             <% end %>
           <% end %>
+          <div>
+            <% if !current_user %>
+                <%= link_to image_tag("google.png", size: "150x50"), "/auth/google_oauth2" %>
+            <% end %>
+          </div>
         </div>
       </div>
 

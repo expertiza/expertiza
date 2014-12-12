@@ -14,8 +14,8 @@
 <!--ACS Here we need to know the size of the team to decide whether or not
 to display the label "Your team" in the student assignment tasks-->
   <%if @assignment.team_assignment? %>
-    <li> <%= link_to 'Your team', :controller=>'student_team', :action => 'view', :id => @participant.id %> 
-	 (View and manage your team)
+    <li> <%= link_to 'Your team', view_student_teams_path(student_id: @participant.id) %>
+      (View and manage your team)
     </li>
   <%end%>
     <li>
@@ -29,7 +29,7 @@ to display the label "Your team" in the student assignment tasks-->
     <!--Quiz-->
     <li>
       <% if @assignment.require_quiz and (@assignment.quiz_allowed(@reviewee_topic_id) or @assignment.get_current_stage(@participant.topic_id) == "Complete") %>
-        <%= link_to "Quiz",{:controller => 'student_quiz', :action => 'list', :id => @participant.id} %>
+        <%= link_to "Quiz", student_quizzes_path(:id => @participant.id) %>
       <% else %>
         <font color="gray">Quiz</font>
       <% end %> (Understand other's work and take the quiz)

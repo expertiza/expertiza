@@ -6,8 +6,17 @@ class Team < ActiveRecord::Base
   has_many :bids, :dependent => :destroy
   has_paper_trail
 
-  def get_participants
-    Participant.where id: users.map(&:id)
+  def assignment
+    participants.first.assignment
+  end
+
+  def participants
+    users.where(parent_id: parent_id || current_user_id).flat_map(&:participants)
+  end
+  alias_method :get_participants, :participants
+
+  def responses
+    participants.flat_map(&:responses)
   end
 
   def delete
@@ -19,10 +28,6 @@ class Team < ActiveRecord::Base
       node.destroy
     end
     self.destroy
-  end
-
-  def get_participants
-    Participant.where user_id: users.map(&:id), parent_id: parent_id
   end
 
   def get_node_type

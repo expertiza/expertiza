@@ -26,6 +26,11 @@
               <%= link_to "Search Audit Data", Version %></a>
             <% end %>
           <% end %>
+          <div>
+            <% if !current_user %>
+                <%= link_to image_tag("google.png", size: "150x50"), "/auth/google_oauth2" %>
+            <% end %>
+          </div>
         </div>
       </div>
 

@@ -77,4 +77,8 @@ RSpec.configure do |config|
     mocks.verify_partial_doubles = true
   end
 =end
+
+  Dir["./spec/features/helpers/*.rb"].each do |filename|
+    require filename.gsub(/\.rb/, "")
+  end
 end

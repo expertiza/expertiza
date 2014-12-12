@@ -1,7 +1,7 @@
 class MenuUpdateCourseEvaluation < ActiveRecord::Migration
   def self.up
      permission1 = Permission.find_by_name('do assignments')
-     site_controller = SiteController.find_or_create_by_name('course_evaluation')
+     site_controller = SiteController.find_or_create_by(name: 'course_evaluation')
      site_controller.permission_id = permission1.id
      site_controller.builtin = 0
      site_controller.save

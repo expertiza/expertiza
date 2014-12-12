@@ -8,24 +8,30 @@
 </script>
 
 <% if current_user %>
-  <table>
-    <tr>
-      <td>User: <%= current_user.name %></td>
-    </tr>
+  <% if session[:super_user] %>
+    <%= form_for :impersonate, url: '/impersonate/impersonate' do |f| %>
+      <table>
+        <tr>
+          <td>User: <%= current_user.name %></td>
+        </tr>
 
-    <% if session[:super_user] %>
-      <%= form_tag :controller => 'impersonate', :action => 'impersonate' do %>
-        <tr><td><input id="impersonate_name" name="impersonate[name]" size="12"
-            title="Enter a user account to impersonate" type="text"
-            onKeyUp="UpdateButton();" /></td></tr>
-        <tr><td><%= submit_tag "Revert", name: "commit", id: "revert_button" %></td></tr>
-      <% end %>
-    <% else %>
-      <%= form_tag :controller => 'auth', :action => 'logout' do %>
+        <tr><td><%= f.text_field :name, size: 12,
+          title: "Enter a user account to impersonate",
+          data: { onKeyUp: "UpdateButton();" } %></td></tr>
+      <tr><td><%= f.submit "Revert", id: "revert_button" %></td></tr>
+      </table>
+    <% end %>
+  <% else %>
+    <%= form_tag :controller => 'auth', :action => 'logout' do %>
+      <table>
+        <tr>
+          <td>User: <%= current_user.name %></td>
+        </tr>
+
         <tr><td><%= submit_tag "Logout", id: 'logout-button' %></td></tr>
-      <% end %>
-    <% end -%>
-  </table>
+      </table>
+    <% end %>
+  <% end %>
 <% else %>
   <h1>Login</h1>
   <%= form_tag :controller => 'auth', :action => 'login' do %>

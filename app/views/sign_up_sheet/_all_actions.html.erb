@@ -1,0 +1,33 @@
+<% if ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include? current_user_role?.name %>
+    <td align="center">
+      <%= link_to image_tag('edit_icon.png', :border => 0, :title => 'Edit Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'edit', :id => topic.id %>
+      <%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Delete Topic', :align => 'middle'), sign_up_sheet_path(topic.id), method: :delete, data: {confirm: 'Are you sure?'} %>
+<%elsif @show_actions %>
+
+    <% action_symbol_added = false %>
+    <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
+        <% for selected_topic in @selected_topics %>
+            <% if selected_topic.topic_id == topic.id and !selected_topic.is_waitlisted%>
+                <td align="center"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id => topic.id, :assignment_id => params[:id] %></td>
+                <% action_symbol_added = true %>
+            <% elsif selected_topic.topic_id == topic.id and selected_topic.is_waitlisted%>
+                <td align="center">
+                  <%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id => topic.id, :assignment_id => params[:id] %>
+                  <% if @assignment.is_intelligent %>
+                      <%= form_tag({:controller=>"sign_up_sheet", :action=>"set_priority",:id => topic.id,:assignment_id => params[:id]}, method: :post) do %>
+                          <%= number_field_tag :priority, selected_topic.preference_priority_number %>
+                          <%= submit_tag  'Set priority', name: nil  %>
+                      <% end %>
+                  <% end %>
+                </td>
+
+
+                <% action_symbol_added = true %>
+            <% end %>
+        <% end %>
+    <% end %>
+    <% if action_symbol_added == false %>
+        <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'sign_up', :id => topic.id, :assignment_id => params[:id] %></td>
+    <% end %>
+
+<% end %>

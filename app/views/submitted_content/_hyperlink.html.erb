@@ -1,9 +1,10 @@
-<%= form_tag({:action => 'remove_hyperlink', :id => participant.id}, {:method => 'post'}) do %>
+<%= form_for :hyperlinks, url: '/submitted_content/remove_hyperlink' do |f| %>
   <% if stage != "Complete" %>
     <b>Hyperlink Actions:</b><BR/>
     </br>
 
-    <%= submit_tag 'Delete selected hyperlink' %>
+    <%= f.hidden_field :participant_id, value: participant.id %>
+    <%= f.submit 'Delete selected hyperlink' %>
     </br>
     </br>
   <% end %>
@@ -12,18 +13,17 @@
   <a href="#" id="urlLink" name="urlLink" onClick="toggleElement('url','links');return false;">hide links</a><br/>
   <div id="url" style="">
     <ul>
-      <% participant.get_hyperlinks.each_with_index {
-        |link, index| %>
-      <% if stage != "Complete" %>
-        <% if index == 0 %>
-          <input type="radio" id='chk_links' name='chk_links' checked value="<%= index %>"/>
-        <% else %>
-          <input type="radio" id='chk_links' name='chk_links' value="<%= index %>"/>
+      <% participant.get_hyperlinks.each_with_index do |link, index| %>
+        <% if stage != "Complete" %>
+          <% if index == 0 %>
+            <%= f.radio_button :chk_links, index, checked: true %>
+          <% else %>
+            <%= f.radio_button :chk_links, index %>
+          <% end %>
         <% end %>
+        <a href="<%= link %>" target="new"><%= link %></a>
+        <br/>
       <% end %>
-      <a href="<%= link %>" target="new"><%= link %></a>
-      <br/>
-    <% } %>
-  </ul>
-</div>
+    </ul>
+  </div>
 <% end %>

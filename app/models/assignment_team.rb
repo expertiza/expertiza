@@ -19,7 +19,9 @@ class AssignmentTeam < Team
   # Evaluates whether any contribution by this team was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object
   def reviewed_by?(reviewer)
-    TeamReviewResponseMap.count(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id]) > 0
+    #TeamReviewResponseMap.count(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id]) > 0
+    count = TeamReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id).count
+    return count > 0
   end
 
   # Topic picked by the team
@@ -34,7 +36,8 @@ class AssignmentTeam < Team
 
   # Whether the team has submitted work or not
   def has_submissions?
-    participants.each { |participant| return true if participant.has_submissions? }
+    list_of_users = participants;
+    list_of_users.each { |participant| return true if participant.has_submissions? }
     false
   end
 
@@ -45,14 +48,23 @@ class AssignmentTeam < Team
   # END of contributor methods
 
   def participants
-    @participants ||= AssignmentParticipant.all(conditions: ['parent_id = ? && user_id IN (?)', parent_id, users])
+    #@participants ||= AssignmentParticipant.all(conditions: ['parent_id = ? && user_id IN (?)', parent_id, users])
+    users.each {|user|
+      @participants ||= AssignmentParticipant.where('parent_id = ? && user_id = ?', parent_id, user.id)
+    }
+    return @participants
   end
 
   def delete
     if read_attribute(:type) == 'AssignmentTeam'
       sign_up = SignedUpUser.find_team_participants(parent_id.to_s).select{|p| p.creator_id == self.id}
-      sign_up.each &:destroy
+      sign_up.each(&:destroy)
     end
+    super
+  end
+
+  def destroy
+    response_maps.each(&:destroy)
     super
   end
 
@@ -61,9 +73,7 @@ class AssignmentTeam < Team
   end
 
   def get_hyperlinks
-    links = Array.new
-    self.get_participants.each { |team_member| links.concat(team_member.get_hyperlinks_array) }
-    links
+    get_participants.flat_map(&:get_hyperlinks_array).uniq
   end
 
   def get_path
@@ -137,16 +147,6 @@ class AssignmentTeam < Team
 
       def fullname
         self.name
-      end
-
-      def get_participants
-        users = self.users
-        participants = Array.new
-        users.each do |user|
-          participant = AssignmentParticipant.where(user_id: user.id, parent_id: self.parent_id).first
-          participants << participant if participant != nil
-        end
-        participants
       end
 
       def copy(course_id)

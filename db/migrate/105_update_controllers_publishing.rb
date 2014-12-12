@@ -2,7 +2,7 @@ class UpdateControllersPublishing < ActiveRecord::Migration
   def self.up
     perm = Permission.find_by_name("do assignments")
     
-    controller = SiteController.find_or_create_by_name("publishing")
+    controller = SiteController.find_or_create_by(name: "publishing")
     controller.permission_id = perm.id
     controller.save      
     

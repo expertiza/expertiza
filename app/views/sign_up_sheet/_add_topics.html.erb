@@ -1,5 +1,3 @@
 <%= link_to 'New topic',:controller => 'sign_up_sheet', :action => 'new', :id => params[:id] %> |
-
-
-<%= link_to 'Import topics', :controller=>'import_file', :action=>'start', :model => 'SignUpTopic', :id => params[:id], :expected_fields => 'Topic identifier, Topic name, Max choosers, Topic Category' %>
-<%= link_to("Manage bookmark rating rubrics", {:controller => "bookmarks", :action => "view_rating_rubrics"}) %>
+<%= link_to 'Import topics', :controller=>'import_file', :action=>'start', :model => 'SignUpTopic', :id => params[:id], :expected_fields => 'Topic identifier, Topic name, Max choosers, Topic Category' %>|
+<%= link_to("Manage bookmark rating rubrics", {:controller => "bookmarks", :action => "view_rating_rubrics"}) %>|

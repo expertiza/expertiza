@@ -1,4 +1,4 @@
-class SurveyResponseController < ApplicationController
+class SurveyResponsesController < ApplicationController
 
   def action_allowed?
     true
@@ -62,11 +62,9 @@ def submit
   @scores = params[:score]
   @comments = params[:comments]
   @assignment_id = params[:assignment_id]
-    for question in @questions
-      SurveyResponseHelper::persist_survey(@survey_id, question.id, @assignment_id, params[:survey_deployment_id], params[:email])
-    end
-
-
+  for question in @questions
+    SurveyResponseHelper::persist_survey(@survey_id, question.id, @assignment_id, params[:survey_deployment_id], params[:email])
+  end
   if !params[:survey_deployment_id]
     surveys = SurveyHelper::get_assigned_surveys(@assignment_id)
   end

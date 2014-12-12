@@ -386,6 +386,7 @@ Expertiza::Application.routes.draw do
       get :download
       get :edit
       get :folder_action
+      get :remove_hyperlink
       post :remove_hyperlink
       get :submit_file
       post :submit_hyperlink
@@ -470,7 +471,7 @@ Expertiza::Application.routes.draw do
   root to: 'content_pages#view', page_name: 'home'
 
   get 'users/list', :to => 'users#list'
-
+  post '/review_mapping/show_available_submissions', :to => 'review_mapping#show_available_submissions'
   get '/submitted_content/remove_hyperlink', :to => 'submitted_content#remove_hyperlink'
   get '/submitted_content/submit_hyperlink', :to => 'submitted_content#submit_hyperlink'
   get '/submitted_content/submit_file', :to => 'submitted_content#submit_file'

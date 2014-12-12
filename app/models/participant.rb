@@ -10,6 +10,14 @@ class Participant < ActiveRecord::Base
   has_many   :team_reviews, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewer_id', dependent: :destroy
   has_many :response_maps, :class_name =>'ResponseMap', :foreign_key => 'reviewee_id', dependent: :destroy
 
+  def team
+    TeamsUser.where(user: user).first.try :team
+  end
+
+  def responses
+    response_maps.map(&:response)
+  end
+
   validates_numericality_of :grade, :allow_nil => true
 
   delegate :course, to: :assignment

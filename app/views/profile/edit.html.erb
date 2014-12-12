@@ -16,7 +16,7 @@
     <%= render :partial => 'limit' %>
   <% end %>
   <label>Preferred Time Zone</label>
-  <%= time_zone_select("user", "timezonepref", ActiveSupport::TimeZone.us_zones) %><br />
+  <%= time_zone_select("user", "timezonepref", ActiveSupport::TimeZone.all) %><br />
 
   <%= f.submit 'Save' %>
 <% end %>

@@ -1,0 +1,59 @@
+<h1>Search Versions</h1>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <%= form_tag({controller: 'versions', action: 'search'}, method: 'get') do %>
+        <table>
+          <tr>
+            <td><%= label_tag(:type, 'ID:') %></td>
+            <td><%= number_field_tag(:id) %></td>
+            <td><%= label_tag(:user, "User:") %></td>
+            <td><%= select("post", "user_id",
+                    if current_user_role?.name == 'Super-Administrator'
+                        (User.all.collect {|u| [ u.name, u.id ] } << ['Any', 0])
+                    else
+                        (User.where("id = #{current_user.id}").collect {|u| [ u.name, u.id ] })
+                    end ) %></td>
+          </tr>
+          <tr>
+            <td><%= label_tag(:item, "Type:") %></td>
+            <td><%= select("post", "item_type",
+                         Version.uniq.pluck(:item_type) << 'Any') %></td>
+            <td><%= label_tag(:before, "Start Date:") %></td>
+            <td><%= datetime_select :datetime, :start %></td>
+          </tr>
+          <tr>
+            <td><%= label_tag(:event, "Event:") %></td>
+            <td><%= select("post", "event",
+                         Version.uniq.pluck(:event) << 'Any') %></td>
+            <td><%= label_tag(:after, "End Date:") %></td>
+            <td><%= datetime_select :datetime, :end %></td>
+          </tr>
+        </table>
+        <br/>
+        <%= submit_tag('Search') %>
+    <% end %>
+  </div>
+</div>
+
+<br/>
+
+<%= render :partial => 'versions/pagination' %>
+
+<div>
+  <table>
+    <tr><th class="head">ID</th><th class="head">Type</th><th class="head">Item ID</th><th class="head">Event</th><th class="head">User</th><th class="head">Created</th></tr>
+    <% for version in @versions %>
+        <tr>
+          <td><%= link_to version.id, :action => 'show', :id => version.id %></td>
+          <td><%= version.item_type %></td>
+          <td><%= version.item_id %></td>
+          <td><%= version.event %></td>
+          <td><%= version.version_author %></td>
+          <td><%= version.created_at %></td>
+        </tr>
+    <% end -%>
+  </table>
+</div>
+<hr/>
+<%= render :partial => 'versions/pagination' %>
+<hr/>

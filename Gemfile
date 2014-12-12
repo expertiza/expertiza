@@ -71,8 +71,6 @@ group :test do
   gem 'guard-rails'
   gem 'guard-rspec'
   gem 'launchy'
-  gem 'minitest'
-  gem 'minitest-reporters'
   gem 'rspec-rails'
   gem 'shoulda'
   gem 'test-unit'

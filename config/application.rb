@@ -13,11 +13,16 @@ module Expertiza
 
     config.time_zone = 'UTC'
 
+    #setting the default ssl setting to false
+    config.use_ssl = false
+
     # Configure the default encoding used in templates for Ruby 1.9.
     config.encoding = "utf-8"
 
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password, :password_confirmation, :password, :password_confirmation]
+
+    config.active_record.whitelist_attributes = false
 
     config.autoload_paths += Dir[Rails.root.join('lib', '{**}')]
   end

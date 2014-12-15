@@ -1,5 +1,5 @@
 GIT
-  remote: https://github.com/expertiza/authlogic.git
+  remote: git://github.com/expertiza/authlogic.git
   revision: 09163c7d2a9b21942c6716e885a14305e1aa0390
   specs:
     expertiza-authlogic (3.2.0)

@@ -61,7 +61,7 @@ class StudentReviewController < ApplicationController
           end
         end
       end
-        end
     end
+  end
 
 end

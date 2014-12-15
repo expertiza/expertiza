@@ -17,7 +17,6 @@ class AssignmentParticipant < Participant
   has_many :response_maps, foreign_key: 'reviewee_id'
   has_many :participant_review_response_maps, foreign_key: 'reviewee_id'
   has_many :quiz_response_maps, foreign_key: 'reviewee_id'
-  has_many :responses, through: :response_maps, foreign_key: 'map_id'
   has_many :quiz_responses, through: :quiz_response_maps, foreign_key: 'map_id'
   # has_many    :quiz_responses,  :class_name => 'Response', :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'QuizResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
     has_many    :collusion_cycles
@@ -322,11 +321,12 @@ class AssignmentParticipant < Participant
   # Note: This method is not used yet. It is here in the case it will be needed.
   # @exception  If the index does not exist in the array
   def remove_hyperlink(index)
-    hyperlinks = get_hyperlinks
+    hyperlinks = get_hyperlinks_array
     raise "The link does not exist" unless index < hyperlinks.size
 
     hyperlinks.delete_at(index)
-    self.submitted_hyperlinks = hyperlinks.empty? ? nil : YAML::dump(hyperlinks)
+
+    self.submitted_hyperlinks = YAML::dump(hyperlinks)
 
     self.save
   end
@@ -336,16 +336,12 @@ class AssignmentParticipant < Participant
   end
   alias_method :members, :get_members
 
-
-  def get_hyperlinks
-    team.try(:get_hyperlinks) || []
-  end
-  alias_method :hyperlinks, :get_hyperlinks
-
   def get_hyperlinks_array
     self.submitted_hyperlinks.nil? ? [] : YAML::load(self.submitted_hyperlinks)
   end
   alias_method :hyperlinks_array, :get_hyperlinks_array
+  alias_method :hyperlinks, :get_hyperlinks_array
+  alias_method :get_hyperlinks, :get_hyperlinks_array
 
   #Copy this participant to a course
   def copy(course_id)

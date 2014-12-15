@@ -10,6 +10,12 @@ module AssignmentHelper
     options
   end
 
+  def is_intelligent_options
+    is_intelligent_options = Array.new
+    is_intelligent_options << ["No", 'false']
+    is_intelligent_options << ["Yes", 'true']
+  end
+
   def wiki_type_options
     wiki_type_options = Array.new
     WikiType.find_each do |wiki_type|
@@ -51,14 +57,7 @@ module AssignmentHelper
   #retrive or create a due_date
   # use in views/assignment/edit.html.erb
   def due_date(assignment, type, round = 0)
-
-
     due_dates = assignment.find_due_dates(type)
-    if type == 'submission'
-      due_dates += assignment.find_due_dates('resubmission')
-    elsif type == 'review'
-      due_dates += assignment.find_due_dates('rereview')
-    end
 
     due_dates.delete_if { |due_date| due_date.due_at.nil? }
     due_dates.sort! { |x, y| x.due_at <=> y.due_at }
@@ -82,10 +81,9 @@ module AssignmentHelper
     questionnaire = assignment.questionnaires.find_by_type(type)
     if questionnaire.nil?
       questionnaire = Object.const_get(type).new
-      questionnaire
-    else
-      questionnaire
     end
+
+    questionnaire
   end
 
   def assignment_questionnaire(assignment, type)

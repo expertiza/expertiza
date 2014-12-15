@@ -81,9 +81,11 @@ class ReviewResponseMap < ResponseMap
   end
 
   def show_feedback()
-    map = FeedbackResponseMap.find_by_reviewed_object_id(self.response.response_id)
-    if map and map.response
-      return map.response.display_as_html()
+    if(self.response)
+      map = FeedbackResponseMap.find_by_reviewed_object_id(self.response.response_id)
+      if map and map.response
+        return map.response.display_as_html()
+      end
     end
   end
 

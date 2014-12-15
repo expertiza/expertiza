@@ -10,6 +10,14 @@ class Participant < ActiveRecord::Base
   has_many   :team_reviews, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewer_id', dependent: :destroy
   has_many :response_maps, :class_name =>'ResponseMap', :foreign_key => 'reviewee_id', dependent: :destroy
 
+  def team
+    TeamsUser.where(user: user).first.try :team
+  end
+
+  def responses
+    response_maps.map(&:response)
+  end
+
   validates_numericality_of :grade, :allow_nil => true
 
   delegate :course, to: :assignment
@@ -93,7 +101,7 @@ class Participant < ActiveRecord::Base
       user = User.find(self.user_id)
       assignment = Assignment.find(self.assignment_id)
 
-      Mailer.deliver_message(
+      Mailer.sync_message(
         {:recipients => user.email,
          :subject => "You have been registered as a participant in Assignment #{assignment.name}",
          :body => {
@@ -104,7 +112,7 @@ class Participant < ActiveRecord::Base
            :partial_name => "register"
          }
       }
-      )
+      ).deliver
     end
 
     #This function updates the topic_id for a participant in assignments where a signup sheet exists

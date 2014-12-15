@@ -1,0 +1,28 @@
+Hi <%= @first_name %>,
+
+A new <%=@type%> for the "<%= @obj_name %>" assignment has just been entered.
+You may log into Expertiza and view it now.
+
+<% if @review_scores != nil %>
+  Review Content:
+  <% for @rs in @review_scores %>
+    -----------------------------------------------------------
+    Question: <%=Question.find(@rs.question_id).txt %>
+
+  Comment: <%=@rs.comments%>
+
+Score: <%=@rs.score%>
+<% end %>
+<% end %>
+
+<% if @ror_review_scores != nil %>
+  Review Content:
+  <% for @rs in @ror_review_scores %>
+    -----------------------------------------------------------
+    Question: <%=Question.find(@rs.question_id).txt %>
+
+  Comment: <%=@rs.comments%>
+
+Score: <%=@rs.score%>
+<% end %>
+<% end %>

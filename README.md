@@ -1,38 +1,9 @@
-We have refactored the DynamicReviewMapping controller (helper). As a part of this assignment we carried out the following tasks:
-
-The code was designed to be used to assign reviewers to work more "intelligently" by making sure that a person does not get his own work to review. But the conditions for the problem targeted made the following assumptions:
-The person does not select what to review
-Any person can give only 2 reviews.
-
-The review rules have since been changed, and the code is not used anywhere in the entire project. It has been maintained, just in case it is desired to go back to the old rules.
-Thus, there is no way to test the code.
-
-1. The code block between line 808 to 825 was duplicated in 3 places in this file. We have refactored the code to remove this bad smell. We have created a method called create_message to avoid duplication in the code.
-2. Method assign_metareviewers, assign_reviewers_team were too long. We have made two new methods (check_assignment_for_review and show_message_for_review_count) that does just one task and does it perfectly instead of large methods to do multiple tasks.
-3. Method assign_reviewers_individual was not used anymore. We have checked for its functionality and deleted it since it did not play any role in the final application.
-4. We have changed if to unless wherever necessary.
-5. Changed " == 0" expression to ".zero?"
-6. Used `if (var)` instead of `if (var == true)`
-7. We have used array checking and made changes according to the following rules:
-    * Use [].empty? instead of [].length == 0 or [].length.zero?
-    * Use [:foo].any? instead of [:foo].length > 0
-    * Use [:foo].one? instead of [:foo].length == 1
-    * Use [:foo].first instead of [:foo][0]
-    * Use [:foo].last instead of [:foo][-1]
-
-8. We have used `&&` and `||` rather than `and` and `or` to keep boolean precedence.
-
-
-This really isn't any different from refactoring projects, which don't change functionality. In our case, we have removed some classes, and the reviewers can verify that the functionality associated with reviews still works.
-
-We have also refactored the ReportsController, in that, we have removed it completely. This code was also not used, and was actually simply copied from ResponseController. The original purpose of the controller could not been determined, and it was removed to prevent further confusion regarding it.
-
 Expertiza
 =========
 
-[![Build Status](https://travis-ci.org/expertiza/expertiza.png?branch=master)](https://travis-ci.org/expertiza/expertiza)
+[![Build Status](https://travis-ci.org/expertiza/expertiza.png?branch=rails4)](https://travis-ci.org/expertiza/expertiza)
 [![Code Climate](https://codeclimate.com/github/expertiza/expertiza.png)](https://codeclimate.com/github/expertiza/expertiza)
-[![Coverage Status](https://coveralls.io/repos/expertiza/expertiza/badge.png?branch=master)](https://coveralls.io/r/expertiza/expertiza?branch=master)
+[![Coverage Status](https://coveralls.io/repos/expertiza/expertiza/badge.png?branch=rails4)](https://coveralls.io/r/expertiza/expertiza?branch=rails4)
 #### Peer review system
 
 Expertiza is a web application where students can submit and peer-review learning objects (articles, code, web sites, etc). It is used in select courses at NC State and by professors at several other colleges and universities.

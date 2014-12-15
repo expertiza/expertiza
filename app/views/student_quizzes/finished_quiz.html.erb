@@ -1,0 +1,45 @@
+<h2>Answers</h2>
+<b>Quiz Score: <%= @quiz_score %>%</b><br><br>
+
+<% i = 1 %>
+<% @questions.each do |question| %>
+  <b>Question <%= i %>: </b><%= label_tag "#{question.id}", question.txt %> <br>
+  <% question_type = QuestionType.find_by_question_id(question.id) %>
+
+
+  <% if question_type.q_type.eql? 'MCR' %>
+    <% QuizQuestionChoice.where(question_id: question.id).each do |answer|  %>
+      <% if(answer.iscorrect) %>
+        Correct answer is: <b><%= p answer.txt  %></b>
+      <% end %>
+    <% end %>
+    <br>
+    Your answer is: <b><%= p Score.where(response_id: @response.id, question_id:  question.id).first.comments  %></b><br><br>
+
+  <% elsif question_type.q_type.eql? 'MCC' %>
+    <%= p 'Correct answer is: '%>
+    <br>
+    <% QuizQuestionChoice.where(question_id: question.id).each do |answer|  %>
+      <% if(answer.iscorrect) %>
+        <b><%= p answer.txt  %></b>
+        <br>
+      <% end %>
+    <% end %><br>
+
+    Your answer is:<br/>
+    <% Score.where(response_id: @response.id, question_id: question.id).each do |answer| %>
+      <b><%= p answer.comments %></b><br>
+    <% end %><br>
+
+  <% elsif(question_type.q_type == 'TF') %>
+    Correct Answer is: <b><%=QuizQuestionChoice.find_by_question_id(question.id).txt%></b><br/>
+    Your answer is: <b><%= p Score.where(response_id: @response.id, question_id:  question.id).first.comments %></b><br><br>
+
+
+  <% elsif(question_type.q_type == 'Essay') %>
+    Your Answer is: <b><%= p Score.where(response_id: @response.id, question_id:  question.id).first.comments %></b><br><br>
+
+  <% end %><hr>
+  <% i += 1 %>
+<% end %>
+<%= link_to "Back", student_quizzes_path(:id => @response_map.reviewer_id) %>

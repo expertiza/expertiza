@@ -30,7 +30,7 @@ end
           <td><%= User.find(penalty_policy.instructor_id).name %></td>
         <% end %>
         <td><%= link_to 'Edit', :action => 'edit', :id => penalty_policy %></td>
-        <td><%= link_to 'Delete', { :action => 'destroy', :id => penalty_policy }, :confirm => 'Are you sure?' %></td>
+        <td><%= link_to 'Delete', penalty_policy, :method => 'delete', data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   <% end %>

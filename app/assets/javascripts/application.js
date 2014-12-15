@@ -13,12 +13,15 @@
 //= require turbolinks
 //= require jquery
 //= require jquery_ujs
+//= require jquery.datetimepicker
+//= require jquery.datetimepicker/init
 //= require hoverIntent
 //= require superfish
 //= require bootstrap
 //= require jquery.ui.all
 //= require_self
 //= require_tree .
+//= require jquery.datetimepicker
 
 $(document).on('ready page:load', function() {
   jQuery(this).trigger('turbo:ready');

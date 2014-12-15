@@ -51,6 +51,7 @@ gem 'superfish-rails'
 gem 'therubyracer'
 gem 'thin'
 gem 'turbolinks'
+gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
 

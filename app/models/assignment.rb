@@ -111,9 +111,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def reject_by_least_reviewed(contributor_set)
-    contributor = contributor_set.min_by { |contributor| contributor.review_mappings.reject! { |review_mapping| review_mapping.response.nil? }.count }
-    min_reviews = contributor.review_mappings.reject! { |review_mapping| review_mapping.response.nil? }.count rescue 0
-    contributor_set.reject! { |contributor| contributor.review_mappings.reject! { |review_mapping| review_mapping.response.nil? }.count  > min_reviews + review_topic_threshold }
+    contributor = contributor_set.min_by { |contributor| contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count }
+    min_reviews = contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count rescue 0
+    contributor_set.reject! { |contributor| contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count  > min_reviews + review_topic_threshold }
 
     return contributor_set
   end

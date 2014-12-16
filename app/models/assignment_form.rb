@@ -35,9 +35,9 @@ class AssignmentForm
     else
       attributes[:assignment][:late_policy_id] = nil
     end
-    update_assignment(attributes[:assignment])
-    update_assignment_questionnaires(attributes[:assignment_questionnaire])
-    update_due_dates(attributes[:due_date])
+    update_assignment(attributes[:assignment]) if attributes[:assignment]
+    update_assignment_questionnaires(attributes[:assignment_questionnaire]) if attributes[:assignment_questionnaire]
+    update_due_dates(attributes[:due_date]) if attributes[:due_date]
     #delete the old queued items and recreate new ones if the assignment has late policy.
     if attributes[:due_date] and !@has_errors and has_late_policy
       delete_from_delayed_queue

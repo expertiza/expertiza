@@ -73,7 +73,7 @@ class Team < ActiveRecord::Base
     else
       max_team_members=Assignment.find(assignment_id).max_team_size
       curr_team_size= TeamsUser.where(["team_id = ?", self.id]).count
-      can_add_member = (curr_team_size < max_team_members)
+      can_add_member = (curr_team_size.size < max_team_members)
     end
 
     if can_add_member

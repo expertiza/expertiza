@@ -52,6 +52,11 @@ class AssignmentsController < ApplicationController
     @user = current_user
   end
 
+  def review_strategy_advanced_options
+    @assignment_form = AssignmentForm.create_form_object(params[:id])
+    #@assignment = Assignment.find(params[:id])
+  end
+
   def update
     @assignment_form= AssignmentForm.create_form_object(params[:id])
     params[:assignment_form][:assignment][:wiki_type_id] = 1 unless params[:assignment_wiki_assignment]

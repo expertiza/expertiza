@@ -14,7 +14,7 @@ class SubmittedContentController < ApplicationController
     #ACS We have to check if the number of members on the team is more than 1(group assignment)
     #hence use team count for the check
     if @assignment.max_team_size > 1 && @participant.team.nil?
-      flash[:alert] = "This is a team assignment. Before submitting your work, you must <a style='color: blue;' href='../../student_team/view/#{params[:id]}'>create a team</a>, even if you will be the only member of the team"
+      flash[:alert] = "This is a team assignment. Before submitting your work, you must <a style='color: blue;' href='../../student_teams/view/#{params[:id]}'>create a team</a>, even if you will be the only member of the team"
         redirect_to :controller => 'student_task', :action => 'view', :id => params[:id]
     else if @participant.team.nil?
       #create a new team for current user before submission
@@ -47,14 +47,13 @@ end
 
 # Note: This is not used yet in the view until we all decide to do so
 def remove_hyperlink
+
   @participant = AssignmentParticipant.find(params[:id])
+  @participant = AssignmentParticipant.find(params[:hyperlinks][:participant_id])
+
   return unless current_user_id?(@participant.user_id)
 
-  begin
-    @participant.remove_hyperlink(params['chk_links'].to_i)
-  rescue
-    flash[:error] = $!
-  end
+  @participant.remove_hyperlink(params[:hyperlinks]['chk_links'].to_i)
   undo_link("Link has been removed successfully. ")
   redirect_to :action => 'edit', :id => @participant.id
 end

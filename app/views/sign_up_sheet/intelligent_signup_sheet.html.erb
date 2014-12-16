@@ -1,0 +1,307 @@
+<script type="text/javascript">
+    var selectedList_limit = <%= @max_bids.nil? ? 0 : @max_bids %>;
+    jQuery(document).ready(initialize);
+
+    function initialize() {
+        jQuery('.actual-list li').draggable({
+            addClasses: false,
+            appendTo: 'body',
+            containment: 'document',
+            cursor: 'move',
+            revert: 'invalid',
+            helper: "clone"
+        }).on("click", function(event){
+            event.preventDefault();
+            addTopicToSelectedList(jQuery(this));
+        });
+
+        function addTopicToSelectedList(topic) {
+            var topicId = topic.attr('topic-id');
+            if(jQuery(".selected-list").find("li[topic-id='" + topicId + "']").length == 0) {
+                if(jQuery(".selected-list").children().length < selectedList_limit){
+                    var link = jQuery("<div class='dismiss'>" +
+                                        "<a href='#' title='Remove bid'>" +
+                                            '<%= image_tag ('delete_icon.png') %>' +
+                                        "</a></div>");
+                    var list = jQuery("<li class='topic'></li>").html(topic.html());
+                    jQuery(list).attr('topic-id', topicId);
+                    jQuery(list).find('div.topic-content-wrapper').prepend(link);
+                    jQuery(list).appendTo(".selected-list");
+                } else {
+                    alert('Maximum number of bids reached. Please remove any bid to continue with subsequent bids.');
+                }
+            } else {
+                alert('You have already bid for this topic. Please choose a different topic.');
+            }
+        }
+
+        jQuery(".selected-list").droppable({
+            addClasses: false,
+            activeClass: "listActive",
+            accept: ":not(.ui-sortable-helper)",
+            tolerance: "touch",
+            drop: function(event, ui) {
+                jQuery(this).find(".placeholder").remove();
+                addTopicToSelectedList(ui.draggable);
+            }
+        }).sortable({
+            axis: "y",
+            cursor: "move",
+            items: "li:not(.placeholder)",
+            sort: function() {
+                jQuery(this).removeClass("listActive");
+            }
+        }).on("click", ".dismiss", function(event) {
+            event.preventDefault();
+            jQuery(this).parent().parent().remove();
+        });
+
+        jQuery("#save-bid-form").submit(function(event){
+            jQuery(".selected-list li.topic").each(function(index) {
+                jQuery("<input>").attr({
+                    type: 'hidden',
+                    name: 'topic_id[' + index + ']',
+                    value: jQuery(this).attr('topic-id')
+                }).appendTo("#save-bid-form");
+            });
+        });
+    }
+</script>
+<style type="text/css">
+    .topic-legend > ul {
+        margin: 5px;
+        padding: 0;
+        list-style-type: none;
+        list-style-position: inside;
+    }
+    .topic-legend > ul > li {
+        padding: 5px;
+        min-height: 15px;
+    }
+    .topic-legend .legend-circle {
+        float: left;
+        content: "";
+        height: 20px;
+        width: 20px;
+        margin: 5px;
+        border-radius: 20px;
+        -moz-border-radius: 20px;
+        -webkit-border-radius: 20px;
+    }
+    .topic-legend .legend-text {
+        margin-top: 1px;
+        padding: 5px;
+    }
+    .actual-list-wrapper, .selected-list-wrapper {
+        float: left;
+        margin-right: 10px;
+    }
+    .topic-list-header {
+        text-align: center;
+        font-weight: bold;
+
+    }
+    .selected-list-wrapper {
+        position: fixed;
+        margin-left: 550px;
+    }
+    .topic-list {
+        border: 1px solid #eee;
+        width: 500px;
+        min-height: 20px;
+        list-style-type: none;
+        list-style-position: inside;
+        padding: 5px 0 0 0;
+    }
+    ul.actual-list {
+        border-color: #f8e0b1;
+    }
+    ul.selected-list {
+        border-color: #add38d;
+    }
+    .topic-list li {
+        margin: 2px;
+        padding: 2px;
+        border-radius: 4px;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        border-radius: 4px;
+    }
+    .actual-list li {
+        background-color: #fcf8e3;
+        border: 1px solid #fbeed5;
+        color: #c09853;
+        cursor: pointer;
+    }
+    .selected-list li {
+        background-color: #ebf5e6;
+        border: 1px solid #d6e9c6;
+        color: #468847;
+    }
+    .sortable-dragging {
+        border-color: #ccc !important;
+        background-color: #fafafa !important;
+        color: #bbb !important;
+    }
+    .sortable-placeholder {
+        height: 40px;
+    }
+    .actual-list .sortable-placeholder {
+        border: 2px dashed #f8e0b1 !important;
+        background-color: #fefcf5 !important;
+    }
+    .selected-list .sortable-placeholder {
+        border: 2px dashed #add38d !important;
+        background-color: #f6fbf4 !important;
+    }
+    body > li {
+        width: 480px;
+        margin: 5px;
+        padding: 5px;
+        border-radius: 4px;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        border-radius: 4px;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+        list-style-type: none;
+        list-style-position: inside;
+        border-width: 1px;
+        border-style: solid;
+        border-color: #ccc !important;
+        background-color: #fafafa !important;
+        color: #bbb !important;
+    }
+    .listActive {
+        border: 1px solid #ccc;
+        background-color: #fcfcfc;
+        padding: 0.5em 0 3em 0 !important;
+    }
+    .placeholder {
+        list-style-type: none;
+        text-align: center;
+        font-style: italic;
+        border: 1px dashed #ddd !important;
+        background-color: #fff !important;
+        color: #aaa !important;
+    }
+    .dismiss {
+        float: right;
+        padding: 4px;
+        margin-top: 4px;
+    }
+    .topic-content-wrapper {
+        overflow: auto;
+        width: 100%;
+    }
+
+    .topic-number, .topic-name {
+        margin-top: 3px;
+        padding: 5px;
+    }
+    .topic-number {
+        float: left;
+        min-width: 40px;
+        border-radius: 4px;
+        -moz-border-radius: 4px;
+        -webkit-border-radius: 4px;
+        background-color: #8e8e8e !important;
+        color: #FFF;
+        font-weight: bold;
+    }
+    .topic-name {
+        margin:0 auto;
+        overflow: hidden;
+    }
+    .counter-data {
+        float: right;
+        width: 80px;
+        padding: 4px 0;
+    }
+    .bid-count, .total-count {
+        float: right;
+        height: 20px;
+        width: 20px;
+        padding: 2px;
+        margin-right: 5px;
+        border-radius: 20px;
+        border: 1px solid #000;
+        -moz-border-radius: 20px;
+        -webkit-border-radius: 20px;
+        text-align: center;
+        font-weight: bold;
+    }
+    .bid-count-color {
+        background-color: #6699FF !important;
+        color: #FFF !important;
+    }
+    .total-count-color {
+        background-color: #FF7563 !important;
+        color: #FFF !important;
+    }
+</style>
+<h1>Signup sheet for <%= Assignment.find(params[:id]).name %> assignment</h1>
+<% @assignment = Assignment.find(params[:id]) %>
+
+<div class="container">
+  <div class="topic-legend">
+    <span><strong>Legend</strong></span>
+    <ul>
+      <li>
+        <div class="legend-circle bid-count-color" title="Total bids: Total number of bids currently placed on a particular topic."></div>
+        <div class="legend-text"><strong>Total bids:</strong> Total number of bids currently placed on a particular topic.</div>
+      </li>
+      <li>
+        <div class="legend-circle total-count-color" title="Total slots: Maximum number of teams that can be assigned a particular topic."></div>
+        <div class="legend-text"><strong>Total slots:</strong> Maximum number of teams that can be assigned a particular topic.</div>
+      </li>
+    </ul>
+  </div>
+  <div class="actual-list-wrapper">
+    <div class="topic-list-header">Complete Topic List</div>
+    <ul class="actual-list topic-list">
+      <% for topic in @sign_up_topics %>
+          <li class="topic" topic-id="<%= topic.id%>">
+            <div class="topic-content-wrapper">
+              <div class="topic-number"><%= topic.topic_identifier%></div>
+              <div class="counter-data">
+                <div class="total-count total-count-color" title="Total slots"><%= topic.max_choosers%></div>
+                <div class="bid-count bid-count-color" title="Total bids"><%= Bid.where(:topic_id=>topic.id).size %></div>
+              </div>
+              <div class="topic-name"><%=topic.topic_name%></div>
+            </div>
+          </li>
+      <% end %>
+    </ul>
+  </div>
+  <div class="selected-list-wrapper">
+    <div class="topic-list-header">Selected List</div>
+    <ul class="selected-list topic-list">
+      <% for topic in @sorted_bid_topics %>
+          <li class="topic" topic-id="<%= topic.id%>">
+            <div class="topic-content-wrapper">
+              <div class="dismiss"><a href="#" title="Remove bid">x</a></div>
+              <div class="topic-number"><%= topic.topic_identifier%></div>
+              <div class="counter-data">
+                <div class="total-count total-count-color" title="Total slots"><%= topic.max_choosers%></div>
+                <div class="bid-count bid-count-color" title="Total bids"><%= Bid.where(:topic=>topic.id).size %></div>
+              </div>
+              <div class="topic-name"><%=topic.topic_name%></div>
+            </div>
+          </li>
+      <% end %>
+    </ul>
+  </div>
+  <div class="container">
+    <form id="save-bid-form" name="save-bid-form" action="/sign_up_sheet/intelligent_save" method="get">
+      <input type="hidden" name="id" value="<%= @assignment_id %>">
+      <input type="hidden" name="team_id" value="<%= @users_team_id %>">
+      <p style="text-align: center">
+        <input type="submit" value="Submit Topic bids">
+      </p>
+    </form>
+  </div>
+</div>
+<div class="container" style="padding: 10px 0;">
+  <a href="javascript:history.back()">Back</a>
+</div>
+

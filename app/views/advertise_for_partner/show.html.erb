@@ -8,7 +8,7 @@
   <b>Team Name: </b><%= @student.team.name %>
 
 <%= link_to "Edit Name",
-  {:controller => 'student_team', :action => 'edit', :team_id => @student.team.id, :student_id => @student.id} %>
+  edit_student_teams_path(team_id: @student.team.id, student_id: @student.id) %>
 <table>
   <tr>
     <td><b>Username &nbsp</b></td>

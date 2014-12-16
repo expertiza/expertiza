@@ -1,5 +1,5 @@
 GIT
-  remote: https://github.com/expertiza/authlogic.git
+  remote: git://github.com/expertiza/authlogic.git
   revision: 09163c7d2a9b21942c6716e885a14305e1aa0390
   specs:
     expertiza-authlogic (3.2.0)
@@ -42,7 +42,6 @@ GEM
       thread_safe (~> 0.1)
       tzinfo (~> 1.1)
     addressable (2.3.6)
-    ansi (1.4.3)
     arel (5.0.1.20140414130214)
     awesome_nested_set (3.0.1)
       activerecord (>= 4.0.0, < 5)
@@ -88,18 +87,6 @@ GEM
       simplecov (>= 0.7)
       term-ansicolor
       thor
-    cucumber (1.3.16)
-      builder (>= 2.1.2)
-      diff-lcs (>= 1.1.3)
-      gherkin (~> 2.12)
-      multi_json (>= 1.7.5, < 2.0)
-      multi_test (>= 0.1.1)
-    cucumber-rails (1.4.1)
-      capybara (>= 1.1.2, < 3)
-      cucumber (>= 1.3.8, < 2)
-      mime-types (~> 1.16)
-      nokogiri (~> 1.5)
-      rails (>= 3, < 5)
     daemons (1.1.9)
     database_cleaner (1.3.0)
     delayed_job (4.0.2)
@@ -114,7 +101,11 @@ GEM
       json
     engtagger (0.2.0)
     erubis (2.7.0)
+    eventmachine (1.0.3)
+    eventmachine (1.0.3-x86-mingw32)
     execjs (2.2.1)
+    faraday (0.9.0)
+      multipart-post (>= 1.2, < 3)
     fastercsv (1.5.5)
     ffi (1.9.3)
     ffi (1.9.3-x86-mingw32)
@@ -137,9 +128,6 @@ GEM
       lumberjack (~> 1.0)
       pry (>= 0.9.12)
       thor (>= 0.18.1)
-    guard-cucumber (1.4.1)
-      cucumber (>= 1.2.0)
-      guard (>= 1.1.0)
     guard-rails (0.5.3)
       guard (~> 2.0)
     guard-rspec (4.3.1)
@@ -152,6 +140,7 @@ GEM
       activesupport (>= 4.0.1)
       haml (>= 3.1, < 5.0)
       railties (>= 4.0.1)
+    hashie (3.3.2)
     hike (1.2.3)
     hoe (3.12.0)
       rake (>= 0.8, < 11.0)
@@ -171,6 +160,7 @@ GEM
       jquery-ui-rails (= 4.0.3)
       railties (>= 3.1.0)
     json (1.8.1)
+    jwt (1.2.0)
     launchy (2.4.2)
       addressable (~> 2.3)
     libv8 (3.16.14.7)
@@ -186,13 +176,9 @@ GEM
     mime-types (1.25.1)
     mini_portile (0.6.0)
     minitest (5.4.1)
-    minitest-reporters (1.0.5)
-      ansi
-      builder
-      minitest (>= 5.0)
-      ruby-progressbar
     multi_json (1.10.1)
-    multi_test (0.1.1)
+    multi_xml (0.5.5)
+    multipart-post (2.0.0)
     mysql2 (0.3.16)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
@@ -202,10 +188,28 @@ GEM
       mini_portile (= 0.6.0)
     nokogiri (1.6.3.1-x86-mingw32)
       mini_portile (= 0.6.0)
+    oauth2 (1.0.0)
+      faraday (>= 0.8, < 0.10)
+      jwt (~> 1.0)
+      multi_json (~> 1.3)
+      multi_xml (~> 0.5)
+      rack (~> 1.2)
+    omniauth (1.2.2)
+      hashie (>= 1.2, < 4)
+      rack (~> 1.0)
+    omniauth-google-oauth2 (0.2.6)
+      omniauth (> 1.0)
+      omniauth-oauth2 (~> 1.1)
+    omniauth-oauth2 (1.2.0)
+      faraday (>= 0.8, < 0.10)
+      multi_json (~> 1.3)
+      oauth2 (~> 1.0)
+      omniauth (~> 1.2)
     open-uri-cached (0.0.5)
     paper_trail (3.0.5)
       activerecord (>= 3.0, < 5.0)
       activesupport (>= 3.0, < 5.0)
+    pg (0.17.1)
     polyglot (0.3.5)
     power_assert (0.1.3)
     protected_attributes (1.0.8)
@@ -239,6 +243,11 @@ GEM
       sprockets-rails (~> 2.0)
     rails4-autocomplete (1.1.1)
       rails (>= 3.0)
+    rails_12factor (0.0.2)
+      rails_serve_static_assets
+      rails_stdout_logging
+    rails_serve_static_assets (0.0.2)
+    rails_stdout_logging (0.0.3)
     railties (4.1.5)
       actionpack (= 4.1.5)
       activesupport (= 4.1.5)
@@ -281,7 +290,6 @@ GEM
       rspec-mocks (~> 3.0.0)
       rspec-support (~> 3.0.0)
     rspec-support (3.0.4)
-    ruby-progressbar (1.5.1)
     rubyzip (1.1.6)
     rwordnet (0.1.3)
     sass (3.2.19)
@@ -336,6 +344,10 @@ GEM
     therubyracer (0.12.1)
       libv8 (~> 3.16.14.0)
       ref
+    thin (1.6.3)
+      daemons (~> 1.0, >= 1.0.9)
+      eventmachine (~> 1.0)
+      rack (~> 1.0)
     thor (0.19.1)
     thread_safe (0.3.4)
     tilt (1.4.1)
@@ -413,6 +425,9 @@ GEM
       coffee-rails
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
+    uglifier (2.5.3)
+      execjs (>= 0.3.0)
+      json (>= 1.8.0)
     websocket (1.0.7)
     will_paginate (3.0.7)
     win32console (1.3.2-x86-mingw32)
@@ -436,7 +451,6 @@ DEPENDENCIES
   capistrano-rails
   capybara
   coveralls
-  cucumber-rails
   daemons
   database_cleaner
   delayed_job_active_record
@@ -451,7 +465,6 @@ DEPENDENCIES
   gchartrb
   gdata
   gherkin
-  guard-cucumber
   guard-rails
   guard-rspec
   haml-rails
@@ -460,18 +473,19 @@ DEPENDENCIES
   jquery-rails
   jquery-ui-sass-rails
   launchy
-  minitest
-  minitest-reporters
   mysql2
   nokogiri
+  omniauth-google-oauth2 (~> 0.2.6)
   open-uri-cached
   paper_trail
+  pg
   protected_attributes
   pry
   pry-nav
   pry-remote
   rails
   rails4-autocomplete
+  rails_12factor
   rake
   rb-readline
   rgl
@@ -490,6 +504,8 @@ DEPENDENCIES
   superfish-rails
   test-unit
   therubyracer
+  thin
   turbolinks
+  uglifier
   will_paginate
   zip-zip

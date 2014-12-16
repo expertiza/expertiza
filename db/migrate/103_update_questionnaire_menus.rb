@@ -2,11 +2,11 @@ class UpdateQuestionnaireMenus < ActiveRecord::Migration
   def self.up
     site_controller = SiteController.find_by_name('tree_display')
     
-    metareview_rubrics_action = ControllerAction.find_or_create_by_name('goto_metareview_rubrics')
+    metareview_rubrics_action = ControllerAction.find_or_create_by(name: 'goto_metareview_rubrics')
     metareview_rubrics_action.site_controller_id = site_controller.id
     metareview_rubrics_action.save
     
-    teammatereview_rubrics_action = ControllerAction.find_or_create_by_name('goto_teammatereview_rubrics')
+    teammatereview_rubrics_action = ControllerAction.find_or_create_by(name: 'goto_teammatereview_rubrics')
     teammatereview_rubrics_action.site_controller_id = site_controller.id
     teammatereview_rubrics_action.save    
     

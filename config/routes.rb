@@ -1,4 +1,8 @@
 Expertiza::Application.routes.draw do
+
+  get 'auth/:provider/callback', to: 'auth#google_login'
+  get 'auth/failure', to: 'content_pages#view'
+
   resources :bookmark_tags
   resources :books
   resources :bookmarks
@@ -38,10 +42,6 @@ Expertiza::Application.routes.draw do
       get :copy
       get :toggle_access
       post :remove_assignment_from_course
-      get :set_questionnaire
-      get :set_due_date
-      get :delete_all_questionnaires
-      get :delete_all_due_dates
     end
   end
 
@@ -167,7 +167,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  get 'late_policies', controller: :late_policies, action: :index
+  resources 'late_policies'
 
   resources :leaderboard, constraints: {id: /\d+/} do
     collection do
@@ -339,6 +339,8 @@ Expertiza::Application.routes.draw do
       get :sign_up
       get :team_details
       get :view_publishing_rights
+      get :intelligent_sign_up
+      get :intelligent_save
     end
   end
 
@@ -357,6 +359,8 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :student_quizzes, :only => [:index]
+
   resources :student_review do
     collection do
       get :list
@@ -370,11 +374,13 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :student_team do
+
+  resources :student_teams do
+
     collection do
       get :view
       get :edit
-      get :leave
+      get :remove_participant
       get :auto_complete_for_user_name
     end
   end
@@ -385,10 +391,10 @@ Expertiza::Application.routes.draw do
       get :edit
       get :folder_action
       get :remove_hyperlink
+      post :remove_hyperlink
       get :submit_file
       post :submit_hyperlink
       get :submit_hyperlink
-      get :remove_hyperlink
       get :view
     end
   end
@@ -416,6 +422,8 @@ Expertiza::Application.routes.draw do
   resources :survey_response do
     collection do
       get :view_responses
+	get :begin_survey
+	get :comments
     end
   end
 
@@ -442,12 +450,15 @@ Expertiza::Application.routes.draw do
   resources :users, constraints: {id: /\d+/} do
     collection do
       get :list
+      post :list
       post ':id', action: :update
       get :show_selection
       get :auto_complete_for_user_name
       get :keys
     end
   end
+
+  get '/versions/search', controller: :versions, action: :search
 
   resources :versions do
     collection do
@@ -464,17 +475,19 @@ Expertiza::Application.routes.draw do
   root to: 'content_pages#view', page_name: 'home'
 
   get 'users/list', :to => 'users#list'
-
+  post '/review_mapping/show_available_submissions', :to => 'review_mapping#show_available_submissions'
   get '/submitted_content/remove_hyperlink', :to => 'submitted_content#remove_hyperlink'
   get '/submitted_content/submit_hyperlink', :to => 'submitted_content#submit_hyperlink'
   get '/submitted_content/submit_file', :to => 'submitted_content#submit_file'
   get '/review_mapping/show_available_submissions', :to => 'review_mapping#show_available_submissions'
   get '/review_mapping/assign_reviewer_dynamically', :to => 'review_mapping#assign_reviewer_dynamically'
-  get "/review_mapping/assign_metareviewer_dynamically", :to => 'review_mapping#assign_metareviewer_dynamically'
+  get '/review_mapping/assign_metareviewer_dynamically', :to => 'review_mapping#assign_metareviewer_dynamically'
   get 'response/', :to => 'response#saving'
 
   get 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
   get ':controller/service.wsdl', :action => 'wsdl'
 
   get ':controller(/:action(/:id))(.:format)'
+
+ # get 'sign_up_sheet/intelligent_signup_sheet.html_erb' => 'sign_up_sheet#intelligentPage'
 end

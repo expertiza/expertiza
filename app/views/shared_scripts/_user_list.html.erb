@@ -21,9 +21,9 @@
         <!-- E726 Fall2012 Changes Begin -->
         <% if participant.special_role=='Reader' or participant.special_role=='Manager' %>
                 <% if participant.special_role=='Reader' %>
-                        <td><%= image_tag('/assets/image_for_reader.gif', :title => 'Reader') %></td>
+                        <td><%= fa_icon 'book', title: 'Reader' %></td>
                     <% else %>
-                        <td><%= image_tag('/assets/image_for_manager.gif', :title => 'Manager') %></td>
+                        <td><%= fa_icon 'building', title: 'Manager' %></td>
                     <% end %>
             <% end %>
         <!-- E726 Fall2012 Changes End -->

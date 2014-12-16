@@ -1,5 +1,3 @@
-#ruby '2.1.0'
-
 source 'http://rubygems.org'
 
 gem 'rails'
@@ -18,7 +16,7 @@ gem 'delayed_job_active_record'
 gem 'dynamic_form'
 gem 'edavis10-ruby-web-search'
 gem 'engtagger'
-gem 'expertiza-authlogic', git: 'https://github.com/expertiza/authlogic.git', :require => 'authlogic'
+gem 'expertiza-authlogic', github: 'expertiza/authlogic', :require => 'authlogic'
 gem 'fastercsv'
 gem 'ffi-aspell'
 gem 'font-awesome-rails'
@@ -32,9 +30,12 @@ gem 'jquery-ui-sass-rails'
 gem 'jquery-datetimepicker-rails'
 gem 'mysql2'
 gem 'nokogiri'
+gem 'omniauth-google-oauth2', '~> 0.2.6'
 gem 'open-uri-cached'
 gem 'paper_trail'
+gem 'pg'
 gem 'protected_attributes'
+gem 'rails_12factor', group: :production
 gem 'rails4-autocomplete'
 gem 'rake'
 gem 'rb-readline'
@@ -49,7 +50,9 @@ gem 'sprockets'
 gem 'stanford-core-nlp'
 gem 'superfish-rails'
 gem 'therubyracer'
+gem 'thin'
 gem 'turbolinks'
+gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
 
@@ -63,15 +66,11 @@ group :development do
 end
 
 group :test do
-  gem 'cucumber-rails', require: false
   gem 'database_cleaner'
   gem 'gherkin'
-  gem 'guard-cucumber'
   gem 'guard-rails'
   gem 'guard-rspec'
   gem 'launchy'
-  gem 'minitest'
-  gem 'minitest-reporters'
   gem 'rspec-rails'
   gem 'shoulda'
   gem 'test-unit'

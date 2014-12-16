@@ -1,24 +1,29 @@
 <% @assignment = Assignment.find(params[:id]) %>
-<h1>Signup sheet for <%= @assignment.name %> assignment</h1>
+<h1>Topics sheet for <%= @assignment.name %> assignment</h1>
 
 
-<%= link_to 'View all Bookmarks', :controller=>'bookmarks', :action=> 'view_bookmarks' %> <br/>
+<%#<%= link_to 'View all Bookmarks', :controller=>'bookmarks', :action=> 'view_bookmarks' %> <%#<br/>
 <%= link_to 'Manage all Bookmarks', :controller => 'bookmarks', :action => 'manage_bookmarks' %>
 
 
 
 <% if flash[:notice] %>
-  <div class="flash_note"><%= flash[:notice] %></div>
+  <div class="flash_note"><%= flash_message :notice %></div>
 <% end %>
+
+<% @sign_up_topics = SignUpTopic.where(['assignment_id = ?', @assignment.id]) %>
+<% @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)  %>
+<% @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id) %>
+<% @participants = SignedUpUser.find_team_participants(@assignment.id)  %>
 
 <% if @sign_up_topics.size != 0 %>
   <table class="general">
-    <tr><%= render :partial => 'table_header' %></tr>
+    <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
 
     <% i=1 %>
     <% for topic in @sign_up_topics %>
       <tr>
-        <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic} %>
+        <%= render :partial => '/sign_up_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
       </tr>
       <% i=i+1 %>
     <% end %>
@@ -34,5 +39,5 @@
 <% session[:return_to] = request.url %>
 <br/><br/>
 
-<%= render :partial => 'add_topics' %>
+<%= render :partial => '/sign_up_sheet/add_topics' %>
 <a href="javascript:history.back()">Back</a>

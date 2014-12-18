@@ -84,11 +84,13 @@ class Assignment < ActiveRecord::Base
     # Initialize contributor set with all teams participating in this assignment
     contributor_set = Array.new(contributors)
 
+ 
     # Reject contributors that have not selected a topic, or have no submissions
     contributor_set=reject_by_no_topic_selection_or_no_submission(contributor_set)
 
     # Reject contributions of topics whose deadline has passed, or which are not reviewable in the current stage
     contributor_set=reject_by_deadline(contributor_set)
+
 
     # Filter submission by reviewer him/her self
     contributor_set=reject_own_submission(contributor_set, reviewer)
@@ -109,19 +111,20 @@ class Assignment < ActiveRecord::Base
   end
 
   def reject_by_least_reviewed(contributor_set)
-    contributor = contributor_set.min_by { |contributor| contributor.review_mappings.count }
-    min_reviews = contributor.review_mappings.count rescue 0
-    contributor_set.reject! { |contributor| contributor.review_mappings.count > min_reviews + review_topic_threshold }
+    contributor = contributor_set.min_by { |contributor| contributor.review_mappings.reject! { |review_mapping| review_mapping.response.nil? }.count }
+    min_reviews = contributor.review_mappings.reject! { |review_mapping| review_mapping.response.nil? }.count rescue 0
+    contributor_set.reject! { |contributor| contributor.review_mappings.reject! { |review_mapping| review_mapping.response.nil? }.count  > min_reviews + review_topic_threshold }
+
     return contributor_set
   end
 
   def reject_previously_reviewed_submissions(contributor_set, reviewer)
-    contributor_set.reject! { |contributor| contributor.reviewed_by?(reviewer) }
+    contributor_set = contributor_set.reject { |contributor| contributor.reviewed_by?(reviewer) }
     return contributor_set
   end
 
   def reject_own_submission(contributor_set, reviewer)
-    contributor_set.reject! { |contributor| contributor.teams_users.find_by_user_id(reviewer.id) }
+    contributor_set.reject! { |contributor| contributor.teams_users.find_by_user_id(reviewer.user_id) }
     return contributor_set
   end
 
@@ -492,7 +495,7 @@ class Assignment < ActiveRecord::Base
       # directory is empty
     end
 
-    if !is_wiki_assignment and !self.directory_path.empty? and !directory.nil?
+    if !is_wiki_assignment and !(self.directory_path.nil? or self.directory_path.empty?) and !directory.nil?
       if directory.size == 2
         Dir.delete(Rails.root + '/pg_data/' + self.directory_path)
       else
@@ -941,6 +944,9 @@ class Assignment < ActiveRecord::Base
     #this should be moved to SignUpSheet model after we refactor the SignUpSheet.
     # returns whether ANY topic has a partner ad; used for deciding whether to show the Advertisements column
     def has_partner_ads?(id)
-      Team.find_by_sql("select * from teams where parent_id = "+id+" AND advertise_for_partner='1'").size > 0
+      #Team.find_by_sql("select * from teams where parent_id = "+id+" AND advertise_for_partner='1'").size > 0
+      return Team.find_by_sql("select t.* "+
+          "from teams t, signed_up_users s "+
+          "where s.topic_id='"+id.to_s+"' and s.creator_id = t.id and t.advertise_for_partner = 1").size > 0
     end
   end

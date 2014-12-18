@@ -36,10 +36,11 @@
           arg += "&data_type[]=" +graph_options[i].value;
         }
 
+        obj.find(".chart")[0].innerHTML = "Please wait....";
         jQuery.get("/analytic/get_graph_data_bundle?" + arg, function (json) {
           console.log(json);
             if (json == null) {
-              obj.find(".chart")[0].innerHTML = "";
+              obj.find(".chart")[0].innerHTML = "Can not load chart. Please select at least one data point and at least one scope.";
             } else {
               obj.find(".chart").highcharts(json);
             }
@@ -57,7 +58,7 @@
               var chart_element,chart_id;
                 chart_max_id ++;
                 chart_id = "chart_" + chart_max_id;
-                chart_element = jQuery("<table id='" + chart_id + "' width='100%'><tbody><tr><td width='280px'><table><tbody  class='options'><tr><td>Graph Type:<br /><select name='graph_type' class='graph_type'><option selected disabled value='default'></option><option value='bar'>bar chart</option><option value='scatter' disabled>scatter plot</option><option value='pie' disabled>pie chart</option><option value='line' disabled>line chart</option></select></td></tr><tbody></table></td><td class='chart'></td></tr><tr><td></td><td align='right'><hr /><input type='button' value='Remove' onclick='remove_chart(" + chart_max_id + ");'></td></tr></tbody></table>");
+                chart_element = jQuery("<table id='" + chart_id + "' width='100%'><tbody><tr><td width='280px'><table><tbody  class='options'><tr><td>Graph Type:<br /><select name='graph_type' class='graph_type'><option selected disabled value='default'></option><option value='bar'>bar chart</option><option value='line'>line graph</option><option value='pie'>pie chart</option><option value='scatters' disabled>scatter plot</option></select></td></tr><tbody></table></td><td class='chart'></td></tr><tr><td></td><td align='right'><hr /><input type='button' value='Remove' onclick='remove_chart(" + chart_max_id + ");'></td></tr></tbody></table>");
                 jQuery("#draw_area").append(chart_element);
                 chart_element.find(".options").append(new_option(0, "Comparison Scope",
                         "<select name='compare_type' class='compare_type' onchange='choose_compare_type(this);'><option value='default' disabled selected class='default_option'></option><option value='course'>course</option><option value='assignment'>assignment</option value='team'><option>team</option></select><br />"

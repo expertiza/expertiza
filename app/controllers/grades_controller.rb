@@ -128,7 +128,7 @@ class GradesController < ApplicationController
     body_text["##[recipients_grade]"] = email_form[recipient.fullname+"_grade"]+"%"
     body_text["##[assignment_name]"] = assignment.name
 
-    Mailer.deliver_message(
+    Mailer.sync_message(
       {:recipients => email_form[:recipients],
        :subject => email_form[:subject],
        :from => email_form[:from],
@@ -137,7 +137,7 @@ class GradesController < ApplicationController
          :partial_name => "grading_conflict"
        }
     }
-    )
+    ).deliver
 
     flash[:notice] = "Your email to " + email_form[:recipients] + " has been sent. If you would like to send an email to another student please do so now, otherwise click Back"
     redirect_to :action => 'conflict_email_form',

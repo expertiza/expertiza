@@ -10,6 +10,12 @@ module AssignmentHelper
     options
   end
 
+  def is_intelligent_options
+    is_intelligent_options = Array.new
+    is_intelligent_options << ["No", 'false']
+    is_intelligent_options << ["Yes", 'true']
+  end
+
   def wiki_type_options
     wiki_type_options = Array.new
     WikiType.find_each do |wiki_type|

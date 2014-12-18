@@ -5,6 +5,10 @@ class MenuItem < ActiveRecord::Base
   validates_presence_of :name
   validates_uniqueness_of :name
 
+  def self.find_or_create_by_name (params)
+    MenuItem.find_or_create_by(name: params)
+  end
+
   def delete
     children = MenuItem.where(['parent_id = ?',self.id])
     children.each {|child| child.delete }

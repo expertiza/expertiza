@@ -25,7 +25,7 @@ class CoursesUsers < ActiveRecord::Base
   def email(pw, home_page)
     user = User.find(self.user_id)
     course = Course.find(self.course_id)
-    Mailer.deliver_message(
+    Mailer.sync_message(
       {:recipients => user.email,
        :subject => "You have been registered as a participant in #{course.title}",
        :body => {
@@ -36,7 +36,7 @@ class CoursesUsers < ActiveRecord::Base
          :partial_name => "register"
        }
     }
-    )
+    ).deliver
   end
 
 end

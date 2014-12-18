@@ -1,26 +1,25 @@
 <SCRIPT LANGUAGE="JavaScript">
-  function toggleVis(value, id) {
-    var elem = document.getElementById(id);
-    if (value) {
-      elem.style.display = 'none';
-    } else {
-      elem.style.display = '';
+    function toggleVis(value, id) {
+        var elem = document.getElementById(id);
+        if (value) {
+            elem.style.display = 'none';
+        } else {
+            elem.style.display = '';
+        }
     }
-  }
 </SCRIPT>
-<%= form_tag :controller => 'review_mapping',
-  :action => 'assign_reviewer_dynamically',
-  :assignment_id => assignment.id,
-  :reviewer_id => session[:user].id do %>
+<% if assignment.has_topics? %>
+    <%= form_tag :controller => 'review_mapping',
+                 :action => 'assign_reviewer_dynamically',
+                 :assignment_id => assignment.id,
+                 :reviewer_id => session[:user].id do %>
 
-  <% if assignment.has_topics? %>
-    <p><b>Select a topic below to begin a new review:</b></p>
 
-    <input id="i_dont_care" name="i_dont_care" type="checkbox" onchange="toggleVis(this.checked, 'topic_list');" />
-    I don't care which topic I review.
+        <p><b>Select a topic below to begin a new review:</b></p>
 
     <table cellpadding="0" id="topic_list">
-      <% candidate_topics_to_review = assignment.candidate_topics_to_review(session[:user]).to_a %>
+      <% #candidate_topics_to_review = assignment.candidate_topics_to_review(session[:user]).to_a %>
+      <% candidate_topics_to_review = assignment.candidate_topics_to_review(participant).to_a %>
       <% candidate_topics_to_review.sort! { |a, b| a.id <=> b.id } %>
       <% non_reviewable_topics = assignment.sign_up_topics - candidate_topics_to_review %>
       <% non_reviewable_topics.sort! { |a, b| a.id <=> b.id } %>

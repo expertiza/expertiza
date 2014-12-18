@@ -1,21 +1,21 @@
 <% if participant.get_hyperlinks.try(:length) || 0 > 0 %>
-  <%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => @participant, stage: @stage} %>
+  <%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant, stage: @stage} %>
 <% end %>
 <% if stage != "Complete" and controller.controller_name == 'submitted_content' %>
-  <%= form_tag :action => 'submit_hyperlink', :id => participant.id do %>
+  <%= form_tag :action => 'submit_hyperlink', :id => assignment_participant.id do %>
     <b>Submit a hyperlink:</b><BR/>
     <input type="text" name="submission" size=40 value="http://">
     <input type="submit" name="upload_link" value="Upload link"/>
   <% end %>
 <% end %>
 
-<% if participant.assignment.wiki_type_id == 1 %>
+<% if assignment_participant.assignment.wiki_type_id == 1 %>
   <%#= render partial: 'submitted_content/submitted_files', locals: {participant: @participant, stage: @stage} %>
   <br/><br/><br/><b>
-    <% if participant.assignment.is_coding_assignment%>
+    <% if assignment_participant.assignment.is_coding_assignment%>
       <%= link_to "Code Review Dashboard", :controller => 'review_files',
         :action => 'show_all_submitted_files',
-        :participant_id => participant.id,
+        :participant_id => assignment_participant.id,
         :stage => stage %>
     </b><br/>
   <% end %>

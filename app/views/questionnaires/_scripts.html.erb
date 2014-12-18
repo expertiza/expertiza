@@ -111,7 +111,7 @@ function addQuestion(in_str, parameter_str, type_str){
     weights = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<select id=new_choices_" + cid + "_weight name=new_choices[" + id + "][" + cid + "][weight]>";
     //Listing the options for a quiz questionnaire
     <% for weight in Question::ANSWERS %>
- <%= "weights += '<option value=" + weight[1].to_s + ">" + weight[0].to_s + "</option>';"%>
+      <%= "weights += '<option value=".html_safe + weight[1].to_s + ">".html_safe + weight[0].to_s + "</option>';".html_safe%>
     <% end %>
 
     weights = weights + "</select>";
@@ -129,7 +129,7 @@ function addQuestion(in_str, parameter_str, type_str){
         weights = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<select id=new_choices_" + cid + "_weight name=new_choices[" + id + "][" + cid + "][weight]>";
         //Listing the options for a quiz questionnaire
         <% for weight in Question::ANSWERS_MCQ_CHECKED %>
- <%= "weights += '<option value=" + weight[1].to_s + ">" + weight[0].to_s + "</option>';"%>
+ <%= "weights += '<option value=".html_safe + weight[1].to_s + ">".html_safe + weight[0].to_s + "</option>';".html_safe%>
         <% end %>
 
         weights = weights + "</select>";
@@ -175,7 +175,7 @@ function addQuestion(in_str, parameter_str, type_str){
     weights = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<select id=new_choices_" + cid + "_weight name=new_choices[" + id + "][" + cid + "][weight]>";
     //Listing the options for a quiz questionnaire
     <% for weight in Question::ANSWERS_TRUE_FALSE %>
- <%= "weights += '<option value=" + weight[1].to_s + ">" + weight[0].to_s + "</option>';"%>
+      <%= "weights += '<option value=".html_safe + weight[1].to_s + ">".html_safe + weight[0].to_s + "</option>';".html_safe%>
     <% end %>
 
     weights = weights + "</select>";
@@ -205,7 +205,7 @@ function addQuestion(in_str, parameter_str, type_str){
  column = document.createElement("td");
     gradingTypes = "<select id=question_" + id + "_true_false name=new_question[" + id + "][true_false]>";
     <% for type in Question::GRADING_TYPES %>
- <%= "gradingTypes += '<option value=" + type[1].to_s + ">" + type[0].to_s + "</option>';"%>
+      <%= "gradingTypes += '<option value=".html_safe + type[1].to_s + ">".html_safe + type[0].to_s + "</option>';".html_safe%>
     <% end %>
     gradingTypes += "</select>"
     column.innerHTML = gradingTypes;
@@ -215,7 +215,7 @@ function addQuestion(in_str, parameter_str, type_str){
     weights = "<select id=new_question_" + id + "_weight name=new_question[" + id + 		"][weight]>";
 
     <% for weight in Question::WEIGHTS %>
- <%= "weights += '<option value=" + weight[1].to_s + ">" + weight[0].to_s + "</option>';"%>
+ <%= "weights += '<option value=".html_safe + weight[1].to_s + ">".html_safe + weight[0].to_s + "</option>';".html_safe%>
     <% end %>
     weights = weights + "</select>";
     column.innerHTML = weights;

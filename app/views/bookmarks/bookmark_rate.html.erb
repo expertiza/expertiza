@@ -1,0 +1,74 @@
+<h1>This is the ratings page</h1>
+<% if !@topic_bookmark_rating_rubric.nil? %>
+  <% form_tag(:controller => :bookmarks, :action => :save_rating) do %>
+    <p>
+      <span>
+        <%= hidden_field_tag("topic_bookmark_id", params[:id])%>
+        <%= hidden_field_tag("assignment_id", params[:assignment_id])%>
+        <%= hidden_field_tag("bmapping_id", @search_results)%>
+        <%= @topic_bookmark_rating_rubric.display_text %>
+        <%= select_tag("bookmark_rating", options_for_select((@topic_bookmark_rating_rubric.minimum_rating..@topic_bookmark_rating_rubric.maximum_rating).to_a, @current_user.bookmark_rated?(@search_results).nil? ? nil : @current_user.bookmark_rated?(@search_results).rating)) %>
+        <%= submit_tag("Save") %>
+      </span>
+    </p>
+  <% end %>
+
+
+<p> There are no bookmark rating rubrics. You can start here:
+  <%= link_to("Create new bookmark rating rubric", {:controller => "bookmarks", :action =>
+                                                    "add_rating_rubric_form"}) %>
+                                                </p>
+                                              <% else %>
+                                                <%if !@rating_rubric.nil? %>
+                                                  <% @rating_rubrics.each do |rr| %>
+                                                    <div style="border:1px solid #986633; padding:5px 15px;margin-bottom:15px;">
+                                                      <p>
+                                                        <div>
+                                                          Display Text:
+                                                        </div>
+                                                        <div>
+                                                          <%= rr.display_text %>
+                                                        </div>
+                                                      </p>
+                                                      <p>
+                                                        <div>
+                                                          <span>Minimum Rating:</span>
+                                                          <span><%= rr.minimum_rating %></span>
+                                                          &nbsp;&nbsp;&nbsp;
+                                                          <span>Maximum Rating:</span>
+                                                          <span><%= rr.maximum_rating %></span>
+                                                        </div>
+                                                      </p>
+                                                      <p>
+                                                        <div>
+                                                          <%= link_to("Edit", {:controller => "bookmarks", :action => "edit_rating_rubric_form", :id => rr.id})
+                                                        %>
+                                                      &nbsp;&nbsp;
+                                                      <%= link_to("New", {:controller => "bookmarks", :action => "add_rating_rubric_form"}) %>
+                                                      &nbsp;&nbsp;
+                                                      <%= link_to("Delete", "#") %>
+                                                    </div>
+                                                  </p>
+                                                </div>
+                                              <% end %>
+                                            <% end %>
+
+
+                                            <% unless @topic_bookmark_rating_rubric.nil? ||
+                                                 @current_user.bookmark_added?(@search_results) %>
+                                               <% form_tag(:controller => :bookmarks, :action => :view_rating_rubric) do %>
+                                                 <p>
+                                                   <span>
+                                                     <%= hidden_field_tag("topic_bookmark_id", params[:id])%>
+                                                     <%= hidden_field_tag("assignment_id", params[:assignment_id])%>
+                                                     <%= hidden_field_tag("bmapping_id", @search_results)%>
+                                                     <%= @topic_bookmark_rating_rubric.display_text %>
+                                                     <%= select_tag("bookmark_rating", options_for_select((@topic_bookmark_rating_rubric.minimum_rating..@topic_bookmark_rating_rubric.maximum_rating).to_a, @current_user.bookmark_rated?(@search_results).nil? ? nil : @current_user.bookmark_rated?(@search_results).rating)) %>
+                                                     <%= submit_tag("Save") %>
+                                                   </span>
+                                                 </p>
+
+
+                                               <% end %>
+                                             <% end %>
+<% end %>

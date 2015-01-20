@@ -13,10 +13,14 @@
       <% if participant %>
           <tr>
             <td>
-              <b><%= "#{title} #{review_no}." %></b>
-              <%= unless participant.topic.nil? then
-                    " #{participant.topic.topic_identifier}: #{participant.topic.topic_name}"
-                  end %>
+              <%round = map.round%>
+              <%if round==nil %>
+                  <%round = ""  %>
+              <%else%>
+                  <%round = " (Round"+round.to_s+")"  %>
+              <%end%>
+              <b><%= "#{title} #{review_no}." %></b> <%=round%>
+              <%= unless participant.topic.nil? then " #{participant.topic.topic_identifier}: #{participant.topic.topic_name}" end %>
             </td>
             <td>&nbsp;</td>
             <% if map.response %>

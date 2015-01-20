@@ -255,11 +255,61 @@ class AssignmentParticipant < Participant
     scores = {}
     scores[:participant] = self
     self.assignment.questionnaires.each do |questionnaire|
+      round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(self.assignment.id, questionnaire.id).used_in_round
+      #create symbol for "varying rubrics" feature -Yang
+      if(round!=nil)
+        questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
+      else
+        questionnaire_symbol = questionnaire.symbol
+      end
+
       scores[questionnaire.symbol] = {}
-      scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
-      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+
+      if round==nil
+        scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_for(self)
+      else
+        scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_round_for(self,round)
+      end
+      scores[questionnaire_symbol][:scores] = Score.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
     end
+
     scores[:total_score] = self.assignment.compute_total_score(scores)
+
+    #merge scores[review#] (for each round) to score[review]  -Yang
+    if self.assignment.varying_rubrics_by_round?
+      review_sym = "review".to_sym
+      scores[review_sym] = Hash.new
+      scores[review_sym][:assessments] = Array.new
+      scores[review_sym][:scores] = Hash.new
+      scores[review_sym][:scores][:max] = -999999999
+      scores[review_sym][:scores][:min] = 999999999
+      scores[review_sym][:scores][:avg] = 0
+      total_score = 0
+      for i in 1..self.assignment.get_review_rounds
+        puts i.to_s
+        round_sym = ("review"+i.to_s).to_sym
+        length_of_assessments=scores[round_sym][:assessments].length.to_f
+
+        scores[review_sym][:assessments]+=scores[round_sym][:assessments]
+
+        if(scores[round_sym][:scores][:max]!=nil && scores[review_sym][:scores][:max]<scores[round_sym][:scores][:max])
+          scores[review_sym][:scores][:max]= scores[round_sym][:scores][:max]
+        end
+        if(scores[round_sym][:scores][:min]!= nil && scores[review_sym][:scores][:min]>scores[round_sym][:scores][:min])
+          scores[review_sym][:scores][:min]= scores[round_sym][:scores][:min]
+        end
+        if(scores[round_sym][:scores][:avg]!=nil)
+          total_score += scores[round_sym][:scores][:avg]*length_of_assessments
+        end
+      end
+
+      if scores[review_sym][:scores][:max] == -999999999 && scores[review_sym][:scores][:min] == 999999999
+               scores[review_sym][:scores][:max] = 0
+               scores[review_sym][:scores][:min] = 0
+      end
+
+      scores[review_sym][:scores][:avg] = total_score/scores[review_sym][:assessments].length.to_f
+    end
 
     # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
     # PS: I don't like the fact that we are doing this here but it is difficult to make it work anywhere else

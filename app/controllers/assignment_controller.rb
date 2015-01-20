@@ -585,6 +585,9 @@ class AssignmentController < ApplicationController
           end
         end
         @assignment = Assignment.find(params[:id])
+        # E1450 change
+        @assignment_questionnaires = AssignmentQuestionnaire.find_all_by_assignment_id(@assignment.id)
+        # E1450 end
         begin
           oldpath = @assignment.get_path
         rescue

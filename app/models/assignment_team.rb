@@ -13,7 +13,29 @@ class AssignmentTeam < Team
     end
 
   def assign_reviewer(reviewer)
-    TeamReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
+    if assignment.has_topics?
+      topic_id = self.topic.id
+      if topic_id==nil
+        raise "this team has not taken any topic"
+      end
+    end
+    assignment = Assignment.find(self.parent_id)
+    if assignment==nil
+      raise "cannot find this assignment"
+    end
+    if assignment.varying_rubrics_by_round?
+      round = assignment.get_current_round(topic_id) #record round number only for varying rubrics feature
+    else
+      round=nil
+    end
+    TeamReviewResponseMap.create(:reviewee_id => self.id, :reviewer_id => reviewer.id,
+                                 :reviewed_object_id => assignment.id, :round =>round)
+  end
+
+  #for varying rubric feature -Yang
+  def reviewed_by_in_round?(reviewer,round)
+    return TeamReviewResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ? AND round=?',
+                                                       self.id, reviewer.id, assignment.id, round]) > 0
   end
 
   # Evaluates whether any contribution by this team was reviewed by reviewer

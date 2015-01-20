@@ -110,6 +110,24 @@ class Assignment < ActiveRecord::Base
     candidate_topics
   end
 
+  #This method is only for the assignments without topics
+  def candidate_assignment_teams_to_review
+
+    contributor_set = Array.new(contributors)
+
+    # Reject contributors that have no submissions
+    contributor_set.reject! { |contributor| !contributor.has_submissions? }
+
+    # Filter the contributors with the least number of reviews
+    # (using the fact that each contributor is associated with a topic)
+    contributor = contributor_set.min_by { |contributor| contributor.review_mappings.count }
+
+    min_reviews = contributor.review_mappings.count rescue 0
+    contributor_set.reject! { |contributor| contributor.review_mappings.count > min_reviews + review_topic_threshold }
+
+    contributor_set
+  end
+
   def reject_by_least_reviewed(contributor_set)
     contributor = contributor_set.min_by { |contributor| contributor.review_mappings.reject! { |review_mapping| review_mapping.response.nil? }.count }
     min_reviews = contributor.review_mappings.reject! { |review_mapping| review_mapping.response.nil? }.count rescue 0
@@ -141,6 +159,29 @@ class Assignment < ActiveRecord::Base
 
   def has_topics?
     @has_topics ||= !sign_up_topics.empty?
+  end
+
+  #assign the reviewer to review the assignment_team's submission. Only used in the assignments that do not have any topic
+  def assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
+    if assignment_team==nil
+      raise "There is no submission right now. Come back later."
+    end
+    participants = assignment_team.get_participants
+
+    if participants.include?(reviewer)
+      raise "We randomly picked your own artifact. You may try click the button again or come back later."
+    end
+    if self.varying_rubrics_by_round?  #review rubrics vary by rounds
+      round = get_current_round(nil)
+      if assignment_team.reviewed_by_in_round?(reviewer,round)
+        raise "We randomly picked an artifact which has already been reviewed by you. You may try click the button again or come back later."
+      end
+    else
+      if assignment_team.reviewed_by?(reviewer)
+        raise "We randomly picked an artifact which has already been reviewed by you. You may try click the button again or come back later."
+      end
+    end
+    assignment_team.assign_reviewer(reviewer)
   end
 
   def has_teams?
@@ -242,8 +283,14 @@ class Assignment < ActiveRecord::Base
     raise "There are no more submissions to review on this #{work}." if contributor_set.empty?
 
     # Reviewer can review each contributor only once
-    contributor_set.reject! { |contributor| contributor.reviewed_by?(reviewer) }
-    raise "You have already reviewed all submissions for this #{work}." if contributor_set.empty?
+    if self.varying_rubrics_by_round?# However, in varying rubric feature, reviewer can review a artifact twice in different rounds
+      round = self.get_current_round(topic.id)
+      contributor_set.reject! { |contributor| contributor.reviewed_by_in_round?(reviewer,round) }
+      raise "You have already reviewed all submissions for this #{work} in current round." if contributor_set.empty?
+    else
+      contributor_set.reject! { |contributor| contributor.reviewed_by?(reviewer) }
+      raise "You have already reviewed all submissions for this #{work}." if contributor_set.empty?
+    end
 
     # Reduce to the contributors with the least number of reviews ("responses") received
     min_contributor = contributor_set.min_by { |a| a.responses.count }
@@ -322,7 +369,7 @@ class Assignment < ActiveRecord::Base
   alias_method :is_using_dynamic_reviewer_assignment?, :dynamic_reviewer_assignment?
 
   def review_mappings
-    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+    #ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     TeamReviewResponseMap.where(reviewed_object_id: self.id)
     end
@@ -359,22 +406,59 @@ class Assignment < ActiveRecord::Base
       scores[:participants][participant.id.to_s.to_sym][:total_score] = compute_total_score(scores[:participants][participant.id.to_s.to_sym])
       scores[:participants][participant.id.to_s.to_sym][:total_score] += participant.compute_quiz_scores(scores[:participants][participant.id.to_s.to_sym])
 
-
-
     end
-    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+    #ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-
-
 
     scores[:teams] = Hash.new
     index = 0
     self.teams.each do |team|
       scores[:teams][index.to_s.to_sym] = Hash.new
       scores[:teams][index.to_s.to_sym][:team] = team
-      assessments = TeamReviewResponseMap.get_assessments_for(team)
-      scores[:teams][index.to_s.to_sym][:scores] = Score.compute_scores(assessments, questions[:review])
-      #... = ScoreCache.get_participant_score(team, id, questionnaire.display_type)
+
+      if self.varying_rubrics_by_round?
+        grades_by_rounds = Hash.new
+
+        total_score = 0
+        total_num_of_assessments = 0    #calculate grades for each rounds
+        for i in 1..self.get_review_rounds
+          assessments = TeamReviewResponseMap.get_assessments_round_for(team,i)
+          round_sym = ("review"+i.to_s).to_sym
+          grades_by_rounds[round_sym]= Score.compute_scores(assessments, questions[round_sym])
+          total_num_of_assessments += assessments.size
+          if grades_by_rounds[round_sym][:avg]!=nil
+            total_score += grades_by_rounds[round_sym][:avg]*assessments.size.to_f
+          end
+        end
+
+        #merge the grades from multiple rounds
+        scores[:teams][index.to_s.to_sym][:scores] = Hash.new
+        scores[:teams][index.to_s.to_sym][:scores][:max] = -999999999
+        scores[:teams][index.to_s.to_sym][:scores][:min] = 999999999
+        scores[:teams][index.to_s.to_sym][:scores][:avg] = 0
+        for i in 1..self.get_review_rounds
+          round_sym = ("review"+i.to_s).to_sym
+          if(grades_by_rounds[round_sym][:max]!=nil && scores[:teams][index.to_s.to_sym][:scores][:max]<grades_by_rounds[round_sym][:max])
+            scores[:teams][index.to_s.to_sym][:scores][:max]= grades_by_rounds[round_sym][:max]
+          end
+          if(grades_by_rounds[round_sym][:min]!= nil && scores[:teams][index.to_s.to_sym][:scores][:min]>grades_by_rounds[round_sym][:min])
+            scores[:teams][index.to_s.to_sym][:scores][:min]= grades_by_rounds[round_sym][:min]
+          end
+        end
+
+        if total_num_of_assessments!=0
+          scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score/total_num_of_assessments
+        else
+          scores[:teams][index.to_s.to_sym][:scores][:avg]=0
+          scores[:teams][index.to_s.to_sym][:scores][:max]=0
+          scores[:teams][index.to_s.to_sym][:scores][:min]=0
+        end
+
+      else
+        assessments = TeamReviewResponseMap.get_assessments_for(team)
+        scores[:teams][index.to_s.to_sym][:scores] = Score.compute_scores(assessments, questions[:review])
+      end
+
       index = index + 1
     end
     scores
@@ -619,6 +703,73 @@ class Assignment < ActiveRecord::Base
     (due_date == nil || due_date == COMPLETE) ? COMPLETE : DeadlineType.find(due_date.deadline_type_id).name
   end
 
+  #if current  stage is submission or review, find the round number
+  #otherwise, return 0
+  def get_current_round(topic_id)
+    if self.staggered_deadline?
+      due_dates = TopicDeadline.where(:topic_id => topic_id).order('due_at DESC')
+    else
+      due_dates = DueDate.where(:assignment_id => self.id).order('due_at DESC')
+    end
+    puts due_dates.size
+    if due_dates != nil and due_dates.size > 0
+      if Time.now > due_dates[0].due_at
+        return 0
+      else
+        i = 0
+        for due_date in due_dates
+          if Time.now < due_date.due_at and
+              (due_dates[i+1] == nil or Time.now > due_dates[i+1].due_at)
+            return due_date.round
+          end
+          i = i + 1
+        end
+      end
+    end
+  end
+
+  #For varying rubric feature
+  def get_current_stage_name(topic_id=nil)
+    if self.staggered_deadline?
+       if topic_id.nil?
+          return 'Unknown'
+       end
+    end
+  due_date = find_current_stage(topic_id)
+
+    if( due_date!=COMPLETE && due_date!='Finished'&& due_date.deadline_name!=nil)
+      return due_date.deadline_name
+    else
+      return get_current_stage(topic_id)
+    end
+  end
+
+  #check if this assignment has multilple review phases with different review rubrics
+  def varying_rubrics_by_round?
+    assignment_questionnaires = AssignmentQuestionnaire.find(:all, :conditions => ["assignment_id=? and used_in_round=?",self.id,2])
+
+    if assignment_questionnaires.size>=1
+      true
+    else
+      false
+    end
+  end
+
+  def get_link_for_current_stage(topic_id=nil)
+    if self.staggered_deadline?
+      if topic_id.nil?
+        return nil
+      end
+    end
+    due_date = find_current_stage(topic_id)
+    if due_date == nil or due_date == COMPLETE
+      return nil
+    else
+      return due_date.description_url
+    end
+
+  end
+
   def get_stage_deadline(topic_id=nil)
     return 'Unknown' if topic_id.nil? if self.staggered_deadline?
     due_date = find_current_stage(topic_id)
@@ -627,11 +778,12 @@ class Assignment < ActiveRecord::Base
 
   def get_review_rounds
     due_dates = DueDate.where(assignment_id: self.id)
-    rounds = 0
-    0 .. due_dates.length-1.each do |i|
-      deadline_type = DeadlineType.find(due_dates[i].deadline_type_id)
-      rounds = rounds + 1 if deadline_type.name == 'review'
-    end
+    due_dates.each{
+        |due_date|
+      if due_date.round>rounds
+        rounds = due_date.round
+      end
+    }
     rounds
   end
 

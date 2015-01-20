@@ -40,6 +40,8 @@ class ReviewMappingController < ApplicationController
 
   def add_reviewer
     assignment = Assignment.find(params[:id])
+    topic_id = params[:topic_id]
+    round = assignment.get_current_round(topic_id)
     msg = String.new
     begin
 
@@ -54,8 +56,8 @@ class ReviewMappingController < ApplicationController
       reviewer = get_reviewer(user,assignment,regurl)
       #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
-      if TeamReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?',params[:id],reviewer.id]).first.nil?
-        TeamReviewResponseMap.create(:reviewee_id => params[:contributor_id], :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id)
+      if TeamReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?  and round = ?',params[:id],reviewer.id, round]).first.nil?
+        TeamReviewResponseMap.create(:reviewee_id => params[:contributor_id], :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id, :round=>round)
       else
         raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
       end
@@ -93,6 +95,8 @@ class ReviewMappingController < ApplicationController
   # Assign self to a submission
   def add_self_reviewer
     assignment = Assignment.find(params[:assignment_id])
+    topic_id = params[:topic_id]
+    round = assignment.get_current_round(topic_id)
     reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
     submission = AssignmentParticipant.find(params[:submission_id],assignment.id)
 
@@ -105,10 +109,11 @@ class ReviewMappingController < ApplicationController
         #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
         # to treat all assignments as team assignments
         contributor = get_team_from_submission(submission)
-        if TeamReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?', contributor.id, reviewer.id]).first.nil?
+        if TeamReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ? and round=?', contributor.id, reviewer.id, round]).first.nil?
           TeamReviewResponseMap.create(:reviewee_id => contributor.id,
                                        :reviewer_id => reviewer.id,
-                                       :reviewed_object_id => assignment.id)
+                                       :reviewed_object_id => assignment.id,
+                                       :round => round)
         else
           raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
         end
@@ -143,10 +148,18 @@ class ReviewMappingController < ApplicationController
       assignment = Assignment.find(params[:assignment_id])
       reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
 
-      unless params[:i_dont_care]
-        topic = (params[:topic_id].nil?) ? nil : SignUpTopic.find(params[:topic_id])
-      else
-        topic = assignment.candidate_topics_to_review(reviewer).to_a.shuffle[0] rescue nil
+      if assignment.has_topics?  #assignment with topics
+        unless params[:i_dont_care]
+          topic = (params[:topic_id].nil?) ? nil : SignUpTopic.find(params[:topic_id])
+        else
+          topic = assignment.candidate_topics_to_review.to_a.shuffle[0] rescue nil
+        end
+
+        assignment.assign_reviewer_dynamically(reviewer, topic)
+      else  #assignment without topic -Yang
+        assignment_teams = assignment.candidate_assignment_teams_to_review
+        assignment_team = assignment_teams.to_a.shuffle[0] rescue nil
+        assignment.assign_reviewer_dynamically_no_topic(reviewer,assignment_team)
       end
 
       assignment.assign_reviewer_dynamically(reviewer, topic)

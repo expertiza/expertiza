@@ -2,7 +2,14 @@ class Questionnaire < ActiveRecord::Base
   validate :validate_questionnaire
 
   def get_weighted_score(assignment, scores)
-    return compute_weighted_score(self.symbol, assignment, scores)
+    #create symbol for "varying rubrics" feature -Yang
+    round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(assignment.id, self.id).used_in_round
+    if(round!=nil)
+      questionnaire_symbol = (self.symbol.to_s+round.to_s).to_sym
+    else
+      questionnaire_symbol = self.symbol
+    end
+    return compute_weighted_score(questionnaire_symbol, assignment, scores)
   end
 
   # for doc on why we do it this way,

@@ -58,6 +58,10 @@ class AssignmentForm
 
   #code to save assignment questionnaires
   def update_assignment_questionnaires(attributes)
+    existing_aqs = AssignmentQuestionnaire::where(assignment_id: @assignment.id)
+    existing_aqs.each do |existing_aq|
+      existing_aq.delete
+    end
     attributes.each do |assignment_questionnaire|
       if assignment_questionnaire[:id].nil? or assignment_questionnaire[:id].blank?
         aq = AssignmentQuestionnaire.new(assignment_questionnaire)

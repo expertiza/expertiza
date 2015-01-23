@@ -141,11 +141,29 @@ class Participant < ActiveRecord::Base
     def get_scores(questions)
       scores = {}
       scores[:participant] = self
-      self.assignment.questionnaires.each do |questionnaire|
-        scores[questionnaire.symbol] = {}
-        scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
-        scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+
+      if self.assignment.varying_rubrics_by_round?  # for "vary rubric by rounds" feature -Yang
+        self.assignment.questionnaires.each do |questionnaire|
+          round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(self.assignment.id, questionnaire.id).used_in_round
+          if(round!=nil)
+            questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
+          else
+            questionnaire_symbol = questionnaire.symbol
+          end
+          scores[questionnaire_symbol] = Hash.new
+          scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_for(self)
+          scores[questionnaire_symbol][:scores] = Score.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
+        end
+
+      else   #not using "vary rubric by rounds" feature
+        self.assignment.questionnaires.each do |questionnaire|
+          scores[questionnaire.symbol] = Hash.new
+          scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
+
+          scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+        end
       end
+
       scores[:total_score] = assignment.compute_total_score(scores)
 
       scores

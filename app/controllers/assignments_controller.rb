@@ -50,6 +50,35 @@ class AssignmentsController < ApplicationController
   def edit
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @user = current_user
+
+    @assignment_questionnaires = AssignmentQuestionnaire::where(assignment_id: params[:id])
+    @due_date_all = DueDate::where(assignment_id: params[:id])
+    @reviewvarycheck = nil
+    @due_date_nameurl_notempty = false
+    @due_date_nameurl_notempty_checkbox = false
+
+    # Check if name and url in database is empty before webpage displays
+    @due_date_all.each do |dd|
+      if((!dd.deadline_name.nil?&&!dd.deadline_name.empty?)||(!dd.description_url.nil?&&!dd.description_url.empty?))
+        @due_date_nameurl_notempty = 1
+        @due_date_nameurl_notempty_checkbox = true
+        break
+      end
+    end
+    @assignment_questionnaires.each do  |aq|
+      if(!(aq.used_in_round.nil?))
+        @reviewvarycheck = 1
+        break
+      end
+    end
+    @due_date_all.each do |dd|
+      if dd.deadline_name.nil?
+        dd.deadline_name=""
+      end
+      if dd.description_url.nil?
+        dd.description_url=""
+      end
+    end
   end
 
   def update

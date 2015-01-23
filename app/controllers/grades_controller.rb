@@ -23,9 +23,25 @@ class GradesController < ApplicationController
     @assignment = Assignment.find(params[:id])
     @questions = {}
     questionnaires = @assignment.questionnaires_with_questions
-    questionnaires.each do |questionnaire|
-      @questions[questionnaire.symbol] = questionnaire.questions
+
+    if @assignment.varying_rubrics_by_round?
+      questionnaires.each {
+          |questionnaire|
+        round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
+        if(round!=nil)
+          questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
+        else
+          questionnaire_symbol = questionnaire.symbol
+        end
+        @questions[questionnaire_symbol] = questionnaire.questions
+      }
+    else      #if this assignment does not have "varying rubric by rounds" feature
+      questionnaires.each {
+          |questionnaire|
+        @questions[questionnaire.symbol] = questionnaire.questions
+      }
     end
+
     @scores = @assignment.get_scores(@questions)
     calculate_all_penalties(@assignment.id)
   end

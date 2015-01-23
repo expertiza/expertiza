@@ -1,5 +1,5 @@
 GIT
-  remote: https://github.com/expertiza/authlogic.git
+  remote: git://github.com/expertiza/authlogic.git
   revision: 09163c7d2a9b21942c6716e885a14305e1aa0390
   specs:
     expertiza-authlogic (3.2.0)
@@ -212,6 +212,8 @@ GEM
     paper_trail (3.0.6)
       activerecord (>= 3.0, < 5.0)
       activesupport (>= 3.0, < 5.0)
+    pg (0.17.1)
+    polyglot (0.3.5)
     power_assert (0.2.2)
     protected_attributes (1.0.8)
       activemodel (>= 4.0.1, < 5.0)
@@ -354,6 +356,9 @@ GEM
       coffee-rails
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
+    uglifier (2.5.3)
+      execjs (>= 0.3.0)
+      json (>= 1.8.0)
     websocket (1.2.1)
     will_paginate (3.0.7)
     win32console (1.3.2-x86-mingw32)
@@ -405,6 +410,7 @@ DEPENDENCIES
   omniauth-google-oauth2 (~> 0.2.6)
   open-uri-cached
   paper_trail
+  pg
   protected_attributes
   pry
   pry-nav
@@ -432,5 +438,6 @@ DEPENDENCIES
   therubyracer
   thin
   turbolinks
+  uglifier
   will_paginate
   zip-zip

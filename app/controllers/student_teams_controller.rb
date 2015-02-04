@@ -54,7 +54,7 @@ class StudentTeamsController < ApplicationController
       TeamNode.create parent_id: parent.id, node_object_id: team.id
       user = User.find student.user_id
       team.add_member user, team.parent_id
-      team_created_successfully
+      team_created_successfully(team)
       redirect_to view_student_teams_path student_id: student.id
 
     else
@@ -176,8 +176,12 @@ class StudentTeamsController < ApplicationController
     redirect_to view_student_teams_path student_id: student.id
   end
 
-  def team_created_successfully
-    undo_link "Team \"#{team.name}\" has been updated successfully. "
+  def team_created_successfully(current_team=nil)
+    if current_team
+      undo_link "Team \"#{current_team.name}\" has been updated successfully. "
+    else
+      undo_link "Team \"#{team.name}\" has been updated successfully. "
+    end
   end
 
 

@@ -53,14 +53,14 @@ class AssignmentsController < ApplicationController
 
     @assignment_questionnaires = AssignmentQuestionnaire::where(assignment_id: params[:id])
     @due_date_all = DueDate::where(assignment_id: params[:id])
-    @reviewvarycheck = nil
+    @reviewvarycheck = false
     @due_date_nameurl_notempty = false
     @due_date_nameurl_notempty_checkbox = false
 
     # Check if name and url in database is empty before webpage displays
     @due_date_all.each do |dd|
       if((!dd.deadline_name.nil?&&!dd.deadline_name.empty?)||(!dd.description_url.nil?&&!dd.description_url.empty?))
-        @due_date_nameurl_notempty = 1
+        @due_date_nameurl_notempty = true
         @due_date_nameurl_notempty_checkbox = true
         break
       end

@@ -386,7 +386,15 @@ class AssignmentParticipant < Participant
   end
   alias_method :members, :get_members
 
-  def get_hyperlinks_array
+  def get_team_hyperlinks  #get hyperlinks submitted by all the team members in a assignment team.
+    if self.assignment.team_assignment?
+      self.team.get_hyperlinks  #get hyperlinks submitted by all the team member
+    else
+      get_hyperlinks_array  #get hyperlinks submitted by the current participant
+    end
+  end
+
+  def get_hyperlinks_array # get hyperlinks submitted by current participant
     self.submitted_hyperlinks.nil? ? [] : YAML::load(self.submitted_hyperlinks)
   end
   alias_method :hyperlinks_array, :get_hyperlinks_array

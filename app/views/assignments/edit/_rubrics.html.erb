@@ -144,7 +144,7 @@
     }
   </script>
 
-<!--//Add a review varies by round checkbox. By: Xiaoqiang Shao-->
+<!--Add a review varies by round checkbox. -->
 <input name="assignment_questionnaire[used_in_round]" type="hidden" value="false" />
 <%= check_box_tag('assignment_questionnaire[used_in_round]', 'true', @reviewvarycheck,:onclick=>"handleCheckReviewVary(this)" ) %>
 <%= label_tag('assignment_questionnaire[used_in_round]', 'Review rubric varies by round?') %>
@@ -160,7 +160,7 @@
   </tr>
   <script>
       jQuery(document).ready(function () {
-          <% if @reviewvarycheck==1%>
+          <% if @reviewvarycheck%>
           <% for i in 1..@assignment_form.assignment.rounds_of_reviews %>
           addQuestionnaireTableRow(
                   'ReviewQuestionnaire',

@@ -15,7 +15,7 @@
     <td><b>Email &nbsp</b></td>
     <td></td>
   </tr>
-  <% for member in @student.team.get_participants %>
+  <% for member in @student.team.participants %>
     <tr>
       <td><%= member.user.name %></td>
       <td><%= member.user.fullname %></td>

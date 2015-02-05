@@ -69,11 +69,11 @@ class AssignmentTeam < Team
   # END of contributor methods
 
   def participants
-    #@participants ||= AssignmentParticipant.all(conditions: ['parent_id = ? && user_id IN (?)', parent_id, users])
+    participants=Array.new
     users.each {|user|
-      @participants ||= AssignmentParticipant.where('parent_id = ? && user_id = ?', parent_id, user.id)
+      participants.push(AssignmentParticipant.where(parent_id:parent_id, user_id:user.id ).first)
     }
-    return @participants
+    return participants
   end
 
   def delete
@@ -94,7 +94,14 @@ class AssignmentTeam < Team
   end
 
   def get_hyperlinks
-    get_participants.flat_map(&:get_hyperlinks_array).uniq
+    links = Array.new
+
+    self.participants.each do |participant|
+      puts participant.id
+      links+= participant.get_hyperlinks_array
+    end
+
+    links
   end
 
   def get_path

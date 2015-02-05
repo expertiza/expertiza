@@ -11,11 +11,13 @@
     </br>
   <% end %>
 
+    <%= participant.id %>
   <b>Hyperlinks</b>&nbsp;&nbsp;&nbsp;
+
   <a href="#" id="urlLink" name="urlLink" onClick="toggleElement('url','links');return false;">hide links</a><br/>
   <div id="url" style="">
     <ul>
-      <% participant.get_hyperlinks.each_with_index do |link, index| %>
+      <% participant.get_team_hyperlinks.each_with_index do |link, index| %>
         <% if stage != "Complete" %>
           <% if index == 0 %>
             <%= f.radio_button :chk_links, index, checked: true %>

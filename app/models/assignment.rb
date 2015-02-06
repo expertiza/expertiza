@@ -280,6 +280,7 @@ class Assignment < ActiveRecord::Base
         contributor.includes?(reviewer) ||
         !contributor.has_submissions?
     end
+
     raise "There are no more submissions to review on this #{work}." if contributor_set.empty?
 
     # Reviewer can review each contributor only once
@@ -711,7 +712,6 @@ class Assignment < ActiveRecord::Base
     else
       due_dates = DueDate.where(:assignment_id => self.id).order('due_at DESC')
     end
-    puts due_dates.size
     if due_dates != nil and due_dates.size > 0
       if Time.now > due_dates[0].due_at
         return 0
@@ -744,9 +744,9 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  #check if this assignment has multilple review phases with different review rubrics
+  #check if this assignment has multiple review phases with different review rubrics
   def varying_rubrics_by_round?
-    assignment_questionnaires = AssignmentQuestionnaire.find(:all, :conditions => ["assignment_id=? and used_in_round=?",self.id,2])
+    assignment_questionnaires = AssignmentQuestionnaire.where(:assignment_id=>self.id,:used_in_round=>2)
 
     if assignment_questionnaires.size>=1
       true

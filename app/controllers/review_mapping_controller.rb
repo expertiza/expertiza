@@ -1,5 +1,5 @@
 class ReviewMappingController < ApplicationController
-  include GC4R
+  #include GC4R
   autocomplete :user, :name
   #use_google_charts
   require 'gchart'
@@ -16,7 +16,6 @@ class ReviewMappingController < ApplicationController
        'Administrator'].include? current_role_name
     end
   end
-
 
   def auto_complete_for_user_name
     name = params[:user][:name]+"%"
@@ -161,8 +160,6 @@ class ReviewMappingController < ApplicationController
         assignment_team = assignment_teams.to_a.shuffle[0] rescue nil
         assignment.assign_reviewer_dynamically_no_topic(reviewer,assignment_team)
       end
-
-      assignment.assign_reviewer_dynamically(reviewer, topic)
 
     rescue Exception => e
       flash[:alert] = (e.nil?) ? $! : e

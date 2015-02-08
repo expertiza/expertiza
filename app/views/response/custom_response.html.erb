@@ -21,8 +21,11 @@
     <% if !@topic_id.nil? %>
         <h2>You are reviewing <%= @signedUpTopic %></h2>
     <% end %>
-    <%= render :partial => 'submitted_content/main', :locals => {:participant => @map.contributor, :stage => @assignment.get_current_stage()} %>
-
+    <%if @assignment.has_teams?%>
+        <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(@participant.topic_id)} %>
+    <%else%>
+        <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage => @assignment.get_current_stage(@participant.topic_id)} %>
+    <%end%>
     </hr>
 <% end %>
 

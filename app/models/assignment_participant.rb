@@ -96,6 +96,10 @@ class AssignmentParticipant < Participant
                            :type=>"QuizResponseMap", :notification_accepted => 0)
   end
 
+  def AssignmentParticipant.find_by_user_id_and_assignment_id(user_id, assignment_id)
+    return AssignmentParticipant.where(:user_id=>user_id,:parent_id=>assignment_id).first
+  end
+
   # Evaluates whether this participant contribution was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object
   def reviewed_by?(reviewer)

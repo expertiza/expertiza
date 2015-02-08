@@ -181,13 +181,14 @@ class Response < ActiveRecord::Base
     defn[:body] = Hash.new
     defn[:body][:partial_name] = partial
     response_map = ResponseMap.find map_id
-    defn[:subject] = "A new submission is available for "+Assignment.find(response_map.reviewed_object_id).name
+    assignment = Assignment.find(response_map.reviewed_object_id)
+    defn[:subject] = "A new submission is available for "+assignment.name
     if response_map.type == "TeamReviewResponseMap"
       defn[:body][:type] = "Author Feedback"
-      AssignmentTeam.find(response_map.reviewee_id).teams_users.each do |user|
-        defn[:body][:obj_name] = SignUpTopic.find(AssignmentParticipant.find(user.id).topic_id).topic_name
-        defn[:body][:first_name] = User.find(user.user_id).fullname
-        defn[:to] = User.find(user.user_id).email
+      AssignmentTeam.find(response_map.reviewee_id).users.each do |user|
+        defn[:body][:obj_name] = SignUpTopic.find(AssignmentParticipant.find_by_user_id_and_assignment_id(user.id,assignment.id).topic_id).topic_name
+        defn[:body][:first_name] = User.find(user.id).fullname
+        defn[:to] = User.find(user.id).email
         Mailer.sync_message(defn).deliver
       end
     end
@@ -195,8 +196,8 @@ class Response < ActiveRecord::Base
       defn[:body][:type] = "Metareview"
       AssignmentTeam.find(response_map.reviewee_id).teams_users.each do |user|
         defn[:body][:obj_name] = SignUpTopic.find(AssignmentParticipant.find(user.id).topic_id).topic_name
-        defn[:body][:first_name] = User.find(user.user_id).fullname
-        defn[:to] = User.find(user.user_id).email
+        defn[:body][:first_name] = User.find(user.id).fullname
+        defn[:to] = User.find(user.id).email
         Mailer.sync_message(defn).deliver
       end
     end

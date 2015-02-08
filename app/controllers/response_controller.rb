@@ -146,6 +146,7 @@ class ResponseController < ApplicationController
     return if redirect_when_disallowed(@response)
 
     @map = @response.map
+    @contributor = @map.contributor
     array_not_empty=0
     @review_scores=Array.new
     @prev=Response.all
@@ -178,35 +179,6 @@ class ResponseController < ApplicationController
       render :action => 'response'
     end
     @response.email("update")
-  end
-
-  def edit
-    @header = "Edit"
-    @next_action = "update"
-    @return = params[:return]
-    @response = Response.find(params[:id])
-    return if redirect_when_disallowed(@response)
-    @map = @response.map
-    @assignment=Assignment.find(@map.reviewed_object_id)
-    @questionnaire = @response.questionnaire
-    latestResponseVersion()
-    if @prev.present?
-      #@sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
-      @sorted=@review_scores.sort
-      @largest_version_num=@sorted[0]
-    end
-    #@response = Response.where(map_id: @map.id, version_num:  @largest_version_num).first
-    @response = Response.where(map_id: @map.id).first
-    #@modified_object = @response.id
-    #get_content()
-    #get_scores()
-    # Check whether this is a custom rubric
-    if @map.questionnaire.section.eql? "Custom"
-      render :action => 'custom_response'
-    else
-      # end of special code (except for the end below, to match the if above)
-      render :action => 'response'
-    end
   end
 
   def update ###-### Seems like this method may no longer be used -- not in E806 version of the file

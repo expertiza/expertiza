@@ -209,7 +209,6 @@ class ResponseController < ApplicationController
 
     begin
       ResponseHelper.compare_scores(@response, @questionnaire)
-      ScoreCache.update_cache(@response.response_id)
 
       msg = "Your response was successfully saved."
     rescue
@@ -341,7 +340,6 @@ class ResponseController < ApplicationController
     #end
 
     ResponseHelper.compare_scores(@response, @questionnaire)
-    ScoreCache.update_cache(@res)
     #@map.save
     msg = "Your response was successfully saved."
     @response.email();

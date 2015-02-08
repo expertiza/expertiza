@@ -95,7 +95,7 @@ class Score < ActiveRecord::Base
       if @questionnaire.section == "Custom"
         @questions.each {
           |question|
-          item = Score.where(response_id: @response.response_id, question_id:  question.id).first
+          item = Score.where(:response_id=>@response.id, :question_id=>question.id).first
           if @q_types.length <= x
             @q_types[x] = QuestionType.find_by_question_id(question.id)
           end

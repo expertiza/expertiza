@@ -14,7 +14,8 @@
                  :assignment_id => assignment.id,
                  :reviewer_id => session[:user].id do %>
 
-
+        <input id="i_dont_care" name="i_dont_care" type="checkbox" onchange="toggleVis(this.checked, 'topic_list');" />
+        I don't care which topic I review.
         <p><b>Select a topic below to begin a new review:</b></p>
 
     <table cellpadding="0" id="topic_list">

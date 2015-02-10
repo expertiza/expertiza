@@ -311,21 +311,9 @@ class ResponseController < ApplicationController
     for element in @prev
       @review_scores << element
     end
-    #if previous responses exist increment the version number.
-    #if @prev.present?
-    #  @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
-    #  @largest_version_num=@sorted[0]
-    #  @version=@largest_version_num.version_num+1
-      #if no previous version is available then initial version number is 1
-    #else
-    #  @version=1
-    #end
+
     @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments])#,:version_num=>@version)
-    #@response = Response.find_by_map_id(@map.id)
-    #@response.additional_comment = params[:review][:comments]
-    #@response.version_num = @version
-    #@response.map = @map
-    #if @response.save
+
       @res = @response.response_id
       @questionnaire = @map.questionnaire
       questions = @questionnaire.questions
@@ -334,33 +322,12 @@ class ResponseController < ApplicationController
           score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
         end
       end
-    #else
-    #rescue
-    #  flash[:warn] = "Error1: Your response was not saved. Cause:330 #{$!}"
-    #end
 
     ResponseHelper.compare_scores(@response, @questionnaire)
     #@map.save
     msg = "Your response was successfully saved."
     @response.email();
     redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]
-  end
-
-  def custom_create ###-### Is this used?  It is not present in the master branch.
-    @map = ResponseMap.find(params[:id])
-    #@map.additional_comment = ""
-    @map.save
-    @response = Response.create(:map_id => @map.id, :additional_comment => "")
-    @res = @response.id
-    @questionnaire = @map.questionnaire
-    questions = @questionnaire.questions
-    for i in 0..questions.size-1
-      # Local variable score is unused; can it be removed?
-      score = Score.create(:response_id => @response.id, :question_id => questions[i].id, :score => @questionnaire.max_question_score, :comments => params[:custom_response][i.to_s])
-    end
-    msg = "#{@map.get_title} was successfully saved."
-
-    saving
   end
 
   def saving

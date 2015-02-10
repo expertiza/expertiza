@@ -290,7 +290,6 @@ class AssignmentParticipant < Participant
       scores[review_sym][:scores][:avg] = 0
       total_score = 0
       for i in 1..self.assignment.get_review_rounds
-        puts i.to_s
         round_sym = ("review"+i.to_s).to_sym
         length_of_assessments=scores[round_sym][:assessments].length.to_f
 

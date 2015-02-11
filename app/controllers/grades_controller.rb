@@ -63,7 +63,13 @@ class GradesController < ApplicationController
     @questions = {}
     questionnaires = @assignment.questionnaires
     questionnaires.each do |questionnaire|
-      @questions[questionnaire.symbol] = questionnaire.questions
+      round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
+      if(round!=nil)
+        questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
+      else
+        questionnaire_symbol = questionnaire.symbol
+      end
+      @questions[questionnaire_symbol] = questionnaire.questions
     end
 
     rmaps = ParticipantReviewResponseMap.where(reviewee_id: @participant.id, reviewed_object_id: @participant.assignment.id)

@@ -7,7 +7,7 @@ class Score < ActiveRecord::Base
   #  questions - the list of questions that was filled out in the process of doing those assessments
   def self.compute_scores(assessments, questions)
     scores = Hash.new
-    if assessments.length > 0
+    if !assessments.nil?&&assessments.length > 0
       scores[:max] = -999999999
       scores[:min] = 999999999
       total_score = 0
@@ -42,13 +42,14 @@ class Score < ActiveRecord::Base
       else
         scores[:avg]=0
       end
-        else
-          scores[:max] = nil
-          scores[:min] = nil
-          scores[:avg] = nil
-        end
-        return scores
+    else
+      scores[:max] = nil
+      scores[:min] = nil
+      scores[:avg] = nil
     end
+
+    return scores
+  end
 
     def self.compute_quiz_scores(responses)
       scores = Hash.new

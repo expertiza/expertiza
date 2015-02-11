@@ -208,14 +208,10 @@ class AssignmentTeam < Team
       end
       alias_method :scores, :get_scores
 
-      def self.get_team(participant)
-        team = nil
-        teams_users = TeamsUser.where(user_id: participant.user_id)
-        teams_users.each do |tuser|
-          fteam = Team.where(['parent_id = ? && id = ?', participant.parent_id, tuser.team_id]).first
-          team = fteam if fteam
-        end
-        team
+      def self.get_team(participant) # return nil if this participant doesn't have a team
+        teams_user = TeamsUser.where(user_id: participant.user_id).first
+        return nil if !teams_user
+        Team.find(teams_user.team_id)
       end
 
       def self.export(csv, parent_id, options)

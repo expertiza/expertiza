@@ -778,6 +778,7 @@ class Assignment < ActiveRecord::Base
 
   def get_review_rounds
     due_dates = DueDate.where(assignment_id: self.id)
+    rounds=0
     due_dates.each{
         |due_date|
       if due_date.round>rounds

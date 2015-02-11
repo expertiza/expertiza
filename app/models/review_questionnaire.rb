@@ -14,8 +14,10 @@ class ReviewQuestionnaire < Questionnaire
 
   # return  the responses for specified round, for varying rubric feature -Yang
   def get_assessments_round_for(participant,round)
-    team_id =AssignmentTeam.get_team(participant).id
+    team=AssignmentTeam.get_team(participant)
+    return nil if !team
 
+    team_id = team.id
     responses = Array.new
     if participant
       maps = ResponseMap.where(:reviewee_id => team_id, :type => "TeamReviewResponseMap", :round => round)

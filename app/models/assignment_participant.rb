@@ -267,7 +267,7 @@ class AssignmentParticipant < Participant
         questionnaire_symbol = questionnaire.symbol
       end
 
-      scores[questionnaire.symbol] = {}
+      scores[questionnaire_symbol] = {}
 
       if round==nil
         scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_for(self)
@@ -291,6 +291,9 @@ class AssignmentParticipant < Participant
       total_score = 0
       for i in 1..self.assignment.get_review_rounds
         round_sym = ("review"+i.to_s).to_sym
+        if length_of_assessments=scores[round_sym][:assessments].nil? || scores[round_sym][:assessments].length==0
+          next
+        end
         length_of_assessments=scores[round_sym][:assessments].length.to_f
 
         scores[review_sym][:assessments]+=scores[round_sym][:assessments]

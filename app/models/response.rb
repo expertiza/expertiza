@@ -183,11 +183,11 @@ class Response < ActiveRecord::Base
     response_map = ResponseMap.find map_id
     assignment=nil
 
-    # need to do similar to MetareviewResponseMap, TeammateReviewResponseMap, ParticipantReviewResponseMap, TeamReviewResponseMap
+    # need to do similar to get assignment_id for MetareviewResponseMap, TeammateReviewResponseMap, ParticipantReviewResponseMap, TeamReviewResponseMap
     if response_map.type =="FeedbackResponseMap"
       reviewer_participant_id =  response_map.reviewer_id
       participant = Participant.find(reviewer_participant_id)
-      assignment = Assignment.find(participant.partent_id)
+      assignment = Assignment.find(participant.parent_id)
     end
 
     defn[:subject] = "A new submission is available for "+assignment.name
@@ -211,7 +211,8 @@ class Response < ActiveRecord::Base
     end
     if response_map.type == "FeedbackResponseMap"
       defn[:body][:type] = "Review Feedback"
-      participant = AssignmentParticipant.find(reviewee_id: response_map.reviewee_id)
+      reviewee_participant_id =  response_map.reviewee_id
+      participant = AssignmentParticipant.find(reviewee_participant_id)
       defn[:body][:obj_name] = SignUpTopic.find(AssignmentParticipant.find(response_map.reviewer_id).topic_id).topic_name
       user = Users.find(participant.user_id)
       defn[:to] = user.email

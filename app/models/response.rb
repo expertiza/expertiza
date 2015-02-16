@@ -181,7 +181,15 @@ class Response < ActiveRecord::Base
     defn[:body] = Hash.new
     defn[:body][:partial_name] = partial
     response_map = ResponseMap.find map_id
-    assignment = Assignment.find(response_map.reviewed_object_id)
+    assignment=nil
+
+    # need to do similar to MetareviewResponseMap, TeammateReviewResponseMap, ParticipantReviewResponseMap, TeamReviewResponseMap
+    if response_map.type =="FeedbackResponseMap"
+      reviewer_participant_id =  response_map.reviewer_id
+      participant = Participant.find(reviewer_participant_id)
+      assignment = Assignment.find(participant.partent_id)
+    end
+
     defn[:subject] = "A new submission is available for "+assignment.name
     if response_map.type == "TeamReviewResponseMap"
       defn[:body][:type] = "Author Feedback"

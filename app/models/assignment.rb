@@ -43,7 +43,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def team_assignment?
-    max_team_size > 1
+    true
   end
 
   def team_assignment

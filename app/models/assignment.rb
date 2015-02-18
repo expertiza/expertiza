@@ -95,8 +95,14 @@ class Assignment < ActiveRecord::Base
     # Filter submission by reviewer him/her self
     contributor_set=reject_own_submission(contributor_set, reviewer)
 
-    # Filter submissions already reviewed by reviewer
-    contributor_set=reject_previously_reviewed_submissions(contributor_set, reviewer)
+    if self.varying_rubrics_by_round?
+      current_round = self.get_current_round(nil)
+      contributor_set = reject__reviewed_submissions_in_current_round(contributor_set, reviewer,current_round)
+    else
+      # Filter submissions already reviewed by reviewer
+      contributor_set=reject_previously_reviewed_submissions(contributor_set, reviewer)
+    end
+
 
     # Filter the contributors with the least number of reviews
     # (using the fact that each contributor is associated with a topic)
@@ -134,6 +140,10 @@ class Assignment < ActiveRecord::Base
     contributor_set.reject { |contributor| contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count  > min_reviews + review_topic_threshold }
 
     return contributor_set
+  end
+
+  def reject__reviewed_submissions_in_current_round(contributor_set, reviewer, current_round)
+    contributor_set = contributor_set.reject { |contributor| contributor.reviewed_by_in_round?(reviewer,current_round) }
   end
 
   def reject_previously_reviewed_submissions(contributor_set, reviewer)

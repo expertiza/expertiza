@@ -210,12 +210,19 @@ class Response < ActiveRecord::Base
         Mailer.sync_message(defn).deliver
       end
     end
-    if response_map.type == "FeedbackResponseMap"
+    if response_map.type == "FeedbackResponseMap" #This is authors' feedback from UI
       defn[:body][:type] = "Review Feedback"
-      reviewee_participant_id =  response_map.reviewee_id
-      participant = AssignmentParticipant.find(reviewee_participant_id)
+      # reviewee is a response, reviewer is a participant
+      # we need to track back to find the original reviewer on whose work the author comments
+      response_id_for_original_feedback = response_map.reviewed_object_id
+      response_for_original_feedback = Response.find response_id_for_original_feedback
+      response_map_for_original_feedback = ResponseMap.find response_for_original_feedback.map_id
+      original_reviewer_participant_id = response_map_for_original_feedback.reviewer_id
+
+      participant = AssignmentParticipant.find(original_reviewer_participant_id)
       defn[:body][:obj_name] = SignUpTopic.find(AssignmentParticipant.find(response_map.reviewer_id).topic_id).topic_name
-      user = Users.find(participant.user_id)
+      user = User.find(participant.user_id)
+
       defn[:to] = user.email
       defn[:body][:first_name] = user.fullname
       Mailer.sync_message(defn).deliver

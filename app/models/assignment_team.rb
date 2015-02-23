@@ -212,7 +212,7 @@ class AssignmentTeam < Team
         teams_users = TeamsUser.where(user_id: participant.user_id)
         return nil if !teams_users
         teams_users.each do |teams_user|
-          team = Team.find(teams_user.team_id)
+          team = AssignmentTeam.find(teams_user.team_id)
           return team if team.parent_id==participant.parent_id
         end
         nil

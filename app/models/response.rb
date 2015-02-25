@@ -233,10 +233,11 @@ class Response < ActiveRecord::Base
     end
     if response_map.type == "TeammateReviewResponseMap"
       defn[:body][:type] = "Teammate Review"
-      participant = AssignmentParticipant.find(reviewee_id: response_map.reviewee_id)
+      participant = AssignmentParticipant.find(response_map.reviewee_id)
       defn[:body][:obj_name] = SignUpTopic.find(participant.topic_id).topic_name
-      defn[:body][:first_name] = User.find(user.user_id).fullname
-      defn[:to] = User.find(user.user_id).email
+      user = User.find(participant.user_id)
+      defn[:body][:first_name] = user.fullname
+      defn[:to] = user.email
       Mailer.sync_message(defn).deliver
     end
   end

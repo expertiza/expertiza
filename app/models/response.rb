@@ -195,7 +195,11 @@ class Response < ActiveRecord::Base
     if response_map.type == "TeamReviewResponseMap"
       defn[:body][:type] = "Author Feedback"
       AssignmentTeam.find(response_map.reviewee_id).users.each do |user|
-        defn[:body][:obj_name] = SignUpTopic.find(AssignmentParticipant.find_by_user_id_and_assignment_id(user.id,assignment.id).topic_id).topic_name
+        if assignment.has_topics?
+          defn[:body][:obj_name] = SignUpTopic.find(AssignmentParticipant.find_by_user_id_and_assignment_id(user.id,assignment.id).topic_id).topic_name
+        else
+          defn[:body][:obj_name] = assignment.name
+        end
         defn[:body][:first_name] = User.find(user.id).fullname
         defn[:to] = User.find(user.id).email
         Mailer.sync_message(defn).deliver

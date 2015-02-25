@@ -184,11 +184,11 @@ class Assignment < ActiveRecord::Base
     if self.varying_rubrics_by_round?  #review rubrics vary by rounds
       round = get_current_round(nil)
       if assignment_team.reviewed_by_in_round?(reviewer,round)
-        raise "We randomly picked an artifact which has already been reviewed by you. You may try click the button again or come back later."
+        raise "We randomly picked an artifact which has already been reviewed by you (or assigned to you). You may try click the button again or come back later."
       end
     else
       if assignment_team.reviewed_by?(reviewer)
-        raise "We randomly picked an artifact which has already been reviewed by you. You may try click the button again or come back later."
+        raise "We randomly picked an artifact which has already been reviewed by you (or assigned to you). You may try click the button again or come back later."
       end
     end
     assignment_team.assign_reviewer(reviewer)

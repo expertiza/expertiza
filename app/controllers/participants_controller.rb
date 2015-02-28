@@ -39,18 +39,18 @@ class ParticipantsController < ApplicationController
       flash[:error] = "User #{params[:user][:name]} does not exist. Would you like to <a href = '#{url_new_user}'>create this user?</a>"
     end
 
-    undo_link("User \"#{params[:user][:name]}\" has been added as a participant successfully. ")
+    flash[:note] = undo_link("User \"#{params[:user][:name]}\" has been added as a participant successfully. ")
     redirect_to :action => 'list', :id => curr_object.id, :model => params[:model]
   end
 
-  def delete
+  def destroy
     participant = Participant.find(params[:id])
     name = participant.user.name
     parent_id = participant.parent_id
     begin
       @participant = participant
       participant.delete(params[:force])
-      undo_link("User \"#{name}\" has been removed as a participant successfully. ")
+      flash[:note] = undo_link("User \"#{name}\" has been removed as a participant successfully. ")
     rescue => error
       url_yes = url_for :action => 'delete', :id => params[:id], :force => 1
       url_show = url_for :action => 'delete_display', :id => params[:id], :model => participant.class.to_s.gsub("Participant","")

@@ -91,7 +91,7 @@ class ApplicationController < ActionController::Base
     # Create a set that will be used to populate the dropbox when a user lists a set of objects (assgts., questionnaires, etc.)
     # Get the Instructor::QUESTIONNAIRE constant
     @display_options ||= eval "#{current_user_role.class}::#{object_type}"
-    end
+  end
 
   # Use this method to validate the current user in order to avoid allowing users
   # to see unauthorized data.

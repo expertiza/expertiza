@@ -41,88 +41,88 @@ module QuestionnaireHelper
         end
 
         csv << row
+      end
     end
+
+    return csv_data
   end
 
-  return csv_data
-end
+  def self.get_questions_from_csv(questionnaire, file)
+    questions = Array.new
+    custom_rubric = questionnaire.section == "Custom"
 
-def self.get_questions_from_csv(questionnaire, file)
-  questions = Array.new
-  custom_rubric = questionnaire.section == "Custom"
+    CSV::Reader.parse(file) do |row|
+      if row.length > 0
+        i = 0
+        score = questionnaire.max_question_score
+        q = Question.new
 
-  CSV::Reader.parse(file) do |row|
-    if row.length > 0
-      i = 0
-      score = questionnaire.max_question_score
-      q = Question.new
+        q_type = QuestionType.new if custom_rubric
 
-      q_type = QuestionType.new if custom_rubric
+        q.true_false = false
 
-      q.true_false = false
-
-      row.each do |cell|
-        case i
-        when CSV_QUESTION
-          q.txt = cell.strip if cell != nil
-        when CSV_TYPE
-          if cell != nil
-            q.true_false = cell.downcase.strip == Question::TRUE_FALSE.downcase
-            q_type.q_type = cell.strip if custom_rubric
+        row.each do |cell|
+          case i
+          when CSV_QUESTION
+            q.txt = cell.strip if cell != nil
+          when CSV_TYPE
+            if cell != nil
+              q.true_false = cell.downcase.strip == Question::TRUE_FALSE.downcase
+              q_type.q_type = cell.strip if custom_rubric
+            end
+          when CSV_PARAM
+            if custom_rubric
+              q_type.parameters = cell.strip if cell
+            end
+          when CSV_WEIGHT
+            q.weight = cell.strip.to_i if cell
+          else
+            if score >= questionnaire.min_question_score and cell != nil
+              a = QuestionAdvice.new(:score => score, :advice => cell.strip) if custom_rubric
+              a = QuestionAdvice.new(:score => questionnaire.min_question_score + i - 4, :advice => cell.strip)
+              score = score - 1
+              q.question_advices << a
+            end
           end
-        when CSV_PARAM
-          if custom_rubric
-            q_type.parameters = cell.strip if cell
-          end
-        when CSV_WEIGHT
-          q.weight = cell.strip.to_i if cell
-        else
-          if score >= questionnaire.min_question_score and cell != nil
-            a = QuestionAdvice.new(:score => score, :advice => cell.strip) if custom_rubric
-            a = QuestionAdvice.new(:score => questionnaire.min_question_score + i - 4, :advice => cell.strip)
-            score = score - 1
-            q.question_advices << a
-          end
+
+          i = i + 1
         end
 
-        i = i + 1
+        q.save
+
+        q_type.question = q if custom_rubric
+        q_type.save if custom_rubric
+
+        questions << q
       end
-
-      q.save
-
-      q_type.question = q if custom_rubric
-      q_type.save if custom_rubric
-
-      questions << q
     end
+
+    questions
   end
 
-  questions
-end
+  def self.adjust_advice_size(questionnaire, question)
+    if question.true_false and question.question_advices.length != 2
+      question.question_advices << QuestionAdvice.new(:score=>0)
+      question.question_advices << QuestionAdvice.new(:score=>1)
 
-def self.adjust_advice_size(questionnaire, question)
-  if question.true_false and question.question_advices.length != 2
-    question.question_advices << QuestionAdvice.new(:score=>0)
-    question.question_advices << QuestionAdvice.new(:score=>1)
-
-    QuestionAdvice.delete_all(["question_id = ? AND (score > 1 OR score < 0)", question.id])
-    return true
-  elsif question.true_false == false
-    for i in (questionnaire.min_question_score..questionnaire.max_question_score)
-      print "\n#{i}: #{question.id}"
-      qa = QuestionAdvice.where("question_id = #{question.id} AND score = #{i}").first
+      QuestionAdvice.delete_all(["question_id = ? AND (score > 1 OR score < 0)", question.id])
+      return true
+    elsif question.true_false == false
+      for i in (questionnaire.min_question_score..questionnaire.max_question_score)
+        print "\n#{i}: #{question.id}"
+        qa = QuestionAdvice.where("question_id = #{question.id} AND score = #{i}").first
 
         if qa == nil
           print " NEW "
           question.question_advices << QuestionAdvice.new(:score=>i)
+        end
       end
+
+      QuestionAdvice.delete_all(["question_id = ? AND (score > ? OR score < ?)",
+                                 question.id, questionnaire.max_question_score, questionnaire.min_question_score])
+      return true
     end
 
-    QuestionAdvice.delete_all(["question_id = ? AND (score > ? OR score < ?)",
-                               question.id, questionnaire.max_question_score, questionnaire.min_question_score])
-    return true
+    return false
   end
-
-  return false
-end
 end

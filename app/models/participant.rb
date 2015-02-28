@@ -54,118 +54,118 @@ class Participant < ActiveRecord::Base
     else
       raise "Associations exist for this participant"
     end
+  end
+
+
+  def force_delete(maps)
+    times = ResubmissionTime.where(participant_id: self.id);
+
+    if times
+      times.each { |time| time.destroy }
     end
 
-
-    def force_delete(maps)
-      times = ResubmissionTime.where(participant_id: self.id);
-
-      if times
-        times.each { |time| time.destroy }
-      end
-
-      if maps
-        maps.each { |map| map.delete(true) }
-      end
-
-      if self.team
-        if self.team.teams_users.length == 1
-          self.team.delete
-        else
-          self.team.teams_users.each{ |tuser|
-            if tuser.user_id == self.id
-              tuser.delete
-            end
-          }
-        end
-      end
-      self.destroy
+    if maps
+      maps.each { |map| map.delete(true) }
     end
 
-    def topic_name
-      if topic.nil? or topic.topic_name.empty?
-        return "<center>&#8212;</center>"
+    if self.team
+      if self.team.teams_users.length == 1
+        self.team.delete
+      else
+        self.team.teams_users.each{ |tuser|
+          if tuser.user_id == self.id
+            tuser.delete
+          end
+        }
       end
-      return topic.topic_name
     end
+    self.destroy
+  end
 
-    def able_to_review
-      if review_allowed
-        return true
-      end
-      return false
+  def topic_name
+    if topic.nil? or topic.topic_name.empty?
+      return "<center>&#8212;</center>"
     end
+    return topic.topic_name
+  end
 
-    # email does not work. It should be made to work in the future
-    def email(pw, home_page)
-      user = User.find(self.user_id)
-      assignment = Assignment.find(self.assignment_id)
-
-      Mailer.sync_message(
-        {:recipients => user.email,
-         :subject => "You have been registered as a participant in Assignment #{assignment.name}",
-         :body => {
-           :home_page => home_page,
-           :first_name => ApplicationHelper::get_user_first_name(user),
-           :name =>user.name,
-           :password =>pw,
-           :partial_name => "register"
-         }
-      }
-      ).deliver
+  def able_to_review
+    if review_allowed
+      return true
     end
+    return false
+  end
 
-    #This function updates the topic_id for a participant in assignments where a signup sheet exists
-    #If the assignment is not a team assignment then this method should be called on the object of the participant
-    #If the assignment is a team assignment then this method should be called on the participant object of one of the team members.
-    #Other team members records will be updated automatically.
-    def update_topic_id(topic_id)
-      assignment = Assignment.find(self.parent_id)
+  # email does not work. It should be made to work in the future
+  def email(pw, home_page)
+    user = User.find(self.user_id)
+    assignment = Assignment.find(self.assignment_id)
 
-      #ACS Call the select method for all the teams(single or group)
-      #removed check to see if it is a team assignment
-      team = Team.find_by_sql("SELECT u.team_id as team_id
+    Mailer.sync_message(
+      {:recipients => user.email,
+       :subject => "You have been registered as a participant in Assignment #{assignment.name}",
+       :body => {
+         :home_page => home_page,
+         :first_name => ApplicationHelper::get_user_first_name(user),
+         :name =>user.name,
+         :password =>pw,
+         :partial_name => "register"
+       }
+       }
+    ).deliver
+  end
+
+  #This function updates the topic_id for a participant in assignments where a signup sheet exists
+  #If the assignment is not a team assignment then this method should be called on the object of the participant
+  #If the assignment is a team assignment then this method should be called on the participant object of one of the team members.
+  #Other team members records will be updated automatically.
+  def update_topic_id(topic_id)
+    assignment = Assignment.find(self.parent_id)
+
+    #ACS Call the select method for all the teams(single or group)
+    #removed check to see if it is a team assignment
+    team = Team.find_by_sql("SELECT u.team_id as team_id
                               FROM teams as t,teams_users as u
                               WHERE t.parent_id = " + assignment.id.to_s + " and t.id = u.team_id and u.user_id = " + self.user_id.to_s )
 
-      team_id = team[0]["team_id"]
-      team_members = TeamsUser.where(team_id: team_id)
+    team_id = team[0]["team_id"]
+    team_members = TeamsUser.where(team_id: team_id)
 
-      team_members.each { |team_member|
-        participant = Participant.where(user_id: team_member.user_id, parent_id: assignment.id).first
-        participant.update_attribute(:topic_id, topic_id)
-      }
-    end
+    team_members.each { |team_member|
+      participant = Participant.where(user_id: team_member.user_id, parent_id: assignment.id).first
+      participant.update_attribute(:topic_id, topic_id)
+    }
+  end
 
-    # Return scores that this participant for the given questions
-    def get_scores(questions)
-      scores = {}
-      scores[:participant] = self
+  # Return scores that this participant for the given questions
+  def get_scores(questions)
+    scores = {}
+    scores[:participant] = self
 
-      if self.assignment.varying_rubrics_by_round?  # for "vary rubric by rounds" feature -Yang
-        self.assignment.questionnaires.each do |questionnaire|
-          round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(self.assignment.id, questionnaire.id).used_in_round
-          if(round!=nil)
-            questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
-          else
-            questionnaire_symbol = questionnaire.symbol
-          end
-          scores[questionnaire_symbol] = Hash.new
-          scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_for(self)
-          scores[questionnaire_symbol][:scores] = Score.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
+    if self.assignment.varying_rubrics_by_round?  # for "vary rubric by rounds" feature -Yang
+      self.assignment.questionnaires.each do |questionnaire|
+        round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(self.assignment.id, questionnaire.id).used_in_round
+        if(round!=nil)
+          questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
+        else
+          questionnaire_symbol = questionnaire.symbol
         end
-
-      else   #not using "vary rubric by rounds" feature
-        self.assignment.questionnaires.each do |questionnaire|
-          scores[questionnaire.symbol] = Hash.new
-          scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
-
-          scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
-        end
+        scores[questionnaire_symbol] = Hash.new
+        scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_for(self)
+        scores[questionnaire_symbol][:scores] = Score.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
       end
 
-      scores[:total_score] = assignment.compute_total_score(scores)
+    else   #not using "vary rubric by rounds" feature
+      self.assignment.questionnaires.each do |questionnaire|
+        scores[questionnaire.symbol] = Hash.new
+        scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
 
-      scores
+        scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+      end
     end
+
+    scores[:total_score] = assignment.compute_total_score(scores)
+
+    scores
   end
+end

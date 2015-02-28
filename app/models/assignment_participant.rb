@@ -19,9 +19,9 @@ class AssignmentParticipant < Participant
   has_many :quiz_response_maps, foreign_key: 'reviewee_id'
   has_many :quiz_responses, through: :quiz_response_maps, foreign_key: 'map_id'
   # has_many    :quiz_responses,  :class_name => 'Response', :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'QuizResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
-    has_many    :collusion_cycles
+  has_many    :collusion_cycles
   # has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'ParticipantReviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
-    belongs_to  :user
+  belongs_to  :user
   validates_presence_of :handle
 
   # Returns the average score of one question from all reviews for this user on this assignment as an floating point number
@@ -88,9 +88,7 @@ class AssignmentParticipant < Participant
                                         :reviewed_object_id => assignment.id)
   end
 
-  def assign_quiz(contributor,reviewer,topic)
-    participant_id=AssignmentParticipant.where(topic_id: topic, parent_id:  contributor.parent_id).first.id
-
+  def assign_quiz(contributor, reviewer, topic)
     quiz = QuizQuestionnaire.find_by_instructor_id(contributor.id)
     QuizResponseMap.create(:reviewed_object_id => quiz.id,:reviewee_id => contributor.id, :reviewer_id => reviewer.id,
                            :type=>"QuizResponseMap", :notification_accepted => 0)
@@ -129,10 +127,10 @@ class AssignmentParticipant < Participant
     reviewees = []
     if self.assignment.team_assignment?
       rmaps = ResponseMap.all(conditions: ["reviewer_id = #{self.id} && type = 'TeamReviewResponseMap'"])
-        rmaps.each { |rm| reviewees.concat(AssignmentTeam.find(rm.reviewee_id).participants) }
+      rmaps.each { |rm| reviewees.concat(AssignmentTeam.find(rm.reviewee_id).participants) }
     else
       rmaps = ResponseMap.where(["reviewer_id = #{self.id} && type = 'ParticipantReviewResponseMap'"])
-        rmaps.each {|rm| reviewees.push(AssignmentParticipant.find(rm.reviewee_id))}
+      rmaps.each {|rm| reviewees.push(AssignmentParticipant.find(rm.reviewee_id))}
     end
 
     reviewees
@@ -310,8 +308,8 @@ class AssignmentParticipant < Participant
       end
 
       if scores[review_sym][:scores][:max] == -999999999 && scores[review_sym][:scores][:min] == 999999999
-               scores[review_sym][:scores][:max] = 0
-               scores[review_sym][:scores][:min] = 0
+        scores[review_sym][:scores][:max] = 0
+        scores[review_sym][:scores][:min] = 0
       end
 
       scores[review_sym][:scores][:avg] = total_score/scores[review_sym][:assessments].length.to_f
@@ -342,7 +340,7 @@ class AssignmentParticipant < Participant
     scores[:total_score] = assignment.compute_total_score(scores)
     scores[:total_score] += compute_quiz_scores(scores)
     scores
-    end
+  end
 
 
   def compute_quiz_scores(scores)
@@ -583,71 +581,71 @@ class AssignmentParticipant < Participant
       participant.permission_granted = participant.verify_digital_signature(private_key)
       participant.save
       raise 'Invalid key' unless participant.permission_granted
-      end
     end
+  end
 
-    # verify the digital signature is valid
-    def verify_digital_signature(private_key)
-      user.public_key == OpenSSL::PKey::RSA.new(private_key).public_key.to_pem
+  # verify the digital signature is valid
+  def verify_digital_signature(private_key)
+    user.public_key == OpenSSL::PKey::RSA.new(private_key).public_key.to_pem
+  end
+
+  #define a handle for a new participant
+  def set_handle
+    if self.user.handle == nil or self.user.handle == ""
+      self.handle = self.user.name
+    elsif AssignmentParticipant.where(parent_id: self.assignment.id, handle: self.user.handle).length > 0
+      self.handle = self.user.name
+    else
+      self.handle = self.user.handle
     end
+    self.save!
+  end
 
-    #define a handle for a new participant
-    def set_handle
-      if self.user.handle == nil or self.user.handle == ""
-        self.handle = self.user.name
-      elsif AssignmentParticipant.where(parent_id: self.assignment.id, handle: self.user.handle).length > 0
-        self.handle = self.user.name
-      else
-        self.handle = self.user.handle
-      end
-      self.save!
-    end
+  def get_path
+    self.assignment.get_path + "/"+ self.directory_num.to_s
+  end
+  alias_method :path, :get_path
 
-    def get_path
-      self.assignment.get_path + "/"+ self.directory_num.to_s
-    end
-    alias_method :path, :get_path
+  def update_resubmit_times
+    new_submit = ResubmissionTime.new(:resubmitted_at => Time.now.to_s)
+    self.resubmission_times << new_submit
+  end
 
-    def update_resubmit_times
-      new_submit = ResubmissionTime.new(:resubmitted_at => Time.now.to_s)
-      self.resubmission_times << new_submit
-    end
-
-    def set_student_directory_num
-      if self.directory_num.nil? || self.directory_num < 0
-        max_num = AssignmentParticipant.where(['parent_id = ?', self.parent_id], :order => 'directory_num desc').first.directory_num
-        dir_num = max_num ? max_num + 1 : 0
-        self.update_attribute('directory_num',dir_num)
-        #ACS Get participants irrespective of the number of participants in the team
-        #removed check to see if it is a team assignment
-        self.team.get_participants.each do | member |
-          if member.directory_num == nil or member.directory_num < 0
-            member.directory_num = self.directory_num
-            member.save
-          end
+  def set_student_directory_num
+    if self.directory_num.nil? || self.directory_num < 0
+      max_num = AssignmentParticipant.where(['parent_id = ?', self.parent_id], :order => 'directory_num desc').first.directory_num
+      dir_num = max_num ? max_num + 1 : 0
+      self.update_attribute('directory_num',dir_num)
+      #ACS Get participants irrespective of the number of participants in the team
+      #removed check to see if it is a team assignment
+      self.team.get_participants.each do | member |
+        if member.directory_num == nil or member.directory_num < 0
+          member.directory_num = self.directory_num
+          member.save
         end
       end
     end
-
-    def get_current_stage
-      assignment.try :get_current_stage, topic_id
-    end
-    alias_method :current_stage, :get_current_stage
-
-
-    def get_stage_deadline
-      assignment.get_stage_deadline topic_id
-    end
-    alias_method :stage_deadline, :get_stage_deadline
-
-
-    def review_response_maps
-      ParticipantReviewResponseMap.where(reviewee_id: id, reviewed_object_id: assignment.id)
-    end
-
-    def get_topic_string
-      return "<center>&#8212;</center>" if topic.nil? or topic.topic_name.empty?
-        topic.topic_name
-    end
-    alias_method :topic_string, :get_topic_string
   end
+
+  def get_current_stage
+    assignment.try :get_current_stage, topic_id
+  end
+  alias_method :current_stage, :get_current_stage
+
+
+  def get_stage_deadline
+    assignment.get_stage_deadline topic_id
+  end
+  alias_method :stage_deadline, :get_stage_deadline
+
+
+  def review_response_maps
+    ParticipantReviewResponseMap.where(reviewee_id: id, reviewed_object_id: assignment.id)
+  end
+
+  def get_topic_string
+    return "<center>&#8212;</center>" if topic.nil? or topic.topic_name.empty?
+    topic.topic_name
+  end
+  alias_method :topic_string, :get_topic_string
+end

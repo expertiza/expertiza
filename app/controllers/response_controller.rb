@@ -171,7 +171,7 @@ class ResponseController < ApplicationController
     end
     # Check whether this is a custom rubric
     if @map.questionnaire.section.eql? "Custom"
-      @next_action = "custom_update"
+
       render :action => 'custom_response'
     else
       # end of special code (except for the end below, to match the if above)
@@ -328,6 +328,23 @@ class ResponseController < ApplicationController
     msg = "Your response was successfully saved."
     @response.email();
     redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]
+  end
+
+  def custom_create
+    @map = ResponseMap.find(params[:id])
+    #@map.additional_comment = ""
+    @map.save
+    @response = Response.create(:map_id => @map.id, :additional_comment => "")
+    @res = @response.id
+    @questionnaire = @map.questionnaire
+    questions = @questionnaire.questions
+    for i in 0..questions.size-1
+      # Local variable score is unused; can it be removed?
+      score = Score.create(:response_id => @response.id, :question_id => questions[i].id, :score => @questionnaire.max_question_score, :comments => params[:custom_response][i.to_s])
+    end
+    msg = "#{@map.get_title} was successfully saved."
+
+    saving
   end
 
   def saving

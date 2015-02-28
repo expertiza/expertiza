@@ -272,6 +272,7 @@ Expertiza::Application.routes.draw do
       get :remove_hyperlink
       get :saving
       get :redirection
+      post :custom_create
     end
   end
 

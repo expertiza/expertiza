@@ -168,7 +168,7 @@ class UsersController < ApplicationController
             TeamsUser.where(user_id: @user.id).each{|teamuser| teamuser.delete}
             AssignmentQuestionnaire.where(user_id: @user.id).each{|aq| aq.destroy}
             @user.destroy
-            undo_link("User \"#{@user.name}\" has been deleted successfully. ")
+            flash[:note] = undo_link("User \"#{@user.name}\" has been deleted successfully. ")
           rescue
             flash[:error] = $!
           end

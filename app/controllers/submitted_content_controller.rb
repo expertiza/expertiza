@@ -13,14 +13,9 @@ class SubmittedContentController < ApplicationController
 
     #ACS We have to check if the number of members on the team is more than 1(group assignment)
     #hence use team count for the check
-    if @assignment.max_team_size > 1 && @participant.team.nil?
+    if  @participant.team.nil?
       flash[:error] = "This is a team assignment. Before submitting your work, you must <a style='color: blue;' href='../../student_teams/view/?student_id=#{params[:id]}'>create a team</a>, even if you will be the only member of the team"
       redirect_to :controller => 'student_task', :action => 'view', :id => params[:id]
-    else if @participant.team.nil?
-      #create a new team for current user before submission
-      team = AssignmentTeam.create_team_and_node(@assignment.id)
-      team.add_member(User.find(@participant.user_id),@assignment.id)
-    end
   end
 end
 

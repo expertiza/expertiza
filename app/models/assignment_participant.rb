@@ -393,10 +393,10 @@ class AssignmentParticipant < Participant
   alias_method :members, :get_members
 
   def get_team_hyperlinks  #get hyperlinks submitted by all the team members in a assignment team.
-    if self.assignment.team_assignment?
+    if self.team
       self.team.get_hyperlinks  #get hyperlinks submitted by all the team member
     else
-      get_hyperlinks_array  #get hyperlinks submitted by the current participant
+      nil
     end
   end
 

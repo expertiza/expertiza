@@ -393,6 +393,7 @@ Expertiza::Application.routes.draw do
       get :remove_hyperlink
       post :remove_hyperlink
       get :submit_file
+      post :submit_file
       post :submit_hyperlink
       get :submit_hyperlink
       get :view

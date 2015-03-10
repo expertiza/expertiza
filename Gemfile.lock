@@ -101,8 +101,7 @@ GEM
       json
     engtagger (0.2.0)
     erubis (2.7.0)
-    eventmachine (1.0.3)
-    eventmachine (1.0.3-x86-mingw32)
+    eventmachine (1.0.4)
     execjs (2.2.1)
     faraday (0.9.0)
       multipart-post (>= 1.2, < 3)

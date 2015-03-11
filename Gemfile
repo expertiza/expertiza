@@ -4,6 +4,7 @@ gem 'rails'
 
 ## Gems in Alphabetical Order
 
+##gem 'mysql'
 gem 'activerecord-session_store'
 gem 'awesome_nested_set'
 gem 'bind-it'
@@ -33,13 +34,13 @@ gem 'nokogiri'
 gem 'omniauth-google-oauth2', '~> 0.2.6'
 gem 'open-uri-cached'
 gem 'paper_trail'
-gem 'pg'
+gem 'pg', '~> 0.18.1'
 gem 'protected_attributes'
 gem 'rails_12factor', group: :production
 gem 'rails4-autocomplete'
 gem 'rake'
 gem 'rb-readline'
-gem 'RedCloth'
+
 gem 'rgl', :require => 'rgl/adjacency'
 gem 'rjb'
 gem 'rubyzip'
@@ -49,13 +50,14 @@ gem 'seer'
 gem 'sprockets'
 gem 'stanford-core-nlp'
 gem 'superfish-rails'
-gem 'therubyracer'
+gem 'therubyracer', :platform => :ruby
 gem 'thin'
 gem 'turbolinks'
+gem 'tzinfo-data'
 gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
-
+gem 'RedCloth'
 group :development do
   gem 'daemons'
   gem 'pry'

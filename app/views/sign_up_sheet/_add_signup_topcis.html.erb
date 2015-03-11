@@ -8,7 +8,7 @@
 
 
 <% if flash[:notice] %>
-  <div class="flash_note"><%= flash_message :notice %></div>
+    <div class="flash_note"><%= flash_message :notice %></div>
 <% end %>
 
 <% @sign_up_topics = SignUpTopic.where(['assignment_id = ?', @assignment.id]) %>
@@ -17,23 +17,23 @@
 <% @participants = SignedUpUser.find_team_participants(@assignment.id)  %>
 
 <% if @sign_up_topics.size != 0 %>
-  <table class="general">
-    <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
+    <table class="general">
+      <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
 
-    <% i=1 %>
-    <% for topic in @sign_up_topics %>
-      <tr>
-        <%= render :partial => '/sign_up_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
-      </tr>
-      <% i=i+1 %>
-    <% end %>
+      <% i=1 %>
+      <% for topic in @sign_up_topics %>
+          <tr>
+            <%= render :partial => '/sign_up_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
+          </tr>
+          <% i=i+1 %>
+      <% end %>
 
-  </table>
+    </table>
 
 <% else %>
-  <div class="flash_note">
-    <%= "Signup topics have not yet been created." %>
-  </div>
+    <div class="flash_note">
+      <%= "Signup topics have not yet been created." %>
+    </div>
 <% end %>
 
 <% session[:return_to] = request.url %>

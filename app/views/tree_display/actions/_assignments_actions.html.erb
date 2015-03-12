@@ -42,7 +42,7 @@
             <%= link_to image_tag('/assets/tree_view/view-survey-24.png', :title => 'View survey responses'), {:controller => 'survey_response', :action => 'view_responses', :id => node.node_object_id}, {:title => 'View survey responses'} %>
             <%= link_to image_tag('/assets/tree_view/view-suggestion-24.png', :title => 'View suggestions'), {:controller => 'suggestion', :action => 'list', :id => node.node_object_id}, {:title => 'View suggestions'} %>
             <% if signup_topic %>
-              <%= link_to image_tag('/assets/tree_view/view-publish-rights-24.png', :title => 'View publishing rights'), {:controller => 'sign_up_sheet', :action => 'view_publishing_rights', :id => node.node_object_id}, {:title => 'View publishing rights'} %>
+              <%= link_to image_tag('/assets/tree_view/view-publish-rights-24.png', :title => 'View publishing rights'), {:controller => 'signup_sheet', :action => 'view_publishing_rights', :id => node.node_object_id}, {:title => 'View publishing rights'} %>
             <% end %>
           </div>
 

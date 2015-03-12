@@ -326,7 +326,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :sign_up_sheet do
+  resources :signup_sheet do
     collection do
       get :signup
       get :delete_signup
@@ -490,5 +490,5 @@ Expertiza::Application.routes.draw do
 
   get ':controller(/:action(/:id))(.:format)'
 
- # get 'sign_up_sheet/intelligent_signup_sheet.html_erb' => 'sign_up_sheet#intelligentPage'
+ # get 'signup_sheet/intelligent_sign_up_sheet.html_erb' => 'signup_sheet#intelligentPage'
 end

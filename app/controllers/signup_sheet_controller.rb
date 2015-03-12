@@ -8,7 +8,7 @@
 #Hence each topic has a field called assignment_id which points which can be used to identify the assignment that this topic belongs
 #to
 
-class SignUpSheetController < ApplicationController
+class SignupSheetController < ApplicationController
   require 'rgl/adjacency'
   require 'rgl/dot'
   require 'rgl/topsort'
@@ -290,7 +290,7 @@ class SignUpSheetController < ApplicationController
             @selected_topics = nil
           else
             #TODO: fix this; cant use 0
-            @selected_topics = SignUpSheetController.other_confirmed_topic_for_user(params[:id], users_team[0].t_id)
+            @selected_topics = SignupSheetController.other_confirmed_topic_for_user(params[:id], users_team[0].t_id)
           end
 
           SignUpTopic.remove_team(users_team, @assignment_id)
@@ -430,7 +430,7 @@ class SignUpSheetController < ApplicationController
           #Waitlist.waitlist_teams(@param_id, @user_id, creator_id, topic_id, assignment_id)
 
           #check whether user has signed up already
-          user_signup = SignUpSheetController.other_confirmed_topic_for_user(assignment_id, creator_id)
+          user_signup = SignupSheetController.other_confirmed_topic_for_user(assignment_id, creator_id)
 
           sign_up = SignedUpUser.new
           sign_up.topic_id = topic_id
@@ -466,7 +466,7 @@ class SignUpSheetController < ApplicationController
               #If all the topics choosen by the user are waitlisted,
               for user_signup_topic in user_signup
                 unless user_signup_topic.is_waitlisted
-                  SignUpSheetController.flash_signedup_topic()
+                  SignupSheetController.flash_signedup_topic()
 
                   return false
                 end

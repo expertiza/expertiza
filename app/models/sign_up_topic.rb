@@ -143,7 +143,7 @@ class SignUpTopic < ActiveRecord::Base
       @selected_topics = nil
     else
       #TODO: fix this; cant use 0
-      @selected_topics = SignUpSheetController.other_confirmed_topic_for_user(assignment_id, users_team[0].t_id)
+      @selected_topics = SignupSheetController.other_confirmed_topic_for_user(assignment_id, users_team[0].t_id)
     end
   end
 end

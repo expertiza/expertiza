@@ -43,7 +43,7 @@ class Waitlist < ActiveRecord::Base
         #If all the topics choosen by the user are waitlisted,
         for user_signup_topic in user_signup
           if user_signup_topic.is_waitlisted == false
-            SignUpSheetController.flash_signedup_topic()
+            SignupSheetController.flash_signedup_topic()
 
             return false
           end

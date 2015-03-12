@@ -55,6 +55,7 @@ gem 'turbolinks'
 gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
+gem 'mysql'
 
 group :development do
   gem 'daemons'

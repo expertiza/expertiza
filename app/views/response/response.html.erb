@@ -31,6 +31,9 @@
 
 
 <%= form_tag :action => @next_action, :id => @modified_object do %>
+    <% if @next_action.eql?'update' %>
+        <input name="_method" type="hidden" value="put" />
+    <%end%>
     <% i = 0
        @questions.each {
                |question| %>

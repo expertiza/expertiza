@@ -16,7 +16,7 @@
               <%= link_to image_tag('/assets/tree_view/create-teams-24.png', :title => 'Create teams'), {:controller => 'teams', :action => 'list', :id => node.node_object_id, :type => 'Assignment'}, {:title => 'Create teams'} %>
             <% end %>
             <% signup_topic = SignUpTopic.where(['assignment_id = ?', node.node_object_id]).first %>
-            
+
           </div>
             <!-- E726 Changes Begin -->
             <div>

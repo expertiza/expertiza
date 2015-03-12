@@ -59,7 +59,6 @@ class SubmittedContentController < ApplicationController
 
   def submit_file
     participant = AssignmentParticipant.find(params[:id])
-    logger.warn "participant: #{participant.inspect}"
     return unless current_user_id?(participant.user_id)
 
     file = params[:uploaded_file]
@@ -72,8 +71,6 @@ class SubmittedContentController < ApplicationController
     end
 
     curr_directory = participant.get_path.to_s + @current_folder.name
-    logger.warn "curr_directory: #{curr_directory.inspect}"
-
 
     if !File.exists? curr_directory
       FileUtils.mkdir_p(curr_directory)

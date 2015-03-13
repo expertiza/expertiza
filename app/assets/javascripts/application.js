@@ -23,6 +23,7 @@
 //= require_tree .
 //= require jquery.datetimepicker
 
+
 $(document).on('ready page:load', function() {
   jQuery(this).trigger('turbo:ready');
 });

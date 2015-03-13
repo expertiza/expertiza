@@ -15,7 +15,7 @@ class SubmittedContentController < ApplicationController
     #hence use team count for the check
     if @assignment.max_team_size > 1 && @participant.team.nil?
       flash[:error] = "This is a team assignment. Before submitting your work, you must <a style='color: blue;' href='../../student_teams/view/?student_id=#{params[:id]}'>create a team</a>, even if you will be the only member of the team"
-      redirect_to :controller => 'student_task', :action => 'view', :id => params[:id]
+      redirect_to controller: 'student_task', action: 'view', id: params[:id]
     elsif @participant.team.nil?
       #create a new team for current user before submission
       team = AssignmentTeam.create_team_and_node(@assignment.id)
@@ -41,7 +41,7 @@ class SubmittedContentController < ApplicationController
       flash[:error] = "The URL or URI is not valid. Reason: #{$!}"
     end
     undo_link("Link has been submitted successfully. ")
-    redirect_to :action => 'edit', :id => @participant.id
+    redirect_to action: 'edit', id: @participant.id
   end
 
   # Note: This is not used yet in the view until we all decide to do so
@@ -54,7 +54,7 @@ class SubmittedContentController < ApplicationController
 
     @participant.remove_hyperlink(params[:hyperlinks]['chk_links'].to_i)
     undo_link("Link has been removed successfully. ")
-    redirect_to :action => 'edit', :id => @participant.id
+    redirect_to action: 'edit', id: @participant.id
   end
 
   def submit_file
@@ -88,7 +88,7 @@ class SubmittedContentController < ApplicationController
     #send message to reviewers when submission has been updated
     participant.assignment.email(participant.id) rescue nil # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
 
-    redirect_to :action => 'edit', :id => participant.id
+    redirect_to action: 'edit', id: participant.id
   end
 
 
@@ -113,24 +113,24 @@ class SubmittedContentController < ApplicationController
       create_new_folder
     end
 
-    redirect_to :action => 'edit', :id => @participant.id
+    redirect_to action: 'edit', id: @participant.id
   end
 
   def download
     #folder_name = FileHelper::sanitize_folder(@current_folder.name)
-    folder_name = params['current_folder']['name']
+    folder_name = params[:current_folder][:name]
     # -- This code removed on 4/10/09 ... was breaking downloads of files with hyphens in them ...file_name = FileHelper::sanitize_filename(params['download'])
-    file_name = params['download']
+    file_name = params[:download]
 
     file_split = file_name.split('.')
-    if file_split.length > 1 and (file_split[1] == 'htm' or file_split[1] == 'html')
-      send_file(folder_name+ "/" + file_name, :disposition => 'inline')
+    if file_split.length > 1 && (file_split[1] == 'htm' or file_split[1] == 'html')
+      send_file(folder_name+ "/" + file_name, disposition: 'inline')
     else
       if !File.directory?(folder_name + "/" + file_name)
         file_ext = File.extname(file_name)[1..-1]
         file_ext = 'bin' if file_ext.blank? # default to application/octet-stream
         send_file folder_name + "/" + file_name,
-                  :disposition => 'inline'
+                  disposition: 'inline'
       else
         raise "Directory downloads are not supported"
       end
@@ -167,9 +167,9 @@ class SubmittedContentController < ApplicationController
     end
 
     if params[:return_to] == "edit"
-      redirect_to :controller=>'response', :action => params[:return_to], :id => params[:id]
+      redirect_to controller: 'response', action: params[:return_to], id: params[:id]
     else
-      redirect_to :controller=>'response', :action => params[:return_to], :id => params[:map]
+      redirect_to controller: 'response', action: params[:return_to], id: params[:map]
     end
   end
 
@@ -185,9 +185,8 @@ class SubmittedContentController < ApplicationController
 
   def move_selected_file
     old_filename = params[:directories][params[:chk_files]] + "/" + params[:filenames][params[:chk_files]]
-    newloc = @participant.dir_path
-    newloc += "/"
-    newloc += params[:faction][:move]
+    newloc = @participant.dir_path + "/" + params[:faction][:move]
+
     begin
       FileHelper::move_file(old_filename, newloc)
       flash[:note] = "The file was moved successfully from \"/#{params[:filenames][params[:chk_files]]}\" to \"/#{params[:faction][:move]}\""
@@ -234,9 +233,8 @@ class SubmittedContentController < ApplicationController
   end
 
   def create_new_folder
-    newloc = @participant.dir_path
-    newloc += "/"
-    newloc += params[:faction][:create]
+    newloc = @participant.dir_path + "/" + params[:faction][:create]
+
     begin
       FileHelper::create_directory_from_path(newloc)
       flash[:note] = "The directory #{params[:faction][:create]} was created."

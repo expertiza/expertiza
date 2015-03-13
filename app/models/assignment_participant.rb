@@ -11,17 +11,17 @@ require 'yaml'
 class AssignmentParticipant < Participant
   require 'wiki_helper'
 
-  belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
-  has_many    :review_mappings, :class_name => 'ParticipantReviewResponseMap', :foreign_key => 'reviewee_id'
-  has_many    :quiz_mappings, :class_name => 'QuizResponseMap', :foreign_key => 'reviewee_id'
+  belongs_to  :assignment, class_name: 'Assignment', foreign_key: 'parent_id'
+  has_many    :review_mappings, class_name: 'ParticipantReviewResponseMap', foreign_key: 'reviewee_id'
+  has_many    :quiz_mappings, class_name: 'QuizResponseMap', foreign_key: 'reviewee_id'
   has_many :response_maps, foreign_key: 'reviewee_id'
   has_many :participant_review_response_maps, foreign_key: 'reviewee_id'
   has_many :quiz_response_maps, foreign_key: 'reviewee_id'
   has_many :quiz_responses, through: :quiz_response_maps, foreign_key: 'map_id'
   # has_many    :quiz_responses,  :class_name => 'Response', :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'QuizResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
-    has_many    :collusion_cycles
+  has_many    :collusion_cycles
   # has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'ParticipantReviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
-    belongs_to  :user
+  belongs_to  :user
   validates_presence_of :handle
 
   # Returns the average score of one question from all reviews for this user on this assignment as an floating point number
@@ -52,7 +52,7 @@ class AssignmentParticipant < Participant
 
   # Returns the average score of all reviews for this user on this assignment
   def average_score
-    return 0 if self.response_maps.size == 0
+    return 0 if self.response_maps.zero?
 
     sum_of_scores = 0
 
@@ -66,7 +66,7 @@ class AssignmentParticipant < Participant
   end
 
   def average_score_per_assignment(assignment_id)
-    return 0 if self.response_maps.size == 0
+    return 0 if self.response_maps.zero?
 
     sum_of_scores = 0
 
@@ -84,33 +84,32 @@ class AssignmentParticipant < Participant
   end
 
   def assign_reviewer(reviewer)
-    ParticipantReviewResponseMap.create(:reviewee_id => self.id, :reviewer_id => reviewer.id,
-                                        :reviewed_object_id => assignment.id)
+    ParticipantReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.id,
+                                        reviewed_object_id: assignment.id)
   end
 
   def assign_quiz(contributor,reviewer,topic)
-    participant_id=AssignmentParticipant.where(topic_id: topic, parent_id:  contributor.parent_id).first.id
+    participant_id=AssignmentParticipant.where(topic_id: topic, parent_id: contributor.parent_id).first.id
 
-    quiz = QuizQuestionnaire.find_by_instructor_id(contributor.id)
-    QuizResponseMap.create(:reviewed_object_id => quiz.id,:reviewee_id => contributor.id, :reviewer_id => reviewer.id,
-                           :type=>"QuizResponseMap", :notification_accepted => 0)
+    quiz = QuizQuestionnaire.where(instructor_id: contributor.id)
+    QuizResponseMap.create(reviewed_object_id: quiz.id,reviewee_id: contributor.id, reviewer_id: reviewer.id,
+                           type: "QuizResponseMap", notification_accepted: 0)
   end
 
   def AssignmentParticipant.find_by_user_id_and_assignment_id(user_id, assignment_id)
-    return AssignmentParticipant.where(:user_id=>user_id,:parent_id=>assignment_id).first
+    return AssignmentParticipant.where(user_id: user_id, parent_id: assignment_id).first
   end
 
   # Evaluates whether this participant contribution was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object
   def reviewed_by?(reviewer)
-    ParticipantReviewResponseMap.where(['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', self.id, reviewer.id, assignment.id]).count > 0
+    ParticipantReviewResponseMap.where(reviewee_id: self.id, reviewer_id: reviewer.id, reviewed_object_id: assignment.id).count > 0
   end
 
 
   def quiz_taken_by?(contributor, reviewer)
-    quiz_id = QuizQuestionnaire.find_by_instructor_id(contributor.id)
-    return QuizResponseMap.where(['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?',
-                                  self.id, reviewer.id, quiz_id]).count > 0
+    quiz_id = QuizQuestionnaire.where(instructor_id: contributor.id)
+    return QuizResponseMap.where(reviewee_id: self.id, reviewer_id: reviewer.id, reviewed_object_id: quiz_id).count > 0
   end
 
   def has_submissions?
@@ -121,17 +120,17 @@ class AssignmentParticipant < Participant
   end
 
   def has_quiz?
-    return !QuizQuestionnaire.find_by_instructor_id(self.id).nil?
+    return !QuizQuestionnaire.where(instructor_id: self.id).nil?
   end
 
   # all the participants in this assignment reviewed by this person
   def reviewees
     reviewees = []
     if self.assignment.team_assignment?
-      rmaps = ResponseMap.all(conditions: ["reviewer_id = #{self.id} && type = 'TeamReviewResponseMap'"])
-        rmaps.each { |rm| reviewees.concat(AssignmentTeam.find(rm.reviewee_id).participants) }
+      rmaps = ResponseMap.where(reviewer_id: self.id, type: 'TeamReviewResponseMap')
+        rmaps.each { |rm| reviewees.concat(AssignmentTeam.find(rm.reviewee_id).participants)}
     else
-      rmaps = ResponseMap.where(["reviewer_id = #{self.id} && type = 'ParticipantReviewResponseMap'"])
+      rmaps = ResponseMap.where(reviewer_id: self.id, type: 'ParticipantReviewResponseMap')
         rmaps.each {|rm| reviewees.push(AssignmentParticipant.find(rm.reviewee_id))}
     end
 
@@ -142,9 +141,9 @@ class AssignmentParticipant < Participant
   def get_reviewers
     reviewers = []
     if self.assignment.team_assignment? && self.team
-      rmaps = ResponseMap.where(["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponseMap'"])
+      rmaps = ResponseMap.where(reviewee_id: self.team.id, type: 'TeamReviewResponseMap')
     else
-      rmaps = ResponseMap.where(["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
+      rmaps = ResponseMap.where(reviewee_id: self.id, type: 'ParticipantReviewResponseMap')
     end
     rmaps.each do |rm|
       reviewers.push(AssignmentParticipant.find(rm.reviewer_id))
@@ -259,7 +258,7 @@ class AssignmentParticipant < Participant
     scores = {}
     scores[:participant] = self
     self.assignment.questionnaires.each do |questionnaire|
-      round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(self.assignment.id, questionnaire.id).used_in_round
+      round = AssignmentQuestionnaire.where(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id).used_in_round
       #create symbol for "varying rubrics" feature -Yang
       if(round!=nil)
         questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
@@ -320,7 +319,7 @@ class AssignmentParticipant < Participant
     # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
     # PS: I don't like the fact that we are doing this here but it is difficult to make it work anywhere else
     if assignment.is_microtask?
-      topic = SignUpTopic.find_by_assignment_id(assignment.id)
+      topic = SignUpTopic.where(assignment_id: assignment.id)
       if !topic.nil?
         scores[:total_score] *= (topic.micropayment.to_f / 100.to_f)
         scores[:max_pts_available] = topic.micropayment
@@ -410,7 +409,7 @@ class AssignmentParticipant < Participant
   #Copy this participant to a course
   def copy(course_id)
     part = CourseParticipant.where(user_id: self.user_id, parent_id: course_id).first
-    CourseParticipant.create(:user_id => self.user_id, :parent_id => course_id) if part.nil?
+    CourseParticipant.create(user_id: self.user_id, parent_id: course_id) if part.nil?
   end
 
   def get_course_string
@@ -528,15 +527,15 @@ class AssignmentParticipant < Participant
   # if user does not exist, it will be created and added to this assignment
   def self.import(row,session,id)
     raise ArgumentError, "No user id has been specified." if row.length < 1
-    user = User.find_by_name(row[0])
+    user = User.where(name: row[0])
     if user == nil
       raise ArgumentError, "The record containing #{row[0]} does not have enough items." if row.length < 4
       attributes = ImportFileHelper::define_attributes(row)
       user = ImportFileHelper::create_new_user(attributes,session)
     end
     raise ImportError, "The assignment with id \""+id.to_s+"\" was not found." if Assignment.find(id) == nil
-    if all({conditions: ['user_id=? && parent_id=?', user.id, id]}).size == 0
-      new_part = AssignmentParticipant.create(:user_id => user.id, :parent_id => id)
+    if AssignmentParticipant.where(user_id: user.id, parent_id: id).zero?
+      new_part = AssignmentParticipant.create(user_id: user.id, parent_id: id)
       new_part.set_handle()
     end
   end
@@ -615,7 +614,7 @@ class AssignmentParticipant < Participant
 
     def set_student_directory_num
       if self.directory_num.nil? || self.directory_num < 0
-        max_num = AssignmentParticipant.where(['parent_id = ?', self.parent_id]).order("directory_num DESC").first.directory_num
+        max_num = AssignmentParticipant.where(parent_id: self.parent_id).order("directory_num DESC").first.directory_num
         dir_num = max_num ? max_num + 1 : 0
         self.update_attribute('directory_num',dir_num)
         #ACS Get participants irrespective of the number of participants in the team

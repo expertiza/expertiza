@@ -123,7 +123,7 @@ class SubmittedContentController < ApplicationController
     file_name = params[:download]
 
     file_split = file_name.split('.')
-    if file_split.length > 1 and (file_split[1] == 'htm' or file_split[1] == 'html')
+    if file_split.length > 1 && (file_split[1] == 'htm' or file_split[1] == 'html')
       send_file(folder_name+ "/" + file_name, disposition: 'inline')
     else
       if !File.directory?(folder_name + "/" + file_name)

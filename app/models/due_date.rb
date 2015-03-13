@@ -43,6 +43,10 @@ class DueDate < ActiveRecord::Base
     default_permission[deadline_type][permission_type]
   end
 
+  def find_with_aid(aid)
+    DueDate.where(assignment_id: aid)
+  end
+
   def type
     self.deadline_type.name
   end

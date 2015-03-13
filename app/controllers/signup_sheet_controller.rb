@@ -50,7 +50,7 @@ class SignupSheetController < ApplicationController
     #topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
     #there are choosers already and if there is an attempt to decrease the max choosers, as of now I am not allowing
     #it.
-    if SignedUpUser.find_by_topic_id(topic.id).nil? || topic.max_choosers == params[:topic][:max_choosers]
+    if SignedUpUser.find_with_topic_id(topic.id).nil? || topic.max_choosers == params[:topic][:max_choosers]
       topic.max_choosers = params[:topic][:max_choosers]
     else
       if topic.max_choosers.to_i < params[:topic][:max_choosers].to_i
@@ -78,7 +78,7 @@ class SignupSheetController < ApplicationController
   #that every assignment will have only one signup sheet
   def create
     puts "2222222 call create"
-    topic = SignUpTopic.where(topic_name: params[:topic][:topic_name], assignment_id:  params[:id]).first
+    topic = SignUpTopic.find_with_name_and_assignment_id(params[:topic][:topic_name], params[:id]).first
     #if the topic already exists then update
     if topic
       update_topic_info(topic)
@@ -119,7 +119,7 @@ class SignupSheetController < ApplicationController
 
   def destroy_dependencies
     if Assignment.find(params[:assignment_id])['staggered_deadline']
-      dependencies = TopicDependency.where(topic_id: params[:id])
+      dependencies = TopicDependency.find_with_topic_id(params[:id])
       unless dependencies.nil?
         dependencies.each { |dependency| dependency.destroy }
       end
@@ -165,9 +165,9 @@ class SignupSheetController < ApplicationController
 
       def set_duedate_info
         @review_rounds = Assignment.find(params[:id]).get_review_rounds
-        @topics = SignUpTopic.where(assignment_id: params[:id])
+        @topics = SignUpTopic.find_with_assignment_id( params[:id])
         #Use this until you figure out how to initialize this array
-        @duedates = SignUpTopic.find_by_sql("SELECT s.id as topic_id FROM sign_up_topics s WHERE s.assignment_id = " + params[:id].to_s)
+        @duedates = SignUpTopic.find_topic_id_with_assignment_id(params[:id].to_s)
         unless @topics.nil?
           i=0
           @topics.each { |topic|
@@ -175,14 +175,14 @@ class SignupSheetController < ApplicationController
             @duedates[i]['topic_identifier'] = topic.topic_identifier
             @duedates[i]['topic_name'] = topic.topic_name
             for j in 1..@review_rounds
-              duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('submission').id).first
-              duedate_rev = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('review').id).first
+              duedate_subm = TopicDeadline.find_with_tid_and_dtype(topic.id, DeadlineType.find_with_name('submission').id).first
+              duedate_rev = TopicDeadline.find_with_tid_and_dtype(topic.id, DeadlineType.find_with_name('review').id).first
               if !duedate_subm.nil? && !duedate_rev.nil?
                 @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
                 @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
               else
                 #the topic is new. so copy deadlines from assignment
-                set_of_due_dates = DueDate.where(assignment_id: params[:id])
+                set_of_due_dates = DueDate.find_with_aid(params[:id])
                 set_of_due_dates.each { |due_date|
                   create_topic_deadline(due_date, 0, topic.id)
                 }
@@ -190,7 +190,7 @@ class SignupSheetController < ApplicationController
                 @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
               end
             end
-            duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('metareview').id).first
+            duedate_subm = TopicDeadline.find_with_tid_and_dtype(topic.id,  DeadlineType.find_with_name('metareview').id).first
             @duedates[i]['submission_'+ (@review_rounds+1).to_s] = !(duedate_subm.nil?)?(DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")):nil
             i = i + 1
           }
@@ -218,7 +218,7 @@ class SignupSheetController < ApplicationController
         puts "aaaaaaaaaaaaaaaa"
         puts "2222222 call load_add_signup_topics"
         @id = assignment_id
-        @sign_up_topics = SignUpTopic.where( ['assignment_id = ?', assignment_id])
+        @sign_up_topics = SignUpTopic.find_with_assignment_id(assignment_id)
         filled_and_waitlisted_topics(@id)
         @assignment = Assignment.find(assignment_id)
         #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
@@ -253,7 +253,7 @@ class SignupSheetController < ApplicationController
       def index
         puts "2222222 call list"
         @assignment_id = params[:id]
-        @sign_up_topics = SignUpTopic.where( ['assignment_id = ?', params[:id]]).all
+        @sign_up_topics =SignUpTopic.find_with_assignment_id( params[:id]).all
         filled_and_waitlisted_topics(@assignment_id)
         @show_actions = true
         @priority = 0
@@ -334,7 +334,7 @@ class SignupSheetController < ApplicationController
                 sign_up.is_waitlisted = false
 
                 #Update topic_id in participant table with the topic_id
-                participant = Participant.where(user_id: session[:user].id, parent_id:  assignment_id).first
+                participant = Participant.find_participant_byassign( session[:user].id,assignment_id).first
 
                 participant.update_topic_id(topic_id)
               else
@@ -366,7 +366,7 @@ class SignupSheetController < ApplicationController
                 Waitlist.cancel_all_waitlists(creator_id, assignment_id)
                 sign_up.is_waitlisted = false
                 sign_up.save
-                participant = Participant.where(user_id: session[:user].id, parent_id:  assignment_id).first
+                participant = Participant.find_participant_byassign(session[:user].id,assignment_id).first
                 participant.update_topic_id(topic_id)
                 result = true
               end
@@ -390,9 +390,9 @@ class SignupSheetController < ApplicationController
           puts "2222222 call set_priority"
           @user_id = session[:user].id
           users_team = SignedUpUser.find_team_users(params[:assignment_id].to_s, @user_id)
-          check = SignedUpUser.find_by_sql(["SELECT su.* FROM signed_up_users su , sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.creator_id = ? AND su.preference_priority_number = ?",params[:assignment_id].to_s,users_team[0].t_id,params[:priority].to_s])
-          if check.size == 0
-            signUp = SignedUpUser.where(topic_id: params[:id], creator_id:  users_team[0].t_id).first
+          check = SignedUpUser.find_checks(params[:assignment_id].to_s,users_team[0].t_id,params[:priority].to_s)
+          if check.empty?
+            signUp = SignedUpUser.find_signup_priority(params[:id],users_team[0].t_id).first
             #signUp.preference_priority_number = params[:priority].to_s
             if params[:priority].to_s.to_f > 0
               signUp.update_attribute('preference_priority_number' , params[:priority].to_s)
@@ -408,7 +408,7 @@ class SignupSheetController < ApplicationController
         def save_topic_dependencies
           puts "2222222 call save_topic_dependencies"
           params[:assignment_id] = params[:assignment_id].to_i.to_s
-          topics = SignUpTopic.where(assignment_id: params[:assignment_id])
+          topics = SignUpTopic.find_with_assignment_id( params[:assignment_id])
           topics = topics.collect { |topic|
             #if there is no dependency for a topic then there wont be a post for that tag.
             #if this happens store the dependency as "0"
@@ -444,18 +444,18 @@ class SignupSheetController < ApplicationController
           review_rounds = Assignment.find(params[:assignment_id]).get_review_rounds
           due_dates.each { |due_date|
             for i in 1..review_rounds
-              topic_deadline_type_subm = DeadlineType.find_by_name('submission').id
-              topic_deadline_type_rev = DeadlineType.find_by_name('review').id
+              topic_deadline_type_subm = DeadlineType.find_with_name('submission').id
+              topic_deadline_type_rev = DeadlineType.find_with_name('review').id
 
-              topic_deadline_subm = TopicDeadline.where(topic_id: due_date['t_id'].to_i, deadline_type_id: topic_deadline_type_subm, round: i).first
+              topic_deadline_subm = TopicDeadline.find_with_tid_and_dtype_and_round( due_date['t_id'].to_i, topic_deadline_type_subm, i).first
               topic_deadline_subm.update_attributes({'due_at' => due_date['submission_' + i.to_s]})
               flash[:error] = "Please enter a valid " + (i > 1 ? "Resubmission deadline " + (i-1).to_s : "Submission deadline") if topic_deadline_subm.errors.length > 0
 
-              topic_deadline_rev = TopicDeadline.where(topic_id: due_date['t_id'].to_i, deadline_type_id: topic_deadline_type_rev, round:i).first
+              topic_deadline_rev = TopicDeadline.find_with_tid_and_dtype_and_round( due_date['t_id'].to_i, topic_deadline_type_rev, i).first
               topic_deadline_rev.update_attributes({'due_at' => due_date['review_' + i.to_s]})
               flash[:error] = "Please enter a valid Review deadline " + (i > 1 ? (i-1).to_s : "") if topic_deadline_rev.errors.length > 0
             end
-            topic_deadline_subm = TopicDeadline.where(topic_id: due_date['t_id'], deadline_type_id:  DeadlineType.find_by_name('metareview').id).first
+            topic_deadline_subm = TopicDeadline.find_with_tid_and_dtype( due_date['t_id'],  DeadlineType.find_with_name('metareview').id).first
             topic_deadline_subm.update_attributes({'due_at' => due_date['submission_' + (review_rounds+1).to_s]})
             flash[:error] = "Please enter a valid Meta review deadline" if topic_deadline_subm.errors.length > 0
           }

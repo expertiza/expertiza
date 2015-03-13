@@ -1,6 +1,10 @@
 class TopicDependency < ActiveRecord::Base
   serialize :dependent_on
 
+  def find_with_topic_id(tid)
+    TopicDependency.where(topic_id: tid)
+  end
+
   def self.save_dependency(topics)
     topics.each {|topic|
       #topic[0] => topic_id and topic[1] => dependent_on

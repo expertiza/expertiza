@@ -168,4 +168,8 @@ class Participant < ActiveRecord::Base
 
       scores
     end
+
+    def find_participant_byassign(user_id,assign_id)
+      Participant.where(user_id:user_id, parent_id:assign_id)
+    end
   end

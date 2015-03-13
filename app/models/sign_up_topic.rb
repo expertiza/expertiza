@@ -138,6 +138,18 @@ class SignUpTopic < ActiveRecord::Base
     }
   end
 
+  def find_topic_id_with_assignment_id(aid)
+    SignUpTopic.find_by_sql("SELECT s.id as topic_id FROM sign_up_topics s WHERE s.assignment_id = " + aid)
+  end
+
+  def find_with_assignment_id(aid)
+    SignUpTopic.where(assignment_id: aid)
+  end
+
+  def find_with_name_and_assignment_id(name, aid)
+    SignUpTopic.where(topic_name: name, assignment_id: aid)
+  end
+
   def self.remove_team(users_team, assignment_id)
     if users_team.size == 0
       @selected_topics = nil

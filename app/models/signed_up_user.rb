@@ -6,18 +6,9 @@ class SignedUpUser < ActiveRecord::Base
 
   scope :by_creator_id, ->(creator_id) { where("creator_id = ?", creator_id) }
 
-  #This method is not used anywhere
-  #def cancel_waitlists_of_users(creator_id, assignment_id)
-  #  waitlisted_topics = SignedUpUser.find_by_sql("SELECT u.id FROM sign_up_topics t, signed_up_users u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = " + assignment_id.to_s + " and u.creator_id = " + creator_id.to_s)
-  #   SignedUpUser
-  #  if !waitlisted_topics.nil?
-  #    for waitlisted_topic in waitlisted_topics
-  #      entry = SignedUpUser.find(waitlisted_topic.id)
-  #      entry.destroy
-  #    end
-  #  end
-
-  #end
+  def find_with_topic_id(tid)
+    SignedUpUser.where(topic_id: tid)
+  end
 
   def self.find_team_participants(assignment_id)
     #@participants = SignedUpUser.find_by_sql("SELECT s.id as id, t.id as topic_id, t.topic_name as name , s.is_waitlisted as is_waitlisted, s.creator_id, s.creator_id as team_id FROM signed_up_users s, sign_up_topics t where s.topic_id = t.id and t.assignment_id = " + assignment_id)
@@ -79,6 +70,12 @@ class SignedUpUser < ActiveRecord::Base
         old_teams_signup.destroy
         end
       end
+  end
+    def find_signup_priority(topic_id,creator_id)
+      SignedUpUser.where(topic_id: topic_id, creator_id:  creator_id)
     end
 
+    def find_checks(aid,tid,pid)
+      SignedUpUser.find_by_sql(["SELECT su.* FROM signed_up_users su , sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.creator_id = ? AND su.preference_priority_number = ?",aid,tid,pid])
+    end
   end

@@ -14,7 +14,7 @@ class Waitlist < ActiveRecord::Base
 
   def waitlist_teams (param_id, user_id, creator_id, topic_id, assignment_id)
     #check whether user has signed up already
-    user_signup = other_confirmed_topic_for_user(assignment_id, creator_id)
+    user_signup = SignupSheetController.other_confirmed_topic_for_user(assignment_id, creator_id)
 
     sign_up = SignedUpUser.new
     sign_up.topic_id = param_id

@@ -14,7 +14,6 @@ class SignupSheetController < ApplicationController
   require 'rgl/topsort'
 
   def action_allowed?
-    puts "2222222 call action_allowed?"
     case params[:action]
     when 'signup_topics', 'sign_up', 'delete_signup', 'index', 'show_team'
       current_role_name.eql? 'Student'
@@ -37,7 +36,6 @@ class SignupSheetController < ApplicationController
 
   # Prepares the form for adding a new topic. Used in conjuntion with create
   def new
-    puts "2222222 call new"
     @id = params[:id]
     @sign_up_topic = SignUpTopic.new
     @sign_up_topic.assignment = Assignment.find(params[:id])
@@ -77,7 +75,6 @@ class SignupSheetController < ApplicationController
   #that assignment id will virtually be the signup sheet id as well as we have assumed
   #that every assignment will have only one signup sheet
   def create
-    puts "2222222 call create"
     topic = SignUpTopic.find_with_name_and_assignment_id(params[:topic][:topic_name], params[:id]).first
     #if the topic already exists then update
     if topic
@@ -103,7 +100,6 @@ class SignupSheetController < ApplicationController
   #This method is used to delete signup topics
   #Renaming delete method to destroy for rails 4 compatible
   def destroy
-    puts "2222222 call destroy"
     @topic = SignUpTopic.find(params[:id])
     if @topic
       @topic.destroy
@@ -128,14 +124,12 @@ class SignupSheetController < ApplicationController
 
   #prepares the page. shows the form which can be used to enter new values for the different properties of an assignment
   def edit
-    puts "2222222 call edit"
     @topic = SignUpTopic.find(params[:id])
   end
 
 
     #updates the database tables to reflect the new values for the assignment. Used in conjuntion with edit
   def update
-    puts "2222222 call update"
     @topic = SignUpTopic.find(params[:id])
 
     if @topic
@@ -158,7 +152,6 @@ class SignupSheetController < ApplicationController
       #Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics
       #can have different deadlines.
       def topic_and_duedate
-        puts "2222222 call add_signup_topic"
         list_signup_topics
         set_duedate_info
       end
@@ -201,22 +194,19 @@ class SignupSheetController < ApplicationController
       end
       #similar to the above function except that all the topics and review/submission rounds have the similar deadlines
       def list_signup_topics
-        puts "2222222 call add_signup_topics"
         load_signup_topics(params[:id])
       end
 
       #Seems like this function is similar to the above function> we are not quite sure what publishing rights mean. Seems like
       #the values for the last column in http://expertiza.ncsu.edu/student_task/list are sourced from here
       def view_publishing_rights
-        puts "2222222 call view_publishing_rights"
         load_signup_topics(params[:id])
       end
 
       #retrieves all the data associated with the given assignment. Includes all topics,
       #participants(people who are doing this assignment) and signed up users (people who have chosen a topic (confirmed or waitlisted)
       def load_signup_topics(assignment_id)
-        puts "aaaaaaaaaaaaaaaa"
-        puts "2222222 call load_add_signup_topics"
+
         @id = assignment_id
         @sign_up_topics = SignUpTopic.find_with_assignment_id(assignment_id)
         filled_and_waitlisted_topics(@id)
@@ -232,7 +222,7 @@ class SignupSheetController < ApplicationController
       end
 
       def set_values_for_new_topic
-        puts "2222222 call set_values_for_new_topic"
+
         @sign_up_topic = SignUpTopic.new
         @sign_up_topic.topic_identifier = params[:topic][:topic_identifier]
         @sign_up_topic.topic_name = params[:topic][:topic_name]
@@ -245,13 +235,11 @@ class SignupSheetController < ApplicationController
       #simple function that redirects ti the /add_signup_topics or the /add_signup_topics_staggered page depending on assignment type
       #staggered means that different topics can have different deadlines.
       def redirect_to_sign_up(assignment_id)
-        puts "2222222 call redirect_to_sign_up"
         assignment = Assignment.find(assignment_id)
         (assignment.staggered_deadline)?(redirect_to action: 'topic_and_duedate', id: assignment_id):(redirect_to action: 'signup_topics', id: assignment_id)
       end
 
       def index
-        puts "2222222 call list"
         @assignment_id = params[:id]
         @sign_up_topics =SignUpTopic.find_with_assignment_id( params[:id]).all
         filled_and_waitlisted_topics(@assignment_id)
@@ -286,7 +274,6 @@ class SignupSheetController < ApplicationController
         end
 
         def sign_up
-          puts "2222222 call sign_up"
           #find the assignment to which user is signing up
           @assignment = Assignment.find(params[:assignment_id])
           @user_id = session[:user].id
@@ -299,7 +286,6 @@ class SignupSheetController < ApplicationController
         end
 
         def signup_team(assignment_id, user_id, topic_id)
-          puts "2222222 call signup_team"
           users_team = SignedUpUser.find_team_users(assignment_id, user_id)
           if users_team.size == 0
             #if team is not yet created, create new team.
@@ -313,7 +299,6 @@ class SignupSheetController < ApplicationController
         end
 
         def confirm_topic(creator_id, topic_id, assignment_id)
-          puts "2222222 call confirmTopic"
           #check whether user has signed up already
           user_signup = SignupSheetController.other_confirmed_topic_for_user(assignment_id, creator_id)
 
@@ -376,18 +361,15 @@ class SignupSheetController < ApplicationController
         end
         # When using this method when creating fields, update race conditions by using db transactions
         def slotAvailable?(topic_id)
-          puts "2222222 call slotAvailable?"
           SignUpTopic.slotAvailable?(topic_id)
         end
 
         def self.other_confirmed_topic_for_user(assignment_id, creator_id)
-          puts "2222222 call other_confirmed_topic_for_user"
           user_signup = SignedUpUser.find_user_signup_topics(assignment_id, creator_id)
           user_signup
         end
 
         def set_priority
-          puts "2222222 call set_priority"
           @user_id = session[:user].id
           users_team = SignedUpUser.find_team_users(params[:assignment_id].to_s, @user_id)
           check = SignedUpUser.find_checks(params[:assignment_id].to_s,users_team[0].t_id,params[:priority].to_s)
@@ -406,7 +388,6 @@ class SignupSheetController < ApplicationController
         #this function is used to prevent injection attacks.  A topic *dependent* on another topic cannot be
         # attempted until the other topic has been completed..
         def save_topic_dependencies
-          puts "2222222 call save_topic_dependencies"
           params[:assignment_id] = params[:assignment_id].to_i.to_s
           topics = SignUpTopic.find_with_assignment_id( params[:assignment_id])
           topics = topics.collect { |topic|
@@ -439,7 +420,6 @@ class SignupSheetController < ApplicationController
         #This is true in case of a staggered deadline type assignment. Individual deadlines can
         # be set on a per topic  and per round basis
         def save_topic_deadlines
-          puts "2222222 call save_topic_deadlines"
           due_dates = params[:due_date]
           review_rounds = Assignment.find(params[:assignment_id]).get_review_rounds
           due_dates.each { |due_date|
@@ -465,12 +445,10 @@ class SignupSheetController < ApplicationController
         #used by save_topic_dependencies. The dependency graph is a partial ordering of topics ... some topics need to be done
         # before others can be attempted.
         def build_dependency_graph(topics,node)
-          puts "2222222 call build_denpendency_graph"
           SignUpSheet.create_dependency_graph(topics,node)
         end
         #used by save_topic_dependencies. Do not know how this works
         def create_common_start_time_topics(dg)
-          puts "2222222 call create_common_start_time_topics"
           dg_reverse = dg.clone.reverse()
           set_of_topics = Array.new
 
@@ -493,18 +471,15 @@ class SignupSheetController < ApplicationController
         end
 
         def create_topic_deadline(due_date, offset, topic_id)
-          puts "2222222 call create_topic_deadline"
           DueDate.assign_topic_deadline(due_date,offset,topic_id)
         end
 
         def set_start_due_date(assignment_id, set_of_topics)
-          puts "2222222 call set_start_due_date"
           DueDate.assign_start_due_date(assignment_id, set_of_topics)
         end
 
         #gets team_details to show it on team_details view for a given assignment
         def show_team
-          puts "2222222 call show_team"
           if !(assignment = Assignment.find(params[:assignment_id])).nil? and !(topic = SignUpTopic.find(params[:id])).nil?
             @results =ad_info(assignment.id, topic.id)
             @results.each do |result|
@@ -527,14 +502,12 @@ class SignupSheetController < ApplicationController
         # get info related to the ad for partners so that it can be displayed when an assignment_participant
         # clicks to see ads related to a topic
         def ad_info(assignment_id, topic_id)
-          puts "2222222 call ad_info"
           query = "select t.id as team_id,t.comments_for_advertisement,t.name,su.assignment_id, t.advertise_for_partner from teams t, signed_up_users s,sign_up_topics su "+
                   "where s.topic_id='"+topic_id.to_s+"' and s.creator_id=t.id and s.topic_id = su.id;    "
           SignUpTopic.find_by_sql(query)
         end
 
         def add_default_microtask
-          puts "2222222 call add_defualt_microtask"
           assignment_id = params[:id]
           @sign_up_topic = SignUpTopic.new
           @sign_up_topic.topic_identifier = 'MT1'

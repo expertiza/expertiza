@@ -102,6 +102,8 @@ class UsersController < ApplicationController
       else
         @user = User.find(params[:id])
         get_role
+        @assignment_participant_num = 0
+        AssignmentParticipant.where(user_id: @user.id).each {|participant| @assignment_participant_num += 1 }
       end
     end
 

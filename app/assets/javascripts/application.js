@@ -23,6 +23,49 @@
 //= require_tree .
 //= require jquery.datetimepicker
 
+//show more than one data confirmation when attempting to delete users.
+//overwrite rails default behavior
+$.rails.allowAction = function(link) {
+  if (!link.attr('data-confirm')) {
+   return true;
+  }
+  $.rails.showConfirmDialog(link);
+  return false;
+};
+
+$.rails.confirmed = function(link) {
+  link.removeAttr('data-confirm');
+  return link.trigger('click.rails');
+};
+
+$.rails.showConfirmDialog = function(link) {
+  var html, message;
+  message = link.attr('data-confirm');
+  html = "<div class=\"modal\" id=\"dialog-confirm\" title=\"Delete This User?\">\n  <div class=\"modal-body\">\n    <p>" + message + "</p>\n";
+  $(html).modal();
+  //confirmation box style
+  $(function() {
+    $("#dialog-confirm").dialog({
+      resizable: false,
+      height:240,
+      width: 340,
+      modal: true,
+      buttons: {
+        "Cancel": function() {
+          $( this ).dialog( "close" );
+        },
+        "OK": function() {
+          return $.rails.confirmed(link);
+        }
+      }
+    });
+  });
+  return $('#dialog-confirm .confirm').on('click', function() {
+    return $.rails.confirmed(link);
+  });
+};
+
+
 $(document).on('ready page:load', function() {
   jQuery(this).trigger('turbo:ready');
 });

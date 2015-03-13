@@ -21,7 +21,7 @@
   <hr/>
   <p><%= link_to 'Edit', :action => 'edit', :id => @user %> |
     <%= link_to 'Delete', {:action => 'destroy', :id => @user},
-    data:{:confirm => "User is participating in #{@assignment_participant_num} assignments.  Delete as a participant in these assignment(s)?"}, :method => :delete %>
+    data:{:confirm => "User is participating in #{@assignment_participant_num} assignments.<br/>Delete as a participant in these assignment(s)?"}, :method => :delete%>
 </p>
 
 <p><%= link_to 'Back', :action => 'list' %> to Users list</p>

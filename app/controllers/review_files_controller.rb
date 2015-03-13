@@ -15,12 +15,10 @@ class ReviewFilesController < ApplicationController
 
     # Calculate the directory for unzipping files
     participant.set_student_directory_num
-    version_dir = ReviewFilesHelper::get_version_directory(participant,
-                                                           new_version_number)
+    version_dir = ReviewFilesHelper::get_version_directory(participant, new_version_number)
     FileUtils.mkdir_p(version_dir) unless File.exists? version_dir
 
-    filename_only = ReviewFilesHelper::get_safe_filename(
-      file.original_filename.to_s)
+    filename_only = ReviewFilesHelper::get_safe_filename( file.original_filename.to_s)
     full_filename = version_dir + filename_only
 
     # Copy file into version_dir
@@ -41,17 +39,12 @@ class ReviewFilesController < ApplicationController
 
     respond_to do |format|
       if @success
-        format.html { redirect_to :action => 'show_all_submitted_files',
-                      :participant_id => participant.id and return}
-        format.xml  { render :xml => @review_file, :status => :created,
-                      :location => @review_file and return}
+        format.html { redirect_to action: 'show_all_submitted_files', participant_id: participant.id and return}
+        format.xml  { render xml: @review_file, status: :created, location: @review_file and return}
       else
-        flash[:error] = "Code Review File was <b>not</b> successfully" +
-          "uploaded. Please Re-Submit."
-        format.html { redirect_to :action => 'show_all_submitted_files',
-                      :participant_id => participant.id and return}
-        format.xml  { render :xml => @review_file.errors,
-                      :status => :unprocessable_entity and return}
+        flash[:error] = "Code Review File was <b>not</b> successfully" + "uploaded. Please Re-Submit."
+        format.html { redirect_to action: 'show_all_submitted_files', participant_id: participant.id and return}
+        format.xml  { render xml: @review_file.errors, status: :unprocessable_entity and return}
       end
     end
   end
@@ -64,40 +57,15 @@ class ReviewFilesController < ApplicationController
   def show_all_submitted_files
     @participant = AssignmentParticipant.find(params[:participant_id])
     @stage = params[:stage]
-
-    # Find all files over all versions submitted by the team
-    all_review_files = []
-
-    if @participant.assignment.team_assignment
-      @participant.team.get_participants.each_with_index { |member,index|
-        all_review_files += ReviewFile.where(author_participant_id: member.id)
-
-      }
-    else
-      all_review_files = ReviewFile.where(author_participant_id: @participant.id)
-    end
-
-    auth=Hash.new
-    # For each file in the above list find out the various versions in which it occurs
-    @file_version_map = Hash.new
-    all_review_files.each_with_index do |each_file,index|
-      @file_version_map[File.basename(each_file.filepath)] = Array.new unless
-      @file_version_map[File.basename(each_file.filepath)]
-      @file_version_map[File.basename(each_file.filepath)] << each_file.version_number
-
-
-      auth[File.basename(each_file.filepath)] = Hash.new unless
-      auth[File.basename(each_file.filepath)]
-      auth[File.basename(each_file.filepath)][each_file.version_number] = each_file.author_participant_id
-    end
+    
+    all_review_files = ReviewFilesHelper::find_review_files(@participant)
+    @file_version_map = ReviewFilesHelper::find_review_versions(all_review_files)
 
     # For each file in the above map create a new map, to store the
     #   filename -> review_file_id mapping.
     @file_id_map = Hash.new
     @latest_version_number = 0
     @file_version_map.each do |base_filename, versions|
-      # code_review_dir = ReviewFilesHelper::get_code_review_file_dir(AssignmentParticipant.find(auth[base_filename][versions.sort.last]))
-      # file_path = ReviewFile.get_file(code_review_dir, versions.sort.last,base_filename)
       all_review_files.each do |file|
         @file_id_map[base_filename] = file.id
       end
@@ -152,7 +120,6 @@ class ReviewFilesController < ApplicationController
     # Get the filepath of both the files.
     older_file = ReviewFile.find(params[:current_version_id])
     newer_file = ReviewFile.find(params[:diff_with_file_id])
-
     @current_review_file = older_file
 
     @version_fileId_map = Hash.new
@@ -173,59 +140,13 @@ class ReviewFilesController < ApplicationController
     processor = DiffHelper::Processor.new(files[:@older_file].filepath, files[:@newer_file].filepath)
     processor.process!
 
-    older_version_comments = ReviewComment.where(review_file_id: files[:@older_file].id)
-    newer_version_comments = ReviewComment.where(review_file_id: files[:@newer_file].id)
-
-    @first_line_num = []
-    @second_line_num = []
-    @first_offset = []
-    @second_offset = []
-    @offsetswithcomments_file1 = []
-    @offsetswithcomments_file2 = []
-
-    @first_offset << 0
-    @second_offset << 0
-
-    first_count = 0
-    second_count = 0
-    for i in (0..processor.absolute_line_num)
-
-      @first_offset = ReviewFile.get_first_offset(processor, i, @first_offset)
-      @second_offset = ReviewFile.get_second_offset(processor, i, @second_offset)
-
-      first_line_num = Hash.new
-      first_line_num = ReviewFile.get_first_line_num(processor, i, first_count)
-
-      @first_line_num << first_line_num[:@first_line_num]
-      first_count = first_line_num[:first_count]
-
-      second_line_num = Hash.new
-      second_line_num = ReviewFile.get_second_line_num(processor, i,second_count)
-      @second_line_num << second_line_num[:@second_line_num]
-      second_count = second_line_num[:second_count]
-
-      # Remove newlines at the end of this line of code
-      processor = ReviewFile.get_first_file_array(processor, i)
-      processor = ReviewFile.get_second_file_array(processor, i)
-    end
-
-    @shareObj = Hash.new()
-    @shareObj['linearray1'] = processor.first_file_array
-    @shareObj['linearray2'] = processor.second_file_array
-    @shareObj['comparator'] = processor.comparison_array
-    @shareObj['linenumarray1'] = @first_line_num
-    @shareObj['linenumarray2'] = @second_line_num
-    @shareObj['offsetarray1'] = @first_offset
-    @shareObj['offsetarray2'] = @second_offset
+    first_line_num, second_line_num, first_offset, second_offset, @shareObj = ReviewFilesHelper::populate_shareObj(processor)
     @file_on_left = files[:@older_file]
     @file_on_right = files[:@newer_file]
 
-
     # REFACTOR: Code Duplication removed
-    @highlight_cell_left_file=ReviewFile.getHighlightCellLeft(older_version_comments,@first_offset,@first_line_num)
-
-    @highlight_cell_right_file=ReviewFile.getHighlightCellRight(newer_version_comments,@second_offset,@second_line_num)
-
+    @highlight_cell_left_file=ReviewFile.getHighlightCellLeft(ReviewComment.where(review_file_id: files[:@older_file].id),first_offset,first_line_num)
+    @highlight_cell_right_file=ReviewFile.getHighlightCellRight(ReviewComment.where(review_file_id: files[:@newer_file].id),second_offset,second_line_num)
   end
 
   def submit_comment
@@ -262,16 +183,15 @@ class ReviewFilesController < ApplicationController
 
     comments_in_table += "</table>"
     respond_to do |format|
-      format.js { render :json => comments_in_table }
+      format.js { render json: comments_in_table }
     end
   end
 
   private
 
   def render_error_page(exception = nil)
-    redirect_to :controller => 'content_pages', :action => 'show',
-      :id => SystemSettings.first.not_found_page_id
+    redirect_to controller: 'content_pages', action: 'show',
+      id: SystemSettings.first.not_found_page_id
   end
-
 
 end

@@ -9,11 +9,11 @@ module ReviewCommentsHelper
     if initial_line_number == final_line_number
       comment_window_html += "<tr><td><hr><b>Comment for line #{initial_line_number + 1}:</b><br/><font color='blue'>" +
         comment_array            #New code---------
-
     else
       comment_window_html += "<tr><td><hr><b>Comment for lines #{initial_line_number + 1} - #{final_line_number + 1}:</b><br/><font color='blue'>" +
         comment_array            #New code---------
-      end
+    end
+
     if authorflag == 0
       comment_window_html +=  "</font></td></tr>"
     else
@@ -27,7 +27,7 @@ module ReviewCommentsHelper
     end
     # comment_window_html += "</table>"
     return comment_window_html
-    end
+  end
 
   def self.construct_bookmarks_table(bookmark_array)
     comment_window_html = "<table width='100%' cellpadding='3' style='table-layout: fixed; word-wrap: break-word;'>"
@@ -74,7 +74,8 @@ module ReviewCommentsHelper
 
   end
 
+  
 
 
-  end
+end
 

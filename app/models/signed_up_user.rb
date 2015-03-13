@@ -6,7 +6,7 @@ class SignedUpUser < ActiveRecord::Base
 
   scope :by_creator_id, ->(creator_id) { where("creator_id = ?", creator_id) }
 
-  def find_with_topic_id(tid)
+  def self.find_with_topic_id(tid)
     SignedUpUser.where(topic_id: tid)
   end
 
@@ -71,11 +71,11 @@ class SignedUpUser < ActiveRecord::Base
         end
       end
   end
-    def find_signup_priority(topic_id,creator_id)
+    def self.find_signup_priority(topic_id,creator_id)
       SignedUpUser.where(topic_id: topic_id, creator_id:  creator_id)
     end
 
-    def find_checks(aid,tid,pid)
+    def self.find_checks(aid,tid,pid)
       SignedUpUser.find_by_sql(["SELECT su.* FROM signed_up_users su , sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.creator_id = ? AND su.preference_priority_number = ?",aid,tid,pid])
     end
   end

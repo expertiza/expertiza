@@ -2,11 +2,11 @@ class TopicDeadline < ActiveRecord::Base
   belongs_to :topic, :class_name => 'SignUpTopic'
 
   validate :due_at_is_valid_datetime
-  def find_with_tid_and_dtype(tid,dtype)
+  def self.find_with_tid_and_dtype(tid,dtype)
     TopicDeadline.where(topic_id:tid, deadline_type_id:  dtype)
   end
 
-  def find_with_tid_and_dtype_and_round(tid,dtype,round)
+  def self.find_with_tid_and_dtype_and_round(tid,dtype,round)
     TopicDeadline.where(topic_id:tid, deadline_type_id:  dtype, round: round)
   end
 

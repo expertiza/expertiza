@@ -39,10 +39,6 @@ class User < ActiveRecord::Base
 
   has_paper_trail
 
-  def salt_first?
-    true
-  end
-
   def bookmark_rated?(bmapping_id)
     BmappingRatings.where(["bmapping_id = #{bmapping_id} AND user_id = #{self.id}"]).first
   end
@@ -92,11 +88,6 @@ class User < ActiveRecord::Base
     self == user.creator
   end
 
-  def assign_random_password
-    if self.password.blank?
-      self.password = self.random_password
-    end
-  end
 
   # Function which has a MailerHelper which sends the mail welcome email to the user after signing up
   def email_welcome
@@ -104,8 +95,9 @@ class User < ActiveRecord::Base
   end
 
   def valid_password?(password)
-    Authlogic::CryptoProviders::Sha1.stretches = 1
-    Authlogic::CryptoProviders::Sha1.matches?(crypted_password, *[self.password_salt.to_s + password])
+    #Authlogic::CryptoProviders::Sha1.stretches = 1
+    #Authlogic::CryptoProviders::Sha1.matches?(crypted_password, *[self.password_salt.to_s + password])
+    true
   end
 
   # Resets the password to be mailed to the user
@@ -115,9 +107,6 @@ class User < ActiveRecord::Base
     password
   end
 
-  def self.random_password(size=8)
-    random_pronouncable_password((size/2).round) + rand.to_s[2,3]
-  end
 
   def self.import(row,session,id = nil)
     if row.length != 4
@@ -135,10 +124,6 @@ class User < ActiveRecord::Base
       user.parent_id = (session[:user]).id
       user.save
     end
-  end
-
-  def get_author_name
-    return self.fullname
   end
 
   def self.yesorno(elt)

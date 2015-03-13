@@ -28,14 +28,7 @@ class UsersController < ApplicationController
     end
   end
 
-  def self.participants_in(assignment_id)
-    users = Array.new
-    participants = AssignmentParticipant.find_by_parent_id(assignment_id)
-    participants.each{
-      |participant|
-      users << User.find(participant.user_id)
-    }
-  end
+
 
   def auto_complete_for_user_name
     user = session[:user]

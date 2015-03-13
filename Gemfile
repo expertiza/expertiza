@@ -1,5 +1,8 @@
 source 'http://rubygems.org'
 
+gem 'eventmachine', :git => 'git://github.com/eventmachine/eventmachine.git', :branch => 'master'
+gem 'thin'
+
 gem 'rails'
 
 ## Gems in Alphabetical Order

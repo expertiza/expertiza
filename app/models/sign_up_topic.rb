@@ -1,18 +1,18 @@
 class SignUpTopic < ActiveRecord::Base
-  has_many :signed_up_users, :foreign_key => 'topic_id', :dependent => :destroy
-  has_many :topic_dependencies, :foreign_key => 'topic_id', :dependent => :destroy
-  has_many :topic_deadlines, :foreign_key => 'topic_id', :dependent => :destroy
+  has_many :signed_up_users, foreign_key: 'topic_id', dependent: :destroy
+  has_many :topic_dependencies, foreign_key: 'topic_id', dependent: :destroy
+  has_many :topic_deadlines, foreign_key: 'topic_id', dependent: :destroy
   alias_method :deadlines, :topic_deadlines
-  has_many :assignment_participants, :foreign_key => 'topic_id'
+  has_many :assignment_participants, foreign_key: 'topic_id'
   has_and_belongs_to_many :bmappings
-  has_many :bids, :foreign_key => 'topic_id', :dependent => :destroy
+  has_many :bids, foreign_key: 'topic_id', dependent: :destroy
   belongs_to :assignment
 
   has_paper_trail
 
   #the below relations have been added to make it consistent with the database schema
   validates_presence_of :topic_name, :assignment_id, :max_choosers
-  validates_length_of :topic_identifier, :maximum => 10
+  validates_length_of :topic_identifier, maximum: 10
 
   #This method is not used anywhere
   #def get_team_id_from_topic_id(user_id)
@@ -74,7 +74,7 @@ class SignUpTopic < ActiveRecord::Base
     assignment = Assignment.find(assignment_id)
 
     #making sure that the drop date deadline hasn't passed
-    dropDate = DueDate.where(:assignment_id => assignment.id, :deadline_type_id => '6').first
+    dropDate = DueDate.where(assignment_id: assignment.id, deadline_type_id: '6').first
     if (!dropDate.nil? && dropDate.due_at < Time.now)
       #flash[:error] = "You cannot drop this topic because the drop deadline has passed."
     else
@@ -101,7 +101,7 @@ class SignUpTopic < ActiveRecord::Base
             #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
             # to treat all assignments as team assignments
 
-            user_id = TeamsUser.where([ :team_id => first_waitlisted_user.creator_id ]).first.user_id
+            user_id = TeamsUser.where([ team_id: first_waitlisted_user.creator_id ]).first.user_id
             participant = Participant.where(user_id: user_id, parent_id: assignment.id).first
 
             participant.update_topic_id(topic_id)
@@ -123,14 +123,14 @@ class SignUpTopic < ActiveRecord::Base
     num_of_users_promotable = max_choosers.to_i - self.max_choosers.to_i
 
     num_of_users_promotable.times {
-      next_wait_listed_user = SignedUpUser.where({:topic_id => self.id, :is_waitlisted => true}).first
+      next_wait_listed_user = SignedUpUser.where({topic_id: self.id, is_waitlisted: true}).first
       if !next_wait_listed_user.nil?
         next_wait_listed_user.is_waitlisted = false
         next_wait_listed_user.save
 
         #update participants
         assignment = Assignment.find(self.assignment_id)
-        user_id = TeamsUser.where({:team_id => next_wait_listed_user.creator_id}).user_id.first
+        user_id = TeamsUser.where({team_id: next_wait_listed_user.creator_id}).user_id.first
         participant = Participant.where(user_id: user_id, parent_id: assignment.id).first
 
         participant.update_topic_id(self.id)
@@ -151,10 +151,9 @@ class SignUpTopic < ActiveRecord::Base
   end
 
   def self.remove_team(users_team, assignment_id)
-    if users_team.size == 0
+    if users_team.empty?
       @selected_topics = nil
     else
-      #TODO: fix this; cant use 0
       @selected_topics = SignupSheetController.other_confirmed_topic_for_user(assignment_id, users_team[0].t_id)
     end
   end

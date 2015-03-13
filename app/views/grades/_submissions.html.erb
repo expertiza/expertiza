@@ -1,4 +1,4 @@
-<%= render :partial => 'submitted_content/main', :locals => {:participant => participant, :stage => participant.assignment.get_current_stage(participant.topic_id)} %>
+<%= render :partial => 'submitted_content/main', :locals => {:participant => participant, :stage => participant.assignment.current_stage(participant.topic_id)} %>
 
 <% if controller.action_name != "view_my_scores" %>
    <% reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, @assignment.id)

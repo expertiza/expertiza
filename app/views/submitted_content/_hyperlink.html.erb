@@ -16,8 +16,8 @@
   <a href="#" id="urlLink" name="urlLink" onClick="toggleElement('url','links');return false;">hide links</a><br/>
   <div id="url" style="">
     <ul>
-      <%if participant.get_team_hyperlinks%>
-          <% participant.get_team_hyperlinks.each_with_index do |link, index| %>
+      <%if participant.team_hyperlinks%>
+          <% participant.team_hyperlinks.each_with_index do |link, index| %>
             <% if stage != "Complete" %>
               <% if index == 0 %>
                 <%= f.radio_button :chk_links, index, checked: true %>

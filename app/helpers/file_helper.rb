@@ -51,7 +51,7 @@ module FileHelper
 
   def self.delete_directory(in_object)
     begin
-      entries = Dir.entries(in_object.get_path)
+      entries = Dir.entries(in_object.path)
       if entries and entries.size == 2
         FileUtils.remove_dir(in_object.get_path)
       end
@@ -64,7 +64,7 @@ module FileHelper
 
   def self.create_directory(in_object)
     begin
-      if !File.exists? in_object.get_path
+      if !File.exists? in_object.path
         FileUtils.mkdir_p(in_object.get_path)
       end
     rescue PathError
@@ -83,4 +83,25 @@ module FileHelper
       raise "An error was encountered while creating this directory: "+$!
     end
   end
+
+  def submitted_files
+    files(self.path) if self.directory_num
+  end
+  #alias_method :submitted_files, :get_submitted_files
+
+  def files(directory)
+    files_list = Dir[directory + "/*"]
+    files = Array.new
+
+    files_list.each do |file|
+      if File.directory?(file)
+        dir_files = files(file)
+        dir_files.each{|f| files << f}
+      end
+      files << file
+    end
+    files
+  end
+  alias_method :files_in_directory, :files
+  #alias_method :files, :get_files
 end

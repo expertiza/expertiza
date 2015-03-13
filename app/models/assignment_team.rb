@@ -99,7 +99,7 @@ class AssignmentTeam < Team
 
     self.participants.each do |participant|
       puts participant.id
-      links+= participant.get_hyperlinks_array
+      links+= participant.hyperlinks_array
     end
 
     links
@@ -112,7 +112,7 @@ class AssignmentTeam < Team
   def get_submitted_files
     self.get_participants.first.submitted_files
   end
-  alias_method :submitted_files, :get_submitted_files
+  alias_method :submitted_files, :submitted_files
 
   def get_review_map_type
     'TeamReviewResponseMap'
@@ -206,7 +206,7 @@ class AssignmentTeam < Team
         scores[:total_score] = assignment.compute_total_score(scores)
         scores
       end
-      alias_method :scores, :get_scores
+      alias_method :scores, :scores
 
       def self.get_team(participant) # return nil if this participant doesn't have a team
         teams_users = TeamsUser.where(user_id: participant.user_id)

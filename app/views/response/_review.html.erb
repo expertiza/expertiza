@@ -11,7 +11,7 @@
            files = Array.new
            for file in files_list
              if File.directory?(file) then
-               dir_files = get_files(file)
+               dir_files = files(file)
                dir_files.each { |f| files << f }
              end
              files << file

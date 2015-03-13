@@ -53,7 +53,7 @@
   <% @taskrevisions.each do |student_task|
     participant = student_task.participant
     stage = student_task.current_stage
-    duedate = participant.assignment.get_stage_deadline(participant.topic_id)
+    duedate = participant.assignment.stage_deadline(participant.topic_id)
     controller = ""
     action = ""
     if stage == "submission" or stage == "resubmission"

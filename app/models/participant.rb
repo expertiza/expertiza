@@ -25,14 +25,14 @@ class Participant < ActiveRecord::Base
   has_paper_trail
 
   def get_current_stage
-    assignment.try :get_current_stage, topic_id
+    assignment.try :current_stage, topic_id
   end
-  alias_method :current_stage, :get_current_stage
+  alias_method :current_stage, :current_stage
 
   def get_stage_deadline
     assignment.get_stage_deadline topic_id
   end
-  alias_method :stage_deadline, :get_stage_deadline
+  alias_method :stage_deadline, :stage_deadline
 
   def name
     User.find(self.user_id).name

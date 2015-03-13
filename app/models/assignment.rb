@@ -59,8 +59,8 @@ class Assignment < ActiveRecord::Base
     contributor_set.reject! { |contributor| signed_up_topic(contributor).nil? }
     #####contributor_set.reject! { |contributor| !contributor.has_quiz? }
     # Reject contributions of topics whose deadline has passed
-    contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "Complete" or
-                              contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "submission" }
+    contributor_set.reject! { |contributor| contributor.assignment.current_stage(signed_up_topic(contributor).id) == "Complete" or
+                              contributor.assignment.current_stage(signed_up_topic(contributor).id) == "submission" }
 
     # Filter the contributors with the least number of reviews
     # (using the fact that each contributor is associated with a topic)
@@ -157,7 +157,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def reject_by_deadline(contributor_set)
-    contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'Complete' or
+    contributor_set.reject! { |contributor| contributor.assignment.current_stage(signed_up_topic(contributor).id) == 'Complete' or
         !contributor.assignment.review_allowed(signed_up_topic(contributor).id) }
     return contributor_set
   end
@@ -399,7 +399,7 @@ class Assignment < ActiveRecord::Base
 
     scores[:participants] = Hash.new
     self.participants.each do |participant|
-      scores[:participants][participant.id.to_s.to_sym] = participant.get_scores(questions)
+      scores[:participants][participant.id.to_s.to_sym] = participant.scores(questions)
 
       # for all quiz questionnaires (quizzes) taken by the participant
       quiz_responses = Array.new

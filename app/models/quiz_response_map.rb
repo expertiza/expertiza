@@ -23,5 +23,9 @@ class QuizResponseMap < ResponseMap
   def self.get_mappings_for_reviewer(participant_id)
     return QuizResponseMap.where(reviewer_id: participant_id)
   end
+
+  def get_quizzes_taken
+    return QuizResponseMap.get_assessments_for(self)
+  end
 end
 

@@ -9,7 +9,7 @@ class ReviewQuestionnaire < Questionnaire
   end
 
   def get_assessments_for(participant)
-    participant.get_reviews()
+    participant.reviews()
   end
 
   # return  the responses for specified round, for varying rubric feature -Yang

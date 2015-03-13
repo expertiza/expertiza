@@ -1,4 +1,4 @@
-<% stage = participant.assignment.get_current_stage(participant.topic_id) %>
+<% stage = participant.assignment.current_stage(participant.topic_id) %>
 <% if controller.action_name == 'view' or controller.action_name == "view_my_scores" %>
 
   <% if stage == "Complete" %>

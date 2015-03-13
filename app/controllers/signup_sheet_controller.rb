@@ -31,8 +31,8 @@ class SignupSheetController < ApplicationController
   include DeadlineHelper
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
-  verify method: 'post', :only => [:destroy, :create, :update],
-    :redirect_to => {:action => :index}
+  verify method: 'post', only: [:destroy, :create, :update],
+    redirect_to: {:action => :index}
 
   # Prepares the form for adding a new topic. Used in conjuntion with create
   def new
@@ -247,15 +247,16 @@ class SignupSheetController < ApplicationController
         @priority = 0
         assignment=Assignment.find(params[:id])
         #end
-        if assignment.due_dates.find_by_deadline_type_id(1)!= nil
-          unless !(assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now )
+        #if assignment.due_dates.find_by_deadline_type_id(1)!= nil
+          if assignment.due_dates.where(deadline_type_id:1)!= nil
+          unless !(assignment.staggered_deadline? and assignment.due_dates.where(deadline_type_id:1).due_at < Time.now )
             @show_actions = false
           end
           #Find whether the user has signed up for any topics; if so the user won't be able to
           #sign up again unless the former was a waitlisted topic
           #if team assignment, then team id needs to be passed as parameter else the user's id
           users_team = SignedUpUser.find_team_users(params[:id],(session[:user].id))
-          if users_team.size == 0
+          if users_team.empty?
             @selected_topics = nil
           else
             #TODO: fix this; cant use 0
@@ -287,7 +288,7 @@ class SignupSheetController < ApplicationController
 
         def signup_team(assignment_id, user_id, topic_id)
           users_team = SignedUpUser.find_team_users(assignment_id, user_id)
-          if users_team.size == 0
+          if users_team.empty?
             #if team is not yet created, create new team.
             team = AssignmentTeam.create_team_and_node(assignment_id)
             user = User.find(user_id)
@@ -332,7 +333,7 @@ class SignupSheetController < ApplicationController
           else
             #If all the topics choosen by the user are waitlisted,
             for user_signup_topic in user_signup
-              if user_signup_topic.is_waitlisted == false
+              unless user_signup_topic.is_waitlisted
                 flash[:error] = "You have already signed up for a topic."
                 return false
               end

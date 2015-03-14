@@ -1,6 +1,5 @@
 Search view - before breaking it into different partials <br />
 <h2></h2>
-<%for term in @search_array %>
-  <%= term %>
-  <br />
-<% end %>
+
+<%= render :partial => 'results' %>
+<br/>

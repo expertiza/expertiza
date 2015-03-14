@@ -67,6 +67,9 @@ class BookmarksController < ApplicationController
     logger.warn(session["comingFrom"])
     @search_content = ""
     @order_by = ""
+    @my_user_temp = params[:users]
+    @my_user_id=session[:user].id
+    logger.warn("my_user_temp=>>"+"#{@my_user_temp}")
     logger.warn("In managing_bookmarks controller **************")
     unless params[:s].nil?
       @search_content = params[:s]
@@ -78,6 +81,10 @@ class BookmarksController < ApplicationController
     end
     @users_included ="All Included users"
     @method_name = "managing_bookmarks"
+    logger.warn("+++++++++++++++++++++++++++++++++++++++++")
+    logger.warn("@my_user_id is "+"#{@my_user_id}")
+     logger.warn("@order_by is "+"#{@order_by}")
+      logger.warn("+++++++++++++++++++++++++++++++++++++++++")
     # Call the model function with order by parameter
     @search_results = Bookmark.search_alltags_foruser(@my_user_id, @order_by)
   end

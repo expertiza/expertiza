@@ -380,6 +380,9 @@ logger.warn("@tags=>>"+"#{@tags.inspect}")
       ## returns the 20 most recent bookmarks_mappings made by the user specified, or the most popular bookmarks in this user's repository, depending on the order_by
       ## Function returns an array. Each element of the array is a hash detailing one record
       def self.search_alltags_foruser (the_userid, order_by)
+
+        logger.warn("++++++IN search_alltags_foruser function of bookmark model now++++")
+        #logger.warn("the_userid value is "+the_userid)
         result_array = Array.new #going to append all the results into this array
 
         if(order_by == "most_recent" )

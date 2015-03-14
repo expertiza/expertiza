@@ -87,6 +87,7 @@ class BookmarksController < ApplicationController
       logger.warn("+++++++++++++++++++++++++++++++++++++++++")
     # Call the model function with order by parameter
     @search_results = Bookmark.search_alltags_foruser(@my_user_id, @order_by)
+    #@search_results = Bookmark.search_alltags(@my_user_id, @order_by)
   end
 
   #Listing all the bookmarks for a topic
@@ -291,6 +292,7 @@ logger.warn("@search_string =>>>"+"#{@search_string}")
       if @search_string.empty?
             logger.warn("-----------Inside the required if block--------")
             @search_results = Bookmark.search_alltags_allusers(@order_by)
+            #@search_results = Bookmark.search_alltags(nil,@order_by)
       else
           @search_array  = BookmarksHelper.separate_tags( @search_string)
 

@@ -5,6 +5,7 @@ log/*.log
 tmp/**/*
 config/database.yml
 coverage
+*.sql
 
 #################
 ## Eclipse

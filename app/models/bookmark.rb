@@ -285,9 +285,9 @@ class Bookmark < ActiveRecord::Base
         # Add the newly discovered bookmark
         bookmarkid = add_new_bookmark(b_url,session_user.id)
         # Add its associations to a user
-        bmappingid = add_bmapping(bookmarkid, b_title, session_user.id, b_description,b_tags_text )
+        bmappingid = Bmapping.add_bmapping(bookmarkid, b_title, session_user.id, b_description,b_tags_text )
         # Add its association to the sign up topic
-        add_bmapping_signuptopic(topicid, bmappingid)
+        Bmapping.add_bmapping_signuptopic(topicid, bmappingid)
 
         # Bookmark with the same url exists.
       else
@@ -304,7 +304,7 @@ class Bookmark < ActiveRecord::Base
 
             # Signup Topic does not exists
           else
-            add_bmapping_signuptopic(topicid, bmapping.id)
+            Bmapping.add_bmapping_signuptopic(topicid, bmapping.id)
           end
 
           # Bookmark with same user - bmapping does not exists.
@@ -313,8 +313,8 @@ class Bookmark < ActiveRecord::Base
           bookmark_resource.user_count = bookmark_resource.user_count + 1
           bookmark_resource.save
           # Add its association with the user
-          bmappingid = add_bmapping(bookmark_resource.id, b_title, session_user.id, b_description,b_tags_text)
-          add_bmapping_signuptopic(topicid, bmappingid)
+          bmappingid = Bmapping.add_bmapping(bookmark_resource.id, b_title, session_user.id, b_description,b_tags_text)
+          Bmapping.add_bmapping_signuptopic(topicid, bmappingid)
         end
       end
     end

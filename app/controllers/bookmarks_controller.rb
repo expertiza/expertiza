@@ -301,7 +301,7 @@ class BookmarksController < ApplicationController
       logger.warn("#{@search_results}")
       logger.warn("==============================")
     else
-
+      logger.warn("@order_by=>>"+"#{@order_by}")
       @search_results = Bookmark.search_fortags_allusers(@search_array, @order_by)
       print(@search_results)
       print("Chutya2****")

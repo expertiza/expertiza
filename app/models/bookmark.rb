@@ -122,33 +122,39 @@ class Bookmark < ActiveRecord::Base
 
       result_array = Array.new # returns this array
       ## find the tags associated with these tagnames
-      @tags = BookmarksHelper.find_tags(tags_array)
+      @tags = BookmarksHelper::find_tags(tags_array)
+logger.warn("@tags=>>"+"#{@tags.inspect}")
+
       @q_tuples_with_all_tags = Array.new
       ## retreive mapping_ids taggeed with all of the word tags
       ## for every word, search for every bookmark that was tagged with that word. Then take the intersection of all the bmapping_ids
       first_time = "true"
       for each_tag in @tags
+        
+        q_tuples = BmappingsTags.where(["tag_id = ?", each_tag.id])
 
-        q_tuples = BmappingsTags.where(["tag_id = ?", each_tag])
+        
 
-        if first_time == "true"
+
           for q_t in q_tuples
             @q_tuples_with_all_tags << q_t.bmapping_id
+          
           end
 
-          first_time = "false"
-        else
-          temp_array = Array.new
-          for q_t in q_tuples
-            temp_array << q_t.bmapping_id
-          end
-          @q_tuples_with_all_tags = @q_tuples_with_all_tags & temp_array ## returns the items  common to both arrays
+          
+       
         end
 
-      end
+  
+
+
+
       ## now you have qualifer tuples with all the required bmapping ids - search for the req ones
       temp_result_records =  Bmapping.where(["id in (?)", @q_tuples_with_all_tags])
+
+
       result_records = Array.new
+
       ## organize these tuples in the order of most earliest, most popular
       if (order_by =="most_recent")
         result_records = temp_result_records.sort {|x,y| y.date_created <=> x.date_created}

@@ -10,7 +10,7 @@ class Bookmark < ActiveRecord::Base
   #     Bookmark.add_bookmark(b_url, b_title, b_tags_text, b_description,session_user,topic_id)
   #   elsif (bmapping_exists)
   #     Bookmark.edit_this_bookmark(b_url, b_title, b_tags_text, b_description,session_user)
-  #   end
+  #   
   # end
 
   #Adds bookmark without topic_id

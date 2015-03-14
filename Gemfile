@@ -4,7 +4,6 @@ gem 'rails'
 
 ## Gems in Alphabetical Order
 
-gem 'mysql'
 gem 'activerecord-session_store'
 gem 'awesome_nested_set'
 gem 'bind-it'
@@ -57,7 +56,6 @@ gem 'turbolinks'
 gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
-gem 'mysql'
 
 group :development do
   gem 'daemons'

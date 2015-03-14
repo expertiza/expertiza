@@ -102,6 +102,11 @@ class UsersController < ApplicationController
       else
         @user = User.find(params[:id])
         get_role
+        #obtain number of assignments participated
+        @assignment_participant_num = 0
+        AssignmentParticipant.where(user_id: @user.id).each {|participant| @assignment_participant_num += 1 }
+        #judge whether this user become reviewer or reviewee
+        @maps = ResponseMap.where(['reviewee_id = ? or reviewer_id = ?',params[:id],params[:id]])
       end
     end
 

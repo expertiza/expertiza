@@ -291,9 +291,9 @@ logger.warn("@tags=>>"+"#{@tags.inspect}")
         # Add the newly discovered bookmark
         bookmarkid = add_new_bookmark(b_url,session_user.id)
         # Add its associations to a user
-        bmappingid = Bmapping.add_bmapping(bookmarkid, b_title, session_user.id, b_description,b_tags_text )
+        bmappingid = add_bmapping(bookmarkid, b_title, session_user.id, b_description,b_tags_text )
         # Add its association to the sign up topic
-        Bmapping.add_bmapping_signuptopic(topicid, bmappingid)
+        add_bmapping_signuptopic(topicid, bmappingid)
 
         # Bookmark with the same url exists.
       else
@@ -310,7 +310,7 @@ logger.warn("@tags=>>"+"#{@tags.inspect}")
 
             # Signup Topic does not exists
           else
-            Bmapping.add_bmapping_signuptopic(topicid, bmapping.id)
+            add_bmapping_signuptopic(topicid, bmapping.id)
           end
 
           # Bookmark with same user - bmapping does not exists.
@@ -319,8 +319,8 @@ logger.warn("@tags=>>"+"#{@tags.inspect}")
           bookmark_resource.user_count = bookmark_resource.user_count + 1
           bookmark_resource.save
           # Add its association with the user
-          bmappingid = Bmapping.add_bmapping(bookmark_resource.id, b_title, session_user.id, b_description,b_tags_text)
-          Bmapping.add_bmapping_signuptopic(topicid, bmappingid)
+          bmappingid = add_bmapping(bookmark_resource.id, b_title, session_user.id, b_description,b_tags_text)
+          add_bmapping_signuptopic(topicid, bmappingid)
         end
       end
     end

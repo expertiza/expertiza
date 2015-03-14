@@ -123,6 +123,8 @@ class Bookmark < ActiveRecord::Base
       result_array = Array.new # returns this array
       ## find the tags associated with these tagnames
       @tags = BookmarksHelper::find_tags(tags_array)
+
+      logger.warn("---------------------")
 logger.warn("@tags=>>"+"#{@tags.inspect}")
 
       @q_tuples_with_all_tags = Array.new
@@ -192,28 +194,21 @@ logger.warn("@tags=>>"+"#{@tags.inspect}")
 
 
       ## search for ids of the tags
-      @tags = BookmarksHelper.find_tags(tags_array)
+      @tags = BookmarksHelper::find_tags(tags_array)
       @q_tuples_with_all_tags = Array.new
-      first_time = "true"
+     
+
       for each_tag in @tags
         ##search for all qualifier tuples with b
         q_tuples = BmappingsTags.where(["tag_id = ?", each_tag])
         #for q_t in q_tuples
         #end
-
-        if first_time == "true"
+    
           for q_t in q_tuples
             @q_tuples_with_all_tags << q_t.bmapping_id
           end
 
-          first_time = "false"
-        else
-          temp_array = Array.new
-          for q_t in q_tuples
-            temp_array << q_t.bmapping_id
-          end
-          @q_tuples_with_all_tags = @q_tuples_with_all_tags & temp_array ## returns the items  common to both arrays
-        end
+        
       end
 
 

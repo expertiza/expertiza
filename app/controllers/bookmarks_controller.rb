@@ -67,7 +67,7 @@ class BookmarksController < ApplicationController
     logger.warn(session["comingFrom"])
     @search_content = ""
     @order_by = ""
-    logger.warn("marker 1")
+    logger.warn("In managing_bookmarks controller **************")
     unless params[:s].nil?
       @search_content = params[:s]
     end
@@ -277,7 +277,7 @@ class BookmarksController < ApplicationController
 
      logger.warn("my_user=>>"+"#{@my_user}")
 
-     logger.warn("--------marker2-------")
+     logger.warn("-------IN search_bookmarks controller------")
 
 
 

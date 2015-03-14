@@ -8,4 +8,5 @@ This is the view all bookmarks page
 <%= render :partial => 'results' %>
 <br/>
 
-<%= link_to('Back', :back) %>
+<%= link_to('Back', session[:comingFrom]) %>
+

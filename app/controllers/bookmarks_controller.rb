@@ -9,12 +9,14 @@ class BookmarksController < ApplicationController
 
   def add_bookmark_form
     # Fields: b_url b_type, b_title b_tags_text, b_type b_description
+    logger.warn("-------------------------------------------------------------")
     @b_url = ""
     @b_title = ""
     @b_tags_text = ""
     @b_description = ""
-    @topic_id = params[:id]
-    return @topic_id
+    @sign_up_topics = SignUpTopic.all
+    #@topic_id = params[:id]
+    #return @topic_id
   end
 
   def show
@@ -32,9 +34,15 @@ class BookmarksController < ApplicationController
     b_title = params[:b_title]
     b_tags_text = params[:b_tags_text]
     b_description = params[:b_description]
+
     BookmarksHelper.prepare_string(b_url)
     session_user = session[:user]
-    @topicid = params[:topicid]
+    #@topicid = params[:topicid]
+    @topicid = params[:topics]
+
+   
+
+
     if @topicid
       # Add the topic bookmark
       Bookmark.add_topic_bookmark(b_url, b_title, b_tags_text, b_description,session_user, @topicid)
@@ -55,8 +63,11 @@ class BookmarksController < ApplicationController
   end
 
   def managing_bookmarks
+    store_referer
+    logger.warn(session["comingFrom"])
     @search_content = ""
     @order_by = ""
+    logger.warn("marker 1")
     unless params[:s].nil?
       @search_content = params[:s]
     end
@@ -255,29 +266,54 @@ class BookmarksController < ApplicationController
     end
     #when getting the hidden variable from the form for the users to include.. you might get "value" appended to the string before the param that you
     ##expect .. Remove that
-    @my_user = @my_user_temp.gsub(/value/, '');
+    
+
+    logger.warn("my_user_temp=>>"+"#{@my_user_temp}")
+    #@my_user = @my_user_temp.gsub(/:value=>/, '');
+
+    #@my_user = @my_user_temp
+
+    @my_user = eval(@my_user_temp).first[1]
+
+     logger.warn("my_user=>>"+"#{@my_user}")
+
+     logger.warn("--------marker2-------")
+
+
 
 
     @search_array  = BookmarksHelper.separate_tags( @search_string)
 
+    logger.warn("#{@search_array}")
+
+    logger.warn("-------marker1-------")
+
     @method_name = "search_bookmarks"
     @search_results = Array.new
     if (@my_user != "all_users")
+      logger.warn("@search_array=>"+"#{@search_array}")
+      logger.warn("@my_user=>"+"#{@my_user}")
+      logger.warn("@order_by=>"+"#{@order_by}")
+      #@my_user=2
       @search_results = Bookmark.search_fortags_foruser(@search_array, @my_user, @order_by)
-      print(@search_results)
+      #print(@search_results)
       print("Chutya1")
+      logger.warn("#{@search_results}")
+      logger.warn("==============================")
     else
-
+      logger.warn("@order_by=>>"+"#{@order_by}")
       @search_results = Bookmark.search_fortags_allusers(@search_array, @order_by)
       print(@search_results)
-      print("Chutya2")
+      print("Chutya2****")
     end
     if(@my_user == "all_users")
       render :action => "view_bookmarks"
       print("Chutya3")
     else
-      render :action =>"manage_bookmarks"
-
+      logger.warn("#{@search_results}")
+      print("Chutya4before")
+      render :action =>"managing_bookmarks"
+  
       print(@search_results.count)
       print("Chutya4")
     end

@@ -52,8 +52,8 @@ class Bookmark < ActiveRecord::Base
       btu_tuple.tag_id = tag_tuple.id
       btu_tuple.bmapping_id = bookmark_user_mapping.id
       btu_tuple.save
+      end
     end
-  end
 
     ## gives the 20 most popular or 20 most recent bookmarks in the system, depending on the order_by parameter. Function returns
     ## an array. Each element of the array is a hash, detailing one record
@@ -122,39 +122,33 @@ class Bookmark < ActiveRecord::Base
 
       result_array = Array.new # returns this array
       ## find the tags associated with these tagnames
-      @tags = BookmarksHelper::find_tags(tags_array)
-logger.warn("@tags=>>"+"#{@tags.inspect}")
-
+      @tags = BookmarksHelper.find_tags(tags_array)
       @q_tuples_with_all_tags = Array.new
       ## retreive mapping_ids taggeed with all of the word tags
       ## for every word, search for every bookmark that was tagged with that word. Then take the intersection of all the bmapping_ids
       first_time = "true"
       for each_tag in @tags
-        
-        q_tuples = BmappingsTags.where(["tag_id = ?", each_tag.id])
 
-        
+        q_tuples = BmappingsTags.where(["tag_id = ?", each_tag])
 
-
+        if first_time == "true"
           for q_t in q_tuples
             @q_tuples_with_all_tags << q_t.bmapping_id
-          
           end
 
-          
-       
+          first_time = "false"
+        else
+          temp_array = Array.new
+          for q_t in q_tuples
+            temp_array << q_t.bmapping_id
+          end
+          @q_tuples_with_all_tags = @q_tuples_with_all_tags & temp_array ## returns the items  common to both arrays
         end
 
-  
-
-
-
+      end
       ## now you have qualifer tuples with all the required bmapping ids - search for the req ones
       temp_result_records =  Bmapping.where(["id in (?)", @q_tuples_with_all_tags])
-
-
       result_records = Array.new
-
       ## organize these tuples in the order of most earliest, most popular
       if (order_by =="most_recent")
         result_records = temp_result_records.sort {|x,y| y.date_created <=> x.date_created}
@@ -198,8 +192,8 @@ logger.warn("@tags=>>"+"#{@tags.inspect}")
       for each_tag in @tags
         ##search for all qualifier tuples with b
         q_tuples = BmappingsTags.where(["tag_id = ?", each_tag])
-        #for q_t in q_tuples
-        #end
+        for q_t in q_tuples
+        end
 
         if first_time == "true"
           for q_t in q_tuples
@@ -291,9 +285,9 @@ logger.warn("@tags=>>"+"#{@tags.inspect}")
         # Add the newly discovered bookmark
         bookmarkid = add_new_bookmark(b_url,session_user.id)
         # Add its associations to a user
-        bmappingid = Bmapping.add_bmapping(bookmarkid, b_title, session_user.id, b_description,b_tags_text )
+        bmappingid = add_bmapping(bookmarkid, b_title, session_user.id, b_description,b_tags_text )
         # Add its association to the sign up topic
-        Bmapping.add_bmapping_signuptopic(topicid, bmappingid)
+        add_bmapping_signuptopic(topicid, bmappingid)
 
         # Bookmark with the same url exists.
       else
@@ -310,7 +304,7 @@ logger.warn("@tags=>>"+"#{@tags.inspect}")
 
             # Signup Topic does not exists
           else
-            Bmapping.add_bmapping_signuptopic(topicid, bmapping.id)
+            add_bmapping_signuptopic(topicid, bmapping.id)
           end
 
           # Bookmark with same user - bmapping does not exists.
@@ -319,8 +313,8 @@ logger.warn("@tags=>>"+"#{@tags.inspect}")
           bookmark_resource.user_count = bookmark_resource.user_count + 1
           bookmark_resource.save
           # Add its association with the user
-          bmappingid = Bmapping.add_bmapping(bookmark_resource.id, b_title, session_user.id, b_description,b_tags_text)
-          Bmapping.add_bmapping_signuptopic(topicid, bmappingid)
+          bmappingid = add_bmapping(bookmark_resource.id, b_title, session_user.id, b_description,b_tags_text)
+          add_bmapping_signuptopic(topicid, bmappingid)
         end
       end
     end
@@ -368,9 +362,9 @@ logger.warn("@tags=>>"+"#{@tags.inspect}")
           btu_tuple.bmapping_id = bookmark_user_mapping.id
           btu_tuple.save
         end
-      end
+        end
         return bookmark_user_mapping.id
-    end
+      end
 
       # Associate bmapping to the sign up topic
       def self.add_bmapping_signuptopic(topicid, bmappingid)
@@ -392,7 +386,7 @@ logger.warn("@tags=>>"+"#{@tags.inspect}")
           # For each tuple returned from the bmapping, generate a hash, containing the url, the specified user's name, date this mapping was made,
           ## title, and description provided by this user. Store these hashes sequentially in a array ad return the array
 
-          result_records = Bmapping.where([" user_id = ?", the_userid]).order("date_created DESC").limit(20)
+          result_records = Bmapping.where([" user_id = ?", the_userid].order("date_created DESC").limit(20)
           for result in result_records
             result_hash = Hash.new
             result_hash["id"] = result.id
@@ -443,5 +437,5 @@ logger.warn("@tags=>>"+"#{@tags.inspect}")
         end
         return result_array
       end
-end
+    end
 

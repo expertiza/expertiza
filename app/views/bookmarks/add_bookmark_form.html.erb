@@ -1,27 +1,31 @@
 <h1>Add new bookmark</h1>
 <h5>Please enter the following fields to create a new bookmark</h5>
-<table>
-  <% form_tag(:action => "add_bookmark", :method => "post") do %>
+
+
+
+  <%= form_tag(:action => "add_bookmark", :method => "post") do %>
     <%= hidden_field_tag("topicid", @topic_id) %>
-    <tr>
-      <td> Bookmark URL </td>
-      <td> <%= text_field_tag(:b_url) %> </td>
-    </tr>
-    <tr>
-      <td> Bookmark Title </td>
-      <td> <%= text_field_tag(:b_title) %> </td>
-    </tr>
-    <tr>
-      <td> Tags </td>
-      <td> <%= text_field_tag(:b_tags_text) %> </td>
-    </tr>
-    <tr>
-      <td> Description </td>
-      <td> <%= text_field_tag(:b_description) %> </td>
-    </tr>
-    <tr>
-      <td> <%= submit_tag("Add", :name => nil) %> </td>
-    </tr>
+
+  
+      <%= label_tag 'Topics' %>
+      <%= select_tag "topics", options_from_collection_for_select(@sign_up_topics, "id","topic_name") %> 
+    
+    <br>
+      <%= label_tag 'Bookmark URL'%>
+      <%= text_field_tag(:b_url) %> 
+    <br>
+  
+      <%= label_tag 'Bookmark Title'%>
+    <%= text_field_tag(:b_title) %> 
+   <br>
+      <%= label_tag 'Tags'%>
+      <%= text_field_tag(:b_tags_text) %>
+ <br>
+      <%= label_tag 'Description'%>
+      <%= text_field_tag(:b_description) %> 
+    <br>
+      <%= submit_tag("Add", :name => nil) %>
+    
   <% end %>
 
-</table>
+

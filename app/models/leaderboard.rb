@@ -52,15 +52,16 @@ class Leaderboard < ActiveRecord::Base
                                      "TeammateReviewResponseMap" => "TeammateReviewQuestionnaire"}
 
     # Get all participants of the assignment list
-    participantList = AssignmentParticipant.where(:parent_id => assignmentList.pluck(:id)).uniq
+    #participantList = getAssignmentParticipantList(assignmentList)
+
 
     # Get all teams participated in the given assignment list.
-    teamList = Team.where("parent_id IN (?) AND type = ?", assignmentList.pluck(:id), 'AssignmentTeam').uniq
+    #teamList = getAssignmentUniqueParticipantTeamList(assignmentList)
 
     # Get mapping of participant and team with corresponding assignment.
     # "participant" => {participantId => {"self" => <ParticipantRecord>, "assignment" => <AssignmentRecord>}}
     # "team" => {teamId => <AssignmentRecord>}
-    assignmentMap = getAssignmentMapping(assignmentList, participantList, teamList)
+    assignmentMap = getAssignmentMapping(assignmentList, getAssignmentUniqueParticipantList(assignmentList), getAssignmentUniqueParticipantTeamList(assignmentList))
 
     # Aggregate total reviewee list
     revieweeList = Array.new
@@ -89,6 +90,15 @@ class Leaderboard < ActiveRecord::Base
     end
 
     qTypeHash
+  end
+  # This method returns the unique participants for assignment list.
+  def self.getAssignmentUniqueParticipantList(assignmentList)
+    AssignmentParticipant.where(:parent_id => assignmentList.pluck(:id)).uniq
+  end
+
+  # This method returns the unique participant teams for assignment list.
+  def self.getAssignmentUniqueParticipantTeamList(assignmentList)
+    Team.where("parent_id IN (?) AND type = ?", assignmentList.pluck(:id), 'AssignmentTeam').uniq
   end
 
   # This method adds score to all the revieweeUser in qTypeHash.

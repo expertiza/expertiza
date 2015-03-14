@@ -298,4 +298,21 @@ class User < ActiveRecord::Base
   def is_teaching_assistant?
     false
   end
+
+  def self.search_users(role, user_id, letter, search_by)
+    if search_by == '1'  #search by user name
+      search_filter = '%' + letter + '%'
+      users = User.order('name').where( "(role_id in (?) or id = ?) and name like ?", role.get_available_roles, user_id, search_filter )
+    elsif search_by == '2' # search by full name
+      search_filter = '%' + letter + '%'
+      users = User.order('name').where( "(role_id in (?) or id = ?) and fullname like ?", role.get_available_roles, user_id, search_filter )
+    elsif search_by == '3' # search by email
+      search_filter = '%' + letter + '%'
+      users = User.order('name').where( "(role_id in (?) or id = ?) and email like ?", role.get_available_roles, user_id, search_filter )
+    else #default used when clicking on letters
+      search_filter = letter + '%'
+      users = User.order('name').where( "(role_id in (?) or id = ?) and name like ?", role.get_available_roles, user_id, search_filter )
+    end
+    users
+  end
 end

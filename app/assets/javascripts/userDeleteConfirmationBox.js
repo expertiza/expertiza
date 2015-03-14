@@ -1,7 +1,8 @@
 //show more than one data confirmation when attempting to delete users.
 //overwrite rails default behavior
 $.rails.allowAction = function(link) {
-  if (!link.attr('data-confirm')) {
+  console.log(link.attr('data-relationship'))
+  if ((!link.attr('data-confirm')) || (link.attr('data-relationship') && link.attr('data-relationship') == 'false')) {
    return true;
   }
   $.rails.showConfirmDialog(link);

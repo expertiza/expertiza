@@ -20,12 +20,10 @@
 <% unless current_user_role? == "Student" %>
   <hr/>
   <p><%= link_to 'Edit', :action => 'edit', :id => @user %> |
-    <% if @assignment_participant_num != 0 and (!@maps.nil? or @maps.length != 0)%>
-      <%= link_to 'Delete', {:action => 'destroy', :id => @user},
-      data:{:confirm => "User is participating in #{@assignment_participant_num} assignments.<br/>Delete as a participant in these assignment(s)?"}, :method => :delete%>
+    <% if (@assignment_participant_num != 0)%> 
+      <%= link_to 'Delete', {:action => 'destroy', :id => @user}, data:{:confirm => "User is participating in #{@assignment_participant_num} assignments.<br/>Delete as a participant in these assignment(s)?", :relationship => 'true'}, :method => :delete%>   
     <% else %>
-      <%= link_to 'Delete', {:action => 'destroy', :id => @user},
-      data:{:confirm => "User is participating in #{@assignment_participant_num} assignment(s), but without participates in any assignments.<br/>Delete as a participant in these assignment(s)?"}, :method => :delete%>
+       <%= link_to 'Delete', {:action => 'destroy', :id => @user}, data:{:confirm => "User joins in #{@assignment_participant_num} assignment(s), but without participates in any assignments. Delete as a participant in these assignment(s)?",  :relationship => 'false'}, :method => :delete%>
     <% end %>
 </p>
 

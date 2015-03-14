@@ -26,7 +26,7 @@ class LeaderboardController < ApplicationController
         @courseAccomp = Leaderboard.extractPersonalAchievements(@csHash, @courseList, current_user.id)
       end
 
-      @csHash = Leaderboard.sortHash(@csHash)
+      @csHash = LeaderboardHelper.sortHash(@csHash)
       # Setup leaderboard for easier consumption by view
       @leaderboards = Array.new
 

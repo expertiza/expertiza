@@ -22,7 +22,6 @@ class BookmarksController < ApplicationController
   end
 
 
-
   def add_bookmark
     # If added properly should be redirected to the users collection of bookmarks.
     # If not, should render the form again
@@ -37,7 +36,7 @@ class BookmarksController < ApplicationController
     @topicid = params[:topicid]
     if @topicid
       # Add the topic bookmark
-      Bookmark.add_topic_bookmark(b_url, b_title, b_tags_text, b_description,session_user, @topicid)
+      Bookmark.add_this_bookmark(b_url, b_title, b_tags_text, b_description,session_user, @topicid)
       params[:id] = @topicid
       redirect_to(:action => 'view_topic_bookmarks', :id => @topicid)
     else

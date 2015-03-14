@@ -1,26 +1,73 @@
 class Bookmark < ActiveRecord::Base
   has_many(:bmappings)
 
-  #Adds Bookmark for a particular topic
-  def self.add_topic_bookmark(b_url, b_title, b_tags_text, b_description,session_user, topicid)
-    # Check if the bookmark exists and add / edit based on that
+  # #Adds Bookmark for a particular topic
+  # def self.add_topic_bookmark(b_url, b_title, b_tags_text, b_description,session_user, topic_id)
+  #   # Check if the bookmark exists and add / edit based on that
+  #   bookmark_exists = check_bookmark_exists(b_url)
+  #   bmapping_exists = check_bmapping_exists(b_url,session_user)
+  #   if (!bookmark_exists || !bmapping_exists)
+  #     Bookmark.add_bookmark(b_url, b_title, b_tags_text, b_description,session_user,topic_id)
+  #   elsif (bmapping_exists)
+  #     Bookmark.edit_this_bookmark(b_url, b_title, b_tags_text, b_description,session_user)
+  #   end
+  # end
+
+  #Adds bookmark without topic_id
+  def self.add_this_bookmark(b_url, b_title, b_tags_text, b_description,session_user, topic_id)
     bookmark_exists = check_bookmark_exists(b_url)
     bmapping_exists = check_bmapping_exists(b_url,session_user)
     if (!bookmark_exists || !bmapping_exists)
-      Bookmark.add_bookmark(b_url, b_title, b_tags_text, b_description,session_user,topicid)
+      if(topic_id) # something has been passed for topic_id
+        Bookmark.add_bookmark(b_url, b_title, b_tags_text, b_description,session_user,topic_id)
+      else
+        Bookmark.add_bookmark(b_url, b_title, b_tags_text, b_description,session_user)
+      end
     elsif (bmapping_exists)
       Bookmark.edit_this_bookmark(b_url, b_title, b_tags_text, b_description,session_user)
     end
   end
 
-  #Adds bookmark without topic_id
-  def self.add_this_bookmark(b_url, b_title, b_tags_text, b_description,session_user)
-    bookmark_exists = check_bookmark_exists(b_url)
-    bmapping_exists = check_bmapping_exists(b_url,session_user)
-    if (!bookmark_exists || !bmapping_exists)
-      Bookmark.add_bookmark(b_url, b_title, b_tags_text, b_description,session_user)
-    elsif (bmapping_exists)
-      Bookmark.edit_this_bookmark(b_url, b_title, b_tags_text, b_description,session_user)
+ # Adds a bookmark and its various associations
+  def self.add_bookmark(b_url, b_title, b_tags_text, b_description,session_user,topic_id)
+    bookmark_resource = Bookmark.where(["url = ?",b_url]).first
+
+    # Bookmark with the same url does not exists.
+    if bookmark_resource.nil?
+      # Add the newly discovered bookmark
+      bookmarkid = add_new_bookmark(b_url,session_user.id)
+      # Add its associations to a user
+      bmappingid = add_bmapping(bookmarkid, b_title, session_user.id, b_description,b_tags_text )
+      # Add its association to the sign up topic
+      add_bmapping_signuptopic(topic_id, bmappingid)
+
+      # Bookmark with the same url exists.
+    else
+      bmapping = Bmapping.where(bookmark_id: bookmark_resource.id, user_id: session_user.id).first
+      # Bookmark with the same user - bmapping exists.
+      if ( !bmapping.nil? )
+        topic = SignUpTopic.find(topic_id)
+        if( !topic.nil? )
+          topic.bmappings.each do |mapping|
+            if (mapping.id == bmapping.id)
+              Bookmark.edit_this_bookmark(b_url, b_title, b_tags_text, b_description,session_user)
+            end
+          end
+
+          # Signup Topic does not exists
+        else
+          add_bmapping_signuptopic(topic_id, bmapping.id)
+        end
+
+        # Bookmark with same user - bmapping does not exists.
+      else
+        # Increment user count for the existing bookmark
+        bookmark_resource.user_count = bookmark_resource.user_count + 1
+        bookmark_resource.save
+        # Add its association with the user
+        bmappingid = add_bmapping(bookmark_resource.id, b_title, session_user.id, b_description,b_tags_text)
+        add_bmapping_signuptopic(topic_id, bmappingid)
+      end
     end
   end
 
@@ -282,49 +329,6 @@ logger.warn("@tags=>>"+"#{@tags.inspect}")
       end
     end
 
-    # Adds a bookmark and its various associations
-    def self.add_bookmark(b_url, b_title, b_tags_text, b_description,session_user,topicid)
-      bookmark_resource = Bookmark.where(["url = ?",b_url]).first
-
-      # Bookmark with the same url does not exists.
-      if bookmark_resource.nil?
-        # Add the newly discovered bookmark
-        bookmarkid = add_new_bookmark(b_url,session_user.id)
-        # Add its associations to a user
-        bmappingid = add_bmapping(bookmarkid, b_title, session_user.id, b_description,b_tags_text )
-        # Add its association to the sign up topic
-        add_bmapping_signuptopic(topicid, bmappingid)
-
-        # Bookmark with the same url exists.
-      else
-        bmapping = Bmapping.where(bookmark_id: bookmark_resource.id, user_id: session_user.id).first
-        # Bookmark with the same user - bmapping exists.
-        if ( !bmapping.nil? )
-          topic = SignUpTopic.find(topicid)
-          if( !topic.nil? )
-            topic.bmappings.each do |mapping|
-              if (mapping.id == bmapping.id)
-                Bookmark.edit_this_bookmark(b_url, b_title, b_tags_text, b_description,session_user)
-              end
-            end
-
-            # Signup Topic does not exists
-          else
-            add_bmapping_signuptopic(topicid, bmapping.id)
-          end
-
-          # Bookmark with same user - bmapping does not exists.
-        else
-          # Increment user count for the existing bookmark
-          bookmark_resource.user_count = bookmark_resource.user_count + 1
-          bookmark_resource.save
-          # Add its association with the user
-          bmappingid = add_bmapping(bookmark_resource.id, b_title, session_user.id, b_description,b_tags_text)
-          add_bmapping_signuptopic(topicid, bmappingid)
-        end
-      end
-    end
-
 
     # Adds a new bookmark
     def self.add_new_bookmark(b_url,user_id)
@@ -373,8 +377,8 @@ logger.warn("@tags=>>"+"#{@tags.inspect}")
     end
 
       # Associate bmapping to the sign up topic
-      def self.add_bmapping_signuptopic(topicid, bmappingid)
-        topic = SignUpTopic.find(topicid)
+      def self.add_bmapping_signuptopic(topic_id, bmappingid)
+        topic = SignUpTopic.find(topic_id)
         bmapping = Bmapping.find(bmappingid)
         unless (topic.nil? && bmapping.nil?)
           topic.bmappings << bmapping

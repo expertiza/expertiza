@@ -64,6 +64,7 @@ group :development do
   gem 'pry-nav'
   gem 'sqlite3-ruby', :require => 'sqlite3'
   gem 'selenium-webdriver'
+  gem 'quiet_assets'
 end
 
 group :test do

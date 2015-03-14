@@ -100,12 +100,12 @@ module DynamicReviewAssignmentHelper
         @submission_review_count[submission.id] = 0 # There are no reviews in progress (potential or completed).
       else
         @submission_review_count[submission.id] = existing_maps.size
-        end
+      end
     end
 
     # Sort and return the list of submissions by the number of reviews that they have.
     sorted_review_count =  @submission_review_count.sort {|a, b| a[1]<=>b[1]}
     return sorted_review_count
-    end
-
   end
+
+end

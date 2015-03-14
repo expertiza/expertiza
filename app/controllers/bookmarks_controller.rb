@@ -271,6 +271,7 @@ class BookmarksController < ApplicationController
     else
       @order_by = params[:order_by].to_s
     end
+
     #when getting the hidden variable from the form for the users to include.. you might get "value" appended to the string before the param that you
     ##expect .. Remove that
     
@@ -285,48 +286,55 @@ class BookmarksController < ApplicationController
      logger.warn("my_user=>>"+"#{@my_user}")
 
      logger.warn("-------IN search_bookmarks controller------")
+logger.warn("@search_string =>>>"+"#{@search_string}")
 
+      if @search_string.empty?
+            logger.warn("-----------Inside the required if block--------")
+            @search_results = Bookmark.search_alltags_allusers(@order_by)
+      else
+          @search_array  = BookmarksHelper.separate_tags( @search_string)
 
+          logger.warn("#{@search_array}")
 
+          logger.warn("-------marker1-------")
 
-    @search_array  = BookmarksHelper.separate_tags( @search_string)
+          @method_name = "search_bookmarks"
+          @search_results = Array.new
 
-    logger.warn("#{@search_array}")
+          if (@my_user != "all_users")
+            logger.warn("@search_array=>"+"#{@search_array}")
+            logger.warn("@my_user=>"+"#{@my_user}")
+            logger.warn("@order_by=>"+"#{@order_by}")
+            #@my_user=2
+            @search_results = Bookmark.search_fortags_foruser(@search_array, @my_user, @order_by)
+            #print(@search_results)
+            print("Chutya1")
+            logger.warn("#{@search_results}")
+            logger.warn("==============================")
+          else
+            logger.warn("@order_by=>>"+"#{@order_by}")
+            @search_results = Bookmark.search_fortags_allusers(@search_array, @order_by)
+            print(@search_results)
+            print("Chutya2****")
+          end
 
-    logger.warn("-------marker1-------")
+          if(@my_user == "all_users")
+            render :action => "view_bookmarks"
+            print("Chutya3")
+          else
+            logger.warn("#{@search_results}")
+            print("Chutya4before")
+            render :action =>"managing_bookmarks"
+        
+            print(@search_results.count)
+            print("Chutya4")
+          end
+        
 
-    @method_name = "search_bookmarks"
-    @search_results = Array.new
-    if (@my_user != "all_users")
-      logger.warn("@search_array=>"+"#{@search_array}")
-      logger.warn("@my_user=>"+"#{@my_user}")
-      logger.warn("@order_by=>"+"#{@order_by}")
-      #@my_user=2
-      @search_results = Bookmark.search_fortags_foruser(@search_array, @my_user, @order_by)
-      #print(@search_results)
-      print("Chutya1")
-      logger.warn("#{@search_results}")
-      logger.warn("==============================")
-    else
-      logger.warn("@order_by=>>"+"#{@order_by}")
-      @search_results = Bookmark.search_fortags_allusers(@search_array, @order_by)
-      print(@search_results)
-      print("Chutya2****")
-    end
-    if(@my_user == "all_users")
-      render :action => "view_bookmarks"
-      print("Chutya3")
-    else
-      logger.warn("#{@search_results}")
-      print("Chutya4before")
-      render :action =>"managing_bookmarks"
-  
-      print(@search_results.count)
-      print("Chutya4")
-    end
-    print("Chutya5")
-    end
-
+          
+          print("Chutya5")
+          end
+        end
 
   def add_rating_rubric_form
     @rating_rubric = BookmarkRatingRubric.new

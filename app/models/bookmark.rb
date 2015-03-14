@@ -58,13 +58,15 @@ class Bookmark < ActiveRecord::Base
     ## gives the 20 most popular or 20 most recent bookmarks in the system, depending on the order_by parameter. Function returns
     ## an array. Each element of the array is a hash, detailing one record
     def self.search_alltags_allusers(order_by)
+
+      logger.warn("++++++++++In search_alltags_allusers method of model+++++")
       result_array = Array.new #going to append all the results into this array
 
 
       if(order_by == "most_recent")
         ## find all the records in the system, order them by the date created. Using Bmapping here. Returns mappings that where created most recently,
         ## the user that created this mapping, the title and description provided this user
-        result_records = Bmapping.all(:order =>"date_created DESC", :limit =>20)
+        result_records = Bmapping.all.order("date_created DESC").limit(20)
 
         for result in result_records
           ## for each tuple returned by the query above, create a new hash, store the values appropriately, and append into the return_array
@@ -87,10 +89,16 @@ class Bookmark < ActiveRecord::Base
           result_hash["tags"] = BookmarksHelper.join_tags(tag_array)
           result_array << result_hash
 
+          logger.warn("tag_fetch="+"#{tag_fetch.inspect}")
+          logger.warn("result.id="+"#{result.id}")
+          logger.warn("result.bookmark.url="+"#{result.bookmark.url}")
+          logger.warn("result.user.name="+"#{result.user.name}")
+          logger.warn("result_array="+"#{result_array.inspect}")
+
         end
       elsif (order_by == "most_popular")
         ## returns the url boomarked by the most number of users, the discoverer of that url, the title and description provided by the discoverer
-        result_records = Bookmark.all(:order =>"user_count DESC", :limit =>20)
+       result_records = Bookmark.all.order("created_at DESC").limit(20)
         for result in result_records
           ## for each tuple returned by the query above, create a new hash, store the values appropriately, and append into the return_array
           result_hash = Hash.new

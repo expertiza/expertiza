@@ -51,55 +51,20 @@ class Leaderboard < ActiveRecord::Base
                                      "FeedbackResponseMap" => "AuthorFeedbackQuestionnaire",
                                      "TeammateReviewResponseMap" => "TeammateReviewQuestionnaire"}
 
-    # Get all participants of the assignment list
-    #participantList = getAssignmentParticipantList(assignmentList)
-
-
-    # Get all teams participated in the given assignment list.
-    #teamList = getAssignmentUniqueParticipantTeamList(assignmentList)
-
     # Get mapping of participant and team with corresponding assignment.
     # "participant" => {participantId => {"self" => <ParticipantRecord>, "assignment" => <AssignmentRecord>}}
     # "team" => {teamId => <AssignmentRecord>}
     assignmentMap = getAssignmentMapping(assignmentList, getAssignmentUniqueParticipantList(assignmentList), getAssignmentUniqueParticipantTeamList(assignmentList))
 
     # Aggregate total reviewee list
-    revieweeList = Array.new
-    revieweeList = participantList.pluck(:id)
-    revieweeList.concat(teamList.pluck(:id)).uniq!
+    revieweeList=getAssignmentRevieweeList(assignmentList)
 
     # Get scores from ScoreCache for computed reviewee list.
-    scores = ScoreCache.where("reviewee_id IN (?) and object_type IN (?)", revieweeList, questionnaireResponseTypeHash.keys)
+    scores = getRevieweeListScore(revieweeList, questionnaireResponseTypeHash.keys)
 
-    for scoreEntry in scores
-      revieweeUserIdList = Array.new
-      if(assignmentMap["team"].has_key?(scoreEntry.reviewee_id))
-        # Reviewee is a team. Actual Reviewee will be users of the team.
-        teamUserIds = TeamsUser.where(:team_id => scoreEntry.reviewee_id).pluck(:user_id)
-        revieweeUserIdList.concat(teamUserIds)
-        courseId = assignmentMap["team"][scoreEntry.reviewee_id].try(:course_id).to_i
-      else
-        # Reviewee is an individual participant.
-        revieweeUserIdList << assignmentMap["participant"][scoreEntry.reviewee_id]["self"].try(:user_id)
-        courseId = assignmentMap["participant"][scoreEntry.reviewee_id]["assignment"].try(:course_id).to_i
-      end
-
-      questionnaireType = questionnaireResponseTypeHash[scoreEntry.object_type]
-
-      addScoreToResultantHash(qTypeHash, questionnaireType, courseId, revieweeUserIdList, scoreEntry.score)
-    end
-
-    qTypeHash
-  end
-  # This method returns the unique participants for assignment list.
-  def self.getAssignmentUniqueParticipantList(assignmentList)
-    AssignmentParticipant.where(:parent_id => assignmentList.pluck(:id)).uniq
+    return getUserScoreHashForCourse(scores,qTypeHash)
   end
 
-  # This method returns the unique participant teams for assignment list.
-  def self.getAssignmentUniqueParticipantTeamList(assignmentList)
-    Team.where("parent_id IN (?) AND type = ?", assignmentList.pluck(:id), 'AssignmentTeam').uniq
-  end
 
   # This method adds score to all the revieweeUser in qTypeHash.
   # Later, qTypeHash will contain the final computer leaderboard.
@@ -220,5 +185,50 @@ class Leaderboard < ActiveRecord::Base
       "No Entry"
     end
   end
+
+  #All the methods below are private methods
+  private
+  #End result is a hash (qType => (course => (user => score)))
+  def Self.getUserScoreHashForCourse(scores,qTypeHash)
+    for scoreEntry in scores
+      revieweeUserIdList = Array.new
+      if(assignmentMap["team"].has_key?(scoreEntry.reviewee_id))
+        # Reviewee is a team. Actual Reviewee will be users of the team.
+        teamUserIds = TeamsUser.where(:team_id => scoreEntry.reviewee_id).pluck(:user_id)
+        revieweeUserIdList.concat(teamUserIds)
+        courseId = assignmentMap["team"][scoreEntry.reviewee_id].try(:course_id).to_i
+      else
+        # Reviewee is an individual participant.
+        revieweeUserIdList << assignmentMap["participant"][scoreEntry.reviewee_id]["self"].try(:user_id)
+        courseId = assignmentMap["participant"][scoreEntry.reviewee_id]["assignment"].try(:course_id).to_i
+      end
+
+      questionnaireType = questionnaireResponseTypeHash[scoreEntry.object_type]
+
+      addScoreToResultantHash(qTypeHash, questionnaireType, courseId, revieweeUserIdList, scoreEntry.score)
+    end
+    qTypeHash
+  end
+
+  def Self.getRevieweeListScore(revieweeList,questionnaireResponseTypeHash)
+    ScoreCache.where("reviewee_id IN (?) and object_type IN (?)", revieweeList, questionnaireResponseTypeHash.keys)
+  end
+  # Aggregate total reviewee list for an assignment
+  def Self.getAggregatedAssignmentRevieweeList(assignmentList)
+    revieweeList=Array.new
+    revieweeList= getAssignmentUniqueParticipantTeamList(assignmentList).pluck(:id)
+    revieweeList.concat(getAssignmentUniqueParticipantTeamList(assignmentList).pluck(:id)).uniq!
+
+  end
+  # This method returns the unique participants for assignment list.
+  def self.getAssignmentUniqueParticipantList(assignmentList)
+    AssignmentParticipant.where(:parent_id => assignmentList.pluck(:id)).uniq
+  end
+
+  # This method returns the unique participant teams for assignment list.
+  def self.getAssignmentUniqueParticipantTeamList(assignmentList)
+    Team.where("parent_id IN (?) AND type = ?", assignmentList.pluck(:id), 'AssignmentTeam').uniq
+  end
+  #All the methods till here are private methods
 
 end

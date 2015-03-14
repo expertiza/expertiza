@@ -309,13 +309,16 @@ logger.warn("@search_string =>>>"+"#{@search_string}")
             logger.warn("@order_by=>"+"#{@order_by}")
             #@my_user=2
             @search_results = Bookmark.search_fortags_foruser(@search_array, @my_user, @order_by)
+            #@search_results = Bookmark.search_fortags(@search_array, @order_by,@my_user)
             #print(@search_results)
             print("Chutya1")
             logger.warn("#{@search_results}")
             logger.warn("==============================")
           else
             logger.warn("@order_by=>>"+"#{@order_by}")
+            #@search_results = Bookmark.search_fortags_allusers(@search_array, @order_by)
             @search_results = Bookmark.search_fortags_allusers(@search_array, @order_by)
+            #@search_results = Bookmark.search_fortags(@search_array, @order_by,nil)
             print(@search_results)
             print("Chutya2****")
           end

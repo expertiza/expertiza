@@ -207,63 +207,7 @@ class Bookmark < ActiveRecord::Base
       ## returns the 20 most recent bookmarks_mappings made by the user specified, or the most popular bookmarks in this user's repository, depending on the order_by
       ## Function returns an array. Each element of the array is a hash detailing one record
       def self.search_alltags_foruser (the_userid, order_by)
-        result_array = Array.new #going to append all the results into this array
-
-        if(order_by == "most_recent" )
-          ## find all the bmappings in this system, created by this user, order them by the date created.
-          # For each tuple returned from the bmapping, generate a hash, containing the url, the specified user's name, date this mapping was made,
-          ## title, and description provided by this user. Store these hashes sequentially in a array ad return the array
-
-          result_records = Bmapping.where([" user_id = ?", the_userid]).order("date_created DESC").limit(20)
-          for result in result_records
-            result_hash = Hash.new
-            result_hash["id"] = result.id
-            result_hash["url"] = result.bookmark.url
-            result_hash["user"] = User.find(the_userid).name
-            result_hash["created_at"] = result.date_created
-            result_hash["title"] = result.title
-            result_hash["description"] = result.description
-            result_hash["copied_by"] = result.bookmark.user_count
-            ## now retrieving tags for this user-bookmak mapping
-            ## first retrieve all the tag_ids mapped to the BMapping id. Then retrieve all the tag names of the tag_ids picked up.
-            ## Append all these into a comma separated string, and push them onto the hash
-
-            tag_fetchs = BmappingsTags.where(["bmapping_id = ?",result.id])
-            tag_array = Array.new
-            for tag_fetch in tag_fetchs
-              tag_array << Tag.find(tag_fetch.tag_id).tagname
-            end
-            result_hash["tags"] = BookmarksHelper.join_tags(tag_array)
-            result_array << result_hash
-          end
-        elsif ( order_by == "most_popular")
-          ### retrieving the most popular records that this user.(The user need not be the discoverer). First retrieve the the user's bookmarks from the bmapping.
-          ### order these records, based on the user_count of the url
-          temp_result_records = Bmapping.where([" user_id = ?", the_userid])
-          ## order result records by result.user_count a.sort {|x,y| y <=> x }
-          result_records = temp_result_records.sort {|x,y| y.bookmark.user_count <=> x.bookmark.user_count}
-          for result in result_records
-            result_hash = Hash.new
-            result_hash["url"] = result.bookmark.url
-            result_hash["id"] = result.id
-            result_hash["user"] = User.find(the_userid).name
-            result_hash["title"] = result.title
-            result_hash["description"] = result.description
-            result_hash["copied_by"] = result.bookmark.user_count
-            ## now retrieving tags for this user-bookmak mapping
-            ## first retrieve all the tag_ids mapped to the BMapping id. Then retrieve all the tag names of the tag_ids picked up.
-            ## Append all these into a comma separated string, and push them onto the hash
-
-            tag_fetchs = BmappingsTags.where(["bmapping_id = ?",result.id])
-            tag_array = Array.new
-            for tag_fetch in tag_fetchs
-              tag_array << Tag.find(tag_fetch.tag_id).tagname
-            end
-            result_hash["tags"] =BookmarksHelper.join_tags(tag_array)
-            result_array << result_hash
-          end
-        end
-        return result_array
+         Bookmark.search_alltags(the_userid,order_by)
       end
 
       def self.search_alltags (the_userid, order_by)

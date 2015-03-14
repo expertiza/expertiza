@@ -17,6 +17,7 @@ gem 'dynamic_form'
 gem 'edavis10-ruby-web-search'
 gem 'engtagger'
 gem 'expertiza-authlogic', github: 'expertiza/authlogic', :require => 'authlogic'
+gem 'eventmachine', github: "eventmachine/eventmachine"
 gem 'fastercsv'
 gem 'ffi-aspell'
 gem 'font-awesome-rails'

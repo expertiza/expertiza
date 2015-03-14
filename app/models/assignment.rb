@@ -1,19 +1,18 @@
-###
-###
-### This class needs refactoring
-### 
-###
+require 'analytic/assignment_analytic'
 class Assignment < ActiveRecord::Base
-  require 'analytic/assignment_analytic'
+
   include AssignmentAnalytic
   include DynamicReviewMapping
   has_paper_trail
+  # Relationships
   belongs_to :course
   belongs_to :wiki_type
+  belongs_to :instructor, :class_name => 'User', :foreign_key => 'instructor_id'
   # wiki_type needs to be removed. When an assignment is created, it needs to
   # be created as an instance of a subclass of the Assignment (model) class;
   # then Rails will "automatically' set the type field to the value that
   # designates an assignment of the appropriate type.
+
   has_many :participants, :class_name => 'AssignmentParticipant', :foreign_key => 'parent_id'
   has_many :participant_review_mappings, :class_name => 'ParticipantReviewResponseMap', :through => :participants, :source => :review_mappings
   has_many :users, :through => :participants
@@ -21,20 +20,20 @@ class Assignment < ActiveRecord::Base
   has_many :teams, :class_name => 'AssignmentTeam', :foreign_key => 'parent_id'
   has_many :team_review_mappings, :class_name => 'TeamReviewResponseMap', :through => :teams, :source => :review_mappings
   has_many :invitations, :class_name => 'Invitation', :foreign_key => 'assignment_id', :dependent => :destroy
-  has_many :assignment_questionnaires,:dependent => :destroy
+  has_many :assignment_questionnaires, :dependent => :destroy
   has_many :questionnaires, :through => :assignment_questionnaires
-  belongs_to :instructor, :class_name => 'User', :foreign_key => 'instructor_id'
   has_many :sign_up_topics, :foreign_key => 'assignment_id', :dependent => :destroy
   has_many :response_maps, :foreign_key => 'reviewed_object_id', :class_name => 'ResponseMap'
-  has_one :assignment_node,:foreign_key => :node_object_id,:dependent => :destroy
+  has_one :assignment_node, :foreign_key => :node_object_id,:dependent => :destroy
 
-  validates_presence_of :name
-  validates_uniqueness_of :name, :scope => :course_id
+  # Validations
+  validates :name, presense: true, uniquness: { scope: :course_id }
+
 
   COMPLETE = 'Finished'
   WAITLIST = 'Waitlist open'
 
-  REVIEW_QUESTIONNAIRES = {:author_feedback => 0, :metareview => 1, :review => 2, :teammate_review => 3}
+  REVIEW_QUESTIONNAIRES = { :author_feedback => 0, :metareview => 1, :review => 2, :teammate_review => 3 }
   #  Review Strategy information.
   RS_INSTRUCTOR_SELECTED = 'Instructor-Selected'
   RS_STUDENT_SELECTED = 'Student-Selected'
@@ -65,7 +64,7 @@ class Assignment < ActiveRecord::Base
     #####contributor_set.reject! { |contributor| !contributor.has_quiz? }
     # Reject contributions of topics whose deadline has passed
     contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "Complete" or
-                              contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "submission" }
+    contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "submission" }
 
     # Filter the contributors with the least number of reviews
     # (using the fact that each contributor is associated with a topic)
@@ -73,7 +72,6 @@ class Assignment < ActiveRecord::Base
 
     ### min_quizzes = contributor.quiz_mappings.count rescue 0
     ###contributor_set.reject! { |contributor| contributor.quiz_mappings.count > min_quizzes + review_topic_threshold }
-
 
     candidate_topics = Set.new
     contributor_set.each { |contributor| candidate_topics.add(signed_up_topic(contributor)) }
@@ -89,29 +87,29 @@ class Assignment < ActiveRecord::Base
     # Initialize contributor set with all teams participating in this assignment
     contributor_set = Array.new(contributors)
 
- 
+
     # Reject contributors that have not selected a topic, or have no submissions
-    contributor_set=reject_by_no_topic_selection_or_no_submission(contributor_set)
+    contributor_set = reject_by_no_topic_selection_or_no_submission(contributor_set)
 
     # Reject contributions of topics whose deadline has passed, or which are not reviewable in the current stage
-    contributor_set=reject_by_deadline(contributor_set)
+    contributor_set = reject_by_deadline(contributor_set)
 
 
     # Filter submission by reviewer him/her self
-    contributor_set=reject_own_submission(contributor_set, reviewer)
+    contributor_set = reject_own_submission(contributor_set, reviewer)
 
     if self.varying_rubrics_by_round?
       current_round = self.get_current_round(nil)
       contributor_set = reject__reviewed_submissions_in_current_round(contributor_set, reviewer,current_round)
     else
       # Filter submissions already reviewed by reviewer
-      contributor_set=reject_previously_reviewed_submissions(contributor_set, reviewer)
+      contributor_set = reject_previously_reviewed_submissions(contributor_set, reviewer)
     end
 
 
     # Filter the contributors with the least number of reviews
     # (using the fact that each contributor is associated with a topic)
-    contributor_set=reject_by_least_reviewed(contributor_set)
+    contributor_set = reject_by_least_reviewed(contributor_set)
 
     # Add topics for all remaining submissions to a list of available topics for review
     candidate_topics = Set.new
@@ -163,7 +161,7 @@ class Assignment < ActiveRecord::Base
 
   def reject_by_deadline(contributor_set)
     contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'Complete' or
-        !contributor.assignment.review_allowed(signed_up_topic(contributor).id) }
+    !contributor.assignment.review_allowed(signed_up_topic(contributor).id) }
     return contributor_set
   end
 
@@ -236,7 +234,7 @@ class Assignment < ActiveRecord::Base
     # 3) remove contributors that have not submitted work yet
     contributor_set.reject! do |contributor|
       signed_up_topic(contributor) != topic or # both will be nil for assignments with no signup sheet
-        contributor.includes?(reviewer) ###or !contributor.has_quiz?
+      contributor.includes?(reviewer) ###or !contributor.has_quiz?
     end
     raise "There are no more submissions to take quiz on for this #{work}." if contributor_set.empty?
     #flash[:error] = "There are no more submissions to take quiz on for this #{work}."
@@ -271,9 +269,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def quiz_taken_by?(contributor, reviewer)
-    quiz_id = QuizQuestionnaire.find_by_instructor_id(contributor.id).id
-    return QuizResponseMap.where(['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?',
-                                  contributor.id, reviewer.id, quiz_id]).count > 0
+    quiz_id = QuizQuestionnaire.select(:id, :instructor_id).find_by(instructor_id: contributor.id).id
+    QuizResponseMap.where(reviewee_id: contributor.id, reviewer_id: reviewer.id, reviewed_object_id: quiz_id).count > 0
   end
 
   # Returns a contributor to review if available, otherwise will raise an error
@@ -385,10 +382,10 @@ class Assignment < ActiveRecord::Base
   alias_method :is_using_dynamic_reviewer_assignment?, :dynamic_reviewer_assignment?
 
   def review_mappings
-    #ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
+    # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     TeamReviewResponseMap.where(reviewed_object_id: self.id)
-    end
+  end
 
   def metareview_mappings
     mappings = Array.new
@@ -491,7 +488,7 @@ class Assignment < ActiveRecord::Base
     num_questions = 0
     questionnaire.questions.each do |question| #type identifies the type of questionnaire
       sum_of_weights += question.weight
-      num_questions+=1
+      num_questions += 1
     end
     max = num_questions * questionnaire.max_question_score * sum_of_weights
     return max, sum_of_weights
@@ -508,21 +505,21 @@ class Assignment < ActiveRecord::Base
 
   # Check whether review, metareview, etc.. is allowed
   # If topic_id is set, check for that topic only. Otherwise, check to see if there is any topic which can be reviewed(etc) now
-  def check_condition(column, topic_id=nil)
+  def check_condition(column, topic_id = nil)
     # the drop topic deadline should not play any role in picking the next due date
     # get the drop_topic_deadline_id to exclude it
     drop_topic_deadline_id = DeadlineType.find_by_name('drop_topic').id
     self.staggered_deadline? ?
       topic_id ?
       next_due_dates = TopicDeadline
-      .where( ['topic_id = ? && due_at >= ? && deadline_type_id <> ?', topic_id, Time.now, drop_topic_deadline_id])
-      .order('due_at') :
-    next_due_dates = TopicDeadline
-      .where( ['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id])
-      .joins( {:topic => :assignment}, :order => 'due_at') :
-    next_due_dates = DueDate
-      .where( ['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id])
-      .order('due_at')
+    .where( ['topic_id = ? && due_at >= ? && deadline_type_id <> ?', topic_id, Time.now, drop_topic_deadline_id])
+    .order('due_at') :
+      next_due_dates = TopicDeadline
+    .where( ['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id])
+    .joins( {:topic => :assignment}, :order => 'due_at') :
+      next_due_dates = DueDate
+    .where( ['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id])
+    .order('due_at')
     next_due_date = next_due_dates.first
 
     return false if next_due_date.nil?
@@ -543,12 +540,12 @@ class Assignment < ActiveRecord::Base
 
   # Determine if the next due date from now allows to take the quizzes
   def quiz_allowed(topic_id=nil)
-    return check_condition("quiz_allowed_id",topic_id)
+    check_condition("quiz_allowed_id",topic_id)
   end
 
   # Determine if the next due date from now allows for reviews
   def review_allowed(topic_id=nil)
-    (check_condition('review_allowed_id', topic_id) )
+    check_condition('review_allowed_id', topic_id)
   end
 
   # Determine if the next due date from now allows for metareviews
@@ -557,7 +554,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def get_quiz_deadline
-    return (DueDate.where( ['assignment_id = ? and deadline_type_id >= ?', self.id, 7]).due_at)
+    DueDate.where( ['assignment_id = ? and deadline_type_id >= ?', self.id, 7]).due_at
   end
 
   def delete(force = nil)
@@ -631,17 +628,17 @@ class Assignment < ActiveRecord::Base
              :first_name => ApplicationHelper::get_user_first_name(user),
              :partial_name => 'update'
            }
-        }
+           }
         ).deliver
       end
     end
-    end
+  end
 
   # Get all review mappings for this assignment & reviewer
   # required to give reviewer location of new submission content
   # link cannot be provided as it might give user ability to access data not
   # available to them.
-  #ajbudlon, sept 07, 2007
+  # ajbudlon, sept 07, 2007
   def get_review_number(mapping)
     reviewer_mappings = ResponseMap.where(reviewer_id: mapping.reviewer.id)
     review_num = 1
@@ -674,14 +671,14 @@ class Assignment < ActiveRecord::Base
       # Is it possible to submit a URL (or a wiki page)
     elsif assignment.directory_path != nil && /(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix.match(assignment.directory_path)
       # In this case we have to check if the directory_path starts with http / https.
-      return true
+        return true
       # Is it possible to submit a Google Doc?
       #    removed because google doc not implemented
       #    elsif assignment.wiki_type == 4 #GOOGLE_DOC
       #      return true
-      else
-        return false
-      end
+    else
+      return false
+    end
   end
 
   def is_google_doc
@@ -735,7 +732,7 @@ class Assignment < ActiveRecord::Base
         i = 0
         for due_date in due_dates
           if Time.now < due_date.due_at and
-              (due_dates[i+1] == nil or Time.now > due_dates[i+1].due_at)
+            (due_dates[i+1] == nil or Time.now > due_dates[i+1].due_at)
             return due_date.round
           end
           i = i + 1
@@ -744,12 +741,12 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  #For varying rubric feature
+  # For varying rubric feature
   def get_current_stage_name(topic_id=nil)
     if self.staggered_deadline?
-       if topic_id.nil?
-          return 'Unknown'
-       end
+      if topic_id.nil?
+        return 'Unknown'
+      end
     end
     due_date = find_current_stage(topic_id)
 
@@ -760,7 +757,7 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  #check if this assignment has multiple review phases with different review rubrics
+  # check if this assignment has multiple review phases with different review rubrics
   def varying_rubrics_by_round?
     assignment_questionnaires = AssignmentQuestionnaire.where(:assignment_id=>self.id,:used_in_round=>2)
 
@@ -796,7 +793,7 @@ class Assignment < ActiveRecord::Base
     due_dates = DueDate.where(assignment_id: self.id)
     rounds=0
     due_dates.each{
-        |due_date|
+      |due_date|
       if due_date.round>rounds
         rounds = due_date.round
       end
@@ -867,7 +864,7 @@ class Assignment < ActiveRecord::Base
       @review_scores[response_map.reviewer_id] = @respective_scores
     end
     @review_scores
-    end
+  end
 
   def get_review_questionnaire_id
     @revqids = []
@@ -1011,19 +1008,19 @@ class Assignment < ActiveRecord::Base
     if (self.require_quiz?)
       signups = SignedUpUser.where(creator_id: contributor.id)
       for signup in signups do
-        signuptopic = SignUpTopic.find(signup.topic_id)
-        if (signuptopic.assignment_id == self.id)
-          contributors_signup_topic = signuptopic
-          return contributors_signup_topic
+          signuptopic = SignUpTopic.find(signup.topic_id)
+          if (signuptopic.assignment_id == self.id)
+            contributors_signup_topic = signuptopic
+            return contributors_signup_topic
+          end
         end
       end
-    end
 
-    # Look for the topic_id where the creator_id equals the contributor id (contributor is a team or a participant)
-    (!Team.where(name: contributor.name, id:  contributor.id).first.nil?) ?
-      contributors_topic = SignedUpUser.find_by_creator_id(contributor.id) :
-      contributors_topic = SignedUpUser.find_by_creator_id(contributor.user_id)
-    contributors_signup_topic = SignUpTopic.find(contributors_topic.topic_id) if !contributors_topic.nil?
+      # Look for the topic_id where the creator_id equals the contributor id (contributor is a team or a participant)
+      (!Team.where(name: contributor.name, id:  contributor.id).first.nil?) ?
+        contributors_topic = SignedUpUser.find_by_creator_id(contributor.id) :
+        contributors_topic = SignedUpUser.find_by_creator_id(contributor.user_id)
+      contributors_signup_topic = SignUpTopic.find(contributors_topic.topic_id) if !contributors_topic.nil?
     end
 
     def self.export(csv, parent_id, options)
@@ -1115,7 +1112,7 @@ class Assignment < ActiveRecord::Base
     def has_partner_ads?(id)
       #Team.find_by_sql("select * from teams where parent_id = "+id+" AND advertise_for_partner='1'").size > 0
       return Team.find_by_sql("select t.* "+
-          "from teams t, signed_up_users s "+
-          "where s.topic_id='"+id.to_s+"' and s.creator_id = t.id and t.advertise_for_partner = 1").size > 0
+                              "from teams t, signed_up_users s "+
+                              "where s.topic_id='"+id.to_s+"' and s.creator_id = t.id and t.advertise_for_partner = 1").size > 0
     end
   end

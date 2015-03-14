@@ -52,8 +52,8 @@ class Bookmark < ActiveRecord::Base
       btu_tuple.tag_id = tag_tuple.id
       btu_tuple.bmapping_id = bookmark_user_mapping.id
       btu_tuple.save
+      end
     end
-  end
 
     ## gives the 20 most popular or 20 most recent bookmarks in the system, depending on the order_by parameter. Function returns
     ## an array. Each element of the array is a hash, detailing one record
@@ -192,8 +192,8 @@ class Bookmark < ActiveRecord::Base
       for each_tag in @tags
         ##search for all qualifier tuples with b
         q_tuples = BmappingsTags.where(["tag_id = ?", each_tag])
-        #for q_t in q_tuples
-        #end
+        for q_t in q_tuples
+        end
 
         if first_time == "true"
           for q_t in q_tuples
@@ -362,9 +362,9 @@ class Bookmark < ActiveRecord::Base
           btu_tuple.bmapping_id = bookmark_user_mapping.id
           btu_tuple.save
         end
-      end
+        end
         return bookmark_user_mapping.id
-    end
+      end
 
       # Associate bmapping to the sign up topic
       def self.add_bmapping_signuptopic(topicid, bmappingid)
@@ -386,7 +386,7 @@ class Bookmark < ActiveRecord::Base
           # For each tuple returned from the bmapping, generate a hash, containing the url, the specified user's name, date this mapping was made,
           ## title, and description provided by this user. Store these hashes sequentially in a array ad return the array
 
-          result_records = Bmapping.where([" user_id = ?", the_userid]).order("date_created DESC").limit(20)
+          result_records = Bmapping.where([" user_id = ?", the_userid].order("date_created DESC").limit(20)
           for result in result_records
             result_hash = Hash.new
             result_hash["id"] = result.id
@@ -437,5 +437,5 @@ class Bookmark < ActiveRecord::Base
         end
         return result_array
       end
-end
+    end
 

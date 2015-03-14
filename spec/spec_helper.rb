@@ -1,5 +1,6 @@
 # Record code coverage with coveralls on Travis
 require 'coveralls'
+require File.expand_path("../../config/environment", __FILE__)
 Coveralls.wear! 'rails'
 
 # Record code coverage with simplecov locally

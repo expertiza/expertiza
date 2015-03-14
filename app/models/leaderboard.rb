@@ -120,29 +120,11 @@ class Leaderboard < ActiveRecord::Base
     resultHash
   end
 
-##  # This method is moved to leaderboard_helper.rb
-##  # This method does a destructive sort on the computed scores hash so
-##  # that it can be mined for personal achievement information
-##  def self.sortHash(qTypeHash)
-##    result = Hash.new
-##    # Deep-copy of Hash
-##    result = Marshal.load(Marshal.dump(qTypeHash))
-##
-##    result.each { |qType, courseHash|
-##      courseHash.each { |courseId, userScoreHash|
-##        userScoreSortArray = userScoreHash.sort { |a, b| b[1][0] <=> a[1][0]}
-##        result[qType][courseId] = userScoreSortArray
-##      }
-##    }
-##    result
-##  end
-
   # This method takes the sorted computed score hash structure and mines
   # it for personal achievement information.
   def self.extractPersonalAchievements(csHash, courseIdList, userId)
     # Get all the possible accomplishments from Leaderboard table
     leaderboardRecords = Leaderboard.all()
-    courseAccomplishmentHash = Hash.new
     accomplishmentMap = Hash.new
 
     # Create map of accomplishment with its name
@@ -150,28 +132,7 @@ class Leaderboard < ActiveRecord::Base
       accomplishmentMap[leaderboardRecord.qtype] = leaderboardRecord.name
     end
 
-    csSortedHash = LeaderboardHelper.sortHash(csHash)
-
-    for courseId in courseIdList
-      for accomplishment in accomplishmentMap.keys
-        # Get score for current questionnaireType/accomplishment, courseId and userId from csHash
-        score = csHash.fetch(accomplishment, {}).fetch(courseId, {}).fetch(userId, nil)
-        if(score)
-          if courseAccomplishmentHash[courseId].nil?
-            courseAccomplishmentHash[courseId] = Array.new
-          end
-          # Calculate rank of current user
-          rank = 1 + csSortedHash[accomplishment][courseId].index([userId, score])
-          total = csSortedHash[accomplishment][courseId].length
-
-          courseAccomplishmentHash[courseId] << {:accomp => accomplishmentMap[accomplishment],
-                                                 :score => score[0],
-                                                 :rankStr => "#{rank} of #{total}"
-          }
-        end
-      end
-    end
-    courseAccomplishmentHash
+    return getCourseAccomplishmentHash(courseIdList,accomplishmentMap,userId,csHash)
   end
 
   # Returns string for Top N Leaderboard Heading or accomplishments entry
@@ -226,6 +187,33 @@ class Leaderboard < ActiveRecord::Base
   # This method returns the unique participant teams for assignment list.
   def self.getAssignmentUniqueParticipantTeamList(assignmentList)
     Team.where("parent_id IN (?) AND type = ?", assignmentList.pluck(:id), 'AssignmentTeam').uniq
+  end
+  
+  # This method returns course accomplishment hash for a user
+  def self.getCourseAccomplishmentHash(courseIdList,accomplishmentMap,userId,csHash)
+    courseAccomplishmentHash = Hash.new
+    csSortedHash = LeaderboardHelper.sortHash(csHash)
+
+    for courseId in courseIdList
+      for accomplishment in accomplishmentMap.keys
+        # Get score for current questionnaireType/accomplishment, courseId and userId from csHash
+        score = csHash.fetch(accomplishment, {}).fetch(courseId, {}).fetch(userId, nil)
+        if(score)
+          if courseAccomplishmentHash[courseId].nil?
+            courseAccomplishmentHash[courseId] = Array.new
+          end
+          # Calculate rank of current user
+          rank = 1 + csSortedHash[accomplishment][courseId].index([userId, score])
+          total = csSortedHash[accomplishment][courseId].length
+
+          courseAccomplishmentHash[courseId] << {:accomp => accomplishmentMap[accomplishment],
+                                                 :score => score[0],
+                                                 :rankStr => "#{rank} of #{total}"
+          }
+        end
+      end
+    end
+    courseAccomplishmentHash
   end
   #All the methods till here are private methods
 

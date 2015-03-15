@@ -19,7 +19,8 @@ class AuthController < ApplicationController
       AuthController.clear_session(session)
     else
       user = User.find_by_login(params[:login][:name])
-
+      logger.warn "#{params[:login][:name]}"
+      logger.warn "User value: #{user.inspect}"
       #if user and user.valid_password?(params[:login][:password])
         after_login(user)
       #else

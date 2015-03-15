@@ -2,7 +2,7 @@
 //overwrite rails default behavior
 $.rails.allowAction = function(link) {
   console.log(link.attr('data-relationship'))
-  if ((!link.attr('data-confirm')) || (link.attr('data-relationship') == 'false')) {
+  if ((!link.attr('data-confirm')) || (link.attr('data-relationship') && link.attr('data-relationship') == 'false')) {
    return true;
   }
   $.rails.showConfirmDialog(link);

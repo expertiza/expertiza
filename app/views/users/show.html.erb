@@ -22,7 +22,7 @@
   <p><%= link_to 'Edit', :action => 'edit', :id => @user %> |
 <!--This user cannot be deleted directly-->
     <% if (@assignment_participant_num != 0)%> 
-      <%= link_to 'Delete', {:action => 'destroy', :id => @user}, data:{:confirm => "User is participating in #{@assignment_participant_num} assignments.<br/>Delete as a participant in these assignment(s)?", :relationship => 'true'}, :method => :delete, remote: true%>   
+      <%= link_to 'Delete', {:action => 'destroy', :id => @user}, data:{:confirm => "User is participating in #{@assignment_participant_num} assignments.<br/>Delete as a participant in these assignment(s)?", :relationship => 'true', :username => @user.name}, :method => :delete, remote: true%>   
     <% else %>
        <%= link_to 'Delete', {:action => 'destroy', :id => @user}, data:{:confirm => "User joins in #{@assignment_participant_num} assignment(s), but without participates in any assignments. Delete as a participant in these assignment(s)?", :relationship => 'false'}, :method => :delete, remote: true%>
     <% end %>

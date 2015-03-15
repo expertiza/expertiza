@@ -127,9 +127,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  def get_author_name
-    return self.fullname
-  end
 
   def self.yesorno(elt)
     if elt==true

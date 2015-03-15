@@ -2,7 +2,7 @@
 //overwrite rails default behavior
 $.rails.allowAction = function(link) {
   console.log(link.attr('data-relationship'))
-  if ((!link.attr('data-confirm')) || (link.attr('data-relationship') && link.attr('data-relationship') == 'false')) {
+  if ((!link.attr('data-confirm')) || (link.attr('data-relationship') == 'false')) {
    return true;
   }
   $.rails.showConfirmDialog(link);
@@ -45,20 +45,9 @@ $.rails.showConfirmDialog = function(link) {
                 $( this ).dialog( "close" );
               },
               "Yes": function() {
-                  //rename the user account to <current_account_name>_hidden.
-                  jQuery('#edit').click(function(){ // use event as per your need
-                     $.ajax({
-                            type: "POST",
-                            url:    "/edit", // should be mapped in routes.rb
-                            data: {name:"#{@user.name}_hidden"},
-                            datatype:"html", // check more option
-                            success: function(data) {
-                                     // handle response data
-                                     },
-                            async:   true
-                          });    
+                  
+                    $('#rename').click 
 
-                  });
                   $( this ).dialog( "close" );
                   $(html3).modal();
                   $("#dialog-confirm3").dialog({

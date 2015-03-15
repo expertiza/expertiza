@@ -156,6 +156,12 @@ class UsersController < ApplicationController
   def update
     @user = User.find params[:id]
 
+    #update username, when the user cannot be deleted
+    #rename occurs in 'show' page, not in 'edit' page
+    #eg. /users/5408?name=5408
+    if (request.original_fullpath == "/users/#{@user.id}?name=#{@user.id}")
+      @user.name += '_hidden'
+    end
     if @user.update_attributes(params[:user])
       undo_link("User \"#{@user.name}\" has been updated successfully. ")
       redirect_to @user
@@ -164,7 +170,6 @@ class UsersController < ApplicationController
       render :action => 'edit'
     end
   end
-
 
   def destroy
     begin

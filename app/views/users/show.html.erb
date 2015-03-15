@@ -20,11 +20,13 @@
 <% unless current_user_role? == "Student" %>
   <hr/>
   <p><%= link_to 'Edit', :action => 'edit', :id => @user %> |
+<!--This user cannot be deleted directly-->
     <% if (@assignment_participant_num != 0)%> 
-      <%= link_to 'Delete', {:action => 'destroy', :id => @user}, data:{:confirm => "User is participating in #{@assignment_participant_num} assignments.<br/>Delete as a participant in these assignment(s)?", :relationship => 'true'}, :method => :delete%>   
+      <%= link_to 'Delete', {:action => 'destroy', :id => @user}, data:{:confirm => "User is participating in #{@assignment_participant_num} assignments.<br/>Delete as a participant in these assignment(s)?", :relationship => 'true'}, :method => :delete, remote: true, id: 'update_username' %>   
     <% else %>
-       <%= link_to 'Delete', {:action => 'destroy', :id => @user}, data:{:confirm => "User joins in #{@assignment_participant_num} assignment(s), but without participates in any assignments. Delete as a participant in these assignment(s)?",  :relationship => 'false'}, :method => :delete%>
+       <%= link_to 'Delete', {:action => 'destroy', :id => @user}, data:{:confirm => "User joins in #{@assignment_participant_num} assignment(s), but without participates in any assignments. Delete as a participant in these assignment(s)?",  :relationship => 'false'}, :method => :delete, remote: true %>
     <% end %>
+    <%= link_to 'rename', {:action => 'update', :name => @user},:method => :update, :id => 'rename', :style => 'color: #FFFFFF; margin-left: 80%;'%>
 </p>
 
 <p><%= link_to 'Back', :action => 'list' %> to Users list</p>

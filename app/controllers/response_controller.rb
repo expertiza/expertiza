@@ -97,11 +97,8 @@ class ResponseController < ApplicationController
           @review_scores << Score.where(response_id: @response.response_id, question_id:  question.id).first
       }
       # Check whether this is Jen's assgt. & if so, use her rubric
-      if (@assignment.instructor_id == User.find_by_name("jace_smith").id) && @title == "Review"
-        handle_jens_assignment
-      else
-        render :action => 'response'
-      end
+      check_jens_assignment 
+      render :action => 'response'
     else
       #else create a new version and update it.
       @header = "New"
@@ -112,11 +109,8 @@ class ResponseController < ApplicationController
       @modified_object = @map.map_id
       get_content
       # Check whether this is Jen's assgt. & if so, use her rubric
-      if (@assignment.instructor_id == User.find_by_name("jace_smith").id) && @title == "Review"
-        handle_jens_assignment
-      else
-        render :action => 'response'
-      end
+      check_jens_assignment
+      render :action => 'response'
     end
   end
 
@@ -388,16 +382,17 @@ class ResponseController < ApplicationController
   end
   
   #kludge for checking if assignment is jen's assignment and using her rubric if it is
-  def handle_jens_assignment
-    if @assignment.id < 469
+  def check_jens_assignment
+   if (@assignment.instructor_id == User.find_by_name("jace_smith").id) && @title == "Review"
+	if @assignment.id < 469
           @next_action = "update"
           render :action => 'custom_response'
         else
           @next_action = "update"
           render :action => 'custom_response_2011'
         end
+   end
   end
-
   
   def redirect_when_disallowed(response)
     # For author feedback, participants need to be able to read feedback submitted by other teammates.

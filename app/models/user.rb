@@ -109,10 +109,6 @@ class User < ActiveRecord::Base
     password
   end
 
-  def self.random_password(size=8)
-    random_pronouncable_password((size/2).round) + rand.to_s[2,3]
-  end
-
   def self.import(row,session,id = nil)
     if row.length != 4
       raise ArgumentError, "Not enough items"

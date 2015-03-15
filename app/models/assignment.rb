@@ -64,7 +64,7 @@ class Assignment < ActiveRecord::Base
     #####contributor_set.reject! { |contributor| !contributor.has_quiz? }
     # Reject contributions of topics whose deadline has passed
     contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "Complete" or
-    contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "submission" }
+                              contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "submission" }
 
     # Filter the contributors with the least number of reviews
     # (using the fact that each contributor is associated with a topic)
@@ -160,7 +160,7 @@ class Assignment < ActiveRecord::Base
 
   def reject_by_deadline(contributor_set)
     contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'Complete' or
-    !contributor.assignment.review_allowed(signed_up_topic(contributor).id) }
+                              !contributor.assignment.review_allowed(signed_up_topic(contributor).id) }
     contributor_set
   end
 
@@ -233,7 +233,7 @@ class Assignment < ActiveRecord::Base
     # 3) remove contributors that have not submitted work yet
     contributor_set.reject! do |contributor|
       signed_up_topic(contributor) != topic or # both will be nil for assignments with no signup sheet
-      contributor.includes?(reviewer) ###or !contributor.has_quiz?
+        contributor.includes?(reviewer) ###or !contributor.has_quiz?
     end
     raise "There are no more submissions to take quiz on for this #{work}." if contributor_set.empty?
     #flash[:error] = "There are no more submissions to take quiz on for this #{work}."
@@ -506,14 +506,14 @@ class Assignment < ActiveRecord::Base
     self.staggered_deadline? ?
       topic_id ?
       next_due_dates = TopicDeadline
-    .where( ['topic_id = ? && due_at >= ? && deadline_type_id <> ?', topic_id, Time.now, drop_topic_deadline_id])
-    .order('due_at') :
-      next_due_dates = TopicDeadline
-    .where( ['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id])
-    .joins( {:topic => :assignment}, :order => 'due_at') :
-      next_due_dates = DueDate
-    .where( ['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id])
-    .order('due_at')
+      .where( ['topic_id = ? && due_at >= ? && deadline_type_id <> ?', topic_id, Time.now, drop_topic_deadline_id])
+      .order('due_at') :
+    next_due_dates = TopicDeadline
+      .where( ['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id])
+      .joins( {:topic => :assignment}, :order => 'due_at') :
+    next_due_dates = DueDate
+      .where( ['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id])
+      .order('due_at')
     next_due_date = next_due_dates.first
 
     return false if next_due_date.nil?
@@ -622,7 +622,7 @@ class Assignment < ActiveRecord::Base
              :first_name => ApplicationHelper::get_user_first_name(user),
              :partial_name => 'update'
            }
-           }
+        }
         ).deliver
       end
     end
@@ -665,7 +665,7 @@ class Assignment < ActiveRecord::Base
       # Is it possible to submit a URL (or a wiki page)
     elsif assignment.directory_path != nil && /(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix.match(assignment.directory_path)
       # In this case we have to check if the directory_path starts with http / https.
-        return true
+      return true
       # Is it possible to submit a Google Doc?
       #    removed because google doc not implemented
       #    elsif assignment.wiki_type == 4 #GOOGLE_DOC
@@ -722,17 +722,11 @@ class Assignment < ActiveRecord::Base
 
     if due_dates.present?
 
-      if Time.now > due_dates[0].due_at
-        return 0
-      else
-        i = 0
-        for due_date in due_dates
-          if Time.now < due_date.due_at and
-            (due_dates[i+1] == nil or Time.now > due_dates[i+1].due_at)
-            return due_date.round
-          end
-          i = i + 1
-        end
+      return 0 if Time.now > due_dates[0].due_at
+      due_dates.each_with_index do |due_date, i|
+        next unless Time.now < due_date.due_at &&
+          (due_dates[i + 1].nil? || Time.now > due_dates[i + 1].due_at)
+        return due_date.round
       end
     end
   end
@@ -887,7 +881,7 @@ class Assignment < ActiveRecord::Base
         i = 0
         for due_date in due_dates
           if Time.now < due_date.due_at and
-            (due_dates[i+1] == nil or Time.now > due_dates[i+1].due_at)
+              (due_dates[i+1] == nil or Time.now > due_dates[i+1].due_at)
             if i > 0
               return due_dates[i-1]
             else
@@ -998,111 +992,112 @@ class Assignment < ActiveRecord::Base
     if (self.require_quiz?)
       signups = SignedUpUser.where(creator_id: contributor.id)
       for signup in signups do
-          signuptopic = SignUpTopic.find(signup.topic_id)
-          if (signuptopic.assignment_id == self.id)
-            contributors_signup_topic = signuptopic
-            return contributors_signup_topic
-          end
-        end
-      end
-
-      # Look for the topic_id where the creator_id equals the contributor id (contributor is a team or a participant)
-      (!Team.where(name: contributor.name, id:  contributor.id).first.nil?) ?
-        contributors_topic = SignedUpUser.find_by_creator_id(contributor.id) :
-        contributors_topic = SignedUpUser.find_by_creator_id(contributor.user_id)
-      contributors_signup_topic = SignUpTopic.find(contributors_topic.topic_id) if !contributors_topic.nil?
-    end
-
-    def self.export(csv, parent_id, options)
-      @assignment = Assignment.find(parent_id)
-      @questions = Hash.new
-      questionnaires = @assignment.questionnaires
-      questionnaires.each { |questionnaire| @questions[questionnaire.symbol] = questionnaire.questions }
-      @scores = @assignment.scores(@questions)
-
-      return csv if @scores[:teams].nil?
-
-      for index in 0 .. @scores[:teams].length - 1
-        team = @scores[:teams][index.to_s.to_sym]
-        for participant in team[:team].participants
-          pscore = @scores[:participants][participant.id.to_s.to_sym]
-          tcsv = Array.new
-          tcsv << 'team'+index.to_s
-
-          team[:scores] ?
-            tcsv.push(team[:scores][:max], team[:scores][:avg], team[:scores][:min], participant.fullname) :
-            tcsv.push('---', '---', '---') if options['team_score'] == 'true'
-
-          pscore[:review] ?
-            tcsv.push(pscore[:review][:scores][:max], pscore[:review][:scores][:min], pscore[:review][:scores][:avg]) :
-            tcsv.push('---', '---', '---') if options['submitted_score']
-
-          pscore[:metareview] ?
-            tcsv.push(pscore[:metareview][:scores][:max], pscore[:metareview][:scores][:min], pscore[:metareview][:scores][:avg]) :
-            tcsv.push('---', '---', '---') if options['metareview_score']
-
-          pscore[:feedback] ?
-            tcsv.push(pscore[:feedback][:scores][:max], pscore[:feedback][:scores][:min], pscore[:feedback][:scores][:avg]) :
-            tcsv.push('---', '---', '---') if options['author_feedback_score']
-
-          pscore[:teammate] ?
-            tcsv.push(pscore[:teammate][:scores][:max], pscore[:teammate][:scores][:min], pscore[:teammate][:scores][:avg]) :
-            tcsv.push('---', '---', '---') if options['teammate_review_score']
-
-          tcsv.push(pscore[:total_score])
-          csv << tcsv
+        signuptopic = SignUpTopic.find(signup.topic_id)
+        if (signuptopic.assignment_id == self.id)
+          contributors_signup_topic = signuptopic
+          return contributors_signup_topic
         end
       end
     end
 
-    def self.export_fields(options)
-      fields = Array.new
-      fields << 'Team Name'
-      fields.push('Team Max', 'Team Avg', 'Team Min') if options['team_score'] == 'true'
-      fields.push('Submitted Max', 'Submitted Avg', 'Submitted Min') if options['submitted_score']
-      fields.push('Metareview Max', 'Metareview Avg', 'Metareview Min') if options['metareview_score']
-      fields.push('Author Feedback Max', 'Author Feedback Avg', 'Author Feedback Min') if options['author_feedback_score']
-      fields.push('Teammate Review Max', 'Teammate Review Avg', 'Teammate Review Min') if options['teammate_review_score']
-      fields.push('Final Score')
-      fields
-    end
+    # Look for the topic_id where the creator_id equals the contributor id (contributor is a team or a participant)
+    (!Team.where(name: contributor.name, id:  contributor.id).first.nil?) ?
+      contributors_topic = SignedUpUser.find_by_creator_id(contributor.id) :
+      contributors_topic = SignedUpUser.find_by_creator_id(contributor.user_id)
+    contributors_signup_topic = SignUpTopic.find(contributors_topic.topic_id) if !contributors_topic.nil?
+  end
 
-    def find_due_dates(type)
-      self.due_dates.select {|due_date| due_date.deadline_type == DeadlineType.find_by(name: type)}
-    end
+  def self.export(csv, parent_id, options)
+    @assignment = Assignment.find(parent_id)
+    @questions = Hash.new
+    questionnaires = @assignment.questionnaires
+    questionnaires.each { |questionnaire| @questions[questionnaire.symbol] = questionnaire.questions }
+    @scores = @assignment.get_scores(@questions)
 
-    def clean_up_due_dates
-      #delete due_dates without due_at
-      self.due_dates.each {|due_date| due_date.delete if due_date.due_at.nil? }
+    return csv if @scores[:teams].nil?
 
-      submissions = self.find_due_dates('submission') + self.find_due_dates('resubmission')
-      submissions.sort! { |x, y| x.due_at <=> y.due_at }
-      reviews = self.find_due_dates('review') + self.find_due_dates('rereview')
-      reviews.sort! { |x, y| x.due_at <=> y.due_at }
+    for index in 0 .. @scores[:teams].length - 1
+      team = @scores[:teams][index.to_s.to_sym]
+      for participant in team[:team].get_participants
+        pscore = @scores[:participants][participant.id.to_s.to_sym]
+        tcsv = Array.new
+        tcsv << 'team'+index.to_s
 
-      while submissions.count > self.rounds_of_reviews
-        submissions.last.delete
+        team[:scores] ?
+          tcsv.push(team[:scores][:max], team[:scores][:avg], team[:scores][:min], participant.fullname) :
+          tcsv.push('---', '---', '---') if options['team_score'] == 'true'
+
+        pscore[:review] ?
+          tcsv.push(pscore[:review][:scores][:max], pscore[:review][:scores][:min], pscore[:review][:scores][:avg]) :
+          tcsv.push('---', '---', '---') if options['submitted_score']
+
+        pscore[:metareview] ?
+          tcsv.push(pscore[:metareview][:scores][:max], pscore[:metareview][:scores][:min], pscore[:metareview][:scores][:avg]) :
+          tcsv.push('---', '---', '---') if options['metareview_score']
+
+        pscore[:feedback] ?
+          tcsv.push(pscore[:feedback][:scores][:max], pscore[:feedback][:scores][:min], pscore[:feedback][:scores][:avg]) :
+          tcsv.push('---', '---', '---') if options['author_feedback_score']
+
+        pscore[:teammate] ?
+          tcsv.push(pscore[:teammate][:scores][:max], pscore[:teammate][:scores][:min], pscore[:teammate][:scores][:avg]) :
+          tcsv.push('---', '---', '---') if options['teammate_review_score']
+
+        tcsv.push(pscore[:total_score])
+        csv << tcsv
+>>>>>>> Added ruby idiomatic code for dur_dates iteration
       end
-
-      while reviews.count > self.rounds_of_reviews
-        reviews.last.delete
-      end
-
-      self.require_signup? ? drop_topic_count = 1 : drop_topic_count = 0
-      drop_topic = self.find_due_dates('drop_topic')
-      drop_topic.sort! { |x, y| y.due_at <=> x.due_at }
-      while drop_topic.count > self.drop_topic_count
-        drop_topic.last.delete
-      end
-    end
-
-
-    #this should be moved to SignUpSheet model after we refactor the SignUpSheet.
-    # returns whether ANY topic has a partner ad; used for deciding whether to show the Advertisements column
-    def has_partner_ads?(id)
-      #Team.find_by_sql("select * from teams where parent_id = "+id+" AND advertise_for_partner='1'").size > 0
-      return Team.find_by_sql("select t.* "+
-                              "from teams t, signed_up_users s "+
-                              "where s.topic_id='"+id.to_s+"' and s.creator_id = t.id and t.advertise_for_partner = 1").size > 0
     end
   end
+
+  def self.get_export_fields(options)
+    fields = Array.new
+    fields << 'Team Name'
+    fields.push('Team Max', 'Team Avg', 'Team Min') if options['team_score'] == 'true'
+    fields.push('Submitted Max', 'Submitted Avg', 'Submitted Min') if options['submitted_score']
+    fields.push('Metareview Max', 'Metareview Avg', 'Metareview Min') if options['metareview_score']
+    fields.push('Author Feedback Max', 'Author Feedback Avg', 'Author Feedback Min') if options['author_feedback_score']
+    fields.push('Teammate Review Max', 'Teammate Review Avg', 'Teammate Review Min') if options['teammate_review_score']
+    fields.push('Final Score')
+    fields
+  end
+
+  def find_due_dates(type)
+    self.due_dates.select {|due_date| due_date.deadline_type == DeadlineType.find_by(name: type)}
+  end
+
+  def clean_up_due_dates
+    #delete due_dates without due_at
+    self.due_dates.each {|due_date| due_date.delete if due_date.due_at.nil? }
+
+    submissions = self.find_due_dates('submission') + self.find_due_dates('resubmission')
+    submissions.sort! { |x, y| x.due_at <=> y.due_at }
+    reviews = self.find_due_dates('review') + self.find_due_dates('rereview')
+    reviews.sort! { |x, y| x.due_at <=> y.due_at }
+
+    while submissions.count > self.rounds_of_reviews
+      submissions.last.delete
+    end
+
+    while reviews.count > self.rounds_of_reviews
+      reviews.last.delete
+    end
+
+    self.require_signup? ? drop_topic_count = 1 : drop_topic_count = 0
+    drop_topic = self.find_due_dates('drop_topic')
+    drop_topic.sort! { |x, y| y.due_at <=> x.due_at }
+    while drop_topic.count > self.drop_topic_count
+      drop_topic.last.delete
+    end
+  end
+
+
+  #this should be moved to SignUpSheet model after we refactor the SignUpSheet.
+  # returns whether ANY topic has a partner ad; used for deciding whether to show the Advertisements column
+  def has_partner_ads?(id)
+    #Team.find_by_sql("select * from teams where parent_id = "+id+" AND advertise_for_partner='1'").size > 0
+    return Team.find_by_sql("select t.* "+
+                            "from teams t, signed_up_users s "+
+                            "where s.topic_id='"+id.to_s+"' and s.creator_id = t.id and t.advertise_for_partner = 1").size > 0
+  end
+end

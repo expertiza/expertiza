@@ -3,11 +3,22 @@ class ResponseController < ApplicationController
   helper :submitted_content
   helper :file
 
-  def action_allowed?
-    current_user
+  def action_allowed?(response)
+    # For author feedback, participants need to be able to read feedback submitted by other teammates.
+    # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
+    if response.map.read_attribute(:type) == 'FeedbackResponseMap' && response.map.assignment.team_assignment?
+      team = response.map.reviewer.team
+      unless team.has_user session[:user]
+        redirect_to '/denied?reason=You are not on the team that wrote this feedback'
+      else
+        return false
+      end
+      response.map.read_attribute(:type)
+    end
+    !current_user_id?(response.map.reviewer.user_id)
   end
 
-  def latestResponseVersion
+  def previous_responses
     #get all previous versions of responses for the response map.
     @review_scores=Array.new
     @prev=Response.where(map_id: @map.id)
@@ -31,7 +42,7 @@ class ResponseController < ApplicationController
 
   def delete
     @response = Response.find(params[:id])
-    return if redirect_when_disallowed(@response) #user cannot delete other people's responses. Needs to be authenticated.
+    return if action_allowed?(@response) #user cannot delete other people's responses. Needs to be authenticated.
     map_id = @response.map.id
     @response.delete
     redirect_to :action => 'redirection', :id => map_id, :return => params[:return], :msg => "The response was deleted."
@@ -53,7 +64,7 @@ class ResponseController < ApplicationController
       end
     end
 
-    latestResponseVersion
+    previous_responses
     #sort all the available versions in descending order.
     if @prev.present?
       @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
@@ -87,7 +98,7 @@ class ResponseController < ApplicationController
       @next_action = "update"
       @return = params[:return]
       @response = Response.where(map_id: params[:id], version_num:  @largest_version_num.version_num).first
-      return if redirect_when_disallowed(@response)
+      return if action_allowed?(@response)
       @modified_object = @response.response_id
       @map = @response.map
       get_content
@@ -143,7 +154,7 @@ class ResponseController < ApplicationController
     @next_action = "update"
     @return = params[:return]
     @response = Response.find(params[:id])
-    return if redirect_when_disallowed(@response)
+    return if action_allowed?(@response)
 
     @map = @response.map
     @contributor = @map.contributor
@@ -183,7 +194,7 @@ class ResponseController < ApplicationController
 
   def update ###-### Seems like this method may no longer be used -- not in E806 version of the file
     @response = Response.find(params[:id])
-    return if redirect_when_disallowed(@response)
+    return if action_allowed?(@response)
     @myid = @response.response_id
     msg = ""
     begin
@@ -215,33 +226,6 @@ class ResponseController < ApplicationController
       msg = "An error occurred while saving the response:198 #{$!}"
     end
     redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :save_options => params[:save_options]
-  end
-
-  def new_feedback
-    review = Response.find(params[:id])
-    if review
-      reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id:  review.map.assignment.id).first
-      map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id:  reviewer.id).first
-      if map.nil?
-        map = FeedbackResponseMap.create(:reviewed_object_id => review.id, :reviewer_id => reviewer.id, :reviewee_id => review.map.reviewer.id)
-      end
-      redirect_to :action => 'new', :id => map.map_id, :return => "feedback"
-    else
-      redirect_to :back
-    end
-  end
-
-  def view
-    @response = Response.find(params[:id])
-    return if redirect_when_disallowed(@response)
-    @map = @response.map
-    get_content
-    @review_scores = Array.new
-    @question_type = Array.new
-    @questions.each do |question|
-      @review_scores << Score.where(response_id: @map.response_id, question_id:  question.id).first
-      @question_type << QuestionType.find_by_question_id(question.id)
-    end
   end
 
   def new
@@ -294,7 +278,7 @@ class ResponseController < ApplicationController
 
   def view
     @response = Response.find(params[:id])
-    return if redirect_when_disallowed(@response)
+    return if action_allowed?(@response)
     @map = @response.map
     get_content
     get_scores
@@ -305,7 +289,7 @@ class ResponseController < ApplicationController
     @res = 0
     msg = ""
     error_msg = ""
-    latestResponseVersion
+    previous_responses
     @review_scores=Array.new
     @prev=Response.where(map_id: @map.id)
     for element in @prev
@@ -405,18 +389,18 @@ class ResponseController < ApplicationController
     @max = @questionnaire.max_question_score
   end
 
-  def redirect_when_disallowed(response)
-    # For author feedback, participants need to be able to read feedback submitted by other teammates.
-    # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
-    if response.map.read_attribute(:type) == 'FeedbackResponseMap' && response.map.assignment.team_assignment?
-      team = response.map.reviewer.team
-      unless team.has_user session[:user]
-        redirect_to '/denied?reason=You are not on the team that wrote this feedback'
-      else
-        return false
-      end
-      response.map.read_attribute(:type)
-    end
-    !current_user_id?(response.map.reviewer.user_id)
-  end
+  # def redirect_when_disallowed(response)
+  #   # For author feedback, participants need to be able to read feedback submitted by other teammates.
+  #   # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
+  #   if response.map.read_attribute(:type) == 'FeedbackResponseMap' && response.map.assignment.team_assignment?
+  #     team = response.map.reviewer.team
+  #     unless team.has_user session[:user]
+  #       redirect_to '/denied?reason=You are not on the team that wrote this feedback'
+  #     else
+  #       return false
+  #     end
+  #     response.map.read_attribute(:type)
+  #   end
+  #   !current_user_id?(response.map.reviewer.user_id)
+  # end
 end

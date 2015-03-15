@@ -27,7 +27,7 @@ class Assignment < ActiveRecord::Base
   has_one :assignment_node, :foreign_key => :node_object_id,:dependent => :destroy
 
   # Validations
-  validates :name, presense: true, uniquness: { scope: :course_id }
+  validates :name, presence: true, uniqueness:  { scope: :course_id }
 
 
   COMPLETE = 'Finished'
@@ -146,27 +146,24 @@ class Assignment < ActiveRecord::Base
   end
 
   def reject__reviewed_submissions_in_current_round(contributor_set, reviewer, current_round)
-    contributor_set = contributor_set.reject { |contributor| contributor.reviewed_by_in_round?(reviewer,current_round) }
+    contributor_set.reject { |contributor| contributor.reviewed_by_in_round?(reviewer,current_round) }
   end
 
   def reject_previously_reviewed_submissions(contributor_set, reviewer)
-    contributor_set = contributor_set.reject { |contributor| contributor.reviewed_by?(reviewer) }
+    contributor_set.reject { |contributor| contributor.reviewed_by?(reviewer) }
   end
 
   def reject_own_submission(contributor_set, reviewer)
     contributor_set.reject! { |contributor| contributor.teams_users.find_by_user_id(reviewer.user_id) }
-    contributor_set
   end
 
   def reject_by_deadline(contributor_set)
     contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'Complete' or
                               !contributor.assignment.review_allowed(signed_up_topic(contributor).id) }
-    contributor_set
   end
 
   def reject_by_no_topic_selection_or_no_submission(contributor_set)
     contributor_set.reject! { |contributor| signed_up_topic(contributor).nil? or !contributor.has_submissions? }
-    contributor_set
   end
 
   def has_topics?
@@ -403,13 +400,9 @@ class Assignment < ActiveRecord::Base
       scores[:participants][participant.id.to_s.to_sym] = participant.scores(questions)
 
       # for all quiz questionnaires (quizzes) taken by the participant
-      quiz_responses = Array.new
+      # for all quiz questionnaires (quizzes) taken by the participant
       quiz_response_mappings = QuizResponseMap.where(reviewer_id: participant.id)
-      quiz_response_mappings.each do |qmapping|
-        if qmapping.response
-          quiz_responses << qmapping.response
-        end
-      end
+      quiz_responses = quiz_response_mappings.select{ |qmapping| qmapping.response }.map(&:response)
 
       scores[:participants][participant.id.to_s.to_sym][:quiz] = Hash.new
       scores[:participants][participant.id.to_s.to_sym][:quiz][:assessments] = quiz_responses
@@ -458,8 +451,8 @@ class Assignment < ActiveRecord::Base
           end
         end
 
-        if total_num_of_assessments!=0
-          scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score/total_num_of_assessments
+        if total_num_of_assessments != 0
+          scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score / total_num_of_assessments
         else
           scores[:teams][index.to_s.to_sym][:scores][:avg] = 0
           scores[:teams][index.to_s.to_sym][:scores][:max] = 0
@@ -961,9 +954,7 @@ class Assignment < ActiveRecord::Base
   # Compute total score for this assignment by summing the scores given on all questionnaires.
   # Only scores passed in are included in this sum.
   def compute_total_score(scores)
-    total = 0
-    self.questionnaires.each { |questionnaire| total += questionnaire.get_weighted_score(self, scores) }
-    total
+    self.questionnaires.inject(0) { |total, questionnaire| total + questionnaire.get_weighted_score(self, scores) }
   end
 
   # Checks whether there are duplicate assignments of the same name by the same instructor.
@@ -1045,7 +1036,6 @@ class Assignment < ActiveRecord::Base
 
         tcsv.push(pscore[:total_score])
         csv << tcsv
->>>>>>> Added ruby idiomatic code for dur_dates iteration
       end
     end
   end

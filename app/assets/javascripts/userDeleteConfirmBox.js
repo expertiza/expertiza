@@ -2,6 +2,7 @@
 //overwrite rails default behavior
 $.rails.allowAction = function(link) {
   console.log(link.attr('data-relationship'))
+  console.log(link.attr('data-username'))
   if ((!link.attr('data-confirm')) || (link.attr('data-relationship') && link.attr('data-relationship') == 'false')) {
    return true;
   }
@@ -19,7 +20,7 @@ $.rails.showConfirmDialog = function(link) {
   message = link.attr('data-confirm');
   html1 = "<div class=\"modal\" id=\"dialog-confirm1\" title=\"Delete This User?\">\n  <div class=\"modal-body\">\n    <p>" + message + "</p>\n";
 
-  html2 = "<div class=\"modal\" id=\"dialog-confirm2\" title=\"System Information\">\n  <div class=\"modal-body\">\n    <p>This user cannot be deleted. Do you want to rename the user account to <current_account_name>_hidden?</p>\n"; 
+  html2 = "<div class=\"modal\" id=\"dialog-confirm2\" title=\"System Information\">\n  <div class=\"modal-body\">\n    <p>This user cannot be deleted. Do you want to rename the user account to <b>" + link.attr('data-username') + "_hidden</b>?</p>\n"; 
 
   html3 = "<div class=\"modal\" id=\"dialog-confirm3\" title=\"System Information\">\n  <div class=\"modal-body\">\n    <p>Rename successfully!!</p>\n";
 

@@ -11,7 +11,7 @@ class BookmarksTest < ActionDispatch::IntegrationTest
     get 'home'
     assert_select "a[href=?]", '/password_retrieval/forgotten' # ensure you're on home page
     post '/auth/login', login: { name: @user.name, password: "123"} # log in user2
-    #assert_template 'tree_display/list'
+    assert_template 'tree_display/list'
     # get 'bookmarks/managing_bookmarks'
     # assert_template 'bookmarks/managing_bookmarks'
   end

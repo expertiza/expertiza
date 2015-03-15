@@ -1,0 +1,8 @@
+
+existing_bookmark:
+  b_url: 'example_url.com'
+  b_title: 'Existing Bookmark' 
+  b_tags_text: 'expertiza'
+  b_description: 'this is a desc of existing bookmark'
+  session_user: 'user2' 
+  topic_id: '1'

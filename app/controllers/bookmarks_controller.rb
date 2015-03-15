@@ -253,7 +253,7 @@ class BookmarksController < ApplicationController
     b_tags_text = params["b_tags_text"]
     b_description = params["b_description"]
     session_user = session[:user]
-    Bookmark.edit_this_bookmark(b_url, b_title, b_tags_text, b_description, session_user)
+    Bookmark.edit(b_url, b_title, b_tags_text, b_description, session_user)
     redirect_to(:action => 'manage_bookmarks')
   end
 

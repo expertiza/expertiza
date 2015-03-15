@@ -9,7 +9,7 @@ class Bookmark < ActiveRecord::Base
     if (!bookmark_exists || !bmapping_exists)
       Bookmark.add_bookmark(b_url, b_title, b_tags_text, b_description,session_user,topicid)
     elsif (bmapping_exists)
-      Bookmark.edit_this_bookmark(b_url, b_title, b_tags_text, b_description,session_user)
+      Bookmark.edit(b_url, b_title, b_tags_text, b_description,session_user)
     end
   end
 
@@ -20,12 +20,12 @@ class Bookmark < ActiveRecord::Base
     if (!bookmark_exists || !bmapping_exists)
       Bookmark.add_bookmark(b_url, b_title, b_tags_text, b_description,session_user)
     elsif (bmapping_exists)
-      Bookmark.edit_this_bookmark(b_url, b_title, b_tags_text, b_description,session_user)
+      Bookmark.edit(b_url, b_title, b_tags_text, b_description,session_user)
     end
   end
 
   # If bookmark mapping for a user and a url exists, then edit
-  def self.edit_this_bookmark (b_url, b_title, b_tags_text, b_description,session_user)
+  def self.edit (b_url, b_title, b_tags_text, b_description,session_user)
     bookmark_resource = Bookmark.where(["url = ?",b_url]).first
     @bmapping_status = "found"
     bookmark_user_mapping = Bmapping.where(["user_id = ? and bookmark_id = ?", session_user.id, bookmark_resource.id]).first
@@ -283,7 +283,7 @@ class Bookmark < ActiveRecord::Base
       # Bookmark with the same url does not exists.
       if bookmark_resource.nil?
         # Add the newly discovered bookmark
-        bookmarkid = add_new_bookmark(b_url,session_user.id)
+        bookmarkid = create(b_url,session_user.id)
         # Add its associations to a user
         bmappingid = add_bmapping(bookmarkid, b_title, session_user.id, b_description,b_tags_text )
         # Add its association to the sign up topic
@@ -298,7 +298,7 @@ class Bookmark < ActiveRecord::Base
           if( !topic.nil? )
             topic.bmappings.each do |mapping|
               if (mapping.id == bmapping.id)
-                Bookmark.edit_this_bookmark(b_url, b_title, b_tags_text, b_description,session_user)
+                Bookmark.edit(b_url, b_title, b_tags_text, b_description,session_user)
               end
             end
 
@@ -321,7 +321,7 @@ class Bookmark < ActiveRecord::Base
 
 
     # Adds a new bookmark
-    def self.add_new_bookmark(b_url,user_id)
+    def self.create(b_url,user_id)
       # Create a resource
       bookmark_resource = Bookmark.new
       bookmark_resource.url = b_url

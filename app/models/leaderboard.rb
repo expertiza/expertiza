@@ -60,7 +60,7 @@ class Leaderboard < ActiveRecord::Base
     revieweeList=getAggregatedAssignmentRevieweeList(assignmentList)
 
     # Get scores from ScoreCache for computed reviewee list.
-    scores = getRevieweeListScore(revieweeList, questionnaireResponseTypeHash.keys)
+    scores = getRevieweeListScore(revieweeList, questionnaireResponseTypeHash)
 
     return getUserScoreHashForCourse(scores,qTypeHash)
   end

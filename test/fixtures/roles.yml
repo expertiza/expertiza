@@ -1,4 +1,4 @@
 
-user2_1:
-  id: 0
-  user_id: 1
+user2_role:
+ id: 4
+ cache: "---:credentials:!ruby/object:"

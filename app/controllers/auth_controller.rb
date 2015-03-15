@@ -18,6 +18,7 @@ class AuthController < ApplicationController
     if request.get?
       AuthController.clear_session(session)
     else
+      logger.warn "#{params[:login][:name]}"
       user = User.find_by_login(params[:login][:name])
       logger.warn "#{params[:login][:name]}"
       logger.warn "User value: #{user.inspect}"
@@ -33,9 +34,13 @@ class AuthController < ApplicationController
 
   # function to handle common functionality for conventional user login and google login
   def after_login (user)
-    logger.info "User #{user.name} successfully logged in"
+    Rails::logger.info "User #{user.name} successfully logged in"
     session[:user] = user
+   Rails::logger.info "session *************=#{session.inspect}"
+   Rails::logger.info "------------------------------MARKER-------------------------------------"
+   Rails::logger.info "user.role_id=#{user.role_id}"
     AuthController.set_current_role(user.role_id, session)
+
 
     redirect_to :controller => AuthHelper::get_home_controller(session[:user]),
                 :action => AuthHelper::get_home_action(session[:user])
@@ -125,11 +130,19 @@ class AuthController < ApplicationController
   def self.set_current_role(role_id, session)
     if role_id
       role = Role.find role_id
+      Rails::logger.info "-------------------IN SET_CURRENT_ROLE1-------------"
+      Rails::logger.info "VALUE OF ROLE.CACHE=#{role.cache.length}"
       if role
         if !role.cache || !role.cache.try(:has_key?, :credentials)
+          Rails::logger.info "-------------------IN SET_CURRENT_ROLE2-------------"
           Role.rebuild_cache
         end
+        Rails::logger.info "-------------------IN SET_CURRENT_ROLE3-------------"
+         Rails::logger.info "VALUE OF ROLE=#{role.inspect}"
+         Rails::logger.info "VALUE OF ROLE.CACHE=#{role.cache.length}"
+         Rails::logger.info "VALUE OF ROLE.CACHE=#{:credentials}"
         session[:credentials] = role.cache[:credentials]
+        Rails::logger.info "-------------------IN SET_CURRENT_ROLE4-------------"
         session[:menu] = role.cache[:menu]
         logger.info "Logging in user as role #{session[:credentials].class}"
       else

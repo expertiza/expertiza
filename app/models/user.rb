@@ -92,12 +92,6 @@ class User < ActiveRecord::Base
     self == user.creator
   end
 
-  def assign_random_password
-    if self.password.blank?
-      self.password = self.random_password
-    end
-  end
-
   # Function which has a MailerHelper which sends the mail welcome email to the user after signing up
   def email_welcome
     MailerHelper::send_mail_to_user(self, "Your Expertiza password has been created", "user_welcome", password)

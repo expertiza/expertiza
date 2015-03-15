@@ -548,7 +548,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def get_quiz_deadline
-    DueDate.where( ['assignment_id = ? and deadline_type_id >= ?', self.id, 7]).due_at
+    DueDate.where(assignment_id: self.id, deadline_type_id: 7).due_at
   end
 
   def delete(force = nil)

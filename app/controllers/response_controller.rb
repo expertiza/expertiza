@@ -96,19 +96,10 @@ class ResponseController < ApplicationController
           |question|
           @review_scores << Score.where(response_id: @response.response_id, question_id:  question.id).first
       }
-      #**********************
       # Check whether this is Jen's assgt. & if so, use her rubric
       if (@assignment.instructor_id == User.find_by_name("jace_smith").id) && @title == "Review"
-        if @assignment.id < 469
-          @next_action = "update"
-          render :action => 'custom_response'
-        else
-          @next_action = "update"
-          render :action => 'custom_response_2011'
-        end
+        handle_jens_assignment
       else
-        # end of special code (except for the end below, to match the if above)
-        #**********************
         render :action => 'response'
       end
     else
@@ -120,19 +111,10 @@ class ResponseController < ApplicationController
       @return = params[:return]
       @modified_object = @map.map_id
       get_content
-      #**********************
       # Check whether this is Jen's assgt. & if so, use her rubric
       if (@assignment.instructor_id == User.find_by_name("jace_smith").id) && @title == "Review"
-        if @assignment.id < 469
-          @next_action = "create"
-          render :action => 'custom_response'
-        else
-          @next_action = "create"
-          render :action => 'custom_response_2011'
-        end
+        handle_jens_assignment
       else
-        # end of special code (except for the end below, to match the if above)
-        #**********************
         render :action => 'response'
       end
     end
@@ -404,7 +386,19 @@ class ResponseController < ApplicationController
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
   end
+  
+  #kludge for checking if assignment is jen's assignment and using her rubric if it is
+  def handle_jens_assignment
+    if @assignment.id < 469
+          @next_action = "update"
+          render :action => 'custom_response'
+        else
+          @next_action = "update"
+          render :action => 'custom_response_2011'
+        end
+  end
 
+  
   def redirect_when_disallowed(response)
     # For author feedback, participants need to be able to read feedback submitted by other teammates.
     # If response is anything but author feedback, only the person who wrote feedback should be able to see it.

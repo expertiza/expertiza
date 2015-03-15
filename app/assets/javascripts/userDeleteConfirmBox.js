@@ -46,7 +46,7 @@ $.rails.showConfirmDialog = function(link) {
               },
               "Yes": function() {
                   
-                    $('#rename').click 
+                    $('#rename').click() 
 
                   $( this ).dialog( "close" );
                   $(html3).modal();

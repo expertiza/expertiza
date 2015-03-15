@@ -142,7 +142,7 @@ class Assignment < ActiveRecord::Base
     min_reviews = contributor.review_mappings.reject! { |review_mapping| review_mapping.response.nil? }.count rescue 0
     contributor_set.reject { |contributor| contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count  > min_reviews + review_topic_threshold }
 
-    return contributor_set
+    contributor_set
   end
 
   def reject__reviewed_submissions_in_current_round(contributor_set, reviewer, current_round)
@@ -151,23 +151,22 @@ class Assignment < ActiveRecord::Base
 
   def reject_previously_reviewed_submissions(contributor_set, reviewer)
     contributor_set = contributor_set.reject { |contributor| contributor.reviewed_by?(reviewer) }
-    return contributor_set
   end
 
   def reject_own_submission(contributor_set, reviewer)
     contributor_set.reject! { |contributor| contributor.teams_users.find_by_user_id(reviewer.user_id) }
-    return contributor_set
+    contributor_set
   end
 
   def reject_by_deadline(contributor_set)
     contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'Complete' or
     !contributor.assignment.review_allowed(signed_up_topic(contributor).id) }
-    return contributor_set
+    contributor_set
   end
 
   def reject_by_no_topic_selection_or_no_submission(contributor_set)
     contributor_set.reject! { |contributor| signed_up_topic(contributor).nil? or !contributor.has_submissions? }
-    return contributor_set
+    contributor_set
   end
 
   def has_topics?
@@ -407,7 +406,7 @@ class Assignment < ActiveRecord::Base
       quiz_responses = Array.new
       quiz_response_mappings = QuizResponseMap.where(reviewer_id: participant.id)
       quiz_response_mappings.each do |qmapping|
-        if (qmapping.response)
+        if qmapping.response
           quiz_responses << qmapping.response
         end
       end
@@ -436,11 +435,11 @@ class Assignment < ActiveRecord::Base
         total_num_of_assessments = 0    #calculate grades for each rounds
         for i in 1..self.get_review_rounds
           assessments = TeamReviewResponseMap.get_assessments_round_for(team,i)
-          round_sym = ("review"+i.to_s).to_sym
+          round_sym = ("review" + i.to_s).to_sym
           grades_by_rounds[round_sym]= Score.compute_scores(assessments, questions[round_sym])
           total_num_of_assessments += assessments.size
           if grades_by_rounds[round_sym][:avg]!=nil
-            total_score += grades_by_rounds[round_sym][:avg]*assessments.size.to_f
+            total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f
           end
         end
 
@@ -450,21 +449,21 @@ class Assignment < ActiveRecord::Base
         scores[:teams][index.to_s.to_sym][:scores][:min] = 999999999
         scores[:teams][index.to_s.to_sym][:scores][:avg] = 0
         for i in 1..self.get_review_rounds
-          round_sym = ("review"+i.to_s).to_sym
+          round_sym = ("review" + i.to_s).to_sym
           if(grades_by_rounds[round_sym][:max]!=nil && scores[:teams][index.to_s.to_sym][:scores][:max]<grades_by_rounds[round_sym][:max])
-            scores[:teams][index.to_s.to_sym][:scores][:max]= grades_by_rounds[round_sym][:max]
+            scores[:teams][index.to_s.to_sym][:scores][:max] = grades_by_rounds[round_sym][:max]
           end
           if(grades_by_rounds[round_sym][:min]!= nil && scores[:teams][index.to_s.to_sym][:scores][:min]>grades_by_rounds[round_sym][:min])
-            scores[:teams][index.to_s.to_sym][:scores][:min]= grades_by_rounds[round_sym][:min]
+            scores[:teams][index.to_s.to_sym][:scores][:min] = grades_by_rounds[round_sym][:min]
           end
         end
 
         if total_num_of_assessments!=0
           scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score/total_num_of_assessments
         else
-          scores[:teams][index.to_s.to_sym][:scores][:avg]=0
-          scores[:teams][index.to_s.to_sym][:scores][:max]=0
-          scores[:teams][index.to_s.to_sym][:scores][:min]=0
+          scores[:teams][index.to_s.to_sym][:scores][:avg] = 0
+          scores[:teams][index.to_s.to_sym][:scores][:max] = 0
+          scores[:teams][index.to_s.to_sym][:scores][:min] = 0
         end
 
       else
@@ -483,15 +482,9 @@ class Assignment < ActiveRecord::Base
 
   # parameterized by questionnaire
   def get_max_score_possible(questionnaire)
-    max = 0
-    sum_of_weights = 0
-    num_questions = 0
-    questionnaire.questions.each do |question| #type identifies the type of questionnaire
-      sum_of_weights += question.weight
-      num_questions += 1
-    end
-    max = num_questions * questionnaire.max_question_score * sum_of_weights
-    return max, sum_of_weights
+    sum_of_weights = questionnaire.questions.map(&:weight).sum
+    max = questionnaire.questions * questionnaire.max_question_score * sum_of_weights
+    [max, sum_of_weights]
   end
 
   def path
@@ -508,7 +501,8 @@ class Assignment < ActiveRecord::Base
   def check_condition(column, topic_id = nil)
     # the drop topic deadline should not play any role in picking the next due date
     # get the drop_topic_deadline_id to exclude it
-    drop_topic_deadline_id = DeadlineType.find_by_name('drop_topic').id
+    drop_topic_deadline_id = DeadlineType.find_by(name: 'drop_topic').id
+
     self.staggered_deadline? ?
       topic_id ?
       next_due_dates = TopicDeadline
@@ -604,7 +598,7 @@ class Assignment < ActiveRecord::Base
   end
 
   # Generate emails for reviewers when new content is available for review
-  #ajbudlon, sept 07, 2007
+  # ajbudlon, sept 07, 2007
   def email(author_id)
 
     # Get all review mappings for this assignment & author
@@ -692,20 +686,20 @@ class Assignment < ActiveRecord::Base
   #manual addition
   # user_name - the user account name of the participant to add
   def add_participant(user_name)
-    user = User.find_by_name(user_name)
+    user = User.find_by(name: user_name)
     raise "The user account with the name #{user_name} does not exist. Please <a href='" + url_for(:controller => 'users', :action => 'new') + "'>create</a> the user first." if user.nil?
     participant = AssignmentParticipant.where(parent_id: self.id, user_id:  user.id).first
     if participant
       raise "The user #{user.name} is already a participant."
     else
-      new_part = AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted)
-      new_part.set_handle()
+      new_part = AssignmentParticipant.create(parent_id: self.id, user_id: user.id, permission_granted: user.master_permission_granted)
+      new_part.set_handle
     end
   end
 
   def create_node
-    parent = CourseNode.find_by_node_object_id(self.course_id)
-    node = AssignmentNode.create(:node_object_id => self.id)
+    parent = CourseNode.find_by(node_object_id: self.course_id)
+    node = AssignmentNode.create(node_object_id: self.id)
     node.parent_id = parent.id if parent != nil
     node.save
   end
@@ -721,11 +715,13 @@ class Assignment < ActiveRecord::Base
   #otherwise, return 0
   def get_current_round(topic_id)
     if self.staggered_deadline?
-      due_dates = TopicDeadline.where(:topic_id => topic_id).order('due_at DESC')
+      due_dates = TopicDeadline.where(topic_id: topic_id).order('due_at DESC')
     else
-      due_dates = DueDate.where(:assignment_id => self.id).order('due_at DESC')
+      due_dates = DueDate.where(assignment_id: self.id).order('due_at DESC')
     end
-    if due_dates != nil and due_dates.size > 0
+
+    if due_dates.present?
+
       if Time.now > due_dates[0].due_at
         return 0
       else
@@ -750,10 +746,10 @@ class Assignment < ActiveRecord::Base
     end
     due_date = find_current_stage(topic_id)
 
-    if(due_date!=COMPLETE && due_date!='Finished'&&due_date!=nil &&due_date.deadline_name!=nil)
-      return due_date.deadline_name
+    if(due_date != COMPLETE && due_date!= 'Finished' && due_date != nil && due_date.deadline_name != nil)
+      due_date.deadline_name
     else
-      return get_current_stage(topic_id)
+      get_current_stage(topic_id)
     end
   end
 
@@ -831,13 +827,13 @@ class Assignment < ActiveRecord::Base
   end
 
   def get_current_due_date
-    due_date = self.find_current_stage()
-    (due_date == nil || due_date == 'Finished') ? 'Finished' : due_date
+    due_date = self.find_current_stage
+    (due_date.nil? || due_date == 'Finished') ? 'Finished' : due_date
   end
 
   # Returns hash review_scores[reviewer_id][reviewee_id] = score
   def compute_reviews_hash
-    review_questionnaire_id = get_review_questionnaire_id()
+    review_questionnaire_id = get_review_questionnaire_id
     @questions = Question.where( ['questionnaire_id = ?', review_questionnaire_id])
     @review_scores = Hash.new
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
@@ -877,11 +873,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def get_next_due_date
-    due_date = self.find_next_stage()
+    due_date = self.find_next_stage
     (due_date == nil || due_date == 'Finished') ? nil : due_date
   end
 
-  def find_next_stage()
+  def find_next_stage
     due_dates = DueDate.where( ['assignment_id = ?', self.id]).order('due_at DESC')
 
     if due_dates != nil and due_dates.size > 0
@@ -915,26 +911,20 @@ class Assignment < ActiveRecord::Base
   # Returns the number of reviewers assigned to a particular assignment by the type of review
   # Param: type - String (ParticipantReviewResponseMap, etc.)
   def get_total_reviews_assigned_by_type(type)
-    count = 0
-    self.response_maps.each { |x| count = count + 1 if x.type == type }
-    count
+    self.response_maps.count { |x| x.type == type }
   end
 
   # Returns the number of reviews completed for a particular assignment
   def get_total_reviews_completed
     # self.responses.size
-    response_count = 0
-    self.response_maps.each { |response_map| response_count = response_count + 1 unless response_map.response.nil? }
-    response_count
+    self.response_maps.count { |response_map| response_map.response.present? }
   end
 
   # Returns the number of reviews completed for a particular assignment by type of review
   # Param: type - String (ParticipantReviewResponseMap, etc.)
   def get_total_reviews_completed_by_type(type)
     # self.responses.size
-    response_count = 0
-    self.response_maps.each {|response_map|response_count = response_count + 1 if !response_map.response.nil? && response_map.type == type}
-    response_count
+    self.response_maps.count {|response_map| response_map.response.present? && response_map.type == type}
   end
 
   # Returns the number of reviews completed for a particular assignment by type of review
@@ -1078,7 +1068,7 @@ class Assignment < ActiveRecord::Base
     end
 
     def find_due_dates(type)
-      self.due_dates.select {|due_date| due_date.deadline_type == DeadlineType.find_by_name(type)}
+      self.due_dates.select {|due_date| due_date.deadline_type == DeadlineType.find_by(name: type)}
     end
 
     def clean_up_due_dates

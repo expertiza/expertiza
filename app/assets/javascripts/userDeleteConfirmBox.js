@@ -16,15 +16,14 @@ $.rails.confirmed = function(link) {
 };
 
 $.rails.showConfirmDialog = function(link) {
-  var html, message;
-  message = link.attr('data-confirm');
-  html1 = "<div class=\"modal\" id=\"dialog-confirm1\" title=\"Delete This User?\">\n  <div class=\"modal-body\">\n    <p>" + message + "</p>\n";
+  var message = link.attr('data-confirm');
+  var html1 = "<div class=\"modal\" id=\"dialog-confirm1\" title=\"Delete This User?\">\n  <div class=\"modal-body\">\n    <p>" + message + "</p>\n";
 
-  html2 = "<div class=\"modal\" id=\"dialog-confirm2\" title=\"System Information\">\n  <div class=\"modal-body\">\n    <p>This user cannot be deleted. Do you want to rename the user account to <b>" + link.attr('data-username') + "_hidden</b>?</p>\n"; 
+  var html2 = "<div class=\"modal\" id=\"dialog-confirm2\" title=\"System Information\">\n  <div class=\"modal-body\">\n    <p>This user cannot be deleted. Do you want to rename the user account to <b>" + link.attr('data-username') + "_hidden</b>?</p>\n"; 
 
-  html3 = "<div class=\"modal\" id=\"dialog-confirm3\" title=\"System Information\">\n  <div class=\"modal-body\">\n    <p>Rename successfully!!</p>\n";
+  var html3 = "<div class=\"modal\" id=\"dialog-confirm3\" title=\"System Information\">\n  <div class=\"modal-body\">\n    <p>Rename successfully!!</p>\n";
 
-  html4 = "<div class=\"modal\" id=\"dialog-confirm4\" title=\"System Information\">\n  <div class=\"modal-body\">\n    <p>You cannot delete this user!!</p>\n";
+  var html4 = "<div class=\"modal\" id=\"dialog-confirm4\" title=\"System Information\">\n  <div class=\"modal-body\">\n    <p>You cannot delete this user!!</p>\n";
 
   //confirmation box style
   $(function() {
@@ -34,6 +33,7 @@ $.rails.showConfirmDialog = function(link) {
       buttons: {
         "Cancel": function() {
           $( this ).dialog( "close" );
+          location.reload();
         },
         "Yes": function() {
           //return $.rails.confirmed(link);
@@ -44,6 +44,7 @@ $.rails.showConfirmDialog = function(link) {
             buttons: {
               "Cancel": function() {
                 $( this ).dialog( "close" );
+                location.reload();
               },
               "Yes": function() {
                   
@@ -53,11 +54,6 @@ $.rails.showConfirmDialog = function(link) {
                   $(html3).modal();
                   $("#dialog-confirm3").dialog({
                     width: 340,
-                    buttons: {
-                      "Close": function() {
-                        $( this ).dialog( "close" );
-                      }
-                    }
                   });
               },
               "No, delete any way!": function() {
@@ -68,6 +64,7 @@ $.rails.showConfirmDialog = function(link) {
                       buttons: {
                         "Close": function() {
                           $( this ).dialog( "close" );
+                          location.reload();
                         }
                       }
                   });

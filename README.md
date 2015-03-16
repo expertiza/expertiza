@@ -1,6 +1,6 @@
 ## Changes made:
 
-#### For Bug #485 fixing
+#### For Bug [#485](https://github.com/expertiza/expertiza/issues/485) fixing
 
 1. In submitted_content_controller.rb, line 19. Changed `else if` to `elsif`
 2. In model/assignment.rb, line 489. Changed `Course.find(self.course_id).get_path` to `Course.find(self.course_id).directory_path`

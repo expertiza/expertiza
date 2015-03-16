@@ -3,6 +3,7 @@ class Assignment < ActiveRecord::Base
 
   include AssignmentAnalytic
   include DynamicReviewMapping
+  include Scorable
   has_paper_trail
   # Relationships
   belongs_to :course
@@ -392,6 +393,7 @@ class Assignment < ActiveRecord::Base
     mappings
   end
 
+
   def scores(questions)
     scores = Hash.new
 
@@ -469,16 +471,11 @@ class Assignment < ActiveRecord::Base
     scores
   end
 
+
   def get_contributor(contrib_id)
     AssignmentTeam.find(contrib_id)
   end
 
-  # parameterized by questionnaire
-  def get_max_score_possible(questionnaire)
-    sum_of_weights = questionnaire.questions.map(&:weight).sum
-    max = questionnaire.questions * questionnaire.max_question_score * sum_of_weights
-    [max, sum_of_weights]
-  end
 
   def path
     raise 'Path cannot be created. The assignment must be associated with either a course or an instructor.' if self.course_id == nil && self.instructor_id == nil
@@ -818,37 +815,6 @@ class Assignment < ActiveRecord::Base
     (due_date.nil? || due_date == 'Finished') ? 'Finished' : due_date
   end
 
-  # Returns hash review_scores[reviewer_id][reviewee_id] = score
-  def compute_reviews_hash
-    review_questionnaire_id = get_review_questionnaire_id
-    @questions = Question.where( ['questionnaire_id = ?', review_questionnaire_id])
-    @review_scores = Hash.new
-    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
-    @response_type = 'TeamReviewResponseMap'
-
-    @myreviewers = ResponseMap.select('DISTINCT reviewer_id').where(['reviewed_object_id = ? && type = ? ', self.id, @type])
-
-    @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
-
-    @response_maps.each do |response_map|
-      # Check if response is there
-      @corresponding_response = Response.where(['map_id = ?', response_map.id])
-      @respective_scores = Hash.new
-      @respective_scores = @review_scores[response_map.reviewer_id] if @review_scores[response_map.reviewer_id] != nil
-
-      if @corresponding_response != nil
-        @this_review_score_raw = Score.get_total_score(response: @corresponding_response, questions: @questions, q_types: Array.new)
-        @this_review_score = ((@this_review_score_raw*100).round/100.0) if @this_review_score_raw >= 0.0
-      else
-        @this_review_score = 0.0
-      end
-      @respective_scores[response_map.reviewee_id] = @this_review_score
-      @review_scores[response_map.reviewer_id] = @respective_scores
-    end
-    @review_scores
-  end
-
   def get_review_questionnaire_id
     @revqids = []
     @revqids = AssignmentQuestionnaire.where(['assignment_id = ?', self.id])
@@ -929,33 +895,6 @@ class Assignment < ActiveRecord::Base
     (get_total_reviews_assigned == 0) ? 0 : ((get_total_reviews_completed().to_f / get_total_reviews_assigned.to_f) * 100).to_i
   end
 
-  # Returns the average of all responses for this assignment as an integer (0-100)
-  def get_average_score
-    return 0 if get_total_reviews_assigned == 0
-    sum_of_scores = 0
-    self.response_maps.each do |response_map|
-      sum_of_scores = sum_of_scores + response_map.response.get_average_score if !response_map.response.nil?
-    end
-    (sum_of_scores / get_total_reviews_completed).to_i
-  end
-
-  def get_score_distribution
-    distribution = Array.new(101, 0)
-
-    self.response_maps.each do |response_map|
-      if !response_map.response.nil?
-        score = response_map.response.get_average_score.to_i
-        distribution[score] += 1 if score >= 0 && score <= 100
-      end
-    end
-    distribution
-  end
-
-  # Compute total score for this assignment by summing the scores given on all questionnaires.
-  # Only scores passed in are included in this sum.
-  def compute_total_score(scores)
-    self.questionnaires.inject(0) { |total, questionnaire| total + questionnaire.get_weighted_score(self, scores) }
-  end
 
   # Checks whether there are duplicate assignments of the same name by the same instructor.
   # If the assignments are assigned to courses, it's OK to have duplicate names in different

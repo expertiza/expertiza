@@ -131,11 +131,11 @@ class UsersController < ApplicationController
         end
         undo_link("User \"#{@user.name}\" has been created successfully. ")
         redirect_to :action => 'list'
-        else
+      else
           foreign
           render :action => 'new'
-        end
-        end
+      end
+    end
 
 
   def edit

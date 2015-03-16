@@ -76,9 +76,10 @@ module ReviewFilesHelper
     end
   end
 
-  def self.find_review_files(participant) {
+  def self.find_review_files(participant) 
     # Find all files over all versions submitted by the team
-    all_review_files = []
+
+    all_review_files = Array.new
 
     if participant.assignment.team_assignment
       participant.team.get_participants.each_with_index { |member,index|
@@ -89,9 +90,9 @@ module ReviewFilesHelper
     end
 
     all_review_files
-  }
+  end
 
-  def self.find_review_versions(all_review_files) {
+  def self.find_review_versions(all_review_files) 
     file_version_map = Hash.new
 
     all_review_files.each_with_index do |each_file,index|
@@ -101,7 +102,7 @@ module ReviewFilesHelper
     end
 
     return file_version_map
-  }
+  end
 
 
 end

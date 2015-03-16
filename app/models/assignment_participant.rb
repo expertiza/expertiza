@@ -470,7 +470,9 @@ class AssignmentParticipant < Participant
         dir_files = get_files(file)
         dir_files.each{|f| files << f}
       end
-      files << file
+      if !File.directory?(file)
+        files << file
+      end
     end
     files
   end
@@ -481,19 +483,6 @@ class AssignmentParticipant < Participant
     files = Array.new
     if(self.directory_num)
       files = get_files(self.get_path)
-    end
-    return files
-  end
-
-  def get_files(directory)
-    files_list = Dir[directory + "/*"]
-    files = Array.new
-    for file in files_list
-      if File.directory?(file) then
-        dir_files = get_files(file)
-        dir_files.each{|f| files << f}
-      end
-      files << file
     end
     return files
   end
@@ -603,7 +592,11 @@ class AssignmentParticipant < Participant
     end
 
     def get_path
-      self.assignment.get_path + "/"+ self.directory_num.to_s
+      if self.assignment.get_path.to_s[-1] != "/" then
+        self.assignment.get_path + self.directory_num.to_s
+      else
+        self.assignment.get_path + "/"+ self.directory_num.to_s
+      end
     end
     alias_method :path, :get_path
 

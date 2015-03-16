@@ -70,6 +70,8 @@ class SubmittedContentController < ApplicationController
       @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
     end
 
+    logger.warn "current_folder: #{@current_folder.name}"
+
     curr_directory = participant.get_path.to_s + @current_folder.name
 
     if !File.exists? curr_directory

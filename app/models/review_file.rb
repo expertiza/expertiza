@@ -25,7 +25,7 @@ class ReviewFile < ActiveRecord::Base
 
     # For all other members of the team, find the most recent version of code
     #   review files submitted by any of them.
-    participant.team.get_participants.each { |member|
+    participant.team.participants.each { |member|
       file = ReviewFile.where(['author_participant_id = ?', member.id], :order => 'version_number desc').first
 
       #if file

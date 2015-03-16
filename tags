@@ -2764,20 +2764,20 @@ get_delimiter	app/controllers/import_file_controller.rb	/^  def get_delimiter(pa
 get_directory	app/models/assignment_node.rb	/^  def get_directory$/;"	f	class:AssignmentNode
 get_directory	app/models/course_node.rb	/^  def get_directory$/;"	f	class:CourseNode
 get_directory	app/models/node.rb	/^  def get_directory$/;"	f	class:Node
-get_export_fields	app/models/assignment.rb	/^    def self.get_export_fields(options)$/;"	F	class:Assignment.signed_up_topic
-get_export_fields	app/models/assignment_participant.rb	/^  def self.get_export_fields(options)$/;"	F	class:AssignmentParticipant
-get_export_fields	app/models/assignment_team.rb	/^      def self.get_export_fields(options)$/;"	F	class:AssignmentTeam
-get_export_fields	app/models/course_participant.rb	/^  def self.get_export_fields(options)$/;"	F	class:CourseParticipant
-get_export_fields	app/models/course_team.rb	/^    def self.get_export_fields(options)$/;"	F	class:CourseTeam
-get_export_fields	app/models/metareview_response_map.rb	/^  def self.get_export_fields(options)$/;"	F	class:MetareviewResponseMap
-get_export_fields	app/models/review_response_map.rb	/^  def self.get_export_fields(options)$/;"	F	class:ReviewResponseMap
-get_export_fields	app/models/user.rb	/^  def self.get_export_fields(options)$/;"	F	class:User
+export_fields	app/models/assignment.rb	/^    def self.export_fields(options)$/;"	F	class:Assignment.signed_up_topic
+export_fields	app/models/assignment_participant.rb	/^  def self.export_fields(options)$/;"	F	class:AssignmentParticipant
+export_fields	app/models/assignment_team.rb	/^      def self.export_fields(options)$/;"	F	class:AssignmentTeam
+export_fields	app/models/course_participant.rb	/^  def self.export_fields(options)$/;"	F	class:CourseParticipant
+export_fields	app/models/course_team.rb	/^    def self.export_fields(options)$/;"	F	class:CourseTeam
+export_fields	app/models/metareview_response_map.rb	/^  def self.export_fields(options)$/;"	F	class:MetareviewResponseMap
+export_fields	app/models/review_response_map.rb	/^  def self.export_fields(options)$/;"	F	class:ReviewResponseMap
+export_fields	app/models/user.rb	/^  def self.export_fields(options)$/;"	F	class:User
 get_feedback	app/models/assignment_participant.rb	/^  def get_feedback$/;"	f	class:AssignmentParticipant
 get_field	app/helpers/application_helper.rb	/^  def get_field(element, field)$/;"	f	class:ApplicationHelper
 get_file	app/models/review_file.rb	/^  def self.get_file(code_review_dir, version_number, base_file_name)$/;"	F	class:ReviewFile.getHighlightCellRight
 get_file_type	app/controllers/submitted_content_controller.rb	/^def get_file_type file_name$/;"	f
 get_file_type	app/helpers/review_files_helper.rb	/^  def self.get_file_type file_name$/;"	F	class:ReviewFilesHelper
-get_files	app/models/assignment_participant.rb	/^  def get_files(directory)$/;"	f	class:AssignmentParticipant
+files	app/models/assignment_participant.rb	/^  def files(directory)$/;"	f	class:AssignmentParticipant
 get_first_file_array	app/models/review_file.rb	/^  def self.get_first_file_array(processor, i)$/;"	F	class:ReviewFile
 get_first_line_num	app/models/review_file.rb	/^  def self.get_first_line_num(processor, i, first_count)$/;"	F	class:ReviewFile.getHighlightCellRight
 get_first_member	app/models/assignment_team.rb	/^  def self.get_first_member(team_id)$/;"	F	class:AssignmentTeam
@@ -2786,14 +2786,21 @@ get_formatted_question_type	app/models/question_type.rb	/^  def self.get_formatt
 get_four_node_cycles	app/models/assignment_participant.rb	/^  def get_four_node_cycles$/;"	f	class:AssignmentParticipant
 get_global_surveys	app/helpers/survey_helper.rb	/^  def self.get_global_surveys$/;"	F	class:SurveyHelper
 get_graph_data_bundle	app/controllers/analytic_controller.rb	/^  def get_graph_data_bundle$/;"	f	class:AnalyticController
-get_hash	app/models/assignment_participant.rb	/^  def get_hash(time_stamp)$/;"	f	class:AssignmentParticipant
+hash	app/models/assignment_participant.rb	/^  def hash(time_stamp)$/;"	f	class:AssignmentParticipant
 get_home_action	app/helpers/auth_helper.rb	/^  def self.get_home_action(user)$/;"	F	class:AuthHelper
 get_home_action	app/models/student.rb	/^  def get_home_action$/;"	f	class:Student
 get_home_controller	app/helpers/auth_helper.rb	/^  def self.get_home_controller(user)$/;"	F	class:AuthHelper
 get_home_controller	app/models/student.rb	/^  def get_home_controller$/;"	f	class:Student
+<<<<<<< HEAD
 get_hyperlinks	app/models/assignment_team.rb	/^  def get_hyperlinks$/;"	f	class:AssignmentTeam
 get_hyperlinks_array	app/models/assignment_participant.rb	/^  def get_hyperlinks_array$/;"	f	class:AssignmentParticipant
 get_id_str	app/helpers/chart_helper.rb	/^    def get_id_str()$/;"	f	class:ChartHelper.Chart
+=======
+hyperlinks	app/models/assignment_participant.rb	/^  def hyperlinks$/;"	f	class:AssignmentParticipant
+hyperlinks	app/models/assignment_team.rb	/^  def hyperlinks$/;"	f	class:AssignmentTeam
+hyperlinks_array	app/models/assignment_participant.rb	/^  def hyperlinks_array$/;"	f	class:AssignmentParticipant
+get_id_str	app/helpers/chart.rb	/^  def get_id_str()$/;"	f	class:Chart
+>>>>>>> b849ecdcb0d1c1d1b22a758fdd969e37869b769a
 get_instructor	app/models/ta.rb	/^  def get_instructor$/;"	f	class:Ta
 get_instructor	app/models/user.rb	/^  def get_instructor$/;"	f	class:User
 get_item	app/models/menu.rb	/^  def get_item(item_id)$/;"	f	class:Menu.initialize
@@ -2850,6 +2857,7 @@ get_participant	app/models/course.rb	/^  def get_participant (user_id)$/;"	f	cla
 get_participant_reviewee	db/migrate/102_standardize_review_mappings.rb	/^  def self.get_participant_reviewee(mapping)$/;"	F	class:StandardizeReviewMappings
 get_participant_reviewer	db/migrate/102_standardize_review_mappings.rb	/^  def self.get_participant_reviewer(mapping)$/;"	F	class:StandardizeReviewMappings
 get_participant_score	app/models/score_cache.rb	/^  def self.get_participant_score()$/;"	F	class:ScoreCache
+<<<<<<< HEAD
 get_participant_type	app/models/assignment_team.rb	/^      def get_participant_type$/;"	f	class:AssignmentTeam
 get_participant_type	app/models/course_team.rb	/^  def get_participant_type$/;"	f	class:CourseTeam
 get_participants	app/models/course.rb	/^  def get_participants$/;"	f	class:Course
@@ -2860,46 +2868,72 @@ get_path	app/models/assignment_participant.rb	/^    def get_path$/;"	f	class:Ass
 get_path	app/models/assignment_team.rb	/^  def get_path$/;"	f	class:AssignmentTeam
 get_path	app/models/course.rb	/^  def get_path$/;"	f	class:Course
 get_path	app/models/course_participant.rb	/^  def get_path$/;"	f	class:CourseParticipant
+=======
+participant_type	app/models/assignment_team.rb	/^      def participant_type$/;"	f	class:AssignmentTeam
+participant_type	app/models/course_team.rb	/^  def participant_type$/;"	f	class:CourseTeam
+get_participants	app/models/assignment_team.rb	/^      def get_participants$/;"	f	class:AssignmentTeam
+get_participants	app/models/course.rb	/^  def get_participants$/;"	f	class:Course
+get_participants	app/models/team.rb	/^  def get_participants$/;"	f	class:Team
+path	app/controllers/assignment_controller.rb	/^      def path$/;"	f	class:AssignmentController
+path	app/controllers/assignments_controller.rb	/^  def path$/;"	f	class:AssignmentsController
+path	app/models/assignment.rb	/^  def path$/;"	f	class:Assignment
+path	app/models/assignment_participant.rb	/^    def path$/;"	f	class:AssignmentParticipant
+path	app/models/assignment_team.rb	/^  def path$/;"	f	class:AssignmentTeam
+path	app/models/course.rb	/^  def path$/;"	f	class:Course
+path	app/models/course_participant.rb	/^  def path$/;"	f	class:CourseParticipant
+>>>>>>> b849ecdcb0d1c1d1b22a758fdd969e37869b769a
 get_percentage_reviews_completed	app/models/assignment.rb	/^  def get_percentage_reviews_completed$/;"	f	class:Assignment
 get_pie_chart_url	app/helpers/charts_helper.rb	/^  def self.get_pie_chart_url(labels, values)$/;"	F	class:ChartsHelper
 get_possible_team_members	app/models/team.rb	/^  def get_possible_team_members(name)$/;"	f	class:Team
 get_questions_from_csv	app/helpers/questionnaire_helper.rb	/^def self.get_questions_from_csv(questionnaire, file)$/;"	F	class:QuestionnaireHelper
 get_quiz_deadline	app/models/assignment.rb	/^  def get_quiz_deadline$/;"	f	class:Assignment
+<<<<<<< HEAD
 get_quizzes_taken	app/models/assignment_participant.rb	/^  def get_quizzes_taken$/;"	f	class:AssignmentParticipant
 get_responses_comments_with_assignment_id	app/models/survey_response.rb	/^  def self.get_responses_comments_with_assignment_id(assignment_id, survey_id, question_id)$/;"	F	class:SurveyResponse
 get_responses_comments_with_deployment_id	app/models/survey_response.rb	/^  def self.get_responses_comments_with_deployment_id(deployment_id, survey_id, question_id)$/;"	F	class:SurveyResponse
 get_review_map_type	app/models/assignment_team.rb	/^  def get_review_map_type$/;"	f	class:AssignmentTeam
+=======
+quizzes_taken	app/models/assignment_participant.rb	/^  def quizzes_taken$/;"	f	class:AssignmentParticipant
+review_map_type	app/models/assignment_team.rb	/^  def review_map_type$/;"	f	class:AssignmentTeam
+>>>>>>> b849ecdcb0d1c1d1b22a758fdd969e37869b769a
 get_review_number	app/models/assignment.rb	/^  def get_review_number(mapping)$/;"	f	class:Assignment
 get_review_questionnaire_id	app/models/assignment.rb	/^  def get_review_questionnaire_id$/;"	f	class:Assignment
 get_review_rounds	app/models/assignment.rb	/^  def get_review_rounds$/;"	f	class:Assignment
 get_reviewer	app/controllers/review_mapping_controller.rb	/^  def get_reviewer(user,assignment,reg_url)$/;"	f	class:ReviewMappingController
 get_reviewer	db/migrate/097_create_feedback_mappings.rb	/^  def self.get_reviewer(map, feedback)    $/;"	F	class:CreateFeedbackMappings
 get_reviewer_assessments_for	app/models/response_map.rb	/^  def self.get_reviewer_assessments_for(participant, reviewer)$/;"	F	class:ResponseMap
-get_reviewers	app/models/assignment_participant.rb	/^  def get_reviewers$/;"	f	class:AssignmentParticipant
-get_reviews	app/models/assignment_participant.rb	/^  def get_reviews$/;"	f	class:AssignmentParticipant
+reviewers	app/models/assignment_participant.rb	/^  def reviewers$/;"	f	class:AssignmentParticipant
+reviews	app/models/assignment_participant.rb	/^  def reviews$/;"	f	class:AssignmentParticipant
 get_reviews_average	app/models/score_cache.rb	/^  def self.get_reviews_average(pid)$/;"	F	class:ScoreCache
-get_reviews_by_reviewer	app/models/assignment_participant.rb	/^  def get_reviews_by_reviewer(reviewer)$/;"	f	class:AssignmentParticipant
+get_reviews_by_reviewer	app/models/assignment_participant.rb	/^  def reviews_by_reviewer(reviewer)$/;"	f	class:AssignmentParticipant
 get_rg_color	app/helpers/charts_helper.rb	/^  def self.get_rg_color(value,max)$/;"	F	class:ChartsHelper
 get_role	app/controllers/users_controller.rb	/^        def get_role$/;"	f	class:UsersController
 get_safe_filename	app/helpers/review_files_helper.rb	/^  def self.get_safe_filename(filename)$/;"	F	class:ReviewFilesHelper
 get_score_distribution	app/models/assignment.rb	/^  def get_score_distribution$/;"	f	class:Assignment
 get_score_set_for_review_type	app/models/score_cache.rb	/^  def self.get_score_set_for_review_type(allscores, map_type)$/;"	F	class:ScoreCache
-get_scores	app/controllers/response_controller.rb	/^  def get_scores$/;"	f	class:ResponseController
-get_scores	app/models/assignment.rb	/^  def get_scores(questions)$/;"	f	class:Assignment
-get_scores	app/models/assignment_participant.rb	/^  def get_scores(questions)$/;"	f	class:AssignmentParticipant
-get_scores	app/models/assignment_team.rb	/^      def get_scores(questions)$/;"	f	class:AssignmentTeam
-get_scores	app/models/participant.rb	/^    def get_scores(questions)$/;"	f	class:Participant
+scores	app/controllers/response_controller.rb	/^  def scores$/;"	f	class:ResponseController
+scores	app/models/assignment.rb	/^  def scores(questions)$/;"	f	class:Assignment
+scores	app/models/assignment_participant.rb	/^  def scores(questions)$/;"	f	class:AssignmentParticipant
+scores	app/models/assignment_team.rb	/^      def scores(questions)$/;"	f	class:AssignmentTeam
+scores	app/models/participant.rb	/^    def scores(questions)$/;"	f	class:Participant
 get_second_file_array	app/models/review_file.rb	/^  def self.get_second_file_array(processor, i)$/;"	F	class:ReviewFile
 get_second_line_num	app/models/review_file.rb	/^  def self.get_second_line_num(processor, i, second_count)$/;"	F	class:ReviewFile.getHighlightCellRight
 get_second_offset	app/models/review_file.rb	/^  def self.get_second_offset(processor, i, second_offset)$/;"	F	class:ReviewFile.getHighlightCellRight
+<<<<<<< HEAD
 get_stage_deadline	app/models/assignment.rb	/^  def get_stage_deadline(topic_id=nil)$/;"	f	class:Assignment
 get_stage_deadline	app/models/assignment_participant.rb	/^    def get_stage_deadline$/;"	f	class:AssignmentParticipant
 get_stage_deadline	app/models/participant.rb	/^  def get_stage_deadline$/;"	f	class:Participant
+=======
+stage_deadline	app/helpers/assignments_helper.rb	/^  def self.stage_deadline(assignment_id)$/;"	F	class:AssignmentsHelper
+stage_deadline	app/models/assignment.rb	/^  def stage_deadline(topic_id=nil)$/;"	f	class:Assignment
+stage_deadline	app/models/assignment_participant.rb	/^    def stage_deadline$/;"	f	class:AssignmentParticipant
+stage_deadline	app/models/participant.rb	/^  def stage_deadline$/;"	f	class:Participant
+>>>>>>> b849ecdcb0d1c1d1b22a758fdd969e37869b769a
 get_state	app/helpers/dynamic_quiz_assignment_helper.rb	/^  def self.get_state(least_quiz_count,current_quiz_count,max_quiz_count)$/;"	F	class:DynamicQuizAssignmentHelper
 get_state	app/helpers/dynamic_review_assignment_helper.rb	/^  def self.get_state(least_review_count,current_review_count,max_review_count)$/;"	F	class:DynamicReviewAssignmentHelper
-get_submitted_files	app/models/assignment_participant.rb	/^  def get_submitted_files$/;"	f	class:AssignmentParticipant
-get_submitted_files	app/models/assignment_participant.rb	/^  def get_submitted_files()$/;"	f	class:AssignmentParticipant
-get_submitted_files	app/models/assignment_team.rb	/^  def get_submitted_files$/;"	f	class:AssignmentTeam
+submitted_files	app/models/assignment_participant.rb	/^  def submitted_files$/;"	f	class:AssignmentParticipant
+submitted_files	app/models/assignment_participant.rb	/^  def submitted_files()$/;"	f	class:AssignmentParticipant
+submitted_files	app/models/assignment_team.rb	/^  def submitted_files$/;"	f	class:AssignmentTeam
 get_survey_distribution_id	app/models/course_node.rb	/^  def get_survey_distribution_id$/;"	f	class:CourseNode
 get_survey_list	app/models/survey_response.rb	/^  def self.get_survey_list(assignment_id, survey_id)$/;"	F	class:SurveyResponse
 get_survey_list_with_deploy_id	app/models/survey_response.rb	/^  def self.get_survey_list_with_deploy_id(deployment_id, survey_id)$/;"	F	class:SurveyResponse
@@ -4062,6 +4096,54 @@ test_generates_with_gem	vendor/plugins/rails_upgrade/test/gemfile_generator_test
 test_generates_with_no_gems	vendor/plugins/rails_upgrade/test/gemfile_generator_test.rb	/^  def test_generates_with_no_gems$/;"	f	class:GemfileGeneratorTest
 test_generates_with_version	vendor/plugins/rails_upgrade/test/gemfile_generator_test.rb	/^  def test_generates_with_version$/;"	f	class:GemfileGeneratorTest
 test_generic_input_tag	vendor/plugins/dynamic_form/test/dynamic_form_test.rb	/^  def test_generic_input_tag$/;"	f
+<<<<<<< HEAD
+=======
+test_get_assessment_for	test/unit/questionnaire_test.rb	/^  def test_get_assessment_for$/;"	f	class:RubricTest
+test_get_assessments_for	test/unit/response_map_test.rb	/^  def test_get_assessments_for$/;"	f	class:ResponseMapTest
+test_get_available_users	test/unit/user_test.rb	/^  def test_get_available_users$/;"	f	class:UserTest
+test_get_children_with_show_false_and_TA_and_ascending_order_by_name	test/unit/course_node_test.rb	/^  def test_get_children_with_show_false_and_TA_and_ascending_order_by_name$/;"	f	class:CourseTest
+test_get_children_with_show_false_and_TA_and_descending_order_by_name	test/unit/course_node_test.rb	/^  def test_get_children_with_show_false_and_TA_and_descending_order_by_name$/;"	f	class:CourseTest
+test_get_children_with_show_false_and_non_TA_and_ascending_order_by_name	test/unit/course_node_test.rb	/^  def test_get_children_with_show_false_and_non_TA_and_ascending_order_by_name$/;"	f	class:CourseTest
+test_get_children_with_show_false_and_non_TA_and_descending_order_by_name	test/unit/course_node_test.rb	/^  def test_get_children_with_show_false_and_non_TA_and_descending_order_by_name$/;"	f	class:CourseTest
+test_get_children_with_show_false_and_non_TA_and_nil_order_by_nil	test/unit/course_node_test.rb	/^  def test_get_children_with_show_false_and_non_TA_and_nil_order_by_nil$/;"	f	class:CourseTest
+test_get_children_with_show_true_and_TA_and_ascending_order_by_name	test/unit/course_node_test.rb	/^  def test_get_children_with_show_true_and_TA_and_ascending_order_by_name$/;"	f	class:CourseTest
+test_get_children_with_show_true_and_TA_and_descending_order_by_name	test/unit/course_node_test.rb	/^  def test_get_children_with_show_true_and_TA_and_descending_order_by_name$/;"	f	class:CourseTest
+test_get_children_with_show_true_and_non_TA_and_ascending_order_by_name	test/unit/course_node_test.rb	/^  def test_get_children_with_show_true_and_non_TA_and_ascending_order_by_name$/;"	f	class:CourseTest
+test_get_children_with_show_true_and_non_TA_and_descending_order_by_name	test/unit/course_node_test.rb	/^  def test_get_children_with_show_true_and_non_TA_and_descending_order_by_name$/;"	f	class:CourseTest
+test_get_creation_date	test/unit/course_node_test.rb	/^  def test_get_creation_date$/;"	f	class:CourseTest
+test_get_current_stage	test/functional/student_review_controller_test.rb	/^  def test_get_current_stage$/;"	f	class:StudentReviewControllerTest
+test_get_current_user_id_and_verify	test/functional/student_review_controller_test.rb	/^  def test_get_current_user_id_and_verify$/;"	f	class:StudentReviewControllerTest
+test_get_directory	test/unit/course_node_test.rb	/^  def test_get_directory$/;"	f	class:CourseTest
+test_get_export_field	test/unit/course_participant_test.rb	/^  def test_get_export_field$/;"	f	class:CourseTest
+test_get_max_score_possible	test/unit/assignment_test.rb	/^  def test_get_max_score_possible$/;"	f	class:AssignmentTest
+test_get_modified_date	test/unit/course_node_test.rb	/^  def test_get_modified_date$/;"	f	class:CourseTest
+test_get_my_scores_feedback	test/unit/score_cache_test.rb	/^  def test_get_my_scores_feedback$/;"	f	class:ScoreCacheTest
+test_get_my_scores_metareview	test/unit/score_cache_test.rb	/^  def test_get_my_scores_metareview$/;"	f	class:ScoreCacheTest
+test_get_my_scores_participantreview	test/unit/score_cache_test.rb	/^  def test_get_my_scores_participantreview$/;"	f	class:ScoreCacheTest
+test_get_my_scores_teammatereview	test/unit/score_cache_test.rb	/^  def test_get_my_scores_teammatereview$/;"	f	class:ScoreCacheTest
+test_get_my_scores_teamreview	test/unit/score_cache_test.rb	/^  def test_get_my_scores_teamreview$/;"	f	class:ScoreCacheTest
+test_get_my_scores_teamreview_nil_allscores	test/unit/score_cache_test.rb	/^  def test_get_my_scores_teamreview_nil_allscores$/;"	f	class:ScoreCacheTest
+test_get_my_scores_teamreview_nil_scoreparameter	test/unit/score_cache_test.rb	/^  def test_get_my_scores_teamreview_nil_scoreparameter$/;"	f	class:ScoreCacheTest
+test_get_name	test/unit/course_node_test.rb	/^  def test_get_name$/;"	f	class:CourseTest
+test_get_parent_id	test/unit/course_node_test.rb	/^  def test_get_parent_id$/;"	f	class:CourseTest
+test_get_parents_includes_children	test/unit/role_test.rb	/^  def test_get_parents_includes_children$/;"	f	class:RoleTest
+test_get_parents_includes_self	test/unit/role_test.rb	/^  def test_get_parents_includes_self$/;"	f	class:RoleTest
+test_get_participant	test/unit/course_test.rb	/^  def test_get_participant$/;"	f	class:CourseTest
+test_get_participants	test/unit/course_test.rb	/^  def test_get_participants$/;"	f	class:CourseTest
+test_path	test/unit/course_participant_test.rb	/^  def test_path$/;"	f	class:CourseTest
+test_path	test/unit/course_test.rb	/^  def test_path$/;"	f	class:CourseTest
+test_get_review_questionnaire_id	test/unit/assignment_test.rb	/^  def test_get_review_questionnaire_id$/;"	f	class:AssignmentTest
+test_get_teams	test/unit/course_node_test.rb	/^  def test_get_teams$/;"	f	class:CourseTest
+test_get_teams	test/unit/course_test.rb	/^  def test_get_teams$/;"	f	class:CourseTest
+test_get_total_score_with_custom_questionnaire_responses	test/unit/score_test.rb	/^  def test_get_total_score_with_custom_questionnaire_responses$/;"	f	class:ScoreTest
+test_get_total_score_with_custom_questionnaire_responses_score_negative	test/unit/score_test.rb	/^  def test_get_total_score_with_custom_questionnaire_responses_score_negative$/;"	f	class:ScoreTest
+test_get_total_score_with_nil_response_many_questions	test/unit/score_test.rb	/^  def test_get_total_score_with_nil_response_many_questions$/;"	f	class:ScoreTest
+test_get_total_score_with_response_empty_questions	test/unit/score_test.rb	/^  def test_get_total_score_with_response_empty_questions$/;"	f	class:ScoreTest
+test_get_total_score_with_response_many_questions	test/unit/score_test.rb	/^  def test_get_total_score_with_response_many_questions$/;"	f	class:ScoreTest
+test_get_total_score_with_response_nil_questions	test/unit/score_test.rb	/^  def test_get_total_score_with_response_nil_questions$/;"	f	class:ScoreTest
+test_get_url	test/functional/student_task_controller_test.rb	/^  def test_get_url$/;"	f	class:StudentTaskControllerTest
+test_get_weighted_score	test/unit/author_feedback_questionnaire_test.rb	/^  def test_get_weighted_score$/;"	f	class:AuthorFeedbackQuestionnaireTest
+>>>>>>> b849ecdcb0d1c1d1b22a758fdd969e37869b769a
 test_google_chart_axis	vendor/plugins/gc4r/test/gc4r_test.rb	/^  def test_google_chart_axis$/;"	f	class:GoogleChartsTest
 test_google_chart_data	vendor/plugins/gc4r/test/gc4r_test.rb	/^  def test_google_chart_data$/;"	f	class:GoogleChartsTest
 test_guarded_by_method_with_prereqs	vendor/plugins/verification/test/verification_test.rb	/^  def test_guarded_by_method_with_prereqs$/;"	f	class:VerificationTest

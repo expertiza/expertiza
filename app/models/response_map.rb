@@ -19,12 +19,10 @@ class ResponseMap < ActiveRecord::Base
       maps = where(reviewee_id: participant.id)
       maps.each { |map|
         if map.response
-          @all_resp=Response.all
-          for element in @all_resp
-            if (element.map_id == map.map_id)
-              @array_sort << element
-            end
-          end
+
+          @all_resp=Response.find_by_map_id(map.map_id)
+          @array_sort << @all_resp
+
           #sort all versions in descending order and get the latest one.
           #@sort_to=@array_sort.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
           @sort_to=@array_sort.sort #{ |m1, m2| (m1.updated_at and m2.updated_at) ? m2.updated_at <=> m1.updated_at : (m1.version_num ? -1 : 1) }

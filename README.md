@@ -1,60 +1,45 @@
-Expertiza
+Expertiza 
 =========
+#### CSC/ECE 517 Project2 OSS 
+ <b>Topic</b>: E1509<br>
+ <b>Team member</b>: mdong3, yshang3, jli53<br>
+ <b>Contact</b>: Ed Gehringer, efg@ncsu.edu, Nikhil Chinthapallee, nchinth@ncsu.edu<br>
 
-[![Build Status](https://travis-ci.org/expertiza/expertiza.png?branch=rails4)](https://travis-ci.org/expertiza/expertiza)
-[![Code Climate](https://codeclimate.com/github/expertiza/expertiza.png)](https://codeclimate.com/github/expertiza/expertiza)
-[![Coverage Status](https://coveralls.io/repos/expertiza/expertiza/badge.png?branch=rails4)](https://coveralls.io/r/expertiza/expertiza?branch=rails4)
-#### Peer review system
+ <b>Classes involved</b>: response.rb, and possibly other model classes<br>
 
-Expertiza is a web application where students can submit and peer-review learning objects (articles, code, web sites, etc). It is used in select courses at NC State and by professors at several other colleges and universities.
+ <b>What it does:</b>  Lists topics available for an assignment, checks whether a user is signed up for a topic, allows users to sign up for topics.<br>
+ 
+ <b>What’s wrong with it</b><br>
+ * These two controllers seem to do almost the same thing.  They have many of the same methods.  SignUpSheetController is much longer, and has many more recent mods, but some methods of SignUpController seem more sophisticated than SignUpSheetController.  So, your first job is to figure out if both controllers are being used.  If not, remove the unused controller.  Or, move the functions to a single controller if that makes sense to do.
+ * Neither controller is at all RESTful; i.e.., its method names aren’t the standard names new, create, edit, delete, etc.  Functionality is divided differently than in a standard controller.<br/>
+    a. def confirm_topic(creator_id, topic_id, assignment_id)
+    b. def delete_signup
+    c. def delete_signup_for_topic(assignment_id,topic_id)
+    d. def other_confirmed_topic_for_user(assignment_id, creator_id)
+    e. def signup
+    f. def slotAvailable?(topic_id)
+ * Functionality that should be in models is incorporated into the controller.
+ * Some methods are too long and appear to do more than one thing
+ * This class interfaces with assignments_controller so that a list of topics can be displayed when one is editing an assignment.  Please be careful that your changes do not affect the functionality on the Topics tab of editing an assignment; contact Nikhil Ch. (nchinth) for details.
+ * Rename the controller(s) to SignupController and/or SignupSheetController.  (“Sign up”, which gets written as SignUp in camel case, is a verb, whereas “Signup” is a noun.)
+ 
+<b>Other classes involved</b><br>
+* sign_up_sheet.rb, sign_up_topic.rb, and possibly other model classes; assignments_controller.rb
 
-Setup
------
+<b>Our works</b><br>
+* After various tests and analysis, we found that there is no code about <b>“SignUpController”</b> in routes.rb file and codes in <b>“SignUpController”</b> never got executed when we ran the project. Then we’ve made a decision that <b>“SignUpController”</b> is not used and we removed it.
+* We’ve changed the function <b>“list”</b> to <b>“index”</b> in <b>“SignUpSheetController”</b> to make it more RESTful. But for some others, it is not good to combine some functions with the standard ones. For example, <b>“create”</b> function creates topics, which is one of the administrator’s functions. However <b>“signup”</b> creates a record that includes information for topic and student, which happens when student clicks <b>“signup”</b> button. We can see that <b>“create”</b> and <b>“signup”</b> are designed for different role and different usage so it is not a good idea to combine them together.
+* Some functionality should appear in models rather than in controllers. For example, in <b>“SignUpSheetController”</b>, there is a sentence <b>“SignUpTopic.find_by_sql("SELECT s.id as topic_id FROM sign_up_topics s WHERE s.assignment_id = " + aid)”</b>. It’s better to put it in <b>“SignUpTopic”</b> model so we create a function called <b>“self.find_topic_id_with_assignment_id”</b> to wrap this sentence and call this function in <b>“SignUpSheetController”</b>. 
+* We’ve find that lots of methods do more than one thing so we separate a long function into several concise functions and call them in the original function. Taking method <b>“create”</b> as an example, there are some preparation works and check works before or after the actual create operation. So we separate two functions <b>“update_topic_info”</b> and <b>“check_after_create”</b> from <b>“create”</b>. And we call these two functions in <b>“create”</b> method instead of executing these codes directly.
+* Sometimes after making some changes, the display topics function didn’t work due to some reasons. We’ve fixed those bugs and make sure it still works after our last change.
+* We have renamed the controller’s name, from <b>“SignUpSheetController”</b> to <b>“SignupSheetController”</b>. And we also make sure every reference for this controller has been changed to match the new controller name.
+* There are lots of points that don’t apply to global rules. We have tried our best to find all of them and here are some examples:<br>
+		a. change “users_team.size == 0” to “users_team.empty?”<br>
+		b. change “:maximum => 10” to “maximum: 10”<br>
+c. change “(assignment.staggered_deadline == true)?” to “	(assignment.staggered_deadline)?”<br>
+d. change “if users_team.size == 0” to “if users_team.size.zero?”
 
-### NCSU VCL image
+ 
 
-The expertiza environment is already set up in [NC State's VCL](https://vcl.ncsu.edu) image "Ruby on Rails".
-If you have access, this is quickest way to get a development environment running for Expertiza.
-See the Expertiza wiki on [developing Expertiza on the VCL](http://wikis.lib.ncsu.edu/index.php/Developing_Expertiza_on_the_VCL).
 
-Using the VCL is the quickest way to get started, but you may find it awkward developing on a remote machine
-with network lag and having to reinstall gems every time you connect. Installing locally can be a pain though too.
-Life is full of tradeoffs. :-) The good news is that you can start on one environment, push your work to git,
-and switch to another environment if you don't like the one you started with.
 
-### Installing locally
-
-See the Expertiza wiki for setup instructions. Please update the wiki with corrections or additional helpful information.
-
- * [OSX](http://wikis.lib.ncsu.edu/index.php/Creating_a_Mac_OS_X_Development_Environment_for_the_Expertiza_Application)
- * [Linux](http://wikis.lib.ncsu.edu/index.php/Creating_a_Linux_Development_Environment_for_the_Expertiza_Application)
- * [Windows](http://wikis.lib.ncsu.edu/index.php/Creating_a_Windows_Development_Environment_for_the_Expertiza_Application)
-
-Contributing
-------------
-
- * [Fork](http://help.github.com/fork-a-repo/) the expertiza project
- * [Create a new branch](http://progit.org/book) for your contribution with a descriptive name
- * [Commit and push](http://progit.org/book) until you are happy with your contribution - follow the style guidelines below
- * Make sure to add tests for it; the tests should fail before your contribution/fix and pass afterward
- * [Send a pull request](http://help.github.com/send-pull-requests) to have your code reviewed for merging back into Expertiza
-
-Style Guidelines
-----------------
-
-We've had many contributors in the past who have used a wide variety of ruby coding styles. It's a mess, and we're trying to unify it.
-
-All new files/contributions should:
-
- * Use unix line endings (Windows users: configure git to use [autocrlf](http://help.github.com/line-endings))
- * Indent with 2 spaces (no tabs; configure your editor) both in ruby and erb
- * Follow the [Ruby Style Guide](https://github.com/bbatsov/ruby-style-guide) style for syntax, formatting, and naming
-
-When editing existing files:
-
- * Keep the existing tabbing (use tabs instead of spaces in files that already use tabs everywhere; otherwise use spaces)
- * Keep the existing line ending style (dos/unix)
- * Follow the Ruby style Guide on code you add or edit, as above
-
-Please do no go crazy changing old code to match these guidelines; it will just create lots of potential merge conflicts.
-Applying style guidelines to code you add and modify is good enough. :-)

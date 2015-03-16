@@ -85,36 +85,43 @@ class AssignmentTeam < Team
     super
   end
 
+<<<<<<< HEAD
   def destroy
     response_maps.each(&:destroy)
     super
   end
 
   def self.get_first_member(team_id)
+=======
+  def self.first_member(team_id)
+>>>>>>> b849ecdcb0d1c1d1b22a758fdd969e37869b769a
     find(team_id).participants.first
   end
 
-  def get_hyperlinks
+  def hyperlinks
     links = Array.new
+<<<<<<< HEAD
 
     self.participants.each do |participant|
       puts participant.id
       links+= participant.get_hyperlinks_array
     end
 
+=======
+    self.participants.each { |team_member| links.concat(team_member.hyperlinks_array) }
+>>>>>>> b849ecdcb0d1c1d1b22a758fdd969e37869b769a
     links
   end
 
-  def get_path
-    self.get_participants.first.dir_path
+  def path
+    self.participants.first.dir_path
   end
 
-  def get_submitted_files
-    self.get_participants.first.submitted_files
+  def submitted_files
+    self.participants.first.submitted_files
   end
-  alias_method :submitted_files, :get_submitted_files
 
-  def get_review_map_type
+  def review_map_type
     'TeamReviewResponseMap'
   end
 
@@ -160,17 +167,17 @@ class AssignmentTeam < Team
 
       # insert team members into team unless team was pre-existing & we ignore duplicate teams
       team.import_team_members(index, row) if !(team_exists && options[:handle_dups] == "ignore")
-      end
+    end
 
       def email
         self.get_team_users.first.email
       end
 
-      def get_participant_type
+      def participant_type
         "AssignmentParticipant"
       end
 
-      def get_parent_model
+      def parent_model
         "Assignment"
       end
 
@@ -178,6 +185,19 @@ class AssignmentTeam < Team
         self.name
       end
 
+<<<<<<< HEAD
+=======
+      def participants
+        users = self.users
+        participants = Array.new
+        users.each do |user|
+          participant = AssignmentParticipant.where(user_id: user.id, parent_id: self.parent_id).first
+          participants << participant if participant != nil
+        end
+        participants
+      end
+
+>>>>>>> b849ecdcb0d1c1d1b22a758fdd969e37869b769a
       def copy(course_id)
         new_team = CourseTeam.create_team_and_node(course_id)
         new_team.name = name
@@ -195,7 +215,7 @@ class AssignmentTeam < Team
       end
 
       # return a hash of scores that the team has received for the questions
-      def get_scores(questions)
+      def scores(questions)
         scores = Hash.new
         scores[:team] = self # This doesn't appear to be used anywhere
         assignment.questionnaires.each do |questionnaire|
@@ -206,9 +226,14 @@ class AssignmentTeam < Team
         scores[:total_score] = assignment.compute_total_score(scores)
         scores
       end
-      alias_method :scores, :get_scores
+     
 
+<<<<<<< HEAD
       def self.get_team(participant) # return nil if this participant doesn't have a team
+=======
+      def self.team(participant)
+        team = nil
+>>>>>>> b849ecdcb0d1c1d1b22a758fdd969e37869b769a
         teams_users = TeamsUser.where(user_id: participant.user_id)
         return nil if !teams_users
         teams_users.each do |teams_user|
@@ -237,7 +262,7 @@ class AssignmentTeam < Team
         end
       end
 
-      def self.get_export_fields(options)
+      def self.export_fields(options)
         fields = Array.new
         fields.push("Team Name")
         fields.push("Team members") if options["team_name"] == "false"

@@ -5,7 +5,7 @@ class CourseTeam < Team
   #   currently they are being called: member, participant, user, etc...
   #   suggestion: refactor all to participant
 
-  def get_participant_type
+  def participant_type
     "CourseParticipant"
   end
 
@@ -124,7 +124,7 @@ class CourseTeam < Team
       end
     end
 
-    def self.get_export_fields(options)
+    def self.export_fields(options)
       fields = Array.new
       fields.push("Team Name")
       if (options[:team_name] == "false")

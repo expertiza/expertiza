@@ -1,5 +1,5 @@
 <H1>Score for <%= @participant.fullname %></H1>
-<% pscore = @participant.get_scores(@questions) %>
+<% pscore = @participant.scores(@questions) %>
 <% form_tag :action => 'update', :id => @participant.id do %>
 <TABLE class="grades" >
 <%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>                      

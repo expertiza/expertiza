@@ -14,7 +14,7 @@ describe StudentTask do
     it "creates a StudentTask from a participant" do
       expect(participant).to receive(:assignment)
       expect(participant).to receive(:topic)
-      expect(participant).to receive(:current_stage)
+      expect(participant).to receive(:get_current_stage)
       expect(participant).to receive(:stage_deadline)
       expect(StudentTask.from_participant(participant).participant).to be participant
     end
@@ -53,7 +53,7 @@ describe StudentTask do
 
   describe "#content_submitted_in_current_stage?" do
     it "checks the stage_deadline, resubmission times and hyperlinks" do
-      expect(student_task).to receive(:current_stage).and_return ("submission")
+      expect(student_task).to receive(:get_current_stage).and_return ("submission")
       expect(participant).to receive(:resubmission_times).and_return []
       expect(student_task).to receive(:hyperlinks)
       student_task.content_submitted_in_current_stage?

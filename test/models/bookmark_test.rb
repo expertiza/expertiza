@@ -26,11 +26,18 @@ class BookmarkTest < ActiveSupport::TestCase
   end    
 
   # test "add_this bookmark creates a new bookmark without topic_id" do
-  #   @new_bookmark = Bookmark.add_this_bookmark('example_url.com', 'New Bookmark' , 'expertiza' , 
-  #                              'this is a desc of new bookmark','user2') # topic_id not passed (should be set to nil)
-  #   assert_equals @new_bookmark.topic_id, nil
+    @new_bookmark = Bookmark.add_this_bookmark('example_url.com', 'New Bookmark' , 'expertiza' , 
+                               'this is a desc of new bookmark','user2') # topic_id not passed (should be set to nil)
+
+    assert_equals @new_bookmark.topic_id, nil
+
+    Bookmark.add_this_bookmark('www.some_other_sample.com', 'New Bookmark' , 'expertiza' , 
+                              'this is a desc of new bookmark', @user2)
+
+    assert (Bookmark.find_by_id(1).bmappings[1].title.eql?("New Bookmark"))
     
-  # end
+    
+  end
 
   # test "add_this_bookmark creates a new bookmark with topic_id" do
   #   @new_bookmark = Bookmark.add_this_bookmark(b_url: 'example_url.com', b_title: 'New Bookmark' , b_tags_text: 'expertiza' , 

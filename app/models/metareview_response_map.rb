@@ -51,7 +51,7 @@ class MetareviewResponseMap < ResponseMap
     }
   end
 
-  def self.get_export_fields(options)
+  def self.export_fields(options)
     fields = ["contributor","reviewed by","metareviewed by"]
     return fields
   end

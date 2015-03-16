@@ -52,7 +52,7 @@ class Team < ActiveRecord::Base
   def get_possible_team_members(name)
     query = "select users.* from users, participants"
     query = query + " where users.id = participants.user_id"
-    query = query + " and participants.type = '"+self.get_participant_type+"'"
+    query = query + " and participants.type = '"+self.participant_type+"'"
     query = query + " and participants.parent_id = #{self.parent_id}"
       query = query + " and users.name like '#{name}%'"
     query = query + " order by users.name"
@@ -91,7 +91,7 @@ class Team < ActiveRecord::Base
     members.each{
       | member |
       t_user = TeamsUser.create(:team_id => new_team.id, :user_id => member.user_id)
-      parent = Object.const_get(self.get_parent_model).find(self.parent_id)
+      parent = Object.const_get(self.parent_model).find(self.parent_id)
       TeamUserNode.create(:parent_id => parent.id, :node_object_id => t_user.id)
     }
   end
@@ -99,7 +99,7 @@ class Team < ActiveRecord::Base
   #TODO: no way in hell this method works
   def self.create_node_object(name, parent_id)
     create(:name => name, :parent_id => parent_id)
-    parent = Object.const_get(self.get_parent_model).find(parent_id)
+    parent = Object.const_get(self.parent_model).find(parent_id)
     Object.const_get(self.get_node_type).create(:parent_id => parent.id, :node_object_id => self.id)
   end
 

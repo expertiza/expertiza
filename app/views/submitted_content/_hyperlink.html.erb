@@ -16,6 +16,7 @@
   <a href="#" id="urlLink" name="urlLink" onClick="toggleElement('url','links');return false;">hide links</a><br/>
   <div id="url" style="">
     <ul>
+<<<<<<< HEAD
       <%if participant.get_team_hyperlinks%>
           <% participant.get_team_hyperlinks.each_with_index do |link, index| %>
             <% if stage != "Complete" %>
@@ -28,6 +29,16 @@
             <a href="<%= link %>" target="new"><%= link %></a>
             <br/>
           <% end %>
+=======
+      <% participant.hyperlinks.each_with_index {
+        |link, index| %>
+      <% if stage != "Complete" %>
+        <% if index == 0 %>
+          <input type="radio" id='chk_links' name='chk_links' checked value="<%= index %>"/>
+        <% else %>
+          <input type="radio" id='chk_links' name='chk_links' value="<%= index %>"/>
+        <% end %>
+>>>>>>> b849ecdcb0d1c1d1b22a758fdd969e37869b769a
       <% end %>
     </ul>
   </div>

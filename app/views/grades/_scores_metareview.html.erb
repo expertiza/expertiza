@@ -5,8 +5,8 @@
     <%
         review = rscore[:assessments][0]
     Score.where(response_id: review.response_id).each {
-      |reviewScore|
-      question = Question.find(reviewScore.question_id)
+      |review_score|
+      question = Question.find(review_score.question_id)
     %>
     question = {};
       question.txt = '<%= question.txt %>'.trim();
@@ -32,16 +32,16 @@
     review.parent = {};
     review.parent.questions = [];
     <%
-        Score.where(response_id: review.id).each{ |reviewScore|
+        Score.where(response_id: review.id).each{ |review_score|
     %>
-    review.scores.push('<%= reviewScore.score.to_s %>'.trim());
-          review.comments.push('<%= reviewScore.comments.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim());
+    review.scores.push('<%= review_score.score.to_s %>'.trim());
+          review.comments.push('<%= review_score.comments.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim());
           <%
       }
-        Score.where(response_id: review.id).each{ |reviewScore|
-          question = Question.find(reviewScore.question_id)
+        Score.where(response_id: review.id).each{ |review_score|
+          question = Question.find(review_score.question_id)
         %>
-    review.parent.questions.push({'max_score': '<%= question.questionnaire.max_question_score.to_s %>'.trim(), 'txt': '<%= question.txt %>'.trim(), 'score': '<%= reviewScore.score.to_s %>'.trim(), 'comment': '<%= reviewScore.comments.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim()});
+    review.parent.questions.push({'max_score': '<%= question.questionnaire.max_question_score.to_s %>'.trim(), 'txt': '<%= question.txt %>'.trim(), 'score': '<%= review_score.score.to_s %>'.trim(), 'comment': '<%= review_score.comments.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim()});
           <%
           }
     %>

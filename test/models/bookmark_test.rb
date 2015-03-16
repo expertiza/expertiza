@@ -25,26 +25,28 @@ class BookmarkTest < ActiveSupport::TestCase
     
   end    
 
-  # test "add_this bookmark creates a new bookmark without topic_id" do
-    @new_bookmark = Bookmark.add_this_bookmark('example_url.com', 'New Bookmark' , 'expertiza' , 
-                               'this is a desc of new bookmark','user2') # topic_id not passed (should be set to nil)
-
-    assert_equals @new_bookmark.topic_id, nil
-
+  test "add_this bookmark creates a new bookmark WITHOUT topic_id" do
+    #Rails::logger.warn("TOTAL NUMBER OF BOOKMARKS: #{Bookmark.count}")
+    assert (Bookmark.count == 1) # only bookmark from fixture present at this point
     Bookmark.add_this_bookmark('www.some_other_sample.com', 'New Bookmark' , 'expertiza' , 
-                              'this is a desc of new bookmark', @user2)
+                              'this is a desc of new bookmark', @user2, nil)
+    
+    assert (Bookmark.count == 2) # since url was different, new bookmark was added (now there is two)
 
-    assert (Bookmark.find_by_id(1).bmappings[1].title.eql?("New Bookmark"))
-    
-    
+    # initial bookmark has not been corrupted/edited
+    assert (Bookmark.find_by_url('www.some_other_sample.com').bmappings[0].title.eql?("New Bookmark"))
+    # newly created bookmark has a correct url
+    assert (Bookmark.find_by_url('www.sample.com').bmappings[0].title.eql?("Bmapping1"))    
+
   end
 
-  # test "add_this_bookmark creates a new bookmark with topic_id" do
-  #   @new_bookmark = Bookmark.add_this_bookmark(b_url: 'example_url.com', b_title: 'New Bookmark' , b_tags_text: 'expertiza' , 
-  #                             b_description: 'this is a desc of new bookmark',
-  #                             session_user: 'user2', topic_id: '2') 
-  #   assert_equals @new_bookmark.topic_id, '2'
-  # end
+  test "add_this_bookmark creates a new bookmark WITH topic_id" do
+    assert (Bookmark.count == 1) # only bookmark from fixture present at this point
+    Bookmark.add_this_bookmark('www.some_other_sample.com', 'New Bookmark' , 'expertiza' , 
+                              'this is a desc of new bookmark', @user2, 2)
+
+    assert (Bookmark.count == 2) # since url was different, new bookmark was added (now there is two)
+  end
 
   # test "search_alltags_allusers returns all the bookmarks from all the users" do
   #   order_by = "most_recent"

@@ -9,7 +9,7 @@ class Bookmark < ActiveRecord::Base
       if(topic_id) # something has been passed for topic_id
         Bookmark.add_bookmark(b_url, b_title, b_tags_text, b_description,session_user,topic_id)
       else
-        Bookmark.add_bookmark(b_url, b_title, b_tags_text, b_description,session_user)
+        Bookmark.add_bookmark(b_url, b_title, b_tags_text, b_description,session_user, nil)
       end
     elsif (bmapping_exists)
       Bookmark.edit(b_url, b_title, b_tags_text, b_description,session_user)
@@ -26,9 +26,10 @@ class Bookmark < ActiveRecord::Base
       bookmarkid = create(b_url,session_user.id)
       # Add its associations to a user
       bmappingid = add_bmapping(bookmarkid, b_title, session_user.id, b_description,b_tags_text )
-      # Add its association to the sign up topic
-      add_bmapping_signuptopic(topic_id, bmappingid)
-
+      if(!topic_id.nil?)
+        # Add its association to the sign up topic if the topic was provided
+        add_bmapping_signuptopic(topic_id, bmappingid)
+      end
       # Bookmark with the same url exists.
     else
       bmapping = Bmapping.where(bookmark_id: bookmark_resource.id, user_id: session_user.id).first

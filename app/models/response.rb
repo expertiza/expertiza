@@ -196,18 +196,23 @@ class Response < ActiveRecord::Base
     response_map = ResponseMap.find map_id
     assignment=nil
 
-    # need to do similar to get assignment_id for MetareviewResponseMap, TeammateReviewResponseMap, ParticipantReviewResponseMap, TeamReviewResponseMap
-    if response_map.type =="FeedbackResponseMap"
-      reviewer_participant_id =  response_map.reviewer_id
-      participant = Participant.find(reviewer_participant_id)
-      assignment = Assignment.find(participant.parent_id)
+    reviewer_participant_id =  response_map.reviewer_id
+    participant = Participant.find(reviewer_participant_id)
+    assignment = Assignment.find(participant.parent_id)
+
+    if response_map.type =="TeamReviewResponseMap"
+
     end
 
     defn[:subject] = "A new submission is available for "+assignment.name
     if response_map.type == "TeamReviewResponseMap"
       defn[:body][:type] = "Author Feedback"
       AssignmentTeam.find(response_map.reviewee_id).users.each do |user|
-        defn[:body][:obj_name] = SignUpTopic.find(AssignmentParticipant.find_by_user_id_and_assignment_id(user.id,assignment.id).topic_id).topic_name
+        if assignment.has_topics?
+          defn[:body][:obj_name] = SignUpTopic.find(AssignmentParticipant.find_by_user_id_and_assignment_id(user.id,assignment.id).topic_id).topic_name
+        else
+          defn[:body][:obj_name] = assignment.name
+        end
         defn[:body][:first_name] = User.find(user.id).fullname
         defn[:to] = User.find(user.id).email
         Mailer.sync_message(defn).deliver
@@ -222,22 +227,30 @@ class Response < ActiveRecord::Base
         Mailer.sync_message(defn).deliver
       end
     end
-    if response_map.type == "FeedbackResponseMap"
+    if response_map.type == "FeedbackResponseMap" #This is authors' feedback from UI
       defn[:body][:type] = "Review Feedback"
-      reviewee_participant_id =  response_map.reviewee_id
-      participant = AssignmentParticipant.find(reviewee_participant_id)
+      # reviewee is a response, reviewer is a participant
+      # we need to track back to find the original reviewer on whose work the author comments
+      response_id_for_original_feedback = response_map.reviewed_object_id
+      response_for_original_feedback = Response.find response_id_for_original_feedback
+      response_map_for_original_feedback = ResponseMap.find response_for_original_feedback.map_id
+      original_reviewer_participant_id = response_map_for_original_feedback.reviewer_id
+
+      participant = AssignmentParticipant.find(original_reviewer_participant_id)
       defn[:body][:obj_name] = SignUpTopic.find(AssignmentParticipant.find(response_map.reviewer_id).topic_id).topic_name
-      user = Users.find(participant.user_id)
+      user = User.find(participant.user_id)
+
       defn[:to] = user.email
       defn[:body][:first_name] = user.fullname
       Mailer.sync_message(defn).deliver
     end
     if response_map.type == "TeammateReviewResponseMap"
       defn[:body][:type] = "Teammate Review"
-      participant = AssignmentParticipant.find(reviewee_id: response_map.reviewee_id)
+      participant = AssignmentParticipant.find(response_map.reviewee_id)
       defn[:body][:obj_name] = SignUpTopic.find(participant.topic_id).topic_name
-      defn[:body][:first_name] = User.find(user.user_id).fullname
-      defn[:to] = User.find(user.user_id).email
+      user = User.find(participant.user_id)
+      defn[:body][:first_name] = user.fullname
+      defn[:to] = user.email
       Mailer.sync_message(defn).deliver
     end
   end

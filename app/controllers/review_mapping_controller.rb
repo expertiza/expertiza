@@ -162,7 +162,7 @@ class ReviewMappingController < ApplicationController
       end
 
     rescue Exception => e
-      flash[:alert] = (e.nil?) ? $! : e
+      flash[:error] = (e.nil?) ? $! : e
     end
 
     redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
@@ -241,7 +241,7 @@ class ReviewMappingController < ApplicationController
       assignment.assign_metareviewer_dynamically(metareviewer)
 
     rescue Exception => e
-      flash[:alert] = (e.nil?) ? $! : e
+      flash[:error] = (e.nil?) ? $! : e
     end
 
     redirect_to :controller => 'student_review', :action => 'list', :id => metareviewer.id

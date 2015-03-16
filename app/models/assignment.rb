@@ -184,11 +184,11 @@ class Assignment < ActiveRecord::Base
     if self.varying_rubrics_by_round?  #review rubrics vary by rounds
       round = get_current_round(nil)
       if assignment_team.reviewed_by_in_round?(reviewer,round)
-        raise "We randomly picked an artifact which has already been reviewed by you. You may try click the button again or come back later."
+        raise "We randomly picked an artifact which has already been reviewed by you (or assigned to you). You may try click the button again or come back later."
       end
     else
       if assignment_team.reviewed_by?(reviewer)
-        raise "We randomly picked an artifact which has already been reviewed by you. You may try click the button again or come back later."
+        raise "We randomly picked an artifact which has already been reviewed by you (or assigned to you). You may try click the button again or come back later."
       end
     end
     assignment_team.assign_reviewer(reviewer)
@@ -745,9 +745,9 @@ class Assignment < ActiveRecord::Base
           return 'Unknown'
        end
     end
-  due_date = find_current_stage(topic_id)
+    due_date = find_current_stage(topic_id)
 
-    if( due_date!=COMPLETE && due_date!='Finished'&& due_date.deadline_name!=nil)
+    if(due_date!=COMPLETE && due_date!='Finished'&&due_date!=nil &&due_date.deadline_name!=nil)
       return due_date.deadline_name
     else
       return get_current_stage(topic_id)
@@ -772,7 +772,7 @@ class Assignment < ActiveRecord::Base
       end
     end
     due_date = find_current_stage(topic_id)
-    if due_date == nil or due_date == COMPLETE
+    if due_date == nil or due_date == COMPLETE or due_date.class=="TopicDeadlines"
       return nil
     else
       return due_date.description_url
@@ -799,7 +799,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_current_stage(topic_id=nil)
-    due_dates = self.staggered_deadline? ?  TopicDeadline.where( ['topic_id = ?', topic_id], :order => 'due_at DESC') : DueDate.where( ['assignment_id = ?', self.id]).order('due_at DESC')
+    due_dates = self.staggered_deadline? ?  TopicDeadline.where( :topic_id => topic_id).order(due_at: :desc) : DueDate.where( :assignment_id => self.id).order(due_at: :desc)
     if due_dates != nil && due_dates.size > 0
       if Time.now > due_dates[0].due_at
         return 'Finished'

@@ -111,7 +111,7 @@ class BookmarksController < ApplicationController
         # First retrieve all the tag_ids mapped to the BMapping id.
         # Then retrieve all the tag names of the tag_ids picked up.
         # Append all these into a comma separated string, and push them onto the hash
-        tag_fetchs = BmappingsTags.where(["bmapping_id=?",bmapping.id])
+        tag_fetchs = BmappingsTag.where(["bmapping_id=?",bmapping.id])
         tag_array = Array.new
         for tag_fetch in tag_fetchs
           tag_array << Tag.find(tag_fetch.tag_id).tagname
@@ -169,7 +169,7 @@ class BookmarksController < ApplicationController
             # First retrieve all the tag_ids mapped to the BMapping id.
             # Then retrieve all the tag names of the tag_ids picked up.
             # Append all these into a comma separated string, and push them onto the hash
-            tag_fetchs = BmappingsTags.where(["bmapping_id=?",bmapping.id])
+            tag_fetchs = BmappingsTag.where(["bmapping_id=?",bmapping.id])
             tag_array = Array.new
             for tag_fetch in tag_fetchs
               tag_array << Tag.find(tag_fetch.tag_id).tagname
@@ -198,7 +198,7 @@ class BookmarksController < ApplicationController
     @result_tuple["description"] = @bookmark_mapping.description
     @result_tuple["url"] = @bookmark_mapping.bookmark.url
     @result_tuple["user_count"] = @bookmark_mapping.bookmark.user_count
-    tag_fetchs = BmappingsTags.where(["bmapping_id = ?",@bookmark_mapping.id])
+    tag_fetchs = BmappingsTag.where(["bmapping_id = ?",@bookmark_mapping.id])
     tag_array = Array.new
     for tag_fetch in tag_fetchs
       tag_array << Tag.find(tag_fetch.tag_id).tagname
@@ -236,7 +236,7 @@ class BookmarksController < ApplicationController
     @b_url = @bookmark_mapping.bookmark.url
     @b_title = @bookmark_mapping.title
     @b_tags_text = ""
-    tag_fetchs = BmappingsTags.where(["bmapping_id = ?",@bookmark_mapping.id])
+    tag_fetchs = BmappingsTag.where(["bmapping_id = ?",@bookmark_mapping.id])
     tag_array = Array.new
     for tag_fetch in tag_fetchs
       tag_array << Tag.find(tag_fetch.tag_id).tagname
@@ -402,7 +402,7 @@ logger.warn("@search_string =>>>"+"#{@search_string}")
   def create_tag_bookmark
     @tag = Tag.new(params[:tag])
     @tag.save
-    @bmapping_tag = BmappingsTags.new
+    @bmapping_tag = BmappingsTag.new
     @bmapping_tag.bmapping_id = params[:bmapping_id]
     @bmapping_tag.tag_id = @tag.id
     @bmapping_tag.save

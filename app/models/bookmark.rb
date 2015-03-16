@@ -18,7 +18,8 @@ class Bookmark < ActiveRecord::Base
 
  # Adds a bookmark and its various associations
   def self.add_bookmark(b_url, b_title, b_tags_text, b_description,session_user,topic_id)
-    bookmark_resource = Bookmark.where(["url = ?",b_url]).first
+    bookmark_resource = Bookmark.where(["url = ?
+      ",b_url]).first
 
     # Bookmark with the same url does not exists.
     if bookmark_resource.nil?
@@ -73,7 +74,7 @@ class Bookmark < ActiveRecord::Base
     bookmark_user_mapping.date_modified = current_timestamp
     bookmark_user_mapping.save
     # Deleting existing tags
-    BmappingsTags.destroy_all(["bmapping_id = ?", bookmark_user_mapping.id])
+    BmappingsTag.destroy_all(["bmapping_id = ?", bookmark_user_mapping.id])
     tag_array = BookmarksHelper.separate_tags(b_tags_text)
     for each_tag in tag_array
       # Look for each tag that is present in tags, if not make them, then make the qualifier entry
@@ -84,7 +85,7 @@ class Bookmark < ActiveRecord::Base
         tag_tuple.save
       end
       # The entries in the qualifier have been deleted.. so all tags are associated freshly now
-      btu_tuple = BmappingsTags.new
+      btu_tuple = BmappingsTag.new
       btu_tuple.tag_id = tag_tuple.id
       btu_tuple.bmapping_id = bookmark_user_mapping.id
       btu_tuple.save
@@ -172,9 +173,9 @@ class Bookmark < ActiveRecord::Base
           tag_tuple.save
         end
         # Check if there is an entry for this tag, this user and this bookmark (via bmappings table)
-        btu_tuple = BmappingsTags.where([ "tag_id = ? and bmapping_id = ?", tag_tuple.id, bookmark_user_mapping.id] ).first
+        btu_tuple = BmappingsTag.where([ "tag_id = ? and bmapping_id = ?", tag_tuple.id, bookmark_user_mapping.id] ).first
         if btu_tuple.nil?
-          btu_tuple = BmappingsTags.new
+          btu_tuple = BmappingsTag.new
           btu_tuple.tag_id = tag_tuple.id
           btu_tuple.bmapping_id = bookmark_user_mapping.id
           btu_tuple.save
@@ -201,8 +202,6 @@ class Bookmark < ActiveRecord::Base
 
       def self.search_alltags (the_userid, order_by)
 
-        logger.warn("++++++IN search_alltags_foruser function of bookmark model now++++")
-        #logger.warn("the_userid value is "+the_userid)
         result_array = Array.new #going to append all the results into this array
 
         if(order_by == "most_recent" )
@@ -218,7 +217,7 @@ class Bookmark < ActiveRecord::Base
           else
             result_records = Bmapping.where([" user_id = ?", the_userid]).order("date_created DESC").limit(20)
           end
-
+          
           #result_records = Bmapping.where([" user_id = ?", the_userid]).order("date_created DESC").limit(20)
           for result in result_records
             result_hash = Hash.new
@@ -233,13 +232,14 @@ class Bookmark < ActiveRecord::Base
             ## first retrieve all the tag_ids mapped to the BMapping id. Then retrieve all the tag names of the tag_ids picked up.
             ## Append all these into a comma separated string, and push them onto the hash
 
-            tag_fetchs = BmappingsTags.where(["bmapping_id = ?",result.id])
+            tag_fetchs = BmappingsTag.where(["bmapping_id = ?",result.id])
             tag_array = Array.new
             for tag_fetch in tag_fetchs
               tag_array << Tag.find(tag_fetch.tag_id).tagname
             end
             result_hash["tags"] = BookmarksHelper.join_tags(tag_array)
             result_array << result_hash
+
           end
         elsif ( order_by == "most_popular" and the_userid != nil) 
           ### retrieving the most popular records that this user.(The user need not be the discoverer). First retrieve the the user's bookmarks from the bmapping.
@@ -259,7 +259,7 @@ class Bookmark < ActiveRecord::Base
             ## first retrieve all the tag_ids mapped to the BMapping id. Then retrieve all the tag names of the tag_ids picked up.
             ## Append all these into a comma separated string, and push them onto the hash
 
-            tag_fetchs = BmappingsTags.where(["bmapping_id = ?",result.id])
+            tag_fetchs = BmappingsTag.where(["bmapping_id = ?",result.id])
             tag_array = Array.new
             for tag_fetch in tag_fetchs
               tag_array << Tag.find(tag_fetch.tag_id).tagname
@@ -284,7 +284,7 @@ class Bookmark < ActiveRecord::Base
           ## first retrieve all the tag_ids mapped to the BMapping id. Then retrieve all the tag names of the tag_ids picked up.
           ## Append all these into a comma separated string, and push them onto the hash
 
-          tag_fetchs = BmappingsTags.where(["bmapping_id = ?",b_u_mapping.id])
+          tag_fetchs = BmappingsTag.where(["bmapping_id = ?",b_u_mapping.id])
           tag_array = Array.new
           for tag_fetch in tag_fetchs
             tag_array << Tag.find(tag_fetch.tag_id).tagname
@@ -294,6 +294,7 @@ class Bookmark < ActiveRecord::Base
         end
 
         end
+
         return result_array
       end
 
@@ -309,33 +310,35 @@ class Bookmark < ActiveRecord::Base
       first_time = "true"
       for each_tag in @tags
         ##search for all qualifier tuples with b
-        q_tuples = BmappingsTags.where(["tag_id = ?", each_tag])
+        q_tuples = BmappingsTag.where(["tag_id = ?", each_tag])
         #for q_t in q_tuples [MARKER]
         #end[MARKER]
 
-        if first_time == "true"
+        #if first_time == "true"
           for q_t in q_tuples
             @q_tuples_with_all_tags << q_t.bmapping_id
           end
 
-          first_time = "false"
-        else
-          temp_array = Array.new
-          for q_t in q_tuples
-            temp_array << q_t.bmapping_id
-          end
-          @q_tuples_with_all_tags = @q_tuples_with_all_tags & temp_array ## returns the items  common to both arrays
-        end
+          #first_time = "false"
+        # else
+        #   temp_array = Array.new
+        #   for q_t in q_tuples
+        #     temp_array << q_t.bmapping_id
+        #   end
+        #   @q_tuples_with_all_tags = @q_tuples_with_all_tags & temp_array ## returns the items  common to both arrays
+        # end
       end
-
+      logger.warn("******************************************************* #{@q_tuples_with_all_tags.inspect}")
 
       if(this_user_id != nil)
         ## now you have qualifer tuples with all the required bmapping ids and the requested userid- search for the req ones
-        temp_result_records =  Bmapping.where(["id in (?) and user_id = ?", @q_tuples_with_all_tags,this_user_id ])
+        temp_result_records =  Bmapping.where(["id in (?) and user_id = ?", @q_tuples_with_all_tags, this_user_id ])
       else
         ## now you have qualifer tuples with all the required bmapping ids - search for the req ones
         temp_result_records =  Bmapping.where(["id in (?)", @q_tuples_with_all_tags])
       end
+
+      logger.warn("******************************************************* #{temp_result_records.inspect}")
 
       ## organize these tuples in the order of most earliest, most popular
       result_records = Array.new
@@ -345,6 +348,7 @@ class Bookmark < ActiveRecord::Base
         result_records = temp_result_records.sort {|x,y| y.bookmark.user_count <=> x.bookmark.user_count }
       end
 
+       logger.warn("******************************************************* #{result_records.inspect}")
 
       for result in result_records
         result_hash = Hash.new
@@ -359,7 +363,7 @@ class Bookmark < ActiveRecord::Base
         ## first retrieve all the tag_ids mapped to the BMapping id. Then retrieve all the tag names of the tag_ids picked up.
         ## Append all these into a comma separated string, and push them onto the hash
 
-        tag_fetchs = BmappingsTags.where(["bmapping_id=?",result.id])
+        tag_fetchs = BmappingsTag.where(["bmapping_id=?",result.id])
         tag_array = Array.new
         for tag_fetch in tag_fetchs
           tag_array <<  Tag.find(tag_fetch.tag_id).tagname
@@ -368,6 +372,7 @@ class Bookmark < ActiveRecord::Base
         result_array << result_hash
       end
 
+      logger.warn("******************************************************* #{result_array.inspect}")
       return result_array
     end
     

@@ -4,6 +4,7 @@ E1505. Refactoring AssignmentParticipant model
 Classes involved: assignment_participant.rb
 
 The AssignmentParticipant model is subclass of Participant model and is used to maintain the list of students/users participating in a given assignment.
+
 Please visit the Final beta commit in the commit history to see what we changed. 
 
 What we did:

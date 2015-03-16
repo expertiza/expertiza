@@ -26,10 +26,10 @@ class Bookmark < ActiveRecord::Base
       # Add the newly discovered bookmark
       bookmarkid = create(b_url,session_user.id)
       # Add its associations to a user
-      bmappingid = add_bmapping(bookmarkid, b_title, session_user.id, b_description,b_tags_text )
+      bmappingid = Bmapping.add_bmapping(bookmarkid, b_title, session_user.id, b_description,b_tags_text )
       if(!topic_id.nil?)
         # Add its association to the sign up topic if the topic was provided
-        add_bmapping_signuptopic(topic_id, bmappingid)
+        Bmapping.add_bmapping_signuptopic(topic_id, bmappingid)
       end
       # Bookmark with the same url exists.
     else
@@ -46,7 +46,7 @@ class Bookmark < ActiveRecord::Base
 
           # Signup Topic does not exists
         else
-          add_bmapping_signuptopic(topic_id, bmapping.id)
+          Bmapping.add_bmapping_signuptopic(topic_id, bmapping.id)
         end
 
         # Bookmark with same user - bmapping does not exists.
@@ -55,8 +55,8 @@ class Bookmark < ActiveRecord::Base
         bookmark_resource.user_count = bookmark_resource.user_count + 1
         bookmark_resource.save
         # Add its association with the user
-        bmappingid = add_bmapping(bookmark_resource.id, b_title, session_user.id, b_description,b_tags_text)
-        add_bmapping_signuptopic(topic_id, bmappingid)
+        bmappingid = Bmapping.add_bmapping(bookmark_resource.id, b_title, session_user.id, b_description,b_tags_text)
+        Bmapping.add_bmapping_signuptopic(topic_id, bmappingid)
       end
     end
   end
@@ -149,50 +149,7 @@ class Bookmark < ActiveRecord::Base
       return bookmark_resource.id
     end
 
-    # Add bookmark - user association with its meta fields
-    def self.add_bmapping(bid, b_title, user_id, b_description,b_tags_text)
-      bookmark_user_mapping = Bmapping.new
-      bookmark_user_mapping.bookmark_id = bid
-      bookmark_user_mapping.title = b_title
-      bookmark_user_mapping.description = b_description
-      bookmark_user_mapping.user_id =user_id
-      current_timestamp = Time.now
-      bookmark_user_mapping.date_created = current_timestamp
-      bookmark_user_mapping.date_modified = current_timestamp
-      bookmark_user_mapping.save
-      # Add tags
-      # tags come in as a text, separating them into a array
-
-      tag_array = BookmarksHelper.separate_tags(b_tags_text)
-      for each_tag in tag_array
-        # Look for each tag that is present in tags, if not make them, then make the BTU entry
-        tag_tuple = Tag.where(["tagname = ?",each_tag]).first
-        if tag_tuple.nil?
-          tag_tuple = Tag.new
-          tag_tuple.tagname = each_tag
-          tag_tuple.save
-        end
-        # Check if there is an entry for this tag, this user and this bookmark (via bmappings table)
-        btu_tuple = BmappingsTag.where([ "tag_id = ? and bmapping_id = ?", tag_tuple.id, bookmark_user_mapping.id] ).first
-        if btu_tuple.nil?
-          btu_tuple = BmappingsTag.new
-          btu_tuple.tag_id = tag_tuple.id
-          btu_tuple.bmapping_id = bookmark_user_mapping.id
-          btu_tuple.save
-        end
-      end
-        return bookmark_user_mapping.id
-    end
-
-      # Associate bmapping to the sign up topic
-      def self.add_bmapping_signuptopic(topic_id, bmappingid)
-        topic = SignUpTopic.find(topic_id)
-        bmapping = Bmapping.find(bmappingid)
-        unless (topic.nil? && bmapping.nil?)
-          topic.bmappings << bmapping
-          topic.save
-        end
-      end
+    
 
       ## returns the 20 most recent bookmarks_mappings made by the user specified, or the most popular bookmarks in this user's repository, depending on the order_by
       ## Function returns an array. Each element of the array is a hash detailing one record

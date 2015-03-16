@@ -48,13 +48,18 @@ class BookmarkTest < ActiveSupport::TestCase
     assert (Bookmark.count == 2) # since url was different, new bookmark was added (now there is two)
   end
 
-  # test "search_alltags_allusers returns all the bookmarks from all the users" do
-  #   order_by = "most_recent"
-  #   array = Array.new
-  #   array = Bookmark.search_alltags_allusers(order_by)
-  #   # each element of result_array is a hash with elements    
-  #   assert_equals @existing_bookmark.b_title, array[0][:title]
-  # end
+  test "search_alltags_allusers returns all the bookmarks from all the users" do
+    order_by = "most_recent"
+
+    array = Array.new
+    array = Bookmark.search_alltags_allusers(order_by)
+
+    Rails::logger.warn("SIZE OF FIRST ELEMENT IN ARRAY: #{array[0].size}")
+    Rails::logger.warn("TITLE IN ARRAY: #{array[0][:title]}")
+    Rails::logger.warn("TITLE IN FIXURED BOOKMARK: #{Bookmark.find_by_id(1).bmappings[0].title}")
+    # each element of result_array is a hash with elements    
+    assert (Bookmark.find_by_id(1).bmappings[0].title.eql?(array[0][:title]))
+  end
 
   # test "search_fortags_allusers returns no bookmarks because the tag is not matching" do
   #   order_by = "most_recent"

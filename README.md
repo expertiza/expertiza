@@ -11,12 +11,12 @@ Expertiza
  
  <b>What’s wrong with it</b><br>
  * These two controllers seem to do almost the same thing.  They have many of the same methods.  SignUpSheetController is much longer, and has many more recent mods, but some methods of SignUpController seem more sophisticated than SignUpSheetController.  So, your first job is to figure out if both controllers are being used.  If not, remove the unused controller.  Or, move the functions to a single controller if that makes sense to do.
- * Neither controller is at all RESTful; i.e.., its method names aren’t the standard names new, create, edit, delete, etc.  Functionality is divided differently than in a standard controller.<br/>
-    a. def confirm_topic(creator_id, topic_id, assignment_id)
-    b. def delete_signup
-    c. def delete_signup_for_topic(assignment_id,topic_id)
-    d. def other_confirmed_topic_for_user(assignment_id, creator_id)
-    e. def signup
+ * Neither controller is at all RESTful; i.e.., its method names aren’t the standard names new, create, edit, delete, etc.  Functionality is divided differently than in a standard controller.<br>
+    a. def confirm_topic(creator_id, topic_id, assignment_id)<br>
+    b. def delete_signup<br>
+    c. def delete_signup_for_topic(assignment_id,topic_id)<br>
+    d. def other_confirmed_topic_for_user(assignment_id, creator_id)<br>
+    e. def signup<br>
     f. def slotAvailable?(topic_id)
  * Functionality that should be in models is incorporated into the controller.
  * Some methods are too long and appear to do more than one thing

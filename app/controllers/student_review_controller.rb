@@ -9,6 +9,7 @@ class StudentReviewController < ApplicationController
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
     @assignment  = @participant.assignment
+    logger.warn "Assignment: #{@assignment.inspect}"
     # Find the current phase that the assignment is in.
     @review_phase = @assignment.get_current_stage(AssignmentParticipant.find(params[:id]).topic_id)
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
@@ -53,7 +54,7 @@ class StudentReviewController < ApplicationController
           #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
           # to treat all assignments as team assignments
           participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
-          end
+        end
         if participant && participant.topic_id
           meta_review_due_date = TopicDeadline.where(topic_id: participant.topic_id, deadline_type_id:deadline_type_id, round:review_rounds).first
           if meta_review_due_date.due_at < Time.now

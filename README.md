@@ -2,10 +2,10 @@
 
 #### For Bug [#483](https://github.com/expertiza/expertiza/issues/483) fixing
 
-1. In submitted_content_controller.rb, line 19. Changed `else if` to `elsif`
-2. In model/assignment.rb, line 489. Changed `Course.find(self.course_id).get_path` to `Course.find(self.course_id).directory_path`
-3. In submitted_content/_main.html.erb. Changed `:participant_id => assignment_participant.id` to `:participant_id => participant.id`
-4. In config/routes.rb. Added one more routes `post :submit_file`
+1. In `submitted_content_controller.rb`, line 19. Changed `else if` to `elsif`
+2. In `model/assignment.rb`, line 489. Changed `Course.find(self.course_id).get_path` to `Course.find(self.course_id).directory_path`
+3. In `submitted_content/_main.html.erb`. Changed `:participant_id => assignment_participant.id` to `:participant_id => participant.id`
+4. In `config/routes.rb`. Added one more routes `post :submit_file`
 
 #### Refactoring review_files_controller
 1. Changed `and` and `or` to `&&` and `||`.
@@ -25,8 +25,12 @@
 4. Added one more routes `post :folder_action` to `config/routes.rb`
 5. Changed all `array.size == 0` to `array.zero?`
 6. Changed all `find_by_x(val)` and `where("x=val")` to `where(x: val)`
-7. In `assignment_participant.rb` line 537, Changed `if all({conditions: ['user_id=? && parent_id=?', user.id, id]}).size == 0` to `if AssignmentParticipant.where(user_id: user.id, parent_id: id).zero?`
+7. In `assignment_participant.rb` line 526, Changed `if all({conditions: ['user_id=? && parent_id=?', user.id, id]}).size == 0` to `if AssignmentParticipant.where(user_id: user.id, parent_id: id).zero?`
 
 #### Results Screenshot
 ![A_Submitted_File](results-imgs/1.png)
 ![On_local_disk](results-imgs/2.png)
+
+#### RSpec Tests
+![assignment test](spec/lib/assignment_spec.rb)
+![assignment_participant test](spec/lib/assignment_participant_spec.rb)

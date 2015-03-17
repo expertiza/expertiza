@@ -75,6 +75,8 @@ group :test do
   gem 'rspec-rails'
   gem 'shoulda'
   gem 'test-unit'
+  gem 'minitest-reporters', '1.0.5'
+  gem 'term-ansicolor'
 end
 
 group :development, :test do

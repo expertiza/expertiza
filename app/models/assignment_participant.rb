@@ -393,11 +393,7 @@ class AssignmentParticipant < Participant
   # Note: This method is not used yet. It is here in the case it will be needed.
   # @exception  If the index does not exist in the array
   def remove_hyperlink(index)
-<<<<<<< HEAD
-    hyperlinks = get_hyperlinks_array
-=======
-    hyperlinks = hyperlinks
->>>>>>> b849ecdcb0d1c1d1b22a758fdd969e37869b769a
+    hyperlinks = hyperlinks   #This needs review
     raise "The link does not exist" unless index < hyperlinks.size
 
     hyperlinks.delete_at(index)
@@ -411,23 +407,6 @@ class AssignmentParticipant < Participant
     team.try :participants
   end
 
-<<<<<<< HEAD
-  def get_team_hyperlinks  #get hyperlinks submitted by all the team members in a assignment team.
-    if self.team
-      self.team.get_hyperlinks  #get hyperlinks submitted by all the team member
-    else
-      nil
-    end
-  end
-
-  def get_hyperlinks_array # get hyperlinks submitted by current participant
-    self.submitted_hyperlinks.nil? ? [] : YAML::load(self.submitted_hyperlinks)
-  end
-  alias_method :hyperlinks_array, :get_hyperlinks_array
-  alias_method :hyperlinks, :get_hyperlinks_array
-  alias_method :get_hyperlinks, :get_hyperlinks_array
-=======
-
   def hyperlinks
     team.try(:hyperlinks) || []
   end
@@ -436,7 +415,6 @@ class AssignmentParticipant < Participant
     self.submitted_hyperlinks.nil? ? [] : YAML::load(self.submitted_hyperlinks)
   end
 
->>>>>>> b849ecdcb0d1c1d1b22a758fdd969e37869b769a
 
   #Copy this participant to a course
   def copy(course_id)

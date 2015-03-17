@@ -22,9 +22,6 @@ Then(/^I should see "(.*?)"$/) do |title|
   page.should have_content(title) # express the regexp above with the code you wish you had
 end
 
-Then(/^I visit the bookmarks\/managing_bookmarks page$/) do
-  visit '/bookmarks/managing_bookmarks' # express the regexp above with the code you wish you had
-end
 
 When(/^I click on "(.*?)"$/) do |link|
   click_link(link) # express the regexp above with the code you wish you had

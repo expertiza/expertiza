@@ -32,5 +32,5 @@
 ![On_local_disk](results-imgs/2.png)
 
 #### RSpec Tests
-[assignment test](spec/lib/assignment_spec.rb)
-[assignment_participant test](spec/lib/assignment_participant_spec.rb)
+1. [assignment.rb](spec/lib/assignment_spec.rb)
+2. [assignment_participant.rb](spec/lib/assignment_participant_spec.rb)

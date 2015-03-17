@@ -27,19 +27,6 @@ class ResponseController < ApplicationController
     end
   end
 
-  def get_scores
-    @review_scores = []
-    @question_type = []
-    @questions.each do |question|
-      @review_scores << Score
-        .where(
-          response_id: @response.id,
-          question_id:  question.id
-        ).first
-      @question_type << QuestionType.find_by_question_id(question.id)
-    end
-  end
-
   def delete
     @response = Response.find(params[:id])
     return if action_allowed?(@response) #user cannot delete other people's responses. Needs to be authenticated.
@@ -52,41 +39,14 @@ class ResponseController < ApplicationController
   #If so, edit that version otherwise create a new version.
   def rereview
     @map=ResponseMap.find(params[:id])
+
+    # store response content in map
     get_content
-    array_not_empty=0
-    @review_scores=Array.new
-    @prev=Response.all
-    #get all versions and find the latest version
-    for element in @prev
-      if (element.map.id==@map.map.id)
-        array_not_empty=1
-        @review_scores << element
-      end
-    end
 
     previous_responses
     #sort all the available versions in descending order.
     if @prev.present?
-      @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
-      @largest_version_num=@sorted[0]
-      @latest_phase=@largest_version_num.created_at
-      due_dates = DueDate.where(["assignment_id = ?", @assignment.id])
-      @sorted_deadlines=Array.new
-      @sorted_deadlines=due_dates.sort { |m1, m2| (m1.due_at and m2.due_at) ? m1.due_at <=> m2.due_at : (m1.due_at ? -1 : 1) }
-      current_time=Time.new.getutc
-      #get the highest version numbered review
-      next_due_date=@sorted_deadlines[0]
-      #check in which phase the latest review was done.
-      for deadline_version in @sorted_deadlines
-        if (@largest_version_num.created_at < deadline_version.due_at)
-          break
-        end
-      end
-      for deadline_time in @sorted_deadlines
-        if (current_time < deadline_time.due_at)
-          break
-        end
-      end
+      sortResponseVersion
     end
     #check if the latest review is done in the current phase.
     #if latest review is in current phase then edit the latest one.
@@ -263,7 +223,7 @@ class ResponseController < ApplicationController
     return if action_allowed?(@response)
     @map = @response.map
     get_content
-    get_scores
+    get_scores(@response, @questions)
   end
 
   def create
@@ -370,7 +330,7 @@ class ResponseController < ApplicationController
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
   end
-  
+
   #kludge for checking if assignment is jen's assignment and using her rubric if it is
   def handle_jens_assignment
     if @assignment.id < 469
@@ -381,19 +341,27 @@ class ResponseController < ApplicationController
       render :action => 'custom_response_2011'
     end
   end
-  
-  def redirect_when_disallowed(response)
-    # For author feedback, participants need to be able to read feedback submitted by other teammates.
-    # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
-    if response.map.read_attribute(:type) == 'FeedbackResponseMap' && response.map.assignment.team_assignment?
-      team = response.map.reviewer.team
-      unless team.has_user session[:user]
-        redirect_to '/denied?reason=You are not on the team that wrote this feedback'
-      else
-        return false
+
+  def sortResponseVersion
+    @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
+    @largest_version_num=@sorted[0]
+    @latest_phase=@largest_version_num.created_at
+    due_dates = DueDate.where(["assignment_id = ?", @assignment.id])
+    @sorted_deadlines=Array.new
+    @sorted_deadlines=due_dates.sort { |m1, m2| (m1.due_at and m2.due_at) ? m1.due_at <=> m2.due_at : (m1.due_at ? -1 : 1) }
+    current_time=Time.new.getutc
+    #get the highest version numbered review
+    next_due_date=@sorted_deadlines[0]
+    #check in which phase the latest review was done.
+    for deadline_version in @sorted_deadlines
+      if (@largest_version_num.created_at < deadline_version.due_at)
+        break
       end
-      response.map.read_attribute(:type)
     end
-    !current_user_id?(response.map.reviewer.user_id)
+    for deadline_time in @sorted_deadlines
+      if (current_time < deadline_time.due_at)
+        break
+      end
+    end
   end
 end

@@ -2,9 +2,8 @@ development:
   adapter: mysql2
   database: expertiza_development
   username: root
-  password:
+  password: root
   host: localhost
-
 
 # Warning: The database defined as 'test' will be erased and
 # re-generated from your development database when you run 'rake'.
@@ -13,19 +12,19 @@ test:
   adapter: mysql2
   database: expertiza_test
   username: root
-  password:
+  password: root
   host: localhost
 
 cucumber:
   adapter: mysql
   database: expertiza_cucumber
   username: root
-  password:
+  password: root
   host: localhost
 
 production:
   adapter: mysql
   database: expertiza_production
-  username: expertiza
-  password:
+  username: root
+  password: root
   host: localhost

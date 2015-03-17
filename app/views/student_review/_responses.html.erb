@@ -83,13 +83,8 @@
                             <%#- Display link for code review if 'any' code review files -%>
                             <%#- have been uploaded i.e. files present in code review dir -%>
                             <td>&nbsp;&nbsp;&nbsp;&nbsp;
-<<<<<<< HEAD
-                              <% if participant.get_files(ReviewFilesHelper::get_code_review_file_dir(participant)).length > 0 %>
-                                  <%= link_to "Review Code", {:controller => 'review_files', :action => 'show_all_submitted_files', :participant_id => participant.id} %>
-=======
                               <% if participant.files(ReviewFilesHelper::get_code_review_file_dir(participant)).length > 0 %>
                                   <%= link_to "Review Code", { :controller => 'review_files', :action => 'show_all_submitted_files', :participant_id => participant.id } %>
->>>>>>> b849ecdcb0d1c1d1b22a758fdd969e37869b769a
                               <% end %>
                             </td>
                         <% else %>
@@ -97,19 +92,6 @@
                             <td> (Work has not yet been submitted)</td>
                         <% end %>
                     <% end %>
-<<<<<<< HEAD
-                <% else %>
-                    <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
-                    <td>&nbsp;&nbsp;</td>
-                    <%- # Display link for code review if 'any' code review files  -%>
-                    <%- # have been uploaded i.e. files present in code review dir -%>
-                    <td>&nbsp;&nbsp;&nbsp;&nbsp;
-                      <% if participant.get_files(ReviewFilesHelper::get_code_review_file_dir(participant)).length > 0 %>
-                          <%= link_to "Review Code", {:controller => 'review_files', :action => 'show_all_submitted_files', :participant_id => participant.id} %>
-                      <% end %>
-                    </td>
-                <% end %>
-=======
                     <% else %>
                         <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
                         <td>&nbsp;&nbsp;</td>
@@ -121,7 +103,6 @@
                           <% end %>
                         </td>
                     <% end %>
->>>>>>> b849ecdcb0d1c1d1b22a758fdd969e37869b769a
             <% else %>
                 <td>Begin</td>
                 <td> (Work has not yet been submitted) for

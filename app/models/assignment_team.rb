@@ -85,31 +85,18 @@ class AssignmentTeam < Team
     super
   end
 
-<<<<<<< HEAD
   def destroy
     response_maps.each(&:destroy)
     super
   end
 
-  def self.get_first_member(team_id)
-=======
   def self.first_member(team_id)
->>>>>>> b849ecdcb0d1c1d1b22a758fdd969e37869b769a
     find(team_id).participants.first
   end
 
   def hyperlinks
     links = Array.new
-<<<<<<< HEAD
-
-    self.participants.each do |participant|
-      puts participant.id
-      links+= participant.get_hyperlinks_array
-    end
-
-=======
     self.participants.each { |team_member| links.concat(team_member.hyperlinks_array) }
->>>>>>> b849ecdcb0d1c1d1b22a758fdd969e37869b769a
     links
   end
 
@@ -185,8 +172,6 @@ class AssignmentTeam < Team
         self.name
       end
 
-<<<<<<< HEAD
-=======
       def participants
         users = self.users
         participants = Array.new
@@ -197,7 +182,6 @@ class AssignmentTeam < Team
         participants
       end
 
->>>>>>> b849ecdcb0d1c1d1b22a758fdd969e37869b769a
       def copy(course_id)
         new_team = CourseTeam.create_team_and_node(course_id)
         new_team.name = name
@@ -227,13 +211,8 @@ class AssignmentTeam < Team
         scores
       end
      
-
-<<<<<<< HEAD
-      def self.get_team(participant) # return nil if this participant doesn't have a team
-=======
       def self.team(participant)
         team = nil
->>>>>>> b849ecdcb0d1c1d1b22a758fdd969e37869b769a
         teams_users = TeamsUser.where(user_id: participant.user_id)
         return nil if !teams_users
         teams_users.each do |teams_user|

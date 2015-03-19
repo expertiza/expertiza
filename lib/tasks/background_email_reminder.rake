@@ -81,7 +81,7 @@ end
       #puts "~~~~~~~~~~Assignment name: #{assign_name}\n"                                  
       #puts "~~~~~~~~~~Assignment stage: #{assign_type}\n"      
       #puts "~~~~~~~~~~Sending submission_reminder if no submissions found ... submitted at nil #{(participant.submitted_at == nil)} .. hyperlink nil #{participant.submitted_hyperlink == nil} hyperlink empty #{participant.submitted_hyperlink != ""}\n"
-      if (participant.submitted_at.nil? && participant.get_hyperlinks.empty?)#if(participant.has_submissions == false)
+      if (participant.submitted_at.nil? && participant.hyperlinks.empty?)#if(participant.has_submissions == false)
         emails << email
       end
     end#end of for loop
@@ -119,7 +119,7 @@ end
               else #if the reviewee has made some sort of submission
                 reviewee = eachresponsemap.reviewee
                 #puts "~~~~~~~~~~Sending review_reminder if no responses found ... submitted at nil #{(reviewee[0].submitted_at == nil)} .. hyperlink nil #{reviewee[0].submitted_hyperlink == nil} hyperlink empty #{reviewee[0].submitted_hyperlink == ""}\n"
-                unless (reviewee[0].submitted_at.nil? && reviewee[0].get_hyperlinks.empty?)
+                unless (reviewee[0].submitted_at.nil? && reviewee[0].hyperlinks.empty?)
                   #puts "~~~~~~~~~~Email: #{email}\n"   
                   emails << email
                 end

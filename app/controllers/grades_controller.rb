@@ -41,8 +41,7 @@ class GradesController < ApplicationController
         @questions[questionnaire.symbol] = questionnaire.questions
       }
     end
-
-    @scores = @assignment.get_scores(@questions)
+    @scores = @assignment.scores(@questions)
     calculate_all_penalties(@assignment.id)
   end
 
@@ -86,7 +85,7 @@ class GradesController < ApplicationController
     end
 
     @topic = @participant.topic
-    @pscore = @participant.get_scores(@questions)
+    @pscore = @participant.scores(@questions)
     @stage = @participant.assignment.get_current_stage(@participant.topic_id)
     calculate_all_penalties(@assignment.id)
   end

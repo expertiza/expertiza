@@ -12,7 +12,7 @@
      
 <%= render :partial => 'participant_title', :locals => {:prefix => prefix } %>        
 <% pindex = 3 %>
-  <% for participant in tscore[:team].get_participants %>     
+  <% for participant in tscore[:team].participants %>
      <%= render :partial => 'grades/participant',
                 :locals => {:prefix => prefix+"_"+pindex.to_s,
      	 			        :team => true,

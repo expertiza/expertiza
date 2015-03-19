@@ -88,7 +88,7 @@ class CreateFeedbackMappings < ActiveRecord::Migration
        if feedback["user_id"].nil?
           if map["team_id"] != nil
              team = AssignmentTeam.find(map["team_id"])
-             reviewer = team.get_participants.first
+             reviewer = team.participants.first
           end              
        else
          reviewer = AssignmentParticipant.where(['user_id = ? and parent_id = ?',feedback["user_id"], feedback["assignment_id"]]).first

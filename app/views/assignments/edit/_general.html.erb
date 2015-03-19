@@ -100,15 +100,14 @@ function is_coding_assignmentChanged(){
   <tr>
     <td style='padding:5px' id='assignment_require_signup_field'>
       <input name="assignment_form[assignment][require_signup]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment[require_signup]', 'true', @assignment_form.assignment.require_signup?, {:onChange => 'hasTopicsChanged()'}) %>
+      <%= check_box_tag('assignment_form[assignment][require_signup]', 'true', @assignment_form.assignment.require_signup?, {:onChange => 'hasTopicsChanged()'}) %>
       <%= label_tag('assignment_form[assignment][require_signup]', 'Has topics?') %>
     </td>
     <td style='padding:5px' id='assignment_is_intelligent_field'>
-      <%= label_tag('assignment_form[assignment][is_intelligent]', 'Intelligent Topic Selection:') %>
-      <select id="assignment_is_intelligent_field" name="assignment_form[assignment][is_intelligent]">
-        <option value=false style="width:75px">No</option>
-        <option value=true style="width:75px" <% if @assignment_form.assignment.is_intelligent %>SELECTED<%end%>>Yes</option>
-      </select>
+      <input name="assignment_form[assignment][is_intelligent]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][is_intelligent]', 'true', @assignment_form.assignment.is_intelligent?) %>
+      <%= label_tag('assignment_form[assignment][is_intelligent]', 'Intelligent topic selection?') %>
+      <img src="/assets/info.png" title="This feature allow students to &quot;bid&quot; for topics.">
     </td>
   </tr>
 

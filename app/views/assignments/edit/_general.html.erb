@@ -85,8 +85,8 @@ function is_coding_assignmentChanged(){
 
 <table id='assignment_general_setting_table'>
 <tr class='heading'>
-<th width=30%></th>
-<th width=70%></th>
+<th width=40%></th>
+<th width=60%></th>
   </tr>
 
   <tr>
@@ -100,7 +100,7 @@ function is_coding_assignmentChanged(){
   <tr>
     <td style='padding:5px' id='assignment_require_signup_field'>
       <input name="assignment_form[assignment][require_signup]" type="hidden" value="false"/>
-      <%= check_box_tag('has_topic', 'true', @assignment_form.assignment.require_signup?, {:onChange => 'hasTopicsChanged()'}) %>
+      <%= check_box_tag('has_topic', 'true', @assignment_form.assignment.has_topics?, {:onChange => 'hasTopicsChanged()'}) %>
       <%= label_tag('assignment_form[assignment][require_signup]', 'Has topics?') %>
     </td>
     <td style='padding:5px' id='assignment_is_intelligent_field'>

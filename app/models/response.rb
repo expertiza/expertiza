@@ -118,6 +118,7 @@ class Response < ActiveRecord::Base
                             ).first
       question_type << QuestionType.find_by_question_id(question.id)
     end
+      question_type
   end
 
   #bug fixed

@@ -20,13 +20,13 @@ class AuthController < ApplicationController
     else
       user = User.find_by_login(params[:login][:name])
 
-       if user and user.valid_password?(params[:login][:password])
-         after_login(user)
-       else
-         logger.warn "Failed login attempt"
-         flash[:error] = "Incorrect Name/Password"
-         redirect_to :controller => 'password_retrieval', :action => 'forgotten'
-       end
+        if user and user.valid_password?(params[:login][:password])
+          after_login(user)
+        else
+          logger.warn "Failed login attempt"
+          flash[:error] = "Incorrect Name/Password"
+          redirect_to :controller => 'password_retrieval', :action => 'forgotten'
+        end
     end
   end  #def login
 

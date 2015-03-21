@@ -1,7 +1,7 @@
 Expertiza 
 =========
 #### CSC/ECE 517 Project2 OSS 
- <b>Topic</b>: E1509<br>
+ <b>Topic</b>: E1509 Refactoring SignUpController and SignUpSheetController<br>
  <b>Team member</b>: mdong3, yshang3, jli53<br>
  <b>Contact</b>: Ed Gehringer, efg@ncsu.edu, Nikhil Chinthapallee, nchinth@ncsu.edu<br>
 

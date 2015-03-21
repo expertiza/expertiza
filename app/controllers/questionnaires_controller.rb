@@ -184,7 +184,6 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
       @questionnaire.min_question_score = 0
       @questionnaire.max_question_score = 1
       @questionnaire.section = "Quiz"
-      print "=====create_questionnaire========="
       @assignment = Assignment.find(params[:aid])
       teams = TeamsUser.where(user_id: session[:user].id)
       for t in teams do
@@ -197,11 +196,9 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
       @questionnaire.instructor_id = team.id    #for a team assignment, set the instructor id to the team_id
 
       @successful_create = true
-      print "=====save in create_questionnaire begin========="
+
       save
-      print "=====save in create_questionnaire over========="
       save_choices @questionnaire.id
-      print "=====save_choice in create_questionnaire over========="
       if @successful_create
         flash[:note] = "Quiz was successfully created"
       end
@@ -423,7 +420,6 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
 
     if params[:question]
      params[:question].keys.each do |question_key|
-        print question_key
         begin
           if params[:question][question_key][:txt].strip.empty?
             # question text is empty, delete the question
@@ -464,8 +460,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
         q_type = params[:question_type][questionnum.to_s][:type]
         if(q_type!="Essay")
           for choice_key in params[:new_choices][questionnum.to_s][q_type].keys
-            print "=====choice_key="+choice_key+"======="
-
+    
             if params[:new_choices][questionnum.to_s][q_type][choice_key]["weight"] == 1.to_s
               score = 1
             else

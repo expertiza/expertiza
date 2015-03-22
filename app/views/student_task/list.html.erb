@@ -52,7 +52,7 @@
   <br/> <strong> &nbsp;&nbsp;<span class="revnum">&nbsp;<%= @taskrevisions.size.to_s %>&nbsp;</span> Revisions<br></strong><br>
   <% @taskrevisions.each do |student_task|
     participant = student_task.participant
-    stage = student_task.get_current_stage
+    stage = student_task.current_stage
     duedate = participant.assignment.stage_deadline(participant.topic_id)
     controller = ""
     action = ""
@@ -74,7 +74,7 @@
 
 <% @notifications.each do |student_task| %>
   <span class="notification">&nbsp; &raquo; <%= link_to student_task.assignment.name + ": " +
-    student_task.get_current_stage + " submitted", :controller => :grades, :action => :view_my_scores, :id => student_task.participant.id %></span><br/>
+    student_task.current_stage + " submitted", :controller => :grades, :action => :view_my_scores, :id => student_task.participant.id %></span><br/>
 <% end %>
 </div>
 </div>

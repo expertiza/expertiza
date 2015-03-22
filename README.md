@@ -1,3 +1,18 @@
+## Demo Video
+
+We offer a short demo video demonstrating what we have done for you if you think it is too troublesome to figure them out.
+The demo video (1:40) is on [Youtube](https://youtu.be/HgmUJqDzhGc)
+
+## Running Server
+
+This branch is running on: [My Amazon EC2 Instance](http://ec2-52-10-80-197.us-west-2.compute.amazonaws.com:3000)
+Credientials:
+admin:      username: admin     pwd: whatever you like(login auth is disabled)
+student:    username: stu1      pwd: whatever you like(login auth is disabled)
+            username: stu2      pwd: whatever you like(login auth is disabled)
+instructor: username: pro1      pwd: whatever you like(login auth is disabled)
+
+
 ## Changes made:
 
 #### For Bug [#483](https://github.com/expertiza/expertiza/issues/483) fixing

@@ -2,6 +2,7 @@
 <% if @assignment.review_allowed(@reviewee_topic_id) || @assignment.get_current_stage(@reviewee_topic_id) == "Complete" %>
     <%= render :partial => 'responses', :locals => {:mappings => @review_mappings, :title => 'Review'} %>
     <% if @assignment.dynamic_reviewer_assignment? %>
+      <% logger.warn("----------------------------FJK") %>
       <%# if @num_reviews_in_progress == 0 %>
         <% if @num_reviews_in_progress < 3 %>
           <% if @assignment.review_assignment_strategy == Assignment::RS_AUTO_SELECTED %>

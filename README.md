@@ -7,7 +7,9 @@ The demo video (1:40) is on [Youtube](https://youtu.be/HgmUJqDzhGc)
 
 This branch is running on: [My Amazon EC2 Instance](http://ec2-52-10-80-197.us-west-2.compute.amazonaws.com:3000)
 
-Credientials:  
+Credientials:
+
+
 Role | Username | Password
 --- | --- | ---
 admin | admin | whatever you like(login auth is disabled)  

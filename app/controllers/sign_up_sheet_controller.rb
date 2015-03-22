@@ -204,6 +204,7 @@ class SignUpSheetController < ApplicationController
           }
         end
       end
+
       def add_signup_topics_staggered
         add_signup_topic
       end
@@ -220,7 +221,6 @@ class SignUpSheetController < ApplicationController
       end
 
       #retrieves all the data associated with the given assignment. Includes all topics,
-      #participants(people who are doing this assignment) and signed up users (people who have chosen a topic (confirmed or waitlisted)
       def load_add_signup_topics(assignment_id)
         @id = assignment_id
         @sign_up_topics = SignUpTopic.where( ['assignment_id = ?', assignment_id])
@@ -230,10 +230,10 @@ class SignUpSheetController < ApplicationController
         @assignment = Assignment.find(assignment_id)
         #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
         # to treat all assignments as team assignments
+        #Though called participants, @participants are actually records in signed_up_users table, which
+        #is a mapping table between teams and topics (waitlisted recored are also counted)
         @participants = SignedUpUser.find_team_participants(assignment_id)
-        end
-
-
+      end
 
       def set_values_for_new_topic
         @sign_up_topic = SignUpTopic.new

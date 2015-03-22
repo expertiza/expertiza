@@ -34,12 +34,17 @@ class ParticipantsController < ApplicationController
       curr_object.add_participant(params[:user][:name])
       user = User.find_by_name(params[:user][:name])
       @participant = curr_object.participants.find_by_user_id(user.id)
+      flash[:note] = "user \"#{params[:user][:name]}\" has has been added as a participant successfully."
     rescue
       url_new_user = url_for :controller => 'users', :action => 'new'
-      flash[:error] = "User #{params[:user][:name]} does not exist. Would you like to <a href = '#{url_new_user}'>create this user?</a>"
+      flash[:error] = "User #{params[:user][:name]} does not exist or has already been added.</a>"
     end
+<<<<<<< HEAD
 
     flash[:note] = undo_link("User \"#{params[:user][:name]}\" has been added as a participant successfully. ")
+=======
+    undo_link("")
+>>>>>>> upstream/rails4
     redirect_to :action => 'list', :id => curr_object.id, :model => params[:model]
   end
 

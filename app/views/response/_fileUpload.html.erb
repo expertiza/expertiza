@@ -10,7 +10,7 @@
     <b><%= label("custom_response", ques_num, ques_text) %></b>
     <% @current_folder = DisplayOption.new
        @current_folder.name = ""
-       files_list = Dir[@participant.assignment.get_path.to_s+ "/" +@map.map_id.to_s + @current_folder.name + "/*"]
+       files_list = Dir[@participant.assignment.path.to_s+ "/" +@map.map_id.to_s + @current_folder.name + "/*"]
        files = Array.new
        for file in files_list
          if File.directory?(file) then

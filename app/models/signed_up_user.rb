@@ -28,13 +28,10 @@ class SignedUpUser < ActiveRecord::Base
       participant_names = SignedUpUser.find_by_sql(["SELECT s.name as u_name, t.name as team_name FROM users s, teams t, teams_users u WHERE t.id = u.team_id and u.user_id = s.id and t.id = ?", participant.team_id])
       team_name_added = false
       names = '(missing team)'
+
       for participant_name in participant_names
         if team_name_added == false
-          if  participant_names.size !=1
-            names =  participant_name.team_name + " "
-          else
-            names =  participant_name.u_name + " "
-          end
+          names = "["+participant_name.team_name+"] "+ participant_name.u_name + " "
           team_name_added = true
         else
           names = names + participant_name.u_name + " "
@@ -43,6 +40,7 @@ class SignedUpUser < ActiveRecord::Base
       @participants[i].name = names
       i = i + 1
     end
+
     @participants
   end
 

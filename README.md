@@ -1,7 +1,8 @@
 ## Demo Video
 
 We offer a short demo video demonstrating what we have done for you if you think it is too troublesome to figure them out.
-The demo video (1:40) is on [Youtube](https://youtu.be/HgmUJqDzhGc)
+The demo video (1:40) is on [Youtube](https://youtu.be/HgmUJqDzhGc)  
+Please change to 1080p version if it is blurry
 
 ## Running Server
 

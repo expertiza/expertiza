@@ -64,6 +64,9 @@
         if (due_at == null) {
             due_at = '';
         }
+        else{
+            due_at = new Date(due_at.substr(0,16)).format('yyyy/mm/dd HH:MM');
+        }
         var due_name = due_date.deadline_name;
         if (due_name == null){
             due_name = '';

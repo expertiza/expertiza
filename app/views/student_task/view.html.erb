@@ -39,7 +39,7 @@ to display the label "Your team" in the student assignment tasks-->
         <%= link_to "Quiz", student_quizzes_path(:id => @participant.id) %>
       <% else %>
         <font color="gray">Quiz</font>
-      <% end %> (Understand other's work and take the quiz)
+      <% end %> (Take quiz over the work you have read)
     </li>
     <li>
       <% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@participant.topic_id) == "Complete" %>

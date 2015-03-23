@@ -34,7 +34,6 @@ class ResponseController < ApplicationController
 
   def delete
     @response = Response.find(params[:id])
-    #return if action_allowed?(@response) #user cannot delete other people's responses. Needs to be authenticated.
     map_id = @response.map.id
     @response.delete
     redirect_to :action => 'redirection', :id => map_id, :return => params[:return], :msg => "The response was deleted."
@@ -63,7 +62,6 @@ class ResponseController < ApplicationController
       @next_action = "update"
       @return = params[:return]
       @response = Response.where(map_id: params[:id], version_num:  @largest_version_num.version_num).first
-      #return if action_allowed?(@response)
       @modified_object = @response.response_id
       @map = @response.map
       get_content
@@ -101,7 +99,6 @@ class ResponseController < ApplicationController
     @next_action = "update"
     @return = params[:return]
     @response = Response.find(params[:id])
-    #return if action_allowed?(@response)
 
     @map = @response.map
     @contributor = @map.contributor
@@ -141,7 +138,6 @@ class ResponseController < ApplicationController
 
   def update ###-### Seems like this method may no longer be used -- not in E806 version of the file
     @response = Response.find(params[:id])
-    #return if action_allowed?(@response)
     @myid = @response.response_id
     msg = ""
     begin
@@ -226,7 +222,6 @@ class ResponseController < ApplicationController
 
   def view
     @response = Response.find(params[:id])
-    #return if action_allowed?(@response)
     @map = @response.map
     get_content
     @question_type = @response.get_scores(@response, @questions)

@@ -23,8 +23,7 @@
 <% @responses_versions = @map.get_all_versions() %>
 
 <% if @responses_versions.empty? %>
-    "<I>No previous review was performed.</I><br/>
-    <hr/><br/>"
+    <I>No previous review was performed.</I><br/><hr/><br/>
 <% else %>
     <%= render :partial => 'review', :locals => {:versions => @responses_versions} %>
 <% end %>

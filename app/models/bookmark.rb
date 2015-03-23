@@ -18,8 +18,7 @@ class Bookmark < ActiveRecord::Base
 
  # Adds a bookmark and its various associations
   def self.add_bookmark(b_url, b_title, b_tags_text, b_description,session_user,topic_id)
-    bookmark_resource = Bookmark.where(["url = ?
-      ",b_url]).first
+    bookmark_resource = Bookmark.where(["url = ?",b_url]).first
 
     # Bookmark with the same url does not exists.
     if bookmark_resource.nil?

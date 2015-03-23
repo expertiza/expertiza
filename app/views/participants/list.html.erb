@@ -19,14 +19,14 @@
   <%= link_to 'Copy participants from course', :action => 'inherit', :id => @root_node.node_object_id %>  |
   <%= link_to 'Copy participants to course', :action => 'bequeath_all', :id => @root_node.node_object_id %><BR/>
 <% end %>
-<%= link_to 'Import '+@model+' Participants', 
+<%= link_to 'Import '+@model.to_s.downcase+' participants',
             :controller=>'import_file', 
             :action=>'start', 
             :model => @model+'Participant', 
             :title => @model+' Participants',
             :expected_fields => 'username, full name (first[ middle] last), e-mail address, password',
             :id => @parent.id %> | 
-<%= link_to 'Export '+@model+' Participants',
+<%= link_to 'Export '+@model.to_s.downcase+' participants',
             :controller=>'export_file',
             :action=>'start',
             :model=>@model+'Participant',

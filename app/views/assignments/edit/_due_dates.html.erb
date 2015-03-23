@@ -296,9 +296,11 @@
 <th width=10%>Meta-review allowed</th>
 <th width=9%>Quiz allowed</th>
 <th width=8%>Reminder(hrs)</th>
-<th width=10% id="due_date_name_column" >Due Date Name</th>
+<% if @due_date_nameurl_notempty =="false" %>
+<th width=10% id="due_date_name_column" >Due date name</th>
 <th width=10% id="due_date_url_column">Description URL</th>
-  </tr>
+<%end%>
+</tr>
   <tr id='blank' style='display:hidden'></tr>
   <script>
     jQuery(document).ready(function () {

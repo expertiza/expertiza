@@ -149,7 +149,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  get '/import_file/import', controller: :import_file, action: :import
+  post '/import_file/import', controller: :import_file, action: :import
 
   resources :institutions
 

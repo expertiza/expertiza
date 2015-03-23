@@ -1,5 +1,7 @@
 source 'http://rubygems.org'
 
+ruby '2.0.0'
+
 gem 'rails'
 
 ## Gems in Alphabetical Order
@@ -29,11 +31,12 @@ gem 'jquery-rails'
 gem 'jquery-ui-sass-rails'
 gem 'jquery-datetimepicker-rails'
 gem 'mysql2'
+gem 'mysql'
 gem 'nokogiri'
 gem 'omniauth-google-oauth2', '~> 0.2.6'
 gem 'open-uri-cached'
 gem 'paper_trail'
-gem 'pg'
+#gem 'pg'
 gem 'protected_attributes'
 gem 'rails_12factor', group: :production
 gem 'rails4-autocomplete'
@@ -55,6 +58,7 @@ gem 'turbolinks'
 gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
+gem 'mysql'
 
 group :development do
   gem 'daemons'

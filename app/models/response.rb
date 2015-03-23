@@ -107,6 +107,20 @@ class Response < ActiveRecord::Base
     self.destroy
   end
 
+  def get_scores(response, questions)
+    review_scores = []
+    question_type = []
+    questions.each do |question|
+      review_scores << Score
+                            .where(
+                                response_id: response.id,
+                                question_id:  question.id
+                            ).first
+      question_type << QuestionType.find_by_question_id(question.id)
+    end
+      question_type
+  end
+
   #bug fixed
   # Returns the average score for this response as an integer (0-100)
   def get_average_score()

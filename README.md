@@ -1,6 +1,9 @@
 Expertiza
 =========
 
+In order to run our code vist: 152.46.20.14:1 (VNC Viewer) or 152.46.20.14:5801 (browser), and use the password: password to log in. Please leave the system like you found it (with the browser open, and set to localhost:3000).
+----
+
 [![Build Status](https://travis-ci.org/expertiza/expertiza.png?branch=rails4)](https://travis-ci.org/expertiza/expertiza)
 [![Code Climate](https://codeclimate.com/github/expertiza/expertiza.png)](https://codeclimate.com/github/expertiza/expertiza)
 [![Coverage Status](https://coveralls.io/repos/expertiza/expertiza/badge.png?branch=rails4)](https://coveralls.io/r/expertiza/expertiza?branch=rails4)

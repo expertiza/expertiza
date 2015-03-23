@@ -6,7 +6,7 @@
   <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
     <b>Your topic(s):</b>
     <% for selected_topic in @selected_topics %>
-      <br/><%= selected_topic.topic_name %>
+      <br/><div id="selected_topic"><%= selected_topic.topic_name %></div>
     <% if selected_topic.is_waitlisted == true %>
       <font color='red'>(waitlisted)</font>
     <% end %>

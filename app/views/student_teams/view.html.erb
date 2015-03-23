@@ -120,7 +120,6 @@
                </tr>
              <% else %>
                <% for inv in @received_invs %>
-                 <!-->
                  <% if inv.reply_status == 'W' %>
                    <tr>
                      <td><%= inv.from_user.name %></td>
@@ -143,12 +142,11 @@
                      {:controller => 'invitation', :action => 'accept', :inv_id => inv.id, :student_id => @student.id, :team_id => @team_id},
                      {:onClick => "javascript: return confirm('Your topics and bids on topics will be dropped if you accept the invitation. Do you want to continue?');"}
                    %>
-                   |
+
                    <%= link_to "Decline",
                    {:controller => 'invitation', :action => 'decline', :inv_id => inv.id, :student_id => @student.id} %>
                </td>
              </tr>
-             <!-->
            <% end %>
          <% end %>
        <% end %>

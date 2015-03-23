@@ -1,3 +1,8 @@
+require 'authlogic'
+require 'authlogic/test_case'
+
+include Authlogic::TestCase
+
 # Record code coverage with coveralls on Travis
 require 'coveralls'
 Coveralls.wear! 'rails'

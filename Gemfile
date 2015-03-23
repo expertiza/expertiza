@@ -74,6 +74,7 @@ group :test do
   gem 'rspec-rails'
   gem 'shoulda'
   gem 'test-unit'
+  gem 'factory_girl_rails'
 end
 
 group :development, :test do

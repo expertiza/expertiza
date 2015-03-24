@@ -1,11 +1,19 @@
 Expertiza 
 =========
 #### CSC/ECE 517 Project2 OSS 
+
+Super-Administrator:
+<br><br><b>
+username: admin<br>
+password: admin
+</b><br><br>
+
 There are three students:
 <br><br><b>
 username: user1,user2,user3<br>
 password: admin
 </b><br><br>
+
  <b>Topic</b>: E1509 Refactoring SignUpController and SignUpSheetController<br>
  <b>Team member</b>: mdong3, yshang3, jli53<br>
  <b>Contact</b>: Ed Gehringer, efg@ncsu.edu, Nikhil Chinthapallee, nchinth@ncsu.edu<br>

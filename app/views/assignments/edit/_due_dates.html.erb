@@ -109,13 +109,6 @@
         }
         else
         {
-            html += '<td align="center" class="due_date_quiz_allowed_id" width="10%">' +
-            '<select id="due_date_quiz_allowed_id" name="assignment_form[due_date][][quiz_allowed_id]">' +
-            '<option disabled value="">---</option>' +
-            '<option disabled value="1">No</option>' +
-            '<option disabled value="2">Late</option>' +
-            '<option disabled value="3">Yes</option>' +
-            '</select></td>';
         }
 
         html += '<td align="center" class="due_date_threshold" width="10%">' +
@@ -297,7 +290,9 @@
 <th width=8%>Review allowed</th>
 
 <th width=10%>Meta-review allowed</th>
-<th width=9%>Has quiz</th>
+<%if @assignment_form.assignment.require_quiz%>
+  <th width=9%>Has quiz</th>
+<%end%>
 <th width=8%>Reminder(hrs)</th>
 <% if @due_date_nameurl_notempty =="false" %>
 <th width=10% id="due_date_name_column" >Due date name</th>

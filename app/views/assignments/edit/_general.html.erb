@@ -97,22 +97,6 @@ function is_coding_assignmentChanged(){
     </td>
   </tr>
 
-  <tr>
-    <td style='padding:5px' id='assignment_require_signup_field'>
-      <input name="assignment_form[assignment][require_signup]" type="hidden" value="false"/>
-      <%= check_box_tag('has_topic', 'true', @assignment_form.assignment.has_topics?, {:onChange => 'hasTopicsChanged()'}) %>
-      <%= label_tag('assignment_form[assignment][require_signup]', 'Has topics?') %>
-    </td>
-    <td style='padding:5px' id='assignment_is_intelligent_field'>
-      <input name="assignment_form[assignment][is_intelligent]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][is_intelligent]', 'true', @assignment_form.assignment.is_intelligent?) %>
-      <%= label_tag('assignment_form[assignment][is_intelligent]', 'Intelligent topic selection?') %>
-      <img src="/assets/info.png" title="This feature allow students to &quot;bid&quot; for topics.
-      You must specify when topics are assigned, by going to the Due Dates tab and
-      entering a due date for ‘signup’.">
-    </td>
-  </tr>
-
   <% if @assignment_form.assignment.require_signup? %>
     <script>
       jQuery(document).ready(function () {
@@ -219,28 +203,6 @@ function is_coding_assignmentChanged(){
 
 
 <script>
-  function hasTopicsChanged() {
-    var msg = 'Warning! Unchecking this box will remove all topics and the reservations of everyone who is signed up for them';
-        var checkbox = jQuery('#has_topic');
-        var intelegent_topic_selection_field  = jQuery('#assignment_is_intelligent_field');
-
-        if (checkbox.is(':checked')) {
-            intelegent_topic_selection_field.removeAttr('hidden');
-
-        } else {
-            if (<%= @assignment_form.assignment.has_topics?%>){
-                if (confirm(msg)) {
-                    intelegent_topic_selection_field.attr('hidden', true);
-                } else {
-                    checkbox.prop('checked', true);
-                }
-            }
-            else{
-                intelegent_topic_selection_field.attr('hidden', true);
-            }
-        }
-  }
-
     function hasTeamsChanged() {
       var msg = 'Warning! Unchecking this box will remove teams that already exist.';
         var checkbox = jQuery('#team_assignment');

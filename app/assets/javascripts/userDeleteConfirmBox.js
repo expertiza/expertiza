@@ -1,18 +1,20 @@
 //show more than one data confirmation when attempting to delete users.
 //overwrite rails default behavior
 $.rails.allowAction = function(link) {
-  console.log(link.attr('data-relationship'))
-  console.log(link.attr('data-username'))
-  if ((!link.attr('data-confirm')) || (link.attr('data-relationship') && link.attr('data-relationship') == 'false')) {
-   return true;
+  //console.log(link.data("overridden"))
+  //console.log(link.attr('data-username'))
+  if (link.data("overridden") != true) {
+    
+    return true;
   }
   $.rails.showConfirmDialog(link);
   return false;
 };
 
+//User click confirm button
 $.rails.confirmed = function(link) {
-  link.removeAttr('data-confirm');
-  return link.trigger('click.rails');
+  link.data("overridden", null);
+  link.trigger('click.rails');
 };
 
 $.rails.showConfirmDialog = function(link) {

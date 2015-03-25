@@ -47,7 +47,7 @@ class StudentTeamsController < ApplicationController
 
     #check if the team name is in use
     if existing_assignments.empty?
-      if(params[:team_name]==nil||params[:team_name]=="")
+      if(params[:team][:name]==nil||params[:team][:name].length==0)
         flash[:notice] = 'Team name is null.'
         redirect_to view_student_teams_path student_id: student.id
         return

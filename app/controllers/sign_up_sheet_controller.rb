@@ -34,7 +34,7 @@ class SignUpSheetController < ApplicationController
   verify :method => :post, :only => [:destroy, :create, :update],
     :redirect_to => {:action => :list}
 
-  # Prepares the form for adding a new topic. Used in conjuntion with create
+  # Prepares the form for adding a new topic. Used in conjunction with create
   def new
     @id = params[:id]
     @sign_up_topic = SignUpTopic.new

@@ -341,7 +341,6 @@ class AssignmentParticipant < Participant
     # move lots of calculation from view(_participant.html.erb) to model
     if self.grade
       scores[:total_score] = self.grade
-    end
     else
       total_score = scores[:total_score]
       hardline = 85
@@ -359,7 +358,7 @@ class AssignmentParticipant < Participant
     scores
 
     end
-
+  end
 
   def compute_quiz_scores(scores)
     total = 0

@@ -180,10 +180,7 @@
             alert('ERROR: number of rounds of review cannot be less than 0');
             return
         }
-        if (new_round_count == 1) {
-            alert('ERROR: number of rounds of review shoud be larger than 1');
-            return
-        }
+
         var i;
         var due_dates_table_element_list = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)');
         var current_round_count = 0;

@@ -150,6 +150,7 @@ Expertiza::Application.routes.draw do
   end
 
   post '/import_file/import', controller: :import_file, action: :import
+  post '/teams_users/create', controller: :teams_users, action: :create
 
   resources :institutions
 

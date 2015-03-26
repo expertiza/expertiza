@@ -39,7 +39,7 @@ class AssignmentsController < ApplicationController
       # flash[:success] = 'Assignment was successfully created.'
       # redirect_to controller: :assignments, action: :edit, id: @assignment.id
       #AAD#
-      redirect_to :controller => 'tree_display', :action => 'list'
+      redirect_to :action => 'edit', :id => @assignment_form.assignment.id
       undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
       #AAD#
     else

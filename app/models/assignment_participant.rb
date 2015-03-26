@@ -356,7 +356,6 @@ class AssignmentParticipant < Participant
       end
       scores[:total_score] = total_score
     scores
-
     end
   end
 

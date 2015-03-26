@@ -4,18 +4,12 @@ $.rails.allowAction = function(link) {
   //console.log(link.data("overridden"))
   //console.log(link.attr('data-username'))
   if (link.data("overridden") != true) {
-    
     return true;
   }
   $.rails.showConfirmDialog(link);
   return false;
 };
 
-//User click confirm button
-$.rails.confirmed = function(link) {
-  link.data("overridden", null);
-  link.trigger('click.rails');
-};
 
 $.rails.showConfirmDialog = function(link) {
   var message = link.attr('data-confirm');
@@ -76,8 +70,5 @@ $.rails.showConfirmDialog = function(link) {
         }
       }
     });
-  });
-  return $('#dialog-confirm .confirm').on('click', function() {
-    return $.rails.confirmed(link);
   });
 };

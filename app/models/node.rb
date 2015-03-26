@@ -37,6 +37,9 @@ class Node < ActiveRecord::Base
   end
 
   # Retreives the node's object name
+  def getinfo
+    self.
+  end
   def get_name
   end
 

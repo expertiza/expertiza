@@ -19,6 +19,8 @@
       <% participant.hyperlinks.each_with_index {
         |link, index| %>
       <% if stage != "Complete" %>
+        <a href="<%= link %>" target="new"><%= link %></a>
+        <br/>
         <% if index == 0 %>
           <input type="radio" id='chk_links' name='chk_links' checked value="<%= index %>"/>
         <% else %>

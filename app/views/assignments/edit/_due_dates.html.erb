@@ -291,10 +291,9 @@
   <th width=9%>Has quiz</th>
 <%end%>
 <th width=8%>Reminder(hrs)</th>
-<% if @due_date_nameurl_notempty =="false" %>
 <th width=10% id="due_date_name_column" >Due date name</th>
 <th width=10% id="due_date_url_column">Description URL</th>
-<%end%>
+
 </tr>
   <tr id='blank' style='display:hidden'></tr>
   <script>
@@ -307,9 +306,9 @@
         //after webpage refreshes, hide or display name and url according to whether names and urls are empty in DB
         var due_date_name_column=document.getElementById("due_date_name_column");
         var due_date_url_column=document.getElementById("due_date_url_column");
-      <% if @due_date_nameurl_notempty =="false" %>
-        due_date_name_column.style.visibility="hidden";
-        due_date_url_column.style.visibility="hidden";
+      <% if @due_date_nameurl_notempty.nil? or @due_date_nameurl_notempty.eql? false %>
+        due_date_name_column.style.display="none";
+        due_date_url_column.style.display="none";
       <% end %>
 
     }());

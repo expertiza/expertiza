@@ -17,10 +17,10 @@ end
 <h3> <%= @heading %> </h3> <br />
 <%@local = @method_name %>
 
-<%if @order_by == "most_recent" %><b><u><% end %><%= link_to('View most recent', :controller =>'bookmarks', :action => 'manage_bookmarks', :order_by =>'most_recent',:s=>@search_string,:users=>@my_user ) %></u></b>
+<%if @order_by == "most_recent" %><b><u><% end %><%= link_to('View most recent |', :controller =>'bookmarks', :action => 'manage_bookmarks', :order_by =>'most_recent',:s=>@search_string,:users=>@my_user ) %></u></b>
 
 
-<%if @order_by == "most_popular" %><b><u><% end %><%= link_to('View most popular', :controller =>'bookmarks', :action => 'manage_bookmarks', :order_by =>'most_popular',:s=>@search_string,:users=>@my_user) %> </u></b>
+<%if @order_by == "most_popular" %><b><u><% end %><%= link_to('View most popular |', :controller =>'bookmarks', :action => 'manage_bookmarks', :order_by =>'most_popular',:s=>@search_string,:users=>@my_user) %> </u></b>
 
 
 <% if @method_name == "managing_bookmarks" %><%= link_to('Add New',:id=>'add_new_bookmark', :controller =>'bookmarks', :action =>'add_bookmark_form')%> |

@@ -27,8 +27,8 @@
             <%= check_box_tag('assignment_form[assignment][is_intelligent]', 'true', @assignment_form.assignment.is_intelligent?)%>
             <%= label_tag('assignment_form[assignment][is_intelligent]', 'Intelligent topic selection?') %>
             <img src="/assets/info.png" title="This feature allow students to &quot;bid&quot; for topics.
-      You must specify when topics are assigned, by going to the Due Dates tab and
-      entering a due date for ‘signup’.">
+      Instructor must specify when topics are assigned, by going to the Due Dates tab and
+      entering a due date for &quot;signup&quot;.">
           <br><br>
         <%= render '/sign_up_sheet/add_signup_topics.html' %>
       </div>

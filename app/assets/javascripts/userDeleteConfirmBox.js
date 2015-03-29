@@ -1,17 +1,69 @@
 //show more than one data confirmation when attempting to delete users.
 //overwrite rails default behavior
 $.rails.allowAction = function(link) {
-  //console.log(link.data("overridden"))
-  //console.log(link.attr('data-username'))
-  if (link.data("overridden") != true) {
-    return true;
+  //console.log(link.attr("confirm"))
+  //console.log(link.attr('data-confirm'))
+  //use normal confirm dialog, when link does not have 'data-overridden' attribute.
+  if (!link.attr("confirm")){
+    if (link.attr('data-confirm')){
+      if (link.attr('data-overridden')){
+        //use special confirm dialog(delete user with relationship), when link has 'data-overridden' attribute.
+        $.rails.showConfirmDialogSpecial(link);
+        return false;
+      }
+      else{
+        $.rails.showConfirmDialogNormal(link);
+        return false;
+      }   
+    }
+    else{
+      return true;
+    }
   }
-  $.rails.showConfirmDialog(link);
-  return false;
+  else{
+    $.rails.showConfirmDialogNormal(link);
+    return false;
+  }
 };
 
+$.rails.confirmed = function(link) {
+  link.removeAttr('data-confirm');
+  return link.trigger('click.rails');
+};
 
-$.rails.showConfirmDialog = function(link) {
+//Normal
+$.rails.showConfirmDialogNormal = function(link) {
+  var html, message;
+  message = link.attr('confirm');
+  if (!message) {message = link.attr('data-confirm');}
+  html = "<div class=\"modal\" id=\"confirmationDialogNormal\" title=\"Warning\">\n  <div class=\"modal-body\">\n    <p>" + message + "</p>\n";
+
+  $(function() {
+    $(html).modal();
+    $("#confirmationDialogNormal").dialog({
+      buttons: [
+          {
+            text: "Cancel",
+            click: function() {
+              $( this ).dialog( "close" );
+            }
+          },
+          {
+            text: "OK",
+            click: function() {
+              $.rails.confirmed(link);
+            }
+          }
+      ]
+    });
+  });
+  return $('#confirmationDialogNormal .confirm').on('click', function() {
+    return $.rails.confirmed(link);
+  });
+};
+
+//Special
+$.rails.showConfirmDialogSpecial = function(link) {
   var message = link.attr('data-confirm');
   var html1 = "<div class=\"modal\" id=\"dialog-confirm1\" title=\"Delete This User?\">\n  <div class=\"modal-body\">\n    <p>" + message + "</p>\n";
 

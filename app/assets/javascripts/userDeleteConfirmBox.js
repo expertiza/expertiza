@@ -36,6 +36,7 @@ $.rails.showConfirmDialogNormal = function(link) {
   var html, message;
   message = link.attr('confirm');
   if (!message) {message = link.attr('data-confirm');}
+  console.log(message)
   html = "<div class=\"modal\" id=\"confirmationDialogNormal\" title=\"Warning\">\n  <div class=\"modal-body\">\n    <p>" + message + "</p>\n";
 
   $(function() {
@@ -46,6 +47,7 @@ $.rails.showConfirmDialogNormal = function(link) {
             text: "Cancel",
             click: function() {
               $( this ).dialog( "close" );
+              location.reload();
             }
           },
           {
@@ -56,9 +58,6 @@ $.rails.showConfirmDialogNormal = function(link) {
           }
       ]
     });
-  });
-  return $('#confirmationDialogNormal .confirm').on('click', function() {
-    return $.rails.confirmed(link);
   });
 };
 

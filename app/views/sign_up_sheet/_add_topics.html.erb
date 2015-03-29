@@ -1,3 +1,8 @@
-<%= link_to 'New topic',{:controller => 'sign_up_sheet', :action => 'new', :id => params[:id]}, data:{:confirm => "You have added [a topic][topics] to this assignment.  Students will now have to select a topic before they submit their work."}, :method => :get%> |
+<% if @topics.count == 0%>
+<%= link_to 'New topic',{:controller => 'sign_up_sheet', :action => 'new', :id => params[:id]}, data:{:confirm => "You have added [a topic][topics] to this assignment.  Students will now have to select a topic before they submit their work.", :topic => @topics}, :method => :get%> |
+<% else %>
+<%= link_to 'New topic',:controller => 'sign_up_sheet', :action => 'new', :id => params[:id]%> |
+<% end %>
+
 <%= link_to 'Import topics', :controller=>'import_file', :action=>'start', :model => 'SignUpTopic', :id => params[:id], :expected_fields => 'Topic identifier, Topic name, Max choosers, Topic Category' %>|
 <%= link_to("Manage bookmark rating rubrics", {:controller => "bookmarks", :action => "view_rating_rubrics"}) %>|

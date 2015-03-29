@@ -48,6 +48,7 @@ class AssignmentsController < ApplicationController
   end
 
   def edit
+    @topics = SignUpTopic.find_by_sql("select * from sign_up_topics where assignment_id="+params[:id])
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @user = current_user
 

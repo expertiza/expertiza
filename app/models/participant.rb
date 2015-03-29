@@ -27,12 +27,12 @@ class Participant < ActiveRecord::Base
   def get_current_stage
     assignment.try :current_stage, topic_id
   end
-  alias_method :current_stage, :current_stage
+  alias_method :current_stage, :get_current_stage
 
   def get_stage_deadline
     assignment.get_stage_deadline topic_id
   end
-  alias_method :stage_deadline, :stage_deadline
+  alias_method :stage_deadline, :get_stage_deadline
 
   def name
     User.find(self.user_id).name

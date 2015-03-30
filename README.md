@@ -1,5 +1,6 @@
 E1505. Refactoring AssignmentParticipant model
 =========
+First of all, please login with username: admin and password: admin
 
 Classes involved: assignment_participant.rb
 

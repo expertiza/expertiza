@@ -177,7 +177,7 @@
     function changeReviewRounds() {
         var new_round_count = parseInt(jQuery('#assignment_form_assignment_rounds_of_reviews').val());
         if (new_round_count <= 0) {
-            alert('ERROR: number of rounds of review cannot be less than 0');
+            alert('ERROR: number of rounds of review should be greater than 0');
             return
         }
 

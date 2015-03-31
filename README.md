@@ -6,7 +6,8 @@ Please change to 1080p version if it is blurry
 
 ## Running Server
 
-This branch is running on: [My Amazon EC2 Instance](http://ec2-52-10-80-197.us-west-2.compute.amazonaws.com:3000)
+This branch is running on: [My Amazon EC2 Instance](http://ec2-52-10-80-197.us-west-2.compute.amazonaws.com:3000)  
+The bug on AWS EC2 Instance is fixed. It was caused by running rails server on the background without proper command
 
 Credientials:
 

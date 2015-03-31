@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-ruby '2.0.0'
+ruby '2.1.5'
 
 gem 'rails'
 
@@ -67,6 +67,8 @@ group :development do
   gem 'pry-nav'
   gem 'sqlite3-ruby', :require => 'sqlite3'
   gem 'selenium-webdriver'
+  gem 'cucumber-rails'
+  gem 'capybara'
 end
 
 group :test do
@@ -81,6 +83,5 @@ group :test do
 end
 
 group :development, :test do
-  gem 'capybara'
   gem 'simplecov', :require => false
 end

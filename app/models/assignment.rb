@@ -123,7 +123,7 @@ class Assignment < ActiveRecord::Base
 
   #This method is only for the assignments without topics
   def candidate_assignment_teams_to_review
-
+    # the contributors are AssignmentTeam objects
     contributor_set = Array.new(contributors)
 
     # Reject contributors that have no submissions

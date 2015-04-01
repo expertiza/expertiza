@@ -123,7 +123,6 @@ class AssignmentForm
   def delete_from_delayed_queue
     djobs = Delayed::Job.where(['handler LIKE "%assignment_id: ?%"', @assignment.id])
     for dj in djobs
-      dj=Delayed::Job.find(delayed_job_id)
       if (dj != nil && dj.id != nil)
         dj.delete
       end

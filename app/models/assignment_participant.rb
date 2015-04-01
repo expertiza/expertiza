@@ -341,7 +341,6 @@ class AssignmentParticipant < Participant
     # move lots of calculation from view(_participant.html.erb) to model
     if self.grade
       scores[:total_score] = self.grade
-    end
     else
       total_score = scores[:total_score]
       hardline = 85
@@ -357,9 +356,8 @@ class AssignmentParticipant < Participant
       end
       scores[:total_score] = total_score
     scores
-
     end
-
+  end
 
   def compute_quiz_scores(scores)
     total = 0
@@ -393,7 +391,7 @@ class AssignmentParticipant < Participant
   # Note: This method is not used yet. It is here in the case it will be needed.
   # @exception  If the index does not exist in the array
   def remove_hyperlink(index)
-    hyperlinks = hyperlinks   #This needs review
+    hyperlinks = self.hyperlinks
     raise "The link does not exist" unless index < hyperlinks.size
 
     hyperlinks.delete_at(index)

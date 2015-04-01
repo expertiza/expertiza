@@ -1,3 +1,23 @@
+<script>
+	function showHiddenUsersChanged() {
+        var checkbox = jQuery('#show_hidden_users');
+ 
+        if (checkbox.is(':checked')) {
+			newURLString = window.location.origin + "/users/list?show=true";
+			//alert(window.location.origin);//still have problem
+			//checkbox.checked =true;
+			//checkbox.attr("checked", "checked");
+    		window.location.href = newURLString; 
+        } else {
+            newURLString = window.location.origin + "/users/list?show=false";
+			//alert(window.location.origin);//still have problem
+			//checkbox.checked =false;
+			//checkbox.removeAttr("checked");
+    		window.location.href = newURLString; 
+        }
+  	}
+</script>
+
 <div style="float: left;">
   <%= form_tag :controller => 'users', :action => 'list', :letter => session[:letter], :search_by => @search_by, :paginate_show => '1' do %>
 
@@ -12,3 +32,13 @@
 </div>
 
 <div style="clear: both;"></div>
+
+<!--decide show hidden users or not-->
+<div>
+	<% if (params[:show] != 'true')%>
+		<%= check_box_tag('show_hidden_users', 'show_hidden_users', false, :onChange => 'showHiddenUsersChanged()') %>
+	<% else%>
+		<%= check_box_tag('show_hidden_users', 'show_hidden_users', true, :onChange => 'showHiddenUsersChanged()') %>
+	<% end %>
+	<%= label_tag("Show 'hidden' users.") %>
+</div>

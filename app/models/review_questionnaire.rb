@@ -14,7 +14,7 @@ class ReviewQuestionnaire < Questionnaire
 
   # return  the responses for specified round, for varying rubric feature -Yang
   def get_assessments_round_for(participant,round)
-    team=AssignmentTeam.get_team(participant)
+    team=AssignmentTeam.team(participant)
     return nil if !team
 
     team_id = team.id

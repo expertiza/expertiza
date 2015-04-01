@@ -34,7 +34,7 @@ class ParticipantsController < ApplicationController
       curr_object.add_participant(params[:user][:name])
       user = User.find_by_name(params[:user][:name])
       @participant = curr_object.participants.find_by_user_id(user.id)
-      flash[:note] = "user \"#{params[:user][:name]}\" has has been added as a participant successfully."
+      flash[:note] = "user \"#{params[:user][:name]}\" has successfully been added."
     rescue
       url_new_user = url_for :controller => 'users', :action => 'new'
       flash[:error] = "User #{params[:user][:name]} does not exist or has already been added.</a>"

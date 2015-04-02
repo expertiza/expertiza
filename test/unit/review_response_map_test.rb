@@ -36,9 +36,9 @@ class ReviewResponseMapTest < ActiveSupport::TestCase
     assert_equal  reviewrespmap.delete(), reviewrespmap
   end
 
-  test "method_get_export_fields" do
+  test "method_export_fields" do
     fields_1 = ["contributor","reviewed by"]
-    fields_2 = ReviewResponseMap.get_export_fields(1)
+    fields_2 = ReviewResponseMap.export_fields(1)
     assert_equal fields_2[0], fields_1[0]
     assert_equal fields_2[1], fields_1[1]
   end

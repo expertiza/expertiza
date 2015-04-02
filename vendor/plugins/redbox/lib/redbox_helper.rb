@@ -27,7 +27,7 @@ module RedboxHelper
 
   def button_to_close_redbox(name, html_options = {})
     @uses_redbox = true
-    button_to_function name, 'RedBox.close()', html_options
+    button_tag name, onclick: 'RedBox.close()', html_options
   end  
 
   def launch_remote_redbox(link_to_remote_options = {}, html_options = {})

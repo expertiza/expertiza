@@ -10,6 +10,7 @@
       stage = student_task.current_stage
       controller = ""
       action = ""
+      id = participant.id
       if stage == "submission" || stage == 'signup'
         controller = "submitted_content"
         action = "edit"
@@ -53,7 +54,7 @@
   <% @taskrevisions.each do |student_task|
     participant = student_task.participant
     stage = student_task.current_stage
-    duedate = participant.assignment.get_stage_deadline(participant.topic_id)
+    duedate = participant.assignment.stage_deadline(participant.topic_id)
     controller = ""
     action = ""
     if stage == "submission" or stage == "resubmission"
@@ -93,14 +94,23 @@
 
     <% @student_tasks.each do |student_task| %>
       <% participant = student_task.participant %>
-      <% if student_task.assignment %>
+      <% if student_task.assignment&&student_task.assignment.availability_flag %>
         <tr class="listingRow">
           <td>&nbsp;</td>
           <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></td>
           <td><%= student_task.course.try :name %></td>
           <td><%= student_task.topic_name %></td>
-          <td><%= participant.assignment.get_current_stage(participant.topic_id) %></td>
-          <td><%= student_task.stage_deadline %></td>
+
+          <td>
+          <% if participant.assignment.get_link_for_current_stage(participant.topic_id)!= nil && participant.assignment.get_link_for_current_stage(participant.topic_id).length!=0%>
+              <%= link_to participant.assignment.get_current_stage_name(participant.topic_id), participant.assignment.get_link_for_current_stage(participant.topic_id) %>
+              <% else %>
+              <%= participant.assignment.get_current_stage_name(participant.topic_id) %>
+              <% end %>
+
+          </td>
+
+          <td><%= student_task.stage_deadline.in_time_zone(session[:user].timezonepref) %></td>
           <td align=center>
             <% if participant.permission_granted %>granted
             <% else %>denied

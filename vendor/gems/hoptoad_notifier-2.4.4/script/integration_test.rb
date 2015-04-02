@@ -4,7 +4,7 @@ require 'logger'
 require 'fileutils'
 
 RAILS_ENV = "production"
-RAILS_ROOT = FileUtils.pwd
+Rails.root = FileUtils.pwd
 RAILS_DEFAULT_LOGGER = Logger.new(STDOUT)
 
 $: << File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))

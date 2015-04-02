@@ -14,9 +14,13 @@ class AssignmentParticipant < Participant
   belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
   has_many    :review_mappings, :class_name => 'ParticipantReviewResponseMap', :foreign_key => 'reviewee_id'
   has_many    :quiz_mappings, :class_name => 'QuizResponseMap', :foreign_key => 'reviewee_id'
-  has_many    :quiz_responses,  :class_name => 'Response', :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'QuizResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
+  has_many :response_maps, foreign_key: 'reviewee_id'
+  has_many :participant_review_response_maps, foreign_key: 'reviewee_id'
+  has_many :quiz_response_maps, foreign_key: 'reviewee_id'
+  has_many :quiz_responses, through: :quiz_response_maps, foreign_key: 'map_id'
+  # has_many    :quiz_responses,  :class_name => 'Response', :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'QuizResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
     has_many    :collusion_cycles
-  has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'ParticipantReviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
+  # has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'ParticipantReviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
     belongs_to  :user
   validates_presence_of :handle
 
@@ -85,31 +89,34 @@ class AssignmentParticipant < Participant
   end
 
   def assign_quiz(contributor,reviewer,topic)
-    participant_id=AssignmentParticipant.find_by_topic_id_and_parent_id(topic, contributor.parent_id).id
+    participant_id=AssignmentParticipant.where(topic_id: topic, parent_id:  contributor.parent_id).first.id
 
     quiz = QuizQuestionnaire.find_by_instructor_id(contributor.id)
     QuizResponseMap.create(:reviewed_object_id => quiz.id,:reviewee_id => contributor.id, :reviewer_id => reviewer.id,
                            :type=>"QuizResponseMap", :notification_accepted => 0)
   end
 
+  def AssignmentParticipant.find_by_user_id_and_assignment_id(user_id, assignment_id)
+    return AssignmentParticipant.where(:user_id=>user_id,:parent_id=>assignment_id).first
+  end
+
   # Evaluates whether this participant contribution was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object
   def reviewed_by?(reviewer)
-    ParticipantReviewResponseMap.count(:conditions => ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',
-                                                       self.id, reviewer.id, assignment.id]) > 0
+    ParticipantReviewResponseMap.where(['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', self.id, reviewer.id, assignment.id]).count > 0
   end
 
 
   def quiz_taken_by?(contributor, reviewer)
     quiz_id = QuizQuestionnaire.find_by_instructor_id(contributor.id)
-    return QuizResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?',
-                                                 self.id, reviewer.id, quiz_id]) > 0
+    return QuizResponseMap.where(['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?',
+                                  self.id, reviewer.id, quiz_id]).count > 0
   end
 
   def has_submissions?
     #return ((submitted_files.length > 0) or
     #        (wiki_submissions.length > 0) or
-    #        (get_hyperlinks_array.length > 0))
+    #        (hyperlinks_array.length > 0))
     return true
   end
 
@@ -121,10 +128,10 @@ class AssignmentParticipant < Participant
   def reviewees
     reviewees = []
     if self.assignment.team_assignment?
-      rmaps = ResponseMap.find(:all, conditions: ["reviewer_id = #{self.id} && type = 'TeamReviewResponseMap'"])
+      rmaps = ResponseMap.all(conditions: ["reviewer_id = #{self.id} && type = 'TeamReviewResponseMap'"])
         rmaps.each { |rm| reviewees.concat(AssignmentTeam.find(rm.reviewee_id).participants) }
     else
-      rmaps = ResponseMap.find(:all, :conditions => ["reviewer_id = #{self.id} && type = 'ParticipantReviewResponseMap'"])
+      rmaps = ResponseMap.where(["reviewer_id = #{self.id} && type = 'ParticipantReviewResponseMap'"])
         rmaps.each {|rm| reviewees.push(AssignmentParticipant.find(rm.reviewee_id))}
     end
 
@@ -132,12 +139,12 @@ class AssignmentParticipant < Participant
   end
 
   # all the participants in this assignment who have reviewed this person
-  def get_reviewers
+  def reviewers
     reviewers = []
     if self.assignment.team_assignment? && self.team
-      rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponseMap'"])
+      rmaps = ResponseMap.where(["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponseMap'"])
     else
-      rmaps = ResponseMap.find(:all, :conditions => ["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
+      rmaps = ResponseMap.where(["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
     end
     rmaps.each do |rm|
       reviewers.push(AssignmentParticipant.find(rm.reviewer_id))
@@ -145,52 +152,51 @@ class AssignmentParticipant < Participant
 
     reviewers
   end
-  alias_method :reviewers, :get_reviewers
+ 
 
   # Cycle data structure
   # Each edge of the cycle stores a participant and the score given to the participant by the reviewer.
   # Consider a 3 node cycle: A --> B --> C --> A (A reviewed B; B reviewed C and C reviewed A)
   # For the above cycle, the data structure would be: [[A, SCA], [B, SAB], [C, SCB]], where SCA is the score given by C to A.
 
-  def get_two_node_cycles
+  def two_node_cycles
     cycles = []
-    self.get_reviewers.each do |ap|
-      if ap.get_reviewers.include?(self)
-        self.get_reviews_by_reviewer(ap).nil? ? next : s01 = self.get_reviews_by_reviewer(ap).get_total_score
-        ap.get_reviews_by_reviewer(self).nil? ? next : s10 = ap.get_reviews_by_reviewer(self).get_total_score
+    self.reviewers.each do |ap|
+      if ap.reviewers.include?(self)
+        self.reviews_by_reviewer(ap).nil? ? next : s01 = self.reviews_by_reviewer(ap).get_total_score
+        ap.reviews_by_reviewer(self).nil? ? next : s10 = ap.reviews_by_reviewer(self).get_total_score
         cycles.push([[self, s01], [ap, s10]])
       end
     end
     cycles
   end
-  alias_method :two_node_cycles, :get_two_node_cycles
 
-  def get_three_node_cycles
+
+  def three_node_cycles
     cycles = []
-    self.get_reviewers.each do |ap1|
-      ap1.get_reviewers.each do |ap2|
-        if ap2.get_reviewers.include?(self)
-          self.get_reviews_by_reviewer(ap1).nil? ? next : s01 = self.get_reviews_by_reviewer(ap1).get_total_score
-          ap1.get_reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score
-          ap2.get_reviews_by_reviewer(self).nil? ? next : s20 = ap2.get_reviews_by_reviewer(self).get_total_score
+    self.reviewers.each do |ap1|
+      ap1.reviewers.each do |ap2|
+        if ap2.reviewers.include?(self)
+          self.reviews_by_reviewer(ap1).nil? ? next : s01 = self.reviews_by_reviewer(ap1).get_total_score
+          ap1.reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.reviews_by_reviewer(ap2).get_total_score
+          ap2.reviews_by_reviewer(self).nil? ? next : s20 = ap2.reviews_by_reviewer(self).get_total_score
           cycles.push([[self, s01], [ap1, s12], [ap2, s20]])
         end
       end
     end
     cycles
   end
-  alias_method :three_node_cycles, :get_three_node_cycles
 
-  def get_four_node_cycles
+  def four_node_cycles
     cycles = []
-    self.get_reviewers.each do |ap1|
-      ap1.get_reviewers.each do |ap2|
-        ap2.get_reviewers.each do |ap3|
-          if ap3.get_reviewers.include?(self)
-            self.get_reviews_by_reviewer(ap1).nil? ? next : s01 = self.get_reviews_by_reviewer(ap1).get_total_score
-            ap1.get_reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.get_reviews_by_reviewer(ap2).get_total_score
-            ap2.get_reviews_by_reviewer(ap3).nil? ? next : s23 = ap2.get_reviews_by_reviewer(ap3).get_total_score
-            ap3.get_reviews_by_reviewer(self).nil? ? next : s30 = ap3.get_reviews_by_reviewer(self).get_total_score
+    self.reviewers.each do |ap1|
+      ap1.reviewers.each do |ap2|
+        ap2.reviewers.each do |ap3|
+          if ap3.reviewers.include?(self)
+            self.reviews_by_reviewer(ap1).nil? ? next : s01 = self.reviews_by_reviewer(ap1).get_total_score
+            ap1.reviews_by_reviewer(ap2).nil? ? next : s12 = ap1.reviews_by_reviewer(ap2).get_total_score
+            ap2.reviews_by_reviewer(ap3).nil? ? next : s23 = ap2.reviews_by_reviewer(ap3).get_total_score
+            ap3.reviews_by_reviewer(self).nil? ? next : s30 = ap3.reviews_by_reviewer(self).get_total_score
             cycles.push([[self, s01], [ap1, s12], [ap2, s23], [ap3, s30]])
           end
         end
@@ -198,10 +204,9 @@ class AssignmentParticipant < Participant
     end
     cycles
   end
-  alias_method :four_node_cycles, :get_four_node_cycles
 
   # Per cycle
-  def get_cycle_similarity_score(cycle)
+  def cycle_similarity_score(cycle)
     similarity_score = 0.0
     count = 0.0
 
@@ -214,10 +219,9 @@ class AssignmentParticipant < Participant
     similarity_score = similarity_score / count unless count == 0.0
     similarity_score
   end
-  alias_method :cycle_similarity_score, :get_cycle_similarity_score
 
   # Per cycle
-  def get_cycle_deviation_score(cycle)
+  def cycle_deviation_score(cycle)
     deviation_score = 0.0
     count = 0.0
 
@@ -231,7 +235,6 @@ class AssignmentParticipant < Participant
     deviation_score = deviation_score / count unless count == 0.0
     deviation_score
   end
-  alias_method :cycle_deviation_score, :get_cycle_deviation_score
 
   def review_score
     review_questionnaire = self.assignment.questionnaires.select {|q| q.type == "ReviewQuestionnaire"}[0]
@@ -248,15 +251,67 @@ class AssignmentParticipant < Participant
   end
 
   # Return scores that this participant has been given
-  def get_scores(questions)
-    scores = Hash.new
-    scores[:participant] = self # This doesn't appear to be used anywhere
+  def scores(questions)
+    scores = {}
+    scores[:participant] = self
     self.assignment.questionnaires.each do |questionnaire|
-      scores[questionnaire.symbol] = Hash.new
-      scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
-      scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+      round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(self.assignment.id, questionnaire.id).used_in_round
+      #create symbol for "varying rubrics" feature -Yang
+      if(round!=nil)
+        questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
+      else
+        questionnaire_symbol = questionnaire.symbol
+      end
+
+      scores[questionnaire_symbol] = {}
+
+      if round==nil
+        scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_for(self)
+      else
+        scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_round_for(self,round)
+      end
+      scores[questionnaire_symbol][:scores] = Score.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
     end
+
     scores[:total_score] = self.assignment.compute_total_score(scores)
+
+    #merge scores[review#] (for each round) to score[review]  -Yang
+    if self.assignment.varying_rubrics_by_round?
+      review_sym = "review".to_sym
+      scores[review_sym] = Hash.new
+      scores[review_sym][:assessments] = Array.new
+      scores[review_sym][:scores] = Hash.new
+      scores[review_sym][:scores][:max] = -999999999
+      scores[review_sym][:scores][:min] = 999999999
+      scores[review_sym][:scores][:avg] = 0
+      total_score = 0
+      for i in 1..self.assignment.get_review_rounds
+        round_sym = ("review"+i.to_s).to_sym
+        if length_of_assessments=scores[round_sym][:assessments].nil? || scores[round_sym][:assessments].length==0
+          next
+        end
+        length_of_assessments=scores[round_sym][:assessments].length.to_f
+
+        scores[review_sym][:assessments]+=scores[round_sym][:assessments]
+
+        if(scores[round_sym][:scores][:max]!=nil && scores[review_sym][:scores][:max]<scores[round_sym][:scores][:max])
+          scores[review_sym][:scores][:max]= scores[round_sym][:scores][:max]
+        end
+        if(scores[round_sym][:scores][:min]!= nil && scores[review_sym][:scores][:min]>scores[round_sym][:scores][:min])
+          scores[review_sym][:scores][:min]= scores[round_sym][:scores][:min]
+        end
+        if(scores[round_sym][:scores][:avg]!=nil)
+          total_score += scores[round_sym][:scores][:avg]*length_of_assessments
+        end
+      end
+
+      if scores[review_sym][:scores][:max] == -999999999 && scores[review_sym][:scores][:min] == 999999999
+               scores[review_sym][:scores][:max] = 0
+               scores[review_sym][:scores][:min] = 0
+      end
+
+      scores[review_sym][:scores][:avg] = total_score/scores[review_sym][:assessments].length.to_f
+    end
 
     # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
     # PS: I don't like the fact that we are doing this here but it is difficult to make it work anywhere else
@@ -270,7 +325,7 @@ class AssignmentParticipant < Participant
 
     # for all quiz questionnaires (quizzes) taken by the participant
     quiz_responses = Array.new
-    quiz_response_mappings = QuizResponseMap.find_all_by_reviewer_id(self.id)
+    quiz_response_mappings = QuizResponseMap.where(reviewer_id: self.id)
     quiz_response_mappings.each do |qmapping|
       if (qmapping.response)
         quiz_responses << qmapping.response
@@ -282,9 +337,27 @@ class AssignmentParticipant < Participant
 
     scores[:total_score] = assignment.compute_total_score(scores)
     scores[:total_score] += compute_quiz_scores(scores)
+
+    # move lots of calculation from view(_participant.html.erb) to model
+    if self.grade
+      scores[:total_score] = self.grade
+    else
+      total_score = scores[:total_score]
+      hardline = 85
+      if scores[:teammate][:scores][:avg].to_f > hardline
+            total_score = total_score + 0.05*total_score
+      elsif scores[:teammate][:scores][:avg].to_f < hardline and (hardline - scores[:teammate][:scores][:avg].to_f) > 40
+             total_score = total_score - 10
+      elsif scores[:teammate][:scores][:avg].to_f < hardline and (hardline - scores[:teammate][:scores][:avg].to_f) > 20
+             total_score = total_score - (hardline - scores[:teammate][:scores][:avg].to_f)*0.5
+      end
+      if total_score > 100
+        total_score = 100
+      end
+      scores[:total_score] = total_score
     scores
     end
-
+  end
 
   def compute_quiz_scores(scores)
     total = 0
@@ -307,7 +380,7 @@ class AssignmentParticipant < Participant
     # If not a valid URL, it will throw an exception
     Net::HTTP.start(url.host, url.port)
 
-    hyperlinks = get_hyperlinks_array
+    hyperlinks = hyperlinks_array
 
     hyperlinks << hyperlink
     self.submitted_hyperlinks = YAML::dump(hyperlinks)
@@ -318,38 +391,36 @@ class AssignmentParticipant < Participant
   # Note: This method is not used yet. It is here in the case it will be needed.
   # @exception  If the index does not exist in the array
   def remove_hyperlink(index)
-    hyperlinks = get_hyperlinks
+    hyperlinks = self.hyperlinks
     raise "The link does not exist" unless index < hyperlinks.size
 
     hyperlinks.delete_at(index)
-    self.submitted_hyperlinks = hyperlinks.empty? ? nil : YAML::dump(hyperlinks)
+
+    self.submitted_hyperlinks = YAML::dump(hyperlinks)
 
     self.save
   end
 
-  def get_members
+  def members
     team.try :participants
   end
-  alias_method :members, :get_members
 
-
-  def get_hyperlinks
-    team.try(:get_hyperlinks) || []
+  def hyperlinks
+    team.try(:hyperlinks) || []
   end
-  alias_method :hyperlinks, :get_hyperlinks
-
-  def get_hyperlinks_array
+ 
+  def hyperlinks_array
     self.submitted_hyperlinks.nil? ? [] : YAML::load(self.submitted_hyperlinks)
   end
-  alias_method :hyperlinks_array, :get_hyperlinks_array
+
 
   #Copy this participant to a course
   def copy(course_id)
-    part = CourseParticipant.find_by_user_id_and_parent_id(self.user_id,course_id)
+    part = CourseParticipant.where(user_id: self.user_id, parent_id: course_id).first
     CourseParticipant.create(:user_id => self.user_id, :parent_id => course_id) if part.nil?
   end
 
-  def get_course_string
+  def course_string
     # if no course is associated with this assignment, or if there is a course with an empty title, or a course with a title that has no printing characters ...
     begin
       course = Course.find(self.assignment.course.id)
@@ -361,26 +432,22 @@ class AssignmentParticipant < Participant
       return "<center>&#8212;</center>".html_safe
     end
   end
-  alias_method :course_string, :get_course_string
 
-  def get_feedback
+  def feedback
     FeedbackResponseMap.get_assessments_for(self)
   end
-  alias_method :feedback, :get_feedback
 
-  def get_reviews
+  def reviews
     #ACS Always get assessments for a team
     #removed check to see if it is a team assignment
     TeamReviewResponseMap.get_assessments_for(self.team)
   end
-  alias_method :reviews, :get_reviews
 
-  def get_reviews_by_reviewer(reviewer)
+  def reviews_by_reviewer(reviewer)
     TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)
   end
-  alias_method :reviews_by_reviewer, :get_reviews_by_reviewer
 
-  def get_quizzes_taken
+  def quizzes_taken
     return QuizResponseMap.get_assessments_for(self)
   end
 
@@ -393,55 +460,39 @@ class AssignmentParticipant < Participant
     TeammateReviewResponseMap.get_assessments_for(self)
   end
 
-  def get_submitted_files
-    get_files(self.get_path) if self.directory_num
+  def submitted_files
+    files(self.path) if self.directory_num
   end
-  alias_method :submitted_files, :get_submitted_files
 
-  def get_files(directory)
+  def files(directory)
     files_list = Dir[directory + "/*"]
     files = Array.new
 
     files_list.each do |file|
       if File.directory?(file)
-        dir_files = get_files(file)
+        dir_files = files(file)
         dir_files.each{|f| files << f}
       end
       files << file
     end
     files
   end
-  alias_method :files_in_directory, :get_files
-  alias_method :files, :get_files
 
-  def get_submitted_files()
+  def submitted_files()
     files = Array.new
     if(self.directory_num)
-      files = get_files(self.get_path)
+      files = files(self.path)
     end
     return files
   end
 
-  def get_files(directory)
-    files_list = Dir[directory + "/*"]
-    files = Array.new
-    for file in files_list
-      if File.directory?(file) then
-        dir_files = get_files(file)
-        dir_files.each{|f| files << f}
-      end
-      files << file
-    end
-    return files
-  end
-
-  def get_wiki_submissions
+  def wiki_submissions
     current_time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
 
     #ACS Check if the team count is greater than one(team assignment)
     if self.assignment.max_team_size > 1 && self.assignment.wiki_type.name == "MediaWiki"
       submissions = Array.new
-      self.team.get_participants.each do |user|
+      self.team.participants.each do |user|
         val = WikiType.review_mediawiki_group(self.assignment.directory_path, current_time, user.handle)
         submissions << val if val != nil
       end if self.team
@@ -454,10 +505,9 @@ class AssignmentParticipant < Participant
       Array.new
     end
   end
-  alias_method :wiki_submissions, :get_wiki_submissions
 
   def team
-    AssignmentTeam.get_team(self)
+    AssignmentTeam.team(self)
   end
 
   # provide import functionality for Assignment Participants
@@ -471,7 +521,7 @@ class AssignmentParticipant < Participant
       user = ImportFileHelper::create_new_user(attributes,session)
     end
     raise ImportError, "The assignment with id \""+id.to_s+"\" was not found." if Assignment.find(id) == nil
-    if find(:all, {conditions: ['user_id=? && parent_id=?', user.id, id]}).size == 0
+    if all({conditions: ['user_id=? && parent_id=?', user.id, id]}).size == 0
       new_part = AssignmentParticipant.create(:user_id => user.id, :parent_id => id)
       new_part.set_handle()
     end
@@ -479,7 +529,7 @@ class AssignmentParticipant < Participant
 
   # provide export functionality for Assignment Participants
   def self.export(csv,parent_id,options)
-    find_all_by_parent_id(parent_id).each do |part|
+    where(parent_id: parent_id).each do |part|
       user = part.user
       csv << [
         user.name,
@@ -495,7 +545,7 @@ class AssignmentParticipant < Participant
     end
   end
 
-  def self.get_export_fields(options)
+  def self.export_fields(options)
     ["name","full name","email","role","parent","email on submission","email on review","email on metareview","handle"]
   end
 
@@ -531,7 +581,7 @@ class AssignmentParticipant < Participant
     def set_handle
       if self.user.handle == nil or self.user.handle == ""
         self.handle = self.user.name
-      elsif AssignmentParticipant.find_all_by_parent_id_and_handle(self.assignment.id, self.user.handle).length > 0
+      elsif AssignmentParticipant.where(parent_id: self.assignment.id, handle: self.user.handle).length > 0
         self.handle = self.user.name
       else
         self.handle = self.user.handle
@@ -539,10 +589,9 @@ class AssignmentParticipant < Participant
       self.save!
     end
 
-    def get_path
-      self.assignment.get_path + "/"+ self.directory_num.to_s
+    def path
+      self.assignment.path + "/"+ self.directory_num.to_s
     end
-    alias_method :path, :get_path
 
     def update_resubmit_times
       new_submit = ResubmissionTime.new(:resubmitted_at => Time.now.to_s)
@@ -551,12 +600,12 @@ class AssignmentParticipant < Participant
 
     def set_student_directory_num
       if self.directory_num.nil? || self.directory_num < 0
-        max_num = AssignmentParticipant.find(:first, conditions: ['parent_id = ?', self.parent_id], :order => 'directory_num desc').directory_num
+        max_num = AssignmentParticipant.where(['parent_id = ?', self.parent_id], :order => 'directory_num desc').first.directory_num
         dir_num = max_num ? max_num + 1 : 0
         self.update_attribute('directory_num',dir_num)
         #ACS Get participants irrespective of the number of participants in the team
         #removed check to see if it is a team assignment
-        self.team.get_participants.each do | member |
+        self.team.participants.each do | member |
           if member.directory_num == nil or member.directory_num < 0
             member.directory_num = self.directory_num
             member.save
@@ -565,25 +614,23 @@ class AssignmentParticipant < Participant
       end
     end
 
-    def get_current_stage
+    def current_stage
       assignment.try :get_current_stage, topic_id
     end
-    alias_method :current_stage, :get_current_stage
 
 
-    def get_stage_deadline
-      assignment.get_stage_deadline topic_id
+    def stage_deadline
+      assignment.stage_deadline topic_id
     end
-    alias_method :stage_deadline, :get_stage_deadline
 
 
     def review_response_maps
-      ParticipantReviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(id, assignment.id)
+      ParticipantReviewResponseMap.where(reviewee_id: id, reviewed_object_id: assignment.id)
     end
 
-    def get_topic_string
+    def topic_string
       return "<center>&#8212;</center>" if topic.nil? or topic.topic_name.empty?
         topic.topic_name
     end
-    alias_method :topic_string, :get_topic_string
+  
   end

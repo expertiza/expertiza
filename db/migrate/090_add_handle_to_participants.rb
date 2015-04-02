@@ -2,7 +2,7 @@ class AddHandleToParticipants < ActiveRecord::Migration
   def self.up
     begin
       add_column :participants, :handle, :string, :null => true
-      AssignmentParticipant.find(:all).each{
+      AssignmentParticipant.find_each{
         |participant|
         if participant.handle.nil?
           user = User.find(participant.user_id)

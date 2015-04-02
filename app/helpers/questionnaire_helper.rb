@@ -110,8 +110,7 @@ def self.adjust_advice_size(questionnaire, question)
   elsif question.true_false == false
     for i in (questionnaire.min_question_score..questionnaire.max_question_score)
       print "\n#{i}: #{question.id}"
-        qa = QuestionAdvice.find(:first,
-                                 :conditions=>"question_id = #{question.id} AND score = #{i}")
+      qa = QuestionAdvice.where("question_id = #{question.id} AND score = #{i}").first
 
         if qa == nil
           print " NEW "

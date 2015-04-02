@@ -24,7 +24,7 @@ class User < ActiveRecord::Base
   validates_uniqueness_of :name
 
   validates_presence_of :email, :message => "can't be blank"
-  validates_format_of :email, :with => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, :allow_blank => true
+  validates_format_of :email, :with => /\A[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\z/i, :allow_blank => true
 
   before_validation :randomize_password, :if => lambda { |user| user.new_record? && user.password.blank? } # AuthLogic
   after_create :email_welcome
@@ -44,22 +44,22 @@ class User < ActiveRecord::Base
   end
 
   def bookmark_rated?(bmapping_id)
-    BmappingRatings.find(:first, :conditions => ["bmapping_id = #{bmapping_id} AND user_id = #{self.id}"])
+    BmappingRatings.where(["bmapping_id = #{bmapping_id} AND user_id = #{self.id}"]).first
   end
 
   def bookmark_added?(bmapping_id)
-    Bmapping.find(:first, :conditions => ["id = #{bmapping_id} AND user_id = #{self.id}"])
+    Bmapping.where(["id = #{bmapping_id} AND user_id = #{self.id}"]).first
   end
 
 
 
   def list_mine(object_type, user_id)
-    object_type.find(:all, :conditions => ["instructor_id = ?", user_id])
+    object_type.where(["instructor_id = ?", user_id])
   end
 
   def get_available_users(name)
     lesser_roles = role.get_parents
-    all_users = User.find(:all, :conditions => ['name LIKE ?', "#{name}%"], :limit => 20) # higher limit, since we're filtering
+    all_users = User.all(:conditions => ['name LIKE ?', "#{name}%"], :limit => 20) # higher limit, since we're filtering
     visible_users = all_users.select{|user| lesser_roles.include? user.role}
     return visible_users[0,10] # the first 10
   end
@@ -159,7 +159,7 @@ class User < ActiveRecord::Base
     if user == nil
       items = login.split("@")
       shortName = items[0]
-      userList = User.find(:all, {:conditions=> ["name =?",shortName]})
+      userList = User.where ["name =?",shortName]
       if userList != nil && userList.length == 1
         user = userList.first
       end
@@ -184,7 +184,7 @@ class User < ActiveRecord::Base
   end
 
   def set_courses_to_assignment
-    @courses = Course.find_all_by_instructor_id(self.id, :order => 'name')
+    @courses = Course.where(instructor_id: self.id).order(:name)
   end
 
   # generate a new RSA public/private key pair and create our own X509 digital certificate which we
@@ -201,7 +201,7 @@ class User < ActiveRecord::Base
 
     # when replacing an existing key, update any digital signatures made previously with the new key
     if (replacing_key)
-      participants = AssignmentParticipant.find_all_by_user_id(self.id)
+      participants = AssignmentParticipant.where(user_id: self.id)
       for participant in participants
         if (participant.permission_granted)
           AssignmentParticipant.grant_publishing_rights(new_key.to_pem, [ participant ])
@@ -223,7 +223,7 @@ class User < ActiveRecord::Base
   end
 
   def self.export(csv, parent_id, options)
-    users = User.find(:all)
+    users = User.all
     users.each {|user|
       tcsv = Array.new
       if (options["personal_details"] == "true")
@@ -249,7 +249,7 @@ class User < ActiveRecord::Base
     parent
   end
 
-  def self.get_export_fields(options)
+  def self.export_fields(options)
     fields = Array.new
     if (options["personal_details"] == "true")
       fields.push("name", "full name", "email")

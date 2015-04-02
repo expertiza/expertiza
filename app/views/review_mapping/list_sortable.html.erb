@@ -26,7 +26,7 @@
 
 </table>
 <%
-    session[:return_to] = request.request_uri
+    session[:return_to] = request.url
   %>
 <%= link_to 'Assign reviewers automatically', :action => 'select_mapping', :id => @assignment.id %>
 | <%= link_to 'Import reviewer mappings',

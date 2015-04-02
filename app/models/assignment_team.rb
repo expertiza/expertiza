@@ -2,7 +2,8 @@ class AssignmentTeam < Team
 
   belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
   has_many    :review_mappings, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewee_id'
-  has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, teams t WHERE r.map_id = m.id AND m.type = \'TeamReviewResponseMap\' AND m.reviewee_id = t.id AND t.id = #{id}'
+  has_many :response_maps, foreign_key: :reviewee_id
+  has_many :responses, through: :response_maps, foreign_key: :map_id
 
     # START of contributor methods, shared with AssignmentParticipant
 
@@ -12,13 +13,37 @@ class AssignmentTeam < Team
     end
 
   def assign_reviewer(reviewer)
-    TeamReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
+    if assignment.has_topics?
+      topic_id = self.topic.id
+      if topic_id==nil
+        raise "this team has not taken any topic"
+      end
+    end
+    assignment = Assignment.find(self.parent_id)
+    if assignment==nil
+      raise "cannot find this assignment"
+    end
+    if assignment.varying_rubrics_by_round?
+      round = assignment.get_current_round(topic_id) #record round number only for varying rubrics feature
+    else
+      round=nil
+    end
+    TeamReviewResponseMap.create(:reviewee_id => self.id, :reviewer_id => reviewer.id,
+                                 :reviewed_object_id => assignment.id, :round =>round)
+  end
+
+  #for varying rubric feature -Yang
+  def reviewed_by_in_round?(reviewer,round)
+    return TeamReviewResponseMap.where(reviewee_id:self.id, reviewer_id:reviewer.id, reviewed_object_id:assignment.id, round:round).count()>0
+    #return TeamReviewResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ? AND round=?',
+                                                       #sself.id, reviewer.id, assignment.id, round]) > 0
   end
 
   # Evaluates whether any contribution by this team was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object
   def reviewed_by?(reviewer)
-    TeamReviewResponseMap.count(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id]) > 0
+    #TeamReviewResponseMap.count(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id]) > 0
+    TeamReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id).count > 0
   end
 
   # Topic picked by the team
@@ -33,48 +58,58 @@ class AssignmentTeam < Team
 
   # Whether the team has submitted work or not
   def has_submissions?
-    participants.each { |participant| return true if participant.has_submissions? }
+    list_of_users = participants;
+    list_of_users.each { |participant| return true if participant.has_submissions? }
     false
   end
 
   def reviewed_contributor?(contributor)
-    TeamReviewResponseMap.find(:all, conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', contributor.id, self.id, assignment.id]).empty? == false
+    TeamReviewResponseMap.all(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', contributor.id, self.id, assignment.id]).empty? == false
   end
 
   # END of contributor methods
 
   def participants
-    @participants ||= AssignmentParticipant.find(:all, conditions: ['parent_id = ? && user_id IN (?)', parent_id, users])
+    participants=Array.new
+    users.each {|user|
+      participants.push(AssignmentParticipant.where(parent_id:parent_id, user_id:user.id ).first)
+    }
+    return participants
   end
+  alias_method :get_participants, :participants
 
   def delete
     if read_attribute(:type) == 'AssignmentTeam'
       sign_up = SignedUpUser.find_team_participants(parent_id.to_s).select{|p| p.creator_id == self.id}
-      sign_up.each &:destroy
+      sign_up.each(&:destroy)
     end
     super
   end
 
-  def self.get_first_member(team_id)
+  def destroy
+    response_maps.each(&:destroy)
+    super
+  end
+
+  def self.first_member(team_id)
     find(team_id).participants.first
   end
 
-  def get_hyperlinks
+  def hyperlinks
     links = Array.new
-    self.get_participants.each { |team_member| links.concat(team_member.get_hyperlinks_array) }
+    self.participants.each { |team_member| links.concat(team_member.hyperlinks_array) }
     links
   end
 
-  def get_path
-    self.get_participants.first.dir_path
+  def path
+    self.participants.first.dir_path
   end
 
-  def get_submitted_files
-    self.get_participants.first.submitted_files
+  def submitted_files
+    self.participants.first.submitted_files
   end
-  alias_method :submitted_files, :get_submitted_files
 
-  def get_review_map_type
+  def review_map_type
     'TeamReviewResponseMap'
   end
 
@@ -101,7 +136,7 @@ class AssignmentTeam < Team
 
       if options[:has_column_names] == "true"
         name = row[0].to_s.strip
-        team = find(:first, conditions: ["name =? && parent_id =?", name, assignment_id])
+        team = where(["name =? && parent_id =?", name, assignment_id]).first
         team_exists = !team.nil?
         name = handle_duplicate(team, name, assignment_id, options[:handle_dups])
         index = 1
@@ -120,17 +155,17 @@ class AssignmentTeam < Team
 
       # insert team members into team unless team was pre-existing & we ignore duplicate teams
       team.import_team_members(index, row) if !(team_exists && options[:handle_dups] == "ignore")
-      end
+    end
 
       def email
         self.get_team_users.first.email
       end
 
-      def get_participant_type
+      def participant_type
         "AssignmentParticipant"
       end
 
-      def get_parent_model
+      def parent_model
         "Assignment"
       end
 
@@ -138,11 +173,11 @@ class AssignmentTeam < Team
         self.name
       end
 
-      def get_participants
+      def participants
         users = self.users
         participants = Array.new
         users.each do |user|
-          participant = AssignmentParticipant.find_by_user_id_and_parent_id(user.id,self.parent_id)
+          participant = AssignmentParticipant.where(user_id: user.id, parent_id: self.parent_id).first
           participants << participant if participant != nil
         end
         participants
@@ -157,7 +192,7 @@ class AssignmentTeam < Team
       end
 
       def add_participant(assignment_id, user)
-        AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted) if AssignmentParticipant.find_by_parent_id_and_user_id(assignment_id, user.id) == nil
+        AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted) if AssignmentParticipant.where(parent_id: assignment_id, user_id:  user.id).first == nil
       end
 
       def assignment
@@ -165,27 +200,27 @@ class AssignmentTeam < Team
       end
 
       # return a hash of scores that the team has received for the questions
-      def get_scores(questions)
+      def scores(questions)
         scores = Hash.new
         scores[:team] = self # This doesn't appear to be used anywhere
         assignment.questionnaires.each do |questionnaire|
           scores[questionnaire.symbol] = Hash.new
-          scores[questionnaire.symbol][:assessments] = TeamReviewResponseMap.find_all_by_reviewee_id(self.id)
+          scores[questionnaire.symbol][:assessments] = TeamReviewResponseMap.where(reviewee_id: self.id)
           scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
         end
         scores[:total_score] = assignment.compute_total_score(scores)
         scores
       end
-      alias_method :scores, :get_scores
-
-      def self.get_team(participant)
+     
+      def self.team(participant)
         team = nil
-        teams_users = TeamsUser.find_all_by_user_id(participant.user_id)
-        teams_users.each do |tuser|
-          fteam = Team.find(:first, conditions: ['parent_id = ? && id = ?', participant.parent_id, tuser.team_id])
-          team = fteam if fteam
+        teams_users = TeamsUser.where(user_id: participant.user_id)
+        return nil if !teams_users
+        teams_users.each do |teams_user|
+          team = Team.find(teams_user.team_id)
+          return team if team.parent_id==participant.parent_id
         end
-        team
+        nil
       end
 
       def self.export(csv, parent_id, options)
@@ -195,7 +230,7 @@ class AssignmentTeam < Team
           team_users = Array.new
           tcsv.push(team.name)
           if options["team_name"] == "false"
-            team_members = TeamsUser.find(:all, conditions: ['team_id = ?', team.id])
+            team_members = TeamsUser.all(conditions: ['team_id = ?', team.id])
             team_members.each do |user|
               team_users.push(user.name)
               team_users.push(" ")
@@ -207,7 +242,7 @@ class AssignmentTeam < Team
         end
       end
 
-      def self.get_export_fields(options)
+      def self.export_fields(options)
         fields = Array.new
         fields.push("Team Name")
         fields.push("Team members") if options["team_name"] == "false"

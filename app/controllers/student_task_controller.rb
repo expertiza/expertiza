@@ -28,10 +28,10 @@ class StudentTaskController < ApplicationController
       review_mappings = @participant.team_reviews
 
       review_mappings.each do |review_mapping|
-        participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
+        participant = AssignmentTeam.first_member(review_mapping.reviewee_id)
 
         if participant && participant.topic
-          review_due_date = TopicDeadline.find_by_topic_id_and_deadline_type_id(participant.topic_id, 1)
+          review_due_date = TopicDeadline.where(topic_id: participant.topic_id, deadline_type_id:  1).first
 
           if review_due_date.due_at < Time.now && @assignment.get_current_stage(participant.topic_id) != 'Complete'
             @reviewee_topic_id = participant.topic_id
@@ -65,8 +65,8 @@ class StudentTaskController < ApplicationController
       end
     end
 
-    @review_mappings = ResponseMap.find_all_by_reviewer_id(@participant.id)
-    @review_of_review_mappings = MetareviewResponseMap.find_all_by_reviewer_id(@participant.id)
+    @review_mappings = ResponseMap.where(reviewer_id: @participant.id)
+    @review_of_review_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
   end
 
   def your_work

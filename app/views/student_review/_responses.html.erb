@@ -1,22 +1,26 @@
 <table>
   <% review_no = 1 %>
   <% mappings.each do |map| %>
-      <%- # ACS Have metareviews done for all teams  -%>
-      <%- # removed code that handles team and individual assignments differently  -%>
+      <%- # ACS Have metareviews done for all teams   -%>
+      <%- # removed code that handles team and individual assignments differently   -%>
       <% if map.type.to_s == "MetareviewResponseMap" %>
           <% review_mapping = Response.find(map.reviewed_object_id) %>
-          <% participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id) %>
+          <% participant = AssignmentTeam.first_member(review_mapping.reviewee_id) %>
       <% else %>
-          <% participant = AssignmentTeam.get_first_member(map.reviewee_id) %>
+          <% participant = AssignmentTeam.first_member(map.reviewee_id) %>
       <% end %>
 
       <% if participant %>
           <tr>
             <td>
-              <b><%= "#{title} #{review_no}." %></b>
-              <%= unless participant.topic.nil? then
-                    " #{participant.topic.topic_identifier}: #{participant.topic.topic_name}"
-                  end %>
+              <%round = map.round%>
+              <%if round==nil %>
+                  <%round = ""  %>
+              <%else%>
+                  <%round = " (Round"+round.to_s+")"  %>
+              <%end%>
+              <b><%= "#{title} #{review_no}." %></b> <%=round%>
+              <%= unless participant.topic.nil? then " #{participant.topic.topic_identifier}: #{participant.topic.topic_name}" end %>
             </td>
             <td>&nbsp;</td>
             <% if map.response %>
@@ -30,12 +34,12 @@
                     <% end %>
                 <% end %>
 
-
                 <% if (array_not_empty == 1) %>
-                <% @sorted = @sorted_array.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) } %>
+
+                <% @sorted = @sorted_array.sort %>
                 <% @largest_version_num = @sorted[0] %>
                 <% @latest_phase = @largest_version_num.created_at %>
-                <% due_dates = DueDate.find(:all, :conditions => ["assignment_id = ?", @assignment.id]) %>
+                <% due_dates = DueDate.where(["assignment_id = ?", @assignment.id]) %>
                 <% @sorted_deadlines = Array.new %>
                 <% @sorted_deadlines = due_dates.sort { |m1, m2| (m1.due_at and m2.due_at) ? m1.due_at <=> m2.due_at : (m1.due_at ? -1 : 1) } %>
                 <% current_time = Time.new.getutc %>
@@ -44,26 +48,25 @@
                     <% if (@largest_version_num.created_at < deadline_version.due_at) %>
                         <% break %>
                     <% end %>
-                <% end %>
-                <% for deadline_time in @sorted_deadlines %>
-                    <% if (current_time < deadline_time.due_at) %>
-                        <% break %>
+                    <% for deadline_time in @sorted_deadlines %>
+                        <% if (current_time < deadline_time.due_at) %>
+                            <% break %>
+                        <% end %>
                     <% end %>
                 <% end %>
-                <% end %>
-
                 <td>
                   <%= link_to "View", {:controller => 'response', :action => 'view', :id => @sorted[0].id} %>
                 </td>
                 <% if @assignment.get_current_stage(participant.topic_id) != "Complete" %>
-                    <%- # show the link as edit when latest review is done in current phase  -%>
-                    <%- # show link as update when latest review is done in different phase than current phase  -%>
+                    <%- # show the link as edit when latest review is done in current phase   -%>
+                    <%- # show link as update when latest review is done in different phase than current phase   -%>
                     <% if (deadline_version.due_at == deadline_time.due_at) %>
                         <td><%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @sorted[0].id} %></td>
                     <% else %>
                         <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
                     <% end %>
                 <% end %>
+                <%end%>
             <% elsif @assignment.get_current_stage(participant.topic_id) != "Complete" %>
                 <% if @assignment.staggered_deadline? %>
                     <% if map.type.to_s == "MetareviewResponseMap" %>
@@ -80,12 +83,13 @@
                             <%#- Display link for code review if 'any' code review files -%>
                             <%#- have been uploaded i.e. files present in code review dir -%>
                             <td>&nbsp;&nbsp;&nbsp;&nbsp;
-                              <% if participant.get_files(ReviewFilesHelper::get_code_review_file_dir(participant)).length > 0 %>
+                              <% if participant.files(ReviewFilesHelper::get_code_review_file_dir(participant)).length > 0 %>
                                   <%= link_to "Review Code", { :controller => 'review_files', :action => 'show_all_submitted_files', :participant_id => participant.id } %>
                               <% end %>
                             </td>
                         <% else %>
-                            <td>Begin</td><td> (Work has not yet been submitted)</td>
+                            <td>Begin</td>
+                            <td> (Work has not yet been submitted)</td>
                         <% end %>
                     <% end %>
                     <% else %>
@@ -94,16 +98,17 @@
                         <%-# Display link for code review if 'any' code review files -%>
                         <%-# have been uploaded i.e. files present in code review dir-%>
                         <td>&nbsp;&nbsp;&nbsp;&nbsp;
-                          <% if participant.get_files(ReviewFilesHelper::get_code_review_file_dir(participant)).length > 0 %>
+                          <% if participant.files(ReviewFilesHelper::get_code_review_file_dir(participant)).length > 0 %>
                               <%= link_to "Review Code", {:controller => 'review_files', :action => 'show_all_submitted_files', :participant_id => participant.id } %>
                           <% end %>
                         </td>
                     <% end %>
             <% else %>
                 <td>Begin</td>
-                <td> (Work has not yet been submitted) for <% review_no += 1 %></td>
+                <td> (Work has not yet been submitted) for
+                  <% review_no += 1 %></td>
             <% end %>
-            <%  review_no+=1 %>
+            <% review_no+=1 %>
           </tr>
       <% end %>
 

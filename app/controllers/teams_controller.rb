@@ -1,5 +1,5 @@
 class TeamsController < ApplicationController
-  auto_complete_for :user, :name
+  autocomplete :user, :name
 
 
   def action_allowed?
@@ -14,7 +14,7 @@ class TeamsController < ApplicationController
 
   def delete_all
     parent = Object.const_get(session[:team_type]).find(params[:id])
-    @teams = Team.find_all_by_parent_id(parent.id)
+    @teams = Team.where(parent_id: parent.id)
     @teams.each do |t|
       t.destroy
     end
@@ -63,7 +63,8 @@ class TeamsController < ApplicationController
       Team.check_for_existing(parent, params[:team][:name], session[:team_type])
       @team.name = params[:team][:name]
       @team.save
-      undo_link("Team \"#{@team.name}\" has been updated successfully. ")
+      flash[:success] = "Team \"#{@team.name}\" has been updated successfully. "
+      undo_link("")
       redirect_to :action => 'list', :id => parent.id
     rescue TeamExistsError
       flash[:error] = $!

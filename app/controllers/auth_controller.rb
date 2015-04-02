@@ -7,7 +7,7 @@ class AuthController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'login', 'logout', 'login_failed'
+    when 'login', 'logout', 'login_failed', 'google_login'
       true
     else
       current_role_name.eql?("Super-Administrator")
@@ -21,18 +21,37 @@ class AuthController < ApplicationController
       user = User.find_by_login(params[:login][:name])
 
       if user and user.valid_password?(params[:login][:password])
-        logger.info "User #{params[:login][:name]} successfully logged in"
-        session[:user] = user
-        AuthController.set_current_role(user.role_id, session)
-
-        redirect_to :controller => AuthHelper::get_home_controller(session[:user]), :action => AuthHelper::get_home_action(session[:user])
+        after_login(user)
       else
         logger.warn "Failed login attempt"
         flash[:error] = "Incorrect Name/Password"
         redirect_to :controller => 'password_retrieval', :action => 'forgotten'
       end
     end
-  end  # def login
+  end  #def login
+
+  # function to handle common functionality for conventional user login and google login
+  def after_login (user)
+    logger.info "User #{user.name} successfully logged in"
+    session[:user] = user
+    AuthController.set_current_role(user.role_id, session)
+
+    redirect_to :controller => AuthHelper::get_home_controller(session[:user]),
+                :action => AuthHelper::get_home_action(session[:user])
+  end
+
+  # Login functionality for google login feature using omniAuth2
+  def google_login
+    g_email = env['omniauth.auth'].info.email
+    Rails.logger.debug("email : #{g_email}")
+    user = User.find_by_email(g_email)
+    if user.nil?
+      flash[:error] = "This email is not authorized to use expertiza!"
+      redirect_to root_path
+    else
+     after_login(user)
+    end
+  end
 
   def login_failed
     flash.now[:error] = "Incorrect Name/Password"

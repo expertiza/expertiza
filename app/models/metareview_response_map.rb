@@ -1,6 +1,7 @@
 class MetareviewResponseMap < ResponseMap
   belongs_to :reviewee, :class_name => 'Participant', :foreign_key => 'reviewee_id'
   belongs_to :review_mapping, :class_name => 'Response', :foreign_key => 'reviewed_object_id'
+  delegate :assignment, to: :reviewee
 
   #return all the versions available for a response map.
   #a person who is doing meta review has to be able to see all the versions of review.
@@ -8,9 +9,8 @@ class MetareviewResponseMap < ResponseMap
     if self.review_mapping.response
       @sorted_array=Array.new
       @prev=Response.all
-      for element in @prev
+      @prev.each do |element|
         if(element.map_id==self.review_mapping.map_id)
-          array_not_empty=1
           @sorted_array << element
         end
       end
@@ -38,10 +38,6 @@ class MetareviewResponseMap < ResponseMap
     return "Metareview"
   end
 
-  def assignment
-    self.review_mapping.assignment
-  end
-
   def self.export(csv,parent_id,options)
     mappings = Assignment.find(parent_id).metareview_mappings
     mappings = mappings.sort_by{|a| [a.review_mapping.reviewee.name,a.reviewee.name,a.reviewer.name]}
@@ -55,7 +51,7 @@ class MetareviewResponseMap < ResponseMap
     }
   end
 
-  def self.get_export_fields(options)
+  def self.export_fields(options)
     fields = ["contributor","reviewed by","metareviewed by"]
     return fields
   end
@@ -68,32 +64,32 @@ class MetareviewResponseMap < ResponseMap
     index = 2
     while index < row.length
       #ACS Make All contributors as teams
-      contributor = AssignmentTeam.find_by_name_and_parent_id(row[0].to_s.strip, id)
+      contributor = AssignmentTeam.where(name: row[0].to_s.strip, parent_id:  id).first
 
       if contributor == nil
         raise ImportError, "Contributor, "+row[0].to_s+", was not found."
       end
 
       ruser = User.find_by_name(row[1].to_s.strip)
-      reviewee = AssignmentParticipant.find_by_user_id_and_parent_id(ruser.id, id)
+      reviewee = AssignmentParticipant.where(user_id: ruser.id, parent_id:  id).first
       if reviewee.nil?
         raise ImportError, "Reviewee,  "+row[1].to_s+", for contributor, "+contributor.name+", was not found."
         end
 
         muser = User.find_by_name(row[index].to_s.strip)
-        reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(muser.id, id)
+        reviewer = AssignmentParticipant.where(user_id: muser.id, parent_id:  id).first
         if reviewer.nil?
           raise ImportError, "Metareviewer,  "+row[index].to_s+", for contributor, "+contributor.name+", and reviewee, "+row[1].to_s+", was not found."
           end
 
           #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
           # to treat all assignments as team assignments
-          reviewmapping = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(contributor.id, reviewee.id)
+        reviewmapping = TeamReviewResponseMap.where(reviewee_id: contributor.id, reviewer_id:  reviewee.id).first
           if reviewmapping.nil?
             raise ImportError, "No review mapping was found for contributor, "+contributor.name+", and reviewee, "+row[1].to_s+"."
           end
 
-          existing_mappings = MetareviewResponseMap.find_all_by_reviewee_id_and_reviewer_id_and_reviewed_object_id(reviewee.id, reviewer.id, reviewmapping.map_id)
+          existing_mappings = MetareviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id: reviewer.id, reviewed_object_id: reviewmapping.map_id)
           # if no mappings have already been imported for this combination
           # create it.
 

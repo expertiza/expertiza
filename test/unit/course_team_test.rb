@@ -17,8 +17,8 @@ class CourseTeamTest < ActiveSupport::TestCase
     assert_equal "team3", @course_team.name
     assert_equal teams(:team2).id, @course_team.id
     assert_equal teams(:team2).parent_id, @course_team.parent_id
-    assert_equal @course_team.get_participant_type, 'CourseParticipant'
-    assert_equal @course_team.get_parent_model, 'Course'
+    assert_equal @course_team.participant_type, 'CourseParticipant'
+    assert_equal @course_team.parent_model, 'Course'
     assert_equal @course_team.get_node_type, 'TeamNode'
   end
 
@@ -149,6 +149,6 @@ class CourseTeamTest < ActiveSupport::TestCase
   #
   ### test method dir_path
   ##def test_add_participant
-  ##  assert_equal RAILS_ROOT + '/pg_data/instructor3/csc110/',@course0.dir_path
+  ##  assert_equal Rails.root + '/pg_data/instructor3/csc110/',@course0.dir_path
   ##end
 end

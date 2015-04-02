@@ -7,7 +7,7 @@ class Score < ActiveRecord::Base
   #  questions - the list of questions that was filled out in the process of doing those assessments
   def self.compute_scores(assessments, questions)
     scores = Hash.new
-    if assessments.length > 0
+    if !assessments.nil?&&assessments.length > 0
       scores[:max] = -999999999
       scores[:min] = 999999999
       total_score = 0
@@ -42,13 +42,14 @@ class Score < ActiveRecord::Base
       else
         scores[:avg]=0
       end
-        else
-          scores[:max] = nil
-          scores[:min] = nil
-          scores[:avg] = nil
-        end
-        return scores
+    else
+      scores[:max] = nil
+      scores[:min] = nil
+      scores[:avg] = nil
     end
+
+    return scores
+  end
 
     def self.compute_quiz_scores(responses)
       scores = Hash.new
@@ -95,7 +96,7 @@ class Score < ActiveRecord::Base
       if @questionnaire.section == "Custom"
         @questions.each {
           |question|
-          item = Score.find_by_response_id_and_question_id(@response.response_id, question.id)
+          item = Score.where(:response_id=>@response.id, :question_id=>question.id).first
           if @q_types.length <= x
             @q_types[x] = QuestionType.find_by_question_id(question.id)
           end
@@ -132,9 +133,9 @@ class Score < ActiveRecord::Base
 
     def self.submission_valid?(response)
       map=ResponseMap.find(response.map_id)
-      #assignment_participant = Participant.find(:all, :conditions => ["id = ?", map.reviewee_id])
+      #assignment_participant = Participant.where(["id = ?", map.reviewee_id])
       @sorted_deadlines = nil
-      @sorted_deadlines = DueDate.find(:all, :conditions => ["assignment_id = ?", map.reviewed_object_id], :order => 'due_at DESC')
+      @sorted_deadlines = DueDate.where(["assignment_id = ?", map.reviewed_object_id]).order('due_at DESC')
 
       # to check the validity of the response
       if @sorted_deadlines.nil?
@@ -162,7 +163,7 @@ class Score < ActiveRecord::Base
           end
         end
 
-        resubmission_times =   ResubmissionTime.find_all_by_participant_id(map.reviewee_id).order('resubmitted_at DESC')
+        resubmission_times =   ResubmissionTime.where(participant_id: map.reviewee_id).order('resubmitted_at DESC')
         if response .is_valid_for_score_calculation?(resubmission_times, latest_review_phase_start_time)
           @invalid = 0
         else

@@ -1,29 +1,8 @@
-<%= stylesheet_link_tag 'jquery-ui-timepicker-addon' %>
-<%= stylesheet_link_tag 'jquery-ui-1.10.3.custom.min' %>
-<script src="/javascripts/jquery-ui-1.10.3.custom.min.js"></script>
-<script src="/javascripts/jquery-ui-timepicker-addon.js"></script>
-
 <h1>Editing Assignment</h1>
 
-<script>
-  function validate() {
-    return true;
-  }
 
-    function submit_form() {
-      //validating the form
-        if (validate()) {
-          //submit the due dates and questionnaires before submitting the rest of the form
-            jQuery.ajaxSetup({async: false});
-            submit_due_dates();
-            submit_questionnaires();
-            jQuery('#assignment_form').submit();
-        }
-    }
-  </script>
-
-  <%= form_for @assignment, html: { id: 'assignment_form' } do %>
-    <div id="tabs">
+  <%= form_for @assignment_form.assignment, html: { id: 'assignment_form' } do %>
+    <div class= "chart-table" id="tabs">
       <ul>
         <li><a href="#tabs-1">General</a></li>
         <li><a href="#tabs-2">Rubrics</a></li>
@@ -44,7 +23,14 @@
         <%= render 'assignments/edit/due_dates' %>
       </div>
       <div id="tabs-5">
-        <%= render 'assignments/edit/add_signup_topics' %>
+            <input name="assignment_form[assignment][is_intelligent]" type="hidden" value="false"/>
+            <%= check_box_tag('assignment_form[assignment][is_intelligent]', 'true', @assignment_form.assignment.is_intelligent?)%>
+            <%= label_tag('assignment_form[assignment][is_intelligent]', 'Intelligent topic selection?') %>
+            <img src="/assets/info.png" title="This feature allow students to &quot;bid&quot; for topics.
+      Instructor must specify when topics are assigned, by going to the Due Dates tab and
+      entering a due date for &quot;signup&quot;.">
+          <br><br>
+        <%= render '/sign_up_sheet/add_signup_topics.html' %>
       </div>
     </div>
     <script>
@@ -52,7 +38,7 @@
         jQuery("#tabs").tabs();
       });
     </script>
-    <%= button_to_function 'Save', 'submit_form()' %>| <%= render :partial => '/shared_scripts/back' %>
+    <%= button_tag 'Save'%>| <%= render :partial => '/shared_scripts/back' %>
   <% end %>
 
   <br/>

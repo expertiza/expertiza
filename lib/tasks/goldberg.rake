@@ -17,14 +17,14 @@ namespace :goldberg do
 
   desc "Install Goldberg"
   task :install => :load_starter do
-    index = "#{RAILS_ROOT}/public/index.html"
+    index = "#{Rails.root}/public/index.html"
     FileTest.exists?(index) and File.delete(index)
   end
 
   desc "Flush cached data out of sessions and Roles"
   task :flush => :environment do
     puts "Deleting any Rails session files"
-    Dir["#{RAILS_ROOT}/tmp/sessions/ruby_sess*"].each do |fname|
+    Dir["#{Rails.root}/tmp/sessions/ruby_sess*"].each do |fname|
       File.delete fname
     end
     
@@ -52,7 +52,7 @@ end
 
 def dump_for_class(klass, dest)
   filename = "#{dest}/#{klass.to_s}.yml"
-  records = klass.find(:all)
+  records = klass.all
   File.open(filename, 'w') do |out|  
     YAML.dump(records, out)
   end

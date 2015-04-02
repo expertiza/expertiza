@@ -33,10 +33,10 @@ module DeadlineHelper
       set_of_due_dates = nil
       if i==0
         #take the first set from the table which user stores
-        set_of_due_dates = DueDate.find_all_by_assignment_id(assignment_id)
+        set_of_due_dates = DueDate.where(assignment_id: assignment_id)
         offset = 0
       else
-        set_of_due_dates = TopicDeadline.find_all_by_topic_id(set_of_topics[i-1][0])
+        set_of_due_dates = TopicDeadline.where(topic_id: set_of_topics[i-1][0])
 
         set_of_due_dates.sort! {|a,b| a.due_at <=> b.due_at}
 
@@ -46,7 +46,7 @@ module DeadlineHelper
       set_of_topic.each { |topic_id|
         #if the due dates have already been created and the save dependency is being clicked,
         #then delete existing n create again
-        prev_saved_due_dates = TopicDeadline.find_all_by_topic_id(topic_id)
+        prev_saved_due_dates = TopicDeadline.where(topic_id: topic_id)
 
         #Only if there is a dependency for the topic
         if !prev_saved_due_dates.nil?

@@ -69,7 +69,7 @@ class StudentTaskControllerTest < ActionController::TestCase
   # for a given user id and for a particular assignment, return the URLS the user has submitted for the particular the assignment 
   def test_get_url
     participant = Participant.find(participants(:student))
-    url_result = participant.get_hyperlinks
+    url_result = participant.hyperlinks
     url_assert = participant.submitted_hyperlinks
     assert_equal(url_assert ,url_result )
   end
@@ -200,7 +200,7 @@ class StudentTaskControllerTest < ActionController::TestCase
   # check if the current assignment is team assignment, if yes return the first team member of the team handle
   def test_first_member_negative
     participant=''
-    maps_result = AssignmentTeam.get_first_member(-1)
+    maps_result = AssignmentTeam.first_member(-1)
     assert_equal(participant.to_a,maps_result.to_a)
   end
 
@@ -211,7 +211,7 @@ class StudentTaskControllerTest < ActionController::TestCase
   # for a given user id and for a particular assignments, return the current due date based on the current stage the assignment is in, test this functionality
   def test_review_due_date
     participant=Participant.find(participants(:par5))
-    assertresult2 =TopicDeadline.find_by_topic_id_and_deadline_type_id(participant.topic_id, 2)
+    assertresult2 =TopicDeadline.where(topic_id: participant.topic_id, deadline_type_id:  2).first
     due_date_result= assertresult2.due_at
     due_date_assert= '2012-10-20 23:31:27'
     assert_equal(due_date_assert.to_s,due_date_result.to_s.sub(' UTC',''))

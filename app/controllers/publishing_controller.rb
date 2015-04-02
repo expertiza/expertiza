@@ -6,8 +6,8 @@ class PublishingController < ApplicationController
 
 
   def view
-    @user = User.find_by_id(session[:user].id) # Find again, because the user's certificate may have changed since login
-    @participants = AssignmentParticipant.find_all_by_user_id(session[:user].id)
+    @user = User.find(session[:user].id) # Find again, because the user's certificate may have changed since login
+    @participants = AssignmentParticipant.where(user_id: session[:user].id)
   end
 
   def set_publish_permission
@@ -26,7 +26,7 @@ class PublishingController < ApplicationController
     if (params[:allow] == '1')
       redirect_to :action => 'grant'
     else
-      participants = AssignmentParticipant.find_all_by_user_id(session[:user].id)
+      participants = AssignmentParticipant.where(user_id: session[:user].id)
       participants.each do |participant|
         participant.update_attribute('permission_granted',params[:allow])
         participant.digital_signature = nil
@@ -44,7 +44,7 @@ class PublishingController < ApplicationController
     if (!params[:id].nil?)
       @participant = AssignmentParticipant.find(params[:id])
     end
-    @user = User.find_by_id(session[:user].id) # Find again, because the user's certificate may have changed since login
+    @user = User.find(session[:user].id) # Find again, because the user's certificate may have changed since login
     end
 
   # Grant publishing rights using the private key supplied by the student
@@ -52,7 +52,7 @@ class PublishingController < ApplicationController
     if (params[:id])
       participants = [ AssignmentParticipant.find(params[:id]) ]
     else
-      participants = AssignmentParticipant.find_all_by_user_id(session[:user].id)
+      participants = AssignmentParticipant.where(user_id: session[:user].id)
     end
     private_key = params[:private_key]
 

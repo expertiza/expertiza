@@ -29,7 +29,7 @@ class CreateFeedbackMappings < ActiveRecord::Migration
        
        if reviewmap != nil
          reviewer = get_reviewer(reviewmap, feedback)
-         reviewee = AssignmentParticipant.find(:first, :conditions => ['user_id = ? and parent_id = ?',reviewmap["reviewer_id"], feedback["assignment_id"]])         
+         reviewee = AssignmentParticipant.where(['user_id = ? and parent_id = ?',reviewmap["reviewer_id"], feedback["assignment_id"]]).first
        end       
        if reviewer != nil and reviewee != nil 
          execute "INSERT INTO `feedback_mappings (`reviewer_id`, `reviewee_id`, `reviewed_object_id`) VALUES
@@ -88,13 +88,13 @@ class CreateFeedbackMappings < ActiveRecord::Migration
        if feedback["user_id"].nil?
           if map["team_id"] != nil
              team = AssignmentTeam.find(map["team_id"])
-             reviewer = team.get_participants.first
+             reviewer = team.participants.first
           end              
        else
-          reviewer = AssignmentParticipant.find(:first, :conditions => ['user_id = ? and parent_id = ?',feedback["user_id"], feedback["assignment_id"]])  
+         reviewer = AssignmentParticipant.where(['user_id = ? and parent_id = ?',feedback["user_id"], feedback["assignment_id"]]).first
        end                          
     else
-       reviewer = AssignmentParticipant.find(:first, :conditions => ['user_id = ? and parent_id = ?',map["author_id"], feedback["assignment_id"]])
+      reviewer = AssignmentParticipant.where(['user_id = ? and parent_id = ?',map["author_id"], feedback["assignment_id"]]).first
     end
     return reviewer
   end
@@ -105,7 +105,7 @@ class CreateFeedbackMappings < ActiveRecord::Migration
     add_column :review_feedbacks, :team_id, :integer, :null => false
     add_column :review_feedbacks, :assignment_id, :integer, :null => false
     
-    ReviewFeedback.find(:all).each{
+    ReviewFeedback.find_each{
       | feedback |
       map = FeedbackMapping.find(feedback.mapping_id)
       

@@ -1,4 +1,11 @@
-<h1>Submit or Review work for <%= @assignment.name %></h1>
+<h1>
+  <% if @assignment.spec_location == nil|| @assignment.spec_location.length==0%>
+      Submit or Review work for <%= @assignment.name %>
+  <% else %>
+      Submit or Review work for <%= link_to @assignment.name, @assignment.spec_location %>
+  <% end %>
+</h1>
+
 <div class="flash_note">
   Next: Click the activity you wish to perform on the assignment titled: <%= @assignment.name %>
 </div>
@@ -14,8 +21,8 @@
 <!--ACS Here we need to know the size of the team to decide whether or not
 to display the label "Your team" in the student assignment tasks-->
   <%if @assignment.team_assignment? %>
-    <li> <%= link_to 'Your team', :controller=>'student_team', :action => 'view', :id => @participant.id %> 
-	 (View and manage your team)
+    <li> <%= link_to 'Your team', view_student_teams_path(student_id: @participant.id) %>
+      (View and manage your team)
     </li>
   <%end%>
     <li>
@@ -27,13 +34,15 @@ to display the label "Your team" in the student assignment tasks-->
       (Submit and view your work)
     </li>
     <!--Quiz-->
+  <%if @assignment.require_quiz%>
     <li>
       <% if @assignment.require_quiz and (@assignment.quiz_allowed(@reviewee_topic_id) or @assignment.get_current_stage(@participant.topic_id) == "Complete") %>
-        <%= link_to "Quiz",{:controller => 'student_quiz', :action => 'list', :id => @participant.id} %>
+        <%= link_to "Quiz", student_quizzes_path(:id => @participant.id) %>
       <% else %>
-        <font color="gray">Quiz</font>
-      <% end %> (Understand other's work and take the quiz)
+        <font color="gray">Take quiz</font>
+      <% end %> (Take quiz over the work you have read)
     </li>
+  <%end%>
     <li>
       <% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@participant.topic_id) == "Complete" %>
         <%= link_to "Others' work",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
@@ -41,7 +50,7 @@ to display the label "Your team" in the student assignment tasks-->
         <font color="gray">Others' work</font>
       <% end %> (Give feedback to others on their work)
     </li>
-    <li><%= link_to "Your scores",{:controller => 'grades', :action => 'view_my_scores', :id => @participant.id} %> (View feedback on your work)</li>
+    <li><%= link_to "Your scores", :controller => 'grades', :action => 'view_my_scores', :id => @participant.id %> (View feedback on your work)</li>
     <%if @can_provide_suggestions == true %>
       <li><%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %></li>
     <% end %>

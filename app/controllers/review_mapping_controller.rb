@@ -1,6 +1,8 @@
 class ReviewMappingController < ApplicationController
-  auto_complete_for :user, :name
-  use_google_charts
+  #include GC4R
+  autocomplete :user, :name
+  #use_google_charts
+  require 'gchart'
   helper :dynamic_review_assignment
   helper :submitted_content
 
@@ -14,7 +16,6 @@ class ReviewMappingController < ApplicationController
        'Administrator'].include? current_role_name
     end
   end
-
 
   def auto_complete_for_user_name
     name = params[:user][:name]+"%"
@@ -38,6 +39,8 @@ class ReviewMappingController < ApplicationController
 
   def add_reviewer
     assignment = Assignment.find(params[:id])
+    topic_id = params[:topic_id]
+    round = assignment.get_current_round(topic_id)
     msg = String.new
     begin
 
@@ -52,8 +55,8 @@ class ReviewMappingController < ApplicationController
       reviewer = get_reviewer(user,assignment,regurl)
       #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
-      if TeamReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?',params[:id],reviewer.id]).first.nil?
-        TeamReviewResponseMap.create(:reviewee_id => params[:contributor_id], :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id)
+      if TeamReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?  and round = ?',params[:id],reviewer.id, round]).first.nil?
+        TeamReviewResponseMap.create(:reviewee_id => params[:contributor_id], :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id, :round=>round)
       else
         raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
       end
@@ -67,7 +70,7 @@ class ReviewMappingController < ApplicationController
   # Get all the available submissions
   def show_available_submissions
     assignment = Assignment.find(params[:assignment_id])
-    reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
+    reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
     requested_topic_id = params[:topic_id]
     @available_submissions =  Hash.new
     @available_submissions = DynamicReviewAssignmentHelper::review_assignment(assignment.id ,
@@ -76,23 +79,25 @@ class ReviewMappingController < ApplicationController
                                                                               Assignment::RS_STUDENT_SELECTED)
   end
   def add_quiz_response_map
-    if ResponseMap.find_by_reviewed_object_id_and_reviewer_id(params[:questionnaire_id], params[:participant_id])
+    if ResponseMap.where(reviewed_object_id: params[:questionnaire_id], reviewer_id:  params[:participant_id]).first
       flash[:error] = "You have already taken that quiz"
     else
       @map = QuizResponseMap.new
-      @map.reviewee_id = Questionnaire.find_by_id(params[:questionnaire_id]).instructor_id
+      @map.reviewee_id = Questionnaire.find(params[:questionnaire_id]).instructor_id
       @map.reviewer_id = params[:participant_id]
       @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
       @map.save
     end
-    redirect_to :controller => 'student_quiz', :action => 'list', :id => params[:participant_id]
+    redirect_to student_quizzes_path(:id => params[:participant_id])
   end
 
   # Assign self to a submission
   def add_self_reviewer
     assignment = Assignment.find(params[:assignment_id])
-    reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
-    submission = AssignmentParticipant.find_by_id_and_parent_id(params[:submission_id],assignment.id)
+    topic_id = params[:topic_id]
+    round = assignment.get_current_round(topic_id)
+    reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
+    submission = AssignmentParticipant.find(params[:submission_id],assignment.id)
 
     if submission.nil?
       flash[:error] = "Could not find a submission to review for the specified topic, please choose another topic to continue."
@@ -103,10 +108,11 @@ class ReviewMappingController < ApplicationController
         #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
         # to treat all assignments as team assignments
         contributor = get_team_from_submission(submission)
-        if TeamReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?', contributor.id, reviewer.id]).first.nil?
+        if TeamReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ? and round=?', contributor.id, reviewer.id, round]).first.nil?
           TeamReviewResponseMap.create(:reviewee_id => contributor.id,
                                        :reviewer_id => reviewer.id,
-                                       :reviewed_object_id => assignment.id)
+                                       :reviewed_object_id => assignment.id,
+                                       :round => round)
         else
           raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
         end
@@ -121,7 +127,7 @@ class ReviewMappingController < ApplicationController
   #  Looks up the team from the submission.
   def get_team_from_submission(submission)
     # Get the list of teams for this assignment.
-    teams = AssignmentTeam.find_all_by_parent_id( submission.parent_id)
+    teams = AssignmentTeam.where(parent_id:  submission.parent_id)
 
     teams.each do |team|
       team.teams_users.each do |team_member|
@@ -139,18 +145,24 @@ class ReviewMappingController < ApplicationController
   def assign_reviewer_dynamically
     begin
       assignment = Assignment.find(params[:assignment_id])
-      reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
+      reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
 
-      unless params[:i_dont_care]
-        topic = (params[:topic_id].nil?) ? nil : SignUpTopic.find(params[:topic_id])
-      else
-        topic = assignment.candidate_topics_to_review(reviewer).to_a.shuffle[0] rescue nil
+      if assignment.has_topics?  #assignment with topics
+        unless params[:i_dont_care]
+          topic = (params[:topic_id].nil?) ? nil : SignUpTopic.find(params[:topic_id])
+        else
+          topic = assignment.candidate_topics_to_review(reviewer).to_a.shuffle[0] rescue nil
+        end
+
+        assignment.assign_reviewer_dynamically(reviewer, topic)
+      else  #assignment without topic -Yang
+        assignment_teams = assignment.candidate_assignment_teams_to_review
+        assignment_team = assignment_teams.to_a.shuffle[0] rescue nil
+        assignment.assign_reviewer_dynamically_no_topic(reviewer,assignment_team)
       end
 
-      assignment.assign_reviewer_dynamically(reviewer, topic)
-
     rescue Exception => e
-      flash[:alert] = (e.nil?) ? $! : e
+      flash[:error] = (e.nil?) ? $! : e
     end
 
     redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
@@ -159,7 +171,7 @@ class ReviewMappingController < ApplicationController
   def assign_metareviewer_dynamically
     begin
       assignment   = Assignment.find(params[:assignment_id])
-      metareviewer = AssignmentParticipant.find_by_user_id_and_parent_id(params[:metareviewer_id], assignment.id)
+      metareviewer = AssignmentParticipant.where(user_id: params[:metareviewer_id], parent_id:  assignment.id).first
 
       assignment.assign_metareviewer_dynamically(metareviewer)
 
@@ -174,15 +186,15 @@ class ReviewMappingController < ApplicationController
   def assign_quiz_dynamically
     begin
       assignment = Assignment.find(params[:assignment_id])
-      reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
-      #topic_id = Participant.find_by_id(Questionnaire.find_by_id(params[:questionnaire_id]).instructor_id).topic_id
+      reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
+      #topic_id = Participant.find(Questionnaire.find(params[:questionnaire_id]).instructor_id).topic_id
       unless params[:i_dont_care]
         #topic = (topic_id.nil?) ? nil : SignUpTopic.find(topic_id)
-        if ResponseMap.find_by_reviewed_object_id_and_reviewer_id(params[:questionnaire_id], params[:participant_id])
+        if ResponseMap.where(reviewed_object_id: params[:questionnaire_id], reviewer_id:  params[:participant_id]).first
           flash[:error] = "You have already taken that quiz"
         else
           @map = QuizResponseMap.new
-          @map.reviewee_id = Questionnaire.find_by_id(params[:questionnaire_id]).instructor_id
+          @map.reviewee_id = Questionnaire.find(params[:questionnaire_id]).instructor_id
           @map.reviewer_id = params[:participant_id]
           @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
           @map.save
@@ -197,7 +209,7 @@ class ReviewMappingController < ApplicationController
     rescue Exception => e
       flash[:alert] = (e.nil?) ? $! : e
     end
-    redirect_to :controller => 'student_quiz', :action => 'list', :id => reviewer.id
+    redirect_to student_quizzes_path(:id => reviewer.id)
 
   end
 
@@ -224,12 +236,12 @@ class ReviewMappingController < ApplicationController
   def assign_metareviewer_dynamically
     begin
       assignment   = Assignment.find(params[:assignment_id])
-      metareviewer = AssignmentParticipant.find_by_user_id_and_parent_id(params[:metareviewer_id], assignment.id)
+      metareviewer = AssignmentParticipant.where(user_id: params[:metareviewer_id], parent_id:  assignment.id).first
 
       assignment.assign_metareviewer_dynamically(metareviewer)
 
     rescue Exception => e
-      flash[:alert] = (e.nil?) ? $! : e
+      flash[:error] = (e.nil?) ? $! : e
     end
 
     redirect_to :controller => 'student_review', :action => 'list', :id => metareviewer.id
@@ -250,7 +262,7 @@ class ReviewMappingController < ApplicationController
   end
 
   def get_reviewer(user,assignment,reg_url)
-    reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(user.id,assignment.id)
+    reviewer = AssignmentParticipant.where(user_id: user.id, parent_id: assignment.id).first
     if reviewer.nil?
       raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue."
     end
@@ -313,7 +325,7 @@ class ReviewMappingController < ApplicationController
 
   def delete_all_metareviewers
     mapping = ResponseMap.find(params[:id])
-    mmappings = MetareviewResponseMap.find_all_by_reviewed_object_id(mapping.map_id)
+    mmappings = MetareviewResponseMap.where(reviewed_object_id: mapping.map_id)
 
     failedCount = ResponseMap.delete_mappings(mmappings, params[:force])
     if failedCount > 0
@@ -421,7 +433,11 @@ class ReviewMappingController < ApplicationController
     end
 
     @letters = Array.new
-    @assignments = Assignment.paginate(:page => params[:page], :order => 'name',:per_page => 10, :conditions => ["instructor_id = ? and substring(name,1,1) = ?",session[:user].id, letter])
+    @assignments = Assignment
+      .where(["instructor_id = ? and substring(name,1,1) = ?",session[:user].id, letter])
+      .order('name')
+      .page(params[:page])
+      .per_page(10)
 
     all_assignments.each {
       | assignObj |
@@ -439,7 +455,7 @@ class ReviewMappingController < ApplicationController
     @assignment = Assignment.find(params[:id])
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    @items = AssignmentTeam.find_all_by_parent_id(@assignment.id)
+    @items = AssignmentTeam.where(parent_id: @assignment.id)
     @items.sort!{|a,b| a.name <=> b.name}
     end
 
@@ -449,11 +465,11 @@ class ReviewMappingController < ApplicationController
     index = 0
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    contributors = AssignmentTeam.find_all_by_parent_id(@assignment.id)
+    contributors = AssignmentTeam.where(parent_id: @assignment.id)
     contributors.sort!{|a,b| a.name <=> b.name}
     contributors.each{
       |contrib|
-      review_mappings = ResponseMap.find_all_by_reviewed_object_id_and_reviewee_id(@assignment.id,contrib.id)
+      review_mappings = ResponseMap.where(reviewed_object_id: @assignment.id, reviewee_id: contrib.id)
 
       if review_mappings.length == 0
         single = Array.new
@@ -466,7 +482,7 @@ class ReviewMappingController < ApplicationController
         review_mappings.sort!{|a,b| a.reviewer.name <=> b.reviewer.name}
         review_mappings.each{
           |review_map|
-          metareview_mappings = MetareviewResponseMap.find_all_by_reviewed_object_id(review_map.map_id)
+          metareview_mappings = MetareviewResponseMap.where(reviewed_object_id: review_map.map_id)
           if metareview_mappings.length == 0
             single = Array.new
             single[0] = contrib.name
@@ -569,7 +585,7 @@ class ReviewMappingController < ApplicationController
     @scores = [0,0,0,0,0,0,0,0,0,0]
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    teams = Team.find_all_by_parent_id(params[:id])
+    teams = Team.where(parent_id: params[:id])
     objtype = "TeamReviewResponseMap"
 
     teams.each do |team|
@@ -584,12 +600,13 @@ class ReviewMappingController < ApplicationController
     end
 
 
-    dataset = GoogleChartDataset.new :data => @scores, :color => '9A0000'
-    data = GoogleChartData.new :datasets => [dataset]
-    axis = GoogleChartAxis.new :axis  => [GoogleChartAxis::BOTTOM, GoogleChartAxis::LEFT]
-    @chart1 = GoogleBarChart.new :width => 500, :height => 200
-    @chart1.data = data
-    @chart1.axis = axis
+    #dataset = GoogleChartDataset.new :data => @scores, :color => '9A0000'
+    #data = GoogleChartData.new :datasets => [dataset]
+    #axis = GoogleChartAxis.new :axis  => [GoogleChartAxis::BOTTOM, GoogleChartAxis::LEFT]
+    #@chart1 = GoogleBarChart.new :width => 500, :height => 200
+    #@chart1.data = data
+    #@chart1.axis = axis
+    @chart1 = Gchart.bar(:data => @scores, :size => '500x200')
 
 
     ###################### Second Graph ####################
@@ -612,13 +629,14 @@ class ReviewMappingController < ApplicationController
       end
     end
 
-    dataset2 = GoogleChartDataset.new :data => @review_distribution, :color => '9A0000'
-    data2 = GoogleChartData.new :datasets => [dataset2]
-    axis2 = GoogleChartAxis.new :axis  => [GoogleChartAxis::BOTTOM, GoogleChartAxis::LEFT]
+    #dataset2 = GoogleChartDataset.new :data => @review_distribution, :color => '9A0000'
+    #data2 = GoogleChartData.new :datasets => [dataset2]
+    #axis2 = GoogleChartAxis.new :axis  => [GoogleChartAxis::BOTTOM, GoogleChartAxis::LEFT]
 
-    @chart2 = GoogleBarChart.new :width => 500, :height => 200
-    @chart2.data = data2
-    @chart2.axis = axis2
+    #@chart2 = GoogleBarChart.new :width => 500, :height => 200
+    #@chart2.data = data2
+    #@chart2.axis = axis2
+    @chart2 = Gchart.bar(:data =>@review_distribution, :size => '500x200')
 
     end
 

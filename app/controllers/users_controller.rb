@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  auto_complete_for :user, :name
+  autocomplete :user, :name
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
     :redirect_to => { :action => :list }
@@ -16,8 +16,6 @@ class UsersController < ApplicationController
        'Teaching Assistant'].include? current_role_name
     end
   end
-
-
 
   def index
     if (current_user_role? == "Student")
@@ -77,14 +75,8 @@ class UsersController < ApplicationController
     # Get the users list to show on current page
     @users = paginate_list(role, user.id, letter)
 
-    all_users.each {
-      | userObj |
-      first = userObj.name[0,1].downcase
-      if not @letters.include?(first)
-        @letters << first
-      end
-    }
-    end
+    @letters = ('A'..'Z').to_a
+  end
 
     def show_selection
       @user = User.find_by_name(params[:user][:name])
@@ -170,9 +162,9 @@ class UsersController < ApplicationController
         def destroy
           begin
             @user = User.find(params[:id])
-            AssignmentParticipant.find_all_by_user_id(@user.id).each{|participant| participant.delete}
-            TeamsUser.find_all_by_user_id(@user.id).each{|teamuser| teamuser.delete}
-            AssignmentQuestionnaire.find_all_by_user_id(@user.id).each{|aq| aq.destroy}
+            AssignmentParticipant.where(user_id: @user.id).each{|participant| participant.delete}
+            TeamsUser.where(user_id: @user.id).each{|teamuser| teamuser.delete}
+            AssignmentQuestionnaire.where(user_id: @user.id).each{|aq| aq.destroy}
             @user.destroy
             undo_link("User \"#{@user.name}\" has been deleted successfully. ")
           rescue
@@ -236,7 +228,7 @@ class UsersController < ApplicationController
           if (paginate_options["#{@per_page}"].nil?) #displaying all - no pagination
             users = User.order('name').where( [condition, role.get_available_roles, user_id, search_filter]).paginate(:page => params[:page], :per_page => User.count)
           else #some pagination is active - use the per_page
-            users = User.paginate(:page => params[:page], :order => 'name', :per_page => paginate_options["#{@per_page}"], :conditions => [condition, role.get_available_roles, user_id, search_filter])
+            users = User.page(params[:page]).order('name').per_page(paginate_options["#{@per_page}"]).where([condition, role.get_available_roles, user_id, search_filter])
           end
           users
           end

@@ -1,3 +1,3 @@
-class Version < ActiveRecord::Base
-  attr_accessible :item_id,:item_type,:event,:whodunnit,:object,:created_at
+class Version < PaperTrail::Version
+  belongs_to :item, polymorphic: true
 end

@@ -1,5 +1,6 @@
 class Course < ActiveRecord::Base
   has_many :ta_mappings,:dependent => :destroy
+  has_many :tas, through: :ta_mappings
   validates_presence_of :name
   has_many :assignments, :dependent => :destroy
   belongs_to :instructor, :class_name => 'User', :foreign_key => 'instructor_id'
@@ -11,23 +12,23 @@ class Course < ActiveRecord::Base
   # Author: ajbudlon
   # Date: 7/21/2008
   def get_teams
-    return CourseTeam.find_all_by_parent_id(self.id)
+    return CourseTeam.where(parent_id: self.id)
   end
 
   #Returns this object's submission directory
-  def get_path
+  def path
     if self.instructor_id == nil
       raise "Path can not be created. The course must be associated with an instructor."
     end
-    return RAILS_ROOT + "/pg_data/" + FileHelper.clean_path(User.find(self.instructor_id).name)+ "/" + FileHelper.clean_path(self.directory_path) + "/"
+    return Rails.root + "/pg_data/" + FileHelper.clean_path(User.find(self.instructor_id).name)+ "/" + FileHelper.clean_path(self.directory_path) + "/"
   end
 
   def get_participants
-    CourseParticipant.find_all_by_parent_id(self.id)
+    CourseParticipant.where(parent_id: self.id)
   end
 
   def get_participant (user_id)
-    CourseParticipant.find_all_by_parent_id_and_user_id(self.id, user_id)
+    CourseParticipant.where(parent_id: self.id, user_id: user_id)
   end
 
   def add_participant(user_name)
@@ -35,14 +36,14 @@ class Course < ActiveRecord::Base
     if (user == nil)
       raise "No user account exists with the name "+user_name+". Please <a href='"+url_for(:controller => 'users', :action => 'new')+"'>create</a> the user first."
     end
-    participant = CourseParticipant.find_by_parent_id_and_user_id(self.id, user.id)
+    participant = CourseParticipant.where(parent_id: self.id, user_id:  user.id).first
     unless participant # If there is already a participant, it has already been added. done. Otherwise, create it
       CourseParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted)
     end
   end
 
   def copy_participants(assignment_id)
-    participants = AssignmentParticipant.find_all_by_parent_id(assignment_id)
+    participants = AssignmentParticipant.where(parent_id: assignment_id)
     errors = Array.new
     error_msg = String.new
     participants.each {

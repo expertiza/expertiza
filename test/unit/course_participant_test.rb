@@ -34,8 +34,8 @@ class CourseTest < ActiveSupport::TestCase
     end
   end
 
-  def test_get_path
-    assert_equal RAILS_ROOT + '/pg_data/instructor3/csc110//',@course_participant.dir_path
+  def test_path
+    assert_equal Rails.root + '/pg_data/instructor3/csc110//',@course_participant.dir_path
   end
 
   def test_export
@@ -47,7 +47,7 @@ class CourseTest < ActiveSupport::TestCase
   end
 
   def test_get_export_field
-    @fields = CourseParticipant.get_export_fields({"personal_details"=>"true","role" => "true","parent" => "true","email_options" => "true","handle" => "false"})
+    @fields = CourseParticipant.export_fields({"personal_details"=>"true","role" => "true","parent" => "true","email_options" => "true","handle" => "false"})
     assert_equal 8,@fields.length
     assert_equal 'name',@fields[0]
   end

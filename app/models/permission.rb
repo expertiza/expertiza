@@ -1,4 +1,5 @@
 class Permission < ActiveRecord::Base
+  attr_accessible :name
 
   validates_presence_of :name
   validates_uniqueness_of :name
@@ -20,6 +21,10 @@ class Permission < ActiveRecord::Base
   def Permission.find_all_for_role(role)
     roles = Role.hierarchy(role.id)
     return find_for_role(roles)
+  end
+
+  def self.find_or_create_by_name (params)
+    Permission.find_or_create_by(name: params)
   end
 
 

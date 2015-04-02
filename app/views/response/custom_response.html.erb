@@ -12,7 +12,7 @@
 
     <% if @map.assignment.team_assignment?
          team_member = TeamsUser.find_by_team_id(@map.contributor).user_id
-         topic_id = Participant.find_by_parent_id_and_user_id(@map.assignment.id, team_member).topic_id
+         topic_id = Participant.where(parent_id: @map.assignment.id, user_id:  team_member).first.topic_id
        else %>
         <% topic_id = Participant.find(@map.contributor).topic_id %>
     <% end %>
@@ -21,15 +21,20 @@
     <% if !@topic_id.nil? %>
         <h2>You are reviewing <%= @signedUpTopic %></h2>
     <% end %>
-    <%= render :partial => 'submitted_content/main', :locals => {:participant => @map.contributor, :stage => @assignment.get_current_stage()} %>
-
+    <%if @assignment.has_teams?%>
+        <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(@participant.topic_id)} %>
+    <%else%>
+        <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage => @assignment.get_current_stage(@participant.topic_id)} %>
+    <%end%>
     </hr>
 <% end %>
 
 <%= @map.show_review() %>
 
 <%= form_tag :action => @next_action, :id => @modified_object %>
-
+<% if @next_action.eql?'update' %>
+    <input name="_method" type="hidden" value="put" />
+<%end%>
 <%
    i = 0
    current_topic = nil
@@ -41,7 +46,7 @@
     <%= get_accordion_title(current_topic, question_type.parameters.split("::")[0]) %>
     <%= find_question_type(question, question_type, i, false, nil, nil, (@questionnaire.min_question_score..@questionnaire.max_question_score).to_a) %>
     <% current_topic = question_type.parameters.split("::")[0]
-       advices = QuestionAdvice.find_all_by_question_id(question.id)
+       advices = QuestionAdvice.where(question_id: question.id)
        advices = remove_empty_advice(advices) %>
     <% if advices.length > 0 %>
         <%= render :partial => 'custom_advice', :locals => {:i => i, :advice_list => advices} %>

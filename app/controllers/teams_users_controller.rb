@@ -13,13 +13,13 @@ class TeamsUsersController < ApplicationController
   end
 
   def list
-    @team = Team.find_by_id(params[:id])
+    @team = Team.find(params[:id])
     @assignment = Assignment.find(@team.assignment_id)
-    @teams_users = TeamsUser.paginate(:page => params[:page], :per_page => 10, :conditions => ["team_id = ?", params[:id]])
+    @teams_users = TeamsUser.page(params[:page]).per_page(10).where(["team_id = ?", params[:id]])
   end
 
   def new
-    @team = Team.find_by_id(params[:id])
+    @team = Team.find(params[:id])
   end
 
   def create
@@ -29,7 +29,7 @@ class TeamsUsersController < ApplicationController
       flash[:error] = "\"#{params[:user][:name].strip}\" is not defined. Please <a href=\"#{urlCreate}\">create</a> this user before continuing."
     end
 
-    team = Team.find_by_id(params[:id])
+    team = Team.find(params[:id])
 
     add_member_return=team.add_member(user, team.parent_id)
     if add_member_return==false

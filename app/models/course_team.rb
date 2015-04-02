@@ -5,7 +5,7 @@ class CourseTeam < Team
   #   currently they are being called: member, participant, user, etc...
   #   suggestion: refactor all to participant
 
-  def get_participant_type
+  def participant_type
     "CourseParticipant"
   end
 
@@ -31,14 +31,14 @@ class CourseTeam < Team
 
   #deprecated: the functionality belongs to course
   def add_participant(course_id, user)
-    if CourseParticipant.find_by_parent_id_and_user_id(course_id, user.id) == nil
+    if CourseParticipant.where(parent_id: course_id, user_id:  user.id).first == nil
       CourseParticipant.create(:parent_id => course_id, :user_id => user.id, :permission_granted => user.master_permission_granted)
     end
   end
 
   def export_participants
     userNames = Array.new
-    participants = TeamsUser.find(:all, :conditions => ['team_id = ?', self.id])
+    participants = TeamsUser.where(['team_id = ?', self.id])
     participants.each do |participant|
       userNames.push(participant.name)
       userNames.push(" ")
@@ -88,7 +88,7 @@ class CourseTeam < Team
 
       if options[:has_column_names] == "true"
         name = row[0].to_s.strip
-        team = find(:first, :conditions => ["name =? and parent_id =?", name, course_id])
+        team = where(["name =? and parent_id =?", name, course_id]).first
         team_exists = !team.nil?
         name = handle_duplicate(team, name, course_id, options[:handle_dups])
         index = 1
@@ -118,13 +118,13 @@ class CourseTeam < Team
         raise ImportError, "The course with id \""+course_id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this course?"
       end
 
-      teams = CourseTeam.find_all_by_parent_id(parent_id)
+      teams = CourseTeam.where(parent_id: parent_id)
       teams.each do |team|
         csv << team.export(options[:team_name])
       end
     end
 
-    def self.get_export_fields(options)
+    def self.export_fields(options)
       fields = Array.new
       fields.push("Team Name")
       if (options[:team_name] == "false")
@@ -138,14 +138,14 @@ class CourseTeam < Team
     #      it should either belong to course class or assignment team class
     def self.export_all_assignment_team_related_to_course(csv, parent_id, options)
       course = Course.find(parent_id)
-      assignmentList = Assignment.find_all_by_course_id(parent_id)
+      assignmentList = Assignment.where(course_id: parent_id)
       assignmentList.each do |currentAssignment|
         currentAssignment.teams.each { |team|
           tcsv = Array.new
           teamUsers = Array.new
           tcsv.push(team.name)
           if (options["team_name"] == "true")
-            teamMembers = TeamsUser.find(:all, :conditions => ['team_id = ?', team.id])
+            teamMembers = TeamsUser.where(['team_id = ?', team.id])
             teamMembers.each do |user|
               teamUsers.push(user.name)
               teamUsers.push(" ")

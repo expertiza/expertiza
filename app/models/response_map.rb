@@ -1,6 +1,6 @@
 class ResponseMap < ActiveRecord::Base
   has_one :response, foreign_key: 'map_id', dependent: :destroy
-  belongs_to :reviewer, :class_name => 'Participant', :foreign_key => 'reviewer_id',:dependent => :destroy
+  belongs_to :reviewer, :class_name => 'Participant', :foreign_key => 'reviewer_id'
 
   def map_id
     id
@@ -16,31 +16,30 @@ class ResponseMap < ActiveRecord::Base
       @sort_to=Array.new
 
       #get all the versions
-      maps = find_all_by_reviewee_id(participant.id)
+      maps = where(reviewee_id: participant.id)
       maps.each { |map|
         if map.response
-          @all_resp=Response.all
-          for element in @all_resp
-            if (element.map_id == map.map_id)
-              @array_sort << element
-            end
-          end
+
+          @all_resp=Response.find_by_map_id(map.map_id)
+          @array_sort << @all_resp
+
           #sort all versions in descending order and get the latest one.
-          @sort_to=@array_sort.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
+          #@sort_to=@array_sort.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
+          @sort_to=@array_sort.sort #{ |m1, m2| (m1.updated_at and m2.updated_at) ? m2.updated_at <=> m1.updated_at : (m1.version_num ? -1 : 1) }
           responses << @sort_to[0]
           @array_sort.clear
           @sort_to.clear
         end
       }
-      responses.sort! { |a, b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }
+      responses = responses.sort { |a, b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }
     end
     return responses
   end
 
   # return latest versions of the response given by reviewer
   def self.get_reviewer_assessments_for(participant, reviewer)
-    map = find_all_by_reviewee_id_and_reviewer_id(participant.id, reviewer.id)
-    return Response.find_all_by_map_id(map).sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }[0]
+    map = where(reviewee_id: participant.id, reviewer_id: reviewer.id)
+    return Response.where(map_id: map).sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }[0]
   end
 
   # Placeholder method, override in derived classes if required.
@@ -63,7 +62,7 @@ class ResponseMap < ActiveRecord::Base
   # Evaluates whether this response_map was metareviewed by metareviewer
   # @param[in] metareviewer AssignmentParticipant object
   def metareviewed_by?(metareviewer)
-    MetareviewResponseMap.find_all_by_reviewee_id_and_reviewer_id_and_reviewed_object_id(self.reviewer.id, metareviewer.id, self.id).count() > 0
+    MetareviewResponseMap.where(reviewee_id: self.reviewer.id, reviewer_id: metareviewer.id, reviewed_object_id: self.id).count() > 0
   end
 
   # Assigns a metareviewer to this review (response)

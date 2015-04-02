@@ -7,13 +7,13 @@ class TeamsParticipantsController < ApplicationController
   end
 
   def list
-    @team = Team.find_by_id(params[:id])
+    @team = Team.find(params[:id])
     @assignment = Assignment.find(@team.assignment_id)
-    @teams_participants = TeamsParticipant.paginate(:page => params[:page], :per_page => 10, :conditions => ["team_id = ?", params[:id]])
+    @teams_participants = TeamsParticipant.page(page => params[:page]).per_page(10).where(["team_id = ?", params[:id]])
   end
 
   def new
-    @team = Team.find_by_id(params[:id])
+    @team = Team.find(params[:id])
   end
 
   def create
@@ -22,7 +22,7 @@ class TeamsParticipantsController < ApplicationController
       urlCreate = url_for :controller => 'users', :action => 'new'
       flash[:error] = "\"#{params[:user][:name].strip}\" is not defined. Please <a href=\"#{urlCreate}\">create</a> this user before continuing."
     end
-    team = Team.find_by_id(params[:id])
+    team = Team.find(params[:id])
 
     team.add_member(user, team.parent_id)
 

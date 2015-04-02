@@ -1,26 +1,38 @@
-require 'goldberg_filters'
-
 class ApplicationController < ActionController::Base
   include AccessHelper
 
+  if Rails.env.production?
+    #forcing SSL only in the production mode
+    force_ssl
+  end
+
+  session ||= Hash.new
+
   helper_method :current_user_session, :current_user, :current_user_role?
-  protect_from_forgery unless Rails.env.test?
+  protect_from_forgery with: :exception
   before_filter :set_time_zone
   before_filter :authorize
+
+  def self.verify(args)
+  end
 
   def current_user_role?
     current_user.role.name
   end
 
   def current_role_name
-    current_user.role.name
+    current_role.try :name
+  end
+
+  def current_role
+    current_user.try :role
   end
 
   helper_method :current_user_role?
 
   def user_for_paper_trail
     if session[:user]
-      session[:user].id
+      session[:user].try :id
     else
       nil
     end
@@ -30,7 +42,7 @@ class ApplicationController < ActionController::Base
     @version = Version.where(['whodunnit = ?',session[:user].id]).last
     if @version.try(:created_at) && Time.now - @version.created_at < 5.0
       @link_name = params[:redo] == "true" ? "redo" : "undo"
-      flash[:notice] = message + "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @version.id,:redo => !params[:redo])}>#{@link_name}</a>"
+      flash[:success] = message + "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @version.id,:redo => !params[:redo])}>#{@link_name}</a>"
     end
   end
 

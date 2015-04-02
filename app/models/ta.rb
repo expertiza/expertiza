@@ -12,8 +12,7 @@ class Ta < User
   end
 
   def list_all(object_type, user_id)
-    object_type.find(:all, 
-                     :conditions => ["instructor_id = ? OR private = 0", user_id])
+    object_type.where(["instructor_id = ? OR private = 0", user_id])
   end
   
   def list_mine(object_type, user_id)
@@ -33,14 +32,12 @@ class Ta < User
       Assignment.find_by_sql(["select assignments.id, assignments.name, assignments.directory_path " +
       "from assignments, ta_mappings where assignments.course_id = ta_mappings.course_id and ta_mappings.ta_id=?",user_id])    
     else
-      object_type.find(:all, :conditions => ["instructor_id = ?", user_id])      
+      object_type.where(["instructor_id = ?", user_id])      
     end
   end
   
   def get(object_type, id, user_id)
-    object_type.find(:first, 
-                     :conditions => ["id = ? AND (instructor_id = ? OR private = 0)", 
-                                     id, user_id])
+    object_type.where(["id = ? AND (instructor_id = ? OR private = 0)", id, user_id]).first
   end
   
   def self.get_my_instructor(user_id)
@@ -50,7 +47,7 @@ class Ta < User
   
   def self.get_mapped_instructor_ids(user_id)
     ids = Array.new
-    mappings = TaMapping.find_all_by_ta_id(user_id)
+    mappings = TaMapping.where(ta_id: user_id)
     mappings.each{
       |map|
       ids << map.course.instructor.id
@@ -60,7 +57,7 @@ class Ta < User
   
   def self.get_mapped_courses(user_id)
     ids = Array.new
-    mappings = TaMapping.find_all_by_ta_id(user_id)
+    mappings = TaMapping.where(ta_id: user_id)
     mappings.each{
       |map|
       ids << map.course.id

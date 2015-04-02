@@ -35,10 +35,10 @@
   <table>
     <% for rp in @rps do %>
       <tr>
-        <td><%= image_tag("/images/permission.png") %></td>
+        <td><%= image_tag("/assets/permission.png") %></td>
         <td><%= link_to rp.name, :controller => 'permissions',
           :action => 'show', :id => rp.permission_id %> </td>
-        <td><%= link_to image_tag("/images/delete.png") + ' Remove',
+        <td><%= link_to image_tag("/assets/delete.png") + ' Remove',
           { :controller => 'roles_permissions',
             :action => 'destroy', :id => rp.id },
             :confirm => 'Remove this Permission from this Role?',
@@ -51,7 +51,7 @@
   <% end -%>
 
   <br/>
-  <p><%= link_to image_tag("/images/add.png") + ' Add Permission', { :controller => 'roles_permissions',
+  <p><%= link_to image_tag("/assets/add.png") + ' Add Permission', { :controller => 'roles_permissions',
                                                                      :action => 'new_permission_for_role',
                                                                      :id => @role.id
   }%> for this Role</p>

@@ -17,15 +17,15 @@ class CoursesUsers < ActiveRecord::Base
     if course == nil
       raise ImportError, "The course with id \""+id.to_s+"\" was not found."
     end
-    if (CoursesUsers.find(:all, {:conditions => ['user_id=? AND course_id=?', user.id, course.id]}).size == 0)
+    if (CoursesUsers.where(['user_id=? AND course_id=?', user.id, course.id]).count.zero?)
       CoursesUsers.create :user_id => user.id, :course_id => course.id
     end
   end
 
   def email(pw, home_page)
-    user = User.find_by_id(self.user_id)
-    course = Course.find_by_id(self.course_id)
-    Mailer.deliver_message(
+    user = User.find(self.user_id)
+    course = Course.find(self.course_id)
+    Mailer.sync_message(
       {:recipients => user.email,
        :subject => "You have been registered as a participant in #{course.title}",
        :body => {
@@ -36,7 +36,7 @@ class CoursesUsers < ActiveRecord::Base
          :partial_name => "register"
        }
     }
-    )
+    ).deliver
   end
 
 end

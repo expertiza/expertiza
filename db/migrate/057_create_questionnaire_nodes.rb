@@ -1,6 +1,6 @@
 class CreateQuestionnaireNodes < ActiveRecord::Migration
   def self.up
-    questionnaires = Questionnaire.find(:all)
+    questionnaires = Questionnaire.all
     questionnaires.each {
       |questionnaire|
       parent = QuestionnaireTypeNode.find_by_node_object_id(questionnaire.type_id)
@@ -9,7 +9,7 @@ class CreateQuestionnaireNodes < ActiveRecord::Migration
   end
 
   def self.down
-    nodes = QuestionnaireNode.find(:all)
+    nodes = QuestionnaireNode.all
     nodes.each { |node| node.destroy }    
   end
 end

@@ -31,7 +31,7 @@
              #ACS Find the user(s) signed up for a topic
              # removed code that handles team and individual assignments differently
              # An unknown bug causes teams to disappear. Don't crash if this happens
-             team = Team.find_by_id(signed_up_user.creator_id)
+             team = Team.find(signed_up_user.creator_id)
              users = []
              users = team.users if team
 
@@ -61,9 +61,9 @@
  <td><%= (permissionGranted ? "granted" : "denied") %></td>
  <td>
    <% if (permissionGranted && hasSignature && signatureValid) %>
-     <img src="/images/Check-icon.png" title="verified with digitigal signature" alt="verified"/>
+     <img src="/assets/Check-icon.png" title="verified with digitigal signature" alt="verified"/>
    <% else %>
-     <img src="/images/delete_icon.png" title="no digitigal signature" alt="unverified"/>
+     <img src="/assets/delete_icon.png" title="no digitigal signature" alt="unverified"/>
    <% end %>
    &nbsp;
  </td>

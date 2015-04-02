@@ -8,7 +8,7 @@
   <b>Team Name: </b><%= @student.team.name %>
 
 <%= link_to "Edit Name",
-  {:controller => 'student_team', :action => 'edit', :team_id => @student.team.id, :student_id => @student.id} %>
+  edit_student_teams_path(team_id: @student.team.id, student_id: @student.id) %>
 <table>
   <tr>
     <td><b>Username &nbsp</b></td>
@@ -16,14 +16,14 @@
     <td><b>Email &nbsp</b></td>
     <td></td>
   </tr>
-  <% for member in @student.team.get_participants %>
+  <% for member in @student.team.participants %>
     <tr>
       <td><%= member.user.name %></td>
       <td><%= member.user.fullname %></td>
       <td><%= member.user.email %></td>
       <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
 
-        <% map = TeammateReviewResponseMap.find(:first, :conditions => ['reviewer_id = ? and reviewee_id = ?', @student.id, member.id])
+        <% map = TeammateReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', @student.id, member.id]).first
         if map.nil?
           map = TeammateReviewResponseMap.create(:reviewer_id => @student.id, :reviewee_id => member.id, :reviewed_object_id => @student.assignment.id)
         end

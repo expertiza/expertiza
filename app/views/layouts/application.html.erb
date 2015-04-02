@@ -4,30 +4,9 @@
     <%= params[:controller] %> | <%= params[:action] %>
   </title>
 
-  <%= csrf_meta_tag %>
-  <%= stylesheet_link_tag 'goldberg',
-    'layout',
-    'application',
-    'flash_messages',
-    'balloontip',
-    'redbox' %>
-
-  <%= javascript_include_tag :all,
-    'jquery',
-    'redbox',
-    'suckerfish',
-    'superfish',
-    'actionmenu',
-    'tableactions',
-    'application',
-    'datetimepicker',
-    'CalendarPopup',
-    'ajaxtabs',
-    'sorttable',
-    'shared',
-    'textareasizer'
-  %>
-<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+  <%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true %>
+  <%= javascript_include_tag "application", "data-turbolinks-track" => true %>
+  <%= csrf_meta_tags %>
 </head>
 
 <body>
@@ -43,10 +22,15 @@
           <%= render :partial => 'auth/login' %><br/>
           <% if session[:user].nil? %>
           <% else %>
-            <% if session[:user].role_id ==4  %>
-              <a href="/versions/index">Manage Versions Table</a>
+            <% if session[:user].role_id == 4 || session[:user].role_id == 3 || session[:user].role_id == 2 %>
+              <%= link_to "Search log", Version %></a>
             <% end %>
           <% end %>
+          <div>
+            <% if !current_user %>
+                <%= link_to image_tag("google.png", size: "150x50"), "/auth/google_oauth2" %>
+            <% end %>
+          </div>
         </div>
       </div>
 

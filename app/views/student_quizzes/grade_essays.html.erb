@@ -1,0 +1,22 @@
+<header> Grade Essays </header>
+<div>
+  <table border = "1">
+    <% @questionnaires.each do |questionnaire| %>
+      <tr bgcolor = "#610B0B"> <th colspan ="3"> <%=questionnaire.name%></th></tr>
+      <%Question.where(questionnaire_id: questionnaire.id).each do |question| %>
+        <% if @questions.include? question %>
+          <%=form_tag :action => 'submit_essay_grades',
+            :question_id => question.id,
+            :response_id => @answers[question].response_id do %>
+            <tr> <td colspan = "3"> <%= question.txt %></td></tr>
+            <tr> <td> <%= @answers[question].comments%></td>
+              <td> <%= select "#{question.id}", 'score',[' ', '0','1'] %> </td>
+            </tr>
+            <tr><td colspan = "3"><%=submit_tag "Submit Grade" %><br> </td></tr>
+
+          <%end%>
+        <%end%>
+      <%end%>
+    <%end%>
+  </table>
+</div>

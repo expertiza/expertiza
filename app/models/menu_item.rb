@@ -5,8 +5,12 @@ class MenuItem < ActiveRecord::Base
   validates_presence_of :name
   validates_uniqueness_of :name
 
+  def self.find_or_create_by_name (params)
+    MenuItem.find_or_create_by(name: params)
+  end
+
   def delete
-    children = MenuItem.find(:all, :conditions => ['parent_id = ?',self.id])
+    children = MenuItem.where(['parent_id = ?',self.id])
     children.each {|child| child.delete }
     self.destroy
   end
@@ -20,8 +24,7 @@ class MenuItem < ActiveRecord::Base
         ["parent_id is null and seq = ?", self.seq - 1]
     end
 
-    return MenuItem.find(:first,
-                         :conditions => conditions)
+    return MenuItem.where(conditions).first
   end
 
 
@@ -34,20 +37,15 @@ class MenuItem < ActiveRecord::Base
         ["parent_id is null and seq = ?", self.seq + 1]
     end
 
-    return MenuItem.find(:first,
-                         :conditions => conditions)
+    return MenuItem.where(conditions).first
   end
 
 
   def MenuItem.repack(repack_id)
     if repack_id
-      items = MenuItem.find(:all,
-                            :conditions => "parent_id = #{repack_id}",
-                            :order => 'seq')
+      items = MenuItem.where("parent_id = #{repack_id}").order('seq')
     else
-      items = MenuItem.find(:all,
-                            :conditions => "parent_id is null",
-                            :order => 'seq')
+      items = MenuItem.where("parent_id is null").order('seq')
     end
 
     seq = 1
@@ -86,8 +84,7 @@ class MenuItem < ActiveRecord::Base
     # List of items to return
     items = []
 
-    menu_items = self.find(:all,
-                           :order => 'parent_id, seq, id')
+    menu_items = self.all.order('parent_id, seq, id')
     for item in menu_items do
       if item.controller_action_id.to_i > 0
         item.controller_action =

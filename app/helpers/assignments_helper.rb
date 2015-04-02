@@ -17,7 +17,7 @@ module AssignmentsHelper
     end
   end
 
-  def self.get_stage_deadline(assignment_id)
+  def self.stage_deadline(assignment_id)
     due_date = find_current_stage(assignment_id)
     if due_date != nil and due_date != COMPLETE
       return due_date.strftime('%A %B %d %Y, %I:%M%p')

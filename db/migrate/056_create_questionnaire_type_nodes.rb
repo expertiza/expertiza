@@ -11,7 +11,7 @@ class CreateQuestionnaireTypeNodes < ActiveRecord::Migration
   end
 
   def self.down  
-    nodes = QuestionnaireTypeNode.find(:all)
+    nodes = QuestionnaireTypeNode.all
     nodes.each {|node| node.destroy }    
   end
 end

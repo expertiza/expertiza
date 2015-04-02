@@ -40,13 +40,13 @@ class CourseTest < ActiveSupport::TestCase
   end
 
   # test method dir_path
-  def test_get_path
-    assert_equal RAILS_ROOT + '/pg_data/instructor3/csc110/',@course0.dir_path
+  def test_path
+    assert_equal Rails.root + '/pg_data/instructor3/csc110/',@course0.dir_path
   end
 
   # test method get_participants
   def test_get_participants
-    @participants = @course0.get_participants
+    @participants = @course0.participants
     assert_equal 4, @participants.count
   end
 

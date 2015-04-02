@@ -5,7 +5,7 @@ class CreateTeamUserNodes < ActiveRecord::Migration
     rescue
     end
     
-    teamsusers = TeamsUser.find(:all)
+    teamsusers = TeamsUser.all
     teamsusers.each{
       | user |
       parent = TeamNode.find_by_node_object_id(user.team_id)
@@ -16,7 +16,7 @@ class CreateTeamUserNodes < ActiveRecord::Migration
   end
 
   def self.down
-    teamsusers = TeamsUser.find(:all)
+    teamsusers = TeamsUser.all
     teamsusers.each{
        |user|
        user.destroy

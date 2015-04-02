@@ -16,7 +16,7 @@ class QuestionnairesController < ApplicationController
   # questions. The name and creator are updated.
   def copy
     orig_questionnaire = Questionnaire.find(params[:id])
-    questions = Question.find_all_by_questionnaire_id(params[:id])
+    questions = Question.where(questionnaire_id: params[:id])
     @questionnaire = orig_questionnaire.clone
     @questionnaire.instructor_id = session[:user].instructor_id  ## Why was TA-specific code removed here?  See Project E713.
       @questionnaire.name = 'Copy of ' + orig_questionnaire.name
@@ -58,7 +58,7 @@ class QuestionnairesController < ApplicationController
       }
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
       parent = FolderNode.find_by_node_object_id(pFolder.id)
-      if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,@questionnaire.id) == nil
+      if QuestionnaireNode.where(parent_id: parent.id, node_object_id: @questionnaire.id) == nil
         QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
       end
       undo_link("Copy of questionnaire #{orig_questionnaire.name} has been created successfully. ")
@@ -104,7 +104,7 @@ class QuestionnairesController < ApplicationController
   #View a quiz questionnaire
   def view_quiz
     @questionnaire = Questionnaire.find(params[:id])
-    @participant = Participant.find_by_id(params[:pid]) #creating an instance variable since it needs to be sent to submitted_content/edit
+    @participant = Participant.find(params[:pid]) #creating an instance variable since it needs to be sent to submitted_content/edit
     render :view
   end
 
@@ -145,15 +145,15 @@ class QuestionnairesController < ApplicationController
     if params['save']
       @questionnaire.update_attributes(params[:questionnaire])
       for qtypeid in params[:question_type].keys
-        @question_type = QuestionType.find_by_id(qtypeid)
+        @question_type = QuestionType.find(qtypeid)
         @question_type.update_attributes(params[:question_type][qtypeid])
       end
       questionnum=1
       for qid in params[:new_question].keys
-        @question = Question.find_by_id(qid)
+        @question = Question.find(qid)
         @question.update_attributes(params[:new_question][qid])
         @question_type = QuestionType.find_by_question_id(qid)
-        @quiz_question_choices = QuizQuestionChoice.find_all_by_question_id(qid)
+        @quiz_question_choices = QuizQuestionChoice.where(question_id: qid)
         i=1
         for quiz_question_choice in @quiz_question_choices
           if  @question_type.q_type!="Essay"
@@ -227,11 +227,11 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
       @questionnaire.max_question_score = 1
       @questionnaire.section = "Quiz"
       print "=====create_questionnaire========="
-      @assignment = Assignment.find_by_id(params[:aid])
-      teams = TeamsUser.find_all_by_user_id(session[:user].id)
+      @assignment = Assignment.find(params[:aid])
+      teams = TeamsUser.where(user_id: session[:user].id)
       for t in teams do
-        if Team.find_by_id_and_parent_id(t.team_id, @assignment.id)
-          if team = Team.find_by_id_and_parent_id(t.team_id, @assignment.id)
+        if Team.find(t.team_id, @assignment.id)
+          if team = Team.find(t.team_id, @assignment.id)
             break
           end
         end
@@ -386,7 +386,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
       if @questionnaire.type != "QuizQuestionnaire"
         pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
         parent = FolderNode.find_by_node_object_id(pFolder.id)
-        if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id,@questionnaire.id) == nil
+        if QuestionnaireNode.where(parent_id: parent.id, node_object_id: @questionnaire.id) == nil
           QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
         end
       end
@@ -424,7 +424,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
           if @questionnaire.type == "QuizQuestionnaire"
             save_new_question_parameters(q.id, question_key)
           end
-          questionnaire = Questionnaire.find_by_id(questionnaire_id)
+          questionnaire = Questionnaire.find(questionnaire_id)
           if questionnaire.section == "Custom"
             for i in (questionnaire.min_question_score .. questionnaire.max_question_score)
               a = QuestionAdvice.new(:score => i, :advice => nil)
@@ -457,7 +457,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
         for advice in question.question_advices
           advice.destroy
         end
-        if Questionnaire.find_by_id(questionnaire_id).section == "Custom"
+        if Questionnaire.find(questionnaire_id).section == "Custom"
           question_type = QuestionType.find_by_question_id(question.id)
           question_type.destroy
         end
@@ -504,7 +504,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
         begin
           if params[:question][question_key][:txt].strip.empty?
             # question text is empty, delete the question
-            if Questionnaire.find_by_id(questionnaire_id).section == "Custom"
+            if Questionnaire.find(questionnaire_id).section == "Custom"
               QuestionType.find_by_question_id(question_key).delete
             end
             Question.delete(question_key)
@@ -521,7 +521,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
           # ignored
         end
       end
-      if Questionnaire.find_by_id(questionnaire_id).section == "Custom"
+      if Questionnaire.find(questionnaire_id).section == "Custom"
         for question_type_key in params[:q].keys
           update_question_type(question_type_key)
         end
@@ -534,7 +534,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
   #only for quiz questionnaire
   def save_choices(questionnaire_id)
     if params[:new_question] and params[:new_choices]
-      questions = Question.find_all_by_questionnaire_id(questionnaire_id)
+      questions = Question.where(questionnaire_id: questionnaire_id)
       questionnum = 1
 
       for question in questions
@@ -641,7 +641,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
       parent = FolderNode.find_by_node_object_id(pFolder.id)
 
-      if QuestionnaireNode.find_by_parent_id_and_node_object_id(parent.id, @questionnaire.id) == nil
+      if QuestionnaireNode.where(parent_id: parent.id, node_object_id:  @questionnaire.id) == nil
         QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
       end
 

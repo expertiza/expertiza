@@ -10,7 +10,7 @@ class InvitationController < ApplicationController
 
   def create
     user = User.find_by_name(params[:user][:name].strip)
-    team = AssignmentTeam.find_by_id(params[:team_id])
+    team = AssignmentTeam.find(params[:team_id])
     student = AssignmentParticipant.find(params[:student_id])
     return unless current_user_id?(student.user_id)
 
@@ -18,12 +18,12 @@ class InvitationController < ApplicationController
     if !user
       flash[:note] = "\"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
     else
-      participant= AssignmentParticipant.first( :conditions => ['user_id =? and parent_id =?', user.id, student.parent_id])
+      participant= AssignmentParticipant.where('user_id =? and parent_id =?', user.id, student.parent_id).first
       #check if the user is a participant of the assignment
       if !participant
         flash[:note] = "\"#{params[:user][:name].strip}\" is not a participant of this assignment."
       else
-        team_member = TeamsUser.all(:conditions => ['team_id =? and user_id =?', team.id, user.id])
+        team_member = TeamsUser.where(['team_id =? and user_id =?', team.id, user.id])
         #check if invited user is already in the team
         if (team_member.size > 0)
           flash[:note] = "\"#{user.name}\" is already a member of team."
@@ -45,15 +45,16 @@ class InvitationController < ApplicationController
 
     update_join_team_request user,student
 
-    redirect_to :controller => 'student_team', :action => 'view', :id=> student.id
+    redirect_to view_student_teams_path student_id: student.id
+
   end
 
   def update_join_team_request(user,student)
     #update the status in the join_team_request to A
     if user && student
-      participant= AssignmentParticipant.first( :conditions => ['user_id =? and parent_id =?', user.id, student.parent_id])
+      participant= AssignmentParticipant.where(['user_id =? and parent_id =?', user.id, student.parent_id]).first
       if participant
-        old_entry = JoinTeamRequest.first(:conditions => ['participant_id =? and team_id =?', participant.id,params[:team_id]])
+        old_entry = JoinTeamRequest.where(['participant_id =? and team_id =?', participant.id,params[:team_id]]).first
         if old_entry
           old_entry.update_attribute("status",'A')
         end
@@ -82,7 +83,8 @@ class InvitationController < ApplicationController
       flash[:error]= "The team already has the maximum number of members."
     end
 
-    redirect_to :controller => 'student_team', :action => 'view', :id => Participant.find(params[:student_id]).id
+    redirect_to view_student_teams_path student_id: params[:student_id]
+
   end
 
   def decline
@@ -90,12 +92,12 @@ class InvitationController < ApplicationController
     @inv.reply_status = 'D'
     @inv.save
     student = Participant.find(params[:student_id])
-    redirect_to :controller => 'student_team', :action => 'view', :id => student.id
+    redirect_to view_student_teams_path student_id: student.id
   end
 
   def cancel
     Invitation.find(params[:inv_id]).destroy
-    redirect_to :controller => 'student_team', :action => 'view', :id => params[:student_id]
+    redirect_to view_student_teams_path student_id: params[:student_id]
   end
 
 end

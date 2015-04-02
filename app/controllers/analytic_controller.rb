@@ -3,28 +3,14 @@ class AnalyticController < ApplicationController
   include AnalyticHelper
 
   before_filter :init
-  def index
-
-  end
-  def init
-    #all internal not use by the page
-    @available_scope_types = [:courses, :assignments, :teams]
-    @available_graph_types = [:line, :bar, :pie, :scatter]
-    @available_courses = associated_courses(session[:user])
-
-    #Hash of available method name of the data mining methods with different type of selection
-    @available_data_types = Hash.new
-    #data type by scope
-    @available_data_types[:course] = CourseAnalytic.instance_methods
-    @available_data_types[:assignment] = AssignmentAnalytic.instance_methods
-    @available_data_types[:team] = AssignmentTeamAnalytic.instance_methods
-    #data type by chart type
-    @available_data_types[:bar] = [
+  # List of supported data fields used by all charts (when enabled). Currently pulled from Bar chart. 
+  # To do: Confirm if Pie charts and Line graphs support the entire same set. If not, eliminate the rest
+  def generic_supported_types
+    [
       #general
       "num_participants",
       "num_assignments",
       "num_teams",
-      "num_participants",
       "num_reviews",
       #assignment_teams
       "total_num_assignment_teams",
@@ -64,17 +50,34 @@ class AnalyticController < ApplicationController
       "max_review_character_count",
       "min_review_character_count"
     ]
+  end
 
-    @available_data_types[:scatter] = [
+  def index
 
-    ]
-    @available_data_types[:line] = []
-    @available_data_types[:pie] = []
+  end
+  def init
+    #all internal not use by the page
+    @available_scope_types = [:courses, :assignments, :teams]
+    @available_graph_types = [:line, :bar, :pie, :scatter]
+    @available_courses = associated_courses(session[:user])
+
+    #Hash of available method name of the data mining methods with different type of selection
+    @available_data_types = Hash.new
+    #data type by scope
+    @available_data_types[:course] = CourseAnalytic.instance_methods
+    @available_data_types[:assignment] = AssignmentAnalytic.instance_methods
+    @available_data_types[:team] = AssignmentTeamAnalytic.instance_methods
+    #data type by chart type
+    @available_data_types[:bar] = generic_supported_types
+    @available_data_types[:scatter] = []
+    # Linking the supportd data types to pie chart and line graph so that they can be generated
+    @available_data_types[:line] = generic_supported_types
+    @available_data_types[:pie] = generic_supported_types
   end
 
   def graph_data_type_list
     #cross checking @available_data_type[chart_type] with @available_data_type[scope]
-    data_type_list =  @available_data_types[params[:scope].to_sym] & @available_data_types[params[:type].to_sym]
+    data_type_list =  @available_data_types[params[:scope].to_sym] & (@available_data_types[params[:type].to_sym].map &:to_sym)
     data_type_list.sort!
     respond_to do |format|
       format.json { render :json => data_type_list}
@@ -99,17 +102,8 @@ class AnalyticController < ApplicationController
       end
       return
     end
-
-    case params[:type]
-    when "line"
-      chart_data = line_graph_data(params[:scope], params[:id], params[:data_type])
-    when "bar"
-      chart_data = bar_chart_data(params[:scope], params[:id], params[:data_type])
-    when "scatter"
-      chart_data = scatter_plot_data(params[:scope], params[:id], params[:data_type])
-    when "pie"
-      chart_data = pie_chart_data(params[:scope], params[:id], params[:data_type])
-    end
+   # removed conditional statemets to use one generic function to generate charts
+    chart_data = get_chart_data(params[:type],params[:scope], params[:id], params[:data_type])
 
     respond_to do |format|
       format.json { render :json => chart_data }

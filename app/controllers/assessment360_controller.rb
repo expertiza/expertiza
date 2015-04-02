@@ -1,16 +1,16 @@
 class Assessment360Controller < ApplicationController
   # Added the @instructor to display the instrucor name in the home page of the 360 degree assessment
   def index
-    @courses = Course.find_all_by_instructor_id(session[:user].id)
+    @courses = Course.where(instructor_id: session[:user].id)
     @instructor_id = session[:user].id
-    @instructor = User.find_by_id(@instructor_id)
+    @instructor = User.find(@instructor_id)
   end
 
   def one_course_all_assignments
     #@REVIEW_TYPES = ["ParticipantReviewResponseMap", "FeedbackResponseMap", "TeammateReviewResponseMap", "MetareviewResponseMap"]
     @REVIEW_TYPES = ["TeammateReviewResponseMap"]
-    @course = Course.find_by_id(params[:course_id])
-    @assignments = Assignment.find_all_by_course_id(@course)
+    @course = Course.find(params[:course_id])
+    @assignments = Assignment.where(course_id: @course)
     @assignments.reject! {|assignment| assignment.get_total_reviews_assigned_by_type(@REVIEW_TYPES.first) == 0 }
 
     @assignment_pie_charts = Hash.new
@@ -88,12 +88,12 @@ class Assessment360Controller < ApplicationController
   end
 
   def all_assignments_all_students
-    @course = Course.find_by_id(params[:course_id]);
-    @assignments = Assignment.find_all_by_course_id(@course)
+    @course = Course.find(params[:course_id]);
+    @assignments = Assignment.where(course_id: @course)
   end
 
   def one_assignment_all_students
-    @assignment = Assignment.find_by_id(params[:assignment_id])
+    @assignment = Assignment.find(params[:assignment_id])
     @participants = @assignment.participants
 
     @bc = Hash.new
@@ -118,15 +118,15 @@ class Assessment360Controller < ApplicationController
 
   # Find the list of all students and assignments pertaining to the course. This data is used to compute the metareview and teammate review scores. This information is used in the view.
   def all_students_all_reviews
-    @course = Course.find_by_id(params[:course_id])
+    @course = Course.find(params[:course_id])
     @students = @course.get_participants()
-    @assignments = Assignment.find_all_by_course_id(@course.id);
+    @assignments = Assignment.where(course_id: @course.id);
   end
 
   # Find all the assignments for a given student pertaining to the course. This data is given a graphical display using bar charts. Individual teammate and metareview scores are displayed along with their aggregate
   def one_student_all_reviews
 
-    @course = Course.find_by_id(params[:course_id])
+    @course = Course.find(params[:course_id])
     @students = @course.get_participants()
     @students.each { |student|
       if student.id.to_s == params[:student_id].to_s
@@ -134,7 +134,7 @@ class Assessment360Controller < ApplicationController
         break
       end
     }
-    @assignments = Assignment.find_all_by_course_id(@course.id);
+    @assignments = Assignment.where(course_id: @course.id);
 
     colors = Array.new
     colors << '0000ff'
@@ -208,7 +208,7 @@ class Assessment360Controller < ApplicationController
   end
 
   def one_assignment_one_student
-    @assignment = Assignment.find_by_id(params[:assignment_id])
+    @assignment = Assignment.find(params[:assignment_id])
     @participant = AssignmentParticipant.find_by_user_id(params[:user_id])
     @questionnaires = @assignment.questionnaires
     bar_1_data = [@participant.average_score]

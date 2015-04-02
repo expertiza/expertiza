@@ -4,7 +4,7 @@ class CourseParticipant < Participant
 
   # Copy this participant to an assignment
   def copy(assignment_id)
-    part = AssignmentParticipant.find_by_user_id_and_parent_id(self.user_id,assignment_id)
+    part = AssignmentParticipant.where(user_id: self.user_id, parent_id: assignment_id).first
     if part.nil?
       part = AssignmentParticipant.create(:user_id => self.user_id, :parent_id => assignment_id)
       part.set_handle()
@@ -29,7 +29,7 @@ class CourseParticipant < Participant
     if course == nil
       raise ImportError, "The course with id \""+id.to_s+"\" was not found."
     end
-    if find(:all, {:conditions => ['user_id=? AND parent_id=?', user.id, course.id]}).size == 0
+    if where(['user_id=? AND parent_id=?', user.id, course.id]).count == 0
       create(:user_id => user.id, :parent_id => course.id)
     end
   end
@@ -42,13 +42,13 @@ class CourseParticipant < Participant
     return self.course.name
   end
 
-  def get_path
-    Course.find(self.parent_id).get_path + self.directory_num.to_s + "/"
+  def path
+    Course.find(self.parent_id).path + self.directory_num.to_s + "/"
   end
 
   # provide export functionality for Assignment Participants
   def self.export(csv, parent_id, options)
-    find_all_by_parent_id(parent_id).each {
+    where(parent_id: parent_id).each {
       |part|
       tcsv = Array.new
       user = part.user
@@ -71,7 +71,7 @@ class CourseParticipant < Participant
     }
   end
 
-  def self.get_export_fields(options)
+  def self.export_fields(options)
     fields = Array.new
     if options["personal_details"] == "true"
       fields.push("name", "full name", "email")

@@ -45,7 +45,7 @@ class JoinTeamRequestsController < ApplicationController
   #create a new join team request entry for join_team_request table and add it to the table
   def create
     #check if the advertisement is from a team member and if so disallow requesting invitations
-    team_member=TeamsUser.all(:conditions => ['team_id =? and user_id =?', params[:team_id],session[:user][:id]])
+    team_member=TeamsUser.where(['team_id =? and user_id =?', params[:team_id],session[:user][:id]])
     if (team_member.size > 0)
       flash[:note] = "You are already a member of team."
     else
@@ -55,7 +55,7 @@ class JoinTeamRequestsController < ApplicationController
       @join_team_request.status = 'P'
       @join_team_request.team_id = params[:team_id]
 
-      participant = Participant.find_by_user_id_and_parent_id(session[:user][:id],params[:assignment_id])
+      participant = Participant.where(user_id: session[:user][:id], parent_id: params[:assignment_id]).first
       @join_team_request.participant_id= participant.id
       respond_to do |format|
         if @join_team_request.save
@@ -102,6 +102,6 @@ class JoinTeamRequestsController < ApplicationController
     @join_team_request = JoinTeamRequest.find(params[:id])
     @join_team_request.status = 'D'
     @join_team_request.save
-    redirect_to :controller => 'student_team', :action => 'view', :id=>params[:teams_user_id]
+    redirect_to view_student_teams_path student_id: params[:teams_user_id]
   end
 end

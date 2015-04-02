@@ -1,6 +1,6 @@
 class MoveFiles < ActiveRecord::Migration
   def self.up    
-    courses = Course.find(:all, :conditions => ['not instructor_id is null'])
+    courses = Course.where(['not instructor_id is null'])
     courses.each{
       | course |
       
@@ -35,12 +35,12 @@ class MoveFiles < ActiveRecord::Migration
       FileHelper.create_directory(course)
     }
     
-    assignments = Assignment.find(:all, :conditions => ['wiki_type_id = 1 and not instructor_id is null'])
+    assignments = Assignment.where(['wiki_type_id = 1 and not instructor_id is null'])
     assignments.each{
       | assignment |
-      directories = Assignment.find_all_by_directory_path(assignment.directory_path)
+      directories = Assignment.find_all_by(directory_path: assignment.directory_path)
       if directories.length ==  1
-         oldpath = RAILS_ROOT + "/pg_data/"+ assignment.directory_path
+        oldpath = Rails.root + "/pg_data/"+ assignment.directory_path
          if assignment.name == 'Another assignment'
             puts assignment.directory_path
             puts assignment.directory_path.length

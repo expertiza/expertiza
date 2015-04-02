@@ -87,7 +87,7 @@ class DelayedMailer
         else
           for signedUser in signedUpUsers
             teamid  = signedUser.creator_id
-            team_members = TeamsUser.find_all_by_team_id(teamid)
+            team_members = TeamsUser.where(team_id: teamid)
             for team_member in team_members
               user = User.find(team_member.user_id)
               emails << user.email
@@ -162,8 +162,8 @@ class DelayedMailer
       body += "Author feedback is optional. However, if you want to give author feedback then the deadline is #{self.due_at}."
       end
 
-      emails<<"vikas.023@gmail.com"
-      emails<<"vsharma4@ncsu.edu"
+      #emails<<"vikas.023@gmail.com"
+      #emails<<"vsharma4@ncsu.edu"
       @@count = @@count+1
       Rails.logger.info "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
       Rails.logger.info deadlineType
@@ -176,7 +176,7 @@ class DelayedMailer
           emails<< assignment.instructor.email
         end
 
-        emails<< "expertiza-support@lists.ncsu.edu"
+        #emails<< "expertiza-support@lists.ncsu.edu"
       end
 
       emails.each do |mail|

@@ -46,7 +46,7 @@
           <%= render :partial => 'num_waiting', :locals => {:topic=>topic}  %>
 
           <td align="center">
-            <% topic_identifier = SignUpTopic.find_all_by_assignment_id(@assignment.id).map {|u| [u.topic_identifier, u.id] } %>
+            <% topic_identifier = SignUpTopic.where(assignment_id: @assignment.id).map {|u| [u.topic_identifier, u.id] } %>
             <% topic_identifier.delete([topic.topic_identifier, topic.id]) %>
             <% select = TopicDependency.find_by_topic_id(topic.id)%>
             <% selected = Array.new%>
@@ -69,7 +69,7 @@
 <% end %>
 <% end %>
 
-<% session[:return_to] = request.request_uri %>
+<% session[:return_to] = request.url %>
 <br/><br/>
 <%= render :partial => 'add_topics' %>
 
@@ -80,7 +80,7 @@
   </a>
 
   <div id="image_myDiv" style="display:none" align="center">
-    <img src='/images/staggered_deadline_assignment_graph/graph_<%= @assignment.id %>.jpg'/>
+    <img src='/assets/staggered_deadline_assignment_graph/graph_<%= @assignment.id %>.jpg'/>
   </div>
 
   | <a href="#due_date" onClick="toggleVis('due_date');">

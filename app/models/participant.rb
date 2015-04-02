@@ -10,19 +10,27 @@ class Participant < ActiveRecord::Base
   has_many   :team_reviews, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewer_id', dependent: :destroy
   has_many :response_maps, :class_name =>'ResponseMap', :foreign_key => 'reviewee_id', dependent: :destroy
 
+  def team
+    TeamsUser.where(user: user).first.try :team
+  end
+
+  def responses
+    response_maps.map(&:response)
+  end
+
   validates_numericality_of :grade, :allow_nil => true
+
+  delegate :course, to: :assignment
 
   has_paper_trail
 
   def get_current_stage
     assignment.try :get_current_stage, topic_id
   end
-  alias_method :current_stage, :get_current_stage
 
-  def get_stage_deadline
-    assignment.get_stage_deadline topic_id
+  def stage_deadline
+    assignment.stage_deadline topic_id
   end
-  alias_method :stage_deadline, :get_stage_deadline
 
   def name
     User.find(self.user_id).name
@@ -36,7 +44,7 @@ class Participant < ActiveRecord::Base
   def delete(force = nil)
 
     # TODO How do we test this code?  #need a controller test_oss808
-    maps = ResponseMap.all(:conditions => ['reviewee_id = ? or reviewer_id = ?',self.id,self.id])
+    maps = ResponseMap.where(['reviewee_id = ? or reviewer_id = ?',self.id,self.id])
 
     if force or ((maps.nil? or maps.length == 0) and
                  self.team.nil?)
@@ -48,7 +56,7 @@ class Participant < ActiveRecord::Base
 
 
     def force_delete(maps)
-      times = ResubmissionTime.find_all_by_participant_id(self.id);
+      times = ResubmissionTime.where(participant_id: self.id);
 
       if times
         times.each { |time| time.destroy }
@@ -88,10 +96,10 @@ class Participant < ActiveRecord::Base
 
     # email does not work. It should be made to work in the future
     def email(pw, home_page)
-      user = User.find_by_id(self.user_id)
-      assignment = Assignment.find_by_id(self.assignment_id)
+      user = User.find(self.user_id)
+      assignment = Assignment.find(self.assignment_id)
 
-      Mailer.deliver_message(
+      Mailer.sync_message(
         {:recipients => user.email,
          :subject => "You have been registered as a participant in Assignment #{assignment.name}",
          :body => {
@@ -102,7 +110,7 @@ class Participant < ActiveRecord::Base
            :partial_name => "register"
          }
       }
-      )
+      ).deliver
     end
 
     #This function updates the topic_id for a participant in assignments where a signup sheet exists
@@ -119,31 +127,43 @@ class Participant < ActiveRecord::Base
                               WHERE t.parent_id = " + assignment.id.to_s + " and t.id = u.team_id and u.user_id = " + self.user_id.to_s )
 
       team_id = team[0]["team_id"]
-      team_members = TeamsUser.find_all_by_team_id(team_id)
+      team_members = TeamsUser.where(team_id: team_id)
 
       team_members.each { |team_member|
-        participant = Participant.find_by_user_id_and_parent_id(team_member.user_id,assignment.id)
+        participant = Participant.where(user_id: team_member.user_id, parent_id: assignment.id).first
         participant.update_attribute(:topic_id, topic_id)
       }
     end
 
-
-
-
     # Return scores that this participant for the given questions
-    def get_scores(questions)
-
-      scores = Hash.new
+    def scores(questions)
+      scores = {}
       scores[:participant] = self
-      self.assignment.questionnaires.each do |questionnaire|
-        scores[questionnaire.symbol] = Hash.new
-        scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
 
-        scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+      if self.assignment.varying_rubrics_by_round?  # for "vary rubric by rounds" feature -Yang
+        self.assignment.questionnaires.each do |questionnaire|
+          round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(self.assignment.id, questionnaire.id).used_in_round
+          if(round!=nil)
+            questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
+          else
+            questionnaire_symbol = questionnaire.symbol
+          end
+          scores[questionnaire_symbol] = Hash.new
+          scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_for(self)
+          scores[questionnaire_symbol][:scores] = Score.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
+        end
+
+      else   #not using "vary rubric by rounds" feature
+        self.assignment.questionnaires.each do |questionnaire|
+          scores[questionnaire.symbol] = Hash.new
+          scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
+
+          scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+        end
       end
 
       scores[:total_score] = assignment.compute_total_score(scores)
-      return scores
-    end
 
+      scores
+    end
   end

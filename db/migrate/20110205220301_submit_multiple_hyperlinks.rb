@@ -6,7 +6,7 @@ class SubmitMultipleHyperlinks < ActiveRecord::Migration
 
     puts "[Converting to YAML] Please wait, this could take some seconds..."
 
-    Participant.find(:all).each do |p|
+    Participant.find_each do |p|
       unless p.submitted_hyperlinks.nil?
         one_hyperlink = p.submitted_hyperlinks.strip
         if one_hyperlink.empty?
@@ -28,7 +28,7 @@ class SubmitMultipleHyperlinks < ActiveRecord::Migration
   def self.down
     puts "Becareful when downgrading submitted_hyperlinks, please read 20110205220301_submit_multiple_hyperlinks.rb"
     
-    Participant.find(:all).each do |p|
+    Participant.find_each do |p|
       unless p.submitted_hyperlinks.nil?
         multiple_hyperlinks = YAML::load(p.submitted_hyperlinks).join(' ')
         p.update_attribute :submitted_hyperlinks, multiple_hyperlinks

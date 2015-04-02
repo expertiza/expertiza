@@ -64,7 +64,7 @@ module SubmittedContentHelper
       end
       ret += "<input type=hidden id='filenames_#{index}' name='filenames[#{index}]' value='"+File.dirname(disp)+"/" +File.basename(path)+"'>"
       if File.ftype( disp ) == "directory"
-        ret += "<a title='Expand/Collapse' href='#' onclick='javascript:collapseSubDirectory(#{index}); return false;'><img id='expand.#{index}' alt='Expand/Collapse' title='Expand/Collapse' src='/images/up.png'></a>&nbsp;"
+        ret += "<a title='Expand/Collapse' href='#' onclick='javascript:collapseSubDirectory(#{index}); return false;'><img id='expand.#{index}' alt='Expand/Collapse' title='Expand/Collapse' src='/assets/up.png'></a>&nbsp;"
           ret += link_to path, :controller=>'submitted_content', :action => 'edit', :id => participant.id, :download => File.basename(path), "current_folder[name]" =>  File.dirname(disp)
         ret += "</li>"
         ret += list_sub_directories(disp, participant)
@@ -81,7 +81,7 @@ module SubmittedContentHelper
   # restart the server
   def self.unzip_file(file_name, unzip_dir, should_delete)
     #begin
-    Zip::ZipFile::open(file_name) {
+    Zip::File.open(file_name) {
       |zf| zf.each { |e|
         safename = FileHelper::sanitize_filename(e.name);
         fpath = File.join(unzip_dir, safename)

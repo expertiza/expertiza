@@ -1,0 +1,24 @@
+<% questions = Question.where(questionnaire_id: questionnaire_id) %><br><br>
+<% questions.each do |question| %>
+  <%= label_tag "#{question.id}", question.txt %> <br>
+  <% question_type = QuestionType.find_by_question_id(question.id) %>
+  <% unless question_type.parameters == nil %>
+    Hint: <%= label_tag "#{question.id}_hint", question_type.parameters %><br>
+  <% end %>
+  <% if(question_type.q_type == 'MCR') %>
+    <% quiz_question_choices = QuizQuestionChoice.where(question_id: question.id) %>
+    <% quiz_question_choices.each do |choice|  %>
+      <%= radio_button_tag "#{question.id}", "#{choice.txt}" %><%= label_tag "#{choice.id}", choice.txt %><br>
+    <% end %>
+  <% elsif(question_type.q_type == 'MCC') %>
+    <% quiz_question_choices = QuizQuestionChoice.where(question_id: question.id) %>
+    <% quiz_question_choices.each do |choice| %>
+      <%= check_box_tag "#{question.id}[]", "#{choice.txt}" %><%= label_tag "#{choice.txt}", choice.txt %><br>
+    <% end %>
+  <% elsif(question_type.q_type == 'TF') %>
+    <%= radio_button_tag "#{question.id}", 'True' %><%= label_tag "#{question.id}_true", 'True' %><br>
+    <%= radio_button_tag "#{question.id}", 'False' %><%= label_tag "#{question.id}_false", 'False' %><br>
+  <% elsif(question_type.q_type == 'Essay') %>
+    <%= text_area_tag "#{question.id}", nil, :cols => "70", :rows => "5" %><br>
+  <% end %><br>
+<% end %>

@@ -1,7 +1,11 @@
 <h1><%= @title %> for <%= @assignment.name %></h1>
 <% if !(@map.instance_of? TeammateReviewResponseMap) %>
-    <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage => @assignment.get_current_stage(@participant.topic_id)} %>
-    <br/>
+    <%if @assignment.has_teams?%>
+        <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(@participant.topic_id)} %>
+    <%else%>
+        <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage => @assignment.get_current_stage(@participant.topic_id)} %>
+    <%end%>
+        <br/>
     <hr/><br/>
 <% end %>
 
@@ -15,7 +19,7 @@
      @current_folder = DisplayOption.new
      @current_folder.name = ""
      @participant = Participant.find(@map.reviewer_id)
-     files_list = Dir[@participant.assignment.get_path.to_s+ "/" +@map.map_id.to_s + @current_folder.name + "/*"]
+     files_list = Dir[@participant.assignment.path.to_s+ "/" +@map.map_id.to_s + @current_folder.name + "/*"]
      files = Array.new
      for file in files_list
        if File.directory?(file) then

@@ -11,6 +11,14 @@ class ControllerAction < ActiveRecord::Base
     joins('left outer join site_controllers on site_controller_id = site_controllers.id').
     order('site_controllers.name, name')
   }
+  
+  def self.find_all_by_site_controller_id (id)
+    ControllerAction.where(site_controller_id: id)
+  end
+
+  def self.find_or_create_by_name (params)
+    ControllerAction.find_or_create_by(name: params)
+  end
 
   def controller
     @controller ||= SiteController.find(self.site_controller_id)
@@ -19,7 +27,7 @@ class ControllerAction < ActiveRecord::Base
   def permission
     if not @permission
       if self.permission_id
-        @permission = Permission.find_by_id(self.permission_id)
+        @permission = Permission.find(self.permission_id)
       else
         @permission = Permission.new(:id => nil,
                                      :name => "(default -- #{self.controller.permission.name})")
@@ -54,7 +62,7 @@ class ControllerAction < ActiveRecord::Base
       end
     end
 
-    actions = ControllerAction.find(:all)
+    actions = ControllerAction.all
     for action in actions do
       if action.permission_id
         if perms.has_key?(action.permission_id)
@@ -75,12 +83,10 @@ class ControllerAction < ActiveRecord::Base
   end
 
   def self.find_for_permission(p_ids)
-    if p_ids and p_ids.length > 0
-      return find(:all,
-                  :conditions => ['permission_id in (?)', p_ids],
-                  :order => 'name')
+    if p_ids && p_ids.length > 0
+      where(['permission_id in (?)', p_ids]).order('name')
     else
-      return Array.new
+      Array.new
     end
   end
 

@@ -1,16 +1,21 @@
 <h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
 
 <% if !@map.contributor.nil? %>
-    <% if @map.assignment.team_assignment?
-         team_member = TeamsUser.find_by_team_id(@map.contributor).user_id
-         topic_id = Participant.find_by_parent_id_and_user_id(@map.assignment.id, team_member).topic_id
-       else %>
-        <% topic_id = Participant.find(@map.contributor).topic_id %>
+    <% if @map.assignment.team_assignment? %>
+        <% team_member = TeamsUser.find_by_team_id(@map.contributor).user_id%>
+        <% topic_id = Participant.where(parent_id: @map.assignment.id, user_id:  team_member).first.topic_id %>
+    <% else %>
+        <% topic_id = Participant.find(TeamsUser.find_by_team_id(@map.contributor).user_id).topic_id %>
     <% end %>
     <% if !topic_id.nil? %>
         <h2>You are reviewing <%= SignUpTopic.find(topic_id).topic_name %></h2>
     <% end %>
-    <%= render :partial => 'submitted_content/main', :locals => {:participant => @map.contributor, :stage => @assignment.get_current_stage()} %>
+
+    <%if @assignment.has_teams?%>
+        <%= render :partial => 'submitted_content/main', :locals => {:reviewee_participant => @contributor.participants.first,:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(@participant.topic_id)} %>
+    <%else%>
+        <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage => @assignment.get_current_stage(@participant.topic_id)} %>
+    <%end%>
     <hr/>
 <% end %>
 <!-- display all versions available -->
@@ -18,14 +23,16 @@
 <% @responses_versions = @map.get_all_versions() %>
 
 <% if @responses_versions.empty? %>
-    "<I>No previous review was performed.</I><br/>
-    <hr/><br/>"
+    <I>No previous review was performed.</I><br/><hr/><br/>
 <% else %>
     <%= render :partial => 'review', :locals => {:versions => @responses_versions} %>
 <% end %>
 
 
 <%= form_tag :action => @next_action, :id => @modified_object do %>
+    <% if @next_action.eql?'update' %>
+        <input name="_method" type="hidden" value="put" />
+    <%end%>
     <% i = 0
        @questions.each {
                |question| %>

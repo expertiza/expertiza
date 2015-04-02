@@ -15,8 +15,8 @@ class AdvertiseForPartnerController < ApplicationController
     team.save
 
     assignment=Assignment.find(Team.find(params[:team_id]).parent_id)
-    participant=AssignmentParticipant.find_by_parent_id_and_user_id(assignment.id,session[:user].id)
-    redirect_to :controller => 'student_team', :action => 'view' , :id => participant.id
+    participant=AssignmentParticipant.where(parent_id: assignment.id, user_id: session[:user].id).first
+    redirect_to view_student_teams_path student_id: participant.id
   end
 
   #update the team table with newly created advertise for partner request for the corresponding team
@@ -27,8 +27,8 @@ class AdvertiseForPartnerController < ApplicationController
     team.save
 
     assignment=Assignment.find(Team.find(params[:id]).parent_id)
-    participant=AssignmentParticipant.find_by_parent_id_and_user_id(assignment.id,session[:user].id)
-    redirect_to :controller => 'student_team', :action => 'view' , :id => participant.id
+    participant=AssignmentParticipant.where(parent_id: assignment.id, user_id: session[:user].id).first
+    redirect_to view_student_teams_path student_id: participant.id
   end
 
   #update the advertisement when done with editing #####This should be edit rather than update....
@@ -37,13 +37,13 @@ class AdvertiseForPartnerController < ApplicationController
     #@team.comments_for_advertisement = params[:comments_for_advertisement]
     Team.update(params[:id], :comments_for_advertisement => params[:comments_for_advertisement])
     assignment=Assignment.find(Team.find(params[:id]).parent_id)
-    participant=AssignmentParticipant.find_by_parent_id_and_user_id(assignment.id,session[:user].id)
+    participant=AssignmentParticipant.where(parent_id: assignment.id, user_id: session[:user].id).first
     if @team.save
       flash[:notice]='Advertisement updated successfully!'
-      redirect_to :controller => 'student_team', :action => 'view' , :id => participant.id
+      redirect_to view_student_teams_path student_id: participant.id
     else
       flash[:error]='Advertisement not updated!'
-      redirect_to :controller => 'student_team', :action => 'view' , :id => participant.id
+      redirect_to view_student_teams_path student_id: participant.id
     end
   end
 
@@ -51,4 +51,4 @@ class AdvertiseForPartnerController < ApplicationController
   def edit
     @team = Team.find(params[:team_id])
   end
-  end
+end

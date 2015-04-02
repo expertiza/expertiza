@@ -26,9 +26,9 @@ class Bookmark < ActiveRecord::Base
 
   # If bookmark mapping for a user and a url exists, then edit
   def self.edit_this_bookmark (b_url, b_title, b_tags_text, b_description,session_user)
-    bookmark_resource = Bookmark.find(:first, :conditions=>["url = ?",b_url])
+    bookmark_resource = Bookmark.where(["url = ?",b_url]).first
     @bmapping_status = "found"
-    bookmark_user_mapping = Bmapping.find(:first, :conditions =>["user_id = ? and bookmark_id = ?", session_user.id, bookmark_resource.id])
+    bookmark_user_mapping = Bmapping.where(["user_id = ? and bookmark_id = ?", session_user.id, bookmark_resource.id]).first
     bookmark_user_mapping.bookmark_id = bookmark_resource.id
     bookmark_user_mapping.title = b_title
     bookmark_user_mapping.description = b_description
@@ -41,7 +41,7 @@ class Bookmark < ActiveRecord::Base
     tag_array = BookmarksHelper.separate_tags(b_tags_text)
     for each_tag in tag_array
       # Look for each tag that is present in tags, if not make them, then make the qualifier entry
-      tag_tuple = Tag.find(:first, :conditions=>["tagname = ?",each_tag])
+      tag_tuple = Tag.where(["tagname = ?",each_tag]).first
       if tag_tuple.nil?
         tag_tuple = Tag.new
         tag_tuple.tagname = each_tag
@@ -64,7 +64,7 @@ class Bookmark < ActiveRecord::Base
       if(order_by == "most_recent")
         ## find all the records in the system, order them by the date created. Using Bmapping here. Returns mappings that where created most recently,
         ## the user that created this mapping, the title and description provided this user
-        result_records = Bmapping.find(:all, :order =>"date_created DESC", :limit =>20)
+        result_records = Bmapping.all(:order =>"date_created DESC", :limit =>20)
 
         for result in result_records
           ## for each tuple returned by the query above, create a new hash, store the values appropriately, and append into the return_array
@@ -79,7 +79,7 @@ class Bookmark < ActiveRecord::Base
           ## now retrieving tags for this user-bookmak mapping
           ## first retrieve all the tag_ids mapped to the BMapping id. Then retrieve all the tag names of the tag_ids picked up.
           ## Append all these into a comma separated string, and push them onto the hash
-          tag_fetchs = BmappingsTags.find(:all, :conditions=>["bmapping_id = ?",result.id])
+          tag_fetchs = BmappingsTags.where(["bmapping_id = ?",result.id])
           tag_array = Array.new
           for tag_fetch in tag_fetchs
             tag_array << Tag.find(tag_fetch.tag_id).tagname
@@ -90,14 +90,14 @@ class Bookmark < ActiveRecord::Base
         end
       elsif (order_by == "most_popular")
         ## returns the url boomarked by the most number of users, the discoverer of that url, the title and description provided by the discoverer
-        result_records = Bookmark.find(:all, :order =>"user_count DESC", :limit =>20)
+        result_records = Bookmark.all(:order =>"user_count DESC", :limit =>20)
         for result in result_records
           ## for each tuple returned by the query above, create a new hash, store the values appropriately, and append into the return_array
           result_hash = Hash.new
           result_hash["url"] = result.url
           result_hash["user"] = User.find(result.discoverer_user_id).name
           result_hash["copied_by"] = result.user_count
-          b_u_mapping = Bmapping.find(:first, :conditions =>["bookmark_id = ? and user_id = ?", result.id, result.discoverer_user_id])
+          b_u_mapping = Bmapping.where(["bookmark_id = ? and user_id = ?", result.id, result.discoverer_user_id]).first
           result_hash["id"] = b_u_mapping.id
           result_hash["description"] = b_u_mapping.description
           result_hash["title"] = b_u_mapping.title
@@ -105,7 +105,7 @@ class Bookmark < ActiveRecord::Base
           ## first retrieve all the tag_ids mapped to the BMapping id. Then retrieve all the tag names of the tag_ids picked up.
           ## Append all these into a comma separated string, and push them onto the hash
 
-          tag_fetchs = BmappingsTags.find(:all, :conditions=>["bmapping_id = ?",b_u_mapping.id])
+          tag_fetchs = BmappingsTags.where(["bmapping_id = ?",b_u_mapping.id])
           tag_array = Array.new
           for tag_fetch in tag_fetchs
             tag_array << Tag.find(tag_fetch.tag_id).tagname
@@ -129,7 +129,7 @@ class Bookmark < ActiveRecord::Base
       first_time = "true"
       for each_tag in @tags
 
-        q_tuples = BmappingsTags.find(:all, :conditions =>["tag_id = ?", each_tag])
+        q_tuples = BmappingsTags.where(["tag_id = ?", each_tag])
 
         if first_time == "true"
           for q_t in q_tuples
@@ -147,7 +147,7 @@ class Bookmark < ActiveRecord::Base
 
       end
       ## now you have qualifer tuples with all the required bmapping ids - search for the req ones
-      temp_result_records =  Bmapping.find(:all, :conditions =>["id in (?)", @q_tuples_with_all_tags])
+      temp_result_records =  Bmapping.where(["id in (?)", @q_tuples_with_all_tags])
       result_records = Array.new
       ## organize these tuples in the order of most earliest, most popular
       if (order_by =="most_recent")
@@ -169,7 +169,7 @@ class Bookmark < ActiveRecord::Base
         ## first retrieve all the tag_ids mapped to the BMapping id. Then retrieve all the tag names of the tag_ids picked up.
         ## Append all these into a comma separated string, and push them onto the hash
 
-        tag_fetchs = BmappingsTags.find(:all,:conditions=>["bmapping_id =?",result.id])
+        tag_fetchs = BmappingsTags.where(["bmapping_id =?",result.id])
         tag_array = Array.new
         for tag_fetch in tag_fetchs
           tag_array <<  Tag.find(tag_fetch.tag_id).tagname
@@ -191,7 +191,7 @@ class Bookmark < ActiveRecord::Base
       first_time = "true"
       for each_tag in @tags
         ##search for all qualifier tuples with b
-        q_tuples = BmappingsTags.find(:all, :conditions =>["tag_id = ?", each_tag])
+        q_tuples = BmappingsTags.where(["tag_id = ?", each_tag])
         for q_t in q_tuples
         end
 
@@ -212,7 +212,7 @@ class Bookmark < ActiveRecord::Base
 
 
       ## now you have qualifer tuples with all the required bmapping ids - search for the req ones
-      temp_result_records =  Bmapping.find(:all, :conditions =>["id in (?) and user_id = ?", @q_tuples_with_all_tags,this_user_id ])
+      temp_result_records =  Bmapping.where(["id in (?) and user_id = ?", @q_tuples_with_all_tags,this_user_id ])
 
       ## organize these tuples in the order of most earliest, most popular
       result_records = Array.new
@@ -236,7 +236,7 @@ class Bookmark < ActiveRecord::Base
         ## first retrieve all the tag_ids mapped to the BMapping id. Then retrieve all the tag names of the tag_ids picked up.
         ## Append all these into a comma separated string, and push them onto the hash
 
-        tag_fetchs = BmappingsTags.find(:all, :conditions=>["bmapping_id=?",result.id])
+        tag_fetchs = BmappingsTags.where(["bmapping_id=?",result.id])
         tag_array = Array.new
         for tag_fetch in tag_fetchs
           tag_array <<  Tag.find(tag_fetch.tag_id).tagname
@@ -255,7 +255,7 @@ class Bookmark < ActiveRecord::Base
 
     # Check if bookmark url exists.
     def self.check_bookmark_exists (b_url)
-      bookmark_resource = Bookmark.find(:first, :conditions=>["url = ?",b_url])
+      bookmark_resource = Bookmark.where(["url = ?",b_url]).first
       if bookmark_resource.nil?
         return false
       else
@@ -264,11 +264,11 @@ class Bookmark < ActiveRecord::Base
     end
 
     def self.check_bmapping_exists(b_url, session_user)
-      bookmark_resource = Bookmark.find(:first, :conditions=>["url = ?",b_url])
+      bookmark_resource = Bookmark.where(["url = ?",b_url]).first
       if bookmark_resource.nil?  #Bookmark doesn't exist, then no chance of finding bmapping
         return false
       end
-      bookmark_user_mapping = Bmapping.find(:first, :conditions =>["user_id = ? and bookmark_id = ?", session_user.id, bookmark_resource.id])
+      bookmark_user_mapping = Bmapping.where(["user_id = ? and bookmark_id = ?", session_user.id, bookmark_resource.id]).first
       if bookmark_user_mapping.nil?
         return false
       else
@@ -278,7 +278,7 @@ class Bookmark < ActiveRecord::Base
 
     # Adds a bookmark and its various associations
     def self.add_bookmark(b_url, b_title, b_tags_text, b_description,session_user,topicid)
-      bookmark_resource = Bookmark.find(:first, :conditions => ["url = ?",b_url])
+      bookmark_resource = Bookmark.where(["url = ?",b_url]).first
 
       # Bookmark with the same url does not exists.
       if bookmark_resource.nil?
@@ -291,7 +291,7 @@ class Bookmark < ActiveRecord::Base
 
         # Bookmark with the same url exists.
       else
-        bmapping = Bmapping.find_by_bookmark_id_and_user_id(bookmark_resource.id,session_user.id)
+        bmapping = Bmapping.where(bookmark_id: bookmark_resource.id, user_id: session_user.id).first
         # Bookmark with the same user - bmapping exists.
         if ( !bmapping.nil? )
           topic = SignUpTopic.find(topicid)
@@ -348,14 +348,14 @@ class Bookmark < ActiveRecord::Base
       tag_array = BookmarksHelper.separate_tags(b_tags_text)
       for each_tag in tag_array
         # Look for each tag that is present in tags, if not make them, then make the BTU entry
-        tag_tuple = Tag.find(:first, :conditions =>["tagname = ?",each_tag])
+        tag_tuple = Tag.where(["tagname = ?",each_tag]).first
         if tag_tuple.nil?
           tag_tuple = Tag.new
           tag_tuple.tagname = each_tag
           tag_tuple.save
         end
         # Check if there is an entry for this tag, this user and this bookmark (via bmappings table)
-        btu_tuple = BmappingsTags.find(:first, :conditions =>[ "tag_id = ? and bmapping_id = ?", tag_tuple.id, bookmark_user_mapping.id] )
+        btu_tuple = BmappingsTags.where([ "tag_id = ? and bmapping_id = ?", tag_tuple.id, bookmark_user_mapping.id] ).first
         if btu_tuple.nil?
           btu_tuple = BmappingsTags.new
           btu_tuple.tag_id = tag_tuple.id
@@ -386,7 +386,7 @@ class Bookmark < ActiveRecord::Base
           # For each tuple returned from the bmapping, generate a hash, containing the url, the specified user's name, date this mapping was made,
           ## title, and description provided by this user. Store these hashes sequentially in a array ad return the array
 
-          result_records = Bmapping.find(:all, :conditions=>[" user_id = ?", the_userid], :order =>"date_created DESC", :limit => 20)
+          result_records = Bmapping.where([" user_id = ?", the_userid].order("date_created DESC").limit(20)
           for result in result_records
             result_hash = Hash.new
             result_hash["id"] = result.id
@@ -400,7 +400,7 @@ class Bookmark < ActiveRecord::Base
             ## first retrieve all the tag_ids mapped to the BMapping id. Then retrieve all the tag names of the tag_ids picked up.
             ## Append all these into a comma separated string, and push them onto the hash
 
-            tag_fetchs = BmappingsTags.find(:all, :conditions =>["bmapping_id = ?",result.id])
+            tag_fetchs = BmappingsTags.where(["bmapping_id = ?",result.id])
             tag_array = Array.new
             for tag_fetch in tag_fetchs
               tag_array << Tag.find(tag_fetch.tag_id).tagname
@@ -411,7 +411,7 @@ class Bookmark < ActiveRecord::Base
         elsif ( order_by == "most_popular")
           ### retrieving the most popular records that this user.(The user need not be the discoverer). First retrieve the the user's bookmarks from the bmapping.
           ### order these records, based on the user_count of the url
-          temp_result_records = Bmapping.find(:all, :conditions=>[" user_id = ?", the_userid])
+          temp_result_records = Bmapping.where([" user_id = ?", the_userid])
           ## order result records by result.user_count a.sort {|x,y| y <=> x }
           result_records = temp_result_records.sort {|x,y| y.bookmark.user_count <=> x.bookmark.user_count}
           for result in result_records
@@ -426,7 +426,7 @@ class Bookmark < ActiveRecord::Base
             ## first retrieve all the tag_ids mapped to the BMapping id. Then retrieve all the tag names of the tag_ids picked up.
             ## Append all these into a comma separated string, and push them onto the hash
 
-            tag_fetchs = BmappingsTags.find(:all, :conditions =>["bmapping_id = ?",result.id])
+            tag_fetchs = BmappingsTags.where(["bmapping_id = ?",result.id])
             tag_array = Array.new
             for tag_fetch in tag_fetchs
               tag_array << Tag.find(tag_fetch.tag_id).tagname

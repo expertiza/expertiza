@@ -39,7 +39,7 @@ class MergeQuestionnaireAndType < ActiveRecord::Migration
      
     add_column :questionnaires, :type, :string
     add_column :questionnaires, :display_type, :string
-    Questionnaire.find(:all).each{
+    Questionnaire.find_each{
       | questionnaire |
       records = ActiveRecord::Base.connection.select_all("select * from questionnaire_types where id = #{questionnaire.type_id}")
       type = records[0]['name']

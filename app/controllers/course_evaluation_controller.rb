@@ -8,7 +8,7 @@ class CourseEvaluationController < ApplicationController
       redirect_to '/'
       return
     end
-    deployments=SurveyParticipant.find_all_by_user_id(session[:user].id)
+    deployments=SurveyParticipant.where(user_id: session[:user].id)
     @surveys=Array.new
     deployments.each do |sd|
       survey_deployment=SurveyDeployment.find(sd.survey_deployment_id)

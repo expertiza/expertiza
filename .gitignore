@@ -1,5 +1,6 @@
 .bundle
 db/*.sqlite3
+db/*.sql
 log/*.log
 tmp/**/*
 config/database.yml
@@ -24,7 +25,7 @@ local.properties
 .classpath
 .settings/
 .loadpath
-
+config/secrets.yml
 # External tool builders
 .externalToolBuilders/
 
@@ -192,3 +193,5 @@ db/expertiza_scrubbed_2013_10_17.sql
 db/expertiza_scrubbed_2013_10_17.sql.gz
 .projectile
 .ruby-gemset
+.ruby-version
+mysql2psql.yml

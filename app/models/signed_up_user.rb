@@ -28,13 +28,10 @@ class SignedUpUser < ActiveRecord::Base
       participant_names = SignedUpUser.find_by_sql(["SELECT s.name as u_name, t.name as team_name FROM users s, teams t, teams_users u WHERE t.id = u.team_id and u.user_id = s.id and t.id = ?", participant.team_id])
       team_name_added = false
       names = '(missing team)'
+
       for participant_name in participant_names
         if team_name_added == false
-          if  participant_names.size !=1
-            names =  participant_name.team_name + " "
-          else
-            names =  participant_name.u_name + " "
-          end
+          names = "["+participant_name.team_name+"] "+ participant_name.u_name + " "
           team_name_added = true
         else
           names = names + participant_name.u_name + " "
@@ -43,6 +40,7 @@ class SignedUpUser < ActiveRecord::Base
       @participants[i].name = names
       i = i + 1
     end
+
     @participants
   end
 
@@ -65,13 +63,13 @@ class SignedUpUser < ActiveRecord::Base
   #If a signup sheet exists then release topics that the given team has selected for the given assignment.
   def self.release_topics_selected_by_team_for_assignment(team_id, assignment_id)
     #Get all the signups for the team
-    old_teams_signups = SignedUpUser.find_all_by_creator_id(team_id)
+    old_teams_signups = SignedUpUser.where(creator_id: team_id)
 
     #If the team has signed up for the topic and they are on the waitlist then remove that team from the waitlist.
     if !old_teams_signups.nil?
       for old_teams_signup in old_teams_signups
         if old_teams_signup.is_waitlisted == false # i.e., if the old team was occupying a slot, & thus is releasing a slot ...
-          first_waitlisted_signup = SignedUpUser.find_by_topic_id_and_is_waitlisted(old_teams_signup.topic_id, true)
+          first_waitlisted_signup = SignedUpUser.where(topic_id: old_teams_signup.topic_id, is_waitlisted:  true).first
           if !first_waitlisted_signup.nil?
             Invitation.remove_waitlists_for_team(old_teams_signup.topic_id, assignment_id)
           end

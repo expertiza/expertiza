@@ -1,5 +1,4 @@
 class GradesController < ApplicationController
-  use_google_charts
   helper :file
   helper :submitted_content
   helper :penalty
@@ -22,65 +21,62 @@ class GradesController < ApplicationController
   #in the scores of all the reviews.
   def view
     @assignment = Assignment.find(params[:id])
-    @questions = Hash.new
-    questionnaires = @assignment.questionnaires
-    questionnaires.each {
-      |questionnaire|
-      @questions[questionnaire.symbol] = questionnaire.questions
-    }
-    @scores = @assignment.get_scores(@questions)
+    @questions = {}
+    questionnaires = @assignment.questionnaires_with_questions
+
+    if @assignment.varying_rubrics_by_round?
+      questionnaires.each {
+          |questionnaire|
+        round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
+        if(round!=nil)
+          questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
+        else
+          questionnaire_symbol = questionnaire.symbol
+        end
+        @questions[questionnaire_symbol] = questionnaire.questions
+      }
+    else      #if this assignment does not have "varying rubric by rounds" feature
+      questionnaires.each {
+          |questionnaire|
+        @questions[questionnaire.symbol] = questionnaire.questions
+      }
+    end
+    @scores = @assignment.scores(@questions)
     calculate_all_penalties(@assignment.id)
   end
 
   def view_my_scores
-
     @participant = AssignmentParticipant.find(params[:id])
-
-    @average_score_results = Array.new
-    @average_score_results = ScoreCache.get_class_scores(@participant.id)
-
-    @statistics = Array.new
-    @average_score_results.each { |x|
-      @statistics << x
-    }
-
-    @average_reviews = ScoreCache.get_reviews_average(@participant.id)
-    @average_metareviews = ScoreCache.get_metareviews_average(@participant.id)
-
-    @my_reviews = ScoreCache.my_reviews(@participant.id)
-
-    @my_metareviews = ScoreCache.my_metareviews(@participant.id)
 
     return if redirect_when_disallowed
     @assignment = @participant.assignment
-    @questions = Hash.new
+    @questions = {}
     questionnaires = @assignment.questionnaires
-    questionnaires.each {
-      |questionnaire|
-      @questions[questionnaire.symbol] = questionnaire.questions
-    }
-    ## When user clicks on the notification, it should go away
-    #deleting all review notifications
-    rmaps = ParticipantReviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(@participant.id, @participant.assignment.id)
-    for rmap in rmaps
-      rmap.notification_accepted = true
-      rmap.save
+    questionnaires.each do |questionnaire|
+      round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id:questionnaire.id).first.used_in_round
+      if(round!=nil)
+        questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
+      else
+        questionnaire_symbol = questionnaire.symbol
+      end
+      @questions[questionnaire_symbol] = questionnaire.questions
     end
-    ############
 
-    #deleting all metareview notifications
-    rmaps = ParticipantReviewResponseMap.find_all_by_reviewer_id_and_reviewed_object_id(@participant.id, @participant.parent_id)
-    for rmap in rmaps
-      mmaps = MetareviewResponseMap.find_all_by_reviewee_id_and_reviewed_object_id(rmap.reviewer_id, rmap.map_id)
-      if !mmaps.nil?
-        for mmap in mmaps
-          mmap.notification_accepted = true
-          mmap.save
-        end
+    rmaps = ParticipantReviewResponseMap.where(reviewee_id: @participant.id, reviewed_object_id: @participant.assignment.id)
+    rmaps.find_each do |rmap|
+      rmap.update_attribute :notification_accepted, true
+    end
+
+    rmaps = ParticipantReviewResponseMap.where reviewer_id: @participant.id, reviewed_object_id: @participant.parent_id
+    rmaps.find_each do |rmap|
+      mmaps = MetareviewResponseMap.where reviewee_id: rmap.reviewer_id, reviewed_object_id: rmap.map_id
+      mmaps.find_each do |mmap|
+        mmap.update_attribute :notification_accepted, true
       end
     end
 
-    @pscore = @participant.get_scores(@questions)
+    @topic = @participant.topic
+    @pscore = @participant.scores(@questions)
     @stage = @participant.assignment.get_current_stage(@participant.topic_id)
     calculate_all_penalties(@assignment.id)
   end
@@ -101,7 +97,7 @@ class GradesController < ApplicationController
   def instructor_review
     participant = AssignmentParticipant.find(params[:id])
 
-    reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, participant.assignment.id)
+    reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id:  participant.assignment.id).first
     if reviewer.nil?
       reviewer = AssignmentParticipant.create(:user_id => session[:user].id, :parent_id => participant.assignment.id)
       reviewer.set_handle()
@@ -111,7 +107,7 @@ class GradesController < ApplicationController
 
     if participant.assignment.team_assignment?
       reviewee = participant.team
-      review_mapping = TeamReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)
+      review_mapping = TeamReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
 
       if review_mapping.nil?
         review_exists = false
@@ -137,14 +133,14 @@ class GradesController < ApplicationController
   def send_grading_conflict_email
     email_form = params[:mailer]
     assignment = Assignment.find(email_form[:assignment])
-    recipient = User.find(:first, :conditions => ["email = ?", email_form[:recipients]])
+    recipient = User.where(["email = ?", email_form[:recipients]]).first
 
     body_text = email_form[:body_text]
     body_text["##[recipient_name]"] = recipient.fullname
     body_text["##[recipients_grade]"] = email_form[recipient.fullname+"_grade"]+"%"
     body_text["##[assignment_name]"] = assignment.name
 
-    Mailer.deliver_message(
+    Mailer.sync_message(
       {:recipients => email_form[:recipients],
        :subject => email_form[:subject],
        :from => email_form[:from],
@@ -153,7 +149,7 @@ class GradesController < ApplicationController
          :partial_name => "grading_conflict"
        }
     }
-    )
+    ).deliver
 
     flash[:notice] = "Your email to " + email_form[:recipients] + " has been sent. If you would like to send an email to another student please do so now, otherwise click Back"
     redirect_to :action => 'conflict_email_form',
@@ -209,7 +205,7 @@ class GradesController < ApplicationController
       participant = AssignmentParticipant.find(params[:id])
       total_score = params[:total_score]
       if sprintf("%.2f", total_score) != params[:participant][:grade]
-        participant.update_attribute('grade', params[:participant][:grade])
+        participant.update_attribute(:grade, params[:participant][:grade])
         if participant.grade.nil?
           message = "The computed score will be used for "+participant.user.name
         else
@@ -251,7 +247,7 @@ class GradesController < ApplicationController
           end
         end
       else
-        reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, @participant.assignment.id)
+        reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id: @participant.assignment.id).first
         return true unless current_user_id?(reviewer.user_id)
       end
       return false
@@ -273,28 +269,26 @@ class GradesController < ApplicationController
     end
 
     def calculate_all_penalties(assignment_id)
-      @all_penalties = Hash.new
-      @assignment = Assignment.find_by_id(assignment_id)
-      participant_count = 0
-      calculate_for_participant = false
-      if @assignment.is_penalty_calculated == false
+      @all_penalties = {}
+      @assignment = Assignment.find(assignment_id)
+      unless @assignment.is_penalty_calculated
         calculate_for_participants = true
       end
-      Participant.find_all_by_parent_id(assignment_id).each do |participant|
+      Participant.where(parent_id: assignment_id).each do |participant|
         penalties = calculate_penalty(participant.id)
-        @total_penalty =0
+        @total_penalty = 0
         if(penalties[:submission] != 0 || penalties[:review] != 0 || penalties[:meta_review] != 0)
-          if(penalties[:submission].nil?)
-            penalties[:submission]=0
+          unless penalties[:submission]
+            penalties[:submission] = 0
           end
-          if(penalties[:review].nil?)
-            penalties[:review]=0
+          unless penalties[:review]
+            penalties[:review] = 0
           end
-          if(penalties[:meta_review].nil?)
-            penalties[:meta_review]=0
+          unless penalties[:meta_review]
+            penalties[:meta_review] = 0
           end
           @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
-          l_policy = LatePolicy.find_by_id(@assignment.late_policy_id)
+          l_policy = LatePolicy.find(@assignment.late_policy_id)
           if(@total_penalty > l_policy.max_penalty)
             @total_penalty = l_policy.max_penalty
           end
@@ -309,13 +303,13 @@ class GradesController < ApplicationController
             CalculatedPenalty.create(penalty_attr3)
           end
         end
-        @all_penalties[participant.id] = Hash.new
+        @all_penalties[participant.id] = {}
         @all_penalties[participant.id][:submission] = penalties[:submission]
         @all_penalties[participant.id][:review] = penalties[:review]
         @all_penalties[participant.id][:meta_review] = penalties[:meta_review]
         @all_penalties[participant.id][:total_penalty] = @total_penalty
       end
-      if @assignment.is_penalty_calculated == false
+      unless @assignment.is_penalty_calculated
         @assignment.update_attribute(:is_penalty_calculated, true)
       end
     end

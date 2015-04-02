@@ -1,6 +1,6 @@
 <table width="100%" cellpadding="10">
   <tr CLASS="head" >
-    <% has_signup_sheet = !(SignUpTopic.find(:first, :conditions => ['assignment_id = ?', assignment.id])).nil? %>
+    <% has_signup_sheet = !(SignUpTopic.where(['assignment_id = ?', assignment.id])).first.nil? %>
     <% if has_signup_sheet %>
       <th width="20%">Topic selected</th>
     <%end%>
@@ -67,7 +67,7 @@
         <% if assignment.max_team_size < 2 %>
           (<%= contributor.fullname %>)
         <%else%>
-          <%team_members = TeamsUser.find_all_by_team_id(contributor.id)%>
+          <%team_members = TeamsUser.where(team_id: contributor.id)%>
           <%team_members.each{|team_member|
           %><font size="1"><%=User.find(team_member['user_id']).fullname%>(<%=User.find(team_member['user_id']).name%>)</font><br/><%
           }%>
@@ -111,7 +111,7 @@
 
           <td width="50%">
             <table width="100%">
-              <% rmappings = MetareviewResponseMap.find_all_by_reviewed_object_id(map.map_id)
+              <% rmappings = MetareviewResponseMap.where(reviewed_object_id: map.map_id)
               rmappings.sort! {|a,b| a.reviewer.fullname <=> b.reviewer.fullname } %>
             <% rmappings.each{
               | rmap |
@@ -145,7 +145,7 @@
   <% } %>
 </table>
 <%
-    session[:return_to] = request.request_uri
+    session[:return_to] = request.url
   %>
 
 <% if !assignment.dynamic_reviewer_assignment? %>

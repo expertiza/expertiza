@@ -56,15 +56,15 @@ class QuestionnaireNode < Node
                           end
                           conditions += ')'
         end
-        find(:all, :include => :questionnaire, :conditions => [conditions,values], :order => "questionnaires.#{sortvar} #{sortorder}")
+        all().includes(:questionnaire).conditions([conditions,values]).order("questionnaires.#{sortvar} #{sortorder}")
       else
         conditions += " and questionnaires.name LIKE ?"
         search = "%"+search+"%"
-        find(:all, :include => :questionnaire, :conditions => [conditions,values,search], :order => "questionnaires.#{sortvar} #{sortorder}")
+        self.includes(:questionnaire).where([conditions,values,search]).order("questionnaires.#{sortvar} #{sortorder}")
         end
 
     else
-      find(:all, :include => :questionnaire, :conditions => [conditions,values], :order => "questionnaires.#{sortvar} #{sortorder}")
+      self.includes(:questionnaire).where([conditions,values]).order("questionnaires.#{sortvar} #{sortorder}")
     end
   end
 

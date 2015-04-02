@@ -1,6 +1,6 @@
 class DowncasePermissions < ActiveRecord::Migration
   def self.up
-      permissions = Permission.find(:all)
+    permissions = Permission.all
       permissions.each{
         | permission |
         permission.name = permission.name.downcase
@@ -10,7 +10,7 @@ class DowncasePermissions < ActiveRecord::Migration
   end
 
   def self.down
-      permissions = Permission.find(:all)
+    permissions = Permission.all
       permissions.each{
         | permission |
         permission.name = permission.name.downcase

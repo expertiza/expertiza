@@ -65,11 +65,13 @@ class User < ActiveRecord::Base
   end
 
   def can_impersonate?(user)
+
     user &&
+      (self.role= super_admin?||
       self == user || # can impersonate self
       self.is_teaching_assistant_for?(user) || #TAs can impersonate their students
       self.is_creator_of?(user) ||
-      can_impersonate?(user.parent) # recursive
+      can_impersonate?(user.parent)) # recursive
   end
 
   def first_name

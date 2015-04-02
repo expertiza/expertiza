@@ -23,7 +23,7 @@
           <% if session[:user].nil? %>
           <% else %>
             <% if session[:user].role_id == 4 || session[:user].role_id == 3 || session[:user].role_id == 2 %>
-              <%= link_to "Search Log", Version %></a>
+              <%= link_to "Search log", Version %></a>
             <% end %>
           <% end %>
           <div>

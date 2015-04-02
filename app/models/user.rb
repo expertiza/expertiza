@@ -118,7 +118,7 @@ class User < ActiveRecord::Base
 
   def valid_password?(password)
     Authlogic::CryptoProviders::Sha1.stretches = 1
-    Authlogic::CryptoProviders::Sha1.matches?(crypted_password, *[self.password_salt.to_s + password
+    Authlogic::CryptoProviders::Sha1.matches?(crypted_password, *[self.password_salt.to_s + password])
   end
 
   # Resets the password to be mailed to the user

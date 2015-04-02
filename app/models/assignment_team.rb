@@ -76,6 +76,7 @@ class AssignmentTeam < Team
     }
     return participants
   end
+  alias_method :get_participants, :participants
 
   def delete
     if read_attribute(:type) == 'AssignmentTeam'

@@ -47,22 +47,13 @@ class GradesController < ApplicationController
 
   def view_my_scores
     @participant = AssignmentParticipant.find(params[:id])
-    @average_score_results = ScoreCache.get_class_scores(@participant.id)
-
-    @statistics = @average_score_results
-
-    @average_reviews = ScoreCache.get_reviews_average(@participant.id)
-    @average_metareviews = ScoreCache.get_metareviews_average(@participant.id)
-
-    @my_reviews = ScoreCache.my_reviews(@participant.id)
-    @my_metareviews = ScoreCache.my_metareviews(@participant.id)
 
     return if redirect_when_disallowed
     @assignment = @participant.assignment
     @questions = {}
     questionnaires = @assignment.questionnaires
     questionnaires.each do |questionnaire|
-      round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
+      round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id:questionnaire.id).first.used_in_round
       if(round!=nil)
         questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
       else

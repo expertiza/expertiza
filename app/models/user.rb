@@ -65,13 +65,24 @@ class User < ActiveRecord::Base
   end
 
   def can_impersonate?(user)
+    if self.role.super_admin?
+      return true
+    end
+    if self.is_teaching_assistant_for?(user)
+      return true
+    end
+    if self.is_recursively_parent_of(user)
+      return true
+    end
+    false
+  end
 
-    user &&
-      (self.role= super_admin?||
-      self == user || # can impersonate self
-      self.is_teaching_assistant_for?(user) || #TAs can impersonate their students
-      self.is_creator_of?(user) ||
-      can_impersonate?(user.parent)) # recursive
+  def is_recursively_parent_of(user)
+    p=user.parent
+    return false if p.nil?
+    return true if p==self
+    return false if p.role.super_admin?
+    return self.is_recursively_parent_of(p)
   end
 
   def first_name
@@ -107,7 +118,7 @@ class User < ActiveRecord::Base
 
   def valid_password?(password)
     Authlogic::CryptoProviders::Sha1.stretches = 1
-    Authlogic::CryptoProviders::Sha1.matches?(crypted_password, *[self.password_salt.to_s + password])
+    Authlogic::CryptoProviders::Sha1.matches?(crypted_password, *[self.password_salt.to_s + password
   end
 
   # Resets the password to be mailed to the user

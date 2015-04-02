@@ -168,19 +168,6 @@ class ReviewMappingController < ApplicationController
     redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
   end
 
-  def assign_metareviewer_dynamically
-    begin
-      assignment   = Assignment.find(params[:assignment_id])
-      metareviewer = AssignmentParticipant.where(user_id: params[:metareviewer_id], parent_id:  assignment.id).first
-
-      assignment.assign_metareviewer_dynamically(metareviewer)
-
-    rescue Exception => e
-      flash[:alert] = (e.nil?) ? $! : e
-    end
-
-    redirect_to :controller => 'student_review', :action => 'list', :id => metareviewer.id
-  end
 
   # assigns the quiz dynamically to the participant
   def assign_quiz_dynamically

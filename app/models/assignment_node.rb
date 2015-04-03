@@ -46,11 +46,8 @@ class AssignmentNode < Node
     else
       find_conditions = [conditions, values]
     end
-<<<<<<< HEAD
     self.includes(:assignment).where(find_conditions).order("assignments.#{sortvar} #{sortorder}")
-=======
     find(:all, :include => :assignment, :conditions => find_conditions, :order => "assignments.#{sortvar} #{sortorder}")
->>>>>>> 2b0d82468950b1cbd827e0b97dd55b0c76bf29e7
 
   end
 
@@ -61,53 +58,41 @@ class AssignmentNode < Node
 
   # Gets the name from the associated object
   def get_name
-<<<<<<< HEAD
   	unless @assign_node
     	@assign_node = Assignment.find(self.node_object_id)
     end
     @assign_node.name
-=======
     Assignment.find(self.node_object_id).name
->>>>>>> 2b0d82468950b1cbd827e0b97dd55b0c76bf29e7
   end
 
   # Gets the directory_path from the associated object
   def get_directory
-<<<<<<< HEAD
     #Assignment.find(self.node_object_id).directory_path
     unless @assign_node
     	@assign_node = Assignment.find(self.node_object_id)
     end
     @assign_node.directory_path
-=======
     Assignment.find(self.node_object_id).directory_path
->>>>>>> 2b0d82468950b1cbd827e0b97dd55b0c76bf29e7
   end
 
   # Gets the created_at from the associated object
   def get_creation_date
-<<<<<<< HEAD
     #Assignment.find(self.node_object_id).created_at
     unless @assign_node
     	@assign_node = Assignment.find(self.node_object_id)
     end
     @assign_node.created_at
-=======
     Assignment.find(self.node_object_id).created_at
->>>>>>> 2b0d82468950b1cbd827e0b97dd55b0c76bf29e7
   end
 
   # Gets the updated_at from the associated object
   def get_modified_date
-<<<<<<< HEAD
     #Assignment.find(self.node_object_id).updated_at
     unless @assign_node
    		@assign_node = Assignment.find(self.node_object_id)
     end
     @assign_node.updated_at
-=======
     Assignment.find(self.node_object_id).updated_at
->>>>>>> 2b0d82468950b1cbd827e0b97dd55b0c76bf29e7
   end
 
   # Gets any TeamNodes associated with this object

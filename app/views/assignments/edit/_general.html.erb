@@ -168,15 +168,6 @@ function is_coding_assignmentChanged(){
   </tr>
 
   <tr>
-    <td style='padding:5px' id='assignment_availability_flag_field'>
-      <input name="assignment_form[assignment][availability_flag]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][availability_flag]', 'true', @assignment_form.assignment.availability_flag) %>
-      <%= label_tag('assignment_form[assignment][availability_flag]', 'Available to students?') %>
-    </td>
-  </tr>
-
-
-  <tr>
     <td style='padding:5px' id='assignment_is_coding_assignment_field'>
       <input name="assignment_form[assignment][is_coding_assignment]" type="hidden" value="false"/>
       <%= check_box_tag('assignment_form[assignment][is_coding_assignment]', 'true', @assignment_form.assignment.is_coding_assignment, {:onchange => 'is_coding_assignmentChanged()'}) %>
@@ -199,6 +190,14 @@ function is_coding_assignmentChanged(){
     </td>
   </tr>
 
+  <!--"available to student?" should be the last checkbox-->
+  <tr>
+    <td style='padding:5px' id='assignment_availability_flag_field'>
+      <input name="assignment_form[assignment][availability_flag]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][availability_flag]', 'true', @assignment_form.assignment.availability_flag) %>
+      <%= label_tag('assignment_form[assignment][availability_flag]', 'Available to students?') %>
+    </td>
+  </tr>
 </table>
 
 

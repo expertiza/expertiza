@@ -47,7 +47,9 @@ gem 'rjb'
 gem 'rubyzip'
 gem 'rwordnet'
 gem 'sass-rails', '~> 4.0.2'
+=begin
 ruby '1.9.3'
+
 
 gem 'rails', '~>3.0.0'
 
@@ -69,13 +71,14 @@ gem 'gdata', :require => false
 gem 'hoptoad_notifier'
 gem 'jquery-rails'
 gem 'mysql2', '< 0.3'
+=end
 gem 'nokogiri'
 gem 'open-uri-cached'
 gem 'paper_trail'
 gem 'rake'
 gem 'rgl', :require => 'rgl/adjacency'
 gem 'rjb'
-gem 'rubyzip', '< 1.0.0'
+#gem 'rubyzip', '< 1.0.0'
 gem 'rwordnet'
 gem 'seer'
 gem 'sprockets'
@@ -87,6 +90,7 @@ gem 'turbolinks'
 gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
+
 
 group :development do
   gem 'daemons'

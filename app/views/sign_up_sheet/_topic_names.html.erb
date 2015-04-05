@@ -3,6 +3,8 @@
   <span class="inline" id="<%= i %>_hide" style="display: none"><%= topic.topic_name %></span>
 </a>
 
+<!--if 'Has teams' is not checked, the UI should not show the team name on the topic list.-->
+<% if(@assignment_form.assignment.max_team_size > 1)%>
 <div id="<%= i %>_myDiv">
   <% if !@participants.nil? && @participants.size > 0 %>
     <% chooser_present = false %>
@@ -22,3 +24,4 @@
     <br/>
   <% end %>
 </div>
+<% end %>

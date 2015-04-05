@@ -65,7 +65,12 @@
             due_at = '';
         }
         else{
-            due_at = new Date(due_at.substr(0,16)).format('yyyy/mm/dd HH:MM');
+            var tzone = due_at.substr(23,6);
+            if(tzone=='Z'){
+                tzone = '+00:00';
+            }
+            var timezone = "(GMT"+tzone.toString()+")";
+            due_at = due_at.substr(0,4)+'/'+due_at.substr(5,2)+'/'+due_at.substr(8,2)+' '+due_at.substr(11,2)+':'+due_at.substr(14,2)+' '+timezone;
         }
         var due_name = due_date.deadline_name;
         if (due_name == null){

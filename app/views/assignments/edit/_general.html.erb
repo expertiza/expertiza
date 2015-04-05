@@ -108,11 +108,16 @@ function is_coding_assignmentChanged(){
 
   <tr>
     <td style='padding:5px' id='assignment_team_assignment_field'>
-      <%= check_box_tag('team_assignment', 'true', @assignment_form.assignment.team_assignment?, {:onChange => 'hasTeamsChanged()'}) %>
+      <% if(@assignment_form.assignment.max_team_size == 1)%>
+        <%= check_box_tag('team_assignment', 'true', false, {:onChange => 'hasTeamsChanged()'}) %>
+      <% else %>
+        <%= check_box_tag('team_assignment', 'true', @assignment_form.assignment.team_assignment?, {:onChange => 'hasTeamsChanged()'}) %>
+      <% end %>
+      <% @assignment_form.assignment.max_team_size %>
       <%= label_tag('team_assignment', 'Has teams?') %>
     </td>
 
-    <td style='padding:5px' id='assignment_team_count_field' <%= 'hidden' unless @assignment_form.assignment.team_assignment? %>>
+    <td style='padding:5px' id='assignment_team_count_field' <%= 'hidden' if @assignment_form.assignment.max_team_size == 1%>>
       <%= label_tag('assignment_form[assignment][max_team_size]', 'Maximum number of members per team:') %>
       <%= text_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size, {:style => 'width:20px'}) %>
     </td>
@@ -211,16 +216,17 @@ function is_coding_assignmentChanged(){
           team_count_field.removeAttr('hidden');
 
         } else {
-          if (<%= @assignment_form.assignment.has_teams?%>) {
             if (confirm(msg)) {
               team_count_field.attr('hidden', true);
+              document.getElementById('assignment_form_assignment_max_team_size').value = '1';
+
             } else {
               checkbox.prop('checked', true);
             }
-          } else {
-            team_count_field.attr('hidden', true);
-          }
-        }
+            if (<%= @assignment_form.assignment.max_team_size == 1%>){
+              team_count_field.attr('hidden', true);
+            }
+          } 
     }
 
     function wikiAssignmentChanged() {

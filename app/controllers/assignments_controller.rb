@@ -65,6 +65,9 @@ class AssignmentsController < ApplicationController
         @due_date_nameurl_notempty_checkbox = true
         break
       end
+      if dd.due_at.present?
+          dd.due_at = dd.due_at.to_s.in_time_zone(session[:user].timezonepref)
+      end
     end
     @assignment_questionnaires.each do  |aq|
       if(!(aq.used_in_round.nil?))
@@ -85,10 +88,9 @@ class AssignmentsController < ApplicationController
   def update
     @assignment_form= AssignmentForm.create_form_object(params[:id])
     params[:assignment_form][:assignment][:wiki_type_id] = 1 unless params[:assignment_wiki_assignment]
-
     #TODO: require params[:assignment][:directory_path] to be not null
     #TODO: insert warning if directory_path is duplicated
-    if @assignment_form.update_attributes(params[:assignment_form])
+    if @assignment_form.update_attributes(params[:assignment_form],session[:user])
         flash[:note] = 'Assignment was successfully saved.'
         #TODO: deal with submission path change
         # Need to rename the bottom-level directory and/or move intermediate directories on the path to an

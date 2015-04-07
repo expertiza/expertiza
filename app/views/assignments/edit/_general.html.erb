@@ -16,7 +16,7 @@ function requireSignUpChanged() {
 }
 
 function teamAssignmentChanged() {
-  var msg = 'Warning! Unchecking this box will remove teams that already exist.'
+  var msg = 'Warning! Unchecking this box will hide teams that already exist.'
 
   if (jQuery('#assignment_team_assignment').is(':checked')) {
     jQuery('#assignment_team_count_field').removeAttr('hidden');
@@ -208,7 +208,7 @@ function is_coding_assignmentChanged(){
 
 <script>
     function hasTeamsChanged() {
-      var msg = 'Warning! Unchecking this box will remove teams that already exist.';
+      var msg = 'Warning! Unchecking this box will hide teams that already exist.';
         var checkbox = jQuery('#team_assignment');
         var team_count_field = jQuery('#assignment_team_count_field');
 

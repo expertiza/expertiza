@@ -42,13 +42,11 @@ end
 
 # Note: This is not used yet in the view until we all decide to do so
 def remove_hyperlink
-
-  @participant = AssignmentParticipant.find(params[:id])
   @participant = AssignmentParticipant.find(params[:hyperlinks][:participant_id])
 
   return unless current_user_id?(@participant.user_id)
 
-  @participant.remove_hyperlink(params[:hyperlinks]['chk_links'].to_i)
+  @participant.remove_hyperlink(params['chk_links'].to_i)
   undo_link("Link has been removed successfully. ")
   redirect_to :action => 'edit', :id => @participant.id
 end
@@ -66,7 +64,7 @@ def submit_file
     @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
   end
 
-  curr_directory = participant.get_path.to_s + @current_folder.name
+  curr_directory = participant.path.to_s + @current_folder.name
 
 
   if !File.exists? curr_directory
@@ -148,7 +146,7 @@ def custom_submit_file
       @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
     end
 
-    curr_directory = participant.assignment.get_path.to_s+ "/" +params[:map].to_s + @current_folder.name
+    curr_directory = participant.assignment.path.to_s+ "/" +params[:map].to_s + @current_folder.name
     if !File.exists? curr_directory
       FileUtils.mkdir_p(curr_directory)
     else

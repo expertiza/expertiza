@@ -4,7 +4,7 @@ class StudentTask
 
   def initialize(args)
     @assignment = args[:assignment]
-    @current_stage = args[:current_stage]
+    @current_stage = args[:get_current_stage]
     @participant = args[:participant]
     @stage_deadline = args[:stage_deadline]
     @topic = args[:topic]
@@ -15,7 +15,7 @@ class StudentTask
       :participant => participant,
       :assignment => participant.assignment,
       :topic => participant.topic,
-      :current_stage => participant.current_stage,
+      :get_current_stage => participant.get_current_stage,
       :stage_deadline => (Time.parse(participant.stage_deadline) rescue Time.now + 1.years)
     )
   end
@@ -48,7 +48,7 @@ class StudentTask
   end
 
   def hyperlinks
-    @hyperlinks ||= participant.get_hyperlinks
+    @hyperlinks ||= participant.hyperlinks
   end
 
   def incomplete?

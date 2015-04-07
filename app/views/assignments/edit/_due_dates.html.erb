@@ -64,6 +64,14 @@
         if (due_at == null) {
             due_at = '';
         }
+        else{
+            var tzone = due_at.substr(23,6);
+            if(tzone=='Z'){
+                tzone = '+00:00';
+            }
+            var timezone = "(GMT"+tzone.toString()+")";
+            due_at = due_at.substr(0,4)+'/'+due_at.substr(5,2)+'/'+due_at.substr(8,2)+' '+due_at.substr(11,2)+':'+due_at.substr(14,2)+' '+timezone;
+        }
         var due_name = due_date.deadline_name;
         if (due_name == null){
             due_name = '';
@@ -94,13 +102,19 @@
         '<option value="3">Yes</option>' +
         '</select></td>';
 
-        html += '<td align="center" class="due_date_quiz_allowed_id" width="10%">' +
-        '<select id="due_date_quiz_allowed_id" name="assignment_form[due_date][][quiz_allowed_id]">' +
-        '<option value="">---</option>' +
-        '<option value="1">No</option>' +
-        '<option value="2">Late</option>' +
-        '<option value="3">Yes</option>' +
-        '</select></td>';
+        if (<%=@assignment_form.assignment.require_quiz%>)
+        {
+            html += '<td align="center" class="due_date_quiz_allowed_id" width="10%">' +
+            '<select id="due_date_quiz_allowed_id" name="assignment_form[due_date][][quiz_allowed_id]">' +
+            '<option value="">---</option>' +
+            '<option value="1">No</option>' +
+            '<option value="2">Late</option>' +
+            '<option value="3">Yes</option>' +
+            '</select></td>';
+        }
+        else
+        {
+        }
 
         html += '<td align="center" class="due_date_threshold" width="10%">' +
         '<select id="due_date_threshold" name="assignment_form[due_date][][threshold]">' +
@@ -168,13 +182,10 @@
     function changeReviewRounds() {
         var new_round_count = parseInt(jQuery('#assignment_form_assignment_rounds_of_reviews').val());
         if (new_round_count <= 0) {
-            alert('ERROR: number of rounds of review cannot be less than 0');
+            alert('ERROR: number of rounds of review should be greater than 0');
             return
         }
-        if (new_round_count == 1) {
-            alert('ERROR: number of rounds of review shoud be larger than 1');
-            return
-        }
+
         var i;
         var due_dates_table_element_list = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)');
         var current_round_count = 0;
@@ -270,7 +281,7 @@
 <!--Add a change name or url checkbox. By: Xiaoqiang Shao-->
 <input name="changenameurl" type="hidden" value="false" />
 <%= check_box_tag('changenameurl', 'true', @due_date_nameurl_notempty_checkbox,:onclick=>"handleChangenameurl(this.checked,due_date_name_column,due_date_url_column)" ) %>
-<%= label_tag('changenameurl', 'Change name and description url?') %>
+<%= label_tag('changenameurl', 'Name and description URL vary by round') %>
 
 <table class='exp' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden;'>
 
@@ -281,10 +292,14 @@
 <th width=8%>Review allowed</th>
 
 <th width=10%>Meta-review allowed</th>
-<th width=9%>Quiz allowed</th>
-<th width=8%>Reminder(hrs)</th><th width=10% id="due_date_name_column">Due Date Name</th>
+<%if @assignment_form.assignment.require_quiz%>
+  <th width=9%>Has quiz</th>
+<%end%>
+<th width=8%>Reminder(hrs)</th>
+<th width=10% id="due_date_name_column" >Due date name</th>
 <th width=10% id="due_date_url_column">Description URL</th>
-  </tr>
+
+</tr>
   <tr id='blank' style='display:hidden'></tr>
   <script>
     jQuery(document).ready(function () {
@@ -296,9 +311,9 @@
         //after webpage refreshes, hide or display name and url according to whether names and urls are empty in DB
         var due_date_name_column=document.getElementById("due_date_name_column");
         var due_date_url_column=document.getElementById("due_date_url_column");
-      <% if @due_date_nameurl_notempty =="false" %>
-        due_date_name_column.style.visibility="hidden";
-        due_date_url_column.style.visibility="hidden";
+      <% if @due_date_nameurl_notempty.nil? or @due_date_nameurl_notempty.eql? false %>
+        due_date_name_column.style.display="none";
+        due_date_url_column.style.display="none";
       <% end %>
 
     }());

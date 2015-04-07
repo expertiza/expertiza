@@ -9,7 +9,7 @@ class QuizQuestionnaire < Questionnaire
   end
 
   def get_assessments_for(participant)
-    participant.get_quizzes_taken()
+    participant.quizzes_taken()
   end
 
   def get_weighted_score(scores)

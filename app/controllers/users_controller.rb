@@ -17,8 +17,6 @@ class UsersController < ApplicationController
     end
   end
 
-
-
   def index
     if (current_user_role? == "Student")
       redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user]))

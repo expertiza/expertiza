@@ -27,7 +27,7 @@ class AssignmentForm
     assignment_form
   end
 
-  def update(attributes)
+  def update(attributes,user)
     @has_errors = false;
     has_late_policy = false;
     if attributes[:assignment][:late_policy_id].to_i > 0
@@ -37,7 +37,7 @@ class AssignmentForm
     end
     update_assignment(attributes[:assignment])
     update_assignment_questionnaires(attributes[:assignment_questionnaire])
-    update_due_dates(attributes[:due_date])
+    update_due_dates(attributes[:due_date],user)
     #delete the old queued items and recreate new ones if the assignment has late policy.
     if attributes[:due_date] and !@has_errors and has_late_policy
       delete_from_delayed_queue
@@ -80,12 +80,13 @@ class AssignmentForm
   end
 
   #code to save due dates
-  def update_due_dates(attributes)
+  def update_due_dates(attributes,user)
     attributes.each do |due_date|
+      if due_date[:due_at].blank? then
+        next
+      end
+      due_date[:due_at]= due_date[:due_at].to_s.in_time_zone(user.timezonepref).utc
       if due_date[:id].nil? or due_date[:id].blank?
-        if due_date[:due_at].blank? then
-          next
-        end
         dd = DueDate.new(due_date)
         if !dd.save
           @errors =@errors + @assignment.errors

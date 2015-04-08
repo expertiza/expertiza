@@ -17,7 +17,7 @@
 <% @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id) %>
 <% @participants = SignedUpUser.find_team_participants(@assignment.id)  %>
 
-<%= button_tag('Toggle', :type => 'button',:onclick => "javascript:toggleTeamsAndMembers()", :id => "toggle_teams_and_members")%>
+<a id="teamsAndMembers" onclick="showHideTeamAndMembers()">Hide all teams</a>
 <% if @sign_up_topics.size != 0 %>
     <table class="general">
       <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
@@ -45,6 +45,17 @@
 <a href="javascript:history.back()">Back</a>
 
 <script>
+function showHideTeamAndMembers(){
+  var element = document.getElementById('teamsAndMembers');
+  var show = element.innerHTML == 'Hide all teams';
+  if (show){
+    element.innerHTML='Show all teams';
+  }else{
+    element.innerHTML='Hide all teams';
+  }
+  toggleTeamsAndMembers();
+}
+
 function toggleTeamsAndMembers() {
   for(var i=1; i<=<%= @sign_up_topics.size%>; i++){
     var elem = document.getElementById(i.toString() + "_myDiv");

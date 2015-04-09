@@ -85,7 +85,22 @@ class AssignmentsController < ApplicationController
   end
 
   def update
+    ##if params doesn't have assignment_form, it means the assignment is assigned to a course using the icon on the popup menu
+    unless(params.has_key?(:assignment_form))
+      @assignment=Assignment.find(params[:id])
+      @assignment.course_id=params[:course_id];
+      if @assignment.save
+        flash[:note] = 'Assignment was successfully saved.'
+        redirect_to :controller => 'tree_display',:action => 'list'
+      else
+        flash[:error] = "Assignment save failed: #{@assignment.errors.full_messages.join(' ')}"
+        redirect_to :action => 'edit', :id => @assignment.id
+      end
+      return
+    end
+
     @assignment_form= AssignmentForm.create_form_object(params[:id])
+    @assignment_form.assignment.instructor ||= current_user
     params[:assignment_form][:assignment][:wiki_type_id] = 1 unless params[:assignment_wiki_assignment]
     #TODO: require params[:assignment][:directory_path] to be not null
     #TODO: insert warning if directory_path is duplicated

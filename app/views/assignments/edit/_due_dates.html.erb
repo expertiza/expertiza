@@ -65,7 +65,7 @@
             due_at = '';
         }
         else{
-            due_at = new Date(due_at.substr(0,16)).format('yyyy/mm/dd HH:MM');
+//            due_at = new Date(due_at.substr(0,16)).format('yyyy/mm/dd HH:MM');
         }
         var due_name = due_date.deadline_name;
         if (due_name == null){
@@ -273,7 +273,7 @@
   <button type="button" id="set_rounds">Set</button>
 </div>
 
-<!--Add a change name or url checkbox. By: Xiaoqiang Shao-->
+
 <input name="changenameurl" type="hidden" value="false" />
 <%= check_box_tag('changenameurl', 'true', @due_date_nameurl_notempty_checkbox,:onclick=>"handleChangenameurl(this.checked,due_date_name_column,due_date_url_column)" ) %>
 <%= label_tag('changenameurl', 'Name and description URL vary by round') %>

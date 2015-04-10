@@ -37,9 +37,6 @@ class Node < ActiveRecord::Base
   end
 
   # Retreives the node's object name
-  def getinfo
-    self.
-  end
   def get_name
   end
 
@@ -58,4 +55,4 @@ class Node < ActiveRecord::Base
   # Retrieves the type of children this node has
   def get_child_type
   end
-end
+end

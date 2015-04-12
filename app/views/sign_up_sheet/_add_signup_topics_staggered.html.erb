@@ -37,20 +37,7 @@
       <% i=1 %>
       <% for topic in @sign_up_topics %>
         <tr>
-          <td><%= topic.topic_identifier %></td>
-
-          <td><%= render :partial => '/sign_up_sheet/topic_names', :locals => {:i => i, :topic=>topic} %></td>
-
-          <% if topic.assignment.is_microtask? %>
-            <td><%= topic.micropayment %></td>
-          <% end %>
-
-          <td align="center"><%= topic.max_choosers %></td>
-
-          <%= render :partial => '/sign_up_sheet/available_slots', :locals => {:topic=>topic} %>
-
-          <%= render :partial => '/sign_up_sheet/num_waiting', :locals => {:topic=>topic}  %>
-
+          <%= render :partial => '/sign_up_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
           <td align="center">
             <% topic_identifier = SignUpTopic.where(assignment_id: @assignment.id).map {|u| [u.topic_identifier, u.id] } %>
             <% topic_identifier.delete([topic.topic_identifier, topic.id]) %>
@@ -59,11 +46,10 @@
             <% if !select.nil?
                  selected = select[:dependent_on].to_a
             end%>
-          <%= select_tag 'topic_dependencies_' + topic.id.to_s + '[dependent_on][]', options_for_select( topic_identifier, selected), :multiple => true, :size => 2 %>
-        </td>
+            <%= select_tag 'topic_dependencies_' + topic.id.to_s + '[dependent_on][]', options_for_select( topic_identifier, selected), :multiple => true, :size => 2 %>
+          </td>
 
-        <td align="center"><%= render :partial => '/sign_up_sheet/actions', :locals => {:i=>i, :topic=>topic} %></td>
-      </tr>
+        </tr>
       <% i=i+1 %>
     <% end %>
   </table>

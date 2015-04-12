@@ -112,6 +112,7 @@ class AssignmentForm
       due_at= Time.parse(due_at)
       mi=find_min_from_now(due_at)
       diff = mi-(due_date.threshold)*60
+      diff = 1
       if diff>0
         dj=Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type, due_date.due_at.to_s(:db)),
                                 1, diff.minutes.from_now)
@@ -138,9 +139,10 @@ class AssignmentForm
   # This functions finds the epoch time in seconds of the due_at parameter and finds the difference of it
   # from the current time and returns this difference in minutes
   def find_min_from_now(due_at)
-    curr_time=DateTime.now.to_s(:db)
+    curr_time=DateTime.now.in_time_zone(zone='UTC').to_s(:db)
     curr_time=Time.parse(curr_time)
     time_in_min=((due_at - curr_time).to_i/60)
+    #time_in_min = 1
     time_in_min
   end
 

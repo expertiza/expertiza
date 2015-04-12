@@ -5,6 +5,14 @@ app = angular.module('MPApp',[
 ])
 
 app.controller 'testCtrl', ($scope) ->
-  console.log "chojfdajfaj"
-  $scope.name = "Hey"
+  console.log "in controller"
+
+app.run () ->
+  console.log "RUN RUN RUN"
+
+app.directive 'testdirective', () ->
+  templateUrl: 'test.html'
+  link: (scope, element, attr) -> 
+    console.log "in directive"
+    scope.name = 'Heyhey'
 

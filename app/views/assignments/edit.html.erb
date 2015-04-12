@@ -30,7 +30,11 @@
       Instructor must specify when topics are assigned, by going to the Due Dates tab and
       entering a due date for &quot;signup&quot;.">
           <br><br>
-        <%= render '/sign_up_sheet/add_signup_topics.html' %>
+          <% if @assignment_form.assignment.staggered_deadline == true %>
+            <%= render '/sign_up_sheet/add_signup_topics_staggered.html' %>
+          <% else %>
+            <%= render '/sign_up_sheet/add_signup_topics.html' %>
+          <% end %>
       </div>
     </div>
     <script>

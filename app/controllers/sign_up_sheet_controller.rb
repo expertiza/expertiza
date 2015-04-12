@@ -72,7 +72,7 @@ class SignUpSheetController < ApplicationController
       #topic.assignment_id = params[:id]
       topic.save
       redirect_to_sign_up(params[:id])
-      else
+    else
         set_values_for_new_topic
 
         if @assignment.is_microtask?

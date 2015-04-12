@@ -201,7 +201,10 @@ class AssignmentsController < ApplicationController
     end
     alias_method :index, :list
 
-
+    def scheduled_jobs
+      @suggestions = Suggestion.where(assignment_id: params[:id])
+      @assignment = Assignment.find(params[:id])
+    end
     #--------------------------------------------------------------------------------------------------------------------
     # DEFINE_INSTRUCTOR_NOTIFICATION_LIMIT
     # TODO: NO usages found need verification

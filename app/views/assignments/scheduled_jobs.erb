@@ -1,6 +1,6 @@
 
 <% @assignment = Assignment.find(params[:id]) %>
-<h1>Topics for <%= @assignment.name %> assignment</h1>
+<h1>Scheduled jobs for <%= @assignment.name %> assignment</h1>
 
 
 <%#<%= link_to 'View all Bookmarks', :controller=>'bookmarks', :action=> 'view_bookmarks' %> <%#<br/>
@@ -12,33 +12,31 @@
     <div class="flash_note"><%= flash_message :notice %></div>
 <% end %>
 
-<% @sign_up_topics = SignUpTopic.where(['assignment_id = ?', @assignment.id]) %>
-<% @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)  %>
-<% @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id) %>
-<% @participants = SignedUpUser.find_team_participants(@assignment.id)  %>
+<% @scheduled_jobs = Delayed::Job.all %>
 
-<% if @sign_up_topics.size != 0 %>
-    <table class="general">
-      <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
+<table class="general">
+  <th width="25%">Deadline type #</th>
+  <th width="25%">Run time</th>
+  <th width="25%">Due date</th>
+  <th width="25 %">Action</th>
+  <% i=1 %>
+  <% for delayed_job in @scheduled_jobs %>
+      <tr>
+        <% if delayed_job.handler.include? "assignment_id: #{@assignment.id}"%>
+            <% handler = delayed_job.handler.split()%>
+            <td><%= handler[5] %></td>
+            <td><%= delayed_job.run_at %></td>
+            <td><%= handler[7][1..-1] + ":" + handler[8][0..-2]%></td>
+            <td><%= handler[1][13..-1] %></td>
+        <% end %>
+      </tr>
+      <% i=i+1 %>
+  <% end %>
 
-      <% i=1 %>
-      <% for topic in @sign_up_topics %>
-          <tr>
-            <%= render :partial => '/sign_up_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
-          </tr>
-          <% i=i+1 %>
-      <% end %>
-
-    </table>
-
-<% else %>
-    <div class="flash_note">
-      <%= "Signup topics have not yet been created." %>
-    </div>
-<% end %>
+</table>
 
 <% session[:return_to] = request.url %>
 <br/><br/>
 
-<%= render :partial => '/sign_up_sheet/add_topics' %>
+
 <a href="javascript:history.back()">Back</a>

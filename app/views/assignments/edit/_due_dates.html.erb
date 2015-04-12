@@ -70,7 +70,7 @@
             if(tzone=='Z'){
                 tzone = '+00:00';
             }
-            var timezone = "(GMT"+tzone.toString()+")";
+            var timezone = "(UTC "+tzone.toString()+")";
             due_at = due_at.substr(0,4)+'/'+due_at.substr(5,2)+'/'+due_at.substr(8,2)+' '+due_at.substr(11,2)+':'+due_at.substr(14,2)+' '+timezone;
 
         }

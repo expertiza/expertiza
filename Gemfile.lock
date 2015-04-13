@@ -1,4 +1,10 @@
 GIT
+  remote: git://github.com/eventmachine/eventmachine.git
+  revision: 6dbdb97bada05d33a1f0d469a49d8c46ac2e77d0
+  specs:
+    eventmachine (1.0.7)
+
+GIT
   remote: git://github.com/expertiza/authlogic.git
   revision: 09163c7d2a9b21942c6716e885a14305e1aa0390
   specs:
@@ -101,8 +107,6 @@ GEM
       json
     engtagger (0.2.0)
     erubis (2.7.0)
-    eventmachine (1.0.3)
-    eventmachine (1.0.3-x86-mingw32)
     execjs (2.2.1)
     faraday (0.9.0)
       multipart-post (>= 1.2, < 3)
@@ -210,6 +214,7 @@ GEM
       activerecord (>= 3.0, < 5.0)
       activesupport (>= 3.0, < 5.0)
     pg (0.17.1)
+    pg (0.17.1-x86-mingw32)
     polyglot (0.3.5)
     power_assert (0.1.3)
     protected_attributes (1.0.8)
@@ -228,6 +233,8 @@ GEM
     pry-remote (0.1.8)
       pry (~> 0.9)
       slop (~> 3.0)
+    quiet_assets (1.1.0)
+      railties (>= 3.1, < 5.0)
     rack (1.5.2)
     rack-test (0.6.2)
       rack (>= 1.0)
@@ -457,6 +464,7 @@ DEPENDENCIES
   dynamic_form
   edavis10-ruby-web-search
   engtagger
+  eventmachine!
   expertiza-authlogic!
   fastercsv
   ffi-aspell
@@ -483,6 +491,7 @@ DEPENDENCIES
   pry
   pry-nav
   pry-remote
+  quiet_assets
   rails
   rails4-autocomplete
   rails_12factor

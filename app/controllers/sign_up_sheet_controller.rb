@@ -170,13 +170,13 @@ class SignUpSheetController < ApplicationController
         @topics = SignUpTopic.where(assignment_id: params[:id])
 
         #Use this until you figure out how to initialize this array
-        @duedates = SignUpTopic.find_by_sql("SELECT s.id as topic_id FROM sign_up_topics s WHERE s.assignment_id = " + params[:id].to_s)
-
+        #@duedates = SignUpTopic.find_by_sql("SELECT s.id as topic_id FROM sign_up_topics s WHERE s.assignment_id = " + params[:id].to_s)
+        @duedates = {}
         unless @topics.nil?
           i=0
           @topics.each { |topic|
-
-            @duedates[i]['t_id'] = topic.id
+            @duedates[i] = {}
+            @duedates[i]['id'] = topic.id
             @duedates[i]['topic_identifier'] = topic.topic_identifier
             @duedates[i]['topic_name'] = topic.topic_name
 
@@ -196,7 +196,6 @@ class SignUpSheetController < ApplicationController
                 @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
                 @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
               end
-
             end
             duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('metareview').id).first
             @duedates[i]['submission_'+ (@review_rounds+1).to_s] = !(duedate_subm.nil?)?(DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")):nil

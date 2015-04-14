@@ -9,12 +9,12 @@ class ReviewQuestionnaire < Questionnaire
   end
 
   def get_assessments_for(participant)
-    participant.get_reviews()
+    participant.reviews()
   end
 
   # return  the responses for specified round, for varying rubric feature -Yang
   def get_assessments_round_for(participant,round)
-    team=AssignmentTeam.team(participant)
+    team = AssignmentTeam.team(participant)
     return nil if !team
 
     team_id = team.id

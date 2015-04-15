@@ -1,19 +1,19 @@
-###
-###
-### This class needs refactoring
-### 
-###
+require 'analytic/assignment_analytic'
 class Assignment < ActiveRecord::Base
-  require 'analytic/assignment_analytic'
+
   include AssignmentAnalytic
   include DynamicReviewMapping
+  include Scorable
   has_paper_trail
+  # Relationships
   belongs_to :course
   belongs_to :wiki_type
+  belongs_to :instructor, :class_name => 'User', :foreign_key => 'instructor_id'
   # wiki_type needs to be removed. When an assignment is created, it needs to
   # be created as an instance of a subclass of the Assignment (model) class;
   # then Rails will "automatically' set the type field to the value that
   # designates an assignment of the appropriate type.
+
   has_many :participants, :class_name => 'AssignmentParticipant', :foreign_key => 'parent_id'
   has_many :participant_review_mappings, :class_name => 'ParticipantReviewResponseMap', :through => :participants, :source => :review_mappings
   has_many :users, :through => :participants
@@ -21,20 +21,20 @@ class Assignment < ActiveRecord::Base
   has_many :teams, :class_name => 'AssignmentTeam', :foreign_key => 'parent_id'
   has_many :team_review_mappings, :class_name => 'TeamReviewResponseMap', :through => :teams, :source => :review_mappings
   has_many :invitations, :class_name => 'Invitation', :foreign_key => 'assignment_id', :dependent => :destroy
-  has_many :assignment_questionnaires,:dependent => :destroy
+  has_many :assignment_questionnaires, :dependent => :destroy
   has_many :questionnaires, :through => :assignment_questionnaires
-  belongs_to :instructor, :class_name => 'User', :foreign_key => 'instructor_id'
   has_many :sign_up_topics, :foreign_key => 'assignment_id', :dependent => :destroy
   has_many :response_maps, :foreign_key => 'reviewed_object_id', :class_name => 'ResponseMap'
-  has_one :assignment_node,:foreign_key => :node_object_id,:dependent => :destroy
+  has_one :assignment_node, :foreign_key => :node_object_id,:dependent => :destroy
 
-  validates_presence_of :name
-  validates_uniqueness_of :name, :scope => :course_id
+  # Validations
+  validates :name, presence: true, uniqueness:  { scope: :course_id }
+
 
   COMPLETE = 'Finished'
   WAITLIST = 'Waitlist open'
 
-  REVIEW_QUESTIONNAIRES = {:author_feedback => 0, :metareview => 1, :review => 2, :teammate_review => 3}
+  REVIEW_QUESTIONNAIRES = { :author_feedback => 0, :metareview => 1, :review => 2, :teammate_review => 3 }
   #  Review Strategy information.
   RS_INSTRUCTOR_SELECTED = 'Instructor-Selected'
   RS_STUDENT_SELECTED = 'Student-Selected'
@@ -74,7 +74,6 @@ class Assignment < ActiveRecord::Base
     ### min_quizzes = contributor.quiz_mappings.count rescue 0
     ###contributor_set.reject! { |contributor| contributor.quiz_mappings.count > min_quizzes + review_topic_threshold }
 
-
     candidate_topics = Set.new
     contributor_set.each { |contributor| candidate_topics.add(signed_up_topic(contributor)) }
     candidate_topics
@@ -89,29 +88,29 @@ class Assignment < ActiveRecord::Base
     # Initialize contributor set with all teams participating in this assignment
     contributor_set = Array.new(contributors)
 
- 
+
     # Reject contributors that have not selected a topic, or have no submissions
-    contributor_set=reject_by_no_topic_selection_or_no_submission(contributor_set)
+    contributor_set = reject_by_no_topic_selection_or_no_submission(contributor_set)
 
     # Reject contributions of topics whose deadline has passed, or which are not reviewable in the current stage
-    contributor_set=reject_by_deadline(contributor_set)
+    contributor_set = reject_by_deadline(contributor_set)
 
 
     # Filter submission by reviewer him/her self
-    contributor_set=reject_own_submission(contributor_set, reviewer)
+    contributor_set = reject_own_submission(contributor_set, reviewer)
 
     if self.varying_rubrics_by_round?
       current_round = self.get_current_round(nil)
       contributor_set = reject__reviewed_submissions_in_current_round(contributor_set, reviewer,current_round)
     else
       # Filter submissions already reviewed by reviewer
-      contributor_set=reject_previously_reviewed_submissions(contributor_set, reviewer)
+      contributor_set = reject_previously_reviewed_submissions(contributor_set, reviewer)
     end
 
 
     # Filter the contributors with the least number of reviews
     # (using the fact that each contributor is associated with a topic)
-    contributor_set=reject_by_least_reviewed(contributor_set)
+    contributor_set = reject_by_least_reviewed(contributor_set)
 
     # Add topics for all remaining submissions to a list of available topics for review
     candidate_topics = Set.new
@@ -144,32 +143,28 @@ class Assignment < ActiveRecord::Base
     min_reviews = contributor.review_mappings.reject! { |review_mapping| review_mapping.response.nil? }.count rescue 0
     contributor_set.reject { |contributor| contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count  > min_reviews + review_topic_threshold }
 
-    return contributor_set
+    contributor_set
   end
 
   def reject__reviewed_submissions_in_current_round(contributor_set, reviewer, current_round)
-    contributor_set = contributor_set.reject { |contributor| contributor.reviewed_by_in_round?(reviewer,current_round) }
+    contributor_set.reject { |contributor| contributor.reviewed_by_in_round?(reviewer,current_round) }
   end
 
   def reject_previously_reviewed_submissions(contributor_set, reviewer)
-    contributor_set = contributor_set.reject { |contributor| contributor.reviewed_by?(reviewer) }
-    return contributor_set
+    contributor_set.reject { |contributor| contributor.reviewed_by?(reviewer) }
   end
 
   def reject_own_submission(contributor_set, reviewer)
     contributor_set.reject! { |contributor| contributor.teams_users.find_by_user_id(reviewer.user_id) }
-    return contributor_set
   end
 
   def reject_by_deadline(contributor_set)
     contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'Complete' or
-        !contributor.assignment.review_allowed(signed_up_topic(contributor).id) }
-    return contributor_set
+                              !contributor.assignment.review_allowed(signed_up_topic(contributor).id) }
   end
 
   def reject_by_no_topic_selection_or_no_submission(contributor_set)
     contributor_set.reject! { |contributor| signed_up_topic(contributor).nil? or !contributor.has_submissions? }
-    return contributor_set
   end
 
   def has_topics?
@@ -271,9 +266,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def quiz_taken_by?(contributor, reviewer)
-    quiz_id = QuizQuestionnaire.find_by_instructor_id(contributor.id).id
-    return QuizResponseMap.where(['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?',
-                                  contributor.id, reviewer.id, quiz_id]).count > 0
+    quiz_id = QuizQuestionnaire.select(:id, :instructor_id).find_by(instructor_id: contributor.id).id
+    QuizResponseMap.where(reviewee_id: contributor.id, reviewer_id: reviewer.id, reviewed_object_id: quiz_id).count > 0
   end
 
   # Returns a contributor to review if available, otherwise will raise an error
@@ -385,10 +379,10 @@ class Assignment < ActiveRecord::Base
   alias_method :is_using_dynamic_reviewer_assignment?, :dynamic_reviewer_assignment?
 
   def review_mappings
-    #ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
+    # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     TeamReviewResponseMap.where(reviewed_object_id: self.id)
-    end
+  end
 
   def metareview_mappings
     mappings = Array.new
@@ -399,6 +393,7 @@ class Assignment < ActiveRecord::Base
     mappings
   end
 
+
   def scores(questions)
     scores = Hash.new
 
@@ -407,13 +402,9 @@ class Assignment < ActiveRecord::Base
       scores[:participants][participant.id.to_s.to_sym] = participant.scores(questions)
 
       # for all quiz questionnaires (quizzes) taken by the participant
-      quiz_responses = Array.new
+      # for all quiz questionnaires (quizzes) taken by the participant
       quiz_response_mappings = QuizResponseMap.where(reviewer_id: participant.id)
-      quiz_response_mappings.each do |qmapping|
-        if (qmapping.response)
-          quiz_responses << qmapping.response
-        end
-      end
+      quiz_responses = quiz_response_mappings.select{ |qmapping| qmapping.response }.map(&:response)
 
       scores[:participants][participant.id.to_s.to_sym][:quiz] = Hash.new
       scores[:participants][participant.id.to_s.to_sym][:quiz][:assessments] = quiz_responses
@@ -439,11 +430,11 @@ class Assignment < ActiveRecord::Base
         total_num_of_assessments = 0    #calculate grades for each rounds
         for i in 1..self.get_review_rounds
           assessments = TeamReviewResponseMap.get_assessments_round_for(team,i)
-          round_sym = ("review"+i.to_s).to_sym
+          round_sym = ("review" + i.to_s).to_sym
           grades_by_rounds[round_sym]= Score.compute_scores(assessments, questions[round_sym])
           total_num_of_assessments += assessments.size
           if grades_by_rounds[round_sym][:avg]!=nil
-            total_score += grades_by_rounds[round_sym][:avg]*assessments.size.to_f
+            total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f
           end
         end
 
@@ -453,21 +444,21 @@ class Assignment < ActiveRecord::Base
         scores[:teams][index.to_s.to_sym][:scores][:min] = 999999999
         scores[:teams][index.to_s.to_sym][:scores][:avg] = 0
         for i in 1..self.get_review_rounds
-          round_sym = ("review"+i.to_s).to_sym
+          round_sym = ("review" + i.to_s).to_sym
           if(grades_by_rounds[round_sym][:max]!=nil && scores[:teams][index.to_s.to_sym][:scores][:max]<grades_by_rounds[round_sym][:max])
-            scores[:teams][index.to_s.to_sym][:scores][:max]= grades_by_rounds[round_sym][:max]
+            scores[:teams][index.to_s.to_sym][:scores][:max] = grades_by_rounds[round_sym][:max]
           end
           if(grades_by_rounds[round_sym][:min]!= nil && scores[:teams][index.to_s.to_sym][:scores][:min]>grades_by_rounds[round_sym][:min])
-            scores[:teams][index.to_s.to_sym][:scores][:min]= grades_by_rounds[round_sym][:min]
+            scores[:teams][index.to_s.to_sym][:scores][:min] = grades_by_rounds[round_sym][:min]
           end
         end
 
-        if total_num_of_assessments!=0
-          scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score/total_num_of_assessments
+        if total_num_of_assessments != 0
+          scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score / total_num_of_assessments
         else
-          scores[:teams][index.to_s.to_sym][:scores][:avg]=0
-          scores[:teams][index.to_s.to_sym][:scores][:max]=0
-          scores[:teams][index.to_s.to_sym][:scores][:min]=0
+          scores[:teams][index.to_s.to_sym][:scores][:avg] = 0
+          scores[:teams][index.to_s.to_sym][:scores][:max] = 0
+          scores[:teams][index.to_s.to_sym][:scores][:min] = 0
         end
 
       else
@@ -480,22 +471,11 @@ class Assignment < ActiveRecord::Base
     scores
   end
 
+
   def get_contributor(contrib_id)
     AssignmentTeam.find(contrib_id)
   end
 
-  # parameterized by questionnaire
-  def get_max_score_possible(questionnaire)
-    max = 0
-    sum_of_weights = 0
-    num_questions = 0
-    questionnaire.questions.each do |question| #type identifies the type of questionnaire
-      sum_of_weights += question.weight
-      num_questions+=1
-    end
-    max = num_questions * questionnaire.max_question_score * sum_of_weights
-    return max, sum_of_weights
-  end
 
   def path
     raise 'Path cannot be created. The assignment must be associated with either a course or an instructor.' if self.course_id == nil && self.instructor_id == nil
@@ -508,10 +488,11 @@ class Assignment < ActiveRecord::Base
 
   # Check whether review, metareview, etc.. is allowed
   # If topic_id is set, check for that topic only. Otherwise, check to see if there is any topic which can be reviewed(etc) now
-  def check_condition(column, topic_id=nil)
+  def check_condition(column, topic_id = nil)
     # the drop topic deadline should not play any role in picking the next due date
     # get the drop_topic_deadline_id to exclude it
-    drop_topic_deadline_id = DeadlineType.find_by_name('drop_topic').id
+    drop_topic_deadline_id = DeadlineType.find_by(name: 'drop_topic').id
+
     self.staggered_deadline? ?
       topic_id ?
       next_due_dates = TopicDeadline
@@ -543,12 +524,12 @@ class Assignment < ActiveRecord::Base
 
   # Determine if the next due date from now allows to take the quizzes
   def quiz_allowed(topic_id=nil)
-    return check_condition("quiz_allowed_id",topic_id)
+    check_condition("quiz_allowed_id",topic_id)
   end
 
   # Determine if the next due date from now allows for reviews
   def review_allowed(topic_id=nil)
-    (check_condition('review_allowed_id', topic_id) )
+    check_condition('review_allowed_id', topic_id)
   end
 
   # Determine if the next due date from now allows for metareviews
@@ -557,7 +538,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def get_quiz_deadline
-    return (DueDate.where( ['assignment_id = ? and deadline_type_id >= ?', self.id, 7]).due_at)
+    DueDate.where(assignment_id: self.id, deadline_type_id: 7).due_at
   end
 
   def delete(force = nil)
@@ -607,7 +588,7 @@ class Assignment < ActiveRecord::Base
   end
 
   # Generate emails for reviewers when new content is available for review
-  #ajbudlon, sept 07, 2007
+  # ajbudlon, sept 07, 2007
   def email(author_id)
 
     # Get all review mappings for this assignment & author
@@ -635,13 +616,13 @@ class Assignment < ActiveRecord::Base
         ).deliver
       end
     end
-    end
+  end
 
   # Get all review mappings for this assignment & reviewer
   # required to give reviewer location of new submission content
   # link cannot be provided as it might give user ability to access data not
   # available to them.
-  #ajbudlon, sept 07, 2007
+  # ajbudlon, sept 07, 2007
   def get_review_number(mapping)
     reviewer_mappings = ResponseMap.where(reviewer_id: mapping.reviewer.id)
     review_num = 1
@@ -679,9 +660,9 @@ class Assignment < ActiveRecord::Base
       #    removed because google doc not implemented
       #    elsif assignment.wiki_type == 4 #GOOGLE_DOC
       #      return true
-      else
-        return false
-      end
+    else
+      return false
+    end
   end
 
   def is_google_doc
@@ -695,20 +676,20 @@ class Assignment < ActiveRecord::Base
   #manual addition
   # user_name - the user account name of the participant to add
   def add_participant(user_name)
-    user = User.find_by_name(user_name)
+    user = User.find_by(name: user_name)
     raise "The user account with the name #{user_name} does not exist. Please <a href='" + url_for(:controller => 'users', :action => 'new') + "'>create</a> the user first." if user.nil?
     participant = AssignmentParticipant.where(parent_id: self.id, user_id:  user.id).first
     if participant
       raise "The user #{user.name} is already a participant."
     else
-      new_part = AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted)
-      new_part.set_handle()
+      new_part = AssignmentParticipant.create(parent_id: self.id, user_id: user.id, permission_granted: user.master_permission_granted)
+      new_part.set_handle
     end
   end
 
   def create_node
-    parent = CourseNode.find_by_node_object_id(self.course_id)
-    node = AssignmentNode.create(:node_object_id => self.id)
+    parent = CourseNode.find_by(node_object_id: self.course_id)
+    node = AssignmentNode.create(node_object_id: self.id)
     node.parent_id = parent.id if parent != nil
     node.save
   end
@@ -724,43 +705,39 @@ class Assignment < ActiveRecord::Base
   #otherwise, return 0
   def get_current_round(topic_id)
     if self.staggered_deadline?
-      due_dates = TopicDeadline.where(:topic_id => topic_id).order('due_at DESC')
+      due_dates = TopicDeadline.where(topic_id: topic_id).order('due_at DESC')
     else
-      due_dates = DueDate.where(:assignment_id => self.id).order('due_at DESC')
+      due_dates = DueDate.where(assignment_id: self.id).order('due_at DESC')
     end
-    if due_dates != nil and due_dates.size > 0
-      if Time.now > due_dates[0].due_at
-        return 0
-      else
-        i = 0
-        for due_date in due_dates
-          if Time.now < due_date.due_at and
-              (due_dates[i+1] == nil or Time.now > due_dates[i+1].due_at)
-            return due_date.round
-          end
-          i = i + 1
-        end
+
+    if due_dates.present?
+
+      return 0 if Time.now > due_dates[0].due_at
+      due_dates.each_with_index do |due_date, i|
+        next unless Time.now < due_date.due_at &&
+          (due_dates[i + 1].nil? || Time.now > due_dates[i + 1].due_at)
+        return due_date.round
       end
     end
   end
 
-  #For varying rubric feature
+  # For varying rubric feature
   def get_current_stage_name(topic_id=nil)
     if self.staggered_deadline?
-       if topic_id.nil?
-          return 'Unknown'
-       end
+      if topic_id.nil?
+        return 'Unknown'
+      end
     end
     due_date = find_current_stage(topic_id)
 
-    if(due_date!=COMPLETE && due_date!='Finished'&&due_date!=nil &&due_date.deadline_name!=nil)
-      return due_date.deadline_name
+    if(due_date != COMPLETE && due_date!= 'Finished' && due_date != nil && due_date.deadline_name != nil)
+      due_date.deadline_name
     else
-      return get_current_stage(topic_id)
+      get_current_stage(topic_id)
     end
   end
 
-  #check if this assignment has multiple review phases with different review rubrics
+  # check if this assignment has multiple review phases with different review rubrics
   def varying_rubrics_by_round?
     assignment_questionnaires = AssignmentQuestionnaire.where(:assignment_id=>self.id,:used_in_round=>2)
 
@@ -796,7 +773,7 @@ class Assignment < ActiveRecord::Base
     due_dates = DueDate.where(assignment_id: self.id)
     rounds=0
     due_dates.each{
-        |due_date|
+      |due_date|
       if due_date.round>rounds
         rounds = due_date.round
       end
@@ -834,40 +811,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def get_current_due_date
-    due_date = self.find_current_stage()
-    (due_date == nil || due_date == 'Finished') ? 'Finished' : due_date
+    due_date = self.find_current_stage
+    (due_date.nil? || due_date == 'Finished') ? 'Finished' : due_date
   end
-
-  # Returns hash review_scores[reviewer_id][reviewee_id] = score
-  def compute_reviews_hash
-    review_questionnaire_id = get_review_questionnaire_id()
-    @questions = Question.where( ['questionnaire_id = ?', review_questionnaire_id])
-    @review_scores = Hash.new
-    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
-    @response_type = 'TeamReviewResponseMap'
-
-    @myreviewers = ResponseMap.select('DISTINCT reviewer_id').where(['reviewed_object_id = ? && type = ? ', self.id, @type])
-
-    @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
-
-    @response_maps.each do |response_map|
-      # Check if response is there
-      @corresponding_response = Response.where(['map_id = ?', response_map.id])
-      @respective_scores = Hash.new
-      @respective_scores = @review_scores[response_map.reviewer_id] if @review_scores[response_map.reviewer_id] != nil
-
-      if @corresponding_response != nil
-        @this_review_score_raw = Score.get_total_score(response: @corresponding_response, questions: @questions, q_types: Array.new)
-        @this_review_score = ((@this_review_score_raw*100).round/100.0) if @this_review_score_raw >= 0.0
-      else
-        @this_review_score = 0.0
-      end
-      @respective_scores[response_map.reviewee_id] = @this_review_score
-      @review_scores[response_map.reviewer_id] = @respective_scores
-    end
-    @review_scores
-    end
 
   def get_review_questionnaire_id
     @revqids = []
@@ -880,11 +826,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def get_next_due_date
-    due_date = self.find_next_stage()
+    due_date = self.find_next_stage
     (due_date == nil || due_date == 'Finished') ? nil : due_date
   end
 
-  def find_next_stage()
+  def find_next_stage
     due_dates = DueDate.where( ['assignment_id = ?', self.id]).order('due_at DESC')
 
     if due_dates != nil and due_dates.size > 0
@@ -894,7 +840,7 @@ class Assignment < ActiveRecord::Base
         i = 0
         for due_date in due_dates
           if Time.now < due_date.due_at and
-            (due_dates[i+1] == nil or Time.now > due_dates[i+1].due_at)
+              (due_dates[i+1] == nil or Time.now > due_dates[i+1].due_at)
             if i > 0
               return due_dates[i-1]
             else
@@ -918,26 +864,20 @@ class Assignment < ActiveRecord::Base
   # Returns the number of reviewers assigned to a particular assignment by the type of review
   # Param: type - String (ParticipantReviewResponseMap, etc.)
   def get_total_reviews_assigned_by_type(type)
-    count = 0
-    self.response_maps.each { |x| count = count + 1 if x.type == type }
-    count
+    self.response_maps.count { |x| x.type == type }
   end
 
   # Returns the number of reviews completed for a particular assignment
   def get_total_reviews_completed
     # self.responses.size
-    response_count = 0
-    self.response_maps.each { |response_map| response_count = response_count + 1 unless response_map.response.nil? }
-    response_count
+    self.response_maps.count { |response_map| response_map.response.present? }
   end
 
   # Returns the number of reviews completed for a particular assignment by type of review
   # Param: type - String (ParticipantReviewResponseMap, etc.)
   def get_total_reviews_completed_by_type(type)
     # self.responses.size
-    response_count = 0
-    self.response_maps.each {|response_map|response_count = response_count + 1 if !response_map.response.nil? && response_map.type == type}
-    response_count
+    self.response_maps.count {|response_map| response_map.response.present? && response_map.type == type}
   end
 
   # Returns the number of reviews completed for a particular assignment by type of review
@@ -955,35 +895,6 @@ class Assignment < ActiveRecord::Base
     (get_total_reviews_assigned == 0) ? 0 : ((get_total_reviews_completed().to_f / get_total_reviews_assigned.to_f) * 100).to_i
   end
 
-  # Returns the average of all responses for this assignment as an integer (0-100)
-  def get_average_score
-    return 0 if get_total_reviews_assigned == 0
-    sum_of_scores = 0
-    self.response_maps.each do |response_map|
-      sum_of_scores = sum_of_scores + response_map.response.get_average_score if !response_map.response.nil?
-    end
-    (sum_of_scores / get_total_reviews_completed).to_i
-  end
-
-  def get_score_distribution
-    distribution = Array.new(101, 0)
-
-    self.response_maps.each do |response_map|
-      if !response_map.response.nil?
-        score = response_map.response.get_average_score.to_i
-        distribution[score] += 1 if score >= 0 && score <= 100
-      end
-    end
-    distribution
-  end
-
-  # Compute total score for this assignment by summing the scores given on all questionnaires.
-  # Only scores passed in are included in this sum.
-  def compute_total_score(scores)
-    total = 0
-    self.questionnaires.each { |questionnaire| total += questionnaire.get_weighted_score(self, scores) }
-    total
-  end
 
   # Checks whether there are duplicate assignments of the same name by the same instructor.
   # If the assignments are assigned to courses, it's OK to have duplicate names in different
@@ -1024,98 +935,98 @@ class Assignment < ActiveRecord::Base
       contributors_topic = SignedUpUser.find_by_creator_id(contributor.id) :
       contributors_topic = SignedUpUser.find_by_creator_id(contributor.user_id)
     contributors_signup_topic = SignUpTopic.find(contributors_topic.topic_id) if !contributors_topic.nil?
-    end
+  end
 
-    def self.export(csv, parent_id, options)
-      @assignment = Assignment.find(parent_id)
-      @questions = Hash.new
-      questionnaires = @assignment.questionnaires
-      questionnaires.each { |questionnaire| @questions[questionnaire.symbol] = questionnaire.questions }
-      @scores = @assignment.scores(@questions)
+  def self.export(csv, parent_id, options)
+    @assignment = Assignment.find(parent_id)
+    @questions = Hash.new
+    questionnaires = @assignment.questionnaires
+    questionnaires.each { |questionnaire| @questions[questionnaire.symbol] = questionnaire.questions }
+    @scores = @assignment.get_scores(@questions)
 
-      return csv if @scores[:teams].nil?
+    return csv if @scores[:teams].nil?
 
-      for index in 0 .. @scores[:teams].length - 1
-        team = @scores[:teams][index.to_s.to_sym]
-        for participant in team[:team].participants
-          pscore = @scores[:participants][participant.id.to_s.to_sym]
-          tcsv = Array.new
-          tcsv << 'team'+index.to_s
+    for index in 0 .. @scores[:teams].length - 1
+      team = @scores[:teams][index.to_s.to_sym]
+      for participant in team[:team].get_participants
+        pscore = @scores[:participants][participant.id.to_s.to_sym]
+        tcsv = Array.new
+        tcsv << 'team'+index.to_s
 
-          team[:scores] ?
-            tcsv.push(team[:scores][:max], team[:scores][:avg], team[:scores][:min], participant.fullname) :
-            tcsv.push('---', '---', '---') if options['team_score'] == 'true'
+        team[:scores] ?
+          tcsv.push(team[:scores][:max], team[:scores][:avg], team[:scores][:min], participant.fullname) :
+          tcsv.push('---', '---', '---') if options['team_score'] == 'true'
 
-          pscore[:review] ?
-            tcsv.push(pscore[:review][:scores][:max], pscore[:review][:scores][:min], pscore[:review][:scores][:avg]) :
-            tcsv.push('---', '---', '---') if options['submitted_score']
+        pscore[:review] ?
+          tcsv.push(pscore[:review][:scores][:max], pscore[:review][:scores][:min], pscore[:review][:scores][:avg]) :
+          tcsv.push('---', '---', '---') if options['submitted_score']
 
-          pscore[:metareview] ?
-            tcsv.push(pscore[:metareview][:scores][:max], pscore[:metareview][:scores][:min], pscore[:metareview][:scores][:avg]) :
-            tcsv.push('---', '---', '---') if options['metareview_score']
+        pscore[:metareview] ?
+          tcsv.push(pscore[:metareview][:scores][:max], pscore[:metareview][:scores][:min], pscore[:metareview][:scores][:avg]) :
+          tcsv.push('---', '---', '---') if options['metareview_score']
 
-          pscore[:feedback] ?
-            tcsv.push(pscore[:feedback][:scores][:max], pscore[:feedback][:scores][:min], pscore[:feedback][:scores][:avg]) :
-            tcsv.push('---', '---', '---') if options['author_feedback_score']
+        pscore[:feedback] ?
+          tcsv.push(pscore[:feedback][:scores][:max], pscore[:feedback][:scores][:min], pscore[:feedback][:scores][:avg]) :
+          tcsv.push('---', '---', '---') if options['author_feedback_score']
 
-          pscore[:teammate] ?
-            tcsv.push(pscore[:teammate][:scores][:max], pscore[:teammate][:scores][:min], pscore[:teammate][:scores][:avg]) :
-            tcsv.push('---', '---', '---') if options['teammate_review_score']
+        pscore[:teammate] ?
+          tcsv.push(pscore[:teammate][:scores][:max], pscore[:teammate][:scores][:min], pscore[:teammate][:scores][:avg]) :
+          tcsv.push('---', '---', '---') if options['teammate_review_score']
 
-          tcsv.push(pscore[:total_score])
-          csv << tcsv
-        end
+        tcsv.push(pscore[:total_score])
+        csv << tcsv
       end
-    end
-
-    def self.export_fields(options)
-      fields = Array.new
-      fields << 'Team Name'
-      fields.push('Team Max', 'Team Avg', 'Team Min') if options['team_score'] == 'true'
-      fields.push('Submitted Max', 'Submitted Avg', 'Submitted Min') if options['submitted_score']
-      fields.push('Metareview Max', 'Metareview Avg', 'Metareview Min') if options['metareview_score']
-      fields.push('Author Feedback Max', 'Author Feedback Avg', 'Author Feedback Min') if options['author_feedback_score']
-      fields.push('Teammate Review Max', 'Teammate Review Avg', 'Teammate Review Min') if options['teammate_review_score']
-      fields.push('Final Score')
-      fields
-    end
-
-    def find_due_dates(type)
-      self.due_dates.select {|due_date| due_date.deadline_type == DeadlineType.find_by_name(type)}
-    end
-
-    def clean_up_due_dates
-      #delete due_dates without due_at
-      self.due_dates.each {|due_date| due_date.delete if due_date.due_at.nil? }
-
-      submissions = self.find_due_dates('submission') + self.find_due_dates('resubmission')
-      submissions.sort! { |x, y| x.due_at <=> y.due_at }
-      reviews = self.find_due_dates('review') + self.find_due_dates('rereview')
-      reviews.sort! { |x, y| x.due_at <=> y.due_at }
-
-      while submissions.count > self.rounds_of_reviews
-        submissions.last.delete
-      end
-
-      while reviews.count > self.rounds_of_reviews
-        reviews.last.delete
-      end
-
-      self.require_signup? ? drop_topic_count = 1 : drop_topic_count = 0
-      drop_topic = self.find_due_dates('drop_topic')
-      drop_topic.sort! { |x, y| y.due_at <=> x.due_at }
-      while drop_topic.count > self.drop_topic_count
-        drop_topic.last.delete
-      end
-    end
-
-
-    #this should be moved to SignUpSheet model after we refactor the SignUpSheet.
-    # returns whether ANY topic has a partner ad; used for deciding whether to show the Advertisements column
-    def has_partner_ads?(id)
-      #Team.find_by_sql("select * from teams where parent_id = "+id+" AND advertise_for_partner='1'").size > 0
-      return Team.find_by_sql("select t.* "+
-          "from teams t, signed_up_users s "+
-          "where s.topic_id='"+id.to_s+"' and s.creator_id = t.id and t.advertise_for_partner = 1").size > 0
     end
   end
+
+  def self.get_export_fields(options)
+    fields = Array.new
+    fields << 'Team Name'
+    fields.push('Team Max', 'Team Avg', 'Team Min') if options['team_score'] == 'true'
+    fields.push('Submitted Max', 'Submitted Avg', 'Submitted Min') if options['submitted_score']
+    fields.push('Metareview Max', 'Metareview Avg', 'Metareview Min') if options['metareview_score']
+    fields.push('Author Feedback Max', 'Author Feedback Avg', 'Author Feedback Min') if options['author_feedback_score']
+    fields.push('Teammate Review Max', 'Teammate Review Avg', 'Teammate Review Min') if options['teammate_review_score']
+    fields.push('Final Score')
+    fields
+  end
+
+  def find_due_dates(type)
+    self.due_dates.select {|due_date| due_date.deadline_type == DeadlineType.find_by(name: type)}
+  end
+
+  def clean_up_due_dates
+    #delete due_dates without due_at
+    self.due_dates.each {|due_date| due_date.delete if due_date.due_at.nil? }
+
+    submissions = self.find_due_dates('submission') + self.find_due_dates('resubmission')
+    submissions.sort! { |x, y| x.due_at <=> y.due_at }
+    reviews = self.find_due_dates('review') + self.find_due_dates('rereview')
+    reviews.sort! { |x, y| x.due_at <=> y.due_at }
+
+    while submissions.count > self.rounds_of_reviews
+      submissions.last.delete
+    end
+
+    while reviews.count > self.rounds_of_reviews
+      reviews.last.delete
+    end
+
+    self.require_signup? ? drop_topic_count = 1 : drop_topic_count = 0
+    drop_topic = self.find_due_dates('drop_topic')
+    drop_topic.sort! { |x, y| y.due_at <=> x.due_at }
+    while drop_topic.count > self.drop_topic_count
+      drop_topic.last.delete
+    end
+  end
+
+
+  #this should be moved to SignUpSheet model after we refactor the SignUpSheet.
+  # returns whether ANY topic has a partner ad; used for deciding whether to show the Advertisements column
+  def has_partner_ads?(id)
+    #Team.find_by_sql("select * from teams where parent_id = "+id+" AND advertise_for_partner='1'").size > 0
+    return Team.find_by_sql("select t.* "+
+                            "from teams t, signed_up_users s "+
+                            "where s.topic_id='"+id.to_s+"' and s.creator_id = t.id and t.advertise_for_partner = 1").size > 0
+  end
+end

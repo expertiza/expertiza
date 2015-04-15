@@ -1,8 +1,9 @@
 require 'rails_helper'
 
 describe StudentTeamsController do
-  let (:student_teams_controller) {StudentTeamsController.new}
-  let(:student) {double "student"}
+  let(:student_teams_controller) { StudentTeamsController.new }
+  let(:student) { double "student" }
+
   describe '#view' do
     it 'sets the student' do
       AssignmentParticipant.should_receive(:find).with('12345').and_return student

@@ -85,4 +85,76 @@ class Questionnaire < ActiveRecord::Base
     results = Questionnaire.where(["id <> ? and name = ? and instructor_id = ?", id, name, instructor_id])
     errors.add(:name, "Questionnaire names must be unique.") if results != nil and results.length > 0
   end
+
+
+
+
+
+
+
+  #begin my refactoring
+  def self.export(id,user)
+    @questionnaire = Questionnaire.find(id)
+
+    csv_data = QuestionnaireHelper::create_questionnaire_csv @questionnaire, user.name
+
+    send_data csv_data,
+              :type => 'text/csv; charset=iso-8859-1; header=present',
+              :disposition => "attachment; filename=questionnaires.csv"
   end
+
+  def self.import(id,file)
+    @questionnaire = Questionnaire.find(id)
+
+    @questionnaire.questions << QuestionnaireHelper::get_questions_from_csv(@questionnaire, file)
+  end
+
+  def self.copy_questionnaires(id,user)
+    @orig_questionnaire = Questionnaire.find(id)
+    questions = Question.where(questionnaire_id: id)
+    @questionnaire = @orig_questionnaire.clone
+    @questionnaire.instructor_id = user.instructor_id  ## Why was TA-specific code removed here?  See Project E713.
+    @questionnaire.name = 'Copy of ' + @orig_questionnaire.name
+
+    if user.role.name != "Teaching Assistant"
+      @questionnaire.instructor_id = user.id
+    else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
+      @questionnaire.instructor_id = Ta.get_my_instructor(user.id)
+    end
+    @questionnaire.name = 'Copy of '+@orig_questionnaire.name
+
+
+      @questionnaire.created_at = Time.now
+      @questionnaire.save!
+
+      questions.each{ | question |
+
+        new_question = question.clone
+        new_question.questionnaire_id = @questionnaire.id
+        new_question.save
+
+        advice = QuestionAdvice.find_by_question_id(question.id)
+        if advice
+          new_advice = advice.clone
+          new_advice.question_id = newquestion.id
+          new_advice.save
+        end
+
+        if (@questionnaire.section == "Custom")
+          old_question_type = QuestionType.find_by_question_id(question.id)
+          if old_question_type
+            new_question_type = old_question_type.clone
+            new_question_type.question_id = newquestion.id
+            new_question_type.save
+          end
+        end
+      }
+      pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
+      parent = FolderNode.find_by_node_object_id(pFolder.id)
+      unless QuestionnaireNode.where(parent_id: parent.id, node_object_id: @questionnaire.id)
+        QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
+      end
+  end
+
+
+end

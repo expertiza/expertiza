@@ -15,52 +15,7 @@ class QuestionnairesController < ApplicationController
   # Create a clone of the given questionnaire, copying all associated
   # questions. The name and creator are updated.
   def copy
-    orig_questionnaire = Questionnaire.find(params[:id])
-    questions = Question.where(questionnaire_id: params[:id])
-    @questionnaire = orig_questionnaire.clone
-    @questionnaire.instructor_id = session[:user].instructor_id  ## Why was TA-specific code removed here?  See Project E713.
-      @questionnaire.name = 'Copy of ' + orig_questionnaire.name
-
-    clone_questionnaire_details(questions)
-    if (session[:user]).role.name != "Teaching Assistant"
-      @questionnaire.instructor_id = session[:user].id
-    else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
-      @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
-    end
-    @questionnaire.name = 'Copy of '+orig_questionnaire.name
-
-    begin
-
-      @questionnaire.created_at = Time.now
-      @questionnaire.save!
-
-      questions.each{ | question |
-
-        newquestion = question.clone
-        newquestion.questionnaire_id = @questionnaire.id
-        newquestion.save
-
-        advice = QuestionAdvice.find_by_question_id(question.id)
-        if !(advice.nil?)
-          newadvice = advice.clone
-          newadvice.question_id = newquestion.id
-          newadvice.save
-        end
-
-        if (@questionnaire.section == "Custom")
-          old_question_type = QuestionType.find_by_question_id(question.id)
-          if !(old_question_type.nil?)
-            new_question_type = old_question_type.clone
-            new_question_type.question_id = newquestion.id
-            new_question_type.save
-          end
-        end
-      }
-      pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
-      parent = FolderNode.find_by_node_object_id(pFolder.id)
-      if QuestionnaireNode.where(parent_id: parent.id, node_object_id: @questionnaire.id) == nil
-        QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
-      end
+    Questionnaire.copy_questionnaires(params[:id],session[:user])
       undo_link("Copy of questionnaire #{orig_questionnaire.name} has been created successfully. ")
       redirect_to :back
     rescue
@@ -77,9 +32,9 @@ class QuestionnairesController < ApplicationController
       begin
         name = @questionnaire.name
 
-        for question in @questionnaire.questions
+        @questionnaire.questions.each do |question|
           current_q_type = QuestionType.find_by_question_id(question.id)
-          unless current_q_type.nil?
+          if current_q_type
             current_q_type.delete
           end
         end
@@ -102,6 +57,7 @@ class QuestionnairesController < ApplicationController
   end
 
   #View a quiz questionnaire
+  # Do I need to move this method to model? it renders a view at last.
   def view_quiz
     @questionnaire = Questionnaire.find(params[:id])
     @participant = Participant.find(params[:pid]) #creating an instance variable since it needs to be sent to submitted_content/edit
@@ -122,8 +78,8 @@ class QuestionnairesController < ApplicationController
       redirect_to :action => 'view',:id => @questionnaire
     end
 
-    export if params['export']
-    import if params['import']
+    Questionnaire.export(params[:id],session[:user]) if params['export']
+    Questionnaire.import(params[:id], params['csv']) if params['import']
 
     if params['view_advice']
       redirect_to :controller => 'advice', :action => 'edit_advice', :id => params[:questionnaire][:id]
@@ -132,6 +88,7 @@ class QuestionnairesController < ApplicationController
 
 
   #edit a quiz questionnaire
+  # move this method?
   def edit_quiz
     @questionnaire = Questionnaire.find(params[:id])
     render :edit
@@ -139,23 +96,24 @@ class QuestionnairesController < ApplicationController
 
 
   #save an updated quiz questionnaire to the database
+  # usage only in views/questionnaires/edit.html.erb line 5
   def update_quiz
     @questionnaire = Questionnaire.find(params[:id])
     redirect_to :controller => 'submitted_content', :action => 'edit', :id => params[:pid] if @questionnaire == nil
     if params['save']
       @questionnaire.update_attributes(params[:questionnaire])
-      for qtypeid in params[:question_type].keys
+      params[:question_type].keys.each do |qtypeid|
         @question_type = QuestionType.find(qtypeid)
         @question_type.update_attributes(params[:question_type][qtypeid])
       end
-      questionnum=1
-      for qid in params[:new_question].keys
+      question_num=1
+      params[:new_question].keys.each do |qid|
         @question = Question.find(qid)
         @question.update_attributes(params[:new_question][qid])
         @question_type = QuestionType.find_by_question_id(qid)
         @quiz_question_choices = QuizQuestionChoice.where(question_id: qid)
         i=1
-        for quiz_question_choice in @quiz_question_choices
+        @quiz_question_choices.each do |quiz_question_choice|
           if  @question_type.q_type!="Essay"
             if (@question_type.q_type=="MCC")
               if(params[:quiz_question_choices][questionnum.to_s][@question_type.q_type][i.to_s])
@@ -185,7 +143,7 @@ class QuestionnairesController < ApplicationController
         i+=1
       end
     end
-    questionnum+=1
+    question_num+=1
   end
   # save
   #save_choices @questionnaire.id
@@ -226,7 +184,6 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
       @questionnaire.min_question_score = 0
       @questionnaire.max_question_score = 1
       @questionnaire.section = "Quiz"
-      print "=====create_questionnaire========="
       @assignment = Assignment.find(params[:aid])
       teams = TeamsUser.where(user_id: session[:user].id)
       for t in teams do
@@ -239,12 +196,10 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
       @questionnaire.instructor_id = team.id    #for a team assignment, set the instructor id to the team_id
 
       @successful_create = true
-      print "=====save in create_questionnaire begin========="
+
       save
-      print "=====save in create_questionnaire over========="
       save_choices @questionnaire.id
-      print "=====save_choice in create_questionnaire over========="
-      if @successful_create == true
+      if @successful_create
         flash[:note] = "Quiz was successfully created"
       end
       redirect_to :controller => 'submitted_content', :action => 'edit', :id => participant_id
@@ -259,8 +214,9 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
   end
 
   #seperate method for creating a quiz questionnaire because of differences in permission
+  #used only in views/questionnaires/new_quiz.erb line 4
   def create_quiz_questionnaire
-    valid = valid_quiz
+    valid = QuizQuestionnaire.valid_quiz(params[:aid],params[:new_question],params[:question_type],params[:new_choices])
     if valid.eql?("valid")
       create_questionnaire
     else
@@ -269,51 +225,6 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
     end
   end
 
-  def valid_quiz
-    num_quiz_questions = Assignment.find(params[:aid]).num_quiz_questions
-    valid = "valid"
-
-    (1..num_quiz_questions).each do |i|
-      if params[:new_question][i.to_s][:txt] == ''
-        #One of the questions text is not filled out
-        valid = "Please make sure all questions have text"
-        break
-      elsif params[:question_type][i.to_s][:type] == nil
-        #A type isnt selected for a question
-        valid = "Please select a type for each question"
-        break
-      else
-        type = params[:question_type][i.to_s][:type]
-        if type == 'MCC' or type == 'MCR'
-          correct_selected = false
-          (1..4).each do |x|
-            if params[:new_choices][i.to_s][type][x.to_s][:txt] == ''
-              #Text isnt provided for an option
-              valid = "Please make sure every question has text for all options"
-              break
-            elsif type == 'MCR' and not params[:new_choices][i.to_s][type][x.to_s][:iscorrect] == nil
-              correct_selected = true
-            elsif type == 'MCC' and not params[:new_choices][i.to_s][type][x.to_s][:iscorrect] == 0.to_s
-              correct_selected = true
-            end
-          end
-          unless correct_selected == true
-            #A correct option isnt selected for a check box or radio question
-            valid = "Please select a correct answer for all questions"
-            break
-          end
-        elsif type == 'TF'
-          if params[:new_choices][i.to_s]["TF"] == nil
-            #A correct option isnt selected for a true/false question
-            valid = "Please select a correct answer for all questions"
-            break
-          end
-        end
-      end
-    end
-
-    return valid
-  end
 
   def select_questionnaire_type
     @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
@@ -357,7 +268,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
 
   def save_advice
     begin
-      for advice_key in params[:advice].keys
+      params[:advice].keys.each do |advice_key|
         QuestionAdvice.update(advice_key, params[:advice][advice_key])
       end
       flash[:notice] = "The questionnaire's question advice was successfully saved"
@@ -382,11 +293,11 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
   def save
     begin
       @questionnaire.save!
-      save_questions @questionnaire.id if @questionnaire.id != nil and @questionnaire.id > 0
+      save_questions @questionnaire.id if @questionnaire.id and @questionnaire.id > 0
       if @questionnaire.type != "QuizQuestionnaire"
         pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
         parent = FolderNode.find_by_node_object_id(pFolder.id)
-        if QuestionnaireNode.where(parent_id: parent.id, node_object_id: @questionnaire.id) == nil
+        unless QuestionnaireNode.where(parent_id: parent.id, node_object_id: @questionnaire.id)
           QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
         end
       end
@@ -398,6 +309,8 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
   end
 
   #save parameters for new questions
+  # move to models/question.rb directly
+  #used only in save_new_questions line 419
   def save_new_question_parameters(qid, q_num)
     q = QuestionType.new
     q.q_type = params[:question_type][q_num][:type]
@@ -407,11 +320,13 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
   end
 
   # save questions that have been added to a questionnaire
+  # put this method into models/question.rb as save_new_questions(questionnaire_id,type)?
+  #used only in save questions line 510
   def save_new_questions(questionnaire_id)
     if params[:new_question]
       # The new_question array contains all the new questions
       # that should be saved to the database
-      for question_key in params[:new_question].keys
+      params[:new_question].keys.each do |question_key|
         q = Question.new(params[:new_question][question_key])
         q.questionnaire_id = questionnaire_id
         if @questionnaire.type == "QuizQuestionnaire"
@@ -440,21 +355,22 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
 
   # delete questions from a questionnaire
   # @param [Object] questionnaire_id
+  # used only in save_questions
   def delete_questions(questionnaire_id)
     # Deletes any questions that, as a result of the edit, are no longer in the questionnaire
     questions = Question.where( "questionnaire_id = " + questionnaire_id.to_s)
     @deleted_questions = []
-    for question in questions
+    questions.each do |question|
       should_delete = true
-      if params[:question] != nil
+      if params[:question]
         for question_key in params[:question].keys
-          if question_key.to_s === question.id.to_s
+          if question_key.to_s == question.id.to_s
             should_delete = false
           end
         end
       end
       if should_delete
-        for advice in question.question_advices
+        question.question_advices.each do |advice|
           advice.destroy
         end
         if Questionnaire.find(questionnaire_id).section == "Custom"
@@ -469,6 +385,8 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
   end
 
   # @param [Object] question_type_key
+  # since it need params[:q], do I still need to move this method and use params[:q] as parameter? if not need to move, then all the save_questions can't be moved.
+  # used only in save_questions line 538
   def update_question_type (question_type_key)
     this_q = QuestionType.find(question_type_key)
     this_q.parameters = params[:q][question_type_key][:parameters]
@@ -487,20 +405,21 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
       this_q.q_type =  Question::GRADING_TYPES_CUSTOM[5][0]
     end
 
-    unless this_q.nil?
+    if this_q
       this_q.save
     end
   end
 
   # Handles questions whose wording changed as a result of the edit
   # @param [Object] questionnaire_id
+  # put this method into models/question.rb as save_questions(questionnaire_id,type)?
+  #used only in save line 390, this method is tightly related with the params[:question]
   def save_questions(questionnaire_id)
     delete_questions questionnaire_id
     save_new_questions questionnaire_id
 
     if params[:question]
-      for question_key in params[:question].keys
-        print question_key
+     params[:question].keys.each do |question_key|
         begin
           if params[:question][question_key][:txt].strip.empty?
             # question text is empty, delete the question
@@ -522,7 +441,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
         end
       end
       if Questionnaire.find(questionnaire_id).section == "Custom"
-        for question_type_key in params[:q].keys
+        params[:q].keys.each do |question_type_key|
           update_question_type(question_type_key)
         end
       end
@@ -535,14 +454,13 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
   def save_choices(questionnaire_id)
     if params[:new_question] and params[:new_choices]
       questions = Question.where(questionnaire_id: questionnaire_id)
-      questionnum = 1
+      question_num = 1
 
       for question in questions
         q_type = params[:question_type][questionnum.to_s][:type]
         if(q_type!="Essay")
           for choice_key in params[:new_choices][questionnum.to_s][q_type].keys
-            print "=====choice_key="+choice_key+"======="
-
+    
             if params[:new_choices][questionnum.to_s][q_type][choice_key]["weight"] == 1.to_s
               score = 1
             else
@@ -568,90 +486,14 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
                 q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "false",:question_id => question.id)
               end
             end
-          end
+            end
           q.save
-        end
-      end
-      questionnum += 1
-      question.weight = 1
-      question.true_false = false
-    end
-  end
-  end
-
-  private
-
-  # FIXME: These private methods belong in the Questionnaire model
-
-  def export
-    @questionnaire = Questionnaire.find(params[:id])
-
-    csv_data = QuestionnaireHelper::create_questionnaire_csv @questionnaire, session[:user].name
-
-    send_data csv_data,
-      :type => 'text/csv; charset=iso-8859-1; header=present',
-      :disposition => "attachment; filename=questionnaires.csv"
-  end
-
-  def import
-    @questionnaire = Questionnaire.find(params[:id])
-
-    file = params['csv']
-
-    @questionnaire.questions << QuestionnaireHelper::get_questions_from_csv(@questionnaire, file)
-  end
-
-  # clones the contents of a questionnaire, including the questions and associated advice
-  def clone_questionnaire_details(questions)
-    if (session[:user]).role.name != "Teaching Assistant"
-      @questionnaire.instructor_id = session[:user].id
-    else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
-      @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
-    end
-
-    @questionnaire.name = 'Copy of '+orig_questionnaire.name
-
-    begin
-      @questionnaire.created_at = Time.now
-      @questionnaire.save!
-
-      questions.each do |question|
-        newquestion = question.clone
-        newquestion.questionnaire_id = @questionnaire.id
-        newquestion.save
-
-        advice = QuestionAdvice.find_by_question_id(question.id)
-
-        if advice
-          newadvice = advice.clone
-          newadvice.question_id = newquestion.id
-          newadvice.save
-        end
-
-        if @questionnaire.section == "Custom"
-          old_question_type = QuestionType.find_by_question_id(question.id)
-          unless old_question_type.nil?
-            new_question_type = old_question_type.clone
-            new_question_type.question_id = newquestion.id
-            new_question_type.save
           end
         end
-      end
-
-      pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
-      parent = FolderNode.find_by_node_object_id(pFolder.id)
-
-      if QuestionnaireNode.where(parent_id: parent.id, node_object_id:  @questionnaire.id) == nil
-        QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
-      end
-
-      undo_link("Copy of questionnaire #{orig_questionnaire.name} has been created successfully. ")
-      redirect_to :controller => 'questionnaire', :action => 'view', :id => @questionnaire.id
-
-    rescue
-
-      flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.'+$!
-      redirect_to :action => 'list', :controller => 'tree_display'
+        question_num += 1
+        question.weight = 1
+        question.true_false = false
     end
   end
+
 end

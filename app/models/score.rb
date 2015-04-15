@@ -83,10 +83,13 @@ class Score < ActiveRecord::Base
     #  questions  - specifies the list of questions being evaluated in the assessment
 
     def self.get_total_score(params)
-      @response = params[:response]
+      @response = params[:response].first
       @questions = params[:questions]
       @q_types = params[:q_types]
 
+      if@response.nil?
+        return -1
+      end
       weighted_score = 0
       sum_of_weights = 0
 
@@ -114,7 +117,7 @@ class Score < ActiveRecord::Base
           max_question_score = @questionnaire.max_question_score
         }
       else
-        questionnaireData = ScoreView.find_by_sql ["SELECT q1_max_question_score ,SUM(question_weight) as sum_of_weights,SUM(question_weight * s_score) as weighted_score FROM score_views WHERE q1_id = ? AND s_response_id = ?",@questions[0].questionnaire_id,@response .id]
+        questionnaireData = ScoreView.find_by_sql ["SELECT q1_max_question_score ,SUM(question_weight) as sum_of_weights,SUM(question_weight * s_score) as weighted_score FROM score_views WHERE q1_id = ? AND s_response_id = ?",@questions[0].questionnaire_id,@response.id]
         weighted_score = questionnaireData[0].weighted_score.to_f
         sum_of_weights = questionnaireData[0].sum_of_weights.to_f
         max_question_score = questionnaireData[0].q1_max_question_score.to_f

@@ -9,6 +9,7 @@
     }
 </SCRIPT>
 <% if assignment.has_topics? %>
+  <%if assignment.get_current_stage()!="Finished" %>
     <%= form_tag :controller => 'review_mapping',
                  :action => 'assign_reviewer_dynamically',
                  :assignment_id => assignment.id,
@@ -42,7 +43,9 @@
 
   <p><input type='submit' value='Request a new submission to review'/></p>
     <% end %>
+  <%end%>
   <% else %>
+    <%if assignment.get_current_stage()!="Finished" %>
     <%= form_tag :controller => 'review_mapping',
                  :action => 'assign_reviewer_dynamically',
                  :assignment_id => assignment.id,
@@ -50,6 +53,6 @@
     <input id="i_dont_care" name="i_dont_care" type="checkbox" onchange="toggleVis(this.checked, 'topic_list');" />
     I don't care which artifact I review.
     <p><input type='submit' value='Request a new submission to review'/></p>
-<% end %>
-
+  <% end %>
+  <%end%>
 <% end %>

@@ -1,11 +1,3 @@
-GIT
-  remote: git://github.com/expertiza/authlogic.git
-  revision: 09163c7d2a9b21942c6716e885a14305e1aa0390
-  specs:
-    expertiza-authlogic (3.2.0)
-      activerecord (>= 3.0.0)
-      activesupport (>= 3.0.0)
-
 GEM
   remote: http://rubygems.org/
   specs:
@@ -43,6 +35,11 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.3.6)
     arel (5.0.1.20140414130214)
+    authlogic (3.4.5)
+      activerecord (>= 3.2)
+      activesupport (>= 3.2)
+      request_store (~> 1.0)
+      scrypt (~> 1.2)
     awesome_nested_set (3.0.1)
       activerecord (>= 4.0.0, < 5)
     bind-it (0.2.7)
@@ -111,6 +108,9 @@ GEM
     ffi (1.9.3-x86-mingw32)
     ffi-aspell (0.0.3)
       ffi (>= 1.0.11)
+    ffi-compiler (0.1.3)
+      ffi (>= 1.0.0)
+      rake
     font-awesome-rails (4.2.0.0)
       railties (>= 3.2, < 5.0)
     formatador (0.2.5)
@@ -259,6 +259,7 @@ GEM
       ffi (>= 0.5.0)
     rb-readline (0.5.1)
     ref (1.0.5)
+    request_store (1.1.0)
     rest-client (1.7.2)
       mime-types (>= 1.16, < 3.0)
       netrc (~> 0.7)
@@ -298,6 +299,9 @@ GEM
       sass (~> 3.2.0)
       sprockets (~> 2.8, <= 2.11.0)
       sprockets-rails (~> 2.0)
+    scrypt (1.2.1)
+      ffi-compiler (>= 0.0.2)
+      rake
     seer (0.10.0)
     selenium-webdriver (2.42.0)
       childprocess (>= 0.5.0)
@@ -355,71 +359,6 @@ GEM
     tins (1.3.2)
     treetop (1.4.15)
       polyglot
-      polyglot
-      polyglot
-      polyglot
-      polyglot
-      polyglot
-      polyglot
-      polyglot
-      polyglot
-      polyglot
-      polyglot
-      polyglot
-      polyglot
-      polyglot
-      polyglot
-      polyglot
-      polyglot
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
-      polyglot (>= 0.3.1)
       polyglot (>= 0.3.1)
     turbolinks (2.3.0)
       coffee-rails
@@ -443,6 +382,7 @@ PLATFORMS
 DEPENDENCIES
   RedCloth
   activerecord-session_store
+  authlogic (~> 3.4.5)
   awesome_nested_set
   bind-it
   bootstrap-sass
@@ -457,7 +397,6 @@ DEPENDENCIES
   dynamic_form
   edavis10-ruby-web-search
   engtagger
-  expertiza-authlogic!
   fastercsv
   ffi-aspell
   font-awesome-rails

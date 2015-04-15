@@ -36,7 +36,7 @@ to display the label "Your team" in the student assignment tasks-->
     <!--Quiz-->
   <%if @assignment.require_quiz%>
     <li>
-      <% if @assignment.require_quiz and (@assignment.quiz_allowed(@reviewee_topic_id) or @assignment.get_current_stage(@participant.topic_id) == "Complete") %>
+      <% if @assignment.require_quiz and (@assignment.quiz_allowed(@reviewee_topic_id) or @assignment.get_current_stage(@participant.topic_id) == "Finished") %>
         <%= link_to "Quiz", student_quizzes_path(:id => @participant.id) %>
       <% else %>
         <font color="gray">Take quiz</font>
@@ -44,7 +44,7 @@ to display the label "Your team" in the student assignment tasks-->
     </li>
   <%end%>
     <li>
-      <% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@participant.topic_id) == "Complete" %>
+      <% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@participant.topic_id) == "Finished" %>
         <%= link_to "Others' work",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
       <% else %>
         <font color="gray">Others' work</font>

@@ -201,6 +201,7 @@ class SignUpSheetController < ApplicationController
             @duedates[i]['submission_'+ (@review_rounds+1).to_s] = !(duedate_subm.nil?)?(DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")):nil
             i = i + 1
           }
+          session[:duedates] = @duedates
       end
 
       def add_signup_topics_staggered
@@ -534,27 +535,32 @@ class SignUpSheetController < ApplicationController
         # be set on a per topic  and per round basis
         def save_topic_deadlines
 
-          due_dates = params[:due_date]
-
+          #due_dates = params[:due_date]
+          topics = SignUpTopic.where(assignment_id: params[:assignment_id])
           review_rounds = Assignment.find(params[:assignment_id]).get_review_rounds
-          due_dates.each { |due_date|
+          j = 0
+          topics.each { |topic|
             for i in 1..review_rounds
               topic_deadline_type_subm = DeadlineType.find_by_name('submission').id
-              topic_deadline_type_rev = DeadlineType.find_by_name('review').id
-
-              topic_deadline_subm = TopicDeadline.where(topic_id: due_date['t_id'].to_i, deadline_type_id: topic_deadline_type_subm, round: i).first
-              topic_deadline_subm.update_attributes({'due_at' => due_date['submission_' + i.to_s]})
+              topic_deadline_subm = TopicDeadline.where(topic_id: session[:duedates][j]['id'].to_i, deadline_type_id: topic_deadline_type_subm, round: i).first
+        binding.pry
+              
+              topic_deadline_subm.update_attributes({'due_at' => session[:duedates][j]['submission_' + i.to_s]})
               flash[:error] = "Please enter a valid " + (i > 1 ? "Resubmission deadline " + (i-1).to_s : "Submission deadline") if topic_deadline_subm.errors.length > 0
-
-              topic_deadline_rev = TopicDeadline.where(topic_id: due_date['t_id'].to_i, deadline_type_id: topic_deadline_type_rev, round:i).first
-              topic_deadline_rev.update_attributes({'due_at' => due_date['review_' + i.to_s]})
+        binding.pry
+              topic_deadline_type_rev = DeadlineType.find_by_name('review').id
+              topic_deadline_rev = TopicDeadline.where(topic_id: session[:duedates][j]['id'].to_i, deadline_type_id: topic_deadline_type_rev, round:i).first
+              topic_deadline_rev.update_attributes({'due_at' => session[:duedates][j]['review_' + i.to_s]})
               flash[:error] = "Please enter a valid Review deadline " + (i > 1 ? (i-1).to_s : "") if topic_deadline_rev.errors.length > 0
             end
+        binding.pry
 
-            topic_deadline_subm = TopicDeadline.where(topic_id: due_date['t_id'], deadline_type_id:  DeadlineType.find_by_name('metareview').id).first
-            topic_deadline_subm.update_attributes({'due_at' => due_date['submission_' + (review_rounds+1).to_s]})
+            topic_deadline_subm = TopicDeadline.where(topic_id: session[:duedates][j]['id'], deadline_type_id:  DeadlineType.find_by_name('metareview').id).first
+            topic_deadline_subm.update_attributes({'due_at' => session[:duedates][j]['submission_' + (review_rounds+1).to_s]})
             flash[:error] = "Please enter a valid Meta review deadline" if topic_deadline_subm.errors.length > 0
+            j = j + 1
           }
+        binding.pry
 
           redirect_to_sign_up(params[:assignment_id])
         end

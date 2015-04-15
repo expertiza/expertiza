@@ -443,8 +443,8 @@ class ReviewMappingController < ApplicationController
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     @items = AssignmentTeam.where(parent_id: @assignment.id)
-    @items.sort!{|a,b| a.name <=> b.name}
-    end
+    @items.sort{|a,b| a.name <=> b.name}
+  end
 
   def list_sortable
     @assignment = Assignment.find(params[:id])

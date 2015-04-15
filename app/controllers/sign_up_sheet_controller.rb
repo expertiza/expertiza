@@ -172,7 +172,7 @@ class SignUpSheetController < ApplicationController
         #Use this until you figure out how to initialize this array
         #@duedates = SignUpTopic.find_by_sql("SELECT s.id as topic_id FROM sign_up_topics s WHERE s.assignment_id = " + params[:id].to_s)
         @duedates = {}
-        unless @topics.nil?
+        return @duedates if @topics.nil?
           i=0
           @topics.each { |topic|
             @duedates[i] = {}
@@ -201,7 +201,6 @@ class SignUpSheetController < ApplicationController
             @duedates[i]['submission_'+ (@review_rounds+1).to_s] = !(duedate_subm.nil?)?(DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")):nil
             i = i + 1
           }
-        end
       end
 
       def add_signup_topics_staggered

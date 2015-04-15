@@ -55,4 +55,4 @@ class Node < ActiveRecord::Base
   # Retrieves the type of children this node has
   def get_child_type
   end
-end
+end

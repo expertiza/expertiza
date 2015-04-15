@@ -3,7 +3,7 @@ source 'http://rubygems.org'
 gem 'rails'
 
 ## Gems in Alphabetical Order
-
+gem "query_reviewer"
 gem 'activerecord-session_store'
 gem 'awesome_nested_set'
 gem 'bind-it'
@@ -15,6 +15,7 @@ gem 'coveralls', require: false
 gem 'delayed_job_active_record'
 gem 'dynamic_form'
 gem 'edavis10-ruby-web-search'
+gem 'eventmachine', :git => 'git://github.com/eventmachine/eventmachine.git', :branch => 'master'
 gem 'engtagger'
 gem 'expertiza-authlogic', github: 'expertiza/authlogic', :require => 'authlogic'
 gem 'fastercsv'
@@ -33,11 +34,11 @@ gem 'nokogiri'
 gem 'omniauth-google-oauth2', '~> 0.2.6'
 gem 'open-uri-cached'
 gem 'paper_trail'
-gem 'pg'
+#gem 'pg'
 gem 'protected_attributes'
 gem 'rails_12factor', group: :production
 gem 'rails4-autocomplete'
-gem 'rake'
+gem 'rake','10.3.2'
 gem 'rb-readline'
 gem 'RedCloth'
 gem 'rgl', :require => 'rgl/adjacency'

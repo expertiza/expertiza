@@ -13,7 +13,8 @@
   <TD WIDTH="2%">&nbsp;</TD>
   <TD WIDTH="2%">&nbsp;</TD>
 <% else %>
-  <% if parent_node.get_name == 'Courses'&& session[:user].role_id == 6 %>
+      <%ParentNode=parent_node.find(parent_node_object_id)%>
+  <% if ParentNode.name == 'Courses'&& session[:user].role_id == 6 %>
   <%else%>
     <% if child_nodes %>
       <TD WIDTH="2%" ALIGN="RIGHT"><a id="<%= prefix %>Link" name="<%= prefix %>Link" href="#" <% if child_nodes.length > 0  %>onclick="toggleList('<%= prefix %>',<%= child_nodes.length %>);alternate('theTable');return false;"><img src="/assets/expand.png"><% else %>onclick="return false;"><img src="/assets/noaction.png"><% end %></a></TD>
@@ -25,6 +26,7 @@
 <TD COLSPAN="<%= 3 - depth %>" WIDTH="<%= width %>%">
   <% if parent_node.get_name == 'Courses'&& session[:user].role_id == 6 %>
   <%else%>
+
     <%= parent_node.get_name %>
     <% if parent_node.get_directory != nil%>
       <BR/><I>Directory:</I> <%= parent_node.get_directory %>

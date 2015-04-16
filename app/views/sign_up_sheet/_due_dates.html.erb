@@ -14,20 +14,20 @@
   <% i=0 %>
   <%@resubmission_rounds = @assignment.get_review_rounds%>
 
-  <% for i in 0..(@duedates.length - 1) %>
+  <% for i in 0..(session[:duedates].length - 1) %>
     <tr>
-      <td><%= @duedates[i]['topic_identifier'] %></td>
-      <td><%= @duedates[i]['topic_name'] %></td>
+      <td><%= session[:duedates][i]['topic_identifier'] %></td>
+      <td><%= session[:duedates][i]['topic_name'] %></td>
       <%for j in 1..@resubmission_rounds%>
         <td>
-          <%= text_field :due_date, (@duedates[i]['id'].to_s + '_submission_' + j.to_s + '_due_date').to_s, size: 20, value: @duedates[i]['submission_'+ j.to_s] %>
+          <%= text_field :due_date, (session[:duedates][i]['id'].to_s + '_submission_' + j.to_s + '_due_date').to_s, size: 20, value: session[:duedates][i]['submission_'+ j.to_s] %>
         </td>
         <td>
-          <%= text_field :due_date, (@duedates[i]['id'].to_s + '_review_' + j.to_s + '_due_date').to_s, size: 20, value: @duedates[i]['review_'+ j.to_s]%>
+          <%= text_field :due_date, (session[:duedates][i]['id'].to_s + '_review_' + j.to_s + '_due_date').to_s, size: 20, value: session[:duedates][i]['review_'+ j.to_s]%>
         </td>
       <%end%>
       <td>
-        <%= text_field :due_date, (@duedates[i]['id'].to_s + '_submission_' + (j+1).to_s + '_due_date').to_s, size: 20, value: @duedates[i]['submission_'+ (@resubmission_rounds+1).to_s]%>
+        <%= text_field :due_date, (session[:duedates][i]['id'].to_s + '_submission_' + (j+1).to_s + '_due_date').to_s, size: 20, value: session[:duedates][i]['submission_'+ (@resubmission_rounds+1).to_s]%>
       </td>
     </tr>
     <% i=i+1 %>

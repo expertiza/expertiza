@@ -31,10 +31,10 @@
       entering a due date for &quot;signup&quot;.">
           <br><br>
           <% if @assignment_form.assignment.staggered_deadline == true %>
-                <%= link_to image_tag('/assets/tree_view/edit-signup-sheet-24.png', :title => 'Edit signup sheet'), {:controller => 'sign_up_sheet', :action => 'add_signup_topics_staggered', :id => @assignment_form.assignment.id}, {:title => 'Edit signup sheet'} %>
-              <% else %>
-                <%= link_to image_tag('/assets/tree_view/edit-signup-sheet-24.png', :title => 'Edit signup sheet'), {:controller => 'sign_up_sheet', :action => 'add_signup_topics', :id => @assignment_form.assignment.id}, {:title => 'Edit signup sheet'} %>
-              <% end %>
+              <%= render '/sign_up_sheet/add_signup_topics_staggered.html' %>
+          <% else %>
+              <%= render '/sign_up_sheet/add_signup_topics.html' %>
+          <% end %>
       </div>
     </div>
     <script>

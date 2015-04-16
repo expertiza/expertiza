@@ -40,11 +40,11 @@
                 <%= link_to image_tag('/assets/tree_view/add-signup-sheet-24.png', :title => 'Add signup sheet'), {:controller => 'sign_up_sheet', :action => 'add_signup_topics', :id => node.node_object_id}, {:title => 'Add signup sheet'} %>
               <% end %>
             <% end %>
-          </div>
+          
             <!-- E726 Changes Begin -->
-            <div>
-              <%= link_to fa_icon('building', title: 'Add Manager'), {:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment', :special_role => 'Manager'}, {:title => 'Add Manager'} %>
-              <%= link_to fa_icon('book', title: 'Add Reader'), {:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment', :special_role => 'Reader'}, {:title => 'Add Reader'} %>
+            
+              <%= link_to fa_icon('building 2x', title: 'Add Manager'), {:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment', :special_role => 'Manager'}, {:title => 'Add Manager'} %>
+              <%= link_to fa_icon('book 2x', title: 'Add Reader'), {:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment', :special_role => 'Reader'}, {:title => 'Add Reader'} %>
             </div>
             <!-- E726 Changes End -->
 

@@ -26,15 +26,6 @@ class UsersController < ApplicationController
     end
   end
 
-  def self.participants_in(assignment_id)
-    users = Array.new
-    participants = AssignmentParticipant.find_by_parent_id(assignment_id)
-    participants.each{
-      |participant|
-      users << User.find(participant.user_id)
-    }
-  end
-
   def auto_complete_for_user_name
     user = session[:user]
     role = Role.find(user.role_id)
@@ -100,6 +91,13 @@ class UsersController < ApplicationController
       else
         @user = User.find(params[:id])
         get_role
+        #obtain number of assignments participated
+        @assignment_participant_num = 0
+        AssignmentParticipant.where(user_id: @user.id).each {|participant| @assignment_participant_num += 1 }
+        #judge whether this user become reviewer or reviewee
+        @maps = ResponseMap.where(['reviewee_id = ? or reviewer_id = ?',params[:id],params[:id]])
+        #count the number of users in DB
+        @total_user_num = User.count
       end
     end
 
@@ -133,108 +131,106 @@ class UsersController < ApplicationController
         end
         undo_link("User \"#{@user.name}\" has been created successfully. ")
         redirect_to :action => 'list'
-        else
+      else
           foreign
           render :action => 'new'
-        end
-        end
-
-
-        def edit
-          @user = User.find(params[:id])
-          get_role
-          foreign
-        end
-
-        def update
-          @user = User.find params[:id]
-
-          if @user.update_attributes(params[:user])
-            undo_link("User \"#{@user.name}\" has been updated successfully. ")
-            redirect_to @user
-          else
-            foreign
-            render :action => 'edit'
-          end
-        end
-
-
-        def destroy
-          begin
-            @user = User.find(params[:id])
-            AssignmentParticipant.where(user_id: @user.id).each{|participant| participant.delete}
-            TeamsUser.where(user_id: @user.id).each{|teamuser| teamuser.delete}
-            AssignmentQuestionnaire.where(user_id: @user.id).each{|aq| aq.destroy}
-            @user.destroy
-            undo_link("User \"#{@user.name}\" has been deleted successfully. ")
-          rescue
-            flash[:error] = $!
-          end
-
-          redirect_to :action => 'list'
-        end
-
-        def keys
-          if (params[:id].nil?) || ((current_user_role? == "Student") &&  (session[:user].id != params[:id].to_i))
-            redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user]))
-          else
-            @user = User.find(params[:id])
-            @private_key = @user.generate_keys
-          end
-        end
-
-        protected
-
-        def foreign
-          role = Role.find((session[:user]).role_id)
-          @all_roles = Role.where( ['id in (?) or id = ?',role.get_available_roles,role.id])
-        end
-
-        private
-
-        def get_role
-          if @user && @user.role_id
-            @role = Role.find(@user.role_id)
-          elsif @user
-            @role = Role.new(:id => nil, :name => '(none)')
-          end
-        end
-
-        # For filtering the users list with proper search and pagination.
-        def paginate_list(role, user_id, letter)
-          paginate_options = {"1" => 25, "2" => 50, "3" => 100}
-
-          # If the above hash does not have a value for the key,
-          # it means that we need to show all the users on the page
-          #
-          # Just a point to remember, when we use pagination, the
-          # 'users' variable should be an object, not an array
-
-          #The type of condition for the search depends on what the user has selected from the search_by dropdown
-          condition = "(role_id in (?) or id = ?) and name like ?" #default used when clicking on letters
-          search_filter = letter + '%'
-          @search_by = params[:search_by]
-          if @search_by == '1'  #search by user name
-            condition = "(role_id in (?) or id = ?) and name like ?"
-            search_filter = '%' + letter + '%'
-          elsif @search_by == '2' # search by full name
-            condition = "(role_id in (?) or id = ?) and fullname like ?"
-            search_filter = '%' + letter + '%'
-          elsif @search_by == '3' # search by email
-            condition = "(role_id in (?) or id = ?) and email like ?"
-            search_filter = '%' + letter + '%'
-          end
-
-          if (paginate_options["#{@per_page}"].nil?) #displaying all - no pagination
-            users = User.order('name').where( [condition, role.get_available_roles, user_id, search_filter]).paginate(:page => params[:page], :per_page => User.count)
-          else #some pagination is active - use the per_page
-            users = User.page(params[:page]).order('name').per_page(paginate_options["#{@per_page}"]).where([condition, role.get_available_roles, user_id, search_filter])
-          end
-          users
-          end
-
-        # generate the undo link
-        #def undo_link
-        #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @user.versions.last.id)}>undo</a>"
-        #end
       end
+    end
+
+
+  def edit
+    @user = User.find(params[:id])
+    get_role
+    foreign
+  end
+
+  def update
+    @user = User.find params[:id]
+
+    #update username, when the user cannot be deleted
+    #rename occurs in 'show' page, not in 'edit' page
+    #eg. /users/5408?name=5408
+    if (request.original_fullpath == "/users/#{@user.id}?name=#{@user.id}")
+      @user.name += '_hidden'
+    end
+    if @user.update_attributes(params[:user])
+      undo_link("User \"#{@user.name}\" has been updated successfully. ")
+      redirect_to @user
+    else
+      foreign
+      render :action => 'edit'
+    end
+  end
+
+  def destroy
+    begin
+      @user = User.find(params[:id])
+      AssignmentParticipant.where(user_id: @user.id).each{|participant| participant.delete}
+      TeamsUser.where(user_id: @user.id).each{|teamuser| teamuser.delete}
+      AssignmentQuestionnaire.where(user_id: @user.id).each{|aq| aq.destroy}
+      Participant.delete(true)
+      @user.destroy
+      flash[:note] = undo_link("User \"#{@user.name}\" has been deleted successfully. ")
+    rescue
+      flash[:error] = $!
+    end
+
+    redirect_to :action => 'list'
+  end
+
+  def keys
+    if (params[:id].nil?) || ((current_user_role? == "Student") &&  (session[:user].id != params[:id].to_i))
+      redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user]))
+    else
+      @user = User.find(params[:id])
+      @private_key = @user.generate_keys
+    end
+  end
+
+  protected
+
+  def foreign
+    role = Role.find((session[:user]).role_id)
+    @all_roles = Role.where( ['id in (?) or id = ?',role.get_available_roles,role.id])
+  end
+
+  private
+
+  def get_role
+    if @user && @user.role_id
+      @role = Role.find(@user.role_id)
+    elsif @user
+      @role = Role.new(:id => nil, :name => '(none)')
+    end
+  end
+
+  # For filtering the users list with proper search and pagination.
+  def paginate_list(role, user_id, letter)
+    paginate_options = {"1" => 25, "2" => 50, "3" => 100}
+
+    # If the above hash does not have a value for the key,
+    # it means that we need to show all the users on the page
+    #
+    # Just a point to remember, when we use pagination, the
+    # 'users' variable should be an object, not an array
+
+    #The type of condition for the search depends on what the user has selected from the search_by dropdown
+    @search_by = params[:search_by]
+
+    # search for corresponding users
+    users = User.search_users(role, user_id, letter, @search_by)
+
+    # paginate
+    if (paginate_options["#{@per_page}"].nil?) #displaying all - no pagination
+      users = users.paginate(:page => params[:page], :per_page => User.count)
+    else #some pagination is active - use the per_page
+      users = users.page(params[:page]).per_page(paginate_options["#{@per_page}"])
+    end
+    users
+  end
+
+  # generate the undo link
+  #def undo_link
+  #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @user.versions.last.id)}>undo</a>"
+  #end
+end

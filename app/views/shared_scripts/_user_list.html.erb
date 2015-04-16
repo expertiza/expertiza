@@ -17,7 +17,7 @@
     <td ><%= User.yesorno(user.email_on_review_of_review) %></td>    
     <td ><%= participant.handle %></td>
            
-    <td ><%= link_to 'Remove', :controller => controller, :action => 'delete', :method => :post, :id => participant.id %></td>
+    <td ><%= link_to 'Remove', {:controller => controller, :action => 'destroy', :id => participant.id}, :method => :delete %></td>
         <!-- E726 Fall2012 Changes Begin -->
         <% if participant.special_role=='Reader' or participant.special_role=='Manager' %>
                 <% if participant.special_role=='Reader' %>

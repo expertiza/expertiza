@@ -20,14 +20,14 @@
       <td><%= session[:duedates][i]['topic_name'] %></td>
       <%for j in 1..@resubmission_rounds%>
         <td>
-          <%= text_field :due_date, (session[:duedates][i]['id'].to_s + '_submission_' + j.to_s + '_due_date').to_s, size: 20, value: session[:duedates][i]['submission_'+ j.to_s] %>
+          <%= text_field :due_date, (session[:duedates][i]['id'].to_s + '_submission_' + j.to_s + '_due_date').to_s, size: 20, value: DateTime.parse(session[:duedates][i]['submission_'+ j.to_s]).strftime("%Y-%m-%d %H:%M") %>
         </td>
         <td>
-          <%= text_field :due_date, (session[:duedates][i]['id'].to_s + '_review_' + j.to_s + '_due_date').to_s, size: 20, value: session[:duedates][i]['review_'+ j.to_s]%>
+          <%= text_field :due_date, (session[:duedates][i]['id'].to_s + '_review_' + j.to_s + '_due_date').to_s, size: 20, value: DateTime.parse(session[:duedates][i]['review_'+ j.to_s]).strftime("%Y-%m-%d %H:%M")%>
         </td>
       <%end%>
       <td>
-        <%= text_field :due_date, (session[:duedates][i]['id'].to_s + '_submission_' + (j+1).to_s + '_due_date').to_s, size: 20, value: session[:duedates][i]['submission_'+ (@resubmission_rounds+1).to_s]%>
+        <%= text_field :due_date, (session[:duedates][i]['id'].to_s + '_submission_' + (j+1).to_s + '_due_date').to_s, size: 20, value: DateTime.parse(session[:duedates][i]['submission_'+ (@resubmission_rounds+1).to_s]).strftime("%Y-%m-%d %H:%M")%>
       </td>
     </tr>
     <% i=i+1 %>

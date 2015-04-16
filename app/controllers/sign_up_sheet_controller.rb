@@ -13,6 +13,8 @@ class SignUpSheetController < ApplicationController
   require 'rgl/dot'
   require 'rgl/topsort'
 
+  before_action :add_signup_topic, only: [:index, :show, :new, :create]
+
   def action_allowed?
     case params[:action]
     when 'signup_topics', 'sign_up', 'delete_signup', 'list', 'show_team'
@@ -82,7 +84,6 @@ class SignUpSheetController < ApplicationController
         if @assignment.staggered_deadline?
           topic_set = Array.new
           topic = @sign_up_topic.id
-
         end
 
         if @sign_up_topic.save
@@ -192,7 +193,8 @@ class SignUpSheetController < ApplicationController
                 set_of_due_dates.each { |due_date|
                   create_topic_deadline(due_date, 0, topic.id)
                 }
-
+                duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('submission').id, round: j).first
+                duedate_rev = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('review').id, round: j).first
                 @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
                 @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
               end
@@ -502,7 +504,6 @@ class SignUpSheetController < ApplicationController
             #if this happens store the dependency as "0"
             !(params['topic_dependencies_' + topic.id.to_s].nil?)?([topic.id, params['topic_dependencies_' + topic.id.to_s][:dependent_on]]):([topic.id, ["0"]])
           }
-
           # Save the dependency in the topic dependency table
           TopicDependency.save_dependency(topics)
 
@@ -517,7 +518,6 @@ class SignUpSheetController < ApplicationController
           else
             flash[:error] = "There may be one or more cycles in the dependencies. Please correct them"
           end
-
 
           node = 'topic_name'
           dg = build_dependency_graph(topics, node) # rebuild with new node name
@@ -540,6 +540,7 @@ class SignUpSheetController < ApplicationController
 
           topics = SignUpTopic.where(assignment_id: params[:assignment_id])
           review_rounds = Assignment.find(params[:assignment_id]).get_review_rounds
+          # j represents the review rounds
           j = 0
           topics.each { |topic|
             for i in 1..review_rounds

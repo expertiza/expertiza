@@ -83,10 +83,9 @@
   <%= form_tag :action => 'save_topic_deadlines', :assignment_id => @assignment.id do %>
     <div id="due_date_myDiv" style="display:none" align="left">
       <br/>
+      <%if !session[:duedates].nil?%>
 
-      <%if !@duedates.nil?%>
-
-        <%if !@duedates[0].nil? && !@duedates[0]['submission_1'].nil?%>
+        <%if !session[:duedates][0].nil? && !session[:duedates][0]['submission_1'].nil?%>
           <%= render :partial => '/sign_up_sheet/due_dates', :locals => {} %>
         <%end%>
       <%else%>

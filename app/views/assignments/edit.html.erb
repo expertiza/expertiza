@@ -31,6 +31,7 @@
       entering a due date for &quot;signup&quot;.">
           <br><br>
           <% if @assignment_form.assignment.staggered_deadline == true %>
+              <%session[:duedates] = SignUpSheet.add_signup_topic(@assignment_form.assignment.id)%>
               <%= render '/sign_up_sheet/add_signup_topics_staggered.html' %>
           <% else %>
               <%= render '/sign_up_sheet/add_signup_topics.html' %>

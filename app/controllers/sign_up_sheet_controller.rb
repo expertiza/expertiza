@@ -166,44 +166,7 @@ class SignUpSheetController < ApplicationController
       #can have different deadlines.
       def add_signup_topic
         load_add_signup_topics(params[:id])
-
-        @review_rounds = Assignment.find(params[:id]).get_review_rounds
-        @topics = SignUpTopic.where(assignment_id: params[:id])
-
-        #Use this until you figure out how to initialize this array
-        #@duedates = SignUpTopic.find_by_sql("SELECT s.id as topic_id FROM sign_up_topics s WHERE s.assignment_id = " + params[:id].to_s)
-        @duedates = {}
-        return @duedates if @topics.nil?
-          i=0
-          @topics.each { |topic|
-            @duedates[i] = {}
-            @duedates[i]['id'] = topic.id
-            @duedates[i]['topic_identifier'] = topic.topic_identifier
-            @duedates[i]['topic_name'] = topic.topic_name
-
-            for j in 1..@review_rounds
-              duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('submission').id, round: j).first
-              duedate_rev = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('review').id, round: j).first
-              if !duedate_subm.nil? && !duedate_rev.nil?
-                @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
-                @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
-              else
-                #the topic is new. so copy deadlines from assignment
-                set_of_due_dates = DueDate.where(assignment_id: params[:id])
-                set_of_due_dates.each { |due_date|
-                  create_topic_deadline(due_date, 0, topic.id)
-                }
-                duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('submission').id, round: j).first
-                duedate_rev = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('review').id, round: j).first
-                @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
-                @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
-              end
-            end
-            duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('metareview').id).first
-            @duedates[i]['submission_'+ (@review_rounds+1).to_s] = !(duedate_subm.nil?)?(DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")):nil
-            i = i + 1
-          }
-          session[:duedates] = @duedates
+        SignUpSheet.add_signup_topic(params[:id])
       end
 
       def add_signup_topics_staggered

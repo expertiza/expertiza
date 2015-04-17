@@ -62,7 +62,6 @@ class AssignmentNode < Node
     	@assign_node = Assignment.find(self.node_object_id)
     end
     @assign_node.name
-    Assignment.find(self.node_object_id).name
   end
 
   # Gets the directory_path from the associated object
@@ -72,7 +71,6 @@ class AssignmentNode < Node
     	@assign_node = Assignment.find(self.node_object_id)
     end
     @assign_node.directory_path
-    Assignment.find(self.node_object_id).directory_path
   end
 
   # Gets the created_at from the associated object
@@ -82,7 +80,6 @@ class AssignmentNode < Node
     	@assign_node = Assignment.find(self.node_object_id)
     end
     @assign_node.created_at
-    Assignment.find(self.node_object_id).created_at
   end
 
   # Gets the updated_at from the associated object
@@ -92,7 +89,6 @@ class AssignmentNode < Node
    		@assign_node = Assignment.find(self.node_object_id)
     end
     @assign_node.updated_at
-    Assignment.find(self.node_object_id).updated_at
   end
 
   # Gets any TeamNodes associated with this object

@@ -33,6 +33,8 @@ Expertiza::Application.routes.draw do
   resources :assessment360 do
     collection do
       get :one_course_all_assignments
+      get :all_students_all_reviews
+      get :one_student_all_reviews
     end
   end
 
@@ -149,10 +151,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  post '/import_file/import', controller: :import_file, action: :import
-  post '/teams_users/create', controller: :teams_users, action: :create
-  post 'participants/change_handle', controller: :participants, action: :change_handle
-  post '/review_mapping/assign_metareviewer_dynamically', controller: :review_mapping, action: :assign_metareviewer_dynamically
+  get '/import_file/import', controller: :import_file, action: :import
 
   resources :institutions
 
@@ -275,7 +274,6 @@ Expertiza::Application.routes.draw do
       get :remove_hyperlink
       get :saving
       get :redirection
-      post :custom_create
     end
   end
 
@@ -475,7 +473,6 @@ Expertiza::Application.routes.draw do
   get '/menu/*name', controller: :menu_items, action: :link
   get ':page_name', controller: :content_pages, action: :view, method: :get
   get '/submitted_content/submit_hyperlink' => 'submitted_content#submit_hyperlink'
-  post '/review_mapping/review_report', controller: :review_mapping, action: :review_report
 
   root to: 'content_pages#view', page_name: 'home'
 

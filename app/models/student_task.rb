@@ -4,7 +4,7 @@ class StudentTask
 
   def initialize(args)
     @assignment = args[:assignment]
-    @current_stage = args[:get_current_stage]
+    @current_stage = args[:current_stage]
     @participant = args[:participant]
     @stage_deadline = args[:stage_deadline]
     @topic = args[:topic]
@@ -15,7 +15,7 @@ class StudentTask
       :participant => participant,
       :assignment => participant.assignment,
       :topic => participant.topic,
-      :get_current_stage => participant.get_current_stage,
+      :current_stage => participant.current_stage,
       :stage_deadline => (Time.parse(participant.stage_deadline) rescue Time.now + 1.years)
     )
   end
@@ -48,7 +48,7 @@ class StudentTask
   end
 
   def hyperlinks
-    @hyperlinks ||= participant.hyperlinks
+    @hyperlinks ||= participant.get_hyperlinks
   end
 
   def incomplete?
@@ -120,5 +120,26 @@ class StudentTask
 
   def topic
     participant.topic
+  end
+
+  def self.teamed_students(user)
+
+        @students_teamed = Hash.new {|h,k| h[k] = Hash.new(&h.default_proc)}
+        @teams = user.teams
+         
+         @teams.each do |team|
+             @course_id = Assignment.find(team.parent_id).course_id
+             @team_participants = Team.find(team.id).participants
+             @teammates = @team_participants.select {|participant| participant.name != user.name}
+             if @teammates.size > 0
+                 if @students_teamed[@course_id].size == 0
+                    @students_teamed[@course_id] = @teammates
+                 else
+                    @students_teamed[@course_id] << @teammates
+                 end
+             end
+            @students_teamed[@course_id].uniq!
+         end
+        @students_teamed
   end
 end

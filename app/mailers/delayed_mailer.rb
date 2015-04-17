@@ -33,10 +33,11 @@ class DelayedMailer
       end
 
       if(self.deadline_type == "drop_topic")
-        sign_up_topics = SignUpTopic.where( ['assignment_id = ?', self.assignment_id])
-        if(sign_up_topics != nil && sign_up_topics.count != 0)
-          drop_topics #reminder to signed_up users of the assignment
-        end
+        #sign_up_topics = SignUpTopic.where( ['assignment_id = ?', self.assignment_id])
+        #if(sign_up_topics != nil && sign_up_topics.count != 0)
+        drop_topics #drop topics from teams that only have one member
+          #reminder to signed_up users of the assignment
+        #end
       end
 
       if(self.deadline_type == "signup")
@@ -207,7 +208,9 @@ class DelayedMailer
     teams = TeamsUser.all.group(:team_id).count(:team_id)
     for team_id in teams.keys
       if teams[team_id] == 1
-        SignedUpUser.where(creator_id: team_id).first.delete
+        topic_to_drop = SignedUpUser.where(creator_id: team_id)
+        if !topic_to_drop.nil?#check if the one-person-team has signed up a topic
+          topic_to_drop.first.delete
       end
     end
   end

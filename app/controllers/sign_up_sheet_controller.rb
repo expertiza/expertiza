@@ -13,7 +13,7 @@ class SignUpSheetController < ApplicationController
   require 'rgl/dot'
   require 'rgl/topsort'
 
-  before_action :add_signup_topic, only: [:index, :show, :new, :create]
+  #before_action :add_signup_topic, only: [:index, :show, :new, :create]
 
   def action_allowed?
     case params[:action]

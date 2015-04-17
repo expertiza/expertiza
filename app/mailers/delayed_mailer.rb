@@ -35,7 +35,7 @@ class DelayedMailer
       if(self.deadline_type == "drop_topic")
         sign_up_topics = SignUpTopic.where( ['assignment_id = ?', self.assignment_id])
         if(sign_up_topics != nil && sign_up_topics.count != 0)
-          mail_signed_up_users #reminder to signed_up users of the assignment
+          drop_topics #reminder to signed_up users of the assignment
         end
       end
 
@@ -114,8 +114,8 @@ class DelayedMailer
   def get_one_member_team
     mailList = Array.new
     teams = TeamsUser.all.group(:team_id).count(:team_id)
-    for team in teams.keys
-        if teams[team] == 1
+    for team_id in teams.keys
+        if teams[team_id] == 1
           user_id = TeamsUser.where(team_id: team).first.user_id
           email = User.find(user_id).email
           mailList << email
@@ -203,3 +203,11 @@ class DelayedMailer
 
   end
 
+  def drop_topics
+    teams = TeamsUser.all.group(:team_id).count(:team_id)
+    for team_id in teams.keys
+      if teams[team_id] == 1
+        SignedUpUser.where(creator_id: team_id).first.delete
+      end
+    end
+  end

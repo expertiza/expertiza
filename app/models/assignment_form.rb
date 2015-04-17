@@ -116,7 +116,12 @@ class AssignmentForm
       if diff>0
         dj=Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type, due_date.due_at.to_s(:db)),
                                 1, diff.minutes.from_now)
+        if deadline_type == "team_formation"
+          dj2 = Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, "drop_topic", due_date.due_at.to_s(:db)),
+                               1, mi.minutes.from_now)
+        end
         due_date.update_attribute(:delayed_job_id, dj.id)
+        due_date.update_attribute(:delayed_job_id, dj2.id)
       end
     end
   end

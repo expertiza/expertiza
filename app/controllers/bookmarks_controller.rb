@@ -9,18 +9,19 @@ class BookmarksController < ApplicationController
 
   def add_bookmark_form
     # Fields: b_url b_type, b_title b_tags_text, b_type b_description
+    logger.warn("-------------------------------------------------------------")
     @b_url = ""
     @b_title = ""
     @b_tags_text = ""
     @b_description = ""
-    @topic_id = params[:id]
-    return @topic_id
+    @sign_up_topics = SignUpTopic.all
+    #@topic_id = params[:id]
+    #return @topic_id
   end
 
   def show
     redirect_to(:action => 'view_bookmarks')
   end
-
 
 
   def add_bookmark
@@ -32,12 +33,18 @@ class BookmarksController < ApplicationController
     b_title = params[:b_title]
     b_tags_text = params[:b_tags_text]
     b_description = params[:b_description]
+
     BookmarksHelper.prepare_string(b_url)
     session_user = session[:user]
-    @topicid = params[:topicid]
+    #@topicid = params[:topicid]
+    @topicid = params[:topics]
+
+   
+
+
     if @topicid
       # Add the topic bookmark
-      Bookmark.add_topic_bookmark(b_url, b_title, b_tags_text, b_description,session_user, @topicid)
+      Bookmark.add_this_bookmark(b_url, b_title, b_tags_text, b_description,session_user, @topicid)
       params[:id] = @topicid
       redirect_to(:action => 'view_topic_bookmarks', :id => @topicid)
     else
@@ -55,8 +62,14 @@ class BookmarksController < ApplicationController
   end
 
   def managing_bookmarks
+    store_referer
+    logger.warn(session["comingFrom"])
     @search_content = ""
     @order_by = ""
+    @my_user_temp = params[:users]
+    @my_user_id=session[:user].id
+    logger.warn("my_user_temp=>>"+"#{@my_user_temp}")
+    logger.warn("In managing_bookmarks controller **************")
     unless params[:s].nil?
       @search_content = params[:s]
     end
@@ -67,8 +80,13 @@ class BookmarksController < ApplicationController
     end
     @users_included ="All Included users"
     @method_name = "managing_bookmarks"
+    logger.warn("+++++++++++++++++++++++++++++++++++++++++")
+    logger.warn("@my_user_id is "+"#{@my_user_id}")
+     logger.warn("@order_by is "+"#{@order_by}")
+      logger.warn("+++++++++++++++++++++++++++++++++++++++++")
     # Call the model function with order by parameter
     @search_results = Bookmark.search_alltags_foruser(@my_user_id, @order_by)
+    #@search_results = Bookmark.search_alltags(@my_user_id, @order_by)
   end
 
   #Listing all the bookmarks for a topic
@@ -93,7 +111,7 @@ class BookmarksController < ApplicationController
         # First retrieve all the tag_ids mapped to the BMapping id.
         # Then retrieve all the tag names of the tag_ids picked up.
         # Append all these into a comma separated string, and push them onto the hash
-        tag_fetchs = BmappingsTags.where(["bmapping_id=?",bmapping.id])
+        tag_fetchs = BmappingsTag.where(["bmapping_id=?",bmapping.id])
         tag_array = Array.new
         for tag_fetch in tag_fetchs
           tag_array << Tag.find(tag_fetch.tag_id).tagname
@@ -151,7 +169,7 @@ class BookmarksController < ApplicationController
             # First retrieve all the tag_ids mapped to the BMapping id.
             # Then retrieve all the tag names of the tag_ids picked up.
             # Append all these into a comma separated string, and push them onto the hash
-            tag_fetchs = BmappingsTags.where(["bmapping_id=?",bmapping.id])
+            tag_fetchs = BmappingsTag.where(["bmapping_id=?",bmapping.id])
             tag_array = Array.new
             for tag_fetch in tag_fetchs
               tag_array << Tag.find(tag_fetch.tag_id).tagname
@@ -180,7 +198,7 @@ class BookmarksController < ApplicationController
     @result_tuple["description"] = @bookmark_mapping.description
     @result_tuple["url"] = @bookmark_mapping.bookmark.url
     @result_tuple["user_count"] = @bookmark_mapping.bookmark.user_count
-    tag_fetchs = BmappingsTags.where(["bmapping_id = ?",@bookmark_mapping.id])
+    tag_fetchs = BmappingsTag.where(["bmapping_id = ?",@bookmark_mapping.id])
     tag_array = Array.new
     for tag_fetch in tag_fetchs
       tag_array << Tag.find(tag_fetch.tag_id).tagname
@@ -218,7 +236,7 @@ class BookmarksController < ApplicationController
     @b_url = @bookmark_mapping.bookmark.url
     @b_title = @bookmark_mapping.title
     @b_tags_text = ""
-    tag_fetchs = BmappingsTags.where(["bmapping_id = ?",@bookmark_mapping.id])
+    tag_fetchs = BmappingsTag.where(["bmapping_id = ?",@bookmark_mapping.id])
     tag_array = Array.new
     for tag_fetch in tag_fetchs
       tag_array << Tag.find(tag_fetch.tag_id).tagname
@@ -235,7 +253,7 @@ class BookmarksController < ApplicationController
     b_tags_text = params["b_tags_text"]
     b_description = params["b_description"]
     session_user = session[:user]
-    Bookmark.edit_this_bookmark(b_url, b_title, b_tags_text, b_description, session_user)
+    Bookmark.edit(b_url, b_title, b_tags_text, b_description, session_user)
     redirect_to(:action => 'manage_bookmarks')
   end
 
@@ -253,37 +271,74 @@ class BookmarksController < ApplicationController
     else
       @order_by = params[:order_by].to_s
     end
+
     #when getting the hidden variable from the form for the users to include.. you might get "value" appended to the string before the param that you
     ##expect .. Remove that
-    @my_user = @my_user_temp.gsub(/value/, '');
+    
 
+    logger.warn("my_user_temp=>>"+"#{@my_user_temp}")
+    #@my_user = @my_user_temp.gsub(/:value=>/, '');
 
-    @search_array  = BookmarksHelper.separate_tags( @search_string)
+    #@my_user = @my_user_temp
 
-    @method_name = "search_bookmarks"
-    @search_results = Array.new
-    if (@my_user != "all_users")
-      @search_results = Bookmark.search_fortags_foruser(@search_array, @my_user, @order_by)
-      print(@search_results)
-      print("Chutya1")
-    else
+    @my_user = eval(@my_user_temp).first[1]
 
-      @search_results = Bookmark.search_fortags_allusers(@search_array, @order_by)
-      print(@search_results)
-      print("Chutya2")
-    end
-    if(@my_user == "all_users")
-      render :action => "view_bookmarks"
-      print("Chutya3")
-    else
-      render :action =>"manage_bookmarks"
+     logger.warn("my_user=>>"+"#{@my_user}")
 
-      print(@search_results.count)
-      print("Chutya4")
-    end
-    print("Chutya5")
-    end
+     logger.warn("-------IN search_bookmarks controller------")
+logger.warn("@search_string =>>>"+"#{@search_string}")
 
+      if @search_string.empty?
+            logger.warn("-----------Inside the required if block--------")
+            @search_results = Bookmark.search_alltags_allusers(@order_by)
+            #@search_results = Bookmark.search_alltags(nil,@order_by)
+      else
+          @search_array  = BookmarksHelper.separate_tags( @search_string)
+
+          logger.warn("#{@search_array}")
+
+          logger.warn("-------marker1-------")
+
+          @method_name = "search_bookmarks"
+          @search_results = Array.new
+
+          if (@my_user != "all_users")
+            logger.warn("@search_array=>"+"#{@search_array}")
+            logger.warn("@my_user=>"+"#{@my_user}")
+            logger.warn("@order_by=>"+"#{@order_by}")
+            #@my_user=2
+            @search_results = Bookmark.search_fortags_foruser(@search_array, @my_user, @order_by)
+            #@search_results = Bookmark.search_fortags(@search_array, @order_by,@my_user)
+            #print(@search_results)
+            print("Chutya1")
+            logger.warn("#{@search_results}")
+            logger.warn("==============================")
+          else
+            logger.warn("@order_by=>>"+"#{@order_by}")
+            #@search_results = Bookmark.search_fortags_allusers(@search_array, @order_by)
+            @search_results = Bookmark.search_fortags_allusers(@search_array, @order_by)
+            #@search_results = Bookmark.search_fortags(@search_array, @order_by,nil)
+            print(@search_results)
+            print("Chutya2****")
+          end
+
+          if(@my_user == "all_users")
+            render :action => "view_bookmarks"
+            print("Chutya3")
+          else
+            logger.warn("#{@search_results}")
+            print("Chutya4before")
+            render :action =>"managing_bookmarks"
+        
+            print(@search_results.count)
+            print("Chutya4")
+          end
+        
+
+          
+          print("Chutya5")
+          end
+        end
 
   def add_rating_rubric_form
     @rating_rubric = BookmarkRatingRubric.new
@@ -347,7 +402,7 @@ class BookmarksController < ApplicationController
   def create_tag_bookmark
     @tag = Tag.new(params[:tag])
     @tag.save
-    @bmapping_tag = BmappingsTags.new
+    @bmapping_tag = BmappingsTag.new
     @bmapping_tag.bmapping_id = params[:bmapping_id]
     @bmapping_tag.tag_id = @tag.id
     @bmapping_tag.save

@@ -5,7 +5,6 @@ Expertiza::Application.routes.draw do
 
   resources :bookmark_tags
   resources :books
-  resources :bookmarks
   resources :join_team_requests
 
   resources :admin do
@@ -56,9 +55,9 @@ Expertiza::Application.routes.draw do
 
   resources :author_feedback_questionnaires, controller: 'questionnaires'
 
-  resources :bookmark do
+  resources :bookmarks do
     collection do
-      get :manage_bookmarks, as: :manage
+      get :managing_bookmarks
       get :view_bookmark, as: :view
       get :view_rating_rubrics, as: :rating
       get :add_rating_rubric_form, as: :rating2
@@ -68,6 +67,9 @@ Expertiza::Application.routes.draw do
       get :view_bookmarks
       get :bookmarks_rate, as: :bookmark_rate
       get :view_rating_rubric
+      get :add_bookmark_form
+      post :add_bookmark
+      post :search_bookmarks
     end
   end
 

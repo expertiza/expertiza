@@ -6,6 +6,7 @@ tmp/**/*
 config/database.yml
 config/locales/database.yml
 coverage
+*.sql
 
 #################
 ## Eclipse
@@ -196,3 +197,8 @@ db/expertiza_scrubbed_2013_10_17.sql.gz
 .ruby-gemset
 .ruby-version
 mysql2psql.yml
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

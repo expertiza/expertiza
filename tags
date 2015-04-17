@@ -1606,7 +1606,7 @@ add_link_nodes	vendor/plugins/graphr-0-1-9/lib/graph/directed_graph.rb	/^  def a
 add_member	app/models/team.rb	/^  def add_member(user, assignment_id)$/;"	f	class:Team
 add_member_to_invited_team	app/models/teams_user.rb	/^  def self.add_member_to_invited_team(invitee_user_id, invited_user_id, assignment_id)$/;"	F	class:TeamsUser
 add_metareviewer	app/controllers/review_mapping_controller.rb	/^  def add_metareviewer$/;"	f	class:ReviewMappingController
-add_new_bookmark	app/models/bookmark.rb	/^    def self.add_new_bookmark(b_url,user_id)$/;"	F	class:Bookmark
+create	app/models/bookmark.rb	/^    def self.create(b_url,user_id)$/;"	F	class:Bookmark
 add_node	vendor/plugins/graphr-0-1-9/lib/graph/directed_graph.rb	/^  def add_node(node)$/;"	f	class:DirectedGraph
 add_nodes_in_links	vendor/plugins/graphr-0-1-9/lib/graph/graphviz_dot.rb	/^  def add_nodes_in_links(links, nodes)$/;"	f	class:DotGraphPrinter
 add_options!	vendor/gems/hoptoad_notifier-2.4.4/generators/hoptoad/hoptoad_generator.rb	/^  def add_options!(opt)$/;"	f	class:HoptoadGenerator
@@ -1625,11 +1625,10 @@ add_signup_topics	app/controllers/sign_up_sheet_controller.rb	/^      def add_si
 add_signup_topics_staggered	app/controllers/sign_up_sheet_controller.rb	/^      def add_signup_topics_staggered$/;"	f	class:SignUpSheetController
 add_ta	app/controllers/course_controller.rb	/^  def add_ta$/;"	f	class:CourseController
 add_tag_bookmark	app/controllers/bookmarks_controller.rb	/^  def add_tag_bookmark$/;"	f	class:BookmarksController
-add_this_bookmark	app/models/bookmark.rb	/^  def self.add_this_bookmark(b_url, b_title, b_tags_text, b_description,session_user)$/;"	F	class:Bookmark
+add_this_bookmark	app/models/bookmark.rb	/^  def self.add_this_bookmark(b_url, b_title, b_tags_text, b_description,session_user, topic_id)$/;"	F	class:Bookmark
 add_to_delayed_queue	app/controllers/assignment_controller.rb	/^    def add_to_delayed_queue$/;"	f	class:AssignmentController
 add_to_delayed_queue	app/models/assignment_form.rb	/^  def add_to_delayed_queue$/;"	f	class:AssignmentForm
 add_to_links	vendor/plugins/graphr-0-1-9/lib/graph/directed_graph.rb	/^  def add_to_links(link)$/;"	f	class:DirectedGraph
-add_topic_bookmark	app/models/bookmark.rb	/^  def self.add_topic_bookmark(b_url, b_title, b_tags_text, b_description,session_user, topicid)$/;"	F	class:Bookmark
 add_user_to_assignment	app/controllers/review_mapping_controller.rb	/^  def add_user_to_assignment$/;"	f	class:ReviewMappingController
 add_user_to_assignment	app/helpers/participants_helper.rb	/^  def self.add_user_to_assignment(params, user)$/;"	F
 add_user_to_course	app/helpers/participants_helper.rb	/^  def self.add_user_to_course(params, user)$/;"	F
@@ -2505,7 +2504,7 @@ edit_bookmark	app/controllers/bookmarks_controller.rb	/^  def edit_bookmark$/;"	
 edit_bookmark_form	app/controllers/bookmarks_controller.rb	/^  def edit_bookmark_form$/;"	f	class:BookmarksController
 edit_quiz	app/controllers/questionnaires_controller.rb	/^  def edit_quiz$/;"	f	class:QuestionnairesController
 edit_rating_rubric_form	app/controllers/bookmarks_controller.rb	/^  def edit_rating_rubric_form$/;"	f	class:BookmarksController
-edit_this_bookmark	app/models/bookmark.rb	/^  def self.edit_this_bookmark (b_url, b_title, b_tags_text, b_description,session_user)$/;"	F	class:Bookmark
+edit	app/models/bookmark.rb	/^  def self.edit (b_url, b_title, b_tags_text, b_description,session_user)$/;"	F	class:Bookmark
 effective_permission_id	app/models/controller_action.rb	/^  def effective_permission_id$/;"	f	class:ControllerAction
 element.ontouchstart	app/assets/javascripts/highcharts.js	/^css:function(a){var b=this.element,b=a&&a.width&&b.nodeName.toLowerCase()==="text",c,d="",e=function(a,b){return"-"+b.toLowerCase()};if(a&&a.color)a.fill=a.color;this.styles=a=v(this.styles,a);$&&b&&delete a.width;if(Da&&!Z)b&&delete a.width,L(this.element,a);else{for(c in a)d+=c.replace(\/([A-Z])\/g,e)+":"+a[c]+";";this.attr({style:d})}b&&this.added&&this.renderer.buildText(this);return this},on:function(a,b){if(fb&&a==="click")this.element.ontouchstart=function(a){a.preventDefault();b()};this.element["on"+$/;"	f
 email	app/models/assignment.rb	/^  def email(author_id)$/;"	f	class:Assignment

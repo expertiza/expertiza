@@ -29,6 +29,7 @@ gem 'jquery-rails'
 gem 'jquery-ui-sass-rails'
 gem 'jquery-datetimepicker-rails'
 gem 'mysql2'
+gem 'mysql'
 gem 'nokogiri'
 gem 'omniauth-google-oauth2', '~> 0.2.6'
 gem 'open-uri-cached'
@@ -74,9 +75,13 @@ group :test do
   gem 'rspec-rails'
   gem 'shoulda'
   gem 'test-unit'
+  gem 'minitest-reporters', '1.0.5'
+  gem 'mini_backtrace',     '0.1.3'
+  gem 'guard-minitest',     '2.3.1'
 end
 
 group :development, :test do
   gem 'capybara'
   gem 'simplecov', :require => false
+  gem 'cucumber-rails', :require => false
 end

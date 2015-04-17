@@ -1,0 +1,7 @@
+
+existing_bookmark:
+  id: 1
+  url: 'www.sample.com'
+  discoverer_user_id: 2
+  user_count: 1
+

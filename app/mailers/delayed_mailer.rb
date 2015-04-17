@@ -49,9 +49,7 @@ class DelayedMailer
       if(self.deadline_type == "team_formation")
         assignment = Assignment.find(self.assignment_id)
         if(assignment.team_assignment?)
-          mail_assignment_participants
-        else
-          emails = Array.new
+          emails = get_one_member_team
           email_reminder(emails, self.deadline_type)
         end
       end
@@ -111,6 +109,19 @@ class DelayedMailer
       end
     end
     return teamMembersMailList
+  end
+
+  def get_one_member_team
+    mailList = Array.new
+    teams = TeamsUser.all.group(:team_id).count(:team_id)
+    for team in teams.keys
+        if teams[team] == 1
+          user_id = TeamsUser.where(team_id: team).first.user_id
+          email = User.find(user_id).email
+          mailList << email
+        end
+    end
+    return mailList
   end
 
   def mail_metareviewers

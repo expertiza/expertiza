@@ -14,6 +14,9 @@ class StudentTaskController < ApplicationController
     @tasknotstarted = @student_tasks.select(&:not_started?)
     @taskrevisions = @student_tasks.select(&:revision?)
     @notifications = @student_tasks.select(&:notify?)
+
+    ######## Students Teamed With###################
+    @students_teamed_with = StudentTask.teamed_students current_user
   end
 
   def view
@@ -28,7 +31,7 @@ class StudentTaskController < ApplicationController
       review_mappings = @participant.team_reviews
 
       review_mappings.each do |review_mapping|
-        participant = AssignmentTeam.first_member(review_mapping.reviewee_id)
+        participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
 
         if participant && participant.topic
           review_due_date = TopicDeadline.where(topic_id: participant.topic_id, deadline_type_id:  1).first

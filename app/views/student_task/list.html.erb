@@ -10,7 +10,6 @@
       stage = student_task.current_stage
       controller = ""
       action = ""
-      id = participant.id
       if stage == "submission" || stage == 'signup'
         controller = "submitted_content"
         action = "edit"
@@ -54,7 +53,7 @@
   <% @taskrevisions.each do |student_task|
     participant = student_task.participant
     stage = student_task.current_stage
-    duedate = participant.assignment.stage_deadline(participant.topic_id)
+    duedate = participant.assignment.get_stage_deadline(participant.topic_id)
     controller = ""
     action = ""
     if stage == "submission" or stage == "resubmission"
@@ -77,6 +76,19 @@
   <span class="notification">&nbsp; &raquo; <%= link_to student_task.assignment.name + ": " +
     student_task.current_stage + " submitted", :controller => :grades, :action => :view_my_scores, :id => student_task.participant.id %></span><br/>
 <% end %>
+<br/>
+
+
+<strong>Students Teamed With You<br></strong><br>
+
+<% @students_teamed_with.keys.each do |course_id| %>
+    <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @students_teamed_with[course_id].size.to_s %>&nbsp;</span> <%= Course.find(course_id).name %><br></strong><br>
+
+    <% @students_teamed_with[course_id].each do |student|%>
+        <span class="notification">&nbsp; &raquo; <%= student.fullname.to_s %> </span><br/>
+    <% end %>
+<% end %>
+
 </div>
 </div>
 
@@ -94,7 +106,7 @@
 
     <% @student_tasks.each do |student_task| %>
       <% participant = student_task.participant %>
-      <% if student_task.assignment&&student_task.assignment.availability_flag %>
+      <% if student_task.assignment %>
         <tr class="listingRow">
           <td>&nbsp;</td>
           <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></td>
@@ -120,3 +132,4 @@
     <% end %>
   </table>
 </div>
+

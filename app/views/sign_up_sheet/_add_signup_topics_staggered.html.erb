@@ -62,7 +62,7 @@
     <span class="inline" id="due_date_hide" style="display: none">Hide start/due date</span>
   </a>
 
-  <%= form_tag :action => 'save_topic_deadlines', :assignment_id => @assignment.id do %>
+  <%= form_tag :controller => 'sign_up_sheet', :action => 'save_topic_deadlines', :assignment_id => @assignment.id do %>
     <div id="due_date_myDiv" style="display:none" align="left">
       <br/>
       <%if !session[:duedates].nil?%>

@@ -209,11 +209,11 @@ class SignUpSheetController < ApplicationController
         @assignment = Assignment.find(params[:id])
       end
 
-      #simple function that redirects ti the /add_signup_topics or the /add_signup_topics_staggered page depending on assignment type
+      #simple function that redirects to assignment->edit->topic panel to display /add_signup_topics or the /add_signup_topics_staggered page
       #staggered means that different topics can have different deadlines.
-      def redirect_to_sign_up(assignment_id)
+      def redirect_to_assignment_edit(assignment_id)
         assignment = Assignment.find(assignment_id)
-        (assignment.staggered_deadline == true)?(redirect_to :action => 'add_signup_topics_staggered', :id => assignment_id):(redirect_to :action => 'add_signup_topics', :id => assignment_id)
+        redirect_to :controller => 'assignments', :action => 'edit', :id => assignment_id
       end
 
       def list
@@ -525,7 +525,7 @@ class SignUpSheetController < ApplicationController
             j = j + 1
           }
 
-          redirect_to_sign_up(params[:assignment_id])
+          redirect_to_assignment_edit(params[:assignment_id])
         end
 
         #used by save_topic_dependencies. The dependency graph is a partial ordering of topics ... some topics need to be done

@@ -463,20 +463,17 @@ class AssignmentParticipant < Participant
     files(self.path) if self.directory_num
   end
 
-  def files(directory)
+  def get_files(directory)
     files_list = Dir[directory + "/*"]
     files = Array.new
-
-    files_list.each do |file|
-      if File.directory?(file)
-        dir_files = files(file)
+    for file in files_list
+      if File.directory?(file) then
+        dir_files = get_files(file)
         dir_files.each{|f| files << f}
       end
-      if !File.directory?(file)
-        files << file
-      end
+      files << file
     end
-    files
+    return files
   end
 
   def submitted_files()
@@ -591,10 +588,10 @@ class AssignmentParticipant < Participant
     end
 
     def get_path
-      if self.assignment.get_path.to_s[-1] != "/" then
-        self.assignment.get_path + self.directory_num.to_s
+      if self.assignment.path.to_s[-1] != "/"
+        self.assignment.path + "/" + self.directory_num.to_s
       else
-        self.assignment.get_path + "/"+ self.directory_num.to_s
+        self.assignment.path + self.directory_num.to_s
       end
     end
 

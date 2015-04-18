@@ -149,7 +149,10 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  get '/import_file/import', controller: :import_file, action: :import
+  post '/import_file/import', controller: :import_file, action: :import
+  post '/teams_users/create', controller: :teams_users, action: :create
+  post 'participants/change_handle', controller: :participants, action: :change_handle
+  post '/review_mapping/assign_metareviewer_dynamically', controller: :review_mapping, action: :assign_metareviewer_dynamically
 
   resources :institutions
 
@@ -272,6 +275,7 @@ Expertiza::Application.routes.draw do
       get :remove_hyperlink
       get :saving
       get :redirection
+      post :custom_create
     end
   end
 
@@ -473,6 +477,7 @@ Expertiza::Application.routes.draw do
   get '/menu/*name', controller: :menu_items, action: :link
   get ':page_name', controller: :content_pages, action: :view, method: :get
   get '/submitted_content/submit_hyperlink' => 'submitted_content#submit_hyperlink'
+  post '/review_mapping/review_report', controller: :review_mapping, action: :review_report
 
   root to: 'content_pages#view', page_name: 'home'
 

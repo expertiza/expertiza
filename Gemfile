@@ -44,7 +44,7 @@ gem 'RedCloth'
 gem 'rgl', :require => 'rgl/adjacency'
 gem 'rjb'
 gem 'rubyzip'
-gem 'rwordnet'
+gem 'rwordnet','0.1.3'
 gem 'sass-rails', '~> 4.0.2'
 gem 'seer'
 gem 'sprockets'
@@ -64,6 +64,7 @@ group :development do
   gem 'pry-nav'
   gem 'sqlite3-ruby', :require => 'sqlite3'
   gem 'selenium-webdriver'
+  gem 'quiet_assets'
 end
 
 group :test do

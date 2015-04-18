@@ -39,7 +39,7 @@ class AssignmentsController < ApplicationController
       # flash[:success] = 'Assignment was successfully created.'
       # redirect_to controller: :assignments, action: :edit, id: @assignment.id
       #AAD#
-      redirect_to :controller => 'tree_display', :action => 'list'
+      redirect_to :action => 'edit', :id => @assignment_form.assignment.id
       undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
       #AAD#
     else
@@ -48,6 +48,7 @@ class AssignmentsController < ApplicationController
   end
 
   def edit
+    @topics = SignUpTopic.find_by_sql("select * from sign_up_topics where assignment_id="+params[:id])
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @user = current_user
 
@@ -63,6 +64,9 @@ class AssignmentsController < ApplicationController
         @due_date_nameurl_notempty = true
         @due_date_nameurl_notempty_checkbox = true
         break
+      end
+      if dd.due_at.present?
+          dd.due_at = dd.due_at.to_s.in_time_zone(session[:user].timezonepref)
       end
     end
     @assignment_questionnaires.each do  |aq|
@@ -82,12 +86,26 @@ class AssignmentsController < ApplicationController
   end
 
   def update
-    @assignment_form= AssignmentForm.create_form_object(params[:id])
-    params[:assignment_form][:assignment][:wiki_type_id] = 1 unless params[:assignment_wiki_assignment]
+    ##if params doesn't have assignment_form, it means the assignment is assigned to a course using the icon on the popup menu
+    unless(params.has_key?(:assignment_form))
+      @assignment=Assignment.find(params[:id])
+      @assignment.course_id=params[:course_id];
+      if @assignment.save
+        flash[:note] = 'Assignment was successfully saved.'
+        redirect_to :controller => 'tree_display',:action => 'list'
+      else
+        flash[:error] = "Assignment save failed: #{@assignment.errors.full_messages.join(' ')}"
+        redirect_to :action => 'edit', :id => @assignment.id
+      end
+      return
+    end
 
+    @assignment_form= AssignmentForm.create_form_object(params[:id])
+    @assignment_form.assignment.instructor ||= current_user
+    params[:assignment_form][:assignment][:wiki_type_id] = 1 unless params[:assignment_wiki_assignment]
     #TODO: require params[:assignment][:directory_path] to be not null
     #TODO: insert warning if directory_path is duplicated
-    if @assignment_form.update_attributes(params[:assignment_form])
+    if @assignment_form.update_attributes(params[:assignment_form],session[:user])
         flash[:note] = 'Assignment was successfully saved.'
         #TODO: deal with submission path change
         # Need to rename the bottom-level directory and/or move intermediate directories on the path to an
@@ -110,9 +128,9 @@ class AssignmentsController < ApplicationController
   #  return the file location if there is any for the assignment
   # TODO: to be depreicated
   #--------------------------------------------------------------------------------------------------------------------
-  def get_path
+  def path
     begin
-      file_path = @assignment.get_path
+      file_path = @assignment.path
     rescue
       file_path = nil
     end
@@ -212,10 +230,10 @@ class AssignmentsController < ApplicationController
 
     def remove_assignment_from_course
       assignment = Assignment.find(params[:id])
-      oldpath = assignment.get_path rescue nil
+      oldpath = assignment.path rescue nil
       assignment.course_id = nil
       assignment.save
-      newpath = assignment.get_path rescue nil
+      newpath = assignment.path rescue nil
       FileHelper.update_file_location(oldpath, newpath)
       redirect_to :controller => 'tree_display', :action => 'list'
     end

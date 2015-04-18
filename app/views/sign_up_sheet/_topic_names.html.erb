@@ -3,13 +3,19 @@
   <span class="inline" id="<%= i %>_hide" style="display: none"><%= topic.topic_name %></span>
 </a>
 
-<div id="<%= i %>_myDiv" style="display:none">
+<!--if 'Has teams' is not checked, the UI should not show the team name on the topic list.-->
+
+<div id="<%= i %>_myDiv">
   <% if !@participants.nil? && @participants.size > 0 %>
     <% chooser_present = false %>
     <% for participant in @participants %>
       <% if topic.id == participant.topic_id %>
         <% chooser_present = true %>
-        <%= participant.name %>
+        <% if(@assignment_form.assignment.max_team_size > 1)%>
+          <%= participant.name%>
+        <% else %>
+          <%= participant.name.gsub(/\[[^\]]+\]/,'')%>
+        <% end %>
         <% if participant.is_waitlisted == true %>
           <font color='red'>(waitlisted)</font>
         <% end %>

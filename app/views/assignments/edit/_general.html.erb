@@ -16,7 +16,7 @@ function requireSignUpChanged() {
 }
 
 function teamAssignmentChanged() {
-  var msg = 'Warning! Unchecking this box will remove teams that already exist.'
+  var msg = 'Warning! Unchecking this box will hide teams that already exist.'
 
   if (jQuery('#assignment_team_assignment').is(':checked')) {
     jQuery('#assignment_team_count_field').removeAttr('hidden');
@@ -85,8 +85,8 @@ function is_coding_assignmentChanged(){
 
 <table id='assignment_general_setting_table'>
 <tr class='heading'>
-<th width=30%></th>
-<th width=70%></th>
+<th width=40%></th>
+<th width=60%></th>
   </tr>
 
   <tr>
@@ -94,21 +94,6 @@ function is_coding_assignmentChanged(){
       <input name="assignment_form[assignment][private]" type="hidden" value="false"/>
       <%= check_box_tag('assignment_form[assignment][private]', 'true', @assignment_form.assignment.private?) %>
       <%= label_tag('assignment_form[assignment][private]', 'Private?') %>
-    </td>
-  </tr>
-
-  <tr>
-    <td style='padding:5px' id='assignment_require_signup_field'>
-      <input name="assignment_form[assignment][require_signup]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment[require_signup]', 'true', @assignment_form.assignment.require_signup?, {:onChange => 'hasTopicsChanged()'}) %>
-      <%= label_tag('assignment_form[assignment][require_signup]', 'Has topics?') %>
-    </td>
-    <td style='padding:5px' id='assignment_is_intelligent_field'>
-      <%= label_tag('assignment_form[assignment][is_intelligent]', 'Intelligent Topic Selection:') %>
-      <select id="assignment_is_intelligent_field" name="assignment_form[assignment][is_intelligent]">
-        <option value=false style="width:75px">No</option>
-        <option value=true style="width:75px" <% if @assignment_form.assignment.is_intelligent %>SELECTED<%end%>>Yes</option>
-      </select>
     </td>
   </tr>
 
@@ -123,11 +108,16 @@ function is_coding_assignmentChanged(){
 
   <tr>
     <td style='padding:5px' id='assignment_team_assignment_field'>
-      <%= check_box_tag('team_assignment', 'true', @assignment_form.assignment.team_assignment?, {:onChange => 'hasTeamsChanged()'}) %>
+      <% if(@assignment_form.assignment.max_team_size == 1)%>
+        <%= check_box_tag('team_assignment', 'true', false, {:onChange => 'hasTeamsChanged()'}) %>
+      <% else %>
+        <%= check_box_tag('team_assignment', 'true', @assignment_form.assignment.team_assignment?, {:onChange => 'hasTeamsChanged()'}) %>
+      <% end %>
+      <% @assignment_form.assignment.max_team_size %>
       <%= label_tag('team_assignment', 'Has teams?') %>
     </td>
 
-    <td style='padding:5px' id='assignment_team_count_field' <%= 'hidden' unless @assignment_form.assignment.team_assignment? %>>
+    <td style='padding:5px' id='assignment_team_count_field' <%= 'hidden' if @assignment_form.assignment.max_team_size == 1%>>
       <%= label_tag('assignment_form[assignment][max_team_size]', 'Maximum number of members per team:') %>
       <%= text_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size, {:style => 'width:20px'}) %>
     </td>
@@ -166,8 +156,6 @@ function is_coding_assignmentChanged(){
     </td>
   </tr>
 
-
-
   <tr>
     <td style='padding:5px' id='assignment_review_visible_to_all_field'>
       <input name="assignment_form[assignment][reviews_visible_to_all]" type="hidden" value="false"/>
@@ -185,73 +173,60 @@ function is_coding_assignmentChanged(){
   </tr>
 
   <tr>
-    <td style='padding:5px' id='assignment_availability_flag_field'>
-      <input name="assignment_form[assignment][availability_flag]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][availability_flag]', 'true', @assignment_form.assignment.availability_flag) %>
-      <%= label_tag('assignment_form[assignment][availability_flag]', 'Available to students?') %>
-    </td>
-  </tr>
-  <!--Quiz fields-->
-
-  <tr>
     <td style='padding:5px' id='assignment_is_coding_assignment_field'>
       <input name="assignment_form[assignment][is_coding_assignment]" type="hidden" value="false"/>
       <%= check_box_tag('assignment_form[assignment][is_coding_assignment]', 'true', @assignment_form.assignment.is_coding_assignment, {:onchange => 'is_coding_assignmentChanged()'}) %>
       <%= label_tag('assignment_form[assignment][is_coding_assignment]', 'Is code submission required?') %>
     </td>
+
+  </tr>
+
+  <!--Quiz fields-->
+  <tr>
+    <td style='padding:5px' id='assignment_require_quiz_field'>
+      <input name="assignment_form[assignment][require_quiz]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][require_quiz]', 'true', @assignment_form.assignment.require_quiz, {:onChange => 'hasQuizChanged()'}) %>
+      <%= label_tag('assignment_form[assignment][require_quiz]', 'Has quiz?') %>
+    </td>
+
     <td style='padding:5px' id='assignment_numbers_of_quiz_field' <%= 'hidden' unless @assignment_form.assignment.require_quiz %>>
       <%= label_tag('assignment_form[assignment][num_quiz_questions]', 'Number of Quiz questions:') %>
       <%= text_field_tag('assignment_form[assignment][num_quiz_questions]', @assignment_form.assignment.num_quiz_questions, { :style => 'width:20px'}) %>
     </td>
   </tr>
 
+  <!--"available to student?" should be the last checkbox-->
+  <tr>
+    <td style='padding:5px' id='assignment_availability_flag_field'>
+      <input name="assignment_form[assignment][availability_flag]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][availability_flag]', 'true', @assignment_form.assignment.availability_flag) %>
+      <%= label_tag('assignment_form[assignment][availability_flag]', 'Available to students?') %>
+    </td>
+  </tr>
 </table>
 
 
 <script>
-  function hasTopicsChanged() {
-    var msg = 'Warning! Unchecking this box will remove all topics and the reservations of everyone who is signed up for them';
-        var checkbox = jQuery('#assignment_require_signup');
-
-        if (checkbox.is(':checked')) {
-          addDueDateTableElement('signup', 0, <%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
-            addDueDateTableElement('drop_topic', 0, <%= due_date(@assignment_form.assignment, 'drop_topic').to_json.html_safe %>);
-        } else {
-          if (<%= @assignment_form.assignment.has_topics? %>) {
-            if (confirm(msg)) {
-              removeDueDateTableElement('signup', 0);
-                    removeDueDateTableElement('drop_topic', 0);
-            } else {
-              checkbox.prop('checked', true);
-            }
-          } else {
-            removeDueDateTableElement('signup', 0);
-                removeDueDateTableElement('drop_topic', 0);
-          }
-        }
-  }
-
     function hasTeamsChanged() {
-      var msg = 'Warning! Unchecking this box will remove teams that already exist.';
+      var msg = 'Warning! Unchecking this box will hide teams that already exist.';
         var checkbox = jQuery('#team_assignment');
         var team_count_field = jQuery('#assignment_team_count_field');
 
         if (checkbox.is(':checked')) {
           team_count_field.removeAttr('hidden');
-            addDueDateTableElement('team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>)
+
         } else {
-          if (<%= @assignment_form.assignment.has_teams?%>) {
             if (confirm(msg)) {
               team_count_field.attr('hidden', true);
-                    removeDueDateTableElement('team_formation', 0);
+              document.getElementById('assignment_form_assignment_max_team_size').value = '1';
+
             } else {
               checkbox.prop('checked', true);
             }
-          } else {
-            team_count_field.attr('hidden', true);
-                removeDueDateTableElement('team_formation', 0);
-          }
-        }
+            if (<%= @assignment_form.assignment.max_team_size == 1%>){
+              team_count_field.attr('hidden', true);
+            }
+          } 
     }
 
     function wikiAssignmentChanged() {
@@ -287,7 +262,7 @@ function is_coding_assignmentChanged(){
 
 
     function hasQuizChanged() {
-      if (jQuery('#assignment_require_quiz').is(':checked')) {
+      if (jQuery('#assignment_form[assignment][require_quiz]').is(':checked')) {
         jQuery('#assignment_numbers_of_quiz_field').removeAttr('hidden');
       } else {
         jQuery('#assignment_numbers_of_quiz_field').attr('hidden', true);

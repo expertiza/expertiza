@@ -40,7 +40,11 @@ class ReviewMappingController < ApplicationController
   def add_reviewer
     assignment = Assignment.find(params[:id])
     topic_id = params[:topic_id]
-    round = assignment.get_current_round(topic_id)
+    if assignment.varying_rubrics_by_round?
+      round = assignment.get_current_round(topic_id) #if vary rubric by round, in the response_maps table we need to record round #
+    else
+      round=nil #if this assignment does not vary rubric by round, there is no point to record the round #
+    end
     msg = String.new
     begin
 
@@ -162,25 +166,12 @@ class ReviewMappingController < ApplicationController
       end
 
     rescue Exception => e
-      flash[:alert] = (e.nil?) ? $! : e
+      flash[:error] = (e.nil?) ? $! : e
     end
 
     redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
   end
 
-  def assign_metareviewer_dynamically
-    begin
-      assignment   = Assignment.find(params[:assignment_id])
-      metareviewer = AssignmentParticipant.where(user_id: params[:metareviewer_id], parent_id:  assignment.id).first
-
-      assignment.assign_metareviewer_dynamically(metareviewer)
-
-    rescue Exception => e
-      flash[:alert] = (e.nil?) ? $! : e
-    end
-
-    redirect_to :controller => 'student_review', :action => 'list', :id => metareviewer.id
-  end
 
   # assigns the quiz dynamically to the participant
   def assign_quiz_dynamically
@@ -241,7 +232,7 @@ class ReviewMappingController < ApplicationController
       assignment.assign_metareviewer_dynamically(metareviewer)
 
     rescue Exception => e
-      flash[:alert] = (e.nil?) ? $! : e
+      flash[:error] = (e.nil?) ? $! : e
     end
 
     redirect_to :controller => 'student_review', :action => 'list', :id => metareviewer.id
@@ -456,8 +447,8 @@ class ReviewMappingController < ApplicationController
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     @items = AssignmentTeam.where(parent_id: @assignment.id)
-    @items.sort!{|a,b| a.name <=> b.name}
-    end
+    @items.sort{|a,b| a.name <=> b.name}
+  end
 
   def list_sortable
     @assignment = Assignment.find(params[:id])

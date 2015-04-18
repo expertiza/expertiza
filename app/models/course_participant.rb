@@ -42,8 +42,8 @@ class CourseParticipant < Participant
     return self.course.name
   end
 
-  def get_path
-    Course.find(self.parent_id).get_path + self.directory_num.to_s + "/"
+  def path
+    Course.find(self.parent_id).path + self.directory_num.to_s + "/"
   end
 
   # provide export functionality for Assignment Participants
@@ -71,7 +71,7 @@ class CourseParticipant < Participant
     }
   end
 
-  def self.get_export_fields(options)
+  def self.export_fields(options)
     fields = Array.new
     if options["personal_details"] == "true"
       fields.push("name", "full name", "email")

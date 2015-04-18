@@ -8,8 +8,8 @@ class CollusionCycle
 
   def two_node_cycles
     collusion_cycles = []
-    assignment_participant.get_reviewers.each do |ap|
-      if ap.get_reviewers.include?(assignment_participant)
+    assignment_participant.reviewers.each do |ap|
+      if ap.reviewers.include?(assignment_participant)
         if assignment_participant.reviews_by_reviewer(ap).nil?
           next
         else
@@ -30,9 +30,9 @@ class CollusionCycle
 
   def three_node_cycles
     collusion_cycles = []
-    assignment_participant.get_reviewers.each do |ap1|
-      ap1.get_reviewers.each do |ap2|
-        if ap2.get_reviewers.include?(assignment_participant)
+    assignment_participant.reviewers.each do |ap1|
+      ap1.reviewers.each do |ap2|
+        if ap2.reviewers.include?(assignment_participant)
           if assignment_participant.reviews_by_reviewer(ap1).nil?
             next
           else
@@ -60,10 +60,10 @@ class CollusionCycle
 
   def four_node_cycles
     collusion_cycles = []
-    assignment_participant.get_reviewers.each do |ap1|
-      ap1.get_reviewers.each do |ap2|
-        ap2.get_reviewers.each do |ap3|
-          if ap3.get_reviewers.include?(assignment_participant)
+    assignment_participant.reviewers.each do |ap1|
+      ap1.reviewers.each do |ap2|
+        ap2.reviewers.each do |ap3|
+          if ap3.reviewers.include?(assignment_participant)
 
             if assignment_participant.reviews_by_reviewer(ap1).nil?
               next

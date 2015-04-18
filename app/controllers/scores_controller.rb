@@ -6,15 +6,6 @@ class ScoresController < ApplicationController
 
   def show
     @participant = AssignmentParticipant.find(params[:id])
-    @average_score_results = ScoreCache.get_class_scores(@participant.id)
-
-    @statistics = @average_score_results
-
-    @average_reviews = ScoreCache.get_reviews_average(@participant.id)
-    @average_metareviews = ScoreCache.get_metareviews_average(@participant.id)
-
-    @my_reviews = ScoreCache.my_reviews(@participant.id)
-    @my_metareviews = ScoreCache.my_metareviews(@participant.id)
 
     return if redirect_when_disallowed
     @assignment = @participant.assignment
@@ -37,7 +28,7 @@ class ScoresController < ApplicationController
       end
     end
 
-    @pscore = @participant.get_scores(@questions)
+    @pscore = @participant.scores(@questions)
     @stage = @participant.assignment.get_current_stage(@participant.topic_id)
     calculate_all_penalties(@assignment.id)
   end

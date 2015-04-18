@@ -63,7 +63,8 @@ class TeamsController < ApplicationController
       Team.check_for_existing(parent, params[:team][:name], session[:team_type])
       @team.name = params[:team][:name]
       @team.save
-      undo_link("Team \"#{@team.name}\" has been updated successfully. ")
+      flash[:success] = "Team \"#{@team.name}\" has been updated successfully. "
+      undo_link("")
       redirect_to :action => 'list', :id => parent.id
     rescue TeamExistsError
       flash[:error] = $!

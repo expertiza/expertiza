@@ -45,7 +45,7 @@
           if topic.is_waitlisted?
             @topics = "#{@topics}#{topic.topic.topic_identifier}: #{topic.topic_name} <font color='red'>(waitlisted)</font> <br/>"
           else
-            @topics = "#{@topics}#{topic.topic.topic_identifier}: #{topic.topic_name}<br/>"
+            @topics = "#{@topics}#{topic.topic.topic_identifier}: #{topic.topic_name}"
             end
         end
       else
@@ -88,7 +88,7 @@
         <% mappings = contributor.review_mappings
 
         if mappings.length > 0
-          mappings.sort! {|a,b| a.reviewer.fullname <=> b.reviewer.fullname}
+          mappings.sort {|a,b| a.reviewer.fullname <=> b.reviewer.fullname}
         end
         mappings.each{
           | map |
@@ -112,7 +112,7 @@
           <td width="50%">
             <table width="100%">
               <% rmappings = MetareviewResponseMap.where(reviewed_object_id: map.map_id)
-              rmappings.sort! {|a,b| a.reviewer.fullname <=> b.reviewer.fullname } %>
+              rmappings.sort {|a,b| a.reviewer.fullname <=> b.reviewer.fullname } %>
             <% rmappings.each{
               | rmap |
               if rmap

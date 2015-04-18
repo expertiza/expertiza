@@ -139,6 +139,8 @@ class CourseController < ApplicationController
       redirect_to :action => 'view_teaching_assistants', :id => @course.id
     else
       @ta_mapping = TaMapping.create(:ta_id => @user.id, :course_id => @course.id)
+      @user.role=Role.find_by_name 'Teaching Assistant'
+      @user.save
 
       redirect_to :action => 'view_teaching_assistants', :id => @course.id
 
@@ -150,6 +152,8 @@ class CourseController < ApplicationController
   def remove_ta
     @ta_mapping = TaMapping.find(params[:id])
     @ta = User.find(@ta_mapping.ta_id)
+    @ta.role = Role.find_by_name 'Student'
+    @ta.save
     @ta_mapping.destroy
 
     @course = @ta_mapping

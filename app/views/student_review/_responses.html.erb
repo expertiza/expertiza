@@ -5,9 +5,9 @@
       <%- # removed code that handles team and individual assignments differently   -%>
       <% if map.type.to_s == "MetareviewResponseMap" %>
           <% review_mapping = Response.find(map.reviewed_object_id) %>
-          <% participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id) %>
+          <% participant = AssignmentTeam.first_member(review_mapping.reviewee_id) %>
       <% else %>
-          <% participant = AssignmentTeam.get_first_member(map.reviewee_id) %>
+          <% participant = AssignmentTeam.first_member(map.reviewee_id) %>
       <% end %>
 
       <% if participant %>
@@ -57,7 +57,7 @@
                 <td>
                   <%= link_to "View", {:controller => 'response', :action => 'view', :id => @sorted[0].id} %>
                 </td>
-                <% if @assignment.get_current_stage(participant.topic_id) != "Complete" %>
+                <% if @assignment.get_current_stage(participant.topic_id) != "Finished" %>
                     <%- # show the link as edit when latest review is done in current phase   -%>
                     <%- # show link as update when latest review is done in different phase than current phase   -%>
                     <% if (deadline_version.due_at == deadline_time.due_at) %>
@@ -83,8 +83,8 @@
                             <%#- Display link for code review if 'any' code review files -%>
                             <%#- have been uploaded i.e. files present in code review dir -%>
                             <td>&nbsp;&nbsp;&nbsp;&nbsp;
-                              <% if participant.get_files(ReviewFilesHelper::get_code_review_file_dir(participant)).length > 0 %>
-                                  <%= link_to "Review Code", {:controller => 'review_files', :action => 'show_all_submitted_files', :participant_id => participant.id} %>
+                              <% if participant.files(ReviewFilesHelper::get_code_review_file_dir(participant)).length > 0 %>
+                                  <%= link_to "Review Code", { :controller => 'review_files', :action => 'show_all_submitted_files', :participant_id => participant.id } %>
                               <% end %>
                             </td>
                         <% else %>
@@ -92,17 +92,17 @@
                             <td> (Work has not yet been submitted)</td>
                         <% end %>
                     <% end %>
-                <% else %>
-                    <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
-                    <td>&nbsp;&nbsp;</td>
-                    <%- # Display link for code review if 'any' code review files  -%>
-                    <%- # have been uploaded i.e. files present in code review dir -%>
-                    <td>&nbsp;&nbsp;&nbsp;&nbsp;
-                      <% if participant.get_files(ReviewFilesHelper::get_code_review_file_dir(participant)).length > 0 %>
-                          <%= link_to "Review Code", {:controller => 'review_files', :action => 'show_all_submitted_files', :participant_id => participant.id} %>
-                      <% end %>
-                    </td>
-                <% end %>
+                    <% else %>
+                        <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
+                        <td>&nbsp;&nbsp;</td>
+                        <%-# Display link for code review if 'any' code review files -%>
+                        <%-# have been uploaded i.e. files present in code review dir-%>
+                        <td>&nbsp;&nbsp;&nbsp;&nbsp;
+                          <% if participant.files(ReviewFilesHelper::get_code_review_file_dir(participant)).length > 0 %>
+                              <%= link_to "Review Code", {:controller => 'review_files', :action => 'show_all_submitted_files', :participant_id => participant.id } %>
+                          <% end %>
+                        </td>
+                    <% end %>
             <% else %>
                 <td>Begin</td>
                 <td> (Work has not yet been submitted) for

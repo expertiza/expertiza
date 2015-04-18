@@ -556,10 +556,6 @@ class SignUpSheetController < ApplicationController
           set_of_topics
         end
 
-        def create_topic_deadline(due_date, offset, topic_id)
-          DueDate.assign_topic_deadline(due_date,offset,topic_id)
-        end
-
         def set_start_due_date(assignment_id, set_of_topics)
           DueDate.assign_start_due_date(assignment_id, set_of_topics)
         end

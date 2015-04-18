@@ -5,7 +5,16 @@ app = angular.module('MPApp',[
 ])
 
 app.controller 'testCtrl', ($scope) ->
-  console.log "in controller"
+  console.log "in testCtrl"
+
+app.controller 'SidebarCtrl', ($scope) ->
+  $scope.$watch('fffffffffffff', (new_value, old_value) ->
+    console.log("old_value: " + new_value)
+    console.log("new_value: " + new_value)
+    )
+
+app.controller 'HeaderAndNavCtrl', ($scope) ->
+  console.log "in HeaderAndNavCtrl"
 
 app.run () ->
   console.log "RUN RUN RUN"

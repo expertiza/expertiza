@@ -1,21 +1,4 @@
-<link href="/stylesheets/jquery.multiselect.css" rel="stylesheet" type="text/css"/>
 
-<link href="/stylesheets/style.css" rel="stylesheet" type="text/css"/>
-
-<link href="/stylesheets/jquery-ui-1.8rc3.custom.css" rel="stylesheet" type="text/css"/>
-<script src="/javascripts/jquery.min.js" type="text/javascript"></script>
-<script src="/javascripts/jquery.bgiframe.js" type="text/javascript"></script>
-<script src="/javascripts/jquery.multiselect.js" type="text/javascript"></script>
-<script src="/javascripts/jquery.dataTables.js" type="text/javascript"></script>
-
-
-<script type="text/javascript">
-  $(function() {
-    $('select').multiSelect({ selectedList:5, minWidth:235, noneSelected:"No dependency"});
-  });
-
-
-</script>
 <% @assignment = Assignment.find(params[:id]) %>
 
 <% @sign_up_topics = SignUpTopic.where(['assignment_id = ?', @assignment.id]) %>
@@ -23,7 +6,6 @@
 <% @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id) %>
 <% @participants = SignedUpUser.find_team_participants(@assignment.id)  %>
 
-<% @assignment = Assignment.find(params[:id]) %>
 <%= form_tag({:action => 'save_topic_dependencies', :id => 'dependency', :assignment_id => @assignment.id}, { :id => 'dependency' }) do %>
   <h1>Signup sheet for <%= @assignment.name %> assignment</h1>
 
@@ -97,3 +79,6 @@
 
 <% end %>
 
+<script>
+  jQuery('select').multiSelect({ selectedList:5, minWidth:235, noneSelected:"No dependency"});
+</script>

@@ -45,7 +45,7 @@
           if topic.is_waitlisted?
             @topics = "#{@topics}#{topic.topic.topic_identifier}: #{topic.topic_name} <font color='red'>(waitlisted)</font> <br/>"
           else
-            @topics = "#{@topics}#{topic.topic.topic_identifier}: #{topic.topic_name}<br/>"
+            @topics = "#{@topics}#{topic.topic.topic_identifier}: #{topic.topic_name}"
             end
         end
       else

@@ -211,6 +211,18 @@ class DelayedMailer
         topic_to_drop = SignedUpUser.where(creator_id: team_id)
         if !topic_to_drop.nil?#check if the one-person-team has signed up a topic
           topic_to_drop.first.delete
+        end
+      end
+    end
+  end
+
+  def drop_reviewers
+    reviews = ResponseMap.all
+    for review in reviews
+      review_has_began = Response.where(map_id: review.id)
+      if review_has_began.nil?#check if the one-person-team has signed up a topic
+        review_to_drop = ResponseMap.where(id: review.id)
+        review_to_drop.first.delete
       end
     end
   end

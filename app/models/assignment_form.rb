@@ -1,9 +1,8 @@
 class AssignmentForm
-
   attr_accessor :assignment, :assignment_questionnaires, :due_dates
-
   DEFAULT_MAX_TEAM_SIZE = 1
   DEFAULT_WIKI_TYPE_ID = 1
+
 
   def initialize(args={})
     @assignment = Assignment.new(args[:assignment])
@@ -119,9 +118,9 @@ class AssignmentForm
         if deadline_type == "team_formation"
           dj2 = Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, "drop_topic", due_date.due_at.to_s(:db)),
                                1, mi.minutes.from_now)
+          due_date.update_attribute(:delayed_job_id, dj2.id)
         end
         due_date.update_attribute(:delayed_job_id, dj.id)
-        due_date.update_attribute(:delayed_job_id, dj2.id)
       end
     end
   end

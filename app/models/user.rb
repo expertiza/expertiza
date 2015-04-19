@@ -105,12 +105,6 @@ class User < ActiveRecord::Base
     self == user.creator
   end
 
-  def assign_random_password
-    if self.password.blank?
-      self.password = self.random_password
-    end
-  end
-
   # Function which has a MailerHelper which sends the mail welcome email to the user after signing up
   def email_welcome
     MailerHelper::send_mail_to_user(self, "Your Expertiza password has been created", "user_welcome", password)
@@ -127,10 +121,6 @@ class User < ActiveRecord::Base
     randomize_password
     save
     password
-  end
-
-  def self.random_password(size=8)
-    random_pronouncable_password((size/2).round) + rand.to_s[2,3]
   end
 
   def self.import(row,session,id = nil)
@@ -151,9 +141,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  def get_author_name
-    return self.fullname
-  end
 
   def self.yesorno(elt)
     if elt==true
@@ -311,5 +298,22 @@ class User < ActiveRecord::Base
 
   def is_teaching_assistant?
     false
+  end
+
+  def self.search_users(role, user_id, letter, search_by)
+    if search_by == '1'  #search by user name
+      search_filter = '%' + letter + '%'
+      users = User.order('name').where( "(role_id in (?) or id = ?) and name like ?", role.get_available_roles, user_id, search_filter )
+    elsif search_by == '2' # search by full name
+      search_filter = '%' + letter + '%'
+      users = User.order('name').where( "(role_id in (?) or id = ?) and fullname like ?", role.get_available_roles, user_id, search_filter )
+    elsif search_by == '3' # search by email
+      search_filter = '%' + letter + '%'
+      users = User.order('name').where( "(role_id in (?) or id = ?) and email like ?", role.get_available_roles, user_id, search_filter )
+    else #default used when clicking on letters
+      search_filter = letter + '%'
+      users = User.order('name').where( "(role_id in (?) or id = ?) and name like ?", role.get_available_roles, user_id, search_filter )
+    end
+    users
   end
 end

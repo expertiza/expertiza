@@ -1,4 +1,6 @@
+<div ng-controller='TreeCtrl'>
 <h1>Manage content</h1>
 <%= render :partial => 'page_header' %>
 <%= render :partial => 'bread_crumbs' %>
-<%=  render :partial => 'page_footer' %>
+<button ng-click="get_children()" type="button" class="btn btn-default">Get</button>
+</div>

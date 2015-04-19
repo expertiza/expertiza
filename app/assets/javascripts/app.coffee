@@ -4,24 +4,31 @@ app = angular.module('MPApp',[
   'ui.bootstrap',
 ])
 
-app.controller 'testCtrl', ($scope) ->
-  console.log "in testCtrl"
+app.controller 'MainPageCtrl', ($scope) ->
+  console.log "in MainPageCtrl"
+  $scope.toDisplay = 0
 
 app.controller 'SidebarCtrl', ($scope) ->
-  $scope.$watch('fffffffffffff', (new_value, old_value) ->
-    console.log("old_value: " + new_value)
-    console.log("new_value: " + new_value)
-    )
+  console.log "in SidebarCtrl"
 
 app.controller 'HeaderAndNavCtrl', ($scope) ->
   console.log "in HeaderAndNavCtrl"
 
-app.run () ->
-  console.log "RUN RUN RUN"
+app.controller 'TreeCtrl', ($scope, $http) ->
+  console.log "in TreeCtrl"
+  $scope.toDisplay = 0
+  
+  $scope.get_children = () ->
+    $http.post('/tree_display/get_children_node_ng', {
+      "Msg": "hey"
+      })
+    .success((data) ->
+      console.log data
+      )
 
-app.directive 'testdirective', () ->
-  templateUrl: 'test.html'
-  link: (scope, element, attr) -> 
-    console.log "in directive"
-    scope.name = 'Heyhey'
+# app.directive 'testdirective', () ->
+#   templateUrl: 'test.html'
+#   link: (scope, element, attr) -> 
+#     console.log "in directive"
+#     scope.name = 'Heyhey'
 

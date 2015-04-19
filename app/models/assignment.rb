@@ -4,12 +4,14 @@
 ### 
 ###
 class Assignment < ActiveRecord::Base
-  require 'analytic/assignment_analytic'
+
+require 'analytic/assignment_analytic'
   include AssignmentAnalytic
   include DynamicReviewMapping
-  has_paper_trail
   belongs_to :course
   belongs_to :wiki_type
+  has_paper_trail
+
   # wiki_type needs to be removed. When an assignment is created, it needs to
   # be created as an instance of a subclass of the Assignment (model) class;
   # then Rails will "automatically' set the type field to the value that

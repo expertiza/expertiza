@@ -6,7 +6,7 @@
 <% @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id) %>
 <% @participants = SignedUpUser.find_team_participants(@assignment.id)  %>
 
-<%= form_tag({:action => 'save_topic_dependencies', :id => 'dependency', :assignment_id => @assignment.id}, { :id => 'dependency' }) do %>
+<%= form_tag :controller => 'sign_up_sheet', :action => 'save_topic_dependencies',:assignment_id => @assignment.id do %>
   <h1>Signup sheet for <%= @assignment.name %> assignment</h1>
 
   <% if flash[:notice] %>
@@ -32,15 +32,14 @@
           </td>
 
         </tr>
-      <% i=i+1 %>
-    <% end %>
-  </table>
-  <br/>
-  <input type="submit" id="submit" value="Save dependencies"/>
-
-<% else %>
-  <div class="flash_note"><%= "Signup topics have not yet been created." %></div>
-<% end %>
+        <% i=i+1 %>
+      <% end %>
+    </table>
+    <br/>
+    <%= submit_tag "Save dependencies"%>
+  <% else %>
+    <div class="flash_note"><%= "Signup topics have not yet been created." %></div>
+  <% end %>
 <% end %>
 
 <% session[:return_to] = request.url %>

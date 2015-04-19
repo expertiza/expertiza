@@ -17,7 +17,11 @@ app.controller 'HeaderAndNavCtrl', ($scope) ->
 app.controller 'TreeCtrl', ($scope, $http) ->
   console.log "in TreeCtrl"
   $scope.toDisplay = 0
-  
+
+  $scope.init = (value) ->
+    console.log eval(value)
+
+
   $scope.get_children = () ->
     $http.post('/tree_display/get_children_node_ng', {
       "Msg": "hey"

@@ -1,3 +1,5 @@
+require 'json'
+
 class TreeDisplayController < ApplicationController
   helper :application
   skip_before_action :verify_authenticity_token, only: [:get_children_node_ng]
@@ -120,11 +122,15 @@ class TreeDisplayController < ApplicationController
       @child_nodes = @root_node.get_children(@sortvar,@sortorder,session[:user].id,@show,nil,@search)
     else
       @child_nodes = FolderNode.get()
+      logger.warn @child_nodes
     end
+    @child_nodes_json = @child_nodes.to_json
+    logger.warn @child_nodes_json
   end
 
   def get_children_node_ng
     logger.warn params
+    logger.warn "====== + #{@child_nodes}"
     respond_to do |format|
       format.html {render text: "Great"}
     end

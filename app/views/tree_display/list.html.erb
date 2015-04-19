@@ -1,8 +1,9 @@
 <div ng-controller='TreeCtrl'>
+<div ng-init="init('<%= @child_nodes_json %>')">
 <h1>Manage content</h1>
 <%= render :partial => 'page_header' %>
 <%= render :partial => 'bread_crumbs' %>
-
+<div ng-model="child_nodes"></div>
 <%#= render :partial => 'page_footer' %>
 
 <button ng-click="get_children()" type="button" class="btn btn-default">Get</button>

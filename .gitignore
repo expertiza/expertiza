@@ -4,6 +4,7 @@ db/*.sql
 log/*.log
 tmp/**/*
 config/database.yml
+config/locales/database.yml
 coverage
 
 #################

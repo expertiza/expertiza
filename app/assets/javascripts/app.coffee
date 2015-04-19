@@ -19,12 +19,12 @@ app.controller 'TreeCtrl', ($scope, $http) ->
   $scope.toDisplay = 0
 
   $scope.init = (value) ->
-    console.log eval(value)
+    $scope.angularParams = JSON.parse(value)
 
 
   $scope.get_children = () ->
     $http.post('/tree_display/get_children_node_ng', {
-      "Msg": "hey"
+      "angularParams": $scope.angularParams
       })
     .success((data) ->
       console.log data

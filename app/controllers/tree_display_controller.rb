@@ -124,13 +124,16 @@ class TreeDisplayController < ApplicationController
       @child_nodes = FolderNode.get()
       logger.warn @child_nodes
     end
-    @child_nodes_json = @child_nodes.to_json
-    logger.warn @child_nodes_json
+    angularParams = {}
+    angularParams[:search] = @search
+    angularParams[:child_nodes] = @child_nodes
+    @angularParamsJSON = angularParams.to_json
   end
 
   def get_children_node_ng
-    logger.warn params
-    logger.warn "====== + #{@child_nodes}"
+    logger.warn params.class
+    childNodes = JSON.parse(params[:angularParams][:child_nodes]).to_json
+    logger.warn childNodes
     respond_to do |format|
       format.html {render text: "Great"}
     end

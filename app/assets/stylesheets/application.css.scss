@@ -14,3 +14,12 @@
 
 @import "bootstrap-sass-official/assets/stylesheets/bootstrap-sprockets";
 @import "bootstrap-sass-official/assets/stylesheets/bootstrap";
+
+
+.inner-table tr {
+    cursor: pointer;
+}
+
+.inner-table .table-hover tbody tr:hover td {
+  background: #F56E5E;
+}

@@ -16,12 +16,13 @@ app.controller 'HeaderAndNavCtrl', ($scope) ->
 
 app.controller 'TreeCtrl', ($scope, $http) ->
   console.log "in TreeCtrl"
+  $scope.display = {}
+  $scope.display["Assignments"] = false
+  $scope.display["Courses"] = false
+  $scope.display["Questionnaires"] = false
 
   $scope.init = (value) ->
     $scope.angularParams = JSON.parse(value)
-
-
-  $scope.get_children = () ->
     $http.post('/tree_display/get_children_node_ng', {
       "angularParams": $scope.angularParams
       })
@@ -30,8 +31,12 @@ app.controller 'TreeCtrl', ($scope, $http) ->
       console.log data
       )
 
-  $scope.show_children = (type) ->
+  $scope.showCellContent = () ->
+    console.log "HEY"
 
+
+  $scope.show_children = (type) ->
+    $scope.display[type] = !$scope.display[type]
 
 
 # app.directive 'testdirective', () ->

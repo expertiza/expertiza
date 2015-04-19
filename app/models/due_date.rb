@@ -2,7 +2,7 @@ class DueDate < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :deadline_type
   validate :due_at_is_valid_datetime
-  has_paper_trail
+#  has_paper_trail
 
   def self.default_permission(deadline_type, permission_type)
     permission_id = Hash.new

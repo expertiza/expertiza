@@ -216,7 +216,7 @@ class DelayedMailer
     end
   end
 
-  def drop_reviewers
+  def drop_reviews
     reviews = ResponseMap.all
     for review in reviews
       review_has_began = Response.where(map_id: review.id)

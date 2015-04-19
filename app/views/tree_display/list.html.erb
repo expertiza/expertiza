@@ -5,6 +5,18 @@
 <%= render :partial => 'bread_crumbs' %>
 <div ng-model="child_nodes"></div>
 <%#= render :partial => 'page_footer' %>
+<table class="table table-striped table-hover">
+  <thead>
+    <tr>
+      <th>Details</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="(type, data) in tableContent"><td><button type="button" class="btn btn-primary">{{type}}</button></td></tr>
+  </tbody>
+</table>
+<div></div>
 
 <button ng-click="get_children()" type="button" class="btn btn-default">Get</button>
 </div>

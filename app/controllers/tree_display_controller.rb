@@ -125,17 +125,20 @@ class TreeDisplayController < ApplicationController
     end
     angularParams = {}
     angularParams[:search] = @search
+    angularParams[:show] = @show
     angularParams[:child_nodes] = @child_nodes
+    angularParams[:sortvar] = @sortvar
+    angularParams[:sortorder] = @sortorder
+    angularParams[:user_id] = session[:user].id
     @angularParamsJSON = angularParams.to_json
 
-    for node in @child_nodes
-      logger.warn node.inspect
-    end
   end
 
   def get_children_node_ng
     childNodes = JSON.parse(params[:angularParams][:child_nodes])
     index = 1
+    tmpRes = {}
+    res = {}
     for node in childNodes
       if index % 2 == 0
         rowtype = "odd"
@@ -146,13 +149,44 @@ class TreeDisplayController < ApplicationController
       for a in node
         fnode[a[0]] = a[1]
       end
-      logger.warn fnode.inspect
+
+      search = params[:angularParams][:search]
+      prefix = fnode.node_object_id.to_s+"_"+index.to_s
+      depth = 0
+
+      # fnode is the parent node
+      # ch_nodes are childrens
+
+      ch_nodes = fnode.get_children(params[:angularParams][:sortvar], 
+                                 params[:angularParams][:sortorder],
+                                 params[:angularParams][:user_id].to_i, 
+                                 params[:angularParams][:show], 
+                                 params[:angularParams][:search])
+      logger.warn "--------"
+      logger.warn fnode.inspect      
+      logger.warn ch_nodes
+      logger.warn ch_nodes.size
+      logger.warn "--------"
+      tmpRes[fnode.get_name] = ch_nodes
+
+      # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
 
       index += 1
     end
 
+    for nodeType in tmpRes.keys
+      tmpArray = []
+      for node in tmpRes[nodeType]
+        tmpArray << node.get_name
+      end
+      res[nodeType] = tmpArray
+    end
+
+    logger.warn res.inspect
+
+
     respond_to do |format|
-      format.html {render text: "Great"}
+      format.html {render json: res}
     end
   end
 

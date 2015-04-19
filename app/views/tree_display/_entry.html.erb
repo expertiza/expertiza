@@ -1,6 +1,5 @@
 
 <% child_nodes = node.get_children(@sortvar,@sortorder,session[:user].id,@show,@search) %>
-<% logger.warn child_nodes.inspect %>
 
 <%= render :partial => '/tree_display/row_header',
   :locals => {

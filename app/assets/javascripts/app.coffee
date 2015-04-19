@@ -27,7 +27,7 @@ app.controller 'TreeCtrl', ($scope, $http) ->
       "angularParams": $scope.angularParams
       })
     .success((data) ->
-      console.log data
+      $scope.tableContent = data
       )
 
 # app.directive 'testdirective', () ->

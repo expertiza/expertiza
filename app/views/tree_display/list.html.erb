@@ -13,7 +13,25 @@
     </tr>
   </thead>
   <tbody>
-    <tr ng-repeat="(type, data) in tableContent"><td><button type="button" class="btn btn-primary">{{type}}</button></td></tr>
+    <tr ng-repeat="(type, data) in tableContent"><td><button ng-click="show_children(type)" type="button" class="btn btn-primary">{{type}}</button>
+    <table ng-if="display==1" class="table table-hover">
+      <thead>
+        <tr>
+          <th>Course Name</th>
+          <th>Directory</th>
+          <th>Creation Date</th>
+          <th>Updated Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+
+
+    </td></tr>
   </tbody>
 </table>
 <div></div>

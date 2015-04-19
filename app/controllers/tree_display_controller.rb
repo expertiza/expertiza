@@ -175,11 +175,21 @@ class TreeDisplayController < ApplicationController
     end
 
     for nodeType in tmpRes.keys
-      tmpArray = []
+      res[nodeType] =  Array.new
+      logger.warn res[nodeType].class
+
       for node in tmpRes[nodeType]
-        tmpArray << node.get_name
+        tmpObject = {}
+        tmpObject["name"] = node.get_name
+
+        if nodeType == 'Courses' || nodeType == "Assignments"
+          tmpObject["directory"] = node.get_directory
+          tmpObject["creation_date"] = node.get_creation_date
+          tmpObject["updated_date"] = node.get_modified_date
+        end
+        res[nodeType] << tmpObject
       end
-      res[nodeType] = tmpArray
+
     end
 
     logger.warn res.inspect

@@ -16,7 +16,6 @@ app.controller 'HeaderAndNavCtrl', ($scope) ->
 
 app.controller 'TreeCtrl', ($scope, $http) ->
   console.log "in TreeCtrl"
-  $scope.toDisplay = 0
 
   $scope.init = (value) ->
     $scope.angularParams = JSON.parse(value)
@@ -28,7 +27,12 @@ app.controller 'TreeCtrl', ($scope, $http) ->
       })
     .success((data) ->
       $scope.tableContent = data
+      console.log data
       )
+
+  $scope.show_children = (type) ->
+
+
 
 # app.directive 'testdirective', () ->
 #   templateUrl: 'test.html'

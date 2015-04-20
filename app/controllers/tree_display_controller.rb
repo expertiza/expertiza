@@ -195,7 +195,7 @@ class TreeDisplayController < ApplicationController
       childNodes = params[:angularParams][:child_nodes]
     end
     tmpRes = {}
-    res = {}
+    res = []
     fnode = eval(params[:angularParams][:nodeType]).new
     childNodes.each do |key, value|
       fnode[key] = value
@@ -210,19 +210,24 @@ class TreeDisplayController < ApplicationController
     if tmpRes
       # logger.warn tmpRes.inspect
       for child in tmpRes
-        logger.warn child.inspect
         nodeType = child.type
+        res2 = {}
+        res2["nodeinfo"] = child
+        res2["name"] = child.get_name
+        res2["key"] = params[:angularParams][:key]
+        logger.warn res2["key"]
+        logger.warn res2["name"]
 
-        res["nodeinfo"] = child
-        res["name"] = child.get_name
-
-        if nodeType == 'Courses' || nodeType == "Assignments"
-          res["directory"] = child.get_directory
-          res["creation_date"] = child.get_creation_date
-          res["updated_date"] = child.get_modified_date
+        if nodeType == 'CourseNode' || nodeType == "AssignmentNode"
+          res2["directory"] = child.get_directory
+          res2["creation_date"] = child.get_creation_date
+          res2["updated_date"] = child.get_modified_date
         end
+        res << res2
       end
     end
+
+    logger.warn res
 
     respond_to do |format|
       format.html {render json: res}

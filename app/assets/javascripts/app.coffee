@@ -20,12 +20,17 @@ app.controller 'TreeCtrl', ($scope, $http) ->
   $scope.display["Assignments"] = false
   $scope.display["Courses"] = false
   $scope.display["Questionnaires"] = false
+  $scope.allData = {}
 
-  $scope.showCellContent = (type) ->
-    console.log type
+  $scope.showCellContent = (name, directory) ->
+    console.log $scope.allData
+    key = name + "|" + directory
+    $scope.cellCentent = $scope.allData[key]
+    console.log $scope.cellCentent
 
   $scope.fetchCellContent = () ->
     for nodeType, outerNode of $scope.tableContent
+      # outerNode is the Assignments/Courses/Questionnaires
       for node in outerNode
         $scope.newParams = {}
         $scope.newParams["sortvar"] = $scope.angularParams["sortvar"]
@@ -33,6 +38,9 @@ app.controller 'TreeCtrl', ($scope, $http) ->
         $scope.newParams["search"] = $scope.angularParams["search"]
         $scope.newParams["show"] = $scope.angularParams["show"]
         $scope.newParams["user_id"] = $scope.angularParams["user_id"]
+        key = node.name + "|" + node.directory
+        $scope.newParams["key"] = key
+        # console.log key
         if nodeType == 'Assignments'
           $scope.newParams["nodeType"] = 'AssignmentNode'
         if nodeType == 'Courses'
@@ -51,7 +59,14 @@ app.controller 'TreeCtrl', ($scope, $http) ->
           "angularParams": $scope.newParams
           })
         .success((data) ->
-          console.log data
+          if data.length > 0
+            console.log data
+            for newNode in data
+              if not $scope.allData[newNode.key]
+                $scope.allData[newNode.key] = []
+              # console.log $scope.allData[newNode.key]
+              $scope.allData[newNode.key].push newNode
+              # console.log $scope.allData[newNode.key]
           )
 
 
@@ -65,10 +80,6 @@ app.controller 'TreeCtrl', ($scope, $http) ->
       console.log data
       $scope.fetchCellContent()
       )
-
-
-      
-
 
   $scope.show_children = (type) ->
     $scope.display[type] = !$scope.display[type]

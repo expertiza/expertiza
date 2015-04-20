@@ -3,6 +3,7 @@ class UsersController < ApplicationController
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
     :redirect_to => { :action => :list }
+  skip_before_action :verify_authenticity_token, only: [:list]
 
 
   def action_allowed?
@@ -76,6 +77,27 @@ class UsersController < ApplicationController
     @users = paginate_list(role, user.id, letter)
 
     @letters = ('A'..'Z').to_a
+
+    @user_ng = {}
+    @users_ng = []
+    for user in @users
+      @user_ng[:username] =  user.name
+      @user_ng[:id] = user.id
+      @user_ng[:fullname] = user.fullname
+      @user_ng[:email] = user.email
+      @user_ng[:role] =  user.role.name
+      @user_ng[:parent] = user.parent.try :name
+      @user_ng[:email_on_review] = User.yesorno(user.email_on_review)
+      @user_ng[:email_on_submission] = User.yesorno(user.email_on_submission)
+      @user_ng[:email_on_review_of_review] = User.yesorno(user.email_on_review_of_review)
+      @user_ng[:leaderboard_privacy] = User.yesorno(user.leaderboard_privacy)
+      @users_ng << @user_ng
+    end
+          
+
+    angularParams = {}
+    angularParams[:users] = @users_ng
+    @angularParamsJSON = angularParams.to_json
   end
 
     def show_selection

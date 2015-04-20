@@ -2,7 +2,7 @@ require 'json'
 
 class TreeDisplayController < ApplicationController
   helper :application
-  skip_before_action :verify_authenticity_token, only: [:get_children_node_ng]
+  skip_before_action :verify_authenticity_token, only: [:get_children_node_ng, :get_children_node_2_ng]
 
   def action_allowed?
     true
@@ -130,48 +130,38 @@ class TreeDisplayController < ApplicationController
     angularParams[:sortvar] = @sortvar
     angularParams[:sortorder] = @sortorder
     angularParams[:user_id] = session[:user].id
+    angularParams[:nodeType] = 'FolderNode'
     @angularParamsJSON = angularParams.to_json
 
   end
 
   def get_children_node_ng
-    childNodes = JSON.parse(params[:angularParams][:child_nodes])
-    index = 1
+    logger.warn params
+    if params[:angularParams][:child_nodes].is_a? String
+      childNodes = JSON.parse(params[:angularParams][:child_nodes])
+    else
+      childNodes = params[:angularParams][:child_nodes]
+    end
     tmpRes = {}
     res = {}
     for node in childNodes
-      if index % 2 == 0
-        rowtype = "odd"
-      else
-        rowtype = "even"
-      end
-      fnode = FolderNode.new
+      fnode = eval(params[:angularParams][:nodeType]).new
+
       for a in node
         fnode[a[0]] = a[1]
       end
 
-      search = params[:angularParams][:search]
-      prefix = fnode.node_object_id.to_s+"_"+index.to_s
-      depth = 0
-
       # fnode is the parent node
       # ch_nodes are childrens
-
       ch_nodes = fnode.get_children(params[:angularParams][:sortvar], 
                                  params[:angularParams][:sortorder],
                                  params[:angularParams][:user_id].to_i, 
                                  params[:angularParams][:show], 
                                  params[:angularParams][:search])
-      logger.warn "--------"
-      logger.warn fnode.inspect      
-      logger.warn ch_nodes
-      logger.warn ch_nodes.size
-      logger.warn "--------"
       tmpRes[fnode.get_name] = ch_nodes
 
       # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
 
-      index += 1
     end
 
     for nodeType in tmpRes.keys
@@ -180,6 +170,7 @@ class TreeDisplayController < ApplicationController
 
       for node in tmpRes[nodeType]
         tmpObject = {}
+        tmpObject["nodeinfo"] = node
         tmpObject["name"] = node.get_name
 
         if nodeType == 'Courses' || nodeType == "Assignments"
@@ -192,8 +183,46 @@ class TreeDisplayController < ApplicationController
 
     end
 
-    logger.warn res.inspect
+    respond_to do |format|
+      format.html {render json: res}
+    end
+  end
 
+  def get_children_node_2_ng
+    if params[:angularParams][:child_nodes].is_a? String
+      childNodes = JSON.parse(params[:angularParams][:child_nodes])
+    else
+      childNodes = params[:angularParams][:child_nodes]
+    end
+    tmpRes = {}
+    res = {}
+    fnode = eval(params[:angularParams][:nodeType]).new
+    childNodes.each do |key, value|
+      fnode[key] = value
+    end
+
+    ch_nodes = fnode.get_children(params[:angularParams][:sortvar], 
+                                 params[:angularParams][:sortorder],
+                                 params[:angularParams][:user_id].to_i, 
+                                 params[:angularParams][:show], 
+                                 params[:angularParams][:search])
+    tmpRes = ch_nodes
+    if tmpRes
+      # logger.warn tmpRes.inspect
+      for child in tmpRes
+        logger.warn child.inspect
+        nodeType = child.type
+
+        res["nodeinfo"] = child
+        res["name"] = child.get_name
+
+        if nodeType == 'Courses' || nodeType == "Assignments"
+          res["directory"] = child.get_directory
+          res["creation_date"] = child.get_creation_date
+          res["updated_date"] = child.get_modified_date
+        end
+      end
+    end
 
     respond_to do |format|
       format.html {render json: res}

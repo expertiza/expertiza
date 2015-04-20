@@ -28,7 +28,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr ng-repeat="record in data" ng-click="showCellContent()" class="clickable-row">
+        <tr ng-repeat="record in data" ng-click="showCellContent(type)" class="clickable-row">
           <div ng-if="type!='Questionnaires'">
           <td>{{record.name}}</td>
           <td>{{record.directory}}</td>

@@ -21,6 +21,40 @@ app.controller 'TreeCtrl', ($scope, $http) ->
   $scope.display["Courses"] = false
   $scope.display["Questionnaires"] = false
 
+  $scope.showCellContent = (type) ->
+    console.log type
+
+  $scope.fetchCellContent = () ->
+    for nodeType, outerNode of $scope.tableContent
+      for node in outerNode
+        $scope.newParams = {}
+        $scope.newParams["sortvar"] = $scope.angularParams["sortvar"]
+        $scope.newParams["sortorder"] = $scope.angularParams["sortorder"]
+        $scope.newParams["search"] = $scope.angularParams["search"]
+        $scope.newParams["show"] = $scope.angularParams["show"]
+        $scope.newParams["user_id"] = $scope.angularParams["user_id"]
+        if nodeType == 'Assignments'
+          $scope.newParams["nodeType"] = 'AssignmentNode'
+        if nodeType == 'Courses'
+          $scope.newParams["nodeType"] = 'CourseNode'
+        if nodeType == 'Questionnaires'
+          $scope.newParams["nodeType"] = 'FolderNode'
+        # console.log "1. "
+        # console.log node.nodeinfo
+        # console.log "2. "
+        # console.log $scope.newParams["child_nodes"]
+        $scope.newParams["child_nodes"] = node.nodeinfo
+        # console.log "3. "
+        # console.log $scope.newParams["child_nodes"]
+        # console.log "4. "
+        $http.post('/tree_display/get_children_node_2_ng', {
+          "angularParams": $scope.newParams
+          })
+        .success((data) ->
+          console.log data
+          )
+
+
   $scope.init = (value) ->
     $scope.angularParams = JSON.parse(value)
     $http.post('/tree_display/get_children_node_ng', {
@@ -29,10 +63,11 @@ app.controller 'TreeCtrl', ($scope, $http) ->
     .success((data) ->
       $scope.tableContent = data
       console.log data
+      $scope.fetchCellContent()
       )
 
-  $scope.showCellContent = () ->
-    console.log "HEY"
+
+      
 
 
   $scope.show_children = (type) ->

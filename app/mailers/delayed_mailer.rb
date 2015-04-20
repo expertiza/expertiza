@@ -4,7 +4,7 @@ class DelayedMailer
   attr_accessor :assignment_id
   attr_accessor :deadline_type
   attr_accessor :due_at
-
+  # require PaperTrailForDelayedJob
   @@count = 0
 
   def initialize(assignment_id, deadline_type, due_at)
@@ -200,8 +200,6 @@ class DelayedMailer
          :subject => subject,
          :body => body
       }).deliver
-    end
-
   end
 
   def drop_topics
@@ -226,3 +224,7 @@ class DelayedMailer
       end
     end
   end
+
+end
+
+

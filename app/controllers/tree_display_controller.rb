@@ -172,6 +172,7 @@ class TreeDisplayController < ApplicationController
         tmpObject = {}
         tmpObject["nodeinfo"] = node
         tmpObject["name"] = node.get_name
+        tmpObject["type"] = node.type
 
         if nodeType == 'Courses' || nodeType == "Assignments"
           tmpObject["directory"] = node.get_directory
@@ -215,6 +216,7 @@ class TreeDisplayController < ApplicationController
         res2["nodeinfo"] = child
         res2["name"] = child.get_name
         res2["key"] = params[:angularParams][:key]
+        res2["type"] = nodeType
         logger.warn res2["key"]
         logger.warn res2["name"]
 
@@ -226,8 +228,6 @@ class TreeDisplayController < ApplicationController
         res << res2
       end
     end
-
-    logger.warn res
 
     respond_to do |format|
       format.html {render json: res}

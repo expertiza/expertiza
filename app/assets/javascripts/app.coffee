@@ -23,51 +23,47 @@ app.controller 'TreeCtrl', ($scope, $http) ->
   $scope.allData = {}
 
   $scope.showCellContent = (name, directory) ->
-    console.log $scope.allData
     key = name + "|" + directory
     $scope.cellCentent = $scope.allData[key]
     console.log $scope.cellCentent
+    $scope.subtable = 'hey'
+    $scope.display[key] = !$scope.display[key]
+    $scope.cellDisplay = $scope.display[key]
 
-  $scope.fetchCellContent = () ->
-    for nodeType, outerNode of $scope.tableContent
-      # outerNode is the Assignments/Courses/Questionnaires
-      for node in outerNode
-        $scope.newParams = {}
-        $scope.newParams["sortvar"] = $scope.angularParams["sortvar"]
-        $scope.newParams["sortorder"] = $scope.angularParams["sortorder"]
-        $scope.newParams["search"] = $scope.angularParams["search"]
-        $scope.newParams["show"] = $scope.angularParams["show"]
-        $scope.newParams["user_id"] = $scope.angularParams["user_id"]
-        key = node.name + "|" + node.directory
-        $scope.newParams["key"] = key
-        # console.log key
-        if nodeType == 'Assignments'
-          $scope.newParams["nodeType"] = 'AssignmentNode'
-        if nodeType == 'Courses'
-          $scope.newParams["nodeType"] = 'CourseNode'
-        if nodeType == 'Questionnaires'
-          $scope.newParams["nodeType"] = 'FolderNode'
-        # console.log "1. "
-        # console.log node.nodeinfo
-        # console.log "2. "
-        # console.log $scope.newParams["child_nodes"]
-        $scope.newParams["child_nodes"] = node.nodeinfo
-        # console.log "3. "
-        # console.log $scope.newParams["child_nodes"]
-        # console.log "4. "
-        $http.post('/tree_display/get_children_node_2_ng', {
-          "angularParams": $scope.newParams
-          })
-        .success((data) ->
-          if data.length > 0
-            console.log data
-            for newNode in data
-              if not $scope.allData[newNode.key]
-                $scope.allData[newNode.key] = []
-              # console.log $scope.allData[newNode.key]
-              $scope.allData[newNode.key].push newNode
-              # console.log $scope.allData[newNode.key]
-          )
+  $scope.fetchCellContent = (nodeType, node) ->
+    console.log nodeType
+    console.log node
+    $scope.newParams = {}
+    $scope.newParams["sortvar"] = $scope.angularParams["sortvar"]
+    $scope.newParams["sortorder"] = $scope.angularParams["sortorder"]
+    $scope.newParams["search"] = $scope.angularParams["search"]
+    $scope.newParams["show"] = $scope.angularParams["show"]
+    $scope.newParams["user_id"] = $scope.angularParams["user_id"]
+    key = node.name + "|" + node.directory
+    $scope.newParams["key"] = key
+    # console.log key
+    if nodeType == 'Assignments'
+      $scope.newParams["nodeType"] = 'AssignmentNode'
+    else if nodeType == 'Courses'
+      $scope.newParams["nodeType"] = 'CourseNode'
+    else if nodeType == 'Questionnaires'
+      $scope.newParams["nodeType"] = 'FolderNode'
+    else
+      $scope.newParams["nodeType"] = nodeType
+
+    $scope.newParams["child_nodes"] = node.nodeinfo
+    $http.post('/tree_display/get_children_node_2_ng', {
+      "angularParams": $scope.newParams
+      })
+    .success((data) ->
+      if data.length > 0
+        for newNode in data
+          if not $scope.allData[newNode.key]
+            $scope.allData[newNode.key] = []
+          $scope.allData[newNode.key].push newNode
+          $scope.fetchCellContent(newNode.type, newNode)
+
+      )
 
 
   $scope.init = (value) ->
@@ -78,7 +74,10 @@ app.controller 'TreeCtrl', ($scope, $http) ->
     .success((data) ->
       $scope.tableContent = data
       console.log data
-      $scope.fetchCellContent()
+      for nodeType, outerNode of $scope.tableContent
+        # outerNode is the Assignments/Courses/Questionnaires
+        for node in outerNode
+          $scope.fetchCellContent(nodeType, node)
       )
 
   $scope.show_children = (type) ->

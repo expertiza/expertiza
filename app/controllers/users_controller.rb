@@ -70,7 +70,7 @@ class UsersController < ApplicationController
     elsif params[:from_letter]
       @per_page = 1
     else
-      @per_page = params[:num_users]
+      @per_page = 2 # show 50 users per page
     end
 
     # Get the users list to show on current page

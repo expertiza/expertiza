@@ -19,14 +19,14 @@
             <td><%= select("post", "item_type",
                          Version.uniq.pluck(:item_type) << 'Any') %></td>
             <td><%= label_tag(:before, "Start Date:") %></td>
-            <td><%= datetime_select :datetime, :start %></td>
+            <td><%= text_field_tag :start_time, Date.today.beginning_of_day.strftime("%Y-%m-%d %H:%M"), class: 'datetimeklass' %></td>
           </tr>
           <tr>
             <td><%= label_tag(:event, "Event:") %></td>
             <td><%= select("post", "event",
                          Version.uniq.pluck(:event) << 'Any') %></td>
             <td><%= label_tag(:after, "End Date:") %></td>
-            <td><%= datetime_select :datetime, :end %></td>
+            <td><%= text_field_tag :end_time, Time.now.strftime("%Y-%m-%d %H:%M"), class: 'datetimeklass' %></td>
           </tr>
         </table>
         <br/>
@@ -36,7 +36,20 @@
 </div>
 
 <br/>
-
+<script type="text/javascript">
+jQuery('.datetimeklass').datetimepicker({
+            dateFormat: 'yy/mm/dd',
+            timeFormat: 'HH:mm:ss z',
+            controlType: 'select',
+            timezoneList: [
+                { value: -000, label: 'GMT'},
+                { value: -300, label: 'Eastern'},
+                { value: -360, label: 'Central' },
+                { value: -420, label: 'Mountain' },
+                { value: -480, label: 'Pacific' }
+            ]
+        });
+</script>
 <%= render :partial => 'versions/pagination' %>
 
 <div>

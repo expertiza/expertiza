@@ -25,5 +25,9 @@ module Expertiza
     config.active_record.whitelist_attributes = false
 
     config.autoload_paths += Dir[Rails.root.join('lib', '{**}')]
+    config.assets.paths << Rails.root.join("vendor","assets","bower_components")
+    config.assets.paths << Rails.root.join("vendor","assets","bower_components","bootstrap-sass-official","assets","fonts")
+ 
+    config.assets.precompile << %r(.*.(?:eot|svg|ttf|woff|woff2)$) 
   end
 end

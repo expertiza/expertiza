@@ -1,4 +1,52 @@
+<div ng-controller='TreeCtrl'>
+<div ng-init="init('<%= @angularParamsJSON %>')">
 <h1>Manage content</h1>
 <%= render :partial => 'page_header' %>
 <%= render :partial => 'bread_crumbs' %>
-<%=  render :partial => 'page_footer' %>
+<%#= render :partial => 'page_footer' %>
+<table class="table table-striped table-hover table-responsive">
+  <thead>
+    <tr>
+      <th>Details</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="(type, data) in tableContent">
+    <td>
+    <button ng-click="show_children(type)" type="button" class="btn btn-primary">{{type}}</button>
+    <div class="inner-table">
+    <table ng-if="display[type]==true" class="table table-striped table-hover table-responsive">
+      <thead>
+        <tr ng-if="type!='Questionnaires'">
+          <th>Course Name</th>
+          <th>Directory</th>
+          <th>Creation Date</th>
+          <th>Updated Date</th>
+        </tr>
+        <tr ng-if="type=='Questionnaires'">
+          <th>Stages</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="record in data" ng-click="showCellContent(record.name, record.directory)" class="clickable-row">
+          <div ng-if="type!='Questionnaires'">
+            <td>{{record.name}}</td>
+            <td>{{record.directory}}</td>
+            <td>{{record.creation_date}}</td>
+            <td>{{record.updated_date}}</td>
+          </div>
+        </tr>
+
+      </tbody>
+    </table>
+    </div>
+
+
+    </td></tr>
+  </tbody>
+</table>
+
+<!-- <button ng-click="get_children()" type="button" class="btn btn-default">Get</button> -->
+</div>
+</div>

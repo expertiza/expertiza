@@ -448,6 +448,8 @@ Expertiza::Application.routes.draw do
     collection do
       get ':action'
       post 'list'
+      post 'get_children_node_ng'
+      post 'get_children_node_2_ng'
     end
   end
 

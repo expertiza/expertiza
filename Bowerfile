@@ -1,0 +1,6 @@
+asset 'angular'
+asset 'bootstrap-sass-official'
+asset 'angular-route'
+asset 'angular-bootstrap'
+asset 'angular-flash-alert'
+# vim: ft=ruby

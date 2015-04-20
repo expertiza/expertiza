@@ -1,6 +1,10 @@
 source 'http://rubygems.org'
 
 gem 'rails'
+gem 'bower-rails'
+gem 'angular-rails-templates' 
+gem 'coffee-rails'
+gem 'sass'
 
 ## Gems in Alphabetical Order
 
@@ -30,6 +34,7 @@ gem 'jquery-ui-sass-rails'
 gem 'jquery-datetimepicker-rails'
 gem 'mysql'
 gem 'mysql2'
+gem 'mysql'
 gem 'nokogiri'
 gem 'omniauth-google-oauth2', '~> 0.2.6'
 gem 'open-uri-cached'
@@ -52,7 +57,6 @@ gem 'stanford-core-nlp'
 gem 'superfish-rails'
 gem 'therubyracer'
 gem 'thin'
-gem 'turbolinks'
 gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'

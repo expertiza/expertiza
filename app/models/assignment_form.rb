@@ -113,10 +113,15 @@ class AssignmentForm
       diff = mi-(due_date.threshold)*60
       diff = 1
       if diff>0
-        dj=Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type, due_date.due_at.to_s(:db)),
+        # Delayed::Job.class_eval do
+        #   has_paper_trail
+        # end
+        dj=ScheduledTask.enqueue(DelayedMailer.new(@assignment.id, deadline_type, due_date.due_at.to_s(:db)),
                                 1, diff.minutes.from_now)
+        log = Version.where(item_type: "Delayed::Backend::ActiveRecord::Job", item_id: dj.id).first
+        log.update_attribute(:item_type, "ScheduledTask")
         if deadline_type == "team_formation"
-          dj2 = Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, "drop_topic", due_date.due_at.to_s(:db)),
+          dj2 = ScheduledTask.enqueue(DelayedMailer.new(@assignment.id, "drop_topic", due_date.due_at.to_s(:db)),
                                1, mi.minutes.from_now)
           due_date.update_attribute(:delayed_job_id, dj2.id)
         end

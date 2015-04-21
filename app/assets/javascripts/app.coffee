@@ -85,11 +85,14 @@ app.controller 'TreeCtrl', ($scope, $http) ->
 
 
 app.controller 'UsersPageCtrl', ($scope, $http) ->
-  $http.get('/users/get_users_ng')
-        .success((data) ->
-          console.log data
-          $scope.name = data
+  
+  $scope.getUsers = () ->
+    $http.get('/users/get_users_ng')
+        .success((users) ->
+          console.log users
+          $scope.users = users
           )
+
 
 # app.directive 'testdirective', () ->
 #   templateUrl: 'test.html'

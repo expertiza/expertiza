@@ -103,11 +103,19 @@ class UsersController < ApplicationController
   end
 
   def get_users_ng
+    
+    user = session[:user]
+    role = Role.find(user.role_id)
+    all_users = User.order('name').where( ['role_id in (?) or id = ?', role.get_available_roles, user.id])
 
-    name = "ivan"
+    users = User.all
+
+    
+      # Rails.logger.warn(users)
+    
 
     respond_to do |format|
-      format.html {render json: name}
+      format.html {render json: users}
     end
   end
 

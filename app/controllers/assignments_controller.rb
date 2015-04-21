@@ -202,7 +202,7 @@ class AssignmentsController < ApplicationController
     end
     alias_method :index, :list
 
-    def scheduled_jobs
+    def scheduled_tasks
       @suggestions = Suggestion.where(assignment_id: params[:id])
       @assignment = Assignment.find(params[:id])
     end
@@ -239,6 +239,13 @@ class AssignmentsController < ApplicationController
       newpath = assignment.path rescue nil
       FileHelper.update_file_location(oldpath, newpath)
       redirect_to :controller => 'tree_display', :action => 'list'
+    end
+
+    def delete_scheduled_task
+      @assignment = Assignment.find(params[:id])
+      @delayed_job = DelayedJob.find(params[:delayed_job_id])
+      @delayed_job.delete
+      redirect_to :controller => 'assignments', :action => 'scheduled_tasks', :id => @assignment.id
     end
 
 end

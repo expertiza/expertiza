@@ -96,11 +96,9 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
     })
     .success((users) ->
       console.log users
-      $scope.users = (users)
+      $scope.users=users
       $scope.fetchNumber+=1
       )
-
-  $scope.increment = (value) ->
 
     
 

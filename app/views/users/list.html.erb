@@ -1,31 +1,23 @@
 <div ng-controller='UsersPageCtrl'> <!-- make this page available to angular controller -->
-
+<div ng-init="init()"></div>
 <h1>Manage users</h1>
 
 <br/>
-<%= form_tag :action => 'show_selection' do %>
-  View user - enter exact login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
-<input type='submit' value='Edit'/>
-<% end %>
-
-<%= form_tag :action => 'list', :paginate_show => '1', :num_users => @per_page do %>
-  <%= label_tag :letter, 'Search users: ' %><%= text_field_tag(:letter,params[:letter]) %>
-<%= select_tag(:search_by, options_for_select([['Username', 1], ['Full name', 2], ['Email', 3]])) %>
-<%= submit_tag("Search") %>
-<% end %>
 
 <div>
-  <%= render :partial => 'shared_scripts/letters' %>
+<label>Search By: 
+  <select ng-model="searchtype" ng-init="searchtype='any'">
+    <option value="any">Any</option>
+    <option value="name">Name</option>
+    <option value="email">Email</option>
+  </select>
+</label>
+<input ng-hide="searchtype != 'any'" ng-model="search.$">
+<input ng-hide="searchtype != 'name'" ng-model="search.name">
+<input ng-hide="searchtype != 'email'" ng-model="search.email">
+<p>
 </div>
 
-<%= render :partial => 'users/pagination' %>
-
-<div ng-repeat="n in names">
-RECEIVED FROM RAILS: {{n}}
-</div>
-
-<!-- <button ng-click="fetch_users()" type="button" class="btn btn-primary">See more...</button> -->
-<div ng-init="init()"></div>
 <button ng-click="getUsers(fetchNumber)" type="button" class="btn btn-primary">See More</button>
 
     <table class="table table-striped table-hover table-responsive">
@@ -35,20 +27,16 @@ RECEIVED FROM RAILS: {{n}}
           <th>Email</th>
       </thead>
       <tbody>
-        <tr ng-repeat="user in users">
+        <tr ng-repeat="user in users | filter:search">
           <td>{{user.name}}</td>
           <td>{{user.email}}</td>
         </tr>
       </tbody>
     </table>
 
-
-<hr/>
-<%= render :partial => 'users/pagination' %>
+<button ng-click="getUsers(fetchNumber)" type="button" class="btn btn-primary">See More</button>    
 <hr/>
 <%= render :partial => 'shared_scripts/pages' %>
-
-<%= render :partial => 'shared_scripts/letters' %>
 
 <p>
   <%

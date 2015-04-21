@@ -79,6 +79,7 @@ class UsersController < ApplicationController
     @users = paginate_list(role, user.id, letter)
 
     @letters = ('A'..'Z').to_a
+    @lettersJSON = @letters.to_json
 
     # @user_ng = {}
     # @users_ng = []
@@ -103,7 +104,7 @@ class UsersController < ApplicationController
   end
 
   def get_users_ng
-    
+
     logger.warn params
     fetchNumber = params[:fetchNumber]
 

@@ -20,7 +20,7 @@
         else {
             if (deadline_type == 'submission') {
                 if (round_no == 1) {
-                    previous_element = jQuery('#due_date_heading');
+                    previous_element = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').last();
                 } else {
                     previous_element = jQuery('#review_round_' + (round_no - 1));
                 }
@@ -234,35 +234,37 @@
         }
         if (state == false && round_count >1){
             //hide name and url colomns
+            removeDueDateTableElement('team_formation', 0);
             for (i =1; i <= round_count; i++) {
                 removeDueDateTableElement('submission', i);
                 removeDueDateTableElement('review', i);
             }
             removeDueDateTableElement('metareview', 0);
-            removeDueDateTableElement('team_formation', 0);
+            addDueDateTableElement(false,'team_formation',0,<%= due_date(@assignment_form.assignment,'team_formation', 0).to_json.html_safe %>);
             <% for i in 1..@assignment_form.assignment.rounds_of_reviews %>
             addDueDateTableElement(false,'submission', <%=i%>, <%= due_date(@assignment_form.assignment,'submission', i-1).to_json.html_safe %>);
             addDueDateTableElement(false,'review', <%=i%>, <%= due_date(@assignment_form.assignment,'review', i-1).to_json.html_safe %>);
             <% end %>
             addDueDateTableElement(false,'metareview',0,<%= due_date(@assignment_form.assignment,'metareview', 0).to_json.html_safe%>);
-            addDueDateTableElement(false,'team_formation',0,<%= due_date(@assignment_form.assignment,'team_formation', 0).to_json.html_safe %>);
+            
             due_date_name_column.style.display="none";
             due_date_url_column.style.display="none";
         }
         if (state == true && round_count >1){
             //display name and url colomns
+            removeDueDateTableElement('team_formation',0);
             for (i =1; i <= round_count; i++) {
                 removeDueDateTableElement('submission', i);
                 removeDueDateTableElement('review', i);
             }
             removeDueDateTableElement('metareview', 0);
-            removeDueDateTableElement('team_formation',0);
+            addDueDateTableElement(true,'team_formation',0,<%= due_date(@assignment_form.assignment,'team_formation', 0).to_json.html_safe %> );
             <% for i in 1..@assignment_form.assignment.rounds_of_reviews %>
             addDueDateTableElement(true,'submission', <%=i%>, <%= due_date(@assignment_form.assignment,'submission', i-1).to_json.html_safe %>);
             addDueDateTableElement(true,'review', <%=i%>, <%= due_date(@assignment_form.assignment,'review', i-1).to_json.html_safe %>);
             <% end %>
             addDueDateTableElement(true,'metareview',0,<%= due_date(@assignment_form.assignment,'metareview', 0).to_json.html_safe %>);
-            addDueDateTableElement(true,'team_formation',0,<%= due_date(@assignment_form.assignment,'team_formation', 0).to_json.html_safe %> );
+            
             due_date_name_column.removeAttribute("style");
             due_date_url_column.removeAttribute("style");
         }
@@ -307,12 +309,13 @@
   <tr id='blank' style='display:hidden'></tr>
   <script>
     jQuery(document).ready(function () {
+        addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
         <% 1.upto @assignment_form.assignment.rounds_of_reviews do |i| %>
         addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'submission', <%=i%>, <%= due_date(@assignment_form.assignment, 'submission', i-1).to_json.html_safe %>); // or use questionnaire_options(@assignment, nil).to_json
         addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'review', <%=i%>, <%= due_date(@assignment_form.assignment, 'review', i-1).to_json.html_safe %>) ;
         <% end %>
         addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
-        addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
+        
         //after webpage refreshes, hide or display name and url according to whether names and urls are empty in DB
         var due_date_name_column=document.getElementById("due_date_name_column");
         var due_date_url_column=document.getElementById("due_date_url_column");

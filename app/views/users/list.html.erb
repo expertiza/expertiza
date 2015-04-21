@@ -24,6 +24,25 @@
 RECEIVED FROM RAILS: {{n}}
 </div>
 
+<!-- <button ng-click="fetch_users()" type="button" class="btn btn-primary">See more...</button> -->
+
+<button ng-click="getUsers()" type="button" class="btn btn-primary">See More</button>
+
+    <table class="table table-striped table-hover table-responsive">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+      </thead>
+      <tbody>
+        <tr ng-repeat="user in users">
+          <td>{{user.name}}</td>
+          <td>{{user.email}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+
 <hr/>
 <%= render :partial => 'users/pagination' %>
 <hr/>

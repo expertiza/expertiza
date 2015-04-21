@@ -40,11 +40,10 @@ class ScheduledTask
       end
 
       if(self.deadline_type == "drop_topic")
-        #sign_up_topics = SignUpTopic.where( ['assignment_id = ?', self.assignment_id])
-        #if(sign_up_topics != nil && sign_up_topics.count != 0)
-        drop_topics #drop topics from teams that only have one member
-        #reminder to signed_up users of the assignment
-        #end
+        sign_up_topics = SignUpTopic.where( ['assignment_id = ?', self.assignment_id])
+        if(sign_up_topics != nil && sign_up_topics.count != 0)
+          mail_signed_up_users #reminder to signed_up users of the assignment
+        end
       end
 
       if(self.deadline_type == "signup")
@@ -60,6 +59,17 @@ class ScheduledTask
           emails = get_one_member_team
           email_reminder(emails, self.deadline_type)
         end
+      end
+
+      if(self.deadline_type == "drop_one_member_topics")
+        assignment = Assignment.find(self.assignment_id)
+        if(assignment.team_assignment?)
+          drop_one_member_topics
+        end
+      end
+
+      if(self.deadline_type == "drop_outstanding_reviews")
+        drop_outstanding_reviews
       end
     end
   end
@@ -209,7 +219,7 @@ class ScheduledTask
   end
 
 
-  def drop_topics
+  def drop_one_member_topics
     teams = TeamsUser.all.group(:team_id).count(:team_id)
     for team_id in teams.keys
       if teams[team_id] == 1
@@ -221,7 +231,7 @@ class ScheduledTask
     end
   end
 
-  def drop_reviews
+  def drop_outstanding_reviews
     reviews = ResponseMap.all
     for review in reviews
       review_has_began = Response.where(map_id: review.id)

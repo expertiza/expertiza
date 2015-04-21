@@ -132,6 +132,16 @@ class UsersController < ApplicationController
     end
   end
 
+  def get_users_list_ng
+
+    count = User.count
+    logger.warn(count)
+    respond_to do |format|
+      format.html {render json: count}
+    end
+  end
+
+
     def show_selection
       @user = User.find_by_name(params[:user][:name])
       if @user != nil

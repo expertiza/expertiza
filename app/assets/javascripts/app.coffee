@@ -89,6 +89,7 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
   $scope.init = () ->
     $scope.fetchNumber = 0
     $scope.getUsers(0)
+    $scope.getUserListSize()
 
   $scope.getUsers = (fn) ->
     $http.post('/users/get_users_ng', {
@@ -98,6 +99,13 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
       console.log users
       $scope.users = (users)
       $scope.fetchNumber+=1
+      )
+
+  $scope.getUserListSize = () ->
+    $http.get('/users/get_users_list_ng')
+    .success((listSize) ->
+      $scope.listSize = listSize
+      console.log listSize
       )
 
   $scope.increment = (value) ->

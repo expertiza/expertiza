@@ -463,6 +463,7 @@ Expertiza::Application.routes.draw do
       get :keys
       get 'get_users_ng'
       post 'get_users_ng'
+      get 'get_users_list_ng'
     end
   end
 

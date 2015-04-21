@@ -14,6 +14,7 @@
   <th width="25%">Run time</th>
   <th width="25%">Due date</th>
   <th width="25 %">Action</th>
+  <th width="25 %">Delete</th>
   <% i=1 %>
   <% for delayed_job in @scheduled_jobs %>
       <tr>
@@ -23,7 +24,7 @@
             <td><%= delayed_job.run_at %></td>
             <td><%= handler[7][1..-1] + ":" + handler[8][0..-2]%></td>
             <td><%= handler[1][13..-1] %></td>
-            <td><%= link_to image_tag('/assets/tree_view/delete-icon-24.png', :title => 'Delete'),
+            <td><%= link_to image_tag('delete_icon.png', :title => 'Delete'),
                             {:controller => 'assignments', :action => 'delete_scheduled_task',
                              :id => @assignment.id, :delayed_job_id => delayed_job.id}%></td>
         <% end %>

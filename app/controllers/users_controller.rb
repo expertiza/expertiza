@@ -1,3 +1,5 @@
+require 'json'
+
 class UsersController < ApplicationController
   autocomplete :user, :name
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
@@ -78,26 +80,35 @@ class UsersController < ApplicationController
 
     @letters = ('A'..'Z').to_a
 
-    @user_ng = {}
-    @users_ng = []
-    for user in @users
-      @user_ng[:username] =  user.name
-      @user_ng[:id] = user.id
-      @user_ng[:fullname] = user.fullname
-      @user_ng[:email] = user.email
-      @user_ng[:role] =  user.role.name
-      @user_ng[:parent] = user.parent.try :name
-      @user_ng[:email_on_review] = User.yesorno(user.email_on_review)
-      @user_ng[:email_on_submission] = User.yesorno(user.email_on_submission)
-      @user_ng[:email_on_review_of_review] = User.yesorno(user.email_on_review_of_review)
-      @user_ng[:leaderboard_privacy] = User.yesorno(user.leaderboard_privacy)
-      @users_ng << @user_ng
-    end
+    # @user_ng = {}
+    # @users_ng = []
+    # for user in @users
+    #   @user_ng[:username] =  user.name
+    #   @user_ng[:id] = user.id
+    #   @user_ng[:fullname] = user.fullname
+    #   @user_ng[:email] = user.email
+    #   @user_ng[:role] =  user.role.name
+    #   @user_ng[:parent] = user.parent.try :name
+    #   @user_ng[:email_on_review] = User.yesorno(user.email_on_review)
+    #   @user_ng[:email_on_submission] = User.yesorno(user.email_on_submission)
+    #   @user_ng[:email_on_review_of_review] = User.yesorno(user.email_on_review_of_review)
+    #   @user_ng[:leaderboard_privacy] = User.yesorno(user.leaderboard_privacy)
+    #   @users_ng << @user_ng
+    # end
           
 
-    angularParams = {}
-    angularParams[:users] = @users_ng
-    @angularParamsJSON = angularParams.to_json
+    # angularParams = {}
+    # angularParams[:users] = @users_ng
+    # @angularParamsJSON = angularParams.to_json
+  end
+
+  def get_users_ng
+
+    name = "ivan"
+
+    respond_to do |format|
+      format.html {render json: name}
+    end
   end
 
     def show_selection

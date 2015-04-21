@@ -1,4 +1,7 @@
 class ScheduledTask
+  #Keeps info required for delayed job
+  #to perform an action at a particular time
+  #such as sending a reminder email, or dropping outstanding review
   attr_accessor :assignment_id
   attr_accessor :deadline_type
   attr_accessor :due_at
@@ -7,18 +10,6 @@ class ScheduledTask
     self.deadline_type=deadline_type
     self.due_at = due_at
   end
-
-  # def perform
-  #   assignment = Assignment.find(self.assignment_id)
-  #   if assignment != nil && assignment.id != nil
-  #     if(self.deadline_type == "drop_topic")
-  #       sign_up_topics = SignUpTopic.where( ['assignment_id = ?', self.assignment_id])
-  #       if(sign_up_topics != nil && sign_up_topics.count != 0)
-  #         mail_signed_up_users #reminder to signed_up users of the assignment
-  #       end
-  #     end
-  #   end
-  # end
 
   def perform
     assignment = Assignment.find(self.assignment_id)

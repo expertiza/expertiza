@@ -80,22 +80,43 @@
         '<input id="datetimepicker_' + element_id +
         '" name="assignment_form[due_date][][due_at]" style="width: 200px" type="text" value="' +
         due_at + '">' + '</td>';
-        html += '<td align="center" class="due_date_due_at" width="10%">' +
-        '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]">' +
+        
+        html += '<td align="center" class="due_date_due_at" width="10%">';
+        if(deadline_type == 'team_formation'){
+            html += '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]" disabled>'
+        }
+        else{
+            html += '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]">'
+        }
+        html +=
         '<option value="">---</option>' +
         '<option value="1">No</option>' +
         '<option value="2">Late</option>' +
         '<option value="3">Yes</option>' +
         '</select></td>';
-        html += '<td align="center" class="due_date_review_allowed_id" width="10%">' +
-        '<select id="due_date_review_allowed_id" name="assignment_form[due_date][][review_allowed_id]">' +
+
+        html += '<td align="center" class="due_date_review_allowed_id" width="10%">';
+        if(deadline_type == 'team_formation'){
+            html += '<select id="due_date_review_allowed_id" name="assignment_form[due_date][][review_allowed_id]" disabled>'
+        }
+        else{
+            html += '<select id="due_date_review_allowed_id" name="assignment_form[due_date][][review_allowed_id]">'
+        }
+         html +=
         '<option value="">---</option>' +
         '<option value="1">No</option>' +
         '<option value="2">Late</option>' +
         '<option value="3">Yes</option>' +
         '</select></td>';
-        html += '<td align="center" class="due_date_review_of_review_allowed_id" width="10%">' +
-        '<select id="due_date_review_of_review_allowed_id" name="assignment_form[due_date][][review_of_review_allowed_id]">' +
+
+        html += '<td align="center" class="due_date_review_of_review_allowed_id" width="10%">';
+        if(deadline_type == 'team_formation'){
+            html += '<select id="due_date_review_of_review_allowed_id" name="assignment_form[due_date][][review_of_review_allowed_id]" disabled>'
+        }
+        else{
+            html += '<select id="due_date_review_of_review_allowed_id" name="assignment_form[due_date][][review_of_review_allowed_id]">'
+        }
+        html +=
         '<option value="">---</option>' +
         '<option value="1">No</option>' +
         '<option value="2">Late</option>' +

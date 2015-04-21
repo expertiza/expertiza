@@ -5,7 +5,7 @@ class UsersController < ApplicationController
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
     :redirect_to => { :action => :list }
-  skip_before_action :verify_authenticity_token, only: [:list]
+  skip_before_action :verify_authenticity_token, only: [:list, :get_users_ng]
 
 
   def action_allowed?
@@ -104,14 +104,20 @@ class UsersController < ApplicationController
 
   def get_users_ng
     
+    logger.warn params
+    fetchNumber = JSON.parse(params[:fetchNumber])
+
+    Rails.logger.warn(fetchNumber)
+
     user = session[:user]
     role = Role.find(user.role_id)
     all_users = User.order('name').where( ['role_id in (?) or id = ?', role.get_available_roles, user.id])
 
-    users = User.all
+    users = []
+    users = User.where('id between 0 and 100')
 
     
-      # Rails.logger.warn(users)
+    #Rails.logger.warn(users)
     
 
     respond_to do |format|

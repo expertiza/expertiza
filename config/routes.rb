@@ -462,6 +462,7 @@ Expertiza::Application.routes.draw do
       get :auto_complete_for_user_name
       get :keys
       get 'get_users_ng'
+      post 'get_users_ng'
     end
   end
 

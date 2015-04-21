@@ -1,5 +1,3 @@
-class Delayedjob < ActiveRecord::Base
+class DelayedJob < Delayed::Job
   has_paper_trail
-  include Delayed::Backend::ActiveRecord
-  # self.table_name = 'delayed_jobs'
 end

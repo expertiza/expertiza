@@ -41,7 +41,8 @@ Expertiza::Application.routes.draw do
       get :associate_assignment_with_course
       get :copy
       get :toggle_access
-      get :scheduled_jobs
+      get :scheduled_tasks
+      get :delete_scheduled_task
       post :remove_assignment_from_course
     end
   end

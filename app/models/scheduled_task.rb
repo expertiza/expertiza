@@ -240,7 +240,6 @@ class ScheduledTask
       end
     end
   end
-
 end
 
 

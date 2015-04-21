@@ -1,18 +1,13 @@
 
 <% @assignment = Assignment.find(params[:id]) %>
-<h1>Scheduled jobs for <%= @assignment.name %> assignment</h1>
-
-
-<%#<%= link_to 'View all Bookmarks', :controller=>'bookmarks', :action=> 'view_bookmarks' %> <%#<br/>
-<%= link_to 'Manage all Bookmarks', :controller => 'bookmarks', :action => 'manage_bookmarks' %>
-
+<h1>Scheduled tasks for <%= @assignment.name %> assignment</h1>
 
 
 <% if flash[:notice] %>
     <div class="flash_note"><%= flash_message :notice %></div>
 <% end %>
 
-<% @scheduled_jobs = Delayed::Job.all %>
+<% @scheduled_jobs = DelayedJob.all %>
 
 <table class="general">
   <th width="25%">Deadline type #</th>
@@ -28,6 +23,9 @@
             <td><%= delayed_job.run_at %></td>
             <td><%= handler[7][1..-1] + ":" + handler[8][0..-2]%></td>
             <td><%= handler[1][13..-1] %></td>
+            <td><%= link_to image_tag('/assets/tree_view/delete-icon-24.png', :title => 'Delete'),
+                            {:controller => 'assignments', :action => 'delete_scheduled_task',
+                             :id => @assignment.id, :delayed_job_id => delayed_job.id}%></td>
         <% end %>
       </tr>
       <% i=i+1 %>

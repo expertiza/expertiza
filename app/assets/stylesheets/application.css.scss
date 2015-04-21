@@ -16,10 +16,14 @@
 @import "bootstrap-sass-official/assets/stylesheets/bootstrap";
 
 
-.inner-table tr {
-    cursor: pointer;
+.inner-table tr:not(.no-cursor-tr) {
+  cursor: pointer;
 }
 
-.inner-table .table-hover tbody tr:hover td {
+.inner-table .table-hover tbody tr:hover:not(.no-color-tr) {
   background: #F56E5E;
+}
+
+.search-box {
+  margin: 5px;
 }

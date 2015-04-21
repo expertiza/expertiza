@@ -14,25 +14,23 @@ app.controller 'SidebarCtrl', ($scope) ->
 app.controller 'HeaderAndNavCtrl', ($scope) ->
   console.log "in HeaderAndNavCtrl"
 
-app.controller 'TreeCtrl', ($scope, $http) ->
+app.controller 'TreeCtrl', ($scope, $http, $location) ->
   console.log "in TreeCtrl"
   $scope.display = {}
-  $scope.display["Assignments"] = false
-  $scope.display["Courses"] = false
-  $scope.display["Questionnaires"] = false
   $scope.allData = {}
+
+  $scope.predicate = ''
 
   $scope.showCellContent = (name, directory) ->
     key = name + "|" + directory
-    $scope.cellCentent = $scope.allData[key]
-    console.log $scope.cellCentent
-    $scope.subtable = 'hey'
+    if !$scope.display[key] || !$scope.cellContent
+      $scope.cellContent = $scope.allData[key]
+      console.log $scope.cellContent
+    else
+      $scope.cellContent = ''
     $scope.display[key] = !$scope.display[key]
-    $scope.cellDisplay = $scope.display[key]
 
   $scope.fetchCellContent = (nodeType, node) ->
-    console.log nodeType
-    console.log node
     $scope.newParams = {}
     $scope.newParams["sortvar"] = $scope.angularParams["sortvar"]
     $scope.newParams["sortorder"] = $scope.angularParams["sortorder"]
@@ -60,11 +58,25 @@ app.controller 'TreeCtrl', ($scope, $http) ->
         for newNode in data
           if not $scope.allData[newNode.key]
             $scope.allData[newNode.key] = []
+          $scope.display[newNode.key] = false
           $scope.allData[newNode.key].push newNode
           $scope.fetchCellContent(newNode.type, newNode)
 
       )
 
+  $scope.getMoreContent = (type, mode) ->
+    if mode == 1
+      for i in [1..10]
+        if not $scope.tableContent[type][$scope.lastLoadNum[type]]
+          break
+        $scope.displayTableContent[type].push $scope.tableContent[type][$scope.lastLoadNum[type]]
+        $scope.lastLoadNum[type] += 1
+    else
+      while true
+        if not $scope.tableContent[type][$scope.lastLoadNum[type]]
+          break
+        $scope.displayTableContent[type].push $scope.tableContent[type][$scope.lastLoadNum[type]]
+        $scope.lastLoadNum[type] += 1
 
   $scope.init = (value) ->
     $scope.angularParams = JSON.parse(value)
@@ -72,16 +84,29 @@ app.controller 'TreeCtrl', ($scope, $http) ->
       "angularParams": $scope.angularParams
       })
     .success((data) ->
-      $scope.tableContent = data
+      $scope.tableContent = {}
+      $scope.displayTableContent = {}
+      $scope.lastLoadNum = {}
+      $scope.typeList = []
       console.log data
-      for nodeType, outerNode of $scope.tableContent
+      for nodeType, outerNode of data
+        $scope.tableContent[nodeType] = []
+        $scope.lastLoadNum[nodeType] = 0
+        $scope.displayTableContent[nodeType] = []
+        $scope.typeList.push nodeType
         # outerNode is the Assignments/Courses/Questionnaires
         for node in outerNode
+          $scope.tableContent[nodeType].push node
           $scope.fetchCellContent(nodeType, node)
+        $scope.getMoreContent(nodeType, 1)
       )
 
-  $scope.show_children = (type) ->
-    $scope.display[type] = !$scope.display[type]
+  $scope.gotoTop = () ->
+    $("html, body").animate({ scrollTop: 0 }, 600)
+    ''
+
+  $scope.initTable = () ->
+    $scope.searchText = ''
 
 
 app.controller 'UsersPageCtrl', ($scope, $http) ->

@@ -166,7 +166,6 @@ class TreeDisplayController < ApplicationController
 
     for nodeType in tmpRes.keys
       res[nodeType] =  Array.new
-      logger.warn res[nodeType].class
 
       for node in tmpRes[nodeType]
         tmpObject = {}
@@ -217,8 +216,6 @@ class TreeDisplayController < ApplicationController
         res2["name"] = child.get_name
         res2["key"] = params[:angularParams][:key]
         res2["type"] = nodeType
-        logger.warn res2["key"]
-        logger.warn res2["name"]
 
         if nodeType == 'CourseNode' || nodeType == "AssignmentNode"
           res2["directory"] = child.get_directory

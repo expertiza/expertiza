@@ -102,7 +102,9 @@ class ScheduledTask
           end
         end
       end
-      email_reminder(emails, self.deadline_type)
+      if emails.size > 0
+        email_reminder(emails, self.deadline_type)
+      end
     end
   end
 
@@ -141,13 +143,16 @@ class ScheduledTask
       #find metareviewers - people who will review the reviewers
       meta_reviewer_tuples = ResponseMap.where( ['reviewed_object_id = ? AND type = "MetareviewResponseMap"', reviewer.id])
       for metareviewer in meta_reviewer_tuples
-        participant = Participant.where( ['parent_id = ? AND id = ?', self.assignment_id, metareviewer.reviewer_id])
+        participant = Participant.where( ['parent_id = ? AND id = ?', self.assignment_id, metareviewer.reviewer_id]).first
         uid  = participant.user_id
         user = User.find(uid)
         emails << user.email
       end
     end
-    email_reminder(emails, self.deadline_type)
+    if emails.size > 0
+      email_reminder(emails, self.deadline_type)
+    end
+
   end
 
   def mail_reviewers
@@ -159,7 +164,9 @@ class ScheduledTask
       user = User.find(uid)
       emails << user.email
     end
-    email_reminder(emails, self.deadline_type)
+    if emails.size > 0
+      email_reminder(emails, self.deadline_type)
+    end
   end
 
   def mail_assignment_participants

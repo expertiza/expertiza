@@ -20,7 +20,25 @@
 
 <%= render :partial => 'users/pagination' %>
 
-RECEIVED FROM RAILS: {{name}}
+<div class="exp">
+    <table>
+      <tr><th colspan=5></th><th colspan=3 class="head">E-mail on ...</th></tr>
+      <tr><th class="head">Name</th><th class="head">Full Name</th><th class="head">Email Address</th><th class="head">Role</th><th class="head">Parent</th><th class="head">Review</th><th class="head">Submission</th><th class="head">Metareview</th></tr>
+      
+       <tr ng-repeat="user in users_ng" class="clickable-row">
+          <td>{{user.username}}</td>
+          <td>{{user.fullname}}</td>
+          <td>{{user.email}}</td>
+          <td>{{user.role}}</td>
+          <td>{{user.parent}}</td>
+          <td>{{user.email_on_review}}</td>
+          <td>{{user.email_on_submission}}</td>
+          <td>{{user.email_on_review_of_review}}</td>
+          <td>{{user.leaderboard_privacy}}</td>
+        </tr>
+      <% end -%>
+    </table>
+  </div>
 
 <hr/>
 <%= render :partial => 'users/pagination' %>

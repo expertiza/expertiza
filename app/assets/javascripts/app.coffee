@@ -88,7 +88,7 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
   $http.get('/users/get_users_ng')
         .success((data) ->
           console.log data
-          $scope.name = data
+          $scope.users_ng = data
           )
 
 # app.directive 'testdirective', () ->

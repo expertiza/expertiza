@@ -104,10 +104,24 @@ class UsersController < ApplicationController
 
   def get_users_ng
 
-    name = "ivan"
+    @user_ng = {}
+    users_ng = []
+    for user in @users
+      @user_ng[:username] =  user.name
+      @user_ng[:id] = user.id
+      @user_ng[:fullname] = user.fullname
+      @user_ng[:email] = user.email
+      @user_ng[:role] =  user.role.name
+      @user_ng[:parent] = user.parent.try :name
+      @user_ng[:email_on_review] = User.yesorno(user.email_on_review)
+      @user_ng[:email_on_submission] = User.yesorno(user.email_on_submission)
+      @user_ng[:email_on_review_of_review] = User.yesorno(user.email_on_review_of_review)
+      @user_ng[:leaderboard_privacy] = User.yesorno(user.leaderboard_privacy)
+      users_ng << @user_ng
+    end
 
     respond_to do |format|
-      format.html {render json: name}
+      format.html {render json: users_ng}
     end
   end
 

@@ -25,8 +25,8 @@ RECEIVED FROM RAILS: {{n}}
 </div>
 
 <!-- <button ng-click="fetch_users()" type="button" class="btn btn-primary">See more...</button> -->
-
-<button ng-click="getUsers()" type="button" class="btn btn-primary">See More</button>
+<div ng-init="init()"></div>
+<button ng-click="getUsers(fetchNumber)" type="button" class="btn btn-primary">See More</button>
 
     <table class="table table-striped table-hover table-responsive">
       <thead>

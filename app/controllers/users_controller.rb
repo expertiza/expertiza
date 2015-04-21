@@ -105,16 +105,24 @@ class UsersController < ApplicationController
   def get_users_ng
     
     logger.warn params
-    fetchNumber = JSON.parse(params[:fetchNumber])
-
-    Rails.logger.warn(fetchNumber)
+    fetchNumber = params[:fetchNumber]
 
     user = session[:user]
     role = Role.find(user.role_id)
     all_users = User.order('name').where( ['role_id in (?) or id = ?', role.get_available_roles, user.id])
+    users_length = all_users.length
+    
+     # div = (users_length/100.to_f).ceil
+    if(fetchNumber == 0)
+      start_num = 0
+      end_num = start_num+100
+    else
+      start_num = (fetchNumber*100)+1
+      end_num = start_num+99
+    end
 
     users = []
-    users = User.where('id between 0 and 100')
+    users = User.where(['id between ? and ?', start_num, end_num])
     
     #Rails.logger.warn(users)
     

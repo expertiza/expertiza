@@ -86,15 +86,23 @@ app.controller 'TreeCtrl', ($scope, $http) ->
 
 app.controller 'UsersPageCtrl', ($scope, $http) ->
   
-  $scope.fetcheNumber = 1;
+  $scope.init = () ->
+    $scope.fetchNumber = 0
+    $scope.getUsers(0)
 
-  $scope.getUsers = () ->
-    $http.post('/users/get_users_ng', $scope.fetchNumber)
-        .success((users) ->
-          console.log users
-          $scope.users.push(users)
-          )
-    $scope.fetcheNumber++
+  $scope.getUsers = (fn) ->
+    $http.post('/users/get_users_ng', {
+      'fetchNumber': fn
+    })
+    .success((users) ->
+      console.log users
+      $scope.users = (users)
+      $scope.fetchNumber+=1
+      )
+
+  $scope.increment = (value) ->
+
+    
 
 # app.directive 'testdirective', () ->
 #   templateUrl: 'test.html'

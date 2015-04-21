@@ -5,6 +5,7 @@ class ScheduledTask
   attr_accessor :assignment_id
   attr_accessor :deadline_type
   attr_accessor :due_at
+  @@count = 0
   def initialize(assignment_id, deadline_type, due_at)
     self.assignment_id=assignment_id
     self.deadline_type=deadline_type
@@ -124,7 +125,7 @@ class ScheduledTask
     teams = TeamsUser.all.group(:team_id).count(:team_id)
     for team_id in teams.keys
       if teams[team_id] == 1
-        user_id = TeamsUser.where(team_id: team).first.user_id
+        user_id = TeamsUser.where(team_id: team_id).first.user_id
         email = User.find(user_id).email
         mailList << email
       end
@@ -154,7 +155,7 @@ class ScheduledTask
     reviewer_tuples = ResponseMap.where( ['reviewed_object_id = ? AND (type = "ParticipantReviewResponseMap" OR type = "TeamReviewResponseMap")', self.assignment_id])
     for reviewer in reviewer_tuples
       participant = Participant.where( ['parent_id = ? AND id = ?', self.assignment_id, reviewer.reviewer_id])
-      uid  = participant.user_id
+      uid  = participant.first.user_id
       user = User.find(uid)
       emails << user.email
     end
@@ -214,21 +215,21 @@ class ScheduledTask
     teams = TeamsUser.all.group(:team_id).count(:team_id)
     for team_id in teams.keys
       if teams[team_id] == 1
-        topic_to_drop = SignedUpUser.where(creator_id: team_id)
-        if !topic_to_drop.nil?#check if the one-person-team has signed up a topic
-          topic_to_drop.first.delete
+        topic_to_drop = SignedUpUser.where(creator_id: team_id).first
+        if topic_to_drop#check if the one-person-team has signed up a topic
+          topic_to_drop.delete
         end
       end
     end
   end
 
   def drop_outstanding_reviews
-    reviews = ResponseMap.all
+    reviews = ResponseMap.where(reviewed_object_id: self.assignment_id)
     for review in reviews
       review_has_began = Response.where(map_id: review.id)
-      if review_has_began.nil?#check if the one-person-team has signed up a topic
+      if review_has_began.size.zero?
         review_to_drop = ResponseMap.where(id: review.id)
-        review_to_drop.first.delete
+        review_to_drop.first.destroy
       end
     end
   end

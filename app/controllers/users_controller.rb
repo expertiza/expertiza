@@ -115,16 +115,18 @@ class UsersController < ApplicationController
      # div = (users_length/100.to_f).ceil
     if(fetchNumber == 0)
       start_num = 0
-      end_num = start_num+100
+      end_num = start_num+99
     else
-      start_num = (fetchNumber*100)+1
+      start_num = (fetchNumber*100)
       end_num = start_num+99
     end
+
+    logger.warn(User.count)
 
     users = []
     users = User.where(['id between ? and ?', start_num, end_num])
     
-    #Rails.logger.warn(users)
+    Rails.logger.warn(users.length)
     
 
     respond_to do |format|

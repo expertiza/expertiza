@@ -86,6 +86,8 @@ app.controller 'TreeCtrl', ($scope, $http) ->
 
 app.controller 'UsersPageCtrl', ($scope, $http) ->
   
+  $scope.users = []
+
   $scope.init = () ->
     $scope.listSize = 0
     $scope.getUserListSize()
@@ -100,8 +102,13 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
       'fetchNumber': fn
     })
     .success((users) ->
-      $scope.users = (users)
+      for user in users
+        $scope.users.push(user)
+      
       $scope.fetchNumber+=1
+
+      console.log $scope.listSize
+      console.log $scope.users.length
       if $scope.users.length < $scope.listSize
         $scope.getUsers($scope.fetchNumber)
       )

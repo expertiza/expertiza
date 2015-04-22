@@ -101,8 +101,8 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
     $http.post('/users/get_users_ng', {
       'fetchNumber': fn
     })
-    .success((users) ->
-      for user in users
+    .success((receivedUsers) ->
+      for user in receivedUsers
         $scope.users.push(user)
       
       $scope.fetchNumber+=1

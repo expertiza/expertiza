@@ -129,9 +129,27 @@ class UsersController < ApplicationController
     
     Rails.logger.warn(users.length)
     
+    
+    all_users = []
+#   @user_ng[:parent] = user.parent.try :name
+    #   @user_ng[:email_on_review] = User.yesorno(user.email_on_review)
+    #   @user_ng[:email_on_submission] = User.yesorno(user.email_on_submission)
+    #   @user_ng[:email_on_review_of_review] = User.yesorno(user.email_on_review_of_review)
+    #   @user_ng[:leaderboard_privacy] = User.yesorno(user.leaderboard_privacy)
+    for user in users
+      single_user = {:object => user, 
+                     :role => user.role.name,
+                     :parent => user.parent.name,
+                     :email_on_review => User.yesorno(user.email_on_review),
+                     :email_on_submission => User.yesorno(user.email_on_submission),
+                     :email_on_review_of_review => User.yesorno(user.email_on_review_of_review),
+                     :leaderboard_privacy => User.yesorno(user.leaderboard_privacy)
+                    }
+      all_users << single_user
+    end
 
     respond_to do |format|
-      format.html {render json: users}
+      format.html {render json: all_users}
     end
   end
 

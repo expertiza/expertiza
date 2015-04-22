@@ -464,6 +464,7 @@ Expertiza::Application.routes.draw do
       get 'get_users_ng'
       post 'get_users_ng'
       get 'get_users_list_ng'
+      post 'set_page_size'
     end
   end
 

@@ -4,6 +4,11 @@ app = angular.module('MPApp',[
   'ui.bootstrap',
 ])
 
+app.filter 'startFrom', ->
+  (input, start) ->
+    start = +start
+    return input.slice start
+
 app.controller 'MainPageCtrl', ($scope) ->
   console.log "in MainPageCtrl"
   $scope.toDisplay = 0
@@ -88,16 +93,29 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
   
   $scope.users = []
 
-  $scope.init = () ->
+  $scope.init = (value) ->
+    
     $scope.listSize = 0
     $scope.getUserListSize()
     
     $scope.fetchNumber = 0
     $scope.getUsers(0)
 
+    $scope.currentPage = 0
+    $scope.pagination(0)
+
+  $scope.pagination = (ps) ->
+    $http.post('/users/set_page_size', {
+      'pageSize': ps
+    })
+    .success((value) ->
+      $scope.pageSize = value[0]
+      $scope.div = value[1]
+      $scope.totalSize = value[2]
+      )
 
   $scope.getUsers = (fn) ->
-    console.log $scope.listSize
+    #console.log $scope.listSize
     $http.post('/users/get_users_ng', {
       'fetchNumber': fn
     })
@@ -107,8 +125,8 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
       
       $scope.fetchNumber+=1
 
-      console.log $scope.listSize
-      console.log $scope.users.length
+      #console.log $scope.listSize
+      #console.log $scope.users.length
       if $scope.users.length < $scope.listSize
         $scope.getUsers($scope.fetchNumber)
       )

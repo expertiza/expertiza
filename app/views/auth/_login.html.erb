@@ -41,11 +41,14 @@
 
     <p><label for="login_password">Password</label><br/>
     <%= password_field 'login', 'password', :size => 12, :class => 'form-control' %></p>
-
-    <%= submit_tag "Login", :class => 'btn btn-danger pull-right' %>
+    <p><%= link_to "Forgot?", {:controller => 'password_retrieval', :action => 'forgotten'}, :class => 'pull-right', :style => 'margin-bottom: 20px' %></p>
+    <p>
+    <%= submit_tag "SIGN IN", :class => 'btn btn-danger', :style => 'width:100%;
+    margin-left:auto;
+    margin-right:auto;' %>
+    </p>
   <% end %>
   <div class="row-fluid">
-  <p><%= link_to "Forgotten your password?", {:controller => 'password_retrieval', :action => 'forgotten'} %></p>
   </div>
     <%# if !current_user %>
         <%#= link_to image_tag("google.png", size: "150x50"), "/auth/google_oauth2" %>

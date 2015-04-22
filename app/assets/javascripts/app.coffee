@@ -66,7 +66,7 @@ app.controller 'TreeCtrl', ($scope, $http, $location) ->
 
   $scope.getMoreContent = (type, mode) ->
     if mode == 1
-      for i in [1..10]
+      for i in [1..20]
         if not $scope.tableContent[type][$scope.lastLoadNum[type]]
           break
         $scope.displayTableContent[type].push $scope.tableContent[type][$scope.lastLoadNum[type]]
@@ -107,6 +107,12 @@ app.controller 'TreeCtrl', ($scope, $http, $location) ->
 
   $scope.initTable = () ->
     $scope.searchText = ''
+
+  $scope.hoverIn = () ->
+     $scope.hoverEdit = true
+
+  $scope.hoverOut = () ->
+     $scope.hoverEdit = false
 
 
 app.controller 'UsersPageCtrl', ($scope, $http) ->

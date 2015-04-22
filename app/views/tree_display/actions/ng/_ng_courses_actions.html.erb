@@ -1,0 +1,2 @@
+<% owner_id = Object.const_get('Course').find(node.node_object_id).instructor_id %>
+<%= render :partial => '/tree_display/actions/ng/ng_shared_actions', :locals => {:model => 'Course', :controller => 'course', :node => node, :owner_id => owner_id} %>

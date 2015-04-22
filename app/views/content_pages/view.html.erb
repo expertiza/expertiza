@@ -1,3 +1,20 @@
 <div ng-controller="MainPageCtrl">
-<%= @content_page.content_html %>
+<div class="container-fluid" id="main-page">
+  <%#= @content_page.content_html %>
+  <h1>Welcome.</h1>
+  <div class="login-panel">
+  <% if not session[:user] %>
+    <%= render :partial => 'auth/login' %><br/>
+    <% if session[:user].nil? %>
+    <% else %>
+      <% if session[:user].role_id == 4 || session[:user].role_id == 3 || session[:user].role_id == 2 %>
+        <%= link_to "Search log", Version %></a>
+      <% end %>
+    <% end %>
+    <div>
+    </div>
+  <% end %>
+  </div>
+
+</div>
 </div>

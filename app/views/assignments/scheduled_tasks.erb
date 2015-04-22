@@ -23,7 +23,24 @@
             <td><%= handler[5] %></td>
             <td><%= delayed_job.run_at %></td>
             <td><%= handler[7][1..-1] + ":" + handler[8][0..-2]%></td>
-            <td><%= handler[1][13..-1] %></td>
+            <% if handler[5] == "submission" %>
+                <td><%= " "%></td>
+            <%end%>
+            <% if handler[5] == "review" %>
+                <td><%= " "%></td>
+            <%end%>
+            <% if handler[5] == "metareview" %>
+                <td><%= " "%></td>
+            <%end%>
+            <% if handler[5] == "team_formation" %>
+                <td><%= "send email to ask students to form teams"%></td>
+            <%end%>
+            <% if handler[5] == "drop_outstanding_reviews" %>
+                <td><%= "drop outstanding reviews and send emails to those students"%></td>
+            <%end%>
+            <% if handler[5] == "drop_one_member_topics" %>
+                <td><%= "drop one member team topics and send emails to those students"%></td>
+            <%end%>
             <td><%= link_to image_tag('delete_icon.png', :title => 'Delete'),
                             {:controller => 'assignments', :action => 'delete_scheduled_task',
                              :id => @assignment.id, :delayed_job_id => delayed_job.id}%></td>

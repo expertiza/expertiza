@@ -5,7 +5,8 @@ class UsersController < ApplicationController
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
     :redirect_to => { :action => :list }
-  skip_before_action :verify_authenticity_token, only: [:list, :get_users_ng, :update, :delete_user_ng]
+
+  skip_before_action :verify_authenticity_token, only: [:list, :get_users_ng, :update, :delete_user_ng, :set_page_size]
   # :get_users_ng, :update, :destroy added to skip_before_action to integrate with angular
 
   def action_allowed?
@@ -50,6 +51,9 @@ class UsersController < ApplicationController
     user = session[:user]
     role = Role.find(user.role_id)
     all_users = User.order('name').where( ['role_id in (?) or id = ?', role.get_available_roles, user.id])
+    users_length = all_users.length
+    div = (users_length/100.to_f).ceil
+    @pagediv = div.to_json
 
     letter = params[:letter]
     session[:letter] = letter
@@ -105,15 +109,15 @@ class UsersController < ApplicationController
 
   def get_users_ng
 
-    logger.warn params
+    #logger.warn params
     fetchNumber = params[:fetchNumber]
 
-    user = session[:user]
-    role = Role.find(user.role_id)
-    all_users = User.order('name').where( ['role_id in (?) or id = ?', role.get_available_roles, user.id])
-    users_length = all_users.length
+    # user = session[:user]
+    # role = Role.find(user.role_id)
+    # all_users = User.order('name').where( ['role_id in (?) or id = ?', role.get_available_roles, user.id])
+    # users_length = all_users.length
+    # @userslengthJSON = users_length.to_json
     
-     # div = (users_length/100.to_f).ceil
     if(fetchNumber == 0)
       start_num = 0
       end_num = 300
@@ -122,12 +126,12 @@ class UsersController < ApplicationController
       end_num = User.count
     end
 
-    logger.warn(User.count)
+    #logger.warn(User.count)
 
     users = []
     users = User.where(['id between ? and ?', start_num, end_num])
     
-    Rails.logger.warn(users.length)
+    #Rails.logger.warn(users.length)
     
     
     all_users = []
@@ -156,7 +160,7 @@ class UsersController < ApplicationController
   def get_users_list_ng
 
     count = User.count
-    logger.warn(count)
+    #logger.warn(count)
     respond_to do |format|
       format.html {render json: count}
     end
@@ -178,6 +182,25 @@ class UsersController < ApplicationController
           #redirect_to :action => 'list'
     respond_to do |format|
       format.html {render json: response}
+    end
+  end
+
+  def set_page_size
+    ps = params[:pageSize].to_i
+    user = session[:user]
+    role = Role.find(user.role_id)
+    all_users = User.order('name').where( ['role_id in (?) or id = ?', role.get_available_roles, user.id])
+    users_length = all_users.length
+    if ps == 0
+      pageSize = users_length
+    else
+      pageSize = ps
+    end
+
+    div = (users_length/pageSize.to_f).ceil
+    
+    respond_to do |format|
+      format.html {render json: [pageSize, div, users_length]}
     end
   end
 

@@ -91,13 +91,16 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
   $scope.profileVisible = false
   $scope.displayedUser
   $scope.editProfileVisible = false
+  $scope.updatedUser
 
   $scope.init = () ->
-    $scope.listSize = 0
-    $scope.getUserListSize()
-    
-    $scope.fetchNumber = 0
-    $scope.getUsers(0)
+    if $scope.users.length == $scope.listSize
+      return
+    else if $scope.users.length == 0
+      $scope.listSize = 0
+      $scope.getUserListSize()
+      $scope.fetchNumber = 0
+    $scope.getUsers(($scope.fetchNumber))
 
 
   $scope.getUsers = (fn) ->
@@ -124,6 +127,7 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
     $scope.tableVisible = decision
     if decision == true 
       $scope.showUser(false)
+      $scope.editProfileVisible = false
      
 
   $scope.showUser = (userID) ->
@@ -135,16 +139,32 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
         if user.object.id == userID
           $scope.displayedUser = user
           $scope.showTable(false)
+          $scope.editProfileVisible = false
           $scope.profileVisible = true
           return
 
-  $scope.editUser = (displayedUser) ->
+  $scope.editUser = () ->
     $scope.showUser(false)
     $scope.editProfileVisible = true
+    $scope.updatedUser = $scope.displayedUser
+    console.log $scope.updatedUser.object.name
 
   $scope.redirectToRoles = (roleID) ->
+    $http.post('/roles/update', {
+      'id': roleID
+    })
+    .success(() ->
+      )
 
+  $scope.saveUser = () ->
 
+    $scope.displayedUser = $scope.updatedUser
+    for user in $scope.users
+      if $scope.displayedUser.object.id == user.object.id
+        console.log "new user saved"
+        user = $scope.displayedUser
+        $scope.showUser($scope.displayedUser.object.id)
+        break
     
 
 # app.directive 'testdirective', () ->

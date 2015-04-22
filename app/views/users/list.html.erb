@@ -28,12 +28,18 @@
       <thead>
         <tr>
           <th>Name</th>
+          <th>Full Name</th>
           <th>Email</th>
+          <th>Role</th>
       </thead>
       <tbody>
         <tr ng-repeat="user in users | filter:search">
           <td>{{user.name}}</td>
+          <td>{{user.fullname}}</td>
           <td>{{user.email}}</td>
+          <td>{{user.role.name}}</td>
+          
+
         </tr>
       </tbody>
     </table>

@@ -90,6 +90,7 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
   $scope.tableVisible = true
   $scope.profileVisible = false
   $scope.displayedUser
+  $scope.editProfileVisible = false
 
   $scope.init = () ->
     $scope.listSize = 0
@@ -100,7 +101,6 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
 
 
   $scope.getUsers = (fn) ->
-    console.log $scope.listSize
     $http.post('/users/get_users_ng', {
       'fetchNumber': fn
     })
@@ -110,8 +110,6 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
       
       $scope.fetchNumber+=1
 
-      console.log $scope.listSize
-      console.log $scope.users.length
       if $scope.users.length < $scope.listSize
         $scope.getUsers($scope.fetchNumber)
       )
@@ -140,7 +138,11 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
           $scope.profileVisible = true
           return
 
+  $scope.editUser = (displayedUser) ->
+    $scope.showUser(false)
+    $scope.editProfileVisible = true
 
+  $scope.redirectToRoles = (roleID) ->
 
 
     

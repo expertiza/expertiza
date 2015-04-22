@@ -119,8 +119,6 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
       $scope.listSize = listSize
       )
 
-  $scope.increment = (value) ->
-
     
 
 # app.directive 'testdirective', () ->

@@ -41,14 +41,30 @@
 
     <table class="table table-striped table-hover table-responsive">
       <thead>
-        <tr>
+        <tr><th colspan=5></th><th colspan=4 class="head info">E-mail on ...</th></tr>
+        <tr class="info">
           <th>Name</th>
+          <th>Full Name</th>
           <th>Email</th>
+          <th>Role</th>
+          <th>Parent</th>
+          <th>Review</th>
+          <th>Submission</th>
+          <th>Metareview</th>
+          <th>Privacy</th>
+        </tr>
       </thead>
       <tbody>
         <tr ng-repeat="user in users | filter:search | startFrom:currentPage*pageSize | limitTo:pageSize">
-          <td>{{user.name}}</td>
-          <td>{{user.email}}</td>
+          <td>{{user.object.name}}</td>
+          <td>{{user.object.fullname}}</td>
+          <td>{{user.object.email}}</td>
+          <td>{{user.role}}</td>
+          <td>{{user.parent}}</td>
+          <td>{{user.email_on_review}}</td>
+          <td>{{user.email_on_submission}}</td>
+          <td>{{user.email_on_review_of_review}}</td>
+          <td>{{user.leaderboard_privacy}}</td>
         </tr>
       </tbody>
     </table>

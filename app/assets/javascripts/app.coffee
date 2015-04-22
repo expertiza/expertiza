@@ -92,6 +92,9 @@ app.controller 'TreeCtrl', ($scope, $http) ->
 app.controller 'UsersPageCtrl', ($scope, $http) ->
   
   $scope.users = []
+  $scope.tableVisible = true
+  $scope.profileVisible = false
+  $scope.displayedUser
 
   $scope.init = (value) ->
     
@@ -136,6 +139,27 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
     .success((listSize) ->
       $scope.listSize = listSize
       )
+
+  $scope.showTable = (decision) ->
+    $scope.tableVisible = decision
+    if decision == true 
+      $scope.showUser(false)
+     
+
+  $scope.showUser = (userID) ->
+    if userID == false
+      $scope.profileVisible = false
+      return
+    else
+      for user in $scope.users
+        if user.object.id == userID
+          $scope.displayedUser = user
+          $scope.showTable(false)
+          $scope.profileVisible = true
+          return
+
+
+
 
     
 

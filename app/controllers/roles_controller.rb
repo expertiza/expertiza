@@ -46,6 +46,7 @@ class RolesController < ApplicationController
   end
 
   def update
+    
     @role = Role.find(params[:id])
     if @role.update_attributes(params[:role])
       Role.rebuild_cache

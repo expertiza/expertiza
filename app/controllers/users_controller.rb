@@ -5,7 +5,7 @@ class UsersController < ApplicationController
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
     :redirect_to => { :action => :list }
-  skip_before_action :verify_authenticity_token, only: [:list, :get_users_ng]
+  skip_before_action :verify_authenticity_token, only: [:list, :get_users_ng, :update]
 
 
   def action_allowed?
@@ -232,15 +232,23 @@ class UsersController < ApplicationController
         end
 
         def update
-          @user = User.find params[:id]
 
-          if @user.update_attributes(params[:user])
-            undo_link("User \"#{@user.name}\" has been updated successfully. ")
-            redirect_to @user
+          user = params[:user] # fetch from angular's post request
+          logger.warn(user[:object])
+          @user = User.find user[:object][:id]
+          # we need to add confirmation messages here (commented out bellow)
+          if @user.update_attributes(user[:object])
+            #undo_link("User \"#{@user.name}\" has been updated successfully. ")
+            #redirect_to @user
           else
             foreign
-            render :action => 'edit'
+            #render :action => 'edit'
           end
+
+          respond_to do |format|
+            format.html {render json: "success"}
+          end
+
         end
 
 

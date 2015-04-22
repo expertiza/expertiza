@@ -461,9 +461,11 @@ Expertiza::Application.routes.draw do
       get :show_selection
       get :auto_complete_for_user_name
       get :keys
+      # added for angular
       get 'get_users_ng'
       post 'get_users_ng'
       get 'get_users_list_ng'
+      post 'update'
     end
   end
 

@@ -162,6 +162,12 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
     for user in $scope.users
       if $scope.displayedUser.object.id == user.object.id
         console.log "new user saved"
+        $http.post('/users/update', {
+          'user': user
+        })
+        .success((response) ->
+            console.log response
+          )
         user = $scope.displayedUser
         $scope.showUser($scope.displayedUser.object.id)
         break

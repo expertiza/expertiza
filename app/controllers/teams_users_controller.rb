@@ -31,13 +31,24 @@ class TeamsUsersController < ApplicationController
 
     team = Team.find(params[:id])
 
-    add_member_return=team.add_member(user, team.parent_id)
-    if add_member_return==false
-      flash[:error]= "The team already has the maximum number of members."
-    end
+    if team.is_a?(AssignmentTeam)
+      assignment = Assignment.find(team.parent_id)
+      if AssignmentParticipant.find_by_user_id_and_assignment_id(user.id,assignment.id).nil?
+        urlAssignmentParticipantList = url_for :controller=>'participants', :action=>'list', :id=>assignment.id, :model => 'Assignment', :special_role => 'Participant'
+        flash[:error] = "\"#{user.name}\" is not a participant of current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
+      else
+        add_member_return=team.add_member(user, team.parent_id)
+        if add_member_return==false
+          flash[:error]= "The team already has the maximum number of members."
+        end
 
-    @teams_user = TeamsUser.last
-    undo_link("Team user \"#{user.name}\" has been added to \"#{team.name}\" successfully. ")
+
+        @teams_user = TeamsUser.last
+        undo_link("Team user \"#{user.name}\" has been added to \"#{team.name}\" successfully. ")
+      end
+    else #CourseParticipant
+
+    end
 
     redirect_to :controller => 'teams', :action => 'list', :id => team.parent_id
   end
@@ -60,11 +71,5 @@ class TeamsUsersController < ApplicationController
 
     redirect_to :action => 'list', :id => params[:id]
   end
-
-  #def undo_link
-  #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @teams_user.versions.last.id)}>undo</a>"
-  #end
-
-
 
 end

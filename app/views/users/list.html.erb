@@ -14,7 +14,7 @@
   <div>
     <button ng-click="showTable(true)" type="button" class="btn btn-primary">Back</button>
     <button ng-click="editUser()" type="button" class="btn btn-success">Edit</button>
-    <button ng-click="deleteUser(displayedUser)" type="button" class="btn btn-danger">Delete</button>
+    <button ng-click="deleteUser()" type="button" class="btn btn-danger">Delete</button>
   </div>
 </div>
 
@@ -104,7 +104,7 @@
           <td><button ng-click="showUser(user.object.id)" type="button" class="btn btn-info">{{user.object.name}}</button></td>
           <td>{{user.object.fullname}}</td>
           <td>{{user.object.email}}</td>
-          <td><button ng-click="redirectToRoles(user.role)" type="button" class="btn btn-primary">{{user.role}}</button></td>
+          <td>{{user.role}}</td>
           <td>{{user.parent}}</td>
           <td>{{user.email_on_review}}</td>
           <td>{{user.email_on_submission}}</td>

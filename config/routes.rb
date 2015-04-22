@@ -466,6 +466,7 @@ Expertiza::Application.routes.draw do
       post 'get_users_ng'
       get 'get_users_list_ng'
       post 'update'
+      post 'delete_user_ng'
     end
   end
 

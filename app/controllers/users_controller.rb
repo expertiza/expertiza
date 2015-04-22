@@ -5,8 +5,8 @@ class UsersController < ApplicationController
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
     :redirect_to => { :action => :list }
-  skip_before_action :verify_authenticity_token, only: [:list, :get_users_ng, :update]
-
+  skip_before_action :verify_authenticity_token, only: [:list, :get_users_ng, :update, :delete_user_ng]
+  # :get_users_ng, :update, :destroy added to skip_before_action to integrate with angular
 
   def action_allowed?
     case params[:action]
@@ -116,10 +116,10 @@ class UsersController < ApplicationController
      # div = (users_length/100.to_f).ceil
     if(fetchNumber == 0)
       start_num = 0
-      end_num = start_num+99
+      end_num = 300
     else
-      start_num = (fetchNumber*100)
-      end_num = start_num+99
+      start_num = 0
+      end_num = User.count
     end
 
     logger.warn(User.count)
@@ -159,6 +159,25 @@ class UsersController < ApplicationController
     logger.warn(count)
     respond_to do |format|
       format.html {render json: count}
+    end
+  end
+
+  def delete_user_ng
+    begin
+      @user = User.find(params[:id])
+      AssignmentParticipant.where(user_id: @user.id).each{|participant| participant.delete}
+      TeamsUser.where(user_id: @user.id).each{|teamuser| teamuser.delete}
+      AssignmentQuestionnaire.where(user_id: @user.id).each{|aq| aq.destroy}
+      @user.destroy
+      #undo_link("User \"#{@user.name}\" has been deleted successfully. ")
+      response = "User \"#{@user.name}\" has been deleted successfully. "    
+    rescue
+      response = $!
+    end   
+          # commented out and implemented in angular
+          #redirect_to :action => 'list'
+    respond_to do |format|
+      format.html {render json: response}
     end
   end
 
@@ -263,8 +282,8 @@ class UsersController < ApplicationController
           rescue
             flash[:error] = $!
           end
-
-          redirect_to :action => 'list'
+          # commented out and implemented in angular
+          #redirect_to :action => 'list'
         end
 
         def keys

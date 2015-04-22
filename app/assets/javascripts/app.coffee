@@ -108,8 +108,7 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
       'fetchNumber': fn
     })
     .success((receivedUsers) ->
-      for user in receivedUsers
-        $scope.users.push(user)
+      $scope.users = receivedUsers
       
       $scope.fetchNumber+=1
 
@@ -171,6 +170,20 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
         user = $scope.displayedUser
         $scope.showUser($scope.displayedUser.object.id)
         break
+
+  $scope.deleteUser = () ->
+    
+    $http.post('/users/delete_user_ng', {
+      'id': $scope.displayedUser.object.id
+    })
+    .success((response) ->
+      console.log response
+      )
+    index = $scope.users.indexOf($scope.displayedUser);
+    console.log index
+    $scope.users.splice(index,1)
+    $scope.showTable(true)
+
     
 
 # app.directive 'testdirective', () ->

@@ -122,8 +122,8 @@ class UsersController < ApplicationController
       start_num = 0
       end_num = 300
     else
-      start_num = 0
-      end_num = User.count
+      start_num = User.find_by(id: 300).id + 1
+      end_num = User.last.id
     end
 
     #logger.warn(User.count)
@@ -178,6 +178,7 @@ class UsersController < ApplicationController
     rescue
       response = $!
     end   
+    logger.warn response
           # commented out and implemented in angular
           #redirect_to :action => 'list'
     respond_to do |format|

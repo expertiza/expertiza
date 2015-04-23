@@ -26,6 +26,14 @@ body { padding-top: 70px; }
   margin: 30px auto;
 }
 
+#paginate-button {
+  margin-left: 30px;
+}
+
+.well .form-inline input {
+  width: 80%;
+}
+
 .inner-table tr:not(.no-cursor-tr) {
   cursor: pointer;
 }

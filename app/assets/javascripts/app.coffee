@@ -130,6 +130,8 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
   $scope.updatedUser
 
   $scope.init = (value) ->
+    $scope.user_display = {}
+    $scope.editProfileVisible = {}
     if $scope.users.length == $scope.listSize
       return
     else if $scope.users.length == 0
@@ -138,7 +140,7 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
       $scope.fetchNumber = 0
     $scope.getUsers(($scope.fetchNumber))
     $scope.currentPage = 0
-    $scope.pagination(100)
+    $scope.pagination(50)
 
   $scope.pagination = (ps) ->
     $http.post('/users/set_page_size', {
@@ -156,9 +158,15 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
       'fetchNumber': fn
     })
     .success((receivedUsers) ->
-      $scope.users = receivedUsers
-      
+      console.log receivedUsers
+      for user in receivedUsers
+        $scope.users.push user
+        $scope.user_display[user.object.id] = false
+        $scope.editProfileVisible[user.object.id] = false
+
       $scope.fetchNumber+=1
+      console.log $scope.users.length
+      console.log $scope.listSize
 
       if $scope.users.length < $scope.listSize
         $scope.getUsers($scope.fetchNumber)
@@ -177,23 +185,29 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
       $scope.editProfileVisible = false
      
 
-  $scope.showUser = (userID) ->
-    if userID == false
-      $scope.profileVisible = false
-      return
-    else
-      for user in $scope.users
-        if user.object.id == userID
-          $scope.displayedUser = user
-          $scope.showTable(false)
-          $scope.editProfileVisible = false
-          $scope.profileVisible = true
-          return
+  $scope.showUser = (user_id) ->
+    # if userID == false
+    #   $scope.profileVisible = false
+    #   return
+    # else
+    #   for user in $scope.users
+    #     if user.object.id == userID
+    #       $scope.displayedUser = user
+    #       $scope.showTable(false)
+    #       $scope.editProfileVisible = false
+    #       $scope.profileVisible = true
+    #       return
+    console.log $scope.user_display[user_id]
+    $scope.user_display[user_id] = !$scope.user_display[user_id]
+    $scope.editProfileVisible[user_id] = false
 
-  $scope.editUser = () ->
-    $scope.showUser(false)
-    $scope.editProfileVisible = true
-    $scope.updatedUser = $scope.displayedUser
+  $scope.hidePanel = (user_id) ->
+    $scope.editProfileVisible[user_id] = !$scope.editProfileVisible[user_id]
+
+  $scope.editUser = (user) ->
+    # $scope.showUser(false)
+    $scope.editProfileVisible[user.object.id] = !$scope.editProfileVisible[user.object.id]
+    $scope.updatedUser = user
     console.log $scope.updatedUser.object.name
 
   $scope.redirectToRoles = (roleID) ->
@@ -203,35 +217,31 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
     .success(() ->
       )
 
-  $scope.saveUser = () ->
+  $scope.saveUser = (user) ->
+    if $scope.updatedUser.password == $scope.confirm_password
+      $http.post('/users/update', {
+        'user': user
+      })
+      .success((response) ->
+          console.log response
+        )
+      $scope.editProfileVisible[user.object.id] = !$scope.editProfileVisible[user.object.id]
 
-    $scope.displayedUser = $scope.updatedUser
-    for user in $scope.users
-      if $scope.displayedUser.object.id == user.object.id
-        console.log "new user saved"
-        $http.post('/users/update', {
-          'user': user
-        })
-        .success((response) ->
-            console.log response
-          )
-        user = $scope.displayedUser
-        $scope.showUser($scope.displayedUser.object.id)
-        break
-
-  $scope.deleteUser = () ->
+  $scope.deleteUser = (user) ->
     
     $http.post('/users/delete_user_ng', {
-      'id': $scope.displayedUser.object.id
+      'id': user.object.id
     })
     .success((response) ->
       console.log response
       )
-    index = $scope.users.indexOf($scope.displayedUser);
+    index = $scope.users.indexOf(user);
     console.log index
     $scope.users.splice(index,1)
-    $scope.showTable(true)
 
+  $scope.gotoTop = () ->
+    $("html, body").animate({ scrollTop: 0 }, 600)
+    ''
     
 
 # app.directive 'testdirective', () ->

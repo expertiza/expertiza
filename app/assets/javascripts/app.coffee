@@ -4,6 +4,11 @@ app = angular.module('MPApp',[
   'ui.bootstrap',
 ])
 
+app.filter 'startFrom', ->
+  (input, start) ->
+    start = +start
+    return input.slice start
+
 app.controller 'MainPageCtrl', ($scope) ->
   console.log "in MainPageCtrl"
   $scope.toDisplay = 0
@@ -116,9 +121,128 @@ app.controller 'TreeCtrl', ($scope, $http, $location) ->
 
 
 app.controller 'UsersPageCtrl', ($scope, $http) ->
+  
+  $scope.users = []
+  $scope.tableVisible = true
+  $scope.profileVisible = false
+  $scope.displayedUser
+  $scope.editProfileVisible = false
+  $scope.updatedUser
+
+
+  $scope.init = () ->
+    if $scope.users.length == $scope.listSize
+      return
+    else if $scope.users.length == 0
+      $scope.listSize = 0
+      $scope.getUserListSize()
+      $scope.fetchNumber = 0
+    $scope.getUsers(($scope.fetchNumber))
+
   $scope.init = (value) ->
-    $scope.users = JSON.parse(value)
-    console.log $scope.users
+    if $scope.users.length == $scope.listSize
+      return
+    else if $scope.users.length == 0
+      $scope.listSize = 0
+      $scope.getUserListSize()
+      $scope.fetchNumber = 0
+    $scope.getUsers(($scope.fetchNumber))
+    $scope.currentPage = 0
+    $scope.pagination(0)
+
+  $scope.pagination = (ps) ->
+    $http.post('/users/set_page_size', {
+      'pageSize': ps
+    })
+    .success((value) ->
+      $scope.pageSize = value[0]
+      $scope.div = value[1]
+      $scope.totalSize = value[2]
+      )
+
+  $scope.getUsers = (fn) ->
+
+    $http.post('/users/get_users_ng', {
+      'fetchNumber': fn
+    })
+    .success((receivedUsers) ->
+      $scope.users = receivedUsers
+      
+      $scope.fetchNumber+=1
+
+      if $scope.users.length < $scope.listSize
+        $scope.getUsers($scope.fetchNumber)
+      )
+
+  $scope.getUserListSize = () ->
+    $http.get('/users/get_users_list_ng')
+    .success((listSize) ->
+      $scope.listSize = listSize
+      )
+
+  $scope.showTable = (decision) ->
+    $scope.tableVisible = decision
+    if decision == true 
+      $scope.showUser(false)
+      $scope.editProfileVisible = false
+     
+
+  $scope.showUser = (userID) ->
+    if userID == false
+      $scope.profileVisible = false
+      return
+    else
+      for user in $scope.users
+        if user.object.id == userID
+          $scope.displayedUser = user
+          $scope.showTable(false)
+          $scope.editProfileVisible = false
+          $scope.profileVisible = true
+          return
+
+  $scope.editUser = () ->
+    $scope.showUser(false)
+    $scope.editProfileVisible = true
+    $scope.updatedUser = $scope.displayedUser
+    console.log $scope.updatedUser.object.name
+
+  $scope.redirectToRoles = (roleID) ->
+    $http.post('/roles/update', {
+      'id': roleID
+    })
+    .success(() ->
+      )
+
+  $scope.saveUser = () ->
+
+    $scope.displayedUser = $scope.updatedUser
+    for user in $scope.users
+      if $scope.displayedUser.object.id == user.object.id
+        console.log "new user saved"
+        $http.post('/users/update', {
+          'user': user
+        })
+        .success((response) ->
+            console.log response
+          )
+        user = $scope.displayedUser
+        $scope.showUser($scope.displayedUser.object.id)
+        break
+
+  $scope.deleteUser = () ->
+    
+    $http.post('/users/delete_user_ng', {
+      'id': $scope.displayedUser.object.id
+    })
+    .success((response) ->
+      console.log response
+      )
+    index = $scope.users.indexOf($scope.displayedUser);
+    console.log index
+    $scope.users.splice(index,1)
+    $scope.showTable(true)
+
+    
 
 # app.directive 'testdirective', () ->
 #   templateUrl: 'test.html'

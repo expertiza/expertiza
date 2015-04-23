@@ -120,7 +120,7 @@ class UsersController < ApplicationController
     
     if(fetchNumber == 0)
       start_num = 0
-      end_num = 150
+      end_num = 300
     else
       start_num = 0
       end_num = User.count

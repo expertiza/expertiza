@@ -489,7 +489,8 @@ class SignUpSheetController < ApplicationController
           FileUtils::mkdir_p graph_output_path
           dg.write_to_graphic_file('jpg', "#{graph_output_path}/graph_#{params[:assignment_id]}")
 
-          redirect_to_sign_up(params[:assignment_id])
+          #redirect_to_sign_up(params[:assignment_id])
+          redirect_to :action => 'add_signup_topics_staggered', :id => params[:assignment_id]
         end
 
 

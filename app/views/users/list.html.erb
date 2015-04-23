@@ -69,8 +69,7 @@
 </div>
 
 
-<div ng-if="tableVisible == true">
-  <h1>Manage users</h1>
+<div ng-if="tableVisible == true" >
   <div>
   <label>Search By: 
     <select ng-model="searchtype" ng-init="searchtype='any'">
@@ -80,12 +79,33 @@
       <option value="email">Email</option>
     </select>
   </label>
-  <input ng-hide="searchtype != 'any'" ng-model="search.$">
+  <input ng-hide="searchtype != 'any'" ng-model="search.object.$">
   <input ng-hide="searchtype != 'name'" ng-model="search.object.name">
   <input ng-hide="searchtype != 'fullname'" ng-model="search.object.fullname">
   <input ng-hide="searchtype != 'email'" ng-model="search.object.email">
   <p>
   </div>
+
+  <div>
+  <label>Paginate By: 
+    <select ng-model="paginate" ng-init="paginate='100'" ng-change="pagination(paginate)">
+      <option value="0">All</option>
+      <option value="25">25</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+      <option value="250">250</option>
+    </select>
+  </label>
+  <p>
+  </div>
+
+  <button ng-disabled="currentPage == 0" ng-click="currentPage=currentPage-1">
+      Previous
+  </button>
+  {{currentPage+1}}/{{div}}
+  <button ng-disabled="currentPage >= totalSize/pageSize - 1" ng-click="currentPage=currentPage+1">
+      Next
+  </button>
 
     <table ng-if="tableVisible == true" class="table table-striped table-hover table-responsive">
       <thead>
@@ -119,59 +139,6 @@
    
   </div>
 
-  <div>
-  <label>Paginate By: 
-    <select ng-model="paginate" ng-init="paginate='0'" ng-change="pagination(paginate)">
-      <option value="0">All</option>
-      <option value="25">25</option>
-      <option value="50">50</option>
-      <option value="100">100</option>
-      <option value="250">250</option>
-    </select>
-  </label>
-  <p>
-  </div>
-
-  <button ng-disabled="currentPage == 0" ng-click="currentPage=currentPage-1">
-      Previous
-  </button>
-  {{currentPage+1}}/{{div}}
-  <button ng-disabled="currentPage >= totalSize/pageSize - 1" ng-click="currentPage=currentPage+1">
-      Next
-  </button>
-
-  <table ng-if="tableVisible == true" class="table table-striped table-hover table-responsive">
-    <thead>
-      <tr><th colspan=5></th><th colspan=4 class="head info">E-mail on ...</th></tr>
-      <tr class="info">
-        <th>Name</th>
-        <th>Full Name</th>
-        <th>Email</th>
-        <th>Role</th>
-        <th>Parent</th>
-        <th>Review</th>
-        <th>Submission</th>
-        <th>Metareview</th>
-            <th>Privacy</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr ng-repeat="user in users | filter:search | startFrom:currentPage*pageSize | limitTo:pageSize">
-        <td><button ng-click="showUser(user.object.id)" type="button" class="btn btn-info">{{user.object.name}}</button></td>
-        <td>{{user.object.fullname}}</td>
-        <td>{{user.object.email}}</td>
-        <td>{{user.role}}</td>
-        <td>{{user.parent}}</td>
-        <td>{{user.email_on_review}}</td>
-        <td>{{user.email_on_submission}}</td>
-        <td>{{user.email_on_review_of_review}}</td>
-        <td>{{user.leaderboard_privacy}}</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-<hr/>
->>>>>>> cf9fa27973527b6aae66d7020b9510c5a1659d56
 <%= render :partial => 'shared_scripts/pages' %>
 
 <p>

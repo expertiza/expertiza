@@ -1,7 +1,7 @@
 digraph RGL__DirectedAdjacencyGraph {
-    b [
+    e [
         fontsize = 8,
-        label = b
+        label = e
     ]
 
     a [
@@ -9,20 +9,38 @@ digraph RGL__DirectedAdjacencyGraph {
         label = a
     ]
 
+    b [
+        fontsize = 8,
+        label = b
+    ]
+
     c [
         fontsize = 8,
         label = c
     ]
 
-    b -> a [
+    d [
+        fontsize = 8,
+        label = d
+    ]
+
+    e -> a [
+        fontsize = 8
+    ]
+
+    e -> b [
+        fontsize = 8
+    ]
+
+    e -> d [
+        fontsize = 8
+    ]
+
+    a -> e [
         fontsize = 8
     ]
 
     b -> c [
-        fontsize = 8
-    ]
-
-    a -> b [
         fontsize = 8
     ]
 }

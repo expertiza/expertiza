@@ -4,6 +4,7 @@ gem 'rails'
 
 ## Gems in Alphabetical Order
 
+gem 'graphviz'
 gem 'activerecord-session_store'
 gem 'awesome_nested_set'
 gem 'bind-it'

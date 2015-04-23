@@ -13,12 +13,7 @@ app.controller 'MainPageCtrl', ($scope) ->
   console.log "in MainPageCtrl"
   $scope.toDisplay = 0
 
-app.controller 'SidebarCtrl', ($scope) ->
-  console.log "in SidebarCtrl"
-
-app.controller 'HeaderAndNavCtrl', ($scope) ->
-  console.log "in HeaderAndNavCtrl"
-
+# Tree Ctrl starts
 app.controller 'TreeCtrl', ($scope, $http, $location) ->
   console.log "in TreeCtrl"
   $scope.display = {}
@@ -120,6 +115,7 @@ app.controller 'TreeCtrl', ($scope, $http, $location) ->
      $scope.hoverEdit = false
 
 
+# User Page Ctrl starts
 app.controller 'UsersPageCtrl', ($scope, $http) ->
   
   $scope.users = []
@@ -243,10 +239,3 @@ app.controller 'UsersPageCtrl', ($scope, $http) ->
     $("html, body").animate({ scrollTop: 0 }, 600)
     ''
     
-
-# app.directive 'testdirective', () ->
-#   templateUrl: 'test.html'
-#   link: (scope, element, attr) -> 
-#     console.log "in directive"
-#     scope.name = 'Heyhey'
-

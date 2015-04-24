@@ -558,7 +558,7 @@ class SignUpSheetController < ApplicationController
         end
 
         def set_start_due_date(assignment_id, set_of_topics)
-          DueDate.assign_start_due_date(assignment_id, set_of_topics)
+          DeadlineHelper.set_start_due_date(assignment_id, set_of_topics)
         end
 
         #gets team_details to show it on team_details view for a given assignment

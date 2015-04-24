@@ -87,7 +87,7 @@ class AssignmentNode < Node
   def get_modified_date
     #Assignment.find(self.node_object_id).updated_at
     unless @assign_node
-   	@assign_node = Assignment.find(self.node_object_id)
+   		@assign_node = Assignment.find(self.node_object_id)
     end
     @assign_node.updated_at
   end

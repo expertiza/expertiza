@@ -125,7 +125,7 @@ class AssignmentForm
           change_item_type(dj.id)
         end
         # If the deadline type is team_formation, add a delayed job to drop one member team
-        if deadline_type == "team_formation"
+        if deadline_type == "team_formation" and @assignment.team_assignment?
           dj = DelayedJob.enqueue(ScheduledTask.new(@assignment.id, "drop_one_member_topics", due_date.due_at.to_s(:db)),
                                1, diff.minutes.from_now)
           change_item_type(dj.id)

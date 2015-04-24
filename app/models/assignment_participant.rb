@@ -479,7 +479,7 @@ class AssignmentParticipant < Participant
   def submitted_files()
     files = Array.new
     if(self.directory_num)
-      files = get_files(self.get_path)
+      files = get_files(self.path)
     end
     return files
   end
@@ -587,7 +587,7 @@ class AssignmentParticipant < Participant
       self.save!
     end
 
-    def get_path
+    def path
       if self.assignment.path.to_s[-1] != "/"
         self.assignment.path + "/" + self.directory_num.to_s
       else

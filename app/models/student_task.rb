@@ -138,7 +138,8 @@ class StudentTask
                     @students_teamed[@course_id] << @teammates
                  end
              end
-            @students_teamed[@course_id].uniq!
+             @students_teamed[@course_id].uniq! if @students_teamed.has_key?(@course_id)
+               
          end
         @students_teamed
   end

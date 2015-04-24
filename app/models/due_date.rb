@@ -134,7 +134,7 @@ class DueDate < ActiveRecord::Base
         end
 
         set_of_due_dates.each { |due_date|
-          create_topic_deadline(due_date, offset, topic_id)
+          DeadlineHelper.create_topic_deadline(due_date, offset, topic_id)
         }
       }
       i = i+1

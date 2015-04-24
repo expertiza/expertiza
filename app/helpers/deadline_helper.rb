@@ -6,12 +6,14 @@ module DeadlineHelper
   # The deadline itself is specified by due_date object which contains several values which specify
   # type { submission deadline, metareview deadline, etc.} a set of other parameters that
   #specify whether submission, review, metareview, etc. are allowed for the particular deadline
-  def create_topic_deadline(due_date, offset, topic_id)
+  def self.create_topic_deadline(due_date, offset, topic_id)
     topic_deadline = TopicDeadline.new
     topic_deadline.topic_id = topic_id
     topic_deadline.due_at = DateTime.parse(due_date.due_at.to_s) + offset.to_i
     topic_deadline.deadline_type_id = due_date.deadline_type_id
-    topic_deadline.late_policy_id = due_date.late_policy_id
+    #select count(*) from topic_deadlines where late_policy_id IS NULL;
+    #all 'late_policy_id' in 'topic_deadlines' table is NULL
+    topic_deadline.late_policy_id = nil
     topic_deadline.submission_allowed_id = due_date.submission_allowed_id
     topic_deadline.review_allowed_id = due_date.review_allowed_id
     topic_deadline.review_of_review_allowed_id = due_date.review_of_review_allowed_id
@@ -21,7 +23,7 @@ module DeadlineHelper
 
   # This function is used to set the starting due date for a group of topics belonging to an assignment.
   # This function is used in building the dependency graph for preventing injection attacks as specified in the sign_up_controller.
-  def set_start_due_date(assignment_id,set_of_topics)
+  def self.set_start_due_date(assignment_id,set_of_topics)
 
     #Remember, in create_common_start_time_topics function we reversed the graph so reverse it back
     set_of_topics = set_of_topics.reverse

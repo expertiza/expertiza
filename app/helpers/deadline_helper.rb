@@ -40,7 +40,7 @@ module DeadlineHelper
       else
         set_of_due_dates = TopicDeadline.where(topic_id: set_of_topics[i-1][0])
 
-        set_of_due_dates.sort! {|a,b| a.due_at <=> b.due_at}
+        set_of_due_dates.sort_by {|a| a.due_at }
 
         offset = days_between_submissions
       end
@@ -64,7 +64,7 @@ module DeadlineHelper
           end
         end
 
-        set_of_due_dates.each {|due_date|
+        set_of_due_dates.each_with_index {|due_date, index|
           create_topic_deadline(due_date, offset, topic_id)
         }
       }

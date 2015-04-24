@@ -4,7 +4,7 @@ Select a course to which the assignment will belong:
 <BR/><BR/>
 <%= form_for @assignment do |f| %>
   <% @courses.each do |course| %>
-    <%= f.radio_button :course_id, course.id %><%= course.name %><br/>
+    <%= radio_button_tag :course_id, course.id %><%= course.name %><br/>
   <% end %>
 
   <BR/>

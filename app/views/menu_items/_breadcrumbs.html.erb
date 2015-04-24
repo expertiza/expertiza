@@ -3,4 +3,6 @@
     <%= link_to crumb.label, "/menu/#{crumb.name}" %>
     <%= ">" if i < (crumbs.length - 1) %>
   <% end %>
+  <div style="float: right;">
+  Current local time : <%= DateTime.now.in_time_zone(session[:user].timezonepref) %></div>
 </div>

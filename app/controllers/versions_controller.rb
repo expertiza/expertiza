@@ -95,8 +95,8 @@ class VersionsController < ApplicationController
     criteria = criteria + "whodunnit = #{current_user.try(:id)} AND " if current_user.try(:id) && current_user.try(:id).to_i > 0
     criteria = criteria + "item_type = '#{item_type}' AND " if item_type && !(item_type.eql? 'Any')
     criteria = criteria + "event = '#{event}' AND " if event && !(event.eql? 'Any')
-    criteria = criteria + "created_at >= '#{datetime['start(1i)']}-#{datetime['start(2i)']}-#{datetime['start(3i)']} #{datetime['start(4i)']}:#{datetime['start(5i)']}:00' AND "
-    criteria = criteria + "created_at <= '#{datetime['end(1i)']}-#{datetime['end(2i)']}-#{datetime['end(3i)']} #{datetime['end(4i)']}:#{datetime['end(5i)']}:00' AND "
+    criteria = criteria + "created_at >= '#{time_to_string(params[:start_time])}' AND "
+    criteria = criteria + "created_at <= '#{time_to_string(params[:end_time])}' AND "
 
     if current_role == 'Instructor' || current_role == 'Administrator'
 
@@ -107,5 +107,9 @@ class VersionsController < ApplicationController
 
     versions = Version.page(params[:page]).order('id').per_page(25).where(criteria)
     versions
+  end
+
+  def time_to_string(time)
+    "#{time.gsub('/', '-')}:00"
   end
 end

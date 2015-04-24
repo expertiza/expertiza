@@ -30,15 +30,16 @@
   <%# if @assignment.team_assignment?%>
   <%    teams = TeamsUser.where(["user_id = ?", session[:user].id])%>
   <%     teams.find_each do |t|
-    if team = Team.where(["id = ? and parent_id = ?", t.team_id, @assignment.id]).first
+    team = Team.where(["id = ? and parent_id = ?", t.team_id, @assignment.id]).first
+    if !team.nil?
+    uid = team.id
       break
+      else
+        uid=nil
+      team=nil
     end
   end
-  uid = team.id%>
-<%#   else
-  uid = participant.id
-end
-    %>
+  %>
 
   <!-- If quiz is required for the assignment, find out if the quiz has already been created -->
 

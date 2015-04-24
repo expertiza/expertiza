@@ -57,22 +57,39 @@ class AssignmentNode < Node
 
   # Gets the name from the associated object
   def get_name
-    Assignment.find(self.node_object_id).name
+    #Assignment.find(self.node_object_id).name
+    unless @assign_node
+    	@assign_node = Assignment.find(self.node_object_id)
+    end
+    @assign_node.name
   end
 
   # Gets the directory_path from the associated object
   def get_directory
-    Assignment.find(self.node_object_id).directory_path
+    #Assignment.find(self.node_object_id).directory_path
+    unless @assign_node
+    	@assign_node = Assignment.find(self.node_object_id)
+    end
+    @assign_node.directory_path
   end
 
   # Gets the created_at from the associated object
   def get_creation_date
-    Assignment.find(self.node_object_id).created_at
+    #Assignment.find(self.node_object_id).created_at
+    unless @assign_node
+    	@assign_node = Assignment.find(self.node_object_id)
+    end
+    @assign_node.created_at
+
   end
 
   # Gets the updated_at from the associated object
   def get_modified_date
-    Assignment.find(self.node_object_id).updated_at
+    #Assignment.find(self.node_object_id).updated_at
+    unless @assign_node
+   	@assign_node = Assignment.find(self.node_object_id)
+    end
+    @assign_node.updated_at
   end
 
   # Gets any TeamNodes associated with this object

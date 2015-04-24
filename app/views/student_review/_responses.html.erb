@@ -57,7 +57,7 @@
                 <td>
                   <%= link_to "View", {:controller => 'response', :action => 'view', :id => @sorted[0].id} %>
                 </td>
-                <% if @assignment.get_current_stage(participant.topic_id) != "Complete" %>
+                <% if @assignment.get_current_stage(participant.topic_id) != "Finished" %>
                     <%- # show the link as edit when latest review is done in current phase   -%>
                     <%- # show link as update when latest review is done in different phase than current phase   -%>
                     <% if (deadline_version.due_at == deadline_time.due_at) %>

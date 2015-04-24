@@ -37,7 +37,7 @@
           <% if (Response.find_by_map_id(ri.id)) %>
             <% @count = @count + 1 %>
           <% end %>
-          <% if (Team.where([ :id => ri.reviewee_id ]).length > 0) %>
+          <% if (Team.where(["id = ?", ri.reviewee_id ]).length > 0) %>
             <% @rspan = @rspan + 1 %>
           <% end %>
         <%end %>
@@ -48,12 +48,12 @@
           <% if (@l%2) == 0 %>
 
             <td bgcolor="#ffffff" rowspan= <%= @rspan%>>
-              <%= link_to_remote_redbox  username, :url => {:controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id} %>
+              <%= link_to  username, :url => {:controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id} %>
             </td>
           <%else %>
 
             <td bgcolor="#DDDDBB" rowspan=<%= @rspan%>>
-              <%= link_to_remote_redbox  username, :url => {:controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id} %>
+              <%= link_to  username, :url => {:controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id} %>
             </td>
 
           <%end %>
@@ -70,7 +70,7 @@
 
           <% (ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", @id, r.reviewer_id, @type])).each do |ri| %>
             <% if (Response.find_by_map_id(ri.id)) %>
-              <%if Team.where([ :id => ri.reviewee_id ]).length > 0 %>
+              <%if Team.where(["id = ?", ri.reviewee_id ]).length > 0 %>
                 <%@team = Team.find(ri.reviewee_id) %>
                 <% @teamid = @team.id%>
                 <% if (@l%2) == 0 %>
@@ -84,7 +84,7 @@
                       <%=  Team.find(ri.reviewee_id).name %>
                     <% end %>
 
-                    <%#= link_to_remote_redbox Team.find(ri.reviewee_id).name,:url => {:controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id} %>
+
                   </td>
                   <%= render :partial => 'teamscore' %>
 
@@ -107,7 +107,7 @@
                       <%else %>
                         <td id = "green" bgcolor="#DDDDBB" align = 'center' colspan=1>
                         <%end %>
-                        <%= link_to_remote_redbox participant.fullname, :url => {:controller => 'popup', :action => 'participants_popup', :id => ri.reviewee_id, :id2 => ri.id} %>
+                        <%= link_to participant.fullname, :url => {:controller => 'popup', :action => 'participants_popup', :id => ri.reviewee_id, :id2 => ri.id} %>
                       </td>
                       <%= render :partial => 'participantscore' %>
                       <!-- write ur partial here to print score -->
@@ -131,7 +131,7 @@
                             <%end %>
                             <%@team = Team.find(ri.reviewee_id) %>
                             <% @teamid = @team.id%>
-                            <%= link_to_remote_redbox Team.find(ri.reviewee_id).name, :url => {:controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => nil} %>
+                            <%= link_to Team.find(ri.reviewee_id).name, :url => {:controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => nil} %>
                           </td>
                           <%= render :partial => 'teamscore' %>
                           <% if (@l%2) == 0 %>
@@ -154,7 +154,7 @@
                               <%else%>
                                 <td  id = "red" style ="color:#DD3300" align = 'center' colspan=1 bgcolor="#DDDDBB"  >
                                 <%end%>
-                                <%= link_to_remote_redbox participant.fullname, :url => {:controller => 'popup', :action => 'participants_popup', :id => ri.reviewee_id, :id2 => nil} %>
+                                <%= link_to_remote participant.fullname, :url => {:controller => 'popup', :action => 'participants_popup', :id => ri.reviewee_id, :id2 => nil} %>
                               </td><!-- write ur partial here to print score -->
                               <%= render :partial => 'participantscore' %>
                               <% if (@l%2) == 0 %>

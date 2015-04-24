@@ -484,6 +484,7 @@ Expertiza::Application.routes.draw do
   get '/menu/*name', controller: :menu_items, action: :link
   get ':page_name', controller: :content_pages, action: :view, method: :get
   get '/submitted_content/submit_hyperlink' => 'submitted_content#submit_hyperlink'
+  post '/review_mapping/review_report', controller: :review_mapping, action: :review_report
 
   root to: 'content_pages#view', page_name: 'home'
 

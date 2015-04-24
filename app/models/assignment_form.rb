@@ -111,7 +111,6 @@ class AssignmentForm
       due_at= Time.parse(due_at)
       mi=find_min_from_now(due_at)
       diff = mi-(due_date.threshold)*60
-      diff = 1
       if diff>0
         dj=DelayedJob.enqueue(ScheduledTask.new(@assignment.id, deadline_type, due_date.due_at.to_s(:db)),
                                 1, diff.minutes.from_now)
@@ -121,13 +120,13 @@ class AssignmentForm
         # If the deadline type is review, add a delayed job to drop outstanding review
         if deadline_type == "review"
           dj = DelayedJob.enqueue(ScheduledTask.new(@assignment.id, "drop_outstanding_reviews", due_date.due_at.to_s(:db)),
-                                  1, diff.minutes.from_now)
+                                  1, mi.minutes.from_now)
           change_item_type(dj.id)
         end
         # If the deadline type is team_formation, add a delayed job to drop one member team
         if deadline_type == "team_formation" and @assignment.team_assignment?
           dj = DelayedJob.enqueue(ScheduledTask.new(@assignment.id, "drop_one_member_topics", due_date.due_at.to_s(:db)),
-                               1, diff.minutes.from_now)
+                               1, mi.minutes.from_now)
           change_item_type(dj.id)
         end
       end

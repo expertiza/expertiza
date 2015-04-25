@@ -10,7 +10,6 @@
 <!--2.The assignment edit panel itself is a big form, and we have 2 small forms to save topics dependencies and staggered deadlines. And rails is not support one form inside another form very well-->
 <!--3.During debugging, we found that the action of  the button ('Save dependencies') in first small form is actually submit the whole assignment edit page. And what is more, the button ('Save start/due dates') in second form works well.-->
 <!--4.So according to this, we build another small form and place it before 2 original small forms. The new small form even do not have 'submit' button. So these 2 original form will work well.-->
-<!--5.And we also found that in assignment->edit->topics panel, all actions can be handled by these 2 buttons, we decide to remove the 'save' button at the bottom. Because this 'save' button only saves changes in front 4 panels and no relationship with 'topics' panel.-->
 <%= form_tag controller: 'assignment', action: 'edit', assignment_id: @assignment.id do %>
   <h1>Signup sheet for <%= @assignment.name %> assignment</h1>
 <% end %>

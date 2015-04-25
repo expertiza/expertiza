@@ -69,6 +69,7 @@ ActiveRecord::Schema.define(version: 201150105163040) do
     t.integer  "late_policy_id"
     t.boolean  "is_penalty_calculated",             default: false, null: false
     t.integer  "max_bids"
+    t.boolean  "show_teammate_reviews"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree

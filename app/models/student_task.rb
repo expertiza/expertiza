@@ -135,7 +135,7 @@ class StudentTask
                  if @students_teamed[@course_id].size == 0
                     @students_teamed[@course_id] = @teammates
                  else
-                    @students_teamed[@course_id] << @teammates
+                     @teammates.each do |teammate| @students_teamed[@course_id] << @teammate end
                  end
              end
              @students_teamed[@course_id].uniq! if @students_teamed.has_key?(@course_id)

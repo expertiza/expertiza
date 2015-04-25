@@ -63,10 +63,15 @@ class AssignmentsController < ApplicationController
       if((!dd.deadline_name.nil?&&!dd.deadline_name.empty?)||(!dd.description_url.nil?&&!dd.description_url.empty?))
         @due_date_nameurl_notempty = true
         @due_date_nameurl_notempty_checkbox = true
-        break
       end
       if dd.due_at.present?
           dd.due_at = dd.due_at.to_s.in_time_zone(session[:user].timezonepref)
+      end
+      if dd.deadline_type_id==5
+        @metareview_allowed = true
+      end
+      if @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox && @metareview_allowed
+        break
       end
     end
     @assignment_questionnaires.each do  |aq|

@@ -4,7 +4,6 @@ gem 'rails'
 
 ## Gems in Alphabetical Order
 
-gem 'graphviz'
 gem 'activerecord-session_store'
 gem 'awesome_nested_set'
 gem 'bind-it'
@@ -24,6 +23,7 @@ gem 'font-awesome-rails'
 gem 'gchart'
 gem 'gchartrb', :require => 'google_chart'
 gem 'gdata', :require => false
+gem 'graphviz'
 gem 'haml-rails'
 gem 'hoptoad_notifier'
 gem 'jquery-rails'

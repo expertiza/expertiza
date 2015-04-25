@@ -491,8 +491,8 @@ class SignUpSheetController < ApplicationController
 
           #execute linux bash script, convert .dot to jpg
           system("dot -Tjpg #{graph_output_path}/graph_#{params[:assignment_id]}.dot -o #{graph_output_path}/graph_#{params[:assignment_id]}.jpg")
-          #redirect_to_sign_up(params[:assignment_id])
-          redirect_to :action => 'add_signup_topics_staggered', :id => params[:assignment_id]
+          
+          redirect_to_assignment_edit(params[:assignment_id])
         end
 
 

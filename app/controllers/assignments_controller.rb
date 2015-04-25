@@ -57,6 +57,9 @@ class AssignmentsController < ApplicationController
     @reviewvarycheck = false
     @due_date_nameurl_notempty = false
     @due_date_nameurl_notempty_checkbox = false
+    @metareview_allowed=false
+    @metareview_allowed_checkbox=false
+
 
     # Check if name and url in database is empty before webpage displays
     @due_date_all.each do |dd|
@@ -104,6 +107,7 @@ class AssignmentsController < ApplicationController
       end
       return
     end
+
 
     @assignment_form= AssignmentForm.create_form_object(params[:id])
     @assignment_form.assignment.instructor ||= current_user

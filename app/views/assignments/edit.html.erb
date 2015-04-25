@@ -37,13 +37,13 @@
               <%= render '/sign_up_sheet/add_signup_topics.html' %>
           <% end %>
       </div>
+      <%= button_tag 'Save'%>| <%= render :partial => '/shared_scripts/back' %>
     </div>
     <script>
       jQuery(document).ready(function () {
         jQuery("#tabs").tabs();
       });
     </script>
-    <%= button_tag 'Save'%>| <%= render :partial => '/shared_scripts/back' %>
   <% end %>
 
   <br/>

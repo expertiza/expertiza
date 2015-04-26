@@ -266,6 +266,16 @@
             return;
         }
     }
+
+        function removeOrAddMetareview(){
+            if(document.getElementById("metareview"))
+                removeDueDateTableElement('metareview', 0);
+             else
+                addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>, 'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
+
+            <%@metareview_allowed_checkbox=true%>
+
+        }
 </script>
 
 <div style="font-size:large;">
@@ -282,6 +292,10 @@
 <input name="changenameurl" type="hidden" value="false" />
 <%= check_box_tag('changenameurl', 'true', @due_date_nameurl_notempty_checkbox,:onclick=>"handleChangenameurl(this.checked,due_date_name_column,due_date_url_column)" ) %>
 <%= label_tag('changenameurl', 'Name and description URL vary by round') %>
+<br>
+<input name="metareivewAllowed" type="hidden" value="false" />
+<%= check_box_tag('metareviewAllowed', 'true', @metareview_allowed,:onclick=>"removeOrAddMetareview()" ) %>
+<%= label_tag('metareivewAllowed', 'metareview allowed?') %>
 
 <table class='exp' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden;'>
 
@@ -307,7 +321,9 @@
         addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'submission', <%=i%>, <%= due_date(@assignment_form.assignment, 'submission', i-1).to_json.html_safe %>); // or use questionnaire_options(@assignment, nil).to_json
         addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'review', <%=i%>, <%= due_date(@assignment_form.assignment, 'review', i-1).to_json.html_safe %>) ;
         <% end %>
+        <% if @metareview_allowed %>
         addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
+        <%end %>
         //after webpage refreshes, hide or display name and url according to whether names and urls are empty in DB
         var due_date_name_column=document.getElementById("due_date_name_column");
         var due_date_url_column=document.getElementById("due_date_url_column");

@@ -83,9 +83,10 @@
 
 <% @students_teamed_with.keys.each do |course_id| %>
     <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @students_teamed_with[course_id].size.to_s %>&nbsp;</span> <%= Course.find(course_id).name %><br></strong><br>
-
-    <% @students_teamed_with[course_id].each do |student|%>
-        <span class="notification">&nbsp; &raquo; <%= student.fullname.to_s %> </span><br/>
+    <% if @students_teamed_with[course_id].size %>
+        <% @students_teamed_with[course_id].each do |student|%>
+                <span class="notification">&nbsp; &raquo; <%= student %> </span><br/>
+        <% end %>
     <% end %>
 <% end %>
 

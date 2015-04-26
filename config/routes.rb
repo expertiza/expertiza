@@ -35,6 +35,7 @@ Expertiza::Application.routes.draw do
       get :one_course_all_assignments
       get :all_students_all_reviews
       get :one_student_all_reviews
+      get :one_assignment_all_students
     end
   end
 

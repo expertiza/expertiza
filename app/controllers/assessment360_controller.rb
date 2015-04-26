@@ -36,7 +36,7 @@ class Assessment360Controller < ApplicationController
         @assignment_pie_charts 
     end
 
-    def reviews_progress_by_date(assignments)
+    def reviews_progress_by_date(assignments,review_types)        
         @assignment_bar_charts = Hash.new
         assignments.each do |assignment|
 
@@ -46,8 +46,8 @@ class Assessment360Controller < ApplicationController
             date = assignment.created_at.to_datetime.to_date
 
             while ((date <=> Date.today) <= 0)
-                if assignment.get_total_reviews_completed_by_type_and_date(@REVIEW_TYPES.first, date) != 0 then
-                    bar_1_data.push(assignment.get_total_reviews_completed_by_type_and_date(@REVIEW_TYPES.first, date))
+                if assignment.get_total_reviews_completed_by_type_and_date(review_types.first, date) != 0 then
+                    bar_1_data.push(assignment.get_total_reviews_completed_by_type_and_date(review_types.first, date))
                     dates.push(date.month.to_s + "-" + date.day.to_s)
                 end
 
@@ -75,7 +75,7 @@ class Assessment360Controller < ApplicationController
 
     def reviews_grade_distribution(assignments)
         @assignment_distribution  = Hash.new
-        @assignments.each do |assignment|
+        assignments.each do |assignment|
 
             # Histogram score distribution .......................
             bar_2_data = assignment.get_score_distribution
@@ -109,7 +109,7 @@ class Assessment360Controller < ApplicationController
             @assignments = @assignments.reject {|assignment| assignment.get_total_reviews_assigned_by_type(@REVIEW_TYPES.first) != 0 }
 
             @assignment_pie_charts = reviews_progress_by_completion(@assignments);
-            @assignment_bar_charts = reviews_progress_by_date(@assignments);
+            @assignment_bar_charts = reviews_progress_by_date(@assignments,@REVIEW_TYPES);
             @assignment_distribution  = reviews_grade_distribution(@assignments);
         end
     end
@@ -126,7 +126,7 @@ class Assessment360Controller < ApplicationController
         @bc = Hash.new
         @participants.each do |participant|
             @questionnaires = @assignment.questionnaires
-            bar_1_data = [participant.average_score]
+            bar_1_data = [participant.average_score*20]
             color_1 = 'c53711'
             min = 0
             max = 100

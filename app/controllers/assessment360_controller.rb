@@ -46,12 +46,12 @@ class Assessment360Controller < ApplicationController
             date = assignment.created_at.to_datetime.to_date
 
             while ((date <=> Date.today) <= 0)
-                if assignment.get_total_reviews_completed_by_type_and_date(review_types.first, date) != 0 then
-                    bar_1_data.push(assignment.get_total_reviews_completed_by_type_and_date(review_types.first, date))
+                if assignment.get_total_reviews_completed_by_date(date) != 0 then
+                    bar_1_data.push(assignment.get_total_reviews_completed_by_date(date))
                     dates.push(date.month.to_s + "-" + date.day.to_s)
                 end
 
-                date = (date.to_datetime.advance(:days => 1)).to_date
+                date = (date.to_datetime.advance(:months => 1)).to_date
             end
 
             color_1 = 'c53711'

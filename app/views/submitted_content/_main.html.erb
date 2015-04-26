@@ -27,16 +27,13 @@
 
 <% if @assignment.require_quiz? %>
   <!-- Setting the uid to team id for a team assignment and participant id for an individual assignment -->
-  <%# if @assignment.team_assignment?%>
   <%    teams = TeamsUser.where(["user_id = ?", session[:user].id])%>
+    <%uid=nil%>
   <%     teams.find_each do |t|
     team = Team.where(["id = ? and parent_id = ?", t.team_id, @assignment.id]).first
-    if !team.nil?
-    uid = team.id
+    uid = t.id
+    if team
       break
-      else
-        uid=nil
-      team=nil
     end
   end
   %>

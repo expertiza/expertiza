@@ -949,6 +949,16 @@ class Assignment < ActiveRecord::Base
     self.response_maps.each { |response_map| response_count = response_count + 1 if (response_map.response.created_at.to_datetime.to_date <=> date) == 0 if !response_map.response.nil? && response_map.type == type }
     response_count
   end
+  
+  # Returns the number of reviews completed for a particular assignment by date
+  # Param: date - Filter reviews that were not created on this date
+  def get_total_reviews_completed_by_date(date)
+    # self.responses.size
+    response_count = 0
+    self.response_maps.each { |response_map| response_count = response_count + 1 if (response_map.response.created_at.to_datetime.to_date <=> date) <= 0 unless response_map.response.nil?
+    }
+    response_count
+  end
 
   # Returns the percentage of reviews completed as an integer (0-100)
   def get_percentage_reviews_completed

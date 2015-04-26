@@ -1,20 +1,14 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
+require 'student_task'
+
 class StudentTaskTest < ActiveSupport::TestCase
-  fixtures :course,:teams,:users
+  fixtures :courses,:teams,:users, :participants, :assignments
 
-
-  def setup
-    @course = courses(:course1)
-    @users = users(:user999)
-    @course_team = teams(:team2)
-  
-  end
-
-
-  def test_teamed_students
-    StudentTask.teamed_students(@user999)
-    assert.equal '0',@students_teamed.length
+  test "method_teamed_students" do
+    @user = users(:user5403)
+    @students_teamed= StudentTask.teamed_students(@user)
+    assert_equal 0,@students_teamed.length
   end
 
 end

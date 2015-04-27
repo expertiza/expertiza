@@ -1,10 +1,18 @@
 require 'rails_helper'
+include LogInHelper
 
 describe SignUpSheetController do
   before(:each) do
+    instructor.save
+    @user = User.find(1)
+
+    @wiki = WikiType.new({"name"=>"No"})
+    @wiki.save
+
     @assignment = Assignment.where(name: 'My assignment').first || Assignment.new({
                                                                                   "name"=>"My assignment",
-                                                                                  "instructor_id"=>1
+                                                                                  "instructor_id"=>@user.id,
+                                                                                  "wiki_type_id"=>@wiki.id
                                                                               })
     @assignment.save
 

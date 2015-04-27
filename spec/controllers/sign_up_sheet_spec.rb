@@ -4,7 +4,7 @@ include LogInHelper
 describe SignUpSheetController do
   before(:each) do
     instructor.save
-    @user = User.find(1)
+    @user = User.find_by_name("instructor")
 
     @wiki = WikiType.new({"name"=>"No"})
     @wiki.save

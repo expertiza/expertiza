@@ -164,6 +164,7 @@ class Assessment360Controller < ApplicationController
         @teammate_review = Hash.new {|h,k| h[k] = Hash.new(&h.default_proc)}
         @student_overall_average = Hash.new {|h,k| h[k] = Hash.new(&h.default_proc)}
         @class_overall_average = Hash.new {|h,k| h[k] = Hash.new(&h.default_proc)}
+        @teamed_count = Hash.new {|h,k| h[k] = Hash.new(&h.default_proc)}
 
         @assignments.each do |assignment|   
             teammate_hash[assignment.name.to_s] = 0 
@@ -188,6 +189,13 @@ class Assessment360Controller < ApplicationController
             meta_aggregate = 0
             teammate_count = 0
             meta_count = 0 
+            cp = Student.select {|c| c.id == student.user_id}.first
+            @students_teamed = StudentTask.teamed_students(cp)  
+            if @students_teamed[@course.id] && @students_teamed[@course.id].size
+                @teamed_count[student.fullname.to_s] = @students_teamed[@course.id].size
+            else
+                @teamed_count[student.fullname.to_s] = 0
+            end
             @assignments.each do |assignment| 
                 puts student.name + '  ' + assignment.name
                 @meta_review[student.fullname.to_s][assignment.name.to_s] = ''
@@ -263,7 +271,7 @@ class Assessment360Controller < ApplicationController
         if overall_teammate_count > 0
             @class_overall_average[@class_average_sym][@teammate_review_sym] = (overall_teammate_average/overall_teammate_count).to_f.round().to_s + '%'
         end 
-       
+
     end
 
     # Find all the assignments for a given student pertaining to the course. This data is given a graphical display using bar charts. Individual teammate and metareview scores are displayed along with their aggregate

@@ -3,7 +3,8 @@ require 'rails_helper'
 describe SignUpSheetController do
   before(:each) do
     @assignment = Assignment.where(name: 'My assignment').first || Assignment.new({
-                                                                                  "name"=>"My assignment"
+                                                                                  "name"=>"My assignment",
+                                                                                  "instructor_id"=>1
                                                                               })
     @assignment.save
 

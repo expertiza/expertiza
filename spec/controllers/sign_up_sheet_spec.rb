@@ -43,4 +43,9 @@ describe SignUpSheetController do
     delete :destroy, id: @topic.id, assignment_id: @assignment.id
     expect(response).should redirect_to edit_assignment_path(@assignment.id) + "#tabs-5"
   end
+
+  it "should be able to generate topic dependency" do
+    post :save_topic_dependencies, assignment_id: @assignment.id
+    expect(File).to exist("public/assets/staggered_deadline_assignment_graph/graph_#{@assignment.id}.jpg")
+  end
 end

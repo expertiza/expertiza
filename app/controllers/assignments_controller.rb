@@ -123,7 +123,7 @@ class AssignmentsController < ApplicationController
         #  - rename an assgt. -- implemented by renaming a directory
         #  - assigning an assignment to a course -- implemented by moving a directory.
       else
-        flash[:error] = "Assignment save failed: #{@assignment_form.errors.full_messages.join(' ')}"
+        flash[:error] = "Assignment save failed: #{@assignment_form.errors}"
     end
     redirect_to :action => 'edit', :id => @assignment_form.assignment.id
   end

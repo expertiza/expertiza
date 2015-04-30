@@ -1,7 +1,9 @@
+
+require 'active_support/time_with_zone'
 class AssignmentForm
 
   attr_accessor :assignment, :assignment_questionnaires, :due_dates
-
+  attr_accessor :errors
   DEFAULT_MAX_TEAM_SIZE = 1
   DEFAULT_WIKI_TYPE_ID = 1
 
@@ -81,24 +83,48 @@ class AssignmentForm
 
   #code to save due dates
   def update_due_dates(attributes,user)
+    due_dates_id =Array.new
+    max_review_dd = NIL
     attributes.each do |due_date|
       if due_date[:due_at].blank? then
         next
       end
-      due_date[:due_at]= due_date[:due_at].to_s.in_time_zone(user.timezonepref).utc
+      #parse the dd and convert it to utc before saving it to db
+      time = Time.parse(due_date[:due_at][0..15] + ' '+ActiveSupport::TimeZone[user.timezonepref].formatted_offset)
+      due_date[:due_at]= time.utc
       if due_date[:id].nil? or due_date[:id].blank?
         dd = DueDate.new(due_date)
         if !dd.save
           @errors =@errors + @assignment.errors
           @has_errors = true;
         end
+        due_dates_id<<dd.id
       else
         dd = DueDate.find(due_date[:id])
-        if !dd.update_attributes(due_date);
+        #get deadline for review
+        if dd.deadline_type_id == 2
+           max_review_dd = dd.due_at
+           dd_type = dd.deadline_type_id
+        end
+        due_dates_id<<dd.id
+        if !dd.update_attributes(due_date)
           @errors =@errors + @assignment.errors
           @has_errors = true;
         end
       end
+    end
+
+    #get the latest date for reviews done on this assignment
+    max_review_date = @assignment.response_maps.maximum(:created_at)
+
+    if !max_review_date.nil? and max_review_date > max_review_dd
+        @errors = 'Cannot delete the due dates as a review has been done on '+ max_review_date.to_s.in_time_zone(user.timezonepref).to_s
+	      @has_errors = true;
+    else
+         duedates = DueDate::where(assignment_id: @assignment.id)
+         duedates.each do |duedate|
+            duedate.destroy unless due_dates_id.include? duedate.id
+         end
     end
   end
 

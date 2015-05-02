@@ -1,0 +1,29 @@
+<% namecolwidth = 18 %>
+<% colwidth = 7  %>
+
+<TR style ="background-color: white;"<% if prefix %>id='<%= prefix %>_1' style="display:none"<% end %>>
+
+<TH WIDTH="<%= namecolwidth %>%" ALIGN="LEFT">
+	Stats
+</TH>
+
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">
+	<img src="<%= @grades_bar_charts[:review] %>" >
+</TH>
+
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">
+	<img src="<%= @grades_bar_charts[:metareview] %>" >
+</TH>
+
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">
+	<img src="<%= @grades_bar_charts[:feedback] %>" >
+</TH>
+
+<% if @assignment.team_assignment? %>		
+  <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">
+  	<img src="<%= @grades_bar_charts[:teammate] %>" >
+  </TH>
+<% end %>
+
+<TH WIDTH="<%= colwidth %>%">&nbsp;</TH></TR>           
+

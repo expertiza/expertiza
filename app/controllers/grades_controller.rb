@@ -42,6 +42,9 @@ class GradesController < ApplicationController
       }
     end
     @scores = @assignment.scores(@questions)
+    averages = calculate_average_vector(@scores)
+    @average_chart =  bar_chart(averages,300,100,5)
+    @avg_of_avg = mean(averages)
     calculate_all_penalties(@assignment.id)
   end
 
@@ -319,24 +322,22 @@ class GradesController < ApplicationController
     @grades_bar_charts = {}
     if @pscore[:review]
       scores = get_scores_for_chart @pscore[:review][:assessments], 'review'
-      p '----------------------'
-      p scores
-      bar_chart(scores, 'review')      
+      @grades_bar_charts[:review] = bar_chart(scores)      
     end
 
     if @pscore[:metareview]
      scores = get_scores_for_chart @pscore[:metareview][:assessments], 'metareview'
-     bar_chart(scores, 'metareview') 
+     @grades_bar_charts[:metareview] = bar_chart(scores)
     end
 
     if @pscore[:feedback]
       scores = get_scores_for_chart @pscore[:feedback][:assessments], 'feedback'
-      bar_chart(scores, 'feedback') 
+      @grades_bar_charts[:feedback] = bar_chart(scores)
     end
 
     if @pscore[:teammate]
       scores = get_scores_for_chart @pscore[:teammate][:assessments], 'teammate'
-      bar_chart(scores, 'teammate') 
+      @grades_bar_charts[:teammate] = bar_chart(scores) 
     end
 
     reliability = get_scores_for_chart @pscore[:review][:assessments], 'review'
@@ -362,18 +363,23 @@ class GradesController < ApplicationController
     scores
   end
 
-  def bar_chart(scores, type)
-    GoogleChart::BarChart.new("100x100", " ", :vertical, false) do |bc|
+  def calculate_average_vector(scores)
+    return scores[:teams].map{|k,v| v[:scores][:avg].to_i}
+  end
+
+  def bar_chart(scores, width=100, height=100, spacing=1)
+    link = nil
+    GoogleChart::BarChart.new("#{width}x#{height}", " ", :vertical, false) do |bc|
       data = scores
       bc.data "Line green", data, '990000'
-      #bc.axis :x, :positions => [0, data.size], :range => [0,100]
       bc.axis :y, :range => [0, data.max] ,:positions => [data.min, data.max]
       bc.show_legend = false
       bc.stacked = false
-      bc.width_spacing_options({:bar_width => 70/(data.size+1),:bar_spacing => 1, :group_spacing => 1})
+      bc.width_spacing_options({:bar_width => (width-30)/(data.size+1),:bar_spacing => 1, :group_spacing => spacing })
       bc.data_encoding = :extended
-      @grades_bar_charts[type.to_sym] = (bc.to_url)
+      link = (bc.to_url)  
     end
+    link
   end
 
   def reliability_chart(score,type)
@@ -402,6 +408,7 @@ class GradesController < ApplicationController
   def mean(array)
     array.inject(0) { |sum, x| sum += x } / array.size.to_f
   end
+
   def mean_and_standard_deviation(array)
     m = mean(array)
     variance = array.inject(0) { |variance, x| variance += (x - m) ** 2 }

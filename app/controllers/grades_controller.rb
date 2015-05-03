@@ -377,14 +377,14 @@ class GradesController < ApplicationController
   end
 
   def reliability_chart(score,type)
-    GoogleChart::BarChart.new("25x50", " ", :horizontal, false) do |bc|
+    GoogleChart::BarChart.new("25x20", " ", :horizontal, false) do |bc|
 
       if score == 'good'
         data = [1,1,1]
         color = '00ff00'
       elsif score == 'medium'
         data = [1,1]
-        color = 'ffa500'
+        color = 'FFCC00'
       else
         data = [1]
         color = '990000'

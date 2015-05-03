@@ -19,8 +19,10 @@
 <TR class="row" <% if team %> id="<%= prefix %>" style="display:none" <% end %>>
     <TD><%= participant.fullname %>
     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_filesLink" name="<%=prefix%>_filesLink" onClick="toggleElement('<%=prefix%>_files','submission');return false;">show submission</a>
-	<% if @topic %> (<%= @topic.topic_identifier %>)<% end %><img src="<%= @grades_bar_charts[:reliability] %>" >
-
+	<% if @topic %> (<%= @topic.topic_identifier %>) <% end %>
+  <% if controller.action_name == "view_my_scores" %>
+    <img src="<%= @grades_bar_charts[:reliability] %>" >
+  <% end %>
 	</FONT>
     </TD>
     

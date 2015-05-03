@@ -1,7 +1,9 @@
 <% namecolwidth = 18 %>
 <% colwidth = 7  %>
 
-<TR style ="background-color: white;"<% if prefix %>id='<%= prefix %>_1' style="display:none"<% end %>>
+<a href="#" name='score-chartLink' onClick="toggleElement('score-chart', 'stats');return false;">hide stats</a>
+
+<TR style ="background-color: white;" id='score-chart'>
 
 <TH WIDTH="<%= namecolwidth %>%">
 	Stats
@@ -55,6 +57,14 @@
 });
   <%end%>
   <%end%>
+  function toggle(x) {
+  if (document.getElementById(x).style.display == 'none') {
+    document.getElementById(x).style.display = '';
+  } else {
+    document.getElementById(x).style.display = 'none';
+  }
+}
+
 </script> 
 
 <style>

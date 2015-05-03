@@ -338,7 +338,18 @@ class GradesController < ApplicationController
       scores = get_scores_for_chart @pscore[:teammate][:assessments], 'teammate'
       bar_chart(scores, 'teammate') 
     end
-  end
+
+    reliability = get_scores_for_chart @pscore[:review][:assessments], 'review'
+    avg,std = mean_and_standard_deviation(reliability)
+    if std<10
+      reliability_chart('good', 'reliability')
+    elsif std>10 and std<20
+      reliability_chart('medium', 'reliability')
+    else
+      reliability_chart('poor', 'reliability')
+    end
+
+    end
 
   def get_scores_for_chart(reviews, symbol)
     scores = []
@@ -363,6 +374,38 @@ class GradesController < ApplicationController
       bc.data_encoding = :extended
       @grades_bar_charts[type.to_sym] = (bc.to_url)
     end
+  end
+
+  def reliability_chart(score,type)
+    GoogleChart::BarChart.new("25x50", " ", :horizontal, false) do |bc|
+
+      if score == 'good'
+        data = [1,1,1]
+        color = '00ff00'
+      elsif score == 'medium'
+        data = [1,1]
+        color = 'ffa500'
+      else
+        data = [1]
+        color = '990000'
+      end
+
+      bc.data "Reliability Symbol", data, color
+      bc.show_legend = false
+      bc.stacked = false
+      bc.width_spacing_options({:bar_width => 5,:bar_spacing => 10, :group_spacing => 1})
+      bc.data_encoding = :extended
+      @grades_bar_charts[type.to_sym] = (bc.to_url)
+    end
+  end
+
+  def mean(array)
+    array.inject(0) { |sum, x| sum += x } / array.size.to_f
+  end
+  def mean_and_standard_deviation(array)
+    m = mean(array)
+    variance = array.inject(0) { |variance, x| variance += (x - m) ** 2 }
+    return m, Math.sqrt(variance/(array.size-1))
   end
 
 end

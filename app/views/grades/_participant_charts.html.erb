@@ -39,37 +39,50 @@
   </TH>
 <% end %>
 
-<TH WIDTH="<%= colwidth %>%">&nbsp;</TH></TR>
+<TH WIDTH="<%= colwidth %>%">&nbsp;
+  <div class="circle" id="final-circle">
+          
+  </div>
+</TH>
+  
+</TR>
 
 <script type="text/javascript">
   <% ['review', 'metareview', 'feedback', 'teammate'].each do |type| %>
   <% if @pscore[type.to_sym][:scores][:avg]%>
-	var myCircle = Circles.create({
-  id:           '<%= "#{type}-circle" %>',
-  radius:       25,
-  value:        <%= @pscore[type.to_sym][:scores][:avg].to_i %>,
-  maxValue:     100,
-  width:        7,
-  text:         '<%=@pscore[type.to_sym][:scores][:avg].to_i%>',
-  colors:       ['#FFEB99', '#FFCC00'],
-  duration:       700,
-  textClass:      'circles-text'
-});
+  var myCircle = Circles.create({
+    id:           '<%= "#{type}-circle" %>',
+    radius:       25,
+    value:        <%= @pscore[type.to_sym][:scores][:avg].to_i %>,
+    maxValue:     100,
+    width:        7,
+    text:         '<%=@pscore[type.to_sym][:scores][:avg].to_i%>',
+    colors:       ['#FFEB99', '#FFCC00'],
+    duration:       700,
+    textClass:      'circles-text'
+  });
   <%end%>
   <%end%>
-  function toggle(x) {
-  if (document.getElementById(x).style.display == 'none') {
-    document.getElementById(x).style.display = '';
-  } else {
-    document.getElementById(x).style.display = 'none';
-  }
-}
+  var myCircle = Circles.create({
+    id:           'final-circle',
+    radius:       35,
+    value:        <%= @pscore[:total_score].to_i %>,
+    maxValue:     100,
+    width:        15,
+    text:         '<%=@pscore[:total_score].to_i%>',
+    colors:       ['#FFEB99', '#FFCC00'],
+    duration:       700,
+    textClass:      'circles-final'  
+  });
 
 </script> 
 
 <style>
   .circles-text{
     font-size: 12px !important;    
+  }
+  .circles-final{
+    font-size: 16px !important;    
   }
 </style>          
 

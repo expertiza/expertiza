@@ -38,6 +38,10 @@ body { padding-top: 70px; }
   cursor: pointer;
 }
 
+.compact-table {
+  margin: 3px;
+}
+
 .inner-table .table-hover tbody tr:hover:not(.no-color-tr) {
   background: #F56E5E;
 }

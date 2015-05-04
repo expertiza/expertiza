@@ -513,9 +513,9 @@ class Assignment < ActiveRecord::Base
     # get the drop_topic_deadline_id to exclude it
     drop_topic_deadline_id = DeadlineType.find_by_name('drop_topic').id
     self.staggered_deadline? ?
-      topic_id ?
+      self.id ?
       next_due_dates = TopicDeadline
-      .where( ['topic_id = ? && due_at >= ? && deadline_type_id <> ?', topic_id, Time.now, drop_topic_deadline_id])
+      .where( ['topic_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id])
       .order('due_at') :
     next_due_dates = TopicDeadline
       .where( ['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id])
@@ -753,10 +753,12 @@ class Assignment < ActiveRecord::Base
     end
     due_date = find_current_stage(topic_id)
 
-    if(due_date!=COMPLETE && due_date!='Finished'&&due_date!=nil &&due_date.deadline_name!=nil)
-      return due_date.deadline_name
-    else
-      return get_current_stage(topic_id)
+    if !self.staggered_deadline?
+      if(due_date!=COMPLETE && due_date!='Finished'&&due_date!=nil &&due_date.deadline_name!=nil)
+        return due_date.deadline_name
+      else
+        return get_current_stage(topic_id)
+      end
     end
   end
 
@@ -778,7 +780,7 @@ class Assignment < ActiveRecord::Base
       end
     end
     due_date = find_current_stage(topic_id)
-    if due_date == nil or due_date == COMPLETE or due_date.class=="TopicDeadlines"
+    if due_date == nil or due_date == COMPLETE or due_date.is_a?(TopicDeadline)
       return nil
     else
       return due_date.description_url

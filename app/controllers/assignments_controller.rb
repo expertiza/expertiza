@@ -242,10 +242,9 @@ class AssignmentsController < ApplicationController
     end
 
     def delete_scheduled_task
-      @assignment = Assignment.find(params[:id])
       @delayed_job = DelayedJob.find(params[:delayed_job_id])
       @delayed_job.delete
-      redirect_to :controller => 'assignments', :action => 'scheduled_tasks', :id => @assignment.id
+      redirect_to :controller => 'assignments', :action => 'scheduled_tasks', :id => params[:id]
     end
 
 end

@@ -357,7 +357,8 @@ DeadlineType.create(:name => 'metareview')
 DeadlineType.create(:name => 'drop_topic')
 DeadlineType.create(:name => 'signup')
 DeadlineType.create(:name => 'team_formation')
-
+DeadlineType.create(:name => 'drop_outstanding_reviews')
+DeadlineType.create(:name => 'drop_one_member_topics')
 ###### Deadline Rights - necessary because there is no configuration from the UI.
 DeadlineRight.create(:name => 'No')
 DeadlineRight.create(:name => 'Late')

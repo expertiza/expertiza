@@ -111,6 +111,8 @@ class AssignmentForm
       due_at= Time.parse(due_at)
       mi=find_min_from_now(due_at)
       diff = mi-(due_date.threshold)*60
+      # diff = 1
+      # mi = 2
       if diff>0
         dj=DelayedJob.enqueue(ScheduledTask.new(@assignment.id, deadline_type, due_date.due_at.to_s(:db)),
                                 1, diff.minutes.from_now)

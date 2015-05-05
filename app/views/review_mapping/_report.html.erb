@@ -26,9 +26,10 @@
       </th>
     </tr>
 
-    <tr>
+
       <%@l = -1 %>
       <% @reviewers.each do |r| %>
+        <tr>
         <% @this_reviewer = r.reviewer_id %>
         <% @count = 0 %>
         <% @rspan = 0 %>
@@ -95,7 +96,7 @@
                       <%end %>
                       <%=  Response.where(["map_id = ?", ri.id]).first.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
                     </td>
-
+                          </tr><tr>
 
                   <% elsif !@assignment.team_assignment? %>
                     <% @participantid = (Participant.find(ri.reviewee_id)).user_id %>
@@ -119,7 +120,7 @@
                           <%=  Response.where(["map_id = ?", ri.id]).first.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
 
                         </td>
-
+                          </tr><tr>
                       <%end %>
 
                     <% else %>
@@ -164,11 +165,12 @@
                                   <%end %>
                                   No
                                 </td>
-                              </tr>
+
                             <%end %>
                           <%end %>
                         <%end %>
                       <%end %>
+        </tr>
                     <%end %>
 
                   </table>

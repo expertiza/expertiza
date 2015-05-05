@@ -11,106 +11,30 @@ class Assessment360Controller < ApplicationController
         @instructor = User.find(@instructor_id)
     end
 
-    def reviews_progress_by_completion(assignments)
+    def reviews_progress(assignments, graph_type)
 
-        @assignment_pie_charts = Hash.new
+        @assignment_charts = Hash.new
 
         assignments.each do |assignment|
-            # Pie Chart Data .....................................
-            reviewed = assignment.get_percentage_reviews_completed
-            pending = 100 - reviewed
-            reviewed_msg = reviewed.to_s + "% reviewed"
-            pending_msg = pending.to_s + "% pending"
-
-            GoogleChart::PieChart.new('160x100'," ",false) do |pc|
-                pc.data_encoding = :extended
-                pc.data reviewed_msg, reviewed, '228b22' # want to write '20' responed
-                pc.data pending_msg, pending, 'ff0000' # rest of the class
-
-                # Pie Chart with labels
-                pc.show_labels = false
-                pc.show_legend = true
-                @assignment_pie_charts[assignment] = (pc.to_url)
-            end
+            @assignment_charts[assignment] = assignment.review_progress_pie_chart if graph_type.eql? "PieChart"
+            @assignment_charts[assignment] = assignment.review_progress_bar_chart if graph_type.eql? "BarChart"
+            @assignment_charts[assignment] = assignment.review_grade_distribution_histogram if graph_type.eql? "Histogram"
         end
-        @assignment_pie_charts 
-    end
-
-    def reviews_progress_by_date(assignments,review_types)        
-        @assignment_bar_charts = Hash.new
-        assignments.each do |assignment|
-
-            # bar chart data ................................
-            bar_1_data = Array.new
-            dates = Array.new
-            date = assignment.created_at.to_datetime.to_date
-
-            while ((date <=> Date.today) <= 0)
-                if assignment.get_total_reviews_completed_by_date(date) != 0 then
-                    bar_1_data.push(assignment.get_total_reviews_completed_by_date(date))
-                    dates.push(date.month.to_s + "-" + date.day.to_s)
-                end
-
-                date = (date.to_datetime.advance(:months => 1)).to_date
-            end
-
-            color_1 = 'c53711'
-            min=0
-            #max= assignment.get_total_reviews_assigned
-            max = assignment.get_total_reviews_assigned
-
-            GoogleChart::BarChart.new("600x80", " ", :vertical, false) do |bc|
-                bc.data "Review", bar_1_data, color_1
-                bc.axis :y, :positions => [min, max], :range => [min,max]
-                bc.axis :x, :labels => dates
-                bc.show_legend = false
-                bc.stacked = false
-                bc.data_encoding = :extended
-                bc.params.merge!({:chl => "Nov"})
-                @assignment_bar_charts[assignment] = (bc.to_url)
-            end
-        end
-        @assignment_bar_charts
-    end
-
-    def reviews_grade_distribution(assignments)
-        @assignment_distribution  = Hash.new
-        assignments.each do |assignment|
-
-            # Histogram score distribution .......................
-            bar_2_data = assignment.get_score_distribution
-            color_2 = '4D89F9'
-            min = 0
-            max = 100
-
-            p '======================='
-            p bar_2_data
-            GoogleChart::BarChart.new("130x100", " ", :vertical, false) do |bc|
-                bc.data "Review", bar_2_data, color_2
-                bc.axis :y, :positions => [0, bar_2_data.max], :range => [0, bar_2_data.max]
-                bc.axis :x, :positions => [min, max], :range => [min,max]
-                bc.width_spacing_options :bar_width => 1, :bar_spacing => 0, :group_spacing => 0
-                bc.show_legend = false
-                bc.stacked = false
-                bc.data_encoding = :extended
-                bc.params.merge!({:chl => "Nov"})
-                @assignment_distribution[assignment] = (bc.to_url)
-            end
-        end
-        @assignment_distribution 
+        @assignment_charts
     end
 
     def one_course_all_assignments
         #@REVIEW_TYPES = ["ParticipantReviewResponseMap", "FeedbackResponseMap", "TeammateReviewResponseMap", "MetareviewResponseMap"]
         @REVIEW_TYPES = ["TeammateReviewResponseMap"]
+        @GRAPH_TYPES = ["PieChart", "BarChart", "Histogram"]
         @course = Course.find(params[:course_id])
         @assignments = Assignment.where(course_id: @course)
         if !@assignments.nil?
             @assignments = @assignments.reject {|assignment| assignment.get_total_reviews_assigned_by_type(@REVIEW_TYPES.first) != 0 }
 
-            @assignment_pie_charts = reviews_progress_by_completion(@assignments);
-            @assignment_bar_charts = reviews_progress_by_date(@assignments,@REVIEW_TYPES);
-            @assignment_distribution  = reviews_grade_distribution(@assignments);
+            @assignment_pie_charts = reviews_progress(@assignments, @GRAPH_TYPES.first)
+            @assignment_bar_charts = reviews_progress(@assignments, @GRAPH_TYPES.second)
+            @assignment_distribution  = reviews_progress(@assignments, @GRAPH_TYPES.last)
         end
     end
 

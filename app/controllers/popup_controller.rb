@@ -1,5 +1,10 @@
 class PopupController < ApplicationController
   layout 'standard'
+
+  def action_allowed?
+    true
+  end
+
   def team_users_popup
     @maxscore = 0
     @sum = 0
@@ -133,7 +138,7 @@ class PopupController < ApplicationController
   def reviewer_details_popup
     @userid = Participant.find(params[:id]).user_id
     @user = User.find(@userid)
-
+    @id=params[:assignment_id]
   end
 
 end

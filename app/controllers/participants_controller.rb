@@ -31,7 +31,14 @@ class ParticipantsController < ApplicationController
   def add
     curr_object = Object.const_get(params[:model]).find(params[:id])
     begin
-      curr_object.add_participant(params[:user][:name])
+      @submit_allowed=true
+      @review_allowed=true
+      @take_quiz_allowed=true
+      if params[:special_role]=='Reader'
+        @submit_allowed=false
+        @review_allowed=false
+      end
+      curr_object.add_participant(params[:user][:name],params[:special_role],@submit_allowed,@review_allowed,@take_quiz_allowed)
       user = User.find_by_name(params[:user][:name])
       @participant = curr_object.participants.find_by_user_id(user.id)
       undo_link("user \"#{params[:user][:name]}\" has successfully been added.")

@@ -48,6 +48,10 @@ class AssignmentsController < ApplicationController
   end
 
   def edit
+    # give an error message is instructor have not set the time zone.
+    if session[:user].timezonepref.nil?
+      flash[:error] = "Dear instructor, you have not specified you preferred timezone yet. Please do this first before you set up the deadlines."
+    end
     @topics = SignUpTopic.find_by_sql("select * from sign_up_topics where assignment_id="+params[:id])
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @user = current_user
@@ -108,12 +112,16 @@ class AssignmentsController < ApplicationController
       return
     end
 
-
     @assignment_form= AssignmentForm.create_form_object(params[:id])
     @assignment_form.assignment.instructor ||= current_user
     params[:assignment_form][:assignment][:wiki_type_id] = 1 unless params[:assignment_wiki_assignment]
-    #TODO: require params[:assignment][:directory_path] to be not null
-    #TODO: insert warning if directory_path is duplicated
+
+    if (session[:user].timezonepref).nil?
+      parent_id=session[:user].parent_id
+      parent_timezone = User.find(parent_id).timezonepref
+      flash[:error] = "We strongly suggest instructors specify the preferred timezone to guarantee the correct time display. For now we assume you are in " +parent_timezone
+      session[:user].timezonepref=parent_timezone
+    end
     if @assignment_form.update_attributes(params[:assignment_form],session[:user])
         flash[:note] = 'Assignment was successfully saved.'
         #TODO: deal with submission path change

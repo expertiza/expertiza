@@ -178,24 +178,15 @@ class ReviewMappingController < ApplicationController
     begin
       assignment = Assignment.find(params[:assignment_id])
       reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
-      #topic_id = Participant.find(Questionnaire.find(params[:questionnaire_id]).instructor_id).topic_id
-      unless params[:i_dont_care]
-        #topic = (topic_id.nil?) ? nil : SignUpTopic.find(topic_id)
-        if ResponseMap.where(reviewed_object_id: params[:questionnaire_id], reviewer_id:  params[:participant_id]).first
-          flash[:error] = "You have already taken that quiz"
-        else
-          @map = QuizResponseMap.new
-          @map.reviewee_id = Questionnaire.find(params[:questionnaire_id]).instructor_id
-          @map.reviewer_id = params[:participant_id]
-          @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
-          @map.save
-        end
+      if ResponseMap.where(reviewed_object_id: params[:questionnaire_id], reviewer_id:  params[:participant_id]).first
+        flash[:error] = "You have already taken that quiz"
       else
-        topic = assignment.candidate_topics_for_quiz.to_a.shuffle[0] rescue nil
-        assignment.assign_quiz_dynamically(reviewer, topic)
+        @map = QuizResponseMap.new
+        @map.reviewee_id = Questionnaire.find(params[:questionnaire_id]).instructor_id
+        @map.reviewer_id = params[:participant_id]
+        @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
+        @map.save
       end
-
-
 
     rescue Exception => e
       flash[:alert] = (e.nil?) ? $! : e

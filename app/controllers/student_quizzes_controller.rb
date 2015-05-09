@@ -1,10 +1,16 @@
 class StudentQuizzesController < ApplicationController
 
+  def action_allowed?
+    ['Administrator',
+     'Instructor',
+     'Teaching Assistant','Student'].include? current_role_name
+  end
+
   def index
-    participant = AssignmentParticipant.find(params[:id])
-    return unless current_user_id?(participant.user_id)
-    @assignment = Assignment.find(participant.parent_id)
-    @quiz_mappings = QuizResponseMap.get_mappings_for_reviewer(participant.id)
+    @participant = AssignmentParticipant.find(params[:id])
+    return unless current_user_id?(@participant.user_id)
+    @assignment = Assignment.find(@participant.parent_id)
+    @quiz_mappings = QuizResponseMap.get_mappings_for_reviewer(@participant.id)
   end
 
   def finished_quiz
@@ -32,19 +38,24 @@ class StudentQuizzesController < ApplicationController
     end
   end
 
+  #Create an array of candidate quizzes for current reviewer
   def self.take_quiz assignment_id , reviewer_id
     quizzes = Array.new
     reviewer = Participant.where(user_id: reviewer_id, parent_id: assignment_id).first
-    Team.where(parent_id: assignment_id).each do |quiz_creator|
-      unless TeamsUser.find_by_team_id(quiz_creator.id).user_id == reviewer_id
-        Questionnaire.where(instructor_id: quiz_creator.id).each do |questionnaire|
-          unless QuizResponseMap.where(reviewed_object_id: questionnaire.id, reviewer_id:  reviewer.id).first
-            quizzes.push(questionnaire)
-          end
-        end
+    reviewed_team_response_maps = TeamReviewResponseMap.where(reviewer_id:reviewer.id)
+    reviewed_team_response_maps.each do |team_response_map_record|
+      reviewee_id=team_response_map_record.reviewee_id
+      reviewee_team = Team.find(reviewee_id) #reviewees should always be teams
+      if reviewee_team.parent_id!=assignment_id
+        next
+      end
+      quiz_questionnaire = QuizQuestionnaire.where(instructor_id:reviewee_team.id).first
+      if quiz_questionnaire
+        puts quiz_questionnaire.id
+        quizzes << quiz_questionnaire
       end
     end
-    return quizzes
+    quizzes
   end
 
   def calculate_score map, response

@@ -230,7 +230,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
       teams = TeamsUser.where(user_id: session[:user].id)
       for t in teams do
         if team = Team.find(t.team_id)
-            if team.parent_id=@assignment.id
+            if team.parent_id==@assignment.id
               break
             end
         end

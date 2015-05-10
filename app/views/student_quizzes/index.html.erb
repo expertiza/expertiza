@@ -2,11 +2,9 @@
 
 <% if @assignment.quiz_allowed(@reviewee_topic_id) or @assignment.get_current_stage(@reviewee_topic_id) == "Complete" %>
   <%= render :partial => 'responses', :locals => {:mappings => @quiz_mappings} %>
-  <% if @assignment.is_using_dynamic_reviewer_assignment? %>
-    <%= render :partial => 'set_dynamic_quiz', :locals => {:assignment => @assignment, :participant => @participant} %>
-  <% end %>
+  <%= render :partial => 'set_dynamic_quiz', :locals => {:assignment => @assignment, :participant => @participant} %>
 <% else %>
-  <p><em>Quizzes cannot be taken at this time</em></p>
+  <p><em>This assignment does not support quizzes</em></p>
 <% end %>
 
 <br><br>

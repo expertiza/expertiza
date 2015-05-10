@@ -14,9 +14,9 @@ class StudentQuizzesController < ApplicationController
   end
 
   def finished_quiz
-    @response = Response.where(map_id: params[:map_id])
+    @response = Response.where(map_id: params[:map_id]).first
     @response_map = ResponseMap.find(params[:map_id])
-    @questions = Question.where(questionnaire_id: @response_map.reviewed_object_id)
+    @questions = Question.where(questionnaire_id: @response_map.reviewed_object_id) #for quiz response map, the reivewed_object_id is questionnaire id
 
     quiz_score = 0.0
 

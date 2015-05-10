@@ -365,7 +365,13 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :student_quizzes, :only => [:index]
+  resources :student_quizzes do
+    collection do
+      post :student_quizzes
+      get :index
+      post :record_response
+    end
+  end
 
   resources :student_review do
     collection do

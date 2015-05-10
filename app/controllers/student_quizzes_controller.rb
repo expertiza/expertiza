@@ -66,7 +66,7 @@ class StudentQuizzesController < ApplicationController
     questions.each do |question|
       score = 0
       correct_answers = QuizQuestionChoice.where(question_id: question.id, iscorrect: true)
-      ques_type = (QuestionType.where( question_id: question.id)).q_type
+      ques_type = (QuestionType.where( question_id: question.id).first).q_type
       if ques_type.eql? 'MCC'
         if params["#{question.id}"].nil?
           valid = false

@@ -18,13 +18,12 @@ class StudentQuizzesController < ApplicationController
     @response_map = ResponseMap.find(params[:map_id])
     @questions = Question.where(questionnaire_id: @response_map.reviewed_object_id)
 
-    essay_not_graded = false
     quiz_score = 0.0
 
     @questions.each do |question|
       score = Score.where(response_id: @response.id, question_id:  question.id).first
       if score.score.eql? -1
-        essay_not_graded = true
+        #This used to be designed for ungraded essay question.
       else
         quiz_score += score.score
       end
@@ -33,9 +32,6 @@ class StudentQuizzesController < ApplicationController
     question_count = @questions.length
 
     @quiz_score = (quiz_score/question_count) * 100
-    if essay_not_graded
-      flash.now[:note] = "Some essay questions in this quiz have not yet been graded."
-    end
   end
 
   #Create an array of candidate quizzes for current reviewer

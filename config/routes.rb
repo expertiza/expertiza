@@ -370,6 +370,7 @@ Expertiza::Application.routes.draw do
       post :student_quizzes
       get :index
       post :record_response
+      get :finished_quiz
     end
   end
 

@@ -46,7 +46,7 @@ class ParticipantsController < ApplicationController
       url_new_user = url_for :controller => 'users', :action => 'new'
       flash[:error] = "User #{params[:user][:name]} does not exist or has already been added.</a>"
     end
-    redirect_to :action => 'list', :id => curr_object.id, :model => params[:model]
+    redirect_to :action => 'list', :id => curr_object.id, :model => params[:model], :special_role => params[:special_role]
   end
 
   def destroy

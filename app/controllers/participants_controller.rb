@@ -36,7 +36,6 @@ class ParticipantsController < ApplicationController
       @take_quiz_allowed=true
       if params[:special_role]=='Reader'
         @submit_allowed=false
-        @review_allowed=false
       end
       curr_object.add_participant(params[:user][:name],params[:special_role],@submit_allowed,@review_allowed,@take_quiz_allowed)
       user = User.find_by_name(params[:user][:name])

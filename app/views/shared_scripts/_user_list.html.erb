@@ -2,8 +2,27 @@
 <%if user_list.length > 0%>
 
 <table>
-  <tr ><th colspan=5></th><th colspan=3 class="head">E-mail on ...</th>
-  <tr><th class="head">Name</th><th class="head">Full Name</th class="head"><th class="head">Email Address</th><th class="head">Role</th><th class="head">Parent</th><th class="head">Review</th><th class="head">Submission</th><th class="head">Metareview</th><th class="head">Handle</th></tr>
+  <tr>
+    <th colspan=5></th>
+    <th colspan=3 class="head">E-mail on ...</th>
+    <th colspan=3 class="head">Permission ...</th>
+  </tr>  
+  <tr>
+    <th class="head">Name</th>
+    <th class="head">Full Name</th class="head">
+    <th class="head">Email Address</th>
+    <th class="head">Role</th>
+    <th class="head">Parent</th>
+    <th class="head">Review</th>
+    <th class="head">Submission</th>
+    <th class="head">Metareview</th>
+    <th class="head">Submit</th>
+    <th class="head">Review</th>
+    <th class="head">Take quiz</th>
+    <th class="head">Handle</th>
+    <th class="head">Action</th>
+  </tr>
+  
 <% for participant in user_list 
    user = User.find(participant.user_id) %>
   <tr class= "exp">
@@ -14,7 +33,10 @@
     <td  align="center"><%= (User.find(user.parent_id)).name %></td>
     <td ><%= User.yesorno(user.email_on_review) %></td>
     <td ><%= User.yesorno(user.email_on_submission) %></td>
-    <td ><%= User.yesorno(user.email_on_review_of_review) %></td>    
+    <td ><%= User.yesorno(user.email_on_review_of_review) %></td>
+    <td ><%= participant.submit_allowed == false ? 'no' : 'yes' %></td>
+    <td ><%= participant.review_allowed == false ? 'no' : 'yes' %></td>  
+    <td ><%= participant.take_quiz_allowed == false ? 'no' : 'yes' %></td>  
     <td ><%= participant.handle %></td>
            
     <td ><%= link_to 'Remove', {:controller => controller, :action => 'destroy', :id => participant.id}, :method => :delete %></td>

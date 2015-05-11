@@ -49,7 +49,6 @@ class StudentQuizzesController < ApplicationController
       end
       quiz_questionnaire = QuizQuestionnaire.where(instructor_id:reviewee_team.id).first
       if quiz_questionnaire
-        puts quiz_questionnaire.id
         quizzes << quiz_questionnaire
       end
     end

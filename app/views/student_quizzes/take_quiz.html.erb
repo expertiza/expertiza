@@ -5,6 +5,10 @@
   :map_id => params[:map_id] do %>
   <% @map = ResponseMap.find(params[:map_id]) %>
   <% @questionnaire = Questionnaire.find(@map.reviewed_object_id) %>
+
+  <% @reviewee_participant=AssignmentTeam.find(@map.reviewee_id).participants.first%>
+  <%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => @reviewee_participant, stage: ""} %>
+
   <%= hidden_field_tag :questionnaire_id, "#{@questionnaire.id}" %>
   <%= hidden_field_tag :assignment_id, "#{params[:assignment_id]}" %>
   <%= render :partial => 'quiz_form', :locals => { :questionnaire_id => @questionnaire.id } %>

@@ -371,6 +371,7 @@ Expertiza::Application.routes.draw do
       get :index
       post :record_response
       get :finished_quiz
+      get :take_quiz
     end
   end
 

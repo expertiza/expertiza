@@ -17,6 +17,8 @@ class StudentQuizzesController < ApplicationController
     @response = Response.where(map_id: params[:map_id]).first
     @response_map = ResponseMap.find(params[:map_id])
     @questions = Question.where(questionnaire_id: @response_map.reviewed_object_id) #for quiz response map, the reivewed_object_id is questionnaire id
+    @map = ResponseMap.find(params[:map_id])
+    @participant = AssignmentTeam.find(@map.reviewee_id).participants.first
 
     quiz_score = 0.0
 

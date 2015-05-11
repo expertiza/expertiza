@@ -94,11 +94,6 @@ class StudentQuizzesController < ApplicationController
         end
       else
         correct_answer = correct_answers.first
-        if ques_type.eql? 'Essay'
-          score = -1
-        elsif  correct_answer && params["#{question.id}"]== correct_answer.txt
-          score = 1
-        end
         new_score = Score.new :comments => params["#{question.id}"], :question_id => question.id, :response_id => response.id, :score => score
         if new_score.comments.empty? || new_score.comments.nil?
           valid = false

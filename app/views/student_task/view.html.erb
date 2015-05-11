@@ -51,17 +51,23 @@ to display the label "Your team" in the student assignment tasks-->
   <%if @assignment.require_quiz%>
     <li>
       <% if @assignment.require_quiz and (@assignment.quiz_allowed(@reviewee_topic_id) or @assignment.get_current_stage(@participant.topic_id) == "Finished") %>
-        <%= link_to "Quiz", student_quizzes_path(:id => @participant.id) %>
+        <%= link_to "Take quizzes", student_quizzes_path(:id => @participant.id) %>
       <% else %>
-        <font color="gray">Take quiz</font>
-      <% end %> (Take quiz over the work you have read)
+        <font color="gray">Take quizzes</font>
+      <% end %> (Take quizzes over the work you have read)
     </li>
   <%end%>
     <li>
-      <% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@participant.topic_id) == "Finished" %>
-        <%= link_to "Others' work",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
+      <!--alias_name means if one participant is a reader, it will show 'Your readings' to see others' work; if one participant is not a reader, it will shoe 'Others' work' on the screen.-->
+      <% if @participant.special_role != 'Reader' %>
+        <% @alias_name = "Others' work" %>
       <% else %>
-        <font color="gray">Others' work</font>
+        <% @alias_name = "Your readings" %>
+      <% end %>
+      <% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@participant.topic_id) == "Finished" %>
+        <%= link_to "#{@alias_name}",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
+      <% else %>
+        <font color="gray"><%= @alias_name%></font>
       <% end %> (Give feedback to others on their work)
     </li>
     <li>

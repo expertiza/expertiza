@@ -52,8 +52,8 @@ class StudentReviewController < ApplicationController
         if review_mapping
           #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
           # to treat all assignments as team assignments
-          participant = AssignmentTeam.first_member(review_mapping.reviewee_id)
-          end
+          participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
+        end
         if participant && participant.topic_id
           meta_review_due_date = TopicDeadline.where(topic_id: participant.topic_id, deadline_type_id:deadline_type_id, round:review_rounds).first
           if meta_review_due_date.due_at < Time.now

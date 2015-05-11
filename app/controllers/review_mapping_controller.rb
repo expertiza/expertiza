@@ -67,7 +67,7 @@ class ReviewMappingController < ApplicationController
 
       rescue
         msg = $!
-      end
+    end
     redirect_to :action => 'list_mappings', :id => assignment.id, :msg => msg
   end
 
@@ -123,7 +123,7 @@ class ReviewMappingController < ApplicationController
         redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
         rescue
           redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id, :msg => $!
-        end
+      end
 
     end
   end

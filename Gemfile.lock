@@ -442,6 +442,8 @@ DEPENDENCIES
   jquery-rails
   jquery-ui-sass-rails
   launchy
+  minitest-reporters (= 1.0.5)
+  mysql
   mysql2
   nokogiri
   omniauth-google-oauth2 (~> 0.2.6)
@@ -472,6 +474,7 @@ DEPENDENCIES
   sqlite3-ruby
   stanford-core-nlp
   superfish-rails
+  term-ansicolor
   test-unit
   therubyracer
   thin

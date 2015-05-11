@@ -1,5 +1,5 @@
 module Hamer
-  def self.calculate_weighted_scores_and_reputation(submissions, reviewers)
+  dbef self.calculate_weighted_scores_and_reputation(submissions, reviewers)
     # Initialize weights
     submissions.each {|s| s.reviews.each {|review| review.weight = 1}}
 

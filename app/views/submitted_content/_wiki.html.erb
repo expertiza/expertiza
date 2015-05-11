@@ -3,5 +3,3 @@
   <% wiki_type = WikiType.find(participant.assignment.wiki_type_id) %>
   <%= render :partial => 'submitted_content/'+wiki_type.name.downcase, :locals => {:participant => participant} %>
 </div>
-
-

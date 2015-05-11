@@ -4,6 +4,7 @@ gem 'rails'
 
 ## Gems in Alphabetical Order
 
+gem 'mysql'
 gem 'activerecord-session_store'
 gem 'awesome_nested_set'
 gem 'bind-it'
@@ -75,6 +76,8 @@ group :test do
   gem 'rspec-rails'
   gem 'shoulda'
   gem 'test-unit'
+  gem 'minitest-reporters', '1.0.5'
+  gem 'term-ansicolor'
 end
 
 group :development, :test do

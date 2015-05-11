@@ -403,9 +403,11 @@ Expertiza::Application.routes.draw do
       get :download
       get :edit
       get :folder_action
+      post :folder_action
       get :remove_hyperlink
       post :remove_hyperlink
       get :submit_file
+      post :submit_file
       post :submit_hyperlink
       get :submit_hyperlink
       get :view

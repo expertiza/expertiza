@@ -41,13 +41,10 @@
            
     <td ><%= link_to 'Remove', {:controller => controller, :action => 'destroy', :id => participant.id}, :method => :delete %></td>
         <!-- E726 Fall2012 Changes Begin -->
-        <% if participant.special_role=='Reader' or participant.special_role=='Manager' %>
-                <% if participant.special_role=='Reader' %>
-                        <td><%= fa_icon 'book', title: 'Reader' %></td>
-                    <% else %>
-                        <td><%= fa_icon 'building', title: 'Manager' %></td>
-                    <% end %>
-            <% end %>
+       
+    <% if participant.special_role=='Reader' %>
+      <td><%= fa_icon 'book', title: 'Reader' %></td>
+    <% end %>
         <!-- E726 Fall2012 Changes End -->
   </tr>
 <% end -%>

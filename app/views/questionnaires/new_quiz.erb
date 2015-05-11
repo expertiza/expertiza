@@ -1,21 +1,21 @@
 <%= render :partial => 'javascript' %>
 <h1>New <%= @questionnaire.display_type %></h1>
 <% if @questionnaire.type == "QuizQuestionnaire" %>    <!--handle a questionnaire differently if it is a quiz-->
-  <%= form_tag :action => 'create_quiz_questionnaire', :pid => @participant_id, :aid => @assignment_id do %>
-    <% $disp_flag = 1 %>
-    <%= render :partial => 'questionnaire' %>
-    <% $disp_flag = 0 %>
+    <%= form_tag :action => 'create_quiz_questionnaire', :pid => @participant_id, :aid => @assignment_id do %>
+        <% $disp_flag = 1 %>
+        <%= render :partial => 'questionnaire' %>
+        <% $disp_flag = 0 %>
 
-    <%= render :partial => 'new_question_template' %>
+        <%= render :partial => 'new_question_template' %>
 
-    <br>
-    <%= submit_tag "Create Quiz", :name=>"save" %>
-  <% end %>
+        <br>
+        <%= submit_tag "Create Quiz", :name=>"save" %>
+    <% end %>
 <% else %>
-  <%= form_tag :action => 'create_questionnaire', :pid => @participant_id, :aid => @assignment_id do %>
-    <%= render :partial => 'questionnaire' %>
-    <%= submit_tag "Create #{@questionnaire.display_type.downcase}", :name=>"save" %>
-  <% end %>
+    <%= form_tag :action => 'create_questionnaire', :pid => @participant_id, :aid => @assignment_id do %>
+        <%= render :partial => 'questionnaire' %>
+        <%= submit_tag "Create #{@questionnaire.display_type.downcase}", :name=>"save" %>
+    <% end %>
 <% end %>
 <br />
 <a href="javascript:window.history.back()">Back</a>

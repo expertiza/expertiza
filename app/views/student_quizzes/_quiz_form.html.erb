@@ -8,7 +8,7 @@
   <% if(question_type.q_type == 'MCR') %>
     <% quiz_question_choices = QuizQuestionChoice.where(question_id: question.id) %>
     <% quiz_question_choices.each do |choice|  %>
-      <%= radio_button_tag "#{question.id}", "#{choice.txt}" %><%= label_tag "#{choice.id}", choice.txt %><br>
+      <%= radio_button_tag "#{question.id}", "#{choice.txt}", choice.iscorrect %><%= label_tag "#{choice.id}", choice.txt %><br>
     <% end %>
   <% elsif(question_type.q_type == 'MCC') %>
     <% quiz_question_choices = QuizQuestionChoice.where(question_id: question.id) %>

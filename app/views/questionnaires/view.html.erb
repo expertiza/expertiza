@@ -9,11 +9,9 @@
 <TABLE>
   <% if (@questionnaire.section == "Custom") %>
     <TR><TH align="left" width="60%">Question</TH><TH align="left">Type</TH><TH>Parameters</TH><TH>Weight</TH><TH>Score Range</TH></TR>
-    <%else if (@questionnaire.section == "Quiz")%>
-      <TR><TH align="left" width="60%">Question</TH><TH align="left">Type</TH><TH>Hint</TH><TH>Weight</TH><TH>Score Range</TH></TR>
-    <% else %>
-      <TR><TH align="left" width="60%">Question</TH><TH align="left">Type</TH><TH>Weight</TH><TH>Score Range</TH></TR>
-    <% end %>   <% end %>
+  <%else%>
+    <TR><TH align="left" width="60%">Question</TH><TH align="left">Type</TH><TH>Weight</TH><TH>Score Range</TH></TR>
+  <% end %>
   <% for question in @questionnaire.questions %>
     <% curr_ques_type = QuestionType.find_by_question_id(question.id) %>
 
@@ -25,9 +23,8 @@
           <TD align="left">
             <% if curr_ques_type.q_type=="MCR" %> Multiple Choice Radio
               <% else if curr_ques_type.q_type=="MCC" %> Multiple Choice Checked
-                <% else if curr_ques_type.q_type=="Essay" %> Essay
                   <% else if curr_ques_type.q_type=="TF" %> True/False
-                  <% else %> Unkonwn <% end %><% end %><% end %><% end %>
+                  <% else %> Unkonwn <% end %><% end %><% end %>
                 </TD>
                 <td align=left><%= curr_ques_type.parameters %></td>
 

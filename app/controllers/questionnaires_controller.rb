@@ -206,13 +206,37 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
   #define a new quiz questionnaire
   #method invoked by the view
   def new_quiz
-    @questionnaire = Object.const_get(params[:model]).new
-    @questionnaire.private = params[:private]
-    @questionnaire.min_question_score = 0
-    @questionnaire.max_question_score = 1
-    @participant_id = params[:pid] #creating an instance variable to hold the participant id
+    valid_request=true
     @assignment_id = params[:aid] #creating an instance variable to hold the assignment id
-    render :new_quiz
+    @participant_id = params[:pid] #creating an instance variable to hold the participant id
+    assignment = Assignment.find(@assignment_id)
+    if !assignment.require_quiz? #flash error if this assignment does not require quiz
+      flash[:error] = "This assignment does not support quizzing feature."
+      valid_request=false
+    else
+      team = AssignmentParticipant.find(@participant_id).team
+
+      if team.nil? #flash error if this current participant does not have a team
+        flash[:error] = "You should create or join a team first."
+        valid_request=false
+      else
+        if assignment.has_topics? && team.topic.nil?#flash error if this assignment has topic but current team does not have a topic
+          flash[:error] = "Your team should have a topic first."
+          valid_request=false
+        end
+      end
+    end
+
+    if valid_request
+      @questionnaire = Object.const_get(params[:model]).new
+      @questionnaire.private = params[:private]
+      @questionnaire.min_question_score = 0
+      @questionnaire.max_question_score = 1
+
+      render :new_quiz
+    else
+      redirect_to :controller => 'submitted_content', :action => 'view', :id => params[:pid]
+    end
   end
 
   # Save the new questionnaire to the database

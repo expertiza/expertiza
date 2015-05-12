@@ -1,6 +1,5 @@
 <div class = "exp">
 <%if user_list.length > 0%>
-
 <table>
   <tr>
     <th colspan=5></th>
@@ -22,9 +21,11 @@
     <th class="head">Handle</th>
     <th class="head">Action</th>
   </tr>
-  
+
+<% @user_id = [] %>
 <% for participant in user_list 
    user = User.find(participant.user_id) %>
+   <% @user_id << participant.user_id %>
   <tr class= "exp">
     <td ><%= link_to user.name, :controller=> 'users', :action => 'show', :id => user.id %></td>
     <td ><%= user.fullname %></td>
@@ -40,15 +41,56 @@
     <td ><%= participant.handle %></td>
            
     <td ><%= link_to 'Remove', {:controller => controller, :action => 'destroy', :id => participant.id}, :method => :delete %></td>
-        <!-- E726 Fall2012 Changes Begin -->
-       
+
+    <!-- E726 Fall2012 Changes Begin -->
     <% if participant.special_role=='Reader' %>
       <td><%= fa_icon 'book', title: 'Reader' %></td>
+    <% else %>
+      <td></td>
     <% end %>
-        <!-- E726 Fall2012 Changes End -->
+    <!-- E726 Fall2012 Changes End -->
+
+    <td>
+      <%= form_tag(:controller=>'participant', :action=>'update') do %>
+        <select id=<%=participant.user_id%> name="roles" style="font-size:12px">
+          <option value="participant" 
+            <% if params[:roles] == "participant" -%>
+              selected
+            <% end -%>
+          >participant</option>
+          <option value="reader"
+            <% if params[:roles] == "reader" -%>
+              selected
+            <% end -%>
+          >reader</option>
+          <option value="reviewer"
+            <% if params[:roles] == "reviewer" -%>
+              selected
+            <% end -%>
+          >reviewer</option>
+          <option value="submitter"
+            <% if params[:roles] == "submitter" -%>
+              selected
+            <% end -%>
+          >submitter</option>
+        </select>
+        <%= button_tag "Submit", {:id=>'button'+participant.user_id.to_s,:style=>"font-size:12px; display:none;"} %>
+      <% end %>
+    </td>
+    
   </tr>
 <% end -%>
 </table>
 <% end -%>
 
 </div>    
+
+
+<script>
+  var participants = <%=@user_id%>;
+  participants.forEach(function(participant){
+    $('#'.concat(participant.toString())).change(function(){
+      $('#button'.concat(participant.toString())).show();
+    });
+  });
+</script>

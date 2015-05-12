@@ -205,6 +205,7 @@ Expertiza::Application.routes.draw do
       post :delete
       get :inherit
       get :bequeath_all
+      post :update_special_roles
     end
   end
 

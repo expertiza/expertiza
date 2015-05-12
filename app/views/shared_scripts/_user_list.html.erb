@@ -43,16 +43,18 @@
     <td ><%= link_to 'Remove', {:controller => controller, :action => 'destroy', :id => participant.id}, :method => :delete %></td>
 
     <!-- E726 Fall2012 Changes Begin -->
-    <% if participant.special_role=='Reader' %>
-      <td><%= fa_icon 'book', title: 'Reader' %></td>
+    <% if participant.special_role=='reader' %>
+      <td><%= fa_icon 'book', title: 'reader' %></td>
     <% else %>
       <td></td>
     <% end %>
     <!-- E726 Fall2012 Changes End -->
 
     <td>
-      <%= form_tag(:controller=>'participant', :action=>'update') do %>
+      <%= form_tag :controller=>'participants', :action=>'update_special_roles', :id => participant.id do %>
+        <% params[:roles] = participant.special_role %>
         <select id=<%=participant.user_id%> name="roles" style="font-size:12px">
+
           <option value="participant" 
             <% if params[:roles] == "participant" -%>
               selected

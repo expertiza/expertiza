@@ -48,6 +48,33 @@ class ParticipantsController < ApplicationController
     redirect_to :action => 'list', :id => curr_object.id, :model => params[:model], :special_role => params[:special_role]
   end
 
+  def update_special_roles
+      params[:special_role]='participant'
+      params[:submit_allowed]=true
+      params[:review_allowed]=true
+      params[:take_quiz_allowed]=true
+    case params[:roles]
+    when 'particiant'
+      params[:special_role]='participant'
+    when 'reader'
+      params[:special_role]='reader'
+      params[:submit_allowed]=false
+    when 'reviewer'
+      params[:special_role]='reviewer'
+      params[:submit_allowed]=false
+      params[:take_quiz_allowed]=false
+    when 'submitter'
+      params[:special_role]='submitter'
+      params[:review_allowed]=false
+      params[:take_quiz_allowed]=false
+    end
+    participant = Participant.find(params[:id])
+    parent_id = participant.parent_id
+    participant.update_attributes(:special_role => params[:special_role],:submit_allowed => params[:submit_allowed], :review_allowed => params[:review_allowed], :take_quiz_allowed => params[:take_quiz_allowed])
+    
+    redirect_to :action => 'list', :id => parent_id, :model => participant.class.to_s.gsub("Participant","")
+  end
+
   def destroy
     participant = Participant.find(params[:id])
     name = participant.user.name

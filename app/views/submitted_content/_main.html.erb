@@ -32,7 +32,7 @@
   <%     teams_users.find_each do |t|
     team = Team.find(t.team_id)
     if team.parent_id==@assignment.id
-      t_id = teamgit gui.id
+      t_id = team.id
       break
     end
   end

@@ -43,15 +43,15 @@
   <% if (controller.action_name != "view_my_scores" and !(@map and @map.reviewer_id != session[:user].id)) %>
     <br/><b>Quiz:</b><br/><br/>
     <% if questionnaire = Questionnaire.where(["instructor_id = ?", uid]).first %>
-      <%= link_to 'View Quiz', :controller => :questionnaires, :action => :view_quiz, :id => questionnaire.id, :pid => participant.id %>
+      <%= link_to 'View quiz', :controller => :questionnaires, :action => :view_quiz, :id => questionnaire.id, :pid => participant.id %>
       <br/><br/>
       <% if @assignment.submission_allowed(participant.topic_id) %>
-        <%= link_to 'Edit Quiz', :controller => :questionnaires, :action => :edit_quiz, :id => questionnaire.id, :pid => participant.id %>
+        <%= link_to 'Edit quiz', :controller => :questionnaires, :action => :edit_quiz, :id => questionnaire.id, :pid => participant.id %>
         <br/><br/>
       <% end %>
     <% else %>
       <br/>
-      <%= link_to 'Create A Quiz', :controller => :questionnaires, :action => :new_quiz, :model => "QuizQuestionnaire", :private => 0, :aid => @assignment.id, :pid => participant.id %>
+      <%= link_to 'Create a quiz', :controller => :questionnaires, :action => :new_quiz, :model => "QuizQuestionnaire", :private => 0, :aid => @assignment.id, :pid => participant.id %>
       <br/><br/>
     <% end %>
   <% end %>

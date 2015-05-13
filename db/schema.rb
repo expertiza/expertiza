@@ -367,6 +367,7 @@ ActiveRecord::Schema.define(version: 201150105163040) do
     t.datetime "time_stamp"
     t.text     "digital_signature",    limit: 65535
     t.string   "special_role",         limit: 255
+    t.boolean  "take_quiz_allowed",    limit: 1,     default: true
   end
 
   add_index "participants", ["user_id"], name: "fk_participant_users", using: :btree

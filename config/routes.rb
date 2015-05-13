@@ -437,8 +437,8 @@ Expertiza::Application.routes.draw do
   resources :survey_response do
     collection do
       get :view_responses
-	get :begin_survey
-	get :comments
+    	get :begin_survey
+    	get :comments
     end
   end
 

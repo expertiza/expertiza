@@ -8,12 +8,22 @@
   <% if(question_type.q_type == 'MCR') %>
     <% quiz_question_choices = QuizQuestionChoice.where(question_id: question.id) %>
     <% quiz_question_choices.each do |choice|  %>
-      <%= radio_button_tag "#{question.id}", "#{choice.txt}", choice.iscorrect %><%= label_tag "#{choice.id}", choice.txt %><br>
+      <%if display=="view"%>
+        <%= radio_button_tag "#{question.id}", "#{choice.txt}", choice.iscorrect %><%= label_tag "#{choice.id}", choice.txt %><br>
+      <%end%>
+      <%if display=="take"%>
+        <%= radio_button_tag "#{question.id}", "#{choice.txt}" %><%= label_tag "#{choice.id}", choice.txt %><br>
+      <%end%>
     <% end %>
   <% elsif(question_type.q_type == 'MCC') %>
     <% quiz_question_choices = QuizQuestionChoice.where(question_id: question.id) %>
     <% quiz_question_choices.each do |choice| %>
-      <%= check_box_tag "#{question.id}[]", "#{choice.txt}", choice.iscorrect %><%= label_tag "#{choice.txt}", choice.txt %><br>
+      <%if display=="view"%>
+        <%= check_box_tag "#{question.id}[]", "#{choice.txt}", choice.iscorrect %><%= label_tag "#{choice.txt}", choice.txt %><br>
+      <%end%>
+      <%if display=="take"%>
+        <%= check_box_tag "#{question.id}[]", "#{choice.txt}"%><%= label_tag "#{choice.txt}", choice.txt %><br>
+      <%end%>
     <% end %>
   <% elsif(question_type.q_type == 'TF') %>
     <%= radio_button_tag "#{question.id}", 'True' %><%= label_tag "#{question.id}_true", 'True' %><br>

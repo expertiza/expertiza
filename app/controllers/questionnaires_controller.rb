@@ -241,7 +241,6 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
 
   # Save the new questionnaire to the database
   def create_questionnaire
-
     @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
 
     # TODO: check for Quiz Questionnaire?

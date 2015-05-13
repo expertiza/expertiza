@@ -11,6 +11,6 @@
 
   <%= hidden_field_tag :questionnaire_id, "#{@questionnaire.id}" %>
   <%= hidden_field_tag :assignment_id, "#{params[:assignment_id]}" %>
-  <%= render :partial => 'quiz_form', :locals => { :questionnaire_id => @questionnaire.id } %>
+  <%= render :partial => 'quiz_form', :locals => { :questionnaire_id => @questionnaire.id,:display=>"take" } %>
   <%= submit_tag "Submit Quiz", :name=>"save" %>
 <% end %>

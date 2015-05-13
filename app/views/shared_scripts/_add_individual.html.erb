@@ -1,9 +1,28 @@
 <%= form_tag({:action => form_action}, {:method => 'post'}) do %>
   Enter a user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
-<%= hidden_field_tag(obj_type, obj_id) %>
-<%= hidden_field_tag('model', model) %>
+	<%= hidden_field_tag(obj_type, obj_id) %>
+	<%= hidden_field_tag('model', model) %>
         <!-- E726 Fall2012 Changes Begin -->
     <%= hidden_field_tag('special_role', special_role) %>
         <!-- E726 Fall2012 Changes End -->
-<input type='submit' value='Add Participant'/>
+    <% if form_action == "add" %>
+		<input id='add_a' type='submit' value='Add'/>
+		<%= radio_button "user","role", "participant", :checked=>true %>
+		<%= label_tag :role_participant, "participant" ,{:style=>"font-size:16px;"}%>
+		<%= radio_button "user","role", "reader" %>
+		<%= label_tag :role_reader, "reader" ,{:style=>"font-size:16px;"}%>
+		<%= radio_button"user","role", "reviewer" %>
+		<%= label_tag :role_reviewer, "reviewer" ,{:style=>"font-size:16px;"}%>
+		<%= radio_button"user","role", "submitter" %>
+		<%= label_tag :role_submitter, "submitter" ,{:style=>"font-size:16px;"} %>
+	<% elsif form_action == "add_ta" %>
+		<input type='submit' value='Add TA'/>
+	<% end %>
 <% end %>
+
+<script>
+	$("input[name='user[role]']").change(function(){
+		var role = $(this).val();
+		$('#special_role').val(role);
+	});
+</script>

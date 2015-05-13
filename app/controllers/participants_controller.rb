@@ -28,16 +28,29 @@ class ParticipantsController < ApplicationController
     DelayedMailer::deliver_mail("recipient.address@example.com")
   end
 
+  def set_special_role_values(role)
+      params[:submit_allowed]=true
+      params[:review_allowed]=true
+      params[:take_quiz_allowed]=true
+    case role
+    when 'reader'
+      params[:submit_allowed]=false
+    when 'reviewer'
+      params[:submit_allowed]=false
+      params[:take_quiz_allowed]=false
+    when 'submitter'
+      params[:review_allowed]=false
+      params[:take_quiz_allowed]=false
+    else
+      params[:special_role]='participant'
+    end
+  end
+
   def add
     curr_object = Object.const_get(params[:model]).find(params[:id])
     begin
-      @submit_allowed=true
-      @review_allowed=true
-      @take_quiz_allowed=true
-      if params[:special_role]=='reader'
-        @submit_allowed=false
-      end
-      curr_object.add_participant(params[:user][:name],params[:special_role],@submit_allowed,@review_allowed,@take_quiz_allowed)
+      set_special_role_values(params[:special_role])
+      curr_object.add_participant(params[:user][:name],params[:special_role],params[:submit_allowed],params[:review_allowed],params[:take_quiz_allowed])
       user = User.find_by_name(params[:user][:name])
       @participant = curr_object.participants.find_by_user_id(user.id)
       undo_link("user \"#{params[:user][:name]}\" has successfully been added.")
@@ -49,25 +62,8 @@ class ParticipantsController < ApplicationController
   end
 
   def update_special_roles
-      params[:special_role]='participant'
-      params[:submit_allowed]=true
-      params[:review_allowed]=true
-      params[:take_quiz_allowed]=true
-    case params[:roles]
-    when 'particiant'
-      params[:special_role]='participant'
-    when 'reader'
-      params[:special_role]='reader'
-      params[:submit_allowed]=false
-    when 'reviewer'
-      params[:special_role]='reviewer'
-      params[:submit_allowed]=false
-      params[:take_quiz_allowed]=false
-    when 'submitter'
-      params[:special_role]='submitter'
-      params[:review_allowed]=false
-      params[:take_quiz_allowed]=false
-    end
+    set_special_role_values(params[:special_role])
+
     participant = Participant.find(params[:id])
     parent_id = participant.parent_id
     participant.update_attributes(:special_role => params[:special_role],:submit_allowed => params[:submit_allowed], :review_allowed => params[:review_allowed], :take_quiz_allowed => params[:take_quiz_allowed])

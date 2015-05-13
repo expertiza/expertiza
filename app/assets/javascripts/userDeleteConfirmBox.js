@@ -27,7 +27,8 @@ $.rails.allowAction = function(link) {
 };
 
 $.rails.confirmed = function(link) {
-  link.removeAttr('data-confirm');
+  message = link.removeAttr('confirm');
+  if (!message) {message = link.removeAttr('data-confirm');}
   return link.trigger('click.rails');
 };
 

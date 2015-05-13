@@ -6,6 +6,7 @@ tmp/**/*
 config/database.yml
 config/locales/database.yml
 coverage
+app/controllers/auth_controller.rb
 
 #################
 ## Eclipse

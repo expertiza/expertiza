@@ -52,26 +52,26 @@
 
     <td>
       <%= form_tag :controller=>'participants', :action=>'update_special_roles', :id => participant.id do %>
-        <% params[:roles] = participant.special_role %>
-        <select id=<%=participant.user_id%> name="roles" style="font-size:12px">
+        <% params[:special_role] = participant.special_role %>
+        <select id=<%=participant.user_id%> name="special_role" style="font-size:12px">
 
           <option value="participant" 
-            <% if params[:roles] == "participant" -%>
+            <% if params[:special_role] == "participant" -%>
               selected
             <% end -%>
           >participant</option>
           <option value="reader"
-            <% if params[:roles] == "reader" -%>
+            <% if params[:special_role] == "reader" -%>
               selected
             <% end -%>
           >reader</option>
           <option value="reviewer"
-            <% if params[:roles] == "reviewer" -%>
+            <% if params[:special_role] == "reviewer" -%>
               selected
             <% end -%>
           >reviewer</option>
           <option value="submitter"
-            <% if params[:roles] == "submitter" -%>
+            <% if params[:special_role] == "submitter" -%>
               selected
             <% end -%>
           >submitter</option>

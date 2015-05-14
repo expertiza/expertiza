@@ -91,7 +91,7 @@
     <%= text_area "suggestion_comment", "comments", :rows => 5, :cols => 50 %>
     <p>
       <%= "Vote"%>
-      <%= select ("suggestion_comment","vote",{"Yes" =>"Y","No"=>"N","Revise"=>"R"}) %>
+      <%= select("suggestion_comment","vote",{"Yes" =>"Y","No"=>"N","Revise"=>"R"}) %>
     </p>
 
     <%= submit_tag "Submit vote", :name => 'add_comment' %>

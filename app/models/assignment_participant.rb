@@ -446,6 +446,11 @@ class AssignmentParticipant < Participant
   def reviews_by_reviewer(reviewer)
     TeamReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)
   end
+  
+  # def get_reviews
+  #   self.response_maps
+  # end
+
 
   def quizzes_taken
     return QuizResponseMap.get_assessments_for(self)

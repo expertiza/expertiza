@@ -539,7 +539,7 @@ class ReviewMappingController < ApplicationController
   def review_report
     # Get the assignment id and set it in an instance variable which will be used in view
     @id = params[:id]
-    @assignment = Assignment.find(params[:id])
+    @assignment = Assignment.find(@id)
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     @type = "TeamReviewResponseMap"
@@ -589,6 +589,7 @@ class ReviewMappingController < ApplicationController
     #@chart1.data = data
     #@chart1.axis = axis
     @chart1 = Gchart.bar(:data => @scores, :size => '500x200')
+    logger.warn "chart1: #{@chart1}"
 
 
     ###################### Second Graph ####################

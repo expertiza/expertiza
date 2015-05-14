@@ -22,11 +22,11 @@
         <%= yield -%>
       </div>
 
-      <div id= "close" align='right'>
-        <b> <%= link_to_close_redbox "X", :title => "Close" %> </b>
-        <!--<%= link_to_close_redbox image_tag("close.png", :border=>0,:title => "Close" )%> -->
-      </div>
+    
     </div>
 
+    <div class="footer">
+      <%= link_to 'Back', :controller=> 'review_mapping', :action=>'review_report', :id=>@id%>
+    </div>
   </body>
 </html>

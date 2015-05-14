@@ -1,11 +1,31 @@
 <div class = "exp">
 <%if user_list.length > 0%>
-
 <table>
-  <tr ><th colspan=5></th><th colspan=3 class="head">E-mail on ...</th>
-  <tr><th class="head">Name</th><th class="head">Full Name</th class="head"><th class="head">Email Address</th><th class="head">Role</th><th class="head">Parent</th><th class="head">Review</th><th class="head">Submission</th><th class="head">Metareview</th><th class="head">Handle</th></tr>
+  <tr>
+    <th colspan=5></th>
+    <th colspan=3 class="head">E-mail on ...</th>
+    <th colspan=3 class="head">Permissions ...</th>
+  </tr>  
+  <tr>
+    <th class="head">Name</th>
+    <th class="head">Full Name</th class="head">
+    <th class="head">Email Address</th>
+    <th class="head">Role</th>
+    <th class="head">Parent</th>
+    <th class="head">Review</th>
+    <th class="head">Submission</th>
+    <th class="head">Metareview</th>
+    <th class="head">Submit</th>
+    <th class="head">Review</th>
+    <th class="head">Take quiz</th>
+    <th class="head">Handle</th>
+    <th class="head">Action</th>
+  </tr>
+
+<% @user_id = [] %>
 <% for participant in user_list 
    user = User.find(participant.user_id) %>
+   <% @user_id << participant.user_id %>
   <tr class= "exp">
     <td ><%= link_to user.name, :controller=> 'users', :action => 'show', :id => user.id %></td>
     <td ><%= user.fullname %></td>
@@ -14,22 +34,65 @@
     <td  align="center"><%= (User.find(user.parent_id)).name %></td>
     <td ><%= User.yesorno(user.email_on_review) %></td>
     <td ><%= User.yesorno(user.email_on_submission) %></td>
-    <td ><%= User.yesorno(user.email_on_review_of_review) %></td>    
+    <td ><%= User.yesorno(user.email_on_review_of_review) %></td>
+    <td ><%= participant.submit_allowed == false ? 'no' : 'yes' %></td>
+    <td ><%= participant.review_allowed == false ? 'no' : 'yes' %></td>  
+    <td ><%= participant.take_quiz_allowed == false ? 'no' : 'yes' %></td>  
     <td ><%= participant.handle %></td>
            
     <td ><%= link_to 'Remove', {:controller => controller, :action => 'destroy', :id => participant.id}, :method => :delete %></td>
-        <!-- E726 Fall2012 Changes Begin -->
-        <% if participant.special_role=='Reader' or participant.special_role=='Manager' %>
-                <% if participant.special_role=='Reader' %>
-                        <td><%= fa_icon 'book', title: 'Reader' %></td>
-                    <% else %>
-                        <td><%= fa_icon 'building', title: 'Manager' %></td>
-                    <% end %>
-            <% end %>
-        <!-- E726 Fall2012 Changes End -->
+
+    <!-- E726 Fall2012 Changes Begin -->
+    <% if participant.special_role=='reader' %>
+      <td><%= fa_icon 'book', title: 'reader' %></td>
+    <% else %>
+      <td></td>
+    <% end %>
+    <!-- E726 Fall2012 Changes End -->
+
+    <td>
+      <%= form_tag :controller=>'participants', :action=>'update_special_roles', :id => participant.id do %>
+        <% params[:special_role] = participant.special_role %>
+        <select id=<%=participant.user_id%> name="special_role" style="font-size:12px">
+
+          <option value="participant" 
+            <% if params[:special_role] == "participant" -%>
+              selected
+            <% end -%>
+          >participant</option>
+          <option value="reader"
+            <% if params[:special_role] == "reader" -%>
+              selected
+            <% end -%>
+          >reader</option>
+          <option value="reviewer"
+            <% if params[:special_role] == "reviewer" -%>
+              selected
+            <% end -%>
+          >reviewer</option>
+          <option value="submitter"
+            <% if params[:special_role] == "submitter" -%>
+              selected
+            <% end -%>
+          >submitter</option>
+        </select>
+        <%= button_tag "Submit", {:id=>'button'+participant.user_id.to_s,:style=>"font-size:12px; display:none;"} %>
+      <% end %>
+    </td>
+    
   </tr>
 <% end -%>
 </table>
 <% end -%>
 
 </div>    
+
+
+<script>
+  var participants = <%=@user_id%>;
+  participants.forEach(function(participant){
+    $('#'.concat(participant.toString())).change(function(){
+      $('#button'.concat(participant.toString())).show();
+    });
+  });
+</script>

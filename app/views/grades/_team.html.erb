@@ -1,5 +1,5 @@
 <TR class="row"><TD>       
-     <a href="#" id="<%= prefix %>Link" name="<%= prefix %>Link" onclick="toggleTeam('<%= prefix %>');return false;"><img src="/images/expand.png"/></a>
+     <a href="#" id="<%= prefix %>Link" name="<%= prefix %>Link" onclick="toggleTeam('<%= prefix %>');return false;"><%=image_tag("expand.png")%></a>
      <%= tscore[:team].name %></TD>
      <% if tscore[:scores][:avg] %>
       	<TD COLSPAN="4" ALIGN="CENTER"><%= sprintf("%.2f",tscore[:scores][:avg]) %>%</TD>

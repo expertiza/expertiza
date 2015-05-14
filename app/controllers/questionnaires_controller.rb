@@ -9,7 +9,7 @@ class QuestionnairesController < ApplicationController
   def action_allowed?
     ['Administrator',
      'Instructor',
-     'Teaching Assistant'].include? current_role_name
+     'Teaching Assistant','Student'].include? current_role_name
   end
 
   # Create a clone of the given questionnaire, copying all associated
@@ -206,18 +206,41 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
   #define a new quiz questionnaire
   #method invoked by the view
   def new_quiz
-    @questionnaire = Object.const_get(params[:model]).new
-    @questionnaire.private = params[:private]
-    @questionnaire.min_question_score = 0
-    @questionnaire.max_question_score = 1
-    @participant_id = params[:pid] #creating an instance variable to hold the participant id
+    valid_request=true
     @assignment_id = params[:aid] #creating an instance variable to hold the assignment id
-    render :new_quiz
+    @participant_id = params[:pid] #creating an instance variable to hold the participant id
+    assignment = Assignment.find(@assignment_id)
+    if !assignment.require_quiz? #flash error if this assignment does not require quiz
+      flash[:error] = "This assignment does not support quizzing feature."
+      valid_request=false
+    else
+      team = AssignmentParticipant.find(@participant_id).team
+
+      if team.nil? #flash error if this current participant does not have a team
+        flash[:error] = "You should create or join a team first."
+        valid_request=false
+      else
+        if assignment.has_topics? && team.topic.nil?#flash error if this assignment has topic but current team does not have a topic
+          flash[:error] = "Your team should have a topic first."
+          valid_request=false
+        end
+      end
+    end
+
+    if valid_request
+      @questionnaire = Object.const_get(params[:model]).new
+      @questionnaire.private = params[:private]
+      @questionnaire.min_question_score = 0
+      @questionnaire.max_question_score = 1
+
+      render :new_quiz
+    else
+      redirect_to :controller => 'submitted_content', :action => 'view', :id => params[:pid]
+    end
   end
 
   # Save the new questionnaire to the database
   def create_questionnaire
-
     @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
 
     # TODO: check for Quiz Questionnaire?
@@ -226,29 +249,27 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
       @questionnaire.min_question_score = 0
       @questionnaire.max_question_score = 1
       @questionnaire.section = "Quiz"
-      print "=====create_questionnaire========="
       @assignment = Assignment.find(params[:aid])
       teams = TeamsUser.where(user_id: session[:user].id)
       for t in teams do
-        if Team.find(t.team_id, @assignment.id)
-          if team = Team.find(t.team_id, @assignment.id)
-            break
-          end
+        if team = Team.find(t.team_id)
+            if team.parent_id==@assignment.id
+              break
+            end
         end
       end
       @questionnaire.instructor_id = team.id    #for a team assignment, set the instructor id to the team_id
 
       @successful_create = true
-      print "=====save in create_questionnaire begin========="
       save
-      print "=====save in create_questionnaire over========="
+
       save_choices @questionnaire.id
-      print "=====save_choice in create_questionnaire over========="
+
       if @successful_create == true
         flash[:note] = "Quiz was successfully created"
       end
       redirect_to :controller => 'submitted_content', :action => 'edit', :id => participant_id
-    else
+    else #if it is not a quiz questionnaire
       if (session[:user]).role.name == "Teaching Assistant"
         @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
       end
@@ -274,7 +295,7 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
     valid = "valid"
 
     (1..num_quiz_questions).each do |i|
-      if params[:new_question][i.to_s][:txt] == ''
+      if params[:new_question][i.to_s] == ''
         #One of the questions text is not filled out
         valid = "Please make sure all questions have text"
         break
@@ -412,7 +433,8 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
       # The new_question array contains all the new questions
       # that should be saved to the database
       for question_key in params[:new_question].keys
-        q = Question.new(params[:new_question][question_key])
+        q = Question.new()
+        q.txt=params[:new_question][question_key]
         q.questionnaire_id = questionnaire_id
         if @questionnaire.type == "QuizQuestionnaire"
           q.weight = 1 #setting the weight to 1 for quiz questionnaire since the model validates this field
@@ -500,7 +522,6 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
 
     if params[:question]
       for question_key in params[:question].keys
-        print question_key
         begin
           if params[:question][question_key][:txt].strip.empty?
             # question text is empty, delete the question
@@ -541,7 +562,6 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
         q_type = params[:question_type][questionnum.to_s][:type]
         if(q_type!="Essay")
           for choice_key in params[:new_choices][questionnum.to_s][q_type].keys
-            print "=====choice_key="+choice_key+"======="
 
             if params[:new_choices][questionnum.to_s][q_type][choice_key]["weight"] == 1.to_s
               score = 1

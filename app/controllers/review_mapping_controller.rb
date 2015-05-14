@@ -8,7 +8,7 @@ class ReviewMappingController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically'
+    when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'add_quiz_response_map', 'assign_quiz_dynamically'
       true
     else
       ['Instructor',
@@ -178,24 +178,15 @@ class ReviewMappingController < ApplicationController
     begin
       assignment = Assignment.find(params[:assignment_id])
       reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
-      #topic_id = Participant.find(Questionnaire.find(params[:questionnaire_id]).instructor_id).topic_id
-      unless params[:i_dont_care]
-        #topic = (topic_id.nil?) ? nil : SignUpTopic.find(topic_id)
-        if ResponseMap.where(reviewed_object_id: params[:questionnaire_id], reviewer_id:  params[:participant_id]).first
-          flash[:error] = "You have already taken that quiz"
-        else
-          @map = QuizResponseMap.new
-          @map.reviewee_id = Questionnaire.find(params[:questionnaire_id]).instructor_id
-          @map.reviewer_id = params[:participant_id]
-          @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
-          @map.save
-        end
+      if ResponseMap.where(reviewed_object_id: params[:questionnaire_id], reviewer_id:  params[:participant_id]).first
+        flash[:error] = "You have already taken that quiz"
       else
-        topic = assignment.candidate_topics_for_quiz.to_a.shuffle[0] rescue nil
-        assignment.assign_quiz_dynamically(reviewer, topic)
+        @map = QuizResponseMap.new
+        @map.reviewee_id = Questionnaire.find(params[:questionnaire_id]).instructor_id
+        @map.reviewer_id = params[:participant_id]
+        @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
+        @map.save
       end
-
-
 
     rescue Exception => e
       flash[:alert] = (e.nil?) ? $! : e

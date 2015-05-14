@@ -7,7 +7,7 @@
         <%= render :partial => '/tree_display/actions/shared_actions', :locals => {:model => 'Assignment', :controller => 'assignments', :node => node, :owner_id => owner_id} %>
         <% if is_available(session[:user], owner_id) || (session[:user].role_id == 6 && is_available(User.find(Ta.get_my_instructor(session[:user].id)), owner_id)) %>
           <div>
-              <%= link_to image_tag('/assets/tree_view/add-participant-24.png', :title => 'Add participants'), {:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment', :special_role => 'Participant'}, {:title => 'Add participants'}%>
+              <%= link_to image_tag('/assets/tree_view/add-participant-24.png', :title => 'Add participants'), {:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment'}, {:title => 'Add participants'}%>
             <% @assignment = Assignment.find(node.node_object_id) %>
 
             <!--ACS Show the create team option in the assignment for the instructor only if
@@ -43,8 +43,8 @@
           
             <!-- E726 Changes Begin -->
             
-              <%= link_to fa_icon('building 2x', title: 'Add Manager'), {:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment', :special_role => 'Manager'}, {:title => 'Add Manager'} %>
-              <%= link_to fa_icon('book 2x', title: 'Add Reader'), {:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment', :special_role => 'Reader'}, {:title => 'Add Reader'} %>
+              <% link_to fa_icon('building 2x', title: 'Add Manager'), {:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment', :special_role => 'Manager'}, {:title => 'Add Manager'} %>
+              <% link_to fa_icon('book 2x', title: 'Add Reader'), {:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment', :special_role => 'Reader'}, {:title => 'Add Reader'} %>
             </div>
             <!-- E726 Changes End -->
 
@@ -57,7 +57,6 @@
             <%= link_to image_tag('/assets/tree_view/assign-reviewers-24.png', :title => 'Assign reviewers'), {:controller => 'review_mapping', :action => 'list_mappings', :id => node.node_object_id}, {:title => 'Assign reviewers'} %>
             <%= link_to image_tag('/assets/tree_view/assign-survey-24.png', :title => 'Assign surveys'), {:controller => 'survey', :action => 'assign', :id => node.node_object_id}, {:title => 'Assign surveys'} %>
             <%= link_to image_tag('/assets/tree_view/view-survey-24.png', :title => 'View quiz questions'), {:controller => 'questions', :action => 'review_questions', :id => node.node_object_id}, {:title => 'View quiz questions'} %>
-            <%= link_to image_tag('/assets/tree_view/grade-essay-icon-24.png', :title => 'Grade Essay Questions'), {:controller => 'student_quizzes', :action => 'grade_essays'} %>
           </div>
           <div>
             <%= link_to image_tag('/assets/tree_view/view-scores-24.png', :title => 'View scores'), {:controller => 'grades', :action => 'view', :id => node.node_object_id}, {:title => 'View scores'} %>

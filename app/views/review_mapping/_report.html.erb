@@ -22,13 +22,14 @@
         Score range
       </th>
       <th width = "20%">
-        Reviewed at
+        Last reviewed at
       </th>
     </tr>
 
-    <tr>
+
       <%@l = -1 %>
       <% @reviewers.each do |r| %>
+        <tr>
         <% @this_reviewer = r.reviewer_id %>
         <% @count = 0 %>
         <% @rspan = 0 %>
@@ -48,24 +49,36 @@
           <% if (@l%2) == 0 %>
 
             <td bgcolor="#ffffff" rowspan= <%= @rspan%>>
-              <%= link_to  username, :url => {:controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id} %>
+              <%= link_to username, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id=>@id%>
             </td>
           <%else %>
 
             <td bgcolor="#DDDDBB" rowspan=<%= @rspan%>>
-              <%= link_to  username, :url => {:controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id} %>
+              <%= link_to username, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id=>@id%>
             </td>
 
           <%end %>
 
           <%if (@count == (ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ?", @id, r.reviewer_id])).length) %>
-            <td align = "center" rowspan= <%= @rspan%>>
+                  <% if (@l%2) == 0 %>
+            <td bgcolor="#ffffff"  align = "center" rowspan= <%= @rspan%>>
               <%= @count %>/<%= @rspan %>
             </td>
+                  <%else %>
+                      <td bgcolor="#DDDDBB"  align = "center" rowspan= <%= @rspan%>>
+                        <%= @count %>/<%= @rspan %>
+                      </td>
+                  <%end %>
           <%else %>
-            <td align = "center" rowspan= <%= @rspan%>>
+                  <% if (@l%2) == 0 %>
+            <td bgcolor="#ffffff" align = "center" rowspan= <%= @rspan%>>
               <%= @count %>/<%= @rspan %>
             </td>
+                  <%else %>
+                      <td bgcolor="#DDDDBB" align = "center" rowspan= <%= @rspan%>>
+                        <%= @count %>/<%= @rspan %>
+                      </td>
+                  <%end %>
           <%end %>
 
           <% (ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", @id, r.reviewer_id, @type])).each do |ri| %>
@@ -95,7 +108,7 @@
                       <%end %>
                       <%=  Response.where(["map_id = ?", ri.id]).first.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
                     </td>
-
+                          </tr><tr>
 
                   <% elsif !@assignment.team_assignment? %>
                     <% @participantid = (Participant.find(ri.reviewee_id)).user_id %>
@@ -119,7 +132,7 @@
                           <%=  Response.where(["map_id = ?", ri.id]).first.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
 
                         </td>
-
+                          </tr><tr>
                       <%end %>
 
                     <% else %>
@@ -164,11 +177,12 @@
                                   <%end %>
                                   No
                                 </td>
-                              </tr>
+
                             <%end %>
                           <%end %>
                         <%end %>
                       <%end %>
+        </tr>
                     <%end %>
 
                   </table>

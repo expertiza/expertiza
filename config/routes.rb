@@ -205,6 +205,7 @@ Expertiza::Application.routes.draw do
       post :delete
       get :inherit
       get :bequeath_all
+      post :update_special_roles
     end
   end
 
@@ -254,6 +255,7 @@ Expertiza::Application.routes.draw do
       post :select_questionnaire_type
       post :toggle_access
       get :view
+      post :create_quiz_questionnaire
     end
   end
 
@@ -303,6 +305,7 @@ Expertiza::Application.routes.draw do
       get :select_reviewer
       get :select_mapping
       get :show_available_submissions
+      post :assign_quiz_dynamically
     end
   end
 
@@ -365,7 +368,15 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :student_quizzes, :only => [:index]
+  resources :student_quizzes do
+    collection do
+      post :student_quizzes
+      get :index
+      post :record_response
+      get :finished_quiz
+      get :take_quiz
+    end
+  end
 
   resources :student_review do
     collection do

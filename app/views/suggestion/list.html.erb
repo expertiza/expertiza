@@ -1,4 +1,4 @@
-<h3>Suggested topics for <%=h @assignment.name %></h3>
+<h2>Suggested topics for <%=h @assignment.name %></h2>
 <%if @suggestions.size > 0 %>
   <div class="flash_note">
     Click View link to view the suggestion and to comment and/or approve
@@ -8,13 +8,13 @@
     <tr>
       <th>Title</th>
       <th>Status</th>
-      <th>Submitter's unity ID</th>
+      <th>Submitter's Username</th>
       <th>Action</th>
     </tr>
 
     <% for suggestion in @suggestions %>
       <tr class="listingRow">
-        <td><%=h suggestion.title %></td>
+        <td style="max-width: 200px"><%=h suggestion.title %></td>
         <td align="center"><%=h suggestion.status %></td>
         <td align="center"><%=h suggestion.unityID %></td>
         <td align="center"><%= link_to 'View', :action => 'show', :id => suggestion %></td>

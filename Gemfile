@@ -20,8 +20,7 @@ gem 'expertiza-authlogic', github: 'expertiza/authlogic', :require => 'authlogic
 gem 'fastercsv'
 gem 'ffi-aspell'
 gem 'font-awesome-rails'
-gem 'gchart'
-gem 'gchartrb', :require => 'google_chart'
+gem "googlecharts", :require => "gchart"
 gem 'gdata', :require => false
 gem 'haml-rails'
 gem 'hoptoad_notifier'

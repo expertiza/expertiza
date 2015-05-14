@@ -13,6 +13,7 @@ class PopupController < ApplicationController
     @team = Team.find(params[:id])
     @assignment = Assignment.find(@team.parent_id)
     @assignment_id = @assignment.id
+    @id=params[:assignment_id]
     #  @teamname = Team.find(params[:id]).name
     @teamusers = TeamsUser.where(team_id: params[:id])
 

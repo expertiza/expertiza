@@ -114,18 +114,19 @@ class AssignmentForm
       end
     end
 
+    #TODO write a method to check if we can delete a due date and call it from here.
     #get the latest date for reviews done on this assignment
     max_review_date = @assignment.response_maps.maximum(:created_at)
 
-    if !max_review_date.nil? and max_review_date > max_review_dd
-        @errors = 'Cannot delete the due dates as a review has been done on '+ max_review_date.to_s.in_time_zone(user.timezonepref).to_s
-	      @has_errors = true;
-    else
+    #if !max_review_date.nil? and max_review_date > max_review_dd
+    #    @errors = 'Cannot delete the due dates as a review has been done on '+ max_review_date.to_s.in_time_zone(user.timezonepref).to_s
+	  #    @has_errors = true;
+    #else
          duedates = DueDate::where(assignment_id: @assignment.id)
          duedates.each do |duedate|
             duedate.destroy unless due_dates_id.include? duedate.id
          end
-    end
+    #end
   end
 
   #Adds items to delayed_jobs queue for this assignment

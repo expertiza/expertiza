@@ -5,6 +5,7 @@ log/*.log
 tmp/**/*
 config/database.yml
 config/locales/database.yml
+public/assets/staggered_deadline_assignment_graph
 coverage
 app/controllers/auth_controller.rb
 

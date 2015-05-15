@@ -1,5 +1,5 @@
 class StudentQuizzesController < ApplicationController
-
+  before_action :permission_of_special_roles, except:[]
   def action_allowed?
     ['Administrator',
      'Instructor',
@@ -155,5 +155,15 @@ class StudentQuizzesController < ApplicationController
 
   def graded?(response, question)
     return (Score.where(question_id: question.id, response_id:  response.id).first)
+  end
+
+  private
+  #special_role: reader,submitter, reviewer
+  def permission_of_special_roles
+    @participant = Participant.find(params[:id])
+    if @participant.special_role == 'submitter' or @participant.special_role == 'reviewer'
+      flash[:error] = "Access denied!"
+      redirect_to controller: 'student_task', action:'view', id: @participant.id
+    end
   end
 end

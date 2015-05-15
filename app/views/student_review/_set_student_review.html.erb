@@ -3,7 +3,7 @@
                  :action => 'show_available_submissions',
                  :assignment_id => assignment.id,
                  :reviewer_id => session[:user].id do %>
-
+    <% end %>
 </script>
 <%= form_tag "/review_mapping/show_available_submissions", {method: "get"} do %>
     <%= hidden_field_tag 'assignment_id', assignment.id %>

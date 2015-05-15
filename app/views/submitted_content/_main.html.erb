@@ -15,7 +15,7 @@
     <% if participant.assignment.is_coding_assignment%>
       <%= link_to "Code Review Dashboard", :controller => 'review_files',
         :action => 'show_all_submitted_files',
-        :participant_id => assignment_participant.id,
+        :participant_id => participant.id,
         :stage => stage %>
     </b><br/>
   <% end %>

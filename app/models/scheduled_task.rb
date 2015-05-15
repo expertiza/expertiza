@@ -1,12 +1,11 @@
-class DelayedMailer
+class ScheduledTask
   #Keeps info required for delayed job
-  #to send mail at a particular time
+  #to perform an action at a particular time
+  #such as sending a reminder email, or dropping outstanding review
   attr_accessor :assignment_id
   attr_accessor :deadline_type
   attr_accessor :due_at
-  # require PaperTrailForDelayedJob
   @@count = 0
-
   def initialize(assignment_id, deadline_type, due_at)
     self.assignment_id=assignment_id
     self.deadline_type=deadline_type
@@ -33,11 +32,10 @@ class DelayedMailer
       end
 
       if(self.deadline_type == "drop_topic")
-        #sign_up_topics = SignUpTopic.where( ['assignment_id = ?', self.assignment_id])
-        #if(sign_up_topics != nil && sign_up_topics.count != 0)
-        drop_topics #drop topics from teams that only have one member
-          #reminder to signed_up users of the assignment
-        #end
+        sign_up_topics = SignUpTopic.where( ['assignment_id = ?', self.assignment_id])
+        if(sign_up_topics != nil && sign_up_topics.count != 0)
+          mail_signed_up_users #reminder to signed_up users of the assignment
+        end
       end
 
       if(self.deadline_type == "signup")
@@ -54,10 +52,20 @@ class DelayedMailer
           email_reminder(emails, self.deadline_type)
         end
       end
+
+      if(self.deadline_type == "drop_one_member_topics")
+        assignment = Assignment.find(self.assignment_id)
+        if(assignment.team_assignment?)
+          drop_one_member_topics
+        end
+      end
+
+      if(self.deadline_type == "drop_outstanding_reviews")
+        drop_outstanding_reviews
+      end
     end
   end
 
-  # Find the signed_up_users of the assignment and send mails to them
   def mail_signed_up_users
     emails = Array.new
     assignment = Assignment.find(self.assignment_id)
@@ -94,9 +102,11 @@ class DelayedMailer
           end
         end
       end
-      email_reminder(emails, self.deadline_type)
+      if emails.size > 0
+        email_reminder(emails, self.deadline_type)
+      end
     end
-    end
+  end
 
   def getTeamMembersMail
     teamMembersMailList = Array.new
@@ -116,11 +126,11 @@ class DelayedMailer
     mailList = Array.new
     teams = TeamsUser.all.group(:team_id).count(:team_id)
     for team_id in teams.keys
-        if teams[team_id] == 1
-          user_id = TeamsUser.where(team_id: team).first.user_id
-          email = User.find(user_id).email
-          mailList << email
-        end
+      if teams[team_id] == 1
+        user_id = TeamsUser.where(team_id: team_id).first.user_id
+        email = User.find(user_id).email
+        mailList << email
+      end
     end
     return mailList
   end
@@ -133,13 +143,16 @@ class DelayedMailer
       #find metareviewers - people who will review the reviewers
       meta_reviewer_tuples = ResponseMap.where( ['reviewed_object_id = ? AND type = "MetareviewResponseMap"', reviewer.id])
       for metareviewer in meta_reviewer_tuples
-        participant = Participant.where( ['parent_id = ? AND id = ?', self.assignment_id, metareviewer.reviewer_id])
+        participant = Participant.where( ['parent_id = ? AND id = ?', self.assignment_id, metareviewer.reviewer_id]).first
         uid  = participant.user_id
         user = User.find(uid)
         emails << user.email
       end
     end
-    email_reminder(emails, self.deadline_type)
+    if emails.size > 0
+      email_reminder(emails, self.deadline_type)
+    end
+
   end
 
   def mail_reviewers
@@ -147,11 +160,13 @@ class DelayedMailer
     reviewer_tuples = ResponseMap.where( ['reviewed_object_id = ? AND (type = "ParticipantReviewResponseMap" OR type = "TeamReviewResponseMap")', self.assignment_id])
     for reviewer in reviewer_tuples
       participant = Participant.where( ['parent_id = ? AND id = ?', self.assignment_id, reviewer.reviewer_id])
-      uid  = participant.user_id
+      uid  = participant.first.user_id
       user = User.find(uid)
       emails << user.email
     end
-    email_reminder(emails, self.deadline_type)
+    if emails.size > 0
+      email_reminder(emails, self.deadline_type)
+    end
   end
 
   def mail_assignment_participants
@@ -172,59 +187,59 @@ class DelayedMailer
 
     if (deadlineType == "resubmission")
       body += "Author feedback is optional. However, if you want to give author feedback then the deadline is #{self.due_at}."
+    end
+
+    #emails<<"vikas.023@gmail.com"
+    #emails<<"vsharma4@ncsu.edu"
+    @@count = @@count+1
+    Rails.logger.info "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+    Rails.logger.info deadlineType
+    Rails.logger.info "Count:" + @@count.to_s
+
+    if @@count%3 == 0
+      assignment = Assignment.find(self.assignment_id)
+
+      if(assignment.instructor.copy_of_emails)
+        emails<< assignment.instructor.email
       end
 
-      #emails<<"vikas.023@gmail.com"
-      #emails<<"vsharma4@ncsu.edu"
-      @@count = @@count+1
-      Rails.logger.info "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-      Rails.logger.info deadlineType
-      Rails.logger.info "Count:" + @@count.to_s
+      #emails<< "expertiza-support@lists.ncsu.edu"
+    end
 
-      if @@count%3 == 0
-        assignment = Assignment.find(self.assignment_id)
+    emails.each do |mail|
+      Rails.logger.info mail
+    end
 
-        if(assignment.instructor.copy_of_emails)
-          emails<< assignment.instructor.email
-        end
-
-        #emails<< "expertiza-support@lists.ncsu.edu"
-      end
-
-      emails.each do |mail|
-        Rails.logger.info mail
-      end
-
-      Mailer.delayed_message(
+    Mailer.delayed_message(
         {:bcc => emails,
          :subject => subject,
          :body => body
-      }).deliver
+        }).deliver
   end
 
-  def drop_topics
+
+  def drop_one_member_topics
     teams = TeamsUser.all.group(:team_id).count(:team_id)
     for team_id in teams.keys
       if teams[team_id] == 1
-        topic_to_drop = SignedUpUser.where(creator_id: team_id)
-        if !topic_to_drop.nil?#check if the one-person-team has signed up a topic
-          topic_to_drop.first.delete
+        topic_to_drop = SignedUpUser.where(creator_id: team_id).first
+        if topic_to_drop#check if the one-person-team has signed up a topic
+          topic_to_drop.delete
         end
       end
     end
   end
 
-  def drop_reviews
-    reviews = ResponseMap.all
+  def drop_outstanding_reviews
+    reviews = ResponseMap.where(reviewed_object_id: self.assignment_id)
     for review in reviews
       review_has_began = Response.where(map_id: review.id)
-      if review_has_began.nil?#check if the one-person-team has signed up a topic
+      if review_has_began.size.zero?
         review_to_drop = ResponseMap.where(id: review.id)
-        review_to_drop.first.delete
+        review_to_drop.first.destroy
       end
     end
   end
-
 end
 
 

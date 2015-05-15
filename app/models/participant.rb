@@ -88,7 +88,7 @@ class Participant < ActiveRecord::Base
     end
 
     def able_to_review
-      if review_allowed
+      if can_review
         return true
       end
       return false

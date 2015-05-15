@@ -35,9 +35,9 @@
     <td ><%= User.yesorno(user.email_on_review) %></td>
     <td ><%= User.yesorno(user.email_on_submission) %></td>
     <td ><%= User.yesorno(user.email_on_review_of_review) %></td>
-    <td ><%= participant.submit_allowed == false ? 'no' : 'yes' %></td>
-    <td ><%= participant.review_allowed == false ? 'no' : 'yes' %></td>  
-    <td ><%= participant.take_quiz_allowed == false ? 'no' : 'yes' %></td>  
+    <td ><%= participant.can_submit == false ? 'no' : 'yes' %></td>
+    <td ><%= participant.can_review == false ? 'no' : 'yes' %></td>  
+    <td ><%= participant.can_take_quiz == false ? 'no' : 'yes' %></td>  
     <td ><%= participant.handle %></td>
            
     <td ><%= link_to 'Remove', {:controller => controller, :action => 'destroy', :id => participant.id}, :method => :delete %></td>

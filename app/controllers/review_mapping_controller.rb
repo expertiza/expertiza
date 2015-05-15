@@ -602,7 +602,7 @@ class ReviewMappingController < ApplicationController
     review_report = @assignment.compute_reviews_hash
     for response_map in response_maps
       score_for_this_review = review_report[response_map.reviewer_id][response_map.reviewee_id]
-      if(score_for_this_review != 0)
+      if(score_for_this_review && score_for_this_review != 0 )
         @review_distribution[(score_for_this_review/10-1).to_i] = @review_distribution[(score_for_this_review/10-1).to_i] + 1
         if (@review_distribution[(score_for_this_review/10-1).to_i] > max_score)
           max_score = @review_distribution[(score_for_this_review/10-1).to_i]

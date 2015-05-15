@@ -348,6 +348,8 @@ Expertiza::Application.routes.draw do
       get :view_publishing_rights
       get :intelligent_sign_up
       get :intelligent_save
+      post :save_topic_deadlines
+      post :save_topic_dependencies
     end
   end
 

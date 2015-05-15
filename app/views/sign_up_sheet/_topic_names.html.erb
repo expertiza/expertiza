@@ -12,7 +12,10 @@
       <% if topic.id == participant.topic_id %>
         <% chooser_present = true %>
         <% if(@assignment_form.assignment.max_team_size > 1)%>
-          <%= participant.name%>
+          <br/>
+          <b><%= participant.name.slice(/\[.*\]/).gsub(/\[/,'').gsub(/\]/,'')%></b>
+          <br/>
+          <%= participant.name.gsub(/\[.*\]/,'')%>
         <% else %>
           <%= participant.name.gsub(/\[[^\]]+\]/,'')%>
         <% end %>

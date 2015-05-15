@@ -1,11 +1,12 @@
 
 require 'active_support/time_with_zone'
 class AssignmentForm
-
   attr_accessor :assignment, :assignment_questionnaires, :due_dates
   attr_accessor :errors
+
   DEFAULT_MAX_TEAM_SIZE = 1
   DEFAULT_WIKI_TYPE_ID = 1
+
 
   def initialize(args={})
     @assignment = Assignment.new(args[:assignment])
@@ -139,10 +140,26 @@ class AssignmentForm
       due_at= Time.parse(due_at)
       mi=find_min_from_now(due_at)
       diff = mi-(due_date.threshold)*60
+      # diff = 1
+      # mi = 2
       if diff>0
-        dj=Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type, due_date.due_at.to_s(:db)),
+        dj=DelayedJob.enqueue(ScheduledTask.new(@assignment.id, deadline_type, due_date.due_at.to_s(:db)),
                                 1, diff.minutes.from_now)
+        change_item_type(dj.id)
         due_date.update_attribute(:delayed_job_id, dj.id)
+
+        # If the deadline type is review, add a delayed job to drop outstanding review
+        if deadline_type == "review"
+          dj = DelayedJob.enqueue(ScheduledTask.new(@assignment.id, "drop_outstanding_reviews", due_date.due_at.to_s(:db)),
+                                  1, mi.minutes.from_now)
+          change_item_type(dj.id)
+        end
+        # If the deadline type is team_formation, add a delayed job to drop one member team
+        if deadline_type == "team_formation" and @assignment.team_assignment?
+          dj = DelayedJob.enqueue(ScheduledTask.new(@assignment.id, "drop_one_member_topics", due_date.due_at.to_s(:db)),
+                               1, mi.minutes.from_now)
+          change_item_type(dj.id)
+        end
       end
     end
   end
@@ -157,6 +174,13 @@ class AssignmentForm
     end
   end
 
+  # Change the item_type displayed in the log
+  def change_item_type(delayed_job_id)
+    log = Version.where(item_type: "Delayed::Backend::ActiveRecord::Job", item_id: delayed_job_id).first
+    log.update_attribute(:item_type, "ScheduledTask") #Change the item type in the log
+  end
+
+
   def delete(force=nil)
         #delete from delayed_jobs queue related to this assignment
         delete_from_delayed_queue
@@ -165,9 +189,10 @@ class AssignmentForm
   # This functions finds the epoch time in seconds of the due_at parameter and finds the difference of it
   # from the current time and returns this difference in minutes
   def find_min_from_now(due_at)
-    curr_time=DateTime.now.to_s(:db)
+    curr_time=DateTime.now.in_time_zone(zone='UTC').to_s(:db)
     curr_time=Time.parse(curr_time)
     time_in_min=((due_at - curr_time).to_i/60)
+    #time_in_min = 1
     time_in_min
   end
 

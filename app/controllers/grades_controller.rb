@@ -1,4 +1,5 @@
 class GradesController < ApplicationController
+  before_action :permission_of_special_roles, except:[]
   helper :file
   helper :submitted_content
   helper :penalty
@@ -313,4 +314,14 @@ class GradesController < ApplicationController
         @assignment.update_attribute(:is_penalty_calculated, true)
       end
     end
+
+  private
+  #special_role: reader,submitter, reviewer
+  def permission_of_special_roles
+    @participant = Participant.find(params[:id])
+    if @participant.special_role == 'reader' or @participant.special_role == 'reviewer' or @participant.special_role == 'submitter'
+      flash[:error] = "Access denied!"
+      redirect_to controller: 'student_task', action:'view', id: @participant.id
+    end
   end
+end

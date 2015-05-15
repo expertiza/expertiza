@@ -1,0 +1,88 @@
+<% namecolwidth = 18 %>
+<% colwidth = 7  %>
+
+<a href="#" name='score-chartLink' onClick="toggleElement('score-chart', 'stats');return false;">hide stats</a>
+
+<TR style ="background-color: white;" id='score-chart'>
+
+<TH WIDTH="<%= namecolwidth %>%">
+	Stats
+</TH>
+
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">
+	<img src="<%= @grades_bar_charts[:review] %>" >
+	<div class="circle" id="review-circle">
+					
+	</div>
+</TH>
+
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">
+	<img src="<%= @grades_bar_charts[:metareview] %>" >
+  <div class="circle" id="metareview-circle">
+          
+  </div>
+</TH>
+
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">
+	<img src="<%= @grades_bar_charts[:feedback] %>" >
+  <div class="circle" id="feedback-circle">
+          
+  </div>
+</TH>
+
+<% if @assignment.team_assignment? %>		
+  <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">
+  	<img src="<%= @grades_bar_charts[:teammate] %>" >
+    <div class="circle" id="teammate-circle">
+          
+  </div>
+  </TH>
+<% end %>
+
+<TH WIDTH="<%= colwidth %>%">&nbsp;
+  <div class="circle" id="final-circle">
+          
+  </div>
+</TH>
+  
+</TR>
+
+<script type="text/javascript">
+  <% ['review', 'metareview', 'feedback', 'teammate'].each do |type| %>
+  <% if @pscore[type.to_sym][:scores][:avg]%>
+  var myCircle = Circles.create({
+    id:           '<%= "#{type}-circle" %>',
+    radius:       25,
+    value:        <%= @pscore[type.to_sym][:scores][:avg].to_i %>,
+    maxValue:     100,
+    width:        7,
+    text:         '<%=@pscore[type.to_sym][:scores][:avg].to_i%>',
+    colors:       ['#FFEB99', '#FFCC00'],
+    duration:       700,
+    textClass:      'circles-text'
+  });
+  <%end%>
+  <%end%>
+  var myCircle = Circles.create({
+    id:           'final-circle',
+    radius:       35,
+    value:        <%= @pscore[:total_score].to_i %>,
+    maxValue:     100,
+    width:        15,
+    text:         '<%=@pscore[:total_score].to_i%>',
+    colors:       ['#FFEB99', '#FFCC00'],
+    duration:       700,
+    textClass:      'circles-final'  
+  });
+
+</script> 
+
+<style>
+  .circles-text{
+    font-size: 12px !important;    
+  }
+  .circles-final{
+    font-size: 16px !important;    
+  }
+</style>          
+

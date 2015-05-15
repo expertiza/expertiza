@@ -1,5 +1,5 @@
 class StudentReviewController < ApplicationController
-
+  before_action :permission_of_special_roles, except:[]
   def action_allowed?
     current_role_name.eql?("Student")
   end
@@ -64,4 +64,14 @@ class StudentReviewController < ApplicationController
     end
   end
 
+
+  private
+  #special_role: reader,submitter, reviewer
+  def permission_of_special_roles
+    @participant = Participant.find(params[:id])
+    if @participant.special_role == 'submitter'
+      flash[:error] = "Access denied!"
+      redirect_to controller: 'student_task', action:'view', id: @participant.id
+    end
+  end
 end

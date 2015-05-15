@@ -241,7 +241,6 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
 
   # Save the new questionnaire to the database
   def create_questionnaire
-
     @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
 
     # TODO: check for Quiz Questionnaire?
@@ -576,11 +575,18 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
               else
                 q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "false",:question_id => question.id)
               end
+              q.save
             else  if(q_type=="TF")
               if (params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect]==choice_key)
                 q = QuizQuestionChoice.new(:txt => "True", :iscorrect => "true",:question_id => question.id)
-              else
+                q.save
                 q = QuizQuestionChoice.new(:txt => "False", :iscorrect => "false",:question_id => question.id)
+                q.save
+              else
+                q = QuizQuestionChoice.new(:txt => "True", :iscorrect => "false",:question_id => question.id)
+                q.save
+                q = QuizQuestionChoice.new(:txt => "False", :iscorrect => "true",:question_id => question.id)
+                q.save
               end
             else
               if (params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect]==choice_key)
@@ -588,9 +594,10 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
               else
                 q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "false",:question_id => question.id)
               end
+              q.save
             end
           end
-          q.save
+
         end
       end
       questionnum += 1

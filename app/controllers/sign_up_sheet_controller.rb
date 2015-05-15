@@ -13,6 +13,8 @@ class SignUpSheetController < ApplicationController
   require 'rgl/dot'
   require 'rgl/topsort'
 
+  before_action :permission_of_special_roles, except:[]
+
   def action_allowed?
     case params[:action]
     when 'signup_topics', 'sign_up', 'delete_signup', 'list', 'show_team'
@@ -651,4 +653,14 @@ class SignUpSheetController < ApplicationController
             render :action => 'new', :id => assignment_id
           end
         end
-        end
+
+  private
+  #special_role: reader,submitter, reviewer
+  def permission_of_special_roles
+    @participant = Participant.where('user_id = ? and parent_id = ?', session[:user].id, params[:id]).first
+    if @participant.special_role == 'reader' or @participant.special_role == 'submitter' or @participant.special_role == 'reviewer'
+      flash[:error] = "Access denied!"
+      redirect_to controller: 'student_task', action:'view', id: @participant.id
+    end
+  end
+end

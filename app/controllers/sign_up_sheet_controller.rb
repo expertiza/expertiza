@@ -74,7 +74,7 @@ class SignUpSheetController < ApplicationController
       #topic.assignment_id = params[:id]
       topic.save
       redirect_to_sign_up(params[:id])
-      else
+    else
         set_values_for_new_topic
 
         if @assignment.is_microtask?
@@ -84,7 +84,6 @@ class SignUpSheetController < ApplicationController
         if @assignment.staggered_deadline?
           topic_set = Array.new
           topic = @sign_up_topic.id
-
         end
 
         if @sign_up_topic.save
@@ -167,44 +166,7 @@ class SignUpSheetController < ApplicationController
       #can have different deadlines.
       def add_signup_topic
         load_add_signup_topics(params[:id])
-
-        @review_rounds = Assignment.find(params[:id]).get_review_rounds
-        @topics = SignUpTopic.where(assignment_id: params[:id])
-
-        #Use this until you figure out how to initialize this array
-        @duedates = SignUpTopic.find_by_sql("SELECT s.id as topic_id FROM sign_up_topics s WHERE s.assignment_id = " + params[:id].to_s)
-
-        unless @topics.nil?
-          i=0
-          @topics.each { |topic|
-
-            @duedates[i]['t_id'] = topic.id
-            @duedates[i]['topic_identifier'] = topic.topic_identifier
-            @duedates[i]['topic_name'] = topic.topic_name
-
-            for j in 1..@review_rounds
-              duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('submission').id).first
-              duedate_rev = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('review').id).first
-              if !duedate_subm.nil? && !duedate_rev.nil?
-                @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
-                @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
-              else
-                #the topic is new. so copy deadlines from assignment
-                set_of_due_dates = DueDate.where(assignment_id: params[:id])
-                set_of_due_dates.each { |due_date|
-                  create_topic_deadline(due_date, 0, topic.id)
-                }
-
-                @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
-                @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
-              end
-
-            end
-            duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('metareview').id).first
-            @duedates[i]['submission_'+ (@review_rounds+1).to_s] = !(duedate_subm.nil?)?(DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")):nil
-            i = i + 1
-          }
-        end
+        SignUpSheet.add_signup_topic(params[:id])
       end
 
       def add_signup_topics_staggered
@@ -247,11 +209,11 @@ class SignUpSheetController < ApplicationController
         @assignment = Assignment.find(params[:id])
       end
 
-      #simple function that redirects ti the /add_signup_topics or the /add_signup_topics_staggered page depending on assignment type
+      #simple function that redirects to assignment->edit->topic panel to display /add_signup_topics or the /add_signup_topics_staggered page
       #staggered means that different topics can have different deadlines.
-      def redirect_to_sign_up(assignment_id)
+      def redirect_to_assignment_edit(assignment_id)
         assignment = Assignment.find(assignment_id)
-        (assignment.staggered_deadline == true)?(redirect_to :action => 'add_signup_topics_staggered', :id => assignment_id):(redirect_to :action => 'add_signup_topics', :id => assignment_id)
+        redirect_to :controller => 'assignments', :action => 'edit', :id => assignment_id
       end
 
       def list
@@ -505,7 +467,6 @@ class SignUpSheetController < ApplicationController
             #if this happens store the dependency as "0"
             !(params['topic_dependencies_' + topic.id.to_s].nil?)?([topic.id, params['topic_dependencies_' + topic.id.to_s][:dependent_on]]):([topic.id, ["0"]])
           }
-
           # Save the dependency in the topic dependency table
           TopicDependency.save_dependency(topics)
 
@@ -521,7 +482,6 @@ class SignUpSheetController < ApplicationController
             flash[:error] = "There may be one or more cycles in the dependencies. Please correct them"
           end
 
-
           node = 'topic_name'
           dg = build_dependency_graph(topics, node) # rebuild with new node name
 
@@ -529,7 +489,10 @@ class SignUpSheetController < ApplicationController
           FileUtils::mkdir_p graph_output_path
           dg.write_to_graphic_file('jpg', "#{graph_output_path}/graph_#{params[:assignment_id]}")
 
-          redirect_to_sign_up(params[:assignment_id])
+          #execute linux bash script, convert .dot to jpg
+          system("dot -Tjpg #{graph_output_path}/graph_#{params[:assignment_id]}.dot -o #{graph_output_path}/graph_#{params[:assignment_id]}.jpg")
+          
+          redirect_to_assignment_edit(params[:assignment_id])
         end
 
 
@@ -537,30 +500,35 @@ class SignUpSheetController < ApplicationController
         #This is true in case of a staggered deadline type assignment. Individual deadlines can
         # be set on a per topic  and per round basis
         def save_topic_deadlines
-
+          #session[:duedates] stores all original duedates info
+          #due_dates stores staggered duedates
           due_dates = params[:due_date]
 
+          topics = SignUpTopic.where(assignment_id: params[:assignment_id])
           review_rounds = Assignment.find(params[:assignment_id]).get_review_rounds
-          due_dates.each { |due_date|
+          # j represents the review rounds
+          j = 0
+          topics.each { |topic|
             for i in 1..review_rounds
               topic_deadline_type_subm = DeadlineType.find_by_name('submission').id
-              topic_deadline_type_rev = DeadlineType.find_by_name('review').id
+              topic_deadline_subm = TopicDeadline.where(topic_id: session[:duedates][j]['id'].to_i, deadline_type_id: topic_deadline_type_subm, round: i).first
 
-              topic_deadline_subm = TopicDeadline.where(topic_id: due_date['t_id'].to_i, deadline_type_id: topic_deadline_type_subm, round: i).first
-              topic_deadline_subm.update_attributes({'due_at' => due_date['submission_' + i.to_s]})
+              topic_deadline_subm.update_attributes({'due_at' => due_dates[session[:duedates][j]['id'].to_s + '_submission_' + i.to_s + '_due_date']})
               flash[:error] = "Please enter a valid " + (i > 1 ? "Resubmission deadline " + (i-1).to_s : "Submission deadline") if topic_deadline_subm.errors.length > 0
 
-              topic_deadline_rev = TopicDeadline.where(topic_id: due_date['t_id'].to_i, deadline_type_id: topic_deadline_type_rev, round:i).first
-              topic_deadline_rev.update_attributes({'due_at' => due_date['review_' + i.to_s]})
+              topic_deadline_type_rev = DeadlineType.find_by_name('review').id
+              topic_deadline_rev = TopicDeadline.where(topic_id: session[:duedates][j]['id'].to_i, deadline_type_id: topic_deadline_type_rev, round:i).first
+              topic_deadline_rev.update_attributes({'due_at' => due_dates[session[:duedates][j]['id'].to_s + '_review_' + i.to_s + '_due_date']})
               flash[:error] = "Please enter a valid Review deadline " + (i > 1 ? (i-1).to_s : "") if topic_deadline_rev.errors.length > 0
             end
 
-            topic_deadline_subm = TopicDeadline.where(topic_id: due_date['t_id'], deadline_type_id:  DeadlineType.find_by_name('metareview').id).first
-            topic_deadline_subm.update_attributes({'due_at' => due_date['submission_' + (review_rounds+1).to_s]})
+            topic_deadline_subm = TopicDeadline.where(topic_id: session[:duedates][j]['id'], deadline_type_id:  DeadlineType.find_by_name('metareview').id).first
+            topic_deadline_subm.update_attributes({'due_at' => due_dates[session[:duedates][j]['id'].to_s + '_submission_' + (review_rounds+1).to_s + '_due_date']})
             flash[:error] = "Please enter a valid Meta review deadline" if topic_deadline_subm.errors.length > 0
+            j = j + 1
           }
 
-          redirect_to_sign_up(params[:assignment_id])
+          redirect_to_assignment_edit(params[:assignment_id])
         end
 
         #used by save_topic_dependencies. The dependency graph is a partial ordering of topics ... some topics need to be done
@@ -591,12 +559,8 @@ class SignUpSheetController < ApplicationController
           set_of_topics
         end
 
-        def create_topic_deadline(due_date, offset, topic_id)
-          DueDate.assign_topic_deadline(due_date,offset,topic_id)
-        end
-
         def set_start_due_date(assignment_id, set_of_topics)
-          DueDate.assign_start_due_date(assignment_id, set_of_topics)
+          DeadlineHelper.set_start_due_date(assignment_id, set_of_topics)
         end
 
         #gets team_details to show it on team_details view for a given assignment

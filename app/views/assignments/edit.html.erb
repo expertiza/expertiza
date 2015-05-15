@@ -30,15 +30,20 @@
       Instructor must specify when topics are assigned, by going to the Due Dates tab and
       entering a due date for &quot;signup&quot;.">
           <br><br>
-        <%= render '/sign_up_sheet/add_signup_topics.html' %>
+          <% if @assignment_form.assignment.staggered_deadline == true %>
+              <%session[:duedates] = SignUpSheet.add_signup_topic(@assignment_form.assignment.id)%>
+              <%= render '/sign_up_sheet/add_signup_topics_staggered.html' %>
+          <% else %>
+              <%= render '/sign_up_sheet/add_signup_topics.html' %>
+          <% end %>
       </div>
+      <%= button_tag 'Save'%>| <%= render :partial => '/shared_scripts/back' %>
     </div>
     <script>
       jQuery(document).ready(function () {
         jQuery("#tabs").tabs();
       });
     </script>
-    <%= button_tag 'Save'%>| <%= render :partial => '/shared_scripts/back' %>
   <% end %>
 
   <br/>

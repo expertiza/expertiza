@@ -14,21 +14,20 @@
   <% i=0 %>
   <%@resubmission_rounds = @assignment.get_review_rounds%>
 
-  <% for @due_date in @duedates %>
+  <% for i in 0..(session[:duedates].length - 1) %>
     <tr>
-      <td><%= @due_date['topic_identifier'] %></td>
-      <td><%= @due_date['topic_name'] %></td>
-      <%= hidden_field('due_date[]', 't_id', :id => 'due_date_' + @due_date['t_id'].to_s) %>
+      <td><%= session[:duedates][i]['topic_identifier'] %></td>
+      <td><%= session[:duedates][i]['topic_name'] %></td>
       <%for j in 1..@resubmission_rounds%>
         <td>
-          <%= text_field 'due_date[]' ,'submission_' + j.to_s, :size=>20, :id => 'due_date_' + @due_date.t_id.to_s + '_submission_' + j.to_s + '_due_date' , :onclick => "NewCal('due_date_" + @due_date.t_id.to_s + "_submission_" + j.to_s + "_due_date','YYYYMMDD',true,24); return false;" %>
+          <%= text_field :due_date, (session[:duedates][i]['id'].to_s + '_submission_' + j.to_s + '_due_date').to_s, size: 20, value: DateTime.parse(session[:duedates][i]['submission_'+ j.to_s]).strftime("%Y-%m-%d %H:%M") %>
         </td>
         <td>
-          <%= text_field 'due_date[]', 'review_' + j.to_s, :size=>20, :id => 'due_date_' + @due_date.t_id.to_s + '_review_' + j.to_s + '_due_date', :onclick => "NewCal('due_date_" + @due_date.t_id.to_s + "_review_" + j.to_s + "_due_date','YYYYMMDD',true,24); return false;" %>
+          <%= text_field :due_date, (session[:duedates][i]['id'].to_s + '_review_' + j.to_s + '_due_date').to_s, size: 20, value: DateTime.parse(session[:duedates][i]['review_'+ j.to_s]).strftime("%Y-%m-%d %H:%M")%>
         </td>
       <%end%>
       <td>
-        <%= text_field 'due_date[]' ,'submission_' + (j+1).to_s, :size=>20, :id => 'due_date_' + @due_date.t_id.to_s + '_submission_' + (j+1).to_s + '_due_date' , :onclick => "NewCal('due_date_" + @due_date.t_id.to_s + "_submission_" + (j+1).to_s + "_due_date','YYYYMMDD',true,24); return false;" %>
+        <%= text_field :due_date, (session[:duedates][i]['id'].to_s + '_submission_' + (j+1).to_s + '_due_date').to_s, size: 20, value: DateTime.parse(session[:duedates][i]['submission_'+ (@resubmission_rounds+1).to_s]).strftime("%Y-%m-%d %H:%M")%>
       </td>
     </tr>
     <% i=i+1 %>
@@ -37,3 +36,17 @@
 <br/>
 <%= submit_tag "Save start/due dates" %>
 
+<script>
+jQuery("input[id^='due_date_']").datetimepicker({
+            dateFormat: 'yy/mm/dd',
+            timeFormat: 'HH:mm:ss',
+            controlType: 'select',
+            timezoneList: [
+                { value: -000, label: 'GMT'},
+                { value: -300, label: 'Eastern'},
+                { value: -360, label: 'Central' },
+                { value: -420, label: 'Mountain' },
+                { value: -480, label: 'Pacific' }
+            ]
+        });
+</script>

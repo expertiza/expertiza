@@ -1,0 +1,11 @@
+<span ng-mouseover="hoverIn()" ng-mouseleave="hoverOut()">
+  <button class="btn btn-default" aria-label="Left Align">
+    <span class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
+  </button>
+  <br/>
+  <span ng-if="hoverEdit" class="menu-content animate-show">
+  <%= link_to 'Create Public Course', { :controller=>'course', :action=>'new', :private => 0 }, class: "btn btn-default" %>
+  <br/>
+  <%= link_to 'Create Private Course', { :controller=>'course', :action=>'new', :private => 1 }, class: "btn btn-default" %>
+  </span>
+</span>

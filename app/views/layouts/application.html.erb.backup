@@ -1,0 +1,48 @@
+
+  <%= render 'shared/header' %>
+
+  <%= render 'shared/navigation' %>
+
+  <div class="wrapper">
+    <div class="container">
+
+      <div class="sidebar">
+        <div class="sidecontent">
+          <%= render :partial => 'auth/login' %><br/>
+          <% if session[:user].nil? %>
+          <% else %>
+            <% if session[:user].role_id == 4 || session[:user].role_id == 3 || session[:user].role_id == 2 %>
+              <%= link_to "Search log", Version %></a>
+            <% end %>
+          <% end %>
+          <div>
+            <% if !current_user %>
+                <%= link_to image_tag("google.png", size: "150x50"), "/auth/google_oauth2" %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <div class="main">
+        <div class="content">
+          <% if session[:menu] %>
+            <%= render :partial => 'menu_items/breadcrumbs', :locals => { :crumbs => session[:menu].crumbs } %>
+          <% end %>
+
+          <%= render 'shared/flash_messages' %>
+
+          <%= yield %>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="clearing">&nbsp;</div>
+
+  </div>
+  <!-- class="wrapper" -->
+
+  <div class="footer" align="center">
+    <%= render 'shared/footer_message' %>
+  </div>
+  <!-- class="footer" -->

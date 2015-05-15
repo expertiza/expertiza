@@ -459,6 +459,8 @@ Expertiza::Application.routes.draw do
     collection do
       get ':action'
       post 'list'
+      post 'get_children_node_ng'
+      post 'get_children_node_2_ng'
     end
   end
 
@@ -470,6 +472,13 @@ Expertiza::Application.routes.draw do
       get :show_selection
       get :auto_complete_for_user_name
       get :keys
+      # added for angular
+      get 'get_users_ng'
+      post 'get_users_ng'
+      get 'get_users_list_ng'
+      post 'update'
+      post 'delete_user_ng'
+      post 'set_page_size'
     end
   end
 

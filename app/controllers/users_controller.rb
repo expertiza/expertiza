@@ -1,9 +1,13 @@
+require 'json'
+
 class UsersController < ApplicationController
   autocomplete :user, :name
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
     :redirect_to => { :action => :list }
 
+  skip_before_action :verify_authenticity_token, only: [:list, :get_users_ng, :update, :delete_user_ng, :set_page_size]
+  # :get_users_ng, :update, :destroy added to skip_before_action to integrate with angular
 
   def action_allowed?
     case params[:action]
@@ -38,6 +42,9 @@ class UsersController < ApplicationController
     user = session[:user]
     role = Role.find(user.role_id)
     all_users = User.order('name').where( ['role_id in (?) or id = ?', role.get_available_roles, user.id])
+    users_length = all_users.length
+    div = (users_length/100.to_f).ceil
+    @pagediv = div.to_json
 
     letter = params[:letter]
     session[:letter] = letter
@@ -60,14 +67,135 @@ class UsersController < ApplicationController
     elsif params[:from_letter]
       @per_page = 1
     else
-      @per_page = params[:num_users]
+      @per_page = 2 # show 50 users per page
     end
 
     # Get the users list to show on current page
     @users = paginate_list(role, user.id, letter)
 
     @letters = ('A'..'Z').to_a
+    @lettersJSON = @letters.to_json
+
+    # @user_ng = {}
+    # @users_ng = []
+    # for user in @users
+    #   @user_ng[:username] =  user.name
+    #   @user_ng[:id] = user.id
+    #   @user_ng[:fullname] = user.fullname
+    #   @user_ng[:email] = user.email
+    #   @user_ng[:role] =  user.role.name
+    #   @user_ng[:parent] = user.parent.try :name
+    #   @user_ng[:email_on_review] = User.yesorno(user.email_on_review)
+    #   @user_ng[:email_on_submission] = User.yesorno(user.email_on_submission)
+    #   @user_ng[:email_on_review_of_review] = User.yesorno(user.email_on_review_of_review)
+    #   @user_ng[:leaderboard_privacy] = User.yesorno(user.leaderboard_privacy)
+    #   @users_ng << @user_ng
+    # end
+          
+
+    # angularParams = {}
+    # angularParams[:users] = @users_ng
+    # @angularParamsJSON = angularParams.to_json
   end
+
+  def get_users_ng
+
+    #logger.warn params
+    fetchNumber = params[:fetchNumber]
+
+    # user = session[:user]
+    # role = Role.find(user.role_id)
+    # all_users = User.order('name').where( ['role_id in (?) or id = ?', role.get_available_roles, user.id])
+    # users_length = all_users.length
+    # @userslengthJSON = users_length.to_json
+    
+    if(fetchNumber == 0)
+      start_num = 0
+      end_num = 300
+    else
+      start_num = User.find_by(id: 300).id + 1
+      end_num = User.last.id
+    end
+
+    #logger.warn(User.count)
+
+    users = []
+    users = User.where(['id between ? and ?', start_num, end_num])
+    
+    #Rails.logger.warn(users.length)
+    
+    
+    all_users = []
+#   @user_ng[:parent] = user.parent.try :name
+    #   @user_ng[:email_on_review] = User.yesorno(user.email_on_review)
+    #   @user_ng[:email_on_submission] = User.yesorno(user.email_on_submission)
+    #   @user_ng[:email_on_review_of_review] = User.yesorno(user.email_on_review_of_review)
+    #   @user_ng[:leaderboard_privacy] = User.yesorno(user.leaderboard_privacy)
+    for user in users
+      single_user = {:object => user, 
+                     :role => user.role.name,
+                     :parent => user.parent.name,
+                     :email_on_review => User.yesorno(user.email_on_review),
+                     :email_on_submission => User.yesorno(user.email_on_submission),
+                     :email_on_review_of_review => User.yesorno(user.email_on_review_of_review),
+                     :leaderboard_privacy => User.yesorno(user.leaderboard_privacy)
+                    }
+      all_users << single_user
+    end
+
+    respond_to do |format|
+      format.html {render json: all_users}
+    end
+  end
+
+  def get_users_list_ng
+
+    count = User.count
+    #logger.warn(count)
+    respond_to do |format|
+      format.html {render json: count}
+    end
+  end
+
+  def delete_user_ng
+    begin
+      @user = User.find(params[:id])
+      AssignmentParticipant.where(user_id: @user.id).each{|participant| participant.delete}
+      TeamsUser.where(user_id: @user.id).each{|teamuser| teamuser.delete}
+      AssignmentQuestionnaire.where(user_id: @user.id).each{|aq| aq.destroy}
+      @user.destroy
+      #undo_link("User \"#{@user.name}\" has been deleted successfully. ")
+      response = "User \"#{@user.name}\" has been deleted successfully. "    
+    rescue
+      response = $!
+    end   
+    logger.warn response
+          # commented out and implemented in angular
+          #redirect_to :action => 'list'
+    respond_to do |format|
+      format.html {render json: response}
+    end
+  end
+
+  def set_page_size
+    ps = params[:pageSize].to_i
+    user = session[:user]
+    role = Role.find(user.role_id)
+    all_users = User.order('name').where( ['role_id in (?) or id = ?', role.get_available_roles, user.id])
+    users_length = all_users.length
+    if ps == 0
+      pageSize = users_length
+    else
+      pageSize = ps
+    end
+
+    div = (users_length/pageSize.to_f).ceil
+    
+    respond_to do |format|
+      format.html {render json: [pageSize, div, users_length]}
+    end
+  end
+
 
     def show_selection
       @user = User.find_by_name(params[:user][:name])
@@ -145,21 +273,23 @@ class UsersController < ApplicationController
   end
 
   def update
-    @user = User.find params[:id]
 
-    #update username, when the user cannot be deleted
-    #rename occurs in 'show' page, not in 'edit' page
-    #eg. /users/5408?name=5408
-    if (request.original_fullpath == "/users/#{@user.id}?name=#{@user.id}")
-      @user.name += '_hidden'
-    end
-    if @user.update_attributes(params[:user])
-      undo_link("User \"#{@user.name}\" has been updated successfully. ")
-      redirect_to @user
+    user = params[:user] # fetch from angular's post request
+    logger.warn(user[:object])
+    @user = User.find user[:object][:id]
+    # we need to add confirmation messages here (commented out bellow)
+    if @user.update_attributes(user[:object])
+      #undo_link("User \"#{@user.name}\" has been updated successfully. ")
+      #redirect_to @user
     else
       foreign
-      render :action => 'edit'
+      #render :action => 'edit'
     end
+
+    respond_to do |format|
+      format.html {render json: "success"}
+    end
+
   end
 
   def destroy
@@ -175,7 +305,8 @@ class UsersController < ApplicationController
       flash[:error] = $!
     end
 
-    redirect_to :action => 'list'
+    # commented out and implemented in angular
+    # redirect_to :action => 'list'
   end
 
   def keys

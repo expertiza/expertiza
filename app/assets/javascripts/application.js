@@ -10,7 +10,6 @@
 // WARNING: THE FIRST BLANK LINE MARKS THE END OF WHAT'S TO BE PROCESSED, ANY BLANK LINE SHOULD
 // GO AFTER THE REQUIRES BELOW.
 //
-//= require turbolinks
 //= require jquery
 //= require jquery_ujs
 //= require jquery.datetimepicker
@@ -20,6 +19,10 @@
 //= require bootstrap
 //= require jquery.ui.all
 //= require_self
+//= require angular/angular
+//= require angular-route/angular-route
+//= require angular-rails-templates
+//= require angular-bootstrap 
 //= require_tree .
 //= require jquery.datetimepicker
 

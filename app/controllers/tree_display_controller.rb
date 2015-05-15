@@ -1,5 +1,8 @@
+require 'json'
+
 class TreeDisplayController < ApplicationController
   helper :application
+  skip_before_action :verify_authenticity_token, only: [:get_children_node_ng, :get_children_node_2_ng]
 
   def action_allowed?
     true
@@ -99,6 +102,7 @@ class TreeDisplayController < ApplicationController
       search_string = nil
     end
 
+
     search_string = filter if params[:commit] == 'Filter'
     search_string = nil if params[:commit] == 'Reset'
 
@@ -118,6 +122,112 @@ class TreeDisplayController < ApplicationController
       @child_nodes = @root_node.get_children(@sortvar,@sortorder,session[:user].id,@show,nil,@search)
     else
       @child_nodes = FolderNode.get()
+    end
+    angularParams = {}
+    angularParams[:search] = @search
+    angularParams[:show] = @show
+    angularParams[:child_nodes] = @child_nodes
+    angularParams[:sortvar] = @sortvar
+    angularParams[:sortorder] = @sortorder
+    angularParams[:user_id] = session[:user].id
+    angularParams[:nodeType] = 'FolderNode'
+    @angularParamsJSON = angularParams.to_json
+
+  end
+
+  def get_children_node_ng
+    logger.warn params
+    if params[:angularParams][:child_nodes].is_a? String
+      childNodes = JSON.parse(params[:angularParams][:child_nodes])
+    else
+      childNodes = params[:angularParams][:child_nodes]
+    end
+    tmpRes = {}
+    res = {}
+    for node in childNodes
+      fnode = eval(params[:angularParams][:nodeType]).new
+
+      for a in node
+        fnode[a[0]] = a[1]
+      end
+
+      # fnode is the parent node
+      # ch_nodes are childrens
+      ch_nodes = fnode.get_children(params[:angularParams][:sortvar], 
+                                 params[:angularParams][:sortorder],
+                                 params[:angularParams][:user_id].to_i, 
+                                 params[:angularParams][:show], 
+                                 params[:angularParams][:search])
+      tmpRes[fnode.get_name] = ch_nodes
+
+      # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
+
+    end
+
+    for nodeType in tmpRes.keys
+      res[nodeType] =  Array.new
+
+      for node in tmpRes[nodeType]
+        tmpObject = {}
+        tmpObject["nodeinfo"] = node
+        tmpObject["name"] = node.get_name
+        tmpObject["type"] = node.type
+
+        if nodeType == 'Courses' || nodeType == "Assignments"
+          tmpObject["directory"] = node.get_directory
+          tmpObject["creation_date"] = node.get_creation_date
+          tmpObject["updated_date"] = node.get_modified_date
+        end
+        res[nodeType] << tmpObject
+      end
+
+    end
+
+    respond_to do |format|
+      format.html {render json: res}
+    end
+  end
+
+  def get_children_node_2_ng
+    if params[:angularParams][:child_nodes].is_a? String
+      childNodes = JSON.parse(params[:angularParams][:child_nodes])
+    else
+      childNodes = params[:angularParams][:child_nodes]
+    end
+    tmpRes = {}
+    res = []
+    fnode = eval(params[:angularParams][:nodeType]).new
+    childNodes.each do |key, value|
+      fnode[key] = value
+    end
+
+    ch_nodes = fnode.get_children(params[:angularParams][:sortvar], 
+                                 params[:angularParams][:sortorder],
+                                 params[:angularParams][:user_id].to_i, 
+                                 params[:angularParams][:show], 
+                                 params[:angularParams][:search])
+    tmpRes = ch_nodes
+    if tmpRes
+      # logger.warn tmpRes.inspect
+      for child in tmpRes
+        nodeType = child.type
+        res2 = {}
+        res2["nodeinfo"] = child
+        res2["name"] = child.get_name
+        res2["key"] = params[:angularParams][:key]
+        res2["type"] = nodeType
+
+        if nodeType == 'CourseNode' || nodeType == "AssignmentNode"
+          res2["directory"] = child.get_directory
+          res2["creation_date"] = child.get_creation_date
+          res2["updated_date"] = child.get_modified_date
+        end
+        res << res2
+      end
+    end
+
+    respond_to do |format|
+      format.html {render json: res}
     end
   end
 

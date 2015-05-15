@@ -68,7 +68,7 @@ to display the label "Your team" in the student assignment tasks-->
         <% @alias_name = "Your readings" %>
       <% end %>
       <% if @participant.special_role != 'submitter' %>
-        <% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@participant.topic_id) == "Finished" %>
+        <% if @assignment.can_review(@reviewee_topic_id) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@participant.topic_id) == "Finished" %>
           <%= link_to "#{@alias_name}",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
         <% end %>
       <% else %>

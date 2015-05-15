@@ -72,7 +72,7 @@ module AssignmentHelper
       #creating new round
       #TODO: add code to assign default permission to the newly created due_date according to the due_date type
       due_date.submission_allowed_id = DueDate.default_permission(type, 'submission_allowed')
-      due_date.review_allowed_id = DueDate.default_permission(type, 'review_allowed')
+      due_date.review_allowed_id = DueDate.default_permission(type, 'can_review')
       due_date.review_of_review_allowed_id = DueDate.default_permission(type, 'review_of_review_allowed')
       due_date
     else

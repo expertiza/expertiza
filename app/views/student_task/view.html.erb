@@ -4,6 +4,7 @@
   <% else %>
       Submit or Review work for <%= link_to @assignment.name, @assignment.spec_location %>
   <% end %>
+  <% @participant.special_role ||= 'participant'%>
 </h1>
 
 <div class="flash_note">
@@ -15,7 +16,7 @@
 <ul>
   <%if SignUpTopic.find_by_assignment_id(@assignment.id)%>
     <li> 
-      <% if @participant.special_role != 'reader' %>
+      <% if @participant.special_role == 'participant' %>
         <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.parent_id%>
       <% else %>
         <font color="gray">Signup sheet</font>
@@ -27,7 +28,7 @@
 to display the label "Your team" in the student assignment tasks-->
   <%if @assignment.team_assignment? %>
     <li> 
-      <% if @participant.special_role != 'reader' %>
+      <% if @participant.special_role == 'participant' %>
         <%= link_to 'Your team', view_student_teams_path(student_id: @participant.id) %>
       <% else %>
         <font color="gray">Your team</font>
@@ -36,7 +37,7 @@ to display the label "Your team" in the student assignment tasks-->
     </li>
   <%end%>
     <li>
-      <% if @participant.special_role != 'reader' %>
+      <% if @participant.special_role == 'participant' or @participant.special_role == 'submitter' %>
         <% if @assignment.submission_allowed(@participant.topic_id) %>
           <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %>
         <% else %>
@@ -50,8 +51,10 @@ to display the label "Your team" in the student assignment tasks-->
     <!--Quiz-->
   <%if @assignment.require_quiz%>
     <li>
-      <% if @assignment.require_quiz and (@assignment.quiz_allowed(@reviewee_topic_id) or @assignment.get_current_stage(@participant.topic_id) == "Finished") %>
-        <%= link_to "Take quizzes", student_quizzes_path(:id => @participant.id) %>
+      <% if @participant.special_role == 'participant' or @participant.special_role == 'reader' %>
+        <% if @assignment.require_quiz and (@assignment.quiz_allowed(@reviewee_topic_id) or @assignment.get_current_stage(@participant.topic_id) == "Finished") %>
+          <%= link_to "Take quizzes", student_quizzes_path(:id => @participant.id) %>
+        <% end %>
       <% else %>
         <font color="gray">Take quizzes</font>
       <% end %> (Take quizzes over the work you have read)
@@ -64,14 +67,16 @@ to display the label "Your team" in the student assignment tasks-->
       <% else %>
         <% @alias_name = "Your readings" %>
       <% end %>
-      <% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@participant.topic_id) == "Finished" %>
-        <%= link_to "#{@alias_name}",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
+      <% if @participant.special_role != 'submitter' %>
+        <% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@participant.topic_id) == "Finished" %>
+          <%= link_to "#{@alias_name}",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
+        <% end %>
       <% else %>
         <font color="gray"><%= @alias_name%></font>
       <% end %> (Give feedback to others on their work)
     </li>
     <li>
-      <% if @participant.special_role != 'reader' %>
+      <% if @participant.special_role == 'participant' %>
         <%= link_to "Your scores", :controller => 'grades', :action => 'view_my_scores', :id => @participant.id %> 
       <% else %>
         <font color="gray">Your scores</font>

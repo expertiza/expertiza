@@ -1,4 +1,5 @@
 class SubmittedContentController < ApplicationController
+  before_action :permission_of_special_roles, except:[]
   helper :wiki
 
   def action_allowed?
@@ -243,4 +244,14 @@ end
 #def undo_link
 #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @participant.versions.last.id)}>undo</a>"
 #end
+  
+  private
+  #special_role: reader,submitter, reviewer
+  def permission_of_special_roles
+    @participant = Participant.find(params[:id])
+    if @participant.special_role == 'reader' or @participant.special_role == 'reviewer'
+      flash[:error] = "Access denied!"
+      redirect_to controller: 'student_task', action:'view', id: @participant.id
+    end
+  end
 end

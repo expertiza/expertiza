@@ -1,4 +1,5 @@
 class StudentTeamsController < ApplicationController
+  before_action :permission_of_special_roles, except:[]
   autocomplete :user, :name
 
   def team
@@ -194,5 +195,15 @@ class StudentTeamsController < ApplicationController
   def review
     @assignment = Assignment.find params[:assignment_id]
     redirect_to view_questionnaires_path id: @assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire').id
+  end
+
+  private
+  #special_role: reader,submitter, reviewer
+  def permission_of_special_roles
+    @participant = Participant.find(params[:student_id])
+    if @participant.special_role == 'reader' or @participant.special_role == 'submitter' or @participant.special_role == 'reviewer'
+      flash[:error] = "Access denied!"
+      redirect_to controller: 'student_task', action:'view', id: @participant.id
+    end
   end
 end

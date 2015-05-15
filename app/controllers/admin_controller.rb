@@ -8,6 +8,7 @@ class AdminController < ApplicationController
     end
   end
 
+ 
   def new_instructor
     @user = User.find_or_create_by_name(params[:name])
 

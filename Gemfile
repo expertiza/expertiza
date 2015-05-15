@@ -22,6 +22,7 @@ gem 'ffi-aspell'
 gem 'font-awesome-rails'
 gem "googlecharts", :require => "gchart"
 gem 'gdata', :require => false
+gem 'graphviz'
 gem 'haml-rails'
 gem 'hoptoad_notifier'
 gem 'jquery-rails'

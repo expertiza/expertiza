@@ -1,5 +1,5 @@
 class GradesController < ApplicationController
-  before_action :permission_of_special_roles, except:[]
+  before_action :permission_for_authorizations, except:[]
   helper :file
   helper :submitted_content
   helper :penalty
@@ -406,10 +406,11 @@ class GradesController < ApplicationController
     end
 
   private
-  #special_role: reader,submitter, reviewer
-  def permission_of_special_roles
+  #authorizations: reader,submitter, reviewer
+  def permission_for_authorizations
     @participant = Participant.find(params[:id])
-    if @participant.special_role == 'reader' or @participant.special_role == 'reviewer' or @participant.special_role == 'submitter'
+    authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
+    if authorization == 'reader' or authorization == 'reviewer' or authorization == 'submitter'
       flash[:error] = "Access denied!"
       redirect_to controller: 'student_task', action:'view', id: @participant.id
     end

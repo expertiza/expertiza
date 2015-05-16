@@ -18,7 +18,7 @@ class ParticipantsController < ApplicationController
     @participants = @parent.participants
     @model = params[:model]
     # E726 Fall2012 Changes Begin
-        @special_role = params[:special_role]
+        @authorization = params[:authorization]
         # E726 Fall2012 Changes End
   end
 
@@ -28,29 +28,16 @@ class ParticipantsController < ApplicationController
     DelayedMailer::deliver_mail("recipient.address@example.com")
   end
 
-  def set_special_role_values(role)
-      params[:can_submit]=true
-      params[:can_review]=true
-      params[:can_take_quiz]=true
-    case role
-    when 'reader'
-      params[:can_submit]=false
-    when 'reviewer'
-      params[:can_submit]=false
-      params[:can_take_quiz]=false
-    when 'submitter'
-      params[:can_review]=false
-      params[:can_take_quiz]=false
-    else
-      params[:special_role]='participant'
-    end
-  end
+ 
 
   def add
     curr_object = Object.const_get(params[:model]).find(params[:id])
     begin
-      set_special_role_values(params[:special_role])
-      curr_object.add_participant(params[:user][:name],params[:special_role],params[:can_submit],params[:can_review],params[:can_take_quiz])
+      permissions = Participant.get_permissions(params[:authorization])
+      can_submit = permissions[:can_submit]
+      can_review = permissions[:can_review]
+      can_take_quiz = permissions[:can_take_quiz]
+      curr_object.add_participant(params[:user][:name],can_submit,can_review,can_take_quiz)
       user = User.find_by_name(params[:user][:name])
       @participant = curr_object.participants.find_by_user_id(user.id)
       undo_link("user \"#{params[:user][:name]}\" has successfully been added.")
@@ -58,15 +45,18 @@ class ParticipantsController < ApplicationController
       url_new_user = url_for :controller => 'users', :action => 'new'
       flash[:error] = "User #{params[:user][:name]} does not exist or has already been added.</a>"
     end
-    redirect_to :action => 'list', :id => curr_object.id, :model => params[:model], :special_role => params[:special_role]
+    redirect_to :action => 'list', :id => curr_object.id, :model => params[:model], :authorization => params[:authorization]
   end
 
-  def update_special_roles
-    set_special_role_values(params[:special_role])
+  def update_authorizations
+    permissions = Participant.get_permissions(params[:authorization])
+    can_submit = permissions[:can_submit]
+    can_review = permissions[:can_review]
+    can_take_quiz = permissions[:can_take_quiz]
 
     participant = Participant.find(params[:id])
     parent_id = participant.parent_id
-    participant.update_attributes(:special_role => params[:special_role],:can_submit => params[:can_submit], :can_review => params[:can_review], :can_take_quiz => params[:can_take_quiz])
+    participant.update_attributes(:can_submit => can_submit, :can_review => can_review, :can_take_quiz => can_take_quiz)
     
     redirect_to :action => 'list', :id => parent_id, :model => participant.class.to_s.gsub("Participant","")
   end

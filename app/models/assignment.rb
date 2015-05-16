@@ -694,14 +694,14 @@ require 'analytic/assignment_analytic'
   #add a new participant to this assignment
   #manual addition
   # user_name - the user account name of the participant to add
-  def add_participant(user_name, special_role,can_submit,can_review,can_take_quiz)
+  def add_participant(user_name,can_submit,can_review,can_take_quiz)
     user = User.find_by_name(user_name)
     raise "The user account with the name #{user_name} does not exist. Please <a href='" + url_for(:controller => 'users', :action => 'new') + "'>create</a> the user first." if user.nil?
     participant = AssignmentParticipant.where(parent_id: self.id, user_id:  user.id).first
     if participant
       raise "The user #{user.name} is already a participant."
     else
-      new_part = AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted, :special_role => special_role, :can_submit => can_submit, :can_review => can_review, :can_take_quiz => can_take_quiz)
+      new_part = AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted, :can_submit => can_submit, :can_review => can_review, :can_take_quiz => can_take_quiz)
       new_part.set_handle()
     end
   end

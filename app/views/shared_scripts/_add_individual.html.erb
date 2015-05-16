@@ -3,17 +3,17 @@
 	<%= hidden_field_tag(obj_type, obj_id) %>
 	<%= hidden_field_tag('model', model) %>
         <!-- E726 Fall2012 Changes Begin -->
-    <%= hidden_field_tag('special_role', special_role) %>
+    <%= hidden_field_tag('authorization', authorization) %>
         <!-- E726 Fall2012 Changes End -->
     <% if form_action == "add" %>
 		<input id='add_a' type='submit' value='Add'/>
-		<%= radio_button "user","role", "participant",:checked=>params[:special_role]=='participant'%>
+		<%= radio_button "user","role", "participant",:checked=>params[:authorization]=='participant'%>
 		<%= label_tag :role_participant, "participant" ,{:style=>"font-size:16px;"}%>
-		<%= radio_button "user","role", "reader", :checked=>params[:special_role]=='reader' %>
+		<%= radio_button "user","role", "reader", :checked=>params[:authorization]=='reader' %>
 		<%= label_tag :role_reader, "reader" ,{:style=>"font-size:16px;"}%>
-		<%= radio_button"user","role", "reviewer", :checked=>params[:special_role]=='reviewer' %>
+		<%= radio_button"user","role", "reviewer", :checked=>params[:authorization]=='reviewer' %>
 		<%= label_tag :role_reviewer, "reviewer" ,{:style=>"font-size:16px;"}%>
-		<%= radio_button"user","role", "submitter", :checked=>params[:special_role]=='submitter' %>
+		<%= radio_button"user","role", "submitter", :checked=>params[:authorization]=='submitter' %>
 		<%= label_tag :role_submitter, "submitter" ,{:style=>"font-size:16px;"} %>
 	<% elsif form_action == "add_ta" %>
 		<input type='submit' value='Add TA'/>
@@ -23,6 +23,6 @@
 <script>
 	$("input[name='user[role]']").change(function(){
 		var role = $(this).val();
-		$('#special_role').val(role);
+		$('#authorization').val(role);
 	});
 </script>

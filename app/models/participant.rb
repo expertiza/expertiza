@@ -166,4 +166,39 @@ class Participant < ActiveRecord::Base
 
       scores
     end
+
+  #Authorizations are paricipant, reader, reviewer, submitter (They are not store in Participant table.)
+  #Permissions are can_submit, can_review, can_take_quiz.
+  #Get permissions form authorizations.
+  def self.get_permissions(authorization)
+      can_submit=true
+      can_review=true
+      can_take_quiz=true
+    case authorization
+    when 'reader'
+      can_submit=false
+    when 'reviewer'
+      can_submit=false
+      can_take_quiz=false
+    when 'submitter'
+      can_review=false
+      can_take_quiz=false
+    end
+    return {:can_submit => can_submit, :can_review => can_review, :can_take_quiz => can_take_quiz}
   end
+
+  #Get authorization from permissions.
+  def self.get_authorization(can_submit, can_review, can_take_quiz)
+    authorization = 'participant'
+    if can_submit == false and can_review == true and can_take_quiz == true
+      authorization = 'reader'
+    end
+    if can_submit == true and can_review == false and can_take_quiz == false
+      authorization = 'submitter'
+    end
+    if can_submit == false and can_review == true and can_take_quiz == false
+      authorization = 'reviewer'
+    end
+    return authorization
+  end
+end

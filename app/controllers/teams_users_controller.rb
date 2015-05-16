@@ -34,7 +34,7 @@ class TeamsUsersController < ApplicationController
     if team.is_a?(AssignmentTeam)
       assignment = Assignment.find(team.parent_id)
       if AssignmentParticipant.find_by_user_id_and_assignment_id(user.id,assignment.id).nil?
-        urlAssignmentParticipantList = url_for :controller=>'participants', :action=>'list', :id=>assignment.id, :model => 'Assignment', :special_role => 'Participant'
+        urlAssignmentParticipantList = url_for :controller=>'participants', :action=>'list', :id=>assignment.id, :model => 'Assignment', :authorization => 'participant'
         flash[:error] = "\"#{user.name}\" is not a participant of current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
       else
         add_member_return=team.add_member(user, team.parent_id)

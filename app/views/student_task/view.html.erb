@@ -5,7 +5,9 @@
       Submit or Review work for <%= link_to @assignment.name, @assignment.spec_location %>
   <% end %>
   <% @authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz) %>
-  <% authorization ||= 'participant'%>
+  <% @can_submit = @participant.can_submit %>
+  <% @can_review = @participant.can_review %>
+  <% @can_take_quiz = @participant.can_take_quiz %>
 </h1>
 
 <div class="flash_note">
@@ -16,73 +18,69 @@
 <% end %>
 <ul>
   <%if SignUpTopic.find_by_assignment_id(@assignment.id)%>
-    <li> 
-      <% if @authorization == 'participant' %>
+    <% if @authorization == 'participant' %>
+      <li> 
         <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.parent_id%>
-      <% else %>
-        <font color="gray">Signup sheet</font>
-      <% end %>
-    (Sign up for a topic)
-  </li>
-<%end%>
+        (Sign up for a topic)
+      </li>
+    <% end %>
+  <%end%>
 <!--ACS Here we need to know the size of the team to decide whether or not
 to display the label "Your team" in the student assignment tasks-->
   <%if @assignment.team_assignment? %>
-    <li> 
-      <% if @authorization == 'participant' %>
+    <% if @authorization == 'participant' %>
+      <li> 
         <%= link_to 'Your team', view_student_teams_path(id: @participant.id) %>
-      <% else %>
-        <font color="gray">Your team</font>
-      <% end %>
-      (View and manage your team)
-    </li>
+        (View and manage your team)
+      </li>
+    <% end %>
   <%end%>
+  <% if @authorization == 'participant' or @can_submit == true %>
     <li>
-      <% if @authorization == 'participant' or @authorization == 'submitter' %>
-        <% if @assignment.submission_allowed(@participant.topic_id) %>
-          <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %>
-        <% else %>
-          <%= link_to 'Your work', :controller => 'submitted_content', :action => 'view', :id => @participant.id %>
-        <% end %>
+      <% if @assignment.submission_allowed(@participant.topic_id) %>
+        <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %>
       <% else %>
-        <font color="gray">Your work</font>
+        <%= link_to 'Your work', :controller => 'submitted_content', :action => 'view', :id => @participant.id %>
       <% end %>
       (Submit and view your work)
     </li>
+  <% end %>
     <!--Quiz-->
   <%if @assignment.require_quiz%>
-    <li>
-      <% if @authorization == 'participant' or @authorization == 'reader' %>
+    <% if @authorization == 'participant' or @can_take_quiz == true %>
+      <li>
         <% if @assignment.require_quiz and (@assignment.quiz_allowed(@reviewee_topic_id) or @assignment.get_current_stage(@participant.topic_id) == "Finished") %>
           <%= link_to "Take quizzes", student_quizzes_path(:id => @participant.id) %>
+        <% else %>
+          <font color="gray">Take quizzes</font>
         <% end %>
-      <% else %>
-        <font color="gray">Take quizzes</font>
-      <% end %> (Take quizzes over the work you have read)
-    </li>
+        (Take quizzes over the work you have read)
+      </li>
+    <% end %> 
   <%end%>
+  <% if @authorization == 'participant' or @can_review == true %>
     <li>
       <!--alias_name means if one participant is a reader, it will show 'Your readings' to see others' work; if one participant is not a reader, it will show 'Others' work' on the screen.-->
-      <% if @authorizatione != 'reader' %>
+      <% if @authorization != 'reader' %>
         <% @alias_name = "Others' work" %>
       <% else %>
         <% @alias_name = "Your readings" %>
       <% end %>
-      <% if @authorization != 'submitter' %>
-        <% if @assignment.can_review(@reviewee_topic_id) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@participant.topic_id) == "Finished" %>
-          <%= link_to "#{@alias_name}",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
-        <% end %>
+
+      <% if @assignment.can_review(@reviewee_topic_id) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@participant.topic_id) == "Finished" %>
+        <%= link_to "#{@alias_name}",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
       <% else %>
         <font color="gray"><%= @alias_name%></font>
-      <% end %> (Give feedback to others on their work)
+      <% end %>
+      (Give feedback to others on their work)
     </li>
+  <% end %>
+  <% if @authorization == 'participant' %>
     <li>
-      <% if @authorization == 'participant' %>
-        <%= link_to "Your scores", :controller => 'grades', :action => 'view_my_scores', :id => @participant.id %> 
-      <% else %>
-        <font color="gray">Your scores</font>
-      <% end %> (View feedback on your work)
+      <%= link_to "Your scores", :controller => 'grades', :action => 'view_my_scores', :id => @participant.id %> 
+      (View feedback on your work)
     </li>
+  <% end %> 
     <%if @can_provide_suggestions == true %>
       <li><%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %></li>
     <% end %>

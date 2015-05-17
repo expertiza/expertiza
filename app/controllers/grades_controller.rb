@@ -404,8 +404,8 @@ class GradesController < ApplicationController
       bc.data_encoding = :extended
       @grades_bar_charts[type.to_sym] = (bc.to_url)
     end
+  end
 
-  private
   #authorizations: reader,submitter, reviewer
   def permission_for_authorizations
     @participant = Participant.find(params[:id])
@@ -425,5 +425,5 @@ class GradesController < ApplicationController
     variance = array.inject(0) { |variance, x| variance += (x - m) ** 2 }
     return m, Math.sqrt(variance/(array.size-1))
   end
-
+  
 end

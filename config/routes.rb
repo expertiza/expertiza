@@ -208,6 +208,7 @@ Expertiza::Application.routes.draw do
       get :inherit
       get :bequeath_all
       post :update_authorizations
+      post :update_duties
     end
   end
 

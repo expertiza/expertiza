@@ -5,6 +5,8 @@ class ParticipantsController < ApplicationController
     case params[:action]
     when 'change_handle'
       current_role_name.eql?("Student")
+    when 'update_duties'
+      current_role_name.eql?("Student")
     else
       ['Administrator',
        'Instructor',
@@ -59,6 +61,13 @@ class ParticipantsController < ApplicationController
     participant.update_attributes(:can_submit => can_submit, :can_review => can_review, :can_take_quiz => can_take_quiz)
     
     redirect_to :action => 'list', :id => parent_id, :model => participant.class.to_s.gsub("Participant","")
+  end
+
+  #duties: manager, designer, programmer, tester
+  def update_duties
+    participant = Participant.find(params[:id])
+    participant.update_attributes(:duty => params[:duty])
+    redirect_to :controller => 'student_teams', :action => 'view', :id => participant.id
   end
 
   def destroy

@@ -129,34 +129,6 @@ class StudentQuizzesController < ApplicationController
 
   end
 
-  # def submit_essay_grades
-  #   params.inspect
-  #   response_id = params[:response_id]
-  #   question_id = params[:question_id]
-  #   score = params[question_id][:score]
-  #   if score.eql? ' '
-  #     flash[:error] =  "Question was not graded. You must choose a score before submitting for grading."
-  #   else
-  #     updated_score = Score.where(question_id: question_id, response_id:  response_id).first
-  #     updated_score.update_attributes(:score => score)
-  #   end
-  #   redirect_to :action => :grade_essays
-  # end
-  #
-  # def grade_essays
-  #   scores = Score.where(score: -1)
-  #   @questions = Array.new
-  #   @answers = Hash.new
-  #   @questionnaires = Array.new
-  #   scores.each do |score|
-  #     question = Question.find(score.question_id)
-  #     @questions << question
-  #     @questionnaires << QuizQuestionnaire.find(question.questionnaire_id)
-  #     @answers.merge!({question: score})
-  #   end
-  #   @questionnaires.uniq!
-  # end
-
   def graded?(response, question)
     return (Score.where(question_id: question.id, response_id:  response.id).first)
   end

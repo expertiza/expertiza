@@ -45,19 +45,7 @@ to display the label "Your team" in the student assignment tasks-->
       (Submit and view your work)
     </li>
   <% end %>
-    <!--Quiz-->
-  <%if @assignment.require_quiz%>
-    <% if @authorization == 'participant' or @can_take_quiz == true %>
-      <li>
-        <% if @assignment.require_quiz and (@assignment.quiz_allowed(@reviewee_topic_id) or @assignment.get_current_stage(@participant.topic_id) == "Finished") %>
-          <%= link_to "Take quizzes", student_quizzes_path(:id => @participant.id) %>
-        <% else %>
-          <font color="gray">Take quizzes</font>
-        <% end %>
-        (Take quizzes over the work you have read)
-      </li>
-    <% end %> 
-  <%end%>
+
   <% if @authorization == 'participant' or @can_review == true %>
     <li>
       <!--alias_name means if one participant is a reader, it will show 'Your readings' to see others' work; if one participant is not a reader, it will show 'Others' work' on the screen.-->
@@ -75,7 +63,22 @@ to display the label "Your team" in the student assignment tasks-->
       (Give feedback to others on their work)
     </li>
   <% end %>
-  <% if @authorization == 'participant' %>
+
+    <!--Quiz-->
+  <%if @assignment.require_quiz%>
+    <% if @authorization == 'participant' or @can_take_quiz == true %>
+      <li>
+        <% if @assignment.require_quiz and (@assignment.quiz_allowed(@reviewee_topic_id) or @assignment.get_current_stage(@participant.topic_id) == "Finished") %>
+          <%= link_to "Take quizzes", student_quizzes_path(:id => @participant.id) %>
+        <% else %>
+          <font color="gray">Take quizzes</font>
+        <% end %>
+        (Take quizzes over the work you have read)
+      </li>
+    <% end %> 
+  <%end%>
+  
+  <% if @authorization == 'participant' or @can_submit == true %>
     <li>
       <%= link_to "Your scores", :controller => 'grades', :action => 'view_my_scores', :id => @participant.id %> 
       (View feedback on your work)

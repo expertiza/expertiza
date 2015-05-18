@@ -165,7 +165,7 @@ require 'analytic/assignment_analytic'
 
   def reject_by_deadline(contributor_set)
     contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'Complete' or
-        !contributor.assignment.review_allowed(signed_up_topic(contributor).id) }
+        !contributor.assignment.can_review(signed_up_topic(contributor).id) }
     return contributor_set
   end
 
@@ -546,7 +546,7 @@ require 'analytic/assignment_analytic'
   end
 
   # Determine if the next due date from now allows for reviews
-  def review_allowed(topic_id=nil)
+  def can_review(topic_id=nil)
     (check_condition('review_allowed_id', topic_id) )
 
   end
@@ -694,14 +694,14 @@ require 'analytic/assignment_analytic'
   #add a new participant to this assignment
   #manual addition
   # user_name - the user account name of the participant to add
-  def add_participant(user_name, special_role,submit_allowed,review_allowed,take_quiz_allowed)
+  def add_participant(user_name,can_submit,can_review,can_take_quiz)
     user = User.find_by_name(user_name)
     raise "The user account with the name #{user_name} does not exist. Please <a href='" + url_for(:controller => 'users', :action => 'new') + "'>create</a> the user first." if user.nil?
     participant = AssignmentParticipant.where(parent_id: self.id, user_id:  user.id).first
     if participant
       raise "The user #{user.name} is already a participant."
     else
-      new_part = AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted, :special_role => special_role, :submit_allowed => submit_allowed, :review_allowed => review_allowed, :take_quiz_allowed => take_quiz_allowed)
+      new_part = AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted, :can_submit => can_submit, :can_review => can_review, :can_take_quiz => can_take_quiz)
       new_part.set_handle()
     end
   end

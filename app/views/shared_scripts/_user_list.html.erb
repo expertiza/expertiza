@@ -35,15 +35,16 @@
     <td ><%= User.yesorno(user.email_on_review) %></td>
     <td ><%= User.yesorno(user.email_on_submission) %></td>
     <td ><%= User.yesorno(user.email_on_review_of_review) %></td>
-    <td ><%= participant.submit_allowed == false ? 'no' : 'yes' %></td>
-    <td ><%= participant.review_allowed == false ? 'no' : 'yes' %></td>  
-    <td ><%= participant.take_quiz_allowed == false ? 'no' : 'yes' %></td>  
+    <td ><%= participant.can_submit == false ? 'no' : 'yes' %></td>
+    <td ><%= participant.can_review == false ? 'no' : 'yes' %></td>  
+    <td ><%= participant.can_take_quiz == false ? 'no' : 'yes' %></td>  
     <td ><%= participant.handle %></td>
            
     <td ><%= link_to 'Remove', {:controller => controller, :action => 'destroy', :id => participant.id}, :method => :delete %></td>
 
     <!-- E726 Fall2012 Changes Begin -->
-    <% if participant.special_role=='reader' %>
+    <% authorization = Participant.get_authorization(participant.can_submit, participant.can_review, participant.can_take_quiz) %>
+    <% if authorization =='reader' %>
       <td><%= fa_icon 'book', title: 'reader' %></td>
     <% else %>
       <td></td>
@@ -51,27 +52,27 @@
     <!-- E726 Fall2012 Changes End -->
 
     <td>
-      <%= form_tag :controller=>'participants', :action=>'update_special_roles', :id => participant.id do %>
-        <% params[:special_role] = participant.special_role %>
-        <select id=<%=participant.user_id%> name="special_role" style="font-size:12px">
+      <%= form_tag :controller=>'participants', :action=>'update_authorizations', :id => participant.id do %>
+        <% params[:authorization] = authorization %>
+        <select id=<%=participant.user_id%> name="authorization" style="font-size:12px">
 
           <option value="participant" 
-            <% if params[:special_role] == "participant" -%>
+            <% if params[:authorization] == "participant" -%>
               selected
             <% end -%>
           >participant</option>
           <option value="reader"
-            <% if params[:special_role] == "reader" -%>
+            <% if params[:authorization] == "reader" -%>
               selected
             <% end -%>
           >reader</option>
           <option value="reviewer"
-            <% if params[:special_role] == "reviewer" -%>
+            <% if params[:authorization] == "reviewer" -%>
               selected
             <% end -%>
           >reviewer</option>
           <option value="submitter"
-            <% if params[:special_role] == "submitter" -%>
+            <% if params[:authorization] == "submitter" -%>
               selected
             <% end -%>
           >submitter</option>

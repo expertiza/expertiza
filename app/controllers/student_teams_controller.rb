@@ -1,5 +1,5 @@
 class StudentTeamsController < ApplicationController
-  before_action :permission_of_special_roles, except:[]
+  before_action :permission_for_authorizations, except:[]
   autocomplete :user, :name
 
   def team
@@ -10,7 +10,7 @@ class StudentTeamsController < ApplicationController
   end
 
   def student
-    @student ||= AssignmentParticipant.find(params[:student_id])
+    @student ||= AssignmentParticipant.find(params[:id])
   end
 
   def student=(value)
@@ -50,7 +50,7 @@ class StudentTeamsController < ApplicationController
     if existing_assignments.empty?
       if(params[:team][:name]==nil||params[:team][:name].length==0)
         flash[:notice] = 'Team name is null.'
-        redirect_to view_student_teams_path student_id: student.id
+        redirect_to view_student_teams_path id: student.id
         return
       end
       team = AssignmentTeam.new params[:team]
@@ -61,11 +61,11 @@ class StudentTeamsController < ApplicationController
       user = User.find student.user_id
       team.add_member user, team.parent_id
       team_created_successfully(team)
-      redirect_to view_student_teams_path student_id: student.id
+      redirect_to view_student_teams_path id: student.id
 
     else
       flash[:notice] = 'Team name is already in use.'
-      redirect_to view_student_teams_path student_id: student.id
+      redirect_to view_student_teams_path id: student.id
     end
   end
 
@@ -78,18 +78,18 @@ class StudentTeamsController < ApplicationController
       if team.update_attributes params[:team]
         team_created_successfully
 
-          redirect_to view_student_teams_path student_id: params[:student_id]
+          redirect_to view_student_teams_path id: params[:id]
 
       end
     elsif matching_teams.length == 1 && (matching_teams[0].name <=> team.name).zero?
 
       team_created_successfully
-      redirect_to view_student_teams_path student_id: params[:student_id]
+      redirect_to view_student_teams_path id: params[:id]
 
     else
       flash[:notice] = 'Team name is already in use.'
 
-      redirect_to edit_student_teams_path team_id: params[:team_id], student_id: params[:student_id]
+      redirect_to edit_student_teams_path team_id: params[:team_id], id: params[:id]
 
     end
   end
@@ -100,7 +100,7 @@ class StudentTeamsController < ApplicationController
 
   def remove_advertisement
     Team.update_all advertise_for_partner: false, id: params[:team_id]
-    redirect_to view_student_teams_path student_id: params[:team_id]
+    redirect_to view_student_teams_path id: params[:team_id]
   end
 
   def remove_participant
@@ -179,7 +179,7 @@ class StudentTeamsController < ApplicationController
 
     student.save
 
-    redirect_to view_student_teams_path student_id: student.id
+    redirect_to view_student_teams_path id: student.id
   end
 
   def team_created_successfully(current_team=nil)
@@ -198,10 +198,11 @@ class StudentTeamsController < ApplicationController
   end
 
   private
-  #special_role: reader,submitter, reviewer
-  def permission_of_special_roles
-    @participant = Participant.find(params[:student_id])
-    if @participant.special_role == 'reader' or @participant.special_role == 'submitter' or @participant.special_role == 'reviewer'
+  #authorizations: reader,submitter, reviewer
+  def permission_for_authorizations
+    @participant = Participant.find(params[:id])
+    authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
+    if authorization == 'reader' or authorization == 'reviewer' or authorization == 'submitter'
       flash[:error] = "Access denied!"
       redirect_to controller: 'student_task', action:'view', id: @participant.id
     end

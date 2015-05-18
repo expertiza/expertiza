@@ -351,7 +351,7 @@ class GradesController < ApplicationController
       reliability_chart('poor', 'reliability')
     end
 
-    end
+  end
 
   def get_scores_for_chart(reviews, symbol)
     scores = []
@@ -404,6 +404,7 @@ class GradesController < ApplicationController
       bc.data_encoding = :extended
       @grades_bar_charts[type.to_sym] = (bc.to_url)
     end
+  end
 
   private
   #special_role: reader,submitter, reviewer

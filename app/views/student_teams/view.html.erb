@@ -8,17 +8,28 @@
   <b>Team Name: </b><%= @student.team.name %>
 
 <%= link_to "Edit Name",
-   edit_student_teams_path(team_id: @student.team.id, student_id: @student.id) %><table>
+   edit_student_teams_path(team_id: @student.team.id, student_id: @student.id) %>
+
+<div class = "exp"> 
+<table>
   <tr>
-    <td><b>Username &nbsp</b></td>
-    <td><b>Full Name &nbsp</b></td>
-    <td><b>Email &nbsp</b></td>
-    <td></td>
+    <th class="head">Username</th>
+    <th class="head">Full Name</th>
+    <th class="head">Team member Duty</th>
+    <th class="head">Email Address</th>
+    <th class="head">Action</th>
   </tr>
   <% for member in @student.team.participants %>
     <tr>
       <td><%= member.user.name %></td>
       <td><%= member.user.fullname %></td>
+      <td>
+        <% if !member.duty.nil? %>
+          <%= member.duty %>
+        <% else %>
+          <%= 'No duty yet!' %>
+        <% end %>
+      </td>
       <td><%= member.user.email %></td>
       <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
 
@@ -42,11 +53,44 @@
   <% end %>
 </tr>
       <% end %>
-    </table>
+</table>
+</div>
     <br>
     <%= link_to "Leave Team",
                 remove_participant_student_teams_path(student_id: @student.id, team_id: @student.team.id) %>
   <% end %>
+
+<% if @student.team != nil %>
+  <h2>Team member duty</h2>
+
+  <%=form_tag :controller=>'participants', :action=>'update_duties', :id=>@student.id do %>
+    <% params[:duty] = @student.duty %>
+    Select your duty: 
+    <select id='select_team_member_duty', name='duty'>
+      <option value='manager'
+        <% if params[:duty] == 'manager' -%>
+          selected
+        <% end -%>
+      >manager</option>
+      <option value='designer'
+        <% if params[:duty] == 'designer' -%>
+          selected
+        <% end -%>
+      >designer</option>
+      <option value='programmer'
+        <% if params[:duty] == 'programmer' -%>
+          selected
+        <% end -%>
+      >programmer</option>
+      <option value='tester'
+        <% if params[:duty] == 'tester' -%>
+          selected
+        <% end -%>
+      >tester</option>
+    </select>
+    <%= button_tag 'Submit' %>
+  <% end %>
+<% end %>
 
   <% if @student.team != nil %>
     <h2>Team Advertisement</h2>

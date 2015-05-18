@@ -43,8 +43,8 @@
           
             <!-- E726 Changes Begin -->
             
-              <% link_to fa_icon('building 2x', title: 'Add Manager'), {:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment', :special_role => 'Manager'}, {:title => 'Add Manager'} %>
-              <% link_to fa_icon('book 2x', title: 'Add Reader'), {:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment', :special_role => 'Reader'}, {:title => 'Add Reader'} %>
+              <% link_to fa_icon('building 2x', title: 'Add Manager'), {:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment', :duty => 'Manager'}, {:title => 'Add Manager'} %>
+              <% link_to fa_icon('book 2x', title: 'Add Reader'), {:controller=>'participants', :action=>'list', :id => node.node_object_id, :model => 'Assignment', :authorizations => 'Reader'}, {:title => 'Add Reader'} %>
             </div>
             <!-- E726 Changes End -->
 

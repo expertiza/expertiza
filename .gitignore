@@ -8,6 +8,7 @@ config/locales/database.yml
 public/assets/staggered_deadline_assignment_graph
 coverage
 app/controllers/auth_controller.rb
+Gemfile.lock
 
 #################
 ## Eclipse

@@ -84,7 +84,6 @@ def view_responses
   else
     @assignment = Assignment.find(params[:id])
     surveys = SurveyHelper::get_all_available_surveys(params[:id], session[:user].role_id)
-    logger.warn "assignment: #{@surveys.inspect}"
   end
   @responses = []
   @empty = true

@@ -91,11 +91,7 @@
                 <%else %>
                   <td id = "green" bgcolor="#DDDDBB" align = 'center' colspan=1>
                 <%end %>
-                    <% if Team.find(ri.reviewee_id).users.size==1 %>
-                      <%=  Team.find(ri.reviewee_id).users.first.name %>
-                    <% else %>
-                      <%=  Team.find(ri.reviewee_id).name %>
-                    <% end %>
+                    <%= link_to Team.find(ri.reviewee_id).name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => nil, :assignment_id=>@id %>
 
 
                   </td>
@@ -140,22 +136,22 @@
                       <% if Team.where([ "id = ?", ri.reviewee_id ]).length > 0 %>
                         <% if (@l%2) == 0 %>
                           <td id = "red" bgcolor="#ffffff" style ="color:#DD3300" align = 'center' colspan=1>
+                        <%else %>
+                          <td id = "red" bgcolor="#DDDDBB" style ="color:#DD3300" align = 'center' colspan=1>
+                        <%end %>
+                          <%@team = Team.find(ri.reviewee_id) %>
+                          <% @teamid = @team.id%>
+                          <%= link_to Team.find(ri.reviewee_id).name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => nil, :assignment_id=>@id %>
+                        </td>
+                        <%= render :partial => 'teamscore' %>
+                        <% if (@l%2) == 0 %>
+                          <td bgcolor="#ffffff" style ="color:#DD3300" align = 'center'>
                           <%else %>
-                            <td id = "red" bgcolor="#DDDDBB" style ="color:#DD3300" align = 'center' colspan=1>
+                            <td bgcolor="#DDDDBB" style ="color:#DD3300" align = 'center'>
                             <%end %>
-                            <%@team = Team.find(ri.reviewee_id) %>
-                            <% @teamid = @team.id%>
-                            <%= link_to Team.find(ri.reviewee_id).name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => nil, :assignment_id=>@id %>
+                            No
                           </td>
-                          <%= render :partial => 'teamscore' %>
-                          <% if (@l%2) == 0 %>
-                            <td bgcolor="#ffffff" style ="color:#DD3300" align = 'center'>
-                            <%else %>
-                              <td bgcolor="#DDDDBB" style ="color:#DD3300" align = 'center'>
-                              <%end %>
-                              No
-                            </td>
-                          </tr><tr>
+                        </tr><tr>
 
                           <% elsif !@assignment.team_assignment? %>
                             <% @participantid = Participant.find(ri.reviewee_id).user_id %>
@@ -166,9 +162,9 @@
 
                             <% if (@l%2) == 0 %>
                               <td id = "red" style ="color:#DD3300" align = 'center' colspan=1 bgcolor="#ffffff" >
-                              <%else%>
+                            <%else%>
                                 <td  id = "red" style ="color:#DD3300" align = 'center' colspan=1 bgcolor="#DDDDBB"  >
-                                <%end%>
+                            <%end%>
                                 <%= link_to participant.fullname, :controller => 'popup', :action => 'participants_popup', :id => ri.reviewee_id, :id2 => nil, :assignment_id => @id %>
                               </td><!-- write ur partial here to print score -->
                               <%= render :partial => 'participantscore' %>

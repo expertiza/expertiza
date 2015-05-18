@@ -1,5 +1,4 @@
 class GradesController < ApplicationController
-  before_action :permission_for_authorizations, except:[]
   helper :file
   helper :submitted_content
   helper :penalty
@@ -8,7 +7,7 @@ class GradesController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'view_my_scores'
-      current_role_name.eql? 'Student'
+      current_role_name.eql? 'Student' and are_needed_authorizations_present?
     else
       ['Instructor',
        'Teaching Assistant',
@@ -407,12 +406,13 @@ class GradesController < ApplicationController
   end
 
   #authorizations: reader,submitter, reviewer
-  def permission_for_authorizations
+  def are_needed_authorizations_present?
     @participant = Participant.find(params[:id])
     authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
-    if authorization == 'reader' or authorization == 'reviewer' or authorization == 'submitter'
-      flash[:error] = "Access denied!"
-      redirect_to controller: 'student_task', action:'view', id: @participant.id
+    if authorization == 'reader' or authorization == 'reviewer'
+      return false
+    else
+      return true
     end
   end
 

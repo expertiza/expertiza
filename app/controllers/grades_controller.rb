@@ -351,7 +351,7 @@ class GradesController < ApplicationController
       reliability_chart('poor', 'reliability')
     end
 
-    end
+  end
 
   def get_scores_for_chart(reviews, symbol)
     scores = []

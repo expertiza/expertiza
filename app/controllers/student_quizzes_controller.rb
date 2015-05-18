@@ -1,5 +1,6 @@
 class StudentQuizzesController < ApplicationController
   before_action :permission_for_authorizations, except:[]
+
   def action_allowed?
     ['Administrator',
      'Instructor',
@@ -93,8 +94,13 @@ class StudentQuizzesController < ApplicationController
             score_update.score = score
           end
         end
-      else
+      else #TF and MCR
         correct_answer = correct_answers.first
+        if correct_answer.txt==params["#{question.id}"]
+          score=1
+        else
+          score=0
+        end
         new_score = Score.new :comments => params["#{question.id}"], :question_id => question.id, :response_id => response.id, :score => score
         if new_score.comments.empty? || new_score.comments.nil?
           valid = false

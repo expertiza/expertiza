@@ -1,9 +1,8 @@
 class SubmittedContentController < ApplicationController
-  before_action :permission_for_authorizations, except:[]
   helper :wiki
 
   def action_allowed?
-    current_role_name.eql?("Student")
+    current_role_name.eql?("Student") and are_needed_authorizations_present?
   end
 
   def edit
@@ -15,7 +14,7 @@ class SubmittedContentController < ApplicationController
     #ACS We have to check if the number of members on the team is more than 1(group assignment)
     #hence use team count for the check
     if  @participant.team.nil?
-      flash[:error] = "This is a team assignment. Before submitting your work, you must <a style='color: blue;' href='../../student_teams/view/?student_id=#{params[:id]}'>create a team</a>, even if you will be the only member of the team"
+      flash[:error] = "This is a team assignment. Before submitting your work, you must <a style='color: blue;' href='../../student_teams/view/?id=#{params[:id]}'>create a team</a>, even if you will be the only member of the team"
       redirect_to :controller => 'student_task', :action => 'view', :id => params[:id]
   end
 end
@@ -247,12 +246,13 @@ end
   
   private
   #authorizations: reader,submitter, reviewer
-  def permission_for_authorizations
+  def are_needed_authorizations_present?
     @participant = Participant.find(params[:id])
     authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
     if authorization == 'reader' or authorization == 'reviewer'
-      flash[:error] = "Access denied!"
-      redirect_to controller: 'student_task', action:'view', id: @participant.id
+      return false
+    else
+      return true
     end
   end
 end

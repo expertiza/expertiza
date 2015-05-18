@@ -4,10 +4,10 @@
   <% else %>
       Submit or Review work for <%= link_to @assignment.name, @assignment.spec_location %>
   <% end %>
-  <% @authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz) %>
   <% @can_submit = @participant.can_submit %>
   <% @can_review = @participant.can_review %>
   <% @can_take_quiz = @participant.can_take_quiz %>
+  <% @authorization = Participant.get_authorization(@can_submit, @can_review, @can_take_quiz) %>
 </h1>
 
 <div class="flash_note">

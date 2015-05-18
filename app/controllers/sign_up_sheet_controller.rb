@@ -13,12 +13,10 @@ class SignUpSheetController < ApplicationController
   require 'rgl/dot'
   require 'rgl/topsort'
 
-  before_action :permission_for_authorizations, except:[]
-
   def action_allowed?
     case params[:action]
     when 'signup_topics', 'sign_up', 'delete_signup', 'list', 'show_team'
-      current_role_name.eql? 'Student'
+      current_role_name.eql? 'Student' and are_needed_authorizations_present?
     else
       ['Instructor',
        'Teaching Assistant',
@@ -619,12 +617,13 @@ class SignUpSheetController < ApplicationController
 
   private
   #authorizations: reader,submitter, reviewer
-  def permission_for_authorizations
+  def are_needed_authorizations_present?
     @participant = Participant.where('user_id = ? and parent_id = ?', session[:user].id, params[:id]).first
     authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
     if authorization == 'reader' or authorization == 'submitter' or authorization == 'reviewer'
-      flash[:error] = "Access denied!"
-      redirect_to controller: 'student_task', action:'view', id: @participant.id
+      return false
+    else
+      return true
     end
   end
 end

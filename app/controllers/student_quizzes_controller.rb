@@ -1,10 +1,10 @@
 class StudentQuizzesController < ApplicationController
-  before_action :permission_for_authorizations, except:[]
 
   def action_allowed?
     ['Administrator',
      'Instructor',
-     'Teaching Assistant','Student'].include? current_role_name
+     'Teaching Assistant'].include? current_role_name or (current_role_name.eql?("Student") and are_needed_authorizations_present?)
+
   end
 
   def index
@@ -137,12 +137,13 @@ class StudentQuizzesController < ApplicationController
 
   private
   #authorizations: reader,submitter, reviewer
-  def permission_for_authorizations
+  def are_needed_authorizations_present?
     @participant = Participant.find(params[:id])
     authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
     if authorization == 'reviewer' or authorization == 'submitter'
-      flash[:error] = "Access denied!"
-      redirect_to controller: 'student_task', action:'view', id: @participant.id
+      return false
+    else
+      return true
     end
   end
 end

@@ -15,7 +15,7 @@
   <tr>
     <th class="head">Username</th>
     <th class="head">Full Name</th>
-    <th class="head">Team member Duty</th>
+    <th class="head">Team-member role (duty)</th>
     <th class="head">Email Address</th>
     <th class="head">Action</th>
   </tr>
@@ -61,7 +61,7 @@
   <% end %>
 
 <% if @student.team != nil %>
-  <h2>Team member duty</h2>
+  <h2>Team-member role (duty)</h2>
 
   <%=form_tag :controller=>'participants', :action=>'update_duties', :id=>@student.id do %>
     <% params[:duty] = @student.duty %>

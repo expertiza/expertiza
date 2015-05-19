@@ -183,6 +183,13 @@ function is_coding_assignmentChanged(){
 
   <!--Quiz fields-->
   <tr>
+    <td style='padding:5px' id='assignment_show_teammate_reviews'>
+      <input name="assignment_form[assignment][show_teammate_reviews]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][show_teammate_reviews]', 'true', @assignment_form.assignment.show_teammate_reviews) %>
+      <%= label_tag('assignment_form[assignment][show_teammate_reviews]', 'Show Teammate Reviews?') %>
+    </td>
+   </tr>
+   <tr>
     <td style='padding:5px' id='assignment_require_quiz_field'>
       <input name="assignment_form[assignment][require_quiz]" type="hidden" value="false"/>
       <%= check_box_tag('assignment_form[assignment][require_quiz]', 'true', @assignment_form.assignment.require_quiz, {:onChange => 'hasQuizChanged()'}) %>

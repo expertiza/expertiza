@@ -4,7 +4,7 @@ class StudentTask
 
   def initialize(args)
     @assignment = args[:assignment]
-    @current_stage = args[:get_current_stage]
+    @current_stage = args[:current_stage]
     @participant = args[:participant]
     @stage_deadline = args[:stage_deadline]
     @topic = args[:topic]
@@ -15,7 +15,7 @@ class StudentTask
       :participant => participant,
       :assignment => participant.assignment,
       :topic => participant.topic,
-      :get_current_stage => participant.get_current_stage,
+      :current_stage => participant.current_stage,
       :stage_deadline => (Time.parse(participant.stage_deadline) rescue Time.now + 1.years)
     )
   end
@@ -48,7 +48,7 @@ class StudentTask
   end
 
   def hyperlinks
-    @hyperlinks ||= participant.hyperlinks
+    @hyperlinks ||= participant.get_hyperlinks
   end
 
   def incomplete?
@@ -120,5 +120,34 @@ class StudentTask
 
   def topic
     participant.topic
+  end
+
+  def self.teamed_students(user)
+
+        @students_teamed = Hash.new #{|h,k| h[k] = Hash.new(&h.default_proc)}
+        @teammates = Array.new
+        @teams = user.teams
+         
+         @teams.each do |team|
+             @teammates  = []
+             @course_id = Assignment.find(team.parent_id).course_id
+             @team_participants = Team.find(team.id).participants
+             @team_participants = @team_participants.select {|participant| participant.name != user.name}
+             @team_participants.each{ |t|
+                 u = Student.find(t.user_id)
+                 @teammates << u.fullname
+             }
+             if @teammates.size
+                 if @students_teamed[@course_id].nil?
+                    @students_teamed[@course_id] = @teammates
+                 else
+                     @teammates.each do |teammate| @students_teamed[@course_id] << teammate end
+                 end
+                 puts @course_id
+                 @students_teamed[@course_id].uniq! if @students_teamed.has_key?(@course_id)
+             end
+               
+         end
+        @students_teamed
   end
 end

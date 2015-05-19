@@ -589,7 +589,6 @@ class ReviewMappingController < ApplicationController
     #@chart1.data = data
     #@chart1.axis = axis
     @chart1 = Gchart.bar(:data => @scores, :size => '500x200')
-    logger.warn "chart1: #{@chart1}"
 
 
     ###################### Second Graph ####################

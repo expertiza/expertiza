@@ -69,6 +69,7 @@ ActiveRecord::Schema.define(version: 201150105163040) do
     t.integer  "late_policy_id",                    limit: 4
     t.boolean  "is_penalty_calculated",             limit: 1,     default: false, null: false
     t.integer  "max_bids",                          limit: 4
+    t.boolean  "show_teammate_reviews",             limit: 1
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -351,8 +352,8 @@ ActiveRecord::Schema.define(version: 201150105163040) do
   add_index "participant_team_roles", ["role_assignment_id"], name: "fk_role_assignment_id", using: :btree
 
   create_table "participants", force: :cascade do |t|
-    t.boolean  "submit_allowed",       limit: 1,     default: true
-    t.boolean  "review_allowed",       limit: 1,     default: true
+    t.boolean  "can_submit",           limit: 1,     default: true
+    t.boolean  "can_review",           limit: 1,     default: true
     t.integer  "user_id",              limit: 4
     t.integer  "parent_id",            limit: 4
     t.integer  "directory_num",        limit: 4
@@ -366,8 +367,8 @@ ActiveRecord::Schema.define(version: 201150105163040) do
     t.integer  "topic_id",             limit: 4
     t.datetime "time_stamp"
     t.text     "digital_signature",    limit: 65535
-    t.string   "special_role",         limit: 255
-    t.boolean  "take_quiz_allowed",    limit: 1,     default: true
+    t.string   "duty",                 limit: 255
+    t.boolean  "can_take_quiz",        limit: 1,     default: true
   end
 
   add_index "participants", ["user_id"], name: "fk_participant_users", using: :btree

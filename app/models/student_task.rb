@@ -137,7 +137,7 @@ class StudentTask
                  u = Student.find(t.user_id)
                  @teammates << u.fullname
              }
-             if @teammates.size
+             if !@teammates.empty?
                  if @students_teamed[@course_id].nil?
                     @students_teamed[@course_id] = @teammates
                  else

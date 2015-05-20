@@ -82,7 +82,13 @@
 <strong>Students Teamed With You<br></strong><br>
 
 <% @students_teamed_with.keys.each do |course_id| %>
-    <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @students_teamed_with[course_id].size.to_s %>&nbsp;</span> <%= Course.find(course_id).name %><br></strong><br>
+    <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @students_teamed_with[course_id].size.to_s %>&nbsp;</span>
+      <%if course_id.nil?%>
+        assignments not associated with any course
+      <%else%>
+        <%=  Course.find(course_id).name %>
+      <%end%>
+      <br></strong><br>
     <% if @students_teamed_with[course_id].size %>
         <% @students_teamed_with[course_id].each do |student|%>
                 <span class="notification">&nbsp; &raquo; <%= student %> </span><br/>

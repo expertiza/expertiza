@@ -143,7 +143,6 @@ class StudentTask
                  else
                      @teammates.each do |teammate| @students_teamed[@course_id] << teammate end
                  end
-                 puts @course_id
                  @students_teamed[@course_id].uniq! if @students_teamed.has_key?(@course_id)
              end
                

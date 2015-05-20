@@ -38,7 +38,7 @@
     <br>
 
   <% elsif(question_type.q_type == 'TF') %>
-    Correct Answer is: <b><%=QuizQuestionChoice.find_by_question_id(question.id).txt%></b><br/>
+    Correct Answer is: <b><%=QuizQuestionChoice.where(question_id: question.id,iscorrect: 1).first.txt%></b><br/>
     Your answer is: <b><%= p Score.where(response_id: @response.id, question_id:  question.id).first.comments %></b><br><br>
   <% end %><hr>
   <% i += 1 %>

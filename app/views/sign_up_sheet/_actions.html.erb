@@ -1,9 +1,9 @@
-<%= link_to :controller=>'bookmarks', :action=> 'view_topic_bookmarks', :id => topic.id , :assignment_id => params[:id] do %>
+<%= link_to :controller=>'bookmarks', :action=> 'view_topic_bookmarks', :id => topic.id , :assignment_id => params[:assignment_id] do %>
   <span class="fa-stack fa-md" title='View topic bookmarks'>
     <i class="fa fa-bookmark fa-stack-1x fa-2x"></i>
   </span>
 <% end %>
-<%= link_to :controller=>'bookmarks', :action=> 'add_bookmark_form', :id => topic.id , :assignment_id => params[:id] do %>
+<%= link_to :controller=>'bookmarks', :action=> 'add_bookmark_form', :id => topic.id , :assignment_id => params[:assignment_id] do %>
   <span class="fa-stack fa-md" title='Add bookmark to topic'>
     <i class="fa fa-bookmark fa-stack-1x fa-2x"></i>
     <i class="fa fa-plus fa-stack-1x fa-inverse" style='font-size: .5em'></i>

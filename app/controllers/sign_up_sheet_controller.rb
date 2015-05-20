@@ -250,7 +250,7 @@ class SignUpSheetController < ApplicationController
         #this function is used to delete a previous signup
   def delete_signup
     delete_signup_for_topic(params[:assignment_id], params[:id])
-    redirect_to :action => 'list', :id => params[:assignment_id]
+    redirect_to :action => 'list', :assignment_id => params[:assignment_id]
   end
 
   def delete_signup_for_topic(assignment_id, topic_id)
@@ -268,7 +268,7 @@ class SignUpSheetController < ApplicationController
     #s = Signupsheet.new
     #check whether the user already has a team for this assignment
     signup_team(@assignment.id, @user_id, params[:id])
-    redirect_to :action => 'list', :id => params[:assignment_id]
+    redirect_to :action => 'list', :assignment_id => params[:assignment_id]
   end
 
   def signup_team(assignment_id, user_id, topic_id)
@@ -619,7 +619,7 @@ class SignUpSheetController < ApplicationController
   private
   #authorizations: reader,submitter, reviewer
   def are_needed_authorizations_present?
-    @participant = Participant.where('user_id = ? and parent_id = ?', session[:user].id, params[:id]).first
+    @participant = Participant.where('user_id = ? and parent_id = ?', session[:user].id, params[:assignment_id]).first
     authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
     if authorization == 'reader' or authorization == 'submitter' or authorization == 'reviewer'
       return false

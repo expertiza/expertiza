@@ -217,8 +217,8 @@ class SignUpSheetController < ApplicationController
   def list
     @assignment_id = params[:assignment_id]
     @sign_up_topics = SignUpTopic.where(['assignment_id = ?', @assignment_id]).all
-    @slots_filled = SignUpTopic.find_slots_filled(params[:id])
-    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:id])
+    @slots_filled = SignUpTopic.find_slots_filled(params[:assignment_id])
+    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:assignment_id])
     @show_actions = true
     @priority = 0
     assignment=Assignment.find(@assignment_id)

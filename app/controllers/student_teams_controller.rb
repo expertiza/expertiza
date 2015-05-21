@@ -9,7 +9,7 @@ class StudentTeamsController < ApplicationController
   end
 
   def student
-    @student ||= AssignmentParticipant.find(params[:id])
+    @student ||= AssignmentParticipant.find(params[:student_id])
   end
 
   def student=(value)
@@ -22,7 +22,7 @@ class StudentTeamsController < ApplicationController
 
   def action_allowed?
     #note, this code replaces the following line that cannot be called before action allowed?
-    if current_role_name.eql? 'Student' and are_needed_authorizations_present?
+    if current_role_name.eql? 'Student'
       #make sure the student is the owner if they are trying to create it
       return current_user_id? student.user_id if %w[create].include? action_name
       #make sure the student belongs to the group before allowed them to try and edit or update
@@ -49,7 +49,7 @@ class StudentTeamsController < ApplicationController
     if existing_assignments.empty?
       if(params[:team][:name]==nil||params[:team][:name].length==0)
         flash[:notice] = 'Team name is null.'
-        redirect_to view_student_teams_path id: student.id
+        redirect_to view_student_teams_path student_id: student.id
         return
       end
       team = AssignmentTeam.new params[:team]
@@ -60,11 +60,11 @@ class StudentTeamsController < ApplicationController
       user = User.find student.user_id
       team.add_member user, team.parent_id
       team_created_successfully(team)
-      redirect_to view_student_teams_path id: student.id
+      redirect_to view_student_teams_path student_id: student.id
 
     else
       flash[:notice] = 'Team name is already in use.'
-      redirect_to view_student_teams_path id: student.id
+      redirect_to view_student_teams_path student_id: student.id
     end
   end
 
@@ -77,18 +77,18 @@ class StudentTeamsController < ApplicationController
       if team.update_attributes params[:team]
         team_created_successfully
 
-          redirect_to view_student_teams_path id: params[:id]
+          redirect_to view_student_teams_path student_id: params[:student_id]
 
       end
     elsif matching_teams.length == 1 && (matching_teams[0].name <=> team.name).zero?
 
       team_created_successfully
-      redirect_to view_student_teams_path id: params[:id]
+      redirect_to view_student_teams_path student_id: params[:student_id]
 
     else
       flash[:notice] = 'Team name is already in use.'
 
-      redirect_to edit_student_teams_path team_id: params[:team_id], id: params[:id]
+      redirect_to edit_student_teams_path team_id: params[:team_id], student_id: params[:student_id]
 
     end
   end
@@ -99,7 +99,7 @@ class StudentTeamsController < ApplicationController
 
   def remove_advertisement
     Team.update_all advertise_for_partner: false, id: params[:team_id]
-    redirect_to view_student_teams_path id: params[:team_id]
+    redirect_to view_student_teams_path student_id: params[:team_id]
   end
 
   def remove_participant
@@ -178,7 +178,7 @@ class StudentTeamsController < ApplicationController
 
     student.save
 
-    redirect_to view_student_teams_path id: student.id
+    redirect_to view_student_teams_path student_id: student.id
   end
 
   def team_created_successfully(current_team=nil)

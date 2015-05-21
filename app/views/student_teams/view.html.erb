@@ -63,7 +63,7 @@
 <% if @student.team != nil %>
   <h2>Team-member role (duty)</h2>
 
-  <%=form_tag :controller=>'participants', :action=>'update_duties', :id=>@student.id do %>
+  <%=form_tag :controller=>'participants', :action=>'update_duties', :student_id=>@student.id do %>
     <% params[:duty] = @student.duty %>
     Select your duty: 
     <select id='select_team_member_duty', name='duty'>

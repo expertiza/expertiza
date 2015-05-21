@@ -1,6 +1,6 @@
 class StudentReviewController < ApplicationController
   def action_allowed?
-    current_role_name.eql?("Student") and are_needed_authorizations_present?
+    current_role_name.eql?("Student") and ((%w(list).include? action_name) ? are_needed_authorizations_present? : true)
   end
 
 

@@ -15,8 +15,8 @@ class SignUpSheetController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'signup_topics', 'sign_up', 'delete_signup', 'list', 'show_team'
-      current_role_name.eql? 'Student' and are_needed_authorizations_present?
+    when 'sign_up', 'delete_signup', 'list', 'show_team'
+      current_role_name.eql? 'Student' and ((%w(list).include? action_name) ? are_needed_authorizations_present? : true)
     else
       ['Instructor',
        'Teaching Assistant',

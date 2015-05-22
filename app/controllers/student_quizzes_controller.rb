@@ -70,28 +70,26 @@ class StudentQuizzesController < ApplicationController
           valid = false
         else
           params["#{question.id}"].each do |choice|
-
+          #loop the quiz taker's choices and see if 1)all the correct choice are checked and 2) # of quiz taker's choice matches the # of the correct choices
             correct_answers.each do |correct|
               if choice.eql? correct.txt
                 score += 1
               end
-
             end
-            new_score = Score.new comments: choice, question_id: question.id, response_id: response.id
+          end
+          if score== correct_answers.count && score == params["#{question.id}"].count
+            score = 1
+          else
+            score = 0
+          end
+          #for MCC, score =1 means the quiz taker have done this question correctly, not just make select this choice correctly.
+          params["#{question.id}"].each do |choice|
+            new_score = Score.new comments: choice, question_id: question.id, response_id: response.id, :score => score
 
             unless new_score.valid?
               valid = false
             end
             scores.push(new_score)
-
-          end
-          if score.eql? correct_answers.count && score == params["#{question.id}"].count
-            score = 1
-          else
-            score = 0
-          end
-          scores.each do |score_update|
-            score_update.score = score
           end
         end
       else #TF and MCR

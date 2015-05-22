@@ -14,7 +14,7 @@ describe StudentTask do
     it "creates a StudentTask from a participant" do
       expect(participant).to receive(:assignment)
       expect(participant).to receive(:topic)
-      expect(participant).to receive(:get_current_stage)
+      expect(participant).to receive(:current_stage)
       expect(participant).to receive(:stage_deadline)
       expect(StudentTask.from_participant(participant).participant).to be participant
     end

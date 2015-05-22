@@ -64,8 +64,9 @@ class AssignmentsController < ApplicationController
     @metareview_allowed=false
     @metareview_allowed_checkbox=false
 
-    if !set_rubrics?
-      flash[:error] = "Dear instructor, you have not specified rubrics of this assignment. Please do this first before you save this assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>."
+    #only when instructor does not assign rubrics and in assignment edit page will show this error message.
+    if !set_rubrics? and request.original_fullpath == "/assignments/#{@assignment_form.assignment.id}/edit"
+      flash[:error] = "Dear instructor, you have not specified rubrics of assignment <b>#{@assignment_form.assignment.name}</b>. Please do this first before you save this assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>."
     end
     # Check if name and url in database is empty before webpage displays
     @due_date_all.each do |dd|

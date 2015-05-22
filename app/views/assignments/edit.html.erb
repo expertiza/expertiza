@@ -4,11 +4,11 @@
   <%= form_for @assignment_form.assignment, html: { id: 'assignment_form' } do %>
     <div class= "chart-table" id="tabs">
       <ul>
-        <li><a href="#tabs-1">General</a></li>
-        <li><a href="#tabs-2">Rubrics</a></li>
-        <li><a href="#tabs-3">Review strategy</a></li>
-        <li><a href="#tabs-4">Due dates</a></li>
-        <li><a href="#tabs-5">Topics</a></li>
+        <li><a href="#tabs-1" id="General">General</a></li>
+        <li><a href="#tabs-2" id="Rubrics">Rubrics</a></li>
+        <li><a href="#tabs-3" id="Review strategy">Review strategy</a></li>
+        <li><a href="#tabs-4" id="Due dates">Due dates</a></li>
+        <li><a href="#tabs-5" id="Topics">Topics</a></li>
       </ul>
       <div id="tabs-1">
         <%= render 'assignments/edit/general' %>
@@ -42,6 +42,10 @@
     <script>
       jQuery(document).ready(function () {
         jQuery("#tabs").tabs();
+      });
+
+      $('#go_to_tabs2').click(function(){
+        $('#Rubrics').click();
       });
     </script>
   <% end %>

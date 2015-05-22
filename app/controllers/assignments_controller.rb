@@ -64,7 +64,9 @@ class AssignmentsController < ApplicationController
     @metareview_allowed=false
     @metareview_allowed_checkbox=false
 
-
+    if !set_rubrics?
+      flash[:error] = "Dear instructor, you have not specified rubrics of this assignment. Please do this first before you save this assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>."
+    end
     # Check if name and url in database is empty before webpage displays
     @due_date_all.each do |dd|
       if((!dd.deadline_name.nil?&&!dd.deadline_name.empty?)||(!dd.description_url.nil?&&!dd.description_url.empty?))
@@ -264,4 +266,12 @@ class AssignmentsController < ApplicationController
       redirect_to :controller => 'assignments', :action => 'scheduled_tasks', :id => params[:id]
     end
 
+    #check whether rubrics are set before save assignment
+    def set_rubrics?
+      set_rubrics = true
+      @assignment_questionnaires.each do |aq|
+        set_rubrics = false if aq.questionnaire_id.nil?
+      end
+      return set_rubrics
+    end
 end

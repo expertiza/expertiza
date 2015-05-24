@@ -121,8 +121,7 @@ class Assessment360Controller < ApplicationController
             else
                 @teamed_count[student.fullname.to_s] = 0
             end
-            @assignments.each do |assignment| 
-                puts student.name + '  ' + assignment.name
+            @assignments.each do |assignment|
                 @meta_review[student.fullname.to_s][assignment.name.to_s] = ''
                 @teammate_review[student.fullname.to_s][assignment.name.to_s] = ''
                 @student_overall_average[student.fullname.to_s][@meta_review_sym] = ''

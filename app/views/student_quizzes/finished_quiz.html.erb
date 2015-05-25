@@ -31,9 +31,17 @@
       <% end %>
     <% end %><br>
 
-    Your answer is:<br/>
-    <% Score.where(response_id: @response.id, question_id: question.id).each do |answer| %>
-      <b><%= p answer.comments %></b><br>
+    Your answer is:
+    <% user_answers= Score.where(response_id: @response.id, question_id: question.id)%>
+    <%if user_answers.first.score==1%>
+      <img src="/assets/Check-icon.png"/>
+    <%else%>
+      <img src="/assets/delete_icon.png"/>
+    <%end%>
+
+    <br/>
+    <% user_answers.each do |answer| %>
+      <b><%= answer.comments %></b><br>
     <% end %>
     <br>
 

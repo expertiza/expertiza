@@ -79,13 +79,13 @@ class DelayedMailer
         signedUpUsers = SignedUpUser.where( ['topic_id = ?', topic.id])
         unless assignment.team_assignment?
           for signedUser in signedUpUsers
-            uid  = signedUser.creator_id
+            uid  = signedUser.team_id
             user = User.find(uid)
             emails << user.email
           end
         else
           for signedUser in signedUpUsers
-            teamid  = signedUser.creator_id
+            teamid  = signedUser.team_id
             team_members = TeamsUser.where(team_id: teamid)
             for team_member in team_members
               user = User.find(team_member.user_id)
@@ -206,7 +206,7 @@ class DelayedMailer
     teams = TeamsUser.all.group(:team_id).count(:team_id)
     for team_id in teams.keys
       if teams[team_id] == 1
-        topic_to_drop = SignedUpUser.where(creator_id: team_id)
+        topic_to_drop = SignedUpUser.where(team_id: team_id)
         if !topic_to_drop.nil?#check if the one-person-team has signed up a topic
           topic_to_drop.first.delete
         end

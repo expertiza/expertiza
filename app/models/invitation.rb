@@ -9,15 +9,15 @@ class Invitation < ActiveRecord::Base
     first_waitlisted_signup.is_waitlisted = false
     first_waitlisted_signup.save
 
-    #Update the Participant Table first_waitlisted_signup.creator_id is the team id so find one
+    #Update the Participant Table first_waitlisted_signup. so find one
     #of the users on the new team
-    user_id = TeamsUser.first_by_team_id(first_waitlisted_signup.creator_id).user_id
+    user_id = TeamsUser.first_by_team_id(first_waitlisted_signup.team_id).user_id
     #Obtain this users entry in the participants table for this assignment
     participant = Participant.where(user_id: user_id, parent_id:  assignment_id).first
     #Update the users topic id to that of the team they are joining in the Participants table
     participant.update_topic_id(topic_id)
     #Cancel all topics the user is waitlisted for
-    SignUpTopic.cancel_all_waitlists(first_waitlisted_signup.creator_id, SignUpTopic.find(topic_id).assignment_id)
+    SignUpTopic.cancel_all_waitlists(first_waitlisted_signup.team_id, SignUpTopic.find(topic_id).assignment_id)
   end
 
   #Remove all invites sent by a user for an assignment.

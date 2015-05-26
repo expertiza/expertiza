@@ -574,7 +574,7 @@ ActiveRecord::Schema.define(version: 201150105163040) do
 
   create_table "signed_up_users", force: :cascade do |t|
     t.integer "topic_id",                   limit: 4, default: 0,     null: false
-    t.integer "creator_id",                 limit: 4, default: 0,     null: false
+    t.integer "team_id",                    limit: 4, default: 0,     null: false
     t.boolean "is_waitlisted",              limit: 1, default: false, null: false
     t.integer "preference_priority_number", limit: 4
   end

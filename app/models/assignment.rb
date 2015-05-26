@@ -1023,11 +1023,11 @@ require 'analytic/assignment_analytic'
   def signed_up_topic(contributor)
     # The purpose is to return the topic that the contributor has signed up to do for this assignment.
     # Returns a record from the sign_up_topic table that gives the topic_id for which the contributor has signed up
-    # Look for the topic_id where the creator_id equals the contributor id (contributor is a team or a participant)
+    # Look for the topic_id where the team_id equals the contributor id (contributor is a team or a participant)
 
     # If this is an assignment with quiz required
     if (self.require_quiz?)
-      signups = SignedUpUser.where(creator_id: contributor.id)
+      signups = SignedUpUser.where(team_id: contributor.id)
       for signup in signups do
         signuptopic = SignUpTopic.find(signup.topic_id)
         if (signuptopic.assignment_id == self.id)
@@ -1037,10 +1037,10 @@ require 'analytic/assignment_analytic'
       end
     end
 
-    # Look for the topic_id where the creator_id equals the contributor id (contributor is a team or a participant)
+    # Look for the topic_id where the team_id equals the contributor id (contributor is a team or a participant)
     (!Team.where(name: contributor.name, id:  contributor.id).first.nil?) ?
-      contributors_topic = SignedUpUser.find_by_creator_id(contributor.id) :
-      contributors_topic = SignedUpUser.find_by_creator_id(contributor.user_id)
+      contributors_topic = SignedUpUser.find_by_team_id(contributor.id) :
+      contributors_topic = SignedUpUser.find_by_team_id(contributor.user_id)
     contributors_signup_topic = SignUpTopic.find(contributors_topic.topic_id) if !contributors_topic.nil?
     end
 
@@ -1134,7 +1134,7 @@ require 'analytic/assignment_analytic'
       #Team.find_by_sql("select * from teams where parent_id = "+id+" AND advertise_for_partner='1'").size > 0
       return Team.find_by_sql("select t.* "+
           "from teams t, signed_up_users s "+
-          "where s.topic_id='"+id.to_s+"' and s.creator_id = t.id and t.advertise_for_partner = 1").size > 0
+          "where s.topic_id='"+id.to_s+"' and s.team_id = t.id and t.advertise_for_partner = 1").size > 0
     end
 
   def review_progress_pie_chart

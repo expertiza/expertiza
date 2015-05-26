@@ -124,7 +124,7 @@ class StudentTeamsController < ApplicationController
         #if assignment has signup sheet then the topic selected by the team has to go back to the pool
         #or to the first team in the waitlist
 
-        sign_ups = SignedUpUser.where creator_id: params[:team_id]
+        sign_ups = SignedUpUser.where team_id: params[:team_id]
         sign_ups.each {|sign_up|
           #get the topic_id
           sign_up_topic_id = sign_up.topic_id
@@ -145,7 +145,7 @@ class StudentTeamsController < ApplicationController
               first_waitlisted_user.is_waitlisted = false
               first_waitlisted_user.save
 
-              waitlisted_team_user = TeamsUser.find_by team_id: first_waitlisted_user.creator_id #<this relationship is weird
+              waitlisted_team_user = TeamsUser.find_by team_id: first_waitlisted_user.team_id #<this relationship is weird
               #waitlisted_team_user could be nil since the team the student left could have been the one waitlisted on the topic
               #and teams_users for the team has been deleted in one of the earlier lines of code
 

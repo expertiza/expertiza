@@ -48,9 +48,9 @@ class SignUpTopic < ActiveRecord::Base
     SignUpTopic.find_by_sql(["SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_users u ON t.id = u.topic_id WHERE t.assignment_id = ? and u.is_waitlisted = true GROUP BY t.id", assignment_id])
   end
 
-  def self.find_waitlisted_topics(assignment_id,creator_id)
-    #SignedUpUser.find_by_sql("SELECT u.id FROM sign_up_topics t, signed_up_users u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = " + assignment_id.to_s + " and u.creator_id = " + creator_id.to_s)
-    SignedUpUser.find_by_sql(["SELECT u.id FROM sign_up_topics t, signed_up_users u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = ? and u.creator_id = ?", assignment_id.to_s, creator_id.to_s])
+  def self.find_waitlisted_topics(assignment_id,team_id)
+    #SignedUpUser.find_by_sql("SELECT u.id FROM sign_up_topics t, signed_up_users u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = " + assignment_id.to_s + " and u.team_id = " + team_id.to_s)
+    SignedUpUser.find_by_sql(["SELECT u.id FROM sign_up_topics t, signed_up_users u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = ? and u.team_id = ?", assignment_id.to_s, team_id.to_s])
   end
 
   def self.slotAvailable?(topic_id)
@@ -83,7 +83,7 @@ class SignUpTopic < ActiveRecord::Base
       # to treat all assignments as team assignments
       #users_team will contain the team id of the team to which the user belongs
       users_team = SignedUpUser.find_team_users(assignment_id, session_user_id)
-      signup_record = SignedUpUser.where(topic_id: topic_id, creator_id:  users_team[0].t_id).first
+      signup_record = SignedUpUser.where(topic_id: topic_id, team_id:  users_team[0].t_id).first
       assignment = Assignment.find(assignment_id)
       #if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
       if(!assignment.is_intelligent?)
@@ -101,12 +101,12 @@ class SignUpTopic < ActiveRecord::Base
             #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
             # to treat all assignments as team assignments
 
-            user_id = TeamsUser.where([ :team_id => first_waitlisted_user.creator_id ]).first.user_id
+            user_id = TeamsUser.where([ :team_id => first_waitlisted_user.team_id ]).first.user_id
             participant = Participant.where(user_id: user_id, parent_id: assignment.id).first
 
             participant.update_topic_id(topic_id)
 
-            Waitlist.cancel_all_waitlists(first_waitlisted_user.creator_id, assignment_id)
+            Waitlist.cancel_all_waitlists(first_waitlisted_user.team_id, assignment_id)
             end
         end
       end
@@ -130,7 +130,7 @@ class SignUpTopic < ActiveRecord::Base
 
         #update participants
         assignment = Assignment.find(self.assignment_id)
-        user_id = TeamsUser.where({:team_id => next_wait_listed_user.creator_id}).user_id.first
+        user_id = TeamsUser.where({:team_id => next_wait_listed_user.team_id}).user_id.first
         participant = Participant.where(user_id: user_id, parent_id: assignment.id).first
 
         participant.update_topic_id(self.id)

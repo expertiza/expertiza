@@ -62,7 +62,7 @@ class LotteryController < ApplicationController
     end
 
     finalTeamTopics.keys.each do |team_id|
-      SignedUpUser.create(:creator_id=>team_id,:topic_id => finalTeamTopics[team_id][0].id) #Create mappings for all winners
+      SignedUpUser.create(:team_id=>team_id,:topic_id => finalTeamTopics[team_id][0].id) #Create mappings for all winners
       unassignedTeams.delete(team_id)
     end
 
@@ -85,8 +85,8 @@ class LotteryController < ApplicationController
     unassignedTeams.each do |team|
       sortedBids = Bid.where(:team_id => team.id).sort_by {|p| p.priority } #Get priority for each unassignmed team
       sortedBids.each do |b|
-        #SignedUpUser.where(:topic=>b.topic_id).first.creator_id
-        winningTeam = SignedUpUser.where(:topic=>b.topic_id).first.creator_id
+        #SignedUpUser.where(:topic=>b.topic_id).first.team_id
+        winningTeam = SignedUpUser.where(:topic=>b.topic_id).first.team_id
         if(TeamsUser.where(:team_id=>winningTeam).size + team.users.size <=assignment.max_team_size) #If the team can be merged to a bigger team
           TeamsUser.where(:team_id=>team.id).update_all(:team_id=>winningTeam)
           Bid.delete_all(:team_id=>team.id)

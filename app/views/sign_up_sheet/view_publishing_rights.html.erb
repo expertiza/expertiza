@@ -33,8 +33,7 @@
              # removed code that handles team and individual assignments differently
              # An unknown bug causes teams to disappear. Don't crash if this happens
 
-             # Does creator_id refer to team_id? Need Confirmation
-             team = Team.find(signed_up_user.creator_id)
+             team = Team.find(signed_up_user.team_id)
              users = []
              users = team.users if team
 

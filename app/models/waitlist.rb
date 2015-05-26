@@ -1,7 +1,7 @@
 class Waitlist < ActiveRecord::Base
 
-  def self.cancel_all_waitlists(creator_id, assignment_id)
-    waitlisted_topics = SignUpTopic.find_waitlisted_topics(assignment_id,creator_id)
+  def self.cancel_all_waitlists(team_id, assignment_id)
+    waitlisted_topics = SignUpTopic.find_waitlisted_topics(assignment_id,team_id)
     if !waitlisted_topics.nil?
       for waitlisted_topic in waitlisted_topics
         entry = SignedUpUser.find(waitlisted_topic.id)
@@ -12,13 +12,13 @@ class Waitlist < ActiveRecord::Base
   end
 
 
-  def waitlist_teams (param_id, user_id, creator_id, topic_id, assignment_id)
+  def waitlist_teams (param_id, user_id, team_id, topic_id, assignment_id)
     #check whether user has signed up already
-    user_signup = other_confirmed_topic_for_user(assignment_id, creator_id)
+    user_signup = other_confirmed_topic_for_user(assignment_id, team_id)
 
     sign_up = SignedUpUser.new
     sign_up.topic_id = param_id
-    sign_up.creator_id = creator_id
+    sign_up.team_id = team_id
     result = false
     if user_signup.size == 0
 
@@ -59,7 +59,7 @@ class Waitlist < ActiveRecord::Base
             end
           else
             #if slot exist, then confirm the topic for the user and delete all the waitlist for this user
-            cancel_all_waitlists(creator_id, assignment_id)
+            cancel_all_waitlists(team_id, assignment_id)
             sign_up.is_waitlisted = false
             sign_up.save
             participant = Participant.where(user_id:  user_id , parent_id:  assignment_id).first

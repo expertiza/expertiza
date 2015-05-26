@@ -263,7 +263,6 @@ class SignUpSheetController < ApplicationController
     #find the assignment to which user is signing up
     @assignment = Assignment.find(params[:assignment_id])
     @user_id = session[:user].id
-    #check whether team assignment. This is to decide whether a team_id or user_id should be the creator_id
     #Always use team_id ACS
     #s = Signupsheet.new
     #check whether the user already has a team for this assignment
@@ -284,13 +283,13 @@ class SignUpSheetController < ApplicationController
     end
   end
 
-  def confirmTopic(creator_id, topic_id, assignment_id)
+  def confirmTopic(team_id, topic_id, assignment_id)
     #check whether user has signed up already
-    user_signup = otherConfirmedTopicforUser(assignment_id, creator_id)
+    user_signup = otherConfirmedTopicforUser(assignment_id, team_id)
 
     sign_up = SignedUpUser.new
     sign_up.topic_id = params[:id]
-    sign_up.creator_id = creator_id
+    sign_up.team_id = team_id
     result = false
     if user_signup.size == 0
 
@@ -330,7 +329,7 @@ class SignUpSheetController < ApplicationController
           end
         else
           #if slot exist, then confirm the topic for the user and delete all the waitlist for this user
-          Waitlist.cancel_all_waitlists(creator_id, assignment_id)
+          Waitlist.cancel_all_waitlists(team_id, assignment_id)
           sign_up.is_waitlisted = false
           sign_up.save
           participant = Participant.where(user_id: session[:user].id, parent_id: assignment_id).first
@@ -343,8 +342,8 @@ class SignUpSheetController < ApplicationController
     result
   end
 
-  def otherConfirmedTopicforUser(assignment_id, creator_id)
-    user_signup = SignedUpUser.find_user_signup_topics(assignment_id, creator_id)
+  def otherConfirmedTopicforUser(assignment_id, team_id)
+    user_signup = SignedUpUser.find_user_signup_topics(assignment_id, team_id)
     user_signup
   end
 
@@ -358,23 +357,23 @@ class SignUpSheetController < ApplicationController
     SignUpTopic.slotAvailable?(topic_id)
   end
 
-  def self.other_confirmed_topic_for_user(assignment_id, creator_id)
+  def self.other_confirmed_topic_for_user(assignment_id, team_id)
 
-    user_signup = SignedUpUser.find_user_signup_topics(assignment_id, creator_id)
+    user_signup = SignedUpUser.find_user_signup_topics(assignment_id, team_id)
     user_signup
   end
 
-  def confirm_topic(creator_id, topic_id, assignment_id)
+  def confirm_topic(team_id, topic_id, assignment_id)
     #@param_id = params[:id]
     @user_id = session[:user].id
-    #Waitlist.waitlist_teams(@param_id, @user_id, creator_id, topic_id, assignment_id)
+    #Waitlist.waitlist_teams(@param_id, @user_id, team_id, topic_id, assignment_id)
 
     #check whether user has signed up already
-    user_signup = SignUpSheetController.other_confirmed_topic_for_user(assignment_id, creator_id)
+    user_signup = SignUpSheetController.other_confirmed_topic_for_user(assignment_id, team_id)
 
     sign_up = SignedUpUser.new
     sign_up.topic_id = topic_id
-    sign_up.creator_id = creator_id
+    sign_up.team_id = team_id
     result = false
     if user_signup.size == 0
 
@@ -423,7 +422,7 @@ class SignUpSheetController < ApplicationController
        end
      else
        #if slot exist, then confirm the topic for the user and delete all the waitlist for this user
-       cancel_all_waitlists(creator_id, assignment_id)
+       cancel_all_waitlists(team_id, assignment_id)
        sign_up.is_waitlisted = false
        sign_up.save
        participant = Participant.where(user_id:  @user_id , parent_id:  assignment_id).first
@@ -440,9 +439,9 @@ class SignUpSheetController < ApplicationController
   def set_priority
     @user_id = session[:user].id
     users_team = SignedUpUser.find_team_users(params[:assignment_id].to_s, @user_id)
-    check = SignedUpUser.find_by_sql(["SELECT su.* FROM signed_up_users su , sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.creator_id = ? AND su.preference_priority_number = ?", params[:assignment_id].to_s, users_team[0].t_id, params[:priority].to_s])
+    check = SignedUpUser.find_by_sql(["SELECT su.* FROM signed_up_users su , sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.team_id = ? AND su.preference_priority_number = ?", params[:assignment_id].to_s, users_team[0].t_id, params[:priority].to_s])
     if check.size == 0
-      signUp = SignedUpUser.where(topic_id: params[:id], creator_id: users_team[0].t_id).first
+      signUp = SignedUpUser.where(topic_id: params[:id], team_id: users_team[0].t_id).first
       #signUp.preference_priority_number = params[:priority].to_s
       if params[:priority].to_s.to_f > 0
         signUp.update_attribute('preference_priority_number', params[:priority].to_s)
@@ -587,7 +586,7 @@ class SignUpSheetController < ApplicationController
         # clicks to see ads related to a topic
   def ad_info(assignment_id, topic_id)
     query = "select t.id as team_id,t.comments_for_advertisement,t.name,su.assignment_id, t.advertise_for_partner from teams t, signed_up_users s,sign_up_topics su "+
-        "where s.topic_id='"+topic_id.to_s+"' and s.creator_id=t.id and s.topic_id = su.id;    "
+        "where s.topic_id='"+topic_id.to_s+"' and s.team_id=t.id and s.topic_id = su.id;    "
     SignUpTopic.find_by_sql(query)
   end
 

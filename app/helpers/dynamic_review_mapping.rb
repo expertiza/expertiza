@@ -417,7 +417,7 @@ module DynamicReviewMapping
 
       number_of_reviews = num_reviews.to_i
 
-      contributors = SignUpTopic.find_by_sql("SELECT creator_id
+      contributors = SignUpTopic.find_by_sql("SELECT team_id
                                              FROM sign_up_topics as t,signed_up_users as u
                                              WHERE t.assignment_id =" + @assignment.id.to_s + " and u.topic_id = t.id")
 
@@ -426,7 +426,7 @@ module DynamicReviewMapping
       reviews_per_team = 0
       #convert to just an array of contributors(team_ids). Topics which needs review.
       unless contributors.nil?
-        contributors.collect! {|contributor| contributor['creator_id'].to_i}
+        contributors.collect! {|contributor| contributor['team_id'].to_i}
       else
         #TODO: Give up, no work to review ..
       end

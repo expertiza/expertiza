@@ -18,7 +18,15 @@
       <% end %>
     <% end %>
     <br>
-    Your answer is: <b><%= p Score.where(response_id: @response.id, question_id:  question.id).first.comments  %></b><br><br>
+
+    <%user_answer=Score.where(response_id: @response.id, question_id:  question.id).first%>
+    Your answer is: <b><%= user_answer.comments  %></b>
+    <%if user_answer.score==1%>
+      <img src="/assets/Check-icon.png"/>
+    <%else%>
+      <img src="/assets/delete_icon.png"/>
+    <%end%>
+    <br><br>
 
   <% elsif question_type.q_type.eql? 'MCC' %>
     <%= p 'Correct answer is: '%>
@@ -47,7 +55,14 @@
 
   <% elsif(question_type.q_type == 'TF') %>
     Correct Answer is: <b><%=QuizQuestionChoice.where(question_id: question.id,iscorrect: 1).first.txt%></b><br/>
-    Your answer is: <b><%= p Score.where(response_id: @response.id, question_id:  question.id).first.comments %></b><br><br>
+    <%user_answer=Score.where(response_id: @response.id, question_id:  question.id).first%>
+    Your answer is: <b><%= user_answer.comments %></b>
+    <%if user_answer.score==1%>
+      <img src="/assets/Check-icon.png"/>
+    <%else%>
+      <img src="/assets/delete_icon.png"/>
+    <%end%>
+    <br><br>
   <% end %><hr>
   <% i += 1 %>
 <% end %>

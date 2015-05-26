@@ -22,6 +22,7 @@ class TeamsController < ApplicationController
     redirect_to :action => 'list', :id => parent.id
   end
 
+  #This function is used to create teams with random names.
   def create_teams
     parent = Object.const_get(session[:team_type]).find(params[:id])
     Team.randomize_all_by_parent(parent, session[:team_type], params[:team][:size].to_i)

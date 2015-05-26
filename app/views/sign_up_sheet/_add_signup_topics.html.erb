@@ -15,7 +15,7 @@
 <% @sign_up_topics = SignUpTopic.where(['assignment_id = ?', @assignment.id]) %>
 <% @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)  %>
 <% @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id) %>
-<% @participants = SignedUpUser.find_team_participants(@assignment.id)  %>
+<% @participants = SignedUpTeam.find_team_participants(@assignment.id)  %>
 
 <a id="teamsAndMembers" onclick="showHideTeamAndMembers()">Hide all teams</a>
 <% if @sign_up_topics.size != 0 %>

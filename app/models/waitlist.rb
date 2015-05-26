@@ -4,7 +4,7 @@ class Waitlist < ActiveRecord::Base
     waitlisted_topics = SignUpTopic.find_waitlisted_topics(assignment_id,team_id)
     if !waitlisted_topics.nil?
       for waitlisted_topic in waitlisted_topics
-        entry = SignedUpUser.find(waitlisted_topic.id)
+        entry = SignedUpTeam.find(waitlisted_topic.id)
         entry.destroy
       end
     end
@@ -16,7 +16,7 @@ class Waitlist < ActiveRecord::Base
     #check whether user has signed up already
     user_signup = other_confirmed_topic_for_user(assignment_id, team_id)
 
-    sign_up = SignedUpUser.new
+    sign_up = SignedUpTeam.new
     sign_up.topic_id = param_id
     sign_up.team_id = team_id
     result = false

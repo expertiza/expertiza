@@ -37,7 +37,7 @@
     %>
 
   <%if !@contributor.nil?
-      topics = SignedUpUser.find_user_signup_topics(assignment.id, @contributor)
+      topics = SignedUpTeam.find_user_signup_topics(assignment.id, @contributor)
 
       if !topics.nil?
         @topics = ""

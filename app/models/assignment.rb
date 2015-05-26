@@ -1025,7 +1025,7 @@ require 'analytic/assignment_analytic'
 
     # If this is an assignment with quiz required
     if (self.require_quiz?)
-      signups = SignedUpUser.where(team_id: contributor.id)
+      signups = SignedUpTeam.where(team_id: contributor.id)
       for signup in signups do
         signuptopic = SignUpTopic.find(signup.topic_id)
         if (signuptopic.assignment_id == self.id)
@@ -1037,8 +1037,8 @@ require 'analytic/assignment_analytic'
 
     # Look for the topic_id where the team_id equals the contributor id (contributor is a team or a participant)
     (!Team.where(name: contributor.name, id:  contributor.id).first.nil?) ?
-      contributors_topic = SignedUpUser.find_by_team_id(contributor.id) :
-      contributors_topic = SignedUpUser.find_by_team_id(contributor.user_id)
+      contributors_topic = SignedUpTeam.find_by_team_id(contributor.id) :
+      contributors_topic = SignedUpTeam.find_by_team_id(contributor.user_id)
     contributors_signup_topic = SignUpTopic.find(contributors_topic.topic_id) if !contributors_topic.nil?
     end
 
@@ -1131,7 +1131,7 @@ require 'analytic/assignment_analytic'
     def has_partner_ads?(id)
       #Team.find_by_sql("select * from teams where parent_id = "+id+" AND advertise_for_partner='1'").size > 0
       return Team.find_by_sql("select t.* "+
-          "from teams t, signed_up_users s "+
+          "from teams t, signed_up_teams s "+
           "where s.topic_id='"+id.to_s+"' and s.team_id = t.id and t.advertise_for_partner = 1").size > 0
     end
 

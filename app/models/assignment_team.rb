@@ -80,7 +80,7 @@ class AssignmentTeam < Team
 
   def delete
     if read_attribute(:type) == 'AssignmentTeam'
-      sign_up = SignedUpUser.find_team_participants(parent_id.to_s).select{|p| p.team_id == self.id}
+      sign_up = SignedUpTeam.find_team_participants(parent_id.to_s).select{|p| p.team_id == self.id}
       sign_up.each(&:destroy)
     end
     super

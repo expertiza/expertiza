@@ -71,7 +71,7 @@ class ScheduledTask
     assignment = Assignment.find(self.assignment_id)
     sign_up_topics = SignUpTopic.where( ['assignment_id = ?', self.assignment_id])
 
-    # If there are sign_up topics for an assignement then send a mail toonly signed_up_users else send a mail to all participants
+    # If there are sign_up topics for an assignement then send a mail toonly signed_up_teams else send a mail to all participants
     if(sign_up_topics == nil || sign_up_topics.count == 0)
       unless assignment.team_assignment?
         mail_assignment_participants
@@ -84,15 +84,15 @@ class ScheduledTask
       end
     else
       for topic in sign_up_topics
-        signedUpUsers = SignedUpUser.where( ['topic_id = ?', topic.id])
+        signedUpTeams = SignedUpTeam.where( ['topic_id = ?', topic.id])
         unless assignment.team_assignment?
-          for signedUser in signedUpUsers
+          for signedUser in signedUpTeams
             uid  = signedUser.team_id
             user = User.find(uid)
             emails << user.email
           end
         else
-          for signedUser in signedUpUsers
+          for signedUser in signedUpTeams
             teamid  = signedUser.team_id
             team_members = TeamsUser.where(team_id: teamid)
             for team_member in team_members
@@ -222,7 +222,7 @@ class ScheduledTask
     teams = TeamsUser.all.group(:team_id).count(:team_id)
     for team_id in teams.keys
       if teams[team_id] == 1
-        topic_to_drop = SignedUpUser.where(team_id: team_id).first
+        topic_to_drop = SignedUpTeam.where(team_id: team_id).first
         if topic_to_drop#check if the one-person-team has signed up a topic
           topic_to_drop.delete
         end

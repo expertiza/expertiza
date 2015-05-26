@@ -714,9 +714,7 @@ require 'analytic/assignment_analytic'
   end
 
   def get_current_stage(topic_id=nil)
-    return 'Unknown' if topic_id.nil? 
-    if self.staggered_deadline? 
-    end
+    return 'Unknown' if topic_id.nil? and self.staggered_deadline?
     due_date = find_current_stage(topic_id)
     (due_date == nil || due_date == COMPLETE) ? COMPLETE : DeadlineType.find(due_date.deadline_type_id).name
   end

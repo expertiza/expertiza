@@ -418,7 +418,7 @@ module DynamicReviewMapping
       number_of_reviews = num_reviews.to_i
 
       contributors = SignUpTopic.find_by_sql("SELECT team_id
-                                             FROM sign_up_topics as t,signed_up_users as u
+                                             FROM sign_up_topics as t,signed_up_teams as u
                                              WHERE t.assignment_id =" + @assignment.id.to_s + " and u.topic_id = t.id")
 
       users = Array.new

@@ -57,7 +57,7 @@ class SignUpSheetController < ApplicationController
       #topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
       #there are choosers already and if there is an attempt to decrease the max choosers, as of now I am not allowing
       #it.
-      if SignedUpUser.find_by_topic_id(topic.id).nil? || topic.max_choosers == params[:topic][:max_choosers]
+      if SignedUpTeam.find_by_topic_id(topic.id).nil? || topic.max_choosers == params[:topic][:max_choosers]
         topic.max_choosers = params[:topic][:max_choosers]
       else
         if topic.max_choosers.to_i < params[:topic][:max_choosers].to_i
@@ -133,7 +133,7 @@ class SignUpSheetController < ApplicationController
         #topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
         #there are choosers already and if there is an attempt to decrease the max choosers, as of now I am not allowing
         #it.
-        if SignedUpUser.find_by_topic_id(@topic.id).nil? || @topic.max_choosers == params[:topic][:max_choosers]
+        if SignedUpTeam.find_by_topic_id(@topic.id).nil? || @topic.max_choosers == params[:topic][:max_choosers]
           @topic.max_choosers = params[:topic][:max_choosers]
         else
           if @topic.max_choosers.to_i < params[:topic][:max_choosers].to_i
@@ -192,9 +192,9 @@ class SignUpSheetController < ApplicationController
         @assignment = Assignment.find(assignment_id)
         #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
         # to treat all assignments as team assignments
-        #Though called participants, @participants are actually records in signed_up_users table, which
+        #Though called participants, @participants are actually records in signed_up_teams table, which
         #is a mapping table between teams and topics (waitlisted recored are also counted)
-        @participants = SignedUpUser.find_team_participants(assignment_id)
+        @participants = SignedUpTeam.find_team_participants(assignment_id)
       end
 
       def set_values_for_new_topic
@@ -232,7 +232,7 @@ class SignUpSheetController < ApplicationController
       #Find whether the user has signed up for any topics; if so the user won't be able to
       #sign up again unless the former was a waitlisted topic
       #if team assignment, then team id needs to be passed as parameter else the user's id
-      users_team = SignedUpUser.find_team_users(@assignment_id, (session[:user].id))
+      users_team = SignedUpTeam.find_team_users(@assignment_id, (session[:user].id))
 
       if users_team.size == 0
         @selected_topics = nil
@@ -271,7 +271,7 @@ class SignUpSheetController < ApplicationController
   end
 
   def signup_team(assignment_id, user_id, topic_id)
-    users_team = SignedUpUser.find_team_users(assignment_id, user_id)
+    users_team = SignedUpTeam.find_team_users(assignment_id, user_id)
     if users_team.size == 0
       #if team is not yet created, create new team.
       team = AssignmentTeam.create_team_and_node(assignment_id)
@@ -287,7 +287,7 @@ class SignUpSheetController < ApplicationController
     #check whether user has signed up already
     user_signup = otherConfirmedTopicforUser(assignment_id, team_id)
 
-    sign_up = SignedUpUser.new
+    sign_up = SignedUpTeam.new
     sign_up.topic_id = params[:id]
     sign_up.team_id = team_id
     result = false
@@ -343,7 +343,7 @@ class SignUpSheetController < ApplicationController
   end
 
   def otherConfirmedTopicforUser(assignment_id, team_id)
-    user_signup = SignedUpUser.find_user_signup_topics(assignment_id, team_id)
+    user_signup = SignedUpTeam.find_user_signup_topics(assignment_id, team_id)
     user_signup
   end
 
@@ -359,7 +359,7 @@ class SignUpSheetController < ApplicationController
 
   def self.other_confirmed_topic_for_user(assignment_id, team_id)
 
-    user_signup = SignedUpUser.find_user_signup_topics(assignment_id, team_id)
+    user_signup = SignedUpTeam.find_user_signup_topics(assignment_id, team_id)
     user_signup
   end
 
@@ -371,7 +371,7 @@ class SignUpSheetController < ApplicationController
     #check whether user has signed up already
     user_signup = SignUpSheetController.other_confirmed_topic_for_user(assignment_id, team_id)
 
-    sign_up = SignedUpUser.new
+    sign_up = SignedUpTeam.new
     sign_up.topic_id = topic_id
     sign_up.team_id = team_id
     result = false
@@ -438,10 +438,10 @@ class SignUpSheetController < ApplicationController
 
   def set_priority
     @user_id = session[:user].id
-    users_team = SignedUpUser.find_team_users(params[:assignment_id].to_s, @user_id)
-    check = SignedUpUser.find_by_sql(["SELECT su.* FROM signed_up_users su , sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.team_id = ? AND su.preference_priority_number = ?", params[:assignment_id].to_s, users_team[0].t_id, params[:priority].to_s])
+    users_team = SignedUpTeam.find_team_users(params[:assignment_id].to_s, @user_id)
+    check = SignedUpTeam.find_by_sql(["SELECT su.* FROM signed_up_teams su , sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.team_id = ? AND su.preference_priority_number = ?", params[:assignment_id].to_s, users_team[0].t_id, params[:priority].to_s])
     if check.size == 0
-      signUp = SignedUpUser.where(topic_id: params[:id], team_id: users_team[0].t_id).first
+      signUp = SignedUpTeam.where(topic_id: params[:id], team_id: users_team[0].t_id).first
       #signUp.preference_priority_number = params[:priority].to_s
       if params[:priority].to_s.to_f > 0
         signUp.update_attribute('preference_priority_number', params[:priority].to_s)
@@ -585,7 +585,7 @@ class SignUpSheetController < ApplicationController
         # get info related to the ad for partners so that it can be displayed when an assignment_participant
         # clicks to see ads related to a topic
   def ad_info(assignment_id, topic_id)
-    query = "select t.id as team_id,t.comments_for_advertisement,t.name,su.assignment_id, t.advertise_for_partner from teams t, signed_up_users s,sign_up_topics su "+
+    query = "select t.id as team_id,t.comments_for_advertisement,t.name,su.assignment_id, t.advertise_for_partner from teams t, signed_up_teams s,sign_up_topics su "+
         "where s.topic_id='"+topic_id.to_s+"' and s.team_id=t.id and s.topic_id = su.id;    "
     SignUpTopic.find_by_sql(query)
   end

@@ -3,7 +3,7 @@ class Invitation < ActiveRecord::Base
   belongs_to :from_user, :class_name => "User", :foreign_key => "from_id"
 
   def self.remove_waitlists_for_team(topic_id, assignment_id)
-    first_waitlisted_signup = SignedUpUser.where(topic_id: topic_id, is_waitlisted:  true).first
+    first_waitlisted_signup = SignedUpTeam.where(topic_id: topic_id, is_waitlisted:  true).first
 
     #As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
     first_waitlisted_signup.is_waitlisted = false
@@ -47,7 +47,7 @@ class Invitation < ActiveRecord::Base
     if TeamsUser.is_team_empty(team_id) and team_id != '0'
       assignment_id = AssignmentTeam.find(team_id).assignment.id
       #Release topics for the team has selected by the invited users empty team
-      SignedUpUser.release_topics_selected_by_team_for_assignment(team_id, assignment_id)
+      SignedUpTeam.release_topics_selected_by_team_for_assignment(team_id, assignment_id)
 
       AssignmentTeam.remove_team_by_id(team_id)
     end

@@ -1,5 +1,5 @@
 class SignUpTopic < ActiveRecord::Base
-  has_many :signed_up_users, :foreign_key => 'topic_id', :dependent => :destroy
+  has_many :signed_up_teams, :foreign_key => 'topic_id', :dependent => :destroy
   has_many :topic_dependencies, :foreign_key => 'topic_id', :dependent => :destroy
   has_many :topic_deadlines, :foreign_key => 'topic_id', :dependent => :destroy
   alias_method :deadlines, :topic_deadlines
@@ -39,23 +39,23 @@ class SignUpTopic < ActiveRecord::Base
   end
 
   def self.find_slots_filled(assignment_id)
-    #SignUpTopic.find_by_sql("SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_users u ON t.id = u.topic_id WHERE t.assignment_id =" + assignment_id+  " and u.is_waitlisted = false GROUP BY t.id")
-    SignUpTopic.find_by_sql(["SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_users u ON t.id = u.topic_id WHERE t.assignment_id = ? and u.is_waitlisted = false GROUP BY t.id", assignment_id])
+    #SignUpTopic.find_by_sql("SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id =" + assignment_id+  " and u.is_waitlisted = false GROUP BY t.id")
+    SignUpTopic.find_by_sql(["SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id = ? and u.is_waitlisted = false GROUP BY t.id", assignment_id])
   end
 
   def self.find_slots_waitlisted(assignment_id)
-    #SignUpTopic.find_by_sql("SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_users u ON t.id = u.topic_id WHERE t.assignment_id =" + assignment_id +  " and u.is_waitlisted = true GROUP BY t.id")
-    SignUpTopic.find_by_sql(["SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_users u ON t.id = u.topic_id WHERE t.assignment_id = ? and u.is_waitlisted = true GROUP BY t.id", assignment_id])
+    #SignUpTopic.find_by_sql("SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id =" + assignment_id +  " and u.is_waitlisted = true GROUP BY t.id")
+    SignUpTopic.find_by_sql(["SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id = ? and u.is_waitlisted = true GROUP BY t.id", assignment_id])
   end
 
   def self.find_waitlisted_topics(assignment_id,team_id)
-    #SignedUpUser.find_by_sql("SELECT u.id FROM sign_up_topics t, signed_up_users u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = " + assignment_id.to_s + " and u.team_id = " + team_id.to_s)
-    SignedUpUser.find_by_sql(["SELECT u.id FROM sign_up_topics t, signed_up_users u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = ? and u.team_id = ?", assignment_id.to_s, team_id.to_s])
+    #SignedUpTeam.find_by_sql("SELECT u.id FROM sign_up_topics t, signed_up_teams u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = " + assignment_id.to_s + " and u.team_id = " + team_id.to_s)
+    SignedUpTeam.find_by_sql(["SELECT u.id FROM sign_up_topics t, signed_up_teams u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = ? and u.team_id = ?", assignment_id.to_s, team_id.to_s])
   end
 
   def self.slotAvailable?(topic_id)
     topic = SignUpTopic.find(topic_id)
-    no_of_students_who_selected_the_topic = SignedUpUser.where(topic_id: topic_id, is_waitlisted: false)
+    no_of_students_who_selected_the_topic = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: false)
 
     if !no_of_students_who_selected_the_topic.nil?
       if topic.max_choosers > no_of_students_who_selected_the_topic.size
@@ -82,14 +82,14 @@ class SignUpTopic < ActiveRecord::Base
       #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
       #users_team will contain the team id of the team to which the user belongs
-      users_team = SignedUpUser.find_team_users(assignment_id, session_user_id)
-      signup_record = SignedUpUser.where(topic_id: topic_id, team_id:  users_team[0].t_id).first
+      users_team = SignedUpTeam.find_team_users(assignment_id, session_user_id)
+      signup_record = SignedUpTeam.where(topic_id: topic_id, team_id:  users_team[0].t_id).first
       assignment = Assignment.find(assignment_id)
       #if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
       if(!assignment.is_intelligent?)
         if signup_record.is_waitlisted == false
           #find the first wait listed user if exists
-          first_waitlisted_user = SignedUpUser.where(topic_id: topic_id, is_waitlisted:  true).first
+          first_waitlisted_user = SignedUpTeam.where(topic_id: topic_id, is_waitlisted:  true).first
 
           if !first_waitlisted_user.nil?
             # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
@@ -123,7 +123,7 @@ class SignUpTopic < ActiveRecord::Base
     num_of_users_promotable = max_choosers.to_i - self.max_choosers.to_i
 
     num_of_users_promotable.times {
-      next_wait_listed_user = SignedUpUser.where({:topic_id => self.id, :is_waitlisted => true}).first
+      next_wait_listed_user = SignedUpTeam.where({:topic_id => self.id, :is_waitlisted => true}).first
       if !next_wait_listed_user.nil?
         next_wait_listed_user.is_waitlisted = false
         next_wait_listed_user.save

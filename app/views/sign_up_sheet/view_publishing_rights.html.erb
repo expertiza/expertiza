@@ -27,13 +27,13 @@
       </tr>
 
       <% if (@assignment.participants.size > 0)
-           for signed_up_user in topic.signed_up_users
-             # logger.warn "user: #{signed_up_user}"
+           for signed_up_team in topic.signed_up_teams
+             # logger.warn "user: #{signed_up_team}"
              #ACS Find the user(s) signed up for a topic
              # removed code that handles team and individual assignments differently
              # An unknown bug causes teams to disappear. Don't crash if this happens
 
-             team = Team.find(signed_up_user.team_id)
+             team = Team.find(signed_up_team.team_id)
              users = []
              users = team.users if team
 

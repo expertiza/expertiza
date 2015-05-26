@@ -572,14 +572,14 @@ ActiveRecord::Schema.define(version: 201150105163040) do
   add_index "sign_up_topics", ["assignment_id"], name: "fk_sign_up_categories_sign_up_topics", using: :btree
   add_index "sign_up_topics", ["assignment_id"], name: "index_sign_up_topics_on_assignment_id", using: :btree
 
-  create_table "signed_up_users", force: :cascade do |t|
+  create_table "signed_up_teams", force: :cascade do |t|
     t.integer "topic_id",                   limit: 4, default: 0,     null: false
     t.integer "team_id",                    limit: 4, default: 0,     null: false
     t.boolean "is_waitlisted",              limit: 1, default: false, null: false
     t.integer "preference_priority_number", limit: 4
   end
 
-  add_index "signed_up_users", ["topic_id"], name: "fk_signed_up_users_sign_up_topics", using: :btree
+  add_index "signed_up_teams", ["topic_id"], name: "fk_signed_up_users_sign_up_topics", using: :btree
 
   create_table "site_controllers", force: :cascade do |t|
     t.string  "name",          limit: 255, default: "", null: false
@@ -824,7 +824,7 @@ ActiveRecord::Schema.define(version: 201150105163040) do
   add_foreign_key "scores", "questions", name: "fk_score_questions"
   add_foreign_key "scores", "responses", name: "fk_score_response"
   add_foreign_key "sign_up_topics", "assignments", name: "fk_sign_up_topics_assignments"
-  add_foreign_key "signed_up_users", "sign_up_topics", column: "topic_id", name: "fk_signed_up_users_sign_up_topics"
+  add_foreign_key "signed_up_teams", "sign_up_topics", column: "topic_id", name: "fk_signed_up_users_sign_up_topics"
   add_foreign_key "ta_mappings", "courses", name: "fk_ta_mappings_course_id"
   add_foreign_key "ta_mappings", "users", column: "ta_id", name: "fk_ta_mappings_ta_id"
   add_foreign_key "team_role_questionnaire", "questionnaires", name: "fk_questionnaire_id"

@@ -455,7 +455,14 @@ Expertiza::Application.routes.draw do
   resources :teams do
     collection do
       get :list
-      post ':id', action: :update
+      #post ':id', action: :create_teams
+      post :create_teams
+    end
+  end
+
+  resources :teams_users do
+    collection do
+      post :create
     end
   end
 

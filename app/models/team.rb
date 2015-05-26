@@ -140,7 +140,7 @@ class Team < ActiveRecord::Base
         break if nextTeamMemberIndex >= users.length
 
         user = users[nextTeamMemberIndex]
-        team.add_member(user)
+        team.add_member(user, parent.id)
 
         nextTeamMemberIndex += 1
       end

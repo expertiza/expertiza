@@ -24,18 +24,21 @@ class Assessment360Controller < ApplicationController
     end
 
     def one_course_all_assignments
-        #@REVIEW_TYPES = ["ParticipantReviewResponseMap", "FeedbackResponseMap", "TeammateReviewResponseMap", "MetareviewResponseMap"]
-        @REVIEW_TYPES = ["TeammateReviewResponseMap"]
+        @REVIEW_TYPES = ["ParticipantReviewResponseMap", "FeedbackResponseMap", "TeammateReviewResponseMap", "MetareviewResponseMap"]
+        # @REVIEW_TYPES = ["TeammateReviewResponseMap"]
         @GRAPH_TYPES = ["PieChart", "BarChart", "Histogram"]
         @course = Course.find(params[:course_id])
         @assignments = Assignment.where(course_id: @course)
+        @listAssignments = []
         if !@assignments.nil?
             #Why Reject?
-            @assignments = @assignments.reject {|assignment| assignment.get_total_reviews_assigned_by_type(@REVIEW_TYPES.first) != 0 }
+            (0..@REVIEW_TYPES.length-1).each do |i|
+              @listAssignments[i] = @assignments.reject {|assignment| assignment.get_total_reviews_assigned_by_type(@REVIEW_TYPES[i]) != 0 }
 
-            @assignment_pie_charts = reviews_progress(@assignments, @GRAPH_TYPES.first)
-            @assignment_bar_charts = reviews_progress(@assignments, @GRAPH_TYPES.second)
-            @assignment_distribution  = reviews_progress(@assignments, @GRAPH_TYPES.last)
+              @assignment_pie_charts = reviews_progress(@listAssignments[i], @GRAPH_TYPES.first)
+              @assignment_bar_charts = reviews_progress(@listAssignments[i], @GRAPH_TYPES.second)
+              @assignment_distribution  = reviews_progress(@listAssignments[i], @GRAPH_TYPES.last)
+            end
         end
     end
 

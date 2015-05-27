@@ -1,5 +1,4 @@
 class PopupController < ApplicationController
-  layout 'standard'
 
   def action_allowed?
     true

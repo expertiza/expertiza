@@ -44,10 +44,12 @@ class SignedUpTeam < ActiveRecord::Base
     @participants
   end
 
-  def self.find_participants(assignment_id)
-    #SignedUpTeam.find_by_sql("SELECT t.id as topic_id,u.name as name, s.is_waitlisted as is_waitlisted FROM signed_up_teams s, users u, sign_up_topics t where s.team_id = u.id and s.topic_id = t.id and t.assignment_id = " + assignment_id)
-    SignedUpTeam.find_by_sql(["SELECT t.id as topic_id,u.name as name, s.is_waitlisted as is_waitlisted FROM signed_up_teams s, users u, sign_up_topics t where s.team_id = u.id and s.topic_id = t.id and t.assignment_id = ?", assignment_id])
-  end
+  #This method name does not make any sense, and it is implemented in the find_by_sql style instead of using Rails.
+  #This method returns a list of tpic id, user id and if the user is waitlisted, given a assignment_id. I comment out it for now, and will remove this method later.
+  # def self.find_participants(assignment_id)
+  #   #SignedUpTeam.find_by_sql("SELECT t.id as topic_id,u.name as name, s.is_waitlisted as is_waitlisted FROM signed_up_teams s, users u, sign_up_topics t where s.team_id = u.id and s.topic_id = t.id and t.assignment_id = " + assignment_id)
+  #   SignedUpTeam.find_by_sql(["SELECT t.id as topic_id,u.name as name, s.is_waitlisted as is_waitlisted FROM signed_up_teams s, users u, sign_up_topics t where s.team_id = u.id and s.topic_id = t.id and t.assignment_id = ?", assignment_id])
+  # end
 
   def self.find_team_users(assignment_id,user_id)
     #TeamsUser.find_by_sql("SELECT t.id as t_id FROM teams_users u, teams t WHERE u.team_id = t.id and t.parent_id =" + assignment_id.to_s + " and user_id =" + user_id.to_s)

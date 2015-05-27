@@ -19,7 +19,6 @@
 
     <table cellpadding="0" id="quiz_list">
       <% candidate_quizzes = StudentQuizzesController.take_quiz(assignment.id, session[:user].id) %>
-      <% #candidate_quizzes.sort! { |a, b| a.id <=> b.id } %>
 
       <% candidate_quizzes.each do |candidate| %>
         <tr>

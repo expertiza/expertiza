@@ -28,7 +28,6 @@
     <%= render :partial => 'review', :locals => {:versions => @responses_versions} %>
 <% end %>
 
-
 <%= form_tag :action => @next_action, :id => @modified_object do %>
     <% if @next_action.eql?'update' %>
         <input name="_method" type="hidden" value="put" />

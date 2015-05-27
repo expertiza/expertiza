@@ -978,7 +978,11 @@ require 'analytic/assignment_analytic'
     self.response_maps.each do |response_map|
       sum_of_scores = sum_of_scores + response_map.response.get_average_score if !response_map.response.nil?
     end
-    (sum_of_scores / get_total_reviews_completed).to_i
+    if get_total_reviews_completed != 0
+      (sum_of_scores / get_total_reviews_completed).to_i
+    else
+      return 0
+    end
   end
 
   def get_score_distribution
@@ -1158,14 +1162,21 @@ require 'analytic/assignment_analytic'
     bar_1_data = Array.new
     dates = Array.new
     date = self.created_at.to_datetime.to_date
+    logger.warn "created: #{date}"
+    reviews = self.find_due_dates('review') + self.find_due_dates('rereview')
+    due = reviews.last.due_at.to_datetime.to_date
+    logger.warn "due: #{due}"
 
-    while ((date <=> Date.today) <= 0)
+    while ((date <=> due) <= 0)
       if self.get_total_reviews_completed_by_date(date) != 0 then
+        logger.warn "hey: #{self.get_total_reviews_completed_by_date(date)}"
         bar_1_data.push(self.get_total_reviews_completed_by_date(date))
         dates.push(date.month.to_s + "-" + date.day.to_s)
+      else
+        logger.warn "here"
       end
 
-      date = (date.to_datetime.advance(:months => 1)).to_date
+      date = (date.to_datetime.advance(:days => 3)).to_date
     end
 
     color_1 = 'c53711'
@@ -1173,7 +1184,7 @@ require 'analytic/assignment_analytic'
     #max= assignment.get_total_reviews_assigned
     max = self.get_total_reviews_assigned
 
-    GoogleChart::BarChart.new("600x80", " ", :vertical, false) do |bc|
+    GoogleChart::BarChart.new("600x160", " ", :vertical, false) do |bc|
       bc.data "Review", bar_1_data, color_1
       bc.axis :y, :positions => [min, max], :range => [min,max]
       bc.axis :x, :labels => dates
@@ -1192,8 +1203,6 @@ require 'analytic/assignment_analytic'
     min = 0
     max = 100
 
-    p '======================='
-    p bar_2_data
     GoogleChart::BarChart.new("130x100", " ", :vertical, false) do |bc|
       bc.data "Review", bar_2_data, color_2
       bc.axis :y, :positions => [0, bar_2_data.max], :range => [0, bar_2_data.max]

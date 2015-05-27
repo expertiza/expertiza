@@ -2,7 +2,6 @@ module SurveyHelper
 
   def self.get_assigned_surveys(assignment_id)
     joiners = AssignmentQuestionnaire.where( ["assignment_id = ?", assignment_id])
-    Rails.logger.warn "joiners: #{joiners.inspect}"
     assigned_surveys = []
     for joiner in joiners
       survey = Questionnaire.find(joiner.questionnaire_id)

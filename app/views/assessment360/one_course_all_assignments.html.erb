@@ -1,5 +1,7 @@
 <div>
   <h1> <%= @course.name %> Dashboard </h1>
+  <% (0..@REVIEW_TYPES.length-1).each do |i| %>
+  <h2> <%= @REVIEW_TYPES[i][0..-12] %> </h2>
   <table class="listing" cellpadding=2 border="1" >
     <tr>
       <th>Assignment</th>
@@ -7,7 +9,7 @@
       <th>Review Progress</th>
       <th>Review Progress By Date</th>
     </tr>
-    <% @assignments.each do |assignment| %>
+    <% @listAssignments[i].each do |assignment| %>
       <tr class="listingRow" align="justify">
         <td align="justify">
           <%= link_to assignment.name, :action => 'one_assignment_all_students', :assignment_id => assignment.id%>
@@ -17,5 +19,8 @@
       <td> <img src="<%= @assignment_pie_charts[assignment] %>" > </td>
       <td> <img src="<%= @assignment_bar_charts[assignment] %>" > </td>
     </tr>
+    <% end %>
+  </table>
+  <br>
   <% end %>
-</table>
+</div>

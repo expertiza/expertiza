@@ -53,7 +53,8 @@
   <% @taskrevisions.each do |student_task|
     participant = student_task.participant
     stage = student_task.current_stage
-    duedate = participant.assignment.stage_deadline(participant.topic_id)
+    topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
+    duedate = participant.assignment.stage_deadline(topic_id)
     controller = ""
     action = ""
     if stage == "submission" or stage == "resubmission"
@@ -121,10 +122,11 @@
           <td><%= student_task.topic_name %></td>
 
           <td>
-          <% if participant.assignment.get_link_for_current_stage(participant.topic_id)!= nil && participant.assignment.get_link_for_current_stage(participant.topic_id).length!=0%>
-              <%= link_to participant.assignment.get_current_stage_name(participant.topic_id), participant.assignment.get_link_for_current_stage(participant.topic_id) %>
+          <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
+          <% if participant.assignment.get_link_for_current_stage(topic_id)!= nil && participant.assignment.get_link_for_current_stage(topic_id).length!=0%>
+              <%= link_to participant.assignment.get_current_stage_name(topic_id), participant.assignment.get_link_for_current_stage(topic_id) %>
               <% else %>
-              <%= participant.assignment.get_current_stage_name(participant.topic_id) %>
+              <%= participant.assignment.get_current_stage_name(topic_id) %>
               <% end %>
 
           </td>

@@ -86,7 +86,17 @@ module DynamicReviewAssignmentHelper
     if @topic_id.blank?
       submissions_in_current_cycle = AssignmentParticipant.where(parent_id: @assignment_id)
     else
-      submissions_in_current_cycle = AssignmentParticipant.where(topic_id: @topic_id, parent_id: @assignment_id)
+      #using topic_id to find participant.id(s).
+      teams = SignedUpTeam.where(topic_id: @topic_id)
+      teams.each do |team|
+        users = TeamsUser.where(team_id: team.id)
+        users.each do |user|
+          participant = Participant.where(user_id: user_id, parent_id: @assignment_id)
+          if participant
+            submissions_in_current_cycle << participant
+          end
+        end
+      end
     end
     submissions_in_current_cycle = submissions_in_current_cycle.reject { |submission| !submission.has_submissions? }
 

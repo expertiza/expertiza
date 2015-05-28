@@ -89,8 +89,13 @@ class AssignmentParticipant < Participant
   end
 
   def assign_quiz(contributor,reviewer,topic)
-    participant_id=AssignmentParticipant.where(topic_id: topic, parent_id:  contributor.parent_id).first.id
-
+    #using topic_id to find first participant.id.
+    teams = SignedUpTeam.where(topic_id: @topic_id)
+    teams.each do |team|
+      users = TeamsUser.where(team_id: team.id)
+      participant_id = Participant.where(user_id: users.first.id, parent_id: @assignment_id).id
+      break
+    end
     quiz = QuizQuestionnaire.find_by_instructor_id(contributor.id)
     QuizResponseMap.create(:reviewed_object_id => quiz.id,:reviewee_id => contributor.id, :reviewer_id => reviewer.id,
                            :type=>"QuizResponseMap", :notification_accepted => 0)
@@ -620,6 +625,7 @@ class AssignmentParticipant < Participant
     end
 
     def current_stage
+      topic_id = SignedUpTeam.topic_id(self.parent_id, self.user_id)
       assignment.try :get_current_stage, topic_id
     end
 

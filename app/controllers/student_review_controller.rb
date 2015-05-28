@@ -9,7 +9,8 @@ class StudentReviewController < ApplicationController
     return unless current_user_id?(@participant.user_id)
     @assignment  = @participant.assignment
     # Find the current phase that the assignment is in.
-    @review_phase = @assignment.get_current_stage(AssignmentParticipant.find(params[:id]).topic_id)
+    @topic_id = SignedUpTeam.topic_id(AssignmentParticipant.find(params[:id]).parent_id, AssignmentParticipant.find(params[:id]).user_id)
+    @review_phase = @assignment.get_current_stage(@topic_id)
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     @review_mappings = TeamReviewResponseMap.where(reviewer_id: @participant.id)
@@ -33,13 +34,13 @@ class StudentReviewController < ApplicationController
         #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
         # to treat all assignments as team assignments
         participant = AssignmentTeam.first_member(review_mapping.reviewee_id)
-
-        if !participant.nil? and !participant.topic_id.nil?
-          review_due_date = TopicDeadline.where(topic_id: participant.topic_id, deadline_type_id: 1).first
+        topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
+        if participant and topic_id
+          review_due_date = TopicDeadline.where(topic_id: topic_id, deadline_type_id: 1).first
           #The logic here is that if the user has at least one reviewee to review then @reviewee_topic_id should
           #not be nil. Enabling and disabling links to individual reviews are handled at the rhtml
           if review_due_date.due_at < Time.now
-            @reviewee_topic_id = participant.topic_id
+            @reviewee_topic_id = topic_id
           end
         end
       }
@@ -52,11 +53,12 @@ class StudentReviewController < ApplicationController
           #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
           # to treat all assignments as team assignments
           participant = AssignmentTeam.first_member(review_mapping.reviewee_id)
+          topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
           end
-        if participant && participant.topic_id
-          meta_review_due_date = TopicDeadline.where(topic_id: participant.topic_id, deadline_type_id:deadline_type_id, round:review_rounds).first
+        if participant and topic_id
+          meta_review_due_date = TopicDeadline.where(topic_id: topic_id, deadline_type_id:deadline_type_id, round:review_rounds).first
           if meta_review_due_date.due_at < Time.now
-            @meta_reviewee_topic_id = participant.topic_id
+            @meta_reviewee_topic_id = topic_id
           end
         end
       end

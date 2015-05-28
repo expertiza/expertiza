@@ -81,7 +81,8 @@ class GradesController < ApplicationController
     @topic = @participant.topic
     @pscore = @participant.scores(@questions)
     make_chart
-    @stage = @participant.assignment.get_current_stage(@participant.topic_id)
+    @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
+    @stage = @participant.assignment.get_current_stage(@topic_id)
     calculate_all_penalties(@assignment.id)
   end
 

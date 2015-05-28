@@ -103,11 +103,11 @@ class StudentTeamsController < ApplicationController
   end
 
   def remove_participant
-    #remove the topic_id from participants
-    student.update_topic_id nil
+    #remove the record from teams_users table
+    team_id = SignedUpTeam.team_id(student.parent_id, student.user_id)
+    TeamsUser.where(team_id: team_id, user_id:student.user_id).destroy_all
 
     #remove the entry from teams_users
-
     team_user = TeamsUser.find_by team_id: params[:team_id], user_id: student.user_id
 
     if team_user
@@ -152,14 +152,11 @@ class StudentTeamsController < ApplicationController
               if waitlisted_team_user
                 user_id = waitlisted_team_user.user_id
                 if user_id
-                  waitlisted_participant = Participant.find_by_user_id user_id
-                  waitlisted_participant.update_topic_id nil
-
+                  SignedUpTeam.update(sign_up.id, topic_id: nil)
                 end
               end
             end
           end
-
         }
       end
     end

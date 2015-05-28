@@ -1,6 +1,6 @@
 <%= render :partial => 'submitted_content/title' %> 
 
-<%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage =>  @assignment.get_current_stage(@participant.topic_id)} %>
+<%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage =>  @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))} %>
 
 <!-- TODO Need to add changes for Manager and Reader -->
 

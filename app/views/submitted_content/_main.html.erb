@@ -45,7 +45,8 @@
     <% if questionnaire = Questionnaire.where(["instructor_id = ?", t_id]).first %>
       <%= link_to 'View quiz', :controller => :questionnaires, :action => :view_quiz, :id => questionnaire.id, :pid => participant.id %>
       <br/><br/>
-      <% if @assignment.submission_allowed(participant.topic_id) %>
+      <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
+      <% if @assignment.submission_allowed(topic_id) %>
         <%= link_to 'Edit quiz', :controller => :questionnaires, :action => :edit_quiz, :id => questionnaire.id, :pid => participant.id %>
         <br/><br/>
       <% end %>

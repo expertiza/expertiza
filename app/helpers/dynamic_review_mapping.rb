@@ -481,7 +481,8 @@ module DynamicReviewMapping
                                            participant = Participant
                                              .joins( "INNER JOIN teams_users ON participants.user_id = teams_users.user_id")
                                              .where( "teams_users.team_id = #{contributor} AND participants.parent_id = #{@assignment.id}")
-                                           topic_team_id[contributor] = participant.first.topic_id
+                                           topic_id = SignedUpTeams.topic_id(participant.parent_id, participant.user_id)
+                                           topic_team_id[contributor] = topic_id
                                          }
 
 
@@ -510,7 +511,7 @@ module DynamicReviewMapping
 
                                            teams_to_assigned = Array.new
                                            #check whether it's the user's topic
-                                           users_topic_id = Participant.where(parent_id: @assignment.id, user_id:  user).first['topic_id']
+                                           users_topic_id = SignedUpTeams.topic_id(@assignment.id, user)
 
                                            if (topic.first.to_i == users_topic_id.to_i && number_of_reviews < topic[1]) || topic.first.to_i != users_topic_id.to_i
                                              #go thru team reviewers and find the team which worked on this topic
@@ -848,8 +849,8 @@ module DynamicReviewMapping
         #We would have just one member for an individual assignment.
         team_members = TeamsUser.where(team_id: map.reviewee_id)
         unless team_members.nil?
-          participant = Participant.where(parent_id: @assignment.id, user_id: team_members.first.user_id).first
-          topic_user_id[contributor] = participant.topic_id
+          topic_id = SignedUpTeams.topic_id(@assignment.id, team_members.first.user_id)
+          topic_user_id[contributor] = topic_id
         end
       }
 
@@ -877,7 +878,7 @@ module DynamicReviewMapping
 
         users_to_be_assigned = Array.new
         #check whether it's the user's topic
-        users_topic_id = Participant.where(parent_id: @assignment.id, user_id: user).first['topic_id']
+        users_topic_id = SignedUpTeams.topic_id(@assignment.id, user)
 
         #go thru reviewers and find the reviewers who worked on this topic
 

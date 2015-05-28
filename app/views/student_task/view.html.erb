@@ -37,7 +37,8 @@ to display the label "Your team" in the student assignment tasks-->
   <%end%>
   <% if @authorization == 'participant' or @can_submit == true %>
     <li>
-      <% if @assignment.submission_allowed(@participant.topic_id) %>
+      <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
+      <% if @assignment.submission_allowed(topic_id) %>
         <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %>
       <% else %>
         <%= link_to 'Your work', :controller => 'submitted_content', :action => 'view', :id => @participant.id %>
@@ -55,7 +56,8 @@ to display the label "Your team" in the student assignment tasks-->
         <% @alias_name = "Your readings" %>
       <% end %>
 
-      <% if @assignment.can_review(@reviewee_topic_id) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@participant.topic_id) == "Finished" %>
+      <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
+      <% if @assignment.can_review(@reviewee_topic_id) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(topic_id) == "Finished" %>
         <%= link_to "#{@alias_name}",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
       <% else %>
         <font color="gray"><%= @alias_name%></font>
@@ -68,7 +70,8 @@ to display the label "Your team" in the student assignment tasks-->
   <%if @assignment.require_quiz%>
     <% if @authorization == 'participant' or @can_take_quiz == true %>
       <li>
-        <% if @assignment.require_quiz and (@assignment.quiz_allowed(@reviewee_topic_id) or @assignment.get_current_stage(@participant.topic_id) == "Finished") %>
+        <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
+        <% if @assignment.require_quiz and (@assignment.quiz_allowed(@reviewee_topic_id) or @assignment.get_current_stage(topic_id) == "Finished") %>
           <%= link_to "Take quizzes", student_quizzes_path(:id => @participant.id) %>
         <% else %>
           <font color="gray">Take quizzes</font>
@@ -88,8 +91,8 @@ to display the label "Your team" in the student assignment tasks-->
       <li><%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %></li>
     <% end %>
 
-
-    <% if @assignment.get_current_stage(@participant.topic_id) == "Complete" %>
+    <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
+    <% if @assignment.get_current_stage(topic_id) == "Complete" %>
       <!-- removed code for survey assignment add in line above && SurveyHelper::is_user_eligible_for_survey?	(@assignment.id, session[:user].id)  -->
       <li><%= link_to "Take a survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id} %> (This will log you out)</li>
     <% end %>

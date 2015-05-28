@@ -32,12 +32,12 @@ class StudentTaskController < ApplicationController
 
       review_mappings.each do |review_mapping|
         participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
+        topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
+        if participant and topic_id
+          review_due_date = TopicDeadline.where(topic_id: topic_id, deadline_type_id:  1).first
 
-        if participant && participant.topic
-          review_due_date = TopicDeadline.where(topic_id: participant.topic_id, deadline_type_id:  1).first
-
-          if review_due_date.due_at < Time.now && @assignment.get_current_stage(participant.topic_id) != 'Complete'
-            @reviewee_topic_id = participant.topic_id
+          if review_due_date.due_at < Time.now && @assignment.get_current_stage(topic_id) != 'Complete'
+            @reviewee_topic_id = topic_id
           end
         end
       end

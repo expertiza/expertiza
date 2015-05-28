@@ -29,7 +29,8 @@ class ScoresController < ApplicationController
     end
 
     @pscore = @participant.scores(@questions)
-    @stage = @participant.assignment.get_current_stage(@participant.topic_id)
+    @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
+    @stage = @participant.assignment.get_current_stage(@topic_id)
     calculate_all_penalties(@assignment.id)
   end
 

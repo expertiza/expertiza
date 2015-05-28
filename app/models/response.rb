@@ -196,7 +196,7 @@ class Response < ActiveRecord::Base
       defn[:body][:type] = "Author Feedback"
       AssignmentTeam.find(response_map.reviewee_id).users.each do |user|
         if assignment.has_topics?
-          defn[:body][:obj_name] = SignUpTopic.find(AssignmentParticipant.find_by_user_id_and_assignment_id(user.id,assignment.id).topic_id).topic_name
+          defn[:body][:obj_name] = SignUpTopic.find(SignedUpTeam.topic_id(assignment.id, user.id)).topic_name
         else
           defn[:body][:obj_name] = assignment.name
         end
@@ -208,7 +208,7 @@ class Response < ActiveRecord::Base
     if response_map.type == "MetareviewResponseMap"
       defn[:body][:type] = "Metareview"
       AssignmentTeam.find(response_map.reviewee_id).teams_users.each do |user|
-        defn[:body][:obj_name] = SignUpTopic.find(AssignmentParticipant.find(user.id).topic_id).topic_name
+        defn[:body][:obj_name] = SignUpTopic.find(SignedUpTeam.topic_id(assignment.id, user.id)).topic_name
         defn[:body][:first_name] = User.find(user.id).fullname
         defn[:to] = User.find(user.id).email
         Mailer.sync_message(defn).deliver
@@ -224,7 +224,7 @@ class Response < ActiveRecord::Base
       original_reviewer_participant_id = response_map_for_original_feedback.reviewer_id
 
       participant = AssignmentParticipant.find(original_reviewer_participant_id)
-      defn[:body][:obj_name] = SignUpTopic.find(AssignmentParticipant.find(response_map.reviewer_id).topic_id).topic_name
+      defn[:body][:obj_name] = SignUpTopic.find(SignedUpTeam.topic_id(assignment.id, response_map.reviewer_id)).topic_name
       user = User.find(participant.user_id)
 
       defn[:to] = user.email
@@ -234,7 +234,8 @@ class Response < ActiveRecord::Base
     if response_map.type == "TeammateReviewResponseMap"
       defn[:body][:type] = "Teammate Review"
       participant = AssignmentParticipant.find(response_map.reviewee_id)
-      defn[:body][:obj_name] = SignUpTopic.find(participant.topic_id).topic_name
+      topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
+      defn[:body][:obj_name] = SignUpTopic.find(topic_id).topic_name
       user = User.find(participant.user_id)
       defn[:body][:first_name] = user.fullname
       defn[:to] = user.email

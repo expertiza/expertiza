@@ -3,7 +3,6 @@ class SignUpTopic < ActiveRecord::Base
   has_many :topic_dependencies, :foreign_key => 'topic_id', :dependent => :destroy
   has_many :topic_deadlines, :foreign_key => 'topic_id', :dependent => :destroy
   alias_method :deadlines, :topic_deadlines
-  has_many :assignment_participants, :foreign_key => 'topic_id'
   has_and_belongs_to_many :bmappings
   has_many :bids, :foreign_key => 'topic_id', :dependent => :destroy
   belongs_to :assignment
@@ -97,23 +96,24 @@ class SignUpTopic < ActiveRecord::Base
             first_waitlisted_user.is_waitlisted = false
             first_waitlisted_user.save
 
-            #update the participants details
             #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
             # to treat all assignments as team assignments
-
-            user_id = TeamsUser.where([ :team_id => first_waitlisted_user.team_id ]).first.user_id
-            participant = Participant.where(user_id: user_id, parent_id: assignment.id).first
-
-            participant.update_topic_id(topic_id)
-
             Waitlist.cancel_all_waitlists(first_waitlisted_user.team_id, assignment_id)
             end
         end
       end
       if !signup_record.nil?
-        participant = Participant.where(user_id: session_user_id, parent_id:  assignment_id).first
-        #update participant's topic id to nil
-        participant.update_topic_id(nil)
+        team_ids = TeamsUser.where(user_id: session_user_id)
+        #team_id variable represents the team_id for this user in this assignment
+        team_id = nil
+        team_ids.each do |t_id|
+          team = Team.find(t_id)
+          if team.parent_id == assignment_id
+            team_id = t_id
+            break
+          end
+        end
+        SignedUpTeam.where(team_id: team_id).destroy
         signup_record.destroy
       end
       end #end condition for 'drop deadline' check
@@ -128,12 +128,21 @@ class SignUpTopic < ActiveRecord::Base
         next_wait_listed_user.is_waitlisted = false
         next_wait_listed_user.save
 
-        #update participants
+        #update topic_id field in SignedUpTeam table
         assignment = Assignment.find(self.assignment_id)
         user_id = TeamsUser.where({:team_id => next_wait_listed_user.team_id}).user_id.first
-        participant = Participant.where(user_id: user_id, parent_id: assignment.id).first
-
-        participant.update_topic_id(self.id)
+        team_ids = TeamsUser.where(user_id: user_id)
+        #team_id variable represents the team_id for this user in this assignment
+        team_id = nil
+        team_ids.each do |t_id|
+          team = Team.find(t_id)
+          if team.parent_id == assignment.id
+            team_id = t_id
+            break
+          end
+        end
+        signed_up_team = SignedUpTeam.where(team_id: team_id)
+        SignedUpTeam.update(signed_up_team.id, topic_id: self.id)
       end
     }
   end

@@ -4,7 +4,7 @@ module SubmittedContentHelper
     index = 0
     participant = @participant if @participant # TODO: Verify why this is needed
     assignment = participant.assignment # participant is @map.contributor
-    topic_id = participant.topic_id     # participant is @map.reviewer
+    topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)     # participant is @map.reviewer
     check_stage = assignment.get_current_stage(topic_id)
 
     ret = "\n<table id='file_table' cellspacing='5'>"

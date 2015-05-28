@@ -57,7 +57,8 @@
                 <td>
                   <%= link_to "View", {:controller => 'response', :action => 'view', :id => @sorted[0].id} %>
                 </td>
-                <% if @assignment.get_current_stage(participant.topic_id) != "Finished" %>
+                <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
+                <% if @assignment.get_current_stage(topic_id) != "Finished" %>
                     <%- # show the link as edit when latest review is done in current phase   -%>
                     <%- # show link as update when latest review is done in different phase than current phase   -%>
                     <% if (deadline_version.due_at == deadline_time.due_at) %>
@@ -67,17 +68,17 @@
                     <% end %>
                 <% end %>
                 <%end%>
-            <% elsif @assignment.get_current_stage(participant.topic_id) != "Complete" %>
+            <% elsif @assignment.get_current_stage(topic_id) != "Complete" %>
                 <% if @assignment.staggered_deadline? %>
                     <% if map.type.to_s == "MetareviewResponseMap" %>
-                        <% if @assignment.get_current_stage(participant.topic_id) == 'metareview' %>
+                        <% if @assignment.get_current_stage(topic_id) == 'metareview' %>
                             <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
                         <% else %>
                             <td>Begin</td>
                             <td> (Work has not yet been submitted)</td>
                         <% end %>
                     <% else %>
-                        <% if @assignment.get_current_stage(participant.topic_id) != 'submission' %>
+                        <% if @assignment.get_current_stage(topic_id) != 'submission' %>
                             <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
                             <td>&nbsp;&nbsp;</td>
                             <%#- Display link for code review if 'any' code review files -%>

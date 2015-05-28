@@ -264,7 +264,7 @@ class ResponseController < ApplicationController
       if !@map.contributor.nil?
         team_member = TeamsUser.find_by_team_id(@map.contributor).user_id
         # Bug: @topic_id is set only in new, not in edit.  So this appears only the 1st time the review is done.-efg
-        @topic_id = Participant.where(parent_id: @map.assignment.id, user_id:  team_member).first.topic_id
+        @topic_id = SignedUpTeam.topic_id(@map.assignment.id, team_member)
       end
       if !@topic_id.nil?
         @signedUpTopic = SignUpTopic.find(@topic_id).topic_name

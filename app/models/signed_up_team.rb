@@ -51,6 +51,7 @@ class SignedUpTeam < ActiveRecord::Base
   #   SignedUpTeam.find_by_sql(["SELECT t.id as topic_id,u.name as name, s.is_waitlisted as is_waitlisted FROM signed_up_teams s, users u, sign_up_topics t where s.team_id = u.id and s.topic_id = t.id and t.assignment_id = ?", assignment_id])
   # end
 
+  #this method is used to find team_id, according to assignment_id and user_id
   def self.find_team_users(assignment_id,user_id)
     #TeamsUser.find_by_sql("SELECT t.id as t_id FROM teams_users u, teams t WHERE u.team_id = t.id and t.parent_id =" + assignment_id.to_s + " and user_id =" + user_id.to_s)
     TeamsUser.find_by_sql(["SELECT t.id as t_id FROM teams_users u, teams t WHERE u.team_id = t.id and t.parent_id = ? and user_id = ?", assignment_id, user_id])
@@ -80,4 +81,30 @@ class SignedUpTeam < ActiveRecord::Base
       end
     end
 
+    #2015-5-27 [zhewei]:
+    #We just remove the topic_id field from the participants table.
+    def self.team_id(assignment_id, user_id)
+      #team_id variable represents the team_id for this user in this assignment
+      team_id = nil
+      teams_users = TeamsUser.where(user_id: user_id)
+      teams_users.each do |teams_user|
+        team = Team.find(teams_user.team_id)
+        if team.parent_id == assignment_id
+          team_id = teams_user.team_id
+          break
+        end
+      end
+      return team_id
+    end
+    #This method is used to returns topic_id from [signed_up_teams] table and the inputs are assignment_id and user_id.
+    def self.topic_id(assignment_id, user_id)
+      #team_id variable represents the team_id for this user in this assignment
+      team_id = SignedUpTeam.team_id(assignment_id, user_id)
+      if team_id != nil
+        topic_id = SignedUpTeam.where(team_id: team_id)
+      end
+      return topic_id
+    end
+
+    
   end

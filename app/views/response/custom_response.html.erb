@@ -12,9 +12,10 @@
 
     <% if @map.assignment.team_assignment?
          team_member = TeamsUser.find_by_team_id(@map.contributor).user_id
-         topic_id = Participant.where(parent_id: @map.assignment.id, user_id:  team_member).first.topic_id
+         topic_id = SignedUpTeam.topic_id(@map.assignment.id, team_member)
        else %>
-        <% topic_id = Participant.find(@map.contributor).topic_id %>
+        <% participant = Participant.find(@map.contributor) %>
+        <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
     <% end %>
 
 
@@ -22,9 +23,11 @@
         <h2>You are reviewing <%= @signedUpTopic %></h2>
     <% end %>
     <%if @assignment.has_teams?%>
-        <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(@participant.topic_id)} %>
+        <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
+        <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(topic_id)} %>
     <%else%>
-        <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage => @assignment.get_current_stage(@participant.topic_id)} %>
+        <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
+        <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage => @assignment.get_current_stage(topic_id)} %>
     <%end%>
     </hr>
 <% end %>

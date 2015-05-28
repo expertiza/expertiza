@@ -9,13 +9,6 @@ class Invitation < ActiveRecord::Base
     first_waitlisted_signup.is_waitlisted = false
     first_waitlisted_signup.save
 
-    #Update the Participant Table first_waitlisted_signup. so find one
-    #of the users on the new team
-    user_id = TeamsUser.first_by_team_id(first_waitlisted_signup.team_id).user_id
-    #Obtain this users entry in the participants table for this assignment
-    participant = Participant.where(user_id: user_id, parent_id:  assignment_id).first
-    #Update the users topic id to that of the team they are joining in the Participants table
-    participant.update_topic_id(topic_id)
     #Cancel all topics the user is waitlisted for
     SignUpTopic.cancel_all_waitlists(first_waitlisted_signup.team_id, SignUpTopic.find(topic_id).assignment_id)
   end
@@ -28,13 +21,34 @@ class Invitation < ActiveRecord::Base
     end
   end
 
-  #After a users accepts an invite to join a team their topic id needs to be updated.
+   #After a users accepts an invite, the teams_users table needs to be updated.
   def self.update_users_topic_after_invite_accept(invitee_user_id, invited_user_id, assignment_id)
-    participant = Participant.where(user_id: invited_user_id, parent_id:  assignment_id).first
-    #Find the topic id that the user who sent the invite is assigned to
-    new_topic_id = Participant.where(user_id: invitee_user_id, parent_id:  assignment_id).first.topic_id
-    #Update topic id of users who accepted the invite
-    participant.update_topic_id(new_topic_id)
+    teams_users = TeamsUser.where(user_id: invitee_user_id)
+    new_team_id = nil
+    teams_users.each do |teams_user|
+      team = Team.find(teams_user.team_id)
+      if team.parent_id == assignment_id
+        new_team_id = teams_user.team_id
+        break
+      end
+    end 
+    #check the invited_user_id have ever join other team in this assignment before
+    #if so, update the original record; else create a new record
+    original_team_id = nil
+    teams_in_this_assignment = Team.where(parent_id: assignment_id)
+    teams_in_this_assignment.each do |team|
+      user_id = TeamsUser.where(team_id: team.id).user_id
+      if user_id == invited_user_id
+        original_team_id = team.id
+        break
+      end
+    end
+    if original_team_id
+      team_user_mapping = TeamsUser.where(team_id: original_team_id, user_id: invited_user_id)
+      TeamsUser.update(team_user_mapping.id, team_id: new_team_id)
+    else
+      TeamsUser.create(team_id: new_team_id, user_id: invited_user_id)
+    end
   end
 
   #This method handles all that needs to be done upon a user accepting an invite.

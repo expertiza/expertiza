@@ -364,7 +364,6 @@ ActiveRecord::Schema.define(version: 201150105163040) do
     t.float    "grade",                limit: 24
     t.string   "type",                 limit: 255
     t.string   "handle",               limit: 255
-    t.integer  "topic_id",             limit: 4
     t.datetime "time_stamp"
     t.text     "digital_signature",    limit: 65535
     t.string   "duty",                 limit: 255

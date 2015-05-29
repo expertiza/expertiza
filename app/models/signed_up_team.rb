@@ -102,6 +102,8 @@ class SignedUpTeam < ActiveRecord::Base
       team_id = SignedUpTeam.team_id(assignment_id, user_id)
       if team_id != nil
         topic_id = SignedUpTeam.where(team_id: team_id)
+      else
+        topic_id=nil
       end
       return topic_id
     end

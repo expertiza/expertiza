@@ -9,7 +9,7 @@ class StudentReviewController < ApplicationController
     return unless current_user_id?(@participant.user_id)
     @assignment  = @participant.assignment
     # Find the current phase that the assignment is in.
-    @topic_id = SignedUpTeam.topic_id(AssignmentParticipant.find(params[:id]).parent_id, AssignmentParticipant.find(params[:id]).user_id)
+    @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
     @review_phase = @assignment.get_current_stage(@topic_id)
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments

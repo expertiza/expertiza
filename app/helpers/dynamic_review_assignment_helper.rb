@@ -87,9 +87,9 @@ module DynamicReviewAssignmentHelper
       submissions_in_current_cycle = AssignmentParticipant.where(parent_id: @assignment_id)
     else
       #using topic_id to find participant.id(s).
-      teams = SignedUpTeam.where(topic_id: @topic_id)
-      teams.each do |team|
-        users = TeamsUser.where(team_id: team.id)
+      signUps = SignedUpTeam.where(topic_id: @topic_id)
+      signUps.each do |signUp|
+        users = TeamsUser.where(team_id: signUp.team_id)
         users.each do |user|
           participant = Participant.where(user_id: user_id, parent_id: @assignment_id)
           if participant

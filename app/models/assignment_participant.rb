@@ -631,6 +631,7 @@ class AssignmentParticipant < Participant
 
 
     def stage_deadline
+      topic_id = SignedUpTeam.topic_id(self.parent_id, self.user_id)
       assignment.stage_deadline topic_id
     end
 

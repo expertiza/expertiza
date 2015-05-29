@@ -103,17 +103,8 @@ class SignUpTopic < ActiveRecord::Base
         end
       end
       if !signup_record.nil?
-        team_ids = TeamsUser.where(user_id: session_user_id)
-        #team_id variable represents the team_id for this user in this assignment
-        team_id = nil
-        team_ids.each do |t_id|
-          team = Team.find(t_id)
-          if team.parent_id == assignment_id
-            team_id = t_id
-            break
-          end
-        end
-        SignedUpTeam.where(team_id: team_id).destroy
+        team_id = SignedUpTeam.team_id(assignment_id, session_user_id)
+        SignedUpTeam.where(team_id: team_id).destroy_all
         signup_record.destroy
       end
       end #end condition for 'drop deadline' check
@@ -131,17 +122,8 @@ class SignUpTopic < ActiveRecord::Base
         #update topic_id field in SignedUpTeam table
         assignment = Assignment.find(self.assignment_id)
         user_id = TeamsUser.where({:team_id => next_wait_listed_user.team_id}).user_id.first
-        team_ids = TeamsUser.where(user_id: user_id)
-        #team_id variable represents the team_id for this user in this assignment
-        team_id = nil
-        team_ids.each do |t_id|
-          team = Team.find(t_id)
-          if team.parent_id == assignment.id
-            team_id = t_id
-            break
-          end
-        end
-        signed_up_team = SignedUpTeam.where(team_id: team_id)
+        team_id = SignedUpTeam.team_id(assignment.id, user_id)
+        signed_up_team = SignedUpTeam.where(team_id: team_id).first
         SignedUpTeam.update(signed_up_team.id, topic_id: self.id)
       end
     }

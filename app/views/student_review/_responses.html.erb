@@ -11,6 +11,7 @@
       <% end %>
 
       <% if participant %>
+          <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
           <tr>
             <td>
               <%round = map.round%>
@@ -57,7 +58,6 @@
                 <td>
                   <%= link_to "View", {:controller => 'response', :action => 'view', :id => @sorted[0].id} %>
                 </td>
-                <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
                 <% if @assignment.get_current_stage(topic_id) != "Finished" %>
                     <%- # show the link as edit when latest review is done in current phase   -%>
                     <%- # show link as update when latest review is done in different phase than current phase   -%>

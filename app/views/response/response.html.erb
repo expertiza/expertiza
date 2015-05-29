@@ -5,8 +5,8 @@
         <% team_member = TeamsUser.find_by_team_id(@map.contributor).user_id%>
         <% topic_id = SignedUpTeam.topic_id(@map.assignment.id, team_member) %>
     <% else %>
-        <% team_id = TeamsUser.find_by_team_id(@map.contributor) %>
-        <% topic_id = SignedUpTeam.where(team_id: team_id) %>
+        <% participant = Participant.find(TeamsUser.find_by_team_id(@map.contributor).user_id) %>
+        <% topic_id = SignedUpTeam.where(participant.parent_id, participant.user_id) %>
     <% end %>
     <% if !topic_id.nil? %>
         <h2>You are reviewing <%= SignUpTopic.find(topic_id).topic_name %></h2>

@@ -4,6 +4,6 @@ class AddRoundToResponseMaps < ActiveRecord::Migration
   end
 
   def self.down
-    remove_column "response_maps","round"
+    remove_column "response_maps","round", :integer
   end
 end

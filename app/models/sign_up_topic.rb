@@ -118,13 +118,6 @@ class SignUpTopic < ActiveRecord::Base
       if !next_wait_listed_user.nil?
         next_wait_listed_user.is_waitlisted = false
         next_wait_listed_user.save
-
-        #update topic_id field in SignedUpTeam table
-        assignment = Assignment.find(self.assignment_id)
-        user_id = TeamsUser.where({:team_id => next_wait_listed_user.team_id}).user_id.first
-        team_id = SignedUpTeam.team_id(assignment.id, user_id)
-        signed_up_team = SignedUpTeam.where(team_id: team_id).first
-        SignedUpTeam.update(signed_up_team.id, topic_id: self.id)
       end
     }
   end

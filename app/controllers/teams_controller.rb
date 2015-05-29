@@ -80,7 +80,11 @@ class TeamsController < ApplicationController
   def delete
     @team = Team.find(params[:id])
     course = Object.const_get(session[:team_type]).find(@team.parent_id)
-    @team.destroy
+    @team.destroy if @team
+    @signUps = SignedUpTeam.where(team_id: params[:id])
+    @signUps.destroy_all if @signUps
+    @teams_users = TeamsUser.where(team_id: params[:id])
+    @teams_users.destroy_all if @teams_users
     undo_link("Team \"#{@team.name}\" has been deleted successfully. ")
     redirect_to :action => 'list', :id => course.id
   end

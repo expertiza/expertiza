@@ -27,10 +27,7 @@ class Waitlist < ActiveRecord::Base
         #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
         if slotAvailable?(topic_id)
           sign_up.is_waitlisted = false
-          #Update topic_id in signed_up_teams table
-          team_id = SignedUpTeam.team_id(assignment_id, user_id)
-          signed_up_team = SignedUpTeam.where(team_id: team_id).first
-          SignedUpTeam.update(signed_up_team.id, topic_id: topic_id)
+          sign_up.save
         else
           sign_up.is_waitlisted = true
         end
@@ -61,10 +58,6 @@ class Waitlist < ActiveRecord::Base
             cancel_all_waitlists(team_id, assignment_id)
             sign_up.is_waitlisted = false
             sign_up.save
-            #Update topic_id in signed_up_teams table
-            team_id = SignedUpTeam.team_id(assignment_id, user_id)
-            signed_up_team = SignedUpTeam.where(team_id: team_id).first
-            SignedUpTeam.update(signed_up_team.id, topic_id: topic_id)
             result = true
           end
         end

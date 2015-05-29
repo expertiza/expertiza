@@ -104,15 +104,10 @@ class StudentTeamsController < ApplicationController
 
   def remove_participant
     #remove the record from teams_users table
-    team_id = SignedUpTeam.team_id(student.parent_id, student.user_id)
-    TeamsUser.where(team_id: team_id, user_id:student.user_id).destroy_all
-
-    #remove the entry from teams_users
-    team_user = TeamsUser.find_by team_id: params[:team_id], user_id: student.user_id
+    team_user = TeamsUser.where(team_id: params[:team_id], user_id: student.user_id)
 
     if team_user
-      team_user.destroy
-
+      team_user.destroy_all
       undo_link "User \"#{team_user.name}\" has been removed from the team successfully. "
     end
 
@@ -123,38 +118,23 @@ class StudentTeamsController < ApplicationController
         old_team.destroy
         #if assignment has signup sheet then the topic selected by the team has to go back to the pool
         #or to the first team in the waitlist
-
         sign_ups = SignedUpTeam.where team_id: params[:team_id]
         sign_ups.each {|sign_up|
           #get the topic_id
           sign_up_topic_id = sign_up.topic_id
           #destroy the sign_up
           sign_up.destroy
-
           #get the number of non-waitlisted users signed up for this topic
           non_waitlisted_users = SignedUpTeam.where topic_id: sign_up_topic_id, is_waitlisted: false
           #get the number of max-choosers for the topic
           max_choosers = SignUpTopic.find(sign_up_topic_id).max_choosers
-
           #check if this number is less than the max choosers
           if non_waitlisted_users.length < max_choosers
             first_waitlisted_user = SignedUpTeam.find_by topic_id: sign_up_topic_id, is_waitlisted: true#<order?
-
             #moving the waitlisted user into the confirmed signed up users list
             if first_waitlisted_user
               first_waitlisted_user.is_waitlisted = false
               first_waitlisted_user.save
-
-              waitlisted_team_user = TeamsUser.find_by team_id: first_waitlisted_user.team_id #<this relationship is weird
-              #waitlisted_team_user could be nil since the team the student left could have been the one waitlisted on the topic
-              #and teams_users for the team has been deleted in one of the earlier lines of code
-
-              if waitlisted_team_user
-                user_id = waitlisted_team_user.user_id
-                if user_id
-                  SignedUpTeam.update(sign_up.id, topic_id: nil)
-                end
-              end
             end
           end
         }

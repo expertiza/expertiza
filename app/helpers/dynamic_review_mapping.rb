@@ -481,7 +481,7 @@ module DynamicReviewMapping
                                            participant = Participant
                                              .joins( "INNER JOIN teams_users ON participants.user_id = teams_users.user_id")
                                              .where( "teams_users.team_id = #{contributor} AND participants.parent_id = #{@assignment.id}")
-                                           topic_id = SignedUpTeams.topic_id(participant.parent_id, participant.user_id)
+                                           topic_id = SignedUpTeams.topic_id(participant.first.parent_id, participant.first.user_id)
                                            topic_team_id[contributor] = topic_id
                                          }
 

@@ -23,28 +23,12 @@ class Invitation < ActiveRecord::Base
 
    #After a users accepts an invite, the teams_users table needs to be updated.
   def self.update_users_topic_after_invite_accept(invitee_user_id, invited_user_id, assignment_id)
-    teams_users = TeamsUser.where(user_id: invitee_user_id)
-    new_team_id = nil
-    teams_users.each do |teams_user|
-      team = Team.find(teams_user.team_id)
-      if team.parent_id == assignment_id
-        new_team_id = teams_user.team_id
-        break
-      end
-    end 
+    new_team_id = SignedUpTeam.team_id(assignment_id, invitee_user_id)
     #check the invited_user_id have ever join other team in this assignment before
     #if so, update the original record; else create a new record
-    original_team_id = nil
-    teams_in_this_assignment = Team.where(parent_id: assignment_id)
-    teams_in_this_assignment.each do |team|
-      user_id = TeamsUser.where(team_id: team.id).user_id
-      if user_id == invited_user_id
-        original_team_id = team.id
-        break
-      end
-    end
+    original_team_id = SignedUpTeam.team_id(assignment_id, invited_user_id)
     if original_team_id
-      team_user_mapping = TeamsUser.where(team_id: original_team_id, user_id: invited_user_id)
+      team_user_mapping = TeamsUser.where(team_id: original_team_id, user_id: invited_user_id).first
       TeamsUser.update(team_user_mapping.id, team_id: new_team_id)
     else
       TeamsUser.create(team_id: new_team_id, user_id: invited_user_id)

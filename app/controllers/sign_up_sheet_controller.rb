@@ -298,7 +298,7 @@ class SignUpSheetController < ApplicationController
         #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
         if slotAvailable?(topic_id)
           sign_up.is_waitlisted = false
-          #Update topic_id in signed_up_teams table with the topic_id
+          #Create new record in signed_up_teams table
           team_id = SignedUpTeam.team_id(assignment_id, session[:user].id)
           topic_id = SignedUpTeam.topic_id(assignment_id, session[:user].id)
           SignedUpTeam.create(topic_id: topic_id, team_id: team_id, is_waitlisted: 0, preference_priority_number: nil)
@@ -332,8 +332,9 @@ class SignUpSheetController < ApplicationController
           sign_up.is_waitlisted = false
           sign_up.save
           #Update topic_id in signed_up_teams table with the topic_id
-          users_team = SignedUpTeam.find_team_users(assignment_id, session[:user].id)
-          SignedUpTeam.update(users_team.id, topic_id: topic_id)
+          team_id = SignedUpTeam.find_team_users(assignment_id, session[:user].id)
+          signUp = SignedUpTeam.where(topic_id: topic_id).first
+          signUp.update_attribute('topic_id', topic_id)
           result = true
         end
       end
@@ -384,8 +385,9 @@ class SignUpSheetController < ApplicationController
           if slotAvailable?(topic_id)
             sign_up.is_waitlisted = false
             #Update topic_id in signed_up_teams table with the topic_id
-            users_team = SignedUpTeam.find_team_users(assignment_id, session[:user].id)
-            SignedUpTeam.update(users_team.id, topic_id: topic_id)
+            team_id = SignedUpTeam.find_team_users(assignment_id, session[:user].id)
+            signUp = SignedUpTeam.where(topic_id: topic_id).first
+            signUp.update_attribute('topic_id', topic_id)
           else
             sign_up.is_waitlisted = true
           end

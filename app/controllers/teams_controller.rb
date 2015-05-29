@@ -78,13 +78,23 @@ class TeamsController < ApplicationController
   end
 
   def delete
+    #delete records in team, teams_users, signed_up_teams table
     @team = Team.find(params[:id])
     course = Object.const_get(session[:team_type]).find(@team.parent_id)
     @team.destroy if @team
     @signUps = SignedUpTeam.where(team_id: params[:id])
-    @signUps.destroy_all if @signUps
+    
     @teams_users = TeamsUser.where(team_id: params[:id])
     @teams_users.destroy_all if @teams_users
+
+    #if there is a team in waitlist, make this team hold this topic
+    topic_id = @signUps.first.topic_id
+    next_wait_listed_team = SignedUpTeam.where({:topic_id => topic_id, :is_waitlisted => true}).first
+    if next_wait_listed_team
+      next_wait_listed_team.is_waitlisted = false
+      next_wait_listed_team.save
+    end
+    @signUps.destroy_all if @signUps
     undo_link("Team \"#{@team.name}\" has been deleted successfully. ")
     redirect_to :action => 'list', :id => course.id
   end

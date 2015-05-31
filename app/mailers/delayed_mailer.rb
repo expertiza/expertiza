@@ -206,9 +206,9 @@ class DelayedMailer
     teams = TeamsUser.all.group(:team_id).count(:team_id)
     for team_id in teams.keys
       if teams[team_id] == 1
-        topic_to_drop = SignedUpTeam.where(team_id: team_id)
-        if !topic_to_drop.nil?#check if the one-person-team has signed up a topic
-          topic_to_drop.first.delete
+        topic_to_drop = SignedUpTeam.where(team_id: team_id).first
+        if topic_to_drop#check if the one-person-team has signed up a topic
+          topic_to_drop.delete
         end
       end
     end

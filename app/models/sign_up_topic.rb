@@ -103,8 +103,6 @@ class SignUpTopic < ActiveRecord::Base
         end
       end
       if !signup_record.nil?
-        team_id = SignedUpTeam.team_id(assignment_id, session_user_id)
-        SignedUpTeam.where(team_id: team_id).destroy_all
         signup_record.destroy
       end
       end #end condition for 'drop deadline' check

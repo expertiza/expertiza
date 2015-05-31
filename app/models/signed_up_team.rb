@@ -100,10 +100,12 @@ class SignedUpTeam < ActiveRecord::Base
     def self.topic_id(assignment_id, user_id)
       #team_id variable represents the team_id for this user in this assignment
       team_id = SignedUpTeam.team_id(assignment_id, user_id)
-      if team_id != nil
-        topic_id = SignedUpTeam.where(team_id: team_id)
+      if team_id
+        if !SignedUpTeam.where(team_id: team_id).empty?
+          topic_id = SignedUpTeam.where(team_id: team_id).first.topic_id
+        end
       else
-        topic_id=nil
+        topic_id = nil
       end
       return topic_id
     end

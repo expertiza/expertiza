@@ -26,6 +26,8 @@ class Waitlist < ActiveRecord::Base
       ActiveRecord::Base.transaction do
         #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
         if slotAvailable?(topic_id)
+          #if slot exist, then confirm the topic for the team and delete all the waitlist for this team
+          cancel_all_waitlists(team_id, assignment_id)
           sign_up.is_waitlisted = false
           sign_up.save
         else
@@ -54,7 +56,7 @@ class Waitlist < ActiveRecord::Base
               result = true
             end
           else
-            #if slot exist, then confirm the topic for the user and delete all the waitlist for this user
+            #if slot exist, then confirm the topic for the team and delete all the waitlist for this team
             cancel_all_waitlists(team_id, assignment_id)
             sign_up.is_waitlisted = false
             sign_up.save

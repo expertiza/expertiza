@@ -2,6 +2,7 @@ class Invitation < ActiveRecord::Base
   belongs_to :to_user, :class_name => "User", :foreign_key => "to_id"
   belongs_to :from_user, :class_name => "User", :foreign_key => "from_id"
 
+  
   def self.remove_waitlists_for_team(topic_id, assignment_id)
     first_waitlisted_signup = SignedUpTeam.where(topic_id: topic_id, is_waitlisted:  true).first
 
@@ -10,7 +11,7 @@ class Invitation < ActiveRecord::Base
     first_waitlisted_signup.save
 
     #Cancel all topics the user is waitlisted for
-    SignUpTopic.cancel_all_waitlists(first_waitlisted_signup.team_id, SignUpTopic.find(topic_id).assignment_id)
+    Waitlist.cancel_all_waitlists(first_waitlisted_signup.team_id, SignUpTopic.find(topic_id).assignment_id)
   end
 
   #Remove all invites sent by a user for an assignment.

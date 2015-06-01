@@ -336,6 +336,8 @@ require 'analytic/assignment_analytic'
     # has to be captured by the caller (in review_mapping_controller)
     response_map = response_map_to_metareview(meta_reviewer)
 
+    logger.warn "response_map: #{response_map}"
+
     response_map.assign_metareviewer(meta_reviewer)
   end
 
@@ -359,6 +361,7 @@ require 'analytic/assignment_analytic'
 
     # Reduce to the response maps with the least number of metareviews received
     response_map_set.sort! { |a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count }
+    logger.warn "response_map: #{response_map_set.inspect}"
     min_metareviews = response_map_set.first.metareview_response_maps.count
     response_map_set.reject! { |response_map| response_map.metareview_response_maps.count > min_metareviews }
 

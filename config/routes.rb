@@ -308,6 +308,7 @@ Expertiza::Application.routes.draw do
       get :select_mapping
       get :show_available_submissions
       post :assign_quiz_dynamically
+      post :assign_metareviewer_dynamically
     end
   end
 

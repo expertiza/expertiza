@@ -147,7 +147,6 @@ class ReviewMappingController < ApplicationController
   end
 
   def assign_reviewer_dynamically
-    begin
       assignment = Assignment.find(params[:assignment_id])
       reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
 
@@ -165,9 +164,6 @@ class ReviewMappingController < ApplicationController
         assignment.assign_reviewer_dynamically_no_topic(reviewer,assignment_team)
       end
 
-    rescue Exception => e
-      flash[:error] = (e.nil?) ? $! : e
-    end
 
     redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
   end
@@ -216,15 +212,12 @@ class ReviewMappingController < ApplicationController
   end
 
   def assign_metareviewer_dynamically
-    begin
       assignment   = Assignment.find(params[:assignment_id])
       metareviewer = AssignmentParticipant.where(user_id: params[:metareviewer_id], parent_id:  assignment.id).first
+      logger.warn "metareviewer: #{metareviewer.inspect}"
 
       assignment.assign_metareviewer_dynamically(metareviewer)
 
-    rescue Exception => e
-      flash[:error] = (e.nil?) ? $! : e
-    end
 
     redirect_to :controller => 'student_review', :action => 'list', :id => metareviewer.id
   end

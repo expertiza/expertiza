@@ -1,6 +1,6 @@
 class MetareviewResponseMap < ResponseMap
   belongs_to :reviewee, :class_name => 'Participant', :foreign_key => 'reviewee_id'
-  belongs_to :review_mapping, :class_name => 'Response', :foreign_key => 'reviewed_object_id'
+  belongs_to :review_mapping, :class_name => 'ResponseMap', :foreign_key => 'reviewed_object_id'
   delegate :assignment, to: :reviewee
 
   #return all the versions available for a response map.
@@ -22,8 +22,11 @@ class MetareviewResponseMap < ResponseMap
     end
   end
 
+  # First, find the "TeamReviewResponseMap" to be metareviewed;
+  # Second, find the team in the "TeamReviewResponseMap" record.
   def contributor
-    self.review_mapping.reviewee
+    team_review_map = TeamReviewResponseMap.find(self.reviewed_object_id)
+    AssignmentTeam.find(team_review_map.reviewee_id)
   end
 
   def questionnaire

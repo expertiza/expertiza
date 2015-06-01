@@ -14,7 +14,7 @@ class AssignmentTeam < Team
 
   def assign_reviewer(reviewer)
     if assignment.has_topics?
-      topic_id = self.topic.id
+      topic_id = self.topic
       if topic_id==nil
         raise "this team has not taken any topic"
       end
@@ -50,7 +50,7 @@ class AssignmentTeam < Team
   def topic
     team_topic = nil
     participants.each do |participant|
-      team_topic = participant.topic
+      team_topic = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
       break if team_topic
     end
     team_topic

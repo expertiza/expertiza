@@ -30,6 +30,7 @@
 <% else %>
     <%= render :partial => 'review', :locals => {:versions => @responses_versions} %>
 <% end %>
+<h2>Feedback for reviewer</h2>
 
 <%= form_tag :action => @next_action, :id => @modified_object do %>
     <% if @next_action.eql?'update' %>

@@ -263,7 +263,8 @@ class ResponseController < ApplicationController
       }
       if !@map.contributor.nil?
         team_member = TeamsUser.find_by_team_id(@map.contributor).user_id
-        # Bug: @topic_id is set only in new, not in edit.  So this appears only the 1st time the review is done.-efg
+        # Bug: @topic_id is set only in new, not in edit.
+        #   So this appears only the 1st time the review is done.-efg
         @topic_id = SignedUpTeam.topic_id(@map.assignment.id, team_member)
       end
       if !@topic_id.nil?
@@ -395,6 +396,7 @@ class ResponseController < ApplicationController
 
   private
   def get_content
+    logger.warn "@map: #{@map.inspect}"
     @title = @map.get_title
     @assignment = @map.assignment
     @participant = @map.reviewer

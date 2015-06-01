@@ -17,6 +17,18 @@ class TeamReviewResponseMap < ReviewResponseMap
     end
   end
 
+  def metareview_response_maps
+    responses = Response.where(map_id:self.id)
+    metareview_list=Array.new()
+    responses.each do |response|
+      metareview_response_maps = MetareviewResponseMap.where(reviewed_object_id:response.id)
+      metareview_response_maps.each do |metareview_response_map|
+        metareview_list<<metareview_response_map
+      end
+    end
+    metareview_list
+  end
+
   # return  the responses for specified round, for varying rubric feature -Yang
   def self.get_assessments_round_for(team,round)
     team_id =team.id

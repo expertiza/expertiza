@@ -207,12 +207,13 @@ class Response < ActiveRecord::Base
     end
     if response_map.type == "MetareviewResponseMap"
       defn[:body][:type] = "Metareview"
-      AssignmentTeam.find(response_map.reviewee_id).teams_users.each do |user|
-        defn[:body][:obj_name] = SignUpTopic.find(SignedUpTeam.topic_id(assignment.id, user.id)).topic_name
-        defn[:body][:first_name] = User.find(user.id).fullname
-        defn[:to] = User.find(user.id).email
-        Mailer.sync_message(defn).deliver
-      end
+      reviewee_user = Participant.find(response_map.reviewee_id)
+      signup_topic_id = SignedUpTeam.topic_id(assignment.id, response_map.contributor.teams_users.first.user_id)
+
+      defn[:body][:obj_name] = SignUpTopic.find(signup_topic_id).topic_name
+      defn[:body][:first_name] = User.find(reviewee_user.user_id).fullname
+      defn[:to] = User.find(reviewee_user.user_id).email
+      Mailer.sync_message(defn).deliver
     end
     if response_map.type == "FeedbackResponseMap" #This is authors' feedback from UI
       defn[:body][:type] = "Review Feedback"

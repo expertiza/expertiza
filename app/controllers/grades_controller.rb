@@ -359,7 +359,7 @@ class GradesController < ApplicationController
       all_resp = Response.where(map_id: review.map_id)
       sort_to = all_resp.sort
       
-      scores << Score.get_total_score(:response => sort_to[0], :questions => @questions[symbol.to_sym], :q_types => Array.new)
+      scores << Score.get_total_score(:response => sort_to, :questions => @questions[symbol.to_sym], :q_types => Array.new)
     end
     scores
   end

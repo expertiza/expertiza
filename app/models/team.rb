@@ -129,10 +129,10 @@ class Team < ActiveRecord::Base
 
     Team.delete_all_by_parent(parent)
 
-    no_of_teams = users.length.fdiv(team_size).ceil
+    num_of_teams = users.length.fdiv(team_size).ceil
     nextTeamMemberIndex = 0
 
-    for i in 1..no_of_teams
+    for i in 1..num_of_teams
       team = Object.const_get(team_type + 'Team').create(:name => "Team #{i}", :parent_id => parent.id)
       TeamNode.create(:parent_id => parent.id, :node_object_id => team.id)
 

@@ -1,12 +1,12 @@
 <H1>Create Teams for <%= @parent.name %></H1>
 
-<H2> Randomly </H2>
+<H2> Automatically </H2>
 
 <p> Uses, insofar as possible, the number of members specified when the
   assignment was created.</p>
 
 <%= form_tag :action => 'create_teams' do %>
-  Team Size:<%= text_field 'team', 'size' %>
+  Team Size:<%= text_field 'team', 'size', size: 1 %>
 <%= hidden_field_tag 'id', @parent.id %>
 
 <%= submit_tag "Create Teams" %>

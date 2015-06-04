@@ -72,7 +72,7 @@ class Team < ActiveRecord::Base
       can_add_member=true
     else
       max_team_members=Assignment.find(assignment_id).max_team_size
-      curr_team_size= TeamsUser.where(["team_id = ?", self.id]).count
+      curr_team_size= Team.size(self.id)
       can_add_member = (curr_team_size < max_team_members)
     end
 
@@ -84,6 +84,10 @@ class Team < ActiveRecord::Base
     end
 
     return can_add_member
+  end
+
+  def self.size(team_id)
+    TeamsUser.where(["team_id = ?", team_id]).count
   end
 
   def copy_members(new_team)
@@ -110,39 +114,56 @@ class Team < ActiveRecord::Base
     end
   end
 
-  def self.delete_all_by_parent(parent)
-    teams = Team.where(["parent_id=?", parent.id])
-
-    for team in teams
-      team.delete
-    end
-  end
-
-  # @param parent [Object]
-  # @param team_type [Object]
-  # @param team_size [Object]
-  def self.randomize_all_by_parent(parent, team_type, team_size)
+  #Algorithm
+  #Start by adding single members to teams that are one member too small.
+  #Add two-member teams to teams that two members too small. etc.
+  def self.randomize_all_by_parent(parent, team_type, min_team_size)
     participants = Participant.where(["parent_id = ? AND type = ?", parent.id, parent.class.to_s + "Participant"])
     participants = participants.sort{rand(3) - 1}
-    users = participants.map{|p| User.find(p.user_id)}
-    #users = users.uniq
-
-    Team.delete_all_by_parent(parent)
-
-    num_of_teams = users.length.fdiv(team_size).ceil
-    nextTeamMemberIndex = 0
-
-    for i in 1..num_of_teams
-      team = Object.const_get(team_type + 'Team').create(:name => "Team #{i}", :parent_id => parent.id)
-      TeamNode.create(:parent_id => parent.id, :node_object_id => team.id)
-
-      team_size.times do
-        break if nextTeamMemberIndex >= users.length
-
-        user = users[nextTeamMemberIndex]
-        team.add_member(user, parent.id)
-
-        nextTeamMemberIndex += 1
+    users = participants.map{|p| User.find(p.user_id)}.to_a
+    #find teams still need team members and users who are not in any team
+    teams = Team.where(parent_id: parent.id, type: parent.class.to_s + "Team").to_a
+    teams_num = teams.size
+    i = 0
+    teams_num.times do
+      teams_users = TeamsUser.where(team_id: teams[i].id)
+      teams_users.each do |teams_user|
+        users.delete(User.find(teams_user.user_id))
+      end
+      if Team.size(teams.first.id) >= min_team_size
+        teams.delete(teams.first)
+      else
+        i += 1
+      end
+    end
+    #sort teams by decreasing team size
+    teams.sort_by{|team| Team.size(team.id)}.reverse!
+    #insert users who are not in any team to teams still need team members
+    if users.size > 0 and teams.size > 0
+      teams.each do |team|
+        curr_team_size = Team.size(team.id)
+        member_num_difference = min_team_size - curr_team_size
+        for i in (1..member_num_difference).to_a
+          team.add_member(users.first, parent.id)
+          users.delete(users.first)
+          break if users.size == 0
+        end
+        break if users.size == 0
+      end
+    end
+    #If all the existing teams are fill to the min_team_size and we still have more users, create teams for them.
+    if users.size > 0
+      num_of_teams = users.length.fdiv(min_team_size).ceil
+      nextTeamMemberIndex = 0
+      for i in (1..num_of_teams).to_a
+        team = Object.const_get(team_type + 'Team').create(:name => "Team" + (rand(100) * rand(0.1)).round(0).to_s, :parent_id => parent.id)
+        TeamNode.create(:parent_id => parent.id, :node_object_id => team.id)
+        min_team_size.times do
+          break if nextTeamMemberIndex >= users.length
+          user = users[nextTeamMemberIndex]
+          team.add_member(user, parent.id)
+          nextTeamMemberIndex += 1
+        end
       end
     end
   end

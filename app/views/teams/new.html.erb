@@ -6,7 +6,7 @@
   assignment was created.</p>
 
 <%= form_tag :action => 'create_teams' do %>
-  Team Size:<%= text_field 'team', 'size', size: 1 %>
+  Team Size:<%= select_tag 'team_size', options_for_select(2..@parent.max_team_size), size: 1 %>
 <%= hidden_field_tag 'id', @parent.id %>
 
 <%= submit_tag "Create Teams" %>

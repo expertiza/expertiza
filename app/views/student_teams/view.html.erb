@@ -199,12 +199,12 @@
      </table>
 
      <% if @student.team == nil %>
-       <h2>Create Team</h2>
+       <h2>Name team</h2>
        <%= form_tag :controller => 'student_teams', :action => 'create' do %>
          <%= hidden_field_tag 'student_id', @student.id %>
-         <label for="team_name">Team Name:</label>&nbsp;
+         <label for="team_name">Team name:</label>&nbsp;
          <%= text_field 'team', 'name' %>
-         <%= submit_tag "Create Team" %>
+         <%= submit_tag "Name team" %>
        <% end %>
      <% else %>
        <h2>Invite people</h2>

@@ -305,22 +305,27 @@ class AssignmentForm
     new_assign.copy_flag = true
     if new_assign.save
       Assignment.record_timestamps = true
-      copy_assignment_questionnaire(old_assign,new_assign)
+      copy_assignment_questionnaire(old_assign,new_assign, user)
       DueDate.copy(old_assign.id, new_assign.id)
       new_assign.create_node
       new_assign_id=new_assign.id
+      #also copy topics from old assignment
+      topics = SignUpTopic.where(assignment_id: old_assign.id)
+      topics.each do |topic|
+        SignUpTopic.create(topic_name: topic.topic_name, assignment_id: new_assign_id, max_choosers: topic.max_choosers, category: topic.category, topic_identifier: topic.topic_identifier, micropayment: topic.micropayment, bookmark_rating_rubric_id: topic.bookmark_rating_rubric_id)
+      end
     else
       new_assign_id=nil
     end
     new_assign_id
   end
 
-  def self.copy_assignment_questionnaire (old_assign, new_assign)
+  def self.copy_assignment_questionnaire (old_assign, new_assign, user)
     old_assign.assignment_questionnaires.each do |aq|
       AssignmentQuestionnaire.create(
           :assignment_id => new_assign.id,
           :questionnaire_id => aq.questionnaire_id,
-          :user_id => session[:user].id,
+          :user_id => user.id,
           :notification_limit => aq.notification_limit,
           :questionnaire_weight => aq.questionnaire_weight
       )

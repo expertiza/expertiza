@@ -181,9 +181,12 @@ class AssignmentsController < ApplicationController
     @user = ApplicationHelper::get_user_role(session[:user])
     @user = session[:user]
     session[:copy_flag] = true
+    #check new assignment submission directory and old assignment submission directory
+    old_assign = Assignment.find(params[:id])
     new_assign_id=AssignmentForm.copy(params[:id],@user)
-    if !new_assign_id.nil?
-      flash[:note] = 'Warning: The submission directory for the copy of this assignment will be the same as the submission directory for the existing assignment, which will allow student submissions to one assignment to overwrite submissions to the other assignment.  If you do not want this to happen, change the submission directory in the new copy of the assignment.'
+    if new_assign_id
+      new_assign = Assignment.find(new_assign_id)
+      flash[:note] = 'Warning: The submission directory for the copy of this assignment will be the same as the submission directory for the existing assignment, which will allow student submissions to one assignment to overwrite submissions to the other assignment.  If you do not want this to happen, change the submission directory in the new copy of the assignment.' if old_assign.directory_path == new_assign.directory_path
       redirect_to :action => 'edit', :id => new_assign_id
     else
       flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'

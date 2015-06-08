@@ -87,8 +87,6 @@ class AssignmentTeam < Team
   end
 
   def destroy
-    puts self.id
-    puts response_maps.size
     response_maps.each(&:destroy)
     super
   end

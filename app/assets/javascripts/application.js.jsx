@@ -29,24 +29,8 @@
 // Eliminate the “element.dispatchEvent is not a function” error
 jQuery.noConflict();
 
-var CommentBox = React.createClass({
-  render: function() {
-    return (
-      <div className="commentBox">
-        <input />
-        Hello, world! I am a CommentBox.
-      </div>
-    );
-  }
-});
-
 jQuery(document).on('ready page:load', function() {
   jQuery(this).trigger('turbo:ready');
-  console.log("hey")
-  React.render(
-    <CommentBox />,
-    document.getElementById('content')
-  );
 });
 
 function capitalize(str) {

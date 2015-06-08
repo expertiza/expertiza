@@ -11,6 +11,9 @@
 // GO AFTER THE REQUIRES BELOW.
 //
 //= require turbolinks
+//= require react
+//= require react_ujs
+//= require components
 //= require jquery
 //= require jquery_ujs
 //= require jquery.datetimepicker
@@ -23,8 +26,27 @@
 //= require_tree .
 //= require jquery.datetimepicker
 
-$(document).on('ready page:load', function() {
+// Eliminate the “element.dispatchEvent is not a function” error
+jQuery.noConflict();
+
+var CommentBox = React.createClass({
+  render: function() {
+    return (
+      <div className="commentBox">
+        <input />
+        Hello, world! I am a CommentBox.
+      </div>
+    );
+  }
+});
+
+jQuery(document).on('ready page:load', function() {
   jQuery(this).trigger('turbo:ready');
+  console.log("hey")
+  React.render(
+    <CommentBox />,
+    document.getElementById('content')
+  );
 });
 
 function capitalize(str) {

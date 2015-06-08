@@ -56,6 +56,7 @@ gem 'turbolinks'
 gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
+gem 'react-rails', '~> 1.0'
 
 group :development do
   gem 'daemons'

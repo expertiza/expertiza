@@ -25,5 +25,7 @@ module Expertiza
     config.active_record.whitelist_attributes = false
 
     config.autoload_paths += Dir[Rails.root.join('lib', '{**}')]
+
+    config.react.addons = true
   end
 end

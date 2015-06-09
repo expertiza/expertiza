@@ -17,7 +17,6 @@ require 'analytic/assignment_analytic'
   # then Rails will "automatically' set the type field to the value that
   # designates an assignment of the appropriate type.
   has_many :participants, :class_name => 'AssignmentParticipant', :foreign_key => 'parent_id'
-  has_many :participant_review_mappings, :class_name => 'ParticipantReviewResponseMap', :through => :participants, :source => :review_mappings
   has_many :users, :through => :participants
   has_many :due_dates, :dependent => :destroy
   has_many :teams, :class_name => 'AssignmentTeam', :foreign_key => 'parent_id'
@@ -565,13 +564,6 @@ require 'analytic/assignment_analytic'
 
   def delete(force = nil)
     begin
-      maps = ParticipantReviewResponseMap.where(reviewed_object_id: self.id)
-      maps.each { |map| map.delete(force) }
-    rescue
-      raise "At least one review response exists for #{self.name}."
-    end
-
-    begin
       maps = TeamReviewResponseMap.where(reviewed_object_id: self.id)
       maps.each { |map| map.delete(force) }
     rescue
@@ -925,7 +917,7 @@ require 'analytic/assignment_analytic'
 
   # get_total_reviews_assigned_by_type()
   # Returns the number of reviewers assigned to a particular assignment by the type of review
-  # Param: type - String (ParticipantReviewResponseMap, etc.)
+  # Param: type - String (TeamReviewResponseMap, etc.)
   def get_total_reviews_assigned_by_type(type)
     count = 0
     self.response_maps.each { |x| count = count + 1 if x.type == type }
@@ -941,7 +933,7 @@ require 'analytic/assignment_analytic'
   end
 
   # Returns the number of reviews completed for a particular assignment by type of review
-  # Param: type - String (ParticipantReviewResponseMap, etc.)
+  # Param: type - String (TeamReviewResponseMap, etc.)
   def get_total_reviews_completed_by_type(type)
     # self.responses.size
     response_count = 0
@@ -950,7 +942,7 @@ require 'analytic/assignment_analytic'
   end
 
   # Returns the number of reviews completed for a particular assignment by type of review
-  # Param: type - String (ParticipantReviewResponseMap, etc.)
+  # Param: type - String (TeamReviewResponseMap, etc.)
   # Param: date - Filter reviews that were not created on this date
   def get_total_reviews_completed_by_type_and_date(type, date)
     # self.responses.size

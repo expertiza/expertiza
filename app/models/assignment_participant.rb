@@ -12,7 +12,7 @@ class AssignmentParticipant < Participant
   require 'wiki_helper'
 
   belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
-  has_many    :review_mappings, :class_name => 'ParticipantReviewResponseMap', :foreign_key => 'reviewee_id'
+  has_many    :review_mappings, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewee_id'
   has_many    :quiz_mappings, :class_name => 'QuizResponseMap', :foreign_key => 'reviewee_id'
   has_many :response_maps, foreign_key: 'reviewee_id'
   has_many :participant_review_response_maps, foreign_key: 'reviewee_id'
@@ -20,7 +20,7 @@ class AssignmentParticipant < Participant
   has_many :quiz_responses, through: :quiz_response_maps, foreign_key: 'map_id'
   # has_many    :quiz_responses,  :class_name => 'Response', :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'QuizResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
     has_many    :collusion_cycles
-  # has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'ParticipantReviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
+  # has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'TeamReviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
     belongs_to  :user
   validates_presence_of :handle
 
@@ -84,7 +84,8 @@ class AssignmentParticipant < Participant
   end
 
   def assign_reviewer(reviewer)
-    ParticipantReviewResponseMap.create(:reviewee_id => self.id, :reviewer_id => reviewer.id,
+    team_id = SignedUpTeam.team_id(self.parent_id, self.user_id)
+    TeamReviewResponseMap.create(:reviewee_id => team_id, :reviewer_id => reviewer.id,
                                         :reviewed_object_id => assignment.id)
   end
 
@@ -108,7 +109,8 @@ class AssignmentParticipant < Participant
   # Evaluates whether this participant contribution was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object
   def reviewed_by?(reviewer)
-    ParticipantReviewResponseMap.where(['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', self.id, reviewer.id, assignment.id]).count > 0
+    team_id = SignedUpTeam.team_id(self.parent_id, self.user_id)
+    TeamReviewResponseMap.where(['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', team_id, reviewer.id, assignment.id]).count > 0
   end
 
 
@@ -132,13 +134,8 @@ class AssignmentParticipant < Participant
   # all the participants in this assignment reviewed by this person
   def reviewees
     reviewees = []
-    if self.assignment.team_assignment?
-      rmaps = ResponseMap.all(conditions: ["reviewer_id = #{self.id} && type = 'TeamReviewResponseMap'"])
+    rmaps = ResponseMap.all(conditions: ["reviewer_id = #{self.id} && type = 'TeamReviewResponseMap'"])
         rmaps.each { |rm| reviewees.concat(AssignmentTeam.find(rm.reviewee_id).participants) }
-    else
-      rmaps = ResponseMap.where(["reviewer_id = #{self.id} && type = 'ParticipantReviewResponseMap'"])
-        rmaps.each {|rm| reviewees.push(AssignmentParticipant.find(rm.reviewee_id))}
-    end
 
     reviewees
   end
@@ -146,11 +143,7 @@ class AssignmentParticipant < Participant
   # all the participants in this assignment who have reviewed this person
   def reviewers
     reviewers = []
-    if self.assignment.team_assignment? && self.team
-      rmaps = ResponseMap.where(["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponseMap'"])
-    else
-      rmaps = ResponseMap.where(["reviewee_id = #{self.id} AND type = 'ParticipantReviewResponseMap'"])
-    end
+    rmaps = ResponseMap.where(["reviewee_id = #{self.team.id} AND type = 'TeamReviewResponseMap'"])
     rmaps.each do |rm|
       reviewers.push(AssignmentParticipant.find(rm.reviewer_id))
     end
@@ -637,7 +630,9 @@ class AssignmentParticipant < Participant
 
 
     def review_response_maps
-      ParticipantReviewResponseMap.where(reviewee_id: id, reviewed_object_id: assignment.id)
+      participant = Participant.find(id)
+      team_id = SignedUpTeam.team_id(participant.parent_id, participant.user_id)
+      TeamReviewResponseMap.where(reviewee_id: team_id, reviewed_object_id: assignment.id)
     end
 
     def topic_string

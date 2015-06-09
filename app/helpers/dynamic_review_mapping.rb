@@ -45,7 +45,8 @@ module DynamicReviewMapping
       current_author_candidate = current_reviewer_candidate
       for j in 0 .. (reviewers.size * num_reviews / authors.size) - 1  # This method potentially assigns authors different #s of reviews, if limit is non-integer
         current_author_candidate = (current_author_candidate + stride) % authors.size
-        ParticipantReviewResponseMap.create(reviewee_id: authors[current_author_candidate].id, reviewer_id: reviewers[i].id, reviewed_object_id: self.id)
+        team_id = SignedUpTeam.team_id(authors[current_author_candidate].parent_id, authors[current_author_candidate].user_id)
+        TeamReviewResponseMap.create(reviewee_id: team_id, reviewer_id: reviewers[i].id, reviewed_object_id: self.id)
       end
       end
     end

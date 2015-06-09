@@ -116,11 +116,7 @@ class BookmarksController < ApplicationController
 
     @assignment  = @participant.assignment
 
-    if @assignment.team_assignment
-      @review_mappings = TeamReviewResponseMap.where(reviewer_id: @participant.id)
-    else
-      @review_mappings = ParticipantReviewResponseMap.where(reviewer_id: @participant.id)
-    end
+    @review_mappings = TeamReviewResponseMap.where(reviewer_id: @participant.id)
 
     @topics_bookmarks = Hash.new
 

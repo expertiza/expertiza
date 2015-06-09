@@ -6,6 +6,7 @@ class ScoresController < ApplicationController
 
   def show
     @participant = AssignmentParticipant.find(params[:id])
+    @team_id = SignedUpTeam.team_id(@participant.parent_id, @participant.user_id)
 
     return if redirect_when_disallowed
     @assignment = @participant.assignment
@@ -15,14 +16,14 @@ class ScoresController < ApplicationController
       @questions[questionnaire.symbol] = questionnaire.questions
     end
 
-    rmaps = ParticipantReviewResponseMap.where(reviewee_id: @participant.id, reviewed_object_id: @participant.assignment.id)
+    rmaps = TeamReviewResponseMap.where(reviewee_id: @team_id, reviewed_object_id: @participant.parent_id)
     rmaps.find_each do |rmap|
       rmap.update_attribute :notification_accepted, true
     end
 
-    rmaps = ParticipantReviewResponseMap.where reviewer_id: @participant.id, reviewed_object_id: @participant.parent_id
+    rmaps = TeamReviewResponseMap.where(reviewer_id: @participant.id, reviewed_object_id: @participant.parent_id)
     rmaps.find_each do |rmap|
-      mmaps = MetareviewResponseMap.where reviewee_id: rmap.reviewer_id, reviewed_object_id: rmap.map_id
+      mmaps = MetareviewResponseMap.where(reviewee_id: rmap.reviewer_id, reviewed_object_id: rmap.map_id)
       mmaps.find_each do |mmap|
         mmap.update_attribute :notification_accepted, true
       end

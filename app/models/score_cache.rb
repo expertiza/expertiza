@@ -215,18 +215,13 @@ class ScoreCache < ActiveRecord::Base
 
   def self.get_score_set_for_review_type(allscores, map_type)
     ##isolates the scores for the particular item needed  (eg: Review, MetaReview, Feedback etc)
-    #  ParticipantReviewResponseMap - Review mappings for single user assignments
     #  TeamReviewResponseMap - Review mappings for team based assignments
     #  MetareviewResponseMap - Metareview mappings
     #  TeammateReviewResponseMap - Review mapping between teammates
     #  FeedbackResponseMap - Feedback from author to reviewer
 
     score_set = Hash.new
-    if map_type == "ParticipantReviewResponseMap"
-      if allscores[:review]
-        score_set = compute_scoreset(allscores , "review")
-      end
-    elsif map_type == "TeamReviewResponseMap"
+    if map_type == "TeamReviewResponseMap"
       if allscores[:review]
         score_set = compute_scoreset(allscores , "review")
       end

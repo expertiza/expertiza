@@ -24,7 +24,7 @@ class Assessment360Controller < ApplicationController
     end
 
     def one_course_all_assignments
-        @REVIEW_TYPES = ["ParticipantReviewResponseMap", "FeedbackResponseMap", "TeammateReviewResponseMap", "MetareviewResponseMap"]
+        @REVIEW_TYPES = ["TeamReviewResponseMap", "FeedbackResponseMap", "TeammateReviewResponseMap", "MetareviewResponseMap"]
         # @REVIEW_TYPES = ["TeammateReviewResponseMap"]
         @GRAPH_TYPES = ["PieChart", "BarChart", "Histogram"]
         @course = Course.find(params[:course_id])

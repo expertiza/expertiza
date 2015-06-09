@@ -2,7 +2,7 @@ class AssignmentTeam < Team
 
   belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
   has_many    :review_mappings, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewee_id'
-  has_many :response_maps, foreign_key: :reviewee_id
+  has_many :team_review_response_maps, foreign_key: :reviewee_id
   has_many :responses, through: :response_maps, foreign_key: :map_id
 
     # START of contributor methods, shared with AssignmentParticipant

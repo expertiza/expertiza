@@ -209,6 +209,7 @@ Expertiza::Application.routes.draw do
       get :bequeath_all
       post :update_authorizations
       post :update_duties
+      post :change_handle
     end
   end
 

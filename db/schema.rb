@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 201150105163040) do
+ActiveRecord::Schema.define(version: 20150527185412) do
 
   create_table "assignment_questionnaires", force: :cascade do |t|
     t.integer "assignment_id",        limit: 4
@@ -438,10 +438,7 @@ ActiveRecord::Schema.define(version: 201150105163040) do
     t.integer  "round",                 limit: 4
   end
 
-  add_index "response_maps", ["reviewed_object_id"], name: "index_response_maps_on_reviewed_object_id", using: :btree
-  add_index "response_maps", ["reviewee_id"], name: "index_response_maps_on_reviewee_id", using: :btree
   add_index "response_maps", ["reviewer_id"], name: "fk_response_map_reviewer", using: :btree
-  add_index "response_maps", ["reviewer_id"], name: "index_response_maps_on_reviewer_id", using: :btree
 
   create_table "responses", force: :cascade do |t|
     t.integer  "map_id",             limit: 4,     default: 0, null: false
@@ -452,7 +449,6 @@ ActiveRecord::Schema.define(version: 201150105163040) do
   end
 
   add_index "responses", ["map_id"], name: "fk_response_response_map", using: :btree
-  add_index "responses", ["map_id"], name: "index_responses_on_map_id", using: :btree
 
   create_table "resubmission_times", force: :cascade do |t|
     t.integer  "participant_id", limit: 4
@@ -507,8 +503,6 @@ ActiveRecord::Schema.define(version: 201150105163040) do
     t.string  "range",       limit: 255, default: ""
     t.string  "object_type", limit: 255, default: "",  null: false
   end
-
-  add_index "score_caches", ["reviewee_id"], name: "index_score_caches_on_reviewee_id", using: :btree
 
   create_table "score_views", id: false, force: :cascade do |t|
     t.integer  "question_weight",        limit: 4
@@ -714,9 +708,7 @@ ActiveRecord::Schema.define(version: 201150105163040) do
   end
 
   add_index "teams_users", ["team_id"], name: "fk_users_teams", using: :btree
-  add_index "teams_users", ["team_id"], name: "index_teams_users_on_team_id", using: :btree
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
-  add_index "teams_users", ["user_id"], name: "index_teams_users_on_user_id", using: :btree
 
   create_table "topic_deadlines", force: :cascade do |t|
     t.datetime "due_at"

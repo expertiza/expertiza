@@ -5,13 +5,20 @@ class ScrubDatabase
       user.name = "#{user.role.name.downcase.gsub(/[- ]/,'_')}#{user.id}"
       user.fullname = "#{user.id}, #{user.role.name.downcase.gsub(/[- ]/,'_')}"
       user.email = "expertiza@mailinator.com"
-
+      user.handle = "handle"
       user.password = "password"
-      user.password_confirmation = "password"
-
+      #user.password_confirmation = "password"
       user.save(validate: false)
       print "." if user.id % 100 == 0
     end
-    puts "Done!"
+    puts "Scrubbing users done!"
+
+    puts "Scrubbing #{Participant.count} participants"
+    Participant.find_each do |participant|
+      participant.handle = "handle"
+      participant.save(validate: false)
+      print "." if participant.id % 500 == 0
+    end
+    puts "Scrubbing participants done!"
   end
 end

@@ -561,7 +561,7 @@ class SignUpSheetController < ApplicationController
     DeadlineHelper.set_start_due_date(assignment_id, set_of_topics)
   end
 
-        #gets team_details to show it on team_details view for a given assignment
+  #gets team_details to show it on team_details view for a given assignment
   def show_team
     if !(assignment = Assignment.find(params[:assignment_id])).nil? and !(topic = SignUpTopic.find(params[:id])).nil?
       @results =ad_info(assignment.id, topic.id)

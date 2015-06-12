@@ -44,5 +44,5 @@ class ConvertAllIndividualAssignmentsToOneMemberTeamAssignments < ActiveRecord::
 #		  	end
 #		end
 #	end
-#  end
+  end
 end

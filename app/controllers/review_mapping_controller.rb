@@ -156,8 +156,12 @@ class ReviewMappingController < ApplicationController
         else
           topic = assignment.candidate_topics_to_review(reviewer).to_a.shuffle[0] rescue nil
         end
+        if topic.nil?
+          flash[:error] ="We cannot not find a topic for you to review."
+        else
+          assignment.assign_reviewer_dynamically(reviewer, topic)
+        end
 
-        assignment.assign_reviewer_dynamically(reviewer, topic)
       else  #assignment without topic -Yang
         assignment_teams = assignment.candidate_assignment_teams_to_review
         assignment_team = assignment_teams.to_a.shuffle[0] rescue nil

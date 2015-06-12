@@ -1,4 +1,4 @@
-<a href="#<%= i %>" onClick="">
+<a href="#<%= i %>" onClick="toggleSingleTeamAndMember(<%= i %>)">
   <span class="inline" id="<%= i %>_show"><%= topic.topic_name %></span>
   <span class="inline" id="<%= i %>_hide" style="display: none"><%= topic.topic_name %></span>
 </a>
@@ -14,9 +14,9 @@
 
         <% if(@assignment.max_team_size > 1)%>
           <br/>
-          <b><%= participant.name.gsub(/\[/,'').gsub(/\]/,'')%></b>
+          <b><%= participant.name.gsub(/\[/,'').gsub(/\]/,'').gsub(/\s.*/,'')%></b>
           <br/>
-          <%= participant.name.gsub(/\[.*\]/,'')%>
+          <%= participant.name.gsub(/\[.*\]\s/,'')%>
         <% else %>
           <%= participant.name.gsub(/\[[^\]]+\]/,'')%>
         <% end %>

@@ -16,12 +16,12 @@ class ScoresController < ApplicationController
       @questions[questionnaire.symbol] = questionnaire.questions
     end
 
-    rmaps = TeamReviewResponseMap.where(reviewee_id: @team_id, reviewed_object_id: @participant.parent_id)
+    rmaps = ReviewResponseMap.where(reviewee_id: @team_id, reviewed_object_id: @participant.parent_id)
     rmaps.find_each do |rmap|
       rmap.update_attribute :notification_accepted, true
     end
 
-    rmaps = TeamReviewResponseMap.where(reviewer_id: @participant.id, reviewed_object_id: @participant.parent_id)
+    rmaps = ReviewResponseMap.where(reviewer_id: @participant.id, reviewed_object_id: @participant.parent_id)
     rmaps.find_each do |rmap|
       mmaps = MetareviewResponseMap.where(reviewee_id: rmap.reviewer_id, reviewed_object_id: rmap.map_id)
       mmaps.find_each do |mmap|

@@ -1,8 +1,8 @@
 class AssignmentTeam < Team
 
   belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
-  has_many    :review_mappings, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewee_id'
-  has_many :team_review_response_maps, foreign_key: :reviewee_id
+  has_many    :review_mappings, :class_name => 'ReviewResponseMap', :foreign_key => 'reviewee_id'
+  has_many :response_maps, foreign_key: :reviewee_id
   has_many :responses, through: :response_maps, foreign_key: :map_id
 
     # START of contributor methods, shared with AssignmentParticipant
@@ -28,22 +28,22 @@ class AssignmentTeam < Team
     else
       round=nil
     end
-    TeamReviewResponseMap.create(:reviewee_id => self.id, :reviewer_id => reviewer.id,
+    ReviewResponseMap.create(:reviewee_id => self.id, :reviewer_id => reviewer.id,
                                  :reviewed_object_id => assignment.id, :round =>round)
   end
 
   #for varying rubric feature -Yang
   def reviewed_by_in_round?(reviewer,round)
-    return TeamReviewResponseMap.where(reviewee_id:self.id, reviewer_id:reviewer.id, reviewed_object_id:assignment.id, round:round).count()>0
-    #return TeamReviewResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ? AND round=?',
+    return ReviewResponseMap.where(reviewee_id:self.id, reviewer_id:reviewer.id, reviewed_object_id:assignment.id, round:round).count()>0
+    #return ReviewResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ? AND round=?',
                                                        #sself.id, reviewer.id, assignment.id, round]) > 0
   end
 
   # Evaluates whether any contribution by this team was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object
   def reviewed_by?(reviewer)
-    #TeamReviewResponseMap.count(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id]) > 0
-    TeamReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id).count > 0
+    #ReviewResponseMap.count(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id]) > 0
+    ReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id).count > 0
   end
 
   # Topic picked by the team
@@ -64,7 +64,7 @@ class AssignmentTeam < Team
   end
 
   def reviewed_contributor?(contributor)
-    TeamReviewResponseMap.all(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', contributor.id, self.id, assignment.id]).empty? == false
+    ReviewResponseMap.all(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', contributor.id, self.id, assignment.id]).empty? == false
   end
 
   # END of contributor methods
@@ -110,7 +110,7 @@ class AssignmentTeam < Team
   end
 
   def review_map_type
-    'TeamReviewResponseMap'
+    'ReviewResponseMap'
   end
 
   def self.handle_duplicate(team, name, assignment_id, handle_duplicates)
@@ -205,7 +205,7 @@ class AssignmentTeam < Team
         scores[:team] = self # This doesn't appear to be used anywhere
         assignment.questionnaires.each do |questionnaire|
           scores[questionnaire.symbol] = Hash.new
-          scores[questionnaire.symbol][:assessments] = TeamReviewResponseMap.where(reviewee_id: self.id)
+          scores[questionnaire.symbol][:assessments] = ReviewResponseMap.where(reviewee_id: self.id)
           scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
         end
         scores[:total_score] = assignment.compute_total_score(scores)

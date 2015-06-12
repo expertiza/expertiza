@@ -59,8 +59,8 @@ class ReviewMappingController < ApplicationController
       reviewer = get_reviewer(user,assignment,regurl)
       #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
-      if TeamReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?  and round = ?',params[:id],reviewer.id, round]).first.nil?
-        TeamReviewResponseMap.create(:reviewee_id => params[:contributor_id], :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id, :round=>round)
+      if ReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?  and round = ?',params[:id],reviewer.id, round]).first.nil?
+        ReviewResponseMap.create(:reviewee_id => params[:contributor_id], :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id, :round=>round)
       else
         raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
       end
@@ -112,8 +112,8 @@ class ReviewMappingController < ApplicationController
         #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
         # to treat all assignments as team assignments
         contributor = get_team_from_submission(submission)
-        if TeamReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ? and round=?', contributor.id, reviewer.id, round]).first.nil?
-          TeamReviewResponseMap.create(:reviewee_id => contributor.id,
+        if ReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ? and round=?', contributor.id, reviewer.id, round]).first.nil?
+          ReviewResponseMap.create(:reviewee_id => contributor.id,
                                        :reviewer_id => reviewer.id,
                                        :reviewed_object_id => assignment.id,
                                        :round => round)
@@ -535,7 +535,7 @@ class ReviewMappingController < ApplicationController
     @assignment = Assignment.find(@id)
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    @type = "TeamReviewResponseMap"
+    @type = "ReviewResponseMap"
 
     if params[:user].nil?
       # This is not a search, so find all reviewers for this assignment
@@ -561,7 +561,7 @@ class ReviewMappingController < ApplicationController
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     teams = Team.where(parent_id: params[:id])
-    objtype = "TeamReviewResponseMap"
+    objtype = "ReviewResponseMap"
 
     teams.each do |team|
       score_cache = ScoreCache.where( ["reviewee_id = ? and object_type = ?",team.id,  objtype]).first

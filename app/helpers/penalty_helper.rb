@@ -76,7 +76,7 @@ module PenaltyHelper
     if (num_of_reviews_required > 0)
 
       #reviews
-      review_mappings = TeamReviewResponseMap.where(reviewer_id: @participant.id)
+      review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
 
       review_due_date = DueDate.where(deadline_type_id: @review_deadline_type_id, assignment_id:  @assignment.id).first
 

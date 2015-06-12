@@ -1,8 +1,21 @@
 class ReviewResponseMap < ResponseMap
+  belongs_to :reviewee, :class_name => 'Team', :foreign_key => 'reviewee_id'
+  belongs_to :contributor, :class_name => 'Team', :foreign_key => 'reviewee_id'
   belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'reviewed_object_id'
 
+  # if this assignment uses "varying rubrics" feature, the "used_in_round" field should not be nil
+  # so find the round # from response_map, and use that round # to find corresponding questionnaire_id from assignment_questionnaires table
+  # otherwise this assignment does not use the "varying rubrics", so in assignment_questionnaires table there should
+  # be only 1 questionnaire with type 'ReviewQuestionnaire'.    -Yang
   def questionnaire
-    self.assignment.questionnaires.find_by_type('ReviewQuestionnaire')
+    round = self.round
+    if round==nil              #for assignment without varying rubrics
+      return self.assignment.questionnaires.find_by_type('ReviewQuestionnaire')
+    else
+      assignment_id = self.assignment.id
+      questionnaire_id= AssignmentQuestionnaire.find_by_assignment_id_and_used_in_round(assignment_id,round).questionnaire_id
+      return self.assignment.questionnaires.find_by_id(questionnaire_id)
+    end
   end
 
   def get_title
@@ -58,9 +71,9 @@ class ReviewResponseMap < ResponseMap
         if reviewee == nil
           raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"
         end
-        existing = TeamReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
+        existing = ReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
         if existing.nil?
-          TeamReviewResponseMap.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => assignment.id)
+          ReviewResponseMap.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => assignment.id)
         end
       else
         puser = User.find_by_name(row[0].to_s.strip)
@@ -72,9 +85,9 @@ class ReviewResponseMap < ResponseMap
           raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"
         end
         team_id = SignedUpTeam.team_id(reviewee.parent_id, reviewee.user_id)
-        existing = TeamReviewResponseMap.where(reviewee_id: team_id, reviewer_id:  reviewer.id).first
+        existing = ReviewResponseMap.where(reviewee_id: team_id, reviewer_id:  reviewer.id).first
         if existing.nil?
-          TeamReviewResponseMap.create(:reviewee_id => team_id, :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id)
+          ReviewResponseMap.create(:reviewee_id => team_id, :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id)
         end
       end
       index += 1
@@ -101,4 +114,31 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
+  def metareview_response_maps
+    responses = Response.where(map_id:self.id)
+    metareview_list=Array.new()
+    responses.each do |response|
+      metareview_response_maps = MetareviewResponseMap.where(reviewed_object_id:response.id)
+      metareview_response_maps.each do |metareview_response_map|
+        metareview_list<<metareview_response_map
+      end
+    end
+    metareview_list
+  end
+
+  # return  the responses for specified round, for varying rubric feature -Yang
+  def self.get_assessments_round_for(team,round)
+    team_id =team.id
+    responses = Array.new
+    if team_id
+      maps = ResponseMap.where(:reviewee_id => team_id, :type => "ReviewResponseMap", :round => round)
+      maps.each{ |map|
+        if map.response
+          responses << map.response
+        end
+      }
+      responses.sort! {|a,b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }
+    end
+    return responses
+  end
 end

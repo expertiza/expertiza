@@ -46,7 +46,7 @@ module DynamicReviewMapping
       for j in 0 .. (reviewers.size * num_reviews / authors.size) - 1  # This method potentially assigns authors different #s of reviews, if limit is non-integer
         current_author_candidate = (current_author_candidate + stride) % authors.size
         team_id = SignedUpTeam.team_id(authors[current_author_candidate].parent_id, authors[current_author_candidate].user_id)
-        TeamReviewResponseMap.create(reviewee_id: team_id, reviewer_id: reviewers[i].id, reviewed_object_id: self.id)
+        ReviewResponseMap.create(reviewee_id: team_id, reviewer_id: reviewers[i].id, reviewed_object_id: self.id)
       end
       end
     end
@@ -127,7 +127,7 @@ module DynamicReviewMapping
         self.teams.each{
           | reviewee |
           if @team_review[i][j].one?
-            TeamReviewResponseMap.create(reviewer_id: reviewer.id, reviewed_object_id: self.id, reviewee_id: reviewee.id)
+            ReviewResponseMap.create(reviewer_id: reviewer.id, reviewed_object_id: self.id, reviewee_id: reviewee.id)
         end
         j += 1
         }
@@ -598,8 +598,8 @@ module DynamicReviewMapping
           #reviewer, and hence participant could be nil when algo couldn't find someone to review somebody's work
           unless participant.nil?
             reviewer_id = participant.id
-            if TeamReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?', team_id, reviewer_id]).first.nil?
-              TeamReviewResponseMap.create(reviewee_id: team_id, reviewer_id: reviewer_id, reviewed_object_id: @assignment.id)
+            if ReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?', team_id, reviewer_id]).first.nil?
+              ReviewResponseMap.create(reviewee_id: team_id, reviewer_id: reviewer_id, reviewed_object_id: @assignment.id)
             else
               #if there is such a review mapping just skip it. Or it can be handled by informing
               #the instructor(TODO:)
@@ -612,7 +612,7 @@ module DynamicReviewMapping
       end
           rescue Exception => exc
             #revert the mapping
-            response_mappings = TeamReviewResponseMap.where(reviewed_object_id: @assignment.id)
+            response_mappings = ReviewResponseMap.where(reviewed_object_id: @assignment.id)
             unless response_mappings.nil?
               response_mappings.each {|response_mapping|
                 response_mapping.delete
@@ -630,7 +630,7 @@ module DynamicReviewMapping
 
           @assignment = assignment
           number_of_reviews = num_review_of_reviews.to_i
-          contributors = TeamReviewResponseMap.where(reviewed_object_id: @assignment.id)
+          contributors = ReviewResponseMap.where(reviewed_object_id: @assignment.id)
           users = Array.new
           mappings = Hash.new
           reviews_per_user = 0

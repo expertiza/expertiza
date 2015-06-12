@@ -20,7 +20,7 @@ require 'analytic/assignment_analytic'
   has_many :users, :through => :participants
   has_many :due_dates, :dependent => :destroy
   has_many :teams, :class_name => 'AssignmentTeam', :foreign_key => 'parent_id'
-  has_many :team_review_mappings, :class_name => 'TeamReviewResponseMap', :through => :teams, :source => :review_mappings
+  has_many :team_review_mappings, :class_name => 'ReviewResponseMap', :through => :teams, :source => :review_mappings
   has_many :invitations, :class_name => 'Invitation', :foreign_key => 'assignment_id', :dependent => :destroy
   has_many :assignment_questionnaires,:dependent => :destroy
   has_many :questionnaires, :through => :assignment_questionnaires
@@ -391,7 +391,7 @@ require 'analytic/assignment_analytic'
   def review_mappings
     #ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    TeamReviewResponseMap.where(reviewed_object_id: self.id)
+    ReviewResponseMap.where(reviewed_object_id: self.id)
     end
 
   def metareview_mappings
@@ -442,7 +442,7 @@ require 'analytic/assignment_analytic'
         total_score = 0
         total_num_of_assessments = 0    #calculate grades for each rounds
         for i in 1..self.get_review_rounds
-          assessments = TeamReviewResponseMap.get_assessments_round_for(team,i)
+          assessments = ReviewResponseMap.get_assessments_round_for(team,i)
           round_sym = ("review"+i.to_s).to_sym
           grades_by_rounds[round_sym]= Score.compute_scores(assessments, questions[round_sym])
           total_num_of_assessments += assessments.size
@@ -475,7 +475,7 @@ require 'analytic/assignment_analytic'
         end
 
       else
-        assessments = TeamReviewResponseMap.get_assessments_for(team)
+        assessments = ReviewResponseMap.get_assessments_for(team)
         scores[:teams][index.to_s.to_sym][:scores] = Score.compute_scores(assessments, questions[:review])
       end
 
@@ -564,7 +564,7 @@ require 'analytic/assignment_analytic'
 
   def delete(force = nil)
     begin
-      maps = TeamReviewResponseMap.where(reviewed_object_id: self.id)
+      maps = ReviewResponseMap.where(reviewed_object_id: self.id)
       maps.each { |map| map.delete(force) }
     rescue
       raise "At least one review response exists for #{self.name}."
@@ -844,7 +844,7 @@ require 'analytic/assignment_analytic'
     @review_scores = Hash.new
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    @response_type = 'TeamReviewResponseMap'
+    @response_type = 'ReviewResponseMap'
 
     @myreviewers = ResponseMap.select('DISTINCT reviewer_id').where(['reviewed_object_id = ? && type = ? ', self.id, @type])
 
@@ -917,7 +917,7 @@ require 'analytic/assignment_analytic'
 
   # get_total_reviews_assigned_by_type()
   # Returns the number of reviewers assigned to a particular assignment by the type of review
-  # Param: type - String (TeamReviewResponseMap, etc.)
+  # Param: type - String (ReviewResponseMap, etc.)
   def get_total_reviews_assigned_by_type(type)
     count = 0
     self.response_maps.each { |x| count = count + 1 if x.type == type }
@@ -933,7 +933,7 @@ require 'analytic/assignment_analytic'
   end
 
   # Returns the number of reviews completed for a particular assignment by type of review
-  # Param: type - String (TeamReviewResponseMap, etc.)
+  # Param: type - String (ReviewResponseMap, etc.)
   def get_total_reviews_completed_by_type(type)
     # self.responses.size
     response_count = 0
@@ -942,7 +942,7 @@ require 'analytic/assignment_analytic'
   end
 
   # Returns the number of reviews completed for a particular assignment by type of review
-  # Param: type - String (TeamReviewResponseMap, etc.)
+  # Param: type - String (ReviewResponseMap, etc.)
   # Param: date - Filter reviews that were not created on this date
   def get_total_reviews_completed_by_type_and_date(type, date)
     # self.responses.size

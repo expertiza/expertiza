@@ -17,7 +17,7 @@ class ScoreCache < ActiveRecord::Base
     @t_min = 0
     @teammember = TeamsUser.new
     @t_max = 0
-    if @map_type == "TeamReviewResponseMap"
+    if @map_type == "ReviewResponseMap"
       get_team_score()
       tm_id=@contributor_id
     else
@@ -33,7 +33,7 @@ class ScoreCache < ActiveRecord::Base
                                             # the project documentation
     tm_user_ct = TeamsUser.where(["team_id = ?", tm_id])
     tm_rv_ct = ScoreCache.where(["reviewee_id = ? and object_type = ?", tm_id, "TeammateReviewResponseMap"]).count
-    sc_proj = ScoreCache.where(["reviewee_id = ? and object_type = ?", tm_id, "TeamReviewResponseMap"]).first
+    sc_proj = ScoreCache.where(["reviewee_id = ? and object_type = ?", tm_id, "ReviewResponseMap"]).first
 
     if tm_user_ct == tm_rv_ct and sc_proj != nil
 
@@ -215,13 +215,13 @@ class ScoreCache < ActiveRecord::Base
 
   def self.get_score_set_for_review_type(allscores, map_type)
     ##isolates the scores for the particular item needed  (eg: Review, MetaReview, Feedback etc)
-    #  TeamReviewResponseMap - Review mappings for team based assignments
+    #  ReviewResponseMap - Review mappings
     #  MetareviewResponseMap - Metareview mappings
     #  TeammateReviewResponseMap - Review mapping between teammates
     #  FeedbackResponseMap - Feedback from author to reviewer
 
     score_set = Hash.new
-    if map_type == "TeamReviewResponseMap"
+    if map_type == "ReviewResponseMap"
       if allscores[:review]
         score_set = compute_scoreset(allscores , "review")
       end
@@ -301,7 +301,7 @@ class ScoreCache < ActiveRecord::Base
     @participant = AssignmentParticipant.find(pid)
     @assignment_id = @participant.parent_id
 
-    assignment_num_reviews = ResponseMap.where(["reviewed_object_id=? AND type=?", @assignment_id, 'TeamReviewResponseMap'])
+    assignment_num_reviews = ResponseMap.where(["reviewed_object_id=? AND type=?", @assignment_id, 'ReviewResponseMap'])
     @assignment_participants = AssignmentParticipant.where(parent_id: @assignment_id)
 
     count = 0
@@ -331,8 +331,8 @@ class ScoreCache < ActiveRecord::Base
     @participant = AssignmentParticipant.find(pid)
     @assignment_id = @participant.parent_id
 
-    #@num_of_reviews = ResponseMap.where("reviewed_object_id=? AND reviewer_id = ? AND type=?", @assignment_id, @participant.id, 'TeamReviewResponseMap')
-    @num_of_reviews = ResponseMap.where(["reviewed_object_id=? AND reviewer_id = ? AND type=?", @assignment_id, @participant.id, 'TeamReviewResponseMap'])
+    #@num_of_reviews = ResponseMap.where("reviewed_object_id=? AND reviewer_id = ? AND type=?", @assignment_id, @participant.id, 'ReviewResponseMap')
+    @num_of_reviews = ResponseMap.where(["reviewed_object_id=? AND reviewer_id = ? AND type=?", @assignment_id, @participant.id, 'ReviewResponseMap'])
 
     reviews_remaining = Array.new
     threshold = 2

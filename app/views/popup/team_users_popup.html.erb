@@ -22,7 +22,7 @@
 
       <td>
         <table>
-          <% @qid ="TeamReviewResponseMap"
+          <% @qid ="ReviewResponseMap"
           @sc = ScoreCache.where(["reviewee_id = ?  and object_type= ?",@teamid, @qid  ]).first %>
         <%if @sc %>
           <% t_score= @sc.score %>

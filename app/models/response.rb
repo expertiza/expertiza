@@ -187,12 +187,12 @@ class Response < ActiveRecord::Base
     participant = Participant.find(reviewer_participant_id)
     assignment = Assignment.find(participant.parent_id)
 
-    if response_map.type =="TeamReviewResponseMap"
+    if response_map.type =="ReviewResponseMap"
 
     end
 
     defn[:subject] = "A new submission is available for "+assignment.name
-    if response_map.type == "TeamReviewResponseMap"
+    if response_map.type == "ReviewResponseMap"
       defn[:body][:type] = "Author Feedback"
       AssignmentTeam.find(response_map.reviewee_id).users.each do |user|
         if assignment.has_topics?

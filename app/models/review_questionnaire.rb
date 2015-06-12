@@ -20,7 +20,7 @@ class ReviewQuestionnaire < Questionnaire
     team_id = team.id
     responses = Array.new
     if participant
-      maps = ResponseMap.where(:reviewee_id => team_id, :type => "TeamReviewResponseMap", :round => round)
+      maps = ResponseMap.where(:reviewee_id => team_id, :type => "ReviewResponseMap", :round => round)
       maps.each{ |map|
         if map.response
           responses << map.response

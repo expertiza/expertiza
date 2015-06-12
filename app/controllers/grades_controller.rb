@@ -65,12 +65,12 @@ class GradesController < ApplicationController
       @questions[questionnaire_symbol] = questionnaire.questions
     end
 
-    rmaps = TeamReviewResponseMap.where(reviewee_id: @team_id, reviewed_object_id: @participant.parent_id)
+    rmaps = ReviewResponseMap.where(reviewee_id: @team_id, reviewed_object_id: @participant.parent_id)
     rmaps.find_each do |rmap|
       rmap.update_attribute :notification_accepted, true
     end
 
-    rmaps = TeamReviewResponseMap.where(reviewer_id: @participant.id, reviewed_object_id: @participant.parent_id)
+    rmaps = ReviewResponseMap.where(reviewer_id: @participant.id, reviewed_object_id: @participant.parent_id)
     rmaps.find_each do |rmap|
       mmaps = MetareviewResponseMap.where(reviewee_id: rmap.reviewer_id, reviewed_object_id: rmap.map_id)
       mmaps.find_each do |mmap|
@@ -112,13 +112,11 @@ class GradesController < ApplicationController
 
     if participant.assignment.team_assignment?
       reviewee = participant.team
-      review_mapping = TeamReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
+      review_mapping = ReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
 
       if review_mapping.nil?
         review_exists = false
-        if participant.assignment.team_assignment?
-          review_mapping = TeamReviewResponseMap.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
-        end
+        review_mapping = ReviewResponseMap.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
         review = Response.find_by_map_id(review_mapping.map_id)
 
         unless review_exists

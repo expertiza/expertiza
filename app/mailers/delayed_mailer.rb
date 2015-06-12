@@ -128,7 +128,7 @@ class DelayedMailer
   def mail_metareviewers
     emails = Array.new
     #find reviewers for the assignment
-    reviewer_tuples = ResponseMap.where( ['reviewed_object_id = ? AND type = "TeamReviewResponseMap"', self.assignment_id])
+    reviewer_tuples = ResponseMap.where( ['reviewed_object_id = ? AND type = "ReviewResponseMap"', self.assignment_id])
     for reviewer in reviewer_tuples
       #find metareviewers - people who will review the reviewers
       meta_reviewer_tuples = ResponseMap.where( ['reviewed_object_id = ? AND type = "MetareviewResponseMap"', reviewer.id])
@@ -144,7 +144,7 @@ class DelayedMailer
 
   def mail_reviewers
     emails = Array.new
-    reviewer_tuples = ResponseMap.where( ['reviewed_object_id = ? AND type = "TeamReviewResponseMap"', self.assignment_id])
+    reviewer_tuples = ResponseMap.where( ['reviewed_object_id = ? AND type = "ReviewResponseMap"', self.assignment_id])
     for reviewer in reviewer_tuples
       participant = Participant.where( ['parent_id = ? AND id = ?', self.assignment_id, reviewer.reviewer_id])
       uid  = participant.user_id

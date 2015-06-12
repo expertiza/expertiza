@@ -6,7 +6,7 @@
 
       <td>
         <table>
-          <% @qid = "TeamReviewResponseMap"
+          <% @qid = "ReviewResponseMap"
           @participant = Participant.find(@participantid)
           @team_id = SignedUpTeam.team_id(@participant.parent_id, @participant.user_id)
           @sc = ScoreCache.where(["reviewee_id = ?  and object_type = ?",@team_id, @qid  ]).first %>

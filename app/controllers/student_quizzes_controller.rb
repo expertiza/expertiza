@@ -41,7 +41,7 @@ class StudentQuizzesController < ApplicationController
   def self.take_quiz assignment_id , reviewer_id
     quizzes = Array.new
     reviewer = Participant.where(user_id: reviewer_id, parent_id: assignment_id).first
-    reviewed_team_response_maps = TeamReviewResponseMap.where(reviewer_id:reviewer.id)
+    reviewed_team_response_maps = ReviewResponseMap.where(reviewer_id:reviewer.id)
     reviewed_team_response_maps.each do |team_response_map_record|
       reviewee_id=team_response_map_record.reviewee_id
       reviewee_team = Team.find(reviewee_id) #reviewees should always be teams

@@ -97,10 +97,6 @@ require 'analytic/assignment_analytic'
     # Reject contributions of topics whose deadline has passed, or which are not reviewable in the current stage
     contributor_set=reject_by_deadline(contributor_set)
 
-
-    # Filter submission by reviewer him/her self
-    contributor_set=reject_own_submission(contributor_set, reviewer)
-
     if self.varying_rubrics_by_round?
       current_round = self.get_current_round(nil)
       contributor_set = reject__reviewed_submissions_in_current_round(contributor_set, reviewer,current_round)
@@ -109,6 +105,8 @@ require 'analytic/assignment_analytic'
       contributor_set=reject_previously_reviewed_submissions(contributor_set, reviewer)
     end
 
+    # Filter submission by reviewer him/her self
+    contributor_set=reject_own_submission(contributor_set, reviewer)
 
     # Filter the contributors with the least number of reviews
     # (using the fact that each contributor is associated with a topic)
@@ -158,7 +156,7 @@ require 'analytic/assignment_analytic'
   end
 
   def reject_own_submission(contributor_set, reviewer)
-    contributor_set.reject! { |contributor| contributor.has_user(reviewer.user_id) }
+    contributor_set.reject! { |contributor| contributor.has_user(User.find(reviewer.user_id)) }
     return contributor_set
   end
 

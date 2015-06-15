@@ -1,6 +1,7 @@
 <%= form_for :hyperlinks, url: '/submitted_content/remove_hyperlink' do |f| %>
   <% if stage != "Complete" %>
-    <% if @current_user.name == participant.handle %>
+    <% team_id = SignedUpTeam.team_id(participant.parent_id, participant.user_id) %>
+    <% if Team.exists?(team_id) and Team.find(team_id).has_user(@current_user) %>
       <b>Hyperlink Actions:</b><BR/>
       </br>
       <%= f.submit 'Delete selected hyperlink' %>

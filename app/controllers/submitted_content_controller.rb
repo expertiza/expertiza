@@ -30,13 +30,18 @@ def submit_hyperlink
   @participant = AssignmentParticipant.find(params[:id])
   return unless current_user_id?(@participant.user_id)
 
-  begin
-    @participant.submit_hyperlink(params['submission'])
-    @participant.update_resubmit_times
-  rescue
-    flash[:error] = "The URL or URI is not valid. Reason: #{$!}"
+  team_hyperlinkds = @participant.hyperlinks
+  if team_hyperlinkds.include?(params['submission'])
+    flash[:error] = "You or your teammate(s) have already submitted the same hyperlink."
+  else
+    begin
+      @participant.submit_hyperlink(params['submission'])
+      @participant.update_resubmit_times
+    rescue
+      flash[:error] = "The URL or URI is not valid. Reason: #{$!}"
+    end
+    undo_link("Link has been submitted successfully. ")
   end
-  undo_link("Link has been submitted successfully. ")
   redirect_to :action => 'edit', :id => @participant.id
 end
 
@@ -45,8 +50,23 @@ def remove_hyperlink
   @participant = AssignmentParticipant.find(params[:hyperlinks][:participant_id])
 
   return unless current_user_id?(@participant.user_id)
+  hyperlink_to_delete = @participant.hyperlinks[params['chk_links'].to_i]
 
-  @participant.remove_hyperlink(params['chk_links'].to_i)
+  team_id = SignedUpTeam.team_id(@participant.parent_id, @participant.user_id)
+  team_participants = Array.new
+  if Team.exists?(team_id)
+    team_users = TeamsUser.where(team_id: team_id)
+    team_users.each do |team_user|
+      team_participants << AssignmentParticipant.where(parent_id: @participant.parent_id, user_id: team_user.user_id).first
+    end
+  else
+    team_participants << @participant
+  end
+
+  team_participants.each do |team_participant|
+    team_participant.remove_hyperlink(hyperlink_to_delete)
+  end
+
   undo_link("Link has been removed successfully. ")
   redirect_to :action => 'edit', :id => @participant.id
 end

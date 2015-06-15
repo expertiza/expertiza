@@ -150,6 +150,7 @@ class ReviewMappingController < ApplicationController
       assignment = Assignment.find(params[:assignment_id])
       reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
 
+    begin
       if assignment.has_topics?  #assignment with topics
         unless params[:i_dont_care]
           topic = (params[:topic_id].nil?) ? nil : SignUpTopic.find(params[:topic_id])
@@ -157,7 +158,7 @@ class ReviewMappingController < ApplicationController
           topic = assignment.candidate_topics_to_review(reviewer).to_a.shuffle[0] rescue nil
         end
         if topic.nil?
-          flash[:error] ="We cannot not find a topic for you to review."
+          flash[:error] ="We cannot not find a topic for you to review. This may caused by not selecting any topic, or there is no topic to review any more."
         else
           assignment.assign_reviewer_dynamically(reviewer, topic)
         end
@@ -167,7 +168,9 @@ class ReviewMappingController < ApplicationController
         assignment_team = assignment_teams.to_a.shuffle[0] rescue nil
         assignment.assign_reviewer_dynamically_no_topic(reviewer,assignment_team)
       end
-
+    rescue Exception => e
+      flash[:error] = (e.nil?) ? $! : e
+    end
 
     redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
   end

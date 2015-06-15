@@ -106,13 +106,13 @@ class AssignmentParticipant < Participant
     return AssignmentParticipant.where(:user_id=>user_id,:parent_id=>assignment_id).first
   end
 
+  #This method should not be used any more after June 2015 because we have removed ParticipantReveiwResponseMap -Yang
   # Evaluates whether this participant contribution was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object
-  def reviewed_by?(reviewer)
-    team_id = SignedUpTeam.team_id(self.parent_id, self.user_id)
-    ReviewResponseMap.where(['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', team_id, reviewer.id, assignment.id]).count > 0
-  end
-
+  ##def reviewed_by?(reviewer)
+  #  team_id = SignedUpTeam.team_id(self.parent_id, self.user_id)
+  ##  ReviewResponseMap.where(['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', team_id, reviewer.id, assignment.id]).count > 0
+  #end
 
   def quiz_taken_by?(contributor, reviewer)
     quiz_id = QuizQuestionnaire.find_by_instructor_id(contributor.id)

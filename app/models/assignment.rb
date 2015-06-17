@@ -1032,12 +1032,15 @@ require 'analytic/assignment_analytic'
       end
     end
 
-    # Look for the topic_id where the team_id equals the contributor id (contributor is a team or a participant)
-    (!Team.where(name: contributor.name, id:  contributor.id).first.nil?) ?
-      contributors_topic = SignedUpTeam.find_by_team_id(contributor.id) :
-      contributors_topic = SignedUpTeam.find_by_team_id(contributor.user_id)
-    contributors_signup_topic = SignUpTopic.find(contributors_topic.topic_id) if !contributors_topic.nil?
+    # Look for the topic_id where the team_id equals the contributor id (contributor is a team)
+    if !SignedUpTeam.where(team_id: contributor.id,is_waitlisted:0).empty?
+      topic_id = SignedUpTeam.where(team_id: contributor.id,is_waitlisted:0).first.topic_id
+      SignUpTopic.find(topic_id)
+    else
+      nil
     end
+
+  end
 
     def self.export(csv, parent_id, options)
       @assignment = Assignment.find(parent_id)

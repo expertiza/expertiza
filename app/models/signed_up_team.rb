@@ -101,8 +101,8 @@ class SignedUpTeam < ActiveRecord::Base
       #team_id variable represents the team_id for this user in this assignment
       team_id = SignedUpTeam.team_id(assignment_id, user_id)
       if team_id
-        if !SignedUpTeam.where(team_id: team_id).empty?
-          topic_id = SignedUpTeam.where(team_id: team_id).first.topic_id
+        if !SignedUpTeam.where(team_id: team_id,is_waitlisted:0).empty?
+          topic_id = SignedUpTeam.where(team_id: team_id,is_waitlisted:0).first.topic_id
         end
       else
         topic_id = nil

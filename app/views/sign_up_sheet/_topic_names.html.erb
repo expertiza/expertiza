@@ -6,6 +6,7 @@
 <!--if 'Has teams' is not checked, the UI should not show the team name on the topic list.-->
 
 <div id="<%= i %>_myDiv">
+<!--Though called participants, @participants are actually records in signed_up_teams table-->
   <% if !@participants.nil? && @participants.size > 0 %>
     <% chooser_present = false %>
     <% for participant in @participants %>
@@ -14,11 +15,11 @@
 
         <% if(@assignment.max_team_size > 1)%>
           <br/>
-          <b><%= participant.name.gsub(/\[/,'').gsub(/\]/,'').gsub(/\s.*/,'')%></b>
+          <b><%= participant.team_name_placeholder%></b>
           <br/>
-          <%= participant.name.gsub(/\[.*\]\s/,'')%>
+          <%= participant.user_name_placeholder%>
         <% else %>
-          <%= participant.name.gsub(/\[[^\]]+\]/,'')%>
+          <%= participant.user_name_placeholder%>
         <% end %>
         <% if participant.is_waitlisted == true %>
           <font color='red'>(waitlisted)</font>

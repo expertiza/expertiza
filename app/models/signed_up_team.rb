@@ -21,7 +21,7 @@ class SignedUpTeam < ActiveRecord::Base
 
   def self.find_team_participants(assignment_id)
     #@participants = SignedUpTeam.find_by_sql("SELECT s.id as id, t.id as topic_id, t.topic_name as name , s.is_waitlisted as is_waitlisted, s.team_id, s.team_id as team_id FROM signed_up_teams s, sign_up_topics t where s.topic_id = t.id and t.assignment_id = " + assignment_id)
-    @participants = SignedUpTeam.find_by_sql(["SELECT s.id as id, t.id as topic_id, t.topic_name as name , s.is_waitlisted as is_waitlisted, s.team_id, s.team_id as team_id FROM signed_up_teams s, sign_up_topics t where s.topic_id = t.id and t.assignment_id = ? ",assignment_id])
+    @participants = SignedUpTeam.find_by_sql(["SELECT s.id as id, t.id as topic_id, t.topic_name as name, t.topic_name as team_name_placeholder, t.topic_name as user_name_placeholder, s.is_waitlisted as is_waitlisted, s.team_id as team_id FROM signed_up_teams s, sign_up_topics t where s.topic_id = t.id and t.assignment_id = ? ",assignment_id])
     i=0
     for participant in @participants
       #participant_names = SignedUpTeam.find_by_sql("SELECT s.name as u_name, t.name as team_name FROM users s, teams t, teams_users u WHERE t.id = u.team_id and u.user_id = s.id and t.id = " + participant.team_id)
@@ -32,9 +32,12 @@ class SignedUpTeam < ActiveRecord::Base
       for participant_name in participant_names
         if team_name_added == false
           names = "["+participant_name.team_name+"] "+ participant_name.u_name + " "
+          participant.team_name_placeholder = participant_name.team_name
+          participant.user_name_placeholder = participant_name.u_name + " "
           team_name_added = true
         else
           names = names + participant_name.u_name + " "
+          participant.user_name_placeholder += participant_name.u_name + " "
         end
       end
       @participants[i].name = names

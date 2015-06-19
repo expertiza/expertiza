@@ -98,6 +98,7 @@ require 'analytic/assignment_analytic'
     contributor_set=reject_by_deadline(contributor_set)
 
     if self.varying_rubrics_by_round?
+      # Filter submissions already reviewed by reviewer in current round
       current_round = self.get_current_round(nil)
       contributor_set = reject__reviewed_submissions_in_current_round(contributor_set, reviewer,current_round)
     else
@@ -140,8 +141,8 @@ require 'analytic/assignment_analytic'
 
   def reject_by_least_reviewed(contributor_set)
     contributor = contributor_set.min_by { |contributor| contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count }
-    min_reviews = contributor.review_mappings.reject! { |review_mapping| review_mapping.response.nil? }.count rescue 0
-    contributor_set.reject { |contributor| contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count  > min_reviews + review_topic_threshold }
+    min_reviews = contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count rescue 0
+    contributor_set.reject! { |contributor| contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count  >= min_reviews + review_topic_threshold }
 
     return contributor_set
   end

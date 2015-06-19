@@ -46,7 +46,7 @@ class SuggestionController < ApplicationController
     @suggestion.assignment_id = session[:assignment_id]
     @suggestion.status = 'Initiated'
     if params[:suggestion_anonymous].nil?
-      @suggestion.unityID = session[:user].name
+      @suggestion.unityID = session[:user].id
     else
       @suggestion.unityID = "";
     end
@@ -86,14 +86,25 @@ class SuggestionController < ApplicationController
       flash[:error] = 'Error when approving the suggestion.'
     end
 
+    #--zhewei--------------------------------------------------------------------------------------------------
+    # If you want to create a new team with topic and team members on view, you have to 
+    # 1. create new Team
+    # 2. create new TeamsUser
+    # 3. create new SignedUpTeam
+    # 4. create new TeamNode
+    # 5. create new TeamUserNode
+    #----------------------------------------------------------------------------------------------------------
     #if suggester's signup_preference is yes and his/her team do not has a topic yet, 
     #Expertiza will assign this topic to them automatically and clean its waitlists. 
-    user_id = session[:user].id
+    user_id = @suggestion.unityID.to_i
     #if this user do not have team in this assignment, create one for him/her
     if SignedUpTeam.team_id(@signuptopic.assignment_id, user_id).nil?
-      new_team = AssignmentTeam.create(name: user_id.to_s, parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
+      new_team = AssignmentTeam.create(name: 'Team' + user_id.to_s + '_' + rand(1000).to_s, parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
       TeamsUser.create(team_id: new_team.id, user_id: user_id)
       SignedUpTeam.create(topic_id: @signuptopic.id, team_id: new_team.id, is_waitlisted: 0)
+      parent = TeamNode.create(:parent_id => @signuptopic.assignment_id, :node_object_id => new_team.id)
+      binding.pry
+      TeamUserNode.create(:parent_id => parent.id, :node_object_id => user_id)
     else #this user has a team in this assignment, check whether this team has topic or not
       if SignedUpTeam.topic_id(@signuptopic.assignment_id, user_id).nil?
         team_id = SignedUpTeam.team_id(@signuptopic.assignment_id, user_id)

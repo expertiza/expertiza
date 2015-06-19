@@ -130,11 +130,7 @@ require 'analytic/assignment_analytic'
     contributor_set.reject! { |contributor| !contributor.has_submissions? }
 
     # Filter the contributors with the least number of reviews
-    # (using the fact that each contributor is associated with a topic)
-    contributor = contributor_set.min_by { |contributor| contributor.review_mappings.count }
-
-    min_reviews = contributor.review_mappings.count rescue 0
-    contributor_set.reject! { |contributor| contributor.review_mappings.count > min_reviews + review_topic_threshold }
+    contributor_set=reject_by_least_reviewed(contributor_set)
 
     contributor_set
   end

@@ -113,6 +113,8 @@ require 'analytic/assignment_analytic'
     # (using the fact that each contributor is associated with a topic)
     contributor_set=reject_by_least_reviewed(contributor_set)
 
+    contributor_set = reject_by_max_reviews_per_submission(contributor_set)
+
     # Add topics for all remaining submissions to a list of available topics for review
     candidate_topics = Set.new
     contributor_set.each { |contributor|
@@ -132,15 +134,22 @@ require 'analytic/assignment_analytic'
     # Filter the contributors with the least number of reviews
     contributor_set=reject_by_least_reviewed(contributor_set)
 
+    contributor_set = reject_by_max_reviews_per_submission(contributor_set)
+
     contributor_set
   end
 
   def reject_by_least_reviewed(contributor_set)
     contributor = contributor_set.min_by { |contributor| contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count }
     min_reviews = contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count rescue 0
-    contributor_set.reject! { |contributor| contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count  >= min_reviews + review_topic_threshold }
+    contributor_set.reject! { |contributor| contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count  > min_reviews + review_topic_threshold }
 
     return contributor_set
+  end
+
+  def reject_by_max_reviews_per_submission(contributor_set)
+    contributor_set.reject! { |contributor| contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count  >= max_reviews_per_submission }
+    contributor_set
   end
 
   def reject__reviewed_submissions_in_current_round(contributor_set, reviewer, current_round)

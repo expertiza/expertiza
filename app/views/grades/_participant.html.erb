@@ -65,7 +65,7 @@ participant = pscore[:participant]
     <TD ALIGN="CENTER">---</TD>
     <% end %>
     <!--ACS Teammate review needs to be done only if there are more than one person in the team-->
-    <% if @assignment.show_teammate_reviews %>
+    <% if @assignment.show_teammate_reviews || session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4 || session[:user].role_id == 6%>
         <% if @rscore_teammate.my_avg %>
             <TD ALIGN="CENTER" VALIGN="TOP">
             <% @course_participant = CourseParticipant.all.select {|c| c.user_id == session[:user].id}.first %>

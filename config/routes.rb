@@ -424,6 +424,7 @@ Expertiza::Application.routes.draw do
   resources :suggestion do
     collection do
       get :list
+      post :submit
     end
   end
 

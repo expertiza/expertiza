@@ -84,7 +84,24 @@ class SuggestionController < ApplicationController
       flash[:notice] = 'Successfully approved the suggestion.'
     else
       flash[:error] = 'Error when approving the suggestion.'
+    end
+
+    #if suggester's signup_preference is yes and his/her team do not has a topic yet, 
+    #Expertiza will assign this topic to them automatically and clean its waitlists. 
+    user_id = session[:user].id
+    #if this user do not have team in this assignment, create one for him/her
+    if SignedUpTeam.team_id(@signuptopic.assignment_id, user_id).nil?
+      new_team = AssignmentTeam.create(name: user_id.to_s, parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
+      TeamsUser.create(team_id: new_team.id, user_id: user_id)
+      SignedUpTeam.create(topic_id: @signuptopic.id, team_id: new_team.id, is_waitlisted: 0)
+    else #this user has a team in this assignment, check whether this team has topic or not
+      if SignedUpTeam.topic_id(@signuptopic.assignment_id, user_id).nil?
+        team_id = SignedUpTeam.team_id(@signuptopic.assignment_id, user_id)
+        #clean waitlists
+        SignedUpTeam.where(team_id: team_id, is_waitlisted: 1).destroy_all
+        SignedUpTeam.create(topic_id: @signuptopic.id, team_id: team_id, is_waitlisted: 0)
       end
+    end
     redirect_to :action => 'show', :id => @suggestion
   end
 

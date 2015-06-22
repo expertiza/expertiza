@@ -103,7 +103,6 @@ class SuggestionController < ApplicationController
       TeamsUser.create(team_id: new_team.id, user_id: user_id)
       SignedUpTeam.create(topic_id: @signuptopic.id, team_id: new_team.id, is_waitlisted: 0)
       parent = TeamNode.create(:parent_id => @signuptopic.assignment_id, :node_object_id => new_team.id)
-      binding.pry
       TeamUserNode.create(:parent_id => parent.id, :node_object_id => user_id)
     else #this user has a team in this assignment, check whether this team has topic or not
       if SignedUpTeam.topic_id(@signuptopic.assignment_id, user_id).nil?

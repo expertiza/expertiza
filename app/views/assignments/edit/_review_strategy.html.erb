@@ -2,7 +2,7 @@
   <tr id='assignment_review_assignment_strategy_row'>
     <td>
       <%= label_tag('assignment_form[assignment][review_assignment_strategy]', 'Review Strategy:') %>
-      <%= select('assignment_form[assignment]', 'review_assignment_strategy', review_strategy_options, {:include_blank => '----', :selected => @assignment_form.assignment.review_assignment_strategy}) %>
+      <%= select('assignment_form[assignment]', 'review_assignment_strategy', review_strategy_options, {:selected => @assignment_form.assignment.review_assignment_strategy}) %>
       <script>
         jQuery(document).ready(function() {reviewStrategyChanged();});
           jQuery('#assignment_form_assignment_review_assignment_strategy').on('change', function() {reviewStrategyChanged();});

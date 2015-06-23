@@ -37,10 +37,9 @@ require 'analytic/assignment_analytic'
 
   REVIEW_QUESTIONNAIRES = {:author_feedback => 0, :metareview => 1, :review => 2, :teammate_review => 3}
   #  Review Strategy information.
-  RS_INSTRUCTOR_SELECTED = 'Instructor-Selected'
-  RS_STUDENT_SELECTED = 'Student-Selected'
   RS_AUTO_SELECTED = 'Auto-Selected'
-  REVIEW_STRATEGIES = [RS_INSTRUCTOR_SELECTED, RS_AUTO_SELECTED]
+  RS_INSTRUCTOR_SELECTED = 'Instructor-Selected'
+  REVIEW_STRATEGIES = [RS_AUTO_SELECTED, RS_INSTRUCTOR_SELECTED]
 
   DEFAULT_MAX_REVIEWERS = 3
 

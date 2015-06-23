@@ -286,7 +286,7 @@ function is_coding_assignmentChanged(){
 
    function reviewStrategyChanged() {
      var val = jQuery('#assignment_form_assignment_review_assignment_strategy').val();
-        if (val == 'Student-Selected' || val == 'Auto-Selected') {
+        if (val == 'Auto-Selected') {
           jQuery('#assignment_review_topic_threshold_row').removeAttr('hidden');
         } else {
           jQuery('#assignment_review_topic_threshold_row').attr('hidden', true);

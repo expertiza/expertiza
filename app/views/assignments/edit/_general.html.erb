@@ -120,31 +120,6 @@ function is_coding_assignmentChanged(){
     <td style='padding:5px' id='assignment_team_count_field' <%= 'hidden' if @assignment_form.assignment.max_team_size == 1%>>
       <%= label_tag('assignment_form[assignment][max_team_size]', 'Maximum number of members per team:') %>
       <%= text_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size, {:style => 'width:20px'}) %><br/>
-      <!--assignment grades adjustment checkbox-->
-      <%= check_box_tag('grades_adjustment', 'true', params[:grades_adjustment_checked], {:onChange => 'adjustGradesChanged()'}) %>
-      <%= label_tag('grades_adjustment', 'Adjust students’ grades based on teammate evaluations?') %>
-      <table id='assignment_grades_adjustment_table' <%= 'hidden' if !params[:grades_adjustment_checked]%>>
-        <tr>
-          <td>Offset: </td>
-          <td><%= text_field :assigned, :thresh, :size=>10, :value=>20 %></td>
-        </tr>
-        <tr>
-          <td>Redistribution Factor: </td>
-          <td><%= text_field :assigned, :rfactor, :size=>10, :value=>0.5 %></td>
-        </tr>
-        <tr>
-          <td>Maximum Deductable Points:  </td>
-          <td> <%= text_field :assigned, :mpd, :size=>10, :value=>10 %></td>
-        </tr>
-        <tr>
-          <td>use class average score as hardline?</td>
-          <td><%= check_box :assigned, :ifclass, {}, true, false %></td>
-        </tr>
-        <tr>
-          <td>Hardline: </td>
-          <td><%= text_field :assigned, :hardline, :size=>10, :value=>85 %></td>
-        </tr>
-      </table>
     </td>
   </tr>
 
@@ -301,15 +276,4 @@ function is_coding_assignmentChanged(){
         jQuery('#assignment_numbers_of_quiz_field').attr('hidden', true);
       }
     }
-
-    function adjustGradesChanged(){
-      if (jQuery('#grades_adjustment').is(':checked')){
-        jQuery('#assignment_grades_adjustment_table').removeAttr('hidden');
-        <%= params[:grades_adjustment_checked] = true %>
-      } else {
-        jQuery('#assignment_grades_adjustment_table').attr('hidden', true);
-        <%= params[:grades_adjustment_checked] = false %>
-      }
-    }
-
   </script>

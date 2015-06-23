@@ -50,8 +50,6 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  get '/assignments/:id/review_strategy_advanced_options', controller: :assignments, action: :review_strategy_advanced_options
-
   resources :auth do
     collection do
       post :login

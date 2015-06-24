@@ -372,17 +372,12 @@ class AssignmentParticipant < Participant
   def submit_hyperlink(hyperlink)
     hyperlink.strip!
     raise "The hyperlink cannot be empty" if hyperlink.empty?
-
     url = URI.parse(hyperlink)
-
     # If not a valid URL, it will throw an exception
     Net::HTTP.start(url.host, url.port)
-
-    hyperlinks = hyperlinks_array
-
+    hyperlinks = self.hyperlinks_array
     hyperlinks << hyperlink
     self.submitted_hyperlinks = YAML::dump(hyperlinks)
-
     self.save
   end
 
@@ -404,7 +399,7 @@ class AssignmentParticipant < Participant
   end
  
   def hyperlinks_array
-    self.submitted_hyperlinks.nil? ? [] : YAML::load(self.submitted_hyperlinks)
+    self.submitted_hyperlinks.blank? ? [] : YAML::load(self.submitted_hyperlinks)
   end
 
 

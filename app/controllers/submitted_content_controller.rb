@@ -6,7 +6,7 @@ class SubmittedContentController < ApplicationController
        'Teaching Assistant',
        'Administrator',
        'Super-Administrator',
-       'Student'].include? current_role_name and ((%w(edit).include? action_name) ? are_needed_authorizations_present? : true)
+       'Student'].include? current_role_name and ((%w(edit).include? action_name) ? are_needed_authorizations_present? : true) and one_team_can_submit_work?
   end
 
   def edit
@@ -277,6 +277,18 @@ end
       return false
     else
       return true
+    end
+  end
+
+  #if one team do not hold a topic (still in waitlist), they cannot submit their work.
+  def one_team_can_submit_work?
+    @participant = AssignmentParticipant.find(params[:id])
+    @topics = SignUpTopic.where(assignment_id: @participant.parent_id)
+    #check one assignment has topics or not
+    if (@topics.size > 0 and !SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id).nil?) or @topics.size == 0
+      return true
+    else
+      return false
     end
   end
 end

@@ -38,12 +38,17 @@ to display the label "Your team" in the student assignment tasks-->
   <% if @authorization == 'participant' or @can_submit == true %>
     <li>
       <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
-      <% if @assignment.submission_allowed(topic_id) %>
-        <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %>
+      <% topics = SignUpTopic.where(assignment_id: @participant.parent_id) %>
+      <!--if one team do not hold a topic (still in waitlist), they cannot submit their work.-->
+      <% if topic_id.nil? and topics.size > 0 %>
+        <font color="gray">Your work</font> (You have to choose a topic first)
       <% else %>
-        <%= link_to 'Your work', :controller => 'submitted_content', :action => 'view', :id => @participant.id %>
+        <% if @assignment.submission_allowed(topic_id) %>
+          <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> (Submit and view your work)
+        <% else %>
+          <%= link_to 'Your work', :controller => 'submitted_content', :action => 'view', :id => @participant.id %> (Submit and view your work)
+        <% end %>
       <% end %>
-      (Submit and view your work)
     </li>
   <% end %>
 

@@ -34,8 +34,8 @@ def submit_hyperlink
   @participant = AssignmentParticipant.find(params[:id])
   return unless current_user_id?(@participant.user_id)
 
-  team_hyperlinkds = @participant.hyperlinks
-  if team_hyperlinkds.include?(params['submission'])
+  team_hyperlinks = @participant.hyperlinks
+  if team_hyperlinks.include?(params['submission'])
     flash[:error] = "You or your teammate(s) have already submitted the same hyperlink."
   else
     begin
@@ -282,7 +282,11 @@ end
 
   #if one team do not hold a topic (still in waitlist), they cannot submit their work.
   def one_team_can_submit_work?
-    @participant = AssignmentParticipant.find(params[:id])
+    if params[:id].nil?
+      @participant = AssignmentParticipant.find(params[:hyperlinks][:participant_id])
+    else
+      @participant = AssignmentParticipant.find(params[:id])
+    end
     @topics = SignUpTopic.where(assignment_id: @participant.parent_id)
     #check one assignment has topics or not
     if (@topics.size > 0 and !SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id).nil?) or @topics.size == 0

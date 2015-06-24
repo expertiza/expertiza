@@ -97,7 +97,7 @@ class AssignmentTeam < Team
 
   def hyperlinks
     links = Array.new
-    self.participants.each { |team_member| links.concat(team_member.hyperlinks_array) }
+    self.participants.each { |team_member| links.concat(team_member.hyperlinks_array) if team_member.hyperlinks_array}
     links
   end
 

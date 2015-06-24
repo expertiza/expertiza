@@ -7,11 +7,16 @@ class GradesController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'view_my_scores'
-      current_role_name.eql? 'Student' and are_needed_authorizations_present?
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator',
+       'Student'].include? current_role_name and are_needed_authorizations_present?
     else
       ['Instructor',
        'Teaching Assistant',
-       'Administrator'].include? current_role_name
+       'Administrator',
+       'Super-Administrator'].include? current_role_name
     end
   end
 

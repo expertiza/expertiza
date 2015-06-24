@@ -2,7 +2,11 @@ class SubmittedContentController < ApplicationController
   helper :wiki
 
   def action_allowed?
-    current_role_name.eql?("Student") and ((%w(edit).include? action_name) ? are_needed_authorizations_present? : true)
+    ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator',
+       'Student'].include? current_role_name and ((%w(edit).include? action_name) ? are_needed_authorizations_present? : true)
   end
 
   def edit

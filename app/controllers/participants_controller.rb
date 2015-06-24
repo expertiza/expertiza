@@ -2,15 +2,17 @@ class ParticipantsController < ApplicationController
   autocomplete :user, :name
 
   def action_allowed?
-    case params[:action]
-    when 'change_handle'
-      current_role_name.eql?("Student")
-    when 'update_duties'
-      current_role_name.eql?("Student")
+    if params[:action] == 'change_handle' or params[:action] == 'update_duties'
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator',
+       'Student'].include? current_role_name
     else
-      ['Administrator',
-       'Instructor',
-       'Teaching Assistant'].include? current_role_name
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator'].include? current_role_name
     end
   end
 

@@ -32,25 +32,6 @@ module DynamicReviewMapping
     populate_column_matrices
   end
 
-  def assign_individual_reviewer(round_num)
-    stride = 1
-    authors = self.participants
-    reviewers = self.participants
-    if self.participants.size.zero?
-      raise "No participants available for assignment"
-    end
-
-    for i in 0 .. reviewers.size - 1
-      current_reviewer_candidate = i
-      current_author_candidate = current_reviewer_candidate
-      for j in 0 .. (reviewers.size * num_reviews / authors.size) - 1  # This method potentially assigns authors different #s of reviews, if limit is non-integer
-        current_author_candidate = (current_author_candidate + stride) % authors.size
-        team_id = SignedUpTeam.team_id(authors[current_author_candidate].parent_id, authors[current_author_candidate].user_id)
-        ReviewResponseMap.create(reviewee_id: team_id, reviewer_id: reviewers[i].id, reviewed_object_id: self.id)
-      end
-      end
-    end
-
   def assign_reviewers_for_team(round_num)
       init
       for i in 0..@num_students-1 do

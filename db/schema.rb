@@ -58,13 +58,13 @@ ActiveRecord::Schema.define(version: 20150527185412) do
     t.boolean  "copy_flag",                         limit: 1,     default: false
     t.integer  "rounds_of_reviews",                 limit: 4,     default: 1
     t.boolean  "microtask",                         limit: 1,     default: false
+    t.integer  "selfreview_questionnaire_id",       limit: 4
+    t.integer  "managerreview_questionnaire_id",    limit: 4
+    t.integer  "readerreview_questionnaire_id",     limit: 4
     t.boolean  "require_quiz",                      limit: 1
     t.integer  "num_quiz_questions",                limit: 4,     default: 0,     null: false
     t.boolean  "is_coding_assignment",              limit: 1
     t.boolean  "is_intelligent",                    limit: 1
-    t.integer  "selfreview_questionnaire_id",       limit: 4
-    t.integer  "managerreview_questionnaire_id",    limit: 4
-    t.integer  "readerreview_questionnaire_id",     limit: 4
     t.boolean  "calculate_penalty",                 limit: 1,     default: false, null: false
     t.integer  "late_policy_id",                    limit: 4
     t.boolean  "is_penalty_calculated",             limit: 1,     default: false, null: false
@@ -249,9 +249,9 @@ ActiveRecord::Schema.define(version: 20150527185412) do
     t.boolean  "flag",                        limit: 1,   default: false
     t.integer  "threshold",                   limit: 4,   default: 1
     t.integer  "delayed_job_id",              limit: 4
-    t.integer  "quiz_allowed_id",             limit: 4
     t.string   "deadline_name",               limit: 255
     t.string   "description_url",             limit: 255
+    t.integer  "quiz_allowed_id",             limit: 4
   end
 
   add_index "due_dates", ["assignment_id"], name: "fk_due_dates_assignments", using: :btree
@@ -433,9 +433,9 @@ ActiveRecord::Schema.define(version: 20150527185412) do
     t.integer  "reviewee_id",           limit: 4,   default: 0,     null: false
     t.string   "type",                  limit: 255, default: "",    null: false
     t.boolean  "notification_accepted", limit: 1,   default: false
+    t.integer  "round",                 limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "round",                 limit: 4
   end
 
   add_index "response_maps", ["reviewer_id"], name: "fk_response_map_reviewer", using: :btree
@@ -810,7 +810,6 @@ ActiveRecord::Schema.define(version: 20150527185412) do
   add_foreign_key "question_advices", "questions", name: "fk_question_question_advices"
   add_foreign_key "question_types", "questions", name: "fk_question_type_question"
   add_foreign_key "questions", "questionnaires", name: "fk_question_questionnaires"
-  add_foreign_key "responses", "response_maps", column: "map_id", name: "fk_response_response_map"
   add_foreign_key "resubmission_times", "participants", name: "fk_resubmission_times_participants"
   add_foreign_key "scores", "questions", name: "fk_score_questions"
   add_foreign_key "scores", "responses", name: "fk_score_response"

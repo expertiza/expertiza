@@ -32,7 +32,6 @@ class AuthController < ApplicationController
 
   # function to handle common functionality for conventional user login and google login
   def after_login (user)
-    logger.info "User #{user.name} successfully logged in"
     session[:user] = user
     AuthController.set_current_role(user.role_id, session)
 

@@ -849,8 +849,7 @@ require 'analytic/assignment_analytic'
     # to treat all assignments as team assignments
     @response_type = 'ReviewResponseMap'
 
-    @myreviewers = ResponseMap.select('DISTINCT reviewer_id').where(['reviewed_object_id = ? && type = ? ', self.id, @type])
-
+    @myreviewers = ResponseMap.select('DISTINCT reviewer_id').where(['reviewed_object_id = ? && type = ? ', self.id, @response_type])
     @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
 
     @response_maps.each do |response_map|
@@ -861,7 +860,7 @@ require 'analytic/assignment_analytic'
 
       if @corresponding_response != nil
         @this_review_score_raw = Score.get_total_score(response: @corresponding_response, questions: @questions, q_types: Array.new)
-        if @this_review_score
+        if @this_review_score_raw
           @this_review_score = ((@this_review_score_raw*100).round/100.0) if @this_review_score_raw >= 0.0
         end
       else
@@ -870,8 +869,9 @@ require 'analytic/assignment_analytic'
       @respective_scores[response_map.reviewee_id] = @this_review_score
       @review_scores[response_map.reviewer_id] = @respective_scores
     end
+    # logger.warn @review_scores.inspect
     @review_scores
-    end
+  end
 
   def get_review_questionnaire_id
     @revqids = []

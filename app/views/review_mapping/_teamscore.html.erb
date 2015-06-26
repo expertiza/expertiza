@@ -1,10 +1,36 @@
-<% @qid = "ReviewResponseMap" %>
+<% qid = "ReviewResponseMap" %>
 <%@teamid%>
 <%@id%>
 <% @this_reviewer %>
-<%@sc = ScoreCache.where(["reviewee_id = ? and object_type = ?",@teamid, @qid  ]).first  %>
-<% if @sc %>
-  <% t_score, t_range = @sc.score, @sc.range  %>
+<% res_map_id = ResponseMap.where(["reviewee_id = ? and type = ?", @teamid, qid])
+   max = 0
+   min = 1.0
+   sum = 0
+   item_no = 0
+   sc = []
+   for item in res_map_id 
+     responses = Response.where(["map_id = ?", item.id])
+     sum2 = 0
+     for i in responses
+       scores = Score.where(["response_id = ?", i.id])
+       for s in scores
+         sum2 += s.score
+       end
+       sum2 = sum2.to_f/30
+       max = sum2 if max <= sum2
+       min = sum2 if min > sum2
+     end
+     item_no += 1
+     sum += sum2
+   end
+   if item_no > 0 then
+     sc << ((sum/item_no)*100).round(2)
+     sc << "#{(min* 100).round(2)}-#{(max*100).round(2)}"
+   end
+%>
+<% if sc %>
+  <%# logger.warn @sc.inspect %>
+  <% t_score, t_range = sc[0], sc[1]  %>
 <%else%>
   <% t_score, t_range = nil,nil %>
 <%end%>
@@ -13,15 +39,16 @@
 <% #########################################    %>
 <% if (@l%2) == 0%>
   <td bgcolor="#ffffff" align = 'center' >
-  <%else%>
+<%else%>
     <td  bgcolor="#DDDDBB" align = 'center' >
-    <%end%>
-    <% if @review_scores[@this_reviewer][@teamid] != 0 %>
-      <%= @review_scores[@this_reviewer][@teamid] %>
-    <% else %>
-      --
-    <% end %>
-  </td>
+<%end%>
+<% if @review_scores[@this_reviewer][@teamid] != 0 %>
+  <%= @review_scores[@this_reviewer][@teamid].inspect %>%
+<% else %>
+  --
+<% end %>
+</td>
+
   <% #####################################        %>
   <%if (t_score && t_range) %>
 

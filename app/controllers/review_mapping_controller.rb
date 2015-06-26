@@ -147,29 +147,34 @@ class ReviewMappingController < ApplicationController
   end
 
   def assign_reviewer_dynamically
-      assignment = Assignment.find(params[:assignment_id])
-      reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
+    assignment = Assignment.find(params[:assignment_id])
+    reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
 
-    begin
-      if assignment.has_topics?  #assignment with topics
-        unless params[:i_dont_care]
-          topic = (params[:topic_id].nil?) ? nil : SignUpTopic.find(params[:topic_id])
-        else
-          topic = assignment.candidate_topics_to_review(reviewer).to_a.shuffle[0] rescue nil
-        end
-        if topic.nil?
-          flash[:error] ="We cannot not find a topic for you to review. This may caused by not selecting any topic, or there is no topic to review any more."
-        else
-          assignment.assign_reviewer_dynamically(reviewer, topic)
-        end
+    if params[:i_dont_care].nil? && params[:topic_id].nil?
+      flash[:error] = "You need to select a topic"
+    else
 
-      else  #assignment without topic -Yang
-        assignment_teams = assignment.candidate_assignment_teams_to_review
-        assignment_team = assignment_teams.to_a.shuffle[0] rescue nil
-        assignment.assign_reviewer_dynamically_no_topic(reviewer,assignment_team)
+      begin
+        if assignment.has_topics?  #assignment with topics
+          unless params[:i_dont_care]
+            topic = (params[:topic_id].nil?) ? nil : SignUpTopic.find(params[:topic_id])
+          else
+            topic = assignment.candidate_topics_to_review(reviewer).to_a.shuffle[0] rescue nil
+          end
+          if topic.nil?
+            flash[:error] ="There are no more topics to review"
+          else
+            assignment.assign_reviewer_dynamically(reviewer, topic)
+          end
+
+        else  #assignment without topic -Yang
+          assignment_teams = assignment.candidate_assignment_teams_to_review
+          assignment_team = assignment_teams.to_a.shuffle[0] rescue nil
+          assignment.assign_reviewer_dynamically_no_topic(reviewer,assignment_team)
+        end
+      rescue Exception => e
+        flash[:error] = (e.nil?) ? $! : e
       end
-    rescue Exception => e
-      flash[:error] = (e.nil?) ? $! : e
     end
 
     redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id

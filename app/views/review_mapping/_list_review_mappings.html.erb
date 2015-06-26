@@ -36,23 +36,22 @@
       end
     %>
 
-  <%if !@contributor.nil?
-      topics = SignedUpTeam.find_user_signup_topics(assignment.id, @contributor)
+  <%if !@contributor.nil?%>
+    <%signed_up_teams = SignedUpTeam.find_user_signup_topics(assignment.id, @contributor)%>
 
-      if !topics.nil?
-        @topics = ""
-        topics.each do |topic|
-          if topic.is_waitlisted?
-            @topics = "#{@topics}#{topic.topic.topic_identifier}: #{topic.topic_name} <font color='red'>(waitlisted)</font> <br/>"
-          else
-            @topics = "#{@topics}#{topic.topic.topic_identifier}: #{topic.topic_name}"
-            end
-        end
-      else
-        @topics = nil
-      end
-  end
-%>
+    <%if !signed_up_teams.nil?%>
+      <%@topics = ""%>
+      <%signed_up_teams.each do |signed_up_team|%>
+        <%if signed_up_team.is_waitlisted?%>
+          <%@topics = signed_up_team.topic.topic_identifier+" "+signed_up_team.topic.topic_name+ " (waitlisted)".html_safe%> <br/>
+        <%else%>
+          <%@topics = signed_up_team.topic.topic_identifier+signed_up_team.topic.topic_name%>
+        <%end%>
+      <%end%>
+    <%else%>
+      <%@topics = nil%>
+    <%end%>
+  <%end %>
 
             <%if @topics.blank? %>
             </tr><%index1-=1%>

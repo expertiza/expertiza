@@ -78,7 +78,7 @@ class SuggestionController < ApplicationController
     @signuptopic.topic_identifier = 'S' + @suggestion.id.to_s
     @signuptopic.topic_name = @suggestion.title
     @signuptopic.assignment_id = @suggestion.assignment_id
-    @signuptopic.max_choosers = 3;
+    @signuptopic.max_choosers = 1;
 
     if @signuptopic.save && @suggestion.update_attribute('status', 'Approved')
       flash[:notice] = 'Successfully approved the suggestion.'

@@ -15,11 +15,12 @@ class SubmittedContentController < ApplicationController
 
     @assignment = @participant.assignment
 
-    #ACS We have to check if the number of members on the team is more than 1(group assignment)
+    #ACS We have to check if this participant has team or not
     #hence use team count for the check
-    if  @participant.team.nil?
-      flash[:error] = "This is a team assignment. Before submitting your work, you must <a style='color: blue;' href='../../student_teams/view/?student_id=#{params[:id]}'>create a team</a>, even if you will be the only member of the team"
-      redirect_to :controller => 'student_task', :action => 'view', :id => params[:id]
+    if @participant.team.nil?
+      #flash[:error] = "This is a team assignment. Before submitting your work, you must <a style='color: blue;' href='../../student_teams/view/?student_id=#{params[:id]}'>create a team</a>, even if you will be the only member of the team"
+      #redirect_to :controller => 'student_task', :action => 'view', :id => params[:id]
+      SignUpSheet.signup_team(@assignment.id, @participant.user_id, nil)
   end
 end
 

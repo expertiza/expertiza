@@ -40,6 +40,9 @@ class ReviewMappingController < ApplicationController
   def add_reviewer
     assignment = Assignment.find(params[:id])
     topic_id = params[:topic_id]
+    user_id = User.where(name: params[:user][:name]).first.id
+    #Team lazy initialization
+    SignUpSheet.signup_team(assignment.id, user_id, topic_id)
     if assignment.varying_rubrics_by_round?
       round = assignment.get_current_round(topic_id) #if vary rubric by round, in the response_maps table we need to record round #
     else

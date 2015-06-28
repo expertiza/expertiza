@@ -91,8 +91,11 @@ class AssignmentForm
         next
       end
       #parse the dd and convert it to utc before saving it to db
-      time = Time.parse(due_date[:due_at][0..15] + ' '+ActiveSupport::TimeZone[user.timezonepref].formatted_offset)
-      due_date[:due_at]= time.utc
+      #eg. 2015-06-22 12:05:00 -0400
+      current_local_time = Time.parse(due_date[:due_at][0..15])
+      tz = ActiveSupport::TimeZone[user.timezonepref].tzinfo
+      utc_time = tz.local_to_utc(Time.local(current_local_time.year,current_local_time.month,current_local_time.day,current_local_time.strftime('%H').to_i,current_local_time.strftime('%M').to_i,current_local_time.strftime('%S').to_i))
+      due_date[:due_at]= utc_time
       if due_date[:id].nil? or due_date[:id].blank?
         dd = DueDate.new(due_date)
         if !dd.save

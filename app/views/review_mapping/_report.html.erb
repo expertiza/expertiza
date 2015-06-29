@@ -92,8 +92,6 @@
                   <td id = "green" bgcolor="#DDDDBB" align = 'center' colspan=1>
                 <%end %>
                     <%= link_to Team.find(ri.reviewee_id).name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
-
-
                   </td>
                   <%= render :partial => 'teamscore' %>
 

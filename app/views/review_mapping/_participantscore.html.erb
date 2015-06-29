@@ -4,7 +4,7 @@
 <%@team_id = SignedUpTeam.team_id(@participant.parent_id, @participant.user_id)%>
 <%@id%>
 <%@this_reviewer%>
-<%@sc = ScoreCache.where(["reviewee_id = ? and object_type = ?",@team_id, @qid  ]).first %>
+<%@sc = ScoreCache.where(["reviewee_id = ? and object_type = ?",@team_id, @qid]).first %>
 
 
 <% #########################################    %>

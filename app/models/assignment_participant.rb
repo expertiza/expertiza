@@ -341,14 +341,7 @@ class AssignmentParticipant < Participant
       scores[:total_score] = self.grade
     else
       total_score = scores[:total_score]
-      hardline = 85
-      if scores[:teammate][:scores][:avg].to_f > hardline
-            total_score = total_score + 0.05*total_score
-      elsif scores[:teammate][:scores][:avg].to_f < hardline and (hardline - scores[:teammate][:scores][:avg].to_f) > 40
-             total_score = total_score - 10
-      elsif scores[:teammate][:scores][:avg].to_f < hardline and (hardline - scores[:teammate][:scores][:avg].to_f) > 20
-             total_score = total_score - (hardline - scores[:teammate][:scores][:avg].to_f)*0.5
-      end
+      puts scores
       if total_score > 100
         total_score = 100
       end

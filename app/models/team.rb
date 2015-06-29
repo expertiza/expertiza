@@ -63,6 +63,12 @@ class Team < ActiveRecord::Base
     users.include? user
   end
 
+ def full?
+  max_team_members=Assignment.find(self.parent_id).max_team_size
+  curr_team_size= Team.size(self.id)
+  return (curr_team_size == max_team_members)
+ end
+
   def add_member(user, assignment_id)
     if has_user(user)
       raise "\""+user.name+"\" is already a member of the team, \""+self.name+"\""

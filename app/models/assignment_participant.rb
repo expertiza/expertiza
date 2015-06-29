@@ -341,7 +341,6 @@ class AssignmentParticipant < Participant
       scores[:total_score] = self.grade
     else
       total_score = scores[:total_score]
-      puts scores
       if total_score > 100
         total_score = 100
       end

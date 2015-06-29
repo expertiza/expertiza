@@ -85,6 +85,7 @@ class GradesController < ApplicationController
 
     @topic = @participant.topic
     @pscore = @participant.scores(@questions)
+    puts @pscore
     make_chart
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
     @stage = @participant.assignment.get_current_stage(@topic_id)

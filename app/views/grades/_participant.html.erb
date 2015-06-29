@@ -36,7 +36,7 @@ participant = pscore[:participant]
     <TD ALIGN="CENTER">---</TD>
     <% end %>
 
-    <% if @rscore_metareview.my_avg %>
+    <% if @rscore_metareview && @rscore_metareview.my_avg %>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",@rscore_metareview.my_avg) %>%
     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_mreviewsLink" name="<%=prefix%>_mreviewsLink" onClick="toggleElement('<%=prefix%>_mreviews','metareviews');return false;">show metareviews</a> (<%= pscore[:metareview][:assessments].size %>)</FONT>
     </TD>

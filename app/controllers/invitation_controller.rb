@@ -22,6 +22,8 @@ class InvitationController < ApplicationController
       #check if the user is a participant of the assignment
       if !participant
         flash[:note] = "\"#{params[:user][:name].strip}\" is not a participant of this assignment."
+      elsif team.full?
+         flash[:note] = "This team already has max members."
       else
         team_member = TeamsUser.where(['team_id =? and user_id =?', team.id, user.id])
         #check if invited user is already in the team

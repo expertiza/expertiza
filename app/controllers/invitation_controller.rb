@@ -102,10 +102,10 @@ class InvitationController < ApplicationController
       add_successful = Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, student.parent_id)
 
       unless add_successful
-        flash[:error]= "The system fails to add you to the team which invited you1."
+        flash[:error]= "The system fails to add you to the team which invited you."
       end
     else
-      flash[:error]= "The system fails to add you to the team which invited you2."
+      #The error message should have been flashed from the checks on ready_to_join flag
     end
 
     redirect_to view_student_teams_path student_id: params[:student_id]

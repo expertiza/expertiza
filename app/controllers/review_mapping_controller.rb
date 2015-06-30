@@ -154,7 +154,7 @@ class ReviewMappingController < ApplicationController
     reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
 
     if params[:i_dont_care].nil? && params[:topic_id].nil?
-      flash[:error] = "You need to select a topic"
+      flash[:error] = "Please go back and select a topic"
     else
 
       begin
@@ -165,7 +165,7 @@ class ReviewMappingController < ApplicationController
             topic = assignment.candidate_topics_to_review(reviewer).to_a.shuffle[0] rescue nil
           end
           if topic.nil?
-            flash[:error] ="There are no more topics to review"
+            flash[:error] ="No topics are available to review at this time. Please try later."
           else
             assignment.assign_reviewer_dynamically(reviewer, topic)
           end

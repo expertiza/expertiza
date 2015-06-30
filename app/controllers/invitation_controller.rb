@@ -23,7 +23,7 @@ class InvitationController < ApplicationController
       if !participant
         flash[:note] = "\"#{params[:user][:name].strip}\" is not a participant of this assignment."
       elsif team.full?
-         flash[:note] = "This team already has max members."
+         flash[:error] = "Your team already has max members."
       else
         team_member = TeamsUser.where(['team_id =? and user_id =?', team.id, user.id])
         #check if invited user is already in the team
@@ -71,18 +71,41 @@ class InvitationController < ApplicationController
 
   def accept
     @inv = Invitation.find(params[:inv_id])
-    @inv.reply_status = 'A'
-    @inv.save
 
     student = Participant.find(params[:student_id])
 
-    #Remove the users previous team since they are accepting an invite for possibly a new team.
-    TeamsUser.remove_team(student.user_id, params[:team_id])
-    #Accept the invite and return boolean on whether the add was successful
-    add_successful = Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, student.parent_id)
-    #If add wasn't successful because team was full display message
-    unless add_successful
-      flash[:error]= "The team already has the maximum number of members."
+    assignment_id=@inv.assignment_id
+    inviter_user_id=@inv.from_id
+    inviter_participant = AssignmentParticipant.find_by_user_id_and_assignment_id(inviter_user_id,assignment_id)
+
+    ready_to_join=false
+    #check if the inviter's team is still existing, and have available slot to add the invitee
+    inviter_assignment_team = AssignmentTeam.team(inviter_participant)
+    if inviter_assignment_team.nil?
+      flash[:error]= "The team which invited you does not exist any more."
+    else
+      if inviter_assignment_team.full?
+        flash[:error]= "The team which invited you is full now."
+      else
+        ready_to_join=true
+      end
+    end
+
+    if ready_to_join
+      @inv.reply_status = 'A'
+      @inv.save
+
+      #Remove the users previous team since they are accepting an invite for possibly a new team.
+      TeamsUser.remove_team(student.user_id, params[:team_id])
+
+      #Accept the invite and return boolean on whether the add was successful
+      add_successful = Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, student.parent_id)
+
+      unless add_successful
+        flash[:error]= "The system fails to add you to the team which invited you1."
+      end
+    else
+      flash[:error]= "The system fails to add you to the team which invited you2."
     end
 
     redirect_to view_student_teams_path student_id: params[:student_id]

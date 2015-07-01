@@ -13,9 +13,9 @@
           <td>&nbsp;</td>
           <% if map.response %>
             <td><%= link_to "View", {:controller => 'student_quizzes', :action => 'finished_quiz', :map_id => map.id} %></td>
-          <% elsif @assignment.get_current_stage(SignedUpTeam.where(team_id: reviewee.id, is_waitlisted: false).topic_id) != "Complete" %>
+          <% elsif @assignment.get_current_stage(SignedUpTeam.topic_id(@assignment.id, reviewee.user_id)) != "Complete" %>
             <% if @assignment.staggered_deadline?%>
-              <% if @assignment.get_current_stage(SignedUpTeam.where(team_id: reviewee.id, is_waitlisted: false).topic_id) != 'submission'%>
+              <% if @assignment.get_current_stage(SignedUpTeam.topic_id(@assignment.id, reviewee.user_id)) != 'submission'%>
                 <td><%= link_to "Begin",{:controller => 'response', :action => 'new', :id => map.id} %></td>
               <%else%>
                 <td>Begin</td><td> (Work has not yet been submitted)</td>

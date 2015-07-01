@@ -8,14 +8,15 @@
     <% end %>
     <% questionnaire = Questionnaire.find_by_instructor_id(map.reviewee_id) %>
     <% if reviewee %>
+      <%topic = SignUpTopic.find(SignedUpTeam.topic_id(@assignment.id, reviewee.user_id))%>
       <tr>
-        <td><b><%= "#{questionnaire.name}" %></b><%= unless reviewee.topic.nil? then " #{reviewee.topic.topic_identifier}: #{reviewee.topic.topic_name}" end %></td>
+        <td><%= unless topic.nil? then " #{topic.topic_identifier}: #{topic.topic_name} --- " end %> <b><%= "#{questionnaire.name}" %></b></td>
           <td>&nbsp;</td>
           <% if map.response %>
             <td><%= link_to "View", {:controller => 'student_quizzes', :action => 'finished_quiz', :map_id => map.id} %></td>
-          <% elsif @assignment.get_current_stage(SignedUpTeam.topic_id(@assignment.id, reviewee.user_id)) != "Complete" %>
+          <% elsif @assignment.get_current_stage(topic) != "Complete" %>
             <% if @assignment.staggered_deadline?%>
-              <% if @assignment.get_current_stage(SignedUpTeam.topic_id(@assignment.id, reviewee.user_id)) != 'submission'%>
+              <% if @assignment.get_current_stage(topic) != 'submission'%>
                 <td><%= link_to "Begin",{:controller => 'response', :action => 'new', :id => map.id} %></td>
               <%else%>
                 <td>Begin</td><td> (Work has not yet been submitted)</td>

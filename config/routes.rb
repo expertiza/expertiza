@@ -258,6 +258,7 @@ Expertiza::Application.routes.draw do
       post :toggle_access
       get :view
       post :create_quiz_questionnaire
+      post :update_quiz
     end
   end
 

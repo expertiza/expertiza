@@ -1,7 +1,5 @@
 <%= error_messages_for 'questionnaire' %>
 
-<p>For help in creating a custom rubric: documentation <%= link_to "guide", "http://wikis.lib.ncsu.edu/index.php/Creating_Custom_Rubric" %> | <%= link_to "video", "http://www.youtube.com/watch?v=uUt1hMUMFbM" %>.</p>
-<!--[form:questionnaire]-->
 <table>
   <tr>
     <td valign="top"><label for="questionnaire_name">Name:</label>
@@ -17,7 +15,7 @@
   <table id="questions_table">
     <% if $disp_flag != 1 %>
       <tr>
-        <td align=left width=300>Question</td>
+        <td align=left width=300>Questions:</td>
         <%  if @questionnaire.type != 'QuizQuestionnaire' %><td align=left>weight</td><%end%>
 
       </tr>
@@ -75,7 +73,7 @@
     <% end %>
   </table>
 <% else %>
-
+    <p>For help in creating a custom rubric: documentation <%= link_to "guide", "http://wikis.lib.ncsu.edu/index.php/Creating_Custom_Rubric" %> | <%= link_to "video", "http://www.youtube.com/watch?v=uUt1hMUMFbM" %>.</p>
 
         <table>
           <tr>

@@ -2,7 +2,7 @@
 <h1>Edit <%= @questionnaire.display_type %></h1>
 
 <% if @questionnaire.type == "QuizQuestionnaire" %>
-  <% form_tag({:action=>'update_quiz', :id=>@questionnaire.id, :pid => params[:pid]}, :multipart => true) do %>
+  <%= form_tag({:action=>'update_quiz', :id=>@questionnaire.id, :pid => params[:pid]}, :multipart => true) do %>
     <% $disp_flag=0 %>
     <%= render :partial => 'questionnaire' %>
     <% $disp_flag=0 %>

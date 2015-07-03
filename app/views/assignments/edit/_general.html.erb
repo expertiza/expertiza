@@ -89,13 +89,7 @@ function is_coding_assignmentChanged(){
 <th width=60%></th>
   </tr>
 
-  <tr>
-    <td style='padding:5px' id='assignment_private_field'>
-      <input name="assignment_form[assignment][private]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][private]', 'true', @assignment_form.assignment.private?) %>
-      <%= label_tag('assignment_form[assignment][private]', 'Private?') %>
-    </td>
-  </tr>
+  
 
   <% if @assignment_form.assignment.require_signup? %>
     <script>

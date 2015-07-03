@@ -89,8 +89,6 @@ function is_coding_assignmentChanged(){
 <th width=60%></th>
   </tr>
 
-  
-
   <% if @assignment_form.assignment.require_signup? %>
     <script>
       jQuery(document).ready(function () {
@@ -112,8 +110,14 @@ function is_coding_assignmentChanged(){
     </td>
 
     <td style='padding:5px' id='assignment_team_count_field' <%= 'hidden' if @assignment_form.assignment.max_team_size == 1%>>
+      <!--Teammate reviews fields-->
+      <input name="assignment_form[assignment][show_teammate_reviews]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][show_teammate_reviews]', 'true', @assignment_form.assignment.show_teammate_reviews) %>
+      <%= label_tag('assignment_form[assignment][show_teammate_reviews]', 'Show teammate reviews?') %>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <!--Maximum number of members per team-->
       <%= label_tag('assignment_form[assignment][max_team_size]', 'Maximum number of members per team:') %>
-      <%= text_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size, {:style => 'width:20px'}) %><br/>
+      <%= text_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size, {:style => 'width:20px'}) %>
     </td>
   </tr>
 
@@ -187,15 +191,6 @@ function is_coding_assignmentChanged(){
     </td>
 
   </tr>
-
-  <!--Teammate reviews fields-->
-  <tr>
-    <td style='padding:5px' id='assignment_show_teammate_reviews'>
-      <input name="assignment_form[assignment][show_teammate_reviews]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][show_teammate_reviews]', 'true', @assignment_form.assignment.show_teammate_reviews) %>
-      <%= label_tag('assignment_form[assignment][show_teammate_reviews]', 'Show teammate reviews?') %>
-    </td>
-   </tr>
 
   <!--"available to student?" should be the last checkbox-->
   <tr>

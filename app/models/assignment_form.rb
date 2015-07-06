@@ -61,6 +61,9 @@ class AssignmentForm
 
   #code to save assignment questionnaires
   def update_assignment_questionnaires(attributes)
+    unless attributes
+      return false 
+    end
     existing_aqs = AssignmentQuestionnaire::where(assignment_id: @assignment.id)
     existing_aqs.each do |existing_aq|
       existing_aq.delete
@@ -84,6 +87,9 @@ class AssignmentForm
 
   #code to save due dates
   def update_due_dates(attributes,user)
+    unless attributes
+      return false 
+    end
     due_dates_id =Array.new
     max_review_dd = NIL
     attributes.each do |due_date|

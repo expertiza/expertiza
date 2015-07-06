@@ -121,10 +121,9 @@ class AssignmentParticipant < Participant
   end
 
   def has_submissions?
-    #return ((submitted_files.length > 0) or
-    #        (wiki_submissions.length > 0) or
-    #        (hyperlinks_array.length > 0))
-    return true
+    return ((submitted_files.length > 0) or
+            (wiki_submissions.length > 0) or
+            (hyperlinks_array.length > 0))
   end
 
   def has_quiz?

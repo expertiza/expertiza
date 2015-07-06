@@ -382,15 +382,6 @@ module DynamicReviewMapping
     #TODO: refactor later to merge with generic code. All the 3 functions have lot of code that is common
     #and all 3 functions work on more or less the same algo
 
-    def assign_reviewers_automatically(num_reviews, num_review_of_reviews)
-      #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-      # to treat all assignments as team assignments
-      review_message = assign_reviewers_team(num_reviews)
-      metareview_message = assign_metareviewers(num_review_of_reviews, @assignment)
-
-      return review_message.to_s + metareview_message.to_s
-      end
-
     def assign_reviewers_team(num_reviews)
 
       @assignment = self

@@ -3,8 +3,8 @@ function requireSignUpChanged() {
   var msg = 'Warning! Unchecking this box will remove all topics and the reservations of everyone who is sign up for them';
 
   if (jQuery('#assignment_require_signup').is(':checked')) {
-    addDueDateTableElement('signup', 0, <%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
-    addDueDateTableElement('drop_topic', 0, <%= due_date(@assignment_form.assignment, 'drop_topic').to_json.html_safe %>)
+    addDueDateTableElement(false, 'signup', 0, <%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
+    addDueDateTableElement(false, 'drop_topic', 0, <%= due_date(@assignment_form.assignment, 'drop_topic').to_json.html_safe %>)
   } else {
     if (confirm(msg)) {
       removeDueDateTableElement('signup', 0);
@@ -100,8 +100,8 @@ function is_coding_assignmentChanged(){
   <% if @assignment_form.assignment.require_signup? %>
     <script>
       jQuery(document).ready(function () {
-        addDueDateTableElement('signup', 0, <%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
-              addDueDateTableElement('drop_topic', 0, <%= due_date(@assignment_form.assignment, 'drop_topic').to_json.html_safe %>)
+        addDueDateTableElement(false, 'signup', 0, <%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
+        addDueDateTableElement(false, 'drop_topic', 0, <%= due_date(@assignment_form.assignment, 'drop_topic').to_json.html_safe %>)
       });
     </script>
   <% end %>
@@ -222,11 +222,13 @@ function is_coding_assignmentChanged(){
 
         if (checkbox.is(':checked')) {
           team_count_field.removeAttr('hidden');
+          addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
 
         } else {
             if (confirm(msg)) {
               team_count_field.attr('hidden', true);
               document.getElementById('assignment_form_assignment_max_team_size').value = '1';
+              removeDueDateTableElement('team_formation', 0);
 
             } else {
               checkbox.prop('checked', true);

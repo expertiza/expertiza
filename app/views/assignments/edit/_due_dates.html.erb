@@ -82,12 +82,12 @@
         due_at + '">' + '</td>';
         
         html += '<td align="center" class="due_date_due_at" width="10%">';
-        if(deadline_type == 'team_formation'){
-            html += '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]" disabled>'
-        }
-        else{
-            html += '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]">'
-        }
+        // if(deadline_type == 'team_formation'){
+        //     html += '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]" disabled>'
+        // }
+        // else{
+        html += '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]">'
+        // }
         html +=
         '<option value="">---</option>' +
         '<option value="1">No</option>' +
@@ -96,12 +96,12 @@
         '</select></td>';
 
         html += '<td align="center" class="due_date_review_allowed_id" width="10%">';
-        if(deadline_type == 'team_formation'){
-            html += '<select id="due_date_review_allowed_id" name="assignment_form[due_date][][review_allowed_id]" disabled>'
-        }
-        else{
+        // if(deadline_type == 'team_formation'){
+        //     html += '<select id="due_date_review_allowed_id" name="assignment_form[due_date][][review_allowed_id]" disabled>'
+        // }
+        // else{
             html += '<select id="due_date_review_allowed_id" name="assignment_form[due_date][][review_allowed_id]">'
-        }
+        // }
          html +=
         '<option value="">---</option>' +
         '<option value="1">No</option>' +
@@ -110,12 +110,12 @@
         '</select></td>';
 
         html += '<td align="center" class="due_date_review_of_review_allowed_id" width="10%">';
-        if(deadline_type == 'team_formation'){
-            html += '<select id="due_date_review_of_review_allowed_id" name="assignment_form[due_date][][review_of_review_allowed_id]" disabled>'
-        }
-        else{
+        // if(deadline_type == 'team_formation'){
+        //     html += '<select id="due_date_review_of_review_allowed_id" name="assignment_form[due_date][][review_of_review_allowed_id]" disabled>'
+        // }
+        // else{
             html += '<select id="due_date_review_of_review_allowed_id" name="assignment_form[due_date][][review_of_review_allowed_id]">'
-        }
+        // }
         html +=
         '<option value="">---</option>' +
         '<option value="1">No</option>' +
@@ -322,7 +322,7 @@
 <br>
 <input name="metareivewAllowed" type="hidden" value="false" />
 <%= check_box_tag('metareviewAllowed', 'true', @metareview_allowed,:onclick=>"removeOrAddMetareview()" ) %>
-<%= label_tag('metareivewAllowed', 'metareview allowed?') %>
+<%= label_tag('metareivewAllowed', 'metareview deadline') %>
 
 <table class='exp' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden;'>
 
@@ -344,7 +344,11 @@
   <tr id='blank' style='display:hidden'></tr>
   <script>
     jQuery(document).ready(function () {
-        addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
+        var checkbox = jQuery('#team_assignment');
+        if (checkbox.is(':checked')) {
+          addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
+      }
+
         <% 1.upto @assignment_form.assignment.rounds_of_reviews do |i| %>
         addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'submission', <%=i%>, <%= due_date(@assignment_form.assignment, 'submission', i-1).to_json.html_safe %>); // or use questionnaire_options(@assignment, nil).to_json
         addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'review', <%=i%>, <%= due_date(@assignment_form.assignment, 'review', i-1).to_json.html_safe %>) ;

@@ -41,7 +41,16 @@
     </div>
     <script>
       jQuery(document).ready(function () {
-        jQuery("#tabs").tabs();
+        jQuery("#tabs").tabs({
+          beforeActivate: function (event, ui) {
+            var frm = jQuery("#assignment_form");
+            jQuery.ajax({
+              url: frm.attr('action'),
+              method: frm.attr('method'),
+              data: frm.serialize(),
+            })
+          }
+        });
       });
 
       $('#go_to_tabs2').click(function(){

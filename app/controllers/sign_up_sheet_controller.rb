@@ -15,7 +15,7 @@ class SignUpSheetController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'sign_up', 'delete_signup', 'list', 'show_team'
+    when 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
       ['Instructor',
        'Teaching Assistant',
        'Administrator',
@@ -219,8 +219,8 @@ class SignUpSheetController < ApplicationController
       end
 
   def list
-    @assignment_id = params[:assignment_id]
-    @sign_up_topics = SignUpTopic.where(['assignment_id = ?', @assignment_id]).all
+    @assignment_id = params[:assignment_id].to_i
+    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: nil)
     @slots_filled = SignUpTopic.find_slots_filled(params[:assignment_id])
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:assignment_id])
     @show_actions = true
@@ -462,6 +462,18 @@ class SignUpSheetController < ApplicationController
     else
       render :action => 'new', :id => assignment_id
     end
+  end
+
+  def switch_original_topic_to_approved_suggested_topic
+    SignUpTopic.find(params[:id]).update_attribute('private_to', nil) if SignUpTopic.exists?(params[:id])
+    team_id = SignedUpTeam.team_id(params[:assignment_id].to_i, session[:user].id)
+    SignedUpTeam.where(team_id: team_id, is_waitlisted: 0).first.update_attribute('topic_id', params[:id].to_i) if SignedUpTeam.exists?(team_id: team_id, is_waitlisted: 0)
+    redirect_to :action => 'list', :assignment_id => params[:assignment_id]
+  end
+
+  def publish_approved_suggested_topic
+    SignUpTopic.find(params[:id]).update_attribute('private_to', nil) if SignUpTopic.exists?(params[:id])
+    redirect_to :action => 'list', :assignment_id => params[:assignment_id]
   end
 
   private

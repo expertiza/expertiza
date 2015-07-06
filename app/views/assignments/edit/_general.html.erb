@@ -89,14 +89,6 @@ function is_coding_assignmentChanged(){
 <th width=60%></th>
   </tr>
 
-  <tr>
-    <td style='padding:5px' id='assignment_private_field'>
-      <input name="assignment_form[assignment][private]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][private]', 'true', @assignment_form.assignment.private?) %>
-      <%= label_tag('assignment_form[assignment][private]', 'Private?') %>
-    </td>
-  </tr>
-
   <% if @assignment_form.assignment.require_signup? %>
     <script>
       jQuery(document).ready(function () {
@@ -115,11 +107,21 @@ function is_coding_assignmentChanged(){
       <% end %>
       <% @assignment_form.assignment.max_team_size %>
       <%= label_tag('team_assignment', 'Has teams?') %>
-    </td>
 
-    <td style='padding:5px' id='assignment_team_count_field' <%= 'hidden' if @assignment_form.assignment.max_team_size == 1%>>
+    <span style='padding:5px' id='assignment_team_count_field' <%= 'hidden' if @assignment_form.assignment.max_team_size == 1%>>
+
+      <!--Teammate reviews fields-->
+      <input name="assignment_form[assignment][show_teammate_reviews]" type="hidden" value="false"/>
       <%= label_tag('assignment_form[assignment][max_team_size]', 'Maximum number of members per team:') %>
-      <%= text_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size, {:style => 'width:20px'}) %><br/>
+      <%= text_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size, {:style => 'width:20px'}) %>
+      </span>
+    </td>
+      <td style='padding-left:50px' id='assignment_show_teammate_reviews'  <%= 'hidden' if @assignment_form.assignment.max_team_size < 2%>>
+
+      <%= check_box_tag('assignment_form[assignment][show_teammate_reviews]', 'true', @assignment_form.assignment.show_teammate_reviews) %>
+      <%= label_tag('assignment_form[assignment][show_teammate_reviews]', 'Show teammate reviews?') %>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <!--Maximum number of members per team-->
     </td>
   </tr>
 
@@ -143,7 +145,7 @@ function is_coding_assignmentChanged(){
       <%= label_tag('assignment_wiki_assignment', 'Wiki assignment?') %>
     </td>
 
-    <td style='padding:5px' id='assignment_wiki_type_field' <%= 'hidden' unless @assignment_form.assignment.wiki_type.name != 'No' %>>
+    <td style='padding-left:50px' id='assignment_wiki_type_field' <%= 'hidden' unless @assignment_form.assignment.wiki_type.name != 'No' %>>
       <%= label_tag('assignment_form[assignment][wiki_type_id]', 'Wiki type:') %>
       <%= select('assignment_form[assignment]', 'wiki_type_id', wiki_type_options, :selected => @assignment_form.assignment.wiki_type_id) %>
     </td>
@@ -194,15 +196,6 @@ function is_coding_assignmentChanged(){
 
   </tr>
 
-  <!--Teammate reviews fields-->
-  <tr>
-    <td style='padding:5px' id='assignment_show_teammate_reviews'>
-      <input name="assignment_form[assignment][show_teammate_reviews]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][show_teammate_reviews]', 'true', @assignment_form.assignment.show_teammate_reviews) %>
-      <%= label_tag('assignment_form[assignment][show_teammate_reviews]', 'Show teammate reviews?') %>
-    </td>
-   </tr>
-
   <!--"available to student?" should be the last checkbox-->
   <tr>
     <td style='padding:5px' id='assignment_availability_flag_field'>
@@ -219,14 +212,17 @@ function is_coding_assignmentChanged(){
       var msg = 'Warning! Unchecking this box will hide teams that already exist.';
         var checkbox = jQuery('#team_assignment');
         var team_count_field = jQuery('#assignment_team_count_field');
+        var teammate_reviews_field = jQuery('#assignment_show_teammate_reviews');
 
         if (checkbox.is(':checked')) {
           team_count_field.removeAttr('hidden');
+          teammate_reviews_field.removeAttr('hidden');
           addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
 
         } else {
             if (confirm(msg)) {
               team_count_field.attr('hidden', true);
+              teammate_reviews_field.attr('hidden', true);
               document.getElementById('assignment_form_assignment_max_team_size').value = '1';
               removeDueDateTableElement('team_formation', 0);
 

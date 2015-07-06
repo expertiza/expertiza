@@ -1135,11 +1135,12 @@ require 'analytic/assignment_analytic'
     # returns whether ANY topic has a partner ad; used for deciding whether to show the Advertisements column
     def has_partner_ads?(id)
       #Team.find_by_sql("select * from teams where parent_id = "+id+" AND advertise_for_partner='1'").size > 0
-      return Team.find_by_sql("select t.* "+
+      @team = Team.find_by_sql("select t.* "+
           "from teams t, signed_up_teams s "+
-          "where s.topic_id='"+id.to_s+"' and s.team_id = t.id and t.advertise_for_partner = 1").size > 0
+          "where s.topic_id='"+id.to_s+"' and s.team_id = t.id and t.advertise_for_partner = 1")
+@team.reject!{|t| t.full?}
+    return @team.size > 0
     end
-
   def review_progress_pie_chart
     reviewed = self.get_percentage_reviews_completed
     pending = 100 - reviewed

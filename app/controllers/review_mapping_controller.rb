@@ -41,36 +41,38 @@ class ReviewMappingController < ApplicationController
     assignment = Assignment.find(params[:id])
     topic_id = params[:topic_id]
     user_id = User.where(name: params[:user][:name]).first.id
-    #Team lazy initialization
-    SignUpSheet.signup_team(assignment.id, user_id, topic_id)
-    if assignment.varying_rubrics_by_round?
-      round = assignment.get_current_round(topic_id) #if vary rubric by round, in the response_maps table we need to record round #
+    if TeamsUser.exists?(team_id: params[:contributor_id], user_id: user_id)
+      flash[:error] = "You cannot assign this student to review his/her own artifact."
     else
-      round=nil #if this assignment does not vary rubric by round, there is no point to record the round #
-    end
-    msg = String.new
-    begin
-
-      user = User.from_params(params)
-
-      regurl = url_for :action => 'add_user_to_assignment',
-        :id => assignment.id,
-        :user_id => user.id,
-        :contributor_id => params[:contributor_id]
-
-      # Get the assignment's participant corresponding to the user
-      reviewer = get_reviewer(user,assignment,regurl)
-      #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-      # to treat all assignments as team assignments
-      if ReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?  and round = ?',params[:id],reviewer.id, round]).first.nil?
-        ReviewResponseMap.create(:reviewee_id => params[:contributor_id], :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id, :round=>round)
+      #Team lazy initialization
+      SignUpSheet.signup_team(assignment.id, user_id, topic_id)
+      if assignment.varying_rubrics_by_round?
+        round = assignment.get_current_round(topic_id) #if vary rubric by round, in the response_maps table we need to record round #
       else
-        raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
+        round=nil #if this assignment does not vary rubric by round, there is no point to record the round #
       end
+      msg = String.new
+      begin
+        user = User.from_params(params)
+        #contributor_id is team_id
+        regurl = url_for :action => 'add_user_to_assignment',
+          :id => assignment.id,
+          :user_id => user.id,
+          :contributor_id => params[:contributor_id]
 
+        # Get the assignment's participant corresponding to the user
+        reviewer = get_reviewer(user,assignment,regurl)
+        #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+        # to treat all assignments as team assignments
+        if ReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?  and round = ?',params[:contributor_id],reviewer.id, round]).first.nil?
+          ReviewResponseMap.create(:reviewee_id => params[:contributor_id], :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id, :round=>round)
+        else
+          raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
+        end
       rescue
-        msg = $!
+          msg = $!
       end
+    end
     redirect_to :action => 'list_mappings', :id => assignment.id, :msg => msg
   end
 
@@ -154,7 +156,7 @@ class ReviewMappingController < ApplicationController
     reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
 
     if params[:i_dont_care].nil? && params[:topic_id].nil?
-      flash[:error] = "You need to select a topic"
+      flash[:error] = "Please go back and select a topic"
     else
 
       begin
@@ -165,7 +167,7 @@ class ReviewMappingController < ApplicationController
             topic = assignment.candidate_topics_to_review(reviewer).to_a.shuffle[0] rescue nil
           end
           if topic.nil?
-            flash[:error] ="There are no more topics to review"
+            flash[:error] ="No topics are available to review at this time. Please try later."
           else
             assignment.assign_reviewer_dynamically(reviewer, topic)
           end

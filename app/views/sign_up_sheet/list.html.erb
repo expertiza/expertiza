@@ -3,7 +3,6 @@
 
 <table class="general">
   <tr><%= render :partial => 'table_header' %></tr>
-
   <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
     <b>Your topic(s):</b>
     <% for selected_topic in @selected_topics %>
@@ -30,21 +29,40 @@
         <% else %>
           <tr>
           <% end %>
-
-          <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic} %>
-
-
+          <% is_suggested_topic = false %>
+          <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
         </tr>
         <% i=i+1 %>
       <% end %>
+</table>
+<br/><br/>
 
-    </table>
+<h2>Your approved suggested topic</h2>
+<table class="general">
+  <tr><%= render :partial => 'table_header' %></tr>
+<br/>
+<% i=1 %>
+<%
+  team_id = SignedUpTeam.team_id(@assignment_id, session[:user].id)
+  teams_users = TeamsUser.where(team_id: team_id)
+  teams_users_array = Array.new
+  teams_users.each do |teams_user|
+    teams_users_array << teams_user.user_id
+  end
+    @suggested_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: teams_users_array)
+%>
+<%if !@suggested_topics.nil? %>
+  <% @suggested_topics.each do |topic| %>
+    <tr>
+      <% is_suggested_topic = true %>
+      <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
+    </tr>
+    <% i=i+1 %>
+  <% end %>
+<% end %>
+</table>
 
-
-
-    <%
-        session[:return_to] = request.url
-      %>
-    <br/><br/>
-    <a href="javascript:history.back()">Back</a>
-    <br/>
+<% session[:return_to] = request.url %>
+<br/><br/>
+<a href="javascript:history.back()">Back</a>
+<br/>

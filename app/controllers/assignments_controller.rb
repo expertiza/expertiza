@@ -3,10 +3,18 @@ class AssignmentsController < ApplicationController
   before_filter :authorize
 
   def action_allowed?
-    ['Super-Administrator',
-     'Administrator',
-     'Instructor',
-     'Teaching Assistant'].include? current_role_name
+    if params[:action] == 'edit' or params[:action] == 'update'
+      assignment = Assignment.find(params[:id])
+      return true if ['Super-Administrator', 'Administrator'].include? current_role_name
+      return true if assignment.instructor_id == session[:user].id
+      return true if TaMapping.exists?(ta_id: session[:user].id, course_id: assignment.course_id) and TaMapping.where(course_id: assignment.course_id).include?TaMapping.where(ta_id: session[:user].id, course_id: assignment.course_id).first
+      return false
+    else
+      ['Super-Administrator',
+       'Administrator',
+       'Instructor',
+       'Teaching Assistant'].include? current_role_name
+    end
   end
 
   # change access permission from public to private or vice versa

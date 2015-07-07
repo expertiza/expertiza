@@ -9,6 +9,8 @@ class SubmittedContentController < ApplicationController
        'Student'].include? current_role_name and ((%w(edit).include? action_name) ? are_needed_authorizations_present? : true) and one_team_can_submit_work?
   end
 
+  #The view have already tested that @assignment.submission_allowed(topic_id) is true,
+  # so @can_submit should be true
   def edit
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
@@ -21,15 +23,28 @@ class SubmittedContentController < ApplicationController
       #flash[:error] = "This is a team assignment. Before submitting your work, you must <a style='color: blue;' href='../../student_teams/view/?student_id=#{params[:id]}'>create a team</a>, even if you will be the only member of the team"
       #redirect_to :controller => 'student_task', :action => 'view', :id => params[:id]
       SignUpSheet.signup_team(@assignment.id, @participant.user_id, nil)
+    end
+
+    #@can_submit is the flag indicating if the user can submit or not in current stage
+    @can_submit=true
+
+    @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
   end
-end
 
-def view
-  @participant = AssignmentParticipant.find(params[:id])
-  return unless current_user_id?(@participant.user_id)
+  #view is called when @assignment.submission_allowed(topic_id) is false
+  #so @can_submit should be false
+  def view
+    @participant = AssignmentParticipant.find(params[:id])
+    return unless current_user_id?(@participant.user_id)
 
-  @assignment = @participant.assignment
-end
+    @assignment = @participant.assignment
+
+    #@can_submit is the flag indicating if the user can submit or not in current stage
+    @can_submit=false
+
+    @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
+
+  end
 
 def submit_hyperlink
   @participant = AssignmentParticipant.find(params[:id])

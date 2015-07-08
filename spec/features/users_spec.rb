@@ -58,15 +58,14 @@ feature 'Method3: Instructor search a user' do
   end
 end
 
-feature 'Instructor delete a user' do
+feature 'Instructor attempts to delete a user' do
   before(:all) do
     instructor.save
     student.save
     log_in instructor.name, "password"
   end
 
-  scenario 'which has no relationship' do
-
+  scenario 'who has not performed any actions' do
     visit '/users/list'
     #in order to show whole user list
     fill_in 'letter', with: ''

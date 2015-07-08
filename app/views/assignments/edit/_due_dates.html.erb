@@ -12,6 +12,18 @@
         var previous_element;
         if (round_no == 0) {
             if (deadline_type == 'team_formation') {
+                if (jQuery('#signup').length != 0) {
+                    previous_element = jQuery("#signup");
+                } else {
+                    previous_element = jQuery('#due_date_heading')
+                }
+            } else if (deadline_type == 'drop_topic') {
+                if (jQuery('#team_formation').length != 0) {
+                    previous_element = jQuery("#team_formation");
+                } else {
+                    previous_element = jQuery('#signup');
+                }
+            } else if (deadline_type == 'signup') {
                 previous_element = jQuery('#due_date_heading')
             } else {
                 previous_element = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').last();
@@ -93,7 +105,7 @@
         html += '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]">'
         // }
         html +=
-        '<option value="">---</option>' +
+        '<option value="">No</option>' +
         '<option value="1">No</option>' +
         '<option value="2">Late</option>' +
         '<option value="3">Yes</option>' +
@@ -107,7 +119,7 @@
             html += '<select id="due_date_review_allowed_id" name="assignment_form[due_date][][review_allowed_id]">'
         // }
          html +=
-        '<option value="">---</option>' +
+        '<option value="">No</option>' +
         '<option value="1">No</option>' +
         '<option value="2">Late</option>' +
         '<option value="3">Yes</option>' +
@@ -121,7 +133,7 @@
             html += '<select id="due_date_review_of_review_allowed_id" name="assignment_form[due_date][][review_of_review_allowed_id]">'
         // }
         html +=
-        '<option value="">---</option>' +
+        '<option value="">No</option>' +
         '<option value="1">No</option>' +
         '<option value="2">Late</option>' +
         '<option value="3">Yes</option>' +
@@ -131,7 +143,7 @@
         {
             html += '<td align="center" class="due_date_quiz_allowed_id" width="10%">' +
             '<select id="due_date_quiz_allowed_id" name="assignment_form[due_date][][quiz_allowed_id]">' +
-            '<option value="">---</option>' +
+            '<option value="">No</option>' +
             '<option value="1">No</option>' +
             '<option value="2">Late</option>' +
             '<option value="3">Yes</option>' +
@@ -143,7 +155,8 @@
 
         html += '<td align="center" class="due_date_threshold" width="10%">' +
         '<select id="due_date_threshold" name="assignment_form[due_date][][threshold]">' +
-        '<option value="">---</option>' +
+        '<option value="">No</option>' +
+        '<option value="1">No</option>' +
         '<option value="8">8</option>' +
         '<option value="16">16</option>' +
         '<option value="24">24</option>' +
@@ -161,7 +174,7 @@
 
         html += '<td  align="center" id="specialname" class="due_date_name" width="10%">';
         html += '<input id="due_date_name" type="text" name="assignment_form[due_date][][deadline_name]" value="'+due_date.deadline_name+'">'+'</td>';
-        html += '<td  align="center" id="due_date_url_col" class="due_date_description_url" width="10%">';
+        html += '<td align="center" id="due_date_url_col" class="due_date_description_url" width="10%">';
         html += '<input id="due_date_description_url" type="text" name="assignment_form[due_date][][description_url]" value="'+due_date.description_url+'">'+'</td>';
         if (addnameurl==false){
             previous_element.after(html2);
@@ -350,6 +363,7 @@
   <tr id='blank' style='display:hidden'></tr>
   <script>
     jQuery(document).ready(function () {
+        console.log(<%= raw @assignment_form.to_json %>);
         <% if @assignment_form.assignment.max_team_size > 1 %>
         addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
         <% end %>

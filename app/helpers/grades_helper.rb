@@ -158,4 +158,19 @@ table_hash
   def render_ui(param1,param2)
     render :partial => param1,:locals =>param2
   end
+
+  def has_team_and_metareview?
+    assignment = Assignment.find(params[:id])
+    has_team = assignment.max_team_size > 1
+    has_metareview = DueDate.exists?(assignment_id: @assignment.id, deadline_type_id: 5)
+    true_num = 0
+    if has_team and has_metareview
+      true_num = 2
+    elsif has_team or has_metareview
+      true_num = 1
+    else
+      true_num = 0
+    end      
+    return {has_team: has_team, has_metareview: has_metareview, true_num: true_num}
+  end
 end

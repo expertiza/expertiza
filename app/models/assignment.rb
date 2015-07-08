@@ -83,13 +83,13 @@ require 'analytic/assignment_analytic'
 
   # Returns a set of topics that can be reviewed.
   # We choose the topics if one of its submissions has received the fewest reviews so far
+  #reviewer, the parameter, is an object of Participant
   def candidate_topics_to_review(reviewer)
     return nil if sign_up_topics.empty? # This is not a topic assignment
 
     # Initialize contributor set with all teams participating in this assignment
     contributor_set = Array.new(contributors)
 
- 
     # Reject contributors that have not selected a topic, or have no submissions
     contributor_set=reject_by_no_topic_selection_or_no_submission(contributor_set)
 
@@ -123,12 +123,24 @@ require 'analytic/assignment_analytic'
   end
 
   #This method is only for the assignments without topics
-  def candidate_assignment_teams_to_review
+  def candidate_assignment_teams_to_review(reviewer)
     # the contributors are AssignmentTeam objects
     contributor_set = Array.new(contributors)
 
     # Reject contributors that have no submissions
     contributor_set.reject! { |contributor| !contributor.has_submissions? }
+
+    if self.varying_rubrics_by_round?
+      # Filter submissions already reviewed by reviewer in current round
+      current_round = self.get_current_round(nil)
+      contributor_set = reject__reviewed_submissions_in_current_round(contributor_set, reviewer,current_round)
+    else
+      # Filter submissions already reviewed by reviewer
+      contributor_set=reject_previously_reviewed_submissions(contributor_set, reviewer)
+    end
+
+    # Filter submission by reviewer him/her self
+    contributor_set=reject_own_submission(contributor_set, reviewer)
 
     # Filter the contributors with the least number of reviews
     contributor_set=reject_by_least_reviewed(contributor_set)
@@ -181,25 +193,13 @@ require 'analytic/assignment_analytic'
   end
 
   #assign the reviewer to review the assignment_team's submission. Only used in the assignments that do not have any topic
+  #Parameter assignment_team is the candidate assignment team, it cannot be a team w/o submission, or have reviewed by reviewer, or reviewer's own team.
+  #(guaranteed by candidate_assignment_teams_to_review method)
   def assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
     if assignment_team==nil
       raise "There is no submission right now. Come back later."
     end
-    participants = assignment_team.get_participants
 
-    if participants.include?(reviewer)
-      raise "We randomly picked your own artifact. You may try click the button again or come back later."
-    end
-    if self.varying_rubrics_by_round?  #review rubrics vary by rounds
-      round = get_current_round(nil)
-      if assignment_team.reviewed_by_in_round?(reviewer,round)
-        raise "We randomly picked an artifact which has already been reviewed by you (or assigned to you). You may try click the button again or come back later."
-      end
-    else
-      if assignment_team.reviewed_by?(reviewer)
-        raise "We randomly picked an artifact which has already been reviewed by you (or assigned to you). You may try click the button again or come back later."
-      end
-    end
     assignment_team.assign_reviewer(reviewer)
   end
 

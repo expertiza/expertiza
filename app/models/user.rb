@@ -88,13 +88,14 @@ class User < ActiveRecord::Base
   def get_user_list
     user_list = []
 
-    # If the user is a super
+    # If the user is a super admin, fetch all users
     if self.role.super_admin?
       User.all.each do |user|
         user_list << user
       end
     end
 
+    # If the user is an instructor, fetch all users in his course/assignment
     if self.role.instructor?
       participants = []
       Course.where(instructor_id: self.id).each do |course|
@@ -112,6 +113,7 @@ class User < ActiveRecord::Base
       end
     end
 
+    # If the user is a TA, fetch all users in his courses
     if self.role.ta?
       courses = Ta.get_mapped_courses(self.id)
       participants = []
@@ -128,6 +130,7 @@ class User < ActiveRecord::Base
       end
     end
 
+    # Add the children to the list
     unless self.role.super_admin?
       User.all.each do |u|
         if is_recursively_parent_of(u)

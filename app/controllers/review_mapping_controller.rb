@@ -157,7 +157,7 @@ class ReviewMappingController < ApplicationController
     assignment = Assignment.find(params[:assignment_id])
     reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
 
-    if params[:i_dont_care].nil? && params[:topic_id].nil?
+    if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.has_topics?
       flash[:error] = "Please go back and select a topic"
     else
 
@@ -175,7 +175,7 @@ class ReviewMappingController < ApplicationController
           end
 
         else  #assignment without topic -Yang
-          assignment_teams = assignment.candidate_assignment_teams_to_review
+          assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
           assignment_team = assignment_teams.to_a.shuffle[0] rescue nil
           assignment.assign_reviewer_dynamically_no_topic(reviewer,assignment_team)
         end

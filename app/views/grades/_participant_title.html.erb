@@ -1,12 +1,26 @@
-<% namecolwidth = 18 %>
-<% colwidth = 7  %>
+
+<% if has_team_and_metareview?[:true_num] == 2 %>
+	<!--100 = 19 + 8 * 9 + 9-->
+	<% namecolwidth = 19 %>
+	<% colwidth = 9 %>
+<% elsif has_team_and_metareview?[:true_num] == 1 %>
+	<!--100 = 16 + 6 * 12 + 12-->
+	<% namecolwidth = 16 %>
+	<% colwidth = 12 %>
+<% else %>
+	<!--100 = 16 + 4 * 18 + 18-->
+	<% namecolwidth = 10 %>
+	<% colwidth = 18 %>
+<% end %>
 
 <TR <% if prefix %>id='<%= prefix %>_1' style="display:none"<% end %>>
 <TH WIDTH="<%= namecolwidth %>%">&nbsp;</TH>
 <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Submitted work</TH>
-<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Reviewing</TH>
+<% if has_team_and_metareview?[:has_metareview] %>
+	<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Reviewing</TH>
+<% end %>
 <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Author Feedback</TH>
-<% if @assignment.team_assignment? %>
+<% if has_team_and_metareview?[:has_team] %>
   <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Teammate Review</TH>
 <% end %>
 <TH WIDTH="<%= colwidth %>%">&nbsp;</TH></TR>           
@@ -15,14 +29,16 @@
 <TH WIDTH="<%= namecolwidth %>%" ALIGN="LEFT">Contributor</TH>
 <TH WIDTH="<%= colwidth %>%">Average</TH>
 <TH WIDTH="<%= colwidth %>%">Range</TH>
-<TH WIDTH="<%= colwidth %>%">Average</TH>
-<TH WIDTH="<%= colwidth %>%">Range </TH>
+<% if has_team_and_metareview?[:has_metareview] %>
+	<TH WIDTH="<%= colwidth %>%">Average</TH>
+	<TH WIDTH="<%= colwidth %>%">Range </TH>
+<% end %> 
 <TH WIDTH="<%= colwidth %>%">Average</TH>
 <TH WIDTH="<%= colwidth %>%">Range </TH>
   <!--ACS Display teammate review ratings only for teams with size greater than 1-->
-  <% if @assignment.max_team_size > 1 %>
-  <TH WIDTH="<%= colwidth %>%">Average</TH>
-  <TH WIDTH="<%= colwidth %>%">Range </TH>
+<% if has_team_and_metareview?[:has_team] %>
+	<TH WIDTH="<%= colwidth %>%">Average</TH>
+	<TH WIDTH="<%= colwidth %>%">Range </TH>
 <% end %>   
 <TH WIDTH="<%= colwidth %>%">Final Score</TH></TR>    
     

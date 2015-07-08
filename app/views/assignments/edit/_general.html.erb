@@ -216,6 +216,7 @@ function is_coding_assignmentChanged(){
 
         if (checkbox.is(':checked')) {
           team_count_field.removeAttr('hidden');
+          jQuery('#assignment_form_assignment_max_team_size').val('2');
           teammate_reviews_field.removeAttr('hidden');
           addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
 

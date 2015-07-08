@@ -46,7 +46,7 @@
             var deleteTeam = 0;
             var frm = jQuery("#assignment_form");
             var max_team_size = jQuery('#assignment_form_assignment_max_team_size').val();
-            if (max_team_size == '1') {
+            if (max_team_size == '1' && jQuery('#team_assignment').is(':checked')) {
               deleteTeam = 1;
               alert("Maxinum number of members per team must be greater than 1!");
             }

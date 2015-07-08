@@ -197,7 +197,7 @@ require 'analytic/assignment_analytic'
   #(guaranteed by candidate_assignment_teams_to_review method)
   def assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
     if assignment_team==nil
-      raise "There is no submission right now. Come back later."
+      raise "here are no more submissions available for review right now. Try again later."
     end
 
     assignment_team.assign_reviewer(reviewer)

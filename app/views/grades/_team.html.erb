@@ -2,11 +2,11 @@
      <a href="#" id="<%= prefix %>Link" name="<%= prefix %>Link" onclick="toggleTeam('<%= prefix %>');return false;"><%=image_tag("expand.png")%></a>
      <%= tscore[:team].name %></TD>
      <% if tscore[:scores][:avg] %>
-      	<TD COLSPAN="4" ALIGN="CENTER"><%= sprintf("%.2f",tscore[:scores][:avg]) %>%</TD>
-       	<TD COLSPAN="4" ALIGN="CENTER"><%= sprintf("%.0f",tscore[:scores][:min]) %>% - <%= sprintf("%.0f",tscore[:scores][:max]) %>%</TD>
+      	<TD COLSPAN="<%= col_avg_th_span_value %>" ALIGN="CENTER"><%= sprintf("%.2f",tscore[:scores][:avg]) %>%</TD>
+       	<TD COLSPAN="<%= col_range_th_span_value %>" ALIGN="CENTER"><%= sprintf("%.0f",tscore[:scores][:min]) %>% - <%= sprintf("%.0f",tscore[:scores][:max]) %>%</TD>
      <% else %>
-        <TD COLSPAN="4" ALIGN="CENTER">---</TD>
-        <TD COLSPAN="4" ALIGN="CENTER">---</TD>
+        <TD COLSPAN="<%= col_avg_th_span_value %>" ALIGN="CENTER">---</TD>
+        <TD COLSPAN="<%= col_range_th_span_value %>" ALIGN="CENTER">---</TD>
      <% end %>
      <TD WIDTH="9">&nbsp;</TD></TR>  
      

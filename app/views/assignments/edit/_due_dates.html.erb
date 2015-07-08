@@ -11,7 +11,11 @@
 //round_no = 0 is used for other deadlines
         var previous_element;
         if (round_no == 0) {
-            previous_element = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').last();
+            if (deadline_type == 'team_formation') {
+                previous_element = jQuery('#due_date_heading')
+            } else {
+                previous_element = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').last();
+            }
             element_id = deadline_type;
             if (jQuery('#' + element_id).length != 0) {
                 return
@@ -324,7 +328,7 @@
 <% end %>
 <input name="metareivewAllowed" type="hidden" value="false" />
 <%= check_box_tag('metareviewAllowed', 'true', @metareview_allowed,:onclick=>"removeOrAddMetareview()" ) %>
-<%= label_tag('metareivewAllowed', 'metareview deadline') %>
+<%= label_tag('metareivewAllowed', 'Use metareview deadline') %>
 
 <table class='exp' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden;'>
 

@@ -37,18 +37,28 @@
               <%= render '/sign_up_sheet/add_signup_topics.html' %>
           <% end %>
       </div>
-      <%= button_tag 'Save'%>| <%= render :partial => '/shared_scripts/back' %>
+      <%= button_tag render :partial => '/shared_scripts/back' %>
     </div>
     <script>
       jQuery(document).ready(function () {
         jQuery("#tabs").tabs({
           beforeActivate: function (event, ui) {
+            var deleteTeam = 0;
             var frm = jQuery("#assignment_form");
-            jQuery.ajax({
-              url: frm.attr('action'),
-              method: frm.attr('method'),
-              data: frm.serialize(),
-            })
+            var max_team_size = jQuery('#assignment_form_assignment_max_team_size').val();
+            if (max_team_size == '1') {
+              deleteTeam = 1;
+              alert("Maxinum number of members per team must be greater than 1!");
+            }
+            if (deleteTeam == 0) {
+              jQuery.ajax({
+                url: frm.attr('action'),
+                method: frm.attr('method'),
+                data: frm.serialize(),
+              })
+            } else {
+              event.preventDefault();
+            }
           }
         });
       });

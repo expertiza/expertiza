@@ -88,7 +88,16 @@ def remove_hyperlink
   end
 
   undo_link("Link has been removed successfully. ")
-  redirect_to :action => 'edit', :id => @participant.id
+  
+  #determine if the user should be redirected to "edit" or  "view" based on the current deadline right
+  topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
+  assignment = Assignment.find(@participant.parent_id)
+
+  if assignment.submission_allowed(topic_id)
+    redirect_to :action => 'edit', :id => @participant.id
+  else
+    redirect_to :action => 'view', :id => @participant.id
+  end
 end
 
 def submit_file

@@ -160,9 +160,14 @@ table_hash
   end
 
   def has_team_and_metareview?
-    assignment = Assignment.find(params[:id])
-    has_team = assignment.max_team_size > 1
-    has_metareview = DueDate.exists?(assignment_id: @assignment.id, deadline_type_id: 5)
+    if params[:action] == "view"
+      @assignment = Assignment.find(params[:id])
+      @assignment_id = @assignment.id 
+    elsif params[:action] == "view_my_scores"
+      @assignment_id = Participant.find(params[:id]).parent_id 
+    end
+    has_team = @assignment.max_team_size > 1
+    has_metareview = DueDate.exists?(assignment_id: @assignment_id, deadline_type_id: 5)
     true_num = 0
     if has_team and has_metareview
       true_num = 2

@@ -1,5 +1,16 @@
-<% namecolwidth = 18 %>
-<% colwidth = 7  %>
+<% if has_team_and_metareview?[:true_num] == 2 %>
+  <!--100 = 19 + 8 * 9 + 9-->
+  <% namecolwidth = 19 %>
+  <% colwidth = 9 %>
+<% elsif has_team_and_metareview?[:true_num] == 1 %>
+  <!--100 = 16 + 6 * 12 + 12-->
+  <% namecolwidth = 16 %>
+  <% colwidth = 12 %>
+<% else %>
+  <!--100 = 16 + 4 * 18 + 18-->
+  <% namecolwidth = 10 %>
+  <% colwidth = 18 %>
+<% end %>
 
 <a href="#" name='score-chartLink' onClick="toggleElement('score-chart', 'stats');return false;">hide stats</a>
 
@@ -16,12 +27,14 @@
 	</div>
 </TH>
 
-<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">
-	<img src="<%= @grades_bar_charts[:metareview] %>" >
-  <div class="circle" id="metareview-circle">
-          
-  </div>
-</TH>
+<% if has_team_and_metareview?[:has_metareview] %>
+  <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">
+  	<img src="<%= @grades_bar_charts[:metareview] %>" >
+    <div class="circle" id="metareview-circle">
+            
+    </div>
+  </TH>
+<% end %>
 
 <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">
 	<img src="<%= @grades_bar_charts[:feedback] %>" >
@@ -30,7 +43,7 @@
   </div>
 </TH>
 
-<% if @assignment.team_assignment? %>		
+<% if has_team_and_metareview?[:has_team] %>		
   <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">
   <% if @assignment.show_teammate_reviews == true %>
   	<img src="<%= @grades_bar_charts[:teammate] %>" >

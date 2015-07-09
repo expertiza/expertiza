@@ -133,4 +133,11 @@ class SignUpTopic < ActiveRecord::Base
       @selected_topics = SignUpSheetController.other_confirmed_topic_for_user(assignment_id, users_team[0].t_id)
     end
   end
+
+  def self.has_suggested_topic?(assignment_id)
+    sign_up_topics = SignUpTopic.where(assignment_id: assignment_id, private_to: nil)
+    all_topics = SignUpTopic.where(assignment_id: assignment_id)
+    return false if sign_up_topics.size == all_topics.size
+    return true
+  end
 end

@@ -37,30 +37,32 @@
 </table>
 <br/><br/>
 
-<h2>Your approved suggested topic</h2>
-<table class="general">
-  <tr><%= render :partial => 'table_header' %></tr>
-<br/>
-<% i=1 %>
-<%
-  team_id = SignedUpTeam.team_id(@assignment_id, session[:user].id)
-  teams_users = TeamsUser.where(team_id: team_id)
-  teams_users_array = Array.new
-  teams_users.each do |teams_user|
-    teams_users_array << teams_user.user_id
-  end
-    @suggested_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: teams_users_array)
-%>
-<%if !@suggested_topics.nil? %>
-  <% @suggested_topics.each do |topic| %>
-    <tr>
-      <% is_suggested_topic = true %>
-      <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
-    </tr>
-    <% i=i+1 %>
+<% if SignUpTopic.has_suggested_topic?(@assignment.id) %>
+  <h2>Your approved suggested topic</h2>
+  <table class="general">
+    <tr><%= render :partial => 'table_header' %></tr>
+  <br/>
+  <% i=1 %>
+  <%
+    team_id = SignedUpTeam.team_id(@assignment_id, session[:user].id)
+    teams_users = TeamsUser.where(team_id: team_id)
+    teams_users_array = Array.new
+    teams_users.each do |teams_user|
+      teams_users_array << teams_user.user_id
+    end
+      @suggested_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: teams_users_array)
+  %>
+  <%if !@suggested_topics.nil? %>
+    <% @suggested_topics.each do |topic| %>
+      <tr>
+        <% is_suggested_topic = true %>
+        <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
+      </tr>
+      <% i=i+1 %>
+    <% end %>
   <% end %>
+  </table>
 <% end %>
-</table>
 
 <% session[:return_to] = request.url %>
 <br/><br/>

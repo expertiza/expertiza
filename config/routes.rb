@@ -154,7 +154,17 @@ Expertiza::Application.routes.draw do
 
   get '/import_file/import', controller: :import_file, action: :import
 
-  resources :institutions
+  resources :institution do
+    collection do
+      get :list
+      get :show
+      post :new
+      post :create
+      post :edit
+      post :update
+      post :destroy
+    end
+  end
 
   resources :invitation do
     collection do

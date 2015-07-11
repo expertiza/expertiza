@@ -1,4 +1,10 @@
 class InstitutionController < ApplicationController
+  def action_allowed?
+    ['Super-Administrator',
+     'Administrator',
+     'Instructor'].include? current_role_name
+  end
+
   def index
     list
     render :action => 'list'

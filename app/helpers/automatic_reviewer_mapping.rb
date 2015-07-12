@@ -5,7 +5,7 @@
 # their own team.  However, this is a solution in search
 # of a problem.  We never had that problem, so the code is
 # not used.
-module DynamicReviewMapping
+module AutomaticReviewerMapping
 
 
 

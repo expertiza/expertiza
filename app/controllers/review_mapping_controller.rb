@@ -505,7 +505,7 @@ class ReviewMappingController < ApplicationController
     }
     end
 
-  def generate_reviewer_mapping
+  def automatic_reviewer_mapping
     assignment = Assignment.find(params[:id])
 
     if params[:selection]
@@ -534,7 +534,7 @@ class ReviewMappingController < ApplicationController
   end
 
   # This is for staggered deadline assignment
-  def automatic_reviewer_mapping
+  def automatic_reviewer_mapping_staggered
     assignment = Assignment.find(params[:id])
     message = assignment.assign_reviewers_staggered(params[:assignment][:num_reviews], params[:assignment][:num_metareviews])
     flash[:note] = message
@@ -542,10 +542,10 @@ class ReviewMappingController < ApplicationController
   end
 
 
-  def select_mapping
+  def assign_reviewers_automatically 
     @assignment = Assignment.find(params[:id])
-    @review_strategies = ReviewStrategy.order('name')
-    @mapping_strategies = MappingStrategy.order('name')
+    #@review_strategies = ReviewStrategy.order('name')
+    #@mapping_strategies = MappingStrategy.order('name')
   end
 
   def review_report

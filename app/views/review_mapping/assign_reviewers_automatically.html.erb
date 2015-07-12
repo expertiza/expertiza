@@ -1,0 +1,8 @@
+<h1>Mapping Strategies for <%= @assignment.name %></h1>
+
+<% if !(SignUpTopic.where(['assignment_id = ?',@assignment.id]).first.nil?)%>
+  <% mapping_type = 'automatic_reviewer_mapping' %>
+<% else %>
+  <% mapping_type = 'generate_reviewer_mapping' %>
+<% end %>
+

@@ -149,7 +149,7 @@
 
 <% if !assignment.dynamic_reviewer_assignment? %>
 
-  <%= link_to 'Assign reviewers automatically', :action => 'select_mapping', :id => assignment.id %>
+  <%= link_to 'Assign reviewers automatically', :action => 'assign_reviewers_automatically', :id => assignment.id %>
   | <%= link_to 'Import reviewer mappings',
     :controller=>'import_file',
     :action=>'start',
@@ -181,8 +181,4 @@
   :id=>assignment.id
 %>
 |
-<%= link_to 'Assign reviewers',
-  :action => 'add_self_reviewer',
-  :id => assignment.id
-%>
-|
+

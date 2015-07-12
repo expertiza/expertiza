@@ -7,7 +7,7 @@ class Assignment < ActiveRecord::Base
 
 require 'analytic/assignment_analytic'
   include AssignmentAnalytic
-  include DynamicReviewMapping
+  include AutomaticReviewerMapping
   belongs_to :course
   belongs_to :wiki_type
   has_paper_trail

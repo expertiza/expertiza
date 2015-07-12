@@ -316,7 +316,7 @@ Expertiza::Application.routes.draw do
       get :review_report
       get :select_metareviewer
       get :select_reviewer
-      get :assign_reviewers_automatically
+      get :select_mapping
       get :show_available_submissions
       post :assign_quiz_dynamically
       post :assign_metareviewer_dynamically

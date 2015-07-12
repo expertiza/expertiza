@@ -153,6 +153,9 @@ class ReviewMappingController < ApplicationController
     return nil
   end
 
+  #7/12/2015 -zhewei
+  #This method is used for assign submissions to students for peer review.
+  #This method is different from 'assignment_reviewer_automatically', which is in 'review_mapping_controller' and is used for instructor assigning reviewers in instructor-selected assignment.
   def assign_reviewer_dynamically
     assignment = Assignment.find(params[:assignment_id])
     reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
@@ -505,7 +508,7 @@ class ReviewMappingController < ApplicationController
     }
     end
 
-  def automatic_reviewer_mapping
+  def automatic_review_mapping
     assignment = Assignment.find(params[:id])
 
     if params[:selection]
@@ -534,7 +537,7 @@ class ReviewMappingController < ApplicationController
   end
 
   # This is for staggered deadline assignment
-  def automatic_reviewer_mapping_staggered
+  def automatic_review_mapping_staggered
     assignment = Assignment.find(params[:id])
     message = assignment.assign_reviewers_staggered(params[:assignment][:num_reviews], params[:assignment][:num_metareviews])
     flash[:note] = message
@@ -542,10 +545,9 @@ class ReviewMappingController < ApplicationController
   end
 
 
-  def assign_reviewers_automatically 
+  def select_mapping 
     @assignment = Assignment.find(params[:id])
-    #@review_strategies = ReviewStrategy.order('name')
-    #@mapping_strategies = MappingStrategy.order('name')
+    
   end
 
   def review_report

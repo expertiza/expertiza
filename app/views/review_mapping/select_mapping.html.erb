@@ -1,0 +1,35 @@
+<h1>Mapping Strategies for <%= @assignment.name %></h1>
+
+<%= form_tag :action => 'select_mapping', :method => 'post' do %>
+  <%= radio_button_tag 'review_num', 'student' %>
+  <b><%= label_tag('student_review_num', 'Set threshold for each student') %></b>&nbsp;&nbsp;&nbsp;&nbsp;
+  <span id='student_review_num_threshold'>
+    <%= label_tag('student_review_num', 'Maximum number of reviewers per student') %>
+    <%= text_field_tag('student_review_num', 0, {:style => 'width:20px'}) %>
+  </span>
+  <br/>
+
+  <%= radio_button_tag 'review_num', 'submission', false %>
+  <b><%= label_tag('submission_review_num', 'Set threshold for each submission') %></b>&nbsp;&nbsp;&nbsp;&nbsp;
+  <span id='submission_review_num_threshold' hidden='hidden'>
+    <%= label_tag('submission_review_num', 'Maximum number of reviewers per submission (team)') %>
+    <%= text_field_tag('submission_review_num', 0, {:style => 'width:20px'}) %>
+  </span>
+  <br/><br/>
+  <%= submit_tag 'submit' %>
+<% end %>
+
+<script>
+  jQuery(document).ready(function() {
+    jQuery('input[type=radio][name=review_num]').change(function(){
+      if (this.value == 'student'){
+        jQuery('#student_review_num_threshold').removeAttr('hidden');
+        jQuery('#submission_review_num_threshold').attr('hidden','hidden');
+      } 
+      else if(this.value == 'submission'){
+        jQuery('#student_review_num_threshold').attr('hidden', 'hidden');
+        jQuery('#submission_review_num_threshold').removeAttr('hidden');
+      }
+    });
+  });
+</script>

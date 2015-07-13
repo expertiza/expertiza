@@ -367,7 +367,7 @@
     <br>
 <% end %>
 
-<% if @assignment_form.assignment.require_signup? %>
+<% if @assignment_form.assignment.has_topics? %>
     <input name="signupAllowed" type="hidden" value="false" />
     <%= check_box_tag('signupAllowed', 'true', @signup_allowed,:onclick=>"removeOrAddSignup()" ) %>
     <%= label_tag('signupAllowed', 'Use signup deadline') %><br/>
@@ -405,9 +405,16 @@
   <tr id='blank' style='display:hidden'></tr>
   <script>
     jQuery(document).ready(function () {
-        console.log(<%= raw @assignment_form.to_json %>);
         <% if @assignment_form.assignment.max_team_size > 1 && due_date(@assignment_form.assignment, 'team_formation').due_at %>
         addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
+        <% end %>
+        <% if @assignment_form.assignment.has_topics? %>
+            <% if due_date(@assignment_form.assignment, 'signup').due_at %>
+                addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'signup', 0,<%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
+            <% end %>
+            <% if due_date(@assignment_form.assignment, 'drop_topic').due_at %>
+                addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'drop_topic', 0,<%= due_date(@assignment_form.assignment, 'drop_topic').to_json.html_safe %>);
+            <% end %>
         <% end %>
         <% 1.upto @assignment_form.assignment.rounds_of_reviews do |i| %>
         addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'submission', <%=i%>, <%= due_date(@assignment_form.assignment, 'submission', i-1).to_json.html_safe %>); // or use questionnaire_options(@assignment, nil).to_json

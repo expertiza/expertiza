@@ -1,7 +1,7 @@
 <h1>Mapping Strategies for <%= @assignment.name %></h1>
 
 <%= form_tag :action => 'automatic_review_mapping', :id => @assignment.id  do %>
-  <%= radio_button_tag 'review_num', 'student' %>
+  <%= radio_button_tag 'review_num', 'student', true %>
   <b><%= label_tag('student_review_num', 'Set threshold for each student') %></b>&nbsp;&nbsp;&nbsp;&nbsp;
   <span id='student_review_num_threshold'>
     <%= label_tag('student_review_num', 'Maximum number of reviewers per student') %>

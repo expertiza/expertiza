@@ -529,14 +529,19 @@ class ReviewMappingController < ApplicationController
           while temp_array.size < review_num_per_team 
             rand_num = rand(0..participants_num-1)
             if participants_hash[participants[rand_num].id] < student_review_num
-              temp_array << rand_num 
+              #instructor can assign one student to review his/her own artifact
+              if !TeamsUser.exists?(team_id: teams[i].id, user_id: participants[rand_num].user_id)
+                temp_array << rand_num
+              else
+                next
+              end
             else 
               participants.delete_at(rand_num)
               participants_num -= 1
             end
           end
         else
-          #review num in last team can be different from other teams.
+          #review num for last team can be different from other teams.
           participants.each {|participant| temp_array << participant.id }
         end
         begin
@@ -560,13 +565,19 @@ class ReviewMappingController < ApplicationController
           while temp_array.size < review_num_per_stu
             rand_num = rand(0..teams_num-1)
             if teams_hash[teams[rand_num].id] < submission_review_num
-              temp_array << rand_num
+              #instructor can assign one student to review his/her own artifact
+              if !TeamsUser.exists?(team_id: teams[rand_num].id, user_id: participants[i].user_id)
+                temp_array << rand_num
+              else
+                next
+              end
             else
               teams.delete_at(rand_num)
               teams_num -= 1
             end
           end
         else
+          #review num for last participant can be different from other participants.
           teams.each {|team| temp_array << team.id }
         end
         begin

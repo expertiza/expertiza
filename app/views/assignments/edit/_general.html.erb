@@ -1,19 +1,4 @@
 <script>
-function requireSignUpChanged() {
-  var msg = 'Warning! Unchecking this box will remove all topics and the reservations of everyone who is sign up for them';
-
-  if (jQuery('#assignment_require_signup').is(':checked')) {
-    addDueDateTableElement(false, 'signup', 0, <%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
-    addDueDateTableElement(false, 'drop_topic', 0, <%= due_date(@assignment_form.assignment, 'drop_topic').to_json.html_safe %>)
-  } else {
-    if (confirm(msg)) {
-      removeDueDateTableElement('signup', 0);
-      removeDueDateTableElement('drop_topic', 0);
-    } else {
-      jQuery('#assignment_require_signup').prop('checked', true);
-    }
-  }
-}
 
 function teamAssignmentChanged() {
   var msg = 'Warning! Unchecking this box will hide teams that already exist.'
@@ -21,7 +6,6 @@ function teamAssignmentChanged() {
   if (jQuery('#assignment_team_assignment').is(':checked')) {
     jQuery('#assignment_team_count_field').removeAttr('hidden');
     if (<%= due_date(@assignment_form.assignment, 'team_formation') %>) {
-      // console.log('here')
       addDueDateTableElement('team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>)
     }
   } else {

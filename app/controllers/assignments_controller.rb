@@ -84,8 +84,6 @@ class AssignmentsController < ApplicationController
     end
     # Check if name and url in database is empty before webpage displays
     @due_date_all.each do |dd|
-      puts dd.inspect
-      puts ' '
       if((!dd.deadline_name.nil?&&!dd.deadline_name.empty?)||(!dd.description_url.nil?&&!dd.description_url.empty?))
         @due_date_nameurl_notempty = true
         @due_date_nameurl_notempty_checkbox = true

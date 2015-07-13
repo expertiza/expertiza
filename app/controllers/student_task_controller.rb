@@ -25,7 +25,6 @@ class StudentTaskController < ApplicationController
     denied unless current_user_id?(@participant.user_id)
 
     @assignment = @participant.assignment
-    puts @assignment.teams.inspect
     @can_provide_suggestions = @assignment.allow_suggestions
     #Even if one of the reviewee's work is ready for review "Other's work" link should be active
     if @assignment.staggered_deadline?

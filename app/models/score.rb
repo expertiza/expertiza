@@ -91,6 +91,7 @@ class Score < ActiveRecord::Base
         
         weighted_score = 0
         sum_of_weights = 0
+        max_question_score = 0
 
         @questionnaire = Questionnaire.find(@questions[0].questionnaire_id)
 

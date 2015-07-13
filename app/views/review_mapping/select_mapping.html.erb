@@ -1,6 +1,6 @@
 <h1>Mapping Strategies for <%= @assignment.name %></h1>
 
-<%= form_tag :action => 'select_mapping', :method => 'post' do %>
+<%= form_tag :action => 'automatic_review_mapping', :id => @assignment.id  do %>
   <%= radio_button_tag 'review_num', 'student' %>
   <b><%= label_tag('student_review_num', 'Set threshold for each student') %></b>&nbsp;&nbsp;&nbsp;&nbsp;
   <span id='student_review_num_threshold'>
@@ -16,7 +16,8 @@
     <%= text_field_tag('submission_review_num', 0, {:style => 'width:20px'}) %>
   </span>
   <br/><br/>
-  <%= submit_tag 'submit' %>
+  <%= submit_tag 'submit' %> |
+  <%= link_to 'Back', :action => 'list_mappings', :id => @assignment.id %>
 <% end %>
 
 <script>

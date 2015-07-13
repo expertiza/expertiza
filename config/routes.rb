@@ -320,6 +320,8 @@ Expertiza::Application.routes.draw do
       get :show_available_submissions
       post :assign_quiz_dynamically
       post :assign_metareviewer_dynamically
+      post :automatic_review_mapping
+      post :automatic_review_mapping_staggered
     end
   end
 

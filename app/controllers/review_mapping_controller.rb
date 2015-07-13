@@ -531,7 +531,8 @@ class ReviewMappingController < ApplicationController
             if participants_hash[participants[rand_num].id] < student_review_num
               #instructor can assign one student to review his/her own artifact
               if !TeamsUser.exists?(team_id: teams[i].id, user_id: participants[rand_num].user_id)
-                temp_array << rand_num
+                temp_array << participants[rand_num].id
+                participants_hash[participants[rand_num].id] += 1
               else
                 next
               end
@@ -567,7 +568,8 @@ class ReviewMappingController < ApplicationController
             if teams_hash[teams[rand_num].id] < submission_review_num
               #instructor can assign one student to review his/her own artifact
               if !TeamsUser.exists?(team_id: teams[rand_num].id, user_id: participants[i].user_id)
-                temp_array << rand_num
+                temp_array << teams[rand_num].id
+                teams_hash[teams[rand_num].id] += 1
               else
                 next
               end

@@ -113,7 +113,7 @@ class SignedUpTeam < ActiveRecord::Base
       return topic_id
     end
 
-  def self.topic_id(team_id)
+  def self.topic_id_by_team_id(team_id)
     signed_up_teams = SignedUpTeam.where(team_id:team_id)
     if signed_up_teams.nil?
       nil

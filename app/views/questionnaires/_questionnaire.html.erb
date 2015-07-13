@@ -15,20 +15,20 @@
   <table id="questions_table">
     <% if $disp_flag != 1 %>
       <tr>
-        <td align=left width=300>Questions:</td>
+        <td align=left width=300>1111Questions:</td>
         <%  if @questionnaire.type != 'QuizQuestionnaire' %><td align=left>weight</td><%end%>
 
       </tr>
     <% end %>
     <% questionnum=1 %>
-    <% for @new_question in @questionnaire.questions %>
+    <% for @question in @questionnaire.questions %>
       <tr>
         <% if $disp_flag != 1 %>
-          <td > <%= text_area "new_question[]", 'txt', :cols=>100 %></td>
+          <td > <%= text_area "question[]", 'txt', :cols=>100 %></td>
         <% end %>
-        <%  @quiz_question_choices = QuizQuestionChoice.where(question_id: @new_question.id) %>
+        <%  @quiz_question_choices = QuizQuestionChoice.where(question_id: @question.id) %>
 
-        <% @question_type= QuestionType.find_by_question_id(@new_question.id)%>
+        <% @question_type= QuestionType.find_by_question_id(@question.id)%>
       </tr>
       <% i=1 %>
 
@@ -56,12 +56,17 @@
             <% end %>
 
             <%if @question_type.q_type=="TF" %>
-              <% if @quiz_question_choices.txt=="True" %>
+              <% if @quiz_question_choices.txt=="True" && @quiz_question_choices.iscorrect%>
                 <%= radio_button_tag("quiz_question_choices[#{questionnum}][TF][1][txt]", 'True', true) %>   True
-                <%= radio_button_tag("quiz_question_choices[#{questionnum}][TF][1][txt]", 'False', false) %>  False
-              <% else %>
+              <%end%>
+              <%if @quiz_question_choices.txt=="True" && !@quiz_question_choices.iscorrect%>
                 <%= radio_button_tag("quiz_question_choices[#{questionnum}][TF][1][txt]", 'True', false) %>  True
+              <%end%>
+              <% if @quiz_question_choices.txt=="False" && @quiz_question_choices.iscorrect%>
                 <%= radio_button_tag("quiz_question_choices[#{questionnum}][TF][1][txt]", 'False', true) %>   False
+              <%end%>
+              <% if @quiz_question_choices.txt=="False" && !@quiz_question_choices.iscorrect%>
+                <%= radio_button_tag("quiz_question_choices[#{questionnum}][TF][1][txt]", 'False', false) %>  False
               <%end%>
             <% end %>
         </td>

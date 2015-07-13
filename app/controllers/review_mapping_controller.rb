@@ -153,6 +153,9 @@ class ReviewMappingController < ApplicationController
     return nil
   end
 
+  #7/12/2015 -zhewei
+  #This method is used for assign submissions to students for peer review.
+  #This method is different from 'assignment_reviewer_automatically', which is in 'review_mapping_controller' and is used for instructor assigning reviewers in instructor-selected assignment.
   def assign_reviewer_dynamically
     assignment = Assignment.find(params[:assignment_id])
     reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
@@ -505,36 +508,84 @@ class ReviewMappingController < ApplicationController
     }
     end
 
-  def generate_reviewer_mapping
-    assignment = Assignment.find(params[:id])
-
-    if params[:selection]
-      mapping_strategy = {}
-      params[:selection].each do |a|
-        if a[0] =~ /^m_/
-          mapping_strategy[a[0]] = a[1]
+  def automatic_review_mapping
+    assignment_id = params[:id].to_i
+    participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.shuffle!
+    teams = AssignmentTeam.where(parent_id: params[:id].to_i).to_a.shuffle!
+    student_review_num = params[:student_review_num].to_i
+    submission_review_num = params[:submission_review_num].to_i
+    if student_review_num == 0 and submission_review_num == 0
+      flash[:error] = "Please set the value of review number."
+    elsif student_review_num != 0 and submission_review_num == 0
+      #review mapping strategy 1
+      participants_hash = {}
+      participants.each {|participant| participants_hash[participant.id] = 0 }
+      #assign reviewers for each team
+      participants_num = participants.size
+      review_num_per_team = (participants.size * student_review_num * 1.0 / teams.size).round
+      for i in 0..teams.size-1
+        temp_array = Array.new
+        if i != teams.size-1
+          while temp_array.size < review_num_per_team 
+            rand_num = rand(0..participants_num-1)
+            if participants_hash[participants[rand_num].id] < student_review_num
+              temp_array << rand_num 
+            else 
+              participants.delete_at(rand_num)
+              participants_num -= 1
+            end
+          end
+        else
+          #review num in last team can be different from other teams.
+          participants.each {|participant| temp_array << participant.id }
+        end
+        begin
+          temp_array.each do |index|
+            ReviewResponseMap.create(:reviewee_id => teams[i].id, :reviewer_id => index,
+                                   :reviewed_object_id => assignment_id) if !ReviewResponseMap.exists?(:reviewee_id => teams[i].id, :reviewer_id => index, :reviewed_object_id => assignment_id)
+          end
+        rescue
+          flash[:error] = "Automatical assign reviewer failed."
+        end
+      end
+    elsif student_review_num == 0 and submission_review_num != 0
+      #review mapping strategy 2
+      teams_hash = {}
+      teams.each {|team| teams_hash[team.id] = 0}
+      teams_num = teams.size
+      review_num_per_stu = (teams.size * submission_review_num * 1.0 / participants.size).round
+      for i in 0..participants.size-1
+        temp_array = Array.new
+        if i != participants.size-1
+          while temp_array.size < review_num_per_stu
+            rand_num = rand(0..teams_num-1)
+            if teams_hash[teams[rand_num].id] < submission_review_num
+              temp_array << rand_num
+            else
+              teams.delete_at(rand_num)
+              teams_num -= 1
+            end
+          end
+        else
+          teams.each {|team| temp_array << team.id }
+        end
+        begin
+          temp_array.each do |index|
+            ReviewResponseMap.create(:reviewee_id => index, :reviewer_id => participants[i].id,
+                                   :reviewed_object_id => assignment_id) if !ReviewResponseMap.exists?(:reviewee_id => index, :reviewer_id => participants[i].id, :reviewed_object_id => assignment_id)
+          end
+        rescue
+          flash[:error] = "Automatical assign reviewer failed."
         end
       end
     else
-      mapping_strategy = 1
+      flash[:error] = "You can only choose one strategy once upon a time."
     end
-
-    if assignment.update_attributes(params[:assignment])
-      begin
-        assignment.assign_reviewers(mapping_strategy)
-      rescue
-        flash[:error] = "Reviewer assignment failed. Cause: " + $!
-      ensure
-        redirect_to :action => 'list_mappings', :id => assignment.id
-      end
-    else
-      @wiki_types = WikiType.all
-      redirect_to :action => 'list_mappings', :id => assignment.id
-    end
+    redirect_to :action => 'list_mappings', :id => assignment_id
   end
 
   # This is for staggered deadline assignment
-  def automatic_reviewer_mapping
+  def automatic_review_mapping_staggered
     assignment = Assignment.find(params[:id])
     message = assignment.assign_reviewers_staggered(params[:assignment][:num_reviews], params[:assignment][:num_metareviews])
     flash[:note] = message
@@ -542,10 +593,8 @@ class ReviewMappingController < ApplicationController
   end
 
 
-  def select_mapping
+  def select_mapping 
     @assignment = Assignment.find(params[:id])
-    @review_strategies = ReviewStrategy.order('name')
-    @mapping_strategies = MappingStrategy.order('name')
   end
 
   def review_report

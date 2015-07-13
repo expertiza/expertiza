@@ -7,7 +7,6 @@ class Assignment < ActiveRecord::Base
 
 require 'analytic/assignment_analytic'
   include AssignmentAnalytic
-  include DynamicReviewMapping
   belongs_to :course
   belongs_to :wiki_type
   has_paper_trail
@@ -819,20 +818,6 @@ require 'analytic/assignment_analytic'
         end
       end
     end
-  end
-
-  def assign_reviewers(mapping_strategy)
-    #ACS Always assign reviewers for a team
-    #removed check to see if it is a team assignment
-    #defined in DynamicReviewMapping module
-    assign_reviewers_for_team(mapping_strategy)
-  end
-
-  #this is for staggered deadline assignments or assignments with signup sheet
-  def assign_reviewers_staggered(num_reviews, num_review_of_reviews)
-    #defined in DynamicReviewMapping module
-    message = assign_reviewers_automatically(num_reviews, num_review_of_reviews)
-
   end
 
   def get_current_due_date

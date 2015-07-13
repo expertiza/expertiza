@@ -1,7 +1,7 @@
 <h1>Add new bookmark</h1>
 <h5>Please enter the following fields to create a new bookmark</h5>
 <table>
-  <% form_tag(:action => "add_bookmark", :method => "post") do %>
+  <%= form_tag(:action => "add_bookmark", :method => "post") do %>
     <%= hidden_field_tag("topicid", @topic_id) %>
     <tr>
       <td> Bookmark URL </td>

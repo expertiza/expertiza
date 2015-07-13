@@ -27,7 +27,7 @@
   <%end%>
 <!--ACS Here we need to know the size of the team to decide whether or not
 to display the label "Your team" in the student assignment tasks-->
-  <%if @assignment.team_assignment? && @assignment.has_teams? && @assignment.teams.max_team_size > 1 %>
+  <%if @assignment.team_assignment? && @assignment.has_teams? && @assignment.max_team_size > 1 %>
     <% if @authorization == 'participant' %>
       <li> 
         <%= link_to 'Your team', view_student_teams_path(student_id: @participant.id) %>

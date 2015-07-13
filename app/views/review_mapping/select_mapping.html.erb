@@ -1,47 +1,36 @@
 <h1>Mapping Strategies for <%= @assignment.name %></h1>
 
-<% if !(SignUpTopic.where(['assignment_id = ?',@assignment.id]).first.nil?%>
-  <% mapping_type = 'automatic_reviewer_mapping' %>
-<% else %>
-  <% mapping_type = 'generate_reviewer_mapping' %>
+<%= form_tag :action => 'automatic_review_mapping', :id => @assignment.id  do %>
+  <%= radio_button_tag 'review_num', 'student' %>
+  <b><%= label_tag('student_review_num', 'Set threshold for each student') %></b>&nbsp;&nbsp;&nbsp;&nbsp;
+  <span id='student_review_num_threshold'>
+    <%= label_tag('student_review_num', 'Maximum number of reviewers per student') %>
+    <%= text_field_tag('student_review_num', 0, {:style => 'width:20px'}) %>
+  </span>
+  <br/>
+
+  <%= radio_button_tag 'review_num', 'submission', false %>
+  <b><%= label_tag('submission_review_num', 'Set threshold for each submission') %></b>&nbsp;&nbsp;&nbsp;&nbsp;
+  <span id='submission_review_num_threshold' hidden='hidden'>
+    <%= label_tag('submission_review_num', 'Maximum number of reviewers per submission (team)') %>
+    <%= text_field_tag('submission_review_num', 0, {:style => 'width:20px'}) %>
+  </span>
+  <br/><br/>
+  <%= submit_tag 'submit' %> |
+  <%= link_to 'Back', :action => 'list_mappings', :id => @assignment.id %>
 <% end %>
 
-<%= form_tag(:action => mapping_type, :method => 'post') do %>
-
-  Number of reviews done by a student: <%= text_field 'assignment', 'num_reviews', "size" => 1 %><br/> <br/>
-  Number of metareviews done by a student: <%= text_field 'assignment', 'num_metareviews', "size" => 1 %>
-
-<%due_date = DueDate.where(["assignment_id = ?",@assignment.id].order("round DESC").limit(1)
-@round = 1
-if (due_date[0] && !due_date[0].round.nil?)
-
-  @round = due_date[0].round - 1
-else
-  @round = 1
-end%>
-
-<p>Reviewer assignments vary for different rounds
-  <%= check_box('assign_reviewers','different_mapping',{:onclick =>
-                                                        "Element.toggle('temp_bar'); "}, 1, nil)%>
-
-                                                      <div id="temp_bar" style="display:none;">
-
-                                                        <%for i in 1..@round%>
-                                                          <p><b>Round<%=i%> </b>
-                                                            <p>Review strategy:
-                                                              <%= select("selection", "r_#{i}", @review_strategies.collect {|r| [r.name, r.id ] }) %>
-                                                              &nbsp;&nbsp;
-                                                              Mapping strategy:
-                                                              <%= select("selection", "m_#{i}", @mapping_strategies.collect {|m| [m.name, m.id ] }) %>
-                                                              &nbsp;&nbsp;
-                                                            <%end%>
-
-                                                          </div>
-
-                                                        </p>
-                                                        <%= hidden_field_tag 'id', @assignment.id %>
-                                                        <input type='submit' value= 'Save' />
-                                                      <% end %>
-                                                      <br/><br/>
-
-                                                      <%= link_to 'Back', :action => 'list_mappings', :id => @assignment.id %>
+<script>
+  jQuery(document).ready(function() {
+    jQuery('input[type=radio][name=review_num]').change(function(){
+      if (this.value == 'student'){
+        jQuery('#student_review_num_threshold').removeAttr('hidden');
+        jQuery('#submission_review_num_threshold').attr('hidden','hidden');
+      } 
+      else if(this.value == 'submission'){
+        jQuery('#student_review_num_threshold').attr('hidden', 'hidden');
+        jQuery('#submission_review_num_threshold').removeAttr('hidden');
+      }
+    });
+  });
+</script>

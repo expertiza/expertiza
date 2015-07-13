@@ -320,6 +320,33 @@
             <%@metareview_allowed_checkbox=true%>
 
         }
+        function removeOrAddSignup(){
+            if(document.getElementById("signup"))
+                removeDueDateTableElement('signup', 0);
+             else
+                addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>, 'signup', 0, <%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
+
+            <%@signup_allowed_checkbox=true%>
+
+        }
+        function removeOrAddDropTopic(){
+            if(document.getElementById("drop_topic"))
+                removeDueDateTableElement('drop_topic', 0);
+             else
+                addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>, 'drop_topic', 0, <%= due_date(@assignment_form.assignment, 'drop_topic').to_json.html_safe %>);
+
+            <%@drop_topic_allowed_checkbox=true%>
+
+        }
+        function removeOrAddTeamFormation(){
+            if(document.getElementById("team_formation"))
+                removeDueDateTableElement('team_formation', 0);
+             else
+                addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>, 'team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
+
+            <%@team_formation_allowed_checkbox=true%>
+
+        }
 </script>
 
 <div style="font-size:large;">
@@ -339,9 +366,24 @@
     <%= label_tag('changenameurl', 'Name and description URL vary by round') %>
     <br>
 <% end %>
+
+<% if @assignment_form.assignment.require_signup? %>
+    <input name="signupAllowed" type="hidden" value="false" />
+    <%= check_box_tag('signupAllowed', 'true', @signup_allowed,:onclick=>"removeOrAddSignup()" ) %>
+    <%= label_tag('signupAllowed', 'Use signup deadline') %><br/>
+
+    <input name="dropTopicAllowed" type="hidden" value="false" />
+    <%= check_box_tag('dropTopicAllowed', 'true', @drop_topic_allowed,:onclick=>"removeOrAddDropTopic()" ) %>
+    <%= label_tag('dropTopicAllowed', 'Use drop topic deadline') %><br/>
+<% end %>
+
+<input name="teamFormationAllowed" type="hidden" value="false" />
+<%= check_box_tag('teamFormationAllowed', 'true', @team_formation_allowed,:onclick=>"removeOrAddTeamFormation()" ) %>
+<%= label_tag('teamFormationAllowed', 'Use team formation deadline') %><br/>
+
 <input name="metareivewAllowed" type="hidden" value="false" />
 <%= check_box_tag('metareviewAllowed', 'true', @metareview_allowed,:onclick=>"removeOrAddMetareview()" ) %>
-<%= label_tag('metareivewAllowed', 'Use metareview deadline') %>
+<%= label_tag('metareivewAllowed', 'Use metareview deadline') %><br/>
 
 <table class='exp' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden;'>
 
@@ -364,7 +406,7 @@
   <script>
     jQuery(document).ready(function () {
         console.log(<%= raw @assignment_form.to_json %>);
-        <% if @assignment_form.assignment.max_team_size > 1 %>
+        <% if @assignment_form.assignment.max_team_size > 1 && due_date(@assignment_form.assignment, 'team_formation').due_at %>
         addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
         <% end %>
         <% 1.upto @assignment_form.assignment.rounds_of_reviews do |i| %>

@@ -71,6 +71,12 @@ class AssignmentsController < ApplicationController
     @due_date_nameurl_notempty_checkbox = false
     @metareview_allowed=false
     @metareview_allowed_checkbox=false
+    @signup_allowed=false
+    @signup_allowed_checkbox=false
+    @drop_topic_allowed=false
+    @drop_topic_allowed_checkbox=false
+    @team_formation_allowed=false
+    @team_formation_allowed_checkbox=false
 
     #only when instructor does not assign rubrics and in assignment edit page will show this error message.
     if !set_rubrics? and request.original_fullpath == "/assignments/#{@assignment_form.assignment.id}/edit"
@@ -78,6 +84,8 @@ class AssignmentsController < ApplicationController
     end
     # Check if name and url in database is empty before webpage displays
     @due_date_all.each do |dd|
+      puts dd.inspect
+      puts ' '
       if((!dd.deadline_name.nil?&&!dd.deadline_name.empty?)||(!dd.description_url.nil?&&!dd.description_url.empty?))
         @due_date_nameurl_notempty = true
         @due_date_nameurl_notempty_checkbox = true
@@ -89,6 +97,24 @@ class AssignmentsController < ApplicationController
         @metareview_allowed = true
       end
       if @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox && @metareview_allowed
+        break
+      end
+      if dd.deadline_type_id==6
+        @drop_topic_allowed = true
+      end
+      if @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox && @drop_topic_allowed
+        break
+      end
+      if dd.deadline_type_id==7
+        @signup_allowed = true
+      end
+      if @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox && @signup_allowed
+        break
+      end
+      if dd.deadline_type_id==8
+        @team_formation_allowed = true
+      end
+      if @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox && @team_formation_allowed
         break
       end
     end

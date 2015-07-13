@@ -20,7 +20,10 @@ function teamAssignmentChanged() {
 
   if (jQuery('#assignment_team_assignment').is(':checked')) {
     jQuery('#assignment_team_count_field').removeAttr('hidden');
-    addDueDateTableElement('team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>)
+    if (<%= due_date(@assignment_form.assignment, 'team_formation') %>) {
+      // console.log('here')
+      addDueDateTableElement('team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>)
+    }
   } else {
     if (confirm(msg)) {
       jQuery('#assignment_team_count_field').attr('hidden', true);
@@ -89,14 +92,16 @@ function is_coding_assignmentChanged(){
 <th width=60%></th>
   </tr>
 
-  <% if @assignment_form.assignment.require_signup? %>
     <script>
       jQuery(document).ready(function () {
-        addDueDateTableElement(false, 'signup', 0, <%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
-        addDueDateTableElement(false, 'drop_topic', 0, <%= due_date(@assignment_form.assignment, 'drop_topic').to_json.html_safe %>)
+        <% if @assignment_form.assignment.require_signup? && due_date(@assignment_form.assignment, 'signup').due_at %>
+          addDueDateTableElement(false, 'signup', 0, <%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
+        <% end %>
+        <% if @assignment_form.assignment.require_signup? && due_date(@assignment_form.assignment, 'drop_topic').due_at %>
+          addDueDateTableElement(false, 'drop_topic', 0, <%= due_date(@assignment_form.assignment, 'drop_topic').to_json.html_safe %>)
+        <% end %>
       });
     </script>
-  <% end %>
 
   <tr>
     <td style='padding:5px' id='assignment_team_assignment_field'>

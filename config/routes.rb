@@ -158,11 +158,9 @@ Expertiza::Application.routes.draw do
     collection do
       get :list
       get :show
-      post :new
+      get :new
       post :create
-      post :edit
-      post :update
-      post :destroy
+      post ':id', action: :update
     end
   end
 

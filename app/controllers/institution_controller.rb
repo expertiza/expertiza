@@ -29,9 +29,10 @@ class InstitutionController < ApplicationController
   def create
     @institution = Institution.new(params[:institution])
     if @institution.save
-      flash[:notice] = 'Institution was successfully created.'
+      flash[:success] = 'Institution was successfully created.'
       redirect_to :action => 'list'
     else
+      flash[:error] = 'Institution was not successfully created.'
       render :action => 'new'
     end
   end
@@ -43,14 +44,15 @@ class InstitutionController < ApplicationController
   def update
     @institution = Institution.find(params[:id])
     if @institution.update_attributes(params[:institution])
-      flash[:notice] = 'Institution was successfully updated.'
+
+      flash[:success] = 'Institution was successfully updated.'
       redirect_to :action => 'show', :id => @institution
     else
       render :action => 'edit'
     end
   end
 
-  def destroy
+  def delete
     Institution.find(params[:id]).destroy
     redirect_to :action => 'list'
   end

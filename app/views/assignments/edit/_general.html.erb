@@ -184,13 +184,6 @@ function is_coding_assignmentChanged(){
     </td>
   </tr>
 
-  <tr>
-    <td style='padding:5px' id='assignment_allow_suggestion_field'>
-      <input name="assignment_form[assignment][allow_suggestions]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][allow_suggestions]', 'true', @assignment_form.assignment.allow_suggestions) %>
-      <%= label_tag('assignment_form[assignment][allow_suggestions]', 'Allow topic suggestions from students?') %>
-    </td>
-  </tr>
 
   <tr>
     <td style='padding:5px' id='assignment_is_coding_assignment_field'>

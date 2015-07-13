@@ -23,6 +23,10 @@
         <%= render 'assignments/edit/due_dates' %>
       </div>
       <div id="tabs-5">
+            <input name="assignment_form[assignment][allow_suggestions]" type="hidden" value="false"/>
+            <%= check_box_tag('assignment_form[assignment][allow_suggestions]', 'true', @assignment_form.assignment.allow_suggestions) %>
+            <%= label_tag('assignment_form[assignment][allow_suggestions]', 'Allow topic suggestions from students?') %>
+            <br>
             <input name="assignment_form[assignment][is_intelligent]" type="hidden" value="false"/>
             <%= check_box_tag('assignment_form[assignment][is_intelligent]', 'true', @assignment_form.assignment.is_intelligent?)%>
             <%= label_tag('assignment_form[assignment][is_intelligent]', 'Intelligent topic selection?') %>

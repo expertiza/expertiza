@@ -663,24 +663,6 @@ require 'analytic/assignment_analytic'
     (self.is_coding_assignment?) ? false : self.is_coding_assignment
   end
 
-  def self.is_submission_possible (assignment)
-    # Is it possible to upload a file?
-    # Check whether the directory text box is nil
-    if assignment.directory_path != nil && assignment.wiki_type == 1
-      return true
-      # Is it possible to submit a URL (or a wiki page)
-    elsif assignment.directory_path != nil && /(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix.match(assignment.directory_path)
-      # In this case we have to check if the directory_path starts with http / https.
-      return true
-      # Is it possible to submit a Google Doc?
-      #    removed because google doc not implemented
-      #    elsif assignment.wiki_type == 4 #GOOGLE_DOC
-      #      return true
-      else
-        return false
-      end
-  end
-
   def is_google_doc
     # This is its own method so that it can be refactored later.
     # Google Document code should never directly check the wiki_type_id
@@ -818,11 +800,6 @@ require 'analytic/assignment_analytic'
         end
       end
     end
-  end
-
-  def get_current_due_date
-    due_date = self.find_current_stage()
-    (due_date == nil || due_date == 'Finished') ? 'Finished' : due_date
   end
 
   # Returns hash review_scores[reviewer_id][reviewee_id] = score
@@ -988,23 +965,6 @@ require 'analytic/assignment_analytic'
     total
   end
 
-  # Checks whether there are duplicate assignments of the same name by the same instructor.
-  # If the assignments are assigned to courses, it's OK to have duplicate names in different
-  # courses.
-  #
-  # changelog: 5/24/2013
-  # Author: hliu11
-  #   old method only works after the assignment is created
-  #   cover corner case where assignment have not yet been created
-  def duplicate_name?
-    assignments = Assignment.where(name: self.name)
-    assignments.select { |x| x.instructor_id == self.instructor_id } unless self.instructor_id.nil?
-    assignments.select { |x| x.course_id == self.course_id } unless self.course_id.nil?
-
-    #if the assignment have not yet been created i.e: Assignment.new without save
-    self.id.nil ? assignments.count > 0 :  assignments.count > 1
-  end
-
   def signed_up_topic(contributor)
     # The purpose is to return the topic that the contributor has signed up to do for this assignment.
     # Returns a record from the sign_up_topic table that gives the topic_id for which the contributor has signed up
@@ -1089,32 +1049,6 @@ require 'analytic/assignment_analytic'
     def find_due_dates(type)
       self.due_dates.select {|due_date| due_date.deadline_type == DeadlineType.find_by_name(type)}
     end
-
-    def clean_up_due_dates
-      #delete due_dates without due_at
-      self.due_dates.each {|due_date| due_date.delete if due_date.due_at.nil? }
-
-      submissions = self.find_due_dates('submission') + self.find_due_dates('resubmission')
-      submissions.sort! { |x, y| x.due_at <=> y.due_at }
-      reviews = self.find_due_dates('review') + self.find_due_dates('rereview')
-      reviews.sort! { |x, y| x.due_at <=> y.due_at }
-
-      while submissions.count > self.rounds_of_reviews
-        submissions.last.delete
-      end
-
-      while reviews.count > self.rounds_of_reviews
-        reviews.last.delete
-      end
-
-      self.require_signup? ? drop_topic_count = 1 : drop_topic_count = 0
-      drop_topic = self.find_due_dates('drop_topic')
-      drop_topic.sort! { |x, y| y.due_at <=> x.due_at }
-      while drop_topic.count > self.drop_topic_count
-        drop_topic.last.delete
-      end
-    end
-
 
     #this should be moved to SignUpSheet model after we refactor the SignUpSheet.
     # returns whether ANY topic has a partner ad; used for deciding whether to show the Advertisements column

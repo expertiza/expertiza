@@ -988,23 +988,6 @@ require 'analytic/assignment_analytic'
     total
   end
 
-  # Checks whether there are duplicate assignments of the same name by the same instructor.
-  # If the assignments are assigned to courses, it's OK to have duplicate names in different
-  # courses.
-  #
-  # changelog: 5/24/2013
-  # Author: hliu11
-  #   old method only works after the assignment is created
-  #   cover corner case where assignment have not yet been created
-  def duplicate_name?
-    assignments = Assignment.where(name: self.name)
-    assignments.select { |x| x.instructor_id == self.instructor_id } unless self.instructor_id.nil?
-    assignments.select { |x| x.course_id == self.course_id } unless self.course_id.nil?
-
-    #if the assignment have not yet been created i.e: Assignment.new without save
-    self.id.nil ? assignments.count > 0 :  assignments.count > 1
-  end
-
   def signed_up_topic(contributor)
     # The purpose is to return the topic that the contributor has signed up to do for this assignment.
     # Returns a record from the sign_up_topic table that gives the topic_id for which the contributor has signed up

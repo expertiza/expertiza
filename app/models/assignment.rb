@@ -1090,32 +1090,6 @@ require 'analytic/assignment_analytic'
       self.due_dates.select {|due_date| due_date.deadline_type == DeadlineType.find_by_name(type)}
     end
 
-    def clean_up_due_dates
-      #delete due_dates without due_at
-      self.due_dates.each {|due_date| due_date.delete if due_date.due_at.nil? }
-
-      submissions = self.find_due_dates('submission') + self.find_due_dates('resubmission')
-      submissions.sort! { |x, y| x.due_at <=> y.due_at }
-      reviews = self.find_due_dates('review') + self.find_due_dates('rereview')
-      reviews.sort! { |x, y| x.due_at <=> y.due_at }
-
-      while submissions.count > self.rounds_of_reviews
-        submissions.last.delete
-      end
-
-      while reviews.count > self.rounds_of_reviews
-        reviews.last.delete
-      end
-
-      self.require_signup? ? drop_topic_count = 1 : drop_topic_count = 0
-      drop_topic = self.find_due_dates('drop_topic')
-      drop_topic.sort! { |x, y| y.due_at <=> x.due_at }
-      while drop_topic.count > self.drop_topic_count
-        drop_topic.last.delete
-      end
-    end
-
-
     #this should be moved to SignUpSheet model after we refactor the SignUpSheet.
     # returns whether ANY topic has a partner ad; used for deciding whether to show the Advertisements column
     def has_partner_ads?(id)

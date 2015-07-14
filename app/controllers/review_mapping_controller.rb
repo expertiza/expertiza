@@ -289,34 +289,18 @@ class ReviewMappingController < ApplicationController
     end
   end
 
-
-  def delete_all_reviewers_and_metareviewers
-    assignment = Assignment.find(params[:id])
-
-    failedCount = ResponseMap.delete_mappings(assignment.review_mappings,params[:force])
-    if failedCount > 0
-      url_yes = url_for :action => 'delete_all_reviewers_and_metareviewers', :id => params[:id], :force => 1
-      url_no  = url_for :action => 'delete_all_reviewers_and_metareviewers', :id => params[:id]
-      flash[:error] = "A delete action failed:<br/>#{failedCount} reviews exist for these mappings. Delete these mappings anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
-    else
-      flash[:note] = "All review mappings for this assignment have been deleted."
-    end
-    redirect_to :action => 'list_mappings', :id => params[:id]
-  end
-
   def delete_all_reviewers
     assignment = Assignment.find(params[:id])
-    contributor = assignment.get_contributor(params[:contributor_id])
-    mappings = contributor.review_mappings
-
-    failedCount = ResponseMap.delete_mappings(mappings, params[:force])
-    if failedCount > 0
-      url_yes = url_for :action => 'delete_all_reviewers', :id => assignment.id, :contributor_id => contributor.id, :force => 1
-      url_no  = url_for :action => 'delete_all_reviewers', :id => assignment.id, :contributor_id => contributor.id
-      flash[:error] = "A delete action failed:<br/>#{failedCount} reviews and/or metareviews exist for these mappings. Delete these mappings anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
-    else
-      flash[:note] = "All review mappings for \""+contributor.name+"\" have been deleted."
+    team = assignment.get_contributor(params[:contributor_id])
+    review_response_maps = team.review_mappings
+    delete_success = false
+    review_response_maps.each do |review_response_map|
+      if !Response.exists?(map_id: review_response_map.id)
+        ReviewResponseMap.find(review_response_map.id).destroy
+        delete_success = true
+      end
     end
+    flash[:success] =  "All outstanding review mappings for \""+team.name+"\" have been deleted." if delete_success == true
     redirect_to :action => 'list_mappings', :id => assignment.id
   end
 
@@ -363,13 +347,13 @@ class ReviewMappingController < ApplicationController
   end
 
   def delete_reviewer
-    mapping = ResponseMap.find(params[:id])
-    assignment_id = mapping.assignment.id
-    begin
-      mapping.delete
-      flash[:note] = "The review mapping for \""+mapping.reviewee.name+"\" and \""+mapping.reviewer.name+"\" have been deleted."
-    rescue
-      flash[:error] = "A delete action failed:<br/>" + $! + "Delete this mapping anyway?&nbsp;<a href='/review_mapping/delete_review/"+mapping.map_id.to_s+"'>Yes</a>&nbsp;|&nbsp;<a href='/review_mapping/list_mappings/#{assignment_id}'>No</a>"
+    review_response_map = ReviewResponseMap.find(params[:id])
+    assignment_id = review_response_map.assignment.id
+    if !Response.exists?(map_id: review_response_map.id)
+        review_response_map.destroy
+        flash[:success] = "The review mapping for \""+review_response_map.reviewee.name+"\" and \""+review_response_map.reviewer.name+"\" have been deleted."
+    else
+      flash[:error] = "This review has already been done. It cannot been deleted."
     end
     redirect_to :action => 'list_mappings', :id => assignment_id
   end
@@ -511,7 +495,7 @@ class ReviewMappingController < ApplicationController
   def automatic_review_mapping
     assignment_id = params[:id].to_i
     participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.shuffle!
-    teams = AssignmentTeam.where(parent_id: params[:id].to_i).to_a.shuffle!
+    teams = AssignmentTeam.where(parent_id: params[:id].to_i).to_a.reject{|team| SignedUpTeam.topic_id_by_team_id(team.id).nil? }.shuffle!
     student_review_num = params[:num_reviews_per_student].to_i
     submission_review_num = params[:num_reviews_per_submission].to_i
     if student_review_num == 0 and submission_review_num == 0
@@ -546,7 +530,6 @@ class ReviewMappingController < ApplicationController
             end
           end
         else
-    binding.pry
           #review num for last team can be different from other teams.
           participants.each {|participant| temp_array << participant.id }
         end

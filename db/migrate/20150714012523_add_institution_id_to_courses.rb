@@ -4,6 +4,6 @@ class AddInstitutionIdToCourses < ActiveRecord::Migration
   end
 
   def self.down
-    remove_column "courses","institutions_idrake "
+    remove_column "courses","institutions_id"
   end
 end

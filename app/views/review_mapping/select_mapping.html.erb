@@ -1,19 +1,17 @@
 <h1>Mapping Strategies for <%= @assignment.name %></h1>
 
 <%= form_tag :action => 'automatic_review_mapping', :id => @assignment.id  do %>
-  <%= radio_button_tag 'review_num', 'student', true %>
-  <b><%= label_tag('student_review_num', 'Set threshold for each student') %></b>&nbsp;&nbsp;&nbsp;&nbsp;
-  <span id='student_review_num_threshold'>
-    <%= label_tag('student_review_num', 'Maximum number of reviewers per student') %>
-    <%= text_field_tag('student_review_num', 0, {:style => 'width:20px'}) %>
+  <%= radio_button_tag 'num_reviews', 'student', true %>
+  <%= label_tag('num_reviews_per_student', 'Set maximum number of reviews done by each student') %>&nbsp;&nbsp;&nbsp;&nbsp;
+  <span id='num_reviews_per_student_threshold'>
+    <%= text_field_tag('num_reviews_per_student', 0, {:style => 'width:20px'}) %>
   </span>
   <br/>
 
-  <%= radio_button_tag 'review_num', 'submission', false %>
-  <b><%= label_tag('submission_review_num', 'Set threshold for each submission') %></b>&nbsp;&nbsp;&nbsp;&nbsp;
-  <span id='submission_review_num_threshold' hidden='hidden'>
-    <%= label_tag('submission_review_num', 'Maximum number of reviewers per submission (team)') %>
-    <%= text_field_tag('submission_review_num', 0, {:style => 'width:20px'}) %>
+  <%= radio_button_tag 'num_reviews', 'submission', false %>
+  <%= label_tag('num_reviews_per_submission', 'Set maximum number of reviews done by each submission') %>&nbsp;&nbsp;&nbsp;&nbsp;
+  <span id='num_reviews_per_submission_threshold' hidden='hidden'>
+    <%= text_field_tag('num_reviews_per_submission', 0, {:style => 'width:20px'}) %>
   </span>
   <br/><br/>
   <%= submit_tag 'submit' %> |
@@ -22,14 +20,14 @@
 
 <script>
   jQuery(document).ready(function() {
-    jQuery('input[type=radio][name=review_num]').change(function(){
+    jQuery('input[type=radio][name=num_reviews]').change(function(){
       if (this.value == 'student'){
-        jQuery('#student_review_num_threshold').removeAttr('hidden');
-        jQuery('#submission_review_num_threshold').attr('hidden','hidden');
+        jQuery('#num_reviews_per_student_threshold').removeAttr('hidden');
+        jQuery('#num_reviews_per_submission_threshold').attr('hidden','hidden');
       } 
       else if(this.value == 'submission'){
-        jQuery('#student_review_num_threshold').attr('hidden', 'hidden');
-        jQuery('#submission_review_num_threshold').removeAttr('hidden');
+        jQuery('#num_reviews_per_student_threshold').attr('hidden', 'hidden');
+        jQuery('#num_reviews_per_submission_threshold').removeAttr('hidden');
       }
     });
   });

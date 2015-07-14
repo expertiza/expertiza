@@ -501,92 +501,63 @@ class ReviewMappingController < ApplicationController
     if student_review_num == 0 and submission_review_num == 0
       flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
     elsif student_review_num != 0 and submission_review_num == 0
-      #review mapping strategy 1
-      participants_hash = {}
-      participants.each {|participant| participants_hash[participant.id] = 0 }
-      #assign reviewers for each team
-      num_participants = participants.size
-      num_reviews_per_team = (participants.size * student_review_num * 1.0 / teams.size).round
-      teams.each do |team|
-        temp_array = Array.new
-        if !team.equal? teams.last
-          while temp_array.size < num_reviews_per_team 
-            rand_num = rand(0..num_participants-1)
-            if participants_hash[participants[rand_num].id] < student_review_num
-              #prohibit one student to review his/her own artifact and temp_array cannot include duplicate num
-              if !TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id) and !temp_array.include? participants[rand_num].id
-                temp_array << participants[rand_num].id
-                participants_hash[participants[rand_num].id] += 1
-              else
-                next
-              end
-            end 
-            #remove students who have already been assigned enough num of reivews out of participants array
-            participants.each do |participant|
-              if participants_hash[participant.id] == student_review_num
-                participants.delete_at(rand_num)
-                num_participants -= 1
-              end
-            end
-          end
-        else
-          #review num for last team can be different from other teams.
-          participants.each {|participant| temp_array << participant.id }
-        end
-        begin
-          temp_array.each do |index|
-            ReviewResponseMap.create(:reviewee_id => team.id, :reviewer_id => index,
-                                   :reviewed_object_id => assignment_id) if !ReviewResponseMap.exists?(:reviewee_id => team.id, :reviewer_id => index, :reviewed_object_id => assignment_id)
-          end
-        rescue
-          flash[:error] = "Automatic assignment of reviewer failed."
-        end
-      end
+      #review mapping strategy
+      automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num, submission_review_num)
     elsif student_review_num == 0 and submission_review_num != 0
-      #review mapping strategy 2
-      teams_hash = {}
-      teams.each {|team| teams_hash[team.id] = 0}
-      num_teams = teams.size
-      num_reviews_per_student = (teams.size * submission_review_num * 1.0 / participants.size).round
-      participants.each do |participant|
-        temp_array = Array.new
-        if !participant.equal? participants.last
-          while temp_array.size < num_reviews_per_student
-            rand_num = rand(0..num_teams-1)
-            if teams_hash[teams[rand_num].id] < submission_review_num
-              #prohibit one student to review his/her own artifact
-              if !TeamsUser.exists?(team_id: teams[rand_num].id, user_id: participant.user_id)
-                temp_array << teams[rand_num].id
-                teams_hash[teams[rand_num].id] += 1
-              else
-                next
-              end
-            end
-            #remove teams who have already been assigned enough num of reivews out of teams array
-            teams.each do |team|
-              if teams_hash[team.id] == submission_review_num
-                teams.delete_at(rand_num)
-                num_teams -= 1
-              end
-            end
-          end
-        else
-          #review num for last participant can be different from other participants.
-          teams.each {|team| temp_array << team.id }
-        end
-        begin
-          temp_array.each do |index|
-            ReviewResponseMap.create(:reviewee_id => index, :reviewer_id => participant.id,
-                                   :reviewed_object_id => assignment_id) if !ReviewResponseMap.exists?(:reviewee_id => index, :reviewer_id => participant.id, :reviewed_object_id => assignment_id)
-          end
-        rescue
-          flash[:error] = "Automatic assignment of reviewer failed."
-        end
-      end
+      #review mapping strategy
+      automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num, submission_review_num)
     else
       flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
     end
     redirect_to :action => 'list_mappings', :id => assignment_id
+  end
+
+  def automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num=0, submission_review_num=0)
+    participants_hash = {}
+    participants.each {|participant| participants_hash[participant.id] = 0 }
+    #assign reviewers for each team
+    num_participants = participants.size
+    if student_review_num != 0 and submission_review_num == 0
+      num_reviews_per_team = (participants.size * student_review_num * 1.0 / teams.size).round
+    elsif student_review_num == 0 and submission_review_num != 0
+      num_reviews_per_team = submission_review_num
+      student_review_num = (teams.size * submission_review_num * 1.0 / participants.size).round
+    end
+    teams.each do |team|
+      temp_array = Array.new
+      if !team.equal? teams.last
+        while temp_array.size < num_reviews_per_team 
+          rand_num = rand(0..num_participants-1)
+          if participants_hash[participants[rand_num].id] < student_review_num
+            #prohibit one student to review his/her own artifact and temp_array cannot include duplicate num
+            if !TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id) and !temp_array.include? participants[rand_num].id
+              temp_array << participants[rand_num].id
+              participants_hash[participants[rand_num].id] += 1
+            else
+              next
+            end
+          end 
+          #remove students who have already been assigned enough num of reivews out of participants array
+          participants.each do |participant|
+            if participants_hash[participant.id] == student_review_num
+              participants.delete_at(rand_num)
+              num_participants -= 1
+            end
+          end
+        end
+      else
+        #review num for last team can be different from other teams.
+        participants.each {|participant| temp_array << participant.id }
+      end
+      begin
+        temp_array.each do |index|
+          ReviewResponseMap.create(:reviewee_id => team.id, :reviewer_id => index,
+                                 :reviewed_object_id => assignment_id) if !ReviewResponseMap.exists?(:reviewee_id => team.id, :reviewer_id => index, :reviewed_object_id => assignment_id)
+        end
+      rescue
+        flash[:error] = "Automatic assignment of reviewer failed."
+      end
+    end
   end
 
   # This is for staggered deadline assignment

@@ -44,7 +44,7 @@
   <br/>
   <% i=1 %>
   <%
-    team_id = SignedUpTeam.team_id(@assignment_id, session[:user].id)
+    team_id = TeamsUser.team_id(@assignment_id, session[:user].id)
     teams_users = TeamsUser.where(team_id: team_id)
     teams_users_array = Array.new
     teams_users.each do |teams_user|

@@ -84,37 +84,19 @@ class SignedUpTeam < ActiveRecord::Base
       end
     end
 
-    #2015-5-27 [zhewei]:
-    #We just remove the topic_id field from the participants table.
-    def self.team_id(assignment_id, user_id)
-      #team_id variable represents the team_id for this user in this assignment
-      team_id = nil
-      teams_users = TeamsUser.where(user_id: user_id)
-      teams_users.each do |teams_user|
-        team = Team.find(teams_user.team_id)
-        if team.parent_id == assignment_id
-          team_id = teams_user.team_id
-          break
-        end
-      end
-      return team_id
-    end
     #This method is used to returns topic_id from [signed_up_teams] table and the inputs are assignment_id and user_id.
     def self.topic_id(assignment_id, user_id)
       #team_id variable represents the team_id for this user in this assignment
-      team_id = SignedUpTeam.team_id(assignment_id, user_id)
+      team_id = TeamsUser.team_id(assignment_id, user_id)
       if team_id
-        if !SignedUpTeam.where(team_id: team_id,is_waitlisted:0).empty?
-          topic_id = SignedUpTeam.where(team_id: team_id,is_waitlisted:0).first.topic_id
-        end
+        topic_id_by_team_id(team_id)
       else
-        topic_id = nil
+         nil
       end
-      return topic_id
     end
 
   def self.topic_id_by_team_id(team_id)
-    signed_up_teams = SignedUpTeam.where(team_id:team_id)
+    signed_up_teams = SignedUpTeam.where(team_id:team_id ,is_waitlisted:0)
     if signed_up_teams.nil?
       nil
     else

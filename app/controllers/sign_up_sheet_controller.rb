@@ -465,7 +465,7 @@ class SignUpSheetController < ApplicationController
   end
 
   def switch_original_topic_to_approved_suggested_topic
-    team_id = SignedUpTeam.team_id(params[:assignment_id].to_i, session[:user].id)
+    team_id = TeamsUser.team_id(params[:assignment_id].to_i, session[:user].id)
     original_topic_id = SignedUpTeam.topic_id(params[:assignment_id].to_i, session[:user].id)
     SignUpTopic.find(params[:id]).update_attribute('private_to', nil) if SignUpTopic.exists?(params[:id]) 
     SignedUpTeam.where(team_id: team_id, is_waitlisted: 0).first.update_attribute('topic_id', params[:id].to_i) if SignedUpTeam.exists?(team_id: team_id, is_waitlisted: 0)

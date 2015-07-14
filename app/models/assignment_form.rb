@@ -230,12 +230,6 @@ class AssignmentForm
     end
   end
 
-  def require_sign_up
-  if @assignment.require_signup.nil?
-      @assignment.require_signup = false
-    end
-  end
-
   def wiki_type
   if @assignment.wiki_type.nil?
       @assignment.wiki_type = WikiType.find_by_name('No')
@@ -288,7 +282,6 @@ class AssignmentForm
 
   #NOTE: unfortunately this method is needed due to bad data in db @_@
   def set_up_defaults
-    require_sign_up
     wiki_type
     staggered_deadline
     availability_flag

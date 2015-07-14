@@ -306,7 +306,6 @@ Expertiza::Application.routes.draw do
       get :auto_complete_for_user_name
       get :delete_all_metareviewers
       get :delete_all_reviewers
-      get :delete_all_reviewers_and_metareviewers
       get :delete_metareviewer
       get :delete_reviewer
       get :distribution

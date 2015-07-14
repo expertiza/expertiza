@@ -663,24 +663,6 @@ require 'analytic/assignment_analytic'
     (self.is_coding_assignment?) ? false : self.is_coding_assignment
   end
 
-  def self.is_submission_possible (assignment)
-    # Is it possible to upload a file?
-    # Check whether the directory text box is nil
-    if assignment.directory_path != nil && assignment.wiki_type == 1
-      return true
-      # Is it possible to submit a URL (or a wiki page)
-    elsif assignment.directory_path != nil && /(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix.match(assignment.directory_path)
-      # In this case we have to check if the directory_path starts with http / https.
-      return true
-      # Is it possible to submit a Google Doc?
-      #    removed because google doc not implemented
-      #    elsif assignment.wiki_type == 4 #GOOGLE_DOC
-      #      return true
-      else
-        return false
-      end
-  end
-
   def is_google_doc
     # This is its own method so that it can be refactored later.
     # Google Document code should never directly check the wiki_type_id

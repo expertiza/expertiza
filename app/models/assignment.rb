@@ -820,11 +820,6 @@ require 'analytic/assignment_analytic'
     end
   end
 
-  def get_current_due_date
-    due_date = self.find_current_stage()
-    (due_date == nil || due_date == 'Finished') ? 'Finished' : due_date
-  end
-
   # Returns hash review_scores[reviewer_id][reviewee_id] = score
   def compute_reviews_hash
     review_questionnaire_id = get_review_questionnaire_id()

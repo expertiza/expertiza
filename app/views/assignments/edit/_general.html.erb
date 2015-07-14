@@ -76,17 +76,6 @@ function is_coding_assignmentChanged(){
 <th width=60%></th>
   </tr>
 
-    <script>
-      jQuery(document).ready(function () {
-        <% if @assignment_form.assignment.require_signup? && due_date(@assignment_form.assignment, 'signup').due_at %>
-          addDueDateTableElement(false, 'signup', 0, <%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
-        <% end %>
-        <% if @assignment_form.assignment.require_signup? && due_date(@assignment_form.assignment, 'drop_topic').due_at %>
-          addDueDateTableElement(false, 'drop_topic', 0, <%= due_date(@assignment_form.assignment, 'drop_topic').to_json.html_safe %>)
-        <% end %>
-      });
-    </script>
-
   <tr>
     <td style='padding:5px' id='assignment_team_assignment_field'>
       <% if(@assignment_form.assignment.max_team_size == 1)%>

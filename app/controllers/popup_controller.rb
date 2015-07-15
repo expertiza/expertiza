@@ -79,7 +79,6 @@ class PopupController < ApplicationController
 
     if(params[:id2] == nil)
       @scores = nil
-
     else
       @reviewid = (Response.find_by_map_id(params[:id2])).id
       @pid = ResponseMap.find(params[:id2]).reviewer_id

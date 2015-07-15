@@ -22,10 +22,10 @@ class MetareviewResponseMap < ResponseMap
     end
   end
 
-  # First, find the "TeamReviewResponseMap" to be metareviewed;
-  # Second, find the team in the "TeamReviewResponseMap" record.
+  # First, find the "ReviewResponseMap" to be metareviewed;
+  # Second, find the team in the "ReviewResponseMap" record.
   def contributor
-    team_review_map = TeamReviewResponseMap.find(self.reviewed_object_id)
+    team_review_map = ReviewResponseMap.find(self.reviewed_object_id)
     AssignmentTeam.find(team_review_map.reviewee_id)
   end
 
@@ -87,7 +87,7 @@ class MetareviewResponseMap < ResponseMap
 
           #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
           # to treat all assignments as team assignments
-        reviewmapping = TeamReviewResponseMap.where(reviewee_id: contributor.id, reviewer_id:  reviewee.id).first
+        reviewmapping = ReviewResponseMap.where(reviewee_id: contributor.id, reviewer_id:  reviewee.id).first
           if reviewmapping.nil?
             raise ImportError, "No review mapping was found for contributor, "+contributor.name+", and reviewee, "+row[1].to_s+"."
           end

@@ -85,6 +85,66 @@ class User < ActiveRecord::Base
     return self.is_recursively_parent_of(p)
   end
 
+  def get_user_list
+    user_list = []
+
+    # If the user is a super admin, fetch all users
+    if self.role.super_admin?
+      User.all.each do |user|
+        user_list << user
+      end
+    end
+
+    # If the user is an instructor, fetch all users in his course/assignment
+    if self.role.instructor?
+      participants = []
+      Course.where(instructor_id: self.id).each do |course|
+        participants << course.get_participants
+      end
+      Assignment.where(instructor_id: self.id).each do |assignment|
+        participants << assignment.participants
+      end
+      participants.each do |p_s|
+        if p_s.length > 0
+          p_s.each do |p|
+            user_list << p.user
+          end
+        end
+      end
+    end
+
+    # If the user is a TA, fetch all users in his courses
+    if self.role.ta?
+      courses = Ta.get_mapped_courses(self.id)
+      participants = []
+      courses.each do |course_id|
+        course = Course.find(course_id)
+        participants << course.get_participants
+      end
+      participants.each do |p_s|
+        if p_s.length > 0
+          p_s.each do |p|
+            user_list << p.user
+          end
+        end
+      end
+    end
+
+    # Add the children to the list
+    unless self.role.super_admin?
+      User.all.each do |u|
+        if is_recursively_parent_of(u)
+          if not user_list.include?(u)
+            user_list << u
+          end
+        end
+      end
+    end
+
+    user_list
+
+  end
+
   def first_name
     fullname.try(:[], /,.+/).try(:[], /\w+/) || ''
   end
@@ -315,4 +375,5 @@ class User < ActiveRecord::Base
     end
     users
   end
+
 end

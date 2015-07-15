@@ -19,20 +19,18 @@ class AuthController < ApplicationController
       AuthController.clear_session(session)
     else
       user = User.find_by_login(params[:login][:name])
-
-      # if user and user.valid_password?(params[:login][:password])
-        after_login(user)
-      # else
-      #   logger.warn "Failed login attempt"
-      #   flash[:error] = "Incorrect Name/Password"
-      #   redirect_to :controller => 'password_retrieval', :action => 'forgotten'
-      # end
+       if user and user.valid_password?(params[:login][:password])
+         after_login(user)
+       else
+         logger.warn "Failed login attempt"
+         flash[:error] = "Incorrect Name/Password"
+         redirect_to :controller => 'password_retrieval', :action => 'forgotten'
+       end
     end
   end  #def login
 
   # function to handle common functionality for conventional user login and google login
   def after_login (user)
-    logger.info "User #{user.name} successfully logged in"
     session[:user] = user
     AuthController.set_current_role(user.role_id, session)
 

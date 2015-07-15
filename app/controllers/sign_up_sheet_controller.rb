@@ -15,8 +15,12 @@ class SignUpSheetController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'sign_up', 'delete_signup', 'list', 'show_team'
-      current_role_name.eql? 'Student' and ((%w(list).include? action_name) ? are_needed_authorizations_present? : true)
+    when 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator',
+       'Student'].include? current_role_name and ((%w(list).include? action_name) ? are_needed_authorizations_present? : true)
     else
       ['Instructor',
        'Teaching Assistant',
@@ -215,8 +219,8 @@ class SignUpSheetController < ApplicationController
       end
 
   def list
-    @assignment_id = params[:assignment_id]
-    @sign_up_topics = SignUpTopic.where(['assignment_id = ?', @assignment_id]).all
+    @assignment_id = params[:assignment_id].to_i
+    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: nil)
     @slots_filled = SignUpTopic.find_slots_filled(params[:assignment_id])
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:assignment_id])
     @show_actions = true
@@ -265,92 +269,9 @@ class SignUpSheetController < ApplicationController
     @user_id = session[:user].id
     #Always use team_id ACS
     #s = Signupsheet.new
-    #check whether the user already has a team for this assignment
-    signup_team(@assignment.id, @user_id, params[:id])
+    #Team lazy initialization: check whether the user already has a team for this assignment
+    SignUpSheet.signup_team(@assignment.id, @user_id, params[:id])
     redirect_to :action => 'list', :assignment_id => params[:assignment_id]
-  end
-
-  def signup_team(assignment_id, user_id, topic_id)
-    users_team = SignedUpTeam.find_team_users(assignment_id, user_id)
-    if users_team.size == 0
-      #if team is not yet created, create new team.
-      team = AssignmentTeam.create_team_and_node(assignment_id)
-      user = User.find(user_id)
-      teamuser = create_team_users(user, team.id)
-      confirmationStatus = confirmTopic(team.id, topic_id, assignment_id)
-    else
-      confirmationStatus = confirmTopic(users_team[0].t_id, topic_id, assignment_id)
-    end
-  end
-
-  def confirmTopic(team_id, topic_id, assignment_id)
-    #check whether user has signed up already
-    user_signup = otherConfirmedTopicforUser(assignment_id, team_id)
-
-    sign_up = SignedUpTeam.new
-    sign_up.topic_id = params[:id]
-    sign_up.team_id = team_id
-    result = false
-    if user_signup.size == 0
-
-      # Using a DB transaction to ensure atomic inserts
-      ActiveRecord::Base.transaction do
-        #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
-        if slotAvailable?(topic_id)
-          sign_up.is_waitlisted = false
-          #Create new record in signed_up_teams table
-          team_id = SignedUpTeam.team_id(assignment_id, session[:user].id)
-          topic_id = SignedUpTeam.topic_id(assignment_id, session[:user].id)
-          SignedUpTeam.create(topic_id: topic_id, team_id: team_id, is_waitlisted: 0, preference_priority_number: nil)
-        else
-          sign_up.is_waitlisted = true
-        end
-        if sign_up.save
-          result = true
-        end
-      end
-    else
-      #If all the topics choosen by the user are waitlisted,
-      for user_signup_topic in user_signup
-        if user_signup_topic.is_waitlisted == false
-          flash[:error] = "You have already signed up for a topic."
-          return false
-        end
-      end
-
-      # Using a DB transaction to ensure atomic inserts
-      ActiveRecord::Base.transaction do
-        #check whether user is clicking on a topic which is not going to place him in the waitlist
-        if !slotAvailable?(topic_id)
-          sign_up.is_waitlisted = true
-          if sign_up.save
-            result = true
-          end
-        else
-          #if slot exist, then confirm the topic for the user and delete all the waitlist for this user
-          Waitlist.cancel_all_waitlists(team_id, assignment_id)
-          sign_up.is_waitlisted = false
-          sign_up.save
-          #Update topic_id in signed_up_teams table with the topic_id
-          team_id = SignedUpTeam.find_team_users(assignment_id, session[:user].id)
-          signUp = SignedUpTeam.where(topic_id: topic_id).first
-          signUp.update_attribute('topic_id', topic_id)
-          result = true
-        end
-      end
-    end
-
-    result
-  end
-
-  def otherConfirmedTopicforUser(assignment_id, team_id)
-    user_signup = SignedUpTeam.find_user_signup_topics(assignment_id, team_id)
-    user_signup
-  end
-
-        # When using this method when creating fields, update race conditions by using db transactions
-  def slotAvailable?(topic_id)
-    SignUpTopic.slotAvailable?(topic_id)
   end
 
         # When using this method when creating fields, update race conditions by using db transactions
@@ -362,78 +283,6 @@ class SignUpSheetController < ApplicationController
 
     user_signup = SignedUpTeam.find_user_signup_topics(assignment_id, team_id)
     user_signup
-  end
-
-  def confirm_topic(team_id, topic_id, assignment_id)
-    #@param_id = params[:id]
-    @user_id = session[:user].id
-    #Waitlist.waitlist_teams(@param_id, @user_id, team_id, topic_id, assignment_id)
-
-    #check whether user has signed up already
-    user_signup = SignUpSheetController.other_confirmed_topic_for_user(assignment_id, team_id)
-
-    sign_up = SignedUpTeam.new
-    sign_up.topic_id = topic_id
-    sign_up.team_id = team_id
-    result = false
-    if user_signup.size == 0
-
-      # Using a DB transaction to ensure atomic inserts
-      ActiveRecord::Base.transaction do
-        if (@assignment.is_intelligent == 0)
-          #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
-          if slotAvailable?(topic_id)
-            sign_up.is_waitlisted = false
-            #Update topic_id in signed_up_teams table with the topic_id
-            team_id = SignedUpTeam.find_team_users(assignment_id, session[:user].id)
-            signUp = SignedUpTeam.where(topic_id: topic_id).first
-            signUp.update_attribute('topic_id', topic_id)
-          else
-            sign_up.is_waitlisted = true
-          end
-        else
-          sign_up.is_waitlisted = true
-          if params[:priority].to_s.to_f > 0
-            sign_up.preference_priority_number = params[:priority];
-          end
-        end
-        if sign_up.save
-          result = true
-        end
-      end
-    else
-      #If all the topics choosen by the user are waitlisted,
-      for user_signup_topic in user_signup
-        if user_signup_topic.is_waitlisted == false
-          SignUpSheetController.flash_signedup_topic()
-
-          return false
-        end
-      end
-
-=begin
-   # Using a DB transaction to ensure atomic inserts
-   ActiveRecord::Base.transaction do
-     #check whether user is clicking on a topic which is not going to place him in the waitlist
-     if !slotAvailable?(topic_id)
-       sign_up.is_waitlisted = true
-       if sign_up.save
-         result = true
-       end
-     else
-       #if slot exist, then confirm the topic for the user and delete all the waitlist for this user
-       cancel_all_waitlists(team_id, assignment_id)
-       sign_up.is_waitlisted = false
-       sign_up.save
-       participant = Participant.where(user_id:  @user_id , parent_id:  assignment_id).first
-       participant.update_topic_id(topic_id)
-       result = true
-     end
-   end
-=end
-    end
-
-    result
   end
 
   def set_priority
@@ -561,7 +410,7 @@ class SignUpSheetController < ApplicationController
     DeadlineHelper.set_start_due_date(assignment_id, set_of_topics)
   end
 
-        #gets team_details to show it on team_details view for a given assignment
+  #gets team_details to show it on team_details view for a given assignment
   def show_team
     if !(assignment = Assignment.find(params[:assignment_id])).nil? and !(topic = SignUpTopic.find(params[:id])).nil?
       @results =ad_info(assignment.id, topic.id)
@@ -613,6 +462,25 @@ class SignUpSheetController < ApplicationController
     else
       render :action => 'new', :id => assignment_id
     end
+  end
+
+  def switch_original_topic_to_approved_suggested_topic
+    team_id = TeamsUser.team_id(params[:assignment_id].to_i, session[:user].id)
+    original_topic_id = SignedUpTeam.topic_id(params[:assignment_id].to_i, session[:user].id)
+    SignUpTopic.find(params[:id]).update_attribute('private_to', nil) if SignUpTopic.exists?(params[:id]) 
+    SignedUpTeam.where(team_id: team_id, is_waitlisted: 0).first.update_attribute('topic_id', params[:id].to_i) if SignedUpTeam.exists?(team_id: team_id, is_waitlisted: 0)
+    #check the waitlist of original topic. Let the first waitlisted team hold the topic, if exists.
+    waitlisted_teams = SignedUpTeam.where(topic_id: original_topic_id, is_waitlisted:1)
+    if !waitlisted_teams.blank?
+      waitlisted_first_team_first_user_id = TeamsUser.where(team_id: waitlisted_teams.first.team_id).first.user_id
+      SignUpSheet.signup_team(params[:assignment_id].to_i, waitlisted_first_team_first_user_id, original_topic_id)
+    end
+    redirect_to :action => 'list', :assignment_id => params[:assignment_id]
+  end
+
+  def publish_approved_suggested_topic
+    SignUpTopic.find(params[:id]).update_attribute('private_to', nil) if SignUpTopic.exists?(params[:id])
+    redirect_to :action => 'list', :assignment_id => params[:assignment_id]
   end
 
   private

@@ -61,6 +61,9 @@ class AssignmentForm
 
   #code to save assignment questionnaires
   def update_assignment_questionnaires(attributes)
+    unless attributes
+      return false 
+    end
     existing_aqs = AssignmentQuestionnaire::where(assignment_id: @assignment.id)
     existing_aqs.each do |existing_aq|
       existing_aq.delete
@@ -84,6 +87,9 @@ class AssignmentForm
 
   #code to save due dates
   def update_due_dates(attributes,user)
+    unless attributes
+      return false 
+    end
     due_dates_id =Array.new
     max_review_dd = NIL
     attributes.each do |due_date|
@@ -91,8 +97,11 @@ class AssignmentForm
         next
       end
       #parse the dd and convert it to utc before saving it to db
-      time = Time.parse(due_date[:due_at][0..15] + ' '+ActiveSupport::TimeZone[user.timezonepref].formatted_offset)
-      due_date[:due_at]= time.utc
+      #eg. 2015-06-22 12:05:00 -0400
+      current_local_time = Time.parse(due_date[:due_at][0..15])
+      tz = ActiveSupport::TimeZone[user.timezonepref].tzinfo
+      utc_time = tz.local_to_utc(Time.local(current_local_time.year,current_local_time.month,current_local_time.day,current_local_time.strftime('%H').to_i,current_local_time.strftime('%M').to_i,current_local_time.strftime('%S').to_i))
+      due_date[:due_at]= utc_time
       if due_date[:id].nil? or due_date[:id].blank?
         dd = DueDate.new(due_date)
         if !dd.save
@@ -221,12 +230,6 @@ class AssignmentForm
     end
   end
 
-  def require_sign_up
-  if @assignment.require_signup.nil?
-      @assignment.require_signup = false
-    end
-  end
-
   def wiki_type
   if @assignment.wiki_type.nil?
       @assignment.wiki_type = WikiType.find_by_name('No')
@@ -279,7 +282,6 @@ class AssignmentForm
 
   #NOTE: unfortunately this method is needed due to bad data in db @_@
   def set_up_defaults
-    require_sign_up
     wiki_type
     staggered_deadline
     availability_flag

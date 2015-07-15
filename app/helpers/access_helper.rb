@@ -7,7 +7,7 @@ module AccessHelper
   end
 
   def flash_msg
-    flash[:error] = "Permission Denied to #{params[:controller]}##{params[:action]} to role #{current_role_name}"
+    flash[:error] = "Permission Denied to #{params[:controller]}##{params[:action]} to this #{current_role_name}"
   end
 
   def all_actions_allowed?

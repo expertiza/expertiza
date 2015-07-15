@@ -46,7 +46,7 @@ class Leaderboard < ActiveRecord::Base
   # End result is a hash (qType => (course => (user => score)))
   def self.getParticipantsScore(assignmentList)
     qTypeHash = Hash.new
-    questionnaireResponseTypeHash = {"TeamReviewResponseMap" => "ReviewQuestionnaire",
+    questionnaireResponseTypeHash = {"ReviewResponseMap" => "ReviewQuestionnaire",
                                      "MetareviewResponseMap" => "MetareviewQuestionnaire",
                                      "FeedbackResponseMap" => "AuthorFeedbackQuestionnaire",
                                      "TeammateReviewResponseMap" => "TeammateReviewQuestionnaire"}

@@ -1,3 +1,5 @@
+require 'will_paginate/array'
+
 class UsersController < ApplicationController
   autocomplete :user, :name
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
@@ -36,15 +38,17 @@ class UsersController < ApplicationController
   #for displaying the list of users
   def list
     user = session[:user]
-    role = Role.find(user.role_id)
-    all_users = User.order('name').where( ['role_id in (?) or id = ?', role.get_available_roles, user.id])
+    role = user.role
+    all_users = user.get_user_list
+    # Deprecated, all_users = User.order('name').where( ['role_id in (?) or id = ?', role.get_available_roles, user.id])
 
     letter = params[:letter]
     session[:letter] = letter
     if letter == nil
-      letter = all_users.first.name[0,1].downcase
+      if all_users.length > 0
+        letter = all_users.first.name[0,1].downcase
+      end
     end
-    logger.info "#{letter}"
     @letters = Array.new
 
     @per_page = 1
@@ -64,7 +68,7 @@ class UsersController < ApplicationController
     end
 
     # Get the users list to show on current page
-    @users = paginate_list(role, user.id, letter)
+    @users = paginate_list all_users
 
     @letters = ('A'..'Z').to_a
   end
@@ -205,7 +209,7 @@ class UsersController < ApplicationController
   end
 
   # For filtering the users list with proper search and pagination.
-  def paginate_list(role, user_id, letter)
+  def paginate_list(users)
     paginate_options = {"1" => 25, "2" => 50, "3" => 100}
 
     # If the above hash does not have a value for the key,
@@ -218,11 +222,11 @@ class UsersController < ApplicationController
     @search_by = params[:search_by]
 
     # search for corresponding users
-    users = User.search_users(role, user_id, letter, @search_by)
+    # users = User.search_users(role, user_id, letter, @search_by)
 
     # paginate
     if (paginate_options["#{@per_page}"].nil?) #displaying all - no pagination
-      users = users.paginate(:page => params[:page], :per_page => User.count)
+      users = users.paginate(:page => params[:page], :per_page => users.count)
     else #some pagination is active - use the per_page
       users = users.page(params[:page]).per_page(paginate_options["#{@per_page}"])
     end

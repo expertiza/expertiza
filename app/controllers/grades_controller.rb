@@ -7,11 +7,16 @@ class GradesController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'view_my_scores'
-      current_role_name.eql? 'Student' and are_needed_authorizations_present?
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator',
+       'Student'].include? current_role_name and are_needed_authorizations_present?
     else
       ['Instructor',
        'Teaching Assistant',
-       'Administrator'].include? current_role_name
+       'Administrator',
+       'Super-Administrator'].include? current_role_name
     end
   end
 
@@ -50,7 +55,7 @@ class GradesController < ApplicationController
 
   def view_my_scores
     @participant = AssignmentParticipant.find(params[:id])
-
+    @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
     return if redirect_when_disallowed
     @assignment = @participant.assignment
     @questions = {}
@@ -65,14 +70,14 @@ class GradesController < ApplicationController
       @questions[questionnaire_symbol] = questionnaire.questions
     end
 
-    rmaps = ParticipantReviewResponseMap.where(reviewee_id: @participant.id, reviewed_object_id: @participant.assignment.id)
+    rmaps = ReviewResponseMap.where(reviewee_id: @team_id, reviewed_object_id: @participant.parent_id)
     rmaps.find_each do |rmap|
       rmap.update_attribute :notification_accepted, true
     end
 
-    rmaps = ParticipantReviewResponseMap.where reviewer_id: @participant.id, reviewed_object_id: @participant.parent_id
+    rmaps = ReviewResponseMap.where(reviewer_id: @participant.id, reviewed_object_id: @participant.parent_id)
     rmaps.find_each do |rmap|
-      mmaps = MetareviewResponseMap.where reviewee_id: rmap.reviewer_id, reviewed_object_id: rmap.map_id
+      mmaps = MetareviewResponseMap.where(reviewee_id: rmap.reviewer_id, reviewed_object_id: rmap.map_id)
       mmaps.find_each do |mmap|
         mmap.update_attribute :notification_accepted, true
       end
@@ -112,13 +117,11 @@ class GradesController < ApplicationController
 
     if participant.assignment.team_assignment?
       reviewee = participant.team
-      review_mapping = TeamReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
+      review_mapping = ReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
 
       if review_mapping.nil?
         review_exists = false
-        if participant.assignment.team_assignment?
-          review_mapping = TeamReviewResponseMap.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
-        end
+        review_mapping = ReviewResponseMap.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
         review = Response.find_by_map_id(review_mapping.map_id)
 
         unless review_exists

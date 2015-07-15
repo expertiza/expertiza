@@ -7,7 +7,6 @@ class Assignment < ActiveRecord::Base
 
 require 'analytic/assignment_analytic'
   include AssignmentAnalytic
-  include DynamicReviewMapping
   belongs_to :course
   belongs_to :wiki_type
   has_paper_trail
@@ -17,11 +16,10 @@ require 'analytic/assignment_analytic'
   # then Rails will "automatically' set the type field to the value that
   # designates an assignment of the appropriate type.
   has_many :participants, :class_name => 'AssignmentParticipant', :foreign_key => 'parent_id'
-  has_many :participant_review_mappings, :class_name => 'ParticipantReviewResponseMap', :through => :participants, :source => :review_mappings
   has_many :users, :through => :participants
   has_many :due_dates, :dependent => :destroy
   has_many :teams, :class_name => 'AssignmentTeam', :foreign_key => 'parent_id'
-  has_many :team_review_mappings, :class_name => 'TeamReviewResponseMap', :through => :teams, :source => :review_mappings
+  has_many :team_review_mappings, :class_name => 'ReviewResponseMap', :through => :teams, :source => :review_mappings
   has_many :invitations, :class_name => 'Invitation', :foreign_key => 'assignment_id', :dependent => :destroy
   has_many :assignment_questionnaires,:dependent => :destroy
   has_many :questionnaires, :through => :assignment_questionnaires
@@ -38,10 +36,9 @@ require 'analytic/assignment_analytic'
 
   REVIEW_QUESTIONNAIRES = {:author_feedback => 0, :metareview => 1, :review => 2, :teammate_review => 3}
   #  Review Strategy information.
-  RS_INSTRUCTOR_SELECTED = 'Instructor-Selected'
-  RS_STUDENT_SELECTED = 'Student-Selected'
   RS_AUTO_SELECTED = 'Auto-Selected'
-  REVIEW_STRATEGIES = [RS_INSTRUCTOR_SELECTED, RS_AUTO_SELECTED]
+  RS_INSTRUCTOR_SELECTED = 'Instructor-Selected'
+  REVIEW_STRATEGIES = [RS_AUTO_SELECTED, RS_INSTRUCTOR_SELECTED]
 
   DEFAULT_MAX_REVIEWERS = 3
 
@@ -85,24 +82,21 @@ require 'analytic/assignment_analytic'
 
   # Returns a set of topics that can be reviewed.
   # We choose the topics if one of its submissions has received the fewest reviews so far
+  #reviewer, the parameter, is an object of Participant
   def candidate_topics_to_review(reviewer)
     return nil if sign_up_topics.empty? # This is not a topic assignment
 
     # Initialize contributor set with all teams participating in this assignment
     contributor_set = Array.new(contributors)
 
- 
     # Reject contributors that have not selected a topic, or have no submissions
     contributor_set=reject_by_no_topic_selection_or_no_submission(contributor_set)
 
     # Reject contributions of topics whose deadline has passed, or which are not reviewable in the current stage
     contributor_set=reject_by_deadline(contributor_set)
 
-
-    # Filter submission by reviewer him/her self
-    contributor_set=reject_own_submission(contributor_set, reviewer)
-
     if self.varying_rubrics_by_round?
+      # Filter submissions already reviewed by reviewer in current round
       current_round = self.get_current_round(nil)
       contributor_set = reject__reviewed_submissions_in_current_round(contributor_set, reviewer,current_round)
     else
@@ -110,10 +104,14 @@ require 'analytic/assignment_analytic'
       contributor_set=reject_previously_reviewed_submissions(contributor_set, reviewer)
     end
 
+    # Filter submission by reviewer him/her self
+    contributor_set=reject_own_submission(contributor_set, reviewer)
 
     # Filter the contributors with the least number of reviews
     # (using the fact that each contributor is associated with a topic)
     contributor_set=reject_by_least_reviewed(contributor_set)
+
+    contributor_set = reject_by_max_reviews_per_submission(contributor_set)
 
     # Add topics for all remaining submissions to a list of available topics for review
     candidate_topics = Set.new
@@ -124,29 +122,44 @@ require 'analytic/assignment_analytic'
   end
 
   #This method is only for the assignments without topics
-  def candidate_assignment_teams_to_review
+  def candidate_assignment_teams_to_review(reviewer)
     # the contributors are AssignmentTeam objects
     contributor_set = Array.new(contributors)
 
     # Reject contributors that have no submissions
     contributor_set.reject! { |contributor| !contributor.has_submissions? }
 
-    # Filter the contributors with the least number of reviews
-    # (using the fact that each contributor is associated with a topic)
-    contributor = contributor_set.min_by { |contributor| contributor.review_mappings.count }
+    if self.varying_rubrics_by_round?
+      # Filter submissions already reviewed by reviewer in current round
+      current_round = self.get_current_round(nil)
+      contributor_set = reject__reviewed_submissions_in_current_round(contributor_set, reviewer,current_round)
+    else
+      # Filter submissions already reviewed by reviewer
+      contributor_set=reject_previously_reviewed_submissions(contributor_set, reviewer)
+    end
 
-    min_reviews = contributor.review_mappings.count rescue 0
-    contributor_set.reject! { |contributor| contributor.review_mappings.count > min_reviews + review_topic_threshold }
+    # Filter submission by reviewer him/her self
+    contributor_set=reject_own_submission(contributor_set, reviewer)
+
+    # Filter the contributors with the least number of reviews
+    contributor_set=reject_by_least_reviewed(contributor_set)
+
+    contributor_set = reject_by_max_reviews_per_submission(contributor_set)
 
     contributor_set
   end
 
   def reject_by_least_reviewed(contributor_set)
     contributor = contributor_set.min_by { |contributor| contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count }
-    min_reviews = contributor.review_mappings.reject! { |review_mapping| review_mapping.response.nil? }.count rescue 0
-    contributor_set.reject { |contributor| contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count  > min_reviews + review_topic_threshold }
+    min_reviews = contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count rescue 0
+    contributor_set.reject! { |contributor| contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count  > min_reviews + review_topic_threshold }
 
     return contributor_set
+  end
+
+  def reject_by_max_reviews_per_submission(contributor_set)
+    contributor_set.reject! { |contributor| contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count  >= max_reviews_per_submission }
+    contributor_set
   end
 
   def reject__reviewed_submissions_in_current_round(contributor_set, reviewer, current_round)
@@ -159,7 +172,7 @@ require 'analytic/assignment_analytic'
   end
 
   def reject_own_submission(contributor_set, reviewer)
-    contributor_set.reject! { |contributor| contributor.teams_users.find_by_user_id(reviewer.user_id) }
+    contributor_set.reject! { |contributor| contributor.has_user(User.find(reviewer.user_id)) }
     return contributor_set
   end
 
@@ -179,25 +192,13 @@ require 'analytic/assignment_analytic'
   end
 
   #assign the reviewer to review the assignment_team's submission. Only used in the assignments that do not have any topic
+  #Parameter assignment_team is the candidate assignment team, it cannot be a team w/o submission, or have reviewed by reviewer, or reviewer's own team.
+  #(guaranteed by candidate_assignment_teams_to_review method)
   def assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
     if assignment_team==nil
-      raise "There is no submission right now. Come back later."
+      raise "There are no more submissions available for review right now. Try again later."
     end
-    participants = assignment_team.get_participants
 
-    if participants.include?(reviewer)
-      raise "We randomly picked your own artifact. You may try click the button again or come back later."
-    end
-    if self.varying_rubrics_by_round?  #review rubrics vary by rounds
-      round = get_current_round(nil)
-      if assignment_team.reviewed_by_in_round?(reviewer,round)
-        raise "We randomly picked an artifact which has already been reviewed by you (or assigned to you). You may try click the button again or come back later."
-      end
-    else
-      if assignment_team.reviewed_by?(reviewer)
-        raise "We randomly picked an artifact which has already been reviewed by you (or assigned to you). You may try click the button again or come back later."
-      end
-    end
     assignment_team.assign_reviewer(reviewer)
   end
 
@@ -385,14 +386,14 @@ require 'analytic/assignment_analytic'
   end
 
   def dynamic_reviewer_assignment?
-    (self.review_assignment_strategy == RS_AUTO_SELECTED || self.review_assignment_strategy == RS_STUDENT_SELECTED) ? true : false
+    (self.review_assignment_strategy == RS_AUTO_SELECTED) ? true : false
   end
   alias_method :is_using_dynamic_reviewer_assignment?, :dynamic_reviewer_assignment?
 
   def review_mappings
     #ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    TeamReviewResponseMap.where(reviewed_object_id: self.id)
+    ReviewResponseMap.where(reviewed_object_id: self.id)
     end
 
   def metareview_mappings
@@ -443,7 +444,7 @@ require 'analytic/assignment_analytic'
         total_score = 0
         total_num_of_assessments = 0    #calculate grades for each rounds
         for i in 1..self.get_review_rounds
-          assessments = TeamReviewResponseMap.get_assessments_round_for(team,i)
+          assessments = ReviewResponseMap.get_assessments_round_for(team,i)
           round_sym = ("review"+i.to_s).to_sym
           grades_by_rounds[round_sym]= Score.compute_scores(assessments, questions[round_sym])
           total_num_of_assessments += assessments.size
@@ -476,7 +477,7 @@ require 'analytic/assignment_analytic'
         end
 
       else
-        assessments = TeamReviewResponseMap.get_assessments_for(team)
+        assessments = ReviewResponseMap.get_assessments_for(team)
         scores[:teams][index.to_s.to_sym][:scores] = Score.compute_scores(assessments, questions[:review])
       end
 
@@ -565,14 +566,7 @@ require 'analytic/assignment_analytic'
 
   def delete(force = nil)
     begin
-      maps = ParticipantReviewResponseMap.where(reviewed_object_id: self.id)
-      maps.each { |map| map.delete(force) }
-    rescue
-      raise "At least one review response exists for #{self.name}."
-    end
-
-    begin
-      maps = TeamReviewResponseMap.where(reviewed_object_id: self.id)
+      maps = ReviewResponseMap.where(reviewed_object_id: self.id)
       maps.each { |map| map.delete(force) }
     rescue
       raise "At least one review response exists for #{self.name}."
@@ -667,24 +661,6 @@ require 'analytic/assignment_analytic'
   # Check to see if assignment is a microtask
   def is_coding_assignment?
     (self.is_coding_assignment?) ? false : self.is_coding_assignment
-  end
-
-  def self.is_submission_possible (assignment)
-    # Is it possible to upload a file?
-    # Check whether the directory text box is nil
-    if assignment.directory_path != nil && assignment.wiki_type == 1
-      return true
-      # Is it possible to submit a URL (or a wiki page)
-    elsif assignment.directory_path != nil && /(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix.match(assignment.directory_path)
-      # In this case we have to check if the directory_path starts with http / https.
-      return true
-      # Is it possible to submit a Google Doc?
-      #    removed because google doc not implemented
-      #    elsif assignment.wiki_type == 4 #GOOGLE_DOC
-      #      return true
-      else
-        return false
-      end
   end
 
   def is_google_doc
@@ -826,25 +802,6 @@ require 'analytic/assignment_analytic'
     end
   end
 
-  def assign_reviewers(mapping_strategy)
-    #ACS Always assign reviewers for a team
-    #removed check to see if it is a team assignment
-    #defined in DynamicReviewMapping module
-    assign_reviewers_for_team(mapping_strategy)
-  end
-
-  #this is for staggered deadline assignments or assignments with signup sheet
-  def assign_reviewers_staggered(num_reviews, num_review_of_reviews)
-    #defined in DynamicReviewMapping module
-    message = assign_reviewers_automatically(num_reviews, num_review_of_reviews)
-
-  end
-
-  def get_current_due_date
-    due_date = self.find_current_stage()
-    (due_date == nil || due_date == 'Finished') ? 'Finished' : due_date
-  end
-
   # Returns hash review_scores[reviewer_id][reviewee_id] = score
   def compute_reviews_hash
     review_questionnaire_id = get_review_questionnaire_id()
@@ -852,10 +809,9 @@ require 'analytic/assignment_analytic'
     @review_scores = Hash.new
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    @response_type = 'TeamReviewResponseMap'
+    @response_type = 'ReviewResponseMap'
 
-    @myreviewers = ResponseMap.select('DISTINCT reviewer_id').where(['reviewed_object_id = ? && type = ? ', self.id, @type])
-
+    @myreviewers = ResponseMap.select('DISTINCT reviewer_id').where(['reviewed_object_id = ? && type = ? ', self.id, @response_type])
     @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
 
     @response_maps.each do |response_map|
@@ -866,7 +822,7 @@ require 'analytic/assignment_analytic'
 
       if @corresponding_response != nil
         @this_review_score_raw = Score.get_total_score(response: @corresponding_response, questions: @questions, q_types: Array.new)
-        if @this_review_score
+        if @this_review_score_raw
           @this_review_score = ((@this_review_score_raw*100).round/100.0) if @this_review_score_raw >= 0.0
         end
       else
@@ -875,8 +831,9 @@ require 'analytic/assignment_analytic'
       @respective_scores[response_map.reviewee_id] = @this_review_score
       @review_scores[response_map.reviewer_id] = @respective_scores
     end
+    # logger.warn @review_scores.inspect
     @review_scores
-    end
+  end
 
   def get_review_questionnaire_id
     @revqids = []
@@ -925,7 +882,7 @@ require 'analytic/assignment_analytic'
 
   # get_total_reviews_assigned_by_type()
   # Returns the number of reviewers assigned to a particular assignment by the type of review
-  # Param: type - String (ParticipantReviewResponseMap, etc.)
+  # Param: type - String (ReviewResponseMap, etc.)
   def get_total_reviews_assigned_by_type(type)
     count = 0
     self.response_maps.each { |x| count = count + 1 if x.type == type }
@@ -941,7 +898,7 @@ require 'analytic/assignment_analytic'
   end
 
   # Returns the number of reviews completed for a particular assignment by type of review
-  # Param: type - String (ParticipantReviewResponseMap, etc.)
+  # Param: type - String (ReviewResponseMap, etc.)
   def get_total_reviews_completed_by_type(type)
     # self.responses.size
     response_count = 0
@@ -950,7 +907,7 @@ require 'analytic/assignment_analytic'
   end
 
   # Returns the number of reviews completed for a particular assignment by type of review
-  # Param: type - String (ParticipantReviewResponseMap, etc.)
+  # Param: type - String (ReviewResponseMap, etc.)
   # Param: date - Filter reviews that were not created on this date
   def get_total_reviews_completed_by_type_and_date(type, date)
     # self.responses.size
@@ -1008,23 +965,6 @@ require 'analytic/assignment_analytic'
     total
   end
 
-  # Checks whether there are duplicate assignments of the same name by the same instructor.
-  # If the assignments are assigned to courses, it's OK to have duplicate names in different
-  # courses.
-  #
-  # changelog: 5/24/2013
-  # Author: hliu11
-  #   old method only works after the assignment is created
-  #   cover corner case where assignment have not yet been created
-  def duplicate_name?
-    assignments = Assignment.where(name: self.name)
-    assignments.select { |x| x.instructor_id == self.instructor_id } unless self.instructor_id.nil?
-    assignments.select { |x| x.course_id == self.course_id } unless self.course_id.nil?
-
-    #if the assignment have not yet been created i.e: Assignment.new without save
-    self.id.nil ? assignments.count > 0 :  assignments.count > 1
-  end
-
   def signed_up_topic(contributor)
     # The purpose is to return the topic that the contributor has signed up to do for this assignment.
     # Returns a record from the sign_up_topic table that gives the topic_id for which the contributor has signed up
@@ -1042,12 +982,15 @@ require 'analytic/assignment_analytic'
       end
     end
 
-    # Look for the topic_id where the team_id equals the contributor id (contributor is a team or a participant)
-    (!Team.where(name: contributor.name, id:  contributor.id).first.nil?) ?
-      contributors_topic = SignedUpTeam.find_by_team_id(contributor.id) :
-      contributors_topic = SignedUpTeam.find_by_team_id(contributor.user_id)
-    contributors_signup_topic = SignUpTopic.find(contributors_topic.topic_id) if !contributors_topic.nil?
+    # Look for the topic_id where the team_id equals the contributor id (contributor is a team)
+    if !SignedUpTeam.where(team_id: contributor.id,is_waitlisted:0).empty?
+      topic_id = SignedUpTeam.where(team_id: contributor.id,is_waitlisted:0).first.topic_id
+      SignUpTopic.find(topic_id)
+    else
+      nil
     end
+
+  end
 
     def self.export(csv, parent_id, options)
       @assignment = Assignment.find(parent_id)
@@ -1107,41 +1050,16 @@ require 'analytic/assignment_analytic'
       self.due_dates.select {|due_date| due_date.deadline_type == DeadlineType.find_by_name(type)}
     end
 
-    def clean_up_due_dates
-      #delete due_dates without due_at
-      self.due_dates.each {|due_date| due_date.delete if due_date.due_at.nil? }
-
-      submissions = self.find_due_dates('submission') + self.find_due_dates('resubmission')
-      submissions.sort! { |x, y| x.due_at <=> y.due_at }
-      reviews = self.find_due_dates('review') + self.find_due_dates('rereview')
-      reviews.sort! { |x, y| x.due_at <=> y.due_at }
-
-      while submissions.count > self.rounds_of_reviews
-        submissions.last.delete
-      end
-
-      while reviews.count > self.rounds_of_reviews
-        reviews.last.delete
-      end
-
-      self.require_signup? ? drop_topic_count = 1 : drop_topic_count = 0
-      drop_topic = self.find_due_dates('drop_topic')
-      drop_topic.sort! { |x, y| y.due_at <=> x.due_at }
-      while drop_topic.count > self.drop_topic_count
-        drop_topic.last.delete
-      end
-    end
-
-
     #this should be moved to SignUpSheet model after we refactor the SignUpSheet.
     # returns whether ANY topic has a partner ad; used for deciding whether to show the Advertisements column
     def has_partner_ads?(id)
       #Team.find_by_sql("select * from teams where parent_id = "+id+" AND advertise_for_partner='1'").size > 0
-      return Team.find_by_sql("select t.* "+
+      @team = Team.find_by_sql("select t.* "+
           "from teams t, signed_up_teams s "+
-          "where s.topic_id='"+id.to_s+"' and s.team_id = t.id and t.advertise_for_partner = 1").size > 0
+          "where s.topic_id='"+id.to_s+"' and s.team_id = t.id and t.advertise_for_partner = 1")
+@team.reject!{|t| t.full?}
+    return @team.size > 0
     end
-
   def review_progress_pie_chart
     reviewed = self.get_percentage_reviews_completed
     pending = 100 - reviewed

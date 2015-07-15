@@ -21,7 +21,7 @@ class SignedUpTeam < ActiveRecord::Base
 
   def self.find_team_participants(assignment_id)
     #@participants = SignedUpTeam.find_by_sql("SELECT s.id as id, t.id as topic_id, t.topic_name as name , s.is_waitlisted as is_waitlisted, s.team_id, s.team_id as team_id FROM signed_up_teams s, sign_up_topics t where s.topic_id = t.id and t.assignment_id = " + assignment_id)
-    @participants = SignedUpTeam.find_by_sql(["SELECT s.id as id, t.id as topic_id, t.topic_name as name , s.is_waitlisted as is_waitlisted, s.team_id, s.team_id as team_id FROM signed_up_teams s, sign_up_topics t where s.topic_id = t.id and t.assignment_id = ? ",assignment_id])
+    @participants = SignedUpTeam.find_by_sql(["SELECT s.id as id, t.id as topic_id, t.topic_name as name, t.topic_name as team_name_placeholder, t.topic_name as user_name_placeholder, s.is_waitlisted as is_waitlisted, s.team_id as team_id FROM signed_up_teams s, sign_up_topics t where s.topic_id = t.id and t.assignment_id = ? ",assignment_id])
     i=0
     for participant in @participants
       #participant_names = SignedUpTeam.find_by_sql("SELECT s.name as u_name, t.name as team_name FROM users s, teams t, teams_users u WHERE t.id = u.team_id and u.user_id = s.id and t.id = " + participant.team_id)
@@ -32,9 +32,12 @@ class SignedUpTeam < ActiveRecord::Base
       for participant_name in participant_names
         if team_name_added == false
           names = "["+participant_name.team_name+"] "+ participant_name.u_name + " "
+          participant.team_name_placeholder = participant_name.team_name
+          participant.user_name_placeholder = participant_name.u_name + " "
           team_name_added = true
         else
           names = names + participant_name.u_name + " "
+          participant.user_name_placeholder += participant_name.u_name + " "
         end
       end
       @participants[i].name = names
@@ -81,34 +84,24 @@ class SignedUpTeam < ActiveRecord::Base
       end
     end
 
-    #2015-5-27 [zhewei]:
-    #We just remove the topic_id field from the participants table.
-    def self.team_id(assignment_id, user_id)
-      #team_id variable represents the team_id for this user in this assignment
-      team_id = nil
-      teams_users = TeamsUser.where(user_id: user_id)
-      teams_users.each do |teams_user|
-        team = Team.find(teams_user.team_id)
-        if team.parent_id == assignment_id
-          team_id = teams_user.team_id
-          break
-        end
-      end
-      return team_id
-    end
     #This method is used to returns topic_id from [signed_up_teams] table and the inputs are assignment_id and user_id.
     def self.topic_id(assignment_id, user_id)
       #team_id variable represents the team_id for this user in this assignment
-      team_id = SignedUpTeam.team_id(assignment_id, user_id)
+      team_id = TeamsUser.team_id(assignment_id, user_id)
       if team_id
-        if !SignedUpTeam.where(team_id: team_id).empty?
-          topic_id = SignedUpTeam.where(team_id: team_id).first.topic_id
-        end
+        topic_id_by_team_id(team_id)
       else
-        topic_id = nil
+         nil
       end
-      return topic_id
     end
 
+  def self.topic_id_by_team_id(team_id)
+    signed_up_teams = SignedUpTeam.where(team_id:team_id ,is_waitlisted:0)
+    if signed_up_teams.blank?
+      nil
+    else
+      signed_up_teams.first.topic_id
+    end
+  end
     
   end

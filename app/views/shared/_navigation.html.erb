@@ -18,12 +18,31 @@
       </ul>
 
       <ul class="nav navbar-nav navbar-right">
-        <% if session[:user] %>
-        <li class="divider-vertical"></li>
-        <li class="right-most">
-          <%= link_to "Logout", {controller: "auth", action: "logout"}, method: :post %>
-        </li>
+        <% if current_user %>
+          <li class="impersonate-box">
+            <span id="impersonate-user-info">User: <%= current_user.name %></span>
+          <% if session[:super_user] %>
+              <%= form_for :impersonate, url: '/impersonate/impersonate', html: {id: 'impersonate-form'} do |f| %>
+                <div class="input-group">
+                <%= f.text_field :name, {id: 'inputImpersonateBox', class: 'form-control', placeholder: "impersonate..."} %>
+                <span class="input-group-btn">
+                <button type="button" class="btn btn-primary" id="impersonate-button">Revert</button>
+                </span>
+                </div>
+              <% end %>
+          <% end %>
+          </li>
+            <li class="divider-vertical"></li>
+            <li class="right-most">
+              <%= link_to "Logout", {controller: "auth", action: "logout"}, method: :post %>
+            </li>
         <% end %>
       </ul>
     </div>
   </div>
+
+<script type="text/javascript">
+  jQuery("#impersonate-button").click(function(event) {
+    jQuery("#impersonate-form").submit()
+  });
+</script>

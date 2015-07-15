@@ -396,7 +396,6 @@ class ResponseController < ApplicationController
 
   private
   def get_content
-    logger.warn "@map: #{@map.inspect}"
     @title = @map.get_title
     @assignment = @map.assignment
     @participant = @map.reviewer

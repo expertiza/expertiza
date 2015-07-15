@@ -1,7 +1,7 @@
 <%= render :partial => 'submitted_content/title' %>    
 <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
 <%@stage = @assignment.get_current_stage(topic_id)%>
-<%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage => @stage} %>
+<%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage => @stage, :can_submit =>@can_submit} %>
 <!-- E726 Changes Begin -->
 <%= render :partial => 'submitted_content/selfreview'%>
 <!-- E726 Changes End -->

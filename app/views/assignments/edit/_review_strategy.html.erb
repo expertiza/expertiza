@@ -2,7 +2,7 @@
   <tr id='assignment_review_assignment_strategy_row'>
     <td>
       <%= label_tag('assignment_form[assignment][review_assignment_strategy]', 'Review Strategy:') %>
-      <%= select('assignment_form[assignment]', 'review_assignment_strategy', review_strategy_options, {:include_blank => '----', :selected => @assignment_form.assignment.review_assignment_strategy}) %>
+      <%= select('assignment_form[assignment]', 'review_assignment_strategy', review_strategy_options, {:selected => @assignment_form.assignment.review_assignment_strategy}) %>
       <script>
         jQuery(document).ready(function() {reviewStrategyChanged();});
           jQuery('#assignment_form_assignment_review_assignment_strategy').on('change', function() {reviewStrategyChanged();});
@@ -16,7 +16,7 @@
   <tr id="assignment_review_topic_threshold_row">
     <td>
       <%= label_tag('assignment_form[assignment][review_topic_threshold]', 'Review topic threshold(k):') %>
-      <%= text_field_tag('assignment_form[assignment][review_topic_threshold]', @assignment_form.assignment.review_topic_threshold) %>
+      <%= text_field_tag('assignment_form[assignment][review_topic_threshold]', @assignment_form.assignment.review_topic_threshold, size: 1) %>
       <img src="/assets/info.png" title='A topic is reviewable if the minimum number of reviews already done for the submissions
       on that topic is within k of the minimum number of reviews done on the least-reviewed submission on any topic.'>
     </td>
@@ -28,31 +28,4 @@
       <%= text_field_tag('assignment_form[assignment][max_reviews_per_submission]', @assignment_form.assignment.max_reviews_per_submission, {:style => 'width:75px'}) %>
     </td>
   </tr>
-
-  <tr>
-    <td>Offset: </td>
-    <td><%= text_field :assigned, :thresh, :size=>10, :value=>20 %></td>
-  </tr>
-  <tr>
-    <td>Redistribution Factor: </td>
-    <td><%= text_field :assigned, :rfactor, :size=>10, :value=>0.5 %></td>
-  </tr>
-  <tr>
-    <td>Maximum Deductable Points:  </td>
-    <td> <%= text_field :assigned, :mpd, :size=>10, :value=>10 %></td>
-  </tr>
-  <tr>
-    <td>use class average score as hardline?</td>
-    <td><%= check_box :assigned, :ifclass, {}, true, false %></td>
-  </tr>
-  <tr>
-    <td>Hardline: </td>
-    <td><%= text_field :assigned, :hardline, :size=>10, :value=>85 %></td>
-  </tr>
-
-
-
-
-
-
 </table>

@@ -50,8 +50,6 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  get '/assignments/:id/review_strategy_advanced_options', controller: :assignments, action: :review_strategy_advanced_options
-
   resources :auth do
     collection do
       post :login
@@ -156,7 +154,15 @@ Expertiza::Application.routes.draw do
 
   get '/import_file/import', controller: :import_file, action: :import
 
-  resources :institutions
+  resources :institution do
+    collection do
+      get :list
+      get :show
+      get :new
+      post :create
+      post ':id', action: :update
+    end
+  end
 
   resources :invitation do
     collection do
@@ -209,6 +215,7 @@ Expertiza::Application.routes.draw do
       get :bequeath_all
       post :update_authorizations
       post :update_duties
+      post :change_handle
     end
   end
 
@@ -259,6 +266,7 @@ Expertiza::Application.routes.draw do
       post :toggle_access
       get :view
       post :create_quiz_questionnaire
+      post :update_quiz
     end
   end
 
@@ -280,6 +288,7 @@ Expertiza::Application.routes.draw do
       get :remove_hyperlink
       get :saving
       get :redirection
+      post :custom_create
     end
   end
 
@@ -297,7 +306,6 @@ Expertiza::Application.routes.draw do
       get :auto_complete_for_user_name
       get :delete_all_metareviewers
       get :delete_all_reviewers
-      get :delete_all_reviewers_and_metareviewers
       get :delete_metareviewer
       get :delete_reviewer
       get :distribution
@@ -309,6 +317,8 @@ Expertiza::Application.routes.draw do
       get :show_available_submissions
       post :assign_quiz_dynamically
       post :assign_metareviewer_dynamically
+      post :automatic_review_mapping
+      post :automatic_review_mapping_staggered
     end
   end
 
@@ -422,6 +432,7 @@ Expertiza::Application.routes.draw do
   resources :suggestion do
     collection do
       get :list
+      post :submit
     end
   end
 

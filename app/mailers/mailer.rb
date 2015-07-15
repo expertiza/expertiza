@@ -24,7 +24,6 @@ class Mailer < ActionMailer::Base
   end
 
   def sync_message(defn)
-
     @body = defn[:body]
     @type = defn[:body][:type]
     @obj_name = defn[:body][:obj_name]
@@ -48,4 +47,17 @@ class Mailer < ActionMailer::Base
     CUSTOM_LOGGER.info("#{ret.encoded}")
   end
 
+  def suggested_topic_approved_message(defn)
+    @body = defn[:body]
+    @topic_name = defn[:body][:approved_topic_name]
+    @proposer = defn[:body][:proposer]
+
+    if Rails.env.development? || Rails.env.test?
+      defn[:to] = 'expertiza.development@gmail.com'
+    end
+    mail(subject: defn[:subject],
+         to: defn[:to],
+         bcc: defn[:cc])
+
+  end
 end

@@ -11,7 +11,23 @@
 //round_no = 0 is used for other deadlines
         var previous_element;
         if (round_no == 0) {
-            previous_element = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').last();
+            if (deadline_type == 'team_formation') {
+                if (jQuery('#signup').length != 0) {
+                    previous_element = jQuery("#signup");
+                } else {
+                    previous_element = jQuery('#due_date_heading')
+                }
+            } else if (deadline_type == 'drop_topic') {
+                if (jQuery('#team_formation').length != 0) {
+                    previous_element = jQuery("#team_formation");
+                } else {
+                    previous_element = jQuery('#signup');
+                }
+            } else if (deadline_type == 'signup') {
+                previous_element = jQuery('#due_date_heading')
+            } else {
+                previous_element = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').last();
+            }
             element_id = deadline_type;
             if (jQuery('#' + element_id).length != 0) {
                 return
@@ -82,42 +98,42 @@
         due_at + '">' + '</td>';
         
         html += '<td align="center" class="due_date_due_at" width="10%">';
-        if(deadline_type == 'team_formation'){
-            html += '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]" disabled>'
-        }
-        else{
-            html += '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]">'
-        }
+        // if(deadline_type == 'team_formation'){
+        //     html += '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]" disabled>'
+        // }
+        // else{
+        html += '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]">'
+        // }
         html +=
-        '<option value="">---</option>' +
+        '<option value="">No</option>' +
         '<option value="1">No</option>' +
         '<option value="2">Late</option>' +
         '<option value="3">Yes</option>' +
         '</select></td>';
 
         html += '<td align="center" class="due_date_review_allowed_id" width="10%">';
-        if(deadline_type == 'team_formation'){
-            html += '<select id="due_date_review_allowed_id" name="assignment_form[due_date][][review_allowed_id]" disabled>'
-        }
-        else{
+        // if(deadline_type == 'team_formation'){
+        //     html += '<select id="due_date_review_allowed_id" name="assignment_form[due_date][][review_allowed_id]" disabled>'
+        // }
+        // else{
             html += '<select id="due_date_review_allowed_id" name="assignment_form[due_date][][review_allowed_id]">'
-        }
+        // }
          html +=
-        '<option value="">---</option>' +
+        '<option value="">No</option>' +
         '<option value="1">No</option>' +
         '<option value="2">Late</option>' +
         '<option value="3">Yes</option>' +
         '</select></td>';
 
         html += '<td align="center" class="due_date_review_of_review_allowed_id" width="10%">';
-        if(deadline_type == 'team_formation'){
-            html += '<select id="due_date_review_of_review_allowed_id" name="assignment_form[due_date][][review_of_review_allowed_id]" disabled>'
-        }
-        else{
+        // if(deadline_type == 'team_formation'){
+        //     html += '<select id="due_date_review_of_review_allowed_id" name="assignment_form[due_date][][review_of_review_allowed_id]" disabled>'
+        // }
+        // else{
             html += '<select id="due_date_review_of_review_allowed_id" name="assignment_form[due_date][][review_of_review_allowed_id]">'
-        }
+        // }
         html +=
-        '<option value="">---</option>' +
+        '<option value="">No</option>' +
         '<option value="1">No</option>' +
         '<option value="2">Late</option>' +
         '<option value="3">Yes</option>' +
@@ -127,7 +143,7 @@
         {
             html += '<td align="center" class="due_date_quiz_allowed_id" width="10%">' +
             '<select id="due_date_quiz_allowed_id" name="assignment_form[due_date][][quiz_allowed_id]">' +
-            '<option value="">---</option>' +
+            '<option value="">No</option>' +
             '<option value="1">No</option>' +
             '<option value="2">Late</option>' +
             '<option value="3">Yes</option>' +
@@ -139,7 +155,8 @@
 
         html += '<td align="center" class="due_date_threshold" width="10%">' +
         '<select id="due_date_threshold" name="assignment_form[due_date][][threshold]">' +
-        '<option value="">---</option>' +
+        '<option value="">No</option>' +
+        '<option value="1">No</option>' +
         '<option value="8">8</option>' +
         '<option value="16">16</option>' +
         '<option value="24">24</option>' +
@@ -157,7 +174,7 @@
 
         html += '<td  align="center" id="specialname" class="due_date_name" width="10%">';
         html += '<input id="due_date_name" type="text" name="assignment_form[due_date][][deadline_name]" value="'+due_date.deadline_name+'">'+'</td>';
-        html += '<td  align="center" id="due_date_url_col" class="due_date_description_url" width="10%">';
+        html += '<td align="center" id="due_date_url_col" class="due_date_description_url" width="10%">';
         html += '<input id="due_date_description_url" type="text" name="assignment_form[due_date][][description_url]" value="'+due_date.description_url+'">'+'</td>';
         if (addnameurl==false){
             previous_element.after(html2);
@@ -303,6 +320,33 @@
             <%@metareview_allowed_checkbox=true%>
 
         }
+        function removeOrAddSignup(){
+            if(document.getElementById("signup"))
+                removeDueDateTableElement('signup', 0);
+             else
+                addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>, 'signup', 0, <%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
+
+            <%@signup_allowed_checkbox=true%>
+
+        }
+        function removeOrAddDropTopic(){
+            if(document.getElementById("drop_topic"))
+                removeDueDateTableElement('drop_topic', 0);
+             else
+                addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>, 'drop_topic', 0, <%= due_date(@assignment_form.assignment, 'drop_topic').to_json.html_safe %>);
+
+            <%@drop_topic_allowed_checkbox=true%>
+
+        }
+        function removeOrAddTeamFormation(){
+            if(document.getElementById("team_formation"))
+                removeDueDateTableElement('team_formation', 0);
+             else
+                addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>, 'team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
+
+            <%@team_formation_allowed_checkbox=true%>
+
+        }
 </script>
 
 <div style="font-size:large;">
@@ -315,14 +359,31 @@
   <button type="button" id="set_rounds">Set</button>
 </div>
 
-<!--Add a change name or url checkbox. By: Xiaoqiang Shao-->
-<input name="changenameurl" type="hidden" value="false" />
-<%= check_box_tag('changenameurl', 'true', @due_date_nameurl_notempty_checkbox,:onclick=>"handleChangenameurl(this.checked,due_date_name_column,due_date_url_column)" ) %>
-<%= label_tag('changenameurl', 'Name and description URL vary by round') %>
-<br>
+<% if @assignment_form.assignment.rounds_of_reviews > 1 %>
+    <!--Add a change name or url checkbox. By: Xiaoqiang Shao-->
+    <input name="changenameurl" type="hidden" value="false" />
+    <%= check_box_tag('changenameurl', 'true', @due_date_nameurl_notempty_checkbox,:onclick=>"handleChangenameurl(this.checked,due_date_name_column,due_date_url_column)" ) %>
+    <%= label_tag('changenameurl', 'Name and description URL vary by round') %>
+    <br>
+<% end %>
+
+<% if @assignment_form.assignment.has_topics? %>
+    <input name="signupAllowed" type="hidden" value="false" />
+    <%= check_box_tag('signupAllowed', 'true', @signup_allowed,:onclick=>"removeOrAddSignup()" ) %>
+    <%= label_tag('signupAllowed', 'Use signup deadline') %><br/>
+
+    <input name="dropTopicAllowed" type="hidden" value="false" />
+    <%= check_box_tag('dropTopicAllowed', 'true', @drop_topic_allowed,:onclick=>"removeOrAddDropTopic()" ) %>
+    <%= label_tag('dropTopicAllowed', 'Use drop topic deadline') %><br/>
+<% end %>
+
+<input name="teamFormationAllowed" type="hidden" value="false" />
+<%= check_box_tag('teamFormationAllowed', 'true', @team_formation_allowed,:onclick=>"removeOrAddTeamFormation()" ) %>
+<%= label_tag('teamFormationAllowed', 'Use team formation deadline') %><br/>
+
 <input name="metareivewAllowed" type="hidden" value="false" />
 <%= check_box_tag('metareviewAllowed', 'true', @metareview_allowed,:onclick=>"removeOrAddMetareview()" ) %>
-<%= label_tag('metareivewAllowed', 'metareview allowed?') %>
+<%= label_tag('metareivewAllowed', 'Use metareview deadline') %><br/>
 
 <table class='exp' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden;'>
 
@@ -344,7 +405,17 @@
   <tr id='blank' style='display:hidden'></tr>
   <script>
     jQuery(document).ready(function () {
+        <% if @assignment_form.assignment.max_team_size > 1 && due_date(@assignment_form.assignment, 'team_formation').due_at %>
         addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
+        <% end %>
+        <% if @assignment_form.assignment.has_topics? %>
+            <% if due_date(@assignment_form.assignment, 'signup').due_at %>
+                addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'signup', 0,<%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
+            <% end %>
+            <% if due_date(@assignment_form.assignment, 'drop_topic').due_at %>
+                addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'drop_topic', 0,<%= due_date(@assignment_form.assignment, 'drop_topic').to_json.html_safe %>);
+            <% end %>
+        <% end %>
         <% 1.upto @assignment_form.assignment.rounds_of_reviews do |i| %>
         addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'submission', <%=i%>, <%= due_date(@assignment_form.assignment, 'submission', i-1).to_json.html_safe %>); // or use questionnaire_options(@assignment, nil).to_json
         addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'review', <%=i%>, <%= due_date(@assignment_form.assignment, 'review', i-1).to_json.html_safe %>) ;

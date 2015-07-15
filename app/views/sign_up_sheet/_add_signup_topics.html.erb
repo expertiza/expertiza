@@ -66,4 +66,13 @@ function toggleTeamsAndMembers() {
     }
   }
 }
+
+function toggleSingleTeamAndMember(i) {
+    var elem = document.getElementById(i.toString() + "_myDiv");
+    if (elem.style.display == 'none') {
+      elem.style.display = '';
+    } else {
+      elem.style.display = 'none';
+    }
+  }
 </script>

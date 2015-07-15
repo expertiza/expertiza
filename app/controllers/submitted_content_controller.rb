@@ -2,41 +2,66 @@ class SubmittedContentController < ApplicationController
   helper :wiki
 
   def action_allowed?
-    current_role_name.eql?("Student") and ((%w(edit).include? action_name) ? are_needed_authorizations_present? : true)
+    ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator',
+       'Student'].include? current_role_name and ((%w(edit).include? action_name) ? are_needed_authorizations_present? : true) and one_team_can_submit_work?
   end
 
+  #The view have already tested that @assignment.submission_allowed(topic_id) is true,
+  # so @can_submit should be true
   def edit
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
 
     @assignment = @participant.assignment
 
-    #ACS We have to check if the number of members on the team is more than 1(group assignment)
+    #ACS We have to check if this participant has team or not
     #hence use team count for the check
-    if  @participant.team.nil?
-      flash[:error] = "This is a team assignment. Before submitting your work, you must <a style='color: blue;' href='../../student_teams/view/?student_id=#{params[:id]}'>create a team</a>, even if you will be the only member of the team"
-      redirect_to :controller => 'student_task', :action => 'view', :id => params[:id]
+    if @participant.team.nil?
+      #flash[:error] = "This is a team assignment. Before submitting your work, you must <a style='color: blue;' href='../../student_teams/view/?student_id=#{params[:id]}'>create a team</a>, even if you will be the only member of the team"
+      #redirect_to :controller => 'student_task', :action => 'view', :id => params[:id]
+      SignUpSheet.signup_team(@assignment.id, @participant.user_id, nil)
+    end
+
+    #@can_submit is the flag indicating if the user can submit or not in current stage
+    @can_submit=true
+
+    @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
   end
-end
 
-def view
-  @participant = AssignmentParticipant.find(params[:id])
-  return unless current_user_id?(@participant.user_id)
+  #view is called when @assignment.submission_allowed(topic_id) is false
+  #so @can_submit should be false
+  def view
+    @participant = AssignmentParticipant.find(params[:id])
+    return unless current_user_id?(@participant.user_id)
 
-  @assignment = @participant.assignment
-end
+    @assignment = @participant.assignment
+
+    #@can_submit is the flag indicating if the user can submit or not in current stage
+    @can_submit=false
+
+    @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
+
+  end
 
 def submit_hyperlink
   @participant = AssignmentParticipant.find(params[:id])
   return unless current_user_id?(@participant.user_id)
 
-  begin
-    @participant.submit_hyperlink(params['submission'])
-    @participant.update_resubmit_times
-  rescue
-    flash[:error] = "The URL or URI is not valid. Reason: #{$!}"
+  team_hyperlinks = @participant.hyperlinks
+  if team_hyperlinks.include?(params['submission'])
+    flash[:error] = "You or your teammate(s) have already submitted the same hyperlink."
+  else
+    begin
+      @participant.submit_hyperlink(params['submission'])
+      @participant.update_resubmit_times
+    rescue
+      flash[:error] = "The URL or URI is not valid. Reason: #{$!}"
+    end
+    undo_link("Link has been submitted successfully. ")
   end
-  undo_link("Link has been submitted successfully. ")
   redirect_to :action => 'edit', :id => @participant.id
 end
 
@@ -45,10 +70,34 @@ def remove_hyperlink
   @participant = AssignmentParticipant.find(params[:hyperlinks][:participant_id])
 
   return unless current_user_id?(@participant.user_id)
+  hyperlink_to_delete = @participant.hyperlinks[params['chk_links'].to_i]
 
-  @participant.remove_hyperlink(params['chk_links'].to_i)
+  team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
+  team_participants = Array.new
+  if Team.exists?(team_id)
+    team_users = TeamsUser.where(team_id: team_id)
+    team_users.each do |team_user|
+      team_participants << AssignmentParticipant.where(parent_id: @participant.parent_id, user_id: team_user.user_id).first
+    end
+  else
+    team_participants << @participant
+  end
+
+  team_participants.each do |team_participant|
+    team_participant.remove_hyperlink(hyperlink_to_delete)
+  end
+
   undo_link("Link has been removed successfully. ")
-  redirect_to :action => 'edit', :id => @participant.id
+
+  #determine if the user should be redirected to "edit" or  "view" based on the current deadline right
+  topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
+  assignment = Assignment.find(@participant.parent_id)
+
+  if assignment.submission_allowed(topic_id)
+    redirect_to :action => 'edit', :id => @participant.id
+  else
+    redirect_to :action => 'view', :id => @participant.id
+  end
 end
 
 def submit_file
@@ -253,6 +302,22 @@ end
       return false
     else
       return true
+    end
+  end
+
+  #if one team do not hold a topic (still in waitlist), they cannot submit their work.
+  def one_team_can_submit_work?
+    if params[:id].nil?
+      @participant = AssignmentParticipant.find(params[:hyperlinks][:participant_id])
+    else
+      @participant = AssignmentParticipant.find(params[:id])
+    end
+    @topics = SignUpTopic.where(assignment_id: @participant.parent_id)
+    #check one assignment has topics or not
+    if (@topics.size > 0 and !SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id).nil?) or @topics.size == 0
+      return true
+    else
+      return false
     end
   end
 end

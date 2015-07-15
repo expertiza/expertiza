@@ -3,10 +3,18 @@ class AssignmentsController < ApplicationController
   before_filter :authorize
 
   def action_allowed?
-    ['Super-Administrator',
-     'Administrator',
-     'Instructor',
-     'Teaching Assistant'].include? current_role_name
+    if params[:action] == 'edit' or params[:action] == 'update'
+      assignment = Assignment.find(params[:id])
+      return true if ['Super-Administrator', 'Administrator'].include? current_role_name
+      return true if assignment.instructor_id == session[:user].id
+      return true if TaMapping.exists?(ta_id: session[:user].id, course_id: assignment.course_id) and TaMapping.where(course_id: assignment.course_id).include?TaMapping.where(ta_id: session[:user].id, course_id: assignment.course_id).first
+      return false
+    else
+      ['Super-Administrator',
+       'Administrator',
+       'Instructor',
+       'Teaching Assistant'].include? current_role_name
+    end
   end
 
   # change access permission from public to private or vice versa
@@ -63,6 +71,12 @@ class AssignmentsController < ApplicationController
     @due_date_nameurl_notempty_checkbox = false
     @metareview_allowed=false
     @metareview_allowed_checkbox=false
+    @signup_allowed=false
+    @signup_allowed_checkbox=false
+    @drop_topic_allowed=false
+    @drop_topic_allowed_checkbox=false
+    @team_formation_allowed=false
+    @team_formation_allowed_checkbox=false
 
     #only when instructor does not assign rubrics and in assignment edit page will show this error message.
     if !set_rubrics? and request.original_fullpath == "/assignments/#{@assignment_form.assignment.id}/edit"
@@ -81,6 +95,24 @@ class AssignmentsController < ApplicationController
         @metareview_allowed = true
       end
       if @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox && @metareview_allowed
+        break
+      end
+      if dd.deadline_type_id==6
+        @drop_topic_allowed = true
+      end
+      if @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox && @drop_topic_allowed
+        break
+      end
+      if dd.deadline_type_id==7
+        @signup_allowed = true
+      end
+      if @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox && @signup_allowed
+        break
+      end
+      if dd.deadline_type_id==8
+        @team_formation_allowed = true
+      end
+      if @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox && @team_formation_allowed
         break
       end
     end

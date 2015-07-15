@@ -1,6 +1,10 @@
 class StudentReviewController < ApplicationController
   def action_allowed?
-    current_role_name.eql?("Student") and ((%w(list).include? action_name) ? are_needed_authorizations_present? : true)
+    ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator',
+       'Student'].include? current_role_name and ((%w(list).include? action_name) ? are_needed_authorizations_present? : true)
   end
 
 
@@ -13,7 +17,7 @@ class StudentReviewController < ApplicationController
     @review_phase = @assignment.get_current_stage(@topic_id)
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    @review_mappings = TeamReviewResponseMap.where(reviewer_id: @participant.id)
+    @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
     @metareview_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
     # Calculate the number of reviews that the user has completed so far.
     @num_reviews_total       = @review_mappings.size

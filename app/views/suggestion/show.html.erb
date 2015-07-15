@@ -1,5 +1,6 @@
-<h3>Suggestion</h3>
+<h2>Suggestion</h2>
 
+<!--displaying suggestion information-->
 <table border=0 cellspacing=10>
 <colgroup>
 <col width=25%>
@@ -51,7 +52,8 @@
 </p>
 
 <br><br>
-<h3>Comments</h3>
+<!--displaying comments-->
+<h2>Comments</h2>
 <%if @suggestion.suggestion_comments.size > 0 %>
   <table class="general" cellpadding=5 border="1">
     <colgroup>
@@ -85,6 +87,7 @@
   </table>
 <%end%>
 <br>
+<!--Add new comment and vote-->
 <% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' %>
   <b>Add new comment and vote</b> <br>
   <%= form_tag :action => 'submit', :id => @suggestion do %>

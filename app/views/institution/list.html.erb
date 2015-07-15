@@ -14,11 +14,11 @@
       <% end %>
       <td><%= link_to 'Show', :action => 'show', :id => institution %></td>
       <td><%= link_to 'Edit', :action => 'edit', :id => institution %></td>
-      <td><%= link_to 'Delete', { :action => 'destroy', :id => institution }, :confirm => 'Are you sure?', :method => :post %></td>
+      <td><%= link_to 'Delete', :action => 'delete', :id => institution.id  %></td>
     </tr>
   <% end %>
 </table>
 
 <br />
 
-<%= link_to 'New institution', :action => 'new' %>
+<%= link_to 'New institution', new_institution_path %>

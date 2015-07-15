@@ -250,15 +250,9 @@ redirect_to :controller => 'submitted_content', :action => 'edit', :id => params
       @questionnaire.max_question_score = 1
       @questionnaire.section = "Quiz"
       @assignment = Assignment.find(params[:aid])
-      teams = TeamsUser.where(user_id: session[:user].id)
-      for t in teams do
-        if team = Team.find(t.team_id)
-            if team.parent_id==@assignment.id
-              break
-            end
-        end
-      end
-      @questionnaire.instructor_id = team.id    #for a team assignment, set the instructor id to the team_id
+      author_team = AssignmentTeam.team(Participant.find(participant_id))
+
+      @questionnaire.instructor_id = author_team.id    #for a team assignment, set the instructor id to the team_id
 
       @successful_create = true
       save

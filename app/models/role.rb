@@ -24,6 +24,14 @@ class Role < ActiveRecord::Base
     name['Student']
   end
 
+  def instructor?
+    name['Instructor']
+  end
+
+  def ta?
+    name['Teaching Assistant']
+  end
+
   def admin?
     name['Administrator'] || super_admin?
   end

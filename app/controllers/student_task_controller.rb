@@ -9,6 +9,7 @@ class StudentTaskController < ApplicationController
   def list
     redirect_to(:controller => 'eula', :action => 'display') if current_user.is_new_user
     @student_tasks = StudentTask.from_user current_user
+    @student_tasks.reject!{|t| !t.assignment.availability_flag}
 
     ########Tasks and Notifications##################
     @tasknotstarted = @student_tasks.select(&:not_started?)

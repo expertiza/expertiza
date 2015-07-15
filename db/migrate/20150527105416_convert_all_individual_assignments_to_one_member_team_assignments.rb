@@ -21,7 +21,7 @@ class ConvertAllIndividualAssignmentsToOneMemberTeamAssignments < ActiveRecord::
 #  		assignment = Assignment.find(assignment_id)
 #  		participants = AssignmentParticipant.where(parent_id: assignment_id)
 #  		participants.each do |participant|
-#  			team_id = SignedUpTeam.team_id(assignment_id, participant.user_id)
+#  			team_id = TeamsUser.team_id(assignment_id, participant.user_id)
 #  			if team_id.nil?
 #  				#create team
 #	        	new_team = AssignmentTeam.create(name: assignment.name + "_" + participant.id.to_s, parent_id: assignment_id)

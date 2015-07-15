@@ -72,7 +72,7 @@ def remove_hyperlink
   return unless current_user_id?(@participant.user_id)
   hyperlink_to_delete = @participant.hyperlinks[params['chk_links'].to_i]
 
-  team_id = SignedUpTeam.team_id(@participant.parent_id, @participant.user_id)
+  team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
   team_participants = Array.new
   if Team.exists?(team_id)
     team_users = TeamsUser.where(team_id: team_id)
@@ -88,7 +88,7 @@ def remove_hyperlink
   end
 
   undo_link("Link has been removed successfully. ")
-  
+
   #determine if the user should be redirected to "edit" or  "view" based on the current deadline right
   topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
   assignment = Assignment.find(@participant.parent_id)

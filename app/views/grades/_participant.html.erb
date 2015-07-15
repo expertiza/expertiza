@@ -87,7 +87,7 @@ participant = pscore[:participant]
                 <% @course_participant = CourseParticipant.all.select {|c| c.user_id == session[:user].id}.first %>
                     <% avg_score = sprintf("%.2f",@rscore_teammate.my_avg) %>
                     <%if @course_participant && @assignment%>
-                        <%= link_to  avg_score, :controller => 'assessment360', :action => 'one_student_all_reviews', :student_id => @course_participant.id, :course_id => @assignment.course_id %>
+                        <%= link_to avg_score, :controller => 'assessment360', :action => 'one_student_all_reviews', :student_id => @course_participant.id, :course_id => @assignment.course_id %>
                     <%end%>
                     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_teammate_reviewsLink" name="<%=prefix%>_teammate_reviewsLink" onClick="toggleElement('<%=prefix%>_teammate_reviews','teammate reviews');return false;">show teammate reviews</a> (<%= pscore[:teammate][:assessments].size %>)</FONT>
                 </TD>
@@ -116,7 +116,8 @@ participant = pscore[:participant]
     else
         score_postfix = "%"
     end %>
-    <% stage = @stage %>
+    <% topic_id = SignedUpTeam.topic_id(@assignment.id, participant.user_id) %>
+    <% stage = @assignment.get_current_stage(topic_id) %>
     <% if controller.action_name == 'view' or controller.action_name == "view_my_scores" %>
     <TD ALIGN="CENTER">
     <% if stage == "Finished" %>

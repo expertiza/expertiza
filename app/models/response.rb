@@ -47,7 +47,7 @@ class Response < ActiveRecord::Base
     # Test for whether custom rubric needs to be used
     if ((self.map.questionnaire.section.eql? "Custom") && (self.map.type.to_s != 'FeedbackResponseMap'))
       #return top of view
-      return code
+      return code.html_safe
     end
     # End of custom code
     count = 0

@@ -84,7 +84,7 @@ class ReviewResponseMap < ResponseMap
         if reviewee == nil
           raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"
         end
-        team_id = SignedUpTeam.team_id(reviewee.parent_id, reviewee.user_id)
+        team_id = TeamsUser.team_id(reviewee.parent_id, reviewee.user_id)
         existing = ReviewResponseMap.where(reviewee_id: team_id, reviewer_id:  reviewer.id).first
         if existing.nil?
           ReviewResponseMap.create(:reviewee_id => team_id, :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id)

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150702170648) do
+ActiveRecord::Schema.define(version: 20150714162923) do
 
   create_table "assignment_questionnaires", force: :cascade do |t|
     t.integer "assignment_id",        limit: 4
@@ -43,7 +43,6 @@ ActiveRecord::Schema.define(version: 20150702170648) do
     t.integer  "teammate_review_questionnaire_id",  limit: 4
     t.boolean  "reviews_visible_to_all",            limit: 1
     t.integer  "wiki_type_id",                      limit: 4,     default: 0,     null: false
-    t.boolean  "require_signup",                    limit: 1
     t.integer  "num_reviewers",                     limit: 4,     default: 0,     null: false
     t.text     "spec_location",                     limit: 65535
     t.integer  "author_feedback_questionnaire_id",  limit: 4
@@ -54,7 +53,6 @@ ActiveRecord::Schema.define(version: 20150702170648) do
     t.string   "review_assignment_strategy",        limit: 255
     t.integer  "max_reviews_per_submission",        limit: 4
     t.integer  "review_topic_threshold",            limit: 4,     default: 0
-    t.boolean  "availability_flag",                 limit: 1
     t.boolean  "copy_flag",                         limit: 1,     default: false
     t.integer  "rounds_of_reviews",                 limit: 4,     default: 1
     t.boolean  "microtask",                         limit: 1,     default: false
@@ -70,6 +68,7 @@ ActiveRecord::Schema.define(version: 20150702170648) do
     t.boolean  "is_penalty_calculated",             limit: 1,     default: false, null: false
     t.integer  "max_bids",                          limit: 4
     t.boolean  "show_teammate_reviews",             limit: 1
+    t.integer  "availability_flag",                 limit: 4,     default: 1
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -201,13 +200,14 @@ ActiveRecord::Schema.define(version: 20150702170648) do
   add_index "controller_actions", ["site_controller_id"], name: "fk_controller_action_site_controller_id", using: :btree
 
   create_table "courses", force: :cascade do |t|
-    t.string   "name",           limit: 255
-    t.integer  "instructor_id",  limit: 4
-    t.string   "directory_path", limit: 255
-    t.text     "info",           limit: 65535
+    t.string   "name",            limit: 255
+    t.integer  "instructor_id",   limit: 4
+    t.string   "directory_path",  limit: 255
+    t.text     "info",            limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "private",        limit: 1,     default: false, null: false
+    t.boolean  "private",         limit: 1,     default: false, null: false
+    t.integer  "institutions_id", limit: 4
   end
 
   add_index "courses", ["instructor_id"], name: "fk_course_users", using: :btree

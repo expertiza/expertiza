@@ -75,6 +75,8 @@ class QuestionsController < ApplicationController
     redirect_to :action => 'list'
   end
 
+  #This method is only for quiz questionnaires, it is called when instructors click "view quiz questions" on the pop-up panel.
+  #We should move it to quiz_questionnaire_controller.
   def review_questions
     @assignment_id = params[:id]
     @questions = Array.new

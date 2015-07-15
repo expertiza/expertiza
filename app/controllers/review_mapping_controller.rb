@@ -289,34 +289,18 @@ class ReviewMappingController < ApplicationController
     end
   end
 
-
-  def delete_all_reviewers_and_metareviewers
-    assignment = Assignment.find(params[:id])
-
-    failedCount = ResponseMap.delete_mappings(assignment.review_mappings,params[:force])
-    if failedCount > 0
-      url_yes = url_for :action => 'delete_all_reviewers_and_metareviewers', :id => params[:id], :force => 1
-      url_no  = url_for :action => 'delete_all_reviewers_and_metareviewers', :id => params[:id]
-      flash[:error] = "A delete action failed:<br/>#{failedCount} reviews exist for these mappings. Delete these mappings anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
-    else
-      flash[:note] = "All review mappings for this assignment have been deleted."
-    end
-    redirect_to :action => 'list_mappings', :id => params[:id]
-  end
-
   def delete_all_reviewers
     assignment = Assignment.find(params[:id])
-    contributor = assignment.get_contributor(params[:contributor_id])
-    mappings = contributor.review_mappings
-
-    failedCount = ResponseMap.delete_mappings(mappings, params[:force])
-    if failedCount > 0
-      url_yes = url_for :action => 'delete_all_reviewers', :id => assignment.id, :contributor_id => contributor.id, :force => 1
-      url_no  = url_for :action => 'delete_all_reviewers', :id => assignment.id, :contributor_id => contributor.id
-      flash[:error] = "A delete action failed:<br/>#{failedCount} reviews and/or metareviews exist for these mappings. Delete these mappings anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
-    else
-      flash[:note] = "All review mappings for \""+contributor.name+"\" have been deleted."
+    team = assignment.get_contributor(params[:contributor_id])
+    review_response_maps = team.review_mappings
+    delete_success = false
+    review_response_maps.each do |review_response_map|
+      if !Response.exists?(map_id: review_response_map.id)
+        ReviewResponseMap.find(review_response_map.id).destroy
+        delete_success = true
+      end
     end
+    flash[:success] =  "All outstanding review mappings for \""+team.name+"\" have been deleted." if delete_success == true
     redirect_to :action => 'list_mappings', :id => assignment.id
   end
 
@@ -363,13 +347,13 @@ class ReviewMappingController < ApplicationController
   end
 
   def delete_reviewer
-    mapping = ResponseMap.find(params[:id])
-    assignment_id = mapping.assignment.id
-    begin
-      mapping.delete
-      flash[:note] = "The review mapping for \""+mapping.reviewee.name+"\" and \""+mapping.reviewer.name+"\" have been deleted."
-    rescue
-      flash[:error] = "A delete action failed:<br/>" + $! + "Delete this mapping anyway?&nbsp;<a href='/review_mapping/delete_review/"+mapping.map_id.to_s+"'>Yes</a>&nbsp;|&nbsp;<a href='/review_mapping/list_mappings/#{assignment_id}'>No</a>"
+    review_response_map = ReviewResponseMap.find(params[:id])
+    assignment_id = review_response_map.assignment.id
+    if !Response.exists?(map_id: review_response_map.id)
+        review_response_map.destroy
+        flash[:success] = "The review mapping for \""+review_response_map.reviewee.name+"\" and \""+review_response_map.reviewer.name+"\" have been deleted."
+    else
+      flash[:error] = "This review has already been done. It cannot been deleted."
     end
     redirect_to :action => 'list_mappings', :id => assignment_id
   end
@@ -511,90 +495,69 @@ class ReviewMappingController < ApplicationController
   def automatic_review_mapping
     assignment_id = params[:id].to_i
     participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.shuffle!
-    teams = AssignmentTeam.where(parent_id: params[:id].to_i).to_a.shuffle!
-    student_review_num = params[:student_review_num].to_i
-    submission_review_num = params[:submission_review_num].to_i
+    teams = AssignmentTeam.where(parent_id: params[:id].to_i).to_a.reject{|team| SignedUpTeam.topic_id_by_team_id(team.id).nil? }.shuffle!
+    student_review_num = params[:num_reviews_per_student].to_i
+    submission_review_num = params[:num_reviews_per_submission].to_i
     if student_review_num == 0 and submission_review_num == 0
-      flash[:error] = "Please set the value of review number."
+      flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
     elsif student_review_num != 0 and submission_review_num == 0
-      #review mapping strategy 1
-      participants_hash = {}
-      participants.each {|participant| participants_hash[participant.id] = 0 }
-      #assign reviewers for each team
-      participants_num = participants.size
-      review_num_per_team = (participants.size * student_review_num * 1.0 / teams.size).round
-      for i in 0..teams.size-1
-        temp_array = Array.new
-        if i != teams.size-1
-          while temp_array.size < review_num_per_team 
-            rand_num = rand(0..participants_num-1)
-            if participants_hash[participants[rand_num].id] < student_review_num
-              #instructor can assign one student to review his/her own artifact
-              if !TeamsUser.exists?(team_id: teams[i].id, user_id: participants[rand_num].user_id)
-                temp_array << participants[rand_num].id
-                participants_hash[participants[rand_num].id] += 1
-              else
-                next
-              end
-            else 
-              participants.delete_at(rand_num)
-              participants_num -= 1
-            end
-          end
-        else
-          #review num for last team can be different from other teams.
-          participants.each {|participant| temp_array << participant.id }
-        end
-        begin
-          temp_array.each do |index|
-            ReviewResponseMap.create(:reviewee_id => teams[i].id, :reviewer_id => index,
-                                   :reviewed_object_id => assignment_id) if !ReviewResponseMap.exists?(:reviewee_id => teams[i].id, :reviewer_id => index, :reviewed_object_id => assignment_id)
-          end
-        rescue
-          flash[:error] = "Automatical assign reviewer failed."
-        end
-      end
+      #review mapping strategy
+      automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num, submission_review_num)
     elsif student_review_num == 0 and submission_review_num != 0
-      #review mapping strategy 2
-      teams_hash = {}
-      teams.each {|team| teams_hash[team.id] = 0}
-      teams_num = teams.size
-      review_num_per_stu = (teams.size * submission_review_num * 1.0 / participants.size).round
-      for i in 0..participants.size-1
-        temp_array = Array.new
-        if i != participants.size-1
-          while temp_array.size < review_num_per_stu
-            rand_num = rand(0..teams_num-1)
-            if teams_hash[teams[rand_num].id] < submission_review_num
-              #instructor can assign one student to review his/her own artifact
-              if !TeamsUser.exists?(team_id: teams[rand_num].id, user_id: participants[i].user_id)
-                temp_array << teams[rand_num].id
-                teams_hash[teams[rand_num].id] += 1
-              else
-                next
-              end
-            else
-              teams.delete_at(rand_num)
-              teams_num -= 1
-            end
-          end
-        else
-          #review num for last participant can be different from other participants.
-          teams.each {|team| temp_array << team.id }
-        end
-        begin
-          temp_array.each do |index|
-            ReviewResponseMap.create(:reviewee_id => index, :reviewer_id => participants[i].id,
-                                   :reviewed_object_id => assignment_id) if !ReviewResponseMap.exists?(:reviewee_id => index, :reviewer_id => participants[i].id, :reviewed_object_id => assignment_id)
-          end
-        rescue
-          flash[:error] = "Automatical assign reviewer failed."
-        end
-      end
+      #review mapping strategy
+      automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num, submission_review_num)
     else
-      flash[:error] = "You can only choose one strategy once upon a time."
+      flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
     end
     redirect_to :action => 'list_mappings', :id => assignment_id
+  end
+
+  def automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num=0, submission_review_num=0)
+    participants_hash = {}
+    participants.each {|participant| participants_hash[participant.id] = 0 }
+    #assign reviewers for each team
+    num_participants = participants.size
+    if student_review_num != 0 and submission_review_num == 0
+      num_reviews_per_team = (participants.size * student_review_num * 1.0 / teams.size).round
+    elsif student_review_num == 0 and submission_review_num != 0
+      num_reviews_per_team = submission_review_num
+      student_review_num = (teams.size * submission_review_num * 1.0 / participants.size).round
+    end
+    teams.each do |team|
+      temp_array = Array.new
+      if !team.equal? teams.last
+        while temp_array.size < num_reviews_per_team 
+          rand_num = rand(0..num_participants-1)
+          if participants_hash[participants[rand_num].id] < student_review_num
+            #prohibit one student to review his/her own artifact and temp_array cannot include duplicate num
+            if !TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id) and !temp_array.include? participants[rand_num].id
+              temp_array << participants[rand_num].id
+              participants_hash[participants[rand_num].id] += 1
+            else
+              next
+            end
+          end 
+          #remove students who have already been assigned enough num of reivews out of participants array
+          participants.each do |participant|
+            if participants_hash[participant.id] == student_review_num
+              participants.delete_at(rand_num)
+              num_participants -= 1
+            end
+          end
+        end
+      else
+        #review num for last team can be different from other teams.
+        participants.each {|participant| temp_array << participant.id }
+      end
+      begin
+        temp_array.each do |index|
+          ReviewResponseMap.create(:reviewee_id => team.id, :reviewer_id => index,
+                                 :reviewed_object_id => assignment_id) if !ReviewResponseMap.exists?(:reviewee_id => team.id, :reviewer_id => index, :reviewed_object_id => assignment_id)
+        end
+      rescue
+        flash[:error] = "Automatic assignment of reviewer failed."
+      end
+    end
   end
 
   # This is for staggered deadline assignment

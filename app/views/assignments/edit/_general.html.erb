@@ -1,26 +1,13 @@
 <script>
-function requireSignUpChanged() {
-  var msg = 'Warning! Unchecking this box will remove all topics and the reservations of everyone who is sign up for them';
-
-  if (jQuery('#assignment_require_signup').is(':checked')) {
-    addDueDateTableElement(false, 'signup', 0, <%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
-    addDueDateTableElement(false, 'drop_topic', 0, <%= due_date(@assignment_form.assignment, 'drop_topic').to_json.html_safe %>)
-  } else {
-    if (confirm(msg)) {
-      removeDueDateTableElement('signup', 0);
-      removeDueDateTableElement('drop_topic', 0);
-    } else {
-      jQuery('#assignment_require_signup').prop('checked', true);
-    }
-  }
-}
 
 function teamAssignmentChanged() {
   var msg = 'Warning! Unchecking this box will hide teams that already exist.'
 
   if (jQuery('#assignment_team_assignment').is(':checked')) {
     jQuery('#assignment_team_count_field').removeAttr('hidden');
-    addDueDateTableElement('team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>)
+    if (<%= due_date(@assignment_form.assignment, 'team_formation') %>) {
+      addDueDateTableElement('team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>)
+    }
   } else {
     if (confirm(msg)) {
       jQuery('#assignment_team_count_field').attr('hidden', true);
@@ -88,15 +75,6 @@ function is_coding_assignmentChanged(){
 <th width=40%></th>
 <th width=60%></th>
   </tr>
-
-  <% if @assignment_form.assignment.require_signup? %>
-    <script>
-      jQuery(document).ready(function () {
-        addDueDateTableElement(false, 'signup', 0, <%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
-        addDueDateTableElement(false, 'drop_topic', 0, <%= due_date(@assignment_form.assignment, 'drop_topic').to_json.html_safe %>)
-      });
-    </script>
-  <% end %>
 
   <tr>
     <td style='padding:5px' id='assignment_team_assignment_field'>
@@ -179,13 +157,6 @@ function is_coding_assignmentChanged(){
     </td>
   </tr>
 
-  <tr>
-    <td style='padding:5px' id='assignment_allow_suggestion_field'>
-      <input name="assignment_form[assignment][allow_suggestions]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][allow_suggestions]', 'true', @assignment_form.assignment.allow_suggestions) %>
-      <%= label_tag('assignment_form[assignment][allow_suggestions]', 'Allow topic suggestions from students?') %>
-    </td>
-  </tr>
 
   <tr>
     <td style='padding:5px' id='assignment_is_coding_assignment_field'>

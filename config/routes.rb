@@ -158,11 +158,9 @@ Expertiza::Application.routes.draw do
     collection do
       get :list
       get :show
-      post :new
+      get :new
       post :create
-      post :edit
-      post :update
-      post :destroy
+      post ':id', action: :update
     end
   end
 
@@ -308,7 +306,6 @@ Expertiza::Application.routes.draw do
       get :auto_complete_for_user_name
       get :delete_all_metareviewers
       get :delete_all_reviewers
-      get :delete_all_reviewers_and_metareviewers
       get :delete_metareviewer
       get :delete_reviewer
       get :distribution

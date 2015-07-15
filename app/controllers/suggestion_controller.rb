@@ -75,7 +75,7 @@ class SuggestionController < ApplicationController
   def approve_suggestion
     @suggestion = Suggestion.find(params[:id])
     @user_id = @suggestion.unityID.to_i
-    @team_id = SignedUpTeam.team_id(@suggestion.assignment_id, @user_id)
+    @team_id = TeamsUser.team_id(@suggestion.assignment_id, @user_id)
     @topic_id = SignedUpTeam.topic_id(@suggestion.assignment_id, @user_id)
     @signuptopic = SignUpTopic.new
     @signuptopic.topic_identifier = 'S' + @suggestion.id.to_s

@@ -32,7 +32,7 @@ class SignUpSheet < ActiveRecord::Base
         if slotAvailable?(topic_id)
           sign_up.is_waitlisted = false
           #Create new record in signed_up_teams table
-          team_id = SignedUpTeam.team_id(assignment_id, user_id)
+          team_id = TeamsUser.team_id(assignment_id, user_id)
           topic_id = SignedUpTeam.topic_id(assignment_id, user_id)
           SignedUpTeam.create(topic_id: topic_id, team_id: team_id, is_waitlisted: 0, preference_priority_number: nil)
         else

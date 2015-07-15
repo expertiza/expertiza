@@ -84,7 +84,7 @@ class AssignmentParticipant < Participant
   end
 
   def assign_reviewer(reviewer)
-    team_id = SignedUpTeam.team_id(self.parent_id, self.user_id)
+    team_id = TeamsUser.team_id(self.parent_id, self.user_id)
     ReviewResponseMap.create(:reviewee_id => team_id, :reviewer_id => reviewer.id,
                                         :reviewed_object_id => assignment.id)
   end
@@ -110,7 +110,7 @@ class AssignmentParticipant < Participant
   # Evaluates whether this participant contribution was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object
   ##def reviewed_by?(reviewer)
-  #  team_id = SignedUpTeam.team_id(self.parent_id, self.user_id)
+  #  team_id = TeamsUser.team_id(self.parent_id, self.user_id)
   ##  ReviewResponseMap.where(['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', team_id, reviewer.id, assignment.id]).count > 0
   #end
 
@@ -613,7 +613,7 @@ class AssignmentParticipant < Participant
 
     def review_response_maps
       participant = Participant.find(id)
-      team_id = SignedUpTeam.team_id(participant.parent_id, participant.user_id)
+      team_id = TeamsUser.team_id(participant.parent_id, participant.user_id)
       ReviewResponseMap.where(reviewee_id: team_id, reviewed_object_id: assignment.id)
     end
 

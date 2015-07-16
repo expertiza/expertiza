@@ -293,14 +293,18 @@ class ReviewMappingController < ApplicationController
     assignment = Assignment.find(params[:id])
     team = assignment.get_contributor(params[:contributor_id])
     review_response_maps = team.review_mappings
-    delete_success = false
+    num_remain_review_response_maps = review_response_maps.size
     review_response_maps.each do |review_response_map|
       if !Response.exists?(map_id: review_response_map.id)
         ReviewResponseMap.find(review_response_map.id).destroy
-        delete_success = true
+        num_remain_review_response_maps -= 1
       end
     end
-    flash[:success] =  "All outstanding review mappings for \""+team.name+"\" have been deleted." if delete_success == true
+    if num_remain_review_response_maps > 0
+      flash[:error] =  "#{num_remain_review_response_maps} reviewer(s) cannot be deleted bacause they has already started review."
+    else
+      flash[:success] = "All review mappings for \"#{team.name}\" have been deleted."
+    end
     redirect_to :action => 'list_mappings', :id => assignment.id
   end
 

@@ -527,11 +527,38 @@ class ReviewMappingController < ApplicationController
       num_reviews_per_team = submission_review_num
       student_review_num = (teams.size * submission_review_num * 1.0 / participants.size).round
     end
+    iterator = 0
     teams.each do |team|
       temp_array = Array.new
       if !team.equal? teams.last
+        #need to even out the # of reviews for teams
         while temp_array.size < num_reviews_per_team 
-          rand_num = rand(0..num_participants-1)
+          if iterator == 0
+            rand_num = rand(0..num_participants-1)
+          else
+            #get mean value of total review num
+            total_review_num = 0
+            participants.each do |participant|
+              total_review_num += participants_hash[participant.id]
+            end
+            mean_of_total_review_num = total_review_num * 1.0 / participants.size
+            #get the temp array including indices of participants, each participant has less review number than mean value
+            temp_participant_array = Array.new
+            participants.each do |participant|
+              temp_participant_array << participants.index(participant) if participants_hash[participant.id] < mean_of_total_review_num
+            end
+            
+            if temp_participant_array.empty? or TeamsUser.exists?(team_id: team.id, user_id: participants[temp_participant_array[0]].user_id)
+              #if temp_participant_array is blank 
+              #or only one element in temp_participant_array, prohibit one student to review his/her own artifact
+              #use original method to get random number
+              rand_num = rand(0..num_participants-1)
+            else
+              #rand_num should be the position of this participant in original array
+              rand_num = temp_participant_array[rand(0..temp_participant_array.size-1)]
+            end
+          end
+
           if participants_hash[participants[rand_num].id] < student_review_num
             #prohibit one student to review his/her own artifact and temp_array cannot include duplicate num
             if !TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id) and !temp_array.include? participants[rand_num].id
@@ -541,7 +568,7 @@ class ReviewMappingController < ApplicationController
               next
             end
           end 
-          #remove students who have already been assigned enough num of reivews out of participants array
+          #remove students who have already been assigned enough num of reviews out of participants array
           participants.each do |participant|
             if participants_hash[participant.id] == student_review_num
               participants.delete_at(rand_num)
@@ -561,6 +588,7 @@ class ReviewMappingController < ApplicationController
       rescue
         flash[:error] = "Automatic assignment of reviewer failed."
       end
+      iterator += 1
     end
   end
 

@@ -132,4 +132,15 @@ class Role < ActiveRecord::Base
     return parents
   end
 
+  # determine if the current role has all the privileges of the parameter role
+  def hasAllPrivilegesOf(target_role)
+    privileges = Hash.new
+    privileges["Student"] = 1
+    privileges["Teaching Assistant"] = 2
+    privileges["Instructor"] = 3
+
+    privileges[self.name] > privileges[target_role.name]
+
+  end
+
 end

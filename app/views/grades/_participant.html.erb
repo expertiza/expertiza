@@ -84,17 +84,16 @@ participant = pscore[:participant]
         <% if @assignment.show_teammate_reviews || session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4 || session[:user].role_id == 6%>
             <% if @rscore_teammate.my_avg %>
                 <TD ALIGN="CENTER" VALIGN="TOP">
-                <% @course_participant = CourseParticipant.all.select {|c| c.user_id == session[:user].id}.first %>
                     <% avg_score = sprintf("%.2f",@rscore_teammate.my_avg) %>
-                    <%if @course_participant && @assignment%>
-                        <%= link_to avg_score, :controller => 'assessment360', :action => 'one_student_all_reviews', :student_id => @course_participant.id, :course_id => @assignment.course_id %>
+                    <%if @assignment%>
+                        <%= avg_score %>
                     <%end%>
                     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_teammate_reviewsLink" name="<%=prefix%>_teammate_reviewsLink" onClick="toggleElement('<%=prefix%>_teammate_reviews','teammate reviews');return false;">show teammate reviews</a> (<%= pscore[:teammate][:assessments].size %>)</FONT>
                 </TD>
                 <TD ALIGN="CENTER" VALIGN="TOP">
                 <% range =  sprintf("%.0f",@rscore_teammate.my_min) + '%' + ' - ' + sprintf("%.0f",@rscore_teammate.my_max) + '%' %>
-                <%if @course_participant && @assignment %>
-                    <%= link_to range,  :controller => 'assessment360', :action => 'one_student_all_reviews', :student_id => @course_participant.id, :course_id => @assignment.course_id %>
+                <%if @assignment %>
+                    <%= range %>
                 <% end %>
                 <% if controller.action_name != "view_my_scores" %>
                     <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => 'teammate_review' %></FONT>

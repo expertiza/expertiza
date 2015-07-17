@@ -107,7 +107,9 @@ class User < ActiveRecord::Base
       participants.each do |p_s|
         if p_s.length > 0
           p_s.each do |p|
-            user_list << p.user
+            if self.role.hasAllPrivilegesOf(p.user.role)
+              user_list << p.user
+            end
           end
         end
       end
@@ -124,7 +126,9 @@ class User < ActiveRecord::Base
       participants.each do |p_s|
         if p_s.length > 0
           p_s.each do |p|
-            user_list << p.user
+            if self.role.hasAllPrivilegesOf(p.user.role)
+              user_list << p.user
+            end
           end
         end
       end

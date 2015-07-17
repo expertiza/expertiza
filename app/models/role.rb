@@ -138,6 +138,8 @@ class Role < ActiveRecord::Base
     privileges["Student"] = 1
     privileges["Teaching Assistant"] = 2
     privileges["Instructor"] = 3
+    privileges["Administrator"] = 4
+    privileges["Super-Administrator"] = 5
 
     privileges[self.name] > privileges[target_role.name]
 

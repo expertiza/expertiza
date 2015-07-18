@@ -536,18 +536,13 @@ class ReviewMappingController < ApplicationController
           if iterator == 0
             rand_num = rand(0..num_participants-1)
           else
-            #get mean value of total review num
-            total_review_num = 0
-            participants.each do |participant|
-              total_review_num += participants_hash[participant.id]
-            end
-            mean_of_total_review_num = total_review_num * 1.0 / participants.size
-            #get the temp array including indices of participants, each participant has less review number than mean value
+            min_value = participants_hash.values.min
+            #get the temp array including indices of participants, each participant has minimum review number in hash table.
             temp_participant_array = Array.new
             participants.each do |participant|
-              temp_participant_array << participants.index(participant) if participants_hash[participant.id] < mean_of_total_review_num
+              temp_participant_array << participants.index(participant) if participants_hash[participant.id] == min_value
             end
-            
+
             if temp_participant_array.empty? or TeamsUser.exists?(team_id: team.id, user_id: participants[temp_participant_array[0]].user_id)
               #if temp_participant_array is blank 
               #or only one element in temp_participant_array, prohibit one student to review his/her own artifact

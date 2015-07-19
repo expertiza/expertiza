@@ -43,16 +43,6 @@ class User < ActiveRecord::Base
     true
   end
 
-  def bookmark_rated?(bmapping_id)
-    BmappingRatings.where(["bmapping_id = #{bmapping_id} AND user_id = #{self.id}"]).first
-  end
-
-  def bookmark_added?(bmapping_id)
-    Bmapping.where(["id = #{bmapping_id} AND user_id = #{self.id}"]).first
-  end
-
-
-
   def list_mine(object_type, user_id)
     object_type.where(["instructor_id = ?", user_id])
   end

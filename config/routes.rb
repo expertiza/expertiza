@@ -3,9 +3,12 @@ Expertiza::Application.routes.draw do
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
 
-  resources :bookmark_tags
-  resources :books
-  resources :bookmarks
+  resources :bookmarks do
+    collection do
+      post :save_bookmark_rating_score
+    end
+  end
+
   resources :join_team_requests
 
   resources :admin do
@@ -59,20 +62,6 @@ Expertiza::Application.routes.draw do
 
   resources :author_feedback_questionnaires, controller: 'questionnaires'
 
-  resources :bookmark do
-    collection do
-      get :manage_bookmarks, as: :manage
-      get :view_bookmark, as: :view
-      get :view_rating_rubrics, as: :rating
-      get :add_rating_rubric_form, as: :rating2
-      get :add_tag_bookmark
-      get :create_tag_bookmark
-      get :search_bookmarks
-      get :view_bookmarks
-      get :bookmarks_rate, as: :bookmark_rate
-      get :view_rating_rubric
-    end
-  end
 
   resources :content_pages do
     collection do
@@ -80,10 +69,6 @@ Expertiza::Application.routes.draw do
       get ':page_name', action: :view
     end
   end
-
-
-
-
 
   resources :controller_actions do
     collection do

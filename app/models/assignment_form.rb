@@ -314,7 +314,7 @@ class AssignmentForm
       #also copy topics from old assignment
       topics = SignUpTopic.where(assignment_id: old_assign.id)
       topics.each do |topic|
-        SignUpTopic.create(topic_name: topic.topic_name, assignment_id: new_assign_id, max_choosers: topic.max_choosers, category: topic.category, topic_identifier: topic.topic_identifier, micropayment: topic.micropayment, bookmark_rating_rubric_id: topic.bookmark_rating_rubric_id)
+        SignUpTopic.create(topic_name: topic.topic_name, assignment_id: new_assign_id, max_choosers: topic.max_choosers, category: topic.category, topic_identifier: topic.topic_identifier, micropayment: topic.micropayment)
       end
     else
       new_assign_id=nil

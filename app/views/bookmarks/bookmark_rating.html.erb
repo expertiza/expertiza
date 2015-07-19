@@ -1,12 +1,12 @@
 <h1>Rate bookmark <%= @bookmark.title %></h1>
 
 <p>
-  <%= label_tag 'Title' %><br/>
-  <%= label_tag @bookmark.title %><br/><br/>
-  <%= label_tag 'Url' %><br/>
-  <a><%= label_tag @bookmark.url %></a><br/><br/>
-  <%= label_tag 'Description' %><br/>
-  <%= label_tag @bookmark.description %><br/>
+  <%= label_tag 'Title:' %><br/>
+  <%= label_tag 'title', @bookmark.title %><br/><br/>
+  <%= label_tag 'Url:' %><br/>
+  <a href= <%= "http://#{@bookmark.url}" %> target='_blank'><%= label_tag 'url', @bookmark.url %></a><br/><br/>
+  <%= label_tag 'Description:' %><br/>
+  <%= label_tag 'description', @bookmark.description %><br/>
 </p>
 <%= form_tag :action => "save_bookmark_rating_score", :id => @bookmark.id do %>
   <p>

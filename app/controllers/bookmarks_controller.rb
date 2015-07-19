@@ -2,8 +2,11 @@ class BookmarksController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'list', 'new', 'create', 'edit', 'update', 'destroy', 'bookmark_rating', 'save_bookmark_rating_score'
+    when 'list', 'new', 'create', 'bookmark_rating', 'save_bookmark_rating_score'
       current_role_name.eql? 'Student'
+    when 'edit', 'update', 'destroy'
+      #edit, update, delete bookmarks can only be done by owner
+      current_role_name.eql? 'Student' and Bookmark.find(params[:id].to_i).user_id == session[:user].id
     end
   end
 

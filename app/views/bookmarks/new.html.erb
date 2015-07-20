@@ -1,0 +1,20 @@
+<h1>Add new bookmark</h1>
+<h5>Please enter the following fields to create a new bookmark</h5>
+<table>
+  <%= form_tag :action => "create" do %>
+    <%= hidden_field_tag("topic_id", @topic.id) %>
+    <p>
+      <%= label_tag 'Title' %><br/>
+      <%= text_field_tag :title %><br/><br/>
+      <%= label_tag 'Url' %><br/>
+      <%= text_field_tag :url %><br/><br/>
+      <%= label_tag 'Description' %><br/>
+      <%= text_area_tag :description %><br/>
+    </p>
+    <p>
+      <td> <%= submit_tag "Add new bookmark" %> |
+      <%= link_to 'Back', :controller=> 'sign_up_sheet', :action=>'list', :assignment_id => @topic.assignment_id %></td>
+    </p>
+  <% end %>
+
+</table>

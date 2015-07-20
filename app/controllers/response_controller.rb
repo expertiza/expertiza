@@ -217,33 +217,6 @@ class ResponseController < ApplicationController
     redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :save_options => params[:save_options]
   end
 
-  def new_feedback
-    review = Response.find(params[:id])
-    if review
-      reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id:  review.map.assignment.id).first
-      map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id:  reviewer.id).first
-      if map.nil?
-        map = FeedbackResponseMap.create(:reviewed_object_id => review.id, :reviewer_id => reviewer.id, :reviewee_id => review.map.reviewer.id)
-      end
-      redirect_to :action => 'new', :id => map.map_id, :return => "feedback"
-    else
-      redirect_to :back
-    end
-  end
-
-  def view
-    @response = Response.find(params[:id])
-    return if redirect_when_disallowed(@response)
-    @map = @response.map
-    get_content
-    @review_scores = Array.new
-    @question_type = Array.new
-    @questions.each do |question|
-      @review_scores << Score.where(response_id: @map.response_id, question_id:  question.id).first
-      @question_type << QuestionType.find_by_question_id(question.id)
-    end
-  end
-
   def new
 
     @header = "New"

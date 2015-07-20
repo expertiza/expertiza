@@ -40,7 +40,7 @@ class ApplicationController < ActionController::Base
     @version = Version.where(['whodunnit = ?',session[:user].id]).last
     if @version.try(:created_at) && Time.now - @version.created_at < 5.0
       @link_name = params[:redo] == "true" ? "redo" : "undo"
-      flash[:success] = message + "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @version.id,:redo => !params[:redo])}>#{@link_name}</a>"
+      message = message + "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @version.id,:redo => !params[:redo])}>#{@link_name}</a>"
     end
   end
 

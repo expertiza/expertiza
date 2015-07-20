@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150714162923) do
+ActiveRecord::Schema.define(version: 20150717142641) do
 
   create_table "assignment_questionnaires", force: :cascade do |t|
     t.integer "assignment_id",        limit: 4
@@ -107,61 +107,25 @@ ActiveRecord::Schema.define(version: 20150714162923) do
   add_index "bids", ["team_id"], name: "index_bids_on_team_id", using: :btree
   add_index "bids", ["topic_id"], name: "index_bids_on_topic_id", using: :btree
 
-  create_table "bmapping_ratings", force: :cascade do |t|
-    t.integer  "bmapping_id", limit: 4, null: false
-    t.integer  "user_id",     limit: 4, null: false
-    t.integer  "rating",      limit: 4, null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "bmappings", force: :cascade do |t|
-    t.integer  "bookmark_id",   limit: 4,   null: false
-    t.string   "title",         limit: 255
-    t.integer  "user_id",       limit: 4,   null: false
-    t.string   "description",   limit: 255
-    t.datetime "date_created",              null: false
-    t.datetime "date_modified",             null: false
-  end
-
-  create_table "bmappings_sign_up_topics", id: false, force: :cascade do |t|
-    t.integer "sign_up_topic_id", limit: 4, null: false
-    t.integer "bmapping_id",      limit: 4, null: false
-  end
-
-  create_table "bmappings_tags", force: :cascade do |t|
-    t.integer  "tag_id",      limit: 4, null: false
-    t.integer  "bmapping_id", limit: 4, null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "bookmark_rating_rubrics", force: :cascade do |t|
-    t.string   "display_text",   limit: 255, null: false
-    t.integer  "minimum_rating", limit: 4,   null: false
-    t.integer  "maximum_rating", limit: 4,   null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "bookmark_tags", force: :cascade do |t|
-    t.string   "tag_name",   limit: 255
+  create_table "bookmark_ratings", force: :cascade do |t|
+    t.integer  "bookmark_id", limit: 4
+    t.integer  "user_id",     limit: 4
+    t.integer  "rating",      limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "bookmarks", force: :cascade do |t|
-    t.string   "url",                limit: 255, null: false
-    t.integer  "discoverer_user_id", limit: 4,   null: false
-    t.integer  "user_count",         limit: 4,   null: false
+    t.text     "url",         limit: 65535
+    t.text     "title",       limit: 65535
+    t.text     "description", limit: 65535
+    t.integer  "user_id",     limit: 4
+    t.integer  "topic_id",    limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "books", force: :cascade do |t|
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
+  add_index "bookmarks", ["topic_id"], name: "index_bookmarks_on_topic_id", using: :btree
 
   create_table "calculated_penalties", force: :cascade do |t|
     t.integer "participant_id",   limit: 4

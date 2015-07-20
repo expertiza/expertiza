@@ -1,0 +1,44 @@
+<h1>Bookmarks list for <%= @topic.topic_name %></h1>
+
+<div class = "exp">
+	<table>
+	  <tr>
+	    <th class="head">Title</th>
+	    <th class="head">Url</th>
+	    <th class="head">Description</th>
+	    <th class="head">Avg. rate score</th>
+	    <th class="head" colspan='3'>Action</th>
+	  </tr>
+
+	  <% @bookmarks.each do |bookmark| %>
+	    <tr>
+	      <td><%=bookmark.title %></td>
+	      <td><a href=<%= "http://#{bookmark.url}"%> target='_blank'><%=bookmark.url %></td>
+	      <td><%=bookmark.description %></td>
+	      <!--Average rating score-->
+	  	  <% @bookmark_ratings = BookmarkRating.where(bookmark_id: bookmark.id) %>
+	  	  <% sum = 0 %>
+	  	  <% @bookmark_ratings.each do |bookmark_rating| %>
+	  	  	<% sum += bookmark_rating.rating %>
+	  	  <% end %>
+	  	  <td>
+	  	  	<% if @bookmark_ratings.size > 0 %>
+	  	  		<%= (sum * 1.0 / @bookmark_ratings.size).round(1) %>
+	  	  	<% else %>
+	  	  		<%= '-' %>
+	  	  	<% end %>
+	  	  </td>
+	      <td><%= link_to 'Rate', :action => 'bookmark_rating', :id => bookmark.id %></td>
+	      <% if bookmark.user_id == session[:user].id %>
+	      	<td><%= link_to 'Edit', :action => 'edit', :id => bookmark.id %></td>
+	        <td><%= link_to 'Destroy', bookmark, :confirm => 'Are you sure?', :method => :delete %></td>
+	      <% end %>
+	    </tr>
+	  <% end %>
+	</table>
+</div>
+
+<br />
+
+<%= link_to 'New bookmark', :action => 'new', :id => @topic.id %> |
+<%= link_to 'Back', :controller=> 'sign_up_sheet', :action=>'list', :assignment_id => @topic.assignment_id %>

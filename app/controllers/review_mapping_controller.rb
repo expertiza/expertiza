@@ -292,14 +292,18 @@ class ReviewMappingController < ApplicationController
     assignment = Assignment.find(params[:id])
     team = assignment.get_contributor(params[:contributor_id])
     review_response_maps = team.review_mappings
-    delete_success = false
+    num_remain_review_response_maps = review_response_maps.size
     review_response_maps.each do |review_response_map|
       if !Response.exists?(map_id: review_response_map.id)
         ReviewResponseMap.find(review_response_map.id).destroy
-        delete_success = true
+        num_remain_review_response_maps -= 1
       end
     end
-    flash[:success] =  "All outstanding review mappings for \""+team.name+"\" have been deleted." if delete_success == true
+    if num_remain_review_response_maps > 0
+      flash[:error] =  "#{num_remain_review_response_maps} reviewer(s) cannot be deleted bacause they has already started review."
+    else
+      flash[:success] = "All review mappings for \"#{team.name}\" have been deleted."
+    end
     redirect_to :action => 'list_mappings', :id => assignment.id
   end
 
@@ -522,11 +526,33 @@ class ReviewMappingController < ApplicationController
       num_reviews_per_team = submission_review_num
       student_review_num = (teams.size * submission_review_num * 1.0 / participants.size).round
     end
+    iterator = 0
     teams.each do |team|
       temp_array = Array.new
       if !team.equal? teams.last
+        #need to even out the # of reviews for teams
         while temp_array.size < num_reviews_per_team 
-          rand_num = rand(0..num_participants-1)
+          if iterator == 0
+            rand_num = rand(0..num_participants-1)
+          else
+            min_value = participants_hash.values.min
+            #get the temp array including indices of participants, each participant has minimum review number in hash table.
+            temp_participant_array = Array.new
+            participants.each do |participant|
+              temp_participant_array << participants.index(participant) if participants_hash[participant.id] == min_value
+            end
+
+            if temp_participant_array.empty? or TeamsUser.exists?(team_id: team.id, user_id: participants[temp_participant_array[0]].user_id)
+              #if temp_participant_array is blank 
+              #or only one element in temp_participant_array, prohibit one student to review his/her own artifact
+              #use original method to get random number
+              rand_num = rand(0..num_participants-1)
+            else
+              #rand_num should be the position of this participant in original array
+              rand_num = temp_participant_array[rand(0..temp_participant_array.size-1)]
+            end
+          end
+
           if participants_hash[participants[rand_num].id] < student_review_num
             #prohibit one student to review his/her own artifact and temp_array cannot include duplicate num
             if !TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id) and !temp_array.include? participants[rand_num].id
@@ -536,7 +562,7 @@ class ReviewMappingController < ApplicationController
               next
             end
           end 
-          #remove students who have already been assigned enough num of reivews out of participants array
+          #remove students who have already been assigned enough num of reviews out of participants array
           participants.each do |participant|
             if participants_hash[participant.id] == student_review_num
               participants.delete_at(rand_num)
@@ -556,6 +582,7 @@ class ReviewMappingController < ApplicationController
       rescue
         flash[:error] = "Automatic assignment of reviewer failed."
       end
+      iterator += 1
     end
   end
 

@@ -43,16 +43,6 @@ class User < ActiveRecord::Base
     true
   end
 
-  def bookmark_rated?(bmapping_id)
-    BmappingRatings.where(["bmapping_id = #{bmapping_id} AND user_id = #{self.id}"]).first
-  end
-
-  def bookmark_added?(bmapping_id)
-    Bmapping.where(["id = #{bmapping_id} AND user_id = #{self.id}"]).first
-  end
-
-
-
   def list_mine(object_type, user_id)
     object_type.where(["instructor_id = ?", user_id])
   end
@@ -107,7 +97,9 @@ class User < ActiveRecord::Base
       participants.each do |p_s|
         if p_s.length > 0
           p_s.each do |p|
-            user_list << p.user
+            if self.role.hasAllPrivilegesOf(p.user.role)
+              user_list << p.user
+            end
           end
         end
       end
@@ -124,7 +116,9 @@ class User < ActiveRecord::Base
       participants.each do |p_s|
         if p_s.length > 0
           p_s.each do |p|
-            user_list << p.user
+            if self.role.hasAllPrivilegesOf(p.user.role)
+              user_list << p.user
+            end
           end
         end
       end

@@ -28,24 +28,6 @@ class QuestionsController < ApplicationController
     @questions = Question.paginate(:page => params[:page],:per_page => 10)
   end
 
-  # List questions for this user
-  # ?? Need clarification of what this task
-  #    actually does.
-  def listuser
-    @question = Array.new
-    @i = 0
-    @sign_qts = SignupQuestion
-      .where( 'signup_id = '+@params[:id].to_s)
-      .order('id')
-
-  end
-
-  # ?? Unknown as of 2/1/2009
-  # Need further investigation
-  def SignUpSheet
-    @questions = Question.paginate(:page => params[:page],:per_page => 10)
-  end
-
   # Display a given question
   def show
     @question = Question.find(params[:id])
@@ -93,6 +75,8 @@ class QuestionsController < ApplicationController
     redirect_to :action => 'list'
   end
 
+  #This method is only for quiz questionnaires, it is called when instructors click "view quiz questions" on the pop-up panel.
+  #We should move it to quiz_questionnaire_controller.
   def review_questions
     @assignment_id = params[:id]
     @questions = Array.new

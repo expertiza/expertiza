@@ -4,17 +4,16 @@
 	<table>
 	  <tr>
 	    <th class="head">Title</th>
-	    <th class="head">Url</th>
 	    <th class="head">Description</th>
-	    <th class="head">Avg. rate score</th>
+	    <th class="head">Avg. rating</th>
 	    <th class="head" colspan='3'>Action</th>
 	  </tr>
 
 	  <% @bookmarks.each do |bookmark| %>
 	    <tr>
-	      <td><%=bookmark.title %></td>
-	      <td><a href=<%= "http://#{bookmark.url}"%> target='_blank'><%=bookmark.url %></td>
-	      <td><%=bookmark.description %></td>
+	      <td><a href=<%= "http://#{bookmark.url}"%> target='_blank'><%=bookmark.title %></td>
+	      <!--Set maximum length of bookmark description and keep description in one line.-->
+	      <td><%=truncate(bookmark.description, length: 100) %></td>
 	      <!--Average rating score-->
 	  	  <% @bookmark_ratings = BookmarkRating.where(bookmark_id: bookmark.id) %>
 	  	  <% sum = 0 %>
@@ -31,7 +30,7 @@
 	      <td><%= link_to 'Rate', :action => 'bookmark_rating', :id => bookmark.id %></td>
 	      <% if bookmark.user_id == session[:user].id %>
 	      	<td><%= link_to 'Edit', :action => 'edit', :id => bookmark.id %></td>
-	        <td><%= link_to 'Destroy', bookmark, :confirm => 'Are you sure?', :method => :delete %></td>
+	        <td><%= link_to 'Destroy', bookmark, :confirm => "Delete bookmark \"#{bookmark.title}\"?", :method => :delete %></td>
 	      <% end %>
 	    </tr>
 	  <% end %>

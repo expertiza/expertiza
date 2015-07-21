@@ -1,3 +1,6 @@
+<!--The reason why add an empty form_tag here. (https://github.com/expertiza/expertiza/commit/4d1a9d50833aca4e8771afd851daa40455d4fc37)-->
+<%= form_tag controller: 'assignment', action: 'edit', assignment_id: @assignment_form.assignment.id do %>
+<% end %>
 <table>
   <tr id='assignment_review_assignment_strategy_row'>
     <td>
@@ -19,13 +22,28 @@
       <%= text_field_tag('assignment_form[assignment][review_topic_threshold]', @assignment_form.assignment.review_topic_threshold, size: 1) %>
       <img src="/assets/info.png" title='A topic is reviewable if the minimum number of reviews already done for the submissions
       on that topic is within k of the minimum number of reviews done on the least-reviewed submission on any topic.'>
+    <br/>
+      <%= label_tag('assignment_form[assignment][max_reviews_per_submission]', 'Maximum number of reviews per submission:') %>
+      <%= text_field_tag('assignment_form[assignment][max_reviews_per_submission]', @assignment_form.assignment.max_reviews_per_submission, size: 1) %>
     </td>
   </tr>
-
-  <tr>
+  <tr id="instructor_selected_review_mapping_mechanism" hidden='hidden'>
     <td>
-      <%= label_tag('assignment_form[assignment][max_reviews_per_submission]', 'Maximum number of reviews per submission:') %>
-      <%= text_field_tag('assignment_form[assignment][max_reviews_per_submission]', @assignment_form.assignment.max_reviews_per_submission, {:style => 'width:75px'}) %>
+      <% link_to 'Assign reviewers automatically', :controller => 'review_mapping', :action => 'select_mapping', :id => @assignment_form.assignment.id %>
+      <%= form_tag :controller => 'review_mapping', :action => 'automatic_review_mapping', :id => @assignment_form.assignment.id do %>
+        <%= radio_button_tag 'num_reviews', 'student', true %>
+        <%= label_tag('num_reviews_per_student', 'Set number of reviews done for each student') %>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span id='num_reviews_per_student_threshold'>
+          <%= text_field_tag('num_reviews_per_student', 0, {:style => 'width:20px'}) %>
+          <%= submit_tag 'submit', :id => 'first_submit_tag' %>
+        </span><br/>
+        <%= radio_button_tag 'num_reviews', 'submission', false %>
+        <%= label_tag('num_reviews_per_submission', 'Set minimum number of reviews done for each submission') %>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span id='num_reviews_per_submission_threshold' hidden='hidden'>
+          <%= text_field_tag('num_reviews_per_submission', 0, {:style => 'width:20px'}) %>
+          <%= submit_tag 'submit', :id => 'second_submit_tag' %>
+        </span><br/>
+      <% end %>
     </td>
   </tr>
 </table>

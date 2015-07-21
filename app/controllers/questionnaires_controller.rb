@@ -141,56 +141,55 @@ class QuestionnairesController < ApplicationController
   #save an updated quiz questionnaire to the database
   def update_quiz
     @questionnaire = Questionnaire.find(params[:id])
-    redirect_to :controller => 'submitted_content', :action => 'edit', :id => params[:pid] if @questionnaire == nil
+    redirect_to :controller => 'submitted_content', :action => 'view', :id => params[:pid] if @questionnaire == nil
     if params['save']
       @questionnaire.update_attributes(params[:questionnaire])
-      for qtypeid in params[:question_type].keys
-        @question_type = QuestionType.find(qtypeid)
-        @question_type.update_attributes(params[:question_type][qtypeid])
-      end
-      questionnum=1
-      for qid in params[:new_question].keys
+      # for qtypeid in params[:question_type].keys
+      #   @question_type = QuestionType.find(qtypeid)
+      #   @question_type.update_attributes(params[:question_type][qtypeid])
+      # end
+      for qid in params[:question].keys
         @question = Question.find(qid)
-        @question.update_attributes(params[:new_question][qid])
+        @question.update_attributes(params[:question][qid])
         @question_type = QuestionType.find_by_question_id(qid)
         @quiz_question_choices = QuizQuestionChoice.where(question_id: qid)
         i=1
         for quiz_question_choice in @quiz_question_choices
-          if  @question_type.q_type!="Essay"
             if (@question_type.q_type=="MCC")
-              if(params[:quiz_question_choices][questionnum.to_s][@question_type.q_type][i.to_s])
-                if  params[:quiz_question_choices][questionnum.to_s][@question_type.q_type][i.to_s][:iscorrect]==1.to_s
-                  quiz_question_choice.update_attributes(:iscorrect => '1',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
-                else
-                  quiz_question_choice.update_attributes(:iscorrect => '0',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
-                end
+              if(params[:quiz_question_choices][@question.id.to_s][@question_type.q_type][i.to_s])
+                  quiz_question_choice.update_attributes(:iscorrect => params[:quiz_question_choices][@question.id.to_s][@question_type.q_type][i.to_s][:iscorrect],:txt=>  params[:quiz_question_choices][@question.id.to_s][@question_type.q_type][i.to_s][:txt])
               else
                 quiz_question_choice.update_attributes(:iscorrect => '0',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
               end
-            else if (@question_type.q_type=="MCR")
-              if  params[:quiz_question_choices][questionnum.to_s][@question_type.q_type][1.to_s][:iscorrect]== i.to_s
+            end
+            if (@question_type.q_type=="MCR")
+              if  params[:quiz_question_choices][@question.id.to_s][@question_type.q_type][1.to_s][:iscorrect]== i.to_s
                 quiz_question_choice.update_attributes(:iscorrect => '1',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
               else
                 quiz_question_choice.update_attributes(:iscorrect => '0',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
               end
-            else if (@question_type.q_type=="TF")
-              if  params[:quiz_question_choices][questionnum.to_s][@question_type.q_type][1.to_s][:iscorrect]== 1.to_s
-                quiz_question_choice.update_attributes(:iscorrect => '1',:txt=>"True")
-              else
-                quiz_question_choice.update_attributes(:iscorrect => '1',:txt=>"False")
+            end
+            if (@question_type.q_type=="TF")
+              if  params[:quiz_question_choices][@question.id.to_s][@question_type.q_type][1.to_s][:iscorrect]== "True" # the statement is correct
+                if quiz_question_choice.txt =="True"
+                  quiz_question_choice.update_attributes(:iscorrect => '1') # the statement is correct so "True" is the right answer
+                else
+                  quiz_question_choice.update_attributes(:iscorrect => '0')
+                end
+              else # the statement is not correct
+                if quiz_question_choice.txt =="True"
+                  quiz_question_choice.update_attributes(:iscorrect => '0')
+                else
+                  quiz_question_choice.update_attributes(:iscorrect => '1') # the statement is not correct so "False" is the right answer
+                end
               end
             end
-          end
+
+            i+=1
         end
-        i+=1
       end
     end
-    questionnum+=1
-  end
-  # save
-  #save_choices @questionnaire.id
-end
-redirect_to :controller => 'submitted_content', :action => 'edit', :id => params[:pid]
+    redirect_to :controller => 'submitted_content', :action => 'view', :id => params[:pid]
   end
 
   # Define a new questionnaire

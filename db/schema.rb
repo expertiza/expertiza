@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150717142641) do
+ActiveRecord::Schema.define(version: 20150720160445) do
 
   create_table "assignment_questionnaires", force: :cascade do |t|
     t.integer "assignment_id",        limit: 4
@@ -68,7 +68,7 @@ ActiveRecord::Schema.define(version: 20150717142641) do
     t.boolean  "is_penalty_calculated",             limit: 1,     default: false, null: false
     t.integer  "max_bids",                          limit: 4
     t.boolean  "show_teammate_reviews",             limit: 1
-    t.integer  "availability_flag",                 limit: 4,     default: 1
+    t.boolean  "availability_flag",                 limit: 1,     default: true
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree

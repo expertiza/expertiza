@@ -233,7 +233,9 @@ function is_coding_assignmentChanged(){
      var val = jQuery('#assignment_form_assignment_review_assignment_strategy').val();
         if (val == 'Auto-Selected') {
           jQuery('#assignment_review_topic_threshold_row').removeAttr('hidden');
+          jQuery('#instructor_selected_review_mapping_mechanism').attr('hidden', true);
         } else {
+          jQuery('#instructor_selected_review_mapping_mechanism').removeAttr('hidden');
           jQuery('#assignment_review_topic_threshold_row').attr('hidden', true);
         }
    }
@@ -246,4 +248,19 @@ function is_coding_assignmentChanged(){
         jQuery('#assignment_numbers_of_quiz_field').attr('hidden', true);
       }
     }
+
+    jQuery(document).ready(function() {
+      jQuery('input[type=radio][name=num_reviews]').change(function(){
+        if (this.value == 'student'){
+          jQuery('#num_reviews_per_student_threshold').removeAttr('hidden');
+          jQuery('#num_reviews_per_submission_threshold').attr('hidden','hidden');
+          jquery('#second_submit_tag').attr('disabled', 'disabled');
+        } 
+        else if(this.value == 'submission'){
+          jQuery('#num_reviews_per_student_threshold').attr('hidden', 'hidden');
+          jQuery('#num_reviews_per_submission_threshold').removeAttr('hidden');
+          jquery('#first_submit_tag').attr('disabled', 'disabled');
+        }
+      });
+    });
   </script>

@@ -22,6 +22,8 @@ class BookmarksController < ApplicationController
 
   
   def create
+    params[:url] = params[:url].gsub!(/http:\/\//,"") if params[:url].start_with?('http://')
+    params[:url] = params[:url].gsub!(/https:\/\//,"") if params[:url].start_with?('https://')
     begin
       Bookmark.create(url: params[:url], title: params[:title], description: params[:description], user_id: session[:user].id, topic_id: params[:topic_id] )
       flash[:success] = 'Bookmark has been created successfully!'

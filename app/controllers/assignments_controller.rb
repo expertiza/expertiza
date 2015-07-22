@@ -31,6 +31,7 @@ class AssignmentsController < ApplicationController
   end
 
   def create
+    params.permit!
     @assignment_form = AssignmentForm.new(params[:assignment_form])
     #This one is working
     #       emails = Array.new
@@ -133,6 +134,7 @@ class AssignmentsController < ApplicationController
   end
 
   def update
+    params.permit!
     ##if params doesn't have assignment_form, it means the assignment is assigned to a course using the icon on the popup menu
     unless(params.has_key?(:assignment_form))
       @assignment=Assignment.find(params[:id])

@@ -45,12 +45,8 @@
             <% end %>
 
             <%if @question_type.q_type=="MCR" %>
-              <% if @quiz_question_choice.iscorrect %>
-                <%= radio_button_tag("quiz_question_choices[#{questionnum}][MCR][#{i}][iscorrect]", "#{i}", true)%>
-              <% else %>
-                <%= radio_button_tag("quiz_question_choices[#{questionnum}][MCR][#{i}][iscorrect]", "#{i}", false)%>
-            <% end %>
-            &nbsp;<%= text_field "quiz_question_choices[]", 'txt', :size=>40 %>
+              <%= radio_button_tag("quiz_question_choices[#{questionnum}][MCR][correctindex]", "#{i}", @quiz_question_choice.iscorrect)%>
+              &nbsp;<%= text_field "quiz_question_choices[#{questionnum}][MCR][#{i}]", 'txt', :size=>40 %>
             <% end %>
 
             <%if @question_type.q_type=="TF" %>

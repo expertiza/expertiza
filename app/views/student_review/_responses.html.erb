@@ -21,7 +21,14 @@
                   <%round = " (Round"+round.to_s+")"  %>
               <%end%>
               <b><%= "#{title} #{review_no}." %></b> <%=round%>
-              <%= unless topic_id.nil? then " #{SignUpTopic.find(topic_id).topic_identifier}: #{SignUpTopic.find(topic_id).topic_name}" end %>
+              <!--In ‘student_review/list’ page, if the topic_identifier is empty, ‘:’ sign should not be displayed.-->
+              <% if !topic_id.nil? %>
+                <% if SignUpTopic.find(topic_id).topic_identifier != '' %>
+                  <%= " #{SignUpTopic.find(topic_id).topic_identifier}: #{SignUpTopic.find(topic_id).topic_name}" %>
+                <% else %>
+                  <%= " #{SignUpTopic.find(topic_id).topic_name}" %>
+                <% end %>
+              <% end %>
             </td>
             <td>&nbsp;</td>
             <% if map.response %>

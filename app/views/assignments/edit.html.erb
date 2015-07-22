@@ -23,6 +23,7 @@
         <%= render 'assignments/edit/due_dates' %>
       </div>
       <div id="tabs-5">
+        <h1>Topics for <%= @assignment_form.assignment.name %> assignment</h1>
             <input name="assignment_form[assignment][allow_suggestions]" type="hidden" value="false"/>
             <%= check_box_tag('assignment_form[assignment][allow_suggestions]', 'true', @assignment_form.assignment.allow_suggestions) %>
             <%= label_tag('assignment_form[assignment][allow_suggestions]', 'Allow topic suggestions from students?') %>

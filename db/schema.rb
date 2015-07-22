@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150717142641) do
+ActiveRecord::Schema.define(version: 20150721174405) do
 
   create_table "assignment_questionnaires", force: :cascade do |t|
     t.integer "assignment_id",        limit: 4
@@ -68,7 +68,7 @@ ActiveRecord::Schema.define(version: 20150717142641) do
     t.boolean  "is_penalty_calculated",             limit: 1,     default: false, null: false
     t.integer  "max_bids",                          limit: 4
     t.boolean  "show_teammate_reviews",             limit: 1
-    t.integer  "availability_flag",                 limit: 4,     default: 1
+    t.boolean  "availability_flag",                 limit: 1,     default: true
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -517,14 +517,13 @@ ActiveRecord::Schema.define(version: 20150717142641) do
   add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
 
   create_table "sign_up_topics", force: :cascade do |t|
-    t.text    "topic_name",                limit: 65535,             null: false
-    t.integer "assignment_id",             limit: 4,     default: 0, null: false
-    t.integer "max_choosers",              limit: 4,     default: 0, null: false
-    t.text    "category",                  limit: 65535
-    t.string  "topic_identifier",          limit: 10
-    t.integer "micropayment",              limit: 4,     default: 0
-    t.integer "bookmark_rating_rubric_id", limit: 4
-    t.integer "private_to",                limit: 4
+    t.text    "topic_name",       limit: 65535,             null: false
+    t.integer "assignment_id",    limit: 4,     default: 0, null: false
+    t.integer "max_choosers",     limit: 4,     default: 0, null: false
+    t.text    "category",         limit: 65535
+    t.string  "topic_identifier", limit: 10
+    t.integer "micropayment",     limit: 4,     default: 0
+    t.integer "private_to",       limit: 4
   end
 
   add_index "sign_up_topics", ["assignment_id"], name: "fk_sign_up_categories_sign_up_topics", using: :btree

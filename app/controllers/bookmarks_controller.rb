@@ -22,6 +22,8 @@ class BookmarksController < ApplicationController
 
   
   def create
+    params[:url] = params[:url].gsub!(/http:\/\//,"") if params[:url].start_with?('http://')
+    params[:url] = params[:url].gsub!(/https:\/\//,"") if params[:url].start_with?('https://')
     begin
       Bookmark.create(url: params[:url], title: params[:title], description: params[:description], user_id: session[:user].id, topic_id: params[:topic_id] )
       flash[:success] = 'Bookmark has been created successfully!'
@@ -55,7 +57,12 @@ class BookmarksController < ApplicationController
 
   def save_bookmark_rating_score
     @bookmark = Bookmark.find(params[:id])
-    BookmarkRating.create(bookmark_id: @bookmark.id, user_id: session[:user].id, rating: params[:rate_score])
+    @bookmark_rating = BookmarkRating.where(bookmark_id: @bookmark.id, user_id: session[:user].id).first
+    if @bookmark_rating.blank?
+      BookmarkRating.create(bookmark_id: @bookmark.id, user_id: session[:user].id, rating: params[:rating])
+    else
+      @bookmark_rating.update_attribute('rating', params[:rating].to_i)
+    end
     redirect_to :action => 'list', :id => @bookmark.topic_id
   end
 end

@@ -163,10 +163,10 @@ class QuestionnairesController < ApplicationController
               end
             end
             if (@question_type.q_type=="MCR")
-              if  params[:quiz_question_choices][@question.id.to_s][@question_type.q_type][1.to_s][:iscorrect]== i.to_s
-                quiz_question_choice.update_attributes(:iscorrect => '1',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
+              if  params[:quiz_question_choices][@question.id.to_s][@question_type.q_type][:correctindex]== i.to_s
+                quiz_question_choice.update_attributes(:iscorrect => '1',:txt=> params[:quiz_question_choices][@question.id.to_s][@question_type.q_type][i.to_s][:txt])
               else
-                quiz_question_choice.update_attributes(:iscorrect => '0',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
+                quiz_question_choice.update_attributes(:iscorrect => '0',:txt=> params[:quiz_question_choices][@question.id.to_s][@question_type.q_type][i.to_s][:txt])
               end
             end
             if (@question_type.q_type=="TF")

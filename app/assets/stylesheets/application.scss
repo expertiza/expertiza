@@ -9,8 +9,9 @@
 @import "layout";
 @import "leaderboard";
 @import "redbox";
-@import "simpletabs";
+@import "react-simpletabs/dist/react-simpletabs";
 @import "jquery.datetimepicker";
-@import "bootstrap-sprockets";
-@import "bootstrap";
+$icon-font-path: "bootstrap-sass/assets/fonts/bootstrap/";
+@import "bootstrap-sass/assets/stylesheets/bootstrap-sprockets";
+@import "bootstrap-sass/assets/stylesheets/bootstrap";
 @import "navbar"

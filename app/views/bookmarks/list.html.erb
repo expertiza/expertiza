@@ -52,7 +52,11 @@
 			        ><%= i.to_s %></option>
 			      <% end %>
 			    </select>
-			    <%= button_tag "submit", {:id=>'button'+bookmark.id.to_s,:style=>"font-size:10px; display:none;"} %>
+			    <% if BookmarkRating.where(bookmark_id: bookmark.id, user_id: session[:user].id).first.blank? %>
+			    	<%= button_tag "rate", {:id=>'button'+bookmark.id.to_s,:style=>"font-size:10px; display:none;"} %>
+			    <% else %>
+			    	<%= button_tag "update", {:id=>'button'+bookmark.id.to_s,:style=>"font-size:10px; display:none;"} %>
+				<% end %>
 			<% end %>
 	    </td>
 	      <% if bookmark.user_id == session[:user].id %>

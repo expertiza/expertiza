@@ -7,43 +7,7 @@ jQuery(".tree_display.list").ready ->
     render: ->
       DOM.label
         className: "col-lg-2"
-        "here"
-
-  tree = [
-    {
-      text: "Parent 1",
-      icon: "glyphicon glyphicon-stop",
-      nodes: [
-        {
-          text: "Child 1",
-          nodes: [
-            {
-              text: "Grandchild 1"
-            },
-            {
-              text: "Grandchild 2"
-            }
-          ]
-        },
-        {
-          text: "Child 2"
-        }
-      ]
-    },
-    {
-      text: "Parent 2"
-    },
-    {
-      text: "Parent 3"
-    },
-    {
-      text: "Parent 4"
-    },
-    {
-      text: "Parent 5"
-    }
-  ];
-
+        "there"
 
   contentTable = React.createClass
     render: ->

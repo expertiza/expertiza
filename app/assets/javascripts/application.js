@@ -10,7 +10,6 @@
 // WARNING: THE FIRST BLANK LINE MARKS THE END OF WHAT'S TO BE PROCESSED, ANY BLANK LINE SHOULD
 // GO AFTER THE REQUIRES BELOW.
 //
-//= require turbolinks
 //= require react
 //= require react_ujs
 //= require components
@@ -30,10 +29,6 @@
 
 // Eliminate the “element.dispatchEvent is not a function” error
 jQuery.noConflict();
-
-jQuery(document).on('ready page:load', function() {
-  jQuery(this).trigger('turbo:ready');
-});
 
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.substring(1).toLowerCase();

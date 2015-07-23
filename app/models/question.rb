@@ -38,4 +38,36 @@ class Question < ActiveRecord::Base
     QuestionAdvice.where(question_id: self.id).each{|advice| advice.destroy}
     self.destroy
   end
+
+  #merge questions table and question_types table
+  #step 1
+  def self.add_q_type_in_questions_table
+    question_types = QuestionType.all
+    question_types.each do |question_type|
+      question = Question.find(question_type.question_id)
+      question.update_attribute('q_type', question_type.q_type)
+    end
+  end
+
+  #step 2
+  def self.add_size_in_questions_table
+    question_types = QuestionType.where("q_type in (?, ?)", 'TextArea', 'TextField')
+    question_types.each do |question_type|
+      next if question_type.parameters.empty?
+      question = Question.find(question_type.question_id)
+      size = question_type.parameters.match(/\d*x\d*/).to_s if question_type.q_type == 'TextArea'
+      size = question_type.parameters.match(/\d/).to_s if question_type.q_type == 'TextField'
+      question.update_attribute('size', size) if size != ""
+    end
+  end
+
+  #step 3
+  def self.add_alternatives_in_questions_table
+    question_types = QuestionType.where(q_type: 'DropDown')
+    question_types.each do |question_type|
+      question = Question.find(question_type.question_id)
+      alternatives = question_type.parameters.match(/[a-zA-Z0-9]*\|[a-zA-Z0-9]*/).to_s
+      question.update_attribute('alternatives', alternatives)
+    end
+  end
 end

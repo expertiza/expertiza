@@ -22,6 +22,7 @@
 //= require superfish
 //= require bootstrap
 //= require jquery.ui.all
+//= require jquery-readyselector
 //= require_self
 //= require_tree .
 //= require jquery.datetimepicker

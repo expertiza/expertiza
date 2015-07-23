@@ -111,6 +111,7 @@ module AssignmentHelper
       default_weight['MetareviewQuestionnaire'] = 0
       default_weight['AuthorFeedbackQuestionnaire'] = 0
       default_weight['TeammateReviewQuestionnaire'] = 0
+      default_weight['BookmarkRatingQuestionnaire'] = 0
 
       default_aq = AssignmentQuestionnaire.where(user_id: assignment.instructor_id, assignment_id: nil, questionnaire_id: nil).first
       if default_aq.nil?

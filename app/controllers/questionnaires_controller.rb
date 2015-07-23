@@ -21,7 +21,7 @@ class QuestionnairesController < ApplicationController
     @questionnaire.instructor_id = session[:user].instructor_id  ## Why was TA-specific code removed here?  See Project E713.
       @questionnaire.name = 'Copy of ' + orig_questionnaire.name
 
-    clone_questionnaire_details(questions)
+    clone_questionnaire_details(questions, orig_questionnaire)
     if (session[:user]).role.name != "Teaching Assistant"
       @questionnaire.instructor_id = session[:user].id
     else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
@@ -623,7 +623,7 @@ class QuestionnairesController < ApplicationController
   end
 
   # clones the contents of a questionnaire, including the questions and associated advice
-  def clone_questionnaire_details(questions)
+  def clone_questionnaire_details(questions, orig_questionnaire)
     if (session[:user]).role.name != "Teaching Assistant"
       @questionnaire.instructor_id = session[:user].id
     else # for TA we need to get his instructor id and by default add it to his course for which he is the TA

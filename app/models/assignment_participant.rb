@@ -433,7 +433,7 @@ class AssignmentParticipant < Participant
 
 
   def quizzes_taken
-    return QuizResponseMap.get_assessments_for(self)
+    QuizResponseMap.get_assessments_for(self)
   end
 
   def metareviews
@@ -443,6 +443,10 @@ class AssignmentParticipant < Participant
 
   def teammate_reviews
     TeammateReviewResponseMap.get_assessments_for(self)
+  end
+
+  def bookmark_reviews
+    BookmarkRatingResponseMap.get_assessments_for(self)
   end
 
   def submitted_files

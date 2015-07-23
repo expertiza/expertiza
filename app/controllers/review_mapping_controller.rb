@@ -595,11 +595,6 @@ class ReviewMappingController < ApplicationController
     redirect_to :action => 'list_mappings', :id => assignment.id
   end
 
-
-  def select_mapping 
-    @assignment = Assignment.find(params[:id])
-  end
-
   def review_report
     # Get the assignment id and set it in an instance variable which will be used in view
     @id = params[:id]

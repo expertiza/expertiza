@@ -27,5 +27,18 @@ module Expertiza
     config.autoload_paths += Dir[Rails.root.join('lib', '{**}')]
 
     config.react.addons = true
+
+    config.assets.paths << Rails.root.join('vendor', 'assets', 'components')
+
+    # Bower asset paths
+    root.join('vendor', 'assets', 'components').to_s.tap do |bower_path|
+      config.sass.load_paths << bower_path
+      config.assets.paths << bower_path
+    end
+    # Precompile Bootstrap fonts
+    config.assets.precompile << %r(bootstrap-sass/assets/fonts/bootstrap/[\w-]+\.(?:eot|svg|ttf|woff2?)$)
+    # Minimum Sass number precision required by bootstrap-sass
+    ::Sass::Script::Value::Number.precision = [8, ::Sass::Script::Value::Number.precision].max
+
   end
 end

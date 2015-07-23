@@ -1,0 +1,18 @@
+{
+  "name": "BowerAndRails",
+  "version": "0.0.1",
+  "homepage": "https://github.com/expertiza/expertiza",
+  "authors": [
+    "Pei Deng <pdeng@ncsu.edu>"
+  ],
+  "description": "For using reactjs plugins in this rails project",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "vendor/assets/components",
+    "test",
+    "tests"
+  ]
+}

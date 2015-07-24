@@ -6,7 +6,7 @@
 <% i = 1 %>
 <% @questions.each do |question| %>
   <b>Question <%= i %>: </b><%= label_tag "#{question.id}", question.txt %> <br>
-  <% question_type = QuestionType.find_by_question_id(question.id) %>
+  <% question_type = question.q_type %>
 
 
   <% if question_type.q_type.eql? 'MCR' %>

@@ -3,7 +3,7 @@
   <% @questions.each do |question| %>
     <b> <%= question.txt %><br></b>
     Question ID: <%= question.id %><br>
-    <% question_type = QuestionType.get_formatted_question_type question.id %>
+    <% question_type = question.get_formatted_question_type%>
     Question Type: <%= question_type %><br>
 
     <% if question_type == 'True/False' %>

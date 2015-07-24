@@ -47,14 +47,6 @@ class QuestionnairesController < ApplicationController
           newadvice.save
         end
 
-        if (@questionnaire.section == "Custom")
-          old_question_type = QuestionType.find_by_question_id(question.id)
-          if !(old_question_type.nil?)
-            new_question_type = old_question_type.clone
-            new_question_type.question_id = newquestion.id
-            new_question_type.save
-          end
-        end
       }
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
       parent = FolderNode.find_by_node_object_id(pFolder.id)

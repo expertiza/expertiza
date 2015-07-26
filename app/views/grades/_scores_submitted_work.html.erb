@@ -34,7 +34,7 @@
     <%
         Answer.where(response_id: review.response_id).each{ |review_score|
     %>
-    review.scores.push('<%= review_score.score.to_s %>'.trim());
+    review.scores.push('<%= review_score.answer.to_s %>'.trim());
           review.comments.push('<%= review_score.comments.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim());
           <%
       }

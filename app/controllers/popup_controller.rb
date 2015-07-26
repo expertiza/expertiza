@@ -49,7 +49,7 @@ class PopupController < ApplicationController
       end
 
       @scores.each do |s|
-        @sum = @sum + s.score
+        @sum = @sum + s.answer
         @s = @sum
         @count = @count + 1
       end
@@ -111,8 +111,8 @@ class PopupController < ApplicationController
 
       @scores = Answer.where(response_id: @reviewid)
       @scores.each do |s|
-        @sum = @sum + s.score
-        @temp = @temp + s.score
+        @sum = @sum + s.answer
+        @temp = @temp + s.answer
         @count = @count + 1
       end
 

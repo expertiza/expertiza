@@ -21,7 +21,7 @@
 
     <%user_answer=Answer.where(response_id: @response.id, question_id:  question.id).first%>
     Your answer is: <b><%= user_answer.comments  %></b>
-    <%if user_answer.score==1%>
+    <%if user_answer.answer==1%>
       <img src="/assets/Check-icon.png"/>
     <%else%>
       <img src="/assets/delete_icon.png"/>
@@ -41,7 +41,7 @@
 
     Your answer is:
     <% user_answers= Answer.where(response_id: @response.id, question_id: question.id)%>
-    <%if user_answers.first.score==1%>
+    <%if user_answers.first.answer==1%>
       <img src="/assets/Check-icon.png"/>
     <%else%>
       <img src="/assets/delete_icon.png"/>
@@ -57,7 +57,7 @@
     Correct Answer is: <b><%=QuizQuestionChoice.where(question_id: question.id,iscorrect: 1).first.txt%></b><br/>
     <%user_answer=Answer.where(response_id: @response.id, question_id:  question.id).first%>
     Your answer is: <b><%= user_answer.comments %></b>
-    <%if user_answer.score==1%>
+    <%if user_answer.answer==1%>
       <img src="/assets/Check-icon.png"/>
     <%else%>
       <img src="/assets/delete_icon.png"/>

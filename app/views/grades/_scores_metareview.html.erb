@@ -34,14 +34,14 @@
     <%
         Answer.where(response_id: review.id).each{ |review_score|
     %>
-    review.scores.push('<%= review_score.score.to_s %>'.trim());
+    review.scores.push('<%= review_score.answer.to_s %>'.trim());
           review.comments.push('<%= review_score.comments.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim());
           <%
       }
         Answer.where(response_id: review.id).each{ |review_score|
           question = Question.find(review_score.question_id)
         %>
-    review.parent.questions.push({'max_score': '<%= question.questionnaire.max_question_score.to_s %>'.trim(), 'txt': '<%= question.txt %>'.trim(), 'score': '<%= review_score.score.to_s %>'.trim(), 'comment': '<%= review_score.comments.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim()});
+    review.parent.questions.push({'max_score': '<%= question.questionnaire.max_question_score.to_s %>'.trim(), 'txt': '<%= question.txt %>'.trim(), 'score': '<%= review_score.answer.to_s %>'.trim(), 'comment': '<%= review_score.comments.gsub(/(?:\n\r?|\r\n?)/, ' ').html_safe %>'.trim()});
           <%
           }
     %>

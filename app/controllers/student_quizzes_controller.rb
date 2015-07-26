@@ -25,10 +25,10 @@ class StudentQuizzesController < ApplicationController
 
     @questions.each do |question|
       score = Answer.where(response_id: @response.id, question_id:  question.id).first
-      if score.score.eql? -1
+      if score.answer.eql? -1
         #This used to be designed for ungraded essay question.
       else
-        quiz_score += score.score
+        quiz_score += score.answer
       end
     end
 

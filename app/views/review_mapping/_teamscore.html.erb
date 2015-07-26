@@ -14,7 +14,7 @@
      for i in responses
        scores = Answer.where(["response_id = ?", i.id])
        for s in scores
-         sum2 += s.score
+         sum2 += s.answer
        end
        sum2 = sum2.to_f/30
        max = sum2 if max <= sum2

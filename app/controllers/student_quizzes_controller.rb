@@ -24,7 +24,7 @@ class StudentQuizzesController < ApplicationController
     quiz_score = 0.0
 
     @questions.each do |question|
-      score = Score.where(response_id: @response.id, question_id:  question.id).first
+      score = Answer.where(response_id: @response.id, question_id:  question.id).first
       if score.score.eql? -1
         #This used to be designed for ungraded essay question.
       else
@@ -84,7 +84,7 @@ class StudentQuizzesController < ApplicationController
           end
           #for MCC, score =1 means the quiz taker have done this question correctly, not just make select this choice correctly.
           params["#{question.id}"].each do |choice|
-            new_score = Score.new comments: choice, question_id: question.id, response_id: response.id, :score => score
+            new_score = Answer.new comments: choice, question_id: question.id, response_id: response.id, :score => score
 
             unless new_score.valid?
               valid = false
@@ -99,7 +99,7 @@ class StudentQuizzesController < ApplicationController
         else
           score=0
         end
-        new_score = Score.new :comments => params["#{question.id}"], :question_id => question.id, :response_id => response.id, :score => score
+        new_score = Answer.new :comments => params["#{question.id}"], :question_id => question.id, :response_id => response.id, :score => score
         if new_score.comments.empty? || new_score.comments.nil?
           valid = false
         end
@@ -130,7 +130,7 @@ class StudentQuizzesController < ApplicationController
   end
 
   def graded?(response, question)
-    return (Score.where(question_id: question.id, response_id:  response.id).first)
+    return (Answer.where(question_id: question.id, response_id:  response.id).first)
   end
 
   private

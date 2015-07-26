@@ -1,6 +1,6 @@
 class Response < ActiveRecord::Base
   belongs_to :response_map, :class_name => 'ResponseMap', :foreign_key => 'map_id'
-  has_many :scores, :class_name => 'Score', :foreign_key => 'response_id', :dependent => :destroy
+  has_many :scores, :class_name => 'Answer', :foreign_key => 'response_id', :dependent => :destroy
   has_many :metareview_response_maps, :class_name => 'MetareviewResponseMap', :foreign_key => 'reviewed_object_id', dependent: :destroy
 
   alias_method :map, :response_map
@@ -52,7 +52,7 @@ class Response < ActiveRecord::Base
     # End of custom code
     count = 0
     #self.scores.each {
-    Score.where(response_id: self.response_id).each {
+    Answer.where(response_id: self.response_id).each {
       |review_score|
       count += 1
       code += '<big><b>Question '+count.to_s+":</b> <I>"+Question.find(review_score.question_id).txt+"</I></big><BR/><BR/>"

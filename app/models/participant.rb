@@ -128,7 +128,7 @@ class Participant < ActiveRecord::Base
           end
           scores[questionnaire_symbol] = Hash.new
           scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_for(self)
-          scores[questionnaire_symbol][:scores] = Score.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
+          scores[questionnaire_symbol][:scores] = Answer.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
         end
 
       else   #not using "vary rubric by rounds" feature
@@ -136,7 +136,7 @@ class Participant < ActiveRecord::Base
           scores[questionnaire.symbol] = Hash.new
           scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
 
-          scores[questionnaire.symbol][:scores] = Score.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+          scores[questionnaire.symbol][:scores] = Answer.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
         end
       end
 

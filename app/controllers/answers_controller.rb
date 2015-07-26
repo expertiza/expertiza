@@ -1,4 +1,4 @@
-class ScoresController < ApplicationController
+class AnswersController < ApplicationController
   helper :file
   helper :submitted_content
   helper :penalty

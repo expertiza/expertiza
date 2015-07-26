@@ -20,7 +20,7 @@ class ResponseController < ApplicationController
     @review_scores = []
     @question_type = []
     @questions.each do |question|
-      @review_scores << Score
+      @review_scores << Answer
         .where(
           response_id: @response.id,
           question_id:  question.id
@@ -94,7 +94,7 @@ class ResponseController < ApplicationController
       @review_scores = Array.new
       @questions.each {
           |question|
-          @review_scores << Score.where(response_id: @response.response_id, question_id:  question.id).first
+          @review_scores << Answer.where(response_id: @response.response_id, question_id:  question.id).first
       }
       #**********************
       # Check whether this is Jen's assgt. & if so, use her rubric
@@ -166,7 +166,7 @@ class ResponseController < ApplicationController
     @review_scores = Array.new
     @question_type = Array.new
     @questions.each do |question|
-      @review_scores << Score.where(response_id: @response.response_id, question_id:  question.id).first
+      @review_scores << Answer.where(response_id: @response.response_id, question_id:  question.id).first
       @question_type << QuestionType.find_by_question_id(question.id)
     end
     # Check whether this is a custom rubric
@@ -196,9 +196,9 @@ class ResponseController < ApplicationController
 
       params[:responses].each_pair do |k, v|
 
-        score = Score.where(response_id: @response.id, question_id:  questions[k.to_i].id).first
+        score = Answer.where(response_id: @response.id, question_id:  questions[k.to_i].id).first
         unless score
-          score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
+          score = Answer.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
         end
         score.update_attribute('score', v[:score])
         score.update_attribute('comments', v[:comment])
@@ -293,7 +293,7 @@ class ResponseController < ApplicationController
       questions = @questionnaire.questions
       if params[:responses]
         params[:responses].each_pair do |k, v|
-          score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
+          score = Answer.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
         end
       end
 
@@ -314,7 +314,7 @@ class ResponseController < ApplicationController
     questions = @questionnaire.questions
     for i in 0..questions.size-1
       # Local variable score is unused; can it be removed?
-      score = Score.create(:response_id => @response.id, :question_id => questions[i].id, :score => @questionnaire.max_question_score, :comments => params[:custom_response][i.to_s])
+      score = Answer.create(:response_id => @response.id, :question_id => questions[i].id, :score => @questionnaire.max_question_score, :comments => params[:custom_response][i.to_s])
     end
     msg = "#{@map.get_title} was successfully saved."
 

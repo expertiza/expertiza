@@ -367,7 +367,7 @@ module ResponseHelper
       when "DropDown"
         empty_response_character= @questionnaire.min_question_score
     end
-    response_count=Score.find_by_sql(["SELECT * FROM scores s, responses r, response_maps rm WHERE s.response_id=r.id AND r.map_id= rm.id AND rm.reviewed_object_id=? AND rm.reviewee_id=? AND s.comments != ? AND s.question_id=?", @map.reviewed_object_id, @map.reviewee_id, empty_response_character, question.id]).count
+    response_count=Answer.find_by_sql(["SELECT * FROM scores s, responses r, response_maps rm WHERE s.response_id=r.id AND r.map_id= rm.id AND rm.reviewed_object_id=? AND rm.reviewee_id=? AND s.comments != ? AND s.question_id=?", @map.reviewed_object_id, @map.reviewee_id, empty_response_character, question.id]).count
     response_count
   end
 
@@ -377,7 +377,7 @@ module ResponseHelper
     checkbox_questions.each { |checkbox_question|
       question_ids<<checkbox_question.id
     }
-    response_count=Score.find_by_sql(["SELECT * FROM scores s, responses r, response_maps rm WHERE s.response_id=r.id AND r.map_id= rm.id AND rm.reviewed_object_id=? AND rm.reviewee_id=? AND s.comments != '0' AND s.question_id IN (?) GROUP BY r.map_id", @map.reviewed_object_id, @map.reviewee_id, question_ids]).count
+    response_count=Answer.find_by_sql(["SELECT * FROM scores s, responses r, response_maps rm WHERE s.response_id=r.id AND r.map_id= rm.id AND rm.reviewed_object_id=? AND rm.reviewee_id=? AND s.comments != '0' AND s.question_id IN (?) GROUP BY r.map_id", @map.reviewed_object_id, @map.reviewee_id, question_ids]).count
     response_count
   end
 

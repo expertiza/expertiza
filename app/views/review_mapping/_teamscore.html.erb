@@ -12,7 +12,7 @@
      responses = Response.where(["map_id = ?", item.id])
      sum2 = 0
      for i in responses
-       scores = Score.where(["response_id = ?", i.id])
+       scores = Answer.where(["response_id = ?", i.id])
        for s in scores
          sum2 += s.score
        end

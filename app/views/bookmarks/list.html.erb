@@ -53,9 +53,9 @@
 			      <% end %>
 			    </select>
 			    <% if BookmarkRating.where(bookmark_id: bookmark.id, user_id: session[:user].id).first.blank? %>
-			    	<%= button_tag "rate", {:id=>'button'+bookmark.id.to_s,:style=>"font-size:10px; display:none;"} %>
+			    	<%= button_tag "Rate", {:id=>'button'+bookmark.id.to_s,:style=>"font-size:10px; display:none;"} %>
 			    <% else %>
-			    	<%= button_tag "update", {:id=>'button'+bookmark.id.to_s,:style=>"font-size:10px; display:none;"} %>
+			    	<%= button_tag "Update", {:id=>'button'+bookmark.id.to_s,:style=>"font-size:10px; display:none;"} %>
 				<% end %>
 			<% end %>
 	    </td>

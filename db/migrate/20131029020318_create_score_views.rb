@@ -8,9 +8,9 @@ class CreateScoreViews < ActiveRecord::Migration
       q1.created_at AS q1_created_at,q1.updated_at AS q1_updated_at,q1.default_num_choices AS q1_default_num_choices,
       q1.TYPE AS q1_type,q1.display_type AS q1_display_type,q1.section AS q1_section,q1.instruction_loc AS q1_instruction_loc,
       ques.id as ques_id,ques.questionnaire_id as ques_questionnaire_id, s.id AS s_id,s.question_id AS s_question_id,
-      s.score AS s_score,s.comments AS s_comments,s.response_id AS s_response_id
+      s.answer AS s_score,s.comments AS s_comments,s.response_id AS s_response_id
       FROM questions ques left join question_types q on ques.id = q.question_id
-      left join questionnaires q1 on ques.questionnaire_id = q1.id left join scores s on ques.id = s.question_id
+      left join questionnaires q1 on ques.questionnaire_id = q1.id left join answers s on ques.id = s.question_id
       SQL
     end
     def self.down

@@ -270,7 +270,9 @@ class SignUpSheetController < ApplicationController
     #Always use team_id ACS
     #s = Signupsheet.new
     #Team lazy initialization: check whether the user already has a team for this assignment
-    SignUpSheet.signup_team(@assignment.id, @user_id, params[:id])
+    unless SignUpSheet.signup_team(@assignment.id, @user_id, params[:id]) then
+	flash[:error] = "You've already signed up for a topic!"
+    end
     redirect_to :action => 'list', :assignment_id => params[:assignment_id]
   end
 

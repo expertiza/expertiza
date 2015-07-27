@@ -52,29 +52,49 @@ class Question < ActiveRecord::Base
     end
   end
 
+  #multipart rubric rewrite
   #merge questions table and question_types table
   #step 1
+  def self.move_true_false_data_into_q_type #true_false: true->Checkbox, false->Criterion
+    questions = Question.all
+    questions.each do |question|
+      if question.true_false == true
+        question.update_attribute('q_type', 'Checkbox')
+      elsif question.true_false == false
+        question.update_attribute('q_type', 'Criterion')
+      elsif question.true_false == nil
+        question.update_attribute('q_type', 'Checkbox')
+      end
+    end
+  end
+
+  #step 2
   def self.add_q_type_in_questions_table
     question_types = QuestionType.all
     question_types.each do |question_type|
       question = Question.find(question_type.question_id)
       question.update_attribute('q_type', question_type.q_type)
     end
+    #q_type: 'rating' -> 'Criterion'
+    questions = Question.all
+    questions.each do |question|
+      question.update_attribute('q_type', 'Criterion') if question.q_type == 'Rating'
+    end
   end
 
-  #step 2
+  #step 3
   def self.add_size_in_questions_table
     question_types = QuestionType.where("q_type in (?, ?)", 'TextArea', 'TextField')
     question_types.each do |question_type|
       next if question_type.parameters.empty?
       question = Question.find(question_type.question_id)
-      size = question_type.parameters.match(/\d*x\d*/).to_s if question_type.q_type == 'TextArea'
+      size = question_type.parameters.match(/\d*x\d*/).to_s.sub! 'x', ',' if question_type.q_type == 'TextArea'
       size = question_type.parameters.match(/\d/).to_s if question_type.q_type == 'TextField'
       question.update_attribute('size', size) if size != ""
     end
   end
 
-  #step 3
+  #step 4
   def self.add_alternatives_in_questions_table
     question_types = QuestionType.where(q_type: 'DropDown')
     question_types.each do |question_type|
@@ -82,5 +102,54 @@ class Question < ActiveRecord::Base
       alternatives = question_type.parameters.match(/[a-zA-Z0-9]*\|[a-zA-Z0-9]*/).to_s
       question.update_attribute('alternatives', alternatives)
     end
+  end
+
+  #step 5
+  def self.find_customed_questions
+    customed_questions = Array.new
+    question_types = QuestionType.all
+    question_types.each do |question_type|
+      customed_questions << question_type.question_id
+    end
+    customed_questions
+  end
+
+  #step 6
+  def self.question_in_normal_questionnaire_use_primary_key_as_seq_no
+    customed_questions = Question.find_customed_questions
+    questions = Question.all
+    questions.each do |question|
+      question.update_attribute('seq', question.id) if !customed_questions.include? question.id
+    end
+  end
+
+  #step 7
+  #Migrate 'answers' table
+  #Although there are many criterion question in customed questionnaires,
+  #only question_ids in (1923~1938) and (2449~2482) have corresponding records in 'answers' table.
+  def self.copy_comments_value_to_score_value_in_every_odd_num_record
+    question_ids = [1923, 1925, 1927, 1929, 1931, 1933, 1935, 1937, 2449, 2451, 2453, 2455, 2457, 2459, 
+2461, 2463, 2465, 2467, 2469, 2471, 2473, 2475, 2477, 2479, 2481]
+    question_ids.each do |question_id|
+      answers = Answer.where(question_id: question_id)
+      answers.each do |answer|
+        answer.update_attributes(answer: answer.comments, comments: Answer.find(answer.id + 1).comments)
+      end
+    end
+  end
+
+  #step 8
+  #Now records in 'answers' table, the txt of these corresponding question being 'Comment:' is useless.
+  def self.remove_useless_comment_records_from_answers_table
+    question_ids = [1924, 1926, 1928, 1930, 1932, 1934, 1936, 1938, 2450, 2452, 2454, 2456, 2458, 2460, 2462, 2464, 2466, 2468, 2470, 2472, 2474, 2476, 2478, 2480, 2482]
+    question_ids.each do |question_id|
+      Answer.where(question_id: question_id).destroy_all
+    end
+  end
+
+  #step 9
+  #Now records in 'questions' table whose txt is 'Comment:' is useless.
+  def self.remove_useless_comment_records_from_questions_table
+    Question.where("q_type = ? and txt = ?", 'Criterion', 'Comment:').destroy_all
   end
 end

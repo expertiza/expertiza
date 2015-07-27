@@ -144,11 +144,13 @@ jQuery(".tree_display.list").ready(function() {
       }
       return (
         <tr style={style}>
-          <td colSpan="5">
-          <SimpleTable
-           key={"simpletable_"+this.props.id}
-           data={this.props.children}
-          />
+          <td>
+          </td>
+          <td colSpan='4'>
+            <SimpleTable
+             key={"simpletable_"+this.props.id}
+             data={this.props.children}
+            />
           </td>
         </tr>
       )
@@ -237,7 +239,7 @@ jQuery(".tree_display.list").ready(function() {
                 _rows.push(<ContentTableDetailsRow
                             key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()}
                             id={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()}
-                            showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()) > -1 ? "block" : "none"}
+                            showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()) > -1 ? "" : "none"}
                             children={entry.children}
                             />)
           } else {

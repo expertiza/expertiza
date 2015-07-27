@@ -2,7 +2,7 @@
   <%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant, stage: @stage} %>
 <% end %>
 
-<% if stage != "Finished" and controller.controller_name == 'submitted_content' and can_submit %>
+<% if stage != "Finished" and controller.controller_name == 'submitted_content' and @can_submit %>
   <%= form_tag :action => 'submit_hyperlink', :id => participant.id do %>
     <b>Submit a hyperlink:</b><BR/>
     <input type="text" name="submission" size=40 value="http://">

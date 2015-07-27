@@ -11,7 +11,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150721174405) do
+ActiveRecord::Schema.define(version: 20150727153308) do
+
+  create_table "answers", force: :cascade do |t|
+    t.integer "question_id", limit: 4,     default: 0, null: false
+    t.integer "answer",      limit: 4
+    t.text    "comments",    limit: 65535
+    t.integer "response_id", limit: 4
+  end
+
+  add_index "answers", ["question_id"], name: "fk_score_questions", using: :btree
+  add_index "answers", ["response_id"], name: "fk_score_response", using: :btree
 
   create_table "assignment_questionnaires", force: :cascade do |t|
     t.integer "assignment_id",        limit: 4
@@ -294,17 +304,6 @@ ActiveRecord::Schema.define(version: 20150721174405) do
     t.string  "type",           limit: 255
   end
 
-  create_table "participant_score_views", id: false, force: :cascade do |t|
-    t.integer "response_id",        limit: 4,  default: 0, null: false
-    t.integer "score",              limit: 4
-    t.integer "weight",             limit: 4
-    t.string  "questionaire_type",  limit: 64
-    t.integer "max_question_score", limit: 4
-    t.integer "team_id",            limit: 4,  default: 0, null: false
-    t.integer "participant_id",     limit: 4
-    t.integer "assignment_id",      limit: 4
-  end
-
   create_table "participant_team_roles", force: :cascade do |t|
     t.integer  "role_assignment_id", limit: 4
     t.integer  "participant_id",     limit: 4
@@ -381,6 +380,11 @@ ActiveRecord::Schema.define(version: 20150721174405) do
     t.boolean "true_false",       limit: 1
     t.integer "weight",           limit: 4
     t.integer "questionnaire_id", limit: 4
+    t.float   "seq",              limit: 24
+    t.string  "q_type",           limit: 255
+    t.string  "size",             limit: 255
+    t.string  "alternatives",     limit: 255
+    t.boolean "break_before",     limit: 1,     default: true
   end
 
   add_index "questions", ["questionnaire_id"], name: "fk_question_questionnaires", using: :btree
@@ -461,13 +465,6 @@ ActiveRecord::Schema.define(version: 20150721174405) do
   add_index "roles_permissions", ["permission_id"], name: "fk_roles_permission_permission_id", using: :btree
   add_index "roles_permissions", ["role_id"], name: "fk_roles_permission_role_id", using: :btree
 
-  create_table "score_caches", force: :cascade do |t|
-    t.integer "reviewee_id", limit: 4
-    t.float   "score",       limit: 24,  default: 0.0, null: false
-    t.string  "range",       limit: 255, default: ""
-    t.string  "object_type", limit: 255, default: "",  null: false
-  end
-
   create_table "score_views", id: false, force: :cascade do |t|
     t.integer  "question_weight",        limit: 4
     t.integer  "q_id",                   limit: 4,     default: 0
@@ -495,16 +492,6 @@ ActiveRecord::Schema.define(version: 20150721174405) do
     t.text     "s_comments",             limit: 65535
     t.integer  "s_response_id",          limit: 4
   end
-
-  create_table "scores", force: :cascade do |t|
-    t.integer "question_id", limit: 4,     default: 0, null: false
-    t.integer "score",       limit: 4
-    t.text    "comments",    limit: 65535
-    t.integer "response_id", limit: 4
-  end
-
-  add_index "scores", ["question_id"], name: "fk_score_questions", using: :btree
-  add_index "scores", ["response_id"], name: "fk_score_response", using: :btree
 
   create_table "sessions", force: :cascade do |t|
     t.string   "session_id", limit: 255,      default: "", null: false
@@ -748,6 +735,8 @@ ActiveRecord::Schema.define(version: 20150721174405) do
     t.string "name", limit: 255, default: "", null: false
   end
 
+  add_foreign_key "answers", "questions", name: "fk_score_questions"
+  add_foreign_key "answers", "responses", name: "fk_score_response"
   add_foreign_key "assignment_questionnaires", "assignments", name: "fk_aq_assignments_id"
   add_foreign_key "assignment_questionnaires", "questionnaires", name: "fk_aq_questionnaire_id"
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
@@ -775,8 +764,6 @@ ActiveRecord::Schema.define(version: 20150721174405) do
   add_foreign_key "question_types", "questions", name: "fk_question_type_question"
   add_foreign_key "questions", "questionnaires", name: "fk_question_questionnaires"
   add_foreign_key "resubmission_times", "participants", name: "fk_resubmission_times_participants"
-  add_foreign_key "scores", "questions", name: "fk_score_questions"
-  add_foreign_key "scores", "responses", name: "fk_score_response"
   add_foreign_key "sign_up_topics", "assignments", name: "fk_sign_up_topics_assignments"
   add_foreign_key "signed_up_teams", "sign_up_topics", column: "topic_id", name: "fk_signed_up_users_sign_up_topics"
   add_foreign_key "ta_mappings", "courses", name: "fk_ta_mappings_course_id"

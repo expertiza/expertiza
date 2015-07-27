@@ -43,7 +43,7 @@ class SubmittedContentController < ApplicationController
     @can_submit=false
 
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
-
+    redirect_to action: 'edit', id:params[:id]
   end
 
 def submit_hyperlink

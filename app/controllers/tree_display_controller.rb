@@ -85,39 +85,139 @@ class TreeDisplayController < ApplicationController
   # ajbudlon, July 3rd 2008
   def list
     redirect_to controller: :student_task, action: :list if current_user.student?
-    if params[:commit] == 'Search'
-      search_node_root = {'Q' => 1, 'C' => 2, 'A' => 3}
+    # if params[:commit] == 'Search'
+    #   search_node_root = {'Q' => 1, 'C' => 2, 'A' => 3}
 
-      if params[:search_string]
-        search_node = params[:searchnode]
-        session[:root] = search_node_root[search_node]
-        search_string = params[:search_string]
-      else
-        search_string = nil
+    #   if params[:search_string]
+    #     search_node = params[:searchnode]
+    #     session[:root] = search_node_root[search_node]
+    #     search_string = params[:search_string]
+    #   else
+    #     search_string = nil
+    #   end
+    # else
+    #   search_string = nil
+    # end
+
+    # search_string = filter if params[:commit] == 'Filter'
+    # search_string = nil if params[:commit] == 'Reset'
+
+    # @search = search_string
+
+    # display = params[:display] #|| session[:display]
+    # if display
+    #   @sortvar = display[:sortvar]
+    #   @sortorder = display[:sortorder]
+    # end
+
+    # @sortvar ||= 'created_at'
+    # @sortorder ||= 'desc'
+
+    # if session[:root]
+    #   @root_node = Node.find(session[:root])
+    #   @child_nodes = @root_node.get_children(@sortvar,@sortorder,session[:user].id,@show,nil,@search)
+    # else
+    # child_nodes = FolderNode.get()
+    # end
+    # @reactjsParams = {}
+    # @reactjsParams[:nodeType] = 'FolderNode'
+    # @reactjsParams[:child_nodes] = child_nodes
+
+  end
+
+  def get_folder_node_ng
+    respond_to do |format|
+      format.html {render json: FolderNode.get()}
+    end
+  end
+
+  def get_children_node_ng
+    childNodes = {}
+    if params[:reactParams][:child_nodes].is_a? String
+      childNodes = JSON.parse(params[:reactParams][:child_nodes])
+    else
+      childNodes = params[:reactParams][:child_nodes]
+    end
+    tmpRes = {}
+    res = {}
+    for node in childNodes
+      fnode = eval(params[:reactParams][:nodeType]).new
+
+      for a in node
+        fnode[a[0]] = a[1]
       end
-    else
-      search_string = nil
+
+      # fnode is the parent node
+      # ch_nodes are childrens
+      ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
+      tmpRes[fnode.get_name] = ch_nodes
+
+      # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
+
     end
 
-    search_string = filter if params[:commit] == 'Filter'
-    search_string = nil if params[:commit] == 'Reset'
+    for nodeType in tmpRes.keys
+      res[nodeType] =  Array.new
 
-    @search = search_string
+      for node in tmpRes[nodeType]
+        tmpObject = {}
+        tmpObject["nodeinfo"] = node
+        tmpObject["name"] = node.get_name
+        tmpObject["type"] = node.type
 
-    display = params[:display] #|| session[:display]
-    if display
-      @sortvar = display[:sortvar]
-      @sortorder = display[:sortorder]
+        if nodeType == 'Courses' || nodeType == "Assignments"
+          tmpObject["directory"] = node.get_directory
+          tmpObject["creation_date"] = node.get_creation_date
+          tmpObject["updated_date"] = node.get_modified_date
+        end
+        res[nodeType] << tmpObject
+      end
+
     end
 
-    @sortvar ||= 'created_at'
-    @sortorder ||= 'desc'
+    respond_to do |format|
+      format.html {render json: res}
+    end
+  end
 
-    if session[:root]
-      @root_node = Node.find(session[:root])
-      @child_nodes = @root_node.get_children(@sortvar,@sortorder,session[:user].id,@show,nil,@search)
+  def get_children_node_2_ng
+    childNodes = {}
+    puts params[:reactParams2]
+    if params[:reactParams2][:child_nodes].is_a? String
+      childNodes = JSON.parse(params[:reactParams2][:child_nodes])
     else
-      @child_nodes = FolderNode.get()
+      childNodes = params[:reactParams2][:child_nodes]
+    end
+    tmpRes = {}
+    res = []
+    fnode = eval(params[:reactParams2][:nodeType]).new
+    childNodes.each do |key, value|
+      fnode[key] = value
+    end
+
+    ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
+    tmpRes = ch_nodes
+    if tmpRes
+      # logger.warn tmpRes.inspect
+      for child in tmpRes
+        nodeType = child.type
+        res2 = {}
+        res2["nodeinfo"] = child
+        res2["name"] = child.get_name
+        res2["key"] = params[:reactParams2][:key]
+        res2["type"] = nodeType
+
+        if nodeType == 'CourseNode' || nodeType == "AssignmentNode"
+          res2["directory"] = child.get_directory
+          res2["creation_date"] = child.get_creation_date
+          res2["updated_date"] = child.get_modified_date
+        end
+        res << res2
+      end
+    end
+
+    respond_to do |format|
+      format.html {render json: res}
     end
   end
 

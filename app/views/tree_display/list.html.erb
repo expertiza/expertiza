@@ -2,4 +2,5 @@
 <%#= render :partial => 'page_header' %>
 <%#= render :partial => 'bread_crumbs' %>
 <%#= render :partial => 'page_footer' %>
-<div id="reactjs"></div>
+<div id="tree_display" params="#{@reactjsParams}"></div>
+<%#= react_component('TreeDisplay', params: '#{@reactjsParams}') %>

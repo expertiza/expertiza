@@ -4,5 +4,5 @@
     <%= ">" if i < (crumbs.length - 1) %>
   <% end %>
   <div style="float: right;">
-  Current local time : <%= DateTime.now.in_time_zone(session[:user].timezonepref) %></div>
+  Current local time : <%= DateTime.now.in_time_zone(session[:user].timezonepref ||= "Eastern Time (US & Canada)").strftime("%Y-%m-%d %H:%M %z")%></div>
 </div>

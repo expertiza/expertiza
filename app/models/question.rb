@@ -105,7 +105,7 @@ class Question < ActiveRecord::Base
   end
 
   #step 5
-  def self.find_customed_questions
+  def self.find_customized_questions
     customed_questions = Array.new
     question_types = QuestionType.all
     question_types.each do |question_type|
@@ -115,11 +115,11 @@ class Question < ActiveRecord::Base
   end
 
   #step 6
-  def self.question_in_normal_questionnaire_use_primary_key_as_seq_no
-    customed_questions = Question.find_customed_questions
+  def self.use_primary_key_as_seq_no
+    customed_questions = Question.find_customized_questions
     questions = Question.all
     questions.each do |question|
-      question.update_attribute('seq', question.id) if !customed_questions.include? question.id
+      question.update_attribute('seq', question.id)
     end
   end
 
@@ -150,6 +150,6 @@ class Question < ActiveRecord::Base
   #step 9
   #Now records in 'questions' table whose txt is 'Comment:' is useless.
   def self.remove_useless_comment_records_from_questions_table
-    Question.where("q_type = ? and txt = ?", 'Criterion', 'Comment:').destroy_all
+    Question.where(["q_type = ? and txt = ?", 'Criterion', 'Comment:']).destroy_all
   end
 end

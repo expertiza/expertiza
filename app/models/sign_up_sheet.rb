@@ -46,7 +46,6 @@ class SignUpSheet < ActiveRecord::Base
       #If all the topics choosen by the user are waitlisted,
       for user_signup_topic in user_signup
         if user_signup_topic.is_waitlisted == false
-          flash[:error] = "You have already signed up for a topic."
           return false
         end
       end

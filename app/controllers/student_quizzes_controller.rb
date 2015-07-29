@@ -84,7 +84,7 @@ class StudentQuizzesController < ApplicationController
           end
           #for MCC, score =1 means the quiz taker have done this question correctly, not just make select this choice correctly.
           params["#{question.id}"].each do |choice|
-            new_score = Answer.new comments: choice, question_id: question.id, response_id: response.id, :score => score
+            new_score = Answer.new comments: choice, question_id: question.id, response_id: response.id, :answer => score
 
             unless new_score.valid?
               valid = false
@@ -99,7 +99,7 @@ class StudentQuizzesController < ApplicationController
         else
           score=0
         end
-        new_score = Answer.new :comments => params["#{question.id}"], :question_id => question.id, :response_id => response.id, :score => score
+        new_score = Answer.new :comments => params["#{question.id}"], :question_id => question.id, :response_id => response.id, :answer => score
         if new_score.comments.empty? || new_score.comments.nil?
           valid = false
         end

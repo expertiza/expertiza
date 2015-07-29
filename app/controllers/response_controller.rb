@@ -18,14 +18,11 @@ class ResponseController < ApplicationController
 
   def get_scores
     @review_scores = []
-    @question_type = []
     @questions.each do |question|
-      @review_scores << Answer
-        .where(
+      @review_scores << Answer.where(
           response_id: @response.id,
           question_id:  question.id
         ).first
-      @question_type << QuestionType.find_by_question_id(question.id)
     end
   end
 
@@ -198,9 +195,9 @@ class ResponseController < ApplicationController
 
         score = Answer.where(response_id: @response.id, question_id:  questions[k.to_i].id).first
         unless score
-          score = Answer.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
+          score = Answer.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :answer => v[:score], :comments => v[:comment])
         end
-        score.update_attribute('score', v[:score])
+        score.update_attribute('answer', v[:score])
         score.update_attribute('comments', v[:comment])
       end
     rescue
@@ -218,7 +215,6 @@ class ResponseController < ApplicationController
   end
 
   def new
-
     @header = "New"
     @next_action = "create"
     @feedback = params[:feedback]
@@ -293,7 +289,7 @@ class ResponseController < ApplicationController
       questions = @questionnaire.questions
       if params[:responses]
         params[:responses].each_pair do |k, v|
-          score = Answer.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
+          score = Answer.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :answer => v[:score], :comments => v[:comment])
         end
       end
 
@@ -314,7 +310,7 @@ class ResponseController < ApplicationController
     questions = @questionnaire.questions
     for i in 0..questions.size-1
       # Local variable score is unused; can it be removed?
-      score = Answer.create(:response_id => @response.id, :question_id => questions[i].id, :score => @questionnaire.max_question_score, :comments => params[:custom_response][i.to_s])
+      score = Answer.create(:response_id => @response.id, :question_id => questions[i].id, :answer => @questionnaire.max_question_score, :comments => params[:custom_response][i.to_s])
     end
     msg = "#{@map.get_title} was successfully saved."
 
@@ -369,7 +365,6 @@ class ResponseController < ApplicationController
 
   private
   def get_content
-    logger.warn "@map: #{@map.inspect}"
     @title = @map.get_title
     @assignment = @map.assignment
     @participant = @map.reviewer

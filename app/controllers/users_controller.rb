@@ -144,12 +144,14 @@ class UsersController < ApplicationController
 
 
   def edit
+    params.permit!
     @user = User.find(params[:id])
     get_role
     foreign
   end
 
   def update
+    params.permit!
     @user = User.find params[:id]
 
     #update username, when the user cannot be deleted

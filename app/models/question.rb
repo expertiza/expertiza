@@ -52,6 +52,22 @@ class Question < ActiveRecord::Base
     end
   end
 
+  def edit
+  end
+
+  def view_question_text
+  end
+
+  def view_completed_question
+  end
+
+  def complete
+  end
+
+  def self.compute_question_score
+     return 0
+  end
+
   #multipart rubric rewrite
   #merge questions table and question_types table
   #step 1

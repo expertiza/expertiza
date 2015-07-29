@@ -4,11 +4,13 @@ class ProfileController < ApplicationController
   end
 
   def edit
+    params.permit!
     @user = session[:user]
     @assignment_questionnaire = AssignmentQuestionnaire.where(['user_id = ? and assignment_id is null and questionnaire_id is null', @user.id]).first
   end
 
   def update
+    params.permit!
     @user = session[:user]
 
     unless params[:assignment_questionnaire].nil? or params[:assignment_questionnaire][:notification_limit].blank?

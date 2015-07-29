@@ -74,7 +74,7 @@ class Response < ActiveRecord::Base
 
   # Computes the total score awarded for a review
   def get_total_score
-    scores.map(&:score).sum
+    scores.map(&:answer).sum
   end
 
   #Generate an email to the instructor when a new review exceeds the allowed difference

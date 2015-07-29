@@ -18,14 +18,11 @@ class ResponseController < ApplicationController
 
   def get_scores
     @review_scores = []
-    @question_type = []
     @questions.each do |question|
-      @review_scores << Answer
-        .where(
+      @review_scores << Answer.where(
           response_id: @response.id,
           question_id:  question.id
         ).first
-      @question_type << QuestionType.find_by_question_id(question.id)
     end
   end
 
@@ -218,7 +215,6 @@ class ResponseController < ApplicationController
   end
 
   def new
-
     @header = "New"
     @next_action = "create"
     @feedback = params[:feedback]
@@ -369,7 +365,6 @@ class ResponseController < ApplicationController
 
   private
   def get_content
-    logger.warn "@map: #{@map.inspect}"
     @title = @map.get_title
     @assignment = @map.assignment
     @participant = @map.reviewer

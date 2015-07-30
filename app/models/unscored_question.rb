@@ -1,6 +1,13 @@
 class UnscoredQuestion < ChoiceQuestion
-  def self.selected_answer
-    answer = Answer.where(question_id: self.id)
-    return self.txt.split('|')[answer.answer]
+  def edit
+  end
+
+  def view_question_text
+  end
+
+  def complete
+  end
+
+  def view_completed_question
   end
 end

@@ -5,9 +5,9 @@ class DropDown < UnscoredQuestion
   def view_question_text
   end
 
-  def view_completed_question
+  def complete
   end
 
-  def complete
+  def view_completed_question
   end
 end

@@ -12,10 +12,10 @@ class Scale < ScoredQuestion
 
   def view_question_text
   	html = "Type: <input id="question_type" name="question[type]" type="text" value="Scale" size="3" disabled="true" />"
-  	html += "Txt: <input id="question_txt" name="question[txt]" size="70" type="text" disabled="true" />"
-  	html += "Min_label: <input id="question_min_label" name="question[min_label]" size="5" type="text" disabled="true" />"
-  	html += "Max_label: <input id="question_max_label" name="question[max_label]" size="5" type="text" disabled="true" />"
-  	html += "Weight: <input id="question_weight" name="question[weight]" size="1" type="text" disabled="true" />"
+  	html += "Txt: <input id="question_txt" name="question[txt]" size="70" type="text" value=" +self.txt+ " disabled="true" />"
+    html += "Min_label: <input id="question_min_label" name="question[min_label]" size="5" type="text" value=" +self.min_label+ " disabled="true" />"
+    html += "Max_label: <input id="question_max_label" name="question[max_label]" size="5" type="text" value=" +self.max_label+ " disabled="true" />"
+  	html += "Weight: <input id="question_weight" name="question[weight]" size="1" type="text" value=" +self.weight+ " disabled="true" />"
   end
 
   def complete

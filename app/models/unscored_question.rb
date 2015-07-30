@@ -1,4 +1,6 @@
 class UnscoredQuestion < ChoiceQuestion
+  validates_presence_of :alternatives
+  
   def edit
   end
 

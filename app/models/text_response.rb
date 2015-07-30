@@ -1,4 +1,6 @@
 class TextResponse < Question
+  validates_presence_of :size
+  
   def edit
   end
 

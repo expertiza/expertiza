@@ -2,7 +2,7 @@ class Question < ActiveRecord::Base
   belongs_to :questionnaire # each question belongs to a specific questionnaire
   belongs_to :review_score  # each review_score pertains to a particular question
   belongs_to :review_of_review_score  # ditto
-  has_many :question_advices, :dependent => :destroy # for each question, there is separate advice about each possible score
+  has_many :question_advices # for each question, there is separate advice about each possible score
   has_many :signup_choices # ?? this may reference signup type questionnaires
   has_one :question_type
 
@@ -166,6 +166,38 @@ class Question < ActiveRecord::Base
   #step 9
   #Now records in 'questions' table whose txt is 'Comment:' is useless.
   def self.remove_useless_comment_records_from_questions_table
+    #questions = Question.where(["q_type = ? and txt = ?", 'Criterion', 'Comment:'])
+    #questions.each do |question|
+    #  QuestionAdvice.where(question_id: question.id).destroy_all
+    #  QuestionType.where(question_id: question.id).destroy_all
+    #end
     Question.where(["q_type = ? and txt = ?", 'Criterion', 'Comment:']).destroy_all
+  end
+
+  #step 10
+  #Add 'section_header' to questions table
+  def self.add_section_header_to_questions_table
+    question_types = QuestionType.all
+    question_types.each do |question_type|
+      txt = question_type.parameters.match(/\A\w*\s*\w*/).to_s
+      seq = question_type.question_id - 0.75
+      questionnaire_id = Question.find(question_type.question_id).questionnaire_id
+      Question.create(txt: txt, weight: 1, questionnaire_id: questionnaire_id, seq: seq, q_type: 'Section_header', break_before: 1)
+    end
+  end
+
+  #step 11
+  #delete unused questionnaires and corresponding questions and question advices
+  def self.delete_unused_questionnaires
+    unused_questionnaire_ids = [126, 133, 151, 170, 171, 180, 186, 197, 203, 205, 206, 207, 208, 209, 210, 212, 216, 220, 222, 223, 224, 225, 229, 230, 231, 232, 233, 234, 235, 241, 244, 247, 251]
+    unused_questionnaire_ids.each do |questionnaire_id|
+      questions = Question.where(questionnaire_id: questionnaire_id)
+      questions.each do |question|
+        QuestionAdvice.where(question_id: question.id).destroy_all
+        QuestionType.where(question_id: question.id).destroy_all
+      end
+      questions.destroy_all
+      Questionnaire.find(questionnaire_id).destroy
+    end
   end
 end

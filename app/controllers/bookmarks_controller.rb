@@ -13,14 +13,6 @@ class BookmarksController < ApplicationController
   def list
     @bookmarks = Bookmark.where(topic_id: params[:id])
     @topic = SignUpTopic.find(params[:id])
-    #Question.move_true_false_data_into_q_type
-    #Question.add_q_type_in_questions_table
-    #Question.add_size_in_questions_table
-    #Question.add_alternatives_in_questions_table
-    #Question.use_primary_key_as_seq_no
-    #Question.copy_comments_value_to_score_value_in_every_odd_num_record
-    #Question.remove_useless_comment_records_from_answers_table
-    Question.remove_useless_comment_records_from_questions_table
   end
 
   def new

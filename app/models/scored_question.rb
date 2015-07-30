@@ -1,4 +1,9 @@
 class ScoredQuestion < ChoiceQuestion
+  validates_presence_of :weight # user must specify a weight for a question
+  validates_numericality_of :weight # the weight must be numeric
+  validates_presence_of :min_label
+  validates_presence_of :max_label
+
   def edit
   end
 

@@ -1,19 +1,17 @@
 class MultipleChoice < UnscoredQuestion
   def edit
   	html = "<form accept-charset="UTF-8" action="/questions/create" method="post">"
-  	html += "Type: <input id="question_type" name="question[type]" type="text" value="Scale" size="3" disabled="true" />"
+  	html += "Type: <input id="question_type" name="question[type]" type="text" value="MultipleChoice" size="5" disabled="true" />"
   	html += "Txt: <input id="question_txt" name="question[txt]" size="70" type="text" />"
   	html += "Alternatives: <input id="question_alternatives" name="question[alternatives]" size="5" type="text" />"
-  	html += "Weight: <input id="question_weight" name="question[weight]" size="1" type="text" />"
   	html += "<input name="commit" type="submit" value="Create/Edit" />"
   	html += "</form>"
   end
 
   def view_question_text
-  	html = "Type: <input id="question_type" name="question[type]" type="text" value="Scale" size="3" disabled="true" />"
-  	html += "Txt: <input id="question_txt" name="question[txt]" size="70" type="text" disabled="true"/>"
-  	html += "Alternatives: <input id="question_alternatives" name="question[alternatives]" size="5" type="text" disabled="true"/>"
-  	html += "Weight: <input id="question_weight" name="question[weight]" size="1" type="text" disabled="true"/>"
+  	html = "Type: <input id="question_type" name="question[type]" type="text" value="MultipleChoice" size="5" disabled="true" />"
+  	html += "Txt: <input id="question_txt" name="question[txt]" size="70" type="text" value=" +self.txt+ " disabled="true" />"
+    html += "Alternatives: <input id="question_alternatives" name="question[alternatives]" size="5" type="text" value=" +self.alternatives+ " disabled="true" />"
   end
 
   def complete

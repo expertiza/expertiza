@@ -52,16 +52,25 @@ class Question < ActiveRecord::Base
     end
   end
 
+  # Placeholder methods, override in derived classes if required.
+  # this method decide what to display if an instructor (etc.) is creating or editing a questionnaire
   def edit
+    return nil
   end
 
+  #this method decide what to display if an instructor (etc.) is viewing a questionnaire
   def view_question_text
+    return nil
   end
 
+  #this method decide what to display if a student is filling out a questionnaire
   def view_completed_question
+    return nil
   end
 
+  #this method decide what to display if a student is viewing a filled-out questionnaire
   def complete
+    return nil
   end
 
   def self.compute_question_score

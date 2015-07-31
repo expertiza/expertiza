@@ -17,7 +17,7 @@ class Criterion < ScoredQuestion
   def view_question_text
     html = '<TR><TD align="left"> '+self.txt+' </TD>'
     html += '<TD align="left">'+self.type+'</TD>'
-    html += '<td align=left>'+self.weight.to_s+'</TD>'
+    html += '<td align="center">'+self.weight.to_s+'</TD>'
     questionnaire = self.questionnaire
     html += '<TD align="center">'+questionnaire.min_question_score.to_s+' to '+ questionnaire.max_question_score.to_s + '</TD>'
     html += '</TR>'

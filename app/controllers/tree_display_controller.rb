@@ -169,6 +169,10 @@ class TreeDisplayController < ApplicationController
           tmpObject["directory"] = node.get_directory
           tmpObject["creation_date"] = node.get_creation_date
           tmpObject["updated_date"] = node.get_modified_date
+          tmpObject["private"] = node.get_private
+          if nodeType == "Assignments"
+            tmpObject["course_id"] = node.get_course_id
+          end
         end
         res[nodeType] << tmpObject
       end
@@ -182,7 +186,6 @@ class TreeDisplayController < ApplicationController
 
   def get_children_node_2_ng
     childNodes = {}
-    puts params[:reactParams2]
     if params[:reactParams2][:child_nodes].is_a? String
       childNodes = JSON.parse(params[:reactParams2][:child_nodes])
     else
@@ -198,7 +201,6 @@ class TreeDisplayController < ApplicationController
     ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
     tmpRes = ch_nodes
     if tmpRes
-      # logger.warn tmpRes.inspect
       for child in tmpRes
         nodeType = child.type
         res2 = {}
@@ -211,6 +213,10 @@ class TreeDisplayController < ApplicationController
           res2["directory"] = child.get_directory
           res2["creation_date"] = child.get_creation_date
           res2["updated_date"] = child.get_modified_date
+          res2["private"] = child.get_private
+          if nodeType == "AssignmentNode"
+            res2["course_id"] = child.get_course_id
+          end
         end
         res << res2
       end

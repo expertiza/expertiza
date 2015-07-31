@@ -114,6 +114,14 @@ class CourseNode < Node
     @course.updated_at
   end
 
+  # Gets the private attribute from the associated object
+  def get_private
+    unless @course
+      @course=Course.find(self.node_object_id)
+    end
+    @course.private
+  end
+
   # Gets any TeamNodes associated with this object
   def get_teams
     TeamNode.get(self.node_object_id)

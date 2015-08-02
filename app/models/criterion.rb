@@ -25,18 +25,39 @@ class Criterion < ScoredQuestion
     html.html_safe
   end
 
-  def complete
-  	# html = self.txt
-  	# html += "<select id="answer_answer" name="answer[answer]">"
-  	# html += "<option value="1">1-" +self.min_label+ "</option>"
-  	# html += "<option value="2">2</option>"
-  	# html += "<option value="3">3</option>"
-  	# html += "<option value="4">4</option>"
-  	# html += "<option value="5">5-" +self.max_label+ "</option></select><br/>"
-  	# html += "Comment:<br/>"
-  	# cols = self.size.split(',')[0]
-  	# rows = self.size.split(',')[1]
-  	# html += "<textarea id="answer_comments" name="answer[comments]" cols=" +cols+ " rows=" +rows+ "></textarea>"
+  def complete(count, answer=nil, questionnaire_min, questionnaire_max)
+  	if self.size.nil?
+      cols = '70'
+      rows = '1'
+    elsif 
+      cols = self.size.split(',')[0]
+      rows = self.size.split(',')[1]
+    end
+    html = self.txt + '<br>'
+    html += '<textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
+    html += answer.comments if !answer.comments.nil?
+    html += '</textarea>'
+    html += '<select id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]">'
+    for j in questionnaire_min..questionnaire_max
+      if !answer.nil? and j == answer.answer
+        html += '<option value=' + j.to_s + ' selected="selected">' 
+      else
+        html += '<option value=' + j.to_s + '>'
+      end
+      if j == questionnaire_min
+        html += j.to_s
+        html += "-" + self.min_label if !self.min_label.nil?
+        html += "</option>"
+      elsif j == questionnaire_max
+        html += j.to_s
+        html += "-" + self.max_label if !self.max_label.nil?
+        html += "</option>"
+      else
+        html += j.to_s + "</option>"
+      end
+    end
+    html += "</select><br><br><br>"
+    html.html_safe
   end
 
   #This method returns what to display if a student is viewing a filled-out questionnaire
@@ -47,7 +68,7 @@ class Criterion < ScoredQuestion
 			html += '<TR><TD valign="top"><B>Response:</B></TD><TD>' + answer.comments.gsub("<", "&lt;").gsub(">", "&gt;").gsub(/\n/, '<BR/>')
 		end
 		html += '</TD></TR></TABLE><BR/>'
-		html
+		html.html_safe
   end
 
   

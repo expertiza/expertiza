@@ -10,7 +10,7 @@ class Question < ActiveRecord::Base
   validates_presence_of :txt # user must define text content for a question
   validates_presence_of :type # user must define type for a question
   validates_presence_of :break_before
-
+  self.inheritance_column = nil
   has_paper_trail
 
   # Class variables
@@ -208,6 +208,22 @@ class Question < ActiveRecord::Base
       end
       questions.destroy_all
       Questionnaire.find(questionnaire_id).destroy
+    end
+  end
+
+  #step12
+  #change the data of 'Checkbox' question. comments -> answer; comments -> null
+  def self.change_checkbox_question_data
+    questions = Question.where(type: 'Checkbox')
+    questions.each do |question|
+      answers = Answer.where(question_id: question.id)
+        answers.each do |answer|
+          if answer.comments == '0' or answer.comments == '1'
+            answer.update_attributes(answer: answer.comments.to_i, comments: nil)
+          else
+            answer.update_attribute('answer', 1)
+          end
+        end
     end
   end
 end

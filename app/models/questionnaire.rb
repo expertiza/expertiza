@@ -43,7 +43,7 @@ class Questionnaire < ActiveRecord::Base
   # Does this questionnaire contain true/false questions?
   def true_false_questions?
     for question in questions
-      if question.true_false
+      if question.type=="Checkbox"
         return true
       end
     end

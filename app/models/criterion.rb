@@ -14,8 +14,8 @@ class Criterion < ScoredQuestion
     html+='<tr>'
     html+='<td></td>'
     html+='<td></td>'
-    html+='<td>text area size <input size="6" value="'+self.size+'" name="question['+self.id.to_s+'][size]" id="question_'+self.id.to_s+'_size" type="text"></td>'
-    html+='<td> max_label <input size="4" value="'+self.max_label+'" name="question['+self.id.to_s+'][max_label]" id="question_'+self.id.to_s+'_max_label" type="text">  <br>min_label <input size="4" value="'+self.min_label+'" name="question['+self.id.to_s+'][min_label]" id="question_'+self.id.to_s+'_min_label" type="text"></td>'
+    html+='<td>text area size <input size="6" value="'+self.size.to_s+'" name="question['+self.id.to_s+'][size]" id="question_'+self.id.to_s+'_size" type="text"></td>'
+    html+='<td> max_label <input size="4" value="'+self.max_label.to_s+'" name="question['+self.id.to_s+'][max_label]" id="question_'+self.id.to_s+'_max_label" type="text">  <br>min_label <input size="4" value="'+self.min_label.to_s+'" name="question['+self.id.to_s+'][min_label]" id="question_'+self.id.to_s+'_min_label" type="text"></td>'
     html+='</tr>'
 
     html.html_safe

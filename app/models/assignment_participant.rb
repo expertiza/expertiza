@@ -236,7 +236,7 @@ class AssignmentParticipant < Participant
   def review_score
     review_questionnaire = self.assignment.questionnaires.select {|q| q.type == "ReviewQuestionnaire"}[0]
     assessment = review_questionnaire.get_assessments_for(self)
-    (Score.compute_scores(assessment, review_questionnaire.questions)[:avg] / 100.00) * review_questionnaire.max_possible_score.to_f
+    (Answer.compute_scores(assessment, review_questionnaire.questions)[:avg] / 100.00) * review_questionnaire.max_possible_score.to_f
   end
 
   def fullname
@@ -267,7 +267,7 @@ class AssignmentParticipant < Participant
       else
         scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_round_for(self,round)
       end
-      scores[questionnaire_symbol][:scores] = Score.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
+      scores[questionnaire_symbol][:scores] = Answer.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
     end
 
     scores[:total_score] = self.assignment.compute_total_score(scores)
@@ -330,7 +330,7 @@ class AssignmentParticipant < Participant
     end
     scores[:quiz] = Hash.new
     scores[:quiz][:assessments] = quiz_responses
-    scores[:quiz][:scores] = Score.compute_quiz_scores(scores[:quiz][:assessments])
+    scores[:quiz][:scores] = Answer.compute_quiz_scores(scores[:quiz][:assessments])
 
     scores[:total_score] = assignment.compute_total_score(scores)
     scores[:total_score] += compute_quiz_scores(scores)
@@ -433,7 +433,7 @@ class AssignmentParticipant < Participant
 
 
   def quizzes_taken
-    return QuizResponseMap.get_assessments_for(self)
+    QuizResponseMap.get_assessments_for(self)
   end
 
   def metareviews
@@ -443,6 +443,10 @@ class AssignmentParticipant < Participant
 
   def teammate_reviews
     TeammateReviewResponseMap.get_assessments_for(self)
+  end
+
+  def bookmark_reviews
+    BookmarkRatingResponseMap.get_assessments_for(self)
   end
 
   def submitted_files

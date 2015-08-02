@@ -1,0 +1,3 @@
+class UploadFile < Question
+
+end

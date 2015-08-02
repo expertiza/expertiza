@@ -33,10 +33,6 @@ class MetareviewResponseMap < ResponseMap
     self.assignment.questionnaires.find_by_type('MetareviewQuestionnaire')
   end
 
-  def review_questionnaire
-    self.assignment.questionnaires.find_by_type("ReviewQuestionnaire")
-  end
-
   def get_title
     return "Metareview"
   end

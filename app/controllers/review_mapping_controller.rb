@@ -594,11 +594,6 @@ class ReviewMappingController < ApplicationController
     redirect_to :action => 'list_mappings', :id => assignment.id
   end
 
-
-  def select_mapping 
-    @assignment = Assignment.find(params[:id])
-  end
-
   def review_report
     # Get the assignment id and set it in an instance variable which will be used in view
     @id = params[:id]
@@ -623,6 +618,7 @@ class ReviewMappingController < ApplicationController
     @review_scores = @assignment.compute_reviews_hash
     end
 
+  # This method should be re-written since the score cache is no longer working.
   def distribution
 
     @assignment = Assignment.find(params[:id])

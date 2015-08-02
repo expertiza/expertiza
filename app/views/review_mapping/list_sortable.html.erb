@@ -28,7 +28,7 @@
 <%
     session[:return_to] = request.url
   %>
-<%= link_to 'Assign reviewers automatically', :action => 'select_mapping', :id => @assignment.id %>
+<%= link_to 'Assign reviewers automatically', :controller => 'assignments', :action => :edit, :id => @assignment.id, :tab => "tab3" %>
 | <%= link_to 'Import reviewer mappings',
   :controller=>'import_file',
   :action=>'start',

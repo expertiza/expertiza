@@ -420,7 +420,7 @@ require 'analytic/assignment_analytic'
 
       scores[:participants][participant.id.to_s.to_sym][:quiz] = Hash.new
       scores[:participants][participant.id.to_s.to_sym][:quiz][:assessments] = quiz_responses
-      scores[:participants][participant.id.to_s.to_sym][:quiz][:scores] = Score.compute_quiz_scores(scores[:participants][participant.id.to_s.to_sym][:quiz][:assessments])
+      scores[:participants][participant.id.to_s.to_sym][:quiz][:scores] = Answer.compute_quiz_scores(scores[:participants][participant.id.to_s.to_sym][:quiz][:assessments])
 
       scores[:participants][participant.id.to_s.to_sym][:total_score] = compute_total_score(scores[:participants][participant.id.to_s.to_sym])
       scores[:participants][participant.id.to_s.to_sym][:total_score] += participant.compute_quiz_scores(scores[:participants][participant.id.to_s.to_sym])
@@ -443,7 +443,7 @@ require 'analytic/assignment_analytic'
         for i in 1..self.get_review_rounds
           assessments = ReviewResponseMap.get_assessments_round_for(team,i)
           round_sym = ("review"+i.to_s).to_sym
-          grades_by_rounds[round_sym]= Score.compute_scores(assessments, questions[round_sym])
+          grades_by_rounds[round_sym]= Answer.compute_scores(assessments, questions[round_sym])
           total_num_of_assessments += assessments.size
           if grades_by_rounds[round_sym][:avg]!=nil
             total_score += grades_by_rounds[round_sym][:avg]*assessments.size.to_f
@@ -475,7 +475,7 @@ require 'analytic/assignment_analytic'
 
       else
         assessments = ReviewResponseMap.get_assessments_for(team)
-        scores[:teams][index.to_s.to_sym][:scores] = Score.compute_scores(assessments, questions[:review])
+        scores[:teams][index.to_s.to_sym][:scores] = Answer.compute_scores(assessments, questions[:review])
       end
 
       index = index + 1
@@ -818,7 +818,7 @@ require 'analytic/assignment_analytic'
       @respective_scores = @review_scores[response_map.reviewer_id] if @review_scores[response_map.reviewer_id] != nil
 
       if @corresponding_response != nil
-        @this_review_score_raw = Score.get_total_score(response: @corresponding_response, questions: @questions, q_types: Array.new)
+        @this_review_score_raw = Answer.get_total_score(response: @corresponding_response, questions: @questions, q_types: Array.new)
         if @this_review_score_raw
           @this_review_score = ((@this_review_score_raw*100).round/100.0) if @this_review_score_raw >= 0.0
         end

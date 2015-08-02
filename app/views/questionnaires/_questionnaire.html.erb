@@ -15,7 +15,7 @@
   <table id="questions_table">
     <% if $disp_flag != 1 %>
       <tr>
-        <td align=left width=300>1111Questions:</td>
+        <td align=left width=300>Questions:</td>
         <%  if @questionnaire.type != 'QuizQuestionnaire' %><td align=left>weight</td><%end%>
 
       </tr>
@@ -101,22 +101,12 @@
          <td align=left>Weight</td>
        </tr>
 
-       <% 	i = 1   %>
+       <% i = 1   %>
        <% for @question in @questionnaire.questions %>
-         <tr>
-           <td align=center><input type=checkbox id="question_chk<%= i %>"></td>
-           <td><%= text_field "question[]", 'seq', :size=>6 %></td>
-           <td><%= text_area "question[]", 'txt', :cols=>50, :rows=>5 %></td>
-           <td><%= text_field "question[]", 'type', :size=>15, :disabled=>true %></td>
-           <td><%= text_field "question[]", 'weight', :size=>6 %></td>
-         </tr>
-         <tr>
-           <td></td>
-           <td></td>
-           <td></td>
-           <td> max_label <%= text_field "question[]", 'max_label', :size=>4 %>  min_label <%= text_field "question[]", 'min_label', :size=>4 %></td>
-         </tr>
-         <% 	i += 1 %>
+           <%if @question.instance_of?(Criterion)%>
+             <%=@question.edit(i)%>
+           <%end%>
+         <% i += 1 %>
        <% end %>
 <%end %>
 </table>

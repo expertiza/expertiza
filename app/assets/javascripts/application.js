@@ -21,7 +21,6 @@
 //= require hoverIntent
 //= require superfish
 //= require jquery.ui.all
-//= require jquery-readyselector
 //= require react-simpletabs
 //= require_self
 //= require_tree .

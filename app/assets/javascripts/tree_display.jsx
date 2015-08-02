@@ -1,4 +1,4 @@
-jQuery(".tree_display.list").ready(function() {
+jQuery(document).ready(function() {
   // This preloadedImages function is refered from http://jsfiddle.net/slashingweapon/8jAeu/
   // Actually I am not using the values in preloadedImages, but image loading speed is indeed getting faster
   var preloadedImages = []
@@ -895,10 +895,11 @@ jQuery(".tree_display.list").ready(function() {
     }
   })
 
-
-  React.render(
-    React.createElement(TabSystem),
-    document.getElementById("tree_display")
-  )
+  if (document.getElementById("tree_display")) {
+    React.render(
+      React.createElement(TabSystem),
+      document.getElementById("tree_display")
+    )
+  }
 
 })

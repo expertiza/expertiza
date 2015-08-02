@@ -5,7 +5,7 @@ function teamAssignmentChanged() {
 
   if (jQuery('#assignment_team_assignment').is(':checked')) {
     jQuery('#assignment_team_count_field').removeAttr('hidden');
-    if (<%= due_date(@assignment_form.assignment, 'team_formation') %>) {
+    if (!<%= due_date(@assignment_form.assignment, 'team_formation').nil? %>) {
       addDueDateTableElement('team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>)
     }
   } else {

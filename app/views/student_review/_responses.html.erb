@@ -56,12 +56,12 @@
                 <% next_due_date = @sorted_deadlines[0] %>
                 <% for deadline_version in @sorted_deadlines %>
                     <% if (@largest_version_num.created_at < deadline_version.due_at) %>
-                        <% break %>
+                      <% break %>
                     <% end %>
-                    <% for deadline_time in @sorted_deadlines %>
-                        <% if (current_time < deadline_time.due_at) %>
-                            <% break %>
-                        <% end %>
+                <% end %>
+                <% for deadline_time in @sorted_deadlines %>
+                    <% if (current_time < deadline_time.due_at) %>
+                      <% break %>
                     <% end %>
                 <% end %>
                 <td>

@@ -350,7 +350,7 @@ class QuestionnairesController < ApplicationController
       @questionnaire.instructor_id = current_user.id
     end
 
-    if @questionnaire.update_attributes(params[:questionnaire])
+    if @questionnaire.update_attributes(params[:questionnaire])&& save_questions(params[:questionnaire][:id])
       redirect_to :controller => 'tree_display', :action => 'list'
     else
       render 'edit'
@@ -460,13 +460,10 @@ class QuestionnairesController < ApplicationController
           end
         end
       end
+
       if should_delete
         for advice in question.question_advices
           advice.destroy
-        end
-        if Questionnaire.find(questionnaire_id).section == "Custom"
-          question_type = QuestionType.find_by_question_id(question.id)
-          question_type.destroy
         end
         # keep track of the deleted questions
         @deleted_questions.push(question)
@@ -510,26 +507,17 @@ class QuestionnairesController < ApplicationController
         begin
           if params[:question][question_key][:txt].strip.empty?
             # question text is empty, delete the question
-            if Questionnaire.find(questionnaire_id).section == "Custom"
-              QuestionType.find_by_question_id(question_key).delete
-            end
             Question.delete(question_key)
           else
             # Update existing question.
-            if (@questionnaire.type == "QuizQuestionnaire")
-              Question.update(question_key,:weight => 1, :txt => params[:question][question_key][:txt] )
-            else
-              Question.update(question_key, params[:question][question_key])
+            question = Question.find(question_key)
+            if !question.update_attributes(params[:question][question_key])
+              binding.pry
+              Rails.logger.info(question.errors.messages.inspect)
             end
-            Question.update(question_key, params[:question][question_key])
           end
         rescue ActiveRecord::RecordNotFound
           # ignored
-        end
-      end
-      if Questionnaire.find(questionnaire_id).section == "Custom"
-        for question_type_key in params[:q].keys
-          update_question_type(question_type_key)
         end
       end
     end

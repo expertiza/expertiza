@@ -36,36 +36,13 @@
     <% if @next_action.eql?'update' %>
         <input name="_method" type="hidden" value="put" />
     <%end%>
-    <% i = 0
-       @questions.each {
-               |question| %>
-        <%= question.txt %><BR/>
-        <% if controller.action_name != 'new' and @review_scores[i] != nil and @review_scores[i].comments != nil %>
-            <% text = @review_scores[i].comments.gsub(/\"/, '&quot;').lstrip %>
-            <textarea cols="70" rows="1" id="responses_<%= i %>_comments" name="responses[<%= i %>][comment]" style="overflow:hidden;" onkeyup="checkRows(this)"><%= text %></textarea>
-        <% else %>
-            <textarea cols="70" rows="1" id="responses_<%= i %>_comments" name="responses[<%= i %>][comment]" style="overflow:hidden;" onkeyup="checkRows(this)"></textarea>
-        <% end %>
-        
-        <select id="responses_<%= i %>_score" name="responses[<%= i %>][score]">
-          <% for j in @min..@max %>
-              <% if controller.action_name != 'new'and @review_scores[i] != nil %>
-                  <option value="<%= j %>"
-                  <% if j==@review_scores[i].answer %> selected="selected"
-                  <% end %> ><%= j %></option>
-              <% else %>
-                  <option value="<%= j %>"><%= j %></option>
-              <% end %>
-          <% end %>
-        </select>
-        <% if question.question_advices.size > 0 %>
-            <%= render :partial => 'advice', :locals => {:i => i, :advice_list => question.question_advices} %>
-        <% else %>
-            <br/>
-        <% end %>
-        <BR/><BR/>
-    <% i+=1
-       } %>
+    <% i = 0%>
+    <%@questions.each do |question| %>
+       <% answer = Answer.where(question_id: question.id, response_id: @response.id).first %>
+       <% questionnaire = Questionnaire.find(question.questionnaire_id) %>
+       <%= question.complete(i, answer, questionnaire.min_question_score, questionnaire.max_question_score) %>
+       <% i += 1%>
+    <% end %>
 
     <p>
       <label for="review_comments">Additional Comments</label><BR/>

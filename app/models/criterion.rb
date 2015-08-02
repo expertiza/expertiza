@@ -42,7 +42,7 @@ class Criterion < ScoredQuestion
     end
     html = self.txt + '<br>'
     html += '<textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
-    html += answer.comments if !answer.comments.nil?
+    html += answer.comments if !answer.nil?
     html += '</textarea>'
     html += '<select id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]">'
     for j in questionnaire_min..questionnaire_max

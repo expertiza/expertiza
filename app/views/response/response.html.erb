@@ -38,16 +38,15 @@
     <%end%>
     <% i = 0%>
     <%@questions.each do |question| %>
-       <% answer = Answer.where(question_id: question.id, response_id: @response.id).first %>
-       <% questionnaire = Questionnaire.find(question.questionnaire_id) %>
-       <%= question.complete(i, answer, questionnaire.min_question_score, questionnaire.max_question_score) %>
+       <% answer = Answer.where(question_id: question.id, response_id: @response.id).first if !@response.nil?%>
+       <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score) %>
        <% i += 1%>
     <% end %>
 
     <p>
       <label for="review_comments">Additional Comments</label><BR/>
       <textarea cols="70" rows="1" id="review_comments" name="review[comments]" style="overflow:hidden;" onkeyup="checkRows(this)">
-        <% if controller.action_name != 'new' and @response.additional_comment != nil %><%= @response.additional_comment.strip %>
+        <% if controller.action_name != 'new' and @response.additional_comment != nil %><%= @response.additional_comment.strip if !@response.nil?%>
         <% end %></textarea>
     </p>
 

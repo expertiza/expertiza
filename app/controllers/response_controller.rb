@@ -161,10 +161,8 @@ class ResponseController < ApplicationController
     @modified_object = @response.response_id
     get_content
     @review_scores = Array.new
-    @question_type = Array.new
     @questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id:  question.id).first
-      @question_type << QuestionType.find_by_question_id(question.id)
     end
     # Check whether this is a custom rubric
     if @map.questionnaire.section.eql? "Custom"
@@ -225,11 +223,6 @@ class ResponseController < ApplicationController
 
     # Check whether this is a custom rubric
     if @map.questionnaire.section.eql? "Custom"
-      @question_type = Array.new
-      @questions.each {
-          |question|
-        @question_type << QuestionType.find_by_question_id(question.id)
-      }
       if !@map.contributor.nil?
         team_member = TeamsUser.find_by_team_id(@map.contributor).user_id
         # Bug: @topic_id is set only in new, not in edit.

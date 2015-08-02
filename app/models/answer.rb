@@ -12,16 +12,11 @@ class Answer < ActiveRecord::Base
       scores[:min] = 999999999
       total_score = 0
       length_of_assessments=assessments.length.to_f
-      q_types = Array.new
-      questions.each {
-        |question|
-        q_types << QuestionType.find_by_question_id(question.id)
-      }
       assessments.each {
         |assessment|
         #questionnaire = Questionnaire.find(assessment.)
 
-        curr_score = get_total_score(:response => [assessment], :questions => questions, :q_types => q_types)
+        curr_score = get_total_score(:response => [assessment], :questions => questions)
 
         if curr_score > scores[:max]
           scores[:max] = curr_score
@@ -86,8 +81,6 @@ class Answer < ActiveRecord::Base
       @response = params[:response].first
       if @response
         @questions = params[:questions]
-        @q_types = params[:q_types]
-
         
         weighted_score = 0
         sum_of_weights = 0
@@ -100,19 +93,7 @@ class Answer < ActiveRecord::Base
           @questions.each {
             |question|
             item = Answer.where(:response_id=>@response.id, :question_id=>question.id).first
-            if @q_types.length <= x
-              @q_types[x] = QuestionType.find_by_question_id(question.id)
-            end
-
-            if @q_types[x].q_type == "Rating"
-              ratingPart = @q_types[x].parameters.split("::").last
-              if ratingPart.split("|")[0] == "1"
-                if (!item.nil?)
-                  weighted_score += item.comments.to_i * question.weight
-                  sum_of_weights += question.weight
-                end
-              end
-            end
+            
             x = x + 1
             max_question_score = @questionnaire.max_question_score
           }

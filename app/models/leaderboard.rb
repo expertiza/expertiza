@@ -49,7 +49,8 @@ class Leaderboard < ActiveRecord::Base
     questionnaireResponseTypeHash = {"ReviewResponseMap" => "ReviewQuestionnaire",
                                      "MetareviewResponseMap" => "MetareviewQuestionnaire",
                                      "FeedbackResponseMap" => "AuthorFeedbackQuestionnaire",
-                                     "TeammateReviewResponseMap" => "TeammateReviewQuestionnaire"}
+                                     "TeammateReviewResponseMap" => "TeammateReviewQuestionnaire",
+                                     "BookmarkRatingResponseMap" => "BookmarkRatingQuestionnaire"}
 
     # Get all participants of the assignment list
     participantList = AssignmentParticipant.where(:parent_id => assignmentList.pluck(:id)).uniq

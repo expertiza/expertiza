@@ -6,8 +6,8 @@
       <ul>
         <li><a href="#tabs-1" id="General">General</a></li>
         <li><a href="#tabs-2" id="Rubrics">Rubrics</a></li>
-        <li><a href="#tabs-3" id="Review strategy">Review strategy</a></li>
-        <li><a href="#tabs-4" id="Due dates">Due dates</a></li>
+        <li><a href="#tabs-3" id="ReviewStrategy">Review strategy</a></li>
+        <li><a href="#tabs-4" id="DueDates">Due dates</a></li>
         <li><a href="#tabs-5" id="Topics">Topics</a></li>
       </ul>
       <div id="tabs-1">
@@ -73,6 +73,9 @@
             }
           }
         });
+        if (<%= params[:tab]=='tab3'%>) {
+          $('#ReviewStrategy').click();
+        }
       });
 
       $('#go_to_tabs2').click(function(){

@@ -1,6 +1,6 @@
 class Response < ActiveRecord::Base
   belongs_to :response_map, :class_name => 'ResponseMap', :foreign_key => 'map_id'
-  has_many :scores, :class_name => 'Score', :foreign_key => 'response_id', :dependent => :destroy
+  has_many :scores, :class_name => 'Answer', :foreign_key => 'response_id', :dependent => :destroy
   has_many :metareview_response_maps, :class_name => 'MetareviewResponseMap', :foreign_key => 'reviewed_object_id', dependent: :destroy
 
   alias_method :map, :response_map
@@ -50,18 +50,18 @@ class Response < ActiveRecord::Base
       return code.html_safe
     end
     # End of custom code
+
     count = 0
-    #self.scores.each {
-    Score.where(response_id: self.response_id).each {
-      |review_score|
+    answers = Answer.where(response_id: self.response_id)
+    questionnaire_max = Question.find(answers.first.question_id).questionnaire.max_question_score
+    answers.each do |answer|
       count += 1
-      code += '<big><b>Question '+count.to_s+":</b> <I>"+Question.find(review_score.question_id).txt+"</I></big><BR/><BR/>"
-      code += '<TABLE CELLPADDING="5"><TR><TD valign="top"><B>Score:</B></TD><TD><FONT style="BACKGROUND-COLOR:gold">'+review_score.score.to_s+"</FONT> out of <B>"+Question.find(review_score.question_id).questionnaire.max_question_score.to_s+"</B></TD></TR>"
-      if review_score.comments != nil
-        code += '<TR><TD valign="top"><B>Response:</B></TD><TD>' + review_score.comments.gsub("<", "&lt;").gsub(">", "&gt;").gsub(/\n/, '<BR/>')
+      question = Question.find(answer.question_id)
+      if question.instance_of?(Criterion)
+        code += question.view_completed_question(count,answer,questionnaire_max)
       end
-      code += '</TD></TR></TABLE><BR/>'
-    }
+
+    end
 
     if self.additional_comment != nil
       comment = self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>&nbsp;&nbsp;&nbsp;')
@@ -74,7 +74,7 @@ class Response < ActiveRecord::Base
 
   # Computes the total score awarded for a review
   def get_total_score
-    scores.map(&:score).sum
+    scores.map(&:answer).sum
   end
 
   #Generate an email to the instructor when a new review exceeds the allowed difference

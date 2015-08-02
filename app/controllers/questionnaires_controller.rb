@@ -21,7 +21,7 @@ class QuestionnairesController < ApplicationController
     @questionnaire.instructor_id = session[:user].instructor_id  ## Why was TA-specific code removed here?  See Project E713.
       @questionnaire.name = 'Copy of ' + orig_questionnaire.name
 
-    clone_questionnaire_details(questions)
+    clone_questionnaire_details(questions, orig_questionnaire)
     if (session[:user]).role.name != "Teaching Assistant"
       @questionnaire.instructor_id = session[:user].id
     else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
@@ -47,14 +47,6 @@ class QuestionnairesController < ApplicationController
           newadvice.save
         end
 
-        if (@questionnaire.section == "Custom")
-          old_question_type = QuestionType.find_by_question_id(question.id)
-          if !(old_question_type.nil?)
-            new_question_type = old_question_type.clone
-            new_question_type.question_id = newquestion.id
-            new_question_type.save
-          end
-        end
       }
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
       parent = FolderNode.find_by_node_object_id(pFolder.id)
@@ -98,7 +90,7 @@ class QuestionnairesController < ApplicationController
   end
 
   def view
-    redirect_to action: :show, id: params[:id]
+    @questionnaire = Questionnaire.find(params[:id])
   end
 
   #View a quiz questionnaire
@@ -163,10 +155,10 @@ class QuestionnairesController < ApplicationController
               end
             end
             if (@question_type.q_type=="MCR")
-              if  params[:quiz_question_choices][@question.id.to_s][@question_type.q_type][1.to_s][:iscorrect]== i.to_s
-                quiz_question_choice.update_attributes(:iscorrect => '1',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
+              if  params[:quiz_question_choices][@question.id.to_s][@question_type.q_type][:correctindex]== i.to_s
+                quiz_question_choice.update_attributes(:iscorrect => '1',:txt=> params[:quiz_question_choices][@question.id.to_s][@question_type.q_type][i.to_s][:txt])
               else
-                quiz_question_choice.update_attributes(:iscorrect => '0',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
+                quiz_question_choice.update_attributes(:iscorrect => '0',:txt=> params[:quiz_question_choices][@question.id.to_s][@question_type.q_type][i.to_s][:txt])
               end
             end
             if (@question_type.q_type=="TF")
@@ -358,7 +350,7 @@ class QuestionnairesController < ApplicationController
       @questionnaire.instructor_id = current_user.id
     end
 
-    if @questionnaire.update_attributes(params[:questionnaire])
+    if @questionnaire.update_attributes(params[:questionnaire])&& save_questions(params[:questionnaire][:id])
       redirect_to :controller => 'tree_display', :action => 'list'
     else
       render 'edit'
@@ -468,13 +460,10 @@ class QuestionnairesController < ApplicationController
           end
         end
       end
+
       if should_delete
         for advice in question.question_advices
           advice.destroy
-        end
-        if Questionnaire.find(questionnaire_id).section == "Custom"
-          question_type = QuestionType.find_by_question_id(question.id)
-          question_type.destroy
         end
         # keep track of the deleted questions
         @deleted_questions.push(question)
@@ -518,26 +507,17 @@ class QuestionnairesController < ApplicationController
         begin
           if params[:question][question_key][:txt].strip.empty?
             # question text is empty, delete the question
-            if Questionnaire.find(questionnaire_id).section == "Custom"
-              QuestionType.find_by_question_id(question_key).delete
-            end
             Question.delete(question_key)
           else
             # Update existing question.
-            if (@questionnaire.type == "QuizQuestionnaire")
-              Question.update(question_key,:weight => 1, :txt => params[:question][question_key][:txt] )
-            else
-              Question.update(question_key, params[:question][question_key])
+            question = Question.find(question_key)
+            if !question.update_attributes(params[:question][question_key])
+              binding.pry
+              Rails.logger.info(question.errors.messages.inspect)
             end
-            Question.update(question_key, params[:question][question_key])
           end
         rescue ActiveRecord::RecordNotFound
           # ignored
-        end
-      end
-      if Questionnaire.find(questionnaire_id).section == "Custom"
-        for question_type_key in params[:q].keys
-          update_question_type(question_type_key)
         end
       end
     end
@@ -623,7 +603,7 @@ class QuestionnairesController < ApplicationController
   end
 
   # clones the contents of a questionnaire, including the questions and associated advice
-  def clone_questionnaire_details(questions)
+  def clone_questionnaire_details(questions, orig_questionnaire)
     if (session[:user]).role.name != "Teaching Assistant"
       @questionnaire.instructor_id = session[:user].id
     else # for TA we need to get his instructor id and by default add it to his course for which he is the TA

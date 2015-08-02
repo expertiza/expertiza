@@ -33,9 +33,9 @@
              responses = Response.where(["map_id = ?", item.id])
              sum2 = 0
              for i in responses
-               scores = Score.where(["response_id = ?", i.id])
+               scores = Answer.where(["response_id = ?", i.id])
                for s in scores
-                 sum2 += s.score
+                 sum2 += s.answer
                end
                sum2 = sum2.to_f/30
              end
@@ -100,7 +100,7 @@
       <tr>
 
         <td align = 'left'> <%= Question.find(s.question_id).txt%></td>
-        <td align = 'center'> <%= s.score%>/<%=@maxscore%></td>
+        <td align = 'center'> <%= s.answer%>/<%=@maxscore%></td>
         <td align = 'left'> <%= s.comments %> </td>
 
       </tr>

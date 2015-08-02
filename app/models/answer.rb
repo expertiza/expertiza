@@ -1,4 +1,4 @@
-class Score < ActiveRecord::Base
+class Answer < ActiveRecord::Base
   belongs_to :question
 
   # Computes the total score for a list of assessments
@@ -99,7 +99,7 @@ class Score < ActiveRecord::Base
         if @questionnaire.section == "Custom"
           @questions.each {
             |question|
-            item = Score.where(:response_id=>@response.id, :question_id=>question.id).first
+            item = Answer.where(:response_id=>@response.id, :question_id=>question.id).first
             if @q_types.length <= x
               @q_types[x] = QuestionType.find_by_question_id(question.id)
             end

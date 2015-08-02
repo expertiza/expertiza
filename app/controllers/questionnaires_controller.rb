@@ -98,7 +98,7 @@ class QuestionnairesController < ApplicationController
   end
 
   def view
-    redirect_to action: :show
+    redirect_to action: :show, id: params[:id]
   end
 
   #View a quiz questionnaire

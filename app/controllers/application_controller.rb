@@ -83,6 +83,12 @@ class ApplicationController < ActionController::Base
     redirect_back
   end
 
+  def is_available(user, owner_id)
+    user.id == owner_id ||
+      user.admin? ||
+      user.super_admin?
+  end
+
   protected
 
   def set_up_display_options(object_type)

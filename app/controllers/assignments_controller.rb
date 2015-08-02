@@ -289,6 +289,7 @@ class AssignmentsController < ApplicationController
     end
 
     def remove_assignment_from_course
+      puts params.inspect
       assignment = Assignment.find(params[:id])
       oldpath = assignment.path rescue nil
       assignment.course_id = nil

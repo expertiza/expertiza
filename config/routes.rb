@@ -49,7 +49,7 @@ Expertiza::Application.routes.draw do
       get :toggle_access
       get :scheduled_tasks
       get :delete_scheduled_task
-      post :remove_assignment_from_course
+      get :remove_assignment_from_course
     end
   end
 
@@ -80,8 +80,8 @@ Expertiza::Application.routes.draw do
 
   resources :course do
     collection do
-      post :delete
-      post :toggle_access
+      get :delete
+      get :toggle_access
       get :copy
       get :view_teaching_assistants
       post :add_ta
@@ -248,8 +248,9 @@ Expertiza::Application.routes.draw do
       post :list_questionnaires
       get :new_quiz
       post :select_questionnaire_type
-      post :toggle_access
+      get :toggle_access
       get :view
+      get :delete
       post :create_quiz_questionnaire
       post :update_quiz
     end
@@ -469,6 +470,9 @@ Expertiza::Application.routes.draw do
       post 'list'
       post 'get_children_node_ng'
       post 'get_children_node_2_ng'
+      post 'bridge_to_is_available'
+      get 'get_session_last_open_tab'
+      get 'set_session_last_open_tab'
     end
   end
 

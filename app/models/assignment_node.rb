@@ -102,6 +102,15 @@ class AssignmentNode < Node
     @assign_node.course_id
   end
 
+  # Gets the instructor_id from the associated object
+  def get_instructor_id
+    #Assignment.find(self.node_object_id).course_id
+    unless @assign_node
+      @assign_node = Assignment.find(self.node_object_id)
+    end
+    @assign_node.instructor_id
+  end
+
   # Gets the private attribute from the associated object
   def get_private
     #Assignment.find(self.node_object_id).private
@@ -109,6 +118,38 @@ class AssignmentNode < Node
       @assign_node = Assignment.find(self.node_object_id)
     end
     @assign_node.private
+  end
+
+  # Gets the max_team_size from the associated object
+  def get_max_team_size
+    unless @assign_node
+      @assign_node=Assignment.find(self.node_object_id)
+    end
+    @assign_node.max_team_size
+  end
+
+  # Gets the is_intelligent from the associated object
+  def get_is_intelligent
+    unless @assign_node
+      @assign_node=Assignment.find(self.node_object_id)
+    end
+    @assign_node.is_intelligent
+  end
+
+  # Gets the require_quiz from the associated object
+  def get_require_quiz
+    unless @assign_node
+      @assign_node=Assignment.find(self.node_object_id)
+    end
+    @assign_node.require_quiz
+  end
+  
+  # Gets the require_quiz from the associated object
+  def get_allow_suggestions
+    unless @assign_node
+      @assign_node=Assignment.find(self.node_object_id)
+    end
+    @assign_node.allow_suggestions
   end
 
   # Gets any TeamNodes associated with this object

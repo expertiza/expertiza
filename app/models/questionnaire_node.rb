@@ -72,6 +72,10 @@ class QuestionnaireNode < Node
     Questionnaire.find(self.node_object_id).name
   end
 
+  def get_private
+    Questionnaire.find(self.node_object_id).private
+  end
+
   def get_creation_date
     Questionnaire.find(self.node_object_id).created_at
   end

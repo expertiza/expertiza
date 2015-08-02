@@ -170,8 +170,21 @@ class TreeDisplayController < ApplicationController
           tmpObject["creation_date"] = node.get_creation_date
           tmpObject["updated_date"] = node.get_modified_date
           tmpObject["private"] = node.get_private
+          instructor_id = node.get_instructor_id
+          tmpObject["instructor_id"] = instructor_id
+          unless (instructor_id.nil?)
+            tmpObject["instructor"] = User.find(instructor_id).name
+          else
+            tmpObject["instructor"] = nil
+          end
+          tmpObject["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role_id == 6 && is_available(User.find(Ta.get_my_instructor(session[:user].id)),owner_id))
           if nodeType == "Assignments"
             tmpObject["course_id"] = node.get_course_id
+            tmpObject["max_team_size"] = node.get_max_team_size
+            tmpObject["is_intelligent"] = node.get_is_intelligent
+            tmpObject["require_quiz"] = node.get_require_quiz
+            tmpObject["allow_suggestions"] = node.get_allow_suggestions
+            tmpObject["has_topic"] = SignUpTopic.where(['assignment_id = ?', node.node_object_id]).first ? true : false
           end
         end
         res[nodeType] << tmpObject
@@ -209,19 +222,55 @@ class TreeDisplayController < ApplicationController
         res2["key"] = params[:reactParams2][:key]
         res2["type"] = nodeType
 
+        res2["private"] = child.get_private
+        res2["creation_date"] = child.get_creation_date
+        res2["updated_date"] = child.get_modified_date
         if nodeType == 'CourseNode' || nodeType == "AssignmentNode"
           res2["directory"] = child.get_directory
-          res2["creation_date"] = child.get_creation_date
-          res2["updated_date"] = child.get_modified_date
-          res2["private"] = child.get_private
+          instructor_id = child.get_instructor_id
+          res2["instructor_id"] = instructor_id
+          unless (instructor_id.nil?)
+            res2["instructor"] = User.find(instructor_id).name
+          else
+            res2["instructor"] = nil
+          end
+          res2["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role_id == 6 && is_available(User.find(Ta.get_my_instructor(session[:user].id)),owner_id))
           if nodeType == "AssignmentNode"
             res2["course_id"] = child.get_course_id
+            res2["max_team_size"] = child.get_max_team_size
+            res2["is_intelligent"] = child.get_is_intelligent
+            res2["require_quiz"] = child.get_require_quiz
+            res2["allow_suggestions"] = child.get_allow_suggestions
+            res2["has_topic"] = SignUpTopic.where(['assignment_id = ?', child.node_object_id]).first ? true : false
           end
         end
         res << res2
       end
     end
 
+    respond_to do |format|
+      format.html {render json: res}
+    end
+  end
+
+  def bridge_to_is_available
+    puts "hey"
+    puts params
+    user = session[:user]
+    owner_id = params[:owner_id]
+    is_available(user, owner_id)
+  end
+
+  def get_session_last_open_tab
+    res = session[:last_open_tab]
+    respond_to do |format|
+      format.html {render json: res}
+    end
+  end
+
+  def set_session_last_open_tab
+    session[:last_open_tab] = params[:tab]
+    res = session[:last_open_tab]
     respond_to do |format|
       format.html {render json: res}
     end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150727153308) do
+ActiveRecord::Schema.define(version: 20150802171710) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -352,14 +352,6 @@ ActiveRecord::Schema.define(version: 20150727153308) do
 
   add_index "question_advices", ["question_id"], name: "fk_question_question_advices", using: :btree
 
-  create_table "question_types", force: :cascade do |t|
-    t.string  "q_type",      limit: 255, default: "", null: false
-    t.string  "parameters",  limit: 255
-    t.integer "question_id", limit: 4,   default: 1,  null: false
-  end
-
-  add_index "question_types", ["question_id"], name: "fk_question_type_question", using: :btree
-
   create_table "questionnaires", force: :cascade do |t|
     t.string   "name",                limit: 64
     t.integer  "instructor_id",       limit: 4,     default: 0,     null: false
@@ -377,14 +369,15 @@ ActiveRecord::Schema.define(version: 20150727153308) do
 
   create_table "questions", force: :cascade do |t|
     t.text    "txt",              limit: 65535
-    t.boolean "true_false"
     t.integer "weight",           limit: 4
     t.integer "questionnaire_id", limit: 4
     t.float   "seq",              limit: 24
-    t.string  "q_type",           limit: 255
-    t.string  "size",             limit: 255
+    t.string  "type",             limit: 255
+    t.string  "size",             limit: 255,   default: ""
     t.string  "alternatives",     limit: 255
-    t.boolean "break_before",     limit: 1,     default: true
+    t.boolean "break_before",                   default: true
+    t.string  "max_label",        limit: 255,   default: ""
+    t.string  "min_label",        limit: 255,   default: ""
   end
 
   add_index "questions", ["questionnaire_id"], name: "fk_question_questionnaires", using: :btree
@@ -464,34 +457,6 @@ ActiveRecord::Schema.define(version: 20150727153308) do
 
   add_index "roles_permissions", ["permission_id"], name: "fk_roles_permission_permission_id", using: :btree
   add_index "roles_permissions", ["role_id"], name: "fk_roles_permission_role_id", using: :btree
-
-  create_table "score_views", id: false, force: :cascade do |t|
-    t.integer  "question_weight",        limit: 4
-    t.integer  "q_id",                   limit: 4,     default: 0
-    t.string   "q_type",                 limit: 255,   default: ""
-    t.string   "q_parameters",           limit: 255
-    t.integer  "q_question_id",          limit: 4,     default: 1
-    t.integer  "q1_id",                  limit: 4,     default: 0
-    t.string   "q1_name",                limit: 64
-    t.integer  "q1_instructor_id",       limit: 4,     default: 0
-    t.boolean  "q1_private",                           default: false
-    t.integer  "q1_min_question_score",  limit: 4,     default: 0
-    t.integer  "q1_max_question_score",  limit: 4
-    t.datetime "q1_created_at"
-    t.datetime "q1_updated_at"
-    t.integer  "q1_default_num_choices", limit: 4
-    t.string   "q1_type",                limit: 255
-    t.string   "q1_display_type",        limit: 255
-    t.string   "q1_section",             limit: 255
-    t.text     "q1_instruction_loc",     limit: 65535
-    t.integer  "ques_id",                limit: 4,     default: 0,     null: false
-    t.integer  "ques_questionnaire_id",  limit: 4
-    t.integer  "s_id",                   limit: 4,     default: 0
-    t.integer  "s_question_id",          limit: 4,     default: 0
-    t.integer  "s_score",                limit: 4
-    t.text     "s_comments",             limit: 65535
-    t.integer  "s_response_id",          limit: 4
-  end
 
   create_table "sessions", force: :cascade do |t|
     t.string   "session_id", limit: 255,      default: "", null: false
@@ -761,7 +726,6 @@ ActiveRecord::Schema.define(version: 20150727153308) do
   add_foreign_key "participant_team_roles", "teamrole_assignment", column: "role_assignment_id", name: "fk_role_assignment_id"
   add_foreign_key "participants", "users", name: "fk_participant_users"
   add_foreign_key "question_advices", "questions", name: "fk_question_question_advices"
-  add_foreign_key "question_types", "questions", name: "fk_question_type_question"
   add_foreign_key "questions", "questionnaires", name: "fk_question_questionnaires"
   add_foreign_key "resubmission_times", "participants", name: "fk_resubmission_times_participants"
   add_foreign_key "sign_up_topics", "assignments", name: "fk_sign_up_topics_assignments"

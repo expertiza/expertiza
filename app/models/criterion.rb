@@ -1,6 +1,7 @@
 class Criterion < ScoredQuestion
   validates_presence_of :size
-  
+
+  #This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
   def edit
   	# html = "<form accept-charset="UTF-8" action="/questions/create" method="post">"
   	# html += "Type: <input id="question_type" name="question[type]" type="text" value="Criterion" size="3" disabled="true" />"

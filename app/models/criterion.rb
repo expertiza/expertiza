@@ -2,16 +2,23 @@ class Criterion < ScoredQuestion
   validates_presence_of :size
 
   #This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
-  def edit
-  	# html = "<form accept-charset="UTF-8" action="/questions/create" method="post">"
-  	# html += "Type: <input id="question_type" name="question[type]" type="text" value="Criterion" size="3" disabled="true" />"
-  	# html += "Txt: <input id="question_txt" name="question[txt]" size="70" type="text" />"
-  	# html += "Min_label: <input id="question_min_label" name="question[min_label]" size="5" type="text" />"
-  	# html += "Max_label: <input id="question_max_label" name="question[max_label]" size="5" type="text" />"
-  	# html += "TextArea size: <input id="question_size" name="question[size]" size="5" type="text" />"
-  	# html += "Weight: <input id="question_weight" name="question[weight]" size="1" type="text" />"
-  	# html += "<input name="commit" type="submit" value="Create/Edit" />"
-  	# html += "</form>"
+  def edit(count)
+    html ='<tr>'
+    html+='<td align="center"><input id="question_chk1" type="checkbox"></td>'
+    html+='<td><input size="6" value="'+self.seq.to_s+'" name="question['+self.id.to_s+'][seq]" id="question_'+self.id.to_s+'_seq" type="text"></td>'
+    html+='<td><textarea cols="50" rows="1" name="question['+self.id.to_s+'][txt]" id="question_'+self.id.to_s+'_txt">'+self.txt+'</textarea></td>'
+    html+='<td><input size="10" disabled="disabled" value="'+self.type+'" name="question['+self.id.to_s+'][type]" id="question_'+self.id.to_s+'_type" type="text">''</td>'
+    html+='<td><input size="6" value="'+self.weight.to_s+'" name="question['+self.id.to_s+'][weight]" id="question_'+self.id.to_s+'_weight" type="text">''</td>'
+    html+='</tr>'
+
+    html+='<tr>'
+    html+='<td></td>'
+    html+='<td></td>'
+    html+='<td>text area size <input size="6" value="'+self.size+'" name="question['+self.id.to_s+'][size]" id="question_'+self.id.to_s+'_size" type="text"></td>'
+    html+='<td> max_label <input size="4" value="'+self.max_label+'" name="question['+self.id.to_s+'][max_label]" id="question_'+self.id.to_s+'_max_label" type="text">  <br>min_label <input size="4" value="'+self.min_label+'" name="question['+self.id.to_s+'][min_label]" id="question_'+self.id.to_s+'_min_label" type="text"></td>'
+    html+='</tr>'
+
+    html.html_safe
   end
 
   #This method returns what to display if an instructor (etc.) is viewing a questionnaire

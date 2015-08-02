@@ -512,7 +512,6 @@ class QuestionnairesController < ApplicationController
             # Update existing question.
             question = Question.find(question_key)
             if !question.update_attributes(params[:question][question_key])
-              binding.pry
               Rails.logger.info(question.errors.messages.inspect)
             end
           end

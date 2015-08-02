@@ -46,33 +46,18 @@
         <% else %>
             <textarea cols="70" rows="1" id="responses_<%= i %>_comments" name="responses[<%= i %>][comment]" style="overflow:hidden;" onkeyup="checkRows(this)"></textarea>
         <% end %>
-        <% if question.true_false? %>
-            <select id="responses_<%= i %>_score" name="responses[<%= i %>][score]">
-              <% if controller.action_name != 'new' %>
-                  <option value="<%= @min %>"
-                          <% if @min==@review_scores[i].score %>selected="selected"
-                  <% end %> ><%= @min %></option>
-                  <option value="<%= @max %>"
-                          <% if @max==@review_scores[i].score %>selected="selected"
-                  <% end %> ><%= @max %></option>
+        
+        <select id="responses_<%= i %>_score" name="responses[<%= i %>][score]">
+          <% for j in @min..@max %>
+              <% if controller.action_name != 'new'and @review_scores[i] != nil %>
+                  <option value="<%= j %>"
+                  <% if j==@review_scores[i].answer %> selected="selected"
+                  <% end %> ><%= j %></option>
               <% else %>
-                  <option value="<%= @min %>"><%= @min %></option>
-                  <option value="<%= @max %>"><%= @max %></option>
+                  <option value="<%= j %>"><%= j %></option>
               <% end %>
-            </select>
-        <% else %>
-            <select id="responses_<%= i %>_score" name="responses[<%= i %>][score]">
-              <% for j in @min..@max %>
-                  <% if controller.action_name != 'new'and @review_scores[i] != nil %>
-                      <option value="<%= j %>"
-                      <% if j==@review_scores[i].answer %> selected="selected"
-                      <% end %> ><%= j %></option>
-                  <% else %>
-                      <option value="<%= j %>"><%= j %></option>
-                  <% end %>
-              <% end %>
-            </select>
-        <% end %>
+          <% end %>
+        </select>
         <% if question.question_advices.size > 0 %>
             <%= render :partial => 'advice', :locals => {:i => i, :advice_list => question.question_advices} %>
         <% else %>

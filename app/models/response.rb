@@ -53,12 +53,16 @@ class Response < ActiveRecord::Base
 
     count = 0
     answers = Answer.where(response_id: self.response_id)
-    questionnaire_max = Question.find(answers.first.question_id).questionnaire.max_question_score
-    answers.each do |answer|
+    questionnaire = Question.find(answers.first.question_id).questionnaire
+    questionnaire_max = questionnaire.max_question_score
+    questions=questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
+    #loop through questions so the the questions are displayed in order based on seq (sequence number)
+    questions.each do |question|
       count += 1
-      question = Question.find(answer.question_id)
-      question = Object.const_get(question.type).find(question.id)
-      code += question.view_completed_question(count,answer,questionnaire_max)
+      answer = answers.find{|a| a.question_id==question.id}
+      if !answer.nil?
+        code += question.view_completed_question(count,answer,questionnaire_max)
+      end
     end
 
     if self.additional_comment != nil

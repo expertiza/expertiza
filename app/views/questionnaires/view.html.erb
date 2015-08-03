@@ -12,9 +12,8 @@
     <TH>Weight</TH>
     <TH>Score Range</TH>
   </TR>
-  <%questions=@questionnaire.questions%>
-  <%questions.sort { |a,b| a.seq <=> b.seq }%>
-  <% questions.each do |question| %>
+  <%questions=@questionnaire.questions.sort { |a,b| a.seq <=> b.seq }%>
+  <%questions.each do |question| %>
 
     <%if question.instance_of?(Criterion)%>
       <%=question.view_question_text.html_safe%>

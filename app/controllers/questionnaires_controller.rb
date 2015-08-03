@@ -343,7 +343,6 @@ class QuestionnairesController < ApplicationController
   end
 
   def update
-    params.permit!
     @questionnaire = Questionnaire.find(params[:id])
     if current_user.role == Role.ta
       @questionnaire.instructor_id = Ta.get_my_instructor(current_user.id)

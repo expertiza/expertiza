@@ -363,7 +363,7 @@ class ResponseController < ApplicationController
     @participant = @map.reviewer
     @contributor = @map.contributor
     @questionnaire = @map.questionnaire
-    @questions = @questionnaire.questions
+    @questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
   end

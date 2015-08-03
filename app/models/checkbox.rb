@@ -1,7 +1,5 @@
-class CheckBox < UnscoredQuestion
-  def edit
-    ''
-  end
+class Checkbox < UnscoredQuestion
+
 
   def view_question_text
     ''

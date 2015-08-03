@@ -57,10 +57,8 @@ class Response < ActiveRecord::Base
     answers.each do |answer|
       count += 1
       question = Question.find(answer.question_id)
-      if question.instance_of?(Criterion)
-        code += question.view_completed_question(count,answer,questionnaire_max)
-      end
-
+      question = Object.const_get(question.type).find(question.id)
+      code += question.view_completed_question(count,answer,questionnaire_max)
     end
 
     if self.additional_comment != nil

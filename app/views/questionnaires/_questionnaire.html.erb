@@ -104,7 +104,7 @@
        <% i = 1 %>
        <% for @question in @questionnaire.questions %>
           <!--zhewei: convert the 'Question' class into its subclass, such as 'Criterion'-->
-          <%question = Object.const_get(question.type).find(question.id)%>
+          <%question = Object.const_get(@question.type).find(@question.id)%>
           <%=question.edit(i)%>
          <% i += 1 %>
        <% end %>

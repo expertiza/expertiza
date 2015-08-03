@@ -10,7 +10,7 @@ class Question < ActiveRecord::Base
   validates_presence_of :txt # user must define text content for a question
   validates_presence_of :type # user must define type for a question
   validates_presence_of :break_before
-  self.inheritance_column = nil
+
   has_paper_trail
 
   # Class variables

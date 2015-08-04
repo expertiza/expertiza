@@ -1,16 +1,30 @@
 class Checkbox < UnscoredQuestion
-
+  def edit
+    ''
+  end
 
   def view_question_text
-    ''
+    html = '<TR><TD align="left"> '+self.txt+' </TD>'
+    html += '<TD align="left">'+self.type+'</TD>'
+    html += '<td align="center">'+self.weight.to_s+'</TD>'
+    questionnaire = self.questionnaire
+    html += '<TD align="center">0 to 1</TD>'
+    html += '</TR>'
+    html.html_safe
   end
 
   def complete
     ''
   end
 
-  def view_completed_question(response_id)
-    ''
+  #This method returns what to display if a student is viewing a filled-out questionnaire
+  def view_completed_question(count, answer)
+    if answer.answer == 1
+      html = '<li><p><img src="/images/Check-icon.png">' +self.txt+ '<br></p></li>'
+    else
+      html = '<li><p><img src="/images/delete-icon.png">' +self.txt+ '<br></p></li>'
+    end
+    html.html_safe
   end
 
   def self.checked?(response_id)

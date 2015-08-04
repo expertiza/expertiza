@@ -1,13 +1,3 @@
-class ColumnHeader < Question
-def edit
-  end
+class ColumnHeader < QuestionnaireHeader
 
-  def view_question_text
-  end
-
-  def complete
-  end
-
-  def view_completed_question
-  end
 end

@@ -28,10 +28,11 @@ class Checkbox < UnscoredQuestion
 
   #This method returns what to display if a student is viewing a filled-out questionnaire
   def view_completed_question(count, answer)
+    
     if answer.answer == 1
-      html = '<li><p><img src="/images/Check-icon.png">' +self.txt+ '<br></p></li>'
+      html = '<big><b>Question '+count.to_s+':</b><img src="/images/Check-icon.png"><i>'+self.txt+'</i></big><br/><br/>'
     else
-      html = '<li><p><img src="/images/delete-icon.png">' +self.txt+ '<br></p></li>'
+      html = '<big><b>Question '+count.to_s+':</b><img src="/images/delete-icon.png"><i>'+self.txt+'</i></big><br/><br/>'
     end
     html.html_safe
   end

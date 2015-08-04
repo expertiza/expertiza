@@ -44,12 +44,7 @@ class Response < ActiveRecord::Base
     end
     code += '<div id="review_'+str+'" style=""><BR/><BR/>'
 
-    # Test for whether custom rubric needs to be used
-    if ((self.map.questionnaire.section.eql? "Custom") && (self.map.type.to_s != 'FeedbackResponseMap'))
-      #return top of view
-      return code.html_safe
-    end
-    # End of custom code
+    
 
     count = 0
     answers = Answer.where(response_id: self.response_id)
@@ -58,10 +53,14 @@ class Response < ActiveRecord::Base
     questions=questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
     #loop through questions so the the questions are displayed in order based on seq (sequence number)
     questions.each do |question|
-      count += 1
+      count += 1 if !question.is_a? QuestionnaireHeader
       answer = answers.find{|a| a.question_id==question.id}
-      if !answer.nil?
-        code += question.view_completed_question(count,answer,questionnaire_max)
+      if !answer.nil? or question.is_a? QuestionnaireHeader
+        if question.instance_of? Criterion
+          code += question.view_completed_question(count,answer,questionnaire_max)
+        else
+          code += question.view_completed_question(count,answer)
+        end
       end
     end
 

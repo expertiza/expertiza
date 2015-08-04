@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150727153308) do
+ActiveRecord::Schema.define(version: 20150804053945) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -44,41 +44,41 @@ ActiveRecord::Schema.define(version: 20150727153308) do
     t.integer  "submitter_count",                   limit: 4,     default: 0,     null: false
     t.integer  "course_id",                         limit: 4,     default: 0
     t.integer  "instructor_id",                     limit: 4,     default: 0
-    t.boolean  "private",                           limit: 1,     default: false, null: false
+    t.boolean  "private",                                         default: false, null: false
     t.integer  "num_reviews",                       limit: 4,     default: 0,     null: false
     t.integer  "num_review_of_reviews",             limit: 4,     default: 0,     null: false
     t.integer  "num_review_of_reviewers",           limit: 4,     default: 0,     null: false
     t.integer  "review_questionnaire_id",           limit: 4
     t.integer  "review_of_review_questionnaire_id", limit: 4
     t.integer  "teammate_review_questionnaire_id",  limit: 4
-    t.boolean  "reviews_visible_to_all",            limit: 1
+    t.boolean  "reviews_visible_to_all"
     t.integer  "wiki_type_id",                      limit: 4,     default: 0,     null: false
     t.integer  "num_reviewers",                     limit: 4,     default: 0,     null: false
     t.text     "spec_location",                     limit: 65535
     t.integer  "author_feedback_questionnaire_id",  limit: 4
     t.integer  "max_team_size",                     limit: 4,     default: 0,     null: false
-    t.boolean  "staggered_deadline",                limit: 1
-    t.boolean  "allow_suggestions",                 limit: 1
+    t.boolean  "staggered_deadline"
+    t.boolean  "allow_suggestions"
     t.integer  "days_between_submissions",          limit: 4
     t.string   "review_assignment_strategy",        limit: 255
     t.integer  "max_reviews_per_submission",        limit: 4
     t.integer  "review_topic_threshold",            limit: 4,     default: 0
-    t.boolean  "copy_flag",                         limit: 1,     default: false
+    t.boolean  "copy_flag",                                       default: false
     t.integer  "rounds_of_reviews",                 limit: 4,     default: 1
-    t.boolean  "microtask",                         limit: 1,     default: false
+    t.boolean  "microtask",                                       default: false
     t.integer  "selfreview_questionnaire_id",       limit: 4
     t.integer  "managerreview_questionnaire_id",    limit: 4
     t.integer  "readerreview_questionnaire_id",     limit: 4
-    t.boolean  "require_quiz",                      limit: 1
+    t.boolean  "require_quiz"
     t.integer  "num_quiz_questions",                limit: 4,     default: 0,     null: false
-    t.boolean  "is_coding_assignment",              limit: 1
-    t.boolean  "is_intelligent",                    limit: 1
-    t.boolean  "calculate_penalty",                 limit: 1,     default: false, null: false
+    t.boolean  "is_coding_assignment"
+    t.boolean  "is_intelligent"
+    t.boolean  "calculate_penalty",                               default: false, null: false
     t.integer  "late_policy_id",                    limit: 4
-    t.boolean  "is_penalty_calculated",             limit: 1,     default: false, null: false
+    t.boolean  "is_penalty_calculated",                           default: false, null: false
     t.integer  "max_bids",                          limit: 4
-    t.boolean  "show_teammate_reviews",             limit: 1
-    t.boolean  "availability_flag",                 limit: 1,     default: true
+    t.boolean  "show_teammate_reviews"
+    t.boolean  "availability_flag",                               default: true
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -145,7 +145,7 @@ ActiveRecord::Schema.define(version: 20150727153308) do
 
   create_table "comments", force: :cascade do |t|
     t.integer "participant_id", limit: 4,     default: 0,     null: false
-    t.boolean "private",        limit: 1,     default: false, null: false
+    t.boolean "private",                      default: false, null: false
     t.text    "comment",        limit: 65535,                 null: false
   end
 
@@ -180,7 +180,7 @@ ActiveRecord::Schema.define(version: 20150727153308) do
     t.text     "info",            limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "private",         limit: 1,     default: false, null: false
+    t.boolean  "private",                       default: false, null: false
     t.integer  "institutions_id", limit: 4
   end
 
@@ -220,7 +220,7 @@ ActiveRecord::Schema.define(version: 20150727153308) do
     t.integer  "rereview_allowed_id",         limit: 4
     t.integer  "review_of_review_allowed_id", limit: 4
     t.integer  "round",                       limit: 4
-    t.boolean  "flag",                        limit: 1,   default: false
+    t.boolean  "flag",                                    default: false
     t.integer  "threshold",                   limit: 4,   default: 1
     t.integer  "delayed_job_id",              limit: 4
     t.string   "deadline_name",               limit: 255
@@ -315,13 +315,13 @@ ActiveRecord::Schema.define(version: 20150727153308) do
   add_index "participant_team_roles", ["role_assignment_id"], name: "fk_role_assignment_id", using: :btree
 
   create_table "participants", force: :cascade do |t|
-    t.boolean  "can_submit",           limit: 1,     default: true
-    t.boolean  "can_review",           limit: 1,     default: true
+    t.boolean  "can_submit",                         default: true
+    t.boolean  "can_review",                         default: true
     t.integer  "user_id",              limit: 4
     t.integer  "parent_id",            limit: 4
     t.integer  "directory_num",        limit: 4
     t.datetime "submitted_at"
-    t.boolean  "permission_granted",   limit: 1
+    t.boolean  "permission_granted"
     t.integer  "penalty_accumulated",  limit: 4,     default: 0,    null: false
     t.text     "submitted_hyperlinks", limit: 65535
     t.float    "grade",                limit: 24
@@ -330,7 +330,7 @@ ActiveRecord::Schema.define(version: 20150727153308) do
     t.datetime "time_stamp"
     t.text     "digital_signature",    limit: 65535
     t.string   "duty",                 limit: 255
-    t.boolean  "can_take_quiz",        limit: 1,     default: true
+    t.boolean  "can_take_quiz",                      default: true
   end
 
   add_index "participants", ["user_id"], name: "fk_participant_users", using: :btree
@@ -352,18 +352,10 @@ ActiveRecord::Schema.define(version: 20150727153308) do
 
   add_index "question_advices", ["question_id"], name: "fk_question_question_advices", using: :btree
 
-  create_table "question_types", force: :cascade do |t|
-    t.string  "q_type",      limit: 255, default: "", null: false
-    t.string  "parameters",  limit: 255
-    t.integer "question_id", limit: 4,   default: 1,  null: false
-  end
-
-  add_index "question_types", ["question_id"], name: "fk_question_type_question", using: :btree
-
   create_table "questionnaires", force: :cascade do |t|
     t.string   "name",                limit: 64
     t.integer  "instructor_id",       limit: 4,     default: 0,     null: false
-    t.boolean  "private",             limit: 1,     default: false, null: false
+    t.boolean  "private",                           default: false, null: false
     t.integer  "min_question_score",  limit: 4,     default: 0,     null: false
     t.integer  "max_question_score",  limit: 4
     t.datetime "created_at"
@@ -372,19 +364,19 @@ ActiveRecord::Schema.define(version: 20150727153308) do
     t.string   "type",                limit: 255
     t.string   "display_type",        limit: 255
     t.text     "instruction_loc",     limit: 65535
-    t.string   "section",             limit: 255
   end
 
   create_table "questions", force: :cascade do |t|
     t.text    "txt",              limit: 65535
-    t.boolean "true_false",       limit: 1
     t.integer "weight",           limit: 4
     t.integer "questionnaire_id", limit: 4
     t.float   "seq",              limit: 24
-    t.string  "q_type",           limit: 255
-    t.string  "size",             limit: 255
+    t.string  "type",             limit: 255
+    t.string  "size",             limit: 255,   default: ""
     t.string  "alternatives",     limit: 255
-    t.boolean "break_before",     limit: 1,     default: true
+    t.boolean "break_before",                   default: true
+    t.string  "max_label",        limit: 255,   default: ""
+    t.string  "min_label",        limit: 255,   default: ""
   end
 
   add_index "questions", ["questionnaire_id"], name: "fk_question_questionnaires", using: :btree
@@ -392,7 +384,7 @@ ActiveRecord::Schema.define(version: 20150727153308) do
   create_table "quiz_question_choices", force: :cascade do |t|
     t.integer "question_id", limit: 4
     t.text    "txt",         limit: 65535
-    t.boolean "iscorrect",   limit: 1,     default: false
+    t.boolean "iscorrect",                 default: false
   end
 
   create_table "response_maps", force: :cascade do |t|
@@ -400,7 +392,7 @@ ActiveRecord::Schema.define(version: 20150727153308) do
     t.integer  "reviewer_id",           limit: 4,   default: 0,     null: false
     t.integer  "reviewee_id",           limit: 4,   default: 0,     null: false
     t.string   "type",                  limit: 255, default: "",    null: false
-    t.boolean  "notification_accepted", limit: 1,   default: false
+    t.boolean  "notification_accepted",             default: false
     t.integer  "round",                 limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -467,14 +459,11 @@ ActiveRecord::Schema.define(version: 20150727153308) do
 
   create_table "score_views", id: false, force: :cascade do |t|
     t.integer  "question_weight",        limit: 4
-    t.integer  "q_id",                   limit: 4,     default: 0
-    t.string   "q_type",                 limit: 255,   default: ""
-    t.string   "q_parameters",           limit: 255
-    t.integer  "q_question_id",          limit: 4,     default: 1
+    t.string   "type",                   limit: 255
     t.integer  "q1_id",                  limit: 4,     default: 0
     t.string   "q1_name",                limit: 64
     t.integer  "q1_instructor_id",       limit: 4,     default: 0
-    t.boolean  "q1_private",             limit: 1,     default: false
+    t.boolean  "q1_private",                           default: false
     t.integer  "q1_min_question_score",  limit: 4,     default: 0
     t.integer  "q1_max_question_score",  limit: 4
     t.datetime "q1_created_at"
@@ -482,7 +471,6 @@ ActiveRecord::Schema.define(version: 20150727153308) do
     t.integer  "q1_default_num_choices", limit: 4
     t.string   "q1_type",                limit: 255
     t.string   "q1_display_type",        limit: 255
-    t.string   "q1_section",             limit: 255
     t.text     "q1_instruction_loc",     limit: 65535
     t.integer  "ques_id",                limit: 4,     default: 0,     null: false
     t.integer  "ques_questionnaire_id",  limit: 4
@@ -519,7 +507,7 @@ ActiveRecord::Schema.define(version: 20150727153308) do
   create_table "signed_up_teams", force: :cascade do |t|
     t.integer "topic_id",                   limit: 4, default: 0,     null: false
     t.integer "team_id",                    limit: 4, default: 0,     null: false
-    t.boolean "is_waitlisted",              limit: 1, default: false, null: false
+    t.boolean "is_waitlisted",                        default: false, null: false
     t.integer "preference_priority_number", limit: 4
   end
 
@@ -650,7 +638,7 @@ ActiveRecord::Schema.define(version: 20150727153308) do
     t.integer "parent_id",                  limit: 4
     t.string  "type",                       limit: 255
     t.text    "comments_for_advertisement", limit: 65535
-    t.boolean "advertise_for_partner",      limit: 1
+    t.boolean "advertise_for_partner"
   end
 
   create_table "teams_users", force: :cascade do |t|
@@ -702,20 +690,20 @@ ActiveRecord::Schema.define(version: 20150727153308) do
     t.string  "fullname",                  limit: 255
     t.string  "email",                     limit: 255
     t.integer "parent_id",                 limit: 4
-    t.boolean "private_by_default",        limit: 1,     default: false
+    t.boolean "private_by_default",                      default: false
     t.string  "mru_directory_path",        limit: 128
-    t.boolean "email_on_review",           limit: 1
-    t.boolean "email_on_submission",       limit: 1
-    t.boolean "email_on_review_of_review", limit: 1
-    t.boolean "is_new_user",               limit: 1,     default: true,  null: false
+    t.boolean "email_on_review"
+    t.boolean "email_on_submission"
+    t.boolean "email_on_review_of_review"
+    t.boolean "is_new_user",                             default: true,  null: false
     t.integer "master_permission_granted", limit: 1,     default: 0
     t.string  "handle",                    limit: 255
-    t.boolean "leaderboard_privacy",       limit: 1,     default: false
+    t.boolean "leaderboard_privacy",                     default: false
     t.text    "digital_certificate",       limit: 65535
     t.string  "persistence_token",         limit: 255
     t.string  "timezonepref",              limit: 255
     t.text    "public_key",                limit: 65535
-    t.boolean "copy_of_emails",            limit: 1,     default: false
+    t.boolean "copy_of_emails",                          default: false
   end
 
   add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree
@@ -761,7 +749,6 @@ ActiveRecord::Schema.define(version: 20150727153308) do
   add_foreign_key "participant_team_roles", "teamrole_assignment", column: "role_assignment_id", name: "fk_role_assignment_id"
   add_foreign_key "participants", "users", name: "fk_participant_users"
   add_foreign_key "question_advices", "questions", name: "fk_question_question_advices"
-  add_foreign_key "question_types", "questions", name: "fk_question_type_question"
   add_foreign_key "questions", "questionnaires", name: "fk_question_questionnaires"
   add_foreign_key "resubmission_times", "participants", name: "fk_resubmission_times_participants"
   add_foreign_key "sign_up_topics", "assignments", name: "fk_sign_up_topics_assignments"

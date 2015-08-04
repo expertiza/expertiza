@@ -27,7 +27,12 @@ class Criterion < ScoredQuestion
     html += '<TD align="left">'+self.type+'</TD>'
     html += '<td align="center">'+self.weight.to_s+'</TD>'
     questionnaire = self.questionnaire
-    html += '<TD align="center">'+questionnaire.min_question_score.to_s+' to '+ questionnaire.max_question_score.to_s + '</TD>'
+    if !self.max_label.nil? && !self.min_label.nil?
+      html += '<TD align="center"> ('+self.min_label+') '+questionnaire.min_question_score.to_s+' to '+ questionnaire.max_question_score.to_s + ' ('+self.max_label+')</TD>'
+    else
+      html += '<TD align="center">'+questionnaire.min_question_score.to_s+' to '+ questionnaire.max_question_score.to_s + '</TD>'
+    end
+
     html += '</TR>'
     html.html_safe
   end

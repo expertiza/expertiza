@@ -58,7 +58,7 @@ class GradesController < ApplicationController
     @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
     return if redirect_when_disallowed
     @assignment = @participant.assignment
-    @questions = {}
+    @questions = {} # A hash containing all the questions in all the questionnaires used in this assignment
     questionnaires = @assignment.questionnaires
     questionnaires.each do |questionnaire|
       round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id:questionnaire.id).first.used_in_round
@@ -83,7 +83,7 @@ class GradesController < ApplicationController
       end
     end
 
-    @topic = @participant.topic
+    @topic = SignedUpTeam.topic_id_by_team_id (@team_id)
     @pscore = @participant.scores(@questions)
     make_chart
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)

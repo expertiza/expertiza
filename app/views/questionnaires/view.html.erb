@@ -15,7 +15,7 @@
   <%questions=@questionnaire.questions.sort { |a,b| a.seq <=> b.seq }%>
   <%questions.each do |question| %>
 
-    <%if question.instance_of?(Criterion)%>
+    <%if question.is_a? Question%>
       <%=question.view_question_text.html_safe%>
     <%end%>
 

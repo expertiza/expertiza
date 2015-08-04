@@ -104,7 +104,7 @@
        <%questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }%>
        <% for @question in questions %>
           <%=@question.edit(i)%>
-         <% i += 1 %>
+          <% i += 1 %>
        <% end %>
 <%end %>
 </table>

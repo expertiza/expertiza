@@ -603,51 +603,6 @@ require 'analytic/assignment_analytic'
     self.destroy
   end
 
-  # Generate emails for reviewers when new content is available for review
-  #ajbudlon, sept 07, 2007
-  def email(author_id)
-
-    # Get all review mappings for this assignment & author
-    participant = AssignmentParticipant.find(author_id)
-    #ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
-    author = participant.team
-
-    author.review_mappings.each do |mapping|
-      # If the reviewer has requested an e-mail deliver a notification
-      # that includes the assignment, and which item has been updated.
-      if mapping.reviewer.user.email_on_submission
-        user = mapping.reviewer.user
-        Mailer.sync_message(
-          {:to => user.email,
-           :subject => "A new submission is available for #{self.name}",
-           :body => {
-             :obj_name => self.name,
-             :type => 'submission',
-             :location => get_review_number(mapping).to_s,
-             :first_name => ApplicationHelper::get_user_first_name(user),
-             :partial_name => 'update'
-           }
-        }
-        ).deliver
-      end
-    end
-    end
-
-  # Get all review mappings for this assignment & reviewer
-  # required to give reviewer location of new submission content
-  # link cannot be provided as it might give user ability to access data not
-  # available to them.
-  #ajbudlon, sept 07, 2007
-  def get_review_number(mapping)
-    reviewer_mappings = ResponseMap.where(reviewer_id: mapping.reviewer.id)
-    review_num = 1
-    reviewer_mappings.each do |rm|
-      (rm.reviewee.id != mapping.reviewee.id) ? review_num += 1 : break
-    end
-    review_num
-  end
-
   # It appears that this method is not used at present!
   def is_wiki_assignment
     self.wiki_type_id > 1

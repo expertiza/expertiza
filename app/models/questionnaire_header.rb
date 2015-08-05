@@ -17,7 +17,7 @@ class QuestionnaireHeader < Question
     html = '<TR><TD align="left"> '+self.txt+' </TD>'
     html += '<TD align="left">'+self.type+'</TD>'
     html += '<td align="center">'+self.weight.to_s+'</TD>'
-    html += '<TD align="center">-</TD>'
+    html += '<TD align="center">&mdash;</TD>'
     html += '</TR>'
     html.html_safe
   end

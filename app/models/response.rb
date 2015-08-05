@@ -44,8 +44,6 @@ class Response < ActiveRecord::Base
     end
     code += '<div id="review_'+str+'" style=""><BR/><BR/>'
 
-    
-
     count = 0
     answers = Answer.where(response_id: self.response_id)
     questionnaire = Question.find(answers.first.question_id).questionnaire
@@ -53,7 +51,7 @@ class Response < ActiveRecord::Base
     questions=questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
     #loop through questions so the the questions are displayed in order based on seq (sequence number)
     questions.each do |question|
-      count += 1 if !question.is_a? QuestionnaireHeader
+      count += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
       answer = answers.find{|a| a.question_id==question.id}
       if !answer.nil? or question.is_a? QuestionnaireHeader
         if question.instance_of? Criterion

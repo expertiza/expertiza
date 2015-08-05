@@ -226,4 +226,19 @@ class Question < ActiveRecord::Base
         end
     end
   end
+
+  #step13
+  #Delete redundant 'SectionHeader' question type
+  def self.delete_redundant_section_header
+    questions = Question.where(type: 'SectionHeader')  
+    txt = ''
+    questions.each do |question|
+      if question.txt != txt
+        txt = question.txt
+        next
+      else
+        question.destroy
+      end
+    end
+  end
 end

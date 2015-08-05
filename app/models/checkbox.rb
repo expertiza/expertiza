@@ -30,9 +30,9 @@ class Checkbox < UnscoredQuestion
   def view_completed_question(count, answer)
     
     if answer.answer == 1
-      html = '<big><b>Question '+count.to_s+':</b><img src="/images/Check-icon.png"><i>'+self.txt+'</i></big><br/><br/>'
+      html = '<big><b>Question '+count.to_s+':</b>&nbsp;&nbsp;<img src="/assets/Check-icon.png"><i>'+self.txt+'</i></big><br/><br/>'
     else
-      html = '<big><b>Question '+count.to_s+':</b><img src="/images/delete-icon.png"><i>'+self.txt+'</i></big><br/><br/>'
+      html = '<big><b>Question '+count.to_s+':</b>&nbsp;&nbsp;<img src="/assets/delete_icon.png"><i>'+self.txt+'</i></big><br/><br/>'
     end
     html.html_safe
   end

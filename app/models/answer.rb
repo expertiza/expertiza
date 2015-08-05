@@ -1,7 +1,7 @@
 class Answer < ActiveRecord::Base
   belongs_to :question
 
-  # Computes the total score for a list of assessments
+  # Computes the total score for a *list of assessments*
   # parameters
   #  assessments - a list of assessments of some type (e.g., author feedback, teammate review)
   #  questions - the list of questions that was filled out in the process of doing those assessments
@@ -88,21 +88,11 @@ class Answer < ActiveRecord::Base
 
         @questionnaire = Questionnaire.find(@questions[0].questionnaire_id)
 
-        x = 0
-        if @questionnaire.section == "Custom"
-          @questions.each {
-            |question|
-            item = Answer.where(:response_id=>@response.id, :question_id=>question.id).first
-            
-            x = x + 1
-            max_question_score = @questionnaire.max_question_score
-          }
-        else
-          questionnaireData = ScoreView.find_by_sql ["SELECT q1_max_question_score ,SUM(question_weight) as sum_of_weights,SUM(question_weight * s_score) as weighted_score FROM score_views WHERE q1_id = ? AND s_response_id = ?",@questions[0].questionnaire_id,@response.id]
-          weighted_score = questionnaireData[0].weighted_score.to_f
-          sum_of_weights = questionnaireData[0].sum_of_weights.to_f
-          max_question_score = questionnaireData[0].q1_max_question_score.to_f
-        end
+
+        questionnaireData = ScoreView.find_by_sql ["SELECT q1_max_question_score ,SUM(question_weight) as sum_of_weights,SUM(question_weight * s_score) as weighted_score FROM score_views WHERE type in('Criterion', 'Scale') AND q1_id = ? AND s_response_id = ?",@questions[0].questionnaire_id,@response.id]
+        weighted_score = questionnaireData[0].weighted_score.to_f
+        sum_of_weights = questionnaireData[0].sum_of_weights.to_f
+        max_question_score = questionnaireData[0].q1_max_question_score.to_f
 
         submission_valid?(@response)
 

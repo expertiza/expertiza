@@ -59,7 +59,7 @@ class AssignmentsController < ApplicationController
   def edit
     # give an error message is instructor have not set the time zone.
     if session[:user].timezonepref.nil?
-      flash[:error] = "Dear instructor, you have not specified you preferred timezone yet. Please do this first before you set up the deadlines."
+      flash[:error] = "You have not specified you preferred timezone yet. Please do this first before you set up the deadlines."
     end
     @topics = SignUpTopic.find_by_sql("select * from sign_up_topics where assignment_id="+params[:id])
     @assignment_form = AssignmentForm.create_form_object(params[:id])
@@ -81,7 +81,7 @@ class AssignmentsController < ApplicationController
 
     #only when instructor does not assign rubrics and in assignment edit page will show this error message.
     if !set_rubrics? and request.original_fullpath == "/assignments/#{@assignment_form.assignment.id}/edit"
-      flash[:error] = "Dear instructor, you have not specified rubrics of assignment <b>#{@assignment_form.assignment.name}</b>. Please do this first before you save this assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>."
+      flash[:error] = "You have not specified rubrics of assignment <b>#{@assignment_form.assignment.name}</b> before you save this assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>."
     end
     # Check if name and url in database is empty before webpage displays
     @due_date_all.each do |dd|

@@ -164,15 +164,7 @@ class ResponseController < ApplicationController
     @questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id:  question.id).first
     end
-    # Check whether this is a custom rubric
-    if @map.questionnaire.section.eql? "Custom"
-
-      render :action => 'custom_response'
-    else
-      # end of special code (except for the end below, to match the if above)
-      #**********************
-      render :action => 'response'
-    end
+    render :action => 'response'
     @response.email("update")
   end
 
@@ -220,24 +212,7 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @modified_object = @map.id
     get_content
-
-    # Check whether this is a custom rubric
-    if @map.questionnaire.section.eql? "Custom"
-      if !@map.contributor.nil?
-        team_member = TeamsUser.find_by_team_id(@map.contributor).user_id
-        # Bug: @topic_id is set only in new, not in edit.
-        #   So this appears only the 1st time the review is done.-efg
-        @topic_id = SignedUpTeam.topic_id(@map.assignment.id, team_member)
-      end
-      if !@topic_id.nil?
-        @signedUpTopic = SignUpTopic.find(@topic_id).topic_name
-      end
-      @next_action = "custom_create"
-      render :action => 'custom_response'
-    else
-      render :action => 'response'
-    end
-    #end
+    render :action => 'response'
   end
 
   def new_feedback

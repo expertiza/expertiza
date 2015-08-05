@@ -2,8 +2,14 @@ class SuggestionController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'create', 'new'
+    when 'create', 'new', 'student_view', 'student_edit', 'update_suggestion'
       current_role_name.eql? 'Student'
+    when 'submit'
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator',
+       'Student'].include? current_role_name
     else
       ['Instructor',
        'Teaching Assistant',
@@ -21,7 +27,11 @@ class SuggestionController < ApplicationController
     else
       flash[:error] = "Error while adding comment"
     end
-    redirect_to :action => "show", :id => params[:id]
+    if current_role_name.eql? 'Student'
+      redirect_to :action => "student_view", :id => params[:id]
+    else
+      redirect_to :action => "show", :id => params[:id]
+    end
   end
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
@@ -32,13 +42,28 @@ class SuggestionController < ApplicationController
     @assignment = Assignment.find(params[:id])
   end
 
+  def student_view
+    @suggestion = Suggestion.find(params[:id])
+  end
+
+  def student_edit
+    @suggestion = Suggestion.find(params[:id])
+  end
+
   def show
     @suggestion = Suggestion.find(params[:id])
   end
 
+  def update_suggestion
+    Suggestion.find(params[:id]).update_attributes(:title => params[:suggestion][:title], :description => params[:suggestion][:description])
+    redirect_to :action => 'new', :id => Suggestion.find(params[:id]).assignment_id
+  end 
+
   def new
     @suggestion = Suggestion.new
     session[:assignment_id] = params[:id]
+    @suggestions = Suggestion.where(unityID: session[:user].id)
+    @assignment = Assignment.find(params[:id])
   end
 
   def create
@@ -59,7 +84,7 @@ class SuggestionController < ApplicationController
   end
 
   def confirm_save
-    # Action to display successful creation of suggestion
+     # Action to display successful creation of suggestion
   end
 
   def submit
@@ -78,7 +103,7 @@ class SuggestionController < ApplicationController
     @team_id = TeamsUser.team_id(@suggestion.assignment_id, @user_id)
     @topic_id = SignedUpTeam.topic_id(@suggestion.assignment_id, @user_id)
     @signuptopic = SignUpTopic.new
-    @signuptopic.topic_identifier = 'S' + @suggestion.id.to_s
+    @signuptopic.topic_identifier = 'S' + Suggestion.where("assignment_id = ? and id <= ?", @suggestion.assignment_id, @suggestion.id).size.to_s
     @signuptopic.topic_name = @suggestion.title
     @signuptopic.assignment_id = @suggestion.assignment_id
     @signuptopic.max_choosers = 1;
@@ -164,7 +189,7 @@ class SuggestionController < ApplicationController
       flash[:notice] = 'Successfully rejected the suggestion'
     else
       flash[:error] = 'Error when rejecting the suggestion'
-      end
+    end
     redirect_to :action => 'show', :id => @suggestion
   end
 end

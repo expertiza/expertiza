@@ -83,7 +83,6 @@ class GradesController < ApplicationController
       end
     end
 
-    @topic = SignedUpTeam.topic_id_by_team_id (@team_id)
     @pscore = @participant.scores(@questions)
     make_chart
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)

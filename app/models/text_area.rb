@@ -4,9 +4,8 @@ class TextArea < TextResponse
   end
 
   def view_completed_question(count, answer)
-    html = '<li><p><i>'
-    html += '<label for="response_' +count.to_s+ '">' +self.txt+ '</label></i>'
-    html += '</p><dl><dd>' +answer.comments+ '</dd></dl></li>'
+    html = '<big><b>Question '+count.to_s+":</b> <I>"+self.txt+"</I></big><BR/>"
+    html += '</p><dl><dd>' +answer.comments+ '</dd></dl>'
     html.html_safe
   end 
 end

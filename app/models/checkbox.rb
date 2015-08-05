@@ -22,8 +22,12 @@ class Checkbox < UnscoredQuestion
     html.html_safe
   end
 
-  def complete
-    ''
+  def complete(count, answer=nil)
+    html = '<p><input name="responses[' +count.to_s+ '][comment]" type="hidden">'
+    html += '<input id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]" type="checkbox"'
+    html += 'checked="checked"' if !answer.nil? and answer.answer == 1
+    html += '><label for="responses_' +count.to_s+ '">' +self.txt+ '</label></p>'
+    html.html_safe
   end
 
   #This method returns what to display if a student is viewing a filled-out questionnaire

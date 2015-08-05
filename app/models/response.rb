@@ -44,8 +44,6 @@ class Response < ActiveRecord::Base
     end
     code += '<div id="review_'+str+'" style=""><BR/><BR/>'
 
-    
-
     count = 0
     answers = Answer.where(response_id: self.response_id)
     questionnaire = Question.find(answers.first.question_id).questionnaire

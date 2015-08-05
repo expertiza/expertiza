@@ -43,9 +43,9 @@
       <%@topics = ""%>
       <%signed_up_teams.each do |signed_up_team|%>
         <%if signed_up_team.is_waitlisted?%>
-          <%@topics = signed_up_team.topic.topic_identifier+" "+signed_up_team.topic.topic_name+ " (waitlisted)".html_safe%> <br/>
+          <%@topics = signed_up_team.topic.topic_identifier+". "+signed_up_team.topic.topic_name+ " (waitlisted)".html_safe%> <br/>
         <%else%>
-          <%@topics = signed_up_team.topic.topic_identifier+signed_up_team.topic.topic_name%>
+          <%@topics = signed_up_team.topic.topic_identifier+". "+signed_up_team.topic.topic_name%>
         <%end%>
       <%end%>
     <%else%>

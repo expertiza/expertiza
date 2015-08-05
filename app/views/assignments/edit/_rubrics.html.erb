@@ -4,6 +4,14 @@
         var row_id = 'questionnaire_table_' + questionnaire_type;
         var i = 0;
         var html;
+        // if (questionnaire_type === 'TeammateReviewQuestionnaire') {
+          // html += "<span id='questionnaire_teammate_review_rubric_row'"
+          // <% if (@assignment_form.assignment.max_team_size > 1) %>
+          //   html += " hidden"
+          // <% end %>
+          // html += '>'
+          // html += '<span>'
+        // }
         html += '<tr id="' + row_id + '">' +
         '<input name="assignment_form[assignment_questionnaire][][assignment_id]" type="hidden" value="' + <%= @assignment_form.assignment.id %> +'">';
         //Rubric name
@@ -33,6 +41,9 @@
         else{
             html += '<td align="center"><input name="assignment_form[assignment_questionnaire][][used_in_round]" style="width:30px" type="hidden" value="' + round_no + '"> </td>';
         }
+        // if (questionnaire_type === 'TeammateReviewQuestionnaire') {
+          // html += '</span>'
+        // }
         questionnaire_table.last().after(html);
         jQuery('#questionnaire_id').val(questionnaire.id).attr('id', '');
     }
@@ -195,6 +206,11 @@
                   <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
                   <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
           );
+          var metareview_allowed_checkbox = jQuery('#metareviewAllowed');
+          if (!metareview_allowed_checkbox.is(':checked')) {
+            var questionnaire_metareview_rubric_row = jQuery("#questionnaire_table_MetareviewQuestionnaire")
+            questionnaire_metareview_rubric_row.attr('hidden', true)
+          }
           addQuestionnaireTableRow(
                   'AuthorFeedbackQuestionnaire',
                   null,
@@ -209,6 +225,11 @@
                   <%= assignment_questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
                   <%= questionnaire_options(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>
           );
+          var team_assignment_checkbox = jQuery('#team_assignment');
+          if (!team_assignment_checkbox.is(':checked')) {
+            var questionnaire_teammate_review_rubric_row = jQuery("#questionnaire_table_TeammateReviewQuestionnaire")
+            questionnaire_teammate_review_rubric_row.attr('hidden', true)
+          }
           addQuestionnaireTableRow(
                   'BookmarkRatingQuestionnaire',
                   null,

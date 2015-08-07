@@ -24,7 +24,13 @@ class Checkbox < UnscoredQuestion
 
   def complete(count, answer=nil)
     html = '<p><input id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" type="hidden" value="">'
-    html += '<input id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]" type="hidden" value="0">'
+    html += '<input id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]" type="hidden"'
+    if !answer.nil? and answer.answer == 1
+      html += 'value="1"'
+    else
+      html += 'value="0"'
+    end 
+    html += '>'
     html += '<input id="responses_' +count.to_s+ '_checkbox" type="checkbox" onchange="checkbox' +count.to_s+ 'Changed()"'
     html += 'checked="checked"' if !answer.nil? and answer.answer == 1
     html += '>'

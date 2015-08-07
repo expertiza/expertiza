@@ -31,7 +31,7 @@
     <td>
       <%= form_tag :controller => 'review_mapping', :action => 'automatic_review_mapping', :id => @assignment_form.assignment.id do %>
         <%= radio_button_tag 'num_reviews', 'student', true %>
-        <%= label_tag('num_reviews_per_student', 'Set number of reviews done for each student') %>&nbsp;&nbsp;&nbsp;&nbsp;
+        <%= label_tag('num_reviews_per_student', 'Set number of reviews done by each student') %>&nbsp;&nbsp;&nbsp;&nbsp;
         <span id='num_reviews_per_student_threshold'>
           <%= text_field_tag('num_reviews_per_student', 0, {:style => 'width:20px'}) %>
           <%= submit_tag 'Assign reviewers', :id => 'first_submit_tag' %>

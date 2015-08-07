@@ -185,22 +185,28 @@ function is_coding_assignmentChanged(){
         var team_count_field = jQuery('#assignment_team_count_field');
         var teammate_reviews_field = jQuery('#assignment_show_teammate_reviews');
         var team_formation_due_date_checkbox = jQuery('#team_formation_due_date_checkbox')
-        var questionnaire_teammate_review_rubric_row = jQuery("#questionnaire_table_TeammateReviewQuestionnaire")
 
         if (checkbox.is(':checked')) {
           team_count_field.removeAttr('hidden');
           team_formation_due_date_checkbox.removeAttr('hidden')
           jQuery('#assignment_form_assignment_max_team_size').val('2');
           teammate_reviews_field.removeAttr('hidden');
-          questionnaire_teammate_review_rubric_row.removeAttr('hidden')
           addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
+          jQuery("#questionnaire_table_TeammateReviewQuestionnaire").remove()
+          addQuestionnaireTableRow(
+                  'TeammateReviewQuestionnaire',
+                  null,
+                  <%= questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
+                  <%= assignment_questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
+                  <%= questionnaire_options(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>
+          );
 
         } else {
             if (confirm(msg)) {
               team_count_field.attr('hidden', true);
               team_formation_due_date_checkbox.attr('hidden', true)
               teammate_reviews_field.attr('hidden', true);
-              questionnaire_teammate_review_rubric_row.attr('hidden', true)
+              jQuery("#questionnaire_table_TeammateReviewQuestionnaire").remove()
               document.getElementById('assignment_form_assignment_max_team_size').value = '1';
               removeDueDateTableElement('team_formation', 0);
 

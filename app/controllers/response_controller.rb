@@ -179,10 +179,9 @@ class ResponseController < ApplicationController
       @response.update_attribute('additional_comment', params[:review][:comments])
 
       @questionnaire = @map.questionnaire
-      questions = @questionnaire.questions
+      questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
 
       params[:responses].each_pair do |k, v|
-
         score = Answer.where(response_id: @response.id, question_id:  questions[k.to_i].id).first
         unless score
           score = Answer.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :answer => v[:score], :comments => v[:comment])
@@ -192,14 +191,6 @@ class ResponseController < ApplicationController
       end
     rescue
       msg = "Your response was not saved. Cause:189 #{$!}"
-    end
-
-    begin
-      ResponseHelper.compare_scores(@response, @questionnaire)
-
-      msg = "Your response was successfully saved."
-    rescue
-      msg = "An error occurred while saving the response:198 #{$!}"
     end
     redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :save_options => params[:save_options]
   end
@@ -254,7 +245,8 @@ class ResponseController < ApplicationController
 
       @res = @response.response_id
       @questionnaire = @map.questionnaire
-      questions = @questionnaire.questions
+      #Change the order for displaying questions for editing response views.
+      questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
       if params[:responses]
         params[:responses].each_pair do |k, v|
           score = Answer.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :answer => v[:score], :comments => v[:comment])

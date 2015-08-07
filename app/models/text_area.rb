@@ -8,7 +8,7 @@ class TextArea < TextResponse
       rows = self.size.split(',')[1]
     end
     html = '<li><p><label for="responses_' +count.to_s+ '">' +self.txt+ '</label></p>'
-    html += '<p><input id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]" type="hidden" value="5">'
+    html += '<p><input id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]" type="hidden" value="">'
     html += '<p><textarea cols="' +cols+ '" rows="' +rows+ '" id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" >'
     html += answer.comments if !answer.nil?
     html += '</textarea>'

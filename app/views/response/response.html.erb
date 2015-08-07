@@ -36,7 +36,7 @@
     <% if @next_action.eql?'update' %>
         <input name="_method" type="hidden" value="put" />
     <%end%>
-    <% i = 0%>
+    <% i = 0 %>
     <%@questions.each do |question| %>
        <% answer = Answer.where(question_id: question.id, response_id: @response.id).first if !@response.nil?%>
        <% if question.instance_of? Criterion%>

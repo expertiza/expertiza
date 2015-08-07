@@ -312,13 +312,19 @@
     }
 
         function removeOrAddMetareview(){
-            var questionnaire_metareview_rubric_row = jQuery("#questionnaire_table_MetareviewQuestionnaire")
             if(document.getElementById("metareview")) {
                 removeDueDateTableElement('metareview', 0);
-                questionnaire_metareview_rubric_row.attr('hidden', true)
+                jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()
             } else {
                 addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>, 'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
-                questionnaire_metareview_rubric_row.removeAttr('hidden')
+                jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()
+                addQuestionnaireTableRow(
+                        'MetareviewQuestionnaire',
+                        null,
+                        <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
+                        <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
+                        <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
+                );
             }
 
             <%@metareview_allowed_checkbox=true%>

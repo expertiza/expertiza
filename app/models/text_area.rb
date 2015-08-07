@@ -18,7 +18,7 @@ class TextArea < TextResponse
 
   def view_completed_question(count, answer)
     html = '<big><b>Question '+count.to_s+":</b> <I>"+self.txt+"</I></big><BR/>"
-    html += '</p><dl><dd>' +answer.comments+ '</dd></dl>'
+    html += '</p>' +answer.comments.gsub('^p', '').gsub(/\n/, '<BR/>')+ '<BR/>'
     html.html_safe
   end 
 end

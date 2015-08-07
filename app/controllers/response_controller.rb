@@ -165,7 +165,6 @@ class ResponseController < ApplicationController
       @review_scores << Answer.where(response_id: @response.response_id, question_id:  question.id).first
     end
     render :action => 'response'
-    @response.email("update")
   end
 
   def update ###-### Seems like this method may no longer be used -- not in E806 version of the file

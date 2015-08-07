@@ -11,7 +11,10 @@
     <hr/><br/>
 <% end %>
 <% @review_versions = @map.get_all_versions() %>
-<%= render :partial => 'review', :locals => {:versions => @review_versions} %>
+<%= @review_versions.each do |response| %>
+	<%= response.display_as_html() %>
+    <br/>
+<% end %>
 <% if false %>[start erb comment] Changes to accommodate Jen's custom rubric [end erb comment]
 <% end %>
 <% file_url = nil %>

@@ -263,22 +263,6 @@ class AssignmentsController < ApplicationController
       @suggestions = Suggestion.where(assignment_id: params[:id])
       @assignment = Assignment.find(params[:id])
     end
-    #--------------------------------------------------------------------------------------------------------------------
-    # DEFINE_INSTRUCTOR_NOTIFICATION_LIMIT
-    # TODO: NO usages found need verification
-    #--------------------------------------------------------------------------------------------------------------------
-    def define_instructor_notification_limit(assignment_id, questionnaire_id, limit)
-      existing = NotificationLimit.where(['user_id = ? and assignment_id = ? and questionnaire_id = ?', session[:user].id, assignment_id, questionnaire_id])
-      if existing.nil?
-        NotificationLimit.create(:user_id => session[:user].id,
-                                 :assignment_id => assignment_id,
-                                 :questionnaire_id => questionnaire_id,
-                                 :limit => limit)
-      else
-        existing.limit = limit
-        existing.save
-      end
-    end
 
     def associate_assignment_with_course
       @assignment = Assignment.find(params[:id])

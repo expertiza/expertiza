@@ -17,16 +17,23 @@ class Checkbox < UnscoredQuestion
     html = '<TR><TD align="left"> '+self.txt+' </TD>'
     html += '<TD align="left">'+self.type+'</TD>'
     html += '<td align="center">'+self.weight.to_s+'</TD>'
-    html += '<TD align="center">True/False</TD>'
+    html += '<TD align="center">Checked/Unchecked</TD>'
     html += '</TR>'
     html.html_safe
   end
 
   def complete(count, answer=nil)
-    html = '<p><input name="responses[' +count.to_s+ '][comment]" type="hidden">'
-    html += '<input id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]" type="checkbox"'
-    html += 'checked="checked"' if !answer.nil? and answer.answer == 1
-    html += '><label for="responses_' +count.to_s+ '">' +self.txt+ '</label></p>'
+    html = '<p><input id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" type="hidden" value="">'
+    html += '<input id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]" type="checkbox" onchange="checkbox' +count.to_s+ 'Changed()" value="0">'
+    html += '<label for="responses_' +count.to_s+ '">' +self.txt+ '</label></p>'
+
+    html += '<script>function checkbox' +count.to_s+ 'Changed() {'
+    html += ' var checkbox = jQuery("#responses_' +count.to_s+ '_score")'
+    html += 'if (checkbox.is(":checked")) {'
+    html += 'checkbox.val("1")'
+    html += '} else {' 
+    html += 'checkbox.val("0")}}</script>'
+
     html.html_safe
   end
 

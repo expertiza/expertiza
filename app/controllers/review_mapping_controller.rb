@@ -499,7 +499,7 @@ class ReviewMappingController < ApplicationController
   def automatic_review_mapping
     assignment_id = params[:id].to_i
     participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.shuffle!
-    teams = AssignmentTeam.where(parent_id: params[:id].to_i).to_a.reject{|team| SignedUpTeam.topic_id_by_team_id(team.id).nil? }.shuffle!
+    teams = AssignmentTeam.where(parent_id: params[:id].to_i).to_a.shuffle!
     student_review_num = params[:num_reviews_per_student].to_i
     submission_review_num = params[:num_reviews_per_submission].to_i
     if student_review_num == 0 and submission_review_num == 0

@@ -1,3 +1,25 @@
+<%unless @suggestions.nil? %>
+<h2>Suggested topics for <%=h @assignment.name %></h2>
+  <table class="general" cellpadding=5 width=50%% border=1>
+    <tr>
+      <th>Title</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+
+    <% for suggestion in @suggestions %>
+      <tr class="listingRow">
+        <td style="max-width: 200px"><%=h suggestion.title %></td>
+        <td align="center"><%=h suggestion.status %></td>
+        <td align="center"><%= link_to 'View', :action => 'student_view', :id => suggestion %>
+        <%= if suggestion.status == 'Initiated'
+          link_to 'Edit', :action => 'student_edit', :id => suggestion 
+          end %></td>
+      </tr>
+    <% end %>
+  </table>
+ <% end %>
+
 <h3>New suggestion</h3>
 
 <%= form_tag :action => 'create' do %>

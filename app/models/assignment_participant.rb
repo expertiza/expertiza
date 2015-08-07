@@ -99,7 +99,7 @@ class AssignmentParticipant < Participant
     end
     quiz = QuizQuestionnaire.find_by_instructor_id(contributor.id)
     QuizResponseMap.create(:reviewed_object_id => quiz.id,:reviewee_id => contributor.id, :reviewer_id => reviewer.id,
-                           :type=>"QuizResponseMap", :notification_accepted => 0)
+                           :type=>"QuizResponseMap")
   end
 
   def AssignmentParticipant.find_by_user_id_and_assignment_id(user_id, assignment_id)

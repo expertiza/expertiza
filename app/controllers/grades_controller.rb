@@ -70,19 +70,6 @@ class GradesController < ApplicationController
       @questions[questionnaire_symbol] = questionnaire.questions
     end
 
-    rmaps = ReviewResponseMap.where(reviewee_id: @team_id, reviewed_object_id: @participant.parent_id)
-    rmaps.find_each do |rmap|
-      rmap.update_attribute :notification_accepted, true
-    end
-
-    rmaps = ReviewResponseMap.where(reviewer_id: @participant.id, reviewed_object_id: @participant.parent_id)
-    rmaps.find_each do |rmap|
-      mmaps = MetareviewResponseMap.where(reviewee_id: rmap.reviewer_id, reviewed_object_id: rmap.map_id)
-      mmaps.find_each do |mmap|
-        mmap.update_attribute :notification_accepted, true
-      end
-    end
-
     @pscore = @participant.scores(@questions)
     make_chart
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)

@@ -261,7 +261,6 @@ class ResponseController < ApplicationController
         end
       end
 
-    ResponseHelper.compare_scores(@response, @questionnaire)
     #@map.save
     msg = "Your response was successfully saved."
     @response.email();
@@ -288,7 +287,6 @@ class ResponseController < ApplicationController
   def saving
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
-    @map.notification_accepted = false
     @map.save
     if (@map.assignment.id == 562) #Making the automated metareview feature available for one 'ethical analysis 6' assignment only.
       if (params["save_options"].nil? or params["save_options"].empty?) #default it to with metareviews

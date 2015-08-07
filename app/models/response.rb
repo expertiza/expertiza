@@ -63,7 +63,7 @@ class Response < ActiveRecord::Base
     end
 
     if self.additional_comment != nil
-      comment = self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>&nbsp;&nbsp;&nbsp;')
+      comment = self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
     else
       comment = ''
     end

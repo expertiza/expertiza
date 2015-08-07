@@ -24,22 +24,25 @@ class Checkbox < UnscoredQuestion
 
   def complete(count, answer=nil)
     html = '<p><input id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" type="hidden" value="">'
-    html += '<input id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]" type="checkbox" onchange="checkbox' +count.to_s+ 'Changed()" value="0">'
+    html += '<input id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]" type="hidden" value="0">'
+    html += '<input id="responses_' +count.to_s+ '_checkbox" type="checkbox" onchange="checkbox' +count.to_s+ 'Changed()"'
+    html += 'checked="checked"' if !answer.nil? and answer.answer == 1
+    html += '>'
     html += '<label for="responses_' +count.to_s+ '">' +self.txt+ '</label></p>'
 
     html += '<script>function checkbox' +count.to_s+ 'Changed() {'
-    html += ' var checkbox = jQuery("#responses_' +count.to_s+ '_score")'
+    html += ' var checkbox = jQuery("#responses_' +count.to_s+ '_checkbox");'
+    html += ' var response_score = jQuery("#responses_' +count.to_s+ '_score");'
     html += 'if (checkbox.is(":checked")) {'
-    html += 'checkbox.val("1")'
+    html += 'response_score.val("1");'
     html += '} else {' 
-    html += 'checkbox.val("0")}}</script>'
+    html += 'response_score.val("0");}}</script>'
 
     html.html_safe
   end
 
   #This method returns what to display if a student is viewing a filled-out questionnaire
   def view_completed_question(count, answer)
-    
     if answer.answer == 1
       html = '<big><b>Question '+count.to_s+':</b>&nbsp;&nbsp;<img src="/assets/Check-icon.png"><i>'+self.txt+'</i></big><br/><br/>'
     else

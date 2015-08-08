@@ -56,9 +56,4 @@ class Checkbox < UnscoredQuestion
     end
     html.html_safe
   end
-
-  def self.checked?(response_id)
-    answer = Answer.where(question_id: self.id, response_id: response_id).first
-    return answer.comment == '0'
-  end
 end

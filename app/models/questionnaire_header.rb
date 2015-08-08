@@ -23,7 +23,7 @@ class QuestionnaireHeader < Question
   end
 
   def complete
-  	self.txt
+    self.txt
   end
 
   def view_completed_question

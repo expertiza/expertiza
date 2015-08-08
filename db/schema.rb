@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150805230305) do
+ActiveRecord::Schema.define(version: 20150806000053) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -387,12 +387,11 @@ ActiveRecord::Schema.define(version: 20150805230305) do
   end
 
   create_table "response_maps", force: :cascade do |t|
-    t.integer  "reviewed_object_id",    limit: 4,   default: 0,     null: false
-    t.integer  "reviewer_id",           limit: 4,   default: 0,     null: false
-    t.integer  "reviewee_id",           limit: 4,   default: 0,     null: false
-    t.string   "type",                  limit: 255, default: "",    null: false
-    t.boolean  "notification_accepted",             default: false
-    t.integer  "round",                 limit: 4
+    t.integer  "reviewed_object_id", limit: 4,   default: 0,  null: false
+    t.integer  "reviewer_id",        limit: 4,   default: 0,  null: false
+    t.integer  "reviewee_id",        limit: 4,   default: 0,  null: false
+    t.string   "type",               limit: 255, default: "", null: false
+    t.integer  "round",              limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
   end

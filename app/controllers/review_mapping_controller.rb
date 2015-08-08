@@ -164,7 +164,7 @@ class ReviewMappingController < ApplicationController
       flash[:error] = "Please go back and select a topic"
     else
 
-      begin
+      # begin
         if assignment.has_topics?  #assignment with topics
           unless params[:i_dont_care]
             topic = (params[:topic_id].nil?) ? nil : SignUpTopic.find(params[:topic_id])
@@ -182,9 +182,9 @@ class ReviewMappingController < ApplicationController
           assignment_team = assignment_teams.to_a.shuffle[0] rescue nil
           assignment.assign_reviewer_dynamically_no_topic(reviewer,assignment_team)
         end
-      rescue Exception => e
-        flash[:error] = (e.nil?) ? $! : e
-      end
+      # rescue Exception => e
+      #   flash[:error] = (e.nil?) ? $! : e
+      # end
     end
 
     redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id

@@ -27,7 +27,8 @@ class UploadFile < Question
     html.html_safe
   end
   def view_completed_question(count, answer)
-  	html = '<i>' +self.txt+ '</i><br/><br/>'
+  	 html = '<big><b>Question ' +count.to_s+ ': </b></big>'
+    html += '<i>' +self.txt+ '</i><br/><br/>'
     html.html_safe 
   end
 end

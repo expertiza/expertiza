@@ -49,11 +49,28 @@ class Checkbox < UnscoredQuestion
 
   #This method returns what to display if a student is viewing a filled-out questionnaire
   def view_completed_question(count, answer)
-    if answer.answer == 1
-      html = '<big><b>Question '+count.to_s+':</b>&nbsp;&nbsp;<img src="/assets/Check-icon.png"><i>'+self.txt+'</i></big><br/><br/>'
+    curr_question = Question.find(answer.question_id)
+    prev_question = Question.where("seq < ?", curr_question.seq).order(:seq).last
+    next_question = Question.where("seq > ?", curr_question.seq).order(:seq).first
+    if prev_question.type == 'ColumnHeader'
+      html = '<td style="padding: 15px;">'
     else
-      html = '<big><b>Question '+count.to_s+':</b>&nbsp;&nbsp;<img src="/assets/delete_icon.png"><i>'+self.txt+'</i></big><br/><br/>'
+      html = ''
     end
+    if answer.answer == 1
+      html += '<big><b>Question '+count.to_s+':</b>&nbsp;&nbsp;<img src="/assets/Check-icon.png"><i>'+self.txt+'</i></big><BR/>'
+    else
+      html += '<big><b>Question '+count.to_s+':</b>&nbsp;&nbsp;<img src="/assets/delete_icon.png"><i>'+self.txt+'</i></big><BR/>'
+    end
+    
+    if next_question.type == 'ColumnHeader'
+      html += '</td></tr>'
+    elsif next_question.type == 'SectionHeader' or next_question.type == 'TableHeader'
+      html += '</td></tr></table><br/>'
+    else
+      html += '<BR/>'
+    end
+
     html.html_safe
   end
 end

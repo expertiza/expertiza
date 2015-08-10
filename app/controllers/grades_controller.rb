@@ -315,6 +315,7 @@ class GradesController < ApplicationController
         scores=[]
         for round in 1 .. @assignment.rounds_of_reviews
           scores = scores.concat(get_scores_for_chart @pscore[:review][:assessments], 'review'+round.to_s)
+          scores = scores-[-1.0]
           @grades_bar_charts[:review] = bar_chart(scores)
         end
         @grades_bar_charts[:review] = bar_chart(scores)

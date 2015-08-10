@@ -617,6 +617,8 @@ class ReviewMappingController < ApplicationController
 
     # Arranged as the hash @review_scores[reveiwer_id][reviewee_id] = score for this particular assignment
     @review_scores = @assignment.compute_reviews_hash
+
+    @avg_and_ranges= @assignment.compute_avg_and_ranges_hash
     end
 
   # This method should be re-written since the score cache is no longer working.

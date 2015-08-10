@@ -2,41 +2,8 @@
 <%@teamid%>
 <%@id%>
 <% @this_reviewer %>
-<% res_map_id = ResponseMap.where(["reviewee_id = ? and type = ?", @teamid, qid])
-   max = 0
-   min = 1.0
-   sum = 0
-   item_no = 0
-   sc = []
-   for item in res_map_id 
-     responses = Response.where(["map_id = ?", item.id])
-     sum2 = 0
-     for i in responses
-       scores = Answer.where(["response_id = ?", i.id])
-       for s in scores
-         sum2 += s.answer
-       end
-       sum2 = sum2.to_f/30
-       max = sum2 if max <= sum2
-       min = sum2 if min > sum2
-     end
-     item_no += 1
-     sum += sum2
-   end
-   if item_no > 0 then
-     sc << ((sum/item_no)*100).round(2)
-     sc << "#{(min* 100).round(2)}-#{(max*100).round(2)}"
-   end
-%>
-<% if sc %>
-  <%# logger.warn @sc.inspect %>
-  <% t_score, t_range = sc[0], sc[1]  %>
-<%else%>
-  <% t_score, t_range = nil,nil %>
-<%end%>
 
-
-<% #########################################    %>
+<% #################Score awarded########################    %>
 <% if (@l%2) == 0%>
   <td bgcolor="#ffffff" align = 'center' >
 <%else%>
@@ -49,23 +16,23 @@
 <% end %>
 </td>
 
-  <% #####################################        %>
-  <%if (t_score && t_range) %>
+  <% #############Avg. score########################        %>
+  <%if (@avg_and_ranges[@teamid] && @avg_and_ranges[@teamid][:avg]&& @avg_and_ranges[@teamid][:max]&& @avg_and_ranges[@teamid][:min]) %>
 
     <% if (@l%2) == 0%>
       <td bgcolor="#ffffff" align = 'center'>
       <%else%>
         <td  bgcolor="#DDDDBB" align = 'center' >
         <%end%>
-        <%= t_score %>%
+        <%= @avg_and_ranges[@teamid][:avg].round(0) %>%
       </td>
-
+    <% #############Score range ########################        %>
       <% if (@l%2) == 0%>
         <td bgcolor="#ffffff" align = 'center' >
         <%else%>
           <td  bgcolor="#DDDDBB" align = 'center' >
           <%end%>
-          (<%= t_range %>)
+          (<%= @avg_and_ranges[@teamid][:min].round(0) %>% - <%= @avg_and_ranges[@teamid][:max].round(0) %>%)
         </td>
 
       <%else%>

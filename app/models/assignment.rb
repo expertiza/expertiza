@@ -758,14 +758,13 @@ require 'analytic/assignment_analytic'
 
 
     # if this assignment use vary rubric by rounds feature, loade @questions for each round
-    if self.varying_rubrics_by_round?
+    if self.varying_rubrics_by_round? #[reviewer_id][round][reviewee_id] = score
       rounds = self.rounds_of_reviews
       for round in 1 .. rounds
         @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ? && round= ?', self.id, @response_type, round])
         review_questionnaire_id = get_review_questionnaire_id(round)
 
         @questions = Question.where( ['questionnaire_id = ?', review_questionnaire_id])
-        #[reviewer_id][round][reviewee_id] = score
 
         @response_maps.each do |response_map|
           # Check if response is there
@@ -786,7 +785,7 @@ require 'analytic/assignment_analytic'
           @review_scores[response_map.reviewer_id][round] = @respective_scores
         end
       end
-    else
+    else #[reviewer_id][reviewee_id] = score
       @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
       review_questionnaire_id = get_review_questionnaire_id()
 

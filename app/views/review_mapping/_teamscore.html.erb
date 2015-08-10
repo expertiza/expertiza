@@ -21,40 +21,41 @@
 
     <% if (@l%2) == 0%>
       <td bgcolor="#ffffff" align = 'center'>
-      <%else%>
-        <td  bgcolor="#DDDDBB" align = 'center' >
-        <%end%>
-        <%= @avg_and_ranges[@teamid][:avg].round(0) %>%
+    <%else%>
+      <td  bgcolor="#DDDDBB" align = 'center' >
+    <%end%>
+    <%= @avg_and_ranges[@teamid][:avg].round(0) %>%
       </td>
+
     <% #############Score range ########################        %>
-      <% if (@l%2) == 0%>
-        <td bgcolor="#ffffff" align = 'center' >
-        <%else%>
-          <td  bgcolor="#DDDDBB" align = 'center' >
-          <%end%>
-          (<%= @avg_and_ranges[@teamid][:min].round(0) %>% - <%= @avg_and_ranges[@teamid][:max].round(0) %>%)
-        </td>
+    <% if (@l%2) == 0%>
+      <td bgcolor="#ffffff" align = 'center' >
+    <%else%>
+      <td  bgcolor="#DDDDBB" align = 'center' >
+    <%end%>
+    (<%= @avg_and_ranges[@teamid][:min].round(0) %>% - <%= @avg_and_ranges[@teamid][:max].round(0) %>%)
+      </td>
 
-      <%else%>
+  <%else%>
 
-        <% if (@l%2) == 0%>
-          <td bgcolor="#ffffff" align = 'center'>
-          <%else%>
-            <td  bgcolor="#DDDDBB" align = 'center' >
-            <%end%>
-            --
-          </td>
+    <% if (@l%2) == 0%>
+      <td bgcolor="#ffffff" align = 'center'>
+    <%else%>
+      <td  bgcolor="#DDDDBB" align = 'center' >
+    <%end%>
+    --
+    </td>
 
-          <% if (@l%2) == 0%>
-            <td bgcolor="#ffffff" align = 'center' >
-            <%else%>
-              <td  bgcolor="#DDDDBB" align = 'center' >
-              <%end%>
-              --
-            </td>
+    <% if (@l%2) == 0%>
+      <td bgcolor="#ffffff" align = 'center' >
+    <%else%>
+      <td  bgcolor="#DDDDBB" align = 'center' >
+    <%end%>
+    --
+    </td>
 
 
-          <%end%>
+  \<%end%>
 
 
 

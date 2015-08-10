@@ -47,7 +47,7 @@ class GradesController < ApplicationController
       }
     end
     @scores = @assignment.scores(@questions)
-    averages = calculate_average_vector(@scores)
+    averages = calculate_average_vector(@assignment.scores(@questions))
     @average_chart =  bar_chart(averages,300,100,5)
     @avg_of_avg = mean(averages)
     calculate_all_penalties(@assignment.id)
@@ -356,6 +356,7 @@ class GradesController < ApplicationController
   end
 
   def calculate_average_vector(scores)
+    scores[:teams].reject!{|k,v| v[:scores][:avg].nil?}
     return scores[:teams].map{|k,v| v[:scores][:avg].to_i}
   end
 

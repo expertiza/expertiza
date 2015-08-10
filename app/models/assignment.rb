@@ -461,12 +461,12 @@ require 'analytic/assignment_analytic'
           end
         end
 
-        if total_num_of_assessments!=0
-          scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score/total_num_of_assessments
+        if total_num_of_assessments != 0
+          scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score / total_num_of_assessments
         else
-          scores[:teams][index.to_s.to_sym][:scores][:avg]=0
-          scores[:teams][index.to_s.to_sym][:scores][:max]=0
-          scores[:teams][index.to_s.to_sym][:scores][:min]=0
+          scores[:teams][index.to_s.to_sym][:scores][:avg] = nil
+          scores[:teams][index.to_s.to_sym][:scores][:max] = 0
+          scores[:teams][index.to_s.to_sym][:scores][:min] = 0
         end
 
       else

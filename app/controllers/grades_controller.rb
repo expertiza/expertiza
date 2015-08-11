@@ -47,7 +47,7 @@ class GradesController < ApplicationController
       }
     end
     @scores = @assignment.scores(@questions)
-    averages = calculate_average_vector(@scores)
+    averages = calculate_average_vector(@assignment.scores(@questions))
     @average_chart =  bar_chart(averages,300,100,5)
     @avg_of_avg = mean(averages)
     calculate_all_penalties(@assignment.id)
@@ -311,8 +311,19 @@ class GradesController < ApplicationController
   def make_chart()
     @grades_bar_charts = {}
     if @pscore[:review]
-      scores = get_scores_for_chart @pscore[:review][:assessments], 'review'
-      @grades_bar_charts[:review] = bar_chart(scores)      
+      if @assignment.varying_rubrics_by_round?
+        scores=[]
+        for round in 1 .. @assignment.rounds_of_reviews
+          scores = scores.concat(get_scores_for_chart @pscore[:review][:assessments], 'review'+round.to_s)
+          scores = scores-[-1.0]
+          @grades_bar_charts[:review] = bar_chart(scores)
+        end
+        @grades_bar_charts[:review] = bar_chart(scores)
+      else
+        scores = get_scores_for_chart @pscore[:review][:assessments], 'review'
+        @grades_bar_charts[:review] = bar_chart(scores)
+      end
+
     end
 
     if @pscore[:metareview]
@@ -330,15 +341,6 @@ class GradesController < ApplicationController
       @grades_bar_charts[:teammate] = bar_chart(scores) 
     end
 
-    reliability = get_scores_for_chart @pscore[:review][:assessments], 'review'
-    avg,std = mean_and_standard_deviation(reliability)
-    if std<10
-      reliability_chart('good', 'reliability')
-    elsif std>10 and std<20
-      reliability_chart('medium', 'reliability')
-    else
-      reliability_chart('poor', 'reliability')
-    end
 
   end
 
@@ -347,13 +349,14 @@ class GradesController < ApplicationController
     reviews.each do |review|
       all_resp = Response.where(map_id: review.map_id)
       sort_to = all_resp.sort
-      
+
       scores << Answer.get_total_score(:response => sort_to, :questions => @questions[symbol.to_sym], :q_types => Array.new)
     end
     scores
   end
 
   def calculate_average_vector(scores)
+    scores[:teams].reject!{|k,v| v[:scores][:avg].nil?}
     return scores[:teams].map{|k,v| v[:scores][:avg].to_i}
   end
 
@@ -415,5 +418,5 @@ class GradesController < ApplicationController
     variance = array.inject(0) { |variance, x| variance += (x - m) ** 2 }
     return m, Math.sqrt(variance/(array.size-1))
   end
-  
+
 end

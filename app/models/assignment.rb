@@ -421,13 +421,6 @@ require 'analytic/assignment_analytic'
         end
       end
 
-      scores[:participants][participant.id.to_s.to_sym][:quiz] = Hash.new
-      scores[:participants][participant.id.to_s.to_sym][:quiz][:assessments] = quiz_responses
-      scores[:participants][participant.id.to_s.to_sym][:quiz][:scores] = Answer.compute_quiz_scores(scores[:participants][participant.id.to_s.to_sym][:quiz][:assessments])
-
-      scores[:participants][participant.id.to_s.to_sym][:total_score] = compute_total_score(scores[:participants][participant.id.to_s.to_sym])
-      scores[:participants][participant.id.to_s.to_sym][:total_score] += participant.compute_quiz_scores(scores[:participants][participant.id.to_s.to_sym])
-
     end
     #ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
@@ -468,12 +461,12 @@ require 'analytic/assignment_analytic'
           end
         end
 
-        if total_num_of_assessments!=0
-          scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score/total_num_of_assessments
+        if total_num_of_assessments != 0
+          scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score / total_num_of_assessments
         else
-          scores[:teams][index.to_s.to_sym][:scores][:avg]=0
-          scores[:teams][index.to_s.to_sym][:scores][:max]=0
-          scores[:teams][index.to_s.to_sym][:scores][:min]=0
+          scores[:teams][index.to_s.to_sym][:scores][:avg] = nil
+          scores[:teams][index.to_s.to_sym][:scores][:max] = 0
+          scores[:teams][index.to_s.to_sym][:scores][:min] = 0
         end
 
       else
@@ -759,45 +752,98 @@ require 'analytic/assignment_analytic'
 
   # Returns hash review_scores[reviewer_id][reviewee_id] = score
   def compute_reviews_hash
-    review_questionnaire_id = get_review_questionnaire_id()
-    @questions = Question.where( ['questionnaire_id = ?', review_questionnaire_id])
     @review_scores = Hash.new
-    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
     @response_type = 'ReviewResponseMap'
+    #@myreviewers = ResponseMap.select('DISTINCT reviewer_id').where(['reviewed_object_id = ? && type = ? ', self.id, @response_type])
 
-    @myreviewers = ResponseMap.select('DISTINCT reviewer_id').where(['reviewed_object_id = ? && type = ? ', self.id, @response_type])
-    @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
 
-    @response_maps.each do |response_map|
-      # Check if response is there
-      @corresponding_response = Response.where(['map_id = ?', response_map.id])
-      @respective_scores = Hash.new
-      @respective_scores = @review_scores[response_map.reviewer_id] if @review_scores[response_map.reviewer_id] != nil
+    # if this assignment use vary rubric by rounds feature, loade @questions for each round
+    if self.varying_rubrics_by_round? #[reviewer_id][round][reviewee_id] = score
+      rounds = self.rounds_of_reviews
+      for round in 1 .. rounds
+        @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ? && round= ?', self.id, @response_type, round])
+        review_questionnaire_id = get_review_questionnaire_id(round)
 
-      if @corresponding_response != nil
-        @this_review_score_raw = Answer.get_total_score(response: @corresponding_response, questions: @questions, q_types: Array.new)
-        if @this_review_score_raw
-          @this_review_score = ((@this_review_score_raw*100).round/100.0) if @this_review_score_raw >= 0.0
+        @questions = Question.where( ['questionnaire_id = ?', review_questionnaire_id])
+
+        @response_maps.each do |response_map|
+          # Check if response is there
+          @corresponding_response = Response.where(['map_id = ?', response_map.id])
+          @respective_scores = Hash.new
+          @respective_scores = @review_scores[response_map.reviewer_id] if @review_scores[response_map.reviewer_id] != nil
+
+          if @corresponding_response != nil
+            #@corresponding_response is an array, Answer.get_total_score calculate the score for the last one
+            @this_review_score_raw = Answer.get_total_score(response: @corresponding_response, questions: @questions)
+            if @this_review_score_raw
+              @this_review_score = ((@this_review_score_raw*100)/100.0).round if @this_review_score_raw >= 0.0
+            end
+          else
+            @this_review_score = 0.0
+          end
+          @respective_scores[response_map.reviewee_id] = @this_review_score
+          @review_scores[response_map.reviewer_id][round] = @respective_scores
         end
-      else
-        @this_review_score = 0.0
       end
-      @respective_scores[response_map.reviewee_id] = @this_review_score
-      @review_scores[response_map.reviewer_id] = @respective_scores
+    else #[reviewer_id][reviewee_id] = score
+      @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
+      review_questionnaire_id = get_review_questionnaire_id()
+
+      @questions = Question.where( ['questionnaire_id = ?', review_questionnaire_id])
+
+      @response_maps.each do |response_map|
+        # Check if response is there
+        @corresponding_response = Response.where(['map_id = ?', response_map.id])
+        @respective_scores = Hash.new
+        @respective_scores = @review_scores[response_map.reviewer_id] if @review_scores[response_map.reviewer_id] != nil
+
+        if @corresponding_response != nil
+          #@corresponding_response is an array, Answer.get_total_score calculate the score for the last one
+          @this_review_score_raw = Answer.get_total_score(response: @corresponding_response, questions: @questions)
+          if @this_review_score_raw
+            @this_review_score = ((@this_review_score_raw*100)/100.0).round if @this_review_score_raw >= 0.0
+          end
+        else
+          @this_review_score = 0.0
+        end
+        @respective_scores[response_map.reviewee_id] = @this_review_score
+        @review_scores[response_map.reviewer_id] = @respective_scores
+      end
+
     end
-    # logger.warn @review_scores.inspect
     @review_scores
   end
 
-  def get_review_questionnaire_id
-    @revqids = []
-    @revqids = AssignmentQuestionnaire.where(['assignment_id = ?', self.id])
-    @revqids.each do |rqid|
-      rtype = Questionnaire.find(rqid.questionnaire_id).type
-      @review_questionnaire_id = rqid.questionnaire_id if rtype == 'ReviewQuestionnaire'
+# calculate the avg score and score range for each reviewee(team), only for peer-review
+  def compute_avg_and_ranges_hash
+    scores = Hash.new
+    contributors =self.contributors  #assignment_teams
+    if self.varying_rubrics_by_round?
+
+    else
+      review_questionnaire_id = get_review_questionnaire_id()
+      questions = Question.where( ['questionnaire_id = ?', review_questionnaire_id])
+      contributors.each do |contributor|
+        assessments = ReviewResponseMap.get_assessments_for(contributor)
+        scores[contributor.id] = Hash.new
+        scores[contributor.id] = Answer.compute_scores(assessments, questions)
+      end
     end
-    @review_questionnaire_id
+    scores
+  end
+
+  def get_review_questionnaire_id (round=nil)
+    revqids = AssignmentQuestionnaire.where(assignment_id:self.id).where(used_in_round:round)
+    review_questionnaire_id=nil
+    revqids.each do |rqid|
+      next if rqid.questionnaire_id.nil?
+      rtype = Questionnaire.find(rqid.questionnaire_id).type
+      if rtype == 'ReviewQuestionnaire'
+        review_questionnaire_id = rqid.questionnaire_id
+        break
+      end
+    end
+    review_questionnaire_id
   end
 
   def get_next_due_date

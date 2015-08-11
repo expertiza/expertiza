@@ -1,17 +1,24 @@
 class MultipleChoice < UnscoredQuestion
-  def edit
-  	html = "<form accept-charset="UTF-8" action="/questions/create" method="post">"
-  	html += "Type: <input id="question_type" name="question[type]" type="text" value="MultipleChoice" size="5" disabled="true" />"
-  	html += "Txt: <input id="question_txt" name="question[txt]" size="70" type="text" />"
-  	html += "Alternatives: <input id="question_alternatives" name="question[alternatives]" size="5" type="text" />"
-  	html += "<input name="commit" type="submit" value="Create/Edit" />"
-  	html += "</form>"
+  def edit(count)
+    html ='<tr>'
+    html+='<td align="center"><input id="question_chk' +count.to_s+ '" type="checkbox"></td>'
+    html+='<td><input size="6" value="'+self.seq.to_s+'" name="question['+self.id.to_s+'][seq]" id="question_'+self.id.to_s+'_seq" type="text"></td>'
+    html+='<td><textarea cols="50" rows="1" name="question['+self.id.to_s+'][txt]" id="question_'+self.id.to_s+'_txt">'+self.txt+'</textarea></td>'
+    html+='<td><input size="10" disabled="disabled" value="'+self.type+'" name="question['+self.id.to_s+'][type]" id="question_'+self.id.to_s+'_type" type="text">''</td>'
+    html+='<td><!--placeholder (UnscoredQuestion does not need weight)--></td>'
+    html+='<td> alternatives <input size="6" value="'+self.alternatives+'" name="question['+self.id.to_s+'][alternatives]" id="question_'+self.id.to_s+'_alternatives" type="text"></td>'
+    html+='</tr>'
+
+    html.html_safe
   end
 
   def view_question_text
-  	html = "Type: <input id="question_type" name="question[type]" type="text" value="MultipleChoice" size="5" disabled="true" />"
-  	html += "Txt: <input id="question_txt" name="question[txt]" size="70" type="text" value=" +self.txt+ " disabled="true" />"
-    html += "Alternatives: <input id="question_alternatives" name="question[alternatives]" size="5" type="text" value=" +self.alternatives+ " disabled="true" />"
+    html = '<TR><TD align="left"> '+self.txt+' </TD>'
+    html += '<TD align="left">'+self.type+'</TD>'
+    html += '<td align="center">'+self.weight.to_s+'</TD>'
+    html += '<TD align="center">&mdash;</TD>'
+    html += '</TR>'
+    html.html_safe
   end
 
   def complete

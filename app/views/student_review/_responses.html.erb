@@ -46,7 +46,7 @@
 
                 <% if (array_not_empty == 1) %>
 
-                    <% @sorted_responses = @sorted_responses.sort { |a,b| a.updated_at <=> b.updated_at}%>
+                    <% @sorted_responses = @sorted_responses.sort_by {|obj| obj.updated_at} # the latest should be at the last%>
                     <% @latest_response = @sorted_responses.last %>
                     <% @latest_response_created_time = @latest_response.created_at %>
                     <% due_dates = DueDate.where(["assignment_id = ?", @assignment.id]) %>
@@ -67,14 +67,14 @@
                     <% end %>
 
                     <td>
-                       <%= link_to "View", {:controller => 'response', :action => 'view', :id => @sorted_responses.first.id} %>
+                       <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
                     </td>
 
                     <% if @assignment.get_current_stage(topic_id) != "Finished" %>
                       <%- # show the link as edit when latest review is done in current deadline   -%>
                       <%- # show link as update when latest review is done in different deadline than current phase   -%>
                       <% if (deadline_version.due_at == coming_deadline.due_at) %>
-                        <td><%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @sorted_responses.first.id} %></td>
+                        <td><%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id} %></td>
                       <% else %>
                         <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
                       <% end %>

@@ -1,39 +1,43 @@
-class DropDown < UnscoredQuestion
-  def edit
-  	html = "<form accept-charset="UTF-8" action="/questions/create" method="post">"
-  	html += "Type: <input id="question_type" name="question[type]" type="text" value="DropDown" size="3" disabled="true" />"
-  	html += "Txt: <input id="question_txt" name="question[txt]" size="70" type="text" />"
-  	html += "Alternatives: <input id="question_alternatives" name="question[alternatives]" size="5" type="text" />"
-  	html += "<input name="commit" type="submit" value="Create/Edit" />"
-  	html += "</form>"
+class Dropdown < UnscoredQuestion
+  def edit(count)
+  	html ='<tr>'
+    html+='<td align="center"><input id="question_chk' +count.to_s+ '" type="checkbox"></td>'
+    html+='<td><input size="6" value="'+self.seq.to_s+'" name="question['+self.id.to_s+'][seq]" id="question_'+self.id.to_s+'_seq" type="text"></td>'
+    html+='<td><textarea cols="50" rows="1" name="question['+self.id.to_s+'][txt]" id="question_'+self.id.to_s+'_txt">'+self.txt+'</textarea></td>'
+    html+='<td><input size="10" disabled="disabled" value="'+self.type+'" name="question['+self.id.to_s+'][type]" id="question_'+self.id.to_s+'_type" type="text">''</td>'
+    html+='<td><!--placeholder (UnscoredQuestion does not need weight)--></td>'
+    html+='<td> alternatives <input size="6" value="'+self.alternatives+'" name="question['+self.id.to_s+'][alternatives]" id="question_'+self.id.to_s+'_alternatives" type="text"></td>'
+    html+='</tr>'
+
+    html.html_safe
   end
 
   def view_question_text
-  	html = "Type: <input id="question_type" name="question[type]" type="text" value="DropDown" size="3" disabled="true" />"
-  	html += "Txt: <input id="question_txt" name="question[txt]" size="70" type="text" value=" +self.txt+ " disabled="true" />"
-  	html += "Alternatives: <input id="question_alternatives" name="question[alternatives]" size="5" type="text" value=" +self.alternatives+ " disabled="true" />"
+    html = '<TR><TD align="left"> '+self.txt+' </TD>'
+    html += '<TD align="left">'+self.type+'</TD>'
+    html += '<td align="center">'+self.weight.to_s+'</TD>'
+    html += '<TD align="center">&mdash;</TD>'
+    html += '</TR>'
+    html.html_safe
   end
 
-  def complete
-  	html = self.txt
-  	alternatives = self.alternatives.splict('|')
-  	html += "<select id="answer_answer" name="answer[answer]">"
-  	alternatives.each_with_index do |alternative, index|
-  		html += "<option value=" +index.to_s+ ">" +index.to_s+ "-" +alternative+ "</option>"
+  def complete(count, answer=nil)
+    html = '<li><label for="responses_' +count.to_s+ '">' +self.txt+ '</label>'
+  	alternatives = self.alternatives.split('|')
+    html += '<input id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]" type="hidden" value="">'
+  	html += '<select id="responses_' +count.to_s+ '_comments" label=' +self.txt+ ' name="responses[' +count.to_s+ '][comment]">'
+  	alternatives.each do |alternative|
+  		html += '<option value=' +alternative.to_s
+      html += ' selected' if !answer.nil? and answer.comments == alternative 
+      html += '>' +alternative.to_s+ '</option>'
   	end
-  	html += "</select>"
+  	html += '</select></li>'
+    html.html_safe
   end
 
-  def view_completed_question(response_id)
-  	answer = Answer.where(question_id: self.id, response_id: response_id).first
-  	html = self.txt
-  	alternatives = self.alternatives.splict('|')
-  	html += "<select id="answer_answer" name="answer[answer]">"
-  	alternatives.each_with_index do |alternative, index|
-  		html += "<option value=" +index.to_s
-  		html += "selected="selected"" if answer.answer == index
-  		html += ">" +index.to_s+ "-" +alternative+ "</option>"
-  	end
-  	html += "</select>"
+  def view_completed_question(count, answer)
+  	html = '<big><b>Question '+count.to_s+":</b> <I>"+self.txt+"</I></big>"
+    html += answer.comments + '<BR/><BR/>'
+    html.html_safe
   end
 end

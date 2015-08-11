@@ -225,7 +225,8 @@ class SignUpSheetController < ApplicationController
     @show_actions = true
     @priority = 0
     assignment=Assignment.find(@assignment_id)
-    #end
+    @signup_topic_deadline = assignment.due_dates.find_by_deadline_type_id(7)
+    @drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
 
     if assignment.due_dates.find_by_deadline_type_id(1)!= nil
       unless !(assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now)
@@ -252,13 +253,20 @@ class SignUpSheetController < ApplicationController
 
         #this function is used to delete a previous signup
   def delete_signup
+    assignment = Assignment.find(params[:assignment_id])
     participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', session[:user].id, params[:assignment_id]).first
+    drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
     #A student who has already submitted work should not be allowed to drop his/her topic! 
     #(A student/team has submitted if participant directory_num is non-null or submitted_hyperlinks is non-null.)
+    #If there is no drop topic deadline, student can drop topic at any time (if all the submissions are deleted)
+    #If there is a drop topic deadline, student cannot drop topic after this deadline.
     if !participant.directory_num.nil? or !participant.hyperlinks.blank?
       flash[:error] = "You have already submitted your work, so you are not allowed to drop your topic!"
+    elsif !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
+      flash[:error] = "You cannot drop your topic after drop topic deadline!"
     else
       delete_signup_for_topic(params[:assignment_id], params[:id])
+      flash[:success] = "You have already dropped your topic successfully!"
     end
     redirect_to :action => 'list', :assignment_id => params[:assignment_id]
   end

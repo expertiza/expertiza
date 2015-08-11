@@ -149,19 +149,19 @@ participant = pscore[:participant]
     <% end %>
 </TR>
 <TR  class="row" id="<%= prefix %>_files" style="display:none">
-    <TD COLSPAN="9"><%= render :partial=>'grades/submissions', :locals => {:participant => participant} %></TD>
+    <TD COLSPAN="10"><%= render :partial=>'grades/submissions', :locals => {:participant => participant} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_reviews" style="display:none">
-    <TD COLSPAN="9"><%= render :partial=>'grades/reviews', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:review]} %></TD>
+    <TD COLSPAN="10"><%= render :partial=>'grades/reviews', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:review]} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_mreviews" style="display:none">
-    <TD COLSPAN="9"><%= render :partial=>'grades/metareviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:metareview]} %></TD>
+    <TD COLSPAN="10"><%= render :partial=>'grades/metareviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:metareview]} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_feedback" style="display:none">
-    <TD COLSPAN="9"><%= render :partial=>'grades/author_feedbacks', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:feedback]} %></TD>
+    <TD COLSPAN="10"><%= render :partial=>'grades/author_feedbacks', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:feedback]} %></TD>
 </TR>
 <TR  class="row" id="<%= prefix %>_teammate_reviews" style="display:none">
-    <TD COLSPAN="9"><%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:teammate]} %></TD>
+    <TD COLSPAN="10"><%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:teammate]} %></TD>
 </TR>
     <!-- END PARTICIPANT -->
 

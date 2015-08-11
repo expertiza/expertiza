@@ -19,6 +19,7 @@ class TextField < TextResponse
       html = '<big><b>Question '+count.to_s+":</b> <I>"+self.txt+"</I></big>"
       html += '&nbsp;&nbsp;&nbsp;&nbsp;'
       html += answer.comments
+      html += '<BR/><BR/>' if Question.find(answer.question_id+1).break_before == true
     else
       html = self.txt
       html += answer.comments 

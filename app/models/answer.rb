@@ -12,9 +12,7 @@ class Answer < ActiveRecord::Base
       scores[:min] = 999999999
       total_score = 0
       length_of_assessments=assessments.length.to_f
-      assessments.each {
-        |assessment|
-        #questionnaire = Questionnaire.find(assessment.)
+      assessments.each { |assessment|
 
         curr_score = get_total_score(:response => [assessment], :questions => questions)
 
@@ -78,7 +76,7 @@ class Answer < ActiveRecord::Base
     #  questions  - specifies the list of questions being evaluated in the assessment
 
     def self.get_total_score(params)
-      @response = params[:response].first
+      @response = params[:response].last
       if @response
         @questions = params[:questions]
         
@@ -87,7 +85,6 @@ class Answer < ActiveRecord::Base
         max_question_score = 0
 
         @questionnaire = Questionnaire.find(@questions[0].questionnaire_id)
-
 
         questionnaireData = ScoreView.find_by_sql ["SELECT q1_max_question_score ,SUM(question_weight) as sum_of_weights,SUM(question_weight * s_score) as weighted_score FROM score_views WHERE type in('Criterion', 'Scale') AND q1_id = ? AND s_response_id = ?",@questions[0].questionnaire_id,@response.id]
         weighted_score = questionnaireData[0].weighted_score.to_f
@@ -99,7 +96,7 @@ class Answer < ActiveRecord::Base
         if (sum_of_weights > 0 && max_question_score)
           return (weighted_score / (sum_of_weights * max_question_score)) * 100
         else
-          return -1 #indicating no score
+          return -1.0 #indicating no score
         end
       end
     end

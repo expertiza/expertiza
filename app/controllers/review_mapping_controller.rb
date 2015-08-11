@@ -615,8 +615,11 @@ class ReviewMappingController < ApplicationController
         .where( ["reviewed_object_id = ? and type = ? and reviewer_id IN (?) ", @id, @type, participants] )
     end
 
-    # Arranged as the hash @review_scores[reveiwer_id][reviewee_id] = score for this particular assignment
+    #  @review_scores[reveiwer_id][reviewee_id] = score for assignments not using vary_rubric_by_rounds feature
+    # @review_scores[reviewer_id][round][reviewee_id] = score for assignments using vary_rubric_by_rounds feature
     @review_scores = @assignment.compute_reviews_hash
+
+    @avg_and_ranges= @assignment.compute_avg_and_ranges_hash
     end
 
   # This method should be re-written since the score cache is no longer working.

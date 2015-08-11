@@ -42,9 +42,9 @@ class Criterion < ScoredQuestion
     end
 
     html = self.txt + '<br>'
-    html += '<textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
+    html += '<table><td valign="top"><textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
     html += answer.comments if !answer.nil?
-    html += '</textarea>'
+    html += '</textarea></td><td valign="top">'
     html += '<select id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]">'
     for j in questionnaire_min..questionnaire_max
       if !answer.nil? and j == answer.answer
@@ -64,7 +64,7 @@ class Criterion < ScoredQuestion
         html += j.to_s + "</option>"
       end
     end
-    html += "</select><br><br><br>"
+    html += "</select></td></table><br><br><br>"
     html.html_safe
   end
 

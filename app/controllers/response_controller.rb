@@ -157,7 +157,7 @@ class ResponseController < ApplicationController
       @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
       @largest_version_num=@sorted[0]
     end
-    @response = Response.where(map_id: @map.map_id, version_num:  @largest_version_num.version_num).first
+
     @modified_object = @response.response_id
     get_content
     @review_scores = Array.new

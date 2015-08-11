@@ -252,7 +252,14 @@ class SignUpSheetController < ApplicationController
 
         #this function is used to delete a previous signup
   def delete_signup
-    delete_signup_for_topic(params[:assignment_id], params[:id])
+    participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', session[:user].id, params[:assignment_id]).first
+    #A student who has already submitted work should not be allowed to drop his/her topic! 
+    #(A student/team has submitted if participant directory_num is non-null or submitted_hyperlinks is non-null.)
+    if !participant.directory_num.nil? or !participant.hyperlinks.blank?
+      flash[:error] = "You have already submitted your work, so you are not allowed to drop your topic!"
+    else
+      delete_signup_for_topic(params[:assignment_id], params[:id])
+    end
     redirect_to :action => 'list', :assignment_id => params[:assignment_id]
   end
 

@@ -540,13 +540,25 @@ jQuery(document).ready(function() {
   })
 
   var SortToggle = React.createClass({
-    handleClick: function() {
-      if (this.props.order === "normal") {
-        this.props.order = "reverse" 
-      } else {
-        this.props.order = "normal" 
+    getInitialState: function() {
+      return {
+        order: this.props.order
       }
-      this.props.handleUserClick(this.props.colName, this.props.order)
+    },
+    handleClick: function() {
+      if (this.state.order === "normal") {
+        this.setState({
+          order: "reverse"
+        }, function() {
+          this.props.handleUserClick(this.props.colName, this.state.order)
+        })
+      } else {
+        this.setState({
+          order: "normal"
+        }, function() {
+          this.props.handleUserClick(this.props.colName, this.state.order)
+        })
+      }
     },
     render: function() {
       return (
@@ -690,11 +702,38 @@ jQuery(document).ready(function() {
       })
     },
     handleUserClick: function(colName, order) {
-      this.setState({
-        tableData: this.state.tableData.reverse()
+      console.log(colName)
+      var tmpData = this.state.tableData
+      tmpData.sort(function(a, b) {
+        var a_val = eval("a."+colName)
+        var b_val = eval("b."+colName)
+        if (order === 'normal') {
+          if (!a_val && b_val) {
+            return 1;
+          }
+          if (!b_val && a_val) {
+            return -1;
+          }
+          if (!a_val && !b_val) {
+            return 0;
+          }
+          return -(a_val.localeCompare(b_val))
+        } else {
+          if (!a_val && b_val) {
+            return -1;
+          }
+          if (!b_val && a_val) {
+            return 1;
+          }
+          if (!a_val && !b_val) {
+            return 0;
+          }
+          return (a_val.localeCompare(b_val))
+        }
       })
-      // this.props.data = this.pros.data.reverse()
-      // this.forceUpdate()
+      this.setState({
+        tableData: tmpData
+      })
     },
     componentWillReceiveProps: function(nextProps) {
       this.setState({

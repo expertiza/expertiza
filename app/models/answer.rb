@@ -1,7 +1,7 @@
 class Answer < ActiveRecord::Base
   belongs_to :question
 
-  # Computes the total score for a list of assessments
+  # Computes the total score for a *list of assessments*
   # parameters
   #  assessments - a list of assessments of some type (e.g., author feedback, teammate review)
   #  questions - the list of questions that was filled out in the process of doing those assessments
@@ -12,16 +12,9 @@ class Answer < ActiveRecord::Base
       scores[:min] = 999999999
       total_score = 0
       length_of_assessments=assessments.length.to_f
-      q_types = Array.new
-      questions.each {
-        |question|
-        q_types << QuestionType.find_by_question_id(question.id)
-      }
-      assessments.each {
-        |assessment|
-        #questionnaire = Questionnaire.find(assessment.)
+      assessments.each { |assessment|
 
-        curr_score = get_total_score(:response => [assessment], :questions => questions, :q_types => q_types)
+        curr_score = get_total_score(:response => [assessment], :questions => questions)
 
         if curr_score > scores[:max]
           scores[:max] = curr_score
@@ -83,11 +76,9 @@ class Answer < ActiveRecord::Base
     #  questions  - specifies the list of questions being evaluated in the assessment
 
     def self.get_total_score(params)
-      @response = params[:response].first
+      @response = params[:response].last
       if @response
         @questions = params[:questions]
-        @q_types = params[:q_types]
-
         
         weighted_score = 0
         sum_of_weights = 0
@@ -95,40 +86,17 @@ class Answer < ActiveRecord::Base
 
         @questionnaire = Questionnaire.find(@questions[0].questionnaire_id)
 
-        x = 0
-        if @questionnaire.section == "Custom"
-          @questions.each {
-            |question|
-            item = Answer.where(:response_id=>@response.id, :question_id=>question.id).first
-            if @q_types.length <= x
-              @q_types[x] = QuestionType.find_by_question_id(question.id)
-            end
-
-            if @q_types[x].q_type == "Rating"
-              ratingPart = @q_types[x].parameters.split("::").last
-              if ratingPart.split("|")[0] == "1"
-                if (!item.nil?)
-                  weighted_score += item.comments.to_i * question.weight
-                  sum_of_weights += question.weight
-                end
-              end
-            end
-            x = x + 1
-            max_question_score = @questionnaire.max_question_score
-          }
-        else
-          questionnaireData = ScoreView.find_by_sql ["SELECT q1_max_question_score ,SUM(question_weight) as sum_of_weights,SUM(question_weight * s_score) as weighted_score FROM score_views WHERE q1_id = ? AND s_response_id = ?",@questions[0].questionnaire_id,@response.id]
-          weighted_score = questionnaireData[0].weighted_score.to_f
-          sum_of_weights = questionnaireData[0].sum_of_weights.to_f
-          max_question_score = questionnaireData[0].q1_max_question_score.to_f
-        end
+        questionnaireData = ScoreView.find_by_sql ["SELECT q1_max_question_score ,SUM(question_weight) as sum_of_weights,SUM(question_weight * s_score) as weighted_score FROM score_views WHERE type in('Criterion', 'Scale') AND q1_id = ? AND s_response_id = ?",@questions[0].questionnaire_id,@response.id]
+        weighted_score = questionnaireData[0].weighted_score.to_f
+        sum_of_weights = questionnaireData[0].sum_of_weights.to_f
+        max_question_score = questionnaireData[0].q1_max_question_score.to_f
 
         submission_valid?(@response)
 
         if (sum_of_weights > 0 && max_question_score)
           return (weighted_score / (sum_of_weights * max_question_score)) * 100
         else
-          return -1 #indicating no score
+          return -1.0 #indicating no score
         end
       end
     end

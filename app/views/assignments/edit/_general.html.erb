@@ -5,9 +5,9 @@ function teamAssignmentChanged() {
 
   if (jQuery('#assignment_team_assignment').is(':checked')) {
     jQuery('#assignment_team_count_field').removeAttr('hidden');
-    if (!<%= due_date(@assignment_form.assignment, 'team_formation').nil? %>) {
+     <% if due_date(@assignment_form.assignment, 'team_formation') %>
       addDueDateTableElement('team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>)
-    }
+     <% end %>
   } else {
     if (confirm(msg)) {
       jQuery('#assignment_team_count_field').attr('hidden', true);
@@ -184,16 +184,27 @@ function is_coding_assignmentChanged(){
         var checkbox = jQuery('#team_assignment');
         var team_count_field = jQuery('#assignment_team_count_field');
         var teammate_reviews_field = jQuery('#assignment_show_teammate_reviews');
+        var team_formation_due_date_checkbox = jQuery('#team_formation_due_date_checkbox')
 
+        jQuery("#questionnaire_table_TeammateReviewQuestionnaire").remove()
         if (checkbox.is(':checked')) {
           team_count_field.removeAttr('hidden');
+          team_formation_due_date_checkbox.removeAttr('hidden')
           jQuery('#assignment_form_assignment_max_team_size').val('2');
           teammate_reviews_field.removeAttr('hidden');
           addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
+          addQuestionnaireTableRow(
+                  'TeammateReviewQuestionnaire',
+                  null,
+                  <%= questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
+                  <%= assignment_questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
+                  <%= questionnaire_options(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>
+          );
 
         } else {
             if (confirm(msg)) {
               team_count_field.attr('hidden', true);
+              team_formation_due_date_checkbox.attr('hidden', true)
               teammate_reviews_field.attr('hidden', true);
               document.getElementById('assignment_form_assignment_max_team_size').value = '1';
               removeDueDateTableElement('team_formation', 0);

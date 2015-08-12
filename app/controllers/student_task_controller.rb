@@ -8,18 +8,16 @@ class StudentTaskController < ApplicationController
 
   def list
     redirect_to(:controller => 'eula', :action => 'display') if current_user.is_new_user
+    session[:user] = User.find_by(id: current_user.id)
     @student_tasks = StudentTask.from_user current_user
-    if @student_tasks
-      @student_tasks.reject{|t| !t.assignment.availability_flag if t.assignment}
+    @student_tasks.reject!{|t| !t.assignment.availability_flag}
 
-      ########Tasks and Notifications##################
-      @tasknotstarted = @student_tasks.select(&:not_started?)
-      @taskrevisions = @student_tasks.select(&:revision?)
-      @notifications = @student_tasks.select(&:notify?)
+    ########Tasks and Notifications##################
+    @tasknotstarted = @student_tasks.select(&:not_started?)
+    @taskrevisions = @student_tasks.select(&:revision?)
 
-      ######## Students Teamed With###################
-      @students_teamed_with = StudentTask.teamed_students current_user
-    end
+    ######## Students Teamed With###################
+    @students_teamed_with = StudentTask.teamed_students current_user
   end
 
   def view

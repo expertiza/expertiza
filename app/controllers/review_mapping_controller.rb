@@ -164,7 +164,7 @@ class ReviewMappingController < ApplicationController
       flash[:error] = "Please go back and select a topic"
     else
 
-      begin
+      # begin
         if assignment.has_topics?  #assignment with topics
           unless params[:i_dont_care]
             topic = (params[:topic_id].nil?) ? nil : SignUpTopic.find(params[:topic_id])
@@ -182,9 +182,9 @@ class ReviewMappingController < ApplicationController
           assignment_team = assignment_teams.to_a.shuffle[0] rescue nil
           assignment.assign_reviewer_dynamically_no_topic(reviewer,assignment_team)
         end
-      rescue Exception => e
-        flash[:error] = (e.nil?) ? $! : e
-      end
+      # rescue Exception => e
+      #   flash[:error] = (e.nil?) ? $! : e
+      # end
     end
 
     redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
@@ -498,7 +498,7 @@ class ReviewMappingController < ApplicationController
   def automatic_review_mapping
     assignment_id = params[:id].to_i
     participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.shuffle!
-    teams = AssignmentTeam.where(parent_id: params[:id].to_i).to_a.reject{|team| SignedUpTeam.topic_id_by_team_id(team.id).nil? }.shuffle!
+    teams = AssignmentTeam.where(parent_id: params[:id].to_i).to_a.shuffle!
     student_review_num = params[:num_reviews_per_student].to_i
     submission_review_num = params[:num_reviews_per_submission].to_i
     if student_review_num == 0 and submission_review_num == 0
@@ -614,8 +614,11 @@ class ReviewMappingController < ApplicationController
         .where( ["reviewed_object_id = ? and type = ? and reviewer_id IN (?) ", @id, @type, participants] )
     end
 
-    # Arranged as the hash @review_scores[reveiwer_id][reviewee_id] = score for this particular assignment
+    #  @review_scores[reveiwer_id][reviewee_id] = score for assignments not using vary_rubric_by_rounds feature
+    # @review_scores[reviewer_id][round][reviewee_id] = score for assignments using vary_rubric_by_rounds feature
     @review_scores = @assignment.compute_reviews_hash
+
+    @avg_and_ranges= @assignment.compute_avg_and_ranges_hash
     end
 
   # This method should be re-written since the score cache is no longer working.

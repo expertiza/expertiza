@@ -63,17 +63,8 @@ class StudentTask
     current_stage == 'metareview' && metareviews_given?
   end
 
-  def metareview_notification_accepted?
-    response_maps.inject(nil) { |i, j| i || j.class.to_s[/Metareview/] && j.notification_accepted }
-  end
-
   def not_started?
     in_work_stage? && !started?
-  end
-
-  def notify?
-    reviews_given_in_current_stage? && !review_notification_accepted? ||
-      metareviews_given_in_current_stage? && !metareview_notification_accepted?
   end
 
   include ActionView::Helpers::DateHelper
@@ -83,10 +74,6 @@ class StudentTask
 
   def response_maps
     participant.response_maps
-  end
-
-  def review_notification_accepted?
-    response_maps.inject(nil) { |i, j| i || j.class.to_s[/Review/] && j.notification_accepted }
   end
 
   def reviews_given?

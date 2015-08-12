@@ -2,16 +2,18 @@ class Criterion < ScoredQuestion
   validates_presence_of :size
 
   #This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
-  def edit
-  	# html = "<form accept-charset="UTF-8" action="/questions/create" method="post">"
-  	# html += "Type: <input id="question_type" name="question[type]" type="text" value="Criterion" size="3" disabled="true" />"
-  	# html += "Txt: <input id="question_txt" name="question[txt]" size="70" type="text" />"
-  	# html += "Min_label: <input id="question_min_label" name="question[min_label]" size="5" type="text" />"
-  	# html += "Max_label: <input id="question_max_label" name="question[max_label]" size="5" type="text" />"
-  	# html += "TextArea size: <input id="question_size" name="question[size]" size="5" type="text" />"
-  	# html += "Weight: <input id="question_weight" name="question[weight]" size="1" type="text" />"
-  	# html += "<input name="commit" type="submit" value="Create/Edit" />"
-  	# html += "</form>"
+  def edit(count)
+    html ='<tr>'
+    html+='<td align="center"><input id="question_chk' +count.to_s+ '" type="checkbox"></td>'
+    html+='<td><input size="6" value="'+self.seq.to_s+'" name="question['+self.id.to_s+'][seq]" id="question_'+self.id.to_s+'_seq" type="text"></td>'
+    html+='<td><textarea cols="50" rows="1" name="question['+self.id.to_s+'][txt]" id="question_'+self.id.to_s+'_txt">'+self.txt+'</textarea></td>'
+    html+='<td><input size="10" disabled="disabled" value="'+self.type+'" name="question['+self.id.to_s+'][type]" id="question_'+self.id.to_s+'_type" type="text">''</td>'
+    html+='<td><input size="6" value="'+self.weight.to_s+'" name="question['+self.id.to_s+'][weight]" id="question_'+self.id.to_s+'_weight" type="text">''</td>'
+    html+='<td>text area size <input size="6" value="'+self.size.to_s+'" name="question['+self.id.to_s+'][size]" id="question_'+self.id.to_s+'_size" type="text"></td>'
+    html+='<td> max_label <input size="4" value="'+self.max_label.to_s+'" name="question['+self.id.to_s+'][max_label]" id="question_'+self.id.to_s+'_max_label" type="text">  min_label <input size="4" value="'+self.min_label.to_s+'" name="question['+self.id.to_s+'][min_label]" id="question_'+self.id.to_s+'_min_label" type="text"></td>'
+    html+='</tr>'
+
+    html.html_safe
   end
 
   #This method returns what to display if an instructor (etc.) is viewing a questionnaire
@@ -20,23 +22,50 @@ class Criterion < ScoredQuestion
     html += '<TD align="left">'+self.type+'</TD>'
     html += '<td align="center">'+self.weight.to_s+'</TD>'
     questionnaire = self.questionnaire
-    html += '<TD align="center">'+questionnaire.min_question_score.to_s+' to '+ questionnaire.max_question_score.to_s + '</TD>'
+    if !self.max_label.nil? && !self.min_label.nil?
+      html += '<TD align="center"> ('+self.min_label+') '+questionnaire.min_question_score.to_s+' to '+ questionnaire.max_question_score.to_s + ' ('+self.max_label+')</TD>'
+    else
+      html += '<TD align="center">'+questionnaire.min_question_score.to_s+' to '+ questionnaire.max_question_score.to_s + '</TD>'
+    end
+
     html += '</TR>'
     html.html_safe
   end
 
-  def complete
-  	# html = self.txt
-  	# html += "<select id="answer_answer" name="answer[answer]">"
-  	# html += "<option value="1">1-" +self.min_label+ "</option>"
-  	# html += "<option value="2">2</option>"
-  	# html += "<option value="3">3</option>"
-  	# html += "<option value="4">4</option>"
-  	# html += "<option value="5">5-" +self.max_label+ "</option></select><br/>"
-  	# html += "Comment:<br/>"
-  	# cols = self.size.split(',')[0]
-  	# rows = self.size.split(',')[1]
-  	# html += "<textarea id="answer_comments" name="answer[comments]" cols=" +cols+ " rows=" +rows+ "></textarea>"
+  def complete(count, answer=nil, questionnaire_min, questionnaire_max)
+  	if self.size.nil?
+      cols = '70'
+      rows = '1'
+    elsif 
+      cols = self.size.split(',')[0]
+      rows = self.size.split(',')[1]
+    end
+
+    html = self.txt + '<br>'
+    html += '<table><td valign="top"><textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
+    html += answer.comments if !answer.nil?
+    html += '</textarea></td><td valign="top">'
+    html += '<select id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]">'
+    for j in questionnaire_min..questionnaire_max
+      if !answer.nil? and j == answer.answer
+        html += '<option value=' + j.to_s + ' selected="selected">' 
+      else
+        html += '<option value=' + j.to_s + '>'
+      end
+      if j == questionnaire_min
+        html += j.to_s
+        html += "-" + self.min_label if !self.min_label.nil?
+        html += "</option>"
+      elsif j == questionnaire_max
+        html += j.to_s
+        html += "-" + self.max_label if !self.max_label.nil?
+        html += "</option>"
+      else
+        html += j.to_s + "</option>"
+      end
+    end
+    html += "</select></td></table><br><br><br>"
+    html.html_safe
   end
 
   #This method returns what to display if a student is viewing a filled-out questionnaire
@@ -47,7 +76,7 @@ class Criterion < ScoredQuestion
 			html += '<TR><TD valign="top"><B>Response:</B></TD><TD>' + answer.comments.gsub("<", "&lt;").gsub(">", "&gt;").gsub(/\n/, '<BR/>')
 		end
 		html += '</TD></TR></TABLE><BR/>'
-		html
+		html.html_safe
   end
 
   

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150802171710) do
+ActiveRecord::Schema.define(version: 20150812013456) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -79,6 +79,7 @@ ActiveRecord::Schema.define(version: 20150802171710) do
     t.integer  "max_bids",                          limit: 4
     t.boolean  "show_teammate_reviews"
     t.boolean  "availability_flag",                               default: true
+    t.boolean  "use_bookmark"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -353,31 +354,29 @@ ActiveRecord::Schema.define(version: 20150802171710) do
   add_index "question_advices", ["question_id"], name: "fk_question_question_advices", using: :btree
 
   create_table "questionnaires", force: :cascade do |t|
-    t.string   "name",                limit: 64
-    t.integer  "instructor_id",       limit: 4,     default: 0,     null: false
-    t.boolean  "private",                           default: false, null: false
-    t.integer  "min_question_score",  limit: 4,     default: 0,     null: false
-    t.integer  "max_question_score",  limit: 4
+    t.string   "name",               limit: 64
+    t.integer  "instructor_id",      limit: 4,     default: 0,     null: false
+    t.boolean  "private",                          default: false, null: false
+    t.integer  "min_question_score", limit: 4,     default: 0,     null: false
+    t.integer  "max_question_score", limit: 4
     t.datetime "created_at"
-    t.datetime "updated_at",                                        null: false
-    t.integer  "default_num_choices", limit: 4
-    t.string   "type",                limit: 255
-    t.string   "display_type",        limit: 255
-    t.text     "instruction_loc",     limit: 65535
-    t.string   "section",             limit: 255
+    t.datetime "updated_at",                                       null: false
+    t.string   "type",               limit: 255
+    t.string   "display_type",       limit: 255
+    t.text     "instruction_loc",    limit: 65535
   end
 
   create_table "questions", force: :cascade do |t|
     t.text    "txt",              limit: 65535
     t.integer "weight",           limit: 4
     t.integer "questionnaire_id", limit: 4
-    t.float   "seq",              limit: 24
+    t.decimal "seq",                            precision: 6, scale: 2
     t.string  "type",             limit: 255
-    t.string  "size",             limit: 255,   default: ""
+    t.string  "size",             limit: 255,                           default: ""
     t.string  "alternatives",     limit: 255
-    t.boolean "break_before",                   default: true
-    t.string  "max_label",        limit: 255,   default: ""
-    t.string  "min_label",        limit: 255,   default: ""
+    t.boolean "break_before",                                           default: true
+    t.string  "max_label",        limit: 255,                           default: ""
+    t.string  "min_label",        limit: 255,                           default: ""
   end
 
   add_index "questions", ["questionnaire_id"], name: "fk_question_questionnaires", using: :btree
@@ -389,12 +388,11 @@ ActiveRecord::Schema.define(version: 20150802171710) do
   end
 
   create_table "response_maps", force: :cascade do |t|
-    t.integer  "reviewed_object_id",    limit: 4,   default: 0,     null: false
-    t.integer  "reviewer_id",           limit: 4,   default: 0,     null: false
-    t.integer  "reviewee_id",           limit: 4,   default: 0,     null: false
-    t.string   "type",                  limit: 255, default: "",    null: false
-    t.boolean  "notification_accepted",             default: false
-    t.integer  "round",                 limit: 4
+    t.integer  "reviewed_object_id", limit: 4,   default: 0,  null: false
+    t.integer  "reviewer_id",        limit: 4,   default: 0,  null: false
+    t.integer  "reviewee_id",        limit: 4,   default: 0,  null: false
+    t.string   "type",               limit: 255, default: "", null: false
+    t.integer  "round",              limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -457,6 +455,35 @@ ActiveRecord::Schema.define(version: 20150802171710) do
 
   add_index "roles_permissions", ["permission_id"], name: "fk_roles_permission_permission_id", using: :btree
   add_index "roles_permissions", ["role_id"], name: "fk_roles_permission_role_id", using: :btree
+
+  create_table "score_views", id: false, force: :cascade do |t|
+    t.integer  "question_weight",       limit: 4
+    t.string   "type",                  limit: 255
+    t.integer  "q1_id",                 limit: 4,     default: 0
+    t.string   "q1_name",               limit: 64
+    t.integer  "q1_instructor_id",      limit: 4,     default: 0
+    t.boolean  "q1_private",                          default: false
+    t.integer  "q1_min_question_score", limit: 4,     default: 0
+    t.integer  "q1_max_question_score", limit: 4
+    t.datetime "q1_created_at"
+    t.datetime "q1_updated_at"
+    t.string   "q1_type",               limit: 255
+    t.string   "q1_display_type",       limit: 255
+    t.integer  "ques_id",               limit: 4,     default: 0,     null: false
+    t.integer  "ques_questionnaire_id", limit: 4
+    t.integer  "s_id",                  limit: 4,     default: 0
+    t.integer  "s_question_id",         limit: 4,     default: 0
+    t.integer  "s_score",               limit: 4
+    t.text     "s_comments",            limit: 65535
+    t.integer  "s_response_id",         limit: 4
+  end
+
+  create_table "sections", force: :cascade do |t|
+    t.string   "name",       limit: 255,   null: false
+    t.text     "desc_text",  limit: 65535
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "sessions", force: :cascade do |t|
     t.string   "session_id", limit: 255,      default: "", null: false

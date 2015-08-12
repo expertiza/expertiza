@@ -71,14 +71,6 @@
 (<%= time_ago_in_words(duedate) %> left) </span><br/>
 <% end %>
 <br/>
-<strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @notifications.size.to_s %>&nbsp;</span> Notifications<br></strong><br>
-
-<% @notifications.each do |student_task| %>
-  <span class="notification">&nbsp; &raquo; <%= link_to student_task.assignment.name + ": " +
-    student_task.current_stage + " submitted", :controller => :grades, :action => :view_my_scores, :id => student_task.participant.id %></span><br/>
-<% end %>
-<br/>
-
 
 <strong>Students Teamed With You<br></strong><br>
 

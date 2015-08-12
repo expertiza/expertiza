@@ -312,10 +312,20 @@
     }
 
         function removeOrAddMetareview(){
-            if(document.getElementById("metareview"))
+            if(document.getElementById("metareview")) {
                 removeDueDateTableElement('metareview', 0);
-             else
+                jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()
+            } else {
                 addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>, 'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
+                jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()
+                addQuestionnaireTableRow(
+                        'MetareviewQuestionnaire',
+                        null,
+                        <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
+                        <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
+                        <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
+                );
+            }
 
             <%@metareview_allowed_checkbox=true%>
 
@@ -377,9 +387,11 @@
     <%= label_tag('dropTopicAllowed', 'Use drop topic deadline') %><br/>
 <% end %>
 
-<input name="teamFormationAllowed" type="hidden" value="false" />
-<%= check_box_tag('teamFormationAllowed', 'true', @team_formation_allowed,:onclick=>"removeOrAddTeamFormation()" ) %>
-<%= label_tag('teamFormationAllowed', 'Use team formation deadline') %><br/>
+<span id='team_formation_due_date_checkbox' <%= 'hidden' if @assignment_form.assignment.max_team_size == 1%> 
+    <input name="teamFormationAllowed" type="hidden" value="false" />
+    <%= check_box_tag('teamFormationAllowed', 'true', @team_formation_allowed,:onclick=>"removeOrAddTeamFormation()" ) %>
+    <%= label_tag('teamFormationAllowed', 'Use team formation deadline') %><br/>
+</span>
 
 <input name="metareivewAllowed" type="hidden" value="false" />
 <%= check_box_tag('metareviewAllowed', 'true', @metareview_allowed,:onclick=>"removeOrAddMetareview()" ) %>
@@ -406,7 +418,7 @@
   <script>
     jQuery(document).ready(function () {
         <% if @assignment_form.assignment.max_team_size > 1 && due_date(@assignment_form.assignment, 'team_formation').due_at %>
-        addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
+            addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
         <% end %>
         <% if @assignment_form.assignment.has_topics? %>
             <% if due_date(@assignment_form.assignment, 'signup').due_at %>

@@ -44,27 +44,26 @@ class Response < ActiveRecord::Base
     end
     code += '<div id="review_'+str+'" style=""><BR/><BR/>'
 
-    # Test for whether custom rubric needs to be used
-    if ((self.map.questionnaire.section.eql? "Custom") && (self.map.type.to_s != 'FeedbackResponseMap'))
-      #return top of view
-      return code.html_safe
-    end
-    # End of custom code
-
     count = 0
     answers = Answer.where(response_id: self.response_id)
-    questionnaire_max = Question.find(answers.first.question_id).questionnaire.max_question_score
-    answers.each do |answer|
-      count += 1
-      question = Question.find(answer.question_id)
-      if question.instance_of?(Criterion)
-        code += question.view_completed_question(count,answer,questionnaire_max)
+    questionnaire = Question.find(answers.first.question_id).questionnaire
+    questionnaire_max = questionnaire.max_question_score
+    questions=questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
+    #loop through questions so the the questions are displayed in order based on seq (sequence number)
+    questions.each do |question|
+      count += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
+      answer = answers.find{|a| a.question_id==question.id}
+      if !answer.nil? or question.is_a? QuestionnaireHeader
+        if question.instance_of? Criterion
+          code += question.view_completed_question(count,answer,questionnaire_max)
+        else
+          code += question.view_completed_question(count,answer)
+        end
       end
-
     end
 
     if self.additional_comment != nil
-      comment = self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>&nbsp;&nbsp;&nbsp;')
+      comment = self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
     else
       comment = ''
     end
@@ -75,31 +74,6 @@ class Response < ActiveRecord::Base
   # Computes the total score awarded for a review
   def get_total_score
     scores.map(&:answer).sum
-  end
-
-  #Generate an email to the instructor when a new review exceeds the allowed difference
-  #ajbudlon, nov 18, 2008
-  def notify_on_difference(new_pct, avg_pct, limit)
-    mapping = self.map
-    instructor = mapping.assignment.instructor
-    Mailer.generic_message(
-      {:to => instructor.email,
-       :subject => "Expertiza Notification: A review score is outside the acceptable range",
-       :body => {
-         :first_name => ApplicationHelper::get_user_first_name(instructor),
-         :reviewer_name => mapping.reviewer.fullname,
-         :type => "review",
-         :reviewee_name => mapping.reviewee.fullname,
-         :limit => limit,
-         :new_pct => new_pct,
-         :avg_pct => avg_pct,
-         :types => "reviews",
-         :performer => "reviewer",
-         :assignment => mapping.assignment,
-         :partial_name => 'limit_notify'
-       }
-    }
-    ).deliver
   end
 
   def delete

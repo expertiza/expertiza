@@ -157,25 +157,14 @@ class ResponseController < ApplicationController
       @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
       @largest_version_num=@sorted[0]
     end
-    @response = Response.where(map_id: @map.map_id, version_num:  @largest_version_num.version_num).first
+
     @modified_object = @response.response_id
     get_content
     @review_scores = Array.new
-    @question_type = Array.new
     @questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id:  question.id).first
-      @question_type << QuestionType.find_by_question_id(question.id)
     end
-    # Check whether this is a custom rubric
-    if @map.questionnaire.section.eql? "Custom"
-
-      render :action => 'custom_response'
-    else
-      # end of special code (except for the end below, to match the if above)
-      #**********************
-      render :action => 'response'
-    end
-    @response.email("update")
+    render :action => 'response'
   end
 
   def update ###-### Seems like this method may no longer be used -- not in E806 version of the file
@@ -189,10 +178,9 @@ class ResponseController < ApplicationController
       @response.update_attribute('additional_comment', params[:review][:comments])
 
       @questionnaire = @map.questionnaire
-      questions = @questionnaire.questions
+      questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
 
       params[:responses].each_pair do |k, v|
-
         score = Answer.where(response_id: @response.id, question_id:  questions[k.to_i].id).first
         unless score
           score = Answer.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :answer => v[:score], :comments => v[:comment])
@@ -202,14 +190,6 @@ class ResponseController < ApplicationController
       end
     rescue
       msg = "Your response was not saved. Cause:189 #{$!}"
-    end
-
-    begin
-      ResponseHelper.compare_scores(@response, @questionnaire)
-
-      msg = "Your response was successfully saved."
-    rescue
-      msg = "An error occurred while saving the response:198 #{$!}"
     end
     redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :save_options => params[:save_options]
   end
@@ -222,29 +202,7 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @modified_object = @map.id
     get_content
-
-    # Check whether this is a custom rubric
-    if @map.questionnaire.section.eql? "Custom"
-      @question_type = Array.new
-      @questions.each {
-          |question|
-        @question_type << QuestionType.find_by_question_id(question.id)
-      }
-      if !@map.contributor.nil?
-        team_member = TeamsUser.find_by_team_id(@map.contributor).user_id
-        # Bug: @topic_id is set only in new, not in edit.
-        #   So this appears only the 1st time the review is done.-efg
-        @topic_id = SignedUpTeam.topic_id(@map.assignment.id, team_member)
-      end
-      if !@topic_id.nil?
-        @signedUpTopic = SignUpTopic.find(@topic_id).topic_name
-      end
-      @next_action = "custom_create"
-      render :action => 'custom_response'
-    else
-      render :action => 'response'
-    end
-    #end
+    render :action => 'response'
   end
 
   def new_feedback
@@ -286,14 +244,14 @@ class ResponseController < ApplicationController
 
       @res = @response.response_id
       @questionnaire = @map.questionnaire
-      questions = @questionnaire.questions
+      #Change the order for displaying questions for editing response views.
+      questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
       if params[:responses]
         params[:responses].each_pair do |k, v|
           score = Answer.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :answer => v[:score], :comments => v[:comment])
         end
       end
 
-    ResponseHelper.compare_scores(@response, @questionnaire)
     #@map.save
     msg = "Your response was successfully saved."
     @response.email();
@@ -320,7 +278,6 @@ class ResponseController < ApplicationController
   def saving
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
-    @map.notification_accepted = false
     @map.save
     if (@map.assignment.id == 562) #Making the automated metareview feature available for one 'ethical analysis 6' assignment only.
       if (params["save_options"].nil? or params["save_options"].empty?) #default it to with metareviews
@@ -370,7 +327,7 @@ class ResponseController < ApplicationController
     @participant = @map.reviewer
     @contributor = @map.contributor
     @questionnaire = @map.questionnaire
-    @questions = @questionnaire.questions
+    @questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
   end

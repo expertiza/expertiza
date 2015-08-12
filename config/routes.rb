@@ -419,7 +419,9 @@ Expertiza::Application.routes.draw do
     collection do
       get :list
       post :submit
-    end
+      post :student_submit
+      post :update_suggestion
+    end      
   end
 
   resources :survey do

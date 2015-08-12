@@ -12,24 +12,15 @@ class AssignmentTeam < Team
       participants.include?(participant)
     end
 
+  #Use current object (AssignmentTeam) as reviewee and create the ReviewResponseMap record
   def assign_reviewer(reviewer)
-    if assignment.has_topics?
-      topic_id = self.topic
-      if topic_id==nil
-        raise "this team has not taken any topic"
-      end
-    end
     assignment = Assignment.find(self.parent_id)
     if assignment==nil
       raise "cannot find this assignment"
     end
-    if assignment.varying_rubrics_by_round?
-      round = assignment.get_current_round(topic_id) #record round number only for varying rubrics feature
-    else
-      round=nil
-    end
+
     ReviewResponseMap.create(:reviewee_id => self.id, :reviewer_id => reviewer.id,
-                                 :reviewed_object_id => assignment.id, :round =>round)
+                                 :reviewed_object_id => assignment.id)
   end
 
   #for varying rubric feature -Yang

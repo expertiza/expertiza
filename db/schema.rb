@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150812013456) do
+ActiveRecord::Schema.define(version: 20150812150214) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -27,9 +27,10 @@ ActiveRecord::Schema.define(version: 20150812013456) do
     t.integer "assignment_id",        limit: 4
     t.integer "questionnaire_id",     limit: 4
     t.integer "user_id",              limit: 4
-    t.integer "notification_limit",   limit: 4, default: 15, null: false
-    t.integer "questionnaire_weight", limit: 4, default: 0,  null: false
+    t.integer "notification_limit",   limit: 4, default: 15,   null: false
+    t.integer "questionnaire_weight", limit: 4, default: 0,    null: false
     t.integer "used_in_round",        limit: 4
+    t.boolean "dropdown",                       default: true
   end
 
   add_index "assignment_questionnaires", ["assignment_id"], name: "fk_aq_assignments_id", using: :btree

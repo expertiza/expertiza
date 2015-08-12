@@ -98,7 +98,10 @@ require 'analytic/assignment_analytic'
     if self.varying_rubrics_by_round?
       # Filter submissions already reviewed by reviewer in current round
       current_round = self.get_current_round(nil)
-      contributor_set = reject__reviewed_submissions_in_current_round(contributor_set, reviewer,current_round)
+      contributor_set = reject_reviewed_submissions_in_current_round(contributor_set, reviewer,current_round)
+      if current_round>1
+        contributor_set = reject_unreviewed_submissions_in_round(contributor_set, reviewer,1)
+      end
     else
       # Filter submissions already reviewed by reviewer
       contributor_set=reject_previously_reviewed_submissions(contributor_set, reviewer)
@@ -132,7 +135,10 @@ require 'analytic/assignment_analytic'
     if self.varying_rubrics_by_round?
       # Filter submissions already reviewed by reviewer in current round
       current_round = self.get_current_round(nil)
-      contributor_set = reject__reviewed_submissions_in_current_round(contributor_set, reviewer,current_round)
+      contributor_set = reject_reviewed_submissions_in_current_round(contributor_set, reviewer,current_round)
+      if current_round>1
+        contributor_set = reject_unreviewed_submissions_in_round(contributor_set, reviewer,1)
+      end
     else
       # Filter submissions already reviewed by reviewer
       contributor_set=reject_previously_reviewed_submissions(contributor_set, reviewer)
@@ -162,8 +168,14 @@ require 'analytic/assignment_analytic'
     contributor_set
   end
 
-  def reject__reviewed_submissions_in_current_round(contributor_set, reviewer, current_round)
+  def reject_reviewed_submissions_in_current_round(contributor_set, reviewer, current_round)
     contributor_set = contributor_set.reject { |contributor| contributor.reviewed_by_in_round?(reviewer,current_round) }
+    contributor_set
+  end
+
+  def reject_unreviewed_submissions_in_round(contributor_set, reviewer, round)
+    contributor_set = contributor_set.reject { |contributor| !contributor.reviewed_by_in_round?(reviewer,round) }
+    contributor_set
   end
 
   def reject_previously_reviewed_submissions(contributor_set, reviewer)

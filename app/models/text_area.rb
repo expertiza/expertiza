@@ -1,31 +1,24 @@
 class TextArea < TextResponse
-  def edit
-  	html = "<form accept-charset="UTF-8" action="/questions/create" method="post">"
-  	html += "Type: <input id="question_type" name="question[type]" type="text" value="TextArea" size="3" disabled="true" />"
-  	html += "Txt: <input id="question_txt" name="question[txt]" size="70" type="text" />"
-  	html += "TextArea size: <input id="question_size" name="question[size]" size="5" type="text" />"
-  	html += "<input name="commit" type="submit" value="Create/Edit" />"
-  	html += "</form>"
+  def complete(count, answer=nil)
+  	if self.size.nil?
+      cols = '70'
+      rows = '1'
+    elsif 
+      cols = self.size.split(',')[0]
+      rows = self.size.split(',')[1]
+    end
+    html = '<li><p><label for="responses_' +count.to_s+ '">' +self.txt+ '</label></p>'
+    html += '<input id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]" type="hidden" value="">'
+    html += '<p><textarea cols="' +cols+ '" rows="' +rows+ '" id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" >'
+    html += answer.comments if !answer.nil?
+    html += '</textarea>'
+    html += '</p></li>'
+    html.html_safe
   end
 
-  def view_question_text
-  	html = "Type: <input id="question_type" name="question[type]" type="text" value="TextArea" size="3" disabled="true" />"
-  	html += "Txt: <input id="question_txt" name="question[txt]" size="70" type="text" value=" +self.txt+ " disabled="true" />"
-  	html += "TextArea size: <input id="question_size" name="question[size]" size="5" type="text" value=" +self.size+ " disabled="true" />"
-  end
-
-  def complete
-  	html = self.txt
-  	cols = self.size.split(',')[0]
-  	rows = self.size.split(',')[1]
-  	html += "<textarea id="answer_comments" name="answer[comments]" cols=" +cols+ " rows=" +rows+ "></textarea>"
-  end
-
-  def view_completed_question(response_id)
-  	answer = Answer.where(question_id: self.id, response_id: response_id).first
-  	html = self.txt
-  	cols = self.size.split(',')[0]
-  	rows = self.size.split(',')[1]
-  	html += "<textarea id="answer_comments" name="answer[comments]" cols=" +cols+ " rows=" +rows+ ">" +answer.comments+ "</textarea>"
+  def view_completed_question(count, answer)
+    html = '<big><b>Question '+count.to_s+":</b> <i>"+self.txt+"</i></big><BR/>"
+    html += '&nbsp;' * 8 + answer.comments.gsub('^p', '').gsub(/\n/, '<BR/>')+ '<BR/><BR/>'
+    html.html_safe
   end 
 end

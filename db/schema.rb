@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150806000053) do
+ActiveRecord::Schema.define(version: 20150812013456) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -79,6 +79,7 @@ ActiveRecord::Schema.define(version: 20150806000053) do
     t.integer  "max_bids",                          limit: 4
     t.boolean  "show_teammate_reviews"
     t.boolean  "availability_flag",                               default: true
+    t.boolean  "use_bookmark"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -369,13 +370,13 @@ ActiveRecord::Schema.define(version: 20150806000053) do
     t.text    "txt",              limit: 65535
     t.integer "weight",           limit: 4
     t.integer "questionnaire_id", limit: 4
-    t.float   "seq",              limit: 24
+    t.decimal "seq",                            precision: 6, scale: 2
     t.string  "type",             limit: 255
-    t.string  "size",             limit: 255,   default: ""
+    t.string  "size",             limit: 255,                           default: ""
     t.string  "alternatives",     limit: 255
-    t.boolean "break_before",                   default: true
-    t.string  "max_label",        limit: 255,   default: ""
-    t.string  "min_label",        limit: 255,   default: ""
+    t.boolean "break_before",                                           default: true
+    t.string  "max_label",        limit: 255,                           default: ""
+    t.string  "min_label",        limit: 255,                           default: ""
   end
 
   add_index "questions", ["questionnaire_id"], name: "fk_question_questionnaires", using: :btree

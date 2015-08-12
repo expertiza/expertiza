@@ -199,7 +199,13 @@ class Response < ActiveRecord::Base
       original_reviewer_participant_id = response_map_for_original_feedback.reviewer_id
 
       participant = AssignmentParticipant.find(original_reviewer_participant_id)
-      defn[:body][:obj_name] = SignUpTopic.find(SignedUpTeam.topic_id(participant.parent_id, participant.user_id)).topic_name
+      topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
+      if topic_id.nil?
+        defn[:body][:obj_name] = assignment.name
+      else
+        defn[:body][:obj_name] = SignUpTopic.find(topic_id).topic_name
+      end
+
       user = User.find(participant.user_id)
 
       defn[:to] = user.email

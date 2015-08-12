@@ -79,10 +79,6 @@ class AssignmentsController < ApplicationController
     @team_formation_allowed=false
     @team_formation_allowed_checkbox=false
 
-    #only when instructor does not assign rubrics and in assignment edit page will show this error message.
-    if !set_rubrics? and request.original_fullpath == "/assignments/#{@assignment_form.assignment.id}/edit"
-      flash.now[:error] = "You did not specify rubrics of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>."
-    end
     # Check if name and url in database is empty before webpage displays
     @due_date_all.each do |dd|
       if((!dd.deadline_name.nil?&&!dd.deadline_name.empty?)||(!dd.description_url.nil?&&!dd.description_url.empty?))
@@ -131,6 +127,16 @@ class AssignmentsController < ApplicationController
         dd.description_url=""
       end
     end
+    #only when instructor does not assign rubrics and in assignment edit page will show this error message.
+    if !empty_rubrics_list.empty? and request.original_fullpath == "/assignments/#{@assignment_form.assignment.id}/edit"
+      empty_rubrics = "<b>["
+      empty_rubrics_list.each do |item|
+        empty_rubrics += item[0...-13] + ", "
+      end
+      empty_rubrics = empty_rubrics[0...-2]
+      empty_rubrics += "] </b>"
+      flash.now[:error] = "You did not specify all necessary rubrics: " +empty_rubrics+" of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>."
+    end
   end
 
   def update
@@ -152,6 +158,9 @@ class AssignmentsController < ApplicationController
     @assignment_form= AssignmentForm.create_form_object(params[:id])
     @assignment_form.assignment.instructor ||= current_user
     params[:assignment_form][:assignment][:wiki_type_id] = 1 unless params[:assignment_wiki_assignment]
+    params[:assignment_form][:assignment_questionnaire].reject! do |q|
+      q[:questionnaire_id].empty?
+    end
 
     if (session[:user].timezonepref).nil?
       parent_id=session[:user].parent_id
@@ -289,11 +298,26 @@ class AssignmentsController < ApplicationController
     end
 
     #check whether rubrics are set before save assignment
-    def set_rubrics?
-      set_rubrics = true
+    def empty_rubrics_list
+      rubrics_list = ["ReviewQuestionnaire",
+                      "MetareviewQuestionnaire","AuthorFeedbackQuestionnaire",
+                      "TeammateReviewQuestionnaire","BookmarkRatingQuestionnaire"]
       @assignment_questionnaires.each do |aq|
-        set_rubrics = false if aq.questionnaire_id.nil?
+        unless aq.questionnaire_id.nil?
+          rubrics_list.reject! do |rubric| 
+            rubric == Questionnaire.where(id: aq.questionnaire_id).first.type.to_s
+          end
+        end
       end
-      return set_rubrics
+      if @assignment_form.assignment.max_team_size == 1
+        rubrics_list.delete("TeammateReviewQuestionnaire")
+      end
+      unless @metareview_allowed
+        rubrics_list.delete("MetareviewQuestionnaire")
+      end
+      unless @assignment_form.assignment.use_bookmark
+        rubrics_list.delete("BookmarkRatingQuestionnaire")
+      end
+      return rubrics_list
     end
 end

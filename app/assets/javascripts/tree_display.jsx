@@ -383,7 +383,8 @@ jQuery(document).ready(function() {
       var updated_date;
       var colWidthArray = ["17%", "17%", "12%", "17%", "17%", "20%"]
       var colDisplayStyle = {
-        "display": ""
+        "display": "",
+        "max-width": "193px"
       }
       if (this.props.dataType === 'questionnaire') {
         colWidthArray = ["70%", "0%", "0%", "0%", "0%", "30%"]
@@ -595,7 +596,8 @@ jQuery(document).ready(function() {
       var _this = this
       var colWidthArray = ["17%", "17%", "12%", "17%", "17%", "20%"]
       var colDisplayStyle = {
-        "display": ""
+        "display": "",
+        "max-width": "193px"
       }
       if (this.props) {
         if (this.props.dataType === 'questionnaire') {

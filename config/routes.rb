@@ -44,6 +44,7 @@ Expertiza::Application.routes.draw do
 
   resources :assignments do
     collection do
+      get :delete
       get :associate_assignment_with_course
       get :copy
       get :toggle_access

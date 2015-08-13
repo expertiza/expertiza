@@ -261,12 +261,12 @@ class SignUpSheetController < ApplicationController
     #If there is no drop topic deadline, student can drop topic at any time (if all the submissions are deleted)
     #If there is a drop topic deadline, student cannot drop topic after this deadline.
     if !participant.directory_num.nil? or !participant.hyperlinks.blank?
-      flash[:error] = "You have already submitted your work, so you are not allowed to drop your topic!"
+      flash[:error] = "You have submitted your work, so you are not allowed to drop your topic."
     elsif !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
       flash[:error] = "You cannot drop your topic after drop topic deadline!"
     else
       delete_signup_for_topic(params[:assignment_id], params[:id])
-      flash[:success] = "You have already dropped your topic successfully!"
+      flash[:success] = "You have dropped your topic successfully!"
     end
     redirect_to :action => 'list', :assignment_id => params[:assignment_id]
   end

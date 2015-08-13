@@ -480,10 +480,11 @@ require 'analytic/assignment_analytic'
   def path
     raise 'Path cannot be created. The assignment must be associated with either a course or an instructor.' if self.course_id == nil && self.instructor_id == nil
     raise PathError, 'No path needed' if self.wiki_type_id != 1
+    path_text = ""
     (self.course_id != nil && self.course_id > 0) ?
-      path = Course.find(self.course_id).path :
-      path = Rails.root + '/pg_data/' + FileHelper.clean_path(User.find(self.instructor_id).name) + '/'
-    path + FileHelper.clean_path(self.directory_path)
+      path_text = Course.find(self.course_id).directory_path :
+      path_text = Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(User.find(self.instructor_id).name) + '/'
+    path_text + FileHelper.clean_path(self.directory_path)
   end
 
   # Check whether review, metareview, etc.. is allowed

@@ -262,28 +262,6 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
-    if (@map.assignment.id == 562) #Making the automated metareview feature available for one 'ethical analysis 6' assignment only.
-      if (params["save_options"].nil? or params["save_options"].empty?) #default it to with metareviews
-        params["save_options"] = "WithMeta"
-      end
-      #calling the automated metareviewer controller, which calls its corresponding model/view
-      if (params[:save_options] == "WithMeta")
-        redirect_to :controller => 'automated_metareviews', :action => 'list', :id => @map.map_id
-      elsif (params[:save_options] == "EmailMeta")
-        redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
-        # calculate the metareview metrics
-        @automated_metareview = AutomatedMetareview.new
-        #pass in the response id as a parameter
-        @response = Response.find_by_map_id(params[:id])
-        @automated_metareview.calculate_metareview_metrics(@response, params[:id])
-        #send email to the reviewer with the metareview details
-        @automated_metareview.send_metareview_metrics_email(@response, params[:id])
-      elsif (params[:save_options] == "WithoutMeta")
-        redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
-      end
-    else
-      redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
-    end
   end
 
   def redirection
@@ -311,9 +289,9 @@ class ResponseController < ApplicationController
     @contributor = @map.contributor #contributor should always be a Team object
 
     reviewees_topic=SignedUpTeam.topic_id_by_team_id(@contributor.id)
-    current_round = @assignment.get_current_round(reviewees_topic)
+    @current_round = @assignment.get_current_round(reviewees_topic)
     if @map.type="ReviewResponseMap"
-      @questionnaire = @map.questionnaire(current_round)
+      @questionnaire = @map.questionnaire(@current_round)
     else
       @questionnaire = @map.questionnaire
     end

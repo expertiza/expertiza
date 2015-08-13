@@ -8,7 +8,6 @@ jQuery(document).ready( function(){
     for (i = 0; i < charts.length; i++) {
       var chart = charts[i];
         var data = eval("(" + chart.innerHTML + ")");
-        console.log(data);
         jQuery('#'+chart.id).highcharts(data);
     }
     jQuery("tspan:contains('Highcharts.com')").remove();

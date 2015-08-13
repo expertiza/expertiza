@@ -6,12 +6,15 @@ or<br/><br/>
 <% if files.length > 0 or stage != "Complete"  %>
   <% if stage != "Complete" %>
     <%= form_tag({:action=>'submit_file',:id => participant.id},{:method => 'post', :enctype => "multipart/form-data", :onSubmit => "return checkIfFileExists(uploaded_file.value,1);"}) do %>
-      <br/><input type="checkbox" name="unzip" value=""/> Unzip submission
-      <br/><input type="file" id="uploaded_file" name="uploaded_file" size=40 />
-      <%= submit_tag 'Upload file' %>
+      <input type="checkbox" name="unzip" value=""/> Unzip submission
+      <div class="form-group">
+        <input type="file" id="uploaded_file" name="uploaded_file" size=40 />
+      </div>
+      <%= submit_tag 'Upload file', class: 'btn btn-default' %>
       <br>
     <% end %>
   <% end %>
+  <hr/>
   <%= form_tag({:action=>'folder_action', :id => participant.id}, {:multipart => true, id: 'folder-action-form'}) do %>
     <% if files.length > 0 and participant.directory_num != nil and participant.directory_num >= 0 %>
       <% if stage != "Complete" %>

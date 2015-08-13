@@ -409,7 +409,8 @@ Expertiza::Application.routes.draw do
       get :folder_action
       get :remove_hyperlink
       post :remove_hyperlink
-      get :submit_file
+      post :submit_file
+      post :folder_action
       post :submit_hyperlink
       get :submit_hyperlink
       get :view

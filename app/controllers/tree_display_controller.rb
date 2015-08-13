@@ -254,8 +254,6 @@ class TreeDisplayController < ApplicationController
   end
 
   def bridge_to_is_available
-    puts "hey"
-    puts params
     user = session[:user]
     owner_id = params[:owner_id]
     is_available(user, owner_id)

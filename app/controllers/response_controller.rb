@@ -135,6 +135,7 @@ class ResponseController < ApplicationController
     end
   end
 
+  #Prepare the parameters when student click "Edit"
   def edit
     @header = "Edit"
     @next_action = "update"
@@ -167,18 +168,19 @@ class ResponseController < ApplicationController
     render :action => 'response'
   end
 
-  def update ###-### Seems like this method may no longer be used -- not in E806 version of the file
+  #Update the response and answers when student "edit" existing response
+  def update
     @response = Response.find(params[:id])
     return if redirect_when_disallowed(@response)
     @myid = @response.response_id
     msg = ""
     begin
-      @myid = @response.response_id
+      @myid = @response.id
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
 
-      @questionnaire = @map.questionnaire
-      questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
+      @questionnaire = @map.questionnaire(@response.round)
+      questions = @questionnaire.questions
 
       params[:responses].each_pair do |k, v|
         score = Answer.where(response_id: @response.id, question_id:  questions[k.to_i].id).first
@@ -201,7 +203,8 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @modified_object = @map.id
-    get_content
+
+    get_content(true)
     render :action => 'response'
   end
 
@@ -220,6 +223,7 @@ class ResponseController < ApplicationController
     end
   end
 
+  #view response
   def view
     @response = Response.find(params[:id])
     return if redirect_when_disallowed(@response)
@@ -240,17 +244,29 @@ class ResponseController < ApplicationController
       @review_scores << element
     end
 
-    @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments])#,:version_num=>@version)
+    #to save the response for ReviewResponsMap, a questionnaire_id is wrapped in the params
+    if params[:review][:questionnaire_id]
+      @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
+    end
 
-      @res = @response.response_id
-      @questionnaire = @map.questionnaire
-      #Change the order for displaying questions for editing response views.
-      questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
-      if params[:responses]
-        params[:responses].each_pair do |k, v|
-          score = Answer.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :answer => v[:score], :comments => v[:comment])
-        end
+    #to save the response for ReviewResponsMap, a questionnaire_id is wrapped in the params
+    if params[:review][:questionnaire_id]
+      @round = params[:review][:round]
+    else
+      @round=nil
+    end
+
+    @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:round => @round)#,:version_num=>@version)
+
+    @res = @response.response_id
+
+    #Change the order for displaying questions for editing response views.
+    questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
+    if params[:responses]
+      params[:responses].each_pair do |k, v|
+        Answer.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :answer => v[:score], :comments => v[:comment])
       end
+    end
 
     #@map.save
     msg = "Your response was successfully saved."
@@ -262,6 +278,7 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
+    redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
   end
 
   def redirection
@@ -282,18 +299,28 @@ class ResponseController < ApplicationController
   end
 
   private
-  def get_content
+  #new_response if a flag parameter indicating that if user is requesting a new rubric to fill
+  #if true: we figure out which questionnaire to use based on current time and records in assignment_questionnaires table
+  # e.g. student click "Begin" or "Update" to start filling out a rubric for others' work
+  #if false: we figure out which questionnaire to display base on @response object
+  # e.g. student click "Edit" or "View"
+  def get_content(new_response=false)
     @title = @map.get_title
     @assignment = @map.assignment
     @participant = @map.reviewer
     @contributor = @map.contributor #contributor should always be a Team object
 
-    reviewees_topic=SignedUpTeam.topic_id_by_team_id(@contributor.id)
-    @current_round = @assignment.get_current_round(reviewees_topic)
-    if @map.type="ReviewResponseMap"
+    if @map.type="ReviewResponseMap" && new_response #determine t
+      reviewees_topic=SignedUpTeam.topic_id_by_team_id(@contributor.id)
+      @current_round = @assignment.get_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
-    else
+      @questionnaire = @map.questionnaire(@current_round)
+    elsif @map.type="MetareviewResponseMap" && new_response
       @questionnaire = @map.questionnaire
+    else
+      answer = @response.scores.first # if user is not filling a new rubric, the @response object should be available. we can find the questionnaire from the question_id in answers
+      question_id = answer.question_id
+      @questionnaire =Questionnaire.find(Question.find(question_id).questionnaire_id)
     end
 
     @questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }

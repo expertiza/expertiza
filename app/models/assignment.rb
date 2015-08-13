@@ -286,14 +286,8 @@ require 'analytic/assignment_analytic'
     raise "There are no more submissions to review on this #{work}." if contributor_set.empty?
 
     # Reviewer can review each contributor only once
-    if self.varying_rubrics_by_round?# However, in varying rubric feature, reviewer can review a artifact twice in different rounds
-      round = self.get_current_round(topic.id)
-      contributor_set.reject! { |contributor| contributor.reviewed_by_in_round?(reviewer,round) }
-      raise "You have already reviewed all submissions for this #{work} in current round." if contributor_set.empty?
-    else
-      contributor_set.reject! { |contributor| contributor.reviewed_by?(reviewer) }
-      raise "You have already reviewed all submissions for this #{work}." if contributor_set.empty?
-    end
+    contributor_set.reject! { |contributor| contributor.reviewed_by?(reviewer) }
+    raise "You have already reviewed all submissions for this #{work}." if contributor_set.empty?
 
     # Reduce to the contributors with the least number of reviews ("responses") received
     min_contributor = contributor_set.min_by { |a| a.responses.count }

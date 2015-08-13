@@ -14,14 +14,7 @@
           <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
           <tr>
             <td>
-              <%round = map.round%>
-              <%if round==nil %>
-                  <%round = ""  %>
-              <%else%>
-                  <%round = " (Round"+round.to_s+")"  %>
-              <%end%>
-
-              <b><%= "#{title} #{review_no}." %></b> <%=round%>
+              <b><%= "#{title} #{review_no}." %></b>
               <!--In ‘student_review/list’ page, if the topic_identifier is empty, ‘:’ sign should not be displayed.-->
               <% if !topic_id.nil? %>
                   <% if SignUpTopic.find(topic_id).topic_identifier != '' %>

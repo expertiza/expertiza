@@ -11,6 +11,7 @@ coverage
 app/controllers/auth_controller.rb
 Gemfile.lock
 nohup.out
+pg_data/*
 
 #################
 ## Eclipse

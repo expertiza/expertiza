@@ -54,11 +54,16 @@
         <% end %></textarea>
     </p>
 
+    <%if @current_round%>
+      <%= hidden_field_tag "review[round]", @current_round %>
+    <%end%>
+    <%= hidden_field_tag "review[questionnaire_id]", @questionnaire.id %>
+
     <br/>
     <br>
     <%= submit_tag "Save "+@title, :name => "save" %>
     <%= hidden_field_tag('return', @return) %>
 <% end %>
 
-<%= @map.show_feedback() %>
+<%= @map.show_feedback(@response) %>
 <a href="javascript:window.history.back()">Back</a>

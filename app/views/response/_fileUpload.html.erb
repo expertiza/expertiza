@@ -25,7 +25,7 @@
          location = parentFolder + File.basename(file) %>
         <u><i><%= link_to File.basename(file), :controller => 'submitted_content', :action => 'download', :download => File.basename(file), "current_folder[name]" => File.dirname(file) %></i></u>
     <% end %>&nbsp &nbsp &nbsp &nbsp &nbsp&nbsp
-    <% if @map.response.nil?
+    <% if @map.response.empty?
          return_to = "new"
        else
          return_to ="edit"

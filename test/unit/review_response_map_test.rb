@@ -23,7 +23,7 @@ class ReviewResponseMapTest < ActiveSupport::TestCase
     @assignment = assignments(:assignment0)
     reviewrespmap = ReviewResponseMap.new
     reviewrespmap.assignment = @assignment
-    reviewrespmap.response = nil
+    reviewrespmap.response = []
     assert_equal  reviewrespmap.delete(1), reviewrespmap
   end
 
@@ -32,7 +32,7 @@ class ReviewResponseMapTest < ActiveSupport::TestCase
     @assignment = assignments(:assignment0)
     reviewrespmap = ReviewResponseMap.new
     reviewrespmap.assignment = @assignment
-    reviewrespmap.response = nil
+    reviewrespmap.response = []
     assert_equal  reviewrespmap.delete(), reviewrespmap
   end
 

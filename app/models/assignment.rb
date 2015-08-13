@@ -323,7 +323,7 @@ require 'analytic/assignment_analytic'
     response_map_set = Array.new(review_mappings)
 
     # Reject response maps without responses
-    response_map_set.reject! { |response_map| !response_map.response }
+    response_map_set.reject! { |response_map| response_map.response.empty? }
     raise 'There are no reviews to metareview at this time for this assignment.' if response_map_set.empty?
 
     # Reject reviews where the meta_reviewer was the reviewer or the contributor
@@ -871,7 +871,7 @@ require 'analytic/assignment_analytic'
   def get_total_reviews_completed
     # self.responses.size
     response_count = 0
-    self.response_maps.each { |response_map| response_count = response_count + 1 unless response_map.response.nil? }
+    self.response_maps.each { |response_map| response_count = response_count + 1 unless response_map.response.empty? }
     response_count
   end
 
@@ -880,7 +880,7 @@ require 'analytic/assignment_analytic'
   def get_total_reviews_completed_by_type(type)
     # self.responses.size
     response_count = 0
-    self.response_maps.each {|response_map|response_count = response_count + 1 if !response_map.response.nil? && response_map.type == type}
+    self.response_maps.each {|response_map|response_count = response_count + 1 if !response_map.response.empty? && response_map.type == type}
     response_count
   end
 
@@ -890,7 +890,7 @@ require 'analytic/assignment_analytic'
   def get_total_reviews_completed_by_type_and_date(type, date)
     # self.responses.size
     response_count = 0
-    self.response_maps.each { |response_map| response_count = response_count + 1 if (response_map.response.created_at.to_datetime.to_date <=> date) == 0 if !response_map.response.nil? && response_map.type == type }
+    self.response_maps.each { |response_map| response_count = response_count + 1 if (response_map.response.last.created_at.to_datetime.to_date <=> date) == 0 if !response_map.response.empty? && response_map.type == type }
     response_count
   end
   
@@ -899,7 +899,7 @@ require 'analytic/assignment_analytic'
   def get_total_reviews_completed_by_date(date)
     # self.responses.size
     response_count = 0
-    self.response_maps.each { |response_map| response_count = response_count + 1 if (response_map.response.created_at.to_datetime.to_date <=> date) <= 0 unless response_map.response.nil?
+    self.response_maps.each { |response_map| response_count = response_count + 1 if (response_map.response.last.created_at.to_datetime.to_date <=> date) <= 0 unless response_map.response.empty?
     }
     response_count
   end
@@ -914,7 +914,7 @@ require 'analytic/assignment_analytic'
     return 0 if get_total_reviews_assigned == 0
     sum_of_scores = 0
     self.response_maps.each do |response_map|
-      sum_of_scores = sum_of_scores + response_map.response.get_average_score if !response_map.response.nil?
+      sum_of_scores = sum_of_scores + response_map.response.last.get_average_score if !response_map.response.empty?
     end
     if get_total_reviews_completed != 0
       (sum_of_scores / get_total_reviews_completed).to_i
@@ -927,8 +927,8 @@ require 'analytic/assignment_analytic'
     distribution = Array.new(101, 0)
 
     self.response_maps.each do |response_map|
-      if !response_map.response.nil?
-        score = response_map.response.get_average_score.to_i
+      if !response_map.response.empty?
+        score = response_map.response.last.get_average_score.to_i
         distribution[score] += 1 if score >= 0 && score <= 100
       end
     end

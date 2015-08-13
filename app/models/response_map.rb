@@ -18,7 +18,7 @@ class ResponseMap < ActiveRecord::Base
       #get all the versions
       maps = where(reviewee_id: participant.id)
       maps.each { |map|
-        if map.response
+        if !map.response.empty?
 
           @all_resp=Response.find_by_map_id(map.map_id)
           @array_sort << @all_resp

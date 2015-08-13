@@ -153,7 +153,7 @@ module PenaltyHelper
 
     # Calculate the number of reviews that the user has completed so far.
     review_mappings.each do |map|
-      if map.response
+      if !map.response.empty?
         created_at = Response.find_by_map_id(map.id).created_at
         review_map_created_at_list <<  created_at
       end

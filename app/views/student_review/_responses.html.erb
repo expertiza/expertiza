@@ -26,7 +26,7 @@
             </td>
 
             <td>&nbsp;</td>
-            <% if map.response %>
+            <% if !map.response.empty? %>
                 <% array_not_empty = 0 %>
                 <% @sorted_responses = Array.new %>
                 <% @prev = Response.where(:map_id => map.id) %>
@@ -96,7 +96,7 @@
                                     <td> (Work has not yet been submitted)</td>
                                 <% end %>
                             <% end %>
-                        <% else %>
+                <% else %>
                             <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
                             <td>&nbsp;&nbsp;</td>
                             <%-# Display link for code review if 'any' code review files -%>
@@ -106,15 +106,15 @@
                                   <%= link_to "Review Code", {:controller => 'review_files', :action => 'show_all_submitted_files', :participant_id => participant.id } %>
                               <% end %>
                             </td>
-                        <% end %>
-                        <% else %>
+                <% end %>
+            <% else %>
                         <td>Begin</td>
                         <td> (Work has not yet been submitted) for
                           <% review_no += 1 %></td>
-                        <% end %>
+            <% end %>
                         <% review_no+=1 %>
                         </tr>
-                        <% end %>
+      <% end %>
 
                         <% if map.type.to_s != "MetareviewResponseMap" %>
                             <% if @sorted_responses !=nil %>

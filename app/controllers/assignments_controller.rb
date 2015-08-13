@@ -78,6 +78,8 @@ class AssignmentsController < ApplicationController
     @drop_topic_allowed_checkbox=false
     @team_formation_allowed=false
     @team_formation_allowed_checkbox=false
+    @participants_count = @assignment_form.assignment.participants.size
+    @teams_count = @assignment_form.assignment.teams.size
 
     # Check if name and url in database is empty before webpage displays
     @due_date_all.each do |dd|

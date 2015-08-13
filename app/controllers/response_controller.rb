@@ -308,8 +308,16 @@ class ResponseController < ApplicationController
     @title = @map.get_title
     @assignment = @map.assignment
     @participant = @map.reviewer
-    @contributor = @map.contributor
-    @questionnaire = @map.questionnaire
+    @contributor = @map.contributor #contributor should always be a Team object
+
+    reviewees_topic=SignedUpTeam.topic_id_by_team_id(@contributor.id)
+    current_round = @assignment.get_current_round(reviewees_topic)
+    if @map.type="ReviewResponseMap"
+      @questionnaire = @map.questionnaire(current_round)
+    else
+      @questionnaire = @map.questionnaire
+    end
+
     @questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score

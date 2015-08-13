@@ -381,10 +381,10 @@ jQuery(document).ready(function() {
     render: function () {
       var creation_date;
       var updated_date;
-      var colWidthArray = ["17%", "17%", "12%", "17%", "17%", "20%"]
+      var colWidthArray = ["19%", "20%", "12%", "17%", "17%", "15%"]
       var colDisplayStyle = {
         "display": "",
-        "max-width": "193px"
+        "word-wrap":"break-word"
       }
       if (this.props.dataType === 'questionnaire') {
         colWidthArray = ["70%", "0%", "0%", "0%", "0%", "30%"]
@@ -594,10 +594,9 @@ jQuery(document).ready(function() {
     render: function() {
       var _rows = []
       var _this = this
-      var colWidthArray = ["17%", "17%", "12%", "17%", "17%", "20%"]
+      var colWidthArray = ["19%", "20%", "12%", "17%", "17%", "15%"]
       var colDisplayStyle = {
         "display": "",
-        "max-width": "193px"
       }
       if (this.props) {
         if (this.props.dataType === 'questionnaire') {
@@ -645,7 +644,7 @@ jQuery(document).ready(function() {
         })
       }
       return (
-        <table className="table table-striped table-hover">
+        <table className="table table-striped table-hover" style={{"table-layout":"fixed"}}>
           <thead>
             <tr>
               <th width={colWidthArray[0]}>
@@ -704,7 +703,6 @@ jQuery(document).ready(function() {
       })
     },
     handleUserClick: function(colName, order) {
-      console.log(colName)
       var tmpData = this.state.tableData
       tmpData.sort(function(a, b) {
         var a_val = eval("a."+colName)
@@ -901,7 +899,6 @@ jQuery(document).ready(function() {
 
               }) 
             })
-            console.log(data2)
             if (data2) {
               _this.setState({
                 tableContent: data2

@@ -38,7 +38,6 @@
 
         obj.find(".chart")[0].innerHTML = "Please wait....";
         jQuery.get("/analytic/get_graph_data_bundle?" + arg, function (json) {
-          console.log(json);
             if (json == null) {
               obj.find(".chart")[0].innerHTML = "Can not load chart. Please select at least one data point and at least one scope.";
             } else {

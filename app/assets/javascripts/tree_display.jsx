@@ -703,7 +703,6 @@ jQuery(document).ready(function() {
       })
     },
     handleUserClick: function(colName, order) {
-      console.log(colName)
       var tmpData = this.state.tableData
       tmpData.sort(function(a, b) {
         var a_val = eval("a."+colName)
@@ -900,7 +899,6 @@ jQuery(document).ready(function() {
 
               }) 
             })
-            console.log(data2)
             if (data2) {
               _this.setState({
                 tableContent: data2

@@ -1,8 +1,6 @@
 //show more than one data confirmation when attempting to delete users.
 //overwrite rails default behavior
 $.rails.allowAction = function(link) {
-  //console.log(link.attr("confirm"))
-  //console.log(link.attr('data-confirm'))
   //use normal confirm dialog, when link does not have 'data-overridden' attribute.
   if (!link.attr("confirm")){
     if (link.attr('data-confirm')){
@@ -37,7 +35,6 @@ $.rails.showConfirmDialogNormal = function(link) {
   var html, message;
   message = link.attr('confirm');
   if (!message) {message = link.attr('data-confirm');}
-  console.log(message)
   html = "<div class=\"modal\" id=\"confirmationDialogNormal\" title=\"Warning\">\n  <div class=\"modal-body\">\n    <p>" + message + "</p>\n";
 
   $(function() {

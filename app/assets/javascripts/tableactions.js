@@ -73,7 +73,6 @@ function toggleCourseList(elementId, child_nodes, child_size, listSize) {
     {
         if(child_node_size[i]!=0)
         {
-            console.log("toggling " + child_nodes_no[i] )
             toggleList(child_nodes_no[i],child_node_size[i]);
         }
     }

@@ -87,9 +87,9 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
-  def show_feedback()
+  def show_feedback(response)
     if(!self.response.empty?)
-      map = FeedbackResponseMap.find_by_reviewed_object_id(self.response.response_id)
+      map = FeedbackResponseMap.find_by_reviewed_object_id(response.id)
       if map and !map.response.empty?
         return map.response.last.display_as_html()
       end

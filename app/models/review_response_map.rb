@@ -88,10 +88,10 @@ class ReviewResponseMap < ResponseMap
   end
 
   def show_feedback()
-    if(self.response)
+    if(!self.response.empty?)
       map = FeedbackResponseMap.find_by_reviewed_object_id(self.response.response_id)
-      if map and map.response
-        return map.response.display_as_html()
+      if map and !map.response.empty?
+        return map.response.last.display_as_html()
       end
     end
   end
@@ -126,8 +126,8 @@ class ReviewResponseMap < ResponseMap
     if team_id
       maps = ResponseMap.where(:reviewee_id => team_id, :type => "ReviewResponseMap", :round => round)
       maps.each{ |map|
-        if map.response
-          responses << map.response
+        if !map.response.empty?
+          responses << map.response.last
         end
       }
       responses.sort! {|a,b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }

@@ -32,8 +32,8 @@ class AssignmentParticipant < Participant
 
     self.response_maps.each do |response_map|
       # TODO There must be a more elegant way of doing this...
-      unless response_map.response.nil?
-        response_map.response.scores.each do |score|
+      unless response_map.response.empty?
+        response_map.response.last.scores.each do |score|
           if score.question == question then
             sum_of_scores = sum_of_scores + score.score
             number_of_scores = number_of_scores + 1
@@ -57,8 +57,8 @@ class AssignmentParticipant < Participant
     sum_of_scores = 0
 
     self.response_maps.each do |response_map|
-      if !response_map.response.nil?  then
-        sum_of_scores = sum_of_scores + response_map.response.average_score
+      if !response_map.response.empty?  then
+        sum_of_scores = sum_of_scores + response_map.response.last.average_score
       end
     end
 
@@ -71,8 +71,8 @@ class AssignmentParticipant < Participant
     sum_of_scores = 0
 
     self.response_maps.metareview_response_maps.each do |metaresponse_map|
-      if !metaresponse_map.response.nil? && response_map == assignment_id then
-        sum_of_scores = sum_of_scores + response_map.response.average_score
+      if !metaresponse_map.response.empty? && response_map == assignment_id then
+        sum_of_scores = sum_of_scores + response_map.response.last.average_score
       end
     end
 

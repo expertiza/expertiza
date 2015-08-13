@@ -106,7 +106,7 @@ end
       #puts" ~~~~~number of response maps #{allresponsemaps.size}\n"
       if(allresponsemaps.size > 0)
         for eachresponsemap in allresponsemaps
-            response = eachresponsemap.response
+            response = eachresponsemap.response.last
             resubmission_times = ResubmissionTime.find(:all, :conditions => ["participant_id = ?", eachresponsemap.reviewee_id], :order => "resubmitted_at DESC")           
             #puts" ~~~~~resubmission times: #{resubmission_times.size}\n"
             if(!response.nil? && resubmission_times.size > 0)#meaning the reviewer has submitted a response for that map_id  
@@ -152,7 +152,7 @@ end
             #checking to see if the response map was for a review in the same assignment
             checkresponsemap = ResponseMap.find(:all, :conditions => ["id = ? AND type = 'ParticipantReviewResponseMap' AND reviewed_object_id = ?", eachresponsemap.reviewed_object_id, assign.id])
             if(checkresponsemap.size > 0)
-              if eachresponsemap.response.nil?
+              if eachresponsemap.response.empty?
                 emails << email
               end
             end

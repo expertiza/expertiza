@@ -27,7 +27,7 @@
         if map.nil?
           map = TeammateReviewResponseMap.create(:reviewer_id => @student.id, :reviewee_id => member.id, :reviewed_object_id => @student.assignment.id)
         end
-        review = map.response
+        review = map.response.last
         if review.nil? %>
       <td>
         <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :return => "teammate"} %>

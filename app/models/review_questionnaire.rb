@@ -22,8 +22,8 @@ class ReviewQuestionnaire < Questionnaire
     if participant
       maps = ResponseMap.where(:reviewee_id => team_id, :type => "ReviewResponseMap", :round => round)
       maps.each{ |map|
-        if map.response
-          responses << map.response
+        if !map.response.empty?
+          responses << map.response.last
         end
       }
       #responses = Response.find(:all, :include => :map, :conditions => ['reviewee_id = ? and type = ?',participant.id, self.to_s])

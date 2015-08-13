@@ -631,6 +631,7 @@ require 'analytic/assignment_analytic'
     else
       due_dates = DueDate.where(:assignment_id => self.id).order('due_at DESC')
     end
+    due_dates = due_dates.reject{|a| a.deadline_type_id != 1 && a.deadline_type_id != 2}
     if due_dates != nil and due_dates.size > 0
       if Time.now > due_dates[0].due_at
         return 0

@@ -48,11 +48,6 @@ class ReviewMappingController < ApplicationController
     else
       #Team lazy initialization
       SignUpSheet.signup_team(assignment.id, user_id, topic_id)
-      if assignment.varying_rubrics_by_round?
-        round = assignment.get_current_round(topic_id) #if vary rubric by round, in the response_maps table we need to record round #
-      else
-        round=nil #if this assignment does not vary rubric by round, there is no point to record the round #
-      end
       msg = String.new
       begin
         user = User.from_params(params)
@@ -66,8 +61,8 @@ class ReviewMappingController < ApplicationController
         reviewer = get_reviewer(user,assignment,regurl)
         #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
         # to treat all assignments as team assignments
-        if ReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?  and round = ?',params[:contributor_id],reviewer.id, round]).first.nil?
-          ReviewResponseMap.create(:reviewee_id => params[:contributor_id], :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id, :round=>round)
+        if ReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ? ',params[:contributor_id],reviewer.id]).first.nil?
+          ReviewResponseMap.create(:reviewee_id => params[:contributor_id], :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id)
         else
           raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
         end
@@ -106,7 +101,6 @@ class ReviewMappingController < ApplicationController
   def add_self_reviewer
     assignment = Assignment.find(params[:assignment_id])
     topic_id = params[:topic_id]
-    round = assignment.get_current_round(topic_id)
     reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
     submission = AssignmentParticipant.find(params[:submission_id],assignment.id)
 
@@ -119,11 +113,10 @@ class ReviewMappingController < ApplicationController
         #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
         # to treat all assignments as team assignments
         contributor = get_team_from_submission(submission)
-        if ReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ? and round=?', contributor.id, reviewer.id, round]).first.nil?
+        if ReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?', contributor.id, reviewer.id]).first.nil?
           ReviewResponseMap.create(:reviewee_id => contributor.id,
                                        :reviewer_id => reviewer.id,
-                                       :reviewed_object_id => assignment.id,
-                                       :round => round)
+                                       :reviewed_object_id => assignment.id)
         else
           raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
         end

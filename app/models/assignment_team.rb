@@ -23,13 +23,6 @@ class AssignmentTeam < Team
                                  :reviewed_object_id => assignment.id)
   end
 
-  #for varying rubric feature -Yang
-  def reviewed_by_in_round?(reviewer,round)
-    return ReviewResponseMap.where(reviewee_id:self.id, reviewer_id:reviewer.id, reviewed_object_id:assignment.id, round:round).count()>0
-    #return ReviewResponseMap.count(:conditions => ['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ? AND round=?',
-                                                       #sself.id, reviewer.id, assignment.id, round]) > 0
-  end
-
   # Evaluates whether any contribution by this team was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object
   def reviewed_by?(reviewer)

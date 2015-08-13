@@ -30,6 +30,7 @@
   <tr id="instructor_selected_review_mapping_mechanism" hidden='hidden'>
     <td>
       <%= form_tag :controller => 'review_mapping', :action => 'automatic_review_mapping', :id => @assignment_form.assignment.id do %>
+        <input name="max_team_size" type="hidden" value="<%= @assignment_form.assignment.max_team_size %>"/>
         <%= radio_button_tag 'num_reviews', 'student', true %>
         <%= label_tag('num_reviews_per_student', 'Set number of reviews done by each student') %>&nbsp;&nbsp;&nbsp;&nbsp;
         <span id='num_reviews_per_student_threshold'>

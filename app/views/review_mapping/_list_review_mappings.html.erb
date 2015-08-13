@@ -53,7 +53,7 @@
     <%end%>
   <%end %>
 
-            <%if @topics.blank? %>
+            <%if @topics.blank? && @assignment.max_team_size > 1 %>
             </tr><%index1-=1%>
           <%next%>
         <%else%>

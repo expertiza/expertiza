@@ -95,17 +95,8 @@ require 'analytic/assignment_analytic'
     # Reject contributions of topics whose deadline has passed, or which are not reviewable in the current stage
     contributor_set=reject_by_deadline(contributor_set)
 
-    if self.varying_rubrics_by_round?
-      # Filter submissions already reviewed by reviewer in current round
-      current_round = self.get_current_round(nil)
-      contributor_set = reject_reviewed_submissions_in_current_round(contributor_set, reviewer,current_round)
-      if current_round>1
-        contributor_set = reject_unreviewed_submissions_in_round(contributor_set, reviewer,1)
-      end
-    else
-      # Filter submissions already reviewed by reviewer
-      contributor_set=reject_previously_reviewed_submissions(contributor_set, reviewer)
-    end
+    # Filter submissions already reviewed by reviewer
+    contributor_set=reject_previously_reviewed_submissions(contributor_set, reviewer)
 
     # Filter submission by reviewer him/her self
     contributor_set=reject_own_submission(contributor_set, reviewer)
@@ -132,17 +123,8 @@ require 'analytic/assignment_analytic'
     # Reject contributors that have no submissions
     contributor_set.reject! { |contributor| !contributor.has_submissions? }
 
-    if self.varying_rubrics_by_round?
-      # Filter submissions already reviewed by reviewer in current round
-      current_round = self.get_current_round(nil)
-      contributor_set = reject_reviewed_submissions_in_current_round(contributor_set, reviewer,current_round)
-      if current_round>1
-        contributor_set = reject_unreviewed_submissions_in_round(contributor_set, reviewer,1)
-      end
-    else
-      # Filter submissions already reviewed by reviewer
-      contributor_set=reject_previously_reviewed_submissions(contributor_set, reviewer)
-    end
+    # Filter submissions already reviewed by reviewer
+    contributor_set=reject_previously_reviewed_submissions(contributor_set, reviewer)
 
     # Filter submission by reviewer him/her self
     contributor_set=reject_own_submission(contributor_set, reviewer)
@@ -165,16 +147,6 @@ require 'analytic/assignment_analytic'
 
   def reject_by_max_reviews_per_submission(contributor_set)
     contributor_set.reject! { |contributor| contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count  >= max_reviews_per_submission }
-    contributor_set
-  end
-
-  def reject_reviewed_submissions_in_current_round(contributor_set, reviewer, current_round)
-    contributor_set = contributor_set.reject { |contributor| contributor.reviewed_by_in_round?(reviewer,current_round) }
-    contributor_set
-  end
-
-  def reject_unreviewed_submissions_in_round(contributor_set, reviewer, round)
-    contributor_set = contributor_set.reject { |contributor| !contributor.reviewed_by_in_round?(reviewer,round) }
     contributor_set
   end
 

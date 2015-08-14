@@ -186,6 +186,8 @@ class ResponseController < ApplicationController
 
       if @map.type="ReviewResponseMap" && @response.round
         @questionnaire = @map.questionnaire(@response.round)
+      elsif @map.type="ReviewResponseMap"
+        @questionnaire = @map.questionnaire(nil)
       else
         @questionnaire = @map.questionnaire
       end

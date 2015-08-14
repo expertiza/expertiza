@@ -179,7 +179,11 @@ class ResponseController < ApplicationController
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
 
-      @questionnaire = @map.questionnaire(@response.round)
+      if map.type="ReviewResponseMap" && @response.round
+        @questionnaire = @map.questionnaire(@response.round)
+      else
+        @questionnaire = @map.questionnaire
+      end
       questions = @questionnaire.questions
 
       params[:responses].each_pair do |k, v|
@@ -313,7 +317,6 @@ class ResponseController < ApplicationController
     if @map.type="ReviewResponseMap" && new_response #determine t
       reviewees_topic=SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.get_current_round(reviewees_topic)
-      @questionnaire = @map.questionnaire(@current_round)
       @questionnaire = @map.questionnaire(@current_round)
     elsif @map.type="MetareviewResponseMap" && new_response
       @questionnaire = @map.questionnaire

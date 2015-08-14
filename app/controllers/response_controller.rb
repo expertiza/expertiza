@@ -148,6 +148,10 @@ class ResponseController < ApplicationController
     array_not_empty=0
     @review_scores=Array.new
     @prev=Response.all
+    assignment = @map.assignment
+    questionnaire = @map.questionnaire(@response.round)
+    use_dropdown = AssignmentQuestionnaire.where(assignment_id: assignment.id, questionnaire_id: questionnaire.id).first.dropdown
+    use_dropdown == true ? @dropdown_or_scale = 'dropdown' : @dropdown_or_scale = 'scale'
     for element in @prev
       if (element.map_id==@map.map_id)
         array_not_empty=1
@@ -179,11 +183,7 @@ class ResponseController < ApplicationController
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
 
-      if map.type="ReviewResponseMap" && @response.round
-        @questionnaire = @map.questionnaire(@response.round)
-      else
-        @questionnaire = @map.questionnaire
-      end
+      @questionnaire = @map.questionnaire(@response.round)
       questions = @questionnaire.questions
 
       params[:responses].each_pair do |k, v|
@@ -248,12 +248,12 @@ class ResponseController < ApplicationController
       @review_scores << element
     end
 
-    #to save the response for ReviewResponsMap, a questionnaire_id is wrapped in the params
+    #to save the response for ReviewResponseMap, a questionnaire_id is wrapped in the params
     if params[:review][:questionnaire_id]
       @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
     end
 
-    #to save the response for ReviewResponsMap, a questionnaire_id is wrapped in the params
+    #to save the response for ReviewResponseMap, a questionnaire_id is wrapped in the params
     if params[:review][:questionnaire_id]
       @round = params[:review][:round]
     else
@@ -314,11 +314,12 @@ class ResponseController < ApplicationController
     @participant = @map.reviewer
     @contributor = @map.contributor #contributor should always be a Team object
 
-    if @map.type=="ReviewResponseMap" && new_response #determine the questionnaire based on which rubric is used in which round
+    if @map.type="ReviewResponseMap" && new_response #determine t
       reviewees_topic=SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.get_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
-    elsif  new_response
+      @questionnaire = @map.questionnaire(@current_round)
+    elsif @map.type="MetareviewResponseMap" && new_response
       @questionnaire = @map.questionnaire
     else
       answer = @response.scores.first # if user is not filling a new rubric, the @response object should be available. we can find the questionnaire from the question_id in answers

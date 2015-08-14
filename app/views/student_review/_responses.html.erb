@@ -47,7 +47,7 @@
                     <%end%>
 
                     <% current_round = @assignment.get_current_round(topic_id) %>
-<%binding.pry%>
+
                     <td>
                        <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
                     </td>

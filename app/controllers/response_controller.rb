@@ -148,10 +148,7 @@ class ResponseController < ApplicationController
     array_not_empty=0
     @review_scores=Array.new
     @prev=Response.all
-    assignment = @map.assignment
-    questionnaire = @map.questionnaire(@response.round)
-    use_dropdown = AssignmentQuestionnaire.where(assignment_id: assignment.id, questionnaire_id: questionnaire.id).first.dropdown
-    use_dropdown == true ? @dropdown_or_scale = 'dropdown' : @dropdown_or_scale = 'scale'
+
     for element in @prev
       if (element.map_id==@map.map_id)
         array_not_empty=1
@@ -164,7 +161,11 @@ class ResponseController < ApplicationController
     end
 
     @modified_object = @response.response_id
+
     get_content
+
+
+
     @review_scores = Array.new
     @questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id:  question.id).first
@@ -331,6 +332,9 @@ class ResponseController < ApplicationController
       question_id = answer.question_id
       @questionnaire =Questionnaire.find(Question.find(question_id).questionnaire_id)
     end
+
+    use_dropdown = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: @questionnaire.id).first.dropdown
+    use_dropdown == true ? @dropdown_or_scale = 'dropdown' : @dropdown_or_scale = 'scale'
 
     @questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
     @min = @questionnaire.min_question_score

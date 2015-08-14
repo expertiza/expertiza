@@ -314,11 +314,11 @@ class ResponseController < ApplicationController
     @participant = @map.reviewer
     @contributor = @map.contributor #contributor should always be a Team object
 
-    if @map.type="ReviewResponseMap" && new_response #determine t
+    if @map.type=="ReviewResponseMap" && new_response #determine the questionnaire based on which rubric is used in which round
       reviewees_topic=SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.get_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
-    elsif @map.type="MetareviewResponseMap" && new_response
+    elsif  new_response
       @questionnaire = @map.questionnaire
     else
       answer = @response.scores.first # if user is not filling a new rubric, the @response object should be available. we can find the questionnaire from the question_id in answers

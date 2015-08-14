@@ -88,6 +88,11 @@ class Criterion < ScoredQuestion
         html += 'checked="checked"' if !answer.nil? && answer.answer == j
         html += '></td>'
       end
+      html += '<script>jQuery("input[name=Radio_' +self.id.to_s+ ']:radio").change(function() {'
+      html += 'var response_score = jQuery("#responses_' +count.to_s+ '_score");'
+      html += 'var checked_value = jQuery("input[name=Radio_' +self.id.to_s+ ']:checked").val();'
+      html += 'response_score.val(checked_value);});</script>'
+
       if !self.max_label.nil?
         html += '<td width="10%">' +self.max_label+ '</td>'
       else
@@ -98,11 +103,7 @@ class Criterion < ScoredQuestion
       html += '<textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
       html += answer.comments if !answer.nil?
       html += '</textarea><br/>'
-      html += '<script>$("input[name=Radio_' +self.id.to_s+ ']:radio").change(function() {'
-      html += 'var response_score = jQuery("#responses_' +count.to_s+ '_score");'
-      html += 'for (i = <%=questionnaire_min%>; i <= <%=questionnaire_max%>; i++) { '
-      html += 'if (jQuery("#"+i.toString()).attr("checked")) {'
-      html += 'response_score.val(jQuery("#"+i.toString()).val());}}}</script>'
+
     end
     html.html_safe
   end

@@ -183,8 +183,12 @@ class ResponseController < ApplicationController
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
 
-      @questionnaire = @map.questionnaire(@response.round)
-      questions = @questionnaire.questions
+      if @map.type="ReviewResponseMap" && @response.round
+        @questionnaire = @map.questionnaire(@response.round)
+      else
+        @questionnaire = @map.questionnaire
+      end
+      questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
 
       params[:responses].each_pair do |k, v|
         score = Answer.where(response_id: @response.id, question_id:  questions[k.to_i].id).first
@@ -266,6 +270,7 @@ class ResponseController < ApplicationController
 
     #Change the order for displaying questions for editing response views.
     questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
+
     if params[:responses]
       params[:responses].each_pair do |k, v|
         Answer.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :answer => v[:score], :comments => v[:comment])

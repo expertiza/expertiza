@@ -70,10 +70,10 @@
                 <% end %>
             <% end %>
             <% map = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
-                review_feedback = map.try :response %>
-            <% if review_feedback %>
-                <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedback.id %> or
-                <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedback.id, :return => "feedback" %> feedback for Review <%= count %>
+                review_feedbacks = map.try :response %>
+            <% if review_feedbacks %>
+                <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedbacks.first.id %> or
+                <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedbacks.first.id, :return => "feedback" %> feedback for Review <%= count %>
             <% else %>
                 <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
             <% end %>

@@ -55,7 +55,7 @@ class ResponseMap < ActiveRecord::Base
     return nil
   end
 
-  def show_feedback()
+  def show_feedback(response)
     return nil
   end
 

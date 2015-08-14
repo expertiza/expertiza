@@ -70,6 +70,7 @@ class GradesController < ApplicationController
       @questions[questionnaire_symbol] = questionnaire.questions
     end
 
+    #@pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
     @pscore = @participant.scores(@questions)
     make_chart
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
@@ -314,12 +315,13 @@ class GradesController < ApplicationController
       if @assignment.varying_rubrics_by_round?
         scores=[]
         for round in 1 .. @assignment.rounds_of_reviews
-          scores = scores.concat(get_scores_for_chart @pscore[:review][:assessments], 'review'+round.to_s)
+          responses = @pscore[:review][:assessments].reject{|response| response.round!=round}
+          scores = scores.concat(get_scores_for_chart responses, 'review'+round.to_s)
           scores = scores-[-1.0]
-          @grades_bar_charts[:review] = bar_chart(scores)
         end
         @grades_bar_charts[:review] = bar_chart(scores)
       else
+        scores = scores-[-1.0]
         scores = get_scores_for_chart @pscore[:review][:assessments], 'review'
         @grades_bar_charts[:review] = bar_chart(scores)
       end
@@ -340,17 +342,12 @@ class GradesController < ApplicationController
       scores = get_scores_for_chart @pscore[:teammate][:assessments], 'teammate'
       @grades_bar_charts[:teammate] = bar_chart(scores) 
     end
-
-
   end
 
   def get_scores_for_chart(reviews, symbol)
     scores = []
     reviews.each do |review|
-      all_resp = Response.where(map_id: review.map_id)
-      sort_to = all_resp.sort
-
-      scores << Answer.get_total_score(:response => sort_to, :questions => @questions[symbol.to_sym], :q_types => Array.new)
+      scores << Answer.get_total_score(:response => [review], :questions => @questions[symbol.to_sym], :q_types => Array.new)
     end
     scores
   end

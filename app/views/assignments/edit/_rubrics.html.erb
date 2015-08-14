@@ -25,8 +25,13 @@
         html += '<td align="center"><input type="checkbox" name="dropdown" id="dropdown" value="true"></td>';
         //Scored question display type (Dropdown or Scale)
         html += '<td align="center"><select id="scored_question_display_type", name="assignment_form[assignment_questionnaire][][dropdown]">';
-            html += '<option value=true <%= selected="selected" if ' +assignment_questionnaire.dropdown+ '== true%>>Dropdown</option>';
-            html += '<option value=false <%= selected="selected" if ' +assignment_questionnaire.dropdown+ '== false%>>Scale</option>';
+          if (assignment_questionnaire.dropdown == true) {
+            html += '<option value=true selected="selected">Dropdown</option>';
+            html += '<option value=false>Scale</option>';
+          } else {
+            html += '<option value=true>Dropdown</option>';
+            html += '<option value=false selected="selected">Scale</option>';
+          }
         html += '</select></td>';
         //Weight
         html += '<td align="center"><input name="assignment_form[assignment_questionnaire][][questionnaire_weight]" style="width:40px" type="text" value="' + assignment_questionnaire.questionnaire_weight + '">% </td>' +

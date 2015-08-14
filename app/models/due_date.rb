@@ -92,4 +92,26 @@ class DueDate < ActiveRecord::Base
     topic_deadline.round = due_date.round
     topic_deadline.save
   end
+
+  def self.done_in_assignment_round(assignment_id, response)
+    #for author feedback, quiz, teammate review and metareview, Expertiza only support one round, so the round # should be 1
+    if(ResponseMap.find(response.map_id).type!="ReviewResponseMap")
+      return 0
+    end
+    due_dates = DueDate.where(["assignment_id = ?", assignment_id])
+    sorted_deadlines = Array.new
+    #sorted so that the earliest deadline is at the first
+    sorted_deadlines = due_dates.sort { |m1, m2| (m1.due_at and m2.due_at) ? m1.due_at <=> m2.due_at : (m1.due_at ? -1 : 1) }
+    due_dates.reject{|due_date| due_date.type!=1 && due_date.type!=2}
+    round=1;
+    for due_date in sorted_deadlines
+      if (response.created_at < due_date.due_at)
+        break;
+      end
+      if response.type==2
+        round+=1;
+      end
+    end
+    round
+  end
 end

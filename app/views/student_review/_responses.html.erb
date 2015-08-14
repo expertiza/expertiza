@@ -39,24 +39,15 @@
 
                     <% @sorted_responses = @sorted_responses.sort_by {|obj| obj.updated_at} # the latest should be at the last%>
                     <% @latest_response = @sorted_responses.last %>
-                    <% @latest_response_created_time = @latest_response.created_at %>
-                    <% due_dates = DueDate.where(["assignment_id = ?", @assignment.id]) %>
-                    <% @sorted_deadlines = Array.new %>
-                    <% @sorted_deadlines = due_dates.sort { |m1, m2| (m1.due_at and m2.due_at) ? m1.due_at <=> m2.due_at : (m1.due_at ? -1 : 1) } %>
-                    <% current_time = Time.new.getutc %>
 
-                    <% for deadline_version in @sorted_deadlines %>
-                      <% if (@latest_response.created_at < deadline_version.due_at) %>
-                        <% break %>
-                      <% end %>
-                    <% end %>
+                    <%if @latest_response.round.nil?%>
+                      <% last_response_round = DueDate.done_in_assignment_round(@assignment.id,@latest_response) %>
+                    <%else%>
+                      <% last_response_round = @latest_response.round %>
+                    <%end%>
 
-                    <% for coming_deadline in @sorted_deadlines %>
-                      <% if (current_time < coming_deadline.due_at) %>
-                        <% break %>
-                      <% end %>
-                    <% end %>
-
+                    <% current_round = @assignment.get_current_round(topic_id) %>
+<%binding.pry%>
                     <td>
                        <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
                     </td>
@@ -64,7 +55,7 @@
                     <% if @assignment.get_current_stage(topic_id) != "Finished" %>
                       <%- # show the link as edit when latest review is done in current deadline   -%>
                       <%- # show link as update when latest review is done in different deadline than current phase   -%>
-                      <% if (deadline_version.due_at == coming_deadline.due_at) %>
+                      <% if (last_response_round == current_round) %>
                         <td><%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id} %></td>
                       <% else %>
                         <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>

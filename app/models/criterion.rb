@@ -32,39 +32,78 @@ class Criterion < ScoredQuestion
     html.html_safe
   end
 
-  def complete(count, answer=nil, questionnaire_min, questionnaire_max)
+  def complete(count, answer=nil, questionnaire_min, questionnaire_max, dropdown_or_scale)
   	if self.size.nil?
       cols = '70'
       rows = '1'
-    elsif 
+    else 
       cols = self.size.split(',')[0]
       rows = self.size.split(',')[1]
     end
 
     html = self.txt + '<br>'
-    html += '<table><td valign="top"><textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
-    html += answer.comments if !answer.nil?
-    html += '</textarea></td><td valign="top">'
-    html += '<select id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]">'
-    for j in questionnaire_min..questionnaire_max
-      if !answer.nil? and j == answer.answer
-        html += '<option value=' + j.to_s + ' selected="selected">' 
-      else
-        html += '<option value=' + j.to_s + '>'
+    if dropdown_or_scale == 'dropdown'
+      html += '<table><td valign="top"><textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
+      html += answer.comments if !answer.nil?
+      html += '</textarea></td><td valign="top">'
+      html += '<select id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]">'
+      for j in questionnaire_min..questionnaire_max
+        if !answer.nil? and j == answer.answer
+          html += '<option value=' + j.to_s + ' selected="selected">' 
+        else
+          html += '<option value=' + j.to_s + '>'
+        end
+        if j == questionnaire_min
+          html += j.to_s
+          html += "-" + self.min_label if !self.min_label.nil?
+          html += "</option>"
+        elsif j == questionnaire_max
+          html += j.to_s
+          html += "-" + self.max_label if !self.max_label.nil?
+          html += "</option>"
+        else
+          html += j.to_s + "</option>"
+        end
       end
-      if j == questionnaire_min
-        html += j.to_s
-        html += "-" + self.min_label if !self.min_label.nil?
-        html += "</option>"
-      elsif j == questionnaire_max
-        html += j.to_s
-        html += "-" + self.max_label if !self.max_label.nil?
-        html += "</option>"
-      else
-        html += j.to_s + "</option>"
+      html += "</select></td></table><br><br><br>"
+    elsif dropdown_or_scale == 'scale'
+      html += '<input id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]" type="hidden"'
+      html += 'value="'+answer.answer.to_s+'"' if !answer.nil?
+      html += '>'
+
+      html += '<table>'
+      html += '<tr><td width="10%"></td>'
+      for j in questionnaire_min..questionnaire_max
+        html += '<td width="10%"><label>' +j.to_s+ '</label></td>'
       end
+      html += '<td width="10%"></td></tr><tr>'
+
+      if !self.min_label.nil?
+        html += '<td width="10%">' +self.min_label+ '</td>'
+      else
+        html += '<td width="10%"></td>'
+      end
+      for j in questionnaire_min..questionnaire_max
+        html += '<td width="10%"><input type="radio" id="' +j.to_s+ '" value="' +j.to_s+ '" name="Radio_' +self.id.to_s+ '"'
+        html += 'checked="checked"' if answer.answer == j
+        html += '></td>'
+      end
+      if !self.max_label.nil?
+        html += '<td width="10%">' +self.max_label+ '</td>'
+      else
+        html += '<td width="10%"></td>'
+      end
+
+      html += '<td width="10%"></td></tr></table>'
+      html += '<textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
+      html += answer.comments if !answer.nil?
+      html += '</textarea><br/>'
+      html += '<script>$("input[name=Radio_' +self.id.to_s+ ']:radio").change(function() {'
+      html += 'var response_score = jQuery("#responses_' +count.to_s+ '_score");'
+      html += 'for (i = <%=questionnaire_min%>; i <= <%=questionnaire_max%>; i++) { '
+      html += 'if (jQuery("#"+i.toString()).attr("checked")) {'
+      html += 'response_score.val(jQuery("#"+i.toString()).val());}}}</script>'
     end
-    html += "</select></td></table><br><br><br>"
     html.html_safe
   end
 

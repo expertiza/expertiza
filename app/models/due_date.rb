@@ -108,7 +108,7 @@ class DueDate < ActiveRecord::Base
       if (response.created_at < due_date.due_at)
         break;
       end
-      if response.type==2
+      if due_date.type==2
         round+=1;
       end
     end

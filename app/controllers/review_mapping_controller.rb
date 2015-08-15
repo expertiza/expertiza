@@ -173,7 +173,11 @@ class ReviewMappingController < ApplicationController
         else  #assignment without topic -Yang
           assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
           assignment_team = assignment_teams.to_a.shuffle[0] rescue nil
-          assignment.assign_reviewer_dynamically_no_topic(reviewer,assignment_team)
+          if assignment_team.nil?
+            flash[:error] ="No artifact are available to review at this time. Please try later."
+          else
+            assignment.assign_reviewer_dynamically_no_topic(reviewer,assignment_team)
+          end
         end
       # rescue Exception => e
       #   flash[:error] = (e.nil?) ? $! : e

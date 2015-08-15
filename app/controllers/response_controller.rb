@@ -326,7 +326,6 @@ class ResponseController < ApplicationController
       reviewees_topic=SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.get_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
-      @questionnaire = @map.questionnaire(@current_round)
     elsif @map.type="MetareviewResponseMap" && new_response
       @questionnaire = @map.questionnaire
     else

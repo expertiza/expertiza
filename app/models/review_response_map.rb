@@ -8,7 +8,11 @@ class ReviewResponseMap < ResponseMap
   # otherwise this assignment does not use the "varying rubrics", so in assignment_questionnaires table there should
   # be only 1 questionnaire with type 'ReviewQuestionnaire'.    -Yang
   def questionnaire(round)
-    Questionnaire.find(self.assignment.get_review_questionnaire_id(round))
+    if self.assignment.varying_rubrics_by_round?
+      Questionnaire.find(self.assignment.get_review_questionnaire_id(round))
+    else
+      Questionnaire.find(self.assignment.get_review_questionnaire_id)
+    end
   end
 
   def get_title

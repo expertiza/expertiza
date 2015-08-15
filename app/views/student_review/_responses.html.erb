@@ -1,6 +1,7 @@
 <table>
   <% review_no = 1 %>
   <% mappings.each do |map| %>
+      <%@sorted_responses=[]%>
       <%- # ACS Have metareviews done for all teams   -%>
       <%- # removed code that handles team and individual assignments differently   -%>
       <% if map.type.to_s == "MetareviewResponseMap" %>

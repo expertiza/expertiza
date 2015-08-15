@@ -312,8 +312,8 @@ class GradesController < ApplicationController
   def make_chart()
     @grades_bar_charts = {}
     if @pscore[:review]
+      scores=[]
       if @assignment.varying_rubrics_by_round?
-        scores=[]
         for round in 1 .. @assignment.rounds_of_reviews
           responses = @pscore[:review][:assessments].reject{|response| response.round!=round}
           scores = scores.concat(get_scores_for_chart responses, 'review'+round.to_s)

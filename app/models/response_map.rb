@@ -20,7 +20,7 @@ class ResponseMap < ActiveRecord::Base
       maps.each { |map|
         if !map.response.empty?
 
-          @all_resp=Response.find_by_map_id(map.map_id)
+          @all_resp=Response.where(map_id: map.map_id).last
           @array_sort << @all_resp
 
           #sort all versions in descending order and get the latest one.

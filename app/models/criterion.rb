@@ -85,7 +85,7 @@ class Criterion < ScoredQuestion
       end
       for j in questionnaire_min..questionnaire_max
         html += '<td width="10%"><input type="radio" id="' +j.to_s+ '" value="' +j.to_s+ '" name="Radio_' +self.id.to_s+ '"'
-        html += 'checked="checked"' if !answer.nil? && answer.answer == j
+        html += 'checked="checked"' if (!answer.nil? and answer.answer == j) or (answer.nil? and questionnaire_min == j)
         html += '></td>'
       end
       html += '<script>jQuery("input[name=Radio_' +self.id.to_s+ ']:radio").change(function() {'

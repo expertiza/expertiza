@@ -29,74 +29,47 @@ class Scale < ScoredQuestion
   end
 
   def complete(count, answer=nil, questionnaire_min, questionnaire_max)
-  	html = "<table border="0" cellpadding="5" cellspacing="0">"
-  	html += "<th>" +self.txt+ "</th>"
-  	html += "<tr><td></td>"
-  	html += "<td><label>1</label></td>"
-  	html += "<td><label>2</label></td>"
-  	html += "<td><label>3</label></td>"
-  	html += "<td><label>4</label></td>"
-  	html += "<td><label>5</label></td">
-  	html += "<td></td></tr>"
-  	html += "<tr><td>" +self.min_label+ "</td>"
-  	html += "<td><input type="radio" id="1" value="1"></td>"
-  	html += "<td><input type="radio" id="2" value="2"></td>"
-  	html += "<td><input type="radio" id="3" value="3"></td>"
-  	html += "<td><input type="radio" id="4" value="4"></td>"
-  	html += "<td><input type="radio" id="5" value="5"></td></tr></tbody></table>"
-  	html += "<td>" +self.max_label+ "</td></tr></table>"
-    html.html_safe
+  	html = self.txt + '<br>'
+    html += '<input id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]" type="hidden"'
+    html += 'value="'+answer.answer.to_s+'"' if !answer.nil?
+    html += '>'
+    html += '<input id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" type="hidden" value="">'
 
-    html = self.txt + '<br>'
-    html += '<textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
-    html += answer.comments if !answer.nil?
-    html += '</textarea>'
-    html += '<select id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]">'
+    html += '<table>'
+    html += '<tr><td width="10%"></td>'
     for j in questionnaire_min..questionnaire_max
-      if !answer.nil? and j == answer.answer
-        html += '<option value=' + j.to_s + ' selected="selected">' 
-      else
-        html += '<option value=' + j.to_s + '>'
-      end
-      if j == questionnaire_min
-        html += j.to_s
-        html += "-" + self.min_label if !self.min_label.nil?
-        html += "</option>"
-      elsif j == questionnaire_max
-        html += j.to_s
-        html += "-" + self.max_label if !self.max_label.nil?
-        html += "</option>"
-      else
-        html += j.to_s + "</option>"
-      end
+      html += '<td width="10%"><label>' +j.to_s+ '</label></td>'
     end
-    html += "</select><br><br><br>"
+    html += '<td width="10%"></td></tr><tr>'
+
+    if !self.min_label.nil?
+      html += '<td width="10%">' +self.min_label+ '</td>'
+    else
+      html += '<td width="10%"></td>'
+    end
+    for j in questionnaire_min..questionnaire_max
+      html += '<td width="10%"><input type="radio" id="' +j.to_s+ '" value="' +j.to_s+ '" name="Radio_' +self.id.to_s+ '"'
+      html += 'checked="checked"' if (!answer.nil? and answer.answer == j) or (answer.nil? and questionnaire_min == j)
+      html += '></td>'
+    end
+    html += '<script>jQuery("input[name=Radio_' +self.id.to_s+ ']:radio").change(function() {'
+    html += 'var response_score = jQuery("#responses_' +count.to_s+ '_score");'
+    html += 'var checked_value = jQuery("input[name=Radio_' +self.id.to_s+ ']:checked").val();'
+    html += 'response_score.val(checked_value);});</script>'
+
+    if !self.max_label.nil?
+      html += '<td width="10%">' +self.max_label+ '</td>'
+    else
+      html += '<td width="10%"></td>'
+    end
+
+    html += '<td width="10%"></td></tr></table>'
     html.html_safe
   end
 
   def view_completed_question(count, answer,questionnaire_max)
-  	answer = Answer.where(question_id: self.id, response_id: response_id).first
-  	html = "<table border="0" cellpadding="5" cellspacing="0">"
-  	html += "<th>" +self.txt+ "</th>"
-  	html += "<tr><td></td>"
-  	html += "<td><label>1</label></td>"
-  	html += "<td><label>2</label></td>"
-  	html += "<td><label>3</label></td>"
-  	html += "<td><label>4</label></td>"
-  	html += "<td><label>5</label></td">
-  	html += "<td></td></tr>"
-  	html += "<tr><td>" +self.min_label+ "</td>"
-  	html += "<td><input type="radio" id="1" value="1"" 
-  	html += "checked="checked"" if answer.answer == 1
-  	html += "></td><td><input type="radio" id="2" value="2"" "></td>"
-  	html += "checked="checked"" if answer.answer == 2
-  	html += "></td><td><input type="radio" id="3" value="3"" "></td>"
-  	html += "checked="checked"" if answer.answer == 3
-  	html += "></td><td><input type="radio" id="4" value="4"" "></td>"
-  	html += "checked="checked"" if answer.answer == 4
-  	html += "></td><td><input type="radio" id="5" value="5"" "></td></tr></tbody></table>"
-  	html += "checked="checked"" if answer.answer == 5
-  	html += "></td><td>" +self.max_label+ "</td></tr></table>"
+    html = '<big><b>Question '+count.to_s+":</b> <I>"+self.txt+"</I></big><BR/><BR/>"
+  	html += '<B>Score:</B></TD><TD><FONT style="BACKGROUND-COLOR:gold">'+answer.answer.to_s+'</FONT> out of <B>'+questionnaire_max.to_s+'</B>'
     html.html_safe
   end
 end

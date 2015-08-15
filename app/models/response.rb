@@ -54,7 +54,7 @@ class Response < ActiveRecord::Base
       count += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
       answer = answers.find{|a| a.question_id==question.id}
       if !answer.nil? or question.is_a? QuestionnaireHeader
-        if question.instance_of? Criterion
+        if question.instance_of? Criterion or question.instance_of? Scale
           code += question.view_completed_question(count,answer,questionnaire_max)
         else
           code += question.view_completed_question(count,answer)

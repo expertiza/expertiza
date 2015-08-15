@@ -523,7 +523,7 @@ class ReviewMappingController < ApplicationController
   def automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num=0, submission_review_num=0)
     participants_hash = {}
     participants.each {|participant| participants_hash[participant.id] = 0 }
-    #assign reviewers for each team
+    #calculate reviewers for each team
     num_participants = participants.size
     if student_review_num != 0 and submission_review_num == 0
       num_reviews_per_team = (participants.size * student_review_num * 1.0 / teams.size).round
@@ -531,12 +531,20 @@ class ReviewMappingController < ApplicationController
       num_reviews_per_team = submission_review_num
       student_review_num = (teams.size * submission_review_num * 1.0 / participants.size).round
     end
+    #Exception detection: If instructor want to assign too many reviews done by each student, there will be an error msg.
+    if student_review_num >= teams.size
+      flash[:error] = 'You cannot set number of reviews done by each student more than or equal to total number of teams.'
+    end
+
     iterator = 0
     teams.each do |team|
       temp_array = Array.new
       if !team.equal? teams.last
         #need to even out the # of reviews for teams
-        while temp_array.size < num_reviews_per_team 
+        while temp_array.size < num_reviews_per_team
+          num_participants_this_team = TeamsUser.where(team_id: team.id).size
+          #if all outstanding participants are already in temp_array, just break the loop.
+          break if temp_array.size == participants.size - num_participants_this_team
           if iterator == 0
             rand_num = rand(0..num_participants-1)
           else
@@ -547,7 +555,7 @@ class ReviewMappingController < ApplicationController
               temp_participant_array << participants.index(participant) if participants_hash[participant.id] == min_value
             end
 
-            if temp_participant_array.empty? or TeamsUser.exists?(team_id: team.id, user_id: participants[temp_participant_array[0]].user_id)
+            if temp_participant_array.empty? or (temp_participant_array.size == 1 and TeamsUser.exists?(team_id: team.id, user_id: participants[temp_participant_array[0]].user_id))
               #if temp_participant_array is blank 
               #or only one element in temp_participant_array, prohibit one student to review his/her own artifact
               #use original method to get random number
@@ -557,15 +565,10 @@ class ReviewMappingController < ApplicationController
               rand_num = temp_participant_array[rand(0..temp_participant_array.size-1)]
             end
           end
-
-          if participants_hash[participants[rand_num].id] < student_review_num
+          if participants_hash[participants[rand_num].id] < student_review_num and !TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id) and !temp_array.include? participants[rand_num].id
             #prohibit one student to review his/her own artifact and temp_array cannot include duplicate num
-            if !TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id) and !temp_array.include? participants[rand_num].id
-              temp_array << participants[rand_num].id
-              participants_hash[participants[rand_num].id] += 1
-            else
-              next
-            end
+            temp_array << participants[rand_num].id
+            participants_hash[participants[rand_num].id] += 1
           end 
           #remove students who have already been assigned enough num of reviews out of participants array
           participants.each do |participant|
@@ -577,7 +580,8 @@ class ReviewMappingController < ApplicationController
         end
       else
         #review num for last team can be different from other teams.
-        participants.each {|participant| temp_array << participant.id }
+        #prohibit one student to review his/her own artifact and temp_array cannot include duplicate num
+        participants.each {|participant| temp_array << participant.id if !TeamsUser.exists?(team_id: team.id, user_id: participant.user_id)}
       end
       begin
         temp_array.each do |index|

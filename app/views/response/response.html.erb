@@ -41,6 +41,8 @@
        <% answer = Answer.where(question_id: question.id, response_id: @response.id).first if !@response.nil?%>
        <% if question.instance_of? Criterion%>
             <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score, @dropdown_or_scale) %>
+       <% elsif question.instance_of? Scale %>
+            <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score) %>
        <% else %>
             <%= question.complete(i, answer) %>
        <% end %>

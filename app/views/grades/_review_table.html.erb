@@ -1,4 +1,7 @@
-<table class="grades">    
+<table class="grades">
+  <%if ctrl=='review' && @assignment.varying_rubrics_by_round? %>
+      <% reviews = reviews.reject{ |response| (response.round)!=round }%>
+  <%end%>
 	<tr><th>&nbsp;</th>
 		<% for i in 0...reviews.size%>
 			<th><%= collabel %>&nbsp;<%=i+1%></th>
@@ -23,11 +26,7 @@
 
 		<% for review in reviews %>
 		   <td align="center">
-
-             <% all_resp=Response.where(map_id: review.map_id) %>
-             <% sort_to=all_resp.sort %>
-
-             <% score = Answer.get_total_score(:response => [sort_to[0]], :questions => @questions[symbol], :q_types => Array.new) %>
+             <% score = Answer.get_total_score(:response => [review], :questions => @questions[symbol], :q_types => Array.new) %>
              
              <% if controller.action_name != "view_my_scores" %>
                <input type="hidden" id="mailer_<%= review.map.reviewer.fullname %>_grade" name="mailer[<%= review.map.reviewer.fullname %>_grade]" value="<%= score  %>">

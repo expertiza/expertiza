@@ -81,7 +81,7 @@ class Checkbox < UnscoredQuestion
     
     if next_question.type == 'ColumnHeader'
       html += '</td></tr>'
-    elsif next_question.type == 'SectionHeader' or next_question.type == 'TableHeader'
+    elsif next_question.type == 'TableHeader'
       html += '</td></tr></table><br/>'
     else
       html += '<BR/>'

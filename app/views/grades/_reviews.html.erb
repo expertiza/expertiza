@@ -71,7 +71,7 @@
             <% end %>
             <% map = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
                 review_feedbacks = map.try :response %>
-            <% if review_feedbacks %>
+            <% if review_feedbacks && !review_feedbacks.empty? %>
                 <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedbacks.first.id %> or
                 <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedbacks.first.id, :return => "feedback" %> feedback for Review <%= count %>
             <% else %>

@@ -472,30 +472,6 @@ class QuestionnairesController < ApplicationController
     end
   end
 
-  # @param [Object] question_type_key
-  def update_question_type (question_type_key)
-    this_q = QuestionType.find(question_type_key)
-    this_q.parameters = params[:q][question_type_key][:parameters]
-
-    if params[:q][question_type_key][:q_type] == "0"
-      this_q.q_type =  Question::GRADING_TYPES_CUSTOM[0][0]
-    elsif params[:q][question_type_key][:q_type] == "1"
-      this_q.q_type =  Question::GRADING_TYPES_CUSTOM[1][0]
-    elsif params[:q][question_type_key][:q_type] == "2"
-      this_q.q_type =  Question::GRADING_TYPES_CUSTOM[2][0]
-    elsif params[:q][question_type_key][:q_type] == "3"
-      this_q.q_type =  Question::GRADING_TYPES_CUSTOM[3][0]
-    elsif params[:q][question_type_key][:q_type] == "4"
-      this_q.q_type =  Question::GRADING_TYPES_CUSTOM[4][0]
-    else
-      this_q.q_type =  Question::GRADING_TYPES_CUSTOM[5][0]
-    end
-
-    unless this_q.nil?
-      this_q.save
-    end
-  end
-
   # Handles questions whose wording changed as a result of the edit
   # @param [Object] questionnaire_id
   def save_questions(questionnaire_id)

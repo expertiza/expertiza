@@ -2,9 +2,9 @@
   <%if ctrl=='review' && @assignment.varying_rubrics_by_round? %>
       <% reviews = reviews.reject{ |response| (response.round)!=round }%>
   <%end%>
-	<tr><th>&nbsp;</th>
+	<tr><th style="text-align:center;">&nbsp;</th>
 		<% for i in 0...reviews.size%>
-			<th><%= collabel %>&nbsp;<%=i+1%></th>
+			<th style="text-align:center;"><%= collabel %>&nbsp;<%=i+1%></th>
 		<% end %>
 	</tr>
 	<% if controller.action_name != "view_my_scores" %>

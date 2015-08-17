@@ -10,12 +10,12 @@
 <TABLE class="grades">
 
   <TR>
-    <TH WIDTH="<%=colwidth %>%">Contributor</TH>
-    <TH WIDTH="<%= colwidth %>%">Average</TH>
-    <TH WIDTH="<%= colwidth %>%">Range</TH>
+    <TH WIDTH="<%=colwidth %>%">Contributor</th>
+    <TH WIDTH="<%= colwidth %>%">Average</th>
+    <TH WIDTH="<%= colwidth %>%">Range</th>
   </TR>
 
-  <TR class="row" <% if team %> id="<%= prefix %>" style="display:none" <% end %>>
+  <TR <% if team %> id="<%= prefix %>" style="display:none; background-color: white;" <% end %>>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= participant.fullname %>
     <% if participant.topic %> (<%= participant.topic.topic_identifier %>)<% end %>
   </FONT>

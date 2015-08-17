@@ -57,7 +57,7 @@
 <table class="table round-border-table text-center table-striped" id="reviewing-table">
   <thead>
     <tr style="background-color:#dddddd">
-      <th style="text-align:left">Question</th>
+      <th style="text-align:center;" style="text-align:center">Question</th>
     </thead>
     <tbody>
 
@@ -95,9 +95,9 @@
           <table class="table round-border-table text-center table-striped" id="parent-review-table">
             <thead>
               <tr style="background-color:#dddddd">
-                <th style="text-align:left">Question</th>
-                <th>Score</th>
-                <th>Comment</th>
+                <th style="text-align:center;" style="text-align:center">Question</th>
+                <th style="text-align:center;">Score</th>
+                <th style="text-align:center;">Comment</th>
               </thead>
               <tbody id="parent-review-table-tbody">
               </tbody>
@@ -128,10 +128,10 @@
         $('#reviewing-table > thead').find('tr').each(function () {
           var trow = $(this);
             if (r.additional_comment.length > 0) {
-              trow.append('<th title="' + r.additional_comment + '" class="td-top-arrow">Metareview ' + (index + 1) + '<span class="top-arrow"></span></th>');
+              trow.append('<th style="text-align:center;" title="' + r.additional_comment + '" class="td-top-arrow">Metareview ' + (index + 1) + '<span class="top-arrow"></span></th>');
             }
             else {
-              trow.append('<th>Metareview ' + (index + 1) + '</th>');
+              trow.append('<th style="text-align:center;">Metareview ' + (index + 1) + '</th>');
             }
         });
 

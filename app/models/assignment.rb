@@ -774,7 +774,7 @@ require 'analytic/assignment_analytic'
         @respective_scores = Hash.new
         @respective_scores = @review_scores[response_map.reviewer_id] if @review_scores[response_map.reviewer_id] != nil
 
-        if @corresponding_response != nil
+        if !@corresponding_response.empty?
           #@corresponding_response is an array, Answer.get_total_score calculate the score for the last one
           @this_review_score_raw = Answer.get_total_score(response: @corresponding_response, questions: @questions)
           if @this_review_score_raw

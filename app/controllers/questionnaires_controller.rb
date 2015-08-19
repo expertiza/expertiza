@@ -69,12 +69,6 @@ class QuestionnairesController < ApplicationController
       begin
         name = @questionnaire.name
 
-        for question in @questionnaire.questions
-          current_q_type = QuestionType.find_by_question_id(question.id)
-          unless current_q_type.nil?
-            current_q_type.delete
-          end
-        end
         @questionnaire.assignments.each{
           | assignment |
           raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"

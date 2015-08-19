@@ -12,18 +12,15 @@
 
 <% if participant.assignment.wiki_type_id == 1 %>
   <%= render partial: 'submitted_content/submitted_files', locals: {participant: @participant, stage: @stage} %>
-  <br/><br/><br/>
     <% if participant.assignment.is_coding_assignment%>
       <%= link_to "Code Review Dashboard", :controller => 'review_files',
         :action => 'show_all_submitted_files',
         :participant_id => participant.id,
         :stage => stage %>
-    <br/>
   <% end %>
 <% else %>
   <%= render :partial => 'submitted_content/wiki', :locals => {:participant => participant} %>
 <% end %>
-<br/>
 
 
 <% if @assignment.require_quiz? %>
@@ -39,19 +36,18 @@
   <!-- If quiz is required for the assignment, find out if the quiz has already been created -->
 
   <% if (controller.action_name != "view_my_scores" and !(@map and @map.reviewer_id != session[:user].id)) %>
-    <br/><b>Quiz:</b><br/><br/>
+    <br/><b>Quiz:</b><br/>
     <% if !t_id.nil? && questionnaire = QuizQuestionnaire.where(["instructor_id = ?", t_id]).first %>
       <%= link_to 'View quiz', :controller => :questionnaires, :action => :view_quiz, :id => questionnaire.id, :pid => participant.id %>
-      <br/><br/>
+      <br/>
 
       <%= link_to 'Edit quiz', :controller => :questionnaires, :action => :edit_quiz, :id => questionnaire.id, :pid => participant.id %>
-      <br/><br/>
+      <br/>
 
     <% else %>
       <br/>
       <%= link_to 'Create a quiz', :controller => :questionnaires, :action => :new_quiz, :model => "QuizQuestionnaire", :private => 0, :aid => @assignment.id, :pid => participant.id %>
-      <br/><br/>
+      <br/>
     <% end %>
   <% end %>
-  <br/>
 <% end %>

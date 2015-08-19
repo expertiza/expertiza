@@ -7,19 +7,18 @@
         <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
         <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage => @assignment.get_current_stage(topic_id)} %>
     <%end%>
-        <br/>
-    <hr/><br/>
 <% end %>
 <% @review_versions = @map.get_all_versions() %>
-<%= @review_versions.each do |response| %>
-	<%= response.display_as_html() %>
-    <br/>
-<% end %>
-<% if false %>[start erb comment] Changes to accommodate Jen's custom rubric [end erb comment]
+<% if !@review_versions.empty? %>
+    <%= @review_versions.each do |response| %>
+    	<%= response.display_as_html() %>
+        <br/>
+    <% end %>
+    <hr/>
 <% end %>
 <% file_url = nil %>
 
-<HR>
+
 <%= @response.display_as_html(nil, nil, file_url) %>
 <br/>
 

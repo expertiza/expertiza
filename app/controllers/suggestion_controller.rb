@@ -55,7 +55,8 @@ class SuggestionController < ApplicationController
   end
 
   def update_suggestion
-    Suggestion.find(params[:id]).update_attributes(:title => params[:suggestion][:title], :description => params[:suggestion][:description])
+    Suggestion.find(params[:id]).update_attributes(:title => params[:suggestion][:title], :description => params[:suggestion][:description],
+    	:signup_preference => params[:suggestion][:signup_preference])
     redirect_to :action => 'new', :id => Suggestion.find(params[:id]).assignment_id
   end 
 

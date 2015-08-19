@@ -9,6 +9,11 @@
     <td><label for="suggestion_topic">Description</label></td>
     <td><%= text_area 'suggestion', 'description',:rows => 10, :cols => 30, :value => @suggestion.description %></td>
   </tr>
+
+  <tr>
+    <td><label for="suggestion_signup_preference">Do you wish to work on this topic?</label></td>
+    <td><%= select "suggestion", "signup_preference", {"Yes" =>"Y","No"=>"N","--"=>""} %> </td>
+  </tr>
 </table>
 
 

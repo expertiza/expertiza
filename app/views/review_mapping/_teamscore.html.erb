@@ -11,7 +11,7 @@
     <%else%>
         <td  bgcolor="#DDDDBB" align = 'left' >
     <%end%>
-    <% if @review_scores[@this_reviewer][@teamid] != 0 && @review_scores[@this_reviewer][@teamid] != -1%>
+    <% if @review_scores[@this_reviewer][@teamid] != -1%>
         <%= @review_scores[@this_reviewer][@teamid].inspect %>%
     <% else %>
         --

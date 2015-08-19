@@ -738,7 +738,7 @@ require 'analytic/assignment_analytic'
     if self.varying_rubrics_by_round? #[reviewer_id][round][reviewee_id] = score
       rounds = self.rounds_of_reviews
       for round in 1 .. rounds
-        @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ? && round= ?', self.id, @response_type, round])
+        @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
         review_questionnaire_id = get_review_questionnaire_id(round)
 
         @questions = Question.where( ['questionnaire_id = ?', review_questionnaire_id])
@@ -746,19 +746,25 @@ require 'analytic/assignment_analytic'
         @response_maps.each do |response_map|
           # Check if response is there
           @corresponding_response = Response.where(['map_id = ?', response_map.id])
+          if !@corresponding_response.empty?
+            @corresponding_response = @corresponding_response.reject{|response| response.round!=round}
+          end
           @respective_scores = Hash.new
-          @respective_scores = @review_scores[response_map.reviewer_id] if @review_scores[response_map.reviewer_id] != nil
+          @respective_scores = @review_scores[response_map.reviewer_id][round] if @review_scores[response_map.reviewer_id] != nil &&@review_scores[response_map.reviewer_id][round] != nil
 
-          if @corresponding_response != nil
+          if !@corresponding_response.empty?
             #@corresponding_response is an array, Answer.get_total_score calculate the score for the last one
             @this_review_score_raw = Answer.get_total_score(response: @corresponding_response, questions: @questions)
             if @this_review_score_raw
               @this_review_score = ((@this_review_score_raw*100)/100.0).round if @this_review_score_raw >= 0.0
             end
           else
-            @this_review_score = 0.0
+            @this_review_score = -1.0
           end
+
           @respective_scores[response_map.reviewee_id] = @this_review_score
+          @review_scores[response_map.reviewer_id] = Hash.new if @review_scores[response_map.reviewer_id].nil?
+          @review_scores[response_map.reviewer_id][round] = Hash.new if @review_scores[response_map.reviewer_id][round].nil?
           @review_scores[response_map.reviewer_id][round] = @respective_scores
         end
       end
@@ -781,7 +787,7 @@ require 'analytic/assignment_analytic'
             @this_review_score = ((@this_review_score_raw*100)/100.0).round if @this_review_score_raw >= 0.0
           end
         else
-          @this_review_score = 0.0
+          @this_review_score = -1.0
         end
         @respective_scores[response_map.reviewee_id] = @this_review_score
         @review_scores[response_map.reviewer_id] = @respective_scores
@@ -796,7 +802,18 @@ require 'analytic/assignment_analytic'
     scores = Hash.new
     contributors =self.contributors  #assignment_teams
     if self.varying_rubrics_by_round?
-
+      rounds = self.rounds_of_reviews
+      for round in 1 .. rounds
+        review_questionnaire_id = get_review_questionnaire_id(round)
+        questions = Question.where( ['questionnaire_id = ?', review_questionnaire_id])
+        contributors.each do |contributor|
+          assessments = ReviewResponseMap.get_assessments_for(contributor)
+          assessments = assessments.reject{|assessment| assessment.round!=round}
+          scores[contributor.id] = Hash.new
+          scores[contributor.id][round] = Hash.new
+          scores[contributor.id][round] = Answer.compute_scores(assessments, questions)
+        end
+      end
     else
       review_questionnaire_id = get_review_questionnaire_id()
       questions = Question.where( ['questionnaire_id = ?', review_questionnaire_id])

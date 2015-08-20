@@ -1,10 +1,17 @@
 <% current_folder = DisplayOption.new
 current_folder.name = "" %>
 <% files = participant.files(participant.path.to_s + current_folder.name) %>
+
+<%session_participant = AssignmentParticipant.where(parent_id: @assignment.id, user_id: session[:user].id).first%>
+<%session_participants_team = AssignmentTeam.team(session_participant)%>
+<%same_team_flag = false %>
+<% if !session_participants_team.nil? and session_participants_team.includes? (participant) %>
+  <%same_team_flag = true%>
+<%end%>
 or<br/><br/>
 <b>Submit a file:</b><BR/>
-<% if files.length > 0 or stage != "Complete"  %>
-  <% if stage != "Complete" %>
+<% if (files.length > 0 or stage != "Complete")  %>
+  <% if same_team_flag && stage != "Complete" %>
     <%= form_tag({:action=>'submit_file',:id => participant.id},{:method => 'post', :enctype => "multipart/form-data", :onSubmit => "return checkIfFileExists(uploaded_file.value,1);"}) do %>
       <input type="checkbox" name="unzip" value=""/> Unzip submission
       <div class="form-group">
@@ -16,8 +23,11 @@ or<br/><br/>
   <% end %>
 
   <%= form_tag({:action=>'folder_action', :id => participant.id}, {:multipart => true, id: 'folder-action-form'}) do %>
+
     <% if files.length > 0 and participant.directory_num != nil and participant.directory_num >= 0 %>
-      <% if stage != "Complete" %>
+
+      <% if same_team_flag && stage != "Complete" %>
+
         <div style="background-color:#EEEEEE; padding-bottom:0.6em"><strong>File and folder actions</strong><br>
           <input type="button" onclick="createNewFolder()"     value="Create new folder"    />
           <input type="button" onclick="copySelectedFile()"    value="Copy selected file"   />
@@ -26,6 +36,7 @@ or<br/><br/>
           <input type="button" onclick="deleteSelectedFile();" value="Delete selected file" />
           <input type="reset" value="Reset"></div><br>
       <% end %>
+
       <table>
         <tr><td>&nbsp;</td><td><div id="1_myDiv"><%= display_directory_tree(participant, files, false).html_safe %> </div></td></tr>
       </table>

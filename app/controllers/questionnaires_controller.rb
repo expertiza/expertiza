@@ -130,10 +130,7 @@ class QuestionnairesController < ApplicationController
     redirect_to :controller => 'submitted_content', :action => 'view', :id => params[:pid] if @questionnaire == nil
     if params['save']
       @questionnaire.update_attributes(params[:questionnaire])
-      # for qtypeid in params[:question_type].keys
-      #   @question_type = QuestionType.find(qtypeid)
-      #   @question_type.update_attributes(params[:question_type][qtypeid])
-      # end
+
       for qid in params[:question].keys
         @question = Question.find(qid)
         @question.update_attributes(params[:question][qid])

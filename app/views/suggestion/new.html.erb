@@ -1,6 +1,6 @@
-<%unless @suggestions.nil? %>
-<h2>Suggested topics for <%=h @assignment.name %></h2>
-  <table class="general" cellpadding=5 width=50%% border=1>
+<%unless @suggestions.empty? %>
+<h2>Suggested topics for <%= @assignment.name %></h2>
+  <table class="general" cellpadding="5" width="50%" border="1">
     <tr>
       <th>Title</th>
       <th>Status</th>

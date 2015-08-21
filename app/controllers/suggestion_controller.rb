@@ -68,8 +68,9 @@ class SuggestionController < ApplicationController
   end
 
   def create
-    @suggestion = Suggestion.new(params[:suggestion])
+    @suggestion = Suggestion.new(suggestion_params)
     @suggestion.assignment_id = session[:assignment_id]
+    @assignment = Assignment.find(session[:assignment_id])
     @suggestion.status = 'Initiated'
     if params[:suggestion_anonymous].nil?
       @suggestion.unityID = session[:user].id
@@ -77,11 +78,8 @@ class SuggestionController < ApplicationController
       @suggestion.unityID = "";
     end
 
-    if @suggestion.save
-      render :action => 'confirm_save'
-    else
-      render :action => 'new'
-    end
+    flash[:success] = 'Thank you for your suggestion!' if @suggestion.save
+    redirect_to :action => 'new', :id => @suggestion.assignment_id
   end
 
   def confirm_save
@@ -193,4 +191,9 @@ class SuggestionController < ApplicationController
     end
     redirect_to :action => 'show', :id => @suggestion
   end
+
+  private
+    def suggestion_params
+      params.require(:suggestion).permit(:assignment_id, :title, :description, :status, :unityID, :signup_preference)
+    end
 end

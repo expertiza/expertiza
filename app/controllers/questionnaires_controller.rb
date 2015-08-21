@@ -185,7 +185,6 @@ class QuestionnairesController < ApplicationController
     @questionnaire.min_question_score = Questionnaire::DEFAULT_MIN_QUESTION_SCORE
     @questionnaire.max_question_score = Questionnaire::DEFAULT_MAX_QUESTION_SCORE
     @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
-    @questionnaire.section = "Regular"
   end
 
   #define a new quiz questionnaire
@@ -233,7 +232,6 @@ class QuestionnairesController < ApplicationController
       participant_id = params[:pid] #creating a local variable to send as parameter to submitted content if it is a quiz questionnaire
       @questionnaire.min_question_score = 0
       @questionnaire.max_question_score = 1
-      @questionnaire.section = "Quiz"
       @assignment = Assignment.find(params[:aid])
       author_team = AssignmentTeam.team(Participant.find(participant_id))
 
@@ -320,7 +318,6 @@ class QuestionnairesController < ApplicationController
     @questionnaire.private = params[:questionnaire][:private]
     @questionnaire.min_question_score = params[:questionnaire][:min_question_score]
     @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
-    @questionnaire.section = params[:questionnaire][:section]
     @questionnaire.id = params[:questionnaire][:id]
     @questionnaire.display_type = params[:questionnaire][:display_type]
   end
@@ -596,15 +593,6 @@ class QuestionnairesController < ApplicationController
           newadvice = advice.clone
           newadvice.question_id = newquestion.id
           newadvice.save
-        end
-
-        if @questionnaire.section == "Custom"
-          old_question_type = QuestionType.find_by_question_id(question.id)
-          unless old_question_type.nil?
-            new_question_type = old_question_type.clone
-            new_question_type.question_id = newquestion.id
-            new_question_type.save
-          end
         end
       end
 

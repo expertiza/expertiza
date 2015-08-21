@@ -78,7 +78,10 @@ class SuggestionController < ApplicationController
       @suggestion.unityID = "";
     end
 
-    flash[:success] = 'Thank you for your suggestion!' if @suggestion.save
+    if @suggestion.save
+      flash[:success] = 'Thank you for your suggestion!' if @suggestion.unityID != ''
+      flash[:success] = 'You have already submit an anonymous suggestion. It will not show in the suggested topic table below.' if @suggestion.unityID == ''
+    end
     redirect_to :action => 'new', :id => @suggestion.assignment_id
   end
 

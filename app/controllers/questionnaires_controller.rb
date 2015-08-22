@@ -410,25 +410,12 @@ class QuestionnairesController < ApplicationController
         q = Question.new()
         q.txt=params[:new_question][question_key]
         q.questionnaire_id = questionnaire_id
+        q.type = params[:question_type][question_key][:type]
         if @questionnaire.type == "QuizQuestionnaire"
           q.weight = 1 #setting the weight to 1 for quiz questionnaire since the model validates this field
-          # if q.true_false == ''
-          q.true_false = false
         end
         unless q.txt.strip.empty?
           q.save
-          if @questionnaire.type == "QuizQuestionnaire"
-            save_new_question_parameters(q.id, question_key)
-          end
-          questionnaire = Questionnaire.find(questionnaire_id)
-          if questionnaire.section == "Custom"
-            for i in (questionnaire.min_question_score .. questionnaire.max_question_score)
-              a = QuestionAdvice.new(:score => i, :advice => nil)
-              a.question_id = q.id
-              a.save
-            end
-            save_new_question_parameters(q.id, question_key)
-          end
         end
       end
     end

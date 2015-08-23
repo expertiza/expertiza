@@ -198,7 +198,7 @@ class SuggestionController < ApplicationController
   end
 
   private
-    def suggestion_params
-      params.require(:suggestion).permit(:assignment_id, :title, :description, :status, :unityID, :signup_preference)
-    end
+  def suggestion_params
+    params.require(:suggestion).permit(:assignment_id, :title, :description, :status, :unityID, :signup_preference)
+  end
 end

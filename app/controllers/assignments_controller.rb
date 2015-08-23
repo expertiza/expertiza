@@ -31,8 +31,7 @@ class AssignmentsController < ApplicationController
   end
 
   def create
-    params.permit!
-    @assignment_form = AssignmentForm.new(params[:assignment_form])
+    @assignment_form = AssignmentForm.new(assignment_form_params)
     #This one is working
     #       emails = Array.new
     #      #emails<<"vikas.023@gmail.com"
@@ -142,7 +141,6 @@ class AssignmentsController < ApplicationController
   end
 
   def update
-    params.permit!
     ##if params doesn't have assignment_form, it means the assignment is assigned to a course using the icon on the popup menu
     unless(params.has_key?(:assignment_form))
       @assignment=Assignment.find(params[:id])
@@ -170,7 +168,7 @@ class AssignmentsController < ApplicationController
       flash[:error] = "We strongly suggest instructors specify the preferred timezone to guarantee the correct time display. For now we assume you are in " +parent_timezone
       session[:user].timezonepref=parent_timezone
     end
-    if @assignment_form.update_attributes(params[:assignment_form],session[:user])
+    if @assignment_form.update_attributes(assignment_form_params,session[:user])
         flash[:note] = 'Assignment was successfully saved.'
         #TODO: deal with submission path change
         # Need to rename the bottom-level directory and/or move intermediate directories on the path to an
@@ -321,5 +319,11 @@ class AssignmentsController < ApplicationController
         rubrics_list.delete("BookmarkRatingQuestionnaire")
       end
       return rubrics_list
+    end
+
+    private
+
+    def assignment_form_params
+      params.require(:assignment_form).permit!
     end
 end

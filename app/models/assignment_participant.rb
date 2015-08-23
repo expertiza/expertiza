@@ -589,13 +589,30 @@ class AssignmentParticipant < Participant
 
     def set_student_directory_num
       if self.directory_num.nil? || self.directory_num < 0
-        max_num = AssignmentParticipant.where(parent_id: self.parent_id).order('directory_num desc').first.directory_num
-        dir_num = max_num ? max_num + 1 : 0
-        self.update_attribute('directory_num',dir_num)
-        #ACS Get participants irrespective of the number of participants in the team
-        #removed check to see if it is a team assignment
-        self.team.participants.each do | member |
-          if member.directory_num == nil or member.directory_num < 0
+        #check all the users in this team, see if they have the direc tory_num in their participants table.
+        this_team_has_directory_num = false
+        team = self.team
+        if team.nil? # this participant does not have a team
+
+        else
+          teammate_participants = team.participants
+          teammate_participants.each do |teammate_participant|
+            if !teammate_participant.directory_num.nil?
+              directory_num_for_this_team = teammate_participant.directory_num
+              this_team_has_directory_num=true
+              self.update_attribute('directory_num',directory_num_for_this_team)
+            end
+          end
+        end
+
+        ##only create a new directory num for this team if there is no directory num for this team
+        if !this_team_has_directory_num
+          max_num = AssignmentParticipant.where(parent_id: self.parent_id).order('directory_num desc').first.directory_num
+          dir_num = max_num ? max_num + 1 : 0
+          self.update_attribute('directory_num',dir_num)
+          #ACS Get participants irrespective of the number of participants in the team
+          #removed check to see if it is a team assignment
+          self.team.participants.each do | member |
             member.directory_num = self.directory_num
             member.save
           end

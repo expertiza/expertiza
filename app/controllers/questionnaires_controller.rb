@@ -491,14 +491,14 @@ class QuestionnairesController < ApplicationController
             else
               score = 0
             end
-            if(q_type=="MCC")
+            if(q_type=="MultipleChoiceCheckbox")
               if (params[:new_choices][questionnum.to_s][q_type][choice_key][:iscorrect]==1.to_s)
                 q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "true",:question_id => question.id)
               else
                 q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "false",:question_id => question.id)
               end
               q.save
-            elsif(q_type=="TF")
+            elsif(q_type=="TrueFalse")
               if (params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect]==choice_key)
                 q = QuizQuestionChoice.new(:txt => "True", :iscorrect => "true",:question_id => question.id)
                 q.save

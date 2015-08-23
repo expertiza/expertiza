@@ -621,6 +621,7 @@ class AssignmentParticipant < Participant
         end
       end
 
+      # if current user has directory_num, update the directory num for all the teammates.
       self.team.participants.each do | member |
         member.update_attribute('directory_num',self.directory_num)
       end

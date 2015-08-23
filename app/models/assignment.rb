@@ -478,7 +478,8 @@ require 'analytic/assignment_analytic'
     (self.course_id != nil && self.course_id > 0) ?
       path_text = Course.find(self.course_id).directory_path :
       path_text = Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(User.find(self.instructor_id).name) + '/'
-    path_text + FileHelper.clean_path(self.directory_path)
+    path_text = path_text + FileHelper.clean_path(self.directory_path)
+    path_text
   end
 
   # Check whether review, metareview, etc.. is allowed

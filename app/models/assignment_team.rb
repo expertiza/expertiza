@@ -249,6 +249,22 @@ class AssignmentTeam < Team
         end
       end
 
+  #for an existing team, after a new_participant joins, update the directory_num for the new participant
+  def update_dirctory_num_for_new_member(new_participant)
+    binding.pry
+    dir_num = nil
+    participants.each do |participant|
+      if !participant.directory_num.nil?
+        dir_num = participant.directory_num
+        break
+      end
+    end
+    if !dir_num.nil?
+      new_participant.directory_num = dir_num
+      new_participant.save
+    end
+  end
+
       require './app/models/analytic/assignment_team_analytic'
       include AssignmentTeamAnalytic
     end

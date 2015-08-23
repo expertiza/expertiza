@@ -202,6 +202,13 @@ class QuestionnairesController < ApplicationController
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
+  #Zhewei: This method is used to add new questions when creating or editing questionnaire.
+  def add_new_questions
+    (1..params[:question][:total_num].to_i).each do |i|
+      Object.const_get(params[:question][:type]).create(id: Question.last.id+1, txt: 'Edit question content here', weight: 1, questionnaire_id: params[:id], seq: 0, type: params[:question][:type], break_before: true)
+    end
+    redirect_to edit_questionnaire_path(params[:id].to_sym)
+  end
   #=========================================================================================================
   #Separate methods for quiz questionnaire
   #=========================================================================================================

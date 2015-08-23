@@ -115,7 +115,6 @@ def submit_file
 
   curr_directory = participant.path.to_s + @current_folder.name
 
-
   if !File.exists? curr_directory
     FileUtils.mkdir_p(curr_directory)
   end

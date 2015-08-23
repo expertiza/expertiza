@@ -1,0 +1,3 @@
+class MultipleChoiceCheckbox < QuizQuestion
+
+end

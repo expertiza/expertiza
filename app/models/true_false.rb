@@ -1,0 +1,3 @@
+class TrueFalse < QuizQuestion
+
+end

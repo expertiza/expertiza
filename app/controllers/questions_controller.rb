@@ -71,8 +71,15 @@ class QuestionsController < ApplicationController
   # Remove question from database and
   # return to list
   def destroy
-    Question.find(params[:id]).destroy
-    redirect_to :action => 'list'
+    question = Question.find(params[:id])
+    questionnaire_id = question.questionnaire_id
+    begin
+      question.destroy
+      flash[:success] = "You have deleted one question successfully!"
+    rescue
+      flash[:error] = $!
+    end
+    redirect_to edit_questionnaire_path(questionnaire_id.to_s.to_sym)
   end
 
   #This method is only for quiz questionnaires, it is called when instructors click "view quiz questions" on the pop-up panel.

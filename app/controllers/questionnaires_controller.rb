@@ -61,41 +61,74 @@ class QuestionnairesController < ApplicationController
     end
   end
 
-  # Remove a given questionnaire
-  def delete
-    @questionnaire = Questionnaire.find(params[:id])
-
-    if @questionnaire
-      begin
-        name = @questionnaire.name
-
-        @questionnaire.assignments.each{
-          | assignment |
-          raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
-        }
-        @questionnaire.destroy
-        undo_link("Questionnaire \"#{name}\" has been deleted successfully. ")
-      rescue
-        flash[:error] = $!
-      end
-    end
-
-    redirect_to :action => 'list', :controller => 'tree_display'
-  end
-
   def view
     @questionnaire = Questionnaire.find(params[:id])
   end
 
-  #View a quiz questionnaire
-  def view_quiz
-    @questionnaire = Questionnaire.find(params[:id])
-    @participant = Participant.find(params[:pid]) #creating an instance variable since it needs to be sent to submitted_content/edit
-    render :view
-  end
-
   def show
     @questionnaire = Questionnaire.find(params[:id])
+  end
+
+    # Define a new questionnaire
+  def new
+    @questionnaire = Object.const_get(params[:model]).new
+    @questionnaire.private = params[:private]
+    @questionnaire.min_question_score = Questionnaire::DEFAULT_MIN_QUESTION_SCORE
+    @questionnaire.max_question_score = Questionnaire::DEFAULT_MAX_QUESTION_SCORE
+    @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
+  end
+
+  # Save the new questionnaire to the database
+  def create_questionnaire
+    @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
+
+    # TODO: check for Quiz Questionnaire?
+    if @questionnaire.type == "QuizQuestionnaire" #checking if it is a quiz questionnaire
+      participant_id = params[:pid] #creating a local variable to send as parameter to submitted content if it is a quiz questionnaire
+      @questionnaire.min_question_score = 0
+      @questionnaire.max_question_score = 1
+      @assignment = Assignment.find(params[:aid])
+      author_team = AssignmentTeam.team(Participant.find(participant_id))
+
+      @questionnaire.instructor_id = author_team.id    #for a team assignment, set the instructor id to the team_id
+
+      @successful_create = true
+      save
+
+      save_choices @questionnaire.id
+
+      if @successful_create == true
+        flash[:note] = "Quiz was successfully created"
+      end
+      redirect_to :controller => 'submitted_content', :action => 'edit', :id => participant_id
+    else #if it is not a quiz questionnaire
+      if (session[:user]).role.name == "Teaching Assistant"
+        @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
+      end
+      save
+
+      redirect_to :controller => 'tree_display', :action => 'list'
+    end
+  end
+
+  def select_questionnaire_type
+    @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
+    @questionnaire.private = params[:questionnaire][:private]
+    @questionnaire.min_question_score = params[:questionnaire][:min_question_score]
+    @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
+    @questionnaire.id = params[:questionnaire][:id]
+    @questionnaire.display_type = params[:questionnaire][:display_type]
+  end
+
+  def create
+    @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
+    if (session[:user]).role.name == "Teaching Assistant"
+      @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
+    else
+      @questionnaire.instructor_id = session[:user].id
+    end
+    save
+    redirect_to :controller => 'tree_display', :action => 'list'
   end
 
   # Edit a questionnaire
@@ -116,13 +149,108 @@ class QuestionnairesController < ApplicationController
     end
   end
 
+  def update
+    @questionnaire = Questionnaire.find(params[:id])
+    if current_user.role == Role.ta
+      @questionnaire.instructor_id = Ta.get_my_instructor(current_user.id)
+    else
+      @questionnaire.instructor_id = current_user.id
+    end
+
+    if @questionnaire.update_attributes(questionnaire_params)&& save_questions(params[:questionnaire][:id])
+      redirect_to :controller => 'tree_display', :action => 'list'
+    else
+      render 'edit'
+    end
+  end
+
+  def edit_advice  ##Code used to be in this class, was removed.  I have not checked the other class.
+    redirect_to :controller => 'advice', :action => 'edit_advice'
+  end
+
+  def save_advice
+    begin
+      for advice_key in params[:advice].keys
+        QuestionAdvice.update(advice_key, params[:advice][advice_key])
+      end
+      flash[:notice] = "The questionnaire's question advice was successfully saved"
+      #redirect_to :action => 'list'
+      redirect_to :controller => 'advice', :action => 'save_advice'
+    end   ##Rescue clause was removed; why?
+  end
+
+  # Toggle the access permission for this assignment from public to private, or vice versa
+  def toggle_access
+    @questionnaire = Questionnaire.find(params[:id])
+    @questionnaire.private = !@questionnaire.private
+    @questionnaire.save
+    @access = @questionnaire.private == true ? "private" : "public"
+    undo_link("Questionnaire \"#{@questionnaire.name}\" has been made #{@access} successfully. ")
+    redirect_to :controller => 'tree_display', :action => 'list'
+  end
+
+  #=========================================================================================================
+  #Separate methods for quiz questionnaire
+  #=========================================================================================================
+  #View a quiz questionnaire
+  def view_quiz
+    @questionnaire = Questionnaire.find(params[:id])
+    @participant = Participant.find(params[:pid]) #creating an instance variable since it needs to be sent to submitted_content/edit
+    render :view
+  end
+
+  #define a new quiz questionnaire
+  #method invoked by the view
+  def new_quiz
+    valid_request=true
+    @assignment_id = params[:aid] #creating an instance variable to hold the assignment id
+    @participant_id = params[:pid] #creating an instance variable to hold the participant id
+    assignment = Assignment.find(@assignment_id)
+    if !assignment.require_quiz? #flash error if this assignment does not require quiz
+      flash[:error] = "This assignment does not support quizzing feature."
+      valid_request=false
+    else
+      team = AssignmentParticipant.find(@participant_id).team
+
+      if team.nil? #flash error if this current participant does not have a team
+        flash[:error] = "You should create or join a team first."
+        valid_request=false
+      else
+        if assignment.has_topics? && team.topic.nil?#flash error if this assignment has topic but current team does not have a topic
+          flash[:error] = "Your team should have a topic first."
+          valid_request=false
+        end
+      end
+    end
+
+    if valid_request
+      @questionnaire = Object.const_get(params[:model]).new
+      @questionnaire.private = params[:private]
+      @questionnaire.min_question_score = 0
+      @questionnaire.max_question_score = 1
+
+      render :new_quiz
+    else
+      redirect_to :controller => 'submitted_content', :action => 'view', :id => params[:pid]
+    end
+  end
+
+  #seperate method for creating a quiz questionnaire because of differences in permission
+  def create_quiz_questionnaire
+    valid = valid_quiz
+    if valid.eql?("valid")
+      create_questionnaire
+    else
+      flash[:error] = valid.to_s
+      redirect_to :back
+    end
+  end
 
   #edit a quiz questionnaire
   def edit_quiz
     @questionnaire = Questionnaire.find(params[:id])
     render :edit
   end
-
 
   #save an updated quiz questionnaire to the database
   def update_quiz
@@ -175,95 +303,6 @@ class QuestionnairesController < ApplicationController
     redirect_to :controller => 'submitted_content', :action => 'view', :id => params[:pid]
   end
 
-  # Define a new questionnaire
-  def new
-    @questionnaire = Object.const_get(params[:model]).new
-    @questionnaire.private = params[:private]
-    @questionnaire.min_question_score = Questionnaire::DEFAULT_MIN_QUESTION_SCORE
-    @questionnaire.max_question_score = Questionnaire::DEFAULT_MAX_QUESTION_SCORE
-    @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
-  end
-
-  #define a new quiz questionnaire
-  #method invoked by the view
-  def new_quiz
-    valid_request=true
-    @assignment_id = params[:aid] #creating an instance variable to hold the assignment id
-    @participant_id = params[:pid] #creating an instance variable to hold the participant id
-    assignment = Assignment.find(@assignment_id)
-    if !assignment.require_quiz? #flash error if this assignment does not require quiz
-      flash[:error] = "This assignment does not support quizzing feature."
-      valid_request=false
-    else
-      team = AssignmentParticipant.find(@participant_id).team
-
-      if team.nil? #flash error if this current participant does not have a team
-        flash[:error] = "You should create or join a team first."
-        valid_request=false
-      else
-        if assignment.has_topics? && team.topic.nil?#flash error if this assignment has topic but current team does not have a topic
-          flash[:error] = "Your team should have a topic first."
-          valid_request=false
-        end
-      end
-    end
-
-    if valid_request
-      @questionnaire = Object.const_get(params[:model]).new
-      @questionnaire.private = params[:private]
-      @questionnaire.min_question_score = 0
-      @questionnaire.max_question_score = 1
-
-      render :new_quiz
-    else
-      redirect_to :controller => 'submitted_content', :action => 'view', :id => params[:pid]
-    end
-  end
-
-  # Save the new questionnaire to the database
-  def create_questionnaire
-    @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
-
-    # TODO: check for Quiz Questionnaire?
-    if @questionnaire.type == "QuizQuestionnaire" #checking if it is a quiz questionnaire
-      participant_id = params[:pid] #creating a local variable to send as parameter to submitted content if it is a quiz questionnaire
-      @questionnaire.min_question_score = 0
-      @questionnaire.max_question_score = 1
-      @assignment = Assignment.find(params[:aid])
-      author_team = AssignmentTeam.team(Participant.find(participant_id))
-
-      @questionnaire.instructor_id = author_team.id    #for a team assignment, set the instructor id to the team_id
-
-      @successful_create = true
-      save
-
-      save_choices @questionnaire.id
-
-      if @successful_create == true
-        flash[:note] = "Quiz was successfully created"
-      end
-      redirect_to :controller => 'submitted_content', :action => 'edit', :id => participant_id
-    else #if it is not a quiz questionnaire
-      if (session[:user]).role.name == "Teaching Assistant"
-        @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
-      end
-      save
-
-      redirect_to :controller => 'tree_display', :action => 'list'
-    end
-  end
-
-  #seperate method for creating a quiz questionnaire because of differences in permission
-  def create_quiz_questionnaire
-    valid = valid_quiz
-    if valid.eql?("valid")
-      create_questionnaire
-    else
-      flash[:error] = valid.to_s
-      redirect_to :back
-    end
-  end
-
   def valid_quiz
     num_quiz_questions = Assignment.find(params[:aid]).num_quiz_questions
     valid = "valid"
@@ -310,68 +349,8 @@ class QuestionnairesController < ApplicationController
     return valid
   end
 
-  def select_questionnaire_type
-    @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
-    @questionnaire.private = params[:questionnaire][:private]
-    @questionnaire.min_question_score = params[:questionnaire][:min_question_score]
-    @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
-    @questionnaire.id = params[:questionnaire][:id]
-    @questionnaire.display_type = params[:questionnaire][:display_type]
-  end
-
-  def create
-    @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
-    if (session[:user]).role.name == "Teaching Assistant"
-      @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
-    else
-      @questionnaire.instructor_id = session[:user].id
-    end
-    save
-    redirect_to :controller => 'tree_display', :action => 'list'
-  end
-
-  def update
-    @questionnaire = Questionnaire.find(params[:id])
-    if current_user.role == Role.ta
-      @questionnaire.instructor_id = Ta.get_my_instructor(current_user.id)
-    else
-      @questionnaire.instructor_id = current_user.id
-    end
-
-    if @questionnaire.update_attributes(params[:questionnaire])&& save_questions(params[:questionnaire][:id])
-      redirect_to :controller => 'tree_display', :action => 'list'
-    else
-      render 'edit'
-    end
-  end
-
-  def edit_advice  ##Code used to be in this class, was removed.  I have not checked the other class.
-    redirect_to :controller => 'advice', :action => 'edit_advice'
-  end
-
-  def save_advice
-    begin
-      for advice_key in params[:advice].keys
-        QuestionAdvice.update(advice_key, params[:advice][advice_key])
-      end
-      flash[:notice] = "The questionnaire's question advice was successfully saved"
-      #redirect_to :action => 'list'
-      redirect_to :controller => 'advice', :action => 'save_advice'
-    end   ##Rescue clause was removed; why?
-  end
-
-  # Toggle the access permission for this assignment from public to private, or vice versa
-  def toggle_access
-    @questionnaire = Questionnaire.find(params[:id])
-    @questionnaire.private = !@questionnaire.private
-    @questionnaire.save
-    @access = @questionnaire.private == true ? "private" : "public"
-    undo_link("Questionnaire \"#{@questionnaire.name}\" has been made #{@access} successfully. ")
-    redirect_to :controller => 'tree_display', :action => 'list'
-  end
 
   private
-
   #save questionnaire object after create or edit
   def save
     begin
@@ -429,7 +408,7 @@ class QuestionnairesController < ApplicationController
     @deleted_questions = []
     for question in questions
       should_delete = true
-      if params[:question] != nil
+      if question_params != nil
         for question_key in params[:question].keys
           if question_key.to_s === question.id.to_s
             should_delete = false
@@ -453,7 +432,6 @@ class QuestionnairesController < ApplicationController
   def save_questions(questionnaire_id)
     delete_questions questionnaire_id
     save_new_questions questionnaire_id
-
     if params[:question]
       for question_key in params[:question].keys
         begin
@@ -532,6 +510,13 @@ class QuestionnairesController < ApplicationController
   end
 
   private
+  def questionnaire_params
+    params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score, :max_question_score, :type, :display_type, :instruction_loc)
+  end
+
+  def question_params
+    params.require(:question).permit(:txt, :weight, :questionnaire_id, :seq, :type, :size, :alternatives, :break_before, :max_label, :min_label)
+  end
 
   # FIXME: These private methods belong in the Questionnaire model
 

@@ -265,7 +265,11 @@ Expertiza::Application.routes.draw do
   resources :course_evaluation_questionnaires, controller: :questionnaires
   resources :bookmarkrating_questionnaires, controller: :questionnaires
 
-
+  resources :questions do
+    collection do
+      get :delete
+    end
+  end
 
   resources :response do
     collection do

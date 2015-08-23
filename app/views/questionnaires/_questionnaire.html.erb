@@ -80,8 +80,26 @@
     <table id="question_actions_table">
       <tr>
         <td>
-          <input type="button" value="Add" onclick="addQuestions()">
-          <input id="numQuestionsToAdd" type="text" value="1" size=1> more question(s)
+        <!--Zhewei: the reason why we put an empty form_tag here: https://github.com/expertiza/expertiza/blob/53212b6967e9b2d6362d91846bc268ecf1750c6b/app/views/sign_up_sheet/_add_signup_topics_staggered.html.erb-->
+          <%= form_tag :action => 'add_new_questions' do %>
+          <% end %> 
+          <%= form_tag :action => 'add_new_questions', :id => params[:id] do %>
+            <%= submit_tag 'Add' %>
+            <%= text_field 'question', 'total_num', :size => 1, :value => "1" %> more 
+            <%= select "question", "type", 
+                {"Criterion" =>"Criterion",
+                 "Scale"=>"Scale",
+                 "Dropdown"=>"Dropdown",
+                 "MultipleChoice"=>"MultipleChoice",
+                 "Checkbox"=>"Checkbox",
+                 "TextArea"=>"TextArea",
+                 "TextField"=>"TextField",
+                 "UploadFile"=>"UploadFile",
+                 "SectionHeader"=>"SectionHeader",
+                 "TableHeader"=>"TableHeader",
+                 "ColumnHeader"=>"ColumnHeader",
+                 } %> question(s)
+           <% end %> 
         </td>
       </tr>
     </table>

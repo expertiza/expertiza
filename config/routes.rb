@@ -254,6 +254,7 @@ Expertiza::Application.routes.draw do
       get :delete
       post :create_quiz_questionnaire
       post :update_quiz
+      post :add_new_questions
     end
   end
 

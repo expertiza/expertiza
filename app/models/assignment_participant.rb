@@ -600,7 +600,9 @@ class AssignmentParticipant < Participant
             if !teammate_participant.directory_num.nil?
               directory_num_for_this_team = teammate_participant.directory_num
               this_team_has_directory_num=true
-              self.update_attribute('directory_num',directory_num_for_this_team)
+              self.team.participants.each do | member |
+                member.update_attribute('directory_num',directory_num_for_this_team)
+              end
             end
           end
         end
@@ -617,6 +619,10 @@ class AssignmentParticipant < Participant
             member.save
           end
         end
+      end
+
+      self.team.participants.each do | member |
+        member.update_attribute('directory_num',self.directory_num)
       end
     end
 

@@ -111,15 +111,6 @@ class QuestionnairesController < ApplicationController
     end
   end
 
-  def select_questionnaire_type
-    @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
-    @questionnaire.private = params[:questionnaire][:private]
-    @questionnaire.min_question_score = params[:questionnaire][:min_question_score]
-    @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
-    @questionnaire.id = params[:questionnaire][:id]
-    @questionnaire.display_type = params[:questionnaire][:display_type]
-  end
-
   def create
     @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
     if (session[:user]).role.name == "Teaching Assistant"
@@ -162,6 +153,28 @@ class QuestionnairesController < ApplicationController
     else
       render 'edit'
     end
+  end
+
+  # Remove a given questionnaire
+  def delete
+    @questionnaire = Questionnaire.find(params[:id])
+
+    if @questionnaire
+      begin
+        name = @questionnaire.name
+
+        @questionnaire.assignments.each{
+          | assignment |
+          raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
+        }
+        @questionnaire.destroy
+        undo_link("Questionnaire \"#{name}\" has been deleted successfully. ")
+      rescue
+        flash[:error] = $!
+      end
+    end
+
+    redirect_to :action => 'list', :controller => 'tree_display'
   end
 
   def edit_advice  ##Code used to be in this class, was removed.  I have not checked the other class.

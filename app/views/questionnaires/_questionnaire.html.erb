@@ -9,12 +9,13 @@
     </td>
   </tr>
 </table>
-
-<% if @questionnaire.type == 'QuizQuestionnaire' %>        <!--handle a questionnaire differently if it is a quiz-->
+<br/>
+<% if @questionnaire.type == 'QuizQuestionnaire' %>        
+<!--handle a questionnaire differently if it is a quiz-->
   <table id="questions_table">
     <% if $disp_flag != 1 %>
       <tr>
-        <td align=left width=300>1111Questions:</td>
+        <td align=left width=300>Questions:</td>
         <%  if @questionnaire.type != 'QuizQuestionnaire' %><td align=left>weight</td><%end%>
 
       </tr>
@@ -65,7 +66,7 @@
     <% end %>
   </table>
 <% else %>
-     <table>
+    <table>
        <tr>
          <td>Min question score:</td>
          <td><%= text_field 'questionnaire', 'min_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
@@ -75,9 +76,7 @@
          <td><%= select(:questionnaire, :private, [ ['no', false],['yes',  true]])%>
          </td>
        </tr>
-     </table>
-     <br/>
-
+    </table>
     <table id="question_actions_table">
       <tr>
         <td>
@@ -89,8 +88,8 @@
         <td ><input type="button" value="Delete selected questions" onclick= "deleteQuestions()"></td>
       </tr>
     </table>
+    <hr/>
      <table id="questions_table">
-       <%# if @questionnaire.questions.length > 0 %>
        <tr>
          <td align=left width=30>Delete</td>
          <td align=center width=30>Seq</td>

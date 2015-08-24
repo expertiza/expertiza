@@ -1,6 +1,3 @@
-  <%= form_tag :action => 'create' do %>
-    <%= render :partial => 'questionnaire' %>
-    <%= submit_tag "Create #{@questionnaire.display_type.downcase}", :name=>"save" %>
-  <% end %>
-  <br />
-  <a href="javascript:window.history.back()">Back</a>
+<%= render :partial => 'questionnaire' %>
+<br />
+<a href="javascript:window.history.back()">Back</a>

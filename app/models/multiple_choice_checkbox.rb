@@ -1,4 +1,4 @@
-class MultipleChoiceRadio < QuizQuestion
+class MultipleChoiceCheckbox < QuizQuestion
   def edit(count)
 
   end

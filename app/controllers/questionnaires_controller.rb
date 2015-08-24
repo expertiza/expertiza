@@ -484,7 +484,6 @@ class QuestionnairesController < ApplicationController
 
       for question in questions
         q_type = params[:question_type][questionnum.to_s][:type]
-
           for choice_key in params[:new_choices][questionnum.to_s][q_type].keys
             if params[:new_choices][questionnum.to_s][q_type][choice_key]["weight"] == 1.to_s
               score = 1
@@ -519,10 +518,9 @@ class QuestionnairesController < ApplicationController
               q.save
             end
           end
-        end
-
-      questionnum += 1
-      question.weight = 1
+        questionnum += 1
+        question.weight = 1
+      end
     end
   end
 

@@ -1,5 +1,4 @@
 class QuizQuestion < Question
-
   def edit
   end
 

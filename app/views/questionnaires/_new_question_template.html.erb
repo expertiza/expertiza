@@ -6,25 +6,25 @@
   </div>
 
   <div id="radio_buttons<%= i %>" style="display: none;">
-    <%= radio_button("new_choices[#{i}][MCR][1]",:iscorrect, '1') %> <%= text_field "new_choices[#{i}][MCR][1]", :txt, size: 50 %> <br>
-    <%= radio_button("new_choices[#{i}][MCR][1]",:iscorrect, '2') %> <%= text_field "new_choices[#{i}][MCR][2]", :txt, size: 50 %> <br>
-    <%= radio_button("new_choices[#{i}][MCR][1]",:iscorrect, '3') %> <%= text_field "new_choices[#{i}][MCR][3]", :txt, size: 50 %> <br>
-    <%= radio_button("new_choices[#{i}][MCR][1]",:iscorrect, '4') %> <%= text_field "new_choices[#{i}][MCR][4]", :txt, size: 50 %> <br><br>
+    <%= radio_button("new_choices[#{i}][MultipleChoiceRadio][1]",:iscorrect, '1') %> <%= text_field "new_choices[#{i}][MultipleChoiceRadio][1]", :txt, size: 50 %> <br>
+    <%= radio_button("new_choices[#{i}][MultipleChoiceRadio][1]",:iscorrect, '2') %> <%= text_field "new_choices[#{i}][MultipleChoiceRadio][2]", :txt, size: 50 %> <br>
+    <%= radio_button("new_choices[#{i}][MultipleChoiceRadio][1]",:iscorrect, '3') %> <%= text_field "new_choices[#{i}][MultipleChoiceRadio][3]", :txt, size: 50 %> <br>
+    <%= radio_button("new_choices[#{i}][MultipleChoiceRadio][1]",:iscorrect, '4') %> <%= text_field "new_choices[#{i}][MultipleChoiceRadio][4]", :txt, size: 50 %> <br><br>
   </div>
   <div id="true_false<%= i %>" style="display: none;">
-    <%= radio_button("new_choices[#{i}][TF][1]",:iscorrect, '1') %> True <br>
-    <%= radio_button("new_choices[#{i}][TF][1]",:iscorrect, '0') %> False <br><br>
+    <%= radio_button("new_choices[#{i}][TrueFalse][1]",:iscorrect, '1') %> True <br>
+    <%= radio_button("new_choices[#{i}][TrueFalse][1]",:iscorrect, '0') %> False <br><br>
   </div>
   <div id="check_boxes<%= i %>" style="display: none;">
-    <%= check_box("new_choices[#{i}][MCC][1]",:iscorrect) %> <%= text_field "new_choices[#{i}][MCC][1]", :txt, size: 50 %> <br>
-    <%= check_box("new_choices[#{i}][MCC][2]",:iscorrect) %> <%= text_field "new_choices[#{i}][MCC][2]", :txt, size: 50 %> <br>
-    <%= check_box("new_choices[#{i}][MCC][3]",:iscorrect) %> <%= text_field "new_choices[#{i}][MCC][3]", :txt, size: 50 %> <br>
-    <%= check_box("new_choices[#{i}][MCC][4]",:iscorrect) %> <%= text_field "new_choices[#{i}][MCC][4]", :txt, size: 50 %> <br><br>
+    <%= check_box("new_choices[#{i}][MultipleChoiceCheckbox][1]",:iscorrect) %> <%= text_field "new_choices[#{i}][MultipleChoiceCheckbox][1]", :txt, size: 50 %> <br>
+    <%= check_box("new_choices[#{i}][MultipleChoiceCheckbox][2]",:iscorrect) %> <%= text_field "new_choices[#{i}][MultipleChoiceCheckbox][2]", :txt, size: 50 %> <br>
+    <%= check_box("new_choices[#{i}][MultipleChoiceCheckbox][3]",:iscorrect) %> <%= text_field "new_choices[#{i}][MultipleChoiceCheckbox][3]", :txt, size: 50 %> <br>
+    <%= check_box("new_choices[#{i}][MultipleChoiceCheckbox][4]",:iscorrect) %> <%= text_field "new_choices[#{i}][MultipleChoiceCheckbox][4]", :txt, size: 50 %> <br><br>
   </div>
   <div id="qtype<%= i %>">
-    <%= radio_button("question_type[#{i}]","type", "MCR") %> Multiple Choice - Radio <br>
-    <%= radio_button("question_type[#{i}]","type", "MCC") %> Multiple Choice - Checked <br>
-    <%= radio_button("question_type[#{i}]","type", "TF") %> True/False <br><br>
+    <%= radio_button("question_type[#{i}]","type", "MultipleChoiceRadio") %> Multiple Choice - Radio <br>
+    <%= radio_button("question_type[#{i}]","type", "MultipleChoiceCheckbox") %> Multiple Choice - Checked <br>
+    <%= radio_button("question_type[#{i}]","type", "TrueFalse") %> True/False <br><br>
   </div>
 
 <% end %>

@@ -393,8 +393,9 @@ class QuestionnairesController < ApplicationController
   private
   #save questionnaire object after create or edit
   def save
-    begin
+
       @questionnaire.save!
+
       save_questions @questionnaire.id if @questionnaire.id != nil and @questionnaire.id > 0
       # We do not create node for quiz questionnaires
       if @questionnaire.type != "QuizQuestionnaire"
@@ -405,10 +406,7 @@ class QuestionnairesController < ApplicationController
         end
       end
       undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
-    rescue
-      @successful_create = false
-      flash[:error] = $!
-    end
+
   end
 
   #save parameters for new questions
@@ -425,15 +423,19 @@ class QuestionnairesController < ApplicationController
     if params[:new_question]
       # The new_question array contains all the new questions
       # that should be saved to the database
+
       for question_key in params[:new_question].keys
+
         q = Question.new()
         q.txt=params[:new_question][question_key]
         q.questionnaire_id = questionnaire_id
         q.type = params[:question_type][question_key][:type]
+        q.seq = question_key.to_i
         if @questionnaire.type == "QuizQuestionnaire"
           q.weight = 1 #setting the weight to 1 for quiz questionnaire since the model validates this field
         end
         unless q.txt.strip.empty?
+
           q.save
         end
       end
@@ -470,12 +472,14 @@ class QuestionnairesController < ApplicationController
   # Handles questions whose wording changed as a result of the edit
   # @param [Object] questionnaire_id
   def save_questions(questionnaire_id)
+
     delete_questions questionnaire_id
     save_new_questions questionnaire_id
+
     if params[:question]
       for question_key in params[:question].keys
-        begin
-          if params[:question][question_key][:txt].strip.empty?
+
+        if params[:question][question_key][:txt].strip.empty?
             # question text is empty, delete the question
             Question.delete(question_key)
           else
@@ -485,9 +489,7 @@ class QuestionnairesController < ApplicationController
               Rails.logger.info(question.errors.messages.inspect)
             end
           end
-        rescue ActiveRecord::RecordNotFound
-          # ignored
-        end
+
       end
     end
   end
@@ -502,23 +504,21 @@ class QuestionnairesController < ApplicationController
 
       for question in questions
         q_type = params[:question_type][questionnum.to_s][:type]
-        if(q_type!="Essay")
-          for choice_key in params[:new_choices][questionnum.to_s][q_type].keys
 
+          for choice_key in params[:new_choices][questionnum.to_s][q_type].keys
             if params[:new_choices][questionnum.to_s][q_type][choice_key]["weight"] == 1.to_s
               score = 1
             else
               score = 0
             end
-
-            if(q_type=="MCC")
+            if(q_type=="MultipleChoiceCheckbox")
               if (params[:new_choices][questionnum.to_s][q_type][choice_key][:iscorrect]==1.to_s)
                 q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "true",:question_id => question.id)
               else
                 q = QuizQuestionChoice.new(:txt => params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], :iscorrect => "false",:question_id => question.id)
               end
               q.save
-            else  if(q_type=="TF")
+            elsif(q_type=="TrueFalse")
               if (params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect]==choice_key)
                 q = QuizQuestionChoice.new(:txt => "True", :iscorrect => "true",:question_id => question.id)
                 q.save
@@ -539,14 +539,11 @@ class QuestionnairesController < ApplicationController
               q.save
             end
           end
-
         end
-      end
+
       questionnum += 1
       question.weight = 1
-      question.true_false = false
     end
-  end
   end
 
   private

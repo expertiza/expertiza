@@ -1,4 +1,6 @@
 class Dropdown < UnscoredQuestion
+  validates_presence_of :alternatives
+  
   def edit(count)
   	html ='<tr>'
     html+='<td align="center"><a rel="nofollow" data-method="delete" href="/questions/' +self.id.to_s+ '">Remove</a></td>'

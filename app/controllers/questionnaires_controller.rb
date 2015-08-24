@@ -204,10 +204,42 @@ class QuestionnairesController < ApplicationController
 
   #Zhewei: This method is used to add new questions when creating or editing questionnaire.
   def add_new_questions
-    (1..params[:question][:total_num].to_i).each do |i|
-      Object.const_get(params[:question][:type]).create(id: Question.last.id+1, txt: 'Edit question content here', weight: 1, questionnaire_id: params[:id], seq: 0, type: params[:question][:type], break_before: true)
+    if params[:id] == nil 
+      #which means this questionnaire has not been created, so create questionnaire first
+      questionnaire_private = params[:private] == "1" ? true : false
+      display_type = params[:questionnaire_type].split('Questionnaire')[0]
+      questionnaire = Object.const_get(params[:questionnaire_type]).create(name: params[:questionnaire][:name], instructor_id: session[:user].id, private: questionnaire_private, min_question_score: params[:questionnaire][:min_question_score], max_question_score: params[:questionnaire][:max_question_score], type: params[:questionnaire_type], display_type: display_type)
+      #Create node
+      tree_folder = TreeFolder.find_by_name(questionnaire.display_type)
+      parent = FolderNode.find_by_node_object_id(tree_folder.id)
+      QuestionnaireNode.create(parent_id: parent.id, node_object_id: questionnaire.id, type: 'QuestionnaireNode')
+      questionnaire_id = questionnaire.id.to_s
     end
-    redirect_to edit_questionnaire_path(params[:id].to_sym)
+    
+    questionnaire_id = params[:id] if params[:id] != nil
+    (1..params[:question][:total_num].to_i).each do |i|
+      question = Object.const_get(params[:question][:type]).create(txt: 'Edit question content here', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
+      if question.is_a? ScoredQuestion
+        question.weight = 1
+        question.max_label = 'Strong agree'
+        question.min_label = 'Not agree'
+      end
+      if question.is_a? Criterion
+        question.size = '50,3'
+      end
+      if question.is_a? Dropdown
+        question.alternatives = '0|1|2|3|4|5'
+      end
+      if question.is_a? TextResponse
+        question.size = '60,5'
+      end
+      begin
+        question.save
+      rescue
+        flash[:error] = $!
+      end
+    end
+    redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
   end
   #=========================================================================================================
   #Separate methods for quiz questionnaire

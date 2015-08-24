@@ -65,7 +65,7 @@ class StudentQuizzesController < ApplicationController
       score = 0
       correct_answers = QuizQuestionChoice.where(question_id: question.id, iscorrect: true)
       ques_type = question.q_type
-      if ques_type.eql? 'MCC'
+      if ques_type.eql? 'MultipleChoiceCheckbox'
         if params["#{question.id}"].nil?
           valid = false
         else
@@ -82,7 +82,7 @@ class StudentQuizzesController < ApplicationController
           else
             score = 0
           end
-          #for MCC, score =1 means the quiz taker have done this question correctly, not just make select this choice correctly.
+          #for MultipleChoiceCheckbox, score =1 means the quiz taker have done this question correctly, not just make select this choice correctly.
           params["#{question.id}"].each do |choice|
             new_score = Answer.new comments: choice, question_id: question.id, response_id: response.id, :answer => score
 
@@ -92,7 +92,7 @@ class StudentQuizzesController < ApplicationController
             scores.push(new_score)
           end
         end
-      else #TF and MCR
+      else #TrueFalse and MultipleChoiceRadio
         correct_answer = correct_answers.first
         if correct_answer.txt==params["#{question.id}"]
           score=1

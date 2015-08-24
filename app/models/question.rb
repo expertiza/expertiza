@@ -40,15 +40,15 @@ class Question < ActiveRecord::Base
     self.destroy
   end
 
-  # for quiz questions, we store 'TF', 'MCC', 'MCR' in the DB, and the full names are returned below
+  # for quiz questions, we store 'TrueFalse', 'ultipleChoiceCheckbox', 'MultipleChoiceRadio' in the DB, and the full names are returned below
   def get_formatted_question_type
     type = self.q_type
 
-    if type == 'TF'
+    if type == 'TrueFalse'
       return 'True/False'
-    elsif type == 'MCC'
+    elsif type == 'MultipleChoiceCheckbox'
       return 'Multiple Choice - Checked'
-    elsif type == 'MCR'
+    elsif type == 'MultipleChoiceRadio'
       return 'Multiple Choice - Radio'
     end
   end

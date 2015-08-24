@@ -1,3 +1,0 @@
-class MultipleChoiceCheckbox < QuizQuestion
-
-end

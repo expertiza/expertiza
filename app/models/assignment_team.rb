@@ -251,7 +251,6 @@ class AssignmentTeam < Team
 
   #for an existing team, after a new_participant joins, update the directory_num for the new participant
   def update_dirctory_num_for_new_member(new_participant)
-    binding.pry
     dir_num = nil
     participants.each do |participant|
       if !participant.directory_num.nil?

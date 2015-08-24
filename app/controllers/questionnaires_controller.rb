@@ -205,7 +205,27 @@ class QuestionnairesController < ApplicationController
   #Zhewei: This method is used to add new questions when creating or editing questionnaire.
   def add_new_questions
     (1..params[:question][:total_num].to_i).each do |i|
-      Object.const_get(params[:question][:type]).create(id: Question.last.id+1, txt: 'Edit question content here', weight: 1, questionnaire_id: params[:id], seq: 0, type: params[:question][:type], break_before: true)
+      question = Object.const_get(params[:question][:type]).create(txt: 'Edit question content here', questionnaire_id: params[:id], seq: i, type: params[:question][:type], break_before: true)
+
+      if question.is_a? ScoredQuestion
+        question.weight = 1
+        question.max_label = 'Strong agree'
+        question.min_label = 'Not agree'
+      end
+      if question.is_a? Criterion
+        question.size = '50,3'
+      end
+      if question.is_a? Dropdown
+        question.alternatives = '0|1|2|3|4|5'
+      end
+      if question.is_a? TextResponse
+        question.size = '60,5'
+      end
+      begin
+        question.save
+      rescue
+        flash[:error] = $!
+      end
     end
     redirect_to edit_questionnaire_path(params[:id].to_sym)
   end

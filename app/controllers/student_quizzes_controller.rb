@@ -100,7 +100,7 @@ class StudentQuizzesController < ApplicationController
           score=0
         end
         new_score = Answer.new :comments => params["#{question.id}"], :question_id => question.id, :response_id => response.id, :answer => score
-        if new_score.comments.empty? || new_score.comments.nil?
+        if new_score.nil? || new_score.comments.nil? || new_score.comments.empty?
           valid = false
         end
         scores.push(new_score)
@@ -112,8 +112,9 @@ class StudentQuizzesController < ApplicationController
       end
       redirect_to :controller => 'student_quizzes', :action => 'finished_quiz', :map_id => map.id
     else
+      response.destroy
       flash[:error] = "Please answer every question."
-      redirect_to :action => :take_quiz, :assignment_id => params[:assignment_id], :questionnaire_id => questionnaire.id
+      redirect_to :action => :take_quiz, :assignment_id => params[:assignment_id], :questionnaire_id => questionnaire.id, :map_id => map.id
     end
   end
 

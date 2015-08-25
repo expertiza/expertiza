@@ -1,8 +1,6 @@
 <%= error_messages_for 'questionnaire' %>
 <!--Zhewei: the reason why we put an empty form_tag here: https://github.com/expertiza/expertiza/blob/53212b6967e9b2d6362d91846bc268ecf1750c6b/app/views/sign_up_sheet/_add_signup_topics_staggered.html.erb-->
-<%= form_tag :action => 'add_new_questions' do %>
-<% end %> 
-<%= form_tag :action => 'add_new_questions', :id => params[:id], :questionnaire_type => params[:model], :private => params[:private] do %>
+
   <table>
     <tr>
       <td valign="top"><label for="questionnaire_name">Name:</label>
@@ -118,7 +116,7 @@
             <%=@question.edit(i)%>
             <% i += 1 %>
          <% end %>
-  <%end %>
+
 </table>
 
 <BR/>

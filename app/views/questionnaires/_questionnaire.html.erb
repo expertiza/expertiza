@@ -40,13 +40,13 @@
               <% if @question.type=="MultipleChoiceCheckbox" %>
                   <%= hidden_field_tag("quiz_question_choices[#{questionnum}][MultipleChoiceCheckbox][#{i}][iscorrect]",'0') %>
                   <%= check_box_tag("quiz_question_choices[#{questionnum}][MultipleChoiceCheckbox][#{i}][iscorrect]",'1', @quiz_question_choice.iscorrect) %>
-                  &nbsp;<%= text_field_tag "quiz_question_choices[#{questionnum}][MultipleChoiceCheckbox][#{i}]", @quiz_question_choice.txt, :size=>40 %>
+                  &nbsp;<%= text_field_tag "quiz_question_choices[#{questionnum}][MultipleChoiceCheckbox][#{i}][txt]", @quiz_question_choice.txt, :size=>40 %>
 
               <% end %>
 
               <%if @question.type=="MultipleChoiceRadio" %>
                 <%= radio_button_tag("quiz_question_choices[#{questionnum}][MultipleChoiceRadio][correctindex]", "#{i}", @quiz_question_choice.iscorrect)%>
-                &nbsp;<%= text_field_tag "quiz_question_choices[#{questionnum}][MultipleChoiceRadio][#{i}]", @quiz_question_choice.txt, :size=>40 %>
+                &nbsp;<%= text_field_tag "quiz_question_choices[#{questionnum}][MultipleChoiceRadio][#{i}][txt]", @quiz_question_choice.txt, :size=>40 %>
               <% end %>
 
               <%if @question.type=="TrueFalse" %>

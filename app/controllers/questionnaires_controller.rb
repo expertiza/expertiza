@@ -318,21 +318,21 @@ class QuestionnairesController < ApplicationController
         i=1
         for quiz_question_choice in @quiz_question_choices
             if (@question.type=="MultipleChoiceCheckbox")
-              if(params[:quiz_question_choices][@question.id.to_s][@question_type.q_type][i.to_s])
-                  quiz_question_choice.update_attributes(:iscorrect => params[:quiz_question_choices][@question.id.to_s][@question_type.q_type][i.to_s][:iscorrect],:txt=>  params[:quiz_question_choices][@question.id.to_s][@question_type.q_type][i.to_s][:txt])
+              if(params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s])
+                  quiz_question_choice.update_attributes(:iscorrect => params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:iscorrect],:txt=>  params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:txt])
               else
                 quiz_question_choice.update_attributes(:iscorrect => '0',:txt=> params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
               end
             end
             if (@question.type=="MultipleChoiceRadio")
-              if  params[:quiz_question_choices][@question.id.to_s][@question_type.q_type][:correctindex]== i.to_s
-                quiz_question_choice.update_attributes(:iscorrect => '1',:txt=> params[:quiz_question_choices][@question.id.to_s][@question_type.q_type][i.to_s][:txt])
+              if  params[:quiz_question_choices][@question.id.to_s][@question.type][:correctindex]== i.to_s
+                quiz_question_choice.update_attributes(:iscorrect => '1',:txt=> params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:txt])
               else
-                quiz_question_choice.update_attributes(:iscorrect => '0',:txt=> params[:quiz_question_choices][@question.id.to_s][@question_type.q_type][i.to_s][:txt])
+                quiz_question_choice.update_attributes(:iscorrect => '0',:txt=> params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:txt])
               end
             end
             if (@question.type=="TrueFalse")
-              if  params[:quiz_question_choices][@question.id.to_s][@question_type.q_type][1.to_s][:iscorrect]== "True" # the statement is correct
+              if  params[:quiz_question_choices][@question.id.to_s][@question.type][1.to_s][:iscorrect]== "True" # the statement is correct
                 if quiz_question_choice.txt =="True"
                   quiz_question_choice.update_attributes(:iscorrect => '1') # the statement is correct so "True" is the right answer
                 else

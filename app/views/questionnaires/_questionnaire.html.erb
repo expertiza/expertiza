@@ -46,7 +46,7 @@
 
               <%if @question.type=="MultipleChoiceRadio" %>
                 <%= radio_button_tag("quiz_question_choices[#{questionnum}][MultipleChoiceRadio][correctindex]", "#{i}", @quiz_question_choice.iscorrect)%>
-                &nbsp;<%= text_field_tag "quiz_question_choices[#{questionnum}][MultipleChoiceRadio][#{i}]", 'txt', :size=>40 %>
+                &nbsp;<%= text_field_tag "quiz_question_choices[#{questionnum}][MultipleChoiceRadio][#{i}]", @quiz_question_choice.txt, :size=>40 %>
               <% end %>
 
               <%if @question.type=="TrueFalse" %>
@@ -95,7 +95,7 @@
                    "TableHeader"=>"TableHeader",
                    "ColumnHeader"=>"ColumnHeader",
                    } %> question(s)
-             <% end %> 
+
           </td>
         </tr>
       </table>
@@ -115,7 +115,7 @@
             <%=@question.edit(i)%>
             <% i += 1 %>
          <% end %>
-
+  <% end %>
 </table>
 
 <BR/>

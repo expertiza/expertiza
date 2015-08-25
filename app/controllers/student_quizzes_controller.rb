@@ -64,7 +64,7 @@ class StudentQuizzesController < ApplicationController
     questions.each do |question|
       score = 0
       correct_answers = QuizQuestionChoice.where(question_id: question.id, iscorrect: true)
-      ques_type = question.q_type
+      ques_type = question.type
       if ques_type.eql? 'MultipleChoiceCheckbox'
         if params["#{question.id}"].nil?
           valid = false

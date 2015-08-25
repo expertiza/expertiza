@@ -30,7 +30,6 @@
           <% end %>
           <%  @quiz_question_choices = QuizQuestionChoice.where(question_id: @question.id) %>
 
-          <% @question_type= QuestionType.find_by_question_id(@question.id)%>
         </tr>
         <% i=1 %>
 
@@ -38,19 +37,19 @@
           <tr>
           <td>
             &nbsp;&nbsp;&nbsp;
-              <% if @question_type.q_type=="MultipleChoiceCheckbox" %>
+              <% if @question.type=="MultipleChoiceCheckbox" %>
                   <%= hidden_field_tag("quiz_question_choices[#{questionnum}][MultipleChoiceCheckbox][#{i}][iscorrect]",'0') %>
                   <%= check_box_tag("quiz_question_choices[#{questionnum}][MultipleChoiceCheckbox][#{i}][iscorrect]",'1', @quiz_question_choice.iscorrect) %>
-                  &nbsp;<%= text_field "quiz_question_choices[#{questionnum}][MultipleChoiceCheckbox][#{i}]", 'txt', :size=>40 %>
+                  &nbsp;<%= text_field_tag "quiz_question_choices[#{questionnum}][MultipleChoiceCheckbox][#{i}]", @quiz_question_choice.txt, :size=>40 %>
 
               <% end %>
 
-              <%if @question_type.q_type=="MultipleChoiceRadio" %>
+              <%if @question.type=="MultipleChoiceRadio" %>
                 <%= radio_button_tag("quiz_question_choices[#{questionnum}][MultipleChoiceRadio][correctindex]", "#{i}", @quiz_question_choice.iscorrect)%>
-                &nbsp;<%= text_field "quiz_question_choices[#{questionnum}][MultipleChoiceRadio][#{i}]", 'txt', :size=>40 %>
+                &nbsp;<%= text_field_tag "quiz_question_choices[#{questionnum}][MultipleChoiceRadio][#{i}]", 'txt', :size=>40 %>
               <% end %>
 
-              <%if @question_type.q_type=="TrueFalse" %>
+              <%if @question.type=="TrueFalse" %>
                 <% if @quiz_question_choice.txt=="True"%>
                   <%= radio_button_tag("quiz_question_choices[#{questionnum}][TrueFalse][1][iscorrect]", 'True', @quiz_question_choice.iscorrect) %>   True
                 <%end%>

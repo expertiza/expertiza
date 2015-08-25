@@ -71,7 +71,7 @@ class QuestionnairesController < ApplicationController
 
   # Define a new questionnaire
   def new
-    @questionnaire = Object.const_get(params[:model]).new
+    @questionnaire = Object.const_get(params[:model].split.join).new
   end
 
   def create
@@ -151,17 +151,13 @@ class QuestionnairesController < ApplicationController
 
   def update
     @questionnaire = Questionnaire.find(params[:id])
-    if current_user.role == Role.ta
-      @questionnaire.instructor_id = Ta.get_my_instructor(current_user.id)
-    else
-      @questionnaire.instructor_id = current_user.id
+    begin
+      @questionnaire.update_attributes(questionnaire_params)
+      flash[:success] = 'Questionnaire has been updated successfully!'
+    rescue
+      flash[:error] = $!
     end
-
-    if @questionnaire.update_attributes(questionnaire_params)&& save_questions(params[:questionnaire][:id])
-      redirect_to :controller => 'tree_display', :action => 'list'
-    else
-      render 'edit'
-    end
+    redirect_to edit_questionnaire_path(@questionnaire.id.to_s.to_sym)
   end
 
   # Remove a given questionnaire
@@ -198,7 +194,9 @@ class QuestionnairesController < ApplicationController
       flash[:notice] = "The questionnaire's question advice was successfully saved"
       #redirect_to :action => 'list'
       redirect_to :controller => 'advice', :action => 'save_advice'
-    end   ##Rescue clause was removed; why?
+    rescue
+      flash[:error] = $!
+    end 
   end
 
   # Toggle the access permission for this assignment from public to private, or vice versa
@@ -211,7 +209,7 @@ class QuestionnairesController < ApplicationController
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
-  #Zhewei: This method is used to add new questions when creating or editing questionnaire.
+  #Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions    
     questionnaire_id = params[:id] if params[:id] != nil
     (1..params[:question][:total_num].to_i).each do |i|

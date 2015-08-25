@@ -14,15 +14,19 @@
   <table>
      <tr>
        <td>Min question score:</td>
-       <td><%= text_field 'questionnaire', 'min_question_score', :size=> 1, :value=>0 %>&nbsp;&nbsp;</td>
+       <td><%= text_field 'questionnaire', 'min_question_score', :size=> 1, :value=>@questionnaire.min_question_score ||= 0 %>&nbsp;&nbsp;</td>
        <td>Max question score:</td>
-       <td><%= text_field 'questionnaire', 'max_question_score', :size=> 1, :value=>5 %>&nbsp;&nbsp;</td>
+       <td><%= text_field 'questionnaire', 'max_question_score', :size=> 1, :value=>@questionnaire.max_question_score ||= 5 %>&nbsp;&nbsp;</td>
        <td>Is this <%= @questionnaire.display_type %> private:</td>
        <td><%= select(:questionnaire, :private, [ ['no', false],['yes',  true]])%>
        </td>
      </tr>
   </table>
-  <%= submit_tag 'Create' %>
+  <% if params[:action] == 'new' %>
+    <%= submit_tag 'Create' %>
+  <% else %>
+    <%= submit_tag 'Update'%>
+  <% end %>
 <% end %>
 
 <!--Question part-->

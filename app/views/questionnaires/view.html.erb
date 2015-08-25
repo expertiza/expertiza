@@ -7,10 +7,10 @@
 
 <TABLE>
   <TR>
-    <TH align="left" width="60%">Question</TH>
-    <TH align="left">Type</TH>
-    <TH>Weight</TH>
-    <TH>Score Range</TH>
+    <TH align="left" width="60%"> Question </TH>
+    <TH align="left">&nbsp Type &nbsp</TH>
+    <TH align="left">&nbsp Weight &nbsp</TH>
+    <TH align="left">&nbsp Score Range &nbsp</TH>
   </TR>
   <%questions=@questionnaire.questions.sort { |a,b| a.seq <=> b.seq }%>
   <%questions.each do |question| %>

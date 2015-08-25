@@ -3,10 +3,6 @@ class MultipleChoiceCheckbox < QuizQuestion
 
   end
 
-  def view_question_text
-
-  end
-
   def complete(count, answer=nil)
 
   end

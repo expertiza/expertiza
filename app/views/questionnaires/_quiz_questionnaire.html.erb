@@ -1,0 +1,122 @@
+<%= error_messages_for 'questionnaire' %>
+<!--Zhewei: the reason why we put an empty form_tag here: https://github.com/expertiza/expertiza/blob/53212b6967e9b2d6362d91846bc268ecf1750c6b/app/views/sign_up_sheet/_add_signup_topics_staggered.html.erb-->
+
+  <table>
+    <tr>
+      <td valign="top"><label for="questionnaire_name">Name:</label>
+        <%= text_field 'questionnaire', 'name'  %>
+        <%= hidden_field 'questionnaire', 'id' %>
+        <%= hidden_field 'questionnaire', 'type' %>
+      </td>
+    </tr>
+  </table>
+  <br/>
+  <% if @questionnaire.type == 'QuizQuestionnaire' %>        
+  <!--handle a questionnaire differently if it is a quiz-->
+    <table id="questions_table">
+      <% if $disp_flag != 1 %>
+        <tr>
+          <td align=left width=300>Questions:</td>
+          <%  if @questionnaire.type != 'QuizQuestionnaire' %><td align=left>weight</td><%end%>
+
+        </tr>
+      <% end %>
+
+      <% for @question in @questionnaire.questions %>
+          <% questionnum=@question.id %>
+        <tr>
+          <% if $disp_flag != 1 %>
+            <td > <%= text_area "question[]", 'txt', :cols=>100 %></td>
+          <% end %>
+          <%  @quiz_question_choices = QuizQuestionChoice.where(question_id: @question.id) %>
+
+        </tr>
+        <% i=1 %>
+
+        <% for @quiz_question_choice in @quiz_question_choices %>
+          <tr>
+          <td>
+            &nbsp;&nbsp;&nbsp;
+              <% if @question.type=="MultipleChoiceCheckbox" %>
+                  <%= hidden_field_tag("quiz_question_choices[#{questionnum}][MultipleChoiceCheckbox][#{i}][iscorrect]",'0') %>
+                  <%= check_box_tag("quiz_question_choices[#{questionnum}][MultipleChoiceCheckbox][#{i}][iscorrect]",'1', @quiz_question_choice.iscorrect) %>
+                  &nbsp;<%= text_field_tag "quiz_question_choices[#{questionnum}][MultipleChoiceCheckbox][#{i}][txt]", @quiz_question_choice.txt, :size=>40 %>
+
+              <% end %>
+
+              <%if @question.type=="MultipleChoiceRadio" %>
+                <%= radio_button_tag("quiz_question_choices[#{questionnum}][MultipleChoiceRadio][correctindex]", "#{i}", @quiz_question_choice.iscorrect)%>
+                &nbsp;<%= text_field_tag "quiz_question_choices[#{questionnum}][MultipleChoiceRadio][#{i}][txt]", @quiz_question_choice.txt, :size=>40 %>
+              <% end %>
+
+              <%if @question.type=="TrueFalse" %>
+                <% if @quiz_question_choice.txt=="True"%>
+                  <%= radio_button_tag("quiz_question_choices[#{questionnum}][TrueFalse][1][iscorrect]", 'True', @quiz_question_choice.iscorrect) %>   True
+                <%end%>
+
+                <% if @quiz_question_choice.txt=="False"%>
+                    <%= radio_button_tag("quiz_question_choices[#{questionnum}][TrueFalse][1][iscorrect]", 'False', @quiz_question_choice.iscorrect) %>   False
+                <%end%>
+              <% end %>
+          </td>
+          </tr>
+          <% i+=1 %> <br>
+        <%end %>
+
+      <% end %>
+    </table>
+  <% else %>
+      <table>
+         <tr>
+           <td>Min question score:</td>
+           <td><%= text_field 'questionnaire', 'min_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
+           <td>Max question score:</td>
+           <td><%= text_field 'questionnaire', 'max_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
+           <td>Is this <%= @questionnaire.display_type %> private:</td>
+           <td><%= select(:questionnaire, :private, [ ['no', false],['yes',  true]])%>
+           </td>
+         </tr>
+      </table>
+      <table id="question_actions_table">
+        <tr>
+          <td>
+              <%= submit_tag 'Add' %>
+              <%= text_field 'question', 'total_num', :size => 1, :value => "1" %> more 
+              <%= select "question", "type", 
+                  {"Criterion" =>"Criterion",
+                   "Scale"=>"Scale",
+                   "Dropdown"=>"Dropdown",
+                   "MultipleChoice"=>"MultipleChoice",
+                   "Checkbox"=>"Checkbox",
+                   "TextArea"=>"TextArea",
+                   "TextField"=>"TextField",
+                   "UploadFile"=>"UploadFile",
+                   "SectionHeader"=>"SectionHeader",
+                   "TableHeader"=>"TableHeader",
+                   "ColumnHeader"=>"ColumnHeader",
+                   } %> question(s)
+
+          </td>
+        </tr>
+      </table>
+      <hr/>
+       <table id="questions_table">
+         <tr>
+           <th class="head" align="center" width="30">Action</td>
+           <th class="head" align="center" width="30">Seq</td>
+           <th class="head" align="center" width="300">Question</td>
+           <th class="head" align="center" width="100">Type</td>
+           <th class="head" align="center">Weight</td>
+         </tr>
+
+         <% i = 1 %>
+         <%questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }%>
+         <% for @question in questions %>
+            <%=@question.edit(i)%>
+            <% i += 1 %>
+         <% end %>
+  <% end %>
+</table>
+
+<BR/>
+

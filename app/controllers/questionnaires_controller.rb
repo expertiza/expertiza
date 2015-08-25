@@ -69,16 +69,36 @@ class QuestionnairesController < ApplicationController
     @questionnaire = Questionnaire.find(params[:id])
   end
 
-    # Define a new questionnaire
+  # Define a new questionnaire
   def new
     @questionnaire = Object.const_get(params[:model]).new
-    @questionnaire.private = params[:private]
-    @questionnaire.min_question_score = Questionnaire::DEFAULT_MIN_QUESTION_SCORE
-    @questionnaire.max_question_score = Questionnaire::DEFAULT_MAX_QUESTION_SCORE
-    @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
   end
 
-  # Save the new questionnaire to the database
+  def create
+    questionnaire_private = params[:questionnaire][:private] == "true" ? true : false
+    display_type = params[:questionnaire][:type].split('Questionnaire')[0]
+    @questionnaire = Object.const_get(params[:questionnaire][:type]).new
+    @questionnaire.private = questionnaire_private
+    @questionnaire.name = params[:questionnaire][:name]
+    @questionnaire.instructor_id = session[:user].id
+    @questionnaire.min_question_score =  params[:questionnaire][:min_question_score]
+    @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
+    @questionnaire.type = params[:questionnaire][:type]
+    @questionnaire.display_type = display_type
+    @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
+    begin
+      @questionnaire.save
+      #Create node
+      tree_folder = TreeFolder.find_by_name(@questionnaire.display_type)
+      parent = FolderNode.find_by_node_object_id(tree_folder.id)
+      QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id, type: 'QuestionnaireNode')
+      flash[:success] = 'You have created a questionnaire successfully!'
+    rescue
+      flash[:error] = $!
+    end
+    redirect_to :controller => 'tree_display', :action => 'list'
+  end
+
   def create_questionnaire
     @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
 
@@ -109,17 +129,6 @@ class QuestionnairesController < ApplicationController
 
       redirect_to :controller => 'tree_display', :action => 'list'
     end
-  end
-
-  def create
-    @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
-    if (session[:user]).role.name == "Teaching Assistant"
-      @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
-    else
-      @questionnaire.instructor_id = session[:user].id
-    end
-    save
-    redirect_to :controller => 'tree_display', :action => 'list'
   end
 
   # Edit a questionnaire
@@ -203,19 +212,7 @@ class QuestionnairesController < ApplicationController
   end
 
   #Zhewei: This method is used to add new questions when creating or editing questionnaire.
-  def add_new_questions
-    if params[:id] == nil 
-      #which means this questionnaire has not been created, so create questionnaire first
-      questionnaire_private = params[:private] == "1" ? true : false
-      display_type = params[:questionnaire_type].split('Questionnaire')[0]
-      questionnaire = Object.const_get(params[:questionnaire_type]).create(name: params[:questionnaire][:name], instructor_id: session[:user].id, private: questionnaire_private, min_question_score: params[:questionnaire][:min_question_score], max_question_score: params[:questionnaire][:max_question_score], type: params[:questionnaire_type], display_type: display_type)
-      #Create node
-      tree_folder = TreeFolder.find_by_name(questionnaire.display_type)
-      parent = FolderNode.find_by_node_object_id(tree_folder.id)
-      QuestionnaireNode.create(parent_id: parent.id, node_object_id: questionnaire.id, type: 'QuestionnaireNode')
-      questionnaire_id = questionnaire.id.to_s
-    end
-    
+  def add_new_questions    
     questionnaire_id = params[:id] if params[:id] != nil
     (1..params[:question][:total_num].to_i).each do |i|
       question = Object.const_get(params[:question][:type]).create(txt: 'Edit question content here', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)

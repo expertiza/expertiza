@@ -12,10 +12,7 @@
         <%= submit_tag "Create Quiz", :name=>"save" %>
     <% end %>
 <% else %>
-    <%= form_tag :action => 'create_questionnaire', :pid => @participant_id, :aid => @assignment_id do %>
-        <%= render :partial => 'questionnaire' %>
-        <%= submit_tag "Create #{@questionnaire.display_type.downcase}", :name=>"save" %>
-    <% end %>
+
 <% end %>
 <br />
 <a href="javascript:window.history.back()">Back</a>

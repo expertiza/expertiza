@@ -6,10 +6,10 @@
 <% i = 1 %>
 <% @questions.each do |question| %>
   <b>Question <%= i %>: </b><%= label_tag "#{question.id}", question.txt %> <br>
-  <% question_type = question.q_type %>
+  <% question_type = question.type %>
 
 
-  <% if question_type.q_type.eql? 'MCR' %>
+  <% if question_type.eql? 'MultipleChoiceRadio' %>
     <% QuizQuestionChoice.where(question_id: question.id).each do |answer|  %>
       <% if(answer.iscorrect) %>
         <b><%= p answer.txt  %></b> -- Correct <br>
@@ -28,14 +28,12 @@
     <%end%>
     <br><br>
 
-  <% elsif question_type.q_type.eql? 'MCC' %>
-    <%= p 'Correct answer is: '%>
+  <% elsif question_type.eql? 'MultipleChoiceCheckbox' %>
     <br>
     <% QuizQuestionChoice.where(question_id: question.id).each do |answer|  %>
       <% if(answer.iscorrect) %>
         <b><%= p answer.txt  %></b> -- Correct <br>
       <%else%>
-        <%= p answer.txt  %><br>
       <% end %>
     <% end %><br>
 
@@ -53,7 +51,7 @@
     <% end %>
     <br>
 
-  <% elsif(question_type.q_type == 'TF') %>
+  <% elsif(question_type == 'TrueFalse') %>
     Correct Answer is: <b><%=QuizQuestionChoice.where(question_id: question.id,iscorrect: 1).first.txt%></b><br/>
     <%user_answer=Answer.where(response_id: @response.id, question_id:  question.id).first%>
     Your answer is: <b><%= user_answer.comments %></b>

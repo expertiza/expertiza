@@ -55,21 +55,35 @@
       </td>
     </tr>
   </table>
-  <table id="questions_table">
-    <tr>
-      <th class="head" align="center" width="30">Action</td>
-      <th class="head" align="center" width="30">Seq</td>
-      <th class="head" align="center" width="300">Question</td>
-      <th class="head" align="center" width="100">Type</td>
-      <th class="head" align="center">Weight</td>
-    </tr>
-    <% i = 1 %>
-    <%questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }%>
-    <% for @question in questions %>
-      <%=@question.edit(i)%>
-      <% i += 1 %>
-    <% end %>
-  </table>
+  
+  <%= form_tag :action => 'save_all_questions', :id => params[:id], :questionnaire_type => params[:model], :private => params[:private] do %>
+    <table id="questions_table">
+      <tr>
+        <th class="head" align="center" width="30">Action</td>
+        <th class="head" align="center" width="30">Seq</td>
+        <th class="head" align="center" width="300">Question</td>
+        <th class="head" align="center" width="100">Type</td>
+        <th class="head" align="center">Weight</td>
+      </tr>
+      <% i = 1 %>
+      <%questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }%>
+      <% for @question in questions %>
+        <%=@question.edit(i)%>
+        <% i += 1 %>
+      <% end %>
+    </table>
+    <%= submit_tag "Save #{@questionnaire.display_type.downcase} questionnaire", :name=>"save" %>
+    <input style="margin-left:36em" type="submit" name="view_advice" value="Edit/View advice"/>
+    
+    <hr/>
+    <h4>Import/Export (from/to CSV format)</h4>
+    <input type="file" name="csv" />
+    <font size="-1"&nbsp;&nbsp; Format: {question}, {'Numeric' | 'True/False'}, {1-5} ></font>
+    <br />
+    <input type="submit" name="import" value="Import questions"/>
+    <br />
+    <%= submit_tag "Export questions to CSV", :name=>"export" %>
+  <% end %>
 <% end %>
 
 <BR/>

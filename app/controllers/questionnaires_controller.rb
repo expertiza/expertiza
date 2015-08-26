@@ -135,18 +135,6 @@ class QuestionnairesController < ApplicationController
   def edit
     @questionnaire = Questionnaire.find(params[:id])
     redirect_to Questionnaire if @questionnaire == nil
-
-    if params['save']
-      @questionnaire.update_attributes(params[:questionnaire])
-      redirect_to :action => 'view',:id => @questionnaire
-    end
-
-    export if params['export']
-    import if params['import']
-
-    if params['view_advice']
-      redirect_to :controller => 'advice', :action => 'edit_advice', :id => params[:questionnaire][:id]
-    end
   end
 
   def update
@@ -233,6 +221,35 @@ class QuestionnairesController < ApplicationController
       rescue
         flash[:error] = $!
       end
+    end
+    redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+  end
+
+  #Zhewei: This method is used to save all questions in current questionnaire.
+  def save_all_questions
+    questionnaire_id = params[:id] if params[:id] != nil
+    if params['save']
+      params[:question].each_pair do |k, v|
+        @question = Question.find(k)
+        #example of 'v' value
+        #{"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
+        v.each_pair do |key, value|
+          @question.send(key+'=', value) if @question.send(key) != value
+        end
+        begin
+          @question.save
+          flash[:success] = 'All questions has been saved successfully!'
+        rescue
+          flash[:error] = $!
+        end
+      end
+    end
+
+    export if params['export']
+    import if params['import']
+
+    if params['view_advice']
+      redirect_to :controller => 'advice', :action => 'edit_advice', :id => params[:questionnaire][:id]
     end
     redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
   end
@@ -550,7 +567,6 @@ class QuestionnairesController < ApplicationController
     end
   end
 
-  private
   def questionnaire_params
     params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score, :max_question_score, :type, :display_type, :instruction_loc)
   end

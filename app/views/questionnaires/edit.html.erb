@@ -11,25 +11,7 @@
   <br/>
   <%= link_to 'Back', :controller => 'submitted_content', :action => 'edit', :id => params[:pid] %>
 <% else %>
-  <%= form_for @questionnaire, :multipart => true do %>
-    <%= render :partial => 'questionnaire' %>
-
-    <%= submit_tag "Save #{@questionnaire.display_type.downcase} questionnaire", :name=>"save" %>
-    <input style="margin-left:36em" type="submit" name="view_advice" value="Edit/View advice"/>
-
-    <hr/>
-    <h4>Import/Export (from/to CSV format)</h4>
-    <input type="file" name="csv" />
-    <font size="-1"&nbsp;&nbsp; Format: {question}, {'Numeric' | 'True/False'}, {1-5} ></font>
-    <br />
-    <input type="submit" name="import" value="Import questions"/>
-    <br />
-
-    <%= submit_tag "Export questions to CSV", :name=>"export" %>
-
-    <br />
-  <% end %>
+  <%= render :partial => 'questionnaire' %>
   <br />
-
   <%= render :partial => '/shared_scripts/back' %>
 <% end %>

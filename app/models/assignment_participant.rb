@@ -328,12 +328,12 @@ class AssignmentParticipant < Participant
         quiz_responses << qmapping.response
       end
     end
-    scores[:quiz] = Hash.new
-    scores[:quiz][:assessments] = quiz_responses
-    scores[:quiz][:scores] = Answer.compute_quiz_scores(scores[:quiz][:assessments])
+    #scores[:quiz] = Hash.new
+    #scores[:quiz][:assessments] = quiz_responses
+    #scores[:quiz][:scores] = Answer.compute_quiz_scores(scores[:quiz][:assessments])
 
     scores[:total_score] = assignment.compute_total_score(scores)
-    scores[:total_score] += compute_quiz_scores(scores)
+    #scores[:total_score] += compute_quiz_scores(scores)
 
     # move lots of calculation from view(_participant.html.erb) to model
     if self.grade

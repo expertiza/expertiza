@@ -1,37 +1,48 @@
 <h1 xmlns="http://www.w3.org/1999/html"> Listing of All Quiz Questions for <%= Assignment.find(@assignment_id).name %> </h1>
 <table>
-  <% @questions.each do |question| %>
-    <b> <%= question.txt %><br></b>
-    Question ID: <%= question.id %><br>
-    <% question_type = question.get_formatted_question_type%>
-    Question Type: <%= question_type %><br>
+  <%@quiz_questionnaires.each do |questionnaire|%>
+      <%author_team = Team.find(questionnaire.instructor_id)%>
+      <h2> Quiz create by <%=author_team.name%></h2>
 
-    <% if question_type == 'True/False' %>
-      Correct Answer: <%= (QuizQuestionChoice.find_by_question_id(question.id)).txt %><br><br>
-    <% elsif question_type == 'Multiple Choice - Radio' %>
-      <% correct_answer = '' %>
-      Answer Options:<br>
-      <% QuizQuestionChoice.where(question_id: question.id).each do |choice| %>
-        <% if choice.iscorrect == true  %>
-          <% correct_answer = choice.txt %>
+      <%topic_id = SignedUpTeam.topic_id_by_team_id(author_team.id)%>
+      <%if topic_id.nil?%>
+          <%topic_name=nil%>
+      <%else%>
+          <%topic_name = SignUpTopic.find(topic_id).topic_name%>
+          <h4> Topic: <%=topic_name%></h4>
+      <%end%>
+
+      <%questions = questionnaire.questions%>
+      <% questions.each do |question| %>
+        <b> <%= question.txt %><br></b>
+        <% question_type = question.get_formatted_question_type%>
+        Question Type: <%= question_type %><br>
+
+        <% if question_type == 'True/False' %>
+          Correct Answer: <%= (QuizQuestionChoice.where(question_id: question.id, iscorrect:1).first.txt) %><br><br>
+        <% elsif question_type == 'Multiple Choice - Radio' %>
+          <% correct_answer = '' %>
+          Answer Options:<br>
+          <% QuizQuestionChoice.where(question_id: question.id).each do |choice| %>
+            <% if choice.iscorrect == true  %>
+              &nbsp;&nbsp;<B><%= choice.txt %></B><br>
+            <%else%>
+              &nbsp;&nbsp;<%= choice.txt %><br>
+            <% end %>
+
+          <% end %>
+          <br><br>
+        <% elsif question_type == 'Multiple Choice - Checked' %>
+          Answer Options:<br>
+          <% QuizQuestionChoice.where(question_id: question.id).each do |choice| %>
+            <% if choice.iscorrect == true  %>
+              &nbsp;&nbsp;<B><%= choice.txt %></B><br>
+            <%else%>
+              &nbsp;&nbsp;<%= choice.txt %><br>
+            <% end %>
+          <% end %>
+          <br><br>
         <% end %>
-        &nbsp;&nbsp;<%= choice.txt %><br>
-      <% end %>
-      Correct Answer:<br>
-      &nbsp;&nbsp;<%= correct_answer %><br><br>
-    <% elsif question_type == 'Multiple Choice - Checked' %>
-      <% correct_answers = Array.new %>
-      Answer Options:<br>
-      <% QuizQuestionChoice.where(question_id: question.id).each do |choice| %>
-        <% if choice.iscorrect == true  %>
-          <% correct_answers.push choice.txt %>
-        <% end %>
-        &nbsp;&nbsp;<%= choice.txt %><br>
-      <% end %>
-      Correct Answer(s):<br>
-      <% correct_answers.each do |correct_answer| %>
-        &nbsp;&nbsp;<%= correct_answer %><br>
-      <% end %><br>
-    <% end %> <hr>
+      <% end %><hr>
   <% end %>
 </table>

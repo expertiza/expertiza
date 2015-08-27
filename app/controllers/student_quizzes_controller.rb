@@ -120,13 +120,19 @@ class StudentQuizzesController < ApplicationController
 
   def record_response
     map = ResponseMap.find(params[:map_id])
-    response = Response.new
-    response.map_id = params[:map_id]
-    response.created_at = DateTime.current
-    response.updated_at = DateTime.current
-    response.save
+    # check if there is any response for this map_id. This is to prevent student take same quiz twice
+    if map.response.empty?
+      response = Response.new
+      response.map_id = params[:map_id]
+      response.created_at = DateTime.current
+      response.updated_at = DateTime.current
+      response.save
 
-    calculate_score map,response
+      calculate_score map,response
+    else
+      flash[:error] = "You have already taken this quiz"
+      redirect_to :controller => 'student_quizzes', :action => 'finished_quiz', :map_id => map.id
+    end
 
   end
 

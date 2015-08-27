@@ -1,6 +1,6 @@
 <h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
 
-<% if !@map.contributor.nil? %>
+<% if !@map.contributor.nil? && !@map.instance_of?(FeedbackResponseMap) %>
     <% if @map.assignment.team_assignment? %>
         <% team_member = TeamsUser.find_by_team_id(@map.contributor).user_id%>
         <% topic_id = SignedUpTeam.topic_id(@map.assignment.id, team_member) %>

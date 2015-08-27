@@ -1,5 +1,4 @@
 <%= error_messages_for 'questionnaire' %>
-<!--Zhewei: the reason why we put an empty form_tag here: https://github.com/expertiza/expertiza/blob/53212b6967e9b2d6362d91846bc268ecf1750c6b/app/views/sign_up_sheet/_add_signup_topics_staggered.html.erb-->
 
   <table>
     <tr>
@@ -64,59 +63,7 @@
         <%end %>
 
       <% end %>
-    </table>
-  <% else %>
-      <table>
-         <tr>
-           <td>Min question score:</td>
-           <td><%= text_field 'questionnaire', 'min_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
-           <td>Max question score:</td>
-           <td><%= text_field 'questionnaire', 'max_question_score', :size=> 1 %>&nbsp;&nbsp;</td>
-           <td>Is this <%= @questionnaire.display_type %> private:</td>
-           <td><%= select(:questionnaire, :private, [ ['no', false],['yes',  true]])%>
-           </td>
-         </tr>
-      </table>
-      <table id="question_actions_table">
-        <tr>
-          <td>
-              <%= submit_tag 'Add' %>
-              <%= text_field 'question', 'total_num', :size => 1, :value => "1" %> more 
-              <%= select "question", "type", 
-                  {"Criterion" =>"Criterion",
-                   "Scale"=>"Scale",
-                   "Dropdown"=>"Dropdown",
-                   "MultipleChoice"=>"MultipleChoice",
-                   "Checkbox"=>"Checkbox",
-                   "TextArea"=>"TextArea",
-                   "TextField"=>"TextField",
-                   "UploadFile"=>"UploadFile",
-                   "SectionHeader"=>"SectionHeader",
-                   "TableHeader"=>"TableHeader",
-                   "ColumnHeader"=>"ColumnHeader",
-                   } %> question(s)
-
-          </td>
-        </tr>
-      </table>
-      <hr/>
-       <table id="questions_table">
-         <tr>
-           <th class="head" align="center" width="30">Action</td>
-           <th class="head" align="center" width="30">Seq</td>
-           <th class="head" align="center" width="300">Question</td>
-           <th class="head" align="center" width="100">Type</td>
-           <th class="head" align="center">Weight</td>
-         </tr>
-
-         <% i = 1 %>
-         <%questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }%>
-         <% for @question in questions %>
-            <%=@question.edit(i)%>
-            <% i += 1 %>
-         <% end %>
+    </table> 
   <% end %>
-</table>
-
 <BR/>
 

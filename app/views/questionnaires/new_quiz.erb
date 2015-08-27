@@ -3,7 +3,7 @@
 <% if @questionnaire.type == "QuizQuestionnaire" %>    <!--handle a questionnaire differently if it is a quiz-->
     <%= form_tag :action => 'create_quiz_questionnaire', :pid => @participant_id, :aid => @assignment_id do %>
         <% $disp_flag = 1 %>
-        <%= render :partial => 'questionnaire' %>
+        <%= render :partial => 'quiz_questionnaire' %>
         <% $disp_flag = 0 %>
 
         <%= render :partial => 'new_question_template' %>

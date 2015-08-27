@@ -1,8 +1,10 @@
 <h2>Answers</h2>
 <b>Quiz score: <%= @quiz_score.round(1) %>%</b>
 
-<%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => @participant, stage: ""} %>
+<%  @assignment = Assignment.find(@participant.parent_id)%>
+<%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage => ""} %>
 
+<br>
 <% i = 1 %>
 <% @questions.each do |question| %>
   <b>Question <%= i %>: </b><%= label_tag "#{question.id}", question.txt %> <br>

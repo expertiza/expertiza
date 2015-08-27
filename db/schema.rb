@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150812190750) do
+ActiveRecord::Schema.define(version: 20150827170101) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -228,6 +228,7 @@ ActiveRecord::Schema.define(version: 20150812190750) do
     t.string   "deadline_name",               limit: 255
     t.string   "description_url",             limit: 255
     t.integer  "quiz_allowed_id",             limit: 4
+    t.integer  "teammate_review_allowed_id",  limit: 4,   default: 3
   end
 
   add_index "due_dates", ["assignment_id"], name: "fk_due_dates_assignments", using: :btree

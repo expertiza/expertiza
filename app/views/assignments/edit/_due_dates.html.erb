@@ -105,7 +105,6 @@
         html += '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]">'
         // }
         html +=
-        '<option value="">No</option>' +
         '<option value="1">No</option>' +
         '<option value="2">Late</option>' +
         '<option value="3">Yes</option>' +
@@ -119,7 +118,14 @@
             html += '<select id="due_date_review_allowed_id" name="assignment_form[due_date][][review_allowed_id]">'
         // }
          html +=
-        '<option value="">No</option>' +
+        '<option value="1">No</option>' +
+        '<option value="2">Late</option>' +
+        '<option value="3">Yes</option>' +
+        '</select></td>';
+
+        html += '<td align="center" class="due_date_teammate_review_allowed_id" width="10%">';
+        html += '<select id="due_date_teammate_review_allowed_id" name="assignment_form[due_date][][teammate_review_allowed_id]">'
+         html +=
         '<option value="1">No</option>' +
         '<option value="2">Late</option>' +
         '<option value="3">Yes</option>' +
@@ -133,7 +139,6 @@
             html += '<select id="due_date_review_of_review_allowed_id" name="assignment_form[due_date][][review_of_review_allowed_id]">'
         // }
         html +=
-        '<option value="">No</option>' +
         '<option value="1">No</option>' +
         '<option value="2">Late</option>' +
         '<option value="3">Yes</option>' +
@@ -143,7 +148,6 @@
         {
             html += '<td align="center" class="due_date_quiz_allowed_id" width="10%">' +
             '<select id="due_date_quiz_allowed_id" name="assignment_form[due_date][][quiz_allowed_id]">' +
-            '<option value="">No</option>' +
             '<option value="1">No</option>' +
             '<option value="2">Late</option>' +
             '<option value="3">Yes</option>' +
@@ -155,7 +159,7 @@
 
         html += '<td align="center" class="due_date_threshold" width="10%">' +
         '<select id="due_date_threshold" name="assignment_form[due_date][][threshold]">' +
-        '<option value="">No</option>' +
+        '<option value="">--</option>' +
         '<option value="1">No</option>' +
         '<option value="8">8</option>' +
         '<option value="16">16</option>' +
@@ -400,18 +404,18 @@
 <table class='exp' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden;'>
 
 <tr id='due_date_heading'>
-<th width=15%>Deadline type</th>
-<th width=20%>Date & time</th>
-<th width=10%>Submission allowed</th>
-<th width=8%>Review allowed</th>
-
-<th width=10%>Meta-review allowed</th>
+<th width=15% style="text-align:left;">Deadline type</th>
+<th width=20% style="text-align:center;">Date & time</th>
+<th width=10% style="text-align:center;">Submission allowed</th>
+<th width=8% style="text-align:center;">Review allowed</th>
+<th width=8% style="text-align:center;">Teammate review allowed</th>
+<th width=10% style="text-align:center;">Meta-review allowed</th>
 <%if @assignment_form.assignment.require_quiz%>
-  <th width=9%>Has quiz</th>
+  <th width=9% style="text-align:center;">Has quiz</th>
 <%end%>
-<th width=8%>Reminder(hrs)</th>
-<th width=10% id="due_date_name_column" >Due date name</th>
-<th width=10% id="due_date_url_column">Description URL</th>
+<th width=8% style="text-align:center;">Reminder(hrs)</th>
+<th width=10% id="due_date_name_column" style="text-align:center;">Due date name</th>
+<th width=10% id="due_date_url_column" style="text-align:center;">Description URL</th>
 
 </tr>
   <tr id='blank' style='display:hidden'></tr>

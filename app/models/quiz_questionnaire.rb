@@ -25,4 +25,8 @@ class QuizQuestionnaire < Questionnaire
       end
     end
 
+  def taken_by_anyone?
+    !ResponseMap.where(reviewed_object_id: self.id, type: 'QuizResponseMap').empty?
+  end
+
   end

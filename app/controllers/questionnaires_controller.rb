@@ -313,7 +313,13 @@ class QuestionnairesController < ApplicationController
   #edit a quiz questionnaire
   def edit_quiz
     @questionnaire = Questionnaire.find(params[:id])
-    render :edit
+    if !@questionnaire.taken_by_anyone?
+      render :edit
+    else
+      flash[:error] = "Your quiz has been taken by some other students, editing cannot be done any more."
+      redirect_to :controller => 'submitted_content', :action => 'view', :id => params[:pid]
+    end
+
   end
 
   #save an updated quiz questionnaire to the database

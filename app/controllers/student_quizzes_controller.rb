@@ -147,13 +147,10 @@ class StudentQuizzesController < ApplicationController
   #This method is only for quiz questionnaires, it is called when instructors click "view quiz questions" on the pop-up panel.
   def review_questions
     @assignment_id = params[:id]
-    @questions = Array.new
+    @quiz_questionnaires = Array.new
     Team.where(parent_id: params[:id]).each do |quiz_creator|
       Questionnaire.where(instructor_id: quiz_creator.id).each do |questionnaire|
-        questions = Question.where(questionnaire_id: questionnaire.id)
-        questions.each do |question|
-          @questions.push question
-        end
+        @quiz_questionnaires.push questionnaire
       end
     end
   end

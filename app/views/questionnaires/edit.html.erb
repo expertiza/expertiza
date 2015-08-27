@@ -3,7 +3,7 @@
 <% if @questionnaire.type == "QuizQuestionnaire" %>
   <%= form_tag({:action=>'update_quiz', :id=>@questionnaire.id, :pid => params[:pid]}, :multipart => true) do %>
     <% $disp_flag=0 %>
-    <%= render :partial => 'questionnaire' %>
+    <%= render :partial => 'quiz_questionnaire' %>
     <% $disp_flag=0 %>
     <%= submit_tag "Save #{@questionnaire.display_type.downcase}", :name=>"save" %>
     <br />

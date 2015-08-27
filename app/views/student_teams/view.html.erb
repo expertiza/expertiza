@@ -17,7 +17,9 @@
     <th class="head">Full Name</th>
     <th class="head">Team-member role (duty)</th>
     <th class="head">Email Address</th>
-    <th class="head">Action</th>
+    <% if @teammate_review_allowed %>
+      <th class="head">Action</th>
+    <% end %>
   </tr>
   <% for member in @student.team.participants %>
     <tr>
@@ -31,25 +33,28 @@
         <% end %>
       </td>
       <td><%= member.user.email %></td>
-      <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
+      
+      <% if @teammate_review_allowed %>
+        <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
 
-        <% map = TeammateReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', @student.id, member.id]).first
-        if map.nil?
-          map = TeammateReviewResponseMap.create(:reviewer_id => @student.id, :reviewee_id => member.id, :reviewed_object_id => @student.assignment.id)
-        end
-        review = map.response.last
-        if review.nil? %>
-      <td>
-        <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :return => "teammate"} %>
-      </td>
-    <% else %>
-      <td>
-        <%= link_to "View", {:controller => 'response', :action => 'view', :id => review.id} %>
-      </td>
-      <td>
-        <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "teammate"} %>
-      </td>
-    <% end %>
+          <% map = TeammateReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', @student.id, member.id]).first
+          if map.nil?
+            map = TeammateReviewResponseMap.create(:reviewer_id => @student.id, :reviewee_id => member.id, :reviewed_object_id => @student.assignment.id)
+          end
+          review = map.response.last
+          if review.nil? %>
+          <td>
+            <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :return => "teammate"} %>
+          </td>
+        <% else %>
+          <td>
+            <%= link_to "View", {:controller => 'response', :action => 'view', :id => review.id} %>
+          </td>
+          <td>
+            <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "teammate"} %>
+          </td>
+        <% end %>
+      <% end %>
   <% end %>
 </tr>
       <% end %>

@@ -49,8 +49,12 @@ class StudentQuizzesController < ApplicationController
         next
       end
       quiz_questionnaire = QuizQuestionnaire.where(instructor_id:reviewee_team.id).first
+
+      #if the reviewee team has created quiz
       if quiz_questionnaire
-        quizzes << quiz_questionnaire
+        if !quiz_questionnaire.taken_by? reviewer
+          quizzes << quiz_questionnaire
+        end
       end
     end
     quizzes

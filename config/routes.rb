@@ -270,6 +270,7 @@ Expertiza::Application.routes.draw do
   resources :questions do
     collection do
       get :delete
+      get :review_questions
     end
   end
 

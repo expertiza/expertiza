@@ -42,7 +42,7 @@ class Question < ActiveRecord::Base
 
   # for quiz questions, we store 'TrueFalse', 'ultipleChoiceCheckbox', 'MultipleChoiceRadio' in the DB, and the full names are returned below
   def get_formatted_question_type
-    type = self.q_type
+    type = self.type
 
     if type == 'TrueFalse'
       return 'True/False'

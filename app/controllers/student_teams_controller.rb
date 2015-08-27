@@ -44,6 +44,14 @@ class StudentTeamsController < ApplicationController
 
     @send_invs = Invitation.where from_id: student.user.id, assignment_id: student.assignment.id
     @received_invs = Invitation.where to_id: student.user.id, assignment_id: student.assignment.id, reply_status: 'W'
+    #Get the current due dates
+    @student.assignment.due_dates.each do |due_date|
+      if due_date.due_at > Time.now
+        @current_due_date = due_date
+        break
+      end
+    end
+    @teammate_review_allowed = true if @current_due_date.teammate_review_allowed_id == 3
   end
 
   def create

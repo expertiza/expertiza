@@ -51,12 +51,11 @@ class StudentTeamsController < ApplicationController
         break
       end
     end
-    @teammate_review_allowed = true if @current_due_date.teammate_review_allowed_id == 3
+    @teammate_review_allowed = true if @current_due_date&&@current_due_date.teammate_review_allowed_id == 3
   end
 
   def create
     existing_assignments = AssignmentTeam.where name: params[:team][:name], parent_id: student.parent_id
-
     #check if the team name is in use
     if existing_assignments.empty?
       if(params[:team][:name]==nil||params[:team][:name].length==0)

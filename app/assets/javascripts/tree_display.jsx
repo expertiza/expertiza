@@ -171,7 +171,7 @@ jQuery(document).ready(function() {
             if (this.props.require_quiz) {
               moreContent.push(
                 <span>
-                  <a title="View quiz questions" href={"/questions/review_questions?id="+(parseInt(this.props.id)/2).toString()+"&type=Assignment"}>
+                  <a title="View quiz questions" href={"/student_quizzes/review_questions?id="+(parseInt(this.props.id)/2).toString()+"&type=Assignment"}>
                     <img src="/assets/tree_view/view-survey-24.png" />
                   </a>
                 </span>

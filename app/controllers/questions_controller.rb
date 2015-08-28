@@ -82,18 +82,4 @@ class QuestionsController < ApplicationController
     redirect_to edit_questionnaire_path(questionnaire_id.to_s.to_sym)
   end
 
-  #This method is only for quiz questionnaires, it is called when instructors click "view quiz questions" on the pop-up panel.
-  #We should move it to quiz_questionnaire_controller.
-  def review_questions
-    @assignment_id = params[:id]
-    @questions = Array.new
-    Team.where(parent_id: params[:id]).each do |quiz_creator|
-      Questionnaire.where(instructor_id: quiz_creator.id).each do |questionnaire|
-        questions = Question.where(questionnaire_id: questionnaire.id)
-        questions.each do |question|
-          @questions.push question
-        end
-      end
-    end
-  end
 end

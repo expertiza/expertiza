@@ -144,6 +144,17 @@ class StudentQuizzesController < ApplicationController
     return (Answer.where(question_id: question.id, response_id:  response.id).first)
   end
 
+  #This method is only for quiz questionnaires, it is called when instructors click "view quiz questions" on the pop-up panel.
+  def review_questions
+    @assignment_id = params[:id]
+    @quiz_questionnaires = Array.new
+    Team.where(parent_id: params[:id]).each do |quiz_creator|
+      Questionnaire.where(instructor_id: quiz_creator.id).each do |questionnaire|
+        @quiz_questionnaires.push questionnaire
+      end
+    end
+  end
+
   private
   #authorizations: reader,submitter, reviewer
   def are_needed_authorizations_present?
@@ -155,4 +166,5 @@ class StudentQuizzesController < ApplicationController
       return true
     end
   end
+
 end

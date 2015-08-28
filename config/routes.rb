@@ -270,7 +270,6 @@ Expertiza::Application.routes.draw do
   resources :questions do
     collection do
       get :delete
-      get :review_questions
     end
   end
 
@@ -382,6 +381,7 @@ Expertiza::Application.routes.draw do
       post :record_response
       get :finished_quiz
       get :take_quiz
+      get :review_questions
     end
   end
 

@@ -21,7 +21,7 @@ set :locals_rails_env, "production"
 
 
 set :application, 'expertiza'
-set :repo_url, 'git@github.com:expertiza/expertiza.git'
+set :repo_url, 'https://github.com/expertiza/expertiza.git'
 
 # Default branch is :master
 # ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call

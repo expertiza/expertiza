@@ -51,12 +51,11 @@ class StudentTeamsController < ApplicationController
         break
       end
     end
-    @teammate_review_allowed = true if @current_due_date.teammate_review_allowed_id == 3
+    @teammate_review_allowed = true if @current_due_date&&@current_due_date.teammate_review_allowed_id == 3
   end
 
   def create
     existing_assignments = AssignmentTeam.where name: params[:team][:name], parent_id: student.parent_id
-
     #check if the team name is in use
     if existing_assignments.empty?
       if(params[:team][:name]==nil||params[:team][:name].length==0)
@@ -64,8 +63,7 @@ class StudentTeamsController < ApplicationController
         redirect_to view_student_teams_path student_id: student.id
         return
       end
-      team = AssignmentTeam.new params[:team]
-      team.parent_id = student.parent_id
+      team = AssignmentTeam.new(name: params[:team][:name], parent_id: student.parent_id)
       team.save
       parent = AssignmentNode.find_by_node_object_id student.parent_id
       TeamNode.create parent_id: parent.id, node_object_id: team.id

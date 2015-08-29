@@ -15,7 +15,7 @@
   <tr>
     <th class="head">Username</th>
     <th class="head">Full Name</th>
-    <th class="head">Team-member role (duty)</th>
+    <!--<th class="head">Team-member role (duty)</th>-->
     <th class="head">Email Address</th>
     <% if @teammate_review_allowed %>
       <th class="head">Action</th>
@@ -25,13 +25,13 @@
     <tr>
       <td><%= member.user.name %></td>
       <td><%= member.user.fullname %></td>
-      <td>
-        <% if !member.duty.nil? %>
-          <%= member.duty %>
-        <% else %>
-          <%= 'No duty yet!' %>
-        <% end %>
-      </td>
+      <!--<td> -->
+        <% #if !member.duty.nil? %>
+          <%#= member.duty %>
+        <% #else %>
+          <%#= 'No duty yet!' %>
+        <% #end %>
+      <!--</td> -->
       <td><%= member.user.email %></td>
       
       <% if @teammate_review_allowed %>
@@ -65,7 +65,8 @@
                 remove_participant_student_teams_path(student_id: @student.id, team_id: @student.team.id) %>
   <% end %>
 
-<% if @student.team != nil %>
+<%# this part is temporaly disabled because the role-based reviewing feature needs to be re-done%>
+<% if false && @student.team != nil %>
   <h2>Team-member role (duty)</h2>
 
   <%=form_tag :controller=>'participants', :action=>'update_duties', :student_id=>@student.id do %>
@@ -131,7 +132,7 @@
                <td><b>To &nbsp</b></td>
                <td><b>Reply Status &nbsp</b></td>
              </tr>
-             <% if @send_inv == nil || @send_invs.length == 0 %>
+             <% if @send_invs == nil || @send_invs.length == 0 %>
                <tr>
                  <td>--</td>
                  <td>--</td>

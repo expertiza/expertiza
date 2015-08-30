@@ -198,7 +198,7 @@ class ParticipantsController < ApplicationController
         flash[:error] = "<b>#{params[:participant][:handle]}</b> is already in use for this assignment. Please select a different handle."
         redirect_to :controller => 'participants', :action => 'change_handle', :id => @participant
       else
-        @participant.update_attributes(params[:participant])
+        @participant.update_attributes(participant_params)
         redirect_to :controller => 'student_task', :action => 'view', :id => @participant
       end
     end
@@ -215,5 +215,10 @@ class ParticipantsController < ApplicationController
       flash[:error] = "\"#{name}\" was not removed. Please ensure that \"#{name}\" is not a reviewer or metareviewer and try again."
       end
     redirect_to :controller => 'review_mapping', :action => 'list_mappings', :id => assignment_id
+  end
+
+  private
+  def participant_params
+    params.require(:participant).permit(:can_submit,:can_review,:user_id,:parent_id,:directory_num,:submitted_at,:permission_granted,:penalty_accumulated,:submitted_hypelinks,:grade,:type,:handle,:time_stamp,:digital_signature,:duty,:can_take_quiz)
   end
 end

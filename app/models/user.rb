@@ -176,19 +176,49 @@ class User < ActiveRecord::Base
     password
   end
 
-  def self.import(row,session,id = nil)
-    if row.length != 4
-      raise ArgumentError, "Not enough items"
+  #import method
+  def self.import(row,row_header,session,id = nil)
+    user=User.new
+    if(row_header==nil)
+      if row.length < 3
+        raise ArgumentError, "Not enough items"
+      end
+      user = User.find_by_name(row[0])
+    else
+      index=0
+      row_header.each do |item|
+        if item.strip=="name"
+          user = User.find_by_name(row[index])
+        end
+        index=index+1
+      end
     end
-    user = User.find_by_name(row[0])
 
     if user == nil
-      attributes = ImportFileHelper::define_attributes(row)
-      user = ImportFileHelper::create_new_user(attributes,session)
+      attributes = ImportFileHelper::define_attributes(row,row_header)
+      unless attributes["name"].nil?
+        user = ImportFileHelper::create_new_user(attributes,session)
+      end
     else
-      user.password = row[3].strip
-      user.email = row[2].strip
-      user.fullname = row[1].strip
+      if(row_header==nil)
+        user.password = row[3].strip
+        user.email = row[2].strip
+        user.fullname = row[1].strip
+      else
+        index=0
+        row_header.each do |item|
+          case item.strip
+            when "password"
+              user.password=row[index].strip
+            when "email"
+              user.email=row[index].strip
+            when "fullname"
+              user.fullname=row[index].strip
+            else
+          end
+          index=index+1
+        end
+      end
       user.parent_id = (session[:user]).id
       user.save
     end

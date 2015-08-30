@@ -100,7 +100,7 @@ class QuestionnairesController < ApplicationController
   end
 
   def create_questionnaire
-    @questionnaire = Object.const_get(params[:questionnaire][:type]).new(params[:questionnaire])
+    @questionnaire = Object.const_get(params[:questionnaire][:type]).new(questionnaire_params)
 
     # TODO: check for Quiz Questionnaire?
     if @questionnaire.type == "QuizQuestionnaire" #checking if it is a quiz questionnaire
@@ -327,11 +327,11 @@ class QuestionnairesController < ApplicationController
     @questionnaire = Questionnaire.find(params[:id])
     redirect_to :controller => 'submitted_content', :action => 'view', :id => params[:pid] if @questionnaire == nil
     if params['save']
-      @questionnaire.update_attributes(params[:questionnaire])
+      @questionnaire.update_attributes(questionnaire_params)
 
       for qid in params[:question].keys
         @question = Question.find(qid)
-        @question.update_attributes(params[:question][qid])
+        @question.update_attributes(question_params)
         @quiz_question_choices = QuizQuestionChoice.where(question_id: qid)
         i=1
         for quiz_question_choice in @quiz_question_choices

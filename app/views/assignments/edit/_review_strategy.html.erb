@@ -12,7 +12,7 @@
       </script>
 
       <img src="/assets/info.png" title='- Instructor-Selected: Instructor decides who reviews whom
-      - Auto-Selected: When a student is about to begin a review, Expertiza assigns that student a particular review.'>
+- Auto-Selected: When a student is about to begin a review, Expertiza assigns that student a particular review.'>
     </td>
   </tr>
 
@@ -20,8 +20,7 @@
     <td>
       <%= label_tag('assignment_form[assignment][review_topic_threshold]', 'Review topic threshold (k):') %>
       <%= text_field_tag('assignment_form[assignment][review_topic_threshold]', @assignment_form.assignment.review_topic_threshold, size: 1) %>
-      <img src="/assets/info.png" title='A topic is reviewable if the minimum number of reviews already done for the submissions
-      on that topic is within k of the minimum number of reviews done on the least-reviewed submission on any topic.'>
+      <img src="/assets/info.png" title='A topic is reviewable if the minimum number of reviews already done for the submissions on that topic is within k of the minimum number of reviews done on the least-reviewed submission on any topic.'>
     <br/>
       <%= label_tag('assignment_form[assignment][max_reviews_per_submission]', 'Maximum number of reviews per submission:') %>
       <%= text_field_tag('assignment_form[assignment][max_reviews_per_submission]', @assignment_form.assignment.max_reviews_per_submission, size: 1) %>

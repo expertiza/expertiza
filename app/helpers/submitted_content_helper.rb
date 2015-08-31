@@ -1,6 +1,6 @@
 module SubmittedContentHelper
 
-  def display_directory_tree(participant, files, flag)
+  def display_directory_tree(participant, files, display_to_reviewer_flag)
     index = 0
     participant = @participant if @participant # TODO: Verify why this is needed
     assignment = participant.assignment # participant is @map.contributor
@@ -13,10 +13,10 @@ module SubmittedContentHelper
       begin
         ret += "\n   <tr>"
         ret += "\n   <td valign = top>\n      "
-        if check_stage != "Complete" && flag == false
+        if check_stage != "Complete" && display_to_reviewer_flag == false
           ret += "<input type=radio id='chk_files' name='chk_files' value='#{index}'>"
         else
-          ret += "<b>**</b>&nbsp";
+          ret += "<b>-</b>&nbsp";
         end
         ret += "\n      <input type=hidden id='filenames_#{index}' name='filenames[#{index}]' value='#{File.basename(file)}'>"
         ret += "\n      <input type=hidden id='directories_#{index}' name='directories[#{index}]' value='#{File.dirname(file)}'>"

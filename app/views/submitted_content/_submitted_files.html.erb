@@ -38,7 +38,7 @@ or<br/><br/>
       <% end %>
 
       <table>
-        <tr><td>&nbsp;</td><td><div id="1_myDiv"><%= display_directory_tree(participant, files, false).html_safe %> </div></td></tr>
+        <tr><td>&nbsp;</td><td><div id="1_myDiv"><%= display_directory_tree(participant, files, !same_team_flag).html_safe %> </div></td></tr>
       </table>
     <% end %>
   <% end %>

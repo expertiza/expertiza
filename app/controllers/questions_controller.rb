@@ -75,7 +75,7 @@ class QuestionsController < ApplicationController
     questionnaire_id = question.questionnaire_id
     begin
       question.destroy
-      flash[:success] = "You have deleted one question successfully!"
+      flash[:success] = "You have successfully deleted one question!"
     rescue
       flash[:error] = $!
     end

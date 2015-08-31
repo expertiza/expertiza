@@ -1,11 +1,5 @@
 class TeamsParticipantsController < ApplicationController
 
-  def auto_complete_for_user_name
-    team = Team.find(session[:team_id])
-    @users = team.get_possible_team_members(params[:user][:name])
-    render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
-  end
-
   def list
     @team = Team.find(params[:id])
     @assignment = Assignment.find(@team.assignment_id)

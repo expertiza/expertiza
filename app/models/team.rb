@@ -49,16 +49,6 @@ class Team < ActiveRecord::Base
     end
   end
 
-  def get_possible_team_members(name)
-    query = "select users.* from users, participants"
-    query = query + " where users.id = participants.user_id"
-    query = query + " and participants.type = '"+self.participant_type+"'"
-    query = query + " and participants.parent_id = #{self.parent_id}"
-      query = query + " and users.name like '#{name}%'"
-    query = query + " order by users.name"
-    User.find_by_sql(query)
-  end
-
   def has_user(user)
     users.include? user
   end
@@ -104,13 +94,6 @@ class Team < ActiveRecord::Base
       parent = Object.const_get(self.parent_model).find(self.parent_id)
       TeamUserNode.create(:parent_id => parent.id, :node_object_id => t_user.id)
     }
-  end
-
-  #TODO: no way in hell this method works
-  def self.create_node_object(name, parent_id)
-    create(:name => name, :parent_id => parent_id)
-    parent = Object.const_get(self.parent_model).find(parent_id)
-    Object.const_get(self.get_node_type).create(:parent_id => parent.id, :node_object_id => self.id)
   end
 
   def self.check_for_existing(parent, name, team_type)

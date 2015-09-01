@@ -128,10 +128,10 @@ class ReviewResponseMap < ResponseMap
     team_id =team.id
     responses = Array.new
     if team_id
-      maps = ResponseMap.where(:reviewee_id => team_id, :type => "ReviewResponseMap", :round => round)
+      maps = ResponseMap.where(:reviewee_id => team_id, :type => "ReviewResponseMap")
       maps.each{ |map|
-        if !map.response.empty?
-          responses << map.response.last
+        if !map.response.empty? && !map.response.reject{|r| r.round!=round}.empty?
+          responses << map.response.reject{|r| r.round!=round}.last
         end
       }
       responses.sort! {|a,b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }

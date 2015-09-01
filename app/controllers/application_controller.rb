@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
 
   if Rails.env.production?
     #forcing SSL only in the production mode
-    #force_ssl
+    force_ssl
   end
 
   helper_method :current_user_session, :current_user, :current_user_role?

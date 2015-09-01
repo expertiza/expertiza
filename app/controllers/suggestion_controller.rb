@@ -19,7 +19,7 @@ class SuggestionController < ApplicationController
   end
 
   def add_comment
-    @suggestioncomment = SuggestionComment.new(params[:suggestion_comment])
+    @suggestioncomment = SuggestionComment.new(:vote => params[:suggestion_comment][:vote], :comments => params[:suggestion_comment][:comments])
     @suggestioncomment.suggestion_id=params[:id]
     @suggestioncomment.commenter= session[:user].name
     if  @suggestioncomment.save

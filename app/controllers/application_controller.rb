@@ -3,12 +3,11 @@ class ApplicationController < ActionController::Base
 
   if Rails.env.production?
     #forcing SSL only in the production mode
-    #force_ssl
+    force_ssl
   end
 
   helper_method :current_user_session, :current_user, :current_user_role?
   protect_from_forgery with: :exception
-  #before_filter :redirect_to_https
   before_filter :set_time_zone
   before_filter :authorize
 
@@ -64,10 +63,6 @@ class ApplicationController < ActionController::Base
   def redirect_back(default = :root)
     redirect_to request.env['HTTP_REFERER'] ? :back : default
   end
-
-  #def redirect_to_https
-  #  redirect_to :protocol => "https://" if Rails.env.production?
-  #end
 
   def set_time_zone
     Time.zone = current_user.timezonepref if current_user

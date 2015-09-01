@@ -73,7 +73,7 @@ class SuggestionController < ApplicationController
     @assignment = Assignment.find(session[:assignment_id])
     @suggestion.status = 'Initiated'
     if params[:suggestion_anonymous].nil?
-      @suggestion.unityID = session[:user].id
+      @suggestion.unityID = session[:user].name
     else
       @suggestion.unityID = "";
     end

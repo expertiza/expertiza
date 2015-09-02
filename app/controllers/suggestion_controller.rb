@@ -63,7 +63,7 @@ class SuggestionController < ApplicationController
   def new
     @suggestion = Suggestion.new
     session[:assignment_id] = params[:id]
-    @suggestions = Suggestion.where(unityID: session[:user].id)
+    @suggestions = Suggestion.where(unityID: session[:user].name)
     @assignment = Assignment.find(params[:id])
   end
 

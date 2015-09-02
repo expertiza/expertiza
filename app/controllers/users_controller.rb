@@ -126,6 +126,9 @@ class UsersController < ApplicationController
       @user.timezonepref = User.find(@user.parent_id).timezonepref
 
       if @user.save
+        password = @user.reset_password         # the password is reset
+        MailerHelper::send_mail_to_user(@user, "Your Expertiza password has been reset", "user_welcome", password).deliver
+        flash[:success] = "A new password has been sent to new user's e-mail address."
         #Instructor and Administrator users need to have a default set for their notifications
         # the creation of an AssignmentQuestionnaire object with only the User ID field populated
         # ensures that these users have a default value of 15% for notifications.

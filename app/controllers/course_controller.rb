@@ -45,7 +45,10 @@ class CourseController < ApplicationController
         flash[:error] = $!
       end
     end
-    @course.update_attributes(params[:course])
+    @course.name = params[:course][:name]
+    @course.directory_path = params[:course][:directory_path]
+    @course.info = params[:course][:info]
+    @course.save
     undo_link("Course \"#{@course.name}\" has been updated successfully. ")
     redirect_to :controller => 'tree_display', :action => 'list'
   end
@@ -75,7 +78,7 @@ class CourseController < ApplicationController
 
   # create a course
   def create
-    @course = Course.new(params[:course])
+    @course = Course.new(:name => params[:course][:name],:directory_path => params[:course][:directory_path],:info => params[:course][:info],:private => params[:course][:private])
 
     @course.instructor_id = session[:user].id
     begin

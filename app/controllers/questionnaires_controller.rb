@@ -331,7 +331,9 @@ class QuestionnairesController < ApplicationController
 
       for qid in params[:question].keys
         @question = Question.find(qid)
-        @question.update_attributes(question_params)
+        @question.txt = params[:question][qid.to_sym][:txt]
+        @question.save
+
         @quiz_question_choices = QuizQuestionChoice.where(question_id: qid)
         i=1
         for quiz_question_choice in @quiz_question_choices

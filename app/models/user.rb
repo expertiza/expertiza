@@ -176,49 +176,20 @@ class User < ActiveRecord::Base
     password
   end
 
-  #import method
-  def self.import(row,row_header,session,id = nil)
-    user=User.new
-    if(row_header==nil)
-      if row.length < 3
-        raise ArgumentError, "Not enough items"
-      end
-      user = User.find_by_name(row[0])
-    else
-      index=0
-      row_header.each do |item|
-        if item.strip=="name"
-          user = User.find_by_name(row[index])
-        end
-        index=index+1
-      end
+  def self.import(row, row_header,session,id = nil)
+    if row.length != 3
+      raise ArgumentError, "Not enough items: expect 3 columns: login name, full name (first and last name, not seperated with the delimiter), email"
     end
+    user = User.find_by_name(row[0])
 
     if user == nil
-      attributes = ImportFileHelper::define_attributes(row,row_header)
-      unless attributes["name"].nil?
-        user = ImportFileHelper::create_new_user(attributes,session)
-      end
+      attributes = ImportFileHelper::define_attributes(row)
+      user = ImportFileHelper::create_new_user(attributes,session)
+      password = user.reset_password         # the password is reset
+      MailerHelper::send_mail_to_user(user, "Your Expertiza account and password have been created", "user_welcome", password).deliver
     else
-      if(row_header==nil)
-        user.password = row[3].strip
-        user.email = row[2].strip
-        user.fullname = row[1].strip
-      else
-        index=0
-        row_header.each do |item|
-          case item.strip
-            when "password"
-              user.password=row[index].strip
-            when "email"
-              user.email=row[index].strip
-            when "fullname"
-              user.fullname=row[index].strip
-            else
-          end
-          index=index+1
-        end
-      end
+      user.email = row[2].strip
+      user.fullname = row[1].strip
       user.parent_id = (session[:user]).id
       user.save
     end

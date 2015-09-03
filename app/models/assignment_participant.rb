@@ -501,7 +501,7 @@ class AssignmentParticipant < Participant
 
   # provide import functionality for Assignment Participants
   # if user does not exist, it will be created and added to this assignment
-  def self.import(row,session,id)
+  def self.import(row,row_header=nil,session,id)
     raise ArgumentError, "No user id has been specified." if row.length < 1
     user = User.find_by_name(row[0])
     if user == nil
@@ -510,7 +510,7 @@ class AssignmentParticipant < Participant
       user = ImportFileHelper::create_new_user(attributes,session)
     end
     raise ImportError, "The assignment with id \""+id.to_s+"\" was not found." if Assignment.find(id) == nil
-    if all({conditions: ['user_id=? && parent_id=?', user.id, id]}).size == 0
+    if !AssignmentParticipant.exists?(:user_id => user.id, :parent_id => id)
       new_part = AssignmentParticipant.create(:user_id => user.id, :parent_id => id)
       new_part.set_handle()
     end

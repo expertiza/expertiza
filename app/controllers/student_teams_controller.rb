@@ -84,7 +84,7 @@ class StudentTeamsController < ApplicationController
   def update
     matching_teams = AssignmentTeam.where name: params[:team][:name], parent_id: team.parent_id
     if matching_teams.length.zero?
-      if team.update_attributes params[:team]
+      if team.update_attribute('name',params[:team][:name])
         team_created_successfully
 
           redirect_to view_student_teams_path student_id: params[:student_id]

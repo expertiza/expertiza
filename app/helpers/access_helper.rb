@@ -7,7 +7,7 @@ module AccessHelper
   end
 
   def flash_msg
-    flash[:error] = "This #{current_role_name.downcase} is not allowed to #{params[:action]} this #{params[:controller]}"
+    flash[:error] = "This #{current_role_name.try(:downcase)} is not allowed to #{params[:action]} this #{params[:controller]}"
   end
 
   def all_actions_allowed?

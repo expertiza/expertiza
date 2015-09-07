@@ -135,7 +135,6 @@ Expertiza::Application.routes.draw do
     collection do
       get :start
       get :import
-      post :import
     end
   end
 
@@ -162,6 +161,7 @@ Expertiza::Application.routes.draw do
   resources :join_team_requests do
     collection do
       get :decline
+      get :edit
     end
   end
 
@@ -256,7 +256,6 @@ Expertiza::Application.routes.draw do
       post :create_quiz_questionnaire
       post :update_quiz
       post :add_new_questions
-      post :save_all_questions
     end
   end
 

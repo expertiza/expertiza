@@ -75,7 +75,7 @@ class JoinTeamRequestsController < ApplicationController
   def update
     @join_team_request = JoinTeamRequest.find(params[:id])
     respond_to do |format|
-      if @join_team_request.update_attributes(params[:join_team_request])
+      if @join_team_request.update_attribute(:comments, params[:join_team_request][:comments])
         format.html { redirect_to(@join_team_request, :notice => 'JoinTeamRequest was successfully updated.') }
         format.xml  { head :ok }
       else

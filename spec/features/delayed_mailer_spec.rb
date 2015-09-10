@@ -21,7 +21,7 @@ describe 'Submission deadline reminder email' do
     Delayed::Job.delete_all
     Delayed::Job.count.should == 0
 
-    dj = Delayed::Job.enqueue(DelayedMailer.new(id, "submission", due_at), 1, time_in_min)
+    dj = Delayed::Job.enqueue(DelayedMailer.new(id, "submission", due_at), priority: 1, run_at: time_in_min)
 
     Delayed::Job.count.should == 1
     # dj=Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type, duedates[i].due_at.to_s(:db)) , 1, diff.minutes.from_now)
@@ -46,7 +46,7 @@ describe 'Resubmission deadline reminder email' do
     Delayed::Job.delete_all
     Delayed::Job.count.should == 0
 
-    dj = Delayed::Job.enqueue(DelayedMailer.new(id, "resubmission", due_at), 1, time_in_min)
+    dj = Delayed::Job.enqueue(DelayedMailer.new(id, "resubmission", due_at), priority: 1, run_at: time_in_min)
 
     Delayed::Job.count.should == 1
     Delayed::Job.last.handler.should include("deadline_type: resubmission")
@@ -68,7 +68,7 @@ describe 'Review deadline reminder email' do
     Delayed::Job.delete_all
     Delayed::Job.count.should == 0
 
-    dj = Delayed::Job.enqueue(DelayedMailer.new(id, "review", due_at), 1, time_in_min)
+    dj = Delayed::Job.enqueue(DelayedMailer.new(id, "review", due_at), priority: 1, run_at: time_in_min)
 
     Delayed::Job.count.should == 1
     Delayed::Job.last.handler.should include("deadline_type: review")
@@ -90,7 +90,7 @@ describe 'Metareview deadline reminder email' do
     Delayed::Job.delete_all
     Delayed::Job.count.should == 0
 
-    dj = Delayed::Job.enqueue(DelayedMailer.new(id, "metareview", due_at), 1, time_in_min)
+    dj = Delayed::Job.enqueue(DelayedMailer.new(id, "metareview", due_at), priority: 1, run_at: time_in_min)
 
     Delayed::Job.count.should == 1
     Delayed::Job.last.handler.should include("deadline_type: metareview")
@@ -112,7 +112,7 @@ describe 'Drop Topic deadline reminder email' do
     Delayed::Job.delete_all
     Delayed::Job.count.should == 0
 
-    dj = Delayed::Job.enqueue(DelayedMailer.new(id, "drop_topic", due_at), 1, time_in_min)
+    dj = Delayed::Job.enqueue(DelayedMailer.new(id, "drop_topic", due_at), priority: 1, run_at: time_in_min)
 
     Delayed::Job.count.should == 1
     Delayed::Job.last.handler.should include("deadline_type: drop_topic")
@@ -134,7 +134,7 @@ describe 'Signup deadline reminder email' do
     Delayed::Job.delete_all
     Delayed::Job.count.should == 0
 
-    dj = Delayed::Job.enqueue(DelayedMailer.new(id, "signup", due_at), 1, time_in_min)
+    dj = Delayed::Job.enqueue(DelayedMailer.new(id, "signup", due_at), priority: 1, run_at: time_in_min)
 
     Delayed::Job.count.should == 1
     Delayed::Job.last.handler.should include("deadline_type: signup")
@@ -156,7 +156,7 @@ describe 'Team formation deadline reminder email' do
     Delayed::Job.delete_all
     Delayed::Job.count.should == 0
 
-    dj = Delayed::Job.enqueue(DelayedMailer.new(id, "team_formation", due_at), 1, time_in_min)
+    dj = Delayed::Job.enqueue(DelayedMailer.new(id, "team_formation", due_at), priority: 1, run_at: time_in_min)
 
     Delayed::Job.count.should == 1
     Delayed::Job.last.handler.should include("deadline_type: team_formation")

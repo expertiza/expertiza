@@ -177,7 +177,8 @@ class TreeDisplayController < ApplicationController
           else
             tmpObject["instructor"] = nil
           end
-          tmpObject["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role_id == 6 && is_available(User.find(Ta.get_my_instructor(session[:user].id)),owner_id))
+
+          tmpObject["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role_id == 6 && is_available(User.find(Ta.get_my_instructor(session[:user].id)),instructor_id) && ta_for_current_course?(node))
           if nodeType == "Assignments"
             tmpObject["course_id"] = node.get_course_id
             tmpObject["max_team_size"] = node.get_max_team_size
@@ -195,6 +196,21 @@ class TreeDisplayController < ApplicationController
     respond_to do |format|
       format.html {render json: res}
     end
+  end
+
+  def ta_for_current_course?(node)
+    ta_mappings = TaMapping.where(ta_id: session[:user].id)
+    if node.type == "CourseNode"
+      ta_mappings.each do |ta_mapping|
+        return true if ta_mapping.course_id == node.node_object_id
+      end
+    elsif node.type == "AssignmentNode"
+      course_id = Assignment.find(node.node_object_id).course_id
+      ta_mappings.each do |ta_mapping|
+        return true if ta_mapping.course_id == course_id
+      end
+    end
+    return false
   end
 
   def get_children_node_2_ng
@@ -234,7 +250,7 @@ class TreeDisplayController < ApplicationController
           else
             res2["instructor"] = nil
           end
-          res2["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role_id == 6 && is_available(User.find(Ta.get_my_instructor(session[:user].id)),owner_id))
+          res2["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role_id == 6 && is_available(User.find(Ta.get_my_instructor(session[:user].id)),instructor_id) && ta_for_current_course?(node))
           if nodeType == "AssignmentNode"
             res2["course_id"] = child.get_course_id
             res2["max_team_size"] = child.get_max_team_size

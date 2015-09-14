@@ -134,7 +134,7 @@ Expertiza::Application.routes.draw do
   resources :import_file do
     collection do
       get :start
-      get :import
+      post :import
     end
   end
 

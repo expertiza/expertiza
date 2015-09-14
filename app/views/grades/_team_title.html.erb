@@ -1,5 +1,6 @@
+<%if !@avg_of_avg.nan?%>
 <%= render :partial => 'team_charts', :locals => {:prefix => nil} %>
-
+<%end%>
 <TR class="team" <% if prefix %>id='<%= prefix %>_<%= num + 4 %>' style="display:none"<% end %>>
 	<th style="text-align:center;">&nbsp;</th>
 	<th style="text-align:center;" COLSPAN="<%= col_outer_th_span_value %>">Submitted work</th>

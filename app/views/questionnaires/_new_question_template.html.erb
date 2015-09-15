@@ -22,8 +22,8 @@
     <%= check_box("new_choices[#{i}][MultipleChoiceCheckbox][4]",:iscorrect) %> <%= text_field "new_choices[#{i}][MultipleChoiceCheckbox][4]", :txt, size: 50 %> <br><br>
   </div>
   <div id="qtype<%= i %>">
-    <%= radio_button("question_type[#{i}]","type", "MultipleChoiceRadio") %> Multiple Choice - Radio <br>
-    <%= radio_button("question_type[#{i}]","type", "MultipleChoiceCheckbox") %> Multiple Choice - Checked <br>
+    <%= radio_button("question_type[#{i}]","type", "MultipleChoiceRadio") %> Multiple Choice - Radio button<br>
+    <%= radio_button("question_type[#{i}]","type", "MultipleChoiceCheckbox") %> Multiple Choice - Checkboxes <br>
   </div>
 
 <% end %>

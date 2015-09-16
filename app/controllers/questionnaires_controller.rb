@@ -377,37 +377,43 @@ class QuestionnairesController < ApplicationController
   def valid_quiz
     num_quiz_questions = Assignment.find(params[:aid]).num_quiz_questions
     valid = "valid"
+    binding.pry
 
     (1..num_quiz_questions).each do |i|
       if params[:new_question][i.to_s] == ''
         #One of the questions text is not filled out
         valid = "Please make sure all questions have text"
         break
-      elsif params[:question_type][i.to_s][:type] == nil
+      elsif !params.has_key?(:question_type) || !params[:question_type].has_key?(i.to_s) || params[:question_type][i.to_s][:type] == nil
         #A type isnt selected for a question
         valid = "Please select a type for each question"
         break
+      elsif params[:questionnaire][:name]==""
+        #questionnaire name is not specified
+        valid = "Please specify quiz name (please do not use your name or id)."
+        break
       else
         type = params[:question_type][i.to_s][:type]
-        if type == 'MCC' or type == 'MCR'
+        if type == 'MultipleChoiceCheckbox' or type == 'MultipleChoiceRadio'
           correct_selected = false
           (1..4).each do |x|
+            binding.pry
             if params[:new_choices][i.to_s][type][x.to_s][:txt] == ''
               #Text isnt provided for an option
               valid = "Please make sure every question has text for all options"
               break
-            elsif type == 'MCR' and not params[:new_choices][i.to_s][type][x.to_s][:iscorrect] == nil
+            elsif type == 'MultipleChoiceRadio' and not params[:new_choices][i.to_s][type][x.to_s][:iscorrect] == nil
               correct_selected = true
-            elsif type == 'MCC' and not params[:new_choices][i.to_s][type][x.to_s][:iscorrect] == 0.to_s
+            elsif type == 'MultipleChoiceCheckbox' and not params[:new_choices][i.to_s][type][x.to_s][:iscorrect] == 0.to_s
               correct_selected = true
             end
           end
-          unless correct_selected == true
+          if valid == "valid" && !correct_selected
             #A correct option isnt selected for a check box or radio question
             valid = "Please select a correct answer for all questions"
             break
           end
-        elsif type == 'TF'
+        elsif type == 'TF' # TF is not disabled. We need to test TF later.
           if params[:new_choices][i.to_s]["TF"] == nil
             #A correct option isnt selected for a true/false question
             valid = "Please select a correct answer for all questions"

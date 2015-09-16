@@ -377,7 +377,6 @@ class QuestionnairesController < ApplicationController
   def valid_quiz
     num_quiz_questions = Assignment.find(params[:aid]).num_quiz_questions
     valid = "valid"
-    binding.pry
 
     (1..num_quiz_questions).each do |i|
       if params[:new_question][i.to_s] == ''
@@ -397,7 +396,6 @@ class QuestionnairesController < ApplicationController
         if type == 'MultipleChoiceCheckbox' or type == 'MultipleChoiceRadio'
           correct_selected = false
           (1..4).each do |x|
-            binding.pry
             if params[:new_choices][i.to_s][type][x.to_s][:txt] == ''
               #Text isnt provided for an option
               valid = "Please make sure every question has text for all options"

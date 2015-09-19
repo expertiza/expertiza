@@ -130,9 +130,12 @@ def submit_file
 
   #send message to reviewers when submission has been updated
   participant.assignment.email(participant.id) rescue nil # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
-
-  redirect_to :action => 'edit', :id => participant.id
+  if params[:origin] == 'response'
+    redirect_to :back
+  else
+    redirect_to :action => 'edit', :id => participant.id
   end
+end
 
 
 def folder_action

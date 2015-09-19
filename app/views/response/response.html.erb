@@ -43,6 +43,9 @@
             <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score, @dropdown_or_scale) %>
        <% elsif question.instance_of? Scale %>
             <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score) %>
+       <% elsif question.instance_of? UploadFile %>
+            <!--One form had better not in another form-->
+            <!--Zhewei: I move the Uploadfile question to the end of questionnaire. So multiple forms will not been overlapped.-->
        <% else %>
             <%= question.complete(i, answer) %>
        <% end %>
@@ -66,6 +69,11 @@
     <%= submit_tag "Save "+@title, :name => "save" %>
     <%= hidden_field_tag('return', @return) %>
 <% end %>
-
+<!--Check whether there is a UploadFile question.-->
+<%@questions.each do |question| %>
+    <% if question.instance_of? UploadFile %>
+        <%= render partial: 'submitted_content/submitted_files', locals: {participant: @participant, stage: @stage, origin: 'response'} %>
+    <% end %>
+<% end %>
 <%= @map.show_feedback(@response) %>
 <a href="javascript:window.history.back()">Back</a>

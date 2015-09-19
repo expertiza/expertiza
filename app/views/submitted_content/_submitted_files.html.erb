@@ -8,11 +8,14 @@ current_folder.name = "" %>
 <% if !session_participants_team.nil? and session_participants_team.includes? (participant) %>
   <%same_team_flag = true%>
 <%end%>
-or<br/><br/>
+<% if params[:controller] == 'submitted_content' %>
+  or
+<% end %>
+<br/><br/>
 <b>Submit a file:</b><BR/>
 <% if (files.length > 0 or stage != "Complete")  %>
   <% if same_team_flag && stage != "Complete" %>
-    <%= form_tag({:action=>'submit_file',:id => participant.id},{:method => 'post', :enctype => "multipart/form-data", :onSubmit => "return checkIfFileExists(uploaded_file.value,1);"}) do %>
+    <%= form_tag({:controller=>'submitted_content',:action=>'submit_file',:id => participant.id, :origin => origin ||= nil},{:method => 'post', :enctype => "multipart/form-data", :onSubmit => "return checkIfFileExists(uploaded_file.value,1);"}) do %>
       <input type="checkbox" name="unzip" value=""/> Unzip submission
       <div class="form-group">
         <input type="file" id="uploaded_file" name="uploaded_file" size=40 />
@@ -22,7 +25,7 @@ or<br/><br/>
     <% end %>
   <% end %>
 
-  <%= form_tag({:action=>'folder_action', :id => participant.id}, {:multipart => true, id: 'folder-action-form'}) do %>
+  <%= form_tag({:controller=>'submitted_content',:action=>'folder_action', :id => participant.id, :origin => origin ||= nil}, {:multipart => true, id: 'folder-action-form'}) do %>
 
     <% if files.length > 0 and participant.directory_num != nil and participant.directory_num >= 0 %>
 

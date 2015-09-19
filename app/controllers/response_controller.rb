@@ -216,6 +216,7 @@ class ResponseController < ApplicationController
     @modified_object = @map.id
 
     get_content(true)
+    @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
     render :action => 'response'
   end
 

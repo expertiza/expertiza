@@ -41,7 +41,7 @@ class Criterion < ScoredQuestion
       rows = self.size.split(',')[1]
     end
 
-    html = self.txt + '<br>'
+    html = '<li><p><label for="responses_' +count.to_s+ '">' +self.txt+ '</label></p>'
     if dropdown_or_scale == 'dropdown'
       html += '<table><td valign="top"><textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
       html += answer.comments if !answer.nil?
@@ -65,7 +65,7 @@ class Criterion < ScoredQuestion
           html += j.to_s + "</option>"
         end
       end
-      html += "</select></td></table><br><br><br>"
+      html += "</select></td></table><br>"
     elsif dropdown_or_scale == 'scale'
       html += '<input id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]" type="hidden"'
       html += 'value="'+answer.answer.to_s+'"' if !answer.nil?
@@ -102,7 +102,7 @@ class Criterion < ScoredQuestion
       html += '<td width="10%"></td></tr></table>'
       html += '<textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
       html += answer.comments if !answer.nil?
-      html += '</textarea><br/>'
+      html += '</textarea><br/><br/>'
 
     end
     html.html_safe

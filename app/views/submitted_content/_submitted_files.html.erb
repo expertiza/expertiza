@@ -1,6 +1,10 @@
 <% current_folder = DisplayOption.new %>
 <% current_folder.name = "" %>
-<% files = participant.files(participant.path.to_s + current_folder.name) %>
+<% if origin == 'response' %>
+  <% files = participant.files(participant.review_file_path.to_s + current_folder.name) %>
+<% else %>
+  <% files = participant.files(participant.path.to_s + current_folder.name) %>
+<%end%>
 
 <%session_participant = AssignmentParticipant.where(parent_id: @assignment.id, user_id: session[:user].id).first%>
 <%session_participants_team = AssignmentTeam.team(session_participant)%>

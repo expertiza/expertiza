@@ -112,9 +112,11 @@ def submit_file
   if params[:current_folder]
     @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
   end
-
-  curr_directory = participant.path.to_s + @current_folder.name
-
+  if params[:origin] == 'response'
+    curr_directory = participant.review_file_path.to_s + @current_folder.name
+  else
+    curr_directory = participant.path.to_s + @current_folder.name
+  end
   if !File.exists? curr_directory
     FileUtils.mkdir_p(curr_directory)
   end

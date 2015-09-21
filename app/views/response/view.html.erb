@@ -19,7 +19,7 @@
 <!--Check whether there is a UploadFile question.-->
 <% current_folder = DisplayOption.new %>
 <% current_folder.name = "" %>
-<% files = @participant.files(@participant.path.to_s + current_folder.name) %>
+<% files = @participant.files(@participant.review_file_path.to_s + current_folder.name) %>
 <%session_participant = AssignmentParticipant.where(parent_id: @assignment.id, user_id: session[:user].id).first%>
 <%session_participants_team = AssignmentTeam.team(session_participant)%>
 <%@questions.each do |question| %>

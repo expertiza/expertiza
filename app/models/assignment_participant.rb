@@ -582,6 +582,11 @@ class AssignmentParticipant < Participant
       self.assignment.path + "/"+ self.directory_num.to_s
     end
 
+    #zhewei: this is the file path for reviewer uploaded files during peer review
+    def review_file_path
+      self.assignment.path + "/"+ self.directory_num.to_s + "_review"
+    end
+
     def update_resubmit_times
       new_submit = ResubmissionTime.new(:resubmitted_at => Time.now.to_s)
       self.resubmission_times << new_submit

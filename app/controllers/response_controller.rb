@@ -183,10 +183,9 @@ class ResponseController < ApplicationController
       @myid = @response.id
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
-
-      if @map.type="ReviewResponseMap" && @response.round
+      if @map.type=="ReviewResponseMap" && @response.round
         @questionnaire = @map.questionnaire(@response.round)
-      elsif @map.type="ReviewResponseMap"
+      elsif @map.type=="ReviewResponseMap"
         @questionnaire = @map.questionnaire(nil)
       else
         @questionnaire = @map.questionnaire

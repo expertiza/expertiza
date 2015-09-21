@@ -205,7 +205,7 @@ class QuestionnairesController < ApplicationController
       if question.is_a? ScoredQuestion
         question.weight = 1
         question.max_label = 'Strong agree'
-        question.min_label = 'Not agree'
+        question.min_label = 'Strong disagree'
       end
       if question.is_a? Criterion
         question.size = '50,3'

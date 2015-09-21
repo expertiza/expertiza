@@ -11,11 +11,22 @@
     <% end %>
     <hr/>
 <% end %>
+
 <% file_url = nil %>
-
-
 <%= @response.display_as_html(nil, nil, file_url) %>
 <br/>
+
+<!--Check whether there is a UploadFile question.-->
+<% current_folder = DisplayOption.new %>
+<% current_folder.name = "" %>
+<% files = @participant.files(@participant.path.to_s + current_folder.name) %>
+<%session_participant = AssignmentParticipant.where(parent_id: @assignment.id, user_id: session[:user].id).first%>
+<%session_participants_team = AssignmentTeam.team(session_participant)%>
+<%@questions.each do |question| %>
+    <% if question.instance_of? UploadFile %>
+        <%= display_directory_tree(@participant, files, true).html_safe %>
+    <% end %>
+<% end %>
 
 <%= @map.show_feedback(@response) %>
 <br/>

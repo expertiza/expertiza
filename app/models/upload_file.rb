@@ -23,10 +23,9 @@ class UploadFile < Question
   end
 
   def complete(count, answer=nil)
+    #Use "app/views/submitted_content/_submitted_files.html.erb" partial.
   end
-  def view_completed_question(count, answer)
-  	 html = '<big><b>Question ' +count.to_s+ ': </b></big>'
-    html += '<i>' +self.txt+ '</i><br/><br/>'
-    html.html_safe 
+  def view_completed_question(count, files)
+  	#Use "display_directory_tree" method in "app/helpers/submitted_content_helper.rb"
   end
 end

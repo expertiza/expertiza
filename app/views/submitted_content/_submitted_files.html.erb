@@ -1,5 +1,5 @@
-<% current_folder = DisplayOption.new
-current_folder.name = "" %>
+<% current_folder = DisplayOption.new %>
+<% current_folder.name = "" %>
 <% files = participant.files(participant.path.to_s + current_folder.name) %>
 
 <%session_participant = AssignmentParticipant.where(parent_id: @assignment.id, user_id: session[:user].id).first%>

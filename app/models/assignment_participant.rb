@@ -583,8 +583,11 @@ class AssignmentParticipant < Participant
     end
 
     #zhewei: this is the file path for reviewer uploaded files during peer review
-    def review_file_path
-      self.assignment.path + "/"+ self.directory_num.to_s + "_review"
+    def review_file_path(response_map_id)
+        response_map = ResponseMap.find(response_map_id)
+        first_user_id = TeamsUser.where(team_id: response_map.reviewee_id).first.user_id
+        participant = Participant.where(parent_id: response_map.reviewed_object_id, user_id: first_user_id).first
+        self.assignment.path + "/"+ participant.directory_num.to_s + "_review" + "/" + response_map_id.to_s
     end
 
     def update_resubmit_times

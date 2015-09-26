@@ -73,7 +73,15 @@
 <%@questions.each do |question| %>
     <% if question.instance_of? UploadFile %>
         <%= label_tag 'UploadFile', '**Before submit you peer review files, you have to click "Save Review" button first!', style: "color:red;"%>
-        <%= render partial: 'submitted_content/submitted_files', locals: {participant: @participant, stage: @stage, origin: 'response'} %>
+        <!--params[:origin] means from where do the files upload-->
+        <!--If the files uploaded from submitted_work (students hand in assignment), params[:origin] will be nil-->
+        <!--If the files uploaded from peer review, params[:origin] will be 'review'-->
+        <% if params[:action] == 'new' %>
+            <% response_map_id = params[:id] %>
+        <% elsif params[:action] == 'edit' %>
+            <% response_map_id = Response.find(params[:id]).response_map.id %>
+        <% end %>
+        <%= render partial: 'submitted_content/submitted_files', locals: {participant: @participant, stage: @stage, origin: 'review', response_map_id: response_map_id} %>
     <% end %>
 <% end %>
 <%= @map.show_feedback(@response) %>

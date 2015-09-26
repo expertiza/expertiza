@@ -1,7 +1,7 @@
 <% current_folder = DisplayOption.new %>
 <% current_folder.name = "" %>
-<% if origin == 'response' %>
-  <% files = participant.files(participant.review_file_path.to_s + current_folder.name) %>
+<% if origin == 'review' %>
+  <% files = participant.files(participant.review_file_path(response_map_id).to_s + current_folder.name) %>
 <% else %>
   <% files = participant.files(participant.path.to_s + current_folder.name) %>
 <%end%>
@@ -19,7 +19,7 @@
 <b>Submit a file:</b><BR/>
 <% if (files.length > 0 or stage != "Complete")  %>
   <% if same_team_flag && stage != "Complete" %>
-    <%= form_tag({:controller=>'submitted_content',:action=>'submit_file',:id => participant.id, :origin => origin ||= nil},{:method => 'post', :enctype => "multipart/form-data", :onSubmit => "return checkIfFileExists(uploaded_file.value,1);"}) do %>
+    <%= form_tag({:controller=>'submitted_content',:action=>'submit_file',:id => participant.id, :origin => origin ||= nil, :response_map_id => response_map_id ||= nil},{:method => 'post', :enctype => "multipart/form-data", :onSubmit => "return checkIfFileExists(uploaded_file.value,1);"}) do %>
       <input type="checkbox" name="unzip" value=""/> Unzip submission
       <div class="form-group">
         <input type="file" id="uploaded_file" name="uploaded_file" size=40 />

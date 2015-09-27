@@ -22,7 +22,7 @@ participant = pscore[:participant]
         </FONT>
     </TD>
 
-    <% if @rscore_review.my_avg %>
+    <% if !@rscore_review.nil? && @rscore_review.my_avg %>
         <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",@rscore_review.my_avg) %>%<BR/>
             <FONT SIZE="-1"><a href="#" id="<%=prefix%>_reviewsLink" name="<%=prefix%>_reviewsLink" onClick="toggleElement('<%=prefix%>_reviews','reviews');return false;">show reviews</a> (<%= pscore[:review][:assessments].size %>)
             </FONT>
@@ -139,7 +139,7 @@ participant = pscore[:participant]
         <% end %>
 
       <% else %>
-            <% if @rscore_review.my_avg %>
+            <% if !@rscore_review.nil? && @rscore_review.my_avg %>
                 <%= sprintf("%.2f",@rscore_review.my_avg) %><%= score_postfix %>
             <% else %>
                 <%= '---' %>

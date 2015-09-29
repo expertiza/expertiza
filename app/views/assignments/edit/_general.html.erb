@@ -58,7 +58,9 @@ function is_coding_assignmentChanged(){
 
 <tr>
 <td style='padding:5px'><%= label_tag('assignment_form[assignment][directory_path]', 'Submission directory:') %></td>
-<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][directory_path]', @assignment_form.assignment.directory_path, :style => 'width:250px') %>  (Mandatory field. No space or special chars.)</td>
+<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][directory_path]', @assignment_form.assignment.directory_path, :style => 'width:250px') %>  (Mandatory field. No space or special chars.)
+  <img src="/assets/info.png" title='- DO NOT change this filed for an on-going assignment. This may cause lost of student submitted file.'>
+</td>
 </tr>
 
 <tr>

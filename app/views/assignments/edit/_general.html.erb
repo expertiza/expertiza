@@ -58,7 +58,7 @@ function is_coding_assignmentChanged(){
 
 <tr>
 <td style='padding:5px'><%= label_tag('assignment_form[assignment][directory_path]', 'Submission directory:') %></td>
-<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][directory_path]', @assignment_form.assignment.directory_path, :style => 'width:250px') %></td>
+<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][directory_path]', @assignment_form.assignment.directory_path, :style => 'width:250px') %>  (Mandatory field. We do not suggest any directory path containing space)</td>
 </tr>
 
 <tr>

@@ -89,8 +89,15 @@ class Answer < ActiveRecord::Base
         questionnaireData = ScoreView.find_by_sql ["SELECT q1_max_question_score ,SUM(question_weight) as sum_of_weights,SUM(question_weight * s_score) as weighted_score FROM score_views WHERE type in('Criterion', 'Scale') AND q1_id = ? AND s_response_id = ?",@questions[0].questionnaire_id,@response.id]
         weighted_score = questionnaireData[0].weighted_score.to_f
         sum_of_weights = questionnaireData[0].sum_of_weights.to_f
+        #Zhewei: we need add questions' weights only their answers are not nil in DB.
+        all_answers_for_curr_response = Answer.where(response_id: @response.id)
+        all_answers_for_curr_response.each do |answer|          
+          if answer.answer.nil?
+            question_weight = Question.find(answer.question_id).weight
+            sum_of_weights -= question_weight
+          end
+        end
         max_question_score = questionnaireData[0].q1_max_question_score.to_f
-
         submission_valid?(@response)
 
         if (sum_of_weights > 0 && max_question_score)

@@ -47,6 +47,7 @@ class Criterion < ScoredQuestion
       html += answer.comments if !answer.nil?
       html += '</textarea></td><td valign="top">'
       html += '<select id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]">'
+      html += '<option value=''>--</option>'
       for j in questionnaire_min..questionnaire_max
         if !answer.nil? and j == answer.answer
           html += '<option value=' + j.to_s + ' selected="selected">' 
@@ -111,7 +112,11 @@ class Criterion < ScoredQuestion
   #This method returns what to display if a student is viewing a filled-out questionnaire
   def view_completed_question(count, answer,questionnaire_max)
 		html = '<big><b>Question '+count.to_s+":</b> <I>"+self.txt+"</I></big><BR/><BR/>"
-		html += '<TABLE CELLPADDING="5"><TR><TD valign="top"><B>Score:</B></TD><TD><FONT style="BACKGROUND-COLOR:gold">'+answer.answer.to_s+'</FONT> out of <B>'+questionnaire_max.to_s+'</B></TD></TR>'
+    if !answer.answer.nil?
+		  html += '<TABLE CELLPADDING="5"><TR><TD valign="top"><B>Score:</B></TD><TD><FONT style="BACKGROUND-COLOR:gold">'+answer.answer.to_s+'</FONT> out of <B>'+questionnaire_max.to_s+'</B></TD></TR>'
+    else
+      html += '<TABLE CELLPADDING="5"><TR><TD valign="top"><B>Score:</B></TD><TD><FONT style="BACKGROUND-COLOR:gold">--</FONT> out of <B>'+questionnaire_max.to_s+'</B></TD></TR>'
+    end
 		if answer.comments != nil
 			html += '<TR><TD valign="top"><B>Response:</B></TD><TD>' + answer.comments.gsub("<", "&lt;").gsub(">", "&gt;").gsub(/\n/, '<BR/>')
 		end

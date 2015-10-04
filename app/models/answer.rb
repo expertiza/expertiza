@@ -91,12 +91,14 @@ class Answer < ActiveRecord::Base
         sum_of_weights = questionnaireData[0].sum_of_weights.to_f
         #Zhewei: we need add questions' weights only their answers are not nil in DB.
         all_answers_for_curr_response = Answer.where(response_id: @response.id)
-        all_answers_for_curr_response.each do |answer|          
-          if answer.answer.nil?
+        all_answers_for_curr_response.each do |answer|
+          question = Question.find(answer.question_id)
+          # if a questions is a scored question (criterion or scale), the weight cannot be null.
+          # Answer.answer is nil indicates that this scored questions is not filled. Therefore the score of this question is ignored and not counted
+          # towards the score for this response.
+          if answer.answer.nil? && question.instance_of?(ScoredQuestion)
             question_weight = Question.find(answer.question_id).weight
-            if !question_weight.nil?
-              sum_of_weights -= question_weight
-            end
+            sum_of_weights -= question_weight
           end
         end
         max_question_score = questionnaireData[0].q1_max_question_score.to_f

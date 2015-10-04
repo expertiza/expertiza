@@ -46,7 +46,9 @@ class Response < ActiveRecord::Base
 
     count = 0
     answers = Answer.where(response_id: self.response_id)
-    questionnaire = Question.find(answers.first.question_id).questionnaire
+
+    questionnaire = self.questionnaire_by_answer(answers.first)
+
     questionnaire_max = questionnaire.max_question_score
     questions=questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
     #loop through questions so the the questions are displayed in order based on seq (sequence number)
@@ -224,6 +226,19 @@ class Response < ActiveRecord::Base
     end
   end
 
+  def questionnaire_by_answer (answer)
+    if !answer.nil? # for all the cases except the case that  file submission is the only question in the rubric.
+      questionnaire = Question.find(answer.question_id).questionnaire
+    else
+      # there is small possibility that the answers is empty: when the questionnaire only have 1 question and it is a upload file question
+      # the reason is that for this question type, there is no answer record, and this question is handled by a different form
+      map = ResponseMap.find(self.map_id)
+      reviewer_participant = Participant.find(map.reviewer_id)
+      assignment = Assignment.find(reviewer_participant.parent_id)
+      questionnaire = Questionnaire.find(assignment.get_review_questionnaire_id)
+    end
+    questionnaire
+  end
   require 'analytic/response_analytic'
   include ResponseAnalytic
   end

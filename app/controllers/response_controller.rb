@@ -330,8 +330,8 @@ class ResponseController < ApplicationController
       @questionnaire = @map.questionnaire
     else
       answer = @response.scores.first # if user is not filling a new rubric, the @response object should be available. we can find the questionnaire from the question_id in answers
-      question_id = answer.question_id
-      @questionnaire =Questionnaire.find(Question.find(question_id).questionnaire_id)
+
+      @questionnaire =@response.questionnaire_by_answer(answer)
     end
 
     use_dropdown = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: @questionnaire.id).first.dropdown

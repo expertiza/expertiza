@@ -94,7 +94,9 @@ class Answer < ActiveRecord::Base
         all_answers_for_curr_response.each do |answer|          
           if answer.answer.nil?
             question_weight = Question.find(answer.question_id).weight
-            sum_of_weights -= question_weight
+            if !question_weight.nil?
+              sum_of_weights -= question_weight
+            end
           end
         end
         max_question_score = questionnaireData[0].q1_max_question_score.to_f

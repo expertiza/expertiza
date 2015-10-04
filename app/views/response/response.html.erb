@@ -72,7 +72,7 @@
 <!--Check whether there is a UploadFile question.-->
 <%@questions.each do |question| %>
     <% if question.instance_of? UploadFile %>
-        <%= label_tag 'UploadFile', '**Before submit you peer review files, you have to click "Save Review" button first!', style: "color:red;"%>
+        <%= label_tag 'UploadFile', '↑↑↑↑↑↑↑Before submit you peer review files, you have to click "Save Review" button first!↑↑↑↑↑↑↑', style: "color:red;"%>
         <!--params[:origin] means from where do the files upload-->
         <!--If the files uploaded from submitted_work (students hand in assignment), params[:origin] will be nil-->
         <!--If the files uploaded from peer review, params[:origin] will be 'review'-->

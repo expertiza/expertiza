@@ -8,8 +8,8 @@ class TextField < TextResponse
     html += '<label for="responses_' +count.to_s+ '">' +self.txt+ '</label>'
     html += '<input id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]" type="hidden" value="">'
     html += '<input id="responses_' +count.to_s+ '_comments" label=' +self.txt+ ' name="responses[' +count.to_s+ '][comment]" size=' +self.size.to_s+ ' type="text"'
-    html += 'value=' + answer.comments if !answer.nil?
-    html += '>'
+    html += 'value="' + answer.comments if !answer.nil?
+    html += '">'
     html += '</li><BR/><BR/>' if self.type == 'TextField' and self.break_before == false
     html.html_safe
   end

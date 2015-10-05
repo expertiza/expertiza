@@ -29,7 +29,7 @@ class Dropdown < UnscoredQuestion
     html += '<input id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]" type="hidden" value="">'
   	html += '<select id="responses_' +count.to_s+ '_comments" label=' +self.txt+ ' name="responses[' +count.to_s+ '][comment]">'
   	alternatives.each do |alternative|
-  		html += '<option value=' +alternative.to_s
+  		html += '<option value="' +alternative.to_s+'"'
       html += ' selected' if !answer.nil? and answer.comments == alternative 
       html += '>' +alternative.to_s+ '</option>'
   	end

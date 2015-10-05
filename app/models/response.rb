@@ -69,7 +69,7 @@ class Response < ActiveRecord::Base
     else
       comment = ''
     end
-    code += "<B>Additional Comment:</B><BR/>"+comment+"</div>"
+    code += "<BR><BR><B>Additional Comment:</B><BR/>"+comment+"</div>"
     return code.html_safe
   end
 

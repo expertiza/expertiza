@@ -17,6 +17,7 @@
 <br/>
 
 <!--Check whether there is a UploadFile question.-->
+<%if @map.instance_of?(ReviewResponseMap)%>
 <% current_folder = DisplayOption.new %>
 <% current_folder.name = "" %>
 <% response_map_id = Response.find(params[:id]).response_map.id %>
@@ -28,6 +29,7 @@
         <%= display_directory_tree(@participant, files, true).html_safe %>
     <% end %>
 <% end %>
+<%end%>
 
 <%= @map.show_feedback(@response) %>
 <br/>

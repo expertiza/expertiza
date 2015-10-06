@@ -4,8 +4,8 @@ class PopupController < ApplicationController
     true
   end
 
+  # this pop up can be called from "review_report" from instructor end.
   def team_users_popup
-    @maxscore = 0
     @sum = 0
     @count = 0
     @teamid = params[:id]
@@ -16,42 +16,31 @@ class PopupController < ApplicationController
     #  @teamname = Team.find(params[:id]).name
     @teamusers = TeamsUser.where(team_id: params[:id])
 
+    #id2 seems to be a response_map
     if(params[:id2] == nil)
       #  if(@reviewid == nil)
       @scores = nil
     else
-      @reviewid = (Response.find_by_map_id(params[:id2])).id
+      #get the last response from response_map id
+      @reviewid = (Response.where(map_id:params[:id2])).last.id
       @pid = ResponseMap.find(params[:id2]).reviewer_id
       @reviewer_id = Participant.find(@pid).user_id
 
       @scores = Answer.where(response_id: @reviewid)
 
-      ##3
-      @revqids = AssignmentQuestionnaire.where(["assignment_id = ?",@assignment.id])
-      @revqids.each do |rqid|
-        rtype = Questionnaire.find(rqid.questionnaire_id).type
-        if( rtype == 'ReviewQuestionnaire')
-          @review_questionnaire_id = rqid.questionnaire_id
-        end
-      end
-      if(@review_questionnaire_id)
-        @review_questionnaire = Questionnaire.find(@review_questionnaire_id)
-        @maxscore = @review_questionnaire.max_question_score
-        @review_questions = @review_questionnaire.questions
-      end
-
-
-      ###
-      # @maxscore = Questionnaire.find(@assignment.review_questionnaire_id).max_question_score
+      questionnaire =Response.find(@reviewid).questionnaire_by_answer(@scores.first)
+      @maxscore = questionnaire.max_question_score
 
       if(@maxscore == nil)
         @maxscore = 5
       end
 
       @scores.each do |s|
-        @sum = @sum + s.answer
-        @s = @sum
-        @count = @count + 1
+        #only use the scorable questions to come up with score.
+        if !s.answer.nil? && Question.find(s.question_id).is_a?(ScoredQuestion)
+          @sum = @sum + s.answer
+          @count = @count + 1
+        end
       end
       @sum1 = (100*@sum.to_f )/(@maxscore.to_f * @count.to_f)
 

@@ -35,7 +35,9 @@
              for i in responses
                scores = Answer.where(["response_id = ?", i.id])
                for s in scores
-                 sum2 += s.answer
+                 if !s.answer.nil?
+                   sum2 += s.answer
+                 end
                end
                sum2 = sum2.to_f/30
              end
@@ -100,14 +102,18 @@
       <tr>
 
         <td align = 'left'> <%= Question.find(s.question_id).txt%></td>
-        <td align = 'center'> <%= s.answer%>/<%=@maxscore%></td>
+        <%if Question.find(s.question_id).is_a?(ScoredQuestion)%>
+          <td align = 'center'> <%= s.answer%>/<%=@maxscore%></td>
+        <%else%>
+          <td align = 'center'> <%= s.answer%></td>
+        <%end%>
         <td align = 'left'> <%= s.comments %> </td>
 
       </tr>
     <%end%>
     <tr>
       <th>Reviewer Score</th>
-      <td align = "center"><%= @s%>/<%=@count*@maxscore%> </td>
+      <td align = "center"><%= @sum%>/<%=@count*@maxscore%> </td>
       <td align = "left"> = <%= sprintf("%.2f", @sum1) %>%</td>
 
     </table>

@@ -8,6 +8,7 @@ class Ta < User
                 ['All public assignments','list_all']]
 
   def courses_assisted_with
+    courses=TaMapping.where(ta_id: self.id)
     courses.map { |c| Course.find(c.course_id) }
   end
 

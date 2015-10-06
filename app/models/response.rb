@@ -75,7 +75,14 @@ class Response < ActiveRecord::Base
 
   # Computes the total score awarded for a review
   def get_total_score
-    scores.map(&:answer).sum
+    # only count the scorable questions, only when the answer is not nil (we accept nil as answer for scorable questions, and they will not be counted towards the total score)
+    sum=0
+    scores.each do |s|
+      if !s.answer.nil? && Question.find(s.question_id).is_a?(ScoredQuestion)
+        sum += s.answer
+      end
+    end
+    sum
   end
 
   def delete
@@ -89,17 +96,25 @@ class Response < ActiveRecord::Base
     if get_maximum_score != 0 then
       ((get_total_score.to_f / get_maximum_score.to_f) * 100).to_i
     else
-      0
+      "N/A"
     end
   end
 
   # Returns the maximum possible score for this response
   def get_maximum_score()
-    max_score = 0
-
-    self.scores.each { |score| max_score = max_score + score.question.questionnaire.max_question_score }
-
-    max_score
+    # only count the scorable questions, only when the answer is not nil (we accept nil as answer for scorable questions, and they will not be counted towards the total score)
+    count = 0
+    scores.each do |s|
+      if !s.answer.nil? && Question.find(s.question_id).is_a?(ScoredQuestion)
+        count+=1
+      end
+    end
+    if scores.empty?
+      questionnaire = questionnaire_by_answer(nil)
+    else
+      questionnaire = questionnaire_by_answer(scores.first)
+    end
+    count*questionnaire.max_question_score
   end
 
   # Returns the total score from this response

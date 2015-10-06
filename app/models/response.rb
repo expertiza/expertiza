@@ -78,8 +78,9 @@ class Response < ActiveRecord::Base
     # only count the scorable questions, only when the answer is not nil (we accept nil as answer for scorable questions, and they will not be counted towards the total score)
     sum=0
     scores.each do |s|
-      if !s.answer.nil? && Question.find(s.question_id).is_a?(ScoredQuestion)
-        sum += s.answer
+      question = Question.find(s.question_id)
+      if !s.answer.nil? && question.is_a?(ScoredQuestion)
+        sum += s.answer*question.weight
       end
     end
     sum
@@ -94,7 +95,7 @@ class Response < ActiveRecord::Base
   # Returns the average score for this response as an integer (0-100)
   def get_average_score()
     if get_maximum_score != 0 then
-      ((get_total_score.to_f / get_maximum_score.to_f) * 100).to_i
+      ((get_total_score.to_f / get_maximum_score.to_f) * 100).round
     else
       "N/A"
     end
@@ -103,10 +104,11 @@ class Response < ActiveRecord::Base
   # Returns the maximum possible score for this response
   def get_maximum_score()
     # only count the scorable questions, only when the answer is not nil (we accept nil as answer for scorable questions, and they will not be counted towards the total score)
-    count = 0
+    total_weight = 0
     scores.each do |s|
-      if !s.answer.nil? && Question.find(s.question_id).is_a?(ScoredQuestion)
-        count+=1
+      question = Question.find(s.question_id)
+      if !s.answer.nil? && question.is_a?(ScoredQuestion)
+        total_weight+=question.weight
       end
     end
     if scores.empty?
@@ -114,7 +116,7 @@ class Response < ActiveRecord::Base
     else
       questionnaire = questionnaire_by_answer(scores.first)
     end
-    count*questionnaire.max_question_score
+    total_weight*questionnaire.max_question_score
   end
 
   # Returns the total score from this response

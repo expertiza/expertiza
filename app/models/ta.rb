@@ -40,10 +40,27 @@ class Ta < User
   def get(object_type, id, user_id)
     object_type.where(["id = ? AND (instructor_id = ? OR private = 0)", id, user_id]).first
   end
-  
+
+  #This method is potentially problematic: it assumes one TA only help teach one course.
+  #This method only returns the instructor_id for the 1st course that this user help teach.  -Yang Oct. 05 2015
   def self.get_my_instructor(user_id)
     course_id = TaMapping.get_course_id(user_id)
     Course.find(course_id).instructor_id
+  end
+
+  #This method should be used to replace the "get_my_instructor" method
+  def self.get_my_instructors(user_id)
+    ta_mappings = TaMapping.where(ta_id: user_id)
+    if ta_mappings.empty?
+      []
+    else
+      instructor_ids = []
+      ta_mappings.each do |ta_mapping|
+        course_id = ta_mapping.course_id
+        instructor_ids << Course.find(course_id).instructor_id
+      end
+      instructor_ids
+    end
   end
   
   def self.get_mapped_instructor_ids(user_id)

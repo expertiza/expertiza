@@ -178,7 +178,7 @@ class TreeDisplayController < ApplicationController
             tmpObject["instructor"] = nil
           end
 
-          tmpObject["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role_id == 6 && is_available(User.find(Ta.get_my_instructor(session[:user].id)),instructor_id) && ta_for_current_course?(node))
+          tmpObject["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role_id == 6 && Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
           if nodeType == "Assignments"
             tmpObject["course_id"] = node.get_course_id
             tmpObject["max_team_size"] = node.get_max_team_size
@@ -250,6 +250,7 @@ class TreeDisplayController < ApplicationController
           else
             res2["instructor"] = nil
           end
+          
           res2["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role_id == 6 && is_available(User.find(Ta.get_my_instructor(session[:user].id)),instructor_id) && ta_for_current_course?(child))
           if nodeType == "AssignmentNode"
             res2["course_id"] = child.get_course_id

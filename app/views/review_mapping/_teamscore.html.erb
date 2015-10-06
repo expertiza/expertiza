@@ -25,16 +25,23 @@
         <%else%>
             <td  bgcolor="#DDDDBB" align = 'left' >
         <%end%>
-        <%= @avg_and_ranges[@teamid][:avg].round(0) %>%
+        <%if @avg_and_ranges[@teamid][:avg]==-1.0%>
+            N/A
+        <%else%>
+          <%= @avg_and_ranges[@teamid][:avg].round(0) %>%
+        <%end%>
         </td>
-
         <% #############Score range ########################        %>
         <% if (@l%2) == 0%>
             <td bgcolor="#ffffff" align = 'left' >
         <%else%>
             <td  bgcolor="#DDDDBB" align = 'left' >
         <%end%>
-        (<%= @avg_and_ranges[@teamid][:min].round(0) %>% - <%= @avg_and_ranges[@teamid][:max].round(0) %>%)
+        <%if @avg_and_ranges[@teamid][:avg]==-1.0%>
+            N/A
+        <%else%>
+            (<%= @avg_and_ranges[@teamid][:min].round(0) %>% - <%= @avg_and_ranges[@teamid][:max].round(0) %>%)
+        <%end%>
         </td>
 
     <%else%>

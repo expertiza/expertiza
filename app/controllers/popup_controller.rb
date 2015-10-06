@@ -22,7 +22,8 @@ class PopupController < ApplicationController
       @scores = nil
     else
       #get the last response from response_map id
-      @reviewid = (Response.where(map_id:params[:id2])).last.id
+      response = Response.where(map_id:params[:id2]).last
+      @reviewid = response.id
       @pid = ResponseMap.find(params[:id2]).reviewer_id
       @reviewer_id = Participant.find(@pid).user_id
 
@@ -35,15 +36,9 @@ class PopupController < ApplicationController
         @maxscore = 5
       end
 
-      @scores.each do |s|
-        #only use the scorable questions to come up with score.
-        if !s.answer.nil? && Question.find(s.question_id).is_a?(ScoredQuestion)
-          @sum = @sum + s.answer
-          @count = @count + 1
-        end
-      end
-      @sum1 = (100*@sum.to_f )/(@maxscore.to_f * @count.to_f)
-
+      @total_percentage = response.get_average_score
+      @sum = response.get_total_score
+      @total_possible = response.get_maximum_score
     end
 
     #    @review_questionnaire = Questionnaire.find(@assignment.review_questionnaire_id)

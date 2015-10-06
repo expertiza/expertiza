@@ -340,18 +340,16 @@ class User < ActiveRecord::Base
   def is_teaching_assistant_for?(student)
     return false unless is_teaching_assistant?
     return false if student.role.name != 'Student'
-
     # We have to use the Ta object instead of User object
     # because single table inheritance is not currently functioning
     ta = Ta.find(id)
-
     return true if ta.courses_assisted_with.any? do |c|
       c.assignments.map(&:participants).flatten.map(&:user_id).include? student.id
     end
   end
 
   def is_teaching_assistant?
-    false
+    return true if self.role.ta?
   end
 
   def self.search_users(role, user_id, letter, search_by)

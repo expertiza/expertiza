@@ -64,7 +64,7 @@
     			<% files = participant.submitted_files %>
     			<%= "Files:" if !files.blank? and participant == @participants.first %>
     			<% if files and files.length > 0 %>
-				    <%= display_directory_tree(participant, files, true) %>
+				    <%= display_directory_tree(participant, files, true).html_safe %>
 				<% end %>
 	    	<% end %>
     	</td>

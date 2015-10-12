@@ -273,6 +273,11 @@ class AssignmentsController < ApplicationController
       @assignment = Assignment.find(params[:id])
     end
 
+    def list_submissions
+      @assignment = Assignment.find(params[:id])
+      @teams = Team.where(parent_id: params[:id])
+    end
+
     def associate_assignment_with_course
       @assignment = Assignment.find(params[:id])
       @assignment.inspect

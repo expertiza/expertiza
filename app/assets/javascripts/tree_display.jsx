@@ -183,6 +183,9 @@ jQuery(document).ready(function() {
             )
             moreContent.push(
               <span>
+                <a title="View submissions" href={"/assignments/list_submissions?id="+(parseInt(this.props.id)/2).toString()}>
+                  <img src="/assets/tree_view/List-submisstions-24.png" />
+                </a>
                 <a title="View scores" href={"/grades/view?id="+(parseInt(this.props.id)/2).toString()}>
                   <img src="/assets/tree_view/view-scores-24.png" />
                 </a>

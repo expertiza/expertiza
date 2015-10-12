@@ -49,6 +49,7 @@ Expertiza::Application.routes.draw do
       get :copy
       get :toggle_access
       get :scheduled_tasks
+      get :list_submissions
       get :delete_scheduled_task
       get :remove_assignment_from_course
     end

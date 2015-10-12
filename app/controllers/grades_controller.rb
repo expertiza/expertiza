@@ -321,8 +321,8 @@ class GradesController < ApplicationController
         end
         @grades_bar_charts[:review] = bar_chart(scores)
       else
-        scores = scores-[-1.0]
         scores = get_scores_for_chart @pscore[:review][:assessments], 'review'
+        scores = scores-[-1.0]
         @grades_bar_charts[:review] = bar_chart(scores)
       end
 
@@ -330,16 +330,19 @@ class GradesController < ApplicationController
 
     if @pscore[:metareview]
      scores = get_scores_for_chart @pscore[:metareview][:assessments], 'metareview'
+     scores = scores-[-1.0]
      @grades_bar_charts[:metareview] = bar_chart(scores)
     end
 
     if @pscore[:feedback]
       scores = get_scores_for_chart @pscore[:feedback][:assessments], 'feedback'
+      scores = scores-[-1.0]
       @grades_bar_charts[:feedback] = bar_chart(scores)
     end
 
     if @pscore[:teammate]
       scores = get_scores_for_chart @pscore[:teammate][:assessments], 'teammate'
+      scores = scores-[-1.0]
       @grades_bar_charts[:teammate] = bar_chart(scores) 
     end
   end

@@ -112,9 +112,9 @@ class PopupController < ApplicationController
   end
 
   def view_review_scores_popup
-    @reviewid = params[:id]
-    @scores = Answer.where(instance_id: @reviewid)
-
+    @reviewerid = params[:reviewer_id]
+    @assignment_id = params[:assignment_id]
+    @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@reviewerid)
 
   end
 

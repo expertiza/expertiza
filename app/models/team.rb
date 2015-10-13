@@ -35,7 +35,7 @@ class Team < ActiveRecord::Base
   end
 
   def get_author_names
-    names = Array.appear_as_new_record
+    names = Array.new
     users.each do |user|
       names << user.fullname
     end

@@ -62,21 +62,21 @@
           <% if (@count == (ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ?", @id, r.reviewer_id])).length) %>
                   <% if (@l%2) == 0 %>
             <td bgcolor="#ffffff"  align = "left" rowspan= <%= @rspan%>>
-              <%= @count %>/<%= @rspan %>
+              <%= @count %>/<%= @rspan %> <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.reviewer_id, :assignment_id=>@id%>
             </td>
                   <%else %>
                       <td bgcolor="#DDDDBB"  align = "left" rowspan= <%= @rspan%>>
-                        <%= @count %>/<%= @rspan %>
+                        <%= @count %>/<%= @rspan %> <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.reviewer_id, :assignment_id=>@id%>
                       </td>
                   <%end %>
           <%else %>
                   <% if (@l%2) == 0 %>
             <td bgcolor="#ffffff" align = "left" rowspan= <%= @rspan%>>
-              <%= @count %>/<%= @rspan %>
+              <%= @count %>/<%= @rspan %> <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.reviewer_id, :assignment_id=>@id%>
             </td>
                   <%else %>
                       <td bgcolor="#DDDDBB" align = "left" rowspan= <%= @rspan%>>
-                        <%= @count %>/<%= @rspan %>
+                        <%= @count %>/<%= @rspan %> <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.reviewer_id, :assignment_id=>@id%>
                       </td>
                   <%end %>
           <%end %>

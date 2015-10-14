@@ -14,8 +14,9 @@ class Answer < ActiveRecord::Base
       total_score = 0
       length_of_assessments=assessments.length.to_f
       assessments.each { |assessment|
-        compute_stat(assessment,questions,total_score,scores,length_of_assessments)
 
+        current_score, scores = compute_stat(assessment,questions,scores,length_of_assessments)
+        total_score  += current_score
       }
 
 
@@ -36,7 +37,7 @@ class Answer < ActiveRecord::Base
     return scores
   end
 
-  def self.compute_stat(assessment,questions,total_score,scores,length_of_assessments)
+  def self.compute_stat(assessment,questions,scores,length_of_assessments)
 
     curr_score = get_total_score(:response => [assessment], :questions => questions)
 
@@ -53,7 +54,7 @@ class Answer < ActiveRecord::Base
       curr_score=0
     end
 
-    total_score += curr_score
+     return curr_score, scores
 
   end
 
@@ -106,7 +107,8 @@ class Answer < ActiveRecord::Base
       #                                            @questions[0].questionnaire_id,@response.id]
 
 
-      questionnaireData = ScoreView.where(type: {in: %w(Criterion Scale)}, q1_id: @questions[0].questionnaire_id, s_response_id: @response.id)
+      questionnaireData = ScoreView.where(type: 'Scale', q1_id: @questions[0].questionnaire_id, s_response_id: @response.id)
+      questionnaireData += ScoreView.where(type: 'Criterion', q1_id: @questions[0].questionnaire_id, s_response_id: @response.id)
       questionnaireData.each { |q|
         sum_of_weights += q.question_weight
         weighted_score += q.question_weight * q.s_score

@@ -114,7 +114,6 @@ def self.adjust_advice_size(questionnaire, question)
     for i in (questionnaire.min_question_score..questionnaire.max_question_score)
       qas = QuestionAdvice.where("question_id = #{question.id} AND score = #{i}")
       if qas.first.nil?
-        binding.pry
         question.question_advices << QuestionAdvice.new(:score=>i)
       end
       if qas.size>1

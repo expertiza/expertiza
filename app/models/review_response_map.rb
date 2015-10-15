@@ -4,8 +4,10 @@ class ReviewResponseMap < ResponseMap
   belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'reviewed_object_id'
 
   # In if this assignment uses "varying rubrics" feature, the "used_in_round" field should not be nil
-  # so find the round # based on current time and the due date times, and use that round # to find corresponding questionnaire_id from assignment_questionnaires table
-  # otherwise this assignment does not use the "varying rubrics", so in assignment_questionnaires table there should
+  # so find the round # based on current time and the due date times, and use that round
+  # to find corresponding questionnaire_id from assignment_questionnaires table
+  # otherwise this assignment does not use the "varying rubrics",
+  # so in assignment_questionnaires table there should
   # be only 1 questionnaire with type 'ReviewQuestionnaire'.    -Yang
   def questionnaire(round)
     if self.assignment.varying_rubrics_by_round?
@@ -43,6 +45,7 @@ class ReviewResponseMap < ResponseMap
       ]
     }
   end
+
   def self.import(row, session, id)
     if row.length < 2
       raise ArgumentError, "Not enough items"
@@ -152,7 +155,7 @@ class ReviewResponseMap < ResponseMap
         response_ids = Array.new
 
         maps.each do |map|
-          responses = Response.where(map_id:map.id, round:round)
+          responses = Response.where(map_id: map.id, round: round)
           if !responses.empty?
             response_ids << responses.last.id
           end
@@ -202,7 +205,8 @@ class ReviewResponseMap < ResponseMap
     team_id = TeamsUser.team_id(reviewee.parent_id, reviewee.user_id)
     existing = ReviewResponseMap.where(reviewee_id: team_id, reviewer_id:  reviewer.id).first
     if existing.nil?
-      ReviewResponseMap.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => assignment.id)
+      ReviewResponseMap.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id,\
+       :reviewed_object_id => assignment.id)
     end
   end
 

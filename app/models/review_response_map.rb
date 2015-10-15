@@ -182,4 +182,79 @@ class ReviewResponseMap < ResponseMap
     end
     review_final_versions
   end
+
+  #OSS Project to refactor -->
+
+  #Untested
+  def self.import_new(row, session, id)
+    if row.length < 2
+      raise ArgumentError, "Not enough items"
+    end
+
+    assignment = Assignment.find(id)
+    assignment_nil(assignment)
+    index = 1
+    while index < row.length
+      user = User.find_by_name(row[index].to_s.strip)
+      review_user_nil(user,row,index)
+      reviewer = AssignmentParticipant.where(user_id: user.id, parent_id:  assignment.id).first
+      reviewer_nil(reviewer,row,index)
+      if assignment.team_assignment
+        reviewee = AssignmentTeam.where(name: row[0].to_s.strip, parent_id:  assignment.id).first
+        reviewee_nil(reviewee,row)
+        existing = ReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
+        existing_nil(existing, reviewer, reviewee, assignment)
+      else
+        puser = User.find_by_name(row[0].to_s.strip)
+        reviewee_user_nil(reviewee,row)
+        reviewee = AssignmentParticipant.where(user_id: puser.id, parent_id:  assignment.id).first
+        reviewee_nil(reviewee,row)
+        team_id = TeamsUser.team_id(reviewee.parent_id, reviewee.user_id)
+        existing = ReviewResponseMap.where(reviewee_id: team_id, reviewer_id:  reviewer.id).first
+        existing_nil(existing, reviewer, reviewee, assignment)
+      end
+      index += 1
+    end
+  end
+
+
+
+  private
+  def reviwer_user_nil(user,row, index)
+    if user.nil?
+      raise ImportError, "The user account for the reviewer \"#{row[index]}\" was not found. <a href='/users/new'>Create</a> this user?"
+    end
+  end
+
+  def reviewee_user_nil(user,row)
+    if user.nil?
+      raise ImportError, "The user account for the reviewee \"#{row[0]}\" was not found. <a href='/users/new'>Create</a> this user?"
+    end
+  end
+
+  private
+  def assignment_nil(assignment)
+    if assignment.nil?
+      raise ImportError, "The assignment with id \"#{id}\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
+    end
+  end
+
+  def reviewer_nil(reviewer,row,index)
+    if reviewer == nil
+      raise ImportError, "The reviewer \"#{row[index]}\" is not a participant in this assignment. <a href='/users/new'>Register</a> this user as a participant?"
+    end
+  end
+
+  def reviewee_nil(reviewee,row)
+    if reviewee == nil
+      raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"
+    end
+  end
+
+  def existing_nil(existing, reviewer, reviewee, assignment)
+    if existing.nil?
+      ReviewResponseMap.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => assignment.id)
+    end
+  end
+
 end

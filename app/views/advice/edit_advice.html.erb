@@ -42,14 +42,6 @@ function show_horizontal_questions(question_id){
       <% for i in (0..@questionnaire.max_question_score-@questionnaire.min_question_score) %>
         <th>
           <%= @questionnaire.max_question_score-i %>
-          <% if @questionnaire.true_false_questions? %>
-            <% if i == 0 %>
-              / True
-            <% end %>
-            <% if i == 1 %>
-              / False
-            <% end %>
-          <% end %>
         </th>
       <% end %>
     </tr>

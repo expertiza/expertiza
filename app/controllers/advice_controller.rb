@@ -7,13 +7,14 @@ class AdviceController < ApplicationController
 
   # Modify the advice associated with a questionnaire
   def edit_advice
-    @questionnaire = get(Questionnaire, params[:id])
+
+    @questionnaire = Questionnaire.find(params[:id])
 
     for question in @questionnaire.questions
-      if question.true_false
-        num_questions = 2
-      else
+      if question.is_a?(ScoredQuestion)
         num_questions = @questionnaire.max_question_score - @questionnaire.min_question_score
+      else
+        num_questions=0
       end
 
       sorted_advice = question.question_advices.sort_by { |x| -x.score }

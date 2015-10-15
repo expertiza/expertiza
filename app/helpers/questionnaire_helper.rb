@@ -103,8 +103,6 @@ end
 def self.adjust_advice_size(questionnaire, question)
   # now we only support question advices for scored questions
   if question.is_a?(ScoredQuestion)
-    question.question_advices << QuestionAdvice.new(:score=>0)
-    question.question_advices << QuestionAdvice.new(:score=>1)
 
     max = questionnaire.max_question_score
     min = questionnaire.min_question_score
@@ -114,11 +112,15 @@ def self.adjust_advice_size(questionnaire, question)
     end
 
     for i in (questionnaire.min_question_score..questionnaire.max_question_score)
-      qa = QuestionAdvice.where("question_id = #{question.id} AND score = #{i}").first
-
-        if qa == nil
-          question.question_advices << QuestionAdvice.new(:score=>i)
+      qas = QuestionAdvice.where("question_id = #{question.id} AND score = #{i}")
+      if qas.first.nil?
+        binding.pry
+        question.question_advices << QuestionAdvice.new(:score=>i)
       end
+      if qas.size>1
+        QuestionAdvice.delete("question_id = #{question.id} AND score = #{i}")
+      end
+
     end
   end
 end

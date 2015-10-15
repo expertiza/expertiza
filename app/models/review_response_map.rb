@@ -16,7 +16,7 @@ class ReviewResponseMap < ResponseMap
   end
 
   def get_title
-    return "Review"
+    'Review'
   end
 
   def delete(force = nil)
@@ -43,49 +43,30 @@ class ReviewResponseMap < ResponseMap
       ]
     }
   end
-
   def self.import(row, session, id)
     if row.length < 2
       raise ArgumentError, "Not enough items"
     end
 
     assignment = Assignment.find(id)
-    if assignment.nil?
-      raise ImportError, "The assignment with id \"#{id}\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
-    end
+    assignment_nil(assignment)
     index = 1
     while index < row.length
       user = User.find_by_name(row[index].to_s.strip)
-      if user.nil?
-        raise ImportError, "The user account for the reviewer \"#{row[index]}\" was not found. <a href='/users/new'>Create</a> this user?"
-      end
+      review_user_nil(user,row,index)
       reviewer = AssignmentParticipant.where(user_id: user.id, parent_id:  assignment.id).first
-      if reviewer == nil
-        raise ImportError, "The reviewer \"#{row[index]}\" is not a participant in this assignment. <a href='/users/new'>Register</a> this user as a participant?"
-      end
+      reviewer_nil(reviewer,row,index)
       if assignment.team_assignment
         reviewee = AssignmentTeam.where(name: row[0].to_s.strip, parent_id:  assignment.id).first
-        if reviewee == nil
-          raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"
-        end
+        reviewee_nil(reviewee,row)
         existing = ReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
-        if existing.nil?
-          ReviewResponseMap.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => assignment.id)
-        end
+        existing_nil(existing, reviewer, reviewee, assignment)
       else
         puser = User.find_by_name(row[0].to_s.strip)
-        if user == nil
-          raise ImportError, "The user account for the reviewee \"#{row[0]}\" was not found. <a href='/users/new'>Create</a> this user?"
-        end
+        reviewee_user_nil(user,row)
         reviewee = AssignmentParticipant.where(user_id: puser.id, parent_id:  assignment.id).first
-        if reviewee == nil
-          raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"
-        end
-        team_id = TeamsUser.team_id(reviewee.parent_id, reviewee.user_id)
-        existing = ReviewResponseMap.where(reviewee_id: team_id, reviewer_id:  reviewer.id).first
-        if existing.nil?
-          ReviewResponseMap.create(:reviewee_id => team_id, :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id)
-        end
+        reviewee_nil(reviewee,row)
+        existing_nil(reviewer, reviewee, assignment)
       end
       index += 1
     end
@@ -94,7 +75,7 @@ class ReviewResponseMap < ResponseMap
   def show_feedback(response)
     if(!self.response.empty? && response)
       map = FeedbackResponseMap.find_by_reviewed_object_id(response.id)
-      if map and !map.response.empty?
+      if map && !map.response.empty?
         return map.response.last.display_as_html()
       end
     end
@@ -112,7 +93,7 @@ class ReviewResponseMap < ResponseMap
   end
 
   def metareview_response_maps
-    responses = Response.where(map_id:self.id)
+    responses = Response.where(map_id: self.id)
     metareview_list=Array.new()
     responses.each do |response|
       metareview_response_maps = MetareviewResponseMap.where(reviewed_object_id:response.id)
@@ -125,7 +106,7 @@ class ReviewResponseMap < ResponseMap
 
   # return  the responses for specified round, for varying rubric feature -Yang
   def self.get_assessments_round_for(team,round)
-    team_id =team.id
+    team_id = team.id
     responses = Array.new
     if team_id
       maps = ResponseMap.where(:reviewee_id => team_id, :type => "ReviewResponseMap")
@@ -186,39 +167,6 @@ class ReviewResponseMap < ResponseMap
   #OSS Project to refactor -->
 
   #Untested
-  def self.import_new(row, session, id)
-    if row.length < 2
-      raise ArgumentError, "Not enough items"
-    end
-
-    assignment = Assignment.find(id)
-    assignment_nil(assignment)
-    index = 1
-    while index < row.length
-      user = User.find_by_name(row[index].to_s.strip)
-      review_user_nil(user,row,index)
-      reviewer = AssignmentParticipant.where(user_id: user.id, parent_id:  assignment.id).first
-      reviewer_nil(reviewer,row,index)
-      if assignment.team_assignment
-        reviewee = AssignmentTeam.where(name: row[0].to_s.strip, parent_id:  assignment.id).first
-        reviewee_nil(reviewee,row)
-        existing = ReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
-        existing_nil(existing, reviewer, reviewee, assignment)
-      else
-        puser = User.find_by_name(row[0].to_s.strip)
-        reviewee_user_nil(reviewee,row)
-        reviewee = AssignmentParticipant.where(user_id: puser.id, parent_id:  assignment.id).first
-        reviewee_nil(reviewee,row)
-        team_id = TeamsUser.team_id(reviewee.parent_id, reviewee.user_id)
-        existing = ReviewResponseMap.where(reviewee_id: team_id, reviewer_id:  reviewer.id).first
-        existing_nil(existing, reviewer, reviewee, assignment)
-      end
-      index += 1
-    end
-  end
-
-
-
   private
   def reviwer_user_nil(user,row, index)
     if user.nil?
@@ -232,7 +180,6 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
-  private
   def assignment_nil(assignment)
     if assignment.nil?
       raise ImportError, "The assignment with id \"#{id}\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
@@ -251,7 +198,9 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
-  def existing_nil(existing, reviewer, reviewee, assignment)
+  def existing_nil( reviewer, reviewee, assignment)
+    team_id = TeamsUser.team_id(reviewee.parent_id, reviewee.user_id)
+    existing = ReviewResponseMap.where(reviewee_id: team_id, reviewer_id:  reviewer.id).first
     if existing.nil?
       ReviewResponseMap.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => assignment.id)
     end

@@ -54,7 +54,7 @@ function show_horizontal_questions(question_id){
         <% for @advice in question.question_advices.sort {|x,y| y.score <=> x.score } %>
           <td id="horizontal_question_<%=question.id%>_<%=i%>">
             <% i = i + 1; %>
-            <%= text_field 'advice[]', 'advice', :size => 12, :id => "horizontal_"+@advice.id.to_s+"_advice"%>
+            <%= text_area 'advice[]', 'advice', rows: 5, cols: 25, :id => "horizontal_"+@advice.id.to_s+"_advice"%>
           </td>
         <% end %>
       </tr>

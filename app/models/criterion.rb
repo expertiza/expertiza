@@ -44,7 +44,12 @@ class Criterion < ScoredQuestion
     html = '<li><p><label for="responses_' +count.to_s+ '">' +self.txt+ '</label></p>'
     #show advice for each criterion question
     question_advices = QuestionAdvice.where(question_id: self.id).sort_by { |advice| advice.id }
-    if question_advices.length > 0
+    advice_total_length = 0
+    question_advices.each do |question_advice|
+      advice_total_length += question_advice.advice.length
+    end
+
+    if question_advices.length > 0 and advice_total_length > 0
       html += '<a id="showAdivce_' + self.id.to_s + '" onclick="showAdvice(' + self.id.to_s + ')">Show advice</a>'
       html += '<script>'
       html += 'function showAdvice(i){'

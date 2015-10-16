@@ -85,11 +85,11 @@ class Criterion < ScoredQuestion
         end
         if j == questionnaire_min
           html += j.to_s
-          html += "-" + self.min_label if !self.min_label.nil?
+          html += "-" + self.min_label if self.min_label && self.min_label.length>0
           html += "</option>"
         elsif j == questionnaire_max
           html += j.to_s
-          html += "-" + self.max_label if !self.max_label.nil?
+          html += "-" + self.max_label if self.max_label && self.max_label.length>0
           html += "</option>"
         else
           html += j.to_s + "</option>"

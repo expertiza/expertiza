@@ -42,6 +42,35 @@ class Criterion < ScoredQuestion
     end
 
     html = '<li><p><label for="responses_' +count.to_s+ '">' +self.txt+ '</label></p>'
+    #show advice for each criterion question
+    question_advices = QuestionAdvice.where(question_id: self.id).sort_by { |advice| advice.id }
+    if question_advices.length > 0
+      html += '<a id="showAdivce_' + self.id.to_s + '" onclick="showAdvice(' + self.id.to_s + ')">Show advice</a>'
+      html += '<script>'
+      html += 'function showAdvice(i){'
+      html += 'var element = document.getElementById("showAdivce_" + i.toString());'
+      html += 'var show = element.innerHTML == "Hide advice";'
+      html += 'if (show){'
+      html += 'element.innerHTML="Show advice";'
+      html += '}else{'
+      html += 'element.innerHTML="Hide advice";}'
+      html += 'toggleAdvice(i);}'
+
+      html += 'function toggleAdvice(i) {'
+      html += 'var elem = document.getElementById(i.toString() + "_myDiv");'
+      html += 'if (elem.style.display == "none") {'
+      html += 'elem.style.display = "";'
+      html += '} else {'
+      html += 'elem.style.display = "none";}}'
+      html += '</script>'
+    end
+
+    html += '<div id="' + self.id.to_s + '_myDiv" style="display: none;">'
+    for advice_num in 0..question_advices.length - 1
+      html += (advice_num + 1).to_s + ' - ' + question_advices[advice_num].advice + '<br/>'
+    end
+    html += '</div>'
+
     if dropdown_or_scale == 'dropdown'
       html += '<table><td valign="top"><textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
       html += answer.comments if !answer.nil?

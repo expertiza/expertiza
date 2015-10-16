@@ -29,17 +29,16 @@ class AdviceController < ApplicationController
 
   # save the advice for a questionnaire
   def save_advice
-    @questionnaire = get(Questionnaire, params[:id])
+    @questionnaire = Questionnaire.find(params[:id])
 
     begin
       for advice_key in params[:advice].keys
-        QuestionAdvice.update(advice_key, params[:advice][advice_key])
+        QuestionAdvice.update(advice_key, :advice=>params[:advice][advice_key.to_sym][:advice])
       end
       flash[:notice] = "The questionnaire's question advice was successfully saved"
-      redirect_to :action => 'edit_advice', :id => params[:id]
-
     rescue ActiveRecord::RecordNotFound
       render :action => 'edit_advice', :id => params[:id]
     end
+    redirect_to :action => 'edit_advice', :id => params[:id]
   end
 end

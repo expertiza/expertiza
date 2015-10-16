@@ -41,7 +41,7 @@ class Criterion < ScoredQuestion
       rows = self.size.split(',')[1]
     end
 
-    html = '<li><p><label for="responses_' +count.to_s+ '">' +self.txt+ '</label></p>'
+    html = '<li><div><label for="responses_' +count.to_s+ '">' +self.txt+ '</label></div>'
     #show advice for each criterion question
     question_advices = QuestionAdvice.where(question_id: self.id).sort_by { |advice| advice.id }
     advice_total_length = 0
@@ -77,10 +77,7 @@ class Criterion < ScoredQuestion
     html += '</div>'
 
     if dropdown_or_scale == 'dropdown'
-      html += '<table><td valign="top"><textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
-      html += answer.comments if !answer.nil?
-      html += '</textarea></td><td valign="top">'
-      html += '<select id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]">'
+      html += '<div><select id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]">'
       html += '<option value=''>--</option>'
       for j in questionnaire_min..questionnaire_max
         if !answer.nil? and j == answer.answer
@@ -100,7 +97,10 @@ class Criterion < ScoredQuestion
           html += j.to_s + "</option>"
         end
       end
-      html += "</select></td></table><br>"
+      html += "</select></div>"
+      html += '<textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
+      html += answer.comments if !answer.nil?
+      html += '</textarea></td></br><br/>'
     elsif dropdown_or_scale == 'scale'
       html += '<input id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]" type="hidden"'
       html += 'value="'+answer.answer.to_s+'"' if !answer.nil?

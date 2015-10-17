@@ -93,4 +93,8 @@ RSpec.configure do |config|
   Dir["./spec/features/helpers/*.rb"].each do |filename|
     require filename.gsub(/\.rb/, "")
   end
+
+    config.mock_with :rspec
+
+
 end

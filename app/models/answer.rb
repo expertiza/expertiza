@@ -99,7 +99,7 @@ class Answer < ActiveRecord::Base
       sum_of_weights = 0
       max_question_score = 0
 
-      @questionnaire = Questionnaire.find(@questions[0].questionnaire_id)
+      #@questionnaire = Questionnaire.find(@questions[0].questionnaire_id)
 
       # questionnaireData = ScoreView.find_by_sql ["SELECT q1_max_question_score ,SUM(question_weight) as sum_of_weights,SUM(question_weight * s_score) as weighted_score
       # FROM score_views WHERE type in('Criterion', 'Scale') AND q1_id = ? AND s_response_id = ?",
@@ -137,7 +137,7 @@ class Answer < ActiveRecord::Base
       # max_question_score = questionnaireData[0].q1_max_question_score.to_f
 
 
-      submission_valid?(@response)
+     # submission_valid?(@response)
 
       if (sum_of_weights > 0 && max_question_score)
         return (weighted_score / (sum_of_weights * max_question_score)) * 100

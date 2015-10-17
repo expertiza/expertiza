@@ -15,8 +15,8 @@ class Answer < ActiveRecord::Base
       length_of_assessments=assessments.length.to_f
       assessments.each { |assessment|
 
-        current_score, scores = compute_stat(assessment,questions,scores,length_of_assessments)
-        total_score  += current_score
+        current_score, scores = compute_stat(assessment, questions, scores, length_of_assessments)
+        total_score += current_score
       }
 
 
@@ -26,18 +26,17 @@ class Answer < ActiveRecord::Base
         scores[:avg]=0
       end
 
-
     else
       scores[:max] = nil
       scores[:min] = nil
       scores[:avg] = nil
     end
 
-
     return scores
+
   end
 
-  def self.compute_stat(assessment,questions,scores,length_of_assessments)
+  def self.compute_stat(assessment, questions, scores, length_of_assessments)
 
     curr_score = get_total_score(:response => [assessment], :questions => questions)
 
@@ -54,7 +53,7 @@ class Answer < ActiveRecord::Base
       curr_score=0
     end
 
-     return curr_score, scores
+    return curr_score, scores
 
   end
 

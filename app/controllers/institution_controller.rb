@@ -6,7 +6,8 @@ class InstitutionController < ApplicationController
   end
 
   def index
-    list
+   # @institutions=Institution.All
+   list
     render :action => 'list'
   end
 
@@ -15,7 +16,8 @@ class InstitutionController < ApplicationController
     :redirect_to => { :action => :list }
 
   def list
-    @institutions = Institution.all
+    @institutions = Institution.all 
+
   end
 
   def show

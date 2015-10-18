@@ -120,6 +120,7 @@ class UsersController < ApplicationController
       end
 
       @user = User.new(user_params)
+      @user.institutions_id=params[:users][:institutions_id]
       # record the person who created this new user
       @user.parent_id = (session[:user]).id
       # set the user's timezone to its parent's

@@ -8,10 +8,12 @@
         :id => user.id %></td>
       <td><%= user.fullname %></td>
       <td><%= user.email %></td>
-      <td><%= (User.find(user.parent_id)).name  %></td>
+      <td><%= (User.find(user.id)).name  %></td>
     </tr>
   <% end -%>
 </table>
 
 <hr/>
-<p><%= link_to 'New Super administrator', :action => 'new' %></p>
+<%= form_tag(new_admin_path, method: :get) do %>
+  <input type='submit' value='New Super Administrator'/>
+<% end %>

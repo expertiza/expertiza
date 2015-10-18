@@ -1,9 +1,9 @@
 <!doctype html>
 <head>
+
   <title>
     <%= params[:controller] %> | <%= params[:action] %>
   </title>
-
   <%= stylesheet_link_tag    "application", media: "all" %>
   <%= javascript_include_tag "application" %>
   <%= csrf_meta_tags %>
@@ -20,20 +20,16 @@
         <div class="<%= controller_name %> <%= action_name %>"> 
         <%= yield %>
         </div>
-
       </div>
     </div>
   </div>
 
   <div class="clearing">&nbsp;</div>
-
   </div>
   <!-- class="wrapper" -->
-
   <div class="footer" align="center">
     <%= render 'shared/footer_message' %>
   </div>
   <!-- class="footer" -->
-
 </body>
 </html>

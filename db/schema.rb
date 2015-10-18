@@ -712,6 +712,7 @@ ActiveRecord::Schema.define(version: 20151021142107) do
     t.string  "timezonepref",              limit: 255
     t.text    "public_key",                limit: 65535
     t.boolean "copy_of_emails",            limit: 1,     default: false
+    t.integer "institutions_id",           limit: 4
   end
 
   add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree

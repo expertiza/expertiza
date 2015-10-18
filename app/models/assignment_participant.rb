@@ -265,7 +265,8 @@ class AssignmentParticipant < Participant
       if round==nil
         scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_for(self)
       else
-        scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_round_for(self,round)
+        #scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_round_for(self,round) -> Function renamed
+        scores[questionnaire_symbol][:assessments] = questionnaire.get_team_responses_for_round(self,round)
       end
       scores[questionnaire_symbol][:scores] = Answer.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
     end

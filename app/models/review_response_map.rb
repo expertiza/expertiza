@@ -31,7 +31,7 @@ class ReviewResponseMap < ResponseMap
 
   def self.export_fields(options)
     fields = ["contributor", "reviewed by"]
-    return fields
+    fields
   end
 
   def self.export(csv, parent_id, options)
@@ -99,20 +99,20 @@ class ReviewResponseMap < ResponseMap
     responses = Response.where(map_id: self.id)
     metareview_list=Array.new()
     responses.each do |response|
-      metareview_response_maps = MetareviewResponseMap.where(reviewed_object_id:response.id)
-      metareview_response_maps.each do |metareview_response_map|
-        metareview_list<<metareview_response_map
-      end
+      metareview_response_maps = MetareviewResponseMap.where(reviewed_object_id: response.id)
+      #metareview_response_maps.each do |metareview_response_map|
+        #metareview_list<<metareview_response_map
+      #end
     end
-    metareview_list
+    #metareview_list
+    metareview_response_maps
   end
 
   # return  the responses for specified round, for varying rubric feature -Yang
-  def self.get_assessments_round_for(team,round)
-    team_id = team.id
+  def self.get_team_responses_for_round(team,round)
     responses = Array.new
-    if team_id
-      maps = ResponseMap.where(:reviewee_id => team_id, :type => "ReviewResponseMap")
+    if team.id
+      maps = ResponseMap.where(:reviewee_id => team.id, :type => "ReviewResponseMap")
       maps.each{ |map|
         if !map.response.empty? && !map.response.reject{|r| r.round!=round}.empty?
           responses << map.response.reject{|r| r.round!=round}.last
@@ -120,7 +120,7 @@ class ReviewResponseMap < ResponseMap
       }
       responses.sort! {|a,b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }
     end
-    return responses
+    responses
   end
 
   #wrap lastest version of responses in each response map, together withe the questionnaire_id

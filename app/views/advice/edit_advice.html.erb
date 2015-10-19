@@ -42,14 +42,6 @@ function show_horizontal_questions(question_id){
       <% for i in (0..@questionnaire.max_question_score-@questionnaire.min_question_score) %>
         <th>
           <%= @questionnaire.max_question_score-i %>
-          <% if @questionnaire.true_false_questions? %>
-            <% if i == 0 %>
-              / True
-            <% end %>
-            <% if i == 1 %>
-              / False
-            <% end %>
-          <% end %>
         </th>
       <% end %>
     </tr>
@@ -62,7 +54,7 @@ function show_horizontal_questions(question_id){
         <% for @advice in question.question_advices.sort {|x,y| y.score <=> x.score } %>
           <td id="horizontal_question_<%=question.id%>_<%=i%>">
             <% i = i + 1; %>
-            <%= text_field 'advice[]', 'advice', :size => 12, :id => "horizontal_"+@advice.id.to_s+"_advice"%>
+            <%= text_area 'advice[]', 'advice', rows: 5, cols: 25, :id => "horizontal_"+@advice.id.to_s+"_advice"%>
           </td>
         <% end %>
       </tr>

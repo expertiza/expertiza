@@ -48,11 +48,11 @@
       <th align = 'left'> Additional Comment</th>
     </tr>
 
-    <tr>
-      <%@review_final_versions[key][:response_ids].each do |response_id|%>
+    <%@review_final_versions[key][:response_ids].each do |response_id|%>
+      <tr>
         <td> <%= Response.find(response_id).additional_comment%> </td>
-      <%end%>
-    </tr>
+      </tr>
+    <%end%>
     </table>
 
 <% end #loop for keys%>

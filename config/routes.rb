@@ -33,6 +33,12 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :advice do
+    collection do
+      post :save_advice
+    end
+  end
+
   resources :assessment360 do
     collection do
       get :one_course_all_assignments

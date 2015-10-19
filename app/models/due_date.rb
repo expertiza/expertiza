@@ -3,44 +3,49 @@ class DueDate < ActiveRecord::Base
   belongs_to :deadline_type
   validate :due_at_is_valid_datetime
 #  has_paper_trail
-
+  @@permission_id = Hash.new
+  @@permission_id['OK'] = DeadlineRight.find_by_name('OK').id
+  @@permission_id['No'] = DeadlineRight.find_by_name('No').id
+  @@permission_id['Late'] = DeadlineRight.find_by_name('Late').id
   def self.default_permission(deadline_type, permission_type)
-    permission_id = Hash.new
-    permission_id['OK'] = DeadlineRight.find_by_name('OK').id
-    permission_id['No'] = DeadlineRight.find_by_name('No').id
-    permission_id['Late'] = DeadlineRight.find_by_name('Late').id
 
     default_permission = Hash.new
+    if (deadline_type == 'submission')
     default_permission['submission'] = Hash.new
-    default_permission['submission']['submission_allowed'] = permission_id['OK']
-    default_permission['submission']['can_review'] = permission_id['No']
-    default_permission['submission']['review_of_review_allowed'] = permission_id['No']
-
-    default_permission['review'] = Hash.new
-    default_permission['review']['submission_allowed'] = permission_id['No']
-    default_permission['review']['can_review'] = permission_id['OK']
-    default_permission['review']['review_of_review_allowed'] = permission_id['No']
-
-    default_permission['metareview'] = Hash.new
-    default_permission['metareview']['submission_allowed'] = permission_id['No']
-    default_permission['metareview']['can_review'] = permission_id['No']
-    default_permission['metareview']['review_of_review_allowed'] = permission_id['OK']
-
-    default_permission['drop_topic'] = Hash.new
-    default_permission['drop_topic']['submission_allowed'] = permission_id['OK']
-    default_permission['drop_topic']['can_review'] = permission_id['No']
-    default_permission['drop_topic']['review_of_review_allowed'] = permission_id['No']
-
-    default_permission['signup'] = Hash.new
-    default_permission['signup']['submission_allowed'] = permission_id['OK']
-    default_permission['signup']['can_review'] = permission_id['No']
-    default_permission['signup']['review_of_review_allowed'] = permission_id['No']
-
-    default_permission['team_formation'] = Hash.new
-    default_permission['team_formation']['submission_allowed'] = permission_id['OK']
-    default_permission['team_formation']['can_review'] = permission_id['No']
-    default_permission['team_formation']['review_of_review_allowed'] = permission_id['No']
-
+    default_permission['submission']['submission_allowed'] = @@permission_id['OK']
+    default_permission['submission']['can_review'] = @@permission_id['No']
+    default_permission['submission']['review_of_review_allowed'] = @@permission_id['No']
+      else if (deadline_type == 'review')
+      default_permission['review'] = Hash.new
+      default_permission['review']['submission_allowed'] = @@permission_id['No']
+      default_permission['review']['can_review'] = @@permission_id['OK']
+      default_permission['review']['review_of_review_allowed'] = @@permission_id['No']
+         else if (deadline_type == 'metareview')
+          default_permission['metareview'] = Hash.new
+          default_permission['metareview']['submission_allowed'] = @@permission_id['No']
+          default_permission['metareview']['can_review'] = @@permission_id['No']
+          default_permission['metareview']['review_of_review_allowed'] = @@permission_id['OK']
+            else if (deadline_type == 'drop_topic')
+            default_permission['drop_topic'] = Hash.new
+            default_permission['drop_topic']['submission_allowed'] = @@permission_id['OK']
+            default_permission['drop_topic']['can_review'] = @@permission_id['No']
+            default_permission['drop_topic']['review_of_review_allowed'] = @@permission_id['No']
+              else if (deadline_type == 'signup')
+              default_permission['signup'] = Hash.new
+              default_permission['signup']['submission_allowed'] = @@permission_id['OK']
+              default_permission['signup']['can_review'] = @@permission_id['No']
+              default_permission['signup']['review_of_review_allowed'] = @@permission_id['No']
+                else if (deadline_type == 'team_formation')
+                default_permission['team_formation'] = Hash.new
+                default_permission['team_formation']['submission_allowed'] = @@permission_id['OK']
+                default_permission['team_formation']['can_review'] = @@permission_id['No']
+                default_permission['team_formation']['review_of_review_allowed'] = @@permission_id['No']
+                     end
+                end
+              end
+            end
+         end
+      end
     default_permission[deadline_type][permission_type]
   end
 
@@ -71,7 +76,7 @@ class DueDate < ActiveRecord::Base
     submit_duedate.save
   end
 
-  def setFlag()
+  def set_flag()
     self.flag = true
     self.save
   end

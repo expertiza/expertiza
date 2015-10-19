@@ -34,4 +34,9 @@ FactoryGirl.define do
           #after(:create) {|assignment| assignment.add_user(:user)}
           #after(:create) {|assignment| assignment.add_team(:team)}¬    end
   end
+
+  factory :sign_up_topic do
+    topic_name "Factory Girl"
+    category "Wiki Assignment"
+  end
   end

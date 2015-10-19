@@ -124,6 +124,7 @@ require 'analytic/assignment_analytic'
   #This method is only for the assignments without topics
   def candidate_assignment_teams_to_review(reviewer)
     # the contributors are AssignmentTeam objects
+
     contributor_set = Array.new(contributors)
 
     # Reject contributors that have no submissions
@@ -329,7 +330,7 @@ require 'analytic/assignment_analytic'
   def contributors
     #ACS Contributors are just teams, so removed check to see if it is a team assignment
     @contributors ||= teams #ACS
-  end
+   end
 
   def assign_metareviewer_dynamically(meta_reviewer)
     # The following method raises an exception if not successful which

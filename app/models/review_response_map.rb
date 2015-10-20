@@ -30,25 +30,25 @@ class ReviewResponseMap < ResponseMap
   end
 
   def self.export_fields(options)
-    fields = ["contributor", "reviewed by"]
+    fields = ['contributor', 'reviewed by']
     fields
   end
 
   def self.export(csv, parent_id, options)
     mappings = where(reviewed_object_id: parent_id)
     mappings.sort! { |a, b| a.reviewee.name <=> b.reviewee.name }
-    mappings.each {
+    mappings.each do
       |map|
       csv << [
         map.reviewee.name,
         map.reviewer.name
       ]
-    }
+    end
   end
 
-  def self.import(row, session, id)
+  def self.import(row, _session, id)
     if row.length < 2
-      raise ArgumentError, "Not enough items"
+      raise ArgumentError, 'Not enough items'
     end
 
     assignment = Assignment.find(id)
@@ -79,7 +79,7 @@ class ReviewResponseMap < ResponseMap
     if(!self.response.empty? && response)
       map = FeedbackResponseMap.find_by_reviewed_object_id(response.id)
       if map && !map.response.empty?
-        return map.response.last.display_as_html()
+        map.response.last.display_as_html
       end
     end
   end
@@ -87,9 +87,9 @@ class ReviewResponseMap < ResponseMap
   # This method adds a new entry in the ResponseMap
   def self.add_reviewer(contributor_id, reviewer_id, assignment_id)
     if where(reviewee_id: contributor_id, reviewer_id: reviewer_id).count > 0
-      create(:reviewee_id => contributor_id,
-             :reviewer_id => reviewer_id,
-             :reviewed_object_id => assignment_id)
+      create(reviewee_id: contributor_id,
+             reviewer_id: reviewer_id,
+             reviewed_object_id: assignment_id)
     else
       raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
     end
@@ -97,7 +97,7 @@ class ReviewResponseMap < ResponseMap
 
   def metareview_response_maps
     responses = Response.where(map_id: self.id)
-    metareview_list=Array.new()
+    #metareview_list=Array.new()
     responses.each do |response|
       metareview_response_maps = MetareviewResponseMap.where(reviewed_object_id: response.id)
       #metareview_response_maps.each do |metareview_response_map|
@@ -109,15 +109,15 @@ class ReviewResponseMap < ResponseMap
   end
 
   # return  the responses for specified round, for varying rubric feature -Yang
-  def self.get_team_responses_for_round(team,round)
-    responses = Array.new
+  def self.get_team_responses_for_round(team, round)
+    responses = []
     if team.id
-      maps = ResponseMap.where(:reviewee_id => team.id, :type => "ReviewResponseMap")
-      maps.each{ |map|
-        if !map.response.empty? && !map.response.reject{|r| r.round!=round}.empty?
-          responses << map.response.reject{|r| r.round!=round}.last
+      maps = ResponseMap.where(reviewee_id: team.id, type: 'ReviewResponseMap')
+      maps.each do |map|
+        if !map.response.empty? && !map.response.reject{ |r| r.round != round}.empty?
+          responses << map.response.reject{ |r| r.round != round}.last
         end
-      }
+      end
       responses.sort! {|a,b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }
     end
     responses
@@ -128,31 +128,28 @@ class ReviewResponseMap < ResponseMap
   def self.final_versions_from_reviewer(reviewer_id)
     maps = ReviewResponseMap.where(reviewer_id: reviewer_id)
     assignment = Assignment.find(Participant.find(reviewer_id).parent_id)
-    review_final_versions = Hash.new
+    review_final_versions = {}
 
     if !assignment.varying_rubrics_by_round?
       #same review rubric used in multiple rounds
-      review_final_versions[:review] = Hash.new
+      review_final_versions[:review] = {}
       review_final_versions[:review][:questionnaire_id] = assignment.get_review_questionnaire_id
-      response_ids = Array.new
-
+      response_ids = []
       maps.each do |map|
-        responses = Response.where(map_id:map.id)
+        responses = Response.where(map_id: map.id)
         if !responses.empty?
           response_ids << responses.last.id
         end
       end
       review_final_versions[:review][:response_ids] = response_ids
-
     else
       #vary rubric by round
       rounds_num = assignment.rounds_of_reviews
-
-      for round in 1..rounds_num
-        symbol = ("review round"+round.to_s).to_sym
-        review_final_versions[symbol] = Hash.new
+      (1..rounds_num).each do |round|
+        symbol = ('review round'+round.to_s).to_sym
+        review_final_versions[symbol] = {}
         review_final_versions[symbol][:questionnaire_id] = assignment.get_review_questionnaire_id(round)
-        response_ids = Array.new
+        response_ids = []
 
         maps.each do |map|
           responses = Response.where(map_id: map.id, round: round)
@@ -162,22 +159,21 @@ class ReviewResponseMap < ResponseMap
         end
         review_final_versions[symbol][:response_ids] = response_ids
       end
-
     end
     review_final_versions
   end
 
-  #OSS Project to refactor -->
+  #OSS Project - Private methods for import function
 
-  #Untested
   private
-  def reviwer_user_nil(user,row, index)
+
+  def reviwer_user_nil(user, row, index)
     if user.nil?
       raise ImportError, "The user account for the reviewer \"#{row[index]}\" was not found. <a href='/users/new'>Create</a> this user?"
     end
   end
 
-  def reviewee_user_nil(user,row)
+  def reviewee_user_nil(user, row)
     if user.nil?
       raise ImportError, "The user account for the reviewee \"#{row[0]}\" was not found. <a href='/users/new'>Create</a> this user?"
     end
@@ -189,14 +185,14 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
-  def reviewer_nil(reviewer,row,index)
-    if reviewer == nil
+  def reviewer_nil(reviewer, row, index)
+    if reviewer.nil?
       raise ImportError, "The reviewer \"#{row[index]}\" is not a participant in this assignment. <a href='/users/new'>Register</a> this user as a participant?"
     end
   end
 
-  def reviewee_nil(reviewee,row)
-    if reviewee == nil
+  def reviewee_nil(reviewee, row)
+    if reviewee.nil?
       raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"
     end
   end
@@ -205,9 +201,8 @@ class ReviewResponseMap < ResponseMap
     team_id = TeamsUser.team_id(reviewee.parent_id, reviewee.user_id)
     existing = ReviewResponseMap.where(reviewee_id: team_id, reviewer_id:  reviewer.id).first
     if existing.nil?
-      ReviewResponseMap.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id,\
-       :reviewed_object_id => assignment.id)
+      ReviewResponseMap.create(reviewer_id: reviewer.id, reviewee_id: reviewee.id,\
+       reviewed_object_id: assignment.id)
     end
   end
-
 end

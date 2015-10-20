@@ -15,36 +15,31 @@ class DueDate < ActiveRecord::Base
     default_permission['submission']['submission_allowed'] = @@permission_id['OK']
     default_permission['submission']['can_review'] = @@permission_id['No']
     default_permission['submission']['review_of_review_allowed'] = @@permission_id['No']
-      else if (deadline_type == 'review')
+      elsif (deadline_type == 'review')
       default_permission['review'] = Hash.new
       default_permission['review']['submission_allowed'] = @@permission_id['No']
       default_permission['review']['can_review'] = @@permission_id['OK']
       default_permission['review']['review_of_review_allowed'] = @@permission_id['No']
-         else if (deadline_type == 'metareview')
+         elsif (deadline_type == 'metareview')
           default_permission['metareview'] = Hash.new
           default_permission['metareview']['submission_allowed'] = @@permission_id['No']
           default_permission['metareview']['can_review'] = @@permission_id['No']
           default_permission['metareview']['review_of_review_allowed'] = @@permission_id['OK']
-            else if (deadline_type == 'drop_topic')
+            elsif (deadline_type == 'drop_topic')
             default_permission['drop_topic'] = Hash.new
             default_permission['drop_topic']['submission_allowed'] = @@permission_id['OK']
             default_permission['drop_topic']['can_review'] = @@permission_id['No']
             default_permission['drop_topic']['review_of_review_allowed'] = @@permission_id['No']
-              else if (deadline_type == 'signup')
+              elsif (deadline_type == 'signup')
               default_permission['signup'] = Hash.new
               default_permission['signup']['submission_allowed'] = @@permission_id['OK']
               default_permission['signup']['can_review'] = @@permission_id['No']
               default_permission['signup']['review_of_review_allowed'] = @@permission_id['No']
-                else if (deadline_type == 'team_formation')
+                elsif (deadline_type == 'team_formation')
                 default_permission['team_formation'] = Hash.new
                 default_permission['team_formation']['submission_allowed'] = @@permission_id['OK']
                 default_permission['team_formation']['can_review'] = @@permission_id['No']
                 default_permission['team_formation']['review_of_review_allowed'] = @@permission_id['No']
-                     end
-                end
-              end
-            end
-         end
       end
     default_permission[deadline_type][permission_type]
   end

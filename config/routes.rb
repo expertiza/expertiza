@@ -312,6 +312,7 @@ Expertiza::Application.routes.draw do
       get :distribution
       get :list_mappings
       get :response_report
+      post :response_report
       get :select_metareviewer
       get :select_reviewer
       get :select_mapping

@@ -30,6 +30,7 @@
       <% @reviewers.each do |r| %>
         <% @response_maps = ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", @id, r.reviewer_id,@type]) %>
         <tr>
+        <% @this_reviewer = r.reviewer_id %>
         <% @count = 0 %>
         <% @rspan = 0 %>
         <%@l = @l+1 %>

@@ -1,4 +1,17 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<%= form_tag :action => 'response_report', :id => @id do %>
+  <select name='report[type]' style="width: 10em">
+    <option value='ReviewResponseMap' selected>
+      Review report
+    </option>
+    <option value='FeedbackResponseMap' >
+      Author feedback report
+    </option>
+  </select>
+  <%= submit_tag("Submit") %>
+<% end %>
+
 <% if @type == "ReviewResponseMap" %>
   <h1> Review report for <%= @assignment.name%> </h1>
 <% else %>

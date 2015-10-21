@@ -613,7 +613,7 @@ class ReviewMappingController < ApplicationController
     @assignment = Assignment.find(@id)
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    @type = "FeedbackResponseMap"
+    @type =  params.has_key?(:report)? params[:report][:type] : "ReviewResponseMap"
 
     case @type
     when "ReviewResponseMap"

@@ -4,7 +4,7 @@ class PopupController < ApplicationController
     true
   end
 
-  # this can be called from "review_report" by clicking team names from instructor end.
+  # this can be called from "response_report" by clicking team names from instructor end.
   def team_users_popup
     @sum = 0
     @count = 0
@@ -118,7 +118,7 @@ class PopupController < ApplicationController
 
   end
 
-  # this can be called from "review_report" by clicking reviewer names from instructor end.
+  # this can be called from "response_report" by clicking reviewer names from instructor end.
   def reviewer_details_popup
     @userid = Participant.find(params[:id]).user_id
     @user = User.find(@userid)

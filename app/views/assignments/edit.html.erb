@@ -28,8 +28,14 @@
             <br>
             <input name="assignment_form[assignment][can_review_same_topic]" type="hidden" value="false"/>
             <%= check_box_tag('assignment_form[assignment][can_review_same_topic]', 'true', @assignment_form.assignment.can_review_same_topic?)%>
-            <%= label_tag('assignment_form[assignment][can_review_same_topic]', 'Can authors review others team who work on same topic?') %>
+            <%= label_tag('assignment_form[assignment][can_review_same_topic]', 'Enable authors to review others working on same topic?') %>
             <img src="/assets/info.png" title="If checked, it is possible that the auhtors review another artifact on the same topic "/>
+            <br>
+
+            <input name="assignment_form[assignment][can_choose_topic_to_review]" type="hidden" value="false"/>
+            <%= check_box_tag('assignment_form[assignment][can_choose_topic_to_review]', 'true', @assignment_form.assignment.can_choose_topic_to_review?)%>
+            <%= label_tag('assignment_form[assignment][can_choose_topic_to_review]', 'Allow reviewer to choose which topic to review') %>
+
             <br>
             <input name="assignment_form[assignment][use_bookmark]" type="hidden" value="false"/>
             <%= check_box_tag('assignment_form[assignment][use_bookmark]', 'true', @assignment_form.assignment.use_bookmark, {:onChange => 'useBookmarkChanged()'})%>

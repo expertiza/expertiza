@@ -1,30 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <div>
 
-  <h3>Members of <%= @team.name %></h3>
-
-  <table width = "100%">
-    <tr>
-      <td>
-        <table>
-          <% if(@teamusers.nil?) %>
-            <tr>No team members</tr>
-          <%else%>
-            <% @teamusers.each do |t|%>
-              <tr>
-                <td> - </td>
-                <td><%= User.find(t.user_id).fullname%></td>
-              </tr>
-            <%end%>
-          <%end%>
-        </table>
-      </td>
-      
-  </tr>
-</table>
-
-<%if @scores == nil%>
-
+<%if @response_id.nil? %>
   <tr> <td align = "center">No review done yet.</td> </tr>
   <br/>
   <tr>
@@ -35,36 +12,28 @@
   </tr>
   <br/>
 <%else%>
-  <h3> Reviewed by <%= User.find(@reviewer_id).fullname%></h3>
-
+  <h3> Author Feedback to <%= @user.fullname %></h3>
   <table>
     <tr>
-
       <th align = 'left' width = "50%"> Question </th>
       <th width = "5%"> Score </th>
       <th width = "45%"> Comments </th>
-
     </tr>
-
     <% @scores.each do |s|%>
-
       <tr>
-
-        <td align = 'left'> <%= Question.find(s.question_id).txt%></td>
-        <%if Question.find(s.question_id).is_a?(ScoredQuestion)%>
-          <td align = 'center'> <%= s.answer%>/<%=@maxscore%></td>
+        <td align = 'left'> <%= Question.find(s.question_id).txt %></td>
+        <%if Question.find(s.question_id).is_a?(ScoredQuestion) %>
+          <td align = 'center'> <%= s.answer %>/<%= @maxscore %></td>
         <%else%>
-          <td align = 'center'> <%= s.answer%></td>
+          <td align = 'center'> <%= s.answer %></td>
         <%end%>
         <td align = 'left'> <%= s.comments %> </td>
-
       </tr>
     <%end%>
     <tr>
       <th>Reviewer Score (Σ weighted score/Σ weighted available score)</th>
-      <td align = "center"><%= @sum%>/<%=@total_possible%> </td>
+      <td align = "center"><%= @sum %>/<%= @total_possible %> </td>
       <td align = "left"> = <%= @total_percentage.is_a?(Float)?  sprintf("%.2f", @total_percentage).to_s+"%" :@total_percentage%></td>
-
     </table>
 
     <table >
@@ -72,10 +41,10 @@
         <th> Additional Comment</th>
       </tr>
       <tr>
-        <%if (Response.find(@reviewid).additional_comment)== nil%>
+        <%if @response.additional_comment.nil? %>
           <td> No Comments </td>
         <%else%>
-          <td> <%= Response.find(@reviewid).additional_comment%> </td>
+          <td> <%= @response.additional_comment %> </td>
         <%end%>
       </tr>
     </table>

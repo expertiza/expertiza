@@ -26,16 +26,16 @@
       </th>
     </tr>
 
-
       <%@l = -1 %>
       <% @reviewers.each do |r| %>
+        <% @response_maps = ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", @id, r.reviewer_id,@type]) %>
         <tr>
         <% @this_reviewer = r.reviewer_id %>
         <% @count = 0 %>
         <% @rspan = 0 %>
         <%@l = @l+1 %>
-        <% ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", @id, r.reviewer_id,@type]).each do |ri| %>
-          <% if (Response.find_by_map_id(ri.id)) %>
+        <% @response_maps.each do |ri| %>
+          <% if (Response.where(ri.id)) %>
             <% @count = @count + 1 %>
           <% end %>
           <% if (Team.where(["id = ?", ri.reviewee_id ]).length > 0) %>
@@ -59,29 +59,29 @@
 
           <%end %>
 
-          <% if (@count == (ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ?", @id, r.reviewer_id])).length) %>
+          <% if (@count == @response_maps.length) %>
                   <% if (@l%2) == 0 %>
             <td bgcolor="#ffffff"  align = "left" rowspan= <%= @rspan%>>
-              <%= @count %>/<%= @rspan %>
+              <%= @count %>/<%= @rspan %> <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.reviewer_id, :assignment_id=>@id%>
             </td>
                   <%else %>
                       <td bgcolor="#DDDDBB"  align = "left" rowspan= <%= @rspan%>>
-                        <%= @count %>/<%= @rspan %>
+                        <%= @count %>/<%= @rspan %> <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.reviewer_id, :assignment_id=>@id%>
                       </td>
                   <%end %>
           <%else %>
                   <% if (@l%2) == 0 %>
             <td bgcolor="#ffffff" align = "left" rowspan= <%= @rspan%>>
-              <%= @count %>/<%= @rspan %>
+              <%= @count %>/<%= @rspan %> <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.reviewer_id, :assignment_id=>@id%>
             </td>
                   <%else %>
                       <td bgcolor="#DDDDBB" align = "left" rowspan= <%= @rspan%>>
-                        <%= @count %>/<%= @rspan %>
+                        <%= @count %>/<%= @rspan %> <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.reviewer_id, :assignment_id=>@id%>
                       </td>
                   <%end %>
           <%end %>
 
-          <% (ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", @id, r.reviewer_id, @type])).each do |ri| %>
+          <% @response_maps.each do |ri| %>
             <% if (Response.find_by_map_id(ri.id)) %>
               <% if Team.where(["id = ?", ri.reviewee_id ]).length > 0 %>
                 <%@team = Team.find(ri.reviewee_id) %>

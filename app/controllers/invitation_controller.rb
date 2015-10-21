@@ -1,7 +1,7 @@
 class InvitationController < ApplicationController
 
   def action_allowed?
-    ['Student', 'Instructor'].include?(current_role_name)
+    ['Student', 'Instructor', 'Teaching Assistant'].include?(current_role_name)
   end
 
   def new

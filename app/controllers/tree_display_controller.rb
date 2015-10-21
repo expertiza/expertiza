@@ -297,21 +297,30 @@ class TreeDisplayController < ApplicationController
   end
 
   def filter
+    #Search String - Assignment Name or Course Name
     search = params[:filter_string]
+    #Filter Node : QAN - Questionnaire by Assignment Name
+    #              ACN - Assignment By Course Name
     filter_node = params[:filternode]
     qid = 'filter+'
 
     if filter_node == 'QAN'
+      #Find assignment by name
       assignment = Assignment.find_by_name(search)
       if assignment
+        #find questionnaires for assignment
         assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment.id)
         if assignment_questionnaires
+          #Add Questionnaire IDs to qid
           assignment_questionnaires.each { |q|  qid << "#{q.questionnaire_id.to_s}+" }
+          #Unused session[:root]
           session[:root] = 1
         end
       end
     elsif filter_node == 'ACN'
+      #Unused sesion[:root]
       session[:root] = 2
+      # Add Course name to qid
       qid <<  search
     end
     return qid

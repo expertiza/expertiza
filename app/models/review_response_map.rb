@@ -97,12 +97,8 @@ class ReviewResponseMap < ResponseMap
 
   def metareview_response_maps
     responses = Response.where(map_id: self.id)
-    #metareview_list=Array.new()
     responses.each do |response|
       metareview_response_maps = MetareviewResponseMap.where(reviewed_object_id: response.id)
-      #metareview_response_maps.each do |metareview_response_map|
-        #metareview_list<<metareview_response_map
-      #end
     end
     #metareview_list
     metareview_response_maps
@@ -123,7 +119,7 @@ class ReviewResponseMap < ResponseMap
     responses
   end
 
-  #wrap lastest version of responses in each response map, together withe the questionnaire_id
+  #wrap The latest version of responses in each response map, together with the questionnaire_id
   # will be used to display the reviewer summary
   def self.final_versions_from_reviewer(reviewer_id)
     maps = ReviewResponseMap.where(reviewer_id: reviewer_id)
@@ -167,36 +163,42 @@ class ReviewResponseMap < ResponseMap
 
   private
 
+  # Check for if user value for reviewer is null
   def reviwer_user_nil(user, row, index)
     if user.nil?
       raise ImportError, "The user account for the reviewer \"#{row[index]}\" was not found. <a href='/users/new'>Create</a> this user?"
     end
   end
 
+  # Check for if user value for reviewee is null
   def reviewee_user_nil(user, row)
     if user.nil?
       raise ImportError, "The user account for the reviewee \"#{row[0]}\" was not found. <a href='/users/new'>Create</a> this user?"
     end
   end
 
+  # Check for if assignment value is null
   def assignment_nil(assignment)
     if assignment.nil?
       raise ImportError, "The assignment with id \"#{id}\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
     end
   end
 
+  # Check for if reviewer value is null
   def reviewer_nil(reviewer, row, index)
     if reviewer.nil?
       raise ImportError, "The reviewer \"#{row[index]}\" is not a participant in this assignment. <a href='/users/new'>Register</a> this user as a participant?"
     end
   end
 
+  # Check for if reviewee value is null
   def reviewee_nil(reviewee, row)
     if reviewee.nil?
       raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"
     end
   end
 
+  # Check for if review already exists, if not, create new one
   def existing_nil( reviewer, reviewee, assignment)
     team_id = TeamsUser.team_id(reviewee.parent_id, reviewee.user_id)
     existing = ReviewResponseMap.where(reviewee_id: team_id, reviewer_id:  reviewer.id).first

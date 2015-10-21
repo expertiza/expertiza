@@ -101,28 +101,27 @@ def self.get_questions_from_csv(questionnaire, file)
 end
 
 def self.adjust_advice_size(questionnaire, question)
-  if question.true_false and question.question_advices.length != 2
-    question.question_advices << QuestionAdvice.new(:score=>0)
-    question.question_advices << QuestionAdvice.new(:score=>1)
+  # now we only support question advices for scored questions
+  if question.is_a?(ScoredQuestion)
 
-    QuestionAdvice.delete_all(["question_id = ? AND (score > 1 OR score < 0)", question.id])
-    return true
-  elsif question.true_false == false
-    for i in (questionnaire.min_question_score..questionnaire.max_question_score)
-      print "\n#{i}: #{question.id}"
-      qa = QuestionAdvice.where("question_id = #{question.id} AND score = #{i}").first
+    max = questionnaire.max_question_score
+    min = questionnaire.min_question_score
 
-        if qa == nil
-          print " NEW "
-          question.question_advices << QuestionAdvice.new(:score=>i)
-      end
+    if !max.nil? && !min.nil?
+      QuestionAdvice.delete_all(["question_id = ? AND (score > "+max.to_s+" OR score < "+min.to_s+")", question.id])
     end
 
-    QuestionAdvice.delete_all(["question_id = ? AND (score > ? OR score < ?)",
-                               question.id, questionnaire.max_question_score, questionnaire.min_question_score])
-    return true
-  end
+    for i in (questionnaire.min_question_score..questionnaire.max_question_score)
+      qas = QuestionAdvice.where("question_id = #{question.id} AND score = #{i}")
+      if qas.first.nil?
+        question.question_advices << QuestionAdvice.new(:score=>i)
+      end
+      if qas.size>1
+        QuestionAdvice.delete("question_id = #{question.id} AND score = #{i}")
+      end
 
-  return false
+    end
+  end
 end
+
 end

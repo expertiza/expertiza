@@ -607,32 +607,41 @@ class ReviewMappingController < ApplicationController
     redirect_to :action => 'list_mappings', :id => assignment.id
   end
 
-  def review_report
+  def response_report
     # Get the assignment id and set it in an instance variable which will be used in view
     @id = params[:id]
     @assignment = Assignment.find(@id)
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    @type = "ReviewResponseMap"
+    @type =  params.has_key?(:report)? params[:report][:type] : "ReviewResponseMap"
 
-    if params[:user].nil?
-      # This is not a search, so find all reviewers for this assignment
-      @reviewers = ResponseMap.select( "DISTINCT reviewer_id").where( ["reviewed_object_id = ? and type = ? ", @id, @type] )
-    else
-      # This is a search, so find reviewers by user's full name
-      us = User.select( "DISTINCT id").where( ["fullname LIKE ?", '%'+params[:user][:fullname]+'%'])
-      participants = Participant.select( "DISTINCT id").where( ["user_id IN (?) and parent_id = ?", us, @assignment.id] )
-      @reviewers = ResponseMap
-        .select( "DISTINCT reviewer_id")
-        .where( ["reviewed_object_id = ? and type = ? and reviewer_id IN (?) ", @id, @type, participants] )
+    case @type
+    when "ReviewResponseMap"
+      if params[:user].nil?
+        # This is not a search, so find all reviewers for this assignment
+        @reviewers = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ?", @id, @type])
+      else
+        # This is a search, so find reviewers by user's full name
+        user = User.select("DISTINCT id").where(["fullname LIKE ?", '%'+params[:user][:fullname]+'%'])
+        participants = Participant.select("DISTINCT id").where(["user_id IN (?) and parent_id = ?", user, @assignment.id])
+        @reviewers = ResponseMap
+          .select("DISTINCT reviewer_id")
+          .where(["reviewed_object_id = ? and type = ? and reviewer_id IN (?)", @id, @type, participants] )
+      end
+      #  @review_scores[reveiwer_id][reviewee_id] = score for assignments not using vary_rubric_by_rounds feature
+      # @review_scores[reviewer_id][round][reviewee_id] = score for assignments using vary_rubric_by_rounds feature
+      @review_scores = @assignment.compute_reviews_hash
+      @avg_and_ranges= @assignment.compute_avg_and_ranges_hash
+    when "FeedbackResponseMap"
+      #Example query
+      #SELECT distinct reviewer_id FROM response_maps where type = 'FeedbackResponseMap' and 
+      #reviewed_object_id in (select id from responses where 
+      #map_id in (select id from response_maps where reviewed_object_id = 722 and type = 'ReviewResponseMap'))
+      @response_map_ids = ResponseMap.select("id").where(["reviewed_object_id = ? and type = ?", @id, 'ReviewResponseMap'])
+      @response_ids = Response.select("id").where(["map_id IN (?)", @response_map_ids])
+      @reviewers = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id IN (?) and type = ?", @response_ids, @type])
     end
-
-    #  @review_scores[reveiwer_id][reviewee_id] = score for assignments not using vary_rubric_by_rounds feature
-    # @review_scores[reviewer_id][round][reviewee_id] = score for assignments using vary_rubric_by_rounds feature
-    @review_scores = @assignment.compute_reviews_hash
-
-    @avg_and_ranges= @assignment.compute_avg_and_ranges_hash
-    end
+  end
 
   # This method should be re-written since the score cache is no longer working.
   def distribution

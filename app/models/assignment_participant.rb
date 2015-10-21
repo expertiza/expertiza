@@ -652,10 +652,5 @@ class AssignmentParticipant < Participant
       team_id = TeamsUser.team_id(participant.parent_id, participant.user_id)
       ReviewResponseMap.where(reviewee_id: team_id, reviewed_object_id: assignment.id)
     end
-
-    def topic_string
-      return "<center>&#8212;</center>" if topic.nil? or topic.topic_name.empty?
-        topic.topic_name
-    end
   
   end

@@ -129,10 +129,8 @@ class SignUpSheet < ActiveRecord::Base
         duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_subm, round: j).first
         deadline_type_rev = DeadlineType.find_by_name('review').id
         duedate_rev = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_rev, round: j).first
-        if !duedate_subm.nil? && !duedate_rev.nil?
-          @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
-          @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
-        else
+
+        if duedate_subm.nil? || duedate_rev.nil?
           #the topic is new. so copy deadlines from assignment
           set_of_due_dates = DueDate.where(assignment_id: assignment_id)
           set_of_due_dates.each { |due_date|
@@ -142,10 +140,12 @@ class SignUpSheet < ActiveRecord::Base
           duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_subm, round: j).first
           deadline_type_rev = DeadlineType.find_by_name('review').id
           duedate_rev = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_rev, round: j).first
-          @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
-          @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
         end
+
+        @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
+        @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
       end
+      
       deadline_type_subm = DeadlineType.find_by_name('metareview').id
       duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_subm).first
       @duedates[i]['submission_'+ (@review_rounds+1).to_s] = !(duedate_subm.nil?) ? (DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")) : nil

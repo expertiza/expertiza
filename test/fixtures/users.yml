@@ -1,0 +1,105 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+# This model initially had no columns defined.  If you add columns to the
+# model remove the '{}' from the fixture names and add the columns immediately
+# below each fixture, per the syntax in the comments below
+#
+
+admin1:
+   id: 2
+   parent_id: 2
+   email_on_review: 1
+   private_by_default: 0
+   email_on_review_of_review: 1
+   is_new_user: 0
+   email_on_submission: 1
+   name:  admin1
+   crypted_password:  9cf6216bb9900ddd36aa1c9ea368216281ab2211
+   role_id: 4
+   password_salt: kNEkWThEF3QUOjJnvrjr
+   fullname:  1, admin
+   email: admin1@ncsu.edu
+   timezonepref: International Date Line West
+
+instructor1:
+   id: 6
+   parent_id: 2
+   email_on_review: 1
+   private_by_default: 0
+   email_on_review_of_review: 1
+   is_new_user: 0
+   email_on_submission: 1
+   name:  instructor1
+   crypted_password:  dbe60dcaccfd8de1a54299ac107fdae170ef0436
+   role_id: 2
+   password_salt: h7CyBWAsTiOtYTuR9cc1
+   fullname:  1, instructor
+   email: instructor1@ncsu.edu
+   timezonepref: International Date Line West
+
+student1:
+   id: 1
+   parent_id: 6
+   private_by_default: 0
+   email_on_review: 1
+   email_on_review_of_review: 1
+   is_new_user: 0
+   email_on_submission: 1
+   name:  student1
+   crypted_password:  dbe60dcaccfd8de1a54299ac107fdae170ef0436
+   role_id: 1
+   password_salt: h7CyBWAsTiOtYTuR9cc1
+   fullname:  1, student
+   email: student1@ncsu.edu
+   timezonepref: International Date Line West
+
+
+student2:
+   id: 10
+   parent_id: 6
+   private_by_default: 0
+   email_on_review: 1
+   email_on_review_of_review: 1
+   is_new_user: 0
+   email_on_submission: 1
+   name:  student2
+   crypted_password:  3da18ceb33932f7e3fd8559b26d7a0d61edefcd4
+   role_id: 1
+   password_salt: 6DrqhAPyQaCc2II8Jl1
+   fullname:  10, student
+   email: student2@ncsu.edu
+   timezonepref:  International Date Line West
+
+
+student3:
+   id: 3
+   name:  student3
+   private_by_default: 0
+   email_on_review: 1
+   email_on_review_of_review: 1
+   is_new_user: 0
+   email_on_submission: 1
+   parent_id: 6
+   crypted_password:  3da18ceb33932f7e3fd8559b26d7a0d61edefcd4
+   role_id: 1
+   password_salt: 6DrqhAPyQaCc2II8Jl1
+   fullname:  3, student
+   email: student3@ncsu.edu
+   timezonepref:  International Date Line West
+
+
+student4:
+   id: 4
+   name:  student4
+   private_by_default: 0
+   email_on_review: 1
+   email_on_review_of_review: 1
+   is_new_user: 0
+   email_on_submission: 1
+   parent_id: 6
+   crypted_password:  3da18ceb33932f7e3fd8559b26d7a0d61edefcd4
+   role_id: 1
+   password_salt: 6DrqhAPyQaCc2II8Jl1
+   fullname:  4, student
+   email: student4@ncsu.edu
+   timezonepref:  International Date Line West

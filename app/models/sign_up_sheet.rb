@@ -125,8 +125,10 @@ class SignUpSheet < ActiveRecord::Base
       @duedates[i]['topic_name'] = topic.topic_name
 
       for j in 1..@review_rounds
-        duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id: DeadlineType.find_by_name('submission').id, round: j).first
-        duedate_rev = TopicDeadline.where(topic_id: topic.id, deadline_type_id: DeadlineType.find_by_name('review').id, round: j).first
+        deadline_type_subm = DeadlineType.find_by_name('submission').id
+        duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_subm, round: j).first
+        deadline_type_rev = DeadlineType.find_by_name('review').id
+        duedate_rev = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_rev, round: j).first
         if !duedate_subm.nil? && !duedate_rev.nil?
           @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
           @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
@@ -136,13 +138,16 @@ class SignUpSheet < ActiveRecord::Base
           set_of_due_dates.each { |due_date|
             DueDate.assign_topic_deadline(due_date, 0, topic.id)
           }
-          duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id: DeadlineType.find_by_name('submission').id, round: j).first
-          duedate_rev = TopicDeadline.where(topic_id: topic.id, deadline_type_id: DeadlineType.find_by_name('review').id, round: j).first
+          deadline_type_subm = DeadlineType.find_by_name('submission').id
+          duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_subm, round: j).first
+          deadline_type_rev = DeadlineType.find_by_name('review').id
+          duedate_rev = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_rev, round: j).first
           @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
           @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
         end
       end
-      duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id: DeadlineType.find_by_name('metareview').id).first
+      deadline_type_subm = DeadlineType.find_by_name('metareview').id
+      duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_subm).first
       @duedates[i]['submission_'+ (@review_rounds+1).to_s] = !(duedate_subm.nil?) ? (DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")) : nil
       i = i + 1
     }

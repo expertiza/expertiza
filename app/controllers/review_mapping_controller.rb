@@ -333,19 +333,6 @@ class ReviewMappingController < ApplicationController
     return failedCount
   end
 
-  def delete_participant
-    contributor = AssignmentParticipant.find(params[:id])
-    name = contributor.name
-    assignment_id = contributor.assignment
-    begin
-      contributor.destroy
-      flash[:note] = "\"#{name}\" is no longer a participant in this assignment."
-    rescue
-      flash[:error] = "\"#{name}\" was not removed. Please ensure that \"#{name}\" is not a reviewer or metareviewer and try again."
-      end
-    redirect_to :action => 'list_mappings', :id => assignment_id
-  end
-
   def delete_reviewer
     review_response_map = ReviewResponseMap.find(params[:id])
     assignment_id = review_response_map.assignment.id

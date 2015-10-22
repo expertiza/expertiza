@@ -8,7 +8,7 @@ class ReviewMappingController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'add_quiz_response_map', 'assign_quiz_dynamically'
+    when 'add_dynamic_reviewer', 'release_mapping', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'add_quiz_response_map', 'assign_quiz_dynamically'
       true
     else
       ['Instructor',
@@ -372,7 +372,7 @@ class ReviewMappingController < ApplicationController
     redirect_to :action => 'list_mappings', :id => assignment_id
   end
 
-  def release_reservation
+  def release_mapping
     mapping = ResponseMap.find(params[:id])
     student_id = mapping.reviewer_id
     mapping.delete

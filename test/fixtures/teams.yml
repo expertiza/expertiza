@@ -1,0 +1,25 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+team1:
+  id: 1
+  name: team1
+  parent_id: 1
+  type: AssignmentTeam
+  comments_for_advertisement: nil
+  advertise_for_partner: false
+
+team2:
+  id: 2
+  name: team2
+  parent_id: 1
+  type: AssignmentTeam
+  comments_for_advertisement: nil
+  advertise_for_partner: false
+
+team3:
+  id: 3
+  name: team3
+  parent_id: 2
+  type: AssignmentTeam
+  comments_for_advertisement: nil
+  advertise_for_partner: false

@@ -85,11 +85,13 @@ class CourseController < ApplicationController
       @course.save!
       parent_id = CourseNode.get_parent_id
       if parent_id
-        CourseNode.create(:node_object_id => @course.id, :parent_id => parent_id)
+        a = CourseNode.create(:node_object_id => @course.id, :parent_id => parent_id)
       else
-        CourseNode.create(:node_object_id => @course.id)
+        a = CourseNode.create(:node_object_id => @course.id)
       end
       FileHelper.create_directory(@course)
+      puts "Course Created successfully"
+      puts a.node_object_id
       undo_link("Course \"#{@course.name}\" has been created successfully. ")
       redirect_to :controller => 'tree_display', :action => 'list'
     rescue

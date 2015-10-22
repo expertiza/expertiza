@@ -10,7 +10,6 @@ class Credentials
 
     role = Role.find(@role_id)
     @updated_at = role.updated_at
-
     @role_ids = role.get_parents.map{|r|r.id}
 
     permissions = Permission.find_for_role(@role_ids)
@@ -19,7 +18,6 @@ class Credentials
     if @permission_ids.empty?
       @permission_ids << 0
     end
-
     #    actions = ControllerAction.find_by_sql ["select *, (case when permission_id in (?) then 1 else 0 end) as allowed from view_controller_actions",
     #                                           @permission_ids]
     actions = ControllerAction.actions_allowed(@permission_ids)
@@ -54,7 +52,6 @@ class Credentials
         @pages[p.name] = false
       end
     end
-
   end
 
 end

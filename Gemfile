@@ -55,6 +55,7 @@ gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
+gem "factory_girl_rails", "~> 4.0"
 
 group :development do
   gem 'daemons'

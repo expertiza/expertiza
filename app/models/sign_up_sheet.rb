@@ -118,39 +118,47 @@ class SignUpSheet < ActiveRecord::Base
     @duedates = {}
     return @duedates if @topics.nil?
     @topics.each_with_index do |topic, i|
-      @duedates[i] = {}
-      @duedates[i]['id'] = topic.id
-      @duedates[i]['topic_identifier'] = topic.topic_identifier
-      @duedates[i]['topic_name'] = topic.topic_name
+      @duedates[i] = duedate = {}
+      duedate['id'] = topic.id
+      duedate['topic_identifier'] = topic.topic_identifier
+      duedate['topic_name'] = topic.topic_name
 
-      for j in 1..@review_rounds
-        duedate_rev, duedate_subm = find_topic_duedates(j, topic)
-
-        if duedate_subm.nil? || duedate_rev.nil?
-          #the topic is new. so copy deadlines from assignment
-          set_of_due_dates = DueDate.where(assignment_id: assignment_id)
-          set_of_due_dates.each { |due_date|
-            DueDate.assign_topic_deadline(due_date, 0, topic.id)
-          }
-          duedate_rev, duedate_subm = find_topic_duedates(j, topic)
-        end
-
-        @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
-        @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
+      for round in 1..@review_rounds
+        process_review_round(assignment_id, duedate, round, topic)
       end
 
       deadline_type_subm = DeadlineType.find_by_name('metareview').id
       duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_subm).first
-      @duedates[i]['submission_'+ (@review_rounds+1).to_s] = !(duedate_subm.nil?) ? (DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")) : nil
+      subm_string = duedate_subm.nil? ? nil : DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
+      duedate['submission_'+ (@review_rounds+1).to_s] = subm_string
     end
-    return @duedates
+    @duedates
   end
 
-  def self.find_topic_duedates(round, topic)
-    deadline_type_subm = DeadlineType.find_by_name('submission').id
-    duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_subm, round: round).first
-    deadline_type_rev = DeadlineType.find_by_name('review').id
-    duedate_rev = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_rev, round: round).first
-    return duedate_rev, duedate_subm
+  class << self
+    private
+    def process_review_round(assignment_id, duedate, round, topic)
+      duedate_rev, duedate_subm = find_topic_duedates(round, topic)
+
+      if duedate_subm.nil? || duedate_rev.nil?
+        #the topic is new. so copy deadlines from assignment
+        set_of_due_dates = DueDate.where(assignment_id: assignment_id)
+        set_of_due_dates.each { |due_date|
+          DueDate.assign_topic_deadline(due_date, 0, topic.id)
+        }
+        duedate_rev, duedate_subm = find_topic_duedates(round, topic)
+      end
+
+      duedate['submission_'+ round.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
+      duedate['review_'+ round.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
+    end
+
+    def find_topic_duedates(round, topic)
+      deadline_type_subm = DeadlineType.find_by_name('submission').id
+      duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_subm, round: round).first
+      deadline_type_rev = DeadlineType.find_by_name('review').id
+      duedate_rev = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_rev, round: round).first
+      return duedate_rev, duedate_subm
+    end
   end
 end

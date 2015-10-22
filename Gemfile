@@ -75,6 +75,7 @@ group :test do
   gem 'rspec-rails'
   gem 'shoulda'
   gem 'test-unit'
+  gem 'rspec-mocks'
 end
 
 group :assets do

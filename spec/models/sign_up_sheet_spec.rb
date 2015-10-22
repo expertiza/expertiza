@@ -1,9 +1,28 @@
-require 'rspec'
+require 'rails_helper'
 
-describe 'Test RSpec Works' do
+describe SignUpSheet do
 
-  it 'should do something' do
+  describe '.add_signup_topic' do
 
-    true.should == false
+    it 'will return an empty Hash when there are no topics' do
+      assignment = double(Assignment)
+      allow(assignment).to receive(:get_review_rounds) { nil }
+      allow(Assignment).to receive(:find) { assignment }
+
+      allow(SignUpTopic).to receive(:where) { nil }
+
+      expect(SignUpSheet.add_signup_topic(2)).to eql({})
+    end
+
+    it 'will return an empty Hash when there are no topics' do
+      assignment = double(Assignment)
+      allow(assignment).to receive(:get_review_rounds) { nil }
+      allow(Assignment).to receive(:find) { assignment }
+
+      allow(SignUpTopic).to receive(:where) { nil }
+
+      expect(SignUpSheet.add_signup_topic(2)).to eql({})
+    end
+
   end
 end

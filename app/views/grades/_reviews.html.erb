@@ -33,6 +33,18 @@
 
         <% if controller.action_name != "view_my_scores" %>
             <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a><%= review.display_as_html(prefix) %>
+            <!-- Display the latest review first -->
+            <!--%= review.display_as_html(nil,review.version_num, file_url) %--><BR/><BR/>
+            <%= review.display_as_html(nil,0, nil) %><BR/><BR/>
+            <!--Display FileUpload question type-->
+            <% current_folder = DisplayOption.new %>
+            <% current_folder.name = "" %>
+            <% files = @participant.files(@participant.review_file_path(review.response_map.id).to_s + current_folder.name) %>
+            <% @questions[:review].each do |question| %>
+                <% if question.instance_of? UploadFile %>
+                    <%= display_directory_tree(@participant, files, true).html_safe %>
+                <% end %>
+            <% end %>
         <% else %>
 
             <h2>Review <%= count %></h2>

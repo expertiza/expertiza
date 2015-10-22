@@ -124,10 +124,7 @@ class SignUpSheet < ActiveRecord::Base
       @duedates[i]['topic_name'] = topic.topic_name
 
       for j in 1..@review_rounds
-        deadline_type_subm = DeadlineType.find_by_name('submission').id
-        duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_subm, round: j).first
-        deadline_type_rev = DeadlineType.find_by_name('review').id
-        duedate_rev = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_rev, round: j).first
+        duedate_rev, duedate_subm = find_topic_duedates(j, topic)
 
         if duedate_subm.nil? || duedate_rev.nil?
           #the topic is new. so copy deadlines from assignment
@@ -135,10 +132,7 @@ class SignUpSheet < ActiveRecord::Base
           set_of_due_dates.each { |due_date|
             DueDate.assign_topic_deadline(due_date, 0, topic.id)
           }
-          deadline_type_subm = DeadlineType.find_by_name('submission').id
-          duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_subm, round: j).first
-          deadline_type_rev = DeadlineType.find_by_name('review').id
-          duedate_rev = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_rev, round: j).first
+          duedate_rev, duedate_subm = find_topic_duedates(j, topic)
         end
 
         @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
@@ -150,5 +144,13 @@ class SignUpSheet < ActiveRecord::Base
       @duedates[i]['submission_'+ (@review_rounds+1).to_s] = !(duedate_subm.nil?) ? (DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")) : nil
     end
     return @duedates
+  end
+
+  def self.find_topic_duedates(round, topic)
+    deadline_type_subm = DeadlineType.find_by_name('submission').id
+    duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_subm, round: round).first
+    deadline_type_rev = DeadlineType.find_by_name('review').id
+    duedate_rev = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_rev, round: round).first
+    return duedate_rev, duedate_subm
   end
 end

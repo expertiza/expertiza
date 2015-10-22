@@ -117,8 +117,7 @@ class SignUpSheet < ActiveRecord::Base
     #@duedates = SignUpTopic.find_by_sql("SELECT s.id as topic_id FROM sign_up_topics s WHERE s.assignment_id = " + assignment_id.to_s)
     @duedates = {}
     return @duedates if @topics.nil?
-    i=0
-    @topics.each { |topic|
+    @topics.each_with_index do |topic, i|
       @duedates[i] = {}
       @duedates[i]['id'] = topic.id
       @duedates[i]['topic_identifier'] = topic.topic_identifier
@@ -145,12 +144,11 @@ class SignUpSheet < ActiveRecord::Base
         @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
         @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
       end
-      
+
       deadline_type_subm = DeadlineType.find_by_name('metareview').id
       duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_subm).first
       @duedates[i]['submission_'+ (@review_rounds+1).to_s] = !(duedate_subm.nil?) ? (DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")) : nil
-      i = i + 1
-    }
+    end
     return @duedates
   end
 end

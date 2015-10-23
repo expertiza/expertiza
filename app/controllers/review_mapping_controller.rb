@@ -128,24 +128,6 @@ class ReviewMappingController < ApplicationController
     end
   end
 
-  #  Looks up the team from the submission.
-  def get_team_from_submission(submission)
-    # Get the list of teams for this assignment.
-    teams = AssignmentTeam.where(parent_id:  submission.parent_id)
-
-    teams.each do |team|
-      team.teams_users.each do |team_member|
-        if team_member.user_id == submission.user_id
-          # Found the team, return it!
-          return team
-        end
-      end
-    end
-
-    # No team found
-    return nil
-  end
-
   #7/12/2015 -zhewei
   #This method is used for assign submissions to students for peer review.
   #This method is different from 'assignment_reviewer_automatically', which is in 'review_mapping_controller' and is used for instructor assigning reviewers in instructor-selected assignment.

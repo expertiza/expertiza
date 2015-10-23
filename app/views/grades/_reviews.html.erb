@@ -33,33 +33,31 @@
 
         <% if controller.action_name != "view_my_scores" %>
             <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a><%= review.display_as_html(prefix) %>
-            <!-- Display the latest review first -->
-            <!--%= review.display_as_html(nil,review.version_num, file_url) %--><BR/><BR/>
-            <%= review.display_as_html(nil,0, nil) %><BR/><BR/>
-            <!--Display FileUpload question type-->
-            <% current_folder = DisplayOption.new %>
-            <% current_folder.name = "" %>
-            <% files = @participant.files(@participant.review_file_path(review.response_map.id).to_s + current_folder.name) %>
-            <% @questions[:review].each do |question| %>
-                <% if question.instance_of? UploadFile %>
-                    <%= display_directory_tree(@participant, files, true).html_safe %>
-                <% end %>
-            <% end %>
         <% else %>
-
             <h2>Review <%= count %></h2>
-            <!-- Display the latest review first -->
-            <!--%= review.display_as_html(nil,review.version_num, file_url) %--><BR/><BR/>
-            <%= review.display_as_html(nil,0, nil) %><BR/><BR/>
-            <!--Display FileUpload question type-->
-            <% current_folder = DisplayOption.new %>
-            <% current_folder.name = "" %>
-            <% files = @participant.files(@participant.review_file_path(review.response_map.id).to_s + current_folder.name) %>
-            <% @questions[:review].each do |question| %>
-                <% if question.instance_of? UploadFile %>
-                    <%= display_directory_tree(@participant, files, true).html_safe %>
-                <% end %>
+        <% end %>
+        
+        <!-- Display the latest review first -->
+        <!--%= review.display_as_html(nil,review.version_num, file_url) %--><BR/>
+        <%= review.display_as_html(nil,0, nil) %><BR/>
+        <!--Display FileUpload question type-->
+        <% current_folder = DisplayOption.new %>
+        <% current_folder.name = "" %>
+        <% files = @participant.files(@participant.review_file_path(review.response_map.id).to_s + current_folder.name) %>
+
+        <!--change code in order to compat to multi-round review-->
+        <% if @assignment.varying_rubrics_by_round? and !review.round.nil? %>
+            <% review_symbol = 'review' + review.round.to_s %>
+        <% else %>
+            <% review_symbol = 'review' %>
+        <% end %>
+        <% @questions[review_symbol.to_sym].each do |question| %>
+            <% if question.instance_of? UploadFile %>
+                <%= display_directory_tree(@participant, files, true).html_safe %>
             <% end %>
+        <% end %>
+
+        <% if controller.action_name == "view_my_scores" %>
             <!-- get all previous versions -->
             <% @sorted_array=Array.new %>
             <% @prev=Response.all %>
@@ -98,8 +96,7 @@
             <% else %>
                 <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
             <% end %>
-            <BR/><HR/><BR/>
-
+            <BR/><HR/>
         <% end %>
     <% end %>
 <% else %>

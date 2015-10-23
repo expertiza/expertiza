@@ -418,58 +418,6 @@ class ReviewMappingController < ApplicationController
     @items.sort{|a,b| a.name <=> b.name}
   end
 
-  def list_sortable
-    @assignment = Assignment.find(params[:id])
-    @entries = Array.new
-    index = 0
-    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
-    contributors = AssignmentTeam.where(parent_id: @assignment.id)
-    contributors.sort!{|a,b| a.name <=> b.name}
-    contributors.each{
-      |contrib|
-      review_mappings = ResponseMap.where(reviewed_object_id: @assignment.id, reviewee_id: contrib.id)
-
-      if review_mappings.length == 0
-        single = Array.new
-        single[0] = contrib.name
-        single[1] = "&nbsp;"
-        single[2] = "&nbsp;"
-        @entries[index] = single
-        index += 1
-      else
-        review_mappings.sort!{|a,b| a.reviewer.name <=> b.reviewer.name}
-        review_mappings.each{
-          |review_map|
-          metareview_mappings = MetareviewResponseMap.where(reviewed_object_id: review_map.map_id)
-          if metareview_mappings.length == 0
-            single = Array.new
-            single[0] = contrib.name
-            single[1] = review_map.reviewer.name
-            single[2] = "&nbsp;"
-            @entries[index] = single
-            index += 1
-          else
-            metareview_mappings.sort!{|a,b| a.reviewer.name <=> b.reviewer.name}
-            metareview_mappings.each{
-              |metareview_map|
-              single = Array.new
-              single[0] = contrib.name
-              single[1] = review_map.reviewer.name
-              if metareview_map.review_reviewer == nil
-                single[2] = metareview_map.reviewer.name
-              else
-                single[2] = metareview_map.review_reviewer.name
-              end
-              @entries[index] = single
-              index += 1
-            }
-          end
-        }
-      end
-    }
-    end
-
   def automatic_review_mapping
     assignment_id = params[:id].to_i
     participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.shuffle!

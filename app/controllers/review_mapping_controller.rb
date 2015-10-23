@@ -383,15 +383,6 @@ class ReviewMappingController < ApplicationController
     redirect_to :action => 'list_mappings', :id => assignment_id
   end
 
-  def delete_rofreviewer
-    mapping = ResponseMapping.find(params[:id])
-    revmapid = mapping.review_mapping.id
-    mapping.delete
-
-    flash[:note] = "The metareviewer has been deleted."
-    redirect_to :action => 'list_rofreviewers', :id => revmapid
-  end
-
   def list
     all_assignments = Assignment.order('name').where( ["instructor_id = ?",session[:user].id])
 

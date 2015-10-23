@@ -52,6 +52,31 @@ describe SignUpSheetController do
     expect(response).should redirect_to(redirect_to :action => 'add_signup_topics', :id => @assignment.id)
   end
 
+  it "should be able to update a topic for assignment that needs the waitlisted users updated" do
+    sign_up_topic = SignUpTopic.new
+    sign_up_topic.max_choosers = 0
+    allow(SignUpTopic).to receive(:where) { sign_up_topic }
+    allow(sign_up_topic).to receive(:first) { sign_up_topic }
+
+    allow(SignedUpTeam).to receive(:find_by_topic_id) { SignedUpTeam.new }
+
+    get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
+    expect(response).should redirect_to(redirect_to :action => 'add_signup_topics', :id => @assignment.id)
+  end
+
+  it "should be able to update a topic for assignment but warn when max_choosers is too much" do
+    sign_up_topic = SignUpTopic.new
+    sign_up_topic.max_choosers = 4
+    allow(SignUpTopic).to receive(:where) { sign_up_topic }
+    allow(sign_up_topic).to receive(:first) { sign_up_topic }
+
+    allow(SignedUpTeam).to receive(:find_by_topic_id) { SignedUpTeam.new }
+
+    get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
+    expect(response).should redirect_to(redirect_to :action => 'add_signup_topics', :id => @assignment.id)
+    expect(flash[:error]).to eq('Value of maximum choosers can only be increased! No change has been made to max choosers.')
+  end
+
   it "should be able to edit topic" do
     get :edit, id: @topic1.id
     expect(response).to be_success

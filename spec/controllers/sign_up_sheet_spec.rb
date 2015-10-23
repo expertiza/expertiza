@@ -42,6 +42,16 @@ describe SignUpSheetController do
     expect(response).should redirect_to(edit_assignment_path(@assignment.id) + "#tabs-5")
   end
 
+  it "should be able to update a topic for assignment that already has max choosers set" do
+    sign_up_topic = SignUpTopic.new
+    sign_up_topic.max_choosers = 2
+    allow(SignUpTopic).to receive(:where) { sign_up_topic }
+    allow(sign_up_topic).to receive(:first) { sign_up_topic }
+
+    get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
+    expect(response).should redirect_to(redirect_to :action => 'add_signup_topics', :id => @assignment.id)
+  end
+
   it "should be able to edit topic" do
     get :edit, id: @topic1.id
     expect(response).to be_success

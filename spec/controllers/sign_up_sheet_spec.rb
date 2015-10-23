@@ -77,6 +77,25 @@ describe SignUpSheetController do
     expect(flash[:error]).to eq('Value of maximum choosers can only be increased! No change has been made to max choosers.')
   end
 
+  it "should be able to update a topic with a microtask" do
+    @assignment.microtask = true
+    @assignment.save
+    get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
+    expect(response).should redirect_to(edit_assignment_path(@assignment.id) + "#tabs-5")
+  end
+
+  it "should be able to update a topic with staggard deadlines" do
+    @assignment.staggered_deadline = true
+    @assignment.save
+    get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
+    expect(response).should redirect_to(edit_assignment_path(@assignment.id) + "#tabs-5")
+  end
+
+  it "should fail gracefully when a topic cannot be saved" do
+    get :create, id: @assignment.id, topic: {topic_name: "New Topic", topic_identifier: "Ch1", category: "Programming"}
+    expect(response).should render_template("sign_up_sheet/new")
+  end
+
   it "should be able to edit topic" do
     get :edit, id: @topic1.id
     expect(response).to be_success

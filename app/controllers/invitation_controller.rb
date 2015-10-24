@@ -72,21 +72,20 @@ class InvitationController < ApplicationController
 
   def accept
     @inv = Invitation.find(params[:inv_id])
-
     student = Participant.find(params[:student_id])
-
     assignment_id=@inv.assignment_id
     inviter_user_id=@inv.from_id
+
     inviter_participant = AssignmentParticipant.find_by_user_id_and_assignment_id(inviter_user_id,assignment_id)
 
     ready_to_join=false
     #check if the inviter's team is still existing, and have available slot to add the invitee
     inviter_assignment_team = AssignmentTeam.team(inviter_participant)
     if inviter_assignment_team.nil?
-      flash[:error]= "The team which invited you does not exist any more."
+      flash[:error]= @@messages[:invitation_not_exist]
     else
       if inviter_assignment_team.full?
-        flash[:error]= "The team which invited you is full now."
+        flash[:error]= @@messages[:full_team]
       else
         ready_to_join=true
       end
@@ -103,7 +102,7 @@ class InvitationController < ApplicationController
       add_successful = Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, student.parent_id)
 
       unless add_successful
-        flash[:error]= "The system fails to add you to the team which invited you."
+        flash[:error] = @@messages[:fail_to_add]
       end
     else
       #The error message should have been flashed from the checks on ready_to_join flag
@@ -132,6 +131,9 @@ class InvitationController < ApplicationController
     @@messages[:max_members] = "Your team already has max members."
     @@messages[:already_member] = "\"#{name}\" is already a member of team."
     @@messages[:already_invited] = "You have already sent an invitation to \"#{name}\"."
+    @@messages[:full_team] = "The team which invited you is full now."
+    @@messages[:invitation_not_exist]= "The team which invited you does not exist any more."
+    @@messages[:fail_to_add] = "The system fails to add you to the team which invited you."
   end
   private def set_invitation(to_id,from_id,assignment_id,reply_status)
     @invitation = Invitation.new

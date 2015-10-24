@@ -66,7 +66,7 @@ student2:
    crypted_password:  3da18ceb33932f7e3fd8559b26d7a0d61edefcd4
    role_id: 1
    password_salt: 6DrqhAPyQaCc2II8Jl1
-   fullname:  10, student
+   fullname:  2, student
    email: student2@ncsu.edu
    timezonepref:  International Date Line West
 
@@ -102,4 +102,20 @@ student4:
    password_salt: 6DrqhAPyQaCc2II8Jl1
    fullname:  4, student
    email: student4@ncsu.edu
+   timezonepref:  International Date Line West
+   
+student7:
+   id: 7
+   name:  student7
+   private_by_default: 0
+   email_on_review: 1
+   email_on_review_of_review: 1
+   is_new_user: 0
+   email_on_submission: 1
+   parent_id: 6
+   crypted_password:  3da18ceb33932f7e3fd8559b26d7a0d61edefcd4
+   role_id: 1
+   password_salt: 6DrqhAPyQaCc2II8Jl1
+   fullname:  7, student
+   email: student7@ncsu.edu
    timezonepref:  International Date Line West

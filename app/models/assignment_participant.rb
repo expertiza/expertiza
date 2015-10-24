@@ -10,7 +10,7 @@ require 'yaml'
 
 class AssignmentParticipant < Participant
   require 'wiki_helper'
-  require 'file_helper'
+  include FileHelper
 
   belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
   has_many    :review_mappings, :class_name => 'ReviewResponseMap', :foreign_key => 'reviewee_id'

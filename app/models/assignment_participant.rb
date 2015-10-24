@@ -10,6 +10,7 @@ require 'yaml'
 
 class AssignmentParticipant < Participant
   require 'wiki_helper'
+  require 'file_helper'
 
   belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
   has_many    :review_mappings, :class_name => 'ReviewResponseMap', :foreign_key => 'reviewee_id'
@@ -46,9 +47,7 @@ class AssignmentParticipant < Participant
     (((sum_of_scores.to_f / number_of_scores.to_f) * 100).to_i) / 100.0
   end
 
-  def dir_path
-    assignment.try :directory_path
-  end
+
 
   # Returns the average score of all reviews for this user on this assignment
   def average_score
@@ -449,31 +448,7 @@ class AssignmentParticipant < Participant
     BookmarkRatingResponseMap.get_assessments_for(self)
   end
 
-  def submitted_files
-    files(self.path) if self.directory_num
-  end
 
-  def files(directory)
-    files_list = Dir[directory + "/*"]
-    files = Array.new
-
-    files_list.each do |file|
-      if File.directory?(file)
-        dir_files = files(file)
-        dir_files.each{|f| files << f}
-      end
-      files << file
-    end
-    files
-  end
-
-  def submitted_files()
-    files = Array.new
-    if(self.directory_num)
-      files = files(self.path)
-    end
-    return files
-  end
 
   def wiki_submissions
     current_time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s

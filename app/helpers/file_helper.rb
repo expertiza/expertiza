@@ -83,4 +83,34 @@ module FileHelper
       raise "An error was encountered while creating this directory: "+$!
     end
   end
+
+  def submitted_files
+    files(self.path) if self.directory_num
+  end
+
+  def files(directory)
+    files_list = Dir[directory + "/*"]
+    files = Array.new
+
+    files_list.each do |file|
+      if File.directory?(file)
+        dir_files = files(file)
+        dir_files.each{|f| files << f}
+      end
+      files << file
+    end
+    files
+  end
+
+  def submitted_files()
+    files = Array.new
+    if(self.directory_num)
+      files = files(self.path)
+    end
+    return files
+  end
+
+  def dir_path
+    assignment.try :directory_path
+  end
 end

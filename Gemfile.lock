@@ -58,8 +58,8 @@ GEM
     babel-transpiler (0.7.0)
       babel-source (>= 4.0, < 6)
       execjs (~> 2.0)
-    bind-it (0.2.7)
-      rjb (~> 1.4.3)
+    bind-it (0.2.6)
+      rjb
     builder (3.2.2)
     capistrano (3.4.0)
       i18n
@@ -302,7 +302,7 @@ GEM
     rgl (0.5.1)
       algorithms (~> 0.6.1)
       stream (~> 0.5.0)
-    rjb (1.4.9)
+    rjb (1.5.3)
     rspec (3.3.0)
       rspec-core (~> 3.3.0)
       rspec-expectations (~> 3.3.0)
@@ -457,7 +457,7 @@ DEPENDENCIES
   rb-readline
   react-rails (~> 1.0)
   rgl
-  rjb
+  rjb (= 1.5.3)
   rspec-rails
   rubyzip
   rwordnet (= 0.1.3)

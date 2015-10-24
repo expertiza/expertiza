@@ -35,6 +35,17 @@ class TeamsUsersControllerTest < ActionController::TestCase
     post :create, user: {name: users(:student1).name}, 'id'=>1
     post :create, user: {name: users(:student2).name}, 'id'=>1
     post :create, user: {name: users(:student3).name}, 'id'=>1
+    assert_not_equal "The team already has the maximum number of members.", flash[:error]
+
+  end
+
+  test "add_four_members" do
+    @request.session[:user] = User.find(users(:instructor1).id)
+    user = User.find(users(:instructor1).id)
+    post :create, user: {name: users(:student1).name}, 'id'=>1
+    post :create, user: {name: users(:student2).name}, 'id'=>1
+    post :create, user: {name: users(:student3).name}, 'id'=>1
+    post :create, user: {name: users(:student4).name}, 'id'=>1
     assert_equal "The team already has the maximum number of members.", flash[:error]
 
   end
@@ -50,9 +61,9 @@ class TeamsUsersControllerTest < ActionController::TestCase
   test "add_non_participant_to_team" do
     @request.session[:user] = User.find(users(:instructor1).id)
     user = User.find(users(:instructor1).id)
-    post :create, user: {name: users(:student4).name}, 'id'=>1
+    post :create, user: {name: users(:student7).name}, 'id'=>1
     url = "http://test.host/participants/list?authorization=participant&id=1&model=Assignment"
-    assert_equal "\"student4\" is not a participant of current assignment. Please <a href=\"#{url}\">add</a> this user before continuing.", flash[:error]
+    assert_equal "\"student7\" is not a participant of current assignment. Please <a href=\"#{url}\">add</a> this user before continuing.", flash[:error]
   end
 
 

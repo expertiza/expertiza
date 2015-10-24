@@ -22,6 +22,7 @@ cucumber:
   password: 
   host: localhost
 
+
 production:
   adapter: mysql2
   database: expertiza_production

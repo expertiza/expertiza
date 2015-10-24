@@ -58,11 +58,11 @@ class Team < ActiveRecord::Base
   end
 
  def full?
-  if self.parent_id==nil
+  if self.parent_id == nil
     return false
   end
-  max_team_members=Assignment.find(self.parent_id).max_team_size
-  curr_team_size= Team.size(self.id)
+  max_team_members = Assignment.find(self.parent_id).max_team_size
+  curr_team_size = Team.size(self.id)
   return (curr_team_size >= max_team_members)
  end
 
@@ -70,8 +70,8 @@ class Team < ActiveRecord::Base
     if has_user(user)
       raise "\""+user.name+"\" is already a member of the team, \""+self.name+"\""
     end
-
-    if can_add_member=!full?
+        
+    if can_add_member = !full?
       t_user = TeamsUser.create(:user_id => user.id, :team_id => self.id)
       parent = TeamNode.find_by_node_object_id(self.id)
       TeamUserNode.create(:parent_id => parent.id, :node_object_id => t_user.id)
@@ -169,7 +169,7 @@ class Team < ActiveRecord::Base
 
   def import_team_members(starting_index, row)
     index = starting_index
-    while(index < row.length)
+    while (index < row.length)
       user = User.find_by_name(row[index].to_s.strip)
       if user.nil?
         raise ImportError, "The user \""+row[index].to_s.strip+"\" was not found. <a href='/users/new'>Create</a> this user?"

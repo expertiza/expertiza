@@ -1,82 +1,75 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class CourseTeamTest < ActiveSupport::TestCase
-  fixtures :course,:teams,:users,:participants,:assignments,:nodes,:tree_folders,:teams_users, :roles
+  fixtures :courses, :teams, :users, :teams_users, :participants, :assignments, :nodes, :roles
 
 
   def setup
-    @course = courses(:course1)
+    @course1 = courses(:course1)
     @course0 = courses(:course0)
 
-    @course_team = teams(:team2)
-    @course_team0 = teams(:team7)
+    @course_team6 = teams(:team6)
+    TeamNode.create(:parent_id => @course0.id, :node_object_id => @course_team6.id)
+    @course_team7 = teams(:team7)
   end
 
   def test_retrieval
-    assert_kind_of CourseTeam, @course_team
-    assert_equal "team3", @course_team.name
-    assert_equal teams(:team2).id, @course_team.id
-    assert_equal teams(:team2).parent_id, @course_team.parent_id
-    assert_equal @course_team.participant_type, 'CourseParticipant'
-    assert_equal @course_team.parent_model, 'Course'
-    assert_equal @course_team.get_node_type, 'TeamNode'
+    assert_kind_of CourseTeam, @course_team6
+    assert_equal "team6", @course_team6.name
+    assert_equal teams(:team6).id, @course_team6.id
+    assert_equal teams(:team6).parent_id, @course_team6.parent_id
+    assert_equal @course_team6.participant_type, 'CourseParticipant'
+    assert_equal @course_team6.get_node_type, 'TeamNode'
   end
 
   def test_import_participants
     row = ["instructor1", "student1", "student2"]
-    teams(:team2).import_team_members(0, row)
-    assert_equal teams(:team2).has_user(users(:instructor1)), true
-    assert_equal teams(:team2).has_user(users(:student1)), true
-    assert_equal teams(:team2).has_user(users(:student2)), true
-  end
-
-  def test_export_participants
-    output = teams(:team2).export_participants
-    assert_equal output[0], teams_users(:teams_users4).name
-    assert_equal output[1], " "
+    @course_team6.import_team_members(0, row)
+    assert_equal @course_team6.has_user(users(:instructor1)), true
+    assert_equal @course_team6.has_user(users(:student1)), true
+    assert_equal @course_team6.has_user(users(:student2)), true
   end
 
   def test_instance_export
-    course = courses(:course0)
     team_name_only = "false"
-    output = teams(:team2).export(team_name_only)
-    assert_equal output[0], teams(:team2).name
-    assert_equal output[1][0], users(:student6).name
-    assert_equal output[2], course.name
+    output = @course_team7.export(team_name_only)
+    assert_equal output[0], @course_team7.name
+    assert_equal output[1], users(:student4).name
+    assert_equal output[2], users(:student7).name
+    assert_equal output[3], @course0.name
     team_name_only = "true"
-    output = teams(:team2).export(team_name_only)
-    assert_equal output[0], teams(:team2).name
-    assert_equal output[1], course.name
+    output = @course_team7.export(team_name_only)
+    assert_equal output[0], @course_team7.name
+    assert_equal output[1], @course0.name
   end
 
   def test_handle_duplicate
     #no duplicate
     course_id = courses(:course_object_oriented).id
-    output = CourseTeam.handle_duplicate("DNE", course_id, "ignore")
+    output = CourseTeam.handle_duplicate(nil, "DNE", course_id, "ignore")
     assert_equal output, "DNE"
 
-    course =  courses(:course0)
-    course_team = teams(:team2)
+    course_team = teams(:team8)
 
     handle_dups = "ignore"
-    output = CourseTeam.handle_duplicate(course_team.name, course.id, handle_dups)
+    output = CourseTeam.handle_duplicate(course_team, course_team.name, @course0.id, handle_dups)
     assert_equal output, nil
 
     handle_dups = "rename"
-    output = CourseTeam.handle_duplicate(course_team.name, course.id, handle_dups)
+    output = CourseTeam.handle_duplicate(course_team, course_team.name, @course0.id, handle_dups)
     assert_not_equal output, course_team.name
 
     handle_dups = "replace"
-    output = CourseTeam.handle_duplicate(course_team.name, course.id, handle_dups)
+    output = CourseTeam.handle_duplicate(course_team, course_team.name, @course0.id, handle_dups)
     assert_equal output, course_team.name
     assert_equal Team.find_by_name(course_team.name), nil
   end
 
   def test_import
-      row = ["student1","student2", "student3"]
+      row = ["student1", "student2", "student3"]
       options = {:has_column_names => "false", :handle_dups => "ignore"}
       course = courses(:course_object_oriented)
-      CourseTeam.import(row, nil, course.id, options)
+      CourseTeam.import(row, course.id, options)
 
       course_team = CourseTeam.find_by_parent_id(course.id)
       assert_not_equal course_team, nil
@@ -91,7 +84,7 @@ class CourseTeamTest < ActiveSupport::TestCase
 
       row = ["yay", "student1","student2", "student3"]
       options[:has_column_names] = "true"
-      CourseTeam.import(row, nil, course.id, options)
+      CourseTeam.import(row, course.id, options)
 
       course_team = CourseTeam.find_by_name("yay")
       assert_equal course_team.parent_id, course.id
@@ -102,45 +95,44 @@ class CourseTeamTest < ActiveSupport::TestCase
   end
 
   def test_class_export
-    course = courses(:course0)
-    course_team0 = teams(:team2)
-    course_team1 = teams(:team7)
-    team0_student0 = users(:student6)
+    course_team6 = teams(:team6)
+    course_team7 = teams(:team7)
+    team6_student7 = users(:student7)
+    course_team6.add_member(team6_student7, 1)
 
     output = Array.new
     options = {:team_name => "true"}
-    CourseTeam.export(output, course.id, options)
-    #assert_equal '',output
-    assert_equal output[0][0], course_team0.name
-    assert_equal output[0][1], course.name
-    assert_equal output[1][0], course_team1.name
-    assert_equal output[1][1], course.name
+    CourseTeam.export(output, @course0.id, options)
+    assert_equal output[0][0], course_team6.name
+    assert_equal output[0][1], @course0.name
+    assert_equal output[1][0], course_team7.name
+    assert_equal output[1][1], @course0.name
 
     output = Array.new
     options[:team_name] = "false"
-    CourseTeam.export(output, course.id, options)
-    assert_equal output[0][0], course_team0.name
-    assert_equal output[0][1][0], team0_student0.name
-    assert_equal output[0][1][1], " "
-    assert_equal output[0][2], course.name
-    assert_equal output[1][0], course_team1.name
-    assert_equal output[1][1][0], nil
-    assert_equal output[1][2], course.name
+    CourseTeam.export(output, @course0.id, options)
+    assert_equal output[0][0], course_team6.name
+    assert_equal output[0][1], team6_student7.name
+    assert_equal output[0][2], @course0.name
+    assert_equal output[1][0], course_team7.name
+    assert_equal output[1][1], users(:student4).name
+    assert_equal output[1][2], users(:student7).name
+    assert_equal output[1][3], @course0.name
   end
 
-  ##def test_get_export_fields
-  ##   options["team_name"] = "false"
-  ##   output = CourseTeam.get_export_fields(options)
-  ##   assert_equal output[0], "Team Name"
-  ##   assert_equal output[1], "Team members"
-  ##   assert_equal output[2], "Assignment Name"
-  ##
-  ##   options["team_name"] = "true"
-  ##   output = CourseTeam.get_export_fields(options)
-  ##   assert_equal output[0], "Team Name"
-  ##   assert_equal output[1], "Assignment Name"
-  ##end
-  #
+  def test_export_fields
+     options = {:team_name => "false"}
+     output = CourseTeam.export_fields(options)
+     assert_equal output[0], "Team Name"
+     assert_equal output[1], "Team members"
+     assert_equal output[2], "Course Name"
+  
+     options[:team_name] = "true"
+     output = CourseTeam.export_fields(options)
+     assert_equal output[0], "Team Name"
+     assert_equal output[1], "Course Name"
+  end
+  
   ##def test_copy
   ##  @assignment_team = @course_team.copy(0)
   ##  assert_kind_of AssignmentTeam, @assignment_team

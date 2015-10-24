@@ -568,9 +568,7 @@ class AssignmentParticipant < Participant
 
     #define a handle for a new participant
     def set_handle
-      if self.user.handle == nil or self.user.handle == ""
-        self.handle = self.user.name
-      elsif AssignmentParticipant.where(parent_id: self.assignment.id, handle: self.user.handle).length > 0
+      if self.user.handle == nil or self.user.handle == "" or AssignmentParticipant.where(parent_id: self.assignment.id, handle: self.user.handle).length > 0
         self.handle = self.user.name
       else
         self.handle = self.user.handle

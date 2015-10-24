@@ -42,7 +42,7 @@ class Response < ActiveRecord::Base
     else
       code += self.updated_at.strftime('%A %B %d %Y, %I:%M%p')
     end
-    code += '<div id="review_'+str+'" style=""><BR/><BR/>'
+    code += '<div id="review_'+str+'" style=""><BR/>'
 
     count = 0
     answers = Answer.where(response_id: self.response_id)
@@ -69,7 +69,7 @@ class Response < ActiveRecord::Base
     else
       comment = ''
     end
-    code += "<BR><BR><B>Additional Comment:</B><BR/>"+comment+"</div>"
+    code += "<B>Additional Comment:</B><BR/>"+comment+"</div>"
     return code.html_safe
   end
 

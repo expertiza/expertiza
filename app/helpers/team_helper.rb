@@ -59,15 +59,5 @@ module TeamHelper
     return unknown
   end
 
-  def self.generate_team_name()
-    counter = 0
-    while (true)
-      temp = "Team #{counter}"
-      if (!Team.find_by_name(temp))
-        return temp
-      end
-      counter=counter+1
-    end
-  end
 
 end

@@ -2,8 +2,7 @@
 
 <table>
   <tr><th>Name</th><th></th><th>Full name</th><th></th><th>E-mail address</th><th></th><th>Parent</th><th></th></tr>
-  <% for user in User.all %>
-   <% if user.role_id == 3%>
+  <% for user in @users %>
     <tr>
       <td><%= link_to user.name, :action => 'show',
         :id => user.id %></td><td> </td>
@@ -12,9 +11,8 @@
       <td><%= (User.find(user.parent_id)).name %></td><td> </td>
     </tr>
   <% end -%>
-  <% end -%>
 </table>
 <hr/>
-<%= form_tag(new_admin_path, method: :get) do %> 
+<%= form_tag(new_user_path, method: :get) do %> 
 <input type='submit' value='New Administrator'/>
 <% end %>

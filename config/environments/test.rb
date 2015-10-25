@@ -33,4 +33,8 @@ Expertiza::Application.configure do
 
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
+
+  #Rails.application.configure do
+    config.active_support.test_order = :sorted
+  #end
 end

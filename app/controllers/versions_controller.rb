@@ -1,4 +1,41 @@
 class VersionsController < ApplicationController
+#TODO : Put checks for access control
+#		Default page for versions should be changed to one with no search results
+#		Then versions should be tabulated only once user searches for versions
+
+  def action_allowed?
+    case params[:action]
+    when 'new', 'create', 'edit', 'update'
+    #Modifications can only be done by papertrail
+      return false
+    when 'destroy_all'
+      ['Super-Administrator',
+       'Administrator'].include? current_role_name
+    else
+      #Allow all others
+      ['Super-Administrator',
+       'Administrator',
+       'Instructor',
+       'Teaching Assistant',
+       'Student'].include? current_role_name
+    end
+  end
+
+  def new
+    #nothing to do, papertrail handles create/update
+  end
+
+  def create
+    #nothing to do, papertrail handles create/update
+  end
+
+  def edit
+    #nothing to do, papertrail handles create/update
+  end
+
+  def update
+    #nothing to do, papertrail handles create/update
+  end
 
   def index
     redirect_to '/versions/search'
@@ -79,10 +116,6 @@ class VersionsController < ApplicationController
   end
 
   private
-
-  def action_allowed?
-    true
-  end
 
   # For filtering the versions list with proper search and pagination.
   def paginate_list(id, user_id, item_type, event, datetime)

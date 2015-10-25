@@ -119,8 +119,8 @@ class ReviewResponseMap < ResponseMap
                                type: 'ReviewResponseMap')
       maps.each do |map|
         if !map.response.empty? &&
-            !map.response.reject{ |r| r.round != round}.empty?
-             responses << map.response.reject{ |r| r.round != round }.last
+           !map.response.reject{ |r| r.round != round}.empty?
+              responses << map.response.reject{ |r| r.round != round }.last
         end
       end
       responses.sort! { |a,b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }

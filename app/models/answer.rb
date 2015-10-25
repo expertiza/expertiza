@@ -19,7 +19,6 @@ class Answer < ActiveRecord::Base
         total_score += current_score
       }
 
-
       if (length_of_assessments!=0)
         scores[:avg] = total_score.to_f / length_of_assessments
       else
@@ -36,10 +35,15 @@ class Answer < ActiveRecord::Base
 
   end
 
-  def self.compute_stat(assessment, questions, scores, length_of_assessments)
+  # Computes stats for each assessment
+  # params
+  #  assessments           - an object of assessment of some type (e.g., author feedback, teammate review)
+  #  questions             - a list of question that was filled out in the process of doing the assessment
+  #  scores                - the hash holding max and min scores
+  #  length_of_assessments - the length of the assessment
 
+  def self.compute_stat(assessment, questions, scores, length_of_assessments)
     curr_score = get_total_score(:response => [assessment], :questions => questions)
-    #binding.pry
     if curr_score > scores[:max]
       scores[:max] = curr_score
     end
@@ -52,9 +56,7 @@ class Answer < ActiveRecord::Base
       length_of_assessments=length_of_assessments-1
       curr_score=0
     end
-
     return curr_score, scores
-
   end
 
 
@@ -99,13 +101,6 @@ class Answer < ActiveRecord::Base
       sum_of_weights = 0
       max_question_score = 0
 
-      #@questionnaire = Questionnaire.find(@questions[0].questionnaire_id)
-
-      # questionnaireData = ScoreView.find_by_sql ["SELECT q1_max_question_score ,SUM(question_weight) as sum_of_weights,SUM(question_weight * s_score) as weighted_score
-      # FROM score_views WHERE type in('Criterion', 'Scale') AND q1_id = ? AND s_response_id = ?",
-      #                                            @questions[0].questionnaire_id,@response.id]
-
-
       questionnaireData = ScoreView.where(type: 'Scale', q1_id: @questions[0].questionnaire_id, s_response_id: @response.id)
       questionnaireData += ScoreView.where(type: 'Criterion', q1_id: @questions[0].questionnaire_id, s_response_id: @response.id)
       questionnaireData.each { |q|
@@ -116,10 +111,6 @@ class Answer < ActiveRecord::Base
       sum_of_weights = sum_of_weights.to_f
       weighted_score = weighted_score.to_f
       max_question_score = max_question_score.to_f
-
-      # weighted_score = questionnaireData[0].weighted_score.to_f
-      # sum_of_weights = questionnaireData[0].sum_of_weights.to_f
-
 
       #Zhewei: we need add questions' weights only their answers are not nil in DB.
       all_answers_for_curr_response = Answer.where(response_id: @response.id)
@@ -134,10 +125,7 @@ class Answer < ActiveRecord::Base
         end
       end
 
-      # max_question_score = questionnaireData[0].q1_max_question_score.to_f
-
-
-     # submission_valid?(@response)
+      submission_valid?(@response)
 
       if (sum_of_weights > 0 && max_question_score)
         return (weighted_score / (sum_of_weights * max_question_score)) * 100
@@ -147,41 +135,48 @@ class Answer < ActiveRecord::Base
     end
   end
 
+  # Find the latest review deadline
+  # params
+  #  sorted_deadlines - an array of DueDate objects
+
+  def self.latest_review_deadline(sorted_deadlines)
+    flag = 0
+    latest_review_phase_start_time = nil
+    current_time = Time.new
+    for deadline in sorted_deadlines
+      # if flag is set then we saw a review deadline in the
+      # previous iteration - check if this deadline is a past
+      # deadline
+      if ((flag == 1) && (deadline.due_at <= current_time))
+        latest_review_phase_start_time = deadline.due_at
+        break
+      else
+        flag = 0
+      end
+
+      # we found a review or re-review deadline - examine the next deadline
+      # to check if it is past
+      if (deadline.deadline_type_id == 4 ||deadline.deadline_type_id == 2)
+        flag = 1
+      end
+    end
+    return latest_review_phase_start_time
+  end
+
   #Check for invalid reviews.
   #Check if the latest review done by the reviewer falls into the latest review stage
 
   def self.submission_valid?(response)
     if response
       map=ResponseMap.find(response.map_id)
+      
       #assignment_participant = Participant.where(["id = ?", map.reviewee_id])
       @sorted_deadlines = nil
       @sorted_deadlines = DueDate.where(["assignment_id = ?", map.reviewed_object_id]).order('due_at DESC')
-
       # to check the validity of the response
       if !@sorted_deadlines.nil?
 
-        #find the latest review deadline
-        #less than current time
-        flag = 0
-        latest_review_phase_start_time = nil
-        current_time = Time.new
-        for deadline in @sorted_deadlines
-          # if flag is set then we saw a review deadline in the
-          # previous iteration - check if this deadline is a past
-          # deadline
-          if ((flag == 1) && (deadline.due_at <= current_time))
-            latest_review_phase_start_time = deadline.due_at
-            break
-          else
-            flag = 0
-          end
-
-          # we found a review or re-review deadline - examine the next deadline
-          # to check if it is past
-          if (deadline.deadline_type_id == 4 ||deadline.deadline_type_id == 2)
-            flag = 1
-          end
-        end
+        latest_review_phase_start_time = latest_review_deadline(@sorted_deadlines)
 
         resubmission_times = ResubmissionTime.where(participant_id: map.reviewee_id).order('resubmitted_at DESC')
         if response.is_valid_for_score_calculation?(resubmission_times, latest_review_phase_start_time)

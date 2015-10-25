@@ -153,11 +153,8 @@ end
 def link
   str = params[:name]
   node = session[:menu].select(str)
-  #puts node.inspect
-  #node_label = node.label
   if node
-   #redirect_to node.url
-    redirect_to :controller => 'tree_display', :action => 'goto', :params1 => node.label
+    redirect_to :controller => 'tree_display', :action => 'go_to_menu_items', :params1 => node.label
   else
     logger.error "(error in menu)"
     redirect_to "/"

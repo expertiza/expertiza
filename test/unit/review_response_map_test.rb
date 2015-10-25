@@ -2,12 +2,6 @@ require File.dirname(__FILE__) + '/../test_helper'
 
 class ReviewResponseMapTest < ActiveSupport::TestCase
   fixtures :response_maps, :questionnaires , :assignments, :responses #include the two fixtures
-  test "questionnaire_title" do
-    @questionnaire = questionnaires(:questionnaire0)
-    @assignment = assignments(:assignment0)
-    responses = ReviewResponseMap.new
-    assert_equal responses.get_title, "Review"
-  end
 
   test "method_questionnaire" do
     @questionnaire = questionnaires(:questionnaire0)
@@ -17,8 +11,15 @@ class ReviewResponseMapTest < ActiveSupport::TestCase
     reviewrespmap.questionnaire
     assert_equal reviewrespmap.assignment.questionnaires[0].type, "ReviewQuestionnaire"
   end
-
-  test "method_delete_review_response_map" do
+  
+  test "method_get_title" do
+    @questionnaire = questionnaires(:questionnaire0)
+    @assignment = assignments(:assignment0)
+    responses = ReviewResponseMap.new
+    assert_equal responses.get_title, "Review"
+  end
+  
+  test "method_delete" do
     @questionnaire = questionnaires(:questionnaire0)
     @assignment = assignments(:assignment0)
     reviewrespmap = ReviewResponseMap.new
@@ -27,7 +28,7 @@ class ReviewResponseMapTest < ActiveSupport::TestCase
     assert_equal  reviewrespmap.delete(1), reviewrespmap
   end
 
-  test "method_delete_review_response_map_not_with_force" do
+  test "method_delete_with_force" do
     @questionnaire = questionnaires(:questionnaire0)
     @assignment = assignments(:assignment0)
     reviewrespmap = ReviewResponseMap.new
@@ -42,33 +43,37 @@ class ReviewResponseMapTest < ActiveSupport::TestCase
     assert_equal fields_2[0], fields_1[0]
     assert_equal fields_2[1], fields_1[1]
   end
-
-  test "method_get_import_fields" do
+  
+   #test "method_export" do
+   #
+   #end
+  
+  test "method_import_fields" do
     p = ReviewResponseMap.import(['student2','student2'], 2, "827400667")
     assert_equal p , nil
   end
 
-  test "method_get_import_raise_less_than_two_items" do
+  test "method_import_raise_less_than_two_items" do
     assert_raise (ArgumentError) {ReviewResponseMap.import([''], 2, "827400667")}
   end
 
-  test "method_get_import_with_incorrect_assignment_id" do
+  test "method_import_with_incorrect_assignment_id" do
     @assignment = '123'
     assert_raise (ActiveRecord::RecordNotFound) {ReviewResponseMap.import(['student2','student2'], 2, @assignment)}
   end
 
-  test "method_get_import_with_incorrect_user" do
+  test "method_import_with_incorrect_user" do
     @user1 = 'student30'
     @user = 'student20'
     assert_raise (ImportError) {ReviewResponseMap.import([@user1,@user,'student2'], 2, "827400667")}
   end
 
-  test "method_get_import_with_incorrect_reviewer" do
+  test "method_import_with_incorrect_reviewer" do
     @user = 'abc'
     assert_raise (ImportError) {ReviewResponseMap.import(['student2',@user], 2, "827400667")}
   end
 
-  test "method_get_import_team_assignment_with_no_reviewee" do
+  test "method_import_team_assignment_with_no_reviewee" do
     @assignment = assignments(:assignment2)
     assert_raise (ImportError) {ReviewResponseMap.import(['student1','student2'], 2, @assignment)}
   end
@@ -83,7 +88,26 @@ class ReviewResponseMapTest < ActiveSupport::TestCase
   end
 
   test "method_add_reviewer" do
-        p = ReviewResponseMap.add_reviewer(299716733,148111809,108022375)
-        assert p.save
-  end
+    p = ReviewResponseMap.add_reviewer(299716733,148111809,108022375)
+    assert p.save
+   end
+   
+   test "method_metareview_response_maps" do
+    @questionnaire = questionnaires(:questionnaire0)
+    @assignment = assignments(:assignment0)
+	assert_nothing_thrown do ReviewResponseMap.metareview_response_maps end
+   end
+   
+   test "method_get_team_responses_for_round" do
+    @questionnaire = questionnaires(:questionnaire0)
+    @assignment = assignments(:assignment0)
+	assert_not_nil ReviewResponseMap.get_team_responses_for_round(1,1)
+   end
+   
+   test "method_final_versions_from_reviewer" do
+    @questionnaire = questionnaires(:questionnaire0)
+    @assignment = assignments(:assignment0)
+    assert_nothing_thrown do ReviewResponseMap.final_versions_from_reviewer(2) end
+   end
+
 end

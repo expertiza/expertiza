@@ -128,39 +128,13 @@ class ReviewResponseMap < ResponseMap
 
     if !assignment.varying_rubrics_by_round?
       #same review rubric used in multiple rounds
-
       review_final_versions = review_final_version_responses(:review, :questionnaire_id, assignment)
-
-      #START HERE ->
-      #review_final_versions[:review] = {}
-      #review_final_versions[:review][:questionnaire_id] = assignment.get_review_questionnaire_id
-      #response_ids = []
-      #maps.each do |map|
-      #  responses = Response.where(map_id: map.id)
-      #  if !responses.empty?
-      #    response_ids << responses.last.id
-      #  end
-      #end
-      #review_final_versions[:review][:response_ids] = response_ids
-      #END HERE ->
     else
       #vary rubric by round
       rounds_num = assignment.rounds_of_reviews
       (1..rounds_num).each do |round|
         symbol = ('review round'+round.to_s).to_sym
         review_final_versions = review_final_version_responses(symbol, :questionnaire_id, assignment, round)
-        #START HERE ->
-        #review_final_versions[symbol] = {}
-        #review_final_versions[symbol][:questionnaire_id] = assignment.get_review_questionnaire_id(round)
-        #response_ids = []
-        #maps.each do |map|
-        #  responses = Response.where(map_id: map.id, round: round)
-        #  if !responses.empty?
-        #    response_ids << responses.last.id
-        #  end
-        #end
-        #review_final_versions[symbol][:response_ids] = response_ids
-        #END HERE ->
       end
     end
     review_final_versions
@@ -215,18 +189,15 @@ class ReviewResponseMap < ResponseMap
 
   def review_final_version_responses(symbol, questionnaire_id, assignment, round=nil )
     review_final_versions = {}
-
     review_final_versions[symbol] = {}
     review_final_versions[symbol][questionnaire_id] = assignment.get_review_questionnaire_id(round)
     response_ids = []
-
     maps.each do |map|
       if round.nil?
         responses = Response.where(map_id: map.id)
       else
         responses = Response.where(map_id: map.id, round: round)
       end
-
       if !responses.empty?
         response_ids << responses.last.id
       end

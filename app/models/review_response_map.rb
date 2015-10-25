@@ -126,7 +126,7 @@ class ReviewResponseMap < ResponseMap
 
     if !assignment.varying_rubrics_by_round?
       #same review rubric used in multiple rounds
-      review_final_versions = review_final_version_responses(:review, :questionnaire_id, assignment)
+      review_final_versions = review_final_version_responses(:review, :questionnaire_id, assignment, maps)
     else
       #vary rubric by round
       rounds_num = assignment.rounds_of_reviews
@@ -154,15 +154,15 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
-  def assignment_nil?(assignment)
   # Check for if assignment value is null
+  def assignment_nil?(assignment)
     if assignment.nil?
       raise ImportError, "The assignment with id \"#{id}\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
     end
   end
 
-  def reviewer_nil?(reviewer, row, index)
   # Check for if reviewer value is null
+  def reviewer_nil?(reviewer, row, index)
     if reviewer.nil?
       raise ImportError, "The reviewer \"#{row[index]}\" is not a participant in this assignment. <a href='/users/new'>Register</a> this user as a participant?"
     end
@@ -175,17 +175,19 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
-  def existing_nil?( reviewer, reviewee, assignment)
   # Check for if review already exists, if not, create new one
+  def existing_nil?( reviewer, reviewee, assignment)
     team_id = TeamsUser.team_id(reviewee.parent_id, reviewee.user_id)
     existing = ReviewResponseMap.where(reviewee_id: team_id, reviewer_id:  reviewer.id).first
     if existing.nil?
-      ReviewResponseMap.create(reviewer_id: reviewer.id, reviewee_id: reviewee.id,\
-       reviewed_object_id: assignment.id)
+      ReviewResponseMap.create(reviewer_id: reviewer.id, \
+                               reviewee_id: reviewee.id,\
+                               reviewed_object_id: assignment.id)
     end
   end
 
-  def review_final_version_responses(symbol, questionnaire_id, assignment, round=nil )
+  # Compute list of responses and return it
+  def review_final_version_responses(symbol, questionnaire_id, assignment, maps, round = nil)
     review_final_versions = {}
     review_final_versions[symbol] = {}
     review_final_versions[symbol][questionnaire_id] = assignment.get_review_questionnaire_id(round)

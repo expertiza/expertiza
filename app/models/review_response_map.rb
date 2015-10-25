@@ -79,6 +79,7 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
+  # Map to display the feedback response
   def show_feedback(response)
     if(!self.response.empty? && response)
       map = FeedbackResponseMap.find_by_reviewed_object_id(response.id)
@@ -120,7 +121,7 @@ class ReviewResponseMap < ResponseMap
       maps.each do |map|
         if !map.response.empty? &&
            !map.response.reject{ |r| r.round != round}.empty?
-              responses << map.response.reject{ |r| r.round != round }.last
+          responses << map.response.reject{ |r| r.round != round }.last
         end
       end
       responses.sort! { |a,b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }

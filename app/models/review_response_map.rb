@@ -50,7 +50,6 @@ class ReviewResponseMap < ResponseMap
     if row.length < 2
       raise ArgumentError, 'Not enough items'
     end
-
     assignment = Assignment.find(id)
     assignment_nil?(assignment)
     index = 1
@@ -100,7 +99,6 @@ class ReviewResponseMap < ResponseMap
     responses.each do |response|
       metareview_response_maps = MetareviewResponseMap.where(reviewed_object_id: response.id)
     end
-    #metareview_list
     metareview_response_maps
   end
 

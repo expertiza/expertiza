@@ -139,15 +139,15 @@ class ReviewResponseMap < ResponseMap
 
   private
 
-  def reviwer_user_nil?(user, row, index)
   # Check for if user value for reviewer is null
+  def reviwer_user_nil?(user, row, index)
     if user.nil?
       raise ImportError, "The user account for the reviewer \"#{row[index]}\" was not found. <a href='/users/new'>Create</a> this user?"
     end
   end
 
-  def reviewee_user_nil?(user, row)
   # Check for if user value for reviewee is null
+  def reviewee_user_nil?(user, row)
     if user.nil?
       raise ImportError, "The user account for the reviewee \"#{row[0]}\" was not found. <a href='/users/new'>Create</a> this user?"
     end
@@ -167,15 +167,15 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
-  def reviewee_nil?(reviewee, row)
   # Check for if reviewee value is null
+  def reviewee_nil?(reviewee, row)
     if reviewee.nil?
       raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"
     end
   end
 
   # Check for if review already exists, if not, create new one
-  def existing_nil?( reviewer, reviewee, assignment)
+  def existing_nil?(reviewer, reviewee, assignment)
     team_id = TeamsUser.team_id(reviewee.parent_id, reviewee.user_id)
     existing = ReviewResponseMap.where(reviewee_id: team_id, reviewer_id:  reviewer.id).first
     if existing.nil?
@@ -203,5 +203,4 @@ class ReviewResponseMap < ResponseMap
     end
     review_final_versions[symbol][:response_ids] = response_ids
   end
-
 end

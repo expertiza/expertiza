@@ -8,7 +8,7 @@ class ReviewMappingController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'add_quiz_response_map', 'assign_quiz_dynamically'
+    when 'add_dynamic_reviewer', 'release_mapping', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'add_quiz_response_map', 'assign_quiz_dynamically'
       true
     else
       ['Instructor',
@@ -126,24 +126,6 @@ class ReviewMappingController < ApplicationController
         end
 
     end
-  end
-
-  #  Looks up the team from the submission.
-  def get_team_from_submission(submission)
-    # Get the list of teams for this assignment.
-    teams = AssignmentTeam.where(parent_id:  submission.parent_id)
-
-    teams.each do |team|
-      team.teams_users.each do |team_member|
-        if team_member.user_id == submission.user_id
-          # Found the team, return it!
-          return team
-        end
-      end
-    end
-
-    # No team found
-    return nil
   end
 
   #7/12/2015 -zhewei
@@ -359,7 +341,7 @@ class ReviewMappingController < ApplicationController
     redirect_to :action => 'list_mappings', :id => assignment_id
   end
 
-  def release_reservation
+  def release_mapping
     mapping = ResponseMap.find(params[:id])
     student_id = mapping.reviewer_id
     mapping.delete
@@ -373,15 +355,6 @@ class ReviewMappingController < ApplicationController
     #metareview.delete
     mapping.delete
     redirect_to :action => 'list_mappings', :id => assignment_id
-  end
-
-  def delete_rofreviewer
-    mapping = ResponseMapping.find(params[:id])
-    revmapid = mapping.review_mapping.id
-    mapping.delete
-
-    flash[:note] = "The metareviewer has been deleted."
-    redirect_to :action => 'list_rofreviewers', :id => revmapid
   end
 
   def list
@@ -418,58 +391,6 @@ class ReviewMappingController < ApplicationController
     @items = AssignmentTeam.where(parent_id: @assignment.id)
     @items.sort{|a,b| a.name <=> b.name}
   end
-
-  def list_sortable
-    @assignment = Assignment.find(params[:id])
-    @entries = Array.new
-    index = 0
-    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
-    contributors = AssignmentTeam.where(parent_id: @assignment.id)
-    contributors.sort!{|a,b| a.name <=> b.name}
-    contributors.each{
-      |contrib|
-      review_mappings = ResponseMap.where(reviewed_object_id: @assignment.id, reviewee_id: contrib.id)
-
-      if review_mappings.length == 0
-        single = Array.new
-        single[0] = contrib.name
-        single[1] = "&nbsp;"
-        single[2] = "&nbsp;"
-        @entries[index] = single
-        index += 1
-      else
-        review_mappings.sort!{|a,b| a.reviewer.name <=> b.reviewer.name}
-        review_mappings.each{
-          |review_map|
-          metareview_mappings = MetareviewResponseMap.where(reviewed_object_id: review_map.map_id)
-          if metareview_mappings.length == 0
-            single = Array.new
-            single[0] = contrib.name
-            single[1] = review_map.reviewer.name
-            single[2] = "&nbsp;"
-            @entries[index] = single
-            index += 1
-          else
-            metareview_mappings.sort!{|a,b| a.reviewer.name <=> b.reviewer.name}
-            metareview_mappings.each{
-              |metareview_map|
-              single = Array.new
-              single[0] = contrib.name
-              single[1] = review_map.reviewer.name
-              if metareview_map.review_reviewer == nil
-                single[2] = metareview_map.reviewer.name
-              else
-                single[2] = metareview_map.review_reviewer.name
-              end
-              @entries[index] = single
-              index += 1
-            }
-          end
-        }
-      end
-    }
-    end
 
   def automatic_review_mapping
     assignment_id = params[:id].to_i

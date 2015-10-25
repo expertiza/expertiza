@@ -17,5 +17,6 @@
 
 <hr/>
 <%= form_tag(new_user_path, method: :get) do %>
- <input type='submit' value='New Instructor'/>
+<%= hidden_field_tag :role, "Instructor" %>
+<%= submit_tag("New Instructor")%>
 <% end %>

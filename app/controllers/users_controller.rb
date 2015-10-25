@@ -21,7 +21,7 @@ class UsersController < ApplicationController
 
   def index
     if (current_user_role? == "Student")
-      redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user]))
+      redirect_to_home
     else
       list
       render :action => 'list'
@@ -92,7 +92,7 @@ class UsersController < ApplicationController
 
     def show
       if (params[:id].nil?) || ((current_user_role? == "Student") &&  (session[:user].id != params[:id].to_i))
-        redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user]))
+        redirect_to_home
       else
         @user = User.find(params[:id])
         get_role
@@ -188,7 +188,7 @@ class UsersController < ApplicationController
 
   def keys
     if (params[:id].nil?) || ((current_user_role? == "Student") &&  (session[:user].id != params[:id].to_i))
-      redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user]))
+      redirect_to_home
     else
       @user = User.find(params[:id])
       @private_key = @user.generate_keys
@@ -239,6 +239,10 @@ class UsersController < ApplicationController
       users = users.page(params[:page]).per_page(paginate_options["#{@per_page}"])
     end
     users
+  end
+
+  def redirect_to_home
+    redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user]))
   end
 
   # generate the undo link

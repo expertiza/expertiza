@@ -100,6 +100,7 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
+  # Returns the response maps for all the metareviews
   def metareview_response_maps
     responses = Response.where(map_id: self.id)
     responses.each do |response|
@@ -119,7 +120,7 @@ class ReviewResponseMap < ResponseMap
       maps.each do |map|
         if !map.response.empty? &&
             !map.response.reject{ |r| r.round != round}.empty?
-          responses << map.response.reject{ |r| r.round != round }.last
+             responses << map.response.reject{ |r| r.round != round }.last
         end
       end
       responses.sort! { |a,b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }

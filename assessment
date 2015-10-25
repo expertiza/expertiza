@@ -1,0 +1,24 @@
+
+[1mFrom:[0m /home/expertiza_developer/RoR/expertiza/app/models/answer.rb @ line 42 Answer.compute_stat:
+
+    [1;34m39[0m: [32mdef[0m [1;36mself[0m.[1;34mcompute_stat[0m(assessment, questions, scores, length_of_assessments)
+    [1;34m40[0m: 
+    [1;34m41[0m:   curr_score = get_total_score([33m:response[0m => [assessment], [33m:questions[0m => questions)
+ => [1;34m42[0m:   binding.pry
+    [1;34m43[0m:   [32mif[0m curr_score > scores[[33m:max[0m]
+    [1;34m44[0m:     scores[[33m:max[0m] = curr_score
+    [1;34m45[0m:   [32mend[0m
+    [1;34m46[0m:   [32mif[0m curr_score < scores[[33m:min[0m]
+    [1;34m47[0m:     scores[[33m:min[0m] = curr_score
+    [1;34m48[0m:   [32mend[0m
+    [1;34m49[0m: 
+    [1;34m50[0m:   [1;34m# Check if the review is invalid. If is not valid do not include in score calculation[0m
+    [1;34m51[0m:   [32mif[0m @invalid==[1;34m1[0m
+    [1;34m52[0m:     length_of_assessments=length_of_assessments-[1;34m1[0m
+    [1;34m53[0m:     curr_score=[1;34m0[0m
+    [1;34m54[0m:   [32mend[0m
+    [1;34m55[0m: 
+    [1;34m56[0m:   [32mreturn[0m curr_score, scores
+    [1;34m57[0m: 
+    [1;34m58[0m: [32mend[0m
+

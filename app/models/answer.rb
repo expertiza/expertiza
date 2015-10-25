@@ -39,7 +39,7 @@ class Answer < ActiveRecord::Base
   def self.compute_stat(assessment, questions, scores, length_of_assessments)
 
     curr_score = get_total_score(:response => [assessment], :questions => questions)
-
+    #binding.pry
     if curr_score > scores[:max]
       scores[:max] = curr_score
     end

@@ -22,7 +22,8 @@ class ReviewResponseMap < ResponseMap
   end
 
   def delete(force = nil)
-    fmaps = FeedbackResponseMap.where(reviewed_object_id: self.response.response_id)
+    fmaps = FeedbackResponseMap.where(reviewed_object_id:
+                                          self.response.response_id)
     fmaps.each { |fmap| fmap.delete(true) }
     maps = MetareviewResponseMap.where(reviewed_object_id: self.id)
     maps.each { |map| map.delete(force) }
@@ -56,17 +57,21 @@ class ReviewResponseMap < ResponseMap
     while index < row.length
       user = User.find_by_name(row[index].to_s.strip)
       review_user_nil?(user,row,index)
-      reviewer = AssignmentParticipant.where(user_id: user.id, parent_id:  assignment.id).first
+      reviewer = AssignmentParticipant.where(user_id: user.id,
+                                             parent_id:  assignment.id).first
       reviewer_nil?(reviewer,row,index)
       if assignment.team_assignment
-        reviewee = AssignmentTeam.where(name: row[0].to_s.strip, parent_id:  assignment.id).first
+        reviewee = AssignmentTeam.where(name: row[0].to_s.strip,
+                                        parent_id:  assignment.id).first
         reviewee_nil?(reviewee,row)
-        existing = ReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
+        existing = ReviewResponseMap.where(reviewee_id: reviewee.id,
+                                           reviewer_id:  reviewer.id).first
         existing_nil?(existing, reviewer, reviewee, assignment)
       else
         puser = User.find_by_name(row[0].to_s.strip)
         reviewee_user_nil?(user,row)
-        reviewee = AssignmentParticipant.where(user_id: puser.id, parent_id:  assignment.id).first
+        reviewee = AssignmentParticipant.where(user_id: puser.id,
+                                               parent_id:  assignment.id).first
         reviewee_nil?(reviewee,row)
         existing_nil?(reviewer, reviewee, assignment)
       end
@@ -85,7 +90,8 @@ class ReviewResponseMap < ResponseMap
 
   # This method adds a new entry in the ResponseMap
   def self.add_reviewer(contributor_id, reviewer_id, assignment_id)
-    if where(reviewee_id: contributor_id, reviewer_id: reviewer_id).count > 0
+    if where(reviewee_id: contributor_id,
+             reviewer_id: reviewer_id).count > 0
       create(reviewee_id: contributor_id,
              reviewer_id: reviewer_id,
              reviewed_object_id: assignment_id)
@@ -97,41 +103,50 @@ class ReviewResponseMap < ResponseMap
   def metareview_response_maps
     responses = Response.where(map_id: self.id)
     responses.each do |response|
-      metareview_response_maps = MetareviewResponseMap.where(reviewed_object_id: response.id)
+      metareview_response_maps =
+          MetareviewResponseMap.where(reviewed_object_id: response.id)
     end
     metareview_response_maps
   end
 
-  # return  the responses for specified round, for varying rubric feature -Yang
+  # return  the responses for specified round,
+  # for varying rubric feature -Yang
   def self.get_team_responses_for_round(team, round)
     responses = []
     if team.id
-      maps = ResponseMap.where(reviewee_id: team.id, type: 'ReviewResponseMap')
+      maps = ResponseMap.where(reviewee_id: team.id,
+                               type: 'ReviewResponseMap')
       maps.each do |map|
-        if !map.response.empty? && !map.response.reject{ |r| r.round != round}.empty?
-          responses << map.response.reject{ |r| r.round != round}.last
+        if !map.response.empty? &&
+            !map.response.reject{ |r| r.round != round}.empty?
+          responses << map.response.reject{ |r| r.round != round }.last
         end
       end
-      responses.sort! {|a,b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }
+      responses.sort! { |a,b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }
     end
     responses
   end
 
-  #wrap The latest version of responses in each response map, together with the questionnaire_id
-  # will be used to display the reviewer summary
+  #wrap The latest version of responses in each response map,
+  # together with the questionnaire_id will be used to
+  # display the reviewer summary
   def self.final_versions_from_reviewer(reviewer_id)
     maps = ReviewResponseMap.where(reviewer_id: reviewer_id)
     assignment = Assignment.find(Participant.find(reviewer_id).parent_id)
     review_final_versions = {}
     if !assignment.varying_rubrics_by_round?
       #same review rubric used in multiple rounds
-      review_final_versions = review_final_version_responses(:review, :questionnaire_id, assignment, maps)
+      review_final_versions =
+          review_final_version_responses(:review, :questionnaire_id,
+                                         assignment, maps)
     else
       #vary rubric by round
       rounds_num = assignment.rounds_of_reviews
       (1..rounds_num).each do |round|
         symbol = ('review round'+round.to_s).to_sym
-        review_final_versions = review_final_version_responses(symbol, :questionnaire_id, assignment, round)
+        review_final_versions =
+            review_final_version_responses(symbol, :questionnaire_id,
+                                           assignment, maps, round)
       end
     end
     review_final_versions
@@ -142,42 +157,53 @@ class ReviewResponseMap < ResponseMap
   # Check for if user value for reviewer is null
   def reviwer_user_nil?(user, row, index)
     if user.nil?
-      raise ImportError, "The user account for the reviewer \"#{row[index]}\" was not found. <a href='/users/new'>Create</a> this user?"
+      raise ImportError,
+            "The user account for the reviewer \"#{row[index]}\" was not found.
+               <a href='/users/new'>Create</a> this user?"
     end
   end
 
   # Check for if user value for reviewee is null
   def reviewee_user_nil?(user, row)
     if user.nil?
-      raise ImportError, "The user account for the reviewee \"#{row[0]}\" was not found. <a href='/users/new'>Create</a> this user?"
+      raise ImportError,
+            "The user account for the reviewee \"#{row[0]}\" was not found.
+               <a href='/users/new'>Create</a> this user?"
     end
   end
 
   # Check for if assignment value is null
   def assignment_nil?(assignment)
     if assignment.nil?
-      raise ImportError, "The assignment with id \"#{id}\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
+      raise ImportError,
+            "The assignment with id \"#{id}\" was not found.
+               <a href='/assignment/new'>Create</a> this assignment?"
     end
   end
 
   # Check for if reviewer value is null
   def reviewer_nil?(reviewer, row, index)
     if reviewer.nil?
-      raise ImportError, "The reviewer \"#{row[index]}\" is not a participant in this assignment. <a href='/users/new'>Register</a> this user as a participant?"
+      raise ImportError,
+            "The reviewer \"#{row[index]}\" is not a participant in this assignment.
+               <a href='/users/new'>Register</a> this user as a participant?"
     end
   end
 
   # Check for if reviewee value is null
   def reviewee_nil?(reviewee, row)
     if reviewee.nil?
-      raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"
+      raise ImportError,
+            "The author \"#{row[0].to_s.strip}\" was not found.
+               <a href='/users/new'>Create</a> this user?"
     end
   end
 
   # Check for if review already exists, if not, create new one
   def existing_nil?(reviewer, reviewee, assignment)
     team_id = TeamsUser.team_id(reviewee.parent_id, reviewee.user_id)
-    existing = ReviewResponseMap.where(reviewee_id: team_id, reviewer_id:  reviewer.id).first
+    existing = ReviewResponseMap.where(reviewee_id: team_id,
+                                       reviewer_id:  reviewer.id).first
     if existing.nil?
       ReviewResponseMap.create(reviewer_id: reviewer.id, \
                                reviewee_id: reviewee.id,\
@@ -186,10 +212,12 @@ class ReviewResponseMap < ResponseMap
   end
 
   # Compute list of responses and return it
-  def review_final_version_responses(symbol, questionnaire_id, assignment, maps, round = nil)
+  def review_final_version_responses(symbol, questionnaire_id,
+                                     assignment, maps, round = nil)
     review_final_versions = {}
     review_final_versions[symbol] = {}
-    review_final_versions[symbol][questionnaire_id] = assignment.get_review_questionnaire_id(round)
+    review_final_versions[symbol][questionnaire_id] =
+        assignment.get_review_questionnaire_id(round)
     response_ids = []
     maps.each do |map|
       if round.nil?

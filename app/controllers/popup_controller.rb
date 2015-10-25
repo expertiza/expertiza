@@ -8,13 +8,13 @@ class PopupController < ApplicationController
   def team_users_popup
     @sum = 0
     @count = 0
-    @teamid = params[:id]
+#    @teamid = params[:id]
     @team = Team.find(params[:id])
     @assignment = Assignment.find(@team.parent_id)
     @assignment_id = @assignment.id
     @id=params[:assignment_id]
     #  @teamname = Team.find(params[:id]).name
-    @teamusers = TeamsUser.where(team_id: params[:id])
+#    @teamusers = TeamsUser.where(team_id: params[:id])
 
     #id2 seems to be a response_map
     if(params[:id2] == nil)
@@ -30,10 +30,17 @@ class PopupController < ApplicationController
       @scores = Answer.where(response_id: @reviewid)
 
       questionnaire =Response.find(@reviewid).questionnaire_by_answer(@scores.first)
-      @maxscore = questionnaire.max_question_score
 
-      if(@maxscore == nil)
-        @maxscore = 5
+#      @maxscore = questionnaire.max_question_score
+
+#      if(@maxscore == nil)
+#        @maxscore = 5
+#      end
+
+
+
+      if(questionnaire.max_question_score == nil)
+        questionnaire.max_question_score = 5
       end
 
       @total_percentage = response.get_average_score
@@ -53,11 +60,11 @@ class PopupController < ApplicationController
 
     @sum = 0
     @count = 0
-    @participantid = params[:id]
+#    @participantid = params[:id]
     @uid = Participant.find(params[:id]).user_id
     @assignment_id =   Participant.find(params[:id]).parent_id
     @user = User.find(@uid)
-    @myuser = @user.id
+#    @myuser = @user.id
     @temp = 0;
     @maxscore = 0
 

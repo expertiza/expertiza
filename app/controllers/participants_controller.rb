@@ -38,10 +38,11 @@ class ParticipantsController < ApplicationController
     curr_object = Object.const_get(params[:model]).find(params[:id])
     begin
       permissions = Participant.get_permissions(params[:authorization])
-      can_submit = permissions[:can_submit]
-      can_review = permissions[:can_review]
-      can_take_quiz = permissions[:can_take_quiz]
-      curr_object.add_participant(params[:user][:name],can_submit,can_review,can_take_quiz)
+#      can_submit = permissions[:can_submit]
+#      can_review = permissions[:can_review]
+#      can_take_quiz = permissions[:can_take_quiz]
+#      curr_object.add_participant(params[:user][:name],can_submit,can_review,can_take_quiz)
+      curr_object.add_participant(params[:user][:name],permissions[:can_submit],permissions[:can_review],permissions[:can_take_quiz])
       user = User.find_by_name(params[:user][:name])
       @participant = curr_object.participants.find_by_user_id(user.id)
       undo_link("user \"#{params[:user][:name]}\" has successfully been added.")
@@ -54,13 +55,13 @@ class ParticipantsController < ApplicationController
 
   def update_authorizations
     permissions = Participant.get_permissions(params[:authorization])
-    can_submit = permissions[:can_submit]
-    can_review = permissions[:can_review]
-    can_take_quiz = permissions[:can_take_quiz]
+#    can_submit = permissions[:can_submit]
+#    can_review = permissions[:can_review]
+#    can_take_quiz = permissions[:can_take_quiz]
 
     participant = Participant.find(params[:id])
     parent_id = participant.parent_id
-    participant.update_attributes(:can_submit => can_submit, :can_review => can_review, :can_take_quiz => can_take_quiz)
+    participant.update_attributes(:can_submit => permissions[:can_submit], :can_review => permissions[:can_review], :can_take_quiz => permissions[:can_take_quiz])
     
     redirect_to :action => 'list', :id => parent_id, :model => participant.class.to_s.gsub("Participant","")
   end
@@ -123,65 +124,48 @@ class ParticipantsController < ApplicationController
   end
 
   # Copies existing participants from a course down to an assignment
-  def inherit
+ def inherit
     assignment = Assignment.find(params[:id])
-    course = assignment.course
-    @copied_participants = []
 
-    if course
-      participants = course.participants
-      if participants.length > 0
-        participants.each{|participant|
-          new_participant = participant.copy(params[:id])
+    if assignment.course
 
-          if new_participant
-            @copied_participants.push new_participant
-          end
-        }
+      if assignment.course.participants.length > 0
+     @copied_participants=polulate_copied_participants(assignment.courses.participants)  
 
-        # Only display undo link if copies of participants are created
-        if @copied_participants.length > 0
-          undo_link("Participants from \"#{course.name}\" has been copied to this assignment successfully. ")
+         if @copied_participants.length > 0
+        undo_link("Participants from \"#{course.name}\" has been copied to this assignment successfully. " )
         else
-          flash[:note] = 'All course participants are already in this assignment'
+        flash[:note] = 'All course participants are already in this assignment'
         end
+     
+     else
+      flash[:note] = "No participants were found to inherit."
+     end
 
-      else
-        flash[:note] = "No participants were found to inherit."
-      end
     else
       flash[:error] = "No course was found for this assignment."
     end
 
-
     redirect_to :controller => 'participants', :action => 'list', :id => assignment.id, :model => 'Assignment'
   end
 
-  def bequeath_all
-    @copied_participants = []
+
+def bequeath_all
+
     assignment = Assignment.find(params[:id])
+    
     if assignment.course
-      course = assignment.course
-      assignment.participants.each{ |participant|
-        new_participant = participant.copy(course.id)
+       @copied_participants=polulate_copied_participants(assignment.participants,assignment.course)  
 
-        if new_participant
-          @copied_participants.push new_participant
-        end
-      }
-      # only display undo link if copies of participants are created
-      if @copied_participants.length > 0
+     if @copied_participants.length > 0
         undo_link("All participants were successfully copied to \"#{course.name}\". " )
-      else
+     else
         flash[:note] = 'All assignment participants are already part of the course'
-      end
-
-      #flash[:note] = "All participants were successfully copied to \""+course.name+"\""
-    else
+     end
+     
+   else
       flash[:error] = "This assignment is not associated with a course."
     end
-
-
 
     redirect_to :controller => 'participants', :action => 'list', :id => assignment.id, :model => 'Assignment'
   end
@@ -221,4 +205,24 @@ class ParticipantsController < ApplicationController
   def participant_params
     params.require(:participant).permit(:can_submit,:can_review,:user_id,:parent_id,:directory_num,:submitted_at,:permission_granted,:penalty_accumulated,:submitted_hypelinks,:grade,:type,:handle,:time_stamp,:digital_signature,:duty,:can_take_quiz)
   end
+
+##from here
+private
+def polulate_copied_participants(participants,*args)
+   length=args.size
+   @copied_participants=[]
+       participants.each{ |participant|
+        if length!=0
+        new_participant = participant.copy(arg[0].id)
+        else
+        new_participant = participant.copy(params[:id])
+        end
+        if new_participant
+          @copied_participants.push new_participant
+        end
+      }
+return @copied_participants
+end
+##till here
+
 end

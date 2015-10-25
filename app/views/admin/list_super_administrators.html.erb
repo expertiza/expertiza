@@ -15,5 +15,6 @@
 
 <hr/>
 <%= form_tag(new_user_path, method: :get) do %>
-  <input type='submit' value='New Super Administrator'/>
+<%= hidden_field_tag :role, "Super-Administrator" %>
+<%= submit_tag("New Super Administrator") %>
 <% end %>

@@ -1,0 +1,9 @@
+<%= render :partial => 'submitted_content/title' %> 
+
+<%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage =>  @stage, :can_submit =>@can_submit} %>
+
+<!-- TODO Need to add changes for Manager and Reader -->
+
+<a href="javascript:window.history.back()">Back</a>
+
+

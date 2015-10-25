@@ -1,0 +1,69 @@
+<h2>Answers</h2>
+<b>Quiz score: <%= @quiz_score.round(1) %>%</b>
+
+<%  @assignment = Assignment.find(@participant.parent_id)%>
+<%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage => ""} %>
+
+<br>
+<% i = 1 %>
+<% @questions.each do |question| %>
+  <b>Question <%= i %>: </b><%= label_tag "#{question.id}", question.txt %> <br>
+  <% question_type = question.type %>
+
+
+  <% if question_type.eql? 'MultipleChoiceRadio' %>
+    <% QuizQuestionChoice.where(question_id: question.id).each do |answer|  %>
+      <% if(answer.iscorrect) %>
+        <b><%= p answer.txt  %></b> -- Correct <br>
+      <%else%>
+        <%= p answer.txt  %><br>
+      <% end %>
+    <% end %>
+    <br>
+
+    <%user_answer=Answer.where(response_id: @response.id, question_id:  question.id).first%>
+    Your answer is: <b><%= user_answer.comments  %></b>
+    <%if user_answer.answer==1%>
+      <img src="/assets/Check-icon.png"/>
+    <%else%>
+      <img src="/assets/delete_icon.png"/>
+    <%end%>
+    <br><br>
+
+  <% elsif question_type.eql? 'MultipleChoiceCheckbox' %>
+    <br>
+    <% QuizQuestionChoice.where(question_id: question.id).each do |answer|  %>
+      <% if(answer.iscorrect) %>
+        <b><%= p answer.txt  %></b> -- Correct <br>
+      <%else%>
+      <% end %>
+    <% end %><br>
+
+    Your answer is:
+    <% user_answers= Answer.where(response_id: @response.id, question_id: question.id)%>
+    <%if user_answers.first.answer==1%>
+      <img src="/assets/Check-icon.png"/>
+    <%else%>
+      <img src="/assets/delete_icon.png"/>
+    <%end%>
+
+    <br/>
+    <% user_answers.each do |answer| %>
+      <b><%= answer.comments %></b><br>
+    <% end %>
+    <br>
+
+  <% elsif(question_type == 'TrueFalse') %>
+    Correct Answer is: <b><%=QuizQuestionChoice.where(question_id: question.id,iscorrect: 1).first.txt%></b><br/>
+    <%user_answer=Answer.where(response_id: @response.id, question_id:  question.id).first%>
+    Your answer is: <b><%= user_answer.comments %></b>
+    <%if user_answer.answer==1%>
+      <img src="/assets/Check-icon.png"/>
+    <%else%>
+      <img src="/assets/delete_icon.png"/>
+    <%end%>
+    <br><br>
+  <% end %><hr>
+  <% i += 1 %>
+<% end %>
+<%= link_to "Back", student_quizzes_path(:id => @response_map.reviewer_id) %>

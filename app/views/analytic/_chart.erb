@@ -1,0 +1,13 @@
+<% require 'json'%>
+<%= render 'chart_header'%>
+<% unless chart.width.nil? %>
+  <table>
+    <tr>
+      <td width='<%=chart.width.to_s%>px'>
+      <% end %>
+      <div id='<%=chart.get_id_str%>' class='_chart_container'><%=chart.data.to_json%></div>
+      <% unless chart.width.nil? %>
+      </td>
+    </tr>
+  </table>
+<% end %>

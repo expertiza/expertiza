@@ -1,0 +1,18 @@
+<% if @file_version_map and @latest_version_number > 0 %>
+  <h2>List of <i>all</i> files submitted so far</h2>
+  <p>Click on Filename to view Latest Version</p>
+
+  <%= render :partial => 'show_all_submitted_files_partial_1'%>
+
+<% end %>
+
+<% if session[:user].id == @participant.user_id and @stage != "Complete" %>
+  <% if @latest_version_number.equal?(0) %>
+    <h2>Upload first version of Code Files</h2>
+  <% else %>
+    <h2>Upload next version of Code Files</h2>
+  <% end %>
+
+  <%= render :partial => 'show_all_submitted_files_partial_2'%>
+<% end %>
+<a href="javascript:window.history.back()">Back</a>

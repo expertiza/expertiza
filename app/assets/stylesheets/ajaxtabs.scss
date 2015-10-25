@@ -1,0 +1,46 @@
+.menutheme{
+padding: 0;
+width: 872px;
+border-top: 5px solid #9A0000; /*Red color theme*/ 
+background: transparent;
+voice-family: "\"}\"";
+voice-family: inherit;
+}
+
+.menutheme ul{
+margin:0;
+margin-left: 10px; /*margin between first menu item and left browser edge*/
+padding: 0;
+list-style: none;
+}
+
+.menutheme li{
+display: inline;
+margin: 0 2px 0 0;
+padding: 0;
+/*text-transform:uppercase;*/
+}
+
+.menutheme a{
+float: left;
+display: block;
+font: 14px Trebuchet MS;
+color: white;
+text-decoration: none;
+margin: 0 1px 0 0; /*Margin between each menu item*/
+padding: 5px 10px;
+background-color: black; /*Red color theme*/ 
+border-top: 1px solid white;
+}
+
+.menutheme a:hover{
+background-color: #9A0000; /*Red color theme*/ 
+color: white;
+}
+
+.menutheme a.selected{ /*currently selected tab*/
+background-color: #9A0000; /*Red color theme*/ 
+color: white;
+border-color: #9A0000; /*Red color theme*/ 
+}
+

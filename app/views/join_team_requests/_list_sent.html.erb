@@ -1,0 +1,52 @@
+<h2>Sent Requests </h2>
+
+<table cellpadding="5">
+  <tr>
+    <th>
+      Team
+    </th>
+    <th>
+      Comments
+    </th>
+    <th>Status</th>
+    <th>Sent at</th>
+  </tr>
+  <% participant = Participant.where(user_id: session[:user].id, parent_id:  assignment_id).first
+  requests=JoinTeamRequest.where(participant_id: participant.id) %>
+<% if requests != nil %>
+
+  <% requests.each do |request| %>
+
+    <tr>
+      <td>
+        <% if Team.exists?(request.team_id)==false  %>
+          <font color="#FF0000">  This team no longer exists. </font>
+        <% else %>
+          <%= Team.find(request.team_id).name %>
+        <% end %>
+      </td>
+      <td>
+        <%= request.comments %>
+      </td>
+      <td>
+        <% if request.status == 'P' %>
+          <%= "Pending" %>
+        <% elsif request.status == 'A' %>
+          <%= "Accepted" %>
+        <% else %>
+          <%= "Declined"  %>
+        <% end %>
+      </td>
+      <td>
+        <%= request.created_at %>
+      </td>
+    </tr>
+  <% end %>
+<% else %>
+  <tr>
+    <td colspan ='4' > You didn't send any request yet</td>
+  </tr>
+
+<% end %>
+  </table>
+

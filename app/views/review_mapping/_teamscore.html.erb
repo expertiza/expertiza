@@ -1,0 +1,123 @@
+<% qid = "ReviewResponseMap" %>
+<%@teamid%>
+<%@id%>
+<% @this_reviewer %>
+
+<% #Assignments do have vary_rubric_by_rounds#%>
+<% if !@assignment.varying_rubrics_by_round? %>
+    <% #################Score awarded########################    %>
+    <% if (@l%2) == 0%>
+        <td bgcolor="#ffffff" align = 'left' >
+    <%else%>
+        <td  bgcolor="#DDDDBB" align = 'left' >
+    <%end%>
+    <% if @review_scores[@this_reviewer][@teamid] != -1%>
+        <%= @review_scores[@this_reviewer][@teamid].inspect %>%
+    <% else %>
+        --
+    <% end %>
+    </td>
+
+    <%if (@avg_and_ranges[@teamid] && @avg_and_ranges[@teamid][:avg]&& @avg_and_ranges[@teamid][:max]&& @avg_and_ranges[@teamid][:min]) %>
+        <% #############Avg. score########################        %>
+        <% if (@l%2) == 0%>
+            <td bgcolor="#ffffff" align = 'left'>
+        <%else%>
+            <td  bgcolor="#DDDDBB" align = 'left' >
+        <%end%>
+        <%if @avg_and_ranges[@teamid][:avg]==-1.0%>
+            N/A
+        <%else%>
+          <%= @avg_and_ranges[@teamid][:avg].round(0) %>%
+        <%end%>
+        </td>
+        <% #############Score range ########################        %>
+        <% if (@l%2) == 0%>
+            <td bgcolor="#ffffff" align = 'left' >
+        <%else%>
+            <td  bgcolor="#DDDDBB" align = 'left' >
+        <%end%>
+        <%if @avg_and_ranges[@teamid][:avg]==-1.0%>
+            N/A
+        <%else%>
+            (<%= @avg_and_ranges[@teamid][:min].round(0) %>% - <%= @avg_and_ranges[@teamid][:max].round(0) %>%)
+        <%end%>
+        </td>
+
+    <%else%>
+
+        <% if (@l%2) == 0%>
+            <td bgcolor="#ffffff" align = 'left'>
+        <%else%>
+            <td  bgcolor="#DDDDBB" align = 'left' >
+        <%end%>
+        --
+        </td>
+
+        <% if (@l%2) == 0%>
+            <td bgcolor="#ffffff" align = 'left' >
+        <%else%>
+            <td  bgcolor="#DDDDBB" align = 'left' >
+        <%end%>
+        --
+        </td>
+    <%end%>
+<%else%>
+    <% #Assignments have vary_rubric_by_rounds#%>
+    <% #################Score awarded########################    %>
+    <%current_round = @assignment.get_current_round(nil)%>
+    <%current_round = @assignment.get_review_rounds if (@assignment.get_current_stage(nil)=="Finished" || @assignment.get_current_stage(nil)=="metareview") %>
+    <% if (@l%2) == 0%>
+        <td bgcolor="#ffffff" align = 'left' >
+    <%else%>
+        <td  bgcolor="#DDDDBB" align = 'left' >
+    <%end%>
+
+    <% if !@review_scores[@this_reviewer].nil? && !@review_scores[@this_reviewer][current_round].nil? && !@review_scores[@this_reviewer][current_round][@teamid].nil? && @review_scores[@this_reviewer][current_round][@teamid] != -1.0%>
+        <%= @review_scores[@this_reviewer][current_round][@teamid].inspect %>%
+    <% elsif  !@review_scores[@this_reviewer].nil? && !@review_scores[@this_reviewer][current_round-1].nil? && !@review_scores[@this_reviewer][current_round-1][@teamid].nil? && @review_scores[@this_reviewer][current_round-1][@teamid] != -1.0%>
+        <font color="gray"><%= @review_scores[@this_reviewer][current_round-1][@teamid].inspect %>%</font>
+    <%else%>
+        --
+    <% end %>
+    </td>
+
+    <%if (@avg_and_ranges[@teamid] && @avg_and_ranges[@teamid][current_round] && @avg_and_ranges[@teamid][current_round][:avg]&& @avg_and_ranges[@teamid][current_round][:max]&& @avg_and_ranges[@teamid][current_round][:min]) %>
+        <% #############Avg. score########################        %>
+        <% if (@l%2) == 0%>
+            <td bgcolor="#ffffff" align = 'left'>
+        <%else%>
+            <td  bgcolor="#DDDDBB" align = 'left' >
+        <%end%>
+        <%= @avg_and_ranges[@teamid][current_round][:avg].round(0) %>%
+        </td>
+
+        <% #############Score range ########################        %>
+        <% if (@l%2) == 0%>
+            <td bgcolor="#ffffff" align = 'left' >
+        <%else%>
+            <td  bgcolor="#DDDDBB" align = 'left' >
+        <%end%>
+        (<%= @avg_and_ranges[@teamid][current_round][:min].round(0) %>% - <%= @avg_and_ranges[@teamid][current_round][:max].round(0) %>%)
+        </td>
+
+    <%else%>
+
+        <% if (@l%2) == 0%>
+            <td bgcolor="#ffffff" align = 'left'>
+        <%else%>
+            <td  bgcolor="#DDDDBB" align = 'left' >
+        <%end%>
+        --
+        </td>
+
+        <% if (@l%2) == 0%>
+            <td bgcolor="#ffffff" align = 'left' >
+        <%else%>
+            <td  bgcolor="#DDDDBB" align = 'left' >
+        <%end%>
+        --
+        </td>
+    <%end%>
+
+<%end%>

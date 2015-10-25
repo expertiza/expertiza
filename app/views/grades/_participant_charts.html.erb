@@ -1,0 +1,107 @@
+<% if has_team_and_metareview?[:true_num] == 2 %>
+  <!--100 = 19 + 8 * 9 + 9-->
+  <% namecolwidth = 19 %>
+  <% colwidth = 9 %>
+<% elsif has_team_and_metareview?[:true_num] == 1 %>
+  <!--100 = 16 + 6 * 12 + 12-->
+  <% namecolwidth = 16 %>
+  <% colwidth = 12 %>
+<% else %>
+  <!--100 = 16 + 4 * 18 + 18-->
+  <% namecolwidth = 10 %>
+  <% colwidth = 18 %>
+<% end %>
+
+<a href="#" name='score-chartLink' onClick="toggleElement('score-chart', 'stats');return false;">hide stats</a>
+
+<TR style ="background-color: white;" id='score-chart'>
+
+<th style="text-align:center;" WIDTH="<%= namecolwidth %>%">
+	Stats
+</th>
+
+<th style="text-align:center;" COLSPAN="2" WIDTH="<%= colwidth*2 %>%">
+	<img src="<%= @grades_bar_charts[:review] %>" >
+	<div class="circle" id="review-circle">
+					
+	</div>
+</th>
+
+<% if has_team_and_metareview?[:has_metareview] %>
+  <th style="text-align:center;" COLSPAN="2" WIDTH="<%= colwidth*2 %>%">
+  	<img src="<%= @grades_bar_charts[:metareview] %>" >
+    <div class="circle" id="metareview-circle">
+            
+    </div>
+  </th>
+<% end %>
+
+<th style="text-align:center;" COLSPAN="2" WIDTH="<%= colwidth*2 %>%">
+	<img src="<%= @grades_bar_charts[:feedback] %>" >
+  <div class="circle" id="feedback-circle">
+          
+  </div>
+</th>
+
+<% if has_team_and_metareview?[:has_team] %>		
+  <th style="text-align:center;" COLSPAN="2" WIDTH="<%= colwidth*2 %>%">
+  <% if @assignment.show_teammate_reviews == true %>
+  	<img src="<%= @grades_bar_charts[:teammate] %>" >
+    <div class="circle" id="teammate-circle">
+  <% else %>
+    Not shown
+  <% end %>
+          
+  </div>
+  </th>
+<% end %>
+
+<th style="text-align:center;" WIDTH="<%= colwidth %>%">&nbsp;
+  <div class="circle" id="final-circle">
+          
+  </div>
+</th>
+  
+</TR>
+
+<script type="text/javascript">
+  <% ['review', 'metareview', 'feedback', 'teammate'].each do |type| %>
+  <% if @pscore[type.to_sym] && @pscore[type.to_sym][:scores][:avg]%>
+  <% if type == 'teammate' && @assignment.show_teammate_reviews == true %>
+  var myCircle = Circles.create({
+    id:           '<%= "#{type}-circle" %>',
+    radius:       25,
+    value:        <%= @pscore[type.to_sym][:scores][:avg].to_i %>,
+    maxValue:     100,
+    width:        7,
+    text:         '<%=@pscore[type.to_sym][:scores][:avg].to_i%>',
+    colors:       ['#FFEB99', '#FFCC00'],
+    duration:       700,
+    textClass:      'circles-text'
+  });
+  <%end%>
+  <%end%>
+  <%end%>
+  var myCircle = Circles.create({
+    id:           'final-circle',
+    radius:       35,
+    value:        <%= @pscore[:total_score].to_i %>,
+    maxValue:     100,
+    width:        15,
+    text:         '<%=@pscore[:total_score].to_i==-1? "N/A":@pscore[:total_score].to_i%>',
+    colors:       ['#FFEB99', '#FFCC00'],
+    duration:       700,
+    textClass:      'circles-final'  
+  });
+
+</script> 
+
+<style>
+  .circles-text{
+    font-size: 12px !important;    
+  }
+  .circles-final{
+    font-size: 16px !important;    
+  }
+</style>          
+

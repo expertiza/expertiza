@@ -1,0 +1,29 @@
+<h1> List of Deployments </h1>
+
+<table border=0>
+  <% if @survey_deployments.size > 0 %>
+    <tr>
+      <th> Survey Name&nbsp;&nbsp;</th>
+      <th> Start Date&nbsp;&nbsp;</th>
+      <th> End Date&nbsp;&nbsp;</th>
+      <th> Number of Students&nbsp;&nbsp;</th>
+      <th> Actions&nbsp;&nbsp;</th>
+    </tr>
+  <% end %>
+  <% @survey_deployments.each do |survey_deployment| %>
+    <tr>
+      <td align=center><%= @surveys[survey_deployment.id] %></td>
+      <td align=center><%= survey_deployment.start_date.strftime('%A %B %d %Y, %I:%M%p') %></td>
+      <td align=center><%= survey_deployment.end_date.strftime('%A %B %d %Y, %I:%M%p') %></td>
+      <td align=center><%= survey_deployment.num_of_students %></td>
+      <td align=center><%= link_to "View Responses", {:controller=>'survey_response',:action=>'view_responses',:id=>survey_deployment.id , :course_eval=>"1"} %> <%= link_to "Delete", {:action=>"delete", :id=>survey_deployment.id}, :confirm=>"Are You Sure?", :method=>"post" %>
+    </td>
+  </tr>
+<% end %>
+</table>
+
+<%= link_to "Add New Deployment", :action=>"new" %><p>
+
+  <% if current_user.role == Role.super_admin %>
+    <%= link_to "Reminder thread status", :action=>"reminder_thread" %>
+  <% end %>

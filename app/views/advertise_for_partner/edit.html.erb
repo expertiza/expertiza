@@ -1,0 +1,5 @@
+<h1>Edit Teammate Advertisement</h1>
+<%= form_tag :action => 'update',:id=>@team.id do %>
+  <%= render :partial => 'qualifications',:locals => {:team_id=>@team_id} %>
+  <%=  submit_tag "Update" %>
+<% end %>

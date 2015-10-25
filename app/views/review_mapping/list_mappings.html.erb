@@ -1,0 +1,7 @@
+<h1>Participants</h1>
+<h2>Assignment: <%= @assignment.name %></h2>
+
+<%= render :partial => "list_review_mappings", :locals => { :assignment => @assignment, :items => @items } %>
+
+<%= link_to 'Back', :controller => 'tree_display', :action => 'list' %>
+

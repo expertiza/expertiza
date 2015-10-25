@@ -1,0 +1,11 @@
+<% found_in_slots = false %>
+<% for slot in @slots_filled %>
+  <% if slot.topic_id.to_s == topic.id.to_s %>
+    <% available_slots = topic.max_choosers.to_int - slot.count.to_i %>
+    <td align="center"><%=  available_slots %></td>
+    <% found_in_slots = true %>
+  <% end %>
+<% end %>
+<% if found_in_slots == false %>
+  <td align="center"><%= topic.max_choosers %></td>
+<% end %>

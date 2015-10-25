@@ -1,0 +1,225 @@
+--- !ruby/object:Gem::Specification 
+name: hoptoad_notifier
+version: !ruby/object:Gem::Version 
+  hash: 23
+  prerelease: 
+  segments: 
+  - 2
+  - 4
+  - 4
+  version: 2.4.4
+platform: ruby
+authors: 
+- thoughtbot, inc
+autorequire: 
+bindir: bin
+cert_chain: []
+
+date: 2011-01-28 00:00:00 -05:00
+default_executable: 
+dependencies: 
+- !ruby/object:Gem::Dependency 
+  name: builder
+  prerelease: false
+  requirement: &id001 !ruby/object:Gem::Requirement 
+    none: false
+    requirements: 
+    - - ">="
+      - !ruby/object:Gem::Version 
+        hash: 3
+        segments: 
+        - 0
+        version: "0"
+  type: :runtime
+  version_requirements: *id001
+- !ruby/object:Gem::Dependency 
+  name: activesupport
+  prerelease: false
+  requirement: &id002 !ruby/object:Gem::Requirement 
+    none: false
+    requirements: 
+    - - ">="
+      - !ruby/object:Gem::Version 
+        hash: 3
+        segments: 
+        - 0
+        version: "0"
+  type: :runtime
+  version_requirements: *id002
+- !ruby/object:Gem::Dependency 
+  name: activerecord
+  prerelease: false
+  requirement: &id003 !ruby/object:Gem::Requirement 
+    none: false
+    requirements: 
+    - - ">="
+      - !ruby/object:Gem::Version 
+        hash: 3
+        segments: 
+        - 0
+        version: "0"
+  type: :development
+  version_requirements: *id003
+- !ruby/object:Gem::Dependency 
+  name: actionpack
+  prerelease: false
+  requirement: &id004 !ruby/object:Gem::Requirement 
+    none: false
+    requirements: 
+    - - ">="
+      - !ruby/object:Gem::Version 
+        hash: 3
+        segments: 
+        - 0
+        version: "0"
+  type: :development
+  version_requirements: *id004
+- !ruby/object:Gem::Dependency 
+  name: bourne
+  prerelease: false
+  requirement: &id005 !ruby/object:Gem::Requirement 
+    none: false
+    requirements: 
+    - - ">="
+      - !ruby/object:Gem::Version 
+        hash: 3
+        segments: 
+        - 0
+        version: "0"
+  type: :development
+  version_requirements: *id005
+- !ruby/object:Gem::Dependency 
+  name: nokogiri
+  prerelease: false
+  requirement: &id006 !ruby/object:Gem::Requirement 
+    none: false
+    requirements: 
+    - - ">="
+      - !ruby/object:Gem::Version 
+        hash: 3
+        segments: 
+        - 0
+        version: "0"
+  type: :development
+  version_requirements: *id006
+- !ruby/object:Gem::Dependency 
+  name: shoulda
+  prerelease: false
+  requirement: &id007 !ruby/object:Gem::Requirement 
+    none: false
+    requirements: 
+    - - ">="
+      - !ruby/object:Gem::Version 
+        hash: 3
+        segments: 
+        - 0
+        version: "0"
+  type: :development
+  version_requirements: *id007
+description: 
+email: support@hoptoadapp.com
+executables: []
+
+extensions: []
+
+extra_rdoc_files: []
+
+files: 
+- CHANGELOG
+- INSTALL
+- MIT-LICENSE
+- Rakefile
+- README.md
+- README_FOR_HEROKU_ADDON.md
+- SUPPORTED_RAILS_VERSIONS
+- TESTING.rdoc
+- generators/hoptoad/hoptoad_generator.rb
+- generators/hoptoad/lib/insert_commands.rb
+- generators/hoptoad/lib/rake_commands.rb
+- generators/hoptoad/templates/capistrano_hook.rb
+- generators/hoptoad/templates/hoptoad_notifier_tasks.rake
+- generators/hoptoad/templates/initializer.rb
+- lib/hoptoad_notifier/backtrace.rb
+- lib/hoptoad_notifier/capistrano.rb
+- lib/hoptoad_notifier/configuration.rb
+- lib/hoptoad_notifier/notice.rb
+- lib/hoptoad_notifier/rack.rb
+- lib/hoptoad_notifier/rails/action_controller_catcher.rb
+- lib/hoptoad_notifier/rails/controller_methods.rb
+- lib/hoptoad_notifier/rails/error_lookup.rb
+- lib/hoptoad_notifier/rails/javascript_notifier.rb
+- lib/hoptoad_notifier/rails.rb
+- lib/hoptoad_notifier/rails3_tasks.rb
+- lib/hoptoad_notifier/railtie.rb
+- lib/hoptoad_notifier/sender.rb
+- lib/hoptoad_notifier/shared_tasks.rb
+- lib/hoptoad_notifier/tasks.rb
+- lib/hoptoad_notifier/user_informer.rb
+- lib/hoptoad_notifier/version.rb
+- lib/hoptoad_notifier.rb
+- lib/hoptoad_tasks.rb
+- lib/rails/generators/hoptoad/hoptoad_generator.rb
+- test/backtrace_test.rb
+- test/catcher_test.rb
+- test/configuration_test.rb
+- test/helper.rb
+- test/hoptoad_tasks_test.rb
+- test/javascript_notifier_test.rb
+- test/logger_test.rb
+- test/notice_test.rb
+- test/notifier_test.rb
+- test/rack_test.rb
+- test/rails_initializer_test.rb
+- test/sender_test.rb
+- test/user_informer_test.rb
+- rails/init.rb
+- script/integration_test.rb
+- lib/templates/javascript_notifier.erb
+- lib/templates/rescue.erb
+has_rdoc: true
+homepage: http://www.hoptoadapp.com
+licenses: []
+
+post_install_message: 
+rdoc_options: []
+
+require_paths: 
+- lib
+required_ruby_version: !ruby/object:Gem::Requirement 
+  none: false
+  requirements: 
+  - - ">="
+    - !ruby/object:Gem::Version 
+      hash: 3
+      segments: 
+      - 0
+      version: "0"
+required_rubygems_version: !ruby/object:Gem::Requirement 
+  none: false
+  requirements: 
+  - - ">="
+    - !ruby/object:Gem::Version 
+      hash: 3
+      segments: 
+      - 0
+      version: "0"
+requirements: []
+
+rubyforge_project: 
+rubygems_version: 1.4.1
+signing_key: 
+specification_version: 3
+summary: Send your application errors to our hosted service and reclaim your inbox.
+test_files: 
+- test/backtrace_test.rb
+- test/catcher_test.rb
+- test/configuration_test.rb
+- test/hoptoad_tasks_test.rb
+- test/javascript_notifier_test.rb
+- test/logger_test.rb
+- test/notice_test.rb
+- test/notifier_test.rb
+- test/rack_test.rb
+- test/rails_initializer_test.rb
+- test/sender_test.rb
+- test/user_informer_test.rb

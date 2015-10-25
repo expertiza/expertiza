@@ -1,0 +1,83 @@
+<h1>Bookmarks list for <%= @topic.topic_name %></h1>
+
+<div class = "exp">
+	<table>
+	  <tr>
+	    <th class="head">Title</th>
+	    <th class="head">Description</th>
+	    <th class="head">Avg. rating</th>
+	    <th class="head">Your rating</th>
+	    <% if !Bookmark.where(user_id: session[:user].id).blank? %>
+	    	<th class="head" colspan='2'>Action</th>
+	    <% end %>
+	  </tr>
+	  <% @bookmark_ids = Array.new %>
+	  <% @bookmarks.each {|bookmark| @bookmark_ids << bookmark.id} %>
+	  <% @bookmarks.each do |bookmark| %>
+	    <tr>
+	      <td><a href=<%= "http://#{bookmark.url}"%> target='_blank'><%=bookmark.title %></td>
+	      <!--Set maximum length of bookmark description and keep description in one line.-->
+	      <td><%=truncate(bookmark.description, length: 100) %></td>
+	      <!--Average rating score-->
+	  	  <% @bookmark_ratings = BookmarkRating.where(bookmark_id: bookmark.id) %>
+	  	  <!--Self rated bookmark should not be counted in average rating.-->
+	  	  <% @bookmark_ratings.to_a.reject! {|bookmark_rating| bookmark_rating.user_id == Bookmark.find(bookmark_rating.bookmark_id).user_id} %>
+	  	  <% sum = 0 %>
+	  	  <% @bookmark_ratings.each do |bookmark_rating| %>
+	  	  	<% sum += bookmark_rating.rating %>
+	  	  <% end %>
+	  	  <td>
+	  	  	<% if @bookmark_ratings.size > 0 %>
+	  	  		<%= (sum * 1.0 / @bookmark_ratings.size).round(1) %>
+	  	  	<% else %>
+	  	  		<%= '-' %>
+	  	  	<% end %>
+	  	  </td>
+	      <td>
+	      	<% if BookmarkRating.exists?(bookmark_id: bookmark.id, user_id: session[:user].id) %>
+	      		<% rating = BookmarkRating.where(bookmark_id: bookmark.id, user_id: session[:user].id).first.rating.to_s %>
+	      	<% else %>
+	      		<% rating = "0" %>
+	      	<% end %>
+	      	<!--If instructor choose to use dropdown, Expertiza will not redirect to this page. Otherwise, we will use this page to do bookmark rating (rubric).-->
+	      	<% link_to 'Rate', :action => 'bookmark_rating', :id => bookmark.id %>
+	      	<%= form_tag :action => "save_bookmark_rating_score", :id => bookmark.id do %>
+			    <% params[:rating] = rating %>
+			    <select id=<%= bookmark.id %> name="rating" style="font-size:10px">
+			      <% (0..5).each do |i| %>
+			        <option value=<%= i.to_s %> 
+			          <% if params[:rating] == i.to_s -%>
+			            selected
+			          <% end -%>
+			        ><%= i.to_s %></option>
+			      <% end %>
+			    </select>
+			    <% if BookmarkRating.where(bookmark_id: bookmark.id, user_id: session[:user].id).first.blank? %>
+			    	<%= button_tag "Rate", {:id=>'button'+bookmark.id.to_s,:style=>"font-size:10px; display:none;"} %>
+			    <% else %>
+			    	<%= button_tag "Update", {:id=>'button'+bookmark.id.to_s,:style=>"font-size:10px; display:none;"} %>
+				<% end %>
+			<% end %>
+	    </td>
+	      <% if bookmark.user_id == session[:user].id %>
+	      	<td><%= link_to 'Edit', :action => 'edit', :id => bookmark.id %></td>
+	        <td><%= link_to 'Destroy', bookmark, :confirm => "Delete bookmark \"#{bookmark.title}\"?", :method => :delete %></td>
+	      <% end %>
+	    </tr>
+	  <% end %>
+	</table>
+</div>
+
+<br />
+
+<%= link_to 'New bookmark', :action => 'new', :id => @topic.id %> |
+<%= link_to 'Back', :controller=> 'sign_up_sheet', :action=>'list', :assignment_id => @topic.assignment_id %>
+
+<script>
+  var bookmark_ids = <%=@bookmark_ids%>;
+  bookmark_ids.forEach(function(bookmark_id){
+    $('#'.concat(bookmark_id.toString())).change(function(){
+      $('#button'.concat(bookmark_id.toString())).show();
+    });
+  });
+</script>

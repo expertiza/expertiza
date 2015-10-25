@@ -1,0 +1,33 @@
+<%unless @suggestions.empty? %>
+<h2>Suggested topics for <%= @assignment.name %></h2>
+  <table class="general" cellpadding="5" width="50%" border="1">
+    <tr>
+      <th style="text-align:center;">Title</th>
+      <th style="text-align:center;">Status</th>
+      <th style="text-align:center;">Action</th>
+    </tr>
+
+    <% for suggestion in @suggestions %>
+      <tr class="listingRow">
+        <td style="text-align:center; max-width: 200px;"><%=h suggestion.title %></td>
+        <td align="center"><%=h suggestion.status %></td>
+        <td align="center"><%= link_to 'View', :action => 'student_view', :id => suggestion %>
+        <%= if suggestion.status == 'Initiated'
+          link_to 'Edit', :action => 'student_edit', :id => suggestion 
+          end %></td>
+      </tr>
+    <% end %>
+  </table>
+ <% end %>
+
+<h3>New suggestion</h3>
+
+<%= form_tag :action => 'create' do %>
+  <%= render :partial => 'form' %>
+  <p>
+    <%= submit_tag "Submit" %>
+  </p>
+<% end %>
+
+<%= link_to 'Back', :controller => 'student_task', :action => 'list' %>
+

@@ -1,0 +1,40 @@
+<!--Only in assignment#edit page, topic name has link on it. In students' sign_up_sheet page, topic name should be plain text.-->
+<% if params[:controller] == "assignments" and params[:action] == "edit"%>
+  <a href="#<%= i %>" onClick="toggleSingleTeamAndMember(<%= i %>)">
+    <span class="inline" id="<%= i %>_show"><%= topic.topic_name %></span>
+    <span class="inline" id="<%= i %>_hide" style="display: none"><%= topic.topic_name %></span>
+  </a>
+<% else %>
+    <span class="inline" id="<%= i %>_show"><%= topic.topic_name %></span>
+<% end %>
+
+<!--if 'Has teams' is not checked, the UI should not show the team name on the topic list.-->
+
+<div id="<%= i %>_myDiv">
+<!--Though called participants, @participants are actually records in signed_up_teams table-->
+  <% if !@participants.nil? && @participants.size > 0 %>
+    <% chooser_present = false %>
+    <% for participant in @participants %>
+      <% if topic.id == participant.topic_id %>
+        <% chooser_present = true %>
+
+        <% if(@assignment.max_team_size > 1)%>
+          <br/>
+          <b><%= participant.team_name_placeholder%></b>
+          <br/>
+          <%= participant.user_name_placeholder%>
+        <% else %>
+          <%= participant.user_name_placeholder%>
+        <% end %>
+        <% if participant.is_waitlisted == true %>
+          <font color='red'>(waitlisted)</font>
+        <% end %>
+        <br/>
+      <% end %>
+    <% end %>
+    <% if chooser_present == false %>
+      No choosers.
+    <% end %>
+    <br/>
+  <% end %>
+</div>

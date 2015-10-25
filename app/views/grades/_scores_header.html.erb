@@ -1,0 +1,103 @@
+<%
+    participant = pscore[:participant]
+%>
+
+<div style="background-color: white;;">
+  <div class="col-md-12">
+    <h1>Scores for <b><%= @assignment.name %></b></h1>
+  </div>
+</div>
+
+<div style="background-color: white;;">
+  <div class="col-md-12">
+    <table class="table round-border-table text-center">
+      <thead>
+        <tr style="background-color:#dddddd">
+          <th style="text-align:center;" width="18%"></th>
+          <th style="text-align:center;" colspan="2" width="14%">Submitted work</th>
+          <th style="text-align:center;" colspan="2" width="14%">Reviewing</th>
+          <th style="text-align:center;" colspan="2" width="14%">Author Feedback</th>
+          <th style="text-align:center;" colspan="2" width="14%">Teammate Review</th>
+          <th style="text-align:center;" width="7%"></th>
+        </tr>
+        <tr style="background-color:#dddddd">
+          <th style="text-align:left;" width="18%">Contributor</th>
+          <th style="text-align:center;" width="6%">Average</th>
+          <th style="text-align:center;" width="8%">Range</th>
+          <th style="text-align:center;" width="6%">Average</th>
+          <th style="text-align:center;" width="8%">Range</th>
+          <th style="text-align:center;" width="6%">Average</th>
+          <th style="text-align:center;" width="8%">Range</th>
+          <th style="text-align:center;" width="6%">Average</th>
+          <th style="text-align:center;" width="8%">Range</th>
+          <th style="text-align:center;" width="7%">Stage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><%= participant.fullname %>
+            <br/><a href="http://expertiza.ncsu.edu/grades/view_my_scores/25132#" id="user_filesLink" name="user_filesLink" onclick="toggleElement(&#39;user_files&#39;,&#39;submission&#39;);return false;">show
+            submission</a>
+        </td>
+        <td>
+          <% if @rscore_review.my_avg %>
+            <%= sprintf("%.2f", @rscore_review.my_avg) %>%
+          <% else %>
+            ---
+          <% end %>
+        </td>
+        <td>
+          <% if @rscore_review.my_avg %>
+            <%= sprintf("%.0f", @rscore_review.my_min) %>% - <%= sprintf("%.0f", @rscore_review.my_max) %>%
+          <% else %>
+            ---
+          <% end %>
+        </td>
+        <td>
+          <% if @rscore_metareview.my_avg %>
+            <%= sprintf("%.2f", @rscore_review.my_avg) %>%
+          <% else %>
+            ---
+          <% end %>
+        </td>
+        <td>
+          <% if @rscore_metareview.my_avg %>
+            <%= sprintf("%.0f", @rscore_review.my_min) %>% - <%= sprintf("%.0f", @rscore_review.my_max) %>%
+          <% else %>
+            ---
+          <% end %>
+        </td>
+        <td>
+          <% if @rscore_feedback.my_avg %>
+            <%= sprintf("%.2f", @rscore_review.my_avg) %>%
+          <% else %>
+            ---
+          <% end %>
+        </td>
+        <td>
+          <% if @rscore_feedback.my_avg %>
+            <%= sprintf("%.0f", @rscore_review.my_min) %>% - <%= sprintf("%.0f", @rscore_review.my_max) %>%
+          <% else %>
+            ---
+          <% end %>
+        </td>
+        <td>
+          <% if @rscore_teammate.my_avg %>
+            <%= sprintf("%.2f", @rscore_review.my_avg) %>
+          <% else %>
+            ---
+          <% end %>
+        </td>
+        <td>
+          <% if @rscore_teammate.my_avg %>
+            <%= sprintf("%.0f", @rscore_review.my_min) %>% - <%= sprintf("%.0f", @rscore_review.my_max) %>%
+          <% else %>
+            ---
+          <% end %>
+        </td>
+        <td><%= stage %></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</div>

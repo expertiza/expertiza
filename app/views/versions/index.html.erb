@@ -1,0 +1,17 @@
+<h1> Version Table </h1>
+<hr/>
+<%= link_to "Delete All", Version, confirm: "Are you sure you want to delete all the versions?", method: :delete %>
+<table>
+  <% @versions.each do |version| %>
+
+    <tr>
+      <td><%= version.item_id %> &nbsp;  &nbsp;</td>
+      <td><%= version.item_type %>&nbsp;  &nbsp; </td>
+      <td><%= version.event %>&nbsp;  &nbsp; </td>
+      <td><%= version.whodunnit %>&nbsp;  &nbsp; </td>
+      <td><%= version.created_at %> &nbsp;  &nbsp; </td>
+      <td><%= link_to "Delete", version, :confirm => "Are you sure you want to delete the version?", :method => :delete %></td>
+    </tr>
+
+  <%end%>
+</table>

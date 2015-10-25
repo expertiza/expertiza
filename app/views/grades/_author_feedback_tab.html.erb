@@ -1,0 +1,7 @@
+<!-- PARTICIPANT -->
+<%
+participant = pscore[:participant]
+%>
+<TR id="<%= prefix %>_feedback" style="display:none; background-color: white;">
+  <TD COLSPAN="9"><%= render :partial=>'grades/author_feedbacks', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:feedback]} %></TD>
+</TR>

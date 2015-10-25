@@ -1,0 +1,15 @@
+<%-# For the student view of a signup sheet, choose the background color for the -%>
+<%-# current line, based on whether it has been selected and/or is waitlisted.  -%>
+<% if !@selected_topics.nil? && @selected_topics.size != 0 %>
+  <% for selected_topic in @selected_topics %>
+    <% if selected_topic.topic_id == topic.id and !selected_topic.is_waitlisted %>
+      <tr bgcolor="yellow">
+      <% elsif selected_topic.topic_id == topic.id and selected_topic.is_waitlisted%>
+        <tr bgcolor="lightgray">
+        <% else %>
+          <tr>
+          <% end %>
+        <% end %>
+      <% else %>
+        <tr>
+        <% end %>

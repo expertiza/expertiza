@@ -1,0 +1,21 @@
+<%
+    session[:mapping] = Hash.new
+session[:mapping][:contributor] = @mapping.reviewee
+session[:mapping][:assignment] = @mapping.assignment
+%>
+
+<h1>Add Reviewer</h1>
+<h2>Contributor: <%= @mapping.reviewee.name %></h2>
+<h2>Reviewer: <%= @mapping.reviewer.name %></h2>
+<h2>Assignment: <%= @mapping.assignment.name %></h2>
+<br/>
+
+<%= form_tag({:action => 'add_metareviewer'}, {:method => 'post'}) do %>
+  Enter a user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
+<%= hidden_field_tag('id', @mapping.map_id) %>
+<input type='submit' value='Add Metareviewer'/><br/><br/>
+<!-- ACS removed check to see if it is a team assignment -->
+<% if @mapping.assignment.max_team_size < 2 %>
+  <%= check_box 'options','include', {:checked => 'checked'},  "true", "false"  %>&nbsp;Include the selected user as a participant in the assignment.<br/>
+<% end %>
+<% end %>

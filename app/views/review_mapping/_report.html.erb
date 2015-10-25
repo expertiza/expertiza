@@ -1,0 +1,185 @@
+
+
+<div class = "reviewreport">
+  <table width="100%" cellspacing="0" cellpadding="2" border="0">
+    <tr bgcolor="#CCCCCC">
+      <th width = "16%">
+        Reviewer
+      </th>
+      <th width = "14%">
+        # reviews done
+      </th>
+      <th width = "20%">
+        Team reviewed
+      </th>
+      <th width = "8%">
+        Score awarded
+      </th>
+      <th width = "8%">
+        Avg. score
+      </th>
+      <th width = "16%">
+        Score range
+      </th>
+      <th width = "20%">
+        Last reviewed at
+      </th>
+    </tr>
+
+
+      <%@l = -1 %>
+      <% @reviewers.each do |r| %>
+        <tr>
+        <% @this_reviewer = r.reviewer_id %>
+        <% @count = 0 %>
+        <% @rspan = 0 %>
+        <%@l = @l+1 %>
+        <% ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", @id, r.reviewer_id,@type]).each do |ri| %>
+          <% if (Response.find_by_map_id(ri.id)) %>
+            <% @count = @count + 1 %>
+          <% end %>
+          <% if (Team.where(["id = ?", ri.reviewee_id ]).length > 0) %>
+            <% @rspan = @rspan + 1 %>
+          <% end %>
+        <%end %>
+        <%if r.reviewer_id != -1 %>
+          <% parid = Participant.find(r.reviewer_id).user_id%>
+          <% username = User.find(parid).fullname%>
+
+          <% if (@l%2) == 0 %>
+
+            <td bgcolor="#ffffff" rowspan= <%= @rspan%>>
+              <%= link_to username, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id=>@id%>
+            </td>
+          <%else %>
+
+            <td bgcolor="#DDDDBB" rowspan=<%= @rspan%>>
+              <%= link_to username, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id=>@id%>
+            </td>
+
+          <%end %>
+
+          <% if (@count == (ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ?", @id, r.reviewer_id])).length) %>
+                  <% if (@l%2) == 0 %>
+            <td bgcolor="#ffffff"  align = "left" rowspan= <%= @rspan%>>
+              <%= @count %>/<%= @rspan %> <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.reviewer_id, :assignment_id=>@id%>
+            </td>
+                  <%else %>
+                      <td bgcolor="#DDDDBB"  align = "left" rowspan= <%= @rspan%>>
+                        <%= @count %>/<%= @rspan %> <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.reviewer_id, :assignment_id=>@id%>
+                      </td>
+                  <%end %>
+          <%else %>
+                  <% if (@l%2) == 0 %>
+            <td bgcolor="#ffffff" align = "left" rowspan= <%= @rspan%>>
+              <%= @count %>/<%= @rspan %> <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.reviewer_id, :assignment_id=>@id%>
+            </td>
+                  <%else %>
+                      <td bgcolor="#DDDDBB" align = "left" rowspan= <%= @rspan%>>
+                        <%= @count %>/<%= @rspan %> <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.reviewer_id, :assignment_id=>@id%>
+                      </td>
+                  <%end %>
+          <%end %>
+
+          <% (ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", @id, r.reviewer_id, @type])).each do |ri| %>
+            <% if (Response.find_by_map_id(ri.id)) %>
+              <% if Team.where(["id = ?", ri.reviewee_id ]).length > 0 %>
+                <%@team = Team.find(ri.reviewee_id) %>
+                <% @teamid = @team.id%>
+                <% if (@l%2) == 0 %>
+                  <td id = "green" bgcolor="#ffffff" align = 'left' colspan=1>
+                <%else %>
+                  <td id = "green" bgcolor="#DDDDBB" align = 'left' colspan=1>
+                <%end %>
+                    <%= link_to Team.find(ri.reviewee_id).name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
+                  </td>
+                  <%= render :partial => 'teamscore' %>
+
+                  <% if (@l%2) == 0 %>
+                    <td bgcolor="#ffffff" align = 'left'>
+                  <%else %>
+                    <td bgcolor="#DDDDBB" align = 'left'>
+                  <%end %>
+                      <%=  Response.where(["map_id = ?", ri.id]).first.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
+                    </td>
+                          </tr>
+                          <tr>
+
+                  <% elsif !@assignment.team_assignment? %>
+                    <% @participantid = (Participant.find(ri.reviewee_id)).user_id %>
+                    <% @myuser = 0%>
+                    <% @myuser = ri.reviewee_id%>
+                    <% participant = User.find(@participantid) %>
+                    <% if (@l%2) == 0 %>
+                      <td id = "green" bgcolor="#ffffff" align = 'left' colspan=1>
+                    <%else %>
+                      <td id = "green" bgcolor="#DDDDBB" align = 'left' colspan=1>
+                    <%end %>
+                      <%= link_to participant.fullname, :controller => 'popup', :action => 'participants_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
+                      </td>
+                      <%= render :partial => 'participantscore' %>
+                      <!-- write ur partial here to print score -->
+                      <% if (@l%2) == 0 %>
+                        <td bgcolor="#ffffff" align = 'left'>
+                        <%else %>
+                          <td bgcolor="#DDDDBB" align = 'left'>
+                          <%end %>
+                          <%=  Response.where(["map_id = ?", ri.id]).first.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
+
+                        </td>
+                          </tr><tr>
+                      <%end %>
+
+                    <% else %>
+                      <% if Team.where([ "id = ?", ri.reviewee_id ]).length > 0 %>
+                        <% if (@l%2) == 0 %>
+                          <td id = "red" bgcolor="#ffffff" style ="color:#DD3300" align = 'left' colspan=1>
+                        <%else %>
+                          <td id = "red" bgcolor="#DDDDBB" style ="color:#DD3300" align = 'left' colspan=1>
+                        <%end %>
+                          <%@team = Team.find(ri.reviewee_id) %>
+                          <% @teamid = @team.id%>
+                          <%= link_to Team.find(ri.reviewee_id).name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => nil, :assignment_id=>@id %>
+                        </td>
+                        <%= render :partial => 'teamscore' %>
+                        <% if (@l%2) == 0 %>
+                          <td bgcolor="#ffffff" style ="color:#DD3300" align = 'left'>
+                          <%else %>
+                            <td bgcolor="#DDDDBB" style ="color:#DD3300" align = 'left'>
+                            <%end %>
+                            No
+                          </td>
+                        </tr><tr>
+
+                          <% elsif !@assignment.team_assignment? %>
+                            <% @participantid = Participant.find(ri.reviewee_id).user_id %>
+                            <% @myuser = 0%>
+                            <% @myuser = ri.reviewee_id%>
+
+                            <% participant = User.find(@participantid) %>
+
+                            <% if (@l%2) == 0 %>
+                              <td id = "red" style ="color:#DD3300" align = 'left' colspan=1 bgcolor="#ffffff" >
+                            <%else%>
+                                <td  id = "red" style ="color:#DD3300" align = 'left' colspan=1 bgcolor="#DDDDBB"  >
+                            <%end%>
+                                <%= link_to participant.fullname, :controller => 'popup', :action => 'participants_popup', :id => ri.reviewee_id, :id2 => nil, :assignment_id => @id %>
+                              </td><!-- write ur partial here to print score -->
+                              <%= render :partial => 'participantscore' %>
+                              <% if (@l%2) == 0 %>
+                                <td bgcolor="#ffffff" align = 'left'>
+                                <%else %>
+                                  <td bgcolor="#DDDDBB" align = 'left'>
+                                  <%end %>
+                                  No
+                                </td>
+
+                            <%end %>
+                          <%end %>
+                        <%end %>
+                      <%end %>
+        </tr>
+                    <%end %>
+
+                  </table>
+                </div>

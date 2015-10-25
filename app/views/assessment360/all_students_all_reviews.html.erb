@@ -1,0 +1,43 @@
+<div>
+  <table cellpadding=2 border="1" frame="below" cellspacing="0" style="border-style:1px solid black;">
+    <tr>
+      <th rowspan=2>Students</th>
+      <% count = 0%>
+      <th rowspan=2 width="300">Teammate Count</th>
+      <% @assignments.each do |assignment| %>
+        <% count = count +1 %>
+        <th colspan=2 width="300"> <%= assignment.name.to_s %> </th>
+      <% end %>
+      <th colspan="2" width="300">Aggregate Score</th>
+    </tr>
+    <tr>
+      <% 1.upto @assignments.count + 1 do %>
+        <td><b>Metareviews</b></td><td><b>Teammate Reviews</b></td>
+      <% end %>
+    </tr>
+    <br>
+
+    <% @students.each do |student|%>
+        <tr>
+            <td align="center"><%= link_to student.fullname.to_s, :action => 'one_student_all_reviews' , :student_id => student.id, :course_id => @course.id  %> </td>
+            <td><%= @teamed_count[student.fullname.to_s] %></td>
+            <% @assignments.each do |assignment|%>
+                <td><%= @meta_review[student.fullname.to_s][assignment.name.to_s] %></td>
+                <td><%= @teammate_review[student.fullname.to_s][assignment.name.to_s] %></td>
+            <% end%>
+            <td><%=  @student_overall_average[student.fullname.to_s][@meta_review_sym] %></td>
+            <td><%=  @student_overall_average[student.fullname.to_s][@teammate_review_sym] %></td>
+        </tr>
+    <%end%>
+        <tr>
+            <td><b>Class Average</b></td>
+            <td>NA </td>
+            <% @assignments.each do |assignment|%>
+                <td><%= @meta_review[@class_average_sym][assignment.name.to_s] %></td>
+                <td><%= @teammate_review[@class_average_sym][assignment.name.to_s] %></td>
+            <% end%>
+            <td><%= @class_overall_average[@class_average_sym][@meta_review_sym] %></td>
+            <td><%= @class_overall_average[@class_average_sym][@teammate_review_sym] %></td>
+        </tr>
+    </table>
+</div>

@@ -1,0 +1,36 @@
+<h1><%= @title %> for <%= @assignment.name %></h1>
+<% if !(@map.instance_of? TeammateReviewResponseMap) %>
+  <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
+  <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(topic_id)} %>
+<% end %>
+<% @review_versions = @map.get_all_versions() %>
+<% if !@review_versions.empty? %>
+    <%= @review_versions.each do |response| %>
+    	<%= response.display_as_html() %>
+        <br/>
+    <% end %>
+    <hr/>
+<% end %>
+
+<% file_url = nil %>
+<%= @response.display_as_html(nil, nil, file_url) %>
+<br/>
+
+<!--Check whether there is a UploadFile question.-->
+<%if @map.instance_of?(ReviewResponseMap)%>
+<% current_folder = DisplayOption.new %>
+<% current_folder.name = "" %>
+<% response_map_id = Response.find(params[:id]).response_map.id %>
+<% files = @participant.files(@participant.review_file_path(response_map_id).to_s + current_folder.name) %>
+<%session_participant = AssignmentParticipant.where(parent_id: @assignment.id, user_id: session[:user].id).first%>
+<%session_participants_team = AssignmentTeam.team(session_participant)%>
+<%@questions.each do |question| %>
+    <% if question.instance_of? UploadFile %>
+        <%= display_directory_tree(@participant, files, true).html_safe %>
+    <% end %>
+<% end %>
+<%end%>
+
+<%= @map.show_feedback(@response) %>
+<br/>
+<a href="javascript:window.history.back()">Back</a>

@@ -1,0 +1,119 @@
+GraphR - Graph-related Ruby classes
+===================================
+Version:          0.1.9
+Release date:     2001-11-16
+Home page:        http://rockit.sf.net/subprojects/graphr
+Tarball:          http://prdownloads.sf.net/rockit/graphr-0-1-9.tar.gz
+Author:           Robert Feldt
+Email:            feldt@ce.chalmers.se
+
+What is it?
+-----------
+Graph-related classes:
+  * DirectedGraph     - fairly extensive directed graph class
+  * DotGraphPrinter   - output a graph in GraphViz's dot format and invoke dot
+
+GraphR is very simple but is growing to support additional features of dot.
+A larger, "full" graph package is now being developed together with
+Horst Duchene so expect more features in the future...
+
+GraphViz is an open source graph drawing software from AT&T 
+(see http://www.research.att.com/sw/tools/graphviz/).
+
+Why?
+----
+Graphs can be handy (;-)) and dot is a great visualization tool for graphs.
+
+Installation?
+-------------
+1. unpack tarball (if you haven't already)
+2. Run tests: ruby -I./lib tests/runtests.rb       (OPTIONAL)
+3. Install:   ruby install.rb
+
+You can uninstall with: ruby install.rb --uninstall
+
+Example of use?
+---------------
+	# Lets crank out a simple graph...
+	require 'graph/graphviz_dot'
+
+	# We create a DotGraphPrinter from some links.
+        # In this simple example we don't even have a "real" graph
+	# just an Array with the links. The optional third 
+        # element of a link is link information. The nodes in this graph
+	# are implicit in the links. If we had additional nodes that were
+	# not linked we would supply them in an array as 2nd parameter to new.
+	links = [[:start, 1, "*"], [1, 1, "a"], [1, 2, "~a"], [2, :stop, "*"]]
+        dgp = DotGraphPrinter.new(links)
+
+	# We specialize the printer to change the shape of nodes
+	# based on their names.
+	dgp.node_shaper = proc{|n| 
+	  ["start", "stop"].include?(n.to_s) ? "doublecircle" : "box"
+        }
+
+	# We can also set the attributes on individual nodes and edges. 
+	# These settings override the default shapers and labelers.
+	dgp.set_node_attributes(2, :shape => "diamond")
+
+	# Add URL link from node (this only work in some output formats?)
+	# Note the extra quotes needed!
+	dgp.set_node_attributes(2, :URL => '"node2.html"')
+
+	# And now output to files
+	dgp.write_to_file("g.png", "png") # Generate png file
+	dgp.orientation = "landscape"      # Dot problem with PS orientation
+	dgp.write_to_file("g.ps")          # Generate postscript file
+
+Requirements?
+-------------
+Ruby and dot.
+
+Dot is only a part of GraphViz. Download at 
+http://www.research.att.com/sw/tools/graphviz/download.html and make sure
+dot can be run from Ruby by doing
+
+system "dot"
+
+ie. that dot is installed somewhere in the PATH.
+
+NOTE THAT THIS IS AN ALPHA RELEASE SO THERE WILL LIKELY BE BUGS. And the API 
+will probably change in future versions.
+
+Documentation?
+--------------
+None yet. But you can look at the tests.
+
+CVS archives?
+-------------
+http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockit/subprojects/graphr/
+
+License and legal issues?
+-------------------------
+GraphR is
+
+Copyright (c) 2001 Robert Feldt, feldt@ce.chalmers.se.
+All rights reserved.
+
+and is distributed under GPL. See LICENSE.
+
+Acknowledgements?
+-----------------
+Thanks to matz for Ruby.
+
+Thanks to Sean Russell, Tobias Reif and Horst Duchene for feedback on and 
+ideas for GraphR.
+
+Special things to note?
+-----------------------
+Don't use old versions since GraphR is continously being improved.
+
+Do you have comments or questions?
+----------------------------------
+I'd appreciate if you drop me a note if you're successfully using 
+GraphR. If there are some known users I'll be more motivated to 
+packing up additions / new versions and post them to RAA.
+
+Happy coding!
+
+Robert Feldt, feldt@ce.chalmers.se

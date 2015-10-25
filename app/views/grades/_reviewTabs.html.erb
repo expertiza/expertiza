@@ -1,0 +1,31 @@
+<%= form_for @assignment, html: {id: 'assignment_form'} do %>
+  <div id="reviewtabs">
+    <ul>
+      <li id="tab1" class="selected"><a href="#tabs-1">Submitted Work</a></li>
+      <li id="tab2"><a href="#tabs-2">Reviewing</a></li>
+      <li id="tab3"><a href="#tabs-3">Meta Reviews</a></li>
+      <li id="tab4"><a href="#tabs-4">Author Feedback</a></li>
+      <li id="tab5"><a href="#tabs-5">Team-mate Review</a></li>
+    </ul>
+    <div id="tabs-1">
+      <%#= render 'grades/submittedwork', :locals => {:prefix => 'user',  :team => false, :pscore => @participant.scores(@questions)} %>
+    </div>
+    <div id="tabs-2">
+      <p>test</p>
+    </div>
+    <div id="tabs-3">
+      <p>test1</p>
+    </div>
+    <div id="tabs-4">
+      <p>test2</p>
+    </div>
+    <div id="tabs-5">
+      <p>test3</p>
+    </div>
+  </div>
+  <script>
+    jQuery(document).ready(function () {
+      jQuery("#reviewtabs").tabs();
+    });
+  </script>
+<% end %>

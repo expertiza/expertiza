@@ -1,0 +1,7 @@
+<h1>New Teammate Advertisement</h1>
+
+<%= form_tag :action => 'create',:id=>params[:team_id] do %>
+  <%= render :partial => 'qualifications' %>
+  <%=  submit_tag "Create" %>
+<% end %>
+

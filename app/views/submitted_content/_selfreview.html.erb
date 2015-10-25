@@ -1,0 +1,27 @@
+<!-- E726 Changes Begin -->
+<!-- Will show a link to begin the self review only if the Self Review is assigned to the questionnaire i.e.
+
+it won't show for the previous assignments for which the questionnaire was not present -->
+<% if !@assignment.selfreview_questionnaire_id.nil? %>
+    <% response_map_id = ResponseMap.where(reviewed_object_id: @assignment.id, reviewer_id: @participant.user_id, reviewee_id: @participant.user_id).first %>
+
+    <% if response_map_id %>
+        Self Review <td><%= link_to 'View', { :controller => 'submitted_content', :action => 'view_selfreview',
+                                              :id => @assignment.selfreview_questionnaire_id,
+                                              :assignment_id => @assignment.id, :user_id => @participant.user_id,
+                                              :action_name => 'View', :response_map_id => response_map_id } %>
+</td>
+        <td>
+          <%= link_to 'Edit', { :controller => 'submitted_content', :action => 'view_selfreview',
+                                :id => @assignment.selfreview_questionnaire_id,
+                                :assignment_id => @assignment.id, :user_id => @participant.user_id,
+                                :action_name => 'Edit', :response_map_id => response_map_id } %>
+        </td>
+    <% else %>
+        Self Review <%= link_to 'Begin', { :controller => 'submitted_content', :action => 'view_selfreview',
+                                           :id => @assignment.selfreview_questionnaire_id,
+                                           :assignment_id => @assignment.id, :user_id => @participant.user_id, :action_name => 'Begin' } %>
+    <% end %>
+<% end %>
+
+<!-- E726 Changes End -->

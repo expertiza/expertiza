@@ -1,0 +1,10 @@
+<h1>Edit Topic</h1>
+
+<%= form_tag url_for(:action => 'update'), method: "put" do %>
+  <%= render :partial => 'topic' %>
+  <%= hidden_field_tag('id', params[:id]) %>
+  <%= hidden_field_tag('assignment_id', @topic.assignment_id) %>
+  <%= submit_tag "Update"%>
+<% end %>
+
+<%= link_to 'Back', edit_assignment_path(@topic.assignment_id, anchor: 'tabs-5') %>

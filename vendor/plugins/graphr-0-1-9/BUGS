@@ -1,0 +1,2 @@
+* the color attribute doesn't seem to work. Problem seems to be in dot
+  and not in GraphR though. Setting colors on nodes works ok.

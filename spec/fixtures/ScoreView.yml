@@ -1,0 +1,11 @@
+--- 
+- !ruby/object:ScoreView
+  attributes:
+    type: 'Criterion'
+    q1_id: 200
+    s_response_id: 1000
+    question_weight: 1
+    s_score: 5
+    q1_max_question_score: 5
+
+

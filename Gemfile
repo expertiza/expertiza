@@ -75,6 +75,7 @@ group :test do
   gem 'rspec-rails'
   gem 'shoulda'
   gem 'test-unit'
+  gem 'mocha', '0.10.0', :require => false
 end
 
 group :assets do

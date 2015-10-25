@@ -534,7 +534,7 @@ Expertiza::Application.routes.draw do
 
   get 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
   get ':controller/service.wsdl', :action => 'wsdl'
-
+  get ':tree_display/go_to_menu_items', :to => 'tree_display_controller#go_to_menu_items'
   get ':controller(/:action(/:id))(.:format)'
 
  # get 'sign_up_sheet/intelligent_signup_sheet.html_erb' => 'sign_up_sheet#intelligentPage'

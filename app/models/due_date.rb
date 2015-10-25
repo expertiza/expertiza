@@ -76,22 +76,22 @@ class DueDate < ActiveRecord::Base
     self.save
   end
 
-  def self.assign_topic_deadline(due_date,offset,topic_id)
-    topic_deadline = TopicDeadline.new
-    topic_deadline.topic_id = topic_id
-    topic_deadline.due_at = DateTime.parse(due_date.due_at.to_s) + offset.to_i
-    topic_deadline.deadline_type_id = due_date.deadline_type_id
+  #def self.assign_topic_deadline(due_date,offset,topic_id)
+  #  topic_deadline = TopicDeadline.new
+  #  topic_deadline.topic_id = topic_id
+  #  topic_deadline.due_at = DateTime.parse(due_date.due_at.to_s) + offset.to_i
+  #  topic_deadline.deadline_type_id = due_date.deadline_type_id
     #select count(*) from topic_deadlines where late_policy_id IS NULL;
     #all 'late_policy_id' in 'topic_deadlines' table is NULL
-    topic_deadline.late_policy_id = nil
-    topic_deadline.submission_allowed_id = due_date.submission_allowed_id
-    topic_deadline.review_allowed_id = due_date.review_allowed_id
+  #  topic_deadline.late_policy_id = nil
+  #  topic_deadline.submission_allowed_id = due_date.submission_allowed_id
+  #  topic_deadline.review_allowed_id = due_date.review_allowed_id
     #topic_deadline.resubmission_allowed_id = due_date.resubmission_allowed_id
     #topic_deadline.rereview_allowed_id = due_date.rereview_allowed_id
-    topic_deadline.review_of_review_allowed_id = due_date.review_of_review_allowed_id
-    topic_deadline.round = due_date.round
-    topic_deadline.save
-  end
+  #  topic_deadline.review_of_review_allowed_id = due_date.review_of_review_allowed_id
+  #  topic_deadline.round = due_date.round
+  #  topic_deadline.save
+  #end
 
   def self.done_in_assignment_round(assignment_id, response)
     #for author feedback, quiz, teammate review and metareview, Expertiza only support one round, so the round # should be 1

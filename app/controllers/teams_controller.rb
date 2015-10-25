@@ -93,12 +93,15 @@ class TeamsController < ApplicationController
       next_wait_listed_team = SignedUpTeam.where({:topic_id => topic_id, :is_waitlisted => true}).first
       #if slot exist, then confirm the topic for this team and delete all waitlists for this team
       if next_wait_listed_team
+=begin        
         team_id = next_wait_listed_team.team_id
         team = Team.find(team_id)
         assignment_id = team.parent_id
         next_wait_listed_team.is_waitlisted = false
         next_wait_listed_team.save
         Waitlist.cancel_all_waitlists(team_id, assignment_id)
+=end
+        SignUpTopic.assign_to_first_waiting_team(next_wait_listed_team)
       end
     end
     @signUps.destroy_all if @signUps

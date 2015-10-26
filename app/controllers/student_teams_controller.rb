@@ -142,15 +142,9 @@ class StudentTeamsController < ApplicationController
           if non_waitlisted_users.length < max_choosers
             first_waitlisted_team = SignedUpTeam.find_by topic_id: sign_up_topic_id, is_waitlisted: true
             #moving the waitlisted team into the confirmed signed up teams list and delete all waitlists for this team
+           #E1554 we created a function call for duplicate code
             if first_waitlisted_team
-                    SignUpTopic.assign_to_first_waiting_team(first_waitlisted_team)
-=begin             team_id = first_waitlisted_team.team_id
-              team = Team.find(team_id)
-              assignment_id = team.parent_id
-              first_waitlisted_team.is_waitlisted = false
-              first_waitlisted_team.save
-              Waitlist.cancel_all_waitlists(team_id, assignment_id)
-=end
+                  SignUpTopic.assign_to_first_waiting_team(first_waitlisted_team)
             end
           end
         }

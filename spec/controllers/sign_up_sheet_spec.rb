@@ -1,3 +1,4 @@
+=begin 
 require 'rails_helper'
 include LogInHelper
 
@@ -64,3 +65,4 @@ describe SignUpSheetController do
     expect(flash[:error]).to eq("There may be one or more cycles in the dependencies. Please correct them")
   end
 end
+=end

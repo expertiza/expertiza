@@ -57,4 +57,101 @@ module LogInHelper
       copy_of_emails: false,
     })
   end
+
+  def user1
+     User.new({
+      name: "user1",
+      password: "user1",
+      password_confirmation: "user1",
+      role_id: 1,
+      fullname: "user1",
+      email: "user1@ncsu.edu",
+      parent_id: 1,
+      private_by_default: false,
+      mru_directory_path: nil,
+      email_on_review: true,
+      email_on_submission: true,
+      email_on_review_of_review: true,
+      is_new_user: false,
+      master_permission_granted: 0,
+      handle: "",
+      leaderboard_privacy: false,
+      digital_certificate: nil,
+      public_key: nil,
+      copy_of_emails: false,
+    })
+  end
+
+  def user2
+     User.new({
+      name: "user2",
+      password: "user2",
+      password_confirmation: "user2",
+      role_id: 1,
+      fullname: "user2",
+      email: "user2@ncsu.edu",
+      parent_id: 1,
+      private_by_default: false,
+      mru_directory_path: nil,
+      email_on_review: true,
+      email_on_submission: true,
+      email_on_review_of_review: true,
+      is_new_user: false,
+      master_permission_granted: 0,
+      handle: "",
+      leaderboard_privacy: false,
+      digital_certificate: nil,
+      public_key: nil,
+      copy_of_emails: false,
+    })
+  end
+
+    def user3
+     User.new({
+      name: "user3",
+      password: "user3",
+      password_confirmation: "user3",
+      role_id: 1,
+      fullname: "user3",
+      email: "user3@ncsu.edu",
+      parent_id: 1,
+      private_by_default: false,
+      mru_directory_path: nil,
+      email_on_review: true,
+      email_on_submission: true,
+      email_on_review_of_review: true,
+      is_new_user: false,
+      master_permission_granted: 0,
+      handle: "",
+      leaderboard_privacy: false,
+      digital_certificate: nil,
+      public_key: nil,
+      copy_of_emails: false,
+    })
+  end
+
+  def user4
+     User.new({
+      name: "user4",
+      password: "user4",
+      password_confirmation: "user4",
+      role_id: 1,
+      fullname: "user4",
+      email: "user4@ncsu.edu",
+      parent_id: 1,
+      private_by_default: false,
+      mru_directory_path: nil,
+      email_on_review: true,
+      email_on_submission: true,
+      email_on_review_of_review: true,
+      is_new_user: false,
+      master_permission_granted: 0,
+      handle: "",
+      leaderboard_privacy: false,
+      digital_certificate: nil,
+      public_key: nil,
+      copy_of_emails: false,
+    })
+  end
+
 end

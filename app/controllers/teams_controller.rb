@@ -81,11 +81,11 @@ class TeamsController < ApplicationController
     #delete records in team, teams_users, signed_up_teams table
     @team = Team.find(params[:id])
     course = Object.const_get(session[:team_type]).find(@team.parent_id)
-    @team.destroy if @team
-    @signUps = SignedUpTeam.where(team_id: params[:id])
+    #@team.destroy if @team
+    @signUps = SignedUpTeam.where(team_id: @team.id)
     
-    @teams_users = TeamsUser.where(team_id: params[:id])
-    @teams_users.destroy_all if @teams_users
+    @teams_users = TeamsUser.where(team_id: @team.id)
+    #@teams_users.destroy_all if @teams_users
 
     if @signUps.size == 1 and @signUps.first.is_waitlisted == false #this team hold a topic
     #if there is another team in waitlist, make this team hold this topic
@@ -105,8 +105,11 @@ class TeamsController < ApplicationController
       end
     end
     @signUps.destroy_all if @signUps
+    @teams_users.destroy_all if @teams_users
+    @team.destroy if @team
     undo_link("Team \"#{@team.name}\" has been deleted successfully. ")
     redirect_to :action => 'list', :id => course.id
+    
   end
 
   # Copies existing teams from a course down to an assignment

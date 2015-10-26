@@ -57,7 +57,7 @@ class InvitationController < ApplicationController
     end
 
     if ready_to_join
-      @inv.reply_status = 'A'
+      @inv.reply_status = 'A' # Request status 'Accept'
       @inv.save
 
       #Remove the users previous team since they are accepting an invite for possibly a new team.

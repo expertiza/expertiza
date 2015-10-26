@@ -66,8 +66,6 @@ group :development do
   gem 'sqlite3-ruby'
   gem 'selenium-webdriver'
   gem 'quiet_assets'
-  gem 'pg', '0.17.1'
-  gem 'rails_12factor', '0.0.2'
 end
 
 group :test do

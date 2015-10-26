@@ -95,20 +95,7 @@ class SignUpSheetController < ApplicationController
       if @topic
         @topic.topic_identifier = params[:topic][:topic_identifier]
 
-        #While saving the max choosers you should be careful; if there are users who have signed up for this particular
-        #topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
-        #there are choosers already and if there is an attempt to decrease the max choosers, as of now I am not allowing
-        #it.
-        if SignedUpTeam.find_by_topic_id(@topic.id).nil? || @topic.max_choosers == params[:topic][:max_choosers]
-          @topic.max_choosers = params[:topic][:max_choosers]
-        else
-          if @topic.max_choosers.to_i < params[:topic][:max_choosers].to_i
-            @topic.update_waitlisted_users(params[:topic][:max_choosers])
-            @topic.max_choosers = params[:topic][:max_choosers]
-          else
-            flash[:error] = 'Value of maximum choosers can only be increased! No change has been made to max choosers.'
-          end
-        end
+        update_max_choosers @topic
 
         #update tables
         @topic.category = params[:topic][:category]
@@ -505,6 +492,15 @@ class SignUpSheetController < ApplicationController
   def update_existing_topic(topic)
     topic.topic_identifier = params[:topic][:topic_identifier]
 
+    update_max_choosers topic
+
+    topic.category = params[:topic][:category]
+    #topic.assignment_id = params[:id]
+    topic.save
+    redirect_to_sign_up params[:id]
+  end
+
+  def update_max_choosers(topic)
     #While saving the max choosers you should be careful; if there are users who have signed up for this particular
     #topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
     #there are choosers already and if there is an attempt to decrease the max choosers, as of now I am not allowing
@@ -519,10 +515,5 @@ class SignUpSheetController < ApplicationController
         flash[:error] = 'Value of maximum choosers can only be increased! No change has been made to max choosers.'
       end
     end
-
-    topic.category = params[:topic][:category]
-    #topic.assignment_id = params[:id]
-    topic.save
-    redirect_to_sign_up params[:id]
   end
 end

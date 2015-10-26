@@ -1,5 +1,5 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
-ENV["RAILS_ENV"] ||= 'test'
+ENV["RAILS_ENV"] ||= 'development'
 require 'spec_helper'
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
@@ -44,8 +44,9 @@ RSpec.configure do |config|
 
 
   # Used database cleaner to truncate existing test data
+=begin
   config.before(:suite) do
-    DatabaseCleaner.clean_with(:truncation,:only => ['users'])
+    DatabaseCleaner.clean_with(:truncation,:only => %w[users assignments])
   end
 
   config.before(:each) do
@@ -59,5 +60,6 @@ RSpec.configure do |config|
   config.before(:each) do
     DatabaseCleaner.start
   end
+=end
 
 end

@@ -79,7 +79,7 @@ class InvitationController < ApplicationController
 
   def decline # allows declining of invitation
     @inv = Invitation.find(params[:inv_id])
-    @inv.reply_status = 'D'
+    @inv.reply_status = 'D' # 'D' states that the invitation has been declined
     @inv.save
     student = Participant.find(params[:student_id])
     redirect_to view_student_teams_path student_id: student.id
@@ -91,14 +91,14 @@ class InvitationController < ApplicationController
   end
 
   private def set_messages(name) # sets flash messages
-    @@messages[:user_not_found] = "\"#{name}\" does not exist. Please make sure the name entered is correct."
+    @@messages[:user_not_found] = "\"#{name}\" does not exist. Please make sure entered name is correct."
     @@messages[:user_not_participant] = "\"#{name}\" is not a participant of this assignment."
-    @@messages[:max_members] = "Your team already has max members."
-    @@messages[:already_member] = "\"#{name}\" is already a member of team."
+    @@messages[:max_members] = "Maximum team limit has been reached."
+    @@messages[:already_member] = "\"#{name}\" is already a team member."
     @@messages[:already_invited] = "You have already sent an invitation to \"#{name}\"."
     @@messages[:full_team] = "The team which invited you is full now."
     @@messages[:invitation_not_exist]= "The team which invited you does not exist any more."
-    @@messages[:fail_to_add] = "The system fails to add you to the team which invited you."
+    @@messages[:fail_to_add] = "The system failed to add you to the team which invited you."
   end
   private def set_invitation(to_id,from_id,assignment_id,reply_status) #creates an instance of invitation
     @invitation = Invitation.new

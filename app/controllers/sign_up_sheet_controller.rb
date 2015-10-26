@@ -51,54 +51,17 @@ class SignUpSheetController < ApplicationController
   #that assignment id will virtually be the signup sheet id as well as we have assumed
   #that every assignment will have only one signup sheet
   def create
-    topic = SignUpTopic.where(topic_name: params[:topic][:topic_name], assignment_id:  params[:id]).first
+    topic = SignUpTopic.where(topic_name: params[:topic][:topic_name], assignment_id: params[:id]).first
 
     #if the topic already exists then update
-    if topic != nil
-      topic.topic_identifier = params[:topic][:topic_identifier]
-
-      #While saving the max choosers you should be careful; if there are users who have signed up for this particular
-      #topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
-      #there are choosers already and if there is an attempt to decrease the max choosers, as of now I am not allowing
-      #it.
-      if SignedUpTeam.find_by_topic_id(topic.id).nil? || topic.max_choosers == params[:topic][:max_choosers]
-        topic.max_choosers = params[:topic][:max_choosers]
-      else
-        if topic.max_choosers.to_i < params[:topic][:max_choosers].to_i
-          topic.update_waitlisted_users(params[:topic][:max_choosers])
-          topic.max_choosers = params[:topic][:max_choosers]
-        else
-          flash[:error] = 'Value of maximum choosers can only be increased! No change has been made to max choosers.'
-        end
-      end
-
-      topic.category = params[:topic][:category]
-      #topic.assignment_id = params[:id]
-      topic.save
-      redirect_to_sign_up(params[:id])
+    unless topic.nil?
+      update_existing_topic topic
     else
-        set_values_for_new_topic
-
-        if @assignment.is_microtask?
-          @sign_up_topic.micropayment = params[:topic][:micropayment]
-        end
-
-        if @assignment.staggered_deadline?
-          topic_set = Array.new
-          topic = @sign_up_topic.id
-        end
-
-        if @sign_up_topic.save
-          undo_link("Topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. ")
-          #changing the redirection url to topics tab in edit assignment view.
-          redirect_to edit_assignment_path(@sign_up_topic.assignment_id) + "#tabs-5"
-        else
-          render :action => 'new', :id => params[:id]
-        end
-      end
+      setup_new_topic
     end
+  end
 
-    #This method is used to delete signup topics
+  #This method is used to delete signup topics
     #Renaming delete method to destroy for rails 4 compatible
     def destroy
       @topic = SignUpTopic.find(params[:id])
@@ -516,5 +479,50 @@ class SignUpSheetController < ApplicationController
     else
       return true
     end
+  end
+
+  def setup_new_topic
+    set_values_for_new_topic
+
+    if @assignment.is_microtask?
+      @sign_up_topic.micropayment = params[:topic][:micropayment]
+    end
+
+    if @assignment.staggered_deadline?
+      topic_set = Array.new
+      topic = @sign_up_topic.id
+    end
+
+    if @sign_up_topic.save
+      undo_link "Topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. "
+      #changing the redirection url to topics tab in edit assignment view.
+      redirect_to edit_assignment_path(@sign_up_topic.assignment_id) + "#tabs-5"
+    else
+      render :action => 'new', :id => params[:id]
+    end
+  end
+
+  def update_existing_topic(topic)
+    topic.topic_identifier = params[:topic][:topic_identifier]
+
+    #While saving the max choosers you should be careful; if there are users who have signed up for this particular
+    #topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
+    #there are choosers already and if there is an attempt to decrease the max choosers, as of now I am not allowing
+    #it.
+    if SignedUpTeam.find_by_topic_id(topic.id).nil? || topic.max_choosers == params[:topic][:max_choosers]
+      topic.max_choosers = params[:topic][:max_choosers]
+    else
+      if topic.max_choosers.to_i < params[:topic][:max_choosers].to_i
+        topic.update_waitlisted_users params[:topic][:max_choosers]
+        topic.max_choosers = params[:topic][:max_choosers]
+      else
+        flash[:error] = 'Value of maximum choosers can only be increased! No change has been made to max choosers.'
+      end
+    end
+
+    topic.category = params[:topic][:category]
+    #topic.assignment_id = params[:id]
+    topic.save
+    redirect_to_sign_up params[:id]
   end
 end

@@ -443,7 +443,7 @@ DEPENDENCIES
   jquery-ui-sass-rails
   launchy
   mocha (= 0.10.0)
-  mysql2 (~> 0.3.20)
+  mysql2
   nokogiri
   omniauth-google-oauth2 (~> 0.2.6)
   open-uri-cached
@@ -480,3 +480,6 @@ DEPENDENCIES
   uglifier
   will_paginate
   zip-zip
+
+BUNDLED WITH
+   1.10.6

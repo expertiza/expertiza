@@ -47,7 +47,7 @@ class JoinTeamRequestsController < ApplicationController
     #check if the advertisement is from a team member and if so disallow requesting invitations
     team_member=TeamsUser.where(['team_id =? and user_id =?', params[:team_id],session[:user][:id]])
     if (team_member.size > 0)
-      flash[:note] = "You are already a member of team."
+      flash[:note] = "You are already a team member."
     else
 
       @join_team_request = JoinTeamRequest.new
@@ -100,7 +100,7 @@ class JoinTeamRequestsController < ApplicationController
   #decline request to join the team...
   def decline
     @join_team_request = JoinTeamRequest.find(params[:id])
-    @join_team_request.status = 'D'
+    @join_team_request.status = 'D' #'D' stands for decline
     @join_team_request.save
     redirect_to view_student_teams_path student_id: params[:teams_user_id]
   end

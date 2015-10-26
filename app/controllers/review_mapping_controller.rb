@@ -403,10 +403,6 @@ class ReviewMappingController < ApplicationController
   end
 
   def automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num=0, submission_review_num=0)
-    participants_hash = {}
-    participants.each {|participant| participants_hash[participant.id] = 0 }
-    #calculate reviewers for each team
-    num_participants = participants.size
     if student_review_num != 0 and submission_review_num == 0
       num_reviews_per_team = (participants.size * student_review_num * 1.0 / teams.size).round
     elsif student_review_num == 0 and submission_review_num != 0
@@ -417,7 +413,14 @@ class ReviewMappingController < ApplicationController
     if student_review_num >= teams.size
       flash[:error] = 'You cannot set the number of reviews done by each student to be greater than or equal to total number of teams [or “participants” if it is an individual assignment].'
     end
+    assign_reviewers(assignment_id, participants, teams, student_review_num)
+  end
 
+  def assign_reviewers(assignment_id, participants, teams, student_review_num)
+    participants_hash = {}
+    participants.each {|participant| participants_hash[participant.id] = 0 }
+    #calculate reviewers for each team
+    num_participants = participants.size
     iterator = 0
     teams.each do |team|
       temp_array = Array.new

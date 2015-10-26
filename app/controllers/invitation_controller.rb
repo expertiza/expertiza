@@ -1,16 +1,16 @@
 class InvitationController < ApplicationController
   @@messages = Hash.new
   before_action :check_validity, only: [:create]
-  def action_allowed?
+  def action_allowed? # user specified only have access to the functionality of the controller
     ['Student', 'Instructor', 'Teaching Assistant'].include?(current_role_name)
   end
 
-  def new
+  def new #creates new invitation instance
     @invitation = Invitation.new
   end
-  def create    
+  def create    #adds the new invitation to the table
           if Invitation.is_invited?(@student.user_id, @user.id, @student.parent_id)
-            set_invitation(@user.id,@student.user_id,@student.parent_id,'W')
+            set_invitation(@user.id,@student.user_id,@student.parent_id,'W') #'W states the invitation is waitlisted, still not accepted'
           else
             flash[:note] = @@messages[:already_invited]
           end
@@ -18,25 +18,24 @@ class InvitationController < ApplicationController
     redirect_to view_student_teams_path student_id: @student.id
   end
 
-  def update_join_team_request(user,student)
-    #update the status in the join_team_request to A
+  def update_join_team_request(user,student) #update the status in the join_team_request to A
     if user && student
       participant= AssignmentParticipant.where(['user_id =? and parent_id =?', user.id, student.parent_id]).first
       if participant
         old_entry = JoinTeamRequest.where(['participant_id =? and team_id =?', participant.id,params[:team_id]]).first
         if old_entry
-          old_entry.update_attribute("status",'A')
+          old_entry.update_attribute("status",'A') # 'A' states that the invitation has been accepted
         end
       end
     end
   end
 
-  def auto_complete_for_user_name
+  def auto_complete_for_user_name # searches the user name in the user table for auto complete
     search = params[:user][:name].to_s
     @users = User.find_by_sql("select * from users where LOWER(name) LIKE '%"+search+"%'") unless search.blank?
   end
 
-  def accept
+  def accept # allows accepting of the invitation
     @inv = Invitation.find(params[:inv_id])
     student = Participant.find(params[:student_id])
     assignment_id=@inv.assignment_id
@@ -78,7 +77,7 @@ class InvitationController < ApplicationController
 
   end
 
-  def decline
+  def decline # allows declining of invitation
     @inv = Invitation.find(params[:inv_id])
     @inv.reply_status = 'D'
     @inv.save
@@ -86,12 +85,12 @@ class InvitationController < ApplicationController
     redirect_to view_student_teams_path student_id: student.id
   end
 
-  def cancel
+  def cancel # allows to cancel a send invitation
     Invitation.find(params[:inv_id]).destroy
     redirect_to view_student_teams_path student_id: params[:student_id]
   end
 
-  private def set_messages(name)
+  private def set_messages(name) # sets flash messages
     @@messages[:user_not_found] = "\"#{name}\" does not exist. Please make sure the name entered is correct."
     @@messages[:user_not_participant] = "\"#{name}\" is not a participant of this assignment."
     @@messages[:max_members] = "Your team already has max members."
@@ -101,7 +100,7 @@ class InvitationController < ApplicationController
     @@messages[:invitation_not_exist]= "The team which invited you does not exist any more."
     @@messages[:fail_to_add] = "The system fails to add you to the team which invited you."
   end
-  private def set_invitation(to_id,from_id,assignment_id,reply_status)
+  private def set_invitation(to_id,from_id,assignment_id,reply_status) #creates an instance of invitation
     @invitation = Invitation.new
     @invitation.to_id = to_id
     @invitation.from_id = from_id
@@ -109,7 +108,7 @@ class InvitationController < ApplicationController
     @invitation.reply_status = reply_status
     @invitation.save
   end
-  private def check_validity
+  private def check_validity # checks if the send invitation is valid
     @user = User.find_by_name(params[:user][:name].strip)
     @team = AssignmentTeam.find(params[:team_id])
     @student = AssignmentParticipant.find(params[:student_id])

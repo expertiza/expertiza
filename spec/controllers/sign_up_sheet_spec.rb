@@ -37,63 +37,65 @@ describe SignUpSheetController do
     ApplicationController.any_instance.stub(:undo_link).and_return(TRUE)
   end
 
-  it "should be able to create topic for assignment" do
-    get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
-    expect(response).should redirect_to(edit_assignment_path(@assignment.id) + "#tabs-5")
-  end
+  describe '#create' do
+    it "should be able to create topic for assignment" do
+      get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
+      expect(response).should redirect_to(edit_assignment_path(@assignment.id) + "#tabs-5")
+    end
 
-  it "should be able to update a topic for assignment that already has max choosers set" do
-    sign_up_topic = SignUpTopic.new
-    sign_up_topic.max_choosers = 2
-    allow(SignUpTopic).to receive(:where) { sign_up_topic }
-    allow(sign_up_topic).to receive(:first) { sign_up_topic }
+    it "should be able to update a topic for assignment that already has max choosers set" do
+      sign_up_topic = SignUpTopic.new
+      sign_up_topic.max_choosers = 2
+      allow(SignUpTopic).to receive(:where) { sign_up_topic }
+      allow(sign_up_topic).to receive(:first) { sign_up_topic }
 
-    get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
-    expect(response).should redirect_to(redirect_to :action => 'add_signup_topics', :id => @assignment.id)
-  end
+      get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
+      expect(response).should redirect_to(redirect_to :action => 'add_signup_topics', :id => @assignment.id)
+    end
 
-  it "should be able to update a topic for assignment that needs the waitlisted users updated" do
-    sign_up_topic = SignUpTopic.new
-    sign_up_topic.max_choosers = 0
-    allow(SignUpTopic).to receive(:where) { sign_up_topic }
-    allow(sign_up_topic).to receive(:first) { sign_up_topic }
+    it "should be able to update a topic for assignment that needs the waitlisted users updated" do
+      sign_up_topic = SignUpTopic.new
+      sign_up_topic.max_choosers = 0
+      allow(SignUpTopic).to receive(:where) { sign_up_topic }
+      allow(sign_up_topic).to receive(:first) { sign_up_topic }
 
-    allow(SignedUpTeam).to receive(:find_by_topic_id) { SignedUpTeam.new }
+      allow(SignedUpTeam).to receive(:find_by_topic_id) { SignedUpTeam.new }
 
-    get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
-    expect(response).should redirect_to(redirect_to :action => 'add_signup_topics', :id => @assignment.id)
-  end
+      get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
+      expect(response).should redirect_to(redirect_to :action => 'add_signup_topics', :id => @assignment.id)
+    end
 
-  it "should be able to update a topic for assignment but warn when max_choosers is too much" do
-    sign_up_topic = SignUpTopic.new
-    sign_up_topic.max_choosers = 4
-    allow(SignUpTopic).to receive(:where) { sign_up_topic }
-    allow(sign_up_topic).to receive(:first) { sign_up_topic }
+    it "should be able to update a topic for assignment but warn when max_choosers is too much" do
+      sign_up_topic = SignUpTopic.new
+      sign_up_topic.max_choosers = 4
+      allow(SignUpTopic).to receive(:where) { sign_up_topic }
+      allow(sign_up_topic).to receive(:first) { sign_up_topic }
 
-    allow(SignedUpTeam).to receive(:find_by_topic_id) { SignedUpTeam.new }
+      allow(SignedUpTeam).to receive(:find_by_topic_id) { SignedUpTeam.new }
 
-    get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
-    expect(response).should redirect_to(redirect_to :action => 'add_signup_topics', :id => @assignment.id)
-    expect(flash[:error]).to eq('Value of maximum choosers can only be increased! No change has been made to max choosers.')
-  end
+      get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
+      expect(response).should redirect_to(redirect_to :action => 'add_signup_topics', :id => @assignment.id)
+      expect(flash[:error]).to eq('Value of maximum choosers can only be increased! No change has been made to max choosers.')
+    end
 
-  it "should be able to update a topic with a microtask" do
-    @assignment.microtask = true
-    @assignment.save
-    get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
-    expect(response).should redirect_to(edit_assignment_path(@assignment.id) + "#tabs-5")
-  end
+    it "should be able to update a topic with a microtask" do
+      @assignment.microtask = true
+      @assignment.save
+      get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
+      expect(response).should redirect_to(edit_assignment_path(@assignment.id) + "#tabs-5")
+    end
 
-  it "should be able to update a topic with staggard deadlines" do
-    @assignment.staggered_deadline = true
-    @assignment.save
-    get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
-    expect(response).should redirect_to(edit_assignment_path(@assignment.id) + "#tabs-5")
-  end
+    it "should be able to update a topic with staggard deadlines" do
+      @assignment.staggered_deadline = true
+      @assignment.save
+      get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
+      expect(response).should redirect_to(edit_assignment_path(@assignment.id) + "#tabs-5")
+    end
 
-  it "should fail gracefully when a topic cannot be saved" do
-    get :create, id: @assignment.id, topic: {topic_name: "New Topic", topic_identifier: "Ch1", category: "Programming"}
-    expect(response).should render_template("sign_up_sheet/new")
+    it "should fail gracefully when a topic cannot be saved" do
+      get :create, id: @assignment.id, topic: {topic_name: "New Topic", topic_identifier: "Ch1", category: "Programming"}
+      expect(response).should render_template("sign_up_sheet/new")
+    end
   end
 
   it "should be able to edit topic" do

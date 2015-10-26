@@ -175,6 +175,17 @@ require 'analytic/assignment_analytic'
     @has_topics ||= !sign_up_topics.empty?
   end
 
+  def self.set_courses_to_assignment(user)
+    @courses=Course.where(instructor_id: user.id).order(:name)
+  end
+
+  def self.remove_assignment_from_course(assignment)
+    oldpath = assignment.path rescue nil
+    assignment.course_id = nil
+    assignment.save
+    newpath = assignment.path rescue nil
+    FileHelper.update_file_location(oldpath, newpath)
+  end
   #assign the reviewer to review the assignment_team's submission. Only used in the assignments that do not have any topic
   #Parameter assignment_team is the candidate assignment team, it cannot be a team w/o submission, or have reviewed by reviewer, or reviewer's own team.
   #(guaranteed by candidate_assignment_teams_to_review method)

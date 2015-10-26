@@ -33,24 +33,12 @@ class AssignmentsController < ApplicationController
 
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
-    #This one is working
-    #       emails = Array.new
-    #      #emails<<"vikas.023@gmail.com"
-    #Mailer.generic_message(
-    #    {:bcc => emails,
-    #     :subject => "one",
-    #     #:body => "two",
-    #    :partial_name => 'update'
-    #    }).deliver
 
     if @assignment_form.save
       @assignment_form.create_assignment_node
-      # flash[:success] = 'Assignment was successfully created.'
-      # redirect_to controller: :assignments, action: :edit, id: @assignment.id
-      #AAD#
+
       redirect_to action: 'edit', id: @assignment_form.assignment.id
       undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
-      #AAD#
     else
       render 'new'
     end
@@ -118,7 +106,6 @@ class AssignmentsController < ApplicationController
 
 
   def update
-    ##if params doesn't have assignment_form, it means the assignment is assigned to a course using the icon on the popup menu
     unless(params.has_key?(:assignment_form))
       @assignment=Assignment.find(params[:id])
       @assignment.course_id=params[:course_id];
@@ -147,12 +134,6 @@ class AssignmentsController < ApplicationController
     end
     if @assignment_form.update_attributes(assignment_form_params,current_user)
       flash[:note] = 'Assignment was successfully saved.'
-      #TODO: deal with submission path change
-      # Need to rename the bottom-level directory and/or move intermediate directories on the path to an
-      # appropriate place
-      # Probably there are 2 different operations:
-      #  - rename an assgt. -- implemented by renaming a directory
-      #  - assigning an assignment to a course -- implemented by moving a directory.
     else
       flash[:error] = "Assignment save failed: #{@assignment_form.errors}"
     end
@@ -254,19 +235,12 @@ class AssignmentsController < ApplicationController
 
   def associate_assignment_with_course
     @assignment = Assignment.find(params[:id])
-    @assignment.inspect
-    @user = ApplicationHelper::get_user_role(session[:user])
-    @user = current_user
-    @courses = @user.set_courses_to_assignment
+    @courses = Assignment.set_courses_to_assignment(current_user)
   end
 
   def remove_assignment_from_course
     assignment = Assignment.find(params[:id])
-    oldpath = assignment.path rescue nil
-    assignment.course_id = nil
-    assignment.save
-    newpath = assignment.path rescue nil
-    FileHelper.update_file_location(oldpath, newpath)
+    Assignment.remove_assignment_from_course(assignment)
     redirect_to controller: 'tree_display', action: 'list'
   end
 

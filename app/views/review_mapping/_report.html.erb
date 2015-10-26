@@ -91,7 +91,7 @@
                 <%else %>
                   <td id = "green" bgcolor="#DDDDBB" align = 'left' colspan=1>
                 <%end %>
-                    <%= link_to Team.find(ri.reviewee_id).name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
+                    <%= link_to Team.find(ri.reviewee_id).name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :response_map_id => ri.id, :assignment_id=>@id %>
                   </td>
                   <%= render :partial => 'teamscore' %>
 
@@ -115,7 +115,7 @@
                     <%else %>
                       <td id = "green" bgcolor="#DDDDBB" align = 'left' colspan=1>
                     <%end %>
-                      <%= link_to participant.fullname, :controller => 'popup', :action => 'participants_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
+                      <%= link_to participant.fullname, :controller => 'popup', :action => 'participants_popup', :id => ri.reviewee_id, :response_map_id => ri.id, :assignment_id=>@id %>
                       </td>
                       <%= render :partial => 'participantscore' %>
                       <!-- write ur partial here to print score -->
@@ -139,7 +139,7 @@
                         <%end %>
                           <%@team = Team.find(ri.reviewee_id) %>
                           <% @teamid = @team.id%>
-                          <%= link_to Team.find(ri.reviewee_id).name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => nil, :assignment_id=>@id %>
+                          <%= link_to Team.find(ri.reviewee_id).name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :response_map_id => nil, :assignment_id=>@id %>
                         </td>
                         <%= render :partial => 'teamscore' %>
                         <% if (@l%2) == 0 %>
@@ -163,7 +163,7 @@
                             <%else%>
                                 <td  id = "red" style ="color:#DD3300" align = 'left' colspan=1 bgcolor="#DDDDBB"  >
                             <%end%>
-                                <%= link_to participant.fullname, :controller => 'popup', :action => 'participants_popup', :id => ri.reviewee_id, :id2 => nil, :assignment_id => @id %>
+                                <%= link_to participant.fullname, :controller => 'popup', :action => 'participants_popup', :id => ri.reviewee_id, :response_map_id => nil, :assignment_id => @id %>
                               </td><!-- write ur partial here to print score -->
                               <%= render :partial => 'participantscore' %>
                               <% if (@l%2) == 0 %>

@@ -124,15 +124,8 @@ class User < ActiveRecord::Base
 
     # Add the children to the list
     unless self.role.super_admin?
-      User.all.each do |u|
-        if is_recursively_parent_of(u)
-          if not user_list.include?(u)
-            user_list << u
-          end
-        end
-      end
+     user_list = add_children user_list
     end
-
     user_list
 
   end

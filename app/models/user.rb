@@ -80,9 +80,7 @@ class User < ActiveRecord::Base
 
     # If the user is a super admin, fetch all users
     if self.role.super_admin?
-      User.all.each do |user|
-        user_list << user
-      end
+     user_list =  fetch_users_for_super_admin user_list
     end
 
     # If the user is an instructor, fetch all users in his course/assignment
@@ -380,6 +378,62 @@ class User < ActiveRecord::Base
     search_filter = '%' + letter + '%'
     users = User.order('name').where( "(role_id in (?) or id = ?) and #{query_attribute} like ?", role.get_available_roles, user_id, search_filter )
     users
+  end
+
+  def iterate_participants(participants,user_list)
+    participants.each do |p_s|
+      if p_s.length > 0
+        p_s.each do |p|
+          if self.role.hasAllPrivilegesOf(p.user.role)
+            user_list << p.user
+          end
+        end
+      end
+    end
+    user_list
+  end
+
+  def fetch_users_for_super_admin(user_list)
+    User.all.each do |user|
+      user_list << user
+    end
+    user_list
+  end
+
+  #For the instructor,fetches all users in his course
+  def fetch_users_for_course(participants)
+    Course.where(instructor_id: self.id).each do |course|
+      participants << course.get_participants
+    end
+    participants
+  end
+
+  #For the instructor,fetches all users in his course
+  def fetch_users_for_assignment(participants)
+    Assignment.where(instructor_id: self.id).each do |assignment|
+      participants << assignment.participants
+    end
+    participants
+  end
+
+  def fetch_participants_for_courses(courses)
+    courses.each do |course_id|
+      course = Course.find(course_id)
+      participants << course.get_participants
+    end
+    participants
+  end
+
+
+  def add_children(user_list)
+    User.all.each do |u|
+      if is_recursively_parent_of(u)
+        if not user_list.include?(u)
+          user_list << u
+        end
+      end
+    end
+    user_list
   end
 
 end

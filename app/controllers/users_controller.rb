@@ -127,7 +127,9 @@ class UsersController < ApplicationController
 
       if @user.save
         password = @user.reset_password         # the password is reset
-        MailerHelper::send_mail_to_user(@user, "Your Expertiza account and password have been created", "user_welcome", password).deliver
+        subject = 'Your Expertiza account and password have been created'
+        partial_name = 'user_welcome'
+        MailerHelper::send_mail_to_user(@user, subject, partial_name, password).deliver
         flash[:success] = "A new password has been sent to new user's e-mail address."
         #Instructor and Administrator users need to have a default set for their notifications
         # the creation of an AssignmentQuestionnaire object with only the User ID field populated

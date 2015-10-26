@@ -369,4 +369,15 @@ class User < ActiveRecord::Base
     users
   end
 
+  public
+
+  def destroy_user (current_user)
+    AssignmentParticipant.where(user_id: current_user.id).each{|participant| participant.delete}
+    TeamsUser.where(user_id: current_user.id).each{|teamuser| teamuser.delete}
+    AssignmentQuestionnaire.where(user_id: current_user.id).each{|aq| aq.destroy}
+    Participant.delete(true)
+    current_user.destroy
+
+  end
+
 end

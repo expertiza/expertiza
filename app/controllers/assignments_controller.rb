@@ -23,7 +23,7 @@ class AssignmentsController < ApplicationController
     assignment = Assignment.find(params[:id])
     assignment.private = !assignment.private
     assignment.save
-    redirect_to controller: 'tree_display', action: 'list'
+    redirect_to list_tree_display_index_path
   end
 
   def new
@@ -37,7 +37,7 @@ class AssignmentsController < ApplicationController
     if @assignment_form.save
       @assignment_form.create_assignment_node
 
-      redirect_to action: 'edit', id: @assignment_form.assignment.id
+      redirect_to edit_assignment_path @assignment_form.assignment.id
       undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
     else
       render 'new'
@@ -111,10 +111,10 @@ class AssignmentsController < ApplicationController
       @assignment.course_id=params[:course_id];
       if @assignment.save
         flash[:note] = 'Assignment was successfully saved.'
-        redirect_to controller: 'tree_display', action: 'list'
+        redirect_to list_tree_display_index_path
       else
         flash[:error] = "Assignment save failed: #{@assignment.errors.full_messages.join(' ')}"
-        redirect_to action: 'edit', id: @assignment.id
+        redirect_to edit_assignment_path @assignment.id
       end
       return
     end
@@ -137,7 +137,7 @@ class AssignmentsController < ApplicationController
     else
       flash[:error] = "Assignment save failed: #{@assignment_form.errors}"
     end
-    redirect_to action: 'edit', id: @assignment_form.assignment.id
+    redirect_to edit_assignment_path @assignment_form.assignment.id
   end
 
   def show
@@ -191,10 +191,10 @@ class AssignmentsController < ApplicationController
     if new_assign_id
       new_assign = Assignment.find(new_assign_id)
       flash[:note] = 'Warning: The submission directory for the copy of this assignment will be the same as the submission directory for the existing assignment, which will allow student submissions to one assignment to overwrite submissions to the other assignment.  If you do not want this to happen, change the submission directory in the new copy of the assignment.' if old_assign.directory_path == new_assign.directory_path
-      redirect_to action: 'edit', id: new_assign_id
+      redirect_to edit_assignment_path  new_assign_id
     else
       flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'
-      redirect_to action: 'list', controller: 'tree_display'
+      redirect_to list_tree_display_index_path
     end
   end
 
@@ -219,7 +219,7 @@ class AssignmentsController < ApplicationController
       error = $!
       flash[:error] = error.to_s + " Delete this assignment anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
     end
-    redirect_to controller: 'tree_display', action: 'list'
+    redirect_to list_tree_display_index_path
   end
 
   def index
@@ -241,13 +241,13 @@ class AssignmentsController < ApplicationController
   def remove_assignment_from_course
     assignment = Assignment.find(params[:id])
     Assignment.remove_assignment_from_course(assignment)
-    redirect_to controller: 'tree_display', action: 'list'
+    redirect_to list_tree_display_index_path
   end
 
   def delete_scheduled_task
     @delayed_job = DelayedJob.find(params[:delayed_job_id])
     @delayed_job.delete
-    redirect_to controller: 'assignments', action: 'scheduled_tasks', id: params[:id]
+    redirect_to scheduled_tasks_assignments_index_path params[:id]
   end
 
   #check whether rubrics are set before save assignment

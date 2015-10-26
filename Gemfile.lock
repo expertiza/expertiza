@@ -115,6 +115,8 @@ GEM
     erubis (2.7.0)
     eventmachine (1.0.8)
     execjs (2.6.0)
+    factory_girl (4.5.0)
+      activesupport (>= 3.0.0)
     faraday (0.9.1)
       multipart-post (>= 1.2, < 3)
     fastercsv (1.5.5)
@@ -423,6 +425,7 @@ DEPENDENCIES
   edavis10-ruby-web-search
   engtagger
   expertiza-authlogic!
+  factory_girl
   fastercsv
   ffi-aspell
   font-awesome-rails
@@ -476,3 +479,6 @@ DEPENDENCIES
   uglifier
   will_paginate
   zip-zip
+
+BUNDLED WITH
+   1.10.6

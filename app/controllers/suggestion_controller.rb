@@ -58,7 +58,7 @@ class SuggestionController < ApplicationController
     Suggestion.find(params[:id]).update_attributes(:title => params[:suggestion][:title], :description => params[:suggestion][:description],
     	:signup_preference => params[:suggestion][:signup_preference])
     redirect_to :action => 'new', :id => Suggestion.find(params[:id]).assignment_id
-  end 
+  end
 
   def new
     @suggestion = Suggestion.new
@@ -68,8 +68,10 @@ class SuggestionController < ApplicationController
   end
 
   def create
+    # puts "In create "
     @suggestion = Suggestion.new(suggestion_params)
     @suggestion.assignment_id = session[:assignment_id]
+    # puts "==> In create, assignment id: " + @suggestion.assignment_id.to_s
     @assignment = Assignment.find(session[:assignment_id])
     @suggestion.status = 'Initiated'
     if params[:suggestion_anonymous].nil?

@@ -27,6 +27,7 @@ SimpleCov.start 'rails'
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
+  
 # The settings below are suggested to provide a good initial experience
 # with RSpec, but feel free to customize to your heart's content.
 =begin
@@ -59,7 +60,6 @@ RSpec.configure do |config|
 =end
   config.order = :random
 =begin
-
   # Seed global randomization in this process using the `--seed` CLI option.
   # Setting this allows you to use `--seed` to deterministically reproduce
   # test failures related to randomization by passing the same `--seed` value
@@ -93,4 +93,7 @@ RSpec.configure do |config|
   Dir["./spec/features/helpers/*.rb"].each do |filename|
     require filename.gsub(/\.rb/, "")
   end
+  require File.expand_path("../../config/environment", __FILE__)
+  require 'capybara/rails'
+  config.include Capybara::DSL
 end

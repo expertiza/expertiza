@@ -17,8 +17,6 @@ class VersionsControllerTest < ActionController::TestCase
     assert_redirected_to versions_path
   end
 
-  test 'should redirect to show' do
-    get :show, id: versions(:version_one).id
-  end
+
 
 end

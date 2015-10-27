@@ -2,40 +2,6 @@ require 'rails_helper'
 include LogInHelper
 
 describe VersionsController do
-# before(:each) do
-#   instructor.save
-#   @user = User.find_by_name("instructor")
-
-#   @wiki = WikiType.new({"name"=>"No"})
-#   @wiki.save
-
-#   @assignment = Assignment.where(name: 'My assignment').first || Assignment.new({
-#                                                                                 "name"=>"My assignment",
-#                                                                                 "instructor_id"=>@user.id,
-#                                                                                 "wiki_type_id"=>@wiki.id
-#                                                                             })
-#   @assignment.save
-
-#   @topic1 = SignUpTopic.new({
-#                                topic_name: "Topic1",
-#                                topic_identifier: "Ch10",
-#                                assignment_id: @assignment.id,
-#                                max_choosers: 2
-#                            })
-#   @topic1.save
-
-#   @topic2 = SignUpTopic.new({
-#                                 topic_name: "Topic2",
-#                                 topic_identifier: "Ch10",
-#                                 assignment_id: @assignment.id,
-#                                 max_choosers: 2
-#                             })
-#   @topic2.save
-
-#   # simulate authorized session
-#   ApplicationController.any_instance.stub(:current_role_name).and_return('Instructor')
-#   ApplicationController.any_instance.stub(:undo_link).and_return(TRUE)
-# end
 
   context "user not logged in" do
 	it "should not be able to create new version" do

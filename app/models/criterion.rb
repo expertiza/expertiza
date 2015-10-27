@@ -71,8 +71,19 @@ class Criterion < ScoredQuestion
     end
 
     html += '<div id="' + self.id.to_s + '_myDiv" style="display: none;">'
-    for advice_num in 0..question_advices.length - 1
-      html += (advice_num + 1).to_s + ' - ' + question_advices[advice_num].advice + '<br/>'
+    #[2015-10-26] Zhewei: 
+    #best to order advices high to low, e.g., 5 to 1
+    #each level used to be a link; 
+    #clicking on the link caused the dropbox to be filled in with the corresponding number
+    question_advices.reverse.each_with_index do |question_advice, index|
+      html += '<a id="changeScore_>' + self.id.to_s + '" onclick="changeScore(' + count.to_s + ',' + index.to_s + ')">'
+      html += (question_advices.length - index).to_s + ' - ' + question_advice.advice + '</a><br/>'
+      html += '<script>'
+      html += 'function changeScore(i, j) {'
+      html += 'var elem = jQuery("#responses_" + i.toString() + "_score");'
+      html += 'var opts = elem.children("option").length;'
+      html += 'elem.val((opts - j - 1).toString());}'
+      html += '</script>'
     end
     html += '</div>'
 

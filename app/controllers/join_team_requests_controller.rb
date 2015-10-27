@@ -52,7 +52,7 @@ class JoinTeamRequestsController < ApplicationController
 
       @join_team_request = JoinTeamRequest.new
       @join_team_request.comments = params[:comments]
-      @join_team_request.status = 'P' 
+      @join_team_request.status = 'P' #Request status is 'Pending'
       @join_team_request.team_id = params[:team_id]
 
       participant = Participant.where(user_id: session[:user][:id], parent_id: params[:assignment_id]).first

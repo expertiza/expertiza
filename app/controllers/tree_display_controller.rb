@@ -66,41 +66,26 @@ class TreeDisplayController < ApplicationController
     tmpRes = {}
     res = {}
     for node in childNodes
-
       # Declaring Foldernode Object as New
       fnode = eval(params[:reactParams][:nodeType]).new
-
       for a in node
-
-
         fnode[a[0]] = a[1]
-
       end
-
       # fnode is the parent node
       # ch_nodes are childrens
       ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
-
       tmpRes[fnode.get_name] = ch_nodes
-
-
-
       # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
-
     end
       call_function ="get_folder_node_ng"
-
       populate_rows(tmpRes,call_function)
-
-
-
   end
+
   def display_row(node)
     tmpObject = {}
     tmpObject["nodeinfo"] = node
     # all the child nodes names got and put in tmpObject from respective controller actions
     tmpObject["name"] = node.get_name
-
     tmpObject["type"] = node.type
     if node.type == 'CourseNode' || node.type == "AssignmentNode"
       tmpObject["directory"] = node.get_directory
@@ -130,48 +115,35 @@ class TreeDisplayController < ApplicationController
 
   def populate_rows(list,call_function)
     if call_function == "get_folder_node_ng"
-
-
       tmpRes ={}
       tmpRes = list
       res = {}
        for nodeType in tmpRes.keys
         # declaring a new array
-       res[nodeType] =  Array.new
-
-       for node in tmpRes[nodeType]
+        res[nodeType] =  Array.new
+        for node in tmpRes[nodeType]
           res[nodeType] << display_row(node)
-
-
-       end
+        end
        end
 
     else
-
       tmpRes = list
       res = []
       if tmpRes
         for child in tmpRes
           res2 = {}
           res2 = display_row child
-
-
           res2["key"] = params[:reactParams2][:key]
-
-
           res << res2
-           end
-
-
         end
+      end
     end
     page_render(res)
   end
 
   def page_render(list)
-      respond_to do |format|
+    respond_to do |format|
       format.html {render json: list}
-
     end
   end
 
@@ -197,7 +169,6 @@ class TreeDisplayController < ApplicationController
     else
       childNodes = params[:reactParams2][:child_nodes]
     end
-    tmpRes = {}
 
     res = []
     fnode = eval(params[:reactParams2][:nodeType]).new
@@ -206,11 +177,10 @@ class TreeDisplayController < ApplicationController
     end
 
     ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
-    tmpRes = ch_nodes
 
     call_function = "get_children_node_2_ng"
 
-    populate_rows(tmpRes,call_function)
+    populate_rows(ch_nodes, call_function)
 
 
 
@@ -245,6 +215,7 @@ class TreeDisplayController < ApplicationController
   def filter
     #Search String - Assignment Name or Course Name
     search = params[:filter_string]
+    puts search.inspect
     #Filter Node : QAN - Questionnaire by Assignment Name
     #              ACN - Assignment By Course Name
     filter_node = params[:filternode]
@@ -259,12 +230,12 @@ class TreeDisplayController < ApplicationController
         if assignment_questionnaires
           #Add Questionnaire IDs to qid
           assignment_questionnaires.each { |q|  qid << "#{q.questionnaire_id.to_s}+" }
-          #Unused session[:root]
+          #Set session[:root] to Questionnaire
           session[:root] = 1
         end
       end
     elsif filter_node == 'ACN'
-      #Unused sesion[:root]
+      #Set session[:root] to Course
       session[:root] = 2
       # Add Course name to qid
       qid <<  search

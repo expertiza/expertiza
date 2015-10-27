@@ -1,6 +1,74 @@
 require 'rspec'
 require_relative '../rails_helper'
 
+#Unit test for 'compute_scores'
+describe 'compute_scores' do
+
+  context 'when assessment is not nil' do
+    it 'should return valid scores' do
+
+      question=Question.new(
+          txt: "qusetionaaaaa",
+          weight: 1,
+          questionnaire_id: 200,
+          type: "Criterion",
+          break_before: true)
+
+      # find what assessment is using bind.pry
+      # and mock it
+      # 需要让length大于0
+      #不确定人为设定assessments.length行不行
+      assessments.length = 5
+
+      Answer.stub(:compute_stat).and_return(100, {max: 100, min: 100, avg: 100})
+
+      scores1 = {max: 100, min: 100, avg: 100}
+      expect(Answer.compute_scores(assessments, question)).to eq scores1
+    end
+  end
+
+  context 'when assessment is nil' do
+    it 'should return nil for score hash' do
+      scores2 = {max: nil, min: nil, avg: nil}
+      expect(Answer.compute_scores(nil, nil)).to eq scores2
+    end
+  end
+
+end
+
+
+
+#Unit test for 'computer_quiz_scores'
+context 'when responses is not nil' do
+  it 'should return valid scores' do
+
+    responses=Response.new
+    responses.id=1000
+    responses.created_at = DateTime.current
+    responses.updated_at = DateTime.current
+    responses.map_id=1
+    responses.additional_comment="additional_comment"
+    responses.version_num=1
+    #不确定人为设定responses.length行不行
+    responses.length = 5
+
+    scores = {max: -999999999, min: 999999999}
+    Answer.stub(:get_total_score).and_return(100)
+    scores1 = {max: 100, min: 100, avg: 100}
+    expect(Answer.compute_quiz_scores(responses)).to eq scores1
+  end
+
+end
+
+context 'when responses is nil' do
+  it 'should return nil for score hash' do
+    scores2 = {max: nil, min: nil, avg: nil}
+    expect(Answer.compute_quiz_scores(nil)).to eq scores2
+  end
+end
+
+
+
 #Unit test for 'get_total_score'
 describe 'get_total_score' do
   before(:each) {

@@ -104,9 +104,8 @@ class JoinTeamRequestsController < ApplicationController
     @join_team_request = JoinTeamRequest.find(params[:id])
     @join_team_request.status = 'D' #'D' stands for decline
 
-    ##EDIT THIS
     if @join_team_request.save
-      redirect_to view_student_teams_path student_id: params[:teams_user_id]
+      redirect_to view_student_teams_path student_id: params[:teams_user_id], notice: "JoinTeamRequest was successfully declined."
     else
       redirect_to root_path, notice: "Decline request could not be performed."
   end

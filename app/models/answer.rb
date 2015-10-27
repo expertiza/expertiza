@@ -119,7 +119,7 @@ class Answer < ActiveRecord::Base
       if sum_of_weights > 0 && max_question_score
         return (weighted_score / (sum_of_weights * max_question_score)) * 100
       else
-        return -1.0     # indicating no score
+        return -1.0 # indicating no score
       end
     end
   end

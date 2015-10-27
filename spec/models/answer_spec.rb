@@ -1,6 +1,7 @@
 require 'rspec'
 require_relative '../rails_helper'
 
+#Unit test for 'get_total_score'
 describe 'get_total_score' do
   before(:each) {
     Answer.stub(:submission_valid?)
@@ -12,34 +13,35 @@ describe 'get_total_score' do
     @responses.additional_comment="additional_comment"
     @responses.version_num=1
     @question=Question.new(
-        txt:"qusetionaaaaa",
+        txt: "qusetionaaaaa",
         weight: 1,
         questionnaire_id: 200,
-        type:"Criterion",
-        break_before:true)
+        type: "Criterion",
+        break_before: true)
   }
 
   it 'should return weighted total score when sum_of_weights > 0 && max_question_score' do
-    score = ScoreView.new(:type =>'Criterion', 
-                          :q1_id=>@question.questionnaire_id, 
-                          :s_response_id=>@responses.id, 
-                          :question_weight=>1,
-                          :s_score=>5,
-                          :q1_max_question_score=>5)
-    ScoreView.stub(:where).and_return( [score] )
-    expect(Answer.get_total_score(:response=>[@responses],:questions=>[@question])).to eq 100
+    score = ScoreView.new(:type => 'Criterion',
+                          :q1_id => @question.questionnaire_id,
+                          :s_response_id => @responses.id,
+                          :question_weight => 1,
+                          :s_score => 5,
+                          :q1_max_question_score => 5)
+    ScoreView.stub(:where).and_return([score])
+    expect(Answer.get_total_score(:response => [@responses], :questions => [@question])).to eq 100
   end
 
   it 'should return -1 when sum_of_weights <= 0 or max_question_score does not exist' do
-    expect(Answer.get_total_score(:response=>[@responses],:questions=>[@question])).to eq -1
+    expect(Answer.get_total_score(:response => [@responses], :questions => [@question])).to eq -1
   end
 
 end
 
-describe 'computer_stat' do
+#Unit test for 'compute_stat'
+describe 'compute_stat' do
   before(:each) {
-    @scores = {max:-999999999, min:999999999}
-    Answer.stub(:get_total_score).and_return( 100 )
+    @scores = {max: -999999999, min: 999999999}
+    Answer.stub(:get_total_score).and_return(100)
   }
 
   context "when invalid is 1" do
@@ -57,11 +59,12 @@ describe 'computer_stat' do
   end
 end
 
+#Unit test for 'submission valid'
 describe 'submission valid' do
   before(:each) {
-    late_due = DueDate.new(due_at:Time.parse("2020-10-30"), deadline_type_id: 2)
-    early_due = DueDate.new(due_at:Time.parse("2010-10-30"), deadline_type_id: 2)
-    sorted_deadlines = [late_due, early_due]   
+    late_due = DueDate.new(due_at: Time.parse("2020-10-30"), deadline_type_id: 2)
+    early_due = DueDate.new(due_at: Time.parse("2010-10-30"), deadline_type_id: 2)
+    sorted_deadlines = [late_due, early_due]
 
     @responses=Response.new
     @responses.id=1000
@@ -83,19 +86,20 @@ describe 'submission valid' do
   }
 
   it 'invalid should be 1' do
-    @responses.stub( :is_valid_for_score_calculation? ).and_return(false)
+    @responses.stub(:is_valid_for_score_calculation?).and_return(false)
     expect(Answer.submission_valid?(@responses)).to eq 1
   end
 
   it 'invalid should be 0' do
-    @responses.stub( :is_valid_for_score_calculation? ).and_return(true)
+    @responses.stub(:is_valid_for_score_calculation?).and_return(true)
     expect(Answer.submission_valid?(@responses)).to eq 0
   end
 end
 
+#Unit test for 'latest review deadline'
 describe 'latest review deadline' do
-  late_due = DueDate.new(due_at:Time.parse("2020-10-30"), deadline_type_id: 2)
-  early_due = DueDate.new(due_at:Time.parse("2010-10-30"), deadline_type_id: 2)
+  late_due = DueDate.new(due_at: Time.parse("2020-10-30"), deadline_type_id: 2)
+  early_due = DueDate.new(due_at: Time.parse("2010-10-30"), deadline_type_id: 2)
   sorted_deadlines = [late_due, early_due]
 
   it 'should return early due date' do

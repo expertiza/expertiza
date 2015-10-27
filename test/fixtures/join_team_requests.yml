@@ -1,0 +1,15 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  id: 11
+  participant_id: 29
+  team_id: 15
+  comments: MyText
+  status: P
+
+two:
+  id: 36
+  participant_id: 23
+  team_id: 16
+  comments: MyText1
+  status: P

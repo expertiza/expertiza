@@ -1,0 +1,44 @@
+rp_student_public_view:
+    permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
+    role_id: <%= Fixtures.identify(:Student_role) %>
+rp_student_execute: 
+    permission_id: <%= Fixtures.identify(:permission_public_actions_execute) %>
+    role_id: <%= Fixtures.identify(:Student_role) %>
+rp_admin:
+    permission_id: <%= Fixtures.identify(:permission_administer_pg) %>
+    role_id: <%= Fixtures.identify(:SuperAdministrator_role) %>
+rp_su_admin_gold:
+    permission_id: <%= Fixtures.identify(:permission_administer_goldberg) %>
+    role_id: <%= Fixtures.identify(:SuperAdministrator_role) %>
+rp_admin_assign_inst:
+    permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+    role_id: <%= Fixtures.identify(:Instructor_role) %>
+rp_admin_assign_admin: 
+    permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+    role_id: <%= Fixtures.identify(:Administrator_role) %>
+rp_admin_assign_su:
+    permission_id: <%= Fixtures.identify(:permission_administer_assignments) %>
+    role_id: <%= Fixtures.identify(:SuperAdministrator_role) %>
+rp_admin_inst_su:
+    permission_id: <%= Fixtures.identify(:permission_administer_instructors) %>
+    role_id: <%= Fixtures.identify(:SuperAdministrator_role) %>
+rp_student_do_assignment: 
+    permission_id: <%= Fixtures.identify(:permission_do_assignments) %>
+    role_id: <%= Fixtures.identify(:Student_role) %>
+rp_su_public_view:
+    permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
+    role_id: <%= Fixtures.identify(:SuperAdministrator_role) %>
+rp_admin_public_view:
+    permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
+    role_id: <%= Fixtures.identify(:Administrator_role) %>
+rp_inst_public_view:
+    permission_id: <%= Fixtures.identify(:permission_public_pages_view) %>
+    role_id: <%= Fixtures.identify(:Instructor_role) %>
+
+# Commented out because it is unknown what they are.
+# rp_no_idea2:
+    # permission_id: "5"
+    # role_id: "2"
+# rp_no_idea:
+    # permission_id: "2"
+    # role_id: "3"

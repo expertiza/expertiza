@@ -1,0 +1,30 @@
+tree_folder_questionnaires:
+  name: 'Questionnaires'
+  child_type: 'QuestionnaireTypeNode'
+tree_folder_courses:
+  name: 'Courses'
+  child_type: 'CourseNode'
+tree_folder_assignments:
+  name: 'Assignments'
+  child_type: 'AssignmentNode'
+tree_folder_review:
+  name: 'Review'
+  child_type: 'QuestionnaireNode'
+tree_folder_metareview:
+  name: 'Metareview'
+  child_type: 'QuestionnaireNode'
+tree_folder_author_feedback:
+  name: 'Author Feedback'
+  child_type: 'QuestionnaireNode'
+tree_folder_teammate_review:
+  name: 'Teammate Review'
+  child_type: 'QuestionnaireNode'
+tree_folder_survey:
+  name: 'Survey'
+  child_type: 'QuestionnaireNode'
+tree_folder_global_survey:
+  name: 'Global Survey'
+  child_type: 'QuestionnaireNode'
+tree_folder_course_evaluation:
+  name: 'Course Evaluation'
+  child_type: 'QuestionnaireNode'

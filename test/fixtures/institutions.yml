@@ -1,0 +1,5 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+institution0:
+  name: North Carolina State University
+institution1:
+  name: Test state university

@@ -1,0 +1,106 @@
+#Question Advice (Implemented only for Review, Metareview, Authorfeedback and TeammateReview)
+
+advice0:     
+ question_id: <%= Fixtures.identify(:question5)%>     
+ score: 2     
+ advice: Good
+
+advice1:
+ question_id: <%= Fixtures.identify(:question1)%>
+ score: 1
+ advice: Assignment guidelines were not at all followed
+ 
+advice2:
+ question_id: <%= Fixtures.identify(:question1)%>
+ score: 2
+ advice: Assignment guidelines were minimally followed
+ 
+advice3:
+ question_id: <%= Fixtures.identify(:question1)%>
+ score: 3
+ advice: Assignment guidelines were somewhat followed
+
+advice4:
+ question_id: <%= Fixtures.identify(:question1)%>
+ score: 4
+ advice: Assignment guidelines were mostly followed
+
+advice5:
+ question_id: <%= Fixtures.identify(:question1)%>
+ score: 5
+ advice: Assignment guidelines were completely followed
+
+advice6:
+ question_id: <%= Fixtures.identify(:question2)%>
+ score: 1
+ advice: Assignment was not at all graded fairly
+
+advice7:
+ question_id: <%= Fixtures.identify(:question2)%>
+ score: 2
+ advice: Points were taken off for unnecessary things
+
+advice8:
+ question_id: <%= Fixtures.identify(:question2)%>
+ score: 3
+ advice: Few points were taken off unnecessarily
+
+advice9:
+ question_id: <%= Fixtures.identify(:question2)%>
+ score: 4
+ advice: Assignment was graded mostly fair
+
+advice10:
+ question_id: <%= Fixtures.identify(:question2)%>
+ score: 5
+ advice: The score given is completely fair
+
+advice11:
+ question_id: <%= Fixtures.identify(:question3)%>
+ score: 1
+ advice: No comments were provided
+
+advice12:
+ question_id: <%= Fixtures.identify(:question3)%>
+ score: 2
+ advice: Unnecessary comments were provided
+
+advice13:
+ question_id: <%= Fixtures.identify(:question3)%>
+ score: 3
+ advice: Very few comments were provided
+
+advice14:
+ question_id: <%= Fixtures.identify(:question3)%>
+ score: 4
+ advice: Some comments were provided
+
+advice15:
+ question_id: <%= Fixtures.identify(:question3)%>
+ score: 5
+ advice: Through comments were provided
+
+advice16:
+ question_id: <%= Fixtures.identify(:question6)%>
+ score: 1
+ advice: Team member did not do any work
+
+advice17:
+ question_id: <%= Fixtures.identify(:question6)%>
+ score: 2
+ advice: Team member never completed his/her work on time
+
+advice18:
+ question_id: <%= Fixtures.identify(:question6)%>
+ score: 3
+ advice: Team member did not complete his/her work in time on few occasions
+
+advice19:
+ question_id: <%= Fixtures.identify(:question6)%>
+ score: 4
+ advice: Team member mostly completed his/her work on time
+
+advice20:
+ question_id: <%= Fixtures.identify(:question6)%>
+ score: 5
+ advice: Team member always completed his/her work on time

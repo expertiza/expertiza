@@ -1,0 +1,24 @@
+SystemSettings: 
+  session_expired_page_id: <%= Fixtures.identify(:content_expired) %>
+  session_timeout: 7200
+  menu_depth: 3
+  site_default_page_id: <%= Fixtures.identify(:content_home) %>
+  permission_denied_page_id: <%= Fixtures.identify(:content_denied) %>
+  not_found_page_id: <%= Fixtures.identify(:content_notfound) %>
+  default_markup_style_id: <%= Fixtures.identify(:markup_textile) %>
+  public_role_id: <%= Fixtures.identify(:Student_role) %>
+  footer_message: <a href="http://research.csc.ncsu.edu/efg/expertiza/papers">Expertiza</a>
+  site_name: "Expertiza"
+  site_subtitle: "Reusable learning objects through peer review"
+first:
+  session_expired_page_id: <%= Fixtures.identify(:content_expired) %>
+  session_timeout: 7200
+  menu_depth: 3
+  site_default_page_id: <%= Fixtures.identify(:content_home) %>
+  permission_denied_page_id: <%= Fixtures.identify(:content_denied) %>
+  not_found_page_id: <%= Fixtures.identify(:content_notfound) %>
+  default_markup_style_id: <%= Fixtures.identify(:markup_style1) %>
+  public_role_id: <%= Fixtures.identify(:Student_role) %>
+  footer_message: <a href="http://research.csc.ncsu.edu/efg/expertiza/papers">Expertiza</a>
+  site_name: "Expertiza"
+  site_subtitle: "Reusable learning objects through peer review"

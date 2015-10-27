@@ -1,0 +1,15 @@
+<% ta_list = [] %>
+<% ta_list << Fixtures.identify(:ta3) %>
+<% ta_list << Fixtures.identify(:ta2) %>
+<% ta_list << Fixtures.identify(:ta1) %>
+
+<% for i in 0..29 %>
+<%   coursenum = "CSC#{i/5+1}1#{i%5}" %>
+ta_mapping_course_<%= coursenum %>:
+  ta_id: <%= ta_list[i%3] %>
+  course_id: <%= Fixtures.identify("course#{i}") %>
+<% end %>
+
+ta_mapping_course_object_oriented:
+  ta_id:  <%= Fixtures.identify(:ta4) %>
+  course_id: <%= Fixtures.identify(:course_object_oriented) %>

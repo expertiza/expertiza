@@ -1,0 +1,31 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+sc0:
+  reviewee_id: <%= Fixtures.identify(:team5) %>
+  score: 75.34
+  range: "75.34 - 100"
+  object_type: "TeamReviewResponseMap"
+
+sc1:
+  reviewee_id: <%= Fixtures.identify(:team3) %>
+  score: 85.34
+  range: "85.34 - 98"
+  object_type: "TeamReviewResponseMap"
+
+sc2:
+  reviewee_id: <%= Fixtures.identify(:par13) %>
+  score: 95.64
+  range: "95.64 - 100"
+  object_type: "ParticipantReviewResponseMap"
+
+sc3:
+  reviewee_id: <%= Fixtures.identify(:par14) %>
+  score: 95.64
+  range: "95.64 - 100"
+  object_type: "TeammateReviewResponseMap"
+
+sc4:
+  reviewee_id: <%= Fixtures.identify(:par14) %>
+  score: 100
+  range: "100 - 100"
+  object_type: "MetareviewResponseMap"
+    

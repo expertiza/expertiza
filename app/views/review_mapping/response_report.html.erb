@@ -1,6 +1,10 @@
 
 <%= render :partial => 'searchbox'%>
-<%= render :partial => 'report' %>
+<% if @type == "ReviewResponseMap" %>
+	<%= render :partial => 'review_report' %>
+<% elsif @type == "FeedbackResponseMap" %>
+	<%= render :partial => 'feedback_report' %>
+<% end %>
 
 <p> **Text in <i style = "color:#DD3300">red</i> indicates that the review is not yet completed; text in <i style = "color:gray">gray</i> indicates that the review is done in previous round(s).</p>
 

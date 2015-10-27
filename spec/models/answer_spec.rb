@@ -3,27 +3,18 @@ require_relative '../rails_helper'
 
 #Unit test for 'compute_scores'
 describe 'compute_scores' do
-
   context 'when assessment is not nil' do
     it 'should return valid scores' do
-
       question=Question.new(
           txt: "qusetionaaaaa",
           weight: 1,
           questionnaire_id: 200,
           type: "Criterion",
           break_before: true)
-
-      # find what assessment is using bind.pry
-      # and mock it
-      # 需要让length大于0
-      #不确定人为设定assessments.length行不行
-      assessments.length = 5
-
-      Answer.stub(:compute_stat).and_return(100, {max: 100, min: 100, avg: 100})
-
+      assessment = 'Assessment'
       scores1 = {max: 100, min: 100, avg: 100}
-      expect(Answer.compute_scores(assessments, question)).to eq scores1
+      allow(Answer).to receive(:compute_stat).and_return([100, scores1])
+      expect(Answer.compute_scores([assessment], [question])).to eq scores1
     end
   end
 
@@ -33,37 +24,41 @@ describe 'compute_scores' do
       expect(Answer.compute_scores(nil, nil)).to eq scores2
     end
   end
-
 end
 
 
 
 #Unit test for 'computer_quiz_scores'
-context 'when responses is not nil' do
-  it 'should return valid scores' do
+describe 'compute_quiz_scores' do
+  before(:each) {
+    allow_message_expectations_on_nil
+  }
 
-    responses=Response.new
-    responses.id=1000
-    responses.created_at = DateTime.current
-    responses.updated_at = DateTime.current
-    responses.map_id=1
-    responses.additional_comment="additional_comment"
-    responses.version_num=1
-    #不确定人为设定responses.length行不行
-    responses.length = 5
-
-    scores = {max: -999999999, min: 999999999}
-    Answer.stub(:get_total_score).and_return(100)
-    scores1 = {max: 100, min: 100, avg: 100}
-    expect(Answer.compute_quiz_scores(responses)).to eq scores1
+  context 'when responses is not nil' do
+    it 'should return valid scores' do
+      responses=Response.new
+      responses.id=1000
+      responses.created_at = DateTime.current
+      responses.updated_at = DateTime.current
+      responses.map_id=1
+      responses.additional_comment="additional_comment"
+      responses.version_num=1
+            
+      allow(QuizQuestionnaire).to receive(:find)
+      allow(nil).to receive(:questions)
+      allow(nil).to receive(:reviewed_object_id)
+      allow(Answer).to receive(:get_total_score).and_return(100)
+      scores1 = {max: 100, min: 100, avg: 100}
+      expect(Answer.compute_quiz_scores([responses])).to eq scores1
+    end
   end
 
-end
-
-context 'when responses is nil' do
-  it 'should return nil for score hash' do
-    scores2 = {max: nil, min: nil, avg: nil}
-    expect(Answer.compute_quiz_scores(nil)).to eq scores2
+  context 'when responses is empty' do
+    it 'should return nil for score hash' do
+      responses = []
+      scores2 = {max: nil, min: nil, avg: nil}
+      expect(Answer.compute_quiz_scores(responses)).to eq scores2
+    end
   end
 end
 
@@ -72,7 +67,7 @@ end
 #Unit test for 'get_total_score'
 describe 'get_total_score' do
   before(:each) {
-    Answer.stub(:submission_valid?)
+    allow(Answer).to receive(:submission_valid?)
     @responses=Response.new
     @responses.id=1000
     @responses.created_at = DateTime.current
@@ -95,7 +90,7 @@ describe 'get_total_score' do
                           :question_weight => 1,
                           :s_score => 5,
                           :q1_max_question_score => 5)
-    ScoreView.stub(:where).and_return([score])
+    allow(ScoreView).to receive(:where).and_return([score])
     expect(Answer.get_total_score(:response => [@responses], :questions => [@question])).to eq 100
   end
 
@@ -109,7 +104,7 @@ end
 describe 'compute_stat' do
   before(:each) {
     @scores = {max: -999999999, min: 999999999}
-    Answer.stub(:get_total_score).and_return(100)
+    allow(Answer).to receive(:get_total_score).and_return(100)
   }
 
   context "when invalid is 1" do
@@ -130,6 +125,7 @@ end
 #Unit test for 'submission valid'
 describe 'submission valid' do
   before(:each) {
+    allow_message_expectations_on_nil
     late_due = DueDate.new(due_at: Time.parse("2020-10-30"), deadline_type_id: 2)
     early_due = DueDate.new(due_at: Time.parse("2010-10-30"), deadline_type_id: 2)
     sorted_deadlines = [late_due, early_due]
@@ -143,23 +139,23 @@ describe 'submission valid' do
     @responses.version_num=1
 
     map=double(:ResponseMap)
-    ResponseMap.stub(:find).and_return(map)
-    map.stub(:reviewed_object_id)
-    map.stub(:reviewee_id)
-    DueDate.stub(:where).and_return(sorted_deadlines)
-    sorted_deadlines.stub(:order).and_return(sorted_deadlines)
-    ResubmissionTime.stub(:where)
-    nil.stub(:order)
-    Answer.stub(:latest_review_deadline)
+    allow(ResponseMap).to receive(:find).and_return(map)
+    allow(map).to receive(:reviewed_object_id)
+    allow(map).to receive(:reviewee_id)
+    allow(DueDate).to receive(:where).and_return(sorted_deadlines)
+    allow(sorted_deadlines).to receive(:order).and_return(sorted_deadlines)
+    allow(ResubmissionTime).to receive(:where)
+    allow(nil).to receive(:order)
+    allow(Answer).to receive(:latest_review_deadline)
   }
 
   it 'invalid should be 1' do
-    @responses.stub(:is_valid_for_score_calculation?).and_return(false)
+    allow(@responses).to receive(:is_valid_for_score_calculation?).and_return(false)
     expect(Answer.submission_valid?(@responses)).to eq 1
   end
 
   it 'invalid should be 0' do
-    @responses.stub(:is_valid_for_score_calculation?).and_return(true)
+    allow(@responses).to receive(:is_valid_for_score_calculation?).and_return(true)
     expect(Answer.submission_valid?(@responses)).to eq 0
   end
 end

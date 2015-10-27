@@ -52,7 +52,7 @@ class JoinTeamRequestsController < ApplicationController
 
       @join_team_request = JoinTeamRequest.new
       @join_team_request.comments = params[:comments]
-      @join_team_request.status = 'P'
+      @join_team_request.status = 'P' 
       @join_team_request.team_id = params[:team_id]
 
       participant = Participant.where(user_id: session[:user][:id], parent_id: params[:assignment_id]).first
@@ -90,18 +90,24 @@ class JoinTeamRequestsController < ApplicationController
 
   def destroy # destroy a join_team_request entry of a particular id
     @join_team_request = JoinTeamRequest.find(params[:id])
-    @join_team_request.destroy
-
-    respond_to do |format|
-      format.html { redirect_to(join_team_requests_url) }
-      format.xml  { head :ok }
+    if @join_team_request.destroy
+      respond_to do |format|
+        format.html { redirect_to(join_team_requests_url) }
+        format.xml  { head :ok }
+      end
+    else
+      redirect_to root_path, notice: "JoinTeamRequest could not deleted."
     end
   end
   #decline request to join the team...
   def decline
     @join_team_request = JoinTeamRequest.find(params[:id])
     @join_team_request.status = 'D' #'D' stands for decline
-    @join_team_request.save
-    redirect_to view_student_teams_path student_id: params[:teams_user_id]
+
+    ##EDIT THIS
+    if @join_team_request.save
+      redirect_to view_student_teams_path student_id: params[:teams_user_id]
+    else
+      redirect_to root_path, notice: "Decline request could not be performed."
   end
 end

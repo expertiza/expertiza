@@ -89,7 +89,7 @@ class InvitationController < ApplicationController
     @@messages[:already_invited] = "You have already sent an invitation to \"#{name}\"."
     @@messages[:full_team] = "The team which invited you is full now."
     @@messages[:invitation_not_exist]= "The team which invited you does not exist any more."
-    @@messages[:fail_to_add] = "The system failed to add you to the team which invited you."
+    @@messages[:fail_to_add] = "Something went wrong in the system. Hence failed to add you to the team which invited you. Please try again."
   end
   private def set_invitation(to_id,from_id,assignment_id,reply_status) #creates an instance of invitation
     @invitation = Invitation.new

@@ -16,3 +16,9 @@ participant3:
   parent_id:  1
   type: AssignmentParticipant
 
+participant4:
+  id: 4
+  user_id:  4
+  parent_id:  1
+  type: AssignmentParticipant
+

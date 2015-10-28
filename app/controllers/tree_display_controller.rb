@@ -5,12 +5,7 @@ class TreeDisplayController < ApplicationController
     true
   end
 
-  # direct access to course evaluations
-  def goto_course_evaluations
-    node_object = TreeFolder.find_by_name('Course Evaluation')
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to :controller => 'tree_display', :action => 'list'
-  end
+
 
   def goto_bookmarkrating_rubrics
     node_object = TreeFolder.find_by_name('Bookmarkrating')
@@ -18,32 +13,41 @@ class TreeDisplayController < ApplicationController
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
- # direct access
+  # direct access
  def go_to_menu_items
     name = params[:params1]
-    if name == "Review rubrics"
-      name = "Review"
-    elsif name == "Teammate review rubrics"
-      name = "Teammate Review"
-    elsif name == "Metareview rubrics"
-      name = "Metareview"
-    elsif name == "Author feedbacks"
-      name = "Author Feedback"
-    elsif name == "Global surveys"
-      name = "Global Survey"
-    elsif name == "Course evaluations"
-      name = "Course Evaluation"
+    if name
+      if name == "Review rubrics"
+          name = "Review"
+        elsif name == "Teammate review rubrics"
+          name = "Teammate Review"
+        elsif name == "Metareview rubrics"
+          name = "Metareview"
+        elsif name == "Author feedbacks"
+          name = "Author Feedback"
+        elsif name == "Global surveys"
+          name = "Global Survey"
+        elsif name == "Course evaluations"
+          name = "Course Evaluation"
+        elsif name == "Surveys"
+            name = "Survey"
+      end
+
+      node_object = TreeFolder.find_by_name(name)
+      puts node_object.inspect
+      session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
+      if node_object.name == "Courses"
+        session[:last_open_tab] = 1
+      elsif node_object.name == "Assignments"
+        session[:last_open_tab] = 2
+      elsif node_object.id ==1 ||node_object.id ==4 ||node_object.id ==5 ||node_object.id ==6 ||node_object.id ==7 ||node_object.id ==8 ||node_object.id ==9 ||node_object.id ==10 # if node_object_name is Questionnaires or its child_nodes
+        session[:last_open_tab] = 3   # for Questionnaires and all its childnodes
+      end
+      redirect_to :controller => 'tree_display', :action => 'list'
+
+    else        # if the passed params is null, redirect to root
+      redirect_to "/"
     end
-
-    node_object = TreeFolder.find_by_name(name)
-    puts node_object.inspect
-    puts node_object.id
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    session_id = session[:root]
-    puts session[:root].inspect
-    redirect_to :controller => 'tree_display', :action => 'list'
- end
-
   # called when the display is requested
   # ajbudlon, July 3rd 2008
   def list

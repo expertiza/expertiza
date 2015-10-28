@@ -84,4 +84,5 @@ end
 group :development, :test do
   gem 'capybara'
   gem 'simplecov', :require => false
+  gem 'factory_girl_rails'
 end

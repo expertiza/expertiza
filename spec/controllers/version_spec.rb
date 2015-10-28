@@ -99,11 +99,13 @@ describe VersionsController do
       expect(response).should redirect_to versions_path
     end
 
-    #TODO: stud Version.find
-    # it 'should allow admin to call destroy version' do
-    #   delete :destroy, { id: 1 }
-    #   expect(response).should redirect_to versions_path
-    # end
+    #Not testing if destroy works, only testing that admin can call the function
+    it 'should allow admin to call destroy version' do
+	  @version = double('version1', :destroy => true)
+      Version.stub(:find).and_return(@version)
+      delete :destroy, { id: 1 }
+      expect(response).should redirect_to versions_path
+    end
 
     it 'should not allow admin to be able to add new version' do
       get :new

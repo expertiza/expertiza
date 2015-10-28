@@ -60,7 +60,7 @@ class ReviewResponseMap < ResponseMap
       raise ArgumentError, 'Not enough items'
     end
     assignment = Assignment.find(id)
-    assignment_nil?(assignment)
+    assignment_nil?(assignment, id)
     index = 1
     while index < row.length
       user = User.find_by_name(row[index].to_s.strip)
@@ -184,7 +184,7 @@ class ReviewResponseMap < ResponseMap
   end
 
   # Check for if assignment value is null
-  def assignment_nil?(assignment)
+  def assignment_nil?(assignment, id)
     if assignment.nil?
       raise ImportError,
             "The assignment with id \"#{id}\" was not found.
@@ -242,4 +242,5 @@ class ReviewResponseMap < ResponseMap
     end
     review_final_versions[symbol][:response_ids] = response_ids
   end
+
 end

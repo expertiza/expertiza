@@ -1,0 +1,28 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+course0:
+  name: "Intro to Garbage"
+  id: 1
+  instructor_id: 6
+  info: "An introductory course to garbage."
+  created_at: '2015-10-22 01:02:03'
+  private: false
+  institutions_id: 123
+
+course1:
+  name: "Continuation of Garbage"
+  id: 2
+  instructor_id: 6
+  info: "The second in a long line of courses on garbage."
+  created_at: '2015-10-22 03:02:01'
+  private: false
+  institutions_id: 321
+
+course_object_oriented:
+  name: "Object Oriented Programming"
+  id: 3
+  instructor_id: 6
+  info: "A course covering the fundamentals of object oriented design."
+  created_at: '2008-08-11 00:01:00'
+  private: false
+  institutions_id: 193

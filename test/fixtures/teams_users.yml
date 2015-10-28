@@ -1,0 +1,21 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+teams_users1:
+  team_id: 1
+  user_id: 1
+  
+teams_users2:
+  team_id: 1
+  user_id: 10
+  
+teams_users3:
+  team_id: 2
+  user_id: 3
+  
+teams_users4:
+  team_id: 7
+  user_id: 4
+ 
+teams_users7:
+  team_id: 7
+  user_id: 7

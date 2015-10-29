@@ -250,6 +250,42 @@ class AssignmentParticipant < Participant
   def scores(questions)
     scores = {}
     scores[:participant] = self
+
+    assignmentQuestionnaires(questions, scores)
+
+    scores[:total_score] = self.assignment.compute_total_score(scores)
+
+    mergeScores(scores)
+
+    # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
+    # PS: I don't like the fact that we are doing this here but it is difficult to make it work anywhere else
+    if assignment.is_microtask?
+      topic = SignUpTopic.find_by_assignment_id(assignment.id)
+      if !topic.nil?
+        scores[:total_score] *= (topic.micropayment.to_f / 100.to_f)
+        scores[:max_pts_available] = topic.micropayment
+      end
+    end
+
+    # for all quiz questionnaires (quizzes) taken by the participant
+    quiz_responses = Array.new
+    quiz_response_mappings = QuizResponseMap.where(reviewer_id: self.id)
+    quiz_response_mappings.each do |qmapping|
+      if (qmapping.response)
+        quiz_responses << qmapping.response
+      end
+    end
+    #scores[:quiz] = Hash.new
+    #scores[:quiz][:assessments] = quiz_responses
+    #scores[:quiz][:scores] = Answer.compute_quiz_scores(scores[:quiz][:assessments])
+
+    scores[:total_score] = assignment.compute_total_score(scores)
+    #scores[:total_score] += compute_quiz_scores(scores)
+
+    calculateScores(scores)
+  end
+
+  def assignmentQuestionnaires(questions, scores)
     self.assignment.questionnaires.each do |questionnaire|
       round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(self.assignment.id, questionnaire.id).used_in_round
       #create symbol for "varying rubrics" feature -Yang
@@ -268,9 +304,9 @@ class AssignmentParticipant < Participant
       end
       scores[questionnaire_symbol][:scores] = Answer.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
     end
+  end
 
-    scores[:total_score] = self.assignment.compute_total_score(scores)
-
+  def mergeScores(scores)
     #merge scores[review#] (for each round) to score[review]  -Yang
     if self.assignment.varying_rubrics_by_round?
       review_sym = "review".to_sym
@@ -302,38 +338,15 @@ class AssignmentParticipant < Participant
       end
 
       if scores[review_sym][:scores][:max] == -999999999 && scores[review_sym][:scores][:min] == 999999999
-               scores[review_sym][:scores][:max] = 0
-               scores[review_sym][:scores][:min] = 0
+        scores[review_sym][:scores][:max] = 0
+        scores[review_sym][:scores][:min] = 0
       end
 
       scores[review_sym][:scores][:avg] = total_score/scores[review_sym][:assessments].length.to_f
     end
+  end
 
-    # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
-    # PS: I don't like the fact that we are doing this here but it is difficult to make it work anywhere else
-    if assignment.is_microtask?
-      topic = SignUpTopic.find_by_assignment_id(assignment.id)
-      if !topic.nil?
-        scores[:total_score] *= (topic.micropayment.to_f / 100.to_f)
-        scores[:max_pts_available] = topic.micropayment
-      end
-    end
-
-    # for all quiz questionnaires (quizzes) taken by the participant
-    quiz_responses = Array.new
-    quiz_response_mappings = QuizResponseMap.where(reviewer_id: self.id)
-    quiz_response_mappings.each do |qmapping|
-      if (qmapping.response)
-        quiz_responses << qmapping.response
-      end
-    end
-    #scores[:quiz] = Hash.new
-    #scores[:quiz][:assessments] = quiz_responses
-    #scores[:quiz][:scores] = Answer.compute_quiz_scores(scores[:quiz][:assessments])
-
-    scores[:total_score] = assignment.compute_total_score(scores)
-    #scores[:total_score] += compute_quiz_scores(scores)
-
+  def calculateScores(scores)
     # move lots of calculation from view(_participant.html.erb) to model
     if self.grade
       scores[:total_score] = self.grade
@@ -343,7 +356,7 @@ class AssignmentParticipant < Participant
         total_score = 100
       end
       scores[:total_score] = total_score
-    scores
+      scores
     end
   end
 

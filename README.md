@@ -1,8 +1,32 @@
+Expertiza Refactoring for: review_response_map.rb Model.
+
+path of file: app/models/review_response_map.rb 
+
+Link to deployed project: http://152.46.16.195:5902/
+
+Credentials:
+(as an instructor)
+username: instructor6
+password: password
+
+(as a student)
+username: student559
+password: password
+
+NOTE: You can view more admins and users after logging in as instructor6 then going to: Manage > Users
+And login as any of the users. All the default passwords are 'password'. You may create new users in the same place.
+
+
+Code improved were based on the criteria given as a requirement as well as a few suggestions and changes from CodeClimate.
+
+
+
+
+
 Expertiza
 =========
 
 
-Start of develop branch for review_response_map.rb
 
 
 

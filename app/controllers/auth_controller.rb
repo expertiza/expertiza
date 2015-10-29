@@ -33,7 +33,7 @@ class AuthController < ApplicationController
   def after_login (user)
     session[:user] = user
     AuthController.set_current_role(user.role_id, session)
-
+    puts "ASL:" + AuthHelper::get_home_controller(session[:user])
     redirect_to :controller => AuthHelper::get_home_controller(session[:user]),
                 :action => AuthHelper::get_home_action(session[:user])
   end
@@ -126,9 +126,10 @@ class AuthController < ApplicationController
         if !role.cache || !role.cache.try(:has_key?, :credentials)
           Role.rebuild_cache
         end
+
         session[:credentials] = role.cache[:credentials]
         session[:menu] = role.cache[:menu]
-        logger.info "Logging in user as role #{session[:credentials].class}"
+        #logger.info "Logging in user as role #{session[:credentials].class}"
       else
         logger.error "Something went seriously wrong with the role"
       end

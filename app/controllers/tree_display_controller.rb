@@ -48,6 +48,7 @@ class TreeDisplayController < ApplicationController
     else        # if the passed params is null, redirect to root
       redirect_to "/"
     end
+ end
   # called when the display is requested
   # ajbudlon, July 3rd 2008
   def list

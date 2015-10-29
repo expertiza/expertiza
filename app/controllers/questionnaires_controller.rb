@@ -57,11 +57,18 @@ class QuestionnairesController < ApplicationController
       if QuestionnaireNode.where(parent_id: parent.id, node_object_id: @questionnaire.id) == nil
         QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id)
       end
+
       undo_link("Copy of questionnaire #{orig_questionnaire.name} has been created successfully. ")
       redirect_to :back
     rescue
       flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.'+$!
       redirect_to action: 'list', controller: 'tree_display'
+    end
+  end
+
+  def check_create_NewNode(parent)
+    if QuestionnaireNode.where(parent_id: parent.id, node_object_id: @questionnaire.id) == nil
+      QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
     end
   end
 
@@ -637,11 +644,7 @@ class QuestionnairesController < ApplicationController
 
   # clones the contents of a questionnaire, including the questions and associated advice
   def clone_questionnaire_details(questions, orig_questionnaire)
-    if (session[:user]).role.name != "Teaching Assistant"
-      @questionnaire.instructor_id = session[:user].id
-    else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
-      @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
-    end
+    assign_Instructor_id
 
     @questionnaire.name = 'Copy of '+orig_questionnaire.name
 
@@ -677,6 +680,14 @@ class QuestionnairesController < ApplicationController
 
       flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.'+$!
       redirect_to action: 'list', controller: 'tree_display'
+    end
+  end
+
+  def assign_Instructor_id
+    if (session[:user]).role.name != "Teaching Assistant"
+      @questionnaire.instructor_id = session[:user].id
+    else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
+      @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
     end
   end
 end

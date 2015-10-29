@@ -65,4 +65,22 @@ describe TreeDisplayController do
        response.should redirect_to(list_student_task_index_path)
     end
   end
+  describe "#ta_for_current_mappings?" do
+    it "should return true if current user is a TA for current course" do
+    end
+  end
+  describe "#populate_rows" do
+    let(:dbl) { double }
+    before { expect(dbl).to receive(:populate_rows).with(Hash, String)}
+    it "passes when the arguments match" do
+      dbl.populate_rows({},"")
+    end
+  end
+  describe "#populate_1_row" do
+    let(:dbl) { double }
+    before { expect(dbl).to receive(:populate_1_row).with(Node) }
+    it "passes when the arguments match" do
+      dbl.populate_1_row(Node.new)
+    end
+  end
 end

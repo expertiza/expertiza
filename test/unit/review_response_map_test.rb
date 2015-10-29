@@ -1,113 +1,70 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class ReviewResponseMapTest < ActiveSupport::TestCase
-  fixtures :response_maps, :questionnaires , :assignments, :responses #include the two fixtures
+	fixtures :response_maps, :questionnaires , :assignments, :responses, :assignment_questionnaires, :users, :participants, :teams
+	
+	test "method_import_fields" do
+		assert_difference 'ResponseMap.count' do
+			review_response_map_test = ReviewResponseMap.import(['User1','User2'], 2, 1)
+    		end
+  	end
 
-  test "method_questionnaire" do
-    @questionnaire = questionnaires(:questionnaire0)
-    @assignment = assignments(:assignment0)
-    reviewrespmap = ReviewResponseMap.new
-    reviewrespmap.assignment = @assignment
-    reviewrespmap.questionnaire
-    assert_equal reviewrespmap.assignment.questionnaires[0].type, "ReviewQuestionnaire"
-  end
-  
-  test "method_get_title" do
-    @questionnaire = questionnaires(:questionnaire0)
-    @assignment = assignments(:assignment0)
-    responses = ReviewResponseMap.new
-    assert_equal responses.get_title, "Review"
-  end
-  
-  test "method_delete" do
-    @questionnaire = questionnaires(:questionnaire0)
-    @assignment = assignments(:assignment0)
-    reviewrespmap = ReviewResponseMap.new
-    reviewrespmap.assignment = @assignment
-    reviewrespmap.response = []
-    assert_equal  reviewrespmap.delete(1), reviewrespmap
-  end
+  	test "method_import_fields_invalid_user" do
+    		assert_raise ImportError do
+			review_response_map_test = ReviewResponseMap.import(['User3','User2'], 2, 1)
+    		end
+  	end
 
-  test "method_delete_with_force" do
-    @questionnaire = questionnaires(:questionnaire0)
-    @assignment = assignments(:assignment0)
-    reviewrespmap = ReviewResponseMap.new
-    reviewrespmap.assignment = @assignment
-    reviewrespmap.response = []
-    assert_equal  reviewrespmap.delete(), reviewrespmap
-  end
+  	test "method_import_fields_invalid_assignment" do
+    		assert_raise ImportError do
+			review_response_map_test = ReviewResponseMap.import(['User1','User2'], 2, 4)
+    		end
+  	end
 
-  test "method_export_fields" do
-    fields_1 = ["contributor","reviewed by"]
-    fields_2 = ReviewResponseMap.export_fields(1)
-    assert_equal fields_2[0], fields_1[0]
-    assert_equal fields_2[1], fields_1[1]
-  end
-  
-   #test "method_export" do
-   #
-   #end
-  
-  test "method_import_fields" do
-    p = ReviewResponseMap.import(['student2','student2'], 2, "827400667")
-    assert_equal p , nil
-  end
+  	test "method_delete" do
+		@response = responses(:Response_1);
+		review_response_map_test = ReviewResponseMap.new
+		review_response_map_test.id = 2
+		assert_difference 'ResponseMap.count', -2 do
+			review_response_map_test.delete(true)
+    		end 
+  	end
 
-  test "method_import_raise_less_than_two_items" do
-    assert_raise (ArgumentError) {ReviewResponseMap.import([''], 2, "827400667")}
-  end
+  	test "method_delete_no _force" do
+    		review_response_map_test= ReviewResponseMap.new
+    		review_response_map_test.id = 2
+    		assert_difference 'ResponseMap.count', -2 do
+			review_response_map_test.delete(false)
+    		end 
+  	end
 
-  test "method_import_with_incorrect_assignment_id" do
-    @assignment = '123'
-    assert_raise (ActiveRecord::RecordNotFound) {ReviewResponseMap.import(['student2','student2'], 2, @assignment)}
-  end
+  	test "method_show_feedback" do
+    		@responses = responses(:Response_1)
+    		review_response_map_test = ReviewResponseMap.new
+    		assert_not review_response_map_test.show_feedback(@responses), nil
+  	end
 
-  test "method_import_with_incorrect_user" do
-    @user1 = 'student30'
-    @user = 'student20'
-    assert_raise (ImportError) {ReviewResponseMap.import([@user1,@user,'student2'], 2, "827400667")}
-  end
+  	test "method_get_title" do
+    		review_response_map_test = ReviewResponseMap.new
+    		assert_equal review_response_map_test.get_title, "Review"
+  	end
 
-  test "method_import_with_incorrect_reviewer" do
-    @user = 'abc'
-    assert_raise (ImportError) {ReviewResponseMap.import(['student2',@user], 2, "827400667")}
-  end
+  	test "method_export_fields" do
+    		fields_1 = ["contributor","reviewed by"]
+    		fields_2 = ReviewResponseMap.export_fields(1)
+    		assert_equal fields_1, fields_2
+  	end
 
-  test "method_import_team_assignment_with_no_reviewee" do
-    @assignment = assignments(:assignment2)
-    assert_raise (ImportError) {ReviewResponseMap.import(['student1','student2'], 2, @assignment)}
-  end
+  	test "method_questionnaire" do
+    		@assignment = assignments(:Assignment_1)
+    		review_response_map_test = ReviewResponseMap.new
+    		review_response_map_test.assignment = @assignment
+    		assert_equal review_response_map_test.questionnaire(2).id, 1
+  	end 
 
-  test "method_show_feedback" do
-    @questionnaire = questionnaires(:questionnaire0)
-    @assignment = assignments(:assignment0)
-    rev = ReviewResponseMap.new
-    rev.assignment = @assignment
-    rev.response =  responses(:response0)
-    rev.show_feedback
-  end
 
-  test "method_add_reviewer" do
-    p = ReviewResponseMap.add_reviewer(299716733,148111809,108022375)
-    assert p.save
-   end
-   
-   test "method_metareview_response_maps" do
-    @questionnaire = questionnaires(:questionnaire0)
-    @assignment = assignments(:assignment0)
-	assert_nothing_thrown do ReviewResponseMap.metareview_response_maps end
-   end
-   
-   test "method_get_team_responses_for_round" do
-    @questionnaire = questionnaires(:questionnaire0)
-    @assignment = assignments(:assignment0)
-	assert_not_nil ReviewResponseMap.get_team_responses_for_round(1,1)
-   end
-   
-   test "method_final_versions_from_reviewer" do
-    @questionnaire = questionnaires(:questionnaire0)
-    @assignment = assignments(:assignment0)
-    assert_nothing_thrown do ReviewResponseMap.final_versions_from_reviewer(2) end
-   end
-
+  	test "method_add_reviewer" do
+    		review_response_map_test = ReviewResponseMap.add_reviewer(1,2,1)
+    		assert review_response_map_test.save
+  	end
 end

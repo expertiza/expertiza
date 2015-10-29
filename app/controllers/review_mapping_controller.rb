@@ -8,7 +8,7 @@ class ReviewMappingController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'add_dynamic_reviewer', 'release_mapping', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'add_quiz_response_map', 'assign_quiz_dynamically'
+    when 'add_dynamic_reviewer', 'release_mapping', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'add_quiz_response_map', 'assign_quiz_dynamically', 'delete_outstanding_reviewers', 'response_report'
       true
     else
       ['Instructor',
@@ -519,7 +519,7 @@ class ReviewMappingController < ApplicationController
     when "ReviewResponseMap"
       if params[:user].nil?
         # This is not a search, so find all reviewers for this assignment
-        @reviewers = ResponseMap.select(:reviewer_id).distinct.where(reviewed_object_id: id, type: type)
+        @reviewers = ResponseMap.select(:reviewer_id).distinct.where(reviewed_object_id: @id, type: @type)
       else
         # This is a search, so find reviewers by user's full name
         user = User.select(:id).distinct.where(["fullname LIKE ?", '%'+params[:user][:fullname]+'%'])
@@ -537,7 +537,7 @@ class ReviewMappingController < ApplicationController
       #SELECT distinct reviewer_id FROM response_maps where type = 'FeedbackResponseMap' and 
       #reviewed_object_id in (select id from responses where 
       #map_id in (select id from response_maps where reviewed_object_id = 722 and type = 'ReviewResponseMap'))
-      @review_response_map_ids = ResponseMap.select(:id).where(reviewed_object_id: id, type: 'ReviewResponseMap')
+      @review_response_map_ids = ResponseMap.select(:id).where(reviewed_object_id: @id, type: 'ReviewResponseMap')
       @response_ids = Response.select("id").where(["map_id IN (?)", @review_response_map_ids])
       @reviewers = ResponseMap.select(:reviewer_id).distinct
       .where(["reviewed_object_id IN (?) and type = ?", @response_ids, @type])

@@ -1,0 +1,10 @@
+Team_1:
+  id : 1
+  name:  'User1'
+  parent_id : 1
+  type : 'AssignmentTeam'
+Team_2:
+  id : 2
+  name:  'User1'
+  parent_id : 2
+  type : 'AssignmentTeam'

@@ -1,0 +1,15 @@
+User_1:
+  id : 1
+  name : 'User1'
+  crypted_password : 'password'
+  role_id : 1
+User_2:
+  id : 2
+  name : 'User2'
+  crypted_password : 'password1'
+  role_id : 1
+User_3:
+  id : 3
+  name : 'User3'
+  crypted_password : 'password'
+  role_id : 2

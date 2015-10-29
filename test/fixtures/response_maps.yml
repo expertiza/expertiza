@@ -1,0 +1,24 @@
+ResponseMap_1 :
+ id : 1
+ reviewed_object_id : 1
+ reviewer_id : 2
+ reviewee_id : 1
+ type : 'ReviewResponseMap'
+ResponseMap_2 :
+ id : 2
+ reviewed_object_id : 2
+ reviewer_id : 3
+ reviewee_id : 1
+ type : 'FeedbackResponseMap'
+ResponseMap_3 :
+  id : 3
+  reviewed_object_id : 2
+  reviewer_id : 4
+  reviewee_id : 1
+  type : 'MetareviewResponseMap'
+ResponseMap_4 :
+ id : 4
+ reviewed_object_id : 2
+ reviewer_id : 2
+ reviewee_id : 1
+ type : 'ReviewResponseMap'

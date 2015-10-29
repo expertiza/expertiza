@@ -1,0 +1,21 @@
+---
+Questionnaire_1 :
+  id : 1
+  name : 'Sample Questionnaire'
+  instructor_id : 1
+  private : 0
+  min_question_score : 50
+  max_question_score : 100
+  type : 'ReviewQuestionnaire'
+  display_type : 'Some display type'
+  instruction_loc : 'Room 205'
+Questionnaire_2 :
+  id : 2
+  name : 'Sample Questionnaire 2'
+  instructor_id : 1
+  private : 0
+  min_question_score : 85
+  max_question_score : 110
+  type : 'Questionnaire'
+  display_type : 'Some display type'
+  instruction_loc : 'Room 205'

@@ -1,0 +1,33 @@
+Assignment_1 :
+  id : 1
+  name : 'Assignment 1'
+  submitter_count : 5
+  course_id : 1
+  instructor_id : 1
+  private : 0
+  num_reviews : 2
+  num_review_of_reviews : 2
+  num_review_of_reviewers : 3
+  num_reviewers : 3
+  max_team_size : 3
+  num_quiz_questions : 10
+  calculate_penalty : 0
+  is_penalty_calculated  : 0
+  review_questionnaire_id : 1
+  team_assignment : 1
+Assignment_2 :
+  id : 2
+  name : 'Assignment 2'
+  submitter_count : 3
+  course_id : 1
+  instructor_id : 1
+  private : 0
+  num_reviews : 3
+  num_review_of_reviews : 4
+  num_review_of_reviewers : 3
+  num_reviewers : 2
+  max_team_size : 2
+  num_quiz_questions : 5
+  calculate_penalty : 0
+  is_penalty_calculated : 0
+  review_questionnaire_id : 2

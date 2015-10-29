@@ -1,0 +1,12 @@
+---
+Assignment_Questionnaires_1 :
+  id : 1
+  assignment_id : 1
+  questionnaire_id : 1
+  user_id : 1
+  used_in_round : 2
+Assignment_Questionnaires_2 :
+  id : 2
+  assignment_id : 2
+  questionnaire_id : 2
+  user_id : 1

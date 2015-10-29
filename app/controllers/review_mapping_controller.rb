@@ -245,28 +245,6 @@ class ReviewMappingController < ApplicationController
   end
 
 
-  def add_user_to_assignment
-    if params[:contributor_id]
-      assignment = Assignment.find(params[:id])
-    else
-      mapping = ResponseMap.find(params[:id])
-      assignment = mapping.assignment
-    end
-
-    user = User.find(params[:user_id])
-    begin
-      assignment.add_participant(user.name)
-    rescue
-      flash[:error] = $!
-    end
-
-    if params[:contributor_id]
-      redirect_to :action => 'add_reviewer',     :id => params[:id], :user_id => user.id, :contributor_id => params[:contributor_id]
-    else
-      redirect_to :action => 'add_metareviewer', :id => params[:id], :user_id => user.id
-    end
-  end
-
   def delete_outstanding_reviewers
     assignment = Assignment.find(params[:id])
     team = assignment.get_contributor(params[:contributor_id])
@@ -425,10 +403,6 @@ class ReviewMappingController < ApplicationController
   end
 
   def automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num=0, submission_review_num=0)
-    participants_hash = {}
-    participants.each {|participant| participants_hash[participant.id] = 0 }
-    #calculate reviewers for each team
-    num_participants = participants.size
     if student_review_num != 0 and submission_review_num == 0
       num_reviews_per_team = (participants.size * student_review_num * 1.0 / teams.size).round
     elsif student_review_num == 0 and submission_review_num != 0
@@ -439,7 +413,14 @@ class ReviewMappingController < ApplicationController
     if student_review_num >= teams.size
       flash[:error] = 'You cannot set the number of reviews done by each student to be greater than or equal to total number of teams [or “participants” if it is an individual assignment].'
     end
+    assign_reviewers(assignment_id, participants, teams, student_review_num)
+  end
 
+  def assign_reviewers(assignment_id, participants, teams, student_review_num)
+    participants_hash = {}
+    participants.each {|participant| participants_hash[participant.id] = 0 }
+    #calculate reviewers for each team
+    num_participants = participants.size
     iterator = 0
     teams.each do |team|
       temp_array = Array.new

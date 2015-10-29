@@ -51,6 +51,28 @@ class ParticipantsController < ApplicationController
     end
     redirect_to :action => 'list', :id => curr_object.id, :model => params[:model], :authorization => params[:authorization]
   end
+  
+  def add_user_to_assignment
+    if params[:contributor_id]
+      assignment = Assignment.find(params[:id])
+    else
+      mapping = ResponseMap.find(params[:id])
+      assignment = mapping.assignment
+    end
+
+    user = User.find(params[:user_id])
+    begin
+      assignment.add_participant(user.name)
+    rescue
+      flash[:error] = $!
+    end
+
+    if params[:contributor_id]
+      redirect_to :action => 'add_reviewer',     :id => params[:id], :user_id => user.id, :contributor_id => params[:contributor_id]
+    else
+      redirect_to :action => 'add_metareviewer', :id => params[:id], :user_id => user.id
+    end
+  end
 
   def update_authorizations
     permissions = Participant.get_permissions(params[:authorization])

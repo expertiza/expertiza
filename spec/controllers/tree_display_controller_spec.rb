@@ -54,22 +54,15 @@ describe TreeDisplayController do
   #  end
   end
   describe "#list" do
-    before do
-      FactoryGirl.create(:student_role).should be_valid
-      FactoryGirl.create(:instructor_role).should be_valid
-      @student = FactoryGirl.create(:student)
-      puts @student.id
-      FactoryGirl.create(:instructor).should be_valid
+    it "should not redirect to student_task controller if current user is an instructor" do
+      allow(session[:user]).to receive("student?").and_return(false)
+      post "list"
+      response.should_not redirect_to(list_student_task_index_path)
     end
     it "should redirect to student_task controller if current user is a student" do
-      #TreeDisplayController.should_receive(:list)
-      session[:user] = @student
- #     post 'list'
-  #    response.should redirect_to '/student_task/list'
-#      expect(:get => "list").to route_to(:method => "get", :controller => "student_task", :action => "list", :page_name => "list")
- #     expect(:get => "list").to redirect_to(list_student_task_index)
-      post "list"
-      response.code.should == 301
+      allow(session[:user]).to receive("student?").and_return(true)
+       post "list"
+       response.should redirect_to(list_student_task_index_path)
     end
   end
 end

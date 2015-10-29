@@ -76,10 +76,11 @@ class TreeDisplayController < ApplicationController
       # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
     end
       call_function ="get_children_node_ng"
+      #Render JSON of the child nodes
       populate_rows(ch_nodes,call_function)
   end
 
-  def populate_1_row(node)
+  def populate_1_row(node) #return JSON for 1 Node
     tmpObject = {}
     tmpObject["nodeinfo"] = node
     # all the child nodes names got and put in tmpObject from respective controller actions
@@ -111,7 +112,7 @@ class TreeDisplayController < ApplicationController
     tmpObject
   end
 
-  def populate_rows(list,call_function)
+  def populate_rows(list,call_function) #render page with data for all nodes in list
     if call_function == "get_children_node_ng"
       tmpRes ={}
       tmpRes = list
@@ -167,21 +168,14 @@ class TreeDisplayController < ApplicationController
     else
       childNodes = params[:reactParams2][:child_nodes]
     end
-
     res = []
     fnode = eval(params[:reactParams2][:nodeType]).new
     childNodes.each do |key, value|
       fnode[key] = value
     end
-
     ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
-
     call_function = "get_children_node_2_ng"
-
     populate_rows(ch_nodes, call_function)
-
-
-
   end
 
   def bridge_to_is_available
@@ -204,39 +198,4 @@ class TreeDisplayController < ApplicationController
       format.html {render json: res}
     end
   end
-
-  def drill
-    session[:root] = params[:root]
-    redirect_to :controller => 'tree_display', :action => 'list'
-  end
-
-  def filter #This method is not current being called anywhere
-    #Search String - Assignment Name or Course Name
-    search = params[:filter_string]
-    puts search.inspect
-    #Filter Node : QAN - Questionnaire by Assignment Name
-    #              ACN - Assignment By Course Name
-    filter_node = params[:filternode]
-    qid = 'filter+'
-
-    if filter_node == 'QAN'
-      assignment = Assignment.find_by_name(search)
-      if assignment
-        assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment.id)
-        if assignment_questionnaires
-          #Append Questionnaire IDs to qid
-          assignment_questionnaires.each { |q|  qid << "#{q.questionnaire_id.to_s}+" }
-          #Set session[:root] to Questionnaire
-          session[:root] = 1
-        end
-      end
-    elsif filter_node == 'ACN'
-      #Set session[:root] to Course
-      session[:root] = 2
-      # Add Course name to qid
-      qid <<  search
-    end
-    return qid
-  end
-
-  end
+end

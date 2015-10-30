@@ -135,11 +135,11 @@ class AssignmentParticipant < Participant
     scores = {}
     scores[:participant] = self
 
-    assignmentQuestionnaires(questions, scores)
+    assignment_questionnaires(questions, scores)
 
     scores[:total_score] = self.assignment.compute_total_score(scores)
 
-    mergeScores(scores)
+    merge_scores(scores)
 
     # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
     # PS: I don't like the fact that we are doing this here but it is difficult to make it work anywhere else
@@ -166,10 +166,10 @@ class AssignmentParticipant < Participant
     scores[:total_score] = assignment.compute_total_score(scores)
     #scores[:total_score] += compute_quiz_scores(scores)
 
-    calculateScores(scores)
+    calculate_scores(scores)
   end
 
-  def assignmentQuestionnaires(questions, scores)
+  def assignment_questionnaires(questions, scores)
     self.assignment.questionnaires.each do |questionnaire|
       round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(self.assignment.id, questionnaire.id).used_in_round
       #create symbol for "varying rubrics" feature -Yang
@@ -190,7 +190,7 @@ class AssignmentParticipant < Participant
     end
   end
 
-  def mergeScores(scores)
+  def merge_scores(scores)
     #merge scores[review#] (for each round) to score[review]  -Yang
     if self.assignment.varying_rubrics_by_round?
       review_sym = "review".to_sym
@@ -230,7 +230,7 @@ class AssignmentParticipant < Participant
     end
   end
 
-  def calculateScores(scores)
+  def calculate_scores(scores)
     # move lots of calculation from view(_participant.html.erb) to model
     if self.grade
       scores[:total_score] = self.grade
@@ -322,16 +322,12 @@ class AssignmentParticipant < Participant
     MetareviewResponseMap.get_assessments_for(self)
   end
 
-
+# Commenting as we cannot figure out any difference in UI Test
+=begin
   def teammate_reviews
     TeammateReviewResponseMap.get_assessments_for(self)
   end
-
-  def bookmark_reviews
-    BookmarkRatingResponseMap.get_assessments_for(self)
-  end
-
-
+=end
 
   def wiki_submissions
     current_time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s

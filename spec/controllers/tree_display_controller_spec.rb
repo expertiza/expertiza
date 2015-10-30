@@ -60,23 +60,23 @@ describe TreeDisplayController do
     end
 
     it "should receive Author feedbacks and redirect to list" do
-      allow(nil).to receive(:find_by_name).with("Author feedbacks").and_return(nil)
-      get "go_to_menu_items", params1: "Author Feedback"
+      allow(nil).to receive(:find_by_name).with("Author Feedback").and_return(nil)
+      get "go_to_menu_items", params1: "Author feedbacks"
       expect(response).to redirect_to(list_tree_display_index_path)
     end
     it "should receive Global surveys and redirect to list" do
-      allow(nil).to receive(:find_by_name).with("Global surveys").and_return(nil)
-      get "go_to_menu_items", params1: "Global Survey"
+      allow(nil).to receive(:find_by_name).with("Global Survey").and_return(nil)
+      get "go_to_menu_items", params1: "Global surveys"
       expect(response).to redirect_to(list_tree_display_index_path)
     end
     it "should receive Course evaluations and redirect to list" do
-      allow(nil).to receive(:find_by_name).with("Course evaluations").and_return(nil)
-      get "go_to_menu_items", params1: "Course Evaluation"
+      allow(nil).to receive(:find_by_name).with("Course Evaluation").and_return(nil)
+      get "go_to_menu_items", params1: "Course evaluations"
       expect(response).to redirect_to(list_tree_display_index_path)
     end
     it "should receive Surveys and redirect to list" do
-      allow(nil).to receive(:find_by_name).with("Surveys").and_return(nil)
-      get "go_to_menu_items", params1: "Survey"
+      allow(nil).to receive(:find_by_name).with("Survey").and_return(nil)
+      get "go_to_menu_items", params1: "Surveys"
       expect(response).to redirect_to(list_tree_display_index_path)
     end
     it "should redirect to root_url if request parameter is invalid" do
@@ -85,7 +85,12 @@ describe TreeDisplayController do
       expect(response).to redirect_to(root_path)
     end
   end
+  describe "#drill" do
+    it "redirect to list action" do
+      get "drill" , root: 1
+      session[:root].should == "1"
+      expect(response).to redirect_to(list_tree_display_index_path)
+    end
 
-
-
+  end
 end

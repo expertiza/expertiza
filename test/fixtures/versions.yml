@@ -1,7 +1,0 @@
-version_one:
-  item_type: 'Assignment'
-  item_id: 'test_item_id_one'
-  event: 'test_event'
-  whodunnit: 'test_whodunnit'
-  object: 'test_object'
-  created_at: '2015/12/24'

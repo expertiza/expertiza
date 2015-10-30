@@ -1,4 +1,4 @@
-class InvitationController < ApplicationController
+class InvitationsController < ApplicationController
   @@messages = Hash.new
   before_action :check_validity, only: [:create]
   def action_allowed? # user specified only have access to the functionality of the controller

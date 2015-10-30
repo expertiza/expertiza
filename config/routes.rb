@@ -157,7 +157,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :invitation do
+  resources :invitations do
     collection do
       get :cancel
       get :accept

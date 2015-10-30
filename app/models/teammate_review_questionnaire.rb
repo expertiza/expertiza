@@ -9,7 +9,7 @@ class TeammateReviewQuestionnaire < Questionnaire
   end
 
   def get_assessments_for(participant)
-    participant.teammate_reviews()
+    TeammateReviewResponseMap.get_assessments_for(participant)   #participant.teammate_reviews()
   end
 
 

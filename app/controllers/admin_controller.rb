@@ -39,9 +39,9 @@ class AdminController < ApplicationController
   #     end
   #   end
   # end
-  def show
-    redirect_to url_for(:controller => :users, :action => :new)
-  end
+ # def show
+ #   redirect_to url_for(:controller => :users, :action => :new)
+ # end
 
   def list_instructors
     @users = User.
@@ -97,10 +97,36 @@ class AdminController < ApplicationController
       @role = Role.new(:id => nil, :name => '(none)')
     end
   end
+  
+  def show_super_admin
+    @user = User.find(params[:id])
+    if @user.role_id
+      @role = Role.find(@user.role_id)
+    else
+      @role = Role.new(:id => nil, :name => '(none)')
+    end
+  end
+  def show_admin
+    @user = User.find(params[:id])
+    if @user.role_id
+      @role = Role.find(@user.role_id)
+    else
+      @role = Role.new(:id => nil, :name => '(none)')
+    end
+  end
 
   def remove_instructor
     User.find(params[:id]).destroy
     redirect_to :action => 'list_instructors'
+  end
+
+  def remove_administrator
+    User.find(params[:id]).destroy
+    redirect_to :action => 'list_administrators'
+  end
+  def remove_super_administrator
+    User.find(params[:id]).destroy
+    redirect_to :action => 'list_super_administrators'
   end
 
   def save_super_administrator

@@ -9,7 +9,7 @@ class BookmarkRatingQuestionnaire < Questionnaire
   end
 
   def get_assessments_for(participant)
-    participant.bookmark_reviews()
+    BookmarkRatingResponseMap.get_assessments_for(participant) # participant.bookmark_reviews()
   end
 
 

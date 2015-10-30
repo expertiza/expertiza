@@ -37,4 +37,60 @@ describe TreeDisplayController do
     end
   end
 
+  describe "#go_to_menu_items" do
+    before do
+      allow(nil).to receive(:find_by_node_object_id).and_return(nil)
+      allow(nil).to receive(:id).and_return(nil)
+      allow(nil).to receive(:name).and_return(true)
+    end
+    it "should receive Review Rubrics and redirect to list" do
+      allow(nil).to receive(:find_by_name).with("Review").and_return(nil)
+        get "go_to_menu_items", params1: "Review Rubrics"
+        expect(response).to redirect_to(list_tree_display_index_path)
+    end
+    it "should receive Teammate review rubrics and redirect to list" do
+      allow(nil).to receive(:find_by_name).with("Teammate review").and_return(nil)
+      get "go_to_menu_items", params1: "Teammate review rubrics"
+      expect(response).to redirect_to(list_tree_display_index_path)
+    end
+    it "should receive Metareview rubrics and redirect to list" do
+      allow(nil).to receive(:find_by_name).with("Metareview").and_return(nil)
+      get "go_to_menu_items", params1: "Metareview rubrics"
+      expect(response).to redirect_to(list_tree_display_index_path)
+    end
+
+    it "should receive Author feedbacks and redirect to list" do
+      allow(nil).to receive(:find_by_name).with("Author Feedback").and_return(nil)
+      get "go_to_menu_items", params1: "Author feedbacks"
+      expect(response).to redirect_to(list_tree_display_index_path)
+    end
+    it "should receive Global surveys and redirect to list" do
+      allow(nil).to receive(:find_by_name).with("Global Survey").and_return(nil)
+      get "go_to_menu_items", params1: "Global surveys"
+      expect(response).to redirect_to(list_tree_display_index_path)
+    end
+    it "should receive Course evaluations and redirect to list" do
+      allow(nil).to receive(:find_by_name).with("Course Evaluation").and_return(nil)
+      get "go_to_menu_items", params1: "Course evaluations"
+      expect(response).to redirect_to(list_tree_display_index_path)
+    end
+    it "should receive Surveys and redirect to list" do
+      allow(nil).to receive(:find_by_name).with("Survey").and_return(nil)
+      get "go_to_menu_items", params1: "Surveys"
+      expect(response).to redirect_to(list_tree_display_index_path)
+    end
+    it "should redirect to root_url if request parameter is invalid" do
+      allow(nil).to receive(:find_by_name).with(nil).and_return(nil)
+      get "go_to_menu_items"
+      expect(response).to redirect_to(root_path)
+    end
+  end
+  describe "#drill" do
+    it "redirect to list action" do
+      get "drill" , root: 1
+      session[:root].should == "1"
+      expect(response).to redirect_to(list_tree_display_index_path)
+    end
+
+  end
 end

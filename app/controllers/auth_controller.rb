@@ -33,7 +33,6 @@ class AuthController < ApplicationController
   def after_login (user)
     session[:user] = user
     AuthController.set_current_role(user.role_id, session)
-    puts "ASL:" + AuthHelper::get_home_controller(session[:user])
     redirect_to :controller => AuthHelper::get_home_controller(session[:user]),
                 :action => AuthHelper::get_home_action(session[:user])
   end

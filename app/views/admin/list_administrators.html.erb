@@ -4,7 +4,7 @@
   <tr><th>Name</th><th></th><th>Full name</th><th></th><th>E-mail address</th><th></th><th>Parent</th><th></th></tr>
   <% for user in @users %>
     <tr>
-      <td><%= link_to user.name, :action => 'show',
+      <td><%= link_to user.name, :action => 'show_admin',
         :id => user.id %></td><td> </td>
       <td><%= user.fullname %></td><td> </td>
       <td><%= user.email %></td><td> </td>

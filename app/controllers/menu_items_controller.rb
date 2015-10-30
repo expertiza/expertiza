@@ -153,8 +153,9 @@ end
 def link
   str = params[:name]
   node = session[:menu].select(str)
-  if node # if nodes are Questionnaires, Courses, Assignments and Questionnaires child nodes
+  if node
     if node.id == 38   || node.id == 39 || node.id == 40  || node.id == 41 || node.id == 42 || node.id ==43 || node.id == 44 || node.id == 45 || node.id == 48 || node.id == 49
+      # if nodes are Questionnaires, Courses, Assignments and Questionnaires child nodes
       redirect_to :controller => 'tree_display', :action => 'go_to_menu_items', :params1 => node.label
     else
       redirect_to node.url

@@ -5,8 +5,6 @@ class TreeDisplayController < ApplicationController
     true
   end
 
-
-
   def goto_bookmarkrating_rubrics
     node_object = TreeFolder.find_by_name('Bookmarkrating')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
@@ -49,6 +47,7 @@ class TreeDisplayController < ApplicationController
       redirect_to "/"
     end
  end
+
   # called when the display is requested
   # ajbudlon, July 3rd 2008
   def list
@@ -202,5 +201,10 @@ class TreeDisplayController < ApplicationController
     respond_to do |format|
       format.html {render json: res}
     end
+  end
+
+  def drill
+    session[:root] = params[:root]
+    redirect_to :controller => 'tree_display', :action => 'list'
   end
 end

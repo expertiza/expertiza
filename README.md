@@ -19,8 +19,23 @@ And login as any of the users. All the default passwords are 'password'. You may
 
 Code improved were based on the criteria given as a requirement as well as a few suggestions and changes from CodeClimate.
 
+Manual Testing Steps:
 
+In order to test the changes made to the ReviewResponseMap, bring up Expertiza and log in as an administrator.  Once logged in, proceed with the following steps:
 
+1.	Create at least three users to perform the tests.
+2.	Create an assignment for only the users you just created.  Ensure that the assignment is only available for your new users.  It’s important to follow this step exactly so that you will not confuse your new users with the preexisting users.
+3.	Sign out.
+4.	Log in to Expertiza as User1 and submit the assignment.
+5.	Open two new Chrome Incognito windows and log in as the other two users and select that submission for review.  It’s best to keep these in multiple incognito tabs so that you won’t have to log out and log back in as another user during each step.
+6.	Check from User1’s “Your scores” page whether the page is loading correctly prior to the reviews being performed.
+7.	Review the assignment from User2’s login.
+8.	Ensure that reviews show up on User1’s page.
+9.	Repeat steps 6 and 7 for User3.
+10.	While logged in as User1, give feedback to User2 and User3.
+11.	Change the deadline so that you are able to switch into the “Metareview Phase”.
+12.	Repeat the above steps.
+13.	Perform the review as User2 (or User3) and ensure that the metareviews are correctly displayed on User1’s page.
 
 
 Expertiza

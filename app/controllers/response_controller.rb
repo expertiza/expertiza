@@ -4,39 +4,28 @@ class ResponseController < ApplicationController
   helper :file
 
   def action_allowed?
-  case params[:action]
-  when 'view','edit','delete','update'
-    response = Response.find(params[:id])
-     if response.map.read_attribute(:type) == 'FeedbackResponseMap' && response.map.assignment.team_assignment?
-      team = response.map.reviewer.team
-      unless team.has_user session[:user]
-        redirect_to '/denied?reason=You are not on the team that wrote this feedback'
-      else
-        return false
+    case params[:action]
+    when 'view','edit','delete','update'
+      response = Response.find(params[:id])
+       if response.map.read_attribute(:type) == 'FeedbackResponseMap' && response.map.assignment.team_assignment?
+        team = response.map.reviewer.team
+        unless team.has_user session[:user]
+          redirect_to '/denied?reason=You are not on the team that wrote this feedback'
+        else
+          return false
+        end
+        response.map.read_attribute(:type)
       end
-      response.map.read_attribute(:type)
-    end
-    current_user_id?(response.map.reviewer.user_id)
-  else
-    current_user   
-  end
-end
-    
-
-
-  def allresponses
-    #get all previous versions of responses for the response map.
-    @review_scores=Array.new
-    @prev=Response.where(map_id: @map.id)
-    for element in @prev
-      @review_scores << element
+      current_user_id?(response.map.reviewer.user_id)
+    else
+      current_user
     end
   end
 
   def scores
-    @review_scores = []
+    @review_ = []
     @questions.each do |question|
-      @review_scores << Answer.where(
+      @review_ << Answer.where(
           response_id: @response.id,
           question_id:  question.id
         ).first
@@ -61,20 +50,12 @@ end
     @next_action = "update"
     @return = params[:return]
     @response = Response.find(params[:id])
-    
+
 
     @map = @response.map
     @contributor = @map.contributor
     array_not_empty=0
-    @review_scores=Array.new
-    @prev=Response.all
-
-    for element in @prev
-      if (element.map_id==@map.map_id)
-        array_not_empty=1
-        @review_scores << element
-      end
-    end
+    set_all_responses
     if @prev.present?
       @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
       @largest_version_num=@sorted[0]
@@ -82,22 +63,26 @@ end
 
     @modified_object = @response.response_id
 
-    content
-    @review_scores = Array.new
+    # set more handy variables for the view
+    set_content
+
+    @review_ = Array.new
+
     @questions.each do |question|
-      @review_scores << Answer.where(response_id: @response.response_id, question_id:  question.id).first
+      @review_ << Answer.where(response_id: @response.response_id, question_id:  question.id).first
     end
     render :action => 'response'
   end
 
   #Update the response and answers when student "edit" existing response
   def update
-    @response = Response.find(params[:id])
     return if action_allowed?
-    @myid = @response.response_id
+
+    # the response to be updated
+    @response = Response.find(params[:id])
+
     msg = ""
     begin
-      @myid = @response.id
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
       if @map.type=="ReviewResponseMap" && @response.round
@@ -107,9 +92,8 @@ end
       else
         @questionnaire = @map.questionnaire
       end
-       questions=sortquestions(@questionnaire)
-       createanswers(params,questions)
-        
+       questions=sort_questions(@questionnaire.questions)
+       create_answers(params,questions)
     rescue
       msg = "Your response was not saved. Cause:189 #{$!}"
     end
@@ -124,7 +108,9 @@ end
     @return = params[:return]
     @modified_object = @map.id
 
-    content(true)
+    # set more handy variables for the view
+    set_content(true)
+
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
     render :action => 'response'
   end
@@ -148,60 +134,34 @@ end
   def view
     @response = Response.find(params[:id])
     @map = @response.map
-    content
-    scores
-  end
+    set_content
 
- def sortquestions(questionnaire)
-     questions = questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
   end
-
-  def createanswers(params,questions)
-     #create score if it is not found. If it is found update it otherwise update it
-    params[:responses].each_pair do |k, v|
-        score = Answer.where(response_id: @response.id, question_id:  questions[k.to_i].id).first
-        unless score
-          score = Answer.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :answer => v[:score], :comments => v[:comment])
-        end
-        score.update_attribute('answer', v[:score])
-        score.update_attribute('comments', v[:comment])     
-      end
-end
 
   def create
     @map = ResponseMap.find(params[:id]) #assignment/review/metareview id is in params id
-    @res = 0
+
     msg = ""
     error_msg = ""
-    allresponses
-    @review_scores=Array.new
-    @prev=Response.where(map_id: @map.id)
-    for element in @prev
-      @review_scores << element
-    end
+
+    set_all_responses
 
     #to save the response for ReviewResponseMap, a questionnaire_id is wrapped in the params
     if params[:review][:questionnaire_id]
       @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
-    end
-
-    #to save the response for ReviewResponseMap, a questionnaire_id is wrapped in the params
-    if params[:review][:questionnaire_id]
       @round = params[:review][:round]
     else
       @round=nil
     end
 
+    # create the response
     @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:round => @round)#,:version_num=>@version)
 
-    @res = @response.response_id
-
     #Change the order for displaying questions for editing response views.
-    questions=sortquestions(@questionnaire)
+    questions=sort_questions(@questionnaire.questions)
 
     if params[:responses]
-       createanswers(params,questions)
-       
+       create_answers(params, questions)
     end
 
     #@map.save
@@ -223,7 +183,7 @@ end
 
     @map = Response.find_by_map_id(params[:id])
     if params[:return] == "feedback"
-      redirect_to :controller => 'grades', :action => 'view_my_scores', :id => @map.reviewer.id
+      redirect_to :controller => 'grades', :action => 'view_my_', :id => @map.reviewer.id
     elsif params[:return] == "teammate"
       redirect_to view_student_teams_path student_id: @map.reviewer.id
     elsif params[:return] == "instructor"
@@ -240,34 +200,87 @@ end
   # e.g. student click "Begin" or "Update" to start filling out a rubric for others' work
   #if false: we figure out which questionnaire to display base on @response object
   # e.g. student click "Edit" or "View"
-  def content(new_response=false)
+  def set_content(new_response=false)
+
+    # handy reference to response title for view
     @title = @map.get_title
+
+    # handy reference to response assignment for ???
     @assignment = @map.assignment
+
+    # handy reference to the reviewer for ???
     @participant = @map.reviewer
-    @contributor = @map.contributor #contributor should always be a Team object
 
+    # handy reference to the contributor (should always be a Team)
+    @contributor = @map.contributor
 
-    if @map.type=="ReviewResponseMap" && new_response #checking wether map is an instance of review responsemap and new response
+    # set a handy reference to the response questionnaire for the view
+    if new_response then set_questionnaire_for_new_response else set_questionnaire end
+
+    # set a handy reference to the dropdown_or_scale property to be used in the view
+    set_dropdown_or_scale
+
+    # set a handy reference to the response questionnaire's questions
+    # sorted in a special way for the view
+    @questions = sort_questions(@questionnaire.questions)
+
+    # set a handy refence to the min/max question  for the view
+    @min = @questionnaire.min_question_score
+    @max = @questionnaire.max_question_score
+
+  end
+
+  def set_questionnaire_for_new_response
+    case @map.type
+    when "ReviewResponseMap"
       reviewees_topic=SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.get_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
-
-    elsif @map.type="MetareviewResponseMap" && new_response  # checking weather it is instance of metareviewresponse map and new response
+    when "MetareviewResponseMap"
       @questionnaire = @map.questionnaire
     else
-      answer = @response.scores.first # if user is not filling a new rubric, the @response object should be available. we can find the questionnaire from the question_id in answers
-
-      @questionnaire =@response.questionnaire_by_answer(answer)
+      # This is most likely an error, but I'm keeping it here in case
+      # someone was relying on this side effect
+      set_questionnaire
     end
-
-    use_dropdown = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: @questionnaire.id).first.dropdown
-    use_dropdown == true ? @dropdown_or_scale = 'dropdown' : @dropdown_or_scale = 'scale'
-
-    @questions=sortquestions(@questionnaire)
-    @min = @questionnaire.min_question_score
-    @max = @questionnaire.max_question_score
   end
 
- 
+  def set_questionnaire
+    # if user is not filling a new rubric, the @response object should be available.
+    # we can find the questionnaire from the question_id in answers
+    answer = @response.scores.first
+    @questionnaire =@response.questionnaire_by_answer(answer)
+  end
+
+  def set_dropdown_or_scale
+    use_dropdown = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: @questionnaire.id).first.dropdown
+    use_dropdown == true ? @dropdown_or_scale = 'dropdown' : @dropdown_or_scale = 'scale'
+  end
+
+  def sort_questions(questions)
+      questions.sort { |a,b| a.seq <=> b.seq }
+  end
+
+  def create_answers(params, questions)
+     #create score if it is not found. If it is found update it otherwise update it
+    params[:responses].each_pair do |k, v|
+        score = Answer.where(response_id: @response.id, question_id:  questions[k.to_i].id).first
+        unless score
+          score = Answer.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :answer => v[:score], :comments => v[:comment])
+        end
+        score.update_attribute('answer', v[:score])
+        score.update_attribute('comments', v[:comment])
+      end
+  end
+
+  def set_all_responses
+    # get all previous versions of responses for the response map.
+    # I guess if we're in the middle of creating a new response, this would be
+    # all 'previous' responses to this new one (which is not yet saved)?
+    @prev=Response.where(map_id: @map.id)
+    # not sure what this is about
+    @review_scores=@prev.to_a
+  end
+
 
 end

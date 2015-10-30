@@ -34,7 +34,6 @@ describe "#has_teams?" do
     assign_team = FactoryGirl.create(:assignmentTeam)
     assign.teams << assign_team
     assign.save!
-    # puts assign.teams.name.to_yaml
     res = assign.has_teams?
     expect(res).to be true
   end
@@ -86,9 +85,7 @@ end
 describe "#is_coding_assignment?" do
   it "checks assignment should be coding assignment" do
     assign = FactoryGirl.create(:assignment).should be_valid
-    #res = assign.is_coding_assignment?
-    #expect(res).to be true
-  end
+   end
 end
 
 describe "#candidate_assignment_teams_to_review" do

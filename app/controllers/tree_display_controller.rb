@@ -71,8 +71,8 @@ class TreeDisplayController < ApplicationController
     for node in childNodes
       # Declaring Foldernode Object as New
       fnode = eval(params[:reactParams][:nodeType]).new
-      for a in node
-        fnode[a[0]] = a[1]
+      node.each do |key, value|
+        fnode[key] = value
       end
       # fnode is the parent node
       # ch_nodes are childrens

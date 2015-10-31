@@ -28,9 +28,7 @@ gem 'hoptoad_notifier'
 gem 'jquery-rails'
 gem 'jquery-ui-sass-rails'
 gem 'jquery-datetimepicker-rails'
-group :development do
-  gem 'mysql2', '~> 0.3.18'
-end
+gem 'mysql2' , '~>0.3.18'
 gem 'nokogiri'
 gem 'omniauth-google-oauth2', '~> 0.2.6'
 gem 'open-uri-cached'
@@ -56,9 +54,7 @@ gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
-group :production do
-gem 'pg'
-end
+
 group :development do
   gem 'daemons'
   gem 'pry'

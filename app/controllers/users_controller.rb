@@ -71,7 +71,7 @@ class UsersController < ApplicationController
     # Get the users list to show on current page
     @users = paginate_list all_users
 
-    @letters = ('A'..'Z').to_a
+      @letters = ('A'..'Z').to_a
   end
 
     def show_selection

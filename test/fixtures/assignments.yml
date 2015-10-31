@@ -13,8 +13,8 @@ Assignment_1 :
   num_quiz_questions : 10
   calculate_penalty : 0
   is_penalty_calculated  : 0
-  review_questionnaire_id : 1
-  team_assignment : 1
+  review_questionnaire_id : 2
+  rounds_of_reviews: 2
 Assignment_2 :
   id : 2
   name : 'Assignment 2'

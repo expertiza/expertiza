@@ -1,0 +1,5 @@
+test:
+  adapter: mysql
+  database: expertiza_test
+  username: root
+  password: password

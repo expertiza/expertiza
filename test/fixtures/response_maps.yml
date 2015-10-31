@@ -19,6 +19,6 @@ ResponseMap_3 :
 ResponseMap_4 :
  id : 4
  reviewed_object_id : 2
- reviewer_id : 2
- reviewee_id : 1
+ reviewer_id : 1
+ reviewee_id : 2
  type : 'ReviewResponseMap'

@@ -231,7 +231,7 @@ describe "SuggestionController" do
       visit "/assignments/711/edit#tabs-2"
       expect(page).to have_no_content("<br/><b>Writing assignment 1a_Team1</b><br/>student5404 student5731 <br/>")
       expect(page).to have_content("Writing assignment 1a_Team5 student5740 student5704")
-      expect(page).to have_content("S1 Violet and Zoe Writing assignment 1a_Team1 student5404 student5731")
+      expect(page).to have_content("Violet and Zoe Writing assignment 1a_Team1 student5404 student5731")
     end
   end
   
@@ -247,6 +247,7 @@ describe "SuggestionController" do
       visit '/suggestion/new?id=711'
       fill_in 'suggestion_title',  with: 'test title'
       fill_in 'suggestion_description',  with: 'test description'
+      select 'No', from: "suggestion_signup_preference"
       click_button "Submit"
   
       click_link "Logout"
@@ -290,7 +291,7 @@ describe "SuggestionController" do
       # check if team1 is has not enrolled
       visit "/assignments/711/edit#tabs-2"
       expect(page).to have_content("Amazon S3 and Rails Writing assignment 1a_Team1 student5404 student5731")
-      expect(page).to have_content("test title")
+      expect(page).to have_content("test title No choosers.")
     end
   end
 

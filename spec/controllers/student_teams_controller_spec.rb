@@ -3,6 +3,8 @@ require 'rails_helper'
 include LogInHelper
 
 describe StudentTeamsController do
+  let (:student_teams_controller) {StudentTeamsController.new}
+  let(:student) {double "user1"}
   before :each do
     instructor.save
     user1.save
@@ -50,6 +52,8 @@ describe StudentTeamsController do
     @participant4=Participant.new({:user_id=>@testuser4.id,:parent_id=>@assignment.id})
     @participant4.save
 
+    @assignment_participant=AssignmentParticipant.new({:user_id=>@testuser1.id, :parent_id=>@assignment.id})
+    @assignment_participant.save
     @team1=Team.new({:name=>"team1",:parent_id=>@assignment.id});
     @team1.save
     @team1_user1=TeamsUser.new({:team_id=>@team1.id,:user_id=>@testuser1.id})
@@ -69,15 +73,19 @@ describe StudentTeamsController do
 
     @sign_up_team2=SignedUpTeam.new({:topic_id=>@topic1.id,:team_id=>@team2.id,:is_waitlisted=>true})
     @sign_up_team2.save
-
-
-    ApplicationController.any_instance.stub(:current_role_name).and_return('User1')
-    ApplicationController.any_instance.stub(:undo_link).and_return(TRUE)
   end
     
     it "should check if the last person leaves the team then topic is transferred to next team" do
-    	delete :remove_participant, team_id: @team1.id, student: {id: @team1_user1.id, user_id: @team1_user1.id}
-      @sign_up_team2.is_waitlisted.should eql false
+      AssignmentParticipant.should_receive(:find).with('1').and_return student
+      student_teams_controller.stub(:current_user_id?)
+      student_teams_controller.stub(:params).and_return({student_id: '1'})
+      student.stub(:user_id)
+      student.stub(:id)
+      student.stub(:parent_id)
+      #manually working
+      delete :remove_participant,{ team_id: @team1.id, student: {:id=>@team1_user1.id, :user_id=>@team1_user1.id, :parent_id=>@assignment.id}}
+      SignedUpTeam.where(team_id: @team2.id, topic_id: @topic1.id).first.is_waitlisted.should eql false
+
     end
     
 end

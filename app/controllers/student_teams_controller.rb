@@ -114,8 +114,6 @@ class StudentTeamsController < ApplicationController
 
   def remove_participant
     #remove the record from teams_users table
-    
-    
     team_user = TeamsUser.where(team_id: params[:team_id], user_id: student.user_id)
 
     if team_user

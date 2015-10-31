@@ -316,6 +316,17 @@ class GradesController < ApplicationController
           @total_penalty = l_policy.max_penalty
         end
         if calculate_for_participants								#Refactored#Removed appending "==true"
+          calculate_penatly_attributes(@participant) #Refactored#Removed
+        end
+      end
+      assign_all_penalties(@participant)
+    end
+    unless @assignment.is_penalty_calculated      #Refactored#Removed
+      @assignment.update_attribute(:is_penalty_calculated, true)
+    end
+  end
+
+def calculate_penatly_attributes(participant)
           penalty_attr1 = {:deadline_type_id => 1,:participant_id => @participant.id, :penalty_points => penalties[:submission]}
           CalculatedPenalty.create(penalty_attr1)
 
@@ -324,18 +335,17 @@ class GradesController < ApplicationController
 
           penalty_attr3 = {:deadline_type_id => 5,:participant_id => @participant.id, :penalty_points => penalties[:meta_review]}
           CalculatedPenalty.create(penalty_attr3)
-        end
-      end
+end        
+
+
+def assign_all_penalties(participant)
       @all_penalties[participant.id] = {}
       @all_penalties[participant.id][:submission] = penalties[:submission]
       @all_penalties[participant.id][:review] = penalties[:review]
       @all_penalties[participant.id][:meta_review] = penalties[:meta_review]
       @all_penalties[participant.id][:total_penalty] = @total_penalty
-    end
-    unless @assignment.is_penalty_calculated
-      @assignment.update_attribute(:is_penalty_calculated, true)
-    end
-  end
+end
+
 
   def make_chart()
     @grades_bar_charts = {}

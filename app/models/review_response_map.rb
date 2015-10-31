@@ -40,7 +40,7 @@ class ReviewResponseMap < ResponseMap
 	
 	 # options parameter used as a signature in other models
 	 def self.export(csv, parent_id, options)
-	 	mappings = where(reviewed_object_id: parent_id)
+	 	 mappings = where(reviewed_object_id: parent_id)
 		 mappings.sort! { |a, b| a.reviewee.name <=> b.reviewee.name }
 		 mappings.each do
 			 |map|
@@ -131,7 +131,9 @@ class ReviewResponseMap < ResponseMap
 	 	maps = ReviewResponseMap.where(reviewer_id: reviewer_id)
 		 assignment = Assignment.find(Participant.find(reviewer_id).parent_id)
 		 review_final_versions = {}
+		symbol = nil
 		 unless assignment.varying_rubrics_by_round?
+			rounds_num = 'None'
 			 #same review rubric used in multiple rounds
 			 review_final_versions =	 review_final_version_responses(:review, :questionnaire_id, assignment, maps)
 		 else
@@ -208,12 +210,12 @@ class ReviewResponseMap < ResponseMap
 	 end
 	
 	 # Compute list of responses and return it
-	 def review_final_version_responses(symbol, questionnaire_id,
-	 	assignment, maps, round = nil)
+	 def self.review_final_version_responses(symbol, questionnaire_id,assignment, maps, round = nil)
 		 review_final_versions = {}
 		 review_final_versions[symbol] = {}
 		 review_final_versions[symbol][questionnaire_id] = assignment.get_review_questionnaire_id(round)
 		 response_ids = []
+responses = nil
 		 maps.each do |map|
 			 if round.nil?
 				 responses = Response.where(map_id: map.id)

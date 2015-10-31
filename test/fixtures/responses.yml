@@ -2,11 +2,13 @@ Response_1 :
   id :  1
   map_id : 1
   additional_comment : 'Some additional comment'
+  round : 2
 Response_2 :
   id : 2
   map_id : 1
   additional_comment : 'Some additional other comment'
 Response_3 :
   id : 3
-  map_id : 1
+  map_id : 4
   additional_comment : 'Some additional comment'
+  round : 2

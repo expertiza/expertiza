@@ -71,12 +71,12 @@ describe StudentTeamsController do
     @sign_up_team2.save
 
 
-    ApplicationController.any_instance.stub(:current_role_name).and_return('user1')
+    ApplicationController.any_instance.stub(:current_role_name).and_return('User1')
     ApplicationController.any_instance.stub(:undo_link).and_return(TRUE)
   end
     
     it "should check if the last person leaves the team then topic is transferred to next team" do
-    	post :remove_participant, team_id:@team1.id,student: {id: @team1_user1.id}
+    	delete :remove_participant, team_id: @team1.id, student: {id: @team1_user1.id, user_id: @team1_user1.id}
       @sign_up_team2.is_waitlisted.should eql false
     end
     

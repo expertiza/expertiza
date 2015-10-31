@@ -73,8 +73,8 @@ describe TeamsController do
 
     it "should check if next wailisted team got the topic" do
         ApplicationController.any_instance.stub(:current_role_name).and_return('Instructor')
-        ApplicationController.any_instance.stub(:undo_link).and_return(TRUE)  
-        @sign_up_team2.is_waitlisted.should eql false
+        ApplicationController.any_instance.stub(:undo_link).and_return(TRUE)   
+        SignedUpTeam.where(team_id: @team2.id, topic_id: @topic1.id).first.is_waitlisted.should eql false
     end
 
 end

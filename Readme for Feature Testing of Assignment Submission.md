@@ -23,15 +23,15 @@ The goal is to test these steps using rspec and capybara.
 To run the feature test, follow the steps
 * Clone this repository
 * Make sure to run bundle install and rake db:migrate
-* First run the assignment_creation.rb to create the assignments
+* First run following command, in the root directory of the application, to create the assignments
 ```
 $ rspec spec/features/assignment_creation.rb
 ```
-* Then run the student_assignment_submission_spec.rb file to run the feature tests
+* Then run this command, in the root directory of the application, to run the feature tests
 ```
 $ rspec spec/features/student_submission_spec.rb
 ```
 
 ## Attribution
 This repository was constructed by [Shrenuj Gandhi](https://github.com/shrenujgandhi), [Kunal Bhandari](https://github.com/kunalb6), [Bharghav Jhaveri](
-https://github.com/BhargavJhaveri) under the guidance of Yatish Mehta. Thanks to [Abhishek Lingwal](https://github.com/imabhishekl) and [Glen Menezes](https://github.com/gmeneze)for their contribution in generating assignments using capybara script.
+https://github.com/BhargavJhaveri) under the guidance of Yatish Mehta. Thanks to [Abhishek Lingwal](https://github.com/imabhishekl) and [Glen Menezes](https://github.com/gmeneze) for their contribution in generating assignments using capybara script.

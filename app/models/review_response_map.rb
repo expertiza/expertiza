@@ -53,6 +53,7 @@ class ReviewResponseMap < ResponseMap
 	 		raise ArgumentError, 'Not enough items'
 	 	end
 	 	assignment = find_assignment(id)
+		assignment_nil?(assignment, id)
 	 	index = 1
 		 while index < row.length
 			 user = User.find_by_name(row[index].to_s.strip)
@@ -146,7 +147,15 @@ class ReviewResponseMap < ResponseMap
 	
 	 
 	private
-	
+
+	 # Check for if assignment value is null
+	 def assignment_nil?(assignment, id)
+		 if assignment.nil?
+			 raise ImportError,
+						 "The assignment with id \"#{id}\" was not found.
+               <a href='/assignment/new'>Create</a> this assignment?"
+		 end
+	 end
 
 	 # Check for if user value for reviewer is null
 	 def self.reviewer_user_nil(user, row, index)

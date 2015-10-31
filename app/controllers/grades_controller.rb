@@ -6,17 +6,17 @@ class GradesController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'view_my_scores'
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator',
-       'Student'].include? current_role_name and are_needed_authorizations_present?
-    else
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator'].include? current_role_name
+      when 'view_my_scores'
+        ['Instructor',
+         'Teaching Assistant',
+         'Administrator',
+         'Super-Administrator',
+         'Student'].include? current_role_name && are_needed_authorizations_present?			#Refactored &&
+      else
+        ['Instructor',
+         'Teaching Assistant',
+         'Administrator',
+         'Super-Administrator'].include? current_role_name
     end
   end
 
@@ -31,7 +31,7 @@ class GradesController < ApplicationController
 
     if @assignment.varying_rubrics_by_round?
       questionnaires.each {
-        |questionnaire|
+          |questionnaire|
         round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
         if(round!=nil)
           questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
@@ -42,7 +42,7 @@ class GradesController < ApplicationController
       }
     else      #if this assignment does not have "varying rubric by rounds" feature
       questionnaires.each {
-        |questionnaire|
+          |questionnaire|
         @questions[questionnaire.symbol] = questionnaire.questions
       }
     end
@@ -81,12 +81,19 @@ class GradesController < ApplicationController
   def edit
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
-    @questions = Hash.new
-    questionnaires = @assignment.questionnaires
-    questionnaires.each {
-      |questionnaire|
-      @questions[questionnaire.symbol] = questionnaire.questions
-    }
+
+    ##################################################################################
+    #	@questions = Hash.new
+    #    questionnaires = assignment.questionnaires
+    #    questionnaires.each {
+    #        |questionnaire|
+    #      @questions[questionnaire.symbol] = questionnaire.questions
+    #    }
+    ##################################################################################
+    #Refactored--> Replaced with a methood call
+
+    list_questions (@assignment)
+    #################################################################################
 
     @scores = @participant.scores(@questions)
   end
@@ -136,20 +143,30 @@ class GradesController < ApplicationController
     body_text["##[assignment_name]"] = assignment.name
 
     Mailer.sync_message(
-      {:recipients => email_form[:recipients],
-       :subject => email_form[:subject],
-       :from => email_form[:from],
-       :body => {
-         :body_text => body_text,
-         :partial_name => "grading_conflict"
-       }
-       }
+        {:recipients => email_form[:recipients],
+         :subject => email_form[:subject],
+         :from => email_form[:from],
+         :body => {
+             :body_text => body_text,
+             :partial_name => "grading_conflict"
+         }
+        }
     ).deliver
 
     flash[:notice] = "Your email to " + email_form[:recipients] + " has been sent. If you would like to send an email to another student please do so now, otherwise click Back"
     redirect_to :action => 'conflict_email_form',
-      :assignment => email_form[:assignment],
-      :author => email_form[:author]
+                :assignment => email_form[:assignment],
+                :author => email_form[:author]
+  end
+
+  #Refactored #Created a method which was a duplicate in conflict_notification and edit methods
+  def list_questions (assignment)
+    @questions = Hash.new
+    questionnaires = assignment.questionnaires
+    questionnaires.each {
+        |questionnaire|
+      @questions[questionnaire.symbol] = questionnaire.questions
+    }
   end
 
   # the grading conflict email form provides the instructor a way of emailing
@@ -163,14 +180,18 @@ class GradesController < ApplicationController
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = Assignment.find(@participant.parent_id)
 
+    ##################################################################################
+    #	@questions = Hash.new
+    #    questionnaires = assignment.questionnaires
+    #    questionnaires.each {
+    #        |questionnaire|
+    #      @questions[questionnaire.symbol] = questionnaire.questions
+    #    }
+    ##################################################################################
+    #Refactored--> Replaced with a methood call
 
-    @questions = Hash.new
-    questionnaires = @assignment.questionnaires
-    questionnaires.each {
-      |questionnaire|
-      @questions[questionnaire.symbol] = questionnaire.questions
-    }
-
+    list_questions (@assignment)
+    #################################################################################
     @reviewers_email_hash = Hash.new
 
     @caction = "view"
@@ -218,7 +239,7 @@ class GradesController < ApplicationController
     @rowlabel = rowlabel
     @reviews = responses
     @reviews.each {
-      |response|
+        |response|
       user = response.map.reviewer.user
       @reviewers_email_hash[user.fullname.to_s+" <"+user.email.to_s+">"] = user.email.to_s
     }
@@ -272,22 +293,29 @@ class GradesController < ApplicationController
     Participant.where(parent_id: assignment_id).each do |participant|
       penalties = calculate_penalty(participant.id)
       @total_penalty = 0
-      if(penalties[:submission] != 0 || penalties[:review] != 0 || penalties[:meta_review] != 0)
-        unless penalties[:submission]
-          penalties[:submission] = 0
-        end
-        unless penalties[:review]
-          penalties[:review] = 0
-        end
-        unless penalties[:meta_review]
-          penalties[:meta_review] = 0
-        end
+      #############################################################################################
+      # if(penalties[:submission] != 0 || penalties[:review] != 0 || penalties[:meta_review] != 0)
+      #  unless penalties[:submission]
+      #     penalties[:submission] = 0
+      #    end
+      #    unless penalties[:review]
+      #      penalties[:review] = 0
+      #    end
+      #    unless penalties[:meta_review]
+      #      penalties[:meta_review] = 0
+      #    end
+      #################################################################################################
+      #  Refactor this to==>
+
+      unless(penalties[:submission].zero? || penalties[:review].zero? || penalties[:meta_review].zero? )
+
+        ####################################################################################################
         @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
         l_policy = LatePolicy.find(@assignment.late_policy_id)
         if(@total_penalty > l_policy.max_penalty)
           @total_penalty = l_policy.max_penalty
         end
-        if calculate_for_participants == true
+        if calculate_for_participants								#Refactored#Removed appending "==true"
           penalty_attr1 = {:deadline_type_id => 1,:participant_id => @participant.id, :penalty_points => penalties[:submission]}
           CalculatedPenalty.create(penalty_attr1)
 
@@ -370,7 +398,7 @@ class GradesController < ApplicationController
       bc.stacked = false
       bc.width_spacing_options({:bar_width => (width-30)/(data.size+1),:bar_spacing => 1, :group_spacing => spacing })
       bc.data_encoding = :extended
-      link = (bc.to_url)  
+      link = (bc.to_url)
     end
     link
   end
@@ -402,7 +430,7 @@ class GradesController < ApplicationController
   def are_needed_authorizations_present?
     @participant = Participant.find(params[:id])
     authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
-    if authorization == 'reader' or authorization == 'reviewer'
+    if authorization == 'reader' || authorization == 'reviewer'							#Refactored ||
       return false
     else
       return true

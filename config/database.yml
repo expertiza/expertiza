@@ -1,11 +1,9 @@
 development:
   adapter: mysql2
-  encoding: utf8
-  database: <%= ENV['RDS_DB_NAME'] %>
-  username: <%= ENV['RDS_USERNAME'] %>
-  password: <%= ENV['RDS_PASSWORD'] %>
-  host: <%= ENV['RDS_USERNAME'] %>
-  port: <%= ENV['RDS_PORT'] %>
+  database: expertiza_development
+  username: viveksubbarao
+  password: 
+  host: localhost
 
 # Warning: The database defined as 'test' will be erased and
 # re-generated from your development database when you run 'rake'.

@@ -146,7 +146,7 @@ describe SignUpSheetController do
 
       deadline_type = DeadlineType.new
       deadline_type.id = 0
-      allow(DeadlineType).to receive(:find_by_name) { deadline_type }
+      allow(DeadlineType).to receive(:where) { deadline_type }
 
       post :save_topic_deadlines, {:due_date =>
                                        "15_submission_1_due_date", :assignment_id => @assignment.id}
@@ -158,15 +158,14 @@ describe SignUpSheetController do
       session[:duedates] = [@topic1, @topic2]
 
       assignment = double(Assignment)
-      allow(assignment).to receive(:get_review_rounds) { 2 }
+      allow(Assignment).to receive(:find) {assignment}
+      allow(assignment).to receive(:get_review_rounds).and_return(2)
 
       allow(SignUpTopic).to receive("where").and_return([@topic1])
 
       deadline_type = DeadlineType.new
       deadline_type.id = 0
-      allow(DeadlineType).to receive(:find_by_name) { deadline_type }
       allow(deadline_type).to receive(:first) {deadline_type}
-      allow(DeadlineType).to receive(:where) {topic_deadline}
       allow(deadline_type).to receive(:update_attributes)
       allow(deadline_type).to receive(:first) {deadline_type}
 
@@ -175,6 +174,7 @@ describe SignUpSheetController do
       allow(TopicDeadline).to receive(:where) {topic_deadline}
       allow(topic_deadline).to receive(:update_attributes)
       allow(topic_deadline).to receive(:first) {topic_deadline}
+      allow(DeadlineType).to receive(:where) {topic_deadline}
 
       post :save_topic_deadlines, {:due_date => "15_submission_1_due_date", :assignment_id => @assignment.id}
       expect(response).to redirect_to edit_assignment_url({:id => @assignment.id} )

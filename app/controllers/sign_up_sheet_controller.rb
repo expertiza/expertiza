@@ -341,7 +341,8 @@ class SignUpSheetController < ApplicationController
         flash[:error] = "Please enter a valid Review deadline " + (i > 1 ? (i-1).to_s : "") if topic_deadline_rev.errors.length > 0
       end
 
-      topic_deadline_subm = TopicDeadline.where(topic_id: session[:duedates][j]['id'], deadline_type_id: DeadlineType.find_by_name('metareview').id).first
+      deadline_type = DeadlineType.where(name: 'metareview')
+      topic_deadline_subm = TopicDeadline.where(topic_id: session[:duedates][j]['id'], deadline_type_id: deadline_type.id).first
       topic_deadline_subm.update_attributes({'due_at' => due_dates[session[:duedates][j]['id'].to_s + '_submission_' + (review_rounds+1).to_s + '_due_date']})
       flash[:error] = "Please enter a valid Meta review deadline" if topic_deadline_subm.errors.length > 0
     end

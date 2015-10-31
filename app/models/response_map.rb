@@ -84,4 +84,16 @@ class ResponseMap < ActiveRecord::Base
     }
     return failedCount
   end
+  def email()
+    @response_map = ResponseMap.find map_id
+    if @response_map.type =="ReviewResponseMap"
+      @response_map.email1(@response_map.map_id)
+    elsif @response_map.type == "MetareviewResponseMap"
+      @response_map.email2(@response_map.map_id)
+    elsif @response_map.type == "FeedbackResponseMap"
+      @response_map.email3(@response_map.map_id)
+    elsif @response_map.type == "TeammateReviewResponseMap"
+      @response_map.email4(@response_map.map_id)
+    end
+  end
 end

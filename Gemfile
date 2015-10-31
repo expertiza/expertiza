@@ -1,6 +1,3 @@
-java_home = '/usr/lib/jvm/java-7-openjdk-amd64/jre' 
-ENV['JAVA_HOME'] = java_home if Dir.exist?(java_home)
-
 source 'http://rubygems.org'
 
 gem 'rails', '~> 4.2.1'
@@ -88,5 +85,3 @@ group :development, :test do
   gem 'capybara'
   gem 'simplecov', :require => false
 end
-
-ruby "2.2.3"

@@ -16,6 +16,7 @@ Feature test for assignment submission by student mocks the steps required in as
 * Select the assignment
 * Select "Your Work"
 * Upload the link or file
+
 The goal is to test these steps using rspec and capybara.
 
 ### Running the Feature Test
@@ -23,9 +24,13 @@ To run the feature test, follow the steps
 * Clone this repository
 * Make sure to run bundle install and rake db:migrate
 * First run the assignment_creation.rb to create the assignments
-'''$ rspec spec/features/assignment_creation.rb'''
+'''
+$ rspec spec/features/assignment_creation.rb
+'''
 * Then run the student_assignment_submission_spec.rb file to run the feature tests
-'''$ rspec spec/features/student_submission_spec.rb'''
+'''
+$ rspec spec/features/student_submission_spec.rb
+'''
 
 ## Background
 ###Feature Test

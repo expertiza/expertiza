@@ -107,7 +107,7 @@ class SignUpTopic < ActiveRecord::Base
       end #end condition for 'drop deadline' check
   end
 
-  def self.assign_to_first_waiting_team(next_wait_listed_team)
+  def self.assign_to_first_waiting_team(next_wait_listed_team)   
         team_id = next_wait_listed_team.team_id
         team = Team.find(team_id)
         assignment_id = team.parent_id

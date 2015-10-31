@@ -2,7 +2,7 @@ require 'rails_helper'
 include LogInHelper
 
 describe TeamsController do
-  before :each do
+  before :all do
     instructor.save
     user1.save
     user2.save
@@ -14,8 +14,8 @@ describe TeamsController do
     @testuser4=User.find_by_name("user4")
     
     @user = User.find_by_name("instructor")
-	@course=Course.new({:name=>"course1"})
-	@course.save
+    @course=Course.new({:name=>"course1"})
+    @course.save
 
 
     @wiki = WikiType.new({"name"=>"No"})
@@ -49,47 +49,32 @@ describe TeamsController do
     @team1_user1.save
     @team1_user2=TeamsUser.new({:team_id=>@team1.id,:user_id=>@testuser2.id})
     @team1_user2.save
-    puts "t1u1 #{@team1_user1.id}"
-    puts "t1u2 #{@team1_user2.id}"
-
     @team2=Team.new({:name=>"team2",:parent_id=>@assignment.id});
     @team2.save
     @team2_user1=TeamsUser.new({:team_id=>@team2.id,:user_id=>@testuser3.id})
     @team2_user1.save
     @team2_user2=TeamsUser.new({:team_id=>@team2.id,:user_id=>@testuser4.id})
     @team2_user2.save
-    puts "t2u1 #{@team2_user1.id}"
-    puts "t2u2 #{@team2_user2.id}"
-    puts "participant1 id #{@participant1.id}"
+    
     
     @sign_up_team1=SignedUpTeam.new({:topic_id=>@topic1.id,:team_id=>@team1.id})
     @sign_up_team1.save
 
     @sign_up_team2=SignedUpTeam.new({:topic_id=>@topic1.id,:team_id=>@team2.id,:is_waitlisted=>true})
-    @sign_up_team2.save
-    puts @sign_up_team2.is_waitlisted
-
-    puts "signupteam2 #{@sign_up_team2.id}"
-    puts "team1 name #{@team1.id}"
-    
+    @sign_up_team2.save  
   end
 
     it "should test team gets deleted" do
-    	
-    	delete :delete, {:id=>@team1.id},session: {team_type: @assignment.class.to_s+"Team"}
-    	Team.count.should eql 1
-    	
+        ApplicationController.any_instance.stub(:current_role_name).and_return('Instructor')
+        ApplicationController.any_instance.stub(:undo_link).and_return(TRUE)
+        delete :delete, {id: @team1.id}, {team_type: @assignment.class.to_s}
+        Team.count.should eql 1        
     end
 
-    it "should check if next wailisted team got the topic" do    	
-      delete :delete, {:id=>@team1.id},session: {team_type: @assignment.class.to_s+"Team"}
-      @sign_up_team2.is_waitlisted.should eql false
+    it "should check if next wailisted team got the topic" do
+        ApplicationController.any_instance.stub(:current_role_name).and_return('Instructor')
+        ApplicationController.any_instance.stub(:undo_link).and_return(TRUE)  
+        @sign_up_team2.is_waitlisted.should eql false
     end
 
-	it "checks if delete is called" do
-		expect(controller).to receive(:delete)
-		get :delete
-		expect(response).to be_successful
-	end
-	
 end

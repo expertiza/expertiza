@@ -59,6 +59,103 @@ module LogInHelper
   end
 
   def user1
+    User.where(name: 'user1').first || User.new({
+      "name"=>"user1",
+      "crypted_password"=>"bd08fb03e2e3115964b1b39ea40625292a776a86",
+      "role_id"=>1,
+      "password_salt"=>"tQ6OGFiyL9dIlwxeSJf",
+      "fullname"=>"user1, Perfect",
+      "email"=>"user1@dev.null",
+      "parent_id"=>1,
+      "private_by_default"=>false,
+      "mru_directory_path"=>nil,
+      "email_on_review"=>true,
+      "email_on_submission"=>true,
+      "email_on_review_of_review"=>true,
+      "is_new_user"=>false,
+      "master_permission_granted"=>0,
+      "handle"=>"",
+      "leaderboard_privacy"=>false,
+      "digital_certificate"=>nil,
+      "timezonepref"=>"Eastern Time (US & Canada)",
+      "copy_of_emails"=>false,
+    })
+  end
+
+  def user2
+    User.where(name: 'user2').first || User.new({
+      "name"=>"user2",
+      "crypted_password"=>"bd08fb03e2e3115964b1b39ea40625292a776a86",
+      "role_id"=>1,
+      "password_salt"=>"tQ6OGFiyL9dIlwxeSJf",
+      "fullname"=>"user2, Perfect",
+      "email"=>"user2@dev.null",
+      "parent_id"=>1,
+      "private_by_default"=>false,
+      "mru_directory_path"=>nil,
+      "email_on_review"=>true,
+      "email_on_submission"=>true,
+      "email_on_review_of_review"=>true,
+      "is_new_user"=>false,
+      "master_permission_granted"=>0,
+      "handle"=>"",
+      "leaderboard_privacy"=>false,
+      "digital_certificate"=>nil,
+      "timezonepref"=>"Eastern Time (US & Canada)",
+      "copy_of_emails"=>false,
+    })
+  end
+
+  def user3
+    User.where(name: 'user3').first || User.new({
+      "name"=>"user3",
+      "crypted_password"=>"bd08fb03e2e3115964b1b39ea40625292a776a86",
+      "role_id"=>1,
+      "password_salt"=>"tQ6OGFiyL9dIlwxeSJf",
+      "fullname"=>"user3, Perfect",
+      "email"=>"user3@dev.null",
+      "parent_id"=>1,
+      "private_by_default"=>false,
+      "mru_directory_path"=>nil,
+      "email_on_review"=>true,
+      "email_on_submission"=>true,
+      "email_on_review_of_review"=>true,
+      "is_new_user"=>false,
+      "master_permission_granted"=>0,
+      "handle"=>"",
+      "leaderboard_privacy"=>false,
+      "digital_certificate"=>nil,
+      "timezonepref"=>"Eastern Time (US & Canada)",
+      "copy_of_emails"=>false,
+    })
+  end
+
+  def user4
+    User.where(name: 'user4').first || User.new({
+      "name"=>"user4",
+      "crypted_password"=>"bd08fb03e2e3115964b1b39ea40625292a776a86",
+      "role_id"=>1,
+      "password_salt"=>"tQ6OGFiyL9dIlwxeSJf",
+      "fullname"=>"user4, Perfect",
+      "email"=>"user4@dev.null",
+      "parent_id"=>1,
+      "private_by_default"=>false,
+      "mru_directory_path"=>nil,
+      "email_on_review"=>true,
+      "email_on_submission"=>true,
+      "email_on_review_of_review"=>true,
+      "is_new_user"=>false,
+      "master_permission_granted"=>0,
+      "handle"=>"",
+      "leaderboard_privacy"=>false,
+      "digital_certificate"=>nil,
+      "timezonepref"=>"Eastern Time (US & Canada)",
+      "copy_of_emails"=>false,
+    })
+  end
+
+=begin
+  def user1
      User.new({
       name: "user1",
       password: "user1",
@@ -153,5 +250,6 @@ module LogInHelper
       copy_of_emails: false,
     })
   end
+=end
 
 end

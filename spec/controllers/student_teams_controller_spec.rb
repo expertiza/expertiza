@@ -3,7 +3,7 @@ require 'rails_helper'
 include LogInHelper
 
 describe StudentTeamsController do
-  before :all do
+  before :each do
     instructor.save
     user1.save
     user2.save
@@ -54,7 +54,7 @@ describe StudentTeamsController do
     @team1.save
     @team1_user1=TeamsUser.new({:team_id=>@team1.id,:user_id=>@testuser1.id})
     @team1_user1.save
-    puts "t1u1 #{@team1_user1.id}"
+    
 
     @team2=Team.new({:name=>"team2",:parent_id=>@assignment.id});
     @team2.save
@@ -62,9 +62,7 @@ describe StudentTeamsController do
     @team2_user1.save
     @team2_user2=TeamsUser.new({:team_id=>@team2.id,:user_id=>@testuser4.id})
     @team2_user2.save
-    puts "t2u1 #{@team2_user1.id}"
-    puts "t2u2 #{@team2_user2.id}"
-    puts "participant1 id #{@participant1.id}"
+    
     
     @sign_up_team1=SignedUpTeam.new({:topic_id=>@topic1.id,:team_id=>@team1.id})
     @sign_up_team1.save
@@ -72,12 +70,13 @@ describe StudentTeamsController do
     @sign_up_team2=SignedUpTeam.new({:topic_id=>@topic1.id,:team_id=>@team2.id,:is_waitlisted=>true})
     @sign_up_team2.save
 
-    puts "signupteam2 #{@sign_up_team2.id}"
-    puts "team1 name #{@team1.id}"
+
+    ApplicationController.any_instance.stub(:current_role_name).and_return('user1')
+    ApplicationController.any_instance.stub(:undo_link).and_return(TRUE)
   end
     
     it "should check if the last person leaves the team then topic is transferred to next team" do
-    	post :remove_participant ,{:team_id=>@team1.id},student: @testuser1
+    	post :remove_participant, team_id:@team1.id,student: {id: @team1_user1.id}
       @sign_up_team2.is_waitlisted.should eql false
     end
     

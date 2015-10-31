@@ -58,8 +58,7 @@ describe SignUpTopic do
     @team1_user1.save
     @team1_user2=TeamsUser.new({:team_id=>@team1.id,:user_id=>@testuser2.id})
     @team1_user2.save
-    puts "t1u1 #{@team1_user1.id}"
-    puts "t1u2 #{@team1_user2.id}"
+
 
     @team2=Team.new({:name=>"team2",:parent_id=>@assignment.id});
     @team2.save
@@ -67,18 +66,12 @@ describe SignUpTopic do
     @team2_user1.save
     @team2_user2=TeamsUser.new({:team_id=>@team2.id,:user_id=>@testuser4.id})
     @team2_user2.save
-    puts "t2u1 #{@team2_user1.id}"
-    puts "t2u2 #{@team2_user2.id}"
-    puts "participant1 id #{@participant1.id}"
     
     @sign_up_team1=SignedUpTeam.new({:topic_id=>@topic1.id,:team_id=>@team1.id})
     @sign_up_team1.save
 
     @sign_up_team2=SignedUpTeam.new({:topic_id=>@topic1.id,:team_id=>@team2.id,:is_waitlisted=>true})
     @sign_up_team2.save
-
-    puts "signupteam2 #{@sign_up_team2.id}"
-    puts "team1 name #{@team1.id}"  
   end
 
   it "should check if slots increased then next waitlisted team gets the topic" do

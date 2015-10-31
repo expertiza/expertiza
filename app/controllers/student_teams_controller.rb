@@ -114,6 +114,8 @@ class StudentTeamsController < ApplicationController
 
   def remove_participant
     #remove the record from teams_users table
+    
+    
     team_user = TeamsUser.where(team_id: params[:team_id], user_id: student.user_id)
 
     if team_user
@@ -132,7 +134,7 @@ class StudentTeamsController < ApplicationController
         sign_ups.each {|sign_up|
           #get the topic_id
           sign_up_topic_id = sign_up.topic_id
-          #destroy the sign_up
+         #destroy the sign_up
           sign_up.destroy
           #get the number of non-waitlisted users signed up for this topic
           non_waitlisted_users = SignedUpTeam.where topic_id: sign_up_topic_id, is_waitlisted: false

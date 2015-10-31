@@ -237,7 +237,8 @@ class UsersController < ApplicationController
     if (paginate_options["#{@per_page}"].nil?) #displaying all - no pagination
       users = users.paginate(:page => params[:page], :per_page => users.count)
     else #some pagination is active - use the per_page
-      users = users.page(params[:page]).per_page(paginate_options["#{@per_page}"])
+      #users = users.page(params[:page]).per_page(paginate_options["#{@per_page}"])
+      users = users.paginate(:page => params[:page], :per_page => users.count)
     end
     users
   end

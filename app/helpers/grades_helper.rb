@@ -65,9 +65,9 @@ module GradesHelper
     has_team = @assignment.max_team_size > 1
     has_metareview = DueDate.exists?(assignment_id: @assignment_id, deadline_type_id: 5)
     true_num = 0
-    if has_team and has_metareview
+    if has_team && has_metareview
       true_num = 2
-    elsif has_team or has_metareview
+    elsif has_team || has_metareview
       true_num = 1
     else
       true_num = 0

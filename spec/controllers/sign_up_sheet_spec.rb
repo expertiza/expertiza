@@ -133,7 +133,7 @@ describe SignUpSheetController do
                                                                @assignment.id} )
     end
 
-    it "should be able to save deadlines for topics with staggered deadlines" do
+    it "saves deadlines for topics with staggered deadlines" do
       session[:duedates] = [@topic1, @topic2]
       assignment = double(Assignment)
       allow(assignment).to receive(:get_review_rounds) { 0 }
@@ -150,6 +150,36 @@ describe SignUpSheetController do
 
       post :save_topic_deadlines, {:due_date =>
                                        "15_submission_1_due_date", :assignment_id => @assignment.id}
+      expect(response).to redirect_to edit_assignment_url({:id =>
+                                                               @assignment.id} )
+    end
+
+    it "updates deadline for topics for multiple review rounds" do
+      session[:duedates] = [@topic1, @topic2]
+
+      assignment = double(Assignment)
+      allow(Assignment).to receive(:find) {assignment}
+      allow(assignment).to receive(:get_review_rounds) { 1 }
+
+      allow(SignUpTopic).to receive("where").and_return([@topic1])
+
+
+      deadline_type = DeadlineType.new
+      deadline_type.id = 0
+      allow(DeadlineType).to receive(:find_by_name) { deadline_type }
+      allow(DeadlineType).to receive(:where) {topic_deadline}
+      allow(deadline_type).to receive(:update_attributes)
+      allow(deadline_type).to receive(:first) {deadline_type}
+
+      topic_deadline_stub = double(TopicDeadline)
+      topic_deadline = TopicDeadline.new
+      allow(TopicDeadline).to receive(:where) {topic_deadline}
+      allow(topic_deadline).to receive(:update_attributes)
+      allow(topic_deadline).to receive(:first) {topic_deadline}
+
+      post :save_topic_deadlines, {:due_date =>
+                                       "15_submission_1_due_date",
+                                   :assignment_id => @assignment.id}
       expect(response).to redirect_to edit_assignment_url({:id =>
                                                                @assignment.id} )
     end

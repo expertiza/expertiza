@@ -327,15 +327,15 @@ class SignUpSheetController < ApplicationController
     review_rounds = Assignment.find(params[:assignment_id]).get_review_rounds
     # j represents the review rounds
     j = 0
-    topics.each { |topic|
+    topics.each_with_index do  |topic, j|
       for i in 1..review_rounds
-        topic_deadline_type_subm = DeadlineType.find_by_name('submission').id
+        topic_deadline_type_subm = DeadlineType.where(name: 'submission').first.id
         topic_deadline_subm = TopicDeadline.where(topic_id: session[:duedates][j]['id'].to_i, deadline_type_id: topic_deadline_type_subm, round: i).first
 
         topic_deadline_subm.update_attributes({'due_at' => due_dates[session[:duedates][j]['id'].to_s + '_submission_' + i.to_s + '_due_date']})
         flash[:error] = "Please enter a valid " + (i > 1 ? "Resubmission deadline " + (i-1).to_s : "Submission deadline") if topic_deadline_subm.errors.length > 0
 
-        topic_deadline_type_rev = DeadlineType.find_by_name('review').id
+        topic_deadline_type_rev = DeadlineType.where(name: 'review').first.id
         topic_deadline_rev = TopicDeadline.where(topic_id: session[:duedates][j]['id'].to_i, deadline_type_id: topic_deadline_type_rev, round: i).first
         topic_deadline_rev.update_attributes({'due_at' => due_dates[session[:duedates][j]['id'].to_s + '_review_' + i.to_s + '_due_date']})
         flash[:error] = "Please enter a valid Review deadline " + (i > 1 ? (i-1).to_s : "") if topic_deadline_rev.errors.length > 0
@@ -344,8 +344,7 @@ class SignUpSheetController < ApplicationController
       topic_deadline_subm = TopicDeadline.where(topic_id: session[:duedates][j]['id'], deadline_type_id: DeadlineType.find_by_name('metareview').id).first
       topic_deadline_subm.update_attributes({'due_at' => due_dates[session[:duedates][j]['id'].to_s + '_submission_' + (review_rounds+1).to_s + '_due_date']})
       flash[:error] = "Please enter a valid Meta review deadline" if topic_deadline_subm.errors.length > 0
-      j = j + 1
-    }
+    end
 
     redirect_to_assignment_edit(params[:assignment_id])
   end

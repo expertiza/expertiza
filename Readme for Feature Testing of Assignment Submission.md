@@ -21,8 +21,17 @@ The goal is to test these steps using rspec and capybara.
 
 ### Running the Feature Test
 To run the feature test, follow the steps
-* Clone this repository
-* Make sure to run bundle install and rake db:migrate
+* Clone this repository: 
+```
+git clone https://github.com/shrenujgandhi/expertiza.git
+```
+* Make sure to update gems and migrate database
+```
+bundle install
+```
+```
+rake db:migrate
+```
 * First run following command, in the root directory of the application, to create the assignments
 ```
 $ rspec spec/features/assignment_creation.rb

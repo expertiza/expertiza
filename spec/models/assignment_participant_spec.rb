@@ -29,9 +29,9 @@ describe AssignmentParticipant do
 =end
 
 
-    it "should do" do
-      should validate_presence_of(:assignment)
-    end
+   # it "should do" do
+  #    should validate_presence_of(:assignment)
+   # end
    # it {should validate_presence_of(:made)}
 
 =begin

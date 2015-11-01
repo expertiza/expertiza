@@ -8,23 +8,15 @@ RSpec.describe ResponseController, type: :controller do
 
   describe "GET #new_feedback" do
 
-    it "Should call find method" do
-    Response.should_receive(:find).with("Additional comments").and_return(:response)
-    end
-    it "should find response in feedresponsemap" do
-    FeedbackResponseMap.should_receive(:where).and_return(:feedresponsemap)
-    end
     it "returns http success" do
       
-      get :new_feedback
+      get :new_feedback,{:params => {:id=>1}}
       expect(response).to have_http_status(:success)
     end
   end
 
   describe "GET #view" do
-     it "Should call find method" do
-    Response.should_receive(:find).with("Additional comments")
-    end
+     
     it "returns http success" do
       get :view
       expect(response).to have_http_status(:success)
@@ -32,9 +24,7 @@ RSpec.describe ResponseController, type: :controller do
   end
 
   describe "POST #delete" do
-    it "Should call find method" do
-    Response.should_receive(:find).with("Additional comments").and_return(:response)
-    end
+   
     it "returns http success" do
 
       post :delete
@@ -45,9 +35,7 @@ RSpec.describe ResponseController, type: :controller do
 
 
   describe "GET #saving" do
-     it "Should call find method" do
-    Response.should_receive(:find).with("Additional comments").and_return(:response)
-    end
+    
     it "returns http success" do
       get :saving
       expect(response).to have_http_status(:success)
@@ -55,9 +43,7 @@ RSpec.describe ResponseController, type: :controller do
   end
 
   describe "GET #redirection" do
-     it "Should call find by map method" do
-    Response.should_receive(:find_by_map).with("Additional comments").and_return(:response)
-    end
+    
 
     it "returns http success" do
       get :redirection

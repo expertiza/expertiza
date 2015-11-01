@@ -283,6 +283,6 @@ class AssignmentTeam < Team
     return nil
   end
 
-  require './app/models/analytic/assignment_team_analytic'
+  require 'analytic/assignment_team_analytic'
   include AssignmentTeamAnalytic
 end

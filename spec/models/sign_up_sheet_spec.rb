@@ -106,14 +106,14 @@ describe '.confirm_topic' do
     expect(SignUpSheet.confirmTopic nil, nil, nil, nil).to eql(false)
 
   end
-
   it "sets sign_up.is_waitlisted = true if slotAvailable is false" do
     allow(SignUpTopic).to receive(:slotAvailable?) { false }
     user_signup = SignedUpTeam.new
     user_signup.is_waitlisted = true
     allow(SignUpSheet).to receive(:otherConfirmedTopicforUser) { [user_signup] }
-    expect(SignUpSheet.confirmTopic nil, nil, nil, nil).to eql(false)
+    expect(SignUpSheet.confirmTopic nil, nil, nil, nil).to eql(nil)
   end
+
 
   it "returns true for SignUpSheet.confirmTopic " do
     allow(SignUpTopic).to receive(:slotAvailable?) { true }

@@ -29,15 +29,7 @@ class SignUpSheet < ActiveRecord::Base
       # Using a DB transaction to ensure atomic inserts
       ActiveRecord::Base.transaction do
         #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
-        if slotAvailable?(topic_id)
-          sign_up.is_waitlisted = false
-          #Create new record in signed_up_teams table
-          team_id = TeamsUser.team_id(assignment_id, user_id)
-          topic_id = SignedUpTeam.topic_id(assignment_id, user_id)
-          SignedUpTeam.create(topic_id: topic_id, team_id: team_id, is_waitlisted: 0, preference_priority_number: nil)
-        else
-          sign_up.is_waitlisted = true
-        end
+        team_id, topic_id = create_SignUpTeam(assignment_id, sign_up, topic_id, user_id)
         if sign_up.save
           result = true
         end
@@ -53,26 +45,48 @@ class SignUpSheet < ActiveRecord::Base
       # Using a DB transaction to ensure atomic inserts
       ActiveRecord::Base.transaction do
         #check whether user is clicking on a topic which is not going to place him in the waitlist
-        if !slotAvailable?(topic_id)
-          sign_up.is_waitlisted = true
-          if sign_up.save
-            result = true
-          end
-        else
-          #if slot exist, then confirm the topic for the user and delete all the waitlist for this user
-          Waitlist.cancel_all_waitlists(team_id, assignment_id)
-          sign_up.is_waitlisted = false
-          sign_up.save
-          #Update topic_id in signed_up_teams table with the topic_id
-          team_id = SignedUpTeam.find_team_users(assignment_id, user_id)
-          signUp = SignedUpTeam.where(topic_id: topic_id).first
-          signUp.update_attribute('topic_id', topic_id)
-          result = true
-        end
+        result = sign_up_wailisted(assignment_id, sign_up, team_id, topic_id, user_id)
       end
     end
 
     result
+  end
+
+  def self.sign_up_wailisted(assignment_id, sign_up, team_id, topic_id, user_id)
+    if !slotAvailable?(topic_id)
+      sign_up.is_waitlisted = true
+      if sign_up.save
+        result = true
+      end
+    else
+      #if slot exist, then confirm the topic for the user and delete all the waitlist for this user
+      result = cancel_all_wailists(assignment_id, sign_up, team_id, topic_id, user_id)
+    end
+    result
+  end
+
+  def self.cancel_all_wailists(assignment_id, sign_up, team_id, topic_id, user_id)
+    Waitlist.cancel_all_waitlists(team_id, assignment_id)
+    sign_up.is_waitlisted = false
+    sign_up.save
+    #Update topic_id in signed_up_teams table with the topic_id
+    team_id = SignedUpTeam.find_team_users(assignment_id, user_id)
+    signUp = SignedUpTeam.where(topic_id: topic_id).first
+    signUp.update_attribute('topic_id', topic_id)
+    result = true
+  end
+
+  def self.create_SignUpTeam(assignment_id, sign_up, topic_id, user_id)
+    if slotAvailable?(topic_id)
+      sign_up.is_waitlisted = false
+      #Create new record in signed_up_teams table
+      team_id = TeamsUser.team_id(assignment_id, user_id)
+      topic_id = SignedUpTeam.topic_id(assignment_id, user_id)
+      SignedUpTeam.create(topic_id: topic_id, team_id: team_id, is_waitlisted: 0, preference_priority_number: nil)
+    else
+      sign_up.is_waitlisted = true
+    end
+    return team_id, topic_id
   end
 
   def self.otherConfirmedTopicforUser(assignment_id, team_id)

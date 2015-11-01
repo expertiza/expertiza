@@ -58,7 +58,7 @@ class ResponseController < ApplicationController
       @latest_phase=@largest_version_num.created_at
       due_dates = DueDate.where(["assignment_id = ?", @assignment.id])
       @sorted_deadlines=Array.new
-      @sorted_deadlines=due_dates.sort { |m1, m2| (m1.due_at and m2.due_at) ? m1.due_at <=> m2.due_at : (m1.due_at ? -1 : 1) }
+      @sorted_deadlines=DueDate.deadline_sort(due_dates)
       current_time=Time.new.getutc
       #get the highest version numbered review
       next_due_date=@sorted_deadlines[0]

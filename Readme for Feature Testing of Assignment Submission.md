@@ -43,4 +43,4 @@ $ rspec spec/features/student_submission_spec.rb
 
 ## Attribution
 This repository was constructed by [Shrenuj Gandhi](https://github.com/shrenujgandhi), [Kunal Bhandari](https://github.com/kunalb6), [Bharghav Jhaveri](
-https://github.com/BhargavJhaveri) under the guidance of Yatish Mehta. Thanks to [Abhishek Lingwal](https://github.com/imabhishekl) and [Glen Menezes](https://github.com/gmeneze) for their contribution in generating assignments using capybara script.
+https://github.com/BhargavJhaveri) under the guidance of [Yatish Mehta](https://github.com/yatish27). Thanks to [Abhishek Lingwal](https://github.com/imabhishekl) and [Glen Menezes](https://github.com/gmeneze) for their contribution in generating assignments using capybara script.

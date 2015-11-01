@@ -487,4 +487,14 @@ class AssignmentParticipant < Participant
       assignment.stage_deadline topic_id
     end
 
+<<<<<<< HEAD
+=======
+
+    def review_response_maps
+      participant = Participant.find(id)
+      team_id = TeamsUser.team_id(participant.parent_id, participant.user_id)
+      ReviewResponseMap.where(reviewee_id: team_id, reviewed_object_id: assignment.id)
+    end
+  
+>>>>>>> upstream/master
   end

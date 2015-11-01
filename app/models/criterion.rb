@@ -41,12 +41,54 @@ class Criterion < ScoredQuestion
       rows = self.size.split(',')[1]
     end
 
-    html = '<li><p><label for="responses_' +count.to_s+ '">' +self.txt+ '</label></p>'
+    html = '<li><div><label for="responses_' +count.to_s+ '">' +self.txt+ '</label></div>'
+    #show advice for each criterion question
+    question_advices = QuestionAdvice.where(question_id: self.id).sort_by { |advice| advice.id }
+    advice_total_length = 0
+    question_advices.each do |question_advice|
+      advice_total_length += question_advice.advice.length
+    end
+
+    if question_advices.length > 0 and advice_total_length > 0
+      html += '<a id="showAdivce_' + self.id.to_s + '" onclick="showAdvice(' + self.id.to_s + ')">Show advice</a>'
+      html += '<script>'
+      html += 'function showAdvice(i){'
+      html += 'var element = document.getElementById("showAdivce_" + i.toString());'
+      html += 'var show = element.innerHTML == "Hide advice";'
+      html += 'if (show){'
+      html += 'element.innerHTML="Show advice";'
+      html += '}else{'
+      html += 'element.innerHTML="Hide advice";}'
+      html += 'toggleAdvice(i);}'
+
+      html += 'function toggleAdvice(i) {'
+      html += 'var elem = document.getElementById(i.toString() + "_myDiv");'
+      html += 'if (elem.style.display == "none") {'
+      html += 'elem.style.display = "";'
+      html += '} else {'
+      html += 'elem.style.display = "none";}}'
+      html += '</script>'
+    end
+
+    html += '<div id="' + self.id.to_s + '_myDiv" style="display: none;">'
+    #[2015-10-26] Zhewei: 
+    #best to order advices high to low, e.g., 5 to 1
+    #each level used to be a link; 
+    #clicking on the link caused the dropbox to be filled in with the corresponding number
+    question_advices.reverse.each_with_index do |question_advice, index|
+      html += '<a id="changeScore_>' + self.id.to_s + '" onclick="changeScore(' + count.to_s + ',' + index.to_s + ')">'
+      html += (question_advices.length - index).to_s + ' - ' + question_advice.advice + '</a><br/>'
+      html += '<script>'
+      html += 'function changeScore(i, j) {'
+      html += 'var elem = jQuery("#responses_" + i.toString() + "_score");'
+      html += 'var opts = elem.children("option").length;'
+      html += 'elem.val((opts - j - 1).toString());}'
+      html += '</script>'
+    end
+    html += '</div>'
+
     if dropdown_or_scale == 'dropdown'
-      html += '<table><td valign="top"><textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
-      html += answer.comments if !answer.nil?
-      html += '</textarea></td><td valign="top">'
-      html += '<select id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]">'
+      html += '<div><select id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]">'
       html += '<option value=''>--</option>'
       for j in questionnaire_min..questionnaire_max
         if !answer.nil? and j == answer.answer
@@ -56,17 +98,20 @@ class Criterion < ScoredQuestion
         end
         if j == questionnaire_min
           html += j.to_s
-          html += "-" + self.min_label if !self.min_label.nil?
+          html += "-" + self.min_label if self.min_label && self.min_label.length>0
           html += "</option>"
         elsif j == questionnaire_max
           html += j.to_s
-          html += "-" + self.max_label if !self.max_label.nil?
+          html += "-" + self.max_label if self.max_label && self.max_label.length>0
           html += "</option>"
         else
           html += j.to_s + "</option>"
         end
       end
-      html += "</select></td></table><br>"
+      html += "</select></div>"
+      html += '<textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
+      html += answer.comments if !answer.nil?
+      html += '</textarea></td></br><br/>'
     elsif dropdown_or_scale == 'scale'
       html += '<input id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]" type="hidden"'
       html += 'value="'+answer.answer.to_s+'"' if !answer.nil?

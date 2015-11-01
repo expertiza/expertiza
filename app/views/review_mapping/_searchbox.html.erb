@@ -1,10 +1,27 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<h1> Review report for <%= @assignment.name%> </h1>
+
+<%= form_tag :action => 'response_report', :id => @id do %>
+  <select name='report[type]' style="width: 10em">
+    <option value='ReviewResponseMap' selected>
+      Review report
+    </option>
+    <option value='FeedbackResponseMap' >
+      Author feedback report
+    </option>
+  </select>
+  <%= submit_tag("Submit") %>
+<% end %>
+
+<% if @type == "ReviewResponseMap" %>
+  <h1> Review report for <%= @assignment.name%> </h1>
+<% else %>
+  <h1> Author feedback report for <%= @assignment.name%> </h1>
+<% end %> 
 
 <div id="searchbox">
 
   <div id="searchlink">
-    <p> <%= link_to "Show all", :action => 'review_report', :id => @id %>
+    <p> <%= link_to "Show all", :action => 'response_report', :id => @id %>
   | <%= link_to "Distribution", :action => 'distribution', :id => @id%>
 | <%= link_to 'Back', :controller=> 'tree_display', :action=>'list', :id => @userid%>
 
@@ -16,7 +33,7 @@
 
 
 
-  <%= form_for :user, :url => {:action => 'review_report', :id => @id} do |n| %>
+  <%= form_for :user, :url => {:action => 'response_report', :id => @id} do |n| %>
     <table>
       <tr>
         <th>Reviewer's Name</th>

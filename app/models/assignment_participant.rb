@@ -487,8 +487,7 @@ class AssignmentParticipant < Participant
       assignment.stage_deadline topic_id
     end
 
-<<<<<<< HEAD
-=======
+
 
     def review_response_maps
       participant = Participant.find(id)
@@ -496,5 +495,4 @@ class AssignmentParticipant < Participant
       ReviewResponseMap.where(reviewee_id: team_id, reviewed_object_id: assignment.id)
     end
   
->>>>>>> upstream/master
   end

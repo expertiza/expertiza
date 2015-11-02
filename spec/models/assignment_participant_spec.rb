@@ -8,10 +8,6 @@ describe AssignmentParticipant do
   end
 =end
 
-  it "should be awesome" do
-    foo = 3
-    foo.should eq(3)
-  end
 
   describe "calculate_Scores" do
     it { is_expected.not_to respond_to(:between?).with(7).arguments }

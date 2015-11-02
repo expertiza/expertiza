@@ -6,7 +6,7 @@ class InstitutionController < ApplicationController
   end
 
   def index
-   list
+    list
     render :action => 'list'
   end
 

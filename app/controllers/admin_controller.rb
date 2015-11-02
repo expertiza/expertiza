@@ -28,7 +28,7 @@ class AdminController < ApplicationController
   #     redirect_to :action => 'list_instructors'
   #   else
   #     @user = User.new(params[:user])
-  #     @u/ser.parent_id = (session[:user]).id
+  #     @user.parent_id = (session[:user]).id
   #     @user.role_id = Role.instructor.id
   #
   #     if @user.save

@@ -13,7 +13,6 @@ Expertiza::Application.routes.draw do
 
   resources :admin do
     collection do
-      get :create_any_user
       get :list_super_administrators
       get :list_administrators
       get :list_instructors

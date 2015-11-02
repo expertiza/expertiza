@@ -6,7 +6,6 @@ class InstitutionController < ApplicationController
   end
 
   def index
-   # @institutions=Institution.All
    list
     render :action => 'list'
   end

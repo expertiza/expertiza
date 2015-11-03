@@ -104,7 +104,7 @@ class Answer < ActiveRecord::Base
           # if a questions is a scored question (criterion or scale), the weight cannot be null.
           # Answer.answer is nil indicates that this scored questions is not filled. Therefore the score of this question is ignored and not counted
           # towards the score for this response.
-          if answer.answer.nil? && question.instance_of?(ScoredQuestion)
+          if answer.answer.nil? && question.is_a?(ScoredQuestion)
             question_weight = Question.find(answer.question_id).weight
             sum_of_weights -= question_weight
           end

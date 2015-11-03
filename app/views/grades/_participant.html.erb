@@ -61,13 +61,13 @@ participant = pscore[:participant]
     <% end %>
 
     <% if !@rscore_feedback.nil? && @rscore_feedback.my_avg %>
-        <TD ALIGN="CENTER" VALIGN="TOP"><%= @rscore_feedback.my_avg.is_a?(Float)?sprintf("%.2f",@rscore_feedback.my_avg):@rscore_feedback.my_avg %>%
+        <TD ALIGN="CENTER" VALIGN="TOP"><%= @rscore_feedback.my_avg.is_a?(Float)? sprintf("%.2f",@rscore_feedback.my_avg): @rscore_feedback.my_avg %>%
             <BR/>
             <FONT SIZE="-1">
                 <a href="#" id="<%=prefix%>_feedbackLink" name="<%=prefix%>_feedbackLink" onClick="toggleElement('<%=prefix%>_feedback','author feedbacks');return false;">show author feedbacks</a> (<%= pscore[:feedback][:assessments].size %>)
             </FONT>
         </TD>
-        <TD ALIGN="CENTER" VALIGN="TOP"><%= @rscore_feedback.my_min.is_a?(Float)?sprintf("%.0f",@rscore_feedback.my_min):@rscore_feedback.my_min %>% - <%= @rscore_feedback.my_max.is_a?(Float)?sprintf("%.0f",@rscore_feedback.my_max):@rscore_feedback.my_max %>%
+        <TD ALIGN="CENTER" VALIGN="TOP"><%= @rscore_feedback.my_min.is_a?(Float)? sprintf("%.0f",@rscore_feedback.my_min): @rscore_feedback.my_min %>% - <%= @rscore_feedback.my_max.is_a?(Float)? sprintf("%.0f",@rscore_feedback.my_max):@rscore_feedback.my_max %>%
             <% if controller.action_name != "view_my_scores" %>
             <BR/>
             <FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => 'review_feedback' %>

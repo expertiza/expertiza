@@ -82,18 +82,7 @@ class GradesController < ApplicationController
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
 
-    ##################################################################################
-    #	@questions = Hash.new
-    #    questionnaires = assignment.questionnaires
-    #    questionnaires.each {
-    #        |questionnaire|
-    #      @questions[questionnaire.symbol] = questionnaire.questions
-    #    }
-    ##################################################################################
-    #Refactored--> Replaced with a methood call
-
     list_questions (@assignment)
-    #################################################################################
 
     @scores = @participant.scores(@questions)
   end
@@ -180,18 +169,7 @@ class GradesController < ApplicationController
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = Assignment.find(@participant.parent_id)
 
-    ##################################################################################
-    #	@questions = Hash.new
-    #    questionnaires = assignment.questionnaires
-    #    questionnaires.each {
-    #        |questionnaire|
-    #      @questions[questionnaire.symbol] = questionnaire.questions
-    #    }
-    ##################################################################################
-    #Refactored--> Replaced with a methood call
-
     list_questions (@assignment)
-    #################################################################################
     @reviewers_email_hash = Hash.new
 
     @caction = "view"
@@ -293,23 +271,9 @@ class GradesController < ApplicationController
     Participant.where(parent_id: assignment_id).each do |participant|
       penalties = calculate_penalty(participant.id)
       @total_penalty = 0
-      #############################################################################################
-      # if(penalties[:submission] != 0 || penalties[:review] != 0 || penalties[:meta_review] != 0)
-      #  unless penalties[:submission]
-      #     penalties[:submission] = 0
-      #    end
-      #    unless penalties[:review]
-      #      penalties[:review] = 0
-      #    end
-      #    unless penalties[:meta_review]
-      #      penalties[:meta_review] = 0
-      #    end
-      #################################################################################################
-      #  Refactor this to==>
 
       unless(penalties[:submission].zero? || penalties[:review].zero? || penalties[:meta_review].zero? )
-
-        ####################################################################################################
+      
         @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
         l_policy = LatePolicy.find(@assignment.late_policy_id)
         if(@total_penalty > l_policy.max_penalty)

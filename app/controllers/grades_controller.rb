@@ -11,7 +11,7 @@ class GradesController < ApplicationController
          'Teaching Assistant',
          'Administrator',
          'Super-Administrator',
-         'Student'].include? current_role_name && are_needed_authorizations_present?			#Refactored &&
+         'Student'].include? current_role_name && are_needed_authorizations_present?
       else
         ['Instructor',
          'Teaching Assistant',
@@ -148,7 +148,7 @@ class GradesController < ApplicationController
                 :author => email_form[:author]
   end
 
-  #Refactored #Created a method which was a duplicate in conflict_notification and edit methods
+  #This method is used from both conflict_notification and edit methods
   def list_questions (assignment)
     @questions = Hash.new
     questionnaires = assignment.questionnaires
@@ -279,13 +279,13 @@ class GradesController < ApplicationController
         if(@total_penalty > l_policy.max_penalty)
           @total_penalty = l_policy.max_penalty
         end
-        if calculate_for_participants								#Refactored#Removed appending "==true"
-          calculate_penatly_attributes(@participant) #Refactored#Removed
+        if calculate_for_participants	
+          calculate_penatly_attributes(@participant)
         end
       end
       assign_all_penalties(@participant)
     end
-    unless @assignment.is_penalty_calculated      #Refactored#Removed
+    unless @assignment.is_penalty_calculated  
       @assignment.update_attribute(:is_penalty_calculated, true)
     end
   end
@@ -404,7 +404,7 @@ end
   def are_needed_authorizations_present?
     @participant = Participant.find(params[:id])
     authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
-    if authorization == 'reader' || authorization == 'reviewer'							#Refactored ||
+    if authorization == 'reader' || authorization == 'reviewer'	
       return false
     else
       return true

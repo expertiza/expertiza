@@ -3,18 +3,15 @@ module GradesHelper
   def get_accordion_title(last_topic, new_topic)
     if last_topic.eql? nil
       #this is the first accordion
-      render partial: "response/accordion", locals: {title: new_topic, is_first: true}					#Refactored
+      render partial: "response/accordion", locals: {title: new_topic, is_first: true}
 
     elsif !new_topic.eql? last_topic
       #render new accordion
-      render partial: "response/accordion", locals: {title: new_topic, is_first: false}					#Refactored
+      render partial: "response/accordion", locals: {title: new_topic, is_first: false}
 
     end
   end
 
-  #---------------------------------------------------------------------#
-  #This method is currently not being used. It can be safely removed.No other references in the project.
-  #---------------------------------------------------------------------#
   # Render the table to display the question, score and response
   def construct_table(parameters)
     table_hash = {"table_title" => nil, "table_headers" => nil, "start_table" => false, "start_col" => false, "end_col" => false, "end_table" => false}
@@ -55,11 +52,9 @@ module GradesHelper
   end
 
   def render_ui(param1,param2)
-    render partial: param1, locals: param2												#Refactored
+    render partial: param1, locals: param2
   end
 
-  #Need to check if this can be broken into two separate methods for has_team? & has_metareview?
-  #It's currently being used together in all the views but breaking it down may provide flexibility in future.
   def has_team_and_metareview?
     if params[:action] == "view"
       @assignment = Assignment.find(params[:id])

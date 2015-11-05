@@ -24,6 +24,15 @@ team3:
   comments_for_advertisement: nil
   advertise_for_partner: false
 
+team4:
+  id: 4
+  name: team4
+  parent_id: 1
+  type: AssignmentTeam
+  comments_for_advertisement: nil
+  advertise_for_partner: false
+
+
 team6:
   id: 6
   name: team6

@@ -3,6 +3,18 @@ require File.dirname(__FILE__) + '/../test_helper'
 class ReviewResponseMapTest < ActiveSupport::TestCase
 	fixtures :response_maps, :questionnaires , :assignments, :responses, :assignment_questionnaires, :users, :participants, :teams
 
+	test "method_export" do
+		csv = Array.new()
+		ReviewResponseMap.export(csv, 3, nil)
+		assert_equal csv.count, 2		
+	end
+
+	test "method_get_metareview_response_maps" do
+        	review_response_map_test = ReviewResponseMap.new
+		review_response_map_test.id = 1
+		assert_equal review_response_map_test.get_metareview_response_maps.count, 2
+	end
+
 	test "method_get_team_response_for_round" do
 		@team = teams('Team_1')
 		assert_equal ReviewResponseMap.get_team_responses_for_round(@team,2)[0].id, 1
@@ -12,19 +24,26 @@ class ReviewResponseMapTest < ActiveSupport::TestCase
 		assert_equal ReviewResponseMap.final_versions_from_reviewer(1)[0], 3
 	end
 
-	test "method_import_fields" do
+	
+	test "method_import" do
 		assert_difference 'ResponseMap.count' do
 			review_response_map_test = ReviewResponseMap.import(['User1','User2'], 2, 1)
     		end
   	end
 
-  	test "method_import_fields_invalid_user" do
+  	test "method_import_invalid_reviewee" do
     		assert_raise ImportError do
 			review_response_map_test = ReviewResponseMap.import(['User3','User2'], 2, 1)
     		end
   	end
 
-  	test "method_import_fields_invalid_assignment" do
+	test "method_import_invalid_reviewer" do
+    		assert_raise ImportError do
+			review_response_map_test = ReviewResponseMap.import(['User1','User3'], 2, 1)
+    		end
+  	end
+
+  	test "method_import_invalid_assignment" do
     		assert_raise ImportError do
 			review_response_map_test = ReviewResponseMap.import(['User1','User2'], 2, 4)
     		end

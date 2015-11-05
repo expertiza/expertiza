@@ -22,3 +22,15 @@ ResponseMap_4 :
  reviewer_id : 1
  reviewee_id : 2
  type : 'ReviewResponseMap'
+ResponseMap_5 :
+ id : 5
+ reviewed_object_id : 3
+ reviewer_id : 2
+ reviewee_id : 3
+ type : 'ReviewResponseMap'
+ResponseMap_6 :
+ id : 6
+ reviewed_object_id : 3
+ reviewer_id : 2
+ reviewee_id : 1
+ type : 'ReviewResponseMap'

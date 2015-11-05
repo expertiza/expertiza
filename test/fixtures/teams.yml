@@ -8,3 +8,8 @@ Team_2:
   name:  'User1'
   parent_id : 2
   type : 'AssignmentTeam'
+Team_3:
+  id : 3
+  name:  'User3'
+  parent_id : 3
+  type : 'AssignmentTeam'

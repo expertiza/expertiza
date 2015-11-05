@@ -9,7 +9,7 @@ class CourseTeamTest < ActiveSupport::TestCase
     @course0 = courses(:course0)
 
     @course_team6 = teams(:team6)
-    TeamNode.create(:parent_id => @course0.id, :node_object_id => @course_team6.id)
+    TeamNode.create(parent_id: @course0.id, node_object_id: @course_team6.id)
     @course_team7 = teams(:team7)
   end
 
@@ -67,7 +67,7 @@ class CourseTeamTest < ActiveSupport::TestCase
 
   def test_import
       row = ["student1", "student2", "student3"]
-      options = {:has_column_names => "false", :handle_dups => "ignore"}
+      options = {has_column_names: "false", handle_dups: "ignore"}
       course = courses(:course_object_oriented)
       CourseTeam.import(row, course.id, options)
 
@@ -101,7 +101,7 @@ class CourseTeamTest < ActiveSupport::TestCase
     course_team6.add_member(team6_student7, 1)
 
     output = Array.new
-    options = {:team_name => "true"}
+    options = {team_name: "true"}
     CourseTeam.export(output, @course0.id, options)
     assert_equal output[0][0], course_team6.name
     assert_equal output[0][1], @course0.name
@@ -121,7 +121,7 @@ class CourseTeamTest < ActiveSupport::TestCase
   end
 
   def test_export_fields
-     options = {:team_name => "false"}
+     options = {team_name: "false"}
      output = CourseTeam.export_fields(options)
      assert_equal output[0], "Team Name"
      assert_equal output[1], "Team members"

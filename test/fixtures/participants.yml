@@ -22,3 +22,32 @@ participant4:
   parent_id:  1
   type: AssignmentParticipant
 
+participant5:
+  id: 5
+  user_id:  7
+  parent_id:  1
+  type: AssignmentParticipant
+
+participant6:
+  id: 6
+  user_id:  8
+  parent_id:  1
+  type: AssignmentParticipant
+
+participant7:
+  id: 7
+  user_id:  9
+  parent_id:  1
+  type: AssignmentParticipant
+
+participant8:
+  id: 8
+  user_id:  12
+  parent_id:  1
+  type: AssignmentParticipant
+
+participant9:
+  id: 9
+  user_id:  11
+  parent_id:  1
+  type: AssignmentParticipant

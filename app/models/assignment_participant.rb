@@ -70,7 +70,7 @@ class AssignmentParticipant < Participant
 
     sum_of_scores = 0
 
-    self.response_maps.metareview_response_maps.each do |metaresponse_map|
+    self.response_maps.get_metareview_response_maps.each do |metaresponse_map|
       if !metaresponse_map.response.empty? && response_map == assignment_id then
         sum_of_scores = sum_of_scores + response_map.response.last.average_score
       end

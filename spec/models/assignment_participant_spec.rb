@@ -3,11 +3,11 @@ require 'rails_helper'
 describe AssignmentParticipant do
 
   describe "calculateScores" do
-
-    it "should_not.be less than 0" do
-      scores =100
-      scores.should >=0
-    end
+#it "should do" do
+#    should validate_presence_of(:assignment)
+# end
+# it {should validate_presence_of(:made)}
+    
   end
 
   describe "Calculate_Scores" do

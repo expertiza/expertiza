@@ -5,7 +5,8 @@ describe AssignmentParticipant do
   describe "calculateScores" do
 
     it "should_not.be less than 0" do
-      5.should >=4
+      scores =100
+      scores.should >=0
     end
   end
 

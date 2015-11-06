@@ -200,6 +200,10 @@ class ResponseController < ApplicationController
         score.update_attribute('answer', v[:score])
         score.update_attribute('comments', v[:comment])
       end
+      if (params['isSubmit'] && (params['isSubmit'].eql?'Yes'))
+        # Update the submission flag.
+        @map.update_attribute('isSubmitted','Yes')
+      end
     rescue
       msg = "Your response was not saved. Cause:189 #{$!}"
     end
@@ -289,6 +293,8 @@ class ResponseController < ApplicationController
   def saving
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
+    #@map.update_attribute('isSubmitted','Yes')
+
     @map.save
     redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
   end
@@ -354,6 +360,7 @@ class ResponseController < ApplicationController
       end
       response.map.read_attribute(:type)
     end
+
     !current_user_id?(response.map.reviewer.user_id)
   end
 end

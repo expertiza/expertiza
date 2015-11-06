@@ -23,7 +23,7 @@ class StudentReviewController < ApplicationController
     @num_reviews_total       = @review_mappings.size
     @num_reviews_completed   = 0
     @review_mappings.each do |map|
-      @num_reviews_completed += 1 if !map.response.empty?
+      @num_reviews_completed += 1 if (!map.response.empty? && (map.isSubmitted.eql?'Yes'))
     end
     @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed
     # Calculate the number of metareviews that the user has completed so far.

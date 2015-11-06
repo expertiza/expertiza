@@ -104,7 +104,7 @@ class ReviewResponseMap < ResponseMap
   # Returns the response maps for all the metareviews
   def get_metareview_response_maps
     responses = Response.where(map_id: id)
-    metareview_response_maps = Array.new()
+    metareview_response_maps = []
     responses.each do |response|
       metareview_response_maps << MetareviewResponseMap.where(reviewed_object_id: response.id)
     end

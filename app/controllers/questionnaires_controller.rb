@@ -22,7 +22,7 @@ class QuestionnairesController < ApplicationController
     @questionnaire.name = 'Copy of ' + orig_questionnaire.name
 
     #clone_questionnaire_details(questions, orig_questionnaire)
-    assign_Instructor_id
+    assign_instructor_id
     @questionnaire.name = 'Copy of '+orig_questionnaire.name
 
     copy_questionnaire(orig_questionnaire, questions)
@@ -636,7 +636,7 @@ class QuestionnairesController < ApplicationController
 
   # clones the contents of a questionnaire, including the questions and associated advice
   def clone_questionnaire_details(questions, orig_questionnaire)
-    assign_Instructor_id
+    assign_instructor_id
 
     @questionnaire.name = 'Copy of '+orig_questionnaire.name
 
@@ -673,7 +673,7 @@ class QuestionnairesController < ApplicationController
     end
   end
 
-  def assign_Instructor_id
+  def assign_instructor_id
     if (session[:user]).role.name != "Teaching Assistant"
       @questionnaire.instructor_id = session[:user].id
     else # for TA we need to get his instructor id and by default add it to his course for which he is the TA

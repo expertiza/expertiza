@@ -20,38 +20,29 @@ class QuestionnairesController < ApplicationController
     @questionnaire = orig_questionnaire.clone
     @questionnaire.instructor_id = session[:user].instructor_id  ## Why was TA-specific code removed here?  See Project E713.
     @questionnaire.name = 'Copy of ' + orig_questionnaire.name
-
-    #clone_questionnaire_details(questions, orig_questionnaire)
     assign_instructor_id
     @questionnaire.name = 'Copy of '+orig_questionnaire.name
-
     copy_questionnaire(orig_questionnaire, questions)
   end
 
   def copy_questionnaire(orig_questionnaire, questions)
     begin
-
       @questionnaire.created_at = Time.now
       @questionnaire.save!
-
       questions.each { |question|
-
         newquestion = question.clone
         newquestion.questionnaire_id = @questionnaire.id
         newquestion.save
-
         advice = QuestionAdvice.find_by_question_id(question.id)
         if !(advice.nil?)
           newadvice = advice.clone
           newadvice.question_id = newquestion.id
           newadvice.save
         end
-
       }
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
       parent = FolderNode.find_by_node_object_id(pFolder.id)
       check_create_new_node(parent)
-
       undo_link("Copy of questionnaire #{orig_questionnaire.name} has been created successfully. ")
       redirect_to :back
     rescue
@@ -106,7 +97,6 @@ class QuestionnairesController < ApplicationController
 
   def create_questionnaire
     @questionnaire = Object.const_get(params[:questionnaire][:type]).new(questionnaire_params)
-
     # TODO: check for Quiz Questionnaire?
     if @questionnaire.type == "QuizQuestionnaire" #checking if it is a quiz questionnaire
       participant_id = params[:pid] #creating a local variable to send as parameter to submitted content if it is a quiz questionnaire
@@ -114,14 +104,10 @@ class QuestionnairesController < ApplicationController
       @questionnaire.max_question_score = 1
       @assignment = Assignment.find(params[:aid])
       author_team = AssignmentTeam.team(Participant.find(participant_id))
-
       @questionnaire.instructor_id = author_team.id    #for a team assignment, set the instructor id to the team_id
-
       @successful_create = true
       save
-
       save_choices @questionnaire.id
-
       if @successful_create
         flash[:note] = "Quiz was successfully created"
       end
@@ -131,7 +117,6 @@ class QuestionnairesController < ApplicationController
         @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
       end
       save
-
       redirect_to controller: 'tree_display', action: 'list'
     end
   end
@@ -156,11 +141,9 @@ class QuestionnairesController < ApplicationController
   # Remove a given questionnaire
   def delete
     @questionnaire = Questionnaire.find(params[:id])
-
     if @questionnaire
       begin
         name = @questionnaire.name
-
         @questionnaire.assignments.each{
             | assignment |
           raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
@@ -171,7 +154,6 @@ class QuestionnairesController < ApplicationController
         flash[:error] = $!
       end
     end
-
     redirect_to action: 'list', controller: 'tree_display'
   end
 
@@ -249,10 +231,8 @@ class QuestionnairesController < ApplicationController
         end
       end
     end
-
     export if params['export']
     import if params['import']
-
     if params['view_advice']
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     else
@@ -281,7 +261,6 @@ class QuestionnairesController < ApplicationController
       valid_request=false
     else
       team = AssignmentParticipant.find(@participant_id).team
-
       if team.nil? #flash error if this current participant does not have a team
         flash[:error] = "You should create or join a team first."
         valid_request=false
@@ -298,7 +277,6 @@ class QuestionnairesController < ApplicationController
       @questionnaire.private = params[:private]
       @questionnaire.min_question_score = 0
       @questionnaire.max_question_score = 1
-
       render :new_quiz
     else
       redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
@@ -325,7 +303,6 @@ class QuestionnairesController < ApplicationController
       flash[:error] = "Your quiz has been taken by some other students, editing cannot be done any more."
       redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
     end
-
   end
 
   #save an updated quiz questionnaire to the database
@@ -334,17 +311,14 @@ class QuestionnairesController < ApplicationController
     redirect_to controller: 'submitted_content', action: 'view', id: params[:pid] if @questionnaire == nil
     if params['save']
       @questionnaire.update_attributes(questionnaire_params)
-
       for qid in params[:question].keys
         @question = Question.find(qid)
         @question.txt = params[:question][qid.to_sym][:txt]
         @question.save
-
         @quiz_question_choices = QuizQuestionChoice.where(question_id: qid)
         i=1
         for quiz_question_choice in @quiz_question_choices
           choose_question_type(i, quiz_question_choice)
-
           i+=1
         end
       end
@@ -387,7 +361,6 @@ class QuestionnairesController < ApplicationController
   def valid_quiz
     num_quiz_questions = Assignment.find(params[:aid]).num_quiz_questions
     valid = "valid"
-
     (1..num_quiz_questions).each do |i|
       if params[:new_question][i.to_s] == ''
         #One of the questions text is not filled out
@@ -419,7 +392,6 @@ class QuestionnairesController < ApplicationController
         end
       end
     end
-
     return valid
   end
 
@@ -439,13 +411,10 @@ class QuestionnairesController < ApplicationController
     return correct_selected, valid
   end
 
-
   private
   #save questionnaire object after create or edit
   def save
-
     @questionnaire.save!
-
     save_questions @questionnaire.id if @questionnaire.id != nil && @questionnaire.id > 0
     # We do not create node for quiz questionnaires
     if @questionnaire.type != "QuizQuestionnaire"
@@ -454,7 +423,6 @@ class QuestionnairesController < ApplicationController
       check_create_new_node(parent)
     end
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
-
   end
 
   #save parameters for new questions
@@ -471,9 +439,7 @@ class QuestionnairesController < ApplicationController
     if params[:new_question]
       # The new_question array contains all the new questions
       # that should be saved to the database
-
       for question_key in params[:new_question].keys
-
         q = Question.new()
         q.txt=params[:new_question][question_key]
         q.questionnaire_id = questionnaire_id
@@ -483,7 +449,6 @@ class QuestionnairesController < ApplicationController
           q.weight = 1 #setting the weight to 1 for quiz questionnaire since the model validates this field
         end
         unless q.txt.strip.empty?
-
           q.save
         end
       end
@@ -505,7 +470,6 @@ class QuestionnairesController < ApplicationController
           end
         end
       end
-
       if should_delete
         for advice in question.question_advices
           advice.destroy
@@ -520,13 +484,10 @@ class QuestionnairesController < ApplicationController
   # Handles questions whose wording changed as a result of the edit
   # @param [Object] questionnaire_id
   def save_questions(questionnaire_id)
-
     delete_questions questionnaire_id
     save_new_questions questionnaire_id
-
     if params[:question]
       for question_key in params[:question].keys
-
         if params[:question][question_key][:txt].strip.empty?
           # question text is empty, delete the question
           Question.delete(question_key)
@@ -537,11 +498,9 @@ class QuestionnairesController < ApplicationController
             Rails.logger.info(question.errors.messages.inspect)
           end
         end
-
       end
     end
   end
-
 
   #method to save the choices associated with a question in a quiz to the database
   #only for quiz questionnaire
@@ -549,7 +508,6 @@ class QuestionnairesController < ApplicationController
     if params[:new_question] && params[:new_choices]
       questions = Question.where(questionnaire_id: questionnaire_id)
       questionnum = 1
-
       for question in questions
         q_type = params[:question_type][questionnum.to_s][:type]
         for choice_key in params[:new_choices][questionnum.to_s][q_type].keys
@@ -618,9 +576,7 @@ class QuestionnairesController < ApplicationController
 
   def export
     @questionnaire = Questionnaire.find(params[:id])
-
     csv_data = QuestionnaireHelper::create_questionnaire_csv @questionnaire, session[:user].name
-
     send_data csv_data,
               type: 'text/csv; charset=iso-8859-1; header=present',
               disposition: "attachment; filename=questionnaires.csv"
@@ -628,46 +584,34 @@ class QuestionnairesController < ApplicationController
 
   def import
     @questionnaire = Questionnaire.find(params[:id])
-
     file = params['csv']
-
     @questionnaire.questions << QuestionnaireHelper::get_questions_from_csv(@questionnaire, file)
   end
 
   # clones the contents of a questionnaire, including the questions and associated advice
   def clone_questionnaire_details(questions, orig_questionnaire)
     assign_instructor_id
-
     @questionnaire.name = 'Copy of '+orig_questionnaire.name
-
     begin
       @questionnaire.created_at = Time.now
       @questionnaire.save!
-
       questions.each do |question|
         newquestion = question.clone
         newquestion.questionnaire_id = @questionnaire.id
         newquestion.save
-
         advice = QuestionAdvice.find_by_question_id(question.id)
-
         if advice
           newadvice = advice.clone
           newadvice.question_id = newquestion.id
           newadvice.save
         end
       end
-
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
       parent = FolderNode.find_by_node_object_id(pFolder.id)
-
       check_create_new_node(parent)
-
       undo_link("Copy of questionnaire #{orig_questionnaire.name} has been created successfully. ")
       redirect_to controller: 'questionnaire', action: 'view', id: @questionnaire.id
-
     rescue
-
       flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.'+$!
       redirect_to action: 'list', controller: 'tree_display'
     end

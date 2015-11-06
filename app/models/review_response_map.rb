@@ -106,7 +106,7 @@ class ReviewResponseMap < ResponseMap
     responses = Response.where(map_id: id)
     metareview_response_maps = []
     responses.each do |response|
-      metareview_response_maps << MetareviewResponseMap.where(reviewed_object_id: response.id)
+      metareview_response_maps.concat MetareviewResponseMap.where(reviewed_object_id: response.id)
     end
     metareview_response_maps
   end

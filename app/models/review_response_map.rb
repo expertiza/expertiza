@@ -211,11 +211,7 @@ class ReviewResponseMap < ResponseMap
     review_final_versions[symbol][questionnaire_id] = assignment.get_review_questionnaire_id(round)
     response_ids = []
     maps.each do |map|
-      if round.nil?
-        responses = Response.where(map_id: map.id)
-      else
-        responses = Response.where(map_id: map.id, round: round)
-      end
+      responses =  get_responses(map.id, round)
       unless responses.empty?
         response_ids << responses.last.id
       end
@@ -223,4 +219,12 @@ class ReviewResponseMap < ResponseMap
     review_final_versions[symbol][:response_ids] = response_ids
   end
 
+#Get responses by map_id and round (if exists)
+  def self.get_responses(id, round)
+     if round.nil?
+       responses = Response.where(map_id: id)
+     else
+       responses = Response.where(map_id: id, round: round)
+     end	
+  end	
 end

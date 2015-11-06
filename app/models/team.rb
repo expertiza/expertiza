@@ -34,8 +34,12 @@ class Team < ActiveRecord::Base
     "TeamNode"
   end
 
-  def get_author_name
-    return self.name
+  def get_author_names
+    names = Array.new
+    users.each do |user|
+      names << user.fullname
+    end
+    names
   end
 
   def self.generate_team_name()

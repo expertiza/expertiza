@@ -4,7 +4,33 @@ class PopupController < ApplicationController
     true
   end
 
-  # this pop up can be called from "review_report" from instructor end.
+  # this can be called from "response_report" by clicking student names from instructor end.
+  def author_feedback_popup
+    @response_id = params[:response_id]
+    @reviewee_id = params[:reviewee_id]
+    if !@response_id.nil?
+      first_question_in_questionnaire = Answer.where(response_id: @response_id).first.question_id
+      questionnaire_id = Question.find(first_question_in_questionnaire).questionnaire_id
+      questionnaire = Questionnaire.find(questionnaire_id)
+      @maxscore = questionnaire.max_question_score
+      @scores = Answer.where(response_id: @response_id)
+      @response = Response.find(@response_id)
+      @total_percentage = @response.get_average_score
+      @sum = @response.get_total_score
+      @total_possible = @response.get_maximum_score
+    end
+
+    if(@maxscore == nil)
+      @maxscore = 5
+    end
+
+    if !@response_id.nil?
+      participant = Participant.find(@reviewee_id)
+      @user = User.find(participant.user_id)
+    end
+  end
+
+  # this can be called from "response_report" by clicking team names from instructor end.
   def team_users_popup
     @sum = 0
     @count = 0
@@ -112,12 +138,13 @@ class PopupController < ApplicationController
   end
 
   def view_review_scores_popup
-    @reviewid = params[:id]
-    @scores = Answer.where(instance_id: @reviewid)
-
+    @reviewerid = params[:reviewer_id]
+    @assignment_id = params[:assignment_id]
+    @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@reviewerid)
 
   end
 
+  # this can be called from "response_report" by clicking reviewer names from instructor end.
   def reviewer_details_popup
     @userid = Participant.find(params[:id]).user_id
     @user = User.find(@userid)

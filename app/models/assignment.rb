@@ -107,6 +107,12 @@ require 'analytic/assignment_analytic'
 
     contributor_set = reject_by_max_reviews_per_submission(contributor_set)
 
+    # if this assignment does not allow reviewer to review other artifacts on the same topic,
+    # remove those teams from candidate list.
+    if !self.can_review_same_topic?
+      contributor_set = reject_by_same_topic(contributor_set,reviewer)
+    end
+
     # Add topics for all remaining submissions to a list of available topics for review
     candidate_topics = Set.new
     contributor_set.each { |contributor|
@@ -148,6 +154,20 @@ require 'analytic/assignment_analytic'
   def reject_by_max_reviews_per_submission(contributor_set)
     contributor_set.reject! { |contributor| contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count  >= max_reviews_per_submission }
     contributor_set
+  end
+
+  def reject_by_same_topic(contributor_set, reviewer)
+    reviewer_team = AssignmentTeam.team(reviewer)
+    # it is possible that this reviewer does not have a team, if so, do nothing
+    if reviewer_team
+      topic_id = reviewer_team.topic
+      # it is also possible that this reviewer has team, but this team has no topic yet, if so, do nothing
+      if topic_id
+        contributor_set = contributor_set.reject { |contributor| contributor.topic==topic_id }
+      end
+    end
+
+    return contributor_set
   end
 
   def reject_previously_reviewed_submissions(contributor_set, reviewer)
@@ -226,6 +246,7 @@ require 'analytic/assignment_analytic'
     if topic
       raise "This topic has too many quizzes taken; please select another one." unless candidate_topics_for_quiz.include?(topic)
     end
+
 
     contributor_set = Array.new(contributors)
     work = (topic.nil?) ? 'assignment' : 'topic'

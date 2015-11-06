@@ -284,7 +284,7 @@ class AssignmentParticipant < Participant
       total_score = 0
       for i in 1..self.assignment.get_review_rounds
         round_sym = ("review"+i.to_s).to_sym
-        if length_of_assessments=scores[round_sym][:assessments].nil? || scores[round_sym][:assessments].length==0
+        if scores[round_sym][:assessments].nil? || scores[round_sym][:assessments].length==0
           next
         end
         length_of_assessments=scores[round_sym][:assessments].length.to_f
@@ -651,11 +651,6 @@ class AssignmentParticipant < Participant
       participant = Participant.find(id)
       team_id = TeamsUser.team_id(participant.parent_id, participant.user_id)
       ReviewResponseMap.where(reviewee_id: team_id, reviewed_object_id: assignment.id)
-    end
-
-    def topic_string
-      return "<center>&#8212;</center>" if topic.nil? or topic.topic_name.empty?
-        topic.topic_name
     end
   
   end

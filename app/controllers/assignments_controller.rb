@@ -238,6 +238,11 @@ class AssignmentsController < ApplicationController
     @courses = Assignment.set_courses_to_assignment(current_user)
   end
 
+  def list_submissions
+    @assignment = Assignment.find(params[:id])
+    @teams = Team.where(parent_id: params[:id])
+  end
+
   def remove_assignment_from_course
     assignment = Assignment.find(params[:id])
     Assignment.remove_assignment_from_course(assignment)
@@ -283,8 +288,6 @@ class AssignmentsController < ApplicationController
     needed_rub += "] </b>"
     needed_rub
   end
-
-
 
   def is_due_date_nameurl_notempty(dd)
     (!dd.deadline_name.nil?&&!dd.deadline_name.empty?)||(!dd.description_url.nil?&&!dd.description_url.empty?)

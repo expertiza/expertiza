@@ -1,37 +1,59 @@
 <h2> Review scores </h2>
-<table>
-  <tr>
 
-    <th align = 'left'> Question </th>
-    <th> Score </th>
-    <th> Comments </th>
+<%keys = @review_final_versions.keys%>
+<%keys.each do |key|%>
+  <h3><%=key%></h3>
+  <table border="1">
 
-  </tr>
-  <% @scores.each do |s|%>
+    <%questionnaire_id = Questionnaire.find(@review_final_versions[key][:questionnaire_id])%>
+    <%questions = Question.where(questionnaire_id: questionnaire_id)%>
+    <%num_responses = @review_final_versions[key][:response_ids].length%>
+    <% questions.each do |question|%>
 
+      <tr>
+        <th  align = 'left'> [Question] <%= question.txt%> </th>
+      </tr>
+      <%if !question.is_a?(QuestionnaireHeader) && num_responses>0%>
+        <tr>
+          <td width="60%"> Reviewee </td>
+          <td width="10%"> Score </td>
+          <td width="30%"> Comments </td>
+        </tr>
+      <%else%>
+        <%next%>
+      <%end%>
+
+      <%@review_final_versions[key][:response_ids].each do |response_id|%>
+        <%answer = Answer.where(response_id: response_id, question_id: question.id).first%>
+          <%if !answer.nil?%>
+            <tr>
+              <%team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id)%>
+              <td>
+                <%=team.name%> <br>
+                <%team.get_author_names.each do |name|%>
+                <%= name%> <br>
+                <%end%>
+              </td>
+              <td align = 'center'> <%= answer.answer%></td>
+              <td align = 'left'> <%= answer.comments %> </td>
+            </tr>
+          <%else%>
+                <td>N/A</td>
+            <td>N/A</td>
+            <td>N/A</td>
+          <%end%>
+      <%end%>
+    <%end%>
     <tr>
-
-      <td align = 'left'> <%= Question.find(s.question_id).txt%></td>
-      <td align = 'center'> <%= s.answer%></td>
-      <td align = 'left'> <%= s.comments %> </td>
-
-
+      <th align = 'left'> Additional Comment</th>
     </tr>
 
-
-  <%end%>
-  <tr>
-    <th> Additional Comment</th>
-  </tr>
-
-  <tr>
-    <%if (Review.find(@reviewid).additional_comment)%>
-      <td> <%= Review.find(@reviewid).additional_comment%> </td>
-    <%else%>
-      <td> No Comments </td>
+    <%@review_final_versions[key][:response_ids].each do |response_id|%>
+      <tr>
+        <td> <%= Response.find(response_id).additional_comment%> </td>
+      </tr>
     <%end%>
-  </tr>
-</table>
+    </table>
 
-
+<% end #loop for keys%>
 <br/>

@@ -1,0 +1,72 @@
+<h1>Submissions for <%= @assignment.name %></h1>
+
+<div>
+  <table width="100%" cellspacing="0" cellpadding="2" border="0">
+  	<tr bgcolor="#CCCCCC">
+  		<% if @assignment.max_team_size > 1 %>
+	  	  <th width = "20%">
+	        Team name
+	      </th>
+	      <th width = "18%">
+	        Team member(s)
+	      </th>
+	      <th>
+	        Submitted hyperlink(s)
+	      </th>
+	    <% else %>
+	      <th width = "38%">
+	        Participant name
+	      </th>
+	      <th>
+	        Submitted hyperlink(s)
+	      </th>
+	    <% end %>
+    </tr>
+
+    <% @l = -1 %>
+    <% @teams.each do |team| %>
+    	<%@l = @l+1 %>
+    	<tr>
+    	<% if (@l%2) == 0 %>
+    		<% bgcolor = "#ffffff" %>
+    	<% else %>
+    		<% bgcolor = "#DDDDBB" %>
+    	<% end %>
+
+  		<% if @assignment.max_team_size > 1 %>
+	    	<td bgcolor= <%= bgcolor %>>
+	    		<%= team.name %>
+	    	</td>
+    	<% end %>
+    	<% teams_users = TeamsUser.where(team_id: team.id) %>
+    	<% users_for_curr_team = "" %>
+    	<% submissions = "" %>
+    	<% teams_users.each do |teams_user| %>
+    		<% user = User.find(teams_user.user_id) %>
+    		<% users_for_curr_team += user.name + ' (' + user.fullname + ')' + '<br/>' %>
+    		<% @participants = Array.new %>
+    		<% @participants << Participant.where(["parent_id = ? AND user_id = ?", @assignment.id, user.id]).first %>
+    	<% end %>
+    	<td bgcolor= <%= bgcolor %>>
+    		<%= users_for_curr_team.html_safe %>
+    	</td>
+    	<td bgcolor= <%= bgcolor %>>
+    		<!--Display submitted hyperlinks-->
+ 			
+ 			<% @participants.each do |participant| %>
+    			<%= "Hyperlinks:<br/>".html_safe if !participant.hyperlinks.blank? and participant == @participants.first %>
+	    		<% participant.hyperlinks.each do |link| %>
+	    			<a href="<%= link %>" target="_blank"><%= link %></a><br/>
+	    		<% end %>
+	    	<% end %>
+    		<!--Display submitted files-->
+ 			<% @participants.each do |participant| %>
+    			<% files = participant.submitted_files %>
+    			<%= "Files:" if !files.blank? and participant == @participants.first %>
+    			<% if files and files.length > 0 %>
+				    <%= display_directory_tree(participant, files, true).html_safe %>
+				<% end %>
+	    	<% end %>
+    	</td>
+    <% end %>
+  </table>

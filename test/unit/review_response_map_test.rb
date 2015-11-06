@@ -4,7 +4,7 @@ class ReviewResponseMapTest < ActiveSupport::TestCase
 	fixtures :response_maps, :questionnaires , :assignments, :responses, :assignment_questionnaires, :users, :participants, :teams
 
 	test "method_export" do
-		csv = Array.new()
+		csv = []
 		ReviewResponseMap.export(csv, 3, nil)
 		assert_equal csv.count, 2		
 	end
@@ -12,7 +12,7 @@ class ReviewResponseMapTest < ActiveSupport::TestCase
 	test "method_get_metareview_response_maps" do
         	review_response_map_test = ReviewResponseMap.new
 		review_response_map_test.id = 1
-		assert_equal review_response_map_test.get_metareview_response_maps.count, 2
+		assert_equal review_response_map_test.get_metareview_response_maps.count, 1
 	end
 
 	test "method_get_team_response_for_round" do

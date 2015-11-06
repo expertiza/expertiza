@@ -4,7 +4,7 @@ class ReviewResponseMapTest < ActiveSupport::TestCase
 	fixtures :response_maps, :questionnaires , :assignments, :responses, :assignment_questionnaires, :users, :participants, :teams
 
 	test "method_export" do
-		csv = Array.new()
+		csv = []
 		ReviewResponseMap.export(csv, 3, nil)
 		assert_equal csv.count, 2		
 	end

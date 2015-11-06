@@ -19,12 +19,7 @@ class Response < ActiveRecord::Base
 
   def display_as_html(prefix = nil, count = nil, file_url = nil)
     identifier = ""
-    # The following three lines print out the type of rubric before displaying
-    # feedback.  Currently this is only done if the rubric is Author Feedback.
-    # It doesn't seem necessary to print out the rubric type in the case of
-    # a ReviewResponseMap.  Also, I'm not sure if that would have to be
-    # TeamResponseMap for a team assignment.  Someone who understands the
-    # situation better could add to the code later.
+    
     if self.map.type.to_s == 'FeedbackResponseMap'
       identifier += "<H2>Feedback from author</H2>"
     end

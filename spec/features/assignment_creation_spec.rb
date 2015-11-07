@@ -12,7 +12,7 @@ RSpec.feature "create private assignment"  do
          fill_in('login_name', :with => 'instructor6')
          fill_in('login_password', :with => 'password')
          click_on('SIGN IN')
-         expect(page).to have_content('Manage')
+         expect(page).to have_content('Manage',:wait=>2)
          within(".content") do
          click_on("Assignments")
          click_button 'New private assignment'
@@ -38,7 +38,7 @@ RSpec.feature "create private assignment"  do
             within('#questionnaire_table_AuthorFeedbackQuestionnaire') do
               select('Author feedback OTD1', from: 'assignment_form[assignment_questionnaire][][questionnaire_id]')
             end
-            expect(page).to have_content("Rubrics")
+            expect(page).to have_content("Rubrics",:wait=>2)
             click_on('submit_btn')
             expect(page).to have_content("successfully",:wait=>5)
         end
@@ -58,7 +58,7 @@ RSpec.feature "create private assignment"  do
             within('#questionnaire_table_AuthorFeedbackQuestionnaire') do
               select('Author feedback OTD1', from: 'assignment_form[assignment_questionnaire][][questionnaire_id]')
             end
-            expect(page).to have_content("Rubrics")
+            expect(page).to have_content("Rubrics",:wait=>2)
             click_on('submit_btn')
             expect(page).to have_content("successfully",:wait=>5)
         end 
@@ -78,7 +78,7 @@ RSpec.feature "create private assignment"  do
             within('#questionnaire_table_AuthorFeedbackQuestionnaire') do
               select('Author feedback OTD1', from: 'assignment_form[assignment_questionnaire][][questionnaire_id]')
             end
-            expect(page).to have_content("Rubrics")
+            expect(page).to have_content("Rubrics",:wait=>2)
             click_on('submit_btn')
             expect(page).to have_content("successfully",:wait=>5)
         end
@@ -98,7 +98,7 @@ RSpec.feature "create private assignment"  do
             within('#questionnaire_table_AuthorFeedbackQuestionnaire') do
               select('Author feedback OTD1', from: 'assignment_form[assignment_questionnaire][][questionnaire_id]')
             end
-            expect(page).to have_content("Rubrics")
+            expect(page).to have_content("Rubrics",:wait=>2)
             click_on('submit_btn')
             expect(page).to have_content("successfully",:wait=>5)
         end
@@ -118,7 +118,7 @@ RSpec.feature "create private assignment"  do
             within('#questionnaire_table_AuthorFeedbackQuestionnaire') do
               select('Author feedback OTD1', from: 'assignment_form[assignment_questionnaire][][questionnaire_id]')
             end
-            expect(page).to have_content("Rubrics")
+            expect(page).to have_content("Rubrics",:wait=>2)
             click_on('submit_btn')
             expect(page).to have_content("successfully",:wait=>5)
         end
@@ -138,7 +138,7 @@ RSpec.feature "create private assignment"  do
             within('#questionnaire_table_AuthorFeedbackQuestionnaire') do
               select('Author feedback OTD1', from: 'assignment_form[assignment_questionnaire][][questionnaire_id]')
             end
-            expect(page).to have_content("Rubrics")
+            expect(page).to have_content("Rubrics",:wait=>2)
             click_on('submit_btn')
             expect(page).to have_content("successfully",:wait=>5)
         end
@@ -156,7 +156,7 @@ RSpec.feature "create private assignment"  do
             within('#questionnaire_table_AuthorFeedbackQuestionnaire') do
               select('Author feedback OTD1', from: 'assignment_form[assignment_questionnaire][][questionnaire_id]')
             end
-            expect(page).to have_content("Rubrics")
+            expect(page).to have_content("Rubrics",:wait=>2)
             click_on('submit_btn')
             expect(page).to have_content("successfully",:wait=>5)
         end
@@ -180,7 +180,7 @@ RSpec.feature "create private assignment"  do
             within('#questionnaire_table_AuthorFeedbackQuestionnaire') do
               select('Author feedback OTD1', from: 'assignment_form[assignment_questionnaire][][questionnaire_id]')
             end
-            expect(page).to have_content("Rubrics")
+            expect(page).to have_content("Rubrics",:wait=>2)
             click_on('submit_btn')
             expect(page).to have_content("successfully",:wait=>5)
         end
@@ -199,7 +199,7 @@ RSpec.feature "create private assignment"  do
             within('#questionnaire_table_AuthorFeedbackQuestionnaire') do
               select('Author feedback OTD1', from: 'assignment_form[assignment_questionnaire][][questionnaire_id]')
             end
-            expect(page).to have_content("Rubrics")
+            expect(page).to have_content("Rubrics",:wait=>2)
             click_on('submit_btn')
             expect(page).to have_content("successfully",:wait=>5)
         end
@@ -220,7 +220,7 @@ RSpec.feature "create private assignment"  do
             within('#questionnaire_table_AuthorFeedbackQuestionnaire') do
               select('Author feedback OTD1', from: 'assignment_form[assignment_questionnaire][][questionnaire_id]')
             end
-            expect(page).to have_content("Rubrics")
+            expect(page).to have_content("Rubrics",:wait=>2)
             click_on('submit_btn')
             expect(page).to have_content("successfully",:wait=>5)
         end
@@ -241,7 +241,7 @@ RSpec.feature "create private assignment"  do
             within('#questionnaire_table_AuthorFeedbackQuestionnaire') do
               select('Author feedback OTD1', from: 'assignment_form[assignment_questionnaire][][questionnaire_id]')
             end
-            expect(page).to have_content("Rubrics")
+            expect(page).to have_content("Rubrics",:wait=>2)
             click_on('submit_btn')
             expect(page).to have_content("successfully",:wait=>5)
         end
@@ -260,7 +260,7 @@ RSpec.feature "create private assignment"  do
             within('#questionnaire_table_AuthorFeedbackQuestionnaire') do
               select('Author feedback OTD1', from: 'assignment_form[assignment_questionnaire][][questionnaire_id]')
             end
-            expect(page).to have_content("Rubrics")
+            expect(page).to have_content("Rubrics",:wait=>2)
             click_on('submit_btn')
             expect(page).to have_content("successfully",:wait=>5)
         end
@@ -279,7 +279,7 @@ RSpec.feature "create private assignment"  do
             within('#questionnaire_table_AuthorFeedbackQuestionnaire') do
               select('Author feedback OTD1', from: 'assignment_form[assignment_questionnaire][][questionnaire_id]')
             end
-            expect(page).to have_content("Rubrics")
+            expect(page).to have_content("Rubrics",:wait=>2)
             click_on('submit_btn')
             expect(page).to have_content("successfully",:wait=>5)
         end
@@ -299,7 +299,7 @@ RSpec.feature "create private assignment"  do
             within('#questionnaire_table_AuthorFeedbackQuestionnaire') do
               select('Author feedback OTD1', from: 'assignment_form[assignment_questionnaire][][questionnaire_id]')
             end
-            expect(page).to have_content("Rubrics")
+            expect(page).to have_content("Rubrics",:wait=>2)
             click_on('submit_btn')
             expect(page).to have_content("successfully",:wait=>5)
         end
@@ -322,7 +322,7 @@ RSpec.feature "create private assignment"  do
             within('#questionnaire_table_AuthorFeedbackQuestionnaire') do
               select('Author feedback OTD1', from: 'assignment_form[assignment_questionnaire][][questionnaire_id]')
             end
-            expect(page).to have_content("Rubrics")
+            expect(page).to have_content("Rubrics",:wait=>2)
             click_on('submit_btn')
             expect(page).to have_content("successfully",:wait=>5)
         end
@@ -333,24 +333,23 @@ RSpec.feature "create private assignment"  do
             fill_in('login_name', :with => 'instructor6')
             fill_in('login_password', :with => 'password')
             click_on('SIGN IN')
-            expect(page).to have_content('Manage')
+            expect(page).to have_content('Manage',:wait=>2)
             within(".content") do
             click_on("Assignments")
             click_button 'New private assignment'
             click_on('Create')
-            expect(page).to have_content("New Assignment")
+            expect(page).to have_content("New Assignment",:wait=>2)
             end 
        end 
 end
 
 RSpec.feature "create public assignment"  do
     before(:each) do
-      #@user = FactoryGirl.create(:user)
       visit root_path
       fill_in('login_name', :with => 'instructor6')
       fill_in('login_password', :with => 'password')
       click_on('SIGN IN')
-      expect(page).to have_content('Manage')
+      expect(page).to have_content('Manage',:wait=>2)
       within(".content") do
         click_on("Assignments")
       end

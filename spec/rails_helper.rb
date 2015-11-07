@@ -42,24 +42,4 @@ RSpec.configure do |config|
   # https://relishapp.com/rspec/rspec-rails/docs
   config.infer_spec_type_from_file_location!
 
-
-  # Used database cleaner to truncate existing test data
-=begin
-  config.before(:suite) do
-    DatabaseCleaner.clean_with(:truncation,:only => %w[users assignments])
-  end
-
-  config.before(:each) do
-    DatabaseCleaner.strategy = :transaction
-  end
-
-  config.before(:each, :js => true) do
-    DatabaseCleaner.strategy = :truncation
-  end
-
-  config.before(:each) do
-    DatabaseCleaner.start
-  end
-=end
-
 end

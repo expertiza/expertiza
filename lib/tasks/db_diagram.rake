@@ -10,7 +10,7 @@ namespace :db do
 
         begin
             puts 'Creating the database schema diagram...'
-            db_config = YAML.load(File.new('config/database.yml').read)
+            db_config = YAML.load(File.new('config/database.yml.example').read)
             db_user = db_config['development']['username']
             db_pass = db_config['development']['password']
             password_args = (db_pass.nil? ? '' : "--password=#{db_pass}")

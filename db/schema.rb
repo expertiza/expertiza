@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151021142107) do
+ActiveRecord::Schema.define(version: 20151106041226) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -78,11 +78,11 @@ ActiveRecord::Schema.define(version: 20151021142107) do
     t.integer  "late_policy_id",                    limit: 4
     t.boolean  "is_penalty_calculated",                           default: false, null: false
     t.integer  "max_bids",                          limit: 4
-    t.boolean  "show_teammate_reviews",             limit: 1
-    t.boolean  "availability_flag",                 limit: 1,     default: true
-    t.boolean  "use_bookmark",                      limit: 1
-    t.boolean  "can_review_same_topic",             limit: 1,     default: true
-    t.boolean  "can_choose_topic_to_review",        limit: 1,     default: true
+    t.boolean  "show_teammate_reviews"
+    t.boolean  "availability_flag",                               default: true
+    t.boolean  "use_bookmark"
+    t.boolean  "can_review_same_topic",                           default: true
+    t.boolean  "can_choose_topic_to_review",                      default: true
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -398,6 +398,7 @@ ActiveRecord::Schema.define(version: 20151021142107) do
     t.string   "type",               limit: 255, default: "", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "isSubmitted",        limit: 255
   end
 
   add_index "response_maps", ["reviewer_id"], name: "fk_response_map_reviewer", using: :btree
@@ -715,6 +716,31 @@ ActiveRecord::Schema.define(version: 20151021142107) do
   end
 
   add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree
+
+  create_table "users_bkp", id: false, force: :cascade do |t|
+    t.integer "id",                        limit: 4,     default: 0,     null: false
+    t.string  "name",                      limit: 255,   default: "",    null: false
+    t.string  "crypted_password",          limit: 40,    default: "",    null: false
+    t.integer "role_id",                   limit: 4,     default: 0,     null: false
+    t.string  "password_salt",             limit: 255
+    t.string  "fullname",                  limit: 255
+    t.string  "email",                     limit: 255
+    t.integer "parent_id",                 limit: 4
+    t.boolean "private_by_default",                      default: false
+    t.string  "mru_directory_path",        limit: 128
+    t.boolean "email_on_review"
+    t.boolean "email_on_submission"
+    t.boolean "email_on_review_of_review"
+    t.boolean "is_new_user",                             default: true,  null: false
+    t.integer "master_permission_granted", limit: 1,     default: 0
+    t.string  "handle",                    limit: 255
+    t.boolean "leaderboard_privacy",                     default: false
+    t.text    "digital_certificate",       limit: 65535
+    t.string  "persistence_token",         limit: 255
+    t.string  "timezonepref",              limit: 255
+    t.text    "public_key",                limit: 65535
+    t.boolean "copy_of_emails",                          default: false
+  end
 
   create_table "versions", force: :cascade do |t|
     t.string   "item_type",  limit: 255,   null: false

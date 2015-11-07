@@ -57,7 +57,7 @@
                       <%- # show the link as edit when latest review is done in current deadline   -%>
                       <%- # show link as update when latest review is done in different deadline than current phase   -%>
                       <% if (last_response_round == current_round)%>
-                        <td><% if (!map.isSubmitted.eql?'Yes') %>
+                        <td><% if (!@latest_response.isSubmitted.eql?'Yes') %>
                               <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id} %>
                               <%end%>
                               </td>

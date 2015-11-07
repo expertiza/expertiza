@@ -4,6 +4,13 @@ class ResponseController < ApplicationController
   helper :file
 
   def action_allowed?
+    case params[:action]
+      when 'edit'
+        response = Response.find(params[:id])
+        if (response.isSubmitted.eql?('Yes'))
+          return false
+        end
+    end
     current_user
   end
 
@@ -202,7 +209,7 @@ class ResponseController < ApplicationController
       end
       if (params['isSubmit'] && (params['isSubmit'].eql?'Yes'))
         # Update the submission flag.
-        @map.update_attribute('isSubmitted','Yes')
+        @response.update_attribute('isSubmitted','Yes')
       end
     rescue
       msg = "Your response was not saved. Cause:189 #{$!}"
@@ -271,7 +278,7 @@ class ResponseController < ApplicationController
       @round=nil
     end
 
-    @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:round => @round)#,:version_num=>@version)
+    @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:round => @round, :isSubmitted => params[:isSubmit])#,:version_num=>@version)
 
     @res = @response.response_id
 
@@ -293,8 +300,6 @@ class ResponseController < ApplicationController
   def saving
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
-    #@map.update_attribute('isSubmitted','Yes')
-
     @map.save
     redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
   end

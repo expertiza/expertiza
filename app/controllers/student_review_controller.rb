@@ -20,10 +20,17 @@ class StudentReviewController < ApplicationController
     @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
     @metareview_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
     # Calculate the number of reviews that the user has completed so far.
-    @num_reviews_total       = @review_mappings.size
+    @num_reviews_total = @review_mappings.map{|response| response.response.size}.sum
+    # Add the reviews which are requested and not began.
+    @review_mappings.map do |response|
+      @num_reviews_total += 1 if response.response.empty?
+    end
     @num_reviews_completed   = 0
     @review_mappings.each do |map|
-      @num_reviews_completed += 1 if (!map.response.empty? && (map.isSubmitted.eql?'Yes'))
+      current_round = map.response.map{|response| response.round}.max
+      map.response.each do |response|
+        @num_reviews_completed += 1 if (!current_round.eql?(response.round) || (response.isSubmitted.eql?'Yes'))
+      end
     end
     @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed
     # Calculate the number of metareviews that the user has completed so far.

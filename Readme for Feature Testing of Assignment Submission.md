@@ -21,22 +21,27 @@ The goal is to test these steps using rspec and capybara.
 
 ### Running the Feature Test
 To run the feature test, follow the steps
-* Clone this repository: 
+* Clone this repository in a new directory: 
 ```
 git clone https://github.com/shrenujgandhi/expertiza.git
 ```
-* Make sure to update gems and migrate database
+* Create database
 ```
-bundle install
+cd expertiza
+rake db:create:all 
 ```
+* Import database
 ```
-rake db:migrate
+$ cd Downloads
+$ mysql -u root -p expertiza_development < expertiza_scrubbed_2015_08_14.sql
+password
 ```
-* First run following command, in the root directory of the application, to create the assignments
+* Migrate database
 ```
-$ rspec spec/features/assignment_creation.rb
+$ cd expertiza
+$ rake db:migrate
 ```
-* Then run this command, in the root directory of the application, to run the feature tests
+* Run feature test
 ```
 $ rspec spec/features/student_submission_spec.rb
 ```

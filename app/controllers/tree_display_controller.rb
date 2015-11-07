@@ -134,10 +134,10 @@ class TreeDisplayController < ApplicationController
       res = []
       if tmpRes
         for child in tmpRes
-          res2 = {}
-          res2 = populate_1_row(child)
-          res2["key"] = params[:reactParams2][:key]
-          res << res2
+          res_node = {}
+          res_node = populate_1_row(child)
+          res_node["key"] = params[:reactParams2][:key]
+          res << res_node
         end
       end
     end

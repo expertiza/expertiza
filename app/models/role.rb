@@ -65,13 +65,12 @@ class Role < ActiveRecord::Base
   end
 
   def Role.rebuild_cache
-    Role.find_each do |role|
+    Role.find_each do |role|      
       role.cache = nil
       role.save # we have to do this to clear it
-
       role.cache = Hash.new
       role.rebuild_credentials
-      role.rebuild_menu
+      role.rebuild_menu            
       role.save
     end
   end

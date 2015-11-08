@@ -30,6 +30,7 @@ gem 'jquery-ui-sass-rails'
 gem 'jquery-datetimepicker-rails'
 gem 'mysql2'
 gem 'nokogiri'
+gem 'net-ssh', '~>2.9.2'
 gem 'omniauth-google-oauth2', '~> 0.2.6'
 gem 'open-uri-cached'
 gem 'paper_trail'
@@ -55,6 +56,7 @@ gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
+gem "factory_girl_rails", "~> 4.0"
 
 group :development do
   gem 'daemons'

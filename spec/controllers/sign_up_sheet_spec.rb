@@ -1,5 +1,5 @@
 require 'rails_helper'
-include LogInHelper
+#include LogInHelper -- causing Travis CI build to fail, can't locate the file. Commenting.
 
 describe SignUpSheetController do
   before(:each) do

@@ -16,25 +16,12 @@ class StudentQuizzesController < ApplicationController
 
   def finished_quiz
     @response = Response.where(map_id: params[:map_id]).first
-    @response_map = ResponseMap.find(params[:map_id])
+    @response_map = QuizResponseMap.find(params[:map_id])
     @questions = Question.where(questionnaire_id: @response_map.reviewed_object_id) #for quiz response map, the reivewed_object_id is questionnaire id
     @map = ResponseMap.find(params[:map_id])
     @participant = AssignmentTeam.find(@map.reviewee_id).participants.first
 
-    quiz_score = 0.0
-
-    @questions.each do |question|
-      score = Answer.where(response_id: @response.id, question_id:  question.id).first
-      if score.answer.eql? -1
-        #This used to be designed for ungraded essay question.
-      else
-        quiz_score += score.answer
-      end
-    end
-
-    question_count = @questions.length
-
-    @quiz_score = (quiz_score/question_count) * 100
+    @quiz_score =@response_map.quiz_score
   end
 
   #Create an array of candidate quizzes for current reviewer

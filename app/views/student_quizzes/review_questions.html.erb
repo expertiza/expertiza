@@ -23,15 +23,22 @@
               <td> <%=User.find(reviewer_user_id).fullname%></td>
             <%end%>
           </tr>
+          <% quiz_scores = [] %>
           <tr>
             <th> quiz score </th>
             <% response_maps.each do |response_map| %>
-                <td> <%=response_map.quiz_score%></td>
+                <% quiz_score = response_map.quiz_score%>
+                <%quiz_scores.push(quiz_score) if !quiz_score.eql?('N/A')%>
+                <td> <%=quiz_score%></td>
             <%end%>
 
           </tr>
         </table>
         <br>
+        <% if quiz_scores.size!= 0 %>
+          Average score for quiz takers: <%= (quiz_scores.sum / quiz_scores.size).round(2) %>
+          <br><br>
+        <% end %>
       <% end %>
 
       <%questions = questionnaire.questions%>

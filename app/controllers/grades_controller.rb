@@ -43,7 +43,8 @@ class GradesController < ApplicationController
     @avg_of_avg = mean(averages)
     calculate_all_penalties(@assignment.id)
   end
-
+	
+  # This method is used to retrieve questions for different review rounds
   def retrieve_questions (questionnaires)
     questionnaires.each do |questionnaire|
       round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id:questionnaire.id).first.used_in_round
@@ -87,7 +88,7 @@ class GradesController < ApplicationController
 
     reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id:  participant.assignment.id).first
     if reviewer.nil?
-      reviewer = AssignmentParticipant.create(:user_id => session[:user].id, :parent_id => participant.assignment.id)
+      reviewer = AssignmentParticipant.create(user_id: session[:user].id, parent_id: participant.assignment.id)
       reviewer.set_handle()
     end
 
@@ -99,7 +100,7 @@ class GradesController < ApplicationController
 
       if review_mapping.nil?
         review_exists = false
-        review_mapping = ReviewResponseMap.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
+        review_mapping = ReviewResponseMap.create(reviewee_id: participant.team.id, reviewer_id: reviewer.id, reviewed_object_id: participant.assignment.id)
         review = Response.find_by_map_id(review_mapping.map_id)
 
         unless review_exists
@@ -112,10 +113,10 @@ class GradesController < ApplicationController
   end
 
   def open
-    send_file(params['fname'], :disposition => 'inline')
+    send_file(params['fname'], disposition: 'inline')
   end
 
-
+  # Formulate the Email content when there is a grading conflict 
   def send_grading_conflict_email
     email_form = params[:mailer]
     assignment = Assignment.find(email_form[:assignment])
@@ -127,20 +128,20 @@ class GradesController < ApplicationController
     body_text["##[assignment_name]"] = assignment.name
 
     Mailer.sync_message(
-        {:recipients => email_form[:recipients],
-         :subject => email_form[:subject],
-         :from => email_form[:from],
-         :body => {
-             :body_text => body_text,
-             :partial_name => "grading_conflict"
+        {recipients: email_form[:recipients],
+         subject: email_form[:subject],
+         from: email_form[:from],
+         body: {
+             body_text: body_text,
+             partial_name: "grading_conflict"
          }
         }
     ).deliver
 
     flash[:notice] = "Your email to " + email_form[:recipients] + " has been sent. If you would like to send an email to another student please do so now, otherwise click Back"
-    redirect_to :action => 'conflict_email_form',
-                :assignment => email_form[:assignment],
-                :author => email_form[:author]
+    redirect_to action: 'conflict_email_form',
+                assignment: email_form[:assignment],
+                author: email_form[:author]
   end
 
   #This method is used from both conflict_notification and edit methods
@@ -284,13 +285,13 @@ class GradesController < ApplicationController
   end
 
   def calculate_penatly_attributes(participant)
-    penalty_attr1 = {:deadline_type_id => 1,:participant_id => @participant.id, :penalty_points => penalties[:submission]}
+    penalty_attr1 = {deadline_type_id: 1,participant_id: @participant.id, penalty_points: penalties[:submission]}
     CalculatedPenalty.create(penalty_attr1)
 
-    penalty_attr2 = {:deadline_type_id => 2,:participant_id => @participant.id, :penalty_points => penalties[:review]}
+    penalty_attr2 = {deadline_type_id: 2,participant_id: @participant.id, penalty_points: penalties[:review]}
     CalculatedPenalty.create(penalty_attr2)
 
-    penalty_attr3 = {:deadline_type_id => 5,:participant_id => @participant.id, :penalty_points => penalties[:meta_review]}
+    penalty_attr3 = {deadline_type_id: 5,participant_id: @participant.id, penalty_points: penalties[:meta_review]}
     CalculatedPenalty.create(penalty_attr3)
   end
 
@@ -345,7 +346,7 @@ class GradesController < ApplicationController
   def get_scores_for_chart(reviews, symbol)
     scores = []
     reviews.each do |review|
-      scores << Answer.get_total_score(:response => [review], :questions => @questions[symbol.to_sym], :q_types => Array.new)
+      scores << Answer.get_total_score(response: [review], questions: @questions[symbol.to_sym], q_types: Array.new)
     end
     scores
   end
@@ -360,10 +361,10 @@ class GradesController < ApplicationController
     GoogleChart::BarChart.new("#{width}x#{height}", " ", :vertical, false) do |bc|
       data = scores
       bc.data "Line green", data, '990000'
-      bc.axis :y, :range => [0, data.max] ,:positions => [data.min, data.max]
+      bc.axis :y, range:[0, data.max] ,positions: [data.min, data.max]
       bc.show_legend = false
       bc.stacked = false
-      bc.width_spacing_options({:bar_width => (width-30)/(data.size+1),:bar_spacing => 1, :group_spacing => spacing })
+      bc.width_spacing_options({bar_width: (width-30)/(data.size+1),bar_spacing: 1, group_spacing: spacing })
       bc.data_encoding = :extended
       link = (bc.to_url)
     end
@@ -387,7 +388,7 @@ class GradesController < ApplicationController
       bc.data "Reliability Symbol", data, color
       bc.show_legend = false
       bc.stacked = false
-      bc.width_spacing_options({:bar_width => 5,:bar_spacing => 10, :group_spacing => 1})
+      bc.width_spacing_options({bar_width: 5,bar_spacing: 10, group_spacing: 1})
       bc.data_encoding = :extended
       @grades_bar_charts[type.to_sym] = (bc.to_url)
     end

@@ -10,6 +10,7 @@ describe "SuggestionController" do
 
   describe "#Test1:approve_suggestion_in_waitlist" do
   
+    # Prepare for test
     before(:each) do
         @assignment_id = 711
         @topic_id = 2864
@@ -25,7 +26,8 @@ describe "SuggestionController" do
           puts "==> assignment is nil"
         end
     end
-
+    
+    # Test login with account of student5717
     it "should be able to login " do
       visit 'content_pages/view'
       expect(page).to have_content('Welcome')
@@ -40,6 +42,7 @@ describe "SuggestionController" do
       expect(page).to have_content('New suggestion')
     end
     
+    # Test function of suggesting a new topic
     it "should be able to suggest a new topic " do
       # login with account student5717
       visit 'content_pages/view'
@@ -48,6 +51,7 @@ describe "SuggestionController" do
       fill_in "Password", with: "password"
       click_button "SIGN IN"
     
+      # suggest a new topic
       visit '/suggestion/new?id=711'
       fill_in 'suggestion_title',  with: 'RSpect'
       fill_in 'suggestion_description',  with: 'RSpect is a ROR test framework. It focus on function test'

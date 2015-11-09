@@ -30,16 +30,7 @@ class GradesController < ApplicationController
     questionnaires = @assignment.questionnaires_with_questions
 
     if @assignment.varying_rubrics_by_round?
-      questionnaires.each {
-          |questionnaire|
-        round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
-        if(round!=nil)
-          questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
-        else
-          questionnaire_symbol = questionnaire.symbol
-        end
-        @questions[questionnaire_symbol] = questionnaire.questions
-      }
+      retrieve_questions (questionnaires)
     else      #if this assignment does not have "varying rubric by rounds" feature
       questionnaires.each {
           |questionnaire|
@@ -53,13 +44,7 @@ class GradesController < ApplicationController
     calculate_all_penalties(@assignment.id)
   end
 
-  def view_my_scores
-    @participant = AssignmentParticipant.find(params[:id])
-    @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
-    return if redirect_when_disallowed
-    @assignment = @participant.assignment
-    @questions = {} # A hash containing all the questions in all the questionnaires used in this assignment
-    questionnaires = @assignment.questionnaires
+  def retrieve_questions (questionnaires)
     questionnaires.each do |questionnaire|
       round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id:questionnaire.id).first.used_in_round
       if(round!=nil)
@@ -69,6 +54,16 @@ class GradesController < ApplicationController
       end
       @questions[questionnaire_symbol] = questionnaire.questions
     end
+  end
+
+  def view_my_scores
+    @participant = AssignmentParticipant.find(params[:id])
+    @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
+    return if redirect_when_disallowed
+    @assignment = @participant.assignment
+    @questions = {} # A hash containing all the questions in all the questionnaires used in this assignment
+    questionnaires = @assignment.questionnaires
+    retrieve_questions (questionnaires)
 
     #@pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
     @pscore = @participant.scores(@questions)
@@ -256,9 +251,7 @@ class GradesController < ApplicationController
       item = "review"
     end
     "Hi ##[recipient_name],
-
         You submitted a score of ##[recipients_grade] for assignment ##[assignment_name] that varied greatly from another "+role+"'s score for the same "+item+".
-
         The Expertiza system has brought this to my attention."
   end
 
@@ -273,42 +266,42 @@ class GradesController < ApplicationController
       @total_penalty = 0
 
       unless(penalties[:submission].zero? || penalties[:review].zero? || penalties[:meta_review].zero? )
-      
+
         @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
         l_policy = LatePolicy.find(@assignment.late_policy_id)
         if(@total_penalty > l_policy.max_penalty)
           @total_penalty = l_policy.max_penalty
         end
-        if calculate_for_participants	
+        if calculate_for_participants
           calculate_penatly_attributes(@participant)
         end
       end
       assign_all_penalties(@participant)
     end
-    unless @assignment.is_penalty_calculated  
+    unless @assignment.is_penalty_calculated
       @assignment.update_attribute(:is_penalty_calculated, true)
     end
   end
 
-def calculate_penatly_attributes(participant)
-          penalty_attr1 = {:deadline_type_id => 1,:participant_id => @participant.id, :penalty_points => penalties[:submission]}
-          CalculatedPenalty.create(penalty_attr1)
+  def calculate_penatly_attributes(participant)
+    penalty_attr1 = {:deadline_type_id => 1,:participant_id => @participant.id, :penalty_points => penalties[:submission]}
+    CalculatedPenalty.create(penalty_attr1)
 
-          penalty_attr2 = {:deadline_type_id => 2,:participant_id => @participant.id, :penalty_points => penalties[:review]}
-          CalculatedPenalty.create(penalty_attr2)
+    penalty_attr2 = {:deadline_type_id => 2,:participant_id => @participant.id, :penalty_points => penalties[:review]}
+    CalculatedPenalty.create(penalty_attr2)
 
-          penalty_attr3 = {:deadline_type_id => 5,:participant_id => @participant.id, :penalty_points => penalties[:meta_review]}
-          CalculatedPenalty.create(penalty_attr3)
-end        
+    penalty_attr3 = {:deadline_type_id => 5,:participant_id => @participant.id, :penalty_points => penalties[:meta_review]}
+    CalculatedPenalty.create(penalty_attr3)
+  end
 
 
-def assign_all_penalties(participant)
-      @all_penalties[participant.id] = {}
-      @all_penalties[participant.id][:submission] = penalties[:submission]
-      @all_penalties[participant.id][:review] = penalties[:review]
-      @all_penalties[participant.id][:meta_review] = penalties[:meta_review]
-      @all_penalties[participant.id][:total_penalty] = @total_penalty
-end
+  def assign_all_penalties(participant)
+    @all_penalties[participant.id] = {}
+    @all_penalties[participant.id][:submission] = penalties[:submission]
+    @all_penalties[participant.id][:review] = penalties[:review]
+    @all_penalties[participant.id][:meta_review] = penalties[:meta_review]
+    @all_penalties[participant.id][:total_penalty] = @total_penalty
+  end
 
 
   def make_chart()
@@ -331,9 +324,9 @@ end
     end
 
     if @pscore[:metareview]
-     scores = get_scores_for_chart @pscore[:metareview][:assessments], 'metareview'
-     scores = scores-[-1.0]
-     @grades_bar_charts[:metareview] = bar_chart(scores)
+      scores = get_scores_for_chart @pscore[:metareview][:assessments], 'metareview'
+      scores = scores-[-1.0]
+      @grades_bar_charts[:metareview] = bar_chart(scores)
     end
 
     if @pscore[:feedback]
@@ -345,7 +338,7 @@ end
     if @pscore[:teammate]
       scores = get_scores_for_chart @pscore[:teammate][:assessments], 'teammate'
       scores = scores-[-1.0]
-      @grades_bar_charts[:teammate] = bar_chart(scores) 
+      @grades_bar_charts[:teammate] = bar_chart(scores)
     end
   end
 
@@ -404,7 +397,7 @@ end
   def are_needed_authorizations_present?
     @participant = Participant.find(params[:id])
     authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
-    if authorization == 'reader' || authorization == 'reviewer'	
+    if authorization == 'reader' || authorization == 'reviewer'
       return false
     else
       return true

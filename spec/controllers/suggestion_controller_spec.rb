@@ -8,7 +8,7 @@ require File.join('./app/controllers/suggestion_controller')
 
 describe "SuggestionController" do
 
-  describe "#Test1:approve_suggestion_in_waitlist" do
+  describe "#Test1:approve suggestion when having a topic in waitlist" do
   
     # Prepare for test
     before(:each) do
@@ -85,6 +85,7 @@ describe "SuggestionController" do
       expect(page).to have_content('Welcome')
     end
 
+    # Test approve a new suggestion
     it " should be able to approve a new suggestion " do
       # Login with student5717 account
       visit 'content_pages/view'
@@ -149,10 +150,9 @@ describe "SuggestionController" do
     end
   end
   
-  describe "test2"  do
+  describe " Test2: approve a suggested topic when already having a topic and enroll into a new topic "  do
     it 'should switch to suggested topic after it got approved' do
       @newtopic = 'Violet and Zoe'
-
 
       #sign in as student5404:
       visit 'content_pages/view'
@@ -245,7 +245,7 @@ describe "SuggestionController" do
   end
   
   # Test by Hma
-  describe "test3" do
+  describe " Test3: approve a suggested topic when having a new topic and do not enroll into a new topic " do
     it "test" do
       # login as student and submit a suggestion
       visit 'content_pages/view'

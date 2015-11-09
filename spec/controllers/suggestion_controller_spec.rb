@@ -59,22 +59,27 @@ describe "SuggestionController" do
       expect{click_button "Submit"}.to change(Suggestion, :count).by(1)
     end
     
+    # Test logout function
     it " should be able to logout " do
+      # login with account student5717
       visit 'content_pages/view'
       expect(page).to have_content('Welcome')
       fill_in "User Name", with: "student5717"
       fill_in "Password", with: "password"
       click_button "SIGN IN"
-    
+      
+      # click logout link
       visit '/suggestion/new?id=711'
       click_link "Logout"
       current_path.should == "/"
       
+      # check logout successfully
       visit '/suggestion/new?id=711'
       expect(page).to have_content('This is not allowed')
       expect(page).to have_content('Welcome')
       expect(page).to have_no_content('User: student5717')
       
+      # check logout successfully
       visit '/menu/Course%20Evaluation'
       expect(page).to have_content('This is not allowed')
       expect(page).to have_content('Welcome')

@@ -29,6 +29,8 @@ Expertiza::Application.configure do
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
+  # Print development logs
+  config.log_level = :debug
 
   # Raise an error on page load if there are pending migrations
   config.active_record.migration_error = :page_load
@@ -38,7 +40,5 @@ Expertiza::Application.configure do
   # number of complex assets.
   config.assets.debug = true
   config.react.variant = :development
-
-  config.log_level = :warn
 end
 

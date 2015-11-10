@@ -210,6 +210,8 @@ class ResponseController < ApplicationController
       if (params['isSubmit'] && (params['isSubmit'].eql?'Yes'))
         # Update the submission flag.
         @response.update_attribute('isSubmitted','Yes')
+      else
+        @response.update_attribute('isSubmitted','No')
       end
     rescue
       msg = "Your response was not saved. Cause:189 #{$!}"
@@ -278,7 +280,12 @@ class ResponseController < ApplicationController
       @round=nil
     end
 
-    @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:round => @round, :isSubmitted => params[:isSubmit])#,:version_num=>@version)
+    if params[:isSubmit].eql?('Yes')
+      isSubmitted = 'Yes'
+    else
+      isSubmitted = 'No'
+    end
+    @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:round => @round, :isSubmitted => isSubmitted)#,:version_num=>@version)
 
     @res = @response.response_id
 

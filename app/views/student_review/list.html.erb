@@ -3,7 +3,7 @@
     <%= render :partial => 'responses', :locals => {:mappings => @review_mappings, :title => 'Review'} %>
     <% if @assignment.dynamic_reviewer_assignment? %>
       <%# if @num_reviews_in_progress == 0 %>
-        <% if @num_reviews_in_progress < 2 %>
+        <% if @num_reviews_in_progress < Assignment.max_outstanding_reviews %>
           <% if @assignment.review_assignment_strategy == Assignment::RS_AUTO_SELECTED %>
               <%= render :partial => 'set_dynamic_review', :locals => {:assignment => @assignment, :participant => @participant} %>
             <!--To add a elsif for Assignment::RS_INSTRUCTOR_SELECTED review strategy. We dont know yet what topics get listed in Instructor.Selected mode-->

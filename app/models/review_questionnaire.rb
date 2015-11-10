@@ -24,7 +24,7 @@ class ReviewQuestionnaire < Questionnaire
       maps.each{ |map|
         if !map.response.empty?
           map.response.each do |response|
-            if response.round==round
+            if response.round==round && (response.isSubmitted.nil? || response.isSubmitted.eql?('Yes'))
               responses << response
             end
           end

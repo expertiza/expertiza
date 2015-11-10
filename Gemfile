@@ -16,6 +16,7 @@ gem 'dynamic_form'
 gem 'edavis10-ruby-web-search'
 gem 'engtagger'
 gem 'expertiza-authlogic', github: 'expertiza/authlogic', :require => 'authlogic'
+gem "factory_girl_rails","~> 4.0"
 gem 'fastercsv'
 gem 'ffi-aspell'
 gem 'font-awesome-rails'
@@ -55,7 +56,7 @@ gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
-
+gem 'rspec-rails', '~> 3.0'
 group :development do
   gem 'daemons'
   gem 'pry'
@@ -72,7 +73,7 @@ group :test do
   gem 'guard-rails'
   gem 'guard-rspec'
   gem 'launchy'
-  gem 'rspec-rails'
+  #gem 'rspec-rails'
   gem 'shoulda'
   gem 'test-unit'
 end

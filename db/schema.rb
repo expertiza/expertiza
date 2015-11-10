@@ -11,8 +11,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
 
 ActiveRecord::Schema.define(version: 20151021142107) do
+=======
+ActiveRecord::Schema.define(version: 20151107195943) do
+>>>>>>> a1eaa3edbb0d94524106cb271c5fe1e967bb3d7f
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -410,6 +414,7 @@ ActiveRecord::Schema.define(version: 20151021142107) do
     t.datetime "updated_at"
     t.integer  "version_num",        limit: 4
     t.integer  "round",              limit: 4
+    t.string   "isSubmitted",        limit: 255
   end
 
   add_index "responses", ["map_id"], name: "fk_response_response_map", using: :btree

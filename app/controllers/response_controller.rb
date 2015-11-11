@@ -76,7 +76,7 @@ class ResponseController < ApplicationController
 
   #Update the response and answers when student "edit" existing response
   def update
-    return if action_allowed?
+    return unless action_allowed?
 
     # the response to be updated
     @response = Response.find(params[:id])

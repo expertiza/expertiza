@@ -23,9 +23,9 @@ class ResponseController < ApplicationController
   end
 
   def scores
-    @review_ = []
+    @review_scores = []
     @questions.each do |question|
-      @review_ << Answer.where(
+      @review_scores << Answer.where(
           response_id: @response.id,
           question_id:  question.id
         ).first
@@ -66,10 +66,10 @@ class ResponseController < ApplicationController
     # set more handy variables for the view
     set_content
 
-    @review_ = Array.new
+    @review_scores = Array.new
 
     @questions.each do |question|
-      @review_ << Answer.where(response_id: @response.response_id, question_id:  question.id).first
+      @review_scores << Answer.where(response_id: @response.response_id, question_id:  question.id).first
     end
     render :action => 'response'
   end
@@ -183,7 +183,7 @@ class ResponseController < ApplicationController
 
     @map = Response.find_by_map_id(params[:id])
     if params[:return] == "feedback"
-      redirect_to :controller => 'grades', :action => 'view_my_', :id => @map.reviewer.id
+      redirect_to :controller => 'grades', :action => 'view_my_score', :id => @map.reviewer.id
     elsif params[:return] == "teammate"
       redirect_to view_student_teams_path student_id: @map.reviewer.id
     elsif params[:return] == "instructor"

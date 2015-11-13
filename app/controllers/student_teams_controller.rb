@@ -51,7 +51,7 @@ class StudentTeamsController < ApplicationController
         break
       end
     end
-    @teammate_review_allowed = true if @current_due_date&&@current_due_date.teammate_review_allowed_id == 3
+    @teammate_review_allowed = true if @current_due_date&&(@current_due_date.teammate_review_allowed_id ==3 ||@current_due_date.teammate_review_allowed_id ==2) #late(2) or yes(3)
   end
 
   def create

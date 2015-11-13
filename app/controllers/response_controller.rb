@@ -199,13 +199,15 @@ class ResponseController < ApplicationController
       end
       questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
 
-      params[:responses].each_pair do |k, v|
-        score = Answer.where(response_id: @response.id, question_id:  questions[k.to_i].id).first
-        unless score
-          score = Answer.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :answer => v[:score], :comments => v[:comment])
+      if !params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
+        params[:responses].each_pair do |k, v|
+          score = Answer.where(response_id: @response.id, question_id:  questions[k.to_i].id).first
+          unless score
+            score = Answer.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :answer => v[:score], :comments => v[:comment])
+          end
+          score.update_attribute('answer', v[:score])
+          score.update_attribute('comments', v[:comment])
         end
-        score.update_attribute('answer', v[:score])
-        score.update_attribute('comments', v[:comment])
       end
       if (params['isSubmit'] && (params['isSubmit'].eql?'Yes'))
         # Update the submission flag.

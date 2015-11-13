@@ -438,7 +438,7 @@ DEPENDENCIES
   jquery-rails
   jquery-ui-sass-rails
   launchy
-  mysql2 (~> 0.3.18)
+  mysql2
   nokogiri
   omniauth-google-oauth2 (~> 0.2.6)
   open-uri-cached
@@ -474,6 +474,3 @@ DEPENDENCIES
   uglifier
   will_paginate
   zip-zip
-
-BUNDLED WITH
-   1.10.6

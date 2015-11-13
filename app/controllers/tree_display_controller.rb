@@ -132,6 +132,7 @@ class TreeDisplayController < ApplicationController
   end
 
   def get_children_node_ng
+    puts params[:filternode]
     childNodes = {}
     if params[:reactParams][:child_nodes].is_a? String
       childNodes = JSON.parse(params[:reactParams][:child_nodes])
@@ -169,7 +170,8 @@ class TreeDisplayController < ApplicationController
           tmpObject["directory"] = node.get_directory
           tmpObject["creation_date"] = node.get_creation_date
           tmpObject["updated_date"] = node.get_modified_date
-          tmpObject["private"] = node.get_private
+          #tmpObject["private"] = node.get_private
+          tmpObject["private"] = node.get_instructor_id===session[:user].id ? true :false
           instructor_id = node.get_instructor_id
           tmpObject["instructor_id"] = instructor_id
           unless (instructor_id.nil?)

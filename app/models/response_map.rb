@@ -21,12 +21,20 @@ class ResponseMap < ActiveRecord::Base
         if !map.response.empty?
 
           @all_resp=Response.where(map_id: map.map_id).last
-          @array_sort << @all_resp
+
+          if (map.type.eql?('ReviewResponseMap'))
+            #If its ReviewResponseMap then only consider those response which are submitted.
+            if (@all_resp.isSubmitted.nil? || @all_resp.isSubmitted.eql?('Yes'))
+              @array_sort << @all_resp
+            end
+          else
+              @array_sort << @all_resp
+          end
 
           #sort all versions in descending order and get the latest one.
           #@sort_to=@array_sort.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
           @sort_to=@array_sort.sort #{ |m1, m2| (m1.updated_at and m2.updated_at) ? m2.updated_at <=> m1.updated_at : (m1.version_num ? -1 : 1) }
-          responses << @sort_to[0]
+          responses << @sort_to[0] if !@sort_to[0].nil?
           @array_sort.clear
           @sort_to.clear
         end

@@ -42,7 +42,7 @@ set :repo_url, 'https://github.com/expertiza/expertiza.git'
 # set :pty, true
 
 # Default value for :linked_files is []
-set :linked_files, %w{config/database.yml }
+set :linked_files, %w{config/database.yml config/database.yml.example}
 
 # Default value for linked_dirs is []
 set :linked_dirs, %w{log pg_data}

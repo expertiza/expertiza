@@ -33,7 +33,7 @@ module SubmittedContentHelper
           end
 
           location = parentFolder + File.basename(file)
-          ret += link_to location, :controller => 'submitted_content', :action => 'download', :id => participant.id, :download => File.basename(file), "current_folder[name]" =>  File.dirname(file)
+          ret += link_to File.basename(file), :controller => 'submitted_content', :action => 'download', :id => participant.id, :download => File.basename(file), "current_folder[name]" =>  File.dirname(file)
         end
         ret += "\n   </td>\n   <td valign = top>\n"
         ret += File.size(file).to_s
@@ -46,7 +46,7 @@ module SubmittedContentHelper
       rescue
       end
     end
-    ret += "\n</table>"
+    ret += "\n</table><br/>"
     return ret
   end
 

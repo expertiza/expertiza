@@ -130,12 +130,56 @@ class ReviewResponseMap < ResponseMap
     if team_id
       maps = ResponseMap.where(:reviewee_id => team_id, :type => "ReviewResponseMap")
       maps.each{ |map|
-        if !map.response.empty? && !map.response.reject{|r| r.round!=round}.empty?
-          responses << map.response.reject{|r| r.round!=round}.last
+        if !map.response.empty? && !map.response.reject{|r| (r.round!=round || !(r.isSubmitted.nil? || r.isSubmitted.eql?('Yes')))}.empty?
+          responses << map.response.reject{|r|  (r.round!=round || !(r.isSubmitted.nil? || r.isSubmitted.eql?('Yes')))}.last
         end
       }
       responses.sort! {|a,b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }
     end
     return responses
+  end
+
+  #wrap lastest version of responses in each response map, together withe the questionnaire_id
+  # will be used to display the reviewer summary
+  def self.final_versions_from_reviewer(reviewer_id)
+    maps = ReviewResponseMap.where(reviewer_id: reviewer_id)
+    assignment = Assignment.find(Participant.find(reviewer_id).parent_id)
+    review_final_versions = Hash.new
+
+    if !assignment.varying_rubrics_by_round?
+      #same review rubric used in multiple rounds
+      review_final_versions[:review] = Hash.new
+      review_final_versions[:review][:questionnaire_id] = assignment.get_review_questionnaire_id
+      response_ids = Array.new
+
+      maps.each do |map|
+        responses = Response.where(map_id:map.id)
+        if !responses.empty?
+          response_ids << responses.last.id
+        end
+      end
+      review_final_versions[:review][:response_ids] = response_ids
+
+    else
+      #vary rubric by round
+      rounds_num = assignment.rounds_of_reviews
+
+      for round in 1..rounds_num
+        symbol = ("review round"+round.to_s).to_sym
+        review_final_versions[symbol] = Hash.new
+        review_final_versions[symbol][:questionnaire_id] = assignment.get_review_questionnaire_id(round)
+        response_ids = Array.new
+
+        maps.each do |map|
+          responses = Response.where(map_id:map.id, round:round)
+          if !responses.empty?
+            response_ids << responses.last.id
+          end
+        end
+        review_final_versions[symbol][:response_ids] = response_ids
+      end
+
+    end
+    review_final_versions
   end
 end

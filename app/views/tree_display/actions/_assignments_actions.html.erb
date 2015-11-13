@@ -46,7 +46,7 @@
           </div>
           <div>
             <%= link_to image_tag('/assets/tree_view/view-scores-24.png', :title => 'View scores'), {:controller => 'grades', :action => 'view', :id => node.node_object_id}, {:title => 'View scores'} %>
-            <%= link_to image_tag('/assets/tree_view/view-review-report-24.png', :title => 'View review report'), {:controller => 'review_mapping', :action => 'review_report', :id => node.node_object_id}, {:title => 'View review report'} %>
+            <%= link_to image_tag('/assets/tree_view/view-review-report-24.png', :title => 'View review report'), {:controller => 'review_mapping', :action => 'response_report', :id => node.node_object_id}, {:title => 'View review report'} %>
             <%= link_to image_tag('/assets/tree_view/view-survey-24.png', :title => 'View survey responses'), {:controller => 'survey_response', :action => 'view_responses', :id => node.node_object_id}, {:title => 'View survey responses'} %>
             <%= link_to image_tag('/assets/tree_view/view-scheduled-tasks.png', :title => 'View delayed jobs'), {:controller => 'assignments', :action => 'scheduled_tasks', :id => node.node_object_id}, {:title => 'View delayed jobs'} %>
             <% if signup_topic %>

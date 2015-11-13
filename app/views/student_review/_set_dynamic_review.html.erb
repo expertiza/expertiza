@@ -8,7 +8,7 @@
         }
     }
 </SCRIPT>
-<% if assignment.has_topics? %>
+<% if assignment.has_topics? && assignment.can_choose_topic_to_review? %>
   <%if assignment.get_current_stage()!="Finished" %>
     <%= form_tag :controller => 'review_mapping',
                  :action => 'assign_reviewer_dynamically',
@@ -44,7 +44,7 @@
   <p><input type='submit' value='Request a new submission to review'/></p>
     <% end %>
   <%end%>
-  <% else %>
+<% else %>
     <%if assignment.get_current_stage()!="Finished" %>
     <%= form_tag :controller => 'review_mapping',
                  :action => 'assign_reviewer_dynamically',

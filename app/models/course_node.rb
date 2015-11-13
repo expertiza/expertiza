@@ -37,18 +37,18 @@ class CourseNode < Node
 
     if show
       if this_user.is_teaching_assistant? == false
-        conditions = 'courses.instructor_id = ?'
+        conditions = 'courses.instructor_id = '+ user_id.to_s
       else
         conditions = 'courses.id in (?)'
       end
     else
       if this_user.is_teaching_assistant? == false
-        conditions = '(courses.private = 0 or courses.instructor_id = ?)'
+        conditions = '(courses.private = 0 or courses.instructor_id = '+user_id.to_s+')'
       else
-        conditions = '(courses.private = 0 or courses.id in (?))'
+        ##conditions = '(courses.private = 0 or courses.id in (?))'
+        conditions='((courses.private = 0 and courses.instructor_id !='+user_id.to_s+') or courses.instructor_id='+user_id.to_s+')'
       end
     end
-
     return conditions
   end
 

@@ -124,11 +124,7 @@ class AdminController < ApplicationController
     User.find(params[:id]).destroy
     redirect_to :action => 'list_administrators'
   end
-  def remove_super_administrator
-    User.find(params[:id]).destroy
-    redirect_to :action => 'list_super_administrators'
-  end
-
+  
   def save_super_administrator
     PgUsersController.create(Role.superadministrator.id, :admin_controller, :list_super_administrators, :new_super_administrator)
   end

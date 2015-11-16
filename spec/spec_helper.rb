@@ -1,3 +1,8 @@
+require 'rubygems'
+ENV["RAILS_ENV"] ||= 'test'
+require File.expand_path("../../config/environment", __FILE__)
+
+
 # Record code coverage with coveralls on Travis
 require 'coveralls'
 Coveralls.wear! 'rails'

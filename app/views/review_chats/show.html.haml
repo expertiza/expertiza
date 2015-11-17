@@ -1,0 +1,21 @@
+%p#notice= notice
+
+%p
+  %b Assignment:
+  = @review_chat.assignment_id
+%p
+  %b Reviewer:
+  = @review_chat.reviewer_id
+%p
+  %b Team:
+  = @review_chat.team_id
+%p
+  %b Type flag:
+  = @review_chat.type_flag
+%p
+  %b Content:
+  = @review_chat.content
+
+= link_to 'Edit', edit_review_chat_path(@review_chat)
+\|
+= link_to 'Back', review_chats_path

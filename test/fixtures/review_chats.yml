@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  assignment_id: 1
+  reviewer_id: 1
+  team_id: 1
+  type_flag: MyString
+  content: MyString
+
+two:
+  assignment_id: 1
+  reviewer_id: 1
+  team_id: 1
+  type_flag: MyString
+  content: MyString

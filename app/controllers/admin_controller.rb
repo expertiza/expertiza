@@ -39,9 +39,6 @@ class AdminController < ApplicationController
   #     end
   #   end
   # end
- # def show
- #   redirect_to url_for(:controller => :users, :action => :new)
- # end
 
   def list_instructors
     @users = User.

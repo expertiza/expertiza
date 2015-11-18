@@ -1,3 +1,16 @@
+<script>
+jQuery(document).ready(function() {
+    jQuery('#Submit').click(function(e){
+    if(!confirm('Once a review has been submitted, you cannot edit it again')){
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+    }else{
+        jQuery('#isSubmit').val('Yes');
+    }
+    })
+})
+</script>
 <h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
 
 <% if !@map.contributor.nil? && !@map.instance_of?(FeedbackResponseMap) %>
@@ -67,7 +80,12 @@
     <br/>
     <br>
     <%= submit_tag "Save "+@title, :name => "save" %>
+    <% if  (@title && (@title.eql?'Review')) %>
+        <%= submit_tag "Submit "+@title, :name => "Submit", :id => "Submit" %>
+        <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
+    <% end %>
     <%= hidden_field_tag('return', @return) %>
+    <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %>
 <% end %>
 <!--Check whether there is a UploadFile question.-->
 <%@questions.each do |question| %>

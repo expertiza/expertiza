@@ -1,11 +1,11 @@
 class SignedUpTeam < ActiveRecord::Base
   belongs_to :topic, :class_name => 'SignUpTopic'
-
+   
   #the below has been added to make is consistent with the database schema
   validates_presence_of :topic_id, :team_id
 
   scope :by_team_id, ->(team_id) { where("team_id = ?", team_id) }
-
+  
   #This method is not used anywhere
   #def cancel_waitlists_of_users(team_id, assignment_id)
   #  waitlisted_topics = SignedUpTeam.find_by_sql("SELECT u.id FROM sign_up_topics t, signed_up_teams u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = " + assignment_id.to_s + " and u.team_id = " + team_id.to_s)

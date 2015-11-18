@@ -26,7 +26,7 @@ class StudentTeamsController < ApplicationController
        'Teaching Assistant',
        'Administrator',
        'Super-Administrator',
-       'Student'].include? current_role_name and ((%w(view).include? action_name) ? are_needed_authorizations_present? : true)
+       'Student','User1'].include? current_role_name and ((%w(view).include? action_name) ? are_needed_authorizations_present? : true)
       #make sure the student is the owner if they are trying to create it
       return current_user_id? student.user_id if %w[create].include? action_name
       #make sure the student belongs to the group before allowed them to try and edit or update
@@ -133,7 +133,7 @@ class StudentTeamsController < ApplicationController
         sign_ups.each {|sign_up|
           #get the topic_id
           sign_up_topic_id = sign_up.topic_id
-          #destroy the sign_up
+         #destroy the sign_up
           sign_up.destroy
           #get the number of non-waitlisted users signed up for this topic
           non_waitlisted_users = SignedUpTeam.where topic_id: sign_up_topic_id, is_waitlisted: false
@@ -143,13 +143,9 @@ class StudentTeamsController < ApplicationController
           if non_waitlisted_users.length < max_choosers
             first_waitlisted_team = SignedUpTeam.find_by topic_id: sign_up_topic_id, is_waitlisted: true
             #moving the waitlisted team into the confirmed signed up teams list and delete all waitlists for this team
+           #E1554 we created a function call for duplicate code
             if first_waitlisted_team
-              team_id = first_waitlisted_team.team_id
-              team = Team.find(team_id)
-              assignment_id = team.parent_id
-              first_waitlisted_team.is_waitlisted = false
-              first_waitlisted_team.save
-              Waitlist.cancel_all_waitlists(team_id, assignment_id)
+                  SignUpTopic.assign_to_first_waiting_team(first_waitlisted_team)
             end
           end
         }

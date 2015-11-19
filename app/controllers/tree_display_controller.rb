@@ -128,7 +128,6 @@ class TreeDisplayController < ApplicationController
           res[nodeType] << populate_1_row(node)
         end
        end
-
     else
       tmpRes = list
       res = []

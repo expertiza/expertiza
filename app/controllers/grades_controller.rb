@@ -77,6 +77,43 @@ class GradesController < ApplicationController
     @stage = @participant.assignment.get_current_stage(@topic_id)
     calculate_all_penalties(@assignment.id)
   end
+  
+  def get_number_of_comments_greater_than_10_words
+    # Create an array to hold the counts for each question
+    count_per_question
+    
+    first_time = true
+    
+    # Iterate over each review (which is an object of type Response)
+    @pscore[:review][:assessments].each do |review|
+      # First, grab all the questions for this review and sort them
+      answers = Answer.where(response_id: review.response_id)
+      questionnaire = review.questionnaire_by_answer(answers.first)
+      questions = questionnaire.questions.sort {|a, b| a.seq <=> b.seq}
+      
+      # Initialize the count array if this is the first time
+      if first_time
+        count_per_question = Array.new(questions.size, 0)
+        first_time = false
+      end
+      
+      current_index = 0
+      # Now iterate over all questions and increment the value at the
+      # current_index if the word count is greater than or equal to 10
+      questions.each do |question|
+        answer = answers.find{|a| a.question_id == question.id}
+        if answer.word_count >= 10
+          Array[current_index] += 1
+        end
+        
+        # Increment the current_index
+        current_index += 1
+      end
+    end
+    
+    # Return the array of counts
+    return count_per_question
+  end
 
   def edit
     @participant = AssignmentParticipant.find(params[:id])

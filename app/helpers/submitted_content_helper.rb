@@ -46,7 +46,7 @@ module SubmittedContentHelper
       rescue
       end
     end
-    ret += "\n</table>"
+    ret += "\n</table><br/>"
     return ret
   end
 

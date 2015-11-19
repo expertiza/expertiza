@@ -189,7 +189,7 @@ jQuery(document).ready(function() {
                 <a title="View scores" href={"/grades/view?id="+(parseInt(this.props.id)/2).toString()}>
                   <img src="/assets/tree_view/view-scores-24.png" />
                 </a>
-                <a title="View review report" href={"/review_mapping/review_report?id="+(parseInt(this.props.id)/2).toString()}>
+                <a title="View review report" href={"/review_mapping/response_report?id="+(parseInt(this.props.id)/2).toString()}>
                   <img src="/assets/tree_view/view-review-report-24.png" />
                 </a>
                 <a title="View survey responses" href={"/survey_response/view_responses?id="+(parseInt(this.props.id)/2).toString()}>
@@ -503,7 +503,7 @@ jQuery(document).ready(function() {
                   checked={this.props.inputCheckboxValue}
                   ref="filterCheckbox"
                   onChange={this.handleChange}>
-             {"Show " + this.props.filterOption+" items?"}
+             {" Include others' items"}
            </input>
          </span> 
       )
@@ -695,7 +695,7 @@ jQuery(document).ready(function() {
     getInitialState: function() {
       return {
         filterText: '',
-        privateCheckbox: true,
+        privateCheckbox: false,
         publicCheckbox: true,
         tableData: this.props.data
       }
@@ -744,39 +744,19 @@ jQuery(document).ready(function() {
       })
     },
     handleUserFilter: function(name, checked) {
-      var privateCheckboxStatus = this.state.privateCheckbox
       var publicCheckboxStatus = this.state.publicCheckbox
-      if (name === 'private') {
-        privateCheckboxStatus = checked
-      } else {
         publicCheckboxStatus = checked
-      }
       var tmpData = this.props.data.filter(function(element) {
-        if (!privateCheckboxStatus && publicCheckboxStatus) {
-        // if private is false, and public is true, display public ONLY
-          return element.private === false
-        } else if (privateCheckboxStatus && publicCheckboxStatus) {
-        // if private is true, and public is true, display all data
-          return true
-        } else if (!privateCheckboxStatus && !publicCheckboxStatus) {
-        // if private is false, and public is false, display nothing  
-          return false
-        } else {
-        // if private is true, and public is false, display private ONLY 
-          return element.private === true
-        }
+          if(publicCheckboxStatus){
+              return true
+          }
+          else
+            return element.private===true
       })
-      if (name === 'private') {
-        this.setState({
-          tableData: tmpData,
-          privateCheckbox: privateCheckboxStatus
-        })
-      } else {
         this.setState({
           tableData: tmpData,
           publicCheckbox: publicCheckboxStatus
         })
-      }
     },
     render: function() {
       return (
@@ -784,12 +764,6 @@ jQuery(document).ready(function() {
           <SearchBar
             filterText={this.state.filterText}
             onUserInput={this.handleUserInput}
-            dataType={this.props.dataType}
-          />
-          <FilterButton
-            filterOption="private"
-            onUserFilter={this.handleUserFilter}
-            inputCheckboxValue={this.state.privateCheckbox}
             dataType={this.props.dataType}
           />
           <FilterButton

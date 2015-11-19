@@ -4,6 +4,13 @@ class ResponseController < ApplicationController
   helper :file
 
   def action_allowed?
+    case params[:action]
+      when 'edit'
+        response = Response.find(params[:id])
+        if (response.isSubmitted.eql?('Yes'))
+          return false
+        end
+    end
     current_user
   end
 
@@ -192,13 +199,21 @@ class ResponseController < ApplicationController
       end
       questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
 
-      params[:responses].each_pair do |k, v|
-        score = Answer.where(response_id: @response.id, question_id:  questions[k.to_i].id).first
-        unless score
-          score = Answer.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :answer => v[:score], :comments => v[:comment])
+      if !params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
+        params[:responses].each_pair do |k, v|
+          score = Answer.where(response_id: @response.id, question_id:  questions[k.to_i].id).first
+          unless score
+            score = Answer.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :answer => v[:score], :comments => v[:comment])
+          end
+          score.update_attribute('answer', v[:score])
+          score.update_attribute('comments', v[:comment])
         end
-        score.update_attribute('answer', v[:score])
-        score.update_attribute('comments', v[:comment])
+      end
+      if (params['isSubmit'] && (params['isSubmit'].eql?'Yes'))
+        # Update the submission flag.
+        @response.update_attribute('isSubmitted','Yes')
+      else
+        @response.update_attribute('isSubmitted','No')
       end
     rescue
       msg = "Your response was not saved. Cause:189 #{$!}"
@@ -267,7 +282,12 @@ class ResponseController < ApplicationController
       @round=nil
     end
 
-    @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:round => @round)#,:version_num=>@version)
+    if params[:isSubmit].eql?('Yes')
+      isSubmitted = 'Yes'
+    else
+      isSubmitted = 'No'
+    end
+    @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:round => @round, :isSubmitted => isSubmitted)#,:version_num=>@version)
 
     @res = @response.response_id
 
@@ -354,6 +374,7 @@ class ResponseController < ApplicationController
       end
       response.map.read_attribute(:type)
     end
+
     !current_user_id?(response.map.reviewer.user_id)
   end
 end

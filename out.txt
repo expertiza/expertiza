@@ -1,0 +1,753 @@
+                                                 Prefix Verb   URI Pattern                                                  Controller#Action
+                                                        GET    /auth/:provider/callback(.:format)                           auth#google_login
+                                           auth_failure GET    /auth/failure(.:format)                                      content_pages#view
+                   save_bookmark_rating_score_bookmarks POST   /bookmarks/save_bookmark_rating_score(.:format)              bookmarks#save_bookmark_rating_score
+                                              bookmarks GET    /bookmarks(.:format)                                         bookmarks#index
+                                                        POST   /bookmarks(.:format)                                         bookmarks#create
+                                           new_bookmark GET    /bookmarks/new(.:format)                                     bookmarks#new
+                                          edit_bookmark GET    /bookmarks/:id/edit(.:format)                                bookmarks#edit
+                                               bookmark GET    /bookmarks/:id(.:format)                                     bookmarks#show
+                                                        PATCH  /bookmarks/:id(.:format)                                     bookmarks#update
+                                                        PUT    /bookmarks/:id(.:format)                                     bookmarks#update
+                                                        DELETE /bookmarks/:id(.:format)                                     bookmarks#destroy
+                                     join_team_requests GET    /join_team_requests(.:format)                                join_team_requests#index
+                                                        POST   /join_team_requests(.:format)                                join_team_requests#create
+                                  new_join_team_request GET    /join_team_requests/new(.:format)                            join_team_requests#new
+                                 edit_join_team_request GET    /join_team_requests/:id/edit(.:format)                       join_team_requests#edit
+                                      join_team_request GET    /join_team_requests/:id(.:format)                            join_team_requests#show
+                                                        PATCH  /join_team_requests/:id(.:format)                            join_team_requests#update
+                                                        PUT    /join_team_requests/:id(.:format)                            join_team_requests#update
+                                                        DELETE /join_team_requests/:id(.:format)                            join_team_requests#destroy
+                  list_super_administrators_admin_index GET    /admin/list_super_administrators(.:format)                   admin#list_super_administrators
+                        list_administrators_admin_index GET    /admin/list_administrators(.:format)                         admin#list_administrators
+                           list_instructors_admin_index GET    /admin/list_instructors(.:format)                            admin#list_instructors
+                          new_administrator_admin_index GET    /admin/new_administrator(.:format)                           admin#new_administrator
+                             new_instructor_admin_index GET    /admin/new_instructor(.:format)                              admin#new_instructor
+                          create_instructor_admin_index POST   /admin/create_instructor(.:format)                           admin#create_instructor
+                          remove_instructor_admin_index GET    /admin/remove_instructor(.:format)                           admin#remove_instructor
+                                                        POST   /admin/remove_instructor(.:format)                           admin#remove_instructor
+                            show_instructor_admin_index GET    /admin/show_instructor(.:format)                             admin#show_instructor
+                                            admin_index GET    /admin(.:format)                                             admin#index
+                                                        POST   /admin(.:format)                                             admin#create
+                                              new_admin GET    /admin/new(.:format)                                         admin#new
+                                             edit_admin GET    /admin/:id/edit(.:format)                                    admin#edit
+                                                  admin GET    /admin/:id(.:format)                                         admin#show
+                                                        PATCH  /admin/:id(.:format)                                         admin#update
+                                                        PUT    /admin/:id(.:format)                                         admin#update
+                                                        DELETE /admin/:id(.:format)                                         admin#destroy
+                       edit_advertise_for_partner_index GET    /advertise_for_partner/edit(.:format)                        advertise_for_partner#edit
+                     remove_advertise_for_partner_index GET    /advertise_for_partner/remove(.:format)                      advertise_for_partner#remove
+                                                        POST   /advertise_for_partner/:id(.:format)                         advertise_for_partner#update
+                            advertise_for_partner_index GET    /advertise_for_partner(.:format)                             advertise_for_partner#index
+                                                        POST   /advertise_for_partner(.:format)                             advertise_for_partner#create
+                              new_advertise_for_partner GET    /advertise_for_partner/new(.:format)                         advertise_for_partner#new
+                             edit_advertise_for_partner GET    /advertise_for_partner/:id/edit(.:format)                    advertise_for_partner#edit
+                                  advertise_for_partner GET    /advertise_for_partner/:id(.:format)                         advertise_for_partner#show
+                                                        PATCH  /advertise_for_partner/:id(.:format)                         advertise_for_partner#update
+                                                        PUT    /advertise_for_partner/:id(.:format)                         advertise_for_partner#update
+                                                        DELETE /advertise_for_partner/:id(.:format)                         advertise_for_partner#destroy
+                               save_advice_advice_index POST   /advice/save_advice(.:format)                                advice#save_advice
+                                           advice_index GET    /advice(.:format)                                            advice#index
+                                                        POST   /advice(.:format)                                            advice#create
+                                             new_advice GET    /advice/new(.:format)                                        advice#new
+                                            edit_advice GET    /advice/:id/edit(.:format)                                   advice#edit
+                                                 advice GET    /advice/:id(.:format)                                        advice#show
+                                                        PATCH  /advice/:id(.:format)                                        advice#update
+                                                        PUT    /advice/:id(.:format)                                        advice#update
+                                                        DELETE /advice/:id(.:format)                                        advice#destroy
+         one_course_all_assignments_assessment360_index GET    /assessment360/one_course_all_assignments(.:format)          assessment360#one_course_all_assignments
+           all_students_all_reviews_assessment360_index GET    /assessment360/all_students_all_reviews(.:format)            assessment360#all_students_all_reviews
+            one_student_all_reviews_assessment360_index GET    /assessment360/one_student_all_reviews(.:format)             assessment360#one_student_all_reviews
+        one_assignment_all_students_assessment360_index GET    /assessment360/one_assignment_all_students(.:format)         assessment360#one_assignment_all_students
+                                    assessment360_index GET    /assessment360(.:format)                                     assessment360#index
+                                                        POST   /assessment360(.:format)                                     assessment360#create
+                                      new_assessment360 GET    /assessment360/new(.:format)                                 assessment360#new
+                                     edit_assessment360 GET    /assessment360/:id/edit(.:format)                            assessment360#edit
+                                          assessment360 GET    /assessment360/:id(.:format)                                 assessment360#show
+                                                        PATCH  /assessment360/:id(.:format)                                 assessment360#update
+                                                        PUT    /assessment360/:id(.:format)                                 assessment360#update
+                                                        DELETE /assessment360/:id(.:format)                                 assessment360#destroy
+                                     delete_assignments GET    /assignments/delete(.:format)                                assignments#delete
+           associate_assignment_with_course_assignments GET    /assignments/associate_assignment_with_course(.:format)      assignments#associate_assignment_with_course
+                                       copy_assignments GET    /assignments/copy(.:format)                                  assignments#copy
+                              toggle_access_assignments GET    /assignments/toggle_access(.:format)                         assignments#toggle_access
+                            scheduled_tasks_assignments GET    /assignments/scheduled_tasks(.:format)                       assignments#scheduled_tasks
+                           list_submissions_assignments GET    /assignments/list_submissions(.:format)                      assignments#list_submissions
+                      delete_scheduled_task_assignments GET    /assignments/delete_scheduled_task(.:format)                 assignments#delete_scheduled_task
+              remove_assignment_from_course_assignments GET    /assignments/remove_assignment_from_course(.:format)         assignments#remove_assignment_from_course
+                                            assignments GET    /assignments(.:format)                                       assignments#index
+                                                        POST   /assignments(.:format)                                       assignments#create
+                                         new_assignment GET    /assignments/new(.:format)                                   assignments#new
+                                        edit_assignment GET    /assignments/:id/edit(.:format)                              assignments#edit
+                                             assignment GET    /assignments/:id(.:format)                                   assignments#show
+                                                        PATCH  /assignments/:id(.:format)                                   assignments#update
+                                                        PUT    /assignments/:id(.:format)                                   assignments#update
+                                                        DELETE /assignments/:id(.:format)                                   assignments#destroy
+                                       login_auth_index POST   /auth/login(.:format)                                        auth#login
+                                      logout_auth_index POST   /auth/logout(.:format)                                       auth#logout
+                                             auth_index GET    /auth(.:format)                                              auth#index
+                                                        POST   /auth(.:format)                                              auth#create
+                                               new_auth GET    /auth/new(.:format)                                          auth#new
+                                              edit_auth GET    /auth/:id/edit(.:format)                                     auth#edit
+                                                   auth GET    /auth/:id(.:format)                                          auth#show
+                                                        PATCH  /auth/:id(.:format)                                          auth#update
+                                                        PUT    /auth/:id(.:format)                                          auth#update
+                                                        DELETE /auth/:id(.:format)                                          auth#destroy
+                         author_feedback_questionnaires GET    /author_feedback_questionnaires(.:format)                    questionnaires#index
+                                                        POST   /author_feedback_questionnaires(.:format)                    questionnaires#create
+                      new_author_feedback_questionnaire GET    /author_feedback_questionnaires/new(.:format)                questionnaires#new
+                     edit_author_feedback_questionnaire GET    /author_feedback_questionnaires/:id/edit(.:format)           questionnaires#edit
+                          author_feedback_questionnaire GET    /author_feedback_questionnaires/:id(.:format)                questionnaires#show
+                                                        PATCH  /author_feedback_questionnaires/:id(.:format)                questionnaires#update
+                                                        PUT    /author_feedback_questionnaires/:id(.:format)                questionnaires#update
+                                                        DELETE /author_feedback_questionnaires/:id(.:format)                questionnaires#destroy
+                                     list_content_pages GET    /content_pages/list(.:format)                                content_pages#list
+                                                        GET    /content_pages/:page_name(.:format)                          content_pages#view
+                                          content_pages GET    /content_pages(.:format)                                     content_pages#index
+                                                        POST   /content_pages(.:format)                                     content_pages#create
+                                       new_content_page GET    /content_pages/new(.:format)                                 content_pages#new
+                                      edit_content_page GET    /content_pages/:id/edit(.:format)                            content_pages#edit
+                                           content_page GET    /content_pages/:id(.:format)                                 content_pages#show
+                                                        PATCH  /content_pages/:id(.:format)                                 content_pages#update
+                                                        PUT    /content_pages/:id(.:format)                                 content_pages#update
+                                                        DELETE /content_pages/:id(.:format)                                 content_pages#destroy
+                                list_controller_actions GET    /controller_actions/list(.:format)                           controller_actions#list
+                                                        POST   /controller_actions/:id(.:format)                            controller_actions#update
+                             new_for_controller_actions GET    /controller_actions/new_for(.:format)                        controller_actions#new_for
+                                     controller_actions GET    /controller_actions(.:format)                                controller_actions#index
+                                                        POST   /controller_actions(.:format)                                controller_actions#create
+                                  new_controller_action GET    /controller_actions/new(.:format)                            controller_actions#new
+                                 edit_controller_action GET    /controller_actions/:id/edit(.:format)                       controller_actions#edit
+                                      controller_action GET    /controller_actions/:id(.:format)                            controller_actions#show
+                                                        PATCH  /controller_actions/:id(.:format)                            controller_actions#update
+                                                        PUT    /controller_actions/:id(.:format)                            controller_actions#update
+                                                        DELETE /controller_actions/:id(.:format)                            controller_actions#destroy
+                                    delete_course_index GET    /course/delete(.:format)                                     course#delete
+                             toggle_access_course_index GET    /course/toggle_access(.:format)                              course#toggle_access
+                                      copy_course_index GET    /course/copy(.:format)                                       course#copy
+                  view_teaching_assistants_course_index GET    /course/view_teaching_assistants(.:format)                   course#view_teaching_assistants
+                                    add_ta_course_index POST   /course/add_ta(.:format)                                     course#add_ta
+               auto_complete_for_user_name_course_index GET    /course/auto_complete_for_user_name(.:format)                course#auto_complete_for_user_name
+                                 remove_ta_course_index POST   /course/remove_ta(.:format)                                  course#remove_ta
+                                           course_index GET    /course(.:format)                                            course#index
+                                                        POST   /course(.:format)                                            course#create
+                                             new_course GET    /course/new(.:format)                                        course#new
+                                            edit_course GET    /course/:id/edit(.:format)                                   course#edit
+                                                 course GET    /course/:id(.:format)                                        course#show
+                                                        PATCH  /course/:id(.:format)                                        course#update
+                                                        PUT    /course/:id(.:format)                                        course#update
+                                                        DELETE /course/:id(.:format)                                        course#destroy
+                           list_course_evaluation_index GET    /course_evaluation/list(.:format)                            course_evaluation#list
+                                course_evaluation_index GET    /course_evaluation(.:format)                                 course_evaluation#index
+                                                        POST   /course_evaluation(.:format)                                 course_evaluation#create
+                                  new_course_evaluation GET    /course_evaluation/new(.:format)                             course_evaluation#new
+                                 edit_course_evaluation GET    /course_evaluation/:id/edit(.:format)                        course_evaluation#edit
+                                      course_evaluation GET    /course_evaluation/:id(.:format)                             course_evaluation#show
+                                                        PATCH  /course_evaluation/:id(.:format)                             course_evaluation#update
+                                                        PUT    /course_evaluation/:id(.:format)                             course_evaluation#update
+                                                        DELETE /course_evaluation/:id(.:format)                             course_evaluation#destroy
+                                      accept_eula_index GET    /eula/accept(.:format)                                       eula#accept
+                                     decline_eula_index GET    /eula/decline(.:format)                                      eula#decline
+                                     display_eula_index GET    /eula/display(.:format)                                      eula#display
+                                             eula_index GET    /eula(.:format)                                              eula#index
+                                                        POST   /eula(.:format)                                              eula#create
+                                               new_eula GET    /eula/new(.:format)                                          eula#new
+                                              edit_eula GET    /eula/:id/edit(.:format)                                     eula#edit
+                                                   eula GET    /eula/:id(.:format)                                          eula#show
+                                                        PATCH  /eula/:id(.:format)                                          eula#update
+                                                        PUT    /eula/:id(.:format)                                          eula#update
+                                                        DELETE /eula/:id(.:format)                                          eula#destroy
+                                start_export_file_index GET    /export_file/start(.:format)                                 export_file#start
+                               export_export_file_index GET    /export_file/export(.:format)                                export_file#export
+                                                        POST   /export_file/export(.:format)                                export_file#export
+                                      export_file_index GET    /export_file(.:format)                                       export_file#index
+                                                        POST   /export_file(.:format)                                       export_file#create
+                                        new_export_file GET    /export_file/new(.:format)                                   export_file#new
+                                       edit_export_file GET    /export_file/:id/edit(.:format)                              export_file#edit
+                                            export_file GET    /export_file/:id(.:format)                                   export_file#show
+                                                        PATCH  /export_file/:id(.:format)                                   export_file#update
+                                                        PUT    /export_file/:id(.:format)                                   export_file#update
+                                                        DELETE /export_file/:id(.:format)                                   export_file#destroy
+                                            view_grades GET    /grades/view(.:format)                                       grades#view
+                                  view_my_scores_grades GET    /grades/view_my_scores(.:format)                             grades#view_my_scores
+                              view_my_scores_new_grades GET    /grades/view_my_scores_new(.:format)                         grades#view_my_scores_new
+                               instructor_review_grades GET    /grades/instructor_review(.:format)                          grades#instructor_review
+                                remove_hyperlink_grades POST   /grades/remove_hyperlink(.:format)                           grades#remove_hyperlink
+                           conflict_notification_grades GET    /grades/conflict_notification(.:format)                      grades#conflict_notification
+                                                 grades GET    /grades(.:format)                                            grades#index
+                                                        POST   /grades(.:format)                                            grades#create
+                                              new_grade GET    /grades/new(.:format)                                        grades#new
+                                             edit_grade GET    /grades/:id/edit(.:format)                                   grades#edit
+                                                  grade GET    /grades/:id(.:format)                                        grades#show
+                                                        PATCH  /grades/:id(.:format)                                        grades#update
+                                                        PUT    /grades/:id(.:format)                                        grades#update
+                                                        DELETE /grades/:id(.:format)                                        grades#destroy
+                                start_impersonate_index GET    /impersonate/start(.:format)                                 impersonate#start
+                          impersonate_impersonate_index POST   /impersonate/impersonate(.:format)                           impersonate#impersonate
+                                      impersonate_index GET    /impersonate(.:format)                                       impersonate#index
+                                                        POST   /impersonate(.:format)                                       impersonate#create
+                                        new_impersonate GET    /impersonate/new(.:format)                                   impersonate#new
+                                       edit_impersonate GET    /impersonate/:id/edit(.:format)                              impersonate#edit
+                                            impersonate GET    /impersonate/:id(.:format)                                   impersonate#show
+                                                        PATCH  /impersonate/:id(.:format)                                   impersonate#update
+                                                        PUT    /impersonate/:id(.:format)                                   impersonate#update
+                                                        DELETE /impersonate/:id(.:format)                                   impersonate#destroy
+                                start_import_file_index GET    /import_file/start(.:format)                                 import_file#start
+                               import_import_file_index POST   /import_file/import(.:format)                                import_file#import
+                                      import_file_index GET    /import_file(.:format)                                       import_file#index
+                                                        POST   /import_file(.:format)                                       import_file#create
+                                        new_import_file GET    /import_file/new(.:format)                                   import_file#new
+                                       edit_import_file GET    /import_file/:id/edit(.:format)                              import_file#edit
+                                            import_file GET    /import_file/:id(.:format)                                   import_file#show
+                                                        PATCH  /import_file/:id(.:format)                                   import_file#update
+                                                        PUT    /import_file/:id(.:format)                                   import_file#update
+                                                        DELETE /import_file/:id(.:format)                                   import_file#destroy
+                                     import_file_import GET    /import_file/import(.:format)                                import_file#import
+                                 list_institution_index GET    /institution/list(.:format)                                  institution#list
+                                      institution_index GET    /institution(.:format)                                       institution#show
+                                                        GET    /institution(.:format)                                       institution#new
+                                                        POST   /institution(.:format)                                       institution#create
+                                                        POST   /institution/:id(.:format)                                   institution#update
+                                                        GET    /institution(.:format)                                       institution#index
+                                                        POST   /institution(.:format)                                       institution#create
+                                        new_institution GET    /institution/new(.:format)                                   institution#new
+                                       edit_institution GET    /institution/:id/edit(.:format)                              institution#edit
+                                            institution GET    /institution/:id(.:format)                                   institution#show
+                                                        PATCH  /institution/:id(.:format)                                   institution#update
+                                                        PUT    /institution/:id(.:format)                                   institution#update
+                                                        DELETE /institution/:id(.:format)                                   institution#destroy
+                                     cancel_invitations GET    /invitations/cancel(.:format)                                invitations#cancel
+                                     accept_invitations GET    /invitations/accept(.:format)                                invitations#accept
+                                    decline_invitations GET    /invitations/decline(.:format)                               invitations#decline
+                                            invitations GET    /invitations(.:format)                                       invitations#index
+                                                        POST   /invitations(.:format)                                       invitations#create
+                                         new_invitation GET    /invitations/new(.:format)                                   invitations#new
+                                        edit_invitation GET    /invitations/:id/edit(.:format)                              invitations#edit
+                                             invitation GET    /invitations/:id(.:format)                                   invitations#show
+                                                        PATCH  /invitations/:id(.:format)                                   invitations#update
+                                                        PUT    /invitations/:id(.:format)                                   invitations#update
+                                                        DELETE /invitations/:id(.:format)                                   invitations#destroy
+                             decline_join_team_requests GET    /join_team_requests/decline(.:format)                        join_team_requests#decline
+                                edit_join_team_requests GET    /join_team_requests/edit(.:format)                           join_team_requests#edit
+                                                        GET    /join_team_requests(.:format)                                join_team_requests#index
+                                                        POST   /join_team_requests(.:format)                                join_team_requests#create
+                                                        GET    /join_team_requests/new(.:format)                            join_team_requests#new
+                                                        GET    /join_team_requests/:id/edit(.:format)                       join_team_requests#edit
+                                                        GET    /join_team_requests/:id(.:format)                            join_team_requests#show
+                                                        PATCH  /join_team_requests/:id(.:format)                            join_team_requests#update
+                                                        PUT    /join_team_requests/:id(.:format)                            join_team_requests#update
+                                                        DELETE /join_team_requests/:id(.:format)                            join_team_requests#destroy
+                                          late_policies GET    /late_policies(.:format)                                     late_policies#index
+                                                        POST   /late_policies(.:format)                                     late_policies#create
+                                        new_late_policy GET    /late_policies/new(.:format)                                 late_policies#new
+                                       edit_late_policy GET    /late_policies/:id/edit(.:format)                            late_policies#edit
+                                            late_policy GET    /late_policies/:id(.:format)                                 late_policies#show
+                                                        PATCH  /late_policies/:id(.:format)                                 late_policies#update
+                                                        PUT    /late_policies/:id(.:format)                                 late_policies#update
+                                                        DELETE /late_policies/:id(.:format)                                 late_policies#destroy
+                                      leaderboard_index GET    /leaderboard(.:format)                                       leaderboard#index
+                                                        GET    /leaderboard(.:format)                                       leaderboard#index
+                                                        POST   /leaderboard(.:format)                                       leaderboard#create
+                                        new_leaderboard GET    /leaderboard/new(.:format)                                   leaderboard#new
+                                       edit_leaderboard GET    /leaderboard/:id/edit(.:format)                              leaderboard#edit {:id=>/\d+/}
+                                            leaderboard GET    /leaderboard/:id(.:format)                                   leaderboard#show {:id=>/\d+/}
+                                                        PATCH  /leaderboard/:id(.:format)                                   leaderboard#update {:id=>/\d+/}
+                                                        PUT    /leaderboard/:id(.:format)                                   leaderboard#update {:id=>/\d+/}
+                                                        DELETE /leaderboard/:id(.:format)                                   leaderboard#destroy {:id=>/\d+/}
+                                                        GET    /leaderboard/index(.:format)                                 leaderboard#index
+                                          markup_styles GET    /markup_styles(.:format)                                     markup_styles#index
+                                                        POST   /markup_styles(.:format)                                     markup_styles#create
+                                       new_markup_style GET    /markup_styles/new(.:format)                                 markup_styles#new
+                                      edit_markup_style GET    /markup_styles/:id/edit(.:format)                            markup_styles#edit
+                                           markup_style GET    /markup_styles/:id(.:format)                                 markup_styles#show
+                                                        PATCH  /markup_styles/:id(.:format)                                 markup_styles#update
+                                                        PUT    /markup_styles/:id(.:format)                                 markup_styles#update
+                                                        DELETE /markup_styles/:id(.:format)                                 markup_styles#destroy
+                                   move_down_menu_items GET    /menu_items/move_down(.:format)                              menu_items#move_down
+                                     move_up_menu_items GET    /menu_items/move_up(.:format)                                menu_items#move_up
+                                     new_for_menu_items GET    /menu_items/new_for(.:format)                                menu_items#new_for
+                                        link_menu_items GET    /menu_items/link(.:format)                                   menu_items#link
+                                        list_menu_items GET    /menu_items/list(.:format)                                   menu_items#list
+                                             menu_items GET    /menu_items(.:format)                                        menu_items#index
+                                                        POST   /menu_items(.:format)                                        menu_items#create
+                                          new_menu_item GET    /menu_items/new(.:format)                                    menu_items#new
+                                         edit_menu_item GET    /menu_items/:id/edit(.:format)                               menu_items#edit
+                                              menu_item GET    /menu_items/:id(.:format)                                    menu_items#show
+                                                        PATCH  /menu_items/:id(.:format)                                    menu_items#update
+                                                        PUT    /menu_items/:id(.:format)                                    menu_items#update
+                                                        DELETE /menu_items/:id(.:format)                                    menu_items#destroy
+                                       add_participants GET    /participants/add(.:format)                                  participants#add
+                                                        POST   /participants/add(.:format)                                  participants#add
+               auto_complete_for_user_name_participants GET    /participants/auto_complete_for_user_name(.:format)          participants#auto_complete_for_user_name
+             delete_assignment_participant_participants GET    /participants/delete_assignment_participant(.:format)        participants#delete_assignment_participant
+                                      list_participants GET    /participants/list(.:format)                                 participants#list
+                             change_handle_participants GET    /participants/change_handle(.:format)                        participants#change_handle
+                                   inherit_participants GET    /participants/inherit(.:format)                              participants#inherit
+                              bequeath_all_participants GET    /participants/bequeath_all(.:format)                         participants#bequeath_all
+                                    delete_participants POST   /participants/delete(.:format)                               participants#delete
+                                                        GET    /participants/inherit(.:format)                              participants#inherit
+                                                        GET    /participants/bequeath_all(.:format)                         participants#bequeath_all
+                     update_authorizations_participants POST   /participants/update_authorizations(.:format)                participants#update_authorizations
+                             update_duties_participants POST   /participants/update_duties(.:format)                        participants#update_duties
+                                                        POST   /participants/change_handle(.:format)                        participants#change_handle
+                                           participants GET    /participants(.:format)                                      participants#index
+                                                        POST   /participants(.:format)                                      participants#create
+                                        new_participant GET    /participants/new(.:format)                                  participants#new
+                                       edit_participant GET    /participants/:id/edit(.:format)                             participants#edit
+                                            participant GET    /participants/:id(.:format)                                  participants#show
+                                                        PATCH  /participants/:id(.:format)                                  participants#update
+                                                        PUT    /participants/:id(.:format)                                  participants#update
+                                                        DELETE /participants/:id(.:format)                                  participants#destroy
+                             participants_change_handle GET    /participants/change_handle(.:format)                        participants#change_handle
+                                         reset_password GET    /reset_password(.:format)                                    password_retrieval#reset_password
+                                                        POST   /reset_password(.:format)                                    users#reset_password
+                     forgotten_password_retrieval_index GET    /password_retrieval/forgotten(.:format)                      password_retrieval#forgotten
+                 send_password_password_retrieval_index POST   /password_retrieval/send_password(.:format)                  password_retrieval#send_password
+                     send_link_password_retrieval_index POST   /password_retrieval/send_link(.:format)                      password_retrieval#send_link
+                               password_retrieval_index GET    /password_retrieval(.:format)                                password_retrieval#index
+                                                        POST   /password_retrieval(.:format)                                password_retrieval#create
+                                 new_password_retrieval GET    /password_retrieval/new(.:format)                            password_retrieval#new
+                                edit_password_retrieval GET    /password_retrieval/:id/edit(.:format)                       password_retrieval#edit
+                                     password_retrieval GET    /password_retrieval/:id(.:format)                            password_retrieval#show
+                                                        PATCH  /password_retrieval/:id(.:format)                            password_retrieval#update
+                                                        PUT    /password_retrieval/:id(.:format)                            password_retrieval#update
+                                                        DELETE /password_retrieval/:id(.:format)                            password_retrieval#destroy
+                                       list_permissions GET    /permissions/list(.:format)                                  permissions#list
+                                                        GET    /permissions/:id(.:format)                                   permissions#show {:id=>/\d+/}
+                                                        POST   /permissions/:id(.:format)                                   permissions#update {:id=>/\d+/}
+                                                        DELETE /permissions/:id(.:format)                                   permissions#destroy {:id=>/\d+/}
+                                            permissions GET    /permissions(.:format)                                       permissions#index
+                                                        POST   /permissions(.:format)                                       permissions#create
+                                         new_permission GET    /permissions/new(.:format)                                   permissions#new
+                                        edit_permission GET    /permissions/:id/edit(.:format)                              permissions#edit {:id=>/\d+/}
+                                             permission GET    /permissions/:id(.:format)                                   permissions#show {:id=>/\d+/}
+                                                        PATCH  /permissions/:id(.:format)                                   permissions#update {:id=>/\d+/}
+                                                        PUT    /permissions/:id(.:format)                                   permissions#update {:id=>/\d+/}
+                                                        DELETE /permissions/:id(.:format)                                   permissions#destroy {:id=>/\d+/}
+                                     edit_profile_index GET    /profile/edit(.:format)                                      profile#edit
+                                          profile_index GET    /profile(.:format)                                           profile#index
+                                                        POST   /profile(.:format)                                           profile#create
+                                            new_profile GET    /profile/new(.:format)                                       profile#new
+                                           edit_profile GET    /profile/:id/edit(.:format)                                  profile#edit
+                                                profile GET    /profile/:id(.:format)                                       profile#show
+                                                        PATCH  /profile/:id(.:format)                                       profile#update
+                                                        PUT    /profile/:id(.:format)                                       profile#update
+                                                        DELETE /profile/:id(.:format)                                       profile#destroy
+                                  view_publishing_index GET    /publishing/view(.:format)                                   publishing#view
+            update_publish_permissions_publishing_index POST   /publishing/update_publish_permissions(.:format)             publishing#update_publish_permissions
+                set_publish_permission_publishing_index POST   /publishing/set_publish_permission(.:format)                 publishing#set_publish_permission
+                                 grant_publishing_index GET    /publishing/grant(.:format)                                  publishing#grant
+                grant_with_private_key_publishing_index GET    /publishing/grant_with_private_key(.:format)                 publishing#grant_with_private_key
+                                                        POST   /publishing/grant_with_private_key(.:format)                 publishing#grant_with_private_key
+                                                        GET    /publishing/set_publish_permission(.:format)                 publishing#set_publish_permission
+                                       publishing_index GET    /publishing(.:format)                                        publishing#index
+                                                        POST   /publishing(.:format)                                        publishing#create
+                                         new_publishing GET    /publishing/new(.:format)                                    publishing#new
+                                        edit_publishing GET    /publishing/:id/edit(.:format)                               publishing#edit
+                                             publishing GET    /publishing/:id(.:format)                                    publishing#show
+                                                        PATCH  /publishing/:id(.:format)                                    publishing#update
+                                                        PUT    /publishing/:id(.:format)                                    publishing#update
+                                                        DELETE /publishing/:id(.:format)                                    publishing#destroy
+                                    copy_questionnaires GET    /questionnaires/copy(.:format)                               questionnaires#copy
+                                    edit_questionnaires GET    /questionnaires/edit(.:format)                               questionnaires#edit
+                                    list_questionnaires GET    /questionnaires/list(.:format)                               questionnaires#list
+                     list_questionnaires_questionnaires POST   /questionnaires/list_questionnaires(.:format)                questionnaires#list_questionnaires
+                                new_quiz_questionnaires GET    /questionnaires/new_quiz(.:format)                           questionnaires#new_quiz
+               select_questionnaire_type_questionnaires POST   /questionnaires/select_questionnaire_type(.:format)          questionnaires#select_questionnaire_type
+                           toggle_access_questionnaires GET    /questionnaires/toggle_access(.:format)                      questionnaires#toggle_access
+                                    view_questionnaires GET    /questionnaires/view(.:format)                               questionnaires#view
+                                  delete_questionnaires GET    /questionnaires/delete(.:format)                             questionnaires#delete
+               create_quiz_questionnaire_questionnaires POST   /questionnaires/create_quiz_questionnaire(.:format)          questionnaires#create_quiz_questionnaire
+                             update_quiz_questionnaires POST   /questionnaires/update_quiz(.:format)                        questionnaires#update_quiz
+                       add_new_questions_questionnaires POST   /questionnaires/add_new_questions(.:format)                  questionnaires#add_new_questions
+                      save_all_questions_questionnaires POST   /questionnaires/save_all_questions(.:format)                 questionnaires#save_all_questions
+                                         questionnaires GET    /questionnaires(.:format)                                    questionnaires#index
+                                                        POST   /questionnaires(.:format)                                    questionnaires#create
+                                      new_questionnaire GET    /questionnaires/new(.:format)                                questionnaires#new
+                                     edit_questionnaire GET    /questionnaires/:id/edit(.:format)                           questionnaires#edit
+                                          questionnaire GET    /questionnaires/:id(.:format)                                questionnaires#show
+                                                        PATCH  /questionnaires/:id(.:format)                                questionnaires#update
+                                                        PUT    /questionnaires/:id(.:format)                                questionnaires#update
+                                                        DELETE /questionnaires/:id(.:format)                                questionnaires#destroy
+                                  review_questionnaires GET    /review_questionnaires(.:format)                             questionnaires#index
+                                                        POST   /review_questionnaires(.:format)                             questionnaires#create
+                               new_review_questionnaire GET    /review_questionnaires/new(.:format)                         questionnaires#new
+                              edit_review_questionnaire GET    /review_questionnaires/:id/edit(.:format)                    questionnaires#edit
+                                   review_questionnaire GET    /review_questionnaires/:id(.:format)                         questionnaires#show
+                                                        PATCH  /review_questionnaires/:id(.:format)                         questionnaires#update
+                                                        PUT    /review_questionnaires/:id(.:format)                         questionnaires#update
+                                                        DELETE /review_questionnaires/:id(.:format)                         questionnaires#destroy
+                              metareview_questionnaires GET    /metareview_questionnaires(.:format)                         questionnaires#index
+                                                        POST   /metareview_questionnaires(.:format)                         questionnaires#create
+                           new_metareview_questionnaire GET    /metareview_questionnaires/new(.:format)                     questionnaires#new
+                          edit_metareview_questionnaire GET    /metareview_questionnaires/:id/edit(.:format)                questionnaires#edit
+                               metareview_questionnaire GET    /metareview_questionnaires/:id(.:format)                     questionnaires#show
+                                                        PATCH  /metareview_questionnaires/:id(.:format)                     questionnaires#update
+                                                        PUT    /metareview_questionnaires/:id(.:format)                     questionnaires#update
+                                                        DELETE /metareview_questionnaires/:id(.:format)                     questionnaires#destroy
+                         teammate_review_questionnaires GET    /teammate_review_questionnaires(.:format)                    questionnaires#index
+                                                        POST   /teammate_review_questionnaires(.:format)                    questionnaires#create
+                      new_teammate_review_questionnaire GET    /teammate_review_questionnaires/new(.:format)                questionnaires#new
+                     edit_teammate_review_questionnaire GET    /teammate_review_questionnaires/:id/edit(.:format)           questionnaires#edit
+                          teammate_review_questionnaire GET    /teammate_review_questionnaires/:id(.:format)                questionnaires#show
+                                                        PATCH  /teammate_review_questionnaires/:id(.:format)                questionnaires#update
+                                                        PUT    /teammate_review_questionnaires/:id(.:format)                questionnaires#update
+                                                        DELETE /teammate_review_questionnaires/:id(.:format)                questionnaires#destroy
+                                  survey_questionnaires GET    /survey_questionnaires(.:format)                             questionnaires#index
+                                                        POST   /survey_questionnaires(.:format)                             questionnaires#create
+                               new_survey_questionnaire GET    /survey_questionnaires/new(.:format)                         questionnaires#new
+                              edit_survey_questionnaire GET    /survey_questionnaires/:id/edit(.:format)                    questionnaires#edit
+                                   survey_questionnaire GET    /survey_questionnaires/:id(.:format)                         questionnaires#show
+                                                        PATCH  /survey_questionnaires/:id(.:format)                         questionnaires#update
+                                                        PUT    /survey_questionnaires/:id(.:format)                         questionnaires#update
+                                                        DELETE /survey_questionnaires/:id(.:format)                         questionnaires#destroy
+                           global_survey_questionnaires GET    /global_survey_questionnaires(.:format)                      questionnaires#index
+                                                        POST   /global_survey_questionnaires(.:format)                      questionnaires#create
+                        new_global_survey_questionnaire GET    /global_survey_questionnaires/new(.:format)                  questionnaires#new
+                       edit_global_survey_questionnaire GET    /global_survey_questionnaires/:id/edit(.:format)             questionnaires#edit
+                            global_survey_questionnaire GET    /global_survey_questionnaires/:id(.:format)                  questionnaires#show
+                                                        PATCH  /global_survey_questionnaires/:id(.:format)                  questionnaires#update
+                                                        PUT    /global_survey_questionnaires/:id(.:format)                  questionnaires#update
+                                                        DELETE /global_survey_questionnaires/:id(.:format)                  questionnaires#destroy
+                       course_evaluation_questionnaires GET    /course_evaluation_questionnaires(.:format)                  questionnaires#index
+                                                        POST   /course_evaluation_questionnaires(.:format)                  questionnaires#create
+                    new_course_evaluation_questionnaire GET    /course_evaluation_questionnaires/new(.:format)              questionnaires#new
+                   edit_course_evaluation_questionnaire GET    /course_evaluation_questionnaires/:id/edit(.:format)         questionnaires#edit
+                        course_evaluation_questionnaire GET    /course_evaluation_questionnaires/:id(.:format)              questionnaires#show
+                                                        PATCH  /course_evaluation_questionnaires/:id(.:format)              questionnaires#update
+                                                        PUT    /course_evaluation_questionnaires/:id(.:format)              questionnaires#update
+                                                        DELETE /course_evaluation_questionnaires/:id(.:format)              questionnaires#destroy
+                          bookmarkrating_questionnaires GET    /bookmarkrating_questionnaires(.:format)                     questionnaires#index
+                                                        POST   /bookmarkrating_questionnaires(.:format)                     questionnaires#create
+                       new_bookmarkrating_questionnaire GET    /bookmarkrating_questionnaires/new(.:format)                 questionnaires#new
+                      edit_bookmarkrating_questionnaire GET    /bookmarkrating_questionnaires/:id/edit(.:format)            questionnaires#edit
+                           bookmarkrating_questionnaire GET    /bookmarkrating_questionnaires/:id(.:format)                 questionnaires#show
+                                                        PATCH  /bookmarkrating_questionnaires/:id(.:format)                 questionnaires#update
+                                                        PUT    /bookmarkrating_questionnaires/:id(.:format)                 questionnaires#update
+                                                        DELETE /bookmarkrating_questionnaires/:id(.:format)                 questionnaires#destroy
+                                       delete_questions GET    /questions/delete(.:format)                                  questions#delete
+                                              questions GET    /questions(.:format)                                         questions#index
+                                                        POST   /questions(.:format)                                         questions#create
+                                           new_question GET    /questions/new(.:format)                                     questions#new
+                                          edit_question GET    /questions/:id/edit(.:format)                                questions#edit
+                                               question GET    /questions/:id(.:format)                                     questions#show
+                                                        PATCH  /questions/:id(.:format)                                     questions#update
+                                                        PUT    /questions/:id(.:format)                                     questions#update
+                                                        DELETE /questions/:id(.:format)                                     questions#destroy
+                            new_feedback_response_index GET    /response/new_feedback(.:format)                             response#new_feedback
+                                    view_response_index GET    /response/view(.:format)                                     response#view
+                                  delete_response_index POST   /response/delete(.:format)                                   response#delete
+                        remove_hyperlink_response_index GET    /response/remove_hyperlink(.:format)                         response#remove_hyperlink
+                                  saving_response_index GET    /response/saving(.:format)                                   response#saving
+                             redirection_response_index GET    /response/redirection(.:format)                              response#redirection
+                           custom_create_response_index POST   /response/custom_create(.:format)                            response#custom_create
+                                         response_index GET    /response(.:format)                                          response#index
+                                                        POST   /response(.:format)                                          response#create
+                                           new_response GET    /response/new(.:format)                                      response#new
+                                          edit_response GET    /response/:id/edit(.:format)                                 response#edit
+                                               response GET    /response/:id(.:format)                                      response#show
+                                                        PATCH  /response/:id(.:format)                                      response#update
+                                                        PUT    /response/:id(.:format)                                      response#update
+                                                        DELETE /response/:id(.:format)                                      response#destroy
+                  add_metareviewer_review_mapping_index POST   /review_mapping/add_metareviewer(.:format)                   review_mapping#add_metareviewer
+                      add_reviewer_review_mapping_index GET    /review_mapping/add_reviewer(.:format)                       review_mapping#add_reviewer
+                                                        POST   /review_mapping/add_reviewer(.:format)                       review_mapping#add_reviewer
+                 add_self_reviewer_review_mapping_index POST   /review_mapping/add_self_reviewer(.:format)                  review_mapping#add_self_reviewer
+                                                        GET    /review_mapping/add_self_reviewer(.:format)                  review_mapping#add_self_reviewer
+            add_user_to_assignment_review_mapping_index GET    /review_mapping/add_user_to_assignment(.:format)             review_mapping#add_user_to_assignment
+   assign_metareviewer_dynamically_review_mapping_index GET    /review_mapping/assign_metareviewer_dynamically(.:format)    review_mapping#assign_metareviewer_dynamically
+       assign_reviewer_dynamically_review_mapping_index GET    /review_mapping/assign_reviewer_dynamically(.:format)        review_mapping#assign_reviewer_dynamically
+                                                        POST   /review_mapping/assign_reviewer_dynamically(.:format)        review_mapping#assign_reviewer_dynamically
+       auto_complete_for_user_name_review_mapping_index GET    /review_mapping/auto_complete_for_user_name(.:format)        review_mapping#auto_complete_for_user_name
+          delete_all_metareviewers_review_mapping_index GET    /review_mapping/delete_all_metareviewers(.:format)           review_mapping#delete_all_metareviewers
+              delete_all_reviewers_review_mapping_index GET    /review_mapping/delete_all_reviewers(.:format)               review_mapping#delete_all_reviewers
+               delete_metareviewer_review_mapping_index GET    /review_mapping/delete_metareviewer(.:format)                review_mapping#delete_metareviewer
+                   delete_reviewer_review_mapping_index GET    /review_mapping/delete_reviewer(.:format)                    review_mapping#delete_reviewer
+                      distribution_review_mapping_index GET    /review_mapping/distribution(.:format)                       review_mapping#distribution
+                     list_mappings_review_mapping_index GET    /review_mapping/list_mappings(.:format)                      review_mapping#list_mappings
+                   response_report_review_mapping_index GET    /review_mapping/response_report(.:format)                    review_mapping#response_report
+                                                        POST   /review_mapping/response_report(.:format)                    review_mapping#response_report
+               select_metareviewer_review_mapping_index GET    /review_mapping/select_metareviewer(.:format)                review_mapping#select_metareviewer
+                   select_reviewer_review_mapping_index GET    /review_mapping/select_reviewer(.:format)                    review_mapping#select_reviewer
+                    select_mapping_review_mapping_index GET    /review_mapping/select_mapping(.:format)                     review_mapping#select_mapping
+        show_available_submissions_review_mapping_index GET    /review_mapping/show_available_submissions(.:format)         review_mapping#show_available_submissions
+           assign_quiz_dynamically_review_mapping_index POST   /review_mapping/assign_quiz_dynamically(.:format)            review_mapping#assign_quiz_dynamically
+                                                        POST   /review_mapping/assign_metareviewer_dynamically(.:format)    review_mapping#assign_metareviewer_dynamically
+          automatic_review_mapping_review_mapping_index POST   /review_mapping/automatic_review_mapping(.:format)           review_mapping#automatic_review_mapping
+automatic_review_mapping_staggered_review_mapping_index POST   /review_mapping/automatic_review_mapping_staggered(.:format) review_mapping#automatic_review_mapping_staggered
+                                   review_mapping_index GET    /review_mapping(.:format)                                    review_mapping#index
+                                                        POST   /review_mapping(.:format)                                    review_mapping#create
+                                     new_review_mapping GET    /review_mapping/new(.:format)                                review_mapping#new
+                                    edit_review_mapping GET    /review_mapping/:id/edit(.:format)                           review_mapping#edit
+                                         review_mapping GET    /review_mapping/:id(.:format)                                review_mapping#show
+                                                        PATCH  /review_mapping/:id(.:format)                                review_mapping#update
+                                                        PUT    /review_mapping/:id(.:format)                                review_mapping#update
+                                                        DELETE /review_mapping/:id(.:format)                                review_mapping#destroy
+                  show_all_submitted_files_review_files GET    /review_files/show_all_submitted_files(.:format)             review_files#show_all_submitted_files
+                            show_code_file_review_files GET    /review_files/show_code_file(.:format)                       review_files#show_code_file
+                       show_code_file_diff_review_files GET    /review_files/show_code_file_diff(.:format)                  review_files#show_code_file_diff
+                              get_comments_review_files GET    /review_files/get_comments(.:format)                         review_files#get_comments
+                            submit_comment_review_files GET    /review_files/submit_comment(.:format)                       review_files#submit_comment
+                                           review_files GET    /review_files(.:format)                                      review_files#index
+                                                        POST   /review_files(.:format)                                      review_files#create
+                                        new_review_file GET    /review_files/new(.:format)                                  review_files#new
+                                       edit_review_file GET    /review_files/:id/edit(.:format)                             review_files#edit
+                                            review_file GET    /review_files/:id(.:format)                                  review_files#show
+                                                        PATCH  /review_files/:id(.:format)                                  review_files#update
+                                                        PUT    /review_files/:id(.:format)                                  review_files#update
+                                                        DELETE /review_files/:id(.:format)                                  review_files#destroy
+                                             list_roles GET    /roles/list(.:format)                                        roles#list
+                                                        POST   /roles/:id(.:format)                                         roles#update
+                                                  roles GET    /roles(.:format)                                             roles#index
+                                                        POST   /roles(.:format)                                             roles#create
+                                               new_role GET    /roles/new(.:format)                                         roles#new
+                                              edit_role GET    /roles/:id/edit(.:format)                                    roles#edit
+                                                   role GET    /roles/:id(.:format)                                         roles#show
+                                                        PATCH  /roles/:id(.:format)                                         roles#update
+                                                        PUT    /roles/:id(.:format)                                         roles#update
+                                                        DELETE /roles/:id(.:format)                                         roles#destroy
+              new_permission_for_role_roles_permissions GET    /roles_permissions/new_permission_for_role(.:format)         roles_permissions#new_permission_for_role
+                                      roles_permissions GET    /roles_permissions(.:format)                                 roles_permissions#index
+                                                        POST   /roles_permissions(.:format)                                 roles_permissions#create
+                                   new_roles_permission GET    /roles_permissions/new(.:format)                             roles_permissions#new
+                                  edit_roles_permission GET    /roles_permissions/:id/edit(.:format)                        roles_permissions#edit
+                                       roles_permission GET    /roles_permissions/:id(.:format)                             roles_permissions#show
+                                                        PATCH  /roles_permissions/:id(.:format)                             roles_permissions#update
+                                                        PUT    /roles_permissions/:id(.:format)                             roles_permissions#update
+                                                        DELETE /roles_permissions/:id(.:format)                             roles_permissions#destroy
+                             signup_sign_up_sheet_index GET    /sign_up_sheet/signup(.:format)                              sign_up_sheet#signup
+                      delete_signup_sign_up_sheet_index GET    /sign_up_sheet/delete_signup(.:format)                       sign_up_sheet#delete_signup
+                  add_signup_topics_sign_up_sheet_index GET    /sign_up_sheet/add_signup_topics(.:format)                   sign_up_sheet#add_signup_topics
+        add_signup_topics_staggered_sign_up_sheet_index GET    /sign_up_sheet/add_signup_topics_staggered(.:format)         sign_up_sheet#add_signup_topics_staggered
+                                                        GET    /sign_up_sheet/delete_signup(.:format)                       sign_up_sheet#delete_signup
+                               edit_sign_up_sheet_index GET    /sign_up_sheet/edit(.:format)                                sign_up_sheet#edit
+                               list_sign_up_sheet_index GET    /sign_up_sheet/list(.:format)                                sign_up_sheet#list
+                      signup_topics_sign_up_sheet_index GET    /sign_up_sheet/signup_topics(.:format)                       sign_up_sheet#signup_topics
+                                                        GET    /sign_up_sheet/signup(.:format)                              sign_up_sheet#signup
+                            sign_up_sign_up_sheet_index GET    /sign_up_sheet/sign_up(.:format)                             sign_up_sheet#sign_up
+                       team_details_sign_up_sheet_index GET    /sign_up_sheet/team_details(.:format)                        sign_up_sheet#team_details
+             view_publishing_rights_sign_up_sheet_index GET    /sign_up_sheet/view_publishing_rights(.:format)              sign_up_sheet#view_publishing_rights
+                intelligent_sign_up_sign_up_sheet_index GET    /sign_up_sheet/intelligent_sign_up(.:format)                 sign_up_sheet#intelligent_sign_up
+                   intelligent_save_sign_up_sheet_index GET    /sign_up_sheet/intelligent_save(.:format)                    sign_up_sheet#intelligent_save
+               save_topic_deadlines_sign_up_sheet_index POST   /sign_up_sheet/save_topic_deadlines(.:format)                sign_up_sheet#save_topic_deadlines
+            save_topic_dependencies_sign_up_sheet_index POST   /sign_up_sheet/save_topic_dependencies(.:format)             sign_up_sheet#save_topic_dependencies
+                                    sign_up_sheet_index GET    /sign_up_sheet(.:format)                                     sign_up_sheet#index
+                                                        POST   /sign_up_sheet(.:format)                                     sign_up_sheet#create
+                                      new_sign_up_sheet GET    /sign_up_sheet/new(.:format)                                 sign_up_sheet#new
+                                     edit_sign_up_sheet GET    /sign_up_sheet/:id/edit(.:format)                            sign_up_sheet#edit
+                                          sign_up_sheet GET    /sign_up_sheet/:id(.:format)                                 sign_up_sheet#show
+                                                        PATCH  /sign_up_sheet/:id(.:format)                                 sign_up_sheet#update
+                                                        PUT    /sign_up_sheet/:id(.:format)                                 sign_up_sheet#update
+                                                        DELETE /sign_up_sheet/:id(.:format)                                 sign_up_sheet#destroy
+                                  list_site_controllers GET    /site_controllers/list(.:format)                             site_controllers#list
+                            new_called_site_controllers GET    /site_controllers/new_called(.:format)                       site_controllers#new_called
+                                       site_controllers GET    /site_controllers(.:format)                                  site_controllers#index
+                                                        POST   /site_controllers(.:format)                                  site_controllers#create
+                                    new_site_controller GET    /site_controllers/new(.:format)                              site_controllers#new
+                                   edit_site_controller GET    /site_controllers/:id/edit(.:format)                         site_controllers#edit
+                                        site_controller GET    /site_controllers/:id(.:format)                              site_controllers#show
+                                                        PATCH  /site_controllers/:id(.:format)                              site_controllers#update
+                                                        PUT    /site_controllers/:id(.:format)                              site_controllers#update
+                                                        DELETE /site_controllers/:id(.:format)                              site_controllers#destroy
+                                list_surveys_statistics GET    /statistics/list_surveys(.:format)                           statistics#list_surveys
+                                        list_statistics GET    /statistics/list(.:format)                                   statistics#list
+                              view_responses_statistics GET    /statistics/view_responses(.:format)                         statistics#view_responses
+                                             statistics GET    /statistics(.:format)                                        statistics#index
+                                                        POST   /statistics(.:format)                                        statistics#create
+                                          new_statistic GET    /statistics/new(.:format)                                    statistics#new
+                                         edit_statistic GET    /statistics/:id/edit(.:format)                               statistics#edit
+                                              statistic GET    /statistics/:id(.:format)                                    statistics#show
+                                                        PATCH  /statistics/:id(.:format)                                    statistics#update
+                                                        PUT    /statistics/:id(.:format)                                    statistics#update
+                                                        DELETE /statistics/:id(.:format)                                    statistics#destroy
+                        student_quizzes_student_quizzes POST   /student_quizzes/student_quizzes(.:format)                   student_quizzes#student_quizzes
+                                        student_quizzes GET    /student_quizzes(.:format)                                   student_quizzes#index
+                        record_response_student_quizzes POST   /student_quizzes/record_response(.:format)                   student_quizzes#record_response
+                          finished_quiz_student_quizzes GET    /student_quizzes/finished_quiz(.:format)                     student_quizzes#finished_quiz
+                              take_quiz_student_quizzes GET    /student_quizzes/take_quiz(.:format)                         student_quizzes#take_quiz
+                       review_questions_student_quizzes GET    /student_quizzes/review_questions(.:format)                  student_quizzes#review_questions
+                                                        GET    /student_quizzes(.:format)                                   student_quizzes#index
+                                                        POST   /student_quizzes(.:format)                                   student_quizzes#create
+                                       new_student_quiz GET    /student_quizzes/new(.:format)                               student_quizzes#new
+                                      edit_student_quiz GET    /student_quizzes/:id/edit(.:format)                          student_quizzes#edit
+                                           student_quiz GET    /student_quizzes/:id(.:format)                               student_quizzes#show
+                                                        PATCH  /student_quizzes/:id(.:format)                               student_quizzes#update
+                                                        PUT    /student_quizzes/:id(.:format)                               student_quizzes#update
+                                                        DELETE /student_quizzes/:id(.:format)                               student_quizzes#destroy
+                              list_student_review_index GET    /student_review/list(.:format)                               student_review#list
+                                   student_review_index GET    /student_review(.:format)                                    student_review#index
+                                                        POST   /student_review(.:format)                                    student_review#create
+                                     new_student_review GET    /student_review/new(.:format)                                student_review#new
+                                    edit_student_review GET    /student_review/:id/edit(.:format)                           student_review#edit
+                                         student_review GET    /student_review/:id(.:format)                                student_review#show
+                                                        PATCH  /student_review/:id(.:format)                                student_review#update
+                                                        PUT    /student_review/:id(.:format)                                student_review#update
+                                                        DELETE /student_review/:id(.:format)                                student_review#destroy
+                                list_student_task_index GET    /student_task/list(.:format)                                 student_task#list
+                                view_student_task_index GET    /student_task/view(.:format)                                 student_task#view
+                                     student_task_index GET    /student_task(.:format)                                      student_task#index
+                                                        POST   /student_task(.:format)                                      student_task#create
+                                       new_student_task GET    /student_task/new(.:format)                                  student_task#new
+                                      edit_student_task GET    /student_task/:id/edit(.:format)                             student_task#edit
+                                           student_task GET    /student_task/:id(.:format)                                  student_task#show
+                                                        PATCH  /student_task/:id(.:format)                                  student_task#update
+                                                        PUT    /student_task/:id(.:format)                                  student_task#update
+                                                        DELETE /student_task/:id(.:format)                                  student_task#destroy
+                                     view_student_teams GET    /student_teams/view(.:format)                                student_teams#view
+                                     edit_student_teams GET    /student_teams/edit(.:format)                                student_teams#edit
+                       remove_participant_student_teams GET    /student_teams/remove_participant(.:format)                  student_teams#remove_participant
+              auto_complete_for_user_name_student_teams GET    /student_teams/auto_complete_for_user_name(.:format)         student_teams#auto_complete_for_user_name
+                                          student_teams GET    /student_teams(.:format)                                     student_teams#index
+                                                        POST   /student_teams(.:format)                                     student_teams#create
+                                       new_student_team GET    /student_teams/new(.:format)                                 student_teams#new
+                                      edit_student_team GET    /student_teams/:id/edit(.:format)                            student_teams#edit
+                                           student_team GET    /student_teams/:id(.:format)                                 student_teams#show
+                                                        PATCH  /student_teams/:id(.:format)                                 student_teams#update
+                                                        PUT    /student_teams/:id(.:format)                                 student_teams#update
+                                                        DELETE /student_teams/:id(.:format)                                 student_teams#destroy
+                       download_submitted_content_index GET    /submitted_content/download(.:format)                        submitted_content#download
+                           edit_submitted_content_index GET    /submitted_content/edit(.:format)                            submitted_content#edit
+                  folder_action_submitted_content_index GET    /submitted_content/folder_action(.:format)                   submitted_content#folder_action
+               remove_hyperlink_submitted_content_index GET    /submitted_content/remove_hyperlink(.:format)                submitted_content#remove_hyperlink
+                                                        POST   /submitted_content/remove_hyperlink(.:format)                submitted_content#remove_hyperlink
+                    submit_file_submitted_content_index POST   /submitted_content/submit_file(.:format)                     submitted_content#submit_file
+                                                        POST   /submitted_content/folder_action(.:format)                   submitted_content#folder_action
+               submit_hyperlink_submitted_content_index POST   /submitted_content/submit_hyperlink(.:format)                submitted_content#submit_hyperlink
+                                                        GET    /submitted_content/submit_hyperlink(.:format)                submitted_content#submit_hyperlink
+                           view_submitted_content_index GET    /submitted_content/view(.:format)                            submitted_content#view
+                                submitted_content_index GET    /submitted_content(.:format)                                 submitted_content#index
+                                                        POST   /submitted_content(.:format)                                 submitted_content#create
+                                  new_submitted_content GET    /submitted_content/new(.:format)                             submitted_content#new
+                                 edit_submitted_content GET    /submitted_content/:id/edit(.:format)                        submitted_content#edit
+                                      submitted_content GET    /submitted_content/:id(.:format)                             submitted_content#show
+                                                        PATCH  /submitted_content/:id(.:format)                             submitted_content#update
+                                                        PUT    /submitted_content/:id(.:format)                             submitted_content#update
+                                                        DELETE /submitted_content/:id(.:format)                             submitted_content#destroy
+                                  list_suggestion_index GET    /suggestion/list(.:format)                                   suggestion#list
+                                submit_suggestion_index POST   /suggestion/submit(.:format)                                 suggestion#submit
+                        student_submit_suggestion_index POST   /suggestion/student_submit(.:format)                         suggestion#student_submit
+                     update_suggestion_suggestion_index POST   /suggestion/update_suggestion(.:format)                      suggestion#update_suggestion
+                                       suggestion_index GET    /suggestion(.:format)                                        suggestion#index
+                                                        POST   /suggestion(.:format)                                        suggestion#create
+                                         new_suggestion GET    /suggestion/new(.:format)                                    suggestion#new
+                                        edit_suggestion GET    /suggestion/:id/edit(.:format)                               suggestion#edit
+                                             suggestion GET    /suggestion/:id(.:format)                                    suggestion#show
+                                                        PATCH  /suggestion/:id(.:format)                                    suggestion#update
+                                                        PUT    /suggestion/:id(.:format)                                    suggestion#update
+                                                        DELETE /suggestion/:id(.:format)                                    suggestion#destroy
+                                    assign_survey_index GET    /survey/assign(.:format)                                     survey#assign
+                                           survey_index GET    /survey(.:format)                                            survey#index
+                                                        POST   /survey(.:format)                                            survey#create
+                                             new_survey GET    /survey/new(.:format)                                        survey#new
+                                            edit_survey GET    /survey/:id/edit(.:format)                                   survey#edit
+                                                 survey GET    /survey/:id(.:format)                                        survey#show
+                                                        PATCH  /survey/:id(.:format)                                        survey#update
+                                                        PUT    /survey/:id(.:format)                                        survey#update
+                                                        DELETE /survey/:id(.:format)                                        survey#destroy
+                           list_survey_deployment_index GET    /survey_deployment/list(.:format)                            survey_deployment#list
+                         delete_survey_deployment_index GET    /survey_deployment/delete(.:format)                          survey_deployment#delete
+                reminder_thread_survey_deployment_index GET    /survey_deployment/reminder_thread(.:format)                 survey_deployment#reminder_thread
+                                survey_deployment_index GET    /survey_deployment(.:format)                                 survey_deployment#index
+                                                        POST   /survey_deployment(.:format)                                 survey_deployment#create
+                                  new_survey_deployment GET    /survey_deployment/new(.:format)                             survey_deployment#new
+                                 edit_survey_deployment GET    /survey_deployment/:id/edit(.:format)                        survey_deployment#edit
+                                      survey_deployment GET    /survey_deployment/:id(.:format)                             survey_deployment#show
+                                                        PATCH  /survey_deployment/:id(.:format)                             survey_deployment#update
+                                                        PUT    /survey_deployment/:id(.:format)                             survey_deployment#update
+                                                        DELETE /survey_deployment/:id(.:format)                             survey_deployment#destroy
+                   view_responses_survey_response_index GET    /survey_response/view_responses(.:format)                    survey_response#view_responses
+                     begin_survey_survey_response_index GET    /survey_response/begin_survey(.:format)                      survey_response#begin_survey
+                         comments_survey_response_index GET    /survey_response/comments(.:format)                          survey_response#comments
+                                  survey_response_index GET    /survey_response(.:format)                                   survey_response#index
+                                                        POST   /survey_response(.:format)                                   survey_response#create
+                                    new_survey_response GET    /survey_response/new(.:format)                               survey_response#new
+                                   edit_survey_response GET    /survey_response/:id/edit(.:format)                          survey_response#edit
+                                        survey_response GET    /survey_response/:id(.:format)                               survey_response#show
+                                                        PATCH  /survey_response/:id(.:format)                               survey_response#update
+                                                        PUT    /survey_response/:id(.:format)                               survey_response#update
+                                                        DELETE /survey_response/:id(.:format)                               survey_response#destroy
+                                   list_system_settings GET    /system_settings/list(.:format)                              system_settings#list
+                                        system_settings GET    /system_settings(.:format)                                   system_settings#index
+                                                        POST   /system_settings(.:format)                                   system_settings#create
+                                     new_system_setting GET    /system_settings/new(.:format)                               system_settings#new
+                                    edit_system_setting GET    /system_settings/:id/edit(.:format)                          system_settings#edit
+                                         system_setting GET    /system_settings/:id(.:format)                               system_settings#show
+                                                        PATCH  /system_settings/:id(.:format)                               system_settings#update
+                                                        PUT    /system_settings/:id(.:format)                               system_settings#update
+                                                        DELETE /system_settings/:id(.:format)                               system_settings#destroy
+                                             list_teams GET    /teams/list(.:format)                                        teams#list
+                                     create_teams_teams POST   /teams/create_teams(.:format)                                teams#create_teams
+                                                  teams GET    /teams(.:format)                                             teams#index
+                                                        POST   /teams(.:format)                                             teams#create
+                                               new_team GET    /teams/new(.:format)                                         teams#new
+                                              edit_team GET    /teams/:id/edit(.:format)                                    teams#edit
+                                                   team GET    /teams/:id(.:format)                                         teams#show
+                                                        PATCH  /teams/:id(.:format)                                         teams#update
+                                                        PUT    /teams/:id(.:format)                                         teams#update
+                                                        DELETE /teams/:id(.:format)                                         teams#destroy
+                                            teams_users POST   /teams_users(.:format)                                       teams_users#create
+                                                        GET    /teams_users(.:format)                                       teams_users#index
+                                                        POST   /teams_users(.:format)                                       teams_users#create
+                                         new_teams_user GET    /teams_users/new(.:format)                                   teams_users#new
+                                        edit_teams_user GET    /teams_users/:id/edit(.:format)                              teams_users#edit
+                                             teams_user GET    /teams_users/:id(.:format)                                   teams_users#show
+                                                        PATCH  /teams_users/:id(.:format)                                   teams_users#update
+                                                        PUT    /teams_users/:id(.:format)                                   teams_users#update
+                                                        DELETE /teams_users/:id(.:format)                                   teams_users#destroy
+                                                        GET    /tree_display/:action(.:format)                              tree_display#:action
+                                list_tree_display_index POST   /tree_display/list(.:format)                                 tree_display#list
+                get_children_node_ng_tree_display_index POST   /tree_display/get_children_node_ng(.:format)                 tree_display#get_children_node_ng
+              get_children_node_2_ng_tree_display_index POST   /tree_display/get_children_node_2_ng(.:format)               tree_display#get_children_node_2_ng
+              bridge_to_is_available_tree_display_index POST   /tree_display/bridge_to_is_available(.:format)               tree_display#bridge_to_is_available
+           get_session_last_open_tab_tree_display_index GET    /tree_display/get_session_last_open_tab(.:format)            tree_display#get_session_last_open_tab
+           set_session_last_open_tab_tree_display_index GET    /tree_display/set_session_last_open_tab(.:format)            tree_display#set_session_last_open_tab
+                                     tree_display_index GET    /tree_display(.:format)                                      tree_display#index
+                                                        POST   /tree_display(.:format)                                      tree_display#create
+                                       new_tree_display GET    /tree_display/new(.:format)                                  tree_display#new
+                                      edit_tree_display GET    /tree_display/:id/edit(.:format)                             tree_display#edit
+                                           tree_display GET    /tree_display/:id(.:format)                                  tree_display#show
+                                                        PATCH  /tree_display/:id(.:format)                                  tree_display#update
+                                                        PUT    /tree_display/:id(.:format)                                  tree_display#update
+                                                        DELETE /tree_display/:id(.:format)                                  tree_display#destroy
+                                             list_users GET    /users/list(.:format)                                        users#list
+                                                        POST   /users/list(.:format)                                        users#list
+                                                        POST   /users/:id(.:format)                                         users#update {:id=>/\d+/}
+                                   show_selection_users GET    /users/show_selection(.:format)                              users#show_selection
+                      auto_complete_for_user_name_users GET    /users/auto_complete_for_user_name(.:format)                 users#auto_complete_for_user_name
+                                             keys_users GET    /users/keys(.:format)                                        users#keys
+                                                  users GET    /users(.:format)                                             users#index
+                                                        POST   /users(.:format)                                             users#create
+                                               new_user GET    /users/new(.:format)                                         users#new
+                                              edit_user GET    /users/:id/edit(.:format)                                    users#edit {:id=>/\d+/}
+                                                   user GET    /users/:id(.:format)                                         users#show {:id=>/\d+/}
+                                                        PATCH  /users/:id(.:format)                                         users#update {:id=>/\d+/}
+                                                        PUT    /users/:id(.:format)                                         users#update {:id=>/\d+/}
+                                                        DELETE /users/:id(.:format)                                         users#destroy {:id=>/\d+/}
+                                        versions_search GET    /versions/search(.:format)                                   versions#search
+                                                        DELETE /versions(.:format)                                          versions#destroy_all
+                                               versions GET    /versions(.:format)                                          versions#index
+                                                        POST   /versions(.:format)                                          versions#create
+                                            new_version GET    /versions/new(.:format)                                      versions#new
+                                           edit_version GET    /versions/:id/edit(.:format)                                 versions#edit
+                                                version GET    /versions/:id(.:format)                                      versions#show
+                                                        PATCH  /versions/:id(.:format)                                      versions#update
+                                                        PUT    /versions/:id(.:format)                                      versions#update
+                                                        DELETE /versions/:id(.:format)                                      versions#destroy
+                                   users_show_selection GET    /users/show_selection(.:format)                              users#show_selection
+                                             users_list GET    /users/list(.:format)                                        users#list
+                                                        GET    /menu/*name(.:format)                                        menu_items#link
+                                                        GET    /:page_name(.:format)                                        content_pages#view {:method=>:get}
+                     submitted_content_submit_hyperlink GET    /submitted_content/submit_hyperlink(.:format)                submitted_content#submit_hyperlink
+                                                   root GET    /                                                            content_pages#view {:page_name=>"home"}
+                                                        GET    /users/list(.:format)                                        users#list
+              review_mapping_show_available_submissions POST   /review_mapping/show_available_submissions(.:format)         review_mapping#show_available_submissions
+                     submitted_content_remove_hyperlink GET    /submitted_content/remove_hyperlink(.:format)                submitted_content#remove_hyperlink
+                                                        GET    /submitted_content/submit_hyperlink(.:format)                submitted_content#submit_hyperlink
+                          submitted_content_submit_file GET    /submitted_content/submit_file(.:format)                     submitted_content#submit_file
+                                                        GET    /review_mapping/show_available_submissions(.:format)         review_mapping#show_available_submissions
+             review_mapping_assign_reviewer_dynamically GET    /review_mapping/assign_reviewer_dynamically(.:format)        review_mapping#assign_reviewer_dynamically
+         review_mapping_assign_metareviewer_dynamically GET    /review_mapping/assign_metareviewer_dynamically(.:format)    review_mapping#assign_metareviewer_dynamically
+                                                        GET    /response(.:format)                                          response#saving
+                     question_select_questionnaire_type GET    /question/select_questionnaire_type(.:format)                questionnaire#select_questionnaire_type
+                                                        GET    /:controller/service.wsdl(.:format)                          :controller#wsdl
+                                                        GET    /:controller(/:action(/:id))(.:format)                       :controller#:action

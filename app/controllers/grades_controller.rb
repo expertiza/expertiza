@@ -12,6 +12,12 @@ class GradesController < ApplicationController
        'Administrator',
        'Super-Administrator',
        'Student'].include? current_role_name and are_needed_authorizations_present?
+      when 'view_team'
+        ['Instructor',
+         'Teaching Assistant',
+         'Administrator',
+         'Super-Administrator',
+         'Student'].include? current_role_name and are_needed_authorizations_present?
     else
       ['Instructor',
        'Teaching Assistant',
@@ -76,6 +82,37 @@ class GradesController < ApplicationController
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
     @stage = @participant.assignment.get_current_stage(@topic_id)
     calculate_all_penalties(@assignment.id)
+  end
+
+  def view_team
+    @participant = AssignmentParticipant.find(params[:id])
+    @assignment = @participant.assignment
+    @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
+    @team = Team.find(@team_id)
+    @reviews = @participant.reviews()
+    questionnaires = @assignment.questionnaires_with_questions
+    @vm = VmQuestionResponse.new
+    questionnaires.each {
+        |questionnaire|
+    questions = questionnaire.questions
+    @vm.addQuestions(questions)
+    }
+
+
+    #@answer = Answer.where(response_id: @reviews.last.response_id)
+    #@questionnairex = @reviews.first.questionnaire_by_answer(answer)
+   # @questions = @questionnaire.questions.sort {|a, b| a.seq <=> b.seq}
+    @reviews.each do |review|
+      @answers = Answer.where(response_id: review.response_id)
+      #@questionnaire = review.questionnaire_by_answer(@answers.first)
+      #@questions = @questionnaire.questions.sort {|a, b| a.seq <=> b.seq}
+      @answers.each do |answer|
+        @vm.addAnswer(answer)
+      end
+    end
+
+
+
   end
   
   def get_number_of_comments_greater_than_10_words

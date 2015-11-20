@@ -28,7 +28,7 @@ gem 'hoptoad_notifier'
 gem 'jquery-rails'
 gem 'jquery-ui-sass-rails'
 gem 'jquery-datetimepicker-rails'
-gem 'mysql2'
+gem 'mysql2', '~> 0.3.18'
 gem 'nokogiri'
 gem 'omniauth-google-oauth2', '~> 0.2.6'
 gem 'open-uri-cached'
@@ -67,14 +67,16 @@ group :development do
 end
 
 group :test do
-  gem 'database_cleaner'
   gem 'gherkin'
   gem 'guard-rails'
   gem 'guard-rspec'
   gem 'launchy'
-  gem 'rspec-rails'
   gem 'shoulda'
   gem 'test-unit'
+  # Gem to perform feature test
+  gem 'capybara'
+  # Gem added to store data
+  gem 'factory_girl_rails'
 end
 
 group :assets do
@@ -82,6 +84,7 @@ group :assets do
 end
 
 group :development, :test do
-  gem 'capybara'
+  # Gem to perform feature test
+  gem 'rspec-rails'
   gem 'simplecov', :require => false
 end

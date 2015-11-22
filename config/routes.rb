@@ -291,6 +291,7 @@ Expertiza::Application.routes.draw do
       get :saving
       get :redirection
       post :custom_create
+      post :submitted_question
     end
   end
 

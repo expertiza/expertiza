@@ -182,7 +182,7 @@ class ResponseController < ApplicationController
     begin
       @myid = @response.id
       @map = @response.map
-      @response.update_attribute('additional_comment', params[:review][:comments])
+      @response.update_attribute('additional_comment', params[:review][:comments] )
       if @map.type=="ReviewResponseMap" && @response.round
         @questionnaire = @map.questionnaire(@response.round)
       elsif @map.type=="ReviewResponseMap"
@@ -310,6 +310,15 @@ class ResponseController < ApplicationController
     end
   end
 
+
+  def submitted_question
+     @map = ResponseMap.find(params[:id])
+      ReviewChat.create(:assignment_id => @map.assignment.id,:reviewer_id => @map.reviewer_id, :team_id=>@map.reviewee_id, :type_flag => 'Q' , :content => params[:review_question])
+      flash[:notice]="Question has been submitted to Author"
+    end
+
+
+
   private
   #new_response if a flag parameter indicating that if user is requesting a new rubric to fill
   #if true: we figure out which questionnaire to use based on current time and records in assignment_questionnaires table
@@ -357,3 +366,4 @@ class ResponseController < ApplicationController
     !current_user_id?(response.map.reviewer.user_id)
   end
 end
+

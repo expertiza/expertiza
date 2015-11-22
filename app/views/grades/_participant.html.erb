@@ -161,7 +161,7 @@ participant = pscore[:participant]
     <TD COLSPAN="10"><%= render :partial=>'grades/author_feedbacks', :locals => {:prefix => 'user', :participant => participant, :pscore => pscore} %></TD>
 </TR>
 <TR id="<%= prefix %>_teammate_reviews" style="display:none; background-color: white;">
-    <TD COLSPAN="10"><%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:teammate]} %></TD>
+    <TD COLSPAN="10"><%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant, :pscore => pscore} %></TD>
 </TR>
     <!-- END PARTICIPANT -->
 

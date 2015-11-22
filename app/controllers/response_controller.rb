@@ -315,8 +315,7 @@ class ResponseController < ApplicationController
      @map = ResponseMap.find(params[:id])
       ReviewChat.create(:assignment_id => @map.assignment.id,:reviewer_id => @map.reviewer_id, :team_id=>@map.reviewee_id, :type_flag => 'Q' , :content => params[:review_question])
       flash[:notice]="Question has been submitted to Author"
-    end
-
+  end
 
 
   private

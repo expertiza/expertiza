@@ -1,5 +1,5 @@
 <!-- METAREVIEWS --> 
-<% if rscore and rscore[:assessments].length > 0 %>
+<% if pscore[:metareview] and pscore[:metareview][:assessments].length > 0 %>
   <BR/>
   <%= render :partial => 'grades/review_table',
            :locals => {
@@ -8,14 +8,14 @@
            :symbol => "metareview".to_sym,
            :prefix => prefix,
            :assignment => participant.assignment,
-           :reviews => rscore[:assessments],
+           :reviews => pscore[:metareview][:assessments],
            :collabel => "Metareview",
            :rowlabel => "Metareviewer",                      
            }%>
   <BR/>         
   <HR/> 
   <% count = 0 %>
-  <% for metareview in rscore[:assessments] %>
+  <% for metareview in pscore[:metareview][:assessments] %>
     <% count = count + 1 %>
     <% if controller.action_name != "view_my_scores" %>
       <a name="<%=prefix+"_"+metareview.map.reviewer.name%>"></a><%= metareview.display_as_html(prefix) %><BR/><BR/> 

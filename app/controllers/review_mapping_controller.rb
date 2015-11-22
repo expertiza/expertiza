@@ -8,12 +8,12 @@ class ReviewMappingController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'add_quiz_response_map', 'assign_quiz_dynamically'
-      true
-    else
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator'].include? current_role_name
+      when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'add_quiz_response_map', 'assign_quiz_dynamically'
+        true
+      else
+        ['Instructor',
+         'Teaching Assistant',
+         'Administrator'].include? current_role_name
     end
   end
 
@@ -21,8 +21,8 @@ class ReviewMappingController < ApplicationController
     name = params[:user][:name]+"%"
     assignment_id = session[:contributor].parent_id
     @users = User.join(:participants)
-      .where( ['participants.type = "AssignmentParticipant" and users.name like ? and participants.parent_id = ?',name,assignment_id])
-      .order ('name')
+                 .where( ['participants.type = "AssignmentParticipant" and users.name like ? and participants.parent_id = ?',name,assignment_id])
+                 .order ('name')
 
     render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
   end
@@ -53,9 +53,9 @@ class ReviewMappingController < ApplicationController
         user = User.from_params(params)
         #contributor_id is team_id
         regurl = url_for :action => 'add_user_to_assignment',
-          :id => assignment.id,
-          :user_id => user.id,
-          :contributor_id => params[:contributor_id]
+                         :id => assignment.id,
+                         :user_id => user.id,
+                         :contributor_id => params[:contributor_id]
 
         # Get the assignment's participant corresponding to the user
         reviewer = get_reviewer(user,assignment,regurl)
@@ -67,7 +67,7 @@ class ReviewMappingController < ApplicationController
           raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
         end
       rescue
-          msg = $!
+        msg = $!
       end
     end
     redirect_to :action => 'list_mappings', :id => assignment.id, :msg => msg
@@ -115,15 +115,15 @@ class ReviewMappingController < ApplicationController
         contributor = get_team_from_submission(submission)
         if ReviewResponseMap.where( ['reviewee_id = ? and reviewer_id = ?', contributor.id, reviewer.id]).first.nil?
           ReviewResponseMap.create(:reviewee_id => contributor.id,
-                                       :reviewer_id => reviewer.id,
-                                       :reviewed_object_id => assignment.id)
+                                   :reviewer_id => reviewer.id,
+                                   :reviewed_object_id => assignment.id)
         else
           raise "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
         end
         redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
-        rescue
-          redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id, :msg => $!
-        end
+      rescue
+        redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id, :msg => $!
+      end
 
     end
   end
@@ -158,27 +158,27 @@ class ReviewMappingController < ApplicationController
     else
 
       # begin
-        if assignment.has_topics?  #assignment with topics
-          if params[:topic_id]
-            topic = (params[:topic_id].nil?) ? nil : SignUpTopic.find(params[:topic_id])
-          else
-            topic = assignment.candidate_topics_to_review(reviewer).to_a.shuffle[0] rescue nil
-          end
-          if topic.nil?
-            flash[:error] ="No topics are available to review at this time. Please try later."
-          else
-            assignment.assign_reviewer_dynamically(reviewer, topic)
-          end
-
-        else  #assignment without topic -Yang
-          assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
-          assignment_team = assignment_teams.to_a.shuffle[0] rescue nil
-          if assignment_team.nil?
-            flash[:error] ="No artifact are available to review at this time. Please try later."
-          else
-            assignment.assign_reviewer_dynamically_no_topic(reviewer,assignment_team)
-          end
+      if assignment.has_topics?  #assignment with topics
+        if params[:topic_id]
+          topic = (params[:topic_id].nil?) ? nil : SignUpTopic.find(params[:topic_id])
+        else
+          topic = assignment.candidate_topics_to_review(reviewer).to_a.shuffle[0] rescue nil
         end
+        if topic.nil?
+          flash[:error] ="No topics are available to review at this time. Please try later."
+        else
+          assignment.assign_reviewer_dynamically(reviewer, topic)
+        end
+
+      else  #assignment without topic -Yang
+        assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
+        assignment_team = assignment_teams.to_a.shuffle[0] rescue nil
+        if assignment_team.nil?
+          flash[:error] ="No artifact are available to review at this time. Please try later."
+        else
+          assignment.assign_reviewer_dynamically_no_topic(reviewer,assignment_team)
+        end
+      end
       # rescue Exception => e
       #   flash[:error] = (e.nil?) ? $! : e
       # end
@@ -231,10 +231,10 @@ class ReviewMappingController < ApplicationController
   end
 
   def assign_metareviewer_dynamically
-      assignment   = Assignment.find(params[:assignment_id])
-      metareviewer = AssignmentParticipant.where(user_id: params[:metareviewer_id], parent_id:  assignment.id).first
+    assignment   = Assignment.find(params[:assignment_id])
+    metareviewer = AssignmentParticipant.where(user_id: params[:metareviewer_id], parent_id:  assignment.id).first
 
-      assignment.assign_metareviewer_dynamically(metareviewer)
+    assignment.assign_metareviewer_dynamically(metareviewer)
 
 
     redirect_to :controller => 'student_review', :action => 'list', :id => metareviewer.id
@@ -322,7 +322,7 @@ class ReviewMappingController < ApplicationController
   def delete_mappings(mappings, force=nil)
     failedCount = 0
     mappings.each{
-      |mapping|
+        |mapping|
       assignment_id = mapping.assignment.id
       begin
         mapping.delete(force)
@@ -342,7 +342,7 @@ class ReviewMappingController < ApplicationController
       flash[:note] = "\"#{name}\" is no longer a participant in this assignment."
     rescue
       flash[:error] = "\"#{name}\" was not removed. Please ensure that \"#{name}\" is not a reviewer or metareviewer and try again."
-      end
+    end
     redirect_to :action => 'list_mappings', :id => assignment_id
   end
 
@@ -350,8 +350,8 @@ class ReviewMappingController < ApplicationController
     review_response_map = ReviewResponseMap.find(params[:id])
     assignment_id = review_response_map.assignment.id
     if !Response.exists?(map_id: review_response_map.id)
-        review_response_map.destroy
-        flash[:success] = "The review mapping for \""+review_response_map.reviewee.name+"\" and \""+review_response_map.reviewer.name+"\" have been deleted."
+      review_response_map.destroy
+      flash[:success] = "The review mapping for \""+review_response_map.reviewee.name+"\" and \""+review_response_map.reviewer.name+"\" have been deleted."
     else
       flash[:error] = "This review has already been done. It cannot been deleted."
     end
@@ -415,13 +415,13 @@ class ReviewMappingController < ApplicationController
 
     @letters = Array.new
     @assignments = Assignment
-      .where(["instructor_id = ? and substring(name,1,1) = ?",session[:user].id, letter])
-      .order('name')
-      .page(params[:page])
-      .per_page(10)
+                       .where(["instructor_id = ? and substring(name,1,1) = ?",session[:user].id, letter])
+                       .order('name')
+                       .page(params[:page])
+                       .per_page(10)
 
     all_assignments.each {
-      | assignObj |
+        | assignObj |
       first = assignObj.name[0,1].downcase
       if not @letters.include?(first)
         @letters << first
@@ -449,7 +449,7 @@ class ReviewMappingController < ApplicationController
     contributors = AssignmentTeam.where(parent_id: @assignment.id)
     contributors.sort!{|a,b| a.name <=> b.name}
     contributors.each{
-      |contrib|
+        |contrib|
       review_mappings = ResponseMap.where(reviewed_object_id: @assignment.id, reviewee_id: contrib.id)
 
       if review_mappings.length == 0
@@ -462,7 +462,7 @@ class ReviewMappingController < ApplicationController
       else
         review_mappings.sort!{|a,b| a.reviewer.name <=> b.reviewer.name}
         review_mappings.each{
-          |review_map|
+            |review_map|
           metareview_mappings = MetareviewResponseMap.where(reviewed_object_id: review_map.map_id)
           if metareview_mappings.length == 0
             single = Array.new
@@ -474,7 +474,7 @@ class ReviewMappingController < ApplicationController
           else
             metareview_mappings.sort!{|a,b| a.reviewer.name <=> b.reviewer.name}
             metareview_mappings.each{
-              |metareview_map|
+                |metareview_map|
               single = Array.new
               single[0] = contrib.name
               single[1] = review_map.reviewer.name
@@ -490,7 +490,7 @@ class ReviewMappingController < ApplicationController
         }
       end
     }
-    end
+  end
 
   def automatic_review_mapping
     assignment_id = params[:id].to_i
@@ -573,7 +573,7 @@ class ReviewMappingController < ApplicationController
             #prohibit one student to review his/her own artifact and temp_array cannot include duplicate num
             temp_array << participants[rand_num].id
             participants_hash[participants[rand_num].id] += 1
-          end 
+          end
           #remove students who have already been assigned enough num of reviews out of participants array
           participants.each do |participant|
             if participants_hash[participant.id] == student_review_num
@@ -590,7 +590,7 @@ class ReviewMappingController < ApplicationController
       begin
         temp_array.each do |index|
           ReviewResponseMap.create(:reviewee_id => team.id, :reviewer_id => index,
-                                 :reviewed_object_id => assignment_id) if !ReviewResponseMap.exists?(:reviewee_id => team.id, :reviewer_id => index, :reviewed_object_id => assignment_id)
+                                   :reviewed_object_id => assignment_id) if !ReviewResponseMap.exists?(:reviewee_id => team.id, :reviewer_id => index, :reviewed_object_id => assignment_id)
         end
       rescue
         flash[:error] = "Automatic assignment of reviewer failed."
@@ -616,52 +616,64 @@ class ReviewMappingController < ApplicationController
     @type =  params.has_key?(:report)? params[:report][:type] : "ReviewResponseMap"
 
     case @type
-    when "ReviewResponseMap"
-      if params[:user].nil?
-        # This is not a search, so find all reviewers for this assignment
-        @reviewers = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ?", @id, @type])
-      else
-        # This is a search, so find reviewers by user's full name
-        user = User.select("DISTINCT id").where(["fullname LIKE ?", '%'+params[:user][:fullname]+'%'])
-        participants = Participant.select("DISTINCT id").where(["user_id IN (?) and parent_id = ?", user, @assignment.id])
-        @reviewers = ResponseMap
-          .select("DISTINCT reviewer_id")
-          .where(["reviewed_object_id = ? and type = ? and reviewer_id IN (?)", @id, @type, participants] )
-      end
-      #  @review_scores[reveiwer_id][reviewee_id] = score for assignments not using vary_rubric_by_rounds feature
-      # @review_scores[reviewer_id][round][reviewee_id] = score for assignments using vary_rubric_by_rounds feature
-      @review_scores = @assignment.compute_reviews_hash
-      @avg_and_ranges= @assignment.compute_avg_and_ranges_hash
-    when "FeedbackResponseMap"
-      #Example query
-      #SELECT distinct reviewer_id FROM response_maps where type = 'FeedbackResponseMap' and 
-      #reviewed_object_id in (select id from responses where 
-      #map_id in (select id from response_maps where reviewed_object_id = 722 and type = 'ReviewResponseMap'))
-      @review_response_map_ids = ResponseMap.select("id").where(["reviewed_object_id = ? and type = ?", @id, 'ReviewResponseMap'])
-      @response_ids = Response.select("id").where(["map_id IN (?)", @review_response_map_ids])
-      @reviewers = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id IN (?) and type = ?", @response_ids, @type])
+      when "ReviewResponseMap"
+        if params[:user].nil?
+          # This is not a search, so find all reviewers for this assignment
+          @reviewers = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ?", @id, @type])
+        else
+          # This is a search, so find reviewers by user's full name
+          user = User.select("DISTINCT id").where(["fullname LIKE ?", '%'+params[:user][:fullname]+'%'])
+          participants = Participant.select("DISTINCT id").where(["user_id IN (?) and parent_id = ?", user, @assignment.id])
+          @reviewers = ResponseMap
+                           .select("DISTINCT reviewer_id")
+                           .where(["reviewed_object_id = ? and type = ? and reviewer_id IN (?)", @id, @type, participants] )
+        end
+        #  @review_scores[reveiwer_id][reviewee_id] = score for assignments not using vary_rubric_by_rounds feature
+        # @review_scores[reviewer_id][round][reviewee_id] = score for assignments using vary_rubric_by_rounds feature
+        @review_scores = @assignment.compute_reviews_hash
+        @avg_and_ranges= @assignment.compute_avg_and_ranges_hash
+      when "FeedbackResponseMap"
+        #Example query
+        #SELECT distinct reviewer_id FROM response_maps where type = 'FeedbackResponseMap' and
+        #reviewed_object_id in (select id from responses where
+        #map_id in (select id from response_maps where reviewed_object_id = 722 and type = 'ReviewResponseMap'))
+        @review_response_map_ids = ResponseMap.select("id").where(["reviewed_object_id = ? and type = ?", @id, 'ReviewResponseMap'])
+        @response_ids = Response.select("id").where(["map_id IN (?)", @review_response_map_ids])
+        @reviewers = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id IN (?) and type = ?", @response_ids, @type])
     end
   end
 
   # This method should be re-written since the score cache is no longer working.
+  #This method has been re-written as score cache in no longer working. Using Sql queries to achieve the same functionality
   def distribution
 
     @assignment = Assignment.find(params[:id])
-
+    team_score=0.0
+    team_score_count=0.0
+    @reviews_not_done = 0.0
     @scores = [0,0,0,0,0,0,0,0,0,0]
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     teams = Team.where(parent_id: params[:id])
     objtype = "ReviewResponseMap"
-
+    response_maps =  ResponseMap.where(["reviewed_object_id = ? and type = ?", @assignment.id, objtype])
     teams.each do |team|
-      score_cache = ScoreCache.where( ["reviewee_id = ? and object_type = ?",team.id,  objtype]).first
-      t_score = 0
-      if score_cache!= nil
-        t_score = score_cache.score
+      team_score=0.0
+      team_score_count = 0.0
+      review_report = @assignment.compute_reviews_hash
+      for response_map in response_maps.where(:reviewee_id=>team.id)
+        score_for_this_review = review_report[response_map.reviewer_id][response_map.reviewee_id]
+        if(score_for_this_review && score_for_this_review != 0 )
+          team_score += score_for_this_review
+          team_score_count +=1
+        else
+          @reviews_not_done +=1
+        end
       end
-      if (t_score != 0)
-        @scores[(t_score/10).to_i] =  @scores[(t_score/10).to_i] + 1
+      if(team_score_count>0)
+        team_score=team_score/team_score_count
+        @scores[(team_score/10-1).ceil.to_i] = @scores[(team_score/10-1).ceil.to_i] + 1
+
       end
     end
 
@@ -704,6 +716,6 @@ class ReviewMappingController < ApplicationController
     #@chart2.axis = axis2
     @chart2 = Gchart.bar(:data =>@review_distribution, :size => '500x200')
 
-    end
+  end
 
 end

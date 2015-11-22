@@ -1,9 +1,9 @@
 <TRstyle="background-color: white;;"><TD>       
      <a href="#" id="<%= prefix %>Link" name="<%= prefix %>Link" onclick="toggleTeam('<%= prefix %>');return false;"><%=image_tag("expand.png")%></a>
-     <%= tscore[:team].name %></TD>
-     <% if tscore[:scores][:avg] %>
-      	<TD COLSPAN="<%= col_avg_th_span_value %>" ALIGN="CENTER"><%= sprintf("%.2f",tscore[:scores][:avg]) %>%</TD>
-       	<TD COLSPAN="<%= col_range_th_span_value %>" ALIGN="CENTER"><%= sprintf("%.0f",tscore[:scores][:min]) %>% - <%= sprintf("%.0f",tscore[:scores][:max]) %>%</TD>
+     <%= @scores[:teams][index][:team].name %></TD>
+     <% if @scores[:teams][index][:scores][:avg] %>
+      	<TD COLSPAN="<%= col_avg_th_span_value %>" ALIGN="CENTER"><%= sprintf("%.2f",@scores[:teams][index][:scores][:avg]) %>%</TD>
+       	<TD COLSPAN="<%= col_range_th_span_value %>" ALIGN="CENTER"><%= sprintf("%.0f",@scores[:teams][index][:scores][:min]) %>% - <%= sprintf("%.0f",@scores[:teams][index][:scores][:max]) %>%</TD>
      <% else %>
         <TD COLSPAN="<%= col_avg_th_span_value %>" ALIGN="CENTER">---</TD>
         <TD COLSPAN="<%= col_range_th_span_value %>" ALIGN="CENTER">---</TD>
@@ -12,10 +12,10 @@
      
 <%= render :partial => 'participant_title', :locals => {:prefix => prefix } %>        
 <% pindex = 3 %>
-  <% for participant in tscore[:team].participants %>
+  <% for participant in @scores[:teams][index][:team].participants %>
      <%= render :partial => 'grades/participant',
                 :locals => {:prefix => prefix+"_"+pindex.to_s,
      	 			        :team => true,
                             :pscore => @scores[:participants][participant.id.to_s.to_sym]} %>  
      <% pindex += 1 %>                            
-<% end %>        
+<% end %>

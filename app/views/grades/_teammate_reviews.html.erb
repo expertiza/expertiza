@@ -1,5 +1,5 @@
 <!-- TeammateReviewS --> 
-<% if rscore and rscore[:assessments].length > 0 %>
+<% if pscore[:teammate] and pscore[:teammate][:assessments].length > 0 %>
   <BR/>
   <%= render :partial => 'grades/review_table',
            :locals => {
@@ -8,14 +8,14 @@
            :symbol => "teammate".to_sym,
            :prefix => prefix,
            :assignment => participant.assignment,
-           :reviews => rscore[:assessments],
+           :reviews => pscore[:teammate][:assessments],
            :collabel => "Feedback",
            :rowlabel => "Author"
            }%>
   <BR/>         
   <HR/> 
   <% count = 0 %>
-  <% for review in rscore[:assessments] %>
+  <% for review in pscore[:teammate][:assessments] %>
     <% count = count + 1 %>
     <% if controller.action_name != "view_my_scores" %>
       <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a><%= review.display_as_html(prefix) %><BR/><BR/>

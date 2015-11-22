@@ -1,5 +1,5 @@
 <!-- FEEDBACKS --> 
-<% if rscore and rscore[:assessments].length > 0 %>
+<% if pscore[:feedback] and pscore[:feedback][:assessments].length > 0 %>
   <BR/>
   <%= render :partial => 'grades/review_table',
            :locals => {
@@ -8,14 +8,14 @@
            :symbol => "feedback".to_sym,
            :prefix => prefix,
            :assignment => participant.assignment,
-           :reviews => rscore[:assessments],
+           :reviews => pscore[:feedback][:assessments],
            :collabel => "Feedback",
            :rowlabel => "Author"
            }%>
   <BR/>         
   <HR/> 
   <% count = 0 %>
-  <% for feedback in rscore[:assessments] %>
+  <% for feedback in pscore[:feedback][:assessments] %>
     <% count = count + 1 %>
     <% if controller.action_name != "view_my_scores" %>
       <a name="<%=prefix+"_"+feedback.map.reviewer.name%>"></a><%= feedback.display_as_html(prefix) %><BR/><BR/>

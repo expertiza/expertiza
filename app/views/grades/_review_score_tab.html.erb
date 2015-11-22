@@ -3,5 +3,5 @@
     participant = pscore[:participant]
 %>
 <TR id="<%= prefix %>_mreviews" style="display:none; background-color: white;">
-  <TD COLSPAN="9"><%= render :partial=>'grades/metareviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:metareview]} %></TD>
+  <TD COLSPAN="9"><%= render :partial=>'grades/metareviews', :locals => {:prefix => prefix, :participant => participant, :pscore => pscore} %></TD>
 </TR>

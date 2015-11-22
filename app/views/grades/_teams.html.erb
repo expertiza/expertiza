@@ -30,7 +30,7 @@
 <% for index in 0 .. @scores[:teams].length - 1 %>   
      <%= render :partial => 'grades/team',
                 :locals => {:prefix => 'team'+index.to_s,
-                            :tscore => @scores[:teams][index.to_s.to_sym],
+                            :index =>index.to_s.to_sym,
                             :col_outer_th_span_value => col_outer_th_span_value,
 							:col_avg_th_span_value => col_avg_th_span_value,
 							:col_range_th_span_value => col_range_th_span_value}  %>    

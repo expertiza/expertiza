@@ -81,7 +81,8 @@ class InvitationsController < ApplicationController
     redirect_to view_student_teams_path student_id: params[:student_id]
   end
 
-  private def set_messages(name) # sets flash messages
+  private 
+  def set_messages(name) # sets flash messages
     @@messages[:user_not_found] = "\"#{name}\" does not exist. Please make sure entered name is correct."
     @@messages[:user_not_participant] = "\"#{name}\" is not a participant of this assignment."
     @@messages[:max_members] = "Maximum team limit has been reached."
@@ -91,7 +92,8 @@ class InvitationsController < ApplicationController
     @@messages[:invitation_not_exist]= "The team which invited you does not exist any more."
     @@messages[:fail_to_add] = "Something went wrong in the system. Hence failed to add you to the team which invited you. Please try again."
   end
-  private def set_invitation(to_id,from_id,assignment_id,reply_status) #creates an instance of invitation
+  private 
+  def set_invitation(to_id,from_id,assignment_id,reply_status) #creates an instance of invitation
     @invitation = Invitation.new
     @invitation.to_id = to_id
     @invitation.from_id = from_id
@@ -99,7 +101,8 @@ class InvitationsController < ApplicationController
     @invitation.reply_status = reply_status
     @invitation.save
   end
-  private def check_validity # checks if the send invitation is valid
+  private 
+  def check_validity # checks if the send invitation is valid
     @user = User.find_by_name(params[:user][:name].strip)
     @team = AssignmentTeam.find(params[:team_id])
     @student = AssignmentParticipant.find(params[:student_id])

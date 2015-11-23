@@ -9,10 +9,10 @@ class ReviewResponseMapTest < ActiveSupport::TestCase
 		assert_equal csv.count, 2		
 	end
 
-	test "method_get_metareview_response_maps" do
+	test "method_metareview_response_maps" do
         	review_response_map_test = ReviewResponseMap.new
 		review_response_map_test.id = 1
-		assert_equal review_response_map_test.get_metareview_response_maps.count, 1
+		assert_equal review_response_map_test.metareview_response_maps.count, 1
 	end
 
 	test "method_get_team_response_for_round" do

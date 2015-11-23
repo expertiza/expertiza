@@ -29,10 +29,10 @@ class ReviewResponseMap < ResponseMap
 
   #Delete FeedbackResponseMap and MetareviewResponseMap related to current objects id
   def delete(force = nil)
-    fmaps = FeedbackResponseMap.where(reviewed_object_id: id)
-    fmaps.each { |fmap| fmap.delete(true) }
-    maps = MetareviewResponseMap.where(reviewed_object_id: id)
-    maps.each { |map| map.delete(force) }
+    feedback_maps = FeedbackResponseMap.where(reviewed_object_id: id)
+    feedback_maps.each { |fmap| fmap.delete(true) }
+    metareview_maps = MetareviewResponseMap.where(reviewed_object_id: id)
+    metareview_maps.each { |metamap| metamap.delete(force) }
     destroy
   end
 
@@ -44,9 +44,9 @@ class ReviewResponseMap < ResponseMap
 
   # options parameter used as a signature in other models
   def self.export(csv, parent_id, options)
-    mappings = where(reviewed_object_id: parent_id)
-    mappings = mappings.sort { |a, b| a.reviewee.name <=> b.reviewee.name }
-    mappings.each do
+    reviewed_object_maps = where(reviewed_object_id: parent_id)
+    reviewed_object_maps = reviewed_object_maps.sort { |a, b| a.reviewee.name <=> b.reviewee.name }
+    reviewed_object_maps.each do
     |map|
       csv << [map.reviewee.name, map.reviewer.name]
     end
@@ -85,9 +85,9 @@ class ReviewResponseMap < ResponseMap
   # Map to display the feedback response
   def show_feedback(response)
     if (!self.response.empty? && response)
-      map = FeedbackResponseMap.find_by_reviewed_object_id(response.id)
-      if map && !map.response.empty?
-        map.response.last.display_as_html
+      feedback_response_map = FeedbackResponseMap.find_by_reviewed_object_id(response.id)
+      if feedback_response_map && !feedback_response_map.response.empty?
+        feedback_response_map.response.last.display_as_html
       end
     end
   end
@@ -102,7 +102,7 @@ class ReviewResponseMap < ResponseMap
   end
 
   # Returns the response maps for all the metareviews
-  def get_metareview_response_maps
+  def metareview_response_maps
     responses = Response.where(map_id: id)
     metareview_response_maps = []
     responses.each do |response|
@@ -116,8 +116,8 @@ class ReviewResponseMap < ResponseMap
   def self.get_team_responses_for_round(team, round)
     responses = []
     if team.id
-      maps = ResponseMap.where(reviewee_id: team.id, type: 'ReviewResponseMap')
-      maps.each do |map|
+      team_response_maps = ResponseMap.where(reviewee_id: team.id, type: 'ReviewResponseMap')
+      team_response_maps.each do |map|
         unless map.response.empty? && map.response.reject { |r| r.round != round }.empty?
           responses << map.response.reject { |r| r.round != round }.last
         end
@@ -131,18 +131,18 @@ class ReviewResponseMap < ResponseMap
   # together with the questionnaire_id will be used to
   # display the reviewer summary
   def self.final_versions_from_reviewer(reviewer_id)
-    maps = ReviewResponseMap.where(reviewer_id: reviewer_id)
+    reviewer_maps = ReviewResponseMap.where(reviewer_id: reviewer_id)
     assignment = find_assignment(Participant.find(reviewer_id).parent_id)
     review_final_versions = {}
     unless assignment.varying_rubrics_by_round?
       #same review rubric used in multiple rounds
-      review_final_versions = review_final_version_responses(:review, :questionnaire_id, assignment, maps)
+      review_final_versions = review_final_version_responses(:review, :questionnaire_id, assignment, reviewer_maps)
     else
       # vary rubric by round
-      rounds_num = assignment.rounds_of_reviews
-      (1..rounds_num).each do |round|
+      num_of_rounds = assignment.rounds_of_reviews
+      (1..num_of_rounds).each do |round|
         symbol = ('review round' + round.to_s).to_sym
-        review_final_versions = review_final_version_responses(symbol, :questionnaire_id, assignment, maps, round)
+        review_final_versions = review_final_version_responses(symbol, :questionnaire_id, assignment, reviewer_maps, round)
       end
     end
     review_final_versions
@@ -150,7 +150,6 @@ class ReviewResponseMap < ResponseMap
 
 
   private
-
 
   # Check for if assignment value is null
   def self.find_assignment(id)
@@ -163,15 +162,15 @@ class ReviewResponseMap < ResponseMap
 
   # Check for if participant is null
   def self.participant_nil?(participant, user_name, participant_type) 
-    error_message = nil
+    error_messsge = nil
     if participant_type == "author"
-	error_message = "The author \"#{user_name.to_s.strip}\" was not found.
+	    error_messsge = "The author \"#{user_name.to_s.strip}\" was not found.
 			 <a href='/users/new'>Create</a> this user?"
     else
-    	error_message =  "The reviewer \"#{user_name}\" is not a participant in this assignment.
+    	error_messsge =  "The reviewer \"#{user_name}\" is not a participant in this assignment.
 			 <a href='/users/new'>Register</a> this user as a participant?"
     end
-    check_nil?(participant, error_message)
+    check_nil?(participant, error_messsge)
   end
 
   # Check for if user is null
@@ -196,8 +195,8 @@ class ReviewResponseMap < ResponseMap
 
   # Check if review already exists, if not, create new one
   def self.create_response_map(reviewer, team_id, assignment)
-    existing = ReviewResponseMap.where(reviewee_id: team_id, reviewer_id: reviewer.id).first
-    if existing.nil?
+    review = ReviewResponseMap.where(reviewee_id: team_id, reviewer_id: reviewer.id).first
+    if review.nil?
       ReviewResponseMap.create(reviewer_id: reviewer.id, \
 			  reviewee_id: team_id, \
 			  reviewed_object_id: assignment.id)
@@ -225,6 +224,6 @@ class ReviewResponseMap < ResponseMap
        responses = Response.where(map_id: id)
      else
        responses = Response.where(map_id: id, round: round)
-     end	
+     end
   end	
 end

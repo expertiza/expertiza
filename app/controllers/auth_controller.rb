@@ -18,13 +18,14 @@ class AuthController < ApplicationController
     if request.get?
       AuthController.clear_session(session)
     else
-      user = User.find_by_login(params[:login][:name])
+       user = User.find_by_login(params[:login][:name])
+       #aise "error"
        if user and user.valid_password?(params[:login][:password])
          after_login(user)
        else
          logger.warn "Failed login attempt"
          flash[:error] = "Incorrect Name/Password"
-         redirect_to :controller => 'password_retrieval', :action => 'forgotten'
+         redirect_to :controller => 'content_pages', :action => 'view'
        end
     end
   end  #def login
@@ -33,7 +34,6 @@ class AuthController < ApplicationController
   def after_login (user)
     session[:user] = user
     AuthController.set_current_role(user.role_id, session)
-
     redirect_to :controller => AuthHelper::get_home_controller(session[:user]),
                 :action => AuthHelper::get_home_action(session[:user])
   end

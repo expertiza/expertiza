@@ -1,7 +1,7 @@
 class Mailer < ActionMailer::Base
 
   if Rails.env.development? || Rails.env.test?
-    default from: 'expertiza.development@gmail.com'
+    default from: 'noreply@expertiza.com'
   else
     default from: 'expertiza-support@lists.ncsu.edu'
   end
@@ -14,9 +14,10 @@ class Mailer < ActionMailer::Base
     @new_pct = defn[:body][:new_pct]
     @avg_pct = defn[:body][:avg_pct]
     @assignment = defn[:body][:assignment]
+    @link = defn[:body][:link]
 
     if Rails.env.development? || Rails.env.test?
-      defn[:to] = 'expertiza.development@gmail.com'
+      defn[:to] = 'rshah5@ncsu.edu'
     end
     mail(subject: defn[:subject],
          to: defn[:to],

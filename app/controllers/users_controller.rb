@@ -8,9 +8,12 @@ class UsersController < ApplicationController
 
 
   def action_allowed?
+    
     case params[:action]
     when 'keys'
       current_role_name.eql? 'Student'
+    when 'reset_password'
+      request.referrer.include?("reset_password")
     else
       ['Super-Administrator',
        'Administrator',
@@ -118,7 +121,6 @@ class UsersController < ApplicationController
       if check != nil
         params[:user][:name] = params[:user][:email]
       end
-
       @user = User.new(user_params)
       # record the person who created this new user
       @user.parent_id = (session[:user]).id
@@ -126,9 +128,9 @@ class UsersController < ApplicationController
       @user.timezonepref = User.find(@user.parent_id).timezonepref
 
       if @user.save
-        password = @user.reset_password         # the password is reset
-        MailerHelper::send_mail_to_user(@user, "Your Expertiza account and password have been created", "user_welcome", password).deliver
-        flash[:success] = "A new password has been sent to new user's e-mail address."
+        link = ExpiryLink.generate_link(@user.email)
+        MailerHelper::send_mail_to_user(@user, "Your Expertiza account has been created", "user_welcome",link).deliver_later
+        flash[:success] = "A reset link has been sent to new user's e-mail address."
         #Instructor and Administrator users need to have a default set for their notifications
         # the creation of an AssignmentQuestionnaire object with only the User ID field populated
         # ensures that these users have a default value of 15% for notifications.
@@ -151,20 +153,34 @@ class UsersController < ApplicationController
     get_role
     foreign
   end
-
+  def reset_password
+    @user = User.find(params[:id])
+    if @user.update_attributes(user_params)
+      e = ExpiryLink.where(email:@user.email).first
+      e.destroy
+      flash[:success] = "Password is sucessfully changed."
+      redirect_to '/'
+    else
+      
+      flash[:error] = @user.errors.full_messages.to_sentence
+      redirect_to request.referrer
+    end
+  end
   def update
     @user = User.find params[:id]
 
     #update username, when the user cannot be deleted
     #rename occurs in 'show' page, not in 'edit' page
     #eg. /users/5408?name=5408
+
     if (request.original_fullpath == "/users/#{@user.id}?name=#{@user.id}")
       @user.name += '_hidden'
     end
     if @user.update_attributes(user_params)
-      undo_link("User \"#{@user.name}\" has been updated successfully. ")
+      undo_link("User \"#{@user.name}\" has been updated successfully.")
       redirect_to @user
     else
+      redirect_to "http://google.com"
       foreign
       render :action => 'edit'
     end
@@ -205,7 +221,7 @@ class UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:name, :crypted_password, :role_id, :password_salt, :fullname, :email, :parent_id, :private_by_default, :mru_directory_path, :email_on_review, :email_on_submission, :email_on_review_of_review, :is_new_user, :master_permission_granted, :handle, :leaderboard_privacy, :digital_certificate, :persistence_token, :timezonepref, :public_key, :copy_of_emails)
+    params.require(:user).permit(:name, :password, :password_confirmation ,:crypted_password, :role_id, :password_salt, :fullname, :email, :parent_id, :private_by_default, :mru_directory_path, :email_on_review, :email_on_submission, :email_on_review_of_review, :is_new_user, :master_permission_granted, :handle, :leaderboard_privacy, :digital_certificate, :persistence_token, :timezonepref, :public_key, :copy_of_emails)
   end
 
   def get_role

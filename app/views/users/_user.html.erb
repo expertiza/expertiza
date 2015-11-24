@@ -7,7 +7,7 @@
 <% new_user ||= false %>
 <%= render :partial => 'users/name' %>
 <%= render :partial => 'users/email' %>
-<%= render :partial => 'users/password', :locals => { :new_user => new_user } %>
+<%= render :partial => 'users/password' , locals: { new_user: true } %>
 <%= render :partial => 'users/prefs' %>
 <!--[eoform:user]-->
 <br/>

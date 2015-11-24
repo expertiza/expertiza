@@ -3,40 +3,37 @@ class JoinTeamRequestsController < ApplicationController
   # GET /join_team_requests.xml
 
   def action_allowed?
-    current_role_name.eql?("Student")
+    ['Student', 'Instructor', 'Teaching Assistant'].include?(current_role_name) #people with this roles can only access the function provied by the controller 
+  end
+
+  private def render_request
+      respond_to do |format|
+      format.html 
+      format.xml  { render :xml => @join_team_request } #displays the join team instance
+    end
   end
 
   def index
-    @join_team_requests = JoinTeamRequest.all
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.xml  { render :xml => @join_team_requests }
-    end
+    @join_team_request = JoinTeamRequest.all #gets all the request to join team  
+    render_request # index.html.erb
   end
 
   # GET /join_team_requests/1
   # GET /join_team_requests/1.xml
-  def show
-    @join_team_request = JoinTeamRequest.find(params[:id])
-    respond_to do |format|
-      format.html # show.html.erb
-      format.xml  { render :xml => @join_team_request }
-    end
+  def show # searches the join team requests for a particular id
+    @join_team_request = JoinTeamRequest.find(params[:id]) 
+    render_request # show.html.erb
   end
 
   # GET /join_team_requests/new
   # GET /join_team_requests/new.xml
-  def new
+  def new # create a new join team request entry instance
     @join_team_request = JoinTeamRequest.new
-    respond_to do |format|
-      format.html # new.html.erb
-      format.xml  { render :xml => @join_team_request }
-    end
+    render_request # new.html.erb
   end
 
   # GET /join_team_requests/1/edit
-  def edit
+  def edit # edit join team request entry with a particular id for join_team_request table
     @join_team_request = JoinTeamRequest.find(params[:id])
   end
 
@@ -47,12 +44,12 @@ class JoinTeamRequestsController < ApplicationController
     #check if the advertisement is from a team member and if so disallow requesting invitations
     team_member=TeamsUser.where(['team_id =? and user_id =?', params[:team_id],session[:user][:id]])
     if (team_member.size > 0)
-      flash[:note] = "You are already a member of team."
+      flash[:note] = "You are already a team member."
     else
 
       @join_team_request = JoinTeamRequest.new
       @join_team_request.comments = params[:comments]
-      @join_team_request.status = 'P'
+      @join_team_request.status = 'P' #Request status is 'Pending'
       @join_team_request.team_id = params[:team_id]
 
       participant = Participant.where(user_id: session[:user][:id], parent_id: params[:assignment_id]).first
@@ -88,20 +85,26 @@ class JoinTeamRequestsController < ApplicationController
   # DELETE /join_team_requests/1
   # DELETE /join_team_requests/1.xml
 
-  def destroy
+  def destroy # destroy a join_team_request entry of a particular id
     @join_team_request = JoinTeamRequest.find(params[:id])
-    @join_team_request.destroy
-
-    respond_to do |format|
-      format.html { redirect_to(join_team_requests_url) }
-      format.xml  { head :ok }
+    if @join_team_request.destroy
+      respond_to do |format|
+        format.html { redirect_to(join_team_requests_url) }
+        format.xml  { head :ok }
+      end
+    else
+      redirect_to root_path, notice: "JoinTeamRequest could not deleted."
     end
   end
   #decline request to join the team...
   def decline
     @join_team_request = JoinTeamRequest.find(params[:id])
-    @join_team_request.status = 'D'
-    @join_team_request.save
-    redirect_to view_student_teams_path student_id: params[:teams_user_id]
+    @join_team_request.status = 'D' #'D' stands for decline
+
+    if @join_team_request.save
+      redirect_to view_student_teams_path student_id: params[:teams_user_id], notice: "JoinTeamRequest was successfully declined."
+    else
+      redirect_to root_path, notice: "Decline request could not be performed."
   end
+end
 end

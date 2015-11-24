@@ -175,7 +175,7 @@ class User < ActiveRecord::Base
     save
     password
   end
-
+  
   def self.import(row, row_header,session,id = nil)
     if row.length != 3
       raise ArgumentError, "Not enough items: expect 3 columns: login name, full name (first and last name, not seperated with the delimiter), email"

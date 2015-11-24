@@ -157,7 +157,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :invitation do
+  resources :invitations do
     collection do
       get :cancel
       get :accept
@@ -167,7 +167,7 @@ Expertiza::Application.routes.draw do
 
   resources :join_team_requests do
     collection do
-      get :decline
+      post :decline
       get :edit
     end
   end
@@ -214,11 +214,14 @@ Expertiza::Application.routes.draw do
   end
 
   get '/participants/change_handle', controller: :participants, action: :change_handle
-
+  get 'reset_password', controller: :password_retrieval, action: :reset_password
+  post 'reset_password/:id', controller: :users, action: :reset_password
   resources :password_retrieval do
     collection do
       get :forgotten
       post :send_password
+      post :send_link
+
     end
   end
 

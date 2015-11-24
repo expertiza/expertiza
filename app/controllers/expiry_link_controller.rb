@@ -1,0 +1,2 @@
+class ExpiryLinkController < ApplicationController
+end

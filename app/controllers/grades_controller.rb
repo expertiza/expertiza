@@ -218,7 +218,7 @@ class GradesController < ApplicationController
       @reviewers_email_hash[user.fullname.to_s+" <"+user.email.to_s+">"] = user.email.to_s
     }
     @reviews.sort! { |a, b| a.map.reviewer.user.fullname <=> b.map.reviewer.user.fullname }
-    @questionnaire = @assignment.questionnaires.find_by_type(questionnaire_type)
+    @questionnaire = @assignment.questionnaires.first.find_by_type(questionnaire_type)
     @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)
   end
 

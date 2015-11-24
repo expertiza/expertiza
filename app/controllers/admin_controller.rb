@@ -20,7 +20,6 @@ class AdminController < ApplicationController
     end
   end
 
-
   # def create_instructor
   #   if params['save']
   #     @user = User.find_or_create_by_name params[:user][:name]
@@ -51,6 +50,7 @@ class AdminController < ApplicationController
 
   def add_administrator
     @user = User.new
+    redirect_to 'users#new'
   end
 
   def new_administrator
@@ -63,6 +63,7 @@ class AdminController < ApplicationController
 
   def create_administrator
     save_administrator
+    redirect_to "users#new"
   end
 
   def list_administrators
@@ -93,12 +94,34 @@ class AdminController < ApplicationController
       @role = Role.new(:id => nil, :name => '(none)')
     end
   end
+  
+  def show_super_admin
+    @user = User.find(params[:id])
+    if @user.role_id
+      @role = Role.find(@user.role_id)
+    else
+      @role = Role.new(:id => nil, :name => '(none)')
+    end
+  end
+  def show_admin
+    @user = User.find(params[:id])
+    if @user.role_id
+      @role = Role.find(@user.role_id)
+    else
+      @role = Role.new(:id => nil, :name => '(none)')
+    end
+  end
 
   def remove_instructor
     User.find(params[:id]).destroy
     redirect_to :action => 'list_instructors'
   end
 
+  def remove_administrator
+    User.find(params[:id]).destroy
+    redirect_to :action => 'list_administrators'
+  end
+  
   def save_super_administrator
     PgUsersController.create(Role.superadministrator.id, :admin_controller, :list_super_administrators, :new_super_administrator)
   end

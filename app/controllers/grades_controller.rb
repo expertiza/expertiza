@@ -11,7 +11,7 @@ class GradesController < ApplicationController
          'Teaching Assistant',
          'Administrator',
          'Super-Administrator',
-         'Student'].include? current_role_name && are_needed_authorizations_present?
+         'Student'].include? current_role_name and are_needed_authorizations_present?
       else
         ['Instructor',
          'Teaching Assistant',
@@ -43,7 +43,7 @@ class GradesController < ApplicationController
     @avg_of_avg = mean(averages)
     calculate_all_penalties(@assignment.id)
   end
-	
+
   # This method is used to retrieve questions for different review rounds
   def retrieve_questions (questionnaires)
     questionnaires.each do |questionnaire|
@@ -277,7 +277,7 @@ class GradesController < ApplicationController
           calculate_penatly_attributes(@participant)
         end
       end
-      assign_all_penalties(@participant)
+      assign_all_penalties(participant, penalties)
     end
     unless @assignment.is_penalty_calculated
       @assignment.update_attribute(:is_penalty_calculated, true)
@@ -296,7 +296,7 @@ class GradesController < ApplicationController
   end
 
 
-  def assign_all_penalties(participant)
+  def assign_all_penalties(participant, penalties)
     @all_penalties[participant.id] = {}
     @all_penalties[participant.id][:submission] = penalties[:submission]
     @all_penalties[participant.id][:review] = penalties[:review]

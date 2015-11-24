@@ -265,6 +265,24 @@ class AssignmentTeam < Team
     end
   end
 
-      require './app/models/analytic/assignment_team_analytic'
-      include AssignmentTeamAnalytic
+    #  Looks up the team from the submission.
+  def get_team_from_submission(submission)
+    # Get the list of teams for this assignment.
+    teams = AssignmentTeam.where(parent_id:  submission.parent_id)
+
+    teams.each do |team|
+      team.teams_users.each do |team_member|
+        if team_member.user_id == submission.user_id
+          # Found the team, return it!
+          return team
+        end
+      end
     end
+
+    # No team found
+    return nil
+  end
+
+  require 'analytic/assignment_team_analytic'
+  include AssignmentTeamAnalytic
+end

@@ -8,7 +8,7 @@ class ReviewMappingController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'add_quiz_response_map', 'assign_quiz_dynamically'
+    when 'add_dynamic_reviewer', 'release_mapping', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'add_quiz_response_map', 'assign_quiz_dynamically', 'delete_outstanding_reviewers', 'response_report'
       true
     else
       ['Instructor',
@@ -128,24 +128,6 @@ class ReviewMappingController < ApplicationController
     end
   end
 
-  #  Looks up the team from the submission.
-  def get_team_from_submission(submission)
-    # Get the list of teams for this assignment.
-    teams = AssignmentTeam.where(parent_id:  submission.parent_id)
-
-    teams.each do |team|
-      team.teams_users.each do |team_member|
-        if team_member.user_id == submission.user_id
-          # Found the team, return it!
-          return team
-        end
-      end
-    end
-
-    # No team found
-    return nil
-  end
-
   #7/12/2015 -zhewei
   #This method is used for assign submissions to students for peer review.
   #This method is different from 'assignment_reviewer_automatically', which is in 'review_mapping_controller' and is used for instructor assigning reviewers in instructor-selected assignment.
@@ -263,29 +245,7 @@ class ReviewMappingController < ApplicationController
   end
 
 
-  def add_user_to_assignment
-    if params[:contributor_id]
-      assignment = Assignment.find(params[:id])
-    else
-      mapping = ResponseMap.find(params[:id])
-      assignment = mapping.assignment
-    end
-
-    user = User.find(params[:user_id])
-    begin
-      assignment.add_participant(user.name)
-    rescue
-      flash[:error] = $!
-    end
-
-    if params[:contributor_id]
-      redirect_to :action => 'add_reviewer',     :id => params[:id], :user_id => user.id, :contributor_id => params[:contributor_id]
-    else
-      redirect_to :action => 'add_metareviewer', :id => params[:id], :user_id => user.id
-    end
-  end
-
-  def delete_all_reviewers
+  def delete_outstanding_reviewers
     assignment = Assignment.find(params[:id])
     team = assignment.get_contributor(params[:contributor_id])
     review_response_maps = team.review_mappings
@@ -333,19 +293,6 @@ class ReviewMappingController < ApplicationController
     return failedCount
   end
 
-  def delete_participant
-    contributor = AssignmentParticipant.find(params[:id])
-    name = contributor.name
-    assignment_id = contributor.assignment
-    begin
-      contributor.destroy
-      flash[:note] = "\"#{name}\" is no longer a participant in this assignment."
-    rescue
-      flash[:error] = "\"#{name}\" was not removed. Please ensure that \"#{name}\" is not a reviewer or metareviewer and try again."
-      end
-    redirect_to :action => 'list_mappings', :id => assignment_id
-  end
-
   def delete_reviewer
     review_response_map = ReviewResponseMap.find(params[:id])
     assignment_id = review_response_map.assignment.id
@@ -372,19 +319,11 @@ class ReviewMappingController < ApplicationController
     redirect_to :action => 'list_mappings', :id => assignment_id
   end
 
-  def release_reservation
+  def release_mapping
     mapping = ResponseMap.find(params[:id])
     student_id = mapping.reviewer_id
     mapping.delete
     redirect_to :controller => 'student_review', :action => 'list', :id => student_id
-  end
-
-  def delete_review
-    mapping = ResponseMap.find(params[:id])
-    assignment_id = mapping.assignment.id
-    mapping.delete
-    #redirect_to :action => 'delete_reviewer', :id => mapping.id
-    redirect_to :action => 'list_mappings', :id => assignment_id
   end
 
   def delete_metareview
@@ -394,15 +333,6 @@ class ReviewMappingController < ApplicationController
     #metareview.delete
     mapping.delete
     redirect_to :action => 'list_mappings', :id => assignment_id
-  end
-
-  def delete_rofreviewer
-    mapping = ResponseMapping.find(params[:id])
-    revmapid = mapping.review_mapping.id
-    mapping.delete
-
-    flash[:note] = "The metareviewer has been deleted."
-    redirect_to :action => 'list_rofreviewers', :id => revmapid
   end
 
   def list
@@ -440,58 +370,6 @@ class ReviewMappingController < ApplicationController
     @items.sort{|a,b| a.name <=> b.name}
   end
 
-  def list_sortable
-    @assignment = Assignment.find(params[:id])
-    @entries = Array.new
-    index = 0
-    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
-    contributors = AssignmentTeam.where(parent_id: @assignment.id)
-    contributors.sort!{|a,b| a.name <=> b.name}
-    contributors.each{
-      |contrib|
-      review_mappings = ResponseMap.where(reviewed_object_id: @assignment.id, reviewee_id: contrib.id)
-
-      if review_mappings.length == 0
-        single = Array.new
-        single[0] = contrib.name
-        single[1] = "&nbsp;"
-        single[2] = "&nbsp;"
-        @entries[index] = single
-        index += 1
-      else
-        review_mappings.sort!{|a,b| a.reviewer.name <=> b.reviewer.name}
-        review_mappings.each{
-          |review_map|
-          metareview_mappings = MetareviewResponseMap.where(reviewed_object_id: review_map.map_id)
-          if metareview_mappings.length == 0
-            single = Array.new
-            single[0] = contrib.name
-            single[1] = review_map.reviewer.name
-            single[2] = "&nbsp;"
-            @entries[index] = single
-            index += 1
-          else
-            metareview_mappings.sort!{|a,b| a.reviewer.name <=> b.reviewer.name}
-            metareview_mappings.each{
-              |metareview_map|
-              single = Array.new
-              single[0] = contrib.name
-              single[1] = review_map.reviewer.name
-              if metareview_map.review_reviewer == nil
-                single[2] = metareview_map.reviewer.name
-              else
-                single[2] = metareview_map.review_reviewer.name
-              end
-              @entries[index] = single
-              index += 1
-            }
-          end
-        }
-      end
-    }
-    end
-
   def automatic_review_mapping
     assignment_id = params[:id].to_i
     participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.shuffle!
@@ -525,10 +403,6 @@ class ReviewMappingController < ApplicationController
   end
 
   def automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num=0, submission_review_num=0)
-    participants_hash = {}
-    participants.each {|participant| participants_hash[participant.id] = 0 }
-    #calculate reviewers for each team
-    num_participants = participants.size
     if student_review_num != 0 and submission_review_num == 0
       num_reviews_per_team = (participants.size * student_review_num * 1.0 / teams.size).round
     elsif student_review_num == 0 and submission_review_num != 0
@@ -539,7 +413,14 @@ class ReviewMappingController < ApplicationController
     if student_review_num >= teams.size
       flash[:error] = 'You cannot set the number of reviews done by each student to be greater than or equal to total number of teams [or “participants” if it is an individual assignment].'
     end
+    assign_reviewers(assignment_id, participants, teams, student_review_num)
+  end
 
+  def assign_reviewers(assignment_id, participants, teams, student_review_num)
+    participants_hash = {}
+    participants.each {|participant| participants_hash[participant.id] = 0 }
+    #calculate reviewers for each team
+    num_participants = participants.size
     iterator = 0
     teams.each do |team|
       temp_array = Array.new
@@ -619,13 +500,13 @@ class ReviewMappingController < ApplicationController
     when "ReviewResponseMap"
       if params[:user].nil?
         # This is not a search, so find all reviewers for this assignment
-        @reviewers = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ?", @id, @type])
+        @reviewers = ResponseMap.select(:reviewer_id).distinct.where(reviewed_object_id: @id, type: @type)
       else
         # This is a search, so find reviewers by user's full name
-        user = User.select("DISTINCT id").where(["fullname LIKE ?", '%'+params[:user][:fullname]+'%'])
-        participants = Participant.select("DISTINCT id").where(["user_id IN (?) and parent_id = ?", user, @assignment.id])
+        user = User.select(:id).distinct.where(["fullname LIKE ?", '%'+params[:user][:fullname]+'%'])
+        participants = Participant.select(:id).distinct.where(["user_id IN (?) and parent_id = ?", user, @assignment.id])
         @reviewers = ResponseMap
-          .select("DISTINCT reviewer_id")
+          .select(:reviewer_id).distinct
           .where(["reviewed_object_id = ? and type = ? and reviewer_id IN (?)", @id, @type, participants] )
       end
       #  @review_scores[reveiwer_id][reviewee_id] = score for assignments not using vary_rubric_by_rounds feature
@@ -637,9 +518,10 @@ class ReviewMappingController < ApplicationController
       #SELECT distinct reviewer_id FROM response_maps where type = 'FeedbackResponseMap' and 
       #reviewed_object_id in (select id from responses where 
       #map_id in (select id from response_maps where reviewed_object_id = 722 and type = 'ReviewResponseMap'))
-      @review_response_map_ids = ResponseMap.select("id").where(["reviewed_object_id = ? and type = ?", @id, 'ReviewResponseMap'])
+      @review_response_map_ids = ResponseMap.select(:id).where(reviewed_object_id: @id, type: 'ReviewResponseMap')
       @response_ids = Response.select("id").where(["map_id IN (?)", @review_response_map_ids])
-      @reviewers = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id IN (?) and type = ?", @response_ids, @type])
+      @reviewers = ResponseMap.select(:reviewer_id).distinct
+      .where(["reviewed_object_id IN (?) and type = ?", @response_ids, @type])
     end
   end
 

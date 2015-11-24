@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151107195943) do
+ActiveRecord::Schema.define(version: 20151124114752) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -713,6 +713,7 @@ ActiveRecord::Schema.define(version: 20151107195943) do
     t.string  "timezonepref",              limit: 255
     t.text    "public_key",                limit: 65535
     t.boolean "copy_of_emails",            limit: 1,     default: false
+    t.integer "institutions_id",           limit: 4
   end
 
   add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree

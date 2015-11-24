@@ -1,17 +1,16 @@
 <h1>Super-Administrators</h1>
 
 <table>
-  <tr><th>Name</th><th>Full name</th><th>E-mail address</th><th>Parent</th></tr>
+  <tr><th>Name</th><th>Full name</th><th>E-mail address</th></tr>
   <% for user in @users %>
     <tr>
-      <td><%= link_to user.name, :action => 'show',
+      <td><%= link_to user.name, :action => 'show_super_admin',
         :id => user.id %></td>
       <td><%= user.fullname %></td>
       <td><%= user.email %></td>
-      <td><%= (User.find(user.parent_id)).name  %></td>
     </tr>
   <% end -%>
 </table>
 
 <hr/>
-<p><%= link_to 'New Super administrator', :action => 'new' %></p>
+There can be only One Super Administrator

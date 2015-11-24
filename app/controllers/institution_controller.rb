@@ -15,7 +15,8 @@ class InstitutionController < ApplicationController
     :redirect_to => { :action => :list }
 
   def list
-    @institutions = Institution.all
+    @institutions = Institution.all 
+
   end
 
   def show
@@ -27,7 +28,7 @@ class InstitutionController < ApplicationController
   end
 
   def create
-    @institution = Institution.new(params[:institution])
+    @institution = Institution.new(:name => params[:institution][:name])
     if @institution.save
       flash[:success] = 'Institution was successfully created.'
       redirect_to :action => 'list'

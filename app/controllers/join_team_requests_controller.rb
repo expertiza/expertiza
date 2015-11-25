@@ -46,7 +46,12 @@ class JoinTeamRequestsController < ApplicationController
   def create
     #check if the advertisement is from a team member and if so disallow requesting invitations
     team_member=TeamsUser.where(['team_id =? and user_id =?', params[:team_id],session[:user][:id]])
-    if (team_member.size > 0)
+    team = Team.find(params[:team_id])
+    if team.full?
+        flash[:note] ="This team is already full"
+
+
+    else if (team_member.size > 0)
       flash[:note] = "You are already a member of team."
     else
 
@@ -104,4 +109,8 @@ class JoinTeamRequestsController < ApplicationController
     @join_team_request.save
     redirect_to view_student_teams_path student_id: params[:teams_user_id]
   end
-end
+  end
+  end
+
+
+

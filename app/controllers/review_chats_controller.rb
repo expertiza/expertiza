@@ -2,8 +2,13 @@ class ReviewChatsController < ApplicationController
   before_action :set_review_chat, only: [:show, :edit, :update, :destroy]
 
   # GET /review_chats
+  def action_allowed?
+    current_user
+  end
+
   def index
     @review_chats = ReviewChat.all
+    #@review_chats = ReviewChat.where
   end
 
   # GET /review_chats/1

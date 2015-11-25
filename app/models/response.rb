@@ -168,7 +168,7 @@ class Response < ActiveRecord::Base
     is_valid
   end
 
-  def self.chat_email (partial="new_submission")
+  def self.chat_email (id,partial="new_submission")
     defn = Hash.new
     defn[:body] = Hash.new
     defn[:body][:partial_name] = partial
@@ -179,8 +179,10 @@ class Response < ActiveRecord::Base
    # participant = Participant.find(reviewer_participant_id)
     #assignment = Assignment.find(participant.parent_id)
 
-    defn[:subject] = "A new submission is available for "
-      defn[:body][:type] = "Author Feedback"
+    defn[:subject] = "Query posted for submission"
+      defn[:body][:type] = "A new query has been posted for your submission .
+      Please open the below URL to view and respond.
+      http://localhost:3000/review_chats/show/#{id}"
      # AssignmentTeam.find(response_map.reviewee_id).users.each do |user|
        # if assignment.has_topics?
         #  defn[:body][:obj_name] = SignUpTopic.find(SignedUpTeam.topic_id(assignment.id, user.id)).topic_name

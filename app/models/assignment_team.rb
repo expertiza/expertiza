@@ -54,7 +54,7 @@ class AssignmentTeam < Team
   # END of contributor methods
 
   def participants
-    participants=Array.new
+    participants = Array.new
     users.each {|user|
       participants.push(AssignmentParticipant.where(parent_id:parent_id, user_id:user.id ).first)
     }
@@ -114,7 +114,7 @@ class AssignmentTeam < Team
     end
     end
 
-    def self.import(row,session,assignment_id,options)
+    def self.import(row, assignment_id, options)
       raise ArgumentError, "Not enough fields on this line" if (row.length < 2 && options[:has_column_names] == "true") || (row.length < 1 && options[:has_column_names] != "true")
       raise ImportError, "The assignment with id \""+assignment_id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this assignment?" if Assignment.find(assignment_id) == nil
 
@@ -215,12 +215,10 @@ class AssignmentTeam < Team
           team_users = Array.new
           tcsv.push(team.name)
           if options["team_name"] == "false"
-            team_members = TeamsUser.all(conditions: ['team_id = ?', team.id])
+            team_members = TeamsUser.where(['team_id = ?', team.id])
             team_members.each do |user|
-              team_users.push(user.name)
-              team_users.push(" ")
+              tcsv.push(user.name)
             end
-            tcsv.push(team_users)
           end
           tcsv.push(current_assignment.name)
           csv << tcsv
@@ -230,7 +228,7 @@ class AssignmentTeam < Team
       def self.export_fields(options)
         fields = Array.new
         fields.push("Team Name")
-        fields.push("Team members") if options["team_name"] == "false"
+        fields.push("Team members") if options[:team_name] == "false"
         fields.push("Assignment Name")
       end
 
@@ -265,6 +263,6 @@ class AssignmentTeam < Team
     end
   end
 
-      require './app/models/analytic/assignment_team_analytic'
+      require File.dirname(__FILE__) + '/analytic/assignment_team_analytic'
       include AssignmentTeamAnalytic
     end

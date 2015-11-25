@@ -1,0 +1,30 @@
+<h1> Chat Log </h1>
+
+<table border=1 cellpadding="30">
+    <tr>
+      <th style = "width:160px;padding-left:5px;padding-right:5px"> Q/A </th>
+      <th style = "width:500px;padding-left:5px;padding-right:5px"> Content</th>
+      <th style = "padding-left:5px;padding-right:5px"> Timestamp</th>
+     </tr>
+
+     <% @chat_log.each do |chat_log| %>
+      <tr>
+        <% if chat_log.type_flag == 'Q' %>
+        <td style = "width:160px;padding-left:5px;padding-right:5px" > Query </td>
+        <%else%>
+        <td style = "width:160px;padding-left:5px;padding-right:5px"> Response </td>
+        <%end%>
+        <td style = "width:500px;padding-left:5px;padding-right:5px" > <%= chat_log.content %> </td>
+        <td style = "padding-left:5px;padding-right:5px"> <%= chat_log.created_at.strftime("%Y-%m-%d %I:%M:%S %p") %> </td>
+        <%end%>
+</tr>
+</table>
+
+<p style="position:fixed; bottom:0px; right:100px ">
+      <%= form_tag :action => "submitted_response" , :id => params[:id] do %>
+      <label for="response">Enter your response</label><BR/>
+      <textarea cols="30" rows="4" id="response_area" name="response_area" style="overflow:hidden;">
+        </textarea> <br/> 
+ <%= submit_tag "Submit", :name => "submit_response" %><% end %>
+    </p>
+

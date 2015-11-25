@@ -13,6 +13,20 @@ class ReviewChatsController < ApplicationController
 
   # GET /review_chats/1
   def show
+    @review_chat = ReviewChat.find(params[:id])
+    @assignment_id=@review_chat.assignment_id
+    @reviewer_id=@review_chat.reviewer_id
+    @team_id=@review_chat.team_id
+    @chat_log=ReviewChat.where(:reviewer_id => @reviewer_id).where(:team_id => @team_id)
+  end
+
+
+  def submitted_response
+     @review_chat = ReviewChat.find(params[:id])
+      ReviewChat.create(:assignment_id => @review_chat.assignment_id,:reviewer_id => @review_chat.reviewer_id, :team_id=>@review_chat.team_id, :type_flag => 'A' , :content => params[:response_area])
+      flash[:notice]="Response has been submitted"
+      Response.chat_email
+      redirect_to action: 'show', id: params[:id]
   end
 
   # GET /review_chats/new

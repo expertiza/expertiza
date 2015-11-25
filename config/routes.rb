@@ -26,6 +26,12 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :review_chats do
+    collection do
+      post :submitted_response
+    end
+  end
+
   resources :advertise_for_partner do
     collection do
       get :edit

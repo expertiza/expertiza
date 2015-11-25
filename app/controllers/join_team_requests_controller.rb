@@ -1,6 +1,4 @@
 class JoinTeamRequestsController < ApplicationController
-  # GET /join_team_requests
-  # GET /join_team_requests.xml
 
   def action_allowed?
     current_role_name.eql?("Student")
@@ -15,8 +13,6 @@ class JoinTeamRequestsController < ApplicationController
     end
   end
 
-  # GET /join_team_requests/1
-  # GET /join_team_requests/1.xml
   def show
     @join_team_request = JoinTeamRequest.find(params[:id])
     respond_to do |format|
@@ -25,8 +21,6 @@ class JoinTeamRequestsController < ApplicationController
     end
   end
 
-  # GET /join_team_requests/new
-  # GET /join_team_requests/new.xml
   def new
     @join_team_request = JoinTeamRequest.new
     respond_to do |format|
@@ -35,13 +29,10 @@ class JoinTeamRequestsController < ApplicationController
     end
   end
 
-  # GET /join_team_requests/1/edit
   def edit
     @join_team_request = JoinTeamRequest.find(params[:id])
   end
 
-  # POST /join_team_requests
-  # POST /join_team_requests.xml
   #create a new join team request entry for join_team_request table and add it to the table
   def create
     #check if the advertisement is from a team member and if so disallow requesting invitations
@@ -72,9 +63,8 @@ class JoinTeamRequestsController < ApplicationController
         end
       end
     end
+  end
 
-  # PUT /join_team_requests/1
-  # PUT /join_team_requests/1.xml
   #update join team request entry for join_team_request table and add it to the table
   def update
     @join_team_request = JoinTeamRequest.find(params[:id])
@@ -88,9 +78,6 @@ class JoinTeamRequestsController < ApplicationController
       end
     end
   end
-
-  # DELETE /join_team_requests/1
-  # DELETE /join_team_requests/1.xml
 
   def destroy
     @join_team_request = JoinTeamRequest.find(params[:id])
@@ -108,8 +95,8 @@ class JoinTeamRequestsController < ApplicationController
     @join_team_request.save
     redirect_to view_student_teams_path student_id: params[:teams_user_id]
   end
-  end
-  end
+
+end
 
 
 

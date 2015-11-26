@@ -111,6 +111,33 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
+  def email1(map_id, partial="new_submission")
+    defn = Hash.new
+    defn[:body] = Hash.new
+    defn[:body][:partial_name] = partial
+    response_map = ResponseMap.find map_id
+    assignment=nil
+
+    reviewer_participant_id =  response_map.reviewer_id
+    participant = Participant.find(reviewer_participant_id)
+    assignment = Assignment.find(participant.parent_id)
+
+    defn[:subject] = "A new submission is available for "+assignment.name
+    defn[:body][:type] = "Author Feedback"
+    AssignmentTeam.find(response_map.reviewee_id).users.each do |user|
+      if assignment.has_topics?
+        #defn[:body][:obj_name] = SignUpTopic.find(SignedUpTeam.topic_id(assignment.id, user.id)).topic_name
+        signup_topic_id = SignedUpTeam.topic_id(assignment.id, user.id)
+        defn[:body][:obj_name] = SignUpTopic.find(signup_topic_id).topic_name
+      else
+        defn[:body][:obj_name] = assignment.name
+      end
+      defn[:body][:first_name] = User.find(user.id).fullname
+      defn[:to] = User.find(user.id).email
+      Mailer.sync_message(defn).deliver
+    end
+  end
+
   def metareview_response_maps
     responses = Response.where(map_id:self.id)
     metareview_list=Array.new()

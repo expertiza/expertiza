@@ -20,26 +20,6 @@ class AdminController < ApplicationController
     end
   end
 
-  # def create_instructor
-  #   if params['save']
-  #     @user = User.find_or_create_by_name params[:user][:name]
-  #     @user.role = Role.instructor
-  #     @user.update_attributes(params[:user])
-  #     redirect_to :action => 'list_instructors'
-  #   else
-  #     @user = User.new(params[:user])
-  #     @user.parent_id = (session[:user]).id
-  #     @user.role_id = Role.instructor.id
-  #
-  #     if @user.save
-  #       flash[:notice] = 'Instructor was successfully created.'
-  #       redirect_to :action => 'list_instructors'
-  #     else
-  #       render :action => 'new_instructor'
-  #     end
-  #   end
-  # end
-
   def list_instructors
     @users = User.
       instructors.
@@ -103,6 +83,7 @@ class AdminController < ApplicationController
       @role = Role.new(:id => nil, :name => '(none)')
     end
   end
+
   def show_admin
     @user = User.find(params[:id])
     if @user.role_id

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151117073827) do
+ActiveRecord::Schema.define(version: 20151120052354) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -699,27 +699,29 @@ ActiveRecord::Schema.define(version: 20151117073827) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string  "name",                      limit: 255,   default: "",    null: false
-    t.string  "crypted_password",          limit: 40,    default: "",    null: false
-    t.integer "role_id",                   limit: 4,     default: 0,     null: false
-    t.string  "password_salt",             limit: 255
-    t.string  "fullname",                  limit: 255
-    t.string  "email",                     limit: 255
-    t.integer "parent_id",                 limit: 4
-    t.boolean "private_by_default",        limit: 1,     default: false
-    t.string  "mru_directory_path",        limit: 128
-    t.boolean "email_on_review",           limit: 1
-    t.boolean "email_on_submission",       limit: 1
-    t.boolean "email_on_review_of_review", limit: 1
-    t.boolean "is_new_user",               limit: 1,     default: true,  null: false
-    t.integer "master_permission_granted", limit: 1,     default: 0
-    t.string  "handle",                    limit: 255
-    t.boolean "leaderboard_privacy",       limit: 1,     default: false
-    t.text    "digital_certificate",       limit: 65535
-    t.string  "persistence_token",         limit: 255
-    t.string  "timezonepref",              limit: 255
-    t.text    "public_key",                limit: 65535
-    t.boolean "copy_of_emails",            limit: 1,     default: false
+    t.string   "name",                      limit: 255,   default: "",                    null: false
+    t.string   "crypted_password",          limit: 40,    default: "",                    null: false
+    t.integer  "role_id",                   limit: 4,     default: 0,                     null: false
+    t.string   "password_salt",             limit: 255
+    t.string   "fullname",                  limit: 255
+    t.string   "email",                     limit: 255
+    t.integer  "parent_id",                 limit: 4
+    t.boolean  "private_by_default",        limit: 1,     default: false
+    t.string   "mru_directory_path",        limit: 128
+    t.boolean  "email_on_review",           limit: 1
+    t.boolean  "email_on_submission",       limit: 1
+    t.boolean  "email_on_review_of_review", limit: 1
+    t.boolean  "is_new_user",               limit: 1,     default: true,                  null: false
+    t.integer  "master_permission_granted", limit: 1,     default: 0
+    t.string   "handle",                    limit: 255
+    t.boolean  "leaderboard_privacy",       limit: 1,     default: false
+    t.text     "digital_certificate",       limit: 65535
+    t.string   "persistence_token",         limit: 255
+    t.string   "timezonepref",              limit: 255
+    t.text     "public_key",                limit: 65535
+    t.boolean  "copy_of_emails",            limit: 1,     default: false
+    t.integer  "login_attempts",            limit: 4,     default: 0
+    t.datetime "next_login_time",                         default: '2015-11-20 05:24:29'
   end
 
   add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree

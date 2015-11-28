@@ -55,6 +55,9 @@ gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
+# Captcha
+gem 'simple_captcha', :git => 'git://github.com/galetahub/simple-captcha.git'
+gem "recaptcha", require: "recaptcha/rails"
 
 group :development do
   gem 'daemons'

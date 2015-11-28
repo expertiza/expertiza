@@ -6,6 +6,12 @@ GIT
       activerecord (>= 3.0.0)
       activesupport (>= 3.0.0)
 
+GIT
+  remote: git://github.com/galetahub/simple-captcha.git
+  revision: 2602bf19a63df25929960b5a7721a9d265281ec1
+  specs:
+    simple_captcha (0.1.6)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -296,6 +302,8 @@ GEM
       execjs
       rails (>= 3.2)
       tilt
+    recaptcha (0.6.0)
+      json
     ref (2.0.0)
     request_store (1.2.0)
     rest-client (1.8.0)
@@ -464,6 +472,7 @@ DEPENDENCIES
   rake
   rb-readline
   react-rails (~> 1.0)
+  recaptcha
   rgl
   rjb
   rspec-rails
@@ -473,6 +482,7 @@ DEPENDENCIES
   seer
   selenium-webdriver
   shoulda
+  simple_captcha!
   simplecov
   sprockets
   sqlite3-ruby

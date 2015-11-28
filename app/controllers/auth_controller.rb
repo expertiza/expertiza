@@ -20,16 +20,39 @@ class AuthController < ApplicationController
     else
        user = User.find_by_login(params[:login][:name])
        #aise "error"
+      if(user.next_login_time<=DateTime.now)
        if user and user.valid_password?(params[:login][:password])
-         after_login(user)
+          user.login_attempts=0
+          user.save
+          after_login(user)
        else
+        if(user.login_attempts<3)
+         user.login_attempts=user.login_attempts+1
+         user.save
          logger.warn "Failed login attempt"
          flash[:error] = "Incorrect Name/Password"
          redirect_to :controller => 'content_pages', :action => 'view'
+        else
+          exponential_backoff(user)
+        end
        end
+      else
+        flash[:error] = "Wait till #{user.next_login_time} for next login attempt"
+        redirect_to :controller => 'content_pages', :action => 'view'
+      end
     end
   end  #def login
 
+  def exponential_backoff(user)
+    # function to handle exponential backoff afterfailedlogin attempt
+    user.login_attempts=user.login_attempts+1
+    interval=2**(user.login_attempts-3)
+    user.next_login_time=DateTime.now+interval.minutes
+    user.save
+    logger.warn "Failed login attempt: Account Blocked"
+    flash[:error] = "Account is Blocked for #{interval} minutes"
+    redirect_to :controller => 'content_pages', :action => 'view'
+  end
   # function to handle common functionality for conventional user login and google login
   def after_login (user)
     session[:user] = user

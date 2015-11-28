@@ -8,8 +8,10 @@ class ResponseController < ApplicationController
       when 'edit'  # If response has been submitted, no further editing allowed
         response = Response.find(params[:id])
         if (response.isSubmitted.eql?('Yes'))
-           return false
+          return false
         end
+    end
+    case params[:action]
       # Deny access to anyone except reviewer & author's team
       when 'view','edit','delete','update'
         response = Response.find(params[:id])
@@ -21,10 +23,10 @@ class ResponseController < ApplicationController
             return false
           end
           response.map.read_attribute(:type)
-        end
+         end
         current_user_id?(response.map.reviewer.user_id)
-        else
-      current_user
+      else
+        current_user
     end
   end
 

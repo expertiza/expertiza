@@ -190,9 +190,7 @@ class ResponseController < ApplicationController
       @round=nil
     end
 
-    @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:round => @round)#,:version_num=>@version)
     # create the response
-    @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:round => @round)#,:version_num=>@version)
     if params[:isSubmit].eql?('Yes')
       isSubmitted = 'Yes'
     else

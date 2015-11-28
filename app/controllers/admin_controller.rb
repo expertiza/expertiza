@@ -68,29 +68,17 @@ class AdminController < ApplicationController
 
   def show_instructor
     @user = User.find(params[:id])
-    if @user.role_id
-      @role = Role.find(@user.role_id)
-    else
-      @role = Role.new(:id => nil, :name => '(none)')
-    end
+    @role = Role.find(@user.role_id)
   end
   
   def show_super_admin
     @user = User.find(params[:id])
-    if @user.role_id
-      @role = Role.find(@user.role_id)
-    else
-      @role = Role.new(:id => nil, :name => '(none)')
-    end
+    @role = Role.find(@user.role_id)
   end
 
   def show_admin
     @user = User.find(params[:id])
-    if @user.role_id
-      @role = Role.find(@user.role_id)
-    else
-      @role = Role.new(:id => nil, :name => '(none)')
-    end
+    @role = Role.find(@user.role_id)
   end
 
   def remove_instructor

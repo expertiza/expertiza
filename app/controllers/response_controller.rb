@@ -310,10 +310,21 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
-    redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
+
+    #TEXT_METRIC_CODE
+    @reviewMetric = ReviewMetric.new
+    @reviewMetric.response_id = Response.find_by_map_id(@map.id).id
+    #@reviewMetric.response_id = Response.where(map_id: @map.id).id
+    @reviewMetric.calulate_metric
+    #####################
+
+redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
   end
 
+
+
   def redirection
+	
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
 

@@ -42,6 +42,12 @@ require 'analytic/assignment_analytic'
 
   DEFAULT_MAX_REVIEWERS = 3
 
+  DEFAULT_MAX_OUTSTANDING_REVIEWS = 2
+
+  def self.max_outstanding_reviews
+    DEFAULT_MAX_OUTSTANDING_REVIEWS
+  end
+
   def questionnaires_with_questions
     questionnaires.includes(:questions).joins(:questions)
   end

@@ -51,7 +51,8 @@ class StudentTeamsController < ApplicationController
         break
       end
     end
-    @teammate_review_allowed = true if @current_due_date&&@current_due_date.teammate_review_allowed_id == 3
+
+    @teammate_review_allowed = true if @student.assignment.find_current_stage=='Finished' || @current_due_date&&(@current_due_date.teammate_review_allowed_id ==3 ||@current_due_date.teammate_review_allowed_id ==2) #late(2) or yes(3)
   end
 
   def create
@@ -143,12 +144,7 @@ class StudentTeamsController < ApplicationController
             first_waitlisted_team = SignedUpTeam.find_by topic_id: sign_up_topic_id, is_waitlisted: true
             #moving the waitlisted team into the confirmed signed up teams list and delete all waitlists for this team
             if first_waitlisted_team
-              team_id = first_waitlisted_team.team_id
-              team = Team.find(team_id)
-              assignment_id = team.parent_id
-              first_waitlisted_team.is_waitlisted = false
-              first_waitlisted_team.save
-              Waitlist.cancel_all_waitlists(team_id, assignment_id)
+              SignUpTopic.assign_to_first_waiting_team(first_waitlisted_team)
             end
           end
         }

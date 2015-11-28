@@ -108,6 +108,7 @@ class UsersController < ApplicationController
 
     def new
       @user = User.new
+      @rolename= Role.find_by_name(params[:role])
       foreign
     end
 
@@ -120,6 +121,7 @@ class UsersController < ApplicationController
       end
 
       @user = User.new(user_params)
+      @user.institutions_id=params[:users][:institutions_id]
       # record the person who created this new user
       @user.parent_id = (session[:user]).id
       # set the user's timezone to its parent's
@@ -154,7 +156,6 @@ class UsersController < ApplicationController
 
   def update
     @user = User.find params[:id]
-
     #update username, when the user cannot be deleted
     #rename occurs in 'show' page, not in 'edit' page
     #eg. /users/5408?name=5408
@@ -205,7 +206,7 @@ class UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:name, :crypted_password, :role_id, :password_salt, :fullname, :email, :parent_id, :private_by_default, :mru_directory_path, :email_on_review, :email_on_submission, :email_on_review_of_review, :is_new_user, :master_permission_granted, :handle, :leaderboard_privacy, :digital_certificate, :persistence_token, :timezonepref, :public_key, :copy_of_emails)
+    params.require(:user).permit(:name, :crypted_password, :role_id, :password_salt, :fullname, :email, :parent_id, :private_by_default, :mru_directory_path, :email_on_review, :email_on_submission, :email_on_review_of_review, :is_new_user, :master_permission_granted, :handle, :leaderboard_privacy, :digital_certificate, :persistence_token, :timezonepref, :public_key, :copy_of_emails,:institutions_id)
   end
 
   def get_role

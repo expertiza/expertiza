@@ -76,7 +76,6 @@ group :test do
   gem 'rspec-rails'
   gem 'shoulda'
   gem 'test-unit'
-  gem "factory_girl_rails", "~> 4.0"
 end
 
 group :assets do

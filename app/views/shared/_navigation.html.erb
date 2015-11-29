@@ -1,4 +1,5 @@
-  <div class="navbar navbar-default navbar-fixed-top">
+<nav role="navigation" class="navbar navbar-default navbar-static-top" style="margin-top: -70px;">
+  <div class="container-fluid">
     <div class="navbar-header">
       <%= image_tag "logo.jpg", height: '65'%>
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -40,9 +41,20 @@
       </ul>
     </div>
   </div>
+  </nav>
 
 <script type="text/javascript">
   jQuery("#impersonate-button").click(function(event) {
     jQuery("#impersonate-form").submit()
+  });
+
+  $(function() {
+    $('button.navbar-toggle').click(function() {
+        if ($('.container').css('margin-top') === '-30px') {
+                $('.container').css('margin-top', '+=600');
+            } else {
+                    $('.container').css('margin-top', '-30px');
+                }
+      });
   });
 </script>

@@ -63,43 +63,46 @@
           <td bgcolor=<%= @bgcolor %>  align = "left" rowspan= <%= @rspan %>>
             <%= @count %>/<%= @rspan %>
           </td>
+        <% end %>
 
-          <% @review_response_maps.each do |rm| %>
-            <!--for each review_response_map, we have to check whether the corresponsding feedback_response_map exists or not-->
-            <% map_id = rm.id %>
-            <% review_response = Response.where(map_id: map_id).first %>
-            <!--'FeedbackResponseMap' alias as 'frm' -->
-            <% @frm = ResponseMap.where(["reviewed_object_id = ? and type = ?", review_response.id, @type]).first if !review_response.blank?%>
-            <% if !@frm.blank? %>
-              <% @reviewee = Participant.find(@frm.reviewee_id) %>
-              <% @reviewee_name = User.find(@reviewee.user_id).fullname %>
-              <% if Response.exists?(map_id: @frm.id) and Participant.exists?(id: @frm.reviewee_id) %>
-                <% @response_id = Response.where(map_id: @frm.id).first %>
-                <!--Review response rejoined-->
-                <td id = "green" bgcolor=<%= @bgcolor %> align = 'left' colspan=1>
-                <%= link_to @reviewee_name, :controller => 'popup', :action => 'author_feedback_popup', :response_id => @response_id, :reviewee_id => @frm.reviewee_id, :source => 'author_feedback' %>
-                </td>
-                <!--Last rejoined at-->
-                <td bgcolor=<%= @bgcolor %> align = 'left'>
-                  <%= @response_id.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
-                </td></tr><tr>
-              <% else %>
-                <!--Review response rejoined-->
-                <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left' colspan=1>
-                <%= @reviewee_name %>
-                </td>
-                <!--Last rejoined at-->
-                <td bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left'>No</td></tr><tr>
-              <% end %>
-            <% else %>
-              <!--Review response rejoined-->
-              <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left' colspan=1>
-                <% reviewer = Participant.find(rm.reviewer_id) %>
-                <%= reviewer_name = User.find(reviewer.user_id).fullname %>
-              </td>
-              <!--Last rejoined at-->
-              <td bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left'>No</td></tr><tr>
-            <% end %>
+
+        <% @feedback_response_maps.each do |rm| %>
+          <% @reviewee = Participant.find(rm.reviewee_id) %>
+          <% @reviewee_name = User.find(@reviewee.user_id).fullname %>
+          <% if Response.exists?(map_id: rm.id) %>
+            <% @response_id = Response.where(map_id: rm.id).first %>
+            <!--Review response rejoined-->
+            <td id = "green" bgcolor=<%= @bgcolor %> align = 'left' colspan=1>
+            <%= link_to @reviewee_name, :controller => 'popup', :action => 'author_feedback_popup', :response_id => @response_id, :reviewee_id => rm.reviewee_id, :source => 'author_feedback' %>
+            </td>
+            <!--Last rejoined at-->
+            <td bgcolor=<%= @bgcolor %> align = 'left'>
+              <%= @response_id.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
+            </td></tr><tr>
+          <% else %>
+            <!--Review response rejoined-->
+            <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left' colspan=1>
+            <%= @reviewee_name %>
+            </td>
+            <!--Last rejoined at-->
+            <td bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left'>No</td></tr><tr>
+          <% end %>
+        <%end %>
+
+        <% @review_response_maps.each do |rm| %>
+          <!--for each review_response_map, we have to check whether the corresponsding feedback_response_map exists or not-->
+          <% map_id = rm.id %>
+          <% review_response = Response.where(map_id: map_id).first %>
+          <!--'FeedbackResponseMap' alias as 'frm' -->
+          <% @frm = ResponseMap.where(["reviewed_object_id = ? and type = ?", review_response.id, @type]).first if !review_response.blank?%>
+          <% if @frm.blank? %>
+            <!--Review response rejoined-->
+            <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left' colspan=1>
+              <% reviewer = Participant.find(rm.reviewer_id) %>
+              <%= reviewer_name = User.find(reviewer.user_id).fullname %>
+            </td>
+            <!--Last rejoined at-->
+            <td bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left'>No</td></tr><tr>
           <% end %>
         <% end %>
       </tr>

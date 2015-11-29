@@ -61,7 +61,11 @@
           </td>
           <!--# teammate reviews done-->
           <td bgcolor=<%= @bgcolor %>  align = "left" rowspan= <%= @rspan %>>
-            <%= @count %>/<%= @rspan %>
+            <% if @team_member_count == 1 %>
+              <%= '--' %>
+            <% else %>
+              <%= @count %>/<%= @rspan %>
+            <% end %>
           </td>
 
           <% @teammate_review_response_maps.each do |rm| %>

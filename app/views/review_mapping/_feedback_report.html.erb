@@ -77,7 +77,7 @@
                 <% @response_id = Response.where(map_id: @frm.id).first %>
                 <!--Review response rejoined-->
                 <td id = "green" bgcolor=<%= @bgcolor %> align = 'left' colspan=1>
-                <%= link_to @reviewee_name, :controller => 'popup', :action => 'author_feedback_popup', :response_id => @response_id, :reviewee_id => @frm.reviewee_id %>
+                <%= link_to @reviewee_name, :controller => 'popup', :action => 'author_feedback_popup', :response_id => @response_id, :reviewee_id => @frm.reviewee_id, :source => 'author_feedback' %>
                 </td>
                 <!--Last rejoined at-->
                 <td bgcolor=<%= @bgcolor %> align = 'left'>

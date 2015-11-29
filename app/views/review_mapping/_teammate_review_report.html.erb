@@ -73,7 +73,7 @@
               <% @reviewee_name = User.find(@reviewee.user_id).fullname %>
                 <!--Teammate reviewed-->
                 <td id = "green" bgcolor=<%= @bgcolor %> align = 'left' colspan=1>
-                <%= link_to @reviewee_name, :controller => 'popup', :action => 'author_feedback_popup', :response_id => @teammate_review_response.id, :reviewee_id => @reviewee.id %>
+                <%= link_to @reviewee_name, :controller => 'popup', :action => 'author_feedback_popup', :response_id => @teammate_review_response.id, :reviewee_id => @reviewee.id, :source => 'teammate_review' %>
                 </td>
                 <!--Last reviewed at-->
                 <td bgcolor=<%= @bgcolor %> align = 'left'>

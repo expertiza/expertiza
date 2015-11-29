@@ -54,8 +54,7 @@
         <% @rspan = @review_response_maps.length %>      
 
         <%if Participant.exists?(id: r.reviewer_id) %>
-          <% @reviewer = Participant.find(r.reviewer_id)%>
-          <% @reviewer_name = User.find(@reviewer.user_id).fullname %>
+          <% @reviewer_name = @user.fullname %>
           <!--Rejoinder-->
           <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan %>>
             <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id => @id%>

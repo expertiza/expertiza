@@ -557,6 +557,10 @@ class ReviewMappingController < ApplicationController
       @review_response_map_ids = ResponseMap.select("id").where(["reviewed_object_id = ? and type = ?", @id, 'ReviewResponseMap'])
       @response_ids = Response.select("id").where(["map_id IN (?)", @review_response_map_ids])
       @reviewers = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id IN (?) and type = ?", @response_ids, @type])
+    when "TeammateReviewResponseMap"
+      #Example query
+      #SELECT distinct reviewer_id FROM response_maps where type = 'TeammateReviewResponseMap' and reviewed_object_id = 711
+      @reviewers = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ?", @id, 'TeammateReviewResponseMap'])
     end
   end
 

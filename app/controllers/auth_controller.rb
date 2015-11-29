@@ -1,6 +1,6 @@
 class AuthController < ApplicationController
   helper :auth
-
+  include SimpleCaptcha::ControllerHelpers
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :login, :logout ],
     :redirect_to => { :action => :list }
@@ -21,7 +21,7 @@ class AuthController < ApplicationController
        user = User.find_by_login(params[:login][:name])
        #aise "error"
       if(user.next_login_time<=DateTime.now)
-       if user and user.valid_password?(params[:login][:password])
+       if user and user.valid_password?(params[:login][:password]) && simple_captcha_valid?
           user.login_attempts=0
           user.save
           after_login(user)
@@ -49,9 +49,10 @@ class AuthController < ApplicationController
     interval=2**(user.login_attempts-3)
     user.next_login_time=DateTime.now+interval.minutes
     user.save
+    @user1=user
     logger.warn "Failed login attempt: Account Blocked"
     flash[:error] = "Account is Blocked for #{interval} minutes"
-    redirect_to :controller => 'content_pages', :action => 'view'
+    redirect_to :controller => 'content_pages', :action => 'view_captcha'
   end
   # function to handle common functionality for conventional user login and google login
   def after_login (user)

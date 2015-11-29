@@ -75,6 +75,7 @@ Expertiza::Application.routes.draw do
     collection do
       get :list
       get ':page_name', action: :view
+      get ':page_name', action: :view_captcha
     end
   end
 

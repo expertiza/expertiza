@@ -82,7 +82,7 @@
                 <!--Last reviewed at-->
                 <td bgcolor=<%= @bgcolor %> align = 'left'>
                   <%= @teammate_review_response.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
-                </td></tr>
+                </td></tr><tr>
             <% else %>
               <!--Teammate reviewed-->
               <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left' colspan=1>
@@ -95,9 +95,10 @@
                 <% end %>
               </td>
               <!--Last reviewed at-->
-              <td bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left'>No</td></tr>
+              <td bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left'>No</td></tr><tr>
             <% end %>
           <% end %>
+          </tr>
         <% end %>
     <% end %>
   </table>

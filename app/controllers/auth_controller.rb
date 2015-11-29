@@ -49,7 +49,6 @@ class AuthController < ApplicationController
     interval=2**(user.login_attempts-3)
     user.next_login_time=DateTime.now+interval.minutes
     user.save
-    @user1=user
     logger.warn "Failed login attempt: Account Blocked"
     flash[:error] = "Account is Blocked for #{interval} minutes"
     redirect_to :controller => 'content_pages', :action => 'view_captcha'

@@ -1,12 +1,15 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
 <%= form_tag :action => 'response_report', :id => @id do %>
-  <select name='report[type]' style="width: 10em">
+  <select name='report[type]' style="width: 15em">
     <option value='ReviewResponseMap' selected>
       Review report
     </option>
     <option value='FeedbackResponseMap' >
       Author feedback report
+    </option>
+    <option value='TeammateReviewResponseMap' >
+      Teammate Review report
     </option>
   </select>
   <%= submit_tag("Submit") %>
@@ -14,8 +17,10 @@
 
 <% if @type == "ReviewResponseMap" %>
   <h1> Review report for <%= @assignment.name%> </h1>
-<% else %>
+<% elsif @type == "FeedbackResponseMap" %>
   <h1> Author feedback report for <%= @assignment.name%> </h1>
+<% elsif @type == "TeammateReviewResponseMap" %>
+  <h1> Teammate review report for <%= @assignment.name%> </h1>
 <% end %> 
 
 <div id="searchbox">

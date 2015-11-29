@@ -449,9 +449,7 @@ class AssignmentParticipant < Participant
     BookmarkRatingResponseMap.get_assessments_for(self)
   end
 
-  def submitted_files
-    files(self.path) if self.directory_num
-  end
+
 
   def files(directory)
     files_list = Dir[directory + "/*"]
@@ -467,13 +465,7 @@ class AssignmentParticipant < Participant
     files
   end
 
-  def submitted_files()
-    files = Array.new
-    if(self.directory_num)
-      files = files(self.path)
-    end
-    return files
-  end
+
 
   def wiki_submissions
     current_time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
@@ -587,7 +579,7 @@ class AssignmentParticipant < Participant
         response_map = ResponseMap.find(response_map_id)
         first_user_id = TeamsUser.where(team_id: response_map.reviewee_id).first.user_id
         participant = Participant.where(parent_id: response_map.reviewed_object_id, user_id: first_user_id).first
-        self.assignment.path + "/"+ participant.directory_num.to_s + "_review" + "/" + response_map_id.to_s
+        self.assignment.path + "/"+ participant.team.directory_num.to_s + "_review" + "/" + response_map_id.to_s
     end
 
     def update_resubmit_times
@@ -595,45 +587,7 @@ class AssignmentParticipant < Participant
       self.resubmission_times << new_submit
     end
 
-    def set_student_directory_num
-      if self.directory_num.nil? || self.directory_num < 0
-        #check all the users in this team, see if they have the direc tory_num in their participants table.
-        this_team_has_directory_num = false
-        team = self.team
-        if team.nil? # this participant does not have a team
 
-        else
-          teammate_participants = team.participants
-          teammate_participants.each do |teammate_participant|
-            if !teammate_participant.directory_num.nil?
-              directory_num_for_this_team = teammate_participant.directory_num
-              this_team_has_directory_num=true
-              self.team.participants.each do | member |
-                member.update_attribute('directory_num',directory_num_for_this_team)
-              end
-            end
-          end
-        end
-
-        ##only create a new directory num for this team if there is no directory num for this team
-        if !this_team_has_directory_num
-          max_num = AssignmentParticipant.where(parent_id: self.parent_id).order('directory_num desc').first.directory_num
-          dir_num = max_num ? max_num + 1 : 0
-          self.update_attribute('directory_num',dir_num)
-          #ACS Get participants irrespective of the number of participants in the team
-          #removed check to see if it is a team assignment
-          self.team.participants.each do | member |
-            member.directory_num = self.directory_num
-            member.save
-          end
-        end
-      end
-
-      # if current user has directory_num, update the directory num for all the teammates.
-      self.team.participants.each do | member |
-        member.update_attribute('directory_num',self.directory_num)
-      end
-    end
 
     def current_stage
       topic_id = SignedUpTeam.topic_id(self.parent_id, self.user_id)

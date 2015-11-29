@@ -14,7 +14,7 @@ class ReviewFilesController < ApplicationController
     new_version_number = ReviewFile.get_max_version_num(participant) + 1
 
     # Calculate the directory for unzipping files
-    participant.set_student_directory_num
+    participant.team.set_student_directory_num
     version_dir = ReviewFilesHelper::get_version_directory(participant,
                                                            new_version_number)
     FileUtils.mkdir_p(version_dir) unless File.exists? version_dir

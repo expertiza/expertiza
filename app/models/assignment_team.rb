@@ -89,8 +89,27 @@ class AssignmentTeam < Team
     self.participants.first.dir_path
   end
 
+  def files(directory)
+    files_list = Dir[directory + "/*"]
+    files = Array.new
+
+    files_list.each do |file|
+      if File.directory?(file)
+        dir_files = files(file)
+        dir_files.each{|f| files << f}
+      end
+      files << file
+    end
+    files
+  end
+
+
   def submitted_files
-    self.participants.first.submitted_files
+    files = Array.new
+    if(self.directory_num)
+      files = files(self.path)
+    end
+    return files
   end
 
   def review_map_type
@@ -265,6 +284,25 @@ class AssignmentTeam < Team
     end
   end
 
+  def path
+    self.assignment.path + "/"+ self.directory_num.to_s
+  end
+
+  def set_student_directory_num
+    if self.directory_num.nil? || self.directory_num < 0
+        max_num = AssignmentTeam.where(parent_id: self.parent_id).order('directory_num desc').first.directory_num
+        dir_num = max_num ? max_num + 1 : 0
+        self.update_attribute('directory_num',dir_num)
+        #ACS Get participants irrespective of the number of participants in the team
+        #removed check to see if it is a team assignment
+
+
+    end
+
+
+  end
+
+
       require './app/models/analytic/assignment_team_analytic'
       include AssignmentTeamAnalytic
-    end
+end

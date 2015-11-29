@@ -104,8 +104,9 @@ def submit_file
   participant = AssignmentParticipant.find(params[:id])
   return unless current_user_id?(participant.user_id)
 
+
   file = params[:uploaded_file]
-  participant.set_student_directory_num
+  participant.team.set_student_directory_num
 
   @current_folder = DisplayOption.new
   @current_folder.name = "/"
@@ -115,7 +116,7 @@ def submit_file
   if params[:origin] == 'review'
     curr_directory = participant.review_file_path(params[:response_map_id]).to_s + @current_folder.name
   else
-    curr_directory = participant.path.to_s + @current_folder.name
+    curr_directory = participant.team.path.to_s + @current_folder.name
   end
   if !File.exists? curr_directory
     FileUtils.mkdir_p(curr_directory)

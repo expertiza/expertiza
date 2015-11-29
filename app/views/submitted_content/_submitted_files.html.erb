@@ -3,7 +3,7 @@
 <% if origin == 'review' %>
   <% files = participant.files(participant.review_file_path(response_map_id).to_s + current_folder.name) %>
 <% else %>
-  <% files = participant.files(participant.path.to_s + current_folder.name) %>
+  <% files = participant.files(participant.team.path.to_s + current_folder.name) %>
 <%end%>
 
 <%session_participant = AssignmentParticipant.where(parent_id: @assignment.id, user_id: session[:user].id).first%>
@@ -31,7 +31,7 @@
 
   <%= form_tag({:controller=>'submitted_content',:action=>'folder_action', :id => participant.id, :origin => origin ||= nil}, {:multipart => true, id: 'folder-action-form'}) do %>
 
-    <% if files.length > 0 and participant.directory_num != nil and participant.directory_num >= 0 %>
+    <% if files.length > 0 and participant.team.directory_num != nil and participant.team.directory_num >= 0 %>
 
       <% if same_team_flag && stage != "Complete" %>
 

@@ -165,7 +165,7 @@ class StudentTeamsController < ApplicationController
     #the student is responsible for resubmitting their work
     #no restriction is placed on when a student can leave
 
-    student.directory_num = nil
+    #student.directory_num = nil
 
     student.save
 

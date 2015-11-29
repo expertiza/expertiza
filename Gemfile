@@ -52,6 +52,7 @@ gem 'superfish-rails'
 gem 'therubyracer'
 gem 'thin'
 gem 'uglifier'
+gem 'whenever', :require => false
 gem 'will_paginate'
 gem 'zip-zip'
 gem 'react-rails', '~> 1.0'

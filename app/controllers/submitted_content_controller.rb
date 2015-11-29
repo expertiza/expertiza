@@ -54,12 +54,15 @@ def submit_hyperlink
   if team_hyperlinks.include?(params['submission'])
     flash[:error] = "You or your teammate(s) have already submitted the same hyperlink."
   else
-    begin
+    #begin
       @participant.submit_hyperlink(params['submission'])
       @participant.update_resubmit_times
-    rescue
-      flash[:error] = "The URL or URI is not valid. Reason: #{$!}"
-    end
+	  @participant.hyperlink_contributor.find_or_create_by(participant_id: @participant.id)
+	  SubmissionHistory.create_hyperlink_submission_event(@participant.id, params['submission'])
+
+    #rescue
+     # flash[:error] = "The URL or URI is not valid. Reason: #{$!}"
+    #end
     undo_link("Link has been submitted successfully. ")
   end
   redirect_to :action => 'edit', :id => @participant.id

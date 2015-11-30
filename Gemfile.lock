@@ -464,6 +464,7 @@ DEPENDENCIES
   react-rails (~> 1.0)
   rgl
   rjb
+  rspec-mocks
   rspec-rails
   rubyzip
   rwordnet (= 0.1.3)

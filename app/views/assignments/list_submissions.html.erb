@@ -55,7 +55,7 @@
  			
  			<% @participants.each do |participant| %>
     			<%= "Hyperlinks:<br/>".html_safe if !participant.hyperlinks.blank? and participant == @participants.first %>
-	    		<% participant.hyperlinks.each do |link| %>
+                <% participant.hyperlinks_array.each do |link| %>
 	    			<a href="<%= link %>" target="_blank"><%= link %></a><br/>
 	    		<% end %>
 	    	<% end %>

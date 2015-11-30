@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151128013208) do
+ActiveRecord::Schema.define(version: 20151129234642) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -450,8 +450,10 @@ ActiveRecord::Schema.define(version: 20151128013208) do
     t.integer  "complete_count",   limit: 4
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false
+    t.integer  "assignment_id",    limit: 4
   end
 
+  add_index "review_metrics", ["assignment_id"], name: "fk_rails_f362cecdbe", using: :btree
   add_index "review_metrics", ["response_id"], name: "fk_rails_bf836f6d3b", using: :btree
 
   create_table "roles", force: :cascade do |t|
@@ -774,6 +776,7 @@ ActiveRecord::Schema.define(version: 20151128013208) do
   add_foreign_key "question_advices", "questions", name: "fk_question_question_advices"
   add_foreign_key "questions", "questionnaires", name: "fk_question_questionnaires"
   add_foreign_key "resubmission_times", "participants", name: "fk_resubmission_times_participants"
+  add_foreign_key "review_metrics", "assignments"
   add_foreign_key "review_metrics", "responses"
   add_foreign_key "sign_up_topics", "assignments", name: "fk_sign_up_topics_assignments"
   add_foreign_key "signed_up_teams", "sign_up_topics", column: "topic_id", name: "fk_signed_up_users_sign_up_topics"

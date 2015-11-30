@@ -3,7 +3,7 @@ class ReviewMappingController < ApplicationController
   autocomplete :user, :name
   #use_google_charts
   require 'gchart'
-  helper :dynamic_review_assignment
+  #helper :dynamic_review_assignment
   helper :submitted_content
 
   def action_allowed?
@@ -73,17 +73,6 @@ class ReviewMappingController < ApplicationController
     redirect_to :action => 'list_mappings', :id => assignment.id, :msg => msg
   end
 
-  # Get all the available submissions
-  def show_available_submissions
-    assignment = Assignment.find(params[:assignment_id])
-    reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
-    requested_topic_id = params[:topic_id]
-    @available_submissions =  Hash.new
-    @available_submissions = DynamicReviewAssignmentHelper::review_assignment(assignment.id ,
-                                                                              reviewer.id,
-                                                                              requested_topic_id ,
-                                                                              Assignment::RS_STUDENT_SELECTED)
-  end
   def add_quiz_response_map
     if ResponseMap.where(reviewed_object_id: params[:questionnaire_id], reviewer_id:  params[:participant_id]).first
       flash[:error] = "You have already taken that quiz"

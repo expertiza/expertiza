@@ -314,6 +314,7 @@ class ResponseController < ApplicationController
     #TEXT_METRIC_CODE
     @reviewMetric = ReviewMetric.new
     @reviewMetric.response_id = Response.find_by_map_id(@map.id).id
+    @reviewMetric.assignment_id=@map.assignment.id
     #@reviewMetric.response_id = Response.where(map_id: @map.id).id
     @reviewMetric.calulate_metric
     #####################

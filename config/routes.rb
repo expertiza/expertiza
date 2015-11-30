@@ -214,14 +214,11 @@ Expertiza::Application.routes.draw do
   end
 
   get '/participants/change_handle', controller: :participants, action: :change_handle
-  get 'reset_password', controller: :password_retrieval, action: :reset_password
-  post 'reset_password/:id', controller: :users, action: :reset_password
+
   resources :password_retrieval do
     collection do
       get :forgotten
       post :send_password
-      post :send_link
-
     end
   end
 

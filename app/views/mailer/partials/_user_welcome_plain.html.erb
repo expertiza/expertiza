@@ -1,10 +1,10 @@
 Hi <%= @first_name %>,
 
-Your Expertiza account has been created at http://expertiza.ncsu.edu
+Your Expertiza account has been created at http://expertiza.ncsu.edu .
+We strongly recommend that you change the password the first time you
+access the application.
 
 User Name: <%= @user.name %>
 E-mail address:<%= @user.email %>
 
-We strongly recommend that you change the password the first time you access the application using the link given below.
-
-Reset link: <%= h = "http://localhost:3000/reset_password?link=#{@link}" %>
+New password: <%= @password %>

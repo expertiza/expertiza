@@ -1,6 +1,5 @@
 module AccessHelper
   def authorize
-    #raise "erro"
     unless all_actions_allowed?
       flash_msg
       redirect_back

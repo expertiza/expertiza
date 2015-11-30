@@ -1,2 +1,0 @@
-class ExpiryLinkController < ApplicationController
-end

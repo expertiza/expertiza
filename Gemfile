@@ -60,7 +60,6 @@ group :development do
   gem 'daemons'
   gem 'pry'
   gem 'pry-remote'
-  gem 'web-console', '~> 2.0'
   gem 'pry-nav'
   gem 'sqlite3-ruby'
   gem 'selenium-webdriver'

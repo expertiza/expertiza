@@ -16,7 +16,7 @@ class ProfileController < ApplicationController
       aq = AssignmentQuestionnaire.where(['user_id = ? and assignment_id is null and questionnaire_id is null',@user.id]).first
       aq.update_attribute('notification_limit',params[:assignment_questionnaire][:notification_limit])
     end
-    #raise "error"
+
     if @user.update_attributes(params[:user])
       flash[:success] = 'Profile was successfully updated.'
     else

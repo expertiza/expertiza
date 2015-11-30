@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151117073827) do
+ActiveRecord::Schema.define(version: 20151107195943) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -240,13 +240,6 @@ ActiveRecord::Schema.define(version: 20151117073827) do
   add_index "due_dates", ["review_allowed_id"], name: "fk_due_date_review_allowed", using: :btree
   add_index "due_dates", ["review_of_review_allowed_id"], name: "fk_due_date_review_of_review_allowed", using: :btree
   add_index "due_dates", ["submission_allowed_id"], name: "fk_due_date_submission_allowed", using: :btree
-
-  create_table "expiry_links", force: :cascade do |t|
-    t.string   "email",      limit: 255
-    t.string   "link",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
 
   create_table "institutions", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false

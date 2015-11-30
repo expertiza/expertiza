@@ -126,23 +126,6 @@ class SuggestionController < ApplicationController
     ).deliver
   end
 
-  def approve
-    @suggestion = Suggestion.find(params[:id])
-    @user_id = User.where(name: @suggestion.unityID).first.id
-    @team_id = TeamsUser.team_id(@suggestion.assignment_id, @user_id)
-    @topic_id = SignedUpTeam.topic_id(@suggestion.assignment_id, @user_id)
-    @signuptopic = SignUpTopic.new
-    @signuptopic.topic_identifier = 'S' + Suggestion.where("assignment_id = ? and id <= ?", @suggestion.assignment_id, @suggestion.id).size.to_s
-    @signuptopic.topic_name = @suggestion.title
-    @signuptopic.assignment_id = @suggestion.assignment_id
-    @signuptopic.max_choosers = 1;
-    if @signuptopic.save && @suggestion.update_attribute('status', 'Approved')
-      flash[:notice] = 'Successfully approved the suggestion.'
-    else
-      flash[:error] = 'Error when approving the suggestion.'
-    end
-  end
-
   def notification
     #--zhewei-----06/22/2015--------------------------------------------------------------------------------------
     # If you want to create a new team with topic and team members on view, you have to
@@ -198,5 +181,22 @@ class SuggestionController < ApplicationController
   private
   def suggestion_params
     params.require(:suggestion).permit(:assignment_id, :title, :description, :status, :unityID, :signup_preference)
+  end
+
+  def approve
+    @suggestion = Suggestion.find(params[:id])
+    @user_id = User.where(name: @suggestion.unityID).first.id
+    @team_id = TeamsUser.team_id(@suggestion.assignment_id, @user_id)
+    @topic_id = SignedUpTeam.topic_id(@suggestion.assignment_id, @user_id)
+    @signuptopic = SignUpTopic.new
+    @signuptopic.topic_identifier = 'S' + Suggestion.where("assignment_id = ? and id <= ?", @suggestion.assignment_id, @suggestion.id).size.to_s
+    @signuptopic.topic_name = @suggestion.title
+    @signuptopic.assignment_id = @suggestion.assignment_id
+    @signuptopic.max_choosers = 1;
+    if @signuptopic.save && @suggestion.update_attribute('status', 'Approved')
+      flash[:notice] = 'Successfully approved the suggestion.'
+    else
+      flash[:error] = 'Error when approving the suggestion.'
+    end
   end
 end

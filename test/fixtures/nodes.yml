@@ -1,0 +1,11 @@
+node1:
+  id: 1
+  parent_id: 1
+  node_object_id: 1
+  type: TeamNode
+
+node2:
+  id: 2
+  parent_id: 1
+  node_object_id: 4
+  type: TeamNode

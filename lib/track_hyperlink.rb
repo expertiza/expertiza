@@ -10,6 +10,8 @@ GITHUB_PUB = "github.com"
 WIKIPEDIA_NCSU_API_BASE_PATH = "/api.php?action=query&prop=revisions&format=json&rvprop=timestamp&titles="
 WIKIPEDIA_PUB_API_BASE_PATH = "/w/api.php?action=query&prop=revisions&format=json&rvprop=timestamp&titles="
 
+GITHUB_PUB_API_BASE_URI = "https://api.github.com/repos"
+
 class TrackHyperlink
   def initialize(hyperlink)
   	@hyperlink = hyperlink
@@ -64,8 +66,18 @@ class TrackHyperlink
 	  return nil
 	end
   end
-
+  
+  #We use pushed_at value retuned by github api for querying a repo, it indicates the last commit timestamp
+  #http://stackoverflow.com/questions/15918588/github-api-v3-what-is-the-difference-between-pushed-at-and-updated-at
   def retrieve_github_pub_timestamp(uri)
+    req_uri = GITHUB_PUB_API_BASE_URI + uri.path
+	auth_header = "token " + GITHUB_CONFIG['oauth_token']
+	#auth_header = "token " + '5dc2668d2dc3b31c31de2b8743dced2d151900c3'
+	#TODO handle request limit exceeded error, will happen only when we make more than 5000 req/hour
+    response = open(req_uri,
+					"Authorization" => auth_header).read
+    parsed_resp = JSON.parse(response)
+	update_time_iso = parsed_resp['pushed_at']
   end
 
 end

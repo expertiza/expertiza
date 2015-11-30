@@ -20,7 +20,7 @@ class HyperlinkContributor < ActiveRecord::Base
 		  										.select(:event_time)
 		  										.order(:event_time)
 		  										.first
-		  old_ts = last_update_ev.nil? ? "0" : last_update_ev.event_timestamp
+		  old_ts = last_update_ev.nil? ? "0" : last_update_ev.event_time
 		  if !new_ts.nil? && new_ts > old_ts
 		    SubmissionHistory.create_new_hyperlink_update_event(contributor.participant_id, hyperlink, new_ts)
 		  end

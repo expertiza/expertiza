@@ -23,7 +23,7 @@
 # For production environment use Capistrano recipees
 # use "crontab -l" to list all current cron jobs
 
-every 1.day, :at => '6:53 pm' do
+every 1.day, :at => '2:14 am' do
   runner "HyperlinkContributor.check_for_updates", :output => 'log/cron.log'
 end
 

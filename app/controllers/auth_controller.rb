@@ -31,14 +31,14 @@ class AuthController < ApplicationController
          user.save
          logger.warn "Failed login attempt"
          flash[:error] = "Incorrect Name/Password"
-         redirect_to :controller => 'content_pages', :action => 'view'
+         redirect_to :controller => 'content_pages', :action => 'view', :locals => {:attempts => '0'}
         else
           exponential_backoff(user)
         end
        end
       else
         flash[:error] = "Wait till #{user.next_login_time} for next login attempt"
-        redirect_to :controller => 'content_pages', :action => 'view'
+        redirect_to :controller => 'content_pages', :action => 'view', :locals => {:attempts => '0'}
       end
     end
   end  #def login
@@ -49,10 +49,9 @@ class AuthController < ApplicationController
     interval=2**(user.login_attempts-3)
     user.next_login_time=DateTime.now+interval.minutes
     user.save
-    @newuser = user
     logger.warn "Failed login attempt: Account Blocked"
     flash[:error] = "Account is Blocked for #{interval} minutes"
-    redirect_to :controller => 'content_pages', :action => 'view'
+    redirect_to :controller => 'content_pages', :action => 'view', :locals => {:attempts => user.login_attempts}
   end
   # function to handle common functionality for conventional user login and google login
   def after_login (user)

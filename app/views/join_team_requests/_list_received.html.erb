@@ -36,6 +36,7 @@
                     <%= hidden_field_tag 'session[:dummy][:assignment_id]', Participant.find(join_team_request.participant_id).parent_id %>
                     <%= hidden_field_tag 'user[name]', User.find(Participant.find(join_team_request.participant_id).user_id).name %>
                     <%= hidden_field_tag 'participant_id', join_team_request.participant_id %>
+                    <%= join_team_request.destroy %>
                     <input type='submit' value='Invite'/>
                   <% end %>
                 </td>

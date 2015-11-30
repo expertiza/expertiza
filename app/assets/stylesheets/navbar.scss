@@ -43,12 +43,11 @@
 
 ul.nav li.first-level {
   font-size: 100%;
-  height: 66px;
 }
 
 li.first-level > a {
-  line-height: 36px;
-  padding: 15px 10px;
+  line-height: 10px;
+  padding: 0px 10px;
 }
 
 ul.nav li.dropdown:hover > ul.dropdown-menu {
@@ -65,7 +64,7 @@ ul.nav > li.dropdown > a:hover {
 
 ul.navbar-right > li.right-most > a {
   color: #EEEEEE;
-  line-height: 36px;
+//  line-height: 36px;
 }
 
 ul.navbar-right > li.right-most > a:hover {
@@ -73,9 +72,11 @@ ul.navbar-right > li.right-most > a:hover {
 }
 
 .navbar .impersonate-box {
-  height: 66px; 
-  padding: 10px 0;
+  height: 13px;
+  padding: 0px 0;
 }
+
+
 
 .impersonate-box .input-group {
   width: 170px;
@@ -83,6 +84,7 @@ ul.navbar-right > li.right-most > a:hover {
 
 #impersonate-user-info {
   color: #EEEEEE;
+  padding-left: 13px;
 }
 
 #impersonate-button {
@@ -158,6 +160,7 @@ ul.navbar-right > li.right-most > a:hover {
 
 // Refer from http://www.bootply.com/120604
 @media (max-width: 1170px) {
+
     .navbar-header {
         float: none;
     }
@@ -200,5 +203,10 @@ ul.navbar-right > li.right-most > a:hover {
         overflow: hidden!important;
     }
     .dropdown-submenu>.dropdown-menu {
+    }
+
+    .logout-box{
+      margin-top: 7px;
+      left: -2px;
     }
 }

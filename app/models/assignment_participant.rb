@@ -368,8 +368,9 @@ class AssignmentParticipant < Participant
     Net::HTTP.start(url.host, url.port)
     hyperlinks = self.hyperlinks_array
     hyperlinks << hyperlink
-    self.submitted_hyperlinks = YAML::dump(hyperlinks)
-    self.save
+    team_object = self.team
+    team_object.submitted_hyperlinks = YAML::dump(hyperlinks)
+    team_object.save
   end
 
   # Note: This method is not used yet. It is here in the case it will be needed.
@@ -377,8 +378,9 @@ class AssignmentParticipant < Participant
   def remove_hyperlink(hyperlink_to_delete)
     hyperlinks = self.hyperlinks_array
     hyperlinks.delete(hyperlink_to_delete)
-    self.submitted_hyperlinks = YAML::dump(hyperlinks)
-    self.save
+    team_object = self.team
+    team_object.submitted_hyperlinks = YAML::dump(hyperlinks)
+    team_object.save
   end
 
   def members
@@ -390,7 +392,7 @@ class AssignmentParticipant < Participant
   end
  
   def hyperlinks_array
-    self.submitted_hyperlinks.blank? ? [] : YAML::load(self.submitted_hyperlinks)
+    self.team.submitted_hyperlinks.blank? ? [] : YAML::load(self.team.submitted_hyperlinks)
   end
 
 

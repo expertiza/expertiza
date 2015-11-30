@@ -96,7 +96,4 @@ RSpec.configure do |config|
   Dir["./spec/features/helpers/*.rb"].each do |filename|
     require filename.gsub(/\.rb/, "")
   end
-  require File.expand_path("../../config/environment", __FILE__)
-  require 'capybara/rails'
-  config.include Capybara::DSL
 end

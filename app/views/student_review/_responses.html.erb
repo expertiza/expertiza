@@ -66,11 +66,11 @@
                         <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
                       <% end %>
                     <% end %>
-		    <% if (!@latest_response.isSubmitted.eql?'Yes') %>
+		   
 			 <td>
                               <%= link_to "Text Metrics", {:controller => 'review_metrics', :action => 'list', :id => map.id} %>
                          </td>
-		    <%end%>
+		   
                 <%end%>
             <% elsif @assignment.get_current_stage(topic_id) != "Complete" %>
                 <% if @assignment.staggered_deadline? %>

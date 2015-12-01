@@ -10,12 +10,15 @@ class SubmissionHistory < ActiveRecord::Base
   :EVENT_FILE_DELETED => "file deleted",
   :EVENT_HYPERLINK_SUBMITTED => "hyperlink submitted",
   :EVENT_HYPERLINK_UPDATED => "hyperlink content updated",
-  :EVENT_HYPERLINK_DELETED => "hyperlink deleted"
+  :EVENT_HYPERLINK_DELETED => "hyperlink deleted",
+  :EVENT_REVIEW_SUBMITTED => "review submitted",
+  :EVENT_REVIEW_RESUBMITTED => "next round review submitted"
   }
 
   #artifact types
   ARTIFACT_TYPE_FILE = "file"
   ARTIFACT_TYPE_HYPERLINK = "hyperlink"
+  ARTIFACT_TYPE_REVIEW = "review"
   
   cattr_reader :events 
 
@@ -41,6 +44,24 @@ class SubmissionHistory < ActiveRecord::Base
 								  artifact_type:ARTIFACT_TYPE_HYPERLINK, 
 								  event:self.events[:EVENT_HYPERLINK_UPDATED], 
 								  event_time:event_ts)
+  end
+
+  def self.create_review_submission_event(participant_id, map_id)
+    artifact_name = "Review by #{map_id}"
+    ev = SubmissionHistory.create(participant_id:participant_id, 
+								  artifact_name:artifact_name, 
+								  artifact_type:ARTIFACT_TYPE_REVIEW, 
+								  event:self.events[:EVENT_REVIEW_SUBMITTED], 
+								  event_time:Time.now)
+  end
+
+  def self.create_review_resubmission_event(participant_id, map_id)
+    artifact_name = "Review by #{map_id}"
+    ev = SubmissionHistory.create(participant_id:participant_id, 
+								  artifact_name:artifact_name, 
+								  artifact_type:ARTIFACT_TYPE_REVIEW, 
+								  event:self.events[:EVENT_REVIEW_RESUBMITTED], 
+								  event_time:Time.now)
   end
 
 end

@@ -2,6 +2,12 @@
 
 <%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage =>  @stage, :can_submit =>@can_submit} %>
 
+<!-- E1578 Timestamps Begin -->
+<%= will_paginate @events %>
+<%= render :partial => 'submitted_content/events_list', :locals => {:participant => participant} %>
+<%= will_paginate @events %>
+<!-- E1578 Timestamps End -->
+
 <!-- TODO Need to add changes for Manager and Reader -->
 
 <a href="javascript:window.history.back()">Back</a>

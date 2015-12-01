@@ -29,6 +29,8 @@ class SubmittedContentController < ApplicationController
     @can_submit=true
 
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
+
+    @events = SubmissionHistory.where( ["participant_id = ?", @participant]).page(params[:page]).order('id').per_page(10).all
   end
 
   #view is called when @assignment.submission_allowed(topic_id) is false

@@ -1,0 +1,18 @@
+
+<b>Events</b>&nbsp;&nbsp;&nbsp;
+<table>
+  <div id="url" style="">
+    <tr>
+      <th> Artifact Name </th>
+      <th> Event</th>
+      <th> Event Time </th>
+    </tr>
+    <% @events.each do |event|  %>
+            <tr>
+              <td><%= event.artifact_name %> &nbsp;  &nbsp;</td>
+              <td><%= event.event%> &nbsp;  &nbsp;</td>
+              <td><%= event.event_time%> &nbsp;  &nbsp;</td>
+            </tr>
+    <% end %>
+  </div>
+</table>

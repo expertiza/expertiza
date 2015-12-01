@@ -5,6 +5,11 @@
 <!-- E726 Changes Begin -->
 <%= render :partial => 'submitted_content/selfreview'%>
 <!-- E726 Changes End -->
+<!-- E1578 Timestamps Begin -->
+<%= will_paginate @events %>
+<%= render :partial => 'submitted_content/events_list', :locals => {:participant => @participant} %>
+<%= will_paginate @events %>
+<!-- E1578 Timestamps End -->
 
 <BR/>
 <BR/>

@@ -12,9 +12,11 @@
 
 <table style="border: 1px solid black">
          <tr>          <td>Question</td>      <td>Weight</td>
+  <% i = 1 %>
   <% @reviews.each do |review| %>
-
-        <td style="border: 1px solid black"> <%= review.id %>   </td>
+    
+    <td style="border: 1px solid black"> <a href= "../grades/view_reviewer?id=<%= review.id.to_s %>"><%= "Rev" + i.to_s %></a> </td>
+    <% i += 1 %>
   <% end %>
   </tr>
 

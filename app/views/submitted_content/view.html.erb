@@ -5,7 +5,7 @@
 <!-- E1578 Timestamps Begin -->
 <b>List of Events</b>
 <%= will_paginate @events %>
-<%= render :partial => 'submitted_content/events_list', :locals => {:participant_id => @participant} %>
+<%= render :partial => 'submitted_content/events_list', :locals => {:participant_id => @participant.id, :team_id => @team_id } %>
 <%= will_paginate @events %>
 <!-- E1578 Timestamps End -->
 

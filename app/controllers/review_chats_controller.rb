@@ -22,11 +22,16 @@ class ReviewChatsController < ApplicationController
 
 
   def submitted_response
-     @review_chat = ReviewChat.find(params[:id])
-      ReviewChat.create(:assignment_id => @review_chat.assignment_id,:reviewer_id => @review_chat.reviewer_id, :team_id=>@review_chat.team_id, :type_flag => 'A' , :content => params[:response_area])
-      flash[:notice]="Response has been submitted"
-      Response.chat_email
-      redirect_to action: 'show', id: params[:id]
+    @review_chat = ReviewChat.find(params[:id])
+    @chat_reviewer=Participant.find(@review_chat.reviewer_id).user_id
+    if(@chat_reviewer==session[:user].id) then
+    	ReviewChat.create(:assignment_id => @review_chat.assignment_id,:reviewer_id => @review_chat.reviewer_id, :team_id=>@review_chat.team_id, :type_flag => 'Q' , :content => params[:response_area])
+    else	
+      	ReviewChat.create(:assignment_id => @review_chat.assignment_id,:reviewer_id => @review_chat.reviewer_id, :team_id=>@review_chat.team_id, :type_flag => 'A' , :content => params[:response_area])
+    end	
+    flash[:notice]="Response has been submitted"
+    ReviewChat.chat_email_response(@review_chat.id,@chat_reviewer)
+    redirect_to action: 'show', id: params[:id]
   end
 
   # GET /review_chats/new

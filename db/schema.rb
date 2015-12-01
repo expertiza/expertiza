@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151107195943) do
+ActiveRecord::Schema.define(version: 20150827170101) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -81,8 +81,6 @@ ActiveRecord::Schema.define(version: 20151107195943) do
     t.boolean  "show_teammate_reviews",             limit: 1
     t.boolean  "availability_flag",                 limit: 1,     default: true
     t.boolean  "use_bookmark",                      limit: 1
-    t.boolean  "can_review_same_topic",             limit: 1,     default: true
-    t.boolean  "can_choose_topic_to_review",        limit: 1,     default: true
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -409,7 +407,6 @@ ActiveRecord::Schema.define(version: 20151107195943) do
     t.datetime "updated_at"
     t.integer  "version_num",        limit: 4
     t.integer  "round",              limit: 4
-    t.string   "isSubmitted",        limit: 255
   end
 
   add_index "responses", ["map_id"], name: "fk_response_response_map", using: :btree

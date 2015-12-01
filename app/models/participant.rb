@@ -52,98 +52,98 @@ class Participant < ActiveRecord::Base
     else
       raise "Associations exist for this participant"
     end
+  end
+
+
+  def force_delete(maps)
+    times = ResubmissionTime.where(participant_id: self.id);
+
+    if times
+      times.each { |time| time.destroy }
     end
 
-
-    def force_delete(maps)
-      times = ResubmissionTime.where(participant_id: self.id);
-
-      if times
-        times.each { |time| time.destroy }
-      end
-
-      if maps
-        maps.each { |map| map.delete(true) }
-      end
-
-      if self.team
-        if self.team.teams_users.length == 1
-          self.team.delete
-        else
-          self.team.teams_users.each{ |tuser|
-            if tuser.user_id == self.id
-              tuser.delete
-            end
-          }
-        end
-      end
-      self.destroy
+    if maps
+      maps.each { |map| map.delete(true) }
     end
 
-    def topic_name
-      if topic.nil? or topic.topic_name.empty?
-        return "<center>&#8212;</center>"
-      end
-      return topic.topic_name
-    end
-
-    def able_to_review
-      if can_review
-        return true
-      end
-      return false
-    end
-
-    # email does not work. It should be made to work in the future
-    def email(pw, home_page)
-      user = User.find(self.user_id)
-      assignment = Assignment.find(self.assignment_id)
-
-      Mailer.sync_message(
-        {:recipients => user.email,
-         :subject => "You have been registered as a participant in Assignment #{assignment.name}",
-         :body => {
-           :home_page => home_page,
-           :first_name => ApplicationHelper::get_user_first_name(user),
-           :name =>user.name,
-           :password =>pw,
-           :partial_name => "register"
-         }
-      }
-      ).deliver
-    end
-
-    # Return scores that this participant for the given questions
-    def scores(questions)
-      scores = {}
-      scores[:participant] = self
-
-      if self.assignment.varying_rubrics_by_round?  # for "vary rubric by rounds" feature -Yang
-        self.assignment.questionnaires.each do |questionnaire|
-          round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(self.assignment.id, questionnaire.id).used_in_round
-          if(round!=nil)
-            questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
-          else
-            questionnaire_symbol = questionnaire.symbol
+    if self.team
+      if self.team.teams_users.length == 1
+        self.team.delete
+      else
+        self.team.teams_users.each{ |tuser|
+          if tuser.user_id == self.id
+            tuser.delete
           end
-          scores[questionnaire_symbol] = Hash.new
-          scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_for(self)
-          scores[questionnaire_symbol][:scores] = Answer.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
-        end
+        }
+      end
+    end
+    self.destroy
+  end
 
-      else   #not using "vary rubric by rounds" feature
-        self.assignment.questionnaires.each do |questionnaire|
-          scores[questionnaire.symbol] = Hash.new
-          scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
+  def topic_name
+    if topic.nil? or topic.topic_name.empty?
+      return "<center>&#8212;</center>"
+    end
+    return topic.topic_name
+  end
 
-          scores[questionnaire.symbol][:scores] = Answer.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+  def able_to_review
+    if can_review
+      return true
+    end
+    return false
+  end
+
+  # email does not work. It should be made to work in the future
+  def email(pw, home_page)
+    user = User.find(self.user_id)
+    assignment = Assignment.find(self.assignment_id)
+
+    Mailer.sync_message(
+      {:recipients => user.email,
+        :subject => "You have been registered as a participant in Assignment #{assignment.name}",
+        :body => {
+          :home_page => home_page,
+          :first_name => ApplicationHelper::get_user_first_name(user),
+          :name =>user.name,
+          :password =>pw,
+          :partial_name => "register"
+        }
+    }
+    ).deliver
+  end
+
+  # Return scores that this participant for the given questions
+  def scores(questions)
+    scores = {}
+    scores[:participant] = self
+
+    if self.assignment.varying_rubrics_by_round?  # for "vary rubric by rounds" feature -Yang
+      self.assignment.questionnaires.each do |questionnaire|
+        round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(self.assignment.id, questionnaire.id).used_in_round
+        if(round!=nil)
+          questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
+        else
+          questionnaire_symbol = questionnaire.symbol
         end
+        scores[questionnaire_symbol] = Hash.new
+        scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_for(self)
+        scores[questionnaire_symbol][:scores] = Answer.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
       end
 
-      scores[:total_score] = assignment.compute_total_score(scores)
+    else   #not using "vary rubric by rounds" feature
+      self.assignment.questionnaires.each do |questionnaire|
+        scores[questionnaire.symbol] = Hash.new
+        scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
 
-      scores
+        scores[questionnaire.symbol][:scores] = Answer.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+      end
     end
+
+    scores[:total_score] = assignment.compute_total_score(scores)
+
+    scores
+  end
 
   #Authorizations are paricipant, reader, reviewer, submitter (They are not store in Participant table.)
   #Permissions are can_submit, can_review, can_take_quiz.

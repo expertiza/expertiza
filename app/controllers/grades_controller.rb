@@ -90,72 +90,153 @@ class GradesController < ApplicationController
     calculate_all_penalties(@assignment.id)
   end
 
+  def view_reviewer
+    @participant = AssignmentParticipant.find(params[:id])
+   @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
+    # return if redirect_when_disallowed
+    @assignment = @participant.assignment
+    @questions = {} # A hash containing all the questions in all the questionnaires used in this assignment
+    questionnaires = @assignment.questionnaires
+    questionnaires.each do |questionnaire|
+      round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id:questionnaire.id).first.used_in_round
+      if(round!=nil)
+        questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
+      else
+        questionnaire_symbol = questionnaire.symbol
+      end
+      @questions[questionnaire_symbol] = questionnaire.questions
+    end
+    #@pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
+    pscore = @participant.scores(@questions)
+    # make_chart
+    @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
+    @stage = @participant.assignment.get_current_stage(@topic_id)
+    # calculate_all_penalties(@assignment.id)
+    @rscore = pscore[:review]
+
+  end
+
+
   def view_team
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
     @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
     @team = Team.find(@team_id)
-    @reviews = @participant.reviews()
+    previews = @participant.reviews()     #regular reviews
+   # mreviews = @participant.metareviews()      #meta reviews
+   # freviews = @participant.feedback()     #feedback reviews
+   # treviews = @participant.teammate_reviews() #teammate reviews
+    @reviews = previews # + mreviews # + freviews + treviews
     questionnaires = @assignment.questionnaires_with_questions
-    @vm = VmQuestionResponse.new
-    questionnaires.each {
-        |questionnaire|
-    questions = questionnaire.questions
-    @vm.addQuestions(questions)
+
+    # seems as if the non regular reviews don't have reviewer ids, or they are null.
+    @vmlist = []
+
+    #prepare heatgrid for peer reviews
+
+
+
+
+    #add all questions of all questionnaires associated with the assignment.
+    questionnaires.each { |questionnaire|
+        vm = VmQuestionResponse.new
+        questions = questionnaire.questions
+        vm.addQuestions(questions)
+
+        #add all answers/scroes
+
+        if questionnaire.type == "ReviewQuestionnaire"
+
+            vm.addReviewers(@reviews,"ReviewQuestionnaire")
+            vm.addTeamMembers(@team)
+          @reviews.each do |review|
+            @answers = Answer.where(response_id: review.response_id)
+            @answers.each do |answer|
+              vm.addAnswer(answer)
+            end
+          end
+
+        #update each row with the commentscount. #this method could become a private method in the vm class.
+        get_number_of_comments_greater_than_10_words(vm.listofreviews,vm.listofrows)
+
+        end
+
+        if questionnaire.type == "AuthorFeedbackQuestionnaire"
+          @reviews = @participant.feedback()     #feedback reviews
+          vm.addReviewers(@reviews,"AuthorFeedbackQuestionnaire")
+          vm.addTeamMembers(@team)
+
+          @reviews.each do |review|
+            @answers = Answer.where(response_id: review.response_id)
+            @answers.each do |answer|
+              vm.addAnswer(answer)
+            end
+          end
+
+          get_number_of_comments_greater_than_10_words(vm.listofreviews,vm.listofrows)
+
+        end
+
+        if questionnaire.type == "TeammateReviewQuestionnaire"
+          @reviews = @participant.teammate_reviews()
+          vm.addReviewers(@reviews,"TeammateReviewQuestionnaire")
+
+          @reviews.each do |review|
+            @answers = Answer.where(response_id: review.response_id)
+            @answers.each do |answer|
+              vm.addAnswer(answer)
+            end
+          end
+
+          get_number_of_comments_greater_than_10_words(vm.listofreviews,vm.listofrows)
+
+        end
+
+        if questionnaire.type == "MetareviewQuestionnaire"
+          @reviews = @participant.metareviews()
+          vm.addReviewers(@reviews,"MetareviewQuestionnaire")
+
+          @reviews.each do |review|
+            @answers = Answer.where(response_id: review.response_id)
+            @answers.each do |answer|
+              vm.addAnswer(answer)
+            end
+          end
+
+          get_number_of_comments_greater_than_10_words(vm.listofreviews,vm.listofrows)
+
+        end
+
+
+
+        @vmlist << vm
     }
-
-
-    #@answer = Answer.where(response_id: @reviews.last.response_id)
-    #@questionnairex = @reviews.first.questionnaire_by_answer(answer)
-   # @questions = @questionnaire.questions.sort {|a, b| a.seq <=> b.seq}
+    @reviews = @participant.metareviews()
     @reviews.each do |review|
       @answers = Answer.where(response_id: review.response_id)
-      #@questionnaire = review.questionnaire_by_answer(@answers.first)
-      #@questions = @questionnaire.questions.sort {|a, b| a.seq <=> b.seq}
-      @answers.each do |answer|
-        @vm.addAnswer(answer)
-      end
+
     end
+
 
 
 
   end
   
-  def get_number_of_comments_greater_than_10_words
-    # Create an array to hold the counts for each question
-    count_per_question
-    
+  def get_number_of_comments_greater_than_10_words(reviews, rows)
+
     first_time = true
-    
-    # Iterate over each review (which is an object of type Response)
-    @pscore[:review][:assessments].each do |review|
-      # First, grab all the questions for this review and sort them
-      answers = Answer.where(response_id: review.response_id)
-      questionnaire = review.questionnaire_by_answer(answers.first)
-      questions = questionnaire.questions.sort {|a, b| a.seq <=> b.seq}
-      
-      # Initialize the count array if this is the first time
-      if first_time
-        count_per_question = Array.new(questions.size, 0)
-        first_time = false
-      end
-      
-      current_index = 0
-      # Now iterate over all questions and increment the value at the
-      # current_index if the word count is greater than or equal to 10
-      questions.each do |question|
-        answer = answers.find{|a| a.question_id == question.id}
-        if answer.word_count >= 10
-          Array[current_index] += 1
-        end
-        
-        # Increment the current_index
-        current_index += 1
-      end
-    end
-    
-    # Return the array of counts
-    return count_per_question
+
+    reviews.each do |review|
+       answers = Answer.where(response_id: review.response_id)
+       questionnaire = review.questionnaire_by_answer(answers.first)
+       answers.each do |answer|
+         rows.each do |row|
+           if row.question_id == answer.question_id && answer.comments.to_s.length >10
+                  row.countofcomments =  row.countofcomments + 1
+           end
+       end
+       end
+       end
   end
 
   def edit

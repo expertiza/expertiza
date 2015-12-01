@@ -5,14 +5,24 @@ class VmQuestionResponseRow
     @question_id = question_id
     @weight = weight
     @score_row = Array.new
+    @countofcomments = 0
   end
+
+  def countofcomments
+    @countofcomments
+  end
+
+  def countofcomments=(newcount)
+    @countofcomments = newcount
+  end
+
 
   def questionText
     @questionText
   end
 
   def question_id
-     @question_id
+    @question_id
   end
 
   def score_row
@@ -21,15 +31,6 @@ class VmQuestionResponseRow
 
   def weight
     @weight
-  end
-  
-  
-  class VmQuestionResponseScoreCell
-
-    def initialize(score_value, color_code)
-      @score_value = score_value
-      @color_code = color_code
-    end
   end
 
 end

@@ -276,6 +276,7 @@ class AssignmentsController < ApplicationController
     def list_submissions
       @assignment = Assignment.find(params[:id])
       @teams = Team.where(parent_id: params[:id])
+      @events = SubmissionHistory.page(params[:page]).order('id').per_page(10).all
     end
 
     def associate_assignment_with_course

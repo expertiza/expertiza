@@ -30,7 +30,7 @@ class SubmittedContentController < ApplicationController
 
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
     team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
-    @events = SubmissionHistory.where( ["team_id = ?", team_id]).page(params[:page]).order('id').per_page(10).all
+    @events = SubmissionHistory.where( ["team_id = ? AND assignment_id = ?", team_id, @participant.parent_id ]).page(params[:page]).order('id').per_page(10).all
   end
 
   #view is called when @assignment.submission_allowed(topic_id) is false
@@ -61,7 +61,7 @@ def submit_hyperlink
       @participant.update_resubmit_times
       team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
 	  @participant.hyperlink_contributor.find_or_create_by(participant_id: @participant.id)
-	  SubmissionHistory.create_hyperlink_submission_event(@participant.id, team_id, params['submission'])
+	  SubmissionHistory.create_hyperlink_submission_event(@participant.id, team_id, @participant.parent_id, params['submission'])
 
     #rescue
      # flash[:error] = "The URL or URI is not valid. Reason: #{$!}"

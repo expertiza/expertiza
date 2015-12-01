@@ -3,6 +3,7 @@
 <%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage =>  @stage, :can_submit =>@can_submit} %>
 
 <!-- E1578 Timestamps Begin -->
+<b>List of Events</b>
 <%= will_paginate @events %>
 <%= render :partial => 'submitted_content/events_list', :locals => {:participant => participant} %>
 <%= will_paginate @events %>

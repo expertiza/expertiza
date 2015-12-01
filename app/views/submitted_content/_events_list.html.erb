@@ -8,7 +8,7 @@
     </tr>
     <% @events.each do |event|  %>
             <tr>
-              <% if participant == event.participant_id %>
+              <% if participant_id == event.participant_id || team_id == event.team_id %>
                   <td><%= event.artifact_name %> &nbsp;  &nbsp;</td>
                   <td><%= event.event%> &nbsp;  &nbsp;</td>
                   <td><%= event.event_time%> &nbsp;  &nbsp;</td>

@@ -2,17 +2,38 @@ class AuthController < ApplicationController
   helper :auth
   include SimpleCaptcha::ControllerHelpers
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
-  verify :method => :post, :only => [ :login, :logout ],
+  verify :method => :post, :only => [ :login, :relogin, :logout ],
     :redirect_to => { :action => :list }
 
   def action_allowed?
     case params[:action]
-    when 'login', 'logout', 'login_failed', 'google_login'
+    when 'login', 'logout', 'relogin', 'login_failed', 'google_login'
       true
     else
       current_role_name.eql?("Super-Administrator")
     end
   end
+
+   def relogin
+    if request.get?
+      AuthController.clear_session(session)
+    else
+       user = User.find_by_login(params[:login][:name])
+       #aise "error"
+    if(user.next_login_time<=DateTime.now)
+       if user and user.valid_password?(params[:login][:password]) && simple_captcha_valid?
+        user.login_attempts=0
+        user.save
+        after_login(user)
+       else
+        failed_login(user)
+       end
+      else
+        flash[:error] = "Wait till #{user.next_login_time} for next login attempt"
+        redirect_to :controller => 'content_pages', :action => 'view', :locals => {:attempts => '0'}
+      end
+    end
+  end  #def relogin
 
   def login
     if request.get?
@@ -20,21 +41,18 @@ class AuthController < ApplicationController
     else
        user = User.find_by_login(params[:login][:name])
        #aise "error"
-      if(user.next_login_time<=DateTime.now)
-       if user and user.valid_password?(params[:login][:password]) && simple_captcha_valid?
+    if(user.next_login_time<=DateTime.now)
+       if user and user.valid_password?(params[:login][:password])
+        if (user.login_attempts >= 3)
+          AuthController.clear_session(session)
+          render 'content_pages/relogin'
+        else
           user.login_attempts=0
           user.save
           after_login(user)
-       else
-        if(user.login_attempts<3)
-         user.login_attempts=user.login_attempts+1
-         user.save
-         logger.warn "Failed login attempt"
-         flash[:error] = "Incorrect Name/Password"
-         redirect_to :controller => 'content_pages', :action => 'view', :locals => {:attempts => '0'}
-        else
-          exponential_backoff(user)
         end
+       else
+        failed_login(user)
        end
       else
         flash[:error] = "Wait till #{user.next_login_time} for next login attempt"
@@ -42,6 +60,18 @@ class AuthController < ApplicationController
       end
     end
   end  #def login
+
+  def failed_login(user)
+    if(user.login_attempts < 3)
+     user.login_attempts=user.login_attempts+1
+     user.save
+     logger.warn "Failed login attempt"
+     flash[:error] = "Incorrect Name/Password"
+     redirect_to :controller => 'content_pages', :action => 'view', :locals => {:attempts => '0'}
+    else
+      exponential_backoff(user)
+    end
+  end 
 
   def exponential_backoff(user)
     # function to handle exponential backoff afterfailedlogin attempt
@@ -51,7 +81,7 @@ class AuthController < ApplicationController
     user.save
     logger.warn "Failed login attempt: Account Blocked"
     flash[:error] = "Account is Blocked for #{interval} minutes"
-    redirect_to :controller => 'content_pages', :action => 'view', :locals => {:attempts => user.login_attempts}
+    render 'content_pages/relogin'
   end
   # function to handle common functionality for conventional user login and google login
   def after_login (user)

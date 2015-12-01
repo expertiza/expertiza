@@ -6,7 +6,7 @@
   <% if not session[:user] %>
    
     <% if session[:user].nil? %>
-    <%= render :partial => 'auth/login' %><br/> 
+    <%= render :partial => 'auth/relogin' %><br/> 
 
     <% else %>
       <% if session[:user].role_id == 4 || session[:user].role_id == 3 || session[:user].role_id == 2 %>

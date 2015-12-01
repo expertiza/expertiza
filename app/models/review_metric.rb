@@ -4,7 +4,7 @@ class ReviewMetric < ActiveRecord::Base
 	
 	@answer = Answer.where ("response_id = #{self.response_id}")
 	offensive_words = {:anal => "offensive", :anus => "offensive", :arse => "offensive",:ass => "offensive", :ballsack => "offensive"}
-	suggestion_words = {:should => "suggestion", :advise => "suggestion", :recommend => "suggestion", :recommendable => "suggestion", :recommendation => "suggestion", :ery => "suggestion" }
+	suggestion_words = {:should => "suggestion", :advise => "suggestion", :recommend => "suggestion", :recommendable => "suggestion", :recommendation => "suggestion", :try => "suggestion" }
 	error_words = {:wrong => "error", :error => "error", :problem => "error", :issue => "error", :problematic => "error", :incorrect => "error"}
 	@total_word_count = 0
 	@offensive_count = 0

@@ -311,18 +311,14 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @map.save
 
+       
     #TEXT_METRIC_CODE
-    @reviewMetric = ReviewMetric.new
-<<<<<<< HEAD
-    
-    @response_all = Response.where("@map.id = #{@map.id}")
+    @reviewMetric = ReviewMetric.new    
+    @response_all = Response.where("map_id = #{@map.id}")
     @reviewMetric.response_id = @response_all [@response_all.count - 1][:id]
-=======
-    @reviewMetric.response_id = Response.find_by_map_id(@map.id).id
-    @reviewMetric.assignment_id=@map.assignment.id
->>>>>>> 1dc1c63f325598e560652b35e6c66af870445ba5
     #@reviewMetric.response_id = Response.where(map_id: @map.id).id
     @reviewMetric.calulate_metric
+    #####################
     #####################
 
 redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]

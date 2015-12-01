@@ -5,13 +5,7 @@ class ReviewChat < ActiveRecord::Base
       defn = Hash.new
       defn[:body] = Hash.new
       defn[:body][:partial_name] = partial
-      #response_map = ResponseMap.find map_id
-      #assignment=nil
       reviewer_email=User.find(reviewer_id).email
-      #reviewer_participant_id =  response_map.reviewer_id
-      #participant = Participant.find(reviewer_participant_id)
-      #assignment = Assignment.find(participant.parent_id)
-
     defn[:subject] = "Response posted for submission"
     defn[:body][:type] = " response has been posted for your query .
     Please open the below URL to view.

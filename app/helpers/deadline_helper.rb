@@ -45,31 +45,36 @@ module DeadlineHelper
         offset = days_between_submissions
       end
 
-      set_of_topic.each { |topic_id|
-        #if the due dates have already been created and the save dependency is being clicked,
-        #then delete existing n create again
-        prev_saved_due_dates = TopicDeadline.where(topic_id: topic_id)
+      check_dependency(set_of_topic, set_of_due_dates, offset)
 
-        #Only if there is a dependency for the topic
-        if !prev_saved_due_dates.nil?
-          num_due_dates = prev_saved_due_dates.length
-          #for each due date in the current topic he want to compare it to the previous due date
-          for x in 0..num_due_dates - 1
-            #we don't want the old date to move earlier in time so we save it as the new due date and destroy the old one
-            if DateTime.parse(set_of_due_dates[x].due_at.to_s) + offset.to_i < DateTime.parse(prev_saved_due_dates[x].due_at.to_s)
-              set_of_due_dates[x] = prev_saved_due_dates[x]
-              offset = 0
-            end
-            prev_saved_due_dates[x].destroy
-          end
-        end
-
-        set_of_due_dates.each_with_index {|due_date, index|
-          create_topic_deadline(due_date, offset, topic_id)
-        }
-      }
       i = i+1
     }
 
+  end
+
+  def self.check_dependency(set_of_topic, set_of_due_dates, offset)
+    set_of_topic.each { |topic_id|
+      #if the due dates have already been created and the save dependency is being clicked,
+      #then delete existing n create again
+      prev_saved_due_dates = TopicDeadline.where(topic_id: topic_id)
+
+      #Only if there is a dependency for the topic
+      if !prev_saved_due_dates.nil?
+        num_due_dates = prev_saved_due_dates.length
+        #for each due date in the current topic he want to compare it to the previous due date
+        for x in 0..num_due_dates - 1
+          #we don't want the old date to move earlier in time so we save it as the new due date and destroy the old one
+          if DateTime.parse(set_of_due_dates[x].due_at.to_s) + offset.to_i < DateTime.parse(prev_saved_due_dates[x].due_at.to_s)
+            set_of_due_dates[x] = prev_saved_due_dates[x]
+            offset = 0
+          end
+          prev_saved_due_dates[x].destroy
+        end
+      end
+
+      set_of_due_dates.each_with_index {|due_date, index|
+        create_topic_deadline(due_date, offset, topic_id)
+      }
+    }
   end
 end

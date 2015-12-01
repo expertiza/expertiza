@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base
   include AccessHelper
-
+  include SimpleCaptcha::ControllerHelpers
   if Rails.env.production?
     #forcing SSL only in the production mode
     force_ssl

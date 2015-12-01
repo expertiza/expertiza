@@ -4,13 +4,9 @@
   <div class="login-panel">
 
   <% if not session[:user] %>
-<<<<<<< HEAD
-    <%= render :partial => 'auth/login'%><br/>
-=======
    
->>>>>>> e063c2310a81e43f07e67020c276e6ee7144b3b5
     <% if session[:user].nil? %>
-    <%= render :partial => 'auth/login' %><br/> 
+    <%= render :partial => 'auth/relogin' %><br/> 
 
     <% else %>
       <% if session[:user].role_id == 4 || session[:user].role_id == 3 || session[:user].role_id == 2 %>

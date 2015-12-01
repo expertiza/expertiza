@@ -55,6 +55,14 @@ gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
+gem 'rmagick'
+# Captcha
+#gem 'simple_captcha', :git => 'git://github.com/galetahub/simple-captcha.git'
+#gem "galetahub-simple_captcha", :require => "simple_captcha"
+#gem "recaptcha", require: "recaptcha/rails"
+gem 'simple_captcha2', require: 'simple_captcha'
+gem 'imagemagick-identify', '~> 0.0.1'
+gem 'paperclip', '~> 4.2.1'
 
 group :development do
   gem 'daemons'

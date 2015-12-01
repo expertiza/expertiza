@@ -30,8 +30,9 @@ class SubmissionHistory < ActiveRecord::Base
 								  event_time:Time.now)
   end
 
-  def self.create_hyperlink_submission_event(participant_id, hyperlink)
-    ev = SubmissionHistory.create(participant_id:participant_id, 
+  def self.create_hyperlink_submission_event(participant_id, team_id, hyperlink)
+    ev = SubmissionHistory.create(participant_id:participant_id,
+                                  team_id:team_id,
 								  artifact_name:hyperlink, 
 								  artifact_type:ARTIFACT_TYPE_HYPERLINK, 
 								  event:self.events[:EVENT_HYPERLINK_SUBMITTED], 

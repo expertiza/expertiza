@@ -1,0 +1,2 @@
+class ReviewMetricsController < ApplicationController
+end

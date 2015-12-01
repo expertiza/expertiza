@@ -1,34 +1,43 @@
+
+
 <h1>Summary report for <%= @assignment.name %></h1>
 <BR/>
 
 <h1>Summary report for team <%= @team.name %></h1>
 <h1>Summary report for part <%= @participant.fullname %></h1>
-
-<h1># of reviews: <%= @reviews.length().to_s %></h1>
-
-
+ <h1># of reviews: <%= @reviews.length().to_s %></h1>
 <h1># of answers: <%= @answers.length().to_s %></h1>
+<h2>first review: <%= @reviews.length.to_s %></h2>
 
+<% @vmlist.each do |vm| %>
 
 <table style="border: 1px solid black">
          <tr>          <td>Question</td>      <td>Weight</td>
-  <% @reviews.each do |review| %>
+           <% i = 1 %>
+           <% vm.listofreviews.each do |review| %>
+               <td style="border: 1px solid black"> <a href= "../grades/view_reviewer?id=<%=@participant.id%>&reviewer_id=<%= review.id.to_s %>"><%= "Rev" + i.to_s %></a>  </td>
 
-        <td style="border: 1px solid black"> <%= review.id %>   </td>
-  <% end %>
+               <% i += 1 %>
+           <% end %>
+           <td># of comments >10</td>
   </tr>
 
-    <% @vm.listofrows.each do |item| %>
+    <% vm.listofrows.each do |item| %>
         <tr>
-          <td style="border: 1px solid black;"> <%= item.questionText[0...25] %>   </td>
+          <td style="border: 1px solid black;"> <%= item.questionText[0...100] %>   </td>
           <td style="border: 1px solid black;"> <%= item.weight %>   </td>
           <% for index in 0 .. item.score_row.length - 1 %>
-              <td style="border: 1px solid black"><%= item.score_row[index].to_s %></td>
+              <td style="border: 1px solid black"><%= item.score_row[index].score_value.to_s %></td>
           <% end %>
+          <td style="border: 1px solid black;"> <%= item.countofcomments.to_s %>   </td>
         </tr>
     <% end %>
   </table>
-</table>
+<span>  Team members:
+<% vm.listofteamparticipants.each do |participant| %>
+  <%= participant.fullname %>,
+<% end %>
+    </span>
 
-
-
+  <br/>   <br/>
+<% end %>

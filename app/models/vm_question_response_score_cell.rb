@@ -1,3 +1,11 @@
 class VmQuestionResponseScoreCell
-  # To change this template use File | Settings | File Templates.
+
+  def initialize(score_value, color_code)
+    @score_value = score_value
+    @color_code = color_code
+  end
+
+  def score_value
+    @score_value
+  end
 end

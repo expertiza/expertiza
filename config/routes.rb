@@ -124,6 +124,7 @@ Expertiza::Application.routes.draw do
     collection do
       get :view
       get :view_team
+      get :view_reviewer
       get :view_my_scores
       get :view_my_scores_new
       get :instructor_review

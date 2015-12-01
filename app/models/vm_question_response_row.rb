@@ -5,7 +5,17 @@ class VmQuestionResponseRow
     @question_id = question_id
     @weight = weight
     @score_row = Array.new
+    @countofcomments = 0
   end
+
+  def countofcomments
+    @countofcomments
+  end
+
+  def countofcomments=(newcount)
+    @countofcomments = newcount
+  end
+
 
   def questionText
     @questionText

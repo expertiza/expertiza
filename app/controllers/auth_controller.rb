@@ -20,16 +20,52 @@ class AuthController < ApplicationController
     else
        user = User.find_by_login(params[:login][:name])
        #aise "error"
+    if(user.next_login_time<=DateTime.now)
        if user and user.valid_password?(params[:login][:password])
-         after_login(user)
+        if (user.login_attempts >= 3)
+          AuthController.clear_session(session)
+          render 'content_pages/relogin'
+        else
+          user.login_attempts=0
+          user.save
+          after_login(user)
+        end
        else
-         logger.warn "Failed login attempt"
-         flash[:error] = "Incorrect Name/Password"
-         redirect_to :controller => 'content_pages', :action => 'view'
+        failed_login(user)
        end
+      else
+        flash[:error] = "Wait till #{user.next_login_time} for next login attempt"
+        redirect_to :controller => 'content_pages', :action => 'view', :locals => {:attempts => '0'}
+      end
     end
   end  #def login
 
+  ##Refactor this
+  def failed_login(user)
+    if(user.login_attempts < 3)
+     user.login_attempts=user.login_attempts+1
+     user.save
+     logger.warn "Failed login attempt"
+     flash[:error] = "Incorrect Name/Password"
+     redirect_to :controller => 'content_pages', :action => 'view', :locals => {:attempts => '0'}
+    else
+      exponential_backoff(user)
+    end
+  end 
+ #def login
+
+  def exponential_backoff(user)
+    # function to handle exponential backoff afterfailedlogin attempt
+    user.login_attempts=user.login_attempts+1
+    interval=2**(user.login_attempts-3)
+    user.next_login_time=DateTime.now+interval.minutes
+    user.save
+    @newuser = user
+    logger.warn "Failed login attempt: Account Blocked"
+    flash[:error] = "Account is Blocked for #{interval} minutes"
+    redirect_to :controller => 'content_pages', :action => 'view'
+  end
+>>>>>>> parent of d3ab0cb... Updated code for CAPTCHA and reverted changes in user.rb
   # function to handle common functionality for conventional user login and google login
   def after_login (user)
     session[:user] = user

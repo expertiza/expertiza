@@ -3,7 +3,7 @@
   <h1>Welcome.</h1>
   <div class="login-panel">
   <% if not session[:user] %>
-    <%= render :partial => 'auth/login'%><br/>
+    <%= render :partial => 'auth/login' %><br/>
     <% if session[:user].nil? %>
     <% else %>
       <% if session[:user].role_id == 4 || session[:user].role_id == 3 || session[:user].role_id == 2 %>

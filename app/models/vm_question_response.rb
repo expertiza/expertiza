@@ -34,7 +34,7 @@ class VmQuestionResponse
         end
       
         # Now construct the color code and we're good to go!
-        color_code = "c" + color_code_number
+        color_code = "c#{color_code_number}"
         
         row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code))
       end

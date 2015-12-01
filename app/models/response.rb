@@ -168,7 +168,7 @@ class Response < ActiveRecord::Base
     is_valid
   end
 
-def self.chat_email (id,partial="new_chatemail")
+  def self.chat_email_query(id,partial="new_chatemail")
   defn = Hash.new
   defn[:body] = Hash.new
   defn[:body][:partial_name] = partial
@@ -180,7 +180,7 @@ def self.chat_email (id,partial="new_chatemail")
   to_mail_list = Array.new
   teams_users.each do |teams_user|
   to_mail_list << User.find(teams_user.user_id).email 
-end
+    end
 
   #reviewer_participant_id =  response_map.reviewer_id
   #participant = Participant.find(reviewer_participant_id)
@@ -200,6 +200,8 @@ end
     defn[:to] = to_mail_list
     Mailer.sync_message(defn).deliver
   end
+
+
 
   # only two types of responses more should be added
   def email (partial="new_submission")

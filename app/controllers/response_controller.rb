@@ -312,11 +312,11 @@ class ResponseController < ApplicationController
 
 
   def submitted_question
-     @map = ResponseMap.find(params[:id])
+      @map = ResponseMap.find(params[:id])
       ReviewChat.create(:assignment_id => @map.assignment.id,:reviewer_id => @map.reviewer_id, :team_id=>@map.reviewee_id, :type_flag => 'Q' , :content => params[:review_question])
       flash[:notice]="Question has been submitted to Author"
       @interaction_id=ReviewChat.where(:reviewer_id => @map.reviewer_id).where(:team_id => @map.reviewee_id)
-      Response.chat_email(@interaction_id[0].id)
+      ReviewChat.chat_email_query(@interaction_id.first.id)
       redirect_to action: 'new', id: params[:id]
   end
 

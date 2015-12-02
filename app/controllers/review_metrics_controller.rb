@@ -13,6 +13,9 @@ class ReviewMetricsController < ApplicationController
   def list
 
     @map_id = params[:id]
+    @map = ResponseMap.find_by_id(@map_id)
+    @assignment = Assignment.find_by_id(@map.reviewed_object_id).name
+    @team_reviewed = User.find_by_id(Participant.find_by_id(@map.reviewee_id))
     @response_id = Array.new
     @metrics = Array.new
     @responses = Response.where ("map_id = #{@map_id}")

@@ -1,15 +1,47 @@
-<div class="topictable">
-<th>
-<td>Response Id</td>
-<td>Total Words</td>
-<td>Different Words</td>
-</th>
+
+<h2>Text Metrics for <%=@assignment %></h2>
+<div class="topictable" >
+  <table class="table" cellpadding="2" align="center">
+    <tr class="taskheader">
+        <th>&nbsp;</th>
+        <th>Round</th>
+        <th>Updated At</th>
+        <th>Total Words</th>
+        <th>Different Words</th>
+        <th>Suggestions Provided</th>
+        <th>Problems Pointed</th>
+        <th>Offensive Language Used</th>
+        <th>Complete Sentences</th>
+    </tr>
 <% @metrics.each do |review_metric| %>
-<tr>
-  <td><%= review_metric.response_id %></td>
+<tr class="listingRow">
+  <td>&nbsp;</td>
+  <td><%= Response.find_by_id(review_metric.response_id).round %></td>
+  <td><%= Response.find_by_id(review_metric.response_id).updated_at %></td>
   <td><%= review_metric.total_word_count %></td>
   <td><%= review_metric.diff_word_count %></td>
-</tr>
+  <% if review_metric.suggestion_count > 0 %>
+      <td>Yes</td>
+  <% else %>
+      <td>No</td>
+  <% end %>
+  <% if review_metric.error_count > 0 %>
+      <td>Yes</td>
+  <% else %>
+      <td>No</td>
+  <% end %>
+  <% if review_metric.offensive_count > 0 %>
+      <td>Yes</td>
+  <% else %>
+      <td>No</td>
+  <% end %>
+  <td><%= review_metric.complete_count %></td>
+     </tr>
+  <% end %>
 
-<% end %>
-    </div>
+  </table>
+
+<br/>
+
+<a href="javascript:window.history.back()">Back</a>
+</div>

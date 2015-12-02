@@ -36,20 +36,28 @@ class ReviewMetric < ActiveRecord::Base
 
 	suggestion_words.each { |key, word|
 		(0..@answer.count-1).each do |i|
+			@temp_val = 0
 			@answer[i][:comments].split.each do |word|
 				if word.eql?key.to_s
-					@suggestion_count = @suggestion_count + 1
+					@temp_val = 1
 				end
-				end
+			end
+			if @temp_val == 1
+				@suggestion_count = @suggestion_count + 1
+			end
 		end
 	}
 
 	error_words.each { |key, word|
 		(0..@answer.count-1).each do |i|
+			@temp_val = 0
 			@answer[i][:comments].split.each do |word|
 				if word.eql?key.to_s
-				@error_count = @error_count + 1
+					@temp_val = 1
 				end
+			end
+			if @temp_val == 1
+				@error_count = @error_count + 1
 			end
 		end
 	}

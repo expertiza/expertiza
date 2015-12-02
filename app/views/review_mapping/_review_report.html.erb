@@ -12,6 +12,9 @@
       <th width = "20%">
         Team reviewed
       </th>
+       <th width = "20%">
+        Review Metrics
+      </th>
       <th width = "8%">
         Score awarded
       </th>
@@ -93,6 +96,15 @@
                 <%end %>
                     <%= link_to Team.find(ri.reviewee_id).name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
                   </td>
+
+                <% if (@l%2) == 0 %>
+                  <td id = "green" bgcolor="#ffffff" align = 'left' colspan=1>
+                <%else %>
+                  <td id = "green" bgcolor="#DDDDBB" align = 'left' colspan=1>
+                <%end %>
+                    <%= link_to Team.find(ri.reviewee_id).name, :controller => 'review_metrics', :action => 'list', :id => ri.id %>
+                  </td>
+
                   <%= render :partial => 'teamscore' %>
 
                   <% if (@l%2) == 0 %>
@@ -141,6 +153,17 @@
                           <% @teamid = @team.id%>
                           <%= link_to Team.find(ri.reviewee_id).name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => nil, :assignment_id=>@id %>
                         </td>
+
+                        <% if (@l%2) == 0 %>
+                          <td id = "red" bgcolor="#ffffff" style ="color:#DD3300" align = 'left' colspan=1>
+                        <%else %>
+                          <td id = "red" bgcolor="#DDDDBB" style ="color:#DD3300" align = 'left' colspan=1>
+                        <%end %>
+                          <%@team = Team.find(ri.reviewee_id) %>
+                          <% @teamid = @team.id%>
+                          <%= link_to Team.find(ri.reviewee_id).name, :controller => 'review_metrics', :action => 'list', :id => ri.id %>
+                        </td>
+
                         <%= render :partial => 'teamscore' %>
                         <% if (@l%2) == 0 %>
                           <td bgcolor="#ffffff" style ="color:#DD3300" align = 'left'>

@@ -317,7 +317,9 @@ class ResponseController < ApplicationController
     @response_all = Response.where("map_id = #{@map.id}")
     
     @reviewMetric = ReviewMetric.find_by_response_id (@response_all[@response_all.count - 1][:id])
-    if !@reviewMetric
+    
+
+    unless @reviewMetric.nil?
 	{
 	@reviewMetric=ReviewMetric.new
 	@reviewMetric.response_id = @response_all[@response_all.count - 1][:id]

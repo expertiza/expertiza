@@ -186,55 +186,55 @@ ControllerAction.create(:site_controller_id => SiteController.find_by_name('join
 
 puts 'ControllerAction'
 ###### menu_items
-MenuItem.create(:parent_id => nil, :name => 'home', :label => 'Home', :seq => 1, :content_page_id => ContentPage.find_by_name('home').id, 
+MenuItem.create(:parent_id => nil, :name => 'home', :label => 'Home', :seq => 1, :content_page_id => ContentPage.find_by_name('home').id,
   :controller_action_id => nil)
-MenuItem.create(:parent_id => nil, :name => 'admin', :label => 'Administration', :seq => 2, :content_page_id => ContentPage.find_by_name('site_admin').id, 
+MenuItem.create(:parent_id => nil, :name => 'admin', :label => 'Administration', :seq => 2, :content_page_id => ContentPage.find_by_name('site_admin').id,
   :controller_action_id => nil)
-MenuItem.create(:parent_id => nil, :name => 'manage instructor content', :label => 'Manage...', :seq => 3, :content_page_id => nil, 
+MenuItem.create(:parent_id => nil, :name => 'manage instructor content', :label => 'Manage...', :seq => 3, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('tree_display').id, name:  'drill').first.id)
-MenuItem.create(:parent_id => nil, :name => 'Survey Deployments', :label => 'Survey Deployments', :seq => 4, :content_page_id => nil, 
+MenuItem.create(:parent_id => nil, :name => 'Survey Deployments', :label => 'Survey Deployments', :seq => 4, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('survey_deployment').id, name:  'list').first.id)
-MenuItem.create(:parent_id => nil, :name => 'student_task', :label => 'Assignments', :seq => 8, :content_page_id => nil, 
+MenuItem.create(:parent_id => nil, :name => 'student_task', :label => 'Assignments', :seq => 8, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('student_task').id, name:  'list').first.id)
-MenuItem.create(:parent_id => nil, :name => 'profile', :label => 'Profile', :seq => 9, :content_page_id => nil, 
+MenuItem.create(:parent_id => nil, :name => 'profile', :label => 'Profile', :seq => 9, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('profile').id, name:  'edit').first.id)
-MenuItem.create(:parent_id => nil, :name => 'contact_us', :label => 'Contact Us', :seq => 10, :content_page_id => ContentPage.find_by_name('contact_us').id, 
+MenuItem.create(:parent_id => nil, :name => 'contact_us', :label => 'Contact Us', :seq => 10, :content_page_id => ContentPage.find_by_name('contact_us').id,
   :controller_action_id => nil)
-MenuItem.create(:parent_id => MenuItem.find_by_name('home').id, :name => 'leaderboard', :label => 'Leaderboard', :seq => 1, :content_page_id => nil, 
+MenuItem.create(:parent_id => MenuItem.find_by_name('home').id, :name => 'leaderboard', :label => 'Leaderboard', :seq => 1, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('leaderboard').id, name:  'index').first.id)
-MenuItem.create(:parent_id => MenuItem.find_by_name('contact_us').id, :name => 'credits', :label => 'Credits &amp; Licence', :seq => 1, :content_page_id => ContentPage.find_by_name('credits').id, 
+MenuItem.create(:parent_id => MenuItem.find_by_name('contact_us').id, :name => 'credits', :label => 'Credits &amp; Licence', :seq => 1, :content_page_id => ContentPage.find_by_name('credits').id,
   :controller_action_id => nil)
-MenuItem.create(:parent_id => MenuItem.find_by_name('admin').id, :name => 'setup', :label => 'Setup', :seq => 1, :content_page_id => ContentPage.find_by_name('site_admin').id, 
+MenuItem.create(:parent_id => MenuItem.find_by_name('admin').id, :name => 'setup', :label => 'Setup', :seq => 1, :content_page_id => ContentPage.find_by_name('site_admin').id,
   :controller_action_id => nil)
-MenuItem.create(:parent_id => MenuItem.find_by_name('admin').id, :name => 'show', :label => 'Show...', :seq => 2, :content_page_id => nil, 
+MenuItem.create(:parent_id => MenuItem.find_by_name('admin').id, :name => 'show', :label => 'Show...', :seq => 2, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('users').id, name:  'list').first.id)
-MenuItem.create(:parent_id => MenuItem.find_by_name('setup').id, :name => 'setup/roles', :label => 'Roles', :seq => 2, :content_page_id => nil, 
+MenuItem.create(:parent_id => MenuItem.find_by_name('setup').id, :name => 'setup/roles', :label => 'Roles', :seq => 2, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('roles').id, name:  'list').first.id)
-MenuItem.create(:parent_id => MenuItem.find_by_name('setup').id, :name => 'setup/permissions', :label => 'Permissions', :seq => 3, :content_page_id => nil, 
+MenuItem.create(:parent_id => MenuItem.find_by_name('setup').id, :name => 'setup/permissions', :label => 'Permissions', :seq => 3, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('permissions').id, name:  'list').first.id)
-MenuItem.create(:parent_id => MenuItem.find_by_name('setup').id, :name => 'setup/controllers', :label => 'Controllers / Actions', :seq => 4, :content_page_id => nil, 
+MenuItem.create(:parent_id => MenuItem.find_by_name('setup').id, :name => 'setup/controllers', :label => 'Controllers / Actions', :seq => 4, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('site_controllers').id, name:  'list').first.id)
-MenuItem.create(:parent_id => MenuItem.find_by_name('setup').id, :name => 'setup/pages', :label => 'Content Pages', :seq => 5, :content_page_id => nil, 
+MenuItem.create(:parent_id => MenuItem.find_by_name('setup').id, :name => 'setup/pages', :label => 'Content Pages', :seq => 5, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('content_pages').id, name:  'list').first.id)
-MenuItem.create(:parent_id => MenuItem.find_by_name('setup').id, :name => 'setup/menus', :label => 'Menu Editor', :seq => 6, :content_page_id => nil, 
+MenuItem.create(:parent_id => MenuItem.find_by_name('setup').id, :name => 'setup/menus', :label => 'Menu Editor', :seq => 6, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('menu_items').id, name:  'list').first.id)
-MenuItem.create(:parent_id => MenuItem.find_by_name('setup').id, :name => 'setup/system_settings', :label => 'System Settings', :seq => 7, :content_page_id => nil, 
+MenuItem.create(:parent_id => MenuItem.find_by_name('setup').id, :name => 'setup/system_settings', :label => 'System Settings', :seq => 7, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('system_settings').id, name:  'list').first.id)
-MenuItem.create(:parent_id => MenuItem.find_by_name('Survey Deployments').id, :name => 'Statistical Test', :label => 'Statistical Test', :seq => 3, :content_page_id => nil, 
+MenuItem.create(:parent_id => MenuItem.find_by_name('Survey Deployments').id, :name => 'Statistical Test', :label => 'Statistical Test', :seq => 3, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('statistics').id, name:  'list_surveys').first.id)
-MenuItem.create(:parent_id => MenuItem.find_by_name('manage instructor content').id, :name => 'manage/users', :label => 'Users', :seq => 1, :content_page_id => nil, 
+MenuItem.create(:parent_id => MenuItem.find_by_name('manage instructor content').id, :name => 'manage/users', :label => 'Users', :seq => 1, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('users').id, name:  'list').first.id)
-MenuItem.create(:parent_id => MenuItem.find_by_name('manage instructor content').id, :name => 'manage/questionnaires', :label => 'Questionnaires', :seq => 2, :content_page_id => nil, 
+MenuItem.create(:parent_id => MenuItem.find_by_name('manage instructor content').id, :name => 'manage/questionnaires', :label => 'Questionnaires', :seq => 2, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('tree_display').id, name:  'goto_questionnaires').first.id)
-MenuItem.create(:parent_id => MenuItem.find_by_name('manage instructor content').id, :name => 'manage/courses', :label => 'Courses', :seq => 3, :content_page_id => nil, 
+MenuItem.create(:parent_id => MenuItem.find_by_name('manage instructor content').id, :name => 'manage/courses', :label => 'Courses', :seq => 3, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('tree_display').id, name:  'goto_courses').first.id)
-MenuItem.create(:parent_id => MenuItem.find_by_name('manage instructor content').id, :name => 'manage/assignments', :label => 'Assignments', :seq => 4, :content_page_id => nil, 
+MenuItem.create(:parent_id => MenuItem.find_by_name('manage instructor content').id, :name => 'manage/assignments', :label => 'Assignments', :seq => 4, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('tree_display').id, name:  'goto_assignments').first.id)
-MenuItem.create(:parent_id => MenuItem.find_by_name('manage instructor content').id, :name => 'impersonate', :label => 'Impersonate User', :seq => 5, :content_page_id => nil, 
+MenuItem.create(:parent_id => MenuItem.find_by_name('manage instructor content').id, :name => 'impersonate', :label => 'Impersonate User', :seq => 5, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('impersonate').id, name:  'start').first.id)
-MenuItem.create(:parent_id => MenuItem.find_by_name('manage/questionnaires').id, :name => 'manage/questionnaires/review rubrics', :label => 'Review rubrics', :seq => 1, :content_page_id => nil, 
+MenuItem.create(:parent_id => MenuItem.find_by_name('manage/questionnaires').id, :name => 'manage/questionnaires/review rubrics', :label => 'Review rubrics', :seq => 1, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('tree_display').id, name:  'goto_review_rubrics').first.id)
-MenuItem.create(:parent_id => MenuItem.find_by_name('manage/questionnaires').id, :name => 'manage/questionnaires/metareview rubrics', :label => 'Metareview rubrics', :seq => 2, :content_page_id => nil, 
+MenuItem.create(:parent_id => MenuItem.find_by_name('manage/questionnaires').id, :name => 'manage/questionnaires/metareview rubrics', :label => 'Metareview rubrics', :seq => 2, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('tree_display').id, name:  'goto_metareview_rubrics').first.id)
 MenuItem.create(:parent_id => MenuItem.find_by_name('manage/questionnaires').id, :name => 'manage/questionnaires/teammate review rubrics', :label => 'Teammate review rubrics', :seq => 3, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('tree_display').id, name:  'goto_teammatereview_rubrics').first.id)
@@ -246,7 +246,7 @@ MenuItem.create(:parent_id => MenuItem.find_by_name('manage/questionnaires').id,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('tree_display').id, name:  'goto_surveys').first.id)
 MenuItem.create(:parent_id => MenuItem.find_by_name('manage/questionnaires').id, :name => 'manage/questionnaires/course evaluations', :label => 'Course evaluations', :seq => 7, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('tree_display').id, name:  'goto_surveys').first.id)
-MenuItem.create(:parent_id => MenuItem.find_by_name('show').id, :name => 'show/institutions', :label => 'Institutions', :seq => 1, :content_page_id => nil, 
+MenuItem.create(:parent_id => MenuItem.find_by_name('show').id, :name => 'show/institutions', :label => 'Institutions', :seq => 1, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('institution').id, name:  'list').first.id)
 MenuItem.create(:parent_id => MenuItem.find_by_name('show').id, :name => 'show/super-administrators', :label => 'Super-Administrators', :seq => 2, :content_page_id => nil,
                 :controller_action_id => ControllerAction.where(site_controller_id: SiteController.find_by_name('admin').id, name:  'list_super_administrators').first.id)
@@ -297,10 +297,10 @@ tu = User.find_by_name('admin') || User.new
 tu.attributes = {:name => 'admin',
              :email => 'anything@mailinator.com',
              crypted_password: 'd033e22ae348aeb5660fc2140aec35850c4da997', # admin
-             :role_id => Role.find_by_name('Super-Administrator').id, 
-             :email_on_review => true, 
-             :email_on_submission => true, 
-             :email_on_review_of_review => true, 
+             :role_id => Role.find_by_name('Super-Administrator').id,
+             :email_on_review => true,
+             :email_on_submission => true,
+             :email_on_review_of_review => true,
              :is_new_user => false,
              :master_permission_granted => false}
 tu.parent_id = tu.id

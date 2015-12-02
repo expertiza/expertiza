@@ -10,7 +10,7 @@ class CourseController < ApplicationController
   require 'fileutils'
 
   def action_allowed?
-    current_role_name.eql?("Instructor")
+    current_role_name.eql?("Instructor") ||  current_role_name.eql?("demo_instructor")
   end
 
   def auto_complete_for_user_name

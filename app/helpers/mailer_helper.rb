@@ -1,7 +1,9 @@
 module MailerHelper
   def self.send_mail_to_user(user,subject,partial_name,password)
+    puts "*************************************"
     Mailer.generic_message ({
       :to => user.email,
+      :cc => user.email,
       :subject => subject,
       :body => {
         :user         => user,

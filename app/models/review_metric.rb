@@ -29,7 +29,7 @@ class ReviewMetric < ActiveRecord::Base
 				if word.eql?key.to_s
 					@offensive_count = @offensive_count + 1
 				end
-				@diff_word_count = @answer[i][:comments].split.uniq.count
+				@diff_word_count += @answer[i][:comments].split.uniq.count
 			end
 		end
 			}

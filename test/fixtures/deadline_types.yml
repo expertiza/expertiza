@@ -1,3 +1,4 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 deadline_type_submission:
   name: submission
 deadline_type_review:

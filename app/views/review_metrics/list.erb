@@ -1,0 +1,15 @@
+<div class="topictable">
+<th>
+<td>Response Id</td>
+<td>Total Words</td>
+<td>Different Words</td>
+</th>
+<% @metrics.each do |review_metric| %>
+<tr>
+  <td><%= review_metric.response_id %></td>
+  <td><%= review_metric.total_word_count %></td>
+  <td><%= review_metric.diff_word_count %></td>
+</tr>
+
+<% end %>
+    </div>

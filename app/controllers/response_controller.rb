@@ -315,7 +315,7 @@ class ResponseController < ApplicationController
     #TEXT_METRIC_CODE
     @reviewMetric = ReviewMetric.new    
     @response_all = Response.where("map_id = #{@map.id}")
-    @reviewMetric.response_id = @response_all [@response_all.count - 1][:id]
+    @reviewMetric.response_id = @response_all[@response_all.count - 1][:id]
     #@reviewMetric.response_id = Response.where(map_id: @map.id).id
     @reviewMetric.calulate_metric
     #####################

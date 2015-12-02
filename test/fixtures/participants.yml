@@ -5,7 +5,7 @@ participant1:
   type: AssignmentParticipant
 
 participant2:
-  id: 2
+  id: 10
   user_id:  10
   parent_id:  1
   type: AssignmentParticipant

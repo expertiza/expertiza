@@ -11,6 +11,10 @@ assignment1:
   updated_at: 2015-10-20 13:44:20
   name: assignment1
   max_team_size: 3
+  course_id: 1
+  wiki_type_id: 1
+  instructor_id: 6
+  directory_path: "assignment1"
 
 assignment2:
   id: 2
@@ -18,6 +22,7 @@ assignment2:
   updated_at: 2015-10-20 13:44:20
   name: assignment2
   max_team_size: 3
+  wiki_type_id: 1
 
 assignment3:
   id: 3
@@ -25,6 +30,7 @@ assignment3:
   updated_at: 2015-10-20 13:44:20
   name: assignment3
   max_team_size: 3
+  wiki_type_id: 1
 
 assignment6:
   id: 6
@@ -32,6 +38,7 @@ assignment6:
   updated_at: 2015-10-20 13:44:20
   name: assignment6
   max_team_size: 3
+  wiki_type_id: 1
 
 assignment83797495:
   id: 83797495
@@ -39,3 +46,4 @@ assignment83797495:
   updated_at: 2015-10-20 13:44:20
   name: assignment83797495
   max_team_size: 3
+  wiki_type_id: 1

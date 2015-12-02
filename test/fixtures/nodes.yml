@@ -9,3 +9,9 @@ node2:
   parent_id: 1
   node_object_id: 4
   type: TeamNode
+
+node3:
+  id: 3
+  parent_id: 1
+  node_object_id: 4
+  type: TeamNode

@@ -8,6 +8,7 @@ course0:
   created_at: '2015-10-22 01:02:03'
   private: false
   institutions_id: 123
+  directory_path: "CSC517"
 
 course1:
   name: "Continuation of Garbage"

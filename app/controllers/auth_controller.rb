@@ -21,7 +21,13 @@ class AuthController < ApplicationController
        user = User.find_by_login(params[:login][:name])
        #aise "error"
     if(user.next_login_time<=DateTime.now)
-      authentication(user)
+       if user and user.valid_password?(params[:login][:password]) && simple_captcha_valid?
+        user.login_attempts=0
+        user.save
+        after_login(user)
+       else
+        failed_authentication(user)
+       end
       else
         flash[:error] = "Wait till #{user.next_login_time} for next login attempt"
         redirect_to :controller => 'content_pages', :action => 'view'
@@ -40,7 +46,13 @@ class AuthController < ApplicationController
           AuthController.clear_session(session)
           render 'content_pages/relogin'
       else
-       authentication(user)
+       if user and user.valid_password?(params[:login][:password])
+          user.login_attempts=0
+          user.save
+          after_login(user)
+       else
+        failed_authentication(user)
+       end
       end
       else
         flash[:error] = "Wait till #{user.next_login_time} for next login attempt"
@@ -48,16 +60,6 @@ class AuthController < ApplicationController
       end
     end
   end  #def login
-
-  def authentication(user)
-     if user and user.valid_password?(params[:login][:password])
-        user.login_attempts=0
-        user.save
-        after_login(user)
-     else
-      failed_authentication(user)
-     end
-  end
 
   def failed_authentication(user)
     if(user.login_attempts < 3)

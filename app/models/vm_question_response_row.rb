@@ -1,9 +1,10 @@
 class VmQuestionResponseRow
 
-  def initialize(questionText, question_id, weight)
+  def initialize(questionText, question_id, weight, question_max_score)
     @questionText = questionText
     @question_id = question_id
     @weight = weight
+    @question_max_score = question_max_score
     @score_row = Array.new
     @countofcomments = 0
   end
@@ -31,6 +32,21 @@ class VmQuestionResponseRow
 
   def weight
     @weight
+  end
+  
+  def question_max_score
+    @question_max_score
+  end
+  
+  def average_score_for_row
+    row_average_score = 0.0
+    @score_row.each do |score|
+      if score.score_value.is_a? Numeric
+        row_average_score += score.score_value.to_f
+      end
+    end
+    row_average_score /= @score_row.length.to_f
+    row_average_score.round(2)
   end
 
 end

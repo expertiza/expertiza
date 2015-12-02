@@ -8,4 +8,9 @@ class VmQuestionResponseScoreCell
   def score_value
     @score_value
   end
+  
+  def color_code
+    @color_code
+  end
+  
 end

@@ -1,0 +1,36 @@
+/* These are the colors used for coloring
+ * score cells within the heatgrid for the
+ * grades view.
+ */
+
+/* This is a null space in the table. Just leave
+ * it the way it is for now. 
+ */
+.c0 {
+
+}
+
+/* This is a red, indicative of a poor score. */
+.c1 {
+  background-color: #FB464C;
+}
+
+/* This is an orange. */
+.c2 {
+  background-color: #FD992D;
+}
+
+/* This is a yellow, indicative of a median score. */
+.c3 {
+  background-color: #FEEC12;
+}
+
+/* This is a light green. */
+.c4 {
+  background-color: #8CE529;
+}
+
+/* This is a green, indicative of a good score. */
+.c5 {
+  background-color: #2DE636;
+}

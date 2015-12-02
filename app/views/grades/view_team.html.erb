@@ -11,27 +11,63 @@
 
 <% @vmlist.each do |vm| %>
 
-<table style="border: 1px solid black">
-         <tr>          <td>Question</td>      <td>Weight</td>
-           <% i = 1 %>
-           <% vm.listofreviews.each do |review| %>
-               <td style="border: 1px solid black"> <a href= "../grades/view_reviewer?id=<%=@participant.id%>&reviewer_id=<%= review.id.to_s %>"><%= "Rev" + i.to_s %></a>  </td>
+  <table style="border: 1px solid black">
+    <tr>
+      <th style="border: 1px solid black">
+        Question
+      </th>
+      <th style="border: 1px solid black">
+        Weight
+      </th>
+      <% i = 1 %>
+      <% vm.listofreviews.each do |review| %>
+        <th style="border: 1px solid black">
+          <a href= "../grades/view_reviewer?id=<%= @participant.id%>&reviewer_id=<%= review.id.to_s %>">
+            <%= "Rev" + i.to_s %>
+          </a>
+        </th>
+        <% i += 1 %>
+      <% end %>
+      <th style="border: 1px solid black">
+        # of comments >10
+      </th>
+      <th style="border: 1px solid black" align="right">
+        Average Question Score
+      </th> 
+    </tr>
 
-               <% i += 1 %>
-           <% end %>
-           <td># of comments >10</td>
-  </tr>
-
-    <% vm.listofrows.each do |item| %>
+    <% vm.listofrows.each do |row| %>
         <tr>
-          <td style="border: 1px solid black;"> <%= item.questionText[0...100] %>   </td>
-          <td style="border: 1px solid black;"> <%= item.weight %>   </td>
-          <% for index in 0 .. item.score_row.length - 1 %>
-              <td style="border: 1px solid black"><%= item.score_row[index].score_value.to_s %></td>
+          <td style="border: 1px solid black;">
+            <%= row.questionText[0...100] %>
+          </td>
+          <td style="border: 1px solid black;">
+            <%= row.weight %>
+          </td>
+          <% row.score_row.each do |score| %>
+            <td style="border: 1px solid black" class="<%= score.color_code %>" align="center">
+              <%= score.score_value.to_s %>
+            </td>
           <% end %>
-          <td style="border: 1px solid black;"> <%= item.countofcomments.to_s %>   </td>
+          <td style="border: 1px solid black;" align="center">
+            <%= row.countofcomments.to_s %>
+          </td>
+          <td style="border: 1px solid black;" align="right">
+            <%= row.average_score_for_row.to_s %>
+          </td>
         </tr>
     <% end %>
+    
+    <tr>
+      <th style="border: 1px solid black;" colspan="2">
+        Average Review Score
+      </th>
+      <% vm.get_average_review_scores.each do |average_score| %>
+        <td style="border: 1px solid black;" align="center">
+          <%= average_score.round(2).to_s %>
+        </td>
+      <% end %>
+    </tr>
   </table>
 <span>  Team members:
 <% vm.listofteamparticipants.each do |participant| %>

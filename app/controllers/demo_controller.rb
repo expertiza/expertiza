@@ -4,13 +4,15 @@ class DemoController < ApplicationController
   def action_allowed?
     true
   end
+
   def new
     @user = User.new
     foreign
   end
 
   def foreign
-    @demo_role = Role.find_by_sql("select id from roles where name like 'demo_instructor'")
+    @demo_role = Role.find_by_name("demo_instructor")
+    @demo_role_id = @demo_role.id
   end
 
   def create
@@ -24,31 +26,18 @@ class DemoController < ApplicationController
         end
 
       @user = User.new(user_params)
-
-      # record the person who created this new user
-      #@user.parent_id = '2'
-      # set the user's timezone to its parent's
-      #@user.timezonepref = User.find(@user.parent_id).timezonepref
+     # @super_admin = User.find_by_name("Super-Administrator")
 
 
       if @user.save
-        #password = @user.reset_password         # the password is reset
-        # MailerHelper::send_mail_to_user(@user, "Your Expertiza account and password have been created", "user_welcome", password).deliver
+        password = @user.reset_password         # the password is reset
+         MailerHelper::send_mail_to_user(@user, "Your Expertiza account and password have been created", "user_welcome", password).deliver
+        # MailerHelper::send_mail_to_user(@super_admin, "A new Demo Instructor account has been created","demo_instructor",@user.name).deliver
+         
          flash[:success] = "A new password has been sent to new user's e-mail address."
-        #Instructor and Administrator users need to have a default set for their notifications
-        # the creation of an AssignmentQuestionnaire object with only the User ID field populated
-        # ensures that these users have a default value of 15% for notifications.
-        #TAs and Students do not need a default. TAs inherit the default from the instructor,
-        # Students do not have any checks for this information.
-        #if @user.role.name == "Instructor" or @user.role.name == "Administrator"
-        #  AssignmentQuestionnaire.create(:user_id => @user.id)
-        #end
-        #undo_link("User \"#{@user.name}\" has been created successfully. ")
         redirect_to :controller => 'content_pages', :action => 'view'
 
       else
-        #foreign
-        #puts @user.save
         flash[:error] = "Please check on the credentials again and re enter."
         render :action => 'new'
       end

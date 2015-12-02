@@ -34,36 +34,42 @@ class SubmissionHistory < ActiveRecord::Base
     ev = SubmissionHistory.create(participant_id:participant_id,
                                   team_id:team_id,
                                   assignment_id: assignment_id,
-								  artifact_name:hyperlink, 
-								  artifact_type:ARTIFACT_TYPE_HYPERLINK, 
-								  event:self.events[:EVENT_HYPERLINK_SUBMITTED], 
-								  event_time:Time.now)
+                                  artifact_name:hyperlink,
+                                  artifact_type:ARTIFACT_TYPE_HYPERLINK,
+                                  event:self.events[:EVENT_HYPERLINK_SUBMITTED],
+                                  event_time:Time.now)
   end
 
-  def self.create_new_hyperlink_update_event(participant_id, hyperlink, event_ts)
-    ev = SubmissionHistory.create(participant_id:participant_id, 
-								  artifact_name:hyperlink, 
-								  artifact_type:ARTIFACT_TYPE_HYPERLINK, 
-								  event:self.events[:EVENT_HYPERLINK_UPDATED], 
-								  event_time:event_ts)
+  def self.create_new_hyperlink_update_event(participant_id, team_id, assignment_id, hyperlink, event_ts)
+    ev = SubmissionHistory.create(participant_id:participant_id,
+                                  team_id:team_id,
+                                  assignment_id: assignment_id,
+                                  artifact_name:hyperlink,
+                                  artifact_type:ARTIFACT_TYPE_HYPERLINK,
+                                  event:self.events[:EVENT_HYPERLINK_UPDATED],
+                                  event_time:event_ts)
   end
 
-  def self.create_review_submission_event(participant_id, map_id)
+  def self.create_review_submission_event(participant_id, team_id, assignment_id, map_id)
     artifact_name = "Review by #{map_id}"
-    ev = SubmissionHistory.create(participant_id:participant_id, 
-								  artifact_name:artifact_name, 
-								  artifact_type:ARTIFACT_TYPE_REVIEW, 
-								  event:self.events[:EVENT_REVIEW_SUBMITTED], 
-								  event_time:Time.now)
+    ev = SubmissionHistory.create(participant_id:participant_id,
+                                  team_id:team_id,
+                                  assignment_id: assignment_id,
+                                  artifact_name:artifact_name,
+                                  artifact_type:ARTIFACT_TYPE_REVIEW,
+                                  event:self.events[:EVENT_REVIEW_SUBMITTED],
+                                  event_time:Time.now)
   end
 
-  def self.create_review_resubmission_event(participant_id, map_id)
+  def self.create_review_resubmission_event(participant_id, team_id, assignment_id, map_id)
     artifact_name = "Review by #{map_id}"
-    ev = SubmissionHistory.create(participant_id:participant_id, 
-								  artifact_name:artifact_name, 
-								  artifact_type:ARTIFACT_TYPE_REVIEW, 
-								  event:self.events[:EVENT_REVIEW_RESUBMITTED], 
-								  event_time:Time.now)
+    ev = SubmissionHistory.create(participant_id:participant_id,
+                                  team_id:team_id,
+                                  assignment_id: assignment_id,
+                                  artifact_name:artifact_name,
+                                  artifact_type:ARTIFACT_TYPE_REVIEW,
+                                  event:self.events[:EVENT_REVIEW_RESUBMITTED],
+                                  event_time:Time.now)
   end
 
 end

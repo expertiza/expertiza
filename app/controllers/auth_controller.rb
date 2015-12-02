@@ -26,7 +26,7 @@ class AuthController < ApplicationController
         user.save
         after_login(user)
        else
-        failed_login(user)
+        failed_authentication(user)
        end
       else
         flash[:error] = "Wait till #{user.next_login_time} for next login attempt"
@@ -52,7 +52,7 @@ class AuthController < ApplicationController
           after_login(user)
         end
        else
-        failed_login(user)
+        failed_authentication(user)
        end
       else
         flash[:error] = "Wait till #{user.next_login_time} for next login attempt"
@@ -61,7 +61,7 @@ class AuthController < ApplicationController
     end
   end  #def login
 
-  def failed_login(user)
+  def failed_authentication(user)
     if(user.login_attempts < 3)
      user.login_attempts=user.login_attempts+1
      user.save

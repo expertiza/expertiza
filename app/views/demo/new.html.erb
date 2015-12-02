@@ -1,6 +1,5 @@
 <%= form_tag :action => 'create' do %>
-    <p><label for="role_id">Role</label><br/>
-<%=text_field 'user','role_id'  %>
+   
 
 
     <p><label for="user_name">Username</label><br/>
@@ -12,6 +11,9 @@
 
     <p><label for="user_email">E-mail address</label><br/>
       <%= text_field 'user', 'email'  %></p>
+
+ <p><label for="role_id">Role</label><br/>
+<%=text_field 'user','role_id'  %></p>
 
     <% new_user ||= false %>
     <p><label for="password">Password</label>

@@ -59,7 +59,6 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @response = Response.find(params[:id])
 
-
     @map = @response.map
     @contributor = @map.contributor
     array_not_empty=0

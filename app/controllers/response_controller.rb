@@ -320,7 +320,7 @@ class ResponseController < ApplicationController
     
 
     if @reviewMetric.nil?
-	begin
+	
 	@reviewMetric=ReviewMetric.new
 	@reviewMetric.response_id = @response_all[@response_all.count - 1][:id]
 	end

@@ -12,8 +12,7 @@
     <p><label for="user_email">E-mail address</label><br/>
       <%= text_field 'user', 'email'  %></p>
 
- <p><label for="role_id">Role</label><br/>
-<%=text_field 'user','role_id'  %></p>
+    <%= hidden_field :user,:role_id, :value => @demo_role_id %>
 
     <% new_user ||= false %>
     <p><label for="password">Password</label>
@@ -23,8 +22,6 @@
 
     <p><label for="password_confirmation">Confirm password</label><br/>
       <%= password_field 'user', 'password_confirmation' %></p>
-
-
 
     <%= show_simple_captcha %>
 

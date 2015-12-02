@@ -30,7 +30,7 @@ class AuthController < ApplicationController
        end
       else
         flash[:error] = "Wait till #{user.next_login_time} for next login attempt"
-        redirect_to :controller => 'content_pages', :action => 'view', :locals => {:attempts => '0'}
+        redirect_to :controller => 'content_pages', :action => 'view'
       end
     end
   end  #def relogin
@@ -42,21 +42,21 @@ class AuthController < ApplicationController
        user = User.find_by_login(params[:login][:name])
        #aise "error"
     if(user.next_login_time<=DateTime.now)
-       if user and user.valid_password?(params[:login][:password])
-        if (user.login_attempts >= 3)
+      if (user.login_attempts >= 3)
           AuthController.clear_session(session)
           render 'content_pages/relogin'
-        else
+      else
+       if user and user.valid_password?(params[:login][:password])
           user.login_attempts=0
           user.save
           after_login(user)
-        end
        else
         failed_authentication(user)
        end
+      end
       else
         flash[:error] = "Wait till #{user.next_login_time} for next login attempt"
-        redirect_to :controller => 'content_pages', :action => 'view', :locals => {:attempts => '0'}
+        redirect_to :controller => 'content_pages', :action => 'view'
       end
     end
   end  #def login
@@ -67,7 +67,7 @@ class AuthController < ApplicationController
      user.save
      logger.warn "Failed login attempt"
      flash[:error] = "Incorrect Name/Password"
-     redirect_to :controller => 'content_pages', :action => 'view', :locals => {:attempts => '0'}
+     redirect_to :controller => 'content_pages', :action => 'view'
     else
       exponential_backoff(user)
     end

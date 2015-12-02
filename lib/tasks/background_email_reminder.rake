@@ -60,7 +60,7 @@ task :send_email_reminders => :environment do
                   metareview_reminder(assign, date)
                 end
                 #puts "~~~~~~~~~~~~~setting flag"
-                date.setFlag
+                date.set_flag
               end
             end #end of for loop
           end #end of the if condition

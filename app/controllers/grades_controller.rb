@@ -116,33 +116,38 @@ class GradesController < ApplicationController
     @assignment = @participant.assignment
     @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
     @team = Team.find(@team_id)
-    previews = @participant.reviews()     #regular reviews
-   # mreviews = @participant.metareviews()      #meta reviews
-   # freviews = @participant.feedback()     #feedback reviews
-   # treviews = @participant.teammate_reviews() #teammate reviews
-    @reviews = previews # + mreviews # + freviews + treviews
     questionnaires = @assignment.questionnaires_with_questions
-
-    # seems as if the non regular reviews don't have reviewer ids, or they are null.
     @vmlist = []
-
-    #prepare heatgrid for peer reviews
-
-
-
 
     #add all questions of all questionnaires associated with the assignment.
     questionnaires.each { |questionnaire|
-        vm = VmQuestionResponse.new
+        vm = VmQuestionResponse.new(questionnaire.max_question_score, questionnaire.type,questionnaire.display_type)
         questions = questionnaire.questions
         vm.addQuestions(questions)
 
         #add all answers/scroes
 
         if questionnaire.type == "ReviewQuestionnaire"
-
+          @reviews = @participant.reviews()     #regular reviews
             vm.addReviewers(@reviews,"ReviewQuestionnaire")
             vm.addTeamMembers(@team)
+        end
+        if questionnaire.type == "AuthorFeedbackQuestionnaire"
+          @reviews = @participant.feedback()     #feedback reviews
+          vm.addReviewers(@reviews,"AuthorFeedbackQuestionnaire")
+          vm.addTeamMembers(@team)
+        end
+        if questionnaire.type == "TeammateReviewQuestionnaire"
+          @reviews = @participant.teammate_reviews()
+          vm.addReviewers(@reviews,"TeammateReviewQuestionnaire")
+        end
+
+        if questionnaire.type == "MetareviewQuestionnaire"
+          @reviews = @participant.metareviews()
+          vm.addReviewers(@reviews,"MetareviewQuestionnaire")
+
+        end
+
           @reviews.each do |review|
             @answers = Answer.where(response_id: review.response_id)
             @answers.each do |answer|
@@ -153,66 +158,8 @@ class GradesController < ApplicationController
         #update each row with the commentscount. #this method could become a private method in the vm class.
         get_number_of_comments_greater_than_10_words(vm.listofreviews,vm.listofrows)
 
-        end
-
-        if questionnaire.type == "AuthorFeedbackQuestionnaire"
-          @reviews = @participant.feedback()     #feedback reviews
-          vm.addReviewers(@reviews,"AuthorFeedbackQuestionnaire")
-          vm.addTeamMembers(@team)
-
-          @reviews.each do |review|
-            @answers = Answer.where(response_id: review.response_id)
-            @answers.each do |answer|
-              vm.addAnswer(answer)
-            end
-          end
-
-          get_number_of_comments_greater_than_10_words(vm.listofreviews,vm.listofrows)
-
-        end
-
-        if questionnaire.type == "TeammateReviewQuestionnaire"
-          @reviews = @participant.teammate_reviews()
-          vm.addReviewers(@reviews,"TeammateReviewQuestionnaire")
-
-          @reviews.each do |review|
-            @answers = Answer.where(response_id: review.response_id)
-            @answers.each do |answer|
-              vm.addAnswer(answer)
-            end
-          end
-
-          get_number_of_comments_greater_than_10_words(vm.listofreviews,vm.listofrows)
-
-        end
-
-        if questionnaire.type == "MetareviewQuestionnaire"
-          @reviews = @participant.metareviews()
-          vm.addReviewers(@reviews,"MetareviewQuestionnaire")
-
-          @reviews.each do |review|
-            @answers = Answer.where(response_id: review.response_id)
-            @answers.each do |answer|
-              vm.addAnswer(answer)
-            end
-          end
-
-          get_number_of_comments_greater_than_10_words(vm.listofreviews,vm.listofrows)
-
-        end
-
-
-
         @vmlist << vm
     }
-    @reviews = @participant.metareviews()
-    @reviews.each do |review|
-      @answers = Answer.where(response_id: review.response_id)
-
-    end
-
-
-
 
   end
   
@@ -228,9 +175,9 @@ class GradesController < ApplicationController
            if row.question_id == answer.question_id && answer.comments.to_s.length >10
                   row.countofcomments =  row.countofcomments + 1
            end
+        end
        end
-       end
-       end
+   end
   end
 
   def edit

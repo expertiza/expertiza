@@ -1,36 +1,65 @@
-
+  <style>
+    .hiddenRow {padding:0 !important;}
+  </style>
 
 <h1>Summary report for <%= @assignment.name %></h1>
-<BR/>
+<h2>Summary report for team <%= @team.name %>(<%= @participant.fullname %>)</h2>
 
-<h1>Summary report for team <%= @team.name %></h1>
-<h1>Summary report for part <%= @participant.fullname %></h1>
- <h1># of reviews: <%= @reviews.length().to_s %></h1>
-<h1># of answers: <%= @answers.length().to_s %></h1>
-<h2>first review: <%= @reviews.length.to_s %></h2>
 
 <% @vmlist.each do |vm| %>
 
-<table style="border: 1px solid black">
-         <tr>          <td>Question</td>      <td>Weight</td>
+<% if vm.listofreviewers.length > 0 %>
+<h4 style="font-weight:bold;"><%= vm.questionnaire_display_type %></h4>
+<table id="tbl_heat">
+         <tr>          <th>Question</th>      <th>Max</th>
            <% i = 1 %>
            <% vm.listofreviews.each do |review| %>
-               <td style="border: 1px solid black"> <a href= "../grades/view_reviewer?id=<%=@participant.id%>&reviewer_id=<%= review.id.to_s %>"><%= "Rev" + i.to_s %></a>  </td>
+               <th style="border: 1px solid black"> <a target="_blank" href="../grades/view_reviewer?id=<%=@participant.id%>&reviewer_id=<%= review.id.to_s %>"><%= "Rev" + i.to_s %></a>  </th>
 
                <% i += 1 %>
            <% end %>
-           <td># of comments >10</td>
-  </tr>
+           <th style="border: 1px solid black" align="right">
+             Average
+           </th>
+           <th># of comments >10</th>
 
-    <% vm.listofrows.each do |item| %>
-        <tr>
-          <td style="border: 1px solid black;"> <%= item.questionText[0...100] %>   </td>
-          <td style="border: 1px solid black;"> <%= item.weight %>   </td>
-          <% for index in 0 .. item.score_row.length - 1 %>
-              <td style="border: 1px solid black"><%= item.score_row[index].score_value.to_s %></td>
+         </tr>
+
+    <% vm.listofrows.each do |row| %>
+        <tr data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= row.question_id.to_s %>">
+          <td class = 'cf' style="border: 1px solid black;"> <%= row.questionText[0...20] %>   </td>
+          <td class = 'cf' style="border: 1px solid black;"> <%= vm.max_score %>   </td>
+          <% row.score_row.each do |score| %>
+              <td style="border: 1px solid black" class="<%= score.color_code %>" align="center">
+                <%= score.score_value.to_s %>
+              </td>
           <% end %>
-          <td style="border: 1px solid black;"> <%= item.countofcomments.to_s %>   </td>
+          <td  class = 'cf' style="border: 1px solid black;" align="right">
+            <%= row.average_score_for_row.to_s %>
+          </td>
+          <td  class = 'cf' style="border: 1px solid black;" align="center">
+            <%= row.countofcomments.to_s %>
+          </td>
+
         </tr>
+      <tr >
+
+        <td colspan="<%= (i+1).to_s %>" class="hiddenRow" ><div id="hid<%= row.question_id.to_s %>" class="accordion-body collapse" style="margin-left:10px;">
+          <div style="background-color:lightblue;padding:4px;"><%= row.questionText %></div>
+          <div>
+          <table style="border: 1px solid grey;">
+            <thead>
+                <th style="border: 1px solid grey;padding: 5px 5px 5px 5px;">Score</th>
+                <th style="border: 1px solid grey;padding: 5px 5px 5px 5px;">Comment</th>
+            </thead>
+            <% for index in 0 .. row.score_row.length - 1 %>
+            <tr><td style="border: 1px solid grey;padding: 5px 5px 5px 5px;background-color: #ffffff;"><%= row.score_row[index].score_value.to_s %></td>
+              <td style="border: 1px solid grey;padding:5px; 5px 5px 5px;background-color: #ffffff;"><%= row.score_row[index].comment %></td></tr>
+            <% end %>
+          </table>
+          </div>
+        </div></td>
+      </tr>
     <% end %>
   </table>
 <span>  Team members:
@@ -38,6 +67,10 @@
   <%= participant.fullname %>,
 <% end %>
     </span>
+
+        <% else %>
+         <div class="flash_error">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>
+        <% end %>
 
   <br/>   <br/>
 <% end %>

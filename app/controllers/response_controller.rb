@@ -319,11 +319,11 @@ class ResponseController < ApplicationController
     @reviewMetric = ReviewMetric.find_by_response_id (@response_all[@response_all.count - 1][:id])
     
 
-    unless @reviewMetric.nil?
-	{
+    if @reviewMetric.nil?
+	begin
 	@reviewMetric=ReviewMetric.new
 	@reviewMetric.response_id = @response_all[@response_all.count - 1][:id]
-	}
+	end
     #@reviewMetric.response_id = Response.where(map_id: @map.id).id
     @reviewMetric.calulate_metric
     #####################

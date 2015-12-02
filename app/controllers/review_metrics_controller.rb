@@ -6,9 +6,12 @@ class ReviewMetricsController < ApplicationController
 
       when 'list'
         true
+      else
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator'].include? current_role_name
       end
-
-    end
+  end
 
   def list
 
@@ -29,4 +32,9 @@ class ReviewMetricsController < ApplicationController
     }
 
   end
+
+  def aggregate
+    @assignment = Assignment.find(params[:assignment_id]).name
+  end
+
 end

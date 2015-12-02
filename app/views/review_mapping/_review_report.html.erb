@@ -9,11 +9,14 @@
       <th width = "14%">
         # reviews done
       </th>
+      <th width = "14%">
+        Aggregate Text Metrics
+      </th>
       <th width = "20%">
         Team reviewed
       </th>
        <th width = "20%">
-        Review Metrics
+        Text Metrics
       </th>
       <th width = "8%">
         Score awarded
@@ -83,6 +86,16 @@
                       </td>
                   <%end %>
           <%end %>
+
+           <% if (@l%2) == 0 %>
+             <td bgcolor="#ffffff"  align = "left" rowspan= <%= @rspan%>>
+               <%= link_to "text metrics summary", :controller => 'review_metrics', :action => 'aggregate', :reviewer_id => r.reviewer_id, :assignment_id=>@id%>
+             </td>
+            <%else %>
+                <td bgcolor="#DDDDBB"  align = "left" rowspan= <%= @rspan%>>
+                  <%= link_to "text metrics summary", :controller => 'review_metrics', :action => 'aggregate', :reviewer_id => r.reviewer_id, :assignment_id=>@id%>
+                </td>
+            <%end %>
 
           <% @response_maps.each do |ri| %>
             <% if (Response.find_by_map_id(ri.id)) %>

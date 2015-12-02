@@ -1,20 +1,20 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 course0:
-  name: "Intro to Garbage"
+  name: "Intro to Algorithms"
   id: 1
   instructor_id: 6
-  info: "An introductory course to garbage."
+  info: "An introductory course to Algorithms."
   created_at: '2015-10-22 01:02:03'
   private: false
   institutions_id: 123
   directory_path: "CSC517"
 
 course1:
-  name: "Continuation of Garbage"
+  name: "Continuation of Algorithms"
   id: 2
   instructor_id: 6
-  info: "The second in a long line of courses on garbage."
+  info: "The second in a long line of courses on algorithms."
   created_at: '2015-10-22 03:02:01'
   private: false
   institutions_id: 321

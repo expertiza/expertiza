@@ -354,6 +354,8 @@ GEM
     shoulda-context (1.2.1)
     shoulda-matchers (2.8.0)
       activesupport (>= 3.0.0)
+    simple_captcha2 (0.3.4)
+      rails (>= 4.1)
     simplecov (0.10.0)
       docile (~> 1.1.0)
       json (~> 1.8)
@@ -471,6 +473,7 @@ DEPENDENCIES
   seer
   selenium-webdriver
   shoulda
+  simple_captcha2
   simplecov
   sprockets
   sqlite3-ruby

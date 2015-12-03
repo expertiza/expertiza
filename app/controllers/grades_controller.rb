@@ -131,18 +131,10 @@ class GradesController < ApplicationController
 
    if @round >1
       (1...(@round)).reverse_each do |x|
-
-        #q = Questionnaire.find(repeat_questionnaire.id)
-        questionnaires << repeat_questionnaire.clone
-
+        questionnaires << (repeat_questionnaire)
       end
-      @current_role_name = current_role_name
+
   end
-
-
-
-
-
     #add all questions of all questionnaires associated with the assignment.
     questionnaires.each { |questionnaire|
         vm = VmQuestionResponse.new(questionnaire.max_question_score, questionnaire.type,questionnaire.display_type,@round,@rounds)
@@ -159,10 +151,8 @@ class GradesController < ApplicationController
 
        @vmlist << vm
     }
+    @current_role_name = current_role_name
 
-   # @reviews1 = ResponseMap.get_assessments_for_round(@team ,1)
-   # @reviews2 = ResponseMap.get_assessments_for_round(@team ,2)
-    #@reviews3 = ResponseMap.get_assessments_for_round(@team ,3)
 
   end
   

@@ -35,11 +35,12 @@ class VmQuestionResponse
      # end
       reviews.each do |review|
         review_mapping = ReviewResponseMap.where(id: review.map_id).first
-
-        participant = Participant.find(review_mapping.reviewer_id)
-       # #review = Response.find(id: review_mapping.review_id)
-        @listofreviewers << participant
-        @listofreviews << review
+         if review_mapping.present?
+            participant = Participant.find(review_mapping.reviewer_id)
+           # #review = Response.find(id: review_mapping.review_id)
+            @listofreviewers << participant
+            @listofreviews << review
+         end
       end
     elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"
       reviews = participant.feedback()     #feedback reviews

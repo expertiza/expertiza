@@ -255,17 +255,26 @@ Expertiza::Application.routes.draw do
       get :edit
       get :list
       post :list_questionnaires
-      get :new_quiz
+
       post :select_questionnaire_type
       get :toggle_access
       get :view
       get :delete
-      post :create_quiz_questionnaire
-      post :update_quiz
+
+
       post :add_new_questions
       post :save_all_questions
     end
   end
+
+  resources :questionnaires_quiz do
+    collection do
+      get :new_quiz
+      post :create_quiz_questionnaire
+      post :update_quiz
+    end
+  end
+
 
   resources :review_questionnaires, controller: :questionnaires
   resources :metareview_questionnaires, controller: :questionnaires

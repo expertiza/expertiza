@@ -8,23 +8,53 @@
 
 <% @vmlist.each do |vm| %>
 
-<% if vm.listofreviewers.length > 0 %>
-<h4 style="font-weight:bold;"><%= vm.questionnaire_display_type %></h4>
+
+      <% if vm.listofreviewers.length > 0 %>
+
+          <table style="border: 1px solid grey;">
+            <thead>
+            <th style="border: 1px solid grey;padding: 5px 5px 5px 5px;">#</th>
+            <th style="border: 1px solid grey;padding: 5px 5px 5px 5px;">Question</th>
+            </thead>
+            <% count = 0 %>
+            <% vm.listofrows.each do |row| %>
+                <% if row.score_row.count > 0 %>
+                    <tr>
+                      <td style="border: 1px solid grey;padding: 5px 5px 5px 5px;background-color: #ffffff;"><%= count += 1 %></td>
+                      <td style="border: 1px solid grey;padding:5px; 5px 5px 5px;background-color: #ffffff;"><%= row.questionText %></td>
+                    </tr>
+                <% end %>
+            <% end %>
+          </table>
+
+
+<h4 style="font-weight:bold;"><%= vm.questionnaire_display_type %> (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %> ) </h4>
 <table id="tbl_heat">
          <tr>          <th>Question</th>      <th>Max</th>
+
            <% i = 1 %>
            <% vm.listofreviews.each do |review| %>
-               <th style="border: 1px solid black"> <a target="_blank" href="../grades/view_reviewer?id=<%=@participant.id%>&reviewer_id=<%= review.id.to_s %>"><%= "Rev" + i.to_s %></a>  </th>
+               <% if @current_role_name.eql?'Student' %>
+                   <th style="border: 1px solid black"> <a target="_blank" href="../grades/view_reviewer?id=<%=@participant.id%>&response_id=<%= review.id.to_s %>"><%= "Rev" + i.to_s %></a>  </th>
+                   <% i += 1 %>
+               <% end %>
 
-               <% i += 1 %>
+               <% if @current_role_name.eql?'Instructor' %>
+                   <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname.to_s %>
+
+                   <th style="border: 1px solid black"> <a target="_blank" href="../grades/view_reviewer?id=<%=@participant.id%>&response_id=<%= review.id.to_s %>"><%= user_name.to_s %></a>  </th>
+                   <% i += 1 %>
+               <% end %>
            <% end %>
+
+
            <th style="border: 1px solid black" align="right">
              Average
            </th>
            <th># of comments >10</th>
 
          </tr>
-
+  <% score_row_count = vm.listofrows.first.score_row.count %>
     <% vm.listofrows.each do |row| %>
         <tr data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= row.question_id.to_s %>">
           <td class = 'cf' style="border: 1px solid black;"> <%= row.questionText[0...20] %>   </td>
@@ -34,6 +64,16 @@
                 <%= score.score_value.to_s %>
               </td>
           <% end %>
+
+          <% if row.score_row.count == 0 %>
+              <% for index in 0 .. score_row_count - 1 %>
+                  <td style="border: 1px solid black" align="center">
+                    <%= "" %>
+                  </td>
+              <% end %>
+          <% end %>
+
+
           <td  class = 'cf' style="border: 1px solid black;" align="right">
             <%= row.average_score_for_row.to_s %>
           </td>
@@ -70,11 +110,8 @@
     <% end %>
   </tr>
   </table>
-<span>  Team members:
-<% vm.listofteamparticipants.each do |participant| %>
-  <%= participant.fullname %>,
-<% end %>
-    </span>
+          <span> <%= vm.displayTeamMembers %></span>
+
 
         <% else %>
          <div class="flash_error">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>

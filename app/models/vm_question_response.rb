@@ -2,7 +2,7 @@
 #the important piece to note is that the @listofrows is a  list of type VmQuestionResponse_Row, which represents a row of the heatgrid table.
 class VmQuestionResponse
 
-  def initialize(max_score, questionnaire_type,question_display_type)
+  def initialize(max_score, questionnaire_type,question_display_type,round,rounds)
       @listofrows = []
       @listofreviewers = []
       @listofreviews = []
@@ -10,8 +10,9 @@ class VmQuestionResponse
       @max_score = max_score
       @questionnaire_type = questionnaire_type
       @questionnaire_display_type = question_display_type
-
-  end
+      @rounds = rounds
+      @round = round
+ end
 
   def addQuestions(questions)
     questions.each do |question|
@@ -24,22 +25,32 @@ class VmQuestionResponse
     end
   end
 
-  def addReviewers(reviews, responseType)
-    if responseType == "ReviewQuestionnaire"
+  def addReviewers(participant,team)
+
+    if @questionnaire_type == "ReviewQuestionnaire"
+     # if @rounds = 1
+     # reviews = participant.reviews()     #regular reviews
+     # else
+      reviews = ResponseMap.get_assessments_for_round(team ,@round,@rounds)
+     # end
       reviews.each do |review|
         review_mapping = ReviewResponseMap.where(id: review.map_id).first
+
         participant = Participant.find(review_mapping.reviewer_id)
+       # #review = Response.find(id: review_mapping.review_id)
         @listofreviewers << participant
         @listofreviews << review
       end
-    elsif responseType == "AuthorFeedbackQuestionnaire"
+    elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"
+      reviews = participant.feedback()     #feedback reviews
            reviews.each do |review|
              review_mapping = FeedbackResponseMap.where(id: review.map_id).first
              participant = Participant.find(review_mapping.reviewer_id)
              @listofreviewers << participant
              @listofreviews << review
            end
-     elsif responseType == "TeammateReviewQuestionnaire"
+    elsif @questionnaire_type == "TeammateReviewQuestionnaire"
+      reviews = participant.teammate_reviews()
            reviews.each do |review|
              review_mapping = TeammateReviewResponseMap.where(id: review.map_id).first
              participant = Participant.find(review_mapping.reviewer_id)
@@ -48,19 +59,38 @@ class VmQuestionResponse
            end
 
 
-      elsif responseType == "MetareviewQuestionnaire"
+    elsif @questionnaire_type == "MetareviewQuestionnaire"
+      reviews = participant.metareviews()
            reviews.each do |review|
              review_mapping = MetareviewResponseMap.where(id: review.map_id).first
              participant = Participant.find(review_mapping.reviewer_id)
              @listofreviewers << participant
              @listofreviews << review
            end
-         end
+      end
 
-
-
+    reviews.each do |review|
+      answers = Answer.where(response_id: review.response_id)
+      answers.each do |answer|
+        addAnswer(answer)
+      end
+    end
 
   end
+
+  def displayTeamMembers
+    @output = ""
+   if @questionnaire_type == "MetareviewQuestionnaire"  ||      @questionnaire_type == "ReviewQuestionnaire"
+       @output = "Team members:"
+      @listofteamparticipants.each do |participant|
+         @output = @output  +  " (" + participant.fullname + ") "
+      end
+
+   end
+
+    @output
+
+   end
 
   def addTeamMembers(team)
     @listofteamparticipants = team.participants
@@ -72,6 +102,14 @@ class VmQuestionResponse
 
   def max_score
     @max_score
+  end
+
+  def rounds
+    @rounds
+  end
+
+  def round
+    @round
   end
 
   def questionnaire_type

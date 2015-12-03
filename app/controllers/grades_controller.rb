@@ -119,47 +119,50 @@ class GradesController < ApplicationController
     questionnaires = @assignment.questionnaires_with_questions
     @vmlist = []
 
+    @round = 1
+    @rounds = @assignment.rounds_of_reviews
+    repeat_questionnaire = nil
+    questionnaires.each { |questionnaire|
+           if questionnaire.type == 'ReviewQuestionnaire'
+              repeat_questionnaire = questionnaire
+             @round = @assignment.rounds_of_reviews
+           end
+    }
+
+   if @round >1
+      (1...(@round)).reverse_each do |x|
+
+        #q = Questionnaire.find(repeat_questionnaire.id)
+        questionnaires << repeat_questionnaire.clone
+
+      end
+      @current_role_name = current_role_name
+  end
+
+
+
+
+
     #add all questions of all questionnaires associated with the assignment.
     questionnaires.each { |questionnaire|
-        vm = VmQuestionResponse.new(questionnaire.max_question_score, questionnaire.type,questionnaire.display_type)
+        vm = VmQuestionResponse.new(questionnaire.max_question_score, questionnaire.type,questionnaire.display_type,@round,@rounds)
         questions = questionnaire.questions
         vm.addQuestions(questions)
-
-        #add all answers/scroes
-
-        if questionnaire.type == "ReviewQuestionnaire"
-          @reviews = @participant.reviews()     #regular reviews
-            vm.addReviewers(@reviews,"ReviewQuestionnaire")
-            vm.addTeamMembers(@team)
-        end
-        if questionnaire.type == "AuthorFeedbackQuestionnaire"
-          @reviews = @participant.feedback()     #feedback reviews
-          vm.addReviewers(@reviews,"AuthorFeedbackQuestionnaire")
-          vm.addTeamMembers(@team)
-        end
-        if questionnaire.type == "TeammateReviewQuestionnaire"
-          @reviews = @participant.teammate_reviews()
-          vm.addReviewers(@reviews,"TeammateReviewQuestionnaire")
-        end
-
-        if questionnaire.type == "MetareviewQuestionnaire"
-          @reviews = @participant.metareviews()
-          vm.addReviewers(@reviews,"MetareviewQuestionnaire")
-
-        end
-
-          @reviews.each do |review|
-            @answers = Answer.where(response_id: review.response_id)
-            @answers.each do |answer|
-              vm.addAnswer(answer)
-            end
-          end
+        vm.addTeamMembers(@team)
+        vm.addReviewers(@participant,@team)
 
         #update each row with the commentscount. #this method could become a private method in the vm class.
         get_number_of_comments_greater_than_10_words(vm.listofreviews,vm.listofrows)
+        if questionnaire.type ==  "ReviewQuestionnaire"
+         @round = @round -1
+        end
 
-        @vmlist << vm
+       @vmlist << vm
     }
+
+   # @reviews1 = ResponseMap.get_assessments_for_round(@team ,1)
+   # @reviews2 = ResponseMap.get_assessments_for_round(@team ,2)
+    #@reviews3 = ResponseMap.get_assessments_for_round(@team ,3)
 
   end
   

@@ -1,6 +1,6 @@
 <%
    puts "In view_review, participant id: " + params[:id]
-   puts "In view_review, reviewer id: " + params[:reviewer_id]
+   puts "In view_review, reviewer id: " + params[:response_id]
    participant = AssignmentParticipant.find(params[:id])
    @assignment = participant.assignment
    @questions = {} # A hash containing all the questions in all the questionnaires used in this assignment
@@ -67,9 +67,9 @@
         <% puts "In view_reviewer, review.map.id: " + review.map.id.to_s %>
         <% puts "In view_reviewer, review.response_map.id: " + review.response_map.map_id.to_s %>
         <% puts "In view_reviewer, review.map.response.first.response_id: " + review.map.response.first.response_id.to_s %>
-        <% puts "In view_review, params[:reviewer_id]: " + params[:reviewer_id] %>
-        <% if review.map.response.first.response_id.to_s.eql? params[:reviewer_id].to_s %>
-            <% puts "!!!!!!!!!!!!!!!Get" + params[:reviewer_id].to_s %>
+        <% puts "In view_review, params[:response_id]: " + params[:response_id] %>
+        <% if review.map.response.first.response_id.to_s.eql? params[:response_id].to_s %>
+            <% puts "!!!!!!!!!!!!!!!Get" + params[:response_id].to_s %>
             <% review_feedback = nil %>
 
             <% count = count + 1 %>

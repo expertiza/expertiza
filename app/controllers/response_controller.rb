@@ -2,6 +2,7 @@ class ResponseController < ApplicationController
   helper :wiki
   helper :submitted_content
   helper :file
+  helper :review_chats
 
   def action_allowed?
     current_user
@@ -316,7 +317,7 @@ class ResponseController < ApplicationController
       ReviewChat.create(:assignment_id => @map.assignment.id,:reviewer_id => @map.reviewer_id, :team_id=>@map.reviewee_id, :type_flag => 'Q' , :content => params[:review_question])
       flash[:notice]="Question has been submitted to Author"
       @interaction_id=ReviewChat.where(:reviewer_id => @map.reviewer_id).where(:team_id => @map.reviewee_id)
-      ReviewChat.chat_email_query(@interaction_id.first.id)
+      ReviewChatsHelper::chat_email_query(@interaction_id.first.id)
       redirect_to action: 'new', id: params[:id]
   end
 

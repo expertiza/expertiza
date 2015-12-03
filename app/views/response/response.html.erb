@@ -82,8 +82,6 @@
 
 <% existing_chat=ReviewChat.where(:reviewer_id => @map.reviewer_id).where(:team_id => @map.reviewee_id)%>
 <%if !existing_chat.empty? then %>
-<% puts "#{!existing_chat.empty?}" %>
-<% puts "Hi*******************************************" %>
 <a href ="http://localhost:3000/review_chats/show/<%= existing_chat[0].id %>" target="_blank"> Click here to see chat log </a> </br>
 <%end%>
 

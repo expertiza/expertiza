@@ -1,1 +1,41 @@
-<h2>Aggregate Text Metrics for <%=@assignment %></h2>
+
+<h2>Aggregate Text Metrics for <%=@assignment_name %></h2>
+<div class="topictable" >
+  <table class="table" cellpadding="2" align="center">
+    <tr class="taskheader">
+      <th>&nbsp;</th>
+      <th>Round</th>
+      <th>Avg. # of words</th>
+      <th>% of Reviews with Suggestions</th>
+      <th>% of Reviews pointing errors</th>
+      <th>% of Reviews with offensive words</th>
+    </tr>
+        <% if @num1 > 0 %>
+    <tr class="listingRow">
+      <td>&nbsp;</td>
+      <td>1</td>
+      <td><%=@total1_average.round(2) %></td>
+      <td><%= @sugg1_percentage.round(2) %></td>
+      <td><%= @error1_percentage.round(2) %></td>
+      <td><%= @off1_percentage.round(2) %></td>
+    </tr>
+        <% end %>
+
+        <% if @num2 > 0 %>
+    <tr class="listingRow">
+      <td>&nbsp;</td>
+      <td>2</td>
+      <td><%=@total2_average.round(2) %></td>
+      <td><%= @sugg2_percentage.round(2) %></td>
+      <td><%= @error2_percentage.round(2) %></td>
+      <td><%= @off2_percentage.round(2) %></td>
+    </tr>
+        <% end %>
+
+
+  </table>
+
+  <br/>
+
+  <a href="javascript:window.history.back()">Back</a>
+</div>

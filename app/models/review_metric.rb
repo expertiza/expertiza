@@ -14,7 +14,7 @@ class ReviewMetric < ActiveRecord::Base
 	@complete_count = 0
 
 	/*Additional comments */
-	@add_comment = Response.find_by_id(self.response_id)
+	@add_comment = Response.find_by_id(self.response_id).additional_comment
 	
 	if @add_comment
 		@answer[0][:comments] = @answers[0][:comments] + ". " + @add_comment	

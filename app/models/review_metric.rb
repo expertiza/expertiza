@@ -13,18 +13,16 @@ class ReviewMetric < ActiveRecord::Base
 	@error_count = 0
 	@complete_count = 0
 
-	/*Additional comments */
 	@add_comment = Response.find_by_id(self.response_id).additional_comment
 	
 	if @add_comment
-		@answer[0][:comments] = @answers[0][:comments] + ". " + @add_comment	
+		@answer[0][:comments] = @answer[0][:comments] + ". " + @add_comment	
 	
 	end
-	/**********************/
 
 	(0..@answer.count-1).each do |i|
 	@sentence_count = @answer[i][:comments].scan(/[\w']+/).count
-		if @sentence_count > 8 and @answer[i][:comments][-1,1].eql?"."
+		if @sentence_count > 7 and @answer[i][:comments][-1,1].eql?"."
 			@complete_count = @complete_count + 1
 		end
 	@total_word_count += @sentence_count

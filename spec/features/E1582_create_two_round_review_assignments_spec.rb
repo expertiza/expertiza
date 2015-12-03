@@ -34,6 +34,8 @@ feature 'Create a two-round review assignment' do
 
     click_button 'Save'
     expect(page).to have_content('Assignment was successfully saved')
+    visit '/tree_display/list'
+    click_link( 'Delete', match: :first)
   end
 
   scenario 'with a topic', :js => true do
@@ -86,6 +88,8 @@ feature 'Create a two-round review assignment' do
 
     click_button 'Save'
     expect(page).to have_content('Assignment was successfully saved')
+    visit '/tree_display/list'
+    click_link( 'Delete', match: :first)
   end
 
   def login_with(username, password)

@@ -3,7 +3,16 @@ class ReviewChatsController < ApplicationController
 
   # GET /review_chats
   def action_allowed?
-    current_user
+    review_chat = ReviewChat.find(params[:id])
+    allowed_users=Array.new
+    team_id=review_chat.team_id
+    teams_users = TeamsUser.where(team_id: team_id)
+    teams_users.each do |teams_user|
+      allowed_users << User.find(teams_user.user_id).id
+      puts "User id #{teams_user.user_id}"
+    end
+    allowed_users << Participant.find(review_chat.reviewer_id).user_id
+    current_role_name.eql? 'Student' and allowed_users.include?(session[:user].id)
   end
 
   def index

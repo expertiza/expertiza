@@ -32,10 +32,17 @@ class AuthController < ApplicationController
   # function to handle common functionality for conventional user login and google login
   def after_login (user)
     session[:user] = user
+
+    session[:demo_role] = Role.find_by_name("demo_instructor")
     AuthController.set_current_role(user.role_id, session)
+    if session[:demo_role][:name] == "demo_instructor"
+      redirect_to :controller => 'demo', :action => 'place_holder'
+    else
 
     redirect_to :controller => AuthHelper::get_home_controller(session[:user]),
                 :action => AuthHelper::get_home_action(session[:user])
+    end
+
   end
 
   # Login functionality for google login feature using omniAuth2

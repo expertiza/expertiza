@@ -15,6 +15,14 @@ class DemoController < ApplicationController
     @demo_role_id = @demo_role.id
   end
 
+  def place_holder
+
+  end
+
+  def proceed
+    redirect_to :controller => 'tree_display', :action => 'list'
+  end
+
   def create
     if simple_captcha_valid?
 

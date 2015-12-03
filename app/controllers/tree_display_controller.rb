@@ -295,7 +295,13 @@ class TreeDisplayController < ApplicationController
 
   def drill
     session[:root] = params[:root]
-    redirect_to :controller => 'tree_display', :action => 'list'
+    # if session[:demo_role][:name] == "demo_instructor"
+    #   redirect_to :controller => 'demo', :action => 'place_holder'
+    # else
+
+     redirect_to :controller => 'tree_display', :action => 'list'
+    # end
+
   end
 
   def filter

@@ -109,6 +109,8 @@ Expertiza::Application.routes.draw do
     collection do
       get :new
       get :show
+      get :place_holder
+      post :proceed
     end
   end
   

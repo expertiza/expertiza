@@ -276,12 +276,11 @@ class ResponseController < ApplicationController
       reviewees_topic=SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.get_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
-    when "MetareviewResponseMap","TeammateReviewResponseMap"
+    when "MetareviewResponseMap","TeammateReviewResponseMap","FeedbackResponseMap"
       @questionnaire = @map.questionnaire
     else
       # This is most likely an error, but I'm keeping it here in case
       # someone was relying on this side effect
-      set_questionnaire
     end
   end
 

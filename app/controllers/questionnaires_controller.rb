@@ -22,11 +22,9 @@ class QuestionnairesController < ApplicationController
       @questionnaire.name = 'Copy of ' + orig_questionnaire.name
 
     clone_questionnaire_details(questions, orig_questionnaire)
-    if (session[:user]).role.name != "Teaching Assistant"
-      @questionnaire.instructor_id = session[:user].id
-    else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
-      @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
-    end
+
+    assign_instructor_id
+
     @questionnaire.name = 'Copy of '+orig_questionnaire.name
 
     begin
@@ -608,11 +606,7 @@ class QuestionnairesController < ApplicationController
 
   # clones the contents of a questionnaire, including the questions and associated advice
   def clone_questionnaire_details(questions, orig_questionnaire)
-    if (session[:user]).role.name != "Teaching Assistant"
-      @questionnaire.instructor_id = session[:user].id
-    else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
-      @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
-    end
+    assign_instructor_id
 
     @questionnaire.name = 'Copy of '+orig_questionnaire.name
 
@@ -653,6 +647,15 @@ class QuestionnairesController < ApplicationController
   def create_new_node_if_necessary(parent)
     if QuestionnaireNode.where(parent_id: parent.id, node_object_id: @questionnaire.id) == nil
       QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
+    end
+  end
+
+  private
+  def assign_instructor_id # if the user to copy the questionnaire is a TA, the instructor should be the owner instead of the TA
+    if (session[:user]).role.name != "Teaching Assistant"
+      @questionnaire.instructor_id = session[:user].id
+    else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
+      @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
     end
   end
 

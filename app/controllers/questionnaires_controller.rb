@@ -50,9 +50,8 @@ class QuestionnairesController < ApplicationController
       }
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
       parent = FolderNode.find_by_node_object_id(pFolder.id)
-      if QuestionnaireNode.where(parent_id: parent.id, node_object_id: @questionnaire.id) == nil
-        QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
-      end
+      create_new_node_if_necessary(parent)
+
       undo_link("Copy of questionnaire #{orig_questionnaire.name} has been created successfully. ")
       redirect_to :back
     rescue
@@ -438,9 +437,7 @@ class QuestionnairesController < ApplicationController
       if @questionnaire.type != "QuizQuestionnaire"
         pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
         parent = FolderNode.find_by_node_object_id(pFolder.id)
-        if QuestionnaireNode.where(parent_id: parent.id, node_object_id: @questionnaire.id) == nil
-          QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
-        end
+        create_new_node_if_necessary(parent)
       end
       undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
 
@@ -640,9 +637,7 @@ class QuestionnairesController < ApplicationController
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
       parent = FolderNode.find_by_node_object_id(pFolder.id)
 
-      if QuestionnaireNode.where(parent_id: parent.id, node_object_id:  @questionnaire.id) == nil
-        QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
-      end
+      create_new_node_if_necessary(parent)
 
       undo_link("Copy of questionnaire #{orig_questionnaire.name} has been created successfully. ")
       redirect_to :controller => 'questionnaire', :action => 'view', :id => @questionnaire.id
@@ -653,4 +648,12 @@ class QuestionnairesController < ApplicationController
       redirect_to :action => 'list', :controller => 'tree_display'
     end
   end
+
+  private
+  def create_new_node_if_necessary(parent)
+    if QuestionnaireNode.where(parent_id: parent.id, node_object_id: @questionnaire.id) == nil
+      QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
+    end
+  end
+
 end

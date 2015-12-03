@@ -13,6 +13,14 @@ class ReviewMetric < ActiveRecord::Base
 	@error_count = 0
 	@complete_count = 0
 
+	/*Additional comments */
+	@add_comment = Response.find_by_id(self.response_id)
+	
+	if @add_comment
+		@answer[0][:comments] = @answers[0][:comments] + ". " + @add_comment	
+	
+	end
+	/**********************/
 
 	(0..@answer.count-1).each do |i|
 	@sentence_count = @answer[i][:comments].split.count

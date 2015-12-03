@@ -649,8 +649,7 @@ class QuestionnairesController < ApplicationController
       QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
     end
   end
-
-  private
+  
   def assign_instructor_id # if the user to copy the questionnaire is a TA, the instructor should be the owner instead of the TA
     if (session[:user]).role.name != "Teaching Assistant"
       @questionnaire.instructor_id = session[:user].id

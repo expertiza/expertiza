@@ -136,6 +136,7 @@ class ResponseController < ApplicationController
   end
 
   def new
+    binding.pry
     @header = "New"
     @next_action = "create"
     @feedback = params[:feedback]
@@ -223,7 +224,7 @@ class ResponseController < ApplicationController
 
     @map = Response.find_by_map_id(params[:id])
     if params[:return] == "feedback"
-      redirect_to :controller => 'grades', :action => 'view_my_score', :id => @map.reviewer.id
+      redirect_to :controller => 'grades', :action => 'view_my_scores', :id => @map.reviewer.id
     elsif params[:return] == "teammate"
       redirect_to view_student_teams_path student_id: @map.reviewer.id
     elsif params[:return] == "instructor"

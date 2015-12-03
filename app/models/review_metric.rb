@@ -23,29 +23,29 @@ class ReviewMetric < ActiveRecord::Base
 	/**********************/
 
 	(0..@answer.count-1).each do |i|
-	@sentence_count = @answer[i][:comments].split.count
+	@sentence_count = @answer[i][:comments].scan(/[\w']+/).count
 		if @sentence_count > 8 and @answer[i][:comments][-1,1].eql?"."
 			@complete_count = @complete_count + 1
 		end
 	@total_word_count += @sentence_count
+	@diff_word_count += @answer[i][:comments].scan(/[\w']+/).uniq.count
 	end
 
 	#checks for offensive words in the answers by comparing with the offensive_words dictionary
 	offensive_words.each { |key, word|
 		(0..@answer.count-1).each do |i|
-			@answer[i][:comments].split.each do |word|
+			@answer[i][:comments].scan(/[\w']+/).each do |word|
 				if word.eql?key.to_s
 					@offensive_count = @offensive_count + 1
 				end
 			end
-			@diff_word_count += @answer[i][:comments].split.uniq.count
 		end
 			}
 
 	suggestion_words.each { |key, word|
 		(0..@answer.count-1).each do |i|
 			@temp_val = 0
-			@answer[i][:comments].split.each do |word|
+			@answer[i][:comments].scan(/[\w']+/).each do |word|
 				if word.eql?key.to_s
 					@temp_val = 1
 				end
@@ -59,7 +59,7 @@ class ReviewMetric < ActiveRecord::Base
 	error_words.each { |key, word|
 		(0..@answer.count-1).each do |i|
 			@temp_val = 0
-			@answer[i][:comments].split.each do |word|
+			@answer[i][:comments].scan(/[\w']+/).each do |word|
 				if word.eql?key.to_s
 					@temp_val = 1
 				end

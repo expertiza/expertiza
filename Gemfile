@@ -64,6 +64,7 @@ group :development do
   gem 'sqlite3-ruby'
   gem 'selenium-webdriver'
   gem 'quiet_assets'
+  gem 'rspec-rails'
 end
 
 group :test do

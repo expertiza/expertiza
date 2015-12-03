@@ -44,6 +44,46 @@ class ResponseMap < ActiveRecord::Base
     return responses
   end
 
+  # return specific rounds versions of the responses
+  def self.get_assessments_for_round(participant,round,rounds)
+    responses = Array.new
+    stime=Time.now
+    if participant
+
+      @array_sort=Array.new
+      @sort_to=Array.new
+
+      #get all the versions
+      maps = where(reviewee_id: participant.id)
+      maps.each { |map|
+        if !map.response.empty?
+
+          @all_resp=Response.where(map_id: map.map_id, round: round).last
+          if (!@all_resp.present?  && round == 1 && rounds > 1)
+            @all_resp=Response.where(map_id: map.map_id).last
+          end
+         # if (map.type.eql?('ReviewResponseMap'))
+            #If its ReviewResponseMap then only consider those response which are submitted.
+         #   if (@all_resp.isSubmitted.nil? || @all_resp.isSubmitted.eql?('Yes'))
+         #     @array_sort << @all_resp
+         #   end
+         # else
+            @array_sort << @all_resp
+         # end
+
+          #sort all versions in descending order and get the latest one.
+          #@sort_to=@array_sort.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
+          @sort_to=@array_sort.sort #{ |m1, m2| (m1.updated_at and m2.updated_at) ? m2.updated_at <=> m1.updated_at : (m1.version_num ? -1 : 1) }
+          responses << @sort_to[0] if !@sort_to[0].nil?
+          @array_sort.clear
+          @sort_to.clear
+        end
+      }
+      responses = responses.sort { |a, b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }
+    end
+    return responses
+  end
+
   # return latest versions of the response given by reviewer
   def self.get_reviewer_assessments_for(participant, reviewer)
     map = where(reviewee_id: participant.id, reviewer_id: reviewer.id)

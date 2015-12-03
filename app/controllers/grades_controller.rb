@@ -118,126 +118,59 @@ class GradesController < ApplicationController
 
 
   def view_team
+
+    #get participant, team, questionnaires for assignment.
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
     @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
     @team = Team.find(@team_id)
-    previews = @participant.reviews()     #regular reviews
-   # mreviews = @participant.metareviews()      #meta reviews
-   # freviews = @participant.feedback()     #feedback reviews
-   # treviews = @participant.teammate_reviews() #teammate reviews
-    @reviews = previews # + mreviews # + freviews + treviews
     questionnaires = @assignment.questionnaires_with_questions
-
-    # seems as if the non regular reviews don't have reviewer ids, or they are null.
     @vmlist = []
 
-    #prepare heatgrid for peer reviews
 
-
-
-
-    #add all questions of all questionnaires associated with the assignment.
+    #get the rounds for the assignment. if >1, add the review questionnaire n-1 times.
+    #this will insure a separate html table appears for each round
+    @round = 1
+    @rounds = @assignment.rounds_of_reviews
+    repeat_questionnaire = nil
     questionnaires.each { |questionnaire|
-        vm = VmQuestionResponse.new
+           if questionnaire.type == 'ReviewQuestionnaire'
+              repeat_questionnaire = questionnaire
+             @round = @assignment.rounds_of_reviews
+           end
+    }
+
+   if @round >1
+      (1...(@round)).reverse_each do |x|
+        questionnaires << (repeat_questionnaire)
+      end
+
+   end
+
+    #loop through each questionnaire, and populate the view model for all data necessary
+    #to render the html tables.
+    questionnaires.each { |questionnaire|
+        vm = VmQuestionResponse.new(questionnaire.max_question_score, questionnaire.type,questionnaire.display_type,@round,@rounds)
         questions = questionnaire.questions
         vm.addQuestions(questions)
+        vm.addTeamMembers(@team)
+        vm.addReviewers(@participant,@team)
+        vm.get_number_of_comments_greater_than_10_words()
 
-        #add all answers/scroes
-
-        if questionnaire.type == "ReviewQuestionnaire"
-
-            vm.addReviewers(@reviews,"ReviewQuestionnaire")
-            vm.addTeamMembers(@team)
-          @reviews.each do |review|
-            @answers = Answer.where(response_id: review.response_id)
-            @answers.each do |answer|
-              vm.addAnswer(answer)
-            end
-          end
-
-        #update each row with the commentscount. #this method could become a private method in the vm class.
-        get_number_of_comments_greater_than_10_words(vm.listofreviews,vm.listofrows)
-
+        #if a multi-round assignment, decrement for each review questionnaire,
+        #to ensure the proper round responses are retrieved.
+        if questionnaire.type ==  "ReviewQuestionnaire"
+         @round = @round -1
         end
 
-        if questionnaire.type == "AuthorFeedbackQuestionnaire"
-          @reviews = @participant.feedback()     #feedback reviews
-          vm.addReviewers(@reviews,"AuthorFeedbackQuestionnaire")
-          vm.addTeamMembers(@team)
-
-          @reviews.each do |review|
-            @answers = Answer.where(response_id: review.response_id)
-            @answers.each do |answer|
-              vm.addAnswer(answer)
-            end
-          end
-
-          get_number_of_comments_greater_than_10_words(vm.listofreviews,vm.listofrows)
-
-        end
-
-        if questionnaire.type == "TeammateReviewQuestionnaire"
-          @reviews = @participant.teammate_reviews()
-          vm.addReviewers(@reviews,"TeammateReviewQuestionnaire")
-
-          @reviews.each do |review|
-            @answers = Answer.where(response_id: review.response_id)
-            @answers.each do |answer|
-              vm.addAnswer(answer)
-            end
-          end
-
-          get_number_of_comments_greater_than_10_words(vm.listofreviews,vm.listofrows)
-
-        end
-
-        if questionnaire.type == "MetareviewQuestionnaire"
-          @reviews = @participant.metareviews()
-          vm.addReviewers(@reviews,"MetareviewQuestionnaire")
-
-          @reviews.each do |review|
-            @answers = Answer.where(response_id: review.response_id)
-            @answers.each do |answer|
-              vm.addAnswer(answer)
-            end
-          end
-
-          get_number_of_comments_greater_than_10_words(vm.listofreviews,vm.listofrows)
-
-        end
-
-
-
-        @vmlist << vm
+       @vmlist << vm
     }
-    @reviews = @participant.metareviews()
-    @reviews.each do |review|
-      @answers = Answer.where(response_id: review.response_id)
-
-    end
-
-
+    @current_role_name = current_role_name
 
 
   end
   
-  def get_number_of_comments_greater_than_10_words(reviews, rows)
 
-    first_time = true
-
-    reviews.each do |review|
-       answers = Answer.where(response_id: review.response_id)
-       questionnaire = review.questionnaire_by_answer(answers.first)
-       answers.each do |answer|
-         rows.each do |row|
-           if row.question_id == answer.question_id && answer.comments.to_s.length >10
-                  row.countofcomments =  row.countofcomments + 1
-           end
-       end
-       end
-       end
-  end
 
   def edit
     @participant = AssignmentParticipant.find(params[:id])

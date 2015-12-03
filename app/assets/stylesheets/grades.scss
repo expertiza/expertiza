@@ -4,7 +4,9 @@
  */
 
 /* This is a null space in the table. Just leave
- * it the way it is for now. 
+
+ * it the way it is for now.
+>>>>>>> origin/dev_1203
  */
 .c0 {
 
@@ -33,4 +35,18 @@
 /* This is a green, indicative of a good score. */
 .c5 {
   background-color: #2DE636;
+}
+
+.cf {
+  background-color: #FFFFFF;
+}
+
+#tbl_heat {
+  border: 1px solid black;
+  margin-top: -9px;
+
+}
+#tbl_heat td {
+  cursor: pointer;
+
 }

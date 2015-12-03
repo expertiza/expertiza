@@ -1,6 +1,7 @@
 require 'rails_helper'
 require 'spec_helper'
 require_relative './helpers/login_helper'
+require 'selenium-webdriver'
 include LogInHelper
 
 def send_inv
@@ -12,11 +13,14 @@ def send_inv
 end
 
 feature 'Add someone to a team' do
-  scenario 'send the invitation as sender', :js=>true do
+  scenario 'send the invitation as sender and receive it', :js=>true do
 
     # sign in
     log_in('student4346', 'password')
+
+    # Maximize the browser to show the 'Logout'
     page.driver.browser.manage.window.maximize
+
     # send invitation
     send_inv
     expect(page). to have_content('Waiting for reply')
@@ -30,7 +34,11 @@ feature 'Add someone to a team' do
     click_link "Your team"
 
     click_link 'Accept'
+
+    # confirm pop out message
     page.driver.browser.switch_to.alert.accept
+
+    # expect the sender student4346 appears on the page
     expect(page). to have_content('student4346')
 
   end

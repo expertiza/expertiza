@@ -11,6 +11,7 @@
 
       <% if vm.listofreviewers.length > 0 %>
 
+          <div id="hid<%= vm.questionnaire_type + vm.round.to_s %>" class="accordion-body collapse" >
           <table style="border: 1px solid grey;">
             <thead>
             <th style="border: 1px solid grey;padding: 5px 5px 5px 5px;">#</th>
@@ -26,9 +27,17 @@
                 <% end %>
             <% end %>
           </table>
+            </div>
 
 
-<h4 style="font-weight:bold;"><%= vm.questionnaire_display_type %> (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %> ) </h4>
+<span style="width:100%;">
+    <h4 style="font-weight:bold;display:inline-block;"><%= vm.questionnaire_display_type %>
+      <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
+            (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)
+      <%end %>
+    </h4>
+    <span style="padding-left:30px;cursor: pointer;" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s %>">display questions</span>
+</span>
 <table id="tbl_heat">
          <tr>          <th>Question</th>      <th>Max</th>
 
@@ -113,7 +122,7 @@
           <span> <%= vm.displayTeamMembers %></span>
 
 
-        <% else %>
+        <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
          <div class="flash_error">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>
         <% end %>
 

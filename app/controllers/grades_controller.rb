@@ -112,6 +112,8 @@ class GradesController < ApplicationController
 
 
   def view_team
+
+    #get participant, team, questionnaires for assignment.
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
     @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
@@ -119,6 +121,9 @@ class GradesController < ApplicationController
     questionnaires = @assignment.questionnaires_with_questions
     @vmlist = []
 
+
+    #get the rounds for the assignment. if >1, add the review questionnaire n-1 times.
+    #this will insure a separate html table appears for each round
     @round = 1
     @rounds = @assignment.rounds_of_reviews
     repeat_questionnaire = nil
@@ -134,17 +139,20 @@ class GradesController < ApplicationController
         questionnaires << (repeat_questionnaire)
       end
 
-  end
-    #add all questions of all questionnaires associated with the assignment.
+   end
+
+    #loop through each questionnaire, and populate the view model for all data necessary
+    #to render the html tables.
     questionnaires.each { |questionnaire|
         vm = VmQuestionResponse.new(questionnaire.max_question_score, questionnaire.type,questionnaire.display_type,@round,@rounds)
         questions = questionnaire.questions
         vm.addQuestions(questions)
         vm.addTeamMembers(@team)
         vm.addReviewers(@participant,@team)
+        vm.get_number_of_comments_greater_than_10_words()
 
-        #update each row with the commentscount. #this method could become a private method in the vm class.
-        get_number_of_comments_greater_than_10_words(vm.listofreviews,vm.listofrows)
+        #if a multi-round assignment, decrement for each review questionnaire,
+        #to ensure the proper round responses are retrieved.
         if questionnaire.type ==  "ReviewQuestionnaire"
          @round = @round -1
         end
@@ -156,22 +164,7 @@ class GradesController < ApplicationController
 
   end
   
-  def get_number_of_comments_greater_than_10_words(reviews, rows)
 
-    first_time = true
-
-    reviews.each do |review|
-       answers = Answer.where(response_id: review.response_id)
-       questionnaire = review.questionnaire_by_answer(answers.first)
-       answers.each do |answer|
-         rows.each do |row|
-           if row.question_id == answer.question_id && answer.comments.to_s.length >10
-                  row.countofcomments =  row.countofcomments + 1
-           end
-        end
-       end
-   end
-  end
 
   def edit
     @participant = AssignmentParticipant.find(params[:id])

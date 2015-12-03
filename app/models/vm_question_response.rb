@@ -187,4 +187,21 @@ class VmQuestionResponse
 
     return average_review_scores
   end
+
+  def get_number_of_comments_greater_than_10_words()
+
+    first_time = true
+
+    @listofreviews.each do |review|
+      answers = Answer.where(response_id: review.response_id)
+      questionnaire = review.questionnaire_by_answer(answers.first)
+      answers.each do |answer|
+        @listofrows.each do |row|
+          if row.question_id == answer.question_id && answer.comments.to_s.length >10
+            row.countofcomments =  row.countofcomments + 1
+          end
+        end
+      end
+    end
+  end
 end

@@ -12,7 +12,7 @@ def send_invi
 end
 
 feature 'Add someone to a team' do
-  scenario 'add' do
+  scenario 'send the invitation as sender' do
 
     # sign in
 
@@ -21,32 +21,6 @@ feature 'Add someone to a team' do
     # send invitation
     send_invi
     expect(page). to have_content('Waitings for reply')
-    # log out
-    #click_link 'Logout'
-
-=begin
-  # sign in as the receiver
-  log_in('student4347','password')
-  click_link "Ethical analysis 2"
-  click_link "Your team"
-
-  # Click accept
-  expect(page). to have_content('student4346')
-  click_link 'Accept'
-
-  # log out
-  click_link 'Logout'
-
-  # sign in as invitation sender
-  log_in('student4346', 'password')
-
-  # In Your team view should appear receiver name
-
-  click_link "Ethical analysis 2"
-  click_link "Your team"
- # expect(page). to have_content('student4347')
-=end
-
   end
 
 end

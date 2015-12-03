@@ -136,7 +136,6 @@ class ResponseController < ApplicationController
   end
 
   def new
-    binding.pry
     @header = "New"
     @next_action = "create"
     @feedback = params[:feedback]

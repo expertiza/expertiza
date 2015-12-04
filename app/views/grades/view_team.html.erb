@@ -11,7 +11,8 @@
 
 <% @vmlist.each do |vm| %>
 
-
+<% if (vm.questionnaire_display_type == "Metareview" or vm.questionnaire_display_type == "Author Feedback" or vm.questionnaire_display_type == "Teammate Review") and @current_role_name.eql?'Student' %>
+<% else %>
       <% if vm.listofreviewers.length > 0 %>
 
           <div id="hid<%= vm.questionnaire_type + vm.round.to_s %>" class="accordion-body collapse" >
@@ -158,6 +159,7 @@
         <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
          <div class="flash_error">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>
         <% end %>
-
   <br/>   <br/>
+  
+  <% end %>
 <% end %>

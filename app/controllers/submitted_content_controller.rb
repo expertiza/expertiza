@@ -29,7 +29,8 @@ class SubmittedContentController < ApplicationController
     @can_submit=true
 
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
-    @events = SubmissionHistory.where( ["participant_id = ?", @participant.id ]).page(params[:page]).order('event_time').reverse_order.per_page(10).all
+    @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
+    @events = SubmissionHistory.page(params[:page]).order('event_time').reverse_order.per_page(10).all
   end
 
   #view is called when @assignment.submission_allowed(topic_id) is false
@@ -42,7 +43,7 @@ class SubmittedContentController < ApplicationController
 
     #@can_submit is the flag indicating if the user can submit or not in current stage
     @can_submit=false
-
+    @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
     redirect_to action: 'edit', id:params[:id]
   end

@@ -17,7 +17,7 @@
       end %>title='<%= long_name %>'><%= item.label.html_safe %></a>
     <% if item.children -%>
     <% if level == 1 %>
-    <ul class="dropdown-menu multi-level">
+    <ul class="dropdown-menu pull-left">
       <%= render :partial => 'menu_items/suckerfish', :locals => {:items => item.children, :level => level} %>
     </ul>
     <% else %>

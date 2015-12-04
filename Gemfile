@@ -62,7 +62,7 @@ group :development do
   gem 'pry-remote'
   gem 'pry-nav'
   gem 'sqlite3-ruby'
-  gem 'selenium-webdriver'
+  #gem 'selenium-webdriver'
   gem 'quiet_assets'
 end
 
@@ -83,5 +83,6 @@ end
 
 group :development, :test do
   gem 'capybara'
+  gem 'selenium-webdriver'
   gem 'simplecov', :require => false
 end

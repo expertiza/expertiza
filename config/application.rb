@@ -11,6 +11,8 @@ module Expertiza
     # Do not access db or load models while precompiling
     config.assets.initialize_on_precompile = false
 
+    config.domain_name = "localhost:3000"
+
     config.time_zone = 'UTC'
 
     #setting the default ssl setting to false

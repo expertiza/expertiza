@@ -1,5 +1,5 @@
 class User < ActiveRecord::Base
-
+  apply_simple_captcha
   acts_as_authentic do |config|
     config.validates_uniqueness_of_email_field_options = {:if => lambda { false }} # Don't validate email uniqueness
     config.crypto_provider = Authlogic::CryptoProviders::Sha1
@@ -175,7 +175,7 @@ class User < ActiveRecord::Base
     save
     password
   end
-
+  
   def self.import(row, row_header,session,id = nil)
     if row.length != 3
       raise ArgumentError, "Not enough items: expect 3 columns: login name, full name (first and last name, not seperated with the delimiter), email"

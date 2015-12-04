@@ -2,6 +2,7 @@ Expertiza::Application.routes.draw do
 
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
+  get 'relogin', to: 'content_pages#relogin'
 
   resources :bookmarks do
     collection do
@@ -64,6 +65,7 @@ Expertiza::Application.routes.draw do
   resources :auth do
     collection do
       post :login
+      post :relogin
       post :logout
     end
   end
@@ -167,7 +169,7 @@ Expertiza::Application.routes.draw do
 
   resources :join_team_requests do
     collection do
-      get :decline
+      post :decline
       get :edit
     end
   end
@@ -214,11 +216,14 @@ Expertiza::Application.routes.draw do
   end
 
   get '/participants/change_handle', controller: :participants, action: :change_handle
-
+  get 'reset_password', controller: :password_retrieval, action: :reset_password
+  post 'reset_password/:id', controller: :users, action: :reset_password
   resources :password_retrieval do
     collection do
       get :forgotten
       post :send_password
+      post :send_link
+
     end
   end
 

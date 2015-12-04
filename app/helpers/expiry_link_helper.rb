@@ -1,0 +1,2 @@
+module ExpiryLinkHelper
+end

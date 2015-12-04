@@ -44,7 +44,7 @@
   <span style="padding-left:30px;color:grey" data-toggle="tooltip" data-placement="right" title="Colors are scaled from poor to excellent in the following order: red, orange, yellow, light-green, dark-green">color legend</span>
 </span>
 <table id="tbl_heat">
-         <tr>          <th>Q Id</th>      <th>Max</th>
+         <tr>          <th>Question Id</th>      <th>Max</th>
 
            <% i = 1 %>
            <% vm.listofreviews.each do |review| %>
@@ -69,9 +69,10 @@
 
          </tr>
   <% score_row_count = vm.listofrows.first.score_row.count %>
+  <% j = 1 %>
     <% vm.listofrows.each do |row| %>
         <tr data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= row.question_id.to_s %>">
-          <td class = 'cf' style="border: 1px solid black;"> <%= row.question_seq.to_s %>   </td>
+          <td class = 'cf' style="border: 1px solid black;"> <%= j.to_s %>   </td>
           <td class = 'cf' style="border: 1px solid black;"> <%= vm.max_score %>   </td>
           <% row.score_row.each do |score| %>
               <td style="border: 1px solid black" class="<%= score.color_code %>" align="center">
@@ -114,24 +115,25 @@
           </div>
         </div></td>
       </tr>
+      <% j += 1 %>
     <% end %>
   <tr>
-    <td style="border: 1px solid black;">
+    <td class = 'cf' style="border: 1px solid black;">
       Review Total
     </td>
-    <td style="border: 1px solid black;" align="center">
+    <td class = 'cf' style="border: 1px solid black;" align="center">
       <%= vm.max_score_for_questionnaire %>
     </td>
     <% vm.get_total_review_scores.each do |total_score| %>
-        <td style="border: 1px solid black;" align="center">
+        <td  class = 'cf' style="border: 1px solid black;" align="center">
           <%= total_score.round.to_s %>
         </td>
     <% end %>
     <!-- To complete the last two columns of the table, these will just be
          empty cells. -->
-    <td style="border: 1px solid black;">
+    <td class = 'cf' style="border: 1px solid black;">
     </td>
-    <td style="border: 1px solid black;">
+    <td  class = 'cf' style="border: 1px solid black;">
     </td>
   </tr>
   <tr>

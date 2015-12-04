@@ -17,49 +17,80 @@
    end
    pscore = participant.scores(@questions)
    rscore = pscore[:review]
+   rscore_meta = pscore[:metareview]
+   rscore_fdbk = pscore[:feedback]
+   rscore_tm = pscore[:teammate]
    prefix = "user"
 %>
 
-<% if rscore %>
-    <% puts "rscore not null" %>
-    <% puts rscore[:assessments].length %>
+<% if rscore_meta and rscore_meta[:assessments].length > 0 %>
+    <BR/>
+    <% count_meta = 0 %>
+    <% for metareview in rscore_meta[:assessments] %>
+        <% count_meta = count_meta + 1 %>
+        <% if controller.action_name != "view_my_scores" and metareview.id.to_s == params[:response_id] %>
+            <h2>Metareview <%= params[:i] %></h2>
+            <a name="<%=prefix+"_"+metareview.map.reviewer.name%>"></a><%= metareview.display_as_html(prefix) %><BR/><BR/>
+        <% elsif metareview.id.to_s == params[:response_id] %>
+            <h2>Metareview <%= params[:i] %></h2>
+            <%= metareview.display_as_html(nil,count_meta) %><BR/><BR/>
+        <% end %>
+    <% end %>
 <% else %>
-    <% puts "rscore is null" %>
+    <i>No metareviews have been completed for this user's reviews.</i>
 <% end %>
 
-<% if rscore and rscore[:assessments].length > 0 %>
-
-    <% if false %>
-
-        <BR/>
-        <%flag_varying_rubrics=false%>
-
-        <%if @questions.has_key?("review1".to_sym)%>
-            <b> Round1:</b>
-            <%flag_varying_rubrics=true%>
-            <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review1".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer", :round=>1 }%>
-        <%end%>
-
-        <%if @questions.has_key?("review2".to_sym)%>
-            <b> Round2:</b>
-            <%flag_varying_rubrics=true%>
-            <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review2".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" , :round=>2 }%>
-        <%end%>
-
-        <%if @questions.has_key?("review3".to_sym)%>
-            <b> Round3:</b>
-            <%flag_varying_rubrics=true%>
-            <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review3".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" , :round=>3 }%>
-        <%end%>
-
-        <%if flag_varying_rubrics==false%>
-            <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" }%>
-        <%end%>
-        <BR/>
-
+<% if rscore_fdbk and rscore_fdbk[:assessments].length > 0 %>
+    <% count_fb = 0 %>
+    <% for feedback in rscore_fdbk[:assessments] %>
+        <% count_fb = count_fb + 1 %>
+        <% if controller.action_name != "view_my_scores" and feedback.id.to_s == params[:response_id]%>
+            <a name="<%=prefix+"_"+feedback.map.reviewer.name%>"></a><%= feedback.display_as_html(prefix) %><BR/><BR/>
+        <% elsif feedback.id.to_s == params[:response_id] %>
+            <%= feedback.display_as_html(nil,count_fb) %><BR/><BR/>
+        <% end %>
     <% end %>
+<% else %>
+    <i>No author feedback has been provided for this user's reviews.</i>
+<% end %>
+
+<% if rscore_tm and rscore_tm[:assessments].length > 0 %>
+    <HR/>
+    <% count_tm = 0 %>
+    <% for teammatereview in rscore_tm[:assessments] %>
+        <% count_tm = count_tm + 1 %>
+        <% if controller.action_name != "view_my_scores" and teammatereview.id.to_s == params[:response_id]%>
+            <h2>Teammate Review <%= params[:i] %></h2>
+            <a name="<%=prefix+"_"+teammatereview.map.reviewer.name%>"></a><%= teammatereview.display_as_html(prefix) %><BR/><BR/>
+        <% elsif teammatereview.id.to_s == params[:response_id] %>
+            <h2>Teammate Review <%= params[:i] %></h2>
+            <%= teammatereview.display_as_html(nil,count) %><BR/><BR/>
+        <% end %>
+    <% end %>
+<% else %>
+    <i>No author feedback has been provided for this user's reviews.</i>
+<% end %>
 
 
+<% if rscore and rscore[:assessments].length > 0 %>
+    <BR/>
+    <%if @questions.has_key?("review1".to_sym)%>
+        <b> Round1:</b>
+        <%flag_varying_rubrics=true%>
+        <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review1".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer", :round=>1 }%>
+    <%end%>
+
+    <%if @questions.has_key?("review2".to_sym)%>
+        <b> Round2:</b>
+        <%flag_varying_rubrics=true%>
+        <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review2".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" , :round=>2 }%>
+    <%end%>
+
+    <%if @questions.has_key?("review3".to_sym)%>
+        <b> Round3:</b>
+        <%flag_varying_rubrics=true%>
+        <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review3".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" , :round=>3 }%>
+    <%end%>
 
     <HR/>
     <% count = 0 %>
@@ -75,15 +106,18 @@
 
             <% count = count + 1 %>
 
-            <% if controller.action_name != "view_my_scores" %>
-                <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a><%= review.display_as_html(prefix) %>
-            <% else %>
-                <h2>Review <%= count %></h2>
-            <% end %>
+            <h2>Review <%= params[:i] %></h2>
+
 
             <!-- Display the latest review first -->
             <!--%= review.display_as_html(nil,review.version_num, file_url) %--><BR/>
-            <%= review.display_as_html(nil,0, nil) %><BR/>
+
+            <% if controller.action_name != "view_my_scores" %>
+                <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a><%= review.display_as_html(prefix) %>
+            <% else %>
+                <%= review.display_as_html(nil,0, nil) %><BR/>
+            <% end %>
+
             <!--Display FileUpload question type-->
             <% current_folder = DisplayOption.new %>
             <% current_folder.name = "" %>

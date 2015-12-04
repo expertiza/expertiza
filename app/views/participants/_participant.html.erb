@@ -1,6 +1,5 @@
-<div class="exp">
 <% @user_id = [] %>
-user = User.find(participant.user_id) %>
+<% user = User.find(participant.user_id) %>
    <% @user_id << participant.user_id %>
 <tr class= "exp">
     <td ><%= link_to user.name, :controller=> 'users', :action => 'show', :id => user.id %></td>
@@ -58,4 +57,3 @@ user = User.find(participant.user_id) %>
     </td>
     
   </tr>
-</div>

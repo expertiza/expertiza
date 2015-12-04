@@ -1,0 +1,18 @@
+<% @questionnaire = Questionnaire.find(id) %>
+<table id="questions_table">
+        <tr>
+          <th class="head" align="center" width="30">Action</td>
+          <th class="head" align="center" width="30">Seq</td>
+          <th class="head" align="center" width="300">Question</td>
+          <th class="head" align="center" width="100">Type</td>
+          <th class="head" align="center">Weight</td>
+        </tr>
+        <% i = 1 %>
+        <div id = "quests">
+        <%questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }%>
+        <% for @question in questions %>
+          <%=@question.edit(i)%>
+          <% i += 1 %>
+        <% end %>
+        </div>
+</table>

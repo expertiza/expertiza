@@ -57,7 +57,7 @@ class ParticipantsController < ApplicationController
     respond_to do |format|
     if curr_object.save
       format.html { redirect_to :action => 'list', :id => curr_object.id, :model => params[:model], :authorization => params[:authorization] }
-      format.js   {}
+      format.js 
       #format.json { render json: @participant, status: :created, location: @participant }
     else
       format.html { render action: "list" }

@@ -134,7 +134,10 @@ class QuestionnairesController < ApplicationController
   # Edit a questionnaire
   def edit
     @questionnaire = Questionnaire.find(params[:id])
-    redirect_to Questionnaire if @questionnaire == nil
+    respond_to do|format|
+      format.html {redirect_to Questionnaire if @questionnaire == nil}
+      format.js
+    end
   end
 
   def update
@@ -145,7 +148,10 @@ class QuestionnairesController < ApplicationController
     rescue
       flash[:error] = $!
     end
-    redirect_to edit_questionnaire_path(@questionnaire.id.to_s.to_sym)
+    respond_to do|format|
+      format.html {redirect_to edit_questionnaire_path(@questionnaire.id.to_s.to_sym)}
+      format.js
+    end
   end
 
   # Remove a given questionnaire
@@ -200,6 +206,7 @@ class QuestionnairesController < ApplicationController
   #Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions    
     questionnaire_id = params[:id] if params[:id] != nil
+    @quest_id = questionnaire_id
     (1..params[:question][:total_num].to_i).each do |i|
       question = Object.const_get(params[:question][:type]).create(txt: 'Edit question content here', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
       if question.is_a? ScoredQuestion
@@ -222,12 +229,16 @@ class QuestionnairesController < ApplicationController
         flash[:error] = $!
       end
     end
-    redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+    respond_to do|format|
+      format.html {redirect_to edit_questionnaire_path(questionnaire_id.to_sym)}
+      format.js
+    end 
   end
 
   #Zhewei: This method is used to save all questions in current questionnaire.
   def save_all_questions
     questionnaire_id = params[:id] if params[:id] != nil
+    @quest_id = questionnaire_id
     if params['save']
       params[:question].each_pair do |k, v|
         @question = Question.find(k)
@@ -251,7 +262,10 @@ class QuestionnairesController < ApplicationController
     if params['view_advice']
       redirect_to :controller => 'advice', :action => 'edit_advice', :id => params[:questionnaire][:id]
     end
-    redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+    respond_to do|format|
+      format.html {redirect_to edit_questionnaire_path(questionnaire_id.to_sym)}
+      format.js
+    end 
   end
   #=========================================================================================================
   #Separate methods for quiz questionnaire

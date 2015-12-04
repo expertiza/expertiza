@@ -1,7 +1,7 @@
 <h1>Teaching assistants</h1>
 <h2>Course: <%= @course.name %></h2>
 <% if @course.ta_mappings != nil && @course.ta_mappings.size > 0 %>
-  <table class="listing" cellpadding=2>
+  <table class="listing" cellpadding=2, id = "mytable">
     <tr>
       <th>Teaching Assistant Name</th>
       <th></th>

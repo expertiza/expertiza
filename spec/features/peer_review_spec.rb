@@ -971,11 +971,17 @@ describe "peer review testing", :type => :feature do
     @assignment_questionnaire = AssignmentQuestionnaire.new({:questionnaire => @quiz, :assignment => @assignment})
     @assignment_questionnaire.save
 
-    @q=Scale.new({:weight => 5, :questionnaire_id => @quiz.id, :seq => "2", :txt => "hello", :break_before => true})
-    @q.save
+    # @q=Scale.new({:weight => 5, :questionnaire_id => @quiz.id, :seq => "2", :txt => "hello", :break_before => true})
+    # @q.save
 
-    @answer=Answer.new({:question_id => @q.id})
-    @answer.save
+    # @answer=Answer.new({:question_id => @q.id})
+    # @answer.save
+
+    @q1=Criterion.new({:size => "70,1", :weight => 5, :questionnaire_id => @quiz.id, :seq => "3", :txt => "helloText"})
+    @q1.save
+
+    @answer_q1 = Answer.new({:question_id => @q1.id})
+    @answer_q1.save
 
     @review_response_map = ReviewResponseMap.new({:assignment => @assignment, :reviewee => @team1})
     @review_response_map.save
@@ -1006,6 +1012,10 @@ describe "peer review testing", :type => :feature do
     click_button "Request a new submission to review"
 
     click_link "Begin"
+
+    # Fill in a textbox and a dropdown
+    fill_in "responses[0][comment]", :with => "HelloWorld"
+    select 5, :from => "responses[0][score]"
 
     click_button "Submit Review"
 

@@ -104,6 +104,10 @@ class VmQuestionResponse
   def max_score
     @max_score
   end
+  
+  def max_score_for_questionnaire
+    @max_score * @listofrows.length
+  end
 
   def rounds
     @rounds
@@ -160,27 +164,33 @@ class VmQuestionResponse
       end
     end
   end
-
-  # This is going to calculate the average of each column, store it in an array, and
-  # return that array.
-  def get_average_review_scores
+  
+  def get_total_review_scores
     # First things first, initialize our array.
-    average_review_scores = Array.new(@listofrows[0].score_row.length){ |i| 0.0 }
-
+    total_review_scores = Array.new(@listofrows[0].score_row.length){ |i| 0.0 }
+    
     # Now iterate over each row and sum the values in the score_row in the corresponding
     # index of our new array.
     @listofrows.each do |row|
       row.score_row.each_index do |index|
         score_value = row.score_row[index].score_value
         if (score_value.is_a? Numeric)
-          average_review_scores[index] += score_value.to_f
+          total_review_scores[index] += score_value.to_f
         end
       end
     end
+    
+    return total_review_scores
+  end
+
+  # This is going to calculate the average of each column, store it in an array, and
+  # return that array.
+  def get_average_review_scores
+    # First things first, initialize our array to be the total scores
+    average_review_scores = self.get_total_review_scores
 
     # All that's left is to divide each entry by the number of questions in the
-    # review, i.e., the number of rows, round it to two digits after the decimal,
-    # and return it.
+    # review, i.e., the number of rows, and return it.
     average_review_scores.each_index do |index|
       average_review_scores[index] /= @listofrows.length.to_f
     end

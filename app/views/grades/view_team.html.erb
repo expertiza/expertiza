@@ -111,12 +111,42 @@
       </tr>
     <% end %>
   <tr>
-    <td>Column Average</td>   <td><%= vm.max_score %></td>
-    <% vm.get_average_review_scores.each do |average_score| %>
-        <td style="border: 1px solid black;" align="center">
-          <%= average_score.round(2).to_s %>
-        </td>
+    <td style="border: 1px solid black;">
+      Review Total
+    </td>
+    <td style="border: 1px solid black;" align="center">
+      <%= vm.max_score_for_questionnaire %>
+    </td>
+    <% vm.get_total_review_scores.each do |total_score| %>
+      <td style="border: 1px solid black;" align="center">
+        <%= total_score.round.to_s %>
+      </td>
     <% end %>
+    <!-- To complete the last two columns of the table, these will just be
+         empty cells. -->
+    <td style="border: 1px solid black;">
+    </td>
+    <td style="border: 1px solid black;">
+    </td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid black;">
+      Column Average
+    </td>
+    <td>
+      <%= vm.max_score %>
+    </td>
+    <% vm.get_average_review_scores.each do |average_score| %>
+      <td style="border: 1px solid black;" align="center">
+        <%= average_score.round(2).to_s %>
+      </td>
+    <% end %>
+    <!-- To complete the last two columns of the table, these will just be
+         empty cells. -->
+    <td style="border: 1px solid black;">
+    </td>
+    <td style="border: 1px solid black;">
+    </td>
   </tr>
   </table>
           <span> <%= vm.displayTeamMembers %></span>

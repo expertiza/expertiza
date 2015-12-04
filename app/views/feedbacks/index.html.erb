@@ -1,0 +1,33 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Feedbacks</h1>
+
+<table class="file_table">
+  <thead>
+    <tr>
+      <th class="feedback">User</th>
+      <th class="feedback">Title</th>
+      <th class="feedback">Description</th>
+      <th class="feedback">Status</th>
+      <th class="feedback" colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @feedbacks.each do |feedback| %>
+      <tr>
+        <td class="feedback"><%= feedback.user_id %></td>
+        <td class="feedback"><%= feedback.title %></td>
+        <td class="feedback"><%= feedback.description %></td>
+        <td class="feedback"><%= feedback.status %></td>
+        <td class="feedback"><%= link_to 'Show', feedback %></td>
+        <td class="feedback"><%= link_to 'Edit', edit_feedback_path(feedback) %></td>
+
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Feedback', new_feedback_path %>

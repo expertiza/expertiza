@@ -1,0 +1,53 @@
+<%= form_for(@feedback) do |f| %>
+    <% if @feedback.errors.any? %>
+        <div id="error_explanation">
+          <h2><%= pluralize(@feedback.errors.count, "error") %> prohibited this feedback from being saved:</h2>
+
+          <ul>
+            <% @feedback.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+    <% end %>
+
+
+    <br>
+    <p><label for="feedback_user_id">Email</label> (Mandatory field.)
+      <img src="/assets/info.png" title='Enter Expertiza registered email id.'>
+      <br/>
+      <% if @user_email.nil? %>
+          <%= text_field 'feedback', 'user_id', :maxlength=>"25", :readonly=> false%></p>
+      <% else %>
+          <%= text_field 'feedback', 'user_id', :maxlength=>"25" , :value => @user_email, :readonly=>true%></p>
+      <% end %>
+
+      <p><label for="feedback_title">Title</label> (Mandatory field.)
+        <img src="/assets/info.png" title='The max character limit is 160.'>
+        <br/>
+        <%= text_field 'feedback', 'title', :maxlength=>"80" %></p>
+
+      <p><label for="feedback_description">Description</label><br/>
+        <%= text_area 'feedback', 'description', :rows => 4, :cols => 78  %>
+
+      <p><label>Attach a File</label><br/>
+        <%= f.file_field :attachment, accept: 'image/png,image/gif,image/jpeg' %>
+        <br>
+        <%= @statuses.inspect %>
+        <%=f.select(:status, @statuses.collect {|r| [ r.status] }) %>
+      <p><label>CAPTCHA</label>
+      <div class="g-recaptcha" data-sitekey="6LfY_RETAAAAAMH85s0nAZWZ15KVGYcZWRZExNJI"></div>
+      <%= recaptcha_tags %>
+      <br>
+      <% if session[:wrong_email_attempts].nil? %>
+          <%= submit_tag "Submit" %>
+      <% else %>
+          <%= submit_tag "Submit" , :disabled => session[:wrong_email_attempts][:expires]> Time.now %>
+          <%= session[:wrong_email_attempts][:expires] %>
+
+      <%end%>
+      <div class="actions">
+      </div>
+      <br>
+
+<% end %>

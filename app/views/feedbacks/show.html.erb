@@ -1,0 +1,32 @@
+<p>
+  <strong>User:</strong>
+  <%= @feedback.user_id %>
+</p>
+
+<p>
+  <strong>Title:</strong>
+  <%= @feedback.title %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @feedback.description %>
+</p>
+
+<p>
+  <strong>Attachments:</strong>
+  <% if @attachment %>
+  <%= link_to @attachment.filename , download_attachment_path(@feedback.id)%>
+  <% else %>
+  No attachments
+  <% end %>
+
+</p>
+
+<p>
+  <strong>Status:</strong>
+  <%= @feedback.status %>
+</p>
+
+<%= link_to 'Edit', edit_feedback_path(@feedback) %> |
+<%= link_to 'Back', feedbacks_path %>

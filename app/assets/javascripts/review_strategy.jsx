@@ -27,7 +27,6 @@ jQuery(document).ready(function() {
                             <tr id="assignment_review_topic_threshold_row">
                                 <td>
                                     <img src="/assets/info.png" title='A topic is reviewable if the minimum number of reviews already done for the submissions on that topic is within k of the minimum number of reviews done on the least-reviewed submission on any topic.'></img>
-                                </br>
                                 'Maximum number of reviews per submission:'
                                 <input type="text" class="form-control" value={this.props.assignment_form.assignment.max_reviews_per_submission} size: "1">
                                 </td>

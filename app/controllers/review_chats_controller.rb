@@ -10,7 +10,6 @@ class ReviewChatsController < ApplicationController
     teams_users = TeamsUser.where(team_id: team_id)
     teams_users.each do |teams_user|
       allowed_users << User.find(teams_user.user_id).id
-      puts "User id #{teams_user.user_id}"
     end
     allowed_users << Participant.find(review_chat.reviewer_id).user_id
     current_role_name.eql? 'Student' and allowed_users.include?(session[:user].id)
@@ -18,7 +17,6 @@ class ReviewChatsController < ApplicationController
 
   def index
     @review_chats = ReviewChat.all
-    #@review_chats = ReviewChat.where
   end
 
   # GET /review_chats/1
@@ -45,43 +43,6 @@ class ReviewChatsController < ApplicationController
     end	
     redirect_to action: 'show', id: params[:id]
   end
-
-=begin
-  # GET /review_chats/new
-  def new
-    @review_chat = ReviewChat.new
-  end
-
-  # GET /review_chats/1/edit
-  def edit
-  end
-
-  # POST /review_chats
-  def create
-    @review_chat = ReviewChat.new(review_chat_params)
-
-    if @review_chat.save
-      redirect_to @review_chat, notice: 'Review chat was successfully created.'
-    else
-      render :new
-    end
-  end
-
-  # PATCH/PUT /review_chats/1
-  def update
-    if @review_chat.update(review_chat_params)
-      redirect_to @review_chat, notice: 'Review chat was successfully updated.'
-    else
-      render :edit
-    end
-  end
-
-  # DELETE /review_chats/1
-  def destroy
-    @review_chat.destroy
-    redirect_to review_chats_url, notice: 'Review chat was successfully destroyed.'
-  end
-=end
 
   private
     # Use callbacks to share common setup or constraints between actions.

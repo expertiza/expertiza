@@ -9,11 +9,22 @@
 <h1>Summary Report for assignment: <%= @assignment.name %></h1>
 <h4>Team: <%= @team.name %>(Username: <%= @participant.fullname %>)</h4>
 
+  <table>
+  <% @vmlist.each do |vm| %>
+   <tr>   <td> <%=   vm.questionnaire_type %></td><td><%= vm.round.to_s %> </td><td><%= vm.name.to_s %> </td>
+    <td><%=  vm.listofreviews.length.to_s %></td>      <td><%=  @answers.length.to_s %></td>
+   </tr>
+      <% end %>
+  </table>
+     <table>
+  <% @answers.each do |answer| %>
+  <tr><td>  <%=   answer.answer.to_s %>    </td>   <td>  <%=   answer.comments.to_s %>    </td>    </tr>
+     <% end %>
+           </table>
+      <% @vmlist.each do |vm| %>
 
-<% @vmlist.each do |vm| %>
 
-
-      <% if vm.listofreviewers.length > 0 %>
+      <% if vm.listofreviewers.length > 0 || true %>
 
           <div id="hid<%= vm.questionnaire_type + vm.round.to_s %>" class="accordion-body collapse" >
           <table style="border: 1px solid grey;">
@@ -23,7 +34,7 @@
             </thead>
             <% count = 0 %>
             <% vm.listofrows.each do |row| %>
-                <% if row.score_row.count > 0 %>
+                <% if row.score_row.count > 0 || true %>
                     <tr>
                       <td style="border: 1px solid grey;padding: 5px 5px 5px 5px;background-color: #ffffff;"><%= count += 1 %></td>
                       <td style="border: 1px solid grey;padding:5px 5px 5px 5px;background-color: #ffffff;"><%= row.questionText %></td>
@@ -187,7 +198,7 @@
 
 
 
-        <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
+        <% elsif vm.questionnaire_type != "ReviewQuestionnaire" || 1==1 %>
          <div class="flash_error">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>
         <% end %>
 

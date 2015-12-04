@@ -118,6 +118,7 @@ class GradesController < ApplicationController
     @assignment = @participant.assignment
     @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
     @team = Team.find(@team_id)
+    return if redirect_when_disallowed
     questionnaires = @assignment.questionnaires_with_questions
     @vmlist = []
 
@@ -134,8 +135,8 @@ class GradesController < ApplicationController
            end
     }
 
-   if @round >1
-      (1...(@round)).reverse_each do |x|
+   if @round >1   && !@assignment.varying_rubrics_by_round?
+      (2...(@round)).reverse_each do |x|
         questionnaires << (repeat_questionnaire)
       end
 
@@ -144,7 +145,13 @@ class GradesController < ApplicationController
     #loop through each questionnaire, and populate the view model for all data necessary
     #to render the html tables.
     questionnaires.each { |questionnaire|
-        vm = VmQuestionResponse.new(questionnaire.max_question_score, questionnaire.type,questionnaire.display_type,@round,@rounds)
+
+        if @assignment.varying_rubrics_by_round?
+          @round  =  AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
+
+        end
+
+        vm = VmQuestionResponse.new(questionnaire.max_question_score, questionnaire.type,questionnaire.display_type,@round,@rounds,questionnaire.name)
         questions = questionnaire.questions
         vm.addQuestions(questions)
         vm.addTeamMembers(@team)
@@ -160,7 +167,7 @@ class GradesController < ApplicationController
        @vmlist << vm
     }
     @current_role_name = current_role_name
-
+    @answers = Answer.where(response_id: 64882)
 
   end
   

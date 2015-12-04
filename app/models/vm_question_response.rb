@@ -2,7 +2,7 @@
 #the important piece to note is that the @listofrows is a  list of type VmQuestionResponse_Row, which represents a row of the heatgrid table.
 class VmQuestionResponse
 
-  def initialize(max_score, questionnaire_type,question_display_type,round,rounds)
+  def initialize(max_score, questionnaire_type,question_display_type,round,rounds,name)
       @listofrows = []
       @listofreviewers = []
       @listofreviews = []
@@ -12,7 +12,12 @@ class VmQuestionResponse
       @questionnaire_display_type = question_display_type
       @rounds = rounds
       @round = round
- end
+    @name  = name
+  end
+
+  def name
+    @name
+  end
 
   def addQuestions(questions)
     questions.each do |question|

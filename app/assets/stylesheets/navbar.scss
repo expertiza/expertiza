@@ -202,11 +202,12 @@ ul.navbar-right > li.right-most > a:hover {
     .collapsing {
         overflow: hidden!important;
     }
-    .dropdown-submenu>.dropdown-menu {
-    }
-
     .logout-box{
       margin-top: 7px;
       left: -2px;
     }
+   .dropdown-menu.pull-left{
+     top: 25%;
+     left: 15%;
+   }
 }

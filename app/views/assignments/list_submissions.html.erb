@@ -73,7 +73,7 @@
 	    	<% end %>
         <!--Display List of Events-->
         <% @participants.each do |participant| %>
-            <% if !participant.nil? and !participant.hyperlinks.blank? and participant == @participants.first %>
+            <% if !participant.nil?  %>
                 <%= "List of Events:<br/>".html_safe %>
                 <%= render :partial => 'submitted_content/events_list', :locals => {:participant_id => participant.id,
                                                                                     :team_id  =>       team.id } %>

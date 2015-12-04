@@ -898,30 +898,27 @@ describe "peer review testing", :type => :feature do
     @student.save
 
     @student2=User.where(name: 'student2').first || User.new({
-                                                                name: "student2",
-                                                                password: "password",
-                                                                password_confirmation: "password",
-                                                                role_id: 1,
-                                                                fullname: "student2, student2",
-                                                                email: "student2@dev.null",
-                                                                parent_id: 2,
-                                                                private_by_default: false,
-                                                                mru_directory_path: nil,
-                                                                email_on_review: true,
-                                                                email_on_submission: true,
-                                                                email_on_review_of_review: true,
-                                                                is_new_user: false,
-                                                                master_permission_granted: 0,
-                                                                handle: "",
-                                                                leaderboard_privacy: false,
-                                                                digital_certificate: nil,
-                                                                public_key: nil,
-                                                                copy_of_emails: false,
-                                                            })
+                                                                 name: "student2",
+                                                                 password: "password",
+                                                                 password_confirmation: "password",
+                                                                 role_id: 1,
+                                                                 fullname: "student2, student2",
+                                                                 email: "student2@dev.null",
+                                                                 parent_id: 2,
+                                                                 private_by_default: false,
+                                                                 mru_directory_path: nil,
+                                                                 email_on_review: true,
+                                                                 email_on_submission: true,
+                                                                 email_on_review_of_review: true,
+                                                                 is_new_user: false,
+                                                                 master_permission_granted: 0,
+                                                                 handle: "",
+                                                                 leaderboard_privacy: false,
+                                                                 digital_certificate: nil,
+                                                                 public_key: nil,
+                                                                 copy_of_emails: false,
+                                                             })
     @student2.save
-
-    @quiz=Questionnaire.new({:name => "test", :instructor_id => @instructor.id, :max_question_score => "5", :min_question_score => "0"})
-    @quiz.save
 
     @course=Course.new({:name => "testcourse"})
     @course.save
@@ -932,7 +929,7 @@ describe "peer review testing", :type => :feature do
     @deadline_type_review = DeadlineType.new({:name => "review"})
     @deadline_type_review.save
 
-    @wiki_type = WikiType.new
+    @wiki_type = WikiType.new({:name => "mediawiki"})
     @wiki_type.save
 
     @assignment=Assignment.new({:name => "TestAssignment", :course_id => @course.id, :instructor => @instructor, :availability_flag => 1, :wiki_type => @wiki_type, :review_assignment_strategy => 'Auto-Selected', :max_reviews_per_submission => 20})
@@ -968,13 +965,18 @@ describe "peer review testing", :type => :feature do
     @signed_up_team = SignedUpTeam.new({:topic => @sign_up_topic, :team_id => @team1.id})
     @signed_up_team.save
 
-    @q=Question.new({:questionnaire_id => @quiz.id, :seq => "2", :txt => "hello", :type => "dropdown", :break_before => true})
+    @quiz=Questionnaire.new({:name => "test", :instructor_id => @instructor.id, :max_question_score => "5", :min_question_score => "0", :type => "ReviewQuestionnaire"})
+    @quiz.save
+
+    @assignment_questionnaire = AssignmentQuestionnaire.new({:questionnaire => @quiz, :assignment => @assignment})
+    @assignment_questionnaire.save
+
+    @q=Scale.new({:weight => 5, :questionnaire_id => @quiz.id, :seq => "2", :txt => "hello", :break_before => true})
     @q.save
 
     @answer=Answer.new({:question_id => @q.id})
     @answer.save
 
-    # TODO: This should map up to the Contributor ReviewMappings
     @review_response_map = ReviewResponseMap.new({:assignment => @assignment, :reviewee => @team1})
     @review_response_map.save
 
@@ -1005,7 +1007,9 @@ describe "peer review testing", :type => :feature do
 
     click_link "Begin"
 
-    # TODO: Load in the correct Questionnaire data for testing...
+    click_button "Submit Review"
+
+    expect(page).to have_content "Your response was successfully saved."
   end
 
 end

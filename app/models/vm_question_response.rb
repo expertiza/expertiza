@@ -151,7 +151,6 @@ class VmQuestionResponse
         color_code_number = 0
         if answer.answer.is_a? Numeric
           color_code_number = ((answer.answer.to_f / question_max_score.to_f) * 5.0).ceil
-
           # Color code c0 is reserved for null spaces in the table which will be gray.
           if color_code_number == 0
             color_code_number = 1

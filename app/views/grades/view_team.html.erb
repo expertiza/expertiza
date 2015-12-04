@@ -1,4 +1,4 @@
-  <style>
+ <style>
     .hiddenRow {padding:0 !important;}
   </style>
 
@@ -13,6 +13,7 @@
 
 <% if (vm.questionnaire_display_type == "Metareview" or vm.questionnaire_display_type == "Author Feedback" or vm.questionnaire_display_type == "Teammate Review") and @current_role_name.eql?'Student' %>
 <% else %>
+
       <% if vm.listofreviewers.length > 0 %>
 
           <div id="hid<%= vm.questionnaire_type + vm.round.to_s %>" class="accordion-body collapse" >
@@ -48,7 +49,7 @@
            <% i = 1 %>
            <% vm.listofreviews.each do |review| %>
                <% if @current_role_name.eql?'Student' %>
-                   <th style="border: 1px solid black"> <a target="_blank" href="../grades/view_reviewer?id=<%=@participant.id%>&response_id=<%= review.id.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Rev" + i.to_s %></a>  </th>
+                   <th style="border: 1px solid black"> <a target="_blank" href="../grades/view_reviewer?id=<%=@participant.id%>&response_id=<%= review.id.to_s %>&i=<%= i.to_s %>"><%= "Rev" + i.to_s %></a>  </th>
                    <% i += 1 %>
                <% end %>
 

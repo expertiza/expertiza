@@ -18,3 +18,4 @@ class VmQuestionResponseScoreCell
     @color_code
   end
 end
+

@@ -1,0 +1,8 @@
+Hi <%= @first_name %>,<BR/>
+<BR/>
+<p>There was a request for password reset for username: <%= @user.name %></p>
+<p>Please click the following link to reset the password.</p>
+<% h = "http://#{Rails.application.config.domain_name}/reset_password?link=#{@link}" %>
+<a href = <%= h %> ><%= h %></a>
+
+

@@ -51,7 +51,7 @@
       session[:return_to] = "#{request.protocol}#{request.host_with_port}#{request.fullpath}"
     %>
 
-  <%= link_to 'New User',:role => "Student", :action => 'new' %> |
+  <%= link_to 'New User', :action => 'new' %> |
   <%= link_to 'Import Users', :controller=>'import_file', :action=>'start', :model => 'User', :expected_fields => 'username, full name (first[ middle] last), e-mail address' %>|
   <%= link_to 'Export Users', :controller=>'export_file',:action=>'start',:model=> 'User',:id=> 1 %>
 

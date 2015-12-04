@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-class InvitationsController < ApplicationController
-=======
 class InvitationController < ApplicationController
   @@messages = Hash.new
->>>>>>> parent of 190b0a4... Renamed Invition_Controller.rb to Invitations_Controller.rb with corresponding changesin other files
   before_action :check_validity, only: [:create]
   def action_allowed? # user specified only have access to the functionality of the controller
     ['Student', 'Instructor', 'Teaching Assistant'].include?(current_role_name)
@@ -16,7 +12,7 @@ class InvitationController < ApplicationController
           if Invitation.is_invited?(@student.user_id, @user.id, @student.parent_id)
             set_invitation(@user.id,@student.user_id,@student.parent_id,'W') #'W states the invitation is waitlisted, still not accepted'
           else
-            flash[:note] = @messages[:already_invited]
+            flash[:note] = @@messages[:already_invited]
           end
     update_join_team_request @user,@student
     redirect_to view_student_teams_path student_id: @student.id
@@ -36,8 +32,7 @@ class InvitationController < ApplicationController
 
   def auto_complete_for_user_name # searches the user name in the user table for auto complete
     search = params[:user][:name].to_s
-    User.where(User.arel_table[:name].matches("%#{search}%"))
-    #@users = User.find_by_sql("select * from users where LOWER(name) LIKE '%"+search+"%'") unless search.blank?
+    @users = User.find_by_sql("select * from users where LOWER(name) LIKE '%"+search+"%'") unless search.blank?
   end
 
   def accept # allows accepting of the invitation
@@ -45,16 +40,24 @@ class InvitationController < ApplicationController
     student = Participant.find(params[:student_id])
     assignment_id=@inv.assignment_id
     inviter_user_id=@inv.from_id
+
     inviter_participant = AssignmentParticipant.find_by_user_id_and_assignment_id(inviter_user_id,assignment_id)
 
+    ready_to_join=false
     #check if the inviter's team is still existing, and have available slot to add the invitee
     inviter_assignment_team = AssignmentTeam.team(inviter_participant)
     if inviter_assignment_team.nil?
-      flash[:error]= @messages[:invitation_not_exist]
-    elsif inviter_assignment_team.full?
-        flash[:error]= @messages[:full_team]
+      flash[:error]= @@messages[:invitation_not_exist]
     else
-      @inv.reply_status = 'A'
+      if inviter_assignment_team.full?
+        flash[:error]= @@messages[:full_team]
+      else
+        ready_to_join=true
+      end
+    end
+
+    if ready_to_join
+      @inv.reply_status = 'A' # Request status 'Accept'
       @inv.save
 
       #Remove the users previous team since they are accepting an invite for possibly a new team.
@@ -64,8 +67,10 @@ class InvitationController < ApplicationController
       add_successful = Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, student.parent_id)
 
       unless add_successful
-        flash[:error] = @messages[:fail_to_add]
+        flash[:error] = @@messages[:fail_to_add]
       end
+    else
+      #The error message should have been flashed from the checks on ready_to_join flag
     end
 
     redirect_to view_student_teams_path student_id: params[:student_id]
@@ -85,21 +90,17 @@ class InvitationController < ApplicationController
     redirect_to view_student_teams_path student_id: params[:student_id]
   end
 
-  private 
-  def set_messages(name) # sets flash messages
-    @messages = Hash.new
-    @messages[:user_not_found] = "\"#{name}\" does not exist. Please make sure entered name is correct."
-    @messages[:user_not_participant] = "\"#{name}\" is not a participant of this assignment."
-    @messages[:max_members] = "Maximum team limit has been reached."
-    @messages[:already_member] = "\"#{name}\" is already a team member."
-    @messages[:already_invited] = "You have already sent an invitation to \"#{name}\"."
-    @messages[:full_team] = "The team which invited you is full now."
-    @messages[:invitation_not_exist]= "The team which invited you does not exist any more."
-    @messages[:fail_to_add] = "Something went wrong in the system. Hence failed to add you to the team which invited you. Please try again."
-
+  private def set_messages(name) # sets flash messages
+    @@messages[:user_not_found] = "\"#{name}\" does not exist. Please make sure entered name is correct."
+    @@messages[:user_not_participant] = "\"#{name}\" is not a participant of this assignment."
+    @@messages[:max_members] = "Maximum team limit has been reached."
+    @@messages[:already_member] = "\"#{name}\" is already a team member."
+    @@messages[:already_invited] = "You have already sent an invitation to \"#{name}\"."
+    @@messages[:full_team] = "The team which invited you is full now."
+    @@messages[:invitation_not_exist]= "The team which invited you does not exist any more."
+    @@messages[:fail_to_add] = "The system failed to add you to the team which invited you."
   end
-  private 
-  def set_invitation(to_id,from_id,assignment_id,reply_status) #creates an instance of invitation
+  private def set_invitation(to_id,from_id,assignment_id,reply_status) #creates an instance of invitation
     @invitation = Invitation.new
     @invitation.to_id = to_id
     @invitation.from_id = from_id
@@ -107,8 +108,7 @@ class InvitationController < ApplicationController
     @invitation.reply_status = reply_status
     @invitation.save
   end
-  private 
-  def check_validity # checks if the send invitation is valid
+  private def check_validity # checks if the send invitation is valid
     @user = User.find_by_name(params[:user][:name].strip)
     @team = AssignmentTeam.find(params[:team_id])
     @student = AssignmentParticipant.find(params[:student_id])
@@ -118,22 +118,22 @@ class InvitationController < ApplicationController
     return false unless current_user_id?(@student.user_id)
     #Check if the invited user is valid
     if @user.nil?
-      flash[:note] = @messages[:user_not_found]
+      flash[:note] = @@messages[:user_not_found]
       false
     else
       participant= AssignmentParticipant.where('user_id =? and parent_id =?', @user.id, @student.parent_id).first
       #Check if the user is a participant of the assignment
       if participant.nil?
-        flash[:note] = @messages[:user_not_participant]
+        flash[:note] = @@messages[:user_not_participant]
         false
       elsif @team.full?
-        flash[:error] = @messages[:max_members]
+        flash[:error] = @@messages[:max_members]
         false
       else
         team_member = TeamsUser.where(['team_id =? and user_id =?', @team.id, @user.id])
         #Check if invited user is already in the team
         unless team_member.empty?
-          flash[:note] = @messages[:already_member]
+          flash[:note] = @@messages[:already_member]
           false
         end
       end

@@ -6,30 +6,33 @@ class JoinTeamRequestsController < ApplicationController
     ['Student', 'Instructor', 'Teaching Assistant'].include?(current_role_name) #people with this roles can only access the function provied by the controller 
   end
 
-  private def render_request
-      respond_to do |format|
-      format.html 
-      format.xml  { render :xml => @join_team_request } #displays the join team instance
-    end
-  end
-
   def index
-    @join_team_request = JoinTeamRequest.all #gets all the request to join team  
-    render_request # index.html.erb
+    @join_team_requests = JoinTeamRequest.all #gets all the request to join team  
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.xml  { render :xml => @join_team_requests } #displays the join team instance
+    end
   end
 
   # GET /join_team_requests/1
   # GET /join_team_requests/1.xml
   def show # searches the join team requests for a particular id
     @join_team_request = JoinTeamRequest.find(params[:id]) 
-    render_request # show.html.erb
+    respond_to do |format|
+      format.html # show.html.erb
+      format.xml  { render :xml => @join_team_request }
+    end
   end
 
   # GET /join_team_requests/new
   # GET /join_team_requests/new.xml
   def new # create a new join team request entry instance
     @join_team_request = JoinTeamRequest.new
-    render_request # new.html.erb
+    respond_to do |format|
+      format.html # new.html.erb
+      format.xml  { render :xml => @join_team_request }
+    end
   end
 
   # GET /join_team_requests/1/edit
@@ -106,5 +109,4 @@ class JoinTeamRequestsController < ApplicationController
     else
       redirect_to root_path, notice: "Decline request could not be performed."
   end
-end
 end

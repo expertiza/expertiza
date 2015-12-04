@@ -731,8 +731,7 @@ ActiveRecord::Schema.define(version: 20151201060819) do
     t.text     "public_key",                limit: 65535
     t.boolean  "copy_of_emails",            limit: 1,     default: false
     t.integer  "login_attempts",            limit: 4,     default: 0
-    t.datetime "next_login_time",                         default: '2015-12-01 03:41:59'
-    t.integer  "institutions_id",           limit: 4
+    t.datetime "next_login_time",                         default: '2015-11-20 05:24:29'
   end
 
   add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree

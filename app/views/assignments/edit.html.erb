@@ -52,7 +52,8 @@
         <%= render 'assignments/edit/rubrics' %>
       </div>
       <div id="tabs-4">
-        <div id="review_strategy" params="#{@reactjsParams}"></div>
+        <!--<div id="review_strategy" params= '{"assignment_form": { "assignment": {} }}'></div>-->
+        <%= react_component('StrategyTable', {assignment_form: @assignment_form}) %>
       </div>
       <div id="tabs-5">
         <%= render 'assignments/edit/due_dates' %>

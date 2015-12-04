@@ -67,6 +67,10 @@ jQuery(document).ready(function() {
 
     var assignmentGeneralInfoTable = React.createClass({
         render: function() {
+            var assignmentName = [];
+            var courseID = [];
+            var submissionDirectory = [];
+            var specURL = [];
 
             return(
                 <table id='assignment_general_info_table'>
@@ -82,7 +86,7 @@ jQuery(document).ready(function() {
                             'Assignment name: '
                         </td>
                         <td style='padding:5px'>
-                            <input type="text" className="form_control" defaultValue={this.props.assignment_form.assignment.name} width="250">
+                            <input id="assignment_name" type="text" className="form_control" defaultValue={this.props.assignment_form.assignment.name} width="250">
                         </td>
                     </tr>
 
@@ -100,7 +104,7 @@ jQuery(document).ready(function() {
                             'Submission Directory: '
                         </td>
                         <td style='padding:5px'>
-                            <input type="text" className="form_control" defaultValue={this.props.assignment_form.assignment.directory_path} width="250"> (Mandatory field. No space or special chars.)
+                            <input id="submission_directory" type="text" className="form_control" defaultValue={this.props.assignment_form.assignment.directory_path} width="250"> (Mandatory field. No space or special chars.)
                             <img src="/assets/info.png" title='- DO NOT change this filed for an on-going assignment. This may cause lost of student submitted file.'>
                         </td>
                     </tr>
@@ -110,7 +114,7 @@ jQuery(document).ready(function() {
                             'Description URL: '
                         </td>
                         <td style='padding:5px'>
-                            <input type="text" className="form_control" defaultValue={this.props.assignment_form.assignment.spec_location} width="250">
+                            <input id="spec_url" type="text" className="form_control" defaultValue={this.props.assignment_form.assignment.spec_location} width="250">
                         </td>
                     </tr>
 

@@ -87,7 +87,18 @@
                   <%end %>
           <%end %>
 
-           <% if (@l%2) == 0 %>
+          <% review_metrics_present = false %>
+          <% @response_maps.each do |ri| %>
+              <% responses = Response.where(:map_id => ri.id) %>
+              <% for response in responses %>
+                  <% if ReviewMetric.where(response_id: response[:id]).count > 0 %>
+                      <% review_metrics_present = true %>
+                  <% end %>
+              <% end %>
+          <% end %>
+
+          <% if review_metrics_present %>
+             <% if (@l%2) == 0 %>
              <td bgcolor="#ffffff"  align = "left" rowspan= <%= @rspan%>>
                <%= link_to "text metrics summary", :controller => 'review_metrics', :action => 'aggregate', :reviewer_id => r.reviewer_id, :assignment_id=>@id%>
              </td>
@@ -96,6 +107,9 @@
                   <%= link_to "text metrics summary", :controller => 'review_metrics', :action => 'aggregate', :reviewer_id => r.reviewer_id, :assignment_id=>@id%>
                 </td>
             <%end %>
+          <% else %>
+              <td bgcolor="#ffffff"  align = "left" rowspan= <%= @rspan%> > Not Available </td>
+          <% end %>
 
           <% @response_maps.each do |ri| %>
             <% if (Response.find_by_map_id(ri.id)) %>
@@ -110,13 +124,25 @@
                     <%= link_to Team.find(ri.reviewee_id).name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
                   </td>
 
-                <% if (@l%2) == 0 %>
-                  <td id = "green" bgcolor="#ffffff" align = 'left' colspan=1>
-                <%else %>
-                  <td id = "green" bgcolor="#DDDDBB" align = 'left' colspan=1>
-                <%end %>
+                <% responses = Response.where(:map_id => ri.id) %>
+                 <% review_metrics_present = false %>
+                 <% for response in responses %>
+                     <% if ReviewMetric.where(response_id: response[:id]).count > 0 %>
+                         <% review_metrics_present = true %>
+                     <% end %>
+                <% end %>
+                <% if review_metrics_present %>
+                    <% if (@l%2) == 0 %>
+                        <td id = "green" bgcolor="#ffffff" align = 'left' colspan=1>
+                    <%else %>
+                        <td id = "green" bgcolor="#DDDDBB" align = 'left' colspan=1>
+                    <%end %>
                     <%= link_to Team.find(ri.reviewee_id).name, :controller => 'review_metrics', :action => 'list', :id => ri.id %>
-                  </td>
+                        </td>
+                <% else %>
+                      <td> Not Available </td>
+                <% end %>
+                
 
                   <%= render :partial => 'teamscore' %>
 

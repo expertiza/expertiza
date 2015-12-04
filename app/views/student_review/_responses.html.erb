@@ -66,10 +66,20 @@
                         <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
                       <% end %>
                     <% end %>
-		   
-			 <td>
-                              <%= link_to "Text Metrics", {:controller => 'review_metrics', :action => 'list', :id => map.id} %>
-                         </td>
+
+                          <% responses = Response.where(:map_id => map.id) %>
+                          <% review_metrics_present = false %>
+                          <% for response in responses %>
+                              <% if ReviewMetric.where(response_id: response[:id]).count > 0 %>
+                                  <% review_metrics_present = true %>
+                              <% end %>
+                          <% end %>
+
+                          <% if review_metrics_present %>
+			                        <td>
+                                  <%= link_to "Text Metrics", {:controller => 'review_metrics', :action => 'list', :id => map.id} %>
+                             </td>
+                         <% end %>
 		   
                 <%end%>
             <% elsif @assignment.get_current_stage(topic_id) != "Complete" %>

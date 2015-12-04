@@ -28,7 +28,9 @@ class ReviewMetricsController < ApplicationController
 
     @response_id.each {
         |response|
-      @metrics << ReviewMetric.where(response_id: response).first
+        if ReviewMetric.where(response_id: response).count > 0
+            @metrics << ReviewMetric.where(response_id: response).first
+        end
     }
 
   end

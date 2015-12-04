@@ -57,7 +57,6 @@ gem 'will_paginate'
 gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
 gem 'simple_captcha2',require:'simple_captcha'
-#gem 'simple_captcha', :git=> 'git://github.com/vittorius/simple-captcha.git'
 group :development do
   gem 'daemons'
   gem 'pry'

@@ -3,9 +3,9 @@ class ReviewMetric < ActiveRecord::Base
   def calulate_metric
 	
 	@answer = Answer.where ("response_id = #{self.response_id}")
-	offensive_words = {:anal => "offensive", :anus => "offensive", :arse => "offensive",:ass => "offensive", :ballsack => "offensive"}
-	suggestion_words = {:should => "suggestion", :advise => "suggestion", :recommend => "suggestion", :recommendable => "suggestion", :recommendation => "suggestion", :try => "suggestion" }
-	error_words = {:wrong => "error", :error => "error", :problem => "error", :issue => "error", :problematic => "error", :incorrect => "error"}
+	offensive_words = Set.new(["anal", "anus", "arse", "ass", "ballsack"])
+	suggestion_words = Set.new(["should", "advise", "recommend", "recommendable", "recommendation", "try"])
+	error_words = Set.new(["wrong", "error", "problem", "issue", "problematic", "incorrect"])
 	@total_word_count = 0
 	@offensive_count = 0
 	@suggestion_count = 0
@@ -35,44 +35,18 @@ class ReviewMetric < ActiveRecord::Base
 
 	@diff_word_count = answers.scan(/[\w']+/).uniq.count
 
-	#checks for offensive words in the answers by comparing with the offensive_words dictionary
-	offensive_words.each { |key, word|
-		(0..@answer.count-1).each do |i|
-			@answer[i][:comments].scan(/[\w']+/).each do |word|
-				if word.eql?key.to_s
-					@offensive_count = @offensive_count + 1
-				end
-			end
-		end
-			}
-
-	suggestion_words.each { |key, word|
-		(0..@answer.count-1).each do |i|
-			@temp_val = 0
-			@answer[i][:comments].scan(/[\w']+/).each do |word|
-				if word.eql?key.to_s
-					@temp_val = 1
-				end
-			end
-			if @temp_val == 1
-				@suggestion_count = @suggestion_count + 1
-			end
-		end
-	}
-
-	error_words.each { |key, word|
-		(0..@answer.count-1).each do |i|
-			@temp_val = 0
-			@answer[i][:comments].scan(/[\w']+/).each do |word|
-				if word.eql?key.to_s
-					@temp_val = 1
-				end
-			end
-			if @temp_val == 1
-				@error_count = @error_count + 1
-			end
-		end
-	}
+    	#checks for offensive, suggestion or error words in the answers by comparing with the dictionaries
+    (0..@answer.count-1).each do |i|
+    	@answer[i][:comments].scan(/[\w']+/).each do |word|
+    	    if offensive_words.include? word
+    	    	@offensive_count = @offensive_count + 1
+    	    elsif suggestion_words.include? word
+    	    	@suggestion_count = @suggestion_count + 1
+    	    elsif error_words.include? word
+    	    	@error_count = @error_count + 1
+    	    end
+    	end
+    end
 
 
 	self.total_word_count = @total_word_count

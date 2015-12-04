@@ -1,11 +1,10 @@
-<% h = "http://localhost:3000/reset_password?link=#{@link}" %>
-<p>Hi <%= @first_name %>,</p>
+Hi <%= @first_name %>,<BR/>
+<BR/>
 <p>
   Your Expertiza account has been created at <a href="http://expertiza.ncsu.edu">http://expertiza.ncsu.edu</a>.
+  We strongly recommend that you change the password the first time you access the application.
 </p>
-<p> User Name: <%= @user.name %> </p>
-<p> E-mail address:<%= @user.email %> </p>
 
-<p>We strongly recommend that you change the password the first time you access the application using the link given below.</p>
-
-Reset link: <a href = <%= h %> ><%= h %></a>
+User Name: <%= @user.name %><BR/>
+E-mail address:<%= @user.email %><BR/><BR/>
+New password: <%= @password %><BR/>

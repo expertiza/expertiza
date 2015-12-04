@@ -128,9 +128,9 @@ class UsersController < ApplicationController
       @user.timezonepref = User.find(@user.parent_id).timezonepref
 
       if @user.save
-        link = ExpiryLink.generate_link(@user.email)
-        MailerHelper::send_mail_to_user(@user, "Your Expertiza account has been created", "user_welcome",link).deliver_later
-        flash[:success] = "A reset link has been sent to new user's e-mail address."
+        password = @user.reset_password         # the password is reset
+        MailerHelper::send_mail_to_user(@user,"Your Expertiza account and password have been created","user_welcome",password).deliver
+        flash[:success] = "A new password has been sent to new user's e-mail address."
         #Instructor and Administrator users need to have a default set for their notifications
         # the creation of an AssignmentQuestionnaire object with only the User ID field populated
         # ensures that these users have a default value of 15% for notifications.
@@ -153,15 +153,16 @@ class UsersController < ApplicationController
     get_role
     foreign
   end
+
+  #reset_password is used when the user forgets one.
   def reset_password
     @user = User.find(params[:id])
     if @user.update_attributes(user_params)
-      e = ExpiryLink.where(email:@user.email).first
+      e = ExpiryLink.where(uid:@user.id).first
       e.destroy
       flash[:success] = "Password is sucessfully changed."
       redirect_to '/'
     else
-      
       flash[:error] = @user.errors.full_messages.to_sentence
       redirect_to request.referrer
     end
@@ -180,7 +181,6 @@ class UsersController < ApplicationController
       undo_link("User \"#{@user.name}\" has been updated successfully.")
       redirect_to @user
     else
-      redirect_to "http://google.com"
       foreign
       render :action => 'edit'
     end

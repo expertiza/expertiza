@@ -10,6 +10,8 @@ Expertiza::Application.configure do
   # Do not eager load code on boot.
   config.eager_load = false
 
+  
+
   # Show full error reports and disable caching.
   config.consider_all_requests_local       = true
   config.action_controller.perform_caching = false
@@ -22,8 +24,8 @@ Expertiza::Application.configure do
       :port           => 587,
       :address        => "smtp.gmail.com",
       :domain         => "example.com",
-      :user_name      => "djscoe2015",
-      :password       => "Everythingisplanned123",
+      :user_name      => "expertiza.development@gmail.com",
+      :password       => "qwer@1234",
       :authentication => :plain,
       :enable_starttls_auto => true
   }

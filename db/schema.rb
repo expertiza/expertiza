@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151128163815) do
+ActiveRecord::Schema.define(version: 20151201060819) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -246,6 +246,7 @@ ActiveRecord::Schema.define(version: 20151128163815) do
     t.string   "link",       limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+    t.integer  "uid",        limit: 4
   end
 
   create_table "institutions", force: :cascade do |t|
@@ -730,7 +731,8 @@ ActiveRecord::Schema.define(version: 20151128163815) do
     t.text     "public_key",                limit: 65535
     t.boolean  "copy_of_emails",            limit: 1,     default: false
     t.integer  "login_attempts",            limit: 4,     default: 0
-    t.datetime "next_login_time",                         default: '2015-11-20 05:24:29'
+    t.datetime "next_login_time",                         default: '2015-12-01 03:41:59'
+    t.integer  "institutions_id",           limit: 4
   end
 
   add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree

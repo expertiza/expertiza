@@ -61,10 +61,6 @@ class AuthController < ApplicationController
     end
   end  #def login
 
-<<<<<<< HEAD
-  ##Refactor this
-=======
->>>>>>> e063c2310a81e43f07e67020c276e6ee7144b3b5
   def failed_login(user)
     if(user.login_attempts < 3)
      user.login_attempts=user.login_attempts+1
@@ -76,10 +72,6 @@ class AuthController < ApplicationController
       exponential_backoff(user)
     end
   end 
-<<<<<<< HEAD
- #def login
-=======
->>>>>>> e063c2310a81e43f07e67020c276e6ee7144b3b5
 
   def exponential_backoff(user)
     # function to handle exponential backoff afterfailedlogin attempt
@@ -87,19 +79,10 @@ class AuthController < ApplicationController
     interval=2**(user.login_attempts-3)
     user.next_login_time=DateTime.now+interval.minutes
     user.save
-<<<<<<< HEAD
-    @newuser = user
-    logger.warn "Failed login attempt: Account Blocked"
-    flash[:error] = "Account is Blocked for #{interval} minutes"
-    redirect_to :controller => 'content_pages', :action => 'view'
-  end
->>>>>>> parent of d3ab0cb... Updated code for CAPTCHA and reverted changes in user.rb
-=======
     logger.warn "Failed login attempt: Account Blocked"
     flash[:error] = "Account is Blocked for #{interval} minutes"
     render 'content_pages/relogin'
   end
->>>>>>> e063c2310a81e43f07e67020c276e6ee7144b3b5
   # function to handle common functionality for conventional user login and google login
   def after_login (user)
     session[:user] = user

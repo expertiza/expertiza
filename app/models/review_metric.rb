@@ -16,18 +16,24 @@ class ReviewMetric < ActiveRecord::Base
 	@add_comment = Response.find_by_id(self.response_id).additional_comment
 	
 	if @add_comment
-		@answer[0][:comments] = @answer[0][:comments] + ". " + @add_comment	
-	
+		@answer[0][:comments] = @answer[0][:comments] + ". " + @add_comment
 	end
 
+    answers = ""
 	(0..@answer.count-1).each do |i|
-	@sentence_count = @answer[i][:comments].scan(/[\w']+/).count
-		if @sentence_count > 7 and @answer[i][:comments][-1,1].eql?"."
-			@complete_count = @complete_count + 1
-		end
-	@total_word_count += @sentence_count
-	@diff_word_count += @answer[i][:comments].scan(/[\w']+/).uniq.count
+	    sentences = @answer[i][:comments].split('.')
+	    #for each sentence in the comment, count full sentences
+	    sentences.each do |sentence|
+	        word_count = sentence.scan(/[\w']+/).count
+	        if word_count > 7
+	        	@complete_count = @complete_count + 1
+	        end
+	        @total_word_count += word_count
+	    end
+	    answers = answers + "." + @answer[i][:comments]
 	end
+
+	@diff_word_count = answers.scan(/[\w']+/).uniq.count
 
 	#checks for offensive words in the answers by comparing with the offensive_words dictionary
 	offensive_words.each { |key, word|

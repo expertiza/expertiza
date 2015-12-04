@@ -4,13 +4,6 @@ require_relative './helpers/login_helper'
 require 'selenium-webdriver'
 include LogInHelper
 
-def send_inv
-
-  click_link "Ethical analysis 2"
-  click_link "Your team"
-  fill_in 'user_name', with: 'student4347'
-  click_button 'Invite'
-end
 
 feature 'Add someone to a team' do
   scenario 'send the invitation as sender and receive it', :js=>true do
@@ -22,7 +15,10 @@ feature 'Add someone to a team' do
     page.driver.browser.manage.window.maximize
 
     # send invitation
-    send_inv
+    click_link "Ethical analysis 2"
+    click_link "Your team"
+    fill_in 'user_name', with: 'student4347'
+    click_button 'Invite'
     expect(page). to have_content('Waiting for reply')
 
     # log out
@@ -33,6 +29,7 @@ feature 'Add someone to a team' do
     click_link "Ethical analysis 2"
     click_link "Your team"
 
+    # accept invitation
     click_link 'Accept'
 
     # confirm pop out message
@@ -42,5 +39,7 @@ feature 'Add someone to a team' do
     expect(page). to have_content('student4346')
 
   end
+
+
 
 end

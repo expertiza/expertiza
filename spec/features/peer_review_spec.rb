@@ -1022,7 +1022,8 @@ describe "peer review testing", :type => :feature do
 
     expect(page).to have_content "Your response was successfully saved."
   end
-it "fills in a single comment with multi word text and saves" do
+
+  it "fills in a single comment with multi word text and saves" do
     # Setup test specific data
     @q1=Criterion.new({:size => "70,1", :weight => 5, :questionnaire_id => @quiz.id, :seq => "3", :txt => "helloText"})
     @q1.save
@@ -1035,14 +1036,13 @@ it "fills in a single comment with multi word text and saves" do
 
     # Fill in a textbox with a multi word comment 
     fill_in "responses[0][comment]", :with => "Excellent Work"
-    
 
     click_button "Submit Review"
 
     expect(page).to have_content "Your response was successfully saved."
-end
+  end
 
-it "fills in a single comment with single word and saves" do
+  it "fills in a single comment with single word and saves" do
     # Setup test specific data
     @q1=Criterion.new({:size => "70,1", :weight => 5, :questionnaire_id => @quiz.id, :seq => "3", :txt => "helloText"})
     @q1.save
@@ -1055,14 +1055,13 @@ it "fills in a single comment with single word and saves" do
 
     # Fill in a textbox with a single word comment
     fill_in "responses[0][comment]", :with => "Excellent"
-    
 
     click_button "Submit Review"
 
     expect(page).to have_content "Your response was successfully saved."
-end
+  end
 
-it "fills in only points and saves" do
+  it "fills in only points and saves" do
     # Setup test specific data
     @q1=Criterion.new({:size => "70,1", :weight => 5, :questionnaire_id => @quiz.id, :seq => "3", :txt => "helloText"})
     @q1.save
@@ -1078,9 +1077,9 @@ it "fills in only points and saves" do
     click_button "Submit Review"
 
     expect(page).to have_content "Your response was successfully saved."
-end
+  end
 
-it "saves an empty review without any points and comments" do
+  it "saves an empty review without any points and comments" do
     # Setup test specific data
     @q1=Criterion.new({:size => "70,1", :weight => 5, :questionnaire_id => @quiz.id, :seq => "3", :txt => "helloText"})
     @q1.save
@@ -1093,9 +1092,9 @@ it "saves an empty review without any points and comments" do
     click_button "Submit Review"
 
     expect(page).to have_content "Your response was successfully saved."
-end
+  end
 
-it "saves a review with only additional comments" do
+  it "saves a review with only additional comments" do
     # Setup test specific data
     @q1=Criterion.new({:size => "70,1", :weight => 5, :questionnaire_id => @quiz.id, :seq => "3", :txt => "helloText"})
     @q1.save
@@ -1105,10 +1104,11 @@ it "saves a review with only additional comments" do
 
     # Load questionnaire with generic setup
     load_questionnaire
-	# Filling in Additional Comments only
-	fill_in "review[comments]", :with => "Excellent work done!"
+
+    # Filling in Additional Comments only
+    fill_in "review[comments]", :with => "Excellent work done!"
     click_button "Submit Review"
 
     expect(page).to have_content "Your response was successfully saved."
-end  
+  end
 end

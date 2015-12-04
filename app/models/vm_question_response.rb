@@ -20,7 +20,7 @@ class VmQuestionResponse
       # score for the question is stored not on the question, but on the questionnaire. Neat.
       corresponding_questionnaire = Questionnaire.find_by(id: question.questionnaire.id)
       question_max_score = corresponding_questionnaire.max_question_score
-      row = VmQuestionResponseRow.new(question.txt, question.id, question.weight, question_max_score)
+      row = VmQuestionResponseRow.new(question.txt, question.id, question.weight, question_max_score,question.seq)
       @listofrows << row
     end
   end
@@ -105,6 +105,10 @@ class VmQuestionResponse
     @max_score
   end
 
+  def max_score_for_questionnaire
+    @max_score * @listofrows.length
+  end
+
   def rounds
     @rounds
   end
@@ -159,6 +163,24 @@ class VmQuestionResponse
         row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments))
       end
     end
+  end
+
+  def get_total_review_scores
+    # First things first, initialize our array.
+    total_review_scores = Array.new(@listofrows[0].score_row.length){ |i| 0.0 }
+
+    # Now iterate over each row and sum the values in the score_row in the corresponding
+    # index of our new array.
+    @listofrows.each do |row|
+      row.score_row.each_index do |index|
+        score_value = row.score_row[index].score_value
+        if (score_value.is_a? Numeric)
+          total_review_scores[index] += score_value.to_f
+        end
+      end
+    end
+
+    return total_review_scores
   end
 
   # This is going to calculate the average of each column, store it in an array, and

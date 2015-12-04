@@ -1,9 +1,10 @@
 class VmQuestionResponseRow
 
-  def initialize(questionText, question_id, weight,question_max_score)
+  def initialize(questionText, question_id, weight,question_max_score,seq)
     @questionText = questionText
     @weight = weight
     @question_id = question_id
+    @question_seq = seq
 
     @question_max_score = question_max_score
 
@@ -15,6 +16,9 @@ class VmQuestionResponseRow
     @countofcomments
   end
 
+  def question_seq
+    @question_seq
+  end
   def countofcomments=(newcount)
     @countofcomments = newcount
   end

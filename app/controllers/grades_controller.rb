@@ -12,7 +12,13 @@ class GradesController < ApplicationController
        'Administrator',
        'Super-Administrator',
        'Student'].include? current_role_name and are_needed_authorizations_present?
-      when 'view_team'
+    when 'view_team'
+      ['Instructor',
+        'Teaching Assistant',
+        'Administrator',
+        'Super-Administrator',
+        'Student'].include? current_role_name and are_needed_authorizations_present?
+    when 'view_reviewer'
         ['Instructor',
          'Teaching Assistant',
          'Administrator',

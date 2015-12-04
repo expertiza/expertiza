@@ -5,6 +5,9 @@
 <h1>Summary report for <%= @assignment.name %></h1>
 <h2>Summary report for team <%= @team.name %>(<%= @participant.fullname %>)</h2>
 
+<script>
+  $(function () { $("[data-toggle='tooltip']").tooltip(); });
+</script>
 
 <% @vmlist.each do |vm| %>
 
@@ -36,7 +39,7 @@
             (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)
       <%end %>
     </h4>
-    <span style="padding-left:30px;cursor: pointer;" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s %>">display questions</span>
+    <span style="padding-left:30px;cursor: pointer;" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">display questions</span>
 </span>
 <table id="tbl_heat">
          <tr>          <th>Question</th>      <th>Max</th>
@@ -44,14 +47,14 @@
            <% i = 1 %>
            <% vm.listofreviews.each do |review| %>
                <% if @current_role_name.eql?'Student' %>
-                   <th style="border: 1px solid black"> <a target="_blank" href="../grades/view_reviewer?id=<%=@participant.id%>&response_id=<%= review.id.to_s %>"><%= "Rev" + i.to_s %></a>  </th>
+                   <th style="border: 1px solid black"> <a target="_blank" href="../grades/view_reviewer?id=<%=@participant.id%>&response_id=<%= review.id.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Rev" + i.to_s %></a>  </th>
                    <% i += 1 %>
                <% end %>
 
                <% if @current_role_name.eql?'Instructor' %>
                    <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname.to_s %>
 
-                   <th style="border: 1px solid black"> <a target="_blank" href="../grades/view_reviewer?id=<%=@participant.id%>&response_id=<%= review.id.to_s %>"><%= user_name.to_s %></a>  </th>
+                   <th style="border: 1px solid black"> <a target="_blank" href="../grades/view_reviewer?id=<%=@participant.id%>&response_id=<%= review.id.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
                    <% i += 1 %>
                <% end %>
            <% end %>
@@ -69,7 +72,7 @@
           <td class = 'cf' style="border: 1px solid black;"> <%= row.questionText[0...20] %>   </td>
           <td class = 'cf' style="border: 1px solid black;"> <%= vm.max_score %>   </td>
           <% row.score_row.each do |score| %>
-              <td style="border: 1px solid black" class="<%= score.color_code %>" align="center">
+              <td style="border: 1px solid black" class="<%= score.color_code %>" align="center" data-toggle="tooltip" data-placement="right" title="GREEN-good, YELLOW-okay, RED-bad">
                 <%= score.score_value.to_s %>
               </td>
           <% end %>

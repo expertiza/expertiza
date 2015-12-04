@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'rails_helper'
 
-include LogInHelper
+
 
 # require File.join('./app/controllers/application_controller')
 

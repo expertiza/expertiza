@@ -49,7 +49,7 @@
            <% i = 1 %>
            <% vm.listofreviews.each do |review| %>
                <% if @current_role_name.eql?'Student' %>
-                   <th style="border: 1px solid black"> <a target="_blank" href="../grades/view_reviewer?id=<%=@participant.id%>&response_id=<%= review.id.to_s %>&i=<%= i.to_s %>"><%= "Rev" + i.to_s %></a>  </th>
+                   <th style="border: 1px solid black"> <a target="_blank" href="../grades/view_reviewer?id=<%=@participant.id%>&response_id=<%= review.id.to_s %>&i=<%= i.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Rev" + i.to_s %></a>  </th>
                    <% i += 1 %>
                <% end %>
 

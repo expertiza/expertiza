@@ -6,8 +6,8 @@
         $(function () { $("[data-toggle='tooltip']").tooltip(); });
   </script>
 
-<h1>Summary report for <%= @assignment.name %></h1>
-<h2>Summary report for team <%= @team.name %>(<%= @participant.fullname %>)</h2>
+<h1>Summary Report for assignment: <%= @assignment.name %></h1>
+<h4>Team: <%= @team.name %>(Username: <%= @participant.fullname %>)</h4>
 
 
 <% @vmlist.each do |vm| %>
@@ -109,7 +109,7 @@
             </thead>
             <% for index in 0 .. row.score_row.length - 1 %>
             <tr><td style="border: 1px solid grey;padding: 5px 5px 5px 5px;background-color: #ffffff;"><%= row.score_row[index].score_value.to_s %></td>
-              <td style="border: 1px solid grey;padding:5px; 5px 5px 5px;background-color: #ffffff;"><%= row.score_row[index].comment %></td></tr>
+              <td style="border: 1px solid grey;padding:5px 5px 5px 5px;background-color: #ffffff;"><%= row.score_row[index].comment %></td></tr>
             <% end %>
           </table>
           </div>
@@ -118,7 +118,7 @@
       <% j += 1 %>
     <% end %>
   <tr>
-    <td class = 'cf' style="border: 1px solid black;">
+    <td class = 'cf' style="border: 1px solid black;"  data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s + "comment" %>">
       Review Total
     </td>
     <td class = 'cf' style="border: 1px solid black;" align="center">
@@ -136,6 +136,33 @@
     <td  class = 'cf' style="border: 1px solid black;">
     </td>
   </tr>
+
+     <tr>
+        <% vm.listofreviews.each do |review| %>
+                <td colspan="<%= (i+1).to_s %>" class="hiddenRow" >
+              <div id="hid<%= vm.questionnaire_type + vm.round.to_s + "comment" %>" class="accordion-body collapse" style="margin-left:10px;">
+               <div style="background-color:#A9A9F5;padding:4px;">
+                  <table style="border: 1px solid grey;">
+                    <thead>
+                 <th style="border: 1px solid grey;padding: 5px 5px 5px 5px;">Review</th>
+                  <th style="border: 1px solid grey;padding: 5px 5px 5px 5px;">Additional Comments</th>
+                  </thead>
+                    <tbody>
+                    <%k = 1%>
+                    <% vm.listofreviews.each do |review| %>
+                            <tr><td style="border: 1px solid grey;padding: 5px 5px 5px 5px;background-color: #ffffff;"><%= k %></td>
+                                 <td style="border: 1px solid grey;padding:5px 5px 5px 5px;background-color: #ffffff;"><%= Response.find(review.id)["additional_comment"] %></td></tr>
+                            <%k += 1%>
+                       <% end %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+           </td>
+            <%end%>
+
+      </tr>
+
   <tr>
     <td style="border: 1px solid black;">
       Column Average

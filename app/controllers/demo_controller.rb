@@ -6,14 +6,19 @@ class DemoController < ApplicationController
   end
 
   def new
-    @user = User.new
-    foreign
+     @demo_role = Role.find_by_name("demo_instructor")
+    if @demo_role
+         @user = User.new
+          @demo_role_id = @demo_role.id
+    else
+      flash[:error] = "Demo Instructor Role not yet created"
+      redirect_to '/'
+    end
+   
+    
   end
 
-  def foreign
-    @demo_role = Role.find_by_name("demo_instructor")
-    @demo_role_id = @demo_role.id
-  end
+  
 
   def place_holder
 

@@ -599,7 +599,7 @@ jQuery(document).ready(function() {
       var _this = this
       var colWidthArray = ["19%", "20%", "12%", "17%", "17%", "15%"]
       var colDisplayStyle = {
-        "display": "",
+        "display": ""
       }
       if (this.props) {
         if (this.props.dataType === 'questionnaire') {

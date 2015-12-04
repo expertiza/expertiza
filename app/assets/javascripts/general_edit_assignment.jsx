@@ -86,7 +86,7 @@ jQuery(document).ready(function() {
                             'Assignment name: '
                         </td>
                         <td style='padding:5px'>
-                            <input id="assignment_name" type="text" className="form_control" defaultValue={this.props.assignment_form.assignment.name} width="250">
+                            <input id="assignment_name" type="text" className="form_control" defaultValue={this.props.assignment_form.assignment.name} width="250"/>
                         </td>
                     </tr>
 
@@ -104,8 +104,8 @@ jQuery(document).ready(function() {
                             'Submission Directory: '
                         </td>
                         <td style='padding:5px'>
-                            <input id="submission_directory" type="text" className="form_control" defaultValue={this.props.assignment_form.assignment.directory_path} width="250"> (Mandatory field. No space or special chars.)
-                            <img src="/assets/info.png" title='- DO NOT change this filed for an on-going assignment. This may cause lost of student submitted file.'>
+                            <input id="submission_directory" type="text" className="form_control" defaultValue={this.props.assignment_form.assignment.directory_path} width="250"/> (Mandatory field. No space or special chars.)
+                            <img src="/assets/info.png" title='- DO NOT change this filed for an on-going assignment. This may cause lost of student submitted file.'/>
                         </td>
                     </tr>
 
@@ -114,7 +114,7 @@ jQuery(document).ready(function() {
                             'Description URL: '
                         </td>
                         <td style='padding:5px'>
-                            <input id="spec_url" type="text" className="form_control" defaultValue={this.props.assignment_form.assignment.spec_location} width="250">
+                            <input id="spec_url" type="text" className="form_control" defaultValue={this.props.assignment_form.assignment.spec_location} width="250"/>
                         </td>
                     </tr>
 
@@ -130,9 +130,10 @@ jQuery(document).ready(function() {
             return(
                 <table id='assignment_general_settings_table'>
                     <tr class='heading'>
-                        <th width="40%">
-                        <th width="60%">
+                        <th width="40%"/>
+                        <th width="60%"/>
                     </tr>
+                </table>
             )
         }
     })

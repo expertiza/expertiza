@@ -1,7 +1,5 @@
 jQuery(document).ready(function() {
-    var topicTab = React.createClass() {
 
-    }
 })
 
 /* Source

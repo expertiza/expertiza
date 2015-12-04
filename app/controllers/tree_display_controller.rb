@@ -190,7 +190,12 @@ class TreeDisplayController < ApplicationController
             tmpObject["has_topic"] = SignUpTopic.where(['assignment_id = ?', node.node_object_id]).first ? true : false
           end
         end
-        res[nodeType] << tmpObject
+
+      if ['Super-Administrator', 'Administrator','Instructor','Teaching Assistant'].include? current_role_name
+          res[nodeType] << tmpObject
+        elsif node.get_instructor_id===session[:user].id
+          res[nodeType] << tmpObject
+        end
       end
 
     end

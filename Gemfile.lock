@@ -52,6 +52,8 @@ GEM
     addressable (2.3.8)
     algorithms (0.6.1)
     arel (6.0.3)
+    assert_difference (1.0.0)
+      activesupport (>= 3.0.0)
     awesome_nested_set (3.0.2)
       activerecord (>= 4.0.0, < 5)
     babel-source (5.8.23)
@@ -415,6 +417,7 @@ PLATFORMS
 DEPENDENCIES
   RedCloth
   activerecord-session_store
+  assert_difference
   awesome_nested_set
   bind-it
   capistrano
@@ -485,3 +488,6 @@ DEPENDENCIES
   uglifier
   will_paginate
   zip-zip
+
+BUNDLED WITH
+   1.10.6

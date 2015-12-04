@@ -5,6 +5,7 @@ gem 'rails', '~> 4.2.1'
 ## Gems in Alphabetical Order
 
 gem 'activerecord-session_store'
+gem 'assert_difference'
 gem 'awesome_nested_set'
 gem 'bind-it'
 gem 'capistrano'
@@ -33,7 +34,7 @@ gem 'nokogiri'
 gem 'omniauth-google-oauth2', '~> 0.2.6'
 gem 'open-uri-cached'
 gem 'paper_trail'
-gem 'pg', group: :production
+gem 'pg', '~> 0.11.0', group: :production
 gem 'protected_attributes'
 gem 'rails_12factor', group: :production
 gem 'rails4-autocomplete'

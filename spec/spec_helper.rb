@@ -1,4 +1,5 @@
 # Record code coverage with coveralls on Travis
+require 'factory_girl_rails'
 require 'coveralls'
 Coveralls.wear! 'rails'
 

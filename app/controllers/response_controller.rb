@@ -15,15 +15,6 @@ class ResponseController < ApplicationController
       # Deny access to anyone except reviewer & author's team
       when 'view','edit','delete','update'
         response = Response.find(params[:id])
-         if response.map.read_attribute(:type) == 'FeedbackResponseMap' && response.map.assignment.team_assignment?
-          team = response.map.reviewer.team
-          unless team.has_user session[:user]
-            redirect_to '/denied?reason=You are not on the team that wrote this feedback'
-          else
-            return false
-          end
-          response.map.read_attribute(:type)
-         end
         current_user_id?(response.map.reviewer.user_id)
       else
         current_user

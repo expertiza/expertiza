@@ -81,7 +81,7 @@ class InvitationsController < ApplicationController
   end
 
   private 
-  def set_messages(name) # sets flash messages
+  def set_messages(name) # sets flash messages in instance variables
     @messages = Hash.new
     @messages[:user_not_found] = "\"#{name}\" does not exist. Please make sure entered name is correct."
     @messages[:user_not_participant] = "\"#{name}\" is not a participant of this assignment."
@@ -91,8 +91,8 @@ class InvitationsController < ApplicationController
     @messages[:full_team] = "The team which invited you is full now."
     @messages[:invitation_not_exist]= "The team which invited you does not exist any more."
     @messages[:fail_to_add] = "Something went wrong in the system. Hence failed to add you to the team which invited you. Please try again."
-
   end
+  
   private 
   def set_invitation(to_id,from_id,assignment_id,reply_status) #creates an instance of invitation
     @invitation = Invitation.new
@@ -102,6 +102,7 @@ class InvitationsController < ApplicationController
     @invitation.reply_status = reply_status
     @invitation.save
   end
+  
   private 
   def check_validity # checks if the send invitation is valid
     @user = User.find_by_name(params[:user][:name].strip)

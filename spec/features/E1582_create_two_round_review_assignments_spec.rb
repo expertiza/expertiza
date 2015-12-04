@@ -1,5 +1,5 @@
 require 'spec_helper'
-require "selenium-webdriver"
+require 'selenium-webdriver'
 
 feature 'Create a two-round review assignment' do
   scenario 'without a topic', :js => true do

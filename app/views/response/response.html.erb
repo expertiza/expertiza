@@ -1,3 +1,15 @@
+<script>
+    function validate() {
+        document.write("good");
+        submitFlag = true;
+        if(document.form2.t.value.length!=4){
+            submitFlag=false;
+            alert("ivalid length - 4 characters needed!");
+        }
+        return submitFlag;
+    }
+</script>
+
 <h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
 
 <% if !@map.contributor.nil? && !@map.instance_of?(FeedbackResponseMap) %>
@@ -72,8 +84,8 @@
 <% end %>
 
     <p style="position:fixed; bottom:0px; right:100px ">
-      <%= form_tag :action => "submitted_question" , :id => @map.id do %>
-      <label for="review_chats">Enter your Query</label><BR/>
+      <%= form_tag :action => "submitted_question" , :id => @map.id  do %>
+      <label for="review_chats">Post your query for the Author</label><BR/>
       <textarea cols="30" rows="4" id="review_question" name="review_question" style="overflow:hidden;">
         </textarea> <br/>	
  <%= submit_tag "Submit", :name => "review_help" %><% end %>

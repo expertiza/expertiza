@@ -1,10 +1,11 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  assignment_id: 1
-  reviewer_id: 1
-  team_id: 1
-  type_flag: MyString
+  id: 71
+  assignment_id: 726
+  reviewer_id: 29103
+  team_id: 23971
+  type_flag: Q
   content: MyString
 
 two:

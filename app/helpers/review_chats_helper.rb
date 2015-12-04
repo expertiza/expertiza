@@ -34,7 +34,7 @@ def self.chat_email_query(id,partial="new_chatemail")
   teams_users.each do |teams_user|
   to_mail_list << User.find(teams_user.user_id).email 
   end
-
+  puts "#{to_mail_list}"
   #reviewer_participant_id =  response_map.reviewer_id
   #participant = Participant.find(reviewer_participant_id)
   #assignment = Assignment.find(participant.parent_id)

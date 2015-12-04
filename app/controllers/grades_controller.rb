@@ -19,11 +19,11 @@ class GradesController < ApplicationController
         'Super-Administrator',
         'Student'].include? current_role_name and are_needed_authorizations_present?
     when 'view_reviewer'
-      ['Instructor',
-        'Teaching Assistant',
-        'Administrator',
-        'Super-Administrator',
-        'Student'].include? current_role_name and are_needed_authorizations_present?
+        ['Instructor',
+         'Teaching Assistant',
+         'Administrator',
+         'Super-Administrator',
+         'Student'].include? current_role_name and are_needed_authorizations_present?
     else
       ['Instructor',
        'Teaching Assistant',

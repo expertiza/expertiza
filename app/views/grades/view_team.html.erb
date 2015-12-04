@@ -5,6 +5,9 @@
 <h1>Summary report for <%= @assignment.name %></h1>
 <h2>Summary report for team <%= @team.name %>(<%= @participant.fullname %>)</h2>
 
+<script>
+  $(function () { $("[data-toggle='tooltip']").tooltip(); });
+</script>
 
 <% @vmlist.each do |vm| %>
 
@@ -35,7 +38,7 @@
             (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)
       <%end %>
     </h4>
-    <span style="padding-left:30px;cursor: pointer;" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s %>">display questions</span>
+    <span style="padding-left:30px;cursor: pointer;" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">display questions</span>
 </span>
 <table id="tbl_heat">
          <tr>          <th>Question</th>      <th>Max</th>
@@ -50,7 +53,7 @@
                <% if @current_role_name.eql?'Instructor' %>
                    <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname.to_s %>
 
-                   <th style="border: 1px solid black"> <a target="_blank" href="../grades/view_reviewer?id=<%=@participant.id%>&response_id=<%= review.id.to_s %>"><%= user_name.to_s %></a>  </th>
+                   <th style="border: 1px solid black"> <a target="_blank" href="../grades/view_reviewer?id=<%=@participant.id%>&response_id=<%= review.id.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
                    <% i += 1 %>
                <% end %>
            <% end %>
@@ -68,7 +71,7 @@
           <td class = 'cf' style="border: 1px solid black;"> <%= row.questionText[0...20] %>   </td>
           <td class = 'cf' style="border: 1px solid black;"> <%= vm.max_score %>   </td>
           <% row.score_row.each do |score| %>
-              <td style="border: 1px solid black" class="<%= score.color_code %>" align="center">
+              <td style="border: 1px solid black" class="<%= score.color_code %>" align="center" data-toggle="tooltip" data-placement="right" title="GREEN-good, YELLOW-okay, RED-bad">
                 <%= score.score_value.to_s %>
               </td>
           <% end %>
@@ -110,14 +113,42 @@
       </tr>
     <% end %>
   <tr>
-    <td>Column Average</td>   <td><%= vm.max_score %></td>
-    <% vm.get_average_review_scores.each do |average_score| %>
-        <td style="border: 1px solid black;" align="center">
-          <%= average_score.round(2).to_s %>
-        </td>
+    <td style="border: 1px solid black;">
+      Review Total
+    </td>
+    <td style="border: 1px solid black;" align="center">
+      <%= vm.max_score_for_questionnaire %>
+    </td>
+    <% vm.get_total_review_scores.each do |total_score| %>
+      <td style="border: 1px solid black;" align="center">
+        <%= total_score.round.to_s %>
+      </td>
     <% end %>
-
-
+    <!-- To complete the last two columns of the table, these will just be
+         empty cells. -->
+    <td style="border: 1px solid black;">
+    </td>
+    <td style="border: 1px solid black;">
+    </td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid black;">
+      Column Average
+    </td>
+    <td>
+      <%= vm.max_score %>
+    </td>
+    <% vm.get_average_review_scores.each do |average_score| %>
+      <td style="border: 1px solid black;" align="center">
+        <%= average_score.round(2).to_s %>
+      </td>
+    <% end %>
+    <!-- To complete the last two columns of the table, these will just be
+         empty cells. -->
+    <td style="border: 1px solid black;">
+    </td>
+    <td style="border: 1px solid black;">
+    </td>
   </tr>
   </table>
           <span> <%= vm.displayTeamMembers %></span>

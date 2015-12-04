@@ -1,27 +1,40 @@
+
+ FactoryGirl.define do
+  sequence (:name) do |n| 
+   n=n%3
+    
+  "student206#{n+4}"
+  end
+end
+
+
+
+
  FactoryGirl.define do
 
 
 factory :role ,class: Role do
      
   	 name "Student"
- 	   parent_id  nil 
+ 	   parent_id  1 
   	 description  "" 
      cache nil
   	
      
   end
 
-
+ 
   
 
   factory :student, class: User do
-     sequence(:name,4) { |n| "student206#{n}" }
+      
+      name
       crypted_password "e83023eae8ec13ce0ed71efce1a3c4bbe23fc21c" 
       role { Role.first || association(:role)}
       password_salt  "XwDiWxpNugmGzpCNib" 
       fullname "2064, student"
       email "expertiza@mailinator.com"
-      parent_id  580
+      parent_id  1
       private_by_default  false 
       mru_directory_path  nil
       email_on_review  true
@@ -53,46 +66,48 @@ factory :role ,class: Role do
  factory :assignment ,class:Assignment do
   
   name "final2"
-  directory_path "try"
-  submitter_count 0 
-  course
-  instructor_id nil
-  private false
-   num_reviews 0
-   num_review_of_reviews 0
-    num_review_of_reviewers 0
-    review_questionnaire_id nil
-    review_of_review_questionnaire_id nil
-     teammate_review_questionnaire_id nil
-    reviews_visible_to_all false
-    association :wiki_type, :factory => :wikitype
-    num_reviewers 0
-    spec_location "bfbfb"
-    author_feedback_questionnaire_id nil
-    max_team_size 3
-    staggered_deadline false
-    allow_suggestions false
-    days_between_submissions nil
-    review_assignment_strategy "Auto-Selected"
-    max_reviews_per_submission nil
-    review_topic_threshold 0
-    copy_flag false
-    rounds_of_reviews 1
-    microtask false
-    selfreview_questionnaire_id nil
-    managerreview_questionnaire_id nil
-    readerreview_questionnaire_id nil
-    require_quiz false
-    num_quiz_questions 0
-    is_coding_assignment false
-    is_intelligent false
-    calculate_penalty false
-    late_policy_id nil
-    is_penalty_calculated false
-    max_bids nil
-    show_teammate_reviews true
-    availability_flag true
-    use_bookmark false
+ directory_path "try" 
+ submitter_count 0 
+ course
+instructor_id nil
+ private false
+ num_reviews 0
+ num_review_of_reviews 0
+ num_review_of_reviewers 0
+review_questionnaire_id nil
+review_of_review_questionnaire_id nil
+teammate_review_questionnaire_id nil
+ reviews_visible_to_all false
+ association  :wiki_type ,:factory => :wikitype
+  num_reviewers 0
+  spec_location "bfbfb"
+  author_feedback_questionnaire_id nil
+  max_team_size 3
+  staggered_deadline false
+  allow_suggestions false
+  days_between_submissions nil
+  review_assignment_strategy "Auto-Selected"
+  max_reviews_per_submission nil
+  review_topic_threshold 0
+  copy_flag false
+  rounds_of_reviews 1
+  microtask false
+  selfreview_questionnaire_id nil
+  managerreview_questionnaire_id nil
+  readerreview_questionnaire_id nil
+  require_quiz false
+  num_quiz_questions 0
+  is_coding_assignment false
+  is_intelligent false
+  calculate_penalty false
+  late_policy_id nil
+  is_penalty_calculated false
+  max_bids nil
+  show_teammate_reviews true
+  availability_flag true
+  use_bookmark false
+  can_review_same_topic true
+  can_choose_topic_to_review true
 
   
  end
@@ -165,7 +180,15 @@ factory :role ,class: Role do
   
    name  "No"
 
- end    
+ end  
+
+ factory :assignmentnode ,class:AssignmentNode do
+
+  parent_id 1
+  node_object_id 1
+  type "AssignmentNode"
+
+ end  
 
   
 

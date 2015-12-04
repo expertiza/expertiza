@@ -1022,4 +1022,61 @@ describe "peer review testing", :type => :feature do
 
     expect(page).to have_content "Your response was successfully saved."
   end
+it "fills in a single comment with multi word text and saves" do
+    # Setup test specific data
+    @q1=Criterion.new({:size => "70,1", :weight => 5, :questionnaire_id => @quiz.id, :seq => "3", :txt => "helloText"})
+    @q1.save
+
+    @answer_q1 = Answer.new({:question_id => @q1.id})
+    @answer_q1.save
+
+    # Load questionnaire with generic setup
+    load_questionnaire
+
+    # Fill in a textbox with a multi word comment 
+    fill_in "responses[0][comment]", :with => "Excellent Work"
+    
+
+    click_button "Submit Review"
+
+    expect(page).to have_content "Your response was successfully saved."
+end
+
+it "fills in a single comment with single word and saves" do
+    # Setup test specific data
+    @q1=Criterion.new({:size => "70,1", :weight => 5, :questionnaire_id => @quiz.id, :seq => "3", :txt => "helloText"})
+    @q1.save
+
+    @answer_q1 = Answer.new({:question_id => @q1.id})
+    @answer_q1.save
+
+    # Load questionnaire with generic setup
+    load_questionnaire
+
+    # Fill in a textbox with a single word comment
+    fill_in "responses[0][comment]", :with => "Excellent"
+    
+
+    click_button "Submit Review"
+
+    expect(page).to have_content "Your response was successfully saved."
+end
+
+it "fills in only points and saves" do
+    # Setup test specific data
+    @q1=Criterion.new({:size => "70,1", :weight => 5, :questionnaire_id => @quiz.id, :seq => "3", :txt => "helloText"})
+    @q1.save
+
+    @answer_q1 = Answer.new({:question_id => @q1.id})
+    @answer_q1.save
+
+    # Load questionnaire with generic setup
+    load_questionnaire
+
+    # Fill in a dropdown with some points
+    select 5, :from => "responses[0][score]"
+    click_button "Submit Review"
+
+    expect(page).to have_content "Your response was successfully saved."
+end  
 end

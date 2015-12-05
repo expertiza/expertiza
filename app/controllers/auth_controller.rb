@@ -37,7 +37,7 @@ class AuthController < ApplicationController
     if Role.find_by_name("demo_instructor") != nil
     @demo_role_id = Role.find_by_name("demo_instructor").id
           if session[:user][:role_id] == @demo_role_id
-          redirect_to :controller => 'demo', :action => 'place_holder'
+          redirect_to :controller => 'demo', :action => 'instruction_page'
           else
 
           redirect_to :controller => AuthHelper::get_home_controller(session[:user]),

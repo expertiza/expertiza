@@ -498,6 +498,7 @@ Expertiza::Application.routes.draw do
     collection do
       get ':action'
       post 'list'
+      post 'list_for_demo'
       post 'get_children_node_ng'
       post 'get_children_node_2_ng'
       post 'bridge_to_is_available'

@@ -14,10 +14,10 @@ class ReviewMetricTest < ActiveSupport::TestCase
     assert @valid_review.valid?
   end
   test "should calculate metrics for valid response_id" do
-    assert @valid_review.calulate_metric
+    assert @valid_review.calculate_metric
   end
   test "should not calculate metrics for invalid response_id" do
-    assert_not @invalid_review.calulate_metric
+    assert_not @invalid_review.calculate_metric
   end
 
 

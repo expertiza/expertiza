@@ -1,6 +1,6 @@
 class ReviewMetric < ActiveRecord::Base
 
-  def calulate_metric
+  def calculate_metric
 	
 	@answer = Answer.where ("response_id = #{self.response_id}")
 	offensive_words = Set.new(["anal", "anus", "arse", "ass", "ballsack"])

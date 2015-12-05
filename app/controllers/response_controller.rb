@@ -325,7 +325,7 @@ class ResponseController < ApplicationController
 	@reviewMetric.response_id = @response_all[@response_all.count - 1][:id]
 	end
     #@reviewMetric.response_id = Response.where(map_id: @map.id).id
-    @reviewMetric.calulate_metric
+    @reviewMetric.calculate_metric
     #####################
     #####################
 

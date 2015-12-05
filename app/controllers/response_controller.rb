@@ -293,9 +293,9 @@ class ResponseController < ApplicationController
       participant = AssignmentTeam.first_member(@map.reviewee_id)
       team_id = TeamsUser.team_id(participant.parent_id, participant.user_id)
 	  if @round.nil? || @round == 1
-	  	SubmissionHistory.create_review_submission_event(participant.id, team_id, participant.parent_id, @map.id)
+	  	SubmissionHistory.create_review_submission_event(participant.id, @map.id)
 	  else
-	    SubmissionHistory.create_review_resubmission_event(participant.id, team_id, participant.parent_id, @map.id)
+	    SubmissionHistory.create_review_resubmission_event(participant.id, @map.id)
 	  end
 	end
 

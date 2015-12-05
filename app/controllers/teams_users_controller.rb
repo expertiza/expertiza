@@ -3,7 +3,7 @@ class TeamsUsersController < ApplicationController
   def action_allowed?
     ['Instructor',
      'Teaching Assistant',
-     'Administrator'].include? current_role_name
+     'Administrator','demo_instructor'].include? current_role_name
   end
 
   def auto_complete_for_user_name

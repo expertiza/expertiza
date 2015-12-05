@@ -15,12 +15,17 @@
       </div>
       <div id="tabs-2">
         <%= react_component('TopicTab', {assignment_form: @assignment_form}) %>
+        <% if @assignment_form.assignment.staggered_deadline == true %>
+            <%session[:duedates] = SignUpSheet.add_signup_topic(@assignment_form.assignment.id)%>
+            <%= render '/sign_up_sheet/add_signup_topics_staggered.html' %>
+        <% else %>
+            <%= render '/sign_up_sheet/add_signup_topics.html' %>
+        <% end %>
       </div>
       <div id="tabs-3">
         <%= render 'assignments/edit/rubrics' %>
       </div>
       <div id="tabs-4">
-        <!--<div id="review_strategy" params= '{"assignment_form": { "assignment": {} }}'></div>-->
         <%= react_component('StrategyTable', {assignment_form: @assignment_form}) %>
       </div>
       <div id="tabs-5">

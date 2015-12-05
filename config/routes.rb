@@ -1,7 +1,16 @@
 Expertiza::Application.routes.draw do
 
+  resources :feedback_settings
+
+  resources :feedbacks
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
+
+  match 'feedbacks/show/:id/download_feedback_attachment' => 'feedbacks#download_feedback_attachment', :via => [:get], :as => 'download_attachment'
+  post 'feedback_settings/add_attachment_type', to: 'feedback_settings#add_attachment_type'
+  post 'feedback_settings/add_status', to: 'feedback_settings#add_status'
+  match 'feedback_settings/edit/:id/delete_attachment_type' => 'feedback_settings#delete_attachment_type', :via => [:get], :as => 'delete_attachment_type'
+  match 'feedback_settings/edit/:id/delete_status' => 'feedback_settings#delete_status', :via => [:get], :as => 'delete_status'
 
   resources :bookmarks do
     collection do

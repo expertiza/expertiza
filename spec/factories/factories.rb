@@ -1,11 +1,11 @@
 
  FactoryGirl.define do
-  sequence (:name) do |n| 
-   n=n%3
+    sequence (:name) do |n| 
+      n=n%3
     
-  "student206#{n+4}"
+      "student206#{n+4}"
+    end
   end
-end
 
 
 
@@ -78,7 +78,7 @@ review_questionnaire_id nil
 review_of_review_questionnaire_id nil
 teammate_review_questionnaire_id nil
  reviews_visible_to_all false
- association  :wiki_type ,:factory => :wikitype
+ wiki_type
   num_reviewers 0
   spec_location "bfbfb"
   author_feedback_questionnaire_id nil
@@ -142,7 +142,7 @@ teammate_review_questionnaire_id nil
  can_take_quiz true
  end 
 
-  factory :wikitype ,class:WikiType do
+  factory :wiki_type ,class:WikiType do
   
    name "MediaWiki" 
 

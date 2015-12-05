@@ -12,13 +12,16 @@ class SubmissionHistory < ActiveRecord::Base
   :EVENT_HYPERLINK_UPDATED => "hyperlink content updated",
   :EVENT_HYPERLINK_DELETED => "hyperlink deleted",
   :EVENT_REVIEW_SUBMITTED => "review submitted",
-  :EVENT_REVIEW_RESUBMITTED => "next round review submitted"
+  :EVENT_REVIEW_RESUBMITTED => "next round review submitted",
+  :EVENT_FEEDBACK_SUBMITTED => "feedback submitted",
+  :EVENT_FEEDBACK_RECEIVED => "feedback received"
   }
 
   #artifact types
   ARTIFACT_TYPE_FILE = "file"
   ARTIFACT_TYPE_HYPERLINK = "hyperlink"
   ARTIFACT_TYPE_REVIEW = "review"
+  ARTIFACT_TYPE_FEEDBACK = "feedback"
   
   cattr_reader :events 
 
@@ -72,4 +75,18 @@ class SubmissionHistory < ActiveRecord::Base
                                   event_time:Time.now)
   end
 
+  def self.create_feedback_submission_event(reviewer_participant_id, reviewee_participant_id )
+    artifact_name1 = "Feedback submitted"
+    ev = SubmissionHistory.create(participant_id:reviewer_participant_id,
+                                  artifact_name:artifact_name1,
+                                  artifact_type:ARTIFACT_TYPE_FEEDBACK,
+                                  event:self.events[:EVENT_FEEDBACK_SUBMITTED],
+                                  event_time:Time.now)
+    artifact_name2 = "Feedback received"
+    ev = SubmissionHistory.create(participant_id:reviewee_participant_id,
+                                  artifact_name:artifact_name2,
+                                  artifact_type:ARTIFACT_TYPE_FEEDBACK,
+                                  event:self.events[:EVENT_FEEDBACK_RECEIVED],
+                                  event_time:Time.now)
+  end
 end

@@ -137,7 +137,7 @@
                     <%else %>
                         <td id = "green" bgcolor="#DDDDBB" align = 'left' colspan=1>
                     <%end %>
-                    <%= link_to Team.find(ri.reviewee_id).name, :controller => 'review_metrics', :action => 'list', :id => ri.id %>
+                    <%= link_to "text metrics", :controller => 'review_metrics', :action => 'list', :id => ri.id %>
                         </td>
                 <% else %>
                       <td> Not Available </td>
@@ -200,7 +200,7 @@
                         <%end %>
                           <%@team = Team.find(ri.reviewee_id) %>
                           <% @teamid = @team.id%>
-                          <%= link_to Team.find(ri.reviewee_id).name, :controller => 'review_metrics', :action => 'list', :id => ri.id %>
+                          <%= link_to "text metrics", :controller => 'review_metrics', :action => 'list', :id => ri.id %>
                         </td>
 
                         <%= render :partial => 'teamscore' %>

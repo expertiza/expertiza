@@ -1,22 +1,28 @@
 //jQuery(document).ready(function() {
 
     var StrategyDropdown = React.createClass({
+
+        handleAutoClick: function(event) {
+            this.props.assignment_form.assignment.review_assignment_strategy = "Auto-Selected";
+            this.setState({ showAutoStrategy: true });
+        },
+        handleInstructorClick: function(event) {
+            this.props.assignment_form.assignment.review_assignment_strategy = "Instructor-Selected";
+            this.setState({ showAutoStrategy: false });
+        },
         render: function() {
             return(
                 <td>
                     Review Strategy: <select id="dropdownlist" className="form-control">
-                    <option><a href="#">Auto-Selected</a></option>
-                    <option><a href="#">Instructor-Selected</a></option>
+                    <option onClick={this.handleAutoClick}><a href="#">Auto-Selected</a></option>
+                    <option onClick={this.handleInstructorClick}><a href="#">Instructor-Selected</a></option>
                     </select>
 
                     <img src="/assets/info.png" title='- Instructor-Selected: Instructor decides who reviews whom
                             - Auto-Selected: When a student is about to begin a review, Expertiza assigns that student a particular review.'/>
+                    <StrategyOptions assignment_form={this.props.assignment_form}/>
                 </td>
             );
-            $('#dropdownlist option').on('click', function(){
-                strategyType = $(this).text();
-                this.props.assignment_form.assignment.review_assignment_strategy = strategyType;
-            });
         }
     })
 
@@ -70,16 +76,7 @@
                     <tr id='assignment_review_assignment_strategy_row'>
                         <StrategyDropdown assignment_form={this.props.assignment_form}/>
                     </tr>
-                    <tr>
-                        <td>
-                            <StrategyOptions assignment_form={this.props.assignment_form}/>
-                        </td>
-                    </tr>
                 </table>
             );
-            $('#dropdownlist option').on('click', function(){
-                strategyType = $(this).text();
-                this.props.assignment_form.assignment.review_assignment_strategy = strategyType;
-            });
         }
     })

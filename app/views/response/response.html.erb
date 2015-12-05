@@ -1,15 +1,3 @@
-<script>
-    function validate() {
-        document.write("good");
-        submitFlag = true;
-        if(document.form2.t.value.length!=4){
-            submitFlag=false;
-            alert("ivalid length - 4 characters needed!");
-        }
-        return submitFlag;
-    }
-</script>
-
 <h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
 
 <% if !@map.contributor.nil? && !@map.instance_of?(FeedbackResponseMap) %>

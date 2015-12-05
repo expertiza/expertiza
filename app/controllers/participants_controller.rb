@@ -24,6 +24,10 @@ class ParticipantsController < ApplicationController
     # E726 Fall2012 Changes Begin
         @authorization = params[:authorization]
         # E726 Fall2012 Changes End
+    respond_to do |format|
+      format.html # new.html.erb
+    end
+      
   end
 
   #OSS_808 change 28th oct
@@ -49,7 +53,17 @@ class ParticipantsController < ApplicationController
       url_new_user = url_for :controller => 'users', :action => 'new'
       flash[:error] = "User #{params[:user][:name]} does not exist or has already been added.</a>"
     end
-    redirect_to :action => 'list', :id => curr_object.id, :model => params[:model], :authorization => params[:authorization]
+    #redirect_to :action => 'list', :id => curr_object.id, :model => params[:model], :authorization => params[:authorization]
+    respond_to do |format|
+    if curr_object.save
+      format.html { redirect_to :action => 'list', :id => curr_object.id, :model => params[:model], :authorization => params[:authorization] }
+      format.js 
+      #format.json { render json: @participant, status: :created, location: @participant }
+    else
+      format.html { render action: "list" }
+      #format.json { render json: @participant.errors, status: :unprocessable_entity }
+    end
+    end
   end
 
   def update_authorizations

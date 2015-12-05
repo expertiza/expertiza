@@ -39,19 +39,38 @@
   background-color: #FFFFFF;
 }
 
-#tbl_heat {
+.tbl_heat {
   border: 1px solid black;
   margin-top: -9px;
 
 }
-#tbl_heat td {
+.tbl_heat td {
   cursor: pointer;
   padding: 0px 2px 0px 2px;
+  border: 1px black solid;
 
 }
 
-#tbl_heat th {
+.tbl_heat th {
   border: 1px black solid;
+  padding: 5px 5px 5px 5px;
+
+}
+
+.hiddenRow {padding:0 !important;}
+
+.tbl_questlist
+  {
+  border: 1px solid grey;
+}
+
+.tbl_questlist th{
+  border: 1px solid grey;
+  padding: 5px 5px 5px 5px;
+}
+
+.tbl_questlist td{
+  border: 1px solid grey;
   padding: 5px 5px 5px 5px;
 
 }

@@ -68,8 +68,9 @@ describe "GET #new_feedback" do
 
       get :new_feedback
       
-      expect(response).should redirect_to :action => :new, :id => map.id+1,:return => "feedback"
+      expect(response).should redirect_to :action => :new, :id => map.id+2,:return => "feedback"
     end
+
     it "redirects to same page if no review is found" do
     Response.stub(:find).and_return(false) 
      expect(response).to have_http_status(200)

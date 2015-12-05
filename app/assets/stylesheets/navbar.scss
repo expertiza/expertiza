@@ -155,12 +155,18 @@ ul.navbar-right > li.right-most > a:hover {
     -moz-border-radius: 6px 0 6px 6px;
     border-radius: 6px 0 6px 6px;
 }
+
+.margintop {
+    margin-top: 23px;
+}
 // end
 
 
 // Refer from http://www.bootply.com/120604
 @media (max-width: 1170px) {
-
+    .margintop {
+        marvin-top: 0px;
+    }
     .navbar-header {
         float: none;
     }

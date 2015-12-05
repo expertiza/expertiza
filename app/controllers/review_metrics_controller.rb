@@ -86,13 +86,17 @@ class ReviewMetricsController < ApplicationController
     @metrics1 = Array.new
     @response_id1.each {
         |response|
-      @metrics1 << ReviewMetric.where(response_id: response).first
+      if ReviewMetric.where(response_id: response).count > 0
+        @metrics1 << ReviewMetric.where(response_id: response).first
+      end
     }
 
     @metrics2 = Array.new
     @response_id2.each {
         |response|
-      @metrics2 << ReviewMetric.where(response_id: response).first
+      if ReviewMetric.where(response_id: response).count > 0
+        @metrics2 << ReviewMetric.where(response_id: response).first
+      end
     }
 
     (0..@metrics1.count-1).each do |i|

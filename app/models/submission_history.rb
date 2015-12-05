@@ -30,6 +30,14 @@ class SubmissionHistory < ActiveRecord::Base
 								  event_time:Time.now)
   end
 
+  def self.create_file_resubmission_event(participant_id, file_name)
+    ev = SubmissionHistory.create(participant_id:participant_id, 
+								  artifact_name:file_name, 
+								  artifact_type:ARTIFACT_TYPE_FILE, 
+								  event:self.events[:EVENT_FILE_RESUBMITTED], 
+								  event_time:Time.now)
+  end
+
   def self.create_hyperlink_submission_event(participant_id, hyperlink)
     ev = SubmissionHistory.create(participant_id:participant_id,
                                   artifact_name:hyperlink,

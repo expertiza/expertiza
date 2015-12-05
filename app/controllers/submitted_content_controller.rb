@@ -30,7 +30,18 @@ class SubmittedContentController < ApplicationController
 
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
     @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
-    @events = SubmissionHistory.page(params[:page]).order('event_time').reverse_order.per_page(10).all
+
+	#Collecting all participants of the team
+	users = AssignmentTeam.team(AssignmentParticipant.find(@participant.id)).users
+	participants = Array.new
+    users.each do |user|
+      participant = AssignmentParticipant.where(user_id: user.id, parent_id: @participant.parent_id).first
+	  participants << participant.id if participant != nil
+    end
+	participant_ids = participants.collect { |id| id }.join ', '
+	
+	#Collect events for all participants of the team
+	@events = SubmissionHistory.where("participant_id in (#{participant_ids})").page(params[:page]).order('event_time').reverse_order.per_page(10).all
   end
 
   #view is called when @assignment.submission_allowed(topic_id) is false
@@ -128,6 +139,14 @@ def submit_file
   safe_filename = file.original_filename.gsub(/\\/,"/")
   safe_filename = FileHelper::sanitize_filename(safe_filename) # new code to sanitize file path before upload*
     full_filename =  curr_directory + File.split(safe_filename).last.gsub(" ",'_') #safe_filename #curr_directory +
+
+  #if file already exists, raise resubmission event else raise submission event
+    if File.exists? full_filename
+       SubmissionHistory.create_file_resubmission_event(participant.id, safe_filename)
+    else 
+       SubmissionHistory.create_file_submission_event(participant.id, safe_filename)
+    end
+
     File.open(full_filename, "wb") { |f| f.write(file.read) }
   if params['unzip']
     SubmittedContentHelper::unzip_file(full_filename, curr_directory, true) if get_file_type(safe_filename) == "zip"

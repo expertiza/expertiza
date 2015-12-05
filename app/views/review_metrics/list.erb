@@ -16,7 +16,7 @@
 <% @metrics.each do |review_metric| %>
 <tr class="listingRow">
   <td>&nbsp;</td>
-  <td><% if !(Response.find_by_id(review_metric.response_id).round) %><%= Response.find_by_id(review_metric.response_id).round %><% else %>1<% end %></td>
+  <td><% if !(Response.find_by_id(review_metric.response_id).round) %>1<% else %><%= Response.find_by_id(review_metric.response_id).round %><% end %></td>
   <td><%= Response.find_by_id(review_metric.response_id).updated_at %></td>
   <td><%= review_metric.total_word_count %></td>
   <td><%= review_metric.diff_word_count %></td>

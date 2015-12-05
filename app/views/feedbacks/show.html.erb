@@ -1,6 +1,6 @@
 <p>
-  <strong>User:</strong>
-  <%= @feedback.user_id %>
+  <strong>User email:</strong>
+  <%= @feedback.user_email %>
 </p>
 
 <p>
@@ -28,5 +28,13 @@
   <%= @feedback.status %>
 </p>
 
-<%= link_to 'Edit', edit_feedback_path(@feedback) %> |
-<%= link_to 'Back', feedbacks_path %>
+<% if @current_user.present? %>
+    <% if FeedbackSetting.find(1).support_team.include? @current_user.email%>
+        <%= link_to 'Edit', edit_feedback_path(@feedback) %> |
+        <%= link_to 'Back', feedbacks_path %>
+    <% end %>
+<% else %>
+    <%= link_to 'Back', new_feedback_path %>
+<% end %>
+
+

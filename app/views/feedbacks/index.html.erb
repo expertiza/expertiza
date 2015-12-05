@@ -16,7 +16,7 @@
   <tbody>
     <% @feedbacks.each do |feedback| %>
       <tr>
-        <td class="feedback"><%= feedback.user_id %></td>
+        <td class="feedback"><%= feedback.user_email%></td>
         <td class="feedback"><%= feedback.title %></td>
         <td class="feedback"><%= feedback.description %></td>
         <td class="feedback"><%= feedback.status %></td>
@@ -30,4 +30,4 @@
 
 <br>
 
-<%= link_to 'New Feedback', new_feedback_path %>
+<%= link_to 'Edit Feedback Settings', edit_feedback_setting_path(1) %>

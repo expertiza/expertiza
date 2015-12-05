@@ -1,6 +1,7 @@
+<%= form_for(@feedback) do |f| %>
 <p>
   <strong>User:</strong>
-  <%= @feedback.user_id %>
+  <%= @feedback.user_email %>
 </p>
 
 <p>
@@ -24,6 +25,12 @@
 </p>
 
 <p>
-  <strong>Status:</strong>
+  <strong>Current Status:</strong>
   <%= @feedback.status %>
 </p>
+    <p><strong>Change Status: </strong> <%=f.select(:status, @statuses.collect {|r| [ r.status] }) %></p>
+
+   <p> <%= submit_tag "Submit" , :disabled => session[:wrong_email_attempts][:expires]> Time.now %> </p>
+
+
+<%end%>

@@ -1,0 +1,34 @@
+<%= form_for(@file_type, :url=> feedback_settings_add_attachment_type_path) do |f| %>
+
+    <h1>Feedback Attachment Settings</h1>
+
+    <table>
+      <thead>
+      <tr>
+        <th>File type</th>
+        <th colspan="3" class="feedback"></th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <% @file_types.each do |feedback_attachment_setting| %>
+          <tr>
+            <td class="feedback"><%= feedback_attachment_setting.file_type %></td>
+            <td class="feedback"><%= link_to 'Destroy', delete_attachment_type_path(feedback_attachment_setting.id) %></td>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
+    <br>
+
+    <div class="field">
+      Add New File Type: <br>
+      <%= f.text_field :file_type %>
+    </div>
+    <br>
+
+    <div class="actions">
+      <%= f.submit "Add" %>
+    </div>
+
+<% end %>

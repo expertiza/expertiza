@@ -13,13 +13,13 @@
 
 
     <br>
-    <p><label for="feedback_user_id">Email</label> (Mandatory field.)
+    <p><label for="feedback_user_email">Email</label> (Mandatory field.)
       <img src="/assets/info.png" title='Enter Expertiza registered email id.'>
       <br/>
-      <% if @user_email.nil? %>
-          <%= text_field 'feedback', 'user_id', :maxlength=>"25", :readonly=> false%></p>
+      <% if @current_user.nil? %>
+          <%= text_field 'feedback', 'user_email', :maxlength=>"25", :readonly=> false%></p>
       <% else %>
-          <%= text_field 'feedback', 'user_id', :maxlength=>"25" , :value => @user_email, :readonly=>true%></p>
+          <%= text_field 'feedback', 'user_email', :maxlength=>"25" , :value => @current_user.email, :readonly=>true%></p>
       <% end %>
 
       <p><label for="feedback_title">Title</label> (Mandatory field.)
@@ -28,13 +28,13 @@
         <%= text_field 'feedback', 'title', :maxlength=>"80" %></p>
 
       <p><label for="feedback_description">Description</label><br/>
-        <%= text_area 'feedback', 'description', :rows => 4, :cols => 78  %>
+        <%= text_area 'feedback', 'description', :rows => 4, :cols => 80  %>
 
-      <p><label>Attach a File</label><br/>
-        <%= f.file_field :attachment, accept: 'image/png,image/gif,image/jpeg' %>
+      <p><label>Attach a File </label> <img src="/assets/info.png" title='Only .png, .jpg, .jpeg and .pdf allowed. Size < 2MB'><br/>
+        <%= f.file_field :attachment, accept: 'image/png,image/jpeg,application/pdf'%>
         <br>
-        <%= @statuses.inspect %>
-        <%=f.select(:status, @statuses.collect {|r| [ r.status] }) %>
+
+
       <p><label>CAPTCHA</label>
       <div class="g-recaptcha" data-sitekey="6LfY_RETAAAAAMH85s0nAZWZ15KVGYcZWRZExNJI"></div>
       <%= recaptcha_tags %>
@@ -43,7 +43,7 @@
           <%= submit_tag "Submit" %>
       <% else %>
           <%= submit_tag "Submit" , :disabled => session[:wrong_email_attempts][:expires]> Time.now %>
-          <%= session[:wrong_email_attempts][:expires] %>
+
 
       <%end%>
       <div class="actions">

@@ -1,0 +1,34 @@
+<%= form_for(@feedback_status,:url=> feedback_settings_add_status_path ) do |f| %>
+
+    <h1>Feedback Status Settings</h1>
+
+    <table>
+      <thead>
+      <tr>
+        <th>Status</th>
+        <th colspan="3" class="feedback"></th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <% @feedback_statuses.each do |feedback_status| %>
+          <tr>
+            <td class="feedback"><%= feedback_status.status %> </td>
+            <td class="feedback"><%= link_to 'Destroy', delete_status_path(feedback_status.id) %></td>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
+    <br>
+
+    <div class="field">
+      Add New Feedback Status: <br>
+      <%= f.text_field :status %>
+    </div>
+    <br>
+
+    <div class="actions">
+      <%= f.submit "Add" %>
+    </div>
+
+<% end %>

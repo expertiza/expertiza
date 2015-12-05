@@ -6,7 +6,7 @@ class SubmittedContentController < ApplicationController
        'Teaching Assistant',
        'Administrator',
        'Super-Administrator',
-       'Student'].include? current_role_name and ((%w(edit).include? action_name) ? are_needed_authorizations_present? : true) and one_team_can_submit_work?
+       'Student','demo_instructor'].include? current_role_name and ((%w(edit).include? action_name) ? are_needed_authorizations_present? : true) and one_team_can_submit_work?
   end
 
   #The view have already tested that @assignment.submission_allowed(topic_id) is true,

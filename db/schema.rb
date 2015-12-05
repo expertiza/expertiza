@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151107195943) do
+ActiveRecord::Schema.define(version: 20151202011525) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -522,6 +522,15 @@ ActiveRecord::Schema.define(version: 20151107195943) do
 
   add_index "signed_up_teams", ["topic_id"], name: "fk_signed_up_users_sign_up_topics", using: :btree
 
+  create_table "simple_captcha_data", force: :cascade do |t|
+    t.string   "key",        limit: 40
+    t.string   "value",      limit: 6
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "simple_captcha_data", ["key"], name: "idx_key", using: :btree
+
   create_table "site_controllers", force: :cascade do |t|
     t.string  "name",          limit: 255, default: "", null: false
     t.integer "permission_id", limit: 4,   default: 0,  null: false
@@ -713,6 +722,7 @@ ActiveRecord::Schema.define(version: 20151107195943) do
     t.string  "timezonepref",              limit: 255
     t.text    "public_key",                limit: 65535
     t.boolean "copy_of_emails",            limit: 1,     default: false
+    t.integer "institution_id",            limit: 4
   end
 
   add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree

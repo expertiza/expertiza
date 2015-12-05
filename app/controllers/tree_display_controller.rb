@@ -85,6 +85,7 @@ class TreeDisplayController < ApplicationController
   # ajbudlon, July 3rd 2008
   def list
     redirect_to controller: :student_task, action: :list if current_user.student?
+    redirect_to controller: :tree_display, action: :list_for_demo if current_role_name==="demo_instructor"
     # if params[:commit] == 'Search'
     #   search_node_root = {'Q' => 1, 'C' => 2, 'A' => 3}
 
@@ -122,6 +123,10 @@ class TreeDisplayController < ApplicationController
     # @reactjsParams = {}
     # @reactjsParams[:nodeType] = 'FolderNode'
     # @reactjsParams[:child_nodes] = child_nodes
+
+  end
+
+  def list_for_demo
 
   end
 
@@ -190,7 +195,12 @@ class TreeDisplayController < ApplicationController
             tmpObject["has_topic"] = SignUpTopic.where(['assignment_id = ?', node.node_object_id]).first ? true : false
           end
         end
-        res[nodeType] << tmpObject
+
+      if ['Super-Administrator', 'Administrator','Instructor','Teaching Assistant'].include? current_role_name
+          res[nodeType] << tmpObject
+        elsif node.get_instructor_id===session[:user].id
+          res[nodeType] << tmpObject
+        end
       end
 
     end
@@ -295,7 +305,13 @@ class TreeDisplayController < ApplicationController
 
   def drill
     session[:root] = params[:root]
-    redirect_to :controller => 'tree_display', :action => 'list'
+    # if session[:demo_role][:name] == "demo_instructor"
+    #   redirect_to :controller => 'demo', :action => 'place_holder'
+    # else
+
+     redirect_to :controller => 'tree_display', :action => 'list'
+    # end
+
   end
 
   def filter

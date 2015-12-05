@@ -1,5 +1,5 @@
 #this class, right now, represents each table in the view_team view. the intention may change.
-#the important piece to note is that the @listofrows is a  list of type VmQuestionResponse_Row, which represents a row of the heatgrid table.
+#the important piece to note is that the @listofrows is a  list of type VmHeatGrid_Row, which represents a row of the heatgrid table.
 class VmQuestionResponse
 
   def initialize(questionnaire, round,rounds)
@@ -25,7 +25,7 @@ class VmQuestionResponse
       # score for the question is stored not on the question, but on the questionnaire. Neat.
       corresponding_questionnaire = Questionnaire.find_by(id: question.questionnaire.id)
       question_max_score = corresponding_questionnaire.max_question_score
-      row = VmQuestionResponseRow.new(question.txt, question.id, question.weight, question_max_score,question.seq)
+      row = VmQuestionResponseScoreCell.new(question.txt, question.id, question.weight, question_max_score,question.seq)
       @listofrows << row
     end
   end
@@ -165,7 +165,7 @@ class VmQuestionResponse
 
         # Now construct the color code and we're good to go!
         color_code = "c#{color_code_number}"
-        row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments))
+        row.score_row.push(VmQuestionResponseRow.new(answer.answer, color_code, answer.comments))
       end
     end
   end

@@ -1,3 +1,16 @@
+<script>
+jQuery(document).ready(function() {
+    jQuery('#Submit').click(function(e){
+    if(!confirm('Once a review has been submitted, you cannot edit it again')){
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+    }else{
+        jQuery('#isSubmit').val('Yes');
+    }
+    })
+})
+</script>
 <h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
 
 <% if !@map.contributor.nil? && !@map.instance_of?(FeedbackResponseMap) %>
@@ -68,7 +81,11 @@
     <br/>
     <br>
     <%= submit_tag "Save "+@title, :name => "save" %>
+    <% if  (@title && (@title.eql?'Review')) %>
+        <%= submit_tag "Submit "+@title, :name => "Submit", :id => "Submit" %>
+    <% end %>
     <%= hidden_field_tag('return', @return) %>
+    <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %>
 <% end %>
 
     <p style="position:fixed; bottom:0px; right:100px ">

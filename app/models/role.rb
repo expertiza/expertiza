@@ -77,7 +77,7 @@ class Role < ActiveRecord::Base
   end
 
   def other_roles
-    Role.where('id != ?', id).order(:name)
+    Role.where('id != 99', id).order(:name)
   end
 
   def rebuild_credentials

@@ -1,0 +1,42 @@
+<%= form_tag :action => 'proceed' do %>
+
+<h1>Placeholder Page</h1>
+    <h2> Sample Youtube Video of Expertiza</h2>
+
+    <iframe width="560" height="315" src="http://www.youtube.com/embed/QYZYWQ1wvns" frameborder="20"></iframe>
+    <!-- ============ RIGHT COLUMN (CONTENT) ============== -->
+    <td width="80%" valign="middle" bgcolor="#d2d8c7">
+
+
+    <h1>Proceed to expertiza home page</h1>
+    </br>
+    <h3>Adding courses:</h3>
+
+
+    1. In the menu provided, select Manage->Courses.</br>
+    2. In the Manage Content page, Select New public course.</br>
+    3. In the New Course page, fill the details of the course to be added and click create.</br>
+    4. The Manage Content page will list the new course listed under the Courses tab.</br>
+
+    <h3>Adding Assignments:</h3>
+    1. In the menu provided, select Manage->Assignments.</br>
+    2. In the Manage Content page, Select New public Assignment.</br>
+    3. In the New Assignment page, fill the details of the assignment.</br>
+    4. The Manage Content page will list the new assignment listed under the Assignments tab.</br>
+    5. Hovering over the Actions listed with each assignment can be used to edit the assignment.</br>
+
+    <h3>Adding Participants:</h3>
+    1. In the actions provided next the Course, select Add paticipants.</br>
+    2. In the Course Participants page, each participant can be added manually by specifying the user id or import course participants by adding a file containing the list of users to be added as participants. If there are no available user Manage->Users can be used to add users.</br>
+    3. To add the participants for an assignment, in the actions provided next to the Assignment, select Add participants.</br>
+    4. Participants can be added similarly as specified above or all the participants in the course can be copied by clicking 'copy participants from course'.</br>
+
+    <h3>Adding Topics:</h3>
+    1. Click the edit action provided next to the assignment in the Manage Assignment page.</br>
+    2. In the Editing Assignment page, in the Topics tab, you can add each topic manually in the New Topic page or import the list of topics from a file.</br>
+
+
+
+    </br>
+    <%= submit_tag "proceed" %>
+<%end%>

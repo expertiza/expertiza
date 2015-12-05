@@ -29,7 +29,7 @@ class RolesPermissionsController < ApplicationController
   end
 
   def create
-    @roles_permission = RolesPermission.new(params[:roles_permission])
+    @roles_permission = RolesPermission.new(role_permission_params)
     if @roles_permission.save
       flash[:notice] = 'RolesPermission was successfully created.'
       redirect_to :controller => 'roles', :action => 'show',
@@ -59,4 +59,9 @@ class RolesPermissionsController < ApplicationController
     rp.destroy
     redirect_to :controller => 'roles', :action => 'show', :id => role
   end
+
+  def role_permission_params
+    params.require(:roles_permission).permit(:role_id,:permission_id)
+  end
+
 end

@@ -2,7 +2,7 @@ class StudentTaskController < ApplicationController
   helper :submitted_content
 
   def action_allowed?
-    ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator', 'Student'].include? current_role_name
+    ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator', 'Student','demo_instructor'].include? current_role_name
   end
 
 

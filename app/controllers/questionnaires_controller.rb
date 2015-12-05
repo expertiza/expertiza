@@ -9,7 +9,7 @@ class QuestionnairesController < ApplicationController
   def action_allowed?
     ['Administrator',
      'Instructor',
-     'Teaching Assistant','Student'].include? current_role_name
+     'Teaching Assistant','Student','demo_instructor'].include? current_role_name
   end
 
   # Create a clone of the given questionnaire, copying all associated

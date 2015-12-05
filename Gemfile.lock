@@ -52,6 +52,8 @@ GEM
     addressable (2.3.8)
     algorithms (0.6.1)
     arel (6.0.3)
+    assert_difference (1.0.0)
+      activesupport (>= 3.0.0)
     awesome_nested_set (3.0.2)
       activerecord (>= 4.0.0, < 5)
     babel-source (5.8.23)
@@ -237,7 +239,7 @@ GEM
       activerecord (>= 3.0, < 6.0)
       activesupport (>= 3.0, < 6.0)
       request_store (~> 1.1)
-    pg (0.18.2)
+    pg (0.11.0)
     power_assert (0.2.4)
     protected_attributes (1.1.3)
       activemodel (>= 4.0.1, < 5.0)
@@ -354,6 +356,8 @@ GEM
     shoulda-context (1.2.1)
     shoulda-matchers (2.8.0)
       activesupport (>= 3.0.0)
+    simple_captcha2 (0.3.4)
+      rails (>= 4.1)
     simplecov (0.10.0)
       docile (~> 1.1.0)
       json (~> 1.8)
@@ -413,6 +417,7 @@ PLATFORMS
 DEPENDENCIES
   RedCloth
   activerecord-session_store
+  assert_difference
   awesome_nested_set
   bind-it
   capistrano
@@ -450,7 +455,7 @@ DEPENDENCIES
   omniauth-google-oauth2 (~> 0.2.6)
   open-uri-cached
   paper_trail
-  pg
+  pg (~> 0.11.0)
   protected_attributes
   pry
   pry-nav
@@ -471,6 +476,7 @@ DEPENDENCIES
   seer
   selenium-webdriver
   shoulda
+  simple_captcha2
   simplecov
   sprockets
   sqlite3-ruby

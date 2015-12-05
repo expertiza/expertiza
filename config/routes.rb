@@ -2,6 +2,7 @@ Expertiza::Application.routes.draw do
 
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
+  post 'demo/create'
 
   resources :bookmarks do
     collection do
@@ -104,6 +105,15 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :demo do
+    collection do
+      get :new
+      get :show
+      get :instruction_page
+      post :proceed
+    end
+  end
+  
   resources :eula do
     collection do
       get :accept
@@ -488,6 +498,7 @@ Expertiza::Application.routes.draw do
     collection do
       get ':action'
       post 'list'
+      post 'list_for_demo'
       post 'get_children_node_ng'
       post 'get_children_node_2_ng'
       post 'bridge_to_is_available'

@@ -3,7 +3,7 @@ class ExportFileController < ApplicationController
     ['Instructor',
      'Teaching Assistant',
      'Administrator',
-     'Super-Administrator'].include? current_role_name
+     'Super-Administrator','demo_instructor'].include? current_role_name
   end
 
   def start

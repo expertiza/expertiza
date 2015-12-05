@@ -29,7 +29,7 @@ class RolesController < ApplicationController
   end
 
   def create
-    @role = Role.new(params[:role])
+    @role = Role.new(role_params)
     if @role.save
       Role.rebuild_cache
       flash[:notice] = 'Role was successfully created.'
@@ -69,5 +69,9 @@ class RolesController < ApplicationController
     @other_roles = @role.other_roles
 
     @users = @role.users
+  end
+
+  def role_params
+    params.require(:role).permit(:name, :parent_id, :description)
   end
 end

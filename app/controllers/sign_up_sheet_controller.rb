@@ -20,12 +20,12 @@ class SignUpSheetController < ApplicationController
        'Teaching Assistant',
        'Administrator',
        'Super-Administrator',
-       'Student'].include? current_role_name and ((%w(list).include? action_name) ? are_needed_authorizations_present? : true)
+       'Student','demo_instructor'].include? current_role_name and ((%w(list).include? action_name) ? are_needed_authorizations_present? : true)
     else
       ['Instructor',
        'Teaching Assistant',
        'Administrator',
-       'Super-Administrator'].include? current_role_name
+       'Super-Administrator','demo_instructor'].include? current_role_name
     end
   end
 

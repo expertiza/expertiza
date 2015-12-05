@@ -1,0 +1,29 @@
+<%= form_tag :action => 'create' do %>
+   
+
+
+    <p><label for="user_name">Username</label><br/>
+      <%= text_field 'user', 'name'  %></p>
+
+    <p><label for="user_fullname">Full name (last, first[ middle])</label><br/>
+      <%= text_field 'user', 'fullname'  %></p>
+
+
+    <p><label for="user_email">E-mail address</label><br/>
+      <%= text_field 'user', 'email'  %></p>
+
+    <%= hidden_field :user,:role_id, :value => @demo_role_id %>
+
+    <% new_user ||= false %>
+    <p><label for="password">Password</label>
+      <%= "(leave password blank to auto-generate; it will be sent in their welcome email)" if new_user %>
+      <br/>
+      <%= password_field 'user', 'password' %></p>
+
+    <p><label for="password_confirmation">Confirm password</label><br/>
+      <%= password_field 'user', 'password_confirmation' %></p>
+
+    <%= show_simple_captcha %>
+
+    <%= submit_tag "Create" %>
+<%end%>

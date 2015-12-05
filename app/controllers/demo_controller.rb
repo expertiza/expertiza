@@ -20,7 +20,7 @@ class DemoController < ApplicationController
 
 
 
-  def place_holder
+  def instruction_page
 
   end
 

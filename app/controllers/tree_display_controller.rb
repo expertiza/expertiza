@@ -85,6 +85,7 @@ class TreeDisplayController < ApplicationController
   # ajbudlon, July 3rd 2008
   def list
     redirect_to controller: :student_task, action: :list if current_user.student?
+    redirect_to controller: :tree_display, action: :list_for_demo if current_role_name==="demo_instructor"
     # if params[:commit] == 'Search'
     #   search_node_root = {'Q' => 1, 'C' => 2, 'A' => 3}
 
@@ -122,6 +123,10 @@ class TreeDisplayController < ApplicationController
     # @reactjsParams = {}
     # @reactjsParams[:nodeType] = 'FolderNode'
     # @reactjsParams[:child_nodes] = child_nodes
+
+  end
+
+  def list_for_demo
 
   end
 

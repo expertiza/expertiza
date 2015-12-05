@@ -1,0 +1,55 @@
+<%= form_tag :action => 'proceed' do %>
+
+<h1>Placeholder Page</h1>
+    <h2> Sample Youtube Video of Expertiza</h2>
+
+    <iframe width="560" height="315" src="http://www.youtube.com/embed/QYZYWQ1wvns" frameborder="20"></iframe>
+    <!-- ============ RIGHT COLUMN (CONTENT) ============== -->
+    <td width="80%" valign="middle" bgcolor="#d2d8c7">
+
+      <h1>Website Logo</h1>
+
+      <h2>Page heading</h2>
+
+
+      This is a basic two-column web page layout. The left column or the <i>menu column</i> is a narrow band of space (usually between 15-25% of the page width) and is reserved for a menu of hyperlinks leading to other pages on your website. The table used to create this layout employs a single table row containing two table cells.<br>
+      <br>
+
+      The right column or the <i>content column</i> takes up the lion's share of the web page width and contains the actual content of each particular page. In a basic two column layout like this, it is common to place the website logo at the top of the content column on each page.</td></tr></table>
+
+    <h1></h1>
+    Proceed to expertiza home page
+    Adding courses:
+    1. In the menu provided, select Manage->Courses.
+    2. In the Manage Content page, Select New public course.
+    3. In the New Course page, fill the details of the course to be added and click create.
+    4. The Manage Content page will list the new course listed under the Courses tab.
+
+    Adding Assignments:
+    1. In the menu provided, select Manage->Assignments.
+    2. In the Manage Content page, Select New public Assignment.
+    3. In the New Assignment page, fill the details of the assignment.
+    4. The Manage Content page will list the new assignment listed under the Assignments tab.
+    5. Hovering over the Actions listed with each assignment can be used to edit the assignment.
+
+    Adding Participants:
+    1. In the actions provided next the Course, select Add paticipants.
+    2. In the Course Participants page, each participant can be added manually by specifying the user id or import course participants by adding a file containing the list of users to be added as participants. If there are no available user Manage->Users can be used to add users.
+    3. To add the participants for an assignment, in the actions provided next to the Assignment, select Add participants.
+    4. Participants can be added similarly as specified above or all the participants in the course can be copied by clicking 'copy participants from course'.
+
+    Adding Topics:
+    1. Click the edit action provided next to the assignment in the Manage Assignment page.
+    2. In the Editing Assignment page, in the Topics tab, you can add each topic manually in the New Topic page or import the list of topics from a file.
+
+    Impersonating a participant:
+    1. Now the participants can view their courses and assignments.
+    2. Choose Manage->Impersonate User and enter the User id of the participant. Select the assignment listed.
+    3. In Submit or Review work for Assignment, Select Signup sheet to select a topic.
+    4. Select Your team, to view and manage the users team. Team Member requests can be sent and the requests made by other participants can be handled here.
+    5. Your work is to submit an d view the participant's work.
+    6. Others' work contains the reviewed works of other participants.
+
+    </br>
+    <%= submit_tag "proceed" %>
+<%end%>

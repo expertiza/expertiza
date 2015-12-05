@@ -46,5 +46,12 @@
 }
 #tbl_heat td {
   cursor: pointer;
+  padding: 0px 2px 0px 2px;
+
+}
+
+#tbl_heat th {
+  border: 1px black solid;
+  padding: 5px 5px 5px 5px;
 
 }

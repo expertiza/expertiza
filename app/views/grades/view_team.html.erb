@@ -9,18 +9,7 @@
 <h1>Summary Report for assignment: <%= @assignment.name %></h1>
 <h4>Team: <%= @team.name %>(Username: <%= @participant.fullname %>)</h4>
 
-  <table>
-  <% @vmlist.each do |vm| %>
-   <tr>   <td> <%=   vm.questionnaire_type %></td><td><%= vm.round.to_s %> </td><td><%= vm.name.to_s %> </td>
-    <td><%=  vm.listofreviews.length.to_s %></td>      <td><%=  @answers.length.to_s %></td>
-   </tr>
-      <% end %>
-  </table>
-     <table>
-  <% @answers.each do |answer| %>
-  <tr><td>  <%=   answer.answer.to_s %>    </td>   <td>  <%=   answer.comments.to_s %>    </td>    </tr>
-     <% end %>
-           </table>
+
       <% @vmlist.each do |vm| %>
 
 
@@ -34,7 +23,7 @@
             </thead>
             <% count = 0 %>
             <% vm.listofrows.each do |row| %>
-                <% if row.score_row.count > 0 || true %>
+                <% if row.score_row.count > 0  %>
                     <tr>
                       <td style="border: 1px solid grey;padding: 5px 5px 5px 5px;background-color: #ffffff;"><%= count += 1 %></td>
                       <td style="border: 1px solid grey;padding:5px 5px 5px 5px;background-color: #ffffff;"><%= row.questionText %></td>
@@ -55,6 +44,7 @@
   <span style="padding-left:30px;color:grey" data-toggle="tooltip" data-placement="right" title="Colors are scaled from poor to excellent in the following order: red, orange, yellow, light-green, dark-green">color legend</span>
 </span>
 <table id="tbl_heat">
+  <thead>
          <tr>          <th>Question Id</th>      <th>Max</th>
 
            <% i = 1 %>
@@ -77,14 +67,14 @@
              Avg
            </th>
            <th><span  data-toggle="tooltip" data-placement="right" title="A count of comments, for the respective question, which have character count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback.">metric-1</span></th>
-
+             </thead>
          </tr>
   <% score_row_count = vm.listofrows.first.score_row.count %>
   <% j = 1 %>
     <% vm.listofrows.each do |row| %>
         <tr data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= row.question_id.to_s %>">
           <td class = 'cf' style="border: 1px solid black;"> <%= j.to_s %>   </td>
-          <td class = 'cf' style="border: 1px solid black;"> <%= vm.max_score %>   </td>
+          <td class = 'cf' style="border: 1px solid black;"> <%= row.question_max_score %>   </td>
           <% row.score_row.each do |score| %>
               <td style="border: 1px solid black" class="<%= score.color_code %>" align="center">
                 <%= score.score_value.to_s %>
@@ -198,7 +188,7 @@
 
 
 
-        <% elsif vm.questionnaire_type != "ReviewQuestionnaire" || 1==1 %>
+        <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
          <div class="flash_error">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>
         <% end %>
 

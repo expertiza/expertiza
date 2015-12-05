@@ -2,17 +2,17 @@
 #the important piece to note is that the @listofrows is a  list of type VmQuestionResponse_Row, which represents a row of the heatgrid table.
 class VmQuestionResponse
 
-  def initialize(max_score, questionnaire_type,question_display_type,round,rounds,name)
+  def initialize(questionnaire, round,rounds)
       @listofrows = []
       @listofreviewers = []
       @listofreviews = []
       @listofteamparticipants = []
-      @max_score = max_score
-      @questionnaire_type = questionnaire_type
-      @questionnaire_display_type = question_display_type
+      @max_score = questionnaire.max_question_score
+      @questionnaire_type = questionnaire.type
+      @questionnaire_display_type = questionnaire.display_type
       @rounds = rounds
       @round = round
-    @name  = name
+    @name  = questionnaire.name
   end
 
   def name
@@ -30,19 +30,19 @@ class VmQuestionResponse
     end
   end
 
-  def addReviewers(participant,team)
+  def addReviewers(participant,team,vary)
 
     if @questionnaire_type == "ReviewQuestionnaire"
-     # if @rounds = 1
-     # reviews = participant.reviews()     #regular reviews
-     # else
-      reviews = ResponseMap.get_assessments_for_round(team ,@round,@rounds)
-     # end
-      reviews.each do |review|
+      if !vary
+        reviews = participant.reviews()
+      else
+        reviews = ResponseMap.get_assessments_for_round(team ,@round,@rounds)
+      end
+      #reviews = ResponseMap.get_assessments_for_round(team ,1,2)
+        reviews.each do |review|
         review_mapping = ReviewResponseMap.where(id: review.map_id).first
          if review_mapping.present?
             participant = Participant.find(review_mapping.reviewer_id)
-           # #review = Response.find(id: review_mapping.review_id)
             @listofreviewers << participant
             @listofreviews << review
          end

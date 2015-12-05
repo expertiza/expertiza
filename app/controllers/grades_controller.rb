@@ -18,6 +18,12 @@ class GradesController < ApplicationController
          'Administrator',
          'Super-Administrator',
          'Student'].include? current_role_name and are_needed_authorizations_present?
+      when 'view_reviewer'
+        ['Instructor',
+         'Teaching Assistant',
+         'Administrator',
+         'Super-Administrator',
+         'Student'].include? current_role_name and are_needed_authorizations_present?
     else
       ['Instructor',
        'Teaching Assistant',
@@ -87,7 +93,9 @@ class GradesController < ApplicationController
   def view_reviewer
     @participant = AssignmentParticipant.find(params[:id])
    @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
-    # return if redirect_when_disallowed
+
+    return if (current_role_name!="Instructor" && redirect_when_disallowed )
+
     @assignment = @participant.assignment
     @questions = {} # A hash containing all the questions in all the questionnaires used in this assignment
     questionnaires = @assignment.questionnaires
@@ -118,7 +126,9 @@ class GradesController < ApplicationController
     @assignment = @participant.assignment
     @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
     @team = Team.find(@team_id)
-    return if redirect_when_disallowed
+
+    return if (current_role_name!="Instructor" && redirect_when_disallowed )
+
     questionnaires = @assignment.questionnaires_with_questions
     @vmlist = []
 
@@ -151,11 +161,11 @@ class GradesController < ApplicationController
 
         end
 
-        vm = VmQuestionResponse.new(questionnaire.max_question_score, questionnaire.type,questionnaire.display_type,@round,@rounds,questionnaire.name)
+        vm = VmQuestionResponse.new(questionnaire,@round,@rounds)
         questions = questionnaire.questions
         vm.addQuestions(questions)
         vm.addTeamMembers(@team)
-        vm.addReviewers(@participant,@team)
+        vm.addReviewers(@participant,@team,@assignment.varying_rubrics_by_round?)
         vm.get_number_of_comments_greater_than_10_words()
 
         #if a multi-round assignment, decrement for each review questionnaire,
@@ -168,6 +178,7 @@ class GradesController < ApplicationController
     }
     @current_role_name = current_role_name
     @answers = Answer.where(response_id: 64882)
+
 
   end
   

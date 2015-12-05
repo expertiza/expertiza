@@ -41,6 +41,10 @@ class VmQuestionResponseRow
   end
 
   def question_max_score
+    question = Question.find(self.question_id)
+    if question.type == "Checkbox"
+      return 1
+    end
     @question_max_score
   end
 

@@ -7,12 +7,12 @@ class ParticipantsController < ApplicationController
        'Teaching Assistant',
        'Administrator',
        'Super-Administrator',
-       'Student'].include? current_role_name
+       'Student','demo_instructor'].include? current_role_name
     else
       ['Instructor',
        'Teaching Assistant',
        'Administrator',
-       'Super-Administrator'].include? current_role_name
+       'Super-Administrator','demo_instructor'].include? current_role_name
     end
   end
 

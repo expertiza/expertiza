@@ -20,6 +20,7 @@ class Mailer < ActionMailer::Base
     end
     mail(subject: defn[:subject],
          to: defn[:to],
+         cc: defn[:cc],
          bcc: defn[:bcc])
   end
 

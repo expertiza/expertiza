@@ -5,6 +5,7 @@ gem 'rails', '~> 4.2.1'
 ## Gems in Alphabetical Order
 
 gem 'activerecord-session_store'
+gem 'assert_difference'
 gem 'awesome_nested_set'
 gem 'bind-it'
 gem 'capistrano'
@@ -55,7 +56,7 @@ gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
-
+gem 'simple_captcha2',require:'simple_captcha'
 group :development do
   gem 'daemons'
   gem 'pry'

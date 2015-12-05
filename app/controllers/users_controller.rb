@@ -15,7 +15,7 @@ class UsersController < ApplicationController
       ['Super-Administrator',
        'Administrator',
        'Instructor',
-       'Teaching Assistant'].include? current_role_name
+       'Teaching Assistant','demo_instructor'].include? current_role_name
     end
   end
 

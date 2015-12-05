@@ -8,13 +8,13 @@ class LatePoliciesController < ApplicationController
       ['Super-Administrator',
        'Administrator',
        'Instructor',
-       'Teaching Assistant'].include? current_role_name
+       'Teaching Assistant','demo_instructor'].include? current_role_name
     when 'edit', 'update', 'destroy'
       [
         'Super-Administrator',
         'Administrator',
         'Instructor',
-        'Teaching Assistant'
+        'Teaching Assistant','demo_instructor'
       ].include?(current_role_name) &&
       current_user.instructor_id == instructor_id
     end

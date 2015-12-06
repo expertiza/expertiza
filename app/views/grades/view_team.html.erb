@@ -39,9 +39,9 @@
                         (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)
                   <%end %>
                 </h4>
-                <span style="padding-left:30px;cursor: pointer;text-decoration:underline;color:blue;font-size:small;" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">toggle question list</span>
-              <span style="padding-left:30px;color:grey" data-toggle="tooltip" data-placement="right" title="Colors are scaled from poor to excellent in the following order: red, orange, yellow, light-green, dark-green">color legend</span>
-              <span style="padding-left:30px;color:grey" data-toggle="tooltip" data-placement="right" title="Click a row to see the comments for the respective question. Click 'Review Total' row to see Add'l Comments. Useful tip: decreasing your browser's zoom to 75% or 90% many improve your experience.">interaction legend</span>
+                <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">toggle question list</span>
+              <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Colors are scaled from poor to excellent in the following order: red, orange, yellow, light-green, dark-green">color legend</span>
+              <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Click a row to see the comments for the respective question. Click 'Review Total' row to see Add'l Comments. Useful tip: decreasing your browser's zoom to 75% or 90% many improve your experience.">interaction legend</span>
 
             </span>
 
@@ -138,10 +138,10 @@
               <!-- now that the scores have been printed, we now create a row for the totals -->
               <!-- notice the loop for getting the total review scores. -->
           <tr data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s + "comment" %>">
-            <td class = 'cf' style="border: 1px solid black;"  >
+            <td class = 'cf'  >
               Review Total
             </td>
-            <td class = 'cf' style="border: 1px solid black;">
+            <td class = 'cf'>
               <%= vm.max_score_for_questionnaire %>
             </td>
             <% vm.get_total_review_scores.each do |total_score| %>
@@ -161,16 +161,16 @@
                     <td colspan="<%= (i+1).to_s %>" class="hiddenRow" >
                   <div id="hid<%= vm.questionnaire_type + vm.round.to_s + "comment" %>" class="accordion-body collapse" style="margin-left:10px;">
                    <div style="background-color:#A9A9F5;padding:4px;">
-                      <table style="border: 1px solid grey;">
+                      <table class="tbl_addlcmt">
                         <thead>
-                            <th style="border: 1px solid grey;padding: 5px 5px 5px 5px;">Review</th>
-                            <th style="border: 1px solid grey;padding: 5px 5px 5px 5px;">Additional Comments</th>
+                            <th>Review</th>
+                            <th >Additional Comments</th>
                         </thead>
                         <tbody>
                         <%k = 1%>
                         <% vm.listofreviews.each do |review| %>
-                                <tr><td style="border: 1px solid grey;padding: 5px 5px 5px 5px;background-color: #ffffff;"><%= k %></td>
-                                     <td style="border: 1px solid grey;padding:5px 5px 5px 5px;background-color: #ffffff;"><%= Response.find(review.id)["additional_comment"] %></td></tr>
+                                <tr><td ><%= k %></td>
+                                     <td ><%= Response.find(review.id)["additional_comment"] %></td></tr>
                                 <%k += 1%>
                            <% end %>
                         </tbody>

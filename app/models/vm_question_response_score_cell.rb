@@ -1,3 +1,4 @@
+#represents each score cell of the heatgrid table.
 class VmQuestionResponseScoreCell
 
   def initialize(questionText, question_id, weight,question_max_score,seq)
@@ -40,6 +41,8 @@ class VmQuestionResponseScoreCell
     @weight
   end
 
+  #the question max score is the max score of the questionnaire, except if the question is a true/false, in which case
+  # the max score is one.
   def question_max_score
     question = Question.find(self.question_id)
     if question.type == "Checkbox"

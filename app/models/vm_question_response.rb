@@ -1,5 +1,5 @@
-#this class, right now, represents each table in the view_team view. the intention may change.
-#the important piece to note is that the @listofrows is a  list of type VmHeatGrid_Row, which represents a row of the heatgrid table.
+#represents each table in the view_team view.
+#the important piece to note is that the @listofrows is a  list of type VmQuestionResponse_Row, which represents a row of the heatgrid table.
 class VmQuestionResponse
 
   def initialize(questionnaire, round,rounds)
@@ -30,7 +30,7 @@ class VmQuestionResponse
     end
   end
 
-  def addReviewers(participant,team,vary)
+  def addReviews(participant,team,vary)
 
     if @questionnaire_type == "ReviewQuestionnaire"
       if !vary

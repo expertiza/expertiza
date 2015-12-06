@@ -166,7 +166,7 @@ class GradesController < ApplicationController
         questions = questionnaire.questions
         vm.addQuestions(questions)
         vm.addTeamMembers(@team)
-        vm.addReviewers(@participant,@team,@assignment.varying_rubrics_by_round?)
+        vm.addReviews(@participant,@team,@assignment.varying_rubrics_by_round?)
         vm.get_number_of_comments_greater_than_10_words()
 
         #if a multi-round assignment, decrement for each review questionnaire,
@@ -178,7 +178,7 @@ class GradesController < ApplicationController
        @vmlist << vm
     }
     @current_role_name = current_role_name
-    @answers = Answer.where(response_id: 64882)
+    #@answers = Answer.where(response_id: 64882)
 
 
   end

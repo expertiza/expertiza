@@ -1,3 +1,4 @@
+#represents each row of a heatgrid-table, which is represented by the vm_question_response class.
 class VmQuestionResponseRow
 
   def initialize(score_value, color_code, comments)

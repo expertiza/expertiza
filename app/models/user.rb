@@ -80,9 +80,7 @@ class User < ActiveRecord::Base
 
     # If the user is a super admin, fetch all users
     if self.role.super_admin?
-      User.all.each do |user|
-        user_list << user
-      end
+     user_list =  fetch_users_for_super_admin user_list
     end
 
     # If the user is an instructor, fetch all users in his course/assignment
@@ -126,15 +124,8 @@ class User < ActiveRecord::Base
 
     # Add the children to the list
     unless self.role.super_admin?
-      User.all.each do |u|
-        if is_recursively_parent_of(u)
-          if not user_list.include?(u)
-            user_list << u
-          end
-        end
-      end
+     user_list = add_children user_list
     end
-
     user_list
 
   end
@@ -353,20 +344,89 @@ class User < ActiveRecord::Base
   end
 
   def self.search_users(role, user_id, letter, search_by)
-    if search_by == '1'  #search by user name
-      search_filter = '%' + letter + '%'
-      users = User.order('name').where( "(role_id in (?) or id = ?) and name like ?", role.get_available_roles, user_id, search_filter )
-    elsif search_by == '2' # search by full name
-      search_filter = '%' + letter + '%'
-      users = User.order('name').where( "(role_id in (?) or id = ?) and fullname like ?", role.get_available_roles, user_id, search_filter )
-    elsif search_by == '3' # search by email
-      search_filter = '%' + letter + '%'
-      users = User.order('name').where( "(role_id in (?) or id = ?) and email like ?", role.get_available_roles, user_id, search_filter )
-    else #default used when clicking on letters
-      search_filter = letter + '%'
-      users = User.order('name').where( "(role_id in (?) or id = ?) and name like ?", role.get_available_roles, user_id, search_filter )
+    case search_by
+      when '1' #search by user name
+        query_attribute ="name"
+      when '2' # search by full name
+        query_attribute ="fullname"
+      when '3' #search by user name
+        query_attribute ="email"
+      else
+        query_attribute ="name"
     end
+    users = fetch_results(role, user_id, letter, query_attribute)
     users
+  end
+
+  def destroy_user (current_user)
+    AssignmentParticipant.where(user_id: current_user.id).each{|participant| participant.delete}
+    TeamsUser.where(user_id: current_user.id).each{|teamuser| teamuser.delete}
+    AssignmentQuestionnaire.where(user_id: current_user.id).each{|aq| aq.destroy}
+    Participant.delete(true)
+    current_user.destroy
+
+  end
+  private
+  def fetch_results(role, user_id, letter, query_attribute)
+    search_filter = '%' + letter + '%'
+    users = User.order('name').where( "(role_id in (?) or id = ?) and #{query_attribute} like ?", role.get_available_roles, user_id, search_filter )
+    users
+  end
+
+  def iterate_participants(participants,user_list)
+    participants.each do |p_s|
+      if p_s.length > 0
+        p_s.each do |p|
+          if self.role.hasAllPrivilegesOf(p.user.role)
+            user_list << p.user
+          end
+        end
+      end
+    end
+    user_list
+  end
+
+  def fetch_users_for_super_admin(user_list)
+    User.all.each do |user|
+      user_list << user
+    end
+    user_list
+  end
+
+  #For the instructor,fetches all users in his course
+  def fetch_users_for_course(participants)
+    Course.where(instructor_id: self.id).each do |course|
+      participants << course.get_participants
+    end
+    participants
+  end
+
+  #For the instructor,fetches all users in his course
+  def fetch_users_for_assignment(participants)
+    Assignment.where(instructor_id: self.id).each do |assignment|
+      participants << assignment.participants
+    end
+    participants
+  end
+
+  def fetch_participants_for_courses(courses)
+    courses.each do |course_id|
+      course = Course.find(course_id)
+      participants << course.get_participants
+    end
+    participants
+  end
+
+
+  def add_children(user_list)
+    User.all.each do |u|
+      if is_recursively_parent_of(u)
+        if not user_list.include?(u)
+          user_list << u
+        end
+      end
+    end
+    user_list
   end
 
 end

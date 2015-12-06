@@ -21,7 +21,7 @@ class UsersController < ApplicationController
 
   def index
     if (current_user_role? == "Student")
-      redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user]))
+      redirect_to_home
     else
       list
       render :action => 'list'
@@ -71,7 +71,7 @@ class UsersController < ApplicationController
     # Get the users list to show on current page
     @users = paginate_list all_users
 
-    @letters = ('A'..'Z').to_a
+      @letters = ('A'..'Z').to_a
   end
 
     def show_selection
@@ -92,7 +92,7 @@ class UsersController < ApplicationController
 
     def show
       if (params[:id].nil?) || ((current_user_role? == "Student") &&  (session[:user].id != params[:id].to_i))
-        redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user]))
+        redirect_to_home
       else
         @user = User.find(params[:id])
         get_role
@@ -129,7 +129,9 @@ class UsersController < ApplicationController
 
       if @user.save
         password = @user.reset_password         # the password is reset
-        MailerHelper::send_mail_to_user(@user, "Your Expertiza account and password have been created", "user_welcome", password).deliver
+        subject = 'Your Expertiza account and password have been created'
+        partial_name = 'user_welcome'
+        MailerHelper::send_mail_to_user(@user, subject, partial_name, password).deliver
         flash[:success] = "A new password has been sent to new user's e-mail address."
         #Instructor and Administrator users need to have a default set for their notifications
         # the creation of an AssignmentQuestionnaire object with only the User ID field populated
@@ -174,11 +176,10 @@ class UsersController < ApplicationController
   def destroy
     begin
       @user = User.find(params[:id])
-      AssignmentParticipant.where(user_id: @user.id).each{|participant| participant.delete}
-      TeamsUser.where(user_id: @user.id).each{|teamuser| teamuser.delete}
-      AssignmentQuestionnaire.where(user_id: @user.id).each{|aq| aq.destroy}
-      Participant.delete(true)
-      @user.destroy
+      @user.destroy_user @user
+
+      #@user.destroy_user
+      #@user.destroy
       flash[:note] = undo_link("User \"#{@user.name}\" has been deleted successfully. ")
     rescue
       flash[:error] = $!
@@ -189,7 +190,7 @@ class UsersController < ApplicationController
 
   def keys
     if (params[:id].nil?) || ((current_user_role? == "Student") &&  (session[:user].id != params[:id].to_i))
-      redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user]))
+      redirect_to_home
     else
       @user = User.find(params[:id])
       @private_key = @user.generate_keys
@@ -237,9 +238,14 @@ class UsersController < ApplicationController
     if (paginate_options["#{@per_page}"].nil?) #displaying all - no pagination
       users = users.paginate(:page => params[:page], :per_page => users.count)
     else #some pagination is active - use the per_page
-      users = users.page(params[:page]).per_page(paginate_options["#{@per_page}"])
+      #users = users.page(params[:page]).per_page(paginate_options["#{@per_page}"])
+      users = users.paginate(:page => params[:page], :per_page => users.count)
     end
     users
+  end
+
+  def redirect_to_home
+    redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user]))
   end
 
   # generate the undo link

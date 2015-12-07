@@ -6,7 +6,6 @@ class JoinTeamRequestsController < ApplicationController
     ['Student', 'Instructor', 'Teaching Assistant'].include?(current_role_name) #people with this roles can only access the function provied by the controller 
   end
 
-  private 
   def render_request
       respond_to do |format|
       format.html 

@@ -12,45 +12,6 @@ module GradesHelper
     end
   end
 
-  # Render the table to display the question, score and response
-  def construct_table(parameters)
-    table_hash = {"table_title" => nil, "table_headers" => nil, "start_table" => false, "start_col" => false, "end_col" => false, "end_table" => false}
-
-    #we need to check if these parameters use tables
-    parameters = parameters.last(3)
-    if parameters[2].nil?
-      return table_hash
-    end
-    current_ques = parameters[2].split("|")[0]
-    total_col_ques = parameters[2].split("|")[1]
-    current_col = parameters[2].split("|")[2]
-    total_col = parameters[2].split("|")[3]
-
-    #since it's first item in a column we need to start a new column
-    if current_ques.to_i.one?
-      table_hash["start_col"] = true
-      #if it's the first column we need to send the title and headers
-      if current_col.to_i.one?
-        if parameters.first.any?
-          table_hash["table_title"] = parameters.first
-        end
-        table_hash["start_table"] = true
-        if parameters[1].any?
-          table_hash["table_headers"] = parameters[1]
-        end
-      end
-    end
-    #end of column, we need to close column
-    if current_ques == total_col_ques
-      table_hash["end_col"] = true
-      #end of table we need to close table
-      if total_col == current_col
-        table_hash["end_table"] = true
-      end
-    end
-    table_hash
-  end
-
   def render_ui(param1,param2)
     render partial: param1, locals: param2
   end

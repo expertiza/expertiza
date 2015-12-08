@@ -90,8 +90,6 @@ class AssignmentForm
     unless attributes
       return false 
     end
-    due_dates_id =Array.new
-    max_review_dd = NIL
     attributes.each do |due_date|
       if due_date[:due_at].blank? then
         next
@@ -100,43 +98,29 @@ class AssignmentForm
       #eg. 2015-06-22 12:05:00 -0400
       current_local_time = Time.parse(due_date[:due_at][0..15])
       tz = ActiveSupport::TimeZone[user.timezonepref].tzinfo
-      utc_time = tz.local_to_utc(Time.local(current_local_time.year,current_local_time.month,current_local_time.day,current_local_time.strftime('%H').to_i,current_local_time.strftime('%M').to_i,current_local_time.strftime('%S').to_i))
+      utc_time = tz.local_to_utc(Time.local(current_local_time.year,
+                                            current_local_time.month,
+                                            current_local_time.day,
+                                            current_local_time.strftime('%H').to_i,
+                                            current_local_time.strftime('%M').to_i,
+                                            current_local_time.strftime('%S').to_i))
       due_date[:due_at]= utc_time
       if due_date[:id].nil? or due_date[:id].blank?
         dd = DueDate.new(due_date)
         if !dd.save
-          @errors =@errors + @assignment.errors
           @has_errors = true;
         end
-        due_dates_id<<dd.id
       else
         dd = DueDate.find(due_date[:id])
         #get deadline for review
-        if dd.deadline_type_id == 2
-           max_review_dd = dd.due_at
-           dd_type = dd.deadline_type_id
-        end
-        due_dates_id<<dd.id
         if !dd.update_attributes(due_date)
-          @errors =@errors + @assignment.errors
           @has_errors = true;
         end
       end
+      if @has_errors
+        @errors =@errors + @assignment.errors
+      end
     end
-
-    #TODO write a method to check if we can delete a due date and call it from here.
-    #get the latest date for reviews done on this assignment
-    max_review_date = @assignment.response_maps.maximum(:created_at)
-
-    #if !max_review_date.nil? and max_review_date > max_review_dd
-    #    @errors = 'Cannot delete the due dates as a review has been done on '+ max_review_date.to_s.in_time_zone(user.timezonepref).to_s
-	  #    @has_errors = true;
-    #else
-         duedates = DueDate::where(assignment_id: @assignment.id)
-         duedates.each do |duedate|
-            duedate.destroy unless due_dates_id.include? duedate.id
-         end
-    #end
   end
 
   #Adds items to delayed_jobs queue for this assignment

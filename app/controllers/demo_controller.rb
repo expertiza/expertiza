@@ -47,7 +47,7 @@ class DemoController < ApplicationController
       end
     else
       flash[:error] = "Please ENTER the correct CAPTCHA code"
-      render :action => 'new'
+      redirect_to '/'
     end
   end
 

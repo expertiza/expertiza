@@ -40,6 +40,17 @@ feature 'Add someone to a team' do
 
   end
 
+  scenario "should not be possible when members amount is up to 3" do
 
+    # sign in
+    log_in('student4346', 'password')
+
+    # send invitation
+    click_link "Ethical analysis 2"
+    click_link "Your team"
+    fill_in 'user_name', with: 'student4349'
+    click_button 'Invite'
+    expect(page). to_not have_content('Waiting for reply')
+  end
 
 end

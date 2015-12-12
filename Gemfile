@@ -67,6 +67,7 @@ group :development do
 end
 
 group :test do
+  gem "factory_girl_rails", "~> 4.0" , :require => false
   gem 'database_cleaner'
   gem 'gherkin'
   gem 'guard-rails'

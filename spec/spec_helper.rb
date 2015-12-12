@@ -1,5 +1,6 @@
 # Record code coverage with coveralls on Travis
 require 'coveralls'
+require 'factory_girl_rails'
 Coveralls.wear! 'rails'
 
 # Record code coverage with simplecov locally

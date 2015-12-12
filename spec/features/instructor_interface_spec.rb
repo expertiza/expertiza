@@ -6,19 +6,19 @@ describe "E1582. Create integration tests for the instructor interface using cap
 
   feature "Test1: Instructor login" do
     scenario "with valid username and password" do
-      login_with 'instructor6', 'password'
+      login_with 'admin', 'admin'
       expect(page).to have_content("Manage content")
     end
 
     scenario "with invalid username and password" do
-      login_with 'instructor6', 'drowssap'
+      login_with 'admin', 'drowssap'
       expect(page).to have_content('Incorrect Name/Password')
     end
   end
 
   feature "Test2: Create a course" do
     scenario "should be able to create a public course or a private course" do
-      login_with 'instructor6', 'password'
+      login_with 'admin', 'admin'
 
       visit '/course/new?private=0'
       fill_in "Course Name", with: 'public course for test'
@@ -36,7 +36,7 @@ describe "E1582. Create integration tests for the instructor interface using cap
 
   feature "Test3: View assignment scores" do
     scenario 'should be able to view scores' do
-      login_with 'instructor6', 'password'
+      login_with 'admin', 'admin'
       click_link( 'Assignments', match: :first)
       expect(page).to have_content('Assignments')
       #go to assignment chapter 11-12 madeup exercise scores
@@ -47,7 +47,7 @@ describe "E1582. Create integration tests for the instructor interface using cap
 
   feature "Test4: View review scores" do
     scenario "should be able to view review scores" do
-      login_with 'instructor6', 'password'
+      login_with 'admin', 'admin'
       expect(page).to have_content('Assignments')
 
       # view assignments
@@ -67,7 +67,7 @@ describe "E1582. Create integration tests for the instructor interface using cap
 
   feature "Test5: View author-feedback scores" do
     scenario "should be able to view author-feedback scores" do
-      login_with 'instructor6', 'password'
+      login_with 'admin', 'admin'
       expect(page).to have_content('Assignments')
 
       # view assignments
@@ -87,7 +87,7 @@ describe "E1582. Create integration tests for the instructor interface using cap
 
   feature 'Test6: Create a two-round review assignment' do
     scenario 'without a topic', :js => true do
-      login_with 'instructor6', 'password'
+      login_with 'admin', 'admin'
       expect(page).to have_content('Manage content')
       click_link( 'Assignments', match: :first)
       expect(page).to have_content('Manage content')
@@ -95,7 +95,7 @@ describe "E1582. Create integration tests for the instructor interface using cap
 
       visit new_assignment_path
       expect(page).to have_content('New Assignment')
-      create_assignment('E1583_test_1')
+      create_assignment('E1582_test_1')
       expect(page).to have_content('You did not specify all necessary rubrics:')
       set_due_dates
       expect(page).to have_content('Assignment was successfully saved')
@@ -104,7 +104,7 @@ describe "E1582. Create integration tests for the instructor interface using cap
     end
 
     scenario 'with a topic', :js => true do
-      login_with 'instructor6', 'password'
+      login_with 'admin', 'admin'
       expect(page).to have_content('Manage content')
       click_link( 'Assignments', match: :first)
       expect(page).to have_content('Manage content')
@@ -112,7 +112,7 @@ describe "E1582. Create integration tests for the instructor interface using cap
 
       visit new_assignment_path
       expect(page).to have_content('New Assignment')
-      create_assignment('E1583_test_2')
+      create_assignment('E1582_test_2')
       expect(page).to have_content('You did not specify all necessary rubrics:')
     
       click_on 'Topics'

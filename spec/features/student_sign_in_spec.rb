@@ -11,8 +11,8 @@ feature 'student sign in' do
 
   scenario 'with valid email or password' do
     # jump to password retrieve page
-    log_in('student4346', 'password')
-    expect(page).to have_content 'User: student4346'
+    log_in('student1', 'password')
+    expect(page).to have_content 'User: student1'
 
   end
 

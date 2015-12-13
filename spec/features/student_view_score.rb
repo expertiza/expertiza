@@ -6,15 +6,16 @@ include LogInHelper
 
 feature 'view your scores' do
   scenario 'no scores available yet', :js=>true do
-    log_in('student4346', 'password')
-    click_link "Ethical analysis 3"
+    log_in('student1', 'password')
+    click_link "Assignment1"
     click_link "Your scores"
-    expect(page). to have_content('0.00%')
+    expect(page). to have_content('0')
   end
   scenario 'scores available', :js=>true do
-    log_in('student4346', 'password')
-    click_link "Ethical analysis"
+    log_in('student3', 'password')
+    click_link "Assignment1"
     click_link "Your scores"
-    expect(page). to have_content('78.33%')
+    click_link "show reviews"
+    expect(page). to have_content('Review 1')
   end  
 end

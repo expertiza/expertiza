@@ -535,7 +535,7 @@ Expertiza::Application.routes.draw do
 
   get 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
   get ':controller/service.wsdl', :action => 'wsdl'
-  get "/assignments/list_submissions" => 'assignments#list_submissions', as: 'list_submissions' 
+
   get ':controller(/:action(/:id))(.:format)'
 
  # get 'sign_up_sheet/intelligent_signup_sheet.html_erb' => 'sign_up_sheet#intelligentPage'

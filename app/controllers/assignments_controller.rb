@@ -277,6 +277,15 @@ class AssignmentsController < ApplicationController
       @assignment = Assignment.find(params[:id])
       @teams = Team.where(parent_id: params[:id])
       @events = SubmissionHistory.order('event_time').reverse_order
+      @participant = Participant.where(parent_id: params[:id])
+      if params[:tid]!= nil   
+        @teams = Team.find(params[:tid])
+        @participant = Participant.find(params[:pid])
+      end  
+      respond_to do |format|               
+       format.js
+       format.html
+      end
     end
 
     def associate_assignment_with_course

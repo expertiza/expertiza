@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151128070453) do
+ActiveRecord::Schema.define(version: 20151201075139) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -546,6 +546,8 @@ ActiveRecord::Schema.define(version: 20151128070453) do
     t.datetime "event_time"
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
+    t.integer  "team_id",        limit: 4
+    t.integer  "assignment_id",  limit: 4
   end
 
   add_index "submission_histories", ["participant_id"], name: "index_submission_histories_on_participant_id", using: :btree

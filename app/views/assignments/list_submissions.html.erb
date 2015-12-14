@@ -73,10 +73,8 @@
 	    	<% end %>
         <!--Display List of Events-->
         <% @participants.each do |participant| %>
-            <% if !participant.nil?  %>
-                <%= "List of Events:<br/>".html_safe %>
-                <%= render :partial => 'submitted_content/events_list', :locals => {:participant_id => participant.id,
-                                                                                    :team_id  =>       team.id } %>
+            <% if !participant.nil?  %>                
+                <%= link_to "Display complete submission history", list_submissions_path(:id => @assignment.id, :tid => team.id, :pid => participant.user_id), :remote => true %> 
             <% end %>
         <% end %>
     	</td>
@@ -85,3 +83,6 @@
       </td>
     <% end %>
   </table>
+  <div id = "fetch_history"> 
+  </div>   
+  

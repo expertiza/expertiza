@@ -1,0 +1,20 @@
+
+<table>
+  <div id="url" style="">
+    <tr>
+      <th> Artifact Name </th>
+      <th> Event</th>
+      <th> Event Time </th>
+          </tr>
+    <% @events.each do |event|  %>
+            <tr>
+              <% if @teams.id == event.team_id %>
+                  <td><%= event.artifact_name %> &nbsp;  &nbsp;</td>
+                  <td><%= event.event%> &nbsp;  &nbsp;</td>
+                  <td><%= event.event_time%> &nbsp;  &nbsp;</td>
+              <% end %>
+            </tr>
+    <% end %>
+  </div>
+</table>
+<%= link_to "Hide submission history", list_submissions_path(:id => @assignment.id) =%>

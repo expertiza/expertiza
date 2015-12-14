@@ -60,8 +60,10 @@ class VmQuestionResponse
            reviews.each do |review|
              review_mapping = TeammateReviewResponseMap.where(id: review.map_id).first
              participant = Participant.find(review_mapping.reviewer_id)
-             @listofreviewers << participant
-             @listofreviews << review
+             #commenting out teamreviews. I just realized that teammate reviews are hidden during the current semester,
+    	     #and I don't know how to implement the logic, so I'm being safe. 
+	     #@listofreviewers << participant
+             #@listofreviews << review
            end
 
 

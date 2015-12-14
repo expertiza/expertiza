@@ -9,7 +9,7 @@
     
     <% @events.each do |event|  %>
             <tr>
-              
+              <% @participant = AssignmentParticipant.find(event.participant_id) %>
               <% team_id_event = TeamsUser.team_id( @participant.parent_id,
                                                     @participant.user_id) %>
               <% if team.id == team_id_event %>

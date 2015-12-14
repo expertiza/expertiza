@@ -4,15 +4,15 @@
   <table width="100%" cellspacing="0" cellpadding="2" border="0">
   	<tr bgcolor="#CCCCCC">
   		<% if @assignment.max_team_size > 1 %>
-	  	  <th width = "20%">
-	        Team name
-	      </th>
-	      <th width = "18%">
-	        Team member(s)
-	      </th>
-	      <th>
-	        Submitted hyperlink(s)
-	      </th>
+          <th width = "20%">
+            Team name
+          </th>
+          <th width = "18%">
+            Team member(s)
+          </th>
+          <th>
+            Submitted hyperlink(s)
+          </th>
 	    <% else %>
 	      <th width = "38%">
 	        Participant name
@@ -52,7 +52,7 @@
     	</td>
     	<td bgcolor= <%= bgcolor %>>
     		<!--Display submitted hyperlinks-->
- 			
+
  			<% @participants.each do |participant| %>
     			<% if !participant.nil? and !participant.hyperlinks.blank? and participant == @participants.first %>
                     <%= "Hyperlinks:<br/>".html_safe %>
@@ -71,6 +71,17 @@
                     <% end %>
 				<% end %>
 	    	<% end %>
+        <!--Display List of Events-->
+        <% @participants.each do |participant| %>
+            <% if !participant.nil?  %>
+                <%= "List of Events:<br/>".html_safe %>
+                <%= render :partial => 'submitted_content/events_list', :locals => {:participant_id => participant.id,
+                                                                                    :team_id  =>       team.id } %>
+            <% end %>
+        <% end %>
     	</td>
+        <td bgcolor= <%= bgcolor %>>
+
+      </td>
     <% end %>
   </table>

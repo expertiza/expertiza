@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151107195943) do
+ActiveRecord::Schema.define(version: 20151128070453) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -240,6 +240,14 @@ ActiveRecord::Schema.define(version: 20151107195943) do
   add_index "due_dates", ["review_allowed_id"], name: "fk_due_date_review_allowed", using: :btree
   add_index "due_dates", ["review_of_review_allowed_id"], name: "fk_due_date_review_of_review_allowed", using: :btree
   add_index "due_dates", ["submission_allowed_id"], name: "fk_due_date_submission_allowed", using: :btree
+
+  create_table "hyperlink_contributors", force: :cascade do |t|
+    t.integer  "participant_id", limit: 4
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  add_index "hyperlink_contributors", ["participant_id"], name: "index_hyperlink_contributors_on_participant_id", using: :btree
 
   create_table "institutions", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
@@ -530,6 +538,18 @@ ActiveRecord::Schema.define(version: 20151107195943) do
 
   add_index "site_controllers", ["permission_id"], name: "fk_site_controller_permission_id", using: :btree
 
+  create_table "submission_histories", force: :cascade do |t|
+    t.integer  "participant_id", limit: 4
+    t.text     "artifact_name",  limit: 65535
+    t.text     "artifact_type",  limit: 65535
+    t.text     "event",          limit: 65535
+    t.datetime "event_time"
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  add_index "submission_histories", ["participant_id"], name: "index_submission_histories_on_participant_id", using: :btree
+
   create_table "suggestion_comments", force: :cascade do |t|
     t.text     "comments",      limit: 65535
     t.string   "commenter",     limit: 255
@@ -750,6 +770,7 @@ ActiveRecord::Schema.define(version: 20151107195943) do
   add_foreign_key "due_dates", "deadline_rights", column: "review_of_review_allowed_id", name: "fk_due_date_review_of_review_allowed"
   add_foreign_key "due_dates", "deadline_rights", column: "submission_allowed_id", name: "fk_due_date_submission_allowed"
   add_foreign_key "due_dates", "deadline_types", name: "fk_deadline_type_due_date"
+  add_foreign_key "hyperlink_contributors", "participants"
   add_foreign_key "invitations", "assignments", name: "fk_invitation_assignments"
   add_foreign_key "invitations", "users", column: "from_id", name: "fk_invitationfrom_users"
   add_foreign_key "invitations", "users", column: "to_id", name: "fk_invitationto_users"
@@ -762,6 +783,7 @@ ActiveRecord::Schema.define(version: 20151107195943) do
   add_foreign_key "resubmission_times", "participants", name: "fk_resubmission_times_participants"
   add_foreign_key "sign_up_topics", "assignments", name: "fk_sign_up_topics_assignments"
   add_foreign_key "signed_up_teams", "sign_up_topics", column: "topic_id", name: "fk_signed_up_users_sign_up_topics"
+  add_foreign_key "submission_histories", "participants"
   add_foreign_key "ta_mappings", "courses", name: "fk_ta_mappings_course_id"
   add_foreign_key "ta_mappings", "users", column: "ta_id", name: "fk_ta_mappings_ta_id"
   add_foreign_key "team_role_questionnaire", "questionnaires", name: "fk_questionnaire_id"

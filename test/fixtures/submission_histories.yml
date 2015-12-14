@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  participant_id: 
+  artifact_name: MyText
+  artifact_type: MyText
+  event: MyText
+  event_time: 2015-11-28 02:04:53
+
+two:
+  participant_id: 
+  artifact_name: MyText
+  artifact_type: MyText
+  event: MyText
+  event_time: 2015-11-28 02:04:53

@@ -243,6 +243,7 @@ class ResponseController < ApplicationController
         #if no feedback exists by dat user den only create for dat particular response/review
         map = FeedbackResponseMap.create(:reviewed_object_id => review.id, :reviewer_id => reviewer.id, :reviewee_id => review.map.reviewer.id)
       end
+        SubmissionHistory.create_feedback_submission_event(map.reviewer_id, map.reviewee_id)
       redirect_to :action => 'new', :id => map.id, :return => "feedback"
     else
       redirect_to :back
@@ -288,6 +289,15 @@ class ResponseController < ApplicationController
       isSubmitted = 'No'
     end
     @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:round => @round, :isSubmitted => isSubmitted)#,:version_num=>@version)
+	#Create an event in submission_history table if review is submitted
+	if @map.type == 'ReviewResponseMap' && isSubmitted == 'Yes'
+      participant = AssignmentTeam.first_member(@map.reviewee_id)
+	  if @round.nil? || @round == 1
+	  	SubmissionHistory.create_review_submission_event(participant.id, @map.id)
+	  else
+	    SubmissionHistory.create_review_resubmission_event(participant.id, @map.id)
+	  end
+	end
 
     @res = @response.response_id
 

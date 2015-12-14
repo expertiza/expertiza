@@ -366,5 +366,6 @@ DeadlineRight.create(:name => 'OK')
 
 puts 'Deadline'
 ###### WikiType
-WikiType.create(:name => 'No')
+#Specifying id also because Assignment#path() has hardcoded id value as 1
+WikiType.find_or_create_by(:id => 1, :name => 'No')
 puts 'WikiType'

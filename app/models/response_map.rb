@@ -61,6 +61,10 @@ class ResponseMap < ActiveRecord::Base
           @all_resp=Response.where(map_id: map.map_id, round: round).last
           if (!@all_resp.present?  && round == 1 && rounds > 1)
             @all_resp=Response.where(map_id: map.map_id).last
+              if !@all_resp.present?
+                @all_resp=Response.where(map_id: map.map_id).last
+              end
+
           end
          # if (map.type.eql?('ReviewResponseMap'))
             #If its ReviewResponseMap then only consider those response which are submitted.

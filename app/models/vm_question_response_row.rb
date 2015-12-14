@@ -1,10 +1,12 @@
+#represents each row of a heatgrid-table, which is represented by the vm_question_response class.
 class VmQuestionResponseRow
 
-  def initialize(questionText, question_id, weight,question_max_score)
+  def initialize(questionText, question_id, weight,question_max_score,seq)
     @questionText = questionText
     @weight = weight
 
     @question_id = question_id
+    @question_seq = seq
 
     @question_max_score = question_max_score
 
@@ -17,6 +19,9 @@ class VmQuestionResponseRow
     @countofcomments
   end
 
+  def question_seq
+    @question_seq
+  end
   def countofcomments=(newcount)
     @countofcomments = newcount
   end
@@ -54,7 +59,13 @@ class VmQuestionResponseRow
   end
 
 
+  #the question max score is the max score of the questionnaire, except if the question is a true/false, in which case
+  # the max score is one.
   def question_max_score
+    question = Question.find(self.question_id)
+    if question.type == "Checkbox"
+      return 1
+    end
     @question_max_score
   end
 

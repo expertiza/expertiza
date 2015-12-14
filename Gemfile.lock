@@ -169,6 +169,9 @@ GEM
     http-cookie (1.0.2)
       domain_name (~> 0.5)
     i18n (0.7.0)
+    jbuilder (2.3.2)
+      activesupport (>= 3.0.0, < 5)
+      multi_json (~> 1.2)
     jquery-datetimepicker-rails (2.4.1.0)
     jquery-rails (4.0.4)
       rails-dom-testing (~> 1.0)
@@ -232,6 +235,8 @@ GEM
       activerecord (>= 3.0, < 6.0)
       activesupport (>= 3.0, < 6.0)
       request_store (~> 1.1)
+
+    pg (0.11.0)
     power_assert (0.2.4)
     protected_attributes (1.1.3)
       activemodel (>= 4.0.1, < 5.0)
@@ -434,6 +439,7 @@ DEPENDENCIES
   guard-rspec
   haml-rails
   hoptoad_notifier
+  jbuilder
   jquery-datetimepicker-rails
   jquery-rails
   jquery-ui-sass-rails
@@ -443,6 +449,10 @@ DEPENDENCIES
   omniauth-google-oauth2 (~> 0.2.6)
   open-uri-cached
   paper_trail
+<<<<<<< HEAD
+=======
+  pg (~> 0.11.0)
+>>>>>>> fc11158a319489a7d29b14747aca625b797de55f
   protected_attributes
   pry
   pry-nav

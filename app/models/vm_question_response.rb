@@ -1,18 +1,23 @@
-#this class, right now, represents each table in the view_team view. the intention may change.
+#represents each table in the view_team view.
 #the important piece to note is that the @listofrows is a  list of type VmQuestionResponse_Row, which represents a row of the heatgrid table.
 class VmQuestionResponse
 
-  def initialize(max_score, questionnaire_type,question_display_type,round,rounds)
+  def initialize(questionnaire, round,rounds)
       @listofrows = []
       @listofreviewers = []
       @listofreviews = []
       @listofteamparticipants = []
-      @max_score = max_score
-      @questionnaire_type = questionnaire_type
-      @questionnaire_display_type = question_display_type
+      @max_score = questionnaire.max_question_score
+      @questionnaire_type = questionnaire.type
+      @questionnaire_display_type = questionnaire.display_type
       @rounds = rounds
       @round = round
- end
+    @name  = questionnaire.name
+  end
+
+  def name
+    @name
+  end
 
   def addQuestions(questions)
     questions.each do |question|
@@ -20,24 +25,23 @@ class VmQuestionResponse
       # score for the question is stored not on the question, but on the questionnaire. Neat.
       corresponding_questionnaire = Questionnaire.find_by(id: question.questionnaire.id)
       question_max_score = corresponding_questionnaire.max_question_score
-      row = VmQuestionResponseRow.new(question.txt, question.id, question.weight, question_max_score)
+      row = VmQuestionResponseScoreRow.new(question.txt, question.id, question.weight, question_max_score,question.seq)
       @listofrows << row
     end
   end
 
-  def addReviewers(participant,team)
+  def addReviews(participant,team,vary)
 
     if @questionnaire_type == "ReviewQuestionnaire"
-     # if @rounds = 1
-     # reviews = participant.reviews()     #regular reviews
-     # else
-      reviews = ResponseMap.get_assessments_for_round(team ,@round,@rounds)
-     # end
-      reviews.each do |review|
+      if @rounds == 1
+        reviews = participant.reviews()
+      else
+        reviews = ResponseMap.get_assessments_for_round(team ,@round,@rounds)
+      end
+        reviews.each do |review|
         review_mapping = ReviewResponseMap.where(id: review.map_id).first
          if review_mapping.present?
             participant = Participant.find(review_mapping.reviewer_id)
-           # #review = Response.find(id: review_mapping.review_id)
             @listofreviewers << participant
             @listofreviews << review
          end
@@ -55,8 +59,10 @@ class VmQuestionResponse
            reviews.each do |review|
              review_mapping = TeammateReviewResponseMap.where(id: review.map_id).first
              participant = Participant.find(review_mapping.reviewer_id)
-             @listofreviewers << participant
-             @listofreviews << review
+             #commenting out teamreviews. I just realized that teammate reviews are hidden during the current semester,
+    	     #and I don't know how to implement the logic, so I'm being safe. 
+	     #@listofreviewers << participant
+             #@listofreviews << review
            end
 
 
@@ -105,6 +111,10 @@ class VmQuestionResponse
     @max_score
   end
   
+  def max_score_for_questionnaire
+    @max_score * @listofrows.length
+  end
+
   def max_score_for_questionnaire
     @max_score * @listofrows.length
   end
@@ -159,9 +169,27 @@ class VmQuestionResponse
 
         # Now construct the color code and we're good to go!
         color_code = "c#{color_code_number}"
-        row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments))
+        row.score_row.push(VmQuestionResponseCell.new(answer.answer, color_code, answer.comments))
       end
     end
+  end
+
+  def get_total_review_scores
+    # First things first, initialize our array.
+    total_review_scores = Array.new(@listofrows[0].score_row.length){ |i| 0.0 }
+
+    # Now iterate over each row and sum the values in the score_row in the corresponding
+    # index of our new array.
+    @listofrows.each do |row|
+      row.score_row.each_index do |index|
+        score_value = row.score_row[index].score_value
+        if (score_value.is_a? Numeric)
+          total_review_scores[index] += score_value.to_f
+        end
+      end
+    end
+
+    return total_review_scores
   end
   
   def get_total_review_scores

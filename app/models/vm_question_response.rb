@@ -33,12 +33,11 @@ class VmQuestionResponse
   def addReviews(participant,team,vary)
 
     if @questionnaire_type == "ReviewQuestionnaire"
-      if !vary
+      if @rounds == 1
         reviews = participant.reviews()
       else
         reviews = ResponseMap.get_assessments_for_round(team ,@round,@rounds)
       end
-      #reviews = ResponseMap.get_assessments_for_round(team ,1,2)
         reviews.each do |review|
         review_mapping = ReviewResponseMap.where(id: review.map_id).first
          if review_mapping.present?

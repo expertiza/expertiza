@@ -25,7 +25,7 @@ class VmQuestionResponse
       # score for the question is stored not on the question, but on the questionnaire. Neat.
       corresponding_questionnaire = Questionnaire.find_by(id: question.questionnaire.id)
       question_max_score = corresponding_questionnaire.max_question_score
-      row = VmQuestionResponseScoreRow.new(question.txt, question.id, question.weight, question_max_score,question.seq)
+      row = VmQuestionResponseRow.new(question.txt, question.id, question.weight, question_max_score,question.seq)
       @listofrows << row
     end
   end
@@ -169,7 +169,7 @@ class VmQuestionResponse
 
         # Now construct the color code and we're good to go!
         color_code = "c#{color_code_number}"
-        row.score_row.push(VmQuestionResponseCell.new(answer.answer, color_code, answer.comments))
+        row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments))
       end
     end
   end

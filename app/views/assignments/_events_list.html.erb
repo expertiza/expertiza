@@ -12,7 +12,7 @@
               <% @participant = AssignmentParticipant.find(event.participant_id) %>
               <% team_id_event = TeamsUser.team_id( @participant.parent_id,
                                                     @participant.user_id) %>
-              <% if team.id == team_id_event %>
+              <% if @teams.id == team_id_event %>
                   <td><%= event.artifact_name %> &nbsp;  &nbsp;</td>
                   <td><%= event.event%> &nbsp;  &nbsp;</td>
                   <td><%= event.event_time%> &nbsp;  &nbsp;</td>

@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.5.46, for debian-linux-gnu (x86_64)
 --
--- Host: localhost    Database: expertiza_development
+-- Host: localhost    Database: expertiza_test
 -- ------------------------------------------------------
 -- Server version	5.5.46-0ubuntu0.12.04.2
 
@@ -559,7 +559,7 @@ CREATE TABLE `due_dates` (
 
 LOCK TABLES `due_dates` WRITE;
 /*!40000 ALTER TABLE `due_dates` DISABLE KEYS */;
-INSERT INTO `due_dates` VALUES (7,'2015-12-12 21:00:00',1,1,3,1,NULL,NULL,1,1,0,1,NULL,NULL,NULL,NULL,1),(8,'2015-12-13 20:09:00',2,1,1,3,NULL,NULL,1,1,0,1,NULL,NULL,NULL,NULL,1),(9,'2015-12-13 17:00:00',1,2,3,1,NULL,NULL,1,1,0,1,NULL,NULL,NULL,NULL,1),(10,'2015-12-14 18:25:00',2,2,1,3,NULL,NULL,1,1,0,1,NULL,NULL,NULL,NULL,1);
+INSERT INTO `due_dates` VALUES (7,'2015-12-12 21:00:00',1,1,3,1,NULL,NULL,1,1,0,1,NULL,NULL,NULL,NULL,1),(8,'2200-01-01 00:00:00',2,1,1,3,NULL,NULL,1,1,0,1,NULL,NULL,NULL,NULL,1),(9,'2015-12-13 17:00:00',1,2,3,1,NULL,NULL,1,1,0,1,NULL,NULL,NULL,NULL,1),(10,'2200-01-01 00:00:00',2,2,1,3,NULL,NULL,1,1,0,1,NULL,NULL,NULL,NULL,1);
 /*!40000 ALTER TABLE `due_dates` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2074,4 +2074,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-12-13 13:33:22
+-- Dump completed on 2015-12-15 15:01:13

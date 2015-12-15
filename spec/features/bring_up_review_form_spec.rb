@@ -4,7 +4,10 @@ require 'spec_helper'
 require_relative './helpers/login_helper'
 include LogInHelper
 
-feature 'bring up review forms' do
+system 'mysql -u root -h localhost expertiza_test < spec/features/db/TestData.sql'
+sleep(10)
+
+feature 'bring up review forms', :js=>true do
 	scenario 'successfully open chosen review forms' do
 	  log_in('student1', 'password')
 	  click_link "Assignment1"
@@ -34,3 +37,4 @@ feature 'bring up review forms' do
 		expect(page).to have_text("New Review for Assignment2")
 	end
 end
+#failed

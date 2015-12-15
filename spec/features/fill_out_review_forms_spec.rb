@@ -3,7 +3,10 @@ require 'spec_helper'
 require_relative './helpers/login_helper'
 include LogInHelper
 
-feature 'fill out review forms' do
+system 'mysql -u root -h localhost expertiza_test < spec/features/db/TestData.sql'
+sleep(10)
+
+feature 'fill out review forms', :js=>true do
 	scenario 'fill out form and save' do
 		log_in('student1', 'password')
 		click_link "Assignment1"
@@ -34,3 +37,4 @@ feature 'fill out review forms' do
 		expect(page).to have_text("Reviews for \"Assignment1\"")
 	end
 end
+#failed

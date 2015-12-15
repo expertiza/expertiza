@@ -4,6 +4,9 @@ require_relative './helpers/login_helper'
 require 'selenium-webdriver'
 include LogInHelper
 
+system 'mysql -u root -h localhost expertiza_test < spec/features/db/TestData.sql'
+sleep(10)
+
 feature 'view your scores' do
   scenario 'no scores available yet', :js=>true do
     log_in('student1', 'password')

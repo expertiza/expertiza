@@ -4,6 +4,8 @@ require_relative './helpers/login_helper'
 require 'selenium-webdriver'
 include LogInHelper
 
+system 'mysql -u root -h localhost expertiza_test < spec/features/db/TestData.sql'
+sleep(10)
 
 feature 'review feedback' do
   scenario 'give feedback to reviewer', :js=>true do

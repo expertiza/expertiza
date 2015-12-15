@@ -3,6 +3,9 @@ require 'spec_helper'
 require 'selenium-webdriver'
 require_relative './helpers/login_helper'
 
+system 'mysql -u root -h localhost expertiza_test < spec/features/db/TestData.sql'
+sleep(10)
+
 include LogInHelper
 feature 'student select a submission to review',:js=>true do
   scenario 'assignment available' do

@@ -1,0 +1,36 @@
+<%= form_for(@feedback) do |f| %>
+<p>
+  <strong>User:</strong>
+  <%= @feedback.user_email %>
+</p>
+
+<p>
+  <strong>Title:</strong>
+  <%= @feedback.title %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @feedback.description %>
+</p>
+
+<p>
+  <strong>Attachments:</strong>
+  <% if @attachment %>
+      <%= link_to @attachment.filename , download_attachment_path(@feedback.id)%>
+  <% else %>
+      No attachments
+  <% end %>
+
+</p>
+
+<p>
+  <strong>Current Status:</strong>
+  <%= @feedback.status %>
+</p>
+    <p><strong>Change Status: </strong> <%=f.select(:status, @statuses.collect {|r| [ r.status] }) %></p>
+
+   <p> <%= submit_tag "Submit" , :disabled => session[:wrong_email_attempts][:expires]> Time.now %> </p>
+
+
+<%end%>

@@ -1,0 +1,40 @@
+<p>
+  <strong>User email:</strong>
+  <%= @feedback.user_email %>
+</p>
+
+<p>
+  <strong>Title:</strong>
+  <%= @feedback.title %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @feedback.description %>
+</p>
+
+<p>
+  <strong>Attachments:</strong>
+  <% if @attachment %>
+  <%= link_to @attachment.filename , download_attachment_path(@feedback.id)%>
+  <% else %>
+  No attachments
+  <% end %>
+
+</p>
+
+<p>
+  <strong>Status:</strong>
+  <%= @feedback.status %>
+</p>
+
+<% if @current_user.present? %>
+    <% if FeedbackSetting.find(1).support_team.include? @current_user.email%>
+        <%= link_to 'Edit', edit_feedback_path(@feedback) %> |
+        <%= link_to 'Back', feedbacks_path %>
+    <% end %>
+<% else %>
+    <%= link_to 'Back', new_feedback_path %>
+<% end %>
+
+

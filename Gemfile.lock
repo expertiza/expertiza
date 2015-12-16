@@ -115,6 +115,11 @@ GEM
     erubis (2.7.0)
     eventmachine (1.0.8)
     execjs (2.6.0)
+    factory_girl (4.5.0)
+      activesupport (>= 3.0.0)
+    factory_girl_rails (4.5.0)
+      factory_girl (~> 4.5.0)
+      railties (>= 3.0.0)
     faraday (0.9.1)
       multipart-post (>= 1.2, < 3)
     fastercsv (1.5.5)
@@ -293,6 +298,8 @@ GEM
       execjs
       rails (>= 3.2)
       tilt
+    recaptcha (0.6.0)
+      json
     ref (2.0.0)
     request_store (1.2.0)
     rest-client (1.8.0)
@@ -423,6 +430,7 @@ DEPENDENCIES
   edavis10-ruby-web-search
   engtagger
   expertiza-authlogic!
+  factory_girl_rails
   fastercsv
   ffi-aspell
   font-awesome-rails
@@ -456,6 +464,7 @@ DEPENDENCIES
   rake
   rb-readline
   react-rails (~> 1.0)
+  recaptcha
   rgl
   rjb
   rspec-rails
@@ -476,3 +485,6 @@ DEPENDENCIES
   uglifier
   will_paginate
   zip-zip
+
+BUNDLED WITH
+   1.10.6

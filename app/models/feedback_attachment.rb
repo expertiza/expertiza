@@ -1,9 +1,9 @@
 class FeedbackAttachment < ActiveRecord::Base
   validate :attachment_type_validation
   def attachment_type_validation
-   #if not ["image/png", "image/jpg", "application/pdf"].include? self.content_type
+
     if not FeedbackAttachmentSetting.pluck(:file_type).include? self.content_type
-    errors.add(:content_type, "The file extension is not supported.")
+      errors.add(:content_type, "The file extension is not supported.")
     end
 
   end

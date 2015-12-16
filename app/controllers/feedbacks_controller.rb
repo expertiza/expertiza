@@ -140,9 +140,9 @@ class FeedbacksController < ApplicationController
     #if params[:action] == 'edit' or params[:action] == 'update'
 
     if ["edit", "update", "index", "destroy"].include? params[:action]
-    if @current_user.present?
-      return true if @settings.support_team.include? @current_user.email
-      return false
+      if @current_user.present?
+        return true if @settings.support_team.include? @current_user.email
+        return false
       end
     else
       return true

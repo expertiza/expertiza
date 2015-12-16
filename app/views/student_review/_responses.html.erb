@@ -52,6 +52,7 @@
                     <td>
                        <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
                     </td>
+                    
 
                     <% if @assignment.get_current_stage(topic_id) != "Finished" %>
                       <%- # show the link as edit when latest review is done in current deadline   -%>
@@ -61,8 +62,22 @@
                               <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id} %>
                               <%end%>
                               </td>
+                        <td>&nbsp;</td>
+                            <td>
+                              <% existing_chat=ReviewChat.where(:response_map_id => map.id)%>
+                              <%if !existing_chat.empty? then %>
+                                <a href ="http://expertiza.ncsu.edu/review_chats/show/<%= existing_chat[0].id %>" target="_blank">Chat Log </a> </br>
+                               <%end%>
+                            </td>
                       <% else %>
                         <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
+                        <td>&nbsp;</td>
+                            <td>
+                              <% existing_chat=ReviewChat.where(:response_map_id => map.id)%>
+                              <%if !existing_chat.empty? then %>
+                                <a href ="http://expertiza.ncsu.edu/review_chats/show/<%= existing_chat[0].id %>" target="_blank">Chat Log </a> </br>
+                               <%end%>
+                            </td>
                       <% end %>
                     <% end %>
                 <%end%>
@@ -71,6 +86,13 @@
                             <% if map.type.to_s == "MetareviewResponseMap" %>
                                 <% if @assignment.get_current_stage(topic_id) == 'metareview' %>
                                     <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
+                                    <td>&nbsp;</td>
+                                    <td>
+                                      <% existing_chat=ReviewChat.where(:response_map_id => map.id)%>
+                                      <%if !existing_chat.empty? then %>
+                                        <a href ="http://expertiza.ncsu.edu/review_chats/show/<%= existing_chat[0].id %>" target="_blank">Chat Log </a> </br>
+                                       <%end%>
+                                    </td>
                                 <% else %>
                                     <td>Begin</td>
                                     <td> (Work has not yet been submitted)</td>
@@ -78,6 +100,13 @@
                             <% else %>
                                 <% if @assignment.get_current_stage(topic_id) != 'submission' %>
                                     <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
+                                    <td>&nbsp;</td>
+                                    <td>
+                                      <% existing_chat=ReviewChat.where(:response_map_id => map.id)%>
+                                      <%if !existing_chat.empty? then %>
+                                        <a href ="http://expertiza.ncsu.edu/review_chats/show/<%= existing_chat[0].id %>" target="_blank">Chat Log </a> </br>
+                                       <%end%>
+                                    </td>
                                     <td>&nbsp;&nbsp;</td>
                                     <%#- Display link for code review if 'any' code review files -%>
                                     <%#- have been uploaded i.e. files present in code review dir -%>
@@ -93,6 +122,13 @@
                             <% end %>
                 <% else %>
                             <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
+                            <td>&nbsp;</td>
+                            <td>
+                              <% existing_chat=ReviewChat.where(:response_map_id => map.id)%>
+                              <%if !existing_chat.empty? then %>
+                                <a href ="http://expertiza.ncsu.edu/review_chats/show/<%= existing_chat[0].id %>" target="_blank">Chat Log </a> </br>
+                               <%end%>
+                            </td>
                             <td>&nbsp;&nbsp;</td>
                             <%-# Display link for code review if 'any' code review files -%>
                             <%-# have been uploaded i.e. files present in code review dir-%>
@@ -123,7 +159,8 @@
                                       <% end %>
                                   <% else %>
                                       <tr>
-                                        <td> <font color="gray" style="font-style: italic;">No previous versions available</font></td>
+                                        <td> 
+                                          <font color="gray" style="font-style: italic;">No previous versions available</font></td>
                                       </tr>
                                   <% end %>
                                 </TABLE>

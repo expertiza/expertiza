@@ -156,20 +156,28 @@ ul.navbar-right > li.right-most > a:hover {
     border-radius: 6px 0 6px 6px;
 }
 
-.margintop {
-    margin-top: 23px;
+.containerposition {
+    position: relative;
+    left: 43px;
+    margin-top: -30px;
+}
+
+.navbarposition {
+  margin-top: -70px;
+}
+
+.menuposition {
+  margin-top: 23px;
 }
 // end
 
 
 // Refer from http://www.bootply.com/120604
 @media (max-width: 1170px) {
-    .margintop {
-        marvin-top: 0px;
-    }
     .navbar-header {
-        float: none;
+      float: none;
     }
+
     .navbar-toggle {
         display: block;
     }

@@ -46,7 +46,6 @@ RSpec.configure do |config|
   # Used database cleaner to truncate existing test data
   config.after(:suite) do
     DatabaseCleaner.clean_with(:truncation,:only => ['users'])
-    DatabaseCleaner.clean_with(:truncation,:only => ['roles'])
     DatabaseCleaner.clean_with(:truncation,:only => ['feedbacks'])
     DatabaseCleaner.clean_with(:truncation,:only => ['feedback_settings'])
     DatabaseCleaner.clean_with(:truncation,:only => ['feedback_attachment_settings'])

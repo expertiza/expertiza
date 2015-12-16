@@ -7,7 +7,6 @@ RSpec.feature 'feedback submission when unlogged user' do
   before(:all) do
     feedback_settings = FactoryGirl.create(:feedback_setting)
     feedback_attachment_setting = FactoryGirl.create(:feedback_attachment_setting)
-    #role = FactoryGirl.create(:role)
     user = FactoryGirl.create(:user)
   end
 

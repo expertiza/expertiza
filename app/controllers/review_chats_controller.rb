@@ -6,12 +6,13 @@ class ReviewChatsController < ApplicationController
   def action_allowed?
     review_chat = ReviewChat.find(params[:id])
     allowed_users=Array.new
-    team_id=review_chat.team_id
+    response_map = ReviewChat.get_response_map(review_chat)
+    team_id = response_map.reviewee_id
     teams_users = TeamsUser.where(team_id: team_id)
     teams_users.each do |teams_user|
       allowed_users << User.find(teams_user.user_id).id
     end
-    allowed_users << Participant.find(review_chat.reviewer_id).user_id
+    allowed_users << Participant.find(response_map.reviewer_id).user_id
     current_role_name.eql? 'Student' and allowed_users.include?(session[:user].id)
   end
 
@@ -22,22 +23,21 @@ class ReviewChatsController < ApplicationController
   # GET /review_chats/1
   def show
     @review_chat = ReviewChat.find(params[:id])
-    @assignment_id=@review_chat.assignment_id
-    @reviewer_id=@review_chat.reviewer_id
-    @team_id=@review_chat.team_id
-    @chat_log=ReviewChat.where(:reviewer_id => @reviewer_id).where(:team_id => @team_id)
+    @map_id=@review_chat.response_map_id
+    @chat_log=ReviewChat.get_chat_log(@map_id)
   end
 
 
   def submitted_response
     @review_chat = ReviewChat.find(params[:id])
-    @chat_reviewer=Participant.find(@review_chat.reviewer_id).user_id
+    response_map = ReviewResponseMap.find(@review_chat.response_map_id)
+    @chat_reviewer=Participant.find(response_map.reviewer_id).user_id
     if(@chat_reviewer==session[:user].id) then
-    	ReviewChat.create(:assignment_id => @review_chat.assignment_id,:reviewer_id => @review_chat.reviewer_id, :team_id=>@review_chat.team_id, :type_flag => 'Q' , :content => params[:response_area])
+    	ReviewChat.create(:response_map_id => @review_chat.response_map_id, :type_flag => 'Q' , :content => params[:response_area])
     	ReviewChatsHelper::chat_email_query(params[:id])
     	flash[:notice]="Query has been submitted"	
     else	
-      	ReviewChat.create(:assignment_id => @review_chat.assignment_id,:reviewer_id => @review_chat.reviewer_id, :team_id=>@review_chat.team_id, :type_flag => 'A' , :content => params[:response_area])
+      	ReviewChat.create(:response_map_id => @review_chat.response_map_id, :type_flag => 'A' , :content => params[:response_area])
       	ReviewChatsHelper::chat_email_response(@review_chat.id,@chat_reviewer)
       flash[:notice]="Response has been submitted"
     end	
@@ -52,6 +52,6 @@ class ReviewChatsController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def review_chat_params
-      params.require(:review_chat).permit(:assignment_id, :reviewer_id, :team_id, :type_flag, :content)
+      params.require(:review_chat).permit(:response_map_id, :type_flag, :content)
     end
 end

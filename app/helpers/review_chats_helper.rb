@@ -17,8 +17,9 @@ def self.chat_email_query(id,partial="new_chatemail")
   defn = Hash.new
   defn[:body] = Hash.new
   defn[:body][:partial_name] = partial
-  assignment=nil
-  @team_id=ReviewChat.find(id).team_id
+  @review_chat=ReviewChat.find(id)
+  response_map = ReviewChat.get_response_map(@review_chat)
+  @team_id = response_map.reviewee_id
   teams_users = TeamsUser.where(team_id: @team_id)
   to_mail_list = Array.new
   teams_users.each do |teams_user|

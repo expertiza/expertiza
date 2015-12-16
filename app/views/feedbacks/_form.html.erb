@@ -22,15 +22,14 @@
           <%= text_field 'feedback', 'user_email', :maxlength=>"25" , :value => @current_user.email, :readonly=>true%></p>
       <% end %>
 
-      <p><label for="feedback_title">Title</label> (Mandatory field.)
-        <img src="/assets/info.png" title='The max character limit is 160.'>
+      <p><label for="feedback_title">Subject</label> (Mandatory field.)(Max 160 characters.)
         <br/>
         <%= text_field 'feedback', 'title', :maxlength=>"80" %></p>
 
       <p><label for="feedback_description">Description</label><br/>
         <%= text_area 'feedback', 'description', :rows => 4, :cols => 80  %>
 
-      <p><label>Attach a File </label> <img src="/assets/info.png" title='Only .png, .jpg, .jpeg and .pdf allowed. Size < 2MB'><br/>
+      <p><label>Attach a file </label> <img src="/assets/info.png" title='Only .png, .jpg, .jpeg and .pdf allowed. Size < 2MB'><br/>
         <%= f.file_field :attachment, accept: 'image/png,image/jpeg,application/pdf'%>
         <br>
 

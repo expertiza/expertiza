@@ -12,43 +12,49 @@
   <% end %>
 
   <div class="field">
-    Support Email Address:<br>
+    Support email address<br>
     <%= f.text_field :support_mail, :maxlength=>"25" %>
   </div>
   <br>
 
   <div class="field">
-    Max Number of Attachments:<br>
+    Max number of attachments<br>
     <%= f.number_field :max_attachments, :maxlength=>"25" %>
   </div>
   <br>
 
   <div class="field">
-    Max Attachment Size (in KB):<br>
+    Max attachment size (in KB)<br>
     <%= f.number_field :max_attachment_size, :maxlength=>"25" %>
   </div>
   <br>
 
   <div class="field">
-    Max number of Wrong retries:<br>
+    Max number of wrong retries
+    <img src="/assets/info.png" title='Number of wrong retries allowed before submit button gets disabled for the wait duration.'>
+    <br>
     <%= f.number_field :wrong_retries, :maxlength=>"25" %>
   </div>
   <br>
 
   <div class="field">
-    Wait Duration:<br>
+    Wait duration
+    <img src="/assets/info.png" title='Number of minutes for the which the submit button gets disabled, after defined wrong retry attempts.'>
+    <br>
     <%= f.number_field :wait_duration, :maxlength=>"25" %>
   </div>
   <br>
 
   <div class="field">
-    Wait Duration Increment:<br>
+    Wait duration increment
+    <img src="/assets/info.png" title='Number of minutes added to wait duration for each wrong retry, after making more than defined wrong retry attempts.'>
+    <br>
     <%= f.number_field :wait_duration_increment, :maxlength=>"25" %>
   </div>
   <br>
 
   <div class="field">
-    Support Team:<br>
+    Support team<br>
     <%= f.text_field :support_team, :maxlength=>"25" %>
   </div>
   <br>

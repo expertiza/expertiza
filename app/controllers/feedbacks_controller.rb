@@ -91,7 +91,7 @@ class FeedbacksController < ApplicationController
     @feedback_setting = FeedbackSetting.find(1)
     Mailer.new_feedback_generated_message(
         { to: @feedback_setting.support_mail,
-          subject: "A new feedback has been submitted",
+          subject: @feedback.title,
           body: {
               email: @feedback.user_email,
               title: @feedback.title,

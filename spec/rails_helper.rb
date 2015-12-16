@@ -44,19 +44,23 @@ RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
 
   # Used database cleaner to truncate existing test data
-  config.before(:suite) do
-    DatabaseCleaner.clean_with(:truncation,:only => ['feedbacks','feedback_settings'])
+  config.after(:suite) do
+    DatabaseCleaner.clean_with(:truncation,:only => ['users'])
+    DatabaseCleaner.clean_with(:truncation,:only => ['roles'])
+    DatabaseCleaner.clean_with(:truncation,:only => ['feedbacks'])
+    DatabaseCleaner.clean_with(:truncation,:only => ['feedback_settings'])
+    DatabaseCleaner.clean_with(:truncation,:only => ['feedback_attachment_settings'])
   end
 
-  config.before(:each) do
+  config.after(:each) do
     DatabaseCleaner.strategy = :transaction
   end
 
-  config.before(:each, :js => true) do
+  config.after(:each, :js => true) do
     DatabaseCleaner.strategy = :truncation
   end
 
-  config.before(:each) do
+  config.after(:each) do
     DatabaseCleaner.start
   end
 

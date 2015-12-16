@@ -297,7 +297,7 @@ Expertiza::Application.routes.draw do
       get :saving
       get :redirection
       post :custom_create
-      post :submitted_question
+      post :initiate_chat
     end
   end
 

@@ -89,6 +89,7 @@ jQuery(document).ready(function() {
 <% end %>
 
     <p style="position:fixed; bottom:0px; right:100px ">
+      <%= form_tag :action => "initiate_chat", :id => @map.id  do %>
       <label for="review_chats">Post your query for the Author</label><BR/>
       <textarea cols="30" rows="4" id="review_question" name="review_question" style="overflow:hidden;">
         </textarea> <br/>	
@@ -96,7 +97,7 @@ jQuery(document).ready(function() {
     </p>
 
 
-<% existing_chat=ReviewChat.where(:reviewer_id => @map.reviewer_id).where(:team_id => @map.reviewee_id)%>
+<% existing_chat=ReviewChat.where(:response_map_id => @map.id)%>
 <%if !existing_chat.empty? then %>
 <a href ="http://expertiza.ncsu.edu/review_chats/show/<%= existing_chat[0].id %>" target="_blank"> Click here to see chat log </a> </br>
 <%end%>

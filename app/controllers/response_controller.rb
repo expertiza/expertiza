@@ -332,7 +332,7 @@ class ResponseController < ApplicationController
   end
 
 
-  def submitted_question
+  def initiate_chat
       @map = ResponseMap.find(params[:id])
       ReviewChat.create( :response_map_id=>@map.id, :type_flag => 'Q' , :content => params[:review_question])
       flash[:notice]="Question has been submitted to Author"

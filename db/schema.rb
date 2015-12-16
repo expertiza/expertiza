@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151107195943) do
+ActiveRecord::Schema.define(version: 20151204171331) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -240,6 +240,48 @@ ActiveRecord::Schema.define(version: 20151107195943) do
   add_index "due_dates", ["review_allowed_id"], name: "fk_due_date_review_allowed", using: :btree
   add_index "due_dates", ["review_of_review_allowed_id"], name: "fk_due_date_review_of_review_allowed", using: :btree
   add_index "due_dates", ["submission_allowed_id"], name: "fk_due_date_submission_allowed", using: :btree
+
+  create_table "feedback_attachment_settings", force: :cascade do |t|
+    t.string   "file_type",  limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "feedback_attachments", force: :cascade do |t|
+    t.string   "feedback_id",  limit: 255
+    t.string   "filename",     limit: 255
+    t.string   "content_type", limit: 255
+    t.binary   "data",         limit: 65535
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+  end
+
+  create_table "feedback_settings", force: :cascade do |t|
+    t.string   "support_mail",            limit: 255
+    t.integer  "max_attachments",         limit: 4
+    t.integer  "max_attachment_size",     limit: 4
+    t.integer  "wrong_retries",           limit: 4
+    t.integer  "wait_duration",           limit: 4
+    t.integer  "wait_duration_increment", limit: 4
+    t.string   "support_team",            limit: 255
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
+  end
+
+  create_table "feedback_statuses", force: :cascade do |t|
+    t.string   "status",     limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "feedbacks", force: :cascade do |t|
+    t.string   "user_email",  limit: 255
+    t.string   "title",       limit: 255
+    t.text     "description", limit: 65535
+    t.string   "status",      limit: 255
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
 
   create_table "institutions", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false

@@ -1,0 +1,53 @@
+<%= form_for(@feedback) do |f| %>
+    <% if @feedback.errors.any? %>
+        <div id="error_explanation">
+          <h2><%= pluralize(@feedback.errors.count, "error") %> prohibited this feedback from being saved:</h2>
+
+          <ul>
+            <% @feedback.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+    <% end %>
+
+
+    <br>
+    <p><label for="feedback_user_email">Email</label> (Mandatory field.)
+      <img src="/assets/info.png" title='Enter Expertiza registered email id.'>
+      <br/>
+      <% if @current_user.nil? %>
+          <%= text_field 'feedback', 'user_email', :maxlength=>"25", :readonly=> false%></p>
+      <% else %>
+          <%= text_field 'feedback', 'user_email', :maxlength=>"25" , :value => @current_user.email, :readonly=>true%></p>
+      <% end %>
+
+      <p><label for="feedback_title">Title</label> (Mandatory field.)
+        <img src="/assets/info.png" title='The max character limit is 160.'>
+        <br/>
+        <%= text_field 'feedback', 'title', :maxlength=>"80" %></p>
+
+      <p><label for="feedback_description">Description</label><br/>
+        <%= text_area 'feedback', 'description', :rows => 4, :cols => 80  %>
+
+      <p><label>Attach a File </label> <img src="/assets/info.png" title='Only .png, .jpg, .jpeg and .pdf allowed. Size < 2MB'><br/>
+        <%= f.file_field :attachment, accept: 'image/png,image/jpeg,application/pdf'%>
+        <br>
+
+
+      <p><label>CAPTCHA</label>
+      <div class="g-recaptcha" data-sitekey="6LfY_RETAAAAAMH85s0nAZWZ15KVGYcZWRZExNJI"></div>
+      <%= recaptcha_tags %>
+      <br>
+      <% if session[:wrong_email_attempts].nil? %>
+          <%= submit_tag "Submit" %>
+      <% else %>
+          <%= submit_tag "Submit" , :disabled => session[:wrong_email_attempts][:expires]> Time.now %>
+
+
+      <%end%>
+      <div class="actions">
+      </div>
+      <br>
+
+<% end %>

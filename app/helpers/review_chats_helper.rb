@@ -1,5 +1,6 @@
 module ReviewChatsHelper
 
+# send an email to the reviewer when the author replies to a query.
 def self.chat_email_response(id,reviewer_id,partial="new_chatemail")
     defn = Hash.new
     defn[:body] = Hash.new
@@ -13,6 +14,7 @@ def self.chat_email_response(id,reviewer_id,partial="new_chatemail")
     Mailer.sync_message(defn).deliver
   end 
 
+# send an email to the author when a reviewer asks a query.
 def self.chat_email_query(id,partial="new_chatemail")
   defn = Hash.new
   defn[:body] = Hash.new

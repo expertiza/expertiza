@@ -138,7 +138,7 @@ class Assessment360Controller < ApplicationController
                     teammate_average = 0 
                     if teammate_reviews.count > 0
                         teammate_reviews.each do |teammate_review| 
-                            teammate_average = teammate_average + teammate_review.get_average_score 
+                            teammate_average = teammate_average + teammate_review.get_average_score.to_i
                         end 
                         teammate_average = (teammate_average.to_f/teammate_reviews.count.to_f).to_f.round() 
                         @teammate_review[student.fullname.to_s][assignment.name.to_s] = teammate_average.to_s + '%'

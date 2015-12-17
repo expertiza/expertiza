@@ -16,12 +16,11 @@ class CourseParticipant < Participant
 
   # provide import functionality for Course Participants
   # if user does not exist, it will be created and added to this assignment
-  def self.import(row,session,id)
-    if row.length != 4
-      raise ArgumentError, "The record containing #{row[0]} should have 4 items, it has #{row.length}."
-    end
+  def self.import(row,row_header=nil,session,id)
+    raise ArgumentError, "No user id has been specified." if row.length < 1
     user = User.find_by_name(row[0])
     if user == nil
+      raise ArgumentError, "The record containing #{row[0]} does not have enough items." if row.length < 4
       attributes = ImportFileHelper::define_attributes(row)
       user = ImportFileHelper::create_new_user(attributes,session)
     end
@@ -29,8 +28,8 @@ class CourseParticipant < Participant
     if course == nil
       raise ImportError, "The course with id \""+id.to_s+"\" was not found."
     end
-    if where(['user_id=? AND parent_id=?', user.id, course.id]).count == 0
-      create(:user_id => user.id, :parent_id => course.id)
+    if !CourseParticipant.exists?(:user_id => user.id, :parent_id => course.id)
+      CourseParticipant.create(:user_id => user.id, :parent_id => course.id)
     end
   end
 

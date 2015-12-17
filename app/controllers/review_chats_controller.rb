@@ -3,6 +3,8 @@ class ReviewChatsController < ApplicationController
   before_action :set_review_chat, only: [:show, :edit, :update, :destroy]
 
   # GET /review_chats
+  # check the access to that interaction. 
+  #Only the author and the particular reviewer should be able to see and interact.
   def action_allowed?
     review_chat = ReviewChat.find(params[:id])
     allowed_users=Array.new
@@ -21,13 +23,14 @@ class ReviewChatsController < ApplicationController
   end
 
   # GET /review_chats/1
+  # show the chat log
   def show
     @review_chat = ReviewChat.find(params[:id])
     @map_id=@review_chat.response_map_id
     @chat_log=ReviewChat.get_chat_log(@map_id)
   end
 
-
+ # submit a followup query or a response
   def submitted_response
     @review_chat = ReviewChat.find(params[:id])
     response_map = ReviewResponseMap.find(@review_chat.response_map_id)

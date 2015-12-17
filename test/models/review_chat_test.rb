@@ -6,7 +6,7 @@ class ReviewChatTest < ActiveSupport::TestCase
 	@review_chat = ReviewChat.new(response_map_id: '90207', type_flag: 'Q', content: 'This is test content.')
 	end
 	
-	test "respone_map_id should be present" do
+	test "response_map_id should be present" do
 	@review_chat.response_map_id = " "
 	assert_not @review_chat.response_map_id?
 	end

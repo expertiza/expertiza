@@ -5,7 +5,6 @@ class AssignmentForm
   attr_accessor :errors
 
   DEFAULT_MAX_TEAM_SIZE = 1
-  DEFAULT_WIKI_TYPE_ID = 1
 
 
   def initialize(args={})
@@ -13,7 +12,6 @@ class AssignmentForm
     if args[:assignment].nil?
       @assignment.course = Course.find(args[:parent_id]) if args[:parent_id]
       @assignment.instructor = @assignment.course.instructor if @assignment.course
-      @assignment.wiki_type_id = DEFAULT_WIKI_TYPE_ID
       @assignment.max_team_size = DEFAULT_MAX_TEAM_SIZE
     end
     @assignment_questionnaires=Array(args[:assignment_questionnaires])
@@ -214,12 +212,6 @@ class AssignmentForm
     end
   end
 
-  def wiki_type
-  if @assignment.wiki_type.nil?
-      @assignment.wiki_type = WikiType.find_by_name('No')
-    end
-  end
-
   def staggered_deadline
   if @assignment.staggered_deadline.nil?
       @assignment.staggered_deadline = false
@@ -266,7 +258,6 @@ class AssignmentForm
 
   #NOTE: unfortunately this method is needed due to bad data in db @_@
   def set_up_defaults
-    wiki_type
     staggered_deadline
     availability_flag
     micro_task

@@ -94,7 +94,6 @@ class AssignmentParticipant < Participant
 
   def has_submissions?
     return ((submitted_files.length > 0) or
-            (wiki_submissions.length > 0) or
             (hyperlinks_array.length > 0))
   end
 
@@ -330,26 +329,6 @@ class AssignmentParticipant < Participant
       files = files(self.path)
     end
     return files
-  end
-
-  def wiki_submissions
-    current_time = Time.now.month.to_s + "/" + Time.now.day.to_s + "/" + Time.now.year.to_s
-
-    #ACS Check if the team count is greater than one(team assignment)
-    if self.assignment.max_team_size > 1 && self.assignment.wiki_type.name == "MediaWiki"
-      submissions = Array.new
-      self.team.participants.each do |user|
-        val = WikiType.review_mediawiki_group(self.assignment.directory_path, current_time, user.handle)
-        submissions << val if val != nil
-      end if self.team
-      submissions
-    elsif self.assignment.wiki_type.name == "MediaWiki"
-      return WikiType.review_mediawiki(self.assignment.directory_path, current_time, self.handle)
-    elsif self.assignment.wiki_type.name == "DocuWiki"
-      return WikiType.review_docuwiki(self.assignment.directory_path, current_time, self.handle)
-    else
-      Array.new
-    end
   end
 
   def team

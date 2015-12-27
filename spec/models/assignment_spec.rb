@@ -50,14 +50,6 @@ describe "#has_topics?" do
   end
 end
 
-describe "#is_wiki_assignment" do
-  it "checks assignment should be a wiki assignment" do
-    assign = FactoryGirl.create(:assignment)
-    id = assign.is_wiki_assignment
-    expect(id).to be true
-  end
-end
-
 describe "#is_google_doc" do
   it "checks whether assignment is a google doc" do
     assign = FactoryGirl.create(:assignment)

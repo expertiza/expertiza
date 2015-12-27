@@ -8,10 +8,9 @@ class Assignment < ActiveRecord::Base
 require 'analytic/assignment_analytic'
   include AssignmentAnalytic
   belongs_to :course
-  belongs_to :wiki_type
   has_paper_trail
 
-  # wiki_type needs to be removed. When an assignment is created, it needs to
+  # When an assignment is created, it needs to
   # be created as an instance of a subclass of the Assignment (model) class;
   # then Rails will "automatically' set the type field to the value that
   # designates an assignment of the appropriate type.
@@ -511,7 +510,6 @@ require 'analytic/assignment_analytic'
 
   def path
     raise 'Path cannot be created. The assignment must be associated with either a course or an instructor.' if self.course_id == nil && self.instructor_id == nil
-    raise PathError, 'No path needed' if self.wiki_type_id != 1
     path_text = ""
     (self.course_id != nil && self.course_id > 0) ?
       path_text = Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(User.find(self.instructor_id).name) + '/' + FileHelper.clean_path(Course.find(self.course_id).directory_path) + '/':
@@ -611,11 +609,6 @@ require 'analytic/assignment_analytic'
     self.destroy
   end
 
-  # It appears that this method is not used at present!
-  def is_wiki_assignment
-    self.wiki_type_id > 1
-  end
-
   # Check to see if assignment is a microtask
   def is_microtask?
     (self.microtask.nil?) ? false : self.microtask
@@ -624,13 +617,6 @@ require 'analytic/assignment_analytic'
   # Check to see if assignment is a microtask
   def is_coding_assignment?
     (self.is_coding_assignment?) ? false : self.is_coding_assignment
-  end
-
-  def is_google_doc
-    # This is its own method so that it can be refactored later.
-    # Google Document code should never directly check the wiki_type_id
-    # and should instead always call is_google_doc.
-    self.wiki_type_id == 4
   end
 
   #add a new participant to this assignment

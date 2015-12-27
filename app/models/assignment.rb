@@ -598,7 +598,7 @@ require 'analytic/assignment_analytic'
       # directory is empty
     end
 
-    if !is_wiki_assignment and !(self.directory_path.nil? or self.directory_path.empty?) and !directory.nil?
+    if !(self.directory_path.nil? or self.directory_path.empty?) and !directory.nil?
       if directory.size == 2
         Dir.delete(Rails.root + '/pg_data/' + self.directory_path)
       else

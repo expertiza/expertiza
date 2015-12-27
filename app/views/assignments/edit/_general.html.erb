@@ -209,15 +209,6 @@ function is_coding_assignmentChanged(){
           } 
     }
 
-    function wikiAssignmentChanged() {
-      if (jQuery('#assignment_wiki_assignment').is(':checked')) {
-        jQuery('#assignment_wiki_type_field').removeAttr('hidden');
-      } else {
-        jQuery('#assignment_wiki_type_field').attr('hidden', true);
-            jQuery('#assignment_wiki_type').val('1');
-      }
-    }
-
     function staggeredDeadlineChanged() {
       var msg = 'Warning! Unchecking all topics for this assignment will now have the same deadline.'
       if (jQuery('#assignment_staggered_deadline').is(':checked')) {

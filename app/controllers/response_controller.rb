@@ -1,5 +1,4 @@
 class ResponseController < ApplicationController
-  helper :wiki
   helper :submitted_content
   helper :file
 

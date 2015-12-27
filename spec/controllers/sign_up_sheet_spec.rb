@@ -6,13 +6,9 @@ describe SignUpSheetController do
     instructor.save
     @user = User.find_by_name("instructor")
 
-    @wiki = WikiType.new({"name"=>"No"})
-    @wiki.save
-
     @assignment = Assignment.where(name: 'My assignment').first || Assignment.new({
                                                                                   "name"=>"My assignment",
                                                                                   "instructor_id"=>@user.id,
-                                                                                  "wiki_type_id"=>@wiki.id
                                                                               })
     @assignment.save
 

@@ -21,7 +21,6 @@ FactoryGirl.define do
     microtask {true}
     review_assignment_strategy {'Auto-Selected'}
     association :instructor, factory: :user
-    association :wiki_type, factory: :wiki_type
   end
 
   # Factory for Assignment without name
@@ -32,12 +31,6 @@ FactoryGirl.define do
     microtask {true}
     review_assignment_strategy {'Auto-Selected'}
     association :instructor, factory: :user
-    association :wiki_type, factory: :wiki_type
-  end
-
-  # Factory for wiki type
-  factory :wiki_type do
-    name {'wiki_1a'}
   end
 
   # Factory for Assignment Team

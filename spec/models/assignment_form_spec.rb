@@ -14,9 +14,7 @@ describe AssignmentForm do
   describe ".create_form_object" do
     it "creates a new form object" do
       expect(Assignment).to receive(:find).and_return assignment
-      expect(assignment).to receive(:wiki_type)
       expect(WikiType).to receive(:find_by_name)
-      expect(assignment).to receive(:wiki_type=)
       expect(assignment).to receive(:staggered_deadline)
       expect(assignment).to receive(:staggered_deadline=)
       expect(assignment).to receive(:days_between_submissions=)
@@ -54,9 +52,7 @@ describe AssignmentForm do
   describe ".set_up_defaults" do
     it "sets up default values" do
       expect(Assignment).to receive(:new).and_return assignment
-      expect(assignment).to receive(:wiki_type)
       expect(WikiType).to receive(:find_by_name)
-      expect(assignment).to receive(:wiki_type=)
       expect(assignment).to receive(:staggered_deadline)
       expect(assignment).to receive(:staggered_deadline=)
       expect(assignment).to receive(:days_between_submissions=)
@@ -80,9 +76,7 @@ describe AssignmentForm do
   describe "#set_up_assignment_review" do
     it "set up assignment review" do
       expect(Assignment).to receive(:new).and_return assignment
-      expect(assignment).to receive(:wiki_type)
       expect(WikiType).to receive(:find_by_name)
-      expect(assignment).to receive(:wiki_type=)
       expect(assignment).to receive(:staggered_deadline)
       expect(assignment).to receive(:staggered_deadline=)
       expect(assignment).to receive(:days_between_submissions=)

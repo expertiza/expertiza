@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151228015657) do
+ActiveRecord::Schema.define(version: 20151228191257) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -69,6 +69,7 @@ ActiveRecord::Schema.define(version: 20151228015657) do
     t.boolean  "calculate_penalty",          limit: 1,     default: false, null: false
     t.integer  "late_policy_id",             limit: 4
     t.boolean  "is_penalty_calculated",      limit: 1,     default: false, null: false
+    t.integer  "max_bids",                   limit: 4
     t.boolean  "show_teammate_reviews",      limit: 1
     t.boolean  "availability_flag",          limit: 1,     default: true
     t.boolean  "use_bookmark",               limit: 1
@@ -636,6 +637,8 @@ ActiveRecord::Schema.define(version: 20151228015657) do
     t.string  "type",                       limit: 255
     t.text    "comments_for_advertisement", limit: 65535
     t.boolean "advertise_for_partner",      limit: 1
+    t.text    "submitted_hyperlinks",       limit: 65535
+    t.integer "directory_num",              limit: 4
   end
 
   create_table "teams_users", force: :cascade do |t|

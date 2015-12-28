@@ -67,11 +67,6 @@ class PopupController < ApplicationController
       @total_possible = response.get_maximum_score
     end
 
-    #    @review_questionnaire = Questionnaire.find(@assignment.review_questionnaire_id)
-    #    @review_questions = @review_questionnaire.questions
-    #@maxscore = @review_questionnaire.max_question_score
-
-
   end
 
 
@@ -112,13 +107,6 @@ class PopupController < ApplicationController
         @review_questions = @review_questionnaire.questions
       end
 
-
-      ###
-
-
-
-      # @maxscore = Questionnaire.find(@assignment.review_questionnaire_id).max_question_score
-
       @scores = Answer.where(response_id: @reviewid)
       @scores.each do |s|
         @sum = @sum + s.answer
@@ -127,13 +115,8 @@ class PopupController < ApplicationController
       end
 
       @sum1 = (100*@sum.to_f )/(@maxscore.to_f * @count.to_f)
-      #    @review_questionnaire = Questionnaire.find(@assignment.review_questionnaire_id)
-      #    @review_questions = @review_questionnaire.questions
-      #
+
     end
-
-
-    #    @maxscore = @review_questionnaire.max_question_score
 
   end
 

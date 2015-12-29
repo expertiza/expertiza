@@ -1,5 +1,43 @@
 class VersionsController < ApplicationController
 
+  include PaginationHelper
+
+  VERSIONS_PER_PAGE = 25
+
+  def action_allowed?
+    case params[:action]
+    when 'new', 'create', 'edit', 'update'
+    #Modifications can only be done by papertrail
+      return false
+    when 'destroy_all'
+      ['Super-Administrator',
+       'Administrator'].include? current_role_name
+    else
+      #Allow all others
+      ['Super-Administrator',
+       'Administrator',
+       'Instructor',
+       'Teaching Assistant',
+       'Student'].include? current_role_name
+    end
+  end
+
+  def new
+    #nothing to do, papertrail handles create/update
+  end
+
+  def create
+    #nothing to do, papertrail handles create/update
+  end
+
+  def edit
+    #nothing to do, papertrail handles create/update
+  end
+
+  def update
+    #nothing to do, papertrail handles create/update
+  end
+
   def index
     redirect_to '/versions/search'
   end
@@ -13,21 +51,25 @@ class VersionsController < ApplicationController
 
     # Get the versions list to show on current page
     if params[:post]
-      @versions = paginate_list(params[:id], params[:post][:user_id], params[:post][:item_type],
-                                params[:post][:event], params[:datetime])
+      search_criteria = BuildSearchCriteria(params[:id], params[:post][:user_id], params[:post][:item_type],
+                                            params[:post][:event])
+      versions_matching_search_criteria = Version.where(search_criteria)
+      @versions = paginate_list versions_matching_search_criteria
     else
-      @versions = Version.page(params[:page]).order('id').per_page(25).all
+      user_ids = get_list_of_user_ids
+      matching_versions = Version.where('whodunnit IN (?)', user_ids).order('id')
+      @versions = paginate_list matching_versions
     end
   end
 
   def destroy_all
     Version.destroy_all
-    redirect_to versions_path, notice: "All versions have been deleted"
+    redirect_to versions_path, notice: 'All versions have been deleted'
   end
 
   def destroy
     Version.find(params[:id]).destroy
-    redirect_to versions_path, notice: "Your version has been deleted"
+    redirect_to versions_path, notice: 'Your version has been deleted'
   end
 
   before_filter :conflict? , :except => [:index,:destroy, :destroy_all]
@@ -80,33 +122,58 @@ class VersionsController < ApplicationController
 
   private
 
-  def action_allowed?
-    true
+  # pagination.
+  def paginate_list(versions)
+    paginate(versions, VERSIONS_PER_PAGE);
   end
 
-  # For filtering the versions list with proper search and pagination.
-  def paginate_list(id, user_id, item_type, event, datetime)
+  def BuildSearchCriteria(id, user_id, item_type, event)
     # Set up the search criteria
-    criteria = ''
-    criteria = criteria + "id = #{id} AND " if id && id.to_i > 0
+    search_criteria = ''
+    search_criteria = search_criteria + add_id_filter_if_valid(id).to_s
     if current_user_role? == 'Super-Administrator'
-      criteria = criteria + "whodunnit = #{user_id} AND " if user_id && user_id.to_i > 0
+      search_criteria = search_criteria + add_user_filter_for_super_admin(user_id).to_s
     end
-    criteria = criteria + "whodunnit = #{current_user.try(:id)} AND " if current_user.try(:id) && current_user.try(:id).to_i > 0
-    criteria = criteria + "item_type = '#{item_type}' AND " if item_type && !(item_type.eql? 'Any')
-    criteria = criteria + "event = '#{event}' AND " if event && !(event.eql? 'Any')
-    criteria = criteria + "created_at >= '#{time_to_string(params[:start_time])}' AND "
-    criteria = criteria + "created_at <= '#{time_to_string(params[:end_time])}' AND "
+    search_criteria = search_criteria + add_user_filter
+    search_criteria = search_criteria + add_version_type_filter(item_type).to_s
+    search_criteria = search_criteria + add_event_filter(event).to_s
+    search_criteria = search_criteria + add_date_time_filter
+    search_criteria
+  end
 
-    if current_role == 'Instructor' || current_role == 'Administrator'
-
+  def get_list_of_user_ids
+    users = current_user.get_user_list
+    users << current_user
+    user_ids = []
+    users.each do |user|
+      user_ids << user.id
     end
+    user_ids
+  end
 
-    # Remove the last ' AND '
-    criteria = criteria[0..-5]
+  def add_id_filter_if_valid (id)
+    "id = #{id} AND " if id && id.to_i > 0
+  end
 
-    versions = Version.page(params[:page]).order('id').per_page(25).where(criteria)
-    versions
+  def add_user_filter_for_super_admin (user_id)
+    "whodunnit = #{user_id} AND " if user_id && user_id.to_i > 0
+  end
+
+  def add_user_filter
+    "whodunnit = #{current_user.try(:id)} AND " if current_user.try(:id) && current_user.try(:id).to_i > 0
+  end
+
+  def add_event_filter (event)
+    "event = '#{event}' AND " if event && !(event.eql? 'Any')
+  end
+
+  def add_date_time_filter
+    "created_at >= '#{time_to_string(params[:start_time])}' AND " +
+        "created_at <= '#{time_to_string(params[:end_time])}'"
+  end
+
+  def add_version_type_filter (version_type)
+    "item_type = '#{version_type}' AND " if version_type && !(version_type.eql? 'Any')
   end
 
   def time_to_string(time)

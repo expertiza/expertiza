@@ -20,7 +20,7 @@
 
 </table>
 
-<% unless current_user_role? == "Student" %>
+<% unless current_user_role?.name == 'Student' %>
     <hr/>
     <p>
       <%= link_to 'Delete', {:action => 'destroy', :id => @version},

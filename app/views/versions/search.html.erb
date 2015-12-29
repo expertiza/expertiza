@@ -11,7 +11,9 @@
                     if current_user_role?.name == 'Super-Administrator'
                         (User.all.collect {|u| [ u.name, u.id ] } << ['Any', 0])
                     else
-                        (User.where("id = #{current_user.id}").collect {|u| [ u.name, u.id ] })
+                        users = current_user.get_user_list
+                        users << current_user
+                        (users.collect {|u| [ u.name, u.id ] })
                     end ) %></td>
           </tr>
           <tr>

@@ -219,6 +219,6 @@ class ParticipantsController < ApplicationController
 
   private
   def participant_params
-    params.require(:participant).permit(:can_submit,:can_review,:user_id,:parent_id,:directory_num,:submitted_at,:permission_granted,:penalty_accumulated,:submitted_hypelinks,:grade,:type,:handle,:time_stamp,:digital_signature,:duty,:can_take_quiz)
+    params.require(:participant).permit(:can_submit,:can_review,:user_id,:parent_id,:submitted_at,:permission_granted,:penalty_accumulated,:grade,:type,:handle,:time_stamp,:digital_signature,:duty,:can_take_quiz)
   end
 end

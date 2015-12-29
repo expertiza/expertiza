@@ -11,14 +11,14 @@
 	        Team member(s)
 	      </th>
 	      <th>
-	        Submitted hyperlink(s)
+	        Submitted item(s)
 	      </th>
 	    <% else %>
 	      <th width = "38%">
 	        Participant name
 	      </th>
 	      <th>
-	        Submitted hyperlink(s)
+	        Submitted item(s)
 	      </th>
 	    <% end %>
     </tr>
@@ -53,24 +53,23 @@
     	<td bgcolor= <%= bgcolor %>>
     		<!--Display submitted hyperlinks-->
  			
- 			<% @participants.each do |participant| %>
-    			<% if !participant.nil? and !participant.hyperlinks.blank? and participant == @participants.first %>
-                    <%= "Hyperlinks:<br/>".html_safe %>
-	    		    <% participant.hyperlinks.each do |link| %>
-	    			    <a href="<%= link %>" target="_blank"><%= link %></a><br/>
-                    <% end %>
-	    		<% end %>
+ 			<% participant = @participants.first %>
+    		<% if !participant.nil? and !participant.hyperlinks_array.empty? %>
+              <%= "Hyperlinks:<br/>".html_safe %>
+              <% participant.hyperlinks_array.each do |link| %>
+	    		<a href="<%= link %>" target="_blank"><%= link %></a><br/>
+              <% end %>
 	    	<% end %>
+
     		<!--Display submitted files-->
- 			<% @participants.each do |participant| %>
-                <% if !participant.nil? and !participant.submitted_files.blank? and participant == @participants.first %>
-    			    <% files = participant.submitted_files %>
-    			    <%= "Files:".html_safe %>
-    			    <% if files and files.length > 0 %>
-				        <%= display_directory_tree(participant, files, true).html_safe %>
-                    <% end %>
-				<% end %>
-	    	<% end %>
+ 			<% if !participant.nil? and !participant.team.submitted_files.empty? %>
+              <% files = participant.team.submitted_files%>
+    		  <%= "Files:".html_safe %>
+    		  <% if files and files.length > 0 %>
+			    <%= display_directory_tree(participant, files, true).html_safe %>
+              <% end %>
+			<% end %>
+
     	</td>
     <% end %>
   </table>

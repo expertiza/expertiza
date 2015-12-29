@@ -88,8 +88,8 @@ to display the label "Your team" in the student assignment tasks-->
   
   <% if @authorization == 'participant' or @can_submit == true %>
     <li>
-      <%= link_to "Your scores", :controller => 'grades', :action => 'view_my_scores', :id => @participant.id %> 
-      (View feedback on your work)
+      <%= link_to "Your scores", :controller => 'grades', :action => 'view_my_scores', :id => @participant.id %>
+      (View feedback on your work) &nbsp;  <%= link_to "Alternate View", :controller => 'grades', :action => 'view_team', :id => @participant.id %>
     </li>
   <% end %> 
     <%if @can_provide_suggestions == true %>

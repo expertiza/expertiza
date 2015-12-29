@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151228191257) do
+ActiveRecord::Schema.define(version: 20151229152546) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -134,12 +134,6 @@ ActiveRecord::Schema.define(version: 20151228191257) do
     t.integer "participant_id",   limit: 4
     t.integer "deadline_type_id", limit: 4
     t.integer "penalty_points",   limit: 4
-  end
-
-  create_table "comments", force: :cascade do |t|
-    t.integer "participant_id", limit: 4,     default: 0,     null: false
-    t.boolean "private",        limit: 1,     default: false, null: false
-    t.text    "comment",        limit: 65535,                 null: false
   end
 
   create_table "content_pages", force: :cascade do |t|

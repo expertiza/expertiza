@@ -1,8 +1,8 @@
 GIT
   remote: git://github.com/expertiza/authlogic.git
-  revision: 3da5247c72587b9132cf82b7b09c0b964e553b8c
+  revision: d678b39a6d050a1804edc6ed16c025441a9a195b
   specs:
-    expertiza-authlogic (3.2.0)
+    expertiza-authlogic (3.4.6)
       activerecord (>= 3.0.0)
       activesupport (>= 3.0.0)
 

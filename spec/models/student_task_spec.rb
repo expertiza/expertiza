@@ -22,8 +22,8 @@ describe StudentTask do
 
   describe ".from_participant_id" do
     it "creates a StudentTask from a participant id" do
-      expect(StudentTask).to receive :from_participant
-      expect(AssignmentParticipant).to receive :find
+      expect(StudentTask).to receive(:from_participant)
+      expect(AssignmentParticipant).to receive(:find)
       StudentTask.from_participant_id 0
     end
   end
@@ -46,7 +46,7 @@ describe StudentTask do
 
   describe "#complete?" do
     it "checks the stage_deadline" do
-      expect(student_task).to receive :stage_deadline
+      expect(student_task).to receive(:stage_deadline)
       student_task.complete?
     end
   end
@@ -62,7 +62,7 @@ describe StudentTask do
 
   describe "#course" do
     it "delegates to assignment" do
-      expect(assignment).to receive :course
+      expect(assignment).to receive(:course)
       student_task.course
     end
   end

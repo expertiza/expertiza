@@ -1,21 +1,20 @@
 require 'rails_helper'
-require 'spec_helper'
 
 describe "validations" do
   it "assignment should exist" do
-    FactoryGirl.create(:assignment).should be_valid
+    expect(FactoryGirl.create(:assignment)).to be_valid
   end
 	
   it "assignment without name should not exist" do
-    FactoryGirl.build(:assignment_without_name).should_not be_valid
+    expect(FactoryGirl.build(:assignment_without_name)).not_to be_valid
   end
 
   it "checks whether Assignment Team is created or not" do
-     FactoryGirl.create(:assignmentTeam).should be_valid
+     expect(FactoryGirl.create(:assignmentTeam)).to be_valid
   end
 	
   it "checks whether signed up topic is created or not" do
-    FactoryGirl.create(:signed_up_topic).should be_valid
+    expect(FactoryGirl.create(:signed_up_topic)).to be_valid
   end
 
 end
@@ -52,6 +51,7 @@ end
 
 describe "#is_google_doc" do
   it "checks whether assignment is a google doc" do
+    skip('#is_google_doc no longer exists in assignment.rb file.')
     assign = FactoryGirl.create(:assignment)
     res = assign.is_google_doc
     expect(res).to be false
@@ -76,7 +76,7 @@ end
 
 describe "#is_coding_assignment?" do
   it "checks assignment should be coding assignment" do
-    assign = FactoryGirl.create(:assignment).should be_valid
+    expect(FactoryGirl.create(:assignment)).to be_valid
    end
 end
 

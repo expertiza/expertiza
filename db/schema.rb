@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151228191257) do
+ActiveRecord::Schema.define(version: 20151229181732) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -134,12 +134,6 @@ ActiveRecord::Schema.define(version: 20151228191257) do
     t.integer "participant_id",   limit: 4
     t.integer "deadline_type_id", limit: 4
     t.integer "penalty_points",   limit: 4
-  end
-
-  create_table "comments", force: :cascade do |t|
-    t.integer "participant_id", limit: 4,     default: 0,     null: false
-    t.boolean "private",        limit: 1,     default: false, null: false
-    t.text    "comment",        limit: 65535,                 null: false
   end
 
   create_table "content_pages", force: :cascade do |t|
@@ -309,22 +303,20 @@ ActiveRecord::Schema.define(version: 20151228191257) do
   add_index "participant_team_roles", ["role_assignment_id"], name: "fk_role_assignment_id", using: :btree
 
   create_table "participants", force: :cascade do |t|
-    t.boolean  "can_submit",           limit: 1,     default: true
-    t.boolean  "can_review",           limit: 1,     default: true
-    t.integer  "user_id",              limit: 4
-    t.integer  "parent_id",            limit: 4
-    t.integer  "directory_num",        limit: 4
+    t.boolean  "can_submit",          limit: 1,     default: true
+    t.boolean  "can_review",          limit: 1,     default: true
+    t.integer  "user_id",             limit: 4
+    t.integer  "parent_id",           limit: 4
     t.datetime "submitted_at"
-    t.boolean  "permission_granted",   limit: 1
-    t.integer  "penalty_accumulated",  limit: 4,     default: 0,    null: false
-    t.text     "submitted_hyperlinks", limit: 65535
-    t.float    "grade",                limit: 24
-    t.string   "type",                 limit: 255
-    t.string   "handle",               limit: 255
+    t.boolean  "permission_granted",  limit: 1
+    t.integer  "penalty_accumulated", limit: 4,     default: 0,    null: false
+    t.float    "grade",               limit: 24
+    t.string   "type",                limit: 255
+    t.string   "handle",              limit: 255
     t.datetime "time_stamp"
-    t.text     "digital_signature",    limit: 65535
-    t.string   "duty",                 limit: 255
-    t.boolean  "can_take_quiz",        limit: 1,     default: true
+    t.text     "digital_signature",   limit: 65535
+    t.string   "duty",                limit: 255
+    t.boolean  "can_take_quiz",       limit: 1,     default: true
   end
 
   add_index "participants", ["user_id"], name: "fk_participant_users", using: :btree

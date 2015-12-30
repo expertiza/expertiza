@@ -29,15 +29,7 @@ class SignUpSheet < ActiveRecord::Base
       # Using a DB transaction to ensure atomic inserts
       ActiveRecord::Base.transaction do
         #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
-        if slotAvailable?(topic_id)
-          sign_up.is_waitlisted = false
-          #Create new record in signed_up_teams table
-          team_id = TeamsUser.team_id(assignment_id, user_id)
-          topic_id = SignedUpTeam.topic_id(assignment_id, user_id)
-          SignedUpTeam.create(topic_id: topic_id, team_id: team_id, is_waitlisted: 0, preference_priority_number: nil)
-        else
-          sign_up.is_waitlisted = true
-        end
+        team_id, topic_id = create_SignUpTeam(assignment_id, sign_up, topic_id, user_id)
         if sign_up.save
           result = true
         end
@@ -53,26 +45,48 @@ class SignUpSheet < ActiveRecord::Base
       # Using a DB transaction to ensure atomic inserts
       ActiveRecord::Base.transaction do
         #check whether user is clicking on a topic which is not going to place him in the waitlist
-        if !slotAvailable?(topic_id)
-          sign_up.is_waitlisted = true
-          if sign_up.save
-            result = true
-          end
-        else
-          #if slot exist, then confirm the topic for the user and delete all the waitlist for this user
-          Waitlist.cancel_all_waitlists(team_id, assignment_id)
-          sign_up.is_waitlisted = false
-          sign_up.save
-          #Update topic_id in signed_up_teams table with the topic_id
-          team_id = SignedUpTeam.find_team_users(assignment_id, user_id)
-          signUp = SignedUpTeam.where(topic_id: topic_id).first
-          signUp.update_attribute('topic_id', topic_id)
-          result = true
-        end
+        result = sign_up_wailisted(assignment_id, sign_up, team_id, topic_id, user_id)
       end
     end
 
     result
+  end
+
+  def self.sign_up_wailisted(assignment_id, sign_up, team_id, topic_id, user_id)
+    if !slotAvailable?(topic_id)
+      sign_up.is_waitlisted = true
+      if sign_up.save
+        result = true
+      end
+    else
+      #if slot exist, then confirm the topic for the user and delete all the waitlist for this user
+      result = cancel_all_wailists(assignment_id, sign_up, team_id, topic_id, user_id)
+    end
+    result
+  end
+
+  def self.cancel_all_wailists(assignment_id, sign_up, team_id, topic_id, user_id)
+    Waitlist.cancel_all_waitlists(team_id, assignment_id)
+    sign_up.is_waitlisted = false
+    sign_up.save
+    #Update topic_id in signed_up_teams table with the topic_id
+    team_id = SignedUpTeam.find_team_users(assignment_id, user_id)
+    signUp = SignedUpTeam.where(topic_id: topic_id).first
+    signUp.update_attribute('topic_id', topic_id)
+    result = true
+  end
+
+  def self.create_SignUpTeam(assignment_id, sign_up, topic_id, user_id)
+    if slotAvailable?(topic_id)
+      sign_up.is_waitlisted = false
+      #Create new record in signed_up_teams table
+      team_id = TeamsUser.team_id(assignment_id, user_id)
+      topic_id = SignedUpTeam.topic_id(assignment_id, user_id)
+      SignedUpTeam.create(topic_id: topic_id, team_id: team_id, is_waitlisted: 0, preference_priority_number: nil)
+    else
+      sign_up.is_waitlisted = true
+    end
+    return team_id, topic_id
   end
 
   def self.otherConfirmedTopicforUser(assignment_id, team_id)
@@ -85,7 +99,7 @@ class SignUpSheet < ActiveRecord::Base
     SignUpTopic.slotAvailable?(topic_id)
   end
 
-  def self.create_dependency_graph(topics,node)
+  def self.create_dependency_graph(topics, node)
     dg = RGL::DirectedAdjacencyGraph.new
 
     #create a graph of the assignment with appropriate dependency
@@ -109,43 +123,56 @@ class SignUpSheet < ActiveRecord::Base
     dg
   end
 
-  def self.add_signup_topic ( assignment_id )
-        @review_rounds = Assignment.find(assignment_id).get_review_rounds
-        @topics = SignUpTopic.where(assignment_id: assignment_id)
+  def self.add_signup_topic (assignment_id)
+    @review_rounds = Assignment.find(assignment_id).get_review_rounds
+    @topics = SignUpTopic.where(assignment_id: assignment_id)
 
-        #Use this until you figure out how to initialize this array
-        #@duedates = SignUpTopic.find_by_sql("SELECT s.id as topic_id FROM sign_up_topics s WHERE s.assignment_id = " + assignment_id.to_s)
-        @duedates = {}
-        return @duedates if @topics.nil?
-          i=0
-          @topics.each { |topic|
-            @duedates[i] = {}
-            @duedates[i]['id'] = topic.id
-            @duedates[i]['topic_identifier'] = topic.topic_identifier
-            @duedates[i]['topic_name'] = topic.topic_name
+    #Use this until you figure out how to initialize this array
+    #@duedates = SignUpTopic.find_by_sql("SELECT s.id as topic_id FROM sign_up_topics s WHERE s.assignment_id = " + assignment_id.to_s)
+    @duedates = {}
+    return @duedates if @topics.nil?
+    @topics.each_with_index do |topic, i|
+      @duedates[i] = duedate = {}
+      duedate['id'] = topic.id
+      duedate['topic_identifier'] = topic.topic_identifier
+      duedate['topic_name'] = topic.topic_name
 
-            for j in 1..@review_rounds
-              duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('submission').id, round: j).first
-              duedate_rev = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('review').id, round: j).first
-              if !duedate_subm.nil? && !duedate_rev.nil?
-                @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
-                @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
-              else
-                #the topic is new. so copy deadlines from assignment
-                set_of_due_dates = DueDate.where(assignment_id: assignment_id)
-                set_of_due_dates.each { |due_date|
-                  DueDate.assign_topic_deadline(due_date, 0, topic.id)
-                }
-                duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('submission').id, round: j).first
-                duedate_rev = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('review').id, round: j).first
-                @duedates[i]['submission_'+ j.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
-                @duedates[i]['review_'+ j.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
-              end
-            end
-            duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id:  DeadlineType.find_by_name('metareview').id).first
-            @duedates[i]['submission_'+ (@review_rounds+1).to_s] = !(duedate_subm.nil?)?(DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")):nil
-            i = i + 1
-          }
-          return @duedates
+      for round in 1..@review_rounds
+        process_review_round(assignment_id, duedate, round, topic)
       end
+
+      deadline_type_subm = DeadlineType.find_by_name('metareview').id
+      duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_subm).first
+      subm_string = duedate_subm.nil? ? nil : DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
+      duedate['submission_'+ (@review_rounds+1).to_s] = subm_string
+    end
+    @duedates
+  end
+
+  class << self
+    private
+    def process_review_round(assignment_id, duedate, round, topic)
+      duedate_rev, duedate_subm = find_topic_duedates(round, topic)
+
+      if duedate_subm.nil? || duedate_rev.nil?
+        #the topic is new. so copy deadlines from assignment
+        set_of_due_dates = DueDate.where(assignment_id: assignment_id)
+        set_of_due_dates.each { |due_date|
+          DeadlineHelper.create_topic_deadline(due_date, 0, topic.id)
+        }
+        duedate_rev, duedate_subm = find_topic_duedates(round, topic)
+      end
+
+      duedate['submission_'+ round.to_s] = DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
+      duedate['review_'+ round.to_s] = DateTime.parse(duedate_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
+    end
+
+    def find_topic_duedates(round, topic)
+      deadline_type_subm = DeadlineType.find_by_name('submission').id
+      duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_subm, round: round).first
+      deadline_type_rev = DeadlineType.find_by_name('review').id
+      duedate_rev = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_rev, round: round).first
+      return duedate_rev, duedate_subm
+    end
+  end
 end

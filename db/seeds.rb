@@ -365,6 +365,3 @@ DeadlineRight.create(:name => 'Late')
 DeadlineRight.create(:name => 'OK')
 
 puts 'Deadline'
-###### WikiType
-WikiType.create(:name => 'No')
-puts 'WikiType'

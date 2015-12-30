@@ -3,7 +3,6 @@
 <%= form_tag @assignment_form.assignment do %>
     <%= hidden_field_tag('assignment_form[assignment][instructor_id]', @assignment_form.assignment.instructor_id) %>
     <%= hidden_field_tag('assignment_form[assignment][course_id]', @assignment_form.assignment.course_id) %>
-    <%= hidden_field_tag('assignment_form[assignment][wiki_type_id]', @assignment_form.assignment.wiki_type_id) %>
     <%= hidden_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size) %>
 
     <div>

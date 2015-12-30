@@ -6,17 +6,17 @@ class GradesController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'view_my_scores'
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator',
-       'Student'].include? current_role_name and are_needed_authorizations_present?
-    else
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator'].include? current_role_name
+      when 'view_my_scores'
+        ['Instructor',
+         'Teaching Assistant',
+         'Administrator',
+         'Super-Administrator',
+         'Student'].include? current_role_name and are_needed_authorizations_present?
+      else
+        ['Instructor',
+         'Teaching Assistant',
+         'Administrator',
+         'Super-Administrator'].include? current_role_name
     end
   end
 
@@ -30,19 +30,10 @@ class GradesController < ApplicationController
     questionnaires = @assignment.questionnaires_with_questions
 
     if @assignment.varying_rubrics_by_round?
-      questionnaires.each {
-        |questionnaire|
-        round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
-        if(round!=nil)
-          questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
-        else
-          questionnaire_symbol = questionnaire.symbol
-        end
-        @questions[questionnaire_symbol] = questionnaire.questions
-      }
+      retrieve_questions (questionnaires)
     else      #if this assignment does not have "varying rubric by rounds" feature
       questionnaires.each {
-        |questionnaire|
+          |questionnaire|
         @questions[questionnaire.symbol] = questionnaire.questions
       }
     end
@@ -53,13 +44,8 @@ class GradesController < ApplicationController
     calculate_all_penalties(@assignment.id)
   end
 
-  def view_my_scores
-    @participant = AssignmentParticipant.find(params[:id])
-    @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
-    return if redirect_when_disallowed
-    @assignment = @participant.assignment
-    @questions = {} # A hash containing all the questions in all the questionnaires used in this assignment
-    questionnaires = @assignment.questionnaires
+  # This method is used to retrieve questions for different review rounds
+  def retrieve_questions (questionnaires)
     questionnaires.each do |questionnaire|
       round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id:questionnaire.id).first.used_in_round
       if(round!=nil)
@@ -69,6 +55,16 @@ class GradesController < ApplicationController
       end
       @questions[questionnaire_symbol] = questionnaire.questions
     end
+  end
+
+  def view_my_scores
+    @participant = AssignmentParticipant.find(params[:id])
+    @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
+    return if redirect_when_disallowed
+    @assignment = @participant.assignment
+    @questions = {} # A hash containing all the questions in all the questionnaires used in this assignment
+    questionnaires = @assignment.questionnaires
+    retrieve_questions (questionnaires)
 
     #@pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
     @pscore = @participant.scores(@questions)
@@ -81,12 +77,8 @@ class GradesController < ApplicationController
   def edit
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
-    @questions = Hash.new
-    questionnaires = @assignment.questionnaires
-    questionnaires.each {
-      |questionnaire|
-      @questions[questionnaire.symbol] = questionnaire.questions
-    }
+
+    list_questions (@assignment)
 
     @scores = @participant.scores(@questions)
   end
@@ -96,7 +88,7 @@ class GradesController < ApplicationController
 
     reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id:  participant.assignment.id).first
     if reviewer.nil?
-      reviewer = AssignmentParticipant.create(:user_id => session[:user].id, :parent_id => participant.assignment.id)
+      reviewer = AssignmentParticipant.create(user_id: session[:user].id, parent_id: participant.assignment.id)
       reviewer.set_handle()
     end
 
@@ -108,7 +100,7 @@ class GradesController < ApplicationController
 
       if review_mapping.nil?
         review_exists = false
-        review_mapping = ReviewResponseMap.create(:reviewee_id => participant.team.id, :reviewer_id => reviewer.id, :reviewed_object_id => participant.assignment.id)
+        review_mapping = ReviewResponseMap.create(reviewee_id: participant.team.id, reviewer_id: reviewer.id, reviewed_object_id: participant.assignment.id)
         review = Response.find_by_map_id(review_mapping.map_id)
 
         unless review_exists
@@ -121,10 +113,10 @@ class GradesController < ApplicationController
   end
 
   def open
-    send_file(params['fname'], :disposition => 'inline')
+    send_file(params['fname'], disposition: 'inline')
   end
 
-
+  # Formulate the Email content when there is a grading conflict 
   def send_grading_conflict_email
     email_form = params[:mailer]
     assignment = Assignment.find(email_form[:assignment])
@@ -136,20 +128,30 @@ class GradesController < ApplicationController
     body_text["##[assignment_name]"] = assignment.name
 
     Mailer.sync_message(
-      {:recipients => email_form[:recipients],
-       :subject => email_form[:subject],
-       :from => email_form[:from],
-       :body => {
-         :body_text => body_text,
-         :partial_name => "grading_conflict"
-       }
-       }
+        {recipients: email_form[:recipients],
+         subject: email_form[:subject],
+         from: email_form[:from],
+         body: {
+             body_text: body_text,
+             partial_name: "grading_conflict"
+         }
+        }
     ).deliver
 
     flash[:notice] = "Your email to " + email_form[:recipients] + " has been sent. If you would like to send an email to another student please do so now, otherwise click Back"
-    redirect_to :action => 'conflict_email_form',
-      :assignment => email_form[:assignment],
-      :author => email_form[:author]
+    redirect_to action: 'conflict_email_form',
+                assignment: email_form[:assignment],
+                author: email_form[:author]
+  end
+
+  #This method is used from both conflict_notification and edit methods
+  def list_questions (assignment)
+    @questions = Hash.new
+    questionnaires = assignment.questionnaires
+    questionnaires.each {
+        |questionnaire|
+      @questions[questionnaire.symbol] = questionnaire.questions
+    }
   end
 
   # the grading conflict email form provides the instructor a way of emailing
@@ -163,14 +165,7 @@ class GradesController < ApplicationController
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = Assignment.find(@participant.parent_id)
 
-
-    @questions = Hash.new
-    questionnaires = @assignment.questionnaires
-    questionnaires.each {
-      |questionnaire|
-      @questions[questionnaire.symbol] = questionnaire.questions
-    }
-
+    list_questions (@assignment)
     @reviewers_email_hash = Hash.new
 
     @caction = "view"
@@ -218,12 +213,12 @@ class GradesController < ApplicationController
     @rowlabel = rowlabel
     @reviews = responses
     @reviews.each {
-      |response|
+        |response|
       user = response.map.reviewer.user
       @reviewers_email_hash[user.fullname.to_s+" <"+user.email.to_s+">"] = user.email.to_s
     }
     @reviews.sort! { |a, b| a.map.reviewer.user.fullname <=> b.map.reviewer.user.fullname }
-    @questionnaire = @assignment.questionnaires.find_by_type(questionnaire_type)
+    @questionnaire = @assignment.questionnaires.first.find_by_type(questionnaire_type)
     @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)
   end
 
@@ -257,9 +252,7 @@ class GradesController < ApplicationController
       item = "review"
     end
     "Hi ##[recipient_name],
-
         You submitted a score of ##[recipients_grade] for assignment ##[assignment_name] that varied greatly from another "+role+"'s score for the same "+item+".
-
         The Expertiza system has brought this to my attention."
   end
 
@@ -272,42 +265,45 @@ class GradesController < ApplicationController
     Participant.where(parent_id: assignment_id).each do |participant|
       penalties = calculate_penalty(participant.id)
       @total_penalty = 0
-      if(penalties[:submission] != 0 || penalties[:review] != 0 || penalties[:meta_review] != 0)
-        unless penalties[:submission]
-          penalties[:submission] = 0
-        end
-        unless penalties[:review]
-          penalties[:review] = 0
-        end
-        unless penalties[:meta_review]
-          penalties[:meta_review] = 0
-        end
+
+      unless(penalties[:submission].zero? || penalties[:review].zero? || penalties[:meta_review].zero? )
+
         @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
         l_policy = LatePolicy.find(@assignment.late_policy_id)
         if(@total_penalty > l_policy.max_penalty)
           @total_penalty = l_policy.max_penalty
         end
-        if calculate_for_participants == true
-          penalty_attr1 = {:deadline_type_id => 1,:participant_id => @participant.id, :penalty_points => penalties[:submission]}
-          CalculatedPenalty.create(penalty_attr1)
-
-          penalty_attr2 = {:deadline_type_id => 2,:participant_id => @participant.id, :penalty_points => penalties[:review]}
-          CalculatedPenalty.create(penalty_attr2)
-
-          penalty_attr3 = {:deadline_type_id => 5,:participant_id => @participant.id, :penalty_points => penalties[:meta_review]}
-          CalculatedPenalty.create(penalty_attr3)
+        if calculate_for_participants
+          calculate_penatly_attributes(@participant)
         end
       end
-      @all_penalties[participant.id] = {}
-      @all_penalties[participant.id][:submission] = penalties[:submission]
-      @all_penalties[participant.id][:review] = penalties[:review]
-      @all_penalties[participant.id][:meta_review] = penalties[:meta_review]
-      @all_penalties[participant.id][:total_penalty] = @total_penalty
+      assign_all_penalties(participant, penalties)
     end
     unless @assignment.is_penalty_calculated
       @assignment.update_attribute(:is_penalty_calculated, true)
     end
   end
+
+  def calculate_penatly_attributes(participant)
+    penalty_attr1 = {deadline_type_id: 1,participant_id: @participant.id, penalty_points: penalties[:submission]}
+    CalculatedPenalty.create(penalty_attr1)
+
+    penalty_attr2 = {deadline_type_id: 2,participant_id: @participant.id, penalty_points: penalties[:review]}
+    CalculatedPenalty.create(penalty_attr2)
+
+    penalty_attr3 = {deadline_type_id: 5,participant_id: @participant.id, penalty_points: penalties[:meta_review]}
+    CalculatedPenalty.create(penalty_attr3)
+  end
+
+
+  def assign_all_penalties(participant, penalties)
+    @all_penalties[participant.id] = {}
+    @all_penalties[participant.id][:submission] = penalties[:submission]
+    @all_penalties[participant.id][:review] = penalties[:review]
+    @all_penalties[participant.id][:meta_review] = penalties[:meta_review]
+    @all_penalties[participant.id][:total_penalty] = @total_penalty
+  end
+
 
   def make_chart()
     @grades_bar_charts = {}
@@ -329,9 +325,9 @@ class GradesController < ApplicationController
     end
 
     if @pscore[:metareview]
-     scores = get_scores_for_chart @pscore[:metareview][:assessments], 'metareview'
-     scores = scores-[-1.0]
-     @grades_bar_charts[:metareview] = bar_chart(scores)
+      scores = get_scores_for_chart @pscore[:metareview][:assessments], 'metareview'
+      scores = scores-[-1.0]
+      @grades_bar_charts[:metareview] = bar_chart(scores)
     end
 
     if @pscore[:feedback]
@@ -343,14 +339,14 @@ class GradesController < ApplicationController
     if @pscore[:teammate]
       scores = get_scores_for_chart @pscore[:teammate][:assessments], 'teammate'
       scores = scores-[-1.0]
-      @grades_bar_charts[:teammate] = bar_chart(scores) 
+      @grades_bar_charts[:teammate] = bar_chart(scores)
     end
   end
 
   def get_scores_for_chart(reviews, symbol)
     scores = []
     reviews.each do |review|
-      scores << Answer.get_total_score(:response => [review], :questions => @questions[symbol.to_sym], :q_types => Array.new)
+      scores << Answer.get_total_score(response: [review], questions: @questions[symbol.to_sym], q_types: Array.new)
     end
     scores
   end
@@ -365,12 +361,12 @@ class GradesController < ApplicationController
     GoogleChart::BarChart.new("#{width}x#{height}", " ", :vertical, false) do |bc|
       data = scores
       bc.data "Line green", data, '990000'
-      bc.axis :y, :range => [0, data.max] ,:positions => [data.min, data.max]
+      bc.axis :y, range:[0, data.max] ,positions: [data.min, data.max]
       bc.show_legend = false
       bc.stacked = false
-      bc.width_spacing_options({:bar_width => (width-30)/(data.size+1),:bar_spacing => 1, :group_spacing => spacing })
+      bc.width_spacing_options({bar_width: (width-30)/(data.size+1),bar_spacing: 1, group_spacing: spacing })
       bc.data_encoding = :extended
-      link = (bc.to_url)  
+      link = (bc.to_url)
     end
     link
   end
@@ -392,7 +388,7 @@ class GradesController < ApplicationController
       bc.data "Reliability Symbol", data, color
       bc.show_legend = false
       bc.stacked = false
-      bc.width_spacing_options({:bar_width => 5,:bar_spacing => 10, :group_spacing => 1})
+      bc.width_spacing_options({bar_width: 5,bar_spacing: 10, group_spacing: 1})
       bc.data_encoding = :extended
       @grades_bar_charts[type.to_sym] = (bc.to_url)
     end
@@ -402,7 +398,7 @@ class GradesController < ApplicationController
   def are_needed_authorizations_present?
     @participant = Participant.find(params[:id])
     authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
-    if authorization == 'reader' or authorization == 'reviewer'
+    if authorization == 'reader' || authorization == 'reviewer'
       return false
     else
       return true

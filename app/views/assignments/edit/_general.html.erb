@@ -119,17 +119,6 @@ function is_coding_assignmentChanged(){
     </td>
   </tr>
 
-  <tr>
-    <td style='padding:5px' id='assignment_wiki_assignment_field'>
-      <%= check_box_tag('assignment_wiki_assignment', 'true', (@assignment_form.assignment.wiki_type.name != 'No'), :onChange => 'wikiAssignmentChanged()') %>
-      <%= label_tag('assignment_wiki_assignment', 'Wiki assignment?') %>
-    </td>
-
-    <td style='padding-left:50px' id='assignment_wiki_type_field' <%= 'hidden' unless @assignment_form.assignment.wiki_type.name != 'No' %>>
-      <%= label_tag('assignment_form[assignment][wiki_type_id]', 'Wiki type:') %>
-      <%= select('assignment_form[assignment]', 'wiki_type_id', wiki_type_options, :selected => @assignment_form.assignment.wiki_type_id) %>
-    </td>
-  </tr>
   <!--staggered_deadlin-->
   <tr>
     <td style='padding:5px' id='assignment_staggered_deadline_field'>
@@ -218,15 +207,6 @@ function is_coding_assignmentChanged(){
               team_count_field.attr('hidden', true);
             }
           } 
-    }
-
-    function wikiAssignmentChanged() {
-      if (jQuery('#assignment_wiki_assignment').is(':checked')) {
-        jQuery('#assignment_wiki_type_field').removeAttr('hidden');
-      } else {
-        jQuery('#assignment_wiki_type_field').attr('hidden', true);
-            jQuery('#assignment_wiki_type').val('1');
-      }
     }
 
     function staggeredDeadlineChanged() {

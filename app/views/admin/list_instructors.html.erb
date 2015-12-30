@@ -4,7 +4,7 @@
 
 <table>
   <tr><th>Name</th><th>Full Name</th><th>Email Address</th><th>Parent</th></tr>
-  <% for user in @users %>
+  <% for user in @users%>
     <tr>
       <td><%= link_to user.name, :action => 'show_instructor',
         :id => user.id %></td>
@@ -16,10 +16,7 @@
 </table>
 
 <hr/>
-<%= form_tag('new_instructor', method: :get) do %>
-
-  <br>
-  <%= text_field_tag('name', '', {'size' => 30}) %>
-  &nbsp;
-  <input type='submit' value='New Instructor'/>
+<%= form_tag(new_user_path, method: :get) do %>
+<%= hidden_field_tag :role, "Instructor" %>
+<%= submit_tag("New Instructor")%>
 <% end %>

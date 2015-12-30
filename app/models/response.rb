@@ -28,15 +28,15 @@ class Response < ActiveRecord::Base
     if self.map.type.to_s == 'FeedbackResponseMap'
       identifier += "<H2>Feedback from author</H2>"
     end
-    if prefix
-      identifier += "<B>Reviewer:</B> #{count}" #+self.map.reviewer.fullname
+    if prefix #has prefix means view_score page in instructor end
+      identifier += "<B>Reviewer: </B>" +self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
       str = prefix+"_"+self.id.to_s
-    else
-      identifier += '<B>'+self.map.get_title+'</B> '+count.to_s+'</B>'
+    else #in student end
+      identifier += '<B>Round: ' + count.to_s+'</B>'
       str = self.id.to_s
     end
     code = identifier+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+str+'Link" onClick="toggleElement('+"'review_"+str+"','review'"+');return false;">hide review</a><BR/>'
-    code += "<B>Last reviewed:</B> "
+    code += "<B>Last reviewed: </B> "
     if self.updated_at.nil?
       code += "Not available"
     else

@@ -238,10 +238,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  def set_courses_to_assignment
-    @courses = Course.where(instructor_id: self.id).order(:name)
-  end
-
   # generate a new RSA public/private key pair and create our own X509 digital certificate which we
   # save in the database. The private key is returned by the method but not saved.
   def generate_keys

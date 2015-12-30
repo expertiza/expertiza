@@ -36,21 +36,14 @@ class CourseTeam < Team
     end
   end
 
-  def export_participants
-    userNames = Array.new
-    participants = TeamsUser.where(['team_id = ?', self.id])
-    participants.each do |participant|
-      userNames.push(participant.name)
-      userNames.push(" ")
-    end
-    return userNames
-  end
-
   def export(team_name_only)
     output = Array.new
     output.push(self.name)
     if team_name_only == "false"
-      output.push(self.export_participants)
+      participants = TeamsUser.where(['team_id = ?', self.id])
+      participants.each do |participant|
+        output.push(participant.name)
+      end
     end
     course = Course.find(self.parent_id)
     output.push(course.name)
@@ -76,8 +69,7 @@ class CourseTeam < Team
     end
     end
 
-    #TODO: unused variable session
-    def self.import(row,session,course_id,options)
+    def self.import(row, course_id, options)
       if (row.length < 2 and options[:has_column_names] == "true") or (row.length < 1 and options[:has_column_names] != "true")
         raise ArgumentError, "Not enough fields on this line"
       end
@@ -86,6 +78,7 @@ class CourseTeam < Team
         raise ImportError, "The course with id \""+course_id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this course?"
       end
 
+      team_exists = false
       if options[:has_column_names] == "true"
         name = row[0].to_s.strip
         team = where(["name =? and parent_id =?", name, course_id]).first
@@ -100,14 +93,14 @@ class CourseTeam < Team
       # handle_dups == "rename" ||" replace"
       # create new team for the team to be inserted
       if name
-        team=CourseTeam.create_team_and_node(course_id)
+        team = CourseTeam.create_team_and_node(course_id)
         team.name = name
         team.save
       end
 
       # handle_dups == "rename" ||" replace" || "insert"
       # insert team members into team unless team was pre-existing & we ignore duplicate teams
-      if !(team_exists && options[:handle_dups] == "ignore")
+      if !team_exists || options[:handle_dups] == "ignore"
         team.import_team_members(index, row)
       end
     end
@@ -118,7 +111,7 @@ class CourseTeam < Team
         raise ImportError, "The course with id \""+course_id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this course?"
       end
 
-      teams = CourseTeam.where(parent_id: parent_id)
+      teams = CourseTeam.where(["parent_id =?", parent_id])
       teams.each do |team|
         csv << team.export(options[:team_name])
       end
@@ -144,11 +137,10 @@ class CourseTeam < Team
           tcsv = Array.new
           teamUsers = Array.new
           tcsv.push(team.name)
-          if (options["team_name"] == "true")
+          if (options[:team_name] == "true")
             teamMembers = TeamsUser.where(['team_id = ?', team.id])
             teamMembers.each do |user|
               teamUsers.push(user.name)
-              teamUsers.push(" ")
             end
             tcsv.push(teamUsers)
           end
@@ -166,4 +158,30 @@ class CourseTeam < Team
       TeamNode.create(:parent_id =>course_id,:node_object_id=>team.id)
       team
     end
+    
+  def import_team_members(starting_index, row)
+    index = starting_index
+    while (index < row.length)
+      user = User.find_by_name(row[index].to_s.strip)
+      if user.nil?
+        raise ImportError, "The user \""+row[index].to_s.strip+"\" was not found. <a href='/users/new'>Create</a> this user?"
+      else
+        if TeamsUser.where(["team_id =? and user_id =?", id, user.id]).first.nil?
+          add_member(user, nil)
+        end
+      end
+      index = index + 1
+    end
   end
+
+  def add_member(user, assignment_id)
+    if has_user(user)
+      raise "\""+user.name+"\" is already a member of the team, \""+self.name+"\""
+    end
+        
+    t_user = TeamsUser.create(:user_id => user.id, :team_id => self.id)
+    parent = TeamNode.find_by_node_object_id(self.id)
+    TeamUserNode.create(:parent_id => parent.id, :node_object_id => t_user.id)
+    add_participant(self.parent_id, user)
+  end
+end

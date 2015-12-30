@@ -1,5 +1,4 @@
 class SubmittedContentController < ApplicationController
-  helper :wiki
 
   def action_allowed?
     ['Instructor',

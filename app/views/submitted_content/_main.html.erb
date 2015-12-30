@@ -10,18 +10,7 @@
   <% end %>
 <% end %>
 
-<% if participant.assignment.wiki_type_id == 1 %>
-  <%= render partial: 'submitted_content/submitted_files', locals: {participant: participant, stage: @stage, origin: ''} %>
-    <% if participant.assignment.is_coding_assignment%>
-      <%= link_to "Code Review Dashboard", :controller => 'review_files',
-        :action => 'show_all_submitted_files',
-        :participant_id => participant.id,
-        :stage => stage %>
-  <% end %>
-<% else %>
-  <%= render :partial => 'submitted_content/wiki', :locals => {:participant => participant} %>
-<% end %>
-
+<%= render partial: 'submitted_content/submitted_files', locals: {participant: participant, stage: @stage, origin: ''} %>
 
 <% if @assignment.require_quiz? %>
   <!-- Setting the t_id for team assignments. The t_id should be not be nil because when the user does not have team, "your work" is unclickable-->

@@ -3,7 +3,7 @@ class ReviewMappingController < ApplicationController
   autocomplete :user, :name
   #use_google_charts
   require 'gchart'
-  helper :dynamic_review_assignment
+  #helper :dynamic_review_assignment
   helper :submitted_content
 
   def action_allowed?
@@ -73,17 +73,6 @@ class ReviewMappingController < ApplicationController
     redirect_to :action => 'list_mappings', :id => assignment.id, :msg => msg
   end
 
-  # Get all the available submissions
-  def show_available_submissions
-    assignment = Assignment.find(params[:assignment_id])
-    reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
-    requested_topic_id = params[:topic_id]
-    @available_submissions =  Hash.new
-    @available_submissions = DynamicReviewAssignmentHelper::review_assignment(assignment.id ,
-                                                                              reviewer.id,
-                                                                              requested_topic_id ,
-                                                                              Assignment::RS_STUDENT_SELECTED)
-  end
   def add_quiz_response_map
     if ResponseMap.where(reviewed_object_id: params[:questionnaire_id], reviewer_id:  params[:participant_id]).first
       flash[:error] = "You have already taken that quiz"
@@ -262,7 +251,6 @@ class ReviewMappingController < ApplicationController
     return reviewer
   end
 
-
   def add_user_to_assignment
     if params[:contributor_id]
       assignment = Assignment.find(params[:id])
@@ -333,19 +321,6 @@ class ReviewMappingController < ApplicationController
     return failedCount
   end
 
-  def delete_participant
-    contributor = AssignmentParticipant.find(params[:id])
-    name = contributor.name
-    assignment_id = contributor.assignment
-    begin
-      contributor.destroy
-      flash[:note] = "\"#{name}\" is no longer a participant in this assignment."
-    rescue
-      flash[:error] = "\"#{name}\" was not removed. Please ensure that \"#{name}\" is not a reviewer or metareviewer and try again."
-      end
-    redirect_to :action => 'list_mappings', :id => assignment_id
-  end
-
   def delete_reviewer
     review_response_map = ReviewResponseMap.find(params[:id])
     assignment_id = review_response_map.assignment.id
@@ -379,14 +354,6 @@ class ReviewMappingController < ApplicationController
     redirect_to :controller => 'student_review', :action => 'list', :id => student_id
   end
 
-  def delete_review
-    mapping = ResponseMap.find(params[:id])
-    assignment_id = mapping.assignment.id
-    mapping.delete
-    #redirect_to :action => 'delete_reviewer', :id => mapping.id
-    redirect_to :action => 'list_mappings', :id => assignment_id
-  end
-
   def delete_metareview
     mapping = MetareviewResponseMap.find(params[:id])
     assignment_id = mapping.assignment.id
@@ -394,15 +361,6 @@ class ReviewMappingController < ApplicationController
     #metareview.delete
     mapping.delete
     redirect_to :action => 'list_mappings', :id => assignment_id
-  end
-
-  def delete_rofreviewer
-    mapping = ResponseMapping.find(params[:id])
-    revmapid = mapping.review_mapping.id
-    mapping.delete
-
-    flash[:note] = "The metareviewer has been deleted."
-    redirect_to :action => 'list_rofreviewers', :id => revmapid
   end
 
   def list
@@ -439,58 +397,6 @@ class ReviewMappingController < ApplicationController
     @items = AssignmentTeam.where(parent_id: @assignment.id)
     @items.sort{|a,b| a.name <=> b.name}
   end
-
-  def list_sortable
-    @assignment = Assignment.find(params[:id])
-    @entries = Array.new
-    index = 0
-    #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
-    contributors = AssignmentTeam.where(parent_id: @assignment.id)
-    contributors.sort!{|a,b| a.name <=> b.name}
-    contributors.each{
-      |contrib|
-      review_mappings = ResponseMap.where(reviewed_object_id: @assignment.id, reviewee_id: contrib.id)
-
-      if review_mappings.length == 0
-        single = Array.new
-        single[0] = contrib.name
-        single[1] = "&nbsp;"
-        single[2] = "&nbsp;"
-        @entries[index] = single
-        index += 1
-      else
-        review_mappings.sort!{|a,b| a.reviewer.name <=> b.reviewer.name}
-        review_mappings.each{
-          |review_map|
-          metareview_mappings = MetareviewResponseMap.where(reviewed_object_id: review_map.map_id)
-          if metareview_mappings.length == 0
-            single = Array.new
-            single[0] = contrib.name
-            single[1] = review_map.reviewer.name
-            single[2] = "&nbsp;"
-            @entries[index] = single
-            index += 1
-          else
-            metareview_mappings.sort!{|a,b| a.reviewer.name <=> b.reviewer.name}
-            metareview_mappings.each{
-              |metareview_map|
-              single = Array.new
-              single[0] = contrib.name
-              single[1] = review_map.reviewer.name
-              if metareview_map.review_reviewer == nil
-                single[2] = metareview_map.reviewer.name
-              else
-                single[2] = metareview_map.review_reviewer.name
-              end
-              @entries[index] = single
-              index += 1
-            }
-          end
-        }
-      end
-    }
-    end
 
   def automatic_review_mapping
     assignment_id = params[:id].to_i
@@ -640,6 +546,10 @@ class ReviewMappingController < ApplicationController
       @review_response_map_ids = ResponseMap.select("id").where(["reviewed_object_id = ? and type = ?", @id, 'ReviewResponseMap'])
       @response_ids = Response.select("id").where(["map_id IN (?)", @review_response_map_ids])
       @reviewers = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id IN (?) and type = ?", @response_ids, @type])
+    when "TeammateReviewResponseMap"
+      #Example query
+      #SELECT distinct reviewer_id FROM response_maps where type = 'TeammateReviewResponseMap' and reviewed_object_id = 711
+      @reviewers = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ?", @id, 'TeammateReviewResponseMap'])
     end
   end
 

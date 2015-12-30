@@ -22,11 +22,9 @@ class QuestionnairesController < ApplicationController
       @questionnaire.name = 'Copy of ' + orig_questionnaire.name
 
     clone_questionnaire_details(questions, orig_questionnaire)
-    if (session[:user]).role.name != "Teaching Assistant"
-      @questionnaire.instructor_id = session[:user].id
-    else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
-      @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
-    end
+
+    assign_instructor_id
+
     @questionnaire.name = 'Copy of '+orig_questionnaire.name
 
     begin
@@ -50,9 +48,8 @@ class QuestionnairesController < ApplicationController
       }
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
       parent = FolderNode.find_by_node_object_id(pFolder.id)
-      if QuestionnaireNode.where(parent_id: parent.id, node_object_id: @questionnaire.id) == nil
-        QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
-      end
+      create_new_node_if_necessary(parent)
+
       undo_link("Copy of questionnaire #{orig_questionnaire.name} has been created successfully. ")
       redirect_to :back
     rescue
@@ -438,9 +435,7 @@ class QuestionnairesController < ApplicationController
       if @questionnaire.type != "QuizQuestionnaire"
         pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
         parent = FolderNode.find_by_node_object_id(pFolder.id)
-        if QuestionnaireNode.where(parent_id: parent.id, node_object_id: @questionnaire.id) == nil
-          QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
-        end
+        create_new_node_if_necessary(parent)
       end
       undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
 
@@ -611,11 +606,7 @@ class QuestionnairesController < ApplicationController
 
   # clones the contents of a questionnaire, including the questions and associated advice
   def clone_questionnaire_details(questions, orig_questionnaire)
-    if (session[:user]).role.name != "Teaching Assistant"
-      @questionnaire.instructor_id = session[:user].id
-    else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
-      @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
-    end
+    assign_instructor_id
 
     @questionnaire.name = 'Copy of '+orig_questionnaire.name
 
@@ -640,9 +631,7 @@ class QuestionnairesController < ApplicationController
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
       parent = FolderNode.find_by_node_object_id(pFolder.id)
 
-      if QuestionnaireNode.where(parent_id: parent.id, node_object_id:  @questionnaire.id) == nil
-        QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
-      end
+      create_new_node_if_necessary(parent)
 
       undo_link("Copy of questionnaire #{orig_questionnaire.name} has been created successfully. ")
       redirect_to :controller => 'questionnaire', :action => 'view', :id => @questionnaire.id
@@ -653,4 +642,20 @@ class QuestionnairesController < ApplicationController
       redirect_to :action => 'list', :controller => 'tree_display'
     end
   end
+
+  private
+  def create_new_node_if_necessary(parent)
+    if QuestionnaireNode.where(parent_id: parent.id, node_object_id: @questionnaire.id) == nil
+      QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
+    end
+  end
+  
+  def assign_instructor_id # if the user to copy the questionnaire is a TA, the instructor should be the owner instead of the TA
+    if (session[:user]).role.name != "Teaching Assistant"
+      @questionnaire.instructor_id = session[:user].id
+    else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
+      @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
+    end
+  end
+
 end

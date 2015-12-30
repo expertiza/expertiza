@@ -8,10 +8,9 @@ class Assignment < ActiveRecord::Base
 require 'analytic/assignment_analytic'
   include AssignmentAnalytic
   belongs_to :course
-  belongs_to :wiki_type
   has_paper_trail
 
-  # wiki_type needs to be removed. When an assignment is created, it needs to
+  # When an assignment is created, it needs to
   # be created as an instance of a subclass of the Assignment (model) class;
   # then Rails will "automatically' set the type field to the value that
   # designates an assignment of the appropriate type.
@@ -201,6 +200,17 @@ require 'analytic/assignment_analytic'
     @has_topics ||= !sign_up_topics.empty?
   end
 
+  def self.set_courses_to_assignment(user)
+    @courses=Course.where(instructor_id: user.id).order(:name)
+  end
+
+  def self.remove_assignment_from_course(assignment)
+    oldpath = assignment.path rescue nil
+    assignment.course_id = nil
+    assignment.save
+    newpath = assignment.path rescue nil
+    FileHelper.update_file_location(oldpath, newpath)
+  end
   #assign the reviewer to review the assignment_team's submission. Only used in the assignments that do not have any topic
   #Parameter assignment_team is the candidate assignment team, it cannot be a team w/o submission, or have reviewed by reviewer, or reviewer's own team.
   #(guaranteed by candidate_assignment_teams_to_review method)
@@ -500,7 +510,6 @@ require 'analytic/assignment_analytic'
 
   def path
     raise 'Path cannot be created. The assignment must be associated with either a course or an instructor.' if self.course_id == nil && self.instructor_id == nil
-    raise PathError, 'No path needed' if self.wiki_type_id != 1
     path_text = ""
     (self.course_id != nil && self.course_id > 0) ?
       path_text = Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(User.find(self.instructor_id).name) + '/' + FileHelper.clean_path(Course.find(self.course_id).directory_path) + '/':
@@ -589,7 +598,7 @@ require 'analytic/assignment_analytic'
       # directory is empty
     end
 
-    if !is_wiki_assignment and !(self.directory_path.nil? or self.directory_path.empty?) and !directory.nil?
+    if !(self.directory_path.nil? or self.directory_path.empty?) and !directory.nil?
       if directory.size == 2
         Dir.delete(Rails.root + '/pg_data/' + self.directory_path)
       else
@@ -600,11 +609,6 @@ require 'analytic/assignment_analytic'
     self.destroy
   end
 
-  # It appears that this method is not used at present!
-  def is_wiki_assignment
-    self.wiki_type_id > 1
-  end
-
   # Check to see if assignment is a microtask
   def is_microtask?
     (self.microtask.nil?) ? false : self.microtask
@@ -613,13 +617,6 @@ require 'analytic/assignment_analytic'
   # Check to see if assignment is a microtask
   def is_coding_assignment?
     (self.is_coding_assignment?) ? false : self.is_coding_assignment
-  end
-
-  def is_google_doc
-    # This is its own method so that it can be refactored later.
-    # Google Document code should never directly check the wiki_type_id
-    # and should instead always call is_google_doc.
-    self.wiki_type_id == 4
   end
 
   #add a new participant to this assignment

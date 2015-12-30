@@ -9,7 +9,7 @@
          map = ReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)        
       end       
             
-      if map != nil and !map.response.empty
+      if map != nil and !map.response.empty?
       	display = "Edit Review"
       else
         display = "Create Review"

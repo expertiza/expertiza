@@ -44,6 +44,7 @@ gem 'rgl', :require => 'rgl/adjacency'
 gem 'rjb'
 gem 'rubyzip'
 gem 'rwordnet','0.1.3'
+gem 'scrypt'
 gem 'sass-rails', '5.0.3'
 gem 'seer'
 gem 'sprockets'
@@ -64,6 +65,7 @@ group :development do
   gem 'sqlite3-ruby'
   gem 'selenium-webdriver'
   gem 'quiet_assets'
+  gem "factory_girl_rails", "~> 4.0"
 end
 
 group :test do

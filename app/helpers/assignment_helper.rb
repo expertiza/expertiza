@@ -16,18 +16,6 @@ module AssignmentHelper
     is_intelligent_options << ["Yes", 'true']
   end
 
-  def wiki_type_options
-    wiki_type_options = Array.new
-    WikiType.find_each do |wiki_type|
-      if wiki_type.name == 'No'
-        wiki_type_options << ['------', wiki_type.id]
-      else
-        wiki_type_options << [wiki_type.name, wiki_type.id]
-      end
-    end
-    wiki_type_options
-  end
-
   #round=0 added by E1450
   def questionnaire_options(assignment, type, round=0)
     questionnaires = Questionnaire.where( ['private = 0 or instructor_id = ?', assignment.instructor_id]).order('name')
@@ -141,6 +129,5 @@ module AssignmentHelper
       #E1450 end
     end
   end
-
 
 end

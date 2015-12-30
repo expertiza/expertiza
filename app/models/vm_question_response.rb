@@ -26,8 +26,11 @@ class VmQuestionResponse
       # score for the question is stored not on the question, but on the questionnaire. Neat.
       corresponding_questionnaire = Questionnaire.find_by(id: question.questionnaire.id)
       question_max_score = corresponding_questionnaire.max_question_score
-      row = VmQuestionResponseRow.new(question.txt, question.id, question.weight, question_max_score,question.seq)
-      @listofrows << row
+      #if this question is a header (table header, section header, column header), ignore this question
+      if !question.is_a?QuestionnaireHeader
+        row = VmQuestionResponseRow.new(question.txt, question.id, question.weight, question_max_score,question.seq)
+        @listofrows << row
+      end
     end
   end
 

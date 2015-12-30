@@ -1,0 +1,12 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  id: 71
+  response_map_id: 31
+  type_flag: Q
+  content: MyString
+
+two:
+  response_map_id: 32
+  type_flag: MyString
+  content: MyString

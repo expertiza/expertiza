@@ -1,0 +1,25 @@
+= form_for @review_chat do |f|
+  - if @review_chat.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@review_chat.errors.count, "error")} prohibited this review_chat from being saved:"
+      %ul
+        - @review_chat.errors.full_messages.each do |msg|
+          %li= msg
+
+  .field
+    = f.label :assignment_id
+    = f.number_field :assignment_id
+  .field
+    = f.label :reviewer_id
+    = f.number_field :reviewer_id
+  .field
+    = f.label :team_id
+    = f.number_field :team_id
+  .field
+    = f.label :type_flag
+    = f.text_field :type_flag
+  .field
+    = f.label :content
+    = f.text_field :content
+  .actions
+    = f.submit 'Save'

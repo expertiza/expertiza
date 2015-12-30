@@ -1,0 +1,29 @@
+%h1 Listing review_chats
+
+%table
+  %thead
+    %tr
+      %th Assignment
+      %th Reviewer
+      %th Team
+      %th Type flag
+      %th Content
+      %th
+      %th
+      %th
+
+  %tbody
+    - @review_chats.each do |review_chat|
+      %tr
+        %td= review_chat.assignment_id
+        %td= review_chat.reviewer_id
+        %td= review_chat.team_id
+        %td= review_chat.type_flag
+        %td= review_chat.content
+        %td= link_to 'Show', review_chat
+        %td= link_to 'Edit', edit_review_chat_path(review_chat)
+        %td= link_to 'Destroy', review_chat, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Review chat', new_review_chat_path

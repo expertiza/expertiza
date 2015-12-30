@@ -72,6 +72,7 @@ jQuery(document).ready(function() {
         <% end %></textarea>
     </p>
 
+
     <%if @current_round%>
       <%= hidden_field_tag "review[round]", @current_round %>
     <%end%>
@@ -86,6 +87,21 @@ jQuery(document).ready(function() {
     <%= hidden_field_tag('return', @return) %>
     <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %>
 <% end %>
+
+    <p style="position:fixed; bottom:0px; right:100px ">
+      <%= form_tag :action => "initiate_chat", :id => @map.id  do %>
+      <label for="review_chats">Post your query for the Author</label><BR/>
+      <textarea cols="30" rows="4" id="review_question" name="review_question" style="overflow:hidden;">
+        </textarea> <br/>	
+ <%= submit_tag "Submit", :name => "review_help" %><% end %>
+    </p>
+
+
+<% existing_chat=ReviewChat.where(:response_map_id => @map.id)%>
+<%if !existing_chat.empty? then %>
+<a href ="http://expertiza.ncsu.edu/review_chats/show/<%= existing_chat[0].id %>" target="_blank"> Click here to see chat log </a> </br>
+<%end%>
+
 <!--Check whether there is a UploadFile question.-->
 <%@questions.each do |question| %>
     <% if question.instance_of? UploadFile %>
@@ -103,3 +119,4 @@ jQuery(document).ready(function() {
 <% end %>
 <%= @map.show_feedback(@response) %>
 <a href="javascript:window.history.back()">Back</a>
+

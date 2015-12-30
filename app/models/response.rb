@@ -259,3 +259,5 @@ class Response < ActiveRecord::Base
   require 'analytic/response_analytic'
   include ResponseAnalytic
   end
+
+

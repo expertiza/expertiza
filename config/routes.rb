@@ -1,5 +1,6 @@
 Expertiza::Application.routes.draw do
 
+  resources :review_chats
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
 
@@ -22,6 +23,12 @@ Expertiza::Application.routes.draw do
       get :remove_instructor
       post :remove_instructor
       get :show_instructor
+    end
+  end
+
+  resources :review_chats do
+    collection do
+      post :submitted_response
     end
   end
 
@@ -290,6 +297,7 @@ Expertiza::Application.routes.draw do
       get :saving
       get :redirection
       post :custom_create
+      post :initiate_chat
     end
   end
 

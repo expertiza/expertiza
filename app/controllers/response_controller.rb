@@ -2,6 +2,7 @@ class ResponseController < ApplicationController
   helper :wiki
   helper :submitted_content
   helper :file
+  helper :review_chats
 
   def action_allowed?
     case params[:action]
@@ -189,7 +190,7 @@ class ResponseController < ApplicationController
     begin
       @myid = @response.id
       @map = @response.map
-      @response.update_attribute('additional_comment', params[:review][:comments])
+      @response.update_attribute('additional_comment', params[:review][:comments] )
       if @map.type=="ReviewResponseMap" && @response.round
         @questionnaire = @map.questionnaire(@response.round)
       elsif @map.type=="ReviewResponseMap"
@@ -330,6 +331,17 @@ class ResponseController < ApplicationController
     end
   end
 
+  #initiate a new chat interaction for an assignment being reviewed
+  def initiate_chat
+      @map = ResponseMap.find(params[:id])
+      ReviewChat.create( :response_map_id=>@map.id, :type_flag => 'Q' , :content => params[:review_question])
+      flash[:notice]="Question has been submitted to Author"
+      @interaction_id=ReviewChat.where(:response_map_id => @map.id)
+      ReviewChatsHelper::chat_email_query(@interaction_id.first.id)
+      redirect_to action: 'new', id: params[:id]
+  end
+
+
   private
   #new_response if a flag parameter indicating that if user is requesting a new rubric to fill
   #if true: we figure out which questionnaire to use based on current time and records in assignment_questionnaires table
@@ -378,3 +390,4 @@ class ResponseController < ApplicationController
     !current_user_id?(response.map.reviewer.user_id)
   end
 end
+

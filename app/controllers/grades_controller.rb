@@ -116,24 +116,6 @@ class GradesController < ApplicationController
     questionnaires = @assignment.questionnaires_with_questions
     @vmlist = []
 
-    # #get the rounds for the assignment. if >1, add the review questionnaire n-1 times.
-    # #this will insure a separate html table appears for each round
-    # @round = 1
-    # @rounds = @assignment.rounds_of_reviews
-    # repeat_questionnaire = nil
-    # questionnaires.each { |questionnaire|
-    #   if questionnaire.type == 'ReviewQuestionnaire'
-    #     repeat_questionnaire = questionnaire
-    #     @round = @assignment.rounds_of_reviews
-    #   end
-    # }
-    #
-    # if @round >1   && !@assignment.varying_rubrics_by_round?
-    #   (2...(@round)).reverse_each do |x|
-    #     questionnaires << (repeat_questionnaire)
-    #   end
-    # end
-
     #loop through each questionnaire, and populate the view model for all data necessary
     #to render the html tables.
     questionnaires.each do |questionnaire|

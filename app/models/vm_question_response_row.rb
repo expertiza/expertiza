@@ -43,30 +43,17 @@ class VmQuestionResponseRow
     @weight
   end
 
-  def question_max_score
-    @question_max_score
-  end
-
-  def average_score_for_row
-    row_average_score = 0.0
-    @score_row.each do |score|
-      if score.score_value.is_a? Numeric
-        row_average_score += score.score_value.to_f
-      end
-    end
-    row_average_score /= @score_row.length.to_f
-    row_average_score.round(2)
-  end
-
-
   #the question max score is the max score of the questionnaire, except if the question is a true/false, in which case
   # the max score is one.
   def question_max_score
     question = Question.find(self.question_id)
     if question.type == "Checkbox"
       return 1
+    elsif question.is_a? ScoredQuestion
+      @question_max_score
+    else
+      "N/A"
     end
-    @question_max_score
   end
 
   def average_score_for_row

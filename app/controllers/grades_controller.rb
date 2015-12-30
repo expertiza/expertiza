@@ -142,7 +142,7 @@ class GradesController < ApplicationController
         @round  =  AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
       end
 
-      vm = VmQuestionResponse.new(questionnaire,@round,@rounds)
+      vm = VmQuestionResponse.new(questionnaire,@round,@assignment.rounds_of_reviews)
       questions = questionnaire.questions
       vm.addQuestions(questions)
       vm.addTeamMembers(@team)

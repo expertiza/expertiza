@@ -57,7 +57,7 @@
                 <% vm.listofreviews.each do |review| %>
                     <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                     <% if ['Student'].include? @current_role_name %>
-                        <th> <a target="_blank" href="../grades/view_reviewer?id=<%=@participant.id%>&response_id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Rev" + i.to_s %></a>  </th>
+                        <th> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Rev" + i.to_s %></a>  </th>
                         <% i += 1 %>
                     <% end %>
                     <% if ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include? @current_role_name %>

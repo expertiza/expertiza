@@ -6,7 +6,7 @@ class GradesController < ApplicationController
 
   def action_allowed?
     case params[:action]
-      when 'view_my_scores', 'view_reviewer'
+      when 'view_my_scores'
         ['Instructor',
          'Teaching Assistant',
          'Administrator',
@@ -80,33 +80,6 @@ class GradesController < ApplicationController
     @stage = @participant.assignment.get_current_stage(@topic_id)
     calculate_all_penalties(@assignment.id)
   end
-
-  def view_reviewer
-    @participant = AssignmentParticipant.find(params[:id])
-    @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
-
-    @assignment = @participant.assignment
-    @questions = {} # A hash containing all the questions in all the questionnaires used in this assignment
-    questionnaires = @assignment.questionnaires
-    questionnaires.each do |questionnaire|
-      round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id:questionnaire.id).first.used_in_round
-      if(round!=nil)
-        questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
-      else
-        questionnaire_symbol = questionnaire.symbol
-      end
-      @questions[questionnaire_symbol] = questionnaire.questions
-    end
-    #@pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
-    pscore = @participant.scores(@questions)
-    # make_chart
-    @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
-    @stage = @participant.assignment.get_current_stage(@topic_id)
-    # calculate_all_penalties(@assignment.id)
-    @rscore = pscore[:review]
-
-  end
-
 
   def view_team
 

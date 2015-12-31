@@ -97,16 +97,16 @@ class GradesController < ApplicationController
     questionnaires.each do |questionnaire|
 
       if @assignment.varying_rubrics_by_round? && questionnaire.type ==  "ReviewQuestionnaire"
-        @round  =  AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
+        @round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
       else
         @round = nil
       end
 
       vm = VmQuestionResponse.new(questionnaire,@round,@assignment.rounds_of_reviews)
       questions = questionnaire.questions
-      vm.addQuestions(questions)
-      vm.addTeamMembers(@team)
-      vm.addReviews(@participant,@team,@assignment.varying_rubrics_by_round?)
+      vm.add_questions(questions)
+      vm.add_team_members(@team)
+      vm.add_reviews(@participant,@team,@assignment.varying_rubrics_by_round?)
       vm.get_number_of_comments_greater_than_10_words()
 
       @vmlist << vm

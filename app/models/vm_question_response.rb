@@ -20,7 +20,7 @@ class VmQuestionResponse
     @name
   end
 
-  def addQuestions(questions)
+  def add_questions(questions)
     questions.each do |question|
       # Get the maximum score for this question. For some unknown, godforsaken reason, the max
       # score for the question is stored not on the question, but on the questionnaire. Neat.
@@ -34,7 +34,7 @@ class VmQuestionResponse
     end
   end
 
-  def addReviews(participant,team,vary)
+  def add_reviews(participant,team,vary)
 
     if @questionnaire_type == "ReviewQuestionnaire"
       if vary
@@ -81,13 +81,13 @@ class VmQuestionResponse
     reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
-        addAnswer(answer)
+        add_answer(answer)
       end
     end
 
   end
 
-  def displayTeamMembers
+  def display_team_members
     @output = ""
     if @questionnaire_type == "MetareviewQuestionnaire"  ||      @questionnaire_type == "ReviewQuestionnaire"
       @output = "Team members:"
@@ -101,7 +101,7 @@ class VmQuestionResponse
 
   end
 
-  def addTeamMembers(team)
+  def add_team_members(team)
     @listofteamparticipants = team.participants
   end
 
@@ -149,7 +149,7 @@ class VmQuestionResponse
     @listofreviewers
   end
 
-  def addAnswer(answer)
+  def add_answer(answer)
     # We want to add each response score from this review (answer) to its corresponding
     # question row.
     @listofrows.each do |row|

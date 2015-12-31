@@ -18,7 +18,7 @@ class ResponseController < ApplicationController
       when 'view'
         response = Response.find(params[:id])
         map = response.map
-        
+
         if map.is_a? ReviewResponseMap # if it is a review response map, all the members of revieweee team should be able to view the reponse (can be done from heat map)
           reviewee_team = AssignmentTeam.find(map.reviewee_id)
           current_user_id?(response.map.reviewer.user_id) || reviewee_team.has_user(current_user)

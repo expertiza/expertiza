@@ -6,12 +6,19 @@ class GradesController < ApplicationController
 
   def action_allowed?
     case params[:action]
-      when 'view_my_scores', 'view_team', 'view_reviewer'
+      when 'view_my_scores', 'view_reviewer'
         ['Instructor',
          'Teaching Assistant',
          'Administrator',
          'Super-Administrator',
          'Student'].include? current_role_name and are_needed_authorizations_present?
+      when 'view_team'
+        if ['Student'].include? current_role_name #students can only see the head map for their own team
+          participant = AssignmentParticipant.find(params[:id])
+          session[:user].id == participant.user_id
+        else
+          true
+        end
       else
         ['Instructor',
          'Teaching Assistant',
@@ -78,8 +85,6 @@ class GradesController < ApplicationController
     @participant = AssignmentParticipant.find(params[:id])
     @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
 
-    return if (current_role_name!="Instructor" && redirect_when_disallowed )
-
     @assignment = @participant.assignment
     @questions = {} # A hash containing all the questions in all the questionnaires used in this assignment
     questionnaires = @assignment.questionnaires
@@ -111,8 +116,6 @@ class GradesController < ApplicationController
     @team = @participant.team
     @team_id = @team.id
 
-    return if (current_role_name!="Instructor" && redirect_when_disallowed )
-
     questionnaires = @assignment.questionnaires_with_questions
     @vmlist = []
 
@@ -132,12 +135,6 @@ class GradesController < ApplicationController
       vm.addTeamMembers(@team)
       vm.addReviews(@participant,@team,@assignment.varying_rubrics_by_round?)
       vm.get_number_of_comments_greater_than_10_words()
-
-      #if a multi-round assignment, decrement for each review questionnaire,
-      #to ensure the proper round responses are retrieved.
-      # if
-      #   @round = @round -1
-      # end
 
       @vmlist << vm
 

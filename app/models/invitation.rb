@@ -64,7 +64,6 @@ class Invitation < ActiveRecord::Base
       invited_participant = Participant.where(user_id: invited_user_id, parent_id: assignment_id).first
       inviter_participant = Participant.where(user_id: inviter_user_id, parent_id: assignment_id).first
       inviter_assignment_team = AssignmentTeam.team(inviter_participant)
-      inviter_assignment_team.update_dirctory_num_for_new_member(invited_participant)
     end
 
     return can_add_member

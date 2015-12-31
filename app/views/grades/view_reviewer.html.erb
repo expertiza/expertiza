@@ -1,0 +1,184 @@
+
+<%
+   puts "In view_review, participant id: " + params[:id]
+   puts "In view_review, reviewer id: " + params[:response_id]
+   participant = AssignmentParticipant.find(params[:id])
+   @assignment = participant.assignment
+   @questions = {} # A hash containing all the questions in all the questionnaires used in this assignment
+   questionnaires = @assignment.questionnaires
+   questionnaires.each do |questionnaire|
+     round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id:questionnaire.id).first.used_in_round
+     if(round!=nil)
+       questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
+     else
+       questionnaire_symbol = questionnaire.symbol
+     end
+     @questions[questionnaire_symbol] = questionnaire.questions
+   end
+   pscore = participant.scores(@questions)
+   rscore = pscore[:review]
+   rscore_meta = pscore[:metareview]
+   rscore_fdbk = pscore[:feedback]
+   rscore_tm = pscore[:teammate]
+   prefix = "user"
+%>
+
+<% if rscore_meta and rscore_meta[:assessments].length > 0 %>
+    <BR/>
+    <% count_meta = 0 %>
+    <% for metareview in rscore_meta[:assessments] %>
+        <% count_meta = count_meta + 1 %>
+        <% if controller.action_name != "view_my_scores" and metareview.id.to_s == params[:response_id] %>
+            <h2>Metareview <%= params[:i] %></h2>
+            <a name="<%=prefix+"_"+metareview.map.reviewer.name%>"></a><%= metareview.display_as_html(prefix) %><BR/><BR/>
+        <% elsif metareview.id.to_s == params[:response_id] %>
+            <h2>Metareview <%= params[:i] %></h2>
+            <%= metareview.display_as_html(nil,count_meta) %><BR/><BR/>
+        <% end %>
+    <% end %>
+<% else %>
+    <i>No metareviews have been completed for this user's reviews.</i>
+<% end %>
+
+<% if rscore_fdbk and rscore_fdbk[:assessments].length > 0 %>
+    <% count_fb = 0 %>
+    <% for feedback in rscore_fdbk[:assessments] %>
+        <% count_fb = count_fb + 1 %>
+        <% if controller.action_name != "view_my_scores" and feedback.id.to_s == params[:response_id]%>
+            <a name="<%=prefix+"_"+feedback.map.reviewer.name%>"></a><%= feedback.display_as_html(prefix) %><BR/><BR/>
+        <% elsif feedback.id.to_s == params[:response_id] %>
+            <%= feedback.display_as_html(nil,count_fb) %><BR/><BR/>
+        <% end %>
+    <% end %>
+<% else %>
+    <i>No author feedback has been provided for this user's reviews.</i>
+<% end %>
+
+<% if rscore_tm and rscore_tm[:assessments].length > 0 %>
+    <HR/>
+    <% count_tm = 0 %>
+    <% for teammatereview in rscore_tm[:assessments] %>
+        <% count_tm = count_tm + 1 %>
+        <% if controller.action_name != "view_my_scores" and teammatereview.id.to_s == params[:response_id]%>
+            <h2>Teammate Review <%= params[:i] %></h2>
+            <a name="<%=prefix+"_"+teammatereview.map.reviewer.name%>"></a><%= teammatereview.display_as_html(prefix) %><BR/><BR/>
+        <% elsif teammatereview.id.to_s == params[:response_id] %>
+            <h2>Teammate Review <%= params[:i] %></h2>
+            <%= teammatereview.display_as_html(nil,count) %><BR/><BR/>
+        <% end %>
+    <% end %>
+<% else %>
+    <i>No author feedback has been provided for this user's reviews.</i>
+<% end %>
+
+
+<% if rscore and rscore[:assessments].length > 0 %>
+    <BR/>
+    <%if @questions.has_key?("review1".to_sym)%>
+        <b> Round1:</b>
+        <%flag_varying_rubrics=true%>
+        <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review1".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer", :round=>1 }%>
+    <%end%>
+
+    <%if @questions.has_key?("review2".to_sym)%>
+        <b> Round2:</b>
+        <%flag_varying_rubrics=true%>
+        <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review2".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" , :round=>2 }%>
+    <%end%>
+
+    <%if @questions.has_key?("review3".to_sym)%>
+        <b> Round3:</b>
+        <%flag_varying_rubrics=true%>
+        <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review3".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" , :round=>3 }%>
+    <%end%>
+
+    <HR/>
+    <% count = 0 %>
+    <% for review in rscore[:assessments] %>
+        <% puts "In view_reviewer, review.map.reviewer.id: " + review.map.reviewer.id.to_s %>
+        <% puts "In view_reviewer, review.map.id: " + review.map.id.to_s %>
+        <% puts "In view_reviewer, review.response_map.id: " + review.response_map.map_id.to_s %>
+        <% puts "In view_reviewer, review.map.response.first.response_id: " + review.map.response.first.response_id.to_s %>
+        <% puts "In view_review, params[:response_id]: " + params[:response_id] %>
+        <% if review.map.response.first.response_id.to_s.eql? params[:response_id].to_s %>
+            <% puts "!!!!!!!!!!!!!!!Get" + params[:response_id].to_s %>
+            <% review_feedback = nil %>
+
+            <% count = count + 1 %>
+
+            <h2>Review <%= params[:i] %></h2>
+
+
+            <!-- Display the latest review first -->
+            <!--%= review.display_as_html(nil,review.version_num, file_url) %--><BR/>
+
+            <% if controller.action_name != "view_my_scores" %>
+                <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a><%= review.display_as_html(prefix) %>
+            <% else %>
+                <%= review.display_as_html(nil,0, nil) %><BR/>
+            <% end %>
+
+            <!--Display FileUpload question type-->
+            <% current_folder = DisplayOption.new %>
+            <% current_folder.name = "" %>
+            <% files = @participant.files(@participant.review_file_path(review.response_map.id).to_s + current_folder.name) %>
+
+            <!--change code in order to compat to multi-round review-->
+            <% if @assignment.varying_rubrics_by_round? and !review.round.nil? %>
+                <% review_symbol = 'review' + review.round.to_s %>
+            <% else %>
+                <% review_symbol = 'review' %>
+            <% end %>
+            <% @questions[review_symbol.to_sym].each do |question| %>
+                <% if question.instance_of? UploadFile %>
+                    <%= display_directory_tree(@participant, files, true).html_safe %>
+                <% end %>
+            <% end %>
+
+            <% if controller.action_name == "view_my_scores" %>
+                <!-- get all previous versions -->
+                <% @sorted_array=Array.new %>
+                <% @prev=Response.all %>
+                <%for element in @prev     %>
+                    <%if(element.map_id==review.map.id && (element.isSubmitted.nil? || element.isSubmitted.eql?('Yes')))%>
+                        <%array_not_empty=1 %>
+                        <% @sorted_array << element %>
+                    <% end %>
+                <% end %>
+                <!--% @sorted=@sorted_array.sort { |m1,m2|(m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)} %-->
+                <% @sorted=@sorted_array.sort %>
+                <% if(@sorted.size>1) %>
+                    <% for i in 1..@sorted.size-1 %>
+                        <% @str = @sorted[i].id.to_s %>
+                        <!-- display previous versions in descending order -->
+                        <!--%= @sorted[i].display_as_html(nil,@sorted[i].version_num, file_url) %-->
+                        <%= @sorted[i].display_as_html(nil,i, nil) %>
+                        <br/>
+                        <script>
+                            toggleElement('reviews_<%=@str%>','review');
+                        </script>
+                    <% end %>
+                    <!-- keep only latest version open -->
+                    <% for i in 1..@sorted.size-1 %>
+                        <% @str = @sorted[i].id.to_s %>
+                        <script>
+                            toggleElement('review_<%=@str%>','review')
+                        </script>
+                    <% end %>
+                <% end %>
+                <% map = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
+                   review_feedbacks = map.try :response %>
+                <% if review_feedbacks && !review_feedbacks.empty? %>
+                    <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedbacks.first.id %> or
+                    <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedbacks.first.id, :return => "feedback" %> feedback for Review <%= count %>
+                <% else %>
+                    <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
+                <% end %>
+                <BR/><HR/>
+            <% end %>
+        <% end %>
+
+    <% end %>
+<% else %>
+    <i>No reviews have been completed for this user's submissions.</i>
+<% end %>

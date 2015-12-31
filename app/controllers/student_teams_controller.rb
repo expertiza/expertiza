@@ -156,13 +156,6 @@ class StudentTeamsController < ApplicationController
 
     old_invites.each{|old_invite| old_invite.destroy}
 
-    #reset the participants submission directory to nil
-    #per EFG:
-    #the student is responsible for resubmitting their work
-    #no restriction is placed on when a student can leave
-
-    student.directory_num = nil
-
     student.save
 
     redirect_to view_student_teams_path student_id: student.id

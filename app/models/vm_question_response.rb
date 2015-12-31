@@ -37,19 +37,19 @@ class VmQuestionResponse
   def addReviews(participant,team,vary)
 
     if @questionnaire_type == "ReviewQuestionnaire"
-      if @rounds == 1
-        reviews = participant.reviews()
+      if vary
+        reviews = ReviewResponseMap.get_assessments_round_for(team,@round)
       else
-        reviews = ReviewResponseMap.get_assessments_round_for(team ,@round)
+        reviews = ReviewResponseMap.get_assessments_for(team)
       end
       reviews.each do |review|
-        review_mapping = ReviewResponseMap.where(id: review.map_id).first
+        review_mapping = ReviewResponseMap.find(review.map_id)
         if review_mapping.present?
           participant = Participant.find(review_mapping.reviewer_id)
           @listofreviewers << participant
-          @listofreviews << review
         end
       end
+      @listofreviews = reviews
     elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"
       reviews = participant.feedback()     #feedback reviews
       reviews.each do |review|

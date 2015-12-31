@@ -79,18 +79,26 @@ class AssignmentTeam < Team
     find(team_id).participants.first
   end
 
-  def hyperlinks
-    links = Array.new
-    self.participants.each { |team_member| links.concat(team_member.hyperlinks_array) if team_member.hyperlinks_array}
-    links
-  end
+  def files(directory)
+    files_list = Dir[directory + "/*"]
+    files = Array.new
 
-  def path
-    self.participants.first.dir_path
+    files_list.each do |file|
+      if File.directory?(file)
+        dir_files = files(file)
+        dir_files.each{|f| files << f}
+      end
+    files << file
+    end
+  files
   end
 
   def submitted_files
-    self.participants.first.submitted_files
+    files = Array.new
+    if(self.directory_num)
+      files = files(self.path)
+    end
+    return files
   end
 
   def review_map_type
@@ -248,18 +256,17 @@ class AssignmentTeam < Team
         end
       end
 
-  #for an existing team, after a new_participant joins, update the directory_num for the new participant
-  def update_dirctory_num_for_new_member(new_participant)
-    dir_num = nil
-    participants.each do |participant|
-      if !participant.directory_num.nil?
-        dir_num = participant.directory_num
-        break
-      end
-    end
-    if !dir_num.nil?
-      new_participant.directory_num = dir_num
-      new_participant.save
+  def path
+    self.assignment.path + "/"+ self.directory_num.to_s
+  end
+
+  def set_student_directory_num
+    if self.directory_num.nil? || self.directory_num < 0
+      max_num = AssignmentTeam.where(parent_id: self.parent_id).order('directory_num desc').first.directory_num
+      dir_num = max_num ? max_num + 1 : 0
+      self.update_attribute('directory_num',dir_num)
+      #ACS Get participants irrespective of the number of participants in the team
+      #removed check to see if it is a team assignment
     end
   end
 

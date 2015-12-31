@@ -1005,14 +1005,16 @@ describe "peer review testing", :type => :feature do
     click_link "Begin"
   end
 
-  it "fills in a single textbox and saves" do
+  before(:each) do
     # Setup test specific data
     @q1=Criterion.new({:size => "70,1", :weight => 5, :questionnaire_id => @quiz.id, :seq => "3", :txt => "helloText"})
     @q1.save
 
     @answer_q1 = Answer.new({:question_id => @q1.id})
     @answer_q1.save
+  end
 
+  it "fills in a single textbox and saves" do
     # Load questionnaire with generic setup
     load_questionnaire
 
@@ -1026,13 +1028,6 @@ describe "peer review testing", :type => :feature do
   end
 
   it "fills in a single comment with multi word text and saves" do
-    # Setup test specific data
-    @q1=Criterion.new({:size => "70,1", :weight => 5, :questionnaire_id => @quiz.id, :seq => "3", :txt => "helloText"})
-    @q1.save
-
-    @answer_q1 = Answer.new({:question_id => @q1.id})
-    @answer_q1.save
-
     # Load questionnaire with generic setup
     load_questionnaire
 
@@ -1045,13 +1040,6 @@ describe "peer review testing", :type => :feature do
   end
 
   it "fills in a single comment with single word and saves" do
-    # Setup test specific data
-    @q1=Criterion.new({:size => "70,1", :weight => 5, :questionnaire_id => @quiz.id, :seq => "3", :txt => "helloText"})
-    @q1.save
-
-    @answer_q1 = Answer.new({:question_id => @q1.id})
-    @answer_q1.save
-
     # Load questionnaire with generic setup
     load_questionnaire
 
@@ -1064,13 +1052,6 @@ describe "peer review testing", :type => :feature do
   end
 
   it "fills in only points and saves" do
-    # Setup test specific data
-    @q1=Criterion.new({:size => "70,1", :weight => 5, :questionnaire_id => @quiz.id, :seq => "3", :txt => "helloText"})
-    @q1.save
-
-    @answer_q1 = Answer.new({:question_id => @q1.id})
-    @answer_q1.save
-
     # Load questionnaire with generic setup
     load_questionnaire
 
@@ -1082,13 +1063,6 @@ describe "peer review testing", :type => :feature do
   end
 
   it "saves an empty review without any points and comments" do
-    # Setup test specific data
-    @q1=Criterion.new({:size => "70,1", :weight => 5, :questionnaire_id => @quiz.id, :seq => "3", :txt => "helloText"})
-    @q1.save
-
-    @answer_q1 = Answer.new({:question_id => @q1.id})
-    @answer_q1.save
-
     # Load questionnaire with generic setup
     load_questionnaire
     click_button "Submit Review"
@@ -1097,13 +1071,6 @@ describe "peer review testing", :type => :feature do
   end
 
   it "saves a review with only additional comments" do
-    # Setup test specific data
-    @q1=Criterion.new({:size => "70,1", :weight => 5, :questionnaire_id => @quiz.id, :seq => "3", :txt => "helloText"})
-    @q1.save
-
-    @answer_q1 = Answer.new({:question_id => @q1.id})
-    @answer_q1.save
-
     # Load questionnaire with generic setup
     load_questionnaire
 

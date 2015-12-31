@@ -71,6 +71,7 @@ end
 group :test do
   gem 'database_cleaner'
   gem 'gherkin'
+  gem "factory_girl_rails", "~> 4.0" ,:require => false
   gem 'guard-rails'
   gem 'guard-rspec'
   gem 'launchy'

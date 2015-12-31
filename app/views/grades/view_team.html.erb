@@ -55,15 +55,13 @@
 
                 <% i = 1 %>
                 <% vm.listofreviews.each do |review| %>
-                    <!-- instructors see reviewer name, students see anonymized string -->
-                    <% if @current_role_name.eql?'Student' %>
+                    <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
+                    <% if ['Student'].include? @current_role_name %>
                         <th> <a target="_blank" href="../grades/view_reviewer?id=<%=@participant.id%>&response_id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Rev" + i.to_s %></a>  </th>
                         <% i += 1 %>
                     <% end %>
-
-                    <% if @current_role_name.eql?'Instructor' %>
+                    <% if ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include? @current_role_name %>
                         <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname.to_s %>
-
                         <th > <a target="_blank" href="../grades/view_reviewer?id=<%=@participant.id%>&response_id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
                         <% i += 1 %>
                     <% end %>

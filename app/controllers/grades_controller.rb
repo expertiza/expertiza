@@ -120,8 +120,10 @@ class GradesController < ApplicationController
     #to render the html tables.
     questionnaires.each do |questionnaire|
 
-      if @assignment.varying_rubrics_by_round?
+      if @assignment.varying_rubrics_by_round? && questionnaire.type ==  "ReviewQuestionnaire"
         @round  =  AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
+      else
+        @round = nil
       end
 
       vm = VmQuestionResponse.new(questionnaire,@round,@assignment.rounds_of_reviews)
@@ -133,9 +135,9 @@ class GradesController < ApplicationController
 
       #if a multi-round assignment, decrement for each review questionnaire,
       #to ensure the proper round responses are retrieved.
-      if questionnaire.type ==  "ReviewQuestionnaire"
-        @round = @round -1
-      end
+      # if
+      #   @round = @round -1
+      # end
 
       @vmlist << vm
 

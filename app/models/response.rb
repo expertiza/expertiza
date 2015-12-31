@@ -195,7 +195,7 @@ class Response < ActiveRecord::Base
         end
         defn[:body][:first_name] = User.find(user.id).fullname
         defn[:to] = User.find(user.id).email
-        Mailer.sync_message(defn).deliver
+        Mailer.sync_message(defn).deliver_now
       end
     end
     if response_map.type == "MetareviewResponseMap"

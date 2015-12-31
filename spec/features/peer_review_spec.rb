@@ -919,7 +919,7 @@ describe "peer review testing", :type => :feature do
                                                              })
     @student2.save
 
-    @course=Course.new({:name => "testcourse"})
+    @course=Course.new({:name => "testcourse", :directory_path => 'test_course'})
     @course.save
 
     @deadline_type = DeadlineType.new({:name => "drop_topic"})
@@ -928,10 +928,7 @@ describe "peer review testing", :type => :feature do
     @deadline_type_review = DeadlineType.new({:name => "review"})
     @deadline_type_review.save
 
-    @wiki_type = WikiType.new({:name => "mediawiki"})
-    @wiki_type.save
-
-    @assignment=Assignment.new({:name => "TestAssignment", :course_id => @course.id, :instructor => @instructor, :availability_flag => 1, :wiki_type => @wiki_type, :review_assignment_strategy => 'Auto-Selected', :max_reviews_per_submission => 20})
+    @assignment=Assignment.new({:name => "TestAssignment", :directory_path => 'test_assignment', :course_id => @course.id, :instructor => @instructor, :availability_flag => 1, :review_assignment_strategy => 'Auto-Selected', :max_reviews_per_submission => 20})
     @assignment.save
 
     @deadline_right = DeadlineRight.new({:name => 'OK'})
@@ -939,6 +936,9 @@ describe "peer review testing", :type => :feature do
 
     @deadline_right_no = DeadlineRight.new({:name => 'No'})
     @deadline_right_no.save
+
+    @deadline_right_late = DeadlineRight.new({:name => 'Late'})
+    @deadline_right_late.save
 
     @due_date = DueDate.new({:due_at => '2100-07-14 23:30:12', :assignment => @assignment, :deadline_type => @deadline_type_review, :review_allowed_id => @deadline_right.id, :review_of_review_allowed_id => @deadline_right_no.id, :submission_allowed_id => @deadline_right.id})
     @due_date.save
@@ -954,12 +954,14 @@ describe "peer review testing", :type => :feature do
 
     @team1 = AssignmentTeam.new(:name => "Team2", :assignment => @assignment)
     @team1.users << @student2
+    @team1.submitted_hyperlinks = "---
+- https://www.expertiza.ncsu.edu"
+    @team1.directory_num = 0
     @team1.save
 
     @team_user1 = TeamsUser.new(:team => @team1, :user => @student2)
     @team_user1
 
-    @team1.participants[0].submit_hyperlink "http://www.ncsu.edu"
 
     @signed_up_team = SignedUpTeam.new({:topic => @sign_up_topic, :team_id => @team1.id})
     @signed_up_team.save

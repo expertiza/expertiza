@@ -92,7 +92,7 @@ class AssignmentParticipant < Participant
   end
 
   def has_submissions?
-    return ((submitted_files.length > 0) or
+    return ((self.team.submitted_files.length > 0) or
             (hyperlinks_array.length > 0))
   end
 

@@ -12,7 +12,7 @@
     <% if (vm.questionnaire_display_type == "Metareview" or vm.questionnaire_display_type == "Author Feedback" or vm.questionnaire_display_type == "Teammate Review") and @current_role_name.eql?'Student' %>
     <% else %>
 
-        <% if vm.listofreviewers.length > 0 %>
+        <% if vm.list_of_reviewers.length > 0 %>
 
             <!-- display the list of questions for this questionnaire -->
             <div id="hid<%= vm.questionnaire_type + vm.round.to_s %>" class="accordion-body collapse" >
@@ -22,7 +22,7 @@
                 <th>Question</th>
                 </thead>
                 <% count = 0 %>
-                <% vm.listofrows.each do |row| %>
+                <% vm.list_of_rows.each do |row| %>
                     <% if row.score_row.count > 0  %>
                         <tr style="background-color: #ffffff;">
                           <td><%= count += 1 %></td>
@@ -54,10 +54,10 @@
                 <th>Max</th>
 
                 <% i = 1 %>
-                <% vm.listofreviews.each do |review| %>
+                <% vm.list_of_reviews.each do |review| %>
                     <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                     <% if ['Student'].include? @current_role_name %>
-                        <th> <a target="_blank" href="../grades/view_reviewer?id=<%=@participant.id%>&response_id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Rev" + i.to_s %></a>  </th>
+                        <th> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Rev" + i.to_s %></a>  </th>
                         <% i += 1 %>
                     <% end %>
                     <% if ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include? @current_role_name %>
@@ -160,7 +160,7 @@
 
             </table>
             <!-- Display the list of team members, for Peer Reviews. -->
-            <span> <%= vm.displayTeamMembers %></span>
+            <span> <%= vm.display_team_members %></span>
 
             <!-- this elsif terminates the heatgrid code.  -->
         <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>

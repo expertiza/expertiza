@@ -6,12 +6,19 @@ class GradesController < ApplicationController
 
   def action_allowed?
     case params[:action]
-      when 'view_my_scores', 'view_team', 'view_reviewer'
+      when 'view_my_scores'
         ['Instructor',
          'Teaching Assistant',
          'Administrator',
          'Super-Administrator',
          'Student'].include? current_role_name and are_needed_authorizations_present?
+      when 'view_team'
+        if ['Student'].include? current_role_name #students can only see the head map for their own team
+          participant = AssignmentParticipant.find(params[:id])
+          session[:user].id == participant.user_id
+        else
+          true
+        end
       else
         ['Instructor',
          'Teaching Assistant',
@@ -74,35 +81,6 @@ class GradesController < ApplicationController
     calculate_all_penalties(@assignment.id)
   end
 
-  def view_reviewer
-    @participant = AssignmentParticipant.find(params[:id])
-    @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
-
-    return if (current_role_name!="Instructor" && redirect_when_disallowed )
-
-    @assignment = @participant.assignment
-    @questions = {} # A hash containing all the questions in all the questionnaires used in this assignment
-    questionnaires = @assignment.questionnaires
-    questionnaires.each do |questionnaire|
-      round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id:questionnaire.id).first.used_in_round
-      if(round!=nil)
-        questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
-      else
-        questionnaire_symbol = questionnaire.symbol
-      end
-      @questions[questionnaire_symbol] = questionnaire.questions
-    end
-    #@pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
-    pscore = @participant.scores(@questions)
-    # make_chart
-    @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
-    @stage = @participant.assignment.get_current_stage(@topic_id)
-    # calculate_all_penalties(@assignment.id)
-    @rscore = pscore[:review]
-
-  end
-
-
   def view_team
 
     #get participant, team, questionnaires for assignment.
@@ -110,8 +88,6 @@ class GradesController < ApplicationController
     @assignment = @participant.assignment
     @team = @participant.team
     @team_id = @team.id
-
-    return if (current_role_name!="Instructor" && redirect_when_disallowed )
 
     questionnaires = @assignment.questionnaires_with_questions
     @vmlist = []
@@ -121,23 +97,17 @@ class GradesController < ApplicationController
     questionnaires.each do |questionnaire|
 
       if @assignment.varying_rubrics_by_round? && questionnaire.type ==  "ReviewQuestionnaire"
-        @round  =  AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
+        @round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
       else
         @round = nil
       end
 
       vm = VmQuestionResponse.new(questionnaire,@round,@assignment.rounds_of_reviews)
       questions = questionnaire.questions
-      vm.addQuestions(questions)
-      vm.addTeamMembers(@team)
-      vm.addReviews(@participant,@team,@assignment.varying_rubrics_by_round?)
+      vm.add_questions(questions)
+      vm.add_team_members(@team)
+      vm.add_reviews(@participant,@team,@assignment.varying_rubrics_by_round?)
       vm.get_number_of_comments_greater_than_10_words()
-
-      #if a multi-round assignment, decrement for each review questionnaire,
-      #to ensure the proper round responses are retrieved.
-      # if
-      #   @round = @round -1
-      # end
 
       @vmlist << vm
 

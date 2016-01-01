@@ -443,7 +443,7 @@ class ReviewMappingController < ApplicationController
     end
     #Exception detection: If instructor want to assign too many reviews done by each student, there will be an error msg.
     if student_review_num >= teams.size
-      flash[:error] = 'You cannot set the number of reviews done by each student to be greater than or equal to total number of teams [or “participants” if it is an individual assignment].'
+      flash[:error] = 'You cannot set the number of reviews done by each student to be greater than or equal to total number of teams [or "participants" if it is an individual assignment].'
     end
 
     iterator = 0

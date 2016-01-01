@@ -4,10 +4,10 @@
 class VmQuestionResponse
 
   def initialize(questionnaire, round,rounds)
-    @listofrows = []
-    @listofreviewers = []
-    @listofreviews = []
-    @listofteamparticipants = []
+    @list_of_rows = []
+    @list_of_reviewers = []
+    @list_of_reviews = []
+    @list_of_team_participants = []
     @max_score = questionnaire.max_question_score
     @questionnaire_type = questionnaire.type
     @questionnaire_display_type = questionnaire.display_type
@@ -20,7 +20,7 @@ class VmQuestionResponse
     @name
   end
 
-  def addQuestions(questions)
+  def add_questions(questions)
     questions.each do |question|
       # Get the maximum score for this question. For some unknown, godforsaken reason, the max
       # score for the question is stored not on the question, but on the questionnaire. Neat.
@@ -29,12 +29,12 @@ class VmQuestionResponse
       #if this question is a header (table header, section header, column header), ignore this question
       if !question.is_a?QuestionnaireHeader
         row = VmQuestionResponseRow.new(question.txt, question.id, question.weight, question_max_score,question.seq)
-        @listofrows << row
+        @list_of_rows << row
       end
     end
   end
 
-  def addReviews(participant,team,vary)
+  def add_reviews(participant,team,vary)
 
     if @questionnaire_type == "ReviewQuestionnaire"
       if vary
@@ -46,17 +46,17 @@ class VmQuestionResponse
         review_mapping = ReviewResponseMap.find(review.map_id)
         if review_mapping.present?
           participant = Participant.find(review_mapping.reviewer_id)
-          @listofreviewers << participant
+          @list_of_reviewers << participant
         end
       end
-      @listofreviews = reviews
+      @list_of_reviews = reviews
     elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"
       reviews = participant.feedback()     #feedback reviews
       reviews.each do |review|
         review_mapping = FeedbackResponseMap.where(id: review.map_id).first
         participant = Participant.find(review_mapping.reviewer_id)
-        @listofreviewers << participant
-        @listofreviews << review
+        @list_of_reviewers << participant
+        @list_of_reviews << review
       end
     elsif @questionnaire_type == "TeammateReviewQuestionnaire"
       reviews = participant.teammate_reviews()
@@ -73,25 +73,25 @@ class VmQuestionResponse
       reviews.each do |review|
         review_mapping = MetareviewResponseMap.where(id: review.map_id).first
         participant = Participant.find(review_mapping.reviewer_id)
-        @listofreviewers << participant
-        @listofreviews << review
+        @list_of_reviewers << participant
+        @list_of_reviews << review
       end
     end
 
     reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
-        addAnswer(answer)
+        add_answer(answer)
       end
     end
 
   end
 
-  def displayTeamMembers
+  def display_team_members
     @output = ""
     if @questionnaire_type == "MetareviewQuestionnaire"  ||      @questionnaire_type == "ReviewQuestionnaire"
       @output = "Team members:"
-      @listofteamparticipants.each do |participant|
+      @list_of_team_participants.each do |participant|
         @output = @output  +  " (" + participant.fullname + ") "
       end
 
@@ -101,12 +101,12 @@ class VmQuestionResponse
 
   end
 
-  def addTeamMembers(team)
-    @listofteamparticipants = team.participants
+  def add_team_members(team)
+    @list_of_team_participants = team.participants
   end
 
   def listofteamparticipants
-    @listofteamparticipants
+    @list_of_team_participants
   end
 
   def max_score
@@ -114,11 +114,11 @@ class VmQuestionResponse
   end
 
   def max_score_for_questionnaire
-    @max_score * @listofrows.length
+    @max_score * @list_of_rows.length
   end
 
   def max_score_for_questionnaire
-    @max_score * @listofrows.length
+    @max_score * @list_of_rows.length
   end
 
   def rounds
@@ -138,21 +138,21 @@ class VmQuestionResponse
   end
 
   def listofreviews
-    @listofreviews
+    @list_of_reviews
   end
   def listofrows
-    @listofrows
+    @list_of_rows
 
   end
 
   def listofreviewers
-    @listofreviewers
+    @list_of_reviewers
   end
 
-  def addAnswer(answer)
+  def add_answer(answer)
     # We want to add each response score from this review (answer) to its corresponding
     # question row.
-    @listofrows.each do |row|
+    @list_of_rows.each do |row|
       if row.question_id == answer.question_id
         # Go ahead and calculate what the color code for this score should be.
         question_max_score = row.question_max_score
@@ -180,11 +180,11 @@ class VmQuestionResponse
 
     first_time = true
 
-    @listofreviews.each do |review|
+    @list_of_reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)
       questionnaire = review.questionnaire_by_answer(answers.first)
       answers.each do |answer|
-        @listofrows.each do |row|
+        @list_of_rows.each do |row|
           if row.question_id == answer.question_id && answer.comments.to_s.length >10
             row.countofcomments =  row.countofcomments + 1
           end

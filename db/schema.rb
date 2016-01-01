@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160101214659) do
+ActiveRecord::Schema.define(version: 20160101221400) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -390,25 +390,6 @@ ActiveRecord::Schema.define(version: 20160101214659) do
   end
 
   add_index "resubmission_times", ["participant_id"], name: "fk_resubmission_times_participants", using: :btree
-
-  create_table "review_comments", force: :cascade do |t|
-    t.integer  "review_file_id",          limit: 4
-    t.text     "comment_content",         limit: 65535
-    t.integer  "reviewer_participant_id", limit: 4
-    t.integer  "file_offset",             limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "initial_line_number",     limit: 4
-    t.integer  "last_line_number",        limit: 4
-  end
-
-  create_table "review_files", force: :cascade do |t|
-    t.string   "filepath",              limit: 255
-    t.integer  "author_participant_id", limit: 4
-    t.integer  "version_number",        limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
 
   create_table "roles", force: :cascade do |t|
     t.string   "name",            limit: 255,   default: "", null: false

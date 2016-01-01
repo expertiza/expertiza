@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160101211437) do
+ActiveRecord::Schema.define(version: 20160101214659) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -568,10 +568,6 @@ ActiveRecord::Schema.define(version: 20160101211437) do
 
   add_index "ta_mappings", ["course_id"], name: "fk_ta_mappings_course_id", using: :btree
   add_index "ta_mappings", ["ta_id"], name: "fk_ta_mappings_ta_id", using: :btree
-
-  create_table "tags", force: :cascade do |t|
-    t.string "tagname", limit: 255, null: false
-  end
 
   create_table "teams", force: :cascade do |t|
     t.string  "name",                       limit: 255

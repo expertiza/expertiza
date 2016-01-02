@@ -16,8 +16,6 @@ Expertiza::Application.routes.draw do
       get :list_super_administrators
       get :list_administrators
       get :list_instructors
-      get :new_administrator
-      get :new_instructor
       post :create_instructor
       get :remove_instructor
       post :remove_instructor

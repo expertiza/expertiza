@@ -1,5 +1,4 @@
-require_relative '../rails_helper'
-require 'yaml'
+require 'rails_helper'
 
 describe "peer review testing", :type => :feature do
 

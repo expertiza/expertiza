@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "validations" do
+xdescribe "validations" do
   it "assignment should exist" do
     expect(FactoryGirl.create(:assignment)).to be_valid
   end
@@ -19,7 +19,7 @@ describe "validations" do
 
 end
 
-describe "#team_assignment" do
+xdescribe "#team_assignment" do
   it "checks team assignment should be true" do
     assign = FactoryGirl.create(:assignment)
     res = assign.team_assignment
@@ -27,7 +27,7 @@ describe "#team_assignment" do
   end
 end
 
-describe "#has_teams?" do
+xdescribe "#has_teams?" do
   it "checks assignment should have a team" do
     assign = FactoryGirl.build(:assignment)
     assign_team = FactoryGirl.create(:assignmentTeam)
@@ -38,7 +38,7 @@ describe "#has_teams?" do
   end
 end
 
-describe "#has_topics?" do
+xdescribe "#has_topics?" do
   it "checks assignment should have a topic" do
     assign_signed_up_topic = FactoryGirl.create(:signed_up_topic)
     assign_topic = FactoryGirl.build(:assignment)
@@ -49,7 +49,7 @@ describe "#has_topics?" do
   end
 end
 
-describe "#is_google_doc" do
+xdescribe "#is_google_doc" do
   it "checks whether assignment is a google doc" do
     skip('#is_google_doc no longer exists in assignment.rb file.')
     assign = FactoryGirl.create(:assignment)
@@ -58,7 +58,7 @@ describe "#is_google_doc" do
   end
 end
 
-describe "#is_microtask?" do
+xdescribe "#is_microtask?" do
   it "checks whether assignment is a micro task" do
     assign = FactoryGirl.create(:assignment)
     id = assign.is_microtask?
@@ -66,7 +66,7 @@ describe "#is_microtask?" do
   end
 end
 
-describe "#dynamic_reviewer_assignment?" do
+xdescribe "#dynamic_reviewer_assignment?" do
   it "checks the Review Strategy Assignment" do
     assign = FactoryGirl.create(:assignment)
     id = assign.dynamic_reviewer_assignment?
@@ -74,13 +74,13 @@ describe "#dynamic_reviewer_assignment?" do
   end
 end
 
-describe "#is_coding_assignment?" do
+xdescribe "#is_coding_assignment?" do
   it "checks assignment should be coding assignment" do
     expect(FactoryGirl.create(:assignment)).to be_valid
    end
 end
 
-describe "#candidate_assignment_teams_to_review" do
+xdescribe "#candidate_assignment_teams_to_review" do
   it "returns nil if if there are no contributors" do
     assign = FactoryGirl.create(:assignment)
     reviewer = FactoryGirl.create(:user)
@@ -90,7 +90,7 @@ describe "#candidate_assignment_teams_to_review" do
 
 end
 
-describe "#candidate_topics_for_quiz" do
+xdescribe "#candidate_topics_for_quiz" do
   it "returns nil if sign up topic is empty" do
     assign = FactoryGirl.create(:assignment)
     cand_team = assign.candidate_topics_for_quiz

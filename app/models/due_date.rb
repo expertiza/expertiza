@@ -5,9 +5,9 @@ class DueDate < ActiveRecord::Base
 #  has_paper_trail
 
   @@permission_id = Hash.new
-  @@permission_id['OK'] = DeadlineRight.find_by_name('OK').id
-  @@permission_id['No'] = DeadlineRight.find_by_name('No').id
-  @@permission_id['Late'] = DeadlineRight.find_by_name('Late').id
+  @@permission_id['OK'] = DeadlineRight.exists?(:name => 'OK') ? DeadlineRight.find_by_name('OK').id : 3
+  @@permission_id['No'] = DeadlineRight.exists?(:name => 'No') ? DeadlineRight.find_by_name('OK').id : 1
+   @@permission_id['Late'] = DeadlineRight.exists?(:name => 'Late') ? DeadlineRight.find_by_name('OK').id : 2
 
 
   def self.default_permission(deadline_type, permission_type)

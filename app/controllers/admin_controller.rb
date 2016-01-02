@@ -8,18 +8,6 @@ class AdminController < ApplicationController
     end
   end
 
-  def new_instructor
-    @user = User.find_or_create_by_name(params[:name])
-
-    # these values need to be true by default so new users receive e-mail on these events unless they opt not to
-    if @user.new_record?
-      @user.email_on_review = true
-      @user.email_on_submission = true
-      @user.email_on_review_of_review = true
-      @user.role = Role.instructor
-    end
-  end
-
   def list_instructors
     @users = User.instructors.order(:name).where("parent_id = ?", current_user.id).paginate(:page => params[:page], :per_page => 50)
   end
@@ -27,10 +15,6 @@ class AdminController < ApplicationController
   def add_administrator
     @user = User.new
     redirect_to 'users#new'
-  end
-
-  def new_administrator
-    add_administrator
   end
 
   def save_administrator # saves newly created administrator to database

@@ -1,0 +1,28 @@
+<%= form_for @questionnaire do %>
+    <table>
+      <tr>
+        <td valign="top"><label for="questionnaire_name">Name:</label>
+          <%= text_field 'questionnaire', 'name'  %>
+          <%= hidden_field 'questionnaire', 'id' %>
+          <%= hidden_field 'questionnaire', 'type' %>
+        </td>
+      </tr>
+    </table>
+    <br/>
+    <table>
+       <tr>
+         <td>Min question score:</td>
+         <td><%= text_field 'questionnaire', 'min_question_score', :size=> 1, :value=>@questionnaire.min_question_score ||= 0 %>&nbsp;&nbsp;</td>
+         <td>Max question score:</td>
+         <td><%= text_field 'questionnaire', 'max_question_score', :size=> 1, :value=>@questionnaire.max_question_score ||= 5 %>&nbsp;&nbsp;</td>
+         <td>Is this <%= @questionnaire.display_type %> private:</td>
+         <td><%= select(:questionnaire, :private, [ ['no', false],['yes',  true]])%>
+         </td>
+       </tr>
+    </table>
+    <% if params[:action] == 'new' %>
+      <%= submit_tag 'Create' %>
+    <% else %>
+      <%= submit_tag 'Update'%>
+    <% end %>
+<% end %>

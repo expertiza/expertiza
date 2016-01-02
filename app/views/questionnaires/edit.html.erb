@@ -11,7 +11,7 @@
   <br/>
   <%= link_to 'Back', :controller => 'submitted_content', :action => 'edit', :id => params[:pid] %>
 <% else %>
-  <%= render :partial => 'questionnaire' %>
+  <%= render :partial => 'questionnaire', :locals => {:add_action => '/questionnaires/add_new_questions', :save_action => '/questionnaires/save_all_questions', :obj_type => "id", :obj_id => @questionnaire.id}%>
   <br />
   <%= render :partial => '/shared_scripts/back' %>
 <% end %>

@@ -138,17 +138,21 @@ class CourseController < ApplicationController
   def add_ta
     @course = Course.find(params[:course_id])
     @user = User.find_by_name(params[:user][:name])
-    if(@user==nil)
-      redirect_to :action => 'view_teaching_assistants', :id => @course.id
-    else
-      @ta_mapping = TaMapping.create(:ta_id => @user.id, :course_id => @course.id)
-      @user.role=Role.find_by_name 'Teaching Assistant'
-      @user.save
-
-      redirect_to :action => 'view_teaching_assistants', :id => @course.id
-
-      @course = @ta_mapping
-      undo_link("TA \"#{@user.name}\" has been added successfully. ")
+    respond_to do |format|
+      if(@user==nil)
+        format.html {redirect_to :action => 'view_teaching_assistants', :id => @course.id}
+        format.js
+      else
+        @ta_mapping = TaMapping.create(:ta_id => @user.id, :course_id => @course.id)
+        @user.role=Role.find_by_name 'Teaching Assistant'
+        @user.save
+        
+        format.html {redirect_to :action => 'view_teaching_assistants', :id => @course.id}
+        format.js
+        @course = @ta_mapping
+        
+        undo_link("TA \"#{@user.name}\" has been added successfully. ")
+      end
     end
   end
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151229181732) do
+ActiveRecord::Schema.define(version: 20160101221400) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -69,7 +69,6 @@ ActiveRecord::Schema.define(version: 20151229181732) do
     t.boolean  "calculate_penalty",          limit: 1,     default: false, null: false
     t.integer  "late_policy_id",             limit: 4
     t.boolean  "is_penalty_calculated",      limit: 1,     default: false, null: false
-    t.integer  "max_bids",                   limit: 4
     t.boolean  "show_teammate_reviews",      limit: 1
     t.boolean  "availability_flag",          limit: 1,     default: true
     t.boolean  "use_bookmark",               limit: 1
@@ -292,16 +291,6 @@ ActiveRecord::Schema.define(version: 20151229181732) do
     t.string  "type",           limit: 255
   end
 
-  create_table "participant_team_roles", force: :cascade do |t|
-    t.integer  "role_assignment_id", limit: 4
-    t.integer  "participant_id",     limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "participant_team_roles", ["participant_id"], name: "fk_participant_id", using: :btree
-  add_index "participant_team_roles", ["role_assignment_id"], name: "fk_role_assignment_id", using: :btree
-
   create_table "participants", force: :cascade do |t|
     t.boolean  "can_submit",          limit: 1,     default: true
     t.boolean  "can_review",          limit: 1,     default: true
@@ -401,25 +390,6 @@ ActiveRecord::Schema.define(version: 20151229181732) do
   end
 
   add_index "resubmission_times", ["participant_id"], name: "fk_resubmission_times_participants", using: :btree
-
-  create_table "review_comments", force: :cascade do |t|
-    t.integer  "review_file_id",          limit: 4
-    t.text     "comment_content",         limit: 65535
-    t.integer  "reviewer_participant_id", limit: 4
-    t.integer  "file_offset",             limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "initial_line_number",     limit: 4
-    t.integer  "last_line_number",        limit: 4
-  end
-
-  create_table "review_files", force: :cascade do |t|
-    t.string   "filepath",              limit: 255
-    t.integer  "author_participant_id", limit: 4
-    t.integer  "version_number",        limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
 
   create_table "roles", force: :cascade do |t|
     t.string   "name",            limit: 255,   default: "", null: false
@@ -580,49 +550,6 @@ ActiveRecord::Schema.define(version: 20151229181732) do
   add_index "ta_mappings", ["course_id"], name: "fk_ta_mappings_course_id", using: :btree
   add_index "ta_mappings", ["ta_id"], name: "fk_ta_mappings_ta_id", using: :btree
 
-  create_table "tags", force: :cascade do |t|
-    t.string "tagname", limit: 255, null: false
-  end
-
-  create_table "team_role_questionnaire", force: :cascade do |t|
-    t.integer  "team_roles_id",    limit: 4
-    t.integer  "questionnaire_id", limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "team_role_questionnaire", ["questionnaire_id"], name: "fk_questionnaire_id", using: :btree
-  add_index "team_role_questionnaire", ["team_roles_id"], name: "fk_team_roles_id", using: :btree
-
-  create_table "team_roles", force: :cascade do |t|
-    t.string  "role_names",       limit: 255
-    t.integer "questionnaire_id", limit: 4
-  end
-
-  add_index "team_roles", ["questionnaire_id"], name: "fk_team_roles_questionnaire", using: :btree
-
-  create_table "team_rolesets", force: :cascade do |t|
-    t.string "roleset_name", limit: 255
-  end
-
-  create_table "team_rolesets_maps", force: :cascade do |t|
-    t.integer  "team_rolesets_id", limit: 4
-    t.integer  "team_role_id",     limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "team_rolesets_maps", ["team_role_id"], name: "fk_team_role_id", using: :btree
-  add_index "team_rolesets_maps", ["team_rolesets_id"], name: "fk_team_rolesets_id", using: :btree
-
-  create_table "teamrole_assignment", force: :cascade do |t|
-    t.integer "team_roleset_id", limit: 4
-    t.integer "assignment_id",   limit: 4
-  end
-
-  add_index "teamrole_assignment", ["assignment_id"], name: "fk_teamrole_assignment_assignments", using: :btree
-  add_index "teamrole_assignment", ["team_roleset_id"], name: "fk_teamrole_assignment_team_rolesets", using: :btree
-
   create_table "teams", force: :cascade do |t|
     t.string  "name",                       limit: 255
     t.integer "parent_id",                  limit: 4
@@ -731,8 +658,6 @@ ActiveRecord::Schema.define(version: 20151229181732) do
   add_foreign_key "invitations", "users", column: "from_id", name: "fk_invitationfrom_users"
   add_foreign_key "invitations", "users", column: "to_id", name: "fk_invitationto_users"
   add_foreign_key "late_policies", "users", column: "instructor_id", name: "fk_instructor_id"
-  add_foreign_key "participant_team_roles", "participants", name: "fk_participant_id"
-  add_foreign_key "participant_team_roles", "teamrole_assignment", column: "role_assignment_id", name: "fk_role_assignment_id"
   add_foreign_key "participants", "users", name: "fk_participant_users"
   add_foreign_key "question_advices", "questions", name: "fk_question_question_advices"
   add_foreign_key "questions", "questionnaires", name: "fk_question_questionnaires"
@@ -741,13 +666,6 @@ ActiveRecord::Schema.define(version: 20151229181732) do
   add_foreign_key "signed_up_teams", "sign_up_topics", column: "topic_id", name: "fk_signed_up_users_sign_up_topics"
   add_foreign_key "ta_mappings", "courses", name: "fk_ta_mappings_course_id"
   add_foreign_key "ta_mappings", "users", column: "ta_id", name: "fk_ta_mappings_ta_id"
-  add_foreign_key "team_role_questionnaire", "questionnaires", name: "fk_questionnaire_id"
-  add_foreign_key "team_role_questionnaire", "team_roles", column: "team_roles_id", name: "fk_team_roles_id"
-  add_foreign_key "team_roles", "questionnaires", name: "fk_team_roles_questionnaire"
-  add_foreign_key "team_rolesets_maps", "team_roles", name: "fk_team_role_id"
-  add_foreign_key "team_rolesets_maps", "team_rolesets", column: "team_rolesets_id", name: "fk_team_rolesets_id"
-  add_foreign_key "teamrole_assignment", "assignments", name: "fk_teamrole_assignment_assignments"
-  add_foreign_key "teamrole_assignment", "team_rolesets", name: "fk_teamrole_assignment_team_rolesets"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
   add_foreign_key "topic_deadlines", "deadline_types", name: "fk_topic_deadlines_deadline_type"

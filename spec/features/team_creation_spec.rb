@@ -21,19 +21,10 @@ describe "Team Creation" do
     FactoryGirl.create(:deadline_type,name:"team_formation")
   end
 
-  def stub_current_user(current_user, current_role_name='Student', current_role)
-    allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(current_user)
-    allow_any_instance_of(ApplicationController).to receive(:current_role_name).and_return(current_role_name)
-    allow_any_instance_of(ApplicationController).to receive(:current_role).and_return(current_role)
-  end
-
   describe 'one student who signup for a topic should send an inviatation to the other student who has no topic' do
        
      before(:each) do
-       student=User.find_by_name("student2064")  
-       role=student.role
-       stub_current_user(student, 'Student', role)
-
+       login_as("student2064")
        visit '/student_task/list'
        #Assignment name
        expect(page).to have_content('final2')
@@ -58,10 +49,7 @@ Hello world! ')
        click_button 'Invite'
        expect(page).to have_content('student2065') 
 
-       student=User.find_by_name("student2065")  
-       role=student.role
-       stub_current_user(student, 'Student', role)
-            
+       login_as("student2065")      
        visit '/student_task/list'
        expect(page).to have_content('final2')
      
@@ -84,10 +72,7 @@ Hello world! ')
   describe 'one student who has a topic sends an invitation to other student who also has a topic' do
     
     before(:each) do
-     student=User.find_by_name("student2064")  
-     role=student.role
-     stub_current_user(student, 'Student', role)
-          
+     login_as("student2064")  
      visit '/student_task/list'
      expect(page).to have_content('final2')
      
@@ -100,10 +85,7 @@ Hello world! ')
      visit '/sign_up_sheet/sign_up?assignment_id=1&id=1'
      #expect(page).to have_content('Your topic(s)')
      #signup for topic for user1 finish
-     student=User.find_by_name("student2065")  
-     role=student.role
-     stub_current_user(student, 'Student', role)
-          
+     login_as("student2065")      
      visit '/student_task/list'
      expect(page).to have_content('final2')
      
@@ -116,10 +98,7 @@ Hello world! ')
      visit '/sign_up_sheet/sign_up?assignment_id=1&id=2'
      #expect(page).to have_content('Your topic(s)')
      #signup for topic for user2 finish
-     student=User.find_by_name("student2064")  
-     role=student.role
-     stub_current_user(student, 'Student', role)
-     
+     login_as("student2064")  
      visit '/student_task/list'
      expect(page).to have_content('final2')
      
@@ -133,10 +112,7 @@ Hello world! ')
      click_button 'Invite'
      expect(page).to have_content('Waiting for reply')
      
-     student=User.find_by_name("student2065")  
-     role=student.role
-     stub_current_user(student, 'Student', role)
-             
+     login_as("student2065")         
      visit '/student_task/list'
      click_link 'final2'
      click_link 'Your team'
@@ -156,10 +132,7 @@ Hello world! ')
   describe 'one student should send an invitation to other student and both does not have topics' do
 
     before(:each) do
-      student=User.find_by_name("student2066")  
-      role=student.role
-      stub_current_user(student, 'Student', role)
-            
+      login_as("student2066")  
       visit '/student_task/list'
       expect(page).to have_content('final2')
 
@@ -172,10 +145,7 @@ Hello world! ')
       visit '/sign_up_sheet/sign_up?assignment_id=1&id=1'
       expect(page).to have_content('Your topic(s)')
          
-      student=User.find_by_name("student2064")  
-      role=student.role
-      stub_current_user(student, 'Student', role)
-            
+      login_as("student2064")  
       visit '/student_task/list'
       expect(page).to have_content('final2')
       
@@ -193,10 +163,7 @@ Hello world! ')
       click_button 'Invite'
       expect(page).to have_content('Waiting for reply')
 
-      student=User.find_by_name("student2065")  
-      role=student.role
-      stub_current_user(student, 'Student', role)
-            
+      login_as("student2065")  
       visit '/student_task/list'
       expect(page).to have_content('final2')
       
@@ -218,10 +185,7 @@ Hello world! ')
   describe 'one student should send an invitation to other student who has a topic signed up for' do
 
     before(:each) do
-     student=User.find_by_name("student2065")  
-     role=student.role
-     stub_current_user(student, 'Student', role)
-     
+     login_as("student2065")  
      visit '/student_task/list'  
      expect(page).to have_content('final2')
 
@@ -235,10 +199,7 @@ Hello world! ')
      expect(page).to have_content('Your topic(s)')
      
      #choose a topic for student5710
-     student=User.find_by_name("student2064")  
-     role=student.role
-     stub_current_user(student, 'Student', role)
-     
+     login_as("student2064")  
      visit '/student_task/list'  
      expect(page).to have_content('final2')
 
@@ -254,10 +215,7 @@ Hello world! ')
      click_button 'Invite'
      expect(page).to have_content('Waiting for reply')
 
-     student=User.find_by_name("student2065")  
-     role=student.role
-     stub_current_user(student, 'Student', role)
-     
+     login_as("student2065")  
      visit '/student_task/list'
      expect(page).to have_content('final2')
      click_link 'final2'

@@ -38,7 +38,31 @@ FactoryGirl.define do
     public_key nil
     copy_of_emails  false
   end
-     
+  
+  factory :instructor, class: User do
+    name 'instructor6'
+    crypted_password "e83023eae8ec13ce0ed71efce1a3c4bbe23fc21c" 
+    role { Role.first || association(:role)}
+    password_salt  "XwDiWxpNugmGzpCNib" 
+    fullname "6, instructor"
+    email "expertiza@mailinator.com"
+    parent_id  6
+    private_by_default  false 
+    mru_directory_path  nil
+    email_on_review  true
+    email_on_submission  true 
+    email_on_review_of_review  true
+    is_new_user false
+    master_permission_granted 0 
+    handle "handle"
+    leaderboard_privacy false 
+    digital_certificate  nil 
+    persistence_token  "31a60e1c3ae74ed6000750006e3347e8a7e092ff1dd38d0036..." 
+    timezonepref nil
+    public_key nil
+    copy_of_emails  false
+  end
+
   factory :course ,class:Course do
     name "CSC517, test"
     instructor_id nil

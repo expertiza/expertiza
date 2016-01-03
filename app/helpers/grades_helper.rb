@@ -20,7 +20,7 @@ module GradesHelper
     if params[:action] == "view"
       @assignment = Assignment.find(params[:id])
       @assignment_id = @assignment.id
-    elsif params[:action] == "view_my_scores" or 'view_review'
+    elsif params[:action] == "view_my_scores" or params[:action] == 'view_review'
       @assignment_id = Participant.find(params[:id]).parent_id
     end
     has_team = @assignment.max_team_size > 1

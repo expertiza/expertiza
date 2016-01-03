@@ -2,7 +2,6 @@
  FactoryGirl.define do
     sequence (:name) do |n| 
       n=n%3
-    
       "student206#{n+4}"
     end
   end
@@ -133,14 +132,15 @@ FactoryGirl.define do
   end
 
   factory :deadline_type ,class:DeadlineType do
+    #name can be overridden in RSpec test.
     name  "drop_topic"
   end     
 
-  factory :deadlineright ,class:DeadlineType do
+  factory :deadline_right ,class:DeadlineType do
     name  "No"
   end  
 
-  factory :assignmentnode ,class:AssignmentNode do
+  factory :assignment_node ,class:AssignmentNode do
     parent_id 1
     node_object_id 1
     type "AssignmentNode"

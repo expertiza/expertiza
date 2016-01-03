@@ -55,4 +55,16 @@ RSpec.configure do |config|
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
   config.infer_spec_type_from_file_location!
+
+  def login_as(user_name)
+    user = User.find_by_name(user_name)  
+    role = user.role
+    stub_current_user(user, role.name, role)
+  end
+
+  def stub_current_user(current_user, current_role_name='Student', current_role)
+    allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(current_user)
+    allow_any_instance_of(ApplicationController).to receive(:current_role_name).and_return(current_role_name)
+    allow_any_instance_of(ApplicationController).to receive(:current_role).and_return(current_role)
+  end
 end

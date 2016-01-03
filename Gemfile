@@ -63,13 +63,12 @@ group :development do
   gem 'pry-remote'
   gem 'pry-nav'
   gem 'sqlite3-ruby'
-  #gem 'selenium-webdriver'
+  gem 'selenium-webdriver'
   gem 'quiet_assets'
   gem "factory_girl_rails", "~> 4.0"
 end
 
 group :test do
-  gem "factory_girl_rails", "~> 4.0" , :require => false
   gem 'database_cleaner'
   gem 'gherkin'
   gem 'guard-rails'
@@ -86,6 +85,5 @@ end
 
 group :development, :test do
   gem 'capybara'
-  gem 'selenium-webdriver'
   gem 'simplecov', :require => false
 end

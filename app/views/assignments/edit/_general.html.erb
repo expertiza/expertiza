@@ -150,10 +150,10 @@ function is_coding_assignmentChanged(){
 
 
   <tr>
-    <td style='padding:5px' id='assignment_is_coding_assignment_field'>
-      <input name="assignment_form[assignment][is_coding_assignment]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][is_coding_assignment]', 'true', @assignment_form.assignment.is_coding_assignment, {:onchange => 'is_coding_assignmentChanged()'}) %>
-      <%= label_tag('assignment_form[assignment][is_coding_assignment]', 'Is code submission required?') %>
+    <td style='padding:5px' id='assignment_is_calibrated_field'>
+      <input name="assignment_form[assignment][is_calibrated]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][is_calibrated]', 'true', @assignment_form.assignment.is_calibrated) %>
+      <%= label_tag('assignment_form[assignment][is_calibrated]', 'Calibrated peer-view for training?') %>
     </td>
 
   </tr>

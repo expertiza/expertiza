@@ -231,12 +231,6 @@ class AssignmentForm
     end
   end
 
-  def is_coding_assignment
-  if @assignment.is_coding_assignment .nil?
-      @assignment.is_coding_assignment  = false
-    end
-  end
-
   def reviews_visible_to_all
   if @assignment.reviews_visible_to_all.nil?
       @assignment.reviews_visible_to_all = false
@@ -256,12 +250,16 @@ class AssignmentForm
     end
   end
 
+  def is_calibrated
+    if @assignment.is_calibrated?
+      @assignment.is_calibrated =  false
+    end
+  end
   #NOTE: unfortunately this method is needed due to bad data in db @_@
   def set_up_defaults
     staggered_deadline
     availability_flag
     micro_task
-    is_coding_assignment
     reviews_visible_to_all
     review_assignment_strategy
     require_quiz

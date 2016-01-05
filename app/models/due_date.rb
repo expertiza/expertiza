@@ -6,8 +6,8 @@ class DueDate < ActiveRecord::Base
 
   @@permission_id = Hash.new
   @@permission_id['OK'] = DeadlineRight.exists?(:name => 'OK') ? DeadlineRight.find_by_name('OK').id : 3
-  @@permission_id['No'] = DeadlineRight.exists?(:name => 'No') ? DeadlineRight.find_by_name('OK').id : 1
-   @@permission_id['Late'] = DeadlineRight.exists?(:name => 'Late') ? DeadlineRight.find_by_name('OK').id : 2
+  @@permission_id['No'] = DeadlineRight.exists?(:name => 'No') ? DeadlineRight.find_by_name('No').id : 1
+   @@permission_id['Late'] = DeadlineRight.exists?(:name => 'Late') ? DeadlineRight.find_by_name('Late').id : 2
 
 
   def self.default_permission(deadline_type, permission_type)

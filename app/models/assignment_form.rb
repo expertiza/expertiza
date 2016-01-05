@@ -231,12 +231,6 @@ class AssignmentForm
     end
   end
 
-  def is_coding_assignment
-  if @assignment.is_coding_assignment .nil?
-      @assignment.is_coding_assignment  = false
-    end
-  end
-
   def reviews_visible_to_all
   if @assignment.reviews_visible_to_all.nil?
       @assignment.reviews_visible_to_all = false

@@ -20,7 +20,7 @@ ActiveRecord::Migration.maintain_test_schema!
 
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
-  config.fixture_path = "#{::Rails.root}/spec/fixtures"
+  # config.fixture_path = "#{::Rails.root}/spec/fixtures"
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false
@@ -57,9 +57,13 @@ RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
 
   def login_as(user_name)
-    user = User.find_by_name(user_name)  
-    role = user.role
-    stub_current_user(user, role.name, role)
+    user = User.find_by_name(user_name)
+
+    visit root_path
+    fill_in 'login_name', with: user_name
+    fill_in 'login_password', with: 'password'
+    click_button 'SIGN IN'
+    stub_current_user(user, user.role.name, user.role)
   end
 
   def stub_current_user(current_user, current_role_name='Student', current_role)

@@ -4,11 +4,11 @@ describe "Team Creation" do
    
   before(:each) do
     create(:assignment)
-    create(:due_date)
     create_list(:participant, 3) 
     create(:assignment_node)
     create(:topic)
     create(:topic, topic_name: 'Great work!')
+    create(:deadline_type,name:"submission")
     create(:deadline_type,name:"review")
     create(:deadline_type,name:"resubmission")
     create(:deadline_type,name:"rereview")
@@ -16,6 +16,10 @@ describe "Team Creation" do
     create(:deadline_type,name:"drop_topic")
     create(:deadline_type,name:"signup")  
     create(:deadline_type,name:"team_formation") 
+    create(:deadline_right)
+    create(:deadline_right, name: 'Late')
+    create(:deadline_right, name: 'OK')
+    create(:due_date)
   end
 
   describe 'one student who signup for a topic should send an inviatation to the other student who has no topic' do

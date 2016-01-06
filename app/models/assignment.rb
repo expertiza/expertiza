@@ -614,11 +614,6 @@ require 'analytic/assignment_analytic'
     (self.microtask.nil?) ? false : self.microtask
   end
 
-  # Check to see if assignment is a microtask
-  def is_coding_assignment?
-    (self.is_coding_assignment?) ? false : self.is_coding_assignment
-  end
-
   #add a new participant to this assignment
   #manual addition
   # user_name - the user account name of the participant to add

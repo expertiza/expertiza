@@ -903,7 +903,7 @@ FactoryGirl.define do
 
   factory :course ,class:Course do
     sequence(:name) { |n| "CSC517, test#{n}" }
-    association :instructor, factory: :instructor 
+    instructor {User.where(role_id: 1).first || association(:instructor)} 
     directory_path "csc517/test"
     info "Object-Oriented Languages and Systems"
     private true
@@ -928,7 +928,7 @@ FactoryGirl.define do
     allow_suggestions false
     days_between_submissions nil
     review_assignment_strategy "Auto-Selected"
-    max_reviews_per_submission nil
+    max_reviews_per_submission 2
     review_topic_threshold 0
     copy_flag false
     rounds_of_reviews 1
@@ -947,6 +947,22 @@ FactoryGirl.define do
     can_choose_topic_to_review true
   end
 
+  factory :assignment_team, class:AssignmentTeam do
+    sequence(:name){|n| "team#{n}"}
+    assignment { Assignment.first || association(:assignment)} 
+    type 'AssignmentTeam'                     
+    comments_for_advertisement nil
+    advertise_for_partner nil
+    submitted_hyperlinks "---
+- https://www.expertiza.ncsu.edu" 
+    directory_num 0
+  end
+
+  factory :team_user, class:TeamsUser do
+    team {AssignmentTeam.first || association(:assignment_team)}
+    user {User.where(role_id: 2).first || association(:student)} 
+  end
+
   factory :topic, class:SignUpTopic do
     topic_name "Hello world!"
     assignment { Assignment.first || association(:assignment)} 
@@ -956,6 +972,13 @@ FactoryGirl.define do
     micropayment 0 
     private_to nil
   end   
+
+  factory :signed_up_team, class:SignedUpTeam do
+    topic {SignUpTopic.first || association(:topic)}                  
+    team_id 1       
+    is_waitlisted 0            
+    preference_priority_number nil
+  end
 
   factory :participant, class:Participant do
     can_submit true
@@ -978,19 +1001,19 @@ FactoryGirl.define do
     due_at  "2015-12-30 23:30:12"
     deadline_type { DeadlineType.first || association(:deadline_type)} 
     assignment { Assignment.first || association(:assignment)} 
-    submission_allowed_id nil
-    review_allowed_id  nil
-    resubmission_allowed_id  nil
-    rereview_allowed_id  nil
-    review_of_review_allowed_id  nil
+    submission_allowed_id 3
+    review_allowed_id  3
+    resubmission_allowed_id  3
+    rereview_allowed_id  3
+    review_of_review_allowed_id  3
     round  1
     flag  false
     threshold  1
     delayed_job_id  nil
     deadline_name  nil
     description_url nil
-    quiz_allowed_id nil
-    teammate_review_allowed_id nil
+    quiz_allowed_id 3
+    teammate_review_allowed_id 3
   end
 
   factory :deadline_type ,class:DeadlineType do
@@ -1007,9 +1030,9 @@ FactoryGirl.define do
     type "AssignmentNode"
   end  
 
-  factory :questionnaire, class:Questionnaire do
+  factory :questionnaire, class:ReviewQuestionnaire do
     name 'Test questionaire'
-    association :instructor, factory: :instructor 
+    instructor {User.where(role_id: 1).first || association(:instructor)} 
     private 0
     min_question_score 0
     max_question_score 5
@@ -1021,11 +1044,11 @@ FactoryGirl.define do
   factory :question, class:Question do
     txt 'Test question:'
     weight 1
-    association :questionnaire, factory: :questionnaire 
+    questionnaire {ReviewQuestionnaire.first || association(:questionnaire)} 
     seq 1.00
     type 'Criterion'
-    size nil
-    alternative nil
+    size "70,1"
+    alternatives nil
     break_before 1
     max_label nil
     min_label nil
@@ -1033,10 +1056,25 @@ FactoryGirl.define do
 
   factory :assignment_questionnaire, class:AssignmentQuestionnaire do
     assignment { Assignment.first || association(:assignment)} 
-    association :questionnaire, factory: :questionnaire 
-    association :instructor, factory: :instructor 
+    questionnaire {ReviewQuestionnaire.first || association(:questionnaire)} 
+    user_id 1 
     questionnaire_weight 100
-    used_in_round 1
+    used_in_round nil
     dropdown 1
+  end
+
+  factory :review_response_map, class:ReviewResponseMap do
+    assignment { Assignment.first || association(:assignment)}
+    reviewee {AssignmentTeam.first || association(:assignment_team)}
+    reviewer_id 1       
+    type 'ReviewResponseMap'
+  end
+
+  factory :response, class:Response do
+    review_response_map { ReviewResponseMap.first || association(:review_response_map)}
+    additional_comment nil
+    version_num nil
+    round nil
+    isSubmitted 'No'
   end
 end

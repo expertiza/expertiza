@@ -6,6 +6,7 @@ describe "Integration tests for instructor interface" do
     create(:assignment)
     create_list(:participant, 3) 
     create(:assignment_node)
+    create(:deadline_type,name:"submission")
     create(:deadline_type,name:"review")
     create(:deadline_type,name:"resubmission")
     create(:deadline_type,name:"rereview")
@@ -15,7 +16,7 @@ describe "Integration tests for instructor interface" do
     create(:deadline_type,name:"team_formation")
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
-    create(:deadline_right, name: 'Ok')
+    create(:deadline_right, name: 'OK')
     create(:due_date)
     create(:due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now + (100*24*60*60))
   end

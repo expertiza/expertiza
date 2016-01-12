@@ -9,6 +9,9 @@
         <li><a href="#tabs-3" id="Rubrics">Rubrics</a></li>
         <li><a href="#tabs-4" id="ReviewStrategy">Review strategy</a></li>
         <li><a href="#tabs-5" id="DueDates">Due dates</a></li>
+        <%if @assignment_form.assignment.is_calibrated%>
+            <li><a href="#tabs-6" id="Calibration">Calibration</a></li>
+        <%end%>
       </ul>
       <div id="tabs-1">
         <%= render 'assignments/edit/general' %>
@@ -56,6 +59,9 @@
       </div>
       <div id="tabs-5">
         <%= render 'assignments/edit/due_dates' %>
+      </div>
+      <div id="tabs-6">
+        <%= render 'assignments/edit/calibration' %>
       </div>
       <%= button_tag "Save", :id => 'submit_btn' %> | <%= render :partial => '/shared_scripts/back' %>
     </div>

@@ -69,6 +69,7 @@ ActiveRecord::Schema.define(version: 20160104040452) do
     t.boolean  "calculate_penalty",          limit: 1,     default: false, null: false
     t.integer  "late_policy_id",             limit: 4
     t.boolean  "is_penalty_calculated",      limit: 1,     default: false, null: false
+    t.integer  "max_bids",                   limit: 4
     t.boolean  "show_teammate_reviews",      limit: 1
     t.boolean  "availability_flag",          limit: 1,     default: true
     t.boolean  "use_bookmark",               limit: 1

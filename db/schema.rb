@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160104040452) do
+ActiveRecord::Schema.define(version: 20160113183359) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -364,12 +364,13 @@ ActiveRecord::Schema.define(version: 20160104040452) do
   end
 
   create_table "response_maps", force: :cascade do |t|
-    t.integer  "reviewed_object_id", limit: 4,   default: 0,  null: false
-    t.integer  "reviewer_id",        limit: 4,   default: 0,  null: false
-    t.integer  "reviewee_id",        limit: 4,   default: 0,  null: false
-    t.string   "type",               limit: 255, default: "", null: false
+    t.integer  "reviewed_object_id", limit: 4,   default: 0,     null: false
+    t.integer  "reviewer_id",        limit: 4,   default: 0,     null: false
+    t.integer  "reviewee_id",        limit: 4,   default: 0,     null: false
+    t.string   "type",               limit: 255, default: "",    null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "calibrate_to",       limit: 1,   default: false
   end
 
   add_index "response_maps", ["reviewer_id"], name: "fk_response_map_reviewer", using: :btree

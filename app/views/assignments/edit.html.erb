@@ -60,9 +60,11 @@
       <div id="tabs-5">
         <%= render 'assignments/edit/due_dates' %>
       </div>
-      <div id="tabs-6">
-        <%= render 'assignments/edit/calibration' %>
-      </div>
+      <%if @assignment_form.assignment.is_calibrated%>
+        <div id="tabs-6">
+          <%= render 'assignments/edit/calibration' %>
+        </div>
+      <%end%>
       <%= button_tag "Save", :id => 'submit_btn' %> | <%= render :partial => '/shared_scripts/back' %>
     </div>
     <script>

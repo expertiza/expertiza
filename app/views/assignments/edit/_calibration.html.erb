@@ -7,6 +7,9 @@
           <th width = "38%">
             Participant name
           </th>
+          <th width = "10%">
+            Action
+          </th>
           <th>
             Submitted item(s)
           </th>
@@ -26,8 +29,16 @@
             <%= users_for_curr_team.html_safe %>
           </td>
           <td>
+            <% instructor = Participant.where(parent_id: params[:id], user_id: session[:user].id).first %>
+            <% map = ReviewResponseMap.where(reviewed_object_id: params[:id], reviewer_id: instructor.id, reviewee_id: team.id).first rescue nil %>
+            <% if !map.nil? %>
+              <%= link_to "View", {:controller => 'response', :action => 'view', :id => map.response[0].id} %>
+            <% else %>
+              <%= link_to "Begin", {:controller => 'review_mapping', :action => 'add_calibration', :id => assignment.id, :team_id => team.id} %>
+            <% end %>
+          </td>
+          <td>
             <!--Display submitted hyperlinks-->
-
             <% participant = team.participants.first %>
             <% if !participant.nil? and !participant.hyperlinks_array.empty? %>
                 <%= "Hyperlinks:<br/>".html_safe %>
@@ -46,5 +57,6 @@
             <% end %>
 
           </td>
+        </tr>
     <% end %>
   </table>

@@ -220,14 +220,15 @@ class ResponseController < ApplicationController
   def redirection
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
-
     @map = Response.find_by_map_id(params[:id])
     if params[:return] == "feedback"
       redirect_to :controller => 'grades', :action => 'view_my_scores', :id => @map.reviewer.id
     elsif params[:return] == "teammate"
       redirect_to view_student_teams_path student_id: @map.reviewer.id
     elsif params[:return] == "instructor"
-      redirect_to :controller => 'grades', :action => 'view', :id => @map.assignment.id
+      redirect_to :controller => 'grades', :action => 'view', :id => @map.response_map.assignment.id
+    elsif params[:return] == "assignment_edit"
+      redirect_to controller: 'assignments', action: 'edit', id: @map.response_map.assignment.id
     else
       redirect_to :controller => 'student_review', :action => 'list', :id => @map.reviewer.id
 

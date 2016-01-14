@@ -194,7 +194,7 @@ class SuggestionController < ApplicationController
     @signuptopic.assignment_id = @suggestion.assignment_id
     @signuptopic.max_choosers = 1;
     if @signuptopic.save && @suggestion.update_attribute('status', 'Approved')
-      flash[:notice] = 'Successfully approved the suggestion.'
+      flash[:success] = 'Successfully approved the suggestion.'
     else
       flash[:error] = 'Error when approving the suggestion.'
     end

@@ -23,6 +23,7 @@ class StudentTaskController < ApplicationController
   def view
     StudentTask.from_participant_id params[:id]
     @participant = AssignmentParticipant.find(params[:id])
+    @team = @participant.team
     denied unless current_user_id?(@participant.user_id)
 
     @assignment = @participant.assignment

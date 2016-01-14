@@ -30,9 +30,9 @@
           </td>
           <td>
             <% instructor = Participant.where(parent_id: params[:id], user_id: session[:user].id).first %>
-            <% map = ReviewResponseMap.where(reviewed_object_id: params[:id], reviewer_id: instructor.id, reviewee_id: team.id).first rescue nil %>
-            <% if !map.nil? %>
-              <%= link_to "View", {:controller => 'response', :action => 'view', :id => map.response[0].id} %>
+            <% map = ReviewResponseMap.where(reviewed_object_id: params[:id], reviewer_id: instructor.id, reviewee_id: team.id, calibrate_to: true).first rescue nil %>
+            <% if !map.nil? && !map.response.empty? %>
+              <%= link_to "View", {:controller => 'response', :action => 'view', :id => map.response.last.id} %>
             <% else %>
               <%= link_to "Begin", {:controller => 'review_mapping', :action => 'add_calibration', :id => assignment.id, :team_id => team.id} %>
             <% end %>

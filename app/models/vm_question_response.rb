@@ -137,15 +137,15 @@ class VmQuestionResponse
     @questionnaire_display_type
   end
 
-  def listofreviews
+  def list_of_reviews
     @list_of_reviews
   end
-  def listofrows
+  def list_of_rows
     @list_of_rows
 
   end
 
-  def listofreviewers
+  def list_of_reviewers
     @list_of_reviewers
   end
 

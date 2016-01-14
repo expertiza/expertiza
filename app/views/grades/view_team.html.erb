@@ -78,11 +78,11 @@
               </thead>
 
 
-              <% score_row_count = vm.listofrows.first.score_row.count %>
+              <% score_row_count = vm.list_of_rows.first.score_row.count %>
               <% j = 1 %>
               <!-- here, starts a series of nested loops. loops for the rows, and for the cells of the rows.-->
               <!-- additionally, there are hidden rows (expandable) which are also generated via iteration. -->
-              <% vm.listofrows.each do |row| %>
+              <% vm.list_of_rows.each do |row| %>
 
                   <!-- notice the data-target. because we're toggling via looped code, we need to dynamically generate the identifier. -->
                   <tr data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= row.question_id.to_s + vm.round.to_s %>">
@@ -146,7 +146,7 @@
                         </thead>
                         <tbody>
                         <%k = 1%>
-                        <% vm.listofreviews.each do |review| %>
+                        <% vm.list_of_reviews.each do |review| %>
                             <tr><td ><%= k %></td>
                               <td ><%= Response.find(review.id)["additional_comment"] %></td></tr>
                             <%k += 1%>

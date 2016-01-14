@@ -69,7 +69,7 @@ def remove_hyperlink
   @participant = AssignmentParticipant.find(params[:hyperlinks][:participant_id])
 
   return unless current_user_id?(@participant.user_id)
-  hyperlink_to_delete = @participant.hyperlinks[params['chk_links'].to_i]
+  hyperlink_to_delete = @participant.hyperlinks_array[params['chk_links'].to_i]
 
   team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
   team_participants = Array.new

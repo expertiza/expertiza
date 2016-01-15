@@ -537,7 +537,7 @@ class ReviewMappingController < ApplicationController
     when "ReviewResponseMap"
       if params[:user].nil?
         # This is not a search, so find all reviewers for this assignment
-        @reviewers = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ?", @id, @type])
+        @reviewers = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ? and calibrate_to = ?", @id, @type, 0])
       else
         # This is a search, so find reviewers by user's full name
         user = User.select("DISTINCT id").where(["fullname LIKE ?", '%'+params[:user][:fullname]+'%'])
@@ -562,6 +562,18 @@ class ReviewMappingController < ApplicationController
       #Example query
       #SELECT distinct reviewer_id FROM response_maps where type = 'TeammateReviewResponseMap' and reviewed_object_id = 711
       @reviewers = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ?", @id, 'TeammateReviewResponseMap'])
+    when "Calibration"
+      participant = AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first rescue nil
+      if participant.nil?
+        participant = AssignmentParticipant.create(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
+      end
+      @assignment = Assignment.find(params[:id])
+      @review_questionnaire_ids = Questionnaire.select("id").where(["type = ?", 'ReviewQuestionnaire'])
+      @assignment_questionnaire = AssignmentQuestionnaire.where(["assignment_id = ? and questionnaire_id IN (?)", params[:id], @review_questionnaire_ids]).first
+      @questions = @assignment_questionnaire.questionnaire.questions.select{|q| q.type == 'Criterion' or q.type == 'Scale'}
+      @calibration_response_maps = ReviewResponseMap.where(["reviewed_object_id = ? and reviewer_id = ? and calibrate_to = ?", params[:id], participant.id, 1])
+      @review_response_map_ids = ReviewResponseMap.select('id').where(["reviewed_object_id = ? and calibrate_to = ?", params[:id], 0])
+      @response_ids = Response.select("id").where(["map_id IN (?)", @review_response_map_ids])
     end
   end
 

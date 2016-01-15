@@ -1,0 +1,42 @@
+<% @calibration_response_maps.each_with_index do |response_map, index| %>
+	<% team = Team.find(response_map.reviewee_id) %>
+	<% min_question_score = @assignment_questionnaire.questionnaire.min_question_score %>
+	<% max_question_score = @assignment_questionnaire.questionnaire.max_question_score %>
+	<% participant_num = @response_ids.count %>
+	
+	<h3> <%= "Calibration #{index+1} (team name:  #{team.name})" %></h3>
+	<% @questions.each_with_index do |question, index| %>
+		<% instructor_answer = Answer.select('answer').where(["question_id = ? and response_id = ?", question.id, response_map.response[0].id]).first.answer ||= 0 %>
+		<b><%= "Question#{index+1}: " %></b><%= question.txt %>
+		<table border="1">
+			<tr>
+				<th width = "20%"> Assigned Score </th>
+				<% (min_question_score..max_question_score).each do |answer| %>
+					<th width = <%= (80.0 / (max_question_score - min_question_score + 1)).to_s + '%'%>><%= answer %></th>
+				<% end %>
+			</tr>
+			<tr>
+				<td> % of students </td>
+				<% (min_question_score..max_question_score).each do |answer| %>
+					<% count = Answer.where(["question_id = ? and response_id IN (?) and answer = ?", question.id, @response_ids, answer]).size %>
+					<% answer = 0 if answer.nil? %>
+					<% case (answer - instructor_answer).abs %>
+					<% when 0 %>
+						<% cell_color = '#28cf30' %>
+					<% when 1 %>
+						<% cell_color = '#6ced72' %>
+					<% when 2 %>
+						<% cell_color = '#abf5ae' %>
+					<% when 3 %>
+						<% cell_color = '#c0f7c2' %>
+					<% when 4 %>
+						<% cell_color = '#eafcea' %>
+					<% else %>
+						<% cell_color = 'white' %>
+					<% end %>
+					<td bgcolor=<%= cell_color %>><%= (count * 100.0 / participant_num).round(2) %></td>
+				<% end %>
+			</tr>
+		</table><br/>
+	<% end %>
+<% end %>

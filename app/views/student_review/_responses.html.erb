@@ -57,65 +57,51 @@
                       <%- # show the link as edit when latest review is done in current deadline   -%>
                       <%- # show link as update when latest review is done in different deadline than current phase   -%>
                       <% if (last_response_round == current_round)%>
-                        <td><% if (!@latest_response.isSubmitted.eql?'Yes') %>
+                        <td>
+                          <% if (!@latest_response.isSubmitted.eql?'Yes') %>
                               <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id} %>
-                              <%end%>
-                              </td>
+                          <%end%>
+                        </td>
                       <% else %>
                         <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
                       <% end %>
                     <% end %>
                 <%end%>
-            <% elsif @assignment.get_current_stage(topic_id) != "Complete" %>
-                <% if @assignment.staggered_deadline? %>
-                            <% if map.type.to_s == "MetareviewResponseMap" %>
-                                <% if @assignment.get_current_stage(topic_id) == 'metareview' %>
-                                    <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
-                                <% else %>
-                                    <td>Begin</td>
-                                    <td> (Work has not yet been submitted)</td>
-                                <% end %>
-                            <% else %>
-                                <% if @assignment.get_current_stage(topic_id) != 'submission' %>
-                                    <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
-                                    <td>&nbsp;&nbsp;</td>
+            <% elsif @assignment.get_current_stage(topic_id) != "Complete" && @assignment.can_review(topic_id) %>
 
-                                <% else %>
-                                    <td>Begin</td>
-                                    <td> (Work has not yet been submitted)</td>
-                                <% end %>
-                            <% end %>
-                <% else %>
                             <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
                             <td>&nbsp;&nbsp;</td>
 
-                <% end %>
+
             <% else %>
                         <td>Begin</td>
                         <td> (Work has not yet been submitted) for
                           <% review_no += 1 %></td>
-            <% end %>
-                        <% review_no+=1 %>
-                        </tr>
       <% end %>
+      <% review_no+=1 %>
+      </tr>
+    <% end %>
 
-                        <% if map.type.to_s != "MetareviewResponseMap" %>
-                            <% if @sorted_responses !=nil %>
-                                <TABLE class="grades" style=" font-style: italic; margin-left: 90px;">
-                                  <% if (@sorted_responses.size > 1) %>
-                                      <%@sorted_responses = @sorted_responses.reverse%>
-                                      <% for i in 1..@sorted_responses.size-1 %>
-                                          <tr>
-                                            <td colspan="10"><%= link_to "Review done at --#{@sorted_responses[i].created_at}", {:controller => 'response', :action => 'view', :id => @sorted_responses[i].id} %></td>
-                                          </tr>
-                                      <% end %>
-                                  <% else %>
-                                      <tr>
-                                        <td> <font color="gray" style="font-style: italic;">No previous versions available</font></td>
-                                      </tr>
-                                  <% end %>
-                                </TABLE>
-                            <% end %>
-                        <% end %>
-                        <% end %>
-                        </table>
+
+     <% if map.type.to_s != "MetareviewResponseMap" %>
+       <% if @sorted_responses !=nil %>
+         <TABLE class="grades" style=" font-style: italic; margin-left: 90px;">
+         <% if (@sorted_responses.size > 1) %>
+           <%@sorted_responses = @sorted_responses.reverse%>
+           <% for i in 1..@sorted_responses.size-1 %>
+             <tr>
+               <td colspan="10"><%= link_to "Review done at --#{@sorted_responses[i].created_at}", {:controller => 'response', :action => 'view', :id => @sorted_responses[i].id} %></td>
+             </tr>
+           <% end %>
+         <% else %>
+           <tr>
+             <td> <font color="gray" style="font-style: italic;">No previous versions available</font></td>
+           </tr>
+         <% end %>
+         </TABLE>
+       <% end %>
+     <% end %>
+
+
+  <% end %>
+</table>

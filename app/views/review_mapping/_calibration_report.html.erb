@@ -34,7 +34,7 @@
 					<% else %>
 						<% cell_color = 'white' %>
 					<% end %>
-					<td bgcolor=<%= cell_color %>><%= (count * 100.0 / participant_num).round(2) %></td>
+					<td bgcolor=<%= cell_color %>><%= (count * 100.0 / participant_num).round(2).to_s + '%' %></td>
 				<% end %>
 			</tr>
 		</table><br/>

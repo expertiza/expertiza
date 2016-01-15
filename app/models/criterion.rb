@@ -45,8 +45,11 @@ class Criterion < ScoredQuestion
     #show advice for each criterion question
     question_advices = QuestionAdvice.where(question_id: self.id).sort_by { |advice| advice.id }
     advice_total_length = 0
+
     question_advices.each do |question_advice|
-      advice_total_length += question_advice.advice.length
+      if question_advice.advice && !question_advice.advice == ""
+        advice_total_length += question_advice.advice.length
+      end
     end
 
     if question_advices.length > 0 and advice_total_length > 0
@@ -68,24 +71,24 @@ class Criterion < ScoredQuestion
       html += '} else {'
       html += 'elem.style.display = "none";}}'
       html += '</script>'
+      
+      html += '<div id="' + self.id.to_s + '_myDiv" style="display: none;">'
+      #[2015-10-26] Zhewei:
+      #best to order advices high to low, e.g., 5 to 1
+      #each level used to be a link;
+      #clicking on the link caused the dropbox to be filled in with the corresponding number
+      question_advices.reverse.each_with_index do |question_advice, index|
+        html += '<a id="changeScore_>' + self.id.to_s + '" onclick="changeScore(' + count.to_s + ',' + index.to_s + ')">'
+        html += (question_advices.length - index).to_s + ' - ' + question_advice.advice + '</a><br/>'
+        html += '<script>'
+        html += 'function changeScore(i, j) {'
+        html += 'var elem = jQuery("#responses_" + i.toString() + "_score");'
+        html += 'var opts = elem.children("option").length;'
+        html += 'elem.val((opts - j - 1).toString());}'
+        html += '</script>'
+      end
+      html += '</div>'
     end
-
-    html += '<div id="' + self.id.to_s + '_myDiv" style="display: none;">'
-    #[2015-10-26] Zhewei: 
-    #best to order advices high to low, e.g., 5 to 1
-    #each level used to be a link; 
-    #clicking on the link caused the dropbox to be filled in with the corresponding number
-    question_advices.reverse.each_with_index do |question_advice, index|
-      html += '<a id="changeScore_>' + self.id.to_s + '" onclick="changeScore(' + count.to_s + ',' + index.to_s + ')">'
-      html += (question_advices.length - index).to_s + ' - ' + question_advice.advice + '</a><br/>'
-      html += '<script>'
-      html += 'function changeScore(i, j) {'
-      html += 'var elem = jQuery("#responses_" + i.toString() + "_score");'
-      html += 'var opts = elem.children("option").length;'
-      html += 'elem.val((opts - j - 1).toString());}'
-      html += '</script>'
-    end
-    html += '</div>'
 
     if dropdown_or_scale == 'dropdown'
       html += '<div><select id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]">'

@@ -58,7 +58,7 @@
                       <%- # show link as update when latest review is done in different deadline than current phase   -%>
                       <% if (last_response_round == current_round)%>
                         <td>
-                          <% if (!@latest_response.is_submitted %>
+                          <% if (!@latest_response.is_submitted) %>
                               <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id} %>
                           <%end%>
                         </td>

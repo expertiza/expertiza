@@ -71,7 +71,7 @@ class Criterion < ScoredQuestion
       html += '} else {'
       html += 'elem.style.display = "none";}}'
       html += '</script>'
-      
+
       html += '<div id="' + self.id.to_s + '_myDiv" style="display: none;">'
       #[2015-10-26] Zhewei:
       #best to order advices high to low, e.g., 5 to 1

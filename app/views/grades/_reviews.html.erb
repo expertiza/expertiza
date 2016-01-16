@@ -61,7 +61,7 @@
             <% @sorted_array=Array.new %>
             <% @prev=review.map.response %>
             <%for element in @prev %>
-                <%if(element.map_id==review.map.id && (element.isSubmitted.nil? || element.isSubmitted.eql?('Yes')))%>
+                <%if(element.map_id==review.map.id &&  element.is_submitted)%>
                     <%array_not_empty=1 %>
                     <% @sorted_array << element %>
                 <% end %>

@@ -371,7 +371,6 @@ ActiveRecord::Schema.define(version: 20160116140353) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "calibrate_to",       limit: 1,   default: false
-    t.boolean  "is_submitted",       limit: 1,   default: false
   end
 
   add_index "response_maps", ["reviewer_id"], name: "fk_response_map_reviewer", using: :btree

@@ -1075,6 +1075,6 @@ FactoryGirl.define do
     additional_comment nil
     version_num nil
     round nil
-    isSubmitted 'No'
+    is_submitted false
   end
 end

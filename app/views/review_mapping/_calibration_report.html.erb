@@ -2,7 +2,10 @@
 	<% team = Team.find(response_map.reviewee_id) %>
 	<% min_question_score = @assignment_questionnaire.questionnaire.min_question_score %>
 	<% max_question_score = @assignment_questionnaire.questionnaire.max_question_score %>
-	<% participant_num = @response_ids.count %>
+	<% current_responses = @responses.select{|response|response.response_map.reviewee_id == response_map.reviewee_id} %>
+	<% response_ids = Array.new %>
+	<% current_responses.each { |curr_response|response_ids << curr_response.id } %>
+	<% participant_num = current_responses.count %>
 	
 	<h3> <%= "Calibration #{index+1} (team name:  #{team.name})" %></h3>
 	<% @questions.each_with_index do |question, index| %>
@@ -18,7 +21,7 @@
 			<tr>
 				<td> % of students </td>
 				<% (min_question_score..max_question_score).each do |answer| %>
-					<% count = Answer.where(["question_id = ? and response_id IN (?) and answer = ?", question.id, @response_ids, answer]).size %>
+					<% count = Answer.where(["question_id = ? and response_id IN (?) and answer = ?", question.id, response_ids, answer]).size %>
 					<% answer = 0 if answer.nil? %>
 					<% case (answer - instructor_answer).abs %>
 					<% when 0 %>

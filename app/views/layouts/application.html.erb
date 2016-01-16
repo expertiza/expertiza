@@ -10,21 +10,22 @@
 </head>
 
 <body>
-<%= render 'shared/navigation' %>
-<div class="container containerposition">
-  <div class="wrapper">
-    <div class="main">
-      <div class="content">
-        <%= render 'shared/flash_messages' %>
-        <div class="<%= controller_name %> <%= action_name %>">
-          <%= yield %>
-        </div>
+<div class="container-fluid">
+  <%= render 'shared/navigation' %>
+    <div class="wrapper">
+      <div class="main">
+        <div class="content">
+          <%= render 'shared/flash_messages' %>
+          <div class="<%= controller_name %> <%= action_name %>">
+            <%= yield %>
+          </div>
 
+        </div>
       </div>
     </div>
-  </div>
+
+  <div class="clearing">&nbsp;</div>
 </div>
-<div class="clearing">&nbsp;</div>
 <!-- class="wrapper" -->
 <div class="footer" align="center">
   <%= render 'shared/footer_message' %>

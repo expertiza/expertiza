@@ -125,9 +125,9 @@ class ResponseController < ApplicationController
       end
       if (params['isSubmit'] && (params['isSubmit'].eql?'Yes'))
         # Update the submission flag.
-        @response.update_attribute('isSubmitted','Yes')
+        @response.update_attribute('is_submitted',true)
       else
-        @response.update_attribute('isSubmitted','No')
+        @response.update_attribute('is_submitted',false)
       end
     rescue
       msg = "Your response was not saved. Cause:189 #{$!}"
@@ -191,11 +191,11 @@ class ResponseController < ApplicationController
 
     # create the response
     if params[:isSubmit].eql?('Yes')
-      isSubmitted = 'Yes'
+      is_submitted = true
     else
-      isSubmitted = 'No'
+      is_submitted = false
     end
-    @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:round => @round, :isSubmitted => isSubmitted)#,:version_num=>@version)
+    @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:round => @round, :is_submitted => is_submitted)#,:version_num=>@version)
 
     #Change the order for displaying questions for editing response views.
     questions=sort_questions(@questionnaire.questions)

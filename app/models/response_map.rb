@@ -24,7 +24,7 @@ class ResponseMap < ActiveRecord::Base
 
           if (map.type.eql?('ReviewResponseMap'))
             #If its ReviewResponseMap then only consider those response which are submitted.
-            if (@all_resp.isSubmitted.nil? || @all_resp.isSubmitted.eql?('Yes'))
+            if @all_resp.is_submitted
               @array_sort << @all_resp
             end
           else

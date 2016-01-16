@@ -33,10 +33,7 @@
 <div id="searchbox">
 
   <div id="searchlink">
-    <p> <%= link_to "Show all", :action => 'response_report', :id => @id %>
-  | <%= link_to "Distribution", :action => 'distribution', :id => @id%>
-| <%= link_to 'Back', :controller=> 'tree_display', :action=>'list', :id => @userid%>
-
+    <%= link_to 'Back', :controller=> 'tree_display', :action=>'list', :id => @userid%>
   </p>
 </div>
 

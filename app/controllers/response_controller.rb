@@ -6,7 +6,7 @@ class ResponseController < ApplicationController
     case params[:action]
       when 'edit'  # If response has been submitted, no further editing allowed
         response = Response.find(params[:id])
-        if (response.isSubmitted.eql?('Yes'))
+        if (response.is_submitted)
           return false
         end
     end

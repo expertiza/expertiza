@@ -35,7 +35,7 @@
         <% @rspan = 0 %>
         <%@l = @l+1 %>
         <% @response_maps.each do |ri| %>
-          <% if (Response.where(ri.id)) %>
+          <% if !ri.response.empty? %>
             <% @count = @count + 1 %>
           <% end %>
           <% if (Team.where(["id = ?", ri.reviewee_id ]).length > 0) %>

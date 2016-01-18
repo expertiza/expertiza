@@ -130,8 +130,8 @@ class ReviewResponseMap < ResponseMap
     if team_id
       maps = ResponseMap.where(:reviewee_id => team_id, :type => "ReviewResponseMap")
       maps.each{ |map|
-        if !map.response.empty? && !map.response.reject{|r| (r.round!=round || r.is_submitted)}.empty?
-          responses << map.response.reject{|r|  (r.round!=round || r.is_submitted)}.last
+        if !map.response.empty? && !map.response.reject{|r| (r.round!=round || !r.is_submitted)}.empty?
+          responses << map.response.reject{|r|  (r.round!=round || !r.is_submitted)}.last
         end
       }
       responses.sort! {|a,b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }

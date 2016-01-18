@@ -29,7 +29,7 @@ class StudentReviewController < ApplicationController
     @review_mappings.each do |map|
       current_round = map.response.map{|response| response.round}.max
       map.response.each do |response|
-        @num_reviews_completed += 1 if (!current_round.eql?(response.round) || (response.is_submitted.eql?'Yes'))
+        @num_reviews_completed += 1 if (!current_round.eql?(response.round) || (response.is_submitted))
       end
     end
     @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed

@@ -465,6 +465,15 @@ class ReviewMappingController < ApplicationController
         #need to even out the # of reviews for teams
         while temp_array.size < num_reviews_per_team
           num_participants_this_team = TeamsUser.where(team_id: team.id).size
+          #If there are some submitters or reviewers in this team, they are not treated as normal participants.
+          #They should be removed from 'num_participants_this_team'
+          TeamsUser.where(team_id: team.id).each do |team_user|
+            temp_participant = Participant.where(user_id: team_user.user_id, parent_id: assignment_id).first
+            if temp_participant.can_review == false or temp_participant.can_submit == false
+              num_participants_this_team -= 1
+            end
+          end
+
           #if all outstanding participants are already in temp_array, just break the loop.
           break if temp_array.size == participants.size - num_participants_this_team
           if iterator == 0

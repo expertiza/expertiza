@@ -64,41 +64,6 @@ def submit_hyperlink
   redirect_to :action => 'edit', :id => @participant.id
 end
 
-# Note: This is not used yet in the view until we all decide to do so
-def remove_hyperlink
-  @participant = AssignmentParticipant.find(params[:hyperlinks][:participant_id])
-
-  return unless current_user_id?(@participant.user_id)
-  hyperlink_to_delete = @participant.hyperlinks_array[params['chk_links'].to_i]
-
-  team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
-  team_participants = Array.new
-  if Team.exists?(team_id)
-    team_users = TeamsUser.where(team_id: team_id)
-    team_users.each do |team_user|
-      team_participants << AssignmentParticipant.where(parent_id: @participant.parent_id, user_id: team_user.user_id).first
-    end
-  else
-    team_participants << @participant
-  end
-
-  team_participants.each do |team_participant|
-    team_participant.remove_hyperlink(hyperlink_to_delete)
-  end
-
-  undo_link("Link has been removed successfully. ")
-
-  #determine if the user should be redirected to "edit" or  "view" based on the current deadline right
-  topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
-  assignment = Assignment.find(@participant.parent_id)
-
-  if assignment.submission_allowed(topic_id)
-    redirect_to :action => 'edit', :id => @participant.id
-  else
-    redirect_to :action => 'view', :id => @participant.id
-  end
-end
-
 def submit_file
   participant = AssignmentParticipant.find(params[:id])
   return unless current_user_id?(participant.user_id)

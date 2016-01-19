@@ -1007,60 +1007,6 @@ require 'analytic/assignment_analytic'
 
   end
 
-    def self.export(csv, parent_id, options)
-      @assignment = Assignment.find(parent_id)
-      @questions = Hash.new
-      questionnaires = @assignment.questionnaires
-      questionnaires.each { |questionnaire| @questions[questionnaire.symbol] = questionnaire.questions }
-      @scores = @assignment.scores(@questions)
-
-      return csv if @scores[:teams].nil?
-
-      for index in 0 .. @scores[:teams].length - 1
-        team = @scores[:teams][index.to_s.to_sym]
-        for participant in team[:team].participants
-          pscore = @scores[:participants][participant.id.to_s.to_sym]
-          tcsv = Array.new
-          tcsv << 'team'+index.to_s
-
-          team[:scores] ?
-            tcsv.push(team[:scores][:max], team[:scores][:avg], team[:scores][:min], participant.fullname) :
-            tcsv.push('---', '---', '---') if options['team_score'] == 'true'
-
-          pscore[:review] ?
-            tcsv.push(pscore[:review][:scores][:max], pscore[:review][:scores][:min], pscore[:review][:scores][:avg]) :
-            tcsv.push('---', '---', '---') if options['submitted_score']
-
-          pscore[:metareview] ?
-            tcsv.push(pscore[:metareview][:scores][:max], pscore[:metareview][:scores][:min], pscore[:metareview][:scores][:avg]) :
-            tcsv.push('---', '---', '---') if options['metareview_score']
-
-          pscore[:feedback] ?
-            tcsv.push(pscore[:feedback][:scores][:max], pscore[:feedback][:scores][:min], pscore[:feedback][:scores][:avg]) :
-            tcsv.push('---', '---', '---') if options['author_feedback_score']
-
-          pscore[:teammate] ?
-            tcsv.push(pscore[:teammate][:scores][:max], pscore[:teammate][:scores][:min], pscore[:teammate][:scores][:avg]) :
-            tcsv.push('---', '---', '---') if options['teammate_review_score']
-
-          tcsv.push(pscore[:total_score])
-          csv << tcsv
-        end
-      end
-    end
-
-    def self.export_fields(options)
-      fields = Array.new
-      fields << 'Team Name'
-      fields.push('Team Max', 'Team Avg', 'Team Min') if options['team_score'] == 'true'
-      fields.push('Submitted Max', 'Submitted Avg', 'Submitted Min') if options['submitted_score']
-      fields.push('Metareview Max', 'Metareview Avg', 'Metareview Min') if options['metareview_score']
-      fields.push('Author Feedback Max', 'Author Feedback Avg', 'Author Feedback Min') if options['author_feedback_score']
-      fields.push('Teammate Review Max', 'Teammate Review Avg', 'Teammate Review Min') if options['teammate_review_score']
-      fields.push('Final Score')
-      fields
-    end
-
     def find_due_dates(type)
       self.due_dates.select {|due_date| due_date.deadline_type == DeadlineType.find_by_name(type)}
     end

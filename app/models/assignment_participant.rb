@@ -262,19 +262,6 @@ class AssignmentParticipant < Participant
     CourseParticipant.create(:user_id => self.user_id, :parent_id => course_id) if part.nil?
   end
 
-  def course_string
-    # if no course is associated with this assignment, or if there is a course with an empty title, or a course with a title that has no printing characters ...
-    begin
-      course = Course.find(self.assignment.course.id)
-      if course.name.strip.length == 0
-        raise
-      end
-      return course.name
-    rescue
-      return "<center>&#8212;</center>".html_safe
-    end
-  end
-
   def feedback
     FeedbackResponseMap.get_assessments_for(self)
   end

@@ -8,7 +8,7 @@ class ReviewMappingController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'add_quiz_response_map', 'assign_quiz_dynamically'
+    when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'assign_quiz_dynamically'
       true
     else
       ['Instructor',
@@ -164,7 +164,6 @@ class ReviewMappingController < ApplicationController
 
     redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
   end
-
 
   # assigns the quiz dynamically to the participant
   def assign_quiz_dynamically

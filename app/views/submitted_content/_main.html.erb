@@ -1,4 +1,4 @@
-<% if participant.hyperlinks.try(:length) || 0 > 0 %>
+<% if participant.hyperlinks.try(:length) %>
   <%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant, stage: @stage} %>
 <% end %>
 

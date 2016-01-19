@@ -20,8 +20,14 @@
 			</tr>
 			<tr>
 				<td> % of students </td>
+				<% max_count = 0 %>
+				<% count_hash = Hash.new %>
 				<% (min_question_score..max_question_score).each do |answer| %>
 					<% count = Answer.where(["question_id = ? and response_id IN (?) and answer = ?", question.id, response_ids, answer]).size %>
+					<% count_hash[answer] = count %>
+					<% max_count = count if count > max_count %>
+				<% end %>
+				<% count_hash.each do |answer, count| %>
 					<% answer = 0 if answer.nil? %>
 					<% case (answer - instructor_answer).abs %>
 					<% when 0 %>
@@ -35,7 +41,13 @@
 					<% else %>
 						<% css_class = 'c1' %>
 					<% end %>
-					<td class=<%= css_class %>><%= (count * 100.0 / participant_num).round(2).to_s + '%' %></td>
+					<td class=<%= css_class %>>
+						<% if count == max_count %>
+							<b><%= (count * 100.0 / participant_num).round(2).to_s + '%' %></b>
+						<% else %>
+							<%= (count * 100.0 / participant_num).round(2).to_s + '%' %>
+						<% end %>
+					</td>
 				<% end %>
 			</tr>
 		</table><br/>

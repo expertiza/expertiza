@@ -29,16 +29,6 @@ class ReviewMappingController < ApplicationController
     redirect_to controller: 'response', action: 'new', id: map.id, assignment_id: params[:id], return: 'assignment_edit'
   end
 
-  def auto_complete_for_user_name
-    name = params[:user][:name]+"%"
-    assignment_id = session[:contributor].parent_id
-    @users = User.join(:participants)
-      .where( ['participants.type = "AssignmentParticipant" and users.name like ? and participants.parent_id = ?',name,assignment_id])
-      .order ('name')
-
-    render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
-  end
-
   def select_reviewer
     assignment = Assignment.find(params[:id])
     @contributor = assignment.get_contributor(params[:contributor_id])
@@ -83,19 +73,6 @@ class ReviewMappingController < ApplicationController
       end
     end
     redirect_to :action => 'list_mappings', :id => assignment.id, :msg => msg
-  end
-
-  def add_quiz_response_map
-    if ResponseMap.where(reviewed_object_id: params[:questionnaire_id], reviewer_id:  params[:participant_id]).first
-      flash[:error] = "You have already taken that quiz"
-    else
-      @map = QuizResponseMap.new
-      @map.reviewee_id = Questionnaire.find(params[:questionnaire_id]).instructor_id
-      @map.reviewer_id = params[:participant_id]
-      @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
-      @map.save
-    end
-    redirect_to student_quizzes_path(:id => params[:participant_id])
   end
 
   # Assign self to a submission
@@ -239,20 +216,6 @@ class ReviewMappingController < ApplicationController
 
 
     redirect_to :controller => 'student_review', :action => 'list', :id => metareviewer.id
-  end
-
-
-  def get_user(params)
-    if params[:user_id]
-      user = User.find(params[:user_id])
-    else
-      user = User.find_by_name(params[:user][:name])
-    end
-    if user.nil?
-      newuser = url_for :controller => 'users', :action => 'new'
-      raise "Please <a href='#{newuser}'>create an account</a> for this user to continue."
-    end
-    return user
   end
 
   def get_reviewer(user,assignment,reg_url)

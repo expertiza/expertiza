@@ -25,19 +25,17 @@
 					<% answer = 0 if answer.nil? %>
 					<% case (answer - instructor_answer).abs %>
 					<% when 0 %>
-						<% cell_color = '#28cf30' %>
+						<% css_class = 'c5' %>
 					<% when 1 %>
-						<% cell_color = '#6ced72' %>
+						<% css_class = 'c4' %>
 					<% when 2 %>
-						<% cell_color = '#abf5ae' %>
+						<% css_class = 'c3' %>
 					<% when 3 %>
-						<% cell_color = '#c0f7c2' %>
-					<% when 4 %>
-						<% cell_color = '#eafcea' %>
+						<% css_class = 'c2' %>
 					<% else %>
-						<% cell_color = 'white' %>
+						<% css_class = 'c1' %>
 					<% end %>
-					<td bgcolor=<%= cell_color %>><%= (count * 100.0 / participant_num).round(2).to_s + '%' %></td>
+					<td class=<%= css_class %>><%= (count * 100.0 / participant_num).round(2).to_s + '%' %></td>
 				<% end %>
 			</tr>
 		</table><br/>

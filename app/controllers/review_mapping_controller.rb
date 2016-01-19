@@ -374,7 +374,8 @@ class ReviewMappingController < ApplicationController
 
   def automatic_review_mapping
     assignment_id = params[:id].to_i
-    participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.reject!{|p|p.can_review == false}.shuffle!
+
+    participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.reject{|p| p.can_review == false}.shuffle!
     teams = AssignmentTeam.where(parent_id: params[:id].to_i).to_a.shuffle!
     max_team_size = Integer(params[:max_team_size]) #Assignment.find(assignment_id).max_team_size
     # Create teams if its an individual assignment.

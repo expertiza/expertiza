@@ -1,3 +1,8 @@
+<style>
+th, td {
+    padding: 5px;
+}
+</style>
 <% @calibration_response_maps.each_with_index do |response_map, index| %>
 	<% team = Team.find(response_map.reviewee_id) %>
 	<% min_question_score = @assignment_questionnaire.questionnaire.min_question_score %>

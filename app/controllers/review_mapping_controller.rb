@@ -540,7 +540,7 @@ class ReviewMappingController < ApplicationController
         participant = AssignmentParticipant.create(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
       end
       @assignment = Assignment.find(params[:id])
-      @review_questionnaire_ids = Questionnaire.select("id").where(["type = ?", 'ReviewQuestionnaire'])
+      @review_questionnaire_ids = ReviewQuestionnaire.select("id")
       @assignment_questionnaire = AssignmentQuestionnaire.where(["assignment_id = ? and questionnaire_id IN (?)", params[:id], @review_questionnaire_ids]).first
       @questions = @assignment_questionnaire.questionnaire.questions.select{|q| q.type == 'Criterion' or q.type == 'Scale'}
       @calibration_response_maps = ReviewResponseMap.where(["reviewed_object_id = ? and reviewer_id = ? and calibrate_to = ?", params[:id], participant.id, 1])

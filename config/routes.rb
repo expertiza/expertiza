@@ -289,6 +289,7 @@ Expertiza::Application.routes.draw do
       get :remove_hyperlink
       get :saving
       get :redirection
+      get :show_calibration_results_for_student
       post :custom_create
     end
   end

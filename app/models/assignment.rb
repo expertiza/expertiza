@@ -566,10 +566,6 @@ require 'analytic/assignment_analytic'
     check_condition('review_of_review_allowed_id', topic_id)
   end
 
-  def get_quiz_deadline
-    return (DueDate.where( ['assignment_id = ? and deadline_type_id >= ?', self.id, 7]).due_at)
-  end
-
   def delete(force = nil)
     begin
       maps = ReviewResponseMap.where(reviewed_object_id: self.id)

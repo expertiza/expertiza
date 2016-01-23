@@ -10,12 +10,6 @@ module AssignmentHelper
     options
   end
 
-  def is_intelligent_options
-    is_intelligent_options = Array.new
-    is_intelligent_options << ["No", 'false']
-    is_intelligent_options << ["Yes", 'true']
-  end
-
   #round=0 added by E1450
   def questionnaire_options(assignment, type, round=0)
     questionnaires = Questionnaire.where( ['private = 0 or instructor_id = ?', assignment.instructor_id]).order('name')
@@ -32,15 +26,6 @@ module AssignmentHelper
       review_strategy_options << [strategy.to_s, strategy.to_s]
     end
     review_strategy_options
-  end
-
-  def deadline_rights_options
-    permissions = DeadlineRight.all
-    options = Array.new
-    permissions.each do |permission|
-      options << [permission.name, permission.id]
-    end
-    options
   end
 
   #retrive or create a due_date
@@ -67,7 +52,6 @@ module AssignmentHelper
       due_dates[round]
     end
   end
-
 
   def questionnaire(assignment, type, round_number)
     #E1450 changes

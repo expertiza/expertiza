@@ -47,7 +47,7 @@ class Criterion < ScoredQuestion
     advice_total_length = 0
 
     question_advices.each do |question_advice|
-      if question_advice.advice && !question_advice.advice == ""
+      if question_advice.advice && question_advice.advice != ""
         advice_total_length += question_advice.advice.length
       end
     end

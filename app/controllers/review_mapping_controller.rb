@@ -543,7 +543,7 @@ class ReviewMappingController < ApplicationController
       @review_questionnaire_ids = ReviewQuestionnaire.select("id")
       @assignment_questionnaire = AssignmentQuestionnaire.where(["assignment_id = ? and questionnaire_id IN (?)", params[:id], @review_questionnaire_ids]).first
       @questions = @assignment_questionnaire.questionnaire.questions.select{|q| q.type == 'Criterion' or q.type == 'Scale'}
-      @calibration_response_maps = ReviewResponseMap.where(["reviewed_object_id = ? and reviewer_id = ? and calibrate_to = ?", params[:id], participant.id, 1])
+      @calibration_response_maps = ReviewResponseMap.where(["reviewed_object_id = ? and calibrate_to = ?", params[:id], 1])
       @review_response_map_ids = ReviewResponseMap.select('id').where(["reviewed_object_id = ? and calibrate_to = ?", params[:id], 0])
       @responses = Response.where(["map_id IN (?)", @review_response_map_ids])
     end

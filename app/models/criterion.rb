@@ -79,12 +79,12 @@ class Criterion < ScoredQuestion
       #clicking on the link caused the dropbox to be filled in with the corresponding number
       question_advices.reverse.each_with_index do |question_advice, index|
         html += '<a id="changeScore_>' + self.id.to_s + '" onclick="changeScore(' + count.to_s + ',' + index.to_s + ')">'
-        html += (question_advices.length - index).to_s + ' - ' + question_advice.advice + '</a><br/>'
+        html += (self.questionnaire.max_question_score - index).to_s + ' - ' + question_advice.advice + '</a><br/>'
         html += '<script>'
         html += 'function changeScore(i, j) {'
         html += 'var elem = jQuery("#responses_" + i.toString() + "_score");'
         html += 'var opts = elem.children("option").length;'
-        html += 'elem.val((opts - j - 1).toString());}'
+        html += 'elem.val((' + self.questionnaire.max_question_score.to_s + ' - j).toString());}'
         html += '</script>'
       end
       html += '</div>'

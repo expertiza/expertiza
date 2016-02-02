@@ -175,6 +175,10 @@ class QuestionnairesController < ApplicationController
           end
           question.delete
         end
+        questionnaire_node = @questionnaire.questionnaire_node
+        questionnaire_node.delete
+        @questionnaire.delete
+
         undo_link("Questionnaire \"#{name}\" has been deleted successfully. ")
       rescue
         flash[:error] = $!

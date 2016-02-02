@@ -172,9 +172,7 @@ class QuestionnairesController < ApplicationController
           advices = question.question_advices
           advices.each do |advice|
             advice.delete
-            binding.pry
           end
-          binding.pry
           question.delete
         end
         undo_link("Questionnaire \"#{name}\" has been deleted successfully. ")

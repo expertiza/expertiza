@@ -153,11 +153,30 @@ class QuestionnairesController < ApplicationController
       begin
         name = @questionnaire.name
 
+        #if this rubric is used by some assignment, flash error
         @questionnaire.assignments.each{
           | assignment |
           raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
         }
-        @questionnaire.destroy
+
+        questions = @questionnaire.questions
+
+        #if this rubric had some answers, flash error
+        questions.each do |question|
+          if !question.answers.empty?
+            raise "There are responses based on this rubric, we do not suggest you delete it."
+          end
+        end
+
+        questions.each do |question|
+          advices = question.question_advices
+          advices.each do |advice|
+            advice.delete
+            binding.pry
+          end
+          binding.pry
+          question.delete
+        end
         undo_link("Questionnaire \"#{name}\" has been deleted successfully. ")
       rescue
         flash[:error] = $!

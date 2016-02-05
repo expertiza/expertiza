@@ -91,7 +91,11 @@
                 <%else %>
                   <td id = "green" bgcolor="#DDDDBB" align = 'left' colspan=1>
                 <%end %>
+                <% if ri.response.last.is_submitted?%>
                     <%= link_to Team.find(ri.reviewee_id).name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
+                <% else %>
+                    <%= link_to "("+Team.find(ri.reviewee_id).name+")", :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
+                <% end %>
                   </td>
                   <%= render :partial => 'teamscore' %>
 

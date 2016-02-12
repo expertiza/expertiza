@@ -4,11 +4,14 @@ module AssignmentHelper
     if session[:user].role.name == 'Teaching Assistant'
       courses = Array.new
       ta = Ta.find(session[:user].id)
-      ta_mappings = ta.ta_mappings
-      ta_mappings.each do |mapping|
-        courses << Course.find(mapping.course_id)
-      end
-    else
+      ta.ta_mappings.each {|mapping| courses << Course.find(mapping.course_id)}
+      # If a TA created some courses before, s/he can still add new assignments to these courses.
+      courses << Course.where(instructor_id: instructor.id)
+      courses.flatten!
+    # Administrator and Super-Administrator can see all courses
+    elsif session[:user].role.name == 'Administrator' or session[:user].role.name == 'Super-Administrator'
+      courses = Course.all
+    elsif session[:user].role.name == 'Instructor'
       courses = Course.where(instructor_id: instructor.id)
     end
     options = Array.new

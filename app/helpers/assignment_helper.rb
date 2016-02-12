@@ -1,7 +1,16 @@
 module AssignmentHelper
 
   def course_options(instructor)
-    courses = Course.where(instructor_id: instructor.id)
+    if session[:user].role.name == 'Teaching Assistant'
+      courses = Array.new
+      ta = Ta.find(session[:user].id)
+      ta_mappings = ta.ta_mappings
+      ta_mappings.each do |mapping|
+        courses << Course.find(mapping.course_id)
+      end
+    else
+      courses = Course.where(instructor_id: instructor.id)
+    end
     options = Array.new
     options << ['-----------', nil]
     courses.each do |course|

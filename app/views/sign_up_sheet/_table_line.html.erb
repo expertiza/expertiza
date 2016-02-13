@@ -1,5 +1,14 @@
 <td><%= topic.topic_identifier %></td>
-<td><%= render :partial => '/sign_up_sheet/topic_names', :locals => {:i => i, :topic=>topic} %></td>
+<td><%= render :partial => '/sign_up_sheet/topic_names', :locals => {:i => i, :topic=>topic} %>
+  <% logger = Logger.new(STDOUT) %>
+  <% logger.debug "waitlisted: #{waitlisted_teams_members.inspect}"%>
+  <% if !waitlisted_teams.nil? && !confirmed_teams.nil? && confirmed_teams_members.include?(session[:user].id) %>
+    <br/>Waitlist:<br/>
+    <% waitlisted_teams_members.each do |team| %>
+      <span><%= team %></span><br/>
+    <% end %>
+  <% end %>
+</td>
 
 <% if @assignment.is_microtask? %>
   <td align="center"><%= topic.micropayment %></td>

@@ -31,6 +31,9 @@ class SignUpSheet < ActiveRecord::Base
         #check whether slots exist (params[:id] = topic_id) or has the user selected another topic
         team_id, topic_id = create_SignUpTeam(assignment_id, sign_up, topic_id, user_id)
         if sign_up.save
+	  #CHANGESHERE
+	  if sign_up.is_waitlisted?
+	  end
           result = true
         end
       end

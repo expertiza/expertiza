@@ -31,7 +31,7 @@
           <% end %>
 	  <% is_suggested_topic = false %>
 	  <% topic_id = topic.topic_identifier.to_i%>
-	  <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic, :waitlisted_teams=>@waitlisted_teams[topic_id], :waitlisted_teams_members=>@waitlisted_teams_members[topic_id], :confirmed_teams=>@confirmed_teams[topic_id], :confirmed_teams_members=>@confirmed_teams_members[topic_id]} %>
+	  <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic, :waitlisted_teams=>@waitlisted_teams[topic_id], :waitlisted_teams_members=>@waitlisted_teams_members[topic_id], :confirmed_teams=>@confirmed_teams[topic_id], :confirmed_teams_members=>@confirmed_teams_members[topic_id], :team_vacancy=>@vacancy_confirmed_teams[topic_id]} %>
         </tr>
         <% i=i+1 %>
       <% end %>

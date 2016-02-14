@@ -185,6 +185,7 @@ class SignUpSheetController < ApplicationController
     @drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
     @waitlisted_teams = []
     @waitlisted_teams_members = []
+    @waitlisted_team_desc = []
     @confirmed_teams = []
     @confirmed_teams_members = []
     @vacancy_confirmed_teams = []
@@ -198,8 +199,10 @@ class SignUpSheetController < ApplicationController
 	logger = Logger.new(STDOUT)
 	logger.debug "waitlist: #{@waitlisted_teams[topic_id].inspect}"
 	  @waitlisted_teams_members[topic_id] = []
+	  @waitlisted_team_desc[topic_id] = []
 	@waitlisted_teams[topic_id].each do |team|
 	  waitlisted_team_id = team.team_id
+	  @waitlisted_team_desc[topic_id][i] = Team.where(id: waitlisted_team_id).first
 	  @waitlisted_teams_members[topic_id][i] = TeamsUser.members_by_team_id(waitlisted_team_id)
 	  @waitlisted_teams_members[topic_id][i].map! do |member|
 	    member = User.where(id: member.user_id).select(:id, :name).to_a

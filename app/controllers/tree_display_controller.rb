@@ -131,6 +131,7 @@ class TreeDisplayController < ApplicationController
     end
   end
 
+  # for folder nodes
   def get_children_node_ng
     puts params[:filternode]
     childNodes = {}
@@ -215,6 +216,7 @@ class TreeDisplayController < ApplicationController
     return false
   end
 
+  # for child nodes
   def get_children_node_2_ng
     childNodes = {}
     if params[:reactParams2][:child_nodes].is_a? String
@@ -253,7 +255,19 @@ class TreeDisplayController < ApplicationController
             res2["instructor"] = nil
           end
 
-          res2["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role_id == 6 && Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(child))
+          # current user is the instructor (role can be admin/instructor/ta) of this course.
+          available_condition_1 = is_available(session[:user], instructor_id)
+
+          # instructor created the course, current user is the ta of this course.
+          available_condition_2 = session[:user].role_id == 6 and Ta.get_my_instructors(session[:user].id).include?(instructor_id) and ta_for_current_course?(child)
+
+          # ta created the course, current user is the instructor of this ta.
+          instructor_ids = Array.new
+          TaMapping.where(ta_id: instructor_id).each{ |mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }
+          available_condition_3 = session[:user].role_id == 2 and instructor_ids.include? session[:user].id
+
+          res2["is_available"] =  available_condition_1 || available_condition_2 || available_condition_3
+
           if nodeType == "AssignmentNode"
             res2["course_id"] = child.get_course_id
             res2["max_team_size"] = child.get_max_team_size

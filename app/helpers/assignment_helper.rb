@@ -13,6 +13,14 @@ module AssignmentHelper
       courses = Course.all
     elsif session[:user].role.name == 'Instructor'
       courses = Course.where(instructor_id: instructor.id)
+      # instructor can see courses his/her TAs created
+      ta_ids = Array.new
+      ta_ids << Instructor.get_my_tas(session[:user].id)
+      ta_ids.flatten!
+      ta_ids.each do |ta_id|
+        ta = Ta.find(ta_id)
+        ta.ta_mappings.each {|mapping| courses << Course.find(mapping.course_id)}
+      end
     end
     options = Array.new
     options << ['-----------', nil]

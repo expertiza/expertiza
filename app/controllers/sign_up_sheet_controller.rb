@@ -187,8 +187,11 @@ class SignUpSheetController < ApplicationController
     @waitlisted_teams_members = []
     @confirmed_teams = []
     @confirmed_teams_members = []
+    @vacancy_confirmed_teams = []
+    max_team_size = Assignment.find(@assignment_id).max_team_size
     for topic in @sign_up_topics
       topic_id = topic.topic_identifier.to_i
+      cur_team_size = 0
       @waitlisted_teams[topic_id] = SignedUpTeam.waitlisted_teams_by_topic_id(topic.id)
       if !@waitlisted_teams[topic_id].nil?
 	i = 0
@@ -199,7 +202,7 @@ class SignUpSheetController < ApplicationController
 	  waitlisted_team_id = team.team_id
 	  @waitlisted_teams_members[topic_id][i] = TeamsUser.members_by_team_id(waitlisted_team_id)
 	  @waitlisted_teams_members[topic_id][i].map! do |member|
-	    member = member.user_id
+	    member = User.where(id: member.user_id).select(:id, :name).to_a
 	  end
 	  i = i+1
 	end
@@ -211,7 +214,9 @@ class SignUpSheetController < ApplicationController
 	@confirmed_teams_members[topic_id].map! do |member|
 	  member = member.user_id
 	end
+      cur_team_size = @confirmed_teams_members[topic_id].count
       end
+    @vacancy_confirmed_teams[topic_id] = max_team_size - cur_team_size
     end
     if assignment.due_dates.find_by_deadline_type_id(1)!= nil
       unless !(assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now)

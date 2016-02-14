@@ -36,5 +36,15 @@
       No choosers.
     <% end %>
     <br/>
+  <% elsif !waitlisted_teams_members.nil? && !confirmed_teams_members.nil? && confirmed_teams_members.include?(session[:user].id) %>
+    <br/>Waitlist:<br/>
+    <% waitlisted_teams_members.each do |team| %>
+      <% if team.count <= team_vacancy %>
+	<span><%= team.map { |member| member[0].name}.join(', ') %></span>
+      <% else %>
+	<span><%= team.map { |member| member[0].name}.join(', ') %></span>
+      <% end %>
+      <br/>
+    <% end %>
   <% end %>
 </div>

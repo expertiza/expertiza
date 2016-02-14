@@ -1,19 +1,5 @@
 <td><%= topic.topic_identifier %></td>
-<td><%= render :partial => '/sign_up_sheet/topic_names', :locals => {:i => i, :topic=>topic} %>
-  <% if local_assigns[:waitlisted_teams] && local_assigns[:confirmed_teams] %>
-    <% unless waitlisted_teams.nil? && confirmed_teams.nil? && !confirmed_teams_members.include?(session[:user].id) %>
-      <br/>Waitlist:<br/>
-      <% waitlisted_teams_members.each do |team| %>
-	<% if team.count <= team_vacancy %>
-	  <span><%= team.map { |member| member[0].name}.join(', ') %></span>
-	<% else %>
-	  <span><%= team.map { |member| member[0].name}.join(', ') %></span>
-	<% end %>
-	<br/>
-      <% end %>
-    <% end %>
-  <% end %>
-</td>
+<td><%= render :partial => '/sign_up_sheet/topic_names', :locals => local_assigns %></td>
 
 <% if @assignment.is_microtask? %>
   <td align="center"><%= topic.micropayment %></td>

@@ -1,3 +1,6 @@
-<%= button_to "Send request", action: "send_post_request" %>
+<%= form_tag action: "send_post_request" do %>
+	Assignment_id: <%= text_field_tag 'assignment_id' %>
+	<%= submit_tag 'Send request' %>
+<% end %>
 <br/><br/>
-<%= params[:results] %>
+<%= @result %>

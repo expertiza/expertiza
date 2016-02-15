@@ -4,6 +4,8 @@ require 'net/http'
 
 class ReputationWebServiceController < ApplicationController
 
+	@@response_body = ''
+
 	def action_allowed?
 	  ['Super-Administrator',
        'Administrator',
@@ -43,26 +45,34 @@ class ReputationWebServiceController < ApplicationController
 		ReviewResponseMap.where(reviewed_object_id: assignment_id).each do |response_map|
 			reviewer = response_map.reviewer.user
 			team = Team.find(response_map.reviewee_id)
-			if SignedUpTeam.where(team_id: team.id).first.is_waitlisted == false
-				response_map.response.select{|r| r.round == 2}.each do |response|
+			topic_condition = ((hasTopic and SignedUpTeam.where(team_id: team.id).first.is_waitlisted == false) or !hasTopic)
+			valid_response = response_map.response.select{|r| r.round == 2}
+			if topic_condition == true and !valid_response.empty?
+				valid_response.each do |response|
 					answers = Answer.where(response_id: response.id)
 					max_question_score = answers.first.question.questionnaire.max_question_score
 					temp_sum = 0
 					weight_sum = 0
-					answers.select{|a| a.question.type == 'Criterion' and !a.answer.nil?}.each do |answer|
-						temp_sum += answer.answer * answer.question.weight
-						weight_sum += answer.question.weight
+					valid_answer = answers.select{|a| a.question.type == 'Criterion' and !a.answer.nil?}
+					unless valid_answer.empty?
+						valid_answer.each do |answer|
+							temp_sum += answer.answer * answer.question.weight
+							weight_sum += answer.question.weight
+						end
+
+						peer_review_grade = 100.0 * temp_sum / (weight_sum * max_question_score)
+						raw_data_array << [reviewer.id, team.id, peer_review_grade.round(3)]
 					end
-					peer_review_grade = 100.0 * temp_sum / (weight_sum * max_question_score)
-					raw_data_array << [reviewer.id, team.id, peer_review_grade.round(3)]
 				end
 			end
 		end
 		raw_data_array
 	end
 
-	def json_generator
-		@results = db_query(733, true)
+	def json_generator(assignment_id)
+		assignment = Assignment.find(assignment_id)
+		has_topic = !SignUpTopic.where(assignment_id: assignment_id).empty?
+		@results = db_query(assignment, has_topic)
 		request_body = Hash.new
 		inner_msg = Hash.new
 		@results.each_with_index do |record, index|
@@ -75,21 +85,21 @@ class ReputationWebServiceController < ApplicationController
 	end
 
 	def client
-		#@results = db_query(736, true)
-		#@results = JSON.pretty_generate(my_json)
+		@result = @@response_body
 	end
 
 	def send_post_request
 		# https://www.socialtext.net/open/very_simple_rest_in_ruby_part_3_post_to_create_a_new_workspace
 		# uri = URI.parse('http://152.7.99.160:3000//calculations/reputation_algorithms')
-		json_generator
 		req = Net::HTTP::Post.new('/calculations/reputation_algorithms', initheader = {'Content-Type' =>'application/json'})
-		req.body = json_generator.to_json
+		req.body = json_generator(params[:assignment_id]).to_json
 		puts req.body
 		puts
 		response = Net::HTTP.new('152.7.99.160', 3000).start {|http| http.request(req)}
 		puts "Response #{response.code} #{response.message}:
           #{response.body}"
-		redirect_to action: 'client', results: response.body
+        puts
+        @@response_body = response.body
+		redirect_to action: 'client'
 	end
 end

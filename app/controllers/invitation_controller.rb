@@ -12,7 +12,6 @@ class InvitationController < ApplicationController
     user = User.find_by_name(params[:user][:name].strip)
     team = AssignmentTeam.find(params[:team_id])
     student = AssignmentParticipant.find(params[:student_id])
-    logger = Logger.new(STDOUT)
     return unless current_user_id?(student.user_id)
 
     #check if the invited user is valid
@@ -52,11 +51,8 @@ class InvitationController < ApplicationController
     end
   end
   def batch_create
-    logger = Logger.new(STDOUT)
-    logger.debug "class #{params[:invitees].class}"
     batch_names = params[:invitees].first.split(', ')
     for each in batch_names
-      logger.debug "invitee #{each}"
       params[:user] = {}
       params[:user][:name] = each
       create

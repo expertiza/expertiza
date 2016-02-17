@@ -46,8 +46,9 @@ class ReputationWebServiceController < ApplicationController
 			reviewer = response_map.reviewer.user
 			team = Team.find(response_map.reviewee_id)
 			topic_condition = ((hasTopic and SignedUpTeam.where(team_id: team.id).first.is_waitlisted == false) or !hasTopic)
-			valid_response = response_map.response.select{|r| r.round == 2}
-			if topic_condition == true and !valid_response.empty?
+			last_valid_response = response_map.response.select{|r| r.round == 2}.sort.last
+			valid_response = [last_valid_response] unless last_valid_response.nil?
+			if topic_condition == true and !valid_response.nil? and !valid_response.empty?
 				valid_response.each do |response|
 					answers = Answer.where(response_id: response.id)
 					max_question_score = answers.first.question.questionnaire.max_question_score

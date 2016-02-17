@@ -162,6 +162,7 @@ Expertiza::Application.routes.draw do
       get :cancel
       get :accept
       get :decline
+      post :batch_create
     end
   end
 

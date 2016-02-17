@@ -12,6 +12,7 @@ class InvitationController < ApplicationController
     user = User.find_by_name(params[:user][:name].strip)
     team = AssignmentTeam.find(params[:team_id])
     student = AssignmentParticipant.find(params[:student_id])
+    logger = Logger.new(STDOUT)
     return unless current_user_id?(student.user_id)
 
     #check if the invited user is valid
@@ -46,9 +47,22 @@ class InvitationController < ApplicationController
     end
 
     update_join_team_request user,student
-
-    redirect_to view_student_teams_path student_id: student.id
-
+    if params[:referrer].nil? || params[:referrer] != "signupsheet"
+      redirect_to view_student_teams_path student_id: student.id
+    end
+  end
+  def batch_create
+    logger = Logger.new(STDOUT)
+    logger.debug "class #{params[:invitees].class}"
+    batch_names = params[:invitees].first.split(', ')
+    for each in batch_names
+      logger.debug "invitee #{each}"
+      params[:user] = {}
+      params[:user][:name] = each
+      create
+    end
+    flash[:note] = "Invitations successfully sent."
+    redirect_to controller: 'sign_up_sheet', action: 'list', assignment_id: params[:assignment_id]
   end
 
   def update_join_team_request(user,student)

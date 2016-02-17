@@ -196,8 +196,6 @@ class SignUpSheetController < ApplicationController
       @waitlisted_teams[topic_id] = SignedUpTeam.waitlisted_teams_by_topic_id(topic.id)
       if !@waitlisted_teams[topic_id].nil?
 	i = 0
-	logger = Logger.new(STDOUT)
-	logger.debug "waitlist: #{@waitlisted_teams[topic_id].inspect}"
 	  @waitlisted_teams_members[topic_id] = []
 	  @waitlisted_team_desc[topic_id] = []
 	@waitlisted_teams[topic_id].each do |team|

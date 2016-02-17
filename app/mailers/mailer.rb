@@ -60,4 +60,15 @@ class Mailer < ActionMailer::Base
          bcc: defn[:cc])
 
   end
+  def waitlist_notification(defn)
+    @body = defn[:body]
+    @first_name = defn[:body][:first_name]
+    @assignment_name = defn[:body][:assignment_name]
+    if Rails.env.development? || Rails.env.test?
+            defn[:to] = 'expertiza.development@gmail.com'
+    end
+    mail(subject: defn[:subject],
+	 to: defn[:to],
+	 bcc: defn[:cc])
+  end
 end

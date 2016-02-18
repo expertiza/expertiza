@@ -6,6 +6,8 @@ class ReviewMappingController < ApplicationController
   #helper :dynamic_review_assignment
   helper :submitted_content
 
+  @@time_create_last_review_mapping_record = nil
+
   def action_allowed?
     case params[:action]
     when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'assign_quiz_dynamically'
@@ -391,13 +393,31 @@ class ReviewMappingController < ApplicationController
     end
     student_review_num = params[:num_reviews_per_student].to_i
     submission_review_num = params[:num_reviews_per_submission].to_i
-    if student_review_num == 0 and submission_review_num == 0
-      flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
-    elsif (student_review_num != 0 and submission_review_num == 0) or (student_review_num == 0 and submission_review_num != 0)
-      #review mapping strategy
-      automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num, submission_review_num)
+    calibrated_artifacts_num = params[:num_calibrated_artifacts].to_i
+    uncalibrated_artifacts_num = params[:num_uncalibrated_artifacts].to_i
+
+    if calibrated_artifacts_num == 0 and uncalibrated_artifacts_num == 0
+      if student_review_num == 0 and submission_review_num == 0
+        flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
+      elsif (student_review_num != 0 and submission_review_num == 0) or (student_review_num == 0 and submission_review_num != 0)
+        #review mapping strategy
+        automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num, submission_review_num)
+      else
+        flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
+      end
     else
-      flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
+        teams_with_calibrated_artifacts = Array.new
+        teams_with_uncalibrated_artifacts = Array.new
+        ReviewResponseMap.where(["reviewed_object_id = ? and calibrate_to = ?", assignment_id, 1]).each do |response_map|
+          teams_with_calibrated_artifacts << AssignmentTeam.find(response_map.reviewee_id)
+        end
+        teams_with_uncalibrated_artifacts = teams - teams_with_calibrated_artifacts
+        #review mapping strategy
+        automatic_review_mapping_strategy(assignment_id, participants, teams_with_calibrated_artifacts.shuffle!, calibrated_artifacts_num, 0)
+        #review mapping strategy
+        # since after first mapping, participants (delete_at) will be nil
+        participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.reject{|p| p.can_review == false}.shuffle!
+        automatic_review_mapping_strategy(assignment_id, participants, teams_with_uncalibrated_artifacts.shuffle!, uncalibrated_artifacts_num, 0)
     end
     redirect_to :action => 'list_mappings', :id => assignment_id
   end
@@ -409,9 +429,11 @@ class ReviewMappingController < ApplicationController
     num_participants = participants.size
     if student_review_num != 0 and submission_review_num == 0
       num_reviews_per_team = (participants.size * student_review_num * 1.0 / teams.size).round
+      exact_num_of_review_needed = participants.size * student_review_num
     elsif student_review_num == 0 and submission_review_num != 0
       num_reviews_per_team = submission_review_num
       student_review_num = (teams.size * submission_review_num * 1.0 / participants.size).round
+      exact_num_of_review_needed = teams.size * submission_review_num
     end
     #Exception detection: If instructor want to assign too many reviews done by each student, there will be an error msg.
     if student_review_num >= teams.size
@@ -493,30 +515,34 @@ class ReviewMappingController < ApplicationController
       end
       iterator += 1
     end
+
     # after assigning peer reviews for each team, if there are still some peer reviewers not obtain enough peer review, just assign them to valid teams
-    participants_with_insufficient_review_num = Array.new
-    participants_hash.each do |participant_id, review_num|
-      participants_with_insufficient_review_num << participant_id if review_num < student_review_num
-    end
-    unsorted_teams_hash = {}
-    ReviewResponseMap.where(reviewed_object_id: assignment_id).each do |response_map|
-      unless unsorted_teams_hash.has_key? (response_map.reviewee_id)
-        unsorted_teams_hash[response_map.reviewee_id] = 1 
-      else
-        unsorted_teams_hash[response_map.reviewee_id] += 1
+    if ReviewResponseMap.where(["reviewed_object_id = ? and created_at > ? and calibrate_to = ?", assignment_id, @@time_create_last_review_mapping_record, 0]).size < exact_num_of_review_needed
+      participants_with_insufficient_review_num = Array.new
+      participants_hash.each do |participant_id, review_num|
+        participants_with_insufficient_review_num << participant_id if review_num < student_review_num
       end
-    end 
-    teams_hash = unsorted_teams_hash.sort_by{|k, v| v}.to_h
-    participants_with_insufficient_review_num.each do |participant_id|
-      teams_hash.each do |team_id, num_review_received|
-        unless TeamsUser.exists?(team_id: team_id, user_id: Participant.find(participant_id).user_id)
-          ReviewResponseMap.where(:reviewee_id => team_id, :reviewer_id => participant_id, :reviewed_object_id => assignment_id).first_or_create
-          teams_hash[team_id] += 1
-          teams_hash = teams_hash.sort_by{|k, v| v}.to_h
-          break
+      unsorted_teams_hash = {}
+      ReviewResponseMap.where(["reviewed_object_id = ? and calibrate_to = ?", assignment_id, 0]).each do |response_map|
+        unless unsorted_teams_hash.has_key? (response_map.reviewee_id)
+          unsorted_teams_hash[response_map.reviewee_id] = 1 
+        else
+          unsorted_teams_hash[response_map.reviewee_id] += 1
+        end
+      end 
+      teams_hash = unsorted_teams_hash.sort_by{|k, v| v}.to_h
+      participants_with_insufficient_review_num.each do |participant_id|
+        teams_hash.each do |team_id, num_review_received|
+          unless TeamsUser.exists?(team_id: team_id, user_id: Participant.find(participant_id).user_id)
+            ReviewResponseMap.where(:reviewee_id => team_id, :reviewer_id => participant_id, :reviewed_object_id => assignment_id).first_or_create
+            teams_hash[team_id] += 1
+            teams_hash = teams_hash.sort_by{|k, v| v}.to_h
+            break
+          end
         end
       end
     end
+    @@time_create_last_review_mapping_record = ReviewResponseMap.where(reviewed_object_id: assignment_id).last.created_at
   end
 
   # This is for staggered deadline assignment

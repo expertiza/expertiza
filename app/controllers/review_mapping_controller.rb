@@ -565,14 +565,16 @@ class ReviewMappingController < ApplicationController
     when "ReviewResponseMap"
       if params[:user].nil?
         # This is not a search, so find all reviewers for this assignment
-        @reviewers = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ? and calibrate_to = ?", @id, @type, 0])
+        response_maps_with_distinct_participant_id = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ? and calibrate_to = ?", @id, @type, 0])
+        @reviewers = []
+        response_maps_with_distinct_participant_id.each do |reviewer_id_from_response_map|
+          @reviewers << (AssignmentParticipant.find(reviewer_id_from_response_map.reviewer_id))
+        end
+        @reviewers = Participant.sort_by_name(@reviewers)
       else
         # This is a search, so find reviewers by user's full name
         user = User.select("DISTINCT id").where(["fullname LIKE ?", '%'+params[:user][:fullname]+'%'])
-        participants = Participant.select("DISTINCT id").where(["user_id IN (?) and parent_id = ?", user, @assignment.id])
-        @reviewers = ResponseMap
-          .select("DISTINCT reviewer_id")
-          .where(["reviewed_object_id = ? and type = ? and reviewer_id IN (?)", @id, @type, participants] )
+        @reviewers = AssignmentParticipant.where(["user_id IN (?) and parent_id = ?", user, @assignment.id])
       end
       #  @review_scores[reveiwer_id][reviewee_id] = score for assignments not using vary_rubric_by_rounds feature
       # @review_scores[reviewer_id][round][reviewee_id] = score for assignments using vary_rubric_by_rounds feature

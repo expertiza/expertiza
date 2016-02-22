@@ -60,7 +60,7 @@
             <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id => @id%>
           </td>
           <!--# author feedbacks done-->
-          <td bgcolor=<%= @bgcolor %>  align = "left" rowspan= <%= @rspan %>>
+          <td bgcolor=<%= @bgcolor %>  align="left" rowspan= <%= @rspan %>>
             <%= @count %>/<%= @rspan %>
           </td>
         <% end %>
@@ -85,11 +85,11 @@
             <% if Response.exists?(map_id: @frm.id) %>
               <% @response_id = Response.where(map_id: @frm.id).first %>
               <!--Review response rejoined-->
-              <td id = "green" bgcolor=<%= @bgcolor %> align = 'left' colspan=1>
+              <td id = "green" bgcolor=<%= @bgcolor %> align='left' colspan=1>
               <%= link_to @reviewee_name, :controller => 'popup', :action => 'author_feedback_popup', :response_id => @response_id, :reviewee_id => @frm.reviewee_id, :source => 'author_feedback' %>
               </td>
               <!--Last rejoined at-->
-              <td bgcolor=<%= @bgcolor %> align = 'left'>
+              <td bgcolor=<%= @bgcolor %> align='left'>
                 <%= @response_id.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
               </td></tr><tr>
             <% else %>

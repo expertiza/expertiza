@@ -70,7 +70,12 @@
           <% map_id = rm.id %>
           <% review_response = Response.where(map_id: map_id).first %>
           <!--'FeedbackResponseMap' alias as 'frm' -->
-          <% @frm = ResponseMap.where(["reviewed_object_id = ? and reviewer_id = ? and type = ?", review_response.id, r.reviewer_id, @type]).first if !review_response.blank?%>
+          <% if review_response.blank? %>
+            <% @frm = nil %>
+          <% else %>
+            <% @frm = ResponseMap.where(["reviewee_id = ? and reviewer_id = ? and type = ?", rm.reviewer_id, r.reviewer_id, @type]).first %>
+          <% end %>
+
           <% if @frm.blank? %>
             <!--Review response rejoined-->
             <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left' colspan=1>

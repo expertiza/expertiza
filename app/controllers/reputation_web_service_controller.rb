@@ -89,8 +89,11 @@ class ReputationWebServiceController < ApplicationController
 	end
 
 	def client
-		@request_body = @@request_body
-		@response_body = @@response_body
+		# quick and dirty way to convert string to hash
+		# @request_body = eval(@@request_body.gsub(':','=>'))
+		# @response_body = eval(@@response_body.gsub(':','=>'))
+		 @request_body = @@request_body
+		 @response_body = @@response_body
 	end
 
 	def send_post_request

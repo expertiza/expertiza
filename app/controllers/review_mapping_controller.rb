@@ -6,6 +6,8 @@ class ReviewMappingController < ApplicationController
   #helper :dynamic_review_assignment
   helper :submitted_content
 
+  @@time_create_last_review_mapping_record = nil
+
   def action_allowed?
     case params[:action]
     when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'assign_quiz_dynamically'
@@ -391,30 +393,47 @@ class ReviewMappingController < ApplicationController
     end
     student_review_num = params[:num_reviews_per_student].to_i
     submission_review_num = params[:num_reviews_per_submission].to_i
-    if student_review_num == 0 and submission_review_num == 0
-      flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
-    elsif student_review_num != 0 and submission_review_num == 0
-      #review mapping strategy
-      automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num, submission_review_num)
-    elsif student_review_num == 0 and submission_review_num != 0
-      #review mapping strategy
-      automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num, submission_review_num)
+    calibrated_artifacts_num = params[:num_calibrated_artifacts].to_i
+    uncalibrated_artifacts_num = params[:num_uncalibrated_artifacts].to_i
+
+    if calibrated_artifacts_num == 0 and uncalibrated_artifacts_num == 0
+      if student_review_num == 0 and submission_review_num == 0
+        flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
+      elsif (student_review_num != 0 and submission_review_num == 0) or (student_review_num == 0 and submission_review_num != 0)
+        #review mapping strategy
+        automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num, submission_review_num)
+      else
+        flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
+      end
     else
-      flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
+        teams_with_calibrated_artifacts = Array.new
+        teams_with_uncalibrated_artifacts = Array.new
+        ReviewResponseMap.where(["reviewed_object_id = ? and calibrate_to = ?", assignment_id, 1]).each do |response_map|
+          teams_with_calibrated_artifacts << AssignmentTeam.find(response_map.reviewee_id)
+        end
+        teams_with_uncalibrated_artifacts = teams - teams_with_calibrated_artifacts
+        #review mapping strategy
+        automatic_review_mapping_strategy(assignment_id, participants, teams_with_calibrated_artifacts.shuffle!, calibrated_artifacts_num, 0)
+        #review mapping strategy
+        # since after first mapping, participants (delete_at) will be nil
+        participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.reject{|p| p.can_review == false}.shuffle!
+        automatic_review_mapping_strategy(assignment_id, participants, teams_with_uncalibrated_artifacts.shuffle!, uncalibrated_artifacts_num, 0)
     end
     redirect_to :action => 'list_mappings', :id => assignment_id
   end
 
   def automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num=0, submission_review_num=0)
     participants_hash = {}
-    participants.each {|participant| participants_hash[participant.id] = 0 }
+    participants.each { |participant| participants_hash[participant.id] = 0 }
     #calculate reviewers for each team
     num_participants = participants.size
     if student_review_num != 0 and submission_review_num == 0
       num_reviews_per_team = (participants.size * student_review_num * 1.0 / teams.size).round
+      exact_num_of_review_needed = participants.size * student_review_num
     elsif student_review_num == 0 and submission_review_num != 0
       num_reviews_per_team = submission_review_num
       student_review_num = (teams.size * submission_review_num * 1.0 / participants.size).round
+      exact_num_of_review_needed = teams.size * submission_review_num
     end
     #Exception detection: If instructor want to assign too many reviews done by each student, there will be an error msg.
     if student_review_num >= teams.size
@@ -423,48 +442,53 @@ class ReviewMappingController < ApplicationController
 
     iterator = 0
     teams.each do |team|
-      temp_array = Array.new
+      selected_participants = Array.new
       if !team.equal? teams.last
         #need to even out the # of reviews for teams
-        while temp_array.size < num_reviews_per_team
+        while selected_participants.size < num_reviews_per_team
           num_participants_this_team = TeamsUser.where(team_id: team.id).size
           #If there are some submitters or reviewers in this team, they are not treated as normal participants.
           #They should be removed from 'num_participants_this_team'
           TeamsUser.where(team_id: team.id).each do |team_user|
             temp_participant = Participant.where(user_id: team_user.user_id, parent_id: assignment_id).first
-            if temp_participant.can_review == false or temp_participant.can_submit == false
-              num_participants_this_team -= 1
-            end
+            num_participants_this_team -= 1 if temp_participant.can_review == false or temp_participant.can_submit == false
           end
+          #if all outstanding participants are already in selected_participants, just break the loop.
+          break if selected_participants.size == participants.size - num_participants_this_team
 
-          #if all outstanding participants are already in temp_array, just break the loop.
-          break if temp_array.size == participants.size - num_participants_this_team
+          # generate random number
           if iterator == 0
             rand_num = rand(0..num_participants-1)
           else
             min_value = participants_hash.values.min
             #get the temp array including indices of participants, each participant has minimum review number in hash table.
-            temp_participant_array = Array.new
+            participants_with_min_assigned_reviews = Array.new
             participants.each do |participant|
-              temp_participant_array << participants.index(participant) if participants_hash[participant.id] == min_value
+              participants_with_min_assigned_reviews << participants.index(participant) if participants_hash[participant.id] == min_value
             end
-
-            if temp_participant_array.empty? or (temp_participant_array.size == 1 and TeamsUser.exists?(team_id: team.id, user_id: participants[temp_participant_array[0]].user_id))
-              #if temp_participant_array is blank 
-              #or only one element in temp_participant_array, prohibit one student to review his/her own artifact
+            #if participants_with_min_assigned_reviews is blank 
+            if_condition_1 = participants_with_min_assigned_reviews.empty?
+            #or only one element in participants_with_min_assigned_reviews, prohibit one student to review his/her own artifact
+            if_condition_2 = (participants_with_min_assigned_reviews.size == 1 and TeamsUser.exists?(team_id: team.id, user_id: participants[participants_with_min_assigned_reviews[0]].user_id))
+            if if_condition_1 or if_condition_2
               #use original method to get random number
               rand_num = rand(0..num_participants-1)
             else
               #rand_num should be the position of this participant in original array
-              rand_num = temp_participant_array[rand(0..temp_participant_array.size-1)]
+              rand_num = participants_with_min_assigned_reviews[rand(0..participants_with_min_assigned_reviews.size-1)]
             end
           end
-          if participants_hash[participants[rand_num].id] < student_review_num and !TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id) and !temp_array.include? participants[rand_num].id
-            #prohibit one student to review his/her own artifact and temp_array cannot include duplicate num
-            temp_array << participants[rand_num].id
+          # prohibit one student to review his/her own artifact
+          next if TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id)
+
+          if_condition_1 = (participants_hash[participants[rand_num].id] < student_review_num)
+          if_condition_2 = (!selected_participants.include? participants[rand_num].id)
+          if if_condition_1 and if_condition_2
+            # selected_participants cannot include duplicate num
+            selected_participants << participants[rand_num].id
             participants_hash[participants[rand_num].id] += 1
           end 
-          #remove students who have already been assigned enough num of reviews out of participants array
+          # remove students who have already been assigned enough num of reviews out of participants array
           participants.each do |participant|
             if participants_hash[participant.id] == student_review_num
               participants.delete_at(rand_num)
@@ -474,19 +498,51 @@ class ReviewMappingController < ApplicationController
         end
       else
         #review num for last team can be different from other teams.
-        #prohibit one student to review his/her own artifact and temp_array cannot include duplicate num
-        participants.each {|participant| temp_array << participant.id if !TeamsUser.exists?(team_id: team.id, user_id: participant.user_id)}
-      end
-      begin
-        temp_array.each do |index|
-          ReviewResponseMap.create(:reviewee_id => team.id, :reviewer_id => index,
-                                 :reviewed_object_id => assignment_id) if !ReviewResponseMap.exists?(:reviewee_id => team.id, :reviewer_id => index, :reviewed_object_id => assignment_id)
+        #prohibit one student to review his/her own artifact and selected_participants cannot include duplicate num
+        participants.each do |participant| 
+          # avoid last team receives too many peer reviews
+          if !TeamsUser.exists?(team_id: team.id, user_id: participant.user_id) and selected_participants.size < num_reviews_per_team
+            selected_participants << participant.id 
+            participants_hash[participant.id] += 1
+          end
         end
+      end
+
+      begin
+        selected_participants.each {|index| ReviewResponseMap.where(:reviewee_id => team.id, :reviewer_id => index, :reviewed_object_id => assignment_id).first_or_create}
       rescue
         flash[:error] = "Automatic assignment of reviewer failed."
       end
       iterator += 1
     end
+
+    # after assigning peer reviews for each team, if there are still some peer reviewers not obtain enough peer review, just assign them to valid teams
+    if ReviewResponseMap.where(["reviewed_object_id = ? and created_at > ? and calibrate_to = ?", assignment_id, @@time_create_last_review_mapping_record, 0]).size < exact_num_of_review_needed
+      participants_with_insufficient_review_num = Array.new
+      participants_hash.each do |participant_id, review_num|
+        participants_with_insufficient_review_num << participant_id if review_num < student_review_num
+      end
+      unsorted_teams_hash = {}
+      ReviewResponseMap.where(["reviewed_object_id = ? and calibrate_to = ?", assignment_id, 0]).each do |response_map|
+        unless unsorted_teams_hash.has_key? (response_map.reviewee_id)
+          unsorted_teams_hash[response_map.reviewee_id] = 1 
+        else
+          unsorted_teams_hash[response_map.reviewee_id] += 1
+        end
+      end 
+      teams_hash = unsorted_teams_hash.sort_by{|k, v| v}.to_h
+      participants_with_insufficient_review_num.each do |participant_id|
+        teams_hash.each do |team_id, num_review_received|
+          unless TeamsUser.exists?(team_id: team_id, user_id: Participant.find(participant_id).user_id)
+            ReviewResponseMap.where(:reviewee_id => team_id, :reviewer_id => participant_id, :reviewed_object_id => assignment_id).first_or_create
+            teams_hash[team_id] += 1
+            teams_hash = teams_hash.sort_by{|k, v| v}.to_h
+            break
+          end
+        end
+      end
+    end
+    @@time_create_last_review_mapping_record = ReviewResponseMap.where(reviewed_object_id: assignment_id).last.created_at
   end
 
   # This is for staggered deadline assignment
@@ -509,14 +565,16 @@ class ReviewMappingController < ApplicationController
     when "ReviewResponseMap"
       if params[:user].nil?
         # This is not a search, so find all reviewers for this assignment
-        @reviewers = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ? and calibrate_to = ?", @id, @type, 0])
+        response_maps_with_distinct_participant_id = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ? and calibrate_to = ?", @id, @type, 0])
+        @reviewers = []
+        response_maps_with_distinct_participant_id.each do |reviewer_id_from_response_map|
+          @reviewers << (AssignmentParticipant.find(reviewer_id_from_response_map.reviewer_id))
+        end
+        @reviewers = Participant.sort_by_name(@reviewers)
       else
         # This is a search, so find reviewers by user's full name
         user = User.select("DISTINCT id").where(["fullname LIKE ?", '%'+params[:user][:fullname]+'%'])
-        participants = Participant.select("DISTINCT id").where(["user_id IN (?) and parent_id = ?", user, @assignment.id])
-        @reviewers = ResponseMap
-          .select("DISTINCT reviewer_id")
-          .where(["reviewed_object_id = ? and type = ? and reviewer_id IN (?)", @id, @type, participants] )
+        @reviewers = AssignmentParticipant.where(["user_id IN (?) and parent_id = ?", user, @assignment.id])
       end
       #  @review_scores[reveiwer_id][reviewee_id] = score for assignments not using vary_rubric_by_rounds feature
       # @review_scores[reviewer_id][round][reviewee_id] = score for assignments using vary_rubric_by_rounds feature

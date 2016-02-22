@@ -36,11 +36,22 @@
           <%= text_field_tag('num_reviews_per_student', 0, {:style => 'width:20px'}) %>
           <%= submit_tag 'Assign reviewers', :id => 'first_submit_tag' %>
         </span><br/>
+
         <%= radio_button_tag 'num_reviews', 'submission', false %>
         <%= label_tag('num_reviews_per_submission', 'Set minimum number of reviews done for each submission') %>&nbsp;&nbsp;&nbsp;&nbsp;
         <span id='num_reviews_per_submission_threshold' hidden='hidden'>
           <%= text_field_tag('num_reviews_per_submission', 0, {:style => 'width:20px'}) %>
           <%= submit_tag 'Assign reviewers', :id => 'second_submit_tag' %>
+        </span><br/>
+
+        <%= radio_button_tag 'num_reviews', 'calibrated_and_uncalibrated', false %>
+        <%= label_tag('assign_both_calibrated_and_uncalibrated_artifacts', 'Set both calibrated and uncalibrated artifacts') %>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span id='calibrated_and_uncalibrated_artifacts_threshold' hidden='hidden'>
+          <%= text_field_tag('num_calibrated_artifacts', 0, {:style => 'width:20px'}) %>
+          <%= label_tag('num_calibrated_artifacts', 'of calibrated artifacts and ') %>&nbsp;&nbsp;&nbsp;&nbsp;
+          <%= text_field_tag('num_uncalibrated_artifacts', 0, {:style => 'width:20px'}) %>
+          <%= label_tag('num_uncalibrated_artifacts', 'of uncalibrated artifacts done by each student') %>&nbsp;&nbsp;&nbsp;&nbsp;
+          <%= submit_tag 'Assign both calibrated and uncalibrated artifacts', :id => 'third_submit_tag' %>
         </span><br/>
       <% end %>
     </td>

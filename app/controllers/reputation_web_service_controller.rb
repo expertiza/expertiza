@@ -6,6 +6,9 @@ class ReputationWebServiceController < ApplicationController
 
 	@@request_body = ''
 	@@response_body = ''
+	@@assignment_id = ''
+	@@algorithm = ''
+	@@other_info = ''
 
 	def action_allowed?
 	  ['Super-Administrator',
@@ -92,6 +95,9 @@ class ReputationWebServiceController < ApplicationController
 		 @request_body = @@request_body
 		 @response_body = @@response_body
 		 @max_assignment_id = Assignment.last.id
+		 @assignment = Assignment.find(@@assignment_id) rescue nil
+		 @algorithm = @@algorithm
+		 @other_info = @@other_info
 	end
 
 	def send_post_request
@@ -101,7 +107,11 @@ class ReputationWebServiceController < ApplicationController
 		req.body = json_generator(params[:assignment_id].empty? ? '724' : params[:assignment_id]).to_json
 		req.body[0] = '' # remove the first '{'
 
+		@@assignment_id = params[:assignment_id]
+		@@algorithm = params[:algorithm]
+
 		if params[:checkbox][:expert_grade] == 'Add expert grades'
+			@@other_info = 'add expert grades'
 			case params[:assignment_id]
 			when '724' # expert grades of Wiki 1a (724)
 				req.body.prepend("\"expert_grades\": {\"submission23967\":93,\"submission23969\":89,\"submission23971\":95,\"submission23972\":86,\"submission23973\":91,\"submission23975\":94,\"submission23979\":90,\"submission23980\":94,\"submission23981\":87,\"submission23982\":79,\"submission23983\":91,\"submission23986\":92,\"submission23987\":91,\"submission23988\":93,\"submission23991\":98,\"submission23992\":91,\"submission23994\":87,\"submission23995\":93,\"submission23998\":92,\"submission23999\":87,\"submission24000\":93,\"submission24001\":93,\"submission24006\":96,\"submission24007\":87,\"submission24008\":92,\"submission24009\":92,\"submission24010\":93,\"submission24012\":94,\"submission24013\":96,\"submission24016\":91,\"submission24018\":93,\"submission24024\":96,\"submission24028\":88,\"submission24031\":94,\"submission24040\":93,\"submission24043\":95,\"submission24044\":91,\"submission24046\":95,\"submission24051\":92},")
@@ -113,6 +123,7 @@ class ReputationWebServiceController < ApplicationController
 				puts '735'
 			end
 		elsif params[:checkbox][:hamer] == 'Add initial Hamer reputation values'
+			@@other_info = 'add initial hamer reputation values'
 			case params[:assignment_id]
 			when '724' # initial hamer reputation of Wiki 1a (724)
 				req.body.prepend("\"initial_hamer_reputation\":{\"stu5787\":1.726,\"stu5790\":3.275,\"stu5791\":1.059,\"stu5796\":0.461,\"stu5797\":5.593,\"stu5800\":3.116,\"stu5807\":2.776,\"stu5808\":4.077,\"stu5810\":0.74,\"stu5815\":2.301,\"stu5818\":1.186,\"stu5825\":2.686,\"stu5826\":2.053,\"stu5827\":0.447,\"stu5828\":0.521,\"stu5829\":3.236,\"stu5835\":1.13,\"stu5837\":0.414,\"stu5839\":0.531,\"stu5843\":2.217,\"stu5846\":1.337,\"stu5849\":0.786,\"stu5850\":2.023,\"stu5855\":0.26,\"stu5856\":0.481,\"stu5857\":2.198,\"stu5859\":2.212,\"stu5860\":0.811,\"stu5862\":0.632,\"stu5864\":1.098,\"stu5866\":0.361,\"stu5867\":5.945,\"stu5870\":3.368,\"stu5874\":1.749,\"stu5880\":0.56},")
@@ -122,7 +133,10 @@ class ReputationWebServiceController < ApplicationController
 				req.body.prepend("\"initial_hamer_reputation\":{\"stu4381\":2.649,\"stu5415\":3.022,\"stu5687\":3.578,\"stu5787\":3.142,\"stu5788\":2.424,\"stu5789\":0.134,\"stu5790\":2.885,\"stu5792\":2.27,\"stu5793\":2.317,\"stu5794\":2.219,\"stu5795\":1.232,\"stu5796\":0.832,\"stu5797\":2.946,\"stu5798\":0.225,\"stu5799\":5.365,\"stu5800\":2.749,\"stu5801\":4.161,\"stu5802\":4.78,\"stu5803\":0.366,\"stu5804\":0.262,\"stu5805\":3.016,\"stu5806\":0.561,\"stu5807\":3.028,\"stu5808\":3.573,\"stu5810\":3.664,\"stu5812\":2.638,\"stu5813\":2.621,\"stu5814\":3.035,\"stu5815\":2.985,\"stu5816\":0.11,\"stu5817\":2.16,\"stu5818\":0.448,\"stu5821\":0.294,\"stu5822\":1.874,\"stu5823\":3.339,\"stu5824\":3.597,\"stu5825\":4.033,\"stu5826\":2.962,\"stu5827\":1.49,\"stu5828\":3.208,\"stu5830\":1.211,\"stu5832\":0.406,\"stu5833\":3.04,\"stu5836\":3.396,\"stu5838\":4.519,\"stu5839\":2.974,\"stu5840\":1.952,\"stu5843\":3.515,\"stu5844\":0.627,\"stu5845\":2.355,\"stu5846\":3.604,\"stu5847\":3.847,\"stu5848\":1.488,\"stu5849\":2.078,\"stu5850\":2.957,\"stu5851\":2.774,\"stu5852\":2.345,\"stu5853\":1.717,\"stu5854\":2.275,\"stu5855\":2.216,\"stu5856\":1.4,\"stu5857\":3.463,\"stu5858\":3.132,\"stu5859\":3.327,\"stu5860\":0.965,\"stu5861\":1.683,\"stu5862\":1.646,\"stu5863\":0.457,\"stu5864\":3.901,\"stu5866\":2.402,\"stu5867\":1.495,\"stu5868\":0.198,\"stu5869\":1.434,\"stu5870\":0.43,\"stu5871\":0.654,\"stu5872\":0.854,\"stu5873\":2.645,\"stu5874\":1.988,\"stu5875\":0.089,\"stu5876\":3.438,\"stu5878\":3.763,\"stu5880\":2.444,\"stu5881\":0.316},")
 			end
 		elsif params[:checkbox][:quiz] == 'Choose quiz scores'
+			@@other_info = 'choose quiz scores'
 
+		else
+			@@other_info = ''
 		end
 			
 		# Eg.

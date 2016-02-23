@@ -1,5 +1,5 @@
 <%= form_tag action: "send_post_request" do %>
-	<b style="font-size: 20px;">Step 1: </b>Assignment_id: <%= number_field_tag 'assignment_id', nil, in: 1..@max_assignment_id %><br>
+	<b style="font-size: 20px;">Step 1: </b>Assignment_id: <%= number_field_tag 'assignment_id', nil, in: 1..@max_assignment_id, value: '724' %><br>
 
 	<b style="font-size: 20px;">Step 2: </b>Choose reputation algorithm:
 	<select id='algorithm' name='algorithm' style="width: 13em">
@@ -27,13 +27,19 @@
 	</select><br>
 
 	<b style="font-size: 20px;">Step 3: </b>Other information:
+	<%= hidden_field_tag 'checkbox[expert_grade]', '' %>
 	<%= check_box_tag 'checkbox[expert_grade]', 'Add expert grades' %>Add expert grades
+	<%= hidden_field_tag 'checkbox[hamer]', '' %>
 	<%= check_box_tag 'checkbox[hamer]', 'Add initial Hamer reputation values' %>Add initial Hamer reputation values
+	<%= hidden_field_tag 'checkbox[quiz]', '' %>
 	<%= check_box_tag 'checkbox[quiz]', 'Choose quiz scores' %>Choose quiz scores<br>
 	<b style="font-size: 20px;">Step 4: </b><%= submit_tag 'Send request' %>
 <% end %>
-<br/><br/>
+<br/>
 <hr>
+<%= "Request info: #{@assignment.name} (#{@assignment.id}) + #{@algorithm} algorithm" unless @assignment.nil? %>
+<%= " + #{@other_info}" unless @other_info.empty? %>
+<br/>
 <table border = '1' width="100%">
 	<tr>
 		<th style="text-align: center;"> Request JSON </th>
@@ -104,28 +110,38 @@
 		switch(selectedDropdownValue) {
 	    case 'hamer-expert':
 	    case 'lauw-peer':
-	        $("#checkbox_expert_grade").prop("checked", true);
-	        $("#checkbox_hamer").prop("checked", false);
-	        $("#checkbox_quiz").prop("checked", false);
-	        $("#checkbox_expert_grade").prop("disabled", true);
-	        $("#checkbox_hamer").prop("disabled", false);
-	        $("#checkbox_quiz").prop("disabled", false);
+	        $("input[id='checkbox_expert_grade'][type='checkbox']").prop("checked", true);
+	        $("input[id='checkbox_hamer'][type='checkbox']").prop("checked", false);
+	        $("input[id='checkbox_quiz'][type='checkbox']").prop("checked", false);
+	        $("input[id='checkbox_expert_grade'][type='checkbox']").prop("disabled", true);
+	        $("input[id='checkbox_hamer'][type='checkbox']").prop("disabled", false);
+	        $("input[id='checkbox_quiz'][type='checkbox']").prop("disabled", false);
+	        // in order to pass the params of disabled checkbox
+	        // we have to assign the value to a hidden input with same id
+	        $("input[id='checkbox_expert_grade'][type='hidden']").prop("value", 'Add expert grades');
+	        $("input[id='checkbox_quiz'][type='hidden']").prop("value", '');
 	        break;
 	    case 'quiz':
-	   		$("#checkbox_expert_grade").prop("checked", false);
-	        $("#checkbox_hamer").prop("checked", false);
-	        $("#checkbox_quiz").prop("checked", true);
-	        $("#checkbox_expert_grade").prop("disabled", false);
-	        $("#checkbox_hamer").prop("disabled", false);
-	        $("#checkbox_quiz").prop("disabled", true);
+	   		$("input[id='checkbox_expert_grade'][type='checkbox']").prop("checked", false);
+	        $("input[id='checkbox_hamer'][type='checkbox']").prop("checked", false);
+	        $("input[id='checkbox_quiz'][type='checkbox']").prop("checked", true);
+	        $("input[id='checkbox_expert_grade'][type='checkbox']").prop("disabled", false);
+	        $("input[id='checkbox_hamer'][type='checkbox']").prop("disabled", false);
+	        $("input[id='checkbox_quiz'][type='checkbox']").prop("disabled", true);
+	        // hidden field
+	        $("input[id='checkbox_expert_grade'][type='hidden']").prop("value", '');
+	        $("input[id='checkbox_quiz'][type='hidden']").prop("value", 'Choose quiz scores');
 	        break;
 	    default:
-	    	$("#checkbox_expert_grade").prop("checked", false);
-	        $("#checkbox_hamer").prop("checked", false);
-	        $("#checkbox_quiz").prop("checked", false);
-	        $("#checkbox_expert_grade").prop("disabled", false);
-	        $("#checkbox_hamer").prop("disabled", false);
-	        $("#checkbox_quiz").prop("disabled", false);
+	    	$("input[id='checkbox_expert_grade'][type='checkbox']").prop("checked", false);
+	        $("input[id='checkbox_hamer'][type='checkbox']").prop("checked", false);
+	        $("input[id='checkbox_quiz'][type='checkbox']").prop("checked", false);
+	        $("input[id='checkbox_expert_grade'][type='checkbox']").prop("disabled", false);
+	        $("input[id='checkbox_hamer'][type='checkbox']").prop("disabled", false);
+	        $("input[id='checkbox_quiz'][type='checkbox']").prop("disabled", false);
+	        //hidden field
+	        $("input[id='checkbox_expert_grade'][type='hidden']").prop("value", '');
+	        $("input[id='checkbox_quiz'][type='hidden']").prop("value", '');
 		}
 	});	
 </script>

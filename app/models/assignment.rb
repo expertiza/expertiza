@@ -421,6 +421,9 @@ require 'analytic/assignment_analytic'
     scores = Hash.new
 
     scores[:participants] = Hash.new
+    self.participants.each do |participant|
+      scores[:participants][participant.id.to_s.to_sym] = participant.scores(questions)
+    end
 
     scores[:teams] = Hash.new
     index = 0

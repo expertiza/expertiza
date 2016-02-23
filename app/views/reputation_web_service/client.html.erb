@@ -1,16 +1,55 @@
 <%= form_tag action: "send_post_request" do %>
-	Assignment_id: <%= text_field_tag 'assignment_id' %>
-	<%= submit_tag 'Send request' %>
+	<b style="font-size: 20px;">Step 1: </b>Assignment_id: <%= number_field_tag 'assignment_id', nil, in: 1..@max_assignment_id %><br>
+
+	<b style="font-size: 20px;">Step 2: </b>Choose reputation algorithm:
+	<select id='algorithm' name='algorithm' style="width: 13em">
+	    <option value='hamer' selected>
+	      Hamer's algorithm
+	    </option>
+	    <option value='hamer-expert' >
+	      Hamer-expert algorithm
+	    </option>
+	    <option value='lauw' >
+	      Lauw's algorithm
+	    </option>
+	    <option value='lauw-peer' >
+	      Lauw-peer algorithm
+	    </option>
+	    <option value='quiz' >
+	      Quiz-based algorithm
+	    </option>
+	    <option value='demytro' >
+	      Demytro's algorithm
+	    </option>
+	    <option value='cho' >
+	      Cho's algorithm
+	    </option>
+	</select><br>
+
+	<b style="font-size: 20px;">Step 3: </b>Other information:
+	<%= check_box_tag 'checkbox[expert_grade]', 'Add expert grades' %>Add expert grades
+	<%= check_box_tag 'checkbox[hamer]', 'Add initial Hamer reputation values' %>Add initial Hamer reputation values
+	<%= check_box_tag 'checkbox[quiz]', 'Choose quiz scores' %>Choose quiz scores<br>
+	<b style="font-size: 20px;">Step 4: </b><%= submit_tag 'Send request' %>
 <% end %>
 <br/><br/>
-<pre><code id='request'></code></pre>
-<pre><code id='response'></code></pre>
+<hr>
+<table border = '1' width="100%">
+	<tr>
+		<th style="text-align: center;"> Request JSON </th>
+		<th style="text-align: center;"> Response JSON </th>
+	</tr>
+	<tr>
+		<td valign="top" width="50%"> <pre><code id='request'></code></pre> </td>
+		<td valign="top" width="50%"> <pre><code id='response'></code></pre> </td>
+	</tr>
+</table>
 
 <style>
 	pre {
-	   background-color: ghostwhite;
-	   border: 1px solid silver;
-	   padding: 10px 20px;
+	   background-color: white;
+	   border: 0px;
+	   padding: 10px 30px;
 	   margin: 20px; 
 	   }
 	.json-key {
@@ -59,4 +98,34 @@
 		$('#request').html(library.json.prettyPrint(request));
 		$('#response').html(library.json.prettyPrint(response));
 	});
+
+	$('#algorithm').change(function changeDropdown(){
+		var selectedDropdownValue = $('#algorithm').find(":selected").val();
+		switch(selectedDropdownValue) {
+	    case 'hamer-expert':
+	    case 'lauw-peer':
+	        $("#checkbox_expert_grade").prop("checked", true);
+	        $("#checkbox_hamer").prop("checked", false);
+	        $("#checkbox_quiz").prop("checked", false);
+	        $("#checkbox_expert_grade").prop("disabled", true);
+	        $("#checkbox_hamer").prop("disabled", false);
+	        $("#checkbox_quiz").prop("disabled", false);
+	        break;
+	    case 'quiz':
+	   		$("#checkbox_expert_grade").prop("checked", false);
+	        $("#checkbox_hamer").prop("checked", false);
+	        $("#checkbox_quiz").prop("checked", true);
+	        $("#checkbox_expert_grade").prop("disabled", false);
+	        $("#checkbox_hamer").prop("disabled", false);
+	        $("#checkbox_quiz").prop("disabled", true);
+	        break;
+	    default:
+	    	$("#checkbox_expert_grade").prop("checked", false);
+	        $("#checkbox_hamer").prop("checked", false);
+	        $("#checkbox_quiz").prop("checked", false);
+	        $("#checkbox_expert_grade").prop("disabled", false);
+	        $("#checkbox_hamer").prop("disabled", false);
+	        $("#checkbox_quiz").prop("disabled", false);
+		}
+	});	
 </script>

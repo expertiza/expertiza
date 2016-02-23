@@ -421,21 +421,6 @@ require 'analytic/assignment_analytic'
     scores = Hash.new
 
     scores[:participants] = Hash.new
-    self.participants.each do |participant|
-      scores[:participants][participant.id.to_s.to_sym] = participant.scores(questions)
-
-      # for all quiz questionnaires (quizzes) taken by the participant
-      quiz_responses = Array.new
-      quiz_response_mappings = QuizResponseMap.where(reviewer_id: participant.id)
-      quiz_response_mappings.each do |qmapping|
-        if (qmapping.response)
-          quiz_responses << qmapping.response
-        end
-      end
-
-    end
-    #ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
 
     scores[:teams] = Hash.new
     index = 0

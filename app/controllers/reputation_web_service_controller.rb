@@ -17,6 +17,7 @@ class ReputationWebServiceController < ApplicationController
        'Teaching Assistant'].include? current_role_name
 	end
 
+	# normal db query, return peer review grades
 	def db_query(assignment_id, hasTopic)
 =begin
 	  query="SELECT U.id, RM.reviewee_id as submission_id, "+
@@ -48,7 +49,7 @@ class ReputationWebServiceController < ApplicationController
 		raw_data_array = Array.new
 		ReviewResponseMap.where(reviewed_object_id: assignment_id).each do |response_map|
 			reviewer = response_map.reviewer.user
-			team = Team.find(response_map.reviewee_id)
+			team = AssignmentTeam.find(response_map.reviewee_id)
 			topic_condition = ((hasTopic and SignedUpTeam.where(team_id: team.id).first.is_waitlisted == false) or !hasTopic)
 			last_valid_response = response_map.response.select{|r| r.round == 2}.sort.last
 			valid_response = [last_valid_response] unless last_valid_response.nil?
@@ -74,10 +75,26 @@ class ReputationWebServiceController < ApplicationController
 		raw_data_array
 	end
 
+	# special db query, return quiz scores
+	def db_query_with_quiz_score(assignment_id)
+		raw_data_array = Array.new
+		teams = AssignmentTeam.where(parent_id: assignment_id)
+		team_ids = Array.new
+		teams.each{|team| team_ids << team.id }
+		quiz_questionnnaires = QuizQuestionnaire.where(['instructor_id in (?)', team_ids])
+		quiz_questionnnaire_ids = Array.new
+		quiz_questionnnaires.each{|questionnaire| quiz_questionnnaire_ids << questionnaire.id }
+		QuizResponseMap.where(['reviewed_object_id in (?)', quiz_questionnnaire_ids]).each do |response_map|
+			quiz_score = response_map.quiz_score
+			raw_data_array << [response_map.reviewer_id, response_map.reviewee_id, quiz_score]
+		end
+		raw_data_array
+	end
+
 	def json_generator(assignment_id)
 		assignment = Assignment.find(assignment_id)
 		has_topic = !SignUpTopic.where(assignment_id: assignment_id).empty?
-		@results = db_query(assignment, has_topic)
+		@results = db_query(assignment.id, has_topic)
 		request_body = Hash.new
 		inner_msg = Hash.new
 		@results.each_with_index do |record, index|
@@ -106,10 +123,9 @@ class ReputationWebServiceController < ApplicationController
 		req = Net::HTTP::Post.new('/calculations/reputation_algorithms', initheader = {'Content-Type' =>'application/json'})
 		req.body = json_generator(params[:assignment_id].empty? ? '724' : params[:assignment_id]).to_json
 		req.body[0] = '' # remove the first '{'
-
 		@@assignment_id = params[:assignment_id]
 		@@algorithm = params[:algorithm]
-
+		
 		if params[:checkbox][:expert_grade] == 'Add expert grades'
 			@@other_info = 'add expert grades'
 			case params[:assignment_id]

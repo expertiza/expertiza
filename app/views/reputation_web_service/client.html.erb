@@ -1,5 +1,5 @@
 <%= form_tag action: "send_post_request" do %>
-	<b style="font-size: 20px;">Step 1: </b>Assignment_id: <%= number_field_tag 'assignment_id', nil, in: 1..@max_assignment_id, value: '724' %><br>
+	<b style="font-size: 20px;">Step 1: </b>Assignment_id: <%= number_field_tag 'assignment_id', nil, in: 1..@max_assignment_id, value: '724', style: 'width: 3em;' %> + <%= number_field_tag 'another_assignment_id', nil, in: 1..@max_assignment_id, value: '', style: 'width: 3em;' %> (optional)<br>
 
 	<b style="font-size: 20px;">Step 2: </b>Choose reputation algorithm:
 	<select id='algorithm' name='algorithm' style="width: 13em">

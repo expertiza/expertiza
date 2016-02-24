@@ -94,7 +94,12 @@ class ReputationWebServiceController < ApplicationController
 	def json_generator(assignment_id)
 		assignment = Assignment.find(assignment_id)
 		has_topic = !SignUpTopic.where(assignment_id: assignment_id).empty?
-		@results = db_query(assignment.id, has_topic)
+		@@algorithm = params[:algorithm]
+		unless @@algorithm == 'quiz'
+			@results = db_query(assignment.id, has_topic)
+		else
+			@results = db_query_with_quiz_score(assignment.id)
+		end
 		request_body = Hash.new
 		inner_msg = Hash.new
 		@results.each_with_index do |record, index|
@@ -124,8 +129,7 @@ class ReputationWebServiceController < ApplicationController
 		req.body = json_generator(params[:assignment_id].empty? ? '724' : params[:assignment_id]).to_json
 		req.body[0] = '' # remove the first '{'
 		@@assignment_id = params[:assignment_id]
-		@@algorithm = params[:algorithm]
-		
+
 		if params[:checkbox][:expert_grade] == 'Add expert grades'
 			@@other_info = 'add expert grades'
 			case params[:assignment_id]
@@ -150,7 +154,12 @@ class ReputationWebServiceController < ApplicationController
 			end
 		elsif params[:checkbox][:quiz] == 'Choose quiz scores'
 			@@other_info = 'choose quiz scores'
-
+			quiz_str = json_generator(params[:assignment_id].to_i).to_json
+			quiz_str[0] = ''
+			quiz_str.prepend('"quiz_scores":{')
+			quiz_str += ','
+			quiz_str.gsub('"N/A"','20.0')
+			req.body.prepend(quiz_str)
 		else
 			@@other_info = ''
 		end
@@ -159,6 +168,7 @@ class ReputationWebServiceController < ApplicationController
 		# "{"initial_hamer_reputation": {"stu1": 0.90, "stu2":0.88, "stu3":0.93, "stu4":0.8, "stu5":0.93, "stu8":0.93},  #optional
 		# "initial_lauw_reputation": {"stu1": 1.90, "stu2":0.98, "stu3":1.12, "stu4":0.94, "stu5":1.24, "stu8":1.18},  #optional
 		# "expert_grades": {"submission1": 90, "submission2":88, "submission3":93},  #optional
+		# "quiz_scores" : {"submission1" : {"stu1":100, "stu3":80}, "submission2":{"stu2":40, "stu1":60}}, #optional
 		# "submission1": {"stu1":91, "stu3":99},"submission2": {"stu5":92, "stu8":90},"submission3": {"stu2":91, "stu4":88}}"
 		req.body.prepend('{')
 		puts req.body

@@ -7,6 +7,7 @@ class ReputationWebServiceController < ApplicationController
 	@@request_body = ''
 	@@response_body = ''
 	@@assignment_id = ''
+	@@another_assignment_id = ''
 	@@algorithm = ''
 	@@other_info = ''
 
@@ -125,6 +126,7 @@ class ReputationWebServiceController < ApplicationController
 		 @response_body = @@response_body
 		 @max_assignment_id = Assignment.last.id
 		 @assignment = Assignment.find(@@assignment_id) rescue nil
+		 @another_assignment = Assignment.find(@@another_assignment_id) rescue nil
 		 @algorithm = @@algorithm
 		 @other_info = @@other_info
 	end
@@ -138,6 +140,7 @@ class ReputationWebServiceController < ApplicationController
 		req.body[0] = '' # remove the first '{'
 		@@assignment_id = params[:assignment_id]
 		@@algorithm = params[:algorithm]
+		@@another_assignment_id = params[:another_assignment_id]
 
 		if params[:checkbox][:expert_grade] == 'Add expert grades'
 			@@other_info = 'add expert grades'

@@ -18,28 +18,33 @@
 	    <option value='quiz' >
 	      Quiz-based algorithm
 	    </option>
-	    <option value='demytro' >
-	      Demytro's algorithm
-	    </option>
 	    <option value='cho' >
 	      Cho's algorithm
 	    </option>
 	</select><br>
 
-	<b style="font-size: 20px;">Step 3: </b>Other information:
+	<b style="font-size: 20px;">Step 3: </b>Additional information: <br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<%= hidden_field_tag 'checkbox[expert_grade]', '' %>
-	<%= check_box_tag 'checkbox[expert_grade]', 'Add expert grades' %>Add expert grades
+	<%= check_box_tag 'checkbox[expert_grade]', 'Add expert grades' %>Add expert grades <br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<%= hidden_field_tag 'checkbox[hamer]', '' %>
-	<%= check_box_tag 'checkbox[hamer]', 'Add initial Hamer reputation values' %>Add initial Hamer reputation values
+	<%= check_box_tag 'checkbox[hamer]', 'Add initial Hamer reputation values' %>Add initial Hamer reputation values 
+	with assignment_id: <%= number_field_tag 'hamer_assignment_id', nil, in: 1..@max_assignment_id, value: '', style: 'width: 3em;' %> + <%= number_field_tag 'another_hamer_assignment_id', nil, in: 1..@max_assignment_id, value: '', style: 'width: 3em;' %> (optional) <br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<%= hidden_field_tag 'checkbox[lauw]', '' %> 
+	<%= check_box_tag 'checkbox[lauw]', 'Add initial Lauw reputation values' %>Add initial Lauw reputation values 
+	with assignment_id: <%= number_field_tag 'lauw_assignment_id', nil, in: 1..@max_assignment_id, value: '', style: 'width: 3em;' %> + <%= number_field_tag 'another_lauw_assignment_id', nil, in: 1..@max_assignment_id, value: '', style: 'width: 3em;' %> (optional) <br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<%= hidden_field_tag 'checkbox[quiz]', '' %>
-	<%= check_box_tag 'checkbox[quiz]', 'Choose quiz scores' %>Choose quiz scores<br>
+	<%= check_box_tag 'checkbox[quiz]', 'Add quiz scores' %>Add quiz scores <br/>
 	<b style="font-size: 20px;">Step 4: </b><%= submit_tag 'Send request' %>
 <% end %>
 <hr>
 <%= "Request info: #{@assignment.name} (#{@assignment.id})" unless @assignment.nil? %>
 <%= " + #{@another_assignment.name} (#{@another_assignment.id})" unless @another_assignment.nil? %>
 <%= " + #{@algorithm} algorithm"  %>
-<%= " + #{@other_info}" unless @other_info.empty? %>
+<%= " + #{@additional_info}" unless @additional_info.empty? %>
 <br/>
 <table border = '1' width="60%">
 	<tr>
@@ -113,9 +118,11 @@
 	    case 'lauw-peer':
 	        $("input[id='checkbox_expert_grade'][type='checkbox']").prop("checked", true);
 	        $("input[id='checkbox_hamer'][type='checkbox']").prop("checked", false);
+	        $("input[id='checkbox_lauw'][type='checkbox']").prop("checked", false);
 	        $("input[id='checkbox_quiz'][type='checkbox']").prop("checked", false);
 	        $("input[id='checkbox_expert_grade'][type='checkbox']").prop("disabled", true);
 	        $("input[id='checkbox_hamer'][type='checkbox']").prop("disabled", false);
+	        $("input[id='checkbox_lauw'][type='checkbox']").prop("disabled", false);
 	        $("input[id='checkbox_quiz'][type='checkbox']").prop("disabled", false);
 	        // in order to pass the params of disabled checkbox
 	        // we have to assign the value to a hidden input with same id
@@ -125,20 +132,24 @@
 	    case 'quiz':
 	   		$("input[id='checkbox_expert_grade'][type='checkbox']").prop("checked", false);
 	        $("input[id='checkbox_hamer'][type='checkbox']").prop("checked", false);
+	        $("input[id='checkbox_lauw'][type='checkbox']").prop("checked", false);
 	        $("input[id='checkbox_quiz'][type='checkbox']").prop("checked", true);
 	        $("input[id='checkbox_expert_grade'][type='checkbox']").prop("disabled", false);
 	        $("input[id='checkbox_hamer'][type='checkbox']").prop("disabled", false);
+	        $("input[id='checkbox_lauw'][type='checkbox']").prop("disabled", false);
 	        $("input[id='checkbox_quiz'][type='checkbox']").prop("disabled", true);
 	        // hidden field
 	        $("input[id='checkbox_expert_grade'][type='hidden']").prop("value", '');
-	        $("input[id='checkbox_quiz'][type='hidden']").prop("value", 'Choose quiz scores');
+	        $("input[id='checkbox_quiz'][type='hidden']").prop("value", 'Add quiz scores');
 	        break;
 	    default:
 	    	$("input[id='checkbox_expert_grade'][type='checkbox']").prop("checked", false);
 	        $("input[id='checkbox_hamer'][type='checkbox']").prop("checked", false);
+	        $("input[id='checkbox_lauw'][type='checkbox']").prop("checked", false);
 	        $("input[id='checkbox_quiz'][type='checkbox']").prop("checked", false);
 	        $("input[id='checkbox_expert_grade'][type='checkbox']").prop("disabled", false);
 	        $("input[id='checkbox_hamer'][type='checkbox']").prop("disabled", false);
+	        $("input[id='checkbox_lauw'][type='checkbox']").prop("disabled", false);
 	        $("input[id='checkbox_quiz'][type='checkbox']").prop("disabled", false);
 	        //hidden field
 	        $("input[id='checkbox_expert_grade'][type='hidden']").prop("value", '');

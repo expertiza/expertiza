@@ -34,7 +34,7 @@
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<%= hidden_field_tag 'checkbox[lauw]', '' %> 
 	<%= check_box_tag 'checkbox[lauw]', 'Add initial Lauw reputation values' %>Add initial Lauw reputation values 
-	with assignment_id: <%= number_field_tag 'lauw_assignment_id', nil, in: 1..@max_assignment_id, value: '', style: 'width: 3em;' %> + <%= number_field_tag 'another_lauw_assignment_id', nil, in: 1..@max_assignment_id, value: '', style: 'width: 3em;' %> (optional) <br/>
+	with assignment_id:&nbsp;&nbsp;&nbsp;<%= number_field_tag 'lauw_assignment_id', nil, in: 1..@max_assignment_id, value: '', style: 'width: 3em;' %> + <%= number_field_tag 'another_lauw_assignment_id', nil, in: 1..@max_assignment_id, value: '', style: 'width: 3em;' %> (optional) <br/>
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<%= hidden_field_tag 'checkbox[quiz]', '' %>
 	<%= check_box_tag 'checkbox[quiz]', 'Add quiz scores' %>Add quiz scores <br/>
@@ -43,7 +43,7 @@
 <hr>
 <%= "Request info: #{@assignment.name} (#{@assignment.id})" unless @assignment.nil? %>
 <%= " + #{@another_assignment.name} (#{@another_assignment.id})" unless @another_assignment.nil? %>
-<%= " + #{@algorithm} algorithm"  %>
+<%= " + #{@algorithm} algorithm" unless @assignment.nil? %>
 <%= " + #{@additional_info}" unless @additional_info.empty? %>
 <br/>
 <table border = '1' width="60%">

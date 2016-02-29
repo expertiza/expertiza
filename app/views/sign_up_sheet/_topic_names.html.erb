@@ -35,8 +35,9 @@
     <% if chooser_present == false %>
       No choosers.
     <% end %>
-    <br/>
-  <% elsif !local_assigns[:waitlisted_teams_members].nil? && !local_assigns[:confirmed_teams_members].nil? && confirmed_teams_members.include?(session[:user].id) %>
+  <%end%>
+  <br/>
+  <% if !local_assigns[:waitlisted_teams_members].nil? && !local_assigns[:confirmed_teams_members].nil? && confirmed_teams_members.include?(session[:user].id) %>
     <br/><span style="color:red">Waitlist:</span><br/>
     <% waitlisted_teams_members.each_with_index do |team, index| %>
       <span><b><%= waitlisted_team_desc[index].name %></b></span>

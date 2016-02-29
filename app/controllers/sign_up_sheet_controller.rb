@@ -190,8 +190,8 @@ class SignUpSheetController < ApplicationController
     @confirmed_teams_members = []
     @vacancy_confirmed_teams = []
     max_team_size = Assignment.find(@assignment_id).max_team_size
-    @sign_up_topics.each_with_index do |topic, index|
-      topic_id = index
+    for topic in @sign_up_topics
+      topic_id = topic.id - @sign_up_topics.first.id
       cur_team_size = 0
       @waitlisted_teams[topic_id] = SignedUpTeam.waitlisted_teams_by_topic_id(topic.id)
       if !@waitlisted_teams[topic_id].nil?

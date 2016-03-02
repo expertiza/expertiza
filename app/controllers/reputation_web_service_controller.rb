@@ -19,7 +19,7 @@ class ReputationWebServiceController < ApplicationController
 	end
 
 	# normal db query, return peer review grades
-	def db_query(assignment_id, another_assignment_id = 0,hasTopic)
+	def db_query(assignment_id, another_assignment_id = 0, round_num, hasTopic)
 =begin
 	  query="SELECT U.id, RM.reviewee_id as submission_id, "+
 		    "sum(A.answer * Q.weight) / sum(QN.max_question_score * Q.weight) * 100 as total_score "+
@@ -55,7 +55,7 @@ class ReputationWebServiceController < ApplicationController
 			reviewer = response_map.reviewer.user
 			team = AssignmentTeam.find(response_map.reviewee_id)
 			topic_condition = ((hasTopic and SignedUpTeam.where(team_id: team.id).first.is_waitlisted == false) or !hasTopic)
-			last_valid_response = response_map.response.select{|r| r.round == 2}.sort.last
+			last_valid_response = response_map.response.select{|r| r.round == round_num}.sort.last
 			valid_response = [last_valid_response] unless last_valid_response.nil?
 			if topic_condition == true and !valid_response.nil? and !valid_response.empty?
 				valid_response.each do |response|
@@ -99,12 +99,12 @@ class ReputationWebServiceController < ApplicationController
 		raw_data_array
 	end
 
-	def json_generator(assignment_id, another_assignment_id = 0,type = 'peer review grades')
+	def json_generator(assignment_id, another_assignment_id = 0, round_num = 2, type = 'peer review grades')
 		assignment = Assignment.find(assignment_id)
 		has_topic = !SignUpTopic.where(assignment_id: assignment_id).empty?
 		
 		if type == 'peer review grades'
-			@results = db_query(assignment.id, another_assignment_id, has_topic)
+			@results = db_query(assignment.id, another_assignment_id, round_num, has_topic)
 		elsif type == 'quiz scores'
 			@results = db_query_with_quiz_score(assignment.id, another_assignment_id)
 		end
@@ -136,7 +136,7 @@ class ReputationWebServiceController < ApplicationController
 		# uri = URI.parse('http://152.7.99.160:3000//calculations/reputation_algorithms')
 		req = Net::HTTP::Post.new('/calculations/reputation_algorithms', initheader = {'Content-Type' =>'application/json'})
 		curr_assignment_id = (params[:assignment_id].empty? ? '724' : params[:assignment_id])
-		req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i,'peer review grades').to_json
+		req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
 		req.body[0] = '' # remove the first '{'
 		@@assignment_id = params[:assignment_id]
 		@@algorithm = params[:algorithm]
@@ -153,7 +153,8 @@ class ReputationWebServiceController < ApplicationController
 		 		end
 			when '735' # expert grades of program 1 (735)
 				req.body.prepend("\"expert_grades\": {\"submission24083\":96.084,\"submission24085\":88.811,\"submission24086\":100,\"submission24087\":100,\"submission24088\":92.657,\"submission24091\":96.783,\"submission24092\":90.21,\"submission24093\":100,\"submission24097\":90.909,\"submission24098\":98.601,\"submission24101\":99.301,\"submission24278\":98.601,\"submission24279\":72.727,\"submission24281\":54.476,\"submission24289\":94.406,\"submission24291\":99.301,\"submission24293\":93.706,\"submission24296\":98.601,\"submission24302\":83.217,\"submission24303\":91.329,\"submission24305\":100,\"submission24307\":100,\"submission24308\":100,\"submission24311\":95.804,\"submission24313\":91.049,\"submission24314\":100,\"submission24315\":97.483,\"submission24316\":91.608,\"submission24317\":98.182,\"submission24320\":90.21,\"submission24321\":90.21,\"submission24322\":98.601},")
-				puts '735'
+			when '756' # expert grades of Calibration_CSC/ECE517_S16 (756)
+				req.body.prepend("\"expert_grades\": {\"submission25107\":87,\"submission25109\":93},")
 			end
 		elsif params[:checkbox][:hamer] == 'Add initial Hamer reputation values'
 			@@additional_info = 'add initial hamer reputation values'
@@ -181,7 +182,7 @@ class ReputationWebServiceController < ApplicationController
 			end
 		elsif params[:checkbox][:quiz] == 'Add quiz scores'
 			@@additional_info = 'add quiz scores'
-			quiz_str = json_generator(params[:assignment_id].to_i, params[:another_assignment_id].to_i,'quiz scores').to_json
+			quiz_str = json_generator(params[:assignment_id].to_i, params[:another_assignment_id].to_i, params[:round_num].to_i, 'quiz scores').to_json
 			quiz_str[0] = ''
 			quiz_str.prepend('"quiz_scores":{')
 			quiz_str += ','

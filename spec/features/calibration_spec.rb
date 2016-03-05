@@ -15,7 +15,7 @@ describe 'Create Assignment' do
 
     # An assignment created with calibration turned on
     # should show the calibration tab when editing
-    it 'Should show calibration tab' do
+    it 'should show calibration tab' do
 
       # Log in as the instructor.
       login_as @instructor.name
@@ -61,5 +61,49 @@ describe 'Create Assignment' do
       expect(find('.assignments.edit > h1')).to have_content('Editing Assignment: Calibration Test')
       expect(page).to have_no_selector('#Calibration')
     end
+  end
+end
+
+# Test Assignment Edit Functionality
+describe 'Edit Assignment' do
+
+  # Set up for testing
+  before :each do
+    # TODO create assignment with calibration
+  end
+
+  # Verify the calibration tab can be accessed by admins
+  it 'calibration can be accessed by admins' do
+    fail 'not yet implemented'
+  end
+
+  # Verify the calibration tab can be accessed by instructors
+  it 'calibration can be accessed by instructors' do
+    fail 'not yet implemented'
+  end
+
+  # Verify that as submissions are made they appear in
+  # the table under the calibration tab
+  it 'shows artifacts that have been submitted' do
+    fail 'not yet implemented'
+  end
+end
+
+# Test Submitter Functionality
+describe 'Submitter' do
+
+  # Set up for testing
+  before :each do
+    # TODO set up any needed state
+  end
+
+  # Verify submitters can be added to the assignment
+  it 'can be added to the assignment by login' do
+    fail 'not yet implemented'
+  end
+
+  # Verify submitters can submit artifacts
+  it 'can submit artifacts for calibration' do
+    fail 'not yet implemented'
   end
 end

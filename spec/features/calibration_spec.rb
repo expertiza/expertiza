@@ -1,15 +1,16 @@
 require 'rails_helper'
 
-# Test course creation functionality
-describe 'Create Course' do
+# Test Assignment Creation Functionality
+describe 'Create Assignment' do
 
   # Before testing create needed state
   before :each do
+
     # Create an instructor account
     @instructor = create :instructor
   end
 
-  # Test creating a course with calibration
+  # Test creating an assignment with calibration
   describe 'With Calibration' do
 
     # An assignment created with calibration turned on
@@ -36,7 +37,7 @@ describe 'Create Course' do
     end
   end
 
-  # Test creating a course without calibration
+  # Test creating an assignment without calibration
   describe 'Without Calibration' do
 
     # An assignment created with calibration turned off

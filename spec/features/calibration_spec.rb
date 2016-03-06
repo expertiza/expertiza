@@ -69,17 +69,38 @@ describe 'Edit Assignment' do
 
   # Set up for testing
   before :each do
-    # TODO create assignment with calibration
+    # Create an instructor and admin
+    @instructor = create(:instructor)
+    @admin = create(:admin)
+
+    # Create an assignment with calibration
+    @assignment = create :assignment, is_calibrated: true
   end
 
   # Verify the calibration tab can be accessed by admins
   it 'calibration can be accessed by admins' do
-    fail 'not yet implemented'
+    # Log in with the admin
+    login_as @admin.name
+
+    # Visit the edit page
+    visit edit_assignment_path @assignment
+
+    # Verify access to calibration
+    expect(find('.assignments.edit > h1')).to have_content("Editing Assignment: #{@assignment.name}")
+    expect(page).to have_selector('#Calibration')
   end
 
   # Verify the calibration tab can be accessed by instructors
   it 'calibration can be accessed by instructors' do
-    fail 'not yet implemented'
+    # Log in with the instructor
+    login_as @instructor.name
+
+    # Visit the edit page
+    visit edit_assignment_path @assignment
+
+    # Verify access to calibration
+    expect(find('.assignments.edit > h1')).to have_content("Editing Assignment: #{@assignment.name}")
+    expect(page).to have_selector('#Calibration')
   end
 
   # Verify that as submissions are made they appear in

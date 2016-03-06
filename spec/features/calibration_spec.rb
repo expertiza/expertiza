@@ -75,6 +75,18 @@ describe 'Edit Assignment' do
 
     # Create an assignment with calibration
     @assignment = create :assignment, is_calibrated: true
+
+    # Create a team linked to the calibrated assignment
+    @team = create :assignment_team, assignment: @assignment
+
+    # Create an assignment participant linked to the assignment.
+    # The factory for this implicitly loads or creates a student
+    # (user) object that the participant is linked to.
+    @submitter = create :participant, assignment: @assignment
+
+    # Create a mapping between the assignment team and the
+    # participant object's user (the student).
+    create :team_user, team: @team, user: @submitter.user
   end
 
   # Verify the calibration tab can be accessed by admins
@@ -106,7 +118,17 @@ describe 'Edit Assignment' do
   # Verify that as submissions are made they appear in
   # the table under the calibration tab
   it 'shows artifacts that have been submitted' do
-    fail 'not yet implemented'
+    # Log in with instructor
+    login_as @instructor.name
+
+    # Visit the edit page
+    visit edit_assignment_path @assignment
+
+    # Click the Calibration Tab
+    find('#Calibration').click
+
+    # verify hyperlink exists
+    expect(page).to have_link 'https://www.expertiza.ncsu.edu'
   end
 end
 

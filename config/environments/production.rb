@@ -89,4 +89,7 @@ Expertiza::Application.configure do
   config.log_formatter = ::Logger::Formatter.new
 
   config.react.variant = :production
+
+  #configuration for summary web service url
+  config.summary_ws_url = 'http://prevdata.csc.ncsu.edu/sum/v1.0/summary/8/lsa'
 end

@@ -561,7 +561,7 @@ class ReviewMappingController < ApplicationController
     # to treat all assignments as team assignments
     @type =  params.has_key?(:report)? params[:report][:type] : "ReviewResponseMap"
 
-    summary_ws_url = 'http://prevdata.csc.ncsu.edu/sum/v1.0/summary/10/lsa'
+    summary_ws_url = Rails.application.config.summary_ws_url
 
     case @type
     # this summarizes the reviews of each reviewee by each question

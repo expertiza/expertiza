@@ -1,27 +1,7 @@
 <!-- PARTICIPANT -->
-<!-- fake link to sumarization table -->
-<style>
-  .fake-link {
-    color: #94672d;
-    cursor: pointer;
-  }
-</style>
-
-<script type="text/javascript" charset="utf-8">
-  $(document).ready(function() {
-
-    $('.fake-link').hover(function(){
-      $(this).css("color", "#2e517e");
-      $(this).css("text-decoration", "underline");
-    }, function(){
-      $(this).css("color", "#94672d");
-      $(this).css("text-decoration", "none");
-    });
-
-  });
-</script>
-<!-- end fake link to sumarization table -->
-<% 
+<link rel="stylesheet" type="text/css" href="/assets/summary.css">
+<script type="text/javascript" src="/assets/summary.js" ></script>
+<%
 participant = pscore[:participant]
     if pscore[:review]
 @rscore_review=Rscore.new(pscore,:review)

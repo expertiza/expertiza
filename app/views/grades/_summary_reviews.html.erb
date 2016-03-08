@@ -1,0 +1,51 @@
+<style>
+  .arrow_icon{
+    width: 20px;
+    height: 20px;
+  }
+  .table_stretch{
+    width: 100%;
+  }
+</style>
+
+
+<script>
+  var mImg = "/assets/arrow_down.png";
+  var pImg = "/assets/arrow_right.png";
+  $(document).ready(function(){
+
+    $('.header_class').click(function(){
+      if($(this).find("img").attr("src") == mImg){
+        $(this).find("img").attr("src", pImg)
+      }else {
+        $(this).find("img").attr("src", mImg)
+      }
+    });
+
+  });
+</script>
+
+<!-- SUMMARY REVIEWS -->
+  <table>
+
+    <%
+      @summaries.keys.each do |round|
+        safe_concat "<tr class='header_class' data-toggle='collapse' data-target='#round_" + round + "' >
+                    <td><h5><img src='/assets/arrow_down.png' class='arrow_icon'></img>[avg score: " +  @score_round_summaries[round].to_s + "%]&nbsp;Round " + round + "</h5></tr></td>"
+        safe_concat "<tr><td><div id = 'round_" + round + "' class='collapse'><table cellpadding='6'>"
+        @summaries[round].keys.each do |q|
+          safe_concat "<tr bgcolor='#BDBDBD'><td><h5>[avg score: " + @score_summaries[round][q].to_s + "%]&nbsp;" + q + "</h5></tr></td>"
+          safe_concat "<tr><td>"
+          if !@summaries[round][q].eql?("")
+            concat @summaries[round][q]
+          else
+            safe_concat "&nbsp;"
+          end
+          safe_concat "</tr></td>"
+        end
+        safe_concat "</tr></td></div></table>"
+      end
+
+    %>
+  <table>
+<!-- END SUMMARY REVIEWS -->

@@ -1,0 +1,74 @@
+<style>
+  .arrow_icon{
+    width: 20px;
+    height: 20px;
+  }
+  .table_stretch{
+    width: 100%;
+    cellpadding: 6;
+  }
+</style>
+
+
+<script>
+  var mImg = "/assets/arrow_down.png";
+  var pImg = "/assets/arrow_right.png";
+  $(document).ready(function(){
+
+    $('.header_class').click(function(){
+      if($(this).find("img").attr("src") == mImg){
+        $(this).find("img").attr("src", pImg)
+      }else {
+        $(this).find("img").attr("src", mImg)
+      }
+    });
+
+  });
+</script>
+
+<div class = "reviewreport">
+  <br>
+  <table border="1" bordercolor="grey" style="table_stretch">
+  <%
+     row_round_index = 0
+
+    @team_reviewers.keys.each do |team|
+      safe_concat  '<tr bgcolor="#BDBDBD"><th class="header_class"  data-toggle="collapse" data-target="#team_' + row_round_index.to_s + '" >
+                    <h5><img id="icon_header_team" src="/assets/arrow_down.png" class="arrow_icon"></img>[avg score: ' + @avg_scores_by_reviewee[team].to_s + '%]&nbsp;' + team + '</h5></th></tr>'
+      safe_concat  '<tr bgcolor="#E6E6E6"><td>Reviewers : '
+      concat @team_reviewers[team].join(", ")
+      safe_concat  '</td></tr>'
+      #print the team name and put the reviews in a div so it can be collapsed smoothly
+      safe_concat '<tr><td><div id="team_' + row_round_index.to_s + '" class="collapse"><table border="1" style="table_stretch">'
+      for i in 0..@assignment.rounds_of_reviews-1
+        team_assg_index = row_round_index.to_s + i.to_s
+        #print the avg scores of each round
+        safe_concat  '<tr><td class="header_class" data-toggle="collapse" data-target="#round_' + team_assg_index + '" >
+                      <h5><img src="/assets/arrow_down.png" class="arrow_icon"></img> [score avg : ' + @avg_scores_by_round[team][i].to_s  + '%]
+                      Round ' + (i+1).to_s + '</h5></tr></td>'
+        safe_concat '<tr><td><div id="round_' + team_assg_index + '" class="collapse"><table style="table_stretch">'
+
+        @answer[team][i].keys.each do | q |
+          #print the avg scores of each question
+          safe_concat "<tr bgcolor='#BDBDBD'><td><i>[score avg : " +
+                          @avg_scores_by_question[team][i][q].to_s + "%]&nbsp;" +
+                          q + "</i></tr></td>"
+          safe_concat "<tr><td>"
+          #print the summary of reviews
+          if !@answer[team][i][q].eql?("")
+            concat @answer[team][i][q]
+          else
+            safe_concat "&nbsp;"
+          end
+
+          safe_concat "</tr></td>"
+        end
+        safe_concat '</table><div></tr></td>'
+      end
+      row_round_index += 1
+      safe_concat '</table><div></tr></td>'
+    end
+
+  %>
+  </table>
+</div>

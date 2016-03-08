@@ -89,7 +89,7 @@ class GradesController < ApplicationController
     @score_summaries = Hash.new
     @score_round_summaries = Hash.new
     #move this to config file
-    summary_ws_url = 'http://prevdata.csc.ncsu.edu/sum/v1.0/summary/10/lsa'
+    summary_ws_url = Rails.application.config.summary_ws_url
 
     #get all answers for each question and send them to summarization WS
     @questions.keys.each do |round|

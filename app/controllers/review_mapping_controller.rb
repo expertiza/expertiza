@@ -561,7 +561,14 @@ class ReviewMappingController < ApplicationController
     # to treat all assignments as team assignments
     @type =  params.has_key?(:report)? params[:report][:type] : "ReviewResponseMap"
 
+    summary_ws_url = 'http://prevdata.csc.ncsu.edu/sum/v1.0/summary/10/lsa'
+
     case @type
+    # this summarizes the reviews of each reviewee by each question
+    when "SummaryRevieweeResponseMap"
+      summarize_reviews_for_reviewees(@assignment, summary_ws_url)
+    when "SummaryResponseMap"
+      summarize_reviews_each_question(@assignment, summary_ws_url)
     when "ReviewResponseMap"
       if params[:user].nil?
         # This is not a search, so find all reviewers for this assignment
@@ -606,5 +613,130 @@ class ReviewMappingController < ApplicationController
       @responses = Response.where(["map_id IN (?)", @review_response_map_ids])
     end
   end
+
+  # required by autosummary
+  def summarize_reviews_each_question(assignment, summary_ws_url)
+    nround = assignment.rounds_of_reviews
+    @teams_responses = Array.new
+    @summary_by_criterion = Array.new(nround)
+    @avg_scores_by_criterion = Array.new(nround)
+    @avg_scores_by_round = Array.new(nround)
+
+    rubric = SummaryHelper.get_questions_by_assignment(assignment)
+
+    for round in 0..nround-1
+      @avg_scores_by_round[round] = 0.0
+      @summary_by_criterion[round] = Hash.new
+      @avg_scores_by_criterion[round] = Hash.new
+
+      questions_used_in_round = rubric[assignment.varying_rubrics_by_round? ? round : 0]
+      #get answers of each question in the rubric
+      questions_used_in_round.each do |question|
+        next if question.type.eql?("SectionHeader")
+        answers_questions =
+            Answer.select("DISTINCT answers.comments,  answers.answer")
+                .joins("JOIN questions ON answers.question_id = questions.id")
+                .joins("JOIN responses ON responses.id = answers.response_id")
+                .joins("JOIN response_maps ON responses.map_id = response_maps.id")
+                .where("answers.question_id = ? and response_maps.reviewed_object_id = ?", question.id, assignment.id)
+
+        max_score = SummaryHelper.get_max_score_for_question(question)
+        # process each question in a seperate thread
+        Thread.new do
+          comments = SummaryHelper.breakup_comments_to_sentences(answers_questions)
+          # store each avg in a hashmap and use the question as the key
+          @avg_scores_by_criterion[round][question.txt] = SummaryHelper.calculate_avg_score_by_criterion(answers_questions, max_score)
+          @summary_by_criterion[round][question.txt] = SummaryHelper.summarize_sentences(comments, summary_ws_url)
+        end
+        # Wait for all threads to end
+        Thread.list.each do |t|
+          # Wait for the thread to finish if it isn't this thread (i.e. the main thread).
+          t.join if t != Thread.current
+        end
+      end
+      @avg_scores_by_round[round] = SummaryHelper.calculate_avg_score_by_round(@avg_scores_by_criterion[round], questions_used_in_round)
+    end
+  end
+
+  def summarize_reviews_for_reviewees(assignment, summary_ws_url)
+
+    #@answer[reviewee][round][question][comments/answer]
+    #@avg_score_round[reviewee][round]
+    #@avg_score_round_question[reviewee][round][question]
+    @answer = Hash.new
+    @avg_scores_by_reviewee = Hash.new
+    @avg_scores_by_round = Hash.new
+    @avg_scores_by_question = Hash.new
+    @team_reviewers = Hash.new
+
+    #get all questions used in each round
+    rubric = SummaryHelper.get_questions_by_assignment(assignment)
+
+    # get all teams in this assignment
+    teams = Team.select(:id, :name).where(:parent_id => @id).order(:name)
+
+    teams.each do |reviewee|
+      @answer[reviewee.name] = Array.new
+      @avg_scores_by_reviewee[reviewee.name] = 0.0
+      @avg_scores_by_round[reviewee.name]= Array.new
+      @avg_scores_by_question[reviewee.name]= Array.new
+
+      #get the name of reviewers for display only
+      @team_reviewers[reviewee.name] = SummaryHelper.get_reviewers_by_reviewee_and_assignment(reviewee, assignment.id)
+
+      #get answers of each reviewer by rubric
+      for round in 0..assignment.rounds_of_reviews-1
+        @answer[reviewee.name][round] = Hash.new
+        @avg_scores_by_round[reviewee.name][round] = 0.0
+        @avg_scores_by_question[reviewee.name][round]=Hash.new
+
+        #iterate each round and get answers
+        #if use the same rubric, only use rubric[0]
+        rubric_used = rubric[assignment.varying_rubrics_by_round? ? round : 0]
+        rubric_used.each do |q|
+
+          next if q.type.eql?("SectionHeader")
+          @answer[reviewee.name][round][q.txt] = ""
+          @avg_scores_by_question[reviewee.name][round][q.txt] = 0.0
+
+
+          #get all answers to this question
+          question_answers = Answer.select(:answer, :comments)
+                                 .joins("join responses on responses.id = answers.response_id")
+                                 .joins("join response_maps on responses.map_id = response_maps.id")
+                                 .joins("join questions on questions.id = answers.question_id")
+                                 .where("response_maps.reviewed_object_id = ? and
+                                             response_maps.reviewee_id = ? and
+                                             answers.question_id = ? and
+                                             responses.round = ?", @id, reviewee.id, q.id, round+1)
+          #get max score of this rubric
+          q_max_score = SummaryHelper.get_max_score_for_question(q)
+
+          comments = SummaryHelper.breakup_comments_to_sentences(question_answers)
+          #get score and summary of answers for each question
+          @avg_scores_by_question[reviewee.name][round][q.txt] = SummaryHelper.calculate_avg_score_by_criterion(question_answers, q_max_score)
+
+          #summarize the comments by calling the summarization Web Service
+
+          #since it'll do a lot of request, do this in seperate threads
+          Thread.new do
+            @answer[reviewee.name][round][q.txt] = SummaryHelper.summarize_sentences(comments, summary_ws_url) if comments.size > 0
+          end
+
+        end
+        @avg_scores_by_round[reviewee.name][round] = SummaryHelper.calculate_avg_score_by_round(@avg_scores_by_question[reviewee.name][round], rubric_used)
+
+      end
+      @avg_scores_by_reviewee[reviewee.name] = SummaryHelper.calculate_avg_score_by_reviewee(@avg_scores_by_round[reviewee.name], assignment.rounds_of_reviews)
+    end
+
+    # Wait for all threads to end
+    Thread.list.each do |t|
+      t.join if t != Thread.current
+    end
+
+  end
+
+  # end required by autosummary
 
 end

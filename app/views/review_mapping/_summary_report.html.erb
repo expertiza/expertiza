@@ -1,0 +1,56 @@
+<style>
+  .arrow_icon{
+    width: 20px;
+    height: 20px;
+  }
+  .table_stretch{
+    width: 100%;
+    cellpadding: 6;
+  }
+</style>
+
+
+<script>
+  var mImg = "/assets/arrow_down.png";
+  var pImg = "/assets/arrow_right.png";
+  $(document).ready(function(){
+
+    $('.header_class').click(function(){
+      if($(this).find("img").attr("src") == mImg){
+        $(this).find("img").attr("src", pImg)
+      }else {
+        $(this).find("img").attr("src", mImg)
+      }
+    });
+
+  });
+</script>
+
+<div class = "reviewreport">
+
+  <br>
+  <table border="1" bordercolor="#848484">
+  <%
+
+    for i in 0..@assignment.rounds_of_reviews-1
+      safe_concat "<tr bgcolor='#848484' class='header_class'  data-toggle='collapse' data-target='#round_" + (i+1).to_s + "'>
+                  <td><img id='icon_header_team' src='/assets/arrow_down.png' class='arrow_icon'></img>[avg score : " + @avg_scores_by_round[i].to_s + "%] Round " + (i+1).to_s + "</td></tr>"
+      safe_concat "<tr><td><div id = 'round_" + (i+1).to_s + "' class='collapse'><table>"
+      @summary_by_criterion[i].keys.each do |question|
+
+        safe_concat "<tr bgcolor='#BDBDBD'><td><h5>[avg score: " + @avg_scores_by_criterion[i][question].to_s + "%]&nbsp;" + question + "</h5></td></tr><tr><td>"
+        safe_concat "<tr><td>"
+        if !@summary_by_criterion[i][question].eql?("")
+          concat @summary_by_criterion[i][question]
+        else
+          safe_concat "&nbsp;"
+        end
+
+        safe_concat "</td></tr>"
+      end
+
+      safe_concat "</table></div></td></tr>"
+    end
+  %>
+  </table>
+</div>

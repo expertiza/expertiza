@@ -1,6 +1,8 @@
 require 'json'
 require 'uri'
 require 'net/http'
+require 'openssl'
+require 'base64'
 
 class ReputationWebServiceController < ApplicationController
 
@@ -8,6 +10,7 @@ class ReputationWebServiceController < ApplicationController
 	@@response_body = ''
 	@@assignment_id = ''
 	@@another_assignment_id = ''
+	@@round_num = ''
 	@@algorithm = ''
 	@@additional_info = ''
 
@@ -127,18 +130,19 @@ class ReputationWebServiceController < ApplicationController
 		 @max_assignment_id = Assignment.last.id
 		 @assignment = Assignment.find(@@assignment_id) rescue nil
 		 @another_assignment = Assignment.find(@@another_assignment_id) rescue nil
+		 @round_num = @@round_num
 		 @algorithm = @@algorithm
 		 @additional_info = @@additional_info
 	end
 
 	def send_post_request
 		# https://www.socialtext.net/open/very_simple_rest_in_ruby_part_3_post_to_create_a_new_workspace
-		# uri = URI.parse('http://152.7.99.160:3000//calculations/reputation_algorithms')
-		req = Net::HTTP::Post.new('/calculations/reputation_algorithms', initheader = {'Content-Type' =>'application/json'})
+		req = Net::HTTP::Post.new('/calculations/reputation_algorithms', initheader = {'Content-Type' =>'application/json', 'charset' => 'utf-8'})
 		curr_assignment_id = (params[:assignment_id].empty? ? '724' : params[:assignment_id])
 		req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
 		req.body[0] = '' # remove the first '{'
 		@@assignment_id = params[:assignment_id]
+		@@round_num = params[:round_num]
 		@@algorithm = params[:algorithm]
 		@@another_assignment_id = params[:another_assignment_id]
 
@@ -202,15 +206,75 @@ class ReputationWebServiceController < ApplicationController
 		# "expert_grades": {"submission1": 90, "submission2":88, "submission3":93},  #optional
 		# "quiz_scores" : {"submission1" : {"stu1":100, "stu3":80}, "submission2":{"stu2":40, "stu1":60}}, #optional
 		# "submission1": {"stu1":91, "stu3":99},"submission2": {"stu5":92, "stu8":90},"submission3": {"stu2":91, "stu4":88}}"
-		req.body.prepend('{')
+		req.body.prepend("{")
+        @@request_body = req.body
 		puts req.body
 		puts
-		response = Net::HTTP.new('152.7.99.160', 3000).start {|http| http.request(req)}
+	# Encryption
+		# AES symmetric algorithm encrypts raw data
+		aes_encrypted_request_data = aes_encrypt(req.body)
+		req.body = aes_encrypted_request_data[0]
+		# RSA asymmetric algorithm encrypts keys of AES
+		encrypted_key = rsa_public_key1(aes_encrypted_request_data[1])
+		encrypted_vi = rsa_public_key1(aes_encrypted_request_data[2])
+		# fixed length 350
+		req.body.prepend('", "data":"')
+		req.body.prepend(encrypted_vi)
+		req.body.prepend(encrypted_key)
+		# request body should be in JSON format.
+		req.body.prepend('{"keys":"')
+		req.body << '"}'
+		req.body.gsub!(/\n/, '\\n')
+		response = Net::HTTP.new('152.46.18.65', 3000).start {|http| http.request(req)}
+		# RSA asymmetric algorithm decrypts keys of AES
+	# Decryption
+		response.body = JSON.parse(response.body)
+		key = rsa_private_key2(response.body["keys"][0, 350])
+		vi = rsa_private_key2(response.body["keys"][350,350])
+		# AES symmetric algorithm decrypts data
+		aes_encrypted_response_data = response.body["data"]
+		response.body = aes_decrypt(aes_encrypted_response_data, key, vi)
+
 		puts "Response #{response.code} #{response.message}:
           #{response.body}"
         puts
-        @@request_body = req.body
         @@response_body = response.body
 		redirect_to action: 'client'
+	end
+
+	def rsa_public_key1(data)
+		public_key_file = 'public1.pem'
+		public_key = OpenSSL::PKey::RSA.new(File.read(public_key_file))
+		encrypted_string = Base64.encode64(public_key.public_encrypt(data))
+
+		return encrypted_string
+	end
+
+	def rsa_private_key2(cipertext)
+		private_key_file = 'private2.pem'
+		password = "ZXhwZXJ0aXph\n"
+		encrypted_string = cipertext
+		private_key = OpenSSL::PKey::RSA.new(File.read(private_key_file),Base64.decode64(password))
+		string = private_key.private_decrypt(Base64.decode64(encrypted_string))
+
+		return string
+	end
+
+	def aes_encrypt(data)
+		cipher = OpenSSL::Cipher::AES.new(256, :CBC)
+		cipher.encrypt
+		key = cipher.random_key
+		iv = cipher.random_iv
+		cipertext = Base64.encode64(cipher.update(data) + cipher.final)
+		return cipertext, key, iv
+	end
+
+	def aes_decrypt(cipertext, key, iv)
+		decipher = OpenSSL::Cipher::AES.new(256, :CBC)
+		decipher.decrypt
+		decipher.key = key
+		decipher.iv = iv
+		plain = decipher.update(Base64.decode64(cipertext)) + decipher.final
+		return plain
 	end
 end

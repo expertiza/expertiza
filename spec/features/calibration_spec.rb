@@ -321,7 +321,7 @@ describe 'Add Expert Review' do
     login_as @student.name
 
     #Be able to go to edit assignment page
-    visit "/response/new?id=#{@submitter.id}"
+    visit "/response/new?id=#{@student.id}"
     save_and_open_page
     click_on 'Submit Review'
     save_and_open_page

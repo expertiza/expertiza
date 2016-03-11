@@ -949,11 +949,11 @@ FactoryGirl.define do
     course { Course.first || association(:course)} 
     instructor { User.first || association(:instructor)} 
     private false
-    num_reviews 0
-    num_review_of_reviews 0
-    num_review_of_reviewers 0
+    num_reviews 1
+    num_review_of_reviews 1
+    num_review_of_reviewers 1
     reviews_visible_to_all false
-    num_reviewers 0
+    num_reviewers 1
     spec_location "https://expertiza.ncsu.edu/"
     max_team_size 3
     staggered_deadline false
@@ -1109,4 +1109,5 @@ FactoryGirl.define do
     round nil
     is_submitted false
   end
+
 end

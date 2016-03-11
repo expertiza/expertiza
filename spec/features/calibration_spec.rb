@@ -306,25 +306,25 @@ describe 'Add Expert Review' do
     # The factory for this implicitly loads or creates a student
     # (user) object that the participant is linked to.
 
-    @submitter = create :participant, assignment: @assignment
+    @reviewer = create :participant, assignment: @assignment
     # @participant = create (:participant)
 
     # Create a mapping between the assignment team and the
     # participant object's user (the student).
-    create :team_user, team: @team, user: @submitter.user
+    create :team_user, team: @team, user: @reviewer.user
     create :review_response_map, assignment: @assignment, reviewee: @team
     create :assignment_questionnaire, assignment: @assignment
   end
 
-  it 'should not be able to assign 2 reviews to 1 assignment' do
+  it 'should not be able to access review page' do
     #Login as instructor
     login_as @student.name
 
     #Be able to go to edit assignment page
-    visit "/response/new?id=#{@student.id}"
-    save_and_open_page
-    click_on 'Submit Review'
-    save_and_open_page
+    visit "/response/new?id=#{@reviewer.id}"
+
+    #assess the page to have no previous review done
+    expect(page).to have_content('No previous review was performed.')
 
   end
 

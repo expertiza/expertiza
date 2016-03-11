@@ -137,6 +137,7 @@ describe 'Add Expert Review' do
   before :each do
     #create instructor
     @instructor = create(:instructor)
+    @student = create(:student)
 
     # Create an assignment with calibration
     @assignment = create :assignment, is_calibrated: true
@@ -162,16 +163,16 @@ describe 'Add Expert Review' do
 
       #should be able to edit assignment to add a expert review
       visit "/review_mapping/add_calibration/#{@assignment.id}?team_id=#{@team.id}"
-      save_and_open_page
-      #submit expert review
+
+      #Submit expert review
       click_on 'Submit Review'
-      save_and_open_page
-      #expect result
+
+      #Expect result
       expect(page).to have_selector('#Calibration')
       find('#Calibration').click
 
       #If the review was uploaded, there'll ve a View link to see the expert review
-      expect(page).to have_no_link('Edit')
+      # expect(page).to have_no_link('Edit')
       expect(page).to have_link('View')
     end
 
@@ -185,14 +186,22 @@ describe 'Add Expert Review' do
       click_on 'Save Review'
 
       #expect result
-      expect(page).to have_selector('#Calibration')
-      find('#Calibration').click
-      # save_and_open_page
       #If the review was uploaded, there'll ve a View link to see the expert review
       expect(page).to have_link('View')
       expect(page).to have_link('Edit')
     end
 
+    #Student should not be able to submit an expert review
+    it 'student should not be able to add an expert review'do
+      #login as student
+      login_as @student.name
+
+      #Should not be able to visit expert review page
+      visit "/review_mapping/add_calibration/#{@assignment.id}?team_id=#{@team.id}"
+      #Expect result
+      expect(page).to have_content('This student is not allowed to add_calibration this review_mapping')
+
+    end
   end
 
 
@@ -277,6 +286,48 @@ describe 'Submitter' do
     # Verify presense of link on page
     expect(page).to have_link 'https://google.com'
   end
+end
+
+#test expert review function
+describe 'Add Expert Review' do
+  before :each do
+    #create instructor
+    @instructor = create(:instructor)
+    @student = create(:student)
+    @student_2 = create(:student)
+
+    # Create an assignment with calibration
+    @assignment = create :assignment, is_calibrated: true
+
+    # Create a team linked to the calibrated assignment
+    @team = create :assignment_team, assignment: @assignment
+
+    # Create an assignment participant linked to the assignment.
+    # The factory for this implicitly loads or creates a student
+    # (user) object that the participant is linked to.
+
+    @submitter = create :participant, assignment: @assignment
+    # @participant = create (:participant)
+
+    # Create a mapping between the assignment team and the
+    # participant object's user (the student).
+    create :team_user, team: @team, user: @submitter.user
+    create :review_response_map, assignment: @assignment, reviewee: @team
+    create :assignment_questionnaire, assignment: @assignment
+  end
+
+  it 'should not be able to assign 2 reviews to 1 assignment' do
+    #Login as instructor
+    login_as @student.name
+
+    #Be able to go to edit assignment page
+    visit "/response/new?id=#{@submitter.id}"
+    save_and_open_page
+    click_on 'Submit Review'
+    save_and_open_page
+
+  end
+
 
 
 end

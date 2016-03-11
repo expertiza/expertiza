@@ -172,7 +172,6 @@ describe 'Add Expert Review' do
       find('#Calibration').click
 
       #If the review was uploaded, there'll ve a View link to see the expert review
-      # expect(page).to have_no_link('Edit')
       expect(page).to have_link('View')
     end
 
@@ -187,7 +186,7 @@ describe 'Add Expert Review' do
 
       #expect result
       #If the review was uploaded, there'll ve a View link to see the expert review
-      expect(page).to have_link('View')
+
       expect(page).to have_link('Edit')
     end
 
@@ -288,46 +287,132 @@ describe 'Submitter' do
   end
 end
 
-#test expert review function
-describe 'Add Expert Review' do
+
+describe 'Reviewer' do
+
+  # Set up for testing
   before :each do
-    #create instructor
-    @instructor = create(:instructor)
-    @student = create(:student)
-    @student_2 = create(:student)
+    # Create an instructor and student
+    @instructor = create :instructor
+    @student = create :student
+    @reviewer = create :student
+    @submitter = create :student
+
 
     # Create an assignment with calibration
-    @assignment = create :assignment, is_calibrated: true
+    # Either course: nil is required or an AssignmentNode must also be created.
+    # The page will not load if the assignment has a course but no mapping node.
+    @assignment = create :assignment, is_calibrated: true, instructor: @instructor, course: nil
+    @questionnaire = create :questionnaire
+    @assignment_questionaire = create :assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire
+
+    # Create an assignment due date
+    create(:deadline_type,name:"submission")
+    create(:deadline_type,name:"review")
+    create(:deadline_type,name:"resubmission")
+    create(:deadline_type,name:"rereview")
+    create(:deadline_type,name:"metareview")
+    create(:deadline_type,name:"drop_topic")
+    create(:deadline_type,name:"signup")
+    create(:deadline_type,name:"team_formation")
+    create(:deadline_right)
+    create(:deadline_right, name: 'Late')
+    create(:deadline_right, name: 'OK')
+    create :due_date, due_at: (DateTime.now + 1)
+
+    # Create and map a questionnaire (rubric) to the assignment
+    @questionnaire = create :questionnaire
+    create :assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire
 
     # Create a team linked to the calibrated assignment
     @team = create :assignment_team, assignment: @assignment
 
-    # Create an assignment participant linked to the assignment.
-    # The factory for this implicitly loads or creates a student
-    # (user) object that the participant is linked to.
-
-    @reviewer = create :participant, assignment: @assignment
-    # @participant = create (:participant)
+    # Create an assignment participant linked to the assignment
+    @participant_submitter = create :participant, assignment: @assignment, user: @submitter
+    @participant_reviewer = create :participant, assignment: @assignment, user: @reviewer
 
     # Create a mapping between the assignment team and the
-    # participant object's user (the student).
-    create :team_user, team: @team, user: @reviewer.user
-    create :review_response_map, assignment: @assignment, reviewee: @team
-    create :assignment_questionnaire, assignment: @assignment
+    # participant object's user.
+    create :team_user, team: @team, user: @reviewer
   end
 
-  it 'should not be able to access review page' do
-    #Login as instructor
-    login_as @student.name
+    # Verify submitters can be added to the assignment
+    it 'can be added to the assignment as reviewer by instuctor' do
+      # Log in as the instructor
+      login_as @instructor.name
 
-    #Be able to go to edit assignment page
-    visit "/response/new?id=#{@reviewer.id}"
+      # Visit the add participant page
+      visit "/participants/list?id=#{@assignment.id}&model=Assignment"
 
-    #assess the page to have no previous review done
-    expect(page).to have_content('No previous review was performed.')
+      # Add student as a submitter
+      fill_in 'user_name', with: @reviewer.name
+      choose 'user_role_reviewer'
+      click_on 'Add'
+
+      visit "/participants/list?id=#{@assignment.id}&model=Assignment"
+
+      fill_in 'user_name', with: @submitter.name
+      choose 'user_role_submitter'
+      click_on 'Add'
+
+      expect(page).to have_link @reviewer.name
+      expect(page).to have_link @submitter.name
+    end
+
+  #instructor should be able to assign artifacts to reviewer
+    it'should be able to create a submitted artifact for instructor to assign' do
+      login_as @submitter.name
+
+      # Click on the assignment link, and navigate to work view
+      click_link @assignment.name
+      click_link 'Your work'
+
+      # Fill in submission with a url and submit
+      fill_in 'submission', with: 'https://google.com'
+      click_on 'Upload link'
+
+      # Verify presense of link on page
+      expect(page).to have_link 'https://google.com'
+
+
+    end
+
+  it'instructor should be able to assign artifact to reviewer' do
+    login_as @instructor.name
+
+    visit edit_assignment_path @assignment
+    page.select 'Instructor-Selected', :from => 'assignment_form_assignment_review_assignment_strategy'
+    click_on 'Save'
+    save_and_open_page
 
   end
 
+    # Verify submitters can submit artifacts
+    it 'can review artifacts' do
+      # Log in as student
+      login_as @reviewer.name
+
+      # Click on the assignment link, and navigate to work view
+      click_link @assignment.name
+
+      click_link 'Others\' work'
+
+      # click_link 'Request a new submission to review'
+      find('input[value="Request a new submission to review"]').click
+
+      expect(page).to have_content("No artifact are available to review at this time. Please try later.")
+
+    end
+  it 'can not review artifacts if not a reviewer'do
+    login_as @submitter.name
+    click_link @assignment.name
+
+    # expect(page).to have_no_link 'Others\' work'
+    #
+    # # click_link 'Request a new submission to review'
+    # find('input[value="Request a new submission to review"]').click
+    # save_and_open_page
+  end
+  end
 
 
-end

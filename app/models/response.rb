@@ -26,7 +26,7 @@ class Response < ActiveRecord::Base
     # TeamResponseMap for a team assignment.  Someone who understands the
     # situation better could add to the code later.
     if self.map.type.to_s == 'FeedbackResponseMap'
-      identifier += "<H2>Feedback from author</H2>"
+      identifier += "<H3>Feedback from author</H3>"
     end
     if prefix #has prefix means view_score page in instructor end
       identifier += "<B>Reviewer: </B>" +self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
@@ -69,7 +69,7 @@ class Response < ActiveRecord::Base
     else
       comment = ''
     end
-    code += "<B>Additional Comment:</B><BR/>"+comment+"</div>"
+    code += "<big><B>Additional Comment:</B></big><BR/>"+comment+"</div>"
     return code.html_safe
   end
 

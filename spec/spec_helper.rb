@@ -2,6 +2,9 @@
 require 'factory_girl_rails'
 require 'coveralls'
 Coveralls.wear! 'rails'
+require 'capybara'
+require 'capybara/dsl'
+require 'selenium-webdriver'
 
 # Record code coverage with simplecov locally
 require 'simplecov'
@@ -29,7 +32,9 @@ SimpleCov.start 'rails'
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
 
-    config.include FactoryGirl::Syntax::Methods
+  config.include FactoryGirl::Syntax::Methods
+  Capybara.default_driver = :selenium
+
 
 # The settings below are suggested to provide a good initial experience
 # with RSpec, but feel free to customize to your heart's content.

@@ -35,11 +35,11 @@
         <% review_feedback = nil %>
         <% count = count + 1 %>
         <% if controller.action_name != "view_my_scores" %>
-            <h2>Review <%= count %></h2><BR/>
+            <h3>Review <%= count %></h3>
             <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a><%= review.display_as_html(prefix, count) %>
-            <BR/><HR/>
+            <hr>
         <% else %>
-            <h2>Review <%= count %></h2><BR/>
+            <h3>Review <%= count %></h3>
             <!--<%= review.display_as_html(nil, count) %><BR/>-->
             <!--change code in order to compat to multi-round review-->
             <% if @assignment.varying_rubrics_by_round? and !review.round.nil? %>
@@ -75,16 +75,12 @@
                 <% for i in 0..@sorted.size-1 %>
                     <% @str = @sorted[i].id.to_s %>
                     <%= @sorted[i].display_as_html(nil,i+1, nil) %><br/>
-                    <script>
-                        toggleElement('reviews_<%=@str%>','review');
-                    </script>
+                    <script>toggleElement('reviews_<%=@str%>','review');</script>
                 <% end %>
                 <!-- keep only latest version open -->
                 <% for i in 0..@sorted.size-1 %>
                     <% @str = @sorted[i].id.to_s %>
-                    <script>
-                        toggleElement('review_<%=@str%>','review')
-                    </script>
+                    <script>toggleElement('review_<%=@str%>','review');</script>
                 <% end %>
             <% end %>
             <% map = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
@@ -95,7 +91,7 @@
             <% else %>
                 <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
             <% end %>
-            <BR/><HR/>
+            <HR/>
         <% end %>
     <% end %>
 <% else %>

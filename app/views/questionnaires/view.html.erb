@@ -5,25 +5,15 @@
 <B>Last modified at:</B> <%= @questionnaire.updated_at %>
 <BR/><BR/>
 
-<TABLE>
-  <TR>
-    <TH align="left" width="60%"> Question </TH>
-    <TH align="left">&nbsp Type &nbsp</TH>
-    <TH align="left">&nbsp Weight &nbsp</TH>
-    <TH align="left">&nbsp Score Range &nbsp</TH>
-  </TR>
-  <%questions=@questionnaire.questions.sort { |a,b| a.seq <=> b.seq }%>
-  <%questions.each do |question| %>
+<%questions=@questionnaire.questions.sort { |a,b| a.seq <=> b.seq }%>
+<%questions.each do |question| %>
 
-    <%if question.is_a? Question%>
-      <%=question.view_question_text.html_safe%>
-    <%end%>
+  <%if question.is_a? Question%>
+    <%=question.view_question_text.html_safe%>
+  <%end%>
 
-  <% end %>
-</TABLE>
+<% end %>
 
 <BR/>
-
-    <BR/>
-    <%= link_to 'Edit', :action => 'edit', :id => @questionnaire %> |
-    <%= link_to "Back", :controller => 'tree_display', :action => 'list' %>
+<%= link_to 'Edit', :action => 'edit', :id => @questionnaire %> |
+<%= link_to "Back", :controller => 'tree_display', :action => 'list' %>

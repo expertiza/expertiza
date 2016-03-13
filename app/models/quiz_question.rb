@@ -4,23 +4,17 @@ class QuizQuestion < Question
   end
 
   def view_question_text
-    html = '<TR><TD align="left"> '+self.txt+' <br>'
+    html = self.txt + '<br />'
     if self.quiz_question_choices
       self.quiz_question_choices.each do |choices|
         if choices.iscorrect?
-          html += "  - <b>"+choices.txt+"</b><br> "
+          html += "  - <b>"+choices.txt+"</b><br /> "
         else
-          html += "  - "+choices.txt+"<br> "
+          html += "  - "+choices.txt+"<br /> "
         end
       end
+      html += '<br />'
     end
-
-    html += ' </TD>'
-    html += '<TD align="left">'+self.type+'</TD>'
-    html += '<td align="center">'+self.weight.to_s+'</TD>'
-    html += '<td align="center">0-1</td>'
-
-    html += '</TR>'
     html.html_safe
   end
 

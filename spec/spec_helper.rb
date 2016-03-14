@@ -33,7 +33,7 @@ SimpleCov.start 'rails'
 RSpec.configure do |config|
 
   config.include FactoryGirl::Syntax::Methods
-  Capybara.default_driver = :selenium
+
 
 
 # The settings below are suggested to provide a good initial experience

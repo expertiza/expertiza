@@ -2,6 +2,20 @@ require 'rails_helper'
 require 'selenium-webdriver'
 
 
+context "Calibration Tests" do
+  #
+  # before (:all) do
+  #   Capybara.current_driver = :selenium
+  # end
+  #
+  # after (:all) do
+  #   Capybara.use_default_driver
+  # end
+
+
+end
+
+
 
 # describe 'some stuff which requires js', :js => true do
 #   it 'will use the default js driver'
@@ -248,7 +262,7 @@ describe 'Add Expert Review' do
     create :assignment_questionnaire, assignment: @assignment
   end
 
-  it 'should be able to save an expert review without uploading' do
+  it 'should be able to save an expert review without uploading', :js => true do
     # Log in as the instructor.
     login_as @instructor.name
 
@@ -263,7 +277,7 @@ describe 'Add Expert Review' do
     expect(page).to have_link('Edit')
   end
 
-  it 'should be able to create expert review' do
+  it 'should be able to create expert review', :js => true do
     # Log in as the instructor.
     login_as @instructor.name
 
@@ -288,7 +302,7 @@ describe 'Add Expert Review' do
 
 
   #Student should not be able to submit an expert review
-  it 'student should not be able to add an expert review'do
+  it 'student should not be able to add an expert review', :js => true do
     #login as student
     login_as @student.name
 
@@ -354,7 +368,7 @@ describe 'Reviewer' do
 
 
   #instructor should be able to assign artifacts to reviewer
-    it'should be able to create a submitted artifact for instructor to assign' do
+    it'should be able to create a submitted artifact for instructor to assign', :js => true do
       login_as @submitter.name
 
       # Click on the assignment link, and navigate to work view
@@ -371,7 +385,7 @@ describe 'Reviewer' do
 
     end
 
-  it'instructor should be able to assign artifact to reviewer' do
+  it'instructor should be able to assign artifact to reviewer', :js => true do
     #Log in as an instructor
     login_as @instructor.name
 
@@ -403,7 +417,7 @@ describe 'Reviewer' do
   end
 
     # Verify submitters can submit artifacts
-    it 'can review artifacts' do
+    it 'can review artifacts', :js => true do
       # Log in as student
       login_as @student.name
 
@@ -420,7 +434,7 @@ describe 'Reviewer' do
       expect(page).to have_link 'Begin'
 
     end
-  it 'can not review artifacts if not a assigned a review'do
+  it 'can not review artifacts if not a assigned a review', :js => true do
     #Log in as a student who hasn't been assigned a artifact to review
     login_as @reviewer.name
 
@@ -438,6 +452,6 @@ describe 'Reviewer' do
 
   end
 
-  end
+end
 
 

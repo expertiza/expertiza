@@ -1,5 +1,5 @@
 <%= form_tag action: "send_post_request" do %>
-	<b style="font-size: 20px;">Step 1: </b>Assignment_id: <%= number_field_tag 'assignment_id', nil, in: 1..@max_assignment_id, value: @assignment.nil? ? '' : @assignment.id, style: 'width: 3em;' %> + <%= number_field_tag 'another_assignment_id', nil, in: 1..@max_assignment_id, value: @another_assignment.nil? ? '' : @another_assignment.id, style: 'width: 3em;' %> (optional) with round <%= number_field_tag 'round_num', nil, in: 1..3, value: 2, style: 'width: 2em;' %><br>
+	<b style="font-size: 20px;">Step 1: </b>Assignment_id: <%= number_field_tag 'assignment_id', nil, in: 1..@max_assignment_id, value: @assignment.nil? ? 724 : @assignment.id, style: 'width: 3em;' %> + <%= number_field_tag 'another_assignment_id', nil, in: 1..@max_assignment_id, value: @another_assignment.nil? ? '' : @another_assignment.id, style: 'width: 3em;' %> (optional) with round <%= number_field_tag 'round_num', nil, in: 1..3, value: 2, style: 'width: 2em;' %><br>
 
 	<b style="font-size: 20px;">Step 2: </b>Choose reputation algorithm:
 	<select id='algorithm' name='algorithm' style="width: 13em">
@@ -18,9 +18,11 @@
 	    <option value='quiz' >
 	      Quiz-based algorithm
 	    </option>
+	    <!--
 	    <option value='cho' >
 	      Cho's algorithm
 	    </option>
+	    -->
 	</select><br>
 
 	<b style="font-size: 20px;">Step 3: </b>Additional information: <br/>
@@ -43,6 +45,7 @@
 <hr>
 <%= "Request info: #{@assignment.name} (#{@assignment.id})" unless @assignment.nil? %>
 <%= " + #{@another_assignment.name} (#{@another_assignment.id})" unless @another_assignment.nil? %>
+<%= " + round #{@round_num}" unless @assignment.nil? %>
 <%= " + #{@algorithm} algorithm" unless @assignment.nil? %>
 <%= " + #{@additional_info}" unless @additional_info.empty? %>
 <br/>

@@ -22,7 +22,7 @@
   <% for participant in tscore[:team].participants %>
      <%= render :partial => 'grades/participant',
                 :locals => {:prefix => prefix+"_"+pindex.to_s,
-     	 			        :team => true,
+     	 			                :team => true,
                             :pscore => @scores[:participants][participant.id.to_s.to_sym]} %>  
      <% pindex += 1 %>                            
 <% end %>        

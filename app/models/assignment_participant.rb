@@ -29,16 +29,9 @@ class AssignmentParticipant < Participant
     sum_of_scores = 0
     number_of_scores = 0
 
-    self.response_maps.each do |response_map|
-      # TODO There must be a more elegant way of doing this...
-      unless response_map.response.empty?
-        response_map.response.last.scores.each do |score|
-          if score.question == question then
-            sum_of_scores = sum_of_scores + score.score
-            number_of_scores = number_of_scores + 1
-          end
-        end
-      end
+    if !self.response_maps.empty?
+      sum_of_scores = self.response_maps.joins(response: :scores).where('answers.question_id'=>question).select('answers.answer').sum(:answer)
+      number_of_scores = self.response_maps.joins(response: :scores).where('answers.question_id'=>question).select('answers.answer').count()
     end
 
     return 0 if number_of_scores == 0

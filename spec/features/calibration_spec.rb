@@ -2,27 +2,6 @@ require 'rails_helper'
 require 'selenium-webdriver'
 
 
-context "Calibration Tests" do
-  #
-  # before (:all) do
-  #   Capybara.current_driver = :selenium
-  # end
-  #
-  # after (:all) do
-  #   Capybara.use_default_driver
-  # end
-
-
-end
-
-
-
-# describe 'some stuff which requires js', :js => true do
-#   it 'will use the default js driver'
-#   it 'will switch to one specific driver', :driver => :webkit
-# end
-
-
 # Test Assignment Creation Functionality
 describe 'Create Assignment' do
 
@@ -57,6 +36,7 @@ describe 'Create Assignment' do
       # Verify Assignment Page
       expect(find('.assignments.edit > h1')).to have_content('Editing Assignment: Calibration Test')
       expect(page).to have_link('Calibration')
+      save_and_open_page
     end
   end
 

@@ -47,7 +47,7 @@ describe "Create a review questionnaire", :type => :controller do
 
     fill_in('questionnaire_name', :with => 'Review 1')
 
-    fill_in('questionnaire_min_question_score', :with =>'7')
+    fill_in('questionnaire_min_question_score', :with =>'0')
 
     fill_in('questionnaire_max_question_score', :with => '5')
 
@@ -59,5 +59,66 @@ describe "Create a review questionnaire", :type => :controller do
 
   end
 end
+
+def load_questionnaire
+	login_as("instructor6")
+	visit '/questionnaires/new?model=ReviewQuestionnaire&private=0'
+
+    fill_in('questionnaire_name', :with => 'Review n')
+
+    fill_in('questionnaire_min_question_score', :with =>'0')
+
+    fill_in('questionnaire_max_question_score', :with => '5')
+
+    select('no', :from=> 'questionnaire_private')
+
+    click_button "Create"
+end
+
+
+describe "Create a review question", :type => :controller do
+
+  it "is able to create a public review question" do
+
+    load_questionnaire
+    fill_in('question_total_num', :with => '1')
+    select('Criterion', :from=> 'question_type')
+    click_button "Add"
+    expect(page).to have_content('Remove') 
+    
+    first("textarea[placeholder='Edit question content here']").set "Question 1"
+
+    click_button "Save review questionnaire"
+    expect(page).to have_content('All questions has been saved successfully!')
+    expect(page).to have_content('Question 1')
+    
+
+    click_on('Remove')
+    expect(page).to have_content('You have successfully deleted one question!')  
+  end
+end
+
+def load_question
+	load_questionnaire
+	fill_in('question_total_num', :with => '1')
+        select('Criterion', :from=> 'question_type')
+        click_button "Add"
+        click_button "Save review questionnaire"
+end
+
+describe "Create a review advice", :type => :controller do
+
+  it "is able to create a public review advice" do
+	load_question
+	click_button "Edit/View advice"
+	expect(page).to have_content('Edit an existing questionnaire')
+
+   first(:css, "textarea[id^='horizontal_'][id$='advice']").set("Advice 1")
+   click_button "Save and redisplay advice"
+   expect(page).to have_content('advice was successfully saved')
+   expect(page).to have_content('Advice 1')
+  end
+end
+
 
 end

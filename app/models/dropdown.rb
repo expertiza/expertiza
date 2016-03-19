@@ -15,14 +15,12 @@ class Dropdown < UnscoredQuestion
     html.html_safe
   end
 
-  # def view_question_text
-  #   html = '<TR><TD align="left"> '+self.txt+' </TD>'
-  #   html += '<TD align="left">'+self.type+'</TD>'
-  #   html += '<td align="center">'+self.weight.to_s+'</TD>'
-  #   html += '<TD align="center">&mdash;</TD>'
-  #   html += '</TR>'
-  #   html.html_safe
-  # end
+  def view_question_text
+    view_question_text_prefix
+    html += '<TD align="center">&mdash;</TD>'
+    html += '</TR>'
+    html.html_safe
+  end
 
   def complete(count, answer=nil)
     html = '<li><label for="responses_' +count.to_s+ '">' +self.txt+ '</label>'

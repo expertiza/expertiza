@@ -4,10 +4,11 @@ class Question < ActiveRecord::Base
   belongs_to :review_of_review_score  # ditto
   has_many :question_advices # for each question, there is separate advice about each possible score
   has_many :signup_choices # ?? this may reference signup type questionnaires
+  has_many :answers
 
   validates_presence_of :seq # user must define sequence for a question
   validates_numericality_of :seq # sequence must be numeric
-  validates_presence_of :txt # user must define text content for a question
+  validates :txt, length: { minimum: 0, allow_nil: false, message: "can't be nil" } # user must define text content for a question
   validates_presence_of :type # user must define type for a question
   validates_presence_of :break_before
 

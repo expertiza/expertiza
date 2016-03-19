@@ -6,19 +6,6 @@ class SignedUpTeam < ActiveRecord::Base
 
   scope :by_team_id, ->(team_id) { where("team_id = ?", team_id) }
 
-  #This method is not used anywhere
-  #def cancel_waitlists_of_users(team_id, assignment_id)
-  #  waitlisted_topics = SignedUpTeam.find_by_sql("SELECT u.id FROM sign_up_topics t, signed_up_teams u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = " + assignment_id.to_s + " and u.team_id = " + team_id.to_s)
-  #   SignedUpTeam
-  #  if !waitlisted_topics.nil?
-  #    for waitlisted_topic in waitlisted_topics
-  #      entry = SignedUpTeam.find(waitlisted_topic.id)
-  #      entry.destroy
-  #    end
-  #  end
-
-  #end
-
   def self.find_team_participants(assignment_id)
     #@participants = SignedUpTeam.find_by_sql("SELECT s.id as id, t.id as topic_id, t.topic_name as name , s.is_waitlisted as is_waitlisted, s.team_id, s.team_id as team_id FROM signed_up_teams s, sign_up_topics t where s.topic_id = t.id and t.assignment_id = " + assignment_id)
     @participants = SignedUpTeam.find_by_sql(["SELECT s.id as id, t.id as topic_id, t.topic_name as name, t.topic_name as team_name_placeholder, t.topic_name as user_name_placeholder, s.is_waitlisted as is_waitlisted, s.team_id as team_id FROM signed_up_teams s, sign_up_topics t where s.topic_id = t.id and t.assignment_id = ? ",assignment_id])

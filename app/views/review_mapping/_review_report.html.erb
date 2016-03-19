@@ -28,9 +28,9 @@
 
       <%@l = -1 %>
       <% @reviewers.each do |r| %>
-        <% @response_maps = ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", @id, r.reviewer_id,@type]) %>
+        <% @response_maps = ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", @id, r.id,@type]) %>
         <tr>
-        <% @this_reviewer = r.reviewer_id %>
+        <% @this_reviewer = r.id %>
         <% @count = 0 %>
         <% @rspan = 0 %>
         <%@l = @l+1 %>
@@ -42,19 +42,19 @@
             <% @rspan = @rspan + 1 %>
           <% end %>
         <%end %>
-        <%if r.reviewer_id != -1 %>
-          <% parid = Participant.find(r.reviewer_id).user_id%>
+        <%if r.id != -1 %>
+          <% parid = Participant.find(r.id).user_id%>
           <% username = User.find(parid).fullname%>
 
           <% if (@l%2) == 0 %>
 
             <td bgcolor="#ffffff" rowspan= <%= @rspan%>>
-              <%= link_to username, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id=>@id%>
+              <%= link_to username, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id=>@id%>
             </td>
           <%else %>
 
             <td bgcolor="#DDDDBB" rowspan=<%= @rspan%>>
-              <%= link_to username, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id=>@id%>
+              <%= link_to username, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id=>@id%>
             </td>
 
           <%end %>
@@ -62,21 +62,21 @@
           <% if (@count == @response_maps.length) %>
                   <% if (@l%2) == 0 %>
             <td bgcolor="#ffffff"  align = "left" rowspan= <%= @rspan%>>
-              <%= @count %>/<%= @rspan %> <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.reviewer_id, :assignment_id=>@id%>
+              <%= @count %>/<%= @rspan %> <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id%>
             </td>
                   <%else %>
                       <td bgcolor="#DDDDBB"  align = "left" rowspan= <%= @rspan%>>
-                        <%= @count %>/<%= @rspan %> <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.reviewer_id, :assignment_id=>@id%>
+                        <%= @count %>/<%= @rspan %> <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id%>
                       </td>
                   <%end %>
           <%else %>
                   <% if (@l%2) == 0 %>
             <td bgcolor="#ffffff" align = "left" rowspan= <%= @rspan%>>
-              <%= @count %>/<%= @rspan %> <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.reviewer_id, :assignment_id=>@id%>
+              <%= @count %>/<%= @rspan %> <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id%>
             </td>
                   <%else %>
                       <td bgcolor="#DDDDBB" align = "left" rowspan= <%= @rspan%>>
-                        <%= @count %>/<%= @rspan %> <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.reviewer_id, :assignment_id=>@id%>
+                        <%= @count %>/<%= @rspan %> <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id%>
                       </td>
                   <%end %>
           <%end %>
@@ -91,7 +91,11 @@
                 <%else %>
                   <td id = "green" bgcolor="#DDDDBB" align = 'left' colspan=1>
                 <%end %>
+                <% if ri.response.last.is_submitted?%>
                     <%= link_to Team.find(ri.reviewee_id).name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
+                <% else %>
+                    <%= link_to "("+Team.find(ri.reviewee_id).name+")", :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
+                <% end %>
                   </td>
                   <%= render :partial => 'teamscore' %>
 
@@ -182,4 +186,7 @@
                     <%end %>
 
                   </table>
-                </div>
+
+  <p> **Text in <i style = "color:#DD3300">red</i> indicates that the review is not yet completed; text in <i style = "color:gray">gray</i> indicates that the review is done in previous round(s).</p>
+
+</div>

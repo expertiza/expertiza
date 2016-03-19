@@ -62,7 +62,7 @@
                     <% end %>
                     <% if ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include? @current_role_name %>
                         <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname.to_s %>
-                        <th > <a target="_blank" href="../grades/view_reviewer?id=<%=@participant.id%>&response_id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
+                        <th > <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
                         <% i += 1 %>
                     <% end %>
                 <% end %>
@@ -71,7 +71,7 @@
                   Avg
                 </th>
                 <th>
-                  <span  data-toggle="tooltip" data-placement="right" title="A count of comments, for the respective question, which have character count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback.">metric-1</span>
+                  <span  data-toggle="tooltip" data-placement="right" title="A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback.">metric-1</span>
                 </th>
 
               </tr>

@@ -19,9 +19,10 @@ class ResponseController < ApplicationController
         response = Response.find(params[:id])
         map = response.map
 
-        if map.is_a? ReviewResponseMap # if it is a review response map, all the members of revieweee team should be able to view the reponse (can be done from heat map)
+        # if it is a review response map, all the members of revieweee team should be able to view the reponse (can be done from heat map)
+        if map.is_a? ReviewResponseMap 
           reviewee_team = AssignmentTeam.find(map.reviewee_id)
-          current_user_id?(response.map.reviewer.user_id) || reviewee_team.has_user(current_user)
+          current_user_id?(response.map.reviewer.user_id) || reviewee_team.has_user(current_user) || (['Administrator','Instructor','Teaching Assistant'].include? current_user.role.name)
         else
           current_user_id?(response.map.reviewer.user_id)
         end
@@ -235,6 +236,17 @@ class ResponseController < ApplicationController
     end
   end
 
+  def show_calibration_results_for_student
+    calibration_response_map = ReviewResponseMap.find(params[:calibration_response_map_id])
+    review_response_map = ReviewResponseMap.find(params[:review_response_map_id])
+    @calibration_response = calibration_response_map.response[0]
+    @review_response = review_response_map.response[0]
+    @assignment = Assignment.find(calibration_response_map.reviewed_object_id)
+    @review_questionnaire_ids = ReviewQuestionnaire.select("id")
+    @assignment_questionnaire = AssignmentQuestionnaire.where(["assignment_id = ? and questionnaire_id IN (?)", @assignment.id, @review_questionnaire_ids]).first
+    @questions = @assignment_questionnaire.questionnaire.questions.reject{|q|q.is_a?(QuestionnaireHeader)}
+  end
+
   private
   #new_response if a flag parameter indicating that if user is requesting a new rubric to fill
   #if true: we figure out which questionnaire to use based on current time and records in assignment_questionnaires table
@@ -321,6 +333,4 @@ class ResponseController < ApplicationController
     # not sure what this is about
     @review_scores=@prev.to_a
   end
-
-
 end

@@ -43,7 +43,7 @@ jQuery(document).ready(function() {
 <% else %>
     <%= render :partial => 'review', :locals => {:versions => @responses_versions} %>
 <% end %>
-<h2>Feedback for reviewer</h2>
+<h2>Directions for the reviewer</h2>
 
 <%= form_tag :action => @next_action, :id => @modified_object do %>
     <% if @next_action.eql?'update' %>
@@ -90,7 +90,7 @@ jQuery(document).ready(function() {
 <!--Check whether there is a UploadFile question.-->
 <%@questions.each do |question| %>
     <% if question.instance_of? UploadFile %>
-        <%= label_tag 'UploadFile', '↑↑↑↑↑↑↑Before submit you peer review files, you have to click "Save Review" button first!↑↑↑↑↑↑↑', style: "color:red;"%>
+        <%= label_tag 'UploadFile', '↑↑↑↑↑↑↑Before you upload a file, you must click “Save Review” first. If you do not, you will lose all your work (everything you have typed into this review form)!↑↑↑↑↑↑↑', style: "color:red;"%>
         <!--params[:origin] means from where do the files upload-->
         <!--If the files uploaded from submitted_work (students hand in assignment), params[:origin] will be nil-->
         <!--If the files uploaded from peer review, params[:origin] will be 'review'-->

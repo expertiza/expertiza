@@ -1,19 +1,33 @@
 module AssignmentHelper
 
   def course_options(instructor)
-    courses = Course.where(instructor_id: instructor.id)
+    if session[:user].role.name == 'Teaching Assistant'
+      courses = Array.new
+      ta = Ta.find(session[:user].id)
+      ta.ta_mappings.each {|mapping| courses << Course.find(mapping.course_id)}
+      # If a TA created some courses before, s/he can still add new assignments to these courses.
+      courses << Course.where(instructor_id: instructor.id)
+      courses.flatten!
+    # Administrator and Super-Administrator can see all courses
+    elsif session[:user].role.name == 'Administrator' or session[:user].role.name == 'Super-Administrator'
+      courses = Course.all
+    elsif session[:user].role.name == 'Instructor'
+      courses = Course.where(instructor_id: instructor.id)
+      # instructor can see courses his/her TAs created
+      ta_ids = Array.new
+      ta_ids << Instructor.get_my_tas(session[:user].id)
+      ta_ids.flatten!
+      ta_ids.each do |ta_id|
+        ta = Ta.find(ta_id)
+        ta.ta_mappings.each {|mapping| courses << Course.find(mapping.course_id)}
+      end
+    end
     options = Array.new
     options << ['-----------', nil]
     courses.each do |course|
       options << [course.name, course.id]
     end
     options
-  end
-
-  def is_intelligent_options
-    is_intelligent_options = Array.new
-    is_intelligent_options << ["No", 'false']
-    is_intelligent_options << ["Yes", 'true']
   end
 
   #round=0 added by E1450
@@ -32,15 +46,6 @@ module AssignmentHelper
       review_strategy_options << [strategy.to_s, strategy.to_s]
     end
     review_strategy_options
-  end
-
-  def deadline_rights_options
-    permissions = DeadlineRight.all
-    options = Array.new
-    permissions.each do |permission|
-      options << [permission.name, permission.id]
-    end
-    options
   end
 
   #retrive or create a due_date
@@ -67,7 +72,6 @@ module AssignmentHelper
       due_dates[round]
     end
   end
-
 
   def questionnaire(assignment, type, round_number)
     #E1450 changes

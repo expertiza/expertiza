@@ -63,7 +63,7 @@ class Question < ActiveRecord::Base
   # remove duplicated edit function of checkbox + questionaire_header + upload_file
   # Unused method argument - count. If it's necessary, use _ or _count as an argument name to indicate that it won't be used.
   # You can also write as edit(*) if you want the method to accept any arguments but don't care about them.
-  def edit(*)
+  def edit(count)
     html ='<tr>'
     html+='<td align="center"><a rel="nofollow" data-method="delete" href="/questions/' +self.id.to_s+ '">Remove</a></td>'
     html+='<td><input size="6" value="'+self.seq.to_s+'" name="question['+self.id.to_s+'][seq]" id="question_'+self.id.to_s+'_seq" type="text"></td>'

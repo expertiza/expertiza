@@ -18,7 +18,6 @@ class ScoredQuestion < ChoiceQuestion
      answer = Answer.where(question_id: self.id, response_id: response_id).first
      return self.weight * answer.answer
   end
-<<<<<<< HEAD
 
   # method added to remove duplicated code from subclasses
 
@@ -52,6 +51,4 @@ class ScoredQuestion < ChoiceQuestion
     end
   end
 
-=======
->>>>>>> 9c41bf084330f887070eaf3a9f7aa2481f07daa8
 end

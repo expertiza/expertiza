@@ -13,20 +13,20 @@ class Scale < ScoredQuestion
     html.html_safe
   end
 
-  #This method returns what to display if an instructor (etc.) is viewing a questionnaire
-  def view_question_text
-    html = '<TR><TD align="left"> '+self.txt+' </TD>'
-    html += '<TD align="left">'+self.type+'</TD>'
-    html += '<td align="center">'+self.weight.to_s+'</TD>'
-    questionnaire = self.questionnaire
-    if !self.max_label.nil? && !self.min_label.nil?
-      html += '<TD align="center"> ('+self.min_label+') '+questionnaire.min_question_score.to_s+' to '+ questionnaire.max_question_score.to_s + ' ('+self.max_label+')</TD>'
-    else
-      html += '<TD align="center">'+questionnaire.min_question_score.to_s+' to '+ questionnaire.max_question_score.to_s + '</TD>'
-    end
-    html += '</TR>'
-    html.html_safe
-  end
+  # #This method returns what to display if an instructor (etc.) is viewing a questionnaire
+  # def view_question_text
+  #   html = '<TR><TD align="left"> '+self.txt+' </TD>'
+  #   html += '<TD align="left">'+self.type+'</TD>'
+  #   html += '<td align="center">'+self.weight.to_s+'</TD>'
+  #   questionnaire = self.questionnaire
+  #   if !self.max_label.nil? && !self.min_label.nil?
+  #     html += '<TD align="center"> ('+self.min_label+') '+questionnaire.min_question_score.to_s+' to '+ questionnaire.max_question_score.to_s + ' ('+self.max_label+')</TD>'
+  #   else
+  #     html += '<TD align="center">'+questionnaire.min_question_score.to_s+' to '+ questionnaire.max_question_score.to_s + '</TD>'
+  #   end
+  #   html += '</TR>'
+  #   html.html_safe
+  # end
 
   def complete(count, answer=nil, questionnaire_min, questionnaire_max)
   	html = self.txt + '<br>'
@@ -47,11 +47,13 @@ class Scale < ScoredQuestion
     else
       html += '<td width="10%"></td>'
     end
-    for j in questionnaire_min..questionnaire_max
-      html += '<td width="10%"><input type="radio" id="' +j.to_s+ '" value="' +j.to_s+ '" name="Radio_' +self.id.to_s+ '"'
-      html += 'checked="checked"' if (!answer.nil? and answer.answer == j) or (answer.nil? and questionnaire_min == j)
-      html += '></td>'
-    end
+    # comment by Hui, replaced with a method
+    # for j in questionnaire_min..questionnaire_max
+    #   html += '<td width="10%"><input type="radio" id="' +j.to_s+ '" value="' +j.to_s+ '" name="Radio_' +self.id.to_s+ '"'
+    #   html += 'checked="checked"' if (!answer.nil? and answer.answer == j) or (answer.nil? and questionnaire_min == j)
+    #   html += '></td>'
+    # end
+    html = complete_questionnaire_min_to_questionnaire_max(html, answer, questionnaire_min, questionnaire_max)
     html += '<script>jQuery("input[name=Radio_' +self.id.to_s+ ']:radio").change(function() {'
     html += 'var response_score = jQuery("#responses_' +count.to_s+ '_score");'
     html += 'var checked_value = jQuery("input[name=Radio_' +self.id.to_s+ ']:checked").val();'
@@ -72,4 +74,6 @@ class Scale < ScoredQuestion
   	html += '<B>Score:</B> <FONT style="BACKGROUND-COLOR:gold">'+answer.answer.to_s+'</FONT> out of <B>'+questionnaire_max.to_s+'</B></TD>'
     html.html_safe
   end
+
+
 end

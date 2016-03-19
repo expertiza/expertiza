@@ -179,21 +179,4 @@ class Participant < ActiveRecord::Base
     end
     return authorization
   end
-
-  # Sort a set of participants based on their user names.
-  # Please make sure there is no duplicated participant in this input array.
-  # There should be a more beautiful way to handle this, though.  -Yang
-  def self.sort_by_name(participants)
-    users = Array.new
-    participants.each do |participant|
-      user = User.find(participant.user_id)
-      users << user
-    end
-    users.sort!{ |a,b| a.name.downcase <=> b.name.downcase }  # Sort the users based on the name
-
-    sorted_user_ids = users.map { |u| u.id }
-    sorted_participants = participants.sort_by{|x| sorted_user_ids.index x.user_id}
-
-    sorted_participants
-  end
 end

@@ -873,7 +873,7 @@ FactoryGirl.define do
     handle "handle"
     leaderboard_privacy false 
     digital_certificate  nil 
-    timezonepref nil
+    timezonepref 'Eastern Time (US & Canada)'
     public_key nil
     copy_of_emails  false
   end
@@ -896,7 +896,7 @@ FactoryGirl.define do
     handle "handle"
     leaderboard_privacy false 
     digital_certificate  nil 
-    timezonepref nil
+    timezonepref 'Eastern Time (US & Canada)'
     public_key nil
     copy_of_emails  false
   end

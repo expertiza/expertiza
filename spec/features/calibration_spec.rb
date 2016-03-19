@@ -2,27 +2,6 @@ require 'rails_helper'
 require 'selenium-webdriver'
 
 
-context "Calibration Tests" do
-  #
-  # before (:all) do
-  #   Capybara.current_driver = :selenium
-  # end
-  #
-  # after (:all) do
-  #   Capybara.use_default_driver
-  # end
-
-
-end
-
-
-
-# describe 'some stuff which requires js', :js => true do
-#   it 'will use the default js driver'
-#   it 'will switch to one specific driver', :driver => :webkit
-# end
-
-
 # Test Assignment Creation Functionality
 describe 'Create Assignment' do
 
@@ -57,6 +36,7 @@ describe 'Create Assignment' do
       # Verify Assignment Page
       expect(find('.assignments.edit > h1')).to have_content('Editing Assignment: Calibration Test')
       expect(page).to have_link('Calibration')
+      save_and_open_page
     end
   end
 
@@ -323,7 +303,7 @@ describe 'Reviewer' do
     # Create an instructor and 3 students
     @instructor = create :instructor
     @student = create :student
-    @reviewer = create :student
+    @nonreviewer = create :student
     @submitter = create :student
 
 
@@ -351,12 +331,12 @@ describe 'Reviewer' do
 
     # Create an assignment participant linked to the assignment
     @participant_submitter = create :participant, assignment: @assignment, user: @submitter
-    @participant_reviewer = create :participant, assignment: @assignment, user: @reviewer
+    @participant_reviewer = create :participant, assignment: @assignment, user: @nonreviewer
     @participant_reviewer_2 = create :participant, assignment: @assignment, user: @student
 
     # Create a mapping between the assignment team and the
     # participant object's user.
-    create :team_user, team: @team, user: @reviewer
+    create :team_user, team: @team, user: @nonreviewer
 
     # Create and map a questionnaire (rubric) to the assignment
     @questionnaire = create :questionnaire
@@ -436,7 +416,7 @@ describe 'Reviewer' do
     end
   it 'can not review artifacts if not a assigned a review', :js => true do
     #Log in as a student who hasn't been assigned a artifact to review
-    login_as @reviewer.name
+    login_as @nonreviewer.name
 
     # Click on the assignment link, and navigate to work view
     click_link @assignment.name

@@ -182,4 +182,13 @@ class ReviewResponseMap < ResponseMap
     end
     review_final_versions
   end
+
+  def self_review_response_map?
+    reviewee.teams_users.each do |user|
+      if (user == reviewer)
+        return true
+      end
+    end
+    false
+  end
 end

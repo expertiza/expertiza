@@ -4,11 +4,10 @@ class Question < ActiveRecord::Base
   belongs_to :review_of_review_score  # ditto
   has_many :question_advices # for each question, there is separate advice about each possible score
   has_many :signup_choices # ?? this may reference signup type questionnaires
-  has_many :answers
 
   validates_presence_of :seq # user must define sequence for a question
   validates_numericality_of :seq # sequence must be numeric
-  validates :txt, length: { minimum: 0, allow_nil: false, message: "can't be nil" } # user must define text content for a question
+  validates_presence_of :txt # user must define text content for a question
   validates_presence_of :type # user must define type for a question
   validates_presence_of :break_before
 
@@ -58,6 +57,30 @@ class Question < ActiveRecord::Base
   # this method decide what to display if an instructor (etc.) is creating or editing a questionnaire
   def edit
     return nil
+  end
+
+  # YJ
+  # remove duplicated edit function of checkbox + questionaire_header + upload_file
+  # Unused method argument - count. If it's necessary, use _ or _count as an argument name to indicate that it won't be used.
+  # You can also write as edit(*) if you want the method to accept any arguments but don't care about them.
+  def edit(count)
+    html ='<tr>'
+    html+='<td align="center"><a rel="nofollow" data-method="delete" href="/questions/' +self.id.to_s+ '">Remove</a></td>'
+    html+='<td><input size="6" value="'+self.seq.to_s+'" name="question['+self.id.to_s+'][seq]" id="question_'+self.id.to_s+'_seq" type="text"></td>'
+    html+='<td><textarea cols="50" rows="1" name="question['+self.id.to_s+'][txt]" id="question_'+self.id.to_s+'_txt">'+self.txt+'</textarea></td>'
+    html+='<td><input size="10" disabled="disabled" value="'+self.type+'" name="question['+self.id.to_s+'][type]" id="question_'+self.id.to_s+'_type" type="text">''</td>'
+    html+='<td><!--placeholder (No need weight)--></td>'
+    html+='</tr>'
+
+    html.html_safe
+  end
+
+  # YJ
+  # remove duplicated view_question_text function
+  def view_question_text_prefix
+       html = '<TR><TD align="left"> '+self.txt+' </TD>'
+       html += '<TD align="left">'+self.type+'</TD>'
+       html += '<td align="center">'+self.weight.to_s+'</TD>'
   end
 
   #this method decide what to display if an instructor (etc.) is viewing a questionnaire

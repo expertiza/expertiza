@@ -7,13 +7,19 @@ class Criterion < ScoredQuestion
     html ='<tr>'
     html+='<td align="center"><a rel="nofollow" data-method="delete" href="/questions/' +self.id.to_s+ '">Remove</a></td>'
     html+='<td><input size="6" value="'+self.seq.to_s+'" name="question['+self.id.to_s+'][seq]" id="question_'+self.id.to_s+'_seq" type="text"></td>'
-    html+='<td><textarea cols="50" rows="1" name="question['+self.id.to_s+'][txt]" id="question_'+self.id.to_s+'_txt" placeholder="Edit question content here">'+self.txt+'</textarea></td>'
+    html+='<td><textarea cols="50" rows="1" name="question['+self.id.to_s+'][txt]" id="question_'+self.id.to_s+'_txt">'+self.txt+'</textarea></td>'
     html+='<td><input size="10" disabled="disabled" value="'+self.type+'" name="question['+self.id.to_s+'][type]" id="question_'+self.id.to_s+'_type" type="text">''</td>'
     html+='<td><input size="2" value="'+self.weight.to_s+'" name="question['+self.id.to_s+'][weight]" id="question_'+self.id.to_s+'_weight" type="text">''</td>'
     html+='<td>text area size <input size="3" value="'+self.size.to_s+'" name="question['+self.id.to_s+'][size]" id="question_'+self.id.to_s+'_size" type="text"></td>'
+<<<<<<< HEAD
     # html+='<td> max_label <input size="10" value="'+self.max_label.to_s+'" name="question['+self.id.to_s+'][max_label]" id="question_'+self.id.to_s+'_max_label" type="text">  min_label <input size="12" value="'+self.min_label.to_s+'" name="question['+self.id.to_s+'][min_label]" id="question_'+self.id.to_s+'_min_label" type="text"></td>'
     # html+='</tr>'
     html = edit_plus_html(html)
+=======
+    html+='<td> max_label <input size="10" value="'+self.max_label.to_s+'" name="question['+self.id.to_s+'][max_label]" id="question_'+self.id.to_s+'_max_label" type="text">  min_label <input size="10" value="'+self.min_label.to_s+'" name="question['+self.id.to_s+'][min_label]" id="question_'+self.id.to_s+'_min_label" type="text"></td>'
+    html+='</tr>'
+
+>>>>>>> 7e5ef278cd5803a254e60254a6ef84aa288c9c88
     html.html_safe
   end
 
@@ -51,7 +57,7 @@ class Criterion < ScoredQuestion
     advice_total_length = 0
 
     question_advices.each do |question_advice|
-      if question_advice.advice && question_advice.advice != ""
+      if question_advice.advice && !question_advice.advice == ""
         advice_total_length += question_advice.advice.length
       end
     end
@@ -83,12 +89,12 @@ class Criterion < ScoredQuestion
       #clicking on the link caused the dropbox to be filled in with the corresponding number
       question_advices.reverse.each_with_index do |question_advice, index|
         html += '<a id="changeScore_>' + self.id.to_s + '" onclick="changeScore(' + count.to_s + ',' + index.to_s + ')">'
-        html += (self.questionnaire.max_question_score - index).to_s + ' - ' + question_advice.advice + '</a><br/>'
+        html += (question_advices.length - index).to_s + ' - ' + question_advice.advice + '</a><br/>'
         html += '<script>'
         html += 'function changeScore(i, j) {'
         html += 'var elem = jQuery("#responses_" + i.toString() + "_score");'
         html += 'var opts = elem.children("option").length;'
-        html += 'elem.val((' + self.questionnaire.max_question_score.to_s + ' - j).toString());}'
+        html += 'elem.val((opts - j - 1).toString());}'
         html += '</script>'
       end
       html += '</div>'

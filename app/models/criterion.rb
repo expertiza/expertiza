@@ -1,6 +1,7 @@
 class Criterion < ScoredQuestion
   validates_presence_of :size
 
+
   #This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
   def edit(count)
     html ='<tr>'

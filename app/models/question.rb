@@ -69,7 +69,7 @@ class Question < ActiveRecord::Base
     html+='<td><input size="6" value="'+self.seq.to_s+'" name="question['+self.id.to_s+'][seq]" id="question_'+self.id.to_s+'_seq" type="text"></td>'
     html+='<td><textarea cols="50" rows="1" name="question['+self.id.to_s+'][txt]" id="question_'+self.id.to_s+'_txt">'+self.txt+'</textarea></td>'
     html+='<td><input size="10" disabled="disabled" value="'+self.type+'" name="question['+self.id.to_s+'][type]" id="question_'+self.id.to_s+'_type" type="text">''</td>'
-    html+='<td><!--placeholder (UnscoredQuestion does not need weight)--></td>'
+    html+='<td><!--placeholder (No need weight)--></td>'
     html+='</tr>'
 
     html.html_safe
@@ -77,14 +77,11 @@ class Question < ActiveRecord::Base
 
   # YJ
   # remove duplicated view_question_text function
-  def view_question_text
-    #   html = '<TR><TD align="left"> '+self.txt+' </TD>'
-    #   html += '<TD align="left">'+self.type+'</TD>'
-    #   html += '<td align="center">'+self.weight.to_s+'</TD>'
-    #   html += '<TD align="center">&mdash;</TD>'
-    #   html += '</TR>'
-    #   html.html_safe
-    # end
+  def view_question_text_prefix
+       html = '<TR><TD align="left"> '+self.txt+' </TD>'
+       html += '<TD align="left">'+self.type+'</TD>'
+       html += '<td align="center">'+self.weight.to_s+'</TD>'
+  end
 
   #this method decide what to display if an instructor (etc.) is viewing a questionnaire
   def view_question_text

@@ -60,6 +60,30 @@ describe "Create a review questionnaire", :type => :controller do
   end
 end
 
+describe "Create a review questionnaire", :type => :controller do
+
+  it "is able to create a private review questionnaire" do
+
+    login_as("instructor6")
+
+    visit '/questionnaires/new?model=ReviewQuestionnaire&private=1'
+
+    fill_in('questionnaire_name', :with => 'Review 1')
+
+    fill_in('questionnaire_min_question_score', :with =>'0')
+
+    fill_in('questionnaire_max_question_score', :with => '5')
+
+    select('yes', :from=> 'questionnaire_private')
+
+    click_button "Create"
+
+    expect(Questionnaire.where(name: "Review 1")).to exist
+
+  end
+end
+
+
 def load_questionnaire
 	login_as("instructor6")
 	visit '/questionnaires/new?model=ReviewQuestionnaire&private=0'

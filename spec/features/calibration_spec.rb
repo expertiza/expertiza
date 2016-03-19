@@ -244,8 +244,11 @@ describe 'Add Expert Review' do
     @instructor = create(:instructor)
     @student = create(:student)
 
+    @questionnaire = create(:questionnaire)
+
     # Create an assignment with calibration
     @assignment = create :assignment, is_calibrated: true
+    @assignment_questionnaire = create :assignment_questionnaire, assignment: @assignment
 
     # Create a team linked to the calibrated assignment
     @team = create :assignment_team, assignment: @assignment
@@ -299,8 +302,6 @@ describe 'Add Expert Review' do
     expect(page).to have_no_link 'Edit'
   end
 
-
-
   #Student should not be able to submit an expert review
   it 'student should not be able to add an expert review', :js => true do
     #login as student
@@ -315,6 +316,101 @@ describe 'Add Expert Review' do
 end
 
 
+#test display calibration
+describe 'Display Calibration Results' do
+  before :each do
+    #create instructor
+    @instructor = create(:instructor)
+    @student = create(:student)
+
+    @questionnaire_name = 'calibration_questionnaire'
+    # Create an assignment with calibration
+    # Either course: nil is required or an AssignmentNode must also be created.
+    # The page will not load if the assignment has a course but no mapping node.
+    @assignment = create :assignment, is_calibrated: true, instructor: @instructor, course: nil
+
+    # Create an assignment due date
+    create(:deadline_type,name:"submission")
+    create(:deadline_type,name:"review")
+    create(:deadline_type,name:"resubmission")
+    create(:deadline_type,name:"rereview")
+    create(:deadline_type,name:"metareview")
+    create(:deadline_type,name:"drop_topic")
+    create(:deadline_type,name:"signup")
+    create(:deadline_type,name:"team_formation")
+    create(:deadline_right)
+    create(:deadline_right, name: 'Late')
+    create(:deadline_right, name: 'OK')
+    create :due_date, due_at: (DateTime.now + 1)
+
+
+    # Create a team linked to the calibrated assignment
+    @team = create :assignment_team, assignment: @assignment
+
+    # Create an assignment participant linked to the assignment
+    @participant = create :participant, assignment: @assignment, user: @student
+
+    # Create a mapping between the assignment team and the
+    # participant object's user (the submitter).
+    create :team_user, team: @team, user: @student
+    create :review_response_map, assignment: @assignment, reviewee: @team
+
+    #creating the questionnaire and then linking it to the assignment.
+    #@questionnaire = create :questionnaire
+    #@assignment_questionnaire = create :assignment_questionnaire , assignment: @assignment, questionnaire: @questionnaire
+
+  end
+
+  it 'needs a proper questionnaire', :js => true do
+    #login as instructor
+    login_as @instructor.name
+
+    # go to the questionnaire creation page
+    visit "/questionnaires/new?model=ReviewQuestionnaire&private=0"
+
+    fill_in 'questionnaire_name', with:@questionnaire_name
+    click_on('Create')
+
+    #page fails here, asks for questions to put into the questionnaire
+    click_on('Add')
+    #name the question
+    fill_in 'question[1][txt]', with:'question_1'
+    #save the questionnaire
+    click_on('Save review questionnaire')
+
+    expect(page).to have_content('All questions has been saved successfully!')
+
+    # go to the assignment edit page
+    visit "/assignments/#{@assignment.id}/edit"
+    #edit_assignment_path @assignment
+
+    #assign the questionnaire to the assignment
+    select @questionnaire_name
+    #have to save the questionnaire assignment
+    click_on("Save")
+
+    #start the calibration
+    click_link('Begin')
+    visit "/review_mapping/add_calibration/#{@assignment.id}?team_id=#{@team.id}"
+
+    #even though you can't see anything, don't worry, the option is actually there. everything will render once the next command runs
+    #select the dropdown option. believe in the heart of the cards!
+    select '5-Strong agree'
+    click_on "Submit Review"
+    page.driver.browser.switch_to.alert.accept
+
+    #review should be submitted at this point. click on view to make sure you can see it
+    click_link "View"
+    visit "/response/view?id=#{@assignment.id}&return=assignment_edit"
+    #review is hidden by default, click on show review to show your review.
+    click_on "show review"
+    #once you click show review, the score label comes up as well as some other fields.
+    expect(page).to have_content('Score:')
+
+  end
+
+
+end
 
 describe 'Reviewer' do
 

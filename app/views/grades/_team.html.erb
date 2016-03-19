@@ -18,11 +18,13 @@
      <TD WIDTH="9">&nbsp;</TD></TR>  
      
 <%= render :partial => 'participant_title', :locals => {:prefix => prefix } %>        
+<!--Zhewei: If several participants coming from same team, view score page only needs to display same review once. -->
 <% pindex = 3 %>
-  <% for participant in tscore[:team].participants %>
+  <% tscore[:team].participants.each_with_index do |participant, index| %>
      <%= render :partial => 'grades/participant',
                 :locals => {:prefix => prefix+"_"+pindex.to_s,
-     	 			        :team => true,
+     	 			                :team => true,
+                            :index => index,
                             :pscore => @scores[:participants][participant.id.to_s.to_sym]} %>  
      <% pindex += 1 %>                            
 <% end %>        

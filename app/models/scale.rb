@@ -49,7 +49,7 @@ class Scale < ScoredQuestion
     # else
     #   html += '<td width="10%"></td>'
     # end
-    html = complete_min_label(ob, html)
+    html = complete_min_label(self, html)
 
     # comment by Hui, replaced with a method
     # for j in questionnaire_min..questionnaire_max

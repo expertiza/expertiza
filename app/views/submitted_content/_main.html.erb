@@ -43,5 +43,7 @@
 <% end %>
 
 <!--#E1600-->
-<br/><br/>
-<%= render partial: 'submitted_content/self_review', locals: {participant: participant, stage: @stage, origin: ''} %>
+<% if @map.instance_of? SelfReviewResponseMap or @map.nil? %>
+  <br/><br/>
+  <%= render partial: 'submitted_content/self_review', locals: {participant: participant, stage: @stage, origin: ''} %>
+<% end %>

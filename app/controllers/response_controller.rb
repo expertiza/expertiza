@@ -213,6 +213,10 @@ class ResponseController < ApplicationController
 
   def saving
     @map = ResponseMap.find(params[:id])
+    if(@map.type == "SelfReviewResponseMap")
+      params[:return] = "selfreview"
+    end
+
     @return = params[:return]
     @map.save
     redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
@@ -230,6 +234,8 @@ class ResponseController < ApplicationController
       redirect_to :controller => 'grades', :action => 'view', :id => @map.response_map.assignment.id
     elsif params[:return] == "assignment_edit"
       redirect_to controller: 'assignments', action: 'edit', id: @map.response_map.assignment.id
+    elsif params[:return] == "selfreview"
+      redirect_to controller: 'submitted_content', action: 'edit', :id => @map.response_map.reviewer_id
     else
       redirect_to :controller => 'student_review', :action => 'list', :id => @map.reviewer.id
 

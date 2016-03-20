@@ -49,7 +49,7 @@ class Scale < ScoredQuestion
     # else
     #   html += '<td width="10%"></td>'
     # end
-    html = complete_min_label(self, html)
+    html = complete_label(self.min_label, html)
 
     # comment by Hui, replaced with a method
     # for j in questionnaire_min..questionnaire_max
@@ -70,7 +70,7 @@ class Scale < ScoredQuestion
     # else
     #   html += '<td width="10%"></td>'
     # end
-    html = complete_max_label(self, html)
+    html = complete_label(self.max_label, html)
 
     html += '<td width="10%"></td></tr></table>'
     html.html_safe

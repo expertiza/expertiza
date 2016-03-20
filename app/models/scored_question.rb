@@ -49,21 +49,21 @@ class ScoredQuestion < ChoiceQuestion
   end
 
   def edit_end(ob, html)
-    html+='<td> max_label <input size="4" value="'+ob.max_label.to_s+'" name="question['+ob.id.to_s+'][max_label]" id="question_'+ob.id.to_s+'_max_label" type="text">  min_label <input size="4" value="'+ob.min_label.to_s+'" name="question['+ob.id.to_s+'][min_label]" id="question_'+ob.id.to_s+'_min_label" type="text"></td>'
+    html+='<td> max_label <input size="10" value="'+ob.max_label.to_s+'" name="question['+ob.id.to_s+'][max_label]" id="question_'+ob.id.to_s+'_max_label" type="text">  min_label <input size="10" value="'+ob.min_label.to_s+'" name="question['+ob.id.to_s+'][min_label]" id="question_'+ob.id.to_s+'_min_label" type="text"></td>'
     html+='</tr>'
   end
 
-  def complete_min_label(ob, html)
-    if !ob.min_label.nil?
-      html += '<td width="10%">' +ob.min_label+ '</td>'
-    else
-      html += '<td width="10%"></td>'
-    end
-  end
+  # def complete_min_label(ob, html)
+  #   if !ob.min_label.nil?
+  #     html += '<td width="10%">' +ob.min_label+ '</td>'
+  #   else
+  #     html += '<td width="10%"></td>'
+  #   end
+  # end
 
-  def complete_max_label(ob, html)
-    if !self.max_label.nil?
-      html += '<td width="10%">' +self.max_label+ '</td>'
+  def complete_label(label, html)
+    if !label.nil?
+      html += '<td width="10%">' +label+ '</td>'
     else
       html += '<td width="10%"></td>'
     end

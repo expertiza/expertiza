@@ -298,9 +298,10 @@ end
 
 #test display calibration
 describe 'Display Calibration Results' do
-  before :each do
+  before :all do
     #create instructor
     @instructor = create(:instructor)
+    @student2 = create(:student)
     @student = create(:student)
 
     @questionnaire_name = 'calibration_questionnaire'
@@ -323,6 +324,10 @@ describe 'Display Calibration Results' do
     create(:deadline_right, name: 'OK')
     create :due_date, due_at: (DateTime.now + 1)
 
+    #@review_deadline_type=create(:deadline_type,name:"review")
+    #create :due_date, due_at: (DateTime.now + 1), deadline_type:@review_deadline_type
+
+
 
     # Create a team linked to the calibrated assignment
     @team = create :assignment_team, assignment: @assignment
@@ -335,12 +340,25 @@ describe 'Display Calibration Results' do
     create :team_user, team: @team, user: @student
     create :review_response_map, assignment: @assignment, reviewee: @team
 
+    # Create a team linked to the calibrated assignment
+    @team2 = create :assignment_team, assignment: @assignment
+
+    # Create an assignment participant linked to the assignment
+    @participant2 = create :participant, assignment: @assignment, user: @student2
+
+    # Create a mapping between the assignment team and the
+    # participant object's user (the submitter).
+    create :team_user, team: @team2, user: @student2
+    create :review_response_map, assignment: @assignment, reviewee: @team2
+
     #creating the questionnaire and then linking it to the assignment.
     #@questionnaire = create :questionnaire
     #@assignment_questionnaire = create :assignment_questionnaire , assignment: @assignment, questionnaire: @questionnaire
 
   end
 
+  #creates a questionnaire, assigns it to the assignment, fills out the questionaire,
+  #displays the questionaire response, checks to make sure the score is there
   it 'needs a proper questionnaire', :js => true do
     #login as instructor
     login_as @instructor.name
@@ -366,29 +384,87 @@ describe 'Display Calibration Results' do
 
     #assign the questionnaire to the assignment
     select @questionnaire_name
+    #set review limit from 0 to 1
+    fill_in 'assignment_form[assignment][review_topic_threshold]', with:'1'
+    #pick a due date for the review
+    #TODO: change this to actually be tomorrow, or put into factory
+    page.execute_script("$('#datetimepicker_review_round_1').val('2099/03/20 15:29 (UTC -04:00)')")
+    #find('assignment_form[due_date][][submission_allowed_id]').find(:xpath,'option[2]').select_option
+    within('#review_round_1')do
+      select 'Yes', from: "assignment_form[due_date][][submission_allowed_id]"
+    end
     #have to save the questionnaire assignment
     click_on("Save")
 
     #start the calibration
-    click_link('Begin')
-    visit "/review_mapping/add_calibration/#{@assignment.id}?team_id=#{@team.id}"
+    #click_link('Begin')
+    visit "/review_mapping/add_calibration/#{@assignment.id}?team_id=#{@team2.id}"
 
     #even though you can't see anything, don't worry, the option is actually there. everything will render once the next command runs
     #select the dropdown option. believe in the heart of the cards!
     select '5-Strong agree'
+    #submit review
     click_on "Submit Review"
+    #click ok on the pop-up box that warns you that responses can not be edited
     page.driver.browser.switch_to.alert.accept
 
     #review should be submitted at this point. click on view to make sure you can see it
-    click_link "View"
+    #click_link "View"
     visit "/response/view?id=#{@assignment.id}&return=assignment_edit"
     #review is hidden by default, click on show review to show your review.
     click_on "show review"
     #once you click show review, the score label comes up as well as some other fields.
     expect(page).to have_content('Score:')
 
+    #time to switch users
+    # Maximize the browser to show the 'Logout'
+    page.driver.browser.manage.window.maximize
+    click_link 'Logout'
+    #confirm that you want to log out.
+    click_button 'logout-button'
+    click_button 'Logout'
+    find('input[name="commit"]').click
+    Capybara.reset_sessions!    #if the above attempts don't work, try clearing cookies
+    browser = Capybara.current_session.driver.browser
+    if browser.respond_to?(:clear_cookies)
+      # Rack::MockSession
+      browser.clear_cookies
+    elsif browser.respond_to?(:manage) and browser.manage.respond_to?(:delete_all_cookies)
+      # Selenium::WebDriver
+      browser.manage.delete_all_cookies
+    else
+      raise "Don't know how to clear cookies. Weird driver?"
+    end
+    #now that you've logged out, try to go to the home page to log in again.
+    visit(root_path)
+
+#    session = Capybara::Session.new(:selenium)
+#    session.visit(root_path)
+
+=begin
+    #login as second student
+    login_as @student2.name
+    #go to the assignment page and request a review
+    visit "/student_review/list?id=#{@assignment.id}"
+    #request a review
+    click_on "Request a new submission to review"
+    #the review should now be avaliable, now click on begin.
+    click_on "Begin"
+=end
+
   end
 
+#  it 'should display calibration results', :js => true do
+    #login as second student
+#    login_as @student.name #student2066
+    #go to the assignment page and request a review
+#    visit "/student_review/list?id=#{@assignment.id}"
+    ##request a review
+    #click_on "Request a new submission to review"
+    #the review should now be avaliable, now click on begin.
+#    click_on "Begin",:match => :first
+
+#  end
 
 end
 

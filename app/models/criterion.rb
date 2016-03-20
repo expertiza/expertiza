@@ -1,6 +1,7 @@
 class Criterion < ScoredQuestion
   validates_presence_of :size
 
+
   #This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
   def edit(count)
     html ='<tr>'
@@ -10,27 +11,32 @@ class Criterion < ScoredQuestion
     html+='<td><input size="10" disabled="disabled" value="'+self.type+'" name="question['+self.id.to_s+'][type]" id="question_'+self.id.to_s+'_type" type="text">''</td>'
     html+='<td><input size="2" value="'+self.weight.to_s+'" name="question['+self.id.to_s+'][weight]" id="question_'+self.id.to_s+'_weight" type="text">''</td>'
     html+='<td>text area size <input size="3" value="'+self.size.to_s+'" name="question['+self.id.to_s+'][size]" id="question_'+self.id.to_s+'_size" type="text"></td>'
-    html+='<td> max_label <input size="10" value="'+self.max_label.to_s+'" name="question['+self.id.to_s+'][max_label]" id="question_'+self.id.to_s+'_max_label" type="text">  min_label <input size="10" value="'+self.min_label.to_s+'" name="question['+self.id.to_s+'][min_label]" id="question_'+self.id.to_s+'_min_label" type="text"></td>'
-    html+='</tr>'
+
+    # html+='<td> max_label <input size="10" value="'+self.max_label.to_s+'" name="question['+self.id.to_s+'][max_label]" id="question_'+self.id.to_s+'_max_label" type="text">  min_label <input size="12" value="'+self.min_label.to_s+'" name="question['+self.id.to_s+'][min_label]" id="question_'+self.id.to_s+'_min_label" type="text"></td>'
+    # html+='</tr>'
+    html = edit_plus_html(html)
 
     html.html_safe
   end
 
+
+  ## This method has been refactor into the superclass scored_question.rb
+  ## code added  to remove duplicated code
   #This method returns what to display if an instructor (etc.) is viewing a questionnaire
-  def view_question_text
-    html = '<TR><TD align="left"> '+self.txt+' </TD>'
-    html += '<TD align="left">'+self.type+'</TD>'
-    html += '<td align="center">'+self.weight.to_s+'</TD>'
-    questionnaire = self.questionnaire
-    if !self.max_label.nil? && !self.min_label.nil?
-      html += '<TD align="center"> ('+self.min_label+') '+questionnaire.min_question_score.to_s+' to '+ questionnaire.max_question_score.to_s + ' ('+self.max_label+')</TD>'
-    else
-      html += '<TD align="center">'+questionnaire.min_question_score.to_s+' to '+ questionnaire.max_question_score.to_s + '</TD>'
-    end
-
-    html += '</TR>'
-    html.html_safe
-  end
+  # def view_question_text
+  #   html = '<TR><TD align="left"> '+self.txt+' </TD>'
+  #   html += '<TD align="left">'+self.type+'</TD>'
+  #   html += '<td align="center">'+self.weight.to_s+'</TD>'
+  #   questionnaire = self.questionnaire
+  #   if !self.max_label.nil? && !self.min_label.nil?
+  #     html += '<TD align="center"> ('+self.min_label+') '+questionnaire.min_question_score.to_s+' to '+ questionnaire.max_question_score.to_s + ' ('+self.max_label+')</TD>'
+  #   else
+  #     html += '<TD align="center">'+questionnaire.min_question_score.to_s+' to '+ questionnaire.max_question_score.to_s + '</TD>'
+  #   end
+  #
+  #   html += '</TR>'
+  #   html.html_safe
+  # end
 
   def complete(count, answer=nil, questionnaire_min, questionnaire_max, dropdown_or_scale)
   	if self.size.nil?
@@ -91,68 +97,83 @@ class Criterion < ScoredQuestion
     end
 
     if dropdown_or_scale == 'dropdown'
-      html += '<div><select id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]">'
-      html += '<option value=''>--</option>'
-      for j in questionnaire_min..questionnaire_max
-        if !answer.nil? and j == answer.answer
-          html += '<option value=' + j.to_s + ' selected="selected">' 
-        else
-          html += '<option value=' + j.to_s + '>'
-        end
-        if j == questionnaire_min
-          html += j.to_s
-          html += "-" + self.min_label if self.min_label && self.min_label.length>0
-          html += "</option>"
-        elsif j == questionnaire_max
-          html += j.to_s
-          html += "-" + self.max_label if self.max_label && self.max_label.length>0
-          html += "</option>"
-        else
-          html += j.to_s + "</option>"
-        end
-      end
-      html += "</select></div>"
-      html += '<textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
-      html += answer.comments if !answer.nil?
-      html += '</textarea></td></br><br/>'
+      # html += '<div><select id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]">'
+      # html += '<option value=''>--</option>'
+      # for j in questionnaire_min..questionnaire_max
+      #   if !answer.nil? and j == answer.answer
+      #     html += '<option value=' + j.to_s + ' selected="selected">'
+      #   else
+      #     html += '<option value=' + j.to_s + '>'
+      #   end
+      #   if j == questionnaire_min
+      #     html += j.to_s
+      #     html += "-" + self.min_label if self.min_label && self.min_label.length>0
+      #     html += "</option>"
+      #   elsif j == questionnaire_max
+      #     html += j.to_s
+      #     html += "-" + self.max_label if self.max_label && self.max_label.length>0
+      #     html += "</option>"
+      #   else
+      #     html += j.to_s + "</option>"
+      #   end
+      # end
+      # html += "</select></div>"
+      # html += '<textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
+      # html += answer.comments if !answer.nil?
+      # html += '</textarea></td></br><br/>'
+
+      ## code added  to reduce Cyclomatic Complexity
+      html = complete_drop_down(html, count, answer, questionnaire_min, questionnaire_max)
     elsif dropdown_or_scale == 'scale'
-      html += '<input id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]" type="hidden"'
-      html += 'value="'+answer.answer.to_s+'"' if !answer.nil?
-      html += '>'
+      # html += '<input id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]" type="hidden"'
+      # html += 'value="'+answer.answer.to_s+'"' if !answer.nil?
+      # html += '>'
+      #
+      # html += '<table>'
+      # html += '<tr><td width="10%"></td>'
+      # for j in questionnaire_min..questionnaire_max
+      #   html += '<td width="10%"><label>' +j.to_s+ '</label></td>'
+      # end
+      # html += '<td width="10%"></td></tr><tr>'
+      #
+      # # if !self.min_label.nil?
+      # #   html += '<td width="10%">' +self.min_label+ '</td>'
+      # # else
+      # #   html += '<td width="10%"></td>'
+      # # end
+      # ## code added  to remove duplicated code
+      # html = complete_min_label_condition(html)
+      #
+      #
+      # ##
+      # # for j in questionnaire_min..questionnaire_max
+      # #   html += '<td width="10%"><input type="radio" id="' +j.to_s+ '" value="' +j.to_s+ '" name="Radio_' +self.id.to_s+ '"'
+      # #   html += 'checked="checked"' if (!answer.nil? and answer.answer == j) or (answer.nil? and questionnaire_min == j)
+      # #   html += '></td>'
+      # # end
+      # ## code added  to remove duplicated code
+      # html = complete_questionnaire_min_to_questionnaire_max(html, answer, questionnaire_min, questionnaire_max)
+      #
+      # html += '<script>jQuery("input[name=Radio_' +self.id.to_s+ ']:radio").change(function() {'
+      # html += 'var response_score = jQuery("#responses_' +count.to_s+ '_score");'
+      # html += 'var checked_value = jQuery("input[name=Radio_' +self.id.to_s+ ']:checked").val();'
+      # html += 'response_score.val(checked_value);});</script>'
+      #
+      # # if !self.max_label.nil?
+      # #   html += '<td width="10%">' +self.max_label+ '</td>'
+      # # else
+      # #   html += '<td width="10%"></td>'
+      # # end
+      # ## code added  to remove duplicated code
+      # html = complete_max_label_condition(html)
+      #
+      # html += '<td width="10%"></td></tr></table>'
+      # html += '<textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
+      # html += answer.comments if !answer.nil?
+      # html += '</textarea><br/><br/>'
 
-      html += '<table>'
-      html += '<tr><td width="10%"></td>'
-      for j in questionnaire_min..questionnaire_max
-        html += '<td width="10%"><label>' +j.to_s+ '</label></td>'
-      end
-      html += '<td width="10%"></td></tr><tr>'
-
-      if !self.min_label.nil?
-        html += '<td width="10%">' +self.min_label+ '</td>'
-      else
-        html += '<td width="10%"></td>'
-      end
-      for j in questionnaire_min..questionnaire_max
-        html += '<td width="10%"><input type="radio" id="' +j.to_s+ '" value="' +j.to_s+ '" name="Radio_' +self.id.to_s+ '"'
-        html += 'checked="checked"' if (!answer.nil? and answer.answer == j) or (answer.nil? and questionnaire_min == j)
-        html += '></td>'
-      end
-      html += '<script>jQuery("input[name=Radio_' +self.id.to_s+ ']:radio").change(function() {'
-      html += 'var response_score = jQuery("#responses_' +count.to_s+ '_score");'
-      html += 'var checked_value = jQuery("input[name=Radio_' +self.id.to_s+ ']:checked").val();'
-      html += 'response_score.val(checked_value);});</script>'
-
-      if !self.max_label.nil?
-        html += '<td width="10%">' +self.max_label+ '</td>'
-      else
-        html += '<td width="10%"></td>'
-      end
-
-      html += '<td width="10%"></td></tr></table>'
-      html += '<textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
-      html += answer.comments if !answer.nil?
-      html += '</textarea><br/><br/>'
-
+      ## code added  to reduce Cyclomatic Complexity
+      html = complete_scale(html, count, answer, questionnaire_min, questionnaire_max)
     end
     html.html_safe
   end
@@ -172,5 +193,95 @@ class Criterion < ScoredQuestion
 		html.html_safe
   end
 
-  
+  #This method process the complete for drop down
+  def complete_drop_down(html, count, answer, questionnaire_min, questionnaire_max)
+    html += '<div><select id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]">'
+    html += '<option value=''>--</option>'
+    for j in questionnaire_min..questionnaire_max
+      if !answer.nil? and j == answer.answer
+        html += '<option value=' + j.to_s + ' selected="selected">'
+      else
+        html += '<option value=' + j.to_s + '>'
+      end
+      if j == questionnaire_min
+        html += j.to_s
+        html += "-" + self.min_label if self.min_label && self.min_label.length>0
+        html += "</option>"
+      elsif j == questionnaire_max
+        html += j.to_s
+        html += "-" + self.max_label if self.max_label && self.max_label.length>0
+        html += "</option>"
+      else
+        html += j.to_s + "</option>"
+      end
+    end
+    html += "</select></div>"
+
+    # html += '<textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
+    # html += answer.comments if !answer.nil?
+    html = complete_answer_comment(html, answer)
+
+    html += '</textarea></td></br><br/>'
+  end
+
+  #This method process the complete for scale
+  def complete_scale(html, count, answer, questionnaire_min, questionnaire_max)
+    html += '<input id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]" type="hidden"'
+    html += 'value="'+answer.answer.to_s+'"' if !answer.nil?
+    html += '>'
+
+    html += '<table>'
+    html += '<tr><td width="10%"></td>'
+    for j in questionnaire_min..questionnaire_max
+      html += '<td width="10%"><label>' +j.to_s+ '</label></td>'
+    end
+    html += '<td width="10%"></td></tr><tr>'
+
+    # if !self.min_label.nil?
+    #   html += '<td width="10%">' +self.min_label+ '</td>'
+    # else
+    #   html += '<td width="10%"></td>'
+    # end
+    ## code added  to remove duplicated code
+    html = complete_min_label_condition(html)
+
+
+    ##
+    # for j in questionnaire_min..questionnaire_max
+    #   html += '<td width="10%"><input type="radio" id="' +j.to_s+ '" value="' +j.to_s+ '" name="Radio_' +self.id.to_s+ '"'
+    #   html += 'checked="checked"' if (!answer.nil? and answer.answer == j) or (answer.nil? and questionnaire_min == j)
+    #   html += '></td>'
+    # end
+    ## code added  to remove duplicated code
+    html = complete_questionnaire_min_to_questionnaire_max(html, answer, questionnaire_min, questionnaire_max)
+
+    html += '<script>jQuery("input[name=Radio_' +self.id.to_s+ ']:radio").change(function() {'
+    html += 'var response_score = jQuery("#responses_' +count.to_s+ '_score");'
+    html += 'var checked_value = jQuery("input[name=Radio_' +self.id.to_s+ ']:checked").val();'
+    html += 'response_score.val(checked_value);});</script>'
+
+    # if !self.max_label.nil?
+    #   html += '<td width="10%">' +self.max_label+ '</td>'
+    # else
+    #   html += '<td width="10%"></td>'
+    # end
+    ## code added  to remove duplicated code
+    html = complete_max_label_condition(html)
+
+    html += '<td width="10%"></td></tr></table>'
+
+    # html += '<textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
+    # html += answer.comments if !answer.nil?
+    html = complete_answer_comment(html, answer)
+
+    html += '</textarea><br/><br/>'
+
+  end
+
+  ## method added  to remove duplicated code
+  def complete_answer_comment(html, answer)
+    html += '<textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
+    html += answer.comments if !answer.nil?
+  end
+
 end

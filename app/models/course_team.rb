@@ -58,31 +58,7 @@ class CourseTeam < Team
       end
       fields.push("Course Name")
     end
-
-    #deprecated: this is the original self.export function
-    #      if this is a desired export behavior than
-    #      it should either belong to course class or assignment team class
-    def self.export_all_assignment_team_related_to_course(csv, parent_id, options)
-      course = Course.find(parent_id)
-      assignmentList = Assignment.where(course_id: parent_id)
-      assignmentList.each do |currentAssignment|
-        currentAssignment.teams.each { |team|
-          tcsv = Array.new
-          teamUsers = Array.new
-          tcsv.push(team.name)
-          if (options[:team_name] == "true")
-            teamMembers = TeamsUser.where(['team_id = ?', team.id])
-            teamMembers.each do |user|
-              teamUsers.push(user.name)
-            end
-            tcsv.push(teamUsers)
-          end
-          tcsv.push(currentAssignment.name)
-          tcsv.push(course.name)
-          csv << tcsv
-        }
-      end
-    end
+  
     
   def import_team_members(starting_index, row)
     index = starting_index

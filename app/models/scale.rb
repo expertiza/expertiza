@@ -16,19 +16,19 @@ class Scale < ScoredQuestion
   end
 
   #This method returns what to display if an instructor (etc.) is viewing a questionnaire
-  def view_question_text
-    html = '<TR><TD align="left"> '+self.txt+' </TD>'
-    html += '<TD align="left">'+self.type+'</TD>'
-    html += '<td align="center">'+self.weight.to_s+'</TD>'
-    questionnaire = self.questionnaire
-    if !self.max_label.nil? && !self.min_label.nil?
-      html += '<TD align="center"> ('+self.min_label+') '+questionnaire.min_question_score.to_s+' to '+ questionnaire.max_question_score.to_s + ' ('+self.max_label+')</TD>'
-    else
-      html += '<TD align="center">'+questionnaire.min_question_score.to_s+' to '+ questionnaire.max_question_score.to_s + '</TD>'
-    end
-    html += '</TR>'
-    html.html_safe
-  end
+  # def view_question_text
+  #   html = '<TR><TD align="left"> '+self.txt+' </TD>'
+  #   html += '<TD align="left">'+self.type+'</TD>'
+  #   html += '<td align="center">'+self.weight.to_s+'</TD>'
+  #   questionnaire = self.questionnaire
+  #   if !self.max_label.nil? && !self.min_label.nil?
+  #     html += '<TD align="center"> ('+self.min_label+') '+questionnaire.min_question_score.to_s+' to '+ questionnaire.max_question_score.to_s + ' ('+self.max_label+')</TD>'
+  #   else
+  #     html += '<TD align="center">'+questionnaire.min_question_score.to_s+' to '+ questionnaire.max_question_score.to_s + '</TD>'
+  #   end
+  #   html += '</TR>'
+  #   html.html_safe
+  # end
 
   def complete(count, answer=nil, questionnaire_min, questionnaire_max)
   	html = self.txt + '<br>'

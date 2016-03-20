@@ -23,7 +23,7 @@ class CourseTeam < Team
   end
 
   def copy(assignment_id)
-    new_team = AssignmentTeam.create_team_and_node(assignment_id)
+    new_team = AssignmentTeam.create_team_and_node(assignment_id,false)
     new_team.name = name
     new_team.save
     copy_members(new_team)
@@ -58,7 +58,7 @@ class CourseTeam < Team
       end
       fields.push("Course Name")
     end
-  
+
     
   def import_team_members(starting_index, row)
     index = starting_index

@@ -205,15 +205,10 @@ class Team < ActiveRecord::Base
 
     if name
       if course
-        assignment = Course.find(id)
-        team_name = Team.generate_team_name(assignment.name)
-        team = Course.create(name: team_name, parent_id: id)
+        team = Team.create_team_and_node(id,true)
       else
-        assignment = Assignment.find(id)
-        team_name = Team.generate_team_name(assignment.name)
-        team = AssignmentTeam.create(name: team_name, parent_id: id)
+        team = Team.create_team_and_node(id,false)
       end
-      TeamNode.create(parent_id: id, node_object_id: team.id)
       team.name = name
       team.save
     end
@@ -263,6 +258,21 @@ class Team < ActiveRecord::Base
       output.push(teams.name)
       csv << output
     end
+  end
+
+  def self.create_team_and_node(id,course)
+    if course
+      curr_course = Course.find(id)
+      team_name = Team.generate_team_name(curr_course.name)
+      team = CourseTeam.create(name: team_name, parent_id: id)
+      TeamNode.create(parent_id: id, node_object_id: team.id)
+    else
+      curr_assignment = Assignment.find(id)
+      team_name = Team.generate_team_name(curr_assignment.name)
+      team = AssignmentTeam.create(name: team_name, parent_id: id)
+      TeamNode.create(parent_id: id, node_object_id: team.id)
+    end
+    team
   end
 
   #REFACTOR END:: class methods import export moved from course_team & assignment_team to here

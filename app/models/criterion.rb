@@ -14,7 +14,7 @@ class Criterion < ScoredQuestion
 
     # html+='<td> max_label <input size="10" value="'+self.max_label.to_s+'" name="question['+self.id.to_s+'][max_label]" id="question_'+self.id.to_s+'_max_label" type="text">  min_label <input size="12" value="'+self.min_label.to_s+'" name="question['+self.id.to_s+'][min_label]" id="question_'+self.id.to_s+'_min_label" type="text"></td>'
     # html+='</tr>'
-    html = edit_plus_html(html)
+    html = edit_end(self, html)
 
     html.html_safe
   end
@@ -243,7 +243,7 @@ class Criterion < ScoredQuestion
     #   html += '<td width="10%"></td>'
     # end
     ## code added  to remove duplicated code
-    html = complete_min_label_condition(html)
+    html = complete_min_label_condition(self, html)
 
 
     ##
@@ -253,7 +253,7 @@ class Criterion < ScoredQuestion
     #   html += '></td>'
     # end
     ## code added  to remove duplicated code
-    html = complete_questionnaire_min_to_questionnaire_max(html, answer, questionnaire_min, questionnaire_max)
+    html = complete_questionnaire_min_to_questionnaire_max(self, html, answer, questionnaire_min, questionnaire_max)
 
     html += '<script>jQuery("input[name=Radio_' +self.id.to_s+ ']:radio").change(function() {'
     html += 'var response_score = jQuery("#responses_' +count.to_s+ '_score");'
@@ -266,7 +266,7 @@ class Criterion < ScoredQuestion
     #   html += '<td width="10%"></td>'
     # end
     ## code added  to remove duplicated code
-    html = complete_max_label_condition(html)
+    html = complete_max_label_condition(self, html)
 
     html += '<td width="10%"></td></tr></table>'
 

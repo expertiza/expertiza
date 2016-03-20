@@ -78,4 +78,13 @@ class Question < ActiveRecord::Base
      return 0
   end
 
+
+  def edit_prefix(ob, html)
+    html ='<tr>'
+    html+='<td align="center"><a rel="nofollow" data-method="delete" href="/questions/' +ob.id.to_s+ '">Remove</a></td>'
+    html+='<td><input size="6" value="'+ob.seq.to_s+'" name="question['+ob.id.to_s+'][seq]" id="question_'+ob.id.to_s+'_seq" type="text"></td>'
+    html+='<td><textarea cols="50" rows="1" name="question['+ob.id.to_s+'][txt]" id="question_'+ob.id.to_s+'_txt">'+ob.txt+'</textarea></td>'
+    html+='<td><input size="10" disabled="disabled" value="'+ob.type+'" name="question['+ob.id.to_s+'][type]" id="question_'+ob.id.to_s+'_type" type="text">''</td>'
+  end
+
 end

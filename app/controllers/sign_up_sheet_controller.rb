@@ -383,33 +383,83 @@ class SignUpSheetController < ApplicationController
     DeadlineHelper.set_start_due_date(assignment_id, set_of_topics)
   end
 
+  #   #gets team_details to show it on team_details view for a given assignment
+  # def show_team
+  #   if !(assignment = Assignment.find(params[:assignment_id])).nil? and !(topic = SignUpTopic.find(params[:id])).nil?
+  #     @results =ad_info(assignment.id, topic.id)
+  #     puts @results[0].to_s
+  #     @results.each do |result|
+  #       result.attributes().each do |attr|
+  #         if attr[0].equal? "name"
+  #           @current_team_name = attr[1]
+  #         end
+  #       end
+  #     end
+  #     @results.each { |result|
+  #       @team_members = ""
+  #       TeamsUser.where(team_id: result[:team_id]).each { |teamuser|
+  #         @team_members+=User.find(teamuser.user_id).name+" "
+  #       }
+  #     }
+  #     #@team_members = find_team_members(topic)
+  #   end
+  # end
+
   #gets team_details to show it on team_details view for a given assignment
   def show_team
+    puts "Hello World"
     if !(assignment = Assignment.find(params[:assignment_id])).nil? and !(topic = SignUpTopic.find(params[:id])).nil?
-      @results =ad_info(assignment.id, topic.id)
+      @results = ad_info(assignment.id, topic.id)
+      puts @results[0].to_s
       @results.each do |result|
-        result.attributes().each do |attr|
-          if attr[0].equal? "name"
-            @current_team_name = attr[1]
+        result.keys.each do |key|
+          if key.equal? :name
+            @current_team_name = result[key]
+            puts "Team name : " + @current_team_name
           end
         end
       end
-      @results.each { |result|
+      @results.each do |result|
         @team_members = ""
-        TeamsUser.where(team_id: result[:team_id]).each { |teamuser|
+        TeamsUser.where(team_id: result[:team_id]).each do |teamuser|
           @team_members+=User.find(teamuser.user_id).name+" "
-        }
-      }
-      #@team_members = find_team_members(topic)
+        end
+      end
+      puts @team_members
+      # @team_members = find_team_members(topic)
     end
   end
 
         # get info related to the ad for partners so that it can be displayed when an assignment_participant
         # clicks to see ads related to a topic
   def ad_info(assignment_id, topic_id)
-    query = "select t.id as team_id,t.comments_for_advertisement,t.name,su.assignment_id, t.advertise_for_partner from teams t, signed_up_teams s,sign_up_topics su "+
-        "where s.topic_id='"+topic_id.to_s+"' and s.team_id=t.id and s.topic_id = su.id;    "
-    SignUpTopic.find_by_sql(query)
+    # query = "select t.id as team_id, t.comments_for_advertisement, t.name,su.assignment_id, t.advertise_for_partner " +
+    #       "from teams t, signed_up_teams s,sign_up_topics su " +
+    #       "where s.topic_id='"+topic_id.to_s+"' and s.team_id=t.id and s.topic_id = su.id;"
+    # SignUpTopic.find_by_sql(query)
+
+    # List that contains individual result object
+    @result_list = []
+    puts "Pre @results"
+    # Get the results
+    @results = SignedUpTeam.where("topic_id = ?", "#{topic_id}")
+    puts "Post @results" + @results.count.to_s
+    # Iterate through the results of the query and get the required attributes
+    @results.each do |result| 
+      team = result.team
+      topic = result.topic
+      resultMap = {}
+      resultMap[:team_id] = team.id
+      resultMap[:comments_for_advertisement] = team.comments_for_advertisement
+      resultMap[:name] = team.name
+      resultMap[:assignment_id] = topic.assignment_id
+      resultMap[:advertise_for_partner] = team.advertise_for_partner
+
+      # Append to the list
+      @result_list.append(resultMap)
+    end
+    puts "At the end"
+    @result_list
   end
 
   def add_default_microtask

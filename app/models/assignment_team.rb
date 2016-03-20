@@ -116,7 +116,7 @@ class AssignmentTeam < Team
     Team.export(csv,parent_id,options,false)
   end
   #REFACTOR END:: functionality of import, export handle_duplicate shifted to team.rb
-  
+
 
       def participant_type
         "AssignmentParticipant"

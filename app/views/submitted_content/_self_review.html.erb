@@ -6,13 +6,13 @@
     <td><b>Self Review:</b><BR/></td>
     <% @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
     <% @review_phase = @assignment.get_current_stage(@topic_id) %>
-    <% @review_mappings = SelfReviewResponseMap.where(reviewer_id: @participant.id).first %>
+    <% @review_mappings = SelfReviewResponseMap.where(reviewer_id: @participant.id) %>
     <% if !@review_mappings.nil? %>
-        <% if !@review_mappings.response.empty? %>
+        <% if !@review_mappings[0].response.empty? %>
             <!--!Response.find(@review_mappings.id).nil?-->
             <% array_not_empty = 0 %>
             <% @sorted_responses = Array.new %>
-            <% @prev = Response.where(:map_id => @review_mappings.id) %>
+            <% @prev = Response.where(:map_id => @review_mappings[0].id) %>
             <% for element in @prev %>
                 <% array_not_empty = 1 %>
                 <% @sorted_responses << element %>
@@ -34,7 +34,7 @@
                   <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
                 </td>
 
-                <% if @assignment.get_current_stage(topic_id) != "Finished" %>
+                <% if @assignment.get_current_stage(@topic_id) != "Finished" %>
                     <%- # show the link as edit when latest review is done in current deadline    -%>
                     <%- # show link as update when latest review is done in different deadline than current phase    -%>
                     <% if (last_response_round == current_round) %>
@@ -44,13 +44,13 @@
                           <% end %>
                         </td>
                     <% else %>
-                        <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => @review_mappings.map_id} %></td>
+                        <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => @review_mappings[0].map_id} %></td>
                     <% end %>
                 <% end %>
             <% end %>
         <% else %>
             <td>&nbsp;&nbsp;</td>
-            <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => @review_mappings.id} %></td>
+            <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => @review_mappings[0].id} %></td>
             <td>&nbsp;&nbsp;</td>
         <% end %>
     <% else %>

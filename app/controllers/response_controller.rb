@@ -285,7 +285,7 @@ class ResponseController < ApplicationController
 
   def set_questionnaire_for_new_response
     case @map.type
-    when "ReviewResponseMap"
+    when "ReviewResponseMap","SelfReviewResponseMap"
       reviewees_topic=SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.get_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)

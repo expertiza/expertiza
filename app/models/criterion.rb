@@ -279,7 +279,7 @@ class Criterion < ScoredQuestion
     #   html += '<td width="10%"></td>'
     # end
     ## code added  to remove duplicated code
-    html = complete_min_label(ob, html)
+    html = complete_label(ob.min_label, html)
 
 
     ##
@@ -302,7 +302,7 @@ class Criterion < ScoredQuestion
     #   html += '<td width="10%"></td>'
     # end
     ## code added  to remove duplicated code
-    html = complete_max_label(ob, html)
+    html = complete_label(ob.max_label, html)
 
     html += '<td width="10%"></td></tr></table>'
 

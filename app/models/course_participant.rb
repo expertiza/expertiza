@@ -2,6 +2,8 @@ class CourseParticipant < Participant
 
   belongs_to :course, :class_name => 'Course', :foreign_key => 'parent_id'
 
+  attr_accessible :can_submit, :can_review, :user_id, :parent_id, :submitted_at, :permission_granted, :penalty_accumulated, :grade, :type, :handle, :time_stamp, :digital_signature, :duty, :can_take_quiz
+
   # Copy this participant to an assignment
   def copy(assignment_id)
     part = AssignmentParticipant.where(user_id: self.user_id, parent_id: assignment_id).first
@@ -71,22 +73,9 @@ class CourseParticipant < Participant
   end
 
   def self.export_fields(options)
-    fields = Array.new
-    if options["personal_details"] == "true"
-      fields.push("name", "full name", "email")
-    end
-    if options["role"] == "true"
-      fields.push("role")
-    end
-    if options["parent"] == "true"
-      fields.push("parent")
-    end
-    if options["email_options"] == "true"
-      fields.push("email on submission", "email on review", "email on metareview")
-    end
-    if options["handle"] == "true"
-      fields.push("handle")
-    end
+
+    User.export_fields(options)
+
     return fields
   end
 

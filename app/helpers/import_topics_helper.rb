@@ -7,7 +7,9 @@ module ImportTopicsHelper
     attributes["topic_identifier"] = row[0].strip
     attributes["topic_name"] = row[1].strip
     attributes["max_choosers"] = row[2]
-    attributes["category"] = row[3].strip
+    if row.length > 3
+      attributes["category"] = row[3].strip 
+    end
     attributes
   end
 

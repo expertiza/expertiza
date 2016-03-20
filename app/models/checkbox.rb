@@ -28,19 +28,21 @@ class Checkbox < UnscoredQuestion
     curr_question = Question.find(self.id)
     prev_question = Question.where("seq < ?", curr_question.seq).order(:seq).last
     next_question = Question.where("seq > ?", curr_question.seq).order(:seq).first
+    html = ''
     if prev_question.type == 'ColumnHeader'
       html = '<td style="padding: 15px;">'
-    else
-      html = ''
+    #else
+    #  html = ''
     end
 
     html += '<input id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" type="hidden" value="">'
     html += '<input id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]" type="hidden"'
-    if !answer.nil? and answer.answer == 1
-      html += 'value="1"'
-    else
-      html += 'value="0"'
-    end 
+    html += hasAnswer(html , answer)
+#    if !answer.nil? and answer.answer == 1
+#      html += 'value="1"'
+#    else
+#      html += 'value="0"'
+#    end 
     html += '>'
     html += '<input id="responses_' +count.to_s+ '_checkbox" type="checkbox" onchange="checkbox' +count.to_s+ 'Changed()"'
     html += 'checked="checked"' if !answer.nil? and answer.answer == 1
@@ -54,7 +56,30 @@ class Checkbox < UnscoredQuestion
     html += 'response_score.val("1");'
     html += '} else {' 
     html += 'response_score.val("0");}}</script>'
+    
+    html = nextQuestionTail(html, next_question)
+#    if next_question.type == 'ColumnHeader'
+#      html += '</td></tr>'
+#    elsif next_question.type == 'SectionHeader' or next_question.type == 'TableHeader'
+#      html += '</td></tr></table><br/>'
+#    else
+#      html += '<BR/>'
+#    end
+    html.html_safe
+  end
 
+
+  #YJ private for complete()
+  def hasAnswer(html, answer)
+    if !answer.nil? and answer.answer == 1
+      html += 'value="1"'
+    else
+      html += 'value="0"'
+    end 
+    return html
+  end
+  
+  def nextQuestionTail(html, next_q)
     if next_question.type == 'ColumnHeader'
       html += '</td></tr>'
     elsif next_question.type == 'SectionHeader' or next_question.type == 'TableHeader'
@@ -62,7 +87,7 @@ class Checkbox < UnscoredQuestion
     else
       html += '<BR/>'
     end
-    html.html_safe
+    return html 
   end
 
   #This method returns what to display if a student is viewing a filled-out questionnaire

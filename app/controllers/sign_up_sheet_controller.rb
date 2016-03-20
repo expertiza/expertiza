@@ -407,15 +407,12 @@ class SignUpSheetController < ApplicationController
 
   #gets team_details to show it on team_details view for a given assignment
   def show_team
-    puts "Hello World"
     if !(assignment = Assignment.find(params[:assignment_id])).nil? and !(topic = SignUpTopic.find(params[:id])).nil?
       @results = ad_info(assignment.id, topic.id)
-      puts @results[0].to_s
       @results.each do |result|
         result.keys.each do |key|
           if key.equal? :name
             @current_team_name = result[key]
-            puts "Team name : " + @current_team_name
           end
         end
       end
@@ -425,7 +422,6 @@ class SignUpSheetController < ApplicationController
           @team_members+=User.find(teamuser.user_id).name+" "
         end
       end
-      puts @team_members
       # @team_members = find_team_members(topic)
     end
   end
@@ -440,10 +436,8 @@ class SignUpSheetController < ApplicationController
 
     # List that contains individual result object
     @result_list = []
-    puts "Pre @results"
     # Get the results
     @results = SignedUpTeam.where("topic_id = ?", "#{topic_id}")
-    puts "Post @results" + @results.count.to_s
     # Iterate through the results of the query and get the required attributes
     @results.each do |result| 
       team = result.team
@@ -458,7 +452,6 @@ class SignUpSheetController < ApplicationController
       # Append to the list
       @result_list.append(resultMap)
     end
-    puts "At the end"
     @result_list
   end
 

@@ -12,7 +12,7 @@ class SelfReviewResponseMap < ResponseMap
   end
 
   def contributor
-    nil
+    Team.find_by_id(self.reviewee_id)
   end
 
   def get_title

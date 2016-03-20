@@ -43,28 +43,34 @@ class Scale < ScoredQuestion
     end
     html += '<td width="10%"></td></tr><tr>'
 
-    if !self.min_label.nil?
-      html += '<td width="10%">' +self.min_label+ '</td>'
-    else
-      html += '<td width="10%"></td>'
-    end
+    # Identical code found in 1 other location, replaced with a method
+    # if !self.min_label.nil?
+    #   html += '<td width="10%">' +self.min_label+ '</td>'
+    # else
+    #   html += '<td width="10%"></td>'
+    # end
+    html = complete_min_label(ob, html)
+
     # comment by Hui, replaced with a method
     # for j in questionnaire_min..questionnaire_max
     #   html += '<td width="10%"><input type="radio" id="' +j.to_s+ '" value="' +j.to_s+ '" name="Radio_' +self.id.to_s+ '"'
     #   html += 'checked="checked"' if (!answer.nil? and answer.answer == j) or (answer.nil? and questionnaire_min == j)
     #   html += '></td>'
     # end
-    html = complete_questionnaire_min_to_questionnaire_max(html, answer, questionnaire_min, questionnaire_max)
+    html = complete_questionnaire_min_to_questionnaire_max(self, html, answer, questionnaire_min, questionnaire_max)
+
     html += '<script>jQuery("input[name=Radio_' +self.id.to_s+ ']:radio").change(function() {'
     html += 'var response_score = jQuery("#responses_' +count.to_s+ '_score");'
     html += 'var checked_value = jQuery("input[name=Radio_' +self.id.to_s+ ']:checked").val();'
     html += 'response_score.val(checked_value);});</script>'
 
-    if !self.max_label.nil?
-      html += '<td width="10%">' +self.max_label+ '</td>'
-    else
-      html += '<td width="10%"></td>'
-    end
+    # comment by Hui, replaced with a method
+    # if !self.max_label.nil?
+    #   html += '<td width="10%">' +self.max_label+ '</td>'
+    # else
+    #   html += '<td width="10%"></td>'
+    # end
+    html = complete_max_label(self, html)
 
     html += '<td width="10%"></td></tr></table>'
     html.html_safe

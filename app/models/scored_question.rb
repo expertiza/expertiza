@@ -37,9 +37,11 @@ class ScoredQuestion < ChoiceQuestion
      return self.weight * answer.answer
   end
 
-  def complete_questionnaire_min_to_questionnaire_max(html, answer, questionnaire_min, questionnaire_max)
+
+  # add the following functions to refactor duplicates.
+  def complete_questionnaire_min_to_questionnaire_max(ob, html, answer, questionnaire_min, questionnaire_max)
     for j in questionnaire_min..questionnaire_max
-      html += '<td width="10%"><input type="radio" id="' +j.to_s+ '" value="' +j.to_s+ '" name="Radio_' +self.id.to_s+ '"'
+      html += '<td width="10%"><input type="radio" id="' +j.to_s+ '" value="' +j.to_s+ '" name="Radio_' +ob.id.to_s+ '"'
       html += 'checked="checked"' if (!answer.nil? and answer.answer == j) or (answer.nil? and questionnaire_min == j)
       html += '></td>'
     end
@@ -50,4 +52,21 @@ class ScoredQuestion < ChoiceQuestion
     html+='<td> max_label <input size="4" value="'+ob.max_label.to_s+'" name="question['+ob.id.to_s+'][max_label]" id="question_'+ob.id.to_s+'_max_label" type="text">  min_label <input size="4" value="'+ob.min_label.to_s+'" name="question['+ob.id.to_s+'][min_label]" id="question_'+ob.id.to_s+'_min_label" type="text"></td>'
     html+='</tr>'
   end
+
+  def complete_min_label(ob, html)
+    if !ob.min_label.nil?
+      html += '<td width="10%">' +ob.min_label+ '</td>'
+    else
+      html += '<td width="10%"></td>'
+    end
+  end
+
+  def complete_max_label(ob, html)
+    if !self.max_label.nil?
+      html += '<td width="10%">' +self.max_label+ '</td>'
+    else
+      html += '<td width="10%"></td>'
+    end
+  end
+
 end

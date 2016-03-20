@@ -236,13 +236,17 @@ class Criterion < ScoredQuestion
         html += '<option value=' + j.to_s + '>'
       end
       if j == questionnaire_min
-        html += j.to_s
-        html += "-" + ob.min_label if ob.min_label && ob.min_label.length>0
-        html += "</option>"
+        # html += j.to_s
+        # html += "-" + ob.min_label if ob.min_label && ob.min_label.length>0
+        # html += "</option>"
+        ## code added  to remove duplicated code
+        html = complete_drop_down_label_config(html, ob.min_label)
       elsif j == questionnaire_max
-        html += j.to_s
-        html += "-" + ob.max_label if ob.max_label && ob.max_label.length>0
-        html += "</option>"
+        # html += j.to_s
+        # html += "-" + ob.max_label if ob.max_label && ob.max_label.length>0
+        # html += "</option>"
+        ## code added  to remove duplicated code
+        html = complete_drop_down_label_config(html, ob.max_label)
       else
         html += j.to_s + "</option>"
       end
@@ -314,6 +318,12 @@ class Criterion < ScoredQuestion
   def complete_answer_comment(count, html, answer)
     html += '<textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
     html += answer.comments if !answer.nil?
+  end
+
+  def complete_drop_down_label_config(html, label)
+    html += j.to_s
+    html += "-" + label if label && label.length>0
+    html += "</option>"
   end
 
 end

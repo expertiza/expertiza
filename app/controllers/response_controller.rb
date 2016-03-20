@@ -97,6 +97,10 @@ class ResponseController < ApplicationController
         @questionnaire = @map.questionnaire(@response.round)
       elsif @map.type=="ReviewResponseMap"
         @questionnaire = @map.questionnaire(nil)
+      elsif @map.type=="SelfReviewResponseMap" && @response.round
+        @questionnaire = @map.questionnaire(@response.round)
+      elsif @map.type=="SelfReviewResponseMap"
+        @questionnaire = @map.questionnaire(nil)
       else
         @questionnaire = @map.questionnaire
       end

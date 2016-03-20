@@ -322,6 +322,7 @@ Expertiza::Application.routes.draw do
       post :assign_metareviewer_dynamically
       post :automatic_review_mapping
       post :automatic_review_mapping_staggered
+      #E1600
       post :start_self_review
     end
   end

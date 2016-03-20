@@ -105,49 +105,17 @@ class AssignmentTeam < Team
     'ReviewResponseMap'
   end
 
-  def self.handle_duplicate(team, name, assignment_id, handle_duplicates)
-    return name if team.nil? #no duplicate
+  #REFACTOR BEGIN:: functionality of import,export, handle_duplicate shifted to team.rb
 
-    if handle_duplicates == "ignore" #ignore: do not create the new team
-      p '>>>setting name to nil ...'
-      return nil
-    end
-    return self.generate_team_name(Assignment.find(assignment_id).name) if handle_duplicates == "rename" #rename: rename new team
+  def self.import(row, assignment_id, options)
+    raise ImportError, "The assignment with id \""+id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this assignment?" if Assignment.find(assignment_id) == nil
+    Team.import(row,assignment_id,options,false)
+  end
 
-    if handle_duplicates == "replace" #replace: delete old team
-      team.delete
-      return name
-    else # handle_duplicates = "insert"
-      return nil
-    end
-    end
-
-    def self.import(row, assignment_id, options)
-      raise ArgumentError, "Not enough fields on this line" if (row.length < 2 && options[:has_column_names] == "true") || (row.length < 1 && options[:has_column_names] != "true")
-      raise ImportError, "The assignment with id \""+assignment_id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this assignment?" if Assignment.find(assignment_id) == nil
-
-      if options[:has_column_names] == "true"
-        name = row[0].to_s.strip
-        team = where(["name =? && parent_id =?", name, assignment_id]).first
-        team_exists = !team.nil?
-        name = handle_duplicate(team, name, assignment_id, options[:handle_dups])
-        index = 1
-      else
-        name = self.generate_team_name(Assignment.find(assignment_id).name)
-        index = 0
-      end
-
-      # create new team for the team to be inserted
-      # do not create new team if we choose 'ignore' or 'insert' duplicate teams
-      if name
-        team = AssignmentTeam.create_team_and_node(assignment_id)
-        team.name = name
-        team.save
-      end
-
-      # insert team members into team unless team was pre-existing & we ignore duplicate teams
-      team.import_team_members(index, row) if !(team_exists && options[:handle_dups] == "ignore")
-    end
+  def self.export(csv, parent_id, options)
+    Team.export(csv,parent_id,options,false)
+  end
+  #REFACTOR END:: functionality of import, export handle_duplicate shifted to team.rb
 
       def email
         self.get_team_users.first.email
@@ -216,22 +184,7 @@ class AssignmentTeam < Team
         nil
       end
 
-      def self.export(csv, parent_id, options)
-        current_assignment = Assignment.find(parent_id)
-        current_assignment.teams.each do |team|
-          tcsv = Array.new
-          team_users = Array.new
-          tcsv.push(team.name)
-          if options["team_name"] == "false"
-            team_members = TeamsUser.where(['team_id = ?', team.id])
-            team_members.each do |user|
-              tcsv.push(user.name)
-            end
-          end
-          tcsv.push(current_assignment.name)
-          csv << tcsv
-        end
-      end
+
 
       def self.export_fields(options)
         fields = Array.new

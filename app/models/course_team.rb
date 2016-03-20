@@ -83,14 +83,6 @@ class CourseTeam < Team
         }
       end
     end
-
-    def self.create_team_and_node(course_id)
-      course = Course.find(course_id)
-      teamname = Team.generate_team_name(course.name)
-      team = CourseTeam.create(:name=>teamname, :parent_id => course_id)
-      TeamNode.create(:parent_id =>course_id,:node_object_id=>team.id)
-      team
-    end
     
   def import_team_members(starting_index, row)
     index = starting_index

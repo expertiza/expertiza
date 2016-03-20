@@ -45,4 +45,9 @@ class ScoredQuestion < ChoiceQuestion
     end
     return html
   end
+
+  def edit_end(ob, html)
+    html+='<td> max_label <input size="4" value="'+ob.max_label.to_s+'" name="question['+ob.id.to_s+'][max_label]" id="question_'+ob.id.to_s+'_max_label" type="text">  min_label <input size="4" value="'+ob.min_label.to_s+'" name="question['+ob.id.to_s+'][min_label]" id="question_'+ob.id.to_s+'_min_label" type="text"></td>'
+    html+='</tr>'
+  end
 end

@@ -205,10 +205,15 @@ class Team < ActiveRecord::Base
 
     if name
       if course
-        team = CourseTeam.create_team_and_node(id)
+        assignment = Course.find(id)
+        team_name = Team.generate_team_name(assignment.name)
+        team = Course.create(name: team_name, parent_id: id)
       else
-        team = AssignmentTeam.create_team_and_node(id)
+        assignment = Assignment.find(id)
+        team_name = Team.generate_team_name(assignment.name)
+        team = AssignmentTeam.create(name: team_name, parent_id: id)
       end
+      TeamNode.create(parent_id: id, node_object_id: team.id)
       team.name = name
       team.save
     end

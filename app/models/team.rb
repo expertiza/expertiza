@@ -181,4 +181,84 @@ class Team < ActiveRecord::Base
       index = index + 1
     end
   end
+
+  #REFACTOR BEGIN:: class methods import export moved from course_team & assignment_team to here
+  def self.import(row, id, options,course)
+    raise ArgumentError, "Not enough fields on this line" if (row.length < 2 && options[:has_column_names] == "true") || (row.length < 1 && options[:has_column_names] != "true")
+
+
+    if options[:has_column_names] == "true"
+      name = row[0].to_s.strip
+      team = where(["name =? && parent_id =?", name, id]).first
+      team_exists = !team.nil?
+      name = handle_duplicate(team, name, id, options[:handle_dups],course)
+      index = 1
+    else
+      if course
+        name = self.generate_team_name(Course.find(id).name)
+      else
+        name = self.generate_team_name(Assignment.find(id).name)
+      end
+      index = 0
+    end
+
+
+    if name
+      if course
+        team = CourseTeam.create_team_and_node(id)
+      else
+        team = AssignmentTeam.create_team_and_node(id)
+      end
+      team.name = name
+      team.save
+    end
+
+    # insert team members into team unless team was pre-existing & we ignore duplicate teams
+    team.import_team_members(index, row) if !(team_exists && options[:handle_dups] == "ignore")
+  end
+
+  def self.handle_duplicate(team, name, id, handle_dups, course)
+    if team.nil? #no duplicate
+      return name
+    end
+    if handle_dups == "ignore" #ignore: do not create the new team
+      p '>>>setting name to nil ...'
+      return nil
+    end
+    if handle_dups == "rename" #rename: rename new team
+      if course
+        return self.generate_team_name(Course.find(id).name)
+      else
+        return self.generate_team_name(Assignment.find(id).name)
+      end
+    end
+    if handle_dups == "replace" #replace: delete old team
+      team.delete
+      return name
+    else # handle_dups = "insert"
+      return nil
+    end
+  end
+
+  def self.export(csv, parent_id, options, course)
+    if course
+      teams = CourseTeam.where(["parent_id =?", parent_id])
+    else
+      teams = AssignmentTeam.where(["parent_id =?", parent_id])
+    end
+    teams.each do |team|
+      output = Array.new
+      output.push(team.name)
+      if options["team_name"] == "false"
+        team_members = TeamsUser.where(['team_id = ?', team.id])
+        team_members.each do |user|
+          output.push(user.name)
+        end
+      end
+      output.push(teams.name)
+      csv << output
+    end
+  end
+
+  #REFACTOR END:: class methods import export moved from course_team & assignment_team to here
 end

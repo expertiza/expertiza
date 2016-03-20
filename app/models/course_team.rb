@@ -36,86 +36,19 @@ class CourseTeam < Team
     end
   end
 
-  def export(team_name_only)
-    output = Array.new
-    output.push(self.name)
-    if team_name_only == "false"
-      participants = TeamsUser.where(['team_id = ?', self.id])
-      participants.each do |participant|
-        output.push(participant.name)
-      end
-    end
-    course = Course.find(self.parent_id)
-    output.push(course.name)
-    return output
+  #REFACTOR BEGIN:: functionality of import, export, handle_duplicate shifted to team.rb
+
+  def self.import(row, course_id, options)
+    raise ImportError, "The course with id \""+id.to_s+"\" was not found. <a href='/course/new'>Create</a> this course?" if Course.find(course_id) == nil
+    Team.import(row,course_id,options,true)
   end
 
-  def self.handle_duplicate(team, name, course_id, handle_dups)
-    if team.nil? #no duplicate
-      return name
-    end
-    if handle_dups == "ignore" #ignore: do not create the new team
-      p '>>>setting name to nil ...'
-      return nil
-    end
-    if handle_dups == "rename" #rename: rename new team
-      return self.generate_team_name(Course.find(course_id).name)
-    end
-    if handle_dups == "replace" #replace: delete old team
-      team.delete
-      return name
-    else # handle_dups = "insert"
-      return nil
-    end
-    end
+  def self.export(csv, parent_id, options)
+    Team.export(csv,parent_id,options,true)
+  end
 
-    def self.import(row, course_id, options)
-      if (row.length < 2 and options[:has_column_names] == "true") or (row.length < 1 and options[:has_column_names] != "true")
-        raise ArgumentError, "Not enough fields on this line"
-      end
+  #REFACTOR END:: functionality of import, export, handle_duplicate shifted to team.rb
 
-      if Course.find(course_id) == nil
-        raise ImportError, "The course with id \""+course_id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this course?"
-      end
-
-      team_exists = false
-      if options[:has_column_names] == "true"
-        name = row[0].to_s.strip
-        team = where(["name =? and parent_id =?", name, course_id]).first
-        team_exists = !team.nil?
-        name = handle_duplicate(team, name, course_id, options[:handle_dups])
-        index = 1
-      else
-        name = self.generate_team_name(Course.find(course_id).name)
-        index = 0
-      end
-
-      # handle_dups == "rename" ||" replace"
-      # create new team for the team to be inserted
-      if name
-        team = CourseTeam.create_team_and_node(course_id)
-        team.name = name
-        team.save
-      end
-
-      # handle_dups == "rename" ||" replace" || "insert"
-      # insert team members into team unless team was pre-existing & we ignore duplicate teams
-      if !team_exists || options[:handle_dups] == "ignore"
-        team.import_team_members(index, row)
-      end
-    end
-
-    def self.export(csv, parent_id, options)
-      course = Course.find(parent_id)
-      if course.nil?
-        raise ImportError, "The course with id \""+course_id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this course?"
-      end
-
-      teams = CourseTeam.where(["parent_id =?", parent_id])
-      teams.each do |team|
-        csv << team.export(options[:team_name])
-      end
-    end
 
     def self.export_fields(options)
       fields = Array.new

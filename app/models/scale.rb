@@ -7,11 +7,11 @@ class Scale < ScoredQuestion
     html+='<td><textarea cols="50" rows="1" name="question['+self.id.to_s+'][txt]" id="question_'+self.id.to_s+'_txt">'+self.txt+'</textarea></td>'
     html+='<td><input size="10" disabled="disabled" value="'+self.type+'" name="question['+self.id.to_s+'][type]" id="question_'+self.id.to_s+'_type" type="text">''</td>'
 
-    html+='<td><input size="2" value="'+self.weight.to_s+'" name="question['+self.id.to_s+'][weight]" id="question_'+self.id.to_s+'_weight" type="text">''</td>'
-    # html+='<td> max_label <input size="10" value="'+self.max_label.to_s+'" name="question['+self.id.to_s+'][max_label]" id="question_'+self.id.to_s+'_max_label" type="text">  min_label <input size="12" value="'+self.min_label.to_s+'" name="question['+self.id.to_s+'][min_label]" id="question_'+self.id.to_s+'_min_label" type="text"></td>'
+    html+='<td><input size="6" value="'+self.weight.to_s+'" name="question['+self.id.to_s+'][weight]" id="question_'+self.id.to_s+'_weight" type="text">''</td>'
+    # html+='<td> max_label <input size="4" value="'+self.max_label.to_s+'" name="question['+self.id.to_s+'][max_label]" id="question_'+self.id.to_s+'_max_label" type="text">  min_label <input size="4" value="'+self.min_label.to_s+'" name="question['+self.id.to_s+'][min_label]" id="question_'+self.id.to_s+'_min_label" type="text"></td>'
     # html+='</tr>'
-    html = edit_plus_html(html)
 
+    html = edit_end(self, html)
     html.html_safe
   end
 
@@ -49,7 +49,7 @@ class Scale < ScoredQuestion
     # else
     #   html += '<td width="10%"></td>'
     # end
-    html = complete_min_label_condition(html)
+    html = complete_min_label_condition(self, html)
 
     # comment by Hui, replaced with a method
     # for j in questionnaire_min..questionnaire_max
@@ -57,7 +57,7 @@ class Scale < ScoredQuestion
     #   html += 'checked="checked"' if (!answer.nil? and answer.answer == j) or (answer.nil? and questionnaire_min == j)
     #   html += '></td>'
     # end
-    html = complete_questionnaire_min_to_questionnaire_max(html, answer, questionnaire_min, questionnaire_max)
+    html = complete_questionnaire_min_to_questionnaire_max(self, html, answer, questionnaire_min, questionnaire_max)
 
     html += '<script>jQuery("input[name=Radio_' +self.id.to_s+ ']:radio").change(function() {'
     html += 'var response_score = jQuery("#responses_' +count.to_s+ '_score");'
@@ -70,7 +70,7 @@ class Scale < ScoredQuestion
     # else
     #   html += '<td width="10%"></td>'
     # end
-    html = complete_max_label_condition(html)
+    html = complete_max_label_condition(self, html)
 
     html += '<td width="10%"></td></tr></table>'
     html.html_safe

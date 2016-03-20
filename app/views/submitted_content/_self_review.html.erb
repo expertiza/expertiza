@@ -1,0 +1,67 @@
+<table>
+  <!--@assignment.isSelfReview-->
+  <% @sorted_responses = [] %>
+  <tr>
+    <td><b>Self Review:</b><BR/></td>
+    <% @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
+    <% @review_phase = @assignment.get_current_stage(@topic_id) %>
+    <% @review_mappings = SelfReviewResponseMap.where(reviewer_id: @participant.id).first %>
+    <% if !@review_mappings.nil? %>
+        <% if @review_mappings.response.empty? %>
+            <!--!Response.find(@review_mappings.id).nil?-->
+            <% array_not_empty = 0 %>
+            <% @sorted_responses = Array.new %>
+            <% @prev = Response.where(:map_id => map.id) %>
+            <% for element in @prev %>
+                <% array_not_empty = 1 %>
+                <% @sorted_responses << element %>
+            <% end %>
+
+            <% if (array_not_empty == 1) %>
+                <% @sorted_responses = @sorted_responses.sort_by { |obj| obj.updated_at } # the latest should be at the last    %>
+                <% @latest_response = @sorted_responses.last %>
+
+                <% if @latest_response.round.nil? %>
+                    <% last_response_round = DueDate.done_in_assignment_round(@assignment.id, @latest_response) %>
+                <% else %>
+                    <% last_response_round = @latest_response.round %>
+                <% end %>
+
+                <% current_round = @assignment.get_current_round(@topic_id) %>
+
+                <td>
+                  <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
+                </td>
+
+                <% if @assignment.get_current_stage(topic_id) != "Finished" %>
+                    <%- # show the link as edit when latest review is done in current deadline    -%>
+                    <%- # show link as update when latest review is done in different deadline than current phase    -%>
+                    <% if (last_response_round == current_round) %>
+                        <td>
+                          <% if (!@latest_response.is_submitted) %>
+                              <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id} %>
+                          <% end %>
+                        </td>
+                    <% else %>
+                        <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => @review_mappings.map_id} %></td>
+                    <% end %>
+                <% end %>
+            <% end %>
+        <% else %>
+            <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => @review_mappings.id} %></td>
+            <td>&nbsp;&nbsp;</td>
+        <% end %>
+    <% else %>
+        <%= form_tag :controller => 'review_mapping',
+                     :action => 'start_self_review',
+                     :assignment_id => @assignment.id,
+                     :reviewer_id => @participant.id,
+                     :reviewer_userid => @participant.user_id do %>
+            <td>&nbsp;&nbsp;</td>
+            <td><input type='submit' value='Request Self Review'/></td>
+            <td>&nbsp;&nbsp;</td>
+        <% end %>
+    <% end %>
+
+  </tr>
+</table>

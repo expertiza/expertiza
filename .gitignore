@@ -180,6 +180,7 @@ capybara-*
 log/
 # rbenv
 .bundle/
+.rbenv-gemsets
 # Kaleidoscope
 *.orig
 

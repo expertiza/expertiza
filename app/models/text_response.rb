@@ -17,9 +17,10 @@ class TextResponse < Question
 
   #This method returns what to display if an instructor (etc.) is viewing a questionnaire
   def view_question_text
-    html = '<TR><TD align="left"> '+self.txt+' </TD>'
-    html += '<TD align="left">'+self.type+'</TD>'
-    html += '<td align="center">'+self.weight.to_s+'</TD>'
+    view_qt_prefix(self, html)
+#    html = '<TR><TD align="left"> '+self.txt+' </TD>'
+#    html += '<TD align="left">'+self.type+'</TD>'
+#    html += '<td align="center">'+self.weight.to_s+'</TD>'
     html += '<TD align="center">&mdash;</TD>'
     html += '</TR>'
     html.html_safe

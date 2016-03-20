@@ -116,10 +116,7 @@ class AssignmentTeam < Team
     Team.export(csv,parent_id,options,false)
   end
   #REFACTOR END:: functionality of import, export handle_duplicate shifted to team.rb
-
-      def email
-        self.get_team_users.first.email
-      end
+  
 
       def participant_type
         "AssignmentParticipant"
@@ -144,7 +141,7 @@ class AssignmentTeam < Team
       end
 
       def copy(course_id)
-        new_team = CourseTeam.create_team_and_node(course_id)
+        new_team = CourseTeam.create_team_and_node(course_id,true)
         new_team.name = name
         new_team.save
         #new_team = CourseTeam.create({:name => self.name, :parent_id => course_id})

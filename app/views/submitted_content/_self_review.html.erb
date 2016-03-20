@@ -1,3 +1,4 @@
+<!--#E1600-->
 <table>
   <!--@assignment.isSelfReview-->
   <% @sorted_responses = [] %>
@@ -7,11 +8,11 @@
     <% @review_phase = @assignment.get_current_stage(@topic_id) %>
     <% @review_mappings = SelfReviewResponseMap.where(reviewer_id: @participant.id).first %>
     <% if !@review_mappings.nil? %>
-        <% if @review_mappings.response.empty? %>
+        <% if !@review_mappings.response.empty? %>
             <!--!Response.find(@review_mappings.id).nil?-->
             <% array_not_empty = 0 %>
             <% @sorted_responses = Array.new %>
-            <% @prev = Response.where(:map_id => map.id) %>
+            <% @prev = Response.where(:map_id => @review_mappings.id) %>
             <% for element in @prev %>
                 <% array_not_empty = 1 %>
                 <% @sorted_responses << element %>
@@ -48,6 +49,7 @@
                 <% end %>
             <% end %>
         <% else %>
+            <td>&nbsp;&nbsp;</td>
             <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => @review_mappings.id} %></td>
             <td>&nbsp;&nbsp;</td>
         <% end %>

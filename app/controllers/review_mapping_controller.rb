@@ -8,9 +8,10 @@ class ReviewMappingController < ApplicationController
 
   @@time_create_last_review_mapping_record = nil
 
+  #E1600
   def action_allowed?
     case params[:action]
-      when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'assign_quiz_dynamically'
+      when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'assign_quiz_dynamically', 'start_self_review'
         true
       else
         ['Instructor',
@@ -616,8 +617,8 @@ class ReviewMappingController < ApplicationController
     begin
       #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
-      if ReviewResponseMap.where(['reviewee_id = ? and reviewer_id = ?', team_id, params[:reviewer_id]]).first.nil?
-        ReviewResponseMap.create(:reviewee_id => team_id,
+      if SelfReviewResponseMap.where(['reviewee_id = ? and reviewer_id = ?', team_id[0].t_id, params[:reviewer_id]]).first.nil?
+        SelfReviewResponseMap.create(:reviewee_id => team_id[0].t_id,
                                  :reviewer_id => params[:reviewer_id],
                                  :reviewed_object_id => assignment.id)
       else

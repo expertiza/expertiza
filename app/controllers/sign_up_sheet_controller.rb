@@ -370,28 +370,6 @@ class SignUpSheetController < ApplicationController
     DeadlineHelper.set_start_due_date(assignment_id, set_of_topics)
   end
 
-  #   #gets team_details to show it on team_details view for a given assignment
-  # def show_team
-  #   if !(assignment = Assignment.find(params[:assignment_id])).nil? and !(topic = SignUpTopic.find(params[:id])).nil?
-  #     @results =ad_info(assignment.id, topic.id)
-  #     puts @results[0].to_s
-  #     @results.each do |result|
-  #       result.attributes().each do |attr|
-  #         if attr[0].equal? "name"
-  #           @current_team_name = attr[1]
-  #         end
-  #       end
-  #     end
-  #     @results.each { |result|
-  #       @team_members = ""
-  #       TeamsUser.where(team_id: result[:team_id]).each { |teamuser|
-  #         @team_members+=User.find(teamuser.user_id).name+" "
-  #       }
-  #     }
-  #     #@team_members = find_team_members(topic)
-  #   end
-  # end
-
   #gets team_details to show it on team_details view for a given assignment
   def show_team
     if !(assignment = Assignment.find(params[:assignment_id])).nil? and !(topic = SignUpTopic.find(params[:id])).nil?
@@ -413,14 +391,9 @@ class SignUpSheetController < ApplicationController
     end
   end
 
-        # get info related to the ad for partners so that it can be displayed when an assignment_participant
-        # clicks to see ads related to a topic
+  # get info related to the ad for partners so that it can be displayed when an assignment_participant
+  # clicks to see ads related to a topic
   def ad_info(assignment_id, topic_id)
-    # query = "select t.id as team_id, t.comments_for_advertisement, t.name,su.assignment_id, t.advertise_for_partner " +
-    #       "from teams t, signed_up_teams s,sign_up_topics su " +
-    #       "where s.topic_id='"+topic_id.to_s+"' and s.team_id=t.id and s.topic_id = su.id;"
-    # SignUpTopic.find_by_sql(query)
-
     # List that contains individual result object
     @result_list = []
     # Get the results

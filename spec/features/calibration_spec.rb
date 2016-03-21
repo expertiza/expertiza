@@ -553,12 +553,9 @@ describe 'Display Calibration For Student' do
     #go to the assignment page and request a review
     visit "/menu/student_task"
     click_on "final2"
-    visit "/student_task/view?id=#{@assignment.id}"
-    #visit "/student_review/list?id=#{@assignment.id}"
+
     expect(page).to have_content('')
     click_on "Others' work"
-    #request a review
-    #click_on "Request a new submission to review"
     #the review should now be avaliable, now click on begin.
     click_on "Show calibration results"
     expect(page).to have_content('Expert review')

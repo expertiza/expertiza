@@ -21,6 +21,19 @@ describe Checkbox do
       expect(html).to eq("<input id=\"responses_1_comments\" name=\"responses[1][comment]\" type=\"hidden\" value=\"\"><input id=\"responses_1_score\" name=\"responses[1][score]\" type=\"hidden\"<input id=\"responses_1_comments\" name=\"responses[1][comment]\" type=\"hidden\" value=\"\"><input id=\"responses_1_score\" name=\"responses[1][score]\" type=\"hidden\"value=\"1\"><input id=\"responses_1_checkbox\" type=\"checkbox\" onchange=\"checkbox1Changed()\"checked=\"checked\"><label for=\"responses_1\">test txt3</label><script>function checkbox1Changed() { var checkbox = jQuery(\"#responses_1_checkbox\"); var response_score = jQuery(\"#responses_1_score\");if (checkbox.is(\":checked\")) {response_score.val(\"1\");} else {response_score.val(\"0\");}}</script><BR/>")
     end
   end
+  
+  describe "#view_question_text" do
+    it "returns the html " do
+      html = checkbox2.view_question_text.to_s
+      expect(html).to eq( "<TR><TD align=\"left\"> test txt3 </TD><TD align=\"left\">Checkbox</TD><td align=\"center\">12</TD><TD align=\"center\">Checked/Unchecked</TD></TR>") 
+    end
+  end
 
+  describe "#view_completed_question" do
+    it "returns the html " do
+      html = checkbox2.view_completed_question(0, answer).to_s
+      expect(html).to eq("<big><b>Question 0:</b>&nbsp;&nbsp;<img src=\"/assets/Check-icon.png\"><i>test txt3</i></big><BR/><BR/>")
+    end
+  end
 end
 

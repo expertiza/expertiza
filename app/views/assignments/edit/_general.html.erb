@@ -150,12 +150,21 @@ function microtaskChanged() {
 
   </tr>
 
-  <!--"available to student?" should be the last checkbox-->
+  <!--"available to student?" -->
   <tr>
     <td style='padding:5px' id='assignment_availability_flag_field'>
       <input name="assignment_form[assignment][availability_flag]" type="hidden" value="false"/>
       <%= check_box_tag('assignment_form[assignment][availability_flag]', 'true', @assignment_form.assignment.availability_flag) %>
       <%= label_tag('assignment_form[assignment][availability_flag]', 'Available to students?') %>
+    </td>
+  </tr>
+
+  <!-- self review flag should be the last checkbox-->
+  <tr>
+    <td style='padding:5px' id='assignment_is_selfreview_enabled'>
+      <input name="assignment_form[assignment][is_selfreview_enabled]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][is_selfreview_enabled]', 'true', @assignment_form.assignment.is_selfreview_enabled) %>
+      <%= label_tag('assignment_form[assignment][is_selfreview_enabled]', 'Allow self reviews?') %>
     </td>
   </tr>
 </table>

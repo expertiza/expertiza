@@ -156,7 +156,153 @@ describe "Integration tests for assignment interface" do
       click_button('OK')
       expect(page).to have_content('Import')
     end
-
-    
   end
+
+#Review
+  describe "Edit assignments" do
+    it "is able to edit assignment" do
+      login_as("instructor6")
+      visit '/assignments/1/edit'
+      expect(page).to have_content("Editing Assignment:")
+    end
+  end
+  describe "Edit rubric" do
+    it "should update review questionnaire", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit#tabs-3'
+      sleep 1
+      choose_a_field('review', 'questionnaire')
+      click_button 'Save'
+      expect(page).to have_content("Assignment was successfully saved.")
+    end
+    it "should update review use dropdown", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit#tabs-3'
+      sleep 1
+      choose_a_field('review', 'usedropdown')
+      click_button 'Save'
+      visit '/assignments/1/edit#tabs-3'
+      expect(page).to have_content("Assignment was successfully saved.")
+    end
+    it "should update review scored question", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit#tabs-3'
+      sleep 1
+      choose_a_field('review', 'scored_question')
+      click_button 'Save'
+      visit '/assignments/1/edit#tabs-3'
+      expect(page).to have_content("Assignment was successfully saved.")
+    end
+    it "should update review wight", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit#tabs-3'
+      sleep 1
+      choose_a_field('review', 'weight')
+      click_button 'Save'
+      visit '/assignments/1/edit#tabs-3'
+      expect(page).to have_content("Assignment was successfully saved.")
+    end
+    it "should update review notify limit", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit#tabs-3'
+      sleep 1
+      choose_a_field('review', 'notify_limit')
+      click_button 'Save'
+      visit '/assignments/1/edit#tabs-3'
+      expect(page).to have_content("Assignment was successfully saved.")
+    end
+
+#Author Feedback
+    it "should update author feedback questionnaire", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit#tabs-3'
+      sleep 1
+      choose_a_field('author feedback', 'questionnaire')
+      click_button 'Save'
+      expect(page).to have_content("Assignment was successfully saved.")
+    end
+    it "should update author feedback use dropdown", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit#tabs-3'
+      sleep 1
+      choose_a_field('author feedback', 'usedropdown')
+      click_button 'Save'
+      visit '/assignments/1/edit#tabs-3'
+      expect(page).to have_content("Assignment was successfully saved.")
+    end
+    it "should update author feedback scored question", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit#tabs-3'
+      sleep 1
+      choose_a_field('author feedback', 'scored_question')
+      click_button 'Save'
+      visit '/assignments/1/edit#tabs-3'
+      expect(page).to have_content("Assignment was successfully saved.")
+    end
+    it "should update author feedback weight", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit#tabs-3'
+      sleep 1
+      choose_a_field('author feedback', 'weight')
+      click_button 'Save'
+      visit '/assignments/1/edit#tabs-3'
+      expect(page).to have_content("Assignment was successfully saved.")
+    end
+    it "should update author feedback notify limit", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit#tabs-3'
+      sleep 1
+      choose_a_field('author feedback', 'notify_limit')
+      click_button 'Save'
+      visit '/assignments/1/edit#tabs-3'
+      expect(page).to have_content("Assignment was successfully saved.")
+    end
+
+#Teammate Review
+    it "should update teammate review questionnaire", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit#tabs-3'
+      sleep 1
+      choose_a_field('teammate review', 'questionnaire')
+      click_button 'Save'
+      expect(page).to have_content("Assignment was successfully saved.")
+    end
+    it "should update teammate review use dropdown", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit#tabs-3'
+      sleep 1
+      choose_a_field('teammate review', 'usedropdown')
+      click_button 'Save'
+      visit '/assignments/1/edit#tabs-3'
+      expect(page).to have_content("Assignment was successfully saved.")
+    end
+    it "should update teammate review scored question", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit#tabs-3'
+      sleep 1
+      choose_a_field('teammate review', 'scored_question')
+      click_button 'Save'
+      visit '/assignments/1/edit#tabs-3'
+      expect(page).to have_content("Assignment was successfully saved.")
+    end
+    it "should update teammate review weight", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit#tabs-3'
+      sleep 1
+      choose_a_field('teammate review', 'weight')
+      click_button 'Save'
+      visit '/assignments/1/edit#tabs-3'
+      expect(page).to have_content("Assignment was successfully saved.")
+    end
+    it "should update teammate review notify limit", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit#tabs-3'
+      sleep 1
+      choose_a_field('teammate review', 'notify_limit')
+      click_button 'Save'
+      visit '/assignments/1/edit#tabs-3'
+      expect(page).to have_content("Assignment was successfully saved.")
+    end
+  end
+
 end

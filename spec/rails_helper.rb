@@ -71,4 +71,98 @@ RSpec.configure do |config|
     allow_any_instance_of(ApplicationController).to receive(:current_role_name).and_return(current_role_name)
     allow_any_instance_of(ApplicationController).to receive(:current_role).and_return(current_role)
   end
+ def questionnaire_options(assignment, type, round=0)
+    questionnaires = Questionnaire.where( ['private = 0 or instructor_id = ?', assignment.instructor_id]).order('name')
+    options = Array.new
+    questionnaires.select { |x| x.type == type }.each do |questionnaire|
+      options << [questionnaire.name, questionnaire.id]
+    end
+    options
+  end
+
+  def choose_a_field(tablerow, selfield)
+    @assignment_form = AssignmentForm.create_form_object('1')
+    if tablerow == 'review'
+      if selfield == 'questionnaire'
+        find(:xpath, "//*[@id='questionnaire_table_ReviewQuestionnaire']//select[@name='assignment_form[assignment_questionnaire][][questionnaire_id]']").
+            find(:option, (get_option)[0][1]).click
+      end
+      if selfield == 'usedropdown'
+        find(:xpath, "//*[@id='questionnaire_table_ReviewQuestionnaire']//input[@id='dropdown']").click
+      end
+      if selfield == 'scored_question'
+        find(:xpath, "//*[@id='questionnaire_table_ReviewQuestionnaire']//select[@id='scored_question_display_type']").
+            find(:option, 'Scale').click
+      end
+      if selfield == 'Weight'
+        find(:xpath, "//*[@id='questionnaire_table_ReviewQuestionnaire']//input[@name='assignment_form[assignment_questionnaire][][questionnaire_weight]']").set('50')
+      end
+      if selfield == 'notify_limit'
+        find(:xpath, "//*[@id='questionnaire_table_ReviewQuestionnaire']//input[@name='assignment_form[assignment_questionnaire][][notification_limit]']").set('30')
+      end
+    end
+    if tablerow == 'author feedback'
+      if selfield == 'questionnaire'
+        find(:xpath, "//*[@id='questionnaire_table_AuthorFeedbackQuestionnaire']//select[@name='assignment_form[assignment_questionnaire][][questionnaire_id]']").
+            find(:option, (get_option)[0][1]).click
+      end
+      if selfield == 'usedropdown'
+        find(:xpath, "//*[@id='questionnaire_table_AuthorFeedbackQuestionnaire']//input[@id='dropdown']").click
+      end
+      if selfield == 'scored_question'
+        find(:xpath, "//*[@id='questionnaire_table_AuthorFeedbackQuestionnaire']//select[@id='scored_question_display_type']").
+            find(:option, 'Scale').click
+      end
+      if selfield == 'Weight'
+        find(:xpath, "//*[@id='questionnaire_table_AuthorFeedbackQuestionnaire']//input[@name='assignment_form[assignment_questionnaire][][questionnaire_weight]']").set('50')
+      end
+      if selfield == 'notify_limit'
+        find(:xpath, "//*[@id='questionnaire_table_AuthorFeedbackQuestionnaire']//input[@name='assignment_form[assignment_questionnaire][][notification_limit]']").set('30')
+      end
+    end
+    if tablerow == 'teammate review'
+      if selfield == 'questionnaire'
+        find(:xpath, "//*[@id='questionnaire_table_TeammateReviewQuestionnaire']//select[@name='assignment_form[assignment_questionnaire][][questionnaire_id]']").
+            find(:option, (get_option)[0][1]).click
+      end
+      if selfield == 'usedropdown'
+        find(:xpath, "//*[@id='questionnaire_table_TeammateReviewQuestionnaire']//input[@id='dropdown']").click
+      end
+      if selfield == 'scored_question'
+        find(:xpath, "//*[@id='questionnaire_table_TeammateReviewQuestionnaire']//select[@id='scored_question_display_type']").
+            find(:option, 'Scale').click
+      end
+      if selfield == 'Weight'
+        find(:xpath, "//*[@id='questionnaire_table_TeammateReviewQuestionnaire']//input[@name='assignment_form[assignment_questionnaire][][questionnaire_weight]']").set('50')
+      end
+      if selfield == 'notify_limit'
+        find(:xpath, "//*[@id='questionnaire_table_TeammateReviewQuestionnaire']//input[@name='assignment_form[assignment_questionnaire][][notification_limit]']").set('30')
+      end
+    end
+  end
+
+  def get_option
+    questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire').to_json.html_safe
+  end
+
+  def questionnaire(assignment, type, round_number)
+    #E1450 changes
+    if round_number.nil?
+      questionnaire=assignment.questionnaires.find_by_type(type)
+    else
+      ass_ques=assignment.assignment_questionnaires.find_by_used_in_round(round_number)
+      # make sure the assignment_questionnaire record is not empty
+      if !ass_ques.nil?
+        temp_num=ass_ques.questionnaire_id
+        questionnaire = assignment.questionnaires.find_by_id(temp_num)
+      end
+    end
+    # E1450 end
+    if questionnaire.nil?
+      questionnaire = Object.const_get(type).new
+    end
+
+    questionnaire
+  end
 end
+

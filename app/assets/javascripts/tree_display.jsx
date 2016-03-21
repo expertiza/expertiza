@@ -215,16 +215,20 @@ jQuery(document).ready(function() {
               </span>
             )
             if (this.props.has_topic) {
-              moreContent.push(
-                <span>
-                  <a title="View publishing rights" href={"/sign_up_sheet/view_publishing_rights?id="+(parseInt(this.props.id)/2).toString()}>
-                    <img src="/assets/tree_view/view-publish-rights-24.png" />
-                  </a>
-                </span>
-              )
+                // Moved content out of this to the block outside this containing "if" statement
             }
           }
           // if ends
+
+          // Moved it out of if (this.props.has_topic) and if(this.props.is_available),
+          // Since view_publishing_rights should be visible for all the assignments
+           moreContent.push(
+            <span>
+              <a title="View publishing rights" href={"/sign_up_sheet/view_publishing_rights?id="+(parseInt(this.props.id)/2).toString()}>
+                  <img src="/assets/tree_view/view-publish-rights-24.png" />
+              </a>
+            </span>
+          )
         } else if (newNodeType === 'questionnaires'){
           moreContent.push(
             <span>

@@ -36,7 +36,7 @@ describe 'Create Assignment' do
       # Verify Assignment Page
       expect(find('.assignments.edit > h1')).to have_content('Editing Assignment: Calibration Test')
       expect(page).to have_link('Calibration')
-      save_and_open_page
+
     end
   end
 
@@ -613,24 +613,6 @@ describe 'Reviewer' do
 
   end
 
-
-  #instructor should be able to assign artifacts to reviewer
-    it'should be able to create a submitted artifact for instructor to assign', :js => true do
-      login_as @submitter.name
-
-      # Click on the assignment link, and navigate to work view
-      click_link @assignment.name
-      click_link 'Your work'
-
-      # Fill in submission with a url and submit
-      fill_in 'submission', with: 'https://google.com'
-      click_on 'Upload link'
-
-      # Verify presense of link on page
-      expect(page).to have_link 'https://google.com'
-
-
-    end
 
   it'instructor should be able to assign artifact to reviewer', :js => true do
     #Log in as an instructor

@@ -297,8 +297,8 @@ end
 
 
 #test display calibration
-describe 'Display Calibration Results' do
-  before :all do
+describe 'Create and Display Calibration' do
+  before :each do
     #create instructor
     @instructor = create(:instructor)
     @student2 = create(:student)
@@ -359,7 +359,7 @@ describe 'Display Calibration Results' do
 
   #creates a questionnaire, assigns it to the assignment, fills out the questionaire,
   #displays the questionaire response, checks to make sure the score is there
-  it 'needs a proper questionnaire', :js => true do
+  it 'create a questionnaire, fill it out, display results', :js => true do
     #login as instructor
     login_as @instructor.name
 
@@ -416,56 +416,151 @@ describe 'Display Calibration Results' do
     #once you click show review, the score label comes up as well as some other fields.
     expect(page).to have_content('Score:')
 
-    #time to switch users
-    # Maximize the browser to show the 'Logout'
-    page.driver.browser.manage.window.maximize
-    click_link 'Logout'
-    #confirm that you want to log out.
-    click_button 'logout-button'
-    click_button 'Logout'
-    find('input[name="commit"]').click
-    Capybara.reset_sessions!    #if the above attempts don't work, try clearing cookies
-    browser = Capybara.current_session.driver.browser
-    if browser.respond_to?(:clear_cookies)
-      # Rack::MockSession
-      browser.clear_cookies
-    elsif browser.respond_to?(:manage) and browser.manage.respond_to?(:delete_all_cookies)
-      # Selenium::WebDriver
-      browser.manage.delete_all_cookies
-    else
-      raise "Don't know how to clear cookies. Weird driver?"
-    end
-    #now that you've logged out, try to go to the home page to log in again.
-    visit(root_path)
+  end
 
-#    session = Capybara::Session.new(:selenium)
-#    session.visit(root_path)
+end
 
-=begin
-    #login as second student
-    login_as @student2.name
-    #go to the assignment page and request a review
-    visit "/student_review/list?id=#{@assignment.id}"
-    #request a review
-    click_on "Request a new submission to review"
-    #the review should now be avaliable, now click on begin.
-    click_on "Begin"
-=end
+#test display calibration
+describe 'Display Calibration For Student' do
+  before :each do
+    #create instructor
+    @instructor = create(:instructor)
+    @student2 = create(:student)
+    @student = create(:student)
+
+    @questionnaire_name = 'calibration_questionnaire'
+    # Create an assignment with calibration
+    # Either course: nil is required or an AssignmentNode must also be created.
+    # The page will not load if the assignment has a course but no mapping node.
+    @assignment = create :assignment_calibration, is_calibrated: true, instructor: @instructor, course: nil
+
+    # Create an assignment due date
+    create(:deadline_type,name:"submission")
+    create(:deadline_type,name:"review")
+    create(:deadline_type,name:"resubmission")
+    create(:deadline_type,name:"rereview")
+    create(:deadline_type,name:"metareview")
+    create(:deadline_type,name:"drop_topic")
+    create(:deadline_type,name:"signup")
+    create(:deadline_type,name:"team_formation")
+    create(:deadline_right)
+    create(:deadline_right, name: 'Late')
+    create(:deadline_right, name: 'OK')
+    create :due_date, due_at: (DateTime.now + 1)
+
+    @review_deadline_type=create(:deadline_type,name:"review")
+    create :due_date_review, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+
+
+
+    # Create a team linked to the calibrated assignment
+    @team = create :assignment_team, assignment: @assignment
+
+    # Create an assignment participant linked to the assignment
+    @participant = create :participant, assignment: @assignment, user: @student
+
+    # Create a mapping between the assignment team and the
+    # participant object's user (the submitter).
+    create :team_user, team: @team, user: @student
+    create :review_response_map, assignment: @assignment, reviewee: @team
+
+    # Create a team linked to the calibrated assignment
+    @team2 = create :assignment_team, assignment: @assignment
+
+    # Create an assignment participant linked to the assignment
+    @participant2 = create :participant, assignment: @assignment, user: @student2
+
+    # Create a mapping between the assignment team and the
+    # participant object's user (the submitter).
+    create :team_user, team: @team2, user: @student2
+    create :review_response_map, assignment: @assignment, reviewee: @team2
+
+    #creating the questionnaire and then linking it to the assignment.
+    @questionnaire = create :questionnaire
+    @assignment_questionnaire = create :assignment_questionnaire , assignment: @assignment, questionnaire: @questionnaire
+
 
   end
 
-#  it 'should display calibration results', :js => true do
-    #login as second student
-#    login_as @student.name #student2066
+  #creates a questionnaire, assigns it to the assignment, fills out the questionaire,
+  #displays the questionaire response, checks to make sure the score is there
+  it 'create a questionnaire, fill it out, display results', :js => true do
+    #login as instructor
+    login_as @instructor.name
+
+    # go to the questionnaire creation page
+    visit "/questionnaires/new?model=ReviewQuestionnaire&private=0"
+
+    fill_in 'questionnaire_name', with:@questionnaire_name
+    click_on('Create')
+
+    #page fails here, asks for questions to put into the questionnaire
+    click_on('Add')
+    #name the question
+    fill_in 'question[1][txt]', with:'question_1'
+    #save the questionnaire
+    click_on('Save review questionnaire')
+
+    expect(page).to have_content('All questions has been saved successfully!')
+
+    # go to the assignment edit page
+    visit "/assignments/#{@assignment.id}/edit"
+    #edit_assignment_path @assignment
+
+    #assign the questionnaire to the assignment
+    select @questionnaire_name
+    #set review limit from 0 to 1
+    fill_in 'assignment_form[assignment][review_topic_threshold]', with:'1'
+    #pick a due date for the review
+    #TODO: change this to actually be tomorrow, or put into factory
+    page.execute_script("$('#datetimepicker_review_round_1').val('2099/03/20 15:29 (UTC -04:00)')")
+    #find('assignment_form[due_date][][submission_allowed_id]').find(:xpath,'option[2]').select_option
+    within('#review_round_1')do
+      select 'Yes', from: "assignment_form[due_date][][submission_allowed_id]"
+    end
+    #have to save the questionnaire assignment
+    click_on("Save")
+
+    #start the calibration
+    #click_link('Begin')
+    visit "/review_mapping/add_calibration/#{@assignment.id}?team_id=#{@team2.id}"
+
+    #even though you can't see anything, don't worry, the option is actually there. everything will render once the next command runs
+    #select the dropdown option. believe in the heart of the cards!
+    select '5-Strong agree'
+    #submit review
+    click_on "Submit Review"
+    #click ok on the pop-up box that warns you that responses can not be edited
+    page.driver.browser.switch_to.alert.accept
+
+    #review should be submitted at this point. click on view to make sure you can see it
+    #click_link "View"
+    visit "/response/view?id=#{@assignment.id}&return=assignment_edit"
+    #review is hidden by default, click on show review to show your review.
+    click_on "show review"
+    #once you click show review, the score label comes up as well as some other fields.
+    expect(page).to have_content('Score:')
+
+    #login as student1
+    visit "/menu/impersonate"
+    fill_in 'user[name]', with:@student.name
+    click_button('Impersonate')
+
+    #login_as @student.name
     #go to the assignment page and request a review
-#    visit "/student_review/list?id=#{@assignment.id}"
-    ##request a review
+    visit "/menu/student_task"
+    click_on "final2"
+    visit "/student_task/view?id=#{@assignment.id}"
+    #visit "/student_review/list?id=#{@assignment.id}"
+    click_on "Others' work"
+    #request a review
     #click_on "Request a new submission to review"
     #the review should now be avaliable, now click on begin.
-#    click_on "Begin",:match => :first
+    click_on "Show calibration results"
+    expect(page).to have_content('Expert review')
+    expect(page).to have_content('Your review')
 
-#  end
-
+  end
 end
 
 describe 'Reviewer' do

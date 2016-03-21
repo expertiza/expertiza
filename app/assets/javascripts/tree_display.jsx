@@ -224,7 +224,7 @@ jQuery(document).ready(function() {
           // Since view_publishing_rights should be visible for all the assignments
            moreContent.push(
             <span>
-              <a title="View publishing rights" href={"/sign_up_sheet/view_publishing_rights?id="+(parseInt(this.props.id)/2).toString()}>
+              <a title="View publishing rights" href={"/participants/view_publishing_rights?id="+(parseInt(this.props.id)/2).toString()}>
                   <img src="/assets/tree_view/view-publish-rights-24.png" />
               </a>
             </span>

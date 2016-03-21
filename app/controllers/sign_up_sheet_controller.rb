@@ -129,12 +129,6 @@ class SignUpSheetController < ApplicationController
         load_add_signup_topics(params[:id])
       end
 
-      #Seems like this function is similar to the above function> we are not quite sure what publishing rights mean. Seems like
-      #the values for the last column in http://expertiza.ncsu.edu/student_task/list are sourced from here
-      def view_publishing_rights
-        load_add_signup_topics(params[:id])
-      end
-
       #retrieves all the data associated with the given assignment. Includes all topics,
       def load_add_signup_topics(assignment_id)
         @id = assignment_id

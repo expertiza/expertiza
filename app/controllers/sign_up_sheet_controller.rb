@@ -245,11 +245,6 @@ class SignUpSheetController < ApplicationController
     redirect_to :action => 'list', :assignment_id => params[:assignment_id]
   end
 
-        # When using this method when creating fields, update race conditions by using db transactions
-  def slotAvailable?(topic_id)
-    SignUpTopic.slotAvailable?(topic_id)
-  end
-
   def set_priority
     @user_id = session[:user].id
     users_team = SignedUpTeam.find_team_users(params[:assignment_id].to_s, @user_id)

@@ -48,7 +48,7 @@ class StudentTask
   end
 
   def hyperlinks
-    @hyperlinks ||= participant.team.hyperlinks
+    @hyperlinks ||= participant.team.nil? ? [] : participant.team.hyperlinks
   end
 
   def incomplete?

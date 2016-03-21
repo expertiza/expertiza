@@ -42,7 +42,7 @@ class Team < ActiveRecord::Base
   def self.generate_team_name()
     counter = 0
     while (true)
-      temp = "Team #{counter}"
+      temp = "Team #{ counter }"
       if (!Team.find_by_name(temp))
         return temp
       end
@@ -85,7 +85,7 @@ class Team < ActiveRecord::Base
   def copy_members(new_team)
     members = TeamsUser.where(team_id: self.id)
     members.each{
-      | member |
+      |member|
       t_user = TeamsUser.create(:team_id => new_team.id, :user_id => member.user_id)
       parent = Object.const_get(self.parent_model).find(self.parent_id)
       TeamUserNode.create(:parent_id => parent.id, :node_object_id => t_user.id)
@@ -104,7 +104,7 @@ class Team < ActiveRecord::Base
   #Add two-member teams to teams that two members too small. etc.
   def self.randomize_all_by_parent(parent, team_type, min_team_size)
     participants = Participant.where(["parent_id = ? AND type = ?", parent.id, parent.class.to_s + "Participant"])
-    participants = participants.sort{rand(3) - 1}
+    participants = participants.sort{ rand(3) - 1 }
     users = participants.map{|p| User.find(p.user_id)}.to_a
     #find teams still need team members and users who are not in any team
     teams = Team.where(parent_id: parent.id, type: parent.class.to_s + "Team").to_a
@@ -122,7 +122,7 @@ class Team < ActiveRecord::Base
       end
     end
     #sort teams by decreasing team size
-    teams.sort_by{|team| Team.size(team.id)}.reverse!
+    teams.sort_by{ |team| Team.size(team.id) }.reverse!
     #insert users who are not in any team to teams still need team members
     if users.size > 0 and teams.size > 0
       teams.each do |team|
@@ -157,7 +157,7 @@ class Team < ActiveRecord::Base
     counter = 1
     while (true)
       teamname = teamnameprefix + "_Team#{counter}"
-      if (!Team.find_by_name(teamname))
+      if !Team.find_by_name(teamname)
         return teamname
       end
       counter=counter+1

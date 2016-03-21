@@ -53,7 +53,7 @@ class CourseTeam < Team
     def self.export_fields(options)
       fields = Array.new
       fields.push("Team Name")
-      if (options[:team_name] == "false")
+      if options[:team_name] == "false"
         fields.push("Team members")
       end
       fields.push("Course Name")

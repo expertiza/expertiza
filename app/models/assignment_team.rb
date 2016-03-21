@@ -27,7 +27,7 @@ class AssignmentTeam < Team
   # @param[in] reviewer AssignmentParticipant object
   def reviewed_by?(reviewer)
     #ReviewResponseMap.count(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id]) > 0
-    ReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id).count > 0
+    ReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', self.id, reviewer.id, assignment.id).count > 0
   end
 
   # Topic picked by the team
@@ -55,8 +55,8 @@ class AssignmentTeam < Team
 
   def participants
     participants = Array.new
-    users.each {|user|
-      participants.push(AssignmentParticipant.where(parent_id:parent_id, user_id:user.id ).first)
+    users.each { |user|
+      participants.push(AssignmentParticipant.where(parent_id:parent_id, user_id:user.id).first)
     }
     return participants
   end
@@ -64,7 +64,7 @@ class AssignmentTeam < Team
 
   def delete
     if read_attribute(:type) == 'AssignmentTeam'
-      sign_up = SignedUpTeam.find_team_participants(parent_id.to_s).select{|p| p.team_id == self.id}
+      sign_up = SignedUpTeam.find_team_participants(parent_id.to_s).select { |p| p.team_id == self.id }
       sign_up.each(&:destroy)
     end
     super
@@ -149,7 +149,7 @@ class AssignmentTeam < Team
       end
 
       def add_participant(assignment_id, user)
-        AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted) if AssignmentParticipant.where(parent_id: assignment_id, user_id:  user.id).first == nil
+        AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted) if AssignmentParticipant.where(parent_id: assignment_id, user_id: user.id).first == nil
       end
 
       def assignment

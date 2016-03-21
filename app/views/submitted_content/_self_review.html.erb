@@ -19,7 +19,7 @@
             <% end %>
 
             <% if (array_not_empty == 1) %>
-                <% @sorted_responses = @sorted_responses.sort_by { |obj| obj.updated_at } # the latest should be at the last      %>
+                <% @sorted_responses = @sorted_responses.sort_by { |obj| obj.updated_at } # the latest should be at the last%>
                 <% @latest_response = @sorted_responses.last %>
 
                 <% if @latest_response.round.nil? %>
@@ -35,8 +35,8 @@
                 <td>&nbsp;&nbsp;</td>
 
                 <% if @assignment.get_current_stage(@topic_id) != 'Finished' %>
-                    <%- # show the link as edit when latest review is done in current deadline      -%>
-                    <%- # show link as update when latest review is done in different deadline than current phase      -%>
+                    <%- # show the link as edit when latest review is done in current deadline-%>
+                    <%- # show link as update when latest review is done in different deadline than current phase-%>
                     <% if (last_response_round == current_round) %>
                         <td>
                           <% if (!@latest_response.is_submitted) %>

@@ -32,8 +32,6 @@ class ParticipantsController < ApplicationController
     DelayedMailer::deliver_mail("recipient.address@example.com")
   end
 
- 
-
   def add
     curr_object = Object.const_get(params[:model]).find(params[:id])
     begin
@@ -216,6 +214,15 @@ class ParticipantsController < ApplicationController
       end
     redirect_to :controller => 'review_mapping', :action => 'list_mappings', :id => assignment_id
   end
+
+  #Seems like this function is similar to the above function> we are not quite sure what publishing rights mean. Seems like
+  #the values for the last column in http://expertiza.ncsu.edu/student_task/list are sourced from here
+  def view_publishing_rights
+    assignment_id = params[:id]
+    @sign_up_topics = SignUpTopic.where( ['assignment_id = ?', assignment_id])
+    @assignment = Assignment.find(assignment_id)
+  end
+
 
   private
   def participant_params

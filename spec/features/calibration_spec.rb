@@ -376,14 +376,18 @@ describe 'Create and Display Calibration' do
     visit "/assignments/#{@assignment.id}/edit"
     #edit_assignment_path @assignment
 
+    #click_on Rubrics
+    click_on("Rubrics")
     #assign the questionnaire to the assignment
     select @questionnaire_name
+    #click on review strategy
+    click_on("Review strategy")
     #set review limit from 0 to 1
     fill_in 'assignment_form[assignment][review_topic_threshold]', with:'1'
+    click_on("Due dates")
     #pick a due date for the review
     #TOD0: change this to actually be tomorrow, or put into factory
     page.execute_script("$('#datetimepicker_review_round_1').val('2099/03/20 15:29 (UTC -04:00)')")
-    #find('assignment_form[due_date][][submission_allowed_id]').find(:xpath,'option[2]').select_option
     within('#review_round_1')do
       select 'Yes', from: "assignment_form[due_date][][submission_allowed_id]"
     end
@@ -501,10 +505,15 @@ describe 'Display Calibration For Student' do
     visit "/assignments/#{@assignment.id}/edit"
     #edit_assignment_path @assignment
 
+    #click_on Rubrics
+    click_on("Rubrics")
     #assign the questionnaire to the assignment
     select @questionnaire_name
+    #click on review strategy
+    click_on("Review strategy")
     #set review limit from 0 to 1
     fill_in 'assignment_form[assignment][review_topic_threshold]', with:'1'
+    click_on("Due dates")
     #pick a due date for the review
     #TOD0: change this to actually be tomorrow, or put into factory
     page.execute_script("$('#datetimepicker_review_round_1').val('2099/03/20 15:29 (UTC -04:00)')")
@@ -546,6 +555,7 @@ describe 'Display Calibration For Student' do
     click_on "final2"
     visit "/student_task/view?id=#{@assignment.id}"
     #visit "/student_review/list?id=#{@assignment.id}"
+    expect(page).to have_content('')
     click_on "Others' work"
     #request a review
     #click_on "Request a new submission to review"

@@ -432,7 +432,7 @@ describe 'Display Calibration For Student' do
     # Create an assignment with calibration
     # Either course: nil is required or an AssignmentNode must also be created.
     # The page will not load if the assignment has a course but no mapping node.
-    @assignment = create :assignment_calibration, is_calibrated: true, instructor: @instructor, course: nil
+    @assignment = create :assignment, is_calibrated: true, instructor: @instructor, course: nil
 
     # Create an assignment due date
     create(:deadline_type,name:"submission")
@@ -449,7 +449,7 @@ describe 'Display Calibration For Student' do
     create :due_date, due_at: (DateTime.now + 1)
 
     @review_deadline_type=create(:deadline_type,name:"review")
-    create :due_date_review, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+    create :due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
 
 
 
@@ -512,7 +512,7 @@ describe 'Display Calibration For Student' do
     #set review limit from 0 to 1
     fill_in 'assignment_form[assignment][review_topic_threshold]', with:'1'
     #pick a due date for the review
-    #TODO: change this to actually be tomorrow, or put into factory
+    #TOD0: change this to actually be tomorrow, or put into factory
     page.execute_script("$('#datetimepicker_review_round_1').val('2099/03/20 15:29 (UTC -04:00)')")
     #find('assignment_form[due_date][][submission_allowed_id]').find(:xpath,'option[2]').select_option
     within('#review_round_1')do

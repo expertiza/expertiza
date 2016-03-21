@@ -80,7 +80,7 @@ jQuery(document).ready(function() {
     <br/>
     <br>
     <%= submit_tag "Save "+@title, :name => "save" %>
-    <% if  (@title && (@title.eql?'Review')) %>
+    <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review')) %>
         <%= submit_tag "Submit "+@title, :name => "Submit", :id => "Submit" %>
         <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
     <% end %>

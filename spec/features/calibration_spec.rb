@@ -324,10 +324,6 @@ describe 'Create and Display Calibration' do
     create(:deadline_right, name: 'OK')
     create :due_date, due_at: (DateTime.now + 1)
 
-    #@review_deadline_type=create(:deadline_type,name:"review")
-    #create :due_date, due_at: (DateTime.now + 1), deadline_type:@review_deadline_type
-
-
 
     # Create a team linked to the calibrated assignment
     @team = create :assignment_team, assignment: @assignment
@@ -351,9 +347,7 @@ describe 'Create and Display Calibration' do
     create :team_user, team: @team2, user: @student2
     create :review_response_map, assignment: @assignment, reviewee: @team2
 
-    #creating the questionnaire and then linking it to the assignment.
-    #@questionnaire = create :questionnaire
-    #@assignment_questionnaire = create :assignment_questionnaire , assignment: @assignment, questionnaire: @questionnaire
+
 
   end
 

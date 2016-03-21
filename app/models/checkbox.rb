@@ -80,9 +80,9 @@ class Checkbox < UnscoredQuestion
   end
   
   def nextQuestionTail(html, next_q)
-    if next_question.type == 'ColumnHeader'
+    if next_q.type == 'ColumnHeader'
       html += '</td></tr>'
-    elsif next_question.type == 'SectionHeader' or next_question.type == 'TableHeader'
+    elsif next_q.type == 'SectionHeader' or next_q.type == 'TableHeader'
       html += '</td></tr></table><br/>'
     else
       html += '<BR/>'

@@ -455,31 +455,6 @@ class SignUpSheetController < ApplicationController
     @result_list
   end
 
-  def add_default_microtask
-    assignment_id = params[:id]
-    @sign_up_topic = SignUpTopic.new
-    @sign_up_topic.topic_identifier = 'MT1'
-    @sign_up_topic.topic_name = 'Microtask Topic'
-    @sign_up_topic.max_choosers = '0'
-    @sign_up_topic.micropayment = 0
-    @sign_up_topic.assignment_id = assignment_id
-
-    @assignment = Assignment.find(params[:id])
-
-    if @assignment.staggered_deadline?
-      topic_set = Array.new
-      topic = @sign_up_topic.id
-    end
-
-    if @sign_up_topic.save
-
-      flash[:notice] = 'Default Microtask topic was created - please update.'
-      redirect_to_sign_up(assignment_id)
-    else
-      render :action => 'new', :id => assignment_id
-    end
-  end
-
   def switch_original_topic_to_approved_suggested_topic
     team_id = TeamsUser.team_id(params[:assignment_id].to_i, session[:user].id)
     original_topic_id = SignedUpTeam.topic_id(params[:assignment_id].to_i, session[:user].id)

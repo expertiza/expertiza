@@ -8,7 +8,6 @@ class Waitlist < ActiveRecord::Base
         entry.destroy
       end
     end
-
   end
-  
+
 end

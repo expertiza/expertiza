@@ -199,10 +199,8 @@ class SignUpSheetController < ApplicationController
         @selected_topics = nil
       else
         #TODO: fix this; cant use 0
-        @selected_topics = SignUpSheetController.other_confirmed_topic_for_user(@assignment_id, users_team[0].t_id)
+        @selected_topics = SignedUpTeam.find_user_signup_topics(@assignment_id, users_team[0].t_id)
       end
-
-      SignUpTopic.remove_team(users_team, @assignment_id)
 
     end
   end
@@ -250,12 +248,6 @@ class SignUpSheetController < ApplicationController
         # When using this method when creating fields, update race conditions by using db transactions
   def slotAvailable?(topic_id)
     SignUpTopic.slotAvailable?(topic_id)
-  end
-
-  def self.other_confirmed_topic_for_user(assignment_id, team_id)
-
-    user_signup = SignedUpTeam.find_user_signup_topics(assignment_id, team_id)
-    user_signup
   end
 
   def set_priority

@@ -73,7 +73,12 @@ class CourseParticipant < Participant
   end
 
   def self.export_fields(options)
-    return User.export_fields(options)
+
+
+    fields = User.export_fields(options)
+
+    return fields
+
   end
 
 end

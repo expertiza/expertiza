@@ -1,4 +1,5 @@
 <h1><%= @title %> for <%= @assignment.name %></h1>
+<h1>TESTING PRANAV</h1>
 <% if !(@map.instance_of? TeammateReviewResponseMap) %>
   <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
   <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(topic_id)} %>
@@ -21,7 +22,7 @@
 <% current_folder = DisplayOption.new %>
 <% current_folder.name = "" %>
 <% response_map_id = Response.find(params[:id]).response_map.id %>
-<% files = @participant.files(@participant.review_file_path(response_map_id).to_s + current_folder.name) %>
+<% files = FileHelper::files(@participant.review_file_path(response_map_id).to_s + current_folder.name) %>
 <%session_participant = AssignmentParticipant.where(parent_id: @assignment.id, user_id: session[:user].id).first%>
 <%session_participants_team = AssignmentTeam.team(session_participant)%>
 <%@questions.each do |question| %>

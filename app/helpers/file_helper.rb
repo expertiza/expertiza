@@ -83,4 +83,19 @@ module FileHelper
       raise "An error was encountered while creating this directory: "+$!
     end
   end
+
+  def files(directory)
+    files_list = Dir[directory + "/*"]
+    files = Array.new
+
+    files_list.each do |file|
+      if File.directory?(file)
+        dir_files = files(file)
+        dir_files.each{|f| files << f}
+      end
+      files << file
+    end
+    files
+  end
+
 end

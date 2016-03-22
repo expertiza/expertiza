@@ -1,9 +1,9 @@
 <% current_folder = DisplayOption.new %>
 <% current_folder.name = "" %>
 <% if origin == 'review' %>
-  <% files = participant.files(participant.review_file_path(response_map_id).to_s + current_folder.name) %>
+  <% files = FileHelper::files(participant.review_file_path(response_map_id).to_s + current_folder.name) %>
 <% else %>
-  <% files = participant.team.files(participant.team.path.to_s + current_folder.name) %>
+  <% files = FileHelper::files(participant.team.path.to_s + current_folder.name) %>
 <%end%>
 
 <%session_participant = AssignmentParticipant.where(parent_id: @assignment.id, user_id: session[:user].id).first%>

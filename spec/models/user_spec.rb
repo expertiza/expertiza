@@ -1,8 +1,10 @@
-require 'rails_helper'
+require "rspec"
+require_relative "../rails_helper"
+#require 'rails_helper'
 
 describe User do
   
-    let(:user){User.new name: "abc", fullname: "abc xyz", email: "abcxyz@gmail.com", password: "12345678", password_confirmation: "12345678"}
+    let(:user){User.new name: "abc", fullname: "abc xyz", email: "abcxyz@gmail.com", password: "12345678", password_confirmation: "12345678", role_id: 1}
   
   describe "#new" do
     it "Validate user instance creation with valid parameters" do
@@ -66,4 +68,26 @@ describe User do
       expect(user).to be_valid
     end
   end
+
+
+    describe "#get_user_list" do
+      it 'user list' do
+        @role = Role.new name: "Instructor"
+
+        #user1 = User.find_by(4)
+        #user1 = FactoryGirl.create :user
+        #m = mock('user')
+
+        user1 = User.new name: "instructor4", role: @role
+        expect(user1.get_user_list).to be_empty
+        expect(user1.get_users_instructor)
+        #user1.verify
+
+        #true.should == false
+      end
+    end
+
+
+
+
 end

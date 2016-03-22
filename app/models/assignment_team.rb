@@ -78,7 +78,7 @@ class AssignmentTeam < Team
   def self.first_member(team_id)
     find(team_id).participants.first
   end
-
+=begin
   def files(directory)
     files_list = Dir[directory + "/*"]
     files = Array.new
@@ -92,11 +92,12 @@ class AssignmentTeam < Team
     end
   files
   end
+=end
 
   def submitted_files
     files = Array.new
     if(self.directory_num)
-      files = files(self.path)
+      files = FileHelper::files(self.path)
     end
     return files
   end

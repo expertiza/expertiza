@@ -52,7 +52,7 @@
                     <!--Display FileUpload question type-->
                     <% current_folder = DisplayOption.new %>
                     <% current_folder.name = "" %>
-                    <% files = @participant.files(@participant.review_file_path(review.response_map.id).to_s + current_folder.name) %>
+                    <% files = FileHelper::files(@participant.review_file_path(review.response_map.id).to_s + current_folder.name) %>
                     <%= display_directory_tree(@participant, files, true).html_safe %>
                 <% end %>
             <% end %>

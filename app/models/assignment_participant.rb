@@ -287,7 +287,9 @@ class AssignmentParticipant < Participant
   end
 
 
+=begin
   def files(directory)
+    puts "***************************************"
     files_list = Dir[directory + "/*"]
     files = Array.new
 
@@ -300,6 +302,8 @@ class AssignmentParticipant < Participant
     end
     files
   end
+=end
+
 
   def team
     AssignmentTeam.team(self)

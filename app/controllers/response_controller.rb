@@ -83,6 +83,8 @@ class ResponseController < ApplicationController
   end
 
   #Update the response and answers when student "edit" existing response
+  #E1600
+  #Added if - else condition for 'SelfReviewResponseMap'
   def update
     return unless action_allowed?
 
@@ -215,6 +217,8 @@ class ResponseController < ApplicationController
     redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]
   end
 
+  #E1600
+  #Added paramps[:return] value for 'SelfReviewResponseMap'
   def saving
     @map = ResponseMap.find(params[:id])
     if(@map.type == "SelfReviewResponseMap")
@@ -226,6 +230,8 @@ class ResponseController < ApplicationController
     redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
   end
 
+  #E1600
+  #Added if - else for 'SelfReviewResponseMap'
   def redirection
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
@@ -293,6 +299,8 @@ class ResponseController < ApplicationController
 
   end
 
+  #E1600
+  #Added 'SelfReviewResponseMap' to when condition
   def set_questionnaire_for_new_response
     case @map.type
     when "ReviewResponseMap","SelfReviewResponseMap"

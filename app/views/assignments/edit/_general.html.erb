@@ -159,6 +159,7 @@ function microtaskChanged() {
     </td>
   </tr>
 
+  <!--#E1600-->
   <!-- self review flag should be the last checkbox-->
   <tr>
     <td style='padding:5px' id='assignment_is_selfreview_enabled'>
@@ -186,11 +187,7 @@ function microtaskChanged() {
           teammate_reviews_field.removeAttr('hidden');
           addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
           addQuestionnaireTableRow(
-                  'TeammateReviewQuestionnaire',
-                  null,
-                  <%= questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
-                  <%= assignment_questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
-                  <%= questionnaire_options(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>
+                  'TeammateReviewQuestionnaire', null, <%= questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>, <%= assignment_questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>, <%= questionnaire_options(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>
           );
 
         } else {
@@ -207,7 +204,7 @@ function microtaskChanged() {
             if (<%= @assignment_form.assignment.max_team_size == 1%>){
               team_count_field.attr('hidden', true);
             }
-          } 
+          }
     }
 
     function staggeredDeadlineChanged() {
@@ -251,7 +248,7 @@ function microtaskChanged() {
           jQuery('#calibrated_and_uncalibrated_artifacts_threshold').attr('hidden','hidden');
           jquery('#second_submit_tag').attr('disabled', 'disabled');
           jquery('#third_submit_tag').attr('disabled', 'disabled');
-        } 
+        }
         else if(this.value == 'submission'){
           jQuery('#num_reviews_per_student_threshold').attr('hidden', 'hidden');
           jQuery('#num_reviews_per_submission_threshold').removeAttr('hidden');

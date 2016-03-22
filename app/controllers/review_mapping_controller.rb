@@ -287,7 +287,6 @@ class ReviewMappingController < ApplicationController
     failedCount = 0
     mappings.each{
       |mapping|
-      assignment_id = mapping.assignment.id
       begin
         mapping.delete(force)
       rescue

@@ -4,15 +4,14 @@ class ResponseController < ApplicationController
 
   def action_allowed?
     case params[:action]
+      # Deny access to anyone except reviewer & author's team
       when 'edit'  # If response has been submitted, no further editing allowed
         response = Response.find(params[:id])
+        current_user_id?(response.map.reviewer.user_id)
         if (response.is_submitted)
           return false
         end
-    end
-    case params[:action]
-      # Deny access to anyone except reviewer & author's team
-      when 'edit','delete','update'
+      when 'delete','update'
         response = Response.find(params[:id])
         current_user_id?(response.map.reviewer.user_id)
       when 'view'
@@ -20,7 +19,7 @@ class ResponseController < ApplicationController
         map = response.map
 
         # if it is a review response map, all the members of revieweee team should be able to view the reponse (can be done from heat map)
-        if map.is_a? ReviewResponseMap 
+        if map.is_a? ReviewResponseMap
           reviewee_team = AssignmentTeam.find(map.reviewee_id)
           current_user_id?(response.map.reviewer.user_id) || reviewee_team.has_user(current_user) || (['Administrator','Instructor','Teaching Assistant'].include? current_user.role.name)
         else

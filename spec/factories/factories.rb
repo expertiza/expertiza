@@ -61,7 +61,7 @@ FactoryGirl.define do
       update_quiz: true
       edit_quiz: true
       view_quiz: true
-    participants:
+    participants.yml:
       add_student: false
       edit_team_members: false
       list_students: false
@@ -166,7 +166,7 @@ FactoryGirl.define do
     course: false
     assignment: false
     questionnaire: false
-    participants: false
+    participants.yml: false
     reports: true
     institution: false
     student_task: true
@@ -389,7 +389,7 @@ FactoryGirl.define do
       update_quiz: true
       edit_quiz: true
       view_quiz: true
-    participants:
+    participants.yml:
       add_student: true
       edit_team_members: true
       list_students: true
@@ -494,7 +494,7 @@ FactoryGirl.define do
     course: true
     assignment: true
     questionnaire: true
-    participants: true
+    participants.yml: true
     reports: true
     institution: false
     student_task: true

@@ -1,0 +1,17 @@
+par1:
+   id: 1798
+   can_submit: 1
+   can_review: 1
+   user_id: 571
+   parent_id: 112
+   submitted_at: NULL
+   permission_granted: 1
+   penalty_accumulated: 0
+   grade: NULL
+   type: 'AssignmentParticipant'
+   handle: 'handle'
+   time_stamp: NULL
+   digital_signature: NULL
+   duty: NULL
+   can_take_quiz: 1
+

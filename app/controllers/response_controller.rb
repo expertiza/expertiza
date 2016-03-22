@@ -169,9 +169,6 @@ class ResponseController < ApplicationController
   def create
     @map = ResponseMap.find(params[:id]) #assignment/review/metareview id is in params id
 
-    msg = ""
-    error_msg = ""
-
     set_all_responses
 
     #to save the response for ReviewResponseMap, a questionnaire_id is wrapped in the params

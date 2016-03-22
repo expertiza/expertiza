@@ -17,5 +17,3 @@ assignment<%= i %>:
   num_reviewers: <%= i%5+1 %>
   spec_location:
 #  team_count: <%= 2*i %>
-
-<% end %>

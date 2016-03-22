@@ -489,13 +489,14 @@ class ReviewMappingController < ApplicationController
           unsorted_teams_hash[response_map.reviewee_id] += 1
         end
       end 
-      teams_hash = unsorted_teams_hash.sort_by{|k, v| v}.to_h
+	  # Using only value argument instead of both key and value
+      teams_hash = unsorted_teams_hash.sort_by{|_k, v| v}.to_h
       participants_with_insufficient_review_num.each do |participant_id|
-        teams_hash.each do |team_id, num_review_received|
+        teams_hash.each do |team_id, _num_review_received| #Changing num_review_received to _num_review_received
           unless TeamsUser.exists?(team_id: team_id, user_id: Participant.find(participant_id).user_id)
             ReviewResponseMap.where(:reviewee_id => team_id, :reviewer_id => participant_id, :reviewed_object_id => assignment_id).first_or_create
             teams_hash[team_id] += 1
-            teams_hash = teams_hash.sort_by{|k, v| v}.to_h
+            teams_hash = teams_hash.sort_by{|_k, v| v}.to_h
             break
           end
         end
@@ -513,6 +514,54 @@ class ReviewMappingController < ApplicationController
   end
 
 
+<<<<<<< HEAD
+=======
+    case @type
+    when "ReviewResponseMap"
+      if params[:user].nil?
+        # This is not a search, so find all reviewers for this assignment
+        response_maps_with_distinct_participant_id = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ? and calibrate_to = ?", @id, @type, 0])
+        @reviewers = []
+        response_maps_with_distinct_participant_id.each do |reviewer_id_from_response_map|
+          @reviewers << (AssignmentParticipant.find(reviewer_id_from_response_map.reviewer_id))
+        end
+        @reviewers = Participant.sort_by_name(@reviewers)
+      else
+        # This is a search, so find reviewers by user's full name
+        user = User.select("DISTINCT id").where(["fullname LIKE ?", '%'+params[:user][:fullname]+'%'])
+        @reviewers = AssignmentParticipant.where(["user_id IN (?) and parent_id = ?", user, @assignment.id])
+      end
+      #  @review_scores[reveiwer_id][reviewee_id] = score for assignments not using vary_rubric_by_rounds feature
+      # @review_scores[reviewer_id][round][reviewee_id] = score for assignments using vary_rubric_by_rounds feature
+      @review_scores = @assignment.compute_reviews_hash
+      @avg_and_ranges= @assignment.compute_avg_and_ranges_hash
+    when "FeedbackResponseMap"
+      #Example query
+      #SELECT distinct reviewer_id FROM response_maps where type = 'FeedbackResponseMap' and 
+      #reviewed_object_id in (select id from responses where 
+      #map_id in (select id from response_maps where reviewed_object_id = 722 and type = 'ReviewResponseMap'))
+      @review_response_map_ids = ResponseMap.select("id").where(["reviewed_object_id = ? and type = ?", @id, 'ReviewResponseMap'])
+      @response_ids = Response.select("id").where(["map_id IN (?)", @review_response_map_ids])
+      @reviewers = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id IN (?) and type = ?", @response_ids, @type])
+    when "TeammateReviewResponseMap"
+      #Example query
+      #SELECT distinct reviewer_id FROM response_maps where type = 'TeammateReviewResponseMap' and reviewed_object_id = 711
+      @reviewers = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ?", @id, 'TeammateReviewResponseMap'])
+    when "Calibration"
+		#Removed useless assignment of participant
+      if AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first.nil?
+        AssignmentParticipant.create(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
+      end
+      @assignment = Assignment.find(params[:id])
+      @review_questionnaire_ids = ReviewQuestionnaire.select("id")
+      @assignment_questionnaire = AssignmentQuestionnaire.where(["assignment_id = ? and questionnaire_id IN (?)", params[:id], @review_questionnaire_ids]).first
+      @questions = @assignment_questionnaire.questionnaire.questions.select{|q| q.type == 'Criterion' or q.type == 'Scale'}
+      @calibration_response_maps = ReviewResponseMap.where(["reviewed_object_id = ? and calibrate_to = ?", params[:id], 1])
+      @review_response_map_ids = ReviewResponseMap.select('id').where(["reviewed_object_id = ? and calibrate_to = ?", params[:id], 0])
+      @responses = Response.where(["map_id IN (?)", @review_response_map_ids])
+    end
+  end
+>>>>>>> 7689f6426cabf01668bb39b791f3b517f1490580
   
 	private
 	def peer_review_strategy(teams, num_participants, student_review_num, participants, participants_hash)

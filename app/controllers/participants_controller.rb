@@ -236,10 +236,6 @@ class ParticipantsController < ApplicationController
 
     # For each of the teams, do
     teams.each do |team|
-      # Choose only those teams that have signed up for topics
-      if !SignedUpTeam.where(["team_id = ?", team.id]).any?
-        next
-      end
       team_info = {}
       # Set the team name
       team_info[:name] = team.name
@@ -256,6 +252,12 @@ class ParticipantsController < ApplicationController
       # Get the signup topics for the assignment
       @has_topics = get_signup_topics_for_assignment(assignment_id, team_info, team.id)   
 
+      # Choose only those teams that have signed up for topics
+      team_without_topic = !SignedUpTeam.where(["team_id = ?", team.id]).any?
+      if @has_topics && team_without_topic
+        next
+      end
+      
       # Append the hashmap to the list of hashmaps
       @teams_info.append(team_info)
     end

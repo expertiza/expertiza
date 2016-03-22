@@ -142,7 +142,7 @@ class ReviewMappingController < ApplicationController
           if params[:topic_id]
             topic = (params[:topic_id].nil?) ? nil : SignUpTopic.find(params[:topic_id])
           else
-            topic = assignment.candidate_topics_to_review(reviewer).to_a.sample(1) rescue nil
+            topic = assignment.candidate_topics_to_review(reviewer).to_a.sample[0] rescue nil
           end
           if topic.nil?
             flash[:error] ="No topics are available to review at this time. Please try later."
@@ -152,7 +152,7 @@ class ReviewMappingController < ApplicationController
 
         else  #assignment without topic -Yang
           assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
-          assignment_team = assignment_teams.to_a.sample(1) rescue nil
+          assignment_team = assignment_teams.to_a.sample[0] rescue nil
           if assignment_team.nil?
             flash[:error] ="No artifact are available to review at this time. Please try later."
           else

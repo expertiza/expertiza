@@ -253,11 +253,10 @@ describe 'Add Expert Review' do
     visit "/review_mapping/add_calibration/#{@assignment.id}?team_id=#{@team.id}"
     #submit expert review
     click_on 'Save Review'
-
     #expect result
     #If the review was uploaded, there will be a edit link
 
-    expect(page).to have_link('Edit')
+    expect(page).to have_content('Editing Assignment: final2')
   end
 
   it 'should be able to create expert review', :js => true do

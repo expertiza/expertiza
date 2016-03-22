@@ -237,12 +237,11 @@ describe 'Add Expert Review' do
     # The factory for this implicitly loads or creates a student
     # (user) object that the participant is linked to.
     @submitter = create :participant, assignment: @assignment
-
     # Create a mapping between the assignment team and the
     # participant object's user (the student).
     create :team_user, team: @team, user: @submitter.user
     create :review_response_map, assignment: @assignment, reviewee: @team
-    create :assignment_questionnaire, assignment: @assignment
+    # create :assignment_questionnaire, assignment: @assignment
   end
 
   it 'should be able to save an expert review without uploading', :js => true do
@@ -252,34 +251,13 @@ describe 'Add Expert Review' do
     #should be able to edit assignment to add a expert review
     visit "/review_mapping/add_calibration/#{@assignment.id}?team_id=#{@team.id}"
     #submit expert review
-    click_on 'Save Review'
+    click_on 'Submit Review'
+    page.driver.browser.switch_to.alert.accept
     #expect result
     #If the review was uploaded, there will be a edit link
-
     expect(page).to have_content('Editing Assignment: final2')
   end
 
-  it 'should be able to create expert review', :js => true do
-    # Log in as the instructor.
-    login_as @instructor.name
-
-    #should be able to edit assignment to add a expert review
-    edit_assignment_path @assignment
-
-    #should be able to see assignment and start calibration
-    visit "/review_mapping/add_calibration/#{@assignment.id}?team_id=#{@team.id}"
-
-    #Submit expert review
-    click_on 'Submit Review'
-    #upload expert review
-    page.driver.browser.switch_to.alert.accept
-
-    #verify if the expert review were successfully uploaded
-    edit_assignment_path @assignment
-    find('#Calibration').click
-    #If the review was uploaded, there will be a edit link
-    expect(page).to have_no_link 'Edit'
-  end
 
   #Student should not be able to submit an expert review
   it 'student should not be able to add an expert review', :js => true do

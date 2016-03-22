@@ -195,6 +195,7 @@ class ResponseController < ApplicationController
 
     #@map.save
     msg = "Your response was successfully saved."
+    error_msg="Error"
     @response.email();
     redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]
   end

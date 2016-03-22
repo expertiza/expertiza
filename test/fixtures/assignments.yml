@@ -1,0 +1,44 @@
+one:
+
+  id: 756
+  created_at:'2016-03-21 22:01:15'
+  updated_at: '2016-03-21 23:18:45'
+  name: 'sbobba_1'
+  directory_path: 'Hello'
+  submitter_count: 0
+  course_id: 10
+  instructor_id: 6
+  private: 0
+  num_reviews: 0
+  num_review_of_reviews:0
+  num_review_of_reviewers:0
+  reviews_visible_to_all:0
+  num_reviewers: 0
+  spec_location: 'www.google.com'
+  max_team_size: 2
+  staggered_deadline: 0
+  allow_suggestions: 0
+  days_between_submissions: NULL
+  max_reviews_per_submission: 'Auto-Selected'
+  review_topic_threshold: 8
+  copy_flag: 0
+  rounds_of_reviews: 1
+  microtask: 0
+  require_quiz: 1
+  num_quiz_questions: 0
+  is_coding_assignment: NULL
+  is_intelligent: 0
+  calculate_penalty: 0
+  late_policy_id: NULL
+  is_penalty_calculated: 0
+  max_bids: NULL
+  show_teammate_reviews: 1
+  availability_flag: 1
+  use_bookmark: 0
+  can_review_same_topic: 1
+  can_choose_topic_to_review: 1
+  is_calibrated: 0
+  is_selfreview_enabled: 1
+
+
+

@@ -159,15 +159,7 @@ function microtaskChanged() {
     </td>
   </tr>
 
-  <!--#E1600-->
-  <!-- self review flag should be the last checkbox-->
-  <tr>
-    <td style='padding:5px' id='assignment_is_selfreview_enabled'>
-      <input name="assignment_form[assignment][is_selfreview_enabled]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][is_selfreview_enabled]', 'true', @assignment_form.assignment.is_selfreview_enabled) %>
-      <%= label_tag('assignment_form[assignment][is_selfreview_enabled]', 'Allow self reviews?') %>
-    </td>
-  </tr>
+
 </table>
 
 

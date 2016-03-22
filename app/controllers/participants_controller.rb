@@ -218,9 +218,43 @@ class ParticipantsController < ApplicationController
   #Seems like this function is similar to the above function> we are not quite sure what publishing rights mean. Seems like
   #the values for the last column in http://expertiza.ncsu.edu/student_task/list are sourced from here
   def view_publishing_rights
+    # Get the assignment ID from the params
     assignment_id = params[:id]
-    @sign_up_topics = SignUpTopic.where( ['assignment_id = ?', assignment_id])
-    @assignment = Assignment.find(assignment_id)
+
+    # Get the assignment object for the above ID and set the @assignment_name object for the view
+    assignment = Assignment.find(assignment_id)
+    @assignment_name = assignment.name
+
+    # Initially set to false, will be true if the assignment has any topics
+    @has_topics = false
+
+    # Attribute that contains the list of the teams and their info related to this assignment
+    @teams_info = []
+
+    # Get all the teams that work on the assignment with ID assignment_id
+    teams = Team.find_by_sql(["select * from teams where parent_id = ?", assignment_id])
+
+    # For each of the teams, do
+    teams.each do |team|
+      team_info = {}
+      # Set the team name
+      team_info[:name] = team.name
+      # List that hold the details of the users in the team
+      users = []
+      # For each of the users, do
+      team.users.each do |team_user|       
+        # Append the user info to the users list
+        users.append(get_user_info(team_user, assignment))
+      end
+      # Append the users list to the team_info object
+      team_info[:users] = users  
+
+      # Get the signup topics for the assignment
+      @has_topics = get_signup_topics_for_assignment(assignment_id, team_info, team.id)   
+
+      # Append the hashmap to the list of hashmaps
+      @teams_info.append(team_info)
+    end
   end
 
 
@@ -228,4 +262,54 @@ class ParticipantsController < ApplicationController
   def participant_params
     params.require(:participant).permit(:can_submit,:can_review,:user_id,:parent_id,:submitted_at,:permission_granted,:penalty_accumulated,:grade,:type,:handle,:time_stamp,:digital_signature,:duty,:can_take_quiz)
   end
+
+  # Get the user info from the team user 
+  def get_user_info(team_user, assignment) 
+    user = {}
+    # Set user's name
+    user[:name] = team_user.name
+    # Set user's fullname
+    user[:fullname] = team_user.fullname
+
+    # Get the permissions straight
+    permissionGranted = false
+    hasSignature = false
+    signatureValid = false
+    assignment.participants.each do |participant|
+      if (team_user.id == participant.user.id)
+        permissionGranted = participant.permission_granted?
+      end
+    end
+    # If permission is granted, set the publisting rights string
+    if permissionGranted
+      user[:pub_rights] = "Granted"
+    else 
+      user[:pub_rights] = "Denied"
+    end
+    user[:verified] = permissionGranted && hasSignature && signatureValid
+    user
+  end
+
+  # Get the signup topics for the assignment
+  def get_signup_topics_for_assignment(assignment_id, team_info, teamId)
+    # Get the signup topics, if any for this assignment
+    signup_topics = SignUpTopic.where( ['assignment_id = ?', assignment_id])
+    if signup_topics.any?
+      # Set this attribute to true 
+      has_topics = true
+      # Iterate through the list of signup_topics 
+      signup_topics.each do |signup_topic|
+        # For each team that signed up for this topic, do
+        signup_topic.signed_up_teams.each do |signed_up_team|
+          # If this team's id == current team's id, set the corresponding values
+          if signed_up_team.team_id == teamId
+            team_info[:topic_name] = signup_topic.topic_name
+            team_info[:topic_id] = signup_topic.topic_identifier
+          end
+        end
+      end        
+    end
+    has_topics
+  end
+
 end

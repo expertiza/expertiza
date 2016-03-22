@@ -1,18 +1,16 @@
-<h1>Publishing rights for <%= @assignment.name %> assignment</h1>
+<h1>Publishing rights for <%= @assignment_name %> assignment</h1>
 
 <% if flash[:notice] %>
     <div class="flash_note"><%= flash[:notice] %></div>
 <% end %>
 
-<% has_topics = @sign_up_topics.any? %>
-
 <table class="general">
     <tr>
-    	<% if has_topics %>
+        <th width="20%" rowspan="2">Team name</th>
+        <% if @has_topics %>
             <th width="5%" rowspan="2">Topic #</th>
             <th width="40" rowspan="2">Topic name(s)</th>
         <% end %>
-        <th width="20%" rowspan="2">Team name</th>
         <th width="35%" colspan="4">Participant</th>
     </tr>
     <tr>
@@ -22,72 +20,36 @@
         <th>Verified</th>
     </tr>
 
-    <% @sign_up_topics.each_with_index do |topic, i| %>
+    <% @teams_info.each do |team_info| %>
+        <% 
+            users = team_info[:users]
+            num_students = users.size 
+        %>        
         <tr>
-        	<% if has_topics %>
-            	<% num_students = 0
-            		for signed_up_team in topic.signed_up_teams
-            			num_students += Team.find(signed_up_team.team_id).users.size
-            		end
-            	%>
-
-                <td rowspan="<%= num_students %>"><%= topic.topic_identifier %> </td>
-                <td rowspan="<%= num_students %>"><%= topic.topic_name %></td>
-            <% end %>
-
-            <% if (@assignment.participants.size > 0)
-                for signed_up_team in topic.signed_up_teams
-        
-
-                    #ACS Find the user(s) signed up for a topic
-                    # removed code that handles team and individual assignments differently
-                    # An unknown bug causes teams to disappear. Don't crash if this happens
-
-                    team = Team.find(signed_up_team.team_id)
-                    users = []
-                    users = team.users if team
-
-                    showed_team = false
-                    for user in users
-                    %>
-<!--                             <th>&nbsp;</th>
-                            <th>&nbsp;</th> -->
-                        <% if !showed_team %>
-                            <td align="center" rowspan="<%= team.users.size %>">
-                                <b><%= team.name %></b> 
-                            </td>
-                        <% end %>
-                        <% showed_team = true %>
-                        <td>
-                            <%=user.name%>
-                        </td>
-                        <td>
-                            <%=user.fullname%>
-                        </td>
-                        <%
-                        permissionGranted = false
-                        hasSignature = false
-                        signatureValid = false
-                        @assignment.participants.each do |participant|
-                            if (user.id == participant.user.id)
-                                permissionGranted = participant.permission_granted?
-                            end
-                        end
-                        %>
-                        <td>
-                            <%= (permissionGranted ? "granted" : "denied") %>
-                        </td>
-                        <td>
-                            <% if (permissionGranted && hasSignature && signatureValid) %>
-                                <img src="/assets/Check-icon.png" title="verified with digitigal signature" alt="verified"/>
-                            <% else %>
-                                <img src="/assets/delete_icon.png" title="no digitigal signature" alt="unverified"/>
-                            <% end %>
-                            <!-- &nbsp; -->
-                        </td> </tr><tr>
+            <td align="center" rowspan="<%= num_students %>">
+                <b><%= team_info[:name] %></b> 
+            </td>
+            <% if @has_topics %>
+                <td rowspan="<%= num_students %>"><%= team_info[:topic_id] %> </td>
+                <td rowspan="<%= num_students %>"><%= team_info[:topic_name] %></td>
+            <% end %> 
+            
+            <% users.each do |user| %>
+                <td> <%=user[:name]%> </td>
+                <td> <%=user[:fullname]%> </td>
+                <td> <%=user[:pub_rights]%> </td>
+                <td>
+                    <% if user[:verfied] %>
+                        <img src="/assets/Check-icon.png" title="verified with digitigal signature" alt="verified"/>
+                    <% else %>
+                        <img src="/assets/delete_icon.png" title="no digitigal signature" alt="unverified"/>
                     <% end %>
-                <% end %>
+                </td> </tr><tr>
             <% end %>
+
         </tr>
+
     <% end %>
 </table>
+
+    

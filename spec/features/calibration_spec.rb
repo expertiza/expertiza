@@ -620,9 +620,14 @@ describe 'Reviewer' do
 
     #Edit assignment route
     visit edit_assignment_path @assignment
+    save_and_open_page
+
+    click_on('Review strategy')
+
 
     #Choose the option for instructor to assign student to review artifacts
     page.select 'Instructor-Selected', :from => 'assignment_form_assignment_review_assignment_strategy'
+
 
     #Assign reviewer
     click_on('Assign reviewers')

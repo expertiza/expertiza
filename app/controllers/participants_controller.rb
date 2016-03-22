@@ -236,6 +236,10 @@ class ParticipantsController < ApplicationController
 
     # For each of the teams, do
     teams.each do |team|
+      # Choose only those teams that have signed up for topics
+      if !SignedUpTeam.where(["team_id = ?", team.id]).any?
+        next
+      end
       team_info = {}
       # Set the team name
       team_info[:name] = team.name

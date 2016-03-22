@@ -62,7 +62,6 @@ class ResponseController < ApplicationController
 
     @map = @response.map
     @contributor = @map.contributor
-    array_not_empty=0
     set_all_responses
     if @prev.present?
       @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }

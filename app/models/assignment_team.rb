@@ -78,21 +78,6 @@ class AssignmentTeam < Team
   def self.first_member(team_id)
     find(team_id).participants.first
   end
-=begin
-  def files(directory)
-    files_list = Dir[directory + "/*"]
-    files = Array.new
-
-    files_list.each do |file|
-      if File.directory?(file)
-        dir_files = files(file)
-        dir_files.each{|f| files << f}
-      end
-    files << file
-    end
-  files
-  end
-=end
 
   def submitted_files
     files = Array.new

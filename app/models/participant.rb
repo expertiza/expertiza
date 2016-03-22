@@ -80,12 +80,7 @@ class Participant < ActiveRecord::Base
       self.destroy
     end
 
-    def topic_name
-      if topic.nil? or topic.topic_name.empty?
-        return "<center>&#8212;</center>"
-      end
-      return topic.topic_name
-    end
+
 
     def able_to_review
       if can_review

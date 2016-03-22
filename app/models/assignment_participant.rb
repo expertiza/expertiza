@@ -287,23 +287,6 @@ class AssignmentParticipant < Participant
   end
 
 
-=begin
-  def files(directory)
-    puts "***************************************"
-    files_list = Dir[directory + "/*"]
-    files = Array.new
-
-    files_list.each do |file|
-      if File.directory?(file)
-        dir_files = files(file)
-        dir_files.each{|f| files << f}
-      end
-      files << file
-    end
-    files
-  end
-=end
-
 
   def team
     AssignmentTeam.team(self)

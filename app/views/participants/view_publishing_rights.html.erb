@@ -6,11 +6,11 @@
 
 <table class="general">
     <tr>
-        <th width="20%" rowspan="2">Team name</th>
         <% if @has_topics %>
             <th width="5%" rowspan="2">Topic #</th>
             <th width="40" rowspan="2">Topic name(s)</th>
         <% end %>
+        <th width="20%" rowspan="2">Team name</th>
         <th width="35%" colspan="4">Participant</th>
     </tr>
     <tr>
@@ -26,13 +26,13 @@
             num_students = users.size 
         %>        
         <tr>
-            <td align="center" rowspan="<%= num_students %>">
-                <b><%= team_info[:name] %></b> 
-            </td>
             <% if @has_topics %>
                 <td rowspan="<%= num_students %>"><%= team_info[:topic_id] %> </td>
                 <td rowspan="<%= num_students %>"><%= team_info[:topic_name] %></td>
             <% end %> 
+            <td align="center" rowspan="<%= num_students %>">
+                <b><%= team_info[:name] %></b> 
+            </td>
             
             <% users.each do |user| %>
                 <td> <%=user[:name]%> </td>

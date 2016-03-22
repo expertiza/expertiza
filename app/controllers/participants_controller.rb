@@ -255,6 +255,8 @@ class ParticipantsController < ApplicationController
       # Append the hashmap to the list of hashmaps
       @teams_info.append(team_info)
     end
+    @teams_info = @teams_info.sort_by {|hashmap| [hashmap[:topic_id] ? 0 :1,hashmap[:topic_id] || 0 ] }
+
   end
 
 
@@ -304,7 +306,7 @@ class ParticipantsController < ApplicationController
           # If this team's id == current team's id, set the corresponding values
           if signed_up_team.team_id == teamId
             team_info[:topic_name] = signup_topic.topic_name
-            team_info[:topic_id] = signup_topic.topic_identifier
+            team_info[:topic_id] = signup_topic.topic_identifier.to_i
           end
         end
       end        

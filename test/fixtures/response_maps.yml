@@ -1,0 +1,11 @@
+resmap1:
+ id: 1798
+ reviewed_object_id: 11286
+ reviewer_id: 8218
+ reviewee_id: 8221
+ type: 'FeedbackResponseMap'
+ created_at: NULL
+ updated_at: NULL
+ calibrate_to: 0
+
+

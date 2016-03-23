@@ -592,10 +592,9 @@ class ReviewMappingController < ApplicationController
       #SELECT distinct reviewer_id FROM response_maps where type = 'TeammateReviewResponseMap' and reviewed_object_id = 711
       @reviewers = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ?", @id, 'TeammateReviewResponseMap'])
     when "Calibration"
-      participant = AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first rescue nil
-      if participant.nil?
-        participant = AssignmentParticipant.create(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
-      end
+      if AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first.nil?
+        AssignmentParticipant.create(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
+	end
       @assignment = Assignment.find(params[:id])
       @review_questionnaire_ids = ReviewQuestionnaire.select("id")
       @assignment_questionnaire = AssignmentQuestionnaire.where(["assignment_id = ? and questionnaire_id IN (?)", params[:id], @review_questionnaire_ids]).first

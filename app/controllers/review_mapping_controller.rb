@@ -535,7 +535,7 @@ class ReviewMappingController < ApplicationController
           unless TeamsUser.exists?(team_id: team_id, user_id: Participant.find(participant_id).user_id)
             ReviewResponseMap.where(:reviewee_id => team_id, :reviewer_id => participant_id, :reviewed_object_id => assignment_id).first_or_create
             teams_hash[team_id] += 1
-            teams_hash = teams_hash.sort_by{|_k, v| v}.to_h
+            teams_hash = teams_hash.sort_by{|k, v| v}.to_h
             break
           end
         end

@@ -52,6 +52,17 @@ describe "Integration tests for instructor interface" do
     end
   end
 
+  describe "View Publishing Rights" do
+    it 'should display teams for assignment without topic' do
+      login_as("instructor6")
+      visit '/participants/view_publishing_rights?id=1'
+      expect(page).to have_content('Team name')
+      expect(page).should_not have_content('Topic name(s)')
+      expect(page).should_not have_content('Topic #')
+
+    end
+  end
+
   describe "View assignment scores" do
     it 'is able to view scores' do
       login_as("instructor6")

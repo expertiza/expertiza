@@ -13,13 +13,15 @@ class MultipleChoiceRadio < QuizQuestion
 
     quiz_question_choices = QuizQuestionChoice.where(question_id: @question.id)
     quiz_question_choices.each do |choice|
-      if display=="view"
+      if answer=="view"
         html += radio_button_tag("#{@question.id}", "#{choice.txt}", choice.iscorrect)
-        html += label_tag("#{choice.id}", choice.txt) + "<br>"
+        html += label_tag("#{choice.id}", choice.txt)
+        html += "<br>"
       end
-      if display=="take"
+      if answer=="take"
         html += radio_button_tag("#{@question.id}", "#{choice.txt}")
-        html += label_tag("#{choice.id}", choice.txt) + "<br>"
+        html += label_tag("#{choice.id}", choice.txt)
+        html += "<br>"
       end
     end
     html += "</br>"

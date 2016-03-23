@@ -12,13 +12,15 @@ class MultipleChoiceCheckbox < QuizQuestion
 
     quiz_question_choices = QuizQuestionChoice.where(question_id: @question.id)
     quiz_question_choices.each do |choice|
-      if display=="view"
+      if answer=="view"
         html += check_box_tag ("#{question.id}[]", "#{choice.txt}", choice.iscorrect)
-        html += label_tag("#{choice.txt}", choice.txt) + "<br>"
+        html += label_tag("#{choice.txt}", choice.txt)
+        html += "<br>"
       end
-      if display=="take"
+      if answer=="take"
         html += check_box_tag ("#{question.id}[]", "#{choice.txt}")
-        html += label_tag("#{choice.txt}", choice.txt) + "<br>"
+        html += label_tag("#{choice.txt}", choice.txt)
+        html += "<br>"
       end
       html.html_safe
     end

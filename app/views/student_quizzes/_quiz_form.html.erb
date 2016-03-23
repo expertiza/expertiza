@@ -1,7 +1,7 @@
 <% questions = Question.where(questionnaire_id: questionnaire_id) %><br><br>
 <% questions.each do |question| %>
 
-    <%= question.complete(question.id)%>
+    <%= question.complete(question.id, display)%>
 
 
 <% end %>

@@ -42,9 +42,7 @@ class AssignmentTeam < Team
 
   # Whether the team has submitted work or not
   def has_submissions?
-    list_of_users = participants;
-    list_of_users.each { |participant| return true if participant.has_submissions? }
-    false
+    (self.submitted_files.length > 0) or self.submitted_hyperlinks.blank?
   end
 
   def reviewed_contributor?(contributor)
@@ -109,18 +107,20 @@ class AssignmentTeam < Team
 
   def self.import(row, assignment_id, options)
     raise ImportError, "The assignment with id \""+id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this assignment?" if Assignment.find(assignment_id) == nil
-    Team.import(row,assignment_id,options,false)
+    @assignmentteam = prototype
+    Team.import(row,assignment_id,options,@assignmentteam)
   end
 
   def self.export(csv, parent_id, options)
-    Team.export(csv,parent_id,options,false)
+    @assignmentteam = prototype
+    Team.export(csv,parent_id,options,@assignmentteam)
   end
   #REFACTOR END:: functionality of import, export handle_duplicate shifted to team.rb
 
 
-      def participant_type
-        "AssignmentParticipant"
-      end
+      # def participant_type
+      #   "AssignmentParticipant"
+      # end
 
       def parent_model
         "Assignment"
@@ -129,6 +129,10 @@ class AssignmentTeam < Team
       def fullname
         self.name
       end
+
+  def self.prototype
+    AssignmentTeam.new
+  end
 
       def participants
         users = self.users

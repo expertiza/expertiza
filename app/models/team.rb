@@ -6,16 +6,18 @@ class Team < ActiveRecord::Base
   has_many :bids, :dependent => :destroy
   has_paper_trail
 
-
+  #Get the participants of the given team
   def participants
     users.where(parent_id: parent_id || current_user_id).flat_map(&:participants)
   end
   alias_method :get_participants, :participants
 
+  #Get the response review map
   def responses
     participants.flat_map(&:responses)
   end
 
+  #Delete the given team
   def delete
     for teamsuser in TeamsUser.where(["team_id =?", self.id])
       teamsuser.delete
@@ -27,10 +29,12 @@ class Team < ActiveRecord::Base
     self.destroy
   end
 
+  #Get the node type of the tree structure
   def get_node_type
     "TeamNode"
   end
 
+  #Get the names of the users
   def get_author_names
     names = Array.new
     users.each do |user|
@@ -39,6 +43,7 @@ class Team < ActiveRecord::Base
     names
   end
 
+  #Generate the team name
   def self.generate_team_name()
     counter = 0
     while (true)
@@ -50,10 +55,12 @@ class Team < ActiveRecord::Base
     end
   end
 
+  #Check if the user exist
   def has_user(user)
     users.include? user
   end
 
+  #Check if the current team is full?
  def full?
   if self.parent_id == nil
     return false
@@ -63,6 +70,7 @@ class Team < ActiveRecord::Base
   return (curr_team_size >= max_team_members)
  end
 
+  #Add memeber to the team
   def add_member(user, assignment_id)
     if has_user(user)
       raise "\""+user.name+"\" is already a member of the team, \""+self.name+"\""
@@ -78,10 +86,12 @@ class Team < ActiveRecord::Base
     return can_add_member
   end
 
+  #Define the size of the team
   def self.size(team_id)
     TeamsUser.where(["team_id = ?", team_id]).count
   end
 
+  #Copy method to copy this team
   def copy_members(new_team)
     members = TeamsUser.where(team_id: self.id)
     members.each{
@@ -92,6 +102,7 @@ class Team < ActiveRecord::Base
     }
   end
 
+  #Check if the team exists
   def self.check_for_existing(parent, name, team_type)
     list = Object.const_get(team_type + 'Team').where(['parent_id = ? and name = ?', parent.id, name])
     if list.length > 0
@@ -153,6 +164,7 @@ class Team < ActiveRecord::Base
     end
   end
 
+  #Generate the team name
   def self.generate_team_name(teamnameprefix)
     counter = 1
     while (true)
@@ -164,6 +176,7 @@ class Team < ActiveRecord::Base
     end
   end
 
+  #Extract team members from the csv and push to DB
   def import_team_members(starting_index, row)
     index = starting_index
     while (index < row.length)
@@ -180,9 +193,9 @@ class Team < ActiveRecord::Base
   end
 
   #REFACTOR BEGIN:: class methods import export moved from course_team & assignment_team to here
+  #Import from csv
   def self.import(row, id, options,teamtype)
     raise ArgumentError, "Not enough fields on this line" if (row.length < 2 && options[:has_column_names] == "true") || (row.length < 1 && options[:has_column_names] != "true")
-
 
     if options[:has_column_names] == "true"
       name = row[0].to_s.strip
@@ -209,6 +222,7 @@ class Team < ActiveRecord::Base
     team.import_team_members(index, row) if !(team_exists && options[:handle_dups] == "ignore")
   end
 
+  #Handle existence of the duplicate team
   def self.handle_duplicate(team, name, id, handle_dups, teamtype)
     if team.nil? #no duplicate
       return name
@@ -232,6 +246,7 @@ class Team < ActiveRecord::Base
     end
   end
 
+  #Export the teams to csv
   def self.export(csv, parent_id, options, teamtype)
     if teamtype.is_a?(CourseTeam)
       teams = CourseTeam.where(["parent_id =?", parent_id])
@@ -252,6 +267,7 @@ class Team < ActiveRecord::Base
     end
   end
 
+  #Create the team with corresponding tree node
   def self.create_team_and_node(id,teamtype)
     if teamtype.is_a?(CourseTeam)
       curr_course = Course.find(id)

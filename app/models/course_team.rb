@@ -5,14 +5,12 @@ class CourseTeam < Team
   #   currently they are being called: member, participant, user, etc...
   #   suggestion: refactor all to participant
 
-  # def participant_type
-  #   "CourseParticipant"
-  # end
-
+  #Get parent course
   def get_parent_model
     "Course"
   end
 
+  #Get team node type
   def get_node_type
     "TeamNode"
   end
@@ -22,10 +20,12 @@ class CourseTeam < Team
     nil
   end
 
+  #Prototype method to implement prototype pattern
   def self.prototype
     CourseTeam.new
   end
 
+  #Copy this course team to the assignment team
   def copy(assignment_id)
     new_team = AssignmentTeam.create_team_and_node(assignment_id, false)
     new_team.name = name
@@ -42,12 +42,14 @@ class CourseTeam < Team
 
   #REFACTOR BEGIN:: functionality of import, export, handle_duplicate shifted to team.rb
 
+  #Import from csv
   def self.import(row, course_id, options)
     raise ImportError, "The course with id \""+id.to_s+"\" was not found. <a href='/course/new'>Create</a> this course?" if Course.find(course_id) == nil
     @courseteam = prototype
     Team.import(row, course_id, options, @courseteam)
   end
 
+  #Export to csv
   def self.export(csv, parent_id, options)
     @courseteam = prototype
     Team.export(csv, parent_id, options, @courseteam)
@@ -55,7 +57,7 @@ class CourseTeam < Team
 
   #REFACTOR END:: functionality of import, export, handle_duplicate shifted to team.rb
 
-
+  #Export the fields of the csv column
   def self.export_fields(options)
     fields = Array.new
     fields.push("Team Name")
@@ -65,22 +67,7 @@ class CourseTeam < Team
     fields.push("Course Name")
   end
 
-
-  def import_team_members(starting_index, row)
-    index = starting_index
-    while (index < row.length)
-      user = User.find_by_name(row[index].to_s.strip)
-      if user.nil?
-        raise ImportError, "The user \""+row[index].to_s.strip+"\" was not found. <a href='/users/new'>Create</a> this user?"
-      else
-        if TeamsUser.where(["team_id =? and user_id =?", id, user.id]).first.nil?
-          add_member(user, nil)
-        end
-      end
-      index = index + 1
-    end
-  end
-
+  #Add member to the course team
   def add_member(user, assignment_id)
     if has_user(user)
       raise "\""+user.name+"\" is already a member of the team, \""+self.name+"\""

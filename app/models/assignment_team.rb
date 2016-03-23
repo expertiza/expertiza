@@ -12,6 +12,26 @@ class AssignmentTeam < Team
     participants.include?(participant)
   end
 
+  #Get the parent of this class=>Assignment
+  def parent_model
+    "Assignment"
+  end
+
+  #Get the name of the class
+  def fullname
+    self.name
+  end
+
+  #Get the review response map
+  def review_map_type
+    'ReviewResponseMap'
+  end
+
+  #Prototype method to implement prototype pattern
+  def self.prototype
+    AssignmentTeam.new
+  end
+
   #Use current object (AssignmentTeam) as reviewee and create the ReviewResponseMap record
   def assign_reviewer(reviewer)
     assignment = Assignment.find(self.parent_id)
@@ -45,22 +65,29 @@ class AssignmentTeam < Team
     (self.submitted_files.length > 0) or self.submitted_hyperlinks.blank?
   end
 
+  #Response Map for each reviewer/reviewee
   def reviewed_contributor?(contributor)
+    #ReviewResponseMap.all showing error but somehow its working, incase it fails please uncomment the following line
+    #ReviewResponseMap.where("reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?", params[contributor.id, self.id, assignment.id]).empty? == false
     ReviewResponseMap.all(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', contributor.id, self.id, assignment.id]).empty? == false
   end
 
   # END of contributor methods
 
+  # Get Participants of the team
   def participants
+    users = self.users
     participants = Array.new
-    users.each { |user|
-      participants.push(AssignmentParticipant.where(parent_id: parent_id, user_id: user.id).first)
-    }
-    return participants
+    users.each do |user|
+      participant = AssignmentParticipant.where(user_id: user.id, parent_id: self.parent_id).first
+      participants << participant if participant != nil
+    end
+    participants
   end
 
   alias_method :get_participants, :participants
 
+  #Delete the team
   def delete
     if read_attribute(:type) == 'AssignmentTeam'
       sign_up = SignedUpTeam.find_team_participants(parent_id.to_s).select { |p| p.team_id == self.id }
@@ -69,15 +96,18 @@ class AssignmentTeam < Team
     super
   end
 
+  #Delete Review response map
   def destroy
     review_response_maps.each(&:destroy)
     super
   end
 
+  #Get the first member of the team
   def self.first_member(team_id)
     find(team_id).participants.first
   end
 
+  #Return the files residing in the directory of team submissions
   def files(directory)
     files_list = Dir[directory + "/*"]
     files = Array.new
@@ -92,6 +122,7 @@ class AssignmentTeam < Team
     files
   end
 
+  #Main calling method to return the files residing in the directory of team submissions
   def submitted_files
     files = Array.new
     if (self.directory_num)
@@ -100,18 +131,15 @@ class AssignmentTeam < Team
     return files
   end
 
-  def review_map_type
-    'ReviewResponseMap'
-  end
-
   #REFACTOR BEGIN:: functionality of import,export, handle_duplicate shifted to team.rb
-
+  #Import csv file to form teams directly
   def self.import(row, assignment_id, options)
     raise ImportError, "The assignment with id \""+id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this assignment?" if Assignment.find(assignment_id) == nil
     @assignmentteam = prototype
     Team.import(row, assignment_id, options, @assignmentteam)
   end
 
+  #Export the existing teams in a csv file
   def self.export(csv, parent_id, options)
     @assignmentteam = prototype
     Team.export(csv, parent_id, options, @assignmentteam)
@@ -119,45 +147,20 @@ class AssignmentTeam < Team
 
   #REFACTOR END:: functionality of import, export handle_duplicate shifted to team.rb
 
-
-  # def participant_type
-  #   "AssignmentParticipant"
-  # end
-
-  def parent_model
-    "Assignment"
-  end
-
-  def fullname
-    self.name
-  end
-
-  def self.prototype
-    AssignmentTeam.new
-  end
-
-  def participants
-    users = self.users
-    participants = Array.new
-    users.each do |user|
-      participant = AssignmentParticipant.where(user_id: user.id, parent_id: self.parent_id).first
-      participants << participant if participant != nil
-    end
-    participants
-  end
-
+  #Copy the current Assignment team to the CourseTeam
   def copy(course_id)
     new_team = CourseTeam.create_team_and_node(course_id, true)
     new_team.name = name
     new_team.save
-    #new_team = CourseTeam.create({:name => self.name, :parent_id => course_id})
     copy_members(new_team)
   end
 
+  #Add Participants to the current Assignment Team
   def add_participant(assignment_id, user)
     AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted) if AssignmentParticipant.where(parent_id: assignment_id, user_id: user.id).first == nil
   end
 
+  #Return the parent Assignment
   def assignment
     Assignment.find(self.parent_id)
   end
@@ -175,6 +178,7 @@ class AssignmentTeam < Team
     scores
   end
 
+  #return the team given the participant
   def self.team(participant)
     return nil if participant.nil?
     team = nil
@@ -187,7 +191,7 @@ class AssignmentTeam < Team
     nil
   end
 
-
+  #Export the fields
   def self.export_fields(options)
     fields = Array.new
     fields.push("Team Name")
@@ -204,10 +208,12 @@ class AssignmentTeam < Team
     end
   end
 
+  #Get the path of the team directory
   def path
     self.assignment.path + "/"+ self.directory_num.to_s
   end
 
+  #Set the directory num for this team
   def set_student_directory_num
     if self.directory_num.nil? || self.directory_num < 0
       max_num = AssignmentTeam.where(parent_id: self.parent_id).order('directory_num desc').first.directory_num

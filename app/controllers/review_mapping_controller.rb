@@ -80,7 +80,7 @@ class ReviewMappingController < ApplicationController
   # Assign self to a submission
   def add_self_reviewer
     assignment = Assignment.find(params[:assignment_id])
-    topic_id = params[:topic_id]
+    # Removed topic_id = params[:topic_id] as it is not used
     reviewer   = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id:  assignment.id).first
     submission = AssignmentParticipant.find(params[:submission_id],assignment.id)
 

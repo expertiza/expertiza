@@ -1,0 +1,3 @@
+teams_users0:
+  team_id: <%= ActiveRecord::FixtureSet.identify(:team0) %>
+  user_id: <%= ActiveRecord::FixtureSet.identify(:student571) %>

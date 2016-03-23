@@ -1,0 +1,3 @@
+response0:
+ map_id: <%= ActiveRecord::FixtureSet.identify(:response_maps0)%>
+ additional_comment: "review0"

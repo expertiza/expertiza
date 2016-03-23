@@ -205,17 +205,6 @@ class Team < ActiveRecord::Base
       team.save
     end
 
-
-    # if name
-    # #   if course
-    # #     team = Team.create_team_and_node(id,true)
-    # #   else
-    #     team = Team.create_team_and_node(id,assignmentteam)
-    # #   end
-    #    team.name = name
-    #    team.save
-    #  end
-
     # insert team members into team unless team was pre-existing & we ignore duplicate teams
     team.import_team_members(index, row) if !(team_exists && options[:handle_dups] == "ignore")
   end

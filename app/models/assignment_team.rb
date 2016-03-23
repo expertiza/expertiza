@@ -1,16 +1,16 @@
 class AssignmentTeam < Team
 
-  belongs_to  :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
-  has_many    :review_mappings, :class_name => 'ReviewResponseMap', :foreign_key => 'reviewee_id'
+  belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
+  has_many :review_mappings, :class_name => 'ReviewResponseMap', :foreign_key => 'reviewee_id'
   has_many :review_response_maps, foreign_key: :reviewee_id
   has_many :responses, through: :review_response_maps, foreign_key: :map_id
 
-    # START of contributor methods, shared with AssignmentParticipant
+  # START of contributor methods, shared with AssignmentParticipant
 
-    # Whether this team includes a given participant or not
-    def includes?(participant)
-      participants.include?(participant)
-    end
+  # Whether this team includes a given participant or not
+  def includes?(participant)
+    participants.include?(participant)
+  end
 
   #Use current object (AssignmentTeam) as reviewee and create the ReviewResponseMap record
   def assign_reviewer(reviewer)
@@ -20,7 +20,7 @@ class AssignmentTeam < Team
     end
 
     ReviewResponseMap.create(:reviewee_id => self.id, :reviewer_id => reviewer.id,
-                                 :reviewed_object_id => assignment.id)
+                             :reviewed_object_id => assignment.id)
   end
 
   # Evaluates whether any contribution by this team was reviewed by reviewer
@@ -54,10 +54,11 @@ class AssignmentTeam < Team
   def participants
     participants = Array.new
     users.each { |user|
-      participants.push(AssignmentParticipant.where(parent_id:parent_id, user_id:user.id).first)
+      participants.push(AssignmentParticipant.where(parent_id: parent_id, user_id: user.id).first)
     }
     return participants
   end
+
   alias_method :get_participants, :participants
 
   def delete
@@ -84,16 +85,16 @@ class AssignmentTeam < Team
     files_list.each do |file|
       if File.directory?(file)
         dir_files = files(file)
-        dir_files.each{|f| files << f}
+        dir_files.each { |f| files << f }
       end
-    files << file
+      files << file
     end
-  files
+    files
   end
 
   def submitted_files
     files = Array.new
-    if(self.directory_num)
+    if (self.directory_num)
       files = files(self.path)
     end
     return files
@@ -108,100 +109,100 @@ class AssignmentTeam < Team
   def self.import(row, assignment_id, options)
     raise ImportError, "The assignment with id \""+id.to_s+"\" was not found. <a href='/assignment/new'>Create</a> this assignment?" if Assignment.find(assignment_id) == nil
     @assignmentteam = prototype
-    Team.import(row,assignment_id,options,@assignmentteam)
+    Team.import(row, assignment_id, options, @assignmentteam)
   end
 
   def self.export(csv, parent_id, options)
     @assignmentteam = prototype
-    Team.export(csv,parent_id,options,@assignmentteam)
+    Team.export(csv, parent_id, options, @assignmentteam)
   end
+
   #REFACTOR END:: functionality of import, export handle_duplicate shifted to team.rb
 
 
-      # def participant_type
-      #   "AssignmentParticipant"
-      # end
+  # def participant_type
+  #   "AssignmentParticipant"
+  # end
 
-      def parent_model
-        "Assignment"
-      end
+  def parent_model
+    "Assignment"
+  end
 
-      def fullname
-        self.name
-      end
+  def fullname
+    self.name
+  end
 
   def self.prototype
     AssignmentTeam.new
   end
 
-      def participants
-        users = self.users
-        participants = Array.new
-        users.each do |user|
-          participant = AssignmentParticipant.where(user_id: user.id, parent_id: self.parent_id).first
-          participants << participant if participant != nil
-        end
-        participants
-      end
+  def participants
+    users = self.users
+    participants = Array.new
+    users.each do |user|
+      participant = AssignmentParticipant.where(user_id: user.id, parent_id: self.parent_id).first
+      participants << participant if participant != nil
+    end
+    participants
+  end
 
-      def copy(course_id)
-        new_team = CourseTeam.create_team_and_node(course_id,true)
-        new_team.name = name
-        new_team.save
-        #new_team = CourseTeam.create({:name => self.name, :parent_id => course_id})
-        copy_members(new_team)
-      end
+  def copy(course_id)
+    new_team = CourseTeam.create_team_and_node(course_id, true)
+    new_team.name = name
+    new_team.save
+    #new_team = CourseTeam.create({:name => self.name, :parent_id => course_id})
+    copy_members(new_team)
+  end
 
-      def add_participant(assignment_id, user)
-        AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted) if AssignmentParticipant.where(parent_id: assignment_id, user_id: user.id).first == nil
-      end
+  def add_participant(assignment_id, user)
+    AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted) if AssignmentParticipant.where(parent_id: assignment_id, user_id: user.id).first == nil
+  end
 
-      def assignment
-        Assignment.find(self.parent_id)
-      end
+  def assignment
+    Assignment.find(self.parent_id)
+  end
 
-      # return a hash of scores that the team has received for the questions
-      def scores(questions)
-        scores = Hash.new
-        scores[:team] = self # This doesn't appear to be used anywhere
-        assignment.questionnaires.each do |questionnaire|
-          scores[questionnaire.symbol] = Hash.new
-          scores[questionnaire.symbol][:assessments] = ReviewResponseMap.where(reviewee_id: self.id)
-          scores[questionnaire.symbol][:scores] = Answer.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
-        end
-        scores[:total_score] = assignment.compute_total_score(scores)
-        scores
-      end
-     
-      def self.team(participant)
-        return nil if participant.nil?
-        team = nil
-        teams_users = TeamsUser.where(user_id: participant.user_id)
-        return nil if !teams_users
-        teams_users.each do |teams_user|
-          team = Team.find(teams_user.team_id)
-          return team if team.parent_id==participant.parent_id
-        end
-        nil
-      end
+  # return a hash of scores that the team has received for the questions
+  def scores(questions)
+    scores = Hash.new
+    scores[:team] = self # This doesn't appear to be used anywhere
+    assignment.questionnaires.each do |questionnaire|
+      scores[questionnaire.symbol] = Hash.new
+      scores[questionnaire.symbol][:assessments] = ReviewResponseMap.where(reviewee_id: self.id)
+      scores[questionnaire.symbol][:scores] = Answer.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+    end
+    scores[:total_score] = assignment.compute_total_score(scores)
+    scores
+  end
 
-
-
-      def self.export_fields(options)
-        fields = Array.new
-        fields.push("Team Name")
-        fields.push("Team members") if options[:team_name] == "false"
-        fields.push("Assignment Name")
-      end
+  def self.team(participant)
+    return nil if participant.nil?
+    team = nil
+    teams_users = TeamsUser.where(user_id: participant.user_id)
+    return nil if !teams_users
+    teams_users.each do |teams_user|
+      team = Team.find(teams_user.team_id)
+      return team if team.parent_id==participant.parent_id
+    end
+    nil
+  end
 
 
-      #Remove a team given the team id
-      def self.remove_team_by_id(id)
-        old_team = AssignmentTeam.find(id)
-        if old_team != nil
-          old_team.destroy
-        end
-      end
+  def self.export_fields(options)
+    fields = Array.new
+    fields.push("Team Name")
+    fields.push("Team members") if options[:team_name] == "false"
+    fields.push("Assignment Name")
+  end
+
+
+  #Remove a team given the team id
+  def self.remove_team_by_id(id)
+    old_team = AssignmentTeam.find(id)
+    if old_team != nil
+      old_team.destroy
+    end
+  end
 
   def path
     self.assignment.path + "/"+ self.directory_num.to_s
@@ -211,12 +212,12 @@ class AssignmentTeam < Team
     if self.directory_num.nil? || self.directory_num < 0
       max_num = AssignmentTeam.where(parent_id: self.parent_id).order('directory_num desc').first.directory_num
       dir_num = max_num ? max_num + 1 : 0
-      self.update_attribute('directory_num',dir_num)
+      self.update_attribute('directory_num', dir_num)
       #ACS Get participants irrespective of the number of participants in the team
       #removed check to see if it is a team assignment
     end
   end
 
-      require File.dirname(__FILE__) + '/analytic/assignment_team_analytic'
-      include AssignmentTeamAnalytic
-    end
+  require File.dirname(__FILE__) + '/analytic/assignment_team_analytic'
+  include AssignmentTeamAnalytic
+end

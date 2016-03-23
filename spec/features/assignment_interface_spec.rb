@@ -7,19 +7,14 @@ describe "Integration tests for assignment interface" do
     @assignment = create(:assignment)
     create_list(:participant, 3)
     create(:assignment_node)
-    create(:deadline_type,name:"submission")
-    create(:deadline_type,name:"review")
-    create(:deadline_type,name:"resubmission")
-    create(:deadline_type,name:"rereview")
-    create(:deadline_type,name:"metareview")
-    create(:deadline_type,name:"drop_topic")
-    create(:deadline_type,name:"signup")
-    create(:deadline_type,name:"team_formation")
-    create(:deadline_right)
-    create(:deadline_right, name: 'Late')
-    create(:deadline_right, name: 'OK')
-    create(:due_date)
-    create(:due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now + (100*24*60*60))
+    create(:question)
+    create(:questionnaire)
+    create(:assignment_questionnaire)
+    (1..3).each do |i|
+      create(:questionnaire, name: "ReviewQuestionnaire#{i}")
+      create(:author_feedback_questionnaire, name: "AuthorFeedbackQuestionnaire#{i}")
+      create(:teammate_review_questionnaire, name: "TeammateReviewQuestionnaire#{i}")
+    end
   end
 
   describe "Create assignments" do
@@ -158,151 +153,196 @@ describe "Integration tests for assignment interface" do
     end
   end
 
-#Review
-  describe "Edit assignments" do
+ #RUBRIC
+  #Load edit page
+  describe "Load rubric questionnaire" do
     it "is able to edit assignment" do
       login_as("instructor6")
       visit '/assignments/1/edit'
-      expect(page).to have_content("Editing Assignment:")
+      find_link('Rubrics').click
+      #might find a better acceptance criteria here
+      expect(page).to have_content("Review rubric varies by round")
     end
   end
-  describe "Edit rubric" do
-    it "should update review questionnaire", js: true do
+
+  #First table row
+  describe "Edit review rubric" do
+    it "should update questionnaire", js: true do
       login_as("instructor6")
-      visit '/assignments/1/edit#tabs-3'
-      sleep 1
-      choose_a_field('review', 'questionnaire')
+      visit '/assignments/1/edit'
+      find_link('Rubrics').click
+      within("tr#questionnaire_table_ReviewQuestionnaire") do
+        select "ReviewQuestionnaire2", :from => 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+      end
       click_button 'Save'
-      expect(page).to have_content("Assignment was successfully saved.")
+      expect(get_questionnaire("ReviewQuestionnaire2")).to exist
     end
-    it "should update review use dropdown", js: true do
+    it "should update use dropdown", js: true do
       login_as("instructor6")
-      visit '/assignments/1/edit#tabs-3'
-      sleep 1
-      choose_a_field('review', 'usedropdown')
+      visit '/assignments/1/edit'
+      find_link('Rubrics').click
+      within("tr#questionnaire_table_ReviewQuestionnaire") do
+        select "ReviewQuestionnaire2", :from => 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+        uncheck('dropdown')
+      end
       click_button 'Save'
-      visit '/assignments/1/edit#tabs-3'
-      expect(page).to have_content("Assignment was successfully saved.")
+      pending("can't find where this value is used")
+      expect(get_questionnaire("ReviewQuestionnaire2").first).to have_attributes(:dropdown => false)
     end
-    it "should update review scored question", js: true do
+    it "should update scored question dropdown", js: true do
       login_as("instructor6")
-      visit '/assignments/1/edit#tabs-3'
-      sleep 1
-      choose_a_field('review', 'scored_question')
+      visit '/assignments/1/edit'
+      find_link('Rubrics').click
+      within("tr#questionnaire_table_ReviewQuestionnaire") do
+        select "ReviewQuestionnaire2", :from => 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+        select "Scale", :from => 'assignment_form[assignment_questionnaire][][dropdown]'
+      end
       click_button 'Save'
-      visit '/assignments/1/edit#tabs-3'
-      expect(page).to have_content("Assignment was successfully saved.")
+      pending("can't find where this value is used")
+      expect(get_questionnaire("ReviewQuestionnaire2").first).to have_attributes(:scored_question_display_type => false)
     end
-    it "should update review wight", js: true do
+    it "should update weight", js: true do
       login_as("instructor6")
-      visit '/assignments/1/edit#tabs-3'
-      sleep 1
-      choose_a_field('review', 'weight')
+      visit '/assignments/1/edit'
+      find_link('Rubrics').click
+      within("tr#questionnaire_table_ReviewQuestionnaire") do
+        select "ReviewQuestionnaire2", :from => 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+        fill_in 'assignment_form[assignment_questionnaire][][questionnaire_weight]', :with => '50'
+      end
       click_button 'Save'
-      visit '/assignments/1/edit#tabs-3'
-      expect(page).to have_content("Assignment was successfully saved.")
+      expect(get_questionnaire).to have_attributes(:questionnaire_weight => 50)
     end
-    it "should update review notify limit", js: true do
+    it "should update notification limit", js: true do
       login_as("instructor6")
-      visit '/assignments/1/edit#tabs-3'
-      sleep 1
-      choose_a_field('review', 'notify_limit')
+      visit '/assignments/1/edit'
+      find_link('Rubrics').click
+      within("tr#questionnaire_table_ReviewQuestionnaire") do
+        select "ReviewQuestionnaire2", :from => 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+        fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', :with => '50'
+      end
       click_button 'Save'
-      visit '/assignments/1/edit#tabs-3'
-      expect(page).to have_content("Assignment was successfully saved.")
+      expect(get_questionnaire("ReviewQuestionnaire2").first).to have_attributes(:notification_limit => 50)
+    end
+  end
+
+  describe "Edit author feedback in rubric" do
+    it "should update questionnaire", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit'
+      find_link('Rubrics').click
+      within("tr#questionnaire_table_AuthorFeedbackQuestionnaire") do
+        select "AuthorFeedbackQuestionnaire2", :from => 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+      end
+      click_button 'Save'
+      expect(get_questionnaire "AuthorFeedbackQuestionnaire2").to exist
+    end
+    it "should update use dropdown", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit'
+      find_link('Rubrics').click
+      within("tr#questionnaire_table_AuthorFeedbackQuestionnaire") do
+        select "AuthorFeedbackQuestionnaire2", :from => 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+        uncheck('dropdown')
+      end
+      click_button 'Save'
+      pending("can't find where this value is used")
+      expect(get_questionnaire("AuthorFeedbackQuestionnaire2").first).to have_attributes(:dropdown => false)
+    end
+    it "should update scored question dropdown", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit'
+      find_link('Rubrics').click
+      within("tr#questionnaire_table_AuthorFeedbackQuestionnaire") do
+        select "AuthorFeedbackQuestionnaire2", :from => 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+        select "Scale", :from => 'assignment_form[assignment_questionnaire][][dropdown]'
+      end
+      click_button 'Save'
+      pending("can't find where this value is used")
+      expect(get_questionnaire("AuthorFeedbackQuestionnaire2").first).to have_attributes(:scored_question_display_type => false)
+    end
+    it "should update weight", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit'
+      find_link('Rubrics').click
+      within("tr#questionnaire_table_AuthorFeedbackQuestionnaire") do
+        select "AuthorFeedbackQuestionnaire2", :from => 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+        fill_in 'assignment_form[assignment_questionnaire][][questionnaire_weight]', :with => '50'
+      end
+      click_button 'Save'
+      expect(get_questionnaire("AuthorFeedbackQuestionnaire2").first).to have_attributes(:questionnaire_weight => 50)
+    end
+    it "should update notification limit", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit'
+      find_link('Rubrics').click
+      within("tr#questionnaire_table_AuthorFeedbackQuestionnaire") do
+        select "AuthorFeedbackQuestionnaire2", :from => 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+        fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', :with => '50'
+      end
+      click_button 'Save'
+      expect(get_questionnaire("AuthorFeedbackQuestionnaire2").first).to have_attributes(:notification_limit => 50)
+    end
+  end
+
+    #TeammateReviewQuestionnaire
+    describe "Edit teammate review in rubric" do
+    it "should update questionnaire", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit'
+      find_link('Rubrics').click
+      within("tr#questionnaire_table_TeammateReviewQuestionnaire") do
+        select "TeammateReviewQuestionnaire2", :from => 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+      end
+      click_button 'Save'
+      expect(get_questionnaire("TeammateReviewQuestionnaire2")).to exist
+    end
+    it "should update use dropdown", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit'
+      find_link('Rubrics').click
+      within("tr#questionnaire_table_TeammateReviewQuestionnaire") do
+        select "TeammateReviewQuestionnaire2", :from => 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+        uncheck('dropdown')
+      end
+      click_button 'Save'
+      pending("can't find where this value is used")
+      expect(get_questionnaire("TeammateReviewQuestionnaire2").first).to have_attributes(:dropdown => false)
+    end
+    it "should update scored question dropdown", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit'
+      find_link('Rubrics').click
+      within("tr#questionnaire_table_TeammateReviewQuestionnaire") do
+        select "TeammateReviewQuestionnaire2", :from => 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+        select "Scale", :from => 'assignment_form[assignment_questionnaire][][dropdown]'
+      end
+      click_button 'Save'
+      pending("can't find where this value is used")
+      expect(get_questionnaire("TeammateReviewQuestionnaire2").first).to have_attributes(:scored_question_display_type => false)
+    end
+    it "should update weight", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit'
+      find_link('Rubrics').click
+      within("tr#questionnaire_table_TeammateReviewQuestionnaire") do
+        select "TeammateReviewQuestionnaire2", :from => 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+        fill_in 'assignment_form[assignment_questionnaire][][questionnaire_weight]', :with => '50'
+      end
+      click_button 'Save'
+      expect(get_questionnaire("TeammateReviewQuestionnaire2").first).to have_attributes(:questionnaire_weight => 50)
+    end
+    it "should update notification limit", js: true do
+      login_as("instructor6")
+      visit '/assignments/1/edit'
+      find_link('Rubrics').click
+      within("tr#questionnaire_table_TeammateReviewQuestionnaire") do
+        select "TeammateReviewQuestionnaire2", :from => 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+        fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', :with => '50'
+      end
+      click_button 'Save'
+      expect(get_questionnaire("TeammateReviewQuestionnaire2").first).to have_attributes(:notification_limit => 50)
     end
 
-#Author Feedback
-    it "should update author feedback questionnaire", js: true do
-      login_as("instructor6")
-      visit '/assignments/1/edit#tabs-3'
-      sleep 1
-      choose_a_field('author feedback', 'questionnaire')
-      click_button 'Save'
-      expect(page).to have_content("Assignment was successfully saved.")
-    end
-    it "should update author feedback use dropdown", js: true do
-      login_as("instructor6")
-      visit '/assignments/1/edit#tabs-3'
-      sleep 1
-      choose_a_field('author feedback', 'usedropdown')
-      click_button 'Save'
-      visit '/assignments/1/edit#tabs-3'
-      expect(page).to have_content("Assignment was successfully saved.")
-    end
-    it "should update author feedback scored question", js: true do
-      login_as("instructor6")
-      visit '/assignments/1/edit#tabs-3'
-      sleep 1
-      choose_a_field('author feedback', 'scored_question')
-      click_button 'Save'
-      visit '/assignments/1/edit#tabs-3'
-      expect(page).to have_content("Assignment was successfully saved.")
-    end
-    it "should update author feedback weight", js: true do
-      login_as("instructor6")
-      visit '/assignments/1/edit#tabs-3'
-      sleep 1
-      choose_a_field('author feedback', 'weight')
-      click_button 'Save'
-      visit '/assignments/1/edit#tabs-3'
-      expect(page).to have_content("Assignment was successfully saved.")
-    end
-    it "should update author feedback notify limit", js: true do
-      login_as("instructor6")
-      visit '/assignments/1/edit#tabs-3'
-      sleep 1
-      choose_a_field('author feedback', 'notify_limit')
-      click_button 'Save'
-      visit '/assignments/1/edit#tabs-3'
-      expect(page).to have_content("Assignment was successfully saved.")
-    end
-
-#Teammate Review
-    it "should update teammate review questionnaire", js: true do
-      login_as("instructor6")
-      visit '/assignments/1/edit#tabs-3'
-      sleep 1
-      choose_a_field('teammate review', 'questionnaire')
-      click_button 'Save'
-      expect(page).to have_content("Assignment was successfully saved.")
-    end
-    it "should update teammate review use dropdown", js: true do
-      login_as("instructor6")
-      visit '/assignments/1/edit#tabs-3'
-      sleep 1
-      choose_a_field('teammate review', 'usedropdown')
-      click_button 'Save'
-      visit '/assignments/1/edit#tabs-3'
-      expect(page).to have_content("Assignment was successfully saved.")
-    end
-    it "should update teammate review scored question", js: true do
-      login_as("instructor6")
-      visit '/assignments/1/edit#tabs-3'
-      sleep 1
-      choose_a_field('teammate review', 'scored_question')
-      click_button 'Save'
-      visit '/assignments/1/edit#tabs-3'
-      expect(page).to have_content("Assignment was successfully saved.")
-    end
-    it "should update teammate review weight", js: true do
-      login_as("instructor6")
-      visit '/assignments/1/edit#tabs-3'
-      sleep 1
-      choose_a_field('teammate review', 'weight')
-      click_button 'Save'
-      visit '/assignments/1/edit#tabs-3'
-      expect(page).to have_content("Assignment was successfully saved.")
-    end
-    it "should update teammate review notify limit", js: true do
-      login_as("instructor6")
-      visit '/assignments/1/edit#tabs-3'
-      sleep 1
-      choose_a_field('teammate review', 'notify_limit')
-      click_button 'Save'
-      visit '/assignments/1/edit#tabs-3'
-      expect(page).to have_content("Assignment was successfully saved.")
-    end
   end
 
 end

@@ -1041,6 +1041,39 @@ FactoryGirl.define do
     instruction_loc nil
   end
 
+  factory :metareview_questionnaire, class:MetareviewQuestionnaire do
+    name 'Test questionaire'
+    instructor {User.where(role_id: 1).first || association(:instructor)}
+    private 0
+    min_question_score 0
+    max_question_score 5
+    type 'MetareviewQuestionnaire'
+    display_type 'Review'
+    instruction_loc nil
+  end
+
+  factory :author_feedback_questionnaire, class:AuthorFeedbackQuestionnaire do
+    name 'Test questionaire'
+    instructor {User.where(role_id: 1).first || association(:instructor)}
+    private 0
+    min_question_score 0
+    max_question_score 5
+    type 'AuthorFeedbackQuestionnaire'
+    display_type 'Review'
+    instruction_loc nil
+  end
+
+  factory :teammate_review_questionnaire, class:TeammateReviewQuestionnaire do
+    name 'Test questionaire'
+    instructor {User.where(role_id: 1).first || association(:instructor)}
+    private 0
+    min_question_score 0
+    max_question_score 5
+    type 'TeammateReviewQuestionnaire'
+    display_type 'Review'
+    instruction_loc nil
+  end
+
   factory :question, class:Question do
     txt 'Test question:'
     weight 1

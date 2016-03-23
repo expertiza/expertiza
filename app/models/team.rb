@@ -180,7 +180,7 @@ class Team < ActiveRecord::Base
   end
 
   #REFACTOR BEGIN:: class methods import export moved from course_team & assignment_team to here
-  def self.import(row, id, options,course)
+  def self.import(row, id, options,teamtype)
     raise ArgumentError, "Not enough fields on this line" if (row.length < 2 && options[:has_column_names] == "true") || (row.length < 1 && options[:has_column_names] != "true")
 
 
@@ -188,33 +188,39 @@ class Team < ActiveRecord::Base
       name = row[0].to_s.strip
       team = where(["name =? && parent_id =?", name, id]).first
       team_exists = !team.nil?
-      name = handle_duplicate(team, name, id, options[:handle_dups],course)
+      name = handle_duplicate(team, name, id, options[:handle_dups],teamtype)
       index = 1
     else
-      if course
+      if teamtype.is_a?(CourseTeam)
         name = self.generate_team_name(Course.find(id).name)
-      else
+      elsif teamtype.is_a?(AssignmentTeam)
         name = self.generate_team_name(Assignment.find(id).name)
       end
       index = 0
     end
 
-
     if name
-      if course
-        team = Team.create_team_and_node(id,true)
-      else
-        team = Team.create_team_and_node(id,false)
-      end
+      team = Team.create_team_and_node(id,teamtype)
       team.name = name
       team.save
     end
+
+
+    # if name
+    # #   if course
+    # #     team = Team.create_team_and_node(id,true)
+    # #   else
+    #     team = Team.create_team_and_node(id,assignmentteam)
+    # #   end
+    #    team.name = name
+    #    team.save
+    #  end
 
     # insert team members into team unless team was pre-existing & we ignore duplicate teams
     team.import_team_members(index, row) if !(team_exists && options[:handle_dups] == "ignore")
   end
 
-  def self.handle_duplicate(team, name, id, handle_dups, course)
+  def self.handle_duplicate(team, name, id, handle_dups, teamtype)
     if team.nil? #no duplicate
       return name
     end
@@ -223,9 +229,9 @@ class Team < ActiveRecord::Base
       return nil
     end
     if handle_dups == "rename" #rename: rename new team
-      if course
+      if teamtype.is_a?(CourseTeam)
         return self.generate_team_name(Course.find(id).name)
-      else
+      elsif teamtype.is_a?(AssignmentTeam)
         return self.generate_team_name(Assignment.find(id).name)
       end
     end
@@ -237,10 +243,10 @@ class Team < ActiveRecord::Base
     end
   end
 
-  def self.export(csv, parent_id, options, course)
-    if course
+  def self.export(csv, parent_id, options, teamtype)
+    if teamtype.is_a?(CourseTeam)
       teams = CourseTeam.where(["parent_id =?", parent_id])
-    else
+    elsif teamtype.is_a?(AssignmentTeam)
       teams = AssignmentTeam.where(["parent_id =?", parent_id])
     end
     teams.each do |team|
@@ -257,13 +263,13 @@ class Team < ActiveRecord::Base
     end
   end
 
-  def self.create_team_and_node(id,course)
-    if course
+  def self.create_team_and_node(id,teamtype)
+    if teamtype.is_a?(CourseTeam)
       curr_course = Course.find(id)
       team_name = Team.generate_team_name(curr_course.name)
       team = CourseTeam.create(name: team_name, parent_id: id)
       TeamNode.create(parent_id: id, node_object_id: team.id)
-    else
+    elsif teamtype.is_a?(AssignmentTeam)
       curr_assignment = Assignment.find(id)
       team_name = Team.generate_team_name(curr_assignment.name)
       team = AssignmentTeam.create(name: team_name, parent_id: id)

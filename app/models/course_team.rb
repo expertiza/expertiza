@@ -5,9 +5,9 @@ class CourseTeam < Team
   #   currently they are being called: member, participant, user, etc...
   #   suggestion: refactor all to participant
 
-  def participant_type
-    "CourseParticipant"
-  end
+  # def participant_type
+  #   "CourseParticipant"
+  # end
 
   def get_parent_model
     "Course"
@@ -20,6 +20,10 @@ class CourseTeam < Team
   # since this team is not an assignment team, the assignment_id is nil.
   def assignment_id
     nil
+  end
+
+  def self.prototype
+    CourseTeam.new
   end
 
   def copy(assignment_id)
@@ -40,11 +44,13 @@ class CourseTeam < Team
 
   def self.import(row, course_id, options)
     raise ImportError, "The course with id \""+id.to_s+"\" was not found. <a href='/course/new'>Create</a> this course?" if Course.find(course_id) == nil
-    Team.import(row,course_id,options,true)
+    @courseteam = prototype
+    Team.import(row,course_id,options,@courseteam)
   end
 
   def self.export(csv, parent_id, options)
-    Team.export(csv,parent_id,options,true)
+    @courseteam = prototype
+    Team.export(csv,parent_id,options,@courseteam)
   end
 
   #REFACTOR END:: functionality of import, export, handle_duplicate shifted to team.rb

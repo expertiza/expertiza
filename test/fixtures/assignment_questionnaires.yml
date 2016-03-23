@@ -1,0 +1,8 @@
+<% assignments = [] %>
+<% assignments << ActiveRecord::FixtureSet.identify(:assignment1) %>
+<% questionnaires = [] %>
+<% questionnaires << ActiveRecord::FixtureSet.identify(:questionnaire0) %>
+assignmentquestionnaire:
+  assignment_id: <%= assignments[0] %>
+  questionnaire_id: <%= questionnaires[0] %>
+#  user_id:

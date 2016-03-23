@@ -4,7 +4,7 @@ class SelfReviewResponseMapTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end
-  fixtures :questionnaires, :assignments
+  fixtures :questionnaires, :assignments, :assignment_questionnaires, :participants
 
   # Replace this with your real tests.
 

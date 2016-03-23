@@ -1,6 +1,6 @@
 superadmin:
   name: suadmin
-  parent_id: <%= ActiveRecord::FixtureSet.identify(:superadmin) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:admin) %>
   crypted_password: <%= Digest::SHA1.hexdigest("suadmin") %>
   email: suadmin@mailinator.com
   password_salt:
@@ -12,7 +12,7 @@ superadmin:
 
 admin:
   name: admin
-  parent_id: <%= ActiveRecord::FixtureSet.identify(:admin) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:instructor1) %>
   crypted_password: <%= Digest::SHA1.hexdigest("admin") %>
   password_salt: ""
   email: admin@mailinator.com
@@ -23,7 +23,7 @@ admin:
 
 instructor1:
   name: instructor6
-  parent_id: <%= ActiveRecord::FixtureSet.identify(:admin) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:ta1) %>
   fullname: instructor1_fullname
   crypted_password: <%= Digest::SHA1.hexdigest("instructor1") %>
   password_salt: ""
@@ -35,7 +35,7 @@ instructor1:
 
 ta1:
   name: ta1
-  parent_id: <%= ActiveRecord::FixtureSet.identify(:instructor1) %>
+  parent_id: <%= ActiveRecord::FixtureSet.identify(:student571) %>
   fullname: teaching_assistant1
   crypted_password: <%= Digest::SHA1.hexdigest("ta1") %>
   password_salt:
@@ -49,7 +49,6 @@ ta1:
 
 student1:
   name: student1
-  parent_id: <%= ActiveRecord::FixtureSet.identify(:instructor1) %>
   fullname: last,first
   crypted_password: <%= Digest::SHA1.hexdigest("student1") %>
   password_salt:
@@ -62,13 +61,16 @@ student1:
   handle: stu1
   is_new_user: 0
 
-admin_test:
-  name: admin_test
-  parent_id: <%= ActiveRecord::FixtureSet.identify(:admin) %>
-  crypted_password: <%= Digest::SHA1.hexdigest("admin_test") %>
-  email: admin_test@mailinator.com
+student571:
+  id: 571
+  fullname: last,first
+  crypted_password: <%= Digest::SHA1.hexdigest("student1") %>
   password_salt:
-  role_id: <%= ActiveRecord::FixtureSet.identify(:Administrator_role) %>
+  email: student1@mailinator.com
+  role_id: <%= ActiveRecord::FixtureSet.identify(:Student_role) %>
   email_on_review: 1
   email_on_submission: 1
   email_on_review: 1
+  master_permission_granted: 1
+  handle: stu1
+  is_new_user: 0

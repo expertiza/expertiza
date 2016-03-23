@@ -529,7 +529,7 @@ class ReviewMappingController < ApplicationController
           unsorted_teams_hash[response_map.reviewee_id] += 1
         end
       end 
-      teams_hash = unsorted_teams_hash.sort_by{|_, v| v}.to_h
+      teams_hash = unsorted_teams_hash.sort_by{|k, v| v}.to_h
       participants_with_insufficient_review_num.each do |participant_id|
         teams_hash.each do |team_id, num_review_received|
           unless TeamsUser.exists?(team_id: team_id, user_id: Participant.find(participant_id).user_id)

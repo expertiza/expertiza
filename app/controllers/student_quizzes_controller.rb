@@ -47,7 +47,6 @@ class StudentQuizzesController < ApplicationController
     quizzes
   end
 
-  # the way 'answers' table store the results of quiz
   def calculate_score map, response
     questionnaire = Questionnaire.find(map.reviewed_object_id)
     scores = Array.new

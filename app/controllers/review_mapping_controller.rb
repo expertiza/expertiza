@@ -529,13 +529,13 @@ class ReviewMappingController < ApplicationController
           unsorted_teams_hash[response_map.reviewee_id] += 1
         end
       end 
-      teams_hash = unsorted_teams_hash.sort_by{|k, v| v}.to_h
+      teams_hash = unsorted_teams_hash.sort_by{|_k, v| v}.to_h
       participants_with_insufficient_review_num.each do |participant_id|
         teams_hash.each do |team_id, num_review_received|
           unless TeamsUser.exists?(team_id: team_id, user_id: Participant.find(participant_id).user_id)
             ReviewResponseMap.where(:reviewee_id => team_id, :reviewer_id => participant_id, :reviewed_object_id => assignment_id).first_or_create
             teams_hash[team_id] += 1
-            teams_hash = teams_hash.sort_by{|k, v| v}.to_h
+            teams_hash = teams_hash.sort_by{|_k, v| v}.to_h
             break
           end
         end
@@ -594,7 +594,7 @@ class ReviewMappingController < ApplicationController
     when "Calibration"
       if AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first.nil?
         AssignmentParticipant.create(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
-	end
+		end
       @assignment = Assignment.find(params[:id])
       @review_questionnaire_ids = ReviewQuestionnaire.select("id")
       @assignment_questionnaire = AssignmentQuestionnaire.where(["assignment_id = ? and questionnaire_id IN (?)", params[:id], @review_questionnaire_ids]).first

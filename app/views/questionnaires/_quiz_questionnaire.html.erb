@@ -10,7 +10,7 @@
     </tr>
   </table>
   <br/>
-  <% if @questionnaire.type == 'QuizQuestionnaire' %>        
+  <% if @questionnaire.type == 'QuizQuestionnaire' %>
   <!--handle a questionnaire differently if it is a quiz-->
     <table id="questions_table">
       <% if $disp_flag != 1 %>
@@ -22,48 +22,9 @@
       <% end %>
 
       <% for @question in @questionnaire.questions %>
-          <% questionnum=@question.id %>
-        <tr>
-          <% if $disp_flag != 1 %>
-            <td > <%= text_area "question[]", 'txt', :cols=>100 %></td>
-          <% end %>
-          <%  @quiz_question_choices = QuizQuestionChoice.where(question_id: @question.id) %>
-
-        </tr>
-        <% i=1 %>
-
-        <% for @quiz_question_choice in @quiz_question_choices %>
-          <tr>
-          <td>
-            &nbsp;&nbsp;&nbsp;
-              <% if @question.type=="MultipleChoiceCheckbox" %>
-                  <%= hidden_field_tag("quiz_question_choices[#{questionnum}][MultipleChoiceCheckbox][#{i}][iscorrect]",'0') %>
-                  <%= check_box_tag("quiz_question_choices[#{questionnum}][MultipleChoiceCheckbox][#{i}][iscorrect]",'1', @quiz_question_choice.iscorrect) %>
-                  &nbsp;<%= text_field_tag "quiz_question_choices[#{questionnum}][MultipleChoiceCheckbox][#{i}][txt]", @quiz_question_choice.txt, :size=>40 %>
-
-              <% end %>
-
-              <%if @question.type=="MultipleChoiceRadio" %>
-                <%= radio_button_tag("quiz_question_choices[#{questionnum}][MultipleChoiceRadio][correctindex]", "#{i}", @quiz_question_choice.iscorrect)%>
-                &nbsp;<%= text_field_tag "quiz_question_choices[#{questionnum}][MultipleChoiceRadio][#{i}][txt]", @quiz_question_choice.txt, :size=>40 %>
-              <% end %>
-
-              <%if @question.type=="TrueFalse" %>
-                <% if @quiz_question_choice.txt=="True"%>
-                  <%= radio_button_tag("quiz_question_choices[#{questionnum}][TrueFalse][1][iscorrect]", 'True', @quiz_question_choice.iscorrect) %>   True
-                <%end%>
-
-                <% if @quiz_question_choice.txt=="False"%>
-                    <%= radio_button_tag("quiz_question_choices[#{questionnum}][TrueFalse][1][iscorrect]", 'False', @quiz_question_choice.iscorrect) %>   False
-                <%end%>
-              <% end %>
-          </td>
-          </tr>
-          <% i+=1 %>
-        <%end %>
-
+      <% i=1 %>
+         <%= @question.edit(i) %>
       <% end %>
-    </table> 
+    </table>
   <% end %>
 <BR/>
-

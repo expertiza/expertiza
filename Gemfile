@@ -1,4 +1,4 @@
-heroku_java_home = '/usr/lib/jvm/java-7-openjdk-amd64/jre/'
+heroku_java_home = '/usr/lib/jvm/java-7-openjdk-amd64'
 ENV['JAVA_HOME'] = heroku_java_home if Dir.exist?(heroku_java_home)
 source 'http://rubygems.org'
 

@@ -125,7 +125,7 @@ Hello world! ')
    end
 
     it 'Student should aceept the invitation sent by the other student and both have topics' do
-       visit '/invitation/accept?inv_id=1&student_id=1&team_id=0'
+       visit '/invitation/accept?inv_id=1&student_id=1&team_id=2'
        expect(page).to have_content('Team Name: final2_Team1')
      end
 
@@ -177,7 +177,8 @@ Hello world! ')
       expect(page).to have_content('final2')
       
       click_link 'final2'
-      visit '/student_teams/view?student_id=2'
+      # student_id below is the participant_id
+      visit '/student_teams/view?student_id=1'
     end
 
     it 'Student should accept other students invitation and both does not have a topic' do
@@ -235,7 +236,7 @@ Hello world! ')
     end
 
    it 'Student should accept the invitation sent by other student who has a topic' do
-    visit '/invitation/accept?inv_id=1&student_id=1&team_id=0'
+    visit '/invitation/accept?inv_id=1&student_id=1&team_id=1'
     expect(page).to have_content('team1')
    end
 

@@ -896,7 +896,7 @@ FactoryGirl.define do
     handle "handle"
     leaderboard_privacy false 
     digital_certificate  nil 
-    timezonepref nil
+    timezonepref "Eastern Time (US & Canada)" #Careful, this is checked for using nested set in controllers. If it's the only user or no users have a timezone there are issues.
     public_key nil
     copy_of_emails  false
   end

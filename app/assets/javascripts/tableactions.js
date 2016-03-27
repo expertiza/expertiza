@@ -23,7 +23,7 @@ function alternate(id){
 function toggleElement(elementId, linkText) {	
   var obj = document.getElementById(elementId);
   if (obj == null) { return; }	
-  var bExpand = obj.style.display.length == 0;
+  var bExpand = obj.style.display.length == 0;	
   obj.style.display = (bExpand ? 'none' : '');           
   var objLinks = document.getElementsByName(elementId+'Link')
     for (var i = 0; i < objLinks.length; i++) {

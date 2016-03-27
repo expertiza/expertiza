@@ -26,24 +26,23 @@ class Response < ActiveRecord::Base
     # TeamResponseMap for a team assignment.  Someone who understands the
     # situation better could add to the code later.
     if self.map.type.to_s == 'FeedbackResponseMap'
-      identifier += "<H3>Feedback from author</H3>"
+      identifier += "<H2>Feedback from author</H2>"
     end
     if prefix #has prefix means view_score page in instructor end
-      identifier += "<B>Reviewer: </B>" +self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')<br>'
-      identifier += '<B>Round: ' + count.to_s+'</B>'
+      identifier += "<B>Reviewer: </B>" +self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
       str = prefix+"_"+self.id.to_s
     else #in student end
       identifier += '<B>Round: ' + count.to_s+'</B>'
       str = self.id.to_s
     end
-    code = identifier+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+str+'Link" onClick="toggleElement('+"'review_"+str+"','review'"+');return false;">show review</a><BR/>'
+    code = identifier+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+str+'Link" onClick="toggleElement('+"'review_"+str+"','review'"+');return false;">hide review</a><BR/>'
     code += "<B>Last reviewed: </B> "
     if self.updated_at.nil?
       code += "Not available"
     else
       code += self.updated_at.strftime('%A %B %d %Y, %I:%M%p')
     end
-    code += '<div id="review_'+str+'" style="display: none;"><BR/>'
+    code += '<div id="review_'+str+'" style=""><BR/>'
 
     count = 0
     answers = Answer.where(response_id: self.response_id)
@@ -70,7 +69,7 @@ class Response < ActiveRecord::Base
     else
       comment = ''
     end
-    code += "<big><B>Additional Comment:</B></big><BR/>"+comment+"</div>"
+    code += "<B>Additional Comment:</B><BR/>"+comment+"</div>"
     return code.html_safe
   end
 

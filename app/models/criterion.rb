@@ -2,6 +2,7 @@ class Criterion < ScoredQuestion
   validates_presence_of :size
 
   #This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
+
   def edit(count)
     html ='<tr>'
     html+='<td align="center"><a rel="nofollow" data-method="delete" href="/questions/' +self.id.to_s+ '">Remove</a></td>'
@@ -17,6 +18,7 @@ class Criterion < ScoredQuestion
   end
 
   #This method returns what to display if an instructor (etc.) is viewing a questionnaire
+
   def view_question_text
     html = '<TR><TD align="left"> '+self.txt+' </TD>'
     html += '<TD align="left">'+self.type+'</TD>'
@@ -31,6 +33,7 @@ class Criterion < ScoredQuestion
     html += '</TR>'
     html.html_safe
   end
+
 
   def complete(count, answer=nil, questionnaire_min, questionnaire_max, dropdown_or_scale)
   	if self.size.nil?

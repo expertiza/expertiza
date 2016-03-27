@@ -30,59 +30,73 @@
     <!--And if one reviewer did not do first-round review and did second round directly, Expertiza will display only second round.-->
     <!--If another reviewer only finished first-round review and did not do second round, Expertiza will display only first round.-->
     <!--If this assignment does not support varying rubrics by round, Expertiza will display last round review.--> 
-    <% for review in rscore[:assessments].reverse.uniq{|response| response.map_id}.reverse %>
+    <% rscore[:assessments].uniq!{|response| response.map_id} if @assignment.varying_rubrics_by_round? %>
+    <% for review in rscore[:assessments] %>
         <% review_feedback = nil %>
         <% count = count + 1 %>
-        <% prefix = nil if controller.action_name == "view_my_scores" %>
-
-        <h3>Review <%= count %></h3>
-        <!--<%= review.display_as_html(nil, count) %><BR/>-->
-        <!--change code in order to compat to multi-round review-->
-        <% if @assignment.varying_rubrics_by_round? and !review.round.nil? %>
-            <% review_symbol = 'review' + review.round.to_s %>
+        <% if controller.action_name != "view_my_scores" %>
+            <h2>Review <%= count %></h2><BR/>
+            <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a><%= review.display_as_html(prefix, count) %>
+            <BR/><HR/>
         <% else %>
-            <% review_symbol = 'review' %>
-        <% end %>
-        <% @questions[review_symbol.to_sym].each do |question| %>
-            <% if question.instance_of? UploadFile %>
-                <!-- Display FileUpload question type -->
-                <% current_folder = DisplayOption.new %>
-                <% current_folder.name = "" %>
-                <% files = @participant.files(@participant.review_file_path(review.response_map.id).to_s + current_folder.name) %>
-                <%= display_directory_tree(@participant, files, true).html_safe %>
+            <h2>Review <%= count %></h2><BR/>
+            <!--<%= review.display_as_html(nil, count) %><BR/>-->
+            <!--change code in order to compat to multi-round review-->
+            <% if @assignment.varying_rubrics_by_round? and !review.round.nil? %>
+                <% review_symbol = 'review' + review.round.to_s %>
+            <% else %>
+                <% review_symbol = 'review' %>
             <% end %>
-        <% end %>
-
-        <!-- get all previous versions, and pick up each round's last verson of peer review. -->
-        <% @sorted_array = Array.new %>
-        <% @prev = review.map.response.select{|response| response.is_submitted} %>
-        <% @prev_review_rounds = Array.new %>
-        <% @prev.each{|response| @prev_review_rounds << response.round unless @prev_review_rounds.include?(response.round) and response.is_submitted} %>
-        <% @prev_review_rounds.delete_at(@prev_review_rounds.length - 1) if review.round == @prev_review_rounds.last %>
-        <% unless @prev_review_rounds.empty? %>
-            <% @prev_review_rounds.each do |round| %>
-                <% @sorted_array << @prev.select{|response| response.round == round}.sort.last %>
+            <% @questions[review_symbol.to_sym].each do |question| %>
+                <% if question.instance_of? UploadFile %>
+                    <!--Display FileUpload question type-->
+                    <% current_folder = DisplayOption.new %>
+                    <% current_folder.name = "" %>
+                    <% files = @participant.files(@participant.review_file_path(review.response_map.id).to_s + current_folder.name) %>
+                    <%= display_directory_tree(@participant, files, true).html_safe %>
+                <% end %>
             <% end %>
-        <% end %>
-        <% @sorted_array << review %>
 
-        <% @sorted_array.each_with_index do |response, index| %>
-            <% @str = response.id.to_s %>
-            <% round = 1 %>
-            <% (response.round.nil? or response.round == 0)? round = 1 : round = response.round %>
-            <%= response.display_as_html(prefix, round, nil) %><br/>
-            <script>toggleElement('reviews_<%=@str%>','review');</script>
+            <!-- get all previous versions -->
+            <% @sorted_array=Array.new %>
+            <% @prev=review.map.response %>
+            <%for element in @prev %>
+                <%if(element.map_id==review.map.id &&  element.is_submitted)%>
+                    <%array_not_empty=1 %>
+                    <% @sorted_array << element %>
+                <% end %>
+            <% end %>
+            <% @sorted=@sorted_array.sort %>
+            <% if !@assignment.varying_rubrics_by_round? and @sorted_array.size > 0%>
+                <% @sorted.clear %>
+                <% @sorted << @sorted_array.sort.last %>
+            <% end %>
+            <% if @sorted.size > 0 %>
+                <% for i in 0..@sorted.size-1 %>
+                    <% @str = @sorted[i].id.to_s %>
+                    <%= @sorted[i].display_as_html(nil,i+1, nil) %><br/>
+                    <script>
+                        toggleElement('reviews_<%=@str%>','review');
+                    </script>
+                <% end %>
+                <!-- keep only latest version open -->
+                <% for i in 0..@sorted.size-1 %>
+                    <% @str = @sorted[i].id.to_s %>
+                    <script>
+                        toggleElement('review_<%=@str%>','review')
+                    </script>
+                <% end %>
+            <% end %>
+            <% map = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
+                review_feedbacks = map.try :response %>
+            <% if review_feedbacks && !review_feedbacks.empty? %>
+                <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedbacks.first.id %> or
+                <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedbacks.first.id, :return => "feedback" %> feedback for Review <%= count %>
+            <% else %>
+                <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
+            <% end %>
+            <BR/><HR/>
         <% end %>
-
-        <% map = FeedbackResponseMap.find_by_reviewed_object_id(review.id)
-            review_feedbacks = map.try :response %>
-        <% if review_feedbacks && !review_feedbacks.empty? %>
-            <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedbacks.first.id %> or
-            <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedbacks.first.id, :return => "feedback" %> feedback for Review <%= count %>
-        <% else %>
-            <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
-        <% end %>
-        <hr>  
     <% end %>
 <% else %>
     <i>No reviews have been completed for this user's submissions.</i>

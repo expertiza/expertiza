@@ -17,6 +17,7 @@
     <% candidate_quizzes = StudentQuizzesController.take_quiz(assignment.id, session[:user].id) %>
 
     <% if assignment.has_topics? && !candidate_quizzes.empty? %>
+
     <p><b>Select a topic below to take a new quiz:</b></p>
 
     <table cellpadding="0" id="quiz_list">
@@ -31,6 +32,7 @@
     </table>
 
     <p><input type='submit' value='Request a new quiz to take'/></p>
-  <% end %>
+
+    <% end %>
 
 <% end %>

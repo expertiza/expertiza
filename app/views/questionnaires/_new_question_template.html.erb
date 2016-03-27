@@ -24,6 +24,7 @@
   <div id="qtype<%= i %>">
     <%= radio_button("question_type[#{i}]","type", "MultipleChoiceRadio") %> Multiple Choice - Radio button<br>
     <%= radio_button("question_type[#{i}]","type", "MultipleChoiceCheckbox") %> Multiple Choice - Checkboxes <br>
+    <%= radio_button("question_type[#{i}]","type", "TrueFalse") %> True/False <br><br>
   </div>
 
 <% end %>

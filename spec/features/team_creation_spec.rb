@@ -62,11 +62,13 @@ Hello world! ')
 
    it 'is able to accept the invitation and form team' do
      visit '/invitation/accept?inv_id=1&student_id=1&team_id=0'
+     visit '/student_teams/view?student_id=1'
      expect(page).to have_content('Team Name: final2_Team1')
    end
 
     it 'is not able to form team on rejecting' do
      visit '/invitation/decline?inv_id=1&student_id=1'
+     visit '/student_teams/view?student_id=1'
      expect(page).to have_content('You no longer have a team!')
     end
   end
@@ -126,11 +128,13 @@ Hello world! ')
 
     it 'Student should aceept the invitation sent by the other student and both have topics' do
        visit '/invitation/accept?inv_id=1&student_id=1&team_id=2'
+       visit '/student_teams/view?student_id=1'
        expect(page).to have_content('Team Name: final2_Team1')
      end
 
      it 'student should reject the invitation sent by the other student and both gave topics' do
        visit '/invitation/decline?inv_id=1&student_id=1'
+       visit '/student_teams/view?student_id=1'
        expect(page).to have_content('Team Name: final2_Team2')
      end
   end
@@ -183,11 +187,13 @@ Hello world! ')
 
     it 'Student should accept other students invitation and both does not have a topic' do
       visit '/invitation/accept?inv_id=1&student_id=1&team_id=0'
+      visit '/student_teams/view?student_id=1'
       expect(page).to have_content('team1')
     end
 
     it "Student should reject the other students invitaton and both dont have a topic" do
      visit '/invitation/decline?inv_id=1&student_id=1'
+     visit '/student_teams/view?student_id=1'
      expect(page).to have_content('You no longer have a team!')
      end
     end
@@ -237,12 +243,13 @@ Hello world! ')
 
    it 'Student should accept the invitation sent by other student who has a topic' do
     visit '/invitation/accept?inv_id=1&student_id=1&team_id=1'
+    visit '/student_teams/view?student_id=1'
     expect(page).to have_content('team1')
    end
 
    it "Student should reject the inviattion sent by the other student who has a topic" do
-
     visit '/invitation/decline?inv_id=1&student_id=1'
+    visit '/student_teams/view?student_id=1'
     expect(page).to have_content('Team Name: final2_Team1')
    end
   end

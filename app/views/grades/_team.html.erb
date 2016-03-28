@@ -24,6 +24,7 @@
      <%= render :partial => 'grades/participant',
                 :locals => {:prefix => prefix+"_"+pindex.to_s,
      	 			                :team => true,
+                            :participant_id => participant.id,
                             :index => index,
                             :team_size => tscore[:team].participants.size,
                             :pscore => @scores[:participants][participant.id.to_s.to_sym]} %>  

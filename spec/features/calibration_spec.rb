@@ -365,8 +365,7 @@ describe 'Create and Display Calibration' do
     #pick a due date for the review
     #TOD0: change this to actually be tomorrow, or put into factory
     page.execute_script("$('#datetimepicker_review_round_1').val('2099/03/20 15:29 (UTC -04:00)')")
-    within('#review_round_1')do
-      select 'Yes', from: "assignment_form[due_date][][submission_allowed_id]"
+    within('#review_round_1')do select 'Yes', from: "assignment_form[due_date][][submission_allowed_id]"
     end
     #have to save the questionnaire assignment
     click_on("Save")
@@ -598,7 +597,6 @@ describe 'Reviewer' do
 
     #Edit assignment route
     visit edit_assignment_path @assignment
-    save_and_open_page
 
     click_on('Review strategy')
 

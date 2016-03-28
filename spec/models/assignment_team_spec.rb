@@ -3,7 +3,9 @@ require 'rails_helper'
 RSpec.describe AssignmentTeam, type: :model do
   # pending "add some examples to (or delete) #{__FILE__}"
 
-  let(:team){AssignmentTeam.new name: "Wikipedia contribution_Team2", parent_id: 754, type: "AssignmentTeam", submitted_hyperlinks: "---\n- http://water.com\n- http://shed.com" }
+ # let(:team){AssignmentTeam.new name: "Wikipedia contribution_Team2", parent_id: 754, type: "AssignmentTeam", submitted_hyperlinks: "---\n- http://water.com\n- http://shed.com" }
+
+  let(:team){FactoryGirl.create(:team)}
 
   describe "#hyperlinks" do
 
@@ -17,7 +19,6 @@ RSpec.describe AssignmentTeam, type: :model do
    end
 
   end
-
   before(:each) do
     @my_submitted_hyperlinks = team.submitted_hyperlinks.split("\n")
   end

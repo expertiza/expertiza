@@ -7,7 +7,7 @@ gem 'rails', '~> 4.2.1'
 ## Gems in Alphabetical Order
 
 gem 'activerecord-session_store'
-gem 'aspell-heroku'
+#gem 'aspell-heroku'
 gem 'awesome_nested_set'
 gem 'bind-it'
 gem 'capistrano'

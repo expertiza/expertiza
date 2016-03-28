@@ -6,7 +6,11 @@
 <TABLE class="grades" >
 <%= render :partial => 'grades/participant_charts', :locals => {:prefix => nil} %> 
 <%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>                      
-<%= render :partial => 'grades/participant', :locals => {:prefix => 'user',  :team => false, :pscore => @pscore} %>                                                                                   
+<%= render :partial => 'grades/participant', :locals => {:prefix => 'user',
+														 :team => false,
+														 :index => 0,
+                            	   						 :team_size => 1, 
+														 :pscore => @pscore} %>                                                                                   
 </TABLE>
 <BR/>
 <a href="javascript:window.history.back()">Back</a>

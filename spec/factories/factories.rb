@@ -1077,4 +1077,5 @@ FactoryGirl.define do
     round nil
     is_submitted false
   end
+
 end

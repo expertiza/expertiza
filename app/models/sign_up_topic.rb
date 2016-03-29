@@ -143,4 +143,16 @@ class SignUpTopic < ActiveRecord::Base
     return false if sign_up_topics.size == all_topics.size
     return true
   end
+
+  def users_on_waiting_list
+    waitlisted_signed_up_teams = SignedUpTeam.where(topic_id:self.id, is_waitlisted:1)
+    waitlisted_users = Array.new
+    if !waitlisted_signed_up_teams.blank?
+      waitlisted_signed_up_teams.each do |waitlisted_signed_up_team|
+        assignment_team = AssignmentTeam.find(waitlisted_signed_up_team.team_id)
+        waitlisted_users << assignment_team.users
+      end
+    end
+    waitlisted_users.flatten
+  end
 end

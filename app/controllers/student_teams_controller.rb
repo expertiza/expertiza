@@ -52,6 +52,14 @@ class StudentTeamsController < ApplicationController
       end
     end
 
+    current_team = @student.team
+
+    if @student.assignment.has_topics? && current_team && current_team.topic
+      @users_on_waiting_list = SignUpTopic.find(current_team.topic).users_on_waiting_list
+    else
+      @users_on_waiting_list = nil
+    end
+
     @teammate_review_allowed = true if @student.assignment.find_current_stage=='Finished' || @current_due_date&&(@current_due_date.teammate_review_allowed_id ==3 ||@current_due_date.teammate_review_allowed_id ==2) #late(2) or yes(3)
   end
 
@@ -168,8 +176,6 @@ class StudentTeamsController < ApplicationController
       undo_link "Team \"#{team.name}\" has been updated successfully. "
     end
   end
-
-
 
   def review
     @assignment = Assignment.find params[:assignment_id]

@@ -345,6 +345,7 @@ describe "assignment function" do
 
 #Begin review strategy tab
   describe "review strategy tab", js:true do
+
     before(:each) do
       @assignment = create(:assignment, name: 'public assignment for test')
       create_list(:participant, 3)
@@ -358,6 +359,7 @@ describe "assignment function" do
         create(:teammate_review_questionnaire, name: "TeammateReviewQuestionnaire#{i}")
       end
     end
+
     it "auto selects", js: true do
       login_as("instructor6")
       visit '/assignments/1/edit'
@@ -372,6 +374,17 @@ describe "assignment function" do
                                    :review_topic_threshold => 3,
                                    :max_reviews_per_submission => 10,
                             )
+    end
+
+    it "sets number of reviews by each student", js: true do
+      pending('review section not yet completed')
+      login_as("instructor6")
+      visit '/assignments/1/edit'
+      find_link('ReviewStrategy').click
+      select "Instructor-Selected", :from => 'assignment_form_assignment_review_assignment_strategy'
+      check 'num_reviews_student'
+      fill_in 'num_reviews_per_student', with: 5
+
     end
   end
 end

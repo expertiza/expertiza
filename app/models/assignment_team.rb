@@ -31,6 +31,7 @@ class AssignmentTeam < Team
   end
 
   # Topic picked by the team
+  # This method needs refactoring: it sounds like it returns a topic object but in fact it returns an id
   def topic
     team_topic = nil
     participants.each do |participant|
@@ -109,7 +110,6 @@ class AssignmentTeam < Team
     return name if team.nil? #no duplicate
 
     if handle_duplicates == "ignore" #ignore: do not create the new team
-      p '>>>setting name to nil ...'
       return nil
     end
     return self.generate_team_name(Assignment.find(assignment_id).name) if handle_duplicates == "rename" #rename: rename new team
@@ -120,7 +120,7 @@ class AssignmentTeam < Team
     else # handle_duplicates = "insert"
       return nil
     end
-    end
+  end
 
     def self.import(row, assignment_id, options)
       raise ArgumentError, "Not enough fields on this line" if (row.length < 2 && options[:has_column_names] == "true") || (row.length < 1 && options[:has_column_names] != "true")

@@ -65,13 +65,6 @@ class AssignmentTeam < Team
     (self.submitted_files.length > 0) or self.submitted_hyperlinks.blank?
   end
 
-  #Response Map for each reviewer/reviewee
-  def reviewed_contributor?(contributor)
-    #ReviewResponseMap.all showing error but somehow its working, incase it fails please uncomment the following line
-    #ReviewResponseMap.where("reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?", params[contributor.id, self.id, assignment.id]).empty? == false
-    ReviewResponseMap.all(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', contributor.id, self.id, assignment.id]).empty? == false
-  end
-
   # END of contributor methods
 
   # Get Participants of the team

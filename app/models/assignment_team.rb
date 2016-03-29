@@ -110,7 +110,6 @@ class AssignmentTeam < Team
     return name if team.nil? #no duplicate
 
     if handle_duplicates == "ignore" #ignore: do not create the new team
-      p '>>>setting name to nil ...'
       return nil
     end
     return self.generate_team_name(Assignment.find(assignment_id).name) if handle_duplicates == "rename" #rename: rename new team

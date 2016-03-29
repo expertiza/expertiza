@@ -273,6 +273,60 @@ describe 'Add Expert Review' do
 end
 
 
+def create_fill_questionnaire
+  #login as instructor
+  login_as @instructor.name
+
+  # go to the questionnaire creation page
+  visit "/questionnaires/new?model=ReviewQuestionnaire&private=0"
+
+  fill_in 'questionnaire_name', with:@questionnaire_name
+  click_on('Create')
+
+  #page fails here, asks for questions to put into the questionnaire
+  click_on('Add')
+  #name the question
+  fill_in 'question[1][txt]', with:'question_1'
+  #save the questionnaire
+  click_on('Save review questionnaire')
+
+  expect(page).to have_content('All questions has been saved successfully!')
+
+  # go to the assignment edit page
+  visit "/assignments/#{@assignment.id}/edit"
+  #edit_assignment_path @assignment
+
+  #click_on Rubrics
+  click_on("Rubrics")
+  #assign the questionnaire to the assignment
+  select @questionnaire_name
+  #click on review strategy
+  click_on("Review strategy")
+  #set review limit from 0 to 1
+  fill_in 'assignment_form[assignment][review_topic_threshold]', with:'1'
+  click_on("Due dates")
+  #pick a due date for the review
+  #TOD0: change this to actually be tomorrow, or put into factory
+  page.execute_script("$('#datetimepicker_review_round_1').val('2099/03/20 15:29 (UTC -04:00)')")
+  within('#review_round_1')do select 'Yes', from: "assignment_form[due_date][][submission_allowed_id]"
+  end
+  #have to save the questionnaire assignment
+  click_on("Save")
+
+  #start the calibration
+  #click_link('Begin')
+  visit "/review_mapping/add_calibration/#{@assignment.id}?team_id=#{@team2.id}"
+
+  #even though you can't see anything, don't worry, the option is actually there. everything will render once the next command runs
+  #select the dropdown option. believe in the heart of the cards!
+  select '5-Strong agree'
+  #submit review
+  click_on "Submit Review"
+  #click ok on the pop-up box that warns you that responses can not be edited
+  page.driver.browser.switch_to.alert.accept
+
+end
+
 #test display calibration
 describe 'Create and Display Calibration' do
   before :each do
@@ -331,57 +385,8 @@ describe 'Create and Display Calibration' do
   #creates a questionnaire, assigns it to the assignment, fills out the questionaire,
   #displays the questionaire response, checks to make sure the score is there
   it 'create a questionnaire, fill it out, display results', :js => true do
-    #login as instructor
-    login_as @instructor.name
 
-    # go to the questionnaire creation page
-    visit "/questionnaires/new?model=ReviewQuestionnaire&private=0"
-
-    fill_in 'questionnaire_name', with:@questionnaire_name
-    click_on('Create')
-
-    #page fails here, asks for questions to put into the questionnaire
-    click_on('Add')
-    #name the question
-    fill_in 'question[1][txt]', with:'question_1'
-    #save the questionnaire
-    click_on('Save review questionnaire')
-
-    expect(page).to have_content('All questions has been saved successfully!')
-
-    # go to the assignment edit page
-    visit "/assignments/#{@assignment.id}/edit"
-    #edit_assignment_path @assignment
-
-    #click_on Rubrics
-    click_on("Rubrics")
-    #assign the questionnaire to the assignment
-    select @questionnaire_name
-    #click on review strategy
-    click_on("Review strategy")
-    #set review limit from 0 to 1
-    fill_in 'assignment_form[assignment][review_topic_threshold]', with:'1'
-    click_on("Due dates")
-    #pick a due date for the review
-    #TOD0: change this to actually be tomorrow, or put into factory
-    page.execute_script("$('#datetimepicker_review_round_1').val('2099/03/20 15:29 (UTC -04:00)')")
-    within('#review_round_1')do select 'Yes', from: "assignment_form[due_date][][submission_allowed_id]"
-    end
-    #have to save the questionnaire assignment
-    click_on("Save")
-
-    #start the calibration
-    #click_link('Begin')
-    visit "/review_mapping/add_calibration/#{@assignment.id}?team_id=#{@team2.id}"
-
-    #even though you can't see anything, don't worry, the option is actually there. everything will render once the next command runs
-    #select the dropdown option. believe in the heart of the cards!
-    select '5-Strong agree'
-    #submit review
-    click_on "Submit Review"
-    #click ok on the pop-up box that warns you that responses can not be edited
-    page.driver.browser.switch_to.alert.accept
-
+    create_fill_questionnaire
     #review should be submitted at this point. click on view to make sure you can see it
     #click_link "View"
     visit "/response/view?id=#{@assignment.id}&return=assignment_edit"
@@ -459,58 +464,8 @@ describe 'Display Calibration For Student' do
   #creates a questionnaire, assigns it to the assignment, fills out the questionaire,
   #displays the questionaire response, checks to make sure the score is there
   it 'create a questionnaire, fill it out, display results', :js => true do
-    #login as instructor
-    login_as @instructor.name
 
-    # go to the questionnaire creation page
-    visit "/questionnaires/new?model=ReviewQuestionnaire&private=0"
-
-    fill_in 'questionnaire_name', with:@questionnaire_name
-    click_on('Create')
-
-    #page fails here, asks for questions to put into the questionnaire
-    click_on('Add')
-    #name the question
-    fill_in 'question[1][txt]', with:'question_1'
-    #save the questionnaire
-    click_on('Save review questionnaire')
-
-    expect(page).to have_content('All questions has been saved successfully!')
-
-    # go to the assignment edit page
-    visit "/assignments/#{@assignment.id}/edit"
-    #edit_assignment_path @assignment
-
-    #click_on Rubrics
-    click_on("Rubrics")
-    #assign the questionnaire to the assignment
-    select @questionnaire_name
-    #click on review strategy
-    click_on("Review strategy")
-    #set review limit from 0 to 1
-    fill_in 'assignment_form[assignment][review_topic_threshold]', with:'1'
-    click_on("Due dates")
-    #pick a due date for the review
-    #TOD0: change this to actually be tomorrow, or put into factory
-    page.execute_script("$('#datetimepicker_review_round_1').val('2099/03/20 15:29 (UTC -04:00)')")
-    #find('assignment_form[due_date][][submission_allowed_id]').find(:xpath,'option[2]').select_option
-    within('#review_round_1')do
-      select 'Yes', from: "assignment_form[due_date][][submission_allowed_id]"
-    end
-    #have to save the questionnaire assignment
-    click_on("Save")
-
-    #start the calibration
-    #click_link('Begin')
-    visit "/review_mapping/add_calibration/#{@assignment.id}?team_id=#{@team2.id}"
-
-    #even though you can't see anything, don't worry, the option is actually there. everything will render once the next command runs
-    #select the dropdown option. believe in the heart of the cards!
-    select '5-Strong agree'
-    #submit review
-    click_on "Submit Review"
-    #click ok on the pop-up box that warns you that responses can not be edited
-    page.driver.browser.switch_to.alert.accept
+    create_fill_questionnaire
 
     #review should be submitted at this point. click on view to make sure you can see it
     #click_link "View"

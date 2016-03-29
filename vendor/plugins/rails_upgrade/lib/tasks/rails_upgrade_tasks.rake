@@ -53,7 +53,7 @@ namespace :rails do
       "config/environments/development.rb",
       "config/environments/production.rb",
       "config/environments/staging.rb",
-      "config/database.yml.example",
+      "config/database.yml.example.example",
       "config.ru",
       "doc/README_FOR_APP",
       "test/test_helper.rb"]

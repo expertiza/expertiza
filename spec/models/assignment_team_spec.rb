@@ -5,12 +5,13 @@ RSpec.describe AssignmentTeam, type: :model do
 
   # let(:team){AssignmentTeam.new name: "Wikipedia contribution_Team2", parent_id: 754, type: "AssignmentTeam", submitted_hyperlinks: "---\n- http://water.com\n- http://shed.com" }
 
+  let(:assignment_fac){FactoryGirl.create(:assignment_fac)}
   let(:team){FactoryGirl.create(:team)}
 
   describe "#hyperlinks" do
 
     it "should have a valid parent id" do
-      expect(team.parent_id).to eq(754)
+      expect(team.parent_id).to be_instance_of(Fixnum)
     end
 
     it "should retun the hyperlinks submitted by the team as a text" do
@@ -44,6 +45,10 @@ RSpec.describe AssignmentTeam, type: :model do
 
       end
     end
+
+  end
+
+  describe "#submit_hyperlink" do
 
   end
 

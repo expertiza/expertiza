@@ -347,7 +347,7 @@ GEM
       ffi-compiler (>= 0.0.2)
       rake
     seer (0.10.0)
-    selenium-webdriver (2.47.1)
+    selenium-webdriver (2.52.0)
       childprocess (~> 0.5)
       multi_json (~> 1.0)
       rubyzip (~> 1.0)

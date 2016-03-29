@@ -3,39 +3,6 @@ require 'selenium-webdriver'
 
 describe "Integration tests for assignment creation" do
 
-  describe "Assignment creation", :js => false do
-    before(:each) do
-      #create(:course)
-      #create(:instructor)
-      create(:assignment)
-      create(:assignment_node)
-    end
-
-    it "can create assignment" do
-      login_as("instructor6")
-      expect(page).to have_content "User: instructor6"
-      visit '/assignments/new?private=0'
-      #expect(page).to have_content "Manage..."
-
-      #click_link "Manage Assignments"
-      #click_link "Assignments"
-      #expect(page).to have_content "New public assignment"
-      #expect(page).to have_content "New private assignment"
-
-      #click_link "New public assignment"
-
-      expect(page).to have_content "Assignment name"
-      fill_in "Assignment name:", with: 'assignment for test'
-      #select 'WCAE 2008', from: "Course"
-      #click_link 'Course'
-      #click_link 'WCAE 2008'
-
-      #      select 'WCAE 2008', :from => "Course"
-      click_button "Create"
-      expect(Assignment.where(name: "assignment for test")).to exist
-    end
-  end
-
   describe "Assignment attributes modification", :js => true do
     pubAssignment = nil
     before(:each) do

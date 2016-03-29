@@ -58,6 +58,8 @@ RSpec.configure do |config|
 
   def login_as(user_name)
     user = User.find_by_name(user_name)
+    msg = user.to_yaml
+    File.open('log/diagnostic.txt', 'a') { |f| f.write msg }
 
     visit root_path
     fill_in 'login_name', with: user_name

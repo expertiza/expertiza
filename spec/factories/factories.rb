@@ -912,10 +912,10 @@ FactoryGirl.define do
 
   factory :assignment ,class:Assignment do
     sequence(:name, 2) { |n| n=2; "final#{n}" }
-    directory_path "final_test" 
-    submitter_count 0 
-    course { Course.first || association(:course)} 
-    instructor { User.first || association(:instructor)} 
+    directory_path "final_test"
+    submitter_count 0
+    course { Course.first || association(:course)}
+    instructor { User.first || association(:instructor)}
     private false
     num_reviews 0
     num_review_of_reviews 0

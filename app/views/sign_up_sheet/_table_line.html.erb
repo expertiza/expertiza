@@ -1,5 +1,5 @@
 <td><%= topic.topic_identifier %></td>
-<td><%= render :partial => '/sign_up_sheet/topic_names', :locals => {:i => i, :topic=>topic} %></td>
+<td><%= render :partial => '/sign_up_sheet/topic_names', :locals => local_assigns %></td>
 
 <% if @assignment.is_microtask? %>
   <td align="center"><%= topic.micropayment %></td>

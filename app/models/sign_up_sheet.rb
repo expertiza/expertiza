@@ -56,7 +56,26 @@ class SignUpSheet < ActiveRecord::Base
     if !slotAvailable?(topic_id)
       sign_up.is_waitlisted = true
       if sign_up.save
-        result = true
+	confirmed_team = SignedUpTeam.confirmed_team_by_topic_id(topic_id)
+	confirmed_team_id = confirmed_team.first.team_id
+	team_members = TeamsUser.members_by_team_id(confirmed_team_id)
+	cc_mail_list = Array.new
+	team_members.map! do |member|
+	  member = User.find(user_id)
+	end
+	team_members.each do |member|
+	  cc_mail_list << member.email if member.email != team_members.first.email
+	end
+	assignment = Assignment.find(assignment_id)
+	Mailer.waitlist_notification({to: team_members.first.email,
+						  cc: cc_mail_list,
+						  subject: "New Waitlisted Team for your topic in #{assignment.name}",
+						  body: {
+						    first_name: team_members.first.first_name,
+						    assignment_name: assignment.name
+						  }
+	}).deliver
+	result = true
       end
     else
       #if slot exist, then confirm the topic for the user and delete all the waitlist for this user

@@ -141,7 +141,6 @@ class SignUpSheetController < ApplicationController
         @sign_up_topics = SignUpTopic.where( ['assignment_id = ?', assignment_id])
         @slots_filled = SignUpTopic.find_slots_filled(assignment_id)
         @slots_waitlisted = SignUpTopic.find_slots_waitlisted(assignment_id)
-
         @assignment = Assignment.find(assignment_id)
         #ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
         # to treat all assignments as team assignments
@@ -184,7 +183,42 @@ class SignUpSheetController < ApplicationController
     assignment=Assignment.find(@assignment_id)
     @signup_topic_deadline = assignment.due_dates.find_by_deadline_type_id(7)
     @drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
-
+    @waitlisted_teams = []
+    @waitlisted_teams_members = []
+    @waitlisted_team_desc = []
+    @confirmed_teams = []
+    @confirmed_teams_members = []
+    @vacancy_confirmed_teams = []
+    max_team_size = Assignment.find(@assignment_id).max_team_size
+    for topic in @sign_up_topics
+      topic_id = topic.id - @sign_up_topics.first.id
+      cur_team_size = 0
+      @waitlisted_teams[topic_id] = SignedUpTeam.waitlisted_teams_by_topic_id(topic.id)
+      if !@waitlisted_teams[topic_id].nil?
+	i = 0
+	  @waitlisted_teams_members[topic_id] = []
+	  @waitlisted_team_desc[topic_id] = []
+	@waitlisted_teams[topic_id].each do |team|
+	  waitlisted_team_id = team.team_id
+	  @waitlisted_team_desc[topic_id][i] = Team.where(id: waitlisted_team_id).first
+	  @waitlisted_teams_members[topic_id][i] = TeamsUser.members_by_team_id(waitlisted_team_id)
+	  @waitlisted_teams_members[topic_id][i].map! do |member|
+	    member = User.where(id: member.user_id).select(:id, :name).to_a
+	  end
+	  i = i+1
+	end
+      end
+      @confirmed_teams[topic_id] = SignedUpTeam.confirmed_team_by_topic_id(topic.id)
+      if !@confirmed_teams[topic_id].nil?
+	confirmed_team_id = @confirmed_teams[topic_id][0].team_id
+	@confirmed_teams_members[topic_id] = TeamsUser.members_by_team_id(confirmed_team_id)
+	@confirmed_teams_members[topic_id].map! do |member|
+	  member = member.user_id
+	end
+      cur_team_size = @confirmed_teams_members[topic_id].count
+      end
+    @vacancy_confirmed_teams[topic_id] = max_team_size - cur_team_size
+    end
     if assignment.due_dates.find_by_deadline_type_id(1)!= nil
       unless !(assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now)
         @show_actions = false

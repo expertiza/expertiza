@@ -46,9 +46,19 @@ class InvitationController < ApplicationController
     end
 
     update_join_team_request user,student
-
-    redirect_to view_student_teams_path student_id: student.id
-
+    if params[:referrer].nil? || params[:referrer] != "signupsheet"
+      redirect_to view_student_teams_path student_id: student.id
+    end
+  end
+  def batch_create
+    batch_names = params[:invitees].first.split(', ')
+    for each in batch_names
+      params[:user] = {}
+      params[:user][:name] = each
+      create
+    end
+    flash[:note] = "Invitations successfully sent."
+    redirect_to controller: 'sign_up_sheet', action: 'list', assignment_id: params[:assignment_id]
   end
 
   def update_join_team_request(user,student)

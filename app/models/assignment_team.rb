@@ -31,6 +31,7 @@ class AssignmentTeam < Team
   end
 
   # Topic picked by the team
+  # This method needs refactoring: it sounds like it returns a topic object but in fact it returns an id
   def topic
     team_topic = nil
     participants.each do |participant|

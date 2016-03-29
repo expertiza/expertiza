@@ -65,6 +65,7 @@ group :development do
   gem 'sqlite3-ruby'
   gem 'selenium-webdriver'
   gem 'quiet_assets'
+  gem "factory_girl_rails", "~> 4.0"
 end
 
 group :test do
@@ -76,8 +77,6 @@ group :test do
   gem 'rspec-rails'
   gem 'shoulda'
   gem 'test-unit'
-  gem 'guard-spork'
-  gem 'factory_girl_rails'
 end
 
 group :assets do

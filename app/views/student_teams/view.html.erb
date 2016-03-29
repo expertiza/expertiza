@@ -209,6 +209,25 @@
      <% end %>
    <% end %>
 
+
+  <% if @users_on_waiting_list && @users_on_waiting_list.count>0%>
+    <h2>Users waiting for this topic:</h2>
+      <table>
+        <tr>
+          <td><b>&nbsp; User id &nbsp; </b></td>
+          <td><b>&nbsp; Full name &nbsp; </b></td>
+          <td><b>&nbsp; Email &nbsp; </b></td>
+        </tr>
+        <% @users_on_waiting_list.each do |user|%>
+          <tr>
+            <td> &nbsp; <%=user.name%> &nbsp; </td>
+            <td> &nbsp; <%=user.fullname%> &nbsp; </td>
+            <td> &nbsp; <%=user.email%> &nbsp; </td>
+          </tr>
+        <% end%>
+      </table>
+  <% end %>
 <% end %>
+<br>
    <a href="javascript:window.history.back()">Back</a>
 

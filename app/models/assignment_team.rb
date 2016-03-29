@@ -120,7 +120,7 @@ class AssignmentTeam < Team
     else # handle_duplicates = "insert"
       return nil
     end
-    end
+  end
 
     def self.import(row, assignment_id, options)
       raise ArgumentError, "Not enough fields on this line" if (row.length < 2 && options[:has_column_names] == "true") || (row.length < 1 && options[:has_column_names] != "true")

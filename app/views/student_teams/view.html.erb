@@ -98,7 +98,7 @@
   <% end %>
 <% end %>
 
-  <% if @student.team != nil %>
+  <% if @student.team != nil && @student.assignment.max_team_size>1 %>
     <h2>Team Advertisement</h2>
 
     <% if @student.team.advertise_for_partner == true %>
@@ -109,7 +109,7 @@
     <% else %>
       <%= link_to 'new', :controller => 'advertise_for_partner', :action => 'new', :team_id=>@student.team.id %>
     <% end %>
-  <% end %>
+
 
   <%= render :partial => 'join_team_requests/list_sent',
     :locals =>{:teams_user_id=>params[:student_id],
@@ -223,5 +223,7 @@
        <input type='submit' value='Invite'/>
      <% end %>
    <% end %>
+
+<% end %>
    <a href="javascript:window.history.back()">Back</a>
 

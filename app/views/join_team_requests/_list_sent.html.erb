@@ -1,3 +1,7 @@
+<% participant = Participant.where(user_id: session[:user].id, parent_id:  assignment_id).first
+   requests=JoinTeamRequest.where(participant_id: participant.id) %>
+<% if !requests.empty? %>
+
 <h2>Sent Requests </h2>
 
 <table cellpadding="5">
@@ -11,9 +15,6 @@
     <th>Status</th>
     <th>Sent at</th>
   </tr>
-  <% participant = Participant.where(user_id: session[:user].id, parent_id:  assignment_id).first
-  requests=JoinTeamRequest.where(participant_id: participant.id) %>
-<% if requests != nil %>
 
   <% requests.each do |request| %>
 
@@ -42,10 +43,6 @@
       </td>
     </tr>
   <% end %>
-<% else %>
-  <tr>
-    <td colspan ='4' > You didn't send any request yet</td>
-  </tr>
 
 <% end %>
   </table>

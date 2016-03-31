@@ -69,7 +69,11 @@ class Criterion < ScoredQuestion
 
   #This method returns what to display if a student is viewing a filled-out questionnaire
   def view_completed_question(count, answer,questionnaire_max)
+<<<<<<< HEAD
     html = '<big><b>Question '+count.to_s+":</b> <I>"+self.txt+"</I></big><BR/><BR/>"
+=======
+		html = '<big><b>Question '+count.to_s+":</b> <I>"+self.txt+"</I></big><BR/>"
+>>>>>>> 974ff6f7f3bbb353d58c61e9e54fb47227ae795b
     if !answer.answer.nil?
       html += '<TABLE CELLPADDING="5"><TR><TD valign="top"><B>Score: </B></TD><TD><FONT style="BACKGROUND-COLOR:gold">'+answer.answer.to_s+'</FONT> out of <B>'+questionnaire_max.to_s+'</B></TD></TR>'
     else

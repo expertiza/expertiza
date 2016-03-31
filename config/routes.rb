@@ -267,6 +267,13 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :reputation_web_service do
+    collection do
+      get :client
+      post :send_post_request
+    end
+  end
+
   resources :review_questionnaires, controller: :questionnaires
   resources :metareview_questionnaires, controller: :questionnaires
   resources :teammate_review_questionnaires, controller: :questionnaires

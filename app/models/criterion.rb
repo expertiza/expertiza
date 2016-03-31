@@ -58,11 +58,11 @@ class Criterion < ScoredQuestion
 
     if dropdown_or_scale == 'dropdown'
 
-      html = complete_drop_down(self, html, count, answer, questionnaire_min, questionnaire_max)
+      html = complete_drop_down(self, html, count, answer, questionnaire_min, questionnaire_max,cols)
 
     elsif dropdown_or_scale == 'scale'
 
-       html = complete_scale(self, html, count, answer, questionnaire_min, questionnaire_max)
+       html = complete_scale(self, html, count, answer, questionnaire_min, questionnaire_max,cols)
     end
     html.html_safe
   end
@@ -111,7 +111,7 @@ class Criterion < ScoredQuestion
   end
 
   #This method process the complete for drop down
-  def complete_drop_down(ob, html, count, answer, questionnaire_min, questionnaire_max)
+  def complete_drop_down(ob, html, count, answer, questionnaire_min, questionnaire_max,cols)
     html += '<div><select id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]">'
     html += '<option value=''>--</option>'
     for j in questionnaire_min..questionnaire_max
@@ -131,12 +131,12 @@ class Criterion < ScoredQuestion
       end
     end
     html += "</select></div>"
-    html = complete_answer_comment(count, html, answer)
+    html = complete_answer_comment(count, html, answer,cols)
     html += '</textarea></td></br><br/>'
   end
 
   #This method process the complete for scale
-  def complete_scale(ob, html, count, answer, questionnaire_min, questionnaire_max)
+  def complete_scale(ob, html, count, answer, questionnaire_min, questionnaire_max,cols)
     html += '<input id="responses_' +count.to_s+ '_score" name="responses[' +count.to_s+ '][score]" type="hidden"'
     html += 'value="'+answer.answer.to_s+'"' if !answer.nil?
     html += '>'
@@ -159,13 +159,13 @@ class Criterion < ScoredQuestion
 
     html = complete_label(ob.max_label, html)
     html += '<td width="10%"></td></tr></table>'
-    html = complete_answer_comment(count, html, answer)
+    html = complete_answer_comment(count, html, answer,cols)
     html += '</textarea><br/><br/>'
 
   end
 
   ## method added  to remove duplicated code
-  def complete_answer_comment(count, html, answer)
+  def complete_answer_comment(count, html, answer,cols)
     html += '<textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
     html += answer.comments if !answer.nil?
   end

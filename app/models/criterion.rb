@@ -107,7 +107,7 @@ class Criterion < ScoredQuestion
     html += '</script>'
 
     html += '<div id="' + ob.id.to_s + '_myDiv" style="display: none;">'
-
+    return html
   end
 
   #This method process the complete for drop down
@@ -133,6 +133,7 @@ class Criterion < ScoredQuestion
     html += "</select></div>"
     html = complete_answer_comment(count, html, answer,cols,rows)
     html += '</textarea></td></br><br/>'
+    return html
   end
 
   #This method process the complete for scale
@@ -161,19 +162,21 @@ class Criterion < ScoredQuestion
     html += '<td width="10%"></td></tr></table>'
     html = complete_answer_comment(count, html, answer,cols,rows)
     html += '</textarea><br/><br/>'
-
+    return html
   end
 
   ## method added  to remove duplicated code
   def complete_answer_comment(count, html, answer,cols,rows)
     html += '<textarea cols=' +cols+ ' rows=' +rows+ ' id="responses_' +count.to_s+ '_comments" name="responses[' +count.to_s+ '][comment]" style="overflow:hidden;">'
     html += answer.comments if !answer.nil?
+    return html
   end
 
   def complete_drop_down_label_config(html, label)
     html += j.to_s
     html += "-" + label if label && label.length>0
     html += "</option>"
+    return html
   end
 
 end

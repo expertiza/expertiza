@@ -29,14 +29,21 @@
             <%= users_for_curr_team.html_safe %>
           </td>
           <td>
-            <% instructor = Participant.where(parent_id: params[:id], user_id: session[:user].id).first %>
+            <% assignment = Assignment.find(params[:id]) rescue nil %>
+            <% instructor = Participant.where(parent_id: params[:id], user_id: assignment.instructor.id).first %>
             <% map = ReviewResponseMap.where(reviewed_object_id: params[:id], reviewer_id: instructor.id, reviewee_id: team.id, calibrate_to: true).first rescue nil %>
 
-            <% if !map.nil? && !map.response.empty? %>
+            <!--Only the instructor of this assignment can do the expert peer-review-->
+            <!--Other teaching staff of this assignment can only view the expert peer-review-->
+            <% if !map.nil? and !map.response.empty? %>
               <%= link_to "View", {:controller => 'response', :action => 'view', :id => map.response.last.id, return: 'assignment_edit'} %>
-              <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => map.response.last.id, return: 'assignment_edit'} if map.response.first.is_submitted == false %>
+              <% if session[:user].id == assignment.instructor.id %>
+                <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => map.response.last.id, return: 'assignment_edit'} if map.response.first.is_submitted == false %>
+              <% end %>
             <% else %>
-              <%= link_to "Begin", {:controller => 'review_mapping', :action => 'add_calibration', :id => assignment.id, :team_id => team.id} %>
+              <% if session[:user].id == assignment.instructor.id %>
+                <%= link_to "Begin", {:controller => 'review_mapping', :action => 'add_calibration', :id => assignment.id, :team_id => team.id} %>
+              <% end %>
             <% end %>
           </td>
           <td>

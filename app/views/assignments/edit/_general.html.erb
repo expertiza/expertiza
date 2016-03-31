@@ -239,12 +239,23 @@ function microtaskChanged() {
         if (this.value == 'student'){
           jQuery('#num_reviews_per_student_threshold').removeAttr('hidden');
           jQuery('#num_reviews_per_submission_threshold').attr('hidden','hidden');
+          jQuery('#calibrated_and_uncalibrated_artifacts_threshold').attr('hidden','hidden');
           jquery('#second_submit_tag').attr('disabled', 'disabled');
+          jquery('#third_submit_tag').attr('disabled', 'disabled');
         } 
         else if(this.value == 'submission'){
           jQuery('#num_reviews_per_student_threshold').attr('hidden', 'hidden');
           jQuery('#num_reviews_per_submission_threshold').removeAttr('hidden');
+          jQuery('#calibrated_and_uncalibrated_artifacts_threshold').attr('hidden','hidden');
           jquery('#first_submit_tag').attr('disabled', 'disabled');
+          jquery('#third_submit_tag').attr('disabled', 'disabled');
+        }
+        else if(this.value == 'calibrated_and_uncalibrated'){
+          jQuery('#num_reviews_per_student_threshold').attr('hidden', 'hidden');
+          jQuery('#num_reviews_per_submission_threshold').attr('hidden', 'hidden');
+          jQuery('#calibrated_and_uncalibrated_artifacts_threshold').removeAttr('hidden');
+          jquery('#first_submit_tag').attr('disabled', 'disabled');
+          jquery('#second_submit_tag').attr('disabled', 'disabled');
         }
       });
      jQuery('#first_submit_tag').add('#second_submit_tag').click(function(e){

@@ -93,7 +93,7 @@ class QuestionnairesController < ApplicationController
     rescue
       flash[:error] = $!
     end
-    redirect_to :controller => 'tree_display', :action => 'list'
+    redirect_to :controller => 'questionnaires', :action => 'edit', :id => @questionnaire.id
   end
 
   def create_questionnaire
@@ -153,11 +153,32 @@ class QuestionnairesController < ApplicationController
       begin
         name = @questionnaire.name
 
+        #if this rubric is used by some assignment, flash error
         @questionnaire.assignments.each{
           | assignment |
           raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
         }
-        @questionnaire.destroy
+
+        questions = @questionnaire.questions
+
+        #if this rubric had some answers, flash error
+        questions.each do |question|
+          if !question.answers.empty?
+            raise "There are responses based on this rubric, we do not suggest you delete it."
+          end
+        end
+
+        questions.each do |question|
+          advices = question.question_advices
+          advices.each do |advice|
+            advice.delete
+          end
+          question.delete
+        end
+        questionnaire_node = @questionnaire.questionnaire_node
+        questionnaire_node.delete
+        @questionnaire.delete
+
         undo_link("Questionnaire \"#{name}\" has been deleted successfully. ")
       rescue
         flash[:error] = $!
@@ -197,8 +218,9 @@ class QuestionnairesController < ApplicationController
   #Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions    
     questionnaire_id = params[:id] if params[:id] != nil
-    (1..params[:question][:total_num].to_i).each do |i|
-      question = Object.const_get(params[:question][:type]).create(txt: 'Edit question content here', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
+    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
+    ((num_of_existed_questions+1)..(num_of_existed_questions+params[:question][:total_num].to_i)).each do |i|
+      question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
       if question.is_a? ScoredQuestion
         question.weight = 1
         question.max_label = 'Strong agree'
@@ -634,7 +656,7 @@ class QuestionnairesController < ApplicationController
       create_new_node_if_necessary(parent)
 
       undo_link("Copy of questionnaire #{orig_questionnaire.name} has been created successfully. ")
-      redirect_to :controller => 'questionnaire', :action => 'view', :id => @questionnaire.id
+      redirect_to :controller => 'questionnaires', :action => 'view', :id => @questionnaire.id
 
     rescue
 

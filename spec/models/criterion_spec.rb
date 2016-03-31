@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+
 describe "criterion" do
   let(:questionnaire){Questionnaire.new min_question_score: 0, max_question_score: 5}
   let(:criterion){Criterion.new id:1, type: "Criterion", seq:1.0, txt:"test txt", weight: 1,questionnaire: questionnaire}

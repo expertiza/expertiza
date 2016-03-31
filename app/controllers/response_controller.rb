@@ -218,7 +218,7 @@ class ResponseController < ApplicationController
   end
 
   #E1600
-  #Added paramps[:return] value for 'SelfReviewResponseMap'
+  #Added paramps[:return] value for 'SelfReviewResponseMap' to ensure that this method is invoked from self-review operation
   def saving
     @map = ResponseMap.find(params[:id])
     if(@map.type == "SelfReviewResponseMap")
@@ -231,7 +231,7 @@ class ResponseController < ApplicationController
   end
 
   #E1600
-  #Added if - else for 'SelfReviewResponseMap'
+  #Added if - else for 'SelfReviewResponseMap' for proper redirection
   def redirection
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?

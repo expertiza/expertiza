@@ -72,9 +72,9 @@ class CourseParticipant < Participant
     }
   end
 
+  # This method returns a list of fields that a user selected on the GUI using a radio button when trying to do
+  # an export a list of users
   def self.export_fields(options)
-
-
     fields = User.export_fields(options)
 
     return fields

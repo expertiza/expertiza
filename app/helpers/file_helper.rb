@@ -84,6 +84,8 @@ module FileHelper
     end
   end
 
+  # This method returns a list of files present in a directory. It recursively calls the same function as long as there are
+  # more sub directories.
   def files(directory)
     files_list = Dir[directory + "/*"]
     files = Array.new

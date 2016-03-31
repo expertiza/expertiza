@@ -70,6 +70,7 @@ describe User do
   end
 
 
+    # this test is to test the list of users under an instructor.
     describe "#get_user_list" do
       it 'user list' do
         @role = Role.new name: "Instructor"

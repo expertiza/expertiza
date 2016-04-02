@@ -589,7 +589,7 @@ class ReviewMappingController < ApplicationController
 		  rescue
 			flash[:error] = "Automatic assignment of reviewer failed."
 		  end
-		  iterator += 1
+		  iterator = iterator + 1
 		end
 	end
 

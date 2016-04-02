@@ -14,7 +14,7 @@ RSpec.describe AssignmentTeam, type: :model do
       expect(team.parent_id).to be_instance_of(Fixnum)
     end
 
-    it "should retun the hyperlinks submitted by the team as a text" do
+    it "should return the hyperlinks submitted by the team as a text" do
       # expect(team.submitted_hyperlinks.size).to be > 0
       expect(team.submitted_hyperlinks).to be_instance_of(String)
     end
@@ -26,7 +26,7 @@ RSpec.describe AssignmentTeam, type: :model do
 
   describe "#submit_hyperlink" do
 
-    it "team members should not be able to upload same link twice" do
+    it "should not allow team members to upload same link twice" do
       # my_submitted_hyperlinks = team.submitted_hyperlinks.split("\n")
       expect(@my_submitted_hyperlinks.uniq.length).to eql(@my_submitted_hyperlinks.length)
     end
@@ -48,9 +48,25 @@ RSpec.describe AssignmentTeam, type: :model do
 
   end
 
-  describe "#submit_hyperlink" do
-
+  describe "#has_submissions?" do
+    it "checks if a team has submitted hyperlinks" do
+      # assignment = build(:assignment)
+      assign_team = build(:assignment_team)
+      assign_team.submitted_hyperlinks << "\n- https://www.harrypotter.ncsu.edu"
+      expect(assign_team.has_submissions?).to be true
+    end
   end
 
+  describe "#remove_hyperlink" do
+    it "should allow team member to delete a previously submitted hyperlink" do
+      assign_team = build(:assignment_team)
+      @selected_hyperlink = "https://www.h2.ncsu.edu"
+      assign_team.submitted_hyperlinks << "\n- https://www.h2.ncsu.edu"
+      assign_team.remove_hyperlink(@selected_hyperlink)
+      expect(assign_team.submitted_hyperlinks.split("\n").include? @assign_team).to be false
+      # print assign_team.submitted_hyperlinks.split("\n").include? @assign_team
+    end
+
+  end
 
 end

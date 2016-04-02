@@ -1073,37 +1073,6 @@ FactoryGirl.define do
     instruction_loc nil
   end
 
-  factory :quiz_questionnaire, class: QuizQuestionnaire do
-    name 'Quiz Questionnaire'
-    instructor_id {AssignmentTeam.first.id || association(:assignment_team).id}
-    private 0
-    min_question_score 0
-    max_question_score 1
-    type 'QuizQuestionnaire'
-    display_type 'Quiz'
-    instruction_loc nil
-  end
-
-  factory :quiz_question, class: QuizQuestion do
-    txt 'Question'
-    weight 1
-    questionnaire {QuizQuestionnaire.first || association(:quiz_questionnaire)}
-    seq 1.0
-    type 'MultipleChoiceRadio'
-  end
-
-  factory :quiz_question_choice, class: QuizQuestionChoice do
-    question {QuizQuestion.first || association(:quiz_question)}
-    txt 'Answer Choice 1'
-    iscorrect 0
-  end
-
-  factory :quiz_response_map, class: QuizResponseMap do
-    quiz_questionnaire {QuizQuestionnaire.first || association(:quiz_questionnaire)}
-    reviewer {Participant.first || association(:participant)}
-    reviewee_id {Teams.first.id || association(:team).id}
-  end
-
   factory :question, class:Question do
     txt 'Test question:'
     weight 1

@@ -238,7 +238,11 @@ end
 # Tests regarding the instructor's ability to interact with quizzes.
 describe 'Instructor', js:true do
 
-  # Setup for testing by creating an instrutor, assignment, student, and quiz.
+  # Setup for testing by creating the following
+  #   An instructor
+  #   An assignment with a 1 question quiz and a valid deadline
+  #   A student, with a valid team in the assignment, that has created a quiz
+  #   A second student, also in the assignment, that has completed the quiz.
   before :each do
     # Create an instructor
     @instructor = create(:instructor)
@@ -302,21 +306,44 @@ describe 'Instructor', js:true do
     @participant2 = create :participant, assignment: @assignment, user: @student2
 
     # Create a response mapping
-    @response = create :quiz_response_map, quiz_questionnaire: @questionnaire, reviewer: @participant2, reviewee_id: @team1.id
+    @response_map = create :quiz_response_map, quiz_questionnaire: @questionnaire, reviewer: @participant2, reviewee_id: @team1.id
 
+    # Create a question response
+    @response = create :quiz_response, response_map: @response_map
+
+    # Create an answer for the question
+    create :answer, question: @question, response_id: @response.id, answer: 1
   end
 
-  # Verify that an instructor can see all quiz questions
-  # by clicking on the view quiz questions icon.
+  # Verify that an instructor can see all quiz questions,
+  # answers, and scores on the review questions page.
   it 'can view quiz questions and scores' do
-    # TODO asserts
-
     # Login as instructor
     login_as @instructor.name
 
-    # Click on view quiz questions
+    # Go to view quizzes.
     visit "/student_quizzes/review_questions?id=#{@assignment.id}&type=Assignment"
 
-    save_and_open_screenshot
+    # Verify that the page lists the student and score
+    student = all("tr > td")[0]
+    score = all("tr > td")[1]
+
+    expect(student).to have_text(@student2.fullname)
+    expect(score).to have_text('100.0')
+
+    # Verify that the page lists the average score for all students
+    expect(page).to have_text('Average score for quiz takers: 100.0 ')
+
+    # Verify that the question and answer choices are listed
+    expect(page).to have_text(@question.txt)
+    expect(page).to have_text("Question Type: Multiple Choice - Radio")
+    expect(page).to have_text('Answer 1')
+    expect(page).to have_text('Answer 2')
+    expect(page).to have_text('Answer 3')
+    expect(page).to have_text('Answer 4')
+
+    # Verify that the selected answer is highlighted
+    correct = find(".student_quizzes > b:nth-child(11)")
+    expect(correct).to have_text('Answer 1')
   end
 end

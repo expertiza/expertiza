@@ -395,54 +395,135 @@ class QuestionnairesController < ApplicationController
     redirect_to :controller => 'submitted_content', :action => 'view', :id => params[:pid]
   end
 
-  def validate_quiz
-    num_quiz_questions = Assignment.find(params[:aid]).num_quiz_questions
-    valid = "valid"
+  # Create quiz questions from data in params and
+  # yield them back to the caller.
+  #
+  # Inputs:
+  #   num_quiz_questions - Number of questions in the quiz.
+  # Outputs:
+  #   yields each question as it is constructed.
+  def create_quiz_questions num_quiz_questions
 
+    # For each question
     (1..num_quiz_questions).each do |i|
-      if params[:new_question][i.to_s] == ''
-        #One of the questions text is not filled out
-        valid = "Please make sure all questions have text"
-        break
-      elsif !params.has_key?(:question_type) || !params[:question_type].has_key?(i.to_s) || params[:question_type][i.to_s][:type] == nil
-        #A type isnt selected for a question
-        valid = "Please select a type for each question"
-        break
-      elsif params[:questionnaire][:name]==""
-        #questionnaire name is not specified
-        valid = "Please specify quiz name (please do not use your name or id)."
-        break
-      else
-        type = params[:question_type][i.to_s][:type]
-        if type == 'MultipleChoiceCheckbox' or type == 'MultipleChoiceRadio'
-          correct_selected = false
-          (1..4).each do |x|
-            if params[:new_choices][i.to_s][type][x.to_s][:txt] == ''
-              #Text isnt provided for an option
-              valid = "Please make sure every question has text for all options"
-              break
-            elsif type == 'MultipleChoiceRadio' and not params[:new_choices][i.to_s][type][x.to_s][:iscorrect] == nil
-              correct_selected = true
-            elsif type == 'MultipleChoiceCheckbox' and not params[:new_choices][i.to_s][type][x.to_s][:iscorrect] == 0.to_s
-              correct_selected = true
-            end
-          end
-          if valid == "valid" && !correct_selected
-            #A correct option isnt selected for a check box or radio question
-            valid = "Please select a correct answer for all questions"
-            break
-          end
-        elsif type == 'TF' # TF is not disabled. We need to test TF later.
-          if params[:new_choices][i.to_s]["TF"] == nil
-            #A correct option isnt selected for a true/false question
-            valid = "Please select a correct answer for all questions"
-            break
-          end
-        end
+
+      # Create and yield the question
+      yield QuizQuestion.new({
+          :txt => params[:new_question][i.to_s],
+          :seq => i,
+          :type => params[:question_type][i.to_s].permit(:type)[:type]
+       })
+    end
+  end
+
+  # Generate each choice for a quiz question from params
+  # and yield them back to the caller.
+  #
+  # Inputs
+  #   question - QuizQuestion that the choices are being generated for.
+  #
+  # Outputs:
+  #   yields each choice as they are made.
+  def create_quiz_question_choices question
+    # Get the correct question parameters
+    parameters = params[:new_choices][question.seq.to_i.to_s][question.type]
+
+    # Create each choice and yield it back to the caller
+    (1..4).each do  |i|
+      yield choice = QuizQuestionChoice.new(parameters[i.to_s].permit(:txt, :iscorrect))
+    end
+  end
+
+  # Validate params as a quiz questionnaire.
+  #
+  # Outputs:
+  #   Either 'valid' or an error message if the quiz does not validate.
+  def validate_quiz
+
+    # Get the number of quiz questions from the assignment
+    num_quiz_questions = Assignment.find(params[:aid]).num_quiz_questions
+
+    # Construct a quiz questionnaire from parameters
+    questionnaire = QuizQuestionnaire.new(questionnaire_params)
+    questionnaire.max_question_score = 1
+    questionnaire.min_question_score = 0
+
+    # Create each quiz question.
+    create_quiz_questions(num_quiz_questions) do |question|
+
+      # Add the question to the questionnaire
+      questionnaire.quiz_questions << question
+
+      # Create each question choice
+      create_quiz_question_choices(question) do |choice|
+
+        # Add the choice to the question
+        question.quiz_question_choices << choice
       end
     end
 
-    return valid
+    # If valid, return
+    if questionnaire.valid?
+      return 'valid'
+    end
+
+    # Not valid
+
+    puts questionnaire.errors.messages
+    questionnaire.quiz_questions.each {|q|
+      puts q.errors.messages
+      q.quiz_question_choices.each {|c| puts c.errors.messages }
+    }
+
+    return 'not valid'
+
+
+    # valid = "valid"
+    #
+    # (1..num_quiz_questions).each do |i|
+    #   if params[:new_question][i.to_s] == ''
+    #     #One of the questions text is not filled out
+    #     valid = "Please make sure all questions have text"
+    #     break
+    #   elsif !params.has_key?(:question_type) || !params[:question_type].has_key?(i.to_s) || params[:question_type][i.to_s][:type] == nil
+    #     #A type isnt selected for a question
+    #     valid = "Please select a type for each question"
+    #     break
+    #   elsif params[:questionnaire][:name]==""
+    #     #questionnaire name is not specified
+    #     valid = "Please specify quiz name (please do not use your name or id)."
+    #     break
+    #   else
+    #     type = params[:question_type][i.to_s][:type]
+    #     if type == 'MultipleChoiceCheckbox' or type == 'MultipleChoiceRadio'
+    #       correct_selected = false
+    #       (1..4).each do |x|
+    #         if params[:new_choices][i.to_s][type][x.to_s][:txt] == ''
+    #           #Text isnt provided for an option
+    #           valid = "Please make sure every question has text for all options"
+    #           break
+    #         elsif type == 'MultipleChoiceRadio' and not params[:new_choices][i.to_s][type][x.to_s][:iscorrect] == nil
+    #           correct_selected = true
+    #         elsif type == 'MultipleChoiceCheckbox' and not params[:new_choices][i.to_s][type][x.to_s][:iscorrect] == 0.to_s
+    #           correct_selected = true
+    #         end
+    #       end
+    #       if valid == "valid" && !correct_selected
+    #         #A correct option isnt selected for a check box or radio question
+    #         valid = "Please select a correct answer for all questions"
+    #         break
+    #       end
+    #     elsif type == 'TF' # TF is not disabled. We need to test TF later.
+    #       if params[:new_choices][i.to_s]["TF"] == nil
+    #         #A correct option isnt selected for a true/false question
+    #         valid = "Please select a correct answer for all questions"
+    #         break
+    #       end
+    #     end
+    #   end
+    # end
+    #
+    # return valid
   end
 
 

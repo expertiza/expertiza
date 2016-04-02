@@ -16,6 +16,16 @@ describe QuestionnairesController do
       #Create an assignment with quiz
       @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 1
 
+      # Define needed hash methods to emulate params.
+      class Hash
+        def require key
+          return self[key]
+        end
+        def permit *args
+          return self
+        end
+      end
+
       # Create a params stub for the controller to work with
       @params = {
           :utf8 => '✓',

@@ -322,7 +322,7 @@ class QuestionnairesController < ApplicationController
 
   #seperate method for creating a quiz questionnaire because of differences in permission
   def create_quiz_questionnaire
-    valid = valid_quiz
+    valid = validate_quiz
     if valid.eql?("valid")
       create_questionnaire
     else
@@ -395,7 +395,7 @@ class QuestionnairesController < ApplicationController
     redirect_to :controller => 'submitted_content', :action => 'view', :id => params[:pid]
   end
 
-  def valid_quiz
+  def validate_quiz
     num_quiz_questions = Assignment.find(params[:aid]).num_quiz_questions
     valid = "valid"
 

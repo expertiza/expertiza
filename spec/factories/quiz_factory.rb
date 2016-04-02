@@ -41,6 +41,7 @@ FactoryGirl.define do
     txt 'Question'
     weight 1
     questionnaire {QuizQuestionnaire.first || association(:quiz_questionnaire)}
+    quiz_question_choices {[QuizQuestionChoice.first] || association(:quiz_question_choices)}
     seq 1.0
     type 'MultipleChoiceRadio'
   end

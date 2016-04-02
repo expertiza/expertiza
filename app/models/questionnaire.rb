@@ -20,7 +20,7 @@ class Questionnaire < ActiveRecord::Base
   has_many :assignments, :through => :assignment_questionnaires
   has_one :questionnaire_node,:foreign_key => :node_object_id,:dependent => :destroy
 
-  validates_presence_of :name
+  validates_presence_of :name, message: 'Please specify quiz name (please do not use your name or id).'
   validates_numericality_of :max_question_score
   validates_numericality_of :min_question_score
 

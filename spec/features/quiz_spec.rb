@@ -289,11 +289,14 @@ describe 'Instructor', js:true do
     @questionnaire = create :quiz_questionnaire, instructor_id: @team1.id
 
     # Create the quiz question and answers
-    @question = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 1'
-    create :quiz_question_choice, question: @question, txt: 'Answer 1', iscorrect: 1
-    create :quiz_question_choice, question: @question, txt: 'Answer 2'
-    create :quiz_question_choice, question: @question, txt: 'Answer 3'
-    create :quiz_question_choice, question: @question, txt: 'Answer 4'
+    choices = [
+      create(:quiz_question_choice, question: @question, txt: 'Answer 1', iscorrect: 1),
+      create(:quiz_question_choice, question: @question, txt: 'Answer 2'),
+      create(:quiz_question_choice, question: @question, txt: 'Answer 3'),
+      create(:quiz_question_choice, question: @question, txt: 'Answer 4')
+    ]
+    @question = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 1', quiz_question_choices: choices
+
 
 
     # Setup Student 2

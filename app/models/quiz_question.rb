@@ -1,5 +1,7 @@
 class QuizQuestion < Question
   has_many :quiz_question_choices, :class_name => 'QuizQuestionChoice', :foreign_key => 'question_id'
+  belongs_to :quiz_questionnaire, class_name: 'QuizQuestionnaire', foreign_key: :questionnaire_id
+
   def edit
   end
 

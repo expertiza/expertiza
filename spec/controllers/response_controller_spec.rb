@@ -56,9 +56,9 @@ end
       ApplicationController.any_instance.stub(:current_role).and_return(@role)
     end
 describe "GET #new_feedback" do
-
+	
+    it "redirects to new if review object is found" do
       Response.stub(:find).and_return(review)
-      it "redirects to new if review object is found" do
       session[:user].stub(:id).and_return(1) 
       review.stub_chain(:map,:assignment,:id).and_return(1)
       review.stub_chain(:map,:reviewer,:id).and_return(1)
@@ -103,26 +103,7 @@ describe "GET #new_feedback" do
       expect(response).to have_http_status(302)
     end
   end
-  describe "GET #view_feedback" do
 
-    Response.stub(:find).and_return(review)
-    it "redirects to view if review object is found" do
-      session[:user].stub(:id).and_return(1)
-      review.stub_chain(:map,:assignment,:id).and_return(1)
-      review.stub_chain(:map,:reviewer,:id).and_return(1)
-      AssignmentParticipant.any_instance.stub_chain(:where,:first).and_return(assignment)
-      FeedbackResponseMap.any_instance.stub_chain(:where,:first).and_return(map)
-      FeedbackResponseMap.any_instance.stub(:create).and_return(map)
-
-      get :view
-
-      expect(response).should redirect_to :action => :view, :id => map.id,:return => "feedback"
-    end
-    it "returns http failure if no review is found" do
-      Response.stub(:find).and_return(false)
-      expect(response).to have_http_status(404)
-    end
-  end
   
 
 

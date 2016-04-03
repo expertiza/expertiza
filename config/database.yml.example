@@ -1,6 +1,6 @@
 development:
   adapter: mysql2
-  database: expertiza_development
+  database: expertiza_test
   username: root
   password: 
   host: localhost

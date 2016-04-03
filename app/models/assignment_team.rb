@@ -50,7 +50,7 @@ class AssignmentTeam < Team
     ReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', self.id, reviewer.id, assignment.id).count > 0
   end
 
-  # Topic picked by the team
+  # Topic picked by the team for the assignment
   # This method needs refactoring: it sounds like it returns a topic object but in fact it returns an id
   def topic
     team_topic = nil

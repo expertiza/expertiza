@@ -124,8 +124,8 @@ describe "assignment function" do
           :days_between_submissions => 7
       )
     end
-  end
 =end
+  end
 
   describe "topics tab" do
 

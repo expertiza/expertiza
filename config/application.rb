@@ -8,10 +8,18 @@ Bundler.require(*Rails.groups)
 
 module Expertiza
   class Application < Rails::Application
+
+    #This is a logger to capture internal server errors that do not show up when testing javascript. Look in log/diagnostic.txt when there is a 500 error.
+    if Rails.env == 'test'
+      require File.expand_path("../diagnostic.rb", __FILE__)
+      config.middleware.use(MyApp::DiagnosticMiddleware)
+    end
+
     # Do not access db or load models while precompiling
     config.assets.initialize_on_precompile = false
 
     config.time_zone = 'UTC'
+
 
     #setting the default ssl setting to false
     config.use_ssl = false
@@ -44,4 +52,5 @@ module Expertiza
     ::Sass::Script::Value::Number.precision = [8, ::Sass::Script::Value::Number.precision].max
 
   end
+
 end

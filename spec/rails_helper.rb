@@ -58,6 +58,8 @@ RSpec.configure do |config|
 
   def login_as(user_name)
     user = User.find_by_name(user_name)
+    msg = user.to_yaml
+    File.open('log/diagnostic.txt', 'a') { |f| f.write msg }
 
     visit root_path
     fill_in 'login_name', with: user_name
@@ -71,4 +73,31 @@ RSpec.configure do |config|
     allow_any_instance_of(ApplicationController).to receive(:current_role_name).and_return(current_role_name)
     allow_any_instance_of(ApplicationController).to receive(:current_role).and_return(current_role)
   end
+ def questionnaire_options(assignment, type, round=0)
+    questionnaires = Questionnaire.where( ['private = 0 or instructor_id = ?', assignment.instructor_id]).order('name')
+    options = Array.new
+    questionnaires.select { |x| x.type == type }.each do |questionnaire|
+      options << [questionnaire.name, questionnaire.id]
+    end
+    options
+  end
+
+  def get_questionnaire(finder_var = nil)
+    if finder_var.nil?
+      AssignmentQuestionnaire.find_by_assignment_id(@assignment[:id])
+    else
+      AssignmentQuestionnaire.where(:assignment_id=>@assignment[:id]).where(:questionnaire_id=>get_selected_id(finder_var))
+    end
+  end
+
+  def get_selected_id(finder_var)
+    if finder_var == "ReviewQuestionnaire2"
+      ReviewQuestionnaire.find_by_name(finder_var)[:id]
+    elsif finder_var == "AuthorFeedbackQuestionnaire2"
+      AuthorFeedbackQuestionnaire.find_by_name(finder_var)[:id]
+    elsif finder_var == "TeammateReviewQuestionnaire2"
+      TeammateReviewQuestionnaire.find_by_name(finder_var)[:id]
+    end
+  end
 end
+

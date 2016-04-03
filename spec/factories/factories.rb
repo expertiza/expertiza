@@ -944,10 +944,10 @@ FactoryGirl.define do
 
   factory :assignment ,class:Assignment do
     sequence(:name, 2) { |n| n=2; "final#{n}" }
-    directory_path "final_test" 
-    submitter_count 0 
-    course { Course.first || association(:course)} 
-    instructor { User.first || association(:instructor)} 
+    directory_path "final_test"
+    submitter_count 0
+    course { Course.first || association(:course)}
+    instructor { User.first || association(:instructor)}
     private false
     num_reviews 1
     num_review_of_reviews 1
@@ -1073,6 +1073,39 @@ FactoryGirl.define do
     instruction_loc nil
   end
 
+  factory :metareview_questionnaire, class:MetareviewQuestionnaire do
+    name 'Test questionaire'
+    instructor {User.where(role_id: 1).first || association(:instructor)}
+    private 0
+    min_question_score 0
+    max_question_score 5
+    type 'MetareviewQuestionnaire'
+    display_type 'Review'
+    instruction_loc nil
+  end
+
+  factory :author_feedback_questionnaire, class:AuthorFeedbackQuestionnaire do
+    name 'Test questionaire'
+    instructor {User.where(role_id: 1).first || association(:instructor)}
+    private 0
+    min_question_score 0
+    max_question_score 5
+    type 'AuthorFeedbackQuestionnaire'
+    display_type 'Review'
+    instruction_loc nil
+  end
+
+  factory :teammate_review_questionnaire, class:TeammateReviewQuestionnaire do
+    name 'Test questionaire'
+    instructor {User.where(role_id: 1).first || association(:instructor)}
+    private 0
+    min_question_score 0
+    max_question_score 5
+    type 'TeammateReviewQuestionnaire'
+    display_type 'Review'
+    instruction_loc nil
+  end
+
   factory :question, class:Question do
     txt 'Test question:'
     weight 1
@@ -1111,3 +1144,4 @@ FactoryGirl.define do
   end
 
 end
+

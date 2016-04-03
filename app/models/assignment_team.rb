@@ -139,7 +139,7 @@ class AssignmentTeam < Team
     Team.export(csv, parent_id, options, @assignmentteam)
   end
 
-<<<<<<< HEAD
+
   #REFACTOR END:: functionality of import, export handle_duplicate shifted to team.rb
 
   #Copy the current Assignment team to the CourseTeam
@@ -148,7 +148,6 @@ class AssignmentTeam < Team
     new_team.name = name
     new_team.save
     copy_members(new_team)
-=======
     if handle_duplicates == "ignore" #ignore: do not create the new team
       return nil
     end
@@ -160,7 +159,6 @@ class AssignmentTeam < Team
     else # handle_duplicates = "insert"
       return nil
     end
->>>>>>> 68e3142f5ea2bc1b28c9b5399eabc3b42365ad65
   end
 
   #Add Participants to the current Assignment Team

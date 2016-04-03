@@ -8,7 +8,7 @@
     <% end %>
     <% questionnaire = Questionnaire.find_by_instructor_id(map.reviewee_id) %>
     <% if reviewee %>
-      <%topic = SignUpTopic.find(SignedUpTeam.topic_id(@assignment.id, reviewee.user_id))%>
+      <%topic = SignUpTopic.find(SignedUpTeam.topic_id(@assignment.id, reviewee.user_id)) rescue nil%>
       <tr>
         <td><%= unless topic.nil? then " #{topic.topic_identifier}: #{topic.topic_name} --- " end %> <b><%= "#{questionnaire.name}" %></b></td>
           <td>&nbsp;</td>

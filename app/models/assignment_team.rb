@@ -51,6 +51,7 @@ class AssignmentTeam < Team
   end
 
   # Topic picked by the team
+  # This method needs refactoring: it sounds like it returns a topic object but in fact it returns an id
   def topic
     team_topic = nil
     participants.each do |participant|
@@ -138,6 +139,7 @@ class AssignmentTeam < Team
     Team.export(csv, parent_id, options, @assignmentteam)
   end
 
+<<<<<<< HEAD
   #REFACTOR END:: functionality of import, export handle_duplicate shifted to team.rb
 
   #Copy the current Assignment team to the CourseTeam
@@ -146,6 +148,19 @@ class AssignmentTeam < Team
     new_team.name = name
     new_team.save
     copy_members(new_team)
+=======
+    if handle_duplicates == "ignore" #ignore: do not create the new team
+      return nil
+    end
+    return self.generate_team_name(Assignment.find(assignment_id).name) if handle_duplicates == "rename" #rename: rename new team
+
+    if handle_duplicates == "replace" #replace: delete old team
+      team.delete
+      return name
+    else # handle_duplicates = "insert"
+      return nil
+    end
+>>>>>>> 68e3142f5ea2bc1b28c9b5399eabc3b42365ad65
   end
 
   #Add Participants to the current Assignment Team

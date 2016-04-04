@@ -76,6 +76,7 @@ ActiveRecord::Schema.define(version: 20160326205445) do
     t.boolean  "can_review_same_topic",      limit: 1,     default: true
     t.boolean  "can_choose_topic_to_review", limit: 1,     default: true
     t.boolean  "is_calibrated",              limit: 1,     default: false
+    t.boolean  "is_selfreview_enabled",      limit: 1
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree

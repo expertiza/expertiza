@@ -83,6 +83,8 @@ class ResponseController < ApplicationController
   end
 
   #Update the response and answers when student "edit" existing response
+  #E1600
+  #Added if - else condition for 'SelfReviewResponseMap'
   def update
     return unless action_allowed?
 
@@ -96,6 +98,10 @@ class ResponseController < ApplicationController
       if @map.type=="ReviewResponseMap" && @response.round
         @questionnaire = @map.questionnaire(@response.round)
       elsif @map.type=="ReviewResponseMap"
+        @questionnaire = @map.questionnaire(nil)
+      elsif @map.type=="SelfReviewResponseMap" && @response.round
+        @questionnaire = @map.questionnaire(@response.round)
+      elsif @map.type=="SelfReviewResponseMap"
         @questionnaire = @map.questionnaire(nil)
       else
         @questionnaire = @map.questionnaire
@@ -211,13 +217,21 @@ class ResponseController < ApplicationController
     redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]
   end
 
+  #E1600
+  #Added paramps[:return] value for 'SelfReviewResponseMap' to ensure that this method is invoked from self-review operation
   def saving
     @map = ResponseMap.find(params[:id])
+    if(@map.type == "SelfReviewResponseMap")
+      params[:return] = "selfreview"
+    end
+
     @return = params[:return]
     @map.save
     redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
   end
 
+  #E1600
+  #Added if - else for 'SelfReviewResponseMap' for proper redirection
   def redirection
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
@@ -230,6 +244,8 @@ class ResponseController < ApplicationController
       redirect_to :controller => 'grades', :action => 'view', :id => @map.response_map.assignment.id
     elsif params[:return] == "assignment_edit"
       redirect_to controller: 'assignments', action: 'edit', id: @map.response_map.assignment.id
+    elsif params[:return] == "selfreview"
+      redirect_to controller: 'submitted_content', action: 'edit', :id => @map.response_map.reviewer_id
     else
       redirect_to :controller => 'student_review', :action => 'list', :id => @map.reviewer.id
 
@@ -283,9 +299,11 @@ class ResponseController < ApplicationController
 
   end
 
+  #E1600
+  #Added 'SelfReviewResponseMap' to when condition
   def set_questionnaire_for_new_response
     case @map.type
-    when "ReviewResponseMap"
+    when "ReviewResponseMap","SelfReviewResponseMap"
       reviewees_topic=SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.get_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)

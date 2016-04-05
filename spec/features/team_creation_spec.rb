@@ -22,7 +22,7 @@ xdescribe "Team Creation" do
     create(:due_date)
   end
 
-  describe 'one student who signup for a topic should send an inviatation to the other student who has no topic' do
+  describe 'one student who signup for a topic should send an invitation to the other student who has no topic' do
        
      before(:each) do
        user = User.find_by_name("student2064")

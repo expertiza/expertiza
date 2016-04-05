@@ -210,6 +210,7 @@ Expertiza::Application.routes.draw do
       post :update_authorizations
       post :update_duties
       post :change_handle
+      get :view_publishing_rights
     end
   end
 
@@ -360,7 +361,6 @@ Expertiza::Application.routes.draw do
       get :signup
       get :sign_up
       get :team_details
-      get :view_publishing_rights
       get :intelligent_sign_up
       get :intelligent_save
       post :save_topic_deadlines

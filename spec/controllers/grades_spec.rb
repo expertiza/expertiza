@@ -6,19 +6,19 @@ describe GradesController do
   before :each do
     controller.class.skip_before_filter :authorize
   end
-#
-#   xit 'returns the score for an assignment' do
-#     assignmentParticipant = double(AssignmentParticipant)
-#     assignment = double(Assignment)
-#     # questionnaires=double(Questionnaire)
-#     allow(AssignmentParticipant).to receive("find").and_return(assignmentParticipant)
-#     allow(assignmentParticipant).to receive(:assignment).and_return(assignment)
-#     allow(assignment).to receive("questionnaires").and_return([])
-#     allow(assignmentParticipant).to receive("scores").and_return([1,2])
-#     @params = {:id => 1}
-#     expect{get :edit, @params}.to eq([1,2])
-#   end
-#
+
+  xit 'returns the score for an assignment' do
+    assignmentParticipant = double(AssignmentParticipant)
+    assignment = double(Assignment)
+    # questionnaires=double(Questionnaire)
+    allow(AssignmentParticipant).to receive("find").and_return(assignmentParticipant)
+    allow(assignmentParticipant).to receive(:assignment).and_return(assignment)
+    allow(assignment).to receive("questionnaires").and_return([])
+    allow(assignmentParticipant).to receive("scores").and_return([1,2])
+    @params = {:id => 1}
+    expect{get :edit, @params}.to eq([1,2])
+  end
+
   it 'prepares the email content for a conflict notification email when user is instructor' do
     user = double(Assignment)
     allow(user).to receive(:timezonepref){nil}

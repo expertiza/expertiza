@@ -215,7 +215,7 @@ require 'rails_helper'
         create(:teammate_review_questionnaire, name: "TeammateReviewQuestionnaire#{i}")
       end
       login_as("instructor6")
-      visit '/assignments/1/edit'
+      visit "/assignments/#{@assignment.id}/edit"
     end
 
     describe "Load rubric questionnaire" do

@@ -1,6 +1,0 @@
-<% assignments = [] %>
-<% assignments << ActiveRecord::FixtureSet.identify(:assignment1) %>
-team0:
-  name: team0
-  parent_id: <%= assignments[0] %>
-  type: AssignmentTeam

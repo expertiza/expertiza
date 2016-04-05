@@ -1,5 +1,14 @@
 FactoryGirl.define do
 
+  factory :role_of_administrator, class: Role do
+    name 'Administrator'
+    parent_id nil
+    description ''
+
+    # Load and cache the administrator credentials object
+    cache YAML::load("---\n:credentials: !ruby/object:Credentials\nactions:\n  content_pages:\n    view_default: true\n    view: true\n    list: false\n  roles:\n    list: false\n  permissions:\n    list: false\n  auth:\n    login: true\n    logout: true\n    login_failed: true\n  menu_items:\n    link: true\n    list: false\n  site_controllers:\n    list: false\n  controller_actions:\n    list: false\n  system_settings:\n    list: false\n  users:\n    list: true\n    keys: true\n  admin:\n    list_instructors: false\n    list_administrators: false\n    list_super_administrators: false\n  course:\n    list_folders: true\n    add_ta: true\n    destroy_course: true\n    edit_course: true\n    new_course: true\n    new_folder: true\n    remove_ta: true\n    update_course: true\n    view_teaching_assistants: true\n    create_course: true\n    list: true\n  suggestion:\n    create: true\n    new: true\n  questionnaire:\n    list: true\n    create_questionnaire: true\n    edit_questionnaire: true\n    copy_questionnaire: true\n    save_questionnaire: true\n    new_quiz: true\n    create_quiz_questionnaire: true\n    update_quiz: true\n    edit_quiz: true\n    view_quiz: true\n  participants:\n    add_student: true\n    edit_team_members: true\n    list_students: true\n    list_courses: true\n    list_assignments: true\n    change_handle: true\n  assignment:\n    list: true\n  institution:\n    list: false\n  student_task:\n    list: true\n  profile:\n    edit: true\n  survey_response:\n    create: true\n    submit: true\n  team:\n    list: true\n    list_assignments: true\n  teams_users:\n    list: true\n  course_evaluation:\n    list: true\n  survey_deployment:\n    list: true\n  statistics:\n    list_surveys: true\n  impersonate:\n    start: true\n    impersonate: true\n  review_mapping:\n    list: true\n    assign_reviewer_dynamically: true\n    release_reservation: true\n    show_available_submissions: true\n    assign_metareviewer_dynamically: true\n    add_self_reviewer: true\n    assign_quiz_dynamically: true\n  tree_display:\n    list: true\n    drill: true\n    goto_questionnaires: true\n    goto_author_feedbacks: true\n    goto_review_rubrics: true\n    goto_global_survey: true\n    goto_surveys: true\n    goto_course_evaluations: true\n    goto_courses: true\n    goto_assignments: true\n    goto_teammate_reviews: true\n    goto_metareview_rubrics: true\n    goto_teammatereview_rubrics: true\n  grades:\n    view_my_scores: true\n  sign_up_sheet:\n    signup_topics: true\n    signup: true\n    delete_signup: true\n    team_details: true\n  leaderboard:\n    index: true\n  review_files:\n    show_code_file: true\n    show_code_file_diff: true\n    show_all_submitted_files: true\n    submit_comment: true\n    submit_review_file: true\n  popup:\n    automated_metareview_details_popup: true\n  advice:\n    edit_advice: true\n    save_advice: true\n  response:\n    delete: true\n  analytic:\n    assignment_list: true\n    course_list: true\n    get_graph_data_bundle: true\n    graph_data_type_list: true\n    index: true\n    init: true\n    render_sample: true\n    team_list: true\n  advertise_for_partner:\n    remove: true\n  versions:\n    revert: true\ncontrollers:\n  content_pages: false\n  controller_actions: false\n  auth: false\n  markup_styles: false\n  menu_items: false\n  permissions: false\n  roles: false\n  site_controllers: false\n  system_settings: false\n  users: true\n  roles_permissions: false\n  admin: false\n  course: true\n  assignment: true\n  questionnaire: true\n  participants: true\n  reports: true\n  institution: false\n  student_task: true\n  profile: true\n  survey_response: true\n  team: true\n  teams_users: true\n  import_file: true\n  course_evaluation: true\n  participant_choices: true\n  survey_deployment: true\n  statistics: true\n  impersonate: true\n  review_mapping: true\n  grades: true\n  tree_display: true\n  student_team: true\n  invitation: true\n  survey: true\n  password_retrieval: true\n  submitted_content: true\n  eula: true\n  student_review: true\n  publishing: true\n  export_file: true\n  response: true\n  popup: true\n  sign_up_sheet: true\n  suggestion: true\n  leaderboard: true\n  delete_object: true\n  assessment360: true\n  review_files: true\n  advertise_for_partners: true\n  join_team_requests: true\n  advertise_for_partner: true\n  automated_metareviews: true\n  advice: true\n  analytic: true\n  versions: true\n  student_quiz: true\npages:\n  home: true\n  expired: true\n  notfound: true\n  denied: true\n  contact_us: true\n  site_admin: false\n  adminpage: true\n  credits: true\n  wiki: true\npermission_ids:\n- 7\n- 7\n- 10\n- 8\n- 4\n- 3\nrole_id: 3\nrole_ids:\n- 3\n- 2\n- 6\n- 1\nupdated_at: 2015-06-11 15:23:44.000000000 Z\n")
+ end
+
   factory :role_of_student ,class: Role do
     name "Student"
     parent_id  nil 
@@ -61,7 +70,7 @@ FactoryGirl.define do
       update_quiz: true
       edit_quiz: true
       view_quiz: true
-    participants.yml:
+    participants:
       add_student: false
       edit_team_members: false
       list_students: false
@@ -166,7 +175,7 @@ FactoryGirl.define do
     course: false
     assignment: false
     questionnaire: false
-    participants.yml: false
+    participants: false
     reports: true
     institution: false
     student_task: true
@@ -389,7 +398,7 @@ FactoryGirl.define do
       update_quiz: true
       edit_quiz: true
       view_quiz: true
-    participants.yml:
+    participants:
       add_student: true
       edit_team_members: true
       list_students: true
@@ -494,7 +503,7 @@ FactoryGirl.define do
     course: true
     assignment: true
     questionnaire: true
-    participants.yml: true
+    participants: true
     reports: true
     institution: false
     student_task: true
@@ -854,6 +863,29 @@ FactoryGirl.define do
 ')
   end
 
+  factory :admin, class: User do
+    sequence(:name) { |n| "admin#{n}" }
+    role { Role.where(name: 'Administrator').first || association(:role_of_administrator) }
+    password "password"
+    password_confirmation "password"
+    sequence(:fullname) { |n| "#{n}, administrator" }
+    email "expertiza@mailinator.com"
+    parent_id  1
+    private_by_default  false
+    mru_directory_path  nil
+    email_on_review  true
+    email_on_submission  true
+    email_on_review_of_review  true
+    is_new_user false
+    master_permission_granted 0
+    handle "handle"
+    leaderboard_privacy false
+    digital_certificate  nil
+    timezonepref nil
+    public_key nil
+    copy_of_emails  false
+  end
+
   factory :student, class: User do
     # Zhewei: In order to keep students the same names (2064, 2065, 2066) before each example.
     sequence(:name) { |n| n=n%3;  "student206#{n+4}" }
@@ -912,16 +944,16 @@ FactoryGirl.define do
 
   factory :assignment ,class:Assignment do
     sequence(:name, 2) { |n| n=2; "final#{n}" }
-    directory_path "final_test" 
-    submitter_count 0 
-    course { Course.first || association(:course)} 
-    instructor { User.first || association(:instructor)} 
+    directory_path "final_test"
+    submitter_count 0
+    course { Course.first || association(:course)}
+    instructor { User.first || association(:instructor)}
     private false
-    num_reviews 0
-    num_review_of_reviews 0
-    num_review_of_reviewers 0
+    num_reviews 1
+    num_review_of_reviews 1
+    num_review_of_reviewers 1
     reviews_visible_to_all false
-    num_reviewers 0
+    num_reviewers 1
     spec_location "https://expertiza.ncsu.edu/"
     max_team_size 3
     staggered_deadline false
@@ -1041,6 +1073,39 @@ FactoryGirl.define do
     instruction_loc nil
   end
 
+  factory :metareview_questionnaire, class:MetareviewQuestionnaire do
+    name 'Test questionaire'
+    instructor {User.where(role_id: 1).first || association(:instructor)}
+    private 0
+    min_question_score 0
+    max_question_score 5
+    type 'MetareviewQuestionnaire'
+    display_type 'Review'
+    instruction_loc nil
+  end
+
+  factory :author_feedback_questionnaire, class:AuthorFeedbackQuestionnaire do
+    name 'Test questionaire'
+    instructor {User.where(role_id: 1).first || association(:instructor)}
+    private 0
+    min_question_score 0
+    max_question_score 5
+    type 'AuthorFeedbackQuestionnaire'
+    display_type 'Review'
+    instruction_loc nil
+  end
+
+  factory :teammate_review_questionnaire, class:TeammateReviewQuestionnaire do
+    name 'Test questionaire'
+    instructor {User.where(role_id: 1).first || association(:instructor)}
+    private 0
+    min_question_score 0
+    max_question_score 5
+    type 'TeammateReviewQuestionnaire'
+    display_type 'Review'
+    instruction_loc nil
+  end
+
   factory :question, class:Question do
     txt 'Test question:'
     weight 1
@@ -1077,4 +1142,6 @@ FactoryGirl.define do
     round nil
     is_submitted false
   end
+
 end
+

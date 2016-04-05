@@ -54,9 +54,9 @@
     		<!--Display submitted hyperlinks-->
  			
  			<% participant = @participants.first %>
-    		<% if !participant.nil? and !participant.hyperlinks_array.empty? %>
+    		<% if !participant.nil? and !participant.team.hyperlinks.empty? %>
               <%= "Hyperlinks:<br/>".html_safe %>
-              <% participant.hyperlinks_array.each do |link| %>
+              <% participant.team.hyperlinks.each do |link| %>
 	    		<a href="<%= link %>" target="_blank"><%= link %></a><br/>
               <% end %>
 	    	<% end %>

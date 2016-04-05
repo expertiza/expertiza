@@ -166,7 +166,6 @@ class ReviewMappingController < ApplicationController
       # rescue Exception => e
       #   flash[:error] = (e.nil?) ? $! : e
       # end
-    end
 
     redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
   end
@@ -499,14 +498,12 @@ class ReviewMappingController < ApplicationController
         @calibration_response_maps = ReviewResponseMap.where(["reviewed_object_id = ? and calibrate_to = ?", params[:id], 1])
         @review_response_map_ids = ReviewResponseMap.select('id').where(["reviewed_object_id = ? and calibrate_to = ?", params[:id], 0])
         @responses = Response.where(["map_id IN (?)", @review_response_map_ids])
-  end
-
+      end
+    end
   #E1600
   # Start self review if not started yet - Creates a self-review mapping when user requests a self-review
   def start_self_review
-    binding.pry
     assignment = Assignment.find(params[:assignment_id])
-    binding.pry
     team_id = TeamsUser.find_by_sql(["SELECT t.id as t_id FROM teams_users u, teams t WHERE u.team_id = t.id and t.parent_id = ? and user_id = ?", assignment.id, params[:reviewer_userid]])
 
     begin

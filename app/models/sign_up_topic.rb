@@ -17,20 +17,20 @@ class SignUpTopic < ActiveRecord::Base
   #  return find_by_sql("select t.id from teams t,teams_users u where t.id=u.team_id and u.user_id = 5");
   #end
 
-  def self.import(row,session,id = nil)
+  def self.import(columns,session,id = nil)
 
-    if row.length != 4
-      raise ArgumentError, "CSV File expects the format: Topic identifier, Topic name, Max choosers, Topic Category"
+    if columns.length < 3
+      raise ArgumentError, "CSV File expects the format: Topic identifier, Topic name, Max choosers, Topic Category (optional)"
     end
 
-    topic = SignUpTopic.where(topic_name: row[1], assignment_id: session[:assignment_id]).first
+    topic = SignUpTopic.where(topic_name: columns[1], assignment_id: session[:assignment_id]).first
 
     if topic == nil
-      attributes = ImportTopicsHelper::define_attributes(row)
+      attributes = ImportTopicsHelper::define_attributes(columns)
       ImportTopicsHelper::create_new_sign_up_topic(attributes,session)
     else
-      topic.max_choosers = row[2]
-      topic.topic_identifier = row[0]
+      topic.max_choosers = columns[2]
+      topic.topic_identifier = columns[0]
       #topic.assignment_id = session[:assignment_id]
       topic.save
     end
@@ -126,15 +126,6 @@ class SignUpTopic < ActiveRecord::Base
         SignUpTopic.assign_to_first_waiting_team(next_wait_listed_team)
       end
     }
-  end
-
-  def self.remove_team(users_team, assignment_id)
-    if users_team.size == 0
-      @selected_topics = nil
-    else
-      #TODO: fix this; cant use 0
-      @selected_topics = SignUpSheetController.other_confirmed_topic_for_user(assignment_id, users_team[0].t_id)
-    end
   end
 
   def self.has_suggested_topic?(assignment_id)

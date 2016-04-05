@@ -4,6 +4,7 @@ class Team < ActiveRecord::Base
   has_many :join_team_requests
   has_one :team_node,:foreign_key => :node_object_id,:dependent => :destroy
   has_many :bids, :dependent => :destroy
+  has_many :signed_up_teams
   has_paper_trail
 
   def assignment

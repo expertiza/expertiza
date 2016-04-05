@@ -10,7 +10,7 @@ RSpec.describe ResponseController, type: :controller do
     it "returns http success" do
         
       get :new_feedback
-      expect(response).should redirect_to(request.env['HTTP_REFERER'] ? :back : :root)
+      expect(response).to redirect_to(request.env['HTTP_REFERER'] ? :back : :root)
     end
   end
 
@@ -19,7 +19,7 @@ RSpec.describe ResponseController, type: :controller do
     
     it "returns http success" do
       get :saving
-      expect(response).should redirect_to(request.env['HTTP_REFERER'] ? :back : :root)
+      expect(response).to redirect_to(request.env['HTTP_REFERER'] ? :back : :root)
     end
   end
 
@@ -28,14 +28,14 @@ RSpec.describe ResponseController, type: :controller do
 
     it "returns http success" do
       get :redirection
-      expect(response).should redirect_to(request.env['HTTP_REFERER'] ? :back : :root)
+      expect(response).to redirect_to(request.env['HTTP_REFERER'] ? :back : :root)
     end
   end
 
   describe "POST #custom_create" do
     it "returns http success" do
       post :create
-      expect(response).should redirect_to(request.env['HTTP_REFERER'] ? :back : :root)
+      expect(response).to redirect_to(request.env['HTTP_REFERER'] ? :back : :root)
     end
   end
 
@@ -68,7 +68,7 @@ describe "GET #new_feedback" do
 
       get :new_feedback
       
-      expect(response).should redirect_to :action => :new, :id => map.id,:return => "feedback"
+      expect(response).to redirect_to :action => :new, :id => map.id,:return => "feedback"
     end
     it "redirects to same page if no review is found" do
     Response.stub(:find).and_return(false) 

@@ -41,11 +41,10 @@ class AssignmentTeam < Team
     team_topic
   end
 
+
   # Whether the team has submitted work or not
   def has_submissions?
-    list_of_users = participants;
-    list_of_users.each { |participant| return true if participant.has_submissions? }
-    false
+    return ((self.submitted_files.length > 0) or (hyperlinks.length > 0))
   end
 
   def reviewed_contributor?(contributor)
@@ -203,7 +202,37 @@ class AssignmentTeam < Team
         scores[:total_score] = assignment.compute_total_score(scores)
         scores
       end
-     
+
+      def hyperlinks
+        self.submitted_hyperlinks.blank? ? [] : YAML::load(self.submitted_hyperlinks)
+      end
+
+      # Appends the hyperlink to a list that is stored in YAML format in the DB
+      # @exception  If is hyperlink was already there
+      #             If it is an invalid URL
+
+      def submit_hyperlink(hyperlink)
+        hyperlink.strip!
+        raise "The hyperlink cannot be empty" if hyperlink.empty?
+        url = URI.parse(hyperlink)
+        # If not a valid URL, it will throw an exception
+        Net::HTTP.start(url.host, url.port)
+        hyperlinks = self.hyperlinks
+        hyperlinks << hyperlink
+        self.submitted_hyperlinks = YAML::dump(hyperlinks)
+        self.save
+      end
+
+      # Note: This method is not used yet. It is here in the case it will be needed.
+      # @exception  If the index does not exist in the array
+
+      def remove_hyperlink(hyperlink_to_delete)
+        hyperlinks = self.hyperlinks
+        hyperlinks.delete(hyperlink_to_delete)
+        self.submitted_hyperlinks = YAML::dump(hyperlinks)
+        self.save
+      end
+
       def self.team(participant)
         return nil if participant.nil?
         team = nil

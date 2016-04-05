@@ -217,7 +217,7 @@ class SignUpSheetController < ApplicationController
     #(A student/team has submitted if participant directory_num is non-null or submitted_hyperlinks is non-null.)
     #If there is no drop topic deadline, student can drop topic at any time (if all the submissions are deleted)
     #If there is a drop topic deadline, student cannot drop topic after this deadline.
-    if !participant.team.submitted_files.empty? or !participant.hyperlinks_array.empty?
+    if !participant.team.submitted_files.empty? or !participant.team.hyperlinks.empty?
       flash[:error] = "You have submitted your work, so you are not allowed to drop your topic."
     elsif !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
       flash[:error] = "You cannot drop your topic after drop topic deadline!"

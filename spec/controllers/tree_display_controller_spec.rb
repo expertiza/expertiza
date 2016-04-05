@@ -6,12 +6,12 @@ describe TreeDisplayController do
     it "should not redirect to student_task controller if current user is an instructor" do
       allow(session[:user]).to receive("student?").and_return(false)
       post "list"
-      response.should_not redirect_to(list_student_task_index_path)
+      expect(response).not_to redirect_to(list_student_task_index_path)
     end
     it "should redirect to student_task controller if current user is a student" do
       allow(session[:user]).to receive("student?").and_return(true)
       post "list"
-      response.should redirect_to(list_student_task_index_path)
+      expect(response).to redirect_to(list_student_task_index_path)
     end
   end
 
@@ -40,7 +40,7 @@ describe TreeDisplayController do
   describe "#drill" do
     it "redirect to list action" do
       get "drill" , root: 1
-      session[:root].should == "1"
+      expect(session[:root]).to eq('1')
       expect(response).to redirect_to(list_tree_display_index_path)
     end
 

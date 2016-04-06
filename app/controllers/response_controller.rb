@@ -4,15 +4,14 @@ class ResponseController < ApplicationController
 
   def action_allowed?
     case params[:action]
-      when 'edit'  # If response has been submitted, no further editing allowed
-        response = Response.find(params[:id])
-        if (response.is_submitted)
+      # Deny access to anyone except reviewer & author's team
+      when 'edit'
+        if (response.is_submitted) # If response has been submitted, no further editing allowed
           return false
         end
-    end
-    case params[:action]
-      # Deny access to anyone except reviewer & author's team
-      when 'edit','delete','update'
+        response = Response.find(params[:id])
+        current_user_id?(response.map.reviewer.user_id)
+      when 'delete','update'
         response = Response.find(params[:id])
         current_user_id?(response.map.reviewer.user_id)
       when 'view'
@@ -20,7 +19,7 @@ class ResponseController < ApplicationController
         map = response.map
 
         # if it is a review response map, all the members of revieweee team should be able to view the reponse (can be done from heat map)
-        if map.is_a? ReviewResponseMap 
+        if map.is_a? ReviewResponseMap
           reviewee_team = AssignmentTeam.find(map.reviewee_id)
           current_user_id?(response.map.reviewer.user_id) || reviewee_team.has_user(current_user) || (['Administrator','Instructor','Teaching Assistant'].include? current_user.role.name)
         else
@@ -62,7 +61,6 @@ class ResponseController < ApplicationController
 
     @map = @response.map
     @contributor = @map.contributor
-    array_not_empty=0
     set_all_responses
     if @prev.present?
       @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
@@ -108,14 +106,7 @@ class ResponseController < ApplicationController
       end
       questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
 
-      params[:responses].each_pair do |k, v|
-        score = Answer.where(response_id: @response.id, question_id:  questions[k.to_i].id).first
-        unless score
-          score = Answer.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :answer => v[:score], :comments => v[:comment])
-        end
-        score.update_attribute('answer', v[:score])
-        score.update_attribute('comments', v[:comment])
-      end
+
        questions=sort_questions(@questionnaire.questions)
        create_answers(params,questions)
       questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
@@ -183,9 +174,6 @@ class ResponseController < ApplicationController
   def create
     @map = ResponseMap.find(params[:id]) #assignment/review/metareview id is in params id
 
-    msg = ""
-    error_msg = ""
-
     set_all_responses
 
     #to save the response for ReviewResponseMap, a questionnaire_id is wrapped in the params
@@ -213,6 +201,7 @@ class ResponseController < ApplicationController
 
     #@map.save
     msg = "Your response was successfully saved."
+    error_msg="Error"
     @response.email();
     redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]
   end
@@ -236,6 +225,7 @@ class ResponseController < ApplicationController
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
     @map = Response.find_by_map_id(params[:id])
+
     if params[:return] == "feedback"
       redirect_to :controller => 'grades', :action => 'view_my_scores', :id => @map.reviewer.id
     elsif params[:return] == "teammate"

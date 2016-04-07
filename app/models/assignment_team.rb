@@ -183,6 +183,35 @@ class AssignmentTeam < Team
     scores
   end
 
+  def hyperlinks
+    self.submitted_hyperlinks.blank? ? [] : YAML::load(self.submitted_hyperlinks)
+  end
+
+  # Appends the hyperlink to a list that is stored in YAML format in the DB
+  # @exception  If is hyperlink was already there
+  #             If it is an invalid URL
+
+  def submit_hyperlink(hyperlink)
+    hyperlink.strip!
+    raise "The hyperlink cannot be empty" if hyperlink.empty?
+    url = URI.parse(hyperlink)
+    # If not a valid URL, it will throw an exception
+    Net::HTTP.start(url.host, url.port)
+    hyperlinks = self.hyperlinks
+    hyperlinks << hyperlink
+    self.submitted_hyperlinks = YAML::dump(hyperlinks)
+    self.save
+  end
+
+  # Note: This method is not used yet. It is here in the case it will be needed.
+  # @exception  If the index does not exist in the array
+
+  def remove_hyperlink(hyperlink_to_delete)
+    hyperlinks = self.hyperlinks
+    hyperlinks.delete(hyperlink_to_delete)
+    self.submitted_hyperlinks = YAML::dump(hyperlinks)
+    self.save
+  end
 
   #return the team given the participant
   def self.team(participant)

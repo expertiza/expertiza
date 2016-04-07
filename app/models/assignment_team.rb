@@ -234,7 +234,6 @@ class AssignmentTeam < Team
     fields.push("Assignment Name")
   end
 
-
   #Remove a team given the team id
   def self.remove_team_by_id(id)
     old_team = AssignmentTeam.find(id)

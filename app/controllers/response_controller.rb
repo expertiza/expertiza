@@ -4,26 +4,24 @@ class ResponseController < ApplicationController
 
   def action_allowed?
     case params[:action]
-      # Deny access to anyone except reviewer & author's team
-      when 'edit'
-        if (response.is_submitted) # If response has been submitted, no further editing allowed
-          return false
-        end
+      when 'edit'  # If response has been submitted, no further editing allowed
         response = Response.find(params[:id])
-        current_user_id?(response.map.reviewer.user_id)
+        return false if response.is_submitted
+        return current_user_id?(response.map.reviewer.user_id)
+      # Deny access to anyone except reviewer & author's team
       when 'delete','update'
         response = Response.find(params[:id])
-        current_user_id?(response.map.reviewer.user_id)
+        return current_user_id?(response.map.reviewer.user_id)
       when 'view'
         response = Response.find(params[:id])
         map = response.map
-
-        # if it is a review response map, all the members of revieweee team should be able to view the reponse (can be done from heat map)
-        if map.is_a? ReviewResponseMap
+        assignment = response.map.reviewer.assignment
+        # if it is a review response map, all the members of reviewee team should be able to view the reponse (can be done from heat map)
+        if map.is_a? ReviewResponseMap 
           reviewee_team = AssignmentTeam.find(map.reviewee_id)
-          current_user_id?(response.map.reviewer.user_id) || reviewee_team.has_user(current_user) || (['Administrator','Instructor','Teaching Assistant'].include? current_user.role.name)
+          return current_user_id?(response.map.reviewer.user_id) || reviewee_team.has_user(current_user) || current_user.role.name == 'Administrator' || (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id ) || (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
         else
-          current_user_id?(response.map.reviewer.user_id)
+          return current_user_id?(response.map.reviewer.user_id)
         end
       else
         current_user

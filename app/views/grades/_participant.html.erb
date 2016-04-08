@@ -163,11 +163,9 @@ participant = pscore[:participant]
         <TD COLSPAN="10"><%= render :partial=>'grades/submissions', :locals => {:participant => participant} %></TD>
     </TR>
 <% end %>
-<% if (controller.action_name != "view_my_scores" and index == 0) or controller.action_name == "view_my_scores" %>
     <TR id="<%= prefix %>_reviews" style="display:none; background-color: white;">
         <TD COLSPAN="10"><%= render :partial=>'grades/reviews', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:review]} %></TD>
     </TR>
-<% end %>
 
 <TR id="<%= prefix %>_mreviews" style="display:none; background-color: white;">
     <TD COLSPAN="10"><%= render :partial=>'grades/metareviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:metareview]} %></TD>

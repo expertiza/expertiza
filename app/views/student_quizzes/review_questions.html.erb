@@ -43,35 +43,8 @@
 
       <%questions = questionnaire.questions%>
       <% questions.each do |question| %>
-        <b> <%= question.txt %><br></b>
-        <% question_type = question.get_formatted_question_type%>
-        Question Type: <%= question_type %><br>
+        <%= question.view_question_text%>
 
-        <% if question_type == 'True/False' %>
-          Correct Answer: <%= (QuizQuestionChoice.where(question_id: question.id, iscorrect:1).first.txt) %><br><br>
-        <% elsif question_type == 'Multiple Choice - Radio' %>
-          <% correct_answer = '' %>
-          Answer Options:<br>
-          <% QuizQuestionChoice.where(question_id: question.id).each do |choice| %>
-            <% if choice.iscorrect == true  %>
-              &nbsp;&nbsp;<B><%= choice.txt %></B><br>
-            <%else%>
-              &nbsp;&nbsp;<%= choice.txt %><br>
-            <% end %>
-
-          <% end %>
-          <br><br>
-        <% elsif question_type == 'Multiple Choice - Checked' %>
-          Answer Options:<br>
-          <% QuizQuestionChoice.where(question_id: question.id).each do |choice| %>
-            <% if choice.iscorrect == true  %>
-              &nbsp;&nbsp;<B><%= choice.txt %></B><br>
-            <%else%>
-              &nbsp;&nbsp;<%= choice.txt %><br>
-            <% end %>
-          <% end %>
-          <br><br>
-        <% end %>
       <% end %><hr>
   <% end %>
 </table>

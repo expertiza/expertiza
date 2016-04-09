@@ -339,7 +339,7 @@ describe 'Instructor', js:true do
 
     # Verify that the question and answer choices are listed
     expect(page).to have_text(@question.txt)
-    expect(page).to have_text("Question Type: Multiple Choice - Radio")
+    expect(page).to have_text("Question Type: MultipleChoiceRadio")
     expect(page).to have_text('Answer 1')
     expect(page).to have_text('Answer 2')
     expect(page).to have_text('Answer 3')

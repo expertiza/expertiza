@@ -26,4 +26,14 @@ class FeedbackResponseMap < ResponseMap
   def contributor
     self.review.map.reviewee
   end
+  def self.feedback_response_report(id,type)
+    #Example query
+    #SELECT distinct reviewer_id FROM response_maps where type = 'FeedbackResponseMap' and
+    #reviewed_object_id in (select id from responses where
+    #map_id in (select id from response_maps where reviewed_object_id = 722 and type = 'ReviewResponseMap'))
+    @review_response_map_ids = ResponseMap.select("id").where(["reviewed_object_id = ? and type = ?", id, 'ReviewResponseMap'])
+    @response_ids = Response.select("id").where(["map_id IN (?)", @review_response_map_ids])
+    @reviewers = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id IN (?) and type = ?", @response_ids, type])
+  end
 end
+

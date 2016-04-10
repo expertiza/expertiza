@@ -6,13 +6,13 @@ describe 'has_paper_trail' do
     for version in Version.all
       version.delete
     end
-    Version.all.count.should == 0
+    expect(Version.all.count).to eq(0)
 
     @delayed_job = DelayedJob.new
     @delayed_job.id = 1
     @delayed_job.priority = 1
     @delayed_job.attempts = 0
     @delayed_job.save
-    Version.all.count.should == 1
+    expect(Version.all.count).to eq(1)
   end
 end

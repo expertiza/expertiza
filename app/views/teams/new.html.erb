@@ -6,7 +6,12 @@
   assignment was created.</p>
 
 <%= form_tag :action => 'create_teams' do %>
-  Team Size:<%= select_tag 'team_size', options_for_select(2..@parent.max_team_size), size: 1 %>
+    <!-- BUG FIX: Check if the parent is course, then set the max size as 4 otherwise the max team size of assignment team-->
+    <% if @parent.is_a?(Course)%>
+          Team Size:<%= select_tag 'team_size', options_for_select(2..4), size: 1 %>
+    <% else %>
+          Team Size:<%= select_tag 'team_size', options_for_select(2..@parent.max_team_size), size: 1 %>
+    <% end %>
 <%= hidden_field_tag 'id', @parent.id %>
 
 <%= submit_tag "Create Teams" %>

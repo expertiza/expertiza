@@ -227,7 +227,7 @@ class ReputationWebServiceController < ApplicationController
 		req.body.prepend('{"keys":"')
 		req.body << '"}'
 		req.body.gsub!(/\n/, '\\n')
-		response = Net::HTTP.new('152.46.18.65', 3000).start {|http| http.request(req)}
+		response = Net::HTTP.new('prevdata.csc.ncsu.edu/reputation', 80, 'prevdata.csc.ncsu.edu', 3001, nil, nil).start {|http| http.request(req)}
 		# RSA asymmetric algorithm decrypts keys of AES
 	# Decryption
 		response.body = JSON.parse(response.body)

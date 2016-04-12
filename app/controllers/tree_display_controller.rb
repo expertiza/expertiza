@@ -85,6 +85,7 @@ class TreeDisplayController < ApplicationController
   # ajbudlon, July 3rd 2008
   def list
     redirect_to controller: :student_task, action: :list if current_user.student?
+    redirect_to(:controller => 'users', :action => 'credly_register') if (current_user.credly_id == nil && current_user.credly_accesstoken == nil)
     # if params[:commit] == 'Search'
     #   search_node_root = {'Q' => 1, 'C' => 2, 'A' => 3}
 

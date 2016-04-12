@@ -252,7 +252,6 @@ class UsersController < ApplicationController
     return dataToken
   end
 
-
   def get_credly_user_id(token)
     uri = URI.parse("https://api.credly.com")
     http = Net::HTTP.new(uri.host, uri.port)

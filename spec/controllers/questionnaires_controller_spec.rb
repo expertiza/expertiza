@@ -16,6 +16,11 @@ describe QuestionnairesController do
       #Create an assignment with quiz
       @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 1
 
+      # Create a participant and assignment team
+      @submitter = create :participant, assignment: @assignment
+      @team = create :assignment_team, assignment: @assignment
+      create :team_user, team: @team, user: @submitter.user
+
       # Define needed hash methods to emulate params.
       class Hash
         def require key
@@ -136,7 +141,9 @@ describe QuestionnairesController do
     it 'should validate a correct submission' do
 
       # Call validate and expect to get valid back
-      expect(@controller.validate_quiz).to eq 'valid'
+      quiz = @controller.validate_quiz
+      expect(quiz).to be_a QuizQuestionnaire
+      expect(quiz.valid?).to be true
     end
   end
 end

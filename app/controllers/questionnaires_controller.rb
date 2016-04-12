@@ -99,26 +99,8 @@ class QuestionnairesController < ApplicationController
   def create_questionnaire
     @questionnaire = Object.const_get(params[:questionnaire][:type]).new(questionnaire_params)
 
-    # TODO: check for Quiz Questionnaire?
-    if @questionnaire.type == "QuizQuestionnaire" #checking if it is a quiz questionnaire
-      participant_id = params[:pid] #creating a local variable to send as parameter to submitted content if it is a quiz questionnaire
-      @questionnaire.min_question_score = 0
-      @questionnaire.max_question_score = 1
-      @assignment = Assignment.find(params[:aid])
-      author_team = AssignmentTeam.team(Participant.find(participant_id))
+    if !@questionnaire.is_a? QuizQuestionnaire
 
-      @questionnaire.instructor_id = author_team.id    #for a team assignment, set the instructor id to the team_id
-
-      @successful_create = true
-      save
-
-      save_choices @questionnaire.id
-
-      if @successful_create == true
-        flash[:note] = "Quiz was successfully created"
-      end
-      redirect_to :controller => 'submitted_content', :action => 'edit', :id => participant_id
-    else #if it is not a quiz questionnaire
       if (session[:user]).role.name == "Teaching Assistant"
         @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
       end
@@ -322,11 +304,13 @@ class QuestionnairesController < ApplicationController
 
   #seperate method for creating a quiz questionnaire because of differences in permission
   def create_quiz_questionnaire
-    valid = validate_quiz
-    if valid.eql?("valid")
-      create_questionnaire
+    result = validate_quiz
+    if result.is_a? QuizQuestionnaire
+      result.save
+      flash[:note] = "Quiz was successfully created"
+      redirect_to :controller => 'submitted_content', :action => 'edit', :id => params[:pid]
     else
-      flash[:error] = valid.to_s
+      flash[:error] = result.to_s
       redirect_to :back
     end
   end
@@ -437,19 +421,19 @@ class QuestionnairesController < ApplicationController
     end
   end
 
-  # Validate params as a quiz questionnaire.
-  #
-  # Outputs:
-  #   Either 'valid' or an error message if the quiz does not validate.
-  def validate_quiz
+  # Constructs a new quiz questionnaire from available params.
+  def quiz_questionnaire num_quiz_questions
 
-    # Get the number of quiz questions from the assignment
-    num_quiz_questions = Assignment.find(params[:aid]).num_quiz_questions
-
-    # Construct a quiz questionnaire from parameters
+    # New questionnaire from params
     questionnaire = QuizQuestionnaire.new(questionnaire_params)
+
+    # Set min and max score
     questionnaire.max_question_score = 1
     questionnaire.min_question_score = 0
+
+    # Set author team
+    author_team = AssignmentTeam.team(Participant.find(params[:pid]))
+    questionnaire.instructor_id = author_team.id
 
     # Create each quiz question.
     create_quiz_questions(num_quiz_questions) do |question|
@@ -465,13 +449,11 @@ class QuestionnairesController < ApplicationController
       end
     end
 
-    # If valid, return
-    if questionnaire.valid?
-      return 'valid'
-    end
+    questionnaire
+  end
 
-    # Not valid, return errors
-
+  # Sift through a quiz questionnaire and return validation errors.
+  def questionnaire_errors questionnaire
     questionnaire.errors.messages.each do |key, val|
       return val[0] if key != :quiz_questions
     end
@@ -487,6 +469,27 @@ class QuestionnairesController < ApplicationController
         end
       end
     end
+  end
+
+  # Validate params as a quiz questionnaire.
+  #
+  # Outputs:
+  #   Either 'valid' or an error message if the quiz does not validate.
+  def validate_quiz
+
+    # Get the number of quiz questions from the assignment
+    num_quiz_questions = Assignment.find(params[:aid]).num_quiz_questions
+
+    # Construct a quiz questionnaire from parameters
+    questionnaire = quiz_questionnaire num_quiz_questions
+
+    # If valid, return
+    if questionnaire.valid?
+      return questionnaire
+    end
+
+    # Not valid, return errors
+    questionnaire_errors questionnaire
   end
 
 

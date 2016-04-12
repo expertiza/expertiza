@@ -137,7 +137,7 @@ class ReputationWebServiceController < ApplicationController
 
 	def send_post_request
 		# https://www.socialtext.net/open/very_simple_rest_in_ruby_part_3_post_to_create_a_new_workspace
-		req = Net::HTTP::Post.new('/calculations/reputation_algorithms', initheader = {'Content-Type' =>'application/json', 'charset' => 'utf-8'})
+		req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', initheader = {'Content-Type' =>'application/json', 'charset' => 'utf-8'})
 		curr_assignment_id = (params[:assignment_id].empty? ? '724' : params[:assignment_id])
 		req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
 		req.body[0] = '' # remove the first '{'
@@ -227,7 +227,7 @@ class ReputationWebServiceController < ApplicationController
 		req.body.prepend('{"keys":"')
 		req.body << '"}'
 		req.body.gsub!(/\n/, '\\n')
-		response = Net::HTTP.new('prevdata.csc.ncsu.edu/reputation', 80, 'prevdata.csc.ncsu.edu', 3001, nil, nil).start {|http| http.request(req)}
+		response = Net::HTTP.new('prevdata.csc.ncsu.edu').start {|http| http.request(req)}
 		# RSA asymmetric algorithm decrypts keys of AES
 	# Decryption
 		response.body = JSON.parse(response.body)

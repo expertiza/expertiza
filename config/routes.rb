@@ -517,6 +517,8 @@ Expertiza::Application.routes.draw do
 
   get '/users/show_selection', controller: :users, action: :show_selection
   get '/users/list', controller: :users, action: :list
+  get '/users/credly_register', controller: :users, action: :credly_register
+  post '/users/credly_register', controller: :users, action: :credly_register
   get '/menu/*name', controller: :menu_items, action: :link
   get ':page_name', controller: :content_pages, action: :view, method: :get
   get '/submitted_content/submit_hyperlink' => 'submitted_content#submit_hyperlink'

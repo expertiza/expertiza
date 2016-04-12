@@ -219,7 +219,11 @@ class UsersController < ApplicationController
         @current_user.credly_refreshtoken = refresh_token
         @current_user.save
         flash[:notice] = nil
-        redirect_to :controller => 'student_task', :action => 'list'
+        if current_role_name.eql? 'Student'
+          redirect_to :controller => 'student_task', :action => 'list'
+        else
+          redirect_to :controller => 'tree_display', :action => 'list'
+        end
       rescue
         if data_token['more_info'].key?('email')
           flash[:notice] = data_token['more_info']['email']

@@ -1,0 +1,21 @@
+
+<h1 style="text-align: center">Register for Credly</h1>
+<div class="login-form">
+  <%= form_tag controller: :users, action: :credly_register do %>
+      <p><label for="email">Email</label><br/>
+        <%= email_field 'register', 'email', :size => 12, :class => 'form-control' %></p>
+
+      <p><label for="password">Password</label><br/>
+        <%= password_field 'register', 'password', :size => 12, :class => 'form-control' %></p>
+      <p>
+
+      <p><label for="confirm_password">Confirm Password</label><br/>
+        <%= password_field 'register', 'password_confirm', :size => 12, :class => 'form-control' %></p>
+      <p>
+        <%= submit_tag "Register", :class => 'btn btn-danger', :style => 'width:100%;
+    margin-left:auto;
+    margin-right:auto;' %>
+      </p>
+  <% end %>
+  <br/>
+</div>

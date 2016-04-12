@@ -209,11 +209,11 @@ class UsersController < ApplicationController
   def credly_register
     if request.post?
       begin
-        dataTokens = send_registration_request_credly
-        token = dataTokens['token']
-        refresh_token = dataTokens['refresh_token']
-        userData = get_credly_user_id token
-        user_id = userData['id']
+        data_token = send_registration_request_credly
+        token = data_token['token']
+        refresh_token = data_token['refresh_token']
+        user_data = get_credly_user_id token
+        user_id = user_data['id']
         @current_user.credly_id = user_id
         @current_user.credly_accesstoken = token
         @current_user.credly_refreshtoken = refresh_token
@@ -221,10 +221,10 @@ class UsersController < ApplicationController
         flash[:notice] = nil
         redirect_to :controller => 'student_task', :action => 'list'
       rescue
-        if dataTokens['more_info'].key?('email')
-          flash[:notice] = dataTokens['more_info']['email']
-        elsif dataTokens['more_info'].key?('password')
-          flash[:notice] = dataTokens['more_info']['password']
+        if data_token['more_info'].key?('email')
+          flash[:notice] = data_token['more_info']['email']
+        elsif data_token['more_info'].key?('password')
+          flash[:notice] = data_token['more_info']['password']
         else
           flash[:notice] = 'Unable to create a Credly account at the moment. Please try again later.'
         end
@@ -241,15 +241,15 @@ class UsersController < ApplicationController
     request["X-Api-Secret"] = "6qmzTxOQZJfF5K1ExH80K+umX9gfU5lmtswycO9TycswGbKEIPwuoXxcIohF4d6go0FeLMRv9uV+MD0jmeQsHBDaTNKa+blumqcd+cfK1y5lqTbLiLZsxdue9vth3Lh9U6Juy1rvy2VGYo8EOqh46PMjOmmOTUIZan9vvaf8Z0I="
     request.set_form_data({"email" => params['register']['email'], "password" => params['register']['password'], "first_name" => @current_user.name, "last_name" => "", "display_name" => @current_user.name, "is_organization" => "0"})
     response = http.request(request)
-    parsedResponse = JSON.parse(response.body)
+    parsed_response = JSON.parse(response.body)
 
-    dataToken = nil
+    data_token = nil
     if response.code == '200'
-      dataToken = parsedResponse['data']
-    elsif
-      dataToken = parsedResponse['meta']
+      data_token = parsed_response['data']
+    else
+      data_token = parsed_response['meta']
     end
-    return dataToken
+    data_token
   end
 
   def get_credly_user_id(token)
@@ -260,15 +260,15 @@ class UsersController < ApplicationController
     request["X-Api-Key"] = "f14c0138c043c3159420f297276eab61"
     request["X-Api-Secret"] = "6qmzTxOQZJfF5K1ExH80K+umX9gfU5lmtswycO9TycswGbKEIPwuoXxcIohF4d6go0FeLMRv9uV+MD0jmeQsHBDaTNKa+blumqcd+cfK1y5lqTbLiLZsxdue9vth3Lh9U6Juy1rvy2VGYo8EOqh46PMjOmmOTUIZan9vvaf8Z0I="
     response = http.request(request)
-    parsedResponse = JSON.parse(response.body)
+    parsed_response = JSON.parse(response.body)
 
-    userData = nil;
-    if(response.code == '200')
-      userData = parsedResponse['data']
-    elsif
-      userData = parsedResponse['meta']
+    user_data = nil
+    if response.code == '200'
+      user_data = parsed_response['data']
+    else
+      user_data = parsed_response['meta']
     end
-    return userData
+    user_data
   end
 
 

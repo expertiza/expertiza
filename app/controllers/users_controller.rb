@@ -208,16 +208,27 @@ class UsersController < ApplicationController
 
   def credly_register
     if request.post?
-      dataTokens = send_registration_request_credly
-      token = dataTokens['token']
-      refresh_token = dataTokens['refresh_token']
-      userData = get_credly_user_id token
-      user_id = userData['id']
-      @current_user.credly_id = user_id
-      @current_user.credly_accesstoken = token
-      @current_user.credly_refreshtoken = refresh_token
-      @current_user.save
-      redirect_to :controller => 'student_task', :action => 'list'
+      begin
+        dataTokens = send_registration_request_credly
+        token = dataTokens['token']
+        refresh_token = dataTokens['refresh_token']
+        userData = get_credly_user_id token
+        user_id = userData['id']
+        @current_user.credly_id = user_id
+        @current_user.credly_accesstoken = token
+        @current_user.credly_refreshtoken = refresh_token
+        @current_user.save
+        flash[:notice] = nil
+        redirect_to :controller => 'student_task', :action => 'list'
+      rescue
+        if dataTokens['more_info'].key?('email')
+          flash[:notice] = dataTokens['more_info']['email']
+        elsif dataTokens['more_info'].key?('password')
+          flash[:notice] = dataTokens['more_info']['password']
+        else
+          flash[:notice] = 'Unable to create a Credly account at the moment. Please try again later.'
+        end
+      end
     end
   end
 
@@ -235,6 +246,8 @@ class UsersController < ApplicationController
     dataToken = nil
     if response.code == '200'
       dataToken = parsedResponse['data']
+    elsif
+      dataToken = parsedResponse['meta']
     end
     return dataToken
   end
@@ -253,8 +266,9 @@ class UsersController < ApplicationController
     userData = nil;
     if(response.code == '200')
       userData = parsedResponse['data']
+    elsif
+      userData = parsedResponse['meta']
     end
-
     return userData
   end
 

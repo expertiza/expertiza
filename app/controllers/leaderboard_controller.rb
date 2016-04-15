@@ -1,14 +1,11 @@
 class LeaderboardController < ApplicationController
-
   before_filter :authorize
 
   def action_allowed?
     true
   end
 
-
-  # Our logic for the overall leaderboard. This method provides the data for
-  # the Top 3 leaderboards and the Personal Achievement leaderboards.
+  # Allows to view leaderBoard - sorted on max number of badges received by a course participant
   def index
     if current_user
       @instructorQuery = LeaderboardHelper.userIsInstructor?(current_user.id)
@@ -18,6 +15,7 @@ class LeaderboardController < ApplicationController
       else
         @courseList = LeaderboardHelper.studentInWhichCourses(current_user.id)
       end
+      @courseInfo = Leaderboard.getCourseInfo(@courseList)
 
       @csHash= Leaderboard.getParticipantEntriesInCourses @courseList, current_user.id
 
@@ -31,7 +29,7 @@ class LeaderboardController < ApplicationController
       @leaderboards = Array.new
 
       @csHash.each { |qType, courseHash|
-        courseHash.each_pair{|courseId, userGradeArray|
+        courseHash.each_pair { |courseId, userGradeArray|
           courseName = LeaderboardHelper.getCourseName(courseId)
           achieveName = LeaderboardHelper.getAchieveName(qType)
 
@@ -44,21 +42,22 @@ class LeaderboardController < ApplicationController
         }
       }
 
-      @leaderboards.sort!{|x,y| x[:courseName] <=> y[:courseName]}
+      @leaderboards.sort! { |x, y| x[:courseName] <=> y[:courseName] }
 
       # Setup personal achievement leaderboards for easier consumption by view
       @achievementLeaderBoards = Array.new
       if !@instructorQuery
-        @courseAccomp.each_pair{ |course, accompHashArray|
+        @courseAccomp.each_pair { |course, accompHashArray|
           courseAccompListHash = Hash.new
           courseAccompListHash[:courseName] = LeaderboardHelper.getCourseName(course)
           courseAccompListHash[:accompList] = Array.new
-          accompHashArray.each {|accompHash|
+          accompHashArray.each { |accompHash|
             courseAccompListHash[:accompList] << accompHash
           }
           @achievementLeaderBoards << courseAccompListHash
         }
       end
+
     end
   end
 end

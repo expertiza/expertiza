@@ -1,36 +1,55 @@
 <SCRIPT LANGUAGE="JavaScript">
   function toggleVis(id) {
-    var elem = document.getElementById(id+"_myDiv");
-    if(elem.style.display == 'none'){
+    var elem = document.getElementById(id + "_myDiv");
+    if (elem.style.display == 'none') {
       elem.style.display = '';
-      document.getElementById(id+"_show").style.display = 'none';
-      document.getElementById(id+"_hide").style.display = '';
+      document.getElementById(id + "_show").style.display = 'none';
+      document.getElementById(id + "_hide").style.display = '';
     } else {
       elem.style.display = 'none';
-      document.getElementById(id+"_show").style.display = '';
-      document.getElementById(id+"_hide").style.display = 'none';
+      document.getElementById(id + "_show").style.display = '';
+      document.getElementById(id + "_hide").style.display = 'none';
     }
   }
 </SCRIPT>
 
-<h1>Leaderboards for <%=current_user.fullname%></h1>
+<h1 style="text-align: center">Badges Information for <%= current_user.fullname %></h1>
 
-<a href="#1" onClick="toggleVis('top3Leaderboard');">
-  <span id="top3Leaderboard_show">View Top 3 Leaderboards</span>
-  <span id="top3Leaderboard_hide" style="display: none">Hide Top 3 Leaderboards</span>
-</a>
-<br/><br/>
-<div id="top3Leaderboard_myDiv" style="display:none">
-  <%= render :partial => 'top3LeaderBoards' %>
-</div>
+<% @courseInfo.each do |course| %>
+    <h4><%= course.name %></h4>
+    <strong>LeaderBoard:</strong>
+    &nbsp;&nbsp;
+    <a href="#1" onClick="toggleVis('leaderBoard');">
+      <span id="leaderBoard_show">View LeaderBoard</span>
+      <span id="leaderBoard_hide" style="display: none">Hide LeaderBoard</span>
+    </a>
+    <br/>
+    <div id="leaderBoard_myDiv" style="display:none">
+      <%= render :partial => 'leaderBoard', :locals => {:course_id => course.id, :user_id => current_user.id} %>
+    </div>
 
-<% if @instructorQuery == false%>
-  <a href="#1" onClick="toggleVis('achievementLeaderboard');">
-    <span id="achievementLeaderboard_show">View Personal Achievement Leaderboards</span>
-    <span id="achievementLeaderboard_hide" style="display: none">Hide Personal Achievement Leaderboards</span>
-  </a>
-  <br/><br/>
-  <div id="achievementLeaderboard_myDiv" style="display:none">
-    <%= render :partial => 'achievementLeaderBoards' %>
-  </div>
+    <% if @instructorQuery %>
+        <strong>Award Badges:</strong>
+        &nbsp;&nbsp;
+        <a href="#1" onClick="toggleVis('awardBadge');">
+          <span id="awardBadge_show">Award Badges</span>
+          <span id="awardBadge_hide" style="display: none">Hide Award Badges</span>
+        </a>
+        <br/>
+        <div id="awardBadge_myDiv" style="display:none">
+          <%= render :partial => 'awardBadges', :locals => {:course_id => course.id, :user_id => current_user.id} %>
+        </div>
+    <% else %>
+        <strong>Personal Badges:</strong>
+        &nbsp;&nbsp;
+        <a href="#1" onClick="toggleVis('personalBadge');">
+          <span id="personalBadge_show">View Personal Badges</span>
+          <span id="personalBadge_hide" style="display: none">Hide Personal Badges</span>
+        </a>
+        <br/>
+        <div id="personalBadge_myDiv" style="display:none">
+          <%= render :partial => 'personalBadges', :locals => {:course_id => course.id, :user_id => current_user.id} %>
+        </div>
+    <% end %>
+    <hr>
 <% end %>

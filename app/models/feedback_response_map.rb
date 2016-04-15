@@ -49,8 +49,8 @@ class FeedbackResponseMap < ResponseMap
       @all_review_response_ids_round_two = Array.new
       @all_review_response_ids_round_three = Array.new
       @temp_review_responses.each do |response|
-        unless @temp_response_map_ids.include? response.map_id
-          @temp_response_map_ids << response.map_id
+        unless @temp_response_map_ids.include? response.map_id.to_s + response.round.to_s
+          @temp_response_map_ids << response.map_id.to_s + response.round.to_s
           @all_review_response_ids_round_one << response.id if response.round == 1
           @all_review_response_ids_round_two << response.id if response.round == 2
           @all_review_response_ids_round_three << response.id if response.round == 3
@@ -59,8 +59,8 @@ class FeedbackResponseMap < ResponseMap
     else
       @all_review_response_ids = Array.new
       @temp_review_responses.each do |response|
-        unless temp_response_map_ids.include? response.map_id
-          temp_response_map_ids << response.map_id
+        unless @temp_response_map_ids.include? response.map_id
+          @temp_response_map_ids << response.map_id
           @all_review_response_ids << response.id 
         end
       end

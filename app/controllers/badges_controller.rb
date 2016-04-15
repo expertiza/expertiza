@@ -1,4 +1,9 @@
 class BadgesController < ApplicationController
+
+  def action_allowed?
+    true
+  end
+
   def new
   end
 
@@ -9,5 +14,9 @@ class BadgesController < ApplicationController
   end
 
   def index
+  end
+
+  def configuration
+    
   end
 end

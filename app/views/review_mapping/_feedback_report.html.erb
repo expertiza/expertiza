@@ -1,7 +1,5 @@
-
-
 <div class = "reviewreport">
-  <table width="100%" cellspacing="0" cellpadding="2" border="0">
+  <table width="100%" cellspacing="0" cellpadding="2">
     <tr bgcolor="#CCCCCC">
       <th width = "16%">
         Rejoinder
@@ -29,85 +27,160 @@
     </tr>
 
     <%@l = -1 %>
-    <% @reviewers.each do |r| %>
-      <% @feedback_response_maps = ResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ? and type = ?", @response_ids, r.reviewer_id, @type]) %>
-      <% @user = User.find(Participant.find(r.reviewer_id).user_id) %>
-      <% @team_id = TeamsUser.team_id(@id.to_i, @user.id) %>
-      <% @review_response_maps = ResponseMap.where(["reviewed_object_id = ? and reviewee_id = ? and type = ?", @id, @team_id, 'ReviewResponseMap']) %>
-      <tr>
-        <% @count = 0 %>
-        <% @rspan = 0 %>
-        <%@l = @l+1 %>
-        <% if @l % 2 == 0 %>
-          <% @bgcolor = "#ffffff" %>
-        <% else %>  
-          <% @bgcolor = "#DDDDBB" %>
-        <% end %>
+    <% @authors.each do |r| %>
+      <!--data prepare-->
+      <% if @assignment.varying_rubrics_by_round? %>
+        <% @team_id = TeamsUser.team_id(@id.to_i, r.user_id) %>
+        <!--Calculate how many responses one team received from each round.-->
+        <!--It is the feedback number each team member should make.-->
+        <% @review_response_map_ids = ReviewResponseMap.where(["reviewed_object_id = ? and reviewee_id = ?", @id, @team_id]).pluck("id") %>
+        <% @review_responses_round_one = Response.where(["map_id IN (?) and round = ?", @review_response_map_ids, 1]) %>
+        <% @review_responses_round_two = Response.where(["map_id IN (?) and round = ?", @review_response_map_ids, 2]) %>
+        <% @review_responses_round_three = Response.where(["map_id IN (?) and round = ?", @review_response_map_ids, 3]) %>
 
-        <% @feedback_response_maps.each do |rm| %>
-        <!--count means the autor feedback one student completed.-->
-          <% if Response.exists?(map_id: rm.id) %>
-            <% @count = @count + 1 %>
-          <% end %>
-        <%end %>
+        <!--Calculate feedback response map records.-->
+        <% @feedback_response_maps_round_one = FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?", @all_review_response_ids_round_one, r.id]) rescue nil %>
+        <% @feedback_response_maps_round_two = FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?", @all_review_response_ids_round_two, r.id]) rescue nil %>
+        <% @feedback_response_maps_round_three = FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?", @all_review_response_ids_round_three, r.id]) rescue nil %>
+        
         <!--rspan means the all peer reviews one student received, including unfinished one.-->
-        <% @rspan = @review_response_maps.length %>      
+        <% @rspan_round_one = @review_responses_round_one.length %>      
+        <% @rspan_round_two = @review_responses_round_two.length %> 
+        <% @review_responses_round_three.nil? ? @rspan_round_three = 0 : @rspan_round_three = @review_responses_round_three.length %> 
+      <% else %>
+        <% @feedback_response_maps = FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?", @all_review_response_ids, r.id]) %>
+        <% @team_id = TeamsUser.team_id(@id.to_i, r.user_id) %>
+        <% @review_response_map_ids = ReviewResponseMap.where(["reviewed_object_id = ? and reviewee_id = ?", @id, @team_id]).pluck("id") %>
+        <% @review_responses = Response.where(["map_id IN (?)", @review_response_map_ids]) %>
+        <% @rspan = @review_responses.length %>      
+      <% end %>
 
-        <%if Participant.exists?(id: r.reviewer_id) %>
-          <% @reviewer_name = @user.fullname %>
-          <!--Rejoinder-->
-          <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan %>>
-            <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id => @id%>
-          </td>
-          <!--# author feedbacks done-->
-          <td bgcolor=<%= @bgcolor %>  align="left" rowspan= <%= @rspan %>>
-            <%= @count %>/<%= @rspan %>
-          </td>
-        <% end %>
 
-        <% @review_response_maps.each do |rm| %>
-          <!--for each review_response_map, we have to check whether the corresponsding feedback_response_map exists or not-->
-          <% map_id = rm.id %>
-          <% review_response = Response.where(map_id: map_id).first %>
-          <!--'FeedbackResponseMap' alias as 'frm' -->
-          <% if review_response.blank? %>
-            <% @frm = nil %>
-          <% else %>
-            <% @frm = ResponseMap.where(["reviewee_id = ? and reviewer_id = ? and type = ?", rm.reviewer_id, r.reviewer_id, @type]).first %>
+      <% @first_col_identifier = true %>
+        
+      <% if @assignment.varying_rubrics_by_round? %>
+          <!--data prepare-->
+          <% @count_round_one, @count_round_two, @count_round_three = 0, 0, 0 %>
+          <% unless @feedback_response_maps_round_one.nil? %>
+            <% @feedback_response_maps_round_one.each  do |rm| %>
+              <% if Response.exists? map_id: rm.id %>
+                <% @count_round_one += 1%>
+              <% end %>
+            <% end %>
+          <% end %>
+          <% unless @feedback_response_maps_round_two.nil? %>
+            <% @feedback_response_maps_round_two.each {|rm| @count_round_two += 1 if Response.exists? map_id: rm.id} %>
+          <% end %>
+          <% unless @feedback_response_maps_round_three.nil? %>
+            <% @feedback_response_maps_round_three.each {|rm| @count_round_three += 1 if Response.exists? map_id: rm.id} %>
           <% end %>
 
-          <% if @frm.blank? %>
-            <!--Review response rejoined-->
-            <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left' colspan=1>
-              <% reviewer = Participant.find(rm.reviewer_id) %>
-              <%= reviewer_name = User.find(reviewer.user_id).fullname %>
+          <!--Rejoinder-->
+        <% ['one', 'two', 'three'].each do |round| %>
+          <% if @first_col_identifier == true %>
+            <% @reviewer_name = r.user.fullname %>
+            <tr><td style="border-bottom: 1px solid black;" rowspan= <%= @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>>
+              <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id => @id %>
             </td>
-            <!--Last rejoined at-->
-            <td bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left'>No</td></tr><tr>
-          <% else %>
-            <% @reviewee = Participant.find(@frm.reviewee_id) %>
-            <% @reviewee_name = User.find(@reviewee.user_id).fullname %>
-            <% if Response.exists?(map_id: @frm.id) %>
-              <% @response_id = Response.where(map_id: @frm.id).first %>
-              <!--Review response rejoined-->
-              <td id = "green" bgcolor=<%= @bgcolor %> align='left' colspan=1>
-              <%= link_to @reviewee_name, :controller => 'popup', :action => 'author_feedback_popup', :response_id => @response_id, :reviewee_id => @frm.reviewee_id, :source => 'author_feedback' %>
-              </td>
-              <!--Last rejoined at-->
-              <td bgcolor=<%= @bgcolor %> align='left'>
-                <%= @response_id.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
-              </td></tr><tr>
-            <% else %>
+            <% @first_col_identifier = false %>
+          <% end %>
+
+          <!--# author feedbacks done-->
+          <% @rspan_certain_round = instance_variable_get("@rspan_round_#{round}") %>
+          <% @count_certain_round = instance_variable_get("@count_round_#{round}") %>
+          <% unless @rspan_certain_round == 0 %>
+            <% @l = @l+1 %>
+            <% (@l % 2 == 0) ? @bgcolor = "#ffffff" : @bgcolor = "#DDDDBB" %>
+            <td bgcolor=<%= @bgcolor %>  align="left" rowspan= <%= @rspan_certain_round %>>
+              <%= @count_certain_round %>/<%= @rspan_certain_round %></td>
+          <% end %>
+
+          <% @review_responses_certain_round = instance_variable_get("@review_responses_round_#{round}") %>
+          <% @review_responses_certain_round.each do |rr| %>
+            <!--'FeedbackResponseMap' alias as 'frm' -->
+            <% @frm = FeedbackResponseMap.where(["reviewed_object_id = ? and reviewer_id = ? and reviewee_id = ?", rr.id, r.id, rr.response_map.reviewer_id]).first %>
+
+            <% if @frm.blank? %>
               <!--Review response rejoined-->
               <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left' colspan=1>
-              <%= @reviewee_name %>
+                <%= reviewee_name = Participant.find(rr.response_map.reviewer_id).user.fullname %>
               </td>
               <!--Last rejoined at-->
               <td bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left'>No</td></tr><tr>
+            <% else %>
+              <% @reviewee_name = Participant.find(@frm.reviewee_id).user.fullname %>
+              <% if Response.exists?(map_id: @frm.id) %>
+                <% feedback_response = Response.where(map_id: @frm.id).first %>
+                <!--Review response rejoined-->
+                <td id = "green" bgcolor=<%= @bgcolor %> align='left' colspan=1>
+                <%= link_to @reviewee_name, :controller => 'popup', :action => 'author_feedback_popup', :response_id => feedback_response.id, :reviewee_id => @frm.reviewee_id, :source => 'author_feedback' %>
+                </td>
+                <!--Last rejoined at-->
+                <td bgcolor=<%= @bgcolor %> align='left'>
+                  <%= feedback_response.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
+                </td></tr><tr>
+              <% else %>
+                <!--Review response rejoined-->
+                <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left' colspan=1>
+                <%= @reviewee_name %>
+                </td>
+                <!--Last rejoined at-->
+                <td bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left'>No</td></tr><tr>
+              <% end %>
             <% end %>
           <% end %>
         <% end %>
-        </tr>
+      <% else %>
+          <% @count = 0 %>
+          <% @feedback_response_maps.each {|rm| @count += 1 if Response.exists? map_id: rm.id} %>
+          <% @l = @l+1 %>
+          <% (@l % 2 == 0) ? @bgcolor = "#ffffff" : @bgcolor = "#DDDDBB" %>
+          <!--Rejoinder-->
+          <tr><td bgcolor=<%= @bgcolor %> rowspan= <%= @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>>
+            <% @reviewer_name = r.user.fullname %>
+            <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id => @id %>
+          </td>
+
+          <!--# author feedbacks done-->
+          <% unless @rspan == 0 %>
+            <td bgcolor=<%= @bgcolor %>  align="left" rowspan= <%= @rspan %>>
+              <%= @count %>/<%= @rspan %>
+            </td>
+          <% end %>
+          <% @review_responses.each do |rr| %>
+            <!--'FeedbackResponseMap' alias as 'frm' -->
+            <% @frm = FeedbackResponseMap.where(["reviewed_object_id = ? and reviewer_id = ? and reviewee_id = ?", rr.id, r.id, rr.response_map.reviewer_id]).first %>
+
+            <% if @frm.blank? %>
+              <!--Review response rejoined-->
+              <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left' colspan=1>
+                <%= reviewee_name = Participant.find(rr.response_map.reviewer_id).user.fullname %>
+              </td>
+              <!--Last rejoined at-->
+              <td bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left'>No</td></tr><tr>
+            <% else %>
+              <% @reviewee_name = Participant.find(@frm.reviewee_id).user.fullname %>
+              <% if Response.exists?(map_id: @frm.id) %>
+                <% feedback_response = Response.where(map_id: @frm.id).first %>
+                <!--Review response rejoined-->
+                <td id = "green" bgcolor=<%= @bgcolor %> align='left' colspan=1>
+                <%= link_to @reviewee_name, :controller => 'popup', :action => 'author_feedback_popup', :response_id => feedback_response.id, :reviewee_id => @frm.reviewee_id, :source => 'author_feedback' %>
+                </td>
+                <!--Last rejoined at-->
+                <td bgcolor=<%= @bgcolor %> align='left'>
+                  <%= feedback_response.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
+                </td></tr><tr>
+              <% else %>
+                <!--Review response rejoined-->
+                <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left' colspan=1>
+                <%= @reviewee_name %>
+                </td>
+                <!--Last rejoined at-->
+                <td bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left'>No</td></tr><tr>
+              <% end %>
+            <% end %>
+          <% end %>
+      <% end %>
     <% end %>
   </table>
 </div>

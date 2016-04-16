@@ -12,6 +12,7 @@
         <%if @assignment_form.assignment.is_calibrated%>
             <li><a href="#tabs-6" id="Calibration">Calibration</a></li>
         <%end%>
+        <li><a href="#tabs-7" id="Badges">Badges</a></li>
       </ul>
       <div id="tabs-1">
         <%= render 'assignments/edit/general' %>
@@ -65,6 +66,11 @@
           <%= render 'assignments/edit/calibration' %>
         </div>
       <%end%>
+
+      <div id="tabs-7">
+        <%= render 'assignments/edit/badges' %>
+      </div>
+
       <%= button_tag "Save", :id => 'submit_btn' %> | <%= render :partial => '/shared_scripts/back' %>
     </div>
     <script>

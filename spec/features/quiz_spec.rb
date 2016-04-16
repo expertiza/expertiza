@@ -1,4 +1,3 @@
-# TODO write quiz tests
 require 'rails_helper'
 require 'selenium-webdriver'
 
@@ -309,7 +308,7 @@ describe 'appropriate quiz taking times', :js => true do
     @instructor = create(:instructor)
 
     #Create an assignment with quiz
-    @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 1
+    @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 1 , review_topic_threshold: 1
 
     # Create an assignment due date
     create(:deadline_type,name:"submission")
@@ -350,11 +349,14 @@ describe 'appropriate quiz taking times', :js => true do
     @questionnaire = create :quiz_questionnaire, instructor_id: @team1.id
 
     # Create the quiz question and answers
-    @question = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 1'
-    create :quiz_question_choice, question: @question, txt: 'Answer 1', iscorrect: 1
-    create :quiz_question_choice, question: @question, txt: 'Answer 2'
-    create :quiz_question_choice, question: @question, txt: 'Answer 3'
-    create :quiz_question_choice, question: @question, txt: 'Answer 4'
+    choices = [
+        create(:quiz_question_choice, question: @question, txt: 'Answer 1', iscorrect: 1),
+        create(:quiz_question_choice, question: @question, txt: 'Answer 2'),
+        create(:quiz_question_choice, question: @question, txt: 'Answer 3'),
+        create(:quiz_question_choice, question: @question, txt: 'Answer 4')
+    ]
+    @question = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 1', quiz_question_choices: choices
+
 
 
     # Setup Student 2
@@ -365,15 +367,17 @@ describe 'appropriate quiz taking times', :js => true do
 
     # Create participant mapping
     @participant2 = create :participant, assignment: @assignment, user: @student2
+    # Create a team linked to the calibrated assignment
+    @team2 = create :assignment_team, assignment: @assignment
 
     # Create a response mapping
-    @response_map = create :quiz_response_map, quiz_questionnaire: @questionnaire, reviewer: @participant2, reviewee_id: @team1.id
+    #@response_map = create :quiz_response_map, quiz_questionnaire: @questionnaire, reviewer: @participant2, reviewee_id: @team1.id
 
     # Create a question response
-    @response = create :quiz_response, response_map: @response_map
+    #@response = create :quiz_response, response_map: @response_map
 
     # Create an answer for the question
-    create :answer, question: @question, response_id: @response.id, answer: 1
+    #create :answer, question: @question, response_id: @response.id, answer: 1
 
   end
 #[S3] - Students may not take quizzes on a phase that does not allow them to do so. When on a stage that does allow for quizzes, they may take quizzes on work that they have reviewed.
@@ -385,21 +389,26 @@ describe 'appropriate quiz taking times', :js => true do
     click_link "Take quizzes"
     #should not be able to see this option until after review has been done
     expect(page).to have_no_content("Request a new quiz to take")
+    expect(page).to have_no_content("Quiz Questionnaire")
   end
   it 'should be able to take quiz after doing review' do
+
+    # Create a response mapping
+    create :team_user, team: @team2, user: @student2
+    create :review_response_map, assignment: @assignment, reviewee: @team1, reviewer_id: 2
+
     login_as @student2.name
+
     # Click on the assignment link, and navigate to work view
     click_link @assignment.name
     expect(page).to have_content("Take quizzes")
-    click_link "Others' work"
-    #do the review
-    expect(page).to have_no_content("Request a new quiz to take")
-    expect(page).to have_no_content("Request a new quiz to take")
+#    click_link "Others' work"
+    click_link "Take quizzes"
 
-    click_button "Request a new submission to review"
-    click_link "Begin"
+#do the review
     expect(page).to have_no_content("Request a new quiz to take")
-    expect(page).to have_no_content("Request a new quiz to take")
+    expect(page).to have_content("Quiz Questionnaire")
+
   end
 end
 

@@ -235,6 +235,76 @@ describe 'Student can create quizzes and edit them', :js => true do
   end
 end
 
+describe 'multiple quiz question test', :js => true do
+  before(:each) do
+    # Create an instructor
+    @instructor = create(:instructor)
+
+    # Create a student
+    @student = create(:student)
+
+    #Create an assignment with quiz
+    @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 3
+
+    # Create an assignment due date
+    create(:deadline_type,name:"submission")
+    create(:deadline_type,name:"review")
+    create(:deadline_type,name:"resubmission")
+    create(:deadline_type,name:"rereview")
+    create(:deadline_type,name:"metareview")
+    create(:deadline_type,name:"drop_topic")
+    create(:deadline_type,name:"signup")
+    create(:deadline_type,name:"team_formation")
+    create(:deadline_right)
+    create(:deadline_right, name: 'Late')
+    create(:deadline_right, name: 'OK')
+    create :due_date, due_at: (DateTime.now + 1)
+
+    @review_deadline_type=create(:deadline_type,name:"review")
+    create :due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+
+    # Create a team linked to the calibrated assignment
+    @team = create :assignment_team, assignment: @assignment
+
+    # Create an assignment participant linked to the assignment
+    @participant = create :participant, assignment: @assignment, user: @student
+
+    # Create a mapping between the assignment team and the
+    # participant object's user (the submitter).
+    create :team_user, team: @team, user: @student
+    create :review_response_map, assignment: @assignment, reviewee: @team
+
+  end
+
+  it 'number of questions set matches number of quiz questions avaliable' do
+    #[S2] - When an assignment has a quiz there is an input field that accepts the number of questions that will be on each quiz. Setting this number appropriately changes the number of quiz questions.
+                                                                                                                                                                                             # Create a quiz
+    login_as @student.name
+
+    # Click on the assignment link, and navigate to work view
+    click_link @assignment.name
+    click_link 'Your work'
+
+    # Click on create quiz link
+    click_link 'Create a quiz'
+
+    # Fill in the form for Name
+    fill_in 'questionnaire_name', :with => 'Quiz for test'
+
+    # Fill in the form for Question 1
+    expect(page).to have_content("Question 1")    #Three shall be the number thou shalt count,
+    expect(page).to have_content("Question 2")    #and the number of the counting shall be three.
+    expect(page).to have_content("Question 3")    #Four shalt thou not count, neither count thou two,
+    expect(page).to have_no_content("Question 4") #excepting that thou then proceed to three.
+    expect(page).to have_no_content("Question 5") #Five is right out.
+
+  end
+end
+
+
+#[S3] - Students may not take quizzes on a phase that does not allow them to do so. When on a stage that does allow for quizzes, they may take quizzes on work that they have reviewed.
+
+
 # Tests regarding the instructor's ability to interact with quizzes.
 describe 'Instructor', js:true do
 

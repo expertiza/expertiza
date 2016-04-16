@@ -233,6 +233,8 @@ describe 'Student can create quizzes and edit them', :js => true do
     # Should have the error message Please select a correct answer for all questions
     expect(page).to have_content ('Please select a correct answer for all questions')
   end
+
+
 end
 
 describe 'multiple quiz question test', :js => true do
@@ -301,9 +303,105 @@ describe 'multiple quiz question test', :js => true do
   end
 end
 
+describe 'appropriate quiz taking times', :js => true do
+  before(:each) do
+    # Create an instructor
+    @instructor = create(:instructor)
 
+    #Create an assignment with quiz
+    @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 1
+
+    # Create an assignment due date
+    create(:deadline_type,name:"submission")
+    create(:deadline_type,name:"review")
+    create(:deadline_type,name:"resubmission")
+    create(:deadline_type,name:"rereview")
+    create(:deadline_type,name:"metareview")
+    create(:deadline_type,name:"drop_topic")
+    create(:deadline_type,name:"signup")
+    create(:deadline_type,name:"team_formation")
+    create(:deadline_right)
+    create(:deadline_right, name: 'Late')
+    create(:deadline_right, name: 'OK')
+    create :due_date, due_at: (DateTime.now + 1)
+
+    @review_deadline_type=create(:deadline_type,name:"review")
+    create :due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+
+
+    # Setup Student 1
+
+
+    # Create student
+    @student1 = create(:student)
+
+    # Create an assignment participant linked to the assignment
+    @participant1 = create :participant, assignment: @assignment, user: @student1
+
+    # Create a team linked to the calibrated assignment
+    @team1 = create :assignment_team, assignment: @assignment
+
+    # Create a mapping between the assignment team and the
+    # participant object's user (the submitter).
+    create :team_user, team: @team1, user: @student1
+    create :review_response_map, assignment: @assignment, reviewee: @team1
+
+    # Create a team quiz questionnaire
+    @questionnaire = create :quiz_questionnaire, instructor_id: @team1.id
+
+    # Create the quiz question and answers
+    @question = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 1'
+    create :quiz_question_choice, question: @question, txt: 'Answer 1', iscorrect: 1
+    create :quiz_question_choice, question: @question, txt: 'Answer 2'
+    create :quiz_question_choice, question: @question, txt: 'Answer 3'
+    create :quiz_question_choice, question: @question, txt: 'Answer 4'
+
+
+    # Setup Student 2
+
+
+    # Create student
+    @student2 = create(:student)
+
+    # Create participant mapping
+    @participant2 = create :participant, assignment: @assignment, user: @student2
+
+    # Create a response mapping
+    @response_map = create :quiz_response_map, quiz_questionnaire: @questionnaire, reviewer: @participant2, reviewee_id: @team1.id
+
+    # Create a question response
+    @response = create :quiz_response, response_map: @response_map
+
+    # Create an answer for the question
+    create :answer, question: @question, response_id: @response.id, answer: 1
+
+  end
 #[S3] - Students may not take quizzes on a phase that does not allow them to do so. When on a stage that does allow for quizzes, they may take quizzes on work that they have reviewed.
+  it 'should not be able to take quiz before doing review' do
+    login_as @student2.name
+    # Click on the assignment link, and navigate to work view
+    click_link @assignment.name
+    expect(page).to have_content("Take quizzes")
+    click_link "Take quizzes"
+    #should not be able to see this option until after review has been done
+    expect(page).to have_no_content("Request a new quiz to take")
+  end
+  it 'should be able to take quiz after doing review' do
+    login_as @student2.name
+    # Click on the assignment link, and navigate to work view
+    click_link @assignment.name
+    expect(page).to have_content("Take quizzes")
+    click_link "Others' work"
+    #do the review
+    expect(page).to have_no_content("Request a new quiz to take")
+    expect(page).to have_no_content("Request a new quiz to take")
 
+    click_button "Request a new submission to review"
+    click_link "Begin"
+    expect(page).to have_no_content("Request a new quiz to take")
+    expect(page).to have_no_content("Request a new quiz to take")
+  end
+end
 
 # Tests regarding the instructor's ability to interact with quizzes.
 describe 'Instructor', js:true do

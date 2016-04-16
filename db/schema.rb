@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160412033630) do
+ActiveRecord::Schema.define(version: 20160416201813) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -85,6 +85,7 @@ ActiveRecord::Schema.define(version: 20160412033630) do
     t.boolean  "can_choose_topic_to_review", limit: 1,     default: true
     t.boolean  "is_calibrated",              limit: 1,     default: false
     t.boolean  "is_selfreview_enabled",      limit: 1
+    t.boolean  "is_badges_enabled",          limit: 1
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree

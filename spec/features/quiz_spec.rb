@@ -420,3 +420,286 @@ describe 'Instructor', js:true do
     expect(correct).to have_text('Answer 1')
   end
 end
+
+# Tests student reviewers can take the quizzes on the work they have reviewed/they need to review
+describe 'Student reviewers can not take the quizzes before request artifact', js:true do
+
+  before :each do
+    # Create an instructor
+    @instructor = create(:instructor)
+
+    #Create an assignment with quiz
+    @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 1
+
+    # Create an assignment due date
+    create(:deadline_type,name:"submission")
+    create(:deadline_type,name:"review")
+    create(:deadline_type,name:"resubmission")
+    create(:deadline_type,name:"rereview")
+    create(:deadline_type,name:"metareview")
+    create(:deadline_type,name:"drop_topic")
+    create(:deadline_type,name:"signup")
+    create(:deadline_type,name:"team_formation")
+    create(:deadline_right)
+    create(:deadline_right, name: 'Late')
+    create(:deadline_right, name: 'OK')
+    create :due_date, due_at: (DateTime.now + 1)
+
+    @review_deadline_type=create(:deadline_type,name:"review")
+    create :due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+
+
+    # Setup Student 1
+
+
+    # Create student
+    @student1 = create(:student)
+
+    # Create an assignment participant linked to the assignment
+    @participant1 = create :participant, assignment: @assignment, user: @student1
+
+    # Create a team linked to the calibrated assignment
+    @team1 = create :assignment_team, assignment: @assignment
+
+    # Create a mapping between the assignment team and the
+    # participant object's user (the submitter).
+    create :team_user, team: @team1, user: @student1
+    create :review_response_map, assignment: @assignment, reviewee: @team1
+
+    # Create a team quiz questionnaire
+    @questionnaire = create :quiz_questionnaire, instructor_id: @team1.id
+
+    # Create the quiz question and answers
+    choices = [
+        create(:quiz_question_choice, question: @question, txt: 'Answer 1', iscorrect: 1),
+        create(:quiz_question_choice, question: @question, txt: 'Answer 2'),
+        create(:quiz_question_choice, question: @question, txt: 'Answer 3'),
+        create(:quiz_question_choice, question: @question, txt: 'Answer 4')
+    ]
+    @question = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 1', quiz_question_choices: choices
+
+
+    # Setup Student 2
+
+
+    # Create student
+    @student2 = create(:student)
+
+    # Create participant mapping
+    @participant2 = create :participant, assignment: @assignment, user: @student2
+
+  end
+
+  it 'can not take quiz' do
+
+    # Login as student2
+    login_as @student2.name
+
+    # Click on the assignment link, and navigate to quizzes view
+    click_link @assignment.name
+    click_link 'Take quizzes'
+
+    # Verify that there is no quizzes listed
+    expect(page).to have_no_content('Begin')
+    expect(page).to have_no_content('View')
+
+  end
+end
+
+describe 'Student reviewers can take the quizzes', js:true do
+
+  before :each do
+    # Create an instructor
+    @instructor = create(:instructor)
+
+    #Create an assignment with quiz
+    @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 1
+
+    # Create an assignment due date
+    create(:deadline_type,name:"submission")
+    create(:deadline_type,name:"review")
+    create(:deadline_type,name:"resubmission")
+    create(:deadline_type,name:"rereview")
+    create(:deadline_type,name:"metareview")
+    create(:deadline_type,name:"drop_topic")
+    create(:deadline_type,name:"signup")
+    create(:deadline_type,name:"team_formation")
+    create(:deadline_right)
+    create(:deadline_right, name: 'Late')
+    create(:deadline_right, name: 'OK')
+    create :due_date, due_at: (DateTime.now + 1)
+
+    @review_deadline_type=create(:deadline_type,name:"review")
+    create :due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+
+
+    # Setup Student 1
+
+
+    # Create student
+    @student1 = create(:student)
+
+    # Create an assignment participant linked to the assignment
+    @participant1 = create :participant, assignment: @assignment, user: @student1
+
+    # Create a team linked to the calibrated assignment
+    @team1 = create :assignment_team, assignment: @assignment
+
+    # Create a mapping between the assignment team and the
+    # participant object's user (the submitter).
+    create :team_user, team: @team1, user: @student1
+    create :review_response_map, assignment: @assignment, reviewee: @team1
+
+    # Create a team quiz questionnaire
+    @questionnaire = create :quiz_questionnaire, instructor_id: @team1.id
+
+    # Create the quiz question and answers
+        choices = [
+          create(:quiz_question_choice, question: @question, txt: 'Answer 1', iscorrect: 1),
+          create(:quiz_question_choice, question: @question, txt: 'Answer 2'),
+          create(:quiz_question_choice, question: @question, txt: 'Answer 3'),
+          create(:quiz_question_choice, question: @question, txt: 'Answer 4')
+        ]
+        @question = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 1', quiz_question_choices: choices
+
+
+    # Setup Student 2
+
+
+    # Create student
+    @student2 = create(:student)
+
+    # Create participant mapping
+    @participant2 = create :participant, assignment: @assignment, user: @student2
+
+    # Create a response mapping
+    @response_map = create :quiz_response_map, quiz_questionnaire: @questionnaire, reviewer: @participant2, reviewee_id: @team1.id
+
+  end
+
+  it 'can take quiz' do
+
+    # Login as student2
+    login_as @student2.name
+
+    # Click on the assignment link, and navigate to quizzes view
+    click_link @assignment.name
+    click_link 'Take quizzes'
+
+    # Verify that there is a quiz can be taken
+    expect(page).to have_link('Begin')
+
+    # Click on the Begin link to start quiz
+    click_link 'Begin'
+
+    # Verify that the page list the quiz
+    expect(page).to have_content('Questions')
+
+    # choose an answer
+    find(:css, "input[value='Answer 1']").click
+
+    # Click Submit Quiz botton and navigate to score view
+    click_on 'Submit Quiz'
+
+    # Verify that Quiz score is shown on page
+    expect(page).to have_content('Quiz score: 100.0%')
+
+  end
+end
+
+describe 'Student reviewers can view the quizzes they take', js:true do
+
+  before :each do
+    # Create an instructor
+    @instructor = create(:instructor)
+
+    #Create an assignment with quiz
+    @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 1
+
+    # Create an assignment due date
+    create(:deadline_type,name:"submission")
+    create(:deadline_type,name:"review")
+    create(:deadline_type,name:"resubmission")
+    create(:deadline_type,name:"rereview")
+    create(:deadline_type,name:"metareview")
+    create(:deadline_type,name:"drop_topic")
+    create(:deadline_type,name:"signup")
+    create(:deadline_type,name:"team_formation")
+    create(:deadline_right)
+    create(:deadline_right, name: 'Late')
+    create(:deadline_right, name: 'OK')
+    create :due_date, due_at: (DateTime.now + 1)
+
+    @review_deadline_type=create(:deadline_type,name:"review")
+    create :due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+
+
+    # Setup Student 1
+
+
+    # Create student
+    @student1 = create(:student)
+
+    # Create an assignment participant linked to the assignment
+    @participant1 = create :participant, assignment: @assignment, user: @student1
+
+    # Create a team linked to the calibrated assignment
+    @team1 = create :assignment_team, assignment: @assignment
+
+    # Create a mapping between the assignment team and the
+    # participant object's user (the submitter).
+    create :team_user, team: @team1, user: @student1
+    create :review_response_map, assignment: @assignment, reviewee: @team1
+
+    # Create a team quiz questionnaire
+    @questionnaire = create :quiz_questionnaire, instructor_id: @team1.id
+
+    # Create the quiz question and answers
+    choices = [
+        create(:quiz_question_choice, question: @question, txt: 'Answer 1', iscorrect: 1),
+        create(:quiz_question_choice, question: @question, txt: 'Answer 2'),
+        create(:quiz_question_choice, question: @question, txt: 'Answer 3'),
+        create(:quiz_question_choice, question: @question, txt: 'Answer 4')
+    ]
+    @question = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 1', quiz_question_choices: choices
+
+
+    # Setup Student 2
+
+
+    # Create student
+    @student2 = create(:student)
+
+    # Create participant mapping
+    @participant2 = create :participant, assignment: @assignment, user: @student2
+
+    # Create a response mapping
+    @response_map = create :quiz_response_map, quiz_questionnaire: @questionnaire, reviewer: @participant2, reviewee_id: @team1.id
+
+    # Create a question response
+    @response = create :quiz_response, response_map: @response_map
+
+    # Create an answer for the question
+    create :answer, question: @question, response_id: @response.id, answer: 1
+  end
+
+  it 'can view quiz' do
+
+    # Login as student2
+    login_as @student2.name
+
+    # Click on the assignment link, and navigate to quizzes view
+    click_link @assignment.name
+    click_link 'Take quizzes'
+
+    # Verify that there is a quiz to view
+    expect(page).to have_link('View')
+
+    # Click on the View link, and navigate to quizzes view
+    click_link 'View'
+
+    # Verify that there is quiz score on the page
+    expect(page).to have_content('Quiz score: 100.0%')
+
+  end
+end

@@ -37,7 +37,6 @@ class AssignmentsController < ApplicationController
 
     if @assignment_form.save
       @assignment_form.create_assignment_node
-      add_badge_stratagies
 
       redirect_to edit_assignment_path @assignment_form.assignment.id
       undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")

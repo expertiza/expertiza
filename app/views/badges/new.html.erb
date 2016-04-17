@@ -1,2 +1,42 @@
-%h1 Badges#new
-%p Find me in app/views/badges/new.html.haml
+<div style="text-align: center">
+  <h3 style="margin-bottom: 50px">Choose Assignments</h3>
+
+  <%= form_tag(badges_create_path, method: 'post') do %>
+  <table style="margin-bottom: 50px">
+    <tr>
+      <td style="padding: 0 15px 0 15px;">
+        <%= label_tag 'badge[GroupName]', 'Enter Group Name' %>
+      </td>
+      <td style="padding: 0 15px 0 15px;">
+        <%= text_field_tag 'badge[GroupName]', nil, {:class => 'form-control input-sm'} %>
+      </td>
+    </tr>
+  </table>
+  <table class="table" style="width: 50%">
+    <thead>
+    <tr>
+      <th style="text-align: center">Assignment Name</th>
+      <th></th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <% @assignments.each do |a| %>
+        <tr>
+          <td><%= a.name %></td>
+          <td style="text-align: left"><%= check_box_tag 'assignment_' + a.id.to_s %></td>
+        </tr>
+    <% end %>
+    </tbody>
+  </table>
+
+  <div style="margin-top: 50px; text-align: left">
+    <h4>Badge Strategy Configuration</h4>
+    <%= render 'select_strategy' %>
+  </div>
+
+  <div style="margin-bottom: 200px; text-align: left;">
+    <%= button_tag 'Create Group', {:class => 'btn btn-success'} %>
+  </div>
+  <% end %>
+</div>

@@ -6,9 +6,12 @@ class BadgesController < ApplicationController
 
   def new i=0
     course_id = params[:course_id]
+    @assignments = Assignment.where("course_id = ?", course_id)
   end
 
   def create
+    i = 0
+    j = 0
   end
 
   def show

@@ -542,6 +542,7 @@ Expertiza::Application.routes.draw do
 
   get '/badges/configuration', controller: :badges, action: :configuration
   get '/badges/new', controller: :badges, action: :new
+  post 'badges/create', controller: :badges, action: :create
 
  # get 'sign_up_sheet/intelligent_signup_sheet.html_erb' => 'sign_up_sheet#intelligentPage'
 end

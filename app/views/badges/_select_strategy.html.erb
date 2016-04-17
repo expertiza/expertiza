@@ -1,0 +1,52 @@
+<script type="text/javascript">
+  function  clearText()
+  {
+    var topText = document.getElementById("badge_badge_assignment_NumBadges");
+    var scoreText = document.getElementById("badge_badge_assignment_threshold");
+    topText.value = null;
+    scoreText.value = null;
+  }
+</script>
+
+<table id="strategyoption" style="border-collapse: separate; border-spacing: 0 1em;">
+  <tr>
+    <td>
+      <table>
+        <tr>
+          <td>
+            <%= radio_button_tag 'badge[badge_assignment_strategy]', badge_strategy_options[0][0], nil, :onchange => 'clearText()' %>
+            <label for="assignment_strategy_1"><%= badge_strategy_options[0][0] %></label>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="assignment_strategy_1">Top 'N' Students: </label>
+            <%= number_field_tag 'badge[badge_assignment_NumBadges]',  :size => '4'%>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+  <tr></tr>
+  <tr>
+    <td>
+      <table>
+        <tr>
+          <td>
+            <%=radio_button_tag 'badge[badge_assignment_strategy]', badge_strategy_options[1][0], nil, :onchange => 'clearText()' %>
+            <label for="assignment_strategy_2"><%= badge_strategy_options[1][0] %></label>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="assignment_strategy_2">Score greater than: </label>
+            <%=number_field_tag 'badge[badge_assignment_threshold]', :size => '4'%>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+</table>
+

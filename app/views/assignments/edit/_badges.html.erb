@@ -12,14 +12,14 @@
       <table>
         <tr>
           <td>
-            <%=radio_button_tag 'assignment_form[badge][badge_assignment_strategy]', badge_strategy_options[0][0], @strategy_top %>
+            <%=radio_button_tag 'assignment_form[badge][badge_assignment_strategy]', badge_strategy_options[0][0], @strategy_top, {:class => 'badge_strategy badge_strategy_top'} %>
             <label for="assignment_strategy_1"><%= badge_strategy_options[0][0] %></label>
           </td>
         </tr>
         <tr>
           <td>
             <label for="assignment_strategy_1">Number of Badges: </label>
-            <%= text_field_tag 'assignment_form[badge][badge_assignment_NumBadges]', @threshold_top,  :size => '4'%>
+            <%= number_field_tag 'assignment_form[badge][badge_assignment_NumBadges]', @threshold_top,  :size => '4'%>
           </td>
         </tr>
 
@@ -32,14 +32,14 @@
       <table>
         <tr>
           <td>
-            <%=radio_button_tag 'assignment_form[badge][badge_assignment_strategy]', badge_strategy_options[1][0], @strategy_score_threshold %>
+            <%=radio_button_tag 'assignment_form[badge][badge_assignment_strategy]', badge_strategy_options[1][0], @strategy_score_threshold, {:class => 'badge_strategy badge_strategy_score'} %>
             <label for="assignment_strategy_2"><%= badge_strategy_options[1][0] %></label>
           </td>
         </tr>
         <tr>
           <td>
             <label for="assignment_strategy_2">Score greater than: </label>
-            <%=text_field_tag 'assignment_form[badge][badge_assignment_threshold]', @threshold_score, :size => '4'%>
+            <%=number_field_tag 'assignment_form[badge][badge_assignment_threshold]', @threshold_score, :size => '4'%>
           </td>
         </tr>
       </table>
@@ -47,3 +47,4 @@
   </tr>
 
 </table>
+

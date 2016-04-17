@@ -4,7 +4,8 @@ class BadgesController < ApplicationController
     true
   end
 
-  def new
+  def new i=0
+    course_id = params[:course_id]
   end
 
   def create
@@ -17,6 +18,5 @@ class BadgesController < ApplicationController
   end
 
   def configuration
-    
   end
 end

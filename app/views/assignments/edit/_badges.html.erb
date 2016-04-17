@@ -1,12 +1,29 @@
+<script type="text/javascript">
+  function toggleDisplay()
+  {
+    var ContentTable = document.getElementById("strategyoption");
+    var enablebadge = document.getElementById("assignment_form_assignment_is_badges_enabled");
+    if(enablebadge.checked)
+    {
+      ContentTable.style.display = "table";
+    }
+    else
+    {
+      ContentTable.style.display = "none";
+    }
+  }
+
+</script>
 <table style="border-collapse: separate; border-spacing: 0 1em;">
   <tr>
     <td style='padding:5px' id='assignment_is_badges_enabled'>
       <input name="assignment_form[assignment][is_badges_enabled]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][is_badges_enabled]', 'true', @assignment_form.assignment.is_badges_enabled) %>
+      <%= check_box_tag('assignment_form[assignment][is_badges_enabled]', 'true', @assignment_form.assignment.is_badges_enabled, :onchange => 'toggleDisplay()') %>
       <%= label_tag('assignment_form[assignment][is_badges_enabled]', 'Enable Badges') %>
     </td>
   </tr>
-
+</table>
+<table id="strategyoption" style="border-collapse: separate; border-spacing: 0 1em;">
   <tr>
     <td>
       <table>

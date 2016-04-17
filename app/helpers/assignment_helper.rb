@@ -134,4 +134,12 @@ module AssignmentHelper
     end
   end
 
+  def badge_strategy_options
+    badge_strategy_options = Array.new
+    Assignment::BS_STRATEGIES.each do |strategy|
+      badge_strategy_options << [strategy.to_s, strategy.to_s]
+    end
+    badge_strategy_options
+  end
+
 end

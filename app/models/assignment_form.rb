@@ -38,6 +38,7 @@ class AssignmentForm
     end
     update_assignment(attributes[:assignment])
     update_assignment_questionnaires(attributes[:assignment_questionnaire])
+    update_badge_stratagies(attributes[:badge], attributes[:assignment])
     update_due_dates(attributes[:due_date],user)
     #delete the old queued items and recreate new ones if the assignment has late policy.
     if attributes[:due_date] and !@has_errors and has_late_policy
@@ -304,6 +305,36 @@ class AssignmentForm
           :notification_limit => aq.notification_limit,
           :questionnaire_weight => aq.questionnaire_weight
       )
+    end
+  end
+
+  def update_badge_stratagies(attributes, assignment)
+    if assignment['is_badges_enabled'] != nil && assignment['is_badges_enabled']
+
+      badgeGroup = nil
+      #Check if there is an existing record for the Assignment. If not create a new object else fetch the assignment  group and badge group record
+      assignment_group = AssignmentGroup.where("assignment_id = ?", assignment[:id]).first
+      if(assignment_group == nil)
+        badgeGroup = BadgeGroup.new
+        assignment_group = AssignmentGroup.new
+      else
+        badgeGroup = BadgeGroup.find_by_id(assignment_group.badge_group_id)
+      end
+
+      #Save/Update the attributes for badge group table according to the input
+      strategy = attributes['badge_assignment_strategy']
+      badgeGroup.strategy = strategy
+      if(strategy == Assignment::BS_TOP_SCORES)
+        badgeGroup.threshold = attributes['badge_assignment_NumBadges']
+      elsif (strategy == Assignment::BS_SCORE_THRESHOLD)
+        badgeGroup.threshold = attributes['badge_assignment_threshold']
+      end
+      badgeGroup.save!
+
+      #Save/Update the attributes for Assignment group table according to the input
+      assignment_group.badge_group_id = badgeGroup.id
+      assignment_group.assignment_id = assignment['id']
+      assignment_group.save!
     end
   end
 

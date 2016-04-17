@@ -37,6 +37,7 @@ class AssignmentsController < ApplicationController
 
     if @assignment_form.save
       @assignment_form.create_assignment_node
+      add_badge_stratagies
 
       redirect_to edit_assignment_path @assignment_form.assignment.id
       undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
@@ -69,6 +70,26 @@ class AssignmentsController < ApplicationController
     @team_formation_allowed_checkbox=false
     @participants_count = @assignment_form.assignment.participants.size
     @teams_count = @assignment_form.assignment.teams.size
+
+    #Check for existing Badge Strategies
+    @badge_group = nil
+    @strategy_top = nil
+    @strategy_score_threshold = nil
+    @threshold_top = nil
+    @threshold_score = nil
+    @assignment_group = AssignmentGroup.where("assignment_id = ?", params[:id]).first
+    if(@assignment_group != nil)
+      @badge_group = BadgeGroup.find_by_id(@assignment_group.badge_group_id)
+      if @badge_group != nil
+        if @badge_group.strategy == 'Top Scores'
+          @strategy_top = true
+          @threshold_top = @badge_group.threshold
+        elsif @badge_group.strategy == 'Score Threshold'
+          @strategy_score_threshold = true
+          @threshold_score = @badge_group.threshold
+        end
+      end
+    end
 
     # Check if name and url in database is empty before webpage displays
     @due_date_all.each do |dd|
@@ -345,4 +366,5 @@ class AssignmentsController < ApplicationController
   def assignment_form_params
     params.require(:assignment_form).permit!
   end
+
 end

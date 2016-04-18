@@ -1,0 +1,41 @@
+<link rel="stylesheet" type="text/css" href="/assets/image-picker.css">
+<script src="/assets/image-picker.js" type="text/javascript"></script>
+<script>
+  jQuery(document).ready(function () {
+    $("select").imagepicker({
+      show_label: true
+    });
+  });
+</script>
+<style type="text/css">
+  .thumbnails li img {
+    width: 150px;
+    height: 150px;
+  }
+
+  select {
+    text-indent: 10px;
+  }
+</style>
+<% if @badge_url.length > 0 %>
+    <h4>Choose from existing badges: </h4>
+    <% i=0 %>
+    <div class="picker">
+      <select class="image-picker show-labels show-html">
+        <% @badge_url.each do |badge| %>
+            <option data-img-src=<%= badge %> value=<%= @badge_id[i] %> ><%= @badge_name[i] %></option>
+            <% i += 1 %>
+        <% end %>
+        <!--<option data-img-src="https://credlyapp.s3.amazonaws.com/badges/27aeb518ad8c0dc05c221f3a6b7e6296.png" value="1">Cute Kitten 1</option>-->
+        <!--<option data-img-src="https://credlyapp.s3.amazonaws.com/badges/27aeb518ad8c0dc05c221f3a6b7e6296.png" value="2">Cute Kitten 2</option>-->
+        <!--<option data-img-src="https://credlyapp.s3.amazonaws.com/badges/27aeb518ad8c0dc05c221f3a6b7e6296.png" value="3">Cute Kitten 3 </option>-->
+        <!--<option data-img-src="https://credlyapp.s3.amazonaws.com/badges/27aeb518ad8c0dc05c221f3a6b7e6296.png" value="4">Cute Kitten 4</option>-->
+      </select>
+    </div>
+<% end %>
+<div>
+  <% if @badge_url.length == 0 %>
+      <a href="https://credly.com/badge-builder">Redirect to Credly</a>
+  <% end %>
+</div>
+<br/><br/>

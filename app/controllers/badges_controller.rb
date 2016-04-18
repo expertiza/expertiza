@@ -1,3 +1,4 @@
+# E1626
 class BadgesController < ApplicationController
 
   def action_allowed?

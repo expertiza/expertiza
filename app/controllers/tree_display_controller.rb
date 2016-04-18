@@ -83,6 +83,7 @@ class TreeDisplayController < ApplicationController
 
   # called when the display is requested
   # ajbudlon, July 3rd 2008
+  # E1626
   def list
     if current_user.student?
       redirect_to controller: :student_task, action: :list

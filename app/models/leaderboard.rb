@@ -22,6 +22,7 @@ class Leaderboard < ActiveRecord::Base
     assignmentList = Assignment.where(:course_id => courseArray)
   end
 
+  # E1626
   def self.getCourseInfo(courseArray)
     courseInfo = Course.where(:id => courseArray)
     courseInfo
@@ -217,12 +218,14 @@ class Leaderboard < ActiveRecord::Base
     end
   end
 
+  # E1626
   def self.getLeaderBoard(course_id)
     badge_users_course = BadgesUser.joins(Badge).select('*, sum(badge_id) as badgesEarned').where(:course_id => course_id).
         group('badge_users.user_id').order('badgesEarned DESC')
     badge_users_course
   end
 
+  # E1626
   def self.current_user_badges(user_id, course_id)
     badge_user = BadgeUser.joins(Badge).where(:user_id => user_id, :course_id => course_id)
     badge_user

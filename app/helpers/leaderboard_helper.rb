@@ -49,6 +49,7 @@ module LeaderboardHelper
   end
 
   # Identify whether current user is instructor
+  # E1626
   def self.userIsInstructor?(userID)
     # Instructors, Admins, Super-Admins, and TAs are all considered as instructors
     instructorNames = ["Instructor", "Administrator", "Super-Administrator", "Teaching Assistant"]

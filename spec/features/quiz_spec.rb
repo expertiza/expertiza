@@ -380,17 +380,21 @@ describe 'appropriate quiz taking times', :js => true do
     #create :answer, question: @question, response_id: @response.id, answer: 1
 
   end
+
 #[S3] - Students may not take quizzes on a phase that does not allow them to do so. When on a stage that does allow for quizzes, they may take quizzes on work that they have reviewed.
   it 'should not be able to take quiz before doing review' do
     login_as @student2.name
+
     # Click on the assignment link, and navigate to work view
     click_link @assignment.name
     expect(page).to have_content("Take quizzes")
     click_link "Take quizzes"
+
     #should not be able to see this option until after review has been done
     expect(page).to have_no_content("Request a new quiz to take")
     expect(page).to have_no_content("Quiz Questionnaire")
   end
+
   it 'should be able to take quiz after doing review' do
 
     # Create a response mapping
@@ -402,10 +406,10 @@ describe 'appropriate quiz taking times', :js => true do
     # Click on the assignment link, and navigate to work view
     click_link @assignment.name
     expect(page).to have_content("Take quizzes")
-#    click_link "Others' work"
+
     click_link "Take quizzes"
 
-#do the review
+    # do the review
     expect(page).to have_no_content("Request a new quiz to take")
     expect(page).to have_content("Quiz Questionnaire")
 

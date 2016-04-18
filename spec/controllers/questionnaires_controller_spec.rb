@@ -33,7 +33,6 @@ describe QuestionnairesController do
 
       # Create a params stub for the controller to work with
       @params = {
-          :utf8 => '✓',
           :questionnaire => {
               :name => 'Quiz for test',
               :id => '',

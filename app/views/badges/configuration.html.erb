@@ -1,17 +1,19 @@
 <div style="text-align: center">
   <h3>Manage Course level Badges</h3>
 
-  <table style="width: 100%">
+  <table style="width: 50%; text-align: left">
     <tr>
-      <td><h4>Existing Badges</h4></td>
       <td>
         <%= form_tag(badges_new_path, :method => 'get') do %>
             <div style="display:inline-block;">
               <%= hidden_field_tag :course_id, params[:course_id] %>
-              <span><%= button_tag 'Create New Badge', {:class => 'btn btn-primary'} %></span>
+              <span><%= button_tag 'Create New Group', {:class => 'btn btn-primary'} %></span>
             </div>
         <% end %>
       </td>
+    </tr>
+    <tr>
+      <td><h4>Existing groups to award badges</h4></td>
     </tr>
     <tr>
     </tr>

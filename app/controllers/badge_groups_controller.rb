@@ -1,3 +1,4 @@
+# E1626
 class BadgeGroupsController < ApplicationController
   def new
   end

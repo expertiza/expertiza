@@ -9,7 +9,7 @@ class UsersController < ApplicationController
   verify :method => :post, :only => [ :destroy, :create, :update ],
     :redirect_to => { :action => :list }
 
-
+  # E1626
   def action_allowed?
     case params[:action]
       when 'keys'
@@ -205,7 +205,7 @@ class UsersController < ApplicationController
     end
   end
 
-
+  # E1626
   def credly_register
     if request.post?
       begin
@@ -236,6 +236,7 @@ class UsersController < ApplicationController
     end
   end
 
+  # E1626
   def send_registration_request_credly
     uri = URI.parse("https://api.credly.com")
     http = Net::HTTP.new(uri.host, uri.port)
@@ -256,6 +257,7 @@ class UsersController < ApplicationController
     data_token
   end
 
+  # E1626
   def get_credly_user_id(token)
     uri = URI.parse("https://api.credly.com")
     http = Net::HTTP.new(uri.host, uri.port)

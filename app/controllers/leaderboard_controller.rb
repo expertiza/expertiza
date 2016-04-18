@@ -6,6 +6,7 @@ class LeaderboardController < ApplicationController
   end
 
   # Allows to view leaderBoard - sorted on max number of badges received by a course participant
+  # E1626
   def index
     if current_user
       @instructorQuery = LeaderboardHelper.userIsInstructor?(current_user.id)

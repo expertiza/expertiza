@@ -517,6 +517,7 @@ Expertiza::Application.routes.draw do
 
   get '/users/show_selection', controller: :users, action: :show_selection
   get '/users/list', controller: :users, action: :list
+  # E1626
   get '/users/credly_register', controller: :users, action: :credly_register
   post '/users/credly_register', controller: :users, action: :credly_register
   get '/menu/*name', controller: :menu_items, action: :link
@@ -540,6 +541,7 @@ Expertiza::Application.routes.draw do
 
   get ':controller(/:action(/:id))(.:format)'
 
+  # E1626
   get '/badges/configuration', controller: :badges, action: :configuration
   get '/badges/new', controller: :badges, action: :new
   post 'badges/create', controller: :badges, action: :create

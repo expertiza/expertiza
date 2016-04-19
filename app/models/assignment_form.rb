@@ -29,8 +29,8 @@ class AssignmentForm
   end
 
   def update(attributes,user)
-    @has_errors = false;
-    has_late_policy = false;
+    @has_errors = false
+    has_late_policy = false
     if attributes[:assignment][:late_policy_id].to_i > 0
       has_late_policy=true
     else
@@ -45,7 +45,7 @@ class AssignmentForm
       delete_from_delayed_queue
       add_to_delayed_queue
     end
-    !@has_errors;
+    !@has_errors
   end
 
   alias update_attributes update

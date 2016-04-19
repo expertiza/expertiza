@@ -18,13 +18,13 @@
     text-indent: 10px;
   }
 </style>
-<% if @badge_url.length > 0 %>
+<% if @list_badges.length > 0 %>
     <h4>Choose from existing badges: </h4>
     <% i=0 %>
     <div class="picker">
       <select class="image-picker show-labels show-html">
-        <% @badge_url.each do |badge| %>
-            <option data-img-src=<%= badge %> value=<%= @badge_id[i] %> ><%= @badge_name[i] %></option>
+        <% @list_badges.each do |badge| %>
+            <option data-img-src=<%= badge["badge_image_url"] %> value=<%= badge["badge_id"] %> ><%= badge["badge_title"] %></option>
             <% i += 1 %>
         <% end %>
         <!--<option data-img-src="https://credlyapp.s3.amazonaws.com/badges/27aeb518ad8c0dc05c221f3a6b7e6296.png" value="1">Cute Kitten 1</option>-->
@@ -35,8 +35,7 @@
     </div>
 <% end %>
 <div>
-  <% if @badge_url.length == 0 %>
-      <a href="https://credly.com/badge-builder">Redirect to Credly</a>
-  <% end %>
+  <h4>Create new badge: </h4>
+  <a href="https://credly.com/badge-builder">Redirect to Credly</a>
 </div>
 <br/><br/>

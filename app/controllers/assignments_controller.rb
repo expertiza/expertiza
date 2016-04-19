@@ -91,9 +91,7 @@ class AssignmentsController < ApplicationController
     end
 
     #Get all badges for current user and expertiza admin
-    @badge_url = Array.new
-    @badge_name = Array.new
-    @badge_id = Array.new
+    @list_badges = Array.new
 
     response = get_badges_created(session[:user].id)
     parsed_response = JSON.parse(response.body)
@@ -101,27 +99,30 @@ class AssignmentsController < ApplicationController
 
     if response.code == '200' && !parsed_response['data'].nil?
       parsed_response['data'].each do |badge|
-        @badge_url.push badge.image_url
-        @badge_name.push badge.title
-        @badge_id.push badge.id
+        @badge_info = Hash.new
+        @badge_info["badge_image_url"] = badge["image_url"]
+        @badge_info["badge_title"] = badge["title"]
+        @badge_info["badge_id"] = badge["id"]
+        @list_badges.push @badge_info
       end
     else
       user_data = parsed_response['meta']
     end
 
-    # response = method_name(expertiza_admin_user_id)
-    parsed_response = JSON.parse(response.body)
-
-    if response.code == '200' && !parsed_response['data'].nil?
-      user_data = parsed_response['data']
-      user_data.each do |badge|
-        @badge_url.push badge.image_url
-        @badge_name.push badge.title
-        @badge_id.push badge.id
-      end
-    else
-      user_data = parsed_response['meta']
-    end
+    # response = get_badges_created(expertiza_admin_user_id)
+    # parsed_response = JSON.parse(response.body)
+    #
+    # if response.code == '200' && !parsed_response['data'].nil?
+    #   user_data = parsed_response['data']
+    #   user_data.each do |badge|
+    #     @badge_info["badge_image_url"] = badge["image_url"]
+    #     @badge_info["badge_title"] = badge["title"]
+    #     @badge_info["badge_id"] = badge["id"]
+    #     @list_badges.push @badge_info
+    #   end
+    # else
+    #   user_data = parsed_response['meta']
+    # end
 
     # Check if name and url in database is empty before webpage displays
     @due_date_all.each do |dd|

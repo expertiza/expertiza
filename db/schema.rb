@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160416201813) do
+ActiveRecord::Schema.define(version: 20160418213209) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -113,6 +113,7 @@ ActiveRecord::Schema.define(version: 20160416201813) do
   create_table "badge_groups", force: :cascade do |t|
     t.string  "strategy",  limit: 255, default: "", null: false
     t.integer "threshold", limit: 4,                null: false
+    t.integer "badge_id",  limit: 4
   end
 
   create_table "badge_users", force: :cascade do |t|
@@ -129,8 +130,9 @@ ActiveRecord::Schema.define(version: 20160416201813) do
   add_index "badge_users", ["user_id"], name: "index_badge_users_on_user_id", using: :btree
 
   create_table "badges", force: :cascade do |t|
-    t.integer "badge_id", limit: 4,                null: false
-    t.string  "name",     limit: 255, default: "", null: false
+    t.integer "badge_id",        limit: 4,                null: false
+    t.string  "name",            limit: 255, default: "", null: false
+    t.integer "credly_badge_id", limit: 4
   end
 
   create_table "bids", force: :cascade do |t|

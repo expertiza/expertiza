@@ -20,6 +20,12 @@ class BadgesController < ApplicationController
         @badge_info["badge_image_url"] = badge["image_url"]
         @badge_info["badge_title"] = badge["title"]
         @badge_info["badge_id"] = badge["id"]
+        if Badge.where("credly_badge_id = ?", badge["id"]).nil?
+          new_badge = Badge.new
+          new_badge.name = badge["title"]
+          new_badge.credly_badge_id = badge["id"]
+          new_badge.save!
+        end
         @list_badges.push @badge_info
       end
     else
@@ -43,8 +49,38 @@ class BadgesController < ApplicationController
   end
 
   def create
-    i = 0
-    j = 0
+    badge_strategy = params["badge"]["badge_assignment_strategy"]
+    badge_threshold = ""
+    if params["badge"]["badge_assignment_threshold"].empty? || params["badge"]["badge_assignment_threshold"].nil?
+      badge_threshold = params["badge"]["badge_assignment_NumBadges"]
+    else
+      badge_threshold = params["badge"]["badge_assignment_threshold"]
+    end
+    id_badge_selected = params["badge_selected"]
+
+    assignment_id_from_form = Array.new
+    params.each do |key, value|
+      if key.include? "assign"
+        assignment_id_from_form.push key.split('_', 2).last
+      end
+    end
+
+    badge_group = BadgeGroup.new
+    badge_group.strategy = badge_strategy
+    badge_group.threshold = badge_threshold.to_i
+    badge_group.is_course_level_group = true
+    badge_group.course_id = params[:course_id].to_i
+    badge_group.badge_id = id_badge_selected.to_i
+    badge_group.save!
+
+    assignment_id_from_form.each do |assgn_id|
+      assignment_group = AssignmentGroup.new
+      assignment_group.badge_group_id = badge_group.id
+      assignment_group.assignment_id = assgn_id.to_i
+      assignment_group.save!
+    end
+
+    redirect_to :controller => 'tree_display', :action => 'list'
   end
 
   def show
@@ -54,6 +90,7 @@ class BadgesController < ApplicationController
   end
 
   def configuration
+    @badge_groups = BadgeGroup.where("course_id = ? and is_course_level_group = TRUE", params[:course_id])
   end
 
   private

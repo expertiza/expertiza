@@ -2,7 +2,7 @@
 <div style="text-align: center">
   <h3>Manage Course level Badges</h3>
 
-  <table style="width: 50%; text-align: left">
+  <table style="width: 75%; text-align: left">
     <tr>
       <td>
         <%= form_tag(badges_new_path, :method => 'get') do %>
@@ -16,7 +16,35 @@
     <tr>
       <td><h4>Existing groups to award badges</h4></td>
     </tr>
-    <tr>
-    </tr>
+  </table>
+  <br/>
+  <table style="width: 75%; text-align: left">
+    <% if @badge_groups.length > 0 %>
+        <tr>
+          <th>Badge Group ID</th>
+          <th>Strategy</th>
+          <th>Threshold</th>
+          <th>Badge used</th>
+          <th>Assignments Involved</th>
+        </tr>
+        <% @badge_groups.each do |badge_group| %>
+            <tr>
+              <td><%= badge_group.id %></td>
+              <td><%= badge_group.strategy %></td>
+              <td><%= badge_group.threshold %></td>
+              <% @badge = Badge.where("credly_badge_id= ?", badge_group.badge_id).first %>
+              <td><%= @badge.name %></td>
+              <% @assignments_list = AssignmentGroup.where('badge_group_id = ?', badge_group.id) %>
+              <td>
+                <ol>
+                  <% @assignments_list.each do |assignment| %>
+                      <% assignment_name = Assignment.where('id = ?', assignment.assignment_id).first %>
+                      <li><%= assignment_name.name %></li>
+                  <% end %>
+                </ol>
+              </td>
+            </tr>
+        <% end %>
+    <% end %>
   </table>
 </div>

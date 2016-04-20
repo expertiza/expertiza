@@ -7,6 +7,7 @@ class Course < ActiveRecord::Base
   belongs_to :institution, :class_name => 'Institution', :foreign_key => 'instituition_id'
   has_many :participants, :class_name => 'CourseParticipant', :foreign_key => 'parent_id'
   has_one :course_node,:foreign_key => :node_object_id,:dependent => :destroy
+  has_many :badge_groups, :class_name => 'BadgeGroup', :foreign_key => :course_id
   has_paper_trail
 
   # Return any predefined teams associated with this course

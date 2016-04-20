@@ -22,7 +22,7 @@
     <h4>Choose from existing badges: </h4>
     <% i=0 %>
     <div class="picker">
-      <select class="image-picker show-labels show-html">
+      <select class="image-picker show-labels show-html" name="badge_selected">
         <% @list_badges.each do |badge| %>
             <option data-img-src=<%= badge["badge_image_url"] %> value=<%= badge["badge_id"] %> ><%= badge["badge_title"] %></option>
             <% i += 1 %>
@@ -39,8 +39,3 @@
   <a href="https://credly.com/badge-builder">Redirect to Credly</a>
 </div>
 <br/><br/>
-
-
-
-
-<!--<%= select_tag 'team_size', options_for_select(@badge_info.collect {|p| [p['name'], p['id'] ] }), size: 1 %>-->

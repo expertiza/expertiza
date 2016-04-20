@@ -2,7 +2,7 @@
 <div style="text-align: center">
   <h3 style="margin-bottom: 50px">Choose Assignments</h3>
 
-  <%= form_tag(badges_create_path, method: 'post') do %>
+  <%= form_tag(badges_create_path(:course_id => params[:course_id]), method: 'post') do %>
       <table style="margin-bottom: 50px">
         <tr>
           <td style="padding: 0 15px 0 15px;">

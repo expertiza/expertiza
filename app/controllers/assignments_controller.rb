@@ -103,6 +103,12 @@ class AssignmentsController < ApplicationController
         @badge_info["badge_image_url"] = badge["image_url"]
         @badge_info["badge_title"] = badge["title"]
         @badge_info["badge_id"] = badge["id"]
+        if Badge.where("credly_badge_id = ?", badge["id"]).nil?
+          new_badge = Badge.new
+          new_badge.name = badge["title"]
+          new_badge.credly_badge_id = badge["id"]
+          new_badge.save!
+        end
         @list_badges.push @badge_info
       end
     else

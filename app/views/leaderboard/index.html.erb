@@ -1,56 +1,20 @@
 <!--E1626-->
-<SCRIPT LANGUAGE="JavaScript">
-  function toggleVis(id) {
-    var elem = document.getElementById(id + "_myDiv");
-    if (elem.style.display == 'none') {
-      elem.style.display = '';
-      document.getElementById(id + "_show").style.display = 'none';
-      document.getElementById(id + "_hide").style.display = '';
-    } else {
-      elem.style.display = 'none';
-      document.getElementById(id + "_show").style.display = '';
-      document.getElementById(id + "_hide").style.display = 'none';
-    }
-  }
-</SCRIPT>
-
 <h1 style="text-align: center">Badges Information for <%= current_user.fullname %></h1>
 
-<% @courseInfo.each do |course| %>
+<% @course_info.each do |course| %>
     <h4><%= course.name %></h4>
-    <strong>leaderboard:</strong>
+    <strong>Leaderboard:</strong>
     &nbsp;&nbsp;
-    <a href="#1" onClick="toggleVis('leaderboard');">
-      <span id="leaderboard_show">View leaderboard</span>
-      <span id="leaderboard_hide" style="display: none">Hide leaderboard</span>
-    </a>
+    <%= link_to 'View Leaderboard', :action => 'view_leaderboard', :course_id => course.id, :user_id => current_user.id, :course_name => course.name %>
     <br/>
-    <div id="leaderboard_myDiv" style="display:none">
-      <%= render :partial => 'leaderboard', :locals => {:course_id => course.id, :user_id => current_user.id} %>
-    </div>
-
-    <% if @instructorQuery %>
+    <% if @instructor_query %>
         <strong>Award Badges:</strong>
         &nbsp;&nbsp;
-        <a href="#1" onClick="toggleVis('award_badge');">
-          <span id="award_badge_show">Award Badges</span>
-          <span id="award_badge_hide" style="display: none">Hide Award Badges</span>
-        </a>
-        <br/>
-        <div id="award_badge_myDiv" style="display:none">
-          <%= render :partial => 'award_badges', :locals => {:course_id => course.id, :user_id => current_user.id} %>
-        </div>
+        <%= link_to 'Award Badges',:controller => 'badges', :action => 'award_badges', :course_id => course.id, :user_id => current_user.id, :course_name => course.name %>
     <% else %>
         <strong>Personal Badges:</strong>
         &nbsp;&nbsp;
-        <a href="#1" onClick="toggleVis('personal_badge');">
-          <span id="personal_badge_show">View Personal Badges</span>
-          <span id="personal_badge_hide" style="display: none">Hide Personal Badges</span>
-        </a>
-        <br/>
-        <div id="personal_badge_myDiv" style="display:none">
-          <%= render :partial => 'personal_badges', :locals => {:course_id => course.id, :user_id => current_user.id} %>
-        </div>
+        <%= link_to 'Personal Badges', :action => 'personal_badges', :course_id => course.id, :user_id => current_user.id, :course_name => course.name %>
     <% end %>
     <hr>
 <% end %>

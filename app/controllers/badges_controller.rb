@@ -99,6 +99,75 @@ class BadgesController < ApplicationController
     @badge_groups = BadgeGroup.where("course_id = ? and is_course_level_group = TRUE", params[:course_id])
   end
 
+  def award_badges
+    @student_list = Leaderboard.getStudentList(params[:course_id])
+    @assignments_list = Leaderboard.getAssignmentsIncourse(params[:course_id], params[:user_id])
+    response = get_badges_created(params[:user_id])
+    parsed_response = JSON.parse(response.body)
+    @list_badges = Array.new
+    user_data = nil
+
+    if response.code == '200' && !parsed_response['data'].nil?
+      parsed_response['data'].each do |badge|
+        @badge_info = Hash.new
+        @badge_info["badge_image_url"] = badge["image_url"]
+        @badge_info["badge_title"] = badge["title"]
+        @badge_info["badge_id"] = badge["id"]
+        if Badge.where("credly_badge_id = ?", badge["id"]).blank?
+          new_badge = Badge.new
+          new_badge.name = badge["title"]
+          new_badge.credly_badge_id = badge["id"]
+          new_badge.save!
+        end
+        @list_badges.push @badge_info
+      end
+    else
+      user_data = parsed_response['meta']
+    end
+
+    # response = get_badges_created(expertiza_admin_user_id)
+    # parsed_response = JSON.parse(response.body)
+    #
+    # if response.code == '200' && !parsed_response['data'].nil?
+    #   user_data = parsed_response['data']
+    #   user_data.each do |badge|
+    #     @badge_info["badge_image_url"] = badge["image_url"]
+    #     @badge_info["badge_title"] = badge["title"]
+    #     @badge_info["badge_id"] = badge["id"]
+    #     if Badge.where("credly_badge_id = ?", badge["id"]).blank?
+    #       new_badge = Badge.new
+    #       new_badge.name = badge["title"]
+    #       new_badge.credly_badge_id = badge["id"]
+    #       new_badge.save!
+    #     end
+    #     @list_badges.push @badge_info
+    #   end
+    # else
+    #   user_data = parsed_response['meta']
+    # end
+  end
+
+  def personal_badges
+
+  end
+
+  def assign_badge_user
+    badge_user = BadgeUser.new
+    badge_user.badge_id = params["badge_selected"]
+    badge_user.user_id = params["student_selected"]
+
+    if params["is_assignment_level_badge"]
+      badge_user.is_course_badge = false
+      badge_user.assignment_id = params["assignment_selected"]
+    else
+      badge_user.is_course_badge = true
+      badge_user.course_id = params[:course_id]
+    end
+
+    badge_user.save!
+    redirect_to controller: 'leaderboard', action: index
+  end
+
   private
 
   def get_badges_created(user_id)

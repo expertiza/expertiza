@@ -25,7 +25,14 @@ class Leaderboard < ActiveRecord::Base
   # E1626
   def self.getCourseInfo(courseArray)
     courseInfo = Course.where(:id => courseArray)
-    courseInfo
+  end
+
+  def self.getStudentList(course_id)
+    student_list = User.joins(:participants).where('participants.parent_id = ?', course_id)
+  end
+
+  def self.getAssignmentsIncourse(course_id, user_id)
+    assignments_list = Assignment.where('course_id = ? and instructor_id = ?', course_id, user_id)
   end
 
   # This method gets all tuples in the Participants table associated

@@ -1,0 +1,70 @@
+<!--E1626-->
+<script type="text/javascript">
+  function toggleDisplay(divToShow, divChecked, selectTag) {
+    var showAssignments = document.getElementById(divToShow);
+    var assignmentBadge = document.getElementById(divChecked);
+    if (assignmentBadge.checked) {
+      showAssignments.style.display = '';
+      document.getElementById(selectTag).style.display = "inline";
+    }
+    else {
+      showAssignments.style.display = 'none';
+      document.getElementById(selectTag).style.display = "none";
+    }
+  }
+</script>
+<style type="text/css">
+  .select {
+    display: inline;
+  }
+</style>
+
+<% if @student_list.length > 0 %>
+    <h2 style="text-align: center">Award badge to students in <%= params[:course_name] %></h2>
+    <%= form_tag(badges_assign_badge_user_path(:course_id => params[:course_id]), method: 'post') do %>
+        <div>
+          <input name="student_select_checkbox" type="hidden" value="false"/>
+          <%= check_box_tag('student_select_checkbox', 'true', nil, :onchange => 'toggleDisplay("show_students", "student_select_checkbox", "select")') %>
+          <%= label_tag('student_select_checkbox', 'Select student') %>
+        </div>
+        <div id="show_students" style="display: none">
+          <select name="student_selected" id="select">
+            <% @student_list.each do |student| %>
+                <option value=<%= student.id %>><%= student.fullname %></option>
+            <% end %>
+          </select>
+        </div>
+
+        <div style="text-align: left">
+          <h3>Which badge to award?</h3>
+          <strong><i style="color: darkred">Please refresh the page whenever a new badge is created</i></strong>
+          <br/>
+          <%= render 'badges/select_badge' %>
+        </div>
+
+        <div>
+          <input name="is_assignment_level_badge" type="hidden" value="false"/>
+          <%= check_box_tag('is_assignment_level_badge', 'true', nil, :onchange => 'toggleDisplay("show_assignments", "is_assignment_level_badge", "select1")') %>
+          <%= label_tag('is_assignment_level_badge', 'Is assignment level badge?') %>
+        </div>
+
+        <% if @assignments_list.length > 0 %>
+            <div id="show_assignments" style="display: none">
+              <%= label_tag 'assignment_selected', 'Select assignment' %>
+              <select name="assignment_selected" id="select1">
+                <% @assignments_list.each do |assignment| %>
+                    <option value=<%= assignment.id %>><%= assignment.name %></option>
+                <% end %>
+              </select>
+            </div>
+        <% else %>
+            <p><strong>Sorry no assignments to view</strong></p>
+        <% end %>
+
+        <div style="margin-bottom: 200px; text-align: left;">
+          <%= button_tag 'Award Badge', {:class => 'btn btn-success'} %>
+        </div>
+    <% end %>
+<% else %>
+    <p><strong>Sorry no students available to award badges</strong></p>
+<% end %>

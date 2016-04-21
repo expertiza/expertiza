@@ -40,6 +40,10 @@ class Participant < ActiveRecord::Base
     User.find(self.user_id).fullname
   end
 
+  def update_reputation(alg, reputation)
+    puts "#{id}, #{alg}, #{reputation}, model
+"
+  end
 
   def delete(force = nil)
 

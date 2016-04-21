@@ -210,7 +210,7 @@ class ReputationWebServiceController < ApplicationController
 		# "submission1": {"stu1":91, "stu3":99},"submission2": {"stu5":92, "stu8":90},"submission3": {"stu2":91, "stu4":88}}"
 		req.body.prepend("{")
         @@request_body = req.body
-		puts req.body
+		puts 'This is the request prior to encryption: ' + req.body
 		puts
 	# Encryption
 		# AES symmetric algorithm encrypts raw data
@@ -241,8 +241,21 @@ class ReputationWebServiceController < ApplicationController
           #{response.body}"
         puts
         @@response_body = response.body
+
+
+		JSON.parse(response.body.to_s).each do |alg, list|
+			unless list.nil?
+				unless list.nil?
+					list.each do |id, rep|
+						Participant.find(id).update_reputation(alg, rep)
+					end
+				end
+			end
+		end
+
 		redirect_to action: 'client'
 	end
+
 
 	def rsa_public_key1(data)
 		public_key_file = 'public1.pem'

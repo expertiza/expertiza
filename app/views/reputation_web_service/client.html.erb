@@ -59,7 +59,6 @@
 		<td valign="top" width="50%"> <pre><code id='response'></code></pre> </td>
 	</tr>
 </table>
-
 <style>
 	pre {
 	   background-color: white;
@@ -81,7 +80,7 @@
 <script>
 
 	$(document).ready(function beautifyJson() {
-		if (!library)
+/*		if (!library)
    			var library = {};
 
 		library.json = {
@@ -112,7 +111,7 @@
 		
 		$('#request').html(library.json.prettyPrint(request));
 		$('#response').html(library.json.prettyPrint(response));
-	});
+	*/});
 
 	$('#algorithm').change(function changeDropdown(){
 		var selectedDropdownValue = $('#algorithm').find(":selected").val();

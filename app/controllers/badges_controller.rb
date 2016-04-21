@@ -14,6 +14,8 @@ class BadgesController < ApplicationController
     parsed_response = JSON.parse(response.body)
     user_data = nil
 
+    @badgeGroups = BadgeGroup.where("course_id = ? AND is_course_level_group = ?", course_id, true)
+
     if response.code == '200' && !parsed_response['data'].nil?
       parsed_response['data'].each do |badge|
         @badge_info = Hash.new
@@ -93,6 +95,14 @@ class BadgesController < ApplicationController
   end
 
   def index
+  end
+
+  def edit
+    @assignments_list = AssignmentGroup.where('badge_group_id = ?', params['badge_group_id'])
+    @badgeGroup = BadgeGroup.find_by_badge_id(params['badge_group_id'])
+
+    print j
+    i =0
   end
 
   def configuration

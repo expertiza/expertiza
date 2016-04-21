@@ -3,16 +3,6 @@
   <h3 style="margin-bottom: 50px">Choose Assignments</h3>
 
   <%= form_tag(badges_create_path(:course_id => params[:course_id]), method: 'post') do %>
-      <table style="margin-bottom: 50px">
-        <tr>
-          <td style="padding: 0 15px 0 15px;">
-            <%= label_tag 'badge[GroupName]', 'Enter Group Name' %>
-          </td>
-          <td style="padding: 0 15px 0 15px;">
-            <%= text_field_tag 'badge[GroupName]', nil, {:class => 'form-control input-sm'} %>
-          </td>
-        </tr>
-      </table>
       <table class="table" style="width: 50%">
         <thead>
         <tr>

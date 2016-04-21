@@ -324,6 +324,9 @@ class AssignmentForm
       #Save/Update the attributes for badge group table according to the input
       strategy = attributes['badge_assignment_strategy']
       badgeGroup.strategy = strategy
+      badgeGroup.badge_id = attributes['badge_selected']
+      badgeGroup.course_id = assignment['course_id']
+      badgeGroup.is_course_level_group = false
       if(strategy == Assignment::BS_TOP_SCORES)
         badgeGroup.threshold = attributes['badge_assignment_NumBadges']
       elsif (strategy == Assignment::BS_SCORE_THRESHOLD)

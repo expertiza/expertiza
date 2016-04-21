@@ -22,15 +22,15 @@
     <h4>Choose from existing badges: </h4>
     <% i=0 %>
     <div class="picker">
-      <select class="image-picker show-labels show-html" name="badge_selected">
+      <select class="image-picker show-labels show-html" name="assignment_form[badge][badge_selected]">
         <% @list_badges.each do |badge| %>
-            <option data-img-src=<%= badge["badge_image_url"] %> value=<%= badge["badge_id"] %> ><%= badge["badge_title"] %></option>
+            <% if @badge_group.badge_id == badge["badge_id"] %>
+              <option data-img-src=<%= badge["badge_image_url"] %> value=<%= badge["badge_id"] %> selected><%= badge["badge_title"] %></option>
+            <%else%>
+              <option data-img-src=<%= badge["badge_image_url"] %> value=<%= badge["badge_id"] %> ><%= badge["badge_title"] %></option>
+            <%end%>
             <% i += 1 %>
         <% end %>
-        <!--<option data-img-src="https://credlyapp.s3.amazonaws.com/badges/27aeb518ad8c0dc05c221f3a6b7e6296.png" value="1">Cute Kitten 1</option>-->
-        <!--<option data-img-src="https://credlyapp.s3.amazonaws.com/badges/27aeb518ad8c0dc05c221f3a6b7e6296.png" value="2">Cute Kitten 2</option>-->
-        <!--<option data-img-src="https://credlyapp.s3.amazonaws.com/badges/27aeb518ad8c0dc05c221f3a6b7e6296.png" value="3">Cute Kitten 3 </option>-->
-        <!--<option data-img-src="https://credlyapp.s3.amazonaws.com/badges/27aeb518ad8c0dc05c221f3a6b7e6296.png" value="4">Cute Kitten 4</option>-->
       </select>
     </div>
 <% end %>

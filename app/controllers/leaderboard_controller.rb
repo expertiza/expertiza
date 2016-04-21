@@ -9,20 +9,20 @@ class LeaderboardController < ApplicationController
   # E1626
   def index
     if current_user
-      @instructorQuery = LeaderboardHelper.userIsInstructor?(current_user.id)
+      @instructor_query = LeaderboardHelper.userIsInstructor?(current_user.id)
 
-      if @instructorQuery
-        @courseList = LeaderboardHelper.instructorCourses(current_user.id)
+      if @instructor_query
+        @course_list = LeaderboardHelper.instructorCourses(current_user.id)
       else
-        @courseList = LeaderboardHelper.studentInWhichCourses(current_user.id)
+        @course_list = LeaderboardHelper.studentInWhichCourses(current_user.id)
       end
-      @courseInfo = Leaderboard.getCourseInfo(@courseList)
+      @course_info = Leaderboard.getCourseInfo(@course_list)
 
-      @csHash= Leaderboard.getParticipantEntriesInCourses @courseList, current_user.id
+      @csHash= Leaderboard.getParticipantEntriesInCourses @course_list, current_user.id
 
-      if !@instructorQuery
+      if !@instructor_query
         @user = current_user
-        @courseAccomp = Leaderboard.extractPersonalAchievements(@csHash, @courseList, current_user.id)
+        @courseAccomp = Leaderboard.extractPersonalAchievements(@csHash, @course_list, current_user.id)
       end
 
       @csHash = Leaderboard.sortHash(@csHash)
@@ -47,7 +47,7 @@ class LeaderboardController < ApplicationController
 
       # Setup personal achievement leaderboards for easier consumption by view
       @achievementLeaderBoards = Array.new
-      if !@instructorQuery
+      if !@instructor_query
         @courseAccomp.each_pair { |course, accompHashArray|
           courseAccompListHash = Hash.new
           courseAccompListHash[:courseName] = LeaderboardHelper.getCourseName(course)
@@ -61,4 +61,9 @@ class LeaderboardController < ApplicationController
 
     end
   end
+
+  def view_leaderboard
+
+  end
+
 end

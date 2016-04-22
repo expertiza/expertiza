@@ -15,14 +15,22 @@
       <table>
         <tr>
           <td>
-            <%= radio_button_tag 'badge[badge_assignment_strategy]', badge_strategy_options[0][0], nil, :onchange => 'clearText()' %>
+            <% if @badgeGroup != nil and @badgeGroup.strategy == 'Top Scores' %>
+              <%= radio_button_tag 'badge[badge_assignment_strategy]', badge_strategy_options[0][0], :checked => 'checked', :onchange => 'clearText()' %>
+            <% else %>
+              <%= radio_button_tag 'badge[badge_assignment_strategy]', badge_strategy_options[0][0],nil, :onchange => 'clearText()' %>
+            <% end %>
             <label for="assignment_strategy_1"><%= badge_strategy_options[0][0] %></label>
           </td>
         </tr>
         <tr>
           <td>
             <label for="assignment_strategy_1">Top 'N' Students: </label>
-            <%= number_field_tag 'badge[badge_assignment_NumBadges]',  :size => '4'%>
+            <% if @badgeGroup != nil and @badgeGroup.strategy == 'Top Scores' %>
+              <%= number_field_tag 'badge[badge_assignment_NumBadges]', @badgeGroup.threshold, :size => '4'%>
+            <% else %>
+              <%= number_field_tag 'badge[badge_assignment_NumBadges]',  :size => '4'%>
+            <% end %>
           </td>
         </tr>
 
@@ -35,14 +43,23 @@
       <table>
         <tr>
           <td>
-            <%=radio_button_tag 'badge[badge_assignment_strategy]', badge_strategy_options[1][0], nil, :onchange => 'clearText()' %>
+            <% if @badgeGroup != nil and @badgeGroup.strategy == 'Score Threshold'%>
+              <%=radio_button_tag 'badge[badge_assignment_strategy]', badge_strategy_options[1][0], :checked => 'checked', :onchange => 'clearText()' %>
+            <% else %>
+              <%=radio_button_tag 'badge[badge_assignment_strategy]', badge_strategy_options[1][0],nil, :onchange => 'clearText()' %>
+            <% end %>
             <label for="assignment_strategy_2"><%= badge_strategy_options[1][0] %></label>
           </td>
         </tr>
         <tr>
           <td>
             <label for="assignment_strategy_2">Score greater than: </label>
-            <%=number_field_tag 'badge[badge_assignment_threshold]', :size => '4'%>
+            <% if @badgeGroup != nil and @badgeGroup.strategy == 'Score Threshold'%>
+                <%=number_field_tag 'badge[badge_assignment_threshold]', @badgeGroup.threshold ,:size => '4'%>
+            <% else %>
+                <%=number_field_tag 'badge[badge_assignment_threshold]',:size => '4'%>
+            <% end %>
+
           </td>
         </tr>
       </table>

@@ -2,7 +2,7 @@
 <div style="text-align: center">
   <h3>Manage Course level Badges</h3>
 
-  <table style="width: 75%; text-align: left">
+  <table style="width: 100%; text-align: left">
     <tr>
       <td>
         <%= form_tag(badges_new_path, :method => 'get') do %>
@@ -18,23 +18,17 @@
     </tr>
   </table>
   <br/>
-  <table style="width: 75%; text-align: left">
+  <table style="width: 100%; text-align: left" class="table">
     <% if @badge_groups.length > 0 %>
         <tr>
-          <th>Badge Group ID</th>
+          <th>Assignments Involved</th>
           <th>Strategy</th>
           <th>Threshold</th>
           <th>Badge used</th>
-          <th>Assignments Involved</th>
           <th>Action</th>
         </tr>
         <% @badge_groups.each do |badge_group| %>
             <tr>
-              <td><%= badge_group.id %></td>
-              <td><%= badge_group.strategy %></td>
-              <td><%= badge_group.threshold %></td>
-              <% @badge = Badge.where("credly_badge_id= ?", badge_group.badge_id).first %>
-              <td><%= @badge.name %></td>
               <% @assignments_list = AssignmentGroup.where('badge_group_id = ?', badge_group.id) %>
               <td>
                 <ol>
@@ -44,13 +38,27 @@
                   <% end %>
                 </ol>
               </td>
+              <td><%= badge_group.strategy %></td>
+              <td><%= badge_group.threshold %></td>
+              <% @badge = Badge.where("credly_badge_id= ?", badge_group.badge_id).first %>
+              <td><%= @badge.name %></td>
+
               <td>
+                <span>
                 <%= form_tag(badges_edit_path, :method => 'get') do %>
                     <div style="display:inline-block;">
                       <%= hidden_field_tag :badge_group_id, badge_group.id %>
                       <span><%= button_tag 'Edit', {:class => 'btn btn-primary'} %></span>
                     </div>
                 <% end %>
+
+                <%= form_tag(badges_destroy_path(:badge_group_id => badge_group.id), :method => 'delete') do %>
+                    <div style="display:inline-block;">
+                      <%= hidden_field_tag :badge_group_id, badge_group.id %>
+                      <span><%= button_tag 'Delete',  {:class => 'btn btn-primary'} %></span>
+                    </div>
+                <% end %>
+                </span>
               </td>
             </tr>
         <% end %>

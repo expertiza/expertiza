@@ -388,7 +388,7 @@ class ReviewMappingController < ApplicationController
     else
       teams_with_calibrated_artifacts = Array.new
       teams_with_uncalibrated_artifacts = Array.new
-      ReviewResponseMap.where(["reviewed_object_id = ? and calibrate_to = ?", assignment_id, 1]).each do |response_map|
+      ReviewResponseMap.where(["reviewed_object_id = ? and  = ?", assignment_id, 1]).each do |response_map|
         teams_with_calibrated_artifacts << AssignmentTeam.find(response_map.reviewee_id)
       end
       teams_with_uncalibrated_artifacts = teams - teams_with_calibrated_artifacts

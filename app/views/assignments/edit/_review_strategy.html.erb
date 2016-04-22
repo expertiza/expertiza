@@ -29,6 +29,12 @@
   <tr id="instructor_selected_review_mapping_mechanism" hidden='hidden'>
     <td>
       <%= form_tag :controller => 'review_mapping', :action => 'automatic_review_mapping', :id => @assignment_form.assignment.id do %>
+
+
+
+
+
+
         <input name="max_team_size" type="hidden" value="<%= @assignment_form.assignment.max_team_size %>"/>
         <%= radio_button_tag 'num_reviews', 'student', true %>
         <%= label_tag('num_reviews_per_student', 'Set number of reviews done by each student') %>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -64,6 +70,14 @@
       <input name="assignment_form[assignment][is_selfreview_enabled]" type="hidden" value="false"/>
       <%= check_box_tag('assignment_form[assignment][is_selfreview_enabled]', 'true', @assignment_form.assignment.is_selfreview_enabled) %>
       <%= label_tag('assignment_form[assignment][is_selfreview_enabled]', 'Allow self reviews?') %>
+    </td>
+  </tr>
+
+  <tr>
+    <td style='padding:5px' id='assignment_reviewer_is_team'>
+      <input name="assignment_form[assignment[reviewer_is_team]" type="hidden" value="false"/>
+      <%= label_tag('assignment_form[assignment][reviewer_is_team]', 'Review Type?') %>
+      <%= select("post", "reviewer_is_team", [['Individual Review', false],['Team Based Review', true]], { include_blank: false }) %>
     </td>
   </tr>
 

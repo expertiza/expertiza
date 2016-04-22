@@ -45,19 +45,18 @@
 
               <td>
                 <span>
-                <%= form_tag(badges_edit_path, :method => 'get') do %>
-                    <div style="display:inline-block;">
-                      <%= hidden_field_tag :badge_group_id, badge_group.id %>
-                      <span><%= button_tag 'Edit', {:class => 'btn btn-primary'} %></span>
-                    </div>
-                <% end %>
-
-                <%= form_tag(badges_destroy_path(:badge_group_id => badge_group.id), :method => 'delete') do %>
-                    <div style="display:inline-block;">
-                      <%= hidden_field_tag :badge_group_id, badge_group.id %>
-                      <span><%= button_tag 'Delete',  {:class => 'btn btn-primary'} %></span>
-                    </div>
-                <% end %>
+                   <div style="display:inline-block;">
+                     <%= form_tag(badges_edit_path, :method => 'get') do %>
+                         <%= hidden_field_tag :badge_group_id, badge_group.id %>
+                         <span><%= button_tag 'Edit', {:class => 'btn btn-primary'} %></span>
+                     <% end %>
+                   </div>
+                  <div style="display:inline-block;">
+                    <%= form_tag(badges_destroy_path(:badge_group_id => badge_group.id), :method => 'delete') do %>
+                        <%= hidden_field_tag :badge_group_id, badge_group.id %>
+                        <span><%= button_tag 'Delete', {:class => 'btn btn-primary'} %></span>
+                    <% end %>
+                  </div>
                 </span>
               </td>
             </tr>

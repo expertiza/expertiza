@@ -243,13 +243,17 @@ class ReputationWebServiceController < ApplicationController
         @@response_body = response.body
 
 
-		JSON.parse(response.body.to_s).each do |alg, list|
-			unless list.nil?
-				unless list.nil?
-					list.each do |id, rep|
-						Participant.find(id).update_reputation(alg, rep)
-					end
-				end
+
+    JSON.parse(response.body.to_s).each do |alg, list|
+      unless list.nil?
+        unless list.nil?
+          list.each do |id, rep|
+            unless /leniency/ =~ id.to_s
+              puts id.to_s
+              Participant.find_by_user_id(id).update_reputation(alg, rep)
+            end
+          end
+        end
 			end
 		end
 

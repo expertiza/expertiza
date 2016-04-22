@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160326205445) do
+ActiveRecord::Schema.define(version: 20160422030133) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -30,7 +30,7 @@ ActiveRecord::Schema.define(version: 20160326205445) do
     t.integer "notification_limit",   limit: 4, default: 15,   null: false
     t.integer "questionnaire_weight", limit: 4, default: 0,    null: false
     t.integer "used_in_round",        limit: 4
-    t.boolean "dropdown",             limit: 1, default: true
+    t.boolean "dropdown",                       default: true
   end
 
   add_index "assignment_questionnaires", ["assignment_id"], name: "fk_aq_assignments_id", using: :btree
@@ -45,38 +45,39 @@ ActiveRecord::Schema.define(version: 20160326205445) do
     t.integer  "submitter_count",            limit: 4,     default: 0,     null: false
     t.integer  "course_id",                  limit: 4,     default: 0
     t.integer  "instructor_id",              limit: 4,     default: 0
-    t.boolean  "private",                    limit: 1,     default: false, null: false
+    t.boolean  "private",                                  default: false, null: false
     t.integer  "num_reviews",                limit: 4,     default: 0,     null: false
     t.integer  "num_review_of_reviews",      limit: 4,     default: 0,     null: false
     t.integer  "num_review_of_reviewers",    limit: 4,     default: 0,     null: false
-    t.boolean  "reviews_visible_to_all",     limit: 1
+    t.boolean  "reviews_visible_to_all"
     t.integer  "num_reviewers",              limit: 4,     default: 0,     null: false
     t.text     "spec_location",              limit: 65535
     t.integer  "max_team_size",              limit: 4,     default: 0,     null: false
-    t.boolean  "staggered_deadline",         limit: 1
-    t.boolean  "allow_suggestions",          limit: 1
+    t.boolean  "staggered_deadline"
+    t.boolean  "allow_suggestions"
     t.integer  "days_between_submissions",   limit: 4
     t.string   "review_assignment_strategy", limit: 255
     t.integer  "max_reviews_per_submission", limit: 4
     t.integer  "review_topic_threshold",     limit: 4,     default: 0
-    t.boolean  "copy_flag",                  limit: 1,     default: false
+    t.boolean  "copy_flag",                                default: false
     t.integer  "rounds_of_reviews",          limit: 4,     default: 1
-    t.boolean  "microtask",                  limit: 1,     default: false
-    t.boolean  "require_quiz",               limit: 1
+    t.boolean  "microtask",                                default: false
+    t.boolean  "require_quiz"
     t.integer  "num_quiz_questions",         limit: 4,     default: 0,     null: false
-    t.boolean  "is_coding_assignment",       limit: 1
-    t.boolean  "is_intelligent",             limit: 1
-    t.boolean  "calculate_penalty",          limit: 1,     default: false, null: false
+    t.boolean  "is_coding_assignment"
+    t.boolean  "is_intelligent"
+    t.boolean  "calculate_penalty",                        default: false, null: false
     t.integer  "late_policy_id",             limit: 4
-    t.boolean  "is_penalty_calculated",      limit: 1,     default: false, null: false
+    t.boolean  "is_penalty_calculated",                    default: false, null: false
     t.integer  "max_bids",                   limit: 4
-    t.boolean  "show_teammate_reviews",      limit: 1
-    t.boolean  "availability_flag",          limit: 1,     default: true
-    t.boolean  "use_bookmark",               limit: 1
-    t.boolean  "can_review_same_topic",      limit: 1,     default: true
-    t.boolean  "can_choose_topic_to_review", limit: 1,     default: true
-    t.boolean  "is_calibrated",              limit: 1,     default: false
-    t.boolean  "is_selfreview_enabled",      limit: 1
+    t.boolean  "show_teammate_reviews"
+    t.boolean  "availability_flag",                        default: true
+    t.boolean  "use_bookmark"
+    t.boolean  "can_review_same_topic",                    default: true
+    t.boolean  "can_choose_topic_to_review",               default: true
+    t.boolean  "is_calibrated",                            default: false
+    t.boolean  "is_selfreview_enabled"
+    t.boolean  "Lauw",                                     default: true
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -169,7 +170,7 @@ ActiveRecord::Schema.define(version: 20160326205445) do
     t.text     "info",            limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "private",         limit: 1,     default: false, null: false
+    t.boolean  "private",                       default: false, null: false
     t.integer  "institutions_id", limit: 4
   end
 
@@ -209,7 +210,7 @@ ActiveRecord::Schema.define(version: 20160326205445) do
     t.integer  "rereview_allowed_id",         limit: 4
     t.integer  "review_of_review_allowed_id", limit: 4
     t.integer  "round",                       limit: 4
-    t.boolean  "flag",                        limit: 1,   default: false
+    t.boolean  "flag",                                    default: false
     t.integer  "threshold",                   limit: 4,   default: 1
     t.integer  "delayed_job_id",              limit: 4
     t.string   "deadline_name",               limit: 255
@@ -295,20 +296,22 @@ ActiveRecord::Schema.define(version: 20160326205445) do
   end
 
   create_table "participants", force: :cascade do |t|
-    t.boolean  "can_submit",          limit: 1,     default: true
-    t.boolean  "can_review",          limit: 1,     default: true
+    t.boolean  "can_submit",                                       default: true
+    t.boolean  "can_review",                                       default: true
     t.integer  "user_id",             limit: 4
     t.integer  "parent_id",           limit: 4
     t.datetime "submitted_at"
-    t.boolean  "permission_granted",  limit: 1
-    t.integer  "penalty_accumulated", limit: 4,     default: 0,    null: false
+    t.boolean  "permission_granted"
+    t.integer  "penalty_accumulated", limit: 4,                    default: 0,    null: false
     t.float    "grade",               limit: 24
     t.string   "type",                limit: 255
     t.string   "handle",              limit: 255
     t.datetime "time_stamp"
     t.text     "digital_signature",   limit: 65535
     t.string   "duty",                limit: 255
-    t.boolean  "can_take_quiz",       limit: 1,     default: true
+    t.boolean  "can_take_quiz",                                    default: true
+    t.decimal  "Hamer",                             precision: 10
+    t.decimal  "Lauw",                              precision: 10
   end
 
   add_index "participants", ["user_id"], name: "fk_participant_users", using: :btree
@@ -333,7 +336,7 @@ ActiveRecord::Schema.define(version: 20160326205445) do
   create_table "questionnaires", force: :cascade do |t|
     t.string   "name",               limit: 64
     t.integer  "instructor_id",      limit: 4,     default: 0,     null: false
-    t.boolean  "private",            limit: 1,     default: false, null: false
+    t.boolean  "private",                          default: false, null: false
     t.integer  "min_question_score", limit: 4,     default: 0,     null: false
     t.integer  "max_question_score", limit: 4
     t.datetime "created_at"
@@ -351,7 +354,7 @@ ActiveRecord::Schema.define(version: 20160326205445) do
     t.string  "type",             limit: 255
     t.string  "size",             limit: 255,                           default: ""
     t.string  "alternatives",     limit: 255
-    t.boolean "break_before",     limit: 1,                             default: true
+    t.boolean "break_before",                                           default: true
     t.string  "max_label",        limit: 255,                           default: ""
     t.string  "min_label",        limit: 255,                           default: ""
   end
@@ -361,7 +364,7 @@ ActiveRecord::Schema.define(version: 20160326205445) do
   create_table "quiz_question_choices", force: :cascade do |t|
     t.integer "question_id", limit: 4
     t.text    "txt",         limit: 65535
-    t.boolean "iscorrect",   limit: 1,     default: false
+    t.boolean "iscorrect",                 default: false
   end
 
   create_table "response_maps", force: :cascade do |t|
@@ -371,7 +374,7 @@ ActiveRecord::Schema.define(version: 20160326205445) do
     t.string   "type",               limit: 255, default: "",    null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "calibrate_to",       limit: 1,   default: false
+    t.boolean  "calibrate_to",                   default: false
   end
 
   add_index "response_maps", ["reviewer_id"], name: "fk_response_map_reviewer", using: :btree
@@ -383,7 +386,7 @@ ActiveRecord::Schema.define(version: 20160326205445) do
     t.datetime "updated_at"
     t.integer  "version_num",        limit: 4
     t.integer  "round",              limit: 4
-    t.boolean  "is_submitted",       limit: 1,     default: false
+    t.boolean  "is_submitted",                     default: false
   end
 
   add_index "responses", ["map_id"], name: "fk_response_response_map", using: :btree
@@ -422,7 +425,7 @@ ActiveRecord::Schema.define(version: 20160326205445) do
     t.integer  "q1_id",                 limit: 4,     default: 0
     t.string   "q1_name",               limit: 64
     t.integer  "q1_instructor_id",      limit: 4,     default: 0
-    t.boolean  "q1_private",            limit: 1,     default: false
+    t.boolean  "q1_private",                          default: false
     t.integer  "q1_min_question_score", limit: 4,     default: 0
     t.integer  "q1_max_question_score", limit: 4
     t.datetime "q1_created_at"
@@ -471,7 +474,7 @@ ActiveRecord::Schema.define(version: 20160326205445) do
   create_table "signed_up_teams", force: :cascade do |t|
     t.integer "topic_id",                   limit: 4, default: 0,     null: false
     t.integer "team_id",                    limit: 4, default: 0,     null: false
-    t.boolean "is_waitlisted",              limit: 1, default: false, null: false
+    t.boolean "is_waitlisted",                        default: false, null: false
     t.integer "preference_priority_number", limit: 4
   end
 
@@ -559,7 +562,7 @@ ActiveRecord::Schema.define(version: 20160326205445) do
     t.integer "parent_id",                  limit: 4
     t.string  "type",                       limit: 255
     t.text    "comments_for_advertisement", limit: 65535
-    t.boolean "advertise_for_partner",      limit: 1
+    t.boolean "advertise_for_partner"
     t.text    "submitted_hyperlinks",       limit: 65535
     t.integer "directory_num",              limit: 4
   end
@@ -613,20 +616,20 @@ ActiveRecord::Schema.define(version: 20160326205445) do
     t.string  "fullname",                  limit: 255
     t.string  "email",                     limit: 255
     t.integer "parent_id",                 limit: 4
-    t.boolean "private_by_default",        limit: 1,     default: false
+    t.boolean "private_by_default",                      default: false
     t.string  "mru_directory_path",        limit: 128
-    t.boolean "email_on_review",           limit: 1
-    t.boolean "email_on_submission",       limit: 1
-    t.boolean "email_on_review_of_review", limit: 1
-    t.boolean "is_new_user",               limit: 1,     default: true,  null: false
+    t.boolean "email_on_review"
+    t.boolean "email_on_submission"
+    t.boolean "email_on_review_of_review"
+    t.boolean "is_new_user",                             default: true,  null: false
     t.integer "master_permission_granted", limit: 1,     default: 0
     t.string  "handle",                    limit: 255
-    t.boolean "leaderboard_privacy",       limit: 1,     default: false
+    t.boolean "leaderboard_privacy",                     default: false
     t.text    "digital_certificate",       limit: 65535
     t.string  "persistence_token",         limit: 255
     t.string  "timezonepref",              limit: 255
     t.text    "public_key",                limit: 65535
-    t.boolean "copy_of_emails",            limit: 1,     default: false
+    t.boolean "copy_of_emails",                          default: false
     t.integer "institution_id",            limit: 4
   end
 

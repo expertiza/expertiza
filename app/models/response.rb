@@ -43,8 +43,7 @@ class Response < ActiveRecord::Base
     else
       code += self.updated_at.strftime('%A %B %d %Y, %I:%M%p')
     end
-    code += '<div id="review_'+str+'" style="display: none;"><BR/>'
-
+    code += '<table id="review_'+str+'" style="display: none;" class="table table-bordered">'
     count = 0
     answers = Answer.where(response_id: self.response_id)
 
@@ -56,6 +55,12 @@ class Response < ActiveRecord::Base
     questions.each do |question|
       count += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
       answer = answers.find{|a| a.question_id==question.id}
+      row_class = if count%2 == 0 then "info" else "warning" end
+      if question.is_a? QuestionnaireHeader 
+        row_class = ""
+      end
+      
+      code += '<tr class="' + row_class + '"><td>'
       if !answer.nil? or question.is_a? QuestionnaireHeader
         if question.instance_of? Criterion or question.instance_of? Scale
           code += question.view_completed_question(count,answer,questionnaire_max)
@@ -63,6 +68,7 @@ class Response < ActiveRecord::Base
           code += question.view_completed_question(count,answer)
         end
       end
+      code += '</td></tr>'
     end
 
     if self.additional_comment != nil
@@ -70,7 +76,8 @@ class Response < ActiveRecord::Base
     else
       comment = ''
     end
-    code += "<big><B>Additional Comment:</B></big><BR/>"+comment+"</div>"
+    code += "<tr><td><B>Additional Comment: </B>"+comment+'</td></tr>'
+    code += "</table>"
     return code.html_safe
   end
 

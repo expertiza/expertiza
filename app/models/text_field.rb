@@ -16,7 +16,7 @@ class TextField < TextResponse
 
   def view_completed_question(count, answer)
     if self.type == 'TextField' and self.break_before == true
-      html = '<big><b>Question '+count.to_s+":</b> <I>"+self.txt+"</I></big>"
+      html = '<b>' + count.to_s + ". " + self.txt + "</b>"
       html += '&nbsp;&nbsp;&nbsp;&nbsp;'
       html += answer.comments
       html += '<BR/><BR/>' if Question.exists?(answer.question_id+1) && Question.find(answer.question_id+1).break_before == true

@@ -503,8 +503,9 @@ class ReviewMappingController < ApplicationController
         @review_response_map_ids = ReviewResponseMap.select('id').where(["reviewed_object_id = ? and calibrate_to = ?", params[:id], 0])
         @responses = Response.where(["map_id IN (?)", @review_response_map_ids])
       when "Collusion"
-        graph = CollusionCycle.get_review_response_map(@assignment.id)
-        graph1 = graph
+        graph = CollusionCycle.create_graph_response_map(@assignment.id)
+        matrix = CollusionCycle.cycle_detection(graph)
+        matrix1 = matrix
       end
     end
   #E1600

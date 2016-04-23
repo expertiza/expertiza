@@ -505,7 +505,8 @@ class ReviewMappingController < ApplicationController
       when "Collusion"
         graph = CollusionCycle.create_graph_response_map(@assignment.id)
         matrix = CollusionCycle.cycle_detection(graph)
-        matrix1 = matrix
+        cycle_n = CollusionCycle.get_cycle_of_size_n(matrix[0],matrix[1],1) #replace the third parameter here by n
+        cycle_n
       end
     end
   #E1600

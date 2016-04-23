@@ -65,6 +65,7 @@ class CollusionCycle < ActiveRecord::Base
     # fill white set with all the vertices assuming each person did atleast 1 review
     graph.each do |current,neighbours|
       white_set.add(current)
+      parent[current] = -1
     end
 
     graph.each do |current, neighbours|
@@ -82,9 +83,11 @@ class CollusionCycle < ActiveRecord::Base
     neighbours = graph[current]
     neighbours.each do |neighbor|
       if gray_set.member?(neighbor) # a cycle detected
-        parent[current] = neighbor
-        cycle[current] = true
-        puts "There is a cycle involving node " + neighbor.to_s
+        if neighbor!=current
+          parent[current] = neighbor
+          cycle[current] = true
+          puts "There is a cycle involving node " + neighbor.to_s
+        end
       end
       if white_set.member?(neighbor)
         dfs_within_graph(neighbor, white_set, gray_set, black_set,graph,parent,cycle)
@@ -100,4 +103,26 @@ class CollusionCycle < ActiveRecord::Base
     destination_set.add(current)
   end
   # Begin Changes ==== Create a method to do DFS on the graph and return nodes for which there is a cycle and parent array
+
+  def self.get_cycle_of_size_n(parent,cycle,n)
+    output_cycle_list = [[]]
+    list_n = []
+    cycle.each do |node|
+      temp_node = node[0]
+      count = 0
+      while parent[temp_node] != -1
+        if(count>n)
+          break
+        end
+        count += 1
+        list_n<<parent[temp_node]
+        temp_node = parent[temp_node]
+      end
+      if count == n
+        output_cycle_list<<list_n
+      end
+      list_n.clear
+    end
+    output_cycle_list
+  end
 end

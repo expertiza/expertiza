@@ -24,7 +24,7 @@
     <div class="picker">
       <select class="image-picker show-labels show-html" name="assignment_form[badge][badge_selected]">
         <% @list_badges.each do |badge| %>
-            <% if @badge_group.badge_id == badge["badge_id"] %>
+            <% if @badge_group != nil and @badge_group.badge_id == badge["badge_id"] %>
               <option data-img-src=<%= badge["badge_image_url"] %> value=<%= badge["badge_id"] %> selected><%= badge["badge_title"] %></option>
             <%else%>
               <option data-img-src=<%= badge["badge_image_url"] %> value=<%= badge["badge_id"] %> ><%= badge["badge_title"] %></option>

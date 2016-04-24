@@ -13,7 +13,11 @@
   }
 </script>
 
-
+<% if @type == "course" %>
+    <h1>
+      Survey Response for course
+    </h1>
+<% else %>
 <h1>
   Survey Responses for Assignment: <%= @assignment.name %>
 </h1>
@@ -78,3 +82,4 @@
       <%= link_to 'Back', :controller => 'survey_deployment',:action => 'list' %>
     <% end %>
   <% end %>
+<% end %>

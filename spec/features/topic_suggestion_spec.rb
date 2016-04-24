@@ -233,4 +233,156 @@ describe "Assignment Topic Suggestion Test", :js => true do
 	visit 'http://127.0.0.1:3000/'
 	end
 	end
+
+########################################
+ # Case 3: 
+# One team is holding a topic. They sent a suggestion for new topic, and keep themselves in old topic
+########################################
+
+
+
+  describe "case3", :js => true do
+
+    it "Instructor set an assignment which allow student suggest topic and register student11" do
+     # login_as("instructor6")
+      visit 'http://127.0.0.1:3000/'
+      #login as instructor6
+      fill_in 'login_name', with: 'instructor6'
+      fill_in 'login_password', with: 'password'
+
+      #create an assignment
+      visit '/assignments/new?private=0'
+      expect(page).to have_content "Assignment name"
+      fill_in "Assignment name:", with: 'Assignment_suggest_topic'
+      click_button "Create"
+      expect(Assignment.where(name: "Assignment_suggest_topic")).to exist
+
+      #allow student suggest topic
+      expect(page).to have_content "Topics"
+      find_link('Topics').click
+      find('#assignment_form_assignment_allow_suggestions').set(true)
+      click_button "Save"
+      expect(page).to have_content "Assignment was successfully saved"
+      expect(Assignment.find(2).allow_suggestions).to eq true
+      #sleep 1000
+
+      #register student
+      visit '/tree_display/list'
+      #expect(page).to have_content "Assignment_suggest_topic"
+      visit '/participants/list?id=2&model=Assignment'
+      #fill_in "Enter a user login:", with: 'student11'
+      fill_in "user_name", with: 'student11'
+      click_button "Add"
+      expect(page).to have_content "expertiza@mailinator.com"
+
+      #logout instructor6
+      find_link('Logout').click
+      visit 'http://127.0.0.1:3000/'
+      #login as student11, Note by Xing Pan: modify spec/factories/factories.rb to generate student11 and call "create student" at beginning
+      fill_in 'login_name', with: 'student11'
+      fill_in 'login_password', with: 'password'
+      click_button 'SIGN IN'
+      expect(page).to have_content "Assignment_suggest_topic"
+      #sleep 1000
+
+      #student11 suggest topic
+      find_link('Assignment_suggest_topic').click
+      expect(page).to have_content "Suggest a topic"
+      find_link('Suggest a topic').click
+      expect(page).to have_content "Title"
+      fill_in 'suggestion_title', with: 'suggested_topic'
+      fill_in 'suggestion_description', with: 'suggested_description'
+      click_button 'Submit'
+      expect(page).to have_content "Thank you for your suggestion"
+      #sleep 1000
+
+      #logout student11
+      find_link('Logout').click
+      visit 'http://127.0.0.1:3000/'
+      #login as instructor6
+      fill_in 'login_name', with: 'instructor6'
+      fill_in 'login_password', with: 'password'
+      click_button 'SIGN IN'
+
+      #instructor approve the suggestion topic
+      visit '/tree_display/list'
+      visit '/suggestion/list?id=2&type=Assignment'
+      expect(page).to have_content "Suggested topics for Assignment_suggest_topic"
+      expect(page).to have_content "suggested_topic"
+      find(:xpath, "//tr[contains(.,'suggested_topic')]/td/a", :text => 'View').click
+
+      #find_link('View').click
+      expect(page).to have_content "suggested_description"
+      click_button 'Approve suggestion'
+      expect(page).to have_content "Successfully approved the suggestion"
+
+      ######################################
+      # One team is holding a topic. They sent a suggestion for new topic
+     ######################################
+      #logout instructor6
+      find_link('Logout').click
+      visit 'http://127.0.0.1:3000/'
+      #login as student11, Note by Xing Pan: modify spec/factories/factories.rb to generate student11 and call "create student" at beginning
+      fill_in 'login_name', with: 'student11'
+      fill_in 'login_password', with: 'password'
+      click_button 'SIGN IN'
+      expect(page).to have_content "Assignment_suggest_topic"
+      #sleep 1000
+
+      #student11 suggest topic
+      find_link('Assignment_suggest_topic').click
+      expect(page).to have_content "Suggest a topic"
+      find_link('Suggest a topic').click
+      expect(page).to have_content "Title"
+      fill_in 'suggestion_title', with: 'suggested_topic2_without_switch'
+      fill_in 'suggestion_description', with: 'suggested_description2_without_switch'
+      #find('#suggestion_signup_preference').set(N)
+      find('#suggestion_signup_preference').find(:xpath, 'option[1]').select_option
+      click_button 'Submit'
+      expect(page).to have_content "Thank you for your suggestion"
+      #sleep 1000
+
+      #logout student11
+      find_link('Logout').click
+      visit 'http://127.0.0.1:3000/'
+      #login as instructor6
+      fill_in 'login_name', with: 'instructor6'
+      fill_in 'login_password', with: 'password'
+      click_button 'SIGN IN'
+
+      #instructor approve the suggestion topic
+      visit '/tree_display/list'
+      visit '/suggestion/list?id=2&type=Assignment'
+      expect(page).to have_content "Suggested topics for Assignment_suggest_topic"
+     expect(page).to have_content "suggested_topic2_without_switch"
+      find(:xpath, "//tr[contains(.,'suggested_topic2_without_switch')]/td/a", :text => 'View').click
+     #find_link('View').click
+     expect(page).to have_content "suggested_description2_without_switch"
+     click_button 'Approve suggestion'
+     expect(page).to have_content "Successfully approved the suggestion"
+
+      #logout instructor6
+      find_link('Logout').click
+      visit 'http://127.0.0.1:3000/'
+      #login as student11, Note by Xing Pan: modify spec/factories/factories.rb to generate student11 and call "create student" at beginning
+      fill_in 'login_name', with: 'student11'
+      fill_in 'login_password', with: 'password'
+      click_button 'SIGN IN'
+      expect(page).to have_content "Assignment_suggest_topic"
+      find_link('Assignment_suggest_topic').click
+      expect(page).to have_content "Signup sheet"
+      find_link('Signup sheet').click
+      expect(page).to have_content " suggested_topic2_without_switch"
+      #find_link('publish_approved_suggested_topic').click
+      find(:xpath, "//tr[contains(.,'suggested_topic2_without_switch')]/td/a", :figure=>"Publish Topic").click
+      expect(page).to have_content "Signup_sheet"
+     #sleep 1000
+
+
+
+    end
+
+  end
+
+        
 end

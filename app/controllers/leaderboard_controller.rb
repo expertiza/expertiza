@@ -22,7 +22,8 @@ class LeaderboardController < ApplicationController
 
   def view
     ##Get Course participants
-    @instructor = User.find_by_id(params[:user_id])
+    #@instructor = User.find_by_id(params[:user_id])
+    @course = Course.find_by_id(params[:course_id])
     @participants = Participant.where('parent_id = ?', params[:course_id]).pluck(:user_id)
     @students = User.where('id in (?) and role_id = ?', @participants, 1)
     @assignments = Assignment.where('course_id = ?', params[:course_id])
@@ -62,7 +63,11 @@ class LeaderboardController < ApplicationController
         end
       end
       sorted_scores = Hash[participant_scores.sort_by{|k, v| v}.reverse!]
-      get_eligible_users_for_badge badge_group, sorted_scores, @assignment_groups.assignment_id
+      final_users = get_eligible_users_for_badge badge_group, sorted_scores, @assignment_groups.assignment_id
+
+      final_users.each do |u|
+        assign_badge_user badge_group.badge_id, u, 1, @assignment_groups.assignment_id, params[:course_id]
+      end
     end
   end
 
@@ -88,11 +93,8 @@ class LeaderboardController < ApplicationController
         final_users = get_users_threshold_team_of_multiple sorted_scores , threshold, assignment_id
       end
     end
-
-
-
+    final_users
   end
-
 
   def get_users_top_scores_team_of_one sorted_scores,threshold
     prev_value = 0
@@ -207,6 +209,27 @@ class LeaderboardController < ApplicationController
       end
       @questions[questionnaire_symbol] = questionnaire.questions
     end
+  end
+
+  def assign_badge_user badge_id, user_id, is_assignment_level_badge, assignment_id, course_id
+    badge_user = BadgeUser.new
+    badge_user.badge_id = badge_id
+    badge_user.user_id = user_id
+
+    if is_assignment_level_badge
+      badge_user.is_course_badge = false
+      badge_user.assignment_id = assignment_id
+    else
+      badge_user.is_course_badge = true
+      badge_user.course_id = course_id
+    end
+
+    badge_user.save!
+
+    student_credly_id = User.where('id = ?', user_id).first
+
+    CredlyHelper.award_badge_user(@course.instructor_id, student_credly_id.credly_id, badge_id)
+
   end
 
 end

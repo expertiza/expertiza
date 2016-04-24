@@ -100,25 +100,25 @@ class AssignmentsController < ApplicationController
 
     # response = CredlyHelper.get_badges_created(expertiza_admin_user_id)
     # parsed_response = JSON.parse(response.body)
-    #
     # if response.code == '200' && !parsed_response['data'].nil?
     #   user_data = parsed_response['data']
     #   user_data.each do |badge|
-    #     @badge_info["badge_image_url"] = badge["image_url"]
-    #     @badge_info["badge_title"] = badge["title"]
-    #     @badge_info["badge_id"] = badge["id"]
-    #     if Badge.where("credly_badge_id = ?", badge["id"]).blank?
+    #     if Badge.where('credly_badge_id = ?', badge['id']).blank?
     #       new_badge = Badge.new
-    #       new_badge.name = badge["title"]
-    #       new_badge.credly_badge_id = badge["id"]
+    #       new_badge.name = badge['title']
+    #       new_badge.credly_badge_id = badge['id']
     #       new_badge.save!
     #     end
-    #     @list_badges.push @badge_info
+    #     badge_info = Hash.new
+    #     badge_info['badge_image_url'] = badge['image_url']
+    #     badge_info['badge_title'] = badge['title']
+    #     badge = Badge.where('credly_badge_id = ?', badge['id']).first
+    #     badge_info['badge_id'] = badge.id
+    #     list_badges.push badge_info
     #   end
     # else
     #   user_data = parsed_response['meta']
     # end
-
     # Check if name and url in database is empty before webpage displays
     @due_date_all.each do |dd|
       @due_date_nameurl_notempty = is_due_date_nameurl_notempty(dd);

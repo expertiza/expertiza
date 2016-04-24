@@ -22,16 +22,17 @@ module CredlyHelper
 
     if response.code == '200' && !parsed_response['data'].nil?
       parsed_response['data'].each do |badge|
-        badge_info = Hash.new
-        badge_info['badge_image_url'] = badge['image_url']
-        badge_info['badge_title'] = badge['title']
-        badge_info['badge_id'] = badge['id']
         if Badge.where('credly_badge_id = ?', badge['id']).blank?
           new_badge = Badge.new
           new_badge.name = badge['title']
           new_badge.credly_badge_id = badge['id']
           new_badge.save!
         end
+        badge_info = Hash.new
+        badge_info['badge_image_url'] = badge['image_url']
+        badge_info['badge_title'] = badge['title']
+        badge = Badge.where('credly_badge_id = ?', badge['id']).first
+        badge_info['badge_id'] = badge.id
         list_badges.push badge_info
       end
     else

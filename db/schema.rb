@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160421162226) do
+ActiveRecord::Schema.define(version: 20160424190302) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -123,9 +123,11 @@ ActiveRecord::Schema.define(version: 20160421162226) do
     t.integer "user_id",         limit: 4
     t.integer "assignment_id",   limit: 4
     t.integer "course_id",       limit: 4
+    t.integer "badge_id",        limit: 4
   end
 
   add_index "badge_users", ["assignment_id"], name: "index_badge_users_on_assignment_id", using: :btree
+  add_index "badge_users", ["badge_id"], name: "index_badge_users_on_badge_id", using: :btree
   add_index "badge_users", ["course_id"], name: "index_badge_users_on_course_id", using: :btree
   add_index "badge_users", ["user_id"], name: "index_badge_users_on_user_id", using: :btree
 
@@ -689,6 +691,7 @@ ActiveRecord::Schema.define(version: 20160421162226) do
   add_foreign_key "assignments", "users", column: "instructor_id", name: "fk_assignments_instructors"
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"
   add_foreign_key "badge_users", "assignments"
+  add_foreign_key "badge_users", "badges"
   add_foreign_key "badge_users", "courses"
   add_foreign_key "badge_users", "users"
   add_foreign_key "courses", "users", column: "instructor_id", name: "fk_course_users"

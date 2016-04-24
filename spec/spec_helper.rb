@@ -101,4 +101,9 @@ RSpec.configure do |config|
   Dir["./spec/features/helpers/*.rb"].each do |filename|
     require filename.gsub(/\.rb/, "")
   end
+
+  Capybara.configure do |config|
+    config.app_host   = 'http://127.0.0.1:3000'
+    config.server_port = 3000
+  end
 end

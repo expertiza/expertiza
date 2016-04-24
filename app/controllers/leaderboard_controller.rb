@@ -40,7 +40,8 @@ class LeaderboardController < ApplicationController
       end
     end
 
-    student_badges = Hash.new()
+    @student_badges = Hash[@students.pluck(:id).map {|x| [x, nil]}]
+    @track_badge_users = Array.new()
 
     #GetBadgeGroups
     @badge_groups = BadgeGroup.where('course_id = ?', params[:course_id])
@@ -87,13 +88,65 @@ class LeaderboardController < ApplicationController
             final_users = get_eligible_users_for_badge badge_group, sorted_scores, assign_group.assignment_id
             final_users.each do |u|
               assign_badge_user badge_group.badge_id, u, 1, assign_group.assignment_id, params[:course_id]
+              if @student_badges[u] == nil
+                badge_array = Array.new()
+                badge_array.push(badge_group.badge_id)
+                @student_badges[u] = badge_array
+              else
+                badge_array = @student_badges[u]
+                badge_array.push(badge_group.badge_id)
+                @student_badges[u] = badge_array
+              end
             end
           end
         end
       else
-
+        if badge_group.is_course_level_group == 0
+          students_with_badges = BadgeUser.where('assignment_id = ? and course_id = ? and badge_id = ?', @assignment_groups[0].assignment_id, params[:course_id], badge_group.badge_id)
+          students_with_badges.each do |student|
+            @track_badge_users.push(students_with_badges.id)
+            if @student_badges[student.user_id] == nil
+              badge_array = Array.new()
+              badge_array.push(badge_group.badge_id)
+              @student_badges[student.user_id] = badge_array
+            else
+              badge_array = @student_badges[student.user_id]
+              badge_array.push(badge_group.badge_id)
+              @student_badges[student.user_id] = badge_array
+            end
+          end
+        else
+          students_with_badges = BadgeUser.where('is_course_badge = ? and course_id = ? and badge_id = ?', 1, params[:course_id], badge_group.badge_id)
+          students_with_badges.each do |student|
+            @track_badge_users.push(students_with_badges.id)
+            if @student_badges[student.user_id] == nil
+              badge_array = Array.new()
+              badge_array.push(badge_group.badge_id)
+              @student_badges[student.user_id] = badge_array
+            else
+              badge_array = @student_badges[student.user_id]
+              badge_array.push(badge_group.badge_id)
+              @student_badges[student.user_id] = badge_array
+            end
+          end
+        end
       end
     end
+
+    #add badges awarded by instructor manually
+    badge_user_instructor = BadgeUser.where('id not in (?)', @track_badge_users)
+    badge_user_instructor.each do |bi|
+      if @student_badges[badge_user_instructor.user_id] == nil
+        badge_array = Array.new()
+        badge_array.push(badge_user_instructor.badge_id)
+        @student_badges[badge_user_instructor.user_id] = badge_array
+      else
+        badge_array = @student_badges[badge_user_instructor.user_id]
+        badge_array.push(badge_user_instructor.badge_id)
+        @student_badges[badge_user_instructor.user_id] = badge_array
+      end
+    end
+
   end
 
 
@@ -251,9 +304,12 @@ class LeaderboardController < ApplicationController
 
     badge_user.save!
 
-    student_credly_id = User.where('id = ?', user_id).first
+    @track_badge_users.push(badge_user.id)
 
-    CredlyHelper.award_badge_user(@course.instructor_id, student_credly_id.credly_id, badge_id)
+    student_credly_id = User.where('id = ?', user_id).first
+    credly_badge = Badge.find_by_id(badge_id)
+
+    CredlyHelper.award_badge_user(@course.instructor_id, student_credly_id.credly_id, credly_badge.credly_badge_id)
 
   end
 

@@ -77,9 +77,9 @@ class LeaderboardController < ApplicationController
               rescue
                 if score.is_a? Float
                   if !participant_scores.key?(p.user_id)
-                    participant_scores[p.user_id] = score[:total_score]
+                    participant_scores[p.user_id] = score
                   else
-                    participant_scores[p.user_id] = participant_scores[p.user_id] + score[:total_score]
+                    participant_scores[p.user_id] = participant_scores[p.user_id] + score
                   end
                 end
               end
@@ -87,7 +87,11 @@ class LeaderboardController < ApplicationController
             sorted_scores = Hash[participant_scores.sort_by { |k, v| v }.reverse!]
             final_users = get_eligible_users_for_badge badge_group, sorted_scores, assign_group.assignment_id
             final_users.each do |u|
-              assign_badge_user badge_group.badge_id, u, 1, assign_group.assignment_id, params[:course_id]
+              if(@assignment_groups.count == 1)
+                assign_badge_user badge_group.badge_id, u, 1, assign_group.assignment_id, params[:course_id]
+              elsif @assignment_groups.count > 1
+                assign_badge_user badge_group.badge_id, u, 0, nil, params[:course_id]
+              end
               if @student_badges[u] == nil
                 badge_array = Array.new()
                 badge_array.push(badge_group.badge_id)
@@ -147,6 +151,8 @@ class LeaderboardController < ApplicationController
       end
     end
 
+    #get badge URLs
+    @badge_urls = CredlyHelper.get_badges_created(@course.instructor_id)
   end
 
 

@@ -1,0 +1,24 @@
+<div style="text-align: center">
+  <h3>Leaderboard for <%= params[:course_name] %></h3>
+  <h5><strong>Instructor:</strong> <%= @instructor.name %></h5>
+</div>
+<div style="margin-top: 50px">
+  <table class="table">
+    <thead>
+      <tr>
+        <td><strong>Student Name</strong></td>
+        <td><strong>Number of Badges</strong></td>
+      </tr>
+    </thead>
+    <tbody>
+      <% @students.each do |student| %>
+        <tr>
+          <td><%= student.name %></td>
+          <td>0</td>
+        </tr>
+      <% end %>
+    </tbody>
+
+  </table>
+</div>
+

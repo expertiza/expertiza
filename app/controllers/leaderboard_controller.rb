@@ -17,53 +17,52 @@ class LeaderboardController < ApplicationController
         @course_list = LeaderboardHelper.studentInWhichCourses(current_user.id)
       end
       @course_info = Leaderboard.getCourseInfo(@course_list)
-
-      @csHash= Leaderboard.getParticipantEntriesInCourses @course_list, current_user.id
-
-      if !@instructor_query
-        @user = current_user
-        @courseAccomp = Leaderboard.extractPersonalAchievements(@csHash, @course_list, current_user.id)
-      end
-
-      @csHash = Leaderboard.sortHash(@csHash)
-      # Setup leaderboard for easier consumption by view
-      @leaderboards = Array.new
-
-      @csHash.each { |qType, courseHash|
-        courseHash.each_pair { |courseId, userGradeArray|
-          courseName = LeaderboardHelper.getCourseName(courseId)
-          achieveName = LeaderboardHelper.getAchieveName(qType)
-
-          leaderboardHash = Hash.new
-          leaderboardHash = {:achievement => achieveName,
-                             :courseName => courseName,
-                             :sortedGrades => userGradeArray}
-
-          @leaderboards << leaderboardHash
-        }
-      }
-
-      @leaderboards.sort! { |x, y| x[:courseName] <=> y[:courseName] }
-
-      # Setup personal achievement leaderboards for easier consumption by view
-      @achievementLeaderBoards = Array.new
-      if !@instructor_query
-        @courseAccomp.each_pair { |course, accompHashArray|
-          courseAccompListHash = Hash.new
-          courseAccompListHash[:courseName] = LeaderboardHelper.getCourseName(course)
-          courseAccompListHash[:accompList] = Array.new
-          accompHashArray.each { |accompHash|
-            courseAccompListHash[:accompList] << accompHash
-          }
-          @achievementLeaderBoards << courseAccompListHash
-        }
-      end
-
     end
   end
 
-  def view_leaderboard
+  def view
+    ##Get Course participants
+    @instructor = User.find_by_id(params[:user_id])
+    @participants = Participant.where('parent_id = ?', params[:course_id]).pluck(:user_id)
+    @students = User.where('id in (?) and role_id = ?', @participants, 1)
+    @assignments = Assignment.where('course_id = ?', params[:course_id])
+    assignment_stage = Hash.new()
 
+    #get assignment stages
+    @assignments.each do |assignment|
+      @students.each do |student|
+        participant_assignment = Participant.where('parent_id = ? and user_id = ?', assignment.id, student.id).first
+        topic_id = SignedUpTeam.topic_id(participant_assignment.parent_id, participant_assignment.user_id)
+        stagename = participant_assignment.assignment.get_current_stage_name(topic_id)
+        assignment_stage[assignment.id] = stagename
+        break
+      end
+    end
+
+
+    #GetBadgeGroups
+    @badge_groups = BadgeGroup.where('course_id = ? and is_course_level_group = ?', params[:course_id], 0)
+    @badge_groups.each do |badge_group|
+      @assignment_groups = AssignmentGroup.where('badge_group_id = ?', badge_group.id)
+
+
+    end
+
+
+
+    #GetScoresForAssignmentLevelBadges
+
+    #@participant = AssignmentParticipant.find(params[:id])
+    #@team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
+    #@assignment = @participant.assignment
+    ##@questions = {} # A hash containing all the questions in all the questionnaires used in this assignment
+    #questionnaires = @assignment.questionnaires
+    #retrieve_questions (questionnaires)
+
+    #@pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
+    #@pscore = @participant.scores(@questions)
+
+    j = 0
   end
 
 end

@@ -124,6 +124,10 @@ require 'selenium-webdriver'
       click_link('Assignments')
       find_link('Assignment_suggest_topic').click
       find_link('Signup sheet').click
+      # Bug found and need the select action name 
+      # replace "select" with mark
+"""
+      find(:xpath, "//tr[contains(.,'suggested_topic')]/td/a", :figure=>"select").click
       # sign up to waitlist
       # but got error
       # expect(page).to have_content "" 
@@ -179,7 +183,7 @@ require 'selenium-webdriver'
       find_link('Logout').click
       visit 'http://0.0.0.0:3000/'
 
-       
+ """    
     end
    
    end

@@ -72,6 +72,32 @@ FactoryGirl.define do
     copy_of_emails  false
   end
   
+  factory :studentb, class: User do
+    # Zhewei: In order to keep students the same names (2064, 2065, 2066) before each example.
+    # sequence(:name) { |n| n=n%3;  "student206#{n+4}" }
+    sequence(:name, 10) { |n| n=10;  "student#{n}" }
+    role { Role.where(name: 'Student').first || association(:role_of_student) } 
+    password "password"
+    password_confirmation "password"
+    #sequence(:fullname) { |n| n=n%3; "206#{n+4}, student" }
+    fullname "10, student"
+    email "expertiza@mailinator.com"
+    parent_id  1
+    private_by_default  false 
+    mru_directory_path  nil
+    email_on_review  true
+    email_on_submission  true 
+    email_on_review_of_review  true
+    is_new_user false
+    master_permission_granted 0 
+    handle "handle"
+    leaderboard_privacy false 
+    digital_certificate  nil 
+    timezonepref 'Eastern Time (US & Canada)'
+    public_key nil
+    copy_of_emails  false
+  end
+
   factory :instructor, class: User do
     sequence(:name, 6) { |n| n=6; "instructor#{n}" }
     role { Role.where(name: 'Instructor').first || association(:role_of_instructor) } 

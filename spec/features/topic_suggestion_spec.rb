@@ -11,6 +11,7 @@ require 'selenium-webdriver'
     before(:each) do
       create(:assignment)
       create(:student)
+      create(:studentb)
       create(:assignment_node)
       create(:deadline_type,name:"submission")
       create(:deadline_type,name:"review")
@@ -31,6 +32,9 @@ require 'selenium-webdriver'
    describe "case1", :js => true do
 
     it "Instructor set an assignment which allow student suggest topic and register student11" do
+      login_as "student10"
+      click_link("Logout")
+      sleep(1000)
       login_as "instructor6"
       #create an assignment
       visit '/assignments/new?private=0'
@@ -146,8 +150,10 @@ require 'selenium-webdriver'
       visit '/tree_display/list'
       visit '/suggestion/list?id=2&type=Assignment'  
       expect(page).to have_content "Suggested topics for Assignment_suggest_topic"
-      expect(page).to have_content "suggested_topic"
-      find_link('View').click  
+      expect(page).to have_content "suggested_topic2_will_switch"
+      # find link for new suggested view
+      find(:xpath, "//tr[contains(.,'suggested_topic2_with_switch')]/td/a", :text => 'View').click
+      #find_link('View').click  
       expect(page).to have_content "suggested_description"     
       click_button 'Approve suggestion'
       expect(page).to have_content "Successfully approved the suggestion"
@@ -160,7 +166,7 @@ require 'selenium-webdriver'
       click_link('Assignments')
       find_link('Assignment_suggest_topic').click
       find_link('Signup sheet').click
-      # expect(page).to have_content " showing the topic is hold" 
+      find('tr', text: 'suggested_topic').should have_content("x")
       find_link('Logout').click
       visit 'http://0.0.0.0:3000/'
 
@@ -169,8 +175,7 @@ require 'selenium-webdriver'
       click_link('Assignments')
       find_link('Assignment_suggest_topic').click
       find_link('Signup sheet').click
-      # expect(page).to have_content " showing the new topic suggested is hold" 
-      # expect(page).to have_content " showing the previous topic suggested is released and hold by other" 
+      find('tr', text: 'suggested_topic2_with_switch').should have_content("x")
       find_link('Logout').click
       visit 'http://0.0.0.0:3000/'
 

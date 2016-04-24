@@ -28,7 +28,7 @@ class Leaderboard < ActiveRecord::Base
   end
 
   def self.getStudentList(course_id)
-    student_list = User.joins(:participants).where('participants.parent_id = ?', course_id)
+    student_list = User.joins(:participants).where('participants.parent_id = ? and users.credly_id is NOT NULL', course_id)
   end
 
   def self.getAssignmentsIncourse(course_id, user_id)

@@ -43,30 +43,55 @@ class LeaderboardController < ApplicationController
     student_badges = Hash.new()
 
     #GetBadgeGroups
-    @badge_groups = BadgeGroup.where('course_id = ? and is_course_level_group = ?', params[:course_id], 0)
+    @badge_groups = BadgeGroup.where('course_id = ?', params[:course_id])
     @badge_groups.each do |badge_group|
-      @assignment_groups = AssignmentGroup.where('badge_group_id = ?', badge_group.id).first
-      participant_scores = Hash.new()
-      if( assignment_stage[@assignment_groups.assignment_id] == 'Finished')
-        participant_assignment = Participant.where('parent_id = ?', @assignment_groups.assignment_id)
-        participant_assignment.each do |p|
-          score = get_scores p.id
-          begin
-            if score != nil and score.key?(:total_score)
-              participant_scores[p.user_id] = score[:total_score]
+
+      if badge_group.badges_awarded == false
+
+        @assignment_groups = AssignmentGroup.where('badge_group_id = ?', badge_group.id)
+
+        assignment_id = @assignment_groups.pluck(:assignment_id)
+        assignment_status = 1
+
+        assignment_id.each do |a|
+          if assignment_stage[a] != 'Finished'
+            assignment_status = 0
+          end
+        end
+
+        if assignment_status == 1
+          @assignment_groups.each do |assign_group|
+            participant_scores = Hash.new()
+            participant_assignment = Participant.where('parent_id = ?', assign_group.assignment_id)
+            participant_assignment.each do |p|
+              score = get_scores p.id
+              begin
+                if score != nil and score.key?(:total_score)
+                  if !participant_scores.key?(p.user_id)
+                    participant_scores[p.user_id] = score[:total_score]
+                  else
+                    participant_scores[p.user_id] = participant_scores[p.user_id] + score[:total_score]
+                  end
+                end
+              rescue
+                if score.is_a? Float
+                  if !participant_scores.key?(p.user_id)
+                    participant_scores[p.user_id] = score[:total_score]
+                  else
+                    participant_scores[p.user_id] = participant_scores[p.user_id] + score[:total_score]
+                  end
+                end
+              end
             end
-          rescue
-            if score.is_a? Float
-              participant_scores[p.user_id] = score
+            sorted_scores = Hash[participant_scores.sort_by { |k, v| v }.reverse!]
+            final_users = get_eligible_users_for_badge badge_group, sorted_scores, assign_group.assignment_id
+            final_users.each do |u|
+              assign_badge_user badge_group.badge_id, u, 1, assign_group.assignment_id, params[:course_id]
             end
           end
         end
-      end
-      sorted_scores = Hash[participant_scores.sort_by{|k, v| v}.reverse!]
-      final_users = get_eligible_users_for_badge badge_group, sorted_scores, @assignment_groups.assignment_id
+      else
 
-      final_users.each do |u|
-        assign_badge_user badge_group.badge_id, u, 1, @assignment_groups.assignment_id, params[:course_id]
       end
     end
   end
@@ -75,28 +100,28 @@ class LeaderboardController < ApplicationController
   def get_eligible_users_for_badge badge_group, sorted_scores, assignment_id
     strategy = badge_group.strategy
     threshold = badge_group.threshold
-    count_teams = Team.where('parent_id = ?', assignment_id )
+    count_teams = Team.where('parent_id = ?', assignment_id)
     count_participants = Participant.where('parent_id = ?', assignment_id)
     final_users = nil
 
 
-    if(count_teams.count == count_participants.count)
+    if (count_teams.count == count_participants.count)
       if strategy == 'Top Scores'
-        final_users = get_users_top_scores_team_of_one sorted_scores , threshold
+        final_users = get_users_top_scores_team_of_one sorted_scores, threshold
       elsif strategy == 'Score Threshold'
-        final_users = get_users_threshold_team_of_one sorted_scores , threshold
+        final_users = get_users_threshold_team_of_one sorted_scores, threshold
       end
     else
       if strategy == 'Top Scores'
-        final_users = get_users_top_scores_team_of_multiple sorted_scores , threshold, assignment_id
+        final_users = get_users_top_scores_team_of_multiple sorted_scores, threshold, assignment_id
       elsif strategy == 'Score Threshold'
-        final_users = get_users_threshold_team_of_multiple sorted_scores , threshold, assignment_id
+        final_users = get_users_threshold_team_of_multiple sorted_scores, threshold, assignment_id
       end
     end
     final_users
   end
 
-  def get_users_top_scores_team_of_one sorted_scores,threshold
+  def get_users_top_scores_team_of_one sorted_scores, threshold
     prev_value = 0
     final_users = Array.new
     rank =0
@@ -106,12 +131,12 @@ class LeaderboardController < ApplicationController
         rank = 1
       end
 
-      if( rank < threshold)
+      if (rank < threshold)
         final_users.push(k)
       else
         break
       end
-      if(v < prev_value)
+      if (v < prev_value)
         rank = rank + 1
         prev_value = v
       end
@@ -140,7 +165,7 @@ class LeaderboardController < ApplicationController
         rank = 1
       end
 
-      if( rank < threshold)
+      if (rank < threshold)
         if !final_users.include?(k)
           final_users.push(k)
         end
@@ -148,14 +173,14 @@ class LeaderboardController < ApplicationController
         team_id = results[0].id
         team_users = TeamsUser.where('team_id = ?', team_id)
         team_users.each do |tu|
-          if(!final_users.include?(k))
+          if (!final_users.include?(k))
             final_users.push(tu.user_id)
           end
         end
       else
         break
       end
-      if(v < prev_value)
+      if (v < prev_value)
         rank = rank + 1
         prev_value = v
       end
@@ -174,7 +199,7 @@ class LeaderboardController < ApplicationController
         team_id = results[0].id
         team_users = TeamsUser.where('team_id = ?', team_id)
         team_users.each do |tu|
-          if(!final_users.include?(k))
+          if (!final_users.include?(k))
             final_users.push(tu.user_id)
           end
         end
@@ -201,8 +226,8 @@ class LeaderboardController < ApplicationController
 
   def retrieve_questions (questionnaires)
     questionnaires.each do |questionnaire|
-      round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id:questionnaire.id).first.used_in_round
-      if(round!=nil)
+      round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first.used_in_round
+      if (round!=nil)
         questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
       else
         questionnaire_symbol = questionnaire.symbol

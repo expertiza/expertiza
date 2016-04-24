@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160424190302) do
+ActiveRecord::Schema.define(version: 20160424200049) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -111,11 +111,12 @@ ActiveRecord::Schema.define(version: 20160424190302) do
   add_index "automated_metareviews", ["response_id"], name: "fk_automated_metareviews_responses_id", using: :btree
 
   create_table "badge_groups", force: :cascade do |t|
-    t.string  "strategy",              limit: 255, default: "", null: false
-    t.integer "threshold",             limit: 4,                null: false
+    t.string  "strategy",              limit: 255, default: "",    null: false
+    t.integer "threshold",             limit: 4,                   null: false
     t.integer "badge_id",              limit: 4
     t.integer "course_id",             limit: 4
     t.boolean "is_course_level_group", limit: 1
+    t.boolean "badges_awarded",        limit: 1,   default: false
   end
 
   create_table "badge_users", force: :cascade do |t|

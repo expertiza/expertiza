@@ -52,7 +52,7 @@ module LeaderboardHelper
   # E1626
   def self.userIsInstructor?(userID)
     # Instructors, Admins, Super-Admins, and TAs are all considered as instructors
-    instructorNames = ["Instructor", "Administrator", "Super-Administrator", "Teaching Assistant"]
+    instructorNames = ["Instructor", "Super-Administrator"]
     instructorRoles = Role.where(:name => instructorNames).pluck(:id)
     user = User.find(userID)
     instructor = false

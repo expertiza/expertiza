@@ -310,8 +310,8 @@ ActiveRecord::Schema.define(version: 20160422030133) do
     t.text     "digital_signature",   limit: 65535
     t.string   "duty",                limit: 255
     t.boolean  "can_take_quiz",                                    default: true
-    t.decimal  "Hamer",                             precision: 10
-    t.decimal  "Lauw",                              precision: 10
+    t.decimal  "Hamer",                             precision: 10, default: 1
+    t.decimal  "Lauw",                              precision: 10, default: 0
   end
 
   add_index "participants", ["user_id"], name: "fk_participant_users", using: :btree

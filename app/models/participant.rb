@@ -41,8 +41,13 @@ class Participant < ActiveRecord::Base
   end
 
   def update_reputation(alg, reputation)
-    puts "#{id}, #{alg}, #{reputation}, model
-"
+    case alg
+      when 'Lauw'
+        self.Lauw = reputation
+      when 'Hamer'
+        self.Hamer = reputation
+    end
+    self
   end
 
   def delete(force = nil)

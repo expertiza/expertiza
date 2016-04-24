@@ -115,7 +115,7 @@ require 'selenium-webdriver'
       visit 'http://127.0.0.1:3000/'
   
       # case 1 need to verify the student's sign up sheet   
-   
+"""   
       # case 2 student already have topic switch to new topic
       # need two students one to be on the waitlist of previous suggested topic,
       # the other one (student11) is holding it and suggest another topic and wish to switch to the new one
@@ -126,7 +126,7 @@ require 'selenium-webdriver'
       find_link('Signup sheet').click
       # Bug found and need the select action name 
       # replace "select" with mark
-"""
+
       find(:xpath, "//tr[contains(.,'suggested_topic')]/td/a", :figure=>"select").click
       # sign up to waitlist
       # but got error

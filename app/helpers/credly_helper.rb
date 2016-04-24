@@ -40,4 +40,65 @@ module CredlyHelper
     return list_badges, user_data
   end
 
+  def self.award_badge_user(user_id, student_credly_id, badge_id)
+    uri = URI.parse(CREDLY_API_URL)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    token = User.select('credly_id, credly_accesstoken').where('id = ?', user_id)
+    request = Net::HTTP::Post.new('/v1.1/member_badges?access_token=' + token[0].credly_accesstoken)
+    request['X-Api-Key'] = CREDLY_API_TOKEN
+    request['X-Api-Secret'] = CREDLY_API_SECRET
+    request.set_form_data({'member_id' => student_credly_id, 'badge_id' => badge_id})
+    response = http.request(request)
+    parsed_response = JSON.parse(response.body)
+
+    if response.code == '200' && !parsed_response['data'].nil?
+      user_data = parsed_response['meta']
+      if user_data['status'] == 'OK'
+        trust_instructor(student_credly_id, token[0].credly_id.to_s)
+      end
+    else
+      user_data = parsed_response['meta']
+    end
+  end
+
+  def self.check_instructor_trust(student_credly_id, instructor_credly_id)
+    uri = URI.parse(CREDLY_API_URL)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    token = User.select('credly_accesstoken').where('credly_id = ?', student_credly_id)
+    request = Net::HTTP::Get.new('/v1.1/me/trusted/'+ instructor_credly_id + '?access_token=' + token[0].credly_accesstoken)
+    request['X-Api-Key'] = CREDLY_API_TOKEN
+    request['X-Api-Secret'] = CREDLY_API_SECRET
+    response = http.request(request)
+    parsed_response = JSON.parse(response.body)
+    if response.code == '200'
+      data = parsed_response['data']
+      true
+    else
+      user_data = parsed_response['meta']
+      false
+    end
+  end
+
+  def self.trust_instructor(student_credly_id, instructor_credly_id)
+    unless check_instructor_trust(student_credly_id, instructor_credly_id)
+      uri = URI.parse(CREDLY_API_URL)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      token = User.select('credly_accesstoken').where('credly_id = ?', student_credly_id)
+      request = Net::HTTP::Put.new('/v1.1/me/trusted/'+ instructor_credly_id + '?access_token=' + token[0].credly_accesstoken)
+      request['X-Api-Key'] = CREDLY_API_TOKEN
+      request['X-Api-Secret'] = CREDLY_API_SECRET
+      response = http.request(request)
+      # parsed_response = JSON.parse(response.body)
+
+      if response.code == '200'
+        data = response.body
+      else
+        user_data = response.body
+      end
+    end
+  end
+
 end

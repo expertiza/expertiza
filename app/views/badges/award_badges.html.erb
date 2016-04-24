@@ -21,6 +21,8 @@
 
 <% if @student_list.length > 0 %>
     <h2 style="text-align: center">Award badge to students in <%= params[:course_name] %></h2>
+    <strong><i style="color: darkred">If you cannot find a student in the dropdown, it is because they don't have a
+      credly account yet. Student should have an account in credly to be able to receive a badge.</i></strong>
     <%= form_tag(badges_assign_badge_user_path(:course_id => params[:course_id]), method: 'post') do %>
         <div>
           <input name="student_select_checkbox" type="hidden" value="false"/>

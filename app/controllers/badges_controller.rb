@@ -192,6 +192,10 @@ class BadgesController < ApplicationController
     end
 
     badge_user.save!
+
+    student_credly_id = User.where('id = ?', params['student_selected']).first
+    CredlyHelper.award_badge_user(session[:user].id, student_credly_id.credly_id, params['badge_selected'])
+
     redirect_to controller: 'leaderboard', action: index
   end
 

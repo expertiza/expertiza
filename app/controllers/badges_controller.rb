@@ -118,6 +118,7 @@ class BadgesController < ApplicationController
   end
 
   def award_badges
+    @is_assignment_level_badge = false
     @student_list = Leaderboard.getStudentList(params[:course_id])
     @assignments_list = Leaderboard.getAssignmentsIncourse(params[:course_id], params[:user_id])
     response = CredlyHelper.get_badges_created(params[:user_id])
@@ -150,12 +151,12 @@ class BadgesController < ApplicationController
     badge_user.badge_id = params['badge_selected']
     badge_user.user_id = params['student_selected']
 
-    if params['is_assignment_level_badge']
-      badge_user.is_course_badge = false
-      badge_user.assignment_id = params['assignment_selected']
-    else
+    if params['assignment_selected'].blank?
       badge_user.is_course_badge = true
       badge_user.course_id = params[:course_id]
+    else
+      badge_user.is_course_badge = false
+      badge_user.assignment_id = params['assignment_selected']
     end
 
     badge_user.save!

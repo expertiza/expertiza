@@ -1,5 +1,5 @@
 <h1>Students for Survey: <%= @survey.name %></h1>
-<% if @assigned_students.length != 0 %>
+<% if @course_students.length != 0 %>
   <%= form_tag(:action=>'survey_add_students', :method=>'get', :id=>params[:id], :course => params[:course]) do %>
     <br />
     <table id="surveys_table">
@@ -7,7 +7,7 @@
         <th>&nbsp; Assigned &nbsp;</th>
         <th align="left"> Student Name</th>
       </tr>
-      <% for student in @assigned_students %>
+      <% for student in @course_students %>
         <tr>
           <td align=center><input type=checkbox name="students[]" value="<%= student.id %>"
             <% if @assigned_students.include?(student) -%>

@@ -151,7 +151,7 @@ class SurveyController < ApplicationController
         @course = Course.find_by(id: params[:course])
         @deployment = SurveyDeployment.where("course_id = ? and course_evaluation_id = ?",@course.id,@survey.id)
         @instructor = session[:user]
-        @course_students = CourseParticipant.where(parent_id: @course.id)
+        @course_students = Participant.where(parent_id: @course.id)
         @assigned_students = SurveyParticipantHelper::get_assigned_survey_students(@deployment[0].id)
         if params['update']
         if params[:students]
@@ -160,22 +160,23 @@ class SurveyController < ApplicationController
        
         for student in @course_students
           unless @checked.include? student.id
-            SurveyParticipant.delete_all(["user_id = ? and survey_deployment_id = ?",student.id,@deployment.id])
+            SurveyParticipant.delete_all(["user_id = ? and survey_deployment_id = ?",student.id,@deployment[0].id])
             @assigned_students.delete(student)
           end
         end
 
         for checked_student in @checked
-          @current = User.find(checked_student)
+          @current = Participant.find(checked_student)
           unless @assigned_students.include? @current
-            @new = SurveyParticipant.new(:user_id => checked_student, :survey_deployment_id => @deployment.id)
+            @user_id = @current.user_id
+            @new = SurveyParticipant.new(:user_id => @user_id, :survey_deployment_id => @deployment[0].id)
             @new.save
             @assigned_students << @current
           end
         end
       else
         for student in @assigned_students
-          SurveyParticipant.delete_all(["user_id = ? and survey_deployment_id = ?",student.id,@deployment.id])
+          SurveyParticipant.delete_all(["user_id = ? and survey_deployment_id = ?",student.id,@deployment[0].id])
           @assigned_students.delete(student)
         end
       end

@@ -160,7 +160,7 @@ class SurveyController < ApplicationController
        
         for student in @course_students
           unless @checked.include? student.id
-            SurveyParticipant.delete_all(["user_id = ? and survey_deployment_id = ?",student.id,@deployment[0].id])
+            SurveyParticipant.delete_all(["user_id = ? and survey_deployment_id = ?",student.user_id,@deployment[0].id])
             @assigned_students.delete(student)
           end
         end
@@ -176,7 +176,7 @@ class SurveyController < ApplicationController
         end
       else
         for student in @assigned_students
-          SurveyParticipant.delete_all(["user_id = ? and survey_deployment_id = ?",student.id,@deployment[0].id])
+          SurveyParticipant.delete_all(["user_id = ? and survey_deployment_id = ?",student.user_id,@deployment[0].id])
           @assigned_students.delete(student)
         end
       end

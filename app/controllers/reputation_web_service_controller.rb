@@ -55,8 +55,8 @@ class ReputationWebServiceController < ApplicationController
 		assignment_ids << assignment_id
 		assignment_ids << another_assignment_id unless another_assignment_id == 0
 		ReviewResponseMap.where(['reviewed_object_id in (?)', assignment_ids]).each do |response_map|
-			reviewer = response_map.reviewer.user
-			team = AssignmentTeam.find(response_map.reviewee_id)
+      reviewer = response_map.reviewer.user # Participant Load and User Load
+      team = AssignmentTeam.find_by_id(response_map.reviewee_id) # AssignmentTeam Load
 			topic_condition = ((hasTopic and SignedUpTeam.where(team_id: team.id).first.is_waitlisted == false) or !hasTopic)
 			last_valid_response = response_map.response.select{|r| r.round == round_num}.sort.last
 			valid_response = [last_valid_response] unless last_valid_response.nil?
@@ -75,7 +75,7 @@ class ReputationWebServiceController < ApplicationController
 
 						peer_review_grade = 100.0 * temp_sum / (weight_sum * max_question_score)
 						raw_data_array << [reviewer.id, team.id, peer_review_grade.round(4)]
-					end
+ 					end
 				end
 			end
 		end
@@ -103,12 +103,12 @@ class ReputationWebServiceController < ApplicationController
 	end
 
 	def json_generator(assignment_id, another_assignment_id = 0, round_num = 2, type = 'peer review grades')
-		assignment = Assignment.find(assignment_id)
+		assignment = Assignment.find_by_id(assignment_id)
 		has_topic = !SignUpTopic.where(assignment_id: assignment_id).empty?
 		
 		if type == 'peer review grades'
 			@results = db_query(assignment.id, another_assignment_id, round_num, has_topic)
-		elsif type == 'quiz scores'
+ 		elsif type == 'quiz scores'
 			@results = db_query_with_quiz_score(assignment.id, another_assignment_id)
 		end
 		request_body = Hash.new
@@ -118,8 +118,8 @@ class ReputationWebServiceController < ApplicationController
 				request_body['submission' + record[1].to_s] = Hash.new
 			end
 			request_body['submission' + record[1].to_s]['stu' + record[0].to_s] = record[2]
-		end
-		# sort the 2-dimention hash
+    end
+ 		# sort the 2-dimention hash
 		request_body.each {|k, v| request_body[k] = v.sort.to_h }
 		request_body.sort.to_h
 	end
@@ -141,7 +141,7 @@ class ReputationWebServiceController < ApplicationController
 		curr_assignment_id = (params[:assignment_id].empty? ? '724' : params[:assignment_id])
 		req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
 		req.body[0] = '' # remove the first '{'
-		@@assignment_id = params[:assignment_id]
+    @@assignment_id = params[:assignment_id]
 		@@round_num = params[:round_num]
 		@@algorithm = params[:algorithm]
 		@@another_assignment_id = params[:another_assignment_id]
@@ -245,13 +245,9 @@ class ReputationWebServiceController < ApplicationController
 
 
 		JSON.parse(response.body.to_s).each do |alg, list|
-			unless list.nil?
-				list.each do |id, rep|
-					unless /leniency/ =~ id.to_s
-						Participant.find_by_user_id(id).update_reputation(alg, rep).save!
-					end
-				end
-			end
+      list.each do |id, rep|
+        Participant.find_by_user_id(id).update(alg.to_sym => rep) unless /leniency/ =~ id.to_s
+      end unless list.nil?
 		end
 
 		redirect_to action: 'client'

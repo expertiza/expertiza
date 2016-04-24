@@ -452,6 +452,12 @@ Expertiza::Application.routes.draw do
       post :survey_add_global
       get :survey_add_students
       post :survey_add_students
+      get :edit_deployment
+      post :edit_deployment
+      get :update
+      post :update
+      get :update_deployment
+      post :update_deployment
     end
   end
 

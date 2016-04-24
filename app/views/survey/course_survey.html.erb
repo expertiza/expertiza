@@ -24,6 +24,7 @@
           <% if @assigned_surveys.include?(survey) -%>
           <td><%= link_to 'Add Students', controller: 'survey', action: 'survey_add_students', id: survey.id,  course: params[:id]%></td>
           <td><%= link_to 'Add Global Surveys', controller: 'survey', action: 'survey_add_global', id: survey.id , course: params[:id]%></td>
+          <td><%= link_to 'Edit Survey Deployment',controller: 'survey', action: 'edit_deployment', id: survey.id, course: params[:id]%></td>
           <% end -%>
         </tr>
       <% end %>

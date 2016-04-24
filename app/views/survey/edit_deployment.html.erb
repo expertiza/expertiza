@@ -1,0 +1,23 @@
+<h1>Editing deploy</h1>
+
+<%= form_for :deploy, url:{:controller => 'survey', :action => 'update_deployment', :course_id => @course.id, :id => @survey.id}, method: :get do |f| %>
+
+    <p>
+      <br><label for="start_date">Start Date:</label></br>
+      <%= f.date_field :start_date %>
+    </p>
+
+    <p>
+      <br><label for="end_date">End Date:</label></br>
+      <%= f.date_field :end_date %>
+    </p>
+
+    <%= f.hidden_field :deploy_id, value: @deploy.id %>
+
+    <p>
+      <%= f.submit(url:{:controller => 'survey', :action => 'update_deployment', :course_id => @course.id, :id => @survey.id})%>
+    </p>
+
+<% end %>
+
+<%= render :partial => '/shared_scripts/back' %>

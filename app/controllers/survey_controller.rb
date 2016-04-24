@@ -151,8 +151,7 @@ class SurveyController < ApplicationController
         @course = Course.find_by(id: params[:course])
         @deployment = SurveyDeployment.where("course_id = ? and course_evaluation_id = ?",@course.id,@survey.id)
         @instructor = session[:user]
-        @assignments = Assignment.where("course_id = ? and instructor_id = ?",@course.id,@instructor.id)
-        @course_students = Participant.where("parent_id = ?",@assignments[0].id)
+        @course_students = CourseParticipant.where(parent_id: @course.id)
         @assigned_students = SurveyParticipantHelper::get_assigned_survey_students(@deployment[0].id)
         if params['update']
         if params[:students]
@@ -185,5 +184,18 @@ class SurveyController < ApplicationController
         
   end
 
+  def edit_deployment
+        @survey = Questionnaire.find_by(id: params[:id])
+        @course = Course.find_by(id: params[:course])
+        @deployment = SurveyDeployment.where("course_id = ? and course_evaluation_id = ?",@course.id,@survey.id)
+        @deploy = @deployment[0]
+  end
+
+  def update_deployment
+       @deploy = SurveyDeployment.find_by(id: params[:deploy][:deploy_id])
+       @deploy.update_attribute(:start_date,params[:deploy][:start_date])
+       @deploy.update_attribute(:end_date,params[:deploy][:end_date])
+       
+  end
 
 end

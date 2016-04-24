@@ -1,25 +1,12 @@
 <h1>Surveys for Assignment: <%= @assignment.name %></h1>
-<%= form_tag(:action=>'assign') do %>
-  <select name="subset" onchange="document.forms[0].submit()">
-    <option value="assigned"
-    <% if params[:subset] == "assigned" -%>
-      selected
-    <% end -%>
-    >Currently assigned surveys</option>
-    <option value="mine"
-    <% if params[:subset] == "mine" -%>
-      selected
-    <% end -%>
-    >My surveys</option>
-    <option value="public"
-    <% if params[:subset] == "public" -%>
-      selected
-    <% end -%>
-    >All public surveys</option>
+<%= form_tag(:action=>'assign', :method => 'get', :id => params[:id]) do %>
+  <select name = "subset">
+    <%= options_for_select([['Currently assigned surveys','assigned'],['My surveys','mine'],['All public surveys','public']]) %>
   </select>
+  <%= submit_tag "Select Survey", :name=>"Select"%>
 <% end %>
-<% if @surveys.length != 0 -%>
-  <%= form_tag(:action=>'assign')do %>
+<% if @surveys.length != 0 %>
+  <%= form_tag(:action=>'assign', :method=>'get', :id=>params[:id]) do %>
     <br />
     <table id="surveys_table">
       <tr>

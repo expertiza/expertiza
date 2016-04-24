@@ -1,12 +1,12 @@
-<h1>Surveys for Assignment: <%= @assignment.name %></h1>
-<%= form_tag(:action=>'assign_survey', :method=>'get', :id=>params[:id]) do %>
+<h1>Surveys for Course: <%= @course.name %></h1>
+<%= form_tag(:action=>'course_survey', :method => 'get', :id => params[:id]) do %>
   <select name = "subset">
     <%= options_for_select([['Currently assigned surveys','assigned'],['My surveys','mine'],['All public surveys','public']]) %>
   </select>
   <%= submit_tag "Select Survey", :name=>"Select"%>
 <% end %>
-<% if @surveys.length != 0 -%>
-  <%= form_tag(:action=>'assign_survey')do %>
+<% if @surveys.length != 0 %>
+  <%= form_tag(:action=>'course_survey', :method=>'get', :id=>params[:id]) do %>
     <br />
     <table id="surveys_table">
       <tr>
@@ -21,6 +21,10 @@
             <% end -%>
             ></td>
           <td><%= survey.name %></td>
+          <% if @assigned_surveys.include?(survey) -%>
+          <td><%= link_to 'Add Students', controller: 'survey', action: 'survey_add_students', id: survey.id,  course: params[:id]%></td>
+          <td><%= link_to 'Add Global Surveys', controller: 'survey', action: 'survey_add_global', id: survey.id , course: params[:id]%></td>
+          <% end -%>
         </tr>
       <% end %>
     </table>
@@ -34,3 +38,4 @@
   <p>No surveys match the selected criteria.</p>
 <% end -%>
 <%= render :partial => '/shared_scripts/back' %>
+

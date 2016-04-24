@@ -445,6 +445,13 @@ Expertiza::Application.routes.draw do
   resources :survey do
     collection do
       get :assign
+      post :assign
+      get :course_survey
+      post :course_survey
+      get :survey_add_global
+      post :survey_add_global
+      get :survey_add_students
+      post :survey_add_students
     end
   end
 

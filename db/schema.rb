@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160326205445) do
+ActiveRecord::Schema.define(version: 20160423183823) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -162,6 +162,17 @@ ActiveRecord::Schema.define(version: 20160326205445) do
   add_index "controller_actions", ["permission_id"], name: "fk_controller_action_permission_id", using: :btree
   add_index "controller_actions", ["site_controller_id"], name: "fk_controller_action_site_controller_id", using: :btree
 
+  create_table "course_questionnaires", force: :cascade do |t|
+    t.integer "course_id",            limit: 4
+    t.integer "questionnaire_id",     limit: 4
+    t.integer "user_id",              limit: 4
+    t.integer "notification_limit",   limit: 4, default: 15, null: false
+    t.integer "questionnaire_weight", limit: 4, default: 0,  null: false
+  end
+
+  add_index "course_questionnaires", ["course_id"], name: "fk_aq_courses_id", using: :btree
+  add_index "course_questionnaires", ["user_id"], name: "fk_aq_user_id", using: :btree
+
   create_table "courses", force: :cascade do |t|
     t.string   "name",            limit: 255
     t.integer  "instructor_id",   limit: 4
@@ -225,6 +236,12 @@ ActiveRecord::Schema.define(version: 20160326205445) do
   add_index "due_dates", ["review_allowed_id"], name: "fk_due_date_review_allowed", using: :btree
   add_index "due_dates", ["review_of_review_allowed_id"], name: "fk_due_date_review_of_review_allowed", using: :btree
   add_index "due_dates", ["submission_allowed_id"], name: "fk_due_date_submission_allowed", using: :btree
+
+  create_table "global_survey_maps", force: :cascade do |t|
+    t.integer "courses_id",        limit: 4
+    t.integer "surveys_id",        limit: 4
+    t.integer "global_surveys_id", limit: 4
+  end
 
   create_table "institutions", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
@@ -650,6 +667,8 @@ ActiveRecord::Schema.define(version: 20160326205445) do
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
   add_foreign_key "assignments", "users", column: "instructor_id", name: "fk_assignments_instructors"
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"
+  add_foreign_key "course_questionnaires", "courses", name: "fk_aq_courses_id"
+  add_foreign_key "course_questionnaires", "users", name: "fk_aq_user_id"
   add_foreign_key "courses", "users", column: "instructor_id", name: "fk_course_users"
   add_foreign_key "due_dates", "assignments", name: "fk_due_dates_assignments"
   add_foreign_key "due_dates", "deadline_rights", column: "rereview_allowed_id", name: "fk_due_date_rereview_allowed"

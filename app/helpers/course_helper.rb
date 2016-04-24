@@ -65,4 +65,7 @@ module CourseHelper
       courses
     end
   end
+  def get_course_students(course)
+  	
+  end
 end

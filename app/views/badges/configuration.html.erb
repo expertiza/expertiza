@@ -40,7 +40,7 @@
               </td>
               <td><%= badge_group.strategy %></td>
               <td><%= badge_group.threshold %></td>
-              <% @badge = Badge.where("credly_badge_id= ?", badge_group.badge_id).first %>
+              <% @badge = Badge.where("id= ?", badge_group.badge_id).first %>
               <td><%= @badge.name %></td>
 
               <td>

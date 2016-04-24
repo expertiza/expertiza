@@ -15,33 +15,15 @@ class BadgesController < ApplicationController
     @assignments = Assignment.where('course_id = ?', course_id)
     @assignments_list = nil
     @badge_groups = nil
+    @badge_groups = BadgeGroup.where('course_id = ? AND is_course_level_group = ?', course_id, true)
+
     response = CredlyHelper.get_badges_created(session[:user].id)
     parsed_response = JSON.parse(response.body)
-
-    @badge_groups = BadgeGroup.where('course_id = ? AND is_course_level_group = ?', course_id, true)
     @list_badges, user_data = CredlyHelper.parse_response(parsed_response, response)
 
     # response = CredlyHelper.get_badges_created(expertiza_admin_user_id)
     # parsed_response = JSON.parse(response.body)
-    # if response.code == '200' && !parsed_response['data'].nil?
-    #   user_data = parsed_response['data']
-    #   user_data.each do |badge|
-    #     if Badge.where('credly_badge_id = ?', badge['id']).blank?
-    #       new_badge = Badge.new
-    #       new_badge.name = badge['title']
-    #       new_badge.credly_badge_id = badge['id']
-    #       new_badge.save!
-    #     end
-    #     badge_info = Hash.new
-    #     badge_info['badge_image_url'] = badge['image_url']
-    #     badge_info['badge_title'] = badge['title']
-    #     badge = Badge.where('credly_badge_id = ?', badge['id']).first
-    #     badge_info['badge_id'] = badge.id
-    #     list_badges.push badge_info
-    #   end
-    # else
-    #   user_data = parsed_response['meta']
-    # end
+    # @list_badges, user_data = CredlyHelper.parse_response(parsed_response, response, @list_badges)
   end
 
   def create
@@ -136,6 +118,7 @@ class BadgesController < ApplicationController
   end
 
   def award_badges
+    @is_assignment_level_badge = false
     @student_list = Leaderboard.getStudentList(params[:course_id])
     @assignments_list = Leaderboard.getAssignmentsIncourse(params[:course_id], params[:user_id])
     response = CredlyHelper.get_badges_created(params[:user_id])
@@ -147,25 +130,7 @@ class BadgesController < ApplicationController
 
     # response = CredlyHelper.get_badges_created(expertiza_admin_user_id)
     # parsed_response = JSON.parse(response.body)
-    # if response.code == '200' && !parsed_response['data'].nil?
-    #   user_data = parsed_response['data']
-    #   user_data.each do |badge|
-    #     if Badge.where('credly_badge_id = ?', badge['id']).blank?
-    #       new_badge = Badge.new
-    #       new_badge.name = badge['title']
-    #       new_badge.credly_badge_id = badge['id']
-    #       new_badge.save!
-    #     end
-    #     badge_info = Hash.new
-    #     badge_info['badge_image_url'] = badge['image_url']
-    #     badge_info['badge_title'] = badge['title']
-    #     badge = Badge.where('credly_badge_id = ?', badge['id']).first
-    #     badge_info['badge_id'] = badge.id
-    #     list_badges.push badge_info
-    #   end
-    # else
-    #   user_data = parsed_response['meta']
-    # end
+    # @list_badges, user_data = CredlyHelper.parse_response(parsed_response, response, @list_badges)
   end
 
   def destroy
@@ -186,18 +151,19 @@ class BadgesController < ApplicationController
     badge_user.badge_id = params['badge_selected']
     badge_user.user_id = params['student_selected']
 
-    if params['is_assignment_level_badge']
-      badge_user.is_course_badge = false
-      badge_user.assignment_id = params['assignment_selected']
-    else
+    if params['assignment_selected'].blank?
       badge_user.is_course_badge = true
       badge_user.course_id = params[:course_id]
+    else
+      badge_user.is_course_badge = false
+      badge_user.assignment_id = params['assignment_selected']
     end
 
     badge_user.save!
 
     student_credly_id = User.where('id = ?', params['student_selected']).first
-    CredlyHelper.award_badge_user(session[:user].id, student_credly_id.credly_id, params['badge_selected'])
+    badge = Badge.where('id = ?', params['badge_selected']).first
+    CredlyHelper.award_badge_user(session[:user].id, student_credly_id.credly_id, badge.credly_badge_id)
 
     redirect_to controller: 'leaderboard', action: index
   end

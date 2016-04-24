@@ -16,8 +16,7 @@ module CredlyHelper
     response
   end
 
-  def self.parse_response(parsed_response, response)
-    list_badges = Array.new
+  def self.parse_response(parsed_response, response, list_badges = Array.new)
     user_data = nil
 
     if response.code == '200' && !parsed_response['data'].nil?
@@ -75,7 +74,11 @@ module CredlyHelper
     parsed_response = JSON.parse(response.body)
     if response.code == '200'
       data = parsed_response['data']
-      true
+      if !data.nil?
+        data
+      else
+        true
+      end
     else
       user_data = parsed_response['meta']
       false

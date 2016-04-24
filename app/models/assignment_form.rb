@@ -1,4 +1,3 @@
-
 require 'active_support/time_with_zone'
 class AssignmentForm
   attr_accessor :assignment, :assignment_questionnaires, :due_dates
@@ -28,7 +27,7 @@ class AssignmentForm
     assignment_form
   end
 
-  def update(attributes,user)
+  def update(attributes, user)
     @has_errors = false
     has_late_policy = false
     if attributes[:assignment][:late_policy_id].to_i > 0
@@ -39,7 +38,7 @@ class AssignmentForm
     update_assignment(attributes[:assignment])
     update_assignment_questionnaires(attributes[:assignment_questionnaire])
     update_badge_stratagies(attributes[:badge], attributes[:assignment])
-    update_due_dates(attributes[:due_date],user)
+    update_due_dates(attributes[:due_date], user)
     #delete the old queued items and recreate new ones if the assignment has late policy.
     if attributes[:due_date] and !@has_errors and has_late_policy
       delete_from_delayed_queue
@@ -61,7 +60,7 @@ class AssignmentForm
   #code to save assignment questionnaires
   def update_assignment_questionnaires(attributes)
     unless attributes
-      return false 
+      return false
     end
     existing_aqs = AssignmentQuestionnaire::where(assignment_id: @assignment.id)
     existing_aqs.each do |existing_aq|
@@ -81,13 +80,13 @@ class AssignmentForm
           @has_errors = true;
         end
       end
-      end
+    end
   end
 
   #code to save due dates
-  def update_due_dates(attributes,user)
+  def update_due_dates(attributes, user)
     unless attributes
-      return false 
+      return false
     end
     attributes.each do |due_date|
       if due_date[:due_at].blank? then
@@ -136,7 +135,7 @@ class AssignmentForm
       # mi = 2
       if diff>0
         dj=DelayedJob.enqueue(ScheduledTask.new(@assignment.id, deadline_type, due_date.due_at.to_s(:db)),
-                                1, diff.minutes.from_now)
+                              1, diff.minutes.from_now)
         change_item_type(dj.id)
         due_date.update_attribute(:delayed_job_id, dj.id)
 
@@ -149,7 +148,7 @@ class AssignmentForm
         # If the deadline type is team_formation, add a delayed job to drop one member team
         if deadline_type == "team_formation" and @assignment.team_assignment?
           dj = DelayedJob.enqueue(ScheduledTask.new(@assignment.id, "drop_one_member_topics", due_date.due_at.to_s(:db)),
-                               1, mi.minutes.from_now)
+                                  1, mi.minutes.from_now)
           change_item_type(dj.id)
         end
       end
@@ -174,10 +173,11 @@ class AssignmentForm
 
 
   def delete(force=nil)
-        #delete from delayed_jobs queue related to this assignment
-        delete_from_delayed_queue
-        @assignment.delete(force)
+    #delete from delayed_jobs queue related to this assignment
+    delete_from_delayed_queue
+    @assignment.delete(force)
   end
+
   # This functions finds the epoch time in seconds of the due_at parameter and finds the difference of it
   # from the current time and returns this difference in minutes
   def find_min_from_now(due_at)
@@ -192,10 +192,11 @@ class AssignmentForm
   def save
     @assignment.save
   end
+
   #create a node for the assignment
   def create_assignment_node
     if !@assignment.nil?
-     @assignment.create_node
+      @assignment.create_node
     end
   end
 
@@ -214,48 +215,49 @@ class AssignmentForm
   end
 
   def staggered_deadline
-  if @assignment.staggered_deadline.nil?
+    if @assignment.staggered_deadline.nil?
       @assignment.staggered_deadline = false
       @assignment.days_between_submissions = 0
     end
   end
 
   def availability_flag
-  if @assignment.availability_flag.nil?
+    if @assignment.availability_flag.nil?
       @assignment.availability_flag = false
     end
   end
 
   def micro_task
-  if @assignment.microtask.nil?
+    if @assignment.microtask.nil?
       @assignment.microtask = false
     end
   end
 
   def reviews_visible_to_all
-  if @assignment.reviews_visible_to_all.nil?
+    if @assignment.reviews_visible_to_all.nil?
       @assignment.reviews_visible_to_all = false
     end
   end
 
   def review_assignment_strategy
-  if @assignment.review_assignment_strategy.nil?
+    if @assignment.review_assignment_strategy.nil?
       @assignment.review_assignment_strategy = ''
     end
   end
 
   def require_quiz
-  if @assignment.require_quiz.nil?
-      @assignment.require_quiz =  false
-      @assignment.num_quiz_questions =  0
+    if @assignment.require_quiz.nil?
+      @assignment.require_quiz = false
+      @assignment.num_quiz_questions = 0
     end
   end
 
   def is_calibrated
     if @assignment.is_calibrated?
-      @assignment.is_calibrated =  false
+      @assignment.is_calibrated = false
     end
   end
+
   #NOTE: unfortunately this method is needed due to bad data in db @_@
   def set_up_defaults
     staggered_deadline
@@ -267,7 +269,7 @@ class AssignmentForm
   end
 
   #Copies the inputted assignment into new one and returns the new assignment id
-  def self.copy(assignment_id,user)
+  def self.copy(assignment_id, user)
     Assignment.record_timestamps = false
     old_assign = Assignment.find(assignment_id)
     new_assign = old_assign.dup
@@ -281,7 +283,7 @@ class AssignmentForm
     new_assign.copy_flag = true
     if new_assign.save
       Assignment.record_timestamps = true
-      copy_assignment_questionnaire(old_assign,new_assign, user)
+      copy_assignment_questionnaire(old_assign, new_assign, user)
       DueDate.copy(old_assign.id, new_assign.id)
       new_assign.create_node
       new_assign_id=new_assign.id
@@ -313,8 +315,8 @@ class AssignmentForm
 
       badgeGroup = nil
       #Check if there is an existing record for the Assignment. If not create a new object else fetch the assignment  group and badge group record
-      assignment_group = AssignmentGroup.where("assignment_id = ?", assignment[:id]).first
-      if(assignment_group == nil)
+      assignment_group = AssignmentGroup.joins(:badge_group).where("assignment_id = ? and badge_groups.is_course_level_group=?", assignment[:id], false).first
+      if (assignment_group == nil)
         badgeGroup = BadgeGroup.new
         assignment_group = AssignmentGroup.new
       else
@@ -327,7 +329,7 @@ class AssignmentForm
       badgeGroup.badge_id = attributes['badge_selected']
       badgeGroup.course_id = assignment['course_id']
       badgeGroup.is_course_level_group = false
-      if(strategy == Assignment::BS_TOP_SCORES)
+      if (strategy == Assignment::BS_TOP_SCORES)
         badgeGroup.threshold = attributes['badge_assignment_NumBadges']
       elsif (strategy == Assignment::BS_SCORE_THRESHOLD)
         badgeGroup.threshold = attributes['badge_assignment_threshold']

@@ -46,7 +46,7 @@
 
         <div>
           <input name="is_assignment_level_badge" type="hidden" value="false"/>
-          <%= check_box_tag('is_assignment_level_badge', 'true', nil, :onchange => 'toggleDisplay("show_assignments", "is_assignment_level_badge", "select1")') %>
+          <%= check_box_tag 'is_assignment_level_badge', 'true', nil, :onchange => 'toggleDisplay("show_assignments", "is_assignment_level_badge", "select1")' %>
           <%= label_tag('is_assignment_level_badge', 'Is assignment level badge?') %>
         </div>
 
@@ -54,6 +54,7 @@
             <div id="show_assignments" style="display: none">
               <%= label_tag 'assignment_selected', 'Select assignment' %>
               <select name="assignment_selected" id="select1">
+                <option selected disabled hidden style='display: none' value=''></option>
                 <% @assignments_list.each do |assignment| %>
                     <option value=<%= assignment.id %>><%= assignment.name %></option>
                 <% end %>

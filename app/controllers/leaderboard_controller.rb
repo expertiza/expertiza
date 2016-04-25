@@ -161,11 +161,16 @@ class LeaderboardController < ApplicationController
     badge_json = CredlyHelper.get_badges_created(@course.instructor_id)
     badge_json_data = JSON.parse(badge_json.body)['data']
     @badgeURL = Hash.new
+    @badge_names = Hash.new
     badge_json_data.each do |data|
       badge = Badge.where('credly_badge_id = ?', data['id']).first
       @badgeURL[badge.id] = data['image_url']
+      @badge_names[badge.id] = badge.name
     end
+
+
     @student_badges.delete_if {|k, v| v.nil?}
+    @sorted_student_badges = Hash[@student_badges.sort_by{|k, v| v}.reverse]
     @badgeURL
   end
 
@@ -222,7 +227,6 @@ class LeaderboardController < ApplicationController
     sorted_scores.each_with_index do |(k, v), i|
       if v >= threshold
         final_users.push(k)
-        break
       end
     end
     final_users
@@ -276,7 +280,6 @@ class LeaderboardController < ApplicationController
             final_users.push(tu.user_id)
           end
         end
-        break
       end
     end
     final_users

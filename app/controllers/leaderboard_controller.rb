@@ -62,8 +62,8 @@ class LeaderboardController < ApplicationController
         end
 
         if assignment_status == 1
+          participant_scores = Hash.new()
           @assignment_groups.each do |assign_group|
-            participant_scores = Hash.new()
             participant_assignment = Participant.where('parent_id = ?', assign_group.assignment_id)
             participant_assignment.each do |p|
               score = get_scores p.id
@@ -72,6 +72,7 @@ class LeaderboardController < ApplicationController
                   if !participant_scores.key?(p.user_id)
                     participant_scores[p.user_id] = score[:total_score]
                   else
+                    #Average or Sum
                     participant_scores[p.user_id] = participant_scores[p.user_id] + score[:total_score]
                   end
                 end
@@ -80,34 +81,46 @@ class LeaderboardController < ApplicationController
                   if !participant_scores.key?(p.user_id)
                     participant_scores[p.user_id] = score
                   else
+                    #Average or Sum
                     participant_scores[p.user_id] = participant_scores[p.user_id] + score
                   end
                 end
               end
             end
-            sorted_scores = Hash[participant_scores.sort_by { |k, v| v }.reverse!]
-            final_users = get_eligible_users_for_badge badge_group, sorted_scores, assign_group.assignment_id
-            final_users.each do |u|
-              if(@assignment_groups.count == 1)
-                assign_badge_user badge_group.badge_id, u, 1, assign_group.assignment_id, params[:course_id]
-              elsif @assignment_groups.count > 1
-                assign_badge_user badge_group.badge_id, u, 0, nil, params[:course_id]
-              end
+          end
+          sorted_scores = Hash[participant_scores.sort_by { |k, v| v }.reverse!]
+          #Average Score Calculation
 
-              badge_group.badges_awarded = true
-              badge_group.save!
-
-              if @student_badges[u] == nil
-                badge_array = Array.new()
-                badge_array.push(badge_group.badge_id)
-                @student_badges[u] = badge_array
-              else
-                badge_array = @student_badges[u]
-                badge_array.push(badge_group.badge_id)
-                @student_badges[u] = badge_array
-              end
+          if @assignment_groups.count == 1
+            final_users = get_eligible_users_for_badge badge_group, sorted_scores, @assignment_groups[0].assignment_id
+          else
+            if badge_group.strategy == 'Top Scores'
+              final_users = get_users_top_scores_team_of_one sorted_scores, badge_group.threshold
+            elsif badge_group.strategy == 'Score Threshold'
+              final_users = get_users_threshold_team_of_one sorted_scores, badge_group.threshold
             end
           end
+
+
+          final_users.each do |u|
+            if(@assignment_groups.count == 1)
+              assign_badge_user badge_group.badge_id, u, 1, @assignment_groups[0].assignment_id, params[:course_id]
+            elsif @assignment_groups.count > 1
+              assign_badge_user badge_group.badge_id, u, 0, nil, params[:course_id]
+            end
+
+            if @student_badges[u] == nil
+              badge_array = Array.new()
+              badge_array.push(badge_group.badge_id)
+              @student_badges[u] = badge_array
+            else
+              badge_array = @student_badges[u]
+              badge_array.push(badge_group.badge_id)
+              @student_badges[u] = badge_array
+            end
+          end
+          badge_group.badges_awarded = true
+          badge_group.save!
         end
       else
         if badge_group.is_course_level_group == false

@@ -3,10 +3,89 @@
     $(function () { 
       $("[data-toggle='tooltip']").tooltip(); 
       $("#scoresTable").tablesorter();
+      $("#rowsort").click(function() {
+
+
+        jQuery.moveColumn = function (table, from, to) {
+          var rows = jQuery('tr', table);
+          var cols;
+          rows.each(function() {
+            cols = jQuery(this).children('th, td');
+            cols.eq(from).detach().insertBefore(cols.eq(to));
+            if(from-to>1)
+            {
+              cols.eq(to).detach().insertAfter((cols.eq(from-1)));
+
+            }
+          });
+        }
+
+
+
+        var tables = $("table.tbl_heat")
+
+
+        for (var m = 0; m < tables.length; m++) {
+
+          var tbr = tables.eq(m).find('tr.accordion-toggle');
+
+
+
+
+          var columns=  tbr.eq(tbr.length-1).find('td')
+          var sum_array = []
+          for (var l = 2; l < columns.length-2; l++)
+          {
+            var Total =0
+            for (var n = 0; n < tbr.length; n++)
+            {
+              var row_slice=tbr.eq(n).find('td')
+              //alert(row_slice[l].innerHTML)
+              if(parseInt(row_slice[l].innerHTML)>0)
+              {
+                Total = Total+parseInt(row_slice[l].innerHTML)
+              }
+            }
+            //alert(Total)
+            sum_array.push(Total)
+
+          }
+
+
+          for (var i = 3; i < columns.length-2; i++) {
+            for (var j = 3; j < columns.length-2; j++) {
+
+
+              var k=j-1
+
+              if(sum_array[j-2]>sum_array[k-2])
+              {
+                var tmp
+                tmp=sum_array[j-2]
+                sum_array[j-2]=sum_array[k-2]
+                sum_array[k-2]=tmp
+
+                jQuery.moveColumn($("table.tbl_heat").eq(m), j, k);
+                var tables = $("table.tbl_heat")
+
+                var tbr = tables.eq(m).find('tr.accordion-toggle');
+
+                var columns=  tbr.eq(tbr.length-1).find('td')
+              }
+            }
+          }
+        }
+
+
+
+
+
+      });
     });
 
-</script>
 
+</script>
+<a id="rowsort" href="#">Row Sort</a>
 <h1>Summary Report for assignment: <%= @assignment.name %></h1>
 <h4>Team: <%= @team.name %></h4>
 

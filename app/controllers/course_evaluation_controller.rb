@@ -11,9 +11,11 @@ class CourseEvaluationController < ApplicationController
     deployments=SurveyParticipant.where(user_id: session[:user].id)
     @surveys=Array.new
     deployments.each do |sd|
-      survey_deployment=SurveyDeployment.find(sd.survey_deployment_id)
+      survey_deployment=SurveyDeployment.find_by_id(sd.survey_deployment_id)
+      if !survey_deployment.nil?
       if(Time.now>survey_deployment.start_date && Time.now<survey_deployment.end_date)
         @surveys<<[Questionnaire.find(survey_deployment.course_evaluation_id),sd.survey_deployment_id,survey_deployment.end_date, survey_deployment.course_id]
+      end
       end
     end
   end

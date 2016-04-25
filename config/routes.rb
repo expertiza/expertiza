@@ -551,5 +551,11 @@ Expertiza::Application.routes.draw do
 
   get ':controller(/:action(/:id))(.:format)'
 
+  resources :course_survey do
+    collection do
+      get :list
+    end
+  end
+
  # get 'sign_up_sheet/intelligent_signup_sheet.html_erb' => 'sign_up_sheet#intelligentPage'
 end

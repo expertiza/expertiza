@@ -95,7 +95,9 @@ class SurveyController < ApplicationController
             @sd = Time.now + 100
             @ed = Time.now + 250000
             @new = SurveyDeployment.new(:course_evaluation_id => @current.id, :course_id => @course.id, :num_of_students => 0, :start_date => @sd, :end_date => @ed)
+            @newCourseQuestionnaire = CourseQuestionnaire.new(:course_id => @course.id, :questionnaire_id => @current.id, :user_id => session[:user].id )
             @new.save
+            @newCourseQuestionnaire.save
             @assigned_surveys << @current
           end
         end

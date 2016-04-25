@@ -1,0 +1,23 @@
+<h1>
+  List of Course surveys
+</h1>
+
+<TABLE>
+  <TR>
+    <TH align="left" width="60%"> Question </TH>
+    <TH align="left">&nbsp Type &nbsp</TH>
+    <TH align="left">&nbsp Weight &nbsp</TH>
+    <TH align="left">&nbsp Score Range &nbsp</TH>
+  </TR>
+  <% if !@questionnaires.nil? %>
+  <% @questionnaires.each do |questionnaire| %>
+
+    <% if !questionnaire.nil? %>
+        <%= link_to questionnaire.questionnaire_id, view_questionnaires_path(questionnaire.questionnaire_id ) %>
+      <% end %>
+
+  <% end %>
+      <% else %>
+  <h1>No records found</h1>
+  <% end %>
+</TABLE>

@@ -9,12 +9,12 @@ class LeaderboardController < ApplicationController
   # E1626
   def index
     if current_user
-      @instructor_query = LeaderboardHelper.userIsInstructor?(current_user.id)
+      @instructor_query = LeaderboardHelper.user_is_instructor?(current_user.id)
 
       if @instructor_query
-        @course_list = LeaderboardHelper.instructorCourses(current_user.id)
+        @course_list = LeaderboardHelper.instructor_courses(current_user.id)
       else
-        @course_list = LeaderboardHelper.studentInWhichCourses(current_user.id)
+        @course_list = LeaderboardHelper.student_in_which_courses(current_user.id)
       end
       @course_info = Leaderboard.getCourseInfo(@course_list)
     end
@@ -28,21 +28,12 @@ class LeaderboardController < ApplicationController
     @participants = Participant.where('parent_id = ?', params[:course_id]).pluck(:user_id)
     @students = User.where('id in (?) and role_id = ?', @participants, 1)
     @assignments = Assignment.where('course_id = ?', params[:course_id])
-    assignment_stage = Hash.new()
 
     #get assignment stages
-    @assignments.each do |assignment|
-      @students.each do |student|
-        participant_assignment = Participant.where('parent_id = ? and user_id = ?', assignment.id, student.id).first
-        topic_id = SignedUpTeam.topic_id(participant_assignment.parent_id, participant_assignment.user_id)
-        stagename = participant_assignment.assignment.get_current_stage_name(topic_id)
-        assignment_stage[assignment.id] = stagename
-        break
-      end
-    end
+    assignment_stage = LeaderboardHelper.get_stage_assignments(@assignments, @students)
 
-    @student_badges = Hash[@students.pluck(:id).map {|x| [x, nil]}]
-    @track_badge_users = Array.new()
+    @student_badges = Hash[@students.pluck(:id).map { |x| [x, nil] }]
+    @track_badge_users = Array.new
 
     #GetBadgeGroups
     @badge_groups = BadgeGroup.where('course_id = ?', params[:course_id])
@@ -62,11 +53,11 @@ class LeaderboardController < ApplicationController
         end
 
         if assignment_status == 1
-          participant_scores = Hash.new()
+          participant_scores = Hash.new
           @assignment_groups.each do |assign_group|
             participant_assignment = Participant.where('parent_id = ?', assign_group.assignment_id)
             participant_assignment.each do |p|
-              score = get_scores p.id
+              score = LeaderboardHelper.get_scores p.id
               begin
                 if score != nil and score.key?(:total_score)
                   if !participant_scores.key?(p.user_id)
@@ -92,25 +83,25 @@ class LeaderboardController < ApplicationController
           #Average Score Calculation
 
           if @assignment_groups.count == 1
-            final_users = get_eligible_users_for_badge badge_group, sorted_scores, @assignment_groups[0].assignment_id
+            final_users = LeaderboardHelper.get_eligible_users_for_badge badge_group, sorted_scores, @assignment_groups[0].assignment_id
           else
             if badge_group.strategy == 'Top Scores'
-              final_users = get_users_top_scores_team_of_one sorted_scores, badge_group.threshold
+              final_users = LeaderboardHelper.get_users_top_scores_team_of_one sorted_scores, badge_group.threshold
             elsif badge_group.strategy == 'Score Threshold'
-              final_users = get_users_threshold_team_of_one sorted_scores, badge_group.threshold
+              final_users = LeaderboardHelper.get_users_threshold_team_of_one sorted_scores, badge_group.threshold
             end
           end
 
 
           final_users.each do |u|
-            if(@assignment_groups.count == 1)
-              assign_badge_user badge_group.badge_id, u, 1, @assignment_groups[0].assignment_id, params[:course_id]
+            if @assignment_groups.count == 1
+              @track_badge_users = LeaderboardHelper.assign_badge_user badge_group.badge_id, u, 1, @assignment_groups[0].assignment_id, params[:course_id], @track_badge_users, @course
             elsif @assignment_groups.count > 1
-              assign_badge_user badge_group.badge_id, u, 0, nil, params[:course_id]
+              @track_badge_users = LeaderboardHelper.assign_badge_user badge_group.badge_id, u, 0, nil, params[:course_id], @track_badge_users, @course
             end
 
             if @student_badges[u] == nil
-              badge_array = Array.new()
+              badge_array = Array.new
               badge_array.push(badge_group.badge_id)
               @student_badges[u] = badge_array
             else
@@ -129,7 +120,7 @@ class LeaderboardController < ApplicationController
           students_with_badges.each do |student|
             @track_badge_users.push(student.id)
             if @student_badges[student.user_id] == nil
-              badge_array = Array.new()
+              badge_array = Array.new
               badge_array.push(badge_group.badge_id)
               @student_badges[student.user_id] = badge_array
             else
@@ -143,7 +134,7 @@ class LeaderboardController < ApplicationController
           students_with_badges.each do |student|
             @track_badge_users.push(student.id)
             if @student_badges[student.user_id] == nil
-              badge_array = Array.new()
+              badge_array = Array.new
               badge_array.push(badge_group.badge_id)
               @student_badges[student.user_id] = badge_array
             else
@@ -157,160 +148,14 @@ class LeaderboardController < ApplicationController
     end
 
     #add badges awarded by instructor manually
-    badge_user_instructor = BadgeUser.where('id not in (?)', @track_badge_users)
-    badge_user_instructor.each do |bi|
-      if @student_badges[badge_user_instructor.user_id] == nil
-        badge_array = Array.new()
-        badge_array.push(badge_user_instructor.badge_id)
-        @student_badges[badge_user_instructor.user_id] = badge_array
-      else
-        badge_array = @student_badges[badge_user_instructor.user_id]
-        badge_array.push(badge_user_instructor.badge_id)
-        @student_badges[badge_user_instructor.user_id] = badge_array
-      end
-    end
+    @track_badge_users, @student_badges = LeaderboardHelper.instructor_added_badges(@track_badge_users, @student_badges)
 
     #get badge URLs
-    badge_json = CredlyHelper.get_badges_created(@course.instructor_id)
-    badge_json_data = JSON.parse(badge_json.body)['data']
-    @badgeURL = Hash.new
-    @badge_names = Hash.new
-    badge_json_data.each do |data|
-      badge = Badge.where('credly_badge_id = ?', data['id']).first
-      @badgeURL[badge.id] = data['image_url']
-      @badge_names[badge.id] = badge.name
-    end
+    @badgeURL, @badge_names = LeaderboardHelper.get_badges_info @course
 
-
-    @student_badges.delete_if {|k, v| v.nil?}
-    @sorted_student_badges = Hash[@student_badges.sort_by{|k, v| v}.reverse]
+    @student_badges.delete_if { |k, v| v.nil? }
+    @sorted_student_badges = Hash[@student_badges.sort_by { |k, v| v }.reverse]
     @badgeURL
-  end
-
-
-  def get_eligible_users_for_badge badge_group, sorted_scores, assignment_id
-    strategy = badge_group.strategy
-    threshold = badge_group.threshold
-    count_teams = Team.where('parent_id = ?', assignment_id)
-    count_participants = Participant.where('parent_id = ?', assignment_id)
-    final_users = nil
-
-
-    if (count_teams.count == count_participants.count)
-      if strategy == 'Top Scores'
-        final_users = get_users_top_scores_team_of_one sorted_scores, threshold
-      elsif strategy == 'Score Threshold'
-        final_users = get_users_threshold_team_of_one sorted_scores, threshold
-      end
-    else
-      if strategy == 'Top Scores'
-        final_users = get_users_top_scores_team_of_multiple sorted_scores, threshold, assignment_id
-      elsif strategy == 'Score Threshold'
-        final_users = get_users_threshold_team_of_multiple sorted_scores, threshold, assignment_id
-      end
-    end
-    final_users
-  end
-
-  def get_users_top_scores_team_of_one sorted_scores, threshold
-    prev_value = 0
-    final_users = Array.new
-    rank =0
-    sorted_scores.each_with_index do |(k, v), i|
-      if i == 0
-        prev_value = v
-        rank = 1
-      end
-
-      if (rank < threshold)
-        final_users.push(k)
-      else
-        break
-      end
-      if (v < prev_value)
-        rank = rank + 1
-        prev_value = v
-      end
-    end
-    final_users
-  end
-
-  def get_users_threshold_team_of_one sorted_scores, threshold
-    final_users = Array.new
-    sorted_scores.each_with_index do |(k, v), i|
-      if v >= threshold
-        final_users.push(k)
-      end
-    end
-    final_users
-  end
-
-  def get_users_top_scores_team_of_multiple sorted_scores, threshold, assignment_id
-    final_users = Array.new
-    prev_value = 0
-    rank = 0
-    sorted_scores.each_with_index do |(k, v), i|
-      if i == 0
-        prev_value = v
-        rank = 1
-      end
-
-      if (rank < threshold)
-        if !final_users.include?(k)
-          final_users.push(k)
-        end
-        results = Team.joins(:teams_users).where('teams.parent_id= ? and teams_users.user_id=?', assignment_id, k)
-        team_id = results[0].id
-        team_users = TeamsUser.where('team_id = ?', team_id)
-        team_users.each do |tu|
-          if (!final_users.include?(k))
-            final_users.push(tu.user_id)
-          end
-        end
-      else
-        break
-      end
-      if (v < prev_value)
-        rank = rank + 1
-        prev_value = v
-      end
-    end
-    final_users
-  end
-
-  def get_users_threshold_team_of_multiple sorted_scores, threshold, assignment_id
-    final_users = Array.new
-    sorted_scores.each_with_index do |(k, v), i|
-      if v >= threshold
-        if !final_users.include?(k)
-          final_users.push(k)
-        end
-        results = Team.joins(:teams_users).where('teams.parent_id= ? and teams_users.user_id=?', assignment_id, k)
-        team_id = results[0].id
-        team_users = TeamsUser.where('team_id = ?', team_id)
-        team_users.each do |tu|
-          if (!final_users.include?(k))
-            final_users.push(tu.user_id)
-          end
-        end
-      end
-    end
-    final_users
-  end
-
-  #GetScoresForAssignmentLevelBadges
-  def get_scores participant_id
-
-    @participant = AssignmentParticipant.find(participant_id)
-    @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
-    @assignment = @participant.assignment
-    @questions = {} # A hash containing all the questions in all the questionnaires used in this assignment
-    questionnaires = @assignment.questionnaires
-    retrieve_questions(questionnaires)
-
-    #@pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
-    @pscore = @participant.scores(@questions)
-
   end
 
   def retrieve_questions (questionnaires)
@@ -323,31 +168,6 @@ class LeaderboardController < ApplicationController
       end
       @questions[questionnaire_symbol] = questionnaire.questions
     end
-  end
-
-  def assign_badge_user badge_id, user_id, is_assignment_level_badge, assignment_id, course_id
-    badge_user = BadgeUser.new
-    badge_user.badge_id = badge_id
-    badge_user.user_id = user_id
-
-    if is_assignment_level_badge
-      badge_user.is_course_badge = false
-      badge_user.assignment_id = assignment_id
-      badge_user.course_id=course_id
-    else
-      badge_user.is_course_badge = true
-      badge_user.course_id = course_id
-    end
-
-    badge_user.save!
-
-    @track_badge_users.push(badge_user.id)
-
-    student_credly_id = User.where('id = ?', user_id).first
-    credly_badge = Badge.find_by_id(badge_id)
-
-    CredlyHelper.award_badge_user(@course.instructor_id, student_credly_id.credly_id, credly_badge.credly_badge_id)
-
   end
 
 end

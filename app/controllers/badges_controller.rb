@@ -157,6 +157,7 @@ class BadgesController < ApplicationController
     else
       badge_user.is_course_badge = false
       badge_user.assignment_id = params['assignment_selected']
+      badge_user.course_id = params[:course_id]
     end
 
     badge_user.save!

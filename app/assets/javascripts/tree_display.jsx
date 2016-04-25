@@ -461,7 +461,7 @@ jQuery(document).ready(function() {
         }
       }
       return (
-        <tr style={style}>
+        <tr style={style} className="active">
           <td style={colDisplayStyle}>
           </td>
           <td colSpan={colSpan}>
@@ -479,7 +479,7 @@ jQuery(document).ready(function() {
   var TitleRow = React.createClass({
     render: function() {
         return (
-        <tr>
+        <tr className="active">
             <td colSpan="6">
                 <b>{this.props.title}</b>
             </td>
@@ -631,66 +631,24 @@ jQuery(document).ready(function() {
         "display": "",
       }
       if (this.props) {
-        if (this.props.dataType === 'questionnaire') {
-          colWidthArray = ["70%", "0%", "0%", "0%", "0%", "30%"]
-          colDisplayStyle = {
-            "display": "none"
+          if (this.props.dataType === 'questionnaire') {
+              colWidthArray = ["70%", "0%", "0%", "0%", "0%", "30%"]
+              colDisplayStyle = {
+                  "display": "none"
+              }
           }
-        }
-         if(this.props.dataType!='questionnaire') {
-         _rows.push(<TitleRow
-             title="Private"
-         />) }
-        jQuery.each(this.props.data, function(i, entry){
-          if (((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
-              (entry.directory && entry.directory.indexOf(_this.props.filterText) !== -1) ||
-              (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
-              (entry.instructor && entry.instructor.indexOf(_this.props.filterText) !== -1) ||
-              (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
-              (entry.private==true || entry.type=='FolderNode')) {
-                _rows.push(<ContentTableRow
-                            key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
-                            id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
-                            name={entry.name}
-                            directory={entry.directory}
-                            instructor={entry.instructor}
-                            creation_date={entry.creation_date}
-                            updated_date={entry.updated_date}
-                            actions={entry.actions}
-                            is_available={entry.is_available}
-                            course_id={entry.course_id}
-                            max_team_size={entry.max_team_size}
-                            is_intelligent={entry.is_intelligent}
-                            require_quiz={entry.require_quiz}
-                            dataType={_this.props.dataType}
-                            private={entry.private}
-                            allow_suggestions={entry.allow_suggestions}
-                            has_topic={entry.has_topic}
-                            rowClicked={_this.handleExpandClick}
-                            newParams={entry.newParams}
-                            />)
-                _rows.push(<ContentTableDetailsRow
-                            key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
-                            id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
-                            showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
-                            dataType={_this.props.dataType}
-                            children={entry.children}
-                            />)
-          } else {
-            return;
-          }
-        })
-          if(this.props.dataType!='questionnaire') {
+          if (this.props.dataType != 'questionnaire') {
               _rows.push(<TitleRow
-                  title="Public"
-              />) }
-          jQuery.each(this.props.data, function(i, entry){
+                  title="Private"
+              />)
+          }
+          jQuery.each(this.props.data, function (i, entry) {
               if (((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
                   (entry.directory && entry.directory.indexOf(_this.props.filterText) !== -1) ||
                   (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
                   (entry.instructor && entry.instructor.indexOf(_this.props.filterText) !== -1) ||
                   (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
-                  (entry.private==false)) {
+                  (entry.private == true || entry.type == 'FolderNode')) {
                   _rows.push(<ContentTableRow
                       key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
                       id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
@@ -723,10 +681,56 @@ jQuery(document).ready(function() {
                   return;
               }
           })
+          if (this.props.showPublic) {
+              if (this.props.dataType != 'questionnaire') {
+                  _rows.push(<TitleRow
+                      title="Public"
+                  />)
+              }
+          jQuery.each(this.props.data, function (i, entry) {
+              if (((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.directory && entry.directory.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.instructor && entry.instructor.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
+                  (entry.private == false)) {
+                  _rows.push(<ContentTableRow
+                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
+                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
+                      name={entry.name}
+                      directory={entry.directory}
+                      instructor={entry.instructor}
+                      creation_date={entry.creation_date}
+                      updated_date={entry.updated_date}
+                      actions={entry.actions}
+                      is_available={entry.is_available}
+                      course_id={entry.course_id}
+                      max_team_size={entry.max_team_size}
+                      is_intelligent={entry.is_intelligent}
+                      require_quiz={entry.require_quiz}
+                      dataType={_this.props.dataType}
+                      private={entry.private}
+                      allow_suggestions={entry.allow_suggestions}
+                      has_topic={entry.has_topic}
+                      rowClicked={_this.handleExpandClick}
+                      newParams={entry.newParams}
+                  />)
+                  _rows.push(<ContentTableDetailsRow
+                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
+                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
+                      showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
+                      dataType={_this.props.dataType}
+                      children={entry.children}
+                  />)
+              } else {
+                  return;
+              }
+          })
+      }
 
       }
       return (
-        <table className="table table-striped table-hover" style={{"table-layout":"fixed"}}>
+        <table className="table table-hover" style={{"table-layout":"fixed"}}>
           <thead>
             <tr>
               <th width={colWidthArray[0]}>
@@ -775,7 +779,7 @@ jQuery(document).ready(function() {
       return {
         filterText: '',
         privateCheckbox: false,
-        publicCheckbox: true,
+        publicCheckbox: false,
         tableData: this.props.data
       }
     },
@@ -837,21 +841,21 @@ jQuery(document).ready(function() {
           publicCheckbox: publicCheckboxStatus
         })
     },
-    componentDidMount: function() {
-        var publicCheckboxStatus = this.state.publicCheckbox
-        publicCheckboxStatus = false;
-        var tmpData = this.state.tableData.filter(function(element) {
-            if(publicCheckboxStatus){
-                return true
-            }
-            else
-                return element.private===true
-        })
-        this.setState({
-            tableData: tmpData,
-            publicCheckbox: publicCheckboxStatus
-        })
-    },
+    //componentDidMount: function() {
+    //    var publicCheckboxStatus = this.state.publicCheckbox
+    //    publicCheckboxStatus = false;
+    //    var tmpData = this.state.tableData.filter(function(element) {
+    //        if(publicCheckboxStatus){
+    //            return true
+    //        }
+    //        else
+    //            return element.private===true
+    //    })
+    //    this.setState({
+    //        tableData: tmpData,
+    //        publicCheckbox: publicCheckboxStatus
+    //    })
+    //},
     render: function() {
         //this.handleUserFilter('public',false);
       return (
@@ -880,6 +884,7 @@ jQuery(document).ready(function() {
             filterText={this.state.filterText}
             onUserClick={this.handleUserClick}
             dataType={this.props.dataType}
+            showPublic={this.state.publicCheckbox}
           />
         </div>
       )

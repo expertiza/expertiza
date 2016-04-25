@@ -54,33 +54,10 @@ class LeaderboardController < ApplicationController
 
         if assignment_status == 1
           participant_scores = Hash.new
-          @assignment_groups.each do |assign_group|
-            participant_assignment = Participant.where('parent_id = ?', assign_group.assignment_id)
-            participant_assignment.each do |p|
-              score = LeaderboardHelper.get_scores p.id
-              begin
-                if score != nil and score.key?(:total_score)
-                  if !participant_scores.key?(p.user_id)
-                    participant_scores[p.user_id] = score[:total_score]
-                  else
-                    #Average or Sum
-                    participant_scores[p.user_id] = participant_scores[p.user_id] + score[:total_score]
-                  end
-                end
-              rescue
-                if score.is_a? Float
-                  if !participant_scores.key?(p.user_id)
-                    participant_scores[p.user_id] = score
-                  else
-                    #Average or Sum
-                    participant_scores[p.user_id] = participant_scores[p.user_id] + score
-                  end
-                end
-              end
-            end
-          end
-          sorted_scores = Hash[participant_scores.sort_by { |k, v| v }.reverse!]
+          participant_scores = LeaderboardHelper.get_participant_scores(participant_scores, @assignment_groups)
           #Average Score Calculation
+          participant_scores.each { |k, v| participant_scores[k] = v/@assignment_groups.length }
+          sorted_scores = Hash[participant_scores.sort_by { |k, v| v }.reverse!]
 
           if @assignment_groups.count == 1
             final_users = LeaderboardHelper.get_eligible_users_for_badge badge_group, sorted_scores, @assignment_groups[0].assignment_id
@@ -117,32 +94,10 @@ class LeaderboardController < ApplicationController
         if badge_group.is_course_level_group == false
           @assignment_groups = AssignmentGroup.where('badge_group_id = ?', badge_group.id)
           students_with_badges = BadgeUser.where('assignment_id = ? and course_id = ? and badge_id = ?', @assignment_groups[0].assignment_id, params[:course_id], badge_group.badge_id)
-          students_with_badges.each do |student|
-            @track_badge_users.push(student.id)
-            if @student_badges[student.user_id] == nil
-              badge_array = Array.new
-              badge_array.push(badge_group.badge_id)
-              @student_badges[student.user_id] = badge_array
-            else
-              badge_array = @student_badges[student.user_id]
-              badge_array.push(badge_group.badge_id)
-              @student_badges[student.user_id] = badge_array
-            end
-          end
+          @track_badge_users, @student_badges = LeaderboardHelper.get_students_badges(badge_group, students_with_badges, @track_badge_users, @student_badges)
         else
           students_with_badges = BadgeUser.where('is_course_badge = ? and course_id = ? and badge_id = ?', 1, params[:course_id], badge_group.badge_id)
-          students_with_badges.each do |student|
-            @track_badge_users.push(student.id)
-            if @student_badges[student.user_id] == nil
-              badge_array = Array.new
-              badge_array.push(badge_group.badge_id)
-              @student_badges[student.user_id] = badge_array
-            else
-              badge_array = @student_badges[student.user_id]
-              badge_array.push(badge_group.badge_id)
-              @student_badges[student.user_id] = badge_array
-            end
-          end
+          @track_badge_users, @student_badges = LeaderboardHelper.get_students_badges(badge_group, students_with_badges, @track_badge_users, @student_badges)
         end
       end
     end
@@ -152,7 +107,6 @@ class LeaderboardController < ApplicationController
 
     #get badge URLs
     @badgeURL, @badge_names = LeaderboardHelper.get_badges_info @course
-
     @student_badges.delete_if { |k, v| v.nil? }
     @sorted_student_badges = Hash[@student_badges.sort_by { |k, v| v }.reverse]
     @badgeURL

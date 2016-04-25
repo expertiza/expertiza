@@ -841,23 +841,7 @@ jQuery(document).ready(function() {
           publicCheckbox: publicCheckboxStatus
         })
     },
-    //componentDidMount: function() {
-    //    var publicCheckboxStatus = this.state.publicCheckbox
-    //    publicCheckboxStatus = false;
-    //    var tmpData = this.state.tableData.filter(function(element) {
-    //        if(publicCheckboxStatus){
-    //            return true
-    //        }
-    //        else
-    //            return element.private===true
-    //    })
-    //    this.setState({
-    //        tableData: tmpData,
-    //        publicCheckbox: publicCheckboxStatus
-    //    })
-    //},
     render: function() {
-        //this.handleUserFilter('public',false);
       return (
         <div className="filterable_table">
           <SearchBar
@@ -933,7 +917,7 @@ jQuery(document).ready(function() {
           activeTab: data
         })
       })
-      jQuery.get("/tree_display/get_folder_node_ng", function(data, status) {
+      jQuery.get("/tree_display/get_folder_node_ng", function(data) {
         jQuery.post("/tree_display/get_children_node_ng",
           {
             reactParams: {

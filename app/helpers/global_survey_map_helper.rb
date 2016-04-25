@@ -4,7 +4,7 @@ module GlobalSurveyMapHelper
     joiners = GlobalSurveyMap.where("courses_id = ? and surveys_id = ?", course_id,survey_id)
     assigned_surveys = []
     for joiner in joiners
-      survey = Questionnaire.find(joiner.id)
+      survey = Questionnaire.find(joiner.global_surveys_id)
       assigned_surveys << survey
     end
     assigned_surveys.sort{|a,b| a.name <=> b.name}

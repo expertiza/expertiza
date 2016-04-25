@@ -11,6 +11,7 @@
         <tr>
           <td align=center><input type=checkbox name="students[]" value="<%= student.id %>"
             <% if @assigned_students.include?(student) -%>
+              
               checked="checked"
             <% end -%>
             ></td>

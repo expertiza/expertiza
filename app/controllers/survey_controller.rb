@@ -117,6 +117,7 @@ class SurveyController < ApplicationController
         @survey = Questionnaire.find_by(id: params[:id])
         @course = Course.find_by(id: params[:course])
         @assigned_surveys = GlobalSurveyMapHelper::get_assigned_global_surveys(@course.id,@survey.id)
+        puts @assigned_surveys.length
         if params['update']
         if params[:surveys]
         @checked = params[:surveys]

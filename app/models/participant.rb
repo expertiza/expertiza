@@ -40,131 +40,126 @@ class Participant < ActiveRecord::Base
     User.find(self.user_id).fullname
   end
 
-  def update_reputation(alg, reputation)
-    puts "#{id}, #{alg}, #{reputation}, model
-"
-  end
-
   def delete(force = nil)
 
     # TODO How do we test this code?  #need a controller test_oss808
     maps = ResponseMap.where(['reviewee_id = ? or reviewer_id = ?',self.id,self.id])
 
     if force or ((maps.nil? or maps.length == 0) and
-                 self.team.nil?)
+        self.team.nil?)
       force_delete(maps)
     else
       raise "Associations exist for this participant"
     end
+  end
+
+
+  def force_delete(maps)
+    times = ResubmissionTime.where(participant_id: self.id);
+
+    if times
+      times.each { |time| time.destroy }
     end
 
-
-    def force_delete(maps)
-      times = ResubmissionTime.where(participant_id: self.id);
-
-      if times
-        times.each { |time| time.destroy }
-      end
-
-      if maps
-        maps.each { |map| map.delete(true) }
-      end
-
-      if self.team
-        if self.team.teams_users.length == 1
-          self.team.delete
-        else
-          self.team.teams_users.each{ |tuser|
-            if tuser.user_id == self.id
-              tuser.delete
-            end
-          }
-        end
-      end
-      self.destroy
+    if maps
+      maps.each { |map| map.delete(true) }
     end
 
-    def topic_name
-      if topic.nil? or topic.topic_name.empty?
-        return "<center>&#8212;</center>"
+    if self.team
+      if self.team.teams_users.length == 1
+        self.team.delete
+      else
+        self.team.teams_users.each{ |tuser|
+          if tuser.user_id == self.id
+            tuser.delete
+          end
+        }
       end
-      return topic.topic_name
     end
+    self.destroy
+  end
 
-    def able_to_review
-      if can_review
-        return true
-      end
-      return false
+  def topic_name
+    if topic.nil? or topic.topic_name.empty?
+      return "<center>&#8212;</center>"
     end
+    return topic.topic_name
+  end
 
-    # email does not work. It should be made to work in the future
-    def email(pw, home_page)
-      user = User.find(self.user_id)
-      assignment = Assignment.find(self.assignment_id)
+  def able_to_review
+    if can_review
+      return true
+    end
+    return false
+  end
 
-      Mailer.sync_message(
+  # email does not work. It should be made to work in the future
+  def email(pw, home_page)
+    user = User.find(self.user_id)
+    assignment = Assignment.find(self.assignment_id)
+
+    Mailer.sync_message(
         {:recipients => user.email,
          :subject => "You have been registered as a participant in Assignment #{assignment.name}",
          :body => {
-           :home_page => home_page,
-           :first_name => ApplicationHelper::get_user_first_name(user),
-           :name =>user.name,
-           :password =>pw,
-           :partial_name => "register"
+             :home_page => home_page,
+             :first_name => ApplicationHelper::get_user_first_name(user),
+             :name =>user.name,
+             :password =>pw,
+             :partial_name => "register"
          }
-      }
-      ).deliver
-    end
+        }
+    ).deliver
+  end
 
-    # Return scores that this participant for the given questions
-    def scores(questions)
-      scores = {}
-      scores[:participant] = self
+  # Return scores that this participant for the given questions
+  def scores(questions)
+    scores = {}
+    scores[:participant] = self
 
-      if self.assignment.varying_rubrics_by_round?  # for "vary rubric by rounds" feature -Yang
-        self.assignment.questionnaires.each do |questionnaire|
-          round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(self.assignment.id, questionnaire.id).used_in_round
-          if(round!=nil)
-            questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
-          else
-            questionnaire_symbol = questionnaire.symbol
-          end
-          scores[questionnaire_symbol] = Hash.new
-          scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_for(self)
-          scores[questionnaire_symbol][:scores] = Answer.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
+    if self.assignment.varying_rubrics_by_round?  # for "vary rubric by rounds" feature -Yang
+      self.assignment.questionnaires.each do |questionnaire|
+        round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(self.assignment.id, questionnaire.id).used_in_round
+        if(round!=nil)
+          questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
+        else
+          questionnaire_symbol = questionnaire.symbol
         end
-
-      else   #not using "vary rubric by rounds" feature
-        self.assignment.questionnaires.each do |questionnaire|
-          scores[questionnaire.symbol] = Hash.new
-          scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
-
-          scores[questionnaire.symbol][:scores] = Answer.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
-        end
+        scores[questionnaire_symbol] = Hash.new
+        scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_for(self)
+        scores[questionnaire_symbol][:scores] = Answer.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
       end
 
-      scores[:total_score] = assignment.compute_total_score(scores)
+    else   #not using "vary rubric by rounds" feature
+      self.assignment.questionnaires.each do |questionnaire|
+        scores[questionnaire.symbol] = Hash.new
+        scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
 
-      scores
+        scores[questionnaire.symbol][:scores] = Answer.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+      end
     end
+
+    scores[:total_score] = assignment.compute_total_score(scores)
+
+    scores
+  end
 
   #Authorizations are paricipant, reader, reviewer, submitter (They are not store in Participant table.)
   #Permissions are can_submit, can_review, can_take_quiz.
   #Get permissions form authorizations.
   def self.get_permissions(authorization)
-      can_submit=true
-      can_review=true
-      can_take_quiz=true
+    can_submit=true
+    can_review=true
+    can_take_quiz=true
     case authorization
-    when 'reader'
-      can_submit=false
-    when 'reviewer'
-      can_submit=false
-      can_take_quiz=false
-    when 'submitter'
-      can_review=false
-      can_take_quiz=false
+      when 'reader'
+        can_submit=false
+      when 'reviewer'
+        can_submit=false
+        can_take_quiz=false
+      when 'submitter'
+        can_review=false
+        can_take_quiz=false
     end
     return {:can_submit => can_submit, :can_review => can_review, :can_take_quiz => can_take_quiz}
   end

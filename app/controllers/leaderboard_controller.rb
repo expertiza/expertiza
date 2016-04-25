@@ -148,7 +148,7 @@ class LeaderboardController < ApplicationController
     end
 
     #add badges awarded by instructor manually
-    @track_badge_users, @student_badges = LeaderboardHelper.instructor_added_badges(@track_badge_users, @student_badges)
+    @track_badge_users, @student_badges = LeaderboardHelper.instructor_added_badges(@track_badge_users, @student_badges, params[:course_id])
 
     #get badge URLs
     @badgeURL, @badge_names = LeaderboardHelper.get_badges_info @course
@@ -156,18 +156,6 @@ class LeaderboardController < ApplicationController
     @student_badges.delete_if { |k, v| v.nil? }
     @sorted_student_badges = Hash[@student_badges.sort_by { |k, v| v }.reverse]
     @badgeURL
-  end
-
-  def retrieve_questions (questionnaires)
-    questionnaires.each do |questionnaire|
-      round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first.used_in_round
-      if (round!=nil)
-        questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
-      else
-        questionnaire_symbol = questionnaire.symbol
-      end
-      @questions[questionnaire_symbol] = questionnaire.questions
-    end
   end
 
 end

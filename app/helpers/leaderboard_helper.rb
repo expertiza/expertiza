@@ -44,6 +44,7 @@ module LeaderboardHelper
         break
       end
     end
+    assignment_stage
   end
 
   def self.get_eligible_users_for_badge(badge_group, sorted_scores, assignment_id)
@@ -93,7 +94,7 @@ module LeaderboardHelper
     final_users
   end
 
-  def get_users_threshold_team_of_one(sorted_scores, threshold)
+  def self.get_users_threshold_team_of_one(sorted_scores, threshold)
     final_users = Array.new
     sorted_scores.each_with_index do |(k, v), i|
       if v >= threshold
@@ -103,7 +104,7 @@ module LeaderboardHelper
     final_users
   end
 
-  def get_users_top_scores_team_of_multiple(sorted_scores, threshold, assignment_id)
+  def self.get_users_top_scores_team_of_multiple(sorted_scores, threshold, assignment_id)
     final_users = Array.new
     prev_value = 0
     rank = 0
@@ -136,7 +137,7 @@ module LeaderboardHelper
     final_users
   end
 
-  def get_users_threshold_team_of_multiple(sorted_scores, threshold, assignment_id)
+  def self.get_users_threshold_team_of_multiple(sorted_scores, threshold, assignment_id)
     final_users = Array.new
     sorted_scores.each_with_index do |(k, v), i|
       if v >= threshold
@@ -163,10 +164,23 @@ module LeaderboardHelper
     @assignment = @participant.assignment
     @questions = {} # A hash containing all the questions in all the questionnaires used in this assignment
     questionnaires = @assignment.questionnaires
-    retrieve_questions(questionnaires)
+    @questions = retrieve_questions(questionnaires, @assignment, @questions)
 
     #@pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
     @pscore = @participant.scores(@questions)
+  end
+
+  def self.retrieve_questions (questionnaires, assignment, questions)
+    questionnaires.each do |questionnaire|
+      round = AssignmentQuestionnaire.where(assignment_id: assignment.id, questionnaire_id: questionnaire.id).first.used_in_round
+      if round!=nil
+        questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
+      else
+        questionnaire_symbol = questionnaire.symbol
+      end
+      questions[questionnaire_symbol] = questionnaire.questions
+    end
+    questions
   end
 
   def self.assign_badge_user badge_id, user_id, is_assignment_level_badge, assignment_id, course_id, track_badge_users, course
@@ -210,17 +224,17 @@ module LeaderboardHelper
   end
 
   #get badges awarded by instructor manually
-  def self.instructor_added_badges(track_badge_users, student_badges)
-    badge_user_instructor = BadgeUser.where('id not in (?)', track_badge_users)
+  def self.instructor_added_badges(track_badge_users, student_badges, course_id)
+    badge_user_instructor = BadgeUser.where('course_id = ? and id not in (?)', course_id, track_badge_users)
     badge_user_instructor.each do |bi|
-      if student_badges[badge_user_instructor.user_id] == nil
+      if student_badges[bi.user_id] == nil
         badge_array = Array.new
-        badge_array.push(badge_user_instructor.badge_id)
-        student_badges[badge_user_instructor.user_id] = badge_array
+        badge_array.push(bi.badge_id)
+        student_badges[bi.user_id] = badge_array
       else
-        badge_array = student_badges[badge_user_instructor.user_id]
-        badge_array.push(badge_user_instructor.badge_id)
-        student_badges[badge_user_instructor.user_id] = badge_array
+        badge_array = student_badges[bi.user_id]
+        badge_array.push(bi.badge_id)
+        student_badges[bi.user_id] = badge_array
       end
     end
 

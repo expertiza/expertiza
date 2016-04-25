@@ -375,11 +375,13 @@ jQuery(document).ready(function() {
       }
     },
     handleClick: function(event) {
+        //alert('click');
+
       if (event.target.type != 'button') {
         this.setState({
           expanded: !this.state.expanded
         }, function() {
-          this.props.rowClicked(this.props.id, this.state.expanded)
+          this.props.rowClicked(this.props.id, this.state.expanded,this.props.newParams)
         })
       } else {
         event.stopPropagation()
@@ -471,6 +473,18 @@ jQuery(document).ready(function() {
           </td>
         </tr>
       )
+    }
+  })
+
+  var TitleRow = React.createClass({
+    render: function() {
+        return (
+        <tr>
+            <td colSpan="6">
+                <b>{this.props.title}</b>
+            </td>
+        </tr>
+        )
     }
   })
 
@@ -581,11 +595,22 @@ jQuery(document).ready(function() {
         expandedRow: []
       }
     },
-    handleExpandClick: function(id, expanded) {
+    handleExpandClick: function(id, expanded,newParams) {
       if (expanded) {
         this.setState({ 
           expandedRow: this.state.expandedRow.concat([id])
-        })
+        });
+        if(this.props.dataType!='assignment') {
+            _this = this;
+            jQuery.post('/tree_display/get_children_node_2_ng',
+                {
+                    reactParams2: newParams
+                },
+                function (data) {
+                    _this.props.data[id.split("_")[2]]['children'] = data;
+                    _this.forceUpdate();
+                }, 'json');
+        }
       } else {
         var index = this.state.expandedRow.indexOf(id)
         if (index > -1) {
@@ -612,12 +637,17 @@ jQuery(document).ready(function() {
             "display": "none"
           }
         }
+         if(this.props.dataType!='questionnaire') {
+         _rows.push(<TitleRow
+             title="Private"
+         />) }
         jQuery.each(this.props.data, function(i, entry){
-          if ((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
+          if (((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
               (entry.directory && entry.directory.indexOf(_this.props.filterText) !== -1) ||
               (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
               (entry.instructor && entry.instructor.indexOf(_this.props.filterText) !== -1) ||
-              (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) {
+              (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
+              (entry.private==true || entry.type=='FolderNode')) {
                 _rows.push(<ContentTableRow
                             key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
                             id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
@@ -637,6 +667,7 @@ jQuery(document).ready(function() {
                             allow_suggestions={entry.allow_suggestions}
                             has_topic={entry.has_topic}
                             rowClicked={_this.handleExpandClick}
+                            newParams={entry.newParams}
                             />)
                 _rows.push(<ContentTableDetailsRow
                             key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
@@ -649,6 +680,50 @@ jQuery(document).ready(function() {
             return;
           }
         })
+          if(this.props.dataType!='questionnaire') {
+              _rows.push(<TitleRow
+                  title="Public"
+              />) }
+          jQuery.each(this.props.data, function(i, entry){
+              if (((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.directory && entry.directory.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.instructor && entry.instructor.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
+                  (entry.private==false)) {
+                  _rows.push(<ContentTableRow
+                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
+                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
+                      name={entry.name}
+                      directory={entry.directory}
+                      instructor={entry.instructor}
+                      creation_date={entry.creation_date}
+                      updated_date={entry.updated_date}
+                      actions={entry.actions}
+                      is_available={entry.is_available}
+                      course_id={entry.course_id}
+                      max_team_size={entry.max_team_size}
+                      is_intelligent={entry.is_intelligent}
+                      require_quiz={entry.require_quiz}
+                      dataType={_this.props.dataType}
+                      private={entry.private}
+                      allow_suggestions={entry.allow_suggestions}
+                      has_topic={entry.has_topic}
+                      rowClicked={_this.handleExpandClick}
+                      newParams={entry.newParams}
+                  />)
+                  _rows.push(<ContentTableDetailsRow
+                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
+                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
+                      showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
+                      dataType={_this.props.dataType}
+                      children={entry.children}
+                  />)
+              } else {
+                  return;
+              }
+          })
+
       }
       return (
         <table className="table table-striped table-hover" style={{"table-layout":"fixed"}}>
@@ -762,7 +837,23 @@ jQuery(document).ready(function() {
           publicCheckbox: publicCheckboxStatus
         })
     },
+    componentDidMount: function() {
+        var publicCheckboxStatus = this.state.publicCheckbox
+        publicCheckboxStatus = false;
+        var tmpData = this.state.tableData.filter(function(element) {
+            if(publicCheckboxStatus){
+                return true
+            }
+            else
+                return element.private===true
+        })
+        this.setState({
+            tableData: tmpData,
+            publicCheckbox: publicCheckboxStatus
+        })
+    },
     render: function() {
+        //this.handleUserFilter('public',false);
       return (
         <div className="filterable_table">
           <SearchBar
@@ -853,31 +944,15 @@ jQuery(document).ready(function() {
                   child_nodes: node.nodeinfo
                 }
                 if (nodeType === 'Assignments') {
-                  node["children"] = null
+                  node["children"] = null;
+                  node[newParams]=newParams;
                 } else if (nodeType === 'Courses') {
                   newParams["nodeType"] = 'CourseNode'
-                  jQuery.post('/tree_display/get_children_node_2_ng',
-                    {
-                      reactParams2: newParams
-                    },
-                    function(data3) {
-                      node["children"] = data3
-                    },
-                    'json'
-                  )
+                  node["newParams"]=newParams;
                 } else if (nodeType === 'Questionnaires') {
                   newParams["nodeType"] = 'FolderNode'
-                  jQuery.post('/tree_display/get_children_node_2_ng',
-                    {
-                      reactParams2: newParams
-                    },
-                    function(data3) {
-                      node["children"] = data3
-                    },
-                    'json'
-                  )
+                  node["newParams"]=newParams;
                 }
-
               }) 
             })
             if (data2) {

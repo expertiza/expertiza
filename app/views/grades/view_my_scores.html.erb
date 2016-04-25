@@ -15,10 +15,35 @@
 
 </TABLE>
 <h3>Reputation</h3>
-<% if @assignment.lauw == true %>
-    <%= @participant.Hamer %>
+<% if @assignment.lauw == false %>
+    <p style = "
+    <% if @participant.Hamer < 0.5 %>
+        background-color:red; width:40px;
+        <%elsif @participant.Hamer >= 0.5 && @participant.Hamer <= 1 %>
+        background-color:yellow; width:40px;
+    <%elsif  @participant.Hamer > 1 && @participant.Hamer <= 1.5 %>
+        background-color:orange; width:40px;
+    <%elsif  @participant.Hamer > 1.5 && @participant.Hamer <= 2   %>
+        background-color:lightgreen; width:40px;
+    <%else%>
+        background-color:green; width:40px;
+        <%end%>
+    "><%= @participant.Hamer %></p>
 <%else%>
-    <%= @participant.Lauw %>
+    <p style = "
+    <% if @participant.Lauw < 0.2 %>
+        background-color:red; width:40px;
+        <%elsif @participant.Lauw >= 0.2 && @participant.Lauw <= 0.4 %>
+        background-color:yellow; width:40px;
+    <%elsif  @participant.Lauw > 0.4 && @participant.Lauw <= 0.6 %>
+        background-color:orange; width:40px;
+    <%elsif  @participant.Lauw > 0.6 && @participant.Hamer <= 0.8   %>
+        background-color:lightgreen; width:40px;
+    <%else%>
+        background-color:green; width:40px;
+        <%end%>
+    "><%= @participant.Lauw %></p>
 <%end%>
 <BR/>
 <a href="javascript:window.history.back()">Back</a>
+

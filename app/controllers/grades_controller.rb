@@ -155,6 +155,13 @@ class GradesController < ApplicationController
     end
   end
 
+
+  #get the reputation of the reviewer
+  #def get_reputation()
+ #   reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id:  participant.assignment.id).first
+#
+  #end
+
   def open
     send_file(params['fname'], disposition: 'inline')
   end
@@ -346,7 +353,6 @@ class GradesController < ApplicationController
     @all_penalties[participant.id][:meta_review] = penalties[:meta_review]
     @all_penalties[participant.id][:total_penalty] = @total_penalty
   end
-
 
   def make_chart()
     @grades_bar_charts = {}

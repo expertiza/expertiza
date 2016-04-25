@@ -59,6 +59,8 @@ require 'analytic/assignment_analytic'
     team_assignment?
   end
 
+
+
   # Returns a set of topics that can be used for taking the quiz.
   # We choose the topics if one of its quiz submissions has been attempted the fewest times so far
   def candidate_topics_for_quiz

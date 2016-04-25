@@ -165,8 +165,8 @@ class LeaderboardController < ApplicationController
       badge = Badge.where('credly_badge_id = ?', data['id']).first
       @badgeURL[badge.id] = data['image_url']
     end
+    @student_badges.delete_if {|k, v| v.nil?}
     @badgeURL
-    @student_badges
   end
 
 

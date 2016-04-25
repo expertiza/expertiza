@@ -1,23 +1,25 @@
 <h1>
   List of Course surveys
 </h1>
+<table class=listing cellpadding=2 width=50%>
+  <% if (@surveys.size > 0) %>
 
-<TABLE>
-  <TR>
-    <TH align="left" width="60%"> Question </TH>
-    <TH align="left">&nbsp Type &nbsp</TH>
-    <TH align="left">&nbsp Weight &nbsp</TH>
-    <TH align="left">&nbsp Score Range &nbsp</TH>
-  </TR>
-  <% if !@questionnaires.nil? %>
-  <% @questionnaires.each do |questionnaire| %>
-
-    <% if !questionnaire.nil? %>
-        <%= link_to questionnaire.questionnaire_id, view_questionnaires_path(questionnaire.questionnaire_id ) %>
+      <% @surveys.each do |s| %>
+          <tr>
+            <% @review_mappings.each do |mapping| %>
+            <td>
+              <%= link_to s[0].name, :controller => 'survey_response', :action => 'new', :id=> mapping.id %>
+            <% end %>
+          </tr>
       <% end %>
+  <% else %>
+      <tr>
+        <td>
+          <div class="flash_note">
+            There exist no pending course surveys.
+          </div>
+        </td> </tr>
 
-  <% end %>
-      <% else %>
-  <h1>No records found</h1>
-  <% end %>
-</TABLE>
+  <%end%>
+
+</table>

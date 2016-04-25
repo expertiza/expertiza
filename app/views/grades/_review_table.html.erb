@@ -1,4 +1,4 @@
-<table class="grades">
+<table class="grades" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
   <%if ctrl=='review' && @assignment.varying_rubrics_by_round? %>
       <% reviews = reviews.select{|response| response.round == round}.reverse.uniq{|response| response.map_id}.sort_by{|response| response.map_id} %>
   <%end%>
@@ -27,7 +27,7 @@
 		<% for review in reviews %>
 		   <td align="center">
              <% score = Answer.get_total_score(:response => [review], :questions => @questions[symbol], :q_types => Array.new) %>
-             
+
              <% if controller.action_name != "view_my_scores" %>
                <input type="hidden" id="mailer_<%= review.map.reviewer.fullname %>_grade" name="mailer[<%= review.map.reviewer.fullname %>_grade]" value="<%= score  %>">
              <% end %>
@@ -36,8 +36,25 @@
              <%else%>
                <%= sprintf("%.2f",score) %>% &nbsp;
              <%end%>
-
 	  	   </td>
 	    <% end %>
 	</tr>
+  &nbsp;
+  <tr class="head">
+    <td align="right"><b>Reputation</b></td>
+
+    <% for review in reviews %>
+
+        <td align="center">
+            <%reputation = Participant.find(review.map.reviewer.id) %>
+
+          <%if @assignment.lauw == true %>
+            <%=reputation.Lauw%>
+          <%else%>
+            <%=reputation.Hamer%>
+          <%end%>
+        </td>
+    <% end %>
+  </tr>
+
 </table>

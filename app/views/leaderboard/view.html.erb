@@ -5,18 +5,27 @@
 <div style="margin-top: 50px">
   <table class="table">
     <thead>
-      <tr>
-        <td><strong>Student Name</strong></td>
-        <td><strong>Number of Badges</strong></td>
-      </tr>
+    <tr>
+      <td><strong>Student Name</strong></td>
+      <td><strong>Number of Badges</strong></td>
+      <td><strong>Badges</strong></td>
+    </tr>
     </thead>
     <tbody>
-      <% @students.each do |student| %>
+    <% @sorted_student_badges.each do |student, badge| %>
+        <% stu = User.find_by_id(student) %>
         <tr>
-          <td><%= student.name %></td>
-          <td>0</td>
+          <td><%= stu.name %></td>
+          <td><%= @sorted_student_badges[student].count %></td>
+          <td>
+            <div id="thumbwrap">
+              <% badge.each do |b| %>
+                  <a class="thumb" href="#"><img src=<%= @badgeURL[b] %> alt="" width="50px" height="50px" title=<%= @badge_names[b] %> ></a>
+              <% end %>
+            </div>
+          </td>
         </tr>
-      <% end %>
+    <% end %>
     </tbody>
 
   </table>

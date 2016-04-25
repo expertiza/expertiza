@@ -255,6 +255,7 @@ class AssignmentForm
       @assignment.is_calibrated =  false
     end
   end
+
   #NOTE: unfortunately this method is needed due to bad data in db @_@
   def set_up_defaults
     staggered_deadline

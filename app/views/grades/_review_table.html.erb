@@ -49,8 +49,34 @@
             <%reputation = Participant.find(review.map.reviewer.id) %>
 
           <%if @assignment.lauw == true %>
+              <p style = "
+              <% if reputation.Lauw < 0.2 %>
+                  background-color:red; width:20px;
+                  <%elsif reputation.Lauw >= 0.2 && @participant.Lauw <= 0.4 %>
+                  background-color:yellow; width:20px;
+                  <%elsif  reputation.Lauw > 0.4 && @participant.Lauw <= 0.6 %>
+                  background-color:orange; width:20px;
+                  <%elsif  reputation.Lauw > 0.6 && @participant.Hamer <= 0.8   %>
+                  background-color:lightgreen; width:20px;
+                  <%else%>
+                  background-color:green; width:20px;
+                  <%end%>
+              ">
             <%=reputation.Lauw%>
           <%else%>
+              <p style = "
+              <% if reputation.Hamer < 0.5 %>
+                  background-color:red; width:20px;
+                  <%elsif reputation.Hamer >= 0.5 && @participant.Hamer <= 1 %>
+                  background-color:yellow; width:20px;
+                  <%elsif  reputation.Hamer > 1 && @participant.Hamer <= 1.5 %>
+                  background-color:orange; width:20px;
+                  <%elsif  reputation.Hamer > 1.5 && @participant.Hamer <= 2   %>
+                  background-color:lightgreen; width:20px;
+                  <%else%>
+                  background-color:green; width:20px;
+                  <%end%>
+              ">
             <%=reputation.Hamer%>
           <%end%>
         </td>

@@ -13,7 +13,7 @@ class ScheduledTask
   end
 
   def perform
-    assignment = Assignment.find(self.assignment_id)
+    assignment = Assignment.find_by_id(self.assignment_id)
     if assignment != nil && assignment.id != nil
       if(self.deadline_type == "metareview")
         mail_metareviewers

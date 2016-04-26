@@ -8,7 +8,7 @@ class Participant < ActiveRecord::Base
   has_many   :resubmission_times, :dependent => :destroy
   has_many   :reviews, :class_name => 'ResponseMap', :foreign_key => 'reviewer_id', dependent: :destroy
   has_many   :team_reviews, :class_name => 'ReviewResponseMap', :foreign_key => 'reviewer_id', dependent: :destroy
-  has_many :response_maps, :class_name =>'ResponseMap', :foreign_key => 'reviewee_id', dependent: :destroy
+  has_many   :response_maps, :class_name =>'ResponseMap', :foreign_key => 'reviewee_id', dependent: :destroy
 
   def team
     TeamsUser.where(user: user).first.try :team

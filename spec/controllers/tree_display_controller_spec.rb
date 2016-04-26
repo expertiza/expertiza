@@ -115,13 +115,11 @@ describe TreeDisplayController do
       @deadline_right = FactoryGirl.create(:deadline_right)
       @due_date = FactoryGirl.create(:due_date)
     end
-
     it "returns a list of course objects(private) as json" do
       params = FolderNode.all()
       get :get_children_node_ng, { :reactParams => { :child_nodes => params.to_json , :nodeType => "FolderNode" } }, { :user => @instructor }
       expect(response.body).to match /csc517\/test/
     end
-
     it "returns an empty list when there are no private or public courses" do
       params = FolderNode.all()
       @instructor.id = 2
@@ -129,7 +127,6 @@ describe TreeDisplayController do
       get :get_children_node_ng, { :reactParams => { :child_nodes => params.to_json , :nodeType => "FolderNode" } }, { :user => @instructor }
       expect(response.body).to eq "{\"Courses\":[]}"
     end
-
     it "returns a list of course objects(public) as json" do
       params = FolderNode.all()
       @instructor.id = 2

@@ -4,14 +4,20 @@ include ParticipantsHelper
 
 describe 'update_reputation' do
   before(:each) do
-    @participant = Participant.find_by[:id]
+    @participant = Participant.all
   end
 
-  it 'should update reputation' do
-    expect{
-      post :send_post_request, Hamer,Lauw: Participant.attributes_for(:Hamer, :Lauw)
-    }.to change(Hamer.value)
-     .and change(Lauw.value)
+  #it 'should update reputation' do
+    #expect{
+      #post :update, :Hamer => @participant.Hamer
+    #}.to change
 
-  end
+  #end
+
+  #it 'should exist' do
+
+    #post :update, { :format => 'json'}
+   # expect(response.body).to exist
+
+  #end
 end

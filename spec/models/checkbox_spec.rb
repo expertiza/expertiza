@@ -32,7 +32,7 @@ describe Checkbox do
   describe "#view_completed_question" do
     it "returns the html " do
       html = checkbox2.view_completed_question(0, answer).to_s
-      expect(html).to eq("<big><b>Question 0:</b>&nbsp;&nbsp;<img src=\"/assets/Check-icon.png\"><i>test txt3</i></big><BR/><BR/>")
+      expect(html).to eq("<b>0. &nbsp;&nbsp;<img src=\"/assets/Check-icon.png\">test txt3</b><BR/><BR/>")
     end
   end
 end

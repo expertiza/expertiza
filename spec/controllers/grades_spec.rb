@@ -1,5 +1,5 @@
 require 'rails_helper'
-include GradesHelper
+#include GradesHelper
 
 describe GradesController do
 
@@ -71,6 +71,8 @@ describe GradesController do
 
     get :conflict_notification, @params
   end
+
+
 #
 #   it 'prepares the email content for a conflict notification email when user is a TA' do
 #     user = double(Assignment)
@@ -131,3 +133,19 @@ describe GradesController do
 end
 #
 #
+
+describe "check reputation_score" do
+  xit "check reputation_score" do
+    login_as("student5976")
+    #visit "localhost:3000"
+    #fill_in 'login_name', with: "student5976"
+    #fill_in 'login_password', with: 'password'
+    #click_button 'SIGN IN'
+    #stub_current_user(user, user.role.name, user.role)
+    click_link 'Evolution Narrative Timeline'
+    click_link 'Your Scores'
+    visit '/grades/view_my_scores/'
+    expect(page).to have_select("reputation_score", :options => [0,100])
+  end
+
+end

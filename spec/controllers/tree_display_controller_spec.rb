@@ -43,6 +43,37 @@ describe TreeDisplayController do
       expect(session[:root]).to eq('1')
       expect(response).to redirect_to(list_tree_display_index_path)
     end
-
   end
+
+  describe "GET #get_folder_node_ng" do
+    before do
+      @treefolder = TreeFolder.new
+      @treefolder.parent_id = nil
+      @treefolder.name = "Courses"
+      @treefolder.child_type = "CourseNode"
+      @treefolder.save
+      @foldernode = FolderNode.new
+      @foldernode.parent_id = nil
+      @foldernode.type = "FolderNode"
+    end
+    it "populates a list of FolderNodes when there is a match" do
+
+      @foldernode.node_object_id = 1
+      @foldernode.save
+
+      get :get_folder_node_ng
+      expect(response.body).to match [@foldernode].to_json
+    end
+    it "populates an empty list when there is no match" do
+
+      @foldernode.node_object_id = 2
+      @foldernode.save
+
+      get :get_folder_node_ng
+      expect(response.body).to eq "[]"
+    end
+  end
+  it { should respond_to(:get_folder_node_ng) }
+  it { should respond_to(:get_children_node_ng) }
+  it { should respond_to(:get_children_node_2_ng) }
 end

@@ -50,7 +50,7 @@ require 'rails_helper'
         check("assignment_form_assignment_reviews_visible_to_all")
         check("assignment_form_assignment_is_calibrated")
         uncheck("assignment_form_assignment_availability_flag")
-        expect(page).to have_select("assignment_lauw_field", :options => ['Hamer', 'Lauw'])
+        expect(page).to have_select("assignment_form[assignment][lauw]", :options => ['Hamer', 'Lauw'])
 
 
         click_button 'Create'
@@ -77,7 +77,7 @@ require 'rails_helper'
         check("assignment_form_assignment_reviews_visible_to_all")
         check("assignment_form_assignment_is_calibrated")
         uncheck("assignment_form_assignment_availability_flag")
-        expect(page).to have_select("assignment_lauw_field", :options => ['Hamer', 'Lauw'])
+        expect(page).to have_select("assignment_form[assignment][lauw]", :options => ['Hamer', 'Lauw'])
 
 
         click_button 'Create'

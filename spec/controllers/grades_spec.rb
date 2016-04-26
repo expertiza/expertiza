@@ -71,6 +71,10 @@ describe GradesController do
 
     get :conflict_notification, @params
   end
+
+  it "should check that student has a reputation displayed" do
+    expect(page).to have_select("assignment_form[assignment][lauw]", :options => [1,100])
+  end
 #
 #   it 'prepares the email content for a conflict notification email when user is a TA' do
 #     user = double(Assignment)

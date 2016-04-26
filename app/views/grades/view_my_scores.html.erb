@@ -2,13 +2,12 @@
 
 
 
-   
 <TABLE class="grades" >
 <%= render :partial => 'grades/participant_charts', :locals => {:prefix => nil} %> 
 <%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>
 <%= render :partial => 'grades/participant', :locals => {:prefix => 'user',
 														 :team => false,
-														 :participant_id => @participant.id,
+														 :participant_id => ptid = @participant.id,
 														 :index => 0,
                             	   						 :team_size => 1, 
 														 :pscore => @pscore} %>
@@ -16,33 +15,33 @@
 </TABLE>
 <h3>Reputation</h3>
 <% if @assignment.lauw == false %>
-    <p style = "
-    <% if @participant.Hamer < 0.5 %>
-        background-color:red; width:40px;
-        <%elsif @participant.Hamer >= 0.5 && @participant.Hamer <= 1 %>
-        background-color:yellow; width:40px;
-    <%elsif  @participant.Hamer > 1 && @participant.Hamer <= 1.5 %>
-        background-color:orange; width:40px;
-    <%elsif  @participant.Hamer > 1.5 && @participant.Hamer <= 2   %>
-        background-color:lightgreen; width:40px;
+    <p id = "reputation_score" style = "
+    <% if @current_participant.Hamer < 0.5 %>
+        background-color:red; width:60px;
+        <%elsif @current_participant.Hamer >= 0.5 && @current_participant.Hamer <= 1 %>
+        background-color:yellow; width:60px;
+    <%elsif  @current_participant.Hamer > 1 && @current_participant.Hamer <= 1.5 %>
+        background-color:orange; width:60px;
+    <%elsif  @current_participant.Hamer > 1.5 && @current_participant.Hamer <= 2   %>
+        background-color:lightgreen; width:60px;
     <%else%>
-        background-color:green; width:40px;
+        background-color:greenyellow; width:60px;
         <%end%>
-    "><%= @participant.Hamer %></p>
+    "><%= @current_participant.Hamer %></p>
 <%else%>
-    <p style = "
-    <% if @participant.Lauw < 0.2 %>
-        background-color:red; width:40px;
-        <%elsif @participant.Lauw >= 0.2 && @participant.Lauw <= 0.4 %>
-        background-color:yellow; width:40px;
-    <%elsif  @participant.Lauw > 0.4 && @participant.Lauw <= 0.6 %>
-        background-color:orange; width:40px;
-    <%elsif  @participant.Lauw > 0.6 && @participant.Hamer <= 0.8   %>
-        background-color:lightgreen; width:40px;
+    <p id = "reputation_score" style = "
+    <% if @current_participant.Lauw < 0.2 %>
+        background-color:red; width:60px;
+        <%elsif @current_participant.Lauw >= 0.2 && @current_participant.Lauw <= 0.4 %>
+        background-color:yellow; width:60px;
+    <%elsif  @current_participant.Lauw > 0.4 && @current_participant.Lauw <= 0.6 %>
+        background-color:orange; width:60px;
+    <%elsif  @current_participant.Lauw > 0.6 && @current_participant.Hamer <= 0.8   %>
+        background-color:lightgreen; width:60px;
     <%else%>
-        background-color:green; width:40px;
+        background-color:greenyellow; width:60px;
         <%end%>
-    "><%= @participant.Lauw %></p>
+    "><%= @current_participant.Lauw %></p>
 <%end%>
 <BR/>
 <a href="javascript:window.history.back()">Back</a>

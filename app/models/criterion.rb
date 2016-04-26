@@ -161,7 +161,12 @@ class Criterion < ScoredQuestion
   def view_completed_question(count, answer,questionnaire_max)
 		html = '<b>' + count.to_s + ". " + self.txt + ' [Max points: ' + questionnaire_max.to_s + "]</b>"
     score = if !answer.answer.nil? then answer.answer.to_s else "-" end
-    score_percent = answer.answer*1.0/questionnaire_max
+    if score != "-"
+      score_percent = answer.answer*1.0/questionnaire_max
+    else
+      score_percent = 0
+    end
+    
     if score_percent > 0.8
       score_color = "c5"
     elsif score_percent > 0.6

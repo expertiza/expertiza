@@ -114,7 +114,7 @@ describe TreeDisplayController do
       @review_response_map = FactoryGirl.create(:review_response_map)
       @question = FactoryGirl.create(:question)
       @deadline_right = FactoryGirl.create(:deadline_right)
-      @due_date = FactoryGirl.create(:due_date)
+      @due_date1 = FactoryGirl.create(:due_date1)
     end
     it "returns a list of course objects(private) as json" do
       params = FolderNode.all()

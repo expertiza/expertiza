@@ -190,6 +190,25 @@ FactoryGirl.define do
   end 
 
   factory :due_date ,class:DueDate do
+    due_at  "2015-12-30 23:30:12"
+    deadline_type { DeadlineType.first || association(:deadline_type)} 
+    assignment { Assignment.first || association(:assignment)} 
+    submission_allowed_id 3
+    review_allowed_id  3
+    resubmission_allowed_id  3
+    rereview_allowed_id  3
+    review_of_review_allowed_id  3
+    round  1
+    flag  false
+    threshold  1
+    delayed_job_id  nil
+    deadline_name  nil
+    description_url nil
+    quiz_allowed_id 3
+    teammate_review_allowed_id 3
+  end
+
+  factory :due_date1 ,class:DueDate do
     due_at  "2016-12-30 23:30:12"
     deadline_type { DeadlineType.first || association(:deadline_type)} 
     assignment { Assignment.first || association(:assignment)} 

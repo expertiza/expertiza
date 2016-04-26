@@ -6,10 +6,8 @@
 
       <% @surveys.each do |s| %>
           <tr>
-            <% @review_mappings.each do |mapping| %>
             <td>
-              <%= link_to s[0].name, :controller => 'survey_response', :action => 'new', :id=> mapping.id %>
-            <% end %>
+              <%= link_to s[0].name, :controller => 'survey_response', :action => 'new_course_survey_response', :questionnaire_id=> s[0].id %>
           </tr>
       <% end %>
   <% else %>

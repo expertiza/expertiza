@@ -18,6 +18,6 @@ class CourseSurveyController < ApplicationController
         end
       end
     end
-    @review_mappings = ReviewResponseMap.where(reviewer_id: session[:user])
+
  end
 end

@@ -13,4 +13,7 @@ class SurveyResponseController < ResponseController
       @course = Course.find(params[:id])
     end
   end
+  def new_course_survey_response
+    @survey_response_questionnaire = SurveyQuestionnaire.new
+  end
 end

@@ -49,7 +49,7 @@
             <%reputation = Participant.find(review.map.reviewer.id) %>
 
           <%if @assignment.lauw == true %>
-              <p style = "
+              <p id = "reputation_score" style = "
               <% if reputation.Lauw < 0.2 %>
                   background-color:red; width:60px;
                   <%elsif reputation.Lauw >= 0.2 && reputation.Lauw <= 0.4 %>
@@ -64,7 +64,7 @@
               ">
             <%=reputation.Lauw%>
           <%else%>
-              <p style = "
+              <p id = "reputation_score" style = "
               <% if reputation.Hamer < 0.5 %>
                   background-color:red; width:60px;
                   <%elsif reputation.Hamer >= 0.5 && reputation.Hamer <= 1 %>

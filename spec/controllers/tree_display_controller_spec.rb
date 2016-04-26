@@ -83,7 +83,8 @@ describe TreeDisplayController do
       expect(response).to have_http_status(200)
     end
   end
-  describe "GET #get_children_node_ng" do
+
+  describe "POST #get_children_node_ng" do
     before do
       @treefolder = TreeFolder.new
       @treefolder.parent_id = nil
@@ -117,14 +118,14 @@ describe TreeDisplayController do
     end
     it "returns a list of course objects(private) as json" do
       params = FolderNode.all()
-      get :get_children_node_ng, { :reactParams => { :child_nodes => params.to_json , :nodeType => "FolderNode" } }, { :user => @instructor }
+      post :get_children_node_ng, { :reactParams => { :child_nodes => params.to_json , :nodeType => "FolderNode" } }, { :user => @instructor }
       expect(response.body).to match /csc517\/test/
     end
     it "returns an empty list when there are no private or public courses" do
       params = FolderNode.all()
       @instructor.id = 2
       @instructor.save
-      get :get_children_node_ng, { :reactParams => { :child_nodes => params.to_json , :nodeType => "FolderNode" } }, { :user => @instructor }
+      post :get_children_node_ng, { :reactParams => { :child_nodes => params.to_json , :nodeType => "FolderNode" } }, { :user => @instructor }
       expect(response.body).to eq "{\"Courses\":[]}"
     end
     it "returns a list of course objects(public) as json" do
@@ -133,7 +134,7 @@ describe TreeDisplayController do
       @instructor.save
       @course.private = false
       @course.save
-      get :get_children_node_ng, { :reactParams => { :child_nodes => params.to_json , :nodeType => "FolderNode" } }, { :user => @instructor }
+      post :get_children_node_ng, { :reactParams => { :child_nodes => params.to_json , :nodeType => "FolderNode" } }, { :user => @instructor }
       expect(response.body).to match /csc517\/test/
     end
   end

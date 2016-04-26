@@ -195,7 +195,7 @@ class Team < ActiveRecord::Base
 
   #REFACTOR BEGIN:: class methods import export moved from course_team & assignment_team to here
   #Import from csv
-  def self.import(row, id, options,teamtype)
+  def self.import(row, id, options, teamtype)
     raise ArgumentError, "Not enough fields on this line" if (row.length < 2 && options[:has_column_names] == "true") || (row.length < 1 && options[:has_column_names] != "true")
 
     if options[:has_column_names] == "true"
@@ -269,13 +269,13 @@ class Team < ActiveRecord::Base
   end
 
   #Create the team with corresponding tree node
-  def self.create_team_and_node(id,teamtype)
-    if teamtype.is_a?(CourseTeam)
+  def self.create_team_and_node(id, teamtype = 'AssignmentTeam')
+    if teamtype == 'CourseTeam'
       curr_course = Course.find(id)
       team_name = Team.generate_team_name(curr_course.name)
       team = CourseTeam.create(name: team_name, parent_id: id)
       TeamNode.create(parent_id: id, node_object_id: team.id)
-    elsif teamtype.is_a?(AssignmentTeam)
+    elsif teamtype == 'AssignmentTeam'
       curr_assignment = Assignment.find(id)
       team_name = Team.generate_team_name(curr_assignment.name)
       team = AssignmentTeam.create(name: team_name, parent_id: id)

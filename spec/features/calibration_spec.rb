@@ -384,18 +384,18 @@ describe 'Create and Display Calibration' do
 
   #creates a questionnaire, assigns it to the assignment, fills out the questionaire,
   #displays the questionaire response, checks to make sure the score is there
-  it 'create a questionnaire, fill it out, display results', :js => true do
 
-    create_fill_questionnaire
-    #review should be submitted at this point. click on view to make sure you can see it
-    #click_link "View"
-    visit "/response/view?id=#{@assignment.id}&return=assignment_edit"
-    #review is hidden by default, click on show review to show your review.
-    click_on "show review"
-    #once you click show review, the score label comes up as well as some other fields.
-    expect(page).to have_content('Score:')
-
-  end
+  # Removing this test since the 'Score' is removed in Pull 678
+  # it 'create a questionnaire, fill it out, display results', :js => true do
+  #   create_fill_questionnaire
+  #   #review should be submitted at this point. click on view to make sure you can see it
+  #   #click_link "View"
+  #   visit "/response/view?id=#{@assignment.id}&return=assignment_edit"
+  #   #review is hidden by default, click on show review to show your review.
+  #   click_on "show review"
+  #   #once you click show review, the score label comes up as well as some other fields.
+  #   expect(page).to have_content('Score:')
+  # end
 
 end
 
@@ -473,7 +473,8 @@ describe 'Display Calibration For Student' do
     #review is hidden by default, click on show review to show your review.
     click_on "show review"
     #once you click show review, the score label comes up as well as some other fields.
-    expect(page).to have_content('Score:')
+    # Removing this check since this text is removed in Pull 678
+    # expect(page).to have_content('Score:')
 
     #login as student1
     visit "/menu/impersonate"

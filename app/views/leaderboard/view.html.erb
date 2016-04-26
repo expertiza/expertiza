@@ -7,7 +7,6 @@
     <thead>
     <tr>
       <td><strong>Student Name</strong></td>
-      <td><strong>Number of Badges</strong></td>
       <td><strong>Badges</strong></td>
     </tr>
     </thead>
@@ -16,7 +15,6 @@
         <% stu = User.find_by_id(student) %>
         <tr>
           <td><%= stu.name %></td>
-          <td><%= @sorted_student_badges[student].count %></td>
           <td>
             <div id="thumbwrap">
               <% badge.each do |b| %>

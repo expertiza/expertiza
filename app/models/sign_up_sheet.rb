@@ -5,7 +5,7 @@ class SignUpSheet < ActiveRecord::Base
     if users_team.size == 0
       #if team is not yet created, create new team.
       #create Team and TeamNode
-      team = AssignmentTeam.create_team_and_node(assignment_id)
+      team = AssignmentTeam.create_team_and_node(assignment_id, AssignmentTeam.name)
       user = User.find(user_id)
       #create TeamsUser and TeamUserNode
       teamuser = ApplicationController.helpers.create_team_users(user, team.id)

@@ -365,7 +365,7 @@ class ReviewMappingController < ApplicationController
       participants.each do |participant|
         user = participant.user
         unless TeamsUser.team_id(assignment_id, user.id)
-          team = AssignmentTeam.create_team_and_node(assignment_id)
+          team = AssignmentTeam.create_team_and_node(assignment_id, AssignmentTeam.name)
           ApplicationController.helpers.create_team_users(participant.user, team.id)
           teams << team
         end

@@ -29,7 +29,7 @@ describe "scale" do
   describe "#view_completed_question" do
     it "returns the html " do
       html = scale.view_completed_question(0, answer, 5).to_s
-      expect(html).to eq("<big><b>Question 0:</b> <I>test txt</I></big><BR/><BR/><B>Score:</B> <FONT style=\"BACKGROUND-COLOR:gold\">8</FONT> out of <B>5</B></TD>")
+      expect(html).to eq("<b>0. test txt</b><BR/><BR/><B>Score:</B> <FONT style=\"BACKGROUND-COLOR:gold\">8</FONT> out of <B>5</B></TD>")
     end
   end
 

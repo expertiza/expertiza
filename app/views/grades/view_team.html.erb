@@ -1,96 +1,84 @@
 
 <script>
-    $(function () { 
-      $("[data-toggle='tooltip']").tooltip(); 
-      $("#scoresTable").tablesorter();
-      $("#rowsort").click(function() {
+  $(function () { 
+    $("[data-toggle='tooltip']").tooltip(); 
+    $("#scoresTable").tablesorter();
+  });
 
+  // Function to sort the columns based on the total review score
+  function col_sort(m, lesser) {
 
-        jQuery.moveColumn = function (table, from, to) {
-          var rows = jQuery('tr', table);
-          var cols;
-          rows.each(function() {
-            cols = jQuery(this).children('th, td');
-            cols.eq(from).detach().insertBefore(cols.eq(to));
-            if(from-to>1)
-            {
-              cols.eq(to).detach().insertAfter((cols.eq(from-1)));
+    // Swaps two columns of the table
+    jQuery.moveColumn = function(table, from, to) {
+      var rows = jQuery('tr', table);
+      var cols;
+      rows.each(function() {
+        cols = jQuery(this).children('th, td');
+        cols.eq(from).detach().insertBefore(cols.eq(to));
+        if (from - to > 1) {
+          cols.eq(to).detach().insertAfter((cols.eq(from - 1)));
 
-            }
-          });
         }
-
-
-
-        var tables = $("table.tbl_heat")
-
-
-        for (var m = 0; m < tables.length; m++) {
-
-          var tbr = tables.eq(m).find('tr.accordion-toggle');
-
-
-
-
-          var columns=  tbr.eq(tbr.length-1).find('td')
-          var sum_array = []
-          for (var l = 2; l < columns.length-2; l++)
-          {
-            var Total =0
-            for (var n = 0; n < tbr.length; n++)
-            {
-              var row_slice=tbr.eq(n).find('td')
-              //alert(row_slice[l].innerHTML)
-              if(parseInt(row_slice[l].innerHTML)>0)
-              {
-                Total = Total+parseInt(row_slice[l].innerHTML)
-              }
-            }
-            //alert(Total)
-            sum_array.push(Total)
-
-          }
-
-
-          for (var i = 3; i < columns.length-2; i++) {
-            for (var j = 3; j < columns.length-2; j++) {
-
-
-              var k=j-1
-
-              if(sum_array[j-2]>sum_array[k-2])
-              {
-                var tmp
-                tmp=sum_array[j-2]
-                sum_array[j-2]=sum_array[k-2]
-                sum_array[k-2]=tmp
-
-                jQuery.moveColumn($("table.tbl_heat").eq(m), j, k);
-                var tables = $("table.tbl_heat")
-
-                var tbr = tables.eq(m).find('tr.accordion-toggle');
-
-                var columns=  tbr.eq(tbr.length-1).find('td')
-              }
-            }
-          }
-        }
-
-
-
-
-
       });
-    });
+    }
+
+    // Gets all the table with the class "tbl_heat"
+    var tables = $("table.tbl_heat");
+    // Get all the rows with the class accordion-toggle
+    var tbr = tables.eq(m).find('tr.accordion-toggle');
+    // Get the cells from the last row of the table
+    var columns = tbr.eq(tbr.length - 1).find('td');
+    // Init an array to hold the review total
+    var sum_array = [];
+    // iterate through the rows and calculate the total of each review
+    for (var l = 2; l < columns.length - 2; l++) {
+      var total = 0;
+      for (var n = 0; n < tbr.length; n++) {
+        var row_slice = tbr.eq(n).find('td');
+        if (parseInt(row_slice[l].innerHTML) > 0) {
+          total = total + parseInt(row_slice[l].innerHTML)
+        }
+      }
+      sum_array.push(total)
+    }
+
+    // The sorting algorithm
+    for (var i = 3; i < columns.length - 2; i++) {
+      for (var j = 3; j < columns.length - 2; j++) {
+        var k = j - 1
+        if (compare(sum_array[j - 2], sum_array[k - 2], lesser)) {
+          var tmp
+          tmp = sum_array[j - 2]
+          sum_array[j - 2] = sum_array[k - 2]
+          sum_array[k - 2] = tmp
+          jQuery.moveColumn($("table.tbl_heat").eq(m), j, k);
+          // This part is repeated since the table is updated
+          tables = $("table.tbl_heat")
+          tbr = tables.eq(m).find('tr.accordion-toggle');
+          columns = tbr.eq(tbr.length - 1).find('td')
+        }
+      }
+    }
+  }
+
+  // Function to return boolean based on lesser or greater operator
+  function compare(a, b, less) {
+    if(less) {
+      return a < b
+    } else {
+      return a > b
+    }
+  }
+
 
 
 </script>
-<a id="rowsort" href="#">Row Sort</a>
+
 <h1>Summary Report for assignment: <%= @assignment.name %></h1>
 <h4>Team: <%= @team.name %></h4>
 
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
-
+<% table_count = 0 %>
 <% @vmlist.each do |vm| %>
 
     <% if (vm.questionnaire_display_type == "Metareview" or vm.questionnaire_display_type == "Author Feedback" or vm.questionnaire_display_type == "Teammate Review") and @current_role_name.eql?'Student' %>
@@ -202,12 +190,16 @@
                     <div>
                       <table class="tbl_questlist">
                         <thead>
+                        <th>Review No.</th>
                         <th>Score</th>
                         <th>Comment</th>
                         </thead>
                         <% for index in 0 .. row.score_row.length - 1 %>
-                            <tr><td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
-                              <td><%= row.score_row[index].comment %></td></tr>
+                            <tr>
+                              <td>Rev<%=index + 1%></td>
+                              <td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
+                              <td><%= row.score_row[index].comment %></td>
+                            </tr>
                         <% end %>
                       </table>
                     </div>
@@ -243,8 +235,11 @@
 
           </table>
           <!-- Display the list of team members, for Peer Reviews. -->
+          <a href="#" onclick="col_sort(<%=table_count%>, true)" data-toggle="tooltip" title="Sort reviews in ascending order of the total score">ASC</a>&nbsp;
+          <a href="#" onclick="col_sort(<%=table_count%>, false)" data-toggle="tooltip" title="Sort reviews in descending order of the total score">DESC </a>
+          <br>
+          <% table_count += 1%>
           <span> <%= vm.display_team_members %></span>
-
           <!-- this elsif terminates the heatgrid code.  -->
         <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
             <div class="flash_error">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>

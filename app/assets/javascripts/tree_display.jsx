@@ -637,9 +637,14 @@ jQuery(document).ready(function() {
                   "display": "none"
               }
           }
-          if (this.props.dataType != 'questionnaire') {
+          if (this.props.dataType == 'course') {
               _rows.push(<TitleRow
-                  title="Private"
+                  title="My Courses"
+              />)
+          }
+          else if(this.props.dataType=='assignment') {
+              _rows.push(<TitleRow
+                  title="My Assignments"
               />)
           }
           jQuery.each(this.props.data, function (i, entry) {
@@ -682,9 +687,14 @@ jQuery(document).ready(function() {
               }
           })
           if (this.props.showPublic) {
-              if (this.props.dataType != 'questionnaire') {
+              if (this.props.dataType == 'course') {
                   _rows.push(<TitleRow
-                      title="Public"
+                      title="Other's Public Courses"
+                  />)
+              }
+              else if(this.props.dataType=='assignment') {
+                  _rows.push(<TitleRow
+                      title="Other's Public Assignments"
                   />)
               }
           jQuery.each(this.props.data, function (i, entry) {

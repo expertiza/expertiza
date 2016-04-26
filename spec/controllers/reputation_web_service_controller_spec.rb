@@ -7,12 +7,12 @@ describe 'update_reputation' do
     @participant = Participant.all
   end
 
-  #it 'should update reputation' do
+  xit 'should update reputation' do
     #expect{
       #post :update, :Hamer => @participant.Hamer
     #}.to change
 
-  #end
+  end
 
   #it 'should exist' do
 

@@ -61,8 +61,7 @@ RSpec.configure do |config|
     msg = user.to_yaml
     File.open('log/diagnostic.txt', 'a') { |f| f.write msg }
 
-    #visit root_path
-    visit "localhost:3000/"
+    visit root_path
     fill_in 'login_name', with: user_name
     fill_in 'login_password', with: 'password'
     click_button 'SIGN IN'

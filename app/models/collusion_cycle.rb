@@ -8,21 +8,27 @@ class CollusionCycle < ActiveRecord::Base
 
 
     #Begin Changes ==== Create a method to make a graph
-  def self.create_graph_response_map(assignment)
+  def self.create_graph_response_map(assignment, threshold)
     graph = Hash.new
 
     @response_maps = ResponseMap.select("*").where(["type=? and reviewed_object_id=?", "ReviewResponseMap", assignment])
+
+    # Get assignment scores
+    @assignment = Assignment.find(assignment)
+    review_scores = @assignment.compute_reviews_hash
 
     for response_map in @response_maps
       @response = Response.find_by_map_id(response_map.id)
       if ! @response.nil?
         reviewer_user_id = get_user_from_reviewer(response_map.reviewer)
         reviewee_user_id = get_user_from_reviewee(response_map.reviewee)
-        if graph.key?(reviewer_user_id)
-          graph.values_at(reviewer_user_id).append(reviewee_user_id)
-        else
-          graph[reviewer_user_id] = reviewee_user_id
-        end
+         if review_scores[response_map.reviewer_id][1][response_map.reviewee_id] > threshold
+          if graph.key?(reviewer_user_id)
+            graph.values_at(reviewer_user_id).append(reviewee_user_id)
+          else
+            graph[reviewer_user_id] = reviewee_user_id
+          end
+         end
       end
     end
 
@@ -54,7 +60,7 @@ class CollusionCycle < ActiveRecord::Base
 
 
   # Begin Changes ==== Create a method to do DFS on the graph and return nodes for which there is a cycle and parent array
-  def self.cycle_detection(graph)
+  def self.cycle_detection(graph,assignment)
     white_set = Set.new
     gray_set = Set.new
     black_set = Set.new

@@ -474,6 +474,7 @@ Expertiza::Application.routes.draw do
       get :view_responses
     	get :begin_survey
     	get :comments
+      get :new_course_survey_response
     end
   end
 

@@ -15,5 +15,7 @@ class SurveyResponseController < ResponseController
   end
   def new_course_survey_response
     @survey_response_questionnaire = SurveyQuestionnaire.new
+    @questionnaire = Questionnaire.find(params[:questionnaire_id])
+    @questions = Question.where('questionnaire_id = ?',params[:questionnaire_id])
   end
 end

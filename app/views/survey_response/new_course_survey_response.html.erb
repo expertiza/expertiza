@@ -1,14 +1,14 @@
-<h1> New course Survey pages</h1>
-<%= form_for @survey_response_questionnaire do |s|%>
+<h1><%= @questionnaire.name %> </h1>
+<%#= form_for @survey_response_questionnaire do |s|%>
     <table>
       <% i=0 %>
       <% if !@questions.nil? %>
-          <%=  @questions.each do |question| %>
+          <%  @questions.each do |question| %>
               <% i=i+1 %>
               <tr>
                 <td>Question <%= i%> :  <%= question.txt %> </td>
 
-                <td><%= s.text_field :score %></td>
+                <td><%#= s.text_field :score %></td>
               </tr>
 
 
@@ -20,4 +20,4 @@
 
     </table>
 
-<% end %>
+<%#end %>

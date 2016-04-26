@@ -108,7 +108,7 @@ class LeaderboardController < ApplicationController
     #get badge URLs
     @badgeURL, @badge_names = LeaderboardHelper.get_badges_info @course
     @student_badges.delete_if { |k, v| v.nil? }
-    @sorted_student_badges = Hash[@student_badges.sort_by { |k, v| v }.reverse]
+    @sorted_student_badges = Hash[@student_badges.sort_by { |k, v| v.size }.reverse]
     @badgeURL
   end
 

@@ -40,44 +40,46 @@
 	    <% end %>
 	</tr>
   &nbsp;
+
+  <!--Adding code for fetching the reputation -->
   <tr class="head">
     <td align="right"><b>Reputation</b></td>
 
     <% for review in reviews %>
 
         <td align="center">
-            <%reputation = Participant.find(review.map.reviewer.id) %>
+            <% review_participant = Participant.find(review.map.reviewer.id) %>
 
           <%if @assignment.lauw == true %>
               <p id = "reputation_score" style = "
-              <% if reputation.Lauw < 0.2 %>
+              <% if review_participant.Lauw < 0.2 %>
                   background-color:red; width:60px;
-                  <%elsif reputation.Lauw >= 0.2 && reputation.Lauw <= 0.4 %>
+                  <%elsif review_participant.Lauw >= 0.2 && review_participant.Lauw <= 0.4 %>
                   background-color:yellow; width:60px;
-                  <%elsif  reputation.Lauw > 0.4 && reputation.Lauw <= 0.6 %>
+                  <%elsif  review_participant.Lauw > 0.4 && review_participant.Lauw <= 0.6 %>
                   background-color:orange; width:60px;
-                  <%elsif  reputation.Lauw > 0.6 && reputation.Lauw <= 0.8   %>
+                  <%elsif  review_participant.Lauw > 0.6 && review_participant.Lauw <= 0.8   %>
                   background-color:lightgreen; width:60px;
                   <%else%>
                   background-color:greenyellow; width:60px;
                   <%end%>
               ">
-            <%=reputation.Lauw%>
+            <%= review_participant.Lauw%>
           <%else%>
               <p id = "reputation_score" style = "
-              <% if reputation.Hamer < 0.5 %>
+              <% if review_participant.Hamer < 0.5 %>
                   background-color:red; width:60px;
-                  <%elsif reputation.Hamer >= 0.5 && reputation.Hamer <= 1 %>
+                  <%elsif review_participant.Hamer >= 0.5 && review_participant.Hamer <= 1 %>
                   background-color:yellow; width:60px;
-                  <%elsif  reputation.Hamer > 1 && reputation.Hamer <= 1.5 %>
+                  <%elsif  review_participant.Hamer > 1 && review_participant.Hamer <= 1.5 %>
                   background-color:orange; width:60px;
-                  <%elsif  reputation.Hamer > 1.5 && reputation.Hamer <= 2   %>
+                  <%elsif  review_participant.Hamer > 1.5 && review_participant.Hamer <= 2   %>
                   background-color:lightgreen; width:60px;
                   <%else%>
                   background-color:greenyellow; width:60px;
                   <%end%>
               ">
-            <%=reputation.Hamer%>
+            <%= review_participant.Hamer%>
           <%end%>
         </td>
     <% end %>

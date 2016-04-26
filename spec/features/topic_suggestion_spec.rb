@@ -10,6 +10,7 @@ require 'selenium-webdriver'
     pubAssignment = nil
     before(:each) do
       create(:assignment)
+      create(:instructorb)
       create(:student)
       create(:studentb)
       create(:assignment_node)
@@ -32,7 +33,7 @@ require 'selenium-webdriver'
    describe "case1", :js => true do
 
     it "Instructor set an assignment which allow student suggest topic and register student11" do
-      login_as "instructor6"
+      login_as "instructor7"
       #create an assignment
       visit '/assignments/new?private=0'
       expect(page).to have_content "Assignment name"
@@ -47,32 +48,24 @@ require 'selenium-webdriver'
       click_button "Save"
       expect(page).to have_content "Assignment was successfully saved"    
       expect(Assignment.find(2).allow_suggestions).to eq true
-      #sleep 1000
 
-      #register student
-      visit '/tree_display/list'
-     #expect(page).to have_content "Assignment_suggest_topic"
       visit '/participants/list?id=2&model=Assignment'
-      #fill_in "Enter a user login:", with: 'student11'
       fill_in "user_name", with: 'student11'
       click_button "Add"
       expect(page).to have_content "expertiza@mailinator.com"
-      
-      #@@@student 10 need to be registered 
       visit '/participants/list?id=2&model=Assignment'
-      #fill_in "Enter a user login:", with: 'student10'
       fill_in "user_name", with: 'student10'
       click_button "Add"
       expect(page).to have_content "expertiza@mailinator.com"
-      #logout instructor6
+      #logout instructor7
       find_link('Logout').click
-      visit 'http://127.0.0.1:3000/'
+      visit 'http://127.0.0.1:50000/'
 
       #login as student11, Note by Xing Pan: modify spec/factories/factories.rb to generate student11 and call "create student" at beginning
-      fill_in 'login_name', with: 'student11'
-      fill_in 'login_password', with: 'password'
-      click_button 'SIGN IN'
-      #login_as("student11")
+      #fill_in 'login_name', with: 'student11'
+      #fill_in 'login_password', with: 'password'
+      #click_button 'SIGN IN'
+      login_as "student11"
       expect(page).to have_content "Assignment_suggest_topic"
       #sleep 1000
 
@@ -89,26 +82,26 @@ require 'selenium-webdriver'
 
       #logout student11
       find_link('Logout').click
-      visit 'http://127.0.0.1:3000/'
-      #login as instructor6
-      #fill_in 'login_name', with: 'instructor6'
-      #fill_in 'login_password', with: 'password'
+      visit 'http://127.0.0.1:50000/'
       #click_button 'SIGN IN'
-      login_as("instructor6")
+      login_as "instructor7"
+      #find_link('Logout').click
+      #visit 'http://127.0.0.1:50000/'
+      #login_as "student11"
       
       #instructor approve the suggestion topic
       # DUE date need to be added here
       visit '/tree_display/list'
-      visit '/suggestion/list?id=2&type=Assignment'  
-      expect(page).to have_content "Suggested topics for Assignment_suggest_topic"
-      expect(page).to have_content "suggested_topic"
-      find_link('View').click  
+      page.all('a')[9].click
+      #visit '/suggestion/list?id=2&type=Assignment'  
+      expect(page).to have_content "Assignment_suggest_topic"
+      find_link('View').click
       expect(page).to have_content "suggested_description"     
       click_button 'Approve suggestion'
       expect(page).to have_content "Successfully approved the suggestion"
-      # log out instructor6
+      # log out instructor7
       find_link('Logout').click
-      visit 'http://127.0.0.1:3000/'
+      visit 'http://127.0.0.1:50000/'
   
       # case 1 need to verify the student's sign up sheet   
    
@@ -117,7 +110,7 @@ require 'selenium-webdriver'
    end
    describe "case2", :js => true do
     it " student11 hold suggest topic and suggest a new one and student10 enroll on waitlist of suggested topic" do
-      login_as "instructor6"
+      login_as "instructor7"
       #create an assignment
       visit '/assignments/new?private=0'
       expect(page).to have_content "Assignment name"
@@ -136,7 +129,6 @@ require 'selenium-webdriver'
 
       #register student
       visit '/tree_display/list'
-     #expect(page).to have_content "Assignment_suggest_topic"
       visit '/participants/list?id=2&model=Assignment'
       #fill_in "Enter a user login:", with: 'student11'
       fill_in "user_name", with: 'student11'
@@ -149,9 +141,9 @@ require 'selenium-webdriver'
       fill_in "user_name", with: 'student10'
       click_button "Add"
       expect(page).to have_content "expertiza@mailinator.com"
-      #logout instructor6
+      #logout instructor7
       find_link('Logout').click
-      visit 'http://127.0.0.1:3000/'
+      visit 'http://127.0.0.1:50000/'
      
       #login as student11, Note by Xing Pan: modify spec/factories/factories.rb to generate student11 and call "create student" at beginning
       fill_in 'login_name', with: 'student11'
@@ -174,12 +166,9 @@ require 'selenium-webdriver'
 
       #logout student11
       find_link('Logout').click
-      visit 'http://127.0.0.1:3000/'
-      #login as instructor6
-      #fill_in 'login_name', with: 'instructor6'
-      #fill_in 'login_password', with: 'password'
-      #click_button 'SIGN IN'
-      login_as("instructor6")
+      visit 'http://127.0.0.1:50000/'
+      #login as instructor7
+      login_as("instructor7")
       
       #instructor approve the suggestion topic
       # DUE date need to be added here
@@ -191,9 +180,9 @@ require 'selenium-webdriver'
       expect(page).to have_content "suggested_description"     
       click_button 'Approve suggestion'
       expect(page).to have_content "Successfully approved the suggestion"
-      # log out instructor6
+      # log out instructor7
       find_link('Logout').click
-      visit 'http://127.0.0.1:3000/'
+      visit 'http://127.0.0.1:50000/'
    
       # case 2 student already have topic switch to new topic
       # need two students one to be on the waitlist of previous suggested topic,
@@ -211,7 +200,7 @@ require 'selenium-webdriver'
       # but got error
       # expect(page).to have_content "" 
       find_link('Logout').click
-      visit 'http://127.0.0.1:3000/'
+      visit 'http://127.0.0.1:50000/'
       
       # log in student11 
       login_as @student.name
@@ -224,10 +213,10 @@ require 'selenium-webdriver'
       click_button 'Submit'
       expect(page).to have_content "Thank you for your suggestion"
       find_link('Logout').click
-      visit 'http://127.0.0.1:3000/'
+      visit 'http://127.0.0.1:50000/'
       
-      # login_as instructor6 to approve the 2nd suggested topic  
-      login_as("instructor6")
+      # login_as instructor7 to approve the 2nd suggested topic  
+      login_as("instructor7")
       
       #instructor approve the suggestion topic
       visit '/tree_display/list'
@@ -240,9 +229,9 @@ require 'selenium-webdriver'
       expect(page).to have_content "suggested_description"     
       click_button 'Approve suggestion'
       expect(page).to have_content "Successfully approved the suggestion"
-      # log out instructor6
+      # log out instructor7
       find_link('Logout').click
-      visit 'http://127.0.0.1:3000/'
+      visit 'http://127.0.0.1:50000/'
    
       # login as student 10 to see if it's holding the topic rather than on the wait list
       login_as "student10"            
@@ -251,7 +240,7 @@ require 'selenium-webdriver'
       find_link('Signup sheet').click
       find('tr', text: 'suggested_topic').should have_content("x")
       find_link('Logout').click
-      visit 'http://127.0.0.1:3000/'
+      visit 'http://127.0.0.1:50000/'
 
       # login as studnet 11 to see if it's already shifted to the new suggested topic 
       login_as "student11"            
@@ -260,7 +249,7 @@ require 'selenium-webdriver'
       find_link('Signup sheet').click
       find('tr', text: 'suggested_topic2_with_switch').should have_content("x")
       find_link('Logout').click
-      visit 'http://127.0.0.1:3000/'
+      visit 'http://127.0.0.1:50000/'
 
     end
 

@@ -181,7 +181,11 @@ require 'analytic/assignment_analytic'
   end
 
   def reject_own_submission(contributor_set, reviewer)
-    contributor_set.reject! { |contributor| contributor.has_user(User.find(reviewer.user_id)) }
+    if self.reviewer_is_team
+      contributor_set.reject! { |contributor| contributor.id == reviewer.team_id }  
+    else
+      contributor_set.reject! { |contributor| contributor.has_user(User.find(reviewer.user_id)) }
+    end
     return contributor_set
   end
 

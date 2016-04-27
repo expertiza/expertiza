@@ -39,15 +39,27 @@ class AssignmentTeam < Team
       raise "cannot find this assignment"
     end
 
-    ReviewResponseMap.create(:reviewee_id => self.id, :reviewer_id => reviewer.id,
-                             :reviewed_object_id => assignment.id)
+    if assignment.reviewer_is_team
+     ReviewResponseMap.create(:reviewee_id => self.id, :reviewer_id => reviewer.team_id,
+                             :reviewed_object_id => assignment.id, :reviewer_is_team => true)
+    else
+     ReviewResponseMap.create(:reviewee_id => self.id, :reviewer_id => reviewer.id,
+                             :reviewed_object_id => assignment.id, :reviewer_is_team => false)
+    end
   end
 
   # Evaluates whether any contribution by this team was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object
   def reviewed_by?(reviewer)
-    #ReviewResponseMap.count(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id]) > 0
-    ReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', self.id, reviewer.id, assignment.id).count > 0
+    assignment = Assignment.find(self.parent_id)
+    if assignment.reviewer_is_team
+     ReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', self.id, reviewer.team_id, assignment.id).count > 0
+    else
+      #ReviewResponseMap.count(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id]) > 0
+      ReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', self.id, reviewer.id, assignment.id).count > 0
+    end
+    
+    
   end
 
   # Topic picked by the team for the assignment

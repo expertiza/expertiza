@@ -7,7 +7,8 @@ class QuestionnairesController < ApplicationController
   before_filter :authorize
 
   def action_allowed?
-    ['Administrator',
+    ['Super-Administrator',
+     'Administrator',
      'Instructor',
      'Teaching Assistant','Student'].include? current_role_name
   end
@@ -17,45 +18,9 @@ class QuestionnairesController < ApplicationController
   def copy
     orig_questionnaire = Questionnaire.find(params[:id])
     questions = Question.where(questionnaire_id: params[:id])
-    @questionnaire = orig_questionnaire.clone
+    @questionnaire = orig_questionnaire.dup
     @questionnaire.instructor_id = session[:user].instructor_id  ## Why was TA-specific code removed here?  See Project E713.
-      @questionnaire.name = 'Copy of ' + orig_questionnaire.name
-
-    clone_questionnaire_details(questions, orig_questionnaire)
-
-    assign_instructor_id
-
-    @questionnaire.name = 'Copy of '+orig_questionnaire.name
-
-    begin
-
-      @questionnaire.created_at = Time.now
-      @questionnaire.save!
-
-      questions.each{ | question |
-
-        newquestion = question.clone
-        newquestion.questionnaire_id = @questionnaire.id
-        newquestion.save
-
-        advice = QuestionAdvice.find_by_question_id(question.id)
-        if !(advice.nil?)
-          newadvice = advice.clone
-          newadvice.question_id = newquestion.id
-          newadvice.save
-        end
-
-      }
-      pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
-      parent = FolderNode.find_by_node_object_id(pFolder.id)
-      create_new_node_if_necessary(parent)
-
-      undo_link("Copy of questionnaire #{orig_questionnaire.name} has been created successfully. ")
-      redirect_to :back
-    rescue
-      flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.'+$!
-      redirect_to :action => 'list', :controller => 'tree_display'
-    end
+    copy_questionnaire_details(questions, orig_questionnaire)
   end
 
   def view
@@ -81,12 +46,24 @@ class QuestionnairesController < ApplicationController
     @questionnaire.min_question_score =  params[:questionnaire][:min_question_score]
     @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
     @questionnaire.type = params[:questionnaire][:type]
+    # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
+    # In the future, we need to write migration files to make them consistency.
+    case display_type
+    when 'AuthorFeedback'
+      display_type = 'Author%Feedback'
+    when 'CourseEvaluation'
+      display_type = 'Course%Evaluation'
+    when 'TeammateReview'
+      display_type = 'Teammate%Review'
+    when 'GlobalSurvey'
+      display_type = 'Global%Survey'
+    end
     @questionnaire.display_type = display_type
     @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
     begin
       @questionnaire.save
       #Create node
-      tree_folder = TreeFolder.find_by_name(@questionnaire.display_type)
+      tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
       parent = FolderNode.find_by_node_object_id(tree_folder.id)
       QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id, type: 'QuestionnaireNode')
       flash[:success] = 'You have created a questionnaire successfully!'
@@ -627,39 +604,33 @@ class QuestionnairesController < ApplicationController
   end
 
   # clones the contents of a questionnaire, including the questions and associated advice
-  def clone_questionnaire_details(questions, orig_questionnaire)
+  def copy_questionnaire_details(questions, orig_questionnaire)
     assign_instructor_id
-
-    @questionnaire.name = 'Copy of '+orig_questionnaire.name
-
+    @questionnaire.name = 'Copy of ' + orig_questionnaire.name
     begin
       @questionnaire.created_at = Time.now
       @questionnaire.save!
-
       questions.each do |question|
-        newquestion = question.clone
-        newquestion.questionnaire_id = @questionnaire.id
-        newquestion.save
-
+        new_question = question.dup
+        new_question.questionnaire_id = @questionnaire.id
+        if (new_question.is_a? Criterion or new_question.is_a? TextResponse) and new_question.size.nil?
+          new_question.size = '50,3' 
+        end
+        new_question.save!
         advice = QuestionAdvice.find_by_question_id(question.id)
-
         if advice
-          newadvice = advice.clone
-          newadvice.question_id = newquestion.id
-          newadvice.save
+          new_advice = advice.dup
+          new_advice.question_id = new_question.id
+          new_advice.save!
         end
       end
 
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
       parent = FolderNode.find_by_node_object_id(pFolder.id)
-
       create_new_node_if_necessary(parent)
-
       undo_link("Copy of questionnaire #{orig_questionnaire.name} has been created successfully. ")
       redirect_to :controller => 'questionnaires', :action => 'view', :id => @questionnaire.id
-
     rescue
-
       flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.'+$!
       redirect_to :action => 'list', :controller => 'tree_display'
     end
@@ -667,7 +638,7 @@ class QuestionnairesController < ApplicationController
 
   private
   def create_new_node_if_necessary(parent)
-    if QuestionnaireNode.where(parent_id: parent.id, node_object_id: @questionnaire.id) == nil
+    unless QuestionnaireNode.exists?(parent_id: parent.id, node_object_id: @questionnaire.id)
       QuestionnaireNode.create(:parent_id => parent.id, :node_object_id => @questionnaire.id)
     end
   end

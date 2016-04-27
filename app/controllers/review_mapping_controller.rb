@@ -375,7 +375,7 @@ class ReviewMappingController < ApplicationController
       participants.each do |participant|
         user = participant.user
         unless TeamsUser.team_id(assignment_id, user.id)
-          team = AssignmentTeam.create_team_and_node(assignment_id)
+          team = AssignmentTeam.create_team_and_node(assignment_id, AssignmentTeam.name)
           ApplicationController.helpers.create_team_users(participant.user, team.id)
           teams << team
         end
@@ -492,7 +492,11 @@ class ReviewMappingController < ApplicationController
         @avg_and_ranges= @assignment.compute_avg_and_ranges_hash
       when "FeedbackResponseMap"
         #If review report for feedback is required call feedback_response_report method in feedback_review_response_map model
-        @reviewers = FeedbackResponseMap.feedback_response_report(@id, @type)
+        if @assignment.varying_rubrics_by_round? 
+          @authors, @all_review_response_ids_round_one, @all_review_response_ids_round_two, @all_review_response_ids_round_three = FeedbackResponseMap.feedback_response_report(@id, @type)
+        else
+          @authors, @all_review_response_ids = FeedbackResponseMap.feedback_response_report(@id, @type)
+        end
       when "TeammateReviewResponseMap"
         #If review report for teammate is required call teammate_response_report method in teammate_review_response_map model
         @reviewers = TeammateReviewResponseMap.teammate_response_report(@id)

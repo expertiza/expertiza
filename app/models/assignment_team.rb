@@ -76,7 +76,7 @@ class AssignmentTeam < Team
 
   # Whether the team has submitted work or not
   def has_submissions?
-    (self.submitted_files.length > 0) or self.submitted_hyperlinks.blank?
+    self.submitted_files.length > 0 or !self.submitted_hyperlinks.blank?
   end
 
   # Get Participants of the team
@@ -155,7 +155,7 @@ class AssignmentTeam < Team
 
   #Copy the current Assignment team to the CourseTeam
   def copy(course_id)
-    new_team = CourseTeam.create_team_and_node(course_id, true)
+    new_team = CourseTeam.create_team_and_node(course_id, CourseTeam.name)
     new_team.name = name
     new_team.save
     copy_members(new_team)

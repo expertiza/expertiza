@@ -177,9 +177,9 @@ class Response < ActiveRecord::Base
     response_map = ResponseMap.find map_id
     assignment=nil
 
-    reviewer_participant_id =  response_map.reviewer_id
-    participant = Participant.find(reviewer_participant_id)
-    assignment = Assignment.find(participant.parent_id)
+    # reviewer_participant_id =  response_map.reviewer_id
+    # participant = Participant.find(reviewer_participant_id)
+    assignment = Assignment.find(response_map.reviewed_object_id)
 
     if response_map.type =="ReviewResponseMap"
 

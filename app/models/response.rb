@@ -236,7 +236,7 @@ class Response < ActiveRecord::Base
       defn[:body][:type] = "Teammate Review"
       participant = AssignmentParticipant.find(response_map.reviewee_id)
       topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
-      defn[:body][:obj_name] = SignUpTopic.find(topic_id).topic_name
+      defn[:body][:obj_name] = SignUpTopic.find(topic_id).topic_name rescue nil
       user = User.find(participant.user_id)
       defn[:body][:first_name] = user.fullname
       defn[:to] = user.email

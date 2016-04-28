@@ -199,13 +199,14 @@ class ResponseController < ApplicationController
 
     #@map.save
     msg = "Your response was successfully saved."
-    error_msg="Error"
+    error_msg=""
     @response.email();
     redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]
   end
 
   #E1600
   #Added paramps[:return] value for 'SelfReviewResponseMap' to ensure that this method is invoked from self-review operation
+  #this looks dirty to me. If other map type do not do this, there is no reason that we handle SelfReviewResponseMap here. There should be a elegant way.. --Yang
   def saving
     @map = ResponseMap.find(params[:id])
     if(@map.type == "SelfReviewResponseMap")

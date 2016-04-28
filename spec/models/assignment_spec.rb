@@ -23,6 +23,13 @@ describe "validations" do
   it "checks whether signed up topic is created or not" do
     expect(create(:topic)).to be_valid
   end
+
+
+  it 'should have a review type boolean field as non-null' do
+    expect(@assignment.reviewer_is_team.should_not be_nil)
+  end
+
+
 end
 
 describe "#team_assignment" do

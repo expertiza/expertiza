@@ -206,6 +206,7 @@ class ResponseController < ApplicationController
 
   #E1600
   #Added paramps[:return] value for 'SelfReviewResponseMap' to ensure that this method is invoked from self-review operation
+  #this looks dirty to me. If other map type do not do this, there is no reason that we handle SelfReviewResponseMap here. There should be a elegant way.. --Yang
   def saving
     @map = ResponseMap.find(params[:id])
     if(@map.type == "SelfReviewResponseMap")

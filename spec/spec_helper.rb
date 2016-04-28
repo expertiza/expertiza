@@ -102,8 +102,4 @@ RSpec.configure do |config|
     require filename.gsub(/\.rb/, "")
   end
 
-  Capybara.configure do |config|
-    config.app_host   = 'http://127.0.0.1:50000'
-    config.server_port = 50000
-  end
 end

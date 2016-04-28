@@ -57,7 +57,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
 			expect(page).to have_content "expertiza@mailinator.com"
 			#logout instructor6
 			find_link('Logout').click
-			visit 'http://127.0.0.1:3000/'
+			visit 'http://127.0.0.1:50000/'
 			#login as student11, Note by Xing Pan: modify spec/factories/factories.rb to generate student11 and call "create student" at beginning
 			fill_in 'login_name', with: 'student11'
 			fill_in 'login_password', with: 'password'
@@ -77,7 +77,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
 			#sleep 1000
 			#logout student11
 			find_link('Logout').click
-			visit 'http://127.0.0.1:3000/'
+			visit 'http://127.0.0.1:50000/'
 			#login as instructor6
 			#fill_in 'login_name', with: 'instructor6'
 			#fill_in 'login_password', with: 'password'
@@ -95,7 +95,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
 			expect(page).to have_content "Successfully approved the suggestion"
 			# log out instructor6
 			find_link('Logout').click
-			visit 'http://127.0.0.1:3000/'
+			visit 'http://127.0.0.1:50000/'
 			# case 1 need to verify the student's sign up sheet
 		end
 	end
@@ -132,7 +132,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
 	expect(page).to have_content "expertiza@mailinator.com"
 	#logout instructor6
 	find_link('Logout').click
-	visit 'http://127.0.0.1:3000/'
+	visit 'http://127.0.0.1:50000/'
 	#login as student11, Note by Xing Pan: modify spec/factories/factories.rb to generate student11 and call "create student" at beginning
 	fill_in 'login_name', with: 'student11'
 	fill_in 'login_password', with: 'password'
@@ -152,7 +152,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
 	#sleep 1000
 	#logout student11
 	find_link('Logout').click
-	visit 'http://127.0.0.1:3000/'
+	visit 'http://127.0.0.1:50000/'
 	#login as instructor6
 	#fill_in 'login_name', with: 'instructor6'
 	#fill_in 'login_password', with: 'password'
@@ -170,7 +170,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
 	expect(page).to have_content "Successfully approved the suggestion"
 	# log out instructor6
 	find_link('Logout').click
-	visit 'http://127.0.0.1:3000/'
+	visit 'http://127.0.0.1:50000/'
 	# case 2 student already have topic switch to new topic
 	# need two students one to be on the waitlist of previous suggested topic,
 	# the other one (student11) is holding it and suggest another topic and wish to switch to the new one
@@ -186,7 +186,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
 	# but got error
 	# expect(page).to have_content ""
 	find_link('Logout').click
-	visit 'http://127.0.0.1:3000/'
+	visit 'http://127.0.0.1:50000/'
 	# log in student11
 	login_as @student.name
 	find_link('Assignment_suggest_topic').click
@@ -198,7 +198,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
 	click_button 'Submit'
 	expect(page).to have_content "Thank you for your suggestion"
 	find_link('Logout').click
-	visit 'http://127.0.0.1:3000/'
+	visit 'http://127.0.0.1:50000/'
 	# login_as instructor6 to approve the 2nd suggested topic
 	login_as("instructor6")
 	#instructor approve the suggestion topic
@@ -214,7 +214,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
 	expect(page).to have_content "Successfully approved the suggestion"
 	# log out instructor6
 	find_link('Logout').click
-	visit 'http://127.0.0.1:3000/'
+	visit 'http://127.0.0.1:50000/'
 	# login as student 10 to see if it's holding the topic rather than on the wait list
 	login_as "student10"
 	click_link('Assignments')
@@ -222,7 +222,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
 	find_link('Signup sheet').click
 	find('tr', text: 'suggested_topic').should have_content("x")
 	find_link('Logout').click
-	visit 'http://127.0.0.1:3000/'
+	visit 'http://127.0.0.1:50000/'
 	# login as studnet 11 to see if it's already shifted to the new suggested topic
 	login_as "student11"
 	click_link('Assignments')
@@ -230,7 +230,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
 	find_link('Signup sheet').click
 	find('tr', text: 'suggested_topic2_with_switch').should have_content("x")
 	find_link('Logout').click
-	visit 'http://127.0.0.1:3000/'
+	visit 'http://127.0.0.1:50000/'
 	end
 	end
 
@@ -243,9 +243,9 @@ describe "Assignment Topic Suggestion Test", :js => true do
 
   describe "case3", :js => true do
 
-    it "Instructor set an assignment which allow student suggest topic and register student11" do
+    it "student11 hold suggest topic and suggest a new one, but wish to stay in the old topic" do
      # login_as("instructor6")
-      visit 'http://127.0.0.1:3000/'
+      visit 'http://127.0.0.1:50000/'
       #login as instructor6
       fill_in 'login_name', with: 'instructor6'
       fill_in 'login_password', with: 'password'
@@ -253,9 +253,9 @@ describe "Assignment Topic Suggestion Test", :js => true do
       #create an assignment
       visit '/assignments/new?private=0'
       expect(page).to have_content "Assignment name"
-      fill_in "Assignment name:", with: 'Assignment_suggest_topic'
+      fill_in "Assignment name:", with: 'Assignment_suggest_topic_case3'
       click_button "Create"
-      expect(Assignment.where(name: "Assignment_suggest_topic")).to exist
+      expect(Assignment.where(name: "Assignment_suggest_topic_case3")).to exist
 
       #allow student suggest topic
       expect(page).to have_content "Topics"
@@ -277,16 +277,16 @@ describe "Assignment Topic Suggestion Test", :js => true do
 
       #logout instructor6
       find_link('Logout').click
-      visit 'http://127.0.0.1:3000/'
+      visit 'http://127.0.0.1:50000/'
       #login as student11, Note by Xing Pan: modify spec/factories/factories.rb to generate student11 and call "create student" at beginning
       fill_in 'login_name', with: 'student11'
       fill_in 'login_password', with: 'password'
       click_button 'SIGN IN'
-      expect(page).to have_content "Assignment_suggest_topic"
+      expect(page).to have_content "Assignment_suggest_topic_case3"
       #sleep 1000
 
       #student11 suggest topic
-      find_link('Assignment_suggest_topic').click
+      find_link('Assignment_suggest_topic_case3').click
       expect(page).to have_content "Suggest a topic"
       find_link('Suggest a topic').click
       expect(page).to have_content "Title"
@@ -298,7 +298,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
 
       #logout student11
       find_link('Logout').click
-      visit 'http://127.0.0.1:3000/'
+      visit 'http://127.0.0.1:50000/'
       #login as instructor6
       fill_in 'login_name', with: 'instructor6'
       fill_in 'login_password', with: 'password'
@@ -321,7 +321,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
      ######################################
       #logout instructor6
       find_link('Logout').click
-      visit 'http://127.0.0.1:3000/'
+      visit 'http://127.0.0.1:50000/'
       #login as student11, Note by Xing Pan: modify spec/factories/factories.rb to generate student11 and call "create student" at beginning
       fill_in 'login_name', with: 'student11'
       fill_in 'login_password', with: 'password'
@@ -344,7 +344,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
 
       #logout student11
       find_link('Logout').click
-      visit 'http://127.0.0.1:3000/'
+      visit 'http://127.0.0.1:50000/'
       #login as instructor6
       fill_in 'login_name', with: 'instructor6'
       fill_in 'login_password', with: 'password'
@@ -363,7 +363,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
 
       #logout instructor6
       find_link('Logout').click
-      visit 'http://127.0.0.1:3000/'
+      visit 'http://127.0.0.1:50000/'
       #login as student11, Note by Xing Pan: modify spec/factories/factories.rb to generate student11 and call "create student" at beginning
       fill_in 'login_name', with: 'student11'
       fill_in 'login_password', with: 'password'

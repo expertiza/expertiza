@@ -1,4 +1,5 @@
 require 'rails_helper'
+
 ########################################
 
 #   Case 1: One team is on the waitlist. They sent a suggestion for new topic and they want to choose their suggested topic. After their suggested topic is approved, they should leave the waitlist and hold their suggested topic;
@@ -31,7 +32,9 @@ require 'rails_helper'
 
     it "Instructor set an assignment which allow student suggest topic and register student11 something" do
       login_as("instructor6")
+
       #create an assignment
+
       visit '/assignments/new?private=0'
       expect(page).to have_content "Assignment name"
       fill_in "Assignment name:", with: 'Assignment_suggest_topic'
@@ -55,7 +58,6 @@ require 'rails_helper'
       fill_in "user_name", with: 'student11'
       click_button "Add"
       expect(page).to have_content "expertiza@mailinator.com"
-      
 
       #logout instructor6
       #visit '/auth/logout'
@@ -65,12 +67,12 @@ require 'rails_helper'
       #visit 'http://127.0.0.1:50000/'
       #visit '/auth/logout'
 
-      end
-      it "Instructor set an assignment which allow student suggest topic and register student11" do
+      #end
+      #it "Instructor set an assignment which allow student suggest topic and register student11" do
 
 
       #find_link('Logout').click
-
+      logout_user("instructor6")
       #sleep 10000000
       visit 'http://127.0.0.1:50000/'
       #login as student11, Note by Xing Pan: modify spec/factories/factories.rb to generate student11 and call "create student" at beginning
@@ -92,8 +94,9 @@ require 'rails_helper'
       #sleep 1000
 
       #logout student11
-      find_link('Logout').click
-      visit 'http://127.0.0.1:3000/'
+	logout_user("student11")
+      #find_link('Logout').click
+      visit 'http://127.0.0.1:50000/'
       #login as instructor6
       fill_in 'login_name', with: 'instructor6'
       fill_in 'login_password', with: 'password'

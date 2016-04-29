@@ -89,7 +89,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
    end
 
 
-   describe "case 3", :js => true do
+   describe "case 2", :js => true do
     it " student2065 hold suggest topic and suggest a new one and student10 enroll on waitlist of suggested topic" do
       login_as "instructor6"
       #create an assignment

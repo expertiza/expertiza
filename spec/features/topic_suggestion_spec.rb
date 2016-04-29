@@ -292,7 +292,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
 
       ######################################
       # One team is holding a topic. They sent a suggestion for new topic
-     ######################################
+      ######################################
       #login_as "student11"
       user = User.find_by_name('student11')
       stub_current_user(user, user.role.name, user.role)
@@ -320,12 +320,12 @@ describe "Assignment Topic Suggestion Test", :js => true do
       visit '/tree_display/list'
       visit '/suggestion/list?id=2&type=Assignment'
       expect(page).to have_content "Suggested topics for Assignment_suggest_topic"
-     expect(page).to have_content "suggested_topic2_without_switch"
+      expect(page).to have_content "suggested_topic2_without_switch"
       find(:xpath, "//tr[contains(.,'suggested_topic2_without_switch')]/td/a", :text => 'View').click
-     #find_link('View').click
-     expect(page).to have_content "suggested_description2_without_switch"
-     click_button 'Approve suggestion'
-     expect(page).to have_content "Successfully approved the suggestion"
+      #find_link('View').click
+      expect(page).to have_content "suggested_description2_without_switch"
+      click_button 'Approve suggestion'
+      expect(page).to have_content "Successfully approved the suggestion"
 
       #login_as "student11"
       user = User.find_by_name('student11')

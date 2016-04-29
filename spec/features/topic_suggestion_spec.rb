@@ -11,6 +11,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
     before(:each) do
       create(:assignment)
       create(:participant)
+      create(:student)
       create(:studentb)
       create(:assignment_node)
       create(:deadline_type,name:"submission")
@@ -119,12 +120,13 @@ describe "Assignment Topic Suggestion Test", :js => true do
       click_button "Add"
       expect(page).to have_content "student11"
 
+      #login_as "student2065"
       user = User.find_by_name('student2065')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       expect(page).to have_content "Assignment_suggest_topic"
 
-      #student11 suggest topic
+      #student2065 suggest topic
       find_link('Assignment_suggest_topic').click
       expect(page).to have_content "Suggest a topic"
       find_link('Suggest a topic').click    
@@ -290,7 +292,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
 
       ######################################
       # One team is holding a topic. They sent a suggestion for new topic
-      ######################################
+     ######################################
       #login_as "student11"
       user = User.find_by_name('student11')
       stub_current_user(user, user.role.name, user.role)
@@ -318,12 +320,12 @@ describe "Assignment Topic Suggestion Test", :js => true do
       visit '/tree_display/list'
       visit '/suggestion/list?id=2&type=Assignment'
       expect(page).to have_content "Suggested topics for Assignment_suggest_topic"
-      expect(page).to have_content "suggested_topic2_without_switch"
+     expect(page).to have_content "suggested_topic2_without_switch"
       find(:xpath, "//tr[contains(.,'suggested_topic2_without_switch')]/td/a", :text => 'View').click
-      #find_link('View').click
-      expect(page).to have_content "suggested_description2_without_switch"
-      click_button 'Approve suggestion'
-      expect(page).to have_content "Successfully approved the suggestion"
+     #find_link('View').click
+     expect(page).to have_content "suggested_description2_without_switch"
+     click_button 'Approve suggestion'
+     expect(page).to have_content "Successfully approved the suggestion"
 
       #login_as "student11"
       user = User.find_by_name('student11')

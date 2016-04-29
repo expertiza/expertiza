@@ -11,6 +11,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
     before(:each) do
       create(:assignment)
       create(:participant)
+      create(:student)
       create(:studentb)
       create(:assignment_node)
       create(:deadline_type,name:"submission")
@@ -90,7 +91,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
 
 
    describe "case 2", :js => true do
-    it " student2065 hold suggest topic and suggest a new one and student10 enroll on waitlist of suggested topic" do
+    it " student2065 hold suggest topic and suggest a new one and student2065 enroll on waitlist of suggested topic" do
       login_as "instructor6"
       #create an assignment
       visit '/assignments/new?private=0'
@@ -119,12 +120,13 @@ describe "Assignment Topic Suggestion Test", :js => true do
       click_button "Add"
       expect(page).to have_content "student11"
 
+      #login_as "student2065"
       user = User.find_by_name('student2065')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       expect(page).to have_content "Assignment_suggest_topic"
 
-      #student11 suggest topic
+      #student2065 suggest topic
       find_link('Assignment_suggest_topic').click
       expect(page).to have_content "Suggest a topic"
       find_link('Suggest a topic').click    
@@ -225,7 +227,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
   describe "case3", :js => true do
 
     it "student11 hold suggest topic and suggest a new one, but wish to stay in the old topic" do
-      login_as "instructor7"
+      login_as "instructor6"
       #create an assignment
       visit '/assignments/new?private=0'
       expect(page).to have_content "Assignment name"
@@ -246,10 +248,10 @@ describe "Assignment Topic Suggestion Test", :js => true do
       click_button "Add"
       expect(page).to have_content "expertiza@mailinator.com"
       visit '/participants/list?id=2&model=Assignment'
-      fill_in "user_name", with: 'student10'
+      fill_in "user_name", with: 'student2065'
       click_button "Add"
       expect(page).to have_content "expertiza@mailinator.com"
-      #logout instructor7
+      #logout instructor6
       #find_link('Logout').click
 
       #login_as "student11"
@@ -273,8 +275,8 @@ describe "Assignment Topic Suggestion Test", :js => true do
       #logout student11
       #find_link('Logout').click
       #click_button 'SIGN IN'
-      #login_as "instructor7"
-      user = User.find_by_name('instructor7')
+      #login_as "instructor6"
+      user = User.find_by_name('instructor6')
       stub_current_user(user, user.role.name, user.role)
       #find_link('Logout').click
       #login_as "student11"
@@ -290,7 +292,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
 
       ######################################
       # One team is holding a topic. They sent a suggestion for new topic
-      ######################################
+     ######################################
       #login_as "student11"
       user = User.find_by_name('student11')
       stub_current_user(user, user.role.name, user.role)
@@ -310,20 +312,20 @@ describe "Assignment Topic Suggestion Test", :js => true do
       expect(page).to have_content "Thank you for your suggestion"
       #sleep 1000
 
-      #login_as "instructor7"
-      user = User.find_by_name('instructor7')
+      #login_as "instructor6"
+      user = User.find_by_name('instructor6')
       stub_current_user(user, user.role.name, user.role)
 
       #instructor approve the suggestion topic
       visit '/tree_display/list'
       visit '/suggestion/list?id=2&type=Assignment'
       expect(page).to have_content "Suggested topics for Assignment_suggest_topic"
-      expect(page).to have_content "suggested_topic2_without_switch"
+     expect(page).to have_content "suggested_topic2_without_switch"
       find(:xpath, "//tr[contains(.,'suggested_topic2_without_switch')]/td/a", :text => 'View').click
-      #find_link('View').click
-      expect(page).to have_content "suggested_description2_without_switch"
-      click_button 'Approve suggestion'
-      expect(page).to have_content "Successfully approved the suggestion"
+     #find_link('View').click
+     expect(page).to have_content "suggested_description2_without_switch"
+     click_button 'Approve suggestion'
+     expect(page).to have_content "Successfully approved the suggestion"
 
       #login_as "student11"
       user = User.find_by_name('student11')
@@ -340,8 +342,8 @@ describe "Assignment Topic Suggestion Test", :js => true do
       visit '/student_task/list'
       expect(page).to have_content "suggested_topic"
 
-      #login_as "student10"
-      user = User.find_by_name('student10')
+      #login_as "student2065"
+      user = User.find_by_name('student2065')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       expect(page).to have_content "Assignment_suggest_topic"

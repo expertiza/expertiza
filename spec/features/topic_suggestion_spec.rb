@@ -249,7 +249,6 @@ describe "Assignment Topic Suggestion Test", :js => true do
       fill_in "user_name", with: 'student2065'
       click_button "Add"
       expect(page).to have_content "expertiza@mailinator.com"
-sleep 100000
       #logout instructor6
       #find_link('Logout').click
 

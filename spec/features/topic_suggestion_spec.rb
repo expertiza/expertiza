@@ -149,14 +149,11 @@ describe "Assignment Topic Suggestion Test", :js => true do
       # case 2 student already have topic switch to new topic
       # need two students one to be on the waitlist of previous suggested topic,
       # the other one (student11) is holding it and suggest another topic and wish to switch to the new one
-      #login as student11 and add itself to the wishlist of the topic
       user = User.find_by_name('student11')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
-      ##click_link('Assignments')
       find_link('Assignment_suggest_topic').click
       find_link('Signup sheet').click
-      # Bug found and need the select action name 
       visit '/sign_up_sheet/sign_up?assignment_id=2&id=1'
       
       # log in student2065 
@@ -216,7 +213,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
 
 
 ########################################
-# Case 3: 
+# Case 2: 
 # One team is holding a topic. They sent a suggestion for new topic, and keep themselves in old topic
 ########################################
 

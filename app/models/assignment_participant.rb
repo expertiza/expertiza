@@ -152,7 +152,7 @@ class AssignmentParticipant < Participant
       total_score = 0
       for i in 1..self.assignment.get_review_rounds
         round_sym = ("review"+i.to_s).to_sym
-        if scores[round_sym][:assessments].nil? || scores[round_sym][:assessments].length==0
+        if scores[round_sym].nil? || scores[round_sym][:assessments].nil? || scores[round_sym][:assessments].length==0
           next
         end
         length_of_assessments=scores[round_sym][:assessments].length.to_f

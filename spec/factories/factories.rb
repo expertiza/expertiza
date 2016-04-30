@@ -93,7 +93,7 @@ FactoryGirl.define do
     public_key nil
     copy_of_emails  false
   end
-
+  
   factory :instructor, class: User do
     sequence(:name, 6) { |n| n=6; "instructor#{n}" }
     role { Role.where(name: 'Instructor').first || association(:role_of_instructor) } 

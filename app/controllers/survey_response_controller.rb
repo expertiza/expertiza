@@ -11,12 +11,15 @@ class SurveyResponseController < ResponseController
       end
     elsif @type =="course"
       @course = Course.find(params[:id])
-      survey_deployment = SurveyDeployment.where('course_id = ?', @course.id)
+      @survey_deployment = SurveyDeployment.where('course_id = ?', @course.id)
       if @survey_deployment.nil?
         @empty = true
       else
-        puts survey_deployment[:course_id]
-        @responses = SurveyResponse.where('survey_deployment_id = ?', survey_deployment[:id])
+        
+        survey_dep_id = @survey_deployment[0].id
+        
+        @responses = SurveyResponse.where('survey_deployment_id = ?', survey_dep_id)
+        
       end
 
 

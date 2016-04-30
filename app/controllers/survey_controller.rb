@@ -197,8 +197,8 @@ class SurveyController < ApplicationController
 
   def update_deployment
        @deploy = SurveyDeployment.find_by(id: params[:deploy][:deploy_id])
-       @deploy.update_attribute(:start_date,params[:deploy][:start_date])
-       @deploy.update_attribute(:end_date,params[:deploy][:end_date])
+       @deploy.update_attribute(:start_date,params[:start_date])
+       @deploy.update_attribute(:end_date,params[:end_date])
        
   end
 

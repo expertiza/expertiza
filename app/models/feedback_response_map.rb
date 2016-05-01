@@ -26,6 +26,7 @@ class FeedbackResponseMap < ResponseMap
   def contributor
     self.review.map.reviewee
   end
+
   def self.feedback_response_report(id,type)
     #Example query
     #SELECT distinct reviewer_id FROM response_maps where type = 'FeedbackResponseMap' and

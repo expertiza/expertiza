@@ -18,7 +18,6 @@ class AssignmentParticipant < Participant
   has_many :quiz_response_maps, foreign_key: 'reviewee_id'
   has_many :quiz_responses, through: :quiz_response_maps, foreign_key: 'map_id'
   # has_many    :quiz_responses,  :class_name => 'Response', :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'QuizResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
-    has_many    :collusion_cycles
   # has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'ReviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
     belongs_to  :user
   validates_presence_of :handle
@@ -91,11 +90,6 @@ class AssignmentParticipant < Participant
     return AssignmentParticipant.where(:user_id=>user_id,:parent_id=>assignment_id).first
   end
 
-  def has_submissions?
-    return ((self.team.submitted_files.length > 0) or
-            (hyperlinks_array.length > 0))
-  end
-
   # all the participants in this assignment who have reviewed this person
   def reviewers
     reviewers = []
@@ -158,7 +152,7 @@ class AssignmentParticipant < Participant
       total_score = 0
       for i in 1..self.assignment.get_review_rounds
         round_sym = ("review"+i.to_s).to_sym
-        if scores[round_sym][:assessments].nil? || scores[round_sym][:assessments].length==0
+        if scores[round_sym].nil? || scores[round_sym][:assessments].nil? || scores[round_sym][:assessments].length==0
           next
         end
         length_of_assessments=scores[round_sym][:assessments].length.to_f
@@ -220,40 +214,6 @@ class AssignmentParticipant < Participant
       scores[:total_score] = total_score
     scores
     end
-  end
-
-  # Appends the hyperlink to a list that is stored in YAML format in the DB
-  # @exception  If is hyperlink was already there
-  #             If it is an invalid URL
-  def submit_hyperlink(hyperlink)
-    hyperlink.strip!
-    raise "The hyperlink cannot be empty" if hyperlink.empty?
-    url = URI.parse(hyperlink)
-    # If not a valid URL, it will throw an exception
-    Net::HTTP.start(url.host, url.port)
-    hyperlinks = self.hyperlinks_array
-    hyperlinks << hyperlink
-    team_object = self.team
-    team_object.submitted_hyperlinks = YAML::dump(hyperlinks)
-    team_object.save
-  end
-
-  # Note: This method is not used yet. It is here in the case it will be needed.
-  # @exception  If the index does not exist in the array
-  def remove_hyperlink(hyperlink_to_delete)
-    hyperlinks = self.hyperlinks_array
-    hyperlinks.delete(hyperlink_to_delete)
-    team_object = self.team
-    team_object.submitted_hyperlinks = YAML::dump(hyperlinks)
-    team_object.save
-  end
-
-  def hyperlinks
-    team.try(:hyperlinks) || []
-  end
- 
-  def hyperlinks_array
-    self.team.submitted_hyperlinks.blank? ? [] : YAML::load(self.team.submitted_hyperlinks)
   end
 
   #Copy this participant to a course

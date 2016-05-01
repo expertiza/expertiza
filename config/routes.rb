@@ -211,6 +211,7 @@ Expertiza::Application.routes.draw do
       post :update_authorizations
       post :update_duties
       post :change_handle
+      get :view_publishing_rights
     end
   end
 
@@ -265,6 +266,13 @@ Expertiza::Application.routes.draw do
       post :update_quiz
       post :add_new_questions
       post :save_all_questions
+    end
+  end
+
+  resources :reputation_web_service do
+    collection do
+      get :client
+      post :send_post_request
     end
   end
 
@@ -323,6 +331,8 @@ Expertiza::Application.routes.draw do
       post :assign_metareviewer_dynamically
       post :automatic_review_mapping
       post :automatic_review_mapping_staggered
+      #E1600
+      post :start_self_review
     end
   end
 
@@ -352,7 +362,6 @@ Expertiza::Application.routes.draw do
       get :signup
       get :sign_up
       get :team_details
-      get :view_publishing_rights
       get :intelligent_sign_up
       get :intelligent_save
       post :save_topic_deadlines

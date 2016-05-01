@@ -44,6 +44,7 @@ class GradesController < ApplicationController
         @questions[questionnaire.symbol] = questionnaire.questions
       }
     end
+
     @scores = @assignment.scores(@questions)
     averages = calculate_average_vector(@assignment.scores(@questions))
     @average_chart =  bar_chart(averages,300,100,5)
@@ -411,29 +412,6 @@ class GradesController < ApplicationController
       link = (bc.to_url)
     end
     link
-  end
-
-  def reliability_chart(score,type)
-    GoogleChart::BarChart.new("25x20", " ", :horizontal, false) do |bc|
-
-      if score == 'good'
-        data = [1,1,1]
-        color = '00ff00'
-      elsif score == 'medium'
-        data = [1,1]
-        color = 'FFCC00'
-      else
-        data = [1]
-        color = '990000'
-      end
-
-      bc.data "Reliability Symbol", data, color
-      bc.show_legend = false
-      bc.stacked = false
-      bc.width_spacing_options({bar_width: 5,bar_spacing: 10, group_spacing: 1})
-      bc.data_encoding = :extended
-      @grades_bar_charts[type.to_sym] = (bc.to_url)
-    end
   end
 
   #authorizations: reader,submitter, reviewer

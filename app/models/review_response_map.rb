@@ -3,7 +3,8 @@ class ReviewResponseMap < ResponseMap
   belongs_to :contributor, :class_name => 'Team', :foreign_key => 'reviewee_id'
   belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'reviewed_object_id'
 
-  # In if this assignment uses "varying rubrics" feature, the "used_in_round" field should not be nil
+  # In if this assignment uses "varying rubrics" feature, the sls
+  # "used_in_round" field should not be nil
   # so find the round # based on current time and the due date times, and use that round # to find corresponding questionnaire_id from assignment_questionnaires table
   # otherwise this assignment does not use the "varying rubrics", so in assignment_questionnaires table there should
   # be only 1 questionnaire with type 'ReviewQuestionnaire'.    -Yang
@@ -181,5 +182,23 @@ class ReviewResponseMap < ResponseMap
 
     end
     review_final_versions
+  end
+  def self.review_response_report(id,assignment, type, review_user )
+
+    if review_user.nil?
+      # This is not a search, so find all reviewers for this assignment
+      response_maps_with_distinct_participant_id = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ? and calibrate_to = ?", id, type, 0])
+      @reviewers = []
+      response_maps_with_distinct_participant_id.each do |reviewer_id_from_response_map|
+        @reviewers << (AssignmentParticipant.find(reviewer_id_from_response_map.reviewer_id))
+      end
+      @reviewers = Participant.sort_by_name(@reviewers)
+    else
+      # This is a search, so find reviewers by user's full name
+      user = User.select("DISTINCT id").where(["fullname LIKE ?", '%'+review_user[:fullname]+'%'])
+      @reviewers = AssignmentParticipant.where(["user_id IN (?) and parent_id = ?", user, assignment.id])
+    end
+    #  @review_scores[reveiwer_id][reviewee_id] = score for assignments not using vary_rubric_by_rounds feature
+    # @review_scores[reviewer_id][round][reviewee_id] = score for assignments using vary_rubric_by_rounds feature
   end
 end

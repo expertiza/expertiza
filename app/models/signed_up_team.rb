@@ -1,5 +1,7 @@
 class SignedUpTeam < ActiveRecord::Base
   belongs_to :topic, :class_name => 'SignUpTopic'
+  belongs_to :team, :class_name => 'Team'
+  
 
   #the below has been added to make is consistent with the database schema
   validates_presence_of :topic_id, :team_id

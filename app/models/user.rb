@@ -232,9 +232,11 @@ class User < ActiveRecord::Base
 
   def instructor_id
     case role.name
-    when 'Instructor' then id
-    when 'Teaching Assistant' then Ta.get_my_instructor(id)
-    else raise NotImplementedError.new "for role #{role.name}"
+      when 'Super-Administrator' then id
+      when 'Administrator' then id
+      when 'Instructor' then id
+      when 'Teaching Assistant' then Ta.get_my_instructor(id)
+      else raise NotImplementedError.new "for role #{role.name}"
     end
   end
 

@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe 'Submission deadline reminder email' do
 
-  it 'should send reminder email for submission deadline to signed-up users ' do
+  it 'is able to send reminder email for submission deadline to signed-up users ' do
     #Delayed::Worker.delay_jobs = false
     id = 2
     @name = "user"
@@ -19,21 +19,19 @@ describe 'Submission deadline reminder email' do
     curr_time=Time.parse(curr_time)
     time_in_min=((due_at1 - curr_time).to_i/60) *60
     Delayed::Job.delete_all
-    Delayed::Job.count.should == 0
+    expect(Delayed::Job.count).to eq(0)
 
-    dj = Delayed::Job.enqueue(DelayedMailer.new(id, "submission", due_at), priority: 1, run_at: time_in_min)
+    dj = Delayed::Job.enqueue({payload_object: DelayedMailer.new(id, "submission", due_at), priority: 1, run_at: time_in_min})
 
-    Delayed::Job.count.should == 1
-    # dj=Delayed::Job.enqueue(DelayedMailer.new(@assignment.id, deadline_type, duedates[i].due_at.to_s(:db)) , 1, diff.minutes.from_now)
-    #ActionMailer::Base.deliveries.last.should include("Message regarding submission for assignment")
-    #mm = Delayed::Job.last.handler
-    Delayed::Job.last.handler.should include("deadline_type: submission")
+    expect(Delayed::Job.count).to eq(1)
+    
+    expect(Delayed::Job.last.handler).to include("deadline_type: submission")
   end
 end
 
 describe 'Resubmission deadline reminder email' do
 
-  it 'should send reminder email for resubmission deadline to reviewers ' do
+  it 'is able to send reminder email for resubmission deadline to reviewers ' do
 
     id = 2
     @name = "user"
@@ -44,18 +42,18 @@ describe 'Resubmission deadline reminder email' do
     curr_time=Time.parse(curr_time)
     time_in_min=((due_at1 - curr_time).to_i/60) *60
     Delayed::Job.delete_all
-    Delayed::Job.count.should == 0
+    expect(Delayed::Job.count).to eq(0)
 
-    dj = Delayed::Job.enqueue(DelayedMailer.new(id, "resubmission", due_at), priority: 1, run_at: time_in_min)
+    dj = Delayed::Job.enqueue({payload_object: DelayedMailer.new(id, "resubmission", due_at), priority: 1, run_at: time_in_min})
 
-    Delayed::Job.count.should == 1
-    Delayed::Job.last.handler.should include("deadline_type: resubmission")
+    expect(Delayed::Job.count).to eq(1)
+    expect(Delayed::Job.last.handler).to include("deadline_type: resubmission")
   end
 end
 
 describe 'Review deadline reminder email' do
 
-  it 'should send reminder email for review deadline to reviewers ' do
+  it 'is able to send reminder email for review deadline to reviewers ' do
 
     id = 2
     @name = "user"
@@ -66,19 +64,19 @@ describe 'Review deadline reminder email' do
     curr_time=Time.parse(curr_time)
     time_in_min=((due_at1 - curr_time).to_i/60) *60
     Delayed::Job.delete_all
-    Delayed::Job.count.should == 0
+    expect(Delayed::Job.count).to eq(0)
 
-    dj = Delayed::Job.enqueue(DelayedMailer.new(id, "review", due_at), priority: 1, run_at: time_in_min)
+    dj = Delayed::Job.enqueue({payload_object: DelayedMailer.new(id, "review", due_at), priority: 1, run_at: time_in_min})
 
-    Delayed::Job.count.should == 1
-    Delayed::Job.last.handler.should include("deadline_type: review")
+    expect(Delayed::Job.count).to eq(1)
+    expect(Delayed::Job.last.handler).to include("deadline_type: review")
 
   end
 end
 
 describe 'Metareview deadline reminder email' do
 
-  it 'should send reminder email for Metareview deadline to reviewers ' do
+  it 'is able to send reminder email for Metareview deadline to reviewers ' do
     id = 2
     @name = "user"
     due_at = DateTime.now.advance(:minutes => +2)
@@ -88,19 +86,19 @@ describe 'Metareview deadline reminder email' do
     curr_time=Time.parse(curr_time)
     time_in_min=((due_at1 - curr_time).to_i/60) *60
     Delayed::Job.delete_all
-    Delayed::Job.count.should == 0
+    expect(Delayed::Job.count).to eq(0)
 
-    dj = Delayed::Job.enqueue(DelayedMailer.new(id, "metareview", due_at), priority: 1, run_at: time_in_min)
+    dj = Delayed::Job.enqueue({payload_object: DelayedMailer.new(id, "metareview", due_at), priority: 1, run_at: time_in_min})
 
-    Delayed::Job.count.should == 1
-    Delayed::Job.last.handler.should include("deadline_type: metareview")
+    expect(Delayed::Job.count).to eq(1)
+    expect(Delayed::Job.last.handler).to include("deadline_type: metareview")
 
   end
 end
 
 describe 'Drop Topic deadline reminder email' do
 
-  it 'should send reminder email for drop topic deadline to reviewers ' do
+  it 'is able to send reminder email for drop topic deadline to reviewers ' do
     id = 2
     @name = "user"
     due_at = DateTime.now.advance(:minutes => +2)
@@ -110,18 +108,18 @@ describe 'Drop Topic deadline reminder email' do
     curr_time=Time.parse(curr_time)
     time_in_min=((due_at1 - curr_time).to_i/60) *60
     Delayed::Job.delete_all
-    Delayed::Job.count.should == 0
+    expect(Delayed::Job.count).to eq(0)
 
-    dj = Delayed::Job.enqueue(DelayedMailer.new(id, "drop_topic", due_at), priority: 1, run_at: time_in_min)
+    dj = Delayed::Job.enqueue({payload_object: DelayedMailer.new(id, "drop_topic", due_at), priority: 1, run_at: time_in_min})
 
-    Delayed::Job.count.should == 1
-    Delayed::Job.last.handler.should include("deadline_type: drop_topic")
+    expect(Delayed::Job.count).to eq(1)
+    expect(Delayed::Job.last.handler).to include("deadline_type: drop_topic")
   end
 end
 
 describe 'Signup deadline reminder email' do
 
-  it 'should send reminder email for signup deadline to reviewers ' do
+  it 'is able to send reminder email for signup deadline to reviewers ' do
 
     id = 2
     @name = "user"
@@ -132,18 +130,18 @@ describe 'Signup deadline reminder email' do
     curr_time=Time.parse(curr_time)
     time_in_min=((due_at1 - curr_time).to_i/60) *60
     Delayed::Job.delete_all
-    Delayed::Job.count.should == 0
+    expect(Delayed::Job.count).to eq(0)
 
-    dj = Delayed::Job.enqueue(DelayedMailer.new(id, "signup", due_at), priority: 1, run_at: time_in_min)
+    dj = Delayed::Job.enqueue({payload_object: DelayedMailer.new(id, "signup", due_at), priority: 1, run_at: time_in_min})
 
-    Delayed::Job.count.should == 1
-    Delayed::Job.last.handler.should include("deadline_type: signup")
+    expect(Delayed::Job.count).to eq(1)
+    expect(Delayed::Job.last.handler).to include("deadline_type: signup")
   end
 end
 
 describe 'Team formation deadline reminder email' do
 
-  it 'should send reminder email for team formation deadline to reviewers ' do
+  it 'is able to send reminder email for team formation deadline to reviewers ' do
 
     id = 2
     @name = "user"
@@ -154,11 +152,11 @@ describe 'Team formation deadline reminder email' do
     curr_time=Time.parse(curr_time)
     time_in_min=((due_at1 - curr_time).to_i/60) *60
     Delayed::Job.delete_all
-    Delayed::Job.count.should == 0
+    expect(Delayed::Job.count).to eq(0)
 
-    dj = Delayed::Job.enqueue(DelayedMailer.new(id, "team_formation", due_at), priority: 1, run_at: time_in_min)
+    dj = Delayed::Job.enqueue({payload_object: DelayedMailer.new(id, "team_formation", due_at), priority: 1, run_at: time_in_min})
 
-    Delayed::Job.count.should == 1
-    Delayed::Job.last.handler.should include("deadline_type: team_formation")
+    expect(Delayed::Job.count).to eq(1)
+    expect(Delayed::Job.last.handler).to include("deadline_type: team_formation")
   end
 end

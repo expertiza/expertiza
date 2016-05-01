@@ -4,7 +4,7 @@
 </script>
 
 <h1>Summary Report for assignment: <%= @assignment.name %></h1>
-<h4>Team: <%= @team.name %>(Username: <%= @participant.fullname %>)</h4>
+<h4>Team: <%= @team.name %></h4>
 
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
 <% @vmlist.each do |vm| %>
@@ -62,7 +62,7 @@
                     <% end %>
                     <% if ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include? @current_role_name %>
                         <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname.to_s %>
-                        <th > <a target="_blank" href="../grades/view_reviewer?id=<%=@participant.id%>&response_id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
+                        <th > <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
                         <% i += 1 %>
                     <% end %>
                 <% end %>

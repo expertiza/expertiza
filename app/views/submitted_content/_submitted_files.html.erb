@@ -17,8 +17,8 @@
 <% end %>
 <br/><br/>
 <b>Submit a file:</b><BR/>
-<% if (files.length > 0 or stage != "Complete")  %>
-  <% if same_team_flag && stage != "Complete" %>
+<% if (files.length > 0 or stage != "Finished")  %>
+  <% if same_team_flag && stage != "Finished" %>
     <%= form_tag({:controller=>'submitted_content',:action=>'submit_file',:id => participant.id, :origin => origin ||= nil, :response_map_id => response_map_id ||= nil},{:method => 'post', :enctype => "multipart/form-data", :onSubmit => "return checkIfFileExists(uploaded_file.value,1);"}) do %>
       <input type="checkbox" name="unzip" value=""/> Unzip submission
       <div class="form-group">
@@ -33,7 +33,7 @@
 
     <% if files.length > 0 and participant.team.directory_num != nil and participant.team.directory_num >= 0 %>
 
-      <% if same_team_flag && stage != "Complete" %>
+      <% if same_team_flag && stage != "Finished" %>
 
         <div style="background-color:#EEEEEE; padding-bottom:0.6em"><strong>File and folder actions</strong><br>
           <input type="button" onclick="createNewFolder()"     value="Create new folder"    />

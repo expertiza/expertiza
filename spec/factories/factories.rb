@@ -222,6 +222,12 @@ FactoryGirl.define do
     type "AssignmentNode"
   end  
 
+  factory :course_node ,class:CourseNode do
+    course { Course.first || association(:course)} 
+    node_object_id 1
+    type "CourseNode"
+  end  
+
   factory :questionnaire, class:ReviewQuestionnaire do
     name 'Test questionaire'
     instructor {User.where(role_id: 1).first || association(:instructor)} 

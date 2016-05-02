@@ -60,6 +60,7 @@ class CollusionCycle < ActiveRecord::Base
 
 
   # Begin Changes ==== Create a method to do DFS on the graph and return nodes for which there is a cycle and parent array
+
   def self.cycle_detection(graph)
     white_set = Set.new
     gray_set = Set.new
@@ -84,15 +85,16 @@ class CollusionCycle < ActiveRecord::Base
   end
 
 
+
   def self.dfs_within_graph(current, white_set, gray_set, black_set, graph,parent,cycle)
     move_vertex(current, white_set, gray_set)
     neighbours = graph[current]
     neighbours.each do |neighbor|
+      parent[neighbor] = current
       if gray_set.member?(neighbor) # a cycle detected
         if neighbor!=current
-          parent[current] = neighbor
+          # parent[current] = neighbor
           cycle[current] = true
-          puts "There is a cycle involving node " + neighbor.to_s
         end
       end
       if white_set.member?(neighbor)
@@ -111,21 +113,24 @@ class CollusionCycle < ActiveRecord::Base
   # Begin Changes ==== Create a method to do DFS on the graph and return nodes for which there is a cycle and parent array
 
   def self.get_cycle_of_size_n(parent,cycle,n)
-    output_cycle_list = [[]]
+    output_cycle_list = []
     list_n = []
     cycle.each do |node|
       temp_node = node[0]
       count = 0
-      while parent[temp_node] != -1
+      while parent.key?(temp_node)  #[temp_node] != -1
         if(count>n)
           break
         end
-        count += 1
-        list_n<<parent[temp_node]
+        if !list_n.include?(parent[temp_node])
+          list_n.append(parent[temp_node])
+        end
         temp_node = parent[temp_node]
+        count += 1
       end
-      if count == n
-        output_cycle_list<<list_n
+
+      if count-1 <= n
+        output_cycle_list.append(list_n.sort)
       end
       list_n.clear
     end

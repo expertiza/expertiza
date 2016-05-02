@@ -43,20 +43,22 @@
     }
 
     // The sorting algorithm
-    for (var i = 3; i < columns.length - 2; i++) {
-      for (var j = 3; j < columns.length - 2; j++) {
-        var k = j - 1
-        if (compare(sum_array[j - 2], sum_array[k - 2], lesser)) {
-          var tmp
-          tmp = sum_array[j - 2]
-          sum_array[j - 2] = sum_array[k - 2]
-          sum_array[k - 2] = tmp
-          jQuery.moveColumn($("table.tbl_heat").eq(m), j, k);
-          // This part is repeated since the table is updated
-          tables = $("table.tbl_heat")
-          tbr = tables.eq(m).find('tr.accordion-toggle');
-          columns = tbr.eq(tbr.length - 1).find('td')
-        }
+    for (var i = 3; i < columns.length - 2; i++)
+    {
+      var j=i;
+      while(j>2 && compare(sum_array[j - 2], sum_array[j - 3], lesser))
+      {
+        var tmp
+        tmp = sum_array[j - 3]
+        sum_array[j - 3] = sum_array[j-2]
+        sum_array[j-2] = tmp
+        jQuery.moveColumn($("table.tbl_heat").eq(m), j, j-1);
+        // This part is repeated since the table is updated
+        tables = $("table.tbl_heat")
+        tbr = tables.eq(m).find('tr.accordion-toggle');
+        columns = tbr.eq(tbr.length - 1).find('td')
+        j=j-1	;
+
       }
     }
   }

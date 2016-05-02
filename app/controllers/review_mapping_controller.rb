@@ -504,8 +504,8 @@ class ReviewMappingController < ApplicationController
         @responses = Response.where(["map_id IN (?)", @review_response_map_ids])
       when "Collusion"
         graph = CollusionCycle.create_graph_response_map(@assignment.id,threshold = 95)
-        matrix = CollusionCycle.cycle_detection(graph,@assignment.id)
-        @cycle_n = CollusionCycle.get_cycle_of_size_n(matrix[0],matrix[1],1) #replace the third parameter here by n
+        matrix = CollusionCycle.cycle_detection(graph)
+        @cycle_n = CollusionCycle.get_cycle_of_size_n(matrix[0],matrix[1],3) #replace the third parameter here by n
         @cycle_n
       end
     end

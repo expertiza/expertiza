@@ -60,7 +60,7 @@ class CollusionCycle < ActiveRecord::Base
 
 
   # Begin Changes ==== Create a method to do DFS on the graph and return nodes for which there is a cycle and parent array
-  def self.cycle_detection(graph,assignment)
+  def self.cycle_detection(graph)
     white_set = Set.new
     gray_set = Set.new
     black_set = Set.new

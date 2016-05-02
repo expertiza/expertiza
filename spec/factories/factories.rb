@@ -208,6 +208,25 @@ FactoryGirl.define do
     teammate_review_allowed_id 3
   end
 
+  factory :due_date1 ,class:DueDate do
+    due_at  "2016-12-30 23:30:12"
+    deadline_type { DeadlineType.first || association(:deadline_type)} 
+    assignment { Assignment.first || association(:assignment)} 
+    submission_allowed_id 1
+    review_allowed_id  1
+    resubmission_allowed_id  1
+    rereview_allowed_id  1
+    review_of_review_allowed_id  1
+    round  1
+    flag  false
+    threshold  1
+    delayed_job_id  nil
+    deadline_name  nil
+    description_url nil
+    quiz_allowed_id 3
+    teammate_review_allowed_id 3
+  end
+
   factory :deadline_type ,class:DeadlineType do
     name  "submission"
   end     
@@ -220,6 +239,12 @@ FactoryGirl.define do
     assignment { Assignment.first || association(:assignment)} 
     node_object_id 1
     type "AssignmentNode"
+  end  
+
+  factory :course_node ,class:CourseNode do
+    course { Course.first || association(:course)} 
+    node_object_id 1
+    type "CourseNode"
   end  
 
   factory :questionnaire, class:ReviewQuestionnaire do

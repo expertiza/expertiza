@@ -1,5 +1,16 @@
 class QuizQuestion < Question
   has_many :quiz_question_choices, :class_name => 'QuizQuestionChoice', :foreign_key => 'question_id'
+  belongs_to :quiz_questionnaire, class_name: 'QuizQuestionnaire', foreign_key: :questionnaire_id
+  validates_presence_of :txt, message: 'Please make sure all questions have text'
+  validate :has_correct_choice
+
+  # Verify that the question has one choice that is considered correct.
+  def has_correct_choice
+    if !quiz_question_choices.any? { |choice| choice.iscorrect }
+      errors.add :correct_choice, 'Please select a correct answer for all questions'
+    end
+  end
+
   def edit
   end
 

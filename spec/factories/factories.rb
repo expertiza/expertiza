@@ -291,7 +291,7 @@ FactoryGirl.define do
   factory :review_response_map, class:ReviewResponseMap do
     assignment { Assignment.first || association(:assignment)}
     reviewee {AssignmentTeam.first || association(:assignment_team)}
-    reviewer_id 1       
+    reviewer_id {1 || association(:reviewer_id)}
     type 'ReviewResponseMap'
   end
 
@@ -302,6 +302,4 @@ FactoryGirl.define do
     round nil
     is_submitted false
   end
-
 end
-

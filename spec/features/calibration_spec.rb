@@ -272,7 +272,6 @@ describe 'Add Expert Review' do
   end
 end
 
-
 def create_fill_questionnaire
   #login as instructor
   login_as @instructor.name
@@ -377,16 +376,13 @@ describe 'Create and Display Calibration' do
     # participant object's user (the submitter).
     create :team_user, team: @team2, user: @student2
     create :review_response_map, assignment: @assignment, reviewee: @team2
-
-
-
   end
 
   #creates a questionnaire, assigns it to the assignment, fills out the questionaire,
   #displays the questionaire response, checks to make sure the score is there
   it 'create a questionnaire, fill it out, display results', :js => true do
-
     create_fill_questionnaire
+
     #review should be submitted at this point. click on view to make sure you can see it
     #click_link "View"
     visit "/response/view?id=#{@assignment.id}&return=assignment_edit"
@@ -430,8 +426,6 @@ describe 'Display Calibration For Student' do
     @review_deadline_type=create(:deadline_type,name:"review")
     create :due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
 
-
-
     # Create a team linked to the calibrated assignment
     @team = create :assignment_team, assignment: @assignment
 
@@ -464,7 +458,6 @@ describe 'Display Calibration For Student' do
   #creates a questionnaire, assigns it to the assignment, fills out the questionaire,
   #displays the questionaire response, checks to make sure the score is there
   it 'create a questionnaire, fill it out, display results', :js => true do
-
     create_fill_questionnaire
 
     #review should be submitted at this point. click on view to make sure you can see it

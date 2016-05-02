@@ -20,7 +20,7 @@ class Questionnaire < ActiveRecord::Base
   has_many :assignments, :through => :assignment_questionnaires
   has_one :questionnaire_node,:foreign_key => :node_object_id,:dependent => :destroy
 
-  validates_presence_of :name
+  validates_presence_of :name, message: 'Please specify quiz name (please do not use your name or id).'
   validates_numericality_of :max_question_score
   validates_numericality_of :min_question_score
 
@@ -73,10 +73,9 @@ class Questionnaire < ActiveRecord::Base
 
   # validate the entries for this questionnaire
   def validate_questionnaire
-    if max_question_score < 1
+    if !max_question_score || max_question_score < 1
       errors.add(:max_question_score, "The maximum question score must be a positive integer.")
-    end
-    if min_question_score >= max_question_score
+    elsif !min_question_score || min_question_score >= max_question_score
       errors.add(:min_question_score, "The minimum question score must be less than the maximum")
     end
 

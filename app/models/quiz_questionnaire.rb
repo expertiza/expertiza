@@ -1,4 +1,6 @@
 class QuizQuestionnaire < Questionnaire
+  has_many :quiz_questions, class_name: 'QuizQuestion', foreign_key: :questionnaire_id
+
   after_initialize :post_initialization
   def post_initialization
     self.display_type = 'Quiz'

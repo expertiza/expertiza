@@ -43,6 +43,86 @@ describe TreeDisplayController do
       expect(session[:root]).to eq('1')
       expect(response).to redirect_to(list_tree_display_index_path)
     end
+  end
 
+  describe "GET #get_folder_node_ng" do
+    before(:each) do
+      @treefolder = TreeFolder.new
+      @treefolder.parent_id = nil
+      @treefolder.name = "Courses"
+      @treefolder.child_type = "CourseNode"
+      @treefolder.save
+      @foldernode = FolderNode.new
+      @foldernode.parent_id = nil
+      @foldernode.type = "FolderNode"
+    end
+    it "populates a list of FolderNodes when there is a match" do
+
+      @foldernode.node_object_id = 1
+      @foldernode.save
+
+      get :get_folder_node_ng
+      expect(response.body).to match [@foldernode].to_json
+    end
+    it "populates an empty list when there is no match" do
+
+      @foldernode.node_object_id = 2
+      @foldernode.save
+
+      get :get_folder_node_ng
+      expect(response.body).to eq "[]"
+    end
+  end
+  it { should respond_to(:get_folder_node_ng) }
+  it { should respond_to(:get_children_node_ng) }
+  it { should respond_to(:get_children_node_2_ng) }
+
+  describe "GET #get_session_last_open_tab" do
+    it "returns HTTP status 200" do
+      get :get_session_last_open_tab
+      expect(response).to have_http_status(200)
+    end
+  end
+
+  describe "POST #get_children_node_ng" do
+    before(:each) do
+      @treefolder = TreeFolder.new
+      @treefolder.parent_id = nil
+      @treefolder.name = "Courses"
+      @treefolder.child_type = "CourseNode"
+      @treefolder.save
+      @foldernode = FolderNode.new
+      @foldernode.parent_id = nil
+      @foldernode.type = "FolderNode"
+      @foldernode.node_object_id = 1
+      @foldernode.save
+      @course = create(:course)
+      create(:assignment)
+      create(:assignment_node)
+      create(:course_node)
+      @instructor = User.where(role_id: 1).first
+    end
+
+    it "returns a list of course objects(private) as json" do
+      params = FolderNode.all()
+      post :get_children_node_ng, { :reactParams => { :child_nodes => params.to_json , :nodeType => "FolderNode" } }, { :user => @instructor }
+      expect(response.body).to match /csc517\/test/
+    end
+
+    it "returns an empty list when there are no private or public courses" do
+      params = FolderNode.all()
+      Assignment.delete(1)
+      Course.delete(1)
+      post :get_children_node_ng, { :reactParams => { :child_nodes => params.to_json , :nodeType => "FolderNode" } }, { :user => @instructor }
+      expect(response.body).to eq "{\"Courses\":[]}"
+    end
+
+    it "returns a list of course objects(public) as json" do
+      params = FolderNode.all()
+      @course.private = false
+      @course.save
+      post :get_children_node_ng, { :reactParams => { :child_nodes => params.to_json , :nodeType => "FolderNode" } }, { :user => @instructor }
+      expect(response.body).to match /csc517\/test/
+    end
   end
 end

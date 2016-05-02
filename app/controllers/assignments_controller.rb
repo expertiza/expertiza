@@ -182,7 +182,6 @@ class AssignmentsController < ApplicationController
   # TODO: need to be tested
   #-------------------------------------------------------------------------------------------------------------------
   def copy
-    @user = ApplicationHelper::get_user_role(current_user)
     @user = current_user
     session[:copy_flag] = true
     #check new assignment submission directory and old assignment submission directory

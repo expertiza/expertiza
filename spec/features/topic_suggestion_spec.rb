@@ -6,7 +6,7 @@ require 'selenium-webdriver'
 
 ########################################
 
-describe "Assignment Topic Suggestion Test", :js => true do
+describe "Assignment Topic Suggestion Test" do
     pubAssignment = nil
     before(:each) do
       create(:assignment, name: 'Assignment_suggest_topic', allow_suggestions: true)
@@ -28,7 +28,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
     end
   
 
-   describe "case 1", :js => true do
+   describe "case 1" do
 
     it "Instructor set an assignment which allow student suggest topic and register student2065" do
       #login as student2065, Note by Xing Pan: modify spec/factories/factories.rb to generate student11 and call "create student" at beginning
@@ -40,7 +40,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
       #student2065 suggest topic
       find_link('Assignment_suggest_topic').click
       expect(page).to have_content "Suggest a topic"
-      find_link('Suggest a topic').click    
+      find_link('Suggest a topic').click
       fill_in 'suggestion_title', with: 'suggested_topic'
       fill_in 'suggestion_description', with: 'suggested_description'
       click_button 'Submit'
@@ -61,7 +61,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
    end
 
 
-   describe "case 2", :js => true do
+   describe "case 2" do
     it " student2064 hold suggest topic and suggest a new one and student2065 enroll on waitlist of suggested topic" do
       #login_as "student2064"
       user = User.find_by_name('student2064')
@@ -159,7 +159,7 @@ describe "Assignment Topic Suggestion Test", :js => true do
 # One team is holding a topic. They sent a suggestion for new topic, and keep themselves in old topic
 ########################################
 
-  describe "case 3", :js => true do
+  describe "case 3" do
 
     it "student2065 hold suggest topic and suggest a new one, but wish to stay in the old topic" do
       #login_as "student2065"

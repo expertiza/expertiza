@@ -1,7 +1,31 @@
+<style>
+th.tablesorter-headerAsc{
+  background-image: url(<%= asset_path("up-arrow.png") %>);
+  background-size: 15px 15px;
+  background-repeat: no-repeat;
+  background-position: center right;
+  padding-right: 15px;
+}
 
+th.tablesorter-headerDesc{
+  background-image: url(<%= asset_path("down-arrow.png") %>);
+  background-size: 15px 15px;
+  background-repeat: no-repeat;
+  background-position: center right;
+  padding-right: 15px;
+}
+
+th.sorter-true.tablesorter-headerUnSorted{
+  background-image: url(<%= asset_path("sort.png") %>);
+  background-size: 15px 7px;
+  background-repeat: no-repeat;
+  background-position: center right;
+  padding-right: 15px;
+}
+</style>
 <script>
-  $(function () { 
-    $("[data-toggle='tooltip']").tooltip(); 
+  $(function () {
+    $("[data-toggle='tooltip']").tooltip();
     $("#scoresTable").tablesorter();
   });
 
@@ -140,7 +164,7 @@
             <!-- display the header row of the heatgrid table. this involves iterating through reviewers.-->
             <thead>
             <tr>
-              <th class="sorter-true">Criterion</th>
+              <th class="sorter-true">Criterion<span></span></th>
               <th class="sorter-false">Max</th>
 
               <% i = 1 %>
@@ -158,7 +182,7 @@
               <% end %>
 
               <th class="sorter-true" align="right" >
-                Avg
+                Avg<span></span>
               </th>
               <th class="sorter-false">
                 <span  data-toggle="tooltip" data-placement="right" title="A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback.">metric-1</span>

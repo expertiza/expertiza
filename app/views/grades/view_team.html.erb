@@ -12,7 +12,7 @@
     jQuery.moveColumn = function(table, from, to) {
       var rows = jQuery('tr', table);
 
-      var hidden_child_row = tables.find('tr.tablesorter-childRow');
+      var hidden_child_row = table.find('tr.tablesorter-childRow');
 
       hidden_child_row.each(function() {
         inner_table=jQuery(this).find('table.tbl_questlist')

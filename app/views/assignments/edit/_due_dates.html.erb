@@ -56,7 +56,7 @@
             return
         }
 
-        var html = '<tr id=' + element_id + '>';
+        var html = '<tr id=' + element_id + ' class="round_deadline">';
 
         var id = due_date.id
         if(id == null){
@@ -230,11 +230,14 @@
         }
 
         var i;
-        var due_dates_table_element_list = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)');
+        var due_dates_table_element_list = jQuery('#due_dates_table>tbody>tr.round_deadline');
         var current_round_count = 0;
         var round_no;
         for (i = 0; i < due_dates_table_element_list.length; i++) {
-            round_no = parseInt(due_dates_table_element_list[i].id.split('_').last());
+            var split_array = due_dates_table_element_list[i].id.split('_');
+            if(split_array.length == 0)
+                continue;
+            round_no = parseInt(split_array[split_array.length - 1]);
             if (!isNaN(round_no)) {
                 if (current_round_count < round_no) {
                     current_round_count = round_no;

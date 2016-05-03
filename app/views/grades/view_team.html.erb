@@ -11,6 +11,23 @@
     // Swaps two columns of the table
     jQuery.moveColumn = function(table, from, to) {
       var rows = jQuery('tr', table);
+
+      var hidden_child_row = tables.find('tr.tablesorter-childRow');
+
+      hidden_child_row.each(function() {
+        inner_table=jQuery(this).find('table.tbl_questlist')
+        hidden_table=inner_table.eq(0).find('tr')
+
+
+        hidden_table.eq(from-1).detach().insertBefore(hidden_table.eq(to-1));
+        if (from - to > 1) {
+          hidden_table.eq(to-1).detach().insertAfter((hidden_table.eq(from - 2)));
+
+        }
+
+      });
+
+
       var cols;
       rows.each(function() {
         cols = jQuery(this).children('th, td');

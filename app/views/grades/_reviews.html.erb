@@ -40,9 +40,9 @@
         <% if controller.action_name != "view_my_scores"%> %>
             <a href="#" name= <%= participant.id.to_s + '_' + round.to_s + "Link" %> onClick="toggleElement('<%= participant.id.to_s + '_' + round.to_s %>','round <%= round.to_s%> reviews');return false;">show round <%= round.to_s%> reviews</a>
         <% end %>
-        <div id=<%= participant.id.to_s + '_' + round.to_s %> <%= style="display: none;" if controller.action_name != "view_my_scores"%>>
+        <table class="table table-striped" id=<%= participant.id.to_s + '_' + round.to_s %> <%= style="display: none;" if controller.action_name != "view_my_scores"%>>
             <% rscore[:assessments].select{|response| response.round == round}.reverse.uniq{|response| response.map_id}.sort_by{|response| response.map_id}.each_with_index do |review, index| %>
-
+                <tr><td>
                 <% review_feedback = nil %>
                 <% count = count + 1 %>
                 <% prefix = nil if controller.action_name == "view_my_scores" %>
@@ -63,9 +63,9 @@
                         <%= display_directory_tree(@participant, files, true).html_safe %>
                     <% end %>
                 <% end %>
-
+                
                 <%= review.display_as_html(prefix, index + 1, nil) %><br/>
-
+                
                 <% map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: participant.id).first
                     review_feedbacks = map.try :response %>
                 <% if review_feedbacks && !review_feedbacks.empty? %>
@@ -74,9 +74,9 @@
                 <% else %>
                     <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
                 <% end %>
-                <hr>  
+                </td></tr>
             <% end %>
-        </div><hr>
+        </table><hr>
     <% end %>
 <% else %>
     <i>No reviews have been completed for this user's submissions.</i>

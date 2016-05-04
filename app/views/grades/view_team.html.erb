@@ -29,11 +29,11 @@ th.sorter-true.tablesorter-headerUnSorted{
     $("#scoresTable").tablesorter();
   });
 
-  var clicked = 1;
+  var lesser = false;
   // Function to sort the columns based on the total review score
   function col_sort(m) {
-    clicked += 1
-    lesser = clicked%2==0
+    
+    lesser = !lesser
     // Swaps two columns of the table
     jQuery.moveColumn = function(table, from, to) {
       var rows = jQuery('tr', table);

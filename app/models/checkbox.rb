@@ -74,9 +74,9 @@ class Checkbox < UnscoredQuestion
       html = ''
     end
     if answer.answer == 1
-      html += '<big><b>Question '+count.to_s+':</b>&nbsp;&nbsp;<img src="/assets/Check-icon.png"><i>'+self.txt+'</i></big><BR/>'
+      html += '<b>'+count.to_s+'. &nbsp;&nbsp;<img src="/assets/Check-icon.png">'+self.txt+'</b><BR/>'
     else
-      html += '<big><b>Question '+count.to_s+':</b>&nbsp;&nbsp;<img src="/assets/delete_icon.png"><i>'+self.txt+'</i></big><BR/>'
+      html += '<b>'+count.to_s+'. &nbsp;&nbsp;<img src="/assets/delete_icon.png">'+self.txt+'</b><BR/>'
     end
     
     if next_question.type == 'ColumnHeader'

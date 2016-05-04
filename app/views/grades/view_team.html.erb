@@ -29,9 +29,11 @@ th.sorter-true.tablesorter-headerUnSorted{
     $("#scoresTable").tablesorter();
   });
 
+  var clicked = 0;
   // Function to sort the columns based on the total review score
-  function col_sort(m, lesser) {
-
+  function col_sort(m) {
+    clicked += 1
+    lesser = clicked%2==0
     // Swaps two columns of the table
     jQuery.moveColumn = function(table, from, to) {
       var rows = jQuery('tr', table);
@@ -278,8 +280,8 @@ th.sorter-true.tablesorter-headerUnSorted{
 
           </table>
           <!-- Display the list of team members, for Peer Reviews. -->
-          <a href="#" onclick="col_sort(<%=table_count%>, true)" data-toggle="tooltip" title="Sort reviews in ascending order of the total score">ASC</a>&nbsp;
-          <a href="#" onclick="col_sort(<%=table_count%>, false)" data-toggle="tooltip" title="Sort reviews in descending order of the total score">DESC </a>
+          <div style="margin-top:5px"></div>
+          <input class="btn btn-default" type="button" href="#" onclick="col_sort(<%=table_count%>)" data-toggle="tooltip" title="Sort reviews in ascending/descending order of the total score. Consecutive clicks will alternate between ascending and descending sort order" value="Sort by total review score"/>
           <br>
           <% table_count += 1%>
           <span> <%= vm.display_team_members %></span>

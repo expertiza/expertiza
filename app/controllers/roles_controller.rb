@@ -18,7 +18,6 @@ class RolesController < ApplicationController
 
   def show
     @role = Role.find(params[:id])
-    @rps = RolesPermission.find_for_role(@role.id)
     @roles = @role.get_parents
     foreign
   end

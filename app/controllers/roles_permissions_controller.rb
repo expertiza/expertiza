@@ -21,12 +21,6 @@ class RolesPermissionsController < ApplicationController
     @roles_permission = RolesPermission.new
   end
 
-  def new_permission_for_role
-    @roles_permission = RolesPermission.new
-    @roles_permission.role_id = params[:id]
-    @role = Role.find(params[:id])
-    @permissions = Permission.find_not_for_role(params[:id])
-  end
 
   def create
     @roles_permission = RolesPermission.new(params[:roles_permission])

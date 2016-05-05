@@ -1,14 +1,14 @@
 require 'rails_helper'
 include LogInHelper
+
 RSpec.describe ResponseController, type: :controller do
 
   context "user not logged in" do
-  	 let!(:response) { Response.create(:map_id => 1, :additional_comment => 'hello',:round => 1)#,:version_num=>@version)
+  	 let(:response) { Response.create(:map_id => 1, :additional_comment => 'hello',:round => 1)
 }
   	#user not logged in 
   describe "GET #new_feedback" do
     it "returns http success" do
-        
       get :new_feedback
       expect(response).to redirect_to(request.env['HTTP_REFERER'] ? :back : :root)
     end
@@ -16,7 +16,6 @@ RSpec.describe ResponseController, type: :controller do
 
 
   describe "GET #saving" do
-    
     it "returns http success" do
       get :saving
       expect(response).to redirect_to(request.env['HTTP_REFERER'] ? :back : :root)
@@ -46,7 +45,6 @@ end
     let(:assignment){AssignmentParticipant.new} 
     let(:responsemap){ResponseMap.new}
     before(:each) do
-     
       student.save
       @user = User.find_by_name('student')
       @role = double('role', :super_admin? => false)
@@ -83,29 +81,19 @@ describe "GET #new_feedback" do
     	allow(ResponseMap).to receive(:save).and_return(true)
 
       get :saving
-      
       expect(response).to have_http_status(302)
     end
   end
 
   describe "GET #redirection" do
 
-
     it "returns http success" do
 
     	allow(Response).to receive(:find_by_map_id).and_return(review)
     	allow(review).to receive_message_chain(:reviewer,:id).and_return(1)
-    
       get :redirection
-      
       expect(response).to have_http_status(302)
     end
   end
-
-  
-
-
-
  end
-
 end

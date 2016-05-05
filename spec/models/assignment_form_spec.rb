@@ -1,10 +1,10 @@
 require 'rails_helper'
 
 describe AssignmentForm do
-  let(:assignment) { double("assignment") }
-  let(:assignment_questionnaire) { double("assignment_questionnaire") }
-  let(:due_date) { double"due_date"}
-  let(:user) { double"user"}
+  let(:assignment) { Assignment.new }
+  let(:assignment_questionnaire) { AssignmentQuestionnaire.new }
+  let(:due_date) { DueDate.new }
+  let(:user) { User.new }
   let(:assignment_form) { AssignmentForm.new(
       assignment: assignment,
       assignment_questionnaires: [assignment_questionnaire],

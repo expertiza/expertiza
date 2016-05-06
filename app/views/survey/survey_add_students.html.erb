@@ -1,0 +1,31 @@
+<h1>Students for Survey: <%= @survey.name %></h1>
+<% if @course_students.length != 0 %>
+  <%= form_tag(:action=>'survey_add_students', :method=>'get', :id=>params[:id], :course => params[:course]) do %>
+    <br />
+    <table id="surveys_table">
+      <tr>
+        <th>&nbsp; Assigned &nbsp;</th>
+        <th align="left"> Student Name</th>
+      </tr>
+      <% for student in @course_students %>
+        <tr>
+          <td align=center><input type=checkbox name="students[]" value="<%= student.id %>"
+            <% if @assigned_students.include?(student) -%>
+              
+              checked="checked"
+            <% end -%>
+            ></td>
+          <td><%= student.name %></td>
+          
+        </tr>
+      <% end %>
+    </table>
+    <br />
+    <%= submit_tag "Assign Student", :name=>"update" %>
+  <% end %>
+  <br />
+<% else -%>
+  <p>No students match the selected criteria.</p>
+<% end -%>
+<%= render :partial => '/shared_scripts/back' %>
+

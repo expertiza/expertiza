@@ -445,6 +445,19 @@ Expertiza::Application.routes.draw do
   resources :survey do
     collection do
       get :assign
+      post :assign
+      get :course_survey
+      post :course_survey
+      get :survey_add_global
+      post :survey_add_global
+      get :survey_add_students
+      post :survey_add_students
+      get :edit_deployment
+      post :edit_deployment
+      get :update
+      post :update
+      get :update_deployment
+      post :update_deployment
     end
   end
 
@@ -461,6 +474,7 @@ Expertiza::Application.routes.draw do
       get :view_responses
     	get :begin_survey
     	get :comments
+      get :new_course_survey_response
     end
   end
 
@@ -537,6 +551,12 @@ Expertiza::Application.routes.draw do
   get ':controller/service.wsdl', :action => 'wsdl'
 
   get ':controller(/:action(/:id))(.:format)'
+
+  resources :course_survey do
+    collection do
+      get :list
+    end
+  end
 
  # get 'sign_up_sheet/intelligent_signup_sheet.html_erb' => 'sign_up_sheet#intelligentPage'
 end

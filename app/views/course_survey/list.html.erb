@@ -1,0 +1,23 @@
+<h1>
+  List of Course surveys
+</h1>
+<table class=listing cellpadding=2 width=50%>
+  <% if (@surveys.size > 0) %>
+
+      <% @surveys.each do |s| %>
+          <tr>
+            <td>
+              <%= link_to s[0].name, :controller => 'survey_response', :action => 'new_course_survey_response', :questionnaire_id=> s[0].id %>
+          </tr>
+      <% end %>
+  <% else %>
+      <tr>
+        <td>
+          <div class="flash_note">
+            There exist no pending course surveys.
+          </div>
+        </td> </tr>
+
+  <%end%>
+
+</table>

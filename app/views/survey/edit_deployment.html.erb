@@ -1,0 +1,35 @@
+<h1>Editing deploy</h1>
+
+<%= form_for :deploy, url:{:controller => 'survey', :action => 'update_deployment', :course_id => @course.id, :id => @survey.id}, method: :get do |f| %>
+
+   <p><%= label_tag(:before, "Start Date:") %></p>
+            <p><%= text_field_tag :start_date, Date.today.beginning_of_day.strftime("%Y-%m-%d %H:%M"), class: 'datetimeklass' %></p>
+
+
+      <p><%= label_tag(:before, "End Date:") %></p>
+            <p><%= text_field_tag :end_date, Date.today.beginning_of_day.strftime("%Y-%m-%d %H:%M"), class: 'datetimeklass' %></p>
+
+    <%= f.hidden_field :deploy_id, value: @deploy.id %>
+
+    <p>
+      <%= f.submit(url:{:controller => 'survey', :action => 'update_deployment', :course_id => @course.id, :id => @survey.id})%>
+    </p>
+
+<% end %>
+
+<script type="text/javascript">
+jQuery('.datetimeklass').datetimepicker({
+            dateFormat: 'yyyy-mm-dd',
+            timeFormat: 'HH:mm:ss z',
+            controlType: 'select',
+            timezoneList: [
+                { value: -000, label: 'GMT'},
+                { value: -300, label: 'Eastern'},
+                { value: -360, label: 'Central' },
+                { value: -420, label: 'Mountain' },
+                { value: -480, label: 'Pacific' }
+            ]
+        });
+</script>
+
+<%= render :partial => '/shared_scripts/back' %>

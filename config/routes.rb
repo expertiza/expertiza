@@ -517,6 +517,9 @@ Expertiza::Application.routes.draw do
 
   get '/users/show_selection', controller: :users, action: :show_selection
   get '/users/list', controller: :users, action: :list
+  # E1626
+  get '/users/credly_register', controller: :users, action: :credly_register
+  post '/users/credly_register', controller: :users, action: :credly_register
   get '/menu/*name', controller: :menu_items, action: :link
   get ':page_name', controller: :content_pages, action: :view, method: :get
   get '/submitted_content/submit_hyperlink' => 'submitted_content#submit_hyperlink'
@@ -538,5 +541,13 @@ Expertiza::Application.routes.draw do
 
   get ':controller(/:action(/:id))(.:format)'
 
+  # E1626
+  get '/badges/configuration', controller: :badges, action: :configuration
+  get '/badges/new', controller: :badges, action: :new
+  post 'badges/create', controller: :badges, action: :create
+  post 'badges/assign_badge_user', controller: :badges, action: :assign_badge_user
+  get '/badges/edit', controller: :badges, action: :edit
+  post '/badges/update', controller: :badges, action: :update
+  delete '/badges/destroy'
  # get 'sign_up_sheet/intelligent_signup_sheet.html_erb' => 'sign_up_sheet#intelligentPage'
 end

@@ -43,6 +43,11 @@ require 'analytic/assignment_analytic'
 
   DEFAULT_MAX_OUTSTANDING_REVIEWS = 2
 
+  #Badge Awarding strategies
+  BS_TOP_SCORES = 'Top Scores'
+  BS_SCORE_THRESHOLD = 'Score Threshold'
+  BS_STRATEGIES = [BS_TOP_SCORES, BS_SCORE_THRESHOLD]
+
   def self.max_outstanding_reviews
     DEFAULT_MAX_OUTSTANDING_REVIEWS
   end

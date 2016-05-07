@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160326205445) do
+ActiveRecord::Schema.define(version: 20160424200049) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -22,6 +22,14 @@ ActiveRecord::Schema.define(version: 20160326205445) do
 
   add_index "answers", ["question_id"], name: "fk_score_questions", using: :btree
   add_index "answers", ["response_id"], name: "fk_score_response", using: :btree
+
+  create_table "assignment_groups", force: :cascade do |t|
+    t.integer "badge_group_id", limit: 4
+    t.integer "assignment_id",  limit: 4
+  end
+
+  add_index "assignment_groups", ["assignment_id"], name: "index_assignment_groups_on_assignment_id", using: :btree
+  add_index "assignment_groups", ["badge_group_id"], name: "index_assignment_groups_on_badge_group_id", using: :btree
 
   create_table "assignment_questionnaires", force: :cascade do |t|
     t.integer "assignment_id",        limit: 4
@@ -77,6 +85,7 @@ ActiveRecord::Schema.define(version: 20160326205445) do
     t.boolean  "can_choose_topic_to_review", limit: 1,     default: true
     t.boolean  "is_calibrated",              limit: 1,     default: false
     t.boolean  "is_selfreview_enabled",      limit: 1
+    t.boolean  "is_badges_enabled",          limit: 1
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -100,6 +109,33 @@ ActiveRecord::Schema.define(version: 20160326205445) do
   end
 
   add_index "automated_metareviews", ["response_id"], name: "fk_automated_metareviews_responses_id", using: :btree
+
+  create_table "badge_groups", force: :cascade do |t|
+    t.string  "strategy",              limit: 255, default: "",    null: false
+    t.integer "threshold",             limit: 4,                   null: false
+    t.integer "badge_id",              limit: 4
+    t.integer "course_id",             limit: 4
+    t.boolean "is_course_level_group", limit: 1
+    t.boolean "badges_awarded",        limit: 1,   default: false
+  end
+
+  create_table "badge_users", force: :cascade do |t|
+    t.boolean "is_course_badge", limit: 1, default: false, null: false
+    t.integer "user_id",         limit: 4
+    t.integer "assignment_id",   limit: 4
+    t.integer "course_id",       limit: 4
+    t.integer "badge_id",        limit: 4
+  end
+
+  add_index "badge_users", ["assignment_id"], name: "index_badge_users_on_assignment_id", using: :btree
+  add_index "badge_users", ["badge_id"], name: "index_badge_users_on_badge_id", using: :btree
+  add_index "badge_users", ["course_id"], name: "index_badge_users_on_course_id", using: :btree
+  add_index "badge_users", ["user_id"], name: "index_badge_users_on_user_id", using: :btree
+
+  create_table "badges", force: :cascade do |t|
+    t.string  "name",            limit: 255, default: "", null: false
+    t.integer "credly_badge_id", limit: 4
+  end
 
   create_table "bids", force: :cascade do |t|
     t.integer  "topic_id",   limit: 4
@@ -628,6 +664,9 @@ ActiveRecord::Schema.define(version: 20160326205445) do
     t.text    "public_key",                limit: 65535
     t.boolean "copy_of_emails",            limit: 1,     default: false
     t.integer "institution_id",            limit: 4
+    t.integer "credly_id",                 limit: 4
+    t.string  "credly_accesstoken",        limit: 255
+    t.string  "credly_refreshtoken",       limit: 255
   end
 
   add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree
@@ -645,11 +684,17 @@ ActiveRecord::Schema.define(version: 20160326205445) do
 
   add_foreign_key "answers", "questions", name: "fk_score_questions"
   add_foreign_key "answers", "responses", name: "fk_score_response"
+  add_foreign_key "assignment_groups", "assignments"
+  add_foreign_key "assignment_groups", "badge_groups"
   add_foreign_key "assignment_questionnaires", "assignments", name: "fk_aq_assignments_id"
   add_foreign_key "assignment_questionnaires", "questionnaires", name: "fk_aq_questionnaire_id"
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
   add_foreign_key "assignments", "users", column: "instructor_id", name: "fk_assignments_instructors"
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"
+  add_foreign_key "badge_users", "assignments"
+  add_foreign_key "badge_users", "badges"
+  add_foreign_key "badge_users", "courses"
+  add_foreign_key "badge_users", "users"
   add_foreign_key "courses", "users", column: "instructor_id", name: "fk_course_users"
   add_foreign_key "due_dates", "assignments", name: "fk_due_dates_assignments"
   add_foreign_key "due_dates", "deadline_rights", column: "rereview_allowed_id", name: "fk_due_date_rereview_allowed"

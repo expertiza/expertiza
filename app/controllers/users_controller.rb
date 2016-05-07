@@ -1,4 +1,7 @@
 require 'will_paginate/array'
+require 'uri'
+require 'net/http'
+require 'json'
 
 class UsersController < ApplicationController
   autocomplete :user, :name
@@ -6,17 +9,23 @@ class UsersController < ApplicationController
   verify :method => :post, :only => [ :destroy, :create, :update ],
     :redirect_to => { :action => :list }
 
-
+  # E1626
   def action_allowed?
     case params[:action]
-    when 'keys'
-      current_role_name.eql? 'Student'
-    else
-      ['Super-Administrator',
-       'Administrator',
-       'Instructor',
-       'Teaching Assistant'].include? current_role_name
-    end
+      when 'keys'
+        current_role_name.eql? 'Student'
+      when 'credly_register'
+        ['Super-Administrator',
+         'Administrator',
+         'Instructor',
+         'Teaching Assistant',
+         'Student'].include? current_role_name
+      else
+        ['Super-Administrator',
+         'Administrator',
+         'Instructor',
+         'Teaching Assistant'].include? current_role_name
+      end
   end
 
   def index
@@ -74,7 +83,7 @@ class UsersController < ApplicationController
     @letters = ('A'..'Z').to_a
   end
 
-    def show_selection
+  def show_selection
       @user = User.find_by_name(params[:user][:name])
       if @user != nil
         get_role
@@ -90,7 +99,7 @@ class UsersController < ApplicationController
       end
     end
 
-    def show
+  def show
       if (params[:id].nil?) || ((current_user_role? == "Student") &&  (session[:user].id != params[:id].to_i))
         redirect_to(:action => AuthHelper::get_home_action(session[:user]), :controller => AuthHelper::get_home_controller(session[:user]))
       else
@@ -106,13 +115,13 @@ class UsersController < ApplicationController
       end
     end
 
-    def new
+  def new
       @user = User.new
       @rolename= Role.find_by_name(params[:role])
       foreign
     end
 
-    def create
+  def create
 
       # if the user name already exists, register the user by email address
       check = User.find_by_name(params[:user][:name])
@@ -196,6 +205,79 @@ class UsersController < ApplicationController
     end
   end
 
+  # E1626
+  def credly_register
+    if request.post?
+      begin
+        data_token = send_registration_request_credly
+        token = data_token['token']
+        refresh_token = data_token['refresh_token']
+        user_data = get_credly_user_id token
+        user_id = user_data['id']
+        @current_user.credly_id = user_id
+        @current_user.credly_accesstoken = token
+        @current_user.credly_refreshtoken = refresh_token
+        @current_user.save
+        flash[:notice] = nil
+        if current_role_name.eql? 'Student'
+          redirect_to :controller => 'student_task', :action => 'list'
+        else
+          redirect_to :controller => 'tree_display', :action => 'list'
+        end
+      rescue
+        if data_token['more_info'].key?('email')
+          flash[:notice] = data_token['more_info']['email']
+        elsif data_token['more_info'].key?('password')
+          flash[:notice] = data_token['more_info']['password']
+        else
+          flash[:notice] = 'Unable to create a Credly account at the moment. Please try again later.'
+        end
+      end
+    end
+  end
+
+  # E1626
+  def send_registration_request_credly
+    uri = URI.parse("https://api.credly.com")
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    request = Net::HTTP::Post.new("/v1.1/authenticate/register")
+    request["X-Api-Key"] = "f14c0138c043c3159420f297276eab61"
+    request["X-Api-Secret"] = "6qmzTxOQZJfF5K1ExH80K+umX9gfU5lmtswycO9TycswGbKEIPwuoXxcIohF4d6go0FeLMRv9uV+MD0jmeQsHBDaTNKa+blumqcd+cfK1y5lqTbLiLZsxdue9vth3Lh9U6Juy1rvy2VGYo8EOqh46PMjOmmOTUIZan9vvaf8Z0I="
+    request.set_form_data({"email" => params['register']['email'], "password" => params['register']['password'], "first_name" => @current_user.name, "last_name" => "", "display_name" => @current_user.name, "is_organization" => "0"})
+    response = http.request(request)
+    parsed_response = JSON.parse(response.body)
+
+    data_token = nil
+    if response.code == '200'
+      data_token = parsed_response['data']
+    else
+      data_token = parsed_response['meta']
+    end
+    data_token
+  end
+
+  # E1626
+  def get_credly_user_id(token)
+    uri = URI.parse("https://api.credly.com")
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    request = Net::HTTP::Get.new("/v1.1/me?access_token=" + token)
+    request["X-Api-Key"] = "f14c0138c043c3159420f297276eab61"
+    request["X-Api-Secret"] = "6qmzTxOQZJfF5K1ExH80K+umX9gfU5lmtswycO9TycswGbKEIPwuoXxcIohF4d6go0FeLMRv9uV+MD0jmeQsHBDaTNKa+blumqcd+cfK1y5lqTbLiLZsxdue9vth3Lh9U6Juy1rvy2VGYo8EOqh46PMjOmmOTUIZan9vvaf8Z0I="
+    response = http.request(request)
+    parsed_response = JSON.parse(response.body)
+
+    user_data = nil
+    if response.code == '200'
+      user_data = parsed_response['data']
+    else
+      user_data = parsed_response['meta']
+    end
+    user_data
+  end
+
+
   protected
 
   def foreign
@@ -246,4 +328,5 @@ class UsersController < ApplicationController
   #def undo_link
   #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @user.versions.last.id)}>undo</a>"
   #end
+
 end

@@ -1,0 +1,44 @@
+<div style="text-align: center">
+  <h3>Leaderboard for <%= params[:course_name] %></h3>
+  <h5><strong>Instructor:</strong> <%= @instructor.name %></h5>
+</div>
+<div style="margin-top: 50px">
+  <table class="table">
+    <thead>
+    <tr>
+      <td><strong>Student Name</strong></td>
+      <td><strong>Badges</strong></td>
+    </tr>
+    </thead>
+    <tbody>
+    <% @sorted_student_badges.each do |student, badge| %>
+        <% stu = User.find_by_id(student) %>
+        <% if current_user.id == stu.id %>
+            <tr style="background-color: darkgrey;">
+              <td><%= stu.name %></td>
+              <td>
+                <div id="thumbwrap">
+                  <% badge.each do |b| %>
+                      <a class="thumb" href="#"><img src=<%= @badgeURL[b] %> alt="" width="50px" height="50px" title=<%= @badge_names[b] %>></a>
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+        <% else %>
+            <tr>
+              <td><%= stu.name %></td>
+              <td>
+                <div id="thumbwrap">
+                  <% badge.each do |b| %>
+                      <a class="thumb" href="#"><img src=<%= @badgeURL[b] %> alt="" width="50px" height="50px" title=<%= @badge_names[b] %>></a>
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+        <% end %>
+    <% end %>
+    </tbody>
+
+  </table>
+</div>
+

@@ -1,0 +1,78 @@
+<!--E1626-->
+<script type="text/javascript">
+  function toggleDisplay() {
+    var ContentTable = document.getElementById("strategyoption");
+    var enablebadge = document.getElementById("assignment_form_assignment_is_badges_enabled");
+    if (enablebadge.checked) {
+      ContentTable.style.display = "table";
+    }
+    else {
+      ContentTable.style.display = "none";
+    }
+  }
+
+  function clearText() {
+    var topText = document.getElementById("assignment_form_badge_badge_assignment_NumBadges");
+    var scoreText = document.getElementById("assignment_form_badge_badge_assignment_threshold");
+    topText.value = null;
+    scoreText.value = null;
+  }
+
+
+</script>
+<table style="border-collapse: separate; border-spacing: 0 1em;">
+  <tr>
+    <td style='padding:5px' id='assignment_is_badges_enabled'>
+      <input name="assignment_form[assignment][is_badges_enabled]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][is_badges_enabled]', 'true', @assignment_form.assignment.is_badges_enabled, :onchange => 'toggleDisplay()') %>
+      <%= label_tag('assignment_form[assignment][is_badges_enabled]', 'Enable Badges') %>
+    </td>
+  </tr>
+</table>
+<table id="strategyoption" style="border-collapse: separate; border-spacing: 0 1em;">
+  <tr>
+    <td>
+      <table>
+        <tr>
+          <td>
+            <%= radio_button_tag 'assignment_form[badge][badge_assignment_strategy]', badge_strategy_options[0][0], @strategy_top, :onchange => 'clearText()' %>
+            <label for="assignment_strategy_1"><%= badge_strategy_options[0][0] %></label>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="assignment_strategy_1">Top 'N' Students: </label>
+            <%= number_field_tag 'assignment_form[badge][badge_assignment_NumBadges]', @threshold_top, :size => '4' %>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+  <tr></tr>
+  <tr>
+    <td>
+      <table>
+        <tr>
+          <td>
+            <%= radio_button_tag 'assignment_form[badge][badge_assignment_strategy]', badge_strategy_options[1][0], @strategy_score_threshold, :onchange => 'clearText()' %>
+            <label for="assignment_strategy_2"><%= badge_strategy_options[1][0] %></label>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="assignment_strategy_2">Score greater than: </label>
+            <%= number_field_tag 'assignment_form[badge][badge_assignment_threshold]', @threshold_score, :size => '4' %>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+<div style="margin-top: 50px; text-align: left">
+  <h3>Which badge to award?</h3>
+  <strong><i style="color: darkred">Please refresh the page whenever a new badge is created</i></strong>
+  <br/>
+  <%= render partial: 'assignments/edit/select_badge' %>
+</div>

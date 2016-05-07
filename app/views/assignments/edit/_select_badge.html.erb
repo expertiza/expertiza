@@ -1,0 +1,41 @@
+<!--E1626-->
+<link rel="stylesheet" type="text/css" href="/assets/image-picker.css">
+<script src="/assets/image-picker.js" type="text/javascript"></script>
+<script>
+  jQuery(document).ready(function () {
+    $("select").imagepicker({
+      show_label: true
+    });
+  });
+</script>
+<style type="text/css">
+  .thumbnails li img {
+    width: 150px;
+    height: 150px;
+  }
+
+  select {
+    text-indent: 10px;
+  }
+</style>
+<% if @list_badges.length > 0 %>
+    <h4>Choose from existing badges: </h4>
+    <% i=0 %>
+    <div class="picker">
+      <select class="image-picker show-labels show-html" name="assignment_form[badge][badge_selected]">
+        <% @list_badges.each do |badge| %>
+            <% if @badge_group != nil and @badge_group.badge_id == badge["badge_id"] %>
+              <option data-img-src=<%= badge["badge_image_url"] %> value=<%= badge["badge_id"] %> selected><%= badge["badge_title"] %></option>
+            <%else%>
+              <option data-img-src=<%= badge["badge_image_url"] %> value=<%= badge["badge_id"] %> ><%= badge["badge_title"] %></option>
+            <%end%>
+            <% i += 1 %>
+        <% end %>
+      </select>
+    </div>
+<% end %>
+<div>
+  <h4>Create new badge: </h4>
+  <a href="https://credly.com/badge-builder">Redirect to Credly</a>
+</div>
+<br/><br/>

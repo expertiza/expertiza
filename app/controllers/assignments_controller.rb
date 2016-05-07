@@ -8,7 +8,7 @@ class AssignmentsController < ApplicationController
       assignment = Assignment.find(params[:id])
       return true if ['Super-Administrator', 'Administrator'].include? current_role_name
       return true if assignment.instructor_id == current_user.id
-      return true if (TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course_id)) && (TaMapping.where(course_id: assignment.course_id).include?TaMapping.where(ta_id: current_user.id, course_id: assignment.course_id).first)
+      return true if (TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course_id)) && (TaMapping.where(course_id: assignment.course_id).include? TaMapping.where(ta_id: current_user.id, course_id: assignment.course_id).first)
       return true if (assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.id)
       return false
     else
@@ -70,6 +70,38 @@ class AssignmentsController < ApplicationController
     @participants_count = @assignment_form.assignment.participants.size
     @teams_count = @assignment_form.assignment.teams.size
 
+    #Check for existing Badge Strategies
+    @badge_group = nil
+    @strategy_top = nil
+    @strategy_score_threshold = nil
+    @threshold_top = nil
+    @threshold_score = nil
+    @assignment_group = AssignmentGroup.joins(:badge_group).where('assignment_groups.assignment_id = ? and badge_groups.is_course_level_group=?', params[:id], false).first
+    if (@assignment_group != nil)
+      @badge_group = BadgeGroup.find_by_id(@assignment_group.badge_group_id)
+      if @badge_group != nil
+        if @badge_group.strategy == 'Top Scores'
+          @strategy_top = true
+          @threshold_top = @badge_group.threshold
+        elsif @badge_group.strategy == 'Score Threshold'
+          @strategy_score_threshold = true
+          @threshold_score = @badge_group.threshold
+        end
+      end
+    end
+
+    #Get all badges for current user and expertiza admin
+    @list_badges = Array.new
+    response = CredlyHelper.get_badges_created(session[:user].id)
+    parsed_response = JSON.parse(response.body)
+    user_data = nil
+
+    @list_badges, user_data = CredlyHelper.parse_response(parsed_response, response)
+
+    # response = CredlyHelper.get_badges_created(expertiza_admin_user_id)
+    # parsed_response = JSON.parse(response.body)
+    # @list_badges, user_data = CredlyHelper.parse_response(parsed_response, response, @list_badges)
+
     # Check if name and url in database is empty before webpage displays
     @due_date_all.each do |dd|
       @due_date_nameurl_notempty = is_due_date_nameurl_notempty(dd);
@@ -82,14 +114,14 @@ class AssignmentsController < ApplicationController
       if dd.due_at.present?
         dd.due_at = dd.due_at.to_s.in_time_zone(current_user.timezonepref)
       end
-      if  @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox &&
+      if @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox &&
           (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
         break
       end
     end
 
-    @assignment_questionnaires.each do  |aq|
-      if(!(aq.used_in_round.nil?))
+    @assignment_questionnaires.each do |aq|
+      if (!(aq.used_in_round.nil?))
         @reviewvarycheck = 1
         break
       end
@@ -107,7 +139,7 @@ class AssignmentsController < ApplicationController
 
 
   def update
-    unless(params.has_key?(:assignment_form))
+    unless (params.has_key?(:assignment_form))
       @assignment=Assignment.find(params[:id])
       @assignment.course_id=params[:course_id];
       if @assignment.save
@@ -132,7 +164,7 @@ class AssignmentsController < ApplicationController
       flash[:error] = "We strongly suggest instructors specify the preferred timezone to guarantee the correct time display. For now we assume you are in " +parent_timezone
       current_user.timezonepref=parent_timezone
     end
-    if @assignment_form.update_attributes(assignment_form_params,current_user)
+    if @assignment_form.update_attributes(assignment_form_params, current_user)
       flash[:note] = 'Assignment was successfully saved.'
     else
       flash[:error] = "Assignment save failed: #{@assignment_form.errors}"
@@ -143,8 +175,6 @@ class AssignmentsController < ApplicationController
   def show
     @assignment = Assignment.find(params[:id])
   end
-
-
 
 
   #--------------------------------------------------------------------------------------------------------------------
@@ -186,11 +216,11 @@ class AssignmentsController < ApplicationController
     session[:copy_flag] = true
     #check new assignment submission directory and old assignment submission directory
     old_assign = Assignment.find(params[:id])
-    new_assign_id=AssignmentForm.copy(params[:id],@user)
+    new_assign_id=AssignmentForm.copy(params[:id], @user)
     if new_assign_id
       new_assign = Assignment.find(new_assign_id)
       flash[:note] = 'Warning: The submission directory for the copy of this assignment will be the same as the submission directory for the existing assignment, which will allow student submissions to one assignment to overwrite submissions to the other assignment.  If you do not want this to happen, change the submission directory in the new copy of the assignment.' if old_assign.directory_path == new_assign.directory_path
-      redirect_to edit_assignment_path  new_assign_id
+      redirect_to edit_assignment_path new_assign_id
     else
       flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'
       redirect_to list_tree_display_index_path
@@ -257,8 +287,8 @@ class AssignmentsController < ApplicationController
   #check whether rubrics are set before save assignment
   def empty_rubrics_list
     rubrics_list = ["ReviewQuestionnaire",
-                    "MetareviewQuestionnaire","AuthorFeedbackQuestionnaire",
-                    "TeammateReviewQuestionnaire","BookmarkRatingQuestionnaire"]
+                    "MetareviewQuestionnaire", "AuthorFeedbackQuestionnaire",
+                    "TeammateReviewQuestionnaire", "BookmarkRatingQuestionnaire"]
     @assignment_questionnaires.each do |aq|
       unless aq.questionnaire_id.nil?
         rubrics_list.reject! do |rubric|
@@ -344,4 +374,5 @@ class AssignmentsController < ApplicationController
   def assignment_form_params
     params.require(:assignment_form).permit!
   end
+
 end

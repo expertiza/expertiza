@@ -5,9 +5,10 @@ class StudentTaskController < ApplicationController
     ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator', 'Student'].include? current_role_name
   end
 
-
+  # E1626
   def list
     redirect_to(:controller => 'eula', :action => 'display') if current_user.is_new_user
+    redirect_to(:controller => 'users', :action => 'credly_register') if (current_user.credly_id == nil && current_user.credly_accesstoken == nil && !current_user.is_new_user)
     session[:user] = User.find_by(id: current_user.id)
     @student_tasks = StudentTask.from_user current_user
     @student_tasks.reject!{|t| !t.assignment.availability_flag}

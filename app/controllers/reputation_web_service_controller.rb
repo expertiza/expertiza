@@ -13,6 +13,7 @@ class ReputationWebServiceController < ApplicationController
 	@@round_num = ''
 	@@algorithm = ''
 	@@additional_info = ''
+	@@response = ''
 
 	def action_allowed?
 	  ['Super-Administrator',
@@ -133,6 +134,7 @@ class ReputationWebServiceController < ApplicationController
 		 @round_num = @@round_num
 		 @algorithm = @@algorithm
 		 @additional_info = @@additional_info
+		 @response = @@response
 	end
 
 	def send_post_request
@@ -264,6 +266,7 @@ class ReputationWebServiceController < ApplicationController
 		puts "Response #{response.code} #{response.message}:
           #{response.body}"
         puts
+        @@response = response
         @@response_body = response.body
 		redirect_to action: 'client'
 	end

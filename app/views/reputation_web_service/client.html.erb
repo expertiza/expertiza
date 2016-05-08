@@ -12,8 +12,8 @@
 	    <option value='lauw' >
 	      Lauw's algorithm
 	    </option>
-	    <option value='lauw-peer' >
-	      Lauw-peer algorithm
+	    <option value='lauw-expert' >
+	      Lauw-expert algorithm
 	    </option>
 	    <option value='quiz' >
 	      Quiz-based algorithm
@@ -73,6 +73,7 @@
           #{@response.body}"%>
 </p>
 
+
 <style>
 	pre {
 	   background-color: white;
@@ -125,13 +126,13 @@
 		
 		$('#request').html(library.json.prettyPrint(request));
 		$('#response').html(library.json.prettyPrint(response));
-	});
+	*/});
 
 	$('#algorithm').change(function changeDropdown(){
 		var selectedDropdownValue = $('#algorithm').find(":selected").val();
 		switch(selectedDropdownValue) {
 	    case 'hamer-expert':
-	    case 'lauw-peer':
+	    case 'lauw-expert':
 	        $("input[id='checkbox_expert_grade'][type='checkbox']").prop("checked", true);
 	        $("input[id='checkbox_hamer'][type='checkbox']").prop("checked", false);
 	        $("input[id='checkbox_lauw'][type='checkbox']").prop("checked", false);

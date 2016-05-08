@@ -1,5 +1,5 @@
 require 'rails_helper'
-include GradesHelper
+#include GradesHelper
 
 describe GradesController do
 
@@ -129,5 +129,4 @@ describe GradesController do
    end
 
 end
-
 

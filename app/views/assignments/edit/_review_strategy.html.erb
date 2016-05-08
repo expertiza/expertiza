@@ -67,4 +67,11 @@
     </td>
   </tr>
 
+  <tr>
+    <td style='padding:5px' id='assignment_reviewer_is_team'>
+      <%= label_tag('assignment_form[assignment][reviewer_is_team]', 'Review Type?') %>
+      <%= select("assignment_form[assignment]", "reviewer_is_team", [['Individual Review', false],['Team Based Review', true]], { include_blank: false }) %>
+    </td>
+  </tr>
+
 </table>

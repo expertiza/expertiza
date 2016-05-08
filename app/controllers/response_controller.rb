@@ -6,14 +6,17 @@ class ResponseController < ApplicationController
     case params[:action]
       when 'edit'  # If response has been submitted, no further editing allowed
         response = Response.find(params[:id])
+        response.map.reviewer = get_reviewer_from_response_map(response.map)
         return false if response.is_submitted
         return current_user_id?(response.map.reviewer.user_id)
       # Deny access to anyone except reviewer & author's team
       when 'delete','update'
         response = Response.find(params[:id])
+        response.map.reviewer = get_reviewer_from_response_map(response.map)
         return current_user_id?(response.map.reviewer.user_id)
       when 'view'
         response = Response.find(params[:id])
+        response.map.reviewer = get_reviewer_from_response_map(response.map)
         map = response.map
         assignment = response.map.reviewer.assignment
         # if it is a review response map, all the members of reviewee team should be able to view the reponse (can be done from heat map)
@@ -26,6 +29,15 @@ class ResponseController < ApplicationController
       else
         current_user
     end
+  end
+
+  def get_reviewer_from_response_map(map)
+    if map.reviewer_is_team
+      reviewer = AssignmentParticipant.where(:parent_id => map.reviewed_object_id, :user_id=>current_user.id).first
+    else
+      reviewer = map.reviewer
+    end
+    return reviewer
   end
 
   def scores
@@ -141,7 +153,6 @@ class ResponseController < ApplicationController
 
     # set more handy variables for the view
     set_content(true)
-
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
     render :action => 'response'
   end
@@ -215,7 +226,8 @@ class ResponseController < ApplicationController
 
     @return = params[:return]
     @map.save
-    redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
+    
+    redirect_to :action => 'redirection', :assignment_id => @map.reviewed_object_id, :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
   end
 
   #E1600
@@ -223,8 +235,7 @@ class ResponseController < ApplicationController
   def redirection
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
-    @map = Response.find_by_map_id(params[:id])
-
+  
     if params[:return] == "feedback"
       redirect_to :controller => 'grades', :action => 'view_my_scores', :id => @map.reviewer.id
     elsif params[:return] == "teammate"
@@ -236,8 +247,8 @@ class ResponseController < ApplicationController
     elsif params[:return] == "selfreview"
       redirect_to controller: 'submitted_content', action: 'edit', :id => @map.response_map.reviewer_id
     else
-      redirect_to :controller => 'student_review', :action => 'list', :id => @map.reviewer.id
-
+      reviewer = AssignmentParticipant.where(:parent_id=>params[:assignment_id], :user_id=>current_user.id).first
+      redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
     end
   end
 
@@ -250,6 +261,16 @@ class ResponseController < ApplicationController
     @review_questionnaire_ids = ReviewQuestionnaire.select("id")
     @assignment_questionnaire = AssignmentQuestionnaire.where(["assignment_id = ? and questionnaire_id IN (?)", @assignment.id, @review_questionnaire_ids]).first
     @questions = @assignment_questionnaire.questionnaire.questions.reject{|q|q.is_a?(QuestionnaireHeader)}
+  end
+
+  def get_participant(assignment_id,user_id, map)
+    assignment = Assignment.where(:id=>assignment_id).first
+    if assignment.reviewer_is_team
+      participant = AssignmentParticipant.where(:parent_id => assignment.id , :user_id=>user_id).first
+    else
+      participant = map.reviewer
+    end
+    return participant
   end
 
   private
@@ -266,8 +287,7 @@ class ResponseController < ApplicationController
     # handy reference to response assignment for ???
     @assignment = @map.assignment
 
-    # handy reference to the reviewer for ???
-    @participant = @map.reviewer
+    @participant = get_participant(@assignment.id, current_user.id, @map)    
 
     # handy reference to the contributor (should always be a Team)
     @contributor = @map.contributor

@@ -133,8 +133,14 @@ class ReviewMappingController < ApplicationController
   #This method is different from 'assignment_reviewer_automatically', which is in 'review_mapping_controller' and is used for instructor assigning reviewers in instructor-selected assignment.
   def assign_reviewer_dynamically
     assignment = Assignment.find(params[:assignment_id])
-    reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
-
+    if assignment.reviewer_is_team
+      team = Team.where(parent_id: assignment.id).select("id")
+      reviewer = TeamsUser.where(user_id: params[:reviewer_id], team_id: team).first
+      participant = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
+    else
+      reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
+    end
+    
     if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.has_topics? && assignment.can_choose_topic_to_review?
       flash[:error] = "Please go back and select a topic"
     else
@@ -166,8 +172,12 @@ class ReviewMappingController < ApplicationController
       # rescue Exception => e
       #   flash[:error] = (e.nil?) ? $! : e
       # end
-
-    redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
+    
+       if assignment.reviewer_is_team
+         redirect_to :controller => 'student_review', :action => 'list', :id => participant.id, :reviewer_team_id => reviewer.team_id, :reviewer_is_team => true
+       else
+        redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id, :reviewer_is_team => true
+       end
   end
 
   # assigns the quiz dynamically to the participant
@@ -388,7 +398,7 @@ class ReviewMappingController < ApplicationController
     else
       teams_with_calibrated_artifacts = Array.new
       teams_with_uncalibrated_artifacts = Array.new
-      ReviewResponseMap.where(["reviewed_object_id = ? and calibrate_to = ?", assignment_id, 1]).each do |response_map|
+      ReviewResponseMap.where(["reviewed_object_id = ? and  = ?", assignment_id, 1]).each do |response_map|
         teams_with_calibrated_artifacts << AssignmentTeam.find(response_map.reviewee_id)
       end
       teams_with_uncalibrated_artifacts = teams - teams_with_calibrated_artifacts

@@ -17,7 +17,14 @@ class StudentReviewController < ApplicationController
     @review_phase = @assignment.get_current_stage(@topic_id)
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
+    if @assignment.reviewer_is_team
+      team = Team.where(parent_id: @assignment.id).select("id")
+      reviewer = TeamsUser.where(user_id: @participant.user_id, team_id: team).first
+      @review_mappings = ReviewResponseMap.where(reviewer_id: reviewer.team_id)
+    else
+      @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
+    end
+
     # if it is an calibrated assignment, change the response_map order in a certain way
     @review_mappings = @review_mappings.sort_by{ |mapping| mapping.id % 5} if @assignment.is_calibrated == true
     @metareview_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
@@ -76,6 +83,7 @@ class StudentReviewController < ApplicationController
         end
       end
     end
+
   end
 
 

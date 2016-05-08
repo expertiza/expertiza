@@ -70,7 +70,7 @@
 <p style="background-color: #fdf6e3; color: #657b83; padding: 5px; word-wrap: break-word;">
 	<%=@request_body unless @request_body.empty? %><br/><br/>
 	<%="Response #{@response.code} #{@response.message}:
-          #{@response.body}"%>
+          #{@response.body}" unless @response == '' %>
 </p>
 
 
@@ -126,7 +126,7 @@
 		
 		$('#request').html(library.json.prettyPrint(request));
 		$('#response').html(library.json.prettyPrint(response));
-	*/});
+	});
 
 	$('#algorithm').change(function changeDropdown(){
 		var selectedDropdownValue = $('#algorithm').find(":selected").val();

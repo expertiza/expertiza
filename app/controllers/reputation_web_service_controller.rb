@@ -76,7 +76,7 @@ class ReputationWebServiceController < ApplicationController
 
 						peer_review_grade = 100.0 * temp_sum / (weight_sum * max_question_score)
 						raw_data_array << [reviewer.id, team.id, peer_review_grade.round(4)]
-					end
+ 					end
 				end
 			end
 		end
@@ -104,12 +104,12 @@ class ReputationWebServiceController < ApplicationController
 	end
 
 	def json_generator(assignment_id, another_assignment_id = 0, round_num = 2, type = 'peer review grades')
-		assignment = Assignment.find(assignment_id)
+		assignment = Assignment.find_by_id(assignment_id)
 		has_topic = !SignUpTopic.where(assignment_id: assignment_id).empty?
 		
 		if type == 'peer review grades'
 			@results = db_query(assignment.id, another_assignment_id, round_num, has_topic)
-		elsif type == 'quiz scores'
+ 		elsif type == 'quiz scores'
 			@results = db_query_with_quiz_score(assignment.id, another_assignment_id)
 		end
 		request_body = Hash.new
@@ -119,8 +119,8 @@ class ReputationWebServiceController < ApplicationController
 				request_body['submission' + record[1].to_s] = Hash.new
 			end
 			request_body['submission' + record[1].to_s]['stu' + record[0].to_s] = record[2]
-		end
-		# sort the 2-dimention hash
+    end
+ 		# sort the 2-dimention hash
 		request_body.each {|k, v| request_body[k] = v.sort.to_h }
 		request_body.sort.to_h
 	end
@@ -143,7 +143,7 @@ class ReputationWebServiceController < ApplicationController
 		curr_assignment_id = (params[:assignment_id].empty? ? '724' : params[:assignment_id])
 		req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
 		req.body[0] = '' # remove the first '{'
-		@@assignment_id = params[:assignment_id]
+    @@assignment_id = params[:assignment_id]
 		@@round_num = params[:round_num]
 		@@algorithm = params[:algorithm]
 		@@another_assignment_id = params[:another_assignment_id]
@@ -236,7 +236,7 @@ class ReputationWebServiceController < ApplicationController
 		# "submission1": {"stu1":91, "stu3":99},"submission2": {"stu5":92, "stu8":90},"submission3": {"stu2":91, "stu4":88}}"
 		req.body.prepend("{")
         @@request_body = req.body
-		puts req.body
+		puts 'This is the request prior to encryption: ' + req.body
 		puts
 	# Encryption
 		# AES symmetric algorithm encrypts raw data
@@ -268,8 +268,18 @@ class ReputationWebServiceController < ApplicationController
         puts
         @@response = response
         @@response_body = response.body
+
+
+
+		JSON.parse(response.body.to_s).each do |alg, list|
+      list.each do |id, rep|
+        Participant.find_by_user_id(id).update(alg.to_sym => rep) unless /leniency/ =~ id.to_s
+      end unless list.nil?
+		end
+
 		redirect_to action: 'client'
 	end
+
 
 	def rsa_public_key1(data)
 		public_key_file = 'public1.pem'

@@ -5,7 +5,18 @@
 
 <h1>Summary Report for assignment: <%= @assignment.name %></h1>
 <h4>Team: <%= @team.name %></h4>
-
+<BR/>
+<TABLE class="grades" style="width:100%">
+	<%= render :partial => 'grades/participant_charts', :locals => {:prefix => nil} %>
+	<%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>
+	<%= render :partial => 'grades/participant', :locals => {:prefix => 'user',
+	  :team => false,
+		:participant_id => @participant.id,
+		:index => 0,
+		:team_size => 1,
+		:pscore => @pscore} %>
+</TABLE>
+<BR/>
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
 <% @vmlist.each do |vm| %>
 
@@ -45,7 +56,8 @@
               <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Click a row to see the comments for the respective question. Click 'Review Total' row to see Add'l Comments. Useful tip: decreasing your browser's zoom to 75% or 90% many improve your experience.">interaction legend</span>
 
             </span>
-
+						<% symbol = ("review" + vm.round.to_s).to_sym%>
+						<span align = "center"><img style="width:100%; padding-bottom: 15px" src="<%= @overall_grades_bar_chart[symbol] %>" ></span>
             <table class="tbl_heat">
               <!-- display the header row of the heatgrid table. this involves iterating through reviewers.-->
               <thead>

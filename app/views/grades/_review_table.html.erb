@@ -7,7 +7,8 @@
 			<th style="text-align:center;"><%= collabel %>&nbsp;<%=i+1%>&nbsp;</th>
 		<% end %>
 	</tr>
-	<% if controller.action_name != "view_my_scores" %>
+	<!--% if controller.action_name != "view_my_scores" %-->
+	<% if controller.action_name != "view_team" %>
 	<tr class="head"><td align="right"><b><%= rowlabel %></b></td>	    	
 		<% for review in reviews %>
            <td align="center">                       
@@ -28,7 +29,8 @@
 		   <td align="center">
              <% score = Answer.get_total_score(:response => [review], :questions => @questions[symbol], :q_types => Array.new) %>
              
-             <% if controller.action_name != "view_my_scores" %>
+             <!--% if controller.action_name != "view_my_scores" %-->
+             <% if controller.action_name != "view_team" %>
                <input type="hidden" id="mailer_<%= review.map.reviewer.fullname %>_grade" name="mailer[<%= review.map.reviewer.fullname %>_grade]" value="<%= score  %>">
              <% end %>
              <%if score==-1%>

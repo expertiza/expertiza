@@ -85,12 +85,22 @@ class GradesController < ApplicationController
   def view_team
 
     #get participant, team, questionnaires for assignment.
+		@overall_grades_bar_chart = Hash.new
+		@teamResponses = Hash.new
+		@teamStandings = Hash.new
+		@currParticipantScore = Hash.new
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
     @team = @participant.team
     @team_id = @team.id
-
+		teams = Team.where(parent_id: @assignment.id).to_a
+		logger = Logger.new(STDOUT)
+		logger.debug "TEAMS #{teams.length}"
+		@questions = {}
     questionnaires = @assignment.questionnaires_with_questions
+		retrieve_questions(questionnaires)
+		@pscore = @participant.scores(@questions)
+		make_chart
     @vmlist = []
 
     #loop through each questionnaire, and populate the view model for all data necessary
@@ -115,6 +125,50 @@ class GradesController < ApplicationController
     end
     @current_role_name = current_role_name
 
+		for round in 1..@assignment.rounds_of_reviews do
+			symbol = ("review" + round.to_s).to_sym
+			@teamStandings[symbol] = []
+		end
+
+		teams.each do |team|
+			team = TeamsUser.find_by(team_id: team.id)
+			team = AssignmentParticipant.find_by(user_id: team.user_id, parent_id: @assignment.id, type: :AssignmentParticipant)
+			
+			@teamResponses[team.id] = team.scores(@questions)[:review][:assessments]
+			
+			for round in 1..@assignment.rounds_of_reviews do
+				count = 0
+				sum = 0.0
+				symbol = ("review" + round.to_s).to_sym
+				
+				for response in @teamResponses[team.id] do
+					if response.round == round
+						score = 0
+						if @assignment.varying_rubrics_by_round?
+							score = Answer.get_total_score(:response => [response], :questions => @questions[symbol], :q_types => Array.new)
+						else
+							score = Answer.get_total_score(:response => [response], :questions => @questions[:review], :q_types => Array.new)
+						end
+						if score != -1
+							sum += score
+							count += 1
+						end
+					end
+				end
+				
+				if count != 0
+					@teamStandings[symbol].append(sum/count)
+					if team.team.id == @team_id
+						@currParticipantScore[symbol] = sum/count
+					end
+				end
+			end
+		end
+
+		for round in 1..@assignment.rounds_of_reviews do
+			symbol = ("review" + round.to_s).to_sym
+			@overall_grades_bar_chart[symbol] = bar_chart([@teamStandings[symbol].sort, @currParticipantScore[symbol]], 1000, 150, 1, true)
+		end
   end
 
   def edit
@@ -350,6 +404,7 @@ class GradesController < ApplicationController
 
   def make_chart()
     @grades_bar_charts = {}
+		@scores_by_round = []
     if @pscore[:review]
       scores=[]
       if @assignment.varying_rubrics_by_round?
@@ -357,6 +412,7 @@ class GradesController < ApplicationController
           responses = @pscore[:review][:assessments].reject{|response| response.round!=round}
           scores = scores.concat(get_scores_for_chart responses, 'review'+round.to_s)
           scores = scores-[-1.0]
+					@scores_by_round[round] = scores.instance_eval{reduce(:+)/ size.to_f}
         end
         @grades_bar_charts[:review] = bar_chart(scores)
       else
@@ -399,15 +455,37 @@ class GradesController < ApplicationController
     return scores[:teams].map{|k,v| v[:scores][:avg].to_i}
   end
 
-  def bar_chart(scores, width=100, height=100, spacing=1)
+	# Varun: Use multiple for creating bar chart to compare user against peers in the assignment
+  def bar_chart(scores, width=100, height=100, spacing=1, multiple=false)
     link = nil
+		data = []
     GoogleChart::BarChart.new("#{width}x#{height}", " ", :vertical, false) do |bc|
-      data = scores
-      bc.data "Line green", data, '990000'
+			if multiple
+				data = scores[0]
+				idx = data.index(scores[1])
+				data.each_with_index do |val, index|
+					if idx == index
+						bc.data index, [val], '117D19'
+					end
+					bc.data index, [val], '990000'
+				end
+				#bc.data "Scores", data, '990000'
+				#bc.opacity = 0
+				bc.width_spacing_options({bar_width: (width-100)/(data.size+1),bar_spacing: 1, group_spacing: spacing })
+				start_pt = 0.025*idx
+				end_pt = 0.025*(idx+1)
+				#bc.fill_area '000000', idx, idx
+				#bc.range_marker :vertical, :color => '000000', :start_point => start_pt, :end_point => end_pt
+				#bc.shape_marker :arrow, :color => '000000', :data_set_index => 0, :data_point_index => idx, :pixel_size => 8
+				bc.chart_title = "Comparison of Scores"
+			else
+				data = scores
+				bc.data "Line green", data, '990000'
+				bc.width_spacing_options({bar_width: (width-30)/(data.size+1),bar_spacing: 1, group_spacing: spacing })
+			end
       bc.axis :y, range:[0, data.max] ,positions: [data.min, data.max]
-      bc.show_legend = false
+			bc.show_legend = false
       bc.stacked = false
-      bc.width_spacing_options({bar_width: (width-30)/(data.size+1),bar_spacing: 1, group_spacing: spacing })
       bc.data_encoding = :extended
       link = (bc.to_url)
     end

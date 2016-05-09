@@ -133,7 +133,6 @@ class TreeDisplayController < ApplicationController
 
   # for folder nodes
   def get_children_node_ng
-    puts params[:filternode]
     childNodes = {}
     if params[:reactParams][:child_nodes].is_a? String
       childNodes = JSON.parse(params[:reactParams][:child_nodes])

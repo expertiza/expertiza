@@ -135,7 +135,6 @@ class GradesController < ApplicationController
 			team = AssignmentParticipant.find_by(user_id: team.user_id, parent_id: @assignment.id, type: :AssignmentParticipant)
 			
 			@teamResponses[team.id] = team.scores(@questions)[:review][:assessments]
-			
 			for round in 1..@assignment.rounds_of_reviews do
 				count = 0
 				sum = 0.0

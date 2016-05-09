@@ -135,6 +135,14 @@ th.sorter-true.tablesorter-headerUnSorted{
 <BR/>
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
 <% table_count = 0 %>
+<h3>Reputation</h3>
+<% if @assignment.reputation_algorithm == 'Hamer' %>
+    <p id = "reputation_score" class = <%= get_css_style_for_hamer_reputation(@participant.Hamer)%> style = "width:60px;"><%= @participant.Hamer %></p>
+   <%binding.pry%>
+<% elsif @assignment.reputation_algorithm == 'Lauw' %>
+    <p id = "reputation_score" class = <%= get_css_style_for_lauw_reputation(@participant.Lauw)%> style = "width:60px;"><%= @participant.Lauw %></p>
+<%end%>
+<BR/>
 <% @vmlist.each do |vm| %>
 
     <% if (vm.questionnaire_display_type == "Metareview" or vm.questionnaire_display_type == "Author Feedback" or vm.questionnaire_display_type == "Teammate Review") and @current_role_name.eql?'Student' %>
@@ -171,7 +179,11 @@ th.sorter-true.tablesorter-headerUnSorted{
             <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Colors are scaled from poor to excellent in the following order: red, orange, yellow, light-green, dark-green">color legend</span>
             <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Click a row to see the comments for the respective question. Click 'Review Total' row to see Add'l Comments. Useful tip: decreasing your browser's zoom to 75% or 90% many improve your experience.">interaction legend</span>
 
-          </span>
+					</span>
+					<% symbol=("review" + vm.round.to_s).to_sym %>
+					<span align="center" style="width:100%">
+						<img style="width:100%; padding-bottom: 10px" align="center" src="<%= @overall_grades_bar_chart[symbol]%>" />
+					</span>
 
           <table id="scoresTable" class="tbl_heat tablesorter">
             <!-- display the header row of the heatgrid table. this involves iterating through reviewers.-->

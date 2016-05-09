@@ -411,7 +411,9 @@ class GradesController < ApplicationController
           responses = @pscore[:review][:assessments].reject{|response| response.round!=round}
           scores = scores.concat(get_scores_for_chart responses, 'review'+round.to_s)
           scores = scores-[-1.0]
-					@scores_by_round[round] = scores.instance_eval{reduce(:+)/ size.to_f}
+					if not scores == []
+						@scores_by_round[round] = scores.instance_eval{reduce(:+)/ size.to_f}
+					end
         end
         @grades_bar_charts[:review] = bar_chart(scores)
       else
@@ -468,14 +470,7 @@ class GradesController < ApplicationController
 					end
 					bc.data index, [val], '990000'
 				end
-				#bc.data "Scores", data, '990000'
-				#bc.opacity = 0
 				bc.width_spacing_options({bar_width: (width-100)/(data.size+1),bar_spacing: 1, group_spacing: spacing })
-				start_pt = 0.025*idx
-				end_pt = 0.025*(idx+1)
-				#bc.fill_area '000000', idx, idx
-				#bc.range_marker :vertical, :color => '000000', :start_point => start_pt, :end_point => end_pt
-				#bc.shape_marker :arrow, :color => '000000', :data_set_index => 0, :data_point_index => idx, :pixel_size => 8
 				bc.chart_title = "Comparison of Scores"
 			else
 				data = scores

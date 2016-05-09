@@ -30,7 +30,7 @@ describe "criterion" do
   describe "#view_completed_question" do
     it "returns the html " do
       html = criterion.view_completed_question(0, answer, 5).to_s
-      expect(html).to eq( "<big><b>Question 0:</b> <I>test txt</I></big><BR/><TABLE CELLPADDING=\"5\"><TR><TD valign=\"top\"><B>Score: </B></TD><TD><FONT style=\"BACKGROUND-COLOR:gold\">8</FONT> out of <B>5</B></TD></TR></TD></TR></TABLE><BR/>")
+      expect(html).to eq( "<b>0. test txt [Max points: 5]</b><table cellpadding=\"5\"><tr><td><div class=\"c5\" style=\"width:30px; height:30px; border-radius:50%; font-size:15px; color:black; line-height:30px; text-align:center;\">8</div></td></tr></table>")
     end
   end
 

@@ -18,7 +18,6 @@ class RolesController < ApplicationController
 
   def show
     @role = Role.find(params[:id])
-    @rps = RolesPermission.find_for_role(@role.id)
     @roles = @role.get_parents
     foreign
   end
@@ -47,7 +46,8 @@ class RolesController < ApplicationController
 
   def update
     @role = Role.find(params[:id])
-    if @role.update_attributes(params[:role])
+
+    if @role.update_with_params(params[:role])
       Role.rebuild_cache
       @role = Role.find(params[:id])
       flash[:notice] = 'Role was successfully updated.'
@@ -70,4 +70,5 @@ class RolesController < ApplicationController
 
     @users = @role.users
   end
+
 end

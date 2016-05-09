@@ -68,7 +68,7 @@ class Scale < ScoredQuestion
   end
 
   def view_completed_question(count, answer,questionnaire_max)
-    html = '<big><b>Question '+count.to_s+":</b> <I>"+self.txt+"</I></big><BR/><BR/>"
+    html = '<b>' + count.to_s + ". " + self.txt + "</b><BR/><BR/>"
   	html += '<B>Score:</B> <FONT style="BACKGROUND-COLOR:gold">'+answer.answer.to_s+'</FONT> out of <B>'+questionnaire_max.to_s+'</B></TD>'
     html.html_safe
   end

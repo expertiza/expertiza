@@ -12,8 +12,8 @@
 	    <option value='lauw' >
 	      Lauw's algorithm
 	    </option>
-	    <option value='lauw-peer' >
-	      Lauw-peer algorithm
+	    <option value='lauw-expert' >
+	      Lauw-expert algorithm
 	    </option>
 	    <option value='quiz' >
 	      Quiz-based algorithm
@@ -43,12 +43,16 @@
 	<b style="font-size: 20px;">Step 4: </b><%= submit_tag 'Send request' %>
 <% end %>
 <hr>
+<!--Request information-->
 <%= "Request info: #{@assignment.name} (#{@assignment.id})" unless @assignment.nil? %>
 <%= " + #{@another_assignment.name} (#{@another_assignment.id})" unless @another_assignment.nil? %>
 <%= " + round #{@round_num}" unless @assignment.nil? %>
 <%= " + #{@algorithm} algorithm" unless @assignment.nil? %>
 <%= " + #{@additional_info}" unless @additional_info.empty? %>
-<br/>
+<br/><br/>
+
+<!--Beautified request and response message-->
+<b>Beautified request and response information</b>
 <table border = '1' width="60%">
 	<tr>
 		<th style="text-align: center;"> Request JSON </th>
@@ -59,6 +63,16 @@
 		<td valign="top" width="50%"> <pre><code id='response'></code></pre> </td>
 	</tr>
 </table>
+<br/>
+
+<!--Minified request and response message-->
+<b>Minified request and response message</b><br/>
+<p style="background-color: #fdf6e3; color: #657b83; padding: 5px; word-wrap: break-word;">
+	<%=@request_body unless @request_body.empty? %><br/><br/>
+	<%="Response #{@response.code} #{@response.message}:
+          #{@response.body}" unless @response == '' %>
+</p>
+
 
 <style>
 	pre {
@@ -118,7 +132,7 @@
 		var selectedDropdownValue = $('#algorithm').find(":selected").val();
 		switch(selectedDropdownValue) {
 	    case 'hamer-expert':
-	    case 'lauw-peer':
+	    case 'lauw-expert':
 	        $("input[id='checkbox_expert_grade'][type='checkbox']").prop("checked", true);
 	        $("input[id='checkbox_hamer'][type='checkbox']").prop("checked", false);
 	        $("input[id='checkbox_lauw'][type='checkbox']").prop("checked", false);

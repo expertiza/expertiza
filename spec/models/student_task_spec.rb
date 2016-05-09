@@ -1,9 +1,9 @@
 require 'rails_helper'
 
 describe StudentTask do
-  let(:participant) { double("participant") }
-  let(:user) { double("user") }
-  let(:assignment) { double("assignment") }
+  let(:participant) { Participant.new }
+  let(:user) { User.new }
+  let(:assignment) { Assignment.new }
   let(:student_task) { StudentTask.new(
     user: user,
     participant: participant,

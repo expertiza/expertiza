@@ -36,4 +36,34 @@ module GradesHelper
     end
     return {has_team: has_team, has_metareview: has_metareview, true_num: true_num}
   end
+
+  def get_css_style_for_hamer_reputation(reputation_value)
+    if reputation_value < 0.5 
+      css_class = 'c1'
+    elsif reputation_value >= 0.5 and reputation_value <= 1 
+      css_class = 'c2'
+    elsif  reputation_value > 1 and reputation_value <= 1.5 
+      css_class = 'c3'
+    elsif  reputation_value > 1.5 and reputation_value <= 2   
+      css_class = 'c4'
+    else
+      css_class = 'c5'
+    end
+    return css_class
+  end
+
+  def get_css_style_for_lauw_reputation(reputation_value)
+    if reputation_value < 0.2 
+      css_class = 'c1'
+    elsif reputation_value >= 0.2 and reputation_value <= 0.4 
+      css_class = 'c2'
+    elsif  reputation_value > 0.4 and reputation_value <= 0.6 
+      css_class = 'c3'
+    elsif  reputation_value > 0.6 and reputation_value <= 0.8   
+      css_class = 'c4'
+    else
+      css_class = 'c5'
+    end
+    return css_class
+  end
 end

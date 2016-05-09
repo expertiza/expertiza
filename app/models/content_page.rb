@@ -8,10 +8,7 @@ class ContentPage < ActiveRecord::Base
 
   attr_accessor :content_html
 
-  def self.find_for_permission(p_ids)
-    where('permission_id in (?)', p_ids)
-      .order(:name)
-  end
+
 
   def url
     "/#{self.name}"

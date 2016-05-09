@@ -38,8 +38,29 @@
              <%else%>
                <%= sprintf("%.2f",score) %>% &nbsp;
              <%end%>
-
 	  	   </td>
 	    <% end %>
 	</tr>
+  &nbsp;
+
+  <!--Adding code for fetching the reputation -->
+  <tr class="head">
+    <td align="right"><b>Reputation</b></td>
+
+    <% for review in reviews %>
+
+        <td align="center">
+            <% review_participant = Participant.find(review.map.reviewer.id) %>
+
+          <% if @assignment.reputation_algorithm == 'Lauw' %>
+              <p id = "reputation_score" class = <%= get_css_style_for_lauw_reputation(review_participant.Lauw)%> style = "width:60px;">
+            <%= review_participant.Lauw%>
+          <% elsif @assignment.reputation_algorithm == 'Hamer' %>
+              <p id = "reputation_score" class = <%= get_css_style_for_hamer_reputation(review_participant.Hamer)%> style = "width:60px;">
+            <%= review_participant.Hamer%>
+          <%end%>
+        </td>
+    <% end %>
+  </tr>
+
 </table>

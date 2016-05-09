@@ -11,6 +11,9 @@
     <option value='TeammateReviewResponseMap' >
       Teammate Review report
     </option>
+    <option value='Collusion' >
+      Collusion report
+    </option>
     <% if @assignment.is_calibrated? %>
       <option value='Calibration' >
         Calibration report
@@ -44,7 +47,7 @@
     <table>
       <tr>
         <th>Reviewer's Name</th>
-        <td><%= n.text_field:fullname %></td>
+        <td><%= n.text_field :fullname %></td>
         <td align = "right"><%= submit_tag "Search"%></td>
       </tr>
 

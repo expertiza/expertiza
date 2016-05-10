@@ -33,7 +33,10 @@ class TeamsUser < ActiveRecord::Base
   def self.first_by_team_id(team_id)
     TeamsUser.where("team_id = ?", team_id).first
   end
-
+  #Returns an array of all members in the TeamUsers table for a given team id
+  def self.members_by_team_id(team_id)
+    TeamsUser.where("team_id = ?", team_id).to_a
+  end
   #Determines whether a team is empty of not
   def self.is_team_empty(team_id)
     team_members = TeamsUser.where("team_id = ?", team_id)

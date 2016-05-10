@@ -92,5 +92,20 @@ class SignedUpTeam < ActiveRecord::Base
       signed_up_teams.first.topic_id
     end
   end
-    
+  def self.waitlisted_teams_by_topic_id(topic_id)
+    waitlisted_teams = SignedUpTeam.where(topic_id:topic_id, is_waitlisted:1)
+    if waitlisted_teams.blank?
+      nil
+    else
+      waitlisted_teams.to_a
+    end
   end
+  def self.confirmed_team_by_topic_id(topic_id)
+    confirmed_team = SignedUpTeam.where(topic_id:topic_id, is_waitlisted:0)
+    if confirmed_team.blank?
+      nil
+    else
+      confirmed_team.to_a
+    end
+  end
+end

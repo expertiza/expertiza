@@ -35,6 +35,35 @@
     <% if chooser_present == false %>
       No choosers.
     <% end %>
-    <br/>
+  <%end%>
+  <br/>
+  <% if !local_assigns[:waitlisted_teams_members].nil? && !local_assigns[:confirmed_teams_members].nil? && confirmed_teams_members.include?(session[:user].id) %>
+    <br/><span style="color:red">Waitlist:</span><br/>
+    <% waitlisted_teams_members.each_with_index do |team, index| %>
+      <span><b><%= waitlisted_team_desc[index].name %></b></span>
+      <br/>
+      <% batch_names = team.map{|member| member[0].name}.join(', ')%>
+      <% batch_ids = team.map{|member| member[0].id}%>
+      <% student_id = Participant.where(user_id: session[:user].id, parent_id: @assignment.id, type: :AssignmentParticipant).first.id%>
+      <% if team.count <= team_vacancy %>
+	<span style="width:100%"><%= batch_names %></span>
+	<%= form_tag :controller => 'invitation', :action => 'batch_create' do %>
+	  <%= hidden_field_tag 'team_id', confirmed_teams[0].team_id %>
+	  <%= hidden_field_tag 'student_id', student_id %>
+	  <%= hidden_field_tag 'invitees[]', batch_names %>
+	  <%= hidden_field_tag 'assignment_id', @assignment.id %>
+	  <%= hidden_field_tag 'referrer', "signupsheet" %>
+	  <%sent_inv = Invitation.where(from_id: session[:user].id, assignment_id:@assignment.id, to_id: batch_ids)%>
+	  <%if sent_inv.count == batch_ids.count%>
+	    <span style='color:red'>(Pending Invitation)</span>
+	  <%else%>
+	    <input type='submit' value='Invite'/>
+	  <% end %>
+	<% end %>
+      <% else %>
+	<span><%= batch_names %></span>
+      <% end %>
+      <br/><br/>
+    <% end %>
   <% end %>
 </div>

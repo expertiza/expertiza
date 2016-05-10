@@ -39,7 +39,7 @@ class StudentTask
   end
 
   def content_submitted_in_current_stage?
-    (current_stage == "submission" || current_stage == "resubmission") &&
+    (current_stage == "submission" ) &&
       (participant.resubmission_times.size > 0 || hyperlinks.present?)
   end
 
@@ -81,14 +81,12 @@ class StudentTask
   end
 
   def reviews_given_in_current_stage?
-    current_stage == 'review' || current_stage == 'rereview' && reviews_given?
+    current_stage == 'review'
   end
 
   def in_work_stage?
     current_stage == 'submission' ||
-      current_stage == 'resubmission' ||
       current_stage == 'review' ||
-      current_stage == 'rereview' ||
       current_stage == 'metareview'
   end
 

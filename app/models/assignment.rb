@@ -1028,7 +1028,7 @@ require 'analytic/assignment_analytic'
     bar_1_data = Array.new
     dates = Array.new
     date = self.created_at.to_datetime.to_date
-    reviews = self.find_due_dates('review') + self.find_due_dates('rereview')
+    reviews = self.find_due_dates('review')
     due = reviews.last.due_at.to_datetime.to_date
 
     while ((date <=> due) <= 0)

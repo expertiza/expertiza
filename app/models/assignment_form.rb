@@ -203,8 +203,8 @@ class AssignmentForm
   def set_up_assignment_review
     set_up_defaults
 
-    submissions = @assignment.find_due_dates('submission') + @assignment.find_due_dates('resubmission')
-    reviews = @assignment.find_due_dates('review') + @assignment.find_due_dates('rereview')
+    submissions = @assignment.find_due_dates('submission')
+    reviews = @assignment.find_due_dates('review')
     @assignment.rounds_of_reviews = [@assignment.rounds_of_reviews, submissions.count, reviews.count].max
 
     if @assignment.directory_path.try :empty?

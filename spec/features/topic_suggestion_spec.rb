@@ -14,8 +14,6 @@ describe "Assignment Topic Suggestion Test" do
       create(:assignment_node)
       create(:deadline_type,name:"submission")
       create(:deadline_type,name:"review")
-      create(:deadline_type,name:"resubmission")
-      create(:deadline_type,name:"rereview")
       create(:deadline_type,name:"metareview")
       create(:deadline_type,name:"drop_topic")
       create(:deadline_type,name:"signup")

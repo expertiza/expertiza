@@ -29,28 +29,6 @@ describe 'Submission deadline reminder email' do
   end
 end
 
-describe 'Resubmission deadline reminder email' do
-
-  it 'is able to send reminder email for resubmission deadline to reviewers ' do
-
-    id = 2
-    @name = "user"
-    due_at = DateTime.now.advance(:minutes => +2)
-
-    due_at1 = Time.parse(due_at.to_s(:db))
-    curr_time=DateTime.now.to_s(:db)
-    curr_time=Time.parse(curr_time)
-    time_in_min=((due_at1 - curr_time).to_i/60) *60
-    Delayed::Job.delete_all
-    expect(Delayed::Job.count).to eq(0)
-
-    dj = Delayed::Job.enqueue({payload_object: DelayedMailer.new(id, "resubmission", due_at), priority: 1, run_at: time_in_min})
-
-    expect(Delayed::Job.count).to eq(1)
-    expect(Delayed::Job.last.handler).to include("deadline_type: resubmission")
-  end
-end
-
 describe 'Review deadline reminder email' do
 
   it 'is able to send reminder email for review deadline to reviewers ' do

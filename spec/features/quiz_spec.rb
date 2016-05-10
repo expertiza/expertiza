@@ -47,8 +47,6 @@ describe 'Student can create quizzes and edit them', :js => true do
     # Create an assignment due date
     create(:deadline_type,name:"submission")
     create(:deadline_type,name:"review")
-    create(:deadline_type,name:"resubmission")
-    create(:deadline_type,name:"rereview")
     create(:deadline_type,name:"metareview")
     create(:deadline_type,name:"drop_topic")
     create(:deadline_type,name:"signup")
@@ -250,8 +248,6 @@ describe 'multiple quiz question test', :js => true do
     # Create an assignment due date
     create(:deadline_type,name:"submission")
     create(:deadline_type,name:"review")
-    create(:deadline_type,name:"resubmission")
-    create(:deadline_type,name:"rereview")
     create(:deadline_type,name:"metareview")
     create(:deadline_type,name:"drop_topic")
     create(:deadline_type,name:"signup")
@@ -313,8 +309,6 @@ describe 'appropriate quiz taking times', :js => true do
     # Create an assignment due date
     create(:deadline_type,name:"submission")
     create(:deadline_type,name:"review")
-    create(:deadline_type,name:"resubmission")
-    create(:deadline_type,name:"rereview")
     create(:deadline_type,name:"metareview")
     create(:deadline_type,name:"drop_topic")
     create(:deadline_type,name:"signup")
@@ -434,8 +428,6 @@ describe 'Instructor', js:true do
     # Create an assignment due date
     create(:deadline_type,name:"submission")
     create(:deadline_type,name:"review")
-    create(:deadline_type,name:"resubmission")
-    create(:deadline_type,name:"rereview")
     create(:deadline_type,name:"metareview")
     create(:deadline_type,name:"drop_topic")
     create(:deadline_type,name:"signup")
@@ -545,8 +537,6 @@ describe 'Student reviewers can not take the quizzes before request artifact', j
     # Create an assignment due date
     create(:deadline_type,name:"submission")
     create(:deadline_type,name:"review")
-    create(:deadline_type,name:"resubmission")
-    create(:deadline_type,name:"rereview")
     create(:deadline_type,name:"metareview")
     create(:deadline_type,name:"drop_topic")
     create(:deadline_type,name:"signup")
@@ -629,8 +619,6 @@ describe 'Student reviewers can take the quizzes', js:true do
     # Create an assignment due date
     create(:deadline_type,name:"submission")
     create(:deadline_type,name:"review")
-    create(:deadline_type,name:"resubmission")
-    create(:deadline_type,name:"rereview")
     create(:deadline_type,name:"metareview")
     create(:deadline_type,name:"drop_topic")
     create(:deadline_type,name:"signup")
@@ -730,8 +718,6 @@ describe 'Student reviewers can view the quizzes they take', js:true do
     # Create an assignment due date
     create(:deadline_type,name:"submission")
     create(:deadline_type,name:"review")
-    create(:deadline_type,name:"resubmission")
-    create(:deadline_type,name:"rereview")
     create(:deadline_type,name:"metareview")
     create(:deadline_type,name:"drop_topic")
     create(:deadline_type,name:"signup")

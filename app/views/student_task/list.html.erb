@@ -34,10 +34,7 @@
             stage = "signup"
             end
           end
-        elsif stage == "resubmission"
-          controller = "submitted_content"
-          action = "edit"
-        elsif stage == "review" or stage == "rereview" or stage == "metareview"
+        elsif stage == "review" or stage == "metareview"
           controller = "student_review"
           action = "list"
         end
@@ -57,10 +54,10 @@
     duedate = participant.assignment.stage_deadline(topic_id)
     controller = ""
     action = ""
-    if stage == "submission" or stage == "resubmission"
+    if stage == "submission"
       controller = "submitted_content"
       action = "edit"
-    elsif stage == "review" or stage == "rereview" or stage == "metareview"
+    elsif stage == "review" or stage == "metareview"
       controller = "student_review"
       action = "list"
     end

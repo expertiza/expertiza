@@ -156,8 +156,6 @@ describe 'Submitter' do
     # Create an assignment due date
     create(:deadline_type,name:"submission")
     create(:deadline_type,name:"review")
-    create(:deadline_type,name:"resubmission")
-    create(:deadline_type,name:"rereview")
     create(:deadline_type,name:"metareview")
     create(:deadline_type,name:"drop_topic")
     create(:deadline_type,name:"signup")
@@ -344,8 +342,6 @@ describe 'Create and Display Calibration' do
     # Create an assignment due date
     create(:deadline_type,name:"submission")
     create(:deadline_type,name:"review")
-    create(:deadline_type,name:"resubmission")
-    create(:deadline_type,name:"rereview")
     create(:deadline_type,name:"metareview")
     create(:deadline_type,name:"drop_topic")
     create(:deadline_type,name:"signup")
@@ -416,8 +412,6 @@ describe 'Display Calibration For Student' do
     # Create an assignment due date
     create(:deadline_type,name:"submission")
     create(:deadline_type,name:"review")
-    create(:deadline_type,name:"resubmission")
-    create(:deadline_type,name:"rereview")
     create(:deadline_type,name:"metareview")
     create(:deadline_type,name:"drop_topic")
     create(:deadline_type,name:"signup")
@@ -515,8 +509,6 @@ describe 'Reviewer' do
     # Create an assignment due date
     create(:deadline_type,name:"submission")
     create(:deadline_type,name:"review")
-    create(:deadline_type,name:"resubmission")
-    create(:deadline_type,name:"rereview")
     create(:deadline_type,name:"metareview")
     create(:deadline_type,name:"drop_topic")
     create(:deadline_type,name:"signup")

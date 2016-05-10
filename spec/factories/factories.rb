@@ -195,8 +195,6 @@ FactoryGirl.define do
     assignment { Assignment.first || association(:assignment)} 
     submission_allowed_id 3
     review_allowed_id  3
-    resubmission_allowed_id  3
-    rereview_allowed_id  3
     review_of_review_allowed_id  3
     round  1
     flag  false

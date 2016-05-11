@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160511000316) do
+ActiveRecord::Schema.define(version: 20160511003610) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -578,16 +578,12 @@ ActiveRecord::Schema.define(version: 20160511000316) do
     t.integer  "late_policy_id",              limit: 4
     t.integer  "submission_allowed_id",       limit: 4
     t.integer  "review_allowed_id",           limit: 4
-    t.integer  "resubmission_allowed_id",     limit: 4
-    t.integer  "rereview_allowed_id",         limit: 4
     t.integer  "review_of_review_allowed_id", limit: 4
     t.integer  "round",                       limit: 4
   end
 
   add_index "topic_deadlines", ["deadline_type_id"], name: "fk_deadline_type_topic_deadlines", using: :btree
   add_index "topic_deadlines", ["late_policy_id"], name: "fk_topic_deadlines_late_policies", using: :btree
-  add_index "topic_deadlines", ["rereview_allowed_id"], name: "idx_rereview_allowed", using: :btree
-  add_index "topic_deadlines", ["resubmission_allowed_id"], name: "idx_resubmission_allowed", using: :btree
   add_index "topic_deadlines", ["review_allowed_id"], name: "idx_review_allowed", using: :btree
   add_index "topic_deadlines", ["review_of_review_allowed_id"], name: "idx_review_of_review_allowed", using: :btree
   add_index "topic_deadlines", ["submission_allowed_id"], name: "idx_submission_allowed", using: :btree

@@ -6,7 +6,7 @@
   <table border="1" bordercolor="grey" style="table_stretch">
   <%
      row_round_index = 0
-    @team_reviewers.keys.each do |team|
+    @reviewers.keys.each do |team|
   %>
     <tr bgcolor="#BDBDBD">
       <th class="header_class"  data-toggle="collapse" data-target="#team_<%= row_round_index.to_s %>" >
@@ -14,7 +14,7 @@
       </th>
     </tr>
     <tr bgcolor="#E6E6E6">
-      <td>Reviewers : <%= @team_reviewers[team].join(", ")  %></td>
+      <td>Reviewers : <%= @reviewers[team].join(", ")  %></td>
     </tr>
       <!--print the team name and put the reviews in a div so it can be collapsed smoothly-->
     <tr>
@@ -39,19 +39,19 @@
            <!--print the summary per round in a new div so it can be collapsed smoothly-->
            <div id='round_<%= team_assg_index %>' class='collapse'>
              <table class='table_stretch'>
-        <%@answer[team][i].keys.each do | q |%>
+        <%@summary[team][i].keys.each do | q |%>
               <!--print the avg scores of each question-->
                 <tr bgcolor='#BDBDBD'>
                   <td>
-                    <i>[score avg : <%= @avg_scores_by_question[team][i][q].to_s %>%] &nbsp; <%= q %></i>
+                    <i>[score avg : <%= @avg_scores_by_criterion[team][i][q].to_s %>%] &nbsp; <%= q %></i>
                   </td>
                 </tr>
                 <tr>
                   <td>
                     <%
                    #print the summary of reviews
-                   if !@answer[team][i][q].eql?("")
-                     concat @answer[team][i][q]
+                   if !@summary[team][i][q].eql?("")
+                     concat @summary[team][i][q]
                    else
                      safe_concat "&nbsp;"
                    end

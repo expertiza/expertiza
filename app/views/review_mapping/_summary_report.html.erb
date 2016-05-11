@@ -13,7 +13,7 @@
         <td>
           <div id = 'round_<%= (i+1).to_s %>' class='collapse'>
             <table class="table_stretch">
-      <%@summary_by_criterion[i].keys.each do |question|%>
+      <%@summary[i].keys.each do |question|%>
             <tr bgcolor='#BDBDBD'>
                 <td>
                   <h5>[avg score: <%= @avg_scores_by_criterion[i][question].to_s %>%]&nbsp;<%= question %></h5>
@@ -22,8 +22,8 @@
             <tr>
               <td>
               <%
-            if !@summary_by_criterion[i][question].eql?("")
-              concat @summary_by_criterion[i][question]
+            if !@summary[i][question].eql?("")
+              concat @summary[i][question]
             else
               safe_concat "&nbsp;"
             end

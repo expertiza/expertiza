@@ -113,7 +113,7 @@ class GradesController < ApplicationController
 
         max_score = SummaryHelper.get_max_score_for_question(q)
 
-        comments = SummaryHelper.breakup_comments_to_sentences(question_answers)
+        comments = SummaryHelper.break_up_comments_to_sentences(question_answers)
 
         #get the avg scores for this question
         @score_summaries[round.to_s][q.txt] = SummaryHelper.calculate_avg_score_by_criterion(question_answers, max_score)

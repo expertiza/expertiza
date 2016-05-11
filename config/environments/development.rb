@@ -30,7 +30,7 @@ Expertiza::Application.configure do
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
   # Print development logs
-  config.log_level = :debug
+  config.log_level = :error
 
   # Raise an error on page load if there are pending migrations
   config.active_record.migration_error = :page_load
@@ -43,6 +43,6 @@ Expertiza::Application.configure do
 
 
   #configuration for summary web service url
-  config.summary_ws_url = 'http://prevdata.csc.ncsu.edu/sum/v1.0/summary/8/lsa'
+  config.summary_ws_url = 'http://peerlogic.csc.ncsu.edu/sum/v1.0/summary/8/lsa'
 end
 

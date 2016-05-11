@@ -134,7 +134,7 @@ class ReputationWebServiceController < ApplicationController
 	def send_post_request
 		# https://www.socialtext.net/open/very_simple_rest_in_ruby_part_3_post_to_create_a_new_workspace
 		# uri = URI.parse('http://152.7.99.160:3000//calculations/reputation_algorithms')
-		req = Net::HTTP::Post.new('/calculations/reputation_algorithms', initheader = {'Content-Type' =>'application/json'})
+		req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', initheader = {'Content-Type' =>'application/json'})
 		curr_assignment_id = (params[:assignment_id].empty? ? '724' : params[:assignment_id])
 		req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
 		req.body[0] = '' # remove the first '{'
@@ -205,7 +205,8 @@ class ReputationWebServiceController < ApplicationController
 		req.body.prepend('{')
 		puts req.body
 		puts
-		response = Net::HTTP.new('152.7.99.160', 3000).start {|http| http.request(req)}
+
+		response = Net::HTTP.new('prevdata.csc.ncsu.edu').start {|http| http.request(req)}
 		puts "Response #{response.code} #{response.message}:
           #{response.body}"
         puts

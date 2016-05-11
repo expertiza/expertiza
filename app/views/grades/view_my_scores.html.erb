@@ -13,11 +13,12 @@
 														 :pscore => @pscore} %>
 
 </TABLE>
-<h3>Reputation</h3>
-<% if @assignment.reputation_algorithm == 'Hamer' %>
+<% case @assignment.reputation_algorithm %>
+<% when 'Hamer' %>
+	<h3>Reputation</h3>
     <p id = "reputation_score" class = <%= get_css_style_for_hamer_reputation(@participant.Hamer)%> style = "width:60px;"><%= @participant.Hamer %></p>
-   <%binding.pry%>
-<% elsif @assignment.reputation_algorithm == 'Lauw' %>
+<% when 'Lauw' %>
+	<h3>Reputation</h3>
     <p id = "reputation_score" class = <%= get_css_style_for_lauw_reputation(@participant.Lauw)%> style = "width:60px;"><%= @participant.Lauw %></p>
 <%end%>
 <BR/>

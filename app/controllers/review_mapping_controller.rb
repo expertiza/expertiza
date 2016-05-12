@@ -566,11 +566,12 @@ class ReviewMappingController < ApplicationController
     case @type
     # this summarizes the reviews of each reviewee by each question
     when "SummaryRevieweeResponseMap"
-       sum = SummaryHelper::Summary.new
-       sum = sum.summarize_reviews_by_reviewees(@assignment, summary_ws_url)
-       #@summary[reviewee][round][question][comments/answer]
+       sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewees(@assignment, summary_ws_url)
+       #@summary[reviewee][round][question]
+       #@reviewers[team][reviewer]
+       #@avg_scores_by_reviewee[team]
        #@avg_score_round[reviewee][round]
-       #@avg_score_round_question[reviewee][round][question]
+       #@avg_scores_by_criterion[reviewee][round][criterion]
 
       @summary = sum.summary
       @reviewers = sum.reviewers
@@ -579,9 +580,7 @@ class ReviewMappingController < ApplicationController
       @avg_scores_by_reviewee = sum.avg_scores_by_reviewee
 
     when "SummaryResponseMap"
-
-      sum = SummaryHelper::Summary.new
-      sum = sum.summarize_reviews_by_criterion(@assignment, summary_ws_url)
+      sum = SummaryHelper::Summary.new.summarize_reviews_by_criterion(@assignment, summary_ws_url)
 
       @summary = sum.summary
       @avg_scores_by_round = sum.avg_scores_by_round

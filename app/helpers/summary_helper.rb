@@ -8,7 +8,46 @@ module SummaryHelper
   class Summary
     attr_accessor :summary, :reviewers, :avg_scores_by_reviewee, :avg_scores_by_round, :avg_scores_by_criterion
 
+    def summarize_reviews_by_reviewee (questions, assignment, r_id, summary_ws_url)
+
+      self.summary = Hash.new
+      self.avg_scores_by_round = Hash.new
+      self.avg_scores_by_criterion = Hash.new
+
+      #get all answers for each question and send them to summarization WS
+      questions.keys.each do |round|
+        self.summary[round.to_s] = Hash.new
+        self.avg_scores_by_criterion[round.to_s] = Hash.new
+        self.avg_scores_by_round[round.to_s] = 0.0
+        included_question_counter = 0
+
+        questions[round].each do |q|
+          next if q.type.eql?("SectionHeader")
+
+          self.summary[round.to_s][q.txt] = ""
+          self.avg_scores_by_criterion[round.to_s][q.txt] = 0.0
+
+          question_answers = assignment.answers_by_reviewee_question(r_id, q.id)
+
+          max_score = get_max_score_for_question(q)
+
+          comments = break_up_comments_to_sentences(question_answers)
+
+          #get the avg scores for this question
+          self.avg_scores_by_criterion[round.to_s][q.txt] = calculate_avg_score_by_criterion(question_answers, max_score)
+          #get the summary of answers to this question
+          self.summary[round.to_s][q.txt] = summarize_sentences(comments, summary_ws_url)
+        end
+        self.avg_scores_by_round[round.to_s] = calculate_avg_score_by_round(self.avg_scores_by_criterion[round.to_s], questions[round])
+      end
+      return self
+    end
+
+    # produce summaries for instructor. it merges all feedback given to all reviewees, and summarize them by criterion
     def summarize_reviews_by_criterion(assignment, summary_ws_url)
+      #@summary[reviewee][round][question]
+      #@avg_score_round[reviewee][round]
+      #@avg_scores_by_criterion[reviewee][round][criterion]
       nround = assignment.rounds_of_reviews
       self.summary = Array.new(nround)
       self.avg_scores_by_criterion = Array.new(nround)
@@ -25,12 +64,7 @@ module SummaryHelper
         #get answers of each question in the rubric
         questions_used_in_round.each do |question|
           next if question.type.eql?("SectionHeader")
-          answers_questions =
-              Answer.select("DISTINCT answers.comments,  answers.answer")
-                  .joins("JOIN questions ON answers.question_id = questions.id")
-                  .joins("JOIN responses ON responses.id = answers.response_id")
-                  .joins("JOIN response_maps ON responses.map_id = response_maps.id")
-                  .where("answers.question_id = ? and response_maps.reviewed_object_id = ?", question.id, assignment.id)
+          answers_questions = assignment.answers_by_question (question.id)
 
           max_score = get_max_score_for_question(question)
           # process each question in a seperate thread
@@ -51,10 +85,13 @@ module SummaryHelper
         return self
     end
 
+    # produce summaries for instructor and students. It sum up the feedback by criterion for each reviewee
     def summarize_reviews_by_reviewees(assignment, summary_ws_url)
-      #summary[reviewee][round][question][comments/answer]
-      #avg_score_round[reviewee][round]
-      #avg_scores_by_criterion[reviewee][round][question]
+      #@summary[reviewee][round][question]
+      #@reviewers[team][reviewer]
+      #@avg_scores_by_reviewee[team]
+      #@avg_score_round[reviewee][round]
+      #@avg_scores_by_criterion[reviewee][round][criterion]
       self.summary = Hash.new
       self.avg_scores_by_reviewee = Hash.new
       self.avg_scores_by_round = Hash.new
@@ -93,14 +130,7 @@ module SummaryHelper
 
 
             #get all answers to this question
-            question_answers = Answer.select(:answer, :comments)
-                                   .joins("join responses on responses.id = answers.response_id")
-                                   .joins("join response_maps on responses.map_id = response_maps.id")
-                                   .joins("join questions on questions.id = answers.question_id")
-                                   .where("response_maps.reviewed_object_id = ? and
-                                               response_maps.reviewee_id = ? and
-                                               answers.question_id = ? and
-                                               responses.round = ?", assignment.id, reviewee.id, q.id, round+1)
+            question_answers = assignment.answers_by_question_reviewee_round(reviewee.id, q.id, round+1)
             #get max score of this rubric
             q_max_score = get_max_score_for_question(q)
 

@@ -163,7 +163,7 @@ function microtaskChanged() {
     <td style='padding:5px' id='assignment_reputation_algorithm_field'>
       <!--<input name="assignment_form[assignment][reputation_algorithm]" type="hidden" value="false"/>-->
       <%= label_tag('assignment_form[assignment][reputation_algorithm]', 'Reputation Algorithm?') %>
-      <%= select('assignment_form[assignment]','reputation_algorithm', [['Lauw', 'Lauw'],['Hamer','Hamer']],:selected => @assignment_form.assignment.reputation_algorithm) %>
+      <%= select('assignment_form[assignment]','reputation_algorithm', [['--', ''],['Lauw', 'Lauw'],['Hamer','Hamer']],:selected => @assignment_form.assignment.reputation_algorithm) %>
 
     </td>
   </tr>

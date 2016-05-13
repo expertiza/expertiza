@@ -39,10 +39,10 @@ class AdvertiseForPartnerController < ApplicationController
     assignment=Assignment.find(Team.find(params[:id]).parent_id)
     participant=AssignmentParticipant.where(parent_id: assignment.id, user_id: session[:user].id).first
     if @team.save
-      flash[:notice]='Advertisement updated successfully!'
+      flash[:notice]='Your advertisement was successfully updated!'
       redirect_to view_student_teams_path student_id: participant.id
     else
-      flash[:error]='Advertisement not updated!'
+      flash[:error]='Your advertisement was not updated!'
       redirect_to view_student_teams_path student_id: participant.id
     end
   end

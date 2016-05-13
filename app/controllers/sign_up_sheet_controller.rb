@@ -67,9 +67,9 @@ class SignUpSheetController < ApplicationController
       @topic = SignUpTopic.find(params[:id])
       if @topic
         @topic.destroy
-        undo_link("Topic: \"#{@topic.topic_name}\" has been deleted successfully. ")
+        undo_link("The topic: \"#{@topic.topic_name}\" has been successfully deleted. ")
       else
-        flash[:error] = "Topic could not be deleted"
+        flash[:error] = "The topic could not be deleted."
       end
 
       #if this assignment has staggered deadlines then destroy the dependencies as well
@@ -102,9 +102,9 @@ class SignUpSheetController < ApplicationController
         @topic.topic_name = params[:topic][:topic_name]
         @topic.micropayment = params[:topic][:micropayment]
         @topic.save
-        undo_link("Topic: \"#{@topic.topic_name}\" has been updated successfully. ")
+        undo_link("The topic: \"#{@topic.topic_name}\" has been successfully updated. ")
         else
-          flash[:error] = "Topic could not be updated"
+          flash[:error] = "The topic could not be updated."
         end
         #changing the redirection url to topics tab in edit assignment view.
         redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
@@ -210,12 +210,12 @@ class SignUpSheetController < ApplicationController
     #If there is no drop topic deadline, student can drop topic at any time (if all the submissions are deleted)
     #If there is a drop topic deadline, student cannot drop topic after this deadline.
     if !participant.team.submitted_files.empty? or !participant.team.hyperlinks.empty?
-      flash[:error] = "You have submitted your work, so you are not allowed to drop your topic."
+      flash[:error] = "You have already submitted your work, so you are not allowed to drop your topic."
     elsif !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
       flash[:error] = "You cannot drop your topic after drop topic deadline!"
     else
       delete_signup_for_topic(params[:assignment_id], params[:id])
-      flash[:success] = "You have dropped your topic successfully!"
+      flash[:success] = "You have successfully dropped your topic!"
     end
     redirect_to :action => 'list', :assignment_id => params[:assignment_id]
   end
@@ -249,7 +249,7 @@ class SignUpSheetController < ApplicationController
       if params[:priority].to_s.to_f > 0
         signUp.update_attribute('preference_priority_number', params[:priority].to_s)
       else
-        flash[:error] = "Invalid priority"
+        flash[:error] = "That is an invalid priority."
       end
     end
     redirect_to :action => 'list', :id => params[:assignment_id]
@@ -279,7 +279,7 @@ class SignUpSheetController < ApplicationController
       set_start_due_date(params[:assignment_id], set_of_topics)
       @top_sort = dg.topsort_iterator.to_a
     else
-      flash[:error] = "There may be one or more cycles in the dependencies. Please correct them"
+      flash[:error] = "There may be one or more cycles in the dependencies. Please correct them."
     end
 
     node = 'topic_name'
@@ -314,7 +314,7 @@ class SignUpSheetController < ApplicationController
         topic_deadline_subm = TopicDeadline.where(topic_id: session[:duedates][j]['id'].to_i, deadline_type_id: topic_deadline_type_subm, round: i).first
 
         topic_deadline_subm.update_attributes({due_at: due_dates[session[:duedates][j]['id'].to_s + '_submission_' + i.to_s + '_due_date']})
-        flash[:error] = "Please enter a valid " + (i > 1 ? "Resubmission deadline " + (i-1).to_s : "Submission deadline") if topic_deadline_subm.errors.length > 0
+        flash[:error] = "Please enter a valid " + (i > 1 ? "Resubmission deadline " + (i-1).to_s: "Submission deadline.") if topic_deadline_subm.errors.length > 0
 
         topic_deadline_type_rev = DeadlineType.where(name: 'review').first.id
         topic_deadline_rev = TopicDeadline.where(topic_id: session[:duedates][j]['id'].to_i, deadline_type_id: topic_deadline_type_rev, round: i).first
@@ -325,7 +325,7 @@ class SignUpSheetController < ApplicationController
       deadline_type = DeadlineType.where(name: 'metareview')
       topic_deadline_subm = TopicDeadline.where(topic_id: session[:duedates][j]['id'], deadline_type_id: deadline_type.id).first
       topic_deadline_subm.update_attributes({due_at: due_dates[session[:duedates][j]['id'].to_s + '_submission_' + (review_rounds+1).to_s + '_due_date']})
-      flash[:error] = "Please enter a valid Meta review deadline" if topic_deadline_subm.errors.length > 0
+      flash[:error] = "Please enter a valid Meta review deadline." if topic_deadline_subm.errors.length > 0
     end
 
     redirect_to_assignment_edit(params[:assignment_id])
@@ -484,7 +484,7 @@ class SignUpSheetController < ApplicationController
         topic.update_waitlisted_users params[:topic][:max_choosers]
         topic.max_choosers = params[:topic][:max_choosers]
       else
-        flash[:error] = 'Value of maximum choosers can only be increased! No change has been made to max choosers.'
+        flash[:error] = 'The value of the maximum choosers can only be increased! No change has been made to maximum choosers.'
       end
     end
   end

@@ -49,7 +49,7 @@ class CourseController < ApplicationController
     @course.directory_path = params[:course][:directory_path]
     @course.info = params[:course][:info]
     @course.save
-    undo_link("Course \"#{@course.name}\" has been updated successfully. ")
+    undo_link("The course \"#{@course.name}\" has been updated successfully.")
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -67,7 +67,7 @@ class CourseController < ApplicationController
         CourseNode.create(:node_object_id => new_course.id)
       end
 
-      undo_link("Course \"#{orig_course.name}\" has been copied successfully. The copy is currently associated with an existing location from the original course. This could cause errors for future submissions and it is recommended that the copy be edited as needed. ")
+      undo_link("The course \"#{orig_course.name}\" has been successfully copied. The copy is currently associated with an existing location from the original course. This could cause errors for future submissions and it is recommended that the copy be edited as needed.")
       redirect_to :controller => 'course', :action => 'edit', :id => new_course.id
 
     rescue
@@ -90,7 +90,7 @@ class CourseController < ApplicationController
         CourseNode.create(:node_object_id => @course.id)
       end
       FileHelper.create_directory(@course)
-      undo_link("Course \"#{@course.name}\" has been created successfully. ")
+      undo_link("The course \"#{@course.name}\" has been successfully created.")
       redirect_to :controller => 'tree_display', :action => 'list'
     rescue
       flash[:error] = $! #"The following error occurred while saving the course: #"+
@@ -113,7 +113,7 @@ class CourseController < ApplicationController
     #  map.destroy
     #}
     @course.destroy
-    undo_link("Course \"#{@course.name}\" has been deleted successfully. ")
+    undo_link("The course \"#{@course.name}\" has been successfully deleted.")
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -126,7 +126,7 @@ class CourseController < ApplicationController
       flash[:error] = $!
     end
     @access = @course.private == true ? "private" : "public"
-    undo_link("Course \"#{@course.name}\" has been made #{@access} successfully. ")
+    undo_link("The course \"#{@course.name}\" has been successfully made #{@access}.")
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -139,7 +139,7 @@ class CourseController < ApplicationController
     @course = Course.find(params[:course_id])
     @user = User.find_by_name(params[:user][:name])
     if(@user==nil)
-      flash[:error] = "Input user \""+params[:user][:name]+"\" does not exist"
+      flash[:error] = "The user inputted \""+params[:user][:name]+"\" does not exist."
       redirect_to :action => 'view_teaching_assistants', :id => @course.id
     else
       @ta_mapping = TaMapping.create(:ta_id => @user.id, :course_id => @course.id)
@@ -149,7 +149,7 @@ class CourseController < ApplicationController
       redirect_to :action => 'view_teaching_assistants', :id => @course.id
 
       @course = @ta_mapping
-      undo_link("TA \"#{@user.name}\" has been added successfully. ")
+      undo_link("The TA \"#{@user.name}\" has been successfully added.")
     end
   end
 
@@ -161,7 +161,7 @@ class CourseController < ApplicationController
     @ta_mapping.destroy
 
     @course = @ta_mapping
-    undo_link("TA \"#{@ta.name}\" has been removed successfully. ")
+    undo_link("The TA \"#{@ta.name}\" has been successfully removed.")
 
     redirect_to :action => 'view_teaching_assistants', :id => @ta_mapping.course
   end

@@ -31,7 +31,7 @@ class MarkupStylesController < ApplicationController
     @markup_style = MarkupStyle.new(params[:markup_style])
     begin
       @markup_style.save!
-      flash[:notice] = 'MarkupStyle was successfully created.'
+      flash[:notice] = 'The markup style was successfully created.'
       redirect_to :action => 'list'
     rescue
       render :action => 'new'
@@ -46,7 +46,7 @@ class MarkupStylesController < ApplicationController
     @markup_style = MarkupStyle.find(params[:id])
     if @markup_style.update_attributes(params[:markup_style])
       redirect_to :action => 'show', :id => @markup_style
-      flash[:notice] = 'MarkupStyle was successfully updated.'
+      flash[:notice] = 'The markup style was successfully updated.'
     else
       render :action => 'edit'
     end

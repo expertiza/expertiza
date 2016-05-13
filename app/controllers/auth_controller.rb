@@ -23,7 +23,7 @@ class AuthController < ApplicationController
          after_login(user)
        else
          logger.warn "Failed login attempt"
-         flash[:error] = "Incorrect Name/Password"
+         flash[:error] = "Your username or password is incorrect."
          redirect_to :controller => 'password_retrieval', :action => 'forgotten'
        end
     end
@@ -44,7 +44,7 @@ class AuthController < ApplicationController
     Rails.logger.debug("email : #{g_email}")
     user = User.find_by_email(g_email)
     if user.nil?
-      flash[:error] = "This email is not authorized to use expertiza!"
+      flash[:error] = "This email is not authorized to use Expertiza!"
       redirect_to root_path
     else
      after_login(user)
@@ -52,7 +52,7 @@ class AuthController < ApplicationController
   end
 
   def login_failed
-    flash.now[:error] = "Incorrect Name/Password"
+    flash.now[:error] = "Your username or password is incorrect."
     render :action => 'forgotten'
   end
 

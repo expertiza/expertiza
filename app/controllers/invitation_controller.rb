@@ -23,12 +23,12 @@ class InvitationController < ApplicationController
       if !participant
         flash[:note] = "\"#{params[:user][:name].strip}\" is not a participant of this assignment."
       elsif team.full?
-         flash[:error] = "Your team already has max members."
+         flash[:error] = "Your team already has the maximum number members."
       else
         team_member = TeamsUser.where(['team_id =? and user_id =?', team.id, user.id])
         #check if invited user is already in the team
         if (team_member.size > 0)
-          flash[:note] = "\"#{user.name}\" is already a member of team."
+          flash[:note] = "\"#{user.name}\" is already a member of the team."
         else
           #check if the invited user is already invited (i.e. awaiting reply)
           if Invitation.is_invited?(student.user_id, user.id, student.parent_id)
@@ -82,10 +82,10 @@ class InvitationController < ApplicationController
     #check if the inviter's team is still existing, and have available slot to add the invitee
     inviter_assignment_team = AssignmentTeam.team(inviter_participant)
     if inviter_assignment_team.nil?
-      flash[:error]= "The team which invited you does not exist any more."
+      flash[:error]= "The team that invited you does not exist anymore."
     else
       if inviter_assignment_team.full?
-        flash[:error]= "The team which invited you is full now."
+        flash[:error]= "The team that invited you is full now."
       else
         ready_to_join=true
       end
@@ -102,7 +102,7 @@ class InvitationController < ApplicationController
       add_successful = Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, student.parent_id)
 
       unless add_successful
-        flash[:error]= "The system fails to add you to the team which invited you."
+        flash[:error]= "The system failed to add you to the team that invited you."
       end
     else
       #The error message should have been flashed from the checks on ready_to_join flag

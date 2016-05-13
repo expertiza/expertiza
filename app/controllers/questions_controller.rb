@@ -44,7 +44,7 @@ class QuestionsController < ApplicationController
   def create
     @question = Question.new(params[:question])
     if @question.save
-      flash[:notice] = 'Question was successfully created.'
+      flash[:notice] = 'The question was successfully created.'
       redirect_to :action => 'list'
     else
       render :action => 'new'
@@ -61,7 +61,7 @@ class QuestionsController < ApplicationController
   def update
     @question = Question.find(params[:id])
     if @question.update_attributes(params[:question])
-      flash[:notice] = 'Question was successfully updated.'
+      flash[:notice] = 'The question was successfully updated.'
       redirect_to :action => 'show', :id => @question
     else
       render :action => 'edit'
@@ -75,7 +75,7 @@ class QuestionsController < ApplicationController
     questionnaire_id = question.questionnaire_id
     begin
       question.destroy
-      flash[:success] = "You have successfully deleted one question!"
+      flash[:success] = "You have successfully deleted the question!"
     rescue
       flash[:error] = $!
     end

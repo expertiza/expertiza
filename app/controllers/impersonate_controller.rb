@@ -20,7 +20,7 @@ class ImpersonateController < ApplicationController
   def impersonate
     # default error message
     if params[:user] && params[:user][:name]
-      message = "No user exists with the name '#{params[:user][:name]}'"
+      message = "No user exists with the name '#{params[:user][:name]}'."
     end
 
     begin
@@ -31,7 +31,7 @@ class ImpersonateController < ApplicationController
         user = User.find_by_name(params[:user][:name])
         if user
           unless original_user.can_impersonate? user
-            flash[:error] = "You cannot impersonate #{params[:user][:name]}"
+            flash[:error] = "You cannot impersonate #{params[:user][:name]}."
             redirect_back
             return
           end
@@ -52,7 +52,7 @@ class ImpersonateController < ApplicationController
           user = User.find_by_name(params[:impersonate][:name])
           if user
             unless original_user.can_impersonate? user
-              flash[:error] = "You cannot impersonate #{params[:user][:name]}"
+              flash[:error] = "You cannot impersonate #{params[:user][:name]}."
               redirect_back
               return
             end

@@ -28,15 +28,6 @@
     parent_id: 
 - !ruby/object:MenuItem 
   attributes: 
-    name: setup/permissions
-    controller_action_id: "4"
-    id: "5"
-    content_page_id: 
-    seq: "3"
-    label: Permissions
-    parent_id: "9"
-- !ruby/object:MenuItem 
-  attributes: 
     name: setup/roles
     controller_action_id: "3"
     id: "6"

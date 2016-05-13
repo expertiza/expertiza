@@ -39,7 +39,7 @@ class StudentTask
   end
 
   def content_submitted_in_current_stage?
-    (current_stage == "submission" || current_stage == "resubmission") &&
+    (current_stage == "submission" ) &&
       (participant.resubmission_times.size > 0 || hyperlinks.present?)
   end
 
@@ -48,7 +48,7 @@ class StudentTask
   end
 
   def hyperlinks
-    @hyperlinks ||= participant.hyperlinks
+    @hyperlinks ||= participant.team.nil? ? [] : participant.team.hyperlinks
   end
 
   def incomplete?
@@ -81,14 +81,12 @@ class StudentTask
   end
 
   def reviews_given_in_current_stage?
-    current_stage == 'review' || current_stage == 'rereview' && reviews_given?
+    current_stage == 'review'
   end
 
   def in_work_stage?
     current_stage == 'submission' ||
-      current_stage == 'resubmission' ||
       current_stage == 'review' ||
-      current_stage == 'rereview' ||
       current_stage == 'metareview'
   end
 
@@ -116,23 +114,25 @@ class StudentTask
         @teams = user.teams
          
          @teams.each do |team|
-             @teammates  = []
-             @course_id = Assignment.find(team.parent_id).course_id
-             @team_participants = Team.find(team.id).participants
-             @team_participants = @team_participants.select {|participant| participant.name != user.name}
-             @team_participants.each{ |t|
-                 u = Student.find(t.user_id)
-                 @teammates << u.fullname
-             }
-             if !@teammates.empty?
-                 if @students_teamed[@course_id].nil?
-                    @students_teamed[@course_id] = @teammates
-                 else
-                     @teammates.each do |teammate| @students_teamed[@course_id] << teammate end
-                 end
-                 @students_teamed[@course_id].uniq! if @students_teamed.has_key?(@course_id)
-             end
-               
+            # Teammates in calibration assignment should not be counted in teaming requirement.
+            if Assignment.find(team.parent_id).is_calibrated == false
+               @teammates  = []
+               @course_id = Assignment.find(team.parent_id).course_id
+               @team_participants = Team.find(team.id).participants
+               @team_participants = @team_participants.select {|participant| participant.name != user.name}
+               @team_participants.each{ |t|
+                   u = Student.find(t.user_id)
+                   @teammates << u.fullname
+               }
+               if !@teammates.empty?
+                   if @students_teamed[@course_id].nil?
+                      @students_teamed[@course_id] = @teammates
+                   else
+                       @teammates.each do |teammate| @students_teamed[@course_id] << teammate end
+                   end
+                   @students_teamed[@course_id].uniq! if @students_teamed.has_key?(@course_id)
+               end
+            end
          end
         @students_teamed
   end

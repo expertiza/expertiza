@@ -27,7 +27,7 @@ class ScheduledTask
         mail_reviewers # to all reviewers
       end
 
-      if(self.deadline_type == "submission"|| self.deadline_type == "resubmission")
+      if(self.deadline_type == "submission")
         mail_signed_up_users  # to all signed up users
       end
 
@@ -184,10 +184,6 @@ class ScheduledTask
     assignment = Assignment.find(self.assignment_id)
     subject = "Message regarding #{deadlineType} for assignment #{assignment.name}"
     body = "This is a reminder to complete #{deadlineType} for assignment #{assignment.name}. Deadline is #{self.due_at}.If you have already done the  #{deadlineType}, Please ignore this mail."
-
-    if (deadlineType == "resubmission")
-      body += "Author feedback is optional. However, if you want to give author feedback then the deadline is #{self.due_at}."
-    end
 
     #emails<<"vikas.023@gmail.com"
     #emails<<"vsharma4@ncsu.edu"

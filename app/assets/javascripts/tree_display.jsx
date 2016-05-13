@@ -215,16 +215,20 @@ jQuery(document).ready(function() {
               </span>
             )
             if (this.props.has_topic) {
-              moreContent.push(
-                <span>
-                  <a title="View publishing rights" href={"/sign_up_sheet/view_publishing_rights?id="+(parseInt(this.props.id)/2).toString()}>
-                    <img src="/assets/tree_view/view-publish-rights-24.png" />
-                  </a>
-                </span>
-              )
+                // Moved content out of this to the block outside this containing "if" statement
             }
           }
           // if ends
+
+          // Moved it out of if (this.props.has_topic) and if(this.props.is_available),
+          // Since view_publishing_rights should be visible for all the assignments
+           moreContent.push(
+            <span>
+              <a title="View publishing rights" href={"/participants/view_publishing_rights?id="+(parseInt(this.props.id)/2).toString()}>
+                  <img src="/assets/tree_view/view-publish-rights-24.png" />
+              </a>
+            </span>
+          )
         } else if (newNodeType === 'questionnaires'){
           moreContent.push(
             <span>
@@ -371,11 +375,13 @@ jQuery(document).ready(function() {
       }
     },
     handleClick: function(event) {
+        //alert('click');
+
       if (event.target.type != 'button') {
         this.setState({
           expanded: !this.state.expanded
         }, function() {
-          this.props.rowClicked(this.props.id, this.state.expanded)
+          this.props.rowClicked(this.props.id, this.state.expanded,this.props.newParams)
         })
       } else {
         event.stopPropagation()
@@ -455,7 +461,7 @@ jQuery(document).ready(function() {
         }
       }
       return (
-        <tr style={style}>
+        <tr style={style} className="active">
           <td style={colDisplayStyle}>
           </td>
           <td colSpan={colSpan}>
@@ -467,6 +473,18 @@ jQuery(document).ready(function() {
           </td>
         </tr>
       )
+    }
+  })
+
+  var TitleRow = React.createClass({
+    render: function() {
+        return (
+        <tr className="active">
+            <td colSpan="6">
+                <b>{this.props.title}</b>
+            </td>
+        </tr>
+        )
     }
   })
 
@@ -577,11 +595,22 @@ jQuery(document).ready(function() {
         expandedRow: []
       }
     },
-    handleExpandClick: function(id, expanded) {
+    handleExpandClick: function(id, expanded,newParams) {
       if (expanded) {
         this.setState({ 
           expandedRow: this.state.expandedRow.concat([id])
-        })
+        });
+        if(this.props.dataType!='assignment') {
+            _this = this;
+            jQuery.post('/tree_display/get_children_node_2_ng',
+                {
+                    reactParams2: newParams
+                },
+                function (data) {
+                    _this.props.data[id.split("_")[2]]['children'] = data;
+                    _this.forceUpdate();
+                }, 'json');
+        }
       } else {
         var index = this.state.expandedRow.indexOf(id)
         if (index > -1) {
@@ -602,52 +631,116 @@ jQuery(document).ready(function() {
         "display": "",
       }
       if (this.props) {
-        if (this.props.dataType === 'questionnaire') {
-          colWidthArray = ["70%", "0%", "0%", "0%", "0%", "30%"]
-          colDisplayStyle = {
-            "display": "none"
+          if (this.props.dataType === 'questionnaire') {
+              colWidthArray = ["70%", "0%", "0%", "0%", "0%", "30%"]
+              colDisplayStyle = {
+                  "display": "none"
+              }
           }
-        }
-        jQuery.each(this.props.data, function(i, entry){
-          if ((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
-              (entry.directory && entry.directory.indexOf(_this.props.filterText) !== -1) ||
-              (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
-              (entry.instructor && entry.instructor.indexOf(_this.props.filterText) !== -1) ||
-              (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) {
-                _rows.push(<ContentTableRow
-                            key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
-                            id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
-                            name={entry.name}
-                            directory={entry.directory}
-                            instructor={entry.instructor}
-                            creation_date={entry.creation_date}
-                            updated_date={entry.updated_date}
-                            actions={entry.actions}
-                            is_available={entry.is_available}
-                            course_id={entry.course_id}
-                            max_team_size={entry.max_team_size}
-                            is_intelligent={entry.is_intelligent}
-                            require_quiz={entry.require_quiz}
-                            dataType={_this.props.dataType}
-                            private={entry.private}
-                            allow_suggestions={entry.allow_suggestions}
-                            has_topic={entry.has_topic}
-                            rowClicked={_this.handleExpandClick}
-                            />)
-                _rows.push(<ContentTableDetailsRow
-                            key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
-                            id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
-                            showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
-                            dataType={_this.props.dataType}
-                            children={entry.children}
-                            />)
-          } else {
-            return;
+          if (this.props.dataType == 'course') {
+              _rows.push(<TitleRow
+                  title="My Courses"
+              />)
           }
-        })
+          else if(this.props.dataType=='assignment') {
+              _rows.push(<TitleRow
+                  title="My Assignments"
+              />)
+          }
+          jQuery.each(this.props.data, function (i, entry) {
+              if (((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.directory && entry.directory.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.instructor && entry.instructor.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
+                  (entry.private == true || entry.type == 'FolderNode')) {
+                  _rows.push(<ContentTableRow
+                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
+                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
+                      name={entry.name}
+                      directory={entry.directory}
+                      instructor={entry.instructor}
+                      creation_date={entry.creation_date}
+                      updated_date={entry.updated_date}
+                      actions={entry.actions}
+                      is_available={entry.is_available}
+                      course_id={entry.course_id}
+                      max_team_size={entry.max_team_size}
+                      is_intelligent={entry.is_intelligent}
+                      require_quiz={entry.require_quiz}
+                      dataType={_this.props.dataType}
+                      private={entry.private}
+                      allow_suggestions={entry.allow_suggestions}
+                      has_topic={entry.has_topic}
+                      rowClicked={_this.handleExpandClick}
+                      newParams={entry.newParams}
+                  />)
+                  _rows.push(<ContentTableDetailsRow
+                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
+                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
+                      showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
+                      dataType={_this.props.dataType}
+                      children={entry.children}
+                  />)
+              } else {
+                  return;
+              }
+          })
+          if (this.props.showPublic) {
+              if (this.props.dataType == 'course') {
+                  _rows.push(<TitleRow
+                      title="Other's Public Courses"
+                  />)
+              }
+              else if(this.props.dataType=='assignment') {
+                  _rows.push(<TitleRow
+                      title="Other's Public Assignments"
+                  />)
+              }
+          jQuery.each(this.props.data, function (i, entry) {
+              if (((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.directory && entry.directory.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.instructor && entry.instructor.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
+                  (entry.private == false)) {
+                  _rows.push(<ContentTableRow
+                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
+                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
+                      name={entry.name}
+                      directory={entry.directory}
+                      instructor={entry.instructor}
+                      creation_date={entry.creation_date}
+                      updated_date={entry.updated_date}
+                      actions={entry.actions}
+                      is_available={entry.is_available}
+                      course_id={entry.course_id}
+                      max_team_size={entry.max_team_size}
+                      is_intelligent={entry.is_intelligent}
+                      require_quiz={entry.require_quiz}
+                      dataType={_this.props.dataType}
+                      private={entry.private}
+                      allow_suggestions={entry.allow_suggestions}
+                      has_topic={entry.has_topic}
+                      rowClicked={_this.handleExpandClick}
+                      newParams={entry.newParams}
+                  />)
+                  _rows.push(<ContentTableDetailsRow
+                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
+                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
+                      showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
+                      dataType={_this.props.dataType}
+                      children={entry.children}
+                  />)
+              } else {
+                  return;
+              }
+          })
+      }
+
       }
       return (
-        <table className="table table-striped table-hover" style={{"table-layout":"fixed"}}>
+        <table className="table table-hover" style={{"table-layout":"fixed"}}>
           <thead>
             <tr>
               <th width={colWidthArray[0]}>
@@ -696,7 +789,7 @@ jQuery(document).ready(function() {
       return {
         filterText: '',
         privateCheckbox: false,
-        publicCheckbox: true,
+        publicCheckbox: false,
         tableData: this.props.data
       }
     },
@@ -785,6 +878,7 @@ jQuery(document).ready(function() {
             filterText={this.state.filterText}
             onUserClick={this.handleUserClick}
             dataType={this.props.dataType}
+            showPublic={this.state.publicCheckbox}
           />
         </div>
       )
@@ -833,7 +927,7 @@ jQuery(document).ready(function() {
           activeTab: data
         })
       })
-      jQuery.get("/tree_display/get_folder_node_ng", function(data, status) {
+      jQuery.get("/tree_display/get_folder_node_ng", function(data) {
         jQuery.post("/tree_display/get_children_node_ng",
           {
             reactParams: {
@@ -849,31 +943,15 @@ jQuery(document).ready(function() {
                   child_nodes: node.nodeinfo
                 }
                 if (nodeType === 'Assignments') {
-                  node["children"] = null
+                  node["children"] = null;
+                  node[newParams]=newParams;
                 } else if (nodeType === 'Courses') {
                   newParams["nodeType"] = 'CourseNode'
-                  jQuery.post('/tree_display/get_children_node_2_ng',
-                    {
-                      reactParams2: newParams
-                    },
-                    function(data3) {
-                      node["children"] = data3
-                    },
-                    'json'
-                  )
+                  node["newParams"]=newParams;
                 } else if (nodeType === 'Questionnaires') {
                   newParams["nodeType"] = 'FolderNode'
-                  jQuery.post('/tree_display/get_children_node_2_ng',
-                    {
-                      reactParams2: newParams
-                    },
-                    function(data3) {
-                      node["children"] = data3
-                    },
-                    'json'
-                  )
+                  node["newParams"]=newParams;
                 }
-
               }) 
             })
             if (data2) {

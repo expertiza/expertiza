@@ -145,4 +145,15 @@ class Role < ActiveRecord::Base
 
   end
 
+  def update_with_params(role_params)
+    begin
+      self.name = role_params[:name]
+      self.parent_id = role_params[:parent_id]
+      self.description = role_params[:description]
+      self.save
+    rescue StandardError => e
+      false
+    end
+  end
+
 end

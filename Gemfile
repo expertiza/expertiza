@@ -58,6 +58,7 @@ gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
+gem 'jquery-tablesorter'
 
 group :development do
   gem 'daemons'

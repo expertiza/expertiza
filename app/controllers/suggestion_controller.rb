@@ -123,7 +123,7 @@ class SuggestionController < ApplicationController
               proposer: proposer.name
           }
         }
-    ).deliver
+    ).deliver_now
   end
 
   def notification

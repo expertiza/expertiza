@@ -82,6 +82,13 @@
           <%end %>
 
           <% @response_maps.each do |ri| %>
+            <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
+            <% if @assignment.max_team_size == 1 %>
+              <% @team_reviewed_link_name = TeamsUser.where(team_id: ri.reviewee_id).first.user.fullname %>
+            <% else %>
+              <% @team_reviewed_link_name = Team.find(ri.reviewee_id).name %>
+            <% end %>
+            
             <% if (Response.find_by_map_id(ri.id)) %>
               <% if Team.where(["id = ?", ri.reviewee_id ]).length > 0 %>
                 <%@team = Team.find(ri.reviewee_id) %>
@@ -91,10 +98,11 @@
                 <%else %>
                   <td id = "green" bgcolor="#DDDDBB" align = 'left' colspan=1>
                 <%end %>
+
                 <% if ri.response.last.is_submitted?%>
-                    <%= link_to Team.find(ri.reviewee_id).name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
+                    <%= link_to @team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
                 <% else %>
-                    <%= link_to "("+Team.find(ri.reviewee_id).name+")", :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
+                    <%= link_to "("+@team_reviewed_link_name+")", :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
                 <% end %>
                   </td>
                   <%= render :partial => 'teamscore' %>
@@ -143,7 +151,7 @@
                         <%end %>
                           <%@team = Team.find(ri.reviewee_id) %>
                           <% @teamid = @team.id%>
-                          <%= link_to Team.find(ri.reviewee_id).name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => nil, :assignment_id=>@id %>
+                          <%= link_to @team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => nil, :assignment_id=>@id %>
                         </td>
                         <%= render :partial => 'teamscore' %>
                         <% if (@l%2) == 0 %>

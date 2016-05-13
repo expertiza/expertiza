@@ -172,12 +172,13 @@ class TreeDisplayController < ApplicationController
           tmpObject["updated_date"] = node.get_modified_date
           #tmpObject["private"] = node.get_private
           tmpObject["private"] = node.get_instructor_id===session[:user].id ? true :false
+          instructor_id = node.get_instructor_id
           ## if current user's role is TA for a course, then that course will be listed under his course listing.
-          if(session[:user].role_id == 6 && Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
+          if(session[:user].role.ta? == 'Teaching Assistant' && Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
             tmpObject["private"]=true;
           end
 
-          instructor_id = node.get_instructor_id
+
           tmpObject["instructor_id"] = instructor_id
           unless (instructor_id.nil?)
             tmpObject["instructor"] = User.find(instructor_id).name
@@ -185,7 +186,7 @@ class TreeDisplayController < ApplicationController
             tmpObject["instructor"] = nil
           end
 
-          tmpObject["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role_id == 6 && Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
+          tmpObject["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role.ta? && Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
           if nodeType == "Assignments"
             tmpObject["course_id"] = node.get_course_id
             tmpObject["max_team_size"] = node.get_max_team_size

@@ -1,12 +1,16 @@
 
 <%= render :partial => 'searchbox'%>
 <% if @type == "ReviewResponseMap" %>
-	<%= render :partial => 'review_report' %>
+    <%= render :partial => 'review_report'  %>
+<% elsif @type == "SummaryResponseMap" %>
+    <%= render :partial => 'summary_report' %>
+<% elsif @type == "SummaryRevieweeResponseMap" %>
+    <%= render :partial => 'summary_reviewee_report' %>
 <% elsif @type == "FeedbackResponseMap" %>
-	<%= render :partial => 'feedback_report' %>
+    <%= render :partial => 'feedback_report' %>
 <% elsif @type == "TeammateReviewResponseMap" %>
-	<%= render :partial => 'teammate_review_report' %>
+    <%= render :partial => 'teammate_review_report' %>
 <% elsif @type == "Calibration" %>
-	<%= render :partial => 'calibration_report' %>
+    <%= render :partial => 'calibration_report' %>
 <% end %>
 

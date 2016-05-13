@@ -1,0 +1,76 @@
+<link rel="stylesheet" type="text/css" href="/assets/summary.css">
+<script type="text/javascript" src="/assets/summary.js" ></script>
+
+<div class = "reviewreport">
+  <br>
+  <table border="1" bordercolor="grey" style="table_stretch">
+  <%
+     row_round_index = 0
+    @reviewers.keys.each do |team|
+  %>
+    <tr bgcolor="#BDBDBD">
+      <th class="header_class"  data-toggle="collapse" data-target="#team_<%= row_round_index.to_s %>" >
+        <h5><img id="icon_header_team" src="/assets/arrow_down.png" class="arrow_icon"/>[avg score: <%= @avg_scores_by_reviewee[team].to_s %>%]&nbsp;<%= team %></h5>
+      </th>
+    </tr>
+    <tr bgcolor="#E6E6E6">
+      <td>Reviewers : <%= @reviewers[team].join(", ")  %></td>
+    </tr>
+      <!--print the team name and put the reviews in a div so it can be collapsed smoothly-->
+    <tr>
+      <td>
+        <div id="team_<%= row_round_index.to_s %>" class="collapse">
+          <table border="1" class="table_stretch">
+     <%
+       for i in 0..@assignment.rounds_of_reviews-1
+         #var to name the div
+        team_assg_index = row_round_index.to_s + i.to_s
+     %>
+        <!--print the round header-->                
+        <tr>
+          <td class="header_class" data-toggle="collapse" data-target="#round_<%= team_assg_index %>" >
+            <h5>
+              <img src="/assets/arrow_down.png" class="arrow_icon"/>[score avg : <%= @avg_scores_by_round[team][i].to_s  %>%]Round <%= (i+1).to_s %>
+            </h5>
+          </td>
+        </tr>
+       <tr>
+         <td>
+           <!--print the summary per round in a new div so it can be collapsed smoothly-->
+           <div id='round_<%= team_assg_index %>' class='collapse'>
+             <table class='table_stretch'>
+        <%@summary[team][i].keys.each do | q |%>
+              <!--print the avg scores of each question-->
+                <tr bgcolor='#BDBDBD'>
+                  <td>
+                    <i>[score avg : <%= @avg_scores_by_criterion[team][i][q].to_s %>%] &nbsp; <%= q %></i>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <%
+                   #print the summary of reviews
+                   if !@summary[team][i][q].eql?("")
+                     concat @summary[team][i][q]
+                   else
+                     safe_concat "&nbsp;"
+                   end
+                    %>
+                   </td>
+                 </tr>
+        <%end%>
+              </table>
+             </div>
+          </td>
+        </tr>
+       <%
+       end
+       row_round_index += 1
+       %>
+          </table>
+        </div>
+      </td>
+    </tr>
+ <% end %>
+  </table>
+</div>

@@ -1016,34 +1016,39 @@ require 'analytic/assignment_analytic'
 
     for index in 0 .. @scores[:teams].length - 1
       team = @scores[:teams][index.to_s.to_sym]
-      for participant in team[:team].participants
-        pscore = @scores[:participants][participant.id.to_s.to_sym]
-        tcsv = Array.new
-        tcsv << 'team'+index.to_s
-
-        team[:scores] ?
-          tcsv.push(team[:scores][:max], team[:scores][:avg], team[:scores][:min], participant.fullname) :
-          tcsv.push('---', '---', '---') if options['team_score'] == 'true'
-
-        pscore[:review] ?
-          tcsv.push(pscore[:review][:scores][:max], pscore[:review][:scores][:min], pscore[:review][:scores][:avg]) :
-          tcsv.push('---', '---', '---') if options['submitted_score']
-
-        pscore[:metareview] ?
-          tcsv.push(pscore[:metareview][:scores][:max], pscore[:metareview][:scores][:min], pscore[:metareview][:scores][:avg]) :
-          tcsv.push('---', '---', '---') if options['metareview_score']
-
-        pscore[:feedback] ?
-          tcsv.push(pscore[:feedback][:scores][:max], pscore[:feedback][:scores][:min], pscore[:feedback][:scores][:avg]) :
-          tcsv.push('---', '---', '---') if options['author_feedback_score']
-
-        pscore[:teammate] ?
-          tcsv.push(pscore[:teammate][:scores][:max], pscore[:teammate][:scores][:min], pscore[:teammate][:scores][:avg]) :
-          tcsv.push('---', '---', '---') if options['teammate_review_score']
-
-        tcsv.push(pscore[:total_score])
-        csv << tcsv
+      first_participant = team[:team].participants[0] unless team[:team].participants[0].nil? 
+      pscore = @scores[:participants][first_participant.id.to_s.to_sym]
+      tcsv = Array.new
+      tcsv << team[:team].name
+      names_of_participants = ''
+      team[:team].participants.each do |p|
+        names_of_participants += p.fullname
+        names_of_participants += '; ' unless p == team[:team].participants.last
       end
+      tcsv << names_of_participants
+
+      team[:scores] ?
+        tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg]) :
+        tcsv.push('---', '---', '---') if options['team_score'] == 'true'
+
+      pscore[:review] ?
+        tcsv.push(pscore[:review][:scores][:max], pscore[:review][:scores][:min], pscore[:review][:scores][:avg]) :
+        tcsv.push('---', '---', '---') if options['submitted_score']
+
+      pscore[:metareview] ?
+        tcsv.push(pscore[:metareview][:scores][:max], pscore[:metareview][:scores][:min], pscore[:metareview][:scores][:avg]) :
+        tcsv.push('---', '---', '---') if options['metareview_score']
+
+      pscore[:feedback] ?
+        tcsv.push(pscore[:feedback][:scores][:max], pscore[:feedback][:scores][:min], pscore[:feedback][:scores][:avg]) :
+        tcsv.push('---', '---', '---') if options['author_feedback_score']
+
+      pscore[:teammate] ?
+        tcsv.push(pscore[:teammate][:scores][:max], pscore[:teammate][:scores][:min], pscore[:teammate][:scores][:avg]) :
+        tcsv.push('---', '---', '---') if options['teammate_review_score']
+
+      tcsv.push(pscore[:total_score])
+      csv << tcsv
     end
   end
 
@@ -1051,11 +1056,12 @@ require 'analytic/assignment_analytic'
   def self.export_fields(options)
     fields = Array.new
     fields << 'Team Name'
-    fields.push('Team Max', 'Team Avg', 'Team Min') if options['team_score'] == 'true'
-    fields.push('Submitted Max', 'Submitted Avg', 'Submitted Min') if options['submitted_score']
-    fields.push('Metareview Max', 'Metareview Avg', 'Metareview Min') if options['metareview_score']
-    fields.push('Author Feedback Max', 'Author Feedback Avg', 'Author Feedback Min') if options['author_feedback_score']
-    fields.push('Teammate Review Max', 'Teammate Review Avg', 'Teammate Review Min') if options['teammate_review_score']
+    fields << 'Team Member(s)'
+    fields.push('Team Max', 'Team Min', 'Team Avg') if options['team_score'] == 'true'
+    fields.push('Submitted Max', 'Submitted Min', 'Submitted Avg') if options['submitted_score']
+    fields.push('Metareview Max', 'Metareview Min', 'Metareview Avg') if options['metareview_score']
+    fields.push('Author Feedback Max', 'Author Feedback Min', 'Author Feedback Avg') if options['author_feedback_score']
+    fields.push('Teammate Review Max', 'Teammate Review Min', 'Teammate Review Avg') if options['teammate_review_score']
     fields.push('Final Score')
     fields
   end

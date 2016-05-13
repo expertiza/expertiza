@@ -24,18 +24,17 @@ class ExportFileController < ApplicationController
 
   def export
     @delim_type = params[:delim_type]
-
     if(@delim_type == "comma")
-      filename = "out.csv"
+      filename = params[:model] + params[:id] + ".csv"
       delimiter = ","
     elsif(@delim_type == "space")
-      filename = "out.csv"
+      filename = params[:model] + params[:id] + ".csv"
       delimiter = " "
     elsif(@delim_type == "tab")
-      filename = "out.tsv"
+      filename = params[:model] + params[:id] + ".csv"
       delimiter = "\t"
     elsif(@delim_type == "other")
-      filename = "out.txt"
+      filename = params[:model] + params[:id] + ".csv"
       delimiter = other_char
     end
     csv_data = CSV.generate(:col_sep => delimiter) do |csv|

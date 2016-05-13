@@ -162,11 +162,11 @@ class UsersController < ApplicationController
     if (request.original_fullpath == "/users/#{@user.id}?name=#{@user.id}")
       @user.name += '_hidden'
     end
-    if @user.update_attributes(user_params)
+    if @user.update_attributes(name: @user.name)
       undo_link("User \"#{@user.name}\" has been updated successfully. ")
       redirect_to @user
     else
-      foreign
+      # foreign
       render :action => 'edit'
     end
   end
@@ -177,7 +177,7 @@ class UsersController < ApplicationController
       AssignmentParticipant.where(user_id: @user.id).each{|participant| participant.delete}
       TeamsUser.where(user_id: @user.id).each{|teamuser| teamuser.delete}
       AssignmentQuestionnaire.where(user_id: @user.id).each{|aq| aq.destroy}
-      Participant.delete(true)
+      # Participant.delete(true)
       @user.destroy
       flash[:note] = undo_link("User \"#{@user.name}\" has been deleted successfully. ")
     rescue

@@ -2,6 +2,12 @@
 
 <%= form_tag :action => 'response_report', :id => @id do %>
   <select name='report[type]' style="width: 15em">
+    <option value='SummaryRevieweeResponseMap' selected>
+      Reviewee summary report
+    </option>
+    <option value='SummaryResponseMap' selected>
+      Review summary report
+    </option>
     <option value='ReviewResponseMap' selected>
       Review report
     </option>
@@ -21,7 +27,11 @@
 <% end %>
 
 <% if @type == "ReviewResponseMap" %>
-  <h1> Review report for <%= @assignment.name%> </h1>
+    <h1> Review report for <%= @assignment.name%> </h1>
+<% elsif @type == "SummaryResponseMap" %>
+    <h1> Review summary report for <%= @assignment.name%> </h1>
+<% elsif @type == "SummaryRevieweeResponseMap" %>
+    <h1> Reviewees summary report for <%= @assignment.name%> </h1>
 <% elsif @type == "FeedbackResponseMap" %>
   <h1> Author feedback report for <%= @assignment.name%> </h1>
 <% elsif @type == "TeammateReviewResponseMap" %>

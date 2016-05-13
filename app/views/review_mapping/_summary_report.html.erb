@@ -1,0 +1,40 @@
+<link rel="stylesheet" type="text/css" href="/assets/summary.css">
+<script type="text/javascript" src="/assets/summary.js" ></script>
+
+<div class = "reviewreport">
+  <table border="1" bordercolor="#848484">
+  <%for i in 0..@assignment.rounds_of_reviews-1 %>
+      <tr bgcolor='#848484' class='header_class'  data-toggle='collapse' data-target='#round_<%= (i+1).to_s %>'>
+         <td>
+           <img id='icon_header_team' src='/assets/arrow_down.png' class='arrow_icon' />[avg score : <%= @avg_scores_by_round[i].to_s %>%] Round <%= (i+1).to_s %>
+         </td>
+      </tr>
+      <tr>
+        <td>
+          <div id = 'round_<%= (i+1).to_s %>' class='collapse'>
+            <table class="table_stretch">
+      <%@summary[i].keys.each do |question|%>
+            <tr bgcolor='#BDBDBD'>
+                <td>
+                  <h5>[avg score: <%= @avg_scores_by_criterion[i][question].to_s %>%]&nbsp;<%= question %></h5>
+                </td>
+            </tr>
+            <tr>
+              <td>
+              <%
+            if !@summary[i][question].eql?("")
+              concat @summary[i][question]
+            else
+              safe_concat "&nbsp;"
+            end
+              %>
+              </td>
+            </tr>
+      <%end%>
+            </table>
+          </div>
+        </td>
+      </tr>
+    <%end%>
+  </table>
+</div>

@@ -1,5 +1,7 @@
 <!-- PARTICIPANT -->
-<% 
+<link rel="stylesheet" type="text/css" href="/assets/summary.css">
+<script type="text/javascript" src="/assets/summary.js" ></script>
+<%
 participant = pscore[:participant]
     if pscore[:review]
 @rscore_review=Rscore.new(pscore,:review)
@@ -37,8 +39,11 @@ participant = pscore[:participant]
                 <% if controller.action_name != "view_my_scores" %>
                     <BR/>
                     <FONT SIZE="-1"><%= link_to 'email reviewers', :action => 'conflict_notification', :id => participant.id, :submission => 'review' %></FONT>
-                <% end %>    
-            
+              <% else %>
+                  <!-- fake link to auto summarization table, only shown to the reviewee-->
+                  <div align="center" data-toggle="collapse" data-target="#summary_review_table" class="fake-link">show review summary</div>
+                  <!-- end fake link -->
+              <% end %>
             </TD>
         <% end %>
     <% else %>
@@ -163,6 +168,17 @@ participant = pscore[:participant]
         <TD COLSPAN="10"><%= render :partial=>'grades/submissions', :locals => {:participant => participant} %></TD>
     </TR>
 <% end %>
+<!-- summarization table, only shown to the reviewee-->
+<% if controller.action_name == "view_my_scores" %>
+    <TR>
+      <TD COLSPAN="10">
+        <div id="summary_review_table" class="collapse">
+          <%= render :partial=>'grades/summary_reviews'  %>
+        </div>
+      </TD>
+    </TR>
+<%end%>
+<!-- end summarization table -->
     <TR id="<%= prefix %>_reviews" style="display:none; background-color: white;">
         <TD COLSPAN="10"><%= render :partial=>'grades/reviews', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:review]} %></TD>
     </TR>

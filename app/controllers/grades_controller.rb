@@ -80,7 +80,56 @@ class GradesController < ApplicationController
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
     @stage = @participant.assignment.get_current_stage(@topic_id)
     calculate_all_penalties(@assignment.id)
+
+    #prepare feedback summaries
+    summary_ws_url = Rails.application.config.summary_ws_url
+    sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewee(@questions, @assignment, @team_id,  summary_ws_url)
+
+    @summary = sum.summary
+    @avg_scores_by_round = sum.avg_scores_by_round
+    @avg_scores_by_criterion = sum.avg_scores_by_criterion
+
   end
+
+  # def prepare_feedback_summaries
+  #   @summaries = Hash.new
+  #   @score_summaries = Hash.new
+  #   @score_round_summaries = Hash.new
+  #   #move this to config file
+  #   summary_ws_url = Rails.application.config.summary_ws_url
+  #
+  #   #get all answers for each question and send them to summarization WS
+  #   @questions.keys.each do |round|
+  #     @summaries[round.to_s] = Hash.new
+  #     @score_summaries[round.to_s] = Hash.new
+  #     @score_round_summaries[round.to_s] = 0.0
+  #     included_question_counter = 0
+  #
+  #     @questions[round].each do |q|
+  #       next if q.type.eql?("SectionHeader")
+  #
+  #       @summaries[round.to_s][q.txt] = ""
+  #       @score_summaries[round.to_s][q.txt]  = 0.0
+  #       question_answers = Answer.select(:answer, :comments)
+  #                              .joins("join responses on responses.id = answers.response_id")
+  #                              .joins("join response_maps on responses.map_id = response_maps.id")
+  #                              .joins("join questions on questions.id = answers.question_id")
+  #                              .where("response_maps.reviewed_object_id = ? and
+  #                                            response_maps.reviewee_id = ? and
+  #                                            answers.question_id = ? ", @assignment.id, @team_id, q.id )
+  #
+  #       max_score = SummaryHelper.get_max_score_for_question(q)
+  #
+  #       comments = SummaryHelper.break_up_comments_to_sentences(question_answers)
+  #
+  #       #get the avg scores for this question
+  #       @score_summaries[round.to_s][q.txt] = SummaryHelper.calculate_avg_score_by_criterion(question_answers, max_score)
+  #       #get the summary of answers to this question
+  #       @summaries[round.to_s][q.txt] = SummaryHelper.summarize_sentences(comments, summary_ws_url)
+  #     end
+  #     @score_round_summaries[round.to_s] = SummaryHelper.calculate_avg_score_by_round(@score_summaries[round.to_s], @questions[round])
+  #   end
+  # end
 
   def view_team
 

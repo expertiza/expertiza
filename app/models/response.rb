@@ -26,24 +26,24 @@ class Response < ActiveRecord::Base
     # TeamResponseMap for a team assignment.  Someone who understands the
     # situation better could add to the code later.
     if self.map.type.to_s == 'FeedbackResponseMap'
-      identifier += "<H2>Feedback from author</H2>"
+      identifier += "<h3>Feedback from author</h3>"
     end
     if prefix #has prefix means view_score page in instructor end
+      identifier += '<h4><B>Review ' + count.to_s+'</B></h4>'
       identifier += "<B>Reviewer: </B>" +self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
       str = prefix+"_"+self.id.to_s
     else #in student end
-      identifier += '<B>Round: ' + count.to_s+'</B>'
+      identifier += '<B>Review ' + count.to_s+'</B>'
       str = self.id.to_s
     end
-    code = identifier+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+str+'Link" onClick="toggleElement('+"'review_"+str+"','review'"+');return false;">hide review</a><BR/>'
+    code = identifier+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+str+'Link" onClick="toggleElement('+"'review_"+str+"','review'"+');return false;">show review</a><BR/>'
     code += "<B>Last reviewed: </B> "
     if self.updated_at.nil?
       code += "Not available"
     else
       code += self.updated_at.strftime('%A %B %d %Y, %I:%M%p')
     end
-    code += '<div id="review_'+str+'" style=""><BR/>'
-
+    code += '<table id="review_'+str+'" style="display: none;" class="table table-bordered">'
     count = 0
     answers = Answer.where(response_id: self.response_id)
 
@@ -55,6 +55,12 @@ class Response < ActiveRecord::Base
     questions.each do |question|
       count += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
       answer = answers.find{|a| a.question_id==question.id}
+      row_class = if count%2 == 0 then "info" else "warning" end
+      if question.is_a? QuestionnaireHeader 
+        row_class = ""
+      end
+      
+      code += '<tr class="' + row_class + '"><td>'
       if !answer.nil? or question.is_a? QuestionnaireHeader
         if question.instance_of? Criterion or question.instance_of? Scale
           code += question.view_completed_question(count,answer,questionnaire_max)
@@ -62,6 +68,7 @@ class Response < ActiveRecord::Base
           code += question.view_completed_question(count,answer)
         end
       end
+      code += '</td></tr>'
     end
 
     if self.additional_comment != nil
@@ -69,7 +76,8 @@ class Response < ActiveRecord::Base
     else
       comment = ''
     end
-    code += "<B>Additional Comment:</B><BR/>"+comment+"</div>"
+    code += "<tr><td><B>Additional Comment: </B>"+comment+'</td></tr>'
+    code += "</table>"
     return code.html_safe
   end
 
@@ -235,7 +243,7 @@ class Response < ActiveRecord::Base
       defn[:body][:type] = "Teammate Review"
       participant = AssignmentParticipant.find(response_map.reviewee_id)
       topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
-      defn[:body][:obj_name] = SignUpTopic.find(topic_id).topic_name
+      defn[:body][:obj_name] = SignUpTopic.find(topic_id).topic_name rescue nil
       user = User.find(participant.user_id)
       defn[:body][:first_name] = user.fullname
       defn[:to] = user.email

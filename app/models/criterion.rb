@@ -159,16 +159,39 @@ class Criterion < ScoredQuestion
 
   #This method returns what to display if a student is viewing a filled-out questionnaire
   def view_completed_question(count, answer,questionnaire_max)
-		html = '<big><b>Question '+count.to_s+":</b> <I>"+self.txt+"</I></big><BR/>"
-    if !answer.answer.nil?
-		  html += '<TABLE CELLPADDING="5"><TR><TD valign="top"><B>Score: </B></TD><TD><FONT style="BACKGROUND-COLOR:gold">'+answer.answer.to_s+'</FONT> out of <B>'+questionnaire_max.to_s+'</B></TD></TR>'
+		html = '<b>' + count.to_s + ". " + self.txt + ' [Max points: ' + questionnaire_max.to_s + "]</b>"
+    score = if !answer.answer.nil? then answer.answer.to_s else "-" end
+    if score != "-"
+      score_percent = answer.answer*1.0/questionnaire_max
     else
-      html += '<TABLE CELLPADDING="5"><TR><TD valign="top"><B>Score: </B></TD><TD><FONT style="BACKGROUND-COLOR:gold">--</FONT> out of <B>'+questionnaire_max.to_s+'</B></TD></TR>'
+      score_percent = 0
     end
-		if answer.comments != nil
-			html += '<TR><TD valign="top"><B>Response:&nbsp;</B></TD><TD>' + answer.comments.gsub("<", "&lt;").gsub(">", "&gt;").gsub(/\n/, '<BR/>')
-		end
-		html += '</TD></TR></TABLE><BR/>'
+    
+    if score_percent > 0.8
+      score_color = "c5"
+    elsif score_percent > 0.6
+      score_color = "c4"
+    elsif score_percent > 0.4
+      score_color = "c3"
+    elsif score_percent > 0.2
+      score_color = "c2"
+    else
+      score_color = "c1"
+    end
+
+    html += '<table cellpadding="5">'
+    html += '<tr>'
+    html += '<td>'
+    html += '<div class="' + score_color + '" style="width:30px; height:30px; border-radius:50%; font-size:15px; color:black; line-height:30px; text-align:center;">'
+    html += score
+    html += '</div>'
+    html += '</td>'
+    if answer.comments != nil
+      html += '<td style="padding-left:10px">'
+      html += answer.comments.gsub("<", "&lt;").gsub(">", "&gt;").gsub(/\n/, '<BR/>')
+      html += '</td>'
+    end
+    html += '</tr></table>'
 		html.html_safe
   end
 

@@ -103,9 +103,12 @@ class AssignmentsController < ApplicationController
       flash.now[:error] = "You did not specify all necessary rubrics: " +rubrics_needed+
           " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>."
     end
+
+    if @assignment_form.assignment.directory_path.nil? || @assignment_form.assignment.directory_path.length == 0
+      flash.now[:error] = "You did not specify submission directory"
+    end
   end
-
-
+  
   def update
     unless(params.has_key?(:assignment_form))
       @assignment=Assignment.find(params[:id])
@@ -182,7 +185,6 @@ class AssignmentsController < ApplicationController
   # TODO: need to be tested
   #-------------------------------------------------------------------------------------------------------------------
   def copy
-    @user = ApplicationHelper::get_user_role(current_user)
     @user = current_user
     session[:copy_flag] = true
     #check new assignment submission directory and old assignment submission directory

@@ -38,7 +38,7 @@ class Dropdown < UnscoredQuestion
   end
 
   def view_completed_question(count, answer)
-  	html = '<big><b>Question '+count.to_s+":</b> <I>"+self.txt+"</I></big>"
+    html = '<b>' + count.to_s + ". " + self.txt + "</b>"
     html += '<BR>&nbsp&nbsp&nbsp&nbsp'+answer.comments.to_s + '<BR/><BR/>'
     html.html_safe
   end

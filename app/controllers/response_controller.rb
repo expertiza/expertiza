@@ -6,25 +6,22 @@ class ResponseController < ApplicationController
     case params[:action]
       when 'edit'  # If response has been submitted, no further editing allowed
         response = Response.find(params[:id])
-        if (response.is_submitted)
-          return false
-        end
-    end
-    case params[:action]
+        return false if response.is_submitted
+        return current_user_id?(response.map.reviewer.user_id)
       # Deny access to anyone except reviewer & author's team
-      when 'edit','delete','update'
+      when 'delete','update'
         response = Response.find(params[:id])
-        current_user_id?(response.map.reviewer.user_id)
+        return current_user_id?(response.map.reviewer.user_id)
       when 'view'
         response = Response.find(params[:id])
         map = response.map
-
-        # if it is a review response map, all the members of revieweee team should be able to view the reponse (can be done from heat map)
+        assignment = response.map.reviewer.assignment
+        # if it is a review response map, all the members of reviewee team should be able to view the reponse (can be done from heat map)
         if map.is_a? ReviewResponseMap 
           reviewee_team = AssignmentTeam.find(map.reviewee_id)
-          current_user_id?(response.map.reviewer.user_id) || reviewee_team.has_user(current_user) || (['Administrator','Instructor','Teaching Assistant'].include? current_user.role.name)
+          return current_user_id?(response.map.reviewer.user_id) || reviewee_team.has_user(current_user) || current_user.role.name == 'Administrator' || (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id ) || (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
         else
-          current_user_id?(response.map.reviewer.user_id)
+          return current_user_id?(response.map.reviewer.user_id)
         end
       else
         current_user
@@ -62,7 +59,6 @@ class ResponseController < ApplicationController
 
     @map = @response.map
     @contributor = @map.contributor
-    array_not_empty=0
     set_all_responses
     if @prev.present?
       @sorted=@review_scores.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
@@ -83,6 +79,8 @@ class ResponseController < ApplicationController
   end
 
   #Update the response and answers when student "edit" existing response
+  #E1600
+  #Added if - else condition for 'SelfReviewResponseMap'
   def update
     return unless action_allowed?
 
@@ -97,19 +95,16 @@ class ResponseController < ApplicationController
         @questionnaire = @map.questionnaire(@response.round)
       elsif @map.type=="ReviewResponseMap"
         @questionnaire = @map.questionnaire(nil)
+      elsif @map.type=="SelfReviewResponseMap" && @response.round
+        @questionnaire = @map.questionnaire(@response.round)
+      elsif @map.type=="SelfReviewResponseMap"
+        @questionnaire = @map.questionnaire(nil)
       else
         @questionnaire = @map.questionnaire
       end
       questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
 
-      params[:responses].each_pair do |k, v|
-        score = Answer.where(response_id: @response.id, question_id:  questions[k.to_i].id).first
-        unless score
-          score = Answer.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :answer => v[:score], :comments => v[:comment])
-        end
-        score.update_attribute('answer', v[:score])
-        score.update_attribute('comments', v[:comment])
-      end
+
        questions=sort_questions(@questionnaire.questions)
        create_answers(params,questions)
       questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
@@ -177,9 +172,6 @@ class ResponseController < ApplicationController
   def create
     @map = ResponseMap.find(params[:id]) #assignment/review/metareview id is in params id
 
-    msg = ""
-    error_msg = ""
-
     set_all_responses
 
     #to save the response for ReviewResponseMap, a questionnaire_id is wrapped in the params
@@ -207,21 +199,32 @@ class ResponseController < ApplicationController
 
     #@map.save
     msg = "Your response was successfully saved."
+    error_msg=""
     @response.email();
     redirect_to :controller => 'response', :action => 'saving', :id => @map.map_id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]
   end
 
+  #E1600
+  #Added paramps[:return] value for 'SelfReviewResponseMap' to ensure that this method is invoked from self-review operation
+  #this looks dirty to me. If other map type do not do this, there is no reason that we handle SelfReviewResponseMap here. There should be a elegant way.. --Yang
   def saving
     @map = ResponseMap.find(params[:id])
+    if(@map.type == "SelfReviewResponseMap")
+      params[:return] = "selfreview"
+    end
+
     @return = params[:return]
     @map.save
     redirect_to :action => 'redirection', :id => @map.map_id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
   end
 
+  #E1600
+  #Added if - else for 'SelfReviewResponseMap' for proper redirection
   def redirection
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
     @map = Response.find_by_map_id(params[:id])
+
     if params[:return] == "feedback"
       redirect_to :controller => 'grades', :action => 'view_my_scores', :id => @map.reviewer.id
     elsif params[:return] == "teammate"
@@ -230,6 +233,8 @@ class ResponseController < ApplicationController
       redirect_to :controller => 'grades', :action => 'view', :id => @map.response_map.assignment.id
     elsif params[:return] == "assignment_edit"
       redirect_to controller: 'assignments', action: 'edit', id: @map.response_map.assignment.id
+    elsif params[:return] == "selfreview"
+      redirect_to controller: 'submitted_content', action: 'edit', :id => @map.response_map.reviewer_id
     else
       redirect_to :controller => 'student_review', :action => 'list', :id => @map.reviewer.id
 
@@ -283,9 +288,11 @@ class ResponseController < ApplicationController
 
   end
 
+  #E1600
+  #Added 'SelfReviewResponseMap' to when condition
   def set_questionnaire_for_new_response
     case @map.type
-    when "ReviewResponseMap"
+    when "ReviewResponseMap","SelfReviewResponseMap"
       reviewees_topic=SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.get_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)

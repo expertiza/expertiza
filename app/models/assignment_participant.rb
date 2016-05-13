@@ -122,7 +122,7 @@ class AssignmentParticipant < Participant
     self.assignment.questionnaires.each do |questionnaire|
       round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(self.assignment.id, questionnaire.id).used_in_round
       #create symbol for "varying rubrics" feature -Yang
-      if(round!=nil)
+      unless round.nil?
         questionnaire_symbol = (questionnaire.symbol.to_s+round.to_s).to_sym
       else
         questionnaire_symbol = questionnaire.symbol
@@ -130,7 +130,7 @@ class AssignmentParticipant < Participant
 
       scores[questionnaire_symbol] = {}
 
-      if round==nil
+      if round.nil?
         scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_for(self)
       else
         scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_round_for(self,round)

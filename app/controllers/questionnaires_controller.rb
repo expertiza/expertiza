@@ -66,7 +66,7 @@ class QuestionnairesController < ApplicationController
       tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
       parent = FolderNode.find_by_node_object_id(tree_folder.id)
       QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id, type: 'QuestionnaireNode')
-      flash[:success] = 'You have created a questionnaire successfully!'
+      flash[:success] = 'You have successfully created a questionnaire!'
     rescue
       flash[:error] = $!
     end
@@ -92,7 +92,7 @@ class QuestionnairesController < ApplicationController
       save_choices @questionnaire.id
 
       if @successful_create == true
-        flash[:note] = "Quiz was successfully created"
+        flash[:note] = "The quiz was successfully created."
       end
       redirect_to :controller => 'submitted_content', :action => 'edit', :id => participant_id
     else #if it is not a quiz questionnaire
@@ -115,7 +115,7 @@ class QuestionnairesController < ApplicationController
     @questionnaire = Questionnaire.find(params[:id])
     begin
       @questionnaire.update_attributes(questionnaire_params)
-      flash[:success] = 'Questionnaire has been updated successfully!'
+      flash[:success] = 'The questionnaire has been successfully updated!'
     rescue
       flash[:error] = $!
     end
@@ -133,7 +133,7 @@ class QuestionnairesController < ApplicationController
         #if this rubric is used by some assignment, flash error
         @questionnaire.assignments.each{
           | assignment |
-          raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
+          raise "The assignment #{assignment.name} uses this questionnaire. Are sure you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
         }
 
         questions = @questionnaire.questions
@@ -141,7 +141,7 @@ class QuestionnairesController < ApplicationController
         #if this rubric had some answers, flash error
         questions.each do |question|
           if !question.answers.empty?
-            raise "There are responses based on this rubric, we do not suggest you delete it."
+            raise "There are responses based on this rubric, we suggest you do not delete it."
           end
         end
 
@@ -156,7 +156,7 @@ class QuestionnairesController < ApplicationController
         questionnaire_node.delete
         @questionnaire.delete
 
-        undo_link("Questionnaire \"#{name}\" has been deleted successfully. ")
+        undo_link("The questionnaire \"#{name}\" has been deleted successfully. ")
       rescue
         flash[:error] = $!
       end
@@ -174,7 +174,7 @@ class QuestionnairesController < ApplicationController
       for advice_key in params[:advice].keys
         QuestionAdvice.update(advice_key, params[:advice][advice_key])
       end
-      flash[:notice] = "The questionnaire's question advice was successfully saved"
+      flash[:notice] = "The questionnaire's question advice was successfully saved."
       #redirect_to :action => 'list'
       redirect_to :controller => 'advice', :action => 'save_advice'
     rescue
@@ -188,7 +188,7 @@ class QuestionnairesController < ApplicationController
     @questionnaire.private = !@questionnaire.private
     @questionnaire.save
     @access = @questionnaire.private == true ? "private" : "public"
-    undo_link("Questionnaire \"#{@questionnaire.name}\" has been made #{@access} successfully. ")
+    undo_link("teh questionnaire \"#{@questionnaire.name}\" has been successfully made #{@access}. ")
     redirect_to :controller => 'tree_display', :action => 'list'
   end
 
@@ -234,7 +234,7 @@ class QuestionnairesController < ApplicationController
         end
         begin
           @question.save
-          flash[:success] = 'All questions has been saved successfully!'
+          flash[:success] = 'All questions has been successfully saved!'
         rescue
           flash[:error] = $!
         end
@@ -269,7 +269,7 @@ class QuestionnairesController < ApplicationController
     @participant_id = params[:pid] #creating an instance variable to hold the participant id
     assignment = Assignment.find(@assignment_id)
     if !assignment.require_quiz? #flash error if this assignment does not require quiz
-      flash[:error] = "This assignment does not support quizzing feature."
+      flash[:error] = "This assignment does not support the quizzing feature."
       valid_request=false
     else
       team = AssignmentParticipant.find(@participant_id).team
@@ -279,7 +279,7 @@ class QuestionnairesController < ApplicationController
         valid_request=false
       else
         if assignment.has_topics? && team.topic.nil?#flash error if this assignment has topic but current team does not have a topic
-          flash[:error] = "Your team should have a topic first."
+          flash[:error] = "Your team should have a topic."
           valid_request=false
         end
       end

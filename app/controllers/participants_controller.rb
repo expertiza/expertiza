@@ -42,10 +42,10 @@ class ParticipantsController < ApplicationController
       curr_object.add_participant(params[:user][:name],can_submit,can_review,can_take_quiz)
       user = User.find_by_name(params[:user][:name])
       @participant = curr_object.participants.find_by_user_id(user.id)
-      undo_link("user \"#{params[:user][:name]}\" has successfully been added.")
+      undo_link("The user \"#{params[:user][:name]}\" has successfully been added.")
     rescue
       url_new_user = url_for :controller => 'users', :action => 'new'
-      flash[:error] = "User #{params[:user][:name]} does not exist or has already been added.</a>"
+      flash[:error] = "The user #{params[:user][:name]} does not exist or has already been added.</a>"
     end
     redirect_to :action => 'list', :id => curr_object.id, :model => params[:model], :authorization => params[:authorization]
   end
@@ -77,12 +77,12 @@ class ParticipantsController < ApplicationController
     begin
       @participant = participant
       participant.delete(params[:force])
-      flash[:note] = undo_link("User \"#{name}\" has been removed as a participant successfully. ")
+      flash[:note] = undo_link("The user \"#{name}\" has been successfully removed as a participant.")
     rescue => error
       url_yes = url_for :action => 'delete', :id => params[:id], :force => 1
       url_show = url_for :action => 'delete_display', :id => params[:id], :model => participant.class.to_s.gsub("Participant","")
       url_no  = url_for :action => 'list', :id => parent_id, :model => participant.class.to_s.gsub("Participant","")
-      flash[:error] = "A delete action failed: At least one (1) review mapping or team membership exist for this participant. <br/><a href='#{url_yes}'>Delete this participant</a>&nbsp;|&nbsp;<a href='#{url_show}'>Show me the associated items</a>|&nbsp;<a href='#{url_no}'>Do nothing</a><BR/>"
+      flash[:error] = "The delete action failed: At least one (1) review mapping or team membership exist for this participant. <br/><a href='#{url_yes}'>Delete this participant</a>&nbsp;|&nbsp;<a href='#{url_show}'>Show me the associated items</a>|&nbsp;<a href='#{url_no}'>Do nothing</a><BR/>"
     end
     redirect_to :action => 'list', :id => parent_id, :model => participant.class.to_s.gsub("Participant","")
   end
@@ -139,13 +139,13 @@ class ParticipantsController < ApplicationController
 
         # Only display undo link if copies of participants are created
         if @copied_participants.length > 0
-          undo_link("Participants from \"#{course.name}\" has been copied to this assignment successfully. ")
+          undo_link("The participants from \"#{course.name}\" have been successfully copied to this assignment. ")
         else
           flash[:note] = 'All course participants are already in this assignment'
         end
 
       else
-        flash[:note] = "No participants were found to inherit."
+        flash[:note] = "No participants were found to inherit this assignment."
       end
     else
       flash[:error] = "No course was found for this assignment."
@@ -193,7 +193,7 @@ class ParticipantsController < ApplicationController
 
     if params[:participant] != nil
       if AssignmentParticipant.where(parent_id: @participant.parent_id, handle: params[:participant][:handle]).length > 0
-        flash[:error] = "<b>#{params[:participant][:handle]}</b> is already in use for this assignment. Please select a different handle."
+        flash[:error] = "<b>The handle #{params[:participant][:handle]}</b> is already in use for this assignment. Please select a different one."
         redirect_to :controller => 'participants', :action => 'change_handle', :id => @participant
       else
         @participant.update_attributes(participant_params)
@@ -210,7 +210,7 @@ class ParticipantsController < ApplicationController
       contributor.destroy
       flash[:note] = "\"#{name}\" is no longer a participant in this assignment."
     rescue
-      flash[:error] = "\"#{name}\" was not removed. Please ensure that \"#{name}\" is not a reviewer or metareviewer and try again."
+      flash[:error] = "\"#{name}\" was not removed from this assignment. Please ensure that \"#{name}\" is not a reviewer or metareviewer and try again."
       end
     redirect_to :controller => 'review_mapping', :action => 'list_mappings', :id => assignment_id
   end

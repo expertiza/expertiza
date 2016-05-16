@@ -68,7 +68,7 @@ class StudentTeamsController < ApplicationController
     #check if the team name is in use
     if existing_assignments.empty?
       if(params[:team][:name]==nil||params[:team][:name].length==0)
-        flash[:notice] = 'Team name is null.'
+        flash[:notice] = 'The team name is empty.'
         redirect_to view_student_teams_path student_id: student.id
         return
       end
@@ -82,7 +82,7 @@ class StudentTeamsController < ApplicationController
       redirect_to view_student_teams_path student_id: student.id
 
     else
-      flash[:notice] = 'Team name is already in use.'
+      flash[:notice] = 'That team name is already in use.'
       redirect_to view_student_teams_path student_id: student.id
     end
   end
@@ -105,7 +105,7 @@ class StudentTeamsController < ApplicationController
       redirect_to view_student_teams_path student_id: params[:student_id]
 
     else
-      flash[:notice] = 'Team name is already in use.'
+      flash[:notice] = 'That team name is already in use.'
 
       redirect_to edit_student_teams_path team_id: params[:team_id], student_id: params[:student_id]
 
@@ -127,7 +127,7 @@ class StudentTeamsController < ApplicationController
 
     if team_user
       team_user.destroy_all
-      undo_link "User \"#{team_user.name}\" has been removed from the team successfully. "
+      undo_link "The user \"#{team_user.name}\" has been removed from the team successfully. "
     end
 
     #if your old team does not have any members, delete the entry for the team
@@ -171,9 +171,9 @@ class StudentTeamsController < ApplicationController
 
   def team_created_successfully(current_team=nil)
     if current_team
-      undo_link "Team \"#{current_team.name}\" has been updated successfully. "
+      undo_link "The team \"#{current_team.name}\" has been updated successfully. "
     else
-      undo_link "Team \"#{team.name}\" has been updated successfully. "
+      undo_link "The team \"#{team.name}\" has been updated successfully. "
     end
   end
 

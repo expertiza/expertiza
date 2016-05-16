@@ -79,7 +79,7 @@ class ApplicationController < ActionController::Base
   end
 
   def invalid_login_status(status)
-    flash[:notice] = "You must be logged #{status} to access this page"
+    flash[:notice] = "You must be logged #{status} to access this page!"
     redirect_back
   end
 

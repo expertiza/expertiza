@@ -240,9 +240,9 @@ class GradesController < ApplicationController
     if sprintf("%.2f", total_score) != params[:participant][:grade]
       participant.update_attribute(:grade, params[:participant][:grade])
       if participant.grade.nil?
-        message = "The computed score will be used for "+participant.user.name
+        message = "The computed score will be used for "+participant.user.name+"."
       else
-        message = "A score of "+params[:participant][:grade]+"% has been saved for "+participant.user.name
+        message = "A score of "+params[:participant][:grade]+"% has been saved for "+participant.user.name+"."
       end
     end
     flash[:note] = message

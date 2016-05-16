@@ -57,7 +57,7 @@ class ContentPagesController < ApplicationController
     @content_page = ContentPage.new(params[:content_page])
     begin
       @content_page.save!
-      flash[:notice] = 'ContentPage was successfully created.'
+      flash[:notice] = 'The Content Page was successfully created.'
       Role.rebuild_cache
       redirect_to :action => 'list'
     rescue
@@ -75,7 +75,7 @@ class ContentPagesController < ApplicationController
   def update
     @content_page = ContentPage.find(params[:id])
     if @content_page.update_attributes(params[:content_page])
-      flash[:notice] = 'ContentPage was successfully updated.'
+      flash[:notice] = 'The Content Page was successfully updated.'
       Role.rebuild_cache
       redirect_to :action => 'show', :id => @content_page
     else
@@ -93,7 +93,7 @@ class ContentPagesController < ApplicationController
       Role.rebuild_cache
       redirect_to :action => 'list'
     else
-      flash.now[:error] = "Cannot delete this Content Page as it has dependants (see below)"
+      flash.now[:error] = "You cannot delete this Content Page as it has dependants (see below)"
       render :action => 'show'
     end
   end

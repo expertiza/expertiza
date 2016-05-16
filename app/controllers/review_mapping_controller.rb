@@ -136,7 +136,7 @@ class ReviewMappingController < ApplicationController
     reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
 
     if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.has_topics? && assignment.can_choose_topic_to_review?
-      flash[:error] = "Please go back and select a topic"
+      flash[:error] = "No topic is selected.  Please go back and select a topic."
     else
 
       # begin
@@ -176,7 +176,7 @@ class ReviewMappingController < ApplicationController
       assignment = Assignment.find(params[:assignment_id])
       reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
       if ResponseMap.where(reviewed_object_id: params[:questionnaire_id], reviewer_id: params[:participant_id]).first
-        flash[:error] = "You have already taken that quiz"
+        flash[:error] = "You have already taken that quiz."
       else
         @map = QuizResponseMap.new
         @map.reviewee_id = Questionnaire.find(params[:questionnaire_id]).instructor_id
@@ -242,7 +242,7 @@ class ReviewMappingController < ApplicationController
       end
     end
     if num_remain_review_response_maps > 0
-      flash[:error] = "#{num_remain_review_response_maps} reviewer(s) cannot be deleted bacause they has already started review."
+      flash[:error] = "#{num_remain_review_response_maps} reviewer(s) cannot be deleted because they has already started review."
     else
       flash[:success] = "All review mappings for \"#{team.name}\" have been deleted."
     end

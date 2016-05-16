@@ -86,7 +86,7 @@ class LatePoliciesController < ApplicationController
     #end
 
     if (params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i)
-      flash[:error] = "Max penalty cannot be less than penalty per unit."
+      flash[:error] = "The maximum penalty cannot be less than penalty per unit."
       is_number = false
     end
 
@@ -94,7 +94,7 @@ class LatePoliciesController < ApplicationController
     if(@late_policy != nil && !@late_policy.empty?)
       @late_policy.each do |p|
         if p.instructor_id == instructor_id
-          flash[:error] = "A policy with same name already exists"
+          flash[:error] = "A policy with the same name already exists."
           is_number = false
           break
         end
@@ -106,7 +106,7 @@ class LatePoliciesController < ApplicationController
 
       begin
         @late_policy.save!
-        flash[:notice] = "Penalty policy was successfully created."
+        flash[:notice] = "The penalty policy was successfully created."
         redirect_to :action => 'index'
       rescue
         flash[:error] = "The following error occurred while saving the penalty policy: "
@@ -124,7 +124,7 @@ def update
   @penalty_policy = LatePolicy.find(params[:id])
   issue_number = false
   if (params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i)
-    flash[:error] = "Max penalty cannot be less than penalty per unit."
+    flash[:error] = "The maximum penalty cannot be less than penalty per unit."
     issue_number = true
   end
   issue_name = false
@@ -134,7 +134,7 @@ def update
     if(@policy != nil && !@policy.empty?)
       @policy.each do |p|
         if p.instructor_id == instructor_id
-          flash[:error] = "Cannot edit the policy. A policy with same name already exists"
+          flash[:error] = "Cannot edit the policy. A policy with the same name already exists."
           issue_name = true
           break
         end
@@ -163,13 +163,13 @@ def update
         end
       end
     end
-    flash[:notice] = "Late policy was successfully updated."
+    flash[:notice] = "The late policy was successfully updated."
     redirect_to :action => 'index'
   elsif issue_number == true
-    flash[:error] = "Cannot edit the policy. Maximum penalty cannot be less than penalty per unit."
+    flash[:error] = "Cannot edit the policy. The maximum penalty cannot be less than penalty per unit."
     redirect_to :action => 'edit', :id => params[:id]
   elsif issue_name == true
-    flash[:error] = "Cannot edit the policy. A policy with same name " + params[:late_policy][:policy_name] + " already exists"
+    flash[:error] = "Cannot edit the policy. A policy with the same name " + params[:late_policy][:policy_name] + " already exists."
     redirect_to :action => 'edit', :id => params[:id]
   end
 end

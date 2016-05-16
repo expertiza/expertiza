@@ -60,7 +60,7 @@ class PublishingController < ApplicationController
       AssignmentParticipant.grant_publishing_rights(private_key, participants)
       redirect_to :action => 'view'
     rescue
-      flash[:notice] = 'Invalid private key.'
+      flash[:notice] = 'The private key you inputted was invalid.'
       if (!params[:id].nil?)
         redirect_to :action => 'grant', :id => participants[0].id
       else

@@ -288,7 +288,7 @@ def create_fill_questionnaire
   #save the questionnaire
   click_on('Save review questionnaire')
 
-  expect(page).to have_content('All questions has been saved successfully!')
+  expect(page).to have_content('All questions has been successfully saved!')
 
   # go to the assignment edit page
   visit "/assignments/#{@assignment.id}/edit"

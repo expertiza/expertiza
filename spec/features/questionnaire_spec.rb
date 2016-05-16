@@ -31,7 +31,7 @@ describe "Instructor login" do
     fill_in 'login_name', with: 'instructor6'
     fill_in 'login_password', with: 'something'
     click_button 'SIGN IN'
-    expect(page).to have_content('Incorrect Name/Password')
+    expect(page).to have_content('Your username or password is incorrect.')
   end
 end
 
@@ -111,7 +111,7 @@ describe "Create a review question", :type => :controller do
     expect(page).to have_content('Remove')
 
     click_button "Save review questionnaire"
-    expect(page).to have_content('All questions has been saved successfully!')
+    expect(page).to have_content('All questions has been successfully saved!')
 
   end
 
@@ -124,7 +124,7 @@ describe "Create a review question", :type => :controller do
     expect(page).to have_content('Remove')
 
     click_button "Save review questionnaire"
-    expect(page).to have_content('All questions has been saved successfully!')
+    expect(page).to have_content('All questions has been successfully saved!')
 
   end
 
@@ -137,7 +137,7 @@ describe "Create a review question", :type => :controller do
     expect(page).to have_content('Remove')
 
     click_button "Save review questionnaire"
-    expect(page).to have_content('All questions has been saved successfully!')
+    expect(page).to have_content('All questions has been successfully saved!')
 
   end
 
@@ -150,7 +150,7 @@ describe "Create a review question", :type => :controller do
     expect(page).to have_content('Remove')
 
     click_button "Save review questionnaire"
-    expect(page).to have_content('All questions has been saved successfully!')
+    expect(page).to have_content('All questions has been successfully saved!')
 
   end
 
@@ -163,7 +163,7 @@ describe "Create a review question", :type => :controller do
     expect(page).to have_content('Remove')
 
     click_button "Save review questionnaire"
-    expect(page).to have_content('All questions has been saved successfully!')
+    expect(page).to have_content('All questions has been successfully saved!')
 
   end
 
@@ -176,7 +176,7 @@ describe "Create a review question", :type => :controller do
     expect(page).to have_content('Remove')
 
     click_button "Save review questionnaire"
-    expect(page).to have_content('All questions has been saved successfully!')
+    expect(page).to have_content('All questions has been successfully saved!')
 
   end
 
@@ -189,7 +189,7 @@ describe "Create a review question", :type => :controller do
     expect(page).to have_content('Remove')
 
     click_button "Save review questionnaire"
-    expect(page).to have_content('All questions has been saved successfully!')
+    expect(page).to have_content('All questions has been successfully saved!')
 
   end
 
@@ -202,7 +202,7 @@ describe "Create a review question", :type => :controller do
     expect(page).to have_content('Remove')
 
     click_button "Save review questionnaire"
-    expect(page).to have_content('All questions has been saved successfully!')
+    expect(page).to have_content('All questions has been successfully saved!')
 
   end
 
@@ -215,7 +215,7 @@ describe "Create a review question", :type => :controller do
     expect(page).to have_content('Remove')
 
     click_button "Save review questionnaire"
-    expect(page).to have_content('All questions has been saved successfully!')
+    expect(page).to have_content('All questions has been successfully saved!')
 
   end
 
@@ -228,7 +228,7 @@ describe "Create a review question", :type => :controller do
     expect(page).to have_content('Remove')
 
     click_button "Save review questionnaire"
-    expect(page).to have_content('All questions has been saved successfully!')
+    expect(page).to have_content('All questions has been successfully saved!')
 
   end
 
@@ -248,7 +248,7 @@ describe "Edit a question", :type => :controller do
     load_question 'Criterion'
     first("textarea[placeholder='Edit question content here']").set "Question edit"
     click_button "Save review questionnaire"
-    expect(page).to have_content('All questions has been saved successfully!')
+    expect(page).to have_content('All questions has been successfully saved!')
     expect(page).to have_content('Question edit')
   end
 
@@ -256,7 +256,7 @@ describe "Edit a question", :type => :controller do
     load_question 'Scale'
     first("textarea[placeholder='Edit question content here']").set "Question edit"
     click_button "Save review questionnaire"
-    expect(page).to have_content('All questions has been saved successfully!')
+    expect(page).to have_content('All questions has been successfully saved!')
     expect(page).to have_content('Question edit')
   end
 
@@ -264,7 +264,7 @@ describe "Edit a question", :type => :controller do
     load_question 'Dropdown'
     first("textarea[placeholder='Edit question content here']").set "Question edit"
     click_button "Save review questionnaire"
-    expect(page).to have_content('All questions has been saved successfully!')
+    expect(page).to have_content('All questions has been successfully saved!')
     expect(page).to have_content('Question edit')
   end
 
@@ -272,7 +272,7 @@ describe "Edit a question", :type => :controller do
     load_question 'Checkbox'
     first("textarea[placeholder='Edit question content here']").set "Question edit"
     click_button "Save review questionnaire"
-    expect(page).to have_content('All questions has been saved successfully!')
+    expect(page).to have_content('All questions has been successfully saved!')
     expect(page).to have_content('Question edit')
   end
 
@@ -280,7 +280,7 @@ describe "Edit a question", :type => :controller do
     load_question 'TextArea'
     first("textarea[placeholder='Edit question content here']").set "Question edit"
     click_button "Save review questionnaire"
-    expect(page).to have_content('All questions has been saved successfully!')
+    expect(page).to have_content('All questions has been successfully saved!')
     expect(page).to have_content('Question edit')
   end
 
@@ -288,7 +288,7 @@ describe "Edit a question", :type => :controller do
     load_question 'TextField'
     first("textarea[placeholder='Edit question content here']").set "Question edit"
     click_button "Save review questionnaire"
-    expect(page).to have_content('All questions has been saved successfully!')
+    expect(page).to have_content('All questions has been successfully saved!')
     expect(page).to have_content('Question edit')
   end
 
@@ -296,7 +296,7 @@ describe "Edit a question", :type => :controller do
     load_question 'UploadFile'
     first("textarea[placeholder='Edit question content here']").set "Question edit"
     click_button "Save review questionnaire"
-    expect(page).to have_content('All questions has been saved successfully!')
+    expect(page).to have_content('All questions has been successfully saved!')
     expect(page).to have_content('Question edit')
   end
 
@@ -304,7 +304,7 @@ describe "Edit a question", :type => :controller do
     load_question 'SectionHeader'
     first("textarea[placeholder='Edit question content here']").set "Question edit"
     click_button "Save review questionnaire"
-    expect(page).to have_content('All questions has been saved successfully!')
+    expect(page).to have_content('All questions has been successfully saved!')
     expect(page).to have_content('Question edit')
   end
 
@@ -312,7 +312,7 @@ describe "Edit a question", :type => :controller do
     load_question 'TableHeader'
     first("textarea[placeholder='Edit question content here']").set "Question edit"
     click_button "Save review questionnaire"
-    expect(page).to have_content('All questions has been saved successfully!')
+    expect(page).to have_content('All questions has been successfully saved!')
     expect(page).to have_content('Question edit')
   end
 
@@ -320,7 +320,7 @@ describe "Edit a question", :type => :controller do
     load_question 'ColumnHeader'
     first("textarea[placeholder='Edit question content here']").set "Question edit"
     click_button "Save review questionnaire"
-    expect(page).to have_content('All questions has been saved successfully!')
+    expect(page).to have_content('All questions has been successfully saved!')
     expect(page).to have_content('Question edit')
   end
 

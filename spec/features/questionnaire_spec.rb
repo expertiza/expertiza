@@ -332,70 +332,70 @@ describe "Delete a question", :type => :controller do
       load_question 'Criterion'
 
       click_on('Remove')
-      expect(page).to have_content('You have successfully deleted one question!')
+      expect(page).to have_content('You have successfully deleted the question!')
     end
 
     it "is able to delete a Scale question" do
       load_question 'Scale'
 
       click_on('Remove')
-      expect(page).to have_content('You have successfully deleted one question!')
+      expect(page).to have_content('You have successfully deleted the question!')
     end
 
     it "is able to delete a Dropdown question" do
       load_question 'Dropdown'
 
       click_on('Remove')
-      expect(page).to have_content('You have successfully deleted one question!')
+      expect(page).to have_content('You have successfully deleted the question!')
     end
 
     it "is able to delete a Checkbox question" do
       load_question 'Checkbox'
 
       click_on('Remove')
-      expect(page).to have_content('You have successfully deleted one question!')
+      expect(page).to have_content('You have successfully deleted the question!')
     end
 
     it "is able to delete a TextArea question" do
       load_question 'TextArea'
 
       click_on('Remove')
-      expect(page).to have_content('You have successfully deleted one question!')
+      expect(page).to have_content('You have successfully deleted the question!')
     end
 
     it "is able to delete a TextField question" do
       load_question 'TextField'
 
       click_on('Remove')
-      expect(page).to have_content('You have successfully deleted one question!')
+      expect(page).to have_content('You have successfully deleted the question!')
     end
 
     it "is able to delete a UploadFile question" do
       load_question 'UploadFile'
 
       click_on('Remove')
-      expect(page).to have_content('You have successfully deleted one question!')
+      expect(page).to have_content('You have successfully deleted the question!')
     end
 
     it "is able to delete a SectionHeader question" do
       load_question 'SectionHeader'
 
       click_on('Remove')
-      expect(page).to have_content('You have successfully deleted one question!')
+      expect(page).to have_content('You have successfully deleted the question!')
     end
 
     it "is able to delete a TableHeader question" do
       load_question 'TableHeader'
 
       click_on('Remove')
-      expect(page).to have_content('You have successfully deleted one question!')
+      expect(page).to have_content('You have successfully deleted the question!')
     end
 
     it "is able to delete a ColumnHeader question" do
       load_question 'ColumnHeader'
 
       click_on('Remove')
-      expect(page).to have_content('You have successfully deleted one question!')
+      expect(page).to have_content('You have successfully deleted the question!')
     end
 
 end

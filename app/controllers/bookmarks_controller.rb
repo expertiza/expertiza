@@ -26,7 +26,7 @@ class BookmarksController < ApplicationController
     params[:url] = params[:url].gsub!(/https:\/\//,"") if params[:url].start_with?('https://')
     begin
       Bookmark.create(url: params[:url], title: params[:title], description: params[:description], user_id: session[:user].id, topic_id: params[:topic_id] )
-      flash[:success] = 'Bookmark has been created successfully!'
+      flash[:success] = 'Your bookmark has been successfully created!'
     rescue
       flash[:error] = $!
     end 
@@ -40,14 +40,14 @@ class BookmarksController < ApplicationController
   def update
     @bookmark = Bookmark.find(params[:id])
     @bookmark.update_attributes(url: params[:bookmark][:url], title: params[:bookmark][:title], description: params[:bookmark][:description])
-    flash[:success] = 'Bookmark has been updated successfully!'
+    flash[:success] = 'Your bookmark has been successfully updated!'
     redirect_to :action => 'list', :id => @bookmark.topic_id
   end
 
   def destroy
     @bookmark = Bookmark.find(params[:id])
     @bookmark.destroy
-    flash[:success] = 'Bookmark has been deleted successfully!'
+    flash[:success] = 'Your bookmark has been successfully deleted!'
     redirect_to :action => 'list', :id => @bookmark.topic_id
   end
 

@@ -48,7 +48,7 @@ class AssignmentsController < ApplicationController
   def edit
     # give an error message is instructor have not set the time zone.
     if current_user.timezonepref.nil?
-      flash.now[:error] = "You have not specified you preferred timezone yet. Please do this first before you set up the deadlines."
+      flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines."
     end
     @topics = SignUpTopic.find_by_sql("select * from sign_up_topics where assignment_id="+params[:id])
     @assignment_form = AssignmentForm.create_form_object(params[:id])
@@ -100,12 +100,12 @@ class AssignmentsController < ApplicationController
     #only when instructor does not assign rubrics and in assignment edit page will show this error message.
     if !empty_rubrics_list.empty? && request.original_fullpath == "/assignments/#{@assignment_form.assignment.id}/edit"
       rubrics_needed = needed_rubrics(empty_rubrics_list)
-      flash.now[:error] = "You did not specify all necessary rubrics: " +rubrics_needed+
+      flash.now[:error] = "You did not specify all the necessary rubrics. You need " +rubrics_needed+
           " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>."
     end
 
     if @assignment_form.assignment.directory_path.nil? || @assignment_form.assignment.directory_path.length == 0
-      flash.now[:error] = "You did not specify submission directory"
+      flash.now[:error] = "You did not specify your submission directory."
     end
   end
   
@@ -114,10 +114,10 @@ class AssignmentsController < ApplicationController
       @assignment=Assignment.find(params[:id])
       @assignment.course_id=params[:course_id];
       if @assignment.save
-        flash[:note] = 'Assignment was successfully saved.'
+        flash[:note] = 'The assignment was successfully saved.'
         redirect_to list_tree_display_index_path
       else
-        flash[:error] = "Assignment save failed: #{@assignment.errors.full_messages.join(' ')}"
+        flash[:error] = "Failed to save the assignment: #{@assignment.errors.full_messages.join(' ')}"
         redirect_to edit_assignment_path @assignment.id
       end
       return
@@ -132,13 +132,13 @@ class AssignmentsController < ApplicationController
     if (current_user.timezonepref).nil?
       parent_id=current_user.parent_id
       parent_timezone = User.find(parent_id).timezonepref
-      flash[:error] = "We strongly suggest instructors specify the preferred timezone to guarantee the correct time display. For now we assume you are in " +parent_timezone
+      flash[:error] = "We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. For now we assume you are in " +parent_timezone
       current_user.timezonepref=parent_timezone
     end
     if @assignment_form.update_attributes(assignment_form_params,current_user)
       flash[:note] = 'Assignment was successfully saved.'
     else
-      flash[:error] = "Assignment save failed: #{@assignment_form.errors}"
+      flash[:error] = "Failed to save the assignment: #{@assignment_form.errors}"
     end
     redirect_to edit_assignment_path @assignment_form.assignment.id
   end
@@ -210,10 +210,10 @@ class AssignmentsController < ApplicationController
       @user = session[:user]
       id = @user.get_instructor
       if (id != @assignment_form.assignment.instructor_id)
-        raise "Not authorised to delete this assignment"
+        raise "You are not authorized to delete this assignment."
       else
         @assignment_form.delete(params[:force])
-        flash[:success] = "The assignment is deleted"
+        flash[:success] = "The assignment was successfully deleted."
       end
     rescue
       url_yes = url_for action: 'delete', id: params[:id], force: 1

@@ -36,7 +36,7 @@ class SiteControllersController < ApplicationController
   def create
     @site_controller = SiteController.new(params[:site_controller])
     if @site_controller.save
-      flash[:notice] = 'SiteController was successfully created.'
+      flash[:notice] = 'The site controller was successfully created.'
       Role.rebuild_cache
       redirect_to :action => 'index'
     else
@@ -53,7 +53,7 @@ class SiteControllersController < ApplicationController
   def update
     @site_controller = SiteController.find(params[:id])
     if @site_controller.update_attributes(params[:site_controller])
-      flash[:notice] = 'SiteController was successfully updated.'
+      flash[:notice] = 'The site controller was successfully updated.'
       Role.rebuild_cache
       redirect_to @site_controller
     else

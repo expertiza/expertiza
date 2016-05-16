@@ -71,7 +71,7 @@ describe SignUpSheetController do
 
       get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
       expect(response).to redirect_to(redirect_to :action => 'add_signup_topics', :id => @assignment.id)
-      expect(flash[:error]).to eq('Value of maximum choosers can only be increased! No change has been made to max choosers.')
+      expect(flash[:error]).to eq('The value of the maximum choosers can only be increased! No change has been made to maximum choosers.')
     end
 
     it "is able to update a topic with a microtask" do
@@ -113,7 +113,7 @@ describe SignUpSheetController do
     post :save_topic_dependencies, assignment_id: @assignment.id,
          ('topic_dependencies_' + @topic1.id.to_s)=>{"dependent_on"=>[@topic2.id.to_s]},
          ('topic_dependencies_' + @topic2.id.to_s)=>{"dependent_on"=>[@topic1.id.to_s]}
-    expect(flash[:error]).to eq("There may be one or more cycles in the dependencies. Please correct them")
+    expect(flash[:error]).to eq("There may be one or more cycles in the dependencies. Please correct them.")
   end
 
   describe "Save topic deadlines" do

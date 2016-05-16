@@ -669,6 +669,7 @@ jQuery(document).ready(function() {
                       is_intelligent={entry.is_intelligent}
                       require_quiz={entry.require_quiz}
                       dataType={_this.props.dataType}
+                      //this is just a hack. All current users courses are marked as private during fetch for display purpose.
                       private={entry.private}
                       allow_suggestions={entry.allow_suggestions}
                       has_topic={entry.has_topic}
@@ -689,12 +690,12 @@ jQuery(document).ready(function() {
           if (this.props.showPublic) {
               if (this.props.dataType == 'course') {
                   _rows.push(<TitleRow
-                      title="Other's Public Courses"
+                      title="Others' Public Courses"
                   />)
               }
               else if(this.props.dataType=='assignment') {
                   _rows.push(<TitleRow
-                      title="Other's Public Assignments"
+                      title="Others' Public Assignments"
                   />)
               }
           jQuery.each(this.props.data, function (i, entry) {

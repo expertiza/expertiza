@@ -18,9 +18,9 @@ class ProfileController < ApplicationController
     end
 
     if @user.update_attributes(params[:user])
-      flash[:success] = 'Profile was successfully updated.'
+      flash[:success] = 'Your profile was successfully updated.'
     else
-      flash[:error] = 'Profile was not updated.'
+      flash[:error] = 'Your profile could not updated.'
     end
 
     redirect_to controller: :profile, action: :edit

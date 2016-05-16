@@ -30,10 +30,10 @@ class InstitutionController < ApplicationController
   def create
     @institution = Institution.new(:name => params[:institution][:name])
     if @institution.save
-      flash[:success] = 'Institution was successfully created.'
+      flash[:success] = 'The institution was successfully created.'
       redirect_to :action => 'list'
     else
-      flash[:error] = 'Institution was not successfully created.'
+      flash[:error] = 'The creation of the institution failed.'
       render :action => 'new'
     end
   end
@@ -46,7 +46,7 @@ class InstitutionController < ApplicationController
     @institution = Institution.find(params[:id])
     if @institution.update_attribute(:name,params[:institution][:name])
 
-      flash[:success] = 'Institution was successfully updated.'
+      flash[:success] = 'The institution was successfully updated.'
       redirect_to :action => 'list'
     else
       render :action => 'edit'

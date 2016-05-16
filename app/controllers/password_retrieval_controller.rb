@@ -9,7 +9,7 @@ class PasswordRetrievalController < ApplicationController
 
   def send_password
     if params[:user][:email].nil? || params[:user][:email].strip.length == 0
-      flash[:error] = "Please enter an e-mail address"
+      flash[:error] = "Please enter an e-mail address."
     else
       user = User.find_by_email(params[:user][:email])
       if user
@@ -17,7 +17,7 @@ class PasswordRetrievalController < ApplicationController
         MailerHelper::send_mail_to_user(user, "Your Expertiza password has been reset", "send_password", password).deliver
         flash[:success] = "A new password has been sent to your e-mail address."
       else
-        flash[:error] = "No account is associated with the address, \""+params[:user][:email]+"\". Please try again."
+        flash[:error] = "No account is associated with the e-mail address: \""+params[:user][:email]+"\". Please try again."
       end
     end
     redirect_to :action => 'forgotten'

@@ -31,7 +31,7 @@ describe "Integration tests for instructor interface" do
       fill_in 'login_name', with: 'instructor6'
       fill_in 'login_password', with: 'something'
       click_button 'SIGN IN'
-      expect(page).to have_content('Incorrect Name/Password')
+      expect(page).to have_content('Your username or password is incorrect.')
     end
   end
 

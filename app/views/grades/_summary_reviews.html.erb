@@ -1,0 +1,37 @@
+<link rel="stylesheet" type="text/css" href="/assets/summary.css" >
+<script type="text/javascript" src="/assets/summary.js" ></script>
+
+<!-- SUMMARY REVIEWS -->
+  <table class="table_stretch">
+    <%
+      @summary.keys.each do |round|
+    %>
+        <tr class='header_class' data-toggle='collapse' data-target='#round_<%= round %>'>
+          <td><h5><img src='/assets/arrow_down.png' class='arrow_icon'/>[avg score: <%= @avg_scores_by_round[round].to_s %>%]&nbsp;Round <%=round %> </h5></tr></td>
+        <tr>
+          <td>
+            <div id = 'round_<%=round %>' class='collapse'>
+              <table class="table_stretch">
+        <% @summary[round].keys.each do |q| %>
+                <tr bgcolor='#BDBDBD'>
+                  <td><h5>[avg score: <%=@avg_scores_by_criterion[round][q].round(2).to_s %>%]&nbsp;<%= q %></h5></td>
+                </tr>
+                <tr>
+                  <td>
+                    <%
+                      if !@summary[round][q].eql?("")
+                        concat @summary[round][q]
+                      else
+                        safe_concat "&nbsp;"
+                      end
+                    %>
+                  </td>
+                </tr>
+       <% end %>
+              </table>
+            </div>
+          </td>
+        </tr>
+    <% end %>
+  </table>
+<!-- END SUMMARY REVIEWS -->

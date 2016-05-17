@@ -94,7 +94,7 @@ class CourseController < ApplicationController
       redirect_to :controller => 'tree_display', :action => 'list'
     rescue
       flash[:error] = $! #"The following error occurred while saving the course: #"+
-        redirect_to :action => 'new'
+        redirect_to :action => 'create'
     end
   end
 

@@ -23,9 +23,9 @@ class SuggestionController < ApplicationController
     @suggestioncomment.suggestion_id=params[:id]
     @suggestioncomment.commenter= session[:user].name
     if  @suggestioncomment.save
-      flash[:notice] = "Successfully added your comment"
+      flash[:notice] = "Your comment has been successfully added."
     else
-      flash[:error] = "Error while adding comment"
+      flash[:error] = "There was an error adding your comment."
     end
     if current_role_name.eql? 'Student'
       redirect_to action: "student_view", id: params[:id]
@@ -171,9 +171,9 @@ class SuggestionController < ApplicationController
     @suggestion = Suggestion.find(params[:id])
 
     if @suggestion.update_attribute('status', 'Rejected')
-      flash[:notice] = 'Successfully rejected the suggestion'
+      flash[:notice] = 'The suggestion has been successfully rejected.'
     else
-      flash[:error] = 'Error when rejecting the suggestion'
+      flash[:error] = 'An error occurred when rejecting the suggestion.'
     end
     redirect_to action: 'show', id: @suggestion
   end
@@ -194,9 +194,9 @@ class SuggestionController < ApplicationController
     @signuptopic.assignment_id = @suggestion.assignment_id
     @signuptopic.max_choosers = 1;
     if @signuptopic.save && @suggestion.update_attribute('status', 'Approved')
-      flash[:success] = 'Successfully approved the suggestion.'
+      flash[:success] = 'Hhe suggestion was successfully approved.'
     else
-      flash[:error] = 'Error when approving the suggestion.'
+      flash[:error] = 'An error occurred when approving the suggestion.'
     end
   end
 end

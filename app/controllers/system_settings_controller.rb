@@ -39,7 +39,7 @@ class SystemSettingsController < ApplicationController
   def create
     @system_settings = SystemSettings.new(params[:system_settings])
     if @system_settings.save
-      flash[:notice] = 'SystemSettings was successfully created.'
+      flash[:notice] = 'The system settings have been successfully created.'
       redirect_to :action => 'list'
     else
       render :action => 'new'
@@ -54,7 +54,7 @@ class SystemSettingsController < ApplicationController
   def update
     @system_settings = SystemSettings.find(params[:id])
     if @system_settings.update_attributes(params[:system_settings])
-      flash[:notice] = 'SystemSettings was successfully updated.'
+      flash[:notice] = 'The system settings have been successfully updated.'
       redirect_to :action => 'show', :id => @system_settings
     else
       render :action => 'edit'

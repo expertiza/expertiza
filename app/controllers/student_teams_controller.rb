@@ -127,7 +127,7 @@ class StudentTeamsController < ApplicationController
 
     if team_user
       team_user.destroy_all
-      undo_link "The user \"#{team_user.name}\" has been removed from the team successfully. "
+      undo_link "The user \"#{team_user.name}\" has been successfully removed from the team."
     end
 
     #if your old team does not have any members, delete the entry for the team
@@ -171,9 +171,9 @@ class StudentTeamsController < ApplicationController
 
   def team_created_successfully(current_team=nil)
     if current_team
-      undo_link "The team \"#{current_team.name}\" has been updated successfully. "
+      undo_link "The team \"#{current_team.name}\" has been successfully updated."
     else
-      undo_link "The team \"#{team.name}\" has been updated successfully. "
+      undo_link "The team \"#{team.name}\" has been successfully updated."
     end
   end
 

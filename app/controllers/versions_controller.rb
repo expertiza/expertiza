@@ -22,12 +22,12 @@ class VersionsController < ApplicationController
 
   def destroy_all
     Version.destroy_all
-    redirect_to versions_path, notice: "All versions have been deleted"
+    redirect_to versions_path, notice: "All versions have been deleted."
   end
 
   def destroy
     Version.find(params[:id]).destroy
-    redirect_to versions_path, notice: "Your version has been deleted"
+    redirect_to versions_path, notice: "Your version has been deleted."
   end
 
   before_filter :conflict? , :except => [:index,:destroy, :destroy_all]
@@ -73,7 +73,7 @@ class VersionsController < ApplicationController
       end
       @iteration += 1
     end
-    @message = params[:redo] == "true" ? "Previous action has been undone successfully. " : "Previous action has been redone successfully. "
+    @message = params[:redo] == "true" ? "Previous action has been successfully undone." : "Previous action has been successfully redone."
     undo_link(@message)
     redirect_to :back
   end

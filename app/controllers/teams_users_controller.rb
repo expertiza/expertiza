@@ -35,16 +35,16 @@ class TeamsUsersController < ApplicationController
       assignment = Assignment.find(team.parent_id)
       if AssignmentParticipant.find_by_user_id_and_assignment_id(user.id,assignment.id).nil?
         urlAssignmentParticipantList = url_for :controller=>'participants', :action=>'list', :id=>assignment.id, :model => 'Assignment', :authorization => 'participant'
-        flash[:error] = "\"#{user.name}\" is not a participant of current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
+        flash[:error] = "\"#{user.name}\" is not a participant of the current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
       else
         add_member_return=team.add_member(user, team.parent_id)
         if add_member_return==false
-          flash[:error]= "The team already has the maximum number of members."
+          flash[:error]= "This team already has the maximum number of members."
         end
 
 
         @teams_user = TeamsUser.last
-        undo_link("Team user \"#{user.name}\" has been added to \"#{team.name}\" successfully. ")
+        undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
       end
     else #CourseParticipant
 
@@ -58,7 +58,7 @@ class TeamsUsersController < ApplicationController
     parent_id = Team.find(@teams_user.team_id).parent_id
     @user = User.find(@teams_user.user_id)
     @teams_user.destroy
-    undo_link("Team user \"#{@user.name}\" has been removed successfully. ")
+    undo_link("The team user \"#{@user.name}\" has been successfully removed. ")
     redirect_to :controller => 'teams', :action => 'list', :id => parent_id
   end
 

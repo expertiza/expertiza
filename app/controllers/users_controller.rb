@@ -129,7 +129,7 @@ class UsersController < ApplicationController
 
       if @user.save
         password = @user.reset_password         # the password is reset
-        MailerHelper::send_mail_to_user(@user, "Your Expertiza account and password have been created", "user_welcome", password).deliver
+        MailerHelper::send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password).deliver
         flash[:success] = "A new password has been sent to new user's e-mail address."
         #Instructor and Administrator users need to have a default set for their notifications
         # the creation of an AssignmentQuestionnaire object with only the User ID field populated
@@ -139,7 +139,7 @@ class UsersController < ApplicationController
         if @user.role.name == "Instructor" or @user.role.name == "Administrator"
           AssignmentQuestionnaire.create(:user_id => @user.id)
         end
-        undo_link("User \"#{@user.name}\" has been created successfully. ")
+        undo_link("The user \"#{@user.name}\" has been successfully created. ")
         redirect_to :action => 'list'
       else
           foreign
@@ -163,7 +163,7 @@ class UsersController < ApplicationController
       @user.name += '_hidden'
     end
     if @user.update_attributes(name: @user.name)
-      undo_link("User \"#{@user.name}\" has been updated successfully. ")
+      undo_link("The user \"#{@user.name}\" has been successfully updated.")
       redirect_to @user
     else
       # foreign
@@ -179,7 +179,7 @@ class UsersController < ApplicationController
       AssignmentQuestionnaire.where(user_id: @user.id).each{|aq| aq.destroy}
       # Participant.delete(true)
       @user.destroy
-      flash[:note] = undo_link("User \"#{@user.name}\" has been deleted successfully. ")
+      flash[:note] = undo_link("User \"#{@user.name}\" has been successfully deleted.")
     rescue
       flash[:error] = $!
     end

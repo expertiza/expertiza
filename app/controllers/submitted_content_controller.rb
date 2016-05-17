@@ -60,7 +60,7 @@ def submit_hyperlink
     rescue
       flash[:error] = "The URL or URI is not valid. Reason: #{$!}"
     end
-    undo_link("Link has been submitted successfully. ")
+    undo_link("The link has been successfully submitted.")
   end
   redirect_to :action => 'edit', :id => @participant.id
 end
@@ -74,7 +74,7 @@ def remove_hyperlink
   hyperlink_to_delete = team.hyperlinks[params['chk_links'].to_i]
   team.remove_hyperlink(hyperlink_to_delete)
 
-  undo_link("Link has been removed successfully. ")
+  undo_link("The link has been successfully removed.")
 
   #determine if the user should be redirected to "edit" or  "view" based on the current deadline right
   topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
@@ -166,7 +166,7 @@ def download
       send_file folder_name + "/" + file_name,
         :disposition => 'inline'
     else
-      raise "Directory downloads are not supported"
+      raise "Directory downloads are not supported."
     end
   end
 end
@@ -224,7 +224,7 @@ def move_selected_file
   newloc += params[:faction][:move]
   begin
     FileHelper::move_file(old_filename, newloc)
-    flash[:note] = "The file was moved successfully from \"/#{params[:filenames][params[:chk_files]]}\" to \"/#{params[:faction][:move]}\""
+    flash[:note] = "The file was successfully moved from \"/#{params[:filenames][params[:chk_files]]}\" to \"/#{params[:faction][:move]}\""
   rescue
     flash[:error] = "There was a problem moving the file: "+$!
     end

@@ -18,7 +18,7 @@ class TeamsController < ApplicationController
     @teams.each do |t|
       t.destroy
     end
-    undo_link("All teams have been removed successfully. ")
+    undo_link("All teams have been successfully removed.")
     redirect_to :action => 'list', :id => parent.id
   end
 
@@ -26,7 +26,7 @@ class TeamsController < ApplicationController
   def create_teams
     parent = Object.const_get(session[:team_type]).find(params[:id])
     Team.randomize_all_by_parent(parent, session[:team_type], params[:team_size].to_i)
-    undo_link("Random teams have been created successfully. ")
+    undo_link("Random teams have been successfully created.")
     redirect_to :action => 'list', :id => parent.id
   end
 
@@ -49,7 +49,7 @@ class TeamsController < ApplicationController
       Team.check_for_existing(parent, params[:team][:name], session[:team_type])
       @team = Object.const_get(session[:team_type]+'Team').create(:name => params[:team][:name], :parent_id => parent.id)
       TeamNode.create(:parent_id => parent.id, :node_object_id => @team.id)
-      undo_link("Team \"#{@team.name}\" has been created successfully. ")
+      undo_link("The team \"#{@team.name}\" has been successfully created.")
       redirect_to :action => 'list', :id => parent.id
     rescue TeamExistsError
       flash[:error] = $!
@@ -64,7 +64,7 @@ class TeamsController < ApplicationController
       Team.check_for_existing(parent, params[:team][:name], session[:team_type])
       @team.name = params[:team][:name]
       @team.save
-      flash[:success] = "Team \"#{@team.name}\" has been updated successfully. "
+      flash[:success] = "The team \"#{@team.name}\" has been successfully updated."
       undo_link("")
       redirect_to :action => 'list', :id => parent.id
     rescue TeamExistsError
@@ -100,7 +100,7 @@ class TeamsController < ApplicationController
     @teams_users.destroy_all if @teams_users
     @team.destroy if @team
 
-    undo_link("Team \"#{@team.name}\" has been deleted successfully. ")
+    undo_link("The team \"#{@team.name}\" has been successfully deleted.")
     redirect_to :action => 'list', :id => course.id
   end
 
@@ -117,7 +117,7 @@ class TeamsController < ApplicationController
           team.copy(assignment.id)
         }
       else
-        flash[:note] = "No teams were found to inherit."
+        flash[:note] = "No teams were found when trying to inherit."
       end
     else
       flash[:error] = "No course was found for this assignment."

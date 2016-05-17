@@ -16,6 +16,13 @@
         Calibration report
       </option>
     <% end %>
+    <option value='SummaryByCriteria' selected>
+      Summary by Criteria
+    </option>
+    <option value='SummaryByRevieweeAndCriteria' selected>
+      Summary by Reviewee and Criteria
+    </option>
+
   </select>
   <%= submit_tag("Submit") %>
 <% end %>
@@ -28,8 +35,13 @@
   <h1> Teammate review report for <%= @assignment.name%> </h1>
 <% elsif @type == "Calibration" %>
   <h1> Calibration report for <%= @assignment.name%> </h1>
-<% end %> 
-
+<!--Show summary reports-->
+<% elsif @type == "SummaryByCriteria" %>
+    <h1> Review summary report for <%= @assignment.name%> </h1>
+<% elsif @type == "SummaryByRevieweeAndCriteria" %>
+    <h1> Reviewees summary report for <%= @assignment.name%> </h1>
+<% end %>
+<!--End show summary reports-->
 <div id="searchbox">
 
   <div id="searchlink">

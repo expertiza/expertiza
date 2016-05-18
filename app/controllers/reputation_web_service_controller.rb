@@ -300,9 +300,11 @@ class ReputationWebServiceController < ApplicationController
 
 
 		JSON.parse(response.body.to_s).each do |alg, list|
-      list.each do |id, rep|
-        Participant.find_by_user_id(id).update(alg.to_sym => rep) unless /leniency/ =~ id.to_s
-      end unless list.nil?
+			if alg == "Hamer" || alg == "Lauw"
+		      list.each do |id, rep|
+		        Participant.find_by_user_id(id).update(alg.to_sym => rep) unless /leniency/ =~ id.to_s
+		      end
+			end
 		end
 
 		redirect_to action: 'client'

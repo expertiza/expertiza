@@ -54,7 +54,7 @@ describe "Assignment Topic Suggestion Test" do
       find_link('View').click
       expect(page).to have_content "suggested_description"     
       click_button 'Approve suggestion'
-      expect(page).to have_content "Successfully approved the suggestion"
+      expect(page).to have_content "The suggestion was successfully approved."
     end 
    end
 
@@ -86,7 +86,7 @@ describe "Assignment Topic Suggestion Test" do
       find_link('View').click  
       expect(page).to have_content "suggested_description"     
       click_button 'Approve suggestion'
-      expect(page).to have_content "Successfully approved the suggestion"
+      expect(page).to have_content "The suggestion was successfully approved."
    
       # case 2 student already have topic switch to new topic
       # need two students one to be on the waitlist of previous suggested topic,
@@ -124,7 +124,7 @@ describe "Assignment Topic Suggestion Test" do
       #find_link('View').click  
       expect(page).to have_content "suggested_description"     
       click_button 'Approve suggestion'
-      expect(page).to have_content "Successfully approved the suggestion"
+      expect(page).to have_content "The suggestion was successfully approved."
 
       # lgoing as student 2064 to switch to new approved topic 
       user = User.find_by_name('student2064')
@@ -185,7 +185,7 @@ describe "Assignment Topic Suggestion Test" do
       find_link('View').click
       expect(page).to have_content "suggested_description"     
       click_button 'Approve suggestion'
-      expect(page).to have_content "Successfully approved the suggestion"
+      expect(page).to have_content "The suggestion was successfully approved."
 
       ######################################
       # One team is holding a topic. They sent a suggestion for new topic
@@ -219,7 +219,7 @@ describe "Assignment Topic Suggestion Test" do
       #find_link('View').click
       expect(page).to have_content "suggested_description2_without_switch"
       click_button 'Approve suggestion'
-      expect(page).to have_content "Successfully approved the suggestion"
+      expect(page).to have_content "The suggestion was successfully approved."
 
       #login_as "student2065"
       user = User.find_by_name('student2065')

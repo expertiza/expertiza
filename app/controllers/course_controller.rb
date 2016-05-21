@@ -55,9 +55,10 @@ class CourseController < ApplicationController
 
   def copy
     orig_course = Course.find(params[:id])
-    new_course = orig_course.clone
+    new_course = orig_course.dup
     new_course.instructor_id = session[:user].id
     new_course.name = 'Copy of '+orig_course.name
+    new_course.directory_path = new_course.directory_path + '_copy'
     begin
       new_course.save!
       parent_id = CourseNode.get_parent_id

@@ -475,6 +475,7 @@ Expertiza::Application.routes.draw do
       get :list
       #post ':id', action: :create_teams
       post :create_teams
+      post :inherit
     end
   end
 

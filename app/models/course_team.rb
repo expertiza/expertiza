@@ -6,7 +6,7 @@ class CourseTeam < Team
   #   suggestion: refactor all to participant
 
   #Get parent course
-  def get_parent_model
+  def parent_model
     "Course"
   end
 

@@ -472,8 +472,31 @@ class ReviewMappingController < ApplicationController
     #ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     @type = params.has_key?(:report) ? params[:report][:type] : "ReviewResponseMap"
+    summary_ws_url = Rails.application.config.summary_ws_url
 
     case @type
+      # this summarizes the reviews of each reviewee by each rubric criterion
+      when "SummaryByRevieweeAndCriteria"
+        sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewees(@assignment, summary_ws_url)
+        #list of variables used in the view and the parameters (should have been done as objects instead of hash maps)
+        #@summary[reviewee][round][question]
+        #@reviewers[team][reviewer]
+        #@avg_scores_by_reviewee[team]
+        #@avg_score_round[reviewee][round]
+        #@avg_scores_by_criterion[reviewee][round][criterion]
+
+        @summary = sum.summary
+        @reviewers = sum.reviewers
+        @avg_scores_by_reviewee = sum.avg_scores_by_reviewee
+        @avg_scores_by_round = sum.avg_scores_by_round
+        @avg_scores_by_criterion = sum.avg_scores_by_criterion
+      # this summarizes all reviews by each rubric criterion
+      when "SummaryByCriteria"
+        sum = SummaryHelper::Summary.new.summarize_reviews_by_criterion(@assignment, summary_ws_url)
+
+        @summary = sum.summary
+        @avg_scores_by_round = sum.avg_scores_by_round
+        @avg_scores_by_criterion = sum.avg_scores_by_criterion
       when "ReviewResponseMap"
         @review_user= params[:user]
         #If review response is required call review_response_report method in review_response_map model

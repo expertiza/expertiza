@@ -453,6 +453,7 @@ DEPENDENCIES
   jquery-rails
   jquery-tablesorter
   jquery-ui-sass-rails
+  json (~> 1.8, >= 1.8.3)
   launchy
   mysql2
   nokogiri
@@ -471,6 +472,7 @@ DEPENDENCIES
   rake
   rb-readline
   react-rails (~> 1.0)
+  rest-client (~> 1.8)
   rgl
   rjb
   rspec-rails
@@ -492,3 +494,6 @@ DEPENDENCIES
   uglifier
   will_paginate
   zip-zip
+
+BUNDLED WITH
+   1.11.2

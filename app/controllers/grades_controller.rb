@@ -80,6 +80,14 @@ class GradesController < ApplicationController
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
     @stage = @participant.assignment.get_current_stage(@topic_id)
     calculate_all_penalties(@assignment.id)
+
+    #prepare feedback summaries
+    summary_ws_url = Rails.application.config.summary_ws_url
+    sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewee(@questions, @assignment, @team_id,  summary_ws_url)
+
+    @summary = sum.summary
+    @avg_scores_by_round = sum.avg_scores_by_round
+    @avg_scores_by_criterion = sum.avg_scores_by_criterion
   end
 
   def view_team

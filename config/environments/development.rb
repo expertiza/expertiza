@@ -40,5 +40,8 @@ Expertiza::Application.configure do
   # number of complex assets.
   config.assets.debug = true
   config.react.variant = :development
+
+  #configuration for summary web service url
+  config.summary_ws_url = 'http://peerlogic.csc.ncsu.edu/sum/v1.0/summary/8/lsa'
 end
 

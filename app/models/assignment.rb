@@ -66,18 +66,10 @@ require 'analytic/assignment_analytic'
     contributor_set = Array.new(contributors)
     # Reject contributors that have not selected a topic, or have no submissions
     contributor_set.reject! { |contributor| signed_up_topic(contributor).nil? }
-    #####contributor_set.reject! { |contributor| !contributor.has_quiz? }
+
     # Reject contributions of topics whose deadline has passed
     contributor_set.reject! { |contributor| contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "Complete" or
                               contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "submission" }
-
-    # Filter the contributors with the least number of reviews
-    # (using the fact that each contributor is associated with a topic)
-    ###contributor = contributor_set.min_by { |contributor| contributor.quiz_mappings.count }
-
-    ### min_quizzes = contributor.quiz_mappings.count rescue 0
-    ###contributor_set.reject! { |contributor| contributor.quiz_mappings.count > min_quizzes + review_topic_threshold }
-
 
     candidate_topics = Set.new
     contributor_set.each { |contributor| candidate_topics.add(signed_up_topic(contributor)) }
@@ -1077,9 +1069,10 @@ require 'analytic/assignment_analytic'
     @team = Team.find_by_sql("select t.* "+
         "from teams t, signed_up_teams s "+
         "where s.topic_id='"+id.to_s+"' and s.team_id = t.id and t.advertise_for_partner = 1")
-@team.reject!{|t| t.full?}
+    @team.reject!{|t| t.full?}
     return @team.size > 0
   end
+
   def review_progress_pie_chart
     reviewed = self.get_percentage_reviews_completed
     pending = 100 - reviewed

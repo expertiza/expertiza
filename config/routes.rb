@@ -37,15 +37,6 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :assessment360 do
-    collection do
-      get :one_course_all_assignments
-      get :all_students_all_reviews
-      get :one_student_all_reviews
-      get :one_assignment_all_students
-    end
-  end
-
   resources :assignments do
     collection do
       get :delete

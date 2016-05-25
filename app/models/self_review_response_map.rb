@@ -7,9 +7,9 @@ class SelfReviewResponseMap < ResponseMap
   # This method is used to get questionnaire for self-review to be performed by user
   def questionnaire(round)
     if self.assignment.varying_rubrics_by_round?
-      Questionnaire.find(self.assignment.get_review_questionnaire_id(round))
+      Questionnaire.find(self.assignment.review_questionnaire_id(round))
     else
-      Questionnaire.find(self.assignment.get_review_questionnaire_id)
+      Questionnaire.find(self.assignment.review_questionnaire_id)
     end
   end
 

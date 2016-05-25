@@ -260,7 +260,7 @@ class Response < ActiveRecord::Base
       map = ResponseMap.find(self.map_id)
       reviewer_participant = Participant.find(map.reviewer_id)
       assignment = Assignment.find(reviewer_participant.parent_id)
-      questionnaire = Questionnaire.find(assignment.get_review_questionnaire_id)
+      questionnaire = Questionnaire.find(assignment.review_questionnaire_id)
     end
     questionnaire
   end

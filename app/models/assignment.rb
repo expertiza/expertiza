@@ -735,7 +735,7 @@ require 'analytic/assignment_analytic'
       rounds = self.rounds_of_reviews
       for round in 1 .. rounds
         @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
-        review_questionnaire_id = get_review_questionnaire_id(round)
+        review_questionnaire_id = review_questionnaire_id(round)
 
         @questions = Question.where( ['questionnaire_id = ?', review_questionnaire_id])
 
@@ -766,7 +766,7 @@ require 'analytic/assignment_analytic'
       end
     else #[reviewer_id][reviewee_id] = score
       @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
-      review_questionnaire_id = get_review_questionnaire_id()
+      review_questionnaire_id = review_questionnaire_id()
 
       @questions = Question.where( ['questionnaire_id = ?', review_questionnaire_id])
 
@@ -800,7 +800,7 @@ require 'analytic/assignment_analytic'
     if self.varying_rubrics_by_round?
       rounds = self.rounds_of_reviews
       for round in 1 .. rounds
-        review_questionnaire_id = get_review_questionnaire_id(round)
+        review_questionnaire_id = review_questionnaire_id(round)
         questions = Question.where( ['questionnaire_id = ?', review_questionnaire_id])
         contributors.each do |contributor|
           assessments = ReviewResponseMap.get_assessments_for(contributor)
@@ -811,7 +811,7 @@ require 'analytic/assignment_analytic'
         end
       end
     else
-      review_questionnaire_id = get_review_questionnaire_id()
+      review_questionnaire_id = review_questionnaire_id()
       questions = Question.where( ['questionnaire_id = ?', review_questionnaire_id])
       contributors.each do |contributor|
         assessments = ReviewResponseMap.get_assessments_for(contributor)
@@ -822,7 +822,7 @@ require 'analytic/assignment_analytic'
     scores
   end
 
-  def get_review_questionnaire_id (round=nil)
+  def review_questionnaire_id (round=nil)
     revqids = AssignmentQuestionnaire.where(assignment_id:self.id).where(used_in_round:round)
     review_questionnaire_id=nil
     revqids.each do |rqid|

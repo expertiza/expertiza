@@ -199,12 +199,12 @@ module SummaryHelper
         rubric[round] = nil
         if assignment.varying_rubrics_by_round?
           #get rubric id in each round
-          questionnaire_id = assignment.get_review_questionnaire_id(round+1)
+          questionnaire_id = assignment.review_questionnaire_id(round+1)
           #get criteria in the corresponding rubric (each round may use different rubric)
           rubric[round] = Question.where(:questionnaire_id => questionnaire_id).order(:seq)
         else
           # if use the same rubric then query only once at the beginning and store them in the rubric[0]
-          questionnaire_id = questionnaire_id.nil? ? assignment.get_review_questionnaire_id() : questionnaire_id
+          questionnaire_id = questionnaire_id.nil? ? assignment.review_questionnaire_id() : questionnaire_id
           rubric[0] = rubric[0].nil? ? Question.where(:questionnaire_id => questionnaire_id).order(:seq) : rubric[0]
         end
       end

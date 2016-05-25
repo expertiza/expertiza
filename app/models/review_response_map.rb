@@ -10,9 +10,9 @@ class ReviewResponseMap < ResponseMap
   # be only 1 questionnaire with type 'ReviewQuestionnaire'.    -Yang
   def questionnaire(round)
     if self.assignment.varying_rubrics_by_round?
-      Questionnaire.find(self.assignment.get_review_questionnaire_id(round))
+      Questionnaire.find(self.assignment.review_questionnaire_id(round))
     else
-      Questionnaire.find(self.assignment.get_review_questionnaire_id)
+      Questionnaire.find(self.assignment.review_questionnaire_id)
     end
   end
 
@@ -150,7 +150,7 @@ class ReviewResponseMap < ResponseMap
     if !assignment.varying_rubrics_by_round?
       #same review rubric used in multiple rounds
       review_final_versions[:review] = Hash.new
-      review_final_versions[:review][:questionnaire_id] = assignment.get_review_questionnaire_id
+      review_final_versions[:review][:questionnaire_id] = assignment.review_questionnaire_id
       response_ids = Array.new
 
       maps.each do |map|
@@ -168,7 +168,7 @@ class ReviewResponseMap < ResponseMap
       for round in 1..rounds_num
         symbol = ("review round"+round.to_s).to_sym
         review_final_versions[symbol] = Hash.new
-        review_final_versions[symbol][:questionnaire_id] = assignment.get_review_questionnaire_id(round)
+        review_final_versions[symbol][:questionnaire_id] = assignment.review_questionnaire_id(round)
         response_ids = Array.new
 
         maps.each do |map|

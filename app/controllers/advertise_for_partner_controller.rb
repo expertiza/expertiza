@@ -42,7 +42,7 @@ class AdvertiseForPartnerController < ApplicationController
       flash[:notice]='Your advertisement was successfully updated!'
       redirect_to view_student_teams_path student_id: participant.id
     else
-      flash[:error]='Your advertisement was not updated!'
+      flash[:error]='An error occured and your advertisement was not updated!'
       redirect_to view_student_teams_path student_id: participant.id
     end
   end

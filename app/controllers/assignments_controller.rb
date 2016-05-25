@@ -136,7 +136,7 @@ class AssignmentsController < ApplicationController
       current_user.timezonepref=parent_timezone
     end
     if @assignment_form.update_attributes(assignment_form_params,current_user)
-      flash[:note] = 'Assignment was successfully saved.'
+      flash[:note] = 'The assignment was successfully saved.'
     else
       flash[:error] = "Failed to save the assignment: #{@assignment_form.errors}"
     end
@@ -192,7 +192,7 @@ class AssignmentsController < ApplicationController
     new_assign_id=AssignmentForm.copy(params[:id],@user)
     if new_assign_id
       new_assign = Assignment.find(new_assign_id)
-      flash[:note] = 'Warning: The submission directory for the copy of this assignment will be the same as the submission directory for the existing assignment, which will allow student submissions to one assignment to overwrite submissions to the other assignment.  If you do not want this to happen, change the submission directory in the new copy of the assignment.' if old_assign.directory_path == new_assign.directory_path
+      flash[:note] = 'Warning: The submission directory for the copy of this assignment will be the same as the submission directory for the existing assignment. This will allow student submissions to one assignment to overwrite submissions to the other assignment.  If you do not want this to happen, change the submission directory in the new copy of the assignment.' if old_assign.directory_path == new_assign.directory_path
       redirect_to edit_assignment_path  new_assign_id
     else
       flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'

@@ -22,7 +22,7 @@ class AuthController < ApplicationController
        if user and user.valid_password?(params[:login][:password])
          after_login(user)
        else
-         logger.warn "Failed login attempt"
+         logger.warn "Failed login attempt."
          flash[:error] = "Your username or password is incorrect."
          redirect_to :controller => 'password_retrieval', :action => 'forgotten'
        end
@@ -130,7 +130,7 @@ class AuthController < ApplicationController
         session[:menu] = role.cache[:menu]
         logger.info "Logging in user as role #{session[:credentials].class}"
       else
-        logger.error "Something went seriously wrong with the role"
+        logger.error "Something went seriously wrong with the role."
       end
     end
   end

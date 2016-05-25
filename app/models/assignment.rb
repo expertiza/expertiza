@@ -551,14 +551,14 @@ require 'analytic/assignment_analytic'
       maps = ReviewResponseMap.where(reviewed_object_id: self.id)
       maps.each { |map| map.delete(force) }
     rescue
-      raise "At least one review response exists for #{self.name}."
+      raise "There is at least one review response exists for #{self.name}."
     end
 
     begin
       maps = TeammateReviewResponseMap.where(reviewed_object_id: self.id)
       maps.each { |map| map.delete(force) }
     rescue
-      raise "At least one teammate review response exists for #{self.name}."
+      raise "There is at least one teammate review response exists for #{self.name}."
     end
 
     self.invitations.each { |invite| invite.destroy }
@@ -578,7 +578,7 @@ require 'analytic/assignment_analytic'
       if directory.size == 2
         Dir.delete(Rails.root + '/pg_data/' + self.directory_path)
       else
-        raise 'Assignment directory is not empty'
+        raise 'The assignment directory is not empty.'
       end
     end
     self.assignment_questionnaires.each { |aq| aq.destroy }

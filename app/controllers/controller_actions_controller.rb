@@ -50,7 +50,7 @@ class ControllerActionsController < ApplicationController
     end
     @controller_action = ControllerAction.new(params[:controller_action])
     if @controller_action.save
-      flash[:notice] = 'The Controller Action was successfully created.'
+      flash[:notice] = 'The controller action was successfully created.'
       Role.rebuild_cache
       redirect_to :controller => 'site_controllers', :action => 'show',
         :id => @controller_action.site_controller_id
@@ -70,7 +70,7 @@ class ControllerActionsController < ApplicationController
   def update
     @controller_action = ControllerAction.find(params[:id])
     if @controller_action.update_attributes(params[:controller_action])
-      flash[:notice] = 'The Controller Action was successfully updated.'
+      flash[:notice] = 'The controller action was successfully updated.'
       Role.rebuild_cache
       redirect_to :controller => 'site_controllers', :action => 'show',
         :id => @controller_action.site_controller_id

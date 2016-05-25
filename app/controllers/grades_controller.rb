@@ -189,7 +189,7 @@ class GradesController < ApplicationController
         }
     ).deliver
 
-    flash[:notice] = "Your email to " + email_form[:recipients] + " has been sent. If you would like to send an email to another student please do so now, otherwise click Back"
+    flash[:notice] = "Your email to " + email_form[:recipients] + " has been sent. If you would like to send an email to another student please do so now, otherwise, click Back"
     redirect_to action: 'conflict_email_form',
                 assignment: email_form[:assignment],
                 author: email_form[:author]

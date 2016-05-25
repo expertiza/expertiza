@@ -15,9 +15,9 @@ class AutomatedMetareviewsController < ApplicationController
     @response = Response.find_by_map_id(params[:id])
     @automated_metareview.calculate_metareview_metrics(@response, params[:id])
     if @automated_metareview.save!
-      flash[:notice] = 'The Automated Metareview was saved!'
+      flash[:notice] = 'The automated meta-review was saved!'
     else
-      flash[:error] = 'The Automated Metareview was not saved'
+      flash[:error] = 'An error occurred and the automated meta-review was not saved!'
     end
 
     #fetching average metrics values

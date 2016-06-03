@@ -73,9 +73,9 @@ describe TreeDisplayController do
       expect(response.body).to eq "[]"
     end
   end
-  it { should respond_to(:get_folder_node_ng) }
-  it { should respond_to(:get_children_node_ng) }
-  it { should respond_to(:get_children_node_2_ng) }
+  it { is_expected.to respond_to(:get_folder_node_ng) }
+  it { is_expected.to respond_to(:get_children_node_ng) }
+  it { is_expected.to respond_to(:get_children_node_2_ng) }
 
   describe "GET #get_session_last_open_tab" do
     it "returns HTTP status 200" do

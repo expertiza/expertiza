@@ -6,9 +6,9 @@ describe StudentTeamsController do
   describe '#view' do
     it 'sets the student' do
       allow(AssignmentParticipant).to receive(:find).with('12345').and_return student
-      student_teams_controller.stub(:current_user_id?)
-      student_teams_controller.stub(:params).and_return({student_id: '12345'})
-      student.stub(:user_id)
+      allow(student_teams_controller).to receive(:current_user_id?)
+      allow(student_teams_controller).to receive(:params).and_return({student_id: '12345'})
+      allow(student).to receive(:user_id)
       student_teams_controller.view
     end
   end

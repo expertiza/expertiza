@@ -836,36 +836,6 @@ require 'analytic/assignment_analytic'
     review_questionnaire_id
   end
 
-  def get_next_due_date
-    due_date = self.find_next_stage()
-    (due_date == nil || due_date == 'Finished') ? nil : due_date
-  end
-
-  def find_next_stage()
-    due_dates = DueDate.where( ['assignment_id = ?', self.id]).order('due_at DESC')
-
-    if due_dates != nil and due_dates.size > 0
-      if Time.now > due_dates[0].due_at
-        return 'Finished'
-      else
-        i = 0
-        for due_date in due_dates
-          if Time.now < due_date.due_at and
-            (due_dates[i+1] == nil or Time.now > due_dates[i+1].due_at)
-            if i > 0
-              return due_dates[i-1]
-            else
-              return nil
-            end
-          end
-          i = i + 1
-        end
-
-        return nil
-      end
-    end
-  end
-
   # Compute total score for this assignment by summing the scores given on all questionnaires.
   # Only scores passed in are included in this sum.
   def compute_total_score(scores)

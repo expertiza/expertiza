@@ -116,9 +116,9 @@
           <% end %>
           <td>
           <% if participant.assignment.get_link_for_current_stage(topic_id)!= nil && participant.assignment.get_link_for_current_stage(topic_id).length!=0%>
-              <%= link_to participant.assignment.get_current_stage_name(topic_id), participant.assignment.get_link_for_current_stage(topic_id) %>
+              <%= link_to participant.assignment.current_stage_name(topic_id), participant.assignment.get_link_for_current_stage(topic_id) %>
               <% else %>
-              <%= participant.assignment.get_current_stage_name(topic_id) %>
+              <%= participant.assignment.current_stage_name(topic_id) %>
               <% end %>
 
           </td>

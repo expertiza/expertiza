@@ -46,7 +46,7 @@
                       <% last_response_round = @latest_response.round %>
                     <%end%>
 
-                    <% current_round = @assignment.get_current_round(topic_id) %>
+                    <% current_round = @assignment.number_of_current_round(topic_id) %>
 
                     <td>
                        <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>

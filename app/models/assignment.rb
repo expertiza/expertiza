@@ -621,7 +621,7 @@ require 'analytic/assignment_analytic'
 
   #if current  stage is submission or review, find the round number
   #otherwise, return 0
-  def get_current_round(topic_id)
+  def number_of_current_round(topic_id)
     if self.staggered_deadline?
       due_dates = TopicDeadline.where(:topic_id => topic_id).order('due_at DESC')
     else
@@ -645,7 +645,7 @@ require 'analytic/assignment_analytic'
   end
 
   #For varying rubric feature
-  def get_current_stage_name(topic_id=nil)
+  def current_stage_name(topic_id=nil)
     if self.staggered_deadline?
        if topic_id.nil?
           return 'Unknown'

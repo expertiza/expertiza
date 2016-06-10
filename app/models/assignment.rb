@@ -675,7 +675,7 @@ require 'analytic/assignment_analytic'
     end
   end
 
-  def get_link_for_current_stage(topic_id=nil)
+  def link_for_current_stage(topic_id=nil)
     if self.staggered_deadline?
       if topic_id.nil?
         return nil

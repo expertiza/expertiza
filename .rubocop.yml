@@ -1,3 +1,15 @@
+AllCops:
+  # Include common Ruby source files.
+  Exclude:
+    - 'bin/**/*'
+    - 'config/**/*'
+    - 'db/**/*'
+    - 'lib/**/*'
+    - 'public/**/*'
+    - 'vendor/**/*'
+Rails:
+  Enabled: true
+
 Metrics/LineLength:
   Max: 160
 

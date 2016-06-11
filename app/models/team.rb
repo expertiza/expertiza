@@ -48,7 +48,7 @@ class Team < ActiveRecord::Base
     while true
       temp = "Team #{counter}"
       return temp if (!Team.find_by_name(temp))
-      counter+ = 1
+      counter += 1
     end
   end
 
@@ -164,7 +164,7 @@ class Team < ActiveRecord::Base
     while true
       teamname = teamnameprefix + "_Team#{counter}"
       return teamname if !Team.find_by_name(teamname)
-      counter+ = 1
+      counter += 1
     end
   end
 

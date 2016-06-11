@@ -180,7 +180,7 @@ class GradesController < ApplicationController
        body: {
          body_text: body_text,
            partial_name: "grading_conflict"
-       }}
+       }
     ).deliver
 
     flash[:notice] = "Your email to " + email_form[:recipients] + " has been sent. If you would like to send an email to another student please do so now, otherwise, click Back"

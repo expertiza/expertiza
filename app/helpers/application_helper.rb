@@ -8,7 +8,7 @@ module ApplicationHelper
 
   # Make a new user of the same class
   def self.get_user_role(l_user)
-    eval "#{l_user.role.name.gsub(/-/, '')}.new"
+    eval "#{l_user.role.name.delete('-')}.new"
   end
 
   def self.get_user_first_name(recipient)
@@ -20,9 +20,7 @@ module ApplicationHelper
   end
 
   def flash_message(type)
-    if flash[type]
-      "<div class='flash_#{type.to_s}'>#{flash[type]}</div>".html_safe
-    end
+    "<div class='flash_#{type}'>#{flash[type]}</div>".html_safe if flash[type]
   end
 
   def text_field_with_auto_complete model, field, options

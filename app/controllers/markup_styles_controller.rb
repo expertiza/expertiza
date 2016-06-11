@@ -1,22 +1,19 @@
 class MarkupStylesController < ApplicationController
-
-
   def action_allowed?
     current_role_name.eql?("Super-Administrator")
   end
 
-
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
-  verify :method => :post, :only => [ :destroy, :create, :update ],
-    :redirect_to => { :action => :list }
+  verify method: :post, only: [:destroy, :create, :update],
+         redirect_to: {action: :list}
 
   def index
     list
-    render :action => 'list'
+    render action: 'list'
   end
 
   def list
-    @markup_styles = MarkupStyle.paginate(:page => params[:page],:per_page => 10)
+    @markup_styles = MarkupStyle.paginate(page: params[:page], per_page: 10)
   end
 
   def show
@@ -32,9 +29,9 @@ class MarkupStylesController < ApplicationController
     begin
       @markup_style.save!
       flash[:notice] = 'The markup style was successfully created.'
-      redirect_to :action => 'list'
+      redirect_to action: 'list'
     rescue
-      render :action => 'new'
+      render action: 'new'
     end
   end
 
@@ -45,16 +42,15 @@ class MarkupStylesController < ApplicationController
   def update
     @markup_style = MarkupStyle.find(params[:id])
     if @markup_style.update_attributes(params[:markup_style])
-      redirect_to :action => 'show', :id => @markup_style
+      redirect_to action: 'show', id: @markup_style
       flash[:notice] = 'The markup style was successfully updated.'
     else
-      render :action => 'edit'
+      render action: 'edit'
     end
   end
 
   def destroy
     MarkupStyle.find(params[:id]).destroy
-    redirect_to :action => 'list'
+    redirect_to action: 'list'
   end
-
 end

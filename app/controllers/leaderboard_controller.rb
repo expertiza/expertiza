@@ -1,11 +1,9 @@
 class LeaderboardController < ApplicationController
-
-  before_filter :authorize
+  before_action :authorize
 
   def action_allowed?
     true
   end
-
 
   # Our logic for the overall leaderboard. This method provides the data for
   # the Top 3 leaderboards and the Personal Achievement leaderboards.
@@ -13,51 +11,51 @@ class LeaderboardController < ApplicationController
     if current_user
       @instructorQuery = LeaderboardHelper.userIsInstructor?(current_user.id)
 
-      if @instructorQuery
-        @courseList = LeaderboardHelper.instructorCourses(current_user.id)
-      else
-        @courseList = LeaderboardHelper.studentInWhichCourses(current_user.id)
-      end
+      @courseList = if @instructorQuery
+                      LeaderboardHelper.instructorCourses(current_user.id)
+                    else
+                      LeaderboardHelper.studentInWhichCourses(current_user.id)
+                    end
 
-      @csHash= Leaderboard.getParticipantEntriesInCourses @courseList, current_user.id
+      @csHash = Leaderboard.getParticipantEntriesInCourses @courseList, current_user.id
 
-      if !@instructorQuery
+      unless @instructorQuery
         @user = current_user
         @courseAccomp = Leaderboard.extractPersonalAchievements(@csHash, @courseList, current_user.id)
       end
 
       @csHash = Leaderboard.sortHash(@csHash)
       # Setup leaderboard for easier consumption by view
-      @leaderboards = Array.new
+      @leaderboards = []
 
-      @csHash.each { |qType, courseHash|
-        courseHash.each_pair{|courseId, userGradeArray|
+      @csHash.each do |qType, courseHash|
+        courseHash.each_pair do |courseId, userGradeArray|
           courseName = LeaderboardHelper.getCourseName(courseId)
           achieveName = LeaderboardHelper.getAchieveName(qType)
 
-          leaderboardHash = Hash.new
-          leaderboardHash = {:achievement => achieveName,
-                             :courseName => courseName,
-                             :sortedGrades => userGradeArray}
+          leaderboardHash = {}
+          leaderboardHash = {achievement: achieveName,
+                             courseName: courseName,
+                             sortedGrades: userGradeArray}
 
           @leaderboards << leaderboardHash
-        }
-      }
+        end
+      end
 
-      @leaderboards.sort!{|x,y| x[:courseName] <=> y[:courseName]}
+      @leaderboards.sort! {|x, y| x[:courseName] <=> y[:courseName] }
 
       # Setup personal achievement leaderboards for easier consumption by view
-      @achievementLeaderBoards = Array.new
-      if !@instructorQuery
-        @courseAccomp.each_pair{ |course, accompHashArray|
-          courseAccompListHash = Hash.new
+      @achievementLeaderBoards = []
+      unless @instructorQuery
+        @courseAccomp.each_pair do |course, accompHashArray|
+          courseAccompListHash = {}
           courseAccompListHash[:courseName] = LeaderboardHelper.getCourseName(course)
-          courseAccompListHash[:accompList] = Array.new
-          accompHashArray.each {|accompHash|
+          courseAccompListHash[:accompList] = []
+          accompHashArray.each do |accompHash|
             courseAccompListHash[:accompList] << accompHash
-          }
+          end
           @achievementLeaderBoards << courseAccompListHash
-        }
+        end
       end
     end
   end

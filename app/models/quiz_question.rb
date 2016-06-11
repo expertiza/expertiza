@@ -1,5 +1,5 @@
 class QuizQuestion < Question
-  has_many :quiz_question_choices, :class_name => 'QuizQuestionChoice', :foreign_key => 'question_id'
+  has_many :quiz_question_choices, class_name: 'QuizQuestionChoice', foreign_key: 'question_id'
   def edit
   end
 
@@ -8,11 +8,11 @@ class QuizQuestion < Question
     html += "Question Type: " + self.type + '<br />'
     if self.quiz_question_choices
       self.quiz_question_choices.each do |choices|
-        if choices.iscorrect?
-          html += "  - <b>"+choices.txt+"</b><br /> "
-        else
-          html += "  - "+choices.txt+"<br /> "
-        end
+        html += if choices.iscorrect?
+                  "  - <b>" + choices.txt + "</b><br /> "
+                else
+                  "  - " + choices.txt + "<br /> "
+                end
       end
       html += '<br />'
     end
@@ -24,5 +24,4 @@ class QuizQuestion < Question
 
   def view_completed_question
   end
-
 end

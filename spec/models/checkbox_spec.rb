@@ -1,12 +1,11 @@
 require 'rails_helper'
 
 describe Checkbox do
-
-  let!(:checkbox){Checkbox.new id:10, type: "Checkbox", seq:1.0, txt:"test txt", weight:11}
-  let!(:answer){Answer.new answer:1}
-  let!(:checkbox1){Checkbox.create(:id => 1, :type => 'Checkbox', :seq => 2.0, :txt => 'test txt2', :weight => 11)}
-  let!(:checkbox2){Checkbox.create(:id => 2, :type => 'Checkbox', :seq => 3.0, :txt => 'test txt3', :weight => 12)}
-  let!(:checkbox3){Checkbox.create(:id => 3, :type => 'Checkbox', :seq => 4.0, :txt => 'test txt4', :weight => 13)}
+  let!(:checkbox) { Checkbox.new id: 10, type: "Checkbox", seq: 1.0, txt: "test txt", weight: 11 }
+  let!(:answer) { Answer.new answer: 1 }
+  let!(:checkbox1) { Checkbox.create(id: 1, type: 'Checkbox', seq: 2.0, txt: 'test txt2', weight: 11) }
+  let!(:checkbox2) { Checkbox.create(id: 2, type: 'Checkbox', seq: 3.0, txt: 'test txt3', weight: 12) }
+  let!(:checkbox3) { Checkbox.create(id: 3, type: 'Checkbox', seq: 4.0, txt: 'test txt4', weight: 13) }
 
   describe "#edit" do
     it "returns the html " do
@@ -21,11 +20,11 @@ describe Checkbox do
       expect(html).to eq("<input id=\"responses_1_comments\" name=\"responses[1][comment]\" type=\"hidden\" value=\"\"><input id=\"responses_1_score\" name=\"responses[1][score]\" type=\"hidden\"value=\"1\"><input id=\"responses_1_checkbox\" type=\"checkbox\" onchange=\"checkbox1Changed()\"checked=\"checked\"><label for=\"responses_1\">test txt3</label><script>function checkbox1Changed() { var checkbox = jQuery(\"#responses_1_checkbox\"); var response_score = jQuery(\"#responses_1_score\");if (checkbox.is(\":checked\")) {response_score.val(\"1\");} else {response_score.val(\"0\");}}</script><BR/>")
     end
   end
-  
+
   describe "#view_question_text" do
     it "returns the html " do
       html = checkbox2.view_question_text.to_s
-      expect(html).to eq( "<TR><TD align=\"left\"> test txt3 </TD><TD align=\"left\">Checkbox</TD><td align=\"center\">12</TD><TD align=\"center\">Checked/Unchecked</TD></TR>") 
+      expect(html).to eq("<TR><TD align=\"left\"> test txt3 </TD><TD align=\"left\">Checkbox</TD><td align=\"center\">12</TD><TD align=\"center\">Checked/Unchecked</TD></TR>")
     end
   end
 
@@ -36,4 +35,3 @@ describe Checkbox do
     end
   end
 end
-

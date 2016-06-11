@@ -14,7 +14,6 @@
 # which show up in the relationships can be found in
 # factories.rb.
 FactoryGirl.define do
-
   # Quiz Questionnaire is the main representation of a quiz
   # in the Expertiza model. It shares a one-to-many relationship
   # with QuizQuestion and QuizResponseMap, and foreign keys
@@ -23,7 +22,7 @@ FactoryGirl.define do
   # superclass, is the field used to store the team id.
   factory :quiz_questionnaire, class: QuizQuestionnaire do
     name 'Quiz Questionnaire'
-    instructor_id {AssignmentTeam.first.id || association(:assignment_team).id}
+    instructor_id { AssignmentTeam.first.id || association(:assignment_team).id }
     private 0
     min_question_score 0
     max_question_score 1
@@ -40,8 +39,8 @@ FactoryGirl.define do
   factory :quiz_question, class: QuizQuestion do
     txt 'Question'
     weight 1
-    questionnaire {QuizQuestionnaire.first || association(:quiz_questionnaire)}
-    quiz_question_choices {[QuizQuestionChoice.first] || association(:quiz_question_choices)}
+    questionnaire { QuizQuestionnaire.first || association(:quiz_questionnaire) }
+    quiz_question_choices { [QuizQuestionChoice.first] || association(:quiz_question_choices) }
     seq 1.0
     type 'MultipleChoiceRadio'
   end
@@ -50,7 +49,7 @@ FactoryGirl.define do
   # choice within a question. It foreign keys to its associated
   # question.
   factory :quiz_question_choice, class: QuizQuestionChoice do
-    question {QuizQuestion.first || association(:quiz_question)}
+    question { QuizQuestion.first || association(:quiz_question) }
     txt 'Answer Choice 1'
     iscorrect 0
   end
@@ -60,15 +59,15 @@ FactoryGirl.define do
   # individual participant who is taking the quiz, the reviewee is
   # the team that created the quiz questionnaire.
   factory :quiz_response_map, class: QuizResponseMap do
-    quiz_questionnaire {QuizQuestionnaire.first || association(:quiz_questionnaire)}
-    reviewer {Participant.first || association(:participant)}
-    reviewee_id {Teams.first.id || association(:team).id}
+    quiz_questionnaire { QuizQuestionnaire.first || association(:quiz_questionnaire) }
+    reviewer { Participant.first || association(:participant) }
+    reviewee_id { Teams.first.id || association(:team).id }
   end
 
   # Quiz Response represents a single response to a quiz
   # questionnaire. It foreign keys to a quiz response map.
   factory :quiz_response, class: QuizResponse do
-    response_map {QuizResponseMap.first || association(:response_map)}
+    response_map { QuizResponseMap.first || association(:response_map) }
     is_submitted 1
   end
 
@@ -76,9 +75,9 @@ FactoryGirl.define do
   # question. It shares a many-to-one relationship with
   # quiz question and quiz response.
   factory :answer, class: Answer do
-    question {Question.first || association(:question)}
-    response_id {Response.first.id || association(:response_id).id}
-    answer {1 || assocaiton(:answer)}
+    question { Question.first || association(:question) }
+    response_id { Response.first.id || association(:response_id).id }
+    answer { 1 || assocaiton(:answer) }
     comments 'Answer text'
   end
 end

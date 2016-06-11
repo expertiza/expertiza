@@ -2,16 +2,16 @@ class ApplicationController < ActionController::Base
   include AccessHelper
 
   if Rails.env.production?
-    #forcing SSL only in the production mode
+    # forcing SSL only in the production mode
     force_ssl
   end
 
   helper_method :current_user_session, :current_user, :current_user_role?
   protect_from_forgery with: :exception
-  before_filter :set_time_zone
-  before_filter :authorize
+  before_action :set_time_zone
+  before_action :authorize
 
-  def self.verify(args)
+  def self.verify(_args)
   end
 
   def current_user_role?
@@ -29,18 +29,14 @@ class ApplicationController < ActionController::Base
   helper_method :current_user_role?
 
   def user_for_paper_trail
-    if session[:user]
-      session[:user].try :id
-    else
-      nil
-    end
+    session[:user].try :id if session[:user]
   end
 
   def undo_link(message)
-    @version = Version.where(['whodunnit = ?',session[:user].id]).last
+    @version = Version.where(['whodunnit = ?', session[:user].id]).last
     if @version.try(:created_at) && Time.now - @version.created_at < 5.0
       @link_name = params[:redo] == "true" ? "redo" : "undo"
-      message = message + "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @version.id,:redo => !params[:redo])}>#{@link_name}</a>"
+      message += "<a href = #{url_for(controller: :versions, action: :revert, id: @version.id, redo: !params[:redo])}>#{@link_name}</a>"
     end
   end
 
@@ -54,7 +50,7 @@ class ApplicationController < ActionController::Base
   def current_user_role
     current_user.role
   end
-  alias_method :current_user_role?, :current_user_role
+  alias current_user_role? current_user_role
 
   def logged_in?
     current_user
@@ -104,7 +100,7 @@ class ApplicationController < ActionController::Base
     current_user.try(:id) == user_id
   end
 
-  def denied(reason=nil)
+  def denied(reason = nil)
     if reason
       redirect_to "/denied?reason=#{reason}"
     else
@@ -113,8 +109,8 @@ class ApplicationController < ActionController::Base
   end
 
   private
-  def record_not_found
-    redirect_to :controller => :tree_display,:action => :list
-  end
 
+  def record_not_found
+    redirect_to controller: :tree_display, action: :list
+  end
 end

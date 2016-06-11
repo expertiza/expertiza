@@ -1,4 +1,4 @@
-#require 'analytic/response_analytic'
+# require 'analytic/response_analytic'
 module AssignmentTeamAnalytic
   #======= general ==========#
   def num_participants
@@ -14,7 +14,7 @@ module AssignmentTeamAnalytic
     if self.num_reviews == 0
       return 0
     else
-      review_scores.inject(:+).to_f/num_reviews
+      review_scores.inject(:+).to_f / num_reviews
     end
   end
 
@@ -35,7 +35,7 @@ module AssignmentTeamAnalytic
     if self.num_reviews == 0
       return 0
     else
-      total_review_word_count.to_f/num_reviews
+      total_review_word_count.to_f / num_reviews
     end
   end
 
@@ -56,7 +56,7 @@ module AssignmentTeamAnalytic
     if num_reviews == 0
       0
     else
-      total_review_character_count.to_f/num_reviews
+      total_review_character_count.to_f / num_reviews
     end
   end
 
@@ -68,28 +68,25 @@ module AssignmentTeamAnalytic
     review_character_counts.min
   end
 
-
-
-
   def review_character_counts
-    list = Array.new
+    list = []
     self.responses.each do |response|
       list << response.total_character_count
     end
-    if (list.empty?)
+    if list.empty?
       [0]
     else
       list
     end
   end
 
-  #return an array containing the score of all the reviews
+  # return an array containing the score of all the reviews
   def review_scores
-    list = Array.new
+    list = []
     self.responses.each do |response|
       list << response.average_score
     end
-    if (list.empty?)
+    if list.empty?
       [0]
     else
       list
@@ -97,11 +94,11 @@ module AssignmentTeamAnalytic
   end
 
   def review_word_counts
-    list = Array.new
+    list = []
     self.responses.each do |response|
       list << response.total_word_count
     end
-    if (list.empty?)
+    if list.empty?
       [0]
     else
       list
@@ -109,8 +106,8 @@ module AssignmentTeamAnalytic
   end
 
   #======= unused ============#
-  ##return students in the participants
-  #def student_list
+  # #return students in the participants
+  # def student_list
   #  students = Array.new
   #  self.participants.each do |participant|
   #    if participant.user.role_id == Role.student.id
@@ -118,10 +115,9 @@ module AssignmentTeamAnalytic
   #    end
   #  end
   #  students
-  #end
+  # end
   #
-  #def num_students
+  # def num_students
   #  self.students.count
-  #end
-
+  # end
 end

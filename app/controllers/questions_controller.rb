@@ -1,5 +1,4 @@
 class QuestionsController < ApplicationController
-
   # A question is a single entry within a questionnaire
   # Questions provide a way of scoring an object
   # based on either a numeric value or a true/false
@@ -8,7 +7,7 @@ class QuestionsController < ApplicationController
   # Default action, same as list
   def index
     list
-    render :action => 'list'
+    render action: 'list'
   end
 
   def action_allowed?
@@ -19,13 +18,12 @@ class QuestionsController < ApplicationController
   end
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
-  verify :method => :post, :only => [ :destroy, :create, :update ],
-    :redirect_to => { :action => :list }
-
+  verify method: :post, only: [:destroy, :create, :update],
+         redirect_to: {action: :list}
 
   # List all questions in paginated view
   def list
-    @questions = Question.paginate(:page => params[:page],:per_page => 10)
+    @questions = Question.paginate(page: params[:page], per_page: 10)
   end
 
   # Display a given question
@@ -45,9 +43,9 @@ class QuestionsController < ApplicationController
     @question = Question.new(params[:question])
     if @question.save
       flash[:notice] = 'The question was successfully created.'
-      redirect_to :action => 'list'
+      redirect_to action: 'list'
     else
-      render :action => 'new'
+      render action: 'new'
     end
   end
 
@@ -62,9 +60,9 @@ class QuestionsController < ApplicationController
     @question = Question.find(params[:id])
     if @question.update_attributes(params[:question])
       flash[:notice] = 'The question was successfully updated.'
-      redirect_to :action => 'show', :id => @question
+      redirect_to action: 'show', id: @question
     else
-      render :action => 'edit'
+      render action: 'edit'
     end
   end
 
@@ -77,9 +75,8 @@ class QuestionsController < ApplicationController
       question.destroy
       flash[:success] = "You have successfully deleted the question!"
     rescue
-      flash[:error] = $!
+      flash[:error] = $ERROR_INFO
     end
     redirect_to edit_questionnaire_path(questionnaire_id.to_s.to_sym)
   end
-
 end

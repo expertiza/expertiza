@@ -1,8 +1,7 @@
 class ControllerActionsController < ApplicationController
-
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
-  verify :method => :post, :only => [ :destroy, :create, :update ],
-    :redirect_to => { :action => :index }
+  verify method: :post, only: [:destroy, :create, :update],
+         redirect_to: {action: :index}
 
   def action_allowed?
     current_role_name.eql?("Super-Administrator")
@@ -12,39 +11,32 @@ class ControllerActionsController < ApplicationController
     @controller_actions = ControllerAction.order(:name).paginate(per_page: 50, page: 1)
   end
 
-
   def list
-    redirect_to :action => 'index'
+    redirect_to action: 'index'
   end
-
 
   def show
     @controller_action = ControllerAction.find(params[:id])
-    @permission = @controller_action.permission || Permission.new(:id => nil, :name => '(default)')
+    @permission = @controller_action.permission || Permission.new(id: nil, name: '(default)')
   end
-
 
   def new
     @controller_action = ControllerAction.new
     foreign
   end
 
-
   def new_for
     @controller_action = ControllerAction.new
     @controller_action.site_controller_id = params[:id]
     @site_controller = SiteController.find(params[:id])
-    if @site_controller
-      @actions = class_actions(@site_controller.name)
-    end
+    @actions = class_actions(@site_controller.name) if @site_controller
     foreign
-    render :action => 'new'
+    render action: 'new'
   end
-
 
   def create
     if params[:controller_action][:specific_name] and
-      params[:controller_action][:specific_name].length > 0
+      !params[:controller_action][:specific_name].empty?
       params[:controller_action][:name] =
         params[:controller_action][:specific_name]
     end
@@ -52,34 +44,31 @@ class ControllerActionsController < ApplicationController
     if @controller_action.save
       flash[:notice] = 'The controller action was successfully created.'
       Role.rebuild_cache
-      redirect_to :controller => 'site_controllers', :action => 'show',
-        :id => @controller_action.site_controller_id
+      redirect_to controller: 'site_controllers', action: 'show',
+                  id: @controller_action.site_controller_id
     else
       foreign
-      render :action => 'new'
+      render action: 'new'
     end
   end
-
 
   def edit
     @controller_action = ControllerAction.find(params[:id])
     foreign
   end
 
-
   def update
     @controller_action = ControllerAction.find(params[:id])
     if @controller_action.update_attributes(params[:controller_action])
       flash[:notice] = 'The controller action was successfully updated.'
       Role.rebuild_cache
-      redirect_to :controller => 'site_controllers', :action => 'show',
-        :id => @controller_action.site_controller_id
+      redirect_to controller: 'site_controllers', action: 'show',
+                  id: @controller_action.site_controller_id
     else
       foreign
-      render :action => 'edit'
+      render action: 'edit'
     end
   end
-
 
   def destroy
     @controller_action = ControllerAction.find(params[:id])
@@ -95,15 +84,14 @@ class ControllerActionsController < ApplicationController
     @controllers = SiteController.order :name
 
     @permissions = Permission.order :name
-    @permissions.unshift Permission.new(:id => nil, :name => '(default)')
+    @permissions.unshift Permission.new(id: nil, name: '(default)')
   end
-
 
   def class_actions(classname)
     classes = SiteController.classes
-    actions = Hash.new()
+    actions = {}
 
-    if classes.has_key? classname
+    if classes.key? classname
       controller = classes[classname]
 
       for method in controller.public_instance_methods(false) do
@@ -115,12 +103,11 @@ class ControllerActionsController < ApplicationController
       end
     end
 
-    action_collection = Array.new
+    action_collection = []
     for action in actions.keys.sort do
-      action_collection << ControllerAction.new(:name => action)
+      action_collection << ControllerAction.new(name: action)
     end
 
-    return action_collection
+    action_collection
   end
-
 end

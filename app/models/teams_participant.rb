@@ -10,18 +10,13 @@ class TeamsParticipant < ActiveRecord::Base
     TeamUserNode.find_by_node_object_id(self.id)
     team = self.team
     self.destroy
-    if team.teams_participants.length == 0
-      team.delete
-    end
+    team.delete if team.teams_participants.empty?
   end
 
   def hello
-    return "Hello"
+    "Hello"
   end
 
   def get_team_members(team_id)
-
-
-
   end
 end

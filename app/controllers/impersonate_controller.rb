@@ -10,11 +10,10 @@ class ImpersonateController < ApplicationController
 
   def auto_complete_for_user_name
     @users = session[:user].get_available_users(params[:user][:name])
-    render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
+    render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
 
   def start
-
   end
 
   def impersonate
@@ -36,9 +35,7 @@ class ImpersonateController < ApplicationController
             return
           end
 
-          if session[:super_user] == nil
-            session[:super_user] = session[:user]
-          end
+          session[:super_user] = session[:user] if session[:super_user].nil?
           AuthController.clear_user_info(session, nil)
           session[:user] = user
         else
@@ -48,7 +45,7 @@ class ImpersonateController < ApplicationController
         end
       else
         # Impersonate a new account
-        if params[:impersonate][:name].length > 0
+        if !params[:impersonate][:name].empty?
           user = User.find_by_name(params[:impersonate][:name])
           if user
             unless original_user.can_impersonate? user
@@ -66,7 +63,7 @@ class ImpersonateController < ApplicationController
           end
           # Revert to original account
         else
-          if session[:super_user] != nil
+          if !session[:super_user].nil?
             AuthController.clear_user_info(session, nil)
             session[:user] = session[:super_user]
             user = session[:user]
@@ -80,12 +77,11 @@ class ImpersonateController < ApplicationController
       end
       # Navigate to user's home location
       AuthController.set_current_role(user.role_id, session)
-      redirect_to :action => AuthHelper::get_home_action(session[:user]),
-        :controller => AuthHelper::get_home_controller(session[:user])
+      redirect_to action: AuthHelper.get_home_action(session[:user]),
+                  controller: AuthHelper.get_home_controller(session[:user])
     rescue Exception => e
       flash[:error] = e.message
       redirect_to :back
     end
-
   end
 end

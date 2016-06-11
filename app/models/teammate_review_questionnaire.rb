@@ -5,12 +5,10 @@ class TeammateReviewQuestionnaire < Questionnaire
   end
 
   def symbol
-    return "teammate".to_sym
+    "teammate".to_sym
   end
 
   def get_assessments_for(participant)
-    participant.teammate_reviews()
+    participant.teammate_reviews
   end
-
-
 end

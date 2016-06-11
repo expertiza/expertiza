@@ -1,10 +1,8 @@
 class StudentQuizzesController < ApplicationController
-
   def action_allowed?
     ['Administrator',
      'Instructor',
      'Teaching Assistant'].include? current_role_name or (current_role_name.eql?("Student") and ((%w(index).include? action_name) ? are_needed_authorizations_present? : true))
-
   end
 
   def index
@@ -17,31 +15,27 @@ class StudentQuizzesController < ApplicationController
   def finished_quiz
     @response = Response.where(map_id: params[:map_id]).first
     @response_map = QuizResponseMap.find(params[:map_id])
-    @questions = Question.where(questionnaire_id: @response_map.reviewed_object_id) #for quiz response map, the reivewed_object_id is questionnaire id
+    @questions = Question.where(questionnaire_id: @response_map.reviewed_object_id) # for quiz response map, the reivewed_object_id is questionnaire id
     @map = ResponseMap.find(params[:map_id])
     @participant = AssignmentTeam.find(@map.reviewee_id).participants.first
 
-    @quiz_score =@response_map.quiz_score
+    @quiz_score = @response_map.quiz_score
   end
 
-  #Create an array of candidate quizzes for current reviewer
-  def self.take_quiz assignment_id , reviewer_id
-    quizzes = Array.new
+  # Create an array of candidate quizzes for current reviewer
+  def self.take_quiz assignment_id, reviewer_id
+    quizzes = []
     reviewer = Participant.where(user_id: reviewer_id, parent_id: assignment_id).first
-    reviewed_team_response_maps = ReviewResponseMap.where(reviewer_id:reviewer.id)
+    reviewed_team_response_maps = ReviewResponseMap.where(reviewer_id: reviewer.id)
     reviewed_team_response_maps.each do |team_response_map_record|
-      reviewee_id=team_response_map_record.reviewee_id
-      reviewee_team = Team.find(reviewee_id) #reviewees should always be teams
-      if reviewee_team.parent_id!=assignment_id
-        next
-      end
-      quiz_questionnaire = QuizQuestionnaire.where(instructor_id:reviewee_team.id).first
+      reviewee_id = team_response_map_record.reviewee_id
+      reviewee_team = Team.find(reviewee_id) # reviewees should always be teams
+      next if reviewee_team.parent_id != assignment_id
+      quiz_questionnaire = QuizQuestionnaire.where(instructor_id: reviewee_team.id).first
 
-      #if the reviewee team has created quiz
+      # if the reviewee team has created quiz
       if quiz_questionnaire
-        if !quiz_questionnaire.taken_by? reviewer
-          quizzes << quiz_questionnaire
-        end
+        quizzes << quiz_questionnaire unless quiz_questionnaire.taken_by? reviewer
       end
     end
     quizzes
@@ -50,7 +44,7 @@ class StudentQuizzesController < ApplicationController
   # the way 'answers' table store the results of quiz
   def calculate_score map, response
     questionnaire = Questionnaire.find(map.reviewed_object_id)
-    scores = Array.new
+    scores = []
     valid = true
     questions = Question.where(questionnaire_id: questionnaire.id)
     questions.each do |question|
@@ -58,40 +52,36 @@ class StudentQuizzesController < ApplicationController
       correct_answers = QuizQuestionChoice.where(question_id: question.id, iscorrect: true)
       ques_type = question.type
       if ques_type.eql? 'MultipleChoiceCheckbox'
-        if params["#{question.id}"].nil?
+        if params[question.id.to_s].nil?
           valid = false
         else
-          params["#{question.id}"].each do |choice|
-          #loop the quiz taker's choices and see if 1)all the correct choice are checked and 2) # of quiz taker's choice matches the # of the correct choices
+          params[question.id.to_s].each do |choice|
+            # loop the quiz taker's choices and see if 1)all the correct choice are checked and 2) # of quiz taker's choice matches the # of the correct choices
             correct_answers.each do |correct|
-              if choice.eql? correct.txt
-                score += 1
-              end
+              score += 1 if choice.eql? correct.txt
             end
           end
-          if score== correct_answers.count && score == params["#{question.id}"].count
-            score = 1
-          else
-            score = 0
-          end
-          #for MultipleChoiceCheckbox, score =1 means the quiz taker have done this question correctly, not just make select this choice correctly.
-          params["#{question.id}"].each do |choice|
-            new_score = Answer.new comments: choice, question_id: question.id, response_id: response.id, :answer => score
+          score = if score == correct_answers.count && score == params[question.id.to_s].count
+                    1
+                  else
+                    0
+                  end
+          # for MultipleChoiceCheckbox, score =1 means the quiz taker have done this question correctly, not just make select this choice correctly.
+          params[question.id.to_s].each do |choice|
+            new_score = Answer.new comments: choice, question_id: question.id, response_id: response.id, answer: score
 
-            unless new_score.valid?
-              valid = false
-            end
+            valid = false unless new_score.valid?
             scores.push(new_score)
           end
         end
-      else #TrueFalse and MultipleChoiceRadio
+      else # TrueFalse and MultipleChoiceRadio
         correct_answer = correct_answers.first
-        if correct_answer.txt==params["#{question.id}"]
-          score=1
-        else
-          score=0
-        end
-        new_score = Answer.new :comments => params["#{question.id}"], :question_id => question.id, :response_id => response.id, :answer => score
+        score = if correct_answer.txt == params[question.id.to_s]
+                  1
+                else
+                  0
+                end
+        new_score = Answer.new comments: params[question.id.to_s], question_id: question.id, response_id: response.id, answer: score
         if new_score.nil? || new_score.comments.nil? || new_score.comments.empty?
           valid = false
         end
@@ -99,14 +89,12 @@ class StudentQuizzesController < ApplicationController
       end
     end
     if valid
-      scores.each do |score|
-        score.save
-      end
-      redirect_to :controller => 'student_quizzes', :action => 'finished_quiz', :map_id => map.id
+      scores.each(&:save)
+      redirect_to controller: 'student_quizzes', action: 'finished_quiz', map_id: map.id
     else
       response.destroy
       flash[:error] = "Please answer every question."
-      redirect_to :action => :take_quiz, :assignment_id => params[:assignment_id], :questionnaire_id => questionnaire.id, :map_id => map.id
+      redirect_to action: :take_quiz, assignment_id: params[:assignment_id], questionnaire_id: questionnaire.id, map_id: map.id
     end
   end
 
@@ -120,22 +108,21 @@ class StudentQuizzesController < ApplicationController
       response.updated_at = DateTime.current
       response.save
 
-      calculate_score map,response
+      calculate_score map, response
     else
       flash[:error] = "You have already taken this quiz, below are the records for your responses."
-      redirect_to :controller => 'student_quizzes', :action => 'finished_quiz', :map_id => map.id
+      redirect_to controller: 'student_quizzes', action: 'finished_quiz', map_id: map.id
     end
-
   end
 
   def graded?(response, question)
-    return (Answer.where(question_id: question.id, response_id:  response.id).first)
+    Answer.where(question_id: question.id, response_id:  response.id).first
   end
 
-  #This method is only for quiz questionnaires, it is called when instructors click "view quiz questions" on the pop-up panel.
+  # This method is only for quiz questionnaires, it is called when instructors click "view quiz questions" on the pop-up panel.
   def review_questions
     @assignment_id = params[:id]
-    @quiz_questionnaires = Array.new
+    @quiz_questionnaires = []
     Team.where(parent_id: params[:id]).each do |quiz_creator|
       Questionnaire.where(instructor_id: quiz_creator.id).each do |questionnaire|
         @quiz_questionnaires.push questionnaire
@@ -144,7 +131,8 @@ class StudentQuizzesController < ApplicationController
   end
 
   private
-  #authorizations: reader,submitter, reviewer
+
+  # authorizations: reader,submitter, reviewer
   def are_needed_authorizations_present?
     @participant = Participant.find(params[:id])
     authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
@@ -154,5 +142,4 @@ class StudentQuizzesController < ApplicationController
       return true
     end
   end
-
 end

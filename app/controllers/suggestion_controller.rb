@@ -120,7 +120,7 @@ class SuggestionController < ApplicationController
         body: {
           approved_topic_name: @suggestion.title,
             proposer: proposer.name
-        }}
+        }
     ).deliver_now
   end
 

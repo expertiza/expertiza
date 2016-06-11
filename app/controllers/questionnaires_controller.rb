@@ -388,7 +388,7 @@ class QuestionnairesController < ApplicationController
               # Text isnt provided for an option
               valid = "Please make sure every question has text for all options"
               break
-            elsif type == 'MultipleChoiceRadio' and notparams[:new_choices][i.to_s][type][x.to_s][:iscorrect].nil?
+            elsif type == 'MultipleChoiceRadio' and !params[:new_choices][i.to_s][type][x.to_s][:iscorrect].nil?
               correct_selected = true
             elsif type == 'MultipleChoiceCheckbox' and params[:new_choices][i.to_s][type][x.to_s][:iscorrect] != 0.to_s
               correct_selected = true

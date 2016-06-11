@@ -12,7 +12,7 @@ describe 'Tests mailer' do
            location: '1',
            first_name: 'User',
            partial_name: 'update'
-       }}
+       }
     ).deliver_now
 
     expect(email.from[0]).to eq("expertiza.development@gmail.com")

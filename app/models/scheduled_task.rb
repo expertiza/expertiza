@@ -199,7 +199,7 @@ class ScheduledTask
     Mailer.delayed_message(
       bcc: emails,
        subject: subject,
-       body: body}
+       body: body
 ).deliver
   end
 

@@ -65,6 +65,7 @@ group :development do
   gem 'pry'
   gem 'pry-remote'
   gem 'pry-nav'
+  gem 'rubocop'
   gem 'sqlite3-ruby'
   gem 'selenium-webdriver'
   gem 'quiet_assets'

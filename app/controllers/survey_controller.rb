@@ -1,5 +1,4 @@
 class SurveyController < ApplicationController
-
   def action_allowed?
     ['Instructor',
      'Teaching Assistant',
@@ -8,28 +7,28 @@ class SurveyController < ApplicationController
 
   def assign
     @assignment = Assignment.find(params[:id])
-    @assigned_surveys = SurveyHelper::get_assigned_surveys(@assignment.id)
-    @surveys = Array.new
+    @assigned_surveys = SurveyHelper.get_assigned_surveys(@assignment.id)
+    @surveys = []
 
-    if params['subset'] == "mine"
-      @surveys = Questionnaire.where( ["type_id = 2 and instructor_id = ?", session[:user].id])
-    elsif params['subset'] == "public"
-      @surveys = Questionnaire.where( ["type_id = 2 and private = 0"])
-    else
-      @surveys = @assigned_surveys
-    end
+    @surveys = if params['subset'] == "mine"
+                 Questionnaire.where(["type_id = 2 and instructor_id = ?", session[:user].id])
+               elsif params['subset'] == "public"
+                 Questionnaire.where(["type_id = 2 and private = 0"])
+               else
+                 @assigned_surveys
+               end
 
     if params['update']
       if params[:surveys]
         @checked = params[:surveys]
 
-        if params['submit_subset'] == "mine"
-          @submit_surveys = Questionnaire.where( ["type_id = 2 and instructor_id = ?", session[:user].id])
-        elsif params['submit_subset'] == "public"
-          @submit_surveys = Questionnaire.where( ["type_id = 2 and private = 0"])
-        else
-          @submit_surveys = @assigned_surveys
-        end
+        @submit_surveys = if params['submit_subset'] == "mine"
+                            Questionnaire.where(["type_id = 2 and instructor_id = ?", session[:user].id])
+                          elsif params['submit_subset'] == "public"
+                            Questionnaire.where(["type_id = 2 and private = 0"])
+                          else
+                            @assigned_surveys
+                          end
 
         for survey in @submit_surveys
           unless @checked.include? survey.id
@@ -40,11 +39,10 @@ class SurveyController < ApplicationController
 
         for checked_survey in @checked
           @current = Questionnaire.find(checked_survey)
-          unless @assigned_surveys.include? @current
-            @new = AssignmentQuestionnaire.new(:questionnaire_id => checked_survey, :assignment_id => @assignment.id)
-            @new.save
-            @assigned_surveys << @current
-          end
+          next if @assigned_surveys.include? @current
+          @new = AssignmentQuestionnaire.new(questionnaire_id: checked_survey, assignment_id: @assignment.id)
+          @new.save
+          @assigned_surveys << @current
         end
       else
         for survey in @submit_surveys
@@ -54,9 +52,6 @@ class SurveyController < ApplicationController
         end
       end
     end
-    @surveys.sort!{|a,b| a.name <=> b.name}
+    @surveys.sort! {|a, b| a.name <=> b.name }
   end
-
-
-
 end

@@ -1,27 +1,27 @@
-#Base Node class
-#Provides common method definitions, but minimal functoinality.
-#Must be subclassed for use in tree_display code
+# Base Node class
+# Provides common method definitions, but minimal functoinality.
+# Must be subclassed for use in tree_display code
 #
-#Author: AJBUDLON
-#Date: 7/18/2008
+# Author: AJBUDLON
+# Date: 7/18/2008
 class Node < ActiveRecord::Base
   has_paper_trail
-  #acts_as_nested_set
+  # acts_as_nested_set
 
-  belongs_to :parent, :class_name => 'Node', :foreign_key => 'parent_id'
+  belongs_to :parent, class_name: 'Node', foreign_key: 'parent_id'
   has_many :children, class_name: Node, foreign_key: 'parent_id'
 
   # Retrieves the nodes of this type
-  def self.get(sortvar = nil,sortorder =nil,user_id = nil,show = nil, parent_id = nil,search=nil)
+  def self.get(_sortvar = nil, _sortorder = nil, _user_id = nil, _show = nil, _parent_id = nil, _search = nil)
   end
 
   # Retrieves the children of this node
-  def get_children(sortvar = nil,sortorder =nil,user_id = nil,show = nil,parent_id = nil,search = nil)
+  def get_children(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, search = nil)
   end
 
   # Retrieves the action partial for this node
   def get_partial_name
-    self.class.table+"_actions"
+    self.class.table + "_actions"
   end
 
   # Most objects are not leaves

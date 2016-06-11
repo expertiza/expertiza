@@ -2,19 +2,18 @@ require "credentials"
 require "menu"
 
 class Role < ActiveRecord::Base
-  belongs_to :parent, :class_name => 'Role'
+  belongs_to :parent, class_name: 'Role'
   has_many :users
 
   serialize :cache
   validates_presence_of :name
   validates_uniqueness_of :name
 
-  attr_reader :student,:ta,:instructor,:administrator,:superadministrator
+  attr_reader :student, :ta, :instructor, :administrator, :superadministrator
 
-  def self.find_or_create_by_name (params)
+  def self.find_or_create_by_name(params)
     Role.find_or_create_by(name: params)
   end
-
 
   def self.student
     @@student_role ||= find_by_name 'Student'
@@ -64,7 +63,7 @@ class Role < ActiveRecord::Base
     superadministrator
   end
 
-  def Role.rebuild_cache
+  def self.rebuild_cache
     Role.find_each do |role|
       role.cache = nil
       role.save # we have to do this to clear it
@@ -84,7 +83,6 @@ class Role < ActiveRecord::Base
     self.cache[:credentials] = Credentials.new(self.id)
   end
 
-
   def rebuild_menu
     menu = Menu.new(self)
     self.cache[:menu] = menu
@@ -92,32 +90,31 @@ class Role < ActiveRecord::Base
 
   # return ids of roles that are below this role
   def get_available_roles
-    ids = Array.new
+    ids = []
 
     current = self.parent_id
     while current
       role = Role.find(current)
-      if role
-        if not ids.index(role.id)
-          ids << role.id
-          current = role.parent_id
-        end
+      next unless role
+      unless ids.index(role.id)
+        ids << role.id
+        current = role.parent_id
       end
     end
-    return ids
+    ids
   end
 
   # "parents" are lesser roles. This returns a list including this role and all lesser roels.
   def get_parents
-    parents = Array.new
-    seen = Hash.new
+    parents = []
+    seen = {}
 
     current = self.id
 
     while current
       role = Role.find(current)
       if role
-        if not seen.has_key?(role.id)
+        if !seen.key?(role.id)
           parents << role
           seen[role.id] = true
           current = role.parent_id
@@ -129,12 +126,12 @@ class Role < ActiveRecord::Base
       end
     end
 
-    return parents
+    parents
   end
 
   # determine if the current role has all the privileges of the parameter role
   def hasAllPrivilegesOf(target_role)
-    privileges = Hash.new
+    privileges = {}
     privileges["Student"] = 1
     privileges["Teaching Assistant"] = 2
     privileges["Instructor"] = 3
@@ -142,7 +139,6 @@ class Role < ActiveRecord::Base
     privileges["Super-Administrator"] = 5
 
     privileges[self.name] > privileges[target_role.name]
-
   end
 
   def update_with_params(role_params)
@@ -155,5 +151,4 @@ class Role < ActiveRecord::Base
       false
     end
   end
-
 end

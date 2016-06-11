@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 describe "validations" do
-
   before(:each) do
     @assignment = build(:assignment)
   end
@@ -9,7 +8,7 @@ describe "validations" do
   it "assignment is valid" do
     expect(@assignment).to be_valid
   end
-	
+
   it "assignment without name is not valid" do
     @assignment.name = nil
     @assignment.save
@@ -17,9 +16,9 @@ describe "validations" do
   end
 
   it "checks whether Assignment Team is created or not" do
-     expect(create(:assignment_team)).to be_valid
+    expect(create(:assignment_team)).to be_valid
   end
-	
+
   it "checks whether signed up topic is created or not" do
     expect(create(:topic)).to be_valid
   end
@@ -77,7 +76,7 @@ describe "#is_coding_assignment?" do
   it "checks assignment is coding assignment or not" do
     assignment = build(:assignment)
     expect(assignment.is_coding_assignment?).to be false
-   end
+  end
 end
 
 describe "#candidate_assignment_teams_to_review" do

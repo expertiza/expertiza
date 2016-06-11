@@ -1,5 +1,4 @@
 class TeamsUsersController < ApplicationController
-
   def action_allowed?
     ['Instructor',
      'Teaching Assistant',
@@ -9,7 +8,7 @@ class TeamsUsersController < ApplicationController
   def auto_complete_for_user_name
     team = Team.find(session[:team_id])
     @users = team.get_possible_team_members(params[:user][:name])
-    render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
+    render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
 
   def list
@@ -24,8 +23,8 @@ class TeamsUsersController < ApplicationController
 
   def create
     user = User.find_by_name(params[:user][:name].strip)
-    if !user
-      urlCreate = url_for :controller => 'users', :action => 'new'
+    unless user
+      urlCreate = url_for controller: 'users', action: 'new'
       flash[:error] = "\"#{params[:user][:name].strip}\" is not defined. Please <a href=\"#{urlCreate}\">create</a> this user before continuing."
     end
 
@@ -33,24 +32,21 @@ class TeamsUsersController < ApplicationController
 
     if team.is_a?(AssignmentTeam)
       assignment = Assignment.find(team.parent_id)
-      if AssignmentParticipant.find_by_user_id_and_assignment_id(user.id,assignment.id).nil?
-        urlAssignmentParticipantList = url_for :controller=>'participants', :action=>'list', :id=>assignment.id, :model => 'Assignment', :authorization => 'participant'
+      if AssignmentParticipant.find_by_user_id_and_assignment_id(user.id, assignment.id).nil?
+        urlAssignmentParticipantList = url_for controller: 'participants', action: 'list', id: assignment.id, model: 'Assignment', authorization: 'participant'
         flash[:error] = "\"#{user.name}\" is not a participant of the current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
       else
-        add_member_return=team.add_member(user, team.parent_id)
-        if add_member_return==false
-          flash[:error]= "This team already has the maximum number of members."
+        add_member_return = team.add_member(user, team.parent_id)
+        if add_member_return == false
+          flash[:error] = "This team already has the maximum number of members."
         end
-
 
         @teams_user = TeamsUser.last
         undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
       end
-    else #CourseParticipant
-
     end
 
-    redirect_to :controller => 'teams', :action => 'list', :id => team.parent_id
+    redirect_to controller: 'teams', action: 'list', id: team.parent_id
   end
 
   def delete
@@ -59,17 +55,15 @@ class TeamsUsersController < ApplicationController
     @user = User.find(@teams_user.user_id)
     @teams_user.destroy
     undo_link("The team user \"#{@user.name}\" has been successfully removed. ")
-    redirect_to :controller => 'teams', :action => 'list', :id => parent_id
+    redirect_to controller: 'teams', action: 'list', id: parent_id
   end
 
   def delete_selected
-    params[:item].each {
-      |item_id|
+    params[:item].each do |item_id|
       team_user = TeamsUser.find(item_id).first
       team_user.destroy
-    }
+    end
 
-    redirect_to :action => 'list', :id => params[:id]
+    redirect_to action: 'list', id: params[:id]
   end
-
 end

@@ -1,5 +1,4 @@
 class UnscoredQuestion < ChoiceQuestion
-  
   def edit
   end
 

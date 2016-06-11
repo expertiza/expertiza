@@ -1,21 +1,14 @@
-#represents each score cell of the heatgrid table.
+# represents each score cell of the heatgrid table.
 class VmQuestionResponseScoreCell
-
   def initialize(score_value, color_code, comments)
     @score_value = score_value
     @color_code = color_code
     @comment = comments
   end
 
-  def score_value
-    @score_value
-  end
+  attr_reader :score_value
 
-  def comment
-    @comment
-  end
+  attr_reader :comment
 
-  def color_code
-    @color_code
-  end
+  attr_reader :color_code
 end

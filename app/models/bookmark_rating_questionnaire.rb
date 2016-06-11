@@ -5,12 +5,10 @@ class BookmarkRatingQuestionnaire < Questionnaire
   end
 
   def symbol
-    return "bookmark".to_sym
+    "bookmark".to_sym
   end
 
   def get_assessments_for(participant)
-    participant.bookmark_reviews()
+    participant.bookmark_reviews
   end
-
-
 end

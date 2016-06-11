@@ -1,12 +1,11 @@
 class SiteControllersController < ApplicationController
-
   def action_allowed?
     current_role_name.eql?("Super-Administrator")
   end
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
-  verify :method => :post, :only => [ :destroy, :create, :update ],
-    :redirect_to => { :action => :index }
+  verify method: :post, only: [:destroy, :create, :update],
+         redirect_to: {action: :index}
 
   def index
     @builtin_site_controllers = SiteController.builtin
@@ -21,7 +20,7 @@ class SiteControllersController < ApplicationController
   def show
     @site_controller = SiteController.find(params[:id])
     @actions = ControllerAction
-      .where( ['site_controller_id = ?', params[:id] ], :order => 'name')
+               .where(['site_controller_id = ?', params[:id]], order: 'name')
   end
 
   def new
@@ -30,7 +29,7 @@ class SiteControllersController < ApplicationController
   end
 
   def new_called
-    redirect_to :action => 'new'
+    redirect_to action: 'new'
   end
 
   def create
@@ -38,10 +37,10 @@ class SiteControllersController < ApplicationController
     if @site_controller.save
       flash[:notice] = 'The site controller was successfully created.'
       Role.rebuild_cache
-      redirect_to :action => 'index'
+      redirect_to action: 'index'
     else
       foreign
-      render :action => 'new'
+      render action: 'new'
     end
   end
 
@@ -58,16 +57,15 @@ class SiteControllersController < ApplicationController
       redirect_to @site_controller
     else
       foreign
-      render :action => 'edit'
+      render action: 'edit'
     end
   end
 
   def destroy
     SiteController.find(params[:id]).destroy
     Role.rebuild_cache
-    redirect_to :action => 'index'
+    redirect_to action: 'index'
   end
-
 
   protected
 
@@ -82,22 +80,22 @@ class SiteControllersController < ApplicationController
     from_classes = SiteController.classes
 
     from_db = SiteController.order(:name)
-    known = Hash.new
-    @missing = Array.new
+    known = {}
+    @missing = []
     from_db.each do |dbc|
-      if from_classes.has_key? dbc.name
+      if from_classes.key? dbc.name
         known[dbc.name] = dbc
       else
         @missing << dbc
       end
     end
 
-    @unknown = Hash.new
-    @app = Array.new
-    @builtin = Array.new
+    @unknown = {}
+    @app = []
+    @builtin = []
 
     from_classes.keys.sort.each do |name|
-      if known.has_key? name
+      if known.key? name
         if known[name].builtin == 1
           @builtin << known[name]
         else
@@ -108,22 +106,20 @@ class SiteControllersController < ApplicationController
       end
     end
 
-    @has_missing = (@missing.length > 0) ? true : false
-    @has_unknown = (@unknown.keys.length > 0) ? true : false
-    @has_app     = (@app.length > 0)     ? true : false
-    @has_builtin = (@builtin.length > 0) ? true : false
+    @has_missing = !@missing.empty? ? true : false
+    @has_unknown = !@unknown.keys.empty? ? true : false
+    @has_app     = !@app.empty?     ? true : false
+    @has_builtin = !@builtin.empty? ? true : false
   end
-
 
   # Given a controller name, returns an array of available actions to
   # which that controller will respond.
 
   def controller_actions(controller_name)
+    controllers = controller_classes
+    actions = {}
 
-    controllers = controller_classes()
-    actions = Hash.new()
-
-    if @controller_classes.has_key? controller_name
+    if @controller_classes.key? controller_name
       controller = @controller_classes[controller_name]
 
       for method in controller.public_instance_methods do
@@ -135,7 +131,6 @@ class SiteControllersController < ApplicationController
       end
     end
 
-    return actions.keys
+    actions.keys
   end  # def controller_actions
-
   end  # class

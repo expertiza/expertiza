@@ -15,7 +15,7 @@ class ScoredQuestion < ChoiceQuestion
   end
 
   def self.compute_question_score(response_id)
-     answer = Answer.where(question_id: self.id, response_id: response_id).first
-     return self.weight * answer.answer
+    answer = Answer.where(question_id: self.id, response_id: response_id).first
+    self.weight * answer.answer
   end
 end

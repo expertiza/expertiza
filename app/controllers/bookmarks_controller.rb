@@ -1,11 +1,10 @@
 class BookmarksController < ApplicationController
-
   def action_allowed?
     case params[:action]
     when 'list', 'new', 'create', 'bookmark_rating', 'save_bookmark_rating_score'
       current_role_name.eql? 'Student'
     when 'edit', 'update', 'destroy'
-      #edit, update, delete bookmarks can only be done by owner
+      # edit, update, delete bookmarks can only be done by owner
       current_role_name.eql? 'Student' and Bookmark.find(params[:id].to_i).user_id == session[:user].id
     end
   end
@@ -20,17 +19,16 @@ class BookmarksController < ApplicationController
     @bookmark = Bookmark.new
   end
 
-  
   def create
-    params[:url] = params[:url].gsub!(/http:\/\//,"") if params[:url].start_with?('http://')
-    params[:url] = params[:url].gsub!(/https:\/\//,"") if params[:url].start_with?('https://')
+    params[:url] = params[:url].gsub!(/http:\/\//, "") if params[:url].start_with?('http://')
+    params[:url] = params[:url].gsub!(/https:\/\//, "") if params[:url].start_with?('https://')
     begin
-      Bookmark.create(url: params[:url], title: params[:title], description: params[:description], user_id: session[:user].id, topic_id: params[:topic_id] )
+      Bookmark.create(url: params[:url], title: params[:title], description: params[:description], user_id: session[:user].id, topic_id: params[:topic_id])
       flash[:success] = 'Your bookmark has been successfully created!'
     rescue
-      flash[:error] = $!
-    end 
-    redirect_to :action => 'list', :id => params[:topic_id]
+      flash[:error] = $ERROR_INFO
+    end
+    redirect_to action: 'list', id: params[:topic_id]
   end
 
   def edit
@@ -41,14 +39,14 @@ class BookmarksController < ApplicationController
     @bookmark = Bookmark.find(params[:id])
     @bookmark.update_attributes(url: params[:bookmark][:url], title: params[:bookmark][:title], description: params[:bookmark][:description])
     flash[:success] = 'Your bookmark has been successfully updated!'
-    redirect_to :action => 'list', :id => @bookmark.topic_id
+    redirect_to action: 'list', id: @bookmark.topic_id
   end
 
   def destroy
     @bookmark = Bookmark.find(params[:id])
     @bookmark.destroy
     flash[:success] = 'Your bookmark has been successfully deleted!'
-    redirect_to :action => 'list', :id => @bookmark.topic_id
+    redirect_to action: 'list', id: @bookmark.topic_id
   end
 
   def bookmark_rating
@@ -63,6 +61,6 @@ class BookmarksController < ApplicationController
     else
       @bookmark_rating.update_attribute('rating', params[:rating].to_i)
     end
-    redirect_to :action => 'list', :id => @bookmark.topic_id
+    redirect_to action: 'list', id: @bookmark.topic_id
   end
 end

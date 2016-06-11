@@ -15,13 +15,13 @@ gem 'delayed_job_active_record'
 gem 'dynamic_form'
 gem 'edavis10-ruby-web-search'
 gem 'engtagger'
-gem 'expertiza-authlogic', github: 'expertiza/authlogic', :require => 'authlogic'
+gem 'expertiza-authlogic', github: 'expertiza/authlogic', require: 'authlogic'
 gem 'fastercsv'
 gem 'ffi-aspell'
 gem 'font-awesome-rails'
-gem 'gchartrb', :require => 'google_chart'
-gem "googlecharts", :require => "gchart"
-gem 'gdata', :require => false
+gem 'gchartrb', require: 'google_chart'
+gem "googlecharts", require: "gchart"
+gem 'gdata', require: false
 gem 'graphviz'
 gem 'haml-rails'
 gem 'hoptoad_notifier'
@@ -42,10 +42,10 @@ gem 'rake'
 gem 'rb-readline'
 gem 'rest-client', '~> 1.8'
 gem 'RedCloth'
-gem 'rgl', :require => 'rgl/adjacency'
+gem 'rgl', require: 'rgl/adjacency'
 gem 'rjb'
 gem 'rubyzip'
-gem 'rwordnet','0.1.3'
+gem 'rwordnet', '0.1.3'
 gem 'scrypt'
 gem 'sass-rails', '5.0.3'
 gem 'seer'
@@ -89,5 +89,5 @@ end
 
 group :development, :test do
   gem 'capybara'
-  gem 'simplecov', :require => false
+  gem 'simplecov', require: false
 end

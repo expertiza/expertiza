@@ -9,7 +9,7 @@ class AdminController < ApplicationController
   end
 
   def list_instructors
-    @users = User.instructors.order(:name).where("parent_id = ?", current_user.id).paginate(:page => params[:page], :per_page => 50)
+    @users = User.instructors.order(:name).where("parent_id = ?", current_user.id).paginate(page: params[:page], per_page: 50)
   end
 
   def add_administrator
@@ -27,11 +27,11 @@ class AdminController < ApplicationController
   end
 
   def list_administrators
-    @users = User.admins.order(:name).where("parent_id = ?", current_user.id).paginate(:page => params[:page], :per_page => 50)
+    @users = User.admins.order(:name).where("parent_id = ?", current_user.id).paginate(page: params[:page], per_page: 50)
   end
 
   def list_users(conditions)
-    @users = User.order(:name).where(conditions).paginate(:page => params[:page], :per_page => 50)
+    @users = User.order(:name).where(conditions).paginate(page: params[:page], per_page: 50)
   end
 
   def new_super_administrator
@@ -46,7 +46,7 @@ class AdminController < ApplicationController
     @user = User.find(params[:id])
     @role = Role.find(@user.role_id)
   end
-  
+
   def show_super_admin
     @user = User.find(params[:id])
     @role = Role.find(@user.role_id)
@@ -59,14 +59,14 @@ class AdminController < ApplicationController
 
   def remove_instructor
     User.find(params[:id]).destroy
-    redirect_to :action => 'list_instructors'
+    redirect_to action: 'list_instructors'
   end
 
   def remove_administrator
     User.find(params[:id]).destroy
-    redirect_to :action => 'list_administrators'
+    redirect_to action: 'list_administrators'
   end
-  
+
   def save_super_administrator
     PgUsersController.create(Role.superadministrator.id, :admin_controller, :list_super_administrators, :new_super_administrator)
   end

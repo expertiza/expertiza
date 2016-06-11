@@ -6,6 +6,4 @@ class Permission < ActiveRecord::Base
 
   has_many :content_pages
   has_many :controller_actions
-  
-
 end

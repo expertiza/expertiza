@@ -1,5 +1,4 @@
 class VersionsController < ApplicationController
-
   def index
     redirect_to '/versions/search'
   end
@@ -30,19 +29,18 @@ class VersionsController < ApplicationController
     redirect_to versions_path, notice: "Your version has been deleted."
   end
 
-  before_filter :conflict? , :except => [:index,:destroy, :destroy_all]
+  before_action :conflict?, except: [:index, :destroy, :destroy_all]
   # test if someone else has edited the same item to undo
 
   def conflict?
     @version = Version.find_by_id(params[:id])
     if @version
-      @versions = Version.where( ["whodunnit = ? AND created_at = ?", @version.version_author, @version.created_at])
+      @versions = Version.where(["whodunnit = ? AND created_at = ?", @version.version_author, @version.created_at])
       @versions.each do |v|
-        if v.item
-          if v.item.versions.last.whodunnit.to_i != session[:user].id
-            flash[:note] = "User #{User.find(v.item.versions.last.whodunnit).name} has edited this item since your last edit. "
-            redirect_to :back
-          end
+        next unless v.item
+        if v.item.versions.last.whodunnit.to_i != session[:user].id
+          flash[:note] = "User #{User.find(v.item.versions.last.whodunnit).name} has edited this item since your last edit. "
+          redirect_to :back
         end
       end
     end
@@ -51,10 +49,10 @@ class VersionsController < ApplicationController
   def revert
     @version = Version.find(params[:id])
     # find all new versions created by current user at one single action
-    @versions = Version.where( ["whodunnit = ? AND created_at BETWEEN ? AND ?", @version.version_author,@version.created_at-1.0,@version.created_at + 1.0] )
+    @versions = Version.where(["whodunnit = ? AND created_at BETWEEN ? AND ?", @version.version_author, @version.created_at - 1.0, @version.created_at + 1.0])
     @iteration = 0
     # due to association constraints, the
-    while @versions.length != 0 and @iteration <= 5
+    while !@versions.empty? and @iteration <= 5
       @versions_clone = @versions.clone
       @versions_clone.each do |v|
         if v.reify
@@ -65,9 +63,7 @@ class VersionsController < ApplicationController
             @versions.delete(v)
           end
         else
-          if v.item
-            v.item.destroy
-          end
+          v.item.destroy if v.item
           @versions.delete(v)
         end
       end
@@ -85,18 +81,18 @@ class VersionsController < ApplicationController
   end
 
   # For filtering the versions list with proper search and pagination.
-  def paginate_list(id, user_id, item_type, event, datetime)
+  def paginate_list(id, user_id, item_type, event, _datetime)
     # Set up the search criteria
     criteria = ''
-    criteria = criteria + "id = #{id} AND " if id && id.to_i > 0
+    criteria += "id = #{id} AND " if id && id.to_i > 0
     if current_user_role? == 'Super-Administrator'
-      criteria = criteria + "whodunnit = #{user_id} AND " if user_id && user_id.to_i > 0
+      criteria += "whodunnit = #{user_id} AND " if user_id && user_id.to_i > 0
     end
-    criteria = criteria + "whodunnit = #{current_user.try(:id)} AND " if current_user.try(:id) && current_user.try(:id).to_i > 0
-    criteria = criteria + "item_type = '#{item_type}' AND " if item_type && !(item_type.eql? 'Any')
-    criteria = criteria + "event = '#{event}' AND " if event && !(event.eql? 'Any')
-    criteria = criteria + "created_at >= '#{time_to_string(params[:start_time])}' AND "
-    criteria = criteria + "created_at <= '#{time_to_string(params[:end_time])}' AND "
+    criteria += "whodunnit = #{current_user.try(:id)} AND " if current_user.try(:id) && current_user.try(:id).to_i > 0
+    criteria += "item_type = '#{item_type}' AND " if item_type && !(item_type.eql? 'Any')
+    criteria += "event = '#{event}' AND " if event && !(event.eql? 'Any')
+    criteria += "created_at >= '#{time_to_string(params[:start_time])}' AND "
+    criteria += "created_at <= '#{time_to_string(params[:end_time])}' AND "
 
     if current_role == 'Instructor' || current_role == 'Administrator'
 
@@ -110,6 +106,6 @@ class VersionsController < ApplicationController
   end
 
   def time_to_string(time)
-    "#{time.gsub('/', '-')}:00"
+    "#{time.tr('/', '-')}:00"
   end
 end

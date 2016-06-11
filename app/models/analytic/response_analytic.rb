@@ -6,7 +6,7 @@ module ResponseAnalytic
 
   #====== score =======#
   def average_score
-    question_score_list.inject(:+)/num_questions
+    question_score_list.inject(:+) / num_questions
   end
 
   def max_question_score
@@ -23,7 +23,7 @@ module ResponseAnalytic
   end
 
   def average_word_count
-    total_word_count.to_f/num_questions
+    total_word_count.to_f / num_questions
   end
 
   def max_word_count
@@ -40,7 +40,7 @@ module ResponseAnalytic
   end
 
   def average_character_count
-    total_character_count.to_f/num_questions
+    total_character_count.to_f / num_questions
   end
 
   def max_character_count
@@ -52,13 +52,14 @@ module ResponseAnalytic
   end
 
   private
-  #return an array of strings containing the word count of al the comments
+
+  # return an array of strings containing the word count of al the comments
   def word_count_list
-    list = Array.new
+    list = []
     self.scores.each do |score|
       list << score.word_count
     end
-    if (list.empty?)
+    if list.empty?
       [0]
     else
       list
@@ -66,37 +67,36 @@ module ResponseAnalytic
   end
 
   def character_count_list
-    list = Array.new
+    list = []
     self.scores.each do |score|
       list << score.character_count
     end
-    if (list.empty?)
+    if list.empty?
       [0]
     else
       list
     end
   end
 
-  #return score for all of the questions in an array
+  # return score for all of the questions in an array
   def question_score_list
-    list = Array.new
+    list = []
     self.scores.each do |score|
       list << score.score
     end
-    if (list.empty?)
+    if list.empty?
       [0]
     else
       list
     end
   end
 
-  #return an array of strings containing all of the comments
+  # return an array of strings containing all of the comments
   def comments_text_list
-    comments_list = Array.new
+    comments_list = []
     self.scores.each do |score|
       comments_list << score.comments
     end
     comments_list
   end
-
 end

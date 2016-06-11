@@ -12,12 +12,12 @@ class SiteController < ActiveRecord::Base
     @actions ||= controller_actions.order(:name)
   end
 
-  def self.find_or_create_by_name (params)
+  def self.find_or_create_by_name(params)
     SiteController.find_or_create_by(name: params)
   end
 
   def self.classes
-    classes = Hash.new
+    classes = {}
 
     ObjectSpace.each_object(Class) do |klass|
       if klass.respond_to?(:controller_name) && klass.superclass.to_s == ApplicationController.to_s

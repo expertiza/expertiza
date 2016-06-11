@@ -1,7 +1,5 @@
 module PenaltyHelper
-
   def calculate_penalty(participant_id)
-
     @submission_deadline_type_id = 1
     @review_deadline_type_id = 2
     @meta_review_deadline_type_id = 5
@@ -17,15 +15,15 @@ module PenaltyHelper
     penalties = Hash.new(0)
 
     calculate_penalty = @assignment.calculate_penalty
-    if (calculate_penalty == true)             # TODO add calculate_penalty column to the assignment table and use its value to check if the penalty is to be calculated for the assignment or not
+    if calculate_penalty == true # TODO: add calculate_penalty column to the assignment table and use its value to check if the penalty is to be calculated for the assignment or not
       topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
       stage = @assignment.get_current_stage(topic_id)
-      if (stage == "Finished")
-        penalties[:submission] = calculate_submission_penalty()
-        penalties[:review] = calculate_review_penalty()
-        penalties[:meta_review] = calculate_meta_review_penalty()
-        #penalties[:author_feedback] = calculate_author_feedback_penalty()
-        #penalties[:team_mate_feedback] = calculate_team_feedback_penalty()
+      if stage == "Finished"
+        penalties[:submission] = calculate_submission_penalty
+        penalties[:review] = calculate_review_penalty
+        penalties[:meta_review] = calculate_meta_review_penalty
+        # penalties[:author_feedback] = calculate_author_feedback_penalty()
+        # penalties[:team_mate_feedback] = calculate_team_feedback_penalty()
       end
     else
       penalties[:submission] = 0
@@ -36,7 +34,7 @@ module PenaltyHelper
     penalties
   end
 
-  def set_penalty_policy()
+  def set_penalty_policy
     @late_policy = Assignment.find(@assignment_id).late_policy
     @late_policy.max_penalty
   end
@@ -47,56 +45,55 @@ module PenaltyHelper
     submission_due_date = DueDate.where(deadline_type_id: @submission_deadline_type_id, assignment_id:  @assignment.id).first.due_at
 
     resubmission_times = @participant.resubmission_times
-    if(resubmission_times.any?)
-      last_submission_time = resubmission_times.at(resubmission_times.size-1).resubmitted_at
-      if(last_submission_time > submission_due_date)
-        if(@penalty_unit == 'Minute')
-          penalty_minutes = ((last_submission_time - submission_due_date))/60
-        elsif(@penalty_unit == 'Hour')
-          penalty_minutes = ((last_submission_time - submission_due_date))/3600
-        elsif(@penalty_unit == 'Day')
-          penalty_minutes = ((last_submission_time - submission_due_date))/86400
+    if resubmission_times.any?
+      last_submission_time = resubmission_times.at(resubmission_times.size - 1).resubmitted_at
+      if last_submission_time > submission_due_date
+        if @penalty_unit == 'Minute'
+          penalty_minutes = ((last_submission_time - submission_due_date)) / 60
+        elsif @penalty_unit == 'Hour'
+          penalty_minutes = ((last_submission_time - submission_due_date)) / 3600
+        elsif @penalty_unit == 'Day'
+          penalty_minutes = ((last_submission_time - submission_due_date)) / 86_400
         end
         penalty_for_submission = penalty_minutes * @penalty_per_unit
-        if (penalty_for_submission > @max_penalty_for_no_submission)
-          penalty = @max_penalty_for_no_submission
-        else
-          penalty = penalty_for_submission
-        end
+        penalty = if penalty_for_submission > @max_penalty_for_no_submission
+                    @max_penalty_for_no_submission
+                  else
+                    penalty_for_submission
+                  end
       end
     else
       penalty = @max_penalty_for_no_submission
     end
   end
 
-  def calculate_review_penalty()
-
+  def calculate_review_penalty
     penalty = 0
     num_of_reviews_required = @assignment.num_reviews
-    if (num_of_reviews_required > 0)
+    if num_of_reviews_required > 0
 
-      #reviews
+      # reviews
       review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
 
       review_due_date = DueDate.where(deadline_type_id: @review_deadline_type_id, assignment_id:  @assignment.id).first
 
-      if(review_due_date != nil)
+      unless review_due_date.nil?
         penalty = compute_penalty_on_reviews(review_mappings, review_due_date.due_at, num_of_reviews_required)
       end
     end
     penalty
   end
 
-  def calculate_meta_review_penalty()
+  def calculate_meta_review_penalty
     penalty = 0
     num_of_meta_reviews_required = @assignment.num_review_of_reviews
-    if (num_of_meta_reviews_required > 0)
+    if num_of_meta_reviews_required > 0
 
       meta_review_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
 
       meta_review_due_date = DueDate.where(deadline_type_id: @meta_review_deadline_type_id, assignment_id:  @assignment.id).first
 
-      if(meta_review_due_date != nil)
+      unless meta_review_due_date.nil?
         penalty = compute_penalty_on_reviews(meta_review_mappings, meta_review_due_date.due_at, num_of_meta_reviews_required)
       end
     end
@@ -114,13 +111,12 @@ module PenaltyHelper
   end
 
   def compute_penalty_on_reviews(review_mappings, review_due_date, num_of_reviews_required)
-
-    review_map_created_at_list = Array.new
+    review_map_created_at_list = []
 
     ## Calculate the number of reviews that the user has completed so far.
-    #num_of_reviews_completed_before_deadline = 0
-    #num_of_reviews_completed = 0
-    #review_mappings.each do |map|
+    # num_of_reviews_completed_before_deadline = 0
+    # num_of_reviews_completed = 0
+    # review_mappings.each do |map|
     #  created_at = Response.find_by_map_id(map.id).created_at
     #  num_of_reviews_completed += 1 if map.response
     #  if(created_at < review_due_date)
@@ -128,15 +124,15 @@ module PenaltyHelper
     #  else
     #    review_map_created_at_after_due_date_list <<  created_at
     #  end
-    #end
+    # end
     #
-    #review_map_created_at_after_due_date_list.sort!
+    # review_map_created_at_after_due_date_list.sort!
     #
-    #penalty = 0
+    # penalty = 0
     ## assign max penalty for all the reviews which are not completed
-    #if(num_of_reviews_completed_before_deadline >= num_of_reviews_required)
+    # if(num_of_reviews_completed_before_deadline >= num_of_reviews_required)
     #  # no need to calculate the penalty
-    #else
+    # else
     #  # assign maximum penalty for uncompleted reviews
     #  if(num_of_reviews_required > num_of_reviews_completed)
     #    penalty += (num_of_reviews_required - num_of_reviews_completed) * @max_penalty_per_missed_review
@@ -146,16 +142,16 @@ module PenaltyHelper
     #      penalty += (review_map_created_at_after_due_date_list[i] - review_due_date) * @penalty_per_unit
     #    end
     #  end
-    #end
-    #penalty
+    # end
+    # penalty
 
     penalty = 0
 
     # Calculate the number of reviews that the user has completed so far.
     review_mappings.each do |map|
-      if !map.response.empty?
+      unless map.response.empty?
         created_at = Response.find_by_map_id(map.id).created_at
-        review_map_created_at_list <<  created_at
+        review_map_created_at_list << created_at
       end
     end
 
@@ -163,17 +159,17 @@ module PenaltyHelper
 
     for i in 0...num_of_reviews_required
       if review_map_created_at_list.at(i)
-        if (review_map_created_at_list.at(i) > review_due_date)
+        if review_map_created_at_list.at(i) > review_due_date
 
-          if(@penalty_unit == 'Minute')
-            penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date))/60
-          elsif(@penalty_unit == 'Hour')
-            penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date))/3600
-          elsif(@penalty_unit == 'Day')
-            penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date))/86400
+          if @penalty_unit == 'Minute'
+            penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date)) / 60
+          elsif @penalty_unit == 'Hour'
+            penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date)) / 3600
+          elsif @penalty_unit == 'Day'
+            penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date)) / 86_400
           end
           penalty_for_this_review = penalty_minutes * @penalty_per_unit
-          if (penalty_for_this_review > @max_penalty_for_no_submission)
+          if penalty_for_this_review > @max_penalty_for_no_submission
             penalty = @max_penalty_for_no_submission
           else
             penalty += penalty_for_this_review

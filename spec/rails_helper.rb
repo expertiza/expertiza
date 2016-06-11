@@ -12,7 +12,7 @@ require 'capybara/rails'
 # run twice. It is recommended that you do not name files matching this glob to
 # end with _spec.rb. You can configure this pattern with the --pattern
 # option on the command line or in ~/.rspec, .rspec or `.rspec-local`.
-Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
+Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f }
 
 # Checks for pending migrations before tests are run.
 # If you are not using ActiveRecord, you can remove this line.
@@ -30,7 +30,7 @@ RSpec.configure do |config|
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
   end
-   config.before(:each) do |example|
+  config.before(:each) do |_example|
     DatabaseCleaner.strategy = :truncation
     DatabaseCleaner.start
   end
@@ -38,8 +38,6 @@ RSpec.configure do |config|
   config.after(:each) do
     DatabaseCleaner.clean
   end
-
-
 
   # RSpec Rails can automatically mix in different behaviours to your tests
   # based on their file location, for example enabling you to call `get` and
@@ -59,7 +57,7 @@ RSpec.configure do |config|
   def login_as(user_name)
     user = User.find_by_name(user_name)
     msg = user.to_yaml
-    File.open('log/diagnostic.txt', 'a') { |f| f.write msg }
+    File.open('log/diagnostic.txt', 'a') {|f| f.write msg }
 
     visit root_path
     fill_in 'login_name', with: user_name
@@ -68,10 +66,9 @@ RSpec.configure do |config|
     stub_current_user(user, user.role.name, user.role)
   end
 
-  def stub_current_user(current_user, current_role_name='Student', current_role)
+  def stub_current_user(current_user, current_role_name = 'Student', current_role)
     allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(current_user)
     allow_any_instance_of(ApplicationController).to receive(:current_role_name).and_return(current_role_name)
     allow_any_instance_of(ApplicationController).to receive(:current_role).and_return(current_role)
   end
 end
-

@@ -5,12 +5,10 @@ class MetareviewQuestionnaire < Questionnaire
   end
 
   def symbol
-    return "metareview".to_sym
+    "metareview".to_sym
   end
 
   def get_assessments_for(participant)
-    participant.metareviews()
+    participant.metareviews
   end
-
-
 end

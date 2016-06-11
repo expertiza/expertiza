@@ -5,7 +5,7 @@
 # functionality). These methods are invoked when called by any activeRecord object(row) of
 # questionnaires table with type 'Rubric'
 
-class  Rubric < Questionnaire
+class Rubric < Questionnaire
   # for doc on why we do it this way,
   # see http://blog.hasmanythrough.com/2007/1/15/basic-rails-association-cardinality
 
@@ -15,7 +15,6 @@ class  Rubric < Questionnaire
   validates_numericality_of :min_question_score
 
   def update_mapping
-    redirect_to :action => 'list' ,:type_id=> type_id
+    redirect_to action: 'list', type_id: type_id
   end
-
   end

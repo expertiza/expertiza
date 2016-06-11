@@ -2,7 +2,6 @@
 # Many of the methods were moved to leaderboard_helper.rb and more
 # probably should be moved.
 class Leaderboard < ActiveRecord::Base
-
   # This module is not really required, but can be helpful when
   # using the script/console and needing to print hash structures.
   require 'pp'
@@ -13,20 +12,19 @@ class Leaderboard < ActiveRecord::Base
 
   ### This methodreturns unaffiliiated assignments - assignments not affiliated to any course
   def self.getIndependantAssignments(user_id)
-    assignmentIds = AssignmentParticipant.where(:user_id => user_id).pluck(:parent_id)
-    noCourseAssignments = Assignment.where(:id => assignmentIds, :course_id => nil)
+    assignmentIds = AssignmentParticipant.where(user_id: user_id).pluck(:parent_id)
+    noCourseAssignments = Assignment.where(id: assignmentIds, course_id: nil)
   end
 
-
   def self.getAssignmentsInCourses(courseArray)
-    assignmentList = Assignment.where(:course_id => courseArray)
+    assignmentList = Assignment.where(course_id: courseArray)
   end
 
   # This method gets all tuples in the Participants table associated
   # hierarchy (qtype => course => user => score)
 
   def self.getParticipantEntriesInCourses(courseArray, user_id)
-    assignmentList = Array.new
+    assignmentList = []
     assignmentList = getAssignmentsInCourses(courseArray)
     independantAssignments = getIndependantAssignments(user_id)
     assignmentList.concat(independantAssignments)
@@ -37,7 +35,7 @@ class Leaderboard < ActiveRecord::Base
   # This method gets all tuples in the Participants table associated
   # hierarchy (qtype => course => user => score).
   def self.getParticipantEntriesInAssignment(assignmentID)
-    assignmentList = Array.new
+    assignmentList = []
     assignmentList << Assignment.find(assignmentID)
     questionnaireHash = getParticipantEntriesInAssignmentList(assignmentList)
   end
@@ -45,7 +43,7 @@ class Leaderboard < ActiveRecord::Base
   # This method returns the participants score grouped by course, grouped by questionnaire type.
   # End result is a hash (qType => (course => (user => score)))
   def self.getParticipantsScore(assignmentList)
-    qTypeHash = Hash.new
+    qTypeHash = {}
     questionnaireResponseTypeHash = {"ReviewResponseMap" => "ReviewQuestionnaire",
                                      "MetareviewResponseMap" => "MetareviewQuestionnaire",
                                      "FeedbackResponseMap" => "AuthorFeedbackQuestionnaire",
@@ -53,7 +51,7 @@ class Leaderboard < ActiveRecord::Base
                                      "BookmarkRatingResponseMap" => "BookmarkRatingQuestionnaire"}
 
     # Get all participants of the assignment list
-    participantList = AssignmentParticipant.where(:parent_id => assignmentList.pluck(:id)).uniq
+    participantList = AssignmentParticipant.where(parent_id: assignmentList.pluck(:id)).uniq
 
     # Get all teams participated in the given assignment list.
     teamList = Team.where("parent_id IN (?) AND type = ?", assignmentList.pluck(:id), 'AssignmentTeam').uniq
@@ -64,7 +62,7 @@ class Leaderboard < ActiveRecord::Base
     assignmentMap = getAssignmentMapping(assignmentList, participantList, teamList)
 
     # Aggregate total reviewee list
-    revieweeList = Array.new
+    revieweeList = []
     revieweeList = participantList.pluck(:id)
     revieweeList.concat(teamList.pluck(:id)).uniq!
 
@@ -72,10 +70,10 @@ class Leaderboard < ActiveRecord::Base
     scores = ScoreCache.where("reviewee_id IN (?) and object_type IN (?)", revieweeList, questionnaireResponseTypeHash.keys)
 
     for scoreEntry in scores
-      revieweeUserIdList = Array.new
-      if(assignmentMap["team"].has_key?(scoreEntry.reviewee_id))
+      revieweeUserIdList = []
+      if assignmentMap["team"].key?(scoreEntry.reviewee_id)
         # Reviewee is a team. Actual Reviewee will be users of the team.
-        teamUserIds = TeamsUser.where(:team_id => scoreEntry.reviewee_id).pluck(:user_id)
+        teamUserIds = TeamsUser.where(team_id: scoreEntry.reviewee_id).pluck(:user_id)
         revieweeUserIdList.concat(teamUserIds)
         courseId = assignmentMap["team"][scoreEntry.reviewee_id].try(:course_id).to_i
       else
@@ -99,12 +97,12 @@ class Leaderboard < ActiveRecord::Base
       # Loop over all the revieweeUserId.
       for revieweeUserId in revieweeUserIdList
         if qTypeHash.fetch(questionnaireType, {}).fetch(courseId, {}).fetch(revieweeUserId, nil).nil?
-          userHash = Hash.new
+          userHash = {}
           userHash[revieweeUserId] = [scoreEntryScore, 1]
 
           if qTypeHash.fetch(questionnaireType, {}).fetch(courseId, nil).nil?
             if qTypeHash.fetch(questionnaireType, nil).nil?
-              courseHash = Hash.new
+              courseHash = {}
               courseHash[courseId] = userHash
 
               qTypeHash[questionnaireType] = courseHash
@@ -128,16 +126,16 @@ class Leaderboard < ActiveRecord::Base
   # This method creates a mapping of participant and team with corresponding assignment.
   # "participant" => {participantId => {"self" => <ParticipantRecord>, "assignment" => <AssignmentRecord>}}
   # "team" => {teamId => <AssignmentRecord>}
-   def self.getAssignmentMapping(assignmentList, participantList, teamList)
+  def self.getAssignmentMapping(assignmentList, participantList, teamList)
     resultHash = {"participant" => {}, "team" => {}}
-    assignmentHash = Hash.new
+    assignmentHash = {}
     # Hash all the assignments for later fetching them by assignment.id
     for assignment in assignmentList
       assignmentHash[assignment.id] = assignment
     end
     # Loop over all the participants to get corresponding assignment by parent_id
     for participant in participantList
-      resultHash["participant"][participant.id] = Hash.new
+      resultHash["participant"][participant.id] = {}
       resultHash["participant"][participant.id]["self"] = participant
       resultHash["participant"][participant.id]["assignment"] = assignmentHash[participant.parent_id]
     end
@@ -147,21 +145,21 @@ class Leaderboard < ActiveRecord::Base
     end
 
     resultHash
-  end
+ end
 
   # This method does a destructive sort on the computed scores hash so
   # that it can be mined for personal achievement information
   def self.sortHash(qTypeHash)
-    result = Hash.new
+    result = {}
     # Deep-copy of Hash
     result = Marshal.load(Marshal.dump(qTypeHash))
 
-    result.each { |qType, courseHash|
-      courseHash.each { |courseId, userScoreHash|
-        userScoreSortArray = userScoreHash.sort { |a, b| b[1][0] <=> a[1][0]}
+    result.each do |qType, courseHash|
+      courseHash.each do |courseId, userScoreHash|
+        userScoreSortArray = userScoreHash.sort {|a, b| b[1][0] <=> a[1][0] }
         result[qType][courseId] = userScoreSortArray
-      }
-    }
+      end
+    end
     result
   end
 
@@ -169,9 +167,9 @@ class Leaderboard < ActiveRecord::Base
   # it for personal achievement information.
   def self.extractPersonalAchievements(csHash, courseIdList, userId)
     # Get all the possible accomplishments from Leaderboard table
-    leaderboardRecords = Leaderboard.all()
-    courseAccomplishmentHash = Hash.new
-    accomplishmentMap = Hash.new
+    leaderboardRecords = Leaderboard.all
+    courseAccomplishmentHash = {}
+    accomplishmentMap = {}
 
     # Create map of accomplishment with its name
     for leaderboardRecord in leaderboardRecords
@@ -184,19 +182,17 @@ class Leaderboard < ActiveRecord::Base
       for accomplishment in accomplishmentMap.keys
         # Get score for current questionnaireType/accomplishment, courseId and userId from csHash
         score = csHash.fetch(accomplishment, {}).fetch(courseId, {}).fetch(userId, nil)
-        if(score)
-          if courseAccomplishmentHash[courseId].nil?
-            courseAccomplishmentHash[courseId] = Array.new
-          end
-          # Calculate rank of current user
-          rank = 1 + csSortedHash[accomplishment][courseId].index([userId, score])
-          total = csSortedHash[accomplishment][courseId].length
-
-          courseAccomplishmentHash[courseId] << {:accomp => accomplishmentMap[accomplishment],
-                                                 :score => score[0],
-                                                 :rankStr => "#{rank} of #{total}"
-          }
+        next unless score
+        if courseAccomplishmentHash[courseId].nil?
+          courseAccomplishmentHash[courseId] = []
         end
+        # Calculate rank of current user
+        rank = 1 + csSortedHash[accomplishment][courseId].index([userId, score])
+        total = csSortedHash[accomplishment][courseId].length
+
+        courseAccomplishmentHash[courseId] << {accomp: accomplishmentMap[accomplishment],
+                                               score: score[0],
+                                               rankStr: "#{rank} of #{total}"}
       end
     end
     courseAccomplishmentHash
@@ -211,5 +207,4 @@ class Leaderboard < ActiveRecord::Base
       "No Entry"
     end
   end
-
 end

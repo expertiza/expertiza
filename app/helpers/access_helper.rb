@@ -19,6 +19,6 @@ module AccessHelper
   end
 
   def action_allowed?
-    #default action_allowed is nil. So to allow any action, we need to override this in the controller.
+    # default action_allowed is nil. So to allow any action, we need to override this in the controller.
   end
 end

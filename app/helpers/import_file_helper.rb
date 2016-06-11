@@ -1,7 +1,6 @@
 require 'csv'
 
 module ImportFileHelper
-
   def self.define_attributes(row)
     attributes = {}
     attributes["role_id"] = Role.student.id
@@ -22,5 +21,3 @@ module ImportFileHelper
     user
   end
 end
-
-

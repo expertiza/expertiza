@@ -7,16 +7,15 @@ class InstitutionController < ApplicationController
 
   def index
     list
-    render :action => 'list'
+    render action: 'list'
   end
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
-  verify :method => :post, :only => [ :destroy, :create, :update ],
-    :redirect_to => { :action => :list }
+  verify method: :post, only: [:destroy, :create, :update],
+         redirect_to: {action: :list}
 
   def list
-    @institutions = Institution.all 
-
+    @institutions = Institution.all
   end
 
   def show
@@ -28,13 +27,13 @@ class InstitutionController < ApplicationController
   end
 
   def create
-    @institution = Institution.new(:name => params[:institution][:name])
+    @institution = Institution.new(name: params[:institution][:name])
     if @institution.save
       flash[:success] = 'The institution was successfully created.'
-      redirect_to :action => 'list'
+      redirect_to action: 'list'
     else
       flash[:error] = 'The creation of the institution failed.'
-      render :action => 'new'
+      render action: 'new'
     end
   end
 
@@ -44,17 +43,17 @@ class InstitutionController < ApplicationController
 
   def update
     @institution = Institution.find(params[:id])
-    if @institution.update_attribute(:name,params[:institution][:name])
+    if @institution.update_attribute(:name, params[:institution][:name])
 
       flash[:success] = 'The institution was successfully updated.'
-      redirect_to :action => 'list'
+      redirect_to action: 'list'
     else
-      render :action => 'edit'
+      render action: 'edit'
     end
   end
 
   def delete
     Institution.find(params[:id]).destroy
-    redirect_to :action => 'list'
+    redirect_to action: 'list'
   end
 end

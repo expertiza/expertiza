@@ -18,7 +18,7 @@ module CourseAnalytic
     if num_assignments == 0
       0
     else
-      total_num_assignment_teams.to_f/num_assignments
+      total_num_assignment_teams.to_f / num_assignments
     end
   end
 
@@ -35,7 +35,7 @@ module CourseAnalytic
     if num_assignments == 0
       0
     else
-      assignment_average_scores.inject(:+).to_f/num_assignments
+      assignment_average_scores.inject(:+).to_f / num_assignments
     end
   end
 
@@ -49,11 +49,11 @@ module CourseAnalytic
 
   #======= reviews =======#
   def assignment_review_counts
-    list = Array.new
+    list = []
     self.assignments.each do |assignment|
       list << assignment.total_num_team_reviews
     end
-    if (list.empty?)
+    if list.empty?
       [0]
     else
       list
@@ -65,7 +65,7 @@ module CourseAnalytic
   end
 
   def average_num_assignment_reviews
-    total_num_assignment_reviews.to_f/num_assignments
+    total_num_assignment_reviews.to_f / num_assignments
   end
 
   def max_num_assignment_reviews
@@ -76,13 +76,12 @@ module CourseAnalytic
     assignment_review_counts.min
   end
 
-
   def assignment_team_counts
-    list = Array.new
+    list = []
     self.assignments.each do |assignment|
       list << assignment.num_teams
     end
-    if (list.empty?)
+    if list.empty?
       [0]
     else
       list
@@ -90,11 +89,11 @@ module CourseAnalytic
   end
 
   def assignment_average_scores
-    list = Array.new
+    list = []
     self.assignments.each do |assignment|
       list << assignment.average_team_score
     end
-    if (list.empty?)
+    if list.empty?
       [0]
     else
       list
@@ -102,11 +101,11 @@ module CourseAnalytic
   end
 
   def assignment_max_scores
-    list = Array.new
+    list = []
     self.assignments.each do |assignment|
       list << assignment.max_team_score
     end
-    if (list.empty?)
+    if list.empty?
       [0]
     else
       list
@@ -114,20 +113,19 @@ module CourseAnalytic
   end
 
   def assignment_min_scores
-    list = Array.new
+    list = []
     self.assignments.each do |assignment|
       list << assignment.min_team_score
     end
-    if (list.empty?)
+    if list.empty?
       [0]
     else
       list
     end
   end
 
-
   #=============== unused ============#
-  #def students
+  # def students
   #  students = Array.new
   #  self.participants.each do |participant|
   #    if participant.user.role_id == Role.student.id
@@ -135,9 +133,9 @@ module CourseAnalytic
   #    end
   #  end
   #  student
-  #end
+  # end
   #
-  #def num_students
+  # def num_students
   #  self.students.count
-  #end
+  # end
 end

@@ -1,13 +1,13 @@
 class Response < ActiveRecord::Base
-  belongs_to :response_map, :class_name => 'ResponseMap', :foreign_key => 'map_id'
-  has_many :scores, :class_name => 'Answer', :foreign_key => 'response_id', :dependent => :destroy
-  has_many :metareview_response_maps, :class_name => 'MetareviewResponseMap', :foreign_key => 'reviewed_object_id', dependent: :destroy
+  belongs_to :response_map, class_name: 'ResponseMap', foreign_key: 'map_id'
+  has_many :scores, class_name: 'Answer', foreign_key: 'response_id', dependent: :destroy
+  has_many :metareview_response_maps, class_name: 'MetareviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy
 
-  alias_method :map, :response_map
+  alias map response_map
 
   attr_accessor :difficulty_rating
 
-  delegate :questionnaire, :reviewee, :reviewer, :to => :map
+  delegate :questionnaire, :reviewee, :reviewer, to: :map
 
   def response_id
     id
@@ -17,7 +17,7 @@ class Response < ActiveRecord::Base
     reviewer.team.has_user user
   end
 
-  def display_as_html(prefix = nil, count = nil, file_url = nil)
+  def display_as_html(prefix = nil, count = nil, _file_url = nil)
     identifier = ""
     # The following three lines print out the type of rubric before displaying
     # feedback.  Currently this is only done if the rubric is Author Feedback.
@@ -28,81 +28,79 @@ class Response < ActiveRecord::Base
     if self.map.type.to_s == 'FeedbackResponseMap'
       identifier += "<h3>Feedback from author</h3>"
     end
-    if prefix #has prefix means view_score page in instructor end
-      identifier += '<h4><B>Review ' + count.to_s+'</B></h4>'
-      identifier += "<B>Reviewer: </B>" +self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
-      str = prefix+"_"+self.id.to_s
-    else #in student end
-      identifier += '<B>Review ' + count.to_s+'</B>'
+    if prefix # has prefix means view_score page in instructor end
+      identifier += '<h4><B>Review ' + count.to_s + '</B></h4>'
+      identifier += "<B>Reviewer: </B>" + self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
+      str = prefix + "_" + self.id.to_s
+    else # in student end
+      identifier += '<B>Review ' + count.to_s + '</B>'
       str = self.id.to_s
     end
-    code = identifier+'&nbsp;&nbsp;&nbsp;<a href="#" name= "review_'+str+'Link" onClick="toggleElement('+"'review_"+str+"','review'"+');return false;">show review</a><BR/>'
+    code = identifier + '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + str + 'Link" onClick="toggleElement(' + "'review_" + str + "','review'" + ');return false;">show review</a><BR/>'
     code += "<B>Last reviewed: </B> "
-    if self.updated_at.nil?
-      code += "Not available"
-    else
-      code += self.updated_at.strftime('%A %B %d %Y, %I:%M%p')
-    end
-    code += '<table id="review_'+str+'" style="display: none;" class="table table-bordered">'
+    code += if self.updated_at.nil?
+              "Not available"
+            else
+              self.updated_at.strftime('%A %B %d %Y, %I:%M%p')
+            end
+    code += '<table id="review_' + str + '" style="display: none;" class="table table-bordered">'
     count = 0
     answers = Answer.where(response_id: self.response_id)
 
     questionnaire = self.questionnaire_by_answer(answers.first)
 
     questionnaire_max = questionnaire.max_question_score
-    questions=questionnaire.questions.sort { |a,b| a.seq <=> b.seq }
-    #loop through questions so the the questions are displayed in order based on seq (sequence number)
+    questions = questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
+    # loop through questions so the the questions are displayed in order based on seq (sequence number)
     questions.each do |question|
       count += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
-      answer = answers.find{|a| a.question_id==question.id}
-      row_class = if count%2 == 0 then "info" else "warning" end
-      if question.is_a? QuestionnaireHeader 
-        row_class = ""
-      end
-      
+      answer = answers.find {|a| a.question_id == question.id }
+      row_class = count.even? ? "info" : "warning"
+      row_class = "" if question.is_a? QuestionnaireHeader
+
       code += '<tr class="' + row_class + '"><td>'
       if !answer.nil? or question.is_a? QuestionnaireHeader
-        if question.instance_of? Criterion or question.instance_of? Scale
-          code += question.view_completed_question(count,answer,questionnaire_max)
-        else
-          code += question.view_completed_question(count,answer)
-        end
+        code += if question.instance_of? Criterion or question.instance_of? Scale
+                  question.view_completed_question(count, answer, questionnaire_max)
+                else
+                  question.view_completed_question(count, answer)
+                end
       end
       code += '</td></tr>'
     end
 
-    if self.additional_comment != nil
-      comment = self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
-    else
-      comment = ''
-    end
-    code += "<tr><td><B>Additional Comment: </B>"+comment+'</td></tr>'
+    comment = if !self.additional_comment.nil?
+                self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
+              else
+                ''
+              end
+    code += "<tr><td><B>Additional Comment: </B>" + comment + '</td></tr>'
     code += "</table>"
-    return code.html_safe
+    code.html_safe
   end
 
   # Computes the total score awarded for a review
   def get_total_score
     # only count the scorable questions, only when the answer is not nil (we accept nil as answer for scorable questions, and they will not be counted towards the total score)
-    sum=0
+    sum = 0
     scores.each do |s|
       question = Question.find(s.question_id)
       if !s.answer.nil? && question.is_a?(ScoredQuestion)
-        sum += s.answer*question.weight
+        sum += s.answer * question.weight
       end
     end
     sum
   end
 
   def delete
-    self.scores.each { |score| score.destroy }
+    self.scores.each(&:destroy)
     self.destroy
   end
 
-  #bug fixed
+  # bug fixed
   # Returns the average score for this response as an integer (0-100)
-  def get_average_score()
-    if get_maximum_score != 0 then
+  def get_average_score
+    if get_maximum_score != 0
       ((get_total_score.to_f / get_maximum_score.to_f) * 100).round
     else
       "N/A"
@@ -110,29 +108,29 @@ class Response < ActiveRecord::Base
   end
 
   # Returns the maximum possible score for this response
-  def get_maximum_score()
+  def get_maximum_score
     # only count the scorable questions, only when the answer is not nil (we accept nil as answer for scorable questions, and they will not be counted towards the total score)
     total_weight = 0
     scores.each do |s|
       question = Question.find(s.question_id)
       if !s.answer.nil? && question.is_a?(ScoredQuestion)
-        total_weight+=question.weight
+        total_weight += question.weight
       end
     end
-    if scores.empty?
-      questionnaire = questionnaire_by_answer(nil)
-    else
-      questionnaire = questionnaire_by_answer(scores.first)
-    end
-    total_weight*questionnaire.max_question_score
+    questionnaire = if scores.empty?
+                      questionnaire_by_answer(nil)
+                    else
+                      questionnaire_by_answer(scores.first)
+                    end
+    total_weight * questionnaire.max_question_score
   end
 
   # Returns the total score from this response
-  def get_alternative_total_score()
-    # TODO The method get_total_score() above does not seem correct.  Replace with this method.
+  def get_alternative_total_score
+    # TODO: The method get_total_score() above does not seem correct.  Replace with this method.
     total_score = 0
 
-    self.scores.each { |score| total_score = total_score + score.score }
+    self.scores.each {|score| total_score += score.score }
 
     total_score
   end
@@ -160,14 +158,12 @@ class Response < ActiveRecord::Base
       # if the response is after a resubmission that is
       # before the latest_review_phase_start_time (check second condition below)
       # then we are good - the response is valid and we can break
-      if (self.updated_at > resubmission_time.resubmitted_at)
-        break
-      end
+      break if self.updated_at > resubmission_time.resubmitted_at
 
       # this means there was a re-submission before the
       # latest_review_phase_start_time and we dont have a response after that
       # so the response is invalid
-      if (resubmission_time.resubmitted_at < latest_review_phase_start_time)
+      if resubmission_time.resubmitted_at < latest_review_phase_start_time
         is_valid = false
         break
       end
@@ -177,30 +173,30 @@ class Response < ActiveRecord::Base
   end
 
   # only two types of responses more should be added
-  def email (partial="new_submission")
-    defn = Hash.new
-    defn[:body] = Hash.new
+  def email(partial = "new_submission")
+    defn = {}
+    defn[:body] = {}
     defn[:body][:partial_name] = partial
     response_map = ResponseMap.find map_id
-    assignment=nil
+    assignment = nil
 
-    reviewer_participant_id =  response_map.reviewer_id
+    reviewer_participant_id = response_map.reviewer_id
     participant = Participant.find(reviewer_participant_id)
     assignment = Assignment.find(participant.parent_id)
 
-    if response_map.type =="ReviewResponseMap"
+    if response_map.type == "ReviewResponseMap"
 
     end
 
-    defn[:subject] = "A new submission is available for "+assignment.name
+    defn[:subject] = "A new submission is available for " + assignment.name
     if response_map.type == "ReviewResponseMap"
       defn[:body][:type] = "Author Feedback"
       AssignmentTeam.find(response_map.reviewee_id).users.each do |user|
-        if assignment.has_topics?
-          defn[:body][:obj_name] = SignUpTopic.find(SignedUpTeam.topic_id(assignment.id, user.id)).topic_name
-        else
-          defn[:body][:obj_name] = assignment.name
-        end
+        defn[:body][:obj_name] = if assignment.has_topics?
+                                   SignUpTopic.find(SignedUpTeam.topic_id(assignment.id, user.id)).topic_name
+                                 else
+                                   assignment.name
+                                 end
         defn[:body][:first_name] = User.find(user.id).fullname
         defn[:to] = User.find(user.id).email
         Mailer.sync_message(defn).deliver_now
@@ -216,7 +212,7 @@ class Response < ActiveRecord::Base
       defn[:to] = User.find(reviewee_user.user_id).email
       Mailer.sync_message(defn).deliver
     end
-    if response_map.type == "FeedbackResponseMap" #This is authors' feedback from UI
+    if response_map.type == "FeedbackResponseMap" # This is authors' feedback from UI
       defn[:body][:type] = "Review Feedback"
       # reviewee is a response, reviewer is a participant
       # we need to track back to find the original reviewer on whose work the author comments
@@ -227,11 +223,11 @@ class Response < ActiveRecord::Base
 
       participant = AssignmentParticipant.find(original_reviewer_participant_id)
       topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
-      if topic_id.nil?
-        defn[:body][:obj_name] = assignment.name
-      else
-        defn[:body][:obj_name] = SignUpTopic.find(topic_id).topic_name
-      end
+      defn[:body][:obj_name] = if topic_id.nil?
+                                 assignment.name
+                               else
+                                 SignUpTopic.find(topic_id).topic_name
+                               end
 
       user = User.find(participant.user_id)
 
@@ -251,7 +247,7 @@ class Response < ActiveRecord::Base
     end
   end
 
-  def questionnaire_by_answer (answer)
+  def questionnaire_by_answer(answer)
     if !answer.nil? # for all the cases except the case that  file submission is the only question in the rubric.
       questionnaire = Question.find(answer.question_id).questionnaire
     else

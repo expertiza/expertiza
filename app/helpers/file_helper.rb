@@ -58,7 +58,7 @@ module FileHelper
     rescue PathError
       # No action required
     rescue
-      raise "An error was encountered while deleting the directory: "+$!
+      raise "An error occurred while deleting the directory: "+$!
     end
   end
 
@@ -69,7 +69,7 @@ module FileHelper
       end
     rescue PathError
     rescue
-      raise "An error was encountered while creating this directory: "+$!
+      raise "An error occurred while creating this directory: "+$!
     end
   end
 
@@ -80,7 +80,7 @@ module FileHelper
       end
     rescue PathError
     rescue
-      raise "An error was encountered while creating this directory: "+$!
+      raise "An error occurred while creating this directory: "+$!
     end
   end
 end

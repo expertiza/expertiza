@@ -23,7 +23,7 @@ class WaitlistsController < ApplicationController
   def create
     @waitlist = Waitlist.new(params[:waitlist])
     if @waitlist.save
-      flash[:notice] = 'The waitlist was successfully created.'
+      flash[:notice] = 'The wait list was successfully created.'
       redirect_to :action => 'list'
     else
       render :action => 'new'
@@ -37,7 +37,7 @@ class WaitlistsController < ApplicationController
   def update
     @waitlist = Waitlist.find(params[:id])
     if @waitlist.update_attributes(params[:waitlist])
-      flash[:notice] = 'The waitlist was successfully updated.'
+      flash[:notice] = 'The wait list was successfully updated.'
       redirect_to :action => 'show', :id => @waitlist
     else
       render :action => 'edit'

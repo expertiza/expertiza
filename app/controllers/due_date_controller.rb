@@ -10,12 +10,14 @@ class DueDateController < ApplicationController
 
   def delete_all
     if params[:assignment_id].nil?
-      return #TODO: add error message
+      flash[:error] = "Missing assignment:" + params[:assignment_id]
+      return
     end
 
     assignment = Assignment.find(params[:assignment_id])
     if assignment.nil?
-      return #TODO: add error message
+      flash[:error] = "Assignment #" + assignment.id + "does not currently exist."
+      return
     end
 
     @due_dates = DueDate.where(assignment_id: params[:assignment_id])
@@ -30,17 +32,20 @@ class DueDateController < ApplicationController
 
   def create
     if params[:assignment_id].nil?
-      return #TODO: add error message
+      flash[:error] = "Missing assignment:" + params[:assignment_id]
+      return
     end
 
     assignment = Assignment.find(params[:assignment_id])
     if assignment.nil?
-      return #TODO: add error message
+      flash[:error] = "Assignment #" + assignment.id + "does not currently exist."
+      return
     end
 
     due_at = DateTime.parse(params[:due_at])
     if due_at.nil?
-      return #TODO: add error message
+      flash[:error] = "You need to specify all due dates and times."
+      return
     end
 
     @due_date = DueDate.new(params)

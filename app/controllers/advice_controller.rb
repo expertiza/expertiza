@@ -37,7 +37,7 @@ class AdviceController < ApplicationController
         for advice_key in params[:advice].keys
           QuestionAdvice.update(advice_key, :advice=>params[:advice][advice_key.to_sym][:advice])
         end
-        flash[:notice] = "The questionnaire's question advice was successfully saved!"
+        flash[:notice] = "The advice was successfully saved!"
       end
     rescue ActiveRecord::RecordNotFound
       render :action => 'edit_advice', :id => params[:id]

@@ -39,7 +39,7 @@ class JoinTeamRequestsController < ApplicationController
     team_member=TeamsUser.where(['team_id =? and user_id =?', params[:team_id],session[:user][:id]])
     team = Team.find(params[:team_id])
     if team.full?
-        flash[:note] ="This team is full'"
+        flash[:note] ="This team is full."
     else
       if (team_member.size > 0)
         flash[:note] = "You are already a member of this team."

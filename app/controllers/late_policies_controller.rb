@@ -75,13 +75,13 @@ class LatePoliciesController < ApplicationController
     is_number = true
 
     #if(!is_numeric?(params[:late_policy][:penalty_per_unit]))
-    #  flash[:error] = "Penalty points per unit should be a numeric value"
+    #  flash[:error] = "The penalty points per unit should be a numeric value."
     #  is_number = false
     #elsif (params[:late_policy][:penalty_per_unit].to_i < 0)
-    #  flash[:error] = "Penalty points per unit cannot be negative"
+    #  flash[:error] = "The penalty points per unit cannot be negative."
     #  is_number = false
     #elsif(!is_numeric?(params[:late_policy][:max_penalty]))
-    #    flash[:error] = "Maximum penalty points should be a numeric value"
+    #    flash[:error] = "The maximum penalty points should be a numeric value."
     #    is_number = false
     #end
 
@@ -134,7 +134,7 @@ def update
     if(@policy != nil && !@policy.empty?)
       @policy.each do |p|
         if p.instructor_id == instructor_id
-          flash[:error] = "Cannot edit the policy. A policy with the same name already exists."
+          flash[:error] = "The policy could not be updated because a policy with the same name already exists."
           issue_name = true
           break
         end
@@ -166,10 +166,10 @@ def update
     flash[:notice] = "The late policy was successfully updated."
     redirect_to :action => 'index'
   elsif issue_number == true
-    flash[:error] = "Cannot edit the policy. The maximum penalty cannot be less than penalty per unit."
+    flash[:error] = "The policy could not be updated because the maximum penalty cannot be less than penalty per unit."
     redirect_to :action => 'edit', :id => params[:id]
   elsif issue_name == true
-    flash[:error] = "Cannot edit the policy. A policy with the same name " + params[:late_policy][:policy_name] + " already exists."
+    flash[:error] = "The policy could not be updated because a policy with the name " + params[:late_policy][:policy_name] + " already exists."
     redirect_to :action => 'edit', :id => params[:id]
   end
 end

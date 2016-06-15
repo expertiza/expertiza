@@ -208,7 +208,7 @@ require 'analytic/assignment_analytic'
   #(guaranteed by candidate_assignment_teams_to_review method)
   def assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
     if assignment_team==nil
-      raise "There are no more submissions available for review right now. Try again later."
+      raise "There are no more submissions available for that review right now. Try again later."
     end
 
     assignment_team.assign_reviewer(reviewer)
@@ -234,14 +234,14 @@ require 'analytic/assignment_analytic'
 
   # Returns a contributor whose quiz is to be taken if available, otherwise will raise an error
   def contributor_for_quiz(reviewer, topic)
-    raise "Please select a topic" if has_topics? and topic.nil?
-    raise "This assignment does not have topics" if !has_topics? and topic
+    raise "Please select a topic." if has_topics? and topic.nil?
+    raise "This assignment does not have topics." if !has_topics? and topic
 
     # This condition might happen if the reviewer/quiz taker waited too much time in the
     # select topic page and other students have already selected this topic.
     # Another scenario is someone that deliberately modifies the view.
     if topic
-      raise "This topic has too many quizzes taken; please select another one." unless candidate_topics_for_quiz.include?(topic)
+      raise "To many quizes have been taken for this topic; please select another one." unless candidate_topics_for_quiz.include?(topic)
     end
 
 
@@ -489,7 +489,7 @@ require 'analytic/assignment_analytic'
   end
 
   def path
-    raise 'Path cannot be created. The assignment must be associated with either a course or an instructor.' if self.course_id == nil && self.instructor_id == nil
+    raise 'The path cannot be created. The assignment must be associated with either a course or an instructor.' if self.course_id == nil && self.instructor_id == nil
     path_text = ""
     (self.course_id != nil && self.course_id > 0) ?
       path_text = Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(User.find(self.instructor_id).name) + '/' + FileHelper.clean_path(Course.find(self.course_id).directory_path) + '/':
@@ -551,14 +551,14 @@ require 'analytic/assignment_analytic'
       maps = ReviewResponseMap.where(reviewed_object_id: self.id)
       maps.each { |map| map.delete(force) }
     rescue
-      raise "There is at least one review response exists for #{self.name}."
+      raise "There is at least one review response that exists for #{self.name}."
     end
 
     begin
       maps = TeammateReviewResponseMap.where(reviewed_object_id: self.id)
       maps.each { |map| map.delete(force) }
     rescue
-      raise "There is at least one teammate review response exists for #{self.name}."
+      raise "There is at least one teammate review response that exists for #{self.name}."
     end
 
     self.invitations.each { |invite| invite.destroy }

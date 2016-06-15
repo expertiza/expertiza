@@ -133,7 +133,7 @@ class TeamsController < ApplicationController
     if assignment.course_id >= 0
       course = Course.find(assignment.course_id)
       team.copy(course.id)
-      flash[:note] = "\""+team.name+"\" was successfully copied to \""+course.name+"\""
+      flash[:note] = "The team \""+team.name+"\" was successfully copied to \""+course.name+"\"."
     else
       flash[:error] = "This assignment is not #{url_for(:controller => 'assignment', :action => 'assign', :id => assignment.id)} with a course."
     end

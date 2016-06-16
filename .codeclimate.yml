@@ -26,6 +26,8 @@ engines:
       # horizontal space that could be used for a better parameter name.
       # Also {| differentiates better from a hash than { | does.
         enabled: false
+      Rubocop/Style/RescueModifier:
+        enabled: false
   golint:
     enabled: true
   eslint:

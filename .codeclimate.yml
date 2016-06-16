@@ -4,12 +4,6 @@ engines:
     #checks:
     Rubocop/Metrics/ClassLength:
        enabled: false
-       
-    Rubocop/Metrics/LineLength:
-        Max: 160
-
-    Rubocop/Metrics/ParameterLists:
-        Max: 9
      
     # This cop looks for use of the same name as outer local variables for block arguments or block local variables.
     Rubocop/Lint/ShadowingOuterLocalVariable:

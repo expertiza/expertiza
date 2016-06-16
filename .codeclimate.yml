@@ -28,6 +28,8 @@ engines:
         enabled: false
       Rubocop/Style/RescueModifier:
         enabled: false
+      Rubocop/Style/AndOr:
+        enabled: false
   golint:
     enabled: true
   eslint:

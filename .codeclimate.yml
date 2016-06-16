@@ -11,6 +11,8 @@ engines:
       # If we enable this cop, many necessary selves will be deleted.
       Rubocop/Style/RedundantSelf:
         enabled: false
+      Rubocop/Style/RedundantBegin:
+        enabled: false
   golint:
     enabled: true
   eslint:

@@ -2,79 +2,72 @@ engines:
   rubocop:
     enabled: true
     checks:
-    Rubocop/Metrics/ClassLength:
+      
+      Rubocop/Metrics/ClassLength:
        enabled: false
-    Rubocop/Metrics/LineLength:
+      Rubocop/Metrics/LineLength:
         Max: 160
 
-    Rubocop/Metrics/ParameterLists:
-     Max: 9
+      Rubocop/Metrics/ParameterLists:
+        Max: 9
      
     # This cop looks for use of the same name as outer local variables for block arguments or block local variables.
-    Rubocop/Lint/ShadowingOuterLocalVariable:
-      Enabled: false
+      Rubocop/Lint/ShadowingOuterLocalVariable:
+        enabled: false
 
     # This cop checks for redundant uses of self.
     # If we enable this cop, many necessary selves will be deleted.
-    Rubocop/Style/RedundantSelf:
-      Enabled: false
+      Rubocop/Style/RedundantSelf:
+        enabled: false
       
-    Rubocop/Style/RedundantBegin:
-      Enabled: false
+      Rubocop/Style/RedundantBegin:
+        enabled: false
 
     # Adopt a consistent multi-line method chaining style. 
     # There are two popular styles in the Ruby community, both of which are considered good.
-    Rubocop/Style/DotPosition:
-      Enabled: false
+      Rubocop/Style/DotPosition:
+        enabled: false
 
     # Single quotes being faster is hardly measurable and only affects parse time.
     # Enforcing double quotes reduces the times where you need to change them
     # when introducing an interpolation. Use single quotes only if their semantics
     # are needed.
-    Rubocop/Style/StringLiterals:
-      Enabled: false
-
-    Rubocop/Style/HashSyntax:
-      EnforcedStyle: ruby19_no_mixed_keys
+      Rubocop/Style/StringLiterals:
+        enabled: false
 
     # A specialized exception class will take one or more arguments and construct the message from it.
     # So both variants make sense. 
-    Rubocop/Style/RaiseArgs:
-      Enabled: false
+      Rubocop/Style/RaiseArgs:
+        enabled: false
 
     # This cop checks the indentation of the right hand side operand in binary operations that span more than one line.
-    Rubocop/Style/MultilineOperationIndentation:
-      Enabled: false
+      Rubocop/Style/MultilineOperationIndentation:
+        enabled: false
 
-    Rubocop/Style/SpaceInsideBlockBraces:
+      Rubocop/Style/SpaceInsideBlockBraces:
       # The space here provides no real gain in readability while consuming
       # horizontal space that could be used for a better parameter name.
       # Also {| differentiates better from a hash than { | does.
-      SpaceBeforeBlockParameters: false
+        enabled: false
 
     # This cop checks for uses of rescue in its modifier form.
-    Rubocop/Style/RescueModifier:
-      Enabled: false
-
-    # No trailing space differentiates better from the block:
-    # foo} means hash, foo } means block.
-    Rubocop/Style/SpaceInsideHashLiteralBraces:
-      EnforcedStyle: no_space
+      Rubocop/Style/RescueModifier:
+        enabled: false
 
     # The and and or keywords are banned. It's just not worth it. Always use && and || instead
-    Rubocop/Style/AndOr:
-      Enabled: false
+      Rubocop/Style/AndOr:
+        enabled: false
 
     # Enforcing the names of variables? To single letter ones? Just no.
-    Rubocop/Style/SingleLineBlockParams:
-      Enabled: false
+      Rubocop/Style/SingleLineBlockParams:
+        enabled: false
 
-    Rubocop/Style/Documentation:
-      Enabled: false 
+      Rubocop/Style/Documentation:
+        enabled: false 
 
     # Style preference
-    Rubocop/Style/MethodDefParentheses:
-      Enabled: false
+      Rubocop/Style/MethodDefParentheses:
+        enabled: false
 
     golint:
       enabled: true

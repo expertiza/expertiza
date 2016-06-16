@@ -19,6 +19,8 @@ engines:
         enabled: false
       Rubocop/Style/RaiseArgs:
         enabled: false
+      Rubocop/Style/MultilineOperationIndentation:
+        enabled: false
   golint:
     enabled: true
   eslint:

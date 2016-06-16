@@ -17,6 +17,8 @@ engines:
         enabled: false
       Rubocop/Style/StringLiterals:
         enabled: false
+      Rubocop/Style/RaiseArgs:
+        enabled: false
   golint:
     enabled: true
   eslint:

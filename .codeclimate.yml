@@ -22,9 +22,6 @@ engines:
       Rubocop/Style/MultilineOperationIndentation:
         enabled: false
       Rubocop/Style/SpaceInsideBlockBraces:
-      # The space here provides no real gain in readability while consuming
-      # horizontal space that could be used for a better parameter name.
-      # Also {| differentiates better from a hash than { | does.
         enabled: false
       Rubocop/Style/RescueModifier:
         enabled: false
@@ -34,6 +31,8 @@ engines:
         enabled: false
       Rubocop/Style/Documentation:
         enabled: false 
+      Rubocop/Style/MethodDefParentheses:
+        enabled: false
   golint:
     enabled: true
   eslint:

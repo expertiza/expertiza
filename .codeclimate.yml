@@ -32,6 +32,8 @@ engines:
         enabled: false
       Rubocop/Style/SingleLineBlockParams:
         enabled: false
+      Rubocop/Style/Documentation:
+        enabled: false 
   golint:
     enabled: true
   eslint:

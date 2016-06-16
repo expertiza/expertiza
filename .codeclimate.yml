@@ -13,6 +13,8 @@ engines:
         enabled: false
       Rubocop/Style/RedundantBegin:
         enabled: false
+      Rubocop/Style/DotPosition:
+        enabled: false
   golint:
     enabled: true
   eslint:

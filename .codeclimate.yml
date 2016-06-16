@@ -33,6 +33,8 @@ engines:
         enabled: false 
       Rubocop/Style/MethodDefParentheses:
         enabled: false
+      Rubocop/Style/HashSyntax:
+        EnforcedStyle: ruby19_no_mixed_keys
   golint:
     enabled: true
   eslint:

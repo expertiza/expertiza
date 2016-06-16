@@ -4,15 +4,14 @@ engines:
     checks:
       Rubocop/Metrics/ClassLength:
        enabled: false
-
-    golint:
-      enabled: true
-    eslint:
-      enabled: true
-    csslint:
-      enabled: true
-    duplication:
-      enabled: true
+  golint:
+    enabled: true
+  eslint:
+    enabled: true
+  csslint:
+    enabled: true
+  duplication:
+    enabled: true
     config:
       languages:
       - ruby

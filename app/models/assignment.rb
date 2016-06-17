@@ -50,10 +50,7 @@ require 'analytic/assignment_analytic'
   def team_assignment?
     true
   end
-
-  def team_assignment
-    team_assignment?
-  end
+  alias_method :team_assignment,:team_assignment?
 
   # Returns a set of topics that can be used for taking the quiz.
   # We choose the topics if one of its quiz submissions has been attempted the fewest times so far
@@ -71,7 +68,6 @@ require 'analytic/assignment_analytic'
     contributor_set.each { |contributor| candidate_topics.add(signed_up_topic(contributor)) }
     candidate_topics
   end
-
 
   # Returns a set of topics that can be reviewed.
   # We choose the topics if one of its submissions has received the fewest reviews so far
@@ -251,28 +247,9 @@ require 'analytic/assignment_analytic'
         contributor.includes?(reviewer) ###or !contributor.has_quiz?
     end
     raise "There are no more submissions to take quiz on for this #{work}." if contributor_set.empty?
-    #flash[:error] = "There are no more submissions to take quiz on for this #{work}."
-    #redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
-    #return
-    #end
     # Reviewer/quiz taker can take quiz for each submission only once
     contributor_set.reject! { |contributor| quiz_taken_by?(contributor, reviewer) }
     #raise "You have already taken the quiz for all submissions for this #{work}." if contributor_set.empty?
-
-    # Reduce to the contributors with the least number of quizzes taken for their submissions ("responses")
-    # min_contributor = contributor_set.min_by { |a| a.quiz_responses.count }
-    # min_quizzes = min_contributor.quiz_responses.count
-    #contributor_set.reject! { |contributor| contributor.quiz_responses.count > min_quizzes }
-
-    # Pick the contributor whose quiz was taken longest ago
-    #if min_quizzes > 0
-    # Sort by last quiz mapping id, since it reflects the order in which quizzes were taken
-    # This has a round-robin effect
-    # Sorting on id assumes that ids are assigned sequentially in the db.
-    # .last assumes the database returns rows in the order they were created.
-    # Added unit tests to ensure these conditions are both true with the current database.
-    # contributor_set.sort! { |a, b| a.quiz_mappings.last.id <=> b.quiz_mappings.last.id }
-    #end
 
     # Choose a contributor at random (.sample) from the remaining contributors.
     # Actually, we SHOULD pick the contributor who was least recently picked.  But sample
@@ -607,9 +584,6 @@ require 'analytic/assignment_analytic'
     node.parent_id = parent.id if parent != nil
     node.save
   end
-
-
-
 
   #if current  stage is submission or review, find the round number
   #otherwise, return 0

@@ -386,7 +386,7 @@ require 'analytic/assignment_analytic'
   end
 
   def dynamic_reviewer_assignment?
-    (self.review_assignment_strategy == RS_AUTO_SELECTED) ? true : false
+    self.review_assignment_strategy == RS_AUTO_SELECTED
   end
   alias_method :is_using_dynamic_reviewer_assignment?, :dynamic_reviewer_assignment?
 
@@ -608,11 +608,7 @@ require 'analytic/assignment_analytic'
     node.save
   end
 
-  def get_current_stage(topic_id=nil)
-    return 'Unknown' if topic_id.nil? and self.staggered_deadline?
-    due_date = find_current_stage(topic_id)
-    (due_date == nil || due_date == COMPLETE) ? COMPLETE : DeadlineType.find(due_date.deadline_type_id).name
-  end
+
 
 
   #if current  stage is submission or review, find the round number
@@ -717,6 +713,12 @@ require 'analytic/assignment_analytic'
         end
       end
     end
+  end
+
+  def get_current_stage(topic_id=nil)
+    return 'Unknown' if topic_id.nil? and self.staggered_deadline?
+    due_date = find_current_stage(topic_id)
+    (due_date == nil || due_date == COMPLETE) ? COMPLETE : DeadlineType.find(due_date.deadline_type_id).name
   end
 
   # Returns hash review_scores[reviewer_id][reviewee_id] = score

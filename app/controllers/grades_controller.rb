@@ -34,7 +34,7 @@ class GradesController < ApplicationController
   def view
     @assignment = Assignment.find(params[:id])
     @questions = {}
-    questionnaires = @assignment.questionnaires_with_questions
+    questionnaires = @assignment.questionnaires
 
     if @assignment.varying_rubrics_by_round?
       retrieve_questions (questionnaires)
@@ -98,7 +98,7 @@ class GradesController < ApplicationController
     @team = @participant.team
     @team_id = @team.id
 
-    questionnaires = @assignment.questionnaires_with_questions
+    questionnaires = @assignment.questionnaires
     @vmlist = []
 
     #loop through each questionnaire, and populate the view model for all data necessary

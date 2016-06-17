@@ -47,10 +47,6 @@ require 'analytic/assignment_analytic'
     DEFAULT_MAX_OUTSTANDING_REVIEWS
   end
 
-  def questionnaires_with_questions
-    questionnaires.includes(:questions).joins(:questions)
-  end
-
   def team_assignment?
     true
   end

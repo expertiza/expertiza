@@ -265,7 +265,7 @@ describe 'Add Expert Review' do
     #Should not be able to visit expert review page
     visit "/review_mapping/add_calibration/#{@assignment.id}?team_id=#{@team.id}"
     #Expect result
-    expect(page).to have_content('This student is not allowed to add_calibration this review_mapping')
+    expect(page).to have_content('A student is not allowed to add_calibration this/these review_mapping')
 
   end
 end

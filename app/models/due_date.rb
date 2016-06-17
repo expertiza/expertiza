@@ -55,6 +55,11 @@ class DueDate < ActiveRecord::Base
     self.deadline_type.name
   end
 
+  def set_flag
+    self.flag = true
+    self.save
+  end
+
   def due_at_is_valid_datetime
     unless due_at.blank?
       errors.add(:due_at, 'must be a valid datetime') if ((DateTime.strptime(due_at.to_s, '%Y-%m-%d %H:%M:%S') rescue ArgumentError) == ArgumentError)
@@ -78,10 +83,7 @@ class DueDate < ActiveRecord::Base
     submit_duedate.save
   end
 
-  def set_flag
-    self.flag = true
-    self.save
-  end
+
 
   def self.deadline_sort(due_dates)
     due_dates.sort { |m1, m2| (m1.due_at and m2.due_at) ? m1.due_at <=> m2.due_at : (m1.due_at ? -1 : 1) }

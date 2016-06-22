@@ -4,65 +4,67 @@
 <% if @student.team == nil %>
   You no longer have a team!
 <% else %>
-
-  <b style="text-align: center">Team Name: </b><%= @student.team.name %>
-
-<%= link_to "Edit name",
-   edit_student_teams_path(team_id: @student.team.id, student_id: @student.id) %>
-<br/>
-<b>Team members</b>
-    <br/> <br/>
-<table style="width:80%" align="center" >
-  <tr style="border: 1px outset #000000; padding: 10px 20px" >
-    <th class="head">Username</th>
-    <th class="head">Full name</th>
-    <!--<th class="head">Team-member role (duty)</th>-->
-    <th class="head">Email address</th>
-    <% if @teammate_review_allowed %>
-      <th class="head">Review action</th>
-    <% end %>
-  </tr>
-  <% for member in @student.team.participants %>
-    <tr>
-      <td><%= member.user.name %></td>
-      <td><%= member.user.fullname %></td>
-      <!--<td> -->
-        <% #if !member.duty.nil? %>
-          <%#= member.duty %>
-        <% #else %>
-          <%#= 'No duty yet!' %>
-        <% #end %>
-      <!--</td> -->
-      <td><%= member.user.email %></td>
-      
+  <b style="text-align: center">Team Name: &nbsp;&nbsp;</b><%= @student.team.name %> &nbsp;&nbsp;&nbsp;
+  <%= link_to "Edit name", edit_student_teams_path(team_id: @student.team.id, student_id: @student.id) %>
+  <br/>
+  <br/>
+  <b>Team members</b>
+  <br/>
+  <br/>
+  <!--start team member table-->
+  <table style="width:80%" align="center" >
+    <!--team member table header-->
+    <tr style="border: 1px outset #000000; padding: 10px 20px" >
+      <th class="head">Username</th>
+      <th class="head">Full name</th>
+      <!--<th class="head">Team-member role (duty)</th>-->
+      <th class="head">Email address</th>
       <% if @teammate_review_allowed %>
-        <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
+        <th class="head">Review action</th>
+      <% end %>
+    </tr>
+    <!--end member table header-->
 
-          <% map = TeammateReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', @student.id, member.id]).first
-          if map.nil?
-            map = TeammateReviewResponseMap.create(:reviewer_id => @student.id, :reviewee_id => member.id, :reviewed_object_id => @student.assignment.id)
-          end
-          review = map.response.last
-          if review.nil? %>
-          <td>
-            <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :return => "teammate"} %>
-          </td>
-        <% else %>
-          <td>
-            <%= link_to "View", {:controller => 'response', :action => 'view', :id => review.id} %>
-            &nbsp;&nbsp;
-            <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "teammate"} %>
-          </td>
+    <% for member in @student.team.participants %> <!--start team member content-->
+      <tr>
+        <td><%= member.user.name %></td>
+        <td><%= member.user.fullname %></td>
+        <td><%= member.user.email %></td>
+
+        <!--author of this code, please describe what it does!!-->
+        <% if @teammate_review_allowed %>
+          <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
+
+            <% map = TeammateReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', @student.id, member.id]).first
+            if map.nil?
+              map = TeammateReviewResponseMap.create(:reviewer_id => @student.id, :reviewee_id => member.id, :reviewed_object_id => @student.assignment.id)
+            end
+            review = map.response.last
+            if review.nil? %>
+            <td>
+              <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :return => "teammate"} %>
+            </td>
+          <% else %>
+            <td>
+              <%= link_to "View", {:controller => 'response', :action => 'view', :id => review.id} %>
+              &nbsp;&nbsp;
+              <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "teammate"} %>
+            </td>
+          <% end %>
         <% end %>
       <% end %>
-  <% end %>
-</tr>
-      <% end %>
-</table>
-    <br>
-    <%= link_to "Leave team",
+    </tr>
+  <% end %>   <!--end team member content-->
+    <tr>
+      <td colspan="3">
+        <br/>
+        <%= link_to "Leave team",
                 remove_participant_student_teams_path(student_id: @student.id, team_id: @student.team.id) %>
-  <% end %>
+      <td>
+    </tr>
+  </table>
+<% end %>
+
 <%# this part is temporaly disabled because the role-based reviewing feature needs to be re-done%>
 <% if false && @student.team != nil %>
   <h3>Team-member role (duty)</h3>
@@ -109,10 +111,10 @@
     <br/>
     <br/>
     <b>Sent invitations</b>
-    <br/><br/>
-    <div>
+    <br/>
+    <br/>
+      <!-- start invited people table -->
       <table style="width:80%" align="center" >
-
         <tr style="border: 1px outset #000000; ">
           <td class="head"><b>Username</b></td>
           <td class="head"><b>Full name</b></td>
@@ -135,7 +137,7 @@
              </tr>
           <% end %>
       </table>
-      </div>
+      <!-- start invited people table -->
     <% end %>
 <br/>
 
@@ -156,9 +158,14 @@
          <%= hidden_field_tag 'team_id', @student.team.id %>
          <%= hidden_field_tag 'student_id', @student.id %>
          <%= hidden_field_tag 'session[:dummy][:assignment_id]', @student.parent_id %>
-
-         Enter user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
-       <input type='submit' value='Invite'/>
+         <table style="width:80%" align="center" >
+           <tr>
+            <td>
+              Enter user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
+              <input type='submit' value='Invite'/>
+            </td>
+           </tr>
+         </table>
      <% end %>
    <% end %>
 
@@ -227,6 +234,9 @@
 <br/>
 <b>Advertisement for teammates</b>
 <br>
+<table style="width:80%" align="center" >
+  <tr>
+    <td>
 <% if @student.team.advertise_for_partner == true %>
     <%= @student.team.comments_for_advertisement%>
     &nbsp;&nbsp;&nbsp;&nbsp;
@@ -235,8 +245,12 @@
     <%= link_to 'Delete', :controller => 'advertise_for_partner', :action => 'remove', :team_id=>@student.team.id %>
 <% else %>
     <%= link_to 'Create', :controller => 'advertise_for_partner', :action => 'new', :team_id=>@student.team.id %>
-
 <% end %>
+      </td>
+    </tr>
+    </table>
+
+
 <br/>
 
 <%= render :partial => 'join_team_requests/list_sent',

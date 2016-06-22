@@ -7,7 +7,7 @@ module AccessHelper
   end
 
   def flash_msg
-    if current_role.name.try(:downcase).start_with?('a','e','i','o','u')
+    if current_role && current_role.name.try(:downcase).start_with?('a','e','i','o','u')
       if params[:action] == 'new'
         flash[:error] = "An #{current_role_name.try(:downcase)} is not allowed to create this/these #{params[:controller]}"
       else

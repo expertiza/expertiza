@@ -1,15 +1,93 @@
 <script>
-jQuery(document).ready(function() {
-    jQuery('#Submit').click(function(e){
-    if(!confirm('Once a review has been submitted, you cannot edit it again')){
-        e.preventDefault();
-        e.stopPropagation();
-        return;
-    }else{
-        jQuery('#isSubmit').val('Yes');
-    }
-    })
-})
+    jQuery(document).ready(function() {
+        jQuery('#Submit').click(function(e){
+            if(!confirm('Once a review has been submitted, you cannot edit it again')){
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }else{
+                jQuery('#isSubmit').val('Yes');
+            }
+        });
+        jQuery('#metareview').click(function(event){
+            event.preventDefault();
+            event.stopPropagation();
+            var URL='http://localhost:3001/metareviewgenerator/';
+
+            var data=({reviews:readComments()});
+
+            jQuery.ajax({
+                type: 'POST',
+                url: URL+'content',
+                data: data
+                //contentType: 'application/x-www-form-urlencoded'
+            }).fail( function (jqXHR, status){
+                jQuery('#lblMetareviewContent').html(status);
+            }).success(function (data){
+                consumeMetareviewContent(data);
+            });
+
+            jQuery.ajax({
+                type: 'POST',
+                url: URL+'volume',
+                data: data
+                //contentType: 'application/x-www-form-urlencoded'
+            }).fail( function (jqXHR, status){
+                jQuery('#lblMetareviewVolume').html(status);
+            }).success(function (data){
+                consumeMetareviewVolume(data);
+            });
+
+            return;
+        });
+        function readComments(){
+            var counter=0;
+            var feedbackComment='';
+            while(document.getElementById('responses_'+counter+'_comments')!=null)
+            {
+                feedbackComment +=jQuery('#responses_'+counter+'_comments').val();
+                counter++;
+            }
+            return feedbackComment;
+        }
+        function consumeMetareviewVolume(data){
+            var volume=data['volume'];
+            var volumeString='Volume of the review is <b>'+volume+'</b>.';
+            if(volume<50)
+                volumeString+=' You should provide more feedback.';
+
+            jQuery('#lblMetareviewVolume').html(volumeString);
+        }
+        function consumeMetareviewContent(data){
+
+
+            var content_summative=data['content_summative']
+            var content_problem=data['content_problem']
+            var content_advisory=data['content_advisory']
+
+
+
+            if(content_summative>0)
+                var summativeString=' This review <b>contains</b> summative feedback.';
+            else
+                var summativeString='You can summarize the work.';
+
+            if(content_problem>0)
+                var problemString=' One or more problems are identified in this review.';
+            else
+                var problemString=' This review <b>does not detect</b> any problem with the artifact.';
+
+            if(content_advisory>0)
+                var advisoryString=' This review <b> contains advisory</b> for the author.';
+            else
+                var advisoryString=' You can provide advisory for the author.';
+
+            resultString =summativeString+'<br />'+problemString+'<br />'+advisoryString;
+
+            jQuery('#lblMetareviewContent').html(resultString);
+        }
+
+    });
 </script>
 <h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
 
@@ -51,18 +129,18 @@ jQuery(document).ready(function() {
     <%end%>
     <% i = 0 %>
     <%@questions.each do |question| %>
-       <% answer = Answer.where(question_id: question.id, response_id: @response.id).first if !@response.nil?%>
-       <% if question.instance_of? Criterion%>
+        <% answer = Answer.where(question_id: question.id, response_id: @response.id).first if !@response.nil?%>
+        <% if question.instance_of? Criterion%>
             <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score, @dropdown_or_scale) %>
-       <% elsif question.instance_of? Scale %>
+        <% elsif question.instance_of? Scale %>
             <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score) %>
-       <% elsif question.instance_of? UploadFile %>
+        <% elsif question.instance_of? UploadFile %>
             <!--One form had better not in another form-->
             <!--Zhewei: I move the Uploadfile question to the end of questionnaire. So multiple forms will not been overlapped.-->
-       <% else %>
+        <% else %>
             <%= question.complete(i, answer) %>
-       <% end %>
-       <% i += 1%>
+        <% end %>
+        <% i += 1%>
     <% end %>
 
     <p>
@@ -73,11 +151,16 @@ jQuery(document).ready(function() {
     </p>
 
     <%if @current_round%>
-      <%= hidden_field_tag "review[round]", @current_round %>
+        <%= hidden_field_tag "review[round]", @current_round %>
     <%end%>
     <%= hidden_field_tag "review[questionnaire_id]", @questionnaire.id %>
 
     <br/>
+    <%=  submit_tag "Evaluate Review Quality", :name=>"metareview", :id=>"metareview" %>
+    <br />
+    <label id="lblMetareviewVolume" name="lblMetareviewVolume"></label><br />
+    <label id="lblMetareviewContent" name="lblMetareviewContent"></label>
+    <br />
     <br>
     <%= submit_tag "Save "+@title, :name => "save" %>
     <!--#E1600 check title for selfreview to show submit button-->
@@ -87,6 +170,7 @@ jQuery(document).ready(function() {
     <% end %>
     <%= hidden_field_tag('return', @return) %>
     <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %>
+
 <% end %>
 <!--Check whether there is a UploadFile question.-->
 <%@questions.each do |question| %>

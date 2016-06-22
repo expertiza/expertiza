@@ -26,6 +26,7 @@ require 'analytic/assignment_analytic'
   has_many :sign_up_topics, :foreign_key => 'assignment_id', :dependent => :destroy
   has_many :response_maps, :foreign_key => 'reviewed_object_id', :class_name => 'ResponseMap'
   has_one :assignment_node,:foreign_key => :node_object_id,:dependent => :destroy
+  has_many :review_mappings, :class_name => 'ReviewResponseMap', :foreign_key => 'reviewed_object_id'
 
   validates_presence_of :name
   validates_uniqueness_of :name, :scope => :course_id
@@ -236,7 +237,6 @@ require 'analytic/assignment_analytic'
       raise "To many quizes have been taken for this topic; please select another one." unless candidate_topics_for_quiz.include?(topic)
     end
 
-
     contributor_set = Array.new(contributors)
     work = (topic.nil?) ? 'assignment' : 'topic'
 
@@ -366,12 +366,6 @@ require 'analytic/assignment_analytic'
     self.review_assignment_strategy == RS_AUTO_SELECTED
   end
   alias_method :is_using_dynamic_reviewer_assignment?, :dynamic_reviewer_assignment?
-
-  def review_mappings
-    #ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
-    ReviewResponseMap.where(reviewed_object_id: self.id)
-    end
 
   def metareview_mappings
     mappings = Array.new

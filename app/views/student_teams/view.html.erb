@@ -1,17 +1,18 @@
-<h1>View team for <%= @student.assignment.name %></h1>
+<h1>Team information for <%= @student.assignment.name %></h1>
 
-<h2>Team members</h2>
+
 <% if @student.team == nil %>
   You no longer have a team!
 <% else %>
 
-  <b>Team Name: </b><%= @student.team.name %>
+  <b style="text-align: center">Team Name: </b><%= @student.team.name %> <!-- not sure about this -->
 
 <%= link_to "Edit Name",
    edit_student_teams_path(team_id: @student.team.id, student_id: @student.id) %>
 
-<div class = "exp"> 
-<table>
+<b>Team members</b> <!-- this should be after the team name -->
+<div class = "exp">
+<table style="width:80%; margin-left: 95px">
   <tr>
     <th class="head">Username</th>
     <th class="head">Full Name</th>
@@ -98,17 +99,7 @@
   <% end %>
 <% end %>
 
-  <% if @student.team != nil && @student.assignment.max_team_size>1 %>
-    <h2>Team Advertisement</h2>
 
-    <% if @student.team.advertise_for_partner == true %>
-      <label><%= @student.team.comments_for_advertisement%></label>
-      &nbsp;&nbsp;&nbsp;&nbsp;
-      <%= link_to 'edit', :controller => 'advertise_for_partner', :action => 'edit', :team_id=>@student.team.id %>
-      <%= link_to 'destroy', :controller => 'advertise_for_partner', :action => 'remove', :team_id=>@student.team.id %>
-    <% else %>
-      <%= link_to 'new', :controller => 'advertise_for_partner', :action => 'new', :team_id=>@student.team.id %>
-    <% end %>
 
   <% if @student.team!=nil %>
     <%= render :partial => 'join_team_requests/list_received',
@@ -118,15 +109,20 @@
   <% end %>
 
     <% if @send_invs && @send_invs.length > 0 %>
-      <table>
-        <h2>Sent Invitations</h2>
+    <div class = "exp">
+      <table style="width:80%; margin-left: 95px">
+        <tr><b>Sent Invitations</b></b></tr>
         <tr>
-          <td><b>To &nbsp</b></td>
-          <td><b>Reply Status &nbsp</b></td>
+          <td><b>Username</b></td>
+          <td><b>Full Name</b></td>
+          <td><b>Email Address</b></td>
+          <td><b>Status</b></td>
         </tr>
           <% for inv in @send_invs %>
             <tr>
               <td><%= inv.to_user.name %></td>
+              <td><%= inv.to_user.fullname %></td>
+              <td><%= inv.to_user.email %></td>
                 <% if inv.reply_status == 'A' %>
                   <td>Accepted</td>
                 <% elsif inv.reply_status == 'D' %>
@@ -138,6 +134,19 @@
              </tr>
           <% end %>
       </table>
+      </div>
+    <% end %>
+
+<% if @student.team != nil && @student.assignment.max_team_size>1 %>
+    <h2>Team Advertisement</h2>
+
+    <% if @student.team.advertise_for_partner == true %>
+        <label><%= @student.team.comments_for_advertisement%></label>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <%= link_to 'edit', :controller => 'advertise_for_partner', :action => 'edit', :team_id=>@student.team.id %>
+        <%= link_to 'destroy', :controller => 'advertise_for_partner', :action => 'remove', :team_id=>@student.team.id %>
+    <% else %>
+        <%= link_to 'new', :controller => 'advertise_for_partner', :action => 'new', :team_id=>@student.team.id %>
     <% end %>
 
      <% if @student.team == nil %>
@@ -149,7 +158,7 @@
          <%= submit_tag "Name team" %>
        <% end %>
      <% else %>
-       <h2>Invite people</h2>
+       <h2>Invite people</h2>  <!-- this should be a pop-up not sure how to do this-->
        <%= form_tag :controller => 'invitation', :action => 'create' do %>
          <%= hidden_field_tag 'team_id', @student.team.id %>
          <%= hidden_field_tag 'student_id', @student.id %>

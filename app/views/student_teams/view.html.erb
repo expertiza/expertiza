@@ -1,25 +1,25 @@
-<h1>Team information for <%= @student.assignment.name %></h1>
+<h1>Team Information for <%= @student.assignment.name %></h1>
 
 
 <% if @student.team == nil %>
   You no longer have a team!
 <% else %>
 
-  <b style="text-align: center">Team Name: </b><%= @student.team.name %> <!-- not sure about this -->
+  <b style="text-align: center">Team Name: </b><%= @student.team.name %>
 
-<%= link_to "Edit Name",
+<%= link_to "Edit name",
    edit_student_teams_path(team_id: @student.team.id, student_id: @student.id) %>
-
-<b>Team members</b> <!-- this should be after the team name -->
-<div class = "exp">
-<table style="width:80%; margin-left: 95px">
-  <tr>
+<br/>
+<b>Team members</b>
+    <br/> <br/>
+<table style="width:80%" align="center" >
+  <tr style="border: 1px outset #000000; padding: 10px 20px" >
     <th class="head">Username</th>
-    <th class="head">Full Name</th>
+    <th class="head">Full name</th>
     <!--<th class="head">Team-member role (duty)</th>-->
-    <th class="head">Email Address</th>
+    <th class="head">Email address</th>
     <% if @teammate_review_allowed %>
-      <th class="head">Action</th>
+      <th class="head">Review action</th>
     <% end %>
   </tr>
   <% for member in @student.team.participants %>
@@ -50,8 +50,7 @@
         <% else %>
           <td>
             <%= link_to "View", {:controller => 'response', :action => 'view', :id => review.id} %>
-          </td>
-          <td>
+            &nbsp;&nbsp;
             <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "teammate"} %>
           </td>
         <% end %>
@@ -60,15 +59,13 @@
 </tr>
       <% end %>
 </table>
-</div>
     <br>
-    <%= link_to "Leave Team",
+    <%= link_to "Leave team",
                 remove_participant_student_teams_path(student_id: @student.id, team_id: @student.team.id) %>
   <% end %>
-
 <%# this part is temporaly disabled because the role-based reviewing feature needs to be re-done%>
 <% if false && @student.team != nil %>
-  <h2>Team-member role (duty)</h2>
+  <h3>Team-member role (duty)</h3>
 
   <%=form_tag :controller=>'participants', :action=>'update_duties', :student_id=>@student.id do %>
     <% params[:duty] = @student.duty %>
@@ -109,14 +106,18 @@
   <% end %>
 
     <% if @send_invs && @send_invs.length > 0 %>
-    <div class = "exp">
-      <table style="width:80%; margin-left: 95px">
-        <tr><b>Sent Invitations</b></b></tr>
-        <tr>
-          <td><b>Username</b></td>
-          <td><b>Full Name</b></td>
-          <td><b>Email Address</b></td>
-          <td><b>Status</b></td>
+    <br/>
+    <br/>
+    <b>Sent invitations</b>
+    <br/><br/>
+    <div>
+      <table style="width:80%" align="center" >
+
+        <tr style="border: 1px outset #000000; ">
+          <td class="head"><b>Username</b></td>
+          <td class="head"><b>Full name</b></td>
+          <td class="head"><b>Email address</b></td>
+          <td class="head" align="center"><b>Status</b></td>
         </tr>
           <% for inv in @send_invs %>
             <tr>
@@ -128,37 +129,29 @@
                 <% elsif inv.reply_status == 'D' %>
                   <td>Declined</td>
                 <% else %>
-                  <td>Waiting for reply</td>
-                  <td><%= link_to "Retract", {:controller => 'invitation', :action => 'cancel', :inv_id => inv.id, :student_id => @student.id} %></td>
+                  <td align = "center">Waiting for reply
+                  &nbsp;&nbsp;<%= link_to "Retract", {:controller => 'invitation', :action => 'cancel', :inv_id => inv.id, :student_id => @student.id} %></td>
                 <% end %>
              </tr>
           <% end %>
       </table>
       </div>
     <% end %>
+<br/>
 
 <% if @student.team != nil && @student.assignment.max_team_size>1 %>
-    <h2>Team Advertisement</h2>
 
-    <% if @student.team.advertise_for_partner == true %>
-        <label><%= @student.team.comments_for_advertisement%></label>
-        &nbsp;&nbsp;&nbsp;&nbsp;
-        <%= link_to 'edit', :controller => 'advertise_for_partner', :action => 'edit', :team_id=>@student.team.id %>
-        <%= link_to 'destroy', :controller => 'advertise_for_partner', :action => 'remove', :team_id=>@student.team.id %>
-    <% else %>
-        <%= link_to 'new', :controller => 'advertise_for_partner', :action => 'new', :team_id=>@student.team.id %>
-    <% end %>
 
      <% if @student.team == nil %>
-       <h2>Name team</h2>
+       <h3>Name team</h3>
        <%= form_tag :controller => 'student_teams', :action => 'create' do %>
          <%= hidden_field_tag 'student_id', @student.id %>
          <label for="team_name">Team name:</label>&nbsp;
          <%= text_field 'team', 'name' %>
          <%= submit_tag "Name team" %>
        <% end %>
-     <% else %>
-       <h2>Invite people</h2>  <!-- this should be a pop-up not sure how to do this-->
+     <% elsif !@student.team.full?%>
+       <b>Invite people</b>
        <%= form_tag :controller => 'invitation', :action => 'create' do %>
          <%= hidden_field_tag 'team_id', @student.team.id %>
          <%= hidden_field_tag 'student_id', @student.id %>
@@ -171,7 +164,7 @@
 
 
   <% if @users_on_waiting_list && @users_on_waiting_list.count>0%>
-    <h2>Users waiting for this topic:</h2>
+    <h3>Users waiting for this topic:</h3>
       <table>
         <tr>
           <td><b>&nbsp; User id &nbsp; </b></td>
@@ -191,7 +184,7 @@
 
   <% if @received_invs && @received_invs.length > 0 %>
     <table>
-      <h2>Received Invitations</h2>
+      <h3>Received Invitations</h3>
       <tr>
         <td><b>From &nbsp</b></td>
         <td><b>Team Name &nbsp</b></td>
@@ -228,9 +221,23 @@
               </tr>
           <% end %>
       <% end %>
-
     </table>
+
   <% end %>
+<br/>
+<b>Advertisement for teammates</b>
+<br>
+<% if @student.team.advertise_for_partner == true %>
+    <%= @student.team.comments_for_advertisement%>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <%= link_to 'Edit', :controller => 'advertise_for_partner', :action => 'edit', :team_id=>@student.team.id %>
+    &nbsp;&nbsp;
+    <%= link_to 'Delete', :controller => 'advertise_for_partner', :action => 'remove', :team_id=>@student.team.id %>
+<% else %>
+    <%= link_to 'Create', :controller => 'advertise_for_partner', :action => 'new', :team_id=>@student.team.id %>
+
+<% end %>
+<br/>
 
 <%= render :partial => 'join_team_requests/list_sent',
            :locals =>{:teams_user_id=>params[:student_id],

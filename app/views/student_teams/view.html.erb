@@ -1,8 +1,9 @@
 <h1>Team Information for <%= @student.assignment.name %></h1>
 
-
 <% if @student.team == nil %>
-  You no longer have a team!
+    <!--todo: we should ask him if he wants to create a new team-->
+    <!--todo: add a Create team button-->
+    You no longer have a team!
 <% else %>
   <b style="text-align: center">Team Name: &nbsp;&nbsp;</b><%= @student.team.name %> &nbsp;&nbsp;&nbsp;
   <%= link_to "Edit name", edit_student_teams_path(team_id: @student.team.id, student_id: @student.id) %>
@@ -31,7 +32,7 @@
         <td><%= member.user.fullname %></td>
         <td><%= member.user.email %></td>
 
-        <!--author of this code, please describe what it does!!-->
+        <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
         <% if @teammate_review_allowed %>
           <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
 
@@ -65,41 +66,7 @@
   </table>
 <% end %>
 
-<%# this part is temporaly disabled because the role-based reviewing feature needs to be re-done%>
-<% if false && @student.team != nil %>
-  <h3>Team-member role (duty)</h3>
-
-  <%=form_tag :controller=>'participants', :action=>'update_duties', :student_id=>@student.id do %>
-    <% params[:duty] = @student.duty %>
-    Select your duty: 
-    <select id='select_team_member_duty', name='duty'>
-      <option value='manager'
-        <% if params[:duty] == 'manager' -%>
-          selected
-        <% end -%>
-      >manager</option>
-      <option value='designer'
-        <% if params[:duty] == 'designer' -%>
-          selected
-        <% end -%>
-      >designer</option>
-      <option value='programmer'
-        <% if params[:duty] == 'programmer' -%>
-          selected
-        <% end -%>
-      >programmer</option>
-      <option value='tester'
-        <% if params[:duty] == 'tester' -%>
-          selected
-        <% end -%>
-      >tester</option>
-    </select>
-    <%= button_tag 'Submit' %>
-  <% end %>
-<% end %>
-
-
-
+<!--render partial for join team request-->
   <% if @student.team!=nil %>
     <%= render :partial => 'join_team_requests/list_received',
     :locals =>{:team_id=>@student.team.id,
@@ -141,6 +108,7 @@
     <% end %>
 <br/>
 
+<!--send invitation-->
 <% if @student.team != nil && @student.assignment.max_team_size>1 %>
 
 
@@ -169,7 +137,7 @@
      <% end %>
    <% end %>
 
-
+  <!--waiting listed users on the same topic-->
   <% if @users_on_waiting_list && @users_on_waiting_list.count>0%>
     <h3>Users waiting for this topic:</h3>
       <table>
@@ -189,6 +157,7 @@
   <% end %>
 <% end %>
 
+<!--display a table of received invitation-->
   <% if @received_invs && @received_invs.length > 0 %>
     <table>
       <h3>Received Invitations</h3>
@@ -232,6 +201,8 @@
 
   <% end %>
 <br/>
+
+<!--display the advertisement-->
 <b>Advertisement for teammates</b>
 <br>
 <table style="width:80%" align="center" >
@@ -253,6 +224,7 @@
 
 <br/>
 
+<!--display a list of sent join-team requests-->
 <%= render :partial => 'join_team_requests/list_sent',
            :locals =>{:teams_user_id=>params[:student_id],
                       :assignment_id => @student.assignment.id

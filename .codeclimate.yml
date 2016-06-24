@@ -1,0 +1,77 @@
+engines:
+  rubocop:
+    enabled: true
+    checks:
+      Rubocop/Metrics/ClassLength:
+       enabled: false
+       # This cop looks for use of the same name as outer local variables for block arguments or block local variables.
+      Rubocop/Lint/ShadowingOuterLocalVariable:
+        enabled: false
+      # This cop checks for redundant uses of self.
+      # If we enable this cop, many necessary selves will be deleted.
+      Rubocop/Style/RedundantSelf:
+        enabled: false
+      Rubocop/Style/RedundantBegin:
+        enabled: false
+      Rubocop/Style/DotPosition:
+        enabled: false
+      Rubocop/Style/StringLiterals:
+        enabled: false
+      Rubocop/Style/RaiseArgs:
+        enabled: false
+      Rubocop/Style/MultilineOperationIndentation:
+        enabled: false
+      Rubocop/Style/SpaceInsideBlockBraces:
+        enabled: false
+      Rubocop/Style/RescueModifier:
+        enabled: false
+      Rubocop/Style/AndOr:
+        enabled: false
+      Rubocop/Style/SingleLineBlockParams:
+        enabled: false
+      Rubocop/Style/Documentation:
+        enabled: false 
+      Rubocop/Style/MethodDefParentheses:
+        enabled: false
+      
+      # invalid rule to configure in .codeclimate.yml
+      #Rubocop/Style/HashSyntax:
+        #EnforcedStyle: ruby19_no_mixed_keys
+       
+      # invalid rule to configure in .codeclimate.yml  
+      #Rubocop/Style/SpaceInsideHashLiteralBraces:
+        #EnforcedStyle: no_space
+      
+      # invalid rule to configure in .codeclimate.yml
+      #Rubocop/Metrics/LineLength:
+        #Max: 160
+
+      # invalid rule to configure in .codeclimate.yml
+      #Rubocop/Metrics/ParameterLists:
+        #Max: 9
+     
+  golint:
+    enabled: true
+  eslint:
+    enabled: true
+  csslint:
+    enabled: true
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - ruby
+        #mass_threshold: 30
+      - javascript
+ratings:
+  paths:
+  - app/**
+  - lib/**
+  - "**.rb"
+exclude_paths:
+- 'bin/**/*'
+- 'config/**/*'
+- 'db/**/*'
+- 'lib/**/*'
+- 'public/**/*'
+- 'vendor/**/*'

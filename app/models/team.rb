@@ -68,7 +68,7 @@ class Team < ActiveRecord::Base
   # Add memeber to the team
   def add_member(user, _assignment_id)
     if has_user(user)
-      raise "\"" + user.name + "\" is already a member of the team, \"" + self.name + "\""
+      raise "The user \"" + user.name + "\" is already a member of the team, \"" + self.name + "\""
     end
 
     if can_add_member = !full?
@@ -100,7 +100,7 @@ class Team < ActiveRecord::Base
   def self.check_for_existing(parent, name, team_type)
     list = Object.const_get(team_type + 'Team').where(['parent_id = ? and name = ?', parent.id, name])
     if !list.empty?
-      raise TeamExistsError, 'Team name, "' + name + '", is already in use.'
+      raise TeamExistsError, 'The team name, "' + name + '", is already in use.'
     end
   end
 
@@ -187,7 +187,7 @@ class Team < ActiveRecord::Base
   # REFACTOR BEGIN:: class methods import export moved from course_team & assignment_team to here
   # Import from csv
   def self.import(row, id, options, teamtype)
-    raise ArgumentError, "Not enough fields on this line" if (row.length < 2 && options[:has_column_names] == "true") || (row.empty? && options[:has_column_names] != "true")
+    raise ArgumentError, "Not enough fields on this line." if (row.length < 2 && options[:has_column_names] == "true") || (row.empty? && options[:has_column_names] != "true")
 
     if options[:has_column_names] == "true"
       name = row[0].to_s.strip

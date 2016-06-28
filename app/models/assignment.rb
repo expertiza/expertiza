@@ -13,18 +13,19 @@ class Assignment < ActiveRecord::Base
   # be created as an instance of a subclass of the Assignment (model) class;
   # then Rails will "automatically' set the type field to the value that
   # designates an assignment of the appropriate type.
-  has_many :participants, class_name: 'AssignmentParticipant', foreign_key: 'parent_id'
-  has_many :users, through: :participants
-  has_many :due_dates, dependent: :destroy
-  has_many :teams, class_name: 'AssignmentTeam', foreign_key: 'parent_id'
-  has_many :team_review_mappings, class_name: 'ReviewResponseMap', through: :teams, source: :review_mappings
-  has_many :invitations, class_name: 'Invitation', foreign_key: 'assignment_id', dependent: :destroy
-  has_many :assignment_questionnaires, dependent: :destroy
-  has_many :questionnaires, through: :assignment_questionnaires
-  belongs_to :instructor, class_name: 'User', foreign_key: 'instructor_id'
-  has_many :sign_up_topics, foreign_key: 'assignment_id', dependent: :destroy
-  has_many :response_maps, foreign_key: 'reviewed_object_id', class_name: 'ResponseMap'
-  has_one :assignment_node, foreign_key: :node_object_id, dependent: :destroy
+  has_many :participants, :class_name => 'AssignmentParticipant', :foreign_key => 'parent_id'
+  has_many :users, :through => :participants
+  has_many :due_dates, :dependent => :destroy
+  has_many :teams, :class_name => 'AssignmentTeam', :foreign_key => 'parent_id'
+  has_many :team_review_mappings, :class_name => 'ReviewResponseMap', :through => :teams, :source => :review_mappings
+  has_many :invitations, :class_name => 'Invitation', :foreign_key => 'assignment_id', :dependent => :destroy
+  has_many :assignment_questionnaires,:dependent => :destroy
+  has_many :questionnaires, :through => :assignment_questionnaires
+  belongs_to :instructor, :class_name => 'User', :foreign_key => 'instructor_id'
+  has_many :sign_up_topics, :foreign_key => 'assignment_id', :dependent => :destroy
+  has_many :response_maps, :foreign_key => 'reviewed_object_id', :class_name => 'ResponseMap'
+  has_one :assignment_node,:foreign_key => :node_object_id,:dependent => :destroy
+  has_many :review_mappings, :class_name => 'ReviewResponseMap', :foreign_key => 'reviewed_object_id'
 
   validates_presence_of :name
   validates_uniqueness_of :name, scope: :course_id
@@ -46,17 +47,10 @@ class Assignment < ActiveRecord::Base
     DEFAULT_MAX_OUTSTANDING_REVIEWS
   end
 
-  def questionnaires_with_questions
-    questionnaires.includes(:questions).joins(:questions)
-  end
-
   def team_assignment?
     true
   end
-
-  def team_assignment
-    team_assignment?
-  end
+  alias_method :team_assignment,:team_assignment?
 
   # Returns a set of topics that can be used for taking the quiz.
   # We choose the topics if one of its quiz submissions has been attempted the fewest times so far
@@ -211,7 +205,7 @@ class Assignment < ActiveRecord::Base
   # (guaranteed by candidate_assignment_teams_to_review method)
   def assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
     if assignment_team.nil?
-      raise "There are no more submissions available for review right now. Try again later."
+      raise "There are no more submissions available for that review right now. Try again later."
     end
 
     assignment_team.assign_reviewer(reviewer)
@@ -235,14 +229,14 @@ class Assignment < ActiveRecord::Base
 
   # Returns a contributor whose quiz is to be taken if available, otherwise will raise an error
   def contributor_for_quiz(reviewer, topic)
-    raise "Please select a topic" if has_topics? and topic.nil?
-    raise "This assignment does not have topics" if !has_topics? and topic
+    raise "Please select a topic." if has_topics? and topic.nil?
+    raise "This assignment does not have topics." if !has_topics? and topic
 
     # This condition might happen if the reviewer/quiz taker waited too much time in the
     # select topic page and other students have already selected this topic.
     # Another scenario is someone that deliberately modifies the view.
     if topic
-      raise "This topic has too many quizzes taken; please select another one." unless candidate_topics_for_quiz.include?(topic)
+      raise "To many quizes have been taken for this topic; please select another one." unless candidate_topics_for_quiz.include?(topic)
     end
 
     contributor_set = Array.new(contributors)
@@ -255,28 +249,9 @@ class Assignment < ActiveRecord::Base
         contributor.includes?(reviewer) # ##or !contributor.has_quiz?
     end
     raise "There are no more submissions to take quiz on for this #{work}." if contributor_set.empty?
-    # flash[:error] = "There are no more submissions to take quiz on for this #{work}."
-    # redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
-    # return
-    # end
     # Reviewer/quiz taker can take quiz for each submission only once
     contributor_set.reject! {|contributor| quiz_taken_by?(contributor, reviewer) }
     # raise "You have already taken the quiz for all submissions for this #{work}." if contributor_set.empty?
-
-    # Reduce to the contributors with the least number of quizzes taken for their submissions ("responses")
-    # min_contributor = contributor_set.min_by { |a| a.quiz_responses.count }
-    # min_quizzes = min_contributor.quiz_responses.count
-    # contributor_set.reject! { |contributor| contributor.quiz_responses.count > min_quizzes }
-
-    # Pick the contributor whose quiz was taken longest ago
-    # if min_quizzes > 0
-    # Sort by last quiz mapping id, since it reflects the order in which quizzes were taken
-    # This has a round-robin effect
-    # Sorting on id assumes that ids are assigned sequentially in the db.
-    # .last assumes the database returns rows in the order they were created.
-    # Added unit tests to ensure these conditions are both true with the current database.
-    # contributor_set.sort! { |a, b| a.quiz_mappings.last.id <=> b.quiz_mappings.last.id }
-    # end
 
     # Choose a contributor at random (.sample) from the remaining contributors.
     # Actually, we SHOULD pick the contributor who was least recently picked.  But sample
@@ -390,15 +365,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def dynamic_reviewer_assignment?
-    (self.review_assignment_strategy == RS_AUTO_SELECTED) ? true : false
+    self.review_assignment_strategy == RS_AUTO_SELECTED
   end
   alias is_using_dynamic_reviewer_assignment? dynamic_reviewer_assignment?
-
-  def review_mappings
-    # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
-    ReviewResponseMap.where(reviewed_object_id: self.id)
-    end
 
   def metareview_mappings
     mappings = []
@@ -489,7 +458,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def path
-    raise 'Path cannot be created. The assignment must be associated with either a course or an instructor.' if self.course_id.nil? && self.instructor_id.nil?
+    raise 'The path cannot be created. The assignment must be associated with either a course or an instructor.' if self.course_id.nil? && self.instructor_id.nil?
     path_text = ""
     (!self.course_id.nil? && self.course_id > 0) ?
       path_text = Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(User.find(self.instructor_id).name) + '/' + FileHelper.clean_path(Course.find(self.course_id).directory_path) + '/' :
@@ -550,14 +519,14 @@ class Assignment < ActiveRecord::Base
       maps = ReviewResponseMap.where(reviewed_object_id: self.id)
       maps.each {|map| map.delete(force) }
     rescue
-      raise "There is at least one review response exists for #{self.name}."
+      raise "There is at least one review response that exists for #{self.name}."
     end
 
     begin
       maps = TeammateReviewResponseMap.where(reviewed_object_id: self.id)
       maps.each {|map| map.delete(force) }
     rescue
-      raise "There is at least one teammate review response exists for #{self.name}."
+      raise "There is at least one teammate review response that exists for #{self.name}."
     end
 
     self.invitations.each(&:destroy)
@@ -611,14 +580,8 @@ class Assignment < ActiveRecord::Base
     node.save
   end
 
-  def get_current_stage(topic_id = nil)
-    return 'Unknown' if topic_id.nil? and self.staggered_deadline?
-    due_date = find_current_stage(topic_id)
-    (due_date.nil? || due_date == COMPLETE) ? COMPLETE : DeadlineType.find(due_date.deadline_type_id).name
-  end
-
-  # if current  stage is submission or review, find the round number
-  # otherwise, return 0
+  #if current  stage is submission or review, find the round number
+  #otherwise, return 0
   def number_of_current_round(topic_id)
     due_dates = if self.staggered_deadline?
                   TopicDeadline.where(topic_id: topic_id).order('due_at DESC')
@@ -713,6 +676,12 @@ class Assignment < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def get_current_stage(topic_id=nil)
+    return 'Unknown' if topic_id.nil? and self.staggered_deadline?
+    due_date = find_current_stage(topic_id)
+    (due_date == nil || due_date == COMPLETE) ? COMPLETE : DeadlineType.find(due_date.deadline_type_id).name
   end
 
   # Returns hash review_scores[reviewer_id][reviewee_id] = score
@@ -949,38 +918,4 @@ class Assignment < ActiveRecord::Base
     !@team.empty?
   end
 
-  # start added by ferry, required for the summarization
-  def answers_by_question_reviewee_round(reviewee_id, q_id, round)
-    #  get all answers to this question
-    question_answer = Answer.select(:answer, :comments)
-                            .joins("join responses on responses.id = answers.response_id")
-                            .joins("join response_maps on responses.map_id = response_maps.id")
-                            .joins("join questions on questions.id = answers.question_id")
-                            .where("response_maps.reviewed_object_id = ? and
-                                           response_maps.reviewee_id = ? and
-                                           answers.question_id = ? and
-                                           responses.round = ?", self.id, reviewee_id, q_id, round)
-    question_answer
-  end
-
-  def answers_by_question(q_id)
-    question_answer = Answer.select("DISTINCT answers.comments,  answers.answer")
-                            .joins("JOIN questions ON answers.question_id = questions.id")
-                            .joins("JOIN responses ON responses.id = answers.response_id")
-                            .joins("JOIN response_maps ON responses.map_id = response_maps.id")
-                            .where("answers.question_id = ? and response_maps.reviewed_object_id = ?", q_id, self.id)
-    question_answer
-  end
-
-  def answers_by_reviewee_question(r_id, q_id)
-    question_answers = Answer.select(:answer, :comments)
-                             .joins("join responses on responses.id = answers.response_id")
-                             .joins("join response_maps on responses.map_id = response_maps.id")
-                             .joins("join questions on questions.id = answers.question_id")
-                             .where("response_maps.reviewed_object_id = ? and
-                                                 response_maps.reviewee_id = ? and
-                                                 answers.question_id = ? ", self.id, r_id, q_id)
-    question_answers
-  end
-  # end added by ferry, required for the summarization
 end

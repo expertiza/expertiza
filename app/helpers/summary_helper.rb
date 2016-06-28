@@ -25,7 +25,7 @@ module SummaryHelper
           self.summary[round.to_s][q.txt] = ""
           self.avg_scores_by_criterion[round.to_s][q.txt] = 0.0
 
-          question_answers = assignment.answers_by_reviewee_question(r_id, q.id)
+          question_answers = Answer.answers_by_question_for_reviewee(assignment.id, r_id, q.id)
 
           max_score = get_max_score_for_question(q)
 
@@ -62,7 +62,7 @@ module SummaryHelper
         # get answers of each question in the rubric
         questions_used_in_round.each do |question|
           next if question.type.eql?("SectionHeader")
-          answers_questions = assignment.answers_by_question question.id
+          answers_questions = Answer.answers_by_question(assignment.id, question.id)
 
           max_score = get_max_score_for_question(question)
           # process each question in a seperate thread
@@ -125,9 +125,9 @@ module SummaryHelper
             summary[reviewee.name][round][q.txt] = ""
             self.avg_scores_by_criterion[reviewee.name][round][q.txt] = 0.0
 
-            # get all answers to this question
-            question_answers = assignment.answers_by_question_reviewee_round(reviewee.id, q.id, round + 1)
-            # get max score of this rubric
+            #get all answers to this question
+            question_answers = Answer.answers_by_question_for_reviewee_in_round(assignment.id, reviewee.id, q.id, round+1)
+            #get max score of this rubric
             q_max_score = get_max_score_for_question(q)
 
             comments = break_up_comments_to_sentences(question_answers)

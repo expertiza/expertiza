@@ -11,7 +11,7 @@ class CoursesUsers < ActiveRecord::Base
     raise MissingObjectIDError if id == nil
     course = Course.find(id)
     if course.nil?
-      raise ImportError, "The course with id \"" + id.to_s + "\" was not found."
+      raise ImportError, "The course with the id \"" + id.to_s + "\" was not found."
     end
     if CoursesUsers.where(['user_id=? AND course_id=?', user.id, course.id]).count.zero?
       CoursesUsers.create user_id: user.id, course_id: course.id

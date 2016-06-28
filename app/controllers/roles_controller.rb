@@ -29,7 +29,7 @@ class RolesController < ApplicationController
     @role = Role.new(params[:role])
     if @role.save
       Role.rebuild_cache
-      flash[:notice] = 'Role was successfully created.'
+      flash[:notice] = 'The role was successfully created.'
       redirect_to Role
     else
       foreign
@@ -48,7 +48,7 @@ class RolesController < ApplicationController
     if @role.update_with_params(params[:role])
       Role.rebuild_cache
       @role = Role.find(params[:id])
-      flash[:notice] = 'Role was successfully updated.'
+      flash[:notice] = 'The role was successfully updated.'
       redirect_to action: 'show', id: @role.id
     else
       foreign

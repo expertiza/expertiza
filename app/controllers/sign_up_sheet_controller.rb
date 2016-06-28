@@ -444,7 +444,7 @@ class SignUpSheetController < ApplicationController
     end
 
     if @sign_up_topic.save
-      undo_link "Topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. "
+      undo_link "The topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. "
       # changing the redirection url to topics tab in edit assignment view.
       redirect_to edit_assignment_path(@sign_up_topic.assignment_id) + "#tabs-5"
     else
@@ -475,7 +475,7 @@ class SignUpSheetController < ApplicationController
         topic.update_waitlisted_users params[:topic][:max_choosers]
         topic.max_choosers = params[:topic][:max_choosers]
       else
-        flash[:error] = 'The value of the maximum choosers can only be increased! No change has been made to maximum choosers.'
+        flash[:error] = 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'
       end
     end
   end

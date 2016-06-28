@@ -45,7 +45,7 @@ class ReviewResponseMap < ResponseMap
   end
 
   def self.import(row, _session, id)
-    raise ArgumentError, "Not enough items" if row.length < 2
+    raise ArgumentError, "Not enough items." if row.length < 2
 
     assignment = Assignment.find(id)
     if assignment.nil?

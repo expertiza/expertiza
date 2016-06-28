@@ -48,7 +48,7 @@ class Participant < ActiveRecord::Base
                  self.team.nil?)
       force_delete(maps)
     else
-      raise "Associations exist for this participant"
+      raise "Associations exist for this participant."
     end
     end
 
@@ -88,7 +88,7 @@ class Participant < ActiveRecord::Base
 
     Mailer.sync_message(
       recipients: user.email,
-       subject: "You have been registered as a participant in Assignment #{assignment.name}",
+       subject: "You have been registered as a participant in the Assignment #{assignment.name}",
        body: {
          home_page: home_page,
          first_name: ApplicationHelper.get_user_first_name(user),

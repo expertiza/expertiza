@@ -47,7 +47,7 @@ class MenuItemsController < ApplicationController
         params[:menu_item][:controller_action_id].empty?) and
       (params[:menu_item][:content_page_id].nil? or
        params[:menu_item][:content_page_id].empty?)
-      flash[:error] = "You must specify either an Action or a Page!"
+      flash[:error] = "You must specify either an action or a page!"
       @menu_item = MenuItem.new(params[:menu_item])
       @parent_item = MenuItem.find(params[:menu_item][:parent_id])
       foreign
@@ -83,7 +83,7 @@ class MenuItemsController < ApplicationController
         params[:menu_item][:controller_action_id].empty?) and
       (params[:menu_item][:content_page_id].nil? or
        params[:menu_item][:content_page_id].empty?)
-      flash[:error] = "You must specify either an Action or a Page!"
+      flash[:error] = "You must specify either an action or a page!"
       edit
       render action: 'edit'
       return

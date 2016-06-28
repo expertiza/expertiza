@@ -53,7 +53,7 @@ module FileHelper
     rescue PathError
       # No action required
     rescue
-      raise "An error was encountered while deleting the directory: " + $ERROR_INFO
+      raise "An error occurred while deleting the directory: "+$!
     end
   end
 
@@ -62,7 +62,7 @@ module FileHelper
       FileUtils.mkdir_p(in_object.path) unless File.exist? in_object.path
     rescue PathError
     rescue
-      raise "An error was encountered while creating this directory: " + $ERROR_INFO
+      raise "An error occurred while creating this directory: "+$!
     end
   end
 
@@ -71,7 +71,7 @@ module FileHelper
       FileUtils.mkdir_p(path) unless File.exist? path
     rescue PathError
     rescue
-      raise "An error was encountered while creating this directory: " + $ERROR_INFO
+      raise "An error occurred while creating this directory: "+$!
     end
   end
 end

@@ -240,7 +240,7 @@ class ReviewMappingController < ApplicationController
       end
     end
     if num_remain_review_response_maps > 0
-      flash[:error] = "#{num_remain_review_response_maps} reviewer(s) cannot be deleted because they has already started review."
+      flash[:error] = "#{num_remain_review_response_maps} reviewer(s) cannot be deleted because they have already started a review."
     else
       flash[:success] = "All review mappings for \"#{team.name}\" have been deleted."
     end
@@ -279,7 +279,7 @@ class ReviewMappingController < ApplicationController
     assignment_id = review_response_map.assignment.id
     if !Response.exists?(map_id: review_response_map.id)
       review_response_map.destroy
-      flash[:success] = "The review mapping for \"" + review_response_map.reviewee.name + "\" and \"" + review_response_map.reviewer.name + "\" have been deleted."
+      flash[:success] = "The review mapping for \"" + review_response_map.reviewee.name + "\" and \"" + review_response_map.reviewer.name + "\" has been deleted."
     else
       flash[:error] = "This review has already been done. It cannot been deleted."
     end
@@ -289,7 +289,7 @@ class ReviewMappingController < ApplicationController
   def delete_metareviewer
     mapping = MetareviewResponseMap.find(params[:id])
     assignment_id = mapping.assignment.id
-    flash[:note] = "The metareview mapping for " + mapping.reviewee.name + " and " + mapping.reviewer.name + " have been deleted."
+    flash[:note] = "The metareview mapping for " + mapping.reviewee.name + " and " + mapping.reviewer.name + " has been deleted."
 
     begin
       mapping.delete

@@ -25,7 +25,7 @@ class CourseParticipant < Participant
     end
     course = Course.find(id)
     if course.nil?
-      raise ImportError, "The course with id \"" + id.to_s + "\" was not found."
+      raise ImportError, "The course with the id \"" + id.to_s + "\" was not found."
     end
     unless CourseParticipant.exists?(user_id: user.id, parent_id: course.id)
       CourseParticipant.create(user_id: user.id, parent_id: course.id)

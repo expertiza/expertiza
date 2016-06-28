@@ -34,7 +34,7 @@ class AssignmentTeam < Team
   # Use current object (AssignmentTeam) as reviewee and create the ReviewResponseMap record
   def assign_reviewer(reviewer)
     assignment = Assignment.find(self.parent_id)
-    raise "cannot find this assignment" if assignment.nil?
+    raise "The assignment cannot be found." if assignment.nil?
 
     ReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.id,
                              reviewed_object_id: assignment.id)
@@ -121,7 +121,7 @@ class AssignmentTeam < Team
   # REFACTOR BEGIN:: functionality of import,export, handle_duplicate shifted to team.rb
   # Import csv file to form teams directly
   def self.import(row, assignment_id, options)
-    raise ImportError, "The assignment with id \"" + id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?" if Assignment.find(assignment_id).nil?
+    raise ImportError, "The assignment with the id \"" + id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?" if Assignment.find(assignment_id).nil?
     @assignment_team = prototype
     Team.import(row, assignment_id, options, @assignment_team)
   end
@@ -184,7 +184,7 @@ class AssignmentTeam < Team
 
   def submit_hyperlink(hyperlink)
     hyperlink.strip!
-    raise "The hyperlink cannot be empty" if hyperlink.empty?
+    raise "The hyperlink cannot be empty!" if hyperlink.empty?
     url = URI.parse(hyperlink)
     # If not a valid URL, it will throw an exception
     Net::HTTP.start(url.host, url.port)

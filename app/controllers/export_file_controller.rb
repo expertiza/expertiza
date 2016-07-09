@@ -37,10 +37,21 @@ class ExportFileController < ApplicationController
       filename = params[:model] + params[:id] + ".csv"
       delimiter = other_char
     end
+    allowed_models = ['Assignment',
+                      'AssignmentParticipant',
+                      'AssignmentTeam',
+                      'CourseParticipant',
+                      'CourseTeam',
+                      'MetareviewResponseMap',
+                      'ReviewResponseMap',
+                      'User',
+                      'Team'
+                      ]
     csv_data = CSV.generate(col_sep: delimiter) do |csv|
-      csv << Object.const_get(params[:model]).export_fields(params[:options])
-
-      Object.const_get(params[:model]).export(csv, params[:id], params[:options])
+      if allowed_models.include? params[:model]
+        csv << Object.const_get(params[:model]).export_fields(params[:options])
+        Object.const_get(params[:model]).export(csv, params[:id], params[:options])
+      end
     end
 
     send_data csv_data,

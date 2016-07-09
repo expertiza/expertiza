@@ -62,7 +62,7 @@ class InvitationController < ApplicationController
 
   def auto_complete_for_user_name
     search = params[:user][:name].to_s
-    @users = User.find_by_sql("select * from users where LOWER(name) LIKE '%" + search + "%'") unless search.blank?
+    @users = User.where("LOWER(name) LIKE ?", "%#{search}%") unless search.blank?
   end
 
   def accept

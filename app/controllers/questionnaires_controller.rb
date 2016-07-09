@@ -33,34 +33,38 @@ class QuestionnairesController < ApplicationController
 
   # Define a new questionnaire
   def new
-    @questionnaire = Object.const_get(params[:model].split.join).new
+    if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model]
+      @questionnaire = Object.const_get(params[:model].split.join).new
+    end
   end
 
   def create
     questionnaire_private = params[:questionnaire][:private] == "true" ? true : false
     display_type = params[:questionnaire][:type].split('Questionnaire')[0]
-    @questionnaire = Object.const_get(params[:questionnaire][:type]).new
-    @questionnaire.private = questionnaire_private
-    @questionnaire.name = params[:questionnaire][:name]
-    @questionnaire.instructor_id = session[:user].id
-    @questionnaire.min_question_score = params[:questionnaire][:min_question_score]
-    @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
-    @questionnaire.type = params[:questionnaire][:type]
-    # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
-    # In the future, we need to write migration files to make them consistency.
-    case display_type
-    when 'AuthorFeedback'
-      display_type = 'Author%Feedback'
-    when 'CourseEvaluation'
-      display_type = 'Course%Evaluation'
-    when 'TeammateReview'
-      display_type = 'Teammate%Review'
-    when 'GlobalSurvey'
-      display_type = 'Global%Survey'
+    if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model]
+      @questionnaire = Object.const_get(params[:questionnaire][:type]).new
     end
-    @questionnaire.display_type = display_type
-    @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
     begin
+      @questionnaire.private = questionnaire_private
+      @questionnaire.name = params[:questionnaire][:name]
+      @questionnaire.instructor_id = session[:user].id
+      @questionnaire.min_question_score = params[:questionnaire][:min_question_score]
+      @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
+      @questionnaire.type = params[:questionnaire][:type]
+      # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
+      # In the future, we need to write migration files to make them consistency.
+      case display_type
+      when 'AuthorFeedback'
+        display_type = 'Author%Feedback'
+      when 'CourseEvaluation'
+        display_type = 'Course%Evaluation'
+      when 'TeammateReview'
+        display_type = 'Teammate%Review'
+      when 'GlobalSurvey'
+        display_type = 'Global%Survey'
+      end
+      @questionnaire.display_type = display_type
+      @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
       @questionnaire.save
       # Create node
       tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
@@ -276,7 +280,7 @@ class QuestionnairesController < ApplicationController
       end
     end
 
-    if valid_request
+    if valid_request && Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model]
       @questionnaire = Object.const_get(params[:model]).new
       @questionnaire.private = params[:private]
       @questionnaire.min_question_score = 0

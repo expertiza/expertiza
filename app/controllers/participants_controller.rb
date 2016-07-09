@@ -17,13 +17,19 @@ class ParticipantsController < ApplicationController
   end
 
   def list
-    @root_node = Object.const_get(params[:model] + "Node").find_by_node_object_id(params[:id])
-    @parent = Object.const_get(params[:model]).find(params[:id])
-    @participants = @parent.participants
-    @model = params[:model]
-    # E726 Fall2012 Changes Begin
-    @authorization = params[:authorization]
-    # E726 Fall2012 Changes End
+    if Participant::PARTICIPANT_TYPES.include? params[:model]
+      @root_node = Object.const_get(params[:model] + "Node").find_by_node_object_id(params[:id])
+      @parent = Object.const_get(params[:model]).find(params[:id])
+    end
+    begin
+      @participants = @parent.participants
+      @model = params[:model]
+      # E726 Fall2012 Changes Begin
+      @authorization = params[:authorization]
+      # E726 Fall2012 Changes End
+    rescue
+      flash[:error] = $!
+    end
   end
 
   # OSS_808 change 28th oct
@@ -33,7 +39,7 @@ class ParticipantsController < ApplicationController
   end
 
   def add
-    curr_object = Object.const_get(params[:model]).find(params[:id])
+    curr_object = Object.const_get(params[:model]).find(params[:id]) if Participant::PARTICIPANT_TYPES.include? params[:model]
     begin
       permissions = Participant.get_permissions(params[:authorization])
       can_submit = permissions[:can_submit]

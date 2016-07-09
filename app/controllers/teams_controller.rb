@@ -28,10 +28,14 @@ class TeamsController < ApplicationController
   end
 
   def list
-    session[:team_type] = params[:type] if params[:type]
-
-    @root_node = Object.const_get(session[:team_type] + "Node").find_by_node_object_id(params[:id])
-    @child_nodes = @root_node.get_teams
+    allowed_types = ['Assignment', 'Course']
+    session[:team_type] = params[:type] if params[:type] && allowed_types.include? params[:type]
+    begin
+      @root_node = Object.const_get(session[:team_type] + "Node").find_by_node_object_id(params[:id])
+      @child_nodes = @root_node.get_teams
+    rescue
+      flash[:error] = $!
+    end
   end
 
   def new

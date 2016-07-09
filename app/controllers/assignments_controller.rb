@@ -50,7 +50,7 @@ class AssignmentsController < ApplicationController
     if current_user.timezonepref.nil?
       flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines."
     end
-    @topics = SignUpTopic.find_by_sql("select * from sign_up_topics where assignment_id=" + params[:id])
+    @topics = SignUpTopic.where(assignment_id: params[:id])
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @user = current_user
 

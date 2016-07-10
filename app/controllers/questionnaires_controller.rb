@@ -41,7 +41,7 @@ class QuestionnairesController < ApplicationController
   def create
     questionnaire_private = params[:questionnaire][:private] == "true" ? true : false
     display_type = params[:questionnaire][:type].split('Questionnaire')[0]
-    if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model]
+    if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
       @questionnaire = Object.const_get(params[:questionnaire][:type]).new
     end
     begin
@@ -280,7 +280,7 @@ class QuestionnairesController < ApplicationController
       end
     end
 
-    if valid_request && Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model]
+    if valid_request && Questionnaire::QUESTIONNAIRE_TYPES.include?(params[:model])
       @questionnaire = Object.const_get(params[:model]).new
       @questionnaire.private = params[:private]
       @questionnaire.min_question_score = 0

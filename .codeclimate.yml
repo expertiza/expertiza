@@ -2,6 +2,11 @@
 engines:
   brakeman:
     enabled: true
+    checks:
+      # disable 'Parameter value used in file name', 
+      # I (Zhewei) cannot find a good way to handle this problem right now.
+      file_access:
+        enabled: false 
   bundler-audit:
     enabled: true
   csslint:

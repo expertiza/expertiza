@@ -10,11 +10,19 @@ AllCops:
 Rails:
   Enabled: true
 
+Metrics/ClassLength:
+  CountComments: false
+  Max: 1000
+
+Metrics/MethodLength:
+  CountComments: false
+  Max: 100
+
 Metrics/LineLength:
   Max: 160
 
 Metrics/ParameterLists:
- Max: 9
+  Max: 9
  
 # This cop looks for use of the same name as outer local variables for block arguments or block local variables.
 Lint/ShadowingOuterLocalVariable:

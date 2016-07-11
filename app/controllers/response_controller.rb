@@ -1,7 +1,7 @@
 class ResponseController < ApplicationController
   helper :submitted_content
   helper :file
-
+  require 'rest-client'
   def action_allowed?
     case params[:action]
       when 'edit'  # If response has been submitted, no further editing allowed
@@ -87,6 +87,7 @@ class ResponseController < ApplicationController
     # the response to be updated
     @response = Response.find(params[:id])
 
+
     msg = ""
     begin
       @map = @response.map
@@ -119,6 +120,10 @@ class ResponseController < ApplicationController
           score.update_attribute('comments', v[:comment])
         end
       end
+      #fetch metareview score and store in database.
+      set_metareview_score(@response.id)
+
+
       if (params['isSubmit'] && (params['isSubmit'].eql?'Yes'))
         # Update the submission flag.
         @response.update_attribute('is_submitted',true)
@@ -196,6 +201,9 @@ class ResponseController < ApplicationController
     if params[:responses]
        create_answers(params, questions)
     end
+
+    #fetch metareview score and store in database.
+    set_metareview_score(@response.id)
 
     #@map.save
     msg = "Your response was successfully saved."
@@ -333,11 +341,52 @@ class ResponseController < ApplicationController
   end
 
   def set_all_responses
+
+
     # get all previous versions of responses for the response map.
     # I guess if we're in the middle of creating a new response, this would be
     # all 'previous' responses to this new one (which is not yet saved)?
     @prev=Response.where(map_id: @map.id)
     # not sure what this is about
     @review_scores=@prev.to_a
+  end
+
+  ##this method saves metareview scores for the review text.
+  def set_metareview_score(review_id)
+
+    #fetch all the comments.
+    @comments=''
+    Answer.where(:response_id => review_id).find_each do |response|
+      @comments+=response.comments
+    end
+
+    metareviewScore=MetareviewScore.new
+
+    metareviewWebScore=metareviewScore.AutomatedMetareviewWebScore(@comments)
+
+    # create a new record if review is new else update the old/existing record.
+    unless MetareviewScore.find_by_review_id(review_id)
+      MetareviewScore.create(:review_id=>review_id,:volume=>metareviewWebScore["volume"],:tone_negative=>metareviewWebScore["tone_negative"],:tone_neutral=>metareviewWebScore["tone_neutral"], :tone_positive=>metareviewWebScore["tone_positive"],:advisory=>metareviewWebScore["advisory"],:summative=>metareviewWebScore["summative"],:problem_identification=>metareviewWebScore["problem_identification"],:relevance=>metareviewWebScore["relevance"],:coverage=>metareviewWebScore["coverage"],:plagiarism=>metareviewWebScore["plagiarism"])
+    else
+        #update existing record.
+        metareviewScore=MetareviewScore.find_by_review_id(review_id)
+        metareviewScore.volume=metareviewWebScore["volume"]
+        metareviewScore.tone_neutral=metareviewWebScore["tone_neutral"]
+        metareviewScore.tone_positive=metareviewWebScore["tone_positive"]
+        metareviewScore.tone_negative=metareviewWebScore["tone_negative"]
+        metareviewScore.problem_identification=metareviewWebScore["problem_identification"]
+        metareviewScore.summative=metareviewWebScore["summative"]
+        metareviewScore.advisory=metareviewWebScore["advisory"]
+        metareviewScore.relevance=metareviewWebScore["relevance"]
+        metareviewScore.coverage=metareviewWebScore["coverage"]
+        metareviewScore.plagiarism=metareviewWebScore["plagiarism"]
+        metareviewScore.save
+
+    end
+
+
+
+
+
   end
 end

@@ -11,7 +11,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160511003610) do
+ActiveRecord::Schema.define(version: 20160708112930) do
+
+  create_table "MetareviewResults", id: false, force: :cascade do |t|
+    t.integer "id",                             limit: 8
+    t.integer "review_id",                      limit: 8
+    t.string  "rubric_text",                    limit: 1000
+    t.float   "rubric_score",                   limit: 24
+    t.float   "tone_negative",                  limit: 24
+    t.float   "tone_neutral",                   limit: 24
+    t.float   "tone_positive",                  limit: 24
+    t.float   "content_summative",              limit: 24
+    t.float   "content_problem_identification", limit: 24
+    t.float   "content_advisory",               limit: 24
+    t.float   "volume",                         limit: 24
+    t.float   "relevance",                      limit: 24
+    t.float   "coverage",                       limit: 24
+  end
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -284,6 +300,23 @@ ActiveRecord::Schema.define(version: 20160511003610) do
   add_index "menu_items", ["content_page_id"], name: "fk_menu_item_content_page_id", using: :btree
   add_index "menu_items", ["controller_action_id"], name: "fk_menu_item_controller_action_id", using: :btree
   add_index "menu_items", ["parent_id"], name: "fk_menu_item_parent_id", using: :btree
+
+  create_table "metareview_scores", force: :cascade do |t|
+    t.integer  "review_id",              limit: 4
+    t.integer  "volume",                 limit: 4
+    t.float    "tone_negative",          limit: 24
+    t.float    "tone_positive",          limit: 24
+    t.float    "tone_neutral",           limit: 24
+    t.float    "advisory",               limit: 24
+    t.float    "problem_identification", limit: 24
+    t.float    "summative",              limit: 24
+    t.float    "relevance",              limit: 24
+    t.float    "coverage",               limit: 24
+    t.binary   "plagiarism",             limit: 65535
+    t.datetime "last_updated"
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
+  end
 
   create_table "nodes", force: :cascade do |t|
     t.integer "parent_id",      limit: 4

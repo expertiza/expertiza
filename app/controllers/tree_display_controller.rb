@@ -9,76 +9,76 @@ class TreeDisplayController < ApplicationController
   def goto_questionnaires
     node_object = TreeFolder.find_by_name('Questionnaires')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to :controller => 'tree_display', :action => 'list'
+    redirect_to controller: 'tree_display', action: 'list'
   end
 
   # direct access to review rubrics
   def goto_review_rubrics
     node_object = TreeFolder.find_by_name('Review')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to :controller => 'tree_display', :action => 'list'
+    redirect_to controller: 'tree_display', action: 'list'
   end
 
   # direct access to metareview rubrics
   def goto_metareview_rubrics
     node_object = TreeFolder.find_by_name('Metareview')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to :controller => 'tree_display', :action => 'list'
+    redirect_to controller: 'tree_display', action: 'list'
   end
 
   # direct access to teammate review rubrics
   def goto_teammatereview_rubrics
     node_object = TreeFolder.find_by_name('Teammate Review')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to :controller => 'tree_display', :action => 'list'
+    redirect_to controller: 'tree_display', action: 'list'
   end
 
   # direct access to author feedbacks
   def goto_author_feedbacks
     node_object = TreeFolder.find_by_name('Author Feedback')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to :controller => 'tree_display', :action => 'list'
+    redirect_to controller: 'tree_display', action: 'list'
   end
 
   # direct access to global survey
   def goto_global_survey
     node_object = TreeFolder.find_by_name('Global Survey')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to :controller => 'tree_display', :action => 'list'
+    redirect_to controller: 'tree_display', action: 'list'
   end
 
   # direct access to surveys
   def goto_surveys
     node_object = TreeFolder.find_by_name('Survey')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to :controller => 'tree_display', :action => 'list'
+    redirect_to controller: 'tree_display', action: 'list'
   end
 
   # direct access to course evaluations
   def goto_course_evaluations
     node_object = TreeFolder.find_by_name('Course Evaluation')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to :controller => 'tree_display', :action => 'list'
+    redirect_to controller: 'tree_display', action: 'list'
   end
 
   # direct access to courses
   def goto_courses
     node_object = TreeFolder.find_by_name('Courses')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to :controller => 'tree_display', :action => 'list'
+    redirect_to controller: 'tree_display', action: 'list'
   end
 
   def goto_bookmarkrating_rubrics
     node_object = TreeFolder.find_by_name('Bookmarkrating')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to :controller => 'tree_display', :action => 'list'
+    redirect_to controller: 'tree_display', action: 'list'
   end
 
   # direct access to assignments
   def goto_assignments
     node_object = TreeFolder.find_by_name('Assignments')
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to :controller => 'tree_display', :action => 'list'
+    redirect_to controller: 'tree_display', action: 'list'
   end
 
   # called when the display is requested
@@ -122,23 +122,22 @@ class TreeDisplayController < ApplicationController
     # @reactjsParams = {}
     # @reactjsParams[:nodeType] = 'FolderNode'
     # @reactjsParams[:child_nodes] = child_nodes
-
   end
 
   def get_folder_node_ng
     respond_to do |format|
-      format.html {render json: FolderNode.get()}
+      format.html { render json: FolderNode.get }
     end
   end
 
   # for folder nodes
   def get_children_node_ng
     childNodes = {}
-    if params[:reactParams][:child_nodes].is_a? String
-      childNodes = JSON.parse(params[:reactParams][:child_nodes])
-    else
-      childNodes = params[:reactParams][:child_nodes]
-    end
+    childNodes = if params[:reactParams][:child_nodes].is_a? String
+                   JSON.parse(params[:reactParams][:child_nodes])
+                 else
+                   params[:reactParams][:child_nodes]
+                 end
     tmpRes = {}
     res = {}
     for node in childNodes
@@ -158,7 +157,7 @@ class TreeDisplayController < ApplicationController
     end
 
     for nodeType in tmpRes.keys
-      res[nodeType] =  Array.new
+      res[nodeType] = []
 
       for node in tmpRes[nodeType]
         tmpObject = {}
@@ -170,21 +169,18 @@ class TreeDisplayController < ApplicationController
           tmpObject["directory"] = node.get_directory
           tmpObject["creation_date"] = node.get_creation_date
           tmpObject["updated_date"] = node.get_modified_date
-          #tmpObject["private"] = node.get_private
-          tmpObject["private"] = node.get_instructor_id===session[:user].id ? true :false
+          # tmpObject["private"] = node.get_private
+          tmpObject["private"] = node.get_instructor_id === session[:user].id ? true : false
           instructor_id = node.get_instructor_id
           ## if current user's role is TA for a course, then that course will be listed under his course listing.
-          if(session[:user].role.ta? == 'Teaching Assistant' && Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
-            tmpObject["private"]=true;
+          if session[:user].role.ta? == 'Teaching Assistant' && Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node)
+            tmpObject["private"] = true
           end
-
 
           tmpObject["instructor_id"] = instructor_id
-          unless (instructor_id.nil?)
-            tmpObject["instructor"] = User.find(instructor_id).name
-          else
-            tmpObject["instructor"] = nil
-          end
+          tmpObject["instructor"] = unless instructor_id.nil?
+                                      User.find(instructor_id).name
+                                    end
 
           tmpObject["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role.ta? && Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
           if nodeType == "Assignments"
@@ -202,7 +198,7 @@ class TreeDisplayController < ApplicationController
     end
 
     respond_to do |format|
-      format.html {render json: res}
+      format.html { render json: res }
     end
   end
 
@@ -218,17 +214,17 @@ class TreeDisplayController < ApplicationController
         return true if ta_mapping.course_id == course_id
       end
     end
-    return false
+    false
   end
 
   # for child nodes
   def get_children_node_2_ng
     childNodes = {}
-    if params[:reactParams2][:child_nodes].is_a? String
-      childNodes = JSON.parse(params[:reactParams2][:child_nodes])
-    else
-      childNodes = params[:reactParams2][:child_nodes]
-    end
+    childNodes = if params[:reactParams2][:child_nodes].is_a? String
+                   JSON.parse(params[:reactParams2][:child_nodes])
+                 else
+                   params[:reactParams2][:child_nodes]
+                 end
     tmpRes = {}
     res = []
     fnode = eval(params[:reactParams2][:nodeType]).new
@@ -254,11 +250,9 @@ class TreeDisplayController < ApplicationController
           res2["directory"] = child.get_directory
           instructor_id = child.get_instructor_id
           res2["instructor_id"] = instructor_id
-          unless (instructor_id.nil?)
-            res2["instructor"] = User.find(instructor_id).name
-          else
-            res2["instructor"] = nil
-          end
+          res2["instructor"] = unless instructor_id.nil?
+                                 User.find(instructor_id).name
+                               end
 
           # current user is the instructor (role can be admin/instructor/ta) of this course.
           available_condition_1 = is_available(session[:user], instructor_id)
@@ -267,11 +261,11 @@ class TreeDisplayController < ApplicationController
           available_condition_2 = session[:user].role_id == 6 and Ta.get_my_instructors(session[:user].id).include?(instructor_id) and ta_for_current_course?(child)
 
           # ta created the course, current user is the instructor of this ta.
-          instructor_ids = Array.new
-          TaMapping.where(ta_id: instructor_id).each{ |mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }
+          instructor_ids = []
+          TaMapping.where(ta_id: instructor_id).each {|mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }
           available_condition_3 = session[:user].role_id == 2 and instructor_ids.include? session[:user].id
 
-          res2["is_available"] =  available_condition_1 || available_condition_2 || available_condition_3
+          res2["is_available"] = available_condition_1 || available_condition_2 || available_condition_3
 
           if nodeType == "AssignmentNode"
             res2["course_id"] = child.get_course_id
@@ -287,7 +281,7 @@ class TreeDisplayController < ApplicationController
     end
 
     respond_to do |format|
-      format.html {render json: res}
+      format.html { render json: res }
     end
   end
 
@@ -300,7 +294,7 @@ class TreeDisplayController < ApplicationController
   def get_session_last_open_tab
     res = session[:last_open_tab]
     respond_to do |format|
-      format.html {render json: res}
+      format.html { render json: res }
     end
   end
 
@@ -308,13 +302,13 @@ class TreeDisplayController < ApplicationController
     session[:last_open_tab] = params[:tab]
     res = session[:last_open_tab]
     respond_to do |format|
-      format.html {render json: res}
+      format.html { render json: res }
     end
   end
 
   def drill
     session[:root] = params[:root]
-    redirect_to :controller => 'tree_display', :action => 'list'
+    redirect_to controller: 'tree_display', action: 'list'
   end
 
   def filter
@@ -327,15 +321,14 @@ class TreeDisplayController < ApplicationController
       if assignment
         assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment.id)
         if assignment_questionnaires
-          assignment_questionnaires.each { |q|  qid << "#{q.questionnaire_id.to_s}+" }
+          assignment_questionnaires.each {|q| qid << "#{q.questionnaire_id}+" }
           session[:root] = 1
         end
       end
     elsif filter_node == 'ACN'
       session[:root] = 2
-      qid <<  search
+      qid << search
     end
-    return qid
+    qid
   end
-
   end

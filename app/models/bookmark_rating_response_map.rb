@@ -1,6 +1,6 @@
 class BookmarkRatingResponseMap < ResponseMap
-  belongs_to :reviewee, :class_name => 'Bookmark', :foreign_key => 'reviewee_id'
-  belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'reviewed_object_id'
+  belongs_to :reviewee, class_name: 'Bookmark', foreign_key: 'reviewee_id'
+  belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
 
   def questionnaire
     self.assignment.questionnaires.find_by_type('BookmarkRatingResponseMap')
@@ -11,6 +11,6 @@ class BookmarkRatingResponseMap < ResponseMap
   end
 
   def get_title
-    return "Bookmark Review"
+    "Bookmark Review"
   end
 end

@@ -17,37 +17,43 @@ class ParticipantsController < ApplicationController
   end
 
   def list
-    @root_node = Object.const_get(params[:model]+"Node").find_by_node_object_id(params[:id])
-    @parent = Object.const_get(params[:model]).find(params[:id])
-    @participants = @parent.participants
-    @model = params[:model]
-    # E726 Fall2012 Changes Begin
-        @authorization = params[:authorization]
-        # E726 Fall2012 Changes End
+    if Participant::PARTICIPANT_TYPES.include? params[:model]
+      @root_node = Object.const_get(params[:model] + "Node").find_by_node_object_id(params[:id])
+      @parent = Object.const_get(params[:model]).find(params[:id])
+    end
+    begin
+      @participants = @parent.participants
+      @model = params[:model]
+      # E726 Fall2012 Changes Begin
+      @authorization = params[:authorization]
+      # E726 Fall2012 Changes End
+    rescue
+      flash[:error] = $!
+    end
   end
 
-  #OSS_808 change 28th oct
-  #required for sending emails
+  # OSS_808 change 28th oct
+  # required for sending emails
   def email_sent
-    DelayedMailer::deliver_mail("recipient.address@example.com")
+    DelayedMailer.deliver_mail("recipient.address@example.com")
   end
 
   def add
-    curr_object = Object.const_get(params[:model]).find(params[:id])
+    curr_object = Object.const_get(params[:model]).find(params[:id]) if Participant::PARTICIPANT_TYPES.include? params[:model]
     begin
       permissions = Participant.get_permissions(params[:authorization])
       can_submit = permissions[:can_submit]
       can_review = permissions[:can_review]
       can_take_quiz = permissions[:can_take_quiz]
-      curr_object.add_participant(params[:user][:name],can_submit,can_review,can_take_quiz)
+      curr_object.add_participant(params[:user][:name], can_submit, can_review, can_take_quiz)
       user = User.find_by_name(params[:user][:name])
       @participant = curr_object.participants.find_by_user_id(user.id)
       undo_link("The user \"#{params[:user][:name]}\" has successfully been added.")
     rescue
-      url_new_user = url_for :controller => 'users', :action => 'new'
-      flash[:error] = $!
+      url_new_user = url_for controller: 'users', action: 'new'
+      flash[:error] = "The user #{params[:user][:name]} does not exist or has already been added.</a>"
     end
-    redirect_to :action => 'list', :id => curr_object.id, :model => params[:model], :authorization => params[:authorization]
+    redirect_to action: 'list', id: curr_object.id, model: params[:model], authorization: params[:authorization]
   end
 
   def update_authorizations
@@ -58,16 +64,16 @@ class ParticipantsController < ApplicationController
 
     participant = Participant.find(params[:id])
     parent_id = participant.parent_id
-    participant.update_attributes(:can_submit => can_submit, :can_review => can_review, :can_take_quiz => can_take_quiz)
-    
-    redirect_to :action => 'list', :id => parent_id, :model => participant.class.to_s.gsub("Participant","")
+    participant.update_attributes(can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz)
+
+    redirect_to action: 'list', id: parent_id, model: participant.class.to_s.gsub("Participant", "")
   end
 
-  #duties: manager, designer, programmer, tester
+  # duties: manager, designer, programmer, tester
   def update_duties
     participant = Participant.find(params[:student_id])
-    participant.update_attributes(:duty => params[:duty])
-    redirect_to :controller => 'student_teams', :action => 'view', :student_id => participant.id
+    participant.update_attributes(duty: params[:duty])
+    redirect_to controller: 'student_teams', action: 'view', student_id: participant.id
   end
 
   def destroy
@@ -79,12 +85,12 @@ class ParticipantsController < ApplicationController
       participant.delete(params[:force])
       flash[:note] = undo_link("The user \"#{name}\" has been successfully removed as a participant.")
     rescue => error
-      url_yes = url_for :action => 'delete', :id => params[:id], :force => 1
-      url_show = url_for :action => 'delete_display', :id => params[:id], :model => participant.class.to_s.gsub("Participant","")
-      url_no  = url_for :action => 'list', :id => parent_id, :model => participant.class.to_s.gsub("Participant","")
+      url_yes = url_for action: 'delete', id: params[:id], force: 1
+      url_show = url_for action: 'delete_display', id: params[:id], model: participant.class.to_s.gsub("Participant", "")
+      url_no = url_for action: 'list', id: parent_id, model: participant.class.to_s.gsub("Participant", "")
       flash[:error] = "The delete action failed: At least one (1) review mapping or team membership exist for this participant. <br/><a href='#{url_yes}'>Delete this participant</a>&nbsp;|&nbsp;<a href='#{url_show}'>Show me the associated items</a>|&nbsp;<a href='#{url_no}'>Do nothing</a><BR/>"
     end
-    redirect_to :action => 'list', :id => parent_id, :model => participant.class.to_s.gsub("Participant","")
+    redirect_to action: 'list', id: parent_id, model: participant.class.to_s.gsub("Participant", "")
   end
 
   def delete_display
@@ -97,27 +103,25 @@ class ParticipantsController < ApplicationController
     maps = params[:ResponseMap]
     teamsusers = params[:TeamsUser]
 
-    if !maps.nil?
-      maps.each{
-        |rmap_id|
+    unless maps.nil?
+      maps.each do |rmap_id|
         begin
           ResponseMap.find(rmap_id[0].to_i).delete(true)
         rescue
         end
-      }
+      end
     end
 
-    if !teamsusers.nil?
-      teamsusers.each{
-        |tuser_id|
+    unless teamsusers.nil?
+      teamsusers.each do |tuser_id|
         begin
           TeamsUser.find(tuser_id[0].to_i).delete
         rescue
         end
-      }
+      end
     end
 
-    redirect_to :action => 'delete', :id => participant.id, :method => :post
+    redirect_to action: 'delete', id: participant.id, method: :post
   end
 
   # Copies existing participants from a course down to an assignment
@@ -128,17 +132,15 @@ class ParticipantsController < ApplicationController
 
     if course
       participants = course.participants
-      if participants.length > 0
-        participants.each{|participant|
+      if !participants.empty?
+        participants.each do |participant|
           new_participant = participant.copy(params[:id])
 
-          if new_participant
-            @copied_participants.push new_participant
-          end
-        }
+          @copied_participants.push new_participant if new_participant
+        end
 
         # Only display undo link if copies of participants are created
-        if @copied_participants.length > 0
+        if !@copied_participants.empty?
           undo_link("The participants from \"#{course.name}\" have been successfully copied to this assignment. ")
         else
           flash[:note] = 'All course participants are already in this assignment'
@@ -151,8 +153,7 @@ class ParticipantsController < ApplicationController
       flash[:error] = "No course was found for this assignment."
     end
 
-
-    redirect_to :controller => 'participants', :action => 'list', :id => assignment.id, :model => 'Assignment'
+    redirect_to controller: 'participants', action: 'list', id: assignment.id, model: 'Assignment'
   end
 
   def bequeath_all
@@ -160,28 +161,24 @@ class ParticipantsController < ApplicationController
     assignment = Assignment.find(params[:id])
     if assignment.course
       course = assignment.course
-      assignment.participants.each{ |participant|
+      assignment.participants.each do |participant|
         new_participant = participant.copy(course.id)
 
-        if new_participant
-          @copied_participants.push new_participant
-        end
-      }
+        @copied_participants.push new_participant if new_participant
+      end
       # only display undo link if copies of participants are created
-      if @copied_participants.length > 0
-        undo_link("All participants were successfully copied to \"#{course.name}\". " )
+      if !@copied_participants.empty?
+        undo_link("All participants were successfully copied to \"#{course.name}\". ")
       else
         flash[:note] = 'All assignment participants are already part of the course'
       end
 
-      #flash[:note] = "All participants were successfully copied to \""+course.name+"\""
+      # flash[:note] = "All participants were successfully copied to \""+course.name+"\""
     else
       flash[:error] = "This assignment is not associated with a course."
     end
 
-
-
-    redirect_to :controller => 'participants', :action => 'list', :id => assignment.id, :model => 'Assignment'
+    redirect_to controller: 'participants', action: 'list', id: assignment.id, model: 'Assignment'
   end
 
   # Allow participant to change handle for this assignment
@@ -191,13 +188,13 @@ class ParticipantsController < ApplicationController
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
 
-    if params[:participant] != nil
-      if AssignmentParticipant.where(parent_id: @participant.parent_id, handle: params[:participant][:handle]).length > 0
+    unless params[:participant].nil?
+      if !AssignmentParticipant.where(parent_id: @participant.parent_id, handle: params[:participant][:handle]).empty?
         flash[:error] = "<b>The handle #{params[:participant][:handle]}</b> is already in use for this assignment. Please select a different one."
-        redirect_to :controller => 'participants', :action => 'change_handle', :id => @participant
+        redirect_to controller: 'participants', action: 'change_handle', id: @participant
       else
         @participant.update_attributes(participant_params)
-        redirect_to :controller => 'student_task', :action => 'view', :id => @participant
+        redirect_to controller: 'student_task', action: 'view', id: @participant
       end
     end
   end
@@ -207,16 +204,16 @@ class ParticipantsController < ApplicationController
     name = contributor.name
     assignment_id = contributor.assignment
     begin
-      contributor.destroy
-      flash[:note] = "\"#{name}\" is no longer a participant in this assignment."
-    rescue
-      flash[:error] = "\"#{name}\" was not removed from this assignment. Please ensure that \"#{name}\" is not a reviewer or metareviewer and try again."
+        contributor.destroy
+        flash[:note] = "\"#{name}\" is no longer a participant in this assignment."
+      rescue
+        flash[:error] = "\"#{name}\" was not removed from this assignment. Please ensure that \"#{name}\" is not a reviewer or metareviewer and try again."
       end
-    redirect_to :controller => 'review_mapping', :action => 'list_mappings', :id => assignment_id
+    redirect_to controller: 'review_mapping', action: 'list_mappings', id: assignment_id
   end
 
-  #Seems like this function is similar to the above function> we are not quite sure what publishing rights mean. Seems like
-  #the values for the last column in http://expertiza.ncsu.edu/student_task/list are sourced from here
+  # Seems like this function is similar to the above function> we are not quite sure what publishing rights mean. Seems like
+  # the values for the last column in http://expertiza.ncsu.edu/student_task/list are sourced from here
   def view_publishing_rights
     # Get the assignment ID from the params
     assignment_id = params[:id]
@@ -242,37 +239,34 @@ class ParticipantsController < ApplicationController
       # List that hold the details of the users in the team
       users = []
       # For each of the users, do
-      team.users.each do |team_user|       
+      team.users.each do |team_user|
         # Append the user info to the users list
         users.append(get_user_info(team_user, assignment))
       end
       # Append the users list to the team_info object
-      team_info[:users] = users  
+      team_info[:users] = users
 
       # Get the signup topics for the assignment
-      @has_topics = get_signup_topics_for_assignment(assignment_id, team_info, team.id)   
+      @has_topics = get_signup_topics_for_assignment(assignment_id, team_info, team.id)
 
       # Choose only those teams that have signed up for topics
       team_without_topic = !SignedUpTeam.where(["team_id = ?", team.id]).any?
-      if @has_topics && team_without_topic
-        next
-      end
-      
+      next if @has_topics && team_without_topic
+
       # Append the hashmap to the list of hashmaps
       @teams_info.append(team_info)
     end
-    @teams_info = @teams_info.sort_by {|hashmap| [hashmap[:topic_id] ? 0 :1,hashmap[:topic_id] || 0 ] }
-
+    @teams_info = @teams_info.sort_by {|hashmap| [hashmap[:topic_id] ? 0 : 1, hashmap[:topic_id] || 0] }
   end
-
 
   private
+
   def participant_params
-    params.require(:participant).permit(:can_submit,:can_review,:user_id,:parent_id,:submitted_at,:permission_granted,:penalty_accumulated,:grade,:type,:handle,:time_stamp,:digital_signature,:duty,:can_take_quiz)
+    params.require(:participant).permit(:can_submit, :can_review, :user_id, :parent_id, :submitted_at, :permission_granted, :penalty_accumulated, :grade, :type, :handle, :time_stamp, :digital_signature, :duty, :can_take_quiz)
   end
 
-  # Get the user info from the team user 
-  def get_user_info(team_user, assignment) 
+  # Get the user info from the team user
+  def get_user_info(team_user, assignment)
     user = {}
     # Set user's name
     user[:name] = team_user.name
@@ -284,16 +278,16 @@ class ParticipantsController < ApplicationController
     hasSignature = false
     signatureValid = false
     assignment.participants.each do |participant|
-      if (team_user.id == participant.user.id)
+      if team_user.id == participant.user.id
         permissionGranted = participant.permission_granted?
       end
     end
     # If permission is granted, set the publisting rights string
-    if permissionGranted
-      user[:pub_rights] = "Granted"
-    else 
-      user[:pub_rights] = "Denied"
-    end
+    user[:pub_rights] = if permissionGranted
+                          "Granted"
+                        else
+                          "Denied"
+                        end
     user[:verified] = permissionGranted && hasSignature && signatureValid
     user
   end
@@ -301,11 +295,11 @@ class ParticipantsController < ApplicationController
   # Get the signup topics for the assignment
   def get_signup_topics_for_assignment(assignment_id, team_info, teamId)
     # Get the signup topics, if any for this assignment
-    signup_topics = SignUpTopic.where( ['assignment_id = ?', assignment_id])
+    signup_topics = SignUpTopic.where(['assignment_id = ?', assignment_id])
     if signup_topics.any?
-      # Set this attribute to true 
+      # Set this attribute to true
       has_topics = true
-      # Iterate through the list of signup_topics 
+      # Iterate through the list of signup_topics
       signup_topics.each do |signup_topic|
         # For each team that signed up for this topic, do
         signup_topic.signed_up_teams.each do |signed_up_team|
@@ -315,9 +309,8 @@ class ParticipantsController < ApplicationController
             team_info[:topic_id] = signup_topic.topic_identifier.to_i
           end
         end
-      end        
+      end
     end
     has_topics
   end
-
 end

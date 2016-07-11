@@ -5,6 +5,6 @@ class Student < User
   end
 
   def get_home_controller
-    return "student_task"
+    "student_task"
   end
 end

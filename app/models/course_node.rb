@@ -1,6 +1,6 @@
 class CourseNode < Node
-  belongs_to :course, :class_name => "Course", :foreign_key => "node_object_id"
-  belongs_to :node_object, :class_name => "Course"
+  belongs_to :course, class_name: "Course", foreign_key: "node_object_id"
+  belongs_to :node_object, class_name: "Course"
 
   # Returns the table in which to locate Courses
   def self.table
@@ -15,54 +15,54 @@ class CourseNode < Node
 
   # returns: list of CourseNodes based on query
   # the get method will return all courses meeting the criteria, but the method name is necessary due to polymorphism
-  def self.get(sortvar = 'name',sortorder ='ASC',user_id = nil,show = nil, parent_id = nil,search = nil)
+  def self.get(sortvar = 'name', sortorder = 'ASC', user_id = nil, show = nil, _parent_id = nil, search = nil)
     sortvar = 'created_at'
     sortorder = 'desc'
     if search
       splitsearch = search.split("+")
-      if(splitsearch[0] == 'filter')
-        search = splitsearch[1]
-      else
-        search = "%"+search+"%"
-      end
-      self.includes(:course).where([get_course_query_conditions(show, user_id)+ " and courses.name LIKE ?" , get_courses_managed_by_user(user_id), search]).order("courses.#{sortvar} #{sortorder}")
+      search = if splitsearch[0] == 'filter'
+                 splitsearch[1]
+               else
+                 "%" + search + "%"
+               end
+      self.includes(:course).where([get_course_query_conditions(show, user_id) + " and courses.name LIKE ?", get_courses_managed_by_user(user_id), search]).order("courses.#{sortvar} #{sortorder}")
     else
-      self.includes(:course).where([get_course_query_conditions(show, user_id) , get_courses_managed_by_user(user_id)]).order("courses.#{sortvar} #{sortorder}")
+      self.includes(:course).where([get_course_query_conditions(show, user_id), get_courses_managed_by_user(user_id)]).order("courses.#{sortvar} #{sortorder}")
       end
   end
 
-  #get the query conditions for a public course
+  # get the query conditions for a public course
   def self.get_course_query_conditions(show = nil, user_id = nil)
     this_user = User.find(user_id)
 
     if show
-      if this_user.is_teaching_assistant? == false
-        conditions = 'courses.instructor_id = '+ user_id.to_s
-      else
-        conditions = 'courses.id in (?)'
-      end
+      conditions = if this_user.is_teaching_assistant? == false
+                     'courses.instructor_id = ' + user_id.to_s
+                   else
+                     'courses.id in (?)'
+                   end
     else
-      if this_user.is_teaching_assistant? == false
-        conditions = '(courses.private = 0 or courses.instructor_id = '+user_id.to_s+')'
-      else
-        ##conditions = '(courses.private = 0 or courses.id in (?))'
-        conditions='((courses.private = 0 and courses.instructor_id !='+user_id.to_s+') or courses.instructor_id='+user_id.to_s+')'
-      end
+      conditions = if this_user.is_teaching_assistant? == false
+                     '(courses.private = 0 or courses.instructor_id = ' + user_id.to_s + ')'
+                   else
+                     # #conditions = '(courses.private = 0 or courses.id in (?))'
+                     '((courses.private = 0 and courses.instructor_id !=' + user_id.to_s + ') or courses.instructor_id=' + user_id.to_s + ')'
+                   end
     end
-    return conditions
+    conditions
   end
 
-  #get the courses managed by the user
+  # get the courses managed by the user
   def self.get_courses_managed_by_user(user_id = nil)
     this_user = User.find(user_id)
 
-    if this_user.is_teaching_assistant? == false
-      values = user_id
-    else
-      values = Ta.get_mapped_courses(user_id)
-    end
+    values = if this_user.is_teaching_assistant? == false
+               user_id
+             else
+               Ta.get_mapped_courses(user_id)
+             end
 
-    return values
+    values
   end
 
   # get parent id
@@ -78,56 +78,44 @@ class CourseNode < Node
 
   # Gets any children associated with this object
   # the get_children method will return assignments belonging to a course, but the method name is necessary due to polymorphism
-  def get_children(sortvar = nil,sortorder =nil,user_id = nil,show = nil, parent_id = nil,search =nil)
-    AssignmentNode.get(sortvar,sortorder,user_id,show,self.node_object_id,search)
+  def get_children(sortvar = nil, sortorder = nil, user_id = nil, show = nil, _parent_id = nil, search = nil)
+    AssignmentNode.get(sortvar, sortorder, user_id, show, self.node_object_id, search)
   end
 
   # Gets the name from the associated object
   def get_name
-    unless @course
-      @course=Course.find(self.node_object_id)
-    end
+    @course = Course.find(self.node_object_id) unless @course
     @course.name
   end
 
   # Gets the directory_path from the associated object
   def get_directory
-    unless @course
-      @course=Course.find(self.node_object_id)
-    end
+    @course = Course.find(self.node_object_id) unless @course
     @course.directory_path
   end
 
   # Gets the created_at from the associated object
   def get_creation_date
-    unless @course
-      @course=Course.find(self.node_object_id)
-    end
+    @course = Course.find(self.node_object_id) unless @course
     @course.created_at
   end
 
   # Gets the updated_at from the associated object
   def get_modified_date
-    unless @course
-      @course=Course.find(self.node_object_id)
-    end
+    @course = Course.find(self.node_object_id) unless @course
     @course.updated_at
   end
 
   # Gets the private attribute from the associated object
   def get_private
-    unless @course
-      @course=Course.find(self.node_object_id)
-    end
+    @course = Course.find(self.node_object_id) unless @course
     @course.private
   end
 
   # Gets the instructor_id from the associated object
   def get_instructor_id
-    #Course.find(self.node_object_id).course_id
-    unless @course
-      @course = Course.find(self.node_object_id)
-    end
+    # Course.find(self.node_object_id).course_id
+    @course = Course.find(self.node_object_id) unless @course
     @course.instructor_id
   end
 
@@ -139,5 +127,4 @@ class CourseNode < Node
   def get_survey_distribution_id
     Course.find(self.node_object_id).survey_distribution_id
   end
-
 end

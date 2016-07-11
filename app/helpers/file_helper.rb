@@ -1,5 +1,4 @@
 module FileHelper
-
   def self.sanitize_filename(file_name)
     just_filename = File.basename(file_name)
     FileHelper.clean_path(just_filename)
@@ -7,25 +6,24 @@ module FileHelper
 
   def self.move_file(oldloc, newloc)
     items = newloc.split(/\//)
-    filename = items[items.length-1]
-    items.delete_at(items.length-1)
+    filename = items[items.length - 1]
+    items.delete_at(items.length - 1)
 
-    newdir = String.new
-    items.each{
-      | item |
-      newdir += FileHelper::clean_path(item)+"/"
-    }
+    newdir = ''
+    items.each do |item|
+      newdir += FileHelper.clean_path(item) + "/"
+    end
 
-    FileHelper::create_directory_from_path(newdir)
-    FileUtils.mv oldloc, newdir+filename
+    FileHelper.create_directory_from_path(newdir)
+    FileUtils.mv oldloc, newdir + filename
   end
 
-  def self.update_file_location(oldpath,newpath)
+  def self.update_file_location(oldpath, newpath)
     begin
       if oldpath and newpath
         create_directory_from_path(newpath)
         oldcontents = Dir.glob(oldpath + "/*")
-        FileUtils.mv(oldcontents,newpath)
+        FileUtils.mv(oldcontents, newpath)
         FileUtils.remove_dir(oldpath)
       elsif newpath # nil oldpath
         create_directory_from_path(newpath)
@@ -40,21 +38,18 @@ module FileHelper
   #           forward slash
   #           alphanumeric characters
   def self.clean_path(file_name)
-    newstr = file_name.gsub(/[^\w\.\_\/]/,'_')
-    newstr.gsub("'","_")
+    newstr = file_name.gsub(/[^\w\.\_\/]/, '_')
+    newstr.tr("'", "_")
   end
 
-
   def self.sanitize_folder(folder)
-    folder.gsub("..","")
+    folder.gsub("..", "")
   end
 
   def self.delete_directory(in_object)
     begin
       entries = Dir.entries(in_object.path)
-      if entries and entries.size == 2
-        FileUtils.remove_dir(in_object.path)
-      end
+      FileUtils.remove_dir(in_object.path) if entries and entries.size == 2
     rescue PathError
       # No action required
     rescue
@@ -64,9 +59,7 @@ module FileHelper
 
   def self.create_directory(in_object)
     begin
-      if !File.exists? in_object.path
-        FileUtils.mkdir_p(in_object.path)
-      end
+      FileUtils.mkdir_p(in_object.path) unless File.exist? in_object.path
     rescue PathError
     rescue
       raise "An error occurred while creating this directory: "+$!
@@ -75,9 +68,7 @@ module FileHelper
 
   def self.create_directory_from_path(path)
     begin
-      if !File.exists? path
-        FileUtils.mkdir_p(path)
-      end
+      FileUtils.mkdir_p(path) unless File.exist? path
     rescue PathError
     rescue
       raise "An error occurred while creating this directory: "+$!

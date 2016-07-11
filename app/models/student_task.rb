@@ -12,11 +12,11 @@ class StudentTask
 
   def self.from_participant(participant)
     StudentTask.new(
-      :participant => participant,
-      :assignment => participant.assignment,
-      :topic => participant.topic,
-      :current_stage => participant.current_stage,
-      :stage_deadline => (Time.parse(participant.stage_deadline) rescue Time.now + 1.years)
+      participant: participant,
+      assignment: participant.assignment,
+      topic: participant.topic,
+      current_stage: participant.current_stage,
+      stage_deadline: (Time.parse(participant.stage_deadline) rescue Time.now + 1.year)
     )
   end
 
@@ -39,13 +39,11 @@ class StudentTask
   end
 
   def content_submitted_in_current_stage?
-    (current_stage == "submission" ) &&
-      (participant.resubmission_times.size > 0 || hyperlinks.present?)
+    (current_stage == "submission") &&
+      (!participant.resubmission_times.empty? || hyperlinks.present?)
   end
 
-  def course
-    assignment.course
-  end
+  delegate :course, to: :assignment
 
   def hyperlinks
     @hyperlinks ||= participant.team.nil? ? [] : participant.team.hyperlinks
@@ -56,7 +54,7 @@ class StudentTask
   end
 
   def metareviews_given?
-    response_maps.inject(nil) { |i, j| i || (j.response && j.class.to_s[/Metareview/]) }
+    response_maps.inject(nil) {|i, j| i || (j.response && j.class.to_s[/Metareview/]) }
   end
 
   def metareviews_given_in_current_stage?
@@ -72,12 +70,10 @@ class StudentTask
     time_ago_in_words(stage_deadline) if stage_deadline
   end
 
-  def response_maps
-    participant.response_maps
-  end
+  delegate :response_maps, to: :participant
 
   def reviews_given?
-    response_maps.inject(nil) { |i, j| i || (j.response && j.class.to_s[/Review/]) }
+    response_maps.inject(nil) {|i, j| i || (j.response && j.class.to_s[/Review/]) }
   end
 
   def reviews_given_in_current_stage?
@@ -103,37 +99,32 @@ class StudentTask
        metareviews_given_in_current_stage?)
   end
 
-  def topic
-    participant.topic
-  end
+  delegate :topic, to: :participant
 
   def self.teamed_students(user)
+    @students_teamed = {} # {|h,k| h[k] = Hash.new(&h.default_proc)}
+    @teammates = []
+    @teams = user.teams
 
-        @students_teamed = Hash.new #{|h,k| h[k] = Hash.new(&h.default_proc)}
-        @teammates = Array.new
-        @teams = user.teams
-         
-         @teams.each do |team|
-            # Teammates in calibration assignment should not be counted in teaming requirement.
-            if Assignment.find(team.parent_id).is_calibrated == false
-               @teammates  = []
-               @course_id = Assignment.find(team.parent_id).course_id
-               @team_participants = Team.find(team.id).participants
-               @team_participants = @team_participants.select {|participant| participant.name != user.name}
-               @team_participants.each{ |t|
-                   u = Student.find(t.user_id)
-                   @teammates << u.fullname
-               }
-               if !@teammates.empty?
-                   if @students_teamed[@course_id].nil?
-                      @students_teamed[@course_id] = @teammates
-                   else
-                       @teammates.each do |teammate| @students_teamed[@course_id] << teammate end
-                   end
-                   @students_teamed[@course_id].uniq! if @students_teamed.has_key?(@course_id)
-               end
-            end
-         end
-        @students_teamed
+    @teams.each do |team|
+      # Teammates in calibration assignment should not be counted in teaming requirement.
+      next unless Assignment.find(team.parent_id).is_calibrated == false
+      @teammates = []
+      @course_id = Assignment.find(team.parent_id).course_id
+      @team_participants = Team.find(team.id).participants
+      @team_participants = @team_participants.select {|participant| participant.name != user.name }
+      @team_participants.each do |t|
+        u = Student.find(t.user_id)
+        @teammates << u.fullname
+      end
+      next if @teammates.empty?
+      if @students_teamed[@course_id].nil?
+        @students_teamed[@course_id] = @teammates
+      else
+        @teammates.each {|teammate| @students_teamed[@course_id] << teammate }
+        end
+      @students_teamed[@course_id].uniq! if @students_teamed.key?(@course_id)
+    end
+    @students_teamed
   end
 end

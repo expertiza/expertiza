@@ -1,7 +1,6 @@
-#custom_logger.rb
+# custom_logger.rb
 class CustomLogger < Logger
-  def format_message(severity, timestamp, progname, msg)
+  def format_message(_severity, _timestamp, _progname, msg)
     "#{msg}\n"
   end
 end
-

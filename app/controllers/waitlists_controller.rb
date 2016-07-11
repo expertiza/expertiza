@@ -1,15 +1,15 @@
 class WaitlistsController < ApplicationController
   def index
     list
-    render :action => 'list'
+    render action: 'list'
   end
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
-  verify :method => :post, :only => [ :destroy, :create, :update ],
-    :redirect_to => { :action => :list }
+  verify method: :post, only: [:destroy, :create, :update],
+         redirect_to: {action: :list}
 
   def list
-    @waitlists = Waitlist.paginate(:page => params[:page], :per_page => 10)
+    @waitlists = Waitlist.paginate(page: params[:page], per_page: 10)
   end
 
   def show
@@ -24,9 +24,9 @@ class WaitlistsController < ApplicationController
     @waitlist = Waitlist.new(params[:waitlist])
     if @waitlist.save
       flash[:notice] = 'The wait list was successfully created.'
-      redirect_to :action => 'list'
+      redirect_to action: 'list'
     else
-      render :action => 'new'
+      render action: 'new'
     end
   end
 
@@ -38,14 +38,14 @@ class WaitlistsController < ApplicationController
     @waitlist = Waitlist.find(params[:id])
     if @waitlist.update_attributes(params[:waitlist])
       flash[:notice] = 'The wait list was successfully updated.'
-      redirect_to :action => 'show', :id => @waitlist
+      redirect_to action: 'show', id: @waitlist
     else
-      render :action => 'edit'
+      render action: 'edit'
     end
   end
 
   def destroy
     Waitlist.find(params[:id]).destroy
-    redirect_to :action => 'list'
+    redirect_to action: 'list'
   end
 end

@@ -1,7 +1,7 @@
-#require 'rails_helper'
-#include LogInHelper
+# require 'rails_helper'
+# include LogInHelper
 #
-#feature 'Method 1: Instructor search a user' do
+# feature 'Method 1: Instructor search a user' do
 #  before(:all) do
 #    instructor.save
 #    student.save
@@ -9,7 +9,7 @@
 #  end
 #
 #  scenario 'by login name' do
-#    
+#
 #    visit '/users/list'
 #    fill_in 'letter', with: 'student'
 #    find('#search_by').select 'Username'
@@ -18,9 +18,9 @@
 #    expect(page).to have_content("Student, Perfect")
 #    expect(page).to have_content("pstudent@dev.null")
 #  end
-#end
+# end
 #
-#feature 'Method2: Instructor search a user' do
+# feature 'Method2: Instructor search a user' do
 #  before(:all) do
 #    instructor.save
 #    student.save
@@ -37,9 +37,9 @@
 #    expect(page).to have_content("Dole, Bob")
 #    expect(page).to have_content("bdole@dev.null")
 #  end
-#end
+# end
 #
-#feature 'Method3: Instructor search a user' do
+# feature 'Method3: Instructor search a user' do
 #  before(:all) do
 #    instructor.save
 #    student.save
@@ -56,9 +56,9 @@
 #    expect(page).to have_content("Dole, Bob")
 #    expect(page).to have_content("bdole@dev.null")
 #  end
-#end
+# end
 #
-#feature 'Instructor attempts to delete a user' do
+# feature 'Instructor attempts to delete a user' do
 #  before(:all) do
 #    instructor.save
 #    student.save
@@ -76,4 +76,4 @@
 #    expect(page).to_not have_content("student")
 #    expect(page).to have_content("instructor")
 #  end
-#end
+# end

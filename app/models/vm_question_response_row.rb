@@ -1,7 +1,6 @@
-#represents each row of a heatgrid-table, which is represented by the vm_question_response class.
+# represents each row of a heatgrid-table, which is represented by the vm_question_response class.
 class VmQuestionResponseRow
-
-  def initialize(questionText, question_id, weight,question_max_score,seq)
+  def initialize(questionText, question_id, weight, question_max_score, seq)
     @questionText = questionText
     @weight = weight
 
@@ -10,40 +9,26 @@ class VmQuestionResponseRow
 
     @question_max_score = question_max_score
 
-    @score_row = Array.new
+    @score_row = []
 
     @countofcomments = 0
   end
 
-  def countofcomments
-    @countofcomments
-  end
+  attr_reader :countofcomments
 
-  def question_seq
-    @question_seq
-  end
+  attr_reader :question_seq
 
-  def countofcomments=(newcount)
-    @countofcomments = newcount
-  end
+  attr_writer :countofcomments
 
-  def questionText
-    @questionText
-  end
+  attr_reader :questionText
 
-  def question_id
-    @question_id
-  end
+  attr_reader :question_id
 
-  def score_row
-    @score_row
-  end
+  attr_reader :score_row
 
-  def weight
-    @weight
-  end
+  attr_reader :weight
 
-  #the question max score is the max score of the questionnaire, except if the question is a true/false, in which case
+  # the question max score is the max score of the questionnaire, except if the question is a true/false, in which case
   # the max score is one.
   def question_max_score
     question = Question.find(self.question_id)
@@ -66,5 +51,4 @@ class VmQuestionResponseRow
     row_average_score /= @score_row.length.to_f
     row_average_score.round(2)
   end
-
 end

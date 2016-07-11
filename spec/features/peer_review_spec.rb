@@ -1,23 +1,22 @@
 require 'rails_helper'
 
-describe "peer review testing", :type => :feature do
-
+describe "peer review testing", type: :feature do
   before(:each) do
     create(:assignment, name: "TestAssignment", directory_path: 'test_assignment')
     create_list(:participant, 3)
     create(:assignment_node)
-    create(:deadline_type,name:"submission")
-    create(:deadline_type,name:"review")
-    create(:deadline_type,name:"metareview")
-    create(:deadline_type,name:"drop_topic")
-    create(:deadline_type,name:"signup")  
-    create(:deadline_type,name:"team_formation")
+    create(:deadline_type, name: "submission")
+    create(:deadline_type, name: "review")
+    create(:deadline_type, name: "metareview")
+    create(:deadline_type, name: "drop_topic")
+    create(:deadline_type, name: "signup")
+    create(:deadline_type, name: "team_formation")
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create(:due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now + (100*24*60*60))
-    create(:topic) 
-    create(:topic, topic_name: "TestReview") 
+    create(:due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now + (100 * 24 * 60 * 60))
+    create(:topic)
+    create(:topic, topic_name: "TestReview")
     create(:team_user, user: User.where(role_id: 2).first)
     create(:team_user, user: User.where(role_id: 2).second)
     create(:assignment_team)
@@ -26,9 +25,9 @@ describe "peer review testing", :type => :feature do
     create(:signed_up_team, team_id: 2, topic: SignUpTopic.second)
     create(:assignment_questionnaire)
     create(:question)
-    #create(:review_response_map, reviewer_id: User.where(role_id: 2).third.id)
-    #create(:review_response_map, reviewer_id: User.where(role_id: 2).second.id, reviewee: AssignmentTeam.second)
-#sleep(10000)
+    # create(:review_response_map, reviewer_id: User.where(role_id: 2).third.id)
+    # create(:review_response_map, reviewer_id: User.where(role_id: 2).second.id, reviewee: AssignmentTeam.second)
+    # sleep(10000)
   end
 
   def load_questionnaire
@@ -54,8 +53,8 @@ describe "peer review testing", :type => :feature do
     load_questionnaire
 
     # Fill in a textbox and a dropdown
-    fill_in "responses[0][comment]", :with => "HelloWorld"
-    select 5, :from => "responses[0][score]"
+    fill_in "responses[0][comment]", with: "HelloWorld"
+    select 5, from: "responses[0][score]"
     click_button "Submit Review"
     expect(page).to have_content "Your response was successfully saved."
   end
@@ -63,8 +62,8 @@ describe "peer review testing", :type => :feature do
   it "fills in a single comment with multi word text and saves" do
     # Load questionnaire with generic setup
     load_questionnaire
-    # Fill in a textbox with a multi word comment 
-    fill_in "responses[0][comment]", :with => "Excellent Work"
+    # Fill in a textbox with a multi word comment
+    fill_in "responses[0][comment]", with: "Excellent Work"
     click_button "Submit Review"
     expect(page).to have_content "Your response was successfully saved."
   end
@@ -73,7 +72,7 @@ describe "peer review testing", :type => :feature do
     # Load questionnaire with generic setup
     load_questionnaire
     # Fill in a textbox with a single word comment
-    fill_in "responses[0][comment]", :with => "Excellent"
+    fill_in "responses[0][comment]", with: "Excellent"
     click_button "Submit Review"
     expect(page).to have_content "Your response was successfully saved."
   end
@@ -82,7 +81,7 @@ describe "peer review testing", :type => :feature do
     # Load questionnaire with generic setup
     load_questionnaire
     # Fill in a dropdown with some points
-    select 5, :from => "responses[0][score]"
+    select 5, from: "responses[0][score]"
     click_button "Submit Review"
     expect(page).to have_content "Your response was successfully saved."
   end
@@ -99,7 +98,7 @@ describe "peer review testing", :type => :feature do
     load_questionnaire
 
     # Filling in Additional Comments only
-    fill_in "review[comments]", :with => "Excellent work done!"
+    fill_in "review[comments]", with: "Excellent work done!"
     click_button "Submit Review"
     expect(page).to have_content "Your response was successfully saved."
   end

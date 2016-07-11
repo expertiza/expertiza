@@ -1,13 +1,12 @@
-#Author: Hao Liu
-#Email: hliu11@ncsu.edu
-#created at: May, 28, 2013
-#update at: May, 28, 2013
+# Author: Hao Liu
+# Email: hliu11@ncsu.edu
+# created at: May, 28, 2013
+# update at: May, 28, 2013
 
-#added the below lines E913
-#No changes needed
-#our changes end E913
+# added the below lines E913
+# No changes needed
+# our changes end E913
 class DueDateController < ApplicationController
-
   def delete_all
     if params[:assignment_id].nil?
       flash[:error] = "Missing assignment:" + params[:assignment_id]
@@ -21,12 +20,10 @@ class DueDateController < ApplicationController
     end
 
     @due_dates = DueDate.where(assignment_id: params[:assignment_id])
-    @due_dates.each do |due_date|
-      due_date.delete
-    end
+    @due_dates.each(&:delete)
 
     respond_to do |format|
-      format.json { render :json => @due_dates }
+      format.json { render json: @due_dates }
     end
   end
 
@@ -52,7 +49,7 @@ class DueDateController < ApplicationController
     @due_date.save
 
     respond_to do |format|
-      format.json { render :json => @due_date }
+      format.json { render json: @due_date }
     end
   end
 end

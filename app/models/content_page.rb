@@ -8,8 +8,6 @@ class ContentPage < ActiveRecord::Base
 
   attr_accessor :content_html
 
-
-
   def url
     "/#{self.name}"
   end
@@ -26,7 +24,7 @@ class ContentPage < ActiveRecord::Base
   end
 
   def content_html
-    if content_cache && content_cache.length > 0
+    if content_cache && !content_cache.empty?
       content_cache.html_safe
     else
       markup_content.html_safe
@@ -38,16 +36,16 @@ class ContentPage < ActiveRecord::Base
   def markup_content
     markup = self.markup_style
     if markup and markup.name
-      if markup.name == 'Textile'
-        content_html = RedCloth.new(self.content).to_html(:textile)
-      elsif markup.name == 'Markdown'
-        content_html = RedCloth.new(self.content).to_html(:markdown)
-      else
-        content_html = self.content
-      end
+      content_html = if markup.name == 'Textile'
+                       RedCloth.new(self.content).to_html(:textile)
+                     elsif markup.name == 'Markdown'
+                       RedCloth.new(self.content).to_html(:markdown)
+                     else
+                       self.content
+                     end
     else
       content_html = self.content
     end
-    return content_html
+    content_html
   end
 end

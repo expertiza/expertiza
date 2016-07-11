@@ -5,12 +5,10 @@ class AuthorFeedbackQuestionnaire < Questionnaire
   end
 
   def symbol
-    return "feedback".to_sym
+    "feedback".to_sym
   end
 
   def get_assessments_for(participant)
-    participant.feedback()
+    participant.feedback
   end
-
-
 end

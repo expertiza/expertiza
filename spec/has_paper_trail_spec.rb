@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe 'has_paper_trail' do
   it "will create Version record when create delayed jobs record" do
-    PaperTrail.enabled =true
+    PaperTrail.enabled = true
     for version in Version.all
       version.delete
     end

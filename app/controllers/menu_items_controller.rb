@@ -1,8 +1,6 @@
 require 'menu'
 
 class MenuItemsController < ApplicationController
-
-
   def action_allowed?
     case params[:action]
     when 'link'
@@ -12,7 +10,7 @@ class MenuItemsController < ApplicationController
 
   def index
     list
-    render :action => 'list'
+    render action: 'list'
   end
 
   def list
@@ -40,21 +38,21 @@ class MenuItemsController < ApplicationController
     @menu_item.parent_id = @parent_item.id
     foreign
     @can_change_parent = false
-    render :action => 'new'
+    render action: 'new'
   end
 
   def create
     # Flash an error if neither an action nor a page has been selected
-    if (params[:menu_item][:controller_action_id] == nil or
-        params[:menu_item][:controller_action_id].length == 0 ) and
-      (params[:menu_item][:content_page_id] == nil or
-       params[:menu_item][:content_page_id].length == 0 )
+    if (params[:menu_item][:controller_action_id].nil? or
+        params[:menu_item][:controller_action_id].empty?) and
+      (params[:menu_item][:content_page_id].nil? or
+       params[:menu_item][:content_page_id].empty?)
       flash[:error] = "You must specify either an action or a page!"
       @menu_item = MenuItem.new(params[:menu_item])
       @parent_item = MenuItem.find(params[:menu_item][:parent_id])
       foreign
       @can_change_parent = false
-      render :action => 'new', :id => params[:id]
+      render action: 'new', id: params[:id]
       return
     end
 
@@ -64,10 +62,10 @@ class MenuItemsController < ApplicationController
     if @menu_item.save
       flash[:notice] = 'The menu item was successfully created.'
       Role.rebuild_cache
-      redirect_to :action => 'list'
+      redirect_to action: 'list'
     else
       foreign
-      render :action => 'new'
+      render action: 'new'
     end
   end
 
@@ -81,13 +79,13 @@ class MenuItemsController < ApplicationController
 
   def update
     # Flash an error if neither an action nor a page has been selected
-    if (params[:menu_item][:controller_action_id] == nil or
-        params[:menu_item][:controller_action_id].length == 0 ) and
-      (params[:menu_item][:content_page_id] == nil or
-       params[:menu_item][:content_page_id].length == 0 )
+    if (params[:menu_item][:controller_action_id].nil? or
+        params[:menu_item][:controller_action_id].empty?) and
+      (params[:menu_item][:content_page_id].nil? or
+       params[:menu_item][:content_page_id].empty?)
       flash[:error] = "You must specify either an action or a page!"
       edit
-      render :action => 'edit'
+      render action: 'edit'
       return
     end
 
@@ -99,83 +97,80 @@ class MenuItemsController < ApplicationController
       repack_for = @menu_item.parent_id
       # Put at the end of new parent's list
       params[:menu_item][:seq] = MenuItem.next_seq(params[:menu_item][:parent_id])
-  else
-    do_repack = false
+    else
+      do_repack = false
   end
 
-  if @menu_item.update_attributes(params[:menu_item])
-    flash[:notice] = 'The menu item was successfully updated.'
-    if do_repack
-      MenuItem.repack(repack_for)
+    if @menu_item.update_attributes(params[:menu_item])
+      flash[:notice] = 'The menu item was successfully updated.'
+      MenuItem.repack(repack_for) if do_repack
+      Role.rebuild_cache
+      # redirect_to :action => 'show', :id => @menu_item
+      redirect_to action: 'list'
+    else
+      foreign
+      render action: 'edit'
     end
+end
+
+  def move_up
+    @menu_item = MenuItem.find(params[:id])
+    @above = @menu_item.above
+
+    if @above
+      @menu_item.update_attribute :seq, (@menu_item.seq - 1)
+      @above.update_attribute :seq, (@above.seq + 1)
+      Role.rebuild_cache
+    end
+    redirect_to action: 'list'
+  end
+
+  def move_down
+    @menu_item = MenuItem.find(params[:id])
+    @below = @menu_item.below
+
+    if @below
+      @menu_item.update_attribute :seq, (@menu_item.seq + 1)
+      @below.update_attribute :seq, (@below.seq - 1)
+      Role.rebuild_cache
+    end
+    redirect_to action: 'list'
+  end
+
+  def destroy
+    @menu_item = MenuItem.find(params[:id])
+    repack_for = @menu_item.parent_id
+    @menu_item.destroy
+    MenuItem.repack(repack_for)
     Role.rebuild_cache
-    # redirect_to :action => 'show', :id => @menu_item
-    redirect_to :action => 'list'
-  else
-    foreign
-    render :action => 'edit'
-  end
-end
-
-def move_up
-  @menu_item = MenuItem.find(params[:id])
-  @above = @menu_item.above
-
-  if @above
-    @menu_item.update_attribute :seq, (@menu_item.seq - 1)
-    @above.update_attribute :seq, (@above.seq + 1)
-    Role.rebuild_cache
-  end
-  redirect_to :action => 'list'
-end
-
-def move_down
-  @menu_item = MenuItem.find(params[:id])
-  @below = @menu_item.below
-
-  if @below
-    @menu_item.update_attribute :seq, (@menu_item.seq + 1)
-    @below.update_attribute :seq, (@below.seq - 1)
-    Role.rebuild_cache
-  end
-  redirect_to :action => 'list'
-end
-
-def destroy
-  @menu_item = MenuItem.find(params[:id])
-  repack_for = @menu_item.parent_id
-  @menu_item.destroy
-  MenuItem.repack(repack_for)
-  Role.rebuild_cache
-  redirect_to :action => 'list'
-end
-
-def link
-  str = params[:name]
-  node = session[:menu].select(str)
-  if node
-    redirect_to node.url
-  else
-    logger.error "(error in menu)"
-    redirect_to "/"
-  end
-end
-
-protected
-
-def foreign
-  if self.respond_to?(:id)
-    @parents = MenuItem.where('id != ?', self.id).order(:name)
-  else
-    @parents = MenuItem.order(:name)
+    redirect_to action: 'list'
   end
 
-  @parents.unshift MenuItem.new(:id => nil, :name => '(root)')
-  @actions = ControllerAction.order_by_controller_and_action
-  @actions.unshift ControllerAction.new(:id => nil, :name => '(none)')
+  def link
+    str = params[:name]
+    node = session[:menu].select(str)
+    if node
+      redirect_to node.url
+    else
+      logger.error "(error in menu)"
+      redirect_to "/"
+    end
+  end
 
-  @pages = ContentPage.order(:name)
-  @pages.unshift ContentPage.new(:id => nil, :name => '(none)')
-end
+  protected
 
+  def foreign
+    @parents = if self.respond_to?(:id)
+                 MenuItem.where('id != ?', self.id).order(:name)
+               else
+                 MenuItem.order(:name)
+               end
+
+    @parents.unshift MenuItem.new(id: nil, name: '(root)')
+    @actions = ControllerAction.order_by_controller_and_action
+    @actions.unshift ControllerAction.new(id: nil, name: '(none)')
+
+    @pages = ContentPage.order(:name)
+    @pages.unshift ContentPage.new(id: nil, name: '(none)')
+  end
 end

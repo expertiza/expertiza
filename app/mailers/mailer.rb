@@ -1,5 +1,4 @@
 class Mailer < ActionMailer::Base
-
   if Rails.env.development? || Rails.env.test?
     default from: 'expertiza.development@gmail.com'
   else
@@ -34,9 +33,8 @@ class Mailer < ActionMailer::Base
       defn[:to] = 'expertiza.development@gmail.com'
     end
     mail(subject: defn[:subject],
-         #content_type: "text/html",
+         # content_type: "text/html",
          to: defn[:to])
-
   end
 
   def delayed_message(defn)
@@ -44,7 +42,7 @@ class Mailer < ActionMailer::Base
                body: defn[:body],
                content_type: "text/html",
                bcc: defn[:bcc])
-    CUSTOM_LOGGER.info("#{ret.encoded}")
+    CUSTOM_LOGGER.info(ret.encoded.to_s)
   end
 
   def suggested_topic_approved_message(defn)
@@ -58,6 +56,5 @@ class Mailer < ActionMailer::Base
     mail(subject: defn[:subject],
          to: defn[:to],
          bcc: defn[:cc])
-
   end
 end

@@ -6,6 +6,9 @@ branches:
     - master
     - production
     - rails4
+addons:
+    code_climate:
+        repo_token: d20eadb9183f9f1866657be5b5e47b4a2398ff1ea0be29fbd50a26a43ea98b62
 before_install:
     - uname -a
     - lsb_release -a

@@ -1,27 +1,26 @@
 require 'rails_helper'
 
 describe "Integration tests for instructor interface" do
-
   before(:each) do
     create(:assignment)
-    create_list(:participant, 3) 
+    create_list(:participant, 3)
     create(:assignment_node)
-    create(:deadline_type,name:"submission")
-    create(:deadline_type,name:"review")
-    create(:deadline_type,name:"metareview")
-    create(:deadline_type,name:"drop_topic")
-    create(:deadline_type,name:"signup")  
-    create(:deadline_type,name:"team_formation")
+    create(:deadline_type, name: "submission")
+    create(:deadline_type, name: "review")
+    create(:deadline_type, name: "metareview")
+    create(:deadline_type, name: "drop_topic")
+    create(:deadline_type, name: "signup")
+    create(:deadline_type, name: "team_formation")
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
     create(:due_date)
-    create(:due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now + (100*24*60*60))
+    create(:due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now + (100 * 24 * 60 * 60))
   end
 
   describe "Instructor login" do
     it "with valid username and password" do
-      login_as("instructor6")  
+      login_as("instructor6")
       visit '/tree_display/list'
       expect(page).to have_content("Manage content")
     end
@@ -35,7 +34,7 @@ describe "Integration tests for instructor interface" do
     end
   end
 
-  describe "Create a course", :type => :controller do
+  describe "Create a course", type: :controller do
     it "is able to create a public course or a private course" do
       login_as("instructor6")
       visit '/course/new?private=0'
@@ -57,7 +56,6 @@ describe "Integration tests for instructor interface" do
       expect(page).to have_content('Team name')
       expect(page).not_to have_content('Topic name(s)')
       expect(page).not_to have_content('Topic #')
-
     end
   end
 
@@ -67,8 +65,8 @@ describe "Integration tests for instructor interface" do
       visit '/assignments/1/edit'
       click_link "Topics"
       click_link "Import topics"
-      file_path=Rails.root+"spec/features/assignment_topic_csvs/3-col-valid_topics_import.csv"
-      attach_file('file',file_path)
+      file_path = Rails.root + "spec/features/assignment_topic_csvs/3-col-valid_topics_import.csv"
+      attach_file('file', file_path)
       click_button "Import"
       click_link "Topics"
       expect(page).to have_content('expertiza')
@@ -80,8 +78,8 @@ describe "Integration tests for instructor interface" do
       visit '/assignments/1/edit'
       click_link "Topics"
       click_link "Import topics"
-      file_path=Rails.root+"spec/features/assignment_topic_csvs/3or4-col-valid_topics_import.csv"
-      attach_file('file',file_path)
+      file_path = Rails.root + "spec/features/assignment_topic_csvs/3or4-col-valid_topics_import.csv"
+      attach_file('file', file_path)
       click_button "Import"
       click_link "Topics"
       expect(page).to have_content('capybara')
@@ -93,8 +91,8 @@ describe "Integration tests for instructor interface" do
       visit '/assignments/1/edit'
       click_link "Topics"
       click_link "Import topics"
-      file_path=Rails.root+"spec/features/assignment_topic_csvs/invalid_topics_import.csv"
-      attach_file('file',file_path)
+      file_path = Rails.root + "spec/features/assignment_topic_csvs/invalid_topics_import.csv"
+      attach_file('file', file_path)
       click_button "Import"
       click_link "Topics"
       expect(page).not_to have_content('airtable')
@@ -106,8 +104,8 @@ describe "Integration tests for instructor interface" do
       visit '/assignments/1/edit'
       click_link "Topics"
       click_link "Import topics"
-      file_path=Rails.root+"spec/features/assignment_topic_csvs/random.txt"
-      attach_file('file',file_path)
+      file_path = Rails.root + "spec/features/assignment_topic_csvs/random.txt"
+      attach_file('file', file_path)
       click_button "Import"
       click_link "Topics"
       expect(page).not_to have_content('this is a random file which should fail')

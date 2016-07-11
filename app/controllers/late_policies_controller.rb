@@ -36,7 +36,7 @@ class LatePoliciesController < ApplicationController
 
     respond_to do |format|
       format.html # index.html.erb
-      format.xml  { render :xml => @penalty_policies }
+      format.xml  { render xml: @penalty_policies }
     end
   end
 
@@ -47,7 +47,7 @@ class LatePoliciesController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
-      format.xml  { render :xml => @penalty_policy }
+      format.xml  { render xml: @penalty_policy }
     end
   end
 
@@ -58,110 +58,113 @@ class LatePoliciesController < ApplicationController
 
     respond_to do |format|
       format.html # new.html.erb
-      format.xml  { render :xml => @late_policy }
+      format.xml  { render xml: @late_policy }
     end
   end
 
   # GET /late_policies/1/edit
   def edit
     @penalty_policy = LatePolicy.find(params[:id])
-
   end
 
   # POST /late_policies
   # POST /late_policies.xml
   def create
-
     is_number = true
 
-    #if(!is_numeric?(params[:late_policy][:penalty_per_unit]))
-    #  flash[:error] = "The penalty points per unit should be a numeric value."
+    # if(!is_numeric?(params[:late_policy][:penalty_per_unit]))
+    #  flash[:error] = "The penalty points per unit should be a numeric value"
     #  is_number = false
-    #elsif (params[:late_policy][:penalty_per_unit].to_i < 0)
-    #  flash[:error] = "The penalty points per unit cannot be negative."
+    # elsif (params[:late_policy][:penalty_per_unit].to_i < 0)
+    #  flash[:error] = "The penalty points per unit cannot be negative"
     #  is_number = false
-    #elsif(!is_numeric?(params[:late_policy][:max_penalty]))
-    #    flash[:error] = "The maximum penalty points should be a numeric value."
+    # elsif(!is_numeric?(params[:late_policy][:max_penalty]))
+    #    flash[:error] = "The maximum penalty points should be a numeric value"
     #    is_number = false
-    #end
+    # end
 
-    if (params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i)
+    if params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i
       flash[:error] = "The maximum penalty cannot be less than penalty per unit."
       is_number = false
     end
 
     @late_policy = LatePolicy.where(policy_name: params[:late_policy][:policy_name])
-    if(@late_policy != nil && !@late_policy.empty?)
+    if !@late_policy.nil? && !@late_policy.empty?
       @late_policy.each do |p|
-        if p.instructor_id == instructor_id
-          flash[:error] = "A policy with the same name already exists."
-          is_number = false
-          break
-        end
+        next unless p.instructor_id == instructor_id
+        flash[:error] = "A policy with the same name already exists."
+        is_number = false
+        break
       end
     end
-    if (is_number)
+    if is_number
       @late_policy = LatePolicy.new(params[:late_policy])
       @late_policy.instructor_id = instructor_id
 
       begin
         @late_policy.save!
         flash[:notice] = "The penalty policy was successfully created."
-        redirect_to :action => 'index'
+        redirect_to action: 'index'
       rescue
         flash[:error] = "The following error occurred while saving the penalty policy: "
-        redirect_to :action => 'new'
+        redirect_to action: 'new'
       end
     else
-      redirect_to :action => 'new'
+      redirect_to action: 'new'
     end
 end
 
-# PUT /late_policies/1
-# PUT /late_policies/1.xml
-def update
-
-  @penalty_policy = LatePolicy.find(params[:id])
-  issue_number = false
-  if (params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i)
-    flash[:error] = "The maximum penalty cannot be less than penalty per unit."
-    issue_number = true
-  end
-  issue_name = false
-  #if name has changed then only check for this
-  if params[:late_policy][:policy_name] != @penalty_policy.policy_name
-    @policy = LatePolicy.where(policy_name: params[:late_policy][:policy_name])
-    if(@policy != nil && !@policy.empty?)
-      @policy.each do |p|
-        if p.instructor_id == instructor_id
+  # PUT /late_policies/1
+  # PUT /late_policies/1.xml
+  def update
+    @penalty_policy = LatePolicy.find(params[:id])
+    issue_number = false
+    if params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i
+      flash[:error] = "The maximum penalty cannot be less than penalty per unit."
+      issue_number = true
+    end
+    issue_name = false
+    # if name has changed then only check for this
+    if params[:late_policy][:policy_name] != @penalty_policy.policy_name
+      @policy = LatePolicy.where(policy_name: params[:late_policy][:policy_name])
+      if !@policy.nil? && !@policy.empty?
+        @policy.each do |p|
+          next unless p.instructor_id == instructor_id
           flash[:error] = "The policy could not be updated because a policy with the same name already exists."
           issue_name = true
           break
         end
       end
     end
-  end
-  if (issue_name == false && issue_number == false)
-    @penalty_policy.update_attributes(params[:late_policy])
-    @penalty_policy.save!
-    @penaltyObjs = CalculatedPenalty.all
-    @penaltyObjs.each do |pen|
-      @participant = AssignmentParticipant.find(pen.participant_id)
-      @assignment = @participant.assignment
-      if @assignment.late_policy_id == @penalty_policy.id
+    if issue_name == false && issue_number == false
+      @penalty_policy.update_attributes(params[:late_policy])
+      @penalty_policy.save!
+      @penaltyObjs = CalculatedPenalty.all
+      @penaltyObjs.each do |pen|
+        @participant = AssignmentParticipant.find(pen.participant_id)
+        @assignment = @participant.assignment
+        next unless @assignment.late_policy_id == @penalty_policy.id
         @penalties = calculate_penalty(pen.participant_id)
         @total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
         if pen.deadline_type_id.to_i == 1
-          {:penalty_points => @penalties[:submission]}
+          {penalty_points: @penalties[:submission]}
           pen.update_attribute(:penalty_points, @penalties[:submission])
         elsif pen.deadline_type_id.to_i == 2
-          {:penalty_points => @penalties[:review]}
+          {penalty_points: @penalties[:review]}
           pen.update_attribute(:penalty_points, @penalties[:review])
         elsif pen.deadline_type_id.to_i == 5
-          {:penalty_points => @penalties[:meta_review]}
+          {penalty_points: @penalties[:meta_review]}
           pen.update_attribute(:penalty_points, @penalties[:meta_review])
         end
       end
+      flash[:notice] = "The late policy was successfully updated."
+      redirect_to action: 'index'
+    elsif issue_number == true
+      flash[:error] = "Cannot edit the policy. The maximum penalty cannot be less than penalty per unit."
+      redirect_to action: 'edit', id: params[:id]
+    elsif issue_name == true
+      flash[:error] = "Cannot edit the policy. A policy with the same name " + params[:late_policy][:policy_name] + " already exists."
+      redirect_to action: 'edit', id: params[:id]
     end
     flash[:notice] = "The late policy was successfully updated."
     redirect_to :action => 'index'
@@ -172,22 +175,21 @@ def update
     flash[:error] = "The policy could not be updated because a policy with the name " + params[:late_policy][:policy_name] + " already exists."
     redirect_to :action => 'edit', :id => params[:id]
   end
-end
 
-# DELETE /late_policies/1
-# DELETE /late_policies/1.xml
-def destroy
-  @penalty_policy = LatePolicy.find(params[:id])
-  begin
-    @penalty_policy.destroy
-  rescue
-    flash[:error] = "This policy is in use and hence cannot be deleted."
+  # DELETE /late_policies/1
+  # DELETE /late_policies/1.xml
+  def destroy
+    @penalty_policy = LatePolicy.find(params[:id])
+    begin
+      @penalty_policy.destroy
+    rescue
+      flash[:error] = "This policy is in use and hence cannot be deleted."
+    end
+    redirect_to controller: 'late_policies', action: 'index'
   end
-  redirect_to :controller => 'late_policies', :action => 'index'
-end
 
-:private
-def is_numeric?(obj)
-  obj.to_s.match(/\A[+-]?\d*?(\.\d+)?\Z/) == nil ? false : true
-end
+  private
+  def is_numeric?(obj)
+    obj.to_s.match(/\A[+-]?\d*?(\.\d+)?\Z/).nil? ? false : true
+  end
 end

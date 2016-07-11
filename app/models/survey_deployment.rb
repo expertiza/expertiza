@@ -6,21 +6,18 @@ class SurveyDeployment < ActiveRecord::Base
   validate :validate_survey_deployment
 
   def validate_survey_deployment
-    if((end_date != nil) && (start_date != nil) && (end_date-start_date)<0)
+    if !end_date.nil? && !start_date.nil? && (end_date - start_date) < 0
       errors.add_to_base("The End Date should be after the Start Date.")
     end
-    if((start_date != nil) && start_date<Time.now)
+    if !start_date.nil? && start_date < Time.now
       errors.add_to_base("The Start Date should be in the future.")
     end
-    if((end_date != nil) && end_date<Time.now)
+    if !end_date.nil? && end_date < Time.now
       errors.add_to_base("The End Date should be in the future.")
     end
 
-    if(num_of_students!=nil && num_of_students > User.where(role_id: Role.student.id).length)
-      errors.add(:num_of_students," - Too many students. #{num_of_students} : #{User.where(role_id: Role.student.id).length}")
+    if !num_of_students.nil? && num_of_students > User.where(role_id: Role.student.id).length
+      errors.add(:num_of_students, " - Too many students. #{num_of_students} : #{User.where(role_id: Role.student.id).length}")
     end
-
-
   end
-
 end

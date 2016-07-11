@@ -4,11 +4,13 @@ describe StudentTask do
   let(:participant) { Participant.new }
   let(:user) { User.new }
   let(:assignment) { Assignment.new }
-  let(:student_task) { StudentTask.new(
-    user: user,
-    participant: participant,
-    assignment: assignment
-  )}
+  let(:student_task) do
+    StudentTask.new(
+      user: user,
+      participant: participant,
+      assignment: assignment
+    )
+  end
 
   describe ".from_participant" do
     it "creates a StudentTask from a participant" do
@@ -53,7 +55,7 @@ describe StudentTask do
 
   describe "#content_submitted_in_current_stage?" do
     it "checks the stage_deadline, resubmission times and hyperlinks" do
-      expect(student_task).to receive(:current_stage).and_return ("submission")
+      expect(student_task).to receive(:current_stage).and_return "submission"
       expect(participant).to receive(:resubmission_times).and_return []
       expect(student_task).to receive(:hyperlinks)
       student_task.content_submitted_in_current_stage?

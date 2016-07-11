@@ -1,22 +1,20 @@
-#Author: Hao Liu
-#Email: hliu11@ncsu.edu
+# Author: Hao Liu
+# Email: hliu11@ncsu.edu
 
 class AssignmentQuestionnaireController < ApplicationController
-  #delete all AssignmentQuestionnaire entry that's associated with an assignment
+  # delete all AssignmentQuestionnaire entry that's associated with an assignment
   def delete_all
     assignment = Assignment.find(params[:assignment_id])
     if assignment.nil?
       flash[:error] = "Assignment #" + assignment.id + "does not currently exist."
-      return #TODO: add error message
+      return
     end
 
     @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:assignment_id])
-    @assignment_questionnaires.each do |assignment_questionnaire|
-      assignment_questionnaire.delete
-    end
+    @assignment_questionnaires.each(&:delete)
 
     respond_to do |format|
-      format.json { render :json => @assignment_questionnaires }
+      format.json { render json: @assignment_questionnaires }
     end
   end
 
@@ -24,7 +22,7 @@ class AssignmentQuestionnaireController < ApplicationController
     if params[:assignment_id].nil?
       flash[:error] = "Missing assignment:" + params[:assignment_id]
       return
-    else if params[:questionnaire_id].nil?
+    elsif params[:questionnaire_id].nil?
            flash[:error] = "Missing questionnaire:" + params[:questionnaire_id]
            return
          end
@@ -47,7 +45,7 @@ class AssignmentQuestionnaireController < ApplicationController
     @assignment_questionnaire.save
 
     respond_to do |format|
-      format.json { render :json => @assignment_questionnaire }
+      format.json { render json: @assignment_questionnaire }
     end
   end
 end

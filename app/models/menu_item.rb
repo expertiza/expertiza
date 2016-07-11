@@ -1,52 +1,45 @@
 class MenuItem < ActiveRecord::Base
-
   attr_accessor :controller_action, :content_page
 
   validates_presence_of :name
   validates_uniqueness_of :name
 
-  def self.find_or_create_by_name (params)
+  def self.find_or_create_by_name(params)
     MenuItem.find_or_create_by(name: params)
   end
 
   def delete
-    children = MenuItem.where(['parent_id = ?',self.id])
-    children.each {|child| child.delete }
+    children = MenuItem.where(['parent_id = ?', self.id])
+    children.each(&:delete)
     self.destroy
   end
 
   def above
-    if self.parent_id
-      conditions =
-        ["parent_id = ? and seq = ?", self.parent_id, self.seq - 1]
-    else
-      conditions =
-        ["parent_id is null and seq = ?", self.seq - 1]
-    end
+    conditions = if self.parent_id
+                   ["parent_id = ? and seq = ?", self.parent_id, self.seq - 1]
+                 else
+                   ["parent_id is null and seq = ?", self.seq - 1]
+                 end
 
-    return MenuItem.where(conditions).first
+    MenuItem.where(conditions).first
   end
-
 
   def below
-    if self.parent_id
-      conditions =
-        ["parent_id = ? and seq = ?", self.parent_id, self.seq + 1]
-    else
-      conditions =
-        ["parent_id is null and seq = ?", self.seq + 1]
-    end
+    conditions = if self.parent_id
+                   ["parent_id = ? and seq = ?", self.parent_id, self.seq + 1]
+                 else
+                   ["parent_id is null and seq = ?", self.seq + 1]
+                 end
 
-    return MenuItem.where(conditions).first
+    MenuItem.where(conditions).first
   end
 
-
-  def MenuItem.repack(repack_id)
-    if repack_id
-      items = MenuItem.where("parent_id = #{repack_id}").order('seq')
-    else
-      items = MenuItem.where("parent_id is null").order('seq')
-    end
+  def self.repack(repack_id)
+    items = if repack_id
+              MenuItem.where("parent_id = #{repack_id}").order('seq')
+            else
+              MenuItem.where("parent_id is null").order('seq')
+            end
 
     seq = 1
     for item in items do
@@ -56,13 +49,12 @@ class MenuItem < ActiveRecord::Base
     end
   end
 
-
-  def MenuItem.next_seq(parent_id)
-    if parent_id and parent_id.to_i > 0
-      next_seq = MenuItem.find_by_sql("select coalesce(max(seq) + 1, 1) as seq from menu_items where parent_id = #{parent_id}")
-    else
-      next_seq = MenuItem.find_by_sql("select coalesce(max(seq) + 1, 1) as seq from menu_items where parent_id is null")
-    end
+  def self.next_seq(parent_id)
+    next_seq = if parent_id and parent_id.to_i > 0
+                 MenuItem.find_by_sql("select coalesce(max(seq) + 1, 1) as seq from menu_items where parent_id = #{parent_id}")
+               else
+                 MenuItem.find_by_sql("select coalesce(max(seq) + 1, 1) as seq from menu_items where parent_id is null")
+               end
 
     if next_seq
       return next_seq[0].seq
@@ -71,8 +63,7 @@ class MenuItem < ActiveRecord::Base
     end
   end
 
-
-  def MenuItem.items_for_permissions(permission_ids = nil)
+  def self.items_for_permissions(permission_ids = nil)
     # Hash for faster & easier lookups
     if permission_ids
       perms = {}
@@ -90,7 +81,7 @@ class MenuItem < ActiveRecord::Base
         item.controller_action =
           ControllerAction.find(item.controller_action_id)
         if perms
-          if perms.has_key?(item.controller_action.effective_permission_id)
+          if perms.key?(item.controller_action.effective_permission_id)
             items << item
           end
         else
@@ -100,16 +91,13 @@ class MenuItem < ActiveRecord::Base
         item.content_page =
           ContentPage.find(item.content_page_id)
         if perms
-          if perms.has_key?(item.content_page.permission_id)
-            items << item
-          end
+          items << item if perms.key?(item.content_page.permission_id)
         else
           items << item
         end
       end
     end
 
-    return items
+    items
   end
-
 end

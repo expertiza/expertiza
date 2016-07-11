@@ -1,9 +1,7 @@
 require 'rails_helper'
 
 describe "UploadFile" do
-
-  let(:uf){UploadFile.new id:1, type: "UploadFile", seq:1.0, txt:"test txt", weight: 1}
-
+  let(:uf) { UploadFile.new id: 1, type: "UploadFile", seq: 1.0, txt: "test txt", weight: 1 }
 
   describe "#edit" do
     it "returns the html " do
@@ -16,7 +14,6 @@ describe "UploadFile" do
     it "returns the html " do
       html = uf.view_question_text.to_s
       expect(html).to eq("<TR><TD align=\"left\"> test txt </TD><TD align=\"left\">UploadFile</TD><td align=\"center\">1</TD><TD align=\"center\">&mdash;</TD></TR>")
-      end
+    end
   end
-
 end

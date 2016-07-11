@@ -1,12 +1,10 @@
 class RolesController < ApplicationController
-
   def action_allowed?
     current_role_name.eql?("Super-Administrator")
   end
 
-
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
-  verify method: :post, only: [ :destroy, :create, :update ], redirect_to: Role
+  verify method: :post, only: [:destroy, :create, :update], redirect_to: Role
 
   def index
     @roles = Role.order(:name)
@@ -24,7 +22,7 @@ class RolesController < ApplicationController
 
   def new
     @role = Role.new
-    foreign()
+    foreign
   end
 
   def create
@@ -35,7 +33,7 @@ class RolesController < ApplicationController
       redirect_to Role
     else
       foreign
-      render :action => 'new'
+      render action: 'new'
     end
   end
 
@@ -51,10 +49,10 @@ class RolesController < ApplicationController
       Role.rebuild_cache
       @role = Role.find(params[:id])
       flash[:notice] = 'The role was successfully updated.'
-      redirect_to :action => 'show', :id => @role.id
+      redirect_to action: 'show', id: @role.id
     else
       foreign
-      render :action => 'edit'
+      render action: 'edit'
     end
   end
 
@@ -70,5 +68,4 @@ class RolesController < ApplicationController
 
     @users = @role.users
   end
-
 end

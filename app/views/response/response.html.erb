@@ -1,15 +1,86 @@
 <script>
-jQuery(document).ready(function() {
-    jQuery('#Submit').click(function(e){
-    if(!confirm('Once a review has been submitted, you cannot edit it again')){
-        e.preventDefault();
-        e.stopPropagation();
-        return;
-    }else{
-        jQuery('#isSubmit').val('Yes');
-    }
-    })
-})
+    jQuery(document).ready(function() {
+        jQuery('#Submit').click(function(e){
+            if(!confirm('Once a review has been submitted, you cannot edit it again')){
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }else{
+                jQuery('#isSubmit').val('Yes');
+            }
+        });
+        jQuery('#metareview').click(function(e){
+
+          if(!e) e=window.event
+          e.cancelBubble=true;
+          if(e.stopPropagation) e.stopPropagation();
+          $('#lbl_metareview_status').text('Wait..');
+            var URL="<%= WEBSERVICE_CONFIG["metareview_webservice_url"]%>";
+
+            var data=({reviews:readComments()});
+
+            jQuery.ajax({
+                type: 'POST',
+                url: URL+'content',
+                data: data
+                //contentType: 'application/x-www-form-urlencoded'
+            }).fail( function (jqXHR, status){
+                jQuery('#lblMetareviewContent').html(status);
+            }).success(function (data){
+                consumeMetareviewContent(data);
+            });
+
+            jQuery.ajax({
+                type: 'POST',
+                url: URL+'volume',
+                data: data
+            }).fail( function (jqXHR, status){
+                jQuery('#lblMetareviewVolume').html(status);
+            }).success(function (data){
+                jQuery('#lblMetareviewVolume').html(data['volume']);
+            });
+
+            jQuery.ajax({
+                type: 'POST',
+                url: URL+'tone',
+                data: data
+            }).fail( function (jqXHR, status){
+                jQuery('#lblMetareviewTone').html(status);
+            }).success(function (data){
+                consumeMetareviewTone(data);
+            });
+            $('#div_Metareview').css('display','block');
+
+            return;
+        });
+        function readComments(){
+            var counter=0;
+            var feedbackComment='';
+            while(document.getElementById('responses_'+counter+'_comments')!=null)
+            {
+                feedbackComment +=jQuery('#responses_'+counter+'_comments').val();
+                counter++;
+            }
+            return feedbackComment;
+        }
+        function consumeMetareviewTone(data){
+            var tone_positive=data['tone_positive'];
+            var tone_negative=data['tone_negative'];
+            var tone_neutral=data['tone_neutral'];
+            var tone=tone_positive-tone_negative;
+            jQuery('#lblMetareviewTone').html(tone);
+          $('#lbl_metareview_status').text('');
+        }
+        function consumeMetareviewContent(data){
+            var content_summative=data['content_summative'];
+            var content_problem=data['content_problem'];
+            var content_advisory=data['content_advisory'];
+            jQuery('#lblMetareviewProblemDetection').html(content_problem);
+            jQuery('#lblMetareviewAdvisory').html(content_advisory);
+            jQuery('#lblMetareviewSummative').html(content_summative);
+        }
+
+    });
 </script>
 <h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
 
@@ -51,18 +122,18 @@ jQuery(document).ready(function() {
     <%end%>
     <% i = 0 %>
     <%@questions.each do |question| %>
-       <% answer = Answer.where(question_id: question.id, response_id: @response.id).first if !@response.nil?%>
-       <% if question.instance_of? Criterion%>
+        <% answer = Answer.where(question_id: question.id, response_id: @response.id).first if !@response.nil?%>
+        <% if question.instance_of? Criterion%>
             <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score, @dropdown_or_scale) %>
-       <% elsif question.instance_of? Scale %>
+        <% elsif question.instance_of? Scale %>
             <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score) %>
-       <% elsif question.instance_of? UploadFile %>
+        <% elsif question.instance_of? UploadFile %>
             <!--One form had better not in another form-->
             <!--Zhewei: I move the Uploadfile question to the end of questionnaire. So multiple forms will not been overlapped.-->
-       <% else %>
+        <% else %>
             <%= question.complete(i, answer) %>
-       <% end %>
-       <% i += 1%>
+        <% end %>
+        <% i += 1%>
     <% end %>
 
     <p>
@@ -73,12 +144,52 @@ jQuery(document).ready(function() {
     </p>
 
     <%if @current_round%>
-      <%= hidden_field_tag "review[round]", @current_round %>
+        <%= hidden_field_tag "review[round]", @current_round %>
     <%end%>
     <%= hidden_field_tag "review[questionnaire_id]", @questionnaire.id %>
 
     <br/>
-    <br>
+
+    <input type="button" name="metareview" id="metareview" value="Evaluate Review Quality"/>
+    <label id="lbl_metareview_status"></label>
+    <table style="display:none" id="div_Metareview" >
+      <tr>
+        <th style="border-style:solid">Metric
+        </th>
+        <th style="border-style:solid">Score
+        </th>
+        <th style="border-style:solid">Target
+        </th>
+      </tr>
+      <tr>
+        <td style="border-style:solid">Volume</td>
+        <td style="border-style:solid"><label id="lblMetareviewVolume" name="lblMetareviewVolume"></label></td>
+        <td style="border-style:solid">60</td>
+      </tr>
+      <tr>
+        <td style="border-style:solid">Problem Detection</td>
+        <td style="border-style:solid"><label id="lblMetareviewProblemDetection" name="lblMetareviewProblemDetection"></label></td>
+        <td style="border-style:solid">0.25</td>
+      </tr>
+      <tr>
+        <td style="border-style:solid">Summative</td>
+        <td style="border-style:solid"><label id="lblMetareviewSummative" name="lblMetareviewSummative"></label></td>
+        <td style="border-style:solid">0.25</td>
+      </tr>
+      <tr>
+        <td style="border-style:solid">Advisory</td>
+        <td style="border-style:solid"><label id="lblMetareviewAdvisory" name="lblMetareviewAdvisory"></label></td>
+        <td style="border-style:solid">0.2</td>
+      </tr>
+      <tr>
+        <td style="border-style:solid">Tone</td>
+        <td style="border-style:solid"><label id="lblMetareviewTone" name="lblMetareviewTone"></label></td>
+        <td style="border-style:solid">0.5</td>
+      </tr>
+    </table>
+    <br />
+    <br />
+    <br />
     <%= submit_tag "Save "+@title, :name => "save" %>
     <!--#E1600 check title for selfreview to show submit button-->
     <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review')) %>
@@ -87,6 +198,7 @@ jQuery(document).ready(function() {
     <% end %>
     <%= hidden_field_tag('return', @return) %>
     <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %>
+
 <% end %>
 <!--Check whether there is a UploadFile question.-->
 <%@questions.each do |question| %>

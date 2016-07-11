@@ -1,0 +1,11 @@
+development:
+  metareview_webservice_url: 'http://localhost:3001/metareviewgenerator/'
+
+
+test:
+  metareview_webservice_url: 'http://localhost:3001/metareviewgenerator/'
+
+
+
+production:
+ metareview_webservice_url: 'http://localhost:3001/metareviewgenerator/'

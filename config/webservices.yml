@@ -1,11 +1,11 @@
 development:
-  metareview_webservice_url: 'http://localhost:3001/metareviewgenerator/'
+  metareview_webservice_url: 'http://peerlogic.csc.ncsu.edu/metareview/metareviewgenerator/'
 
 
 test:
-  metareview_webservice_url: 'http://localhost:3001/metareviewgenerator/'
+  metareview_webservice_url: 'http://peerlogic.csc.ncsu.edu/metareview/metareviewgenerator/'
 
 
 
 production:
- metareview_webservice_url: 'http://localhost:3001/metareviewgenerator/'
+ metareview_webservice_url: 'http://peerlogic.csc.ncsu.edu/metareview/metareviewgenerator/'

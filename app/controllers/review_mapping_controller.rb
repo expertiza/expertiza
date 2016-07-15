@@ -35,7 +35,7 @@ class ReviewMappingController < ApplicationController
 
   def select_reviewer
     assignment = Assignment.find(params[:id])
-    @contributor = assignment.get_contributor(params[:contributor_id])
+    @contributor = AssignmentTeam.find(params[:contributor_id])
     session[:contributor] = @contributor
   end
 
@@ -230,7 +230,7 @@ class ReviewMappingController < ApplicationController
 
   def delete_all_reviewers
     assignment = Assignment.find(params[:id])
-    team = assignment.get_contributor(params[:contributor_id])
+    team = AssignmentTeam.find(params[:contributor_id])
     review_response_maps = team.review_mappings
     num_remain_review_response_maps = review_response_maps.size
     review_response_maps.each do |review_response_map|

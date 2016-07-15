@@ -440,10 +440,6 @@ class Assignment < ActiveRecord::Base
     scores
   end
 
-  def get_contributor(contrib_id)
-    AssignmentTeam.find(contrib_id)
-  end
-
   # parameterized by questionnaire
   def get_max_score_possible(questionnaire)
     max = 0

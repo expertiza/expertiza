@@ -148,7 +148,7 @@ class AssignmentParticipant < Participant
       scores[review_sym][:scores][:min] = 999_999_999
       scores[review_sym][:scores][:avg] = 0
       total_score = 0
-      for i in 1..self.assignment.get_review_rounds
+      for i in 1..self.assignment.num_review_rounds
         round_sym = ("review" + i.to_s).to_sym
         if scores[round_sym].nil? || scores[round_sym][:assessments].nil? || scores[round_sym][:assessments].empty?
           next

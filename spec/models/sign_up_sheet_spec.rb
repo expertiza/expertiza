@@ -4,7 +4,7 @@ describe SignUpSheet do
   describe '.add_signup_topic' do
     it 'will return an empty Hash when there are no topics' do
       assignment = double('Assignment')
-      allow(assignment).to receive(:get_review_rounds) { nil }
+      allow(assignment).to receive(:num_review_rounds) { nil }
       allow(Assignment).to receive(:find) { assignment }
 
       allow(SignUpTopic).to receive(:where) { nil }
@@ -14,7 +14,7 @@ describe SignUpSheet do
 
     it 'will return a SignUpSheet with one topic and no due dates' do
       assignment = double('Assignment')
-      allow(assignment).to receive(:get_review_rounds) { 0 }
+      allow(assignment).to receive(:num_review_rounds) { 0 }
       allow(Assignment).to receive(:find) { assignment }
 
       topic1 = SignUpTopic.new
@@ -37,7 +37,7 @@ describe SignUpSheet do
     it 'will return a SignUpSheet when the topic already has deadlines' do
       skip('skip test on staggered deadline')
       assignment = double(Assignment)
-      allow(assignment).to receive(:get_review_rounds) { 1 }
+      allow(assignment).to receive(:num_review_rounds) { 1 }
       allow(Assignment).to receive(:find) { assignment }
 
       topic1 = SignUpTopic.new

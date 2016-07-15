@@ -66,7 +66,7 @@
     <% #Assignments have vary_rubric_by_rounds#%>
     <% #################Score awarded########################    %>
     <%current_round = @assignment.number_of_current_round(nil)%>
-    <%current_round = @assignment.get_review_rounds if (@assignment.get_current_stage(nil)=="Finished" || @assignment.get_current_stage(nil)=="metareview") %>
+    <%current_round = @assignment.num_review_rounds if (@assignment.get_current_stage(nil)=="Finished" || @assignment.get_current_stage(nil)=="metareview") %>
     <% if (@l%2) == 0%>
         <td bgcolor="#ffffff" align = 'left' >
     <%else%>

@@ -299,7 +299,7 @@ class SignUpSheetController < ApplicationController
     due_dates = params[:due_date]
 
     topics = SignUpTopic.where(assignment_id: params[:assignment_id])
-    review_rounds = Assignment.find(params[:assignment_id]).get_review_rounds
+    review_rounds = Assignment.find(params[:assignment_id]).num_review_rounds
     # j represents the review rounds
     j = 0
     topics.each_with_index do |_topic, j|

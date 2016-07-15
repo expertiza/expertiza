@@ -114,7 +114,7 @@ describe SignUpSheetController do
     it "redirects to edit assignment page" do
       session[:duedates] = [@topic1, @topic2]
       assignment = double(Assignment)
-      allow(assignment).to receive(:get_review_rounds) { 0 }
+      allow(assignment).to receive(:num_review_rounds) { 0 }
       allow(SignUpTopic).to receive("where").and_return([])
       post :save_topic_deadlines, due_date: NIL, assignment_id:                                     @assignment.id
       expect(response).to redirect_to edit_assignment_url(id:                                                                @assignment.id)
@@ -123,7 +123,7 @@ describe SignUpSheetController do
     it "saves deadlines for topics with staggered deadlines" do
       session[:duedates] = [@topic1, @topic2]
       assignment = double(Assignment)
-      allow(assignment).to receive(:get_review_rounds) { 0 }
+      allow(assignment).to receive(:num_review_rounds) { 0 }
       allow(SignUpTopic).to receive("where").and_return([@topic1])
       topic_deadline_stub = double(TopicDeadline)
       topic_deadline = TopicDeadline.new
@@ -144,7 +144,7 @@ describe SignUpSheetController do
 
       assignment = double(Assignment)
       allow(Assignment).to receive(:find) { assignment }
-      allow(assignment).to receive(:get_review_rounds).and_return(2)
+      allow(assignment).to receive(:num_review_rounds).and_return(2)
 
       allow(SignUpTopic).to receive("where").and_return([@topic1])
 

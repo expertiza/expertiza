@@ -397,7 +397,7 @@ class Assignment < ActiveRecord::Base
 
         total_score = 0
         total_num_of_assessments = 0 # calculate grades for each rounds
-        for i in 1..self.get_review_rounds
+        for i in 1..self.num_review_rounds
           assessments = ReviewResponseMap.get_assessments_round_for(team, i)
           round_sym = ("review" + i.to_s).to_sym
           grades_by_rounds[round_sym] = Answer.compute_scores(assessments, questions[round_sym])
@@ -412,7 +412,7 @@ class Assignment < ActiveRecord::Base
         scores[:teams][index.to_s.to_sym][:scores][:max] = -999_999_999
         scores[:teams][index.to_s.to_sym][:scores][:min] = 999_999_999
         scores[:teams][index.to_s.to_sym][:scores][:avg] = 0
-        for i in 1..self.get_review_rounds
+        for i in 1..self.num_review_rounds
           round_sym = ("review" + i.to_s).to_sym
           if !grades_by_rounds[round_sym][:max].nil? && scores[:teams][index.to_s.to_sym][:scores][:max] < grades_by_rounds[round_sym][:max]
             scores[:teams][index.to_s.to_sym][:scores][:max] = grades_by_rounds[round_sym][:max]
@@ -654,7 +654,7 @@ class Assignment < ActiveRecord::Base
     (due_date.nil? || due_date == 'Finished') ? due_date : due_date.due_at.to_s
   end
 
-  def get_review_rounds
+  def num_review_rounds
     due_dates = DueDate.where(assignment_id: self.id)
     rounds = 0
     due_dates.each do |due_date|
@@ -905,17 +905,6 @@ class Assignment < ActiveRecord::Base
 
   def find_due_dates(type)
     self.due_dates.select {|due_date| due_date.deadline_type == DeadlineType.find_by_name(type) }
-  end
-
-  # this should be moved to SignUpSheet model after we refactor the SignUpSheet.
-  # returns whether ANY topic has a partner ad; used for deciding whether to show the Advertisements column
-  def has_partner_ads?(id)
-    # Team.find_by_sql("select * from teams where parent_id = "+id+" AND advertise_for_partner='1'").size > 0
-    @team = Team.find_by_sql("select t.* "\
-        "from teams t, signed_up_teams s "\
-        "where s.topic_id='" + id.to_s + "' and s.team_id = t.id and t.advertise_for_partner = 1")
-    @team.reject!(&:full?)
-    !@team.empty?
   end
 
 end

@@ -53,7 +53,7 @@ class StudentReviewController < ApplicationController
         # not be nil. Enabling and disabling links to individual reviews are handled at the rhtml
         @reviewee_topic_id = topic_id if review_due_date.due_at < Time.now
       end
-      review_rounds = @assignment.get_review_rounds
+      review_rounds = @assignment.num_review_rounds
       deadline_type_id = DeadlineType.find_by_name('review').id
 
       @metareview_mappings.each do |metareview_mapping|

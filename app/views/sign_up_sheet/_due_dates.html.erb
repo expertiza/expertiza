@@ -5,14 +5,14 @@
     <th>Submission deadline</th>
     <th>Review deadline</th>
 
-    <%for i in 2..@assignment.get_review_rounds%>
+    <%for i in 2..@assignment.num_review_rounds%>
       <th>Submission deadline <%=i%></th>
       <th>Review deadline <%=i%></th>
     <%end%>
     <th>Metareview deadline</th>
   </tr>
   <% i=0 %>
-  <%@resubmission_rounds = @assignment.get_review_rounds%>
+  <%@resubmission_rounds = @assignment.num_review_rounds%>
 
   <% for i in 0..(session[:duedates].length - 1) %>
     <tr>

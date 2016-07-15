@@ -118,7 +118,7 @@ class SignUpSheet < ActiveRecord::Base
   end
 
   def self.add_signup_topic(assignment_id)
-    @review_rounds = Assignment.find(assignment_id).get_review_rounds
+    @review_rounds = Assignment.find(assignment_id).num_review_rounds
     @topics = SignUpTopic.where(assignment_id: assignment_id)
 
     # Use this until you figure out how to initialize this array
@@ -141,6 +141,14 @@ class SignUpSheet < ActiveRecord::Base
       duedate['submission_' + (@review_rounds + 1).to_s] = subm_string
     end
     @duedates
+  end
+
+  def self.has_teammate_ads?(topic_id)
+    teams = Team.find_by_sql("select t.* "\
+        "from teams t, signed_up_teams s "\
+        "where s.topic_id='" + topic_id.to_s + "' and s.team_id = t.id and t.advertise_for_partner = 1")
+    teams.reject!(&:full?)
+    !teams.empty?
   end
 
   class << self

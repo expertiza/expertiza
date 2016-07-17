@@ -118,7 +118,6 @@ Expertiza::Application.routes.draw do
       get :view_my_scores_new
       get :instructor_review
       post :remove_hyperlink
-      get :conflict_notification
     end
   end
 

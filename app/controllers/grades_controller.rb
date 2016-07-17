@@ -189,7 +189,7 @@ class GradesController < ApplicationController
                 author: email_form[:author]
   end
 
-  # This method is used from both conflict_notification and edit methods
+  # This method is used from edit methods
   def list_questions(assignment)
     @questions = {}
     questionnaires = assignment.questionnaires

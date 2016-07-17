@@ -440,7 +440,7 @@ class Assignment < ActiveRecord::Base
     scores
   end
 
-  # parameterized by questionnaire
+  # parameterized by questionnaire, should be removed
   def get_max_score_possible(questionnaire)
     max = 0
     sum_of_weights = 0
@@ -529,6 +529,7 @@ class Assignment < ActiveRecord::Base
     self.teams.each(&:delete)
     self.participants.each(&:delete)
     self.due_dates.each(&:destroy)
+    self.assignment_questionnaires.each(&:destroy)
 
     # The size of an empty directory is 2
     # Delete the directory if it is empty
@@ -545,7 +546,7 @@ class Assignment < ActiveRecord::Base
         raise 'The assignment directory is not empty.'
       end
     end
-    self.assignment_questionnaires.each(&:destroy)
+
     self.destroy
   end
 
@@ -680,13 +681,13 @@ class Assignment < ActiveRecord::Base
     (due_date == nil || due_date == COMPLETE) ? COMPLETE : DeadlineType.find(due_date.deadline_type_id).name
   end
 
-  # Returns hash review_scores[reviewer_id][reviewee_id] = score
+  # Returns hash of review_scores[reviewer_id][reviewee_id] = score
   def compute_reviews_hash
     @review_scores = {}
     @response_type = 'ReviewResponseMap'
     # @myreviewers = ResponseMap.select('DISTINCT reviewer_id').where(['reviewed_object_id = ? && type = ? ', self.id, @response_type])
 
-    # if this assignment use vary rubric by rounds feature, loade @questions for each round
+    # if this assignment uses vary rubric by rounds feature, load @questions for each round
     if self.varying_rubrics_by_round? # [reviewer_id][round][reviewee_id] = score
       rounds = self.rounds_of_reviews
       for round in 1..rounds
@@ -779,9 +780,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def review_questionnaire_id(round = nil)
-    revqids = AssignmentQuestionnaire.where(assignment_id: self.id).where(used_in_round: round)
+    rev_q_ids = AssignmentQuestionnaire.where(assignment_id: self.id).where(used_in_round: round)
     review_questionnaire_id = nil
-    revqids.each do |rqid|
+    rev_q_ids.each do |rqid|
       next if rqid.questionnaire_id.nil?
       rtype = Questionnaire.find(rqid.questionnaire_id).type
       if rtype == 'ReviewQuestionnaire'
@@ -800,14 +801,14 @@ class Assignment < ActiveRecord::Base
     total
   end
 
-  def signed_up_topic(contributor)
+  def signed_up_topic(team)
     # The purpose is to return the topic that the contributor has signed up to do for this assignment.
     # Returns a record from the sign_up_topic table that gives the topic_id for which the contributor has signed up
     # Look for the topic_id where the team_id equals the contributor id (contributor is a team or a participant)
 
     # If this is an assignment with quiz required
     if self.require_quiz?
-      signups = SignedUpTeam.where(team_id: contributor.id)
+      signups = SignedUpTeam.where(team_id: team.id)
       for signup in signups do
         signuptopic = SignUpTopic.find(signup.topic_id)
         if signuptopic.assignment_id == self.id
@@ -818,8 +819,8 @@ class Assignment < ActiveRecord::Base
     end
 
     # Look for the topic_id where the team_id equals the contributor id (contributor is a team)
-    unless SignedUpTeam.where(team_id: contributor.id, is_waitlisted: 0).empty?
-      topic_id = SignedUpTeam.where(team_id: contributor.id, is_waitlisted: 0).first.topic_id
+    unless SignedUpTeam.where(team_id: team.id, is_waitlisted: 0).empty?
+      topic_id = SignedUpTeam.where(team_id: team.id, is_waitlisted: 0).first.topic_id
       SignUpTopic.find(topic_id)
     end
   end

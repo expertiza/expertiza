@@ -134,56 +134,6 @@ class Assignment < ActiveRecord::Base
     contributor_set
   end
 
-  def reject_by_least_reviewed(contributor_set)
-    contributor = contributor_set.min_by {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count }
-    min_reviews = contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count rescue 0
-    contributor_set.reject! {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count > min_reviews + review_topic_threshold }
-
-    contributor_set
-  end
-
-  def reject_by_max_reviews_per_submission(contributor_set)
-    contributor_set.reject! {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count >= max_reviews_per_submission }
-    contributor_set
-  end
-
-  def reject_by_same_topic(contributor_set, reviewer)
-    reviewer_team = AssignmentTeam.team(reviewer)
-    # it is possible that this reviewer does not have a team, if so, do nothing
-    if reviewer_team
-      topic_id = reviewer_team.topic
-      # it is also possible that this reviewer has team, but this team has no topic yet, if so, do nothing
-      if topic_id
-        contributor_set = contributor_set.reject {|contributor| contributor.topic == topic_id }
-      end
-    end
-
-    contributor_set
-  end
-
-  def reject_previously_reviewed_submissions(contributor_set, reviewer)
-    contributor_set = contributor_set.reject {|contributor| contributor.reviewed_by?(reviewer) }
-    contributor_set
-  end
-
-  def reject_own_submission(contributor_set, reviewer)
-    contributor_set.reject! {|contributor| contributor.has_user(User.find(reviewer.user_id)) }
-    contributor_set
-  end
-
-  def reject_by_deadline(contributor_set)
-    contributor_set.reject! do |contributor|
-      contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'Complete' or
-      !contributor.assignment.can_review(signed_up_topic(contributor).id)
-    end
-    contributor_set
-  end
-
-  def reject_by_no_topic_selection_or_no_submission(contributor_set)
-    contributor_set.reject! {|contributor| signed_up_topic(contributor).nil? or !contributor.has_submissions? }
-    contributor_set
-  end
-
   def has_topics?
     @has_topics ||= !sign_up_topics.empty?
   end
@@ -889,6 +839,58 @@ class Assignment < ActiveRecord::Base
 
   def find_due_dates(type)
     self.due_dates.select {|due_date| due_date.deadline_type == DeadlineType.find_by_name(type) }
+  end
+
+  private
+
+  def reject_by_least_reviewed(contributor_set)
+    contributor = contributor_set.min_by {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count }
+    min_reviews = contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count rescue 0
+    contributor_set.reject! {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count > min_reviews + review_topic_threshold }
+
+    contributor_set
+  end
+
+  def reject_by_max_reviews_per_submission(contributor_set)
+    contributor_set.reject! {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count >= max_reviews_per_submission }
+    contributor_set
+  end
+
+  def reject_by_same_topic(contributor_set, reviewer)
+    reviewer_team = AssignmentTeam.team(reviewer)
+    # it is possible that this reviewer does not have a team, if so, do nothing
+    if reviewer_team
+      topic_id = reviewer_team.topic
+      # it is also possible that this reviewer has team, but this team has no topic yet, if so, do nothing
+      if topic_id
+        contributor_set = contributor_set.reject {|contributor| contributor.topic == topic_id }
+      end
+    end
+
+    contributor_set
+  end
+
+  def reject_previously_reviewed_submissions(contributor_set, reviewer)
+    contributor_set = contributor_set.reject {|contributor| contributor.reviewed_by?(reviewer) }
+    contributor_set
+  end
+
+  def reject_own_submission(contributor_set, reviewer)
+    contributor_set.reject! {|contributor| contributor.has_user(User.find(reviewer.user_id)) }
+    contributor_set
+  end
+
+  def reject_by_deadline(contributor_set)
+    contributor_set.reject! do |contributor|
+      contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'Complete' or
+          !contributor.assignment.can_review(signed_up_topic(contributor).id)
+    end
+    contributor_set
+  end
+
+  def reject_by_no_topic_selection_or_no_submission(contributor_set)
+    contributor_set.reject! {|contributor| signed_up_topic(contributor).nil? or !contributor.has_submissions? }
+    contributor_set
   end
 
 end

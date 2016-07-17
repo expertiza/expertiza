@@ -64,8 +64,6 @@ describe GradesController do
     allow(assignment).to receive(:questionnaires).and_return([questionnaire])
     allow(questionnaire).to receive(:find_by_type) { questionnaire }
 
-    allow(assignment).to receive(:get_max_score_possible) { [50, 100] }
-
     @params = {submission: "review", id: 5}
 
     get :conflict_notification, @params
@@ -119,8 +117,6 @@ describe GradesController do
 
     allow(assignment).to receive(:questionnaires).and_return([questionnaire])
     allow(questionnaire).to receive(:find_by_type) { questionnaire }
-
-    allow(assignment).to receive(:get_max_score_possible) { [50, 100] }
 
     @params = {submission: "review", id: 5}
 

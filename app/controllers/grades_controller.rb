@@ -198,41 +198,6 @@ class GradesController < ApplicationController
     end
   end
 
-  # the grading conflict email form provides the instructor a way of emailing
-  # the reviewers of a submission if he feels one of the reviews was unfair or inaccurate.
-  def conflict_notification
-    @instructor = if session[:user].role_id != 6
-      session[:user]
-    else
-      Ta.get_my_instructor(session[:user].id)
-                  end
-    @participant = AssignmentParticipant.find(params[:id])
-    @assignment = Assignment.find(@participant.parent_id)
-
-    list_questions @assignment
-    @reviewers_email_hash = {}
-
-    @caction = "view"
-    @submission = params[:submission]
-    if @submission == "review"
-      @caction = "view_review"
-      @symbol = "review"
-      process_response("Review", "Reviewer", @participant.reviews, "ReviewQuestionnaire")
-    elsif @submission == "review_of_review"
-      @symbol = "metareview"
-      process_response("Metareview", "Metareviewer", @participant.metareviews, "MetareviewQuestionnaire")
-    elsif @submission == "review_feedback"
-      @symbol = "feedback"
-      process_response("Feedback", "Author", @participant.feedback, "AuthorFeedbackQuestionnaire")
-    elsif @submission == "teammate_review"
-      @symbol = "teammate"
-      process_response("Teammate Review", "Reviewer", @participant.teammate_reviews, "TeammateReviewQuestionnaire")
-    end
-
-    @subject = " Your " + @collabel.downcase + " score for " + @assignment.name + " conflicts with another " + @rowlabel.downcase + "'s score."
-    @body = get_body_text(params[:submission])
-  end
-
   def update
     participant = AssignmentParticipant.find(params[:id])
     total_score = params[:total_score]
@@ -249,19 +214,6 @@ class GradesController < ApplicationController
   end
 
   private
-
-  def process_response(collabel, rowlabel, responses, questionnaire_type)
-    @collabel = collabel
-    @rowlabel = rowlabel
-    @reviews = responses
-    @reviews.each do |response|
-      user = response.map.reviewer.user
-      @reviewers_email_hash[user.fullname.to_s + " <" + user.email.to_s + ">"] = user.email.to_s
-    end
-    @reviews.sort! {|a, b| a.map.reviewer.user.fullname <=> b.map.reviewer.user.fullname }
-    @questionnaire = @assignment.questionnaires.first.find_by_type(questionnaire_type)
-    @max_score, @weight = @assignment.get_max_score_possible(@questionnaire)
-  end
 
   def redirect_when_disallowed
     # For author feedback, participants need to be able to read feedback submitted by other teammates.

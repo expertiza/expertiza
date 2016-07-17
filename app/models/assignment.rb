@@ -440,19 +440,6 @@ class Assignment < ActiveRecord::Base
     scores
   end
 
-  # parameterized by questionnaire, should be removed
-  def get_max_score_possible(questionnaire)
-    max = 0
-    sum_of_weights = 0
-    num_questions = 0
-    questionnaire.questions.each do |question| # type identifies the type of questionnaire
-      sum_of_weights += question.weight
-      num_questions += 1
-    end
-    max = num_questions * questionnaire.max_question_score * sum_of_weights
-    [max, sum_of_weights]
-  end
-
   def path
     raise 'The path cannot be created. The assignment must be associated with either a course or an instructor.' if self.course_id.nil? && self.instructor_id.nil?
     path_text = ""

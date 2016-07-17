@@ -41,8 +41,6 @@ participant = pscore[:participant]
             <TD id=<%="rowspanTd2#{participant_id}"%> ALIGN="CENTER" rowspan=<%=team_size.to_s%>>
                 <%= @rscore_review.my_min.is_a?(Float)? sprintf("%.0f",@rscore_review.my_min): @rscore_review.my_min %>% - <%= @rscore_review.my_max.is_a?(Float)? sprintf("%.0f",@rscore_review.my_max): @rscore_review.my_max %>%
                 <% if controller.action_name != "view_my_scores" %>
-                    <BR/>
-                    <FONT SIZE="-1"><%= link_to 'email reviewers', :action => 'conflict_notification', :id => participant.id, :submission => 'review' %></FONT>
                 <!-- add a fake link to the auto summarization table, and only show it to the reviewee-->
                 <% else %>
                     <div align="center" data-toggle="collapse" data-target="#summary_review_table" class="fake-link">show review summary</div>
@@ -64,11 +62,6 @@ participant = pscore[:participant]
                 </FONT>
             </TD>
             <TD ALIGN="CENTER" VALIGN="TOP"><%= @rscore_metareview.my_min.is_a?(Float)? sprintf("%.0f",@rscore_metareview.my_min):@rscore_metareview.my_min %>% - <%= @rscore_metareview.my_max.is_a?(Float)?sprintf("%.0f",@rscore_metareview.my_max):@rscore_metareview.my_max %>%
-                <% if controller.action_name != "view_my_scores" %>
-                    <BR/>
-                    <FONT SIZE="-1"><%= link_to 'email metareviewers', :action => 'conflict_notification', :id => participant.id, :submission => 'review_of_review' %>
-                    </FONT>
-                <% end %>       
             </TD>
             <% else %>
                 <TD ALIGN="CENTER">---</TD>
@@ -84,11 +77,6 @@ participant = pscore[:participant]
             </FONT>
         </TD>
         <TD ALIGN="CENTER" VALIGN="TOP"><%= @rscore_feedback.my_min.is_a?(Float)? sprintf("%.0f",@rscore_feedback.my_min): @rscore_feedback.my_min %>% - <%= @rscore_feedback.my_max.is_a?(Float)? sprintf("%.0f",@rscore_feedback.my_max):@rscore_feedback.my_max %>%
-            <% if controller.action_name != "view_my_scores" %>
-            <BR/>
-            <FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => 'review_feedback' %>
-            </FONT>
-            <% end %>       
         </TD>
     <% else %>
             <TD ALIGN="CENTER">---</TD>
@@ -111,9 +99,6 @@ participant = pscore[:participant]
                 <%if @assignment %>
                     <%= range %>
                 <% end %>
-                <% if controller.action_name != "view_my_scores" %>
-                    <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => 'teammate_review' %></FONT>
-                <% end %>       
                 </TD>
             <% else %>
                 <TD ALIGN="CENTER">---</TD>

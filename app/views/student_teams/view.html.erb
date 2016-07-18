@@ -94,9 +94,9 @@
               <td><%= inv.to_user.fullname %></td>
               <td><%= inv.to_user.email %></td>
                 <% if inv.reply_status == 'A' %>
-                  <td>Accepted</td>
+                  <td align = "center">Accepted</td>
                 <% elsif inv.reply_status == 'D' %>
-                  <td>Declined</td>
+                  <td align = "center">Declined</td>
                 <% else %>
                   <td align = "center">Waiting for reply
                   &nbsp;&nbsp;<%= link_to "Retract", {:controller => 'invitation', :action => 'cancel', :inv_id => inv.id, :student_id => @student.id} %></td>

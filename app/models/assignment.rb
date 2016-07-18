@@ -217,48 +217,6 @@ class Assignment < ActiveRecord::Base
                            contributor.id, reviewer.id, quiz_id]).count > 0
   end
 
-  # Returns a contributor to review if available, otherwise will raise an error
-  def contributor_to_review(reviewer, topic)
-    raise 'Please select a topic' if has_topics? && topic.nil?
-    raise 'This assignment does not have topics' if !has_topics? && topic
-    # This condition might happen if the reviewer waited too much time in the
-    # select topic page and other students have already selected this topic.
-    # Another scenario is someone that deliberately modifies the view.
-    raise 'This topic has too many reviews; please select another one.' if topic && !candidate_topics_to_review(reviewer).include?(topic)
-
-    contributor_set = Array.new(contributors)
-    work = topic.nil? ? 'assignment' : 'topic'
-
-    # 1) Only consider contributors that worked on this topic; 2) remove reviewer as contributor
-    # 3) remove contributors that have not submitted work yet
-    contributor_set.reject! do |contributor|
-      signed_up_topic(contributor) != topic || # both will be nil for assignments with no signup sheet
-        contributor.includes?(reviewer) ||
-        !contributor.has_submissions?
-    end
-
-    raise "There are no more submissions to review on this #{work}." if contributor_set.empty?
-
-    # Reviewer can review each contributor only once
-    contributor_set.reject! {|contributor| contributor.reviewed_by?(reviewer) }
-    raise "You have already reviewed all submissions for this #{work}." if contributor_set.empty?
-
-    # Reduce to the contributors with the least number of reviews ("responses") received
-    min_contributor = contributor_set.min_by {|a| a.responses.count }
-    min_reviews = min_contributor.responses.count
-    contributor_set.reject! {|contributor| contributor.responses.count > min_reviews }
-
-    # Pick the contributor whose most recent reviewer was assigned longest ago
-    contributor_set.sort! {|a, b| a.review_mappings.last.id <=> b.review_mappings.last.id } if min_reviews > 0
-
-    # Choose a contributor at random (.sample) from the remaining contributors.
-    # Actually, we SHOULD pick the contributor who was least recently picked.  But sample
-    # is much simpler, and probably almost as good, given that even if the contributors are
-    # picked in round-robin fashion, the reviews will not be submitted in the same order that
-    # they were picked.
-    contributor_set.sample
-  end
-
   def contributors
     # ACS Contributors are just teams, so removed check to see if it is a team assignment
     @contributors ||= teams # ACS
@@ -891,6 +849,48 @@ class Assignment < ActiveRecord::Base
   def reject_by_no_topic_selection_or_no_submission(contributor_set)
     contributor_set.reject! {|contributor| signed_up_topic(contributor).nil? or !contributor.has_submissions? }
     contributor_set
+  end
+
+  # Returns a contributor to review if available, otherwise will raise an error
+  def contributor_to_review(reviewer, topic)
+    raise 'Please select a topic' if has_topics? && topic.nil?
+    raise 'This assignment does not have topics' if !has_topics? && topic
+    # This condition might happen if the reviewer waited too much time in the
+    # select topic page and other students have already selected this topic.
+    # Another scenario is someone that deliberately modifies the view.
+    raise 'This topic has too many reviews; please select another one.' if topic && !candidate_topics_to_review(reviewer).include?(topic)
+
+    contributor_set = Array.new(contributors)
+    work = topic.nil? ? 'assignment' : 'topic'
+
+    # 1) Only consider contributors that worked on this topic; 2) remove reviewer as contributor
+    # 3) remove contributors that have not submitted work yet
+    contributor_set.reject! do |contributor|
+      signed_up_topic(contributor) != topic || # both will be nil for assignments with no signup sheet
+          contributor.includes?(reviewer) ||
+          !contributor.has_submissions?
+    end
+
+    raise "There are no more submissions to review on this #{work}." if contributor_set.empty?
+
+    # Reviewer can review each contributor only once
+    contributor_set.reject! {|contributor| contributor.reviewed_by?(reviewer) }
+    raise "You have already reviewed all submissions for this #{work}." if contributor_set.empty?
+
+    # Reduce to the contributors with the least number of reviews ("responses") received
+    min_contributor = contributor_set.min_by {|a| a.responses.count }
+    min_reviews = min_contributor.responses.count
+    contributor_set.reject! {|contributor| contributor.responses.count > min_reviews }
+
+    # Pick the contributor whose most recent reviewer was assigned longest ago
+    contributor_set.sort! {|a, b| a.review_mappings.last.id <=> b.review_mappings.last.id } if min_reviews > 0
+
+    # Choose a contributor at random (.sample) from the remaining contributors.
+    # Actually, we SHOULD pick the contributor who was least recently picked.  But sample
+    # is much simpler, and probably almost as good, given that even if the contributors are
+    # picked in round-robin fashion, the reviews will not be submitted in the same order that
+    # they were picked.
+    contributor_set.sample
   end
 
 end

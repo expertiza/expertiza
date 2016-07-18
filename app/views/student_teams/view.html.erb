@@ -208,16 +208,18 @@
 <table style="width:80%" align="center" >
   <tr>
     <td>
-<% if @student.team.advertise_for_partner == true %>
-    <%= @student.team.comments_for_advertisement%>
-    &nbsp;&nbsp;&nbsp;&nbsp;
-    <%= link_to 'Edit', :controller => 'advertise_for_partner', :action => 'edit', :team_id=>@student.team.id %>
-    &nbsp;&nbsp;
-    <%= link_to 'Delete', :controller => 'advertise_for_partner', :action => 'remove', :team_id=>@student.team.id %>
-<% else %>
-    <%= link_to 'Create', :controller => 'advertise_for_partner', :action => 'new', :team_id=>@student.team.id %>
-<% end %>
-      </td>
+      <% if @student.team%>
+        <% if @student.team && @student.team.advertise_for_partner%>
+            < %= @student.team.comments_for_advertisement%>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <%= link_to 'Edit', :controller => 'advertise_for_partner', :action => 'edit', :team_id=>@student.team.id %>
+            &nbsp;&nbsp;
+            <%= link_to 'Delete', :controller => 'advertise_for_partner', :action => 'remove', :team_id=>@student.team.id %>
+        <% else %>
+            <%= link_to 'Create', :controller => 'advertise_for_partner', :action => 'new', :team_id=>@student.team.id %>
+        <% end %>
+      <% end %>
+    </td>
     </tr>
     </table>
 

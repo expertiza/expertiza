@@ -203,14 +203,15 @@
 <br/>
 
 <!--display the advertisement-->
-<b>Advertisement for teammates</b>
-<br>
-<table style="width:80%" align="center" >
-  <tr>
-    <td>
-      <% if @student.team%>
+
+  <% if @student.team%>
+    <b>Advertisement for teammates</b>
+    <br>
+    <table style="width:80%" align="center" >
+      <tr>
+        <td>
         <% if @student.team && @student.team.advertise_for_partner%>
-            < %= @student.team.comments_for_advertisement%>
+            <%= @student.team.comments_for_advertisement%>
             &nbsp;&nbsp;&nbsp;&nbsp;
             <%= link_to 'Edit', :controller => 'advertise_for_partner', :action => 'edit', :team_id=>@student.team.id %>
             &nbsp;&nbsp;
@@ -218,10 +219,11 @@
         <% else %>
             <%= link_to 'Create', :controller => 'advertise_for_partner', :action => 'new', :team_id=>@student.team.id %>
         <% end %>
-      <% end %>
-    </td>
-    </tr>
+        </td>
+      </tr>
     </table>
+  <% end %>
+
 
 
 <br/>

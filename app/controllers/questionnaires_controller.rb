@@ -603,11 +603,13 @@ class QuestionnairesController < ApplicationController
           new_question.size = '50,3'
         end
         new_question.save!
-        advice = QuestionAdvice.find_by_question_id(question.id)
-        next unless advice
-        new_advice = advice.dup
-        new_advice.question_id = new_question.id
-        new_advice.save!
+        advices = QuestionAdvice.where(question_id: question.id)
+        next unless !advices.empty?
+        advices.each do |advice|
+          new_advice = advice.dup
+          new_advice.question_id = new_question.id
+          new_advice.save!
+          end
       end
 
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)

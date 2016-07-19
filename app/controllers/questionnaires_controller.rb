@@ -201,12 +201,12 @@ class QuestionnairesController < ApplicationController
       question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
       if question.is_a? ScoredQuestion
         question.weight = 1
-        question.max_label = 'Strong agree'
-        question.min_label = 'Strong disagree'
+        question.max_label = 'Strongly agree'
+        question.min_label = 'Strongly disagree'
       end
-      question.size = '50,3' if question.is_a? Criterion
+      question.size = '50, 3' if question.is_a? Criterion
       question.alternatives = '0|1|2|3|4|5' if question.is_a? Dropdown
-      question.size = '60,5' if question.is_a? TextResponse
+      question.size = '60, 5' if question.is_a? TextResponse
       begin
         question.save
       rescue

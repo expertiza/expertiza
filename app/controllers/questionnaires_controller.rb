@@ -587,6 +587,8 @@ class QuestionnairesController < ApplicationController
     @questionnaire.questions << QuestionnaireHelper.get_questions_from_csv(@questionnaire, file)
   end
 
+  private
+
   # clones the contents of a questionnaire, including the questions and associated advice
   def copy_questionnaire_details(questions, orig_questionnaire)
     assign_instructor_id
@@ -618,8 +620,6 @@ class QuestionnairesController < ApplicationController
       redirect_to action: 'list', controller: 'tree_display'
     end
   end
-
-  private
 
   def create_new_node_if_necessary(parent)
     unless QuestionnaireNode.exists?(parent_id: parent.id, node_object_id: @questionnaire.id)

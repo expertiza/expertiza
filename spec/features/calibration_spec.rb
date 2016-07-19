@@ -301,7 +301,7 @@ def create_fill_questionnaire
 
   # even though you can't see anything, don't worry, the option is actually there. everything will render once the next command runs
   # select the dropdown option. believe in the heart of the cards!
-  select '5-Strong agree'
+  select '5-Strongly agree'
   # submit review
   click_on "Submit Review"
   # click ok on the pop-up box that warns you that responses can not be edited

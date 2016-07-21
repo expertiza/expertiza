@@ -31,6 +31,13 @@ describe Questionnaire do
       questionnaire.max_question_score = 'a'
       expect(questionnaire).not_to be_valid
     end
+
+    it "validate maximum should be positive" do
+      expect(questionnaire.max_question_score).to eq(10)
+      questionnaire.max_question_score = -10
+      expect(questionnaire).not_to be_valid
+      questionnaire.max_question_score = 10
+    end
   end
 
   describe "#minimum_score" do
@@ -41,6 +48,13 @@ describe Questionnaire do
 
     it "validate default minimum score" do
       expect(questionnaire1.min_question_score).to eq(0)
+    end
+
+    it "validate minimum should be smaller than maximum" do
+      expect(questionnaire.min_question_score).to eq(0)
+      questionnaire.min_question_score = 10
+      expect(questionnaire).not_to be_valid
+      questionnaire.min_question_score = 0
     end
   end
 end

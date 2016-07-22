@@ -29,7 +29,7 @@ class Scale < ScoredQuestion
   end
 
   def complete(count, answer = nil, questionnaire_min, questionnaire_max)
-    html = self.txt + '<br>'
+    html = '<li><div><label for="responses_' + count.to_s + '">' + self.txt + '</label></div>'
     html += '<input id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" type="hidden"'
     html += 'value="' + answer.answer.to_s + '"' unless answer.nil?
     html += '>'
@@ -63,7 +63,7 @@ class Scale < ScoredQuestion
               '<td width="10%"></td>'
             end
 
-    html += '<td width="10%"></td></tr></table>'
+    html += '<td width="10%"></td></tr></table><br/>'
     html.html_safe
   end
 

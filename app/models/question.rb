@@ -15,7 +15,6 @@ class Question < ActiveRecord::Base
   has_paper_trail
 
   # Class variables
-  # Class variables
   NUMERIC = 'Numeric'.freeze # Display string for NUMERIC questions
   TRUE_FALSE = 'True/False'.freeze # Display string for TRUE_FALSE questions
   GRADING_TYPES = [[NUMERIC, false], [TRUE_FALSE, true]].freeze

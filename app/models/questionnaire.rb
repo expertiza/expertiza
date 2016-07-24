@@ -92,4 +92,4 @@ class Questionnaire < ActiveRecord::Base
     results = Questionnaire.where(["id <> ? and name = ? and instructor_id = ?", id, name, instructor_id])
     errors.add(:name, "Questionnaire names must be unique.") if !results.nil? and !results.empty?
   end
-  end
+end

@@ -588,8 +588,6 @@ class QuestionnairesController < ApplicationController
     @questionnaire.questions << QuestionnaireHelper.get_questions_from_csv(@questionnaire, file)
   end
 
-  private
-
   # clones the contents of a questionnaire, including the questions and associated advice
   def copy_questionnaire_details(questions, orig_questionnaire)
     assign_instructor_id

@@ -16,14 +16,11 @@ module QuestionnaireHelper
         # Question, question advice (from high score to low), type, weight
         row = []
         row << question.txt
-        if questionnaire.section != "Custom"
-          row << "True/False" if question.true_false
-          row << "Numeric" unless question.true_false
-        else
-          row << QuestionType.find_by_question_id(question.id).q_type
-        end
+        row << question.type
 
-        row << question.question_type.try(:parameters) || ''
+
+        row << question.alternatives || ''
+        row << question.size || ''
 
         row << question.weight
 

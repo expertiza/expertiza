@@ -24,7 +24,7 @@ class Dropdown < UnscoredQuestion
   end
 
   def complete(count, answer = nil)
-    html = '<li><label for="responses_' + count.to_s + '">' + self.txt + '    </label>'
+    html = '<li><label for="responses_' + count.to_s + '">' + self.txt + '&nbsp;&nbsp;</label>'
     alternatives = self.alternatives.split('|')
     html += '<input id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" type="hidden" value="">'
     html += '<select id="responses_' + count.to_s + '_comments" label=' + self.txt + ' name="responses[' + count.to_s + '][comment]">'

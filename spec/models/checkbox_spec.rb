@@ -17,7 +17,7 @@ describe Checkbox do
   describe "#complete" do
     it "returns the html" do
       html = checkbox2.complete(1, answer)
-      expect(html).to eq("<input id=\"responses_1_comments\" name=\"responses[1][comment]\" type=\"hidden\" value=\"\"><input id=\"responses_1_score\" name=\"responses[1][score]\" type=\"hidden\"value=\"1\"><input id=\"responses_1_checkbox\" type=\"checkbox\" onchange=\"checkbox1Changed()\"checked=\"checked\"><label for=\"responses_1\">test txt3</label><script>function checkbox1Changed() { var checkbox = jQuery(\"#responses_1_checkbox\"); var response_score = jQuery(\"#responses_1_score\");if (checkbox.is(\":checked\")) {response_score.val(\"1\");} else {response_score.val(\"0\");}}</script><BR/>")
+      expect(html).to eq("<input id=\"responses_1_comments\" name=\"responses[1][comment]\" type=\"hidden\" value=\"\"><input id=\"responses_1_score\" name=\"responses[1][score]\" type=\"hidden\"value=\"1\"><input id=\"responses_1_checkbox\" type=\"checkbox\" onchange=\"checkbox1Changed()\"checked=\"checked\"><label for=\"responses_1\">&nbsp;&nbsp;test txt3</label><script>function checkbox1Changed() { var checkbox = jQuery(\"#responses_1_checkbox\"); var response_score = jQuery(\"#responses_1_score\");if (checkbox.is(\":checked\")) {response_score.val(\"1\");} else {response_score.val(\"0\");}}</script><BR/>")
     end
   end
 

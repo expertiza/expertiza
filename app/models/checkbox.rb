@@ -43,7 +43,7 @@ class Checkbox < UnscoredQuestion
     html += '<input id="responses_' + count.to_s + '_checkbox" type="checkbox" onchange="checkbox' + count.to_s + 'Changed()"'
     html += 'checked="checked"' if !answer.nil? and answer.answer == 1
     html += '>'
-    html += '<label for="responses_' + count.to_s + '">' + self.txt + '</label>'
+    html += '<label for="responses_' + count.to_s + '">&nbsp;&nbsp;' + self.txt + '</label>'
 
     html += '<script>function checkbox' + count.to_s + 'Changed() {'
     html += ' var checkbox = jQuery("#responses_' + count.to_s + '_checkbox");'

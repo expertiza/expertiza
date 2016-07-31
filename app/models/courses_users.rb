@@ -30,7 +30,7 @@ class CoursesUsers < ActiveRecord::Base
          name: user.name,
          password: pw,
          partial_name: "register"
-       }}
+       }
     ).deliver
   end
 end

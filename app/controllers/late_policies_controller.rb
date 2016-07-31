@@ -166,14 +166,6 @@ end
       flash[:error] = "Cannot edit the policy. A policy with the same name " + params[:late_policy][:policy_name] + " already exists."
       redirect_to action: 'edit', id: params[:id]
     end
-    flash[:notice] = "The late policy was successfully updated."
-    redirect_to :action => 'index'
-  elsif issue_number == true
-    flash[:error] = "The policy could not be updated because the maximum penalty cannot be less than penalty per unit."
-    redirect_to :action => 'edit', :id => params[:id]
-  elsif issue_name == true
-    flash[:error] = "The policy could not be updated because a policy with the name " + params[:late_policy][:policy_name] + " already exists."
-    redirect_to :action => 'edit', :id => params[:id]
   end
 
   # DELETE /late_policies/1

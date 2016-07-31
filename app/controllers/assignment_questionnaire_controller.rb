@@ -25,7 +25,6 @@ class AssignmentQuestionnaireController < ApplicationController
     elsif params[:questionnaire_id].nil?
            flash[:error] = "Missing questionnaire:" + params[:questionnaire_id]
            return
-         end
     end
 
 

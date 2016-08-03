@@ -148,6 +148,7 @@ class UsersController < ApplicationController
   end
 
   def update
+    params.permit!
     @user = User.find params[:id]
     # update username, when the user cannot be deleted
     # rename occurs in 'show' page, not in 'edit' page
@@ -155,11 +156,11 @@ class UsersController < ApplicationController
     if request.original_fullpath == "/users/#{@user.id}?name=#{@user.id}"
       @user.name += '_hidden'
     end
-    if @user.update_attributes(name: @user.name)
-      undo_link("The user \"#{@user.name}\" has been successfully updated.")
+
+    if @user.update_attributes(params[:user])
+      flash[:success] = "The user \"#{@user.name}\" has been successfully updated."
       redirect_to @user
     else
-      # foreign
       render action: 'edit'
     end
   end

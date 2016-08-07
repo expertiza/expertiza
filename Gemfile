@@ -81,7 +81,6 @@ group :test do
   gem 'rspec-rails'
   gem 'shoulda'
   gem 'test-unit'
-  gem "codeclimate-test-reporter"
 end
 
 group :assets do

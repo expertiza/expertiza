@@ -5,8 +5,7 @@ Coveralls.wear! 'rails'
 require 'capybara'
 require 'capybara/dsl'
 require 'selenium-webdriver'
-require "codeclimate-test-reporter"
-CodeClimate::TestReporter.start
+
 # Record code coverage with simplecov locally
 require 'simplecov'
 SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[

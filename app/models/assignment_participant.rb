@@ -65,12 +65,6 @@ class AssignmentParticipant < Participant
     participant == self
   end
 
-  def assign_reviewer(reviewer)
-    team_id = TeamsUser.team_id(self.parent_id, self.user_id)
-    ReviewResponseMap.create(reviewee_id: team_id, reviewer_id: reviewer.id,
-                             reviewed_object_id: assignment.id)
-  end
-
   def assign_quiz(contributor, reviewer, _topic)
     # using topic_id to find first participant.id.
     teams = SignedUpTeam.where(topic_id: @topic_id)

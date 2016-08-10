@@ -28,6 +28,7 @@ See the Expertiza wiki for setup instructions. Please update the wiki with corre
 
  * [OSX](http://wiki.expertiza.ncsu.edu/index.php/Development:Setup:OSX)
  * [Linux](http://wiki.expertiza.ncsu.edu/index.php/Development:Setup:Linux:RHEL)
+ * [Docker](https://hub.docker.com/r/winbobob/expertiza-fall2016/)
 
 Contributing
 ------------

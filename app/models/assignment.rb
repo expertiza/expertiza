@@ -32,7 +32,6 @@ class Assignment < ActiveRecord::Base
   validates_uniqueness_of :name, scope: :course_id
 
   COMPLETE = 'Finished'.freeze
-  WAITLIST = 'Waitlist open'.freeze
 
   REVIEW_QUESTIONNAIRES = {author_feedback: 0, metareview: 1, review: 2, teammate_review: 3}.freeze
   #  Review Strategy information.

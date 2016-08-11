@@ -22,13 +22,38 @@
     <option value='SummaryByRevieweeAndCriteria' selected>
       Summary by Reviewee and Criteria
     </option>
-
+    <option value='Collusion' selected>
+      Potential collusion report
+    </option>
   </select>
   <%= submit_tag("Submit") %>
 <% end %>
 
 <% if @type == "ReviewResponseMap" %>
   <h1> Review report for <%= @assignment.name%> </h1>
+    <div id="searchbox">
+
+      <div id="searchlink">
+        <%= link_to 'Back', :controller=> 'tree_display', :action=>'list', :id => @userid%>
+      </div>
+
+
+      <div id="searchform" style = " border: solid; border-width: 1px; border-color: #986633;">
+
+        <%= form_for :user, :url => {:action => 'response_report', :id => @id} do |n| %>
+            <table>
+              <tr>
+                <th>Reviewer's Name</th>
+                <td><%= n.text_field:fullname %></td>
+                <td align = "right"><%= submit_tag "Search"%></td>
+              </tr>
+
+            </table>
+        <%end%>
+
+      </div>
+    </div>
+
 <% elsif @type == "FeedbackResponseMap" %>
   <h1> Author feedback report for <%= @assignment.name%> </h1>
 <% elsif @type == "TeammateReviewResponseMap" %>
@@ -40,30 +65,9 @@
     <h1> Review summary report for <%= @assignment.name%> </h1>
 <% elsif @type == "SummaryByRevieweeAndCriteria" %>
     <h1> Reviewees summary report for <%= @assignment.name%> </h1>
-<% end %>
 <!--End show summary reports-->
-<div id="searchbox">
-
-  <div id="searchlink">
-    <%= link_to 'Back', :controller=> 'tree_display', :action=>'list', :id => @userid%>
-  </p>
-</div>
+<% elsif @type == "Collusion" %>
+    <h1> Potential collusion report for <%= @assignment.name%> </h1>
+<% end %>
 
 
-<div id="searchform" style = " border: solid; border-width: 1px; border-color: #986633;">
-  
-  <%= form_for :user, :url => {:action => 'response_report', :id => @id} do |n| %>
-    <table>
-      <tr>
-        <th>Reviewer's Name</th>
-        <td><%= n.text_field:fullname %></td>
-        <td align = "right"><%= submit_tag "Search"%></td>
-      </tr>
-
-    </table>
-  <%end%>
-
-
-
-</div>
-</div>

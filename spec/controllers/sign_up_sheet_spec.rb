@@ -98,18 +98,6 @@ describe SignUpSheetController do
     expect(response).to redirect_to edit_assignment_path(@assignment.id) + "#tabs-5"
   end
 
-  # it "is able to generate topic dependency" do
-  #  post :save_topic_dependencies, assignment_id: @assignment.id
-  #  expect(File).to exist("public/assets/staggered_deadline_assignment_graph/graph_#{@assignment.id}.jpg")
-  # end
-
-  it "is able to detect cycles" do
-    post :save_topic_dependencies, :assignment_id => @assignment.id,
-                                   ('topic_dependencies_' + @topic1.id.to_s) => {"dependent_on" => [@topic2.id.to_s]},
-                                   ('topic_dependencies_' + @topic2.id.to_s) => {"dependent_on" => [@topic1.id.to_s]}
-    expect(flash[:error]).to eq("There may be one or more cycles in the dependencies. Please correct them.")
-  end
-
   describe "Save topic deadlines" do
     it "redirects to edit assignment page" do
       session[:duedates] = [@topic1, @topic2]

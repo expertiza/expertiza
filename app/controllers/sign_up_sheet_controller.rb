@@ -250,46 +250,6 @@ class SignUpSheetController < ApplicationController
     redirect_to action: 'list', id: params[:assignment_id]
   end
 
-  # this function is used to prevent injection attacks.  A topic *dependent* on another topic cannot be
-  # attempted until the other topic has been completed..
-  def save_topic_dependencies
-    # Prevent injection attacks - we're using this in a system() call later
-    params[:assignment_id] = params[:assignment_id].to_i.to_s
-
-    topics = SignUpTopic.where(assignment_id: params[:assignment_id])
-    topics = topics.collect do |topic|
-      # if there is no dependency for a topic then there wont be a post for that tag.
-      # if this happens store the dependency as "0"
-      !params['topic_dependencies_' + topic.id.to_s].nil? ? [topic.id, params['topic_dependencies_' + topic.id.to_s][:dependent_on]] : [topic.id, ["0"]]
-    end
-    # Save the dependency in the topic dependency table
-    TopicDependency.save_dependency(topics)
-
-    node = 'id'
-    dg = build_dependency_graph(topics, node)
-
-    if dg.acyclic?
-      # This method produces sets of vertexes which should have common start time/deadlines
-      set_of_topics = create_common_start_time_topics(dg)
-      set_start_due_date(params[:assignment_id], set_of_topics)
-      @top_sort = dg.topsort_iterator.to_a
-    else
-      flash[:error] = "There may be one or more cycles in the dependencies. Please correct them."
-    end
-
-    node = 'topic_name'
-    dg = build_dependency_graph(topics, node) # rebuild with new node name
-
-    graph_output_path = 'public/assets/staggered_deadline_assignment_graph'
-    FileUtils.mkdir_p graph_output_path
-    dg.write_to_graphic_file('jpg', "#{graph_output_path}/graph_#{params[:assignment_id]}")
-
-    # execute linux bash script, convert .dot to jpg
-    system("dot -Tjpg #{graph_output_path}/graph_#{params[:assignment_id]}.dot -o #{graph_output_path}/graph_#{params[:assignment_id]}.jpg")
-
-    redirect_to_assignment_edit(params[:assignment_id])
-  end
-
   # If the instructor needs to explicitly change the start/due dates of the topics
   # This is true in case of a staggered deadline type assignment. Individual deadlines can
   # be set on a per topic  and per round basis

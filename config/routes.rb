@@ -354,7 +354,6 @@ Expertiza::Application.routes.draw do
       get :intelligent_sign_up
       get :intelligent_save
       post :save_topic_deadlines
-      post :save_topic_dependencies
     end
   end
 

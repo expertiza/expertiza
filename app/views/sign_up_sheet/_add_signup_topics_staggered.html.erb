@@ -24,17 +24,6 @@
       <% for topic in @sign_up_topics %>
         <tr>
           <%= render :partial => '/sign_up_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
-          <td align="center">
-            <% topic_identifier = SignUpTopic.where(assignment_id: @assignment.id).map {|u| [u.topic_identifier, u.id] } %>
-            <% topic_identifier.delete([topic.topic_identifier, topic.id]) %>
-            <% select = TopicDependency.find_by_topic_id(topic.id)%>
-            <% selected = Array.new%>
-            <% if !select.nil?
-                 selected = select[:dependent_on].to_a
-            end%>
-            <%= select_tag 'topic_dependencies_' + topic.id.to_s + '[dependent_on][]', options_for_select( topic_identifier, selected), :multiple => true, :size => 2 %>
-          </td>
-
         </tr>
         <% i=i+1 %>
       <% end %>
@@ -51,14 +40,6 @@
 <%= render :partial => '/sign_up_sheet/add_topics' %>
 
 <% if @assignment.staggered_deadline == true %>
-    <a href="#image" onClick="toggleVis('image');">
-    <span class="inline" id="image_show">Show dependency graph</span>
-    <span class="inline" id="image_hide" style="display: none">Hide dependency graph</span>
-  </a>
-
-  <div id="image_myDiv" style="display:none" align="center">
-    <img src='/assets/staggered_deadline_assignment_graph/graph_<%= @assignment.id %>.jpg'/>
-  </div>
 
   | <a href="#due_date" onClick="toggleVis('due_date');">
     <span class="inline" id="due_date_show">Show start/due date</span>
@@ -81,7 +62,3 @@
   <% end %>
 
 <% end %>
-
-<script>
-  jQuery('select').multiSelect({ selectedList:5, minWidth:235, noneSelected:"No dependency"});
-</script>

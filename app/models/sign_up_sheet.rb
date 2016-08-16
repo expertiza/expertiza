@@ -93,30 +93,6 @@ class SignUpSheet < ActiveRecord::Base
     SignUpTopic.slotAvailable?(topic_id)
   end
 
-  def self.create_dependency_graph(topics, node)
-    dg = RGL::DirectedAdjacencyGraph.new
-
-    # create a graph of the assignment with appropriate dependency
-    topics.collect do |topic|
-      topic[1].each do |dependent_node|
-        edge = []
-        # if a topic is not dependent on any other topic
-        dependent_node = dependent_node.to_i
-        if dependent_node == 0
-          edge.push("fake")
-        else
-          # if we want the topic names to be displayed in the graph replace node to topic_name
-          edge.push(SignUpTopic.find(dependent_node)[node])
-        end
-        edge.push(SignUpTopic.find(topic[0])[node])
-        dg.add_edges(edge)
-      end
-    end
-    # remove the fake vertex
-    dg.remove_vertex("fake")
-    dg
-  end
-
   def self.add_signup_topic(assignment_id)
     @review_rounds = Assignment.find(assignment_id).num_review_rounds
     @topics = SignUpTopic.where(assignment_id: assignment_id)

@@ -141,7 +141,6 @@ GEM
     globalid (0.3.6)
       activesupport (>= 4.1.0)
     googlecharts (1.6.12)
-    graphviz (0.1.0)
     guard (2.13.0)
       formatador (>= 0.2.4)
       listen (>= 2.7, <= 4.0)
@@ -461,7 +460,6 @@ DEPENDENCIES
   gdata
   gherkin
   googlecharts
-  graphviz
   guard-rails
   guard-rspec
   haml-rails

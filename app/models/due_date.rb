@@ -4,49 +4,8 @@ class DueDate < ActiveRecord::Base
   validate :due_at_is_valid_datetime
   #  has_paper_trail
 
-  @@permission_id = {}
-  @@permission_id['OK'] = DeadlineRight.exists?(name: 'OK') ? DeadlineRight.find_by_name('OK').id : 3
-  @@permission_id['No'] = DeadlineRight.exists?(name: 'No') ? DeadlineRight.find_by_name('No').id : 1
-  @@permission_id['Late'] = DeadlineRight.exists?(name: 'Late') ? DeadlineRight.find_by_name('Late').id : 2
-
   def self.default_permission(deadline_type, permission_type)
-    permission_id = {}
-
-    default_permission = {}
-    case deadline_type
-    when 'submission'
-      default_permission['submission'] = {}
-      default_permission['submission']['submission_allowed'] = @@permission_id['OK']
-      default_permission['submission']['can_review'] = @@permission_id['No']
-      default_permission['submission']['review_of_review_allowed'] = @@permission_id['No']
-    when 'review'
-      default_permission['review'] = {}
-      default_permission['review']['submission_allowed'] = @@permission_id['No']
-      default_permission['review']['can_review'] = @@permission_id['OK']
-      default_permission['review']['review_of_review_allowed'] = @@permission_id['No']
-    when 'metareview'
-      default_permission['metareview'] = {}
-      default_permission['metareview']['submission_allowed'] = @@permission_id['No']
-      default_permission['metareview']['can_review'] = @@permission_id['No']
-      default_permission['metareview']['review_of_review_allowed'] = @@permission_id['OK']
-    when 'drop_topic'
-      default_permission['drop_topic'] = {}
-      default_permission['drop_topic']['submission_allowed'] = @@permission_id['OK']
-      default_permission['drop_topic']['can_review'] = @@permission_id['No']
-      default_permission['drop_topic']['review_of_review_allowed'] = @@permission_id['No']
-    when 'signup'
-      default_permission['signup'] = {}
-      default_permission['signup']['submission_allowed'] = @@permission_id['OK']
-      default_permission['signup']['can_review'] = @@permission_id['No']
-      default_permission['signup']['review_of_review_allowed'] = @@permission_id['No']
-    when 'team_formation'
-      default_permission['team_formation'] = {}
-      default_permission['team_formation']['submission_allowed'] = @@permission_id['OK']
-      default_permission['team_formation']['can_review'] = @@permission_id['No']
-      default_permission['team_formation']['review_of_review_allowed'] = @@permission_id['No']
-    end
-
-    default_permission[deadline_type][permission_type]
+    DeadlineRight::DEFAULT_PERMISSION[deadline_type][permission_type]
   end
 
   def type
@@ -80,8 +39,6 @@ class DueDate < ActiveRecord::Base
     submit_duedate.round = max_round
     submit_duedate.save
   end
-
-
 
   def self.deadline_sort(due_dates)
     due_dates.sort {|m1, m2| (m1.due_at and m2.due_at) ? m1.due_at <=> m2.due_at : (m1.due_at ? -1 : 1) }

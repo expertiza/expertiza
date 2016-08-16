@@ -194,7 +194,7 @@ class AssignmentForm
     if @assignment.staggered_deadline.nil?
       @assignment.staggered_deadline = false
       @assignment.days_between_submissions = 0
-      end
+    end
   end
 
   def availability_flag

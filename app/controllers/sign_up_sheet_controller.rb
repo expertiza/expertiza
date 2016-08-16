@@ -285,38 +285,7 @@ class SignUpSheetController < ApplicationController
     redirect_to_assignment_edit(params[:assignment_id])
   end
 
-  # used by save_topic_dependencies. The dependency graph is a partial ordering of topics ... some topics need to be done
-  # before others can be attempted.
-  def build_dependency_graph(topics, node)
-    SignUpSheet.create_dependency_graph(topics, node)
-  end
-
-  # used by save_topic_dependencies. Do not know how this works
-  def create_common_start_time_topics(dg)
-    dg_reverse = dg.clone.reverse
-    set_of_topics = []
-
-    until dg_reverse.empty?
-      i = 0
-      temp_vertex_array = []
-      dg_reverse.each_vertex do |vertex|
-        temp_vertex_array.push(vertex) if dg_reverse.out_degree(vertex) == 0
-      end
-      # this cannot go inside the if statement above
-      temp_vertex_array.each do |vertex|
-        dg_reverse.remove_vertex(vertex)
-      end
-      set_of_topics.insert(i, temp_vertex_array)
-      i += 1
-    end
-    set_of_topics
-  end
-
-  def set_start_due_date(assignment_id, set_of_topics)
-    DeadlineHelper.set_start_due_date(assignment_id, set_of_topics)
-  end
-
-  # gets team_details to show it on team_details view for a given assignment
+  # This method is called when a student click on the trumpet icon. So this is a bad method name. --Yang
   def show_team
     if !(assignment = Assignment.find(params[:assignment_id])).nil? and !(topic = SignUpTopic.find(params[:id])).nil?
       @results = ad_info(assignment.id, topic.id)
@@ -333,30 +302,6 @@ class SignUpSheetController < ApplicationController
       end
       # @team_members = find_team_members(topic)
     end
-  end
-
-  # get info related to the ad for partners so that it can be displayed when an assignment_participant
-  # clicks to see ads related to a topic
-  def ad_info(_assignment_id, topic_id)
-    # List that contains individual result object
-    @result_list = []
-    # Get the results
-    @results = SignedUpTeam.where("topic_id = ?", topic_id.to_s)
-    # Iterate through the results of the query and get the required attributes
-    @results.each do |result|
-      team = result.team
-      topic = result.topic
-      resultMap = {}
-      resultMap[:team_id] = team.id
-      resultMap[:comments_for_advertisement] = team.comments_for_advertisement
-      resultMap[:name] = team.name
-      resultMap[:assignment_id] = topic.assignment_id
-      resultMap[:advertise_for_partner] = team.advertise_for_partner
-
-      # Append to the list
-      @result_list.append(resultMap)
-    end
-    @result_list
   end
 
   def switch_original_topic_to_approved_suggested_topic
@@ -438,5 +383,29 @@ class SignUpSheetController < ApplicationController
         flash[:error] = 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'
       end
     end
+  end
+
+  # get info related to the ad for partners so that it can be displayed when an assignment_participant
+  # clicks to see ads related to a topic
+  def ad_info(_assignment_id, topic_id)
+    # List that contains individual result object
+    @result_list = []
+    # Get the results
+    @results = SignedUpTeam.where("topic_id = ?", topic_id.to_s)
+    # Iterate through the results of the query and get the required attributes
+    @results.each do |result|
+      team = result.team
+      topic = result.topic
+      resultMap = {}
+      resultMap[:team_id] = team.id
+      resultMap[:comments_for_advertisement] = team.comments_for_advertisement
+      resultMap[:name] = team.name
+      resultMap[:assignment_id] = topic.assignment_id
+      resultMap[:advertise_for_partner] = team.advertise_for_partner
+
+      # Append to the list
+      @result_list.append(resultMap)
+    end
+    @result_list
   end
 end

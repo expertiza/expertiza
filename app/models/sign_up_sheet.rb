@@ -135,7 +135,7 @@ class SignUpSheet < ActiveRecord::Base
 
       if duedate_subm.nil? || duedate_rev.nil?
         # the topic is new. so copy deadlines from assignment
-        set_of_due_dates = DueDate.where(assignment_id: assignment_id)
+        set_of_due_dates = AssignmentDueDate.where(assignment_id: assignment_id)
         set_of_due_dates.each do |due_date|
           DeadlineHelper.create_topic_deadline(due_date, 0, topic.id)
         end

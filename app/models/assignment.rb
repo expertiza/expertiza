@@ -224,7 +224,7 @@ class Assignment < ActiveRecord::Base
         next_due_dates = TopicDeadline.where(['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id]).joins({topic: :assignment}, order: 'due_at')
         end
     else
-      next_due_dates = DueDate.where(['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id]).order('due_at')
+      next_due_dates = AssignmentDueDate.where(['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id]).order('due_at')
       next_due_date = next_due_dates.first
     end
     return false if next_due_date.nil?
@@ -331,7 +331,7 @@ class Assignment < ActiveRecord::Base
     due_dates = if self.staggered_deadline?
                   TopicDeadline.where(topic_id: topic_id).order('due_at DESC')
                 else
-                  DueDate.where(assignment_id: self.id).order('due_at DESC')
+                  AssignmentDueDate.where(assignment_id: self.id).order('due_at DESC')
                 end
     due_dates = due_dates.reject {|a| a.deadline_type_id != 1 && a.deadline_type_id != 2 }
     if !due_dates.nil? and !due_dates.empty?
@@ -400,7 +400,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def num_review_rounds
-    due_dates = DueDate.where(assignment_id: self.id)
+    due_dates = AssignmentDueDate.where(assignment_id: self.id)
     rounds = 0
     due_dates.each do |due_date|
       rounds = due_date.round if due_date.round > rounds
@@ -409,7 +409,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_current_stage(topic_id = nil)
-    due_dates = self.staggered_deadline? ? TopicDeadline.where(topic_id: topic_id).order(due_at: :desc) : DueDate.where(assignment_id: self.id).order(due_at: :desc)
+    due_dates = self.staggered_deadline? ? TopicDeadline.where(topic_id: topic_id).order(due_at: :desc) : AssignmentDueDate.where(assignment_id: self.id).order(due_at: :desc)
     if !due_dates.nil? && !due_dates.empty?
       if Time.now > due_dates[0].due_at
         return 'Finished'

@@ -50,8 +50,8 @@ class StudentTaskController < ApplicationController
 
     @assignment = @participant.assignment
     # Finding the current phase that we are in
-    due_dates = DueDate.where(["assignment_id = ?", @assignment.id])
-    @very_last_due_date = DueDate.order("due_at DESC").limit(1).where(["assignment_id = ?", @assignment.id])
+    due_dates = AssignmentDueDate.where(["assignment_id = ?", @assignment.id])
+    @very_last_due_date = AssignmentDueDate.order("due_at DESC").limit(1).where(["assignment_id = ?", @assignment.id])
     next_due_date = @very_last_due_date[0]
     for due_date in due_dates
       if due_date.due_at > Time.now
@@ -60,7 +60,7 @@ class StudentTaskController < ApplicationController
     end
 
     @review_phase = next_due_date.deadline_type_id
-    if next_due_date.review_of_review_allowed_id == DueDate::LATE or next_due_date.review_of_review_allowed_id == DueDate::OK
+    if next_due_date.review_of_review_allowed_id == DeadlineRight::LATE or next_due_date.review_of_review_allowed_id == DeadlineRight::OK
       if @review_phase == DeadlineType.find_by_name("metareview").id
         @can_view_metareview = true
       end

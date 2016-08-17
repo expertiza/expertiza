@@ -41,7 +41,7 @@
                     <% @latest_response = @sorted_responses.last %>
 
                     <%if @latest_response.round.nil?%>
-                      <% last_response_round = DueDate.done_in_assignment_round(@assignment.id,@latest_response) %>
+                      <% last_response_round = AssignmentDueDate.done_in_assignment_round(@assignment.id,@latest_response) %>
                     <%else%>
                       <% last_response_round = @latest_response.round %>
                     <%end%>

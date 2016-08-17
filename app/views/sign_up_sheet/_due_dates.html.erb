@@ -27,7 +27,7 @@
         </td>
       <%end%>
       <td>
-        <%= text_field :due_date, (session[:duedates][i]['id'].to_s + '_submission_' + (j+1).to_s + '_due_date').to_s, size: 20, value: DateTime.parse(session[:duedates][i]['submission_'+ (@resubmission_rounds+1).to_s]).strftime("%Y-%m-%d %H:%M")%>
+        <%= text_field :due_date, (session[:duedates][i]['id'].to_s + '_submission_' + (j+1).to_s + '_due_date').to_s, size: 20, value: DateTime.parse(session[:duedates][i]['submission_'+ (@resubmission_rounds).to_s]).strftime("%Y-%m-%d %H:%M")%>
       </td>
     </tr>
     <% i=i+1 %>

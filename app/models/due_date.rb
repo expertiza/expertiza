@@ -8,7 +8,7 @@ class DueDate < ActiveRecord::Base
     DeadlineRight::DEFAULT_PERMISSION[deadline_type][permission_type]
   end
 
-  def type
+  def deadline_type
     self.deadline_type.name
   end
 
@@ -51,11 +51,11 @@ class DueDate < ActiveRecord::Base
     sorted_deadlines = []
     # sorted so that the earliest deadline is at the first
     sorted_deadlines = deadline_sort(due_dates)
-    due_dates.reject {|due_date| due_date.type != 1 && due_date.type != 2 }
+    due_dates.reject {|due_date| due_date.deadline_type != 1 && due_date.deadline_type != 2 }
     round = 1
     for due_date in sorted_deadlines
       break if response.created_at < due_date.due_at
-      round += 1 if due_date.type == 2
+      round += 1 if due_date.deadline_type == 2
     end
     round
   end

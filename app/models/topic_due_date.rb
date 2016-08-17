@@ -1,0 +1,2 @@
+class TopicDueDate < DueDate
+end

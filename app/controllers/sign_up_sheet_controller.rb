@@ -265,19 +265,19 @@ class SignUpSheetController < ApplicationController
     topics.each_with_index do |_topic, j|
       for i in 1..review_rounds
         topic_deadline_type_subm = DeadlineType.where(name: 'submission').first.id
-        topic_deadline_subm = TopicDeadline.where(topic_id: session[:duedates][j]['id'].to_i, deadline_type_id: topic_deadline_type_subm, round: i).first
+        topic_deadline_subm = TopicDueDate.where(parent_id: session[:duedates][j]['id'].to_i, deadline_type_id: topic_deadline_type_subm, round: i).first
 
         topic_deadline_subm.update_attributes(due_at: due_dates[session[:duedates][j]['id'].to_s + '_submission_' + i.to_s + '_due_date'])
         flash[:error] = "Please enter a valid " + (i > 1 ? "Resubmission deadline " + (i - 1).to_s : "Submission deadline.") unless topic_deadline_subm.errors.empty?
 
         topic_deadline_type_rev = DeadlineType.where(name: 'review').first.id
-        topic_deadline_rev = TopicDeadline.where(topic_id: session[:duedates][j]['id'].to_i, deadline_type_id: topic_deadline_type_rev, round: i).first
+        topic_deadline_rev = TopicDueDate.where(parent_id: session[:duedates][j]['id'].to_i, deadline_type_id: topic_deadline_type_rev, round: i).first
         topic_deadline_rev.update_attributes(due_at: due_dates[session[:duedates][j]['id'].to_s + '_review_' + i.to_s + '_due_date'])
         flash[:error] = "Please enter a valid Review deadline " + (i > 1 ? (i - 1).to_s : "") unless topic_deadline_rev.errors.empty?
       end
 
       deadline_type = DeadlineType.where(name: 'metareview')
-      topic_deadline_subm = TopicDeadline.where(topic_id: session[:duedates][j]['id'], deadline_type_id: deadline_type.id).first
+      topic_deadline_subm = TopicDueDate.where(parent_id: session[:duedates][j]['id'], deadline_type_id: deadline_type.id).first
       topic_deadline_subm.update_attributes(due_at: due_dates[session[:duedates][j]['id'].to_s + '_submission_' + (review_rounds + 1).to_s + '_due_date'])
       flash[:error] = "Please enter a valid Meta review deadline." unless topic_deadline_subm.errors.empty?
     end

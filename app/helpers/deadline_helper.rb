@@ -11,7 +11,7 @@ module DeadlineHelper
   # type { submission deadline, metareview deadline, etc.} a set of other parameters that
   # specify whether submission, review, metareview, etc. are allowed for the particular deadline
   def self.create_topic_deadline(due_date, offset, topic_id)
-    topic_deadline = TopicDeadline.new
+    topic_deadline = TopicDueDate.new
     topic_deadline.topic_id = topic_id
     topic_deadline.due_at = DateTime.parse(due_date.due_at.to_s) + offset.to_i
     topic_deadline.deadline_type_id = due_date.deadline_type_id

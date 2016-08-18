@@ -22,7 +22,7 @@ class AssignmentForm
     assignment_form = AssignmentForm.new
     assignment_form.assignment = Assignment.find(assignment_id)
     assignment_form.assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment_id)
-    assignment_form.due_dates = AssignmentDueDate.where(assignment_id: assignment_id)
+    assignment_form.due_dates = AssignmentDueDate.where(parent_id: assignment_id)
     assignment_form.set_up_assignment_review
     assignment_form
   end
@@ -108,7 +108,7 @@ class AssignmentForm
 
   # Adds items to delayed_jobs queue for this assignment
   def add_to_delayed_queue
-    duedates = AssignmentDueDate.where(assignment_id: @assignment.id)
+    duedates = AssignmentDueDate.where(parent_id: @assignment.id)
     duedates.each do |due_date|
       deadline_type = DeadlineType.find(due_date.deadline_type_id).name
       due_at = due_date.due_at.to_s(:db)

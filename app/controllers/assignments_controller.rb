@@ -55,7 +55,7 @@ class AssignmentsController < ApplicationController
     @user = current_user
 
     @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
-    @due_date_all = AssignmentDueDate.where(assignment_id: params[:id])
+    @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
     @reviewvarycheck = false
     @due_date_nameurl_notempty = false
     @due_date_nameurl_notempty_checkbox = false

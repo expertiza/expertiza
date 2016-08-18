@@ -19,7 +19,7 @@ class DueDateController < ApplicationController
       return
     end
 
-    @due_dates = AssignmentDueDate.where(assignment_id: params[:assignment_id])
+    @due_dates = AssignmentDueDate.where(parent_id: params[:assignment_id])
     @due_dates.each(&:delete)
 
     respond_to do |format|

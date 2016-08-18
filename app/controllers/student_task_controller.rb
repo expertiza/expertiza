@@ -35,7 +35,7 @@ class StudentTaskController < ApplicationController
         participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
         topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
         next unless participant and topic_id
-        review_due_date = TopicDeadline.where(topic_id: topic_id, deadline_type_id:  1).first
+        review_due_date = TopicDueDate.where(parent_id: topic_id, deadline_type_id:  1).first
 
         if review_due_date.due_at < Time.now && @assignment.get_current_stage(topic_id) != 'Complete'
           @reviewee_topic_id = topic_id
@@ -50,8 +50,8 @@ class StudentTaskController < ApplicationController
 
     @assignment = @participant.assignment
     # Finding the current phase that we are in
-    due_dates = AssignmentDueDate.where(["assignment_id = ?", @assignment.id])
-    @very_last_due_date = AssignmentDueDate.order("due_at DESC").limit(1).where(["assignment_id = ?", @assignment.id])
+    due_dates = AssignmentDueDate.where(parent_id: @assignment.id)
+    @very_last_due_date = AssignmentDueDate.where(parent_id: @assignment.id).order("due_at DESC").limit(1)
     next_due_date = @very_last_due_date[0]
     for due_date in due_dates
       if due_date.due_at > Time.now

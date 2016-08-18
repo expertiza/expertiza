@@ -24,7 +24,7 @@ module GradesHelper
       @assignment_id = Participant.find(params[:id]).parent_id
     end
     has_team = @assignment.max_team_size > 1
-    has_metareview = AssignmentDueDate.exists?(assignment_id: @assignment_id, deadline_type_id: 5)
+    has_metareview = AssignmentDueDate.exists?(parent_id: @assignment_id, deadline_type_id: 5)
     true_num = 0
     true_num = if has_team && has_metareview
                  2

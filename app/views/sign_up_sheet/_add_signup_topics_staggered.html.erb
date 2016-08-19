@@ -11,12 +11,6 @@
 <%= form_tag controller: 'assignment', action: 'edit', assignment_id: @assignment.id do %>
 <% end %>
 
-<%= form_tag :controller => 'sign_up_sheet', :action => 'save_topic_dependencies',:assignment_id => @assignment.id do %>
-  
-  <% if flash[:notice] %>
-    <div class="flash_note"><%= flash[:notice] %></div>
-  <% end %>
-
   <% if @sign_up_topics.size != 0 %>
     <table class="general" id="topics">
       <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
@@ -29,11 +23,9 @@
       <% end %>
     </table>
     <br/>
-    <%= submit_tag "Save dependencies"%>
   <% else %>
     <div class="flash_note"><%= "Signup topics have not yet been created." %></div>
   <% end %>
-<% end %>
 
 <% session[:return_to] = request.url %>
 <br/><br/>
@@ -55,7 +47,7 @@
           <%= render :partial => '/sign_up_sheet/due_dates', :locals => {} %>
         <%end%>
       <%else%>
-        Please set the dependencies and click 'Save dependencies'.
+        There is no topic deadline specified yet.
       <%end%>
     </div>
     <br/>

@@ -9,7 +9,6 @@
       <th>Submission deadline <%=i%></th>
       <th>Review deadline <%=i%></th>
     <%end%>
-    <th>Metareview deadline</th>
   </tr>
   <% i=0 %>
   <%@resubmission_rounds = @assignment.num_review_rounds%>
@@ -26,9 +25,6 @@
           <%= text_field :due_date, (session[:duedates][i]['id'].to_s + '_review_' + j.to_s + '_due_date').to_s, size: 20, value: DateTime.parse(session[:duedates][i]['review_'+ j.to_s]).strftime("%Y-%m-%d %H:%M")%>
         </td>
       <%end%>
-      <td>
-        <%= text_field :due_date, (session[:duedates][i]['id'].to_s + '_submission_' + (j+1).to_s + '_due_date').to_s, size: 20, value: DateTime.parse(session[:duedates][i]['submission_'+ (@resubmission_rounds).to_s]).strftime("%Y-%m-%d %H:%M")%>
-      </td>
     </tr>
     <% i=i+1 %>
   <% end %>

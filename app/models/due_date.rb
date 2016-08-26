@@ -1,14 +1,9 @@
 class DueDate < ActiveRecord::Base
-  belongs_to :deadline_type
   validate :due_at_is_valid_datetime
   #  has_paper_trail
 
   def self.default_permission(deadline_type, permission_type)
     DeadlineRight::DEFAULT_PERMISSION[deadline_type][permission_type]
-  end
-
-  def deadline_type
-    self.deadline_type.name
   end
 
   def set_flag
@@ -50,11 +45,11 @@ class DueDate < ActiveRecord::Base
     sorted_deadlines = []
     # sorted so that the earliest deadline is at the first
     sorted_deadlines = deadline_sort(due_dates)
-    due_dates.reject {|due_date| due_date.deadline_type != 1 && due_date.deadline_type != 2 }
+    due_dates.reject {|due_date| due_date.deadline_type_id != 1 && due_date.deadline_type_id != 2 }
     round = 1
     for due_date in sorted_deadlines
       break if response.created_at < due_date.due_at
-      round += 1 if due_date.deadline_type == 2
+      round += 1 if due_date.deadline_type_id == 2
     end
     round
   end

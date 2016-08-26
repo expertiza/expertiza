@@ -626,7 +626,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_due_dates(type)
-    self.due_dates.select {|due_date| due_date.deadline_type == DeadlineType.find_by_name(type) }
+    self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by_name(type).id }
   end
 
 end

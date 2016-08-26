@@ -65,7 +65,7 @@
         html +=
                 '<input name="assignment_form[due_date][][id]" type="hidden" value="' + id +'">';
 
-        html += '<input class="due_date_assignment_id" name="assignment_form[due_date][][assignment_id]" type="hidden" value="' + <%= @assignment_form.assignment.id %> + '">' +
+        html += '<input class="due_date_assignment_id" name="assignment_form[due_date][][parent_id]" type="hidden" value="' + <%= @assignment_form.assignment.id %> + '">' +
         '<input class="due_date_round" name="assignment_form[due_date][][round]" type="hidden" value="' + round_no + '">' +
         '<input class="due_date_deadline_type_id" name="assignment_form[due_date][][deadline_type_id]" type="hidden" value="' + due_date.deadline_type_id + '">';
 

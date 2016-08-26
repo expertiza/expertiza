@@ -60,7 +60,7 @@ module AssignmentHelper
 
     if due_dates[round].nil? or round < 0
       due_date = AssignmentDueDate.new
-      due_date.deadline_type = DeadlineType.find_by_name(type)
+      due_date.deadline_type_id = DeadlineType.find_by_name(type).id
       # creating new round
       # TODO: add code to assign default permission to the newly created due_date according to the due_date type
       due_date.submission_allowed_id = AssignmentDueDate.default_permission(type, 'submission_allowed')

@@ -23,9 +23,9 @@ describe SignUpSheet do
       topic1.topic_name = 'topic_name'
       allow(SignUpTopic).to receive(:where) { [topic1] }
 
-      topicDeadline = double('TopicDeadline')
-      allow(TopicDeadline).to receive(:where) { topicDeadline }
-      allow(topicDeadline).to receive(:first) { nil }
+      assignment_due_date = double('AssignmentDueDate')
+      allow(AssignmentDueDate).to receive(:where) { assignment_due_date }
+      allow(AssignmentDueDate).to receive(:first) { nil }
 
       deadlineType = double('DeadlineType')
       allow(DeadlineType).to receive(:find_by_name) { deadlineType }
@@ -46,10 +46,10 @@ describe SignUpSheet do
       topic1.topic_name = 'topic_name'
       allow(SignUpTopic).to receive(:where) { [topic1] }
 
-      topicDeadline = TopicDeadline.new
-      topicDeadline.due_at = DateTime.new(2000, 1, 1)
-      allow(TopicDeadline).to receive(:where) { topicDeadline }
-      allow(topicDeadline).to receive(:first) { topicDeadline }
+      assignment_due_date = AssignmentDueDate.new
+      assignment_due_date.due_at = DateTime.new(2000, 1, 1)
+      allow(AssignmentDueDate).to receive(:where) { assignment_due_date }
+      allow(AssignmentDueDate).to receive(:first) { assignment_due_date }
 
       deadlineType = double(DeadlineType)
       allow(DeadlineType).to receive(:find_by_name) { deadlineType }

@@ -28,6 +28,17 @@ def get_selected_id(finder_var)
 end
 
 describe "assignment function" do
+  before(:each) do
+    create(:deadline_type, name: "submission")
+    create(:deadline_type, name: "review")
+    create(:deadline_type, name: "metareview")
+    create(:deadline_type, name: "drop_topic")
+    create(:deadline_type, name: "signup")
+    create(:deadline_type, name: "team_formation")
+    create(:deadline_right)
+    create(:deadline_right, name: 'Late')
+    create(:deadline_right, name: 'OK')
+  end
   describe "creation page", js: true do
     before(:each) do
       (1..3).each do |i|

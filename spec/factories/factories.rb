@@ -188,7 +188,7 @@ FactoryGirl.define do
     can_take_quiz true
   end
 
-  factory :due_date, class: DueDate do
+  factory :assignment_due_date, class: AssignmentDueDate do
     due_at "2015-12-30 23:30:12"
     deadline_type { DeadlineType.first || association(:deadline_type) }
     assignment { Assignment.first || association(:assignment) }
@@ -203,6 +203,25 @@ FactoryGirl.define do
     description_url nil
     quiz_allowed_id 3
     teammate_review_allowed_id 3
+    type 'AssignmentDueDate'
+  end
+
+  factory :topic_due_date, class: TopicDueDate do
+    due_at "2015-12-30 23:30:12"
+    deadline_type { DeadlineType.first || association(:deadline_type) }
+    topic { SignUpTopic.first || association(:topic) }
+    submission_allowed_id 3
+    review_allowed_id 3
+    review_of_review_allowed_id 3
+    round 1
+    flag false
+    threshold 1
+    delayed_job_id nil
+    deadline_name nil
+    description_url nil
+    quiz_allowed_id 3
+    teammate_review_allowed_id 3
+    type 'TopicDueDate'
   end
 
   factory :deadline_type, class: DeadlineType do

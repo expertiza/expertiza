@@ -113,11 +113,10 @@ describe SignUpSheetController do
       assignment = double(Assignment)
       allow(assignment).to receive(:num_review_rounds) { 0 }
       allow(SignUpTopic).to receive("where").and_return([@topic1])
-      topic_deadline_stub = double(TopicDeadline)
-      topic_deadline = TopicDeadline.new
-      allow(TopicDeadline).to receive(:where) { topic_deadline }
-      allow(topic_deadline).to receive(:update_attributes)
-      allow(topic_deadline).to receive(:first) { topic_deadline }
+      topic_duedate = TopicDueDate.new
+      allow(TopicDueDate).to receive(:where) { topic_duedate }
+      allow(topic_duedate).to receive(:update_attributes)
+      allow(topic_duedate).to receive(:first) { topic_duedate }
 
       deadline_type = DeadlineType.new
       deadline_type.id = 0
@@ -142,12 +141,11 @@ describe SignUpSheetController do
       allow(deadline_type).to receive(:update_attributes)
       allow(deadline_type).to receive(:first) { deadline_type }
 
-      topic_deadline_stub = double(TopicDeadline)
-      topic_deadline = TopicDeadline.new
-      allow(TopicDeadline).to receive(:where) { topic_deadline }
-      allow(topic_deadline).to receive(:update_attributes)
-      allow(topic_deadline).to receive(:first) { topic_deadline }
-      allow(DeadlineType).to receive(:where) { topic_deadline }
+      topic_duedate = TopicDueDate.new
+      allow(TopicDueDate).to receive(:where) { topic_duedate }
+      allow(topic_duedate).to receive(:update_attributes)
+      allow(topic_duedate).to receive(:first) { topic_duedate }
+      allow(DeadlineType).to receive(:where) { topic_duedate }
 
       post :save_topic_deadlines, due_date: "15_submission_1_due_date", assignment_id: @assignment.id
       expect(response).to redirect_to edit_assignment_url(id: @assignment.id)

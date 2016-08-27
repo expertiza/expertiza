@@ -32,8 +32,6 @@ class Assignment < ActiveRecord::Base
   validates_presence_of :name
   validates_uniqueness_of :name, scope: :course_id
 
-  COMPLETE = 'Finished'.freeze
-
   REVIEW_QUESTIONNAIRES = {author_feedback: 0, metareview: 1, review: 2, teammate_review: 3}.freeze
   #  Review Strategy information.
   RS_AUTO_SELECTED = 'Auto-Selected'.freeze
@@ -363,7 +361,7 @@ class Assignment < ActiveRecord::Base
     due_date = find_current_stage(topic_id)
 
     unless self.staggered_deadline?
-      if due_date != COMPLETE && due_date != 'Finished' && !due_date.nil? && !due_date.deadline_name.nil?
+      if due_date != 'Finished' && !due_date.nil? && !due_date.deadline_name.nil?
         return due_date.deadline_name
       else
         return get_current_stage(topic_id)
@@ -387,7 +385,7 @@ class Assignment < ActiveRecord::Base
       return nil if topic_id.nil?
     end
     due_date = find_current_stage(topic_id)
-    if due_date.nil? or due_date == COMPLETE or due_date.is_a?(TopicDueDate)
+    if due_date.nil? or due_date == 'Finished' or due_date.is_a?(TopicDueDate)
       return nil
     else
       return due_date.description_url
@@ -410,7 +408,17 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_current_stage(topic_id = nil)
-    due_dates = self.staggered_deadline? ? TopicDueDate.where(parent_id: topic_id).order(due_at: :desc) : AssignmentDueDate.where(parent_id: self.id).order(due_at: :desc)
+    due_dates = AssignmentDueDate.where(parent_id: self.id).order(due_at: :desc)
+    if self.staggered_deadline?
+      due_dates.each_with_index do |due_date, index|
+        topic_due_date = TopicDueDate.where(parent_id: topic_id, 
+                                            deadline_type_id: due_date.deadline_type_id, 
+                                            round: due_date.round).first rescue nil
+        due_dates[index] = topic_due_date unless topic_due_date.nil?
+      end
+    end
+    due_dates.sort {|x, y| y.due_at <=> x.due_at}
+
     if !due_dates.nil? && !due_dates.empty?
       if Time.now > due_dates[0].due_at
         return 'Finished'
@@ -427,7 +435,7 @@ class Assignment < ActiveRecord::Base
   def get_current_stage(topic_id=nil)
     return 'Unknown' if topic_id.nil? and self.staggered_deadline?
     due_date = find_current_stage(topic_id)
-    (due_date == nil || due_date == COMPLETE) ? COMPLETE : DeadlineType.find(due_date.deadline_type_id).name
+    (due_date == nil || due_date == 'Finished') ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
   end
 
   # Returns hash of review_scores[reviewer_id][reviewee_id] = score

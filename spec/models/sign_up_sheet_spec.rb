@@ -35,7 +35,7 @@ describe SignUpSheet do
     end
 
     it 'will return a SignUpSheet when the topic already has deadlines' do
-      skip('skip test on staggered deadline')
+      skip('skip test on staggered deadline temporarily')
       assignment = double(Assignment)
       allow(assignment).to receive(:num_review_rounds) { 1 }
       allow(Assignment).to receive(:find) { assignment }

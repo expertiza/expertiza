@@ -136,7 +136,8 @@ describe "assignment function" do
       )
     end
 
-    xit "is able to create with staggered deadline" do
+    it "is able to create with staggered deadline" do
+      skip('skip test on staggered deadline temporarily')
       login_as("instructor6")
       visit '/assignments/new?private=1'
 

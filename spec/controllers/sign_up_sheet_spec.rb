@@ -98,7 +98,7 @@ describe SignUpSheetController do
     expect(response).to redirect_to edit_assignment_path(@assignment.id) + "#tabs-5"
   end
 
-  describe "Save topic deadlines" do
+  xdescribe "Save topic deadlines" do
     it "redirects to edit assignment page" do
       session[:duedates] = [@topic1, @topic2]
       assignment = double(Assignment)

@@ -4,29 +4,22 @@
     <th>Topic name</th>
     <th>Submission deadline</th>
     <th>Review deadline</th>
-
-    <%for i in 2..@assignment.num_review_rounds%>
+    <%for i in 2..review_rounds%>
       <th>Submission deadline <%=i%></th>
       <th>Review deadline <%=i%></th>
     <%end%>
   </tr>
   <% i=0 %>
-  <%@resubmission_rounds = @assignment.num_review_rounds%>
-
-  <% for i in 0..(session[:duedates].length - 1) %>
+  <% for i in 0..(@assignment.sign_up_topics.size - 1) %>
     <tr>
-      <td><%= session[:duedates][i]['topic_identifier'] %></td>
-      <td><%= session[:duedates][i]['topic_name'] %></td>
-      <%for j in 1..@resubmission_rounds%>
-        <td>
-          <%= text_field :due_date, (session[:duedates][i]['id'].to_s + '_submission_' + j.to_s + '_due_date').to_s, size: 20, value: DateTime.parse(session[:duedates][i]['submission_'+ j.to_s]).strftime("%Y-%m-%d %H:%M") %>
-        </td>
-        <td>
-          <%= text_field :due_date, (session[:duedates][i]['id'].to_s + '_review_' + j.to_s + '_due_date').to_s, size: 20, value: DateTime.parse(session[:duedates][i]['review_'+ j.to_s]).strftime("%Y-%m-%d %H:%M")%>
-        </td>
+      <td><%= @assignment.sign_up_topics[i].topic_identifier %></td>
+      <td><%= @assignment.sign_up_topics[i].topic_name %></td>
+      <% for review_round in 1..review_rounds %>
+        <% topic_id = @assignment.sign_up_topics[i].id %>
+        <td><%= text_field :due_date, (topic_id.to_s + '_submission_' + review_round.to_s + '_due_date').to_s, size: 20, value: check_topic_due_date_value(assignment_submission_due_dates, topic_id, 1, review_round) %></td>
+        <td><%= text_field :due_date, (topic_id.to_s + '_review_' + review_round.to_s + '_due_date').to_s, size: 20, value: check_topic_due_date_value(assignment_review_due_dates, topic_id, 2, review_round) %></td>
       <%end%>
     </tr>
-    <% i=i+1 %>
   <% end %>
 </table>
 <br/>

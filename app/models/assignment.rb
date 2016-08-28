@@ -213,32 +213,8 @@ class Assignment < ActiveRecord::Base
   # The permissions of TopicDueDate is the same as AssignmentDueDate. 
   # Here, column is usually something like 'review_allowed_id'
   def check_condition(column, topic_id = nil)
-    if self.staggered_deadline?
-      next_due_date = TopicDueDate.where(['parent_id = ? and due_at >= ?', topic_id, Time.now]).first
-      # if certion TopicDueDate is not exist, we should query next corresponding AssignmentDueDate.
-      # eg. Time.now is 08/28/2016
-      # One topic uses following deadlines:
-      # TopicDueDate      08/01/2016
-      # TopicDueDate      08/02/2016
-      # TopicDueDate      08/03/2016
-      # AssignmentDueDate 09/04/2016
-      # In this case, we cannot find due_at later than Time.now in TopicDueDate.
-      # So we should find next corrsponding AssignmentDueDate, starting with the 4th one, not the 1st one!
-      if next_due_date.nil?
-        topic_due_date_size = TopicDueDate.where(parent_id: topic_id).size
-        next_assignment_due_dates = AssignmentDueDate.where(parent_id: self.id)[topic_due_date_size..-1]
-        next_assignment_due_dates.each do |assignment_due_date|
-          if assignment_due_date.due_at >= Time.now
-            next_due_date = assignment_due_date 
-            break
-          end
-        end
-      end
-    else
-      next_due_date = AssignmentDueDate.where(['parent_id = ? && due_at >= ?', self.id, Time.now]).first
-    end
+    next_due_date = DueDate.get_next_due_date(self.id, topic_id)
     return false if next_due_date.nil?
-
     right_id = next_due_date.send column
     right = DeadlineRight.find(right_id)
     right && (right.name == 'OK' || right.name == 'Late')
@@ -334,26 +310,9 @@ class Assignment < ActiveRecord::Base
   #if current  stage is submission or review, find the round number
   #otherwise, return 0
   def number_of_current_round(topic_id)
-    due_dates = if self.staggered_deadline?
-                  TopicDueDate.where(parent_id: topic_id).order('due_at DESC')
-                else
-                  AssignmentDueDate.where(parent_id: self.id).order('due_at DESC')
-                end
-    due_dates = due_dates.reject {|a| a.deadline_type_id != 1 && a.deadline_type_id != 2 }
-    if !due_dates.nil? and !due_dates.empty?
-      if Time.now > due_dates[0].due_at
-        return 0
-      else
-        i = 0
-        for due_date in due_dates
-          if Time.now < due_date.due_at and
-              (due_dates[i + 1].nil? or Time.now > due_dates[i + 1].due_at)
-            return due_date.round
-          end
-          i += 1
-        end
-      end
-    end
+    next_due_date = DueDate.get_next_due_date(self.id, topic_id)
+    return 0 if next_due_date.nil?
+    next_due_date.round ||= 0
   end
 
   # For varying rubric feature
@@ -415,26 +374,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_current_stage(topic_id = nil)
-    due_dates = AssignmentDueDate.where(parent_id: self.id).order(due_at: :desc)
-    if self.staggered_deadline?
-      due_dates.each_with_index do |due_date, index|
-        topic_due_date = TopicDueDate.where(parent_id: topic_id, 
-                                            deadline_type_id: due_date.deadline_type_id, 
-                                            round: due_date.round).first rescue nil
-        due_dates[index] = topic_due_date unless topic_due_date.nil?
-      end
-    end
-    due_dates.sort {|x, y| y.due_at <=> x.due_at}
-
-    if !due_dates.nil? && !due_dates.empty?
-      if Time.now > due_dates[0].due_at
-        return 'Finished'
-      else
-        due_dates.each_with_index do |due_date, index|
-          return due_date if Time.now < due_date.due_at && (due_dates[index + 1].nil? || Time.now > due_dates[index + 1].due_at)
-        end
-      end
-    end
+    next_due_date = DueDate.get_next_due_date(self.id, topic_id)
+    return 'Finished' if next_due_date.nil?
+    next_due_date
   end
 
   def get_current_stage(topic_id=nil)

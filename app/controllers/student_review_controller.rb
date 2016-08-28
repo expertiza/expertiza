@@ -41,36 +41,7 @@ class StudentReviewController < ApplicationController
       @num_metareviews_completed += 1 unless map.response.empty?
     end
     @num_metareviews_in_progress = @num_metareviews_total - @num_metareviews_completed
-    if @assignment.staggered_deadline?
-      @review_mappings.each do |review_mapping|
-        # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-        # to treat all assignments as team assignments
-        participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
-        topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
-        next unless participant and topic_id
-        review_due_date = TopicDueDate.where(parent_id: topic_id, deadline_type_id: 1).first
-        # The logic here is that if the user has at least one reviewee to review then @reviewee_topic_id should
-        # not be nil. Enabling and disabling links to individual reviews are handled at the rhtml
-        @reviewee_topic_id = topic_id if review_due_date.due_at < Time.now
-      end
-      review_rounds = @assignment.num_review_rounds
-      deadline_type_id = DeadlineType.find_by_name('review').id
-
-      @metareview_mappings.each do |metareview_mapping|
-        review_mapping = ResponseMap.find(metareview_mapping.reviewed_object_id)
-        if review_mapping
-          # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-          # to treat all assignments as team assignments
-          participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
-          topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
-          end
-        next unless participant and topic_id
-        meta_review_due_date = TopicDueDate.where(parent_id: topic_id, deadline_type_id: deadline_type_id, round: review_rounds).first
-        if meta_review_due_date.due_at < Time.now
-          @meta_reviewee_topic_id = topic_id
-        end
-      end
-    end
+    @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
   end
 
   private

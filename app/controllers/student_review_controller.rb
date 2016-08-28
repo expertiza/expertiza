@@ -45,7 +45,7 @@ class StudentReviewController < ApplicationController
       @review_mappings.each do |review_mapping|
         # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
         # to treat all assignments as team assignments
-        participant = AssignmentTeam.first_member(review_mapping.reviewee_id)
+        participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
         topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
         next unless participant and topic_id
         review_due_date = TopicDueDate.where(parent_id: topic_id, deadline_type_id: 1).first
@@ -61,7 +61,7 @@ class StudentReviewController < ApplicationController
         if review_mapping
           # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
           # to treat all assignments as team assignments
-          participant = AssignmentTeam.first_member(review_mapping.reviewee_id)
+          participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
           topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
           end
         next unless participant and topic_id

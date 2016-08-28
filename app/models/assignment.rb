@@ -215,8 +215,25 @@ class Assignment < ActiveRecord::Base
   def check_condition(column, topic_id = nil)
     if self.staggered_deadline?
       next_due_date = TopicDueDate.where(['parent_id = ? and due_at >= ?', topic_id, Time.now]).first
-      # if certion TopicDueDate is not exist, we should query corresponding AssignmentDueDate.
-      next_due_date = AssignmentDueDate.where(['parent_id = ? && due_at >= ?', self.id, Time.now]).first if next_due_date.nil?
+      # if certion TopicDueDate is not exist, we should query next corresponding AssignmentDueDate.
+      # eg. Time.now is 08/28/2016
+      # One topic uses following deadlines:
+      # TopicDueDate      08/01/2016
+      # TopicDueDate      08/02/2016
+      # TopicDueDate      08/03/2016
+      # AssignmentDueDate 09/04/2016
+      # In this case, we cannot find due_at later than Time.now in TopicDueDate.
+      # So we should find next corrsponding AssignmentDueDate, starting with the 4th one, not the 1st one!
+      if next_due_date.nil?
+        topic_due_date_size = TopicDueDate.where(parent_id: topic_id).size
+        next_assignment_due_dates = AssignmentDueDate.where(parent_id: self.id)[topic_due_date_size..-1]
+        next_assignment_due_dates.each do |assignment_due_date|
+          if assignment_due_date.due_at >= Time.now
+            next_due_date = assignment_due_date 
+            break
+          end
+        end
+      end
     else
       next_due_date = AssignmentDueDate.where(['parent_id = ? && due_at >= ?', self.id, Time.now]).first
     end

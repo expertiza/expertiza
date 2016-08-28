@@ -92,7 +92,7 @@ class AssignmentTeam < Team
   end
 
   # Get the first member of the team
-  def self.first_member(team_id)
+  def self.get_first_member(team_id)
     find(team_id).participants.first
   end
 

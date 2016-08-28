@@ -210,31 +210,21 @@ class Assignment < ActiveRecord::Base
   end
 
   # Check whether review, metareview, etc.. is allowed
-  # If topic_id is set, check for that topic only. Otherwise, check to see if there is any topic which can be reviewed(etc) now
+  # The permissions of TopicDueDate is the same as AssignmentDueDate. 
+  # Here, column is usually something like 'review_allowed_id'
   def check_condition(column, topic_id = nil)
-    # the drop topic deadline should not play any role in picking the next due date
-    # get the drop_topic_deadline_id to exclude it
-    drop_topic_deadline_id = DeadlineType.find_by_name('drop_topic').id
     if self.staggered_deadline?
-      # TODO: need to change the logic --zhewei
-      if topic_id
-        next_due_dates = TopicDueDate.where(['parent_id = ? && due_at >= ? && deadline_type_id <> ?', topic_id, Time.now, drop_topic_deadline_id]).order('due_at')
-      else
-        next_due_dates = TopicDueDate.where(['parent_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id]).joins({topic: :assignment}, order: 'due_at')
-        end
+      next_due_date = TopicDueDate.where(['parent_id = ? and due_at >= ?', topic_id, Time.now]).first
+      # if certion TopicDueDate is not exist, we should query corresponding AssignmentDueDate.
+      next_due_date = AssignmentDueDate.where(['parent_id = ? && due_at >= ?', self.id, Time.now]).first if next_due_date.nil?
     else
-      next_due_dates = AssignmentDueDate.where(['parent_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id]).order('due_at')
-      next_due_date = next_due_dates.first
+      next_due_date = AssignmentDueDate.where(['parent_id = ? && due_at >= ?', self.id, Time.now]).first
     end
     return false if next_due_date.nil?
 
-    # command pattern - get the attribute with the name in column
-    # Here, column is usually something like 'review_allowed_id'
-
     right_id = next_due_date.send column
-
     right = DeadlineRight.find(right_id)
-    (right && (right.name == 'OK' || right.name == 'Late'))
+    right && (right.name == 'OK' || right.name == 'Late')
   end
 
   # Determine if the next due date from now allows for submissions
@@ -423,10 +413,8 @@ class Assignment < ActiveRecord::Base
       if Time.now > due_dates[0].due_at
         return 'Finished'
       else
-        i = 0
-        due_dates.each do |due_date|
-          return due_date if Time.now < due_date.due_at && (due_dates[i + 1].nil? || Time.now > due_dates[i + 1].due_at)
-          i += 1
+        due_dates.each_with_index do |due_date, index|
+          return due_date if Time.now < due_date.due_at && (due_dates[index + 1].nil? || Time.now > due_dates[index + 1].due_at)
         end
       end
     end

@@ -22,26 +22,16 @@ class StudentTaskController < ApplicationController
   def view
     StudentTask.from_participant_id params[:id]
     @participant = AssignmentParticipant.find(params[:id])
+    @can_submit = @participant.can_submit
+    @can_review = @participant.can_review
+    @can_take_quiz = @participant.can_take_quiz
+    @authorization = Participant.get_authorization(@can_submit, @can_review, @can_take_quiz)
     @team = @participant.team
     denied unless current_user_id?(@participant.user_id)
-
     @assignment = @participant.assignment
     @can_provide_suggestions = @assignment.allow_suggestions
-    # Even if one of the reviewee's work is ready for review "Other's work" link should be active
-    if @assignment.staggered_deadline?
-      review_mappings = @participant.team_reviews
-
-      review_mappings.each do |review_mapping|
-        participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
-        topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
-        next unless participant and topic_id
-        review_due_date = TopicDueDate.where(parent_id: topic_id, deadline_type_id:  1).first
-
-        if review_due_date.due_at < Time.now && @assignment.get_current_stage(topic_id) != 'Complete'
-          @reviewee_topic_id = topic_id
-        end
-      end
-    end
+    @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
+    @topics = SignUpTopic.where(assignment_id: @assignment.id)
   end
 
   def others_work

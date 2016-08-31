@@ -1,5 +1,5 @@
 <h2>Reviews for "<%= @assignment.name %>"</h2>
-<% if @assignment.can_review(@reviewee_topic_id) or @assignment.get_current_stage(@reviewee_topic_id) == "Finished" %>
+<% if @assignment.can_review(@topic_id) or @assignment.get_current_stage(@topic_id) == "Finished" %>
     <%= render :partial => 'responses', :locals => {:mappings => @review_mappings, :title => 'Review'} %>
     <% if @assignment.dynamic_reviewer_assignment? %>
       <%# if @num_reviews_in_progress == 0 %>
@@ -18,7 +18,7 @@
     <p><em>Reviews cannot be performed at this time</em></p>
 <% end %>
 
-<% if @assignment.metareview_allowed(@meta_reviewee_topic_id) or @assignment.get_current_stage() == "Complete" %>
+<% if @assignment.metareview_allowed(@topic_id) or @assignment.get_current_stage() == "Complete" %>
     <h2>Metareviews for "<%= @assignment.name %>"</h2>
     <%= render :partial => 'responses', :locals => {:mappings => @metareview_mappings, :title => 'Metareview'} %>
     <br/>

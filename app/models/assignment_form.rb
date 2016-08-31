@@ -22,7 +22,7 @@ class AssignmentForm
     assignment_form = AssignmentForm.new
     assignment_form.assignment = Assignment.find(assignment_id)
     assignment_form.assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment_id)
-    assignment_form.due_dates = DueDate.where(assignment_id: assignment_id)
+    assignment_form.due_dates = AssignmentDueDate.where(parent_id: assignment_id)
     assignment_form.set_up_assignment_review
     assignment_form
   end
@@ -95,10 +95,10 @@ class AssignmentForm
                                             current_local_time.strftime('%S').to_i))
       due_date[:due_at] = utc_time
       if due_date[:id].nil? or due_date[:id].blank?
-        dd = DueDate.new(due_date)
+        dd = AssignmentDueDate.new(due_date)
         @has_errors = true unless dd.save
       else
-        dd = DueDate.find(due_date[:id])
+        dd = AssignmentDueDate.find(due_date[:id])
         # get deadline for review
         @has_errors = true unless dd.update_attributes(due_date)
       end
@@ -108,7 +108,7 @@ class AssignmentForm
 
   # Adds items to delayed_jobs queue for this assignment
   def add_to_delayed_queue
-    duedates = DueDate.where(assignment_id: @assignment.id)
+    duedates = AssignmentDueDate.where(parent_id: @assignment.id)
     duedates.each do |due_date|
       deadline_type = DeadlineType.find(due_date.deadline_type_id).name
       due_at = due_date.due_at.to_s(:db)
@@ -254,7 +254,7 @@ class AssignmentForm
     if new_assign.save
       Assignment.record_timestamps = true
       copy_assignment_questionnaire(old_assign, new_assign, user)
-      DueDate.copy(old_assign.id, new_assign.id)
+      AssignmentDueDate.copy(old_assign.id, new_assign.id)
       new_assign.create_node
       new_assign_id = new_assign.id
       # also copy topics from old assignment

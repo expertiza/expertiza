@@ -1,7 +1,6 @@
 class SignUpTopic < ActiveRecord::Base
   has_many :signed_up_teams, foreign_key: 'topic_id', dependent: :destroy
-  has_many :topic_deadlines, foreign_key: 'topic_id', dependent: :destroy
-  alias deadlines topic_deadlines
+  has_many :due_dates, :class_name => 'TopicDueDate', :foreign_key => 'parent_id', :dependent => :destroy
   has_many :bids, foreign_key: 'topic_id', dependent: :destroy
   belongs_to :assignment
 
@@ -69,7 +68,7 @@ class SignUpTopic < ActiveRecord::Base
     assignment = Assignment.find(assignment_id)
 
     # making sure that the drop date deadline hasn't passed
-    dropDate = DueDate.where(assignment_id: assignment.id, deadline_type_id: '6').first
+    dropDate = AssignmentDueDate.where(parent_id: assignment.id, deadline_type_id: '6').first
     if !dropDate.nil? && dropDate.due_at < Time.now
       # flash[:error] = "You cannot drop this topic because the drop deadline has passed."
     else

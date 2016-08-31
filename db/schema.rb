@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160815174615) do
+ActiveRecord::Schema.define(version: 20160817151255) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -203,7 +203,7 @@ ActiveRecord::Schema.define(version: 20160815174615) do
   create_table "due_dates", force: :cascade do |t|
     t.datetime "due_at"
     t.integer  "deadline_type_id",            limit: 4
-    t.integer  "assignment_id",               limit: 4
+    t.integer  "parent_id",                   limit: 4
     t.integer  "submission_allowed_id",       limit: 4
     t.integer  "review_allowed_id",           limit: 4
     t.integer  "review_of_review_allowed_id", limit: 4
@@ -215,10 +215,11 @@ ActiveRecord::Schema.define(version: 20160815174615) do
     t.string   "description_url",             limit: 255
     t.integer  "quiz_allowed_id",             limit: 4
     t.integer  "teammate_review_allowed_id",  limit: 4,   default: 3
+    t.string   "type",                        limit: 255, default: "AssignmentDueDate"
   end
 
-  add_index "due_dates", ["assignment_id"], name: "fk_due_dates_assignments", using: :btree
   add_index "due_dates", ["deadline_type_id"], name: "fk_deadline_type_due_date", using: :btree
+  add_index "due_dates", ["parent_id"], name: "fk_due_dates_assignments", using: :btree
   add_index "due_dates", ["review_allowed_id"], name: "fk_due_date_review_allowed", using: :btree
   add_index "due_dates", ["review_of_review_allowed_id"], name: "fk_due_date_review_of_review_allowed", using: :btree
   add_index "due_dates", ["submission_allowed_id"], name: "fk_due_date_submission_allowed", using: :btree
@@ -571,24 +572,6 @@ ActiveRecord::Schema.define(version: 20160815174615) do
   add_index "teams_users", ["team_id"], name: "fk_users_teams", using: :btree
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 
-  create_table "topic_deadlines", force: :cascade do |t|
-    t.datetime "due_at"
-    t.integer  "deadline_type_id",            limit: 4
-    t.integer  "topic_id",                    limit: 4
-    t.integer  "late_policy_id",              limit: 4
-    t.integer  "submission_allowed_id",       limit: 4
-    t.integer  "review_allowed_id",           limit: 4
-    t.integer  "review_of_review_allowed_id", limit: 4
-    t.integer  "round",                       limit: 4
-  end
-
-  add_index "topic_deadlines", ["deadline_type_id"], name: "fk_deadline_type_topic_deadlines", using: :btree
-  add_index "topic_deadlines", ["late_policy_id"], name: "fk_topic_deadlines_late_policies", using: :btree
-  add_index "topic_deadlines", ["review_allowed_id"], name: "idx_review_allowed", using: :btree
-  add_index "topic_deadlines", ["review_of_review_allowed_id"], name: "idx_review_of_review_allowed", using: :btree
-  add_index "topic_deadlines", ["submission_allowed_id"], name: "idx_submission_allowed", using: :btree
-  add_index "topic_deadlines", ["topic_id"], name: "fk_topic_deadlines_topics", using: :btree
-
   create_table "tree_folders", force: :cascade do |t|
     t.string  "name",       limit: 255
     t.string  "child_type", limit: 255
@@ -641,7 +624,6 @@ ActiveRecord::Schema.define(version: 20160815174615) do
   add_foreign_key "assignments", "users", column: "instructor_id", name: "fk_assignments_instructors"
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"
   add_foreign_key "courses", "users", column: "instructor_id", name: "fk_course_users"
-  add_foreign_key "due_dates", "assignments", name: "fk_due_dates_assignments"
   add_foreign_key "due_dates", "deadline_rights", column: "review_allowed_id", name: "fk_due_date_review_allowed"
   add_foreign_key "due_dates", "deadline_rights", column: "review_of_review_allowed_id", name: "fk_due_date_review_of_review_allowed"
   add_foreign_key "due_dates", "deadline_rights", column: "submission_allowed_id", name: "fk_due_date_submission_allowed"
@@ -660,7 +642,4 @@ ActiveRecord::Schema.define(version: 20160815174615) do
   add_foreign_key "ta_mappings", "users", column: "ta_id", name: "fk_ta_mappings_ta_id"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
-  add_foreign_key "topic_deadlines", "deadline_types", name: "fk_topic_deadlines_deadline_type"
-  add_foreign_key "topic_deadlines", "late_policies", name: "fk_topic_deadlines_late_policies"
-  add_foreign_key "topic_deadlines", "sign_up_topics", column: "topic_id", name: "fk_topic_deadlines_sign_up_topic"
 end

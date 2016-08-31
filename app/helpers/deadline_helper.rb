@@ -11,13 +11,13 @@ module DeadlineHelper
   # type { submission deadline, metareview deadline, etc.} a set of other parameters that
   # specify whether submission, review, metareview, etc. are allowed for the particular deadline
   def self.create_topic_deadline(due_date, offset, topic_id)
-    topic_deadline = TopicDeadline.new
-    topic_deadline.topic_id = topic_id
+    topic_deadline = TopicDueDate.new
+    topic_deadline.parent_id = topic_id
     topic_deadline.due_at = DateTime.parse(due_date.due_at.to_s) + offset.to_i
     topic_deadline.deadline_type_id = due_date.deadline_type_id
     # select count(*) from topic_deadlines where late_policy_id IS NULL;
     # all 'late_policy_id' in 'topic_deadlines' table is NULL
-    topic_deadline.late_policy_id = nil
+    # topic_deadline.late_policy_id = nil
     topic_deadline.submission_allowed_id = due_date.submission_allowed_id
     topic_deadline.review_allowed_id = due_date.review_allowed_id
     topic_deadline.review_of_review_allowed_id = due_date.review_of_review_allowed_id

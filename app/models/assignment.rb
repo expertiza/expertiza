@@ -18,7 +18,7 @@ class Assignment < ActiveRecord::Base
   # designates an assignment of the appropriate type.
   has_many :participants, :class_name => 'AssignmentParticipant', :foreign_key => 'parent_id'
   has_many :users, :through => :participants
-  has_many :due_dates, :dependent => :destroy
+  has_many :due_dates, :class_name => 'AssignmentDueDate', :foreign_key => 'parent_id', :dependent => :destroy
   has_many :teams, :class_name => 'AssignmentTeam', :foreign_key => 'parent_id'
   has_many :team_review_mappings, :class_name => 'ReviewResponseMap', :through => :teams, :source => :review_mappings
   has_many :invitations, :class_name => 'Invitation', :foreign_key => 'assignment_id', :dependent => :destroy
@@ -32,8 +32,6 @@ class Assignment < ActiveRecord::Base
 
   validates_presence_of :name
   validates_uniqueness_of :name, scope: :course_id
-
-  COMPLETE = 'Finished'.freeze
 
   REVIEW_QUESTIONNAIRES = {author_feedback: 0, metareview: 1, review: 2, teammate_review: 3}.freeze
   #  Review Strategy information.
@@ -213,30 +211,14 @@ class Assignment < ActiveRecord::Base
   end
 
   # Check whether review, metareview, etc.. is allowed
-  # If topic_id is set, check for that topic only. Otherwise, check to see if there is any topic which can be reviewed(etc) now
+  # The permissions of TopicDueDate is the same as AssignmentDueDate. 
+  # Here, column is usually something like 'review_allowed_id'
   def check_condition(column, topic_id = nil)
-    # the drop topic deadline should not play any role in picking the next due date
-    # get the drop_topic_deadline_id to exclude it
-    drop_topic_deadline_id = DeadlineType.find_by_name('drop_topic').id
-    if self.staggered_deadline?
-      if topic_id
-        next_due_dates = TopicDeadline.where(['topic_id = ? && due_at >= ? && deadline_type_id <> ?', topic_id, Time.now, drop_topic_deadline_id]).order('due_at')
-      else
-        next_due_dates = TopicDeadline.where(['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id]).joins({topic: :assignment}, order: 'due_at')
-        end
-    else
-      next_due_dates = DueDate.where(['assignment_id = ? && due_at >= ? && deadline_type_id <> ?', self.id, Time.now, drop_topic_deadline_id]).order('due_at')
-      next_due_date = next_due_dates.first
-    end
+    next_due_date = DueDate.get_next_due_date(self.id, topic_id)
     return false if next_due_date.nil?
-
-    # command pattern - get the attribute with the name in column
-    # Here, column is usually something like 'review_allowed_id'
-
     right_id = next_due_date.send column
-
     right = DeadlineRight.find(right_id)
-    (right && (right.name == 'OK' || right.name == 'Late'))
+    right && (right.name == 'OK' || right.name == 'Late')
   end
 
   # Determine if the next due date from now allows for submissions
@@ -329,26 +311,9 @@ class Assignment < ActiveRecord::Base
   #if current  stage is submission or review, find the round number
   #otherwise, return 0
   def number_of_current_round(topic_id)
-    due_dates = if self.staggered_deadline?
-                  TopicDeadline.where(topic_id: topic_id).order('due_at DESC')
-                else
-                  DueDate.where(assignment_id: self.id).order('due_at DESC')
-                end
-    due_dates = due_dates.reject {|a| a.deadline_type_id != 1 && a.deadline_type_id != 2 }
-    if !due_dates.nil? and !due_dates.empty?
-      if Time.now > due_dates[0].due_at
-        return 0
-      else
-        i = 0
-        for due_date in due_dates
-          if Time.now < due_date.due_at and
-              (due_dates[i + 1].nil? or Time.now > due_dates[i + 1].due_at)
-            return due_date.round
-          end
-          i += 1
-        end
-      end
-    end
+    next_due_date = DueDate.get_next_due_date(self.id, topic_id)
+    return 0 if next_due_date.nil?
+    next_due_date.round ||= 0
   end
 
   # For varying rubric feature
@@ -363,7 +328,7 @@ class Assignment < ActiveRecord::Base
     due_date = find_current_stage(topic_id)
 
     unless self.staggered_deadline?
-      if due_date != COMPLETE && due_date != 'Finished' && !due_date.nil? && !due_date.deadline_name.nil?
+      if due_date != 'Finished' && !due_date.nil? && !due_date.deadline_name.nil?
         return due_date.deadline_name
       else
         return get_current_stage(topic_id)
@@ -387,7 +352,7 @@ class Assignment < ActiveRecord::Base
       return nil if topic_id.nil?
     end
     due_date = find_current_stage(topic_id)
-    if due_date.nil? or due_date == COMPLETE or due_date.is_a?(TopicDeadline)
+    if due_date.nil? or due_date == 'Finished' or due_date.is_a?(TopicDueDate)
       return nil
     else
       return due_date.description_url
@@ -401,7 +366,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def num_review_rounds
-    due_dates = DueDate.where(assignment_id: self.id)
+    due_dates = AssignmentDueDate.where(parent_id: self.id)
     rounds = 0
     due_dates.each do |due_date|
       rounds = due_date.round if due_date.round > rounds
@@ -410,24 +375,15 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_current_stage(topic_id = nil)
-    due_dates = self.staggered_deadline? ? TopicDeadline.where(topic_id: topic_id).order(due_at: :desc) : DueDate.where(assignment_id: self.id).order(due_at: :desc)
-    if !due_dates.nil? && !due_dates.empty?
-      if Time.now > due_dates[0].due_at
-        return 'Finished'
-      else
-        i = 0
-        due_dates.each do |due_date|
-          return due_date if Time.now < due_date.due_at && (due_dates[i + 1].nil? || Time.now > due_dates[i + 1].due_at)
-          i += 1
-        end
-      end
-    end
+    next_due_date = DueDate.get_next_due_date(self.id, topic_id)
+    return 'Finished' if next_due_date.nil?
+    next_due_date
   end
 
   def get_current_stage(topic_id=nil)
     return 'Unknown' if topic_id.nil? and self.staggered_deadline?
     due_date = find_current_stage(topic_id)
-    (due_date == nil || due_date == COMPLETE) ? COMPLETE : DeadlineType.find(due_date.deadline_type_id).name
+    (due_date == nil || due_date == 'Finished') ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
   end
 
   def review_questionnaire_id(round = nil)
@@ -520,7 +476,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_due_dates(type)
-    self.due_dates.select {|due_date| due_date.deadline_type == DeadlineType.find_by_name(type) }
+    self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by_name(type).id }
   end
 
 end

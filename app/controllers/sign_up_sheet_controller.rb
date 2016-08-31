@@ -110,20 +110,14 @@ class SignUpSheetController < ApplicationController
 
   # This displays a page that lists all the available topics for an assignment.
   # Contains links that let an admin or Instructor edit, delete, view enrolled/waitlisted members for each topic
-  # Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics
-  # can have different deadlines.
-  def add_signup_topic
+  # Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics can have different deadlines.
+  def add_signup_topics
     load_add_signup_topics(params[:id])
     SignUpSheet.add_signup_topic(params[:id])
   end
 
   def add_signup_topics_staggered
-    add_signup_topic
-  end
-
-  # similar to the above function except that all the topics and review/submission rounds have the similar deadlines
-  def add_signup_topics
-    load_add_signup_topics(params[:id])
+    add_signup_topics
   end
 
   # retrieves all the data associated with the given assignment. Includes all topics,
@@ -252,36 +246,55 @@ class SignUpSheetController < ApplicationController
 
   # If the instructor needs to explicitly change the start/due dates of the topics
   # This is true in case of a staggered deadline type assignment. Individual deadlines can
-  # be set on a per topic  and per round basis
+  # be set on a per topic and per round basis
   def save_topic_deadlines
-    # session[:duedates] stores all original duedates info
-    # due_dates stores staggered duedates
+    assignment = Assignment.find(params[:assignment_id])
+    @assignment_submission_due_dates = assignment.due_dates.select {|due_date| due_date.deadline_type_id == 1 }
+    @assignment_review_due_dates = assignment.due_dates.select {|due_date| due_date.deadline_type_id == 2 }
     due_dates = params[:due_date]
-
     topics = SignUpTopic.where(assignment_id: params[:assignment_id])
-    review_rounds = Assignment.find(params[:assignment_id]).num_review_rounds
-    # j represents the review rounds
-    j = 0
-    topics.each_with_index do |_topic, j|
+    review_rounds = assignment.num_review_rounds
+    topics.each_with_index do |topic, index|
       for i in 1..review_rounds
-        topic_deadline_type_subm = DeadlineType.where(name: 'submission').first.id
-        topic_deadline_subm = TopicDeadline.where(topic_id: session[:duedates][j]['id'].to_i, deadline_type_id: topic_deadline_type_subm, round: i).first
-
-        topic_deadline_subm.update_attributes(due_at: due_dates[session[:duedates][j]['id'].to_s + '_submission_' + i.to_s + '_due_date'])
-        flash[:error] = "Please enter a valid " + (i > 1 ? "Resubmission deadline " + (i - 1).to_s : "Submission deadline.") unless topic_deadline_subm.errors.empty?
-
-        topic_deadline_type_rev = DeadlineType.where(name: 'review').first.id
-        topic_deadline_rev = TopicDeadline.where(topic_id: session[:duedates][j]['id'].to_i, deadline_type_id: topic_deadline_type_rev, round: i).first
-        topic_deadline_rev.update_attributes(due_at: due_dates[session[:duedates][j]['id'].to_s + '_review_' + i.to_s + '_due_date'])
-        flash[:error] = "Please enter a valid Review deadline " + (i > 1 ? (i - 1).to_s : "") unless topic_deadline_rev.errors.empty?
+        @topic_submission_due_date = due_dates[topics[index].id.to_s + '_submission_' + i.to_s + '_due_date']
+        @topic_review_due_date = due_dates[topics[index].id.to_s + '_review_' + i.to_s + '_due_date']
+        @assignment_submission_due_date = DateTime.parse(@assignment_submission_due_dates[i - 1].due_at.to_s).strftime("%Y-%m-%d %H:%M")
+        @assignment_review_due_date = DateTime.parse(@assignment_review_due_dates[i - 1].due_at.to_s).strftime("%Y-%m-%d %H:%M")
+        %w(submission review).each do |deadline_type|
+          deadline_type_id = DeadlineType.find_by_name(deadline_type).id
+          next if instance_variable_get('@topic_' + deadline_type + '_due_date') == instance_variable_get('@assignment_' + deadline_type + '_due_date')
+          topic_due_date = TopicDueDate.where(parent_id: topic.id, deadline_type_id: deadline_type_id, round: i).first rescue nil
+          if topic_due_date.nil? # create a new record
+            TopicDueDate.create(
+              due_at:                      instance_variable_get('@topic_' + deadline_type + '_due_date'),
+              deadline_type_id:            DeadlineType.find_by_name(deadline_type).id,
+              parent_id:                   topic.id,
+              submission_allowed_id:       instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].submission_allowed_id,
+              review_allowed_id:           instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_allowed_id,
+              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id, 
+              round:                       i,
+              flag:                        instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].flag,
+              threshold:                   instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].threshold,
+              delayed_job_id:              instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].delayed_job_id,
+              deadline_name:               instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].deadline_name,
+              description_url:             instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].description_url,
+              quiz_allowed_id:             instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].quiz_allowed_id,
+              teammate_review_allowed_id:  instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].teammate_review_allowed_id,
+              type:                       'TopicDueDate'
+            )
+          else # update an existed record
+            topic_due_date.update_attributes(
+              due_at:                      instance_variable_get('@topic_' + deadline_type + '_due_date'),
+              submission_allowed_id:       instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].submission_allowed_id,
+              review_allowed_id:           instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_allowed_id,
+              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id, 
+              quiz_allowed_id:             instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].quiz_allowed_id,
+              teammate_review_allowed_id:  instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].teammate_review_allowed_id
+            )
+          end
+        end
       end
-
-      deadline_type = DeadlineType.where(name: 'metareview')
-      topic_deadline_subm = TopicDeadline.where(topic_id: session[:duedates][j]['id'], deadline_type_id: deadline_type.id).first
-      topic_deadline_subm.update_attributes(due_at: due_dates[session[:duedates][j]['id'].to_s + '_submission_' + (review_rounds + 1).to_s + '_due_date'])
-      flash[:error] = "Please enter a valid Meta review deadline." unless topic_deadline_subm.errors.empty?
     end
-
     redirect_to_assignment_edit(params[:assignment_id])
   end
 

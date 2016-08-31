@@ -54,10 +54,10 @@ describe 'Student can create quizzes and edit them', js: true do
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create :due_date, due_at: (DateTime.now + 1)
+    create :assignment_due_date, due_at: (DateTime.now + 1)
 
     @review_deadline_type = create(:deadline_type, name: "review")
-    create :due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+    create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
 
     # Create a team linked to the calibrated assignment
     @team = create :assignment_team, assignment: @assignment
@@ -247,10 +247,10 @@ describe 'multiple quiz question test', js: true do
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create :due_date, due_at: (DateTime.now + 1)
+    create :assignment_due_date, due_at: (DateTime.now + 1)
 
     @review_deadline_type = create(:deadline_type, name: "review")
-    create :due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+    create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
 
     # Create a team linked to the calibrated assignment
     @team = create :assignment_team, assignment: @assignment
@@ -306,10 +306,10 @@ describe 'appropriate quiz taking times', js: true do
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create :due_date, due_at: (DateTime.now + 1)
+    create :assignment_due_date, due_at: (DateTime.now + 1)
 
     @review_deadline_type = create(:deadline_type, name: "review")
-    create :due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+    create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
 
     # Setup Student 1
 
@@ -416,10 +416,10 @@ describe 'Instructor', js: true do
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create :due_date, due_at: (DateTime.now + 1)
+    create :assignment_due_date, due_at: (DateTime.now + 1)
 
     @review_deadline_type = create(:deadline_type, name: "review")
-    create :due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+    create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
 
     # Setup Student 1
 
@@ -519,10 +519,10 @@ describe 'Student reviewers can not take the quizzes before request artifact', j
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create :due_date, due_at: (DateTime.now + 1)
+    create :assignment_due_date, due_at: (DateTime.now + 1)
 
     @review_deadline_type = create(:deadline_type, name: "review")
-    create :due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+    create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
 
     # Setup Student 1
 
@@ -593,10 +593,10 @@ describe 'Student reviewers can take the quizzes', js: true do
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create :due_date, due_at: (DateTime.now + 1)
+    create :assignment_due_date, due_at: (DateTime.now + 1)
 
     @review_deadline_type = create(:deadline_type, name: "review")
-    create :due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+    create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
 
     # Setup Student 1
 
@@ -684,10 +684,10 @@ describe 'Student reviewers can view the quizzes they take', js: true do
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create :due_date, due_at: (DateTime.now + 1)
+    create :assignment_due_date, due_at: (DateTime.now + 1)
 
     @review_deadline_type = create(:deadline_type, name: "review")
-    create :due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+    create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
 
     # Setup Student 1
 

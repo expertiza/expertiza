@@ -4,10 +4,7 @@
   <% else %>
       Submit or Review work for <%= link_to @assignment.name, @assignment.spec_location %>
   <% end %>
-  <% @can_submit = @participant.can_submit %>
-  <% @can_review = @participant.can_review %>
-  <% @can_take_quiz = @participant.can_take_quiz %>
-  <% @authorization = Participant.get_authorization(@can_submit, @can_review, @can_take_quiz) %>
+  
 </h1>
 
 <div class="flash_note">
@@ -17,7 +14,7 @@
   <a href="<%= @assignment.spec_location %>" target="new">Assignment Description</a>
 <% end %>
 <ul>
-  <%if SignUpTopic.find_by_assignment_id(@assignment.id)%>
+  <%if @topics.size > 0 %>
     <% if @authorization == 'participant' %>
       <li> 
         <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :assignment_id => @participant.parent_id%>
@@ -37,13 +34,11 @@ to display the label "Your team" in the student assignment tasks-->
   <%end%>
   <% if @authorization == 'participant' or @can_submit == true %>
     <li>
-      <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
-      <% topics = SignUpTopic.where(assignment_id: @participant.parent_id) %>
       <!--if one team do not hold a topic (still in waitlist), they cannot submit their work.-->
-      <% if topic_id.nil? and topics.size > 0 %>
+      <% if @topic_id.nil? and @topics.size > 0 %>
         <font color="gray">Your work</font> (You have to choose a topic first)
       <% else %>
-        <% if @assignment.submission_allowed(topic_id) %>
+        <% if @assignment.submission_allowed(@topic_id) %>
           <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> (Submit and view your work)
         <% else %>
           <%= link_to 'Your work', :controller => 'submitted_content', :action => 'view', :id => @participant.id %> (Submit and view your work)
@@ -60,9 +55,7 @@ to display the label "Your team" in the student assignment tasks-->
       <% else %>
         <% @alias_name = "Your readings" %>
       <% end %>
-
-      <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
-      <% if @assignment.can_review(@reviewee_topic_id) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(topic_id) == "Finished" %>
+      <% if @assignment.can_review(@topic_id) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@topic_id) == "Finished" %>
         <%= link_to "#{@alias_name}",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
       <% else %>
         <font color="gray"><%= @alias_name%></font>
@@ -75,8 +68,7 @@ to display the label "Your team" in the student assignment tasks-->
   <%if @assignment.require_quiz%>
     <% if @authorization == 'participant' or @can_take_quiz == true %>
       <li>
-        <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
-        <% if @assignment.require_quiz and (@assignment.quiz_allowed(@reviewee_topic_id) or @assignment.get_current_stage(topic_id) == "Finished") %>
+        <% if @assignment.require_quiz and (@assignment.quiz_allowed(@topic_id) or @assignment.get_current_stage(@topic_id) == "Finished") %>
           <%= link_to "Take quizzes", student_quizzes_path(:id => @participant.id) %>
         <% else %>
           <font color="gray">Take quizzes</font>
@@ -96,8 +88,7 @@ to display the label "Your team" in the student assignment tasks-->
       <li><%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %></li>
     <% end %>
 
-    <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
-    <% if @assignment.get_current_stage(topic_id) == "Complete" %>
+    <% if @assignment.get_current_stage(@topic_id) == "Complete" %>
       <!-- removed code for survey assignment add in line above && SurveyHelper::is_user_eligible_for_survey?	(@assignment.id, session[:user].id)  -->
       <li><%= link_to "Take a survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id} %> (This will log you out)</li>
     <% end %>

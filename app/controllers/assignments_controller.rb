@@ -55,7 +55,7 @@ class AssignmentsController < ApplicationController
     @user = current_user
 
     @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
-    @due_date_all = DueDate.where(assignment_id: params[:id])
+    @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
     @reviewvarycheck = false
     @due_date_nameurl_notempty = false
     @due_date_nameurl_notempty_checkbox = false
@@ -69,6 +69,12 @@ class AssignmentsController < ApplicationController
     @team_formation_allowed_checkbox = false
     @participants_count = @assignment_form.assignment.participants.size
     @teams_count = @assignment_form.assignment.teams.size
+
+    if @assignment_form.assignment.staggered_deadline == true
+      @review_rounds = @assignment_form.assignment.num_review_rounds
+      @assignment_submission_due_dates = @due_date_all.select{|due_date| due_date.deadline_type_id == 1}
+      @assignment_review_due_dates = @due_date_all.select{|due_date| due_date.deadline_type_id == 2}
+    end
 
     # Check if name and url in database is empty before webpage displays
     @due_date_all.each do |dd|

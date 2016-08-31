@@ -45,10 +45,9 @@
             <%= label_tag('assignment_form[assignment][use_bookmark]', 'Allow participants to create bookmarks?') %>
           <br><br>
           <% if @assignment_form.assignment.staggered_deadline == true %>
-              <%session[:duedates] = SignUpSheet.add_signup_topic(@assignment_form.assignment.id)%>
-              <%= render '/sign_up_sheet/add_signup_topics_staggered.html' %>
+              <%= render partial: '/sign_up_sheet/add_signup_topics_staggered', locals: {review_rounds: @review_rounds, assignment_submission_due_dates: @assignment_submission_due_dates, assignment_review_due_dates: @assignment_review_due_dates} %>
           <% else %>
-              <%= render '/sign_up_sheet/add_signup_topics.html' %>
+              <%= render '/sign_up_sheet/add_signup_topics' %>
           <% end %>
       </div>
       <div id="tabs-3">

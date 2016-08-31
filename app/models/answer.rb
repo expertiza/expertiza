@@ -97,7 +97,7 @@ class Answer < ActiveRecord::Base
       map = ResponseMap.find(response.map_id)
       # assignment_participant = Participant.where(["id = ?", map.reviewee_id])
       @sorted_deadlines = nil
-      @sorted_deadlines = DueDate.where(["assignment_id = ?", map.reviewed_object_id]).order('due_at DESC')
+      @sorted_deadlines = AssignmentDueDate.where(parent_id: map.reviewed_object_id).order('due_at DESC')
 
       # to check the validity of the response
       if @sorted_deadlines.nil?

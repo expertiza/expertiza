@@ -112,7 +112,7 @@ class SignUpSheet < ActiveRecord::Base
       end
 
       deadline_type_subm = DeadlineType.find_by_name('metareview').id
-      duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_subm).first
+      duedate_subm = TopicDueDate.where(parent_id: topic.id, deadline_type_id: deadline_type_subm).first
       subm_string = duedate_subm.nil? ? nil : DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
       duedate['submission_' + (@review_rounds + 1).to_s] = subm_string
     end
@@ -135,7 +135,7 @@ class SignUpSheet < ActiveRecord::Base
 
       if duedate_subm.nil? || duedate_rev.nil?
         # the topic is new. so copy deadlines from assignment
-        set_of_due_dates = DueDate.where(assignment_id: assignment_id)
+        set_of_due_dates = AssignmentDueDate.where(parent_id: assignment_id)
         set_of_due_dates.each do |due_date|
           DeadlineHelper.create_topic_deadline(due_date, 0, topic.id)
         end
@@ -148,9 +148,9 @@ class SignUpSheet < ActiveRecord::Base
 
     def find_topic_duedates(round, topic)
       deadline_type_subm = DeadlineType.find_by_name('submission').id
-      duedate_subm = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_subm, round: round).first
+      duedate_subm = TopicDueDate.where(parent_id: topic.id, deadline_type_id: deadline_type_subm, round: round).first
       deadline_type_rev = DeadlineType.find_by_name('review').id
-      duedate_rev = TopicDeadline.where(topic_id: topic.id, deadline_type_id: deadline_type_rev, round: round).first
+      duedate_rev = TopicDueDate.where(parent_id: topic.id, deadline_type_id: deadline_type_rev, round: round).first
       [duedate_rev, duedate_subm]
     end
   end

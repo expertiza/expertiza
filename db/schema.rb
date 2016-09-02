@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160817151255) do
+ActiveRecord::Schema.define(version: 20160902201338) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -213,7 +213,7 @@ ActiveRecord::Schema.define(version: 20160817151255) do
     t.integer  "delayed_job_id",              limit: 4
     t.string   "deadline_name",               limit: 255
     t.string   "description_url",             limit: 255
-    t.integer  "quiz_allowed_id",             limit: 4
+    t.integer  "quiz_allowed_id",             limit: 4,   default: 1
     t.integer  "teammate_review_allowed_id",  limit: 4,   default: 3
     t.string   "type",                        limit: 255, default: "AssignmentDueDate"
   end

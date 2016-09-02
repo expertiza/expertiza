@@ -23,7 +23,7 @@
       <img src="/assets/info.png" title='A topic is reviewable if the minimum number of reviews already done for the submissions on that topic is within k of the minimum number of reviews done on the least-reviewed submission on any topic.'>
     <br/>
       <%= label_tag('assignment_form[assignment][max_reviews_per_submission]', 'Maximum number of reviews per submission:') %>
-      <%= text_field_tag('assignment_form[assignment][max_reviews_per_submission]', @assignment_form.assignment.max_reviews_per_submission, size: 1) %>
+      <%= text_field_tag('assignment_form[assignment][max_reviews_per_submission]', @assignment_form.assignment.max_reviews_per_submission ||= 10, size: 1) %>
     </td>
   </tr>
   <tr id="instructor_selected_review_mapping_mechanism" hidden='hidden'>

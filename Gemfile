@@ -35,7 +35,6 @@ gem 'open-uri-cached'
 gem 'paper_trail'
 gem 'pg', group: :production
 gem 'protected_attributes'
-gem 'rails_12factor', group: :production
 gem 'rails4-autocomplete'
 gem 'rake'
 gem 'rb-readline'

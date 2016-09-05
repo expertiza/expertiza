@@ -151,19 +151,13 @@ class SubmittedContentController < ApplicationController
     folder_name = params['current_folder']['name']
     # -- This code removed on 4/10/09 ... was breaking downloads of files with hyphens in them ...file_name = FileHelper::sanitize_filename(params['download'])
     file_name = params['download']
-
-    file_split = file_name.split('.')
-    if file_split.length > 1 and (file_split[1] == 'htm' or file_split[1] == 'html')
-      send_file(folder_name + "/" + file_name, disposition: 'inline')
+    
+    if folder_name.nil?
+      raise "folder_name is nil."
+    elsif file_name.nil?
+      raise "file_name is nil."
     else
-      if !File.directory?(folder_name + "/" + file_name)
-        file_ext = File.extname(file_name)[1..-1]
-        file_ext = 'bin' if file_ext.blank? # default to application/octet-stream
-        send_file folder_name + "/" + file_name,
-                  disposition: 'inline'
-      else
-        raise "Directory downloads are not supported."
-      end
+       send_file(folder_name + "/" + file_name, disposition: 'inline')
     end
   end
 

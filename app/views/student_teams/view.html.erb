@@ -204,7 +204,7 @@
 
 <!--display the advertisement-->
 
-  <% if @student.team%>
+  <% if @student.team && @student.assignment.has_topics? && @student.team.topic%>
     <b>Advertisement for teammates</b>
     <br>
     <table style="width:80%" align="center" >

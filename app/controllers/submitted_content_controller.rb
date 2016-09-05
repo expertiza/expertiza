@@ -153,11 +153,15 @@ class SubmittedContentController < ApplicationController
     file_name = params['download']
 
     if folder_name.nil?
-      raise "folder_name is nil."
+      raise "Folder_name is nil."
     elsif file_name.nil?
-      raise "file_name is nil."
+      raise "File_name is nil."
+    elsif File.directory?(folder_name + "/" + file_name)
+      raise "Cannot send a whole folder."
+    elsif !File.exist?(folder_name + "/" + file_name)
+      rails "File does not exist."
     else
-       send_file(folder_name + "/" + file_name, disposition: 'inline')
+      send_data(folder_name + "/" + file_name, disposition: 'inline')
     end
   end
 

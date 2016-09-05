@@ -161,7 +161,7 @@ class SubmittedContentController < ApplicationController
     elsif !File.exist?(folder_name + "/" + file_name)
       rails "File does not exist."
     else
-      send_data(folder_name + "/" + file_name, disposition: 'inline')
+      send_file(folder_name + "/" + file_name, disposition: 'inline')
     end
   end
 

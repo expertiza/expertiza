@@ -118,10 +118,6 @@ function microtaskChanged() {
       <%= check_box_tag('assignment_form[assignment][staggered_deadline]', 'true', @assignment_form.assignment.staggered_deadline, {:onChange => 'staggeredDeadlineChanged()'}) %>
       <%= label_tag('assignment_form[assignment][staggered_deadline]', 'Staggered deadline assignment?') %>
     </td>
-    <td style='padding:5px' id='assignment_days_between_submissions_field' <%= 'hidden' unless @assignment_form.assignment.staggered_deadline %>>
-      <%= label_tag('assignment_form[assignment][days_between_submissions]', 'Days between chapters:') %>
-      <%= text_field_tag('assignment_form[assignment][days_between_submissions]', @assignment_form.assignment.days_between_submissions, {:onChange => 'daysBetweenSubmissionsChanged()', :style => 'width:20px'}) %>
-    </td>
   </tr>
 
   <tr>
@@ -212,12 +208,8 @@ function microtaskChanged() {
 
     function staggeredDeadlineChanged() {
       var msg = 'Warning! Unchecking all topics for this assignment will now have the same deadline.'
-      if (jQuery('#assignment_staggered_deadline').is(':checked')) {
-        jQuery('#assignment_days_between_submissions_field').removeAttr('hidden');
-      } else {
-        if (confirm(msg)) {
-          jQuery('#assignment_days_between_submissions_field').attr('hidden', true);
-        } else {
+      if (!jQuery('#assignment_staggered_deadline').is(':checked')) {
+        if (!confirm(msg)) {
           jQuery('#assignment_staggered_deadline').prop('checked', true);
         }
       }

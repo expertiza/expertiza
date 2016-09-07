@@ -18,10 +18,10 @@ class DueDate < ActiveRecord::Base
   end
 
   def self.copy(old_assignment_id, new_assignment_id)
-    duedates = where(['assignment_id = ?', old_assignment_id])
+    duedates = where(parent_id: old_assignment_id)
     duedates.each do |orig_due_date|
       new_due_date = orig_due_date.dup
-      new_due_date.assignment_id = new_assignment_id
+      new_due_date.parent_id = new_assignment_id
       new_due_date.save
     end
   end
@@ -29,7 +29,7 @@ class DueDate < ActiveRecord::Base
   def self.set_duedate(duedate, deadline, assign_id, max_round)
     submit_duedate = DueDate.new(duedate)
     submit_duedate.deadline_type_id = deadline
-    submit_duedate.assignment_id = assign_id
+    submit_duedate.parent_id = assign_id
     submit_duedate.round = max_round
     submit_duedate.save
   end
@@ -41,7 +41,7 @@ class DueDate < ActiveRecord::Base
   def self.done_in_assignment_round(assignment_id, response)
     # for author feedback, quiz, teammate review and metareview, Expertiza only support one round, so the round # should be 1
     return 0 if ResponseMap.find(response.map_id).type != "ReviewResponseMap"
-    due_dates = DueDate.where(["assignment_id = ?", assignment_id])
+    due_dates = DueDate.where(parent_id: assignment_id)
     sorted_deadlines = []
     # sorted so that the earliest deadline is at the first
     sorted_deadlines = deadline_sort(due_dates)

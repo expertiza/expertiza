@@ -117,7 +117,6 @@ FactoryGirl.define do
     max_team_size 3
     staggered_deadline false
     allow_suggestions false
-    days_between_submissions nil
     review_assignment_strategy "Auto-Selected"
     max_reviews_per_submission 2
     review_topic_threshold 0

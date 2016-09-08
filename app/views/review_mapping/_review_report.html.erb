@@ -17,13 +17,13 @@
             </td>
             <!--# reviews done-->
             <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
-              <%= @count %>/<%= @rspan %> <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id%>
+              <%= @count %>/<%= @rspan %> <br/>
+              <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id%>
             </td>
 
           <% @response_maps.each do |ri| %>
             <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
             <% team_name_color = Response.exists?(map_id: ri.id) ? "green" : "red" %>
-    <%binding.pry if ri.id >= 111650 %>
             <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, ri.response, ri.reviewee_id) %>
               <% if Team.where(id: ri.reviewee_id).length > 0 %>
                 <%@team = Team.find(ri.reviewee_id) %>

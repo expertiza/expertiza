@@ -35,7 +35,8 @@ module ReviewMappingHelper
         else 
             team_reviewed_link_name = Team.find(reviewee_id).name 
         end
-        team_reviewed_link_name = "("+team_reviewed_link_name+")" if !response.nil? and !response.last.is_submitted?
+        team_reviewed_link_name = "("+team_reviewed_link_name+")" if !response.empty? and !response.last.is_submitted?
+        team_reviewed_link_name
 	end
 	#
 	# for calibration report

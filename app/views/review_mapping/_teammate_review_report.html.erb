@@ -1,33 +1,7 @@
-
-
-<div class = "reviewreport">
-  <table width="100%" cellspacing="0" cellpadding="2" border="0">
-    <tr bgcolor="#CCCCCC">
-      <th width = "16%">
-        Reviewer
-      </th>
-      <th width = "14%">
-        # teammate reviews done
-      </th>
-      <th width = "20%">
-        Teammate reviewed
-      </th>
-    <!--
-      <th width = "8%">
-        Score awarded
-      </th>
-      <th width = "8%">
-        Avg. score
-      </th>
-      <th width = "16%">
-        Score range
-      </th>
-      -->
-      <th width = "20%">
-        Last reviewed at
-      </th>
-    </tr>
-
+<%= create_report_table_header("Reviewer" => "16%",
+                               "# teammate reviews done" => "14%",
+                               "Teammate reviewed" => "20%",
+                               "Last reviewed at" => "20%") %>
     <%@l = -1 %>
     <% @reviewers.each do |r| %>
       <% @teammate_review_response_maps = ResponseMap.where(["reviewed_object_id = ? and reviewer_id = ? and type = ?", @id, r.reviewer_id, @type]) %>
@@ -38,11 +12,7 @@
         <% @count = 0 %>
         <% @rspan = 0 %>
         <%@l = @l+1 %>
-        <% if @l % 2 == 0 %>
-          <% @bgcolor = "#ffffff" %>
-        <% else %>  
-          <% @bgcolor = "#DDDDBB" %>
-        <% end %>
+        <% (@l % 2 == 0) ? @bgcolor = "#ffffff" : @bgcolor = "#DDDDBB" %>
 
         <% @teammate_review_response_maps.each do |rm| %>
         <!--count means the teammate reviews one student completed.-->

@@ -1,31 +1,7 @@
-<div class = "reviewreport">
-  <table width="100%" cellspacing="0" cellpadding="2">
-    <tr bgcolor="#CCCCCC">
-      <th width = "16%">
-        Rejoinder
-      </th>
-      <th width = "14%">
-        # author feedbacks done
-      </th>
-      <th width = "20%">
-        Review response rejoined
-      </th>
-    <!--
-      <th width = "8%">
-        Score awarded
-      </th>
-      <th width = "8%">
-        Avg. score
-      </th>
-      <th width = "16%">
-        Score range
-      </th>
-      -->
-      <th width = "20%">
-        Last rejoined at
-      </th>
-    </tr>
-
+<%= create_report_table_header("Rejoinder" => "16%",
+                               "# author feedbacks done" => "14%",
+                               "Review response rejoined" => "20%",
+                               "Last rejoined at" => "20%") %>
     <%@l = -1 %>
     <% @authors.each do |r| %>
       <!--data prepare-->

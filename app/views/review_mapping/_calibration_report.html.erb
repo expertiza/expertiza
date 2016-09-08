@@ -34,18 +34,7 @@ th, td {
 				<% end %>
 				<% count_hash.each do |answer, count| %>
 					<% answer = 0 if answer.nil? %>
-					<% case (answer - instructor_answer).abs %>
-					<% when 0 %>
-						<% css_class = 'c5' %>
-					<% when 1 %>
-						<% css_class = 'c4' %>
-					<% when 2 %>
-						<% css_class = 'c3' %>
-					<% when 3 %>
-						<% css_class = 'c2' %>
-					<% else %>
-						<% css_class = 'c1' %>
-					<% end %>
+					<% css_class = get_css_style_for_calibration_report(answer - instructor_answer) %>
 					<td class=<%= css_class %>>
 						<% if count == max_count %>
 							<b><%= (count * 100.0 / participant_num).round(2).to_s + '%' %></b>

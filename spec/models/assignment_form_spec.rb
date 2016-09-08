@@ -52,7 +52,6 @@ describe AssignmentForm do
       expect(Assignment).to receive(:new).and_return assignment
       expect(assignment).to receive(:staggered_deadline)
       expect(assignment).to receive(:staggered_deadline=)
-      expect(assignment).to receive(:days_between_submissions=)
       expect(assignment).to receive(:availability_flag)
       expect(assignment).to receive(:availability_flag=)
       expect(assignment).to receive(:microtask)

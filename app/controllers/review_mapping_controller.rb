@@ -409,7 +409,7 @@ class ReviewMappingController < ApplicationController
       flash[:error] = 'You cannot set the number of reviews done by each student to be greater than or equal to total number of teams [or "participants" if it is an individual assignment].'
     end
 
-    peer_review_strategy(teams, num_participants, student_review_num, num_reviews_per_team, participants, participants_hash)
+    peer_review_strategy(assignment_id, teams, num_participants, student_review_num, num_reviews_per_team, participants, participants_hash)
 
     # after assigning peer reviews for each team, if there are still some peer reviewers not obtain enough peer review, just assign them to valid teams
     if ReviewResponseMap.where(["reviewed_object_id = ? and created_at > ? and calibrate_to = ?", assignment_id, @@time_create_last_review_mapping_record, 0]).size < exact_num_of_review_needed
@@ -537,7 +537,7 @@ class ReviewMappingController < ApplicationController
 
   private
 
-  def peer_review_strategy(teams, num_participants, student_review_num, num_reviews_per_team, participants, participants_hash)
+  def peer_review_strategy(assignment_id, teams, num_participants, student_review_num, num_reviews_per_team, participants, participants_hash)
     iterator = 0
     teams.each do |team|
       selected_participants = []

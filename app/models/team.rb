@@ -42,16 +42,6 @@ class Team < ActiveRecord::Base
     names
   end
 
-  # Generate the team name
-  def self.generate_team_name
-    counter = 0
-    while true
-      temp = "Team #{counter}"
-      return temp if (!Team.find_by_name(temp))
-      counter += 1
-    end
-  end
-
   # Check if the user exist
   def has_user(user)
     users.include? user

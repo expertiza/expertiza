@@ -157,8 +157,7 @@ describe "assignment function" do
       assignment = Assignment.where(name: 'private assignment for test').first
       pending(%(not sure what's broken here but the error is: #ActionController::RoutingError: No route matches [GET] "/assets/staggered_deadline_assignment_graph/graph_1.jpg"))
       expect(assignment).to have_attributes(
-        staggered_deadline: true,
-        days_between_submissions: 7
+        staggered_deadline: true
       )
     end
   end

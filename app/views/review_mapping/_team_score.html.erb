@@ -34,20 +34,12 @@
     <!--Score awarded-->
     <% current_round = get_current_round_for_review_report(reviewer_id) %>
     <td bgcolor=<%= bgcolor %> align = 'left' >
-
-    <% [current_round, current_round - 1].each do |round| %>
-        <% if @review_scores[reviewer_id] && @review_scores[reviewer_id][round] && @review_scores[reviewer_id][round][team_id] && @review_scores[reviewer_id][round][team_id] != -1.0 %>
-            <%= @review_scores[reviewer_id][round][team_id].inspect %>%
-        <% end %>    
-    <% elsif @review_scores[reviewer_id] && @review_scores[reviewer_id][round-1] && @review_scores[reviewer_id][round-1][team_id] && @review_scores[reviewer_id][round-1][team_id] != -1.0 %>
-        <font color="gray"><%= @review_scores[reviewer_id][round-1][team_id].inspect %>%</font>
-    <%else%>
-        --
-    <% end %>
+        <% color, score_awarded = get_vary_rubric_by_rounds_score_awarded_for_review_report(current_round, reviewer_id, team_id) %>
+        <font color=<%= color %>><%= score_awarded %></font>
     </td>
 
     <%if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][current_round] && [:max, :min, :avg].all? {|k| @avg_and_ranges[team_id][current_round].key? k} %>
-        <!--Score awarded-->
+        <!--Avg. score-->
         <td bgcolor=<%= bgcolor %> align = 'left'>
             <%= @avg_and_ranges[team_id][current_round][:avg].round(0) %>%
         </td>

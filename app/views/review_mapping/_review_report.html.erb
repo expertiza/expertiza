@@ -27,12 +27,11 @@
             <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, ri.response, ri.reviewee_id) %>
               <% if Team.where(id: ri.reviewee_id).length > 0 %>
                 <%@team = Team.find(ri.reviewee_id) %>
-                <% @teamid = @team.id%>
                 <!--Team reviewed-->
                 <td id = <%= team_name_color%> bgcolor=<%= @bgcolor %> align = 'left' colspan=1>
                   <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
                 </td>
-                  <%= render :partial => 'teamscore' %>
+                  <%= render partial: 'team_score',  locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: r.id} %>
                 </tr><tr>
               <%end%>
             <%end %>

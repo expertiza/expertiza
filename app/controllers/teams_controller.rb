@@ -7,10 +7,6 @@ class TeamsController < ApplicationController
      'Administrator'].include? current_role_name
   end
 
-  def create_teams_view
-    @parent = Object.const_get(session[:team_type]).find(params[:id])
-  end
-
   # This function is used to create teams with random names.
   # Instructors can call by clicking "Create temas" icon anc then click "Create teams" at the bottom.
   def create_teams

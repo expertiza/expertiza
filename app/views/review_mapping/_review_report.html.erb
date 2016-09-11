@@ -1,12 +1,11 @@
 <%= create_report_table_header("Reviewer" => "16%",
-                               "# reviews done" => "14%",
+                               "# reviews done per round" => "14%",
                                "Team reviewed" => "20%",
-                               "Score awarded" => "18%",
-                               "Avg. score" => "18%",
-                               "Score range" => "16%") %>
+                               "Score awarded / Avg. score" => "40%",
+                               "Metrics" => "10%") %>
       <%@l = -1 %>
       <% @reviewers.each do |r| %>
-        <% @response_maps, @bgcolor, @count, @rspan, @l = get_data_for_review_report(@id, r.id, @type, @l) %>
+        <% @response_maps, @bgcolor, @rspan, @l = get_data_for_review_report(@id, r.id, @type, @l) %>
         <tr>
         <%if r.id != -1 %>
           <% parid = Participant.find(r.id).user_id%>
@@ -17,7 +16,10 @@
             </td>
             <!--# reviews done-->
             <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
-              <%= @count %>/<%= @rspan %> <br/>
+              <% (1..@assignment.num_review_rounds).each do |round| %>
+                <%= instance_variable_get("@review_in_round_" + round.to_s) %>/<%= @rspan %>
+                <%= ', ' unless round == @assignment.num_review_rounds %>
+              <% end %>
               <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id%>
             </td>
 
@@ -31,7 +33,9 @@
                 <td id = <%= team_name_color%> bgcolor=<%= @bgcolor %> align = 'left' colspan=1>
                   <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
                 </td>
-                  <%= render partial: 'team_score',  locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: r.id} %>
+                <%= render partial: 'team_score',  locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: r.id} %>
+                <!--Metrics-->
+                <td></td>
                 </tr><tr>
               <%end%>
             <%end %>

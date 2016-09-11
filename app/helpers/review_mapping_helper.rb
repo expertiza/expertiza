@@ -16,17 +16,20 @@ module ReviewMappingHelper
     # for review report
     #
     def get_data_for_review_report(reviewed_object_id, reviewer_id, type, line_num)
-        response_maps = ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", reviewed_object_id, reviewer_id, type]) 
-        this_reviewer = reviewer_id 
-        count, rspan = 0, 0 
+        rspan = 0
         line_num = line_num + 1 
         (line_num % 2 == 0) ? bgcolor = "#ffffff" : bgcolor = "#DDDDBB" 
-
-         response_maps.each do |ri| 
-           count = count + 1 if !ri.response.empty? 
-           rspan = rspan + 1 if (Team.where(["id = ?", ri.reviewee_id ]).length > 0) 
+        (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@review_in_round_" + round.to_s, 0)}
+        
+        response_maps = ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", reviewed_object_id, reviewer_id, type]) 
+        response_maps.each do |ri| 
+            rspan = rspan + 1 if Team.exists?(id: ri.reviewee_id)
+            responses = ri.response
+            (1..@assignment.num_review_rounds).each do |round| 
+                instance_variable_set("@review_in_round_" + round.to_s, instance_variable_get("@review_in_round_" + round.to_s) + 1) if responses.exists?(round: round)
+            end
         end
-        [response_maps, bgcolor, count, rspan, line_num] 
+        [response_maps, bgcolor, rspan, line_num]
     end
 
     def get_team_reviewed_link_name(max_team_size, response, reviewee_id)
@@ -46,21 +49,56 @@ module ReviewMappingHelper
         current_round = @assignment.num_review_rounds if @assignment.get_current_stage(topic_id)=="Finished" || @assignment.get_current_stage(topic_id)=="metareview" 
     end
     
-    def get_vary_rubric_by_rounds_score_awarded_for_review_report(current_round, reviewer_id, team_id)
-        has_value = false 
-        color = ''
-        score_awarded = '--'
-        [current_round, current_round - 1].each_with_index do |round, index| 
-            color = 'gray' if index == 1
+    # varying rubric by round
+    def get_each_round_score_awarded_for_review_report(reviewer_id, team_id)
+        (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@score_awarded_round_" + round.to_s, '-----')}
+        (1..@assignment.num_review_rounds).each do |round| 
             if @review_scores[reviewer_id] && @review_scores[reviewer_id][round] && @review_scores[reviewer_id][round][team_id] && @review_scores[reviewer_id][round][team_id] != -1.0 
-                score_awarded = @review_scores[reviewer_id][round][team_id].inspect + '%'
-                has_value = true 
-                break 
+                instance_variable_set("@score_awarded_round_" + round.to_s, @review_scores[reviewer_id][round][team_id].inspect + '%')
             end 
         end 
-        [color, score_awarded]
     end
 
+    def get_min_max_avg_value_for_review_report(round, team_id)
+        [:max, :min, :avg].each {|metric| instance_variable_set('@' + metric.to_s, '-----')}
+        if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && [:max, :min, :avg].all? {|k| @avg_and_ranges[team_id][round].key? k} 
+            [:max, :min, :avg].each do |metric|
+                metric_value = @avg_and_ranges[team_id][round][metric].nil? ? '-----' : @avg_and_ranges[team_id][round][metric].round(0).to_s + '%'
+                instance_variable_set('@' + metric.to_s, metric_value)
+            end
+        end
+    end
+    #
+    # for author feedback report
+    #
+    #
+    # varying rubric by round
+    def get_each_round_review_and_feedback_response_map_for_feedback_report(author)
+        @team_id = TeamsUser.team_id(@id.to_i, author.user_id) 
+        # Calculate how many responses one team received from each round
+        # It is the feedback number each team member should make
+        @review_response_map_ids = ReviewResponseMap.where(["reviewed_object_id = ? and reviewee_id = ?", @id, @team_id]).pluck("id") 
+        {1 => 'one', 2 => 'two', 3 => 'three'}.each do |key, round_num|
+            instance_variable_set('@review_responses_round_' + round_num,
+                                  Response.where(["map_id IN (?) and round = ?", @review_response_map_ids, key]))
+            # Calculate feedback response map records
+            instance_variable_set('@feedback_response_maps_round_' + round_num, 
+                                  FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?", 
+                                                             instance_variable_get('@all_review_response_ids_round_' + round_num), author.id]))
+        end
+        # rspan means the all peer reviews one student received, including unfinished one
+        @rspan_round_one = @review_responses_round_one.length       
+        @rspan_round_two = @review_responses_round_two.length  
+        @rspan_round_three = @review_responses_round_three.nil? ?  0 : @review_responses_round_three.length
+    end
+
+    def get_certain_round_review_and_feedback_response_map_for_feedback_report(author)
+        @feedback_response_maps = FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?", @all_review_response_ids, author.id]) 
+        @team_id = TeamsUser.team_id(@id.to_i, author.user_id) 
+        @review_response_map_ids = ReviewResponseMap.where(["reviewed_object_id = ? and reviewee_id = ?", @id, @team_id]).pluck("id") 
+        @review_responses = Response.where(["map_id IN (?)", @review_response_map_ids]) 
+        @rspan = @review_responses.length 
+    end
     #
     # for calibration report
     #

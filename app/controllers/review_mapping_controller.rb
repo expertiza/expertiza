@@ -513,6 +513,14 @@ class ReviewMappingController < ApplicationController
       end
     end
 
+  def save_grade_and_comment_for_reviewer
+    participant = Participant.find(params[:participant_id])
+    participant.grade_for_reviewer = params[:grade_for_reviewer] unless params[:grade_for_reviewer].nil?
+    participant.comment_for_reviewer = params[:comment_for_reviewer] unless params[:comment_for_reviewer].nil?
+    participant.save
+    redirect_to controller: 'review_mapping', action: 'response_report', id: params[:assignment_id]
+  end
+
   # E1600
   # Start self review if not started yet - Creates a self-review mapping when user requests a self-review
   def start_self_review

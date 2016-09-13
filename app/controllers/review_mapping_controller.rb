@@ -517,7 +517,11 @@ class ReviewMappingController < ApplicationController
     participant = Participant.find(params[:participant_id])
     participant.grade_for_reviewer = params[:grade_for_reviewer] unless params[:grade_for_reviewer].nil?
     participant.comment_for_reviewer = params[:comment_for_reviewer] unless params[:comment_for_reviewer].nil?
-    participant.save
+    begin
+      participant.save
+    rescue
+      flash[:error] = $ERROR_INFO
+    end
     redirect_to controller: 'review_mapping', action: 'response_report', id: params[:assignment_id]
   end
 

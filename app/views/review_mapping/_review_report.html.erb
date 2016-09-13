@@ -40,12 +40,12 @@
                   <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'></td>
                   <!--Assign grade and write comments-->
                   <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
-                    <%= form_tag 'save_grade_and_comment_for_reviewer' do %>
+                    <%= form_tag 'save_grade_and_comment_for_reviewer', remote: true do %>
                       <%= hidden_field_tag :participant_id, r.id %>
                       <%= hidden_field_tag :assignment_id, @id %>
                       <%= number_field_tag 'grade_for_reviewer', r.grade_for_reviewer ,min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade for reviewer' %><br/>
                       <%= text_area_tag 'comment_for_reviewer', r.comment_for_reviewer, placeholder: 'Comment' %>
-                      <%= submit_tag 'Submit' %>
+                      <%= submit_tag 'Save' %>
                     <% end %>
                   </td>
                 <% end %>
@@ -58,5 +58,4 @@
 </table>
 
   <p> **Text in <i style = "color:#DD3300">red</i> indicates that the review is not yet completed; text in <i style = "color:gray">gray</i> indicates that the review is done in previous round(s).</p>
-
 </div>

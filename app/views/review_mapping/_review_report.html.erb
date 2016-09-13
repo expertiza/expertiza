@@ -1,8 +1,9 @@
 <%= create_report_table_header("Reviewer" => "16%",
                                "# reviews done per round" => "14%",
                                "Team reviewed" => "20%",
-                               "Score awarded / Avg. score" => "40%",
-                               "Metrics" => "10%") %>
+                               "Score awarded / Avg. score" => "14%",
+                               "Metrics" => "10%",
+                               "Assign grade and write comments" => "36%") %>
       <%@l = -1 %>
       <% @reviewers.each do |r| %>
         <% @response_maps, @bgcolor, @rspan, @l = get_data_for_review_report(@id, r.id, @type, @l) %>
@@ -23,7 +24,7 @@
               <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id%>
             </td>
 
-          <% @response_maps.each do |ri| %>
+          <% @response_maps.each_with_index do |ri, index| %>
             <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
             <% team_name_color = Response.exists?(map_id: ri.id) ? "green" : "red" %>
             <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, ri.response, ri.reviewee_id) %>
@@ -34,8 +35,20 @@
                   <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
                 </td>
                 <%= render partial: 'team_score',  locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: r.id} %>
-                <!--Metrics-->
-                <td></td>
+                <% if index == 0 %>
+                  <!--Metrics-->
+                  <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'></td>
+                  <!--Assign grade and write comments-->
+                  <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
+                    <%= form_tag 'save_grade_and_comment_for_reviewer', remote: true do %>
+                      <%= hidden_field_tag :participant_id, r.id %>
+                      <%= hidden_field_tag :assignment_id, @id %>
+                      <%= number_field_tag 'grade_for_reviewer', r.grade_for_reviewer ,min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade for reviewer' %><br/>
+                      <%= text_area_tag 'comment_for_reviewer', r.comment_for_reviewer, placeholder: 'Comment' %>
+                      <%= submit_tag 'Save' %>
+                    <% end %>
+                  </td>
+                <% end %>
                 </tr><tr>
               <%end%>
             <%end %>
@@ -45,5 +58,4 @@
 </table>
 
   <p> **Text in <i style = "color:#DD3300">red</i> indicates that the review is not yet completed; text in <i style = "color:gray">gray</i> indicates that the review is done in previous round(s).</p>
-
 </div>

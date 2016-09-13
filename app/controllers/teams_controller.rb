@@ -7,19 +7,8 @@ class TeamsController < ApplicationController
      'Administrator'].include? current_role_name
   end
 
-  def create_teams_view
-    @parent = Object.const_get(session[:team_type]).find(params[:id])
-  end
-
-  def delete_all
-    parent = Object.const_get(session[:team_type]).find(params[:id])
-    @teams = Team.where(parent_id: parent.id)
-    @teams.each(&:destroy)
-    undo_link("All teams have been successfully removed.")
-    redirect_to action: 'list', id: parent.id
-  end
-
   # This function is used to create teams with random names.
+  # Instructors can call by clicking "Create temas" icon anc then click "Create teams" at the bottom.
   def create_teams
     parent = Object.const_get(session[:team_type]).find(params[:id])
     Team.randomize_all_by_parent(parent, session[:team_type], params[:team_size].to_i)
@@ -42,6 +31,7 @@ class TeamsController < ApplicationController
     @parent = Object.const_get(session[:team_type]).find(params[:id])
   end
 
+  # called when a instructor tries to create an empty namually.
   def create
     parent = Object.const_get(session[:team_type]).find(params[:id])
     begin

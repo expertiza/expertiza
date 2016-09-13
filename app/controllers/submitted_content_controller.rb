@@ -253,6 +253,7 @@ class SubmittedContentController < ApplicationController
 
   # if one team do not hold a topic (still in waitlist), they cannot submit their work.
   def one_team_can_submit_work?
+    return true if !(%w(submit_file, submit_hyperlink).include? action_name) #should work only when submit_file/hyperlink is called
     @participant = if params[:id].nil?
                      AssignmentParticipant.find(params[:hyperlinks][:participant_id])
                    else

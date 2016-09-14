@@ -522,6 +522,7 @@ class ReviewMappingController < ApplicationController
     rescue
       flash[:error] = $ERROR_INFO
     end
+    redirect_to controller: 'review_mapping', action: 'response_report', id: params[:assignment_id]
   end
 
   # E1600

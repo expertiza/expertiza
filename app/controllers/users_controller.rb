@@ -115,7 +115,7 @@ class UsersController < ApplicationController
     params[:user][:name] = params[:user][:email] unless check.nil?
 
     @user = User.new(user_params)
-    @user.institution_id = params[:users][:institution_id]
+    @user.institution_id = params[:user][:institution_id]
     # record the person who created this new user
     @user.parent_id = session[:user].id
     # set the user's timezone to its parent's

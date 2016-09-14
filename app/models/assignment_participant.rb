@@ -20,7 +20,8 @@ class AssignmentParticipant < Participant
   # has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'ReviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
   belongs_to :user
   validates_presence_of :handle
-
+  attr_accessor :review_volume
+ 
   # Returns the average score of one question from all reviews for this user on this assignment as an floating point number
   # Params: question - The Question object to retrieve the scores from
   def average_question_score(question)

@@ -1,3 +1,5 @@
+require 'lingua/en/readability'
+
 module ReviewMappingHelper
 
     def create_report_table_header(headers = {})
@@ -67,6 +69,16 @@ module ReviewMappingHelper
                 instance_variable_set('@' + metric.to_s, metric_value)
             end
         end
+    end
+
+    def get_volume_of_review_comments(reviewer_id)
+        comments = Response.concatenate_all_review_comments(@assignment.id, reviewer_id)
+        volume = Lingua::EN::Readability.new(comments).num_words
+    end
+
+    def sort_reviewer_by_review_volume_desc
+        @reviewers.each {|r| r.review_volume = get_volume_of_review_comments(r.id) }
+        @reviewers.sort!{|r1, r2| r2.review_volume <=> r1.review_volume}
     end
     #
     # for author feedback report

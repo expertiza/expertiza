@@ -5,7 +5,7 @@
                                "Metrics" => "10%",
                                "Assign grade and write comments" => "36%") %>
       <%@l = -1 %>
-      <% @reviewers.each do |r| %>
+      <% sort_reviewer_by_review_volume_desc.each do |r| %>
         <% @response_maps, @bgcolor, @rspan, @l = get_data_for_review_report(@id, r.id, @type, @l) %>
         <tr>
         <%if r.id != -1 %>
@@ -37,7 +37,9 @@
                 <%= render partial: 'team_score',  locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: r.id} %>
                 <% if index == 0 %>
                   <!--Metrics-->
-                  <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'></td>
+                  <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
+                    <%= 'Volume: ' + r.review_volume.to_s %>
+                  </td>
                   <!--Assign grade and write comments-->
                   <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
                     <%= form_tag 'save_grade_and_comment_for_reviewer', remote: true do %>

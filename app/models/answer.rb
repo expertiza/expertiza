@@ -1,4 +1,7 @@
+require 'analytic/score_analytic'
+
 class Answer < ActiveRecord::Base
+  include ScoreAnalytic
   belongs_to :question
 
   # Computes the total score for a *list of assessments*
@@ -171,6 +174,4 @@ class Answer < ActiveRecord::Base
   end
   # end added by ferry, required for the summarization
 
-    require 'analytic/score_analytic'
-    include ScoreAnalytic
-  end
+end

@@ -88,7 +88,7 @@ module OnTheFlyCalc
         contributors.each do |contributor|
           assessments = ReviewResponseMap.get_assessments_for(contributor)
           assessments = assessments.reject {|assessment| assessment.round != round }
-          scores[contributor.id] = {}
+          scores[contributor.id] = {} if round == 1
           scores[contributor.id][round] = {}
           scores[contributor.id][round] = Answer.compute_scores(assessments, questions)
         end

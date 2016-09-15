@@ -76,4 +76,15 @@ class Question < ActiveRecord::Base
   def self.compute_question_score
     0
   end
+
+  # this method return questions (question_ids) in one assignment whose comments field are meaningful (ScoredQuestion and TextArea)
+  def self.get_all_questions_with_comments_available(assignment_id)
+    question_ids = []
+    questionnaires = Assignment.find(assignment_id).questionnaires.select{|questionnaire| questionnaire.type == 'ReviewQuestionnaire'}
+    questionnaires.each do |questionnaire|
+      questions = questionnaire.questions.select{|question| question.is_a? ScoredQuestion or question.instance_of? TextArea}
+      questions.each{|question| question_ids << question.id }
+    end
+    question_ids
+  end
 end

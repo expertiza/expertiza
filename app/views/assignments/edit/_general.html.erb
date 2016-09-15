@@ -208,6 +208,11 @@ function microtaskChanged() {
 
     function staggeredDeadlineChanged() {
       var msg = 'Warning! Unchecking all topics for this assignment will now have the same deadline.'
+      if (!jQuery('#assignment_staggered_deadline').is(':checked')) {
+        if (!confirm(msg)) {
+          jQuery('#assignment_staggered_deadline').prop('checked', true);
+        }
+      }
     }
 
    function reviewStrategyChanged() {

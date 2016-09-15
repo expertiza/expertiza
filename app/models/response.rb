@@ -1,4 +1,8 @@
+require 'analytic/response_analytic'
+
 class Response < ActiveRecord::Base
+  include ResponseAnalytic
+  
   belongs_to :response_map, class_name: 'ResponseMap', foreign_key: 'map_id'
   has_many :scores, class_name: 'Answer', foreign_key: 'response_id', dependent: :destroy
   has_many :metareview_response_maps, class_name: 'MetareviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy
@@ -260,6 +264,21 @@ class Response < ActiveRecord::Base
     end
     questionnaire
   end
-  require 'analytic/response_analytic'
-  include ResponseAnalytic
+  
+  def self.concatenate_all_review_comments(assignment_id, reviewer_id)
+    comments = ''
+    assignment = Assignment.find(assignment_id)
+    question_ids = Question.get_all_questions_with_comments_available(assignment_id)
+    
+    ReviewResponseMap.where(reviewed_object_id: assignment_id, reviewer_id: reviewer_id).each do |response_map|
+      (1..assignment.num_review_rounds).each do |round|
+        last_response_in_current_round = response_map.response.select{|r| r.round == round }.last
+        unless last_response_in_current_round.nil?
+          last_response_in_current_round.scores.each {|answer| comments += answer.comments if question_ids.include? answer.question_id }
+          comments += last_response_in_current_round.additional_comment
+        end
+      end
+    end
+    comments
   end
+end

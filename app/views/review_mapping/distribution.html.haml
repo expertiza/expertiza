@@ -1,0 +1,19 @@
+%h1
+  Distributions for  #{@assignment.name}
+%a{:href => "#1", :onclick => "toggleVis('aggregateDistribution');"}
+  %span#aggregateDistribution_show View aggregate score distribution
+  %span#aggregateDistribution_hide{:style => "display: none"} Hide aggregate score distribution
+%br/
+%br/
+#aggregateDistribution_myDiv{:style => "display:none"}
+  = render :partial => 'aggregate_distribution'
+%a{:href => "#1", :onclick => "toggleVis('reviewDistribution');"}
+  %span#reviewDistribution_show View  individual reviews distribution
+  %span#reviewDistribution_hide{:style => "display: none"} Hide  individual reviews distribution
+%br/
+%br/
+#reviewDistribution_myDiv{:style => "display:none"}
+  = render :partial => 'review_distribution'
+%br/
+%br/
+= link_to "Back", :action=>'response_report', :id=>@assignment.id

@@ -5,6 +5,7 @@ gem 'rails', '~> 4.2.6'
 ## Gems in Alphabetical Order
 
 gem 'activerecord-session_store'
+gem 'airbrake'
 gem 'awesome_nested_set'
 gem 'bind-it'
 gem 'capistrano'
@@ -23,7 +24,6 @@ gem 'gchartrb', require: 'google_chart'
 gem "googlecharts", require: "gchart"
 gem 'gdata', require: false
 gem 'haml-rails'
-gem 'hoptoad_notifier'
 gem 'jquery-rails'
 gem 'jquery-ui-sass-rails'
 gem 'jquery-datetimepicker-rails'

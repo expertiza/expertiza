@@ -33,7 +33,7 @@ Airbrake.configure do |c|
   # NOTE: This option must be set in order to make the 'ignore_environments'
   # option work.
   # https://github.com/airbrake/airbrake-ruby#environment
-  c.environment = :production
+  c.environment = Rails.env
 
   # Setting this option allows Airbrake to filter exceptions occurring in
   # unwanted environments such as :test. By default, it is equal to an empty
@@ -41,7 +41,7 @@ Airbrake.configure do |c|
   # environments.
   # NOTE: This option *does not* work if you don't set the 'environment' option.
   # https://github.com/airbrake/airbrake-ruby#ignore_environments
-  c.ignore_environments = %w(test)
+  c.ignore_environments = %w(development test)
 
   # A list of parameters that should be filtered out of what is sent to
   # Airbrake. By default, all "password" attributes will have their contents

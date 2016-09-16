@@ -171,7 +171,7 @@ class SignUpSheetController < ApplicationController
     @drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
 
     unless assignment.due_dates.find_by_deadline_type_id(1).nil?
-      if assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
+      if !assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
         @show_actions = false
       end
 

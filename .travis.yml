@@ -20,6 +20,7 @@ before_install:
     - gem update bundler
     - gem install raspell -- --with-ruby-include=$rvm_path/src/ruby-1.9.3-head/
     - bundle config build.raspell --with-opt-dir=
+    - bower install
 before_script:
     - mysql -u root < db/grant_expertiza.sql
     - cp config/database.yml.example config/database.yml

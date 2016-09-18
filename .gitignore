@@ -4,8 +4,9 @@ db/*.sql
 *.sql
 log/*.log
 tmp/**/*
+vendor/assets/components/
 config/database.yml
-config/locales/database.yml
+config/secrets.yml
 coverage
 app/controllers/auth_controller.rb
 nohup.out
@@ -30,7 +31,6 @@ local.properties
 .classpath
 .settings/
 .loadpath
-config/secrets.yml
 # External tool builders
 .externalToolBuilders/
 
@@ -192,9 +192,6 @@ pg_data
 #*#
 *#*#
 
-db/expertiza_scrubbed_2013_10_17.sql
-
-db/expertiza_scrubbed_2013_10_17.sql.gz
 .projectile
 .ruby-gemset
 .ruby-version

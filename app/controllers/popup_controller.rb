@@ -33,36 +33,29 @@ class PopupController < ApplicationController
   # this can be called from "response_report" by clicking team names from instructor end.
   def team_users_popup
     @sum = 0
-    @count = 0
-    @teamid = params[:id]
     @team = Team.find(params[:id])
     @assignment = Assignment.find(@team.parent_id)
-    @assignment_id = @assignment.id
-    @id = params[:assignment_id]
-    #  @teamname = Team.find(params[:id]).name
-    @teamusers = TeamsUser.where(team_id: params[:id])
+    @team_users = TeamsUser.where(team_id: params[:id])
 
-    # id2 seems to be a response_map
-    if params[:id2].nil?
-      #  if(@reviewid == nil)
-      @scores = nil
-    else
-      # get the last response from response_map id
-      response = Response.where(map_id: params[:id2]).last
-      @reviewid = response.id
-      @pid = ResponseMap.find(params[:id2]).reviewer_id
-      @reviewer_id = Participant.find(@pid).user_id
-
-      @scores = Answer.where(response_id: @reviewid)
-
-      questionnaire = Response.find(@reviewid).questionnaire_by_answer(@scores.first)
-      @maxscore = questionnaire.max_question_score
-
-      @maxscore = 5 if @maxscore.nil?
-
-      @total_percentage = response.get_average_score
-      @sum = response.get_total_score
-      @total_possible = response.get_maximum_score
+    # id2 is a response_map id
+    unless params[:id2].nil?
+      participant_id = ResponseMap.find(params[:id2]).reviewer_id
+      @reviewer_id = Participant.find(participant_id).user_id
+      # get the last response in each round from response_map id
+      (1..@assignment.num_review_rounds).each do |round|
+        response = Response.where(map_id: params[:id2], round: round).last
+        instance_variable_set('@response_round_' + round.to_s, response)
+        next if response.nil?
+        instance_variable_set('@response_id_round_' + round.to_s, response.id)
+        instance_variable_set('@scores_round_' + round.to_s, Answer.where(response_id: response.id))
+        questionnaire = Response.find(response.id).questionnaire_by_answer(instance_variable_get('@scores_round_' + round.to_s).first)
+        instance_variable_set('@max_score_round_' + round.to_s, questionnaire.max_question_score ||= 5)
+        total_percentage = response.get_average_score
+        total_percentage += '%' if total_percentage.is_a? Float
+        instance_variable_set('@total_percentage_round_' + round.to_s, total_percentage)
+        instance_variable_set('@sum_round_' + round.to_s, response.get_total_score)
+        instance_variable_set('@total_possible_round_' + round.to_s, response.get_maximum_score)
+      end
     end
   end
 

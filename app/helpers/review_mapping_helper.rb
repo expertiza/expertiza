@@ -71,16 +71,16 @@ module ReviewMappingHelper
 
   def sort_reviewer_by_review_volume_desc
     @reviewers.each do |r| 
-      r.overall_volume,
+      r.overall_avg_vol,
       r.avg_vol_in_round_1,
       r.avg_vol_in_round_2,
       r.avg_vol_in_round_3 = Response.get_volume_of_review_comments(@assignment.id, r.id)
     end
-    @reviewers.sort! {|r1, r2| r2.overall_volume <=> r1.overall_volume }
+    @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
 
-  def display_volume_metric(overall_volume, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3)
-    metric = "Volume: #{overall_volume.to_s} <br/> ("
+  def display_volume_metric(overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3)
+    metric = "Avg. Volume: #{overall_avg_vol.to_s} <br/> ("
     metric += "1st: " + avg_vol_in_round_1.to_s if avg_vol_in_round_1 > 0
     metric += ", 2nd: " + avg_vol_in_round_2.to_s if avg_vol_in_round_2 > 0
     metric += ", 3rd: " + avg_vol_in_round_3.to_s if avg_vol_in_round_3 > 0

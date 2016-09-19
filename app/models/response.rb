@@ -268,6 +268,7 @@ class Response < ActiveRecord::Base
   
   def self.concatenate_all_review_comments(assignment_id, reviewer_id)
     comments = ''
+    counter = 0
     @comments_in_round_1, @comments_in_round_2, @comments_in_round_3 = '', '', ''
     @counter_in_round_1, @counter_in_round_2, @counter_in_round_3 = 0, 0, 0
     assignment = Assignment.find(assignment_id)
@@ -283,27 +284,28 @@ class Response < ActiveRecord::Base
           end
           additional_comment = last_response_in_current_round.additional_comment
           comments += additional_comment
+          counter += 1
           instance_variable_set('@comments_in_round_' + round.to_s, instance_variable_get('@comments_in_round_' + round.to_s) + additional_comment)
           instance_variable_set('@counter_in_round_' + round.to_s, instance_variable_get('@counter_in_round_' + round.to_s) + 1)
         end
       end
     end
-    [comments,
+    [comments, counter,
      @comments_in_round_1, @counter_in_round_1,
      @comments_in_round_2, @counter_in_round_2,
      @comments_in_round_3, @counter_in_round_3]
   end
 
   def self.get_volume_of_review_comments(assignment_id, reviewer_id)
-    comments,
+    comments, counter,
     comments_in_round_1, counter_in_round_1,
     comments_in_round_2, counter_in_round_2,
     comments_in_round_3, counter_in_round_3 = Response.concatenate_all_review_comments(assignment_id, reviewer_id)
 
-    overall_volume = Lingua::EN::Readability.new(comments).num_words
+    overall_avg_vol = (Lingua::EN::Readability.new(comments).num_words / (counter.zero? ? 1 : counter)).round(0)
     avg_vol_in_round_1 = (Lingua::EN::Readability.new(comments_in_round_1).num_words / (counter_in_round_1.zero? ? 1 : counter_in_round_1)).round(0)
     avg_vol_in_round_2 = (Lingua::EN::Readability.new(comments_in_round_2).num_words / (counter_in_round_2.zero? ? 1 : counter_in_round_2)).round(0)
     avg_vol_in_round_3 = (Lingua::EN::Readability.new(comments_in_round_3).num_words / (counter_in_round_3.zero? ? 1 : counter_in_round_3)).round(0)
-    [overall_volume, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3]
+    [overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3]
   end
 end

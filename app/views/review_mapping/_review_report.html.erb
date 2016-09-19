@@ -38,7 +38,7 @@
                 <% if index == 0 %>
                   <!--Metrics-->
                   <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
-                    <%= display_volume_metric(r.overall_volume, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3) %>
+                    <%= display_volume_metric(r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3) %>
                   </td>
                   <!--Assign grade and write comments-->
                   <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>

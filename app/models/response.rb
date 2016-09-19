@@ -1,4 +1,5 @@
 require 'analytic/response_analytic'
+require 'lingua/en/readability'
 
 class Response < ActiveRecord::Base
   include ResponseAnalytic
@@ -267,6 +268,8 @@ class Response < ActiveRecord::Base
   
   def self.concatenate_all_review_comments(assignment_id, reviewer_id)
     comments = ''
+    @comments_in_round_1, @comments_in_round_2, @comments_in_round_3 = '', '', ''
+    @counter_in_round_1, @counter_in_round_2, @counter_in_round_3 = 0, 0, 0
     assignment = Assignment.find(assignment_id)
     question_ids = Question.get_all_questions_with_comments_available(assignment_id)
     
@@ -274,11 +277,33 @@ class Response < ActiveRecord::Base
       (1..assignment.num_review_rounds).each do |round|
         last_response_in_current_round = response_map.response.select{|r| r.round == round }.last
         unless last_response_in_current_round.nil?
-          last_response_in_current_round.scores.each {|answer| comments += answer.comments if question_ids.include? answer.question_id }
-          comments += last_response_in_current_round.additional_comment
+          last_response_in_current_round.scores.each do |answer| 
+            comments += answer.comments if question_ids.include? answer.question_id
+            instance_variable_set('@comments_in_round_' + round.to_s, instance_variable_get('@comments_in_round_' + round.to_s) + answer.comments)
+          end
+          additional_comment = last_response_in_current_round.additional_comment
+          comments += additional_comment
+          instance_variable_set('@comments_in_round_' + round.to_s, instance_variable_get('@comments_in_round_' + round.to_s) + additional_comment)
+          instance_variable_set('@counter_in_round_' + round.to_s, instance_variable_get('@counter_in_round_' + round.to_s) + 1)
         end
       end
     end
-    comments
+    [comments,
+     @comments_in_round_1, @counter_in_round_1,
+     @comments_in_round_2, @counter_in_round_2,
+     @comments_in_round_3, @counter_in_round_3]
+  end
+
+  def self.get_volume_of_review_comments(assignment_id, reviewer_id)
+    comments,
+    comments_in_round_1, counter_in_round_1,
+    comments_in_round_2, counter_in_round_2,
+    comments_in_round_3, counter_in_round_3 = Response.concatenate_all_review_comments(assignment_id, reviewer_id)
+
+    overall_volume = Lingua::EN::Readability.new(comments).num_words
+    avg_vol_in_round_1 = (Lingua::EN::Readability.new(comments_in_round_1).num_words / (counter_in_round_1.zero? ? 1 : counter_in_round_1)).round(0)
+    avg_vol_in_round_2 = (Lingua::EN::Readability.new(comments_in_round_2).num_words / (counter_in_round_2.zero? ? 1 : counter_in_round_2)).round(0)
+    avg_vol_in_round_3 = (Lingua::EN::Readability.new(comments_in_round_3).num_words / (counter_in_round_3.zero? ? 1 : counter_in_round_3)).round(0)
+    [overall_volume, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3]
   end
 end

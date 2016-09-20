@@ -7,7 +7,7 @@
         --
     <% end %>
     /
-    <%if @avg_and_ranges[team_id] && [:max, :min, :avg].all? {|k| @avg_and_ranges[team_id].key? k} &&  @avg_and_ranges[team_id][:avg] != -1.0 %>
+    <%if @avg_and_ranges[team_id] && !@avg_and_ranges[team_id][:avg].nil? && @avg_and_ranges[team_id][:avg] != -1.0 %>
         <%= @avg_and_ranges[team_id][:avg].round(0) %>%
     <%else%>
         --

@@ -16,23 +16,20 @@ class StudentReviewController < ApplicationController
     @review_phase = @assignment.get_current_stage(@topic_id)
     # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
+
     @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
     # if it is an calibrated assignment, change the response_map order in a certain way
     @review_mappings = @review_mappings.sort_by {|mapping| mapping.id % 5 } if @assignment.is_calibrated == true
     @metareview_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
     # Calculate the number of reviews that the user has completed so far.
-    @num_reviews_total = @review_mappings.map {|response| response.response.size }.sum
+
+    @num_reviews_total = @review_mappings.size
     # Add the reviews which are requested and not began.
-    @review_mappings.map do |response|
-      @num_reviews_total += 1 if response.response.empty?
-    end
     @num_reviews_completed = 0
     @review_mappings.each do |map|
-      current_round = map.response.map(&:round).max
-      map.response.each do |response|
-        @num_reviews_completed += 1 if !current_round.eql?(response.round) || response.is_submitted
-      end
+      @num_reviews_completed += 1 if (!map.response.empty? && map.response.last.is_submitted)
     end
+
     @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed
     # Calculate the number of metareviews that the user has completed so far.
     @num_metareviews_total       = @metareview_mappings.size

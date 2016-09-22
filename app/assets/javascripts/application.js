@@ -22,6 +22,7 @@
 //= require superfish
 //= require jquery.ui.all
 //= require react-simpletabs
+//= require sisyphus
 //= require_self
 //= require_tree .
 //= require jquery.datetimepicker

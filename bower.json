@@ -25,6 +25,7 @@
       "jquery": "~2.1.4",
       "react": "~0.13.3",
       "react-simpletabs": "~0.6.0",
-      "react-bootstrap-treeview": "0.1.0"
+      "react-bootstrap-treeview": "0.1.0",
+      "sisyphus": "1.1.3"
     }
 }

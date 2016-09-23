@@ -197,6 +197,15 @@ jQuery(document).ready(function() {
                 </a>
               </span>
             )
+
+            if(this.props.is_intelligent) {
+              moreContent.push(
+                <a title="Intelligent Assignment" href={"/lottery/run_intelligent_assignment/"+(parseInt(this.props.id)/2).toString()}>
+                  <img src="/assets/tree_view/run-lottery.png" />
+                </a>
+              )
+            }
+
             if (this.props.allow_suggestions) {
               moreContent.push(
                 <span>

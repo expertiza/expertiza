@@ -15,7 +15,7 @@ class SignUpSheetController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
+    when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
       ['Instructor',
        'Teaching Assistant',
        'Administrator',
@@ -169,6 +169,8 @@ class SignUpSheetController < ApplicationController
     assignment = Assignment.find(@assignment_id)
     @signup_topic_deadline = assignment.due_dates.find_by_deadline_type_id(7)
     @drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
+    @student_bids = Bid.where(team_id: session[:user_id])
+    puts @student_bids
 
     unless assignment.due_dates.find_by_deadline_type_id(1).nil?
       if !assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
@@ -230,18 +232,24 @@ class SignUpSheetController < ApplicationController
 
   def set_priority
     @user_id = session[:user].id
-    users_team = SignedUpTeam.find_team_users(params[:assignment_id].to_s, @user_id)
-    check = SignedUpTeam.find_by_sql(["SELECT su.* FROM signed_up_teams su , sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.team_id = ? AND su.preference_priority_number = ?", params[:assignment_id].to_s, users_team[0].t_id, params[:priority].to_s])
+    # users_team = SignedUpTeam.find_team_users(params[:assignment_id].to_s, @user_id)
+    # check = SignedUpTeam.find_by_sql(["SELECT su.* FROM signed_up_teams su , sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.team_id = ? AND su.preference_priority_number = ?", params[:assignment_id].to_s, users_team[0].t_id, params[:priority].to_s])
+    # if check.empty?
+    #   signUp = SignedUpTeam.where(topic_id: params[:id], team_id: users_team[0].t_id).first
+    #   # signUp.preference_priority_number = params[:priority].to_s
+    #   if params[:priority].to_s.to_f > 0
+    #     signUp.update_attribute('preference_priority_number', params[:priority].to_s)
+    #   else
+    #     flash[:error] = "That is an invalid priority."
+    #   end
+    # end
+    check = Bid.where(team_id: @user_id, topic_id: params[:id])
     if check.empty?
-      signUp = SignedUpTeam.where(topic_id: params[:id], team_id: users_team[0].t_id).first
-      # signUp.preference_priority_number = params[:priority].to_s
-      if params[:priority].to_s.to_f > 0
-        signUp.update_attribute('preference_priority_number', params[:priority].to_s)
-      else
-        flash[:error] = "That is an invalid priority."
-      end
+      Bid.create(topic_id: params[:id], team_id: @user_id, priority: params[:priority])
+    else
+      check.first.update(priority: params[:priority])
     end
-    redirect_to action: 'list', id: params[:assignment_id]
+    redirect_to action: 'list', assignment_id: params[:assignment_id]
   end
 
   # If the instructor needs to explicitly change the start/due dates of the topics

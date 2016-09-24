@@ -112,9 +112,9 @@ class AssignmentTeam < Team
   end
 
   # Main calling method to return the files residing in the directory of team submissions
-  def submitted_files
+  def submitted_files(path = self.path)
     files = []
-    files = files(self.path) if self.directory_num
+    files = files(path) if self.directory_num
     files
   end
 

@@ -19,20 +19,16 @@ module SubmittedContentHelper
                end
         ret += "\n      <input type=hidden id='filenames_#{index}' name='filenames[#{index}]' value='#{File.basename(file)}'>"
         ret += "\n      <input type=hidden id='directories_#{index}' name='directories[#{index}]' value='#{File.dirname(file)}'>"
+
         if File.exist?(file) && File.directory?(file)
           ret += link_to File.basename(file), :controller => 'submitted_content', :action => 'edit', :id => participant.id, "current_folder[name]" => file
         else
           ret += "\n      "
-          parentFolder = File.dirname(file)
-          if parentFolder != participant.dir_path
-            parentFolder.sub!(participant.dir_path + "/", "")
-            parentFolder += "/"
-          else
-            parentFolder = ""
-          end
-
-          location = parentFolder + File.basename(file)
-          ret += link_to File.basename(file), :controller => 'submitted_content', :action => 'download', :id => participant.id, :download => File.basename(file), "current_folder[name]" => File.dirname(file)
+          ret += link_to File.basename(file), :controller => 'submitted_content', 
+                                              :action => 'download', 
+                                              :id => participant.id, 
+                                              :download => File.basename(file), 
+                                              "current_folder[name]" => File.dirname(file)
         end
         ret += "\n   </td>\n   <td valign = top>\n"
         ret += File.size(file).to_s
@@ -47,6 +43,30 @@ module SubmittedContentHelper
     end
     ret += "\n</table><br/>"
     ret
+  end
+
+  # Zhewei: this method is used to display reviewer uploaded files during peer review.
+  def display_review_files_directory_tree(participant, files)
+    index = 0
+    participant = @participant if @participant # TODO: Verify why this is needed
+    assignment = participant.assignment # participant is @map.contributor
+    html = ''
+
+    for file in files
+      begin
+        if File.exist?(file)
+          html += link_to image_tag('/assets/tree_view/List-submisstions-24.png'), 
+                          :controller => 'submitted_content', 
+                          :action => 'download', 
+                          :id => participant.id, 
+                          :download => File.basename(file), 
+                          "current_folder[name]" => File.dirname(file)
+        end
+      rescue
+        flash[:error] = $ERROR_INFO
+      end
+    end
+    html
   end
 
   def list_sub_directories(file, participant)

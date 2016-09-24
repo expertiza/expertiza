@@ -9,8 +9,7 @@
         <% @response_maps, @bgcolor, @rspan, @l = get_data_for_review_report(@id, r.id, @type, @l) %>
         <tr>
         <%if r.id != -1 %>
-          <% parid = Participant.find(r.id).user_id%>
-          <% username = User.find(parid).fullname%>
+          <% username = Participant.find(r.id).user.fullname %>
             <!--reviewer-->
             <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%>>
               <%= link_to username, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id=>@id%>
@@ -21,7 +20,7 @@
                 <%= instance_variable_get("@review_in_round_" + round.to_s) %>/<%= @rspan %>
                 <%= ', ' unless round == @assignment.num_review_rounds %>
               <% end %>
-              <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id%>
+              <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id %>
             </td>
 
           <% @response_maps.each_with_index do |ri, index| %>
@@ -33,6 +32,7 @@
                 <!--Team reviewed-->
                 <td id = <%= team_name_color%> bgcolor=<%= @bgcolor %> align = 'left' colspan=1>
                   <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
+                  <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>
                 </td>
                 <%= render partial: 'team_score',  locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: r.id} %>
                 <% if index == 0 %>

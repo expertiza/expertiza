@@ -65,10 +65,6 @@ class AssignmentParticipant < Participant
     (sum_of_scores / self.response_maps.size).to_i
   end
 
-  def includes?(participant)
-    participant == self
-  end
-
   def assign_quiz(contributor, reviewer, _topic)
     # using topic_id to find first participant.id.
     teams = SignedUpTeam.where(topic_id: @topic_id)

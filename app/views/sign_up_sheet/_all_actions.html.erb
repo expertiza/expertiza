@@ -33,11 +33,11 @@
           <% if @assignment.is_intelligent %>
             <td><%= form_tag({:controller=>"sign_up_sheet", :action=>"set_priority",:id => topic.id,:assignment_id => params[:assignment_id]}, method: :post) do %>
             <% if @student_bids.all? {|sb| sb.topic_id != topic.id} %>
-              <%= number_field_tag :priority%>
+              <%= number_field_tag :priority, nil, min: 1, max: @num_of_topics, place_holder: 0 %>
             <% end %>
             <% @student_bids.each do |sb| %>
               <% if sb.topic_id == topic.id %>
-                <%= number_field_tag :priority, sb.priority%>
+                <%= number_field_tag :priority, sb.priority, min: 1, max: @num_of_topics, place_holder: 0 %>
                 <% break %>
               <% end %>
             <% end %>
@@ -53,11 +53,11 @@
     <% if @assignment.is_intelligent %>
       <td><%= form_tag({:controller=>"sign_up_sheet", :action=>"set_priority",:id => topic.id,:assignment_id => params[:assignment_id]}, method: :post) do %>
       <% if @student_bids.all? {|sb| sb.topic_id != topic.id} %>
-        <%= number_field_tag :priority%>
+        <%= number_field_tag :priority, nil, min: 1, max: @num_of_topics, place_holder: 0 %>
       <% end %>
       <% @student_bids.each do |sb| %>
         <% if sb.topic_id == topic.id %>
-          <%= number_field_tag :priority, sb.priority%>
+          <%= number_field_tag :priority, sb.priority, min: 1, max: @num_of_topics, place_holder: 0 %>
           <% break %>
         <% end %>
       <% end %>

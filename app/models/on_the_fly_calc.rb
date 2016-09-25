@@ -166,5 +166,4 @@ module OnTheFlyCalc
     end
     scores
   end
-
 end

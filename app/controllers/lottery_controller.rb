@@ -9,16 +9,13 @@ class LotteryController < ApplicationController
   def run_intelligent_assignment
     json_info = []
     #get topics for assignment
-    topics = SignUpTopic.where(assignment_id: params[:id])
-    topics.each do |t|
-      t = t.id
-    end
+    topics = SignUpTopic.where(assignment_id: params[:id]).map{ |t| [t.id]}
     # students is a list of student ids in an assignment
-    students = Participant.where(parent_id: params[:id])
+    students = Participant.where(parent_id: params[:id]).map{ |p| [p.user_id]}
     students.each do |student|
       #grab student id and list of bids
-      s = student.id
-      bids = Bid.where(team_id: s).sort_by{ |b| [topics.index(b.topic_id)]}
+      bids = Bid.where(team_id: student).sort_by{ |b| [topics.index(b.topic_id)]}
+      topics.map{|t| }
       json_info << {"pid"=>s,"ranks"=>bids.map{|b| b.priority}}
     end
     json_data = {"users"=>json_info,"max_team_size"=>Assignment.find_by_id(params[:id]).max_team_size}

@@ -87,6 +87,20 @@ module ReviewMappingHelper
     metric += ")"
     metric.html_safe
   end
+
+  def list_review_submissions(participant_id, reviewee_team_id, response_map_id)
+    participant = Participant.find(participant_id)
+    team = AssignmentTeam.find(reviewee_team_id)
+    html = ''
+    if !team.nil? and !participant.nil?
+      review_submissions_path = team.path + "_review" + "/" + response_map_id.to_s
+      files = team.submitted_files(review_submissions_path)
+      if files and files.length > 0 
+        html += display_review_files_directory_tree(participant, files) 
+      end 
+    end 
+    html.html_safe
+  end
   #
   # for author feedback report
   #

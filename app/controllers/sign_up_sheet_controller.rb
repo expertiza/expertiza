@@ -162,6 +162,7 @@ class SignUpSheetController < ApplicationController
   def list
     @assignment_id = params[:assignment_id].to_i
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: nil)
+    @num_of_topics = @sign_up_topics.size
     @slots_filled = SignUpTopic.find_slots_filled(params[:assignment_id])
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:assignment_id])
     @show_actions = true
@@ -170,7 +171,7 @@ class SignUpSheetController < ApplicationController
     @signup_topic_deadline = assignment.due_dates.find_by_deadline_type_id(7)
     @drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
     @student_bids = Bid.where(team_id: session[:user].id)
-    
+
     unless assignment.due_dates.find_by_deadline_type_id(1).nil?
       if !assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
         @show_actions = false

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160912034350) do
+ActiveRecord::Schema.define(version: 20160927212558) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -104,14 +104,14 @@ ActiveRecord::Schema.define(version: 20160912034350) do
 
   create_table "bids", force: :cascade do |t|
     t.integer  "topic_id",   limit: 4
-    t.integer  "team_id",    limit: 4
+    t.integer  "user_id",    limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "priority",   limit: 4
   end
 
-  add_index "bids", ["team_id"], name: "index_bids_on_team_id", using: :btree
   add_index "bids", ["topic_id"], name: "index_bids_on_topic_id", using: :btree
+  add_index "bids", ["user_id"], name: "index_bids_on_user_id", using: :btree
 
   create_table "bookmark_ratings", force: :cascade do |t|
     t.integer  "bookmark_id", limit: 4

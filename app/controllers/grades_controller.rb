@@ -81,7 +81,7 @@ class GradesController < ApplicationController
     calculate_all_penalties(@assignment.id)
 
     # prepare feedback summaries
-    summary_ws_url = Rails.application.config.summary_ws_url
+    summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
     sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewee(@questions, @assignment, @team_id, summary_ws_url)
 
     @summary = sum.summary

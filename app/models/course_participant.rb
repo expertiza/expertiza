@@ -32,14 +32,6 @@ class CourseParticipant < Participant
     end
   end
 
-  def course_string
-    # if no course is associated with this assignment, or if there is a course with an empty title, or a course with a title that has no printing characters ...
-    if self.course.nil? or self.course.name.nil? or self.course.name.strip == ""
-      return "<center>&#8212;</center>"
-    end
-    self.course.name
-  end
-
   def path
     Course.find(self.parent_id).path + self.directory_num.to_s + "/"
   end

@@ -65,10 +65,6 @@ class AssignmentParticipant < Participant
     (sum_of_scores / self.response_maps.size).to_i
   end
 
-  def includes?(participant)
-    participant == self
-  end
-
   def assign_quiz(contributor, reviewer, _topic)
     # using topic_id to find first participant.id.
     teams = SignedUpTeam.where(topic_id: @topic_id)
@@ -311,7 +307,7 @@ class AssignmentParticipant < Participant
       participant.save
       raise 'Invalid key' unless participant.permission_granted
     end
-    end
+  end
 
   # verify the digital signature is valid
   def verify_digital_signature(private_key)
@@ -362,4 +358,4 @@ class AssignmentParticipant < Participant
     team_id = TeamsUser.team_id(participant.parent_id, participant.user_id)
     ReviewResponseMap.where(reviewee_id: team_id, reviewed_object_id: assignment.id)
   end
-  end
+end

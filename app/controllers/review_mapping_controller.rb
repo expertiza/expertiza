@@ -457,7 +457,7 @@ class ReviewMappingController < ApplicationController
     # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     @type = params.key?(:report) ? params[:report][:type] : "ReviewResponseMap"
-    summary_ws_url = Rails.application.config.summary_ws_url
+    summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
 
     case @type
       # this summarizes the reviews of each reviewee by each rubric criterion

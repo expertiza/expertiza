@@ -38,7 +38,7 @@ class LotteryController < ApplicationController
     rescue => err
       flash[:error] = err.message
     end
-
+# TODO: refactor after get the response bodey structure
     teams.each do |team|
       t = nil
       #find if existing team exists

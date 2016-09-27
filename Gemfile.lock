@@ -385,9 +385,6 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    sqlite3 (1.3.10)
-    sqlite3-ruby (1.3.3)
-      sqlite3 (>= 1.3.3)
     sshkit (1.7.1)
       colorize (>= 0.7.0)
       net-scp (>= 1.1.2)
@@ -464,7 +461,7 @@ DEPENDENCIES
   jquery-rails
   jquery-tablesorter
   jquery-ui-sass-rails
-  json (~> 1.8, >= 1.8.3)
+  json
   launchy
   lingua
   mysql2
@@ -483,7 +480,7 @@ DEPENDENCIES
   rake
   rb-readline
   react-rails (~> 1.0)
-  rest-client (~> 1.8)
+  rest-client
   rgl
   rjb
   rspec-rails
@@ -497,7 +494,6 @@ DEPENDENCIES
   shoulda
   simplecov
   sprockets
-  sqlite3-ruby
   stanford-core-nlp
   superfish-rails
   test-unit

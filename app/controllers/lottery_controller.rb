@@ -20,14 +20,15 @@ class LotteryController < ApplicationController
           bids.insert(topics.index(topic),{priority:0,topic_id:topic})
         end
       end
-      json_info << {"pid"=>student,"ranks"=>bids.map{|b| b[:priority]}}
+      json_info << {"pid"=>student,"ranks"=>bids.map{|b| b[:priority] ||= 0}}
     end
+    # req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', initheader = {'Content-Type' => 'application/json', 'charset' => 'utf-8'})
     json_data = {'Content-Type' => 'application/json',"users"=>json_info,"max_team_size"=>Assignment.find_by_id(params[:id]).max_team_size}
     #send json_data with a get request and get teams
     uri = URI.parse("http://peerlogic.csc.ncsu.edu/intelligent_assignment/merge_teams")
     http = Net::HTTP.new(uri.host, uri.port)
-    request = Net::HTTP::Post.new(uri.request_uri, 
-          'Content-Type' => 'application/json')
+    request = Net::HTTP::Post.new(uri.request_uri, initheader = {'Content-Type' => 'application/json', 'charset' => 'utf-8'})
+binding.pry
     request.body = json_data.to_json()
     response = http.request(request)
     teams = JSON.parse(response.body)["teams"]
@@ -54,7 +55,7 @@ class LotteryController < ApplicationController
       end
     end
 
-    redirect_to controller: 'lottery', action: 'run_intelligent_bid', id: params[:id]
+    redirect_to controller: 'tree_display', action: 'list'
   end
 
   # This method is called for assignments which have their is_intelligent property set to 1. It runs a stable match algorithm and assigns topics

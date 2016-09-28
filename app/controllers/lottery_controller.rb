@@ -74,31 +74,46 @@ class LotteryController < ApplicationController
       return
     end
 
-    finalTeamTopics = {} # Hashmap (Team,Topic) to store teams which have been assigned topics
-    # unassignedTeams = Bid.where(topic: SignUpTopic.where(assignment_id: params[:id])).uniq.pluck(:team_id) # Get all unassigned teams,. Will be used for merging
-    unassignedTeams = Team.where(parent_id: params[:id]).reject {|t| !SignedUpTeam.where(team_id: t.id).empty?}
     sign_up_topics = SignUpTopic.includes(bids: [{team: [:users]}]).where("assignment_id = ? and max_choosers > 0", params[:id]) # Getting signuptopics with max_choosers > 0
-    topicsBidsArray = []
-    sign_up_topics.each do |topic|
-      team_bids = []
-      unassignedTeams.each do |team|
+    unassignedTeams = Team.where(parent_id: params[:id]).reject {|t| !SignedUpTeam.where(team_id: t.id).empty?}
+    unassignedTeams.sort! {|t| TeamsUser.where(team_id: t.id).count*-1}
+
+    team_bids = []
+    unassignedTeams.each do |team|
+      topic_bids = []
+      sign_up_topics.each do |topic|
         student_bids = []
         TeamsUser.where(team_id: team).each do |s|
-          puts s.user_id
-          puts topic.id
           if !Bid.where(team_id: s.user_id, topic_id: topic.id).empty?
             student_bids<< Bid.where(team_id: s.user_id, topic_id: topic.id).first.priority
           else
             student_bids << 0
           end
         end
+        #takes the most frequent priority as the team priority
         freq = student_bids.inject(Hash.new(0)) { |h,v| h[v] += 1; h}
-        team_bids << {team_id: team.id,priority: student_bids.max_by { |v| freq[v] }}
+        topic_bids << {topic_id: topic,priority: student_bids.max_by { |v| freq[v] }}
       end
-      topicsBidsArray << [topic,team_bids.sort_by {|b| [TeamsUser.where(["team_id = ?", b[:team_id]]).count * -1, b[:priority], rand(100)] }]
+      topic_bids.sort! {|b| b[:priority]}
+      team_bids<<{team_id: team.id,bids: topic_bids}
     end
-    puts topicsBidsArray
-   
+
+    team_bids.each do |tb|
+      tb[:bids].each do |bid|
+        if !SignedUpTeam.exists?(topic_id: bid[:topic_id])
+          SignedUpTeam.create(team_id: tb[:team_id], topic_id: bid[:topic_id])
+          break
+        end
+      end
+    end
+
+    #auto_merge_teams unassignedTeams, finalTeamTopics
+
+    #Remove is_intelligent property from assignment so that it can revert to the default signup state
+    assignment = Assignment.find(params[:id])
+    assignment.update_attribute(:is_intelligent, false)
+    flash[:notice] = 'The intelligent assignment was successfully completed for ' + assignment.name + '.'
+
     redirect_to controller: 'tree_display', action: 'list'
   end
 

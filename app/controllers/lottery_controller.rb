@@ -14,23 +14,25 @@ class LotteryController < ApplicationController
   def run_intelligent_assignment
     priority_info = []
     topic_ids = SignUpTopic.where(assignment_id: params[:id]).map(&:id)
-    student_ids = Participant.where(parent_id: params[:id]).map(&:user_id)
-    student_ids.each do |student_id|
+    user_ids = Participant.where(parent_id: params[:id]).map(&:user_id)
+    user_ids.each do |user_id|
       #grab student id and list of bids
       bids = []
       topic_ids.each do |topic_id|
-        bid_record = Bid.where(user_id: student_id, topic_id: topic_id).first rescue nil
+        bid_record = Bid.where(user_id: user_id, topic_id: topic_id).first rescue nil
         if bid_record.nil?
           bids << 0
         else
           bids << bid_record.priority ||= 0
         end
       end
-      priority_info << {pid: student_id, ranks: bids}
+      if bids.uniq != [0] and ![6864, 6865, 6866, 6855].include? user_id
+        priority_info << {pid: user_id, ranks: bids}
+      end
     end
-
-    data = {users: priority_info, max_team_size: Assignment.find_by_id(params[:id]).max_team_size}
-    url = "http://peerlogic.csc.ncsu.edu/intelligent_assignment/merge_teams"
+    assignment = Assignment.find_by_id(params[:id])
+    data = {users: priority_info, max_team_size: assignment.max_team_size}
+    url = WEBSERVICE_CONFIG["topic_bidding_webservice_url"]
     begin
       response = RestClient.post url, data.to_json, :content_type => :json, :accept => :json
       # store each summary in a hashmap and use the question as the key
@@ -38,31 +40,23 @@ class LotteryController < ApplicationController
     rescue => err
       flash[:error] = err.message
     end
-# TODO: refactor after get the response bodey structure
-    teams.each do |team|
-      t = nil
-      #find if existing team exists
-      team.each do |student|
-        TeamsUser.where(user_id: student).each do |user|
-          nTeam = Team.where(id: user.team_id, parent_id: params[:id]).first
-          if t.nil? and !nTeam.nil?
-            t = nTeam
-          end
-        end
-      end
-      if t.nil?
-        #create the team
-        t = AssignmentTeam.create(parent_id: params[:id])
-      end
-      team.each do |student|
-        #make the teamid of each student in team the team id of first student
-        if TeamsUser.where(user_id: student, team_id: t.id).first.nil?
-          TeamsUser.create(user_id: student, team_id: t.id) 
-        end
-      end
-    end
+    create_new_teams_for_bidding_response(teams, assignment)
 
     redirect_to controller: 'tree_display', action: 'list'
+  end
+
+  def create_new_teams_for_bidding_response(teams, assignment)
+    teams.each_with_index do |user_ids, index|
+      new_team = AssignmentTeam.create(name: assignment.name + '_Team' + rand(1000).to_s, 
+                                       parent_id: assignment.id, 
+                                       type: 'AssignmentTeam')
+      parent = TeamNode.create(parent_id: assignment.id, node_object_id: new_team.id)
+      user_ids.each do |user_id|
+        team_user = TeamsUser.where(user_id: user_id, team_id: new_team.id).first rescue nil
+        team_user = TeamsUser.create(user_id: user_id, team_id: new_team.id) if team_user.nil?
+        TeamUserNode.create(parent_id: parent.id, node_object_id: team_user.id) 
+      end
+    end
   end
 
   # This method is called for assignments which have their is_intelligent property set to 1. It runs a stable match algorithm and assigns topics

@@ -33,6 +33,9 @@ Expertiza::Application.configure do
   # Generate digests for assets URLs.
   config.assets.digest = true
 
+  # `load 'deploy/assets'` in Capfile links the folder specified in config.assets.prefix to shared/assets
+  config.assets.prefix = 'public/assets'
+
   # Version of your assets, change this if you want to expire all your assets.
   config.assets.version = '1.0'
 

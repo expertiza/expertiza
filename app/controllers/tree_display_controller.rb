@@ -124,75 +124,75 @@ class TreeDisplayController < ApplicationController
     # @reactjsParams[:child_nodes] = child_nodes
   end
 
-  def get_folder_node_ng
+  def folder_node_ng
     respond_to do |format|
       format.html { render json: FolderNode.get }
     end
   end
 
   # for folder nodes
-  def get_children_node_ng
-    childNodes = {}
-    childNodes = if params[:reactParams][:child_nodes].is_a? String
+  def children_node_ng
+
+    child_nodes = if params[:reactParams][:child_nodes].is_a? String
                    JSON.parse(params[:reactParams][:child_nodes])
                  else
                    params[:reactParams][:child_nodes]
                  end
-    tmpRes = {}
+    tmp_res = {}
     res = {}
-    for node in childNodes
+    child_nodes.each do |node|
       fnode = eval(params[:reactParams][:nodeType]).new
 
-      for a in node
+      node.each do |a|
         fnode[a[0]] = a[1]
       end
 
       # fnode is the parent node
       # ch_nodes are childrens
       ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
-      tmpRes[fnode.get_name] = ch_nodes
+      tmp_res[fnode.get_name] = ch_nodes
 
       # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
 
     end
 
-    for nodeType in tmpRes.keys
-      res[nodeType] = []
+    tmp_res.keys.each do |node_type|
+      res[node_type] = []
 
-      for node in tmpRes[nodeType]
-        tmpObject = {}
-        tmpObject["nodeinfo"] = node
-        tmpObject["name"] = node.get_name
-        tmpObject["type"] = node.type
+      tmp_res[node_type].each do |node|
+        tmp_object = {}
+        tmp_object["nodeinfo"] = node
+        tmp_object["name"] = node.get_name
+        tmp_object["type"] = node.type
 
-        if nodeType == 'Courses' || nodeType == "Assignments"
-          tmpObject["directory"] = node.get_directory
-          tmpObject["creation_date"] = node.get_creation_date
-          tmpObject["updated_date"] = node.get_modified_date
+        if node_type == 'Courses' || node_type == "Assignments"
+          tmp_object["directory"] = node.get_directory
+          tmp_object["creation_date"] = node.get_creation_date
+          tmp_object["updated_date"] = node.get_modified_date
           # tmpObject["private"] = node.get_private
-          tmpObject["private"] = node.get_instructor_id === session[:user].id ? true : false
+          tmp_object["private"] = node.get_instructor_id === session[:user].id ? true : false
           instructor_id = node.get_instructor_id
           ## if current user's role is TA for a course, then that course will be listed under his course listing.
           if session[:user].role.ta? == 'Teaching Assistant' && Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node)
-            tmpObject["private"] = true
+            tmp_object["private"] = true
           end
 
-          tmpObject["instructor_id"] = instructor_id
-          tmpObject["instructor"] = unless instructor_id.nil?
+          tmp_object["instructor_id"] = instructor_id
+          tmp_object["instructor"] = unless instructor_id.nil?
                                       User.find(instructor_id).name
-                                    end
+                                     end
 
-          tmpObject["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role.ta? && Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
-          if nodeType == "Assignments"
-            tmpObject["course_id"] = node.get_course_id
-            tmpObject["max_team_size"] = node.get_max_team_size
-            tmpObject["is_intelligent"] = node.get_is_intelligent
-            tmpObject["require_quiz"] = node.get_require_quiz
-            tmpObject["allow_suggestions"] = node.get_allow_suggestions
-            tmpObject["has_topic"] = SignUpTopic.where(['assignment_id = ?', node.node_object_id]).first ? true : false
+          tmp_object["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role.ta? && Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
+          if node_type == "Assignments"
+            tmp_object["course_id"] = node.get_course_id
+            tmp_object["max_team_size"] = node.get_max_team_size
+            tmp_object["is_intelligent"] = node.get_is_intelligent
+            tmp_object["require_quiz"] = node.get_require_quiz
+            tmp_object["allow_suggestions"] = node.get_allow_suggestions
+            tmp_object["has_topic"] = SignUpTopic.where(['assignment_id = ?', node.node_object_id]).first ? true : false
           end
         end
-        res[nodeType] << tmpObject
+        res[node_type] << tmp_object
       end
 
     end
@@ -218,35 +218,35 @@ class TreeDisplayController < ApplicationController
   end
 
   # for child nodes
-  def get_children_node_2_ng
-    childNodes = {}
-    childNodes = if params[:reactParams2][:child_nodes].is_a? String
+  def children_node_2_ng
+
+    child_nodes = if params[:reactParams2][:child_nodes].is_a? String
                    JSON.parse(params[:reactParams2][:child_nodes])
-                 else
+                  else
                    params[:reactParams2][:child_nodes]
-                 end
-    tmpRes = {}
+                  end
+
     res = []
     fnode = eval(params[:reactParams2][:nodeType]).new
-    childNodes.each do |key, value|
+    child_nodes.each do |key, value|
       fnode[key] = value
     end
 
     ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
-    tmpRes = ch_nodes
-    if tmpRes
-      for child in tmpRes
-        nodeType = child.type
+    tmp_res = ch_nodes
+    if tmp_res
+      tmp_res.each do |child|
+        node_type = child.type
         res2 = {}
         res2["nodeinfo"] = child
         res2["name"] = child.get_name
         res2["key"] = params[:reactParams2][:key]
-        res2["type"] = nodeType
+        res2["type"] = node_type
 
         res2["private"] = child.get_private
         res2["creation_date"] = child.get_creation_date
         res2["updated_date"] = child.get_modified_date
-        if nodeType == 'CourseNode' || nodeType == "AssignmentNode"
+        if node_type == 'CourseNode' || node_type == "AssignmentNode"
           res2["directory"] = child.get_directory
           instructor_id = child.get_instructor_id
           res2["instructor_id"] = instructor_id
@@ -258,7 +258,8 @@ class TreeDisplayController < ApplicationController
           available_condition_1 = is_available(session[:user], instructor_id)
 
           # instructor created the course, current user is the ta of this course.
-          available_condition_2 = session[:user].role_id == 6 and Ta.get_my_instructors(session[:user].id).include?(instructor_id) and ta_for_current_course?(child)
+          available_condition_2 = session[:user].role_id == 6 and
+              Ta.get_my_instructors(session[:user].id).include?(instructor_id) and ta_for_current_course?(child)
 
           # ta created the course, current user is the instructor of this ta.
           instructor_ids = []
@@ -267,7 +268,7 @@ class TreeDisplayController < ApplicationController
 
           res2["is_available"] = available_condition_1 || available_condition_2 || available_condition_3
 
-          if nodeType == "AssignmentNode"
+          if node_type == "AssignmentNode"
             res2["course_id"] = child.get_course_id
             res2["max_team_size"] = child.get_max_team_size
             res2["is_intelligent"] = child.get_is_intelligent
@@ -291,7 +292,7 @@ class TreeDisplayController < ApplicationController
     is_available(user, owner_id)
   end
 
-  def get_session_last_open_tab
+  def session_last_open_tab
     res = session[:last_open_tab]
     respond_to do |format|
       format.html { render json: res }
@@ -331,4 +332,4 @@ class TreeDisplayController < ApplicationController
     end
     qid
   end
-  end
+end

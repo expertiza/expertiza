@@ -5,80 +5,65 @@ class TreeDisplayController < ApplicationController
     true
   end
 
-  # direct access to questionnaires
-  def goto_questionnaires
-    node_object = TreeFolder.find_by_name('Questionnaires')
+
+  def goto_controller(name_parameter)
+    node_object = TreeFolder.find_by_name(name_parameter)
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
     redirect_to controller: 'tree_display', action: 'list'
+  end
+
+  # direct access to questionnaires
+  def goto_questionnaires(parameter_name)
+    goto_controller('Questionnaires')
   end
 
   # direct access to review rubrics
   def goto_review_rubrics
-    node_object = TreeFolder.find_by_name('Review')
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to controller: 'tree_display', action: 'list'
+    goto_controller('Review')
   end
 
   # direct access to metareview rubrics
   def goto_metareview_rubrics
-    node_object = TreeFolder.find_by_name('Metareview')
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to controller: 'tree_display', action: 'list'
+    goto_controller('Metareview')
   end
 
   # direct access to teammate review rubrics
   def goto_teammatereview_rubrics
-    node_object = TreeFolder.find_by_name('Teammate Review')
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to controller: 'tree_display', action: 'list'
+    goto_controller('Teammate Review')
   end
 
   # direct access to author feedbacks
   def goto_author_feedbacks
-    node_object = TreeFolder.find_by_name('Author Feedback')
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to controller: 'tree_display', action: 'list'
+    goto_controller('Author Feedback')
   end
 
   # direct access to global survey
   def goto_global_survey
-    node_object = TreeFolder.find_by_name('Global Survey')
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to controller: 'tree_display', action: 'list'
+    goto_controller('Global Survey')
   end
 
   # direct access to surveys
   def goto_surveys
-    node_object = TreeFolder.find_by_name('Survey')
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to controller: 'tree_display', action: 'list'
+    goto_controller('Survey')
   end
 
   # direct access to course evaluations
   def goto_course_evaluations
-    node_object = TreeFolder.find_by_name('Course Evaluation')
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to controller: 'tree_display', action: 'list'
+    goto_controller('Course Evaluation')
   end
 
   # direct access to courses
   def goto_courses
-    node_object = TreeFolder.find_by_name('Courses')
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to controller: 'tree_display', action: 'list'
+    goto_controller('Courses')
   end
 
   def goto_bookmarkrating_rubrics
-    node_object = TreeFolder.find_by_name('Bookmarkrating')
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to controller: 'tree_display', action: 'list'
+    goto_controller('Bookmarkrating')
   end
 
   # direct access to assignments
   def goto_assignments
-    node_object = TreeFolder.find_by_name('Assignments')
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
-    redirect_to controller: 'tree_display', action: 'list'
+    goto_controller('Assignments')
   end
 
   # called when the display is requested
@@ -132,12 +117,11 @@ class TreeDisplayController < ApplicationController
 
   # for folder nodes
   def children_node_ng
-
     child_nodes = if params[:reactParams][:child_nodes].is_a? String
                    JSON.parse(params[:reactParams][:child_nodes])
-                 else
+                  else
                    params[:reactParams][:child_nodes]
-                 end
+                  end
     tmp_res = {}
     res = {}
     child_nodes.each do |node|
@@ -181,8 +165,8 @@ class TreeDisplayController < ApplicationController
           tmp_object["instructor"] = unless instructor_id.nil?
                                       User.find(instructor_id).name
                                      end
-
-          tmp_object["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role.ta? && Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
+          tmp_object["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role.ta? &&
+              Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
           if node_type == "Assignments"
             tmp_object["course_id"] = node.get_course_id
             tmp_object["max_team_size"] = node.get_max_team_size
@@ -194,7 +178,6 @@ class TreeDisplayController < ApplicationController
         end
         res[node_type] << tmp_object
       end
-
     end
 
     respond_to do |format|

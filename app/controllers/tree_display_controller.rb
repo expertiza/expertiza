@@ -5,7 +5,6 @@ class TreeDisplayController < ApplicationController
     true
   end
 
-
   def goto_controller(name_parameter)
     node_object = TreeFolder.find_by_name(name_parameter)
     session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
@@ -13,7 +12,7 @@ class TreeDisplayController < ApplicationController
   end
 
   # direct access to questionnaires
-  def goto_questionnaires(parameter_name)
+  def goto_questionnaires
     goto_controller('Questionnaires')
   end
 
@@ -118,9 +117,9 @@ class TreeDisplayController < ApplicationController
   # for folder nodes
   def children_node_ng
     child_nodes = if params[:reactParams][:child_nodes].is_a? String
-                   JSON.parse(params[:reactParams][:child_nodes])
+                     JSON.parse(params[:reactParams][:child_nodes])
                   else
-                   params[:reactParams][:child_nodes]
+                     params[:reactParams][:child_nodes]
                   end
     tmp_res = {}
     res = {}
@@ -137,7 +136,6 @@ class TreeDisplayController < ApplicationController
       tmp_res[fnode.get_name] = ch_nodes
 
       # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
-
     end
 
     tmp_res.keys.each do |node_type|
@@ -154,7 +152,7 @@ class TreeDisplayController < ApplicationController
           tmp_object["creation_date"] = node.get_creation_date
           tmp_object["updated_date"] = node.get_modified_date
           # tmpObject["private"] = node.get_private
-          tmp_object["private"] = node.get_instructor_id === session[:user].id ? true : false
+          tmp_object["private"] = node.get_instructor_id == session[:user].id ? true : false
           instructor_id = node.get_instructor_id
           ## if current user's role is TA for a course, then that course will be listed under his course listing.
           if session[:user].role.ta? == 'Teaching Assistant' && Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node)
@@ -163,7 +161,7 @@ class TreeDisplayController < ApplicationController
 
           tmp_object["instructor_id"] = instructor_id
           tmp_object["instructor"] = unless instructor_id.nil?
-                                      User.find(instructor_id).name
+                                        User.find(instructor_id).name
                                      end
           tmp_object["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role.ta? &&
               Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
@@ -202,13 +200,11 @@ class TreeDisplayController < ApplicationController
 
   # for child nodes
   def children_node_2_ng
-
     child_nodes = if params[:reactParams2][:child_nodes].is_a? String
-                   JSON.parse(params[:reactParams2][:child_nodes])
+                     JSON.parse(params[:reactParams2][:child_nodes])
                   else
-                   params[:reactParams2][:child_nodes]
+                     params[:reactParams2][:child_nodes]
                   end
-
     res = []
     fnode = eval(params[:reactParams2][:nodeType]).new
     child_nodes.each do |key, value|

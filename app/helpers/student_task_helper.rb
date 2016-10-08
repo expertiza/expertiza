@@ -13,6 +13,7 @@ module StudentTaskHelper
   end
 
   def check_reviewable_topics(assignment)
+    return true unless assignment.has_topics?
     sign_up_topics = SignUpTopic.where(assignment_id: assignment.id)
     sign_up_topics.each {|topic| return true if assignment.can_review(topic.id) }
     false

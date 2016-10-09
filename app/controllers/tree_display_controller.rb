@@ -122,25 +122,9 @@ class TreeDisplayController < ApplicationController
     end
   end
 
-  # for folder nodes
-  def children_node_ng
-    child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
-    tmp_res = {}
+
+  def res_node_for_child(tmp_res)
     res = {}
-    child_nodes.each do |node|
-      fnode = eval(params[:reactParams][:nodeType]).new
-
-      node.each do |a|
-        fnode[a[0]] = a[1]
-      end
-
-      # fnode is the parent node
-      # ch_nodes are childrens
-      ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
-      tmp_res[fnode.get_name] = ch_nodes
-
-      # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
-    end
 
     tmp_res.keys.each do |node_type|
       res[node_type] = []
@@ -181,6 +165,28 @@ class TreeDisplayController < ApplicationController
         res[node_type] << tmp_object
       end
     end
+    res
+  end
+
+  # for folder nodes
+  def children_node_ng
+    child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
+    tmp_res = {}
+    child_nodes.each do |node|
+      fnode = eval(params[:reactParams][:nodeType]).new
+
+      node.each do |a|
+        fnode[a[0]] = a[1]
+      end
+
+      # fnode is the parent node
+      # ch_nodes are childrens
+      ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
+      tmp_res[fnode.get_name] = ch_nodes
+      res = res_node_for_child(tmp_res)
+      # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
+    end
+
 
     respond_to do |format|
       format.html { render json: res }
@@ -202,18 +208,9 @@ class TreeDisplayController < ApplicationController
     false
   end
 
-  # for child nodes
-  def children_node_2_ng
-    child_nodes = child_nodes_from_params(params[:reactParams2][:child_nodes])
-
+  def res_node_for_child_2(tmp_res)
     res = []
-    fnode = eval(params[:reactParams2][:nodeType]).new
-    child_nodes.each do |key, value|
-      fnode[key] = value
-    end
 
-    ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
-    tmp_res = ch_nodes
     if tmp_res
       tmp_res.each do |child|
         node_type = child.type
@@ -260,7 +257,21 @@ class TreeDisplayController < ApplicationController
         res << res2
       end
     end
+    res2
+  end
 
+  # for child nodes
+  def children_node_2_ng
+    child_nodes = child_nodes_from_params(params[:reactParams2][:child_nodes])
+
+    fnode = eval(params[:reactParams2][:nodeType]).new
+    child_nodes.each do |key, value|
+      fnode[key] = value
+    end
+
+    ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
+    tmp_res = ch_nodes
+    res = res_node_for_child_2(tmp_res)
     respond_to do |format|
       format.html { render json: res }
     end

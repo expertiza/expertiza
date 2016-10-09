@@ -114,13 +114,17 @@ class TreeDisplayController < ApplicationController
     end
   end
 
+  def child_nodes_from_params(child_nodes)
+    if child_nodes.is_a? String
+      JSON.parse(child_nodes)
+    else
+      child_nodes
+    end
+  end
+
   # for folder nodes
   def children_node_ng
-    child_nodes = if params[:reactParams][:child_nodes].is_a? String
-                     JSON.parse(params[:reactParams][:child_nodes])
-                  else
-                     params[:reactParams][:child_nodes]
-                  end
+    child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
     tmp_res = {}
     res = {}
     child_nodes.each do |node|
@@ -160,8 +164,8 @@ class TreeDisplayController < ApplicationController
           end
 
           tmp_object["instructor_id"] = instructor_id
-          tmp_object["instructor"] = unless instructor_id.nil?
-                                        User.find(instructor_id).name
+          tmp_object["instructor"] = if instructor_id
+                                       User.find(instructor_id).name
                                      end
           tmp_object["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role.ta? &&
               Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
@@ -200,11 +204,8 @@ class TreeDisplayController < ApplicationController
 
   # for child nodes
   def children_node_2_ng
-    child_nodes = if params[:reactParams2][:child_nodes].is_a? String
-                     JSON.parse(params[:reactParams2][:child_nodes])
-                  else
-                     params[:reactParams2][:child_nodes]
-                  end
+    child_nodes = child_nodes_from_params(params[:reactParams2][:child_nodes])
+
     res = []
     fnode = eval(params[:reactParams2][:nodeType]).new
     child_nodes.each do |key, value|
@@ -229,7 +230,7 @@ class TreeDisplayController < ApplicationController
           res2["directory"] = child.get_directory
           instructor_id = child.get_instructor_id
           res2["instructor_id"] = instructor_id
-          res2["instructor"] = unless instructor_id.nil?
+          res2["instructor"] = if instructor_id
                                  User.find(instructor_id).name
                                end
 
@@ -242,7 +243,7 @@ class TreeDisplayController < ApplicationController
 
           # ta created the course, current user is the instructor of this ta.
           instructor_ids = []
-          TaMapping.where(ta_id: instructor_id).each {|mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }
+          TaMapping.where(ta_id: instructor_id).each { |mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }
           available_condition_3 = session[:user].role_id == 2 and instructor_ids.include? session[:user].id
 
           res2["is_available"] = available_condition_1 || available_condition_2 || available_condition_3
@@ -291,20 +292,24 @@ class TreeDisplayController < ApplicationController
     redirect_to controller: 'tree_display', action: 'list'
   end
 
+  def filter_qan(search, qid)
+    assignment = Assignment.find_by_name(search)
+    if assignment
+      assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment.id)
+      if assignment_questionnaires
+        assignment_questionnaires.each { |q| qid << "#{q.questionnaire_id}+" }
+        session[:root] = 1
+      end
+    end
+    qid
+  end
+
   def filter
+    qid = 'filter+'
     search = params[:filter_string]
     filter_node = params[:filternode]
-    qid = 'filter+'
-
     if filter_node == 'QAN'
-      assignment = Assignment.find_by_name(search)
-      if assignment
-        assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment.id)
-        if assignment_questionnaires
-          assignment_questionnaires.each {|q| qid << "#{q.questionnaire_id}+" }
-          session[:root] = 1
-        end
-      end
+      qid = filter_qan(search, qid)
     elsif filter_node == 'ACN'
       session[:root] = 2
       qid << search

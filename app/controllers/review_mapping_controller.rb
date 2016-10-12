@@ -182,7 +182,7 @@ class ReviewMappingController < ApplicationController
         @map.reviewee_id = Questionnaire.find(params[:questionnaire_id]).instructor_id
         @map.reviewer_id = params[:participant_id]
         @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
-        @map.save
+        @map.savessignment
       end
 
     rescue Exception => e
@@ -228,7 +228,7 @@ class ReviewMappingController < ApplicationController
     reviewer
   end
 
-  def delete_all_reviewers
+  def delete_outstanding_reviewers
     assignment = Assignment.find(params[:id])
     team = AssignmentTeam.find(params[:contributor_id])
     review_response_maps = team.review_mappings

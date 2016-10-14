@@ -125,11 +125,11 @@ class TreeDisplayController < ApplicationController
   def assignments_func(node_type, node, tmp_object)
     tmp_object.merge!(
       "course_id" => node.get_course_id,
-    "max_team_size" => node.get_max_team_size,
-    "is_intelligent" => node.get_is_intelligent,
-    "require_quiz" => node.get_require_quiz,
-    "allow_suggestions" => node.get_allow_suggestions,
-    "has_topic" => SignUpTopic.where(['assignment_id = ?', node.node_object_id]).first ? true : false
+      "max_team_size" => node.get_max_team_size,
+      "is_intelligent" => node.get_is_intelligent,
+      "require_quiz" => node.get_require_quiz,
+      "allow_suggestions" => node.get_allow_suggestions,
+      "has_topic" => SignUpTopic.where(['assignment_id = ?', node.node_object_id]).first ? true : false
     ) if node_type == "Assignments"
   end
 
@@ -147,18 +147,18 @@ class TreeDisplayController < ApplicationController
 
       tmp_res[node_type].each do |node|
         tmp_object = {
-                       "nodeinfo" => node,
-                       "name" => node.get_name,
-                       "type" => node.type
-                     }
+            "nodeinfo" => node,
+            "name" => node.get_name,
+            "type" => node.type
+         }
 
         if node_type == 'Courses' || node_type == "Assignments"
           tmp_object.merge!(
-            "directory" => node.get_directory,
-          "creation_date" => node.get_creation_date,
-          "updated_date" => node.get_modified_date,
-          "private" => node.get_instructor_id == session[:user].id ? true : false
-                            )
+              "directory" => node.get_directory,
+              "creation_date" => node.get_creation_date,
+              "updated_date" => node.get_modified_date,
+              "private" => node.get_instructor_id == session[:user].id ? true : false
+          )
           # tmpObject["private"] = node.get_private     NOTE: already present
           instructor_id = node.get_instructor_id
           ## if current user's role is TA for a course, then that course will be listed under his course listing.

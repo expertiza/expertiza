@@ -96,7 +96,6 @@ describe "assignment function" do
         spec_location: 'testLocation'
       )
     end
-def methodA
     it "is able to create with teams" do
       login_as("instructor6")
       visit '/assignments/new?private=1'
@@ -116,9 +115,25 @@ def methodA
         show_teammate_reviews: true
       )
     end
-end
-    methodA
-    methodA
+    it "is able to create with teams" do
+      login_as("instructor6")
+      visit '/assignments/new?private=1'
+
+      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
+      select('Course 2', from: 'assignment_form_assignment_course_id')
+      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      check("team_assignment")
+      check("assignment_form_assignment_show_teammate_reviews")
+      fill_in 'assignment_form_assignment_max_team_size', with: 3
+
+      click_button 'Create'
+
+      assignment = Assignment.where(name: 'private assignment for test').first
+      expect(assignment).to have_attributes(
+        max_team_size: 3,
+        show_teammate_reviews: true
+      )
+    end
 
     it "is able to create with staggered deadline" do
       skip('skip test on staggered deadline temporarily')
@@ -238,7 +253,7 @@ end
           notification_limit: 50
         )
       end
-
+def methodA
       it "should update scored question dropdown" do
         find_link('Rubrics').click
         within("tr#questionnaire_table_ReviewQuestionnaire") do
@@ -250,7 +265,8 @@ end
         assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
         expect(assignment_questionnaire.dropdown).to eq(false)
       end
-
+end
+      methodA()
       # Second row of rubric
       it "updates author feedback questionnaire" do
         find_link('Rubrics').click
@@ -268,19 +284,7 @@ end
           notification_limit: 50
         )
       end
-
-      it "should update scored question dropdown" do
-        find_link('Rubrics').click
-        within("tr#questionnaire_table_AuthorFeedbackQuestionnaire") do
-          select "AuthorFeedbackQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-          select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-        end
-        click_button 'Save'
-        questionnaire = Questionnaire.where(name: "AuthorFeedbackQuestionnaire2").first
-        assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
-        expect(assignment_questionnaire.dropdown).to eq(false)
-      end
-
+methodA()
       # Third row of rubric
       it "updates teammate review questionnaire" do
         find_link('Rubrics').click

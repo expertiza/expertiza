@@ -122,22 +122,29 @@ class TreeDisplayController < ApplicationController
     end
   end
 
-
   def assignments_func(node_type, node, tmp_object)
-    if node_type == "Assignments"
-      tmp_object["course_id"] = node.get_course_id
-      tmp_object["max_team_size"] = node.get_max_team_size
-      tmp_object["is_intelligent"] = node.get_is_intelligent
-      tmp_object["require_quiz"] = node.get_require_quiz
-      tmp_object["allow_suggestions"] = node.get_allow_suggestions
-      tmp_object["has_topic"] = SignUpTopic.where(['assignment_id = ?', node.node_object_id]).first ? true : false
-    end
+    tmp_object.merge!({
+                        "course_id" => node.get_course_id,
+                        "max_team_size" => node.get_max_team_size,
+                        "is_intelligent" => node.get_is_intelligent,
+                        "require_quiz" => node.get_require_quiz,
+                        "allow_suggestions" => node.get_allow_suggestions,
+                        "has_topic" => SignUpTopic.where(['assignment_id = ?', node.node_object_id]).first ? true : false
+                      }) if node_type == "Assignments"
+    # if node_type == "Assignments"
+    #   tmp_object["course_id"] = node.get_course_id
+    #   tmp_object["max_team_size"] = node.get_max_team_size
+    #   tmp_object["is_intelligent"] = node.get_is_intelligent
+    #   tmp_object["require_quiz"] = node.get_require_quiz
+    #   tmp_object["allow_suggestions"] = node.get_allow_suggestions
+    #   tmp_object["has_topic"] = SignUpTopic.where(['assignment_id = ?', node.node_object_id]).first ? true : false
+    # end
   end
 
   def update_in_ta_course_listing(instructor_id, node, tmp_object)
-    if session[:user].role.ta? == 'Teaching Assistant' && Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node)
-      tmp_object["private"] = true
-    end
+    # if session[:user].role.ta? == 'Teaching Assistant' && Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node)
+    tmp_object["private"] = true if session[:user].role.ta? == 'Teaching Assistant' && Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node)
+    # end
   end
 
   def res_node_for_child(tmp_res)
@@ -149,10 +156,10 @@ class TreeDisplayController < ApplicationController
       tmp_res[node_type].each do |node|
 
         tmp_object = {
-            "nodeinfo" => node,
-            "name" => node.get_name,
-            "type" => node.type,
-        }
+                        "nodeinfo" => node,
+                        "name" => node.get_name,
+                        "type" => node.type
+                      }
 
         # tmp_object = {}
         # tmp_object["nodeinfo"] = node
@@ -160,10 +167,11 @@ class TreeDisplayController < ApplicationController
         # tmp_object["type"] = node.type
 
         if node_type == 'Courses' || node_type == "Assignments"
-          tmp_object.merge!({"directory" => node.get_directory,
-                            "creation_date" => node.get_creation_date,
-                            "updated_date" => node.get_modified_date,
-                            "private" => node.get_instructor_id == session[:user].id ? true : false
+          tmp_object.merge!({
+                              "directory" => node.get_directory,
+                              "creation_date" => node.get_creation_date,
+                              "updated_date" => node.get_modified_date,
+                              "private" => node.get_instructor_id == session[:user].id ? true : false
                             })
           # tmp_object["directory"] = node.get_directory
           # tmp_object["creation_date"] = node.get_creation_date

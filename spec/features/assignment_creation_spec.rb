@@ -96,7 +96,7 @@ describe "assignment function" do
         spec_location: 'testLocation'
       )
     end
-
+temp=lambda{
     it "is able to create with teams" do
       login_as("instructor6")
       visit '/assignments/new?private=1'
@@ -116,25 +116,9 @@ describe "assignment function" do
         show_teammate_reviews: true
       )
     end
-
-    it "is able to create with quiz" do
-      login_as("instructor6")
-      visit '/assignments/new?private=1'
-
-      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
-      check("assignment_form_assignment_require_quiz")
-      click_button 'Create'
-      fill_in 'assignment_form_assignment_num_quiz_questions', with: 3
-      click_button 'submit_btn'
-
-      assignment = Assignment.where(name: 'private assignment for test').first
-      expect(assignment).to have_attributes(
-        num_quiz_questions: 3,
-        require_quiz: true
-      )
-    end
+  }
+    &temp
+    &temp
 
     it "is able to create with staggered deadline" do
       skip('skip test on staggered deadline temporarily')

@@ -147,14 +147,14 @@ class TreeDisplayController < ApplicationController
 
       tmp_res[node_type].each do |node|
         tmp_object = {
-            "nodeinfo" => node,
-            "name" => node.get_name,
-            "type" => node.type
-         }
+          "nodeinfo" => node,
+          "name" => node.get_name,
+          "type" => node.type
+        }
 
         if node_type == 'Courses' || node_type == "Assignments"
           tmp_object.merge!(
-              "directory" => node.get_directory,
+                "directory" => node.get_directory,
               "creation_date" => node.get_creation_date,
               "updated_date" => node.get_modified_date,
               "private" => node.get_instructor_id == session[:user].id ? true : false

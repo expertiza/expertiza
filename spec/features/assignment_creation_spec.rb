@@ -96,7 +96,7 @@ describe "assignment function" do
         spec_location: 'testLocation'
       )
     end
-temp=lambda{
+def methodA
     it "is able to create with teams" do
       login_as("instructor6")
       visit '/assignments/new?private=1'
@@ -116,9 +116,9 @@ temp=lambda{
         show_teammate_reviews: true
       )
     end
-  }
-    &temp
-    &temp
+end
+    methodA
+    methodA
 
     it "is able to create with staggered deadline" do
       skip('skip test on staggered deadline temporarily')

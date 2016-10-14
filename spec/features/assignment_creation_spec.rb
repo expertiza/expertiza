@@ -254,12 +254,12 @@ describe "assignment function" do
         )
       end
 def methodA
-      it "should update scored question dropdown" do
+       it "should update scored question dropdown" do
         find_link('Rubrics').click
         within("tr#questionnaire_table_ReviewQuestionnaire") do
           select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-        end
+       end
         click_button 'Save'
         questionnaire = Questionnaire.where(name: "ReviewQuestionnaire2").first
         assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
@@ -284,7 +284,7 @@ end
           notification_limit: 50
         )
       end
-methodA()
+      methodA()
       # Third row of rubric
       it "updates teammate review questionnaire" do
         find_link('Rubrics').click

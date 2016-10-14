@@ -124,19 +124,19 @@ class TreeDisplayController < ApplicationController
 
   def assignments_func(node_type, node, tmp_object)
     tmp_object.merge!(
-                        "course_id" => node.get_course_id,
-                        "max_team_size" => node.get_max_team_size,
-                        "is_intelligent" => node.get_is_intelligent,
-                        "require_quiz" => node.get_require_quiz,
-                        "allow_suggestions" => node.get_allow_suggestions,
-                        "has_topic" => SignUpTopic.where(['assignment_id = ?', node.node_object_id]).first ? true : false
-                      ) if node_type == "Assignments"
+      "course_id" => node.get_course_id,
+    "max_team_size" => node.get_max_team_size,
+    "is_intelligent" => node.get_is_intelligent,
+    "require_quiz" => node.get_require_quiz,
+    "allow_suggestions" => node.get_allow_suggestions,
+    "has_topic" => SignUpTopic.where(['assignment_id = ?', node.node_object_id]).first ? true : false
+    ) if node_type == "Assignments"
   end
 
   def update_in_ta_course_listing(instructor_id, node, tmp_object)
-    tmp_object["private"] = true if session[:user].role.ta? == 'Teaching Assistant' \
-                            && Ta.get_my_instructors(session[:user].id).include?(instructor_id) \
-                            && ta_for_current_course?(node)
+    tmp_object["private"] = true if session[:user].role.ta? == 'Teaching Assistant' &&
+        Ta.get_my_instructors(session[:user].id).include?(instructor_id) &&
+        ta_for_current_course?(node)
     # end
   end
 
@@ -154,10 +154,10 @@ class TreeDisplayController < ApplicationController
 
         if node_type == 'Courses' || node_type == "Assignments"
           tmp_object.merge!(
-                              "directory" => node.get_directory,
-                              "creation_date" => node.get_creation_date,
-                              "updated_date" => node.get_modified_date,
-                              "private" => node.get_instructor_id == session[:user].id ? true : false
+            "directory" => node.get_directory,
+          "creation_date" => node.get_creation_date,
+          "updated_date" => node.get_modified_date,
+          "private" => node.get_instructor_id == session[:user].id ? true : false
                             )
           # tmpObject["private"] = node.get_private     NOTE: already present
           instructor_id = node.get_instructor_id

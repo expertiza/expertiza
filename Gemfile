@@ -46,7 +46,9 @@ gem 'rjb'
 gem 'rubyzip'
 gem 'rwordnet', '0.1.3'
 gem 'scrypt'
+gem 'bootstrap-sass', '~> 3.3.6'
 gem 'sass-rails', '5.0.3'
+gem 'sisyphus-rails'
 gem 'seer'
 gem 'sprockets'
 gem 'stanford-core-nlp'
@@ -58,6 +60,8 @@ gem 'will_paginate'
 gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
 gem 'jquery-tablesorter'
+
+
 
 group :development do
   gem 'daemons'

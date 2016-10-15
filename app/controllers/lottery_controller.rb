@@ -48,7 +48,7 @@ class LotteryController < ApplicationController
   def create_new_teams_for_bidding_response(teams, assignment)
     teams.each_with_index do |user_ids, index|
       new_team = AssignmentTeam.create(name: assignment.name + '_Team' + rand(1000).to_s,
-                                       parent_id: assignment.id, 
+                                       parent_id: assignment.id,
                                        type: 'AssignmentTeam')
       parent = TeamNode.create(parent_id: assignment.id, node_object_id: new_team.id)
       user_ids.each do |user_id|
@@ -84,7 +84,7 @@ class LotteryController < ApplicationController
         end
         # takes the most frequent priority as the team priority
         freq = student_bids.inject(Hash.new(0)) {|h, v| h[v] += 1; h }
-        topic_bids << {topic_id: topic.id, priority: student_bids.max_by {|v| freq[v]}} unless freq.empty?
+        topic_bids << {topic_id: topic.id, priority: student_bids.max_by {|v| freq[v] }} unless freq.empty?
       end
       topic_bids.sort! {|b| b[:priority] }
       team_bids << { team_id: team.id, bids: topic_bids }

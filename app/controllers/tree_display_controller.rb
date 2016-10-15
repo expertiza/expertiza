@@ -229,13 +229,13 @@ class TreeDisplayController < ApplicationController
     false
   end
 
-  def is_available_condition2(instructor_id, child)
+  def available_condition2(instructor_id, child)
     # instructor created the course, current user is the ta of this course.
     session[:user].role_id == 6 and
         Ta.get_my_instructors(session[:user].id).include?(instructor_id) and ta_for_current_course?(child)
   end
 
-  def is_available_condition3(instructor_id)
+  def available_condition3(instructor_id)
     # ta created the course, current user is the instructor of this ta.
     instructor_ids = []
     TaMapping.where(ta_id: instructor_id).each {|mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }
@@ -244,10 +244,12 @@ class TreeDisplayController < ApplicationController
 
   def update_is_available_2(res2, instructor_id, child)
     # current user is the instructor (role can be admin/instructor/ta) of this course. is_available_condition1
-    res2["is_available"] = is_available(session[:user], instructor_id) || is_available_condition2(instructor_id, child) || is_available_condition3(instructor_id)
+    res2["is_available"] = is_available(session[:user], instructor_id) ||
+        available_condition2(instructor_id, child) ||
+        available_condition3(instructor_id)
   end
 
-  def courseNode_assignmentNode(res2, child)
+  def coursenode_assignmentnode(res2, child)
     res2["directory"] = child.get_directory
     instructor_id = child.get_instructor_id
     update_instructor(res2, instructor_id)
@@ -262,16 +264,16 @@ class TreeDisplayController < ApplicationController
       tmp_res.each do |child|
         node_type = child.type
         res2 = {
-            "nodeinfo" => child,
-            "name" => child.get_name,
-            "key" => params[:reactParams2][:key],
-            "type" => node_type,
-            "private" => child.get_private,
-            "creation_date" => child.get_creation_date,
-            "updated_date" => child.get_modified_date
+          "nodeinfo" => child,
+          "name" => child.get_name,
+          "key" => params[:reactParams2][:key],
+          "type" => node_type,
+          "private" => child.get_private,
+          "creation_date" => child.get_creation_date,
+          "updated_date" => child.get_modified_date
         }
         if node_type == 'CourseNode' || node_type == "AssignmentNode"
-          courseNode_assignmentNode(res2, child)
+          coursenode_assignmentnode(res2, child)
         end
         res << res2
       end

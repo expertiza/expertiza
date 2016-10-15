@@ -229,19 +229,30 @@ class TreeDisplayController < ApplicationController
     false
   end
 
-  def update_is_available_2(res2, instructor_id, child)
-    # current user is the instructor (role can be admin/instructor/ta) of this course.
-    available_condition1 = is_available(session[:user], instructor_id)
-
+  def is_available_condition2(instructor_id, child)
     # instructor created the course, current user is the ta of this course.
-    available_condition2 = session[:user].role_id == 6 and
+    session[:user].role_id == 6 and
         Ta.get_my_instructors(session[:user].id).include?(instructor_id) and ta_for_current_course?(child)
+  end
 
+  def is_available_condition3(instructor_id)
     # ta created the course, current user is the instructor of this ta.
     instructor_ids = []
     TaMapping.where(ta_id: instructor_id).each {|mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }
-    available_condition3 = session[:user].role_id == 2 and instructor_ids.include? session[:user].id
-    res2["is_available"] = available_condition1 || available_condition2 || available_condition3
+    session[:user].role_id == 2 and instructor_ids.include? session[:user].id
+  end
+
+  def update_is_available_2(res2, instructor_id, child)
+    # current user is the instructor (role can be admin/instructor/ta) of this course. is_available_condition1
+    res2["is_available"] = is_available(session[:user], instructor_id) || is_available_condition2(instructor_id, child) || is_available_condition3(instructor_id)
+  end
+
+  def courseNode_assignmentNode(res2, child)
+    res2["directory"] = child.get_directory
+    instructor_id = child.get_instructor_id
+    update_instructor(res2, instructor_id)
+    update_is_available_2(res2, instructor_id, child)
+    assignments_func(child, res2) if node_type == "AssignmentNode"
   end
 
   def res_node_for_child_2(tmp_res)
@@ -260,11 +271,7 @@ class TreeDisplayController < ApplicationController
             "updated_date" => child.get_modified_date
         }
         if node_type == 'CourseNode' || node_type == "AssignmentNode"
-          res2["directory"] = child.get_directory
-          instructor_id = child.get_instructor_id
-          update_instructor(res2, instructor_id)
-          update_is_available_2(res2, instructor_id, child)
-          assignments_func(child, res2) if node_type == "AssignmentNode"
+          courseNode_assignmentNode(res2, child)
         end
         res << res2
       end

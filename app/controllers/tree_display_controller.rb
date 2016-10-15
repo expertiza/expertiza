@@ -140,30 +140,34 @@ class TreeDisplayController < ApplicationController
     # end
   end
 
-  def update_is_available(tmp_object, instructor_id)
+  def update_is_available(tmp_object, instructor_id, node)
     tmp_object["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role.ta? &&
         Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
   end
 
-  def update_instructor_is_available(tmp_object, node, instructor_id)
+  def update_instructor_is_available(tmp_object, instructor_id)
     tmp_object["instructor_id"] = instructor_id
     tmp_object["instructor"] = nil
     tmp_object["instructor"] = User.find(instructor_id).name if instructor_id
   end
 
-  def courses_assignments_obj(tmp_object, node)
+  def update_tmp_obj(tmp_object, node)
     tmp_object.merge!(
-      "directory" => node.get_directory,
-      "creation_date" => node.get_creation_date,
-      "updated_date" => node.get_modified_date,
-      "private" => node.get_instructor_id == session[:user].id ? true : false
+        "directory" => node.get_directory,
+        "creation_date" => node.get_creation_date,
+        "updated_date" => node.get_modified_date,
+        "private" => node.get_instructor_id == session[:user].id ? true : false
     )
+  end
+
+  def courses_assignments_obj(tmp_object, node)
+    update_tmp_obj(tmp_object, node)
     # tmpObject["private"] = node.get_private
     instructor_id = node.get_instructor_id
     ## if current user's role is TA for a course, then that course will be listed under his course listing.
     update_in_ta_course_listing(instructor_id, node, tmp_object)
-    update_instructor_is_available(tmp_object, node, instructor_id)
-    update_is_available(tmp_object, instructor_id)
+    update_instructor_is_available(tmp_object, instructor_id)
+    update_is_available(tmp_object, instructor_id, node)
     assignments_func(node_type, node, tmp_object)
   end
 

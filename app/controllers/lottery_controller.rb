@@ -109,11 +109,11 @@ class LotteryController < ApplicationController
   end
 
   # This method is called to automerge smaller teams to teams which were assigned topics through intelligent assignment
-  def auto_merge_teams(unassignedTeams, _finalTeamTopics)
+  def auto_merge_teams(unassigned_teams, _finalTeamTopics)
     assignment = Assignment.find(params[:id])
     # Sort unassigned
-    unassignedTeams = Team.where(id: unassignedTeams).sort_by {|t| !t.users.size }
-    unassignedTeams.each do |team|
+    unassigned_teams = Team.where(id: unassigned_teams).sort_by {|t| !t.users.size }
+    unassigned_teams.each do |team|
       sortedBids = Bid.where(user_id: team.id).sort_by(&:priority) # Get priority for each unassignmed team
       sortedBids.each do |b|
         # SignedUpTeam.where(:topic=>b.topic_id).first.team_id

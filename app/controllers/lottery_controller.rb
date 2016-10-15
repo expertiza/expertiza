@@ -47,14 +47,14 @@ class LotteryController < ApplicationController
 
   def create_new_teams_for_bidding_response(teams, assignment)
     teams.each_with_index do |user_ids, index|
-      new_team = AssignmentTeam.create(name: assignment.name + '_Team' + rand(1000).to_s, 
+      new_team = AssignmentTeam.create(name: assignment.name + '_Team' + rand(1000).to_s,
                                        parent_id: assignment.id, 
                                        type: 'AssignmentTeam')
       parent = TeamNode.create(parent_id: assignment.id, node_object_id: new_team.id)
       user_ids.each do |user_id|
         team_user = TeamsUser.where(user_id: user_id, team_id: new_team.id).first rescue nil
         team_user = TeamsUser.create(user_id: user_id, team_id: new_team.id) if team_user.nil?
-        TeamUserNode.create(parent_id: parent.id, node_object_id: team_user.id) 
+        TeamUserNode.create(parent_id: parent.id, node_object_id: team_user.id)
       end
     end
   end
@@ -68,7 +68,7 @@ class LotteryController < ApplicationController
       return
     end
     # Getting signuptopics with max_choosers > 0
-    sign_up_topics = SignUpTopic.where("assignment_id = ? and max_choosers > 0", params[:id]) 
+    sign_up_topics = SignUpTopic.where("assignment_id = ? and max_choosers > 0", params[:id])
     unassignedTeams = AssignmentTeam.where(parent_id: params[:id]).reject { |t| !SignedUpTeam.where(team_id: t.id).empty? }
     unassignedTeams.sort! { |t1, t2| TeamsUser.where(team_id: t2.id).size <=> TeamsUser.where(team_id: t1.id).size }
     team_bids = []
@@ -83,8 +83,8 @@ class LotteryController < ApplicationController
           end
         end
         # takes the most frequent priority as the team priority
-        freq = student_bids.inject(Hash.new(0)) {|h,v| h[v] += 1; h}
-        topic_bids << { topic_id: topic.id, priority: student_bids.max_by {|v| freq[v]} } unless freq.empty?
+        freq = student_bids.inject(Hash.new(0)) {|h, v| h[v] += 1; h }
+        topic_bids << {topic_id: topic.id, priority: student_bids.max_by {|v| freq[v]}} unless freq.empty?
       end
       topic_bids.sort! {|b| b[:priority] }
       team_bids << { team_id: team.id, bids: topic_bids }

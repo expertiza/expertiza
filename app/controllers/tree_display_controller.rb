@@ -212,10 +212,10 @@ class TreeDisplayController < ApplicationController
       fnode = Object.const_get(params[:reactParams][:nodeType]).new
       init_fnode_update_children(fnode, node, tmp_res)
 
-      res = res_node_for_child(tmp_res)
+      # res = res_node_for_child(tmp_res)
       # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
     end
-
+    res = res_node_for_child(tmp_res)
     respond_to do |format|
       format.html { render json: res }
     end

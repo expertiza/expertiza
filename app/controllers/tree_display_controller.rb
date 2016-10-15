@@ -319,6 +319,10 @@ class TreeDisplayController < ApplicationController
     end
   end
 
+
+
+
+  
   def bridge_to_is_available
     user = session[:user]
     owner_id = params[:owner_id]

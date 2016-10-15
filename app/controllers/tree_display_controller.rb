@@ -197,7 +197,8 @@ class TreeDisplayController < ApplicationController
     tmp_res[fnode.get_name] = ch_nodes
   end
 
-  def init_fnode_update_children(fnode, node, tmp_res)
+  def init_fnode_update_children(params, node, tmp_res)
+    fnode = Object.public_send(params[:reactParams][:nodeType]).new
     node.each do |a|
       fnode[a[0]] = a[1]
     end
@@ -209,8 +210,7 @@ class TreeDisplayController < ApplicationController
     child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
     tmp_res = {}
     child_nodes.each do |node|
-      fnode = Object.public_send(params[:reactParams][:nodeType]).new
-      init_fnode_update_children(fnode, node, tmp_res)
+      init_fnode_update_children(params, node, tmp_res)
 
       # res = res_node_for_child(tmp_res)
       # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)

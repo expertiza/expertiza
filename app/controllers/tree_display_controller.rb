@@ -195,6 +195,11 @@ class TreeDisplayController < ApplicationController
     tmp_res[fnode.get_name] = ch_nodes
   end
 
+  def init_fnode(fnode, node)
+    node.each do |a|
+      fnode[a[0]] = a[1]
+    end
+  end
   # for folder nodes
   def children_node_ng
     child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
@@ -202,9 +207,7 @@ class TreeDisplayController < ApplicationController
     child_nodes.each do |node|
       fnode = eval(params[:reactParams][:nodeType]).new
 
-      node.each do |a|
-        fnode[a[0]] = a[1]
-      end
+      init_fnode(fnode, node)
 
       # fnode is the parent node
       # ch_nodes are childrens
@@ -285,14 +288,18 @@ class TreeDisplayController < ApplicationController
     res2
   end
 
+  def init_fnode_2(fnode, child_nodes)
+    child_nodes.each do |key, value|
+      fnode[key] = value
+    end
+  end
+
   # for child nodes
   def children_node_2_ng
     child_nodes = child_nodes_from_params(params[:reactParams2][:child_nodes])
 
     fnode = eval(params[:reactParams2][:nodeType]).new
-    child_nodes.each do |key, value|
-      fnode[key] = value
-    end
+    init_fnode_2(fnode, child_nodes)
 
     ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
     tmp_res = ch_nodes

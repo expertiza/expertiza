@@ -153,10 +153,10 @@ class TreeDisplayController < ApplicationController
 
   def update_tmp_obj(tmp_object, node)
     tmp_object.merge!(
-        "directory" => node.get_directory,
-        "creation_date" => node.get_creation_date,
-        "updated_date" => node.get_modified_date,
-        "private" => node.get_instructor_id == session[:user].id ? true : false
+      "directory" => node.get_directory,
+      "creation_date" => node.get_creation_date,
+      "updated_date" => node.get_modified_date,
+      "private" => node.get_instructor_id == session[:user].id ? true : false
     )
   end
 

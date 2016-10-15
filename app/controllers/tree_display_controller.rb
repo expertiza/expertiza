@@ -302,7 +302,8 @@ class TreeDisplayController < ApplicationController
     end
   end
 
-  def get_tmp_res(fnode, child_nodes)
+  def get_tmp_res(params, child_nodes)
+    fnode = Object.public_send(params[:reactParams2][:nodeType]).new
     init_fnode_2(fnode, child_nodes)
     ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
     tmp_res = ch_nodes
@@ -312,8 +313,7 @@ class TreeDisplayController < ApplicationController
   # for child nodes
   def children_node_2_ng
     child_nodes = child_nodes_from_params(params[:reactParams2][:child_nodes])
-    fnode = Object.public_send(params[:reactParams2][:nodeType]).new
-    res = get_tmp_res(fnode, child_nodes)
+    res = get_tmp_res(params, child_nodes)
     respond_to do |format|
       format.html { render json: res }
     end

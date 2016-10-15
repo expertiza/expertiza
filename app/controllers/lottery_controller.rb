@@ -46,7 +46,7 @@ class LotteryController < ApplicationController
   end
 
   def create_new_teams_for_bidding_response(teams, assignment)
-    teams.each_with_index do |user_ids, index|
+    teams.each_with_index do |user_ids|
       new_team = AssignmentTeam.create(name: assignment.name + '_Team' + rand(1000).to_s,
                                        parent_id: assignment.id,
                                        type: 'AssignmentTeam')

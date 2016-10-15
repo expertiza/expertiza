@@ -82,9 +82,9 @@ class LotteryController < ApplicationController
             student_bids << student_bid.priority
           end
         end
-        #takes the most frequent priority as the team priority
-        freq = student_bids.inject(Hash.new(0)) { |h,v| h[v] += 1; h}
-        topic_bids << {topic_id: topic.id, priority: student_bids.max_by { |v| freq[v] }} unless freq.empty?
+        # takes the most frequent priority as the team priority
+        freq = student_bids.inject(Hash.new(0)) {|h,v| h[v] += 1; h}
+        topic_bids << {topic_id: topic.id, priority: student_bids.max_by {|v| freq[v] }} unless freq.empty?
       end
       topic_bids.sort! {|b| b[:priority]}
       team_bids << {team_id: team.id, bids: topic_bids}
@@ -100,9 +100,9 @@ class LotteryController < ApplicationController
       end
     end
 
-    #auto_merge_teams unassignedTeams, finalTeamTopics
+    # auto_merge_teams unassignedTeams, finalTeamTopics
 
-    #Remove is_intelligent property from assignment so that it can revert to the default signup state
+    # Remove is_intelligent property from assignment so that it can revert to the default signup state
     assignment = Assignment.find(params[:id])
     assignment.update_attribute(:is_intelligent, false)
     flash[:notice] = 'The intelligent assignment was successfully completed for ' + assignment.name + '.'

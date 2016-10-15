@@ -122,45 +122,67 @@ class TreeDisplayController < ApplicationController
     end
   end
 
+  def assignments_func(node, tmp_object)
+    tmp_object.merge!(
+      "course_id" => node.get_course_id,
+      "max_team_size" => node.get_max_team_size,
+      "is_intelligent" => node.get_is_intelligent,
+      "require_quiz" => node.get_require_quiz,
+      "allow_suggestions" => node.get_allow_suggestions,
+      "has_topic" => SignUpTopic.where(['assignment_id = ?', node.node_object_id]).first ? true : false
+    )
+  end
+
+  def update_in_ta_course_listing(instructor_id, node, tmp_object)
+    tmp_object["private"] = true if session[:user].role.ta? == 'Teaching Assistant' &&
+        Ta.get_my_instructors(session[:user].id).include?(instructor_id) &&
+        ta_for_current_course?(node)
+    # end
+  end
+
+  def update_is_available(tmp_object, instructor_id, node)
+    tmp_object["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role.ta? &&
+        Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
+  end
+
+  def update_instructor(tmp_object, instructor_id)
+    tmp_object["instructor_id"] = instructor_id
+    tmp_object["instructor"] = nil
+    tmp_object["instructor"] = User.find(instructor_id).name if instructor_id
+  end
+
+  def update_tmp_obj(tmp_object, node)
+    tmp_object.merge!(
+      "directory" => node.get_directory,
+      "creation_date" => node.get_creation_date,
+      "updated_date" => node.get_modified_date,
+      "private" => node.get_instructor_id == session[:user].id ? true : false
+    )
+  end
+
+  def courses_assignments_obj(tmp_object, node)
+    update_tmp_obj(tmp_object, node)
+    # tmpObject["private"] = node.get_private
+    instructor_id = node.get_instructor_id
+    ## if current user's role is TA for a course, then that course will be listed under his course listing.
+    update_in_ta_course_listing(instructor_id, node, tmp_object)
+    update_instructor(tmp_object, instructor_id)
+    update_is_available(tmp_object, instructor_id, node)
+    assignments_func(node, tmp_object) if node_type == "Assignments"
+  end
 
   def res_node_for_child(tmp_res)
     res = {}
-
     tmp_res.keys.each do |node_type|
       res[node_type] = []
-
       tmp_res[node_type].each do |node|
-        tmp_object = {}
-        tmp_object["nodeinfo"] = node
-        tmp_object["name"] = node.get_name
-        tmp_object["type"] = node.type
-
+        tmp_object = {
+          "nodeinfo" => node,
+          "name" => node.get_name,
+          "type" => node.type
+        }
         if node_type == 'Courses' || node_type == "Assignments"
-          tmp_object["directory"] = node.get_directory
-          tmp_object["creation_date"] = node.get_creation_date
-          tmp_object["updated_date"] = node.get_modified_date
-          # tmpObject["private"] = node.get_private
-          tmp_object["private"] = node.get_instructor_id == session[:user].id ? true : false
-          instructor_id = node.get_instructor_id
-          ## if current user's role is TA for a course, then that course will be listed under his course listing.
-          if session[:user].role.ta? == 'Teaching Assistant' && Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node)
-            tmp_object["private"] = true
-          end
-
-          tmp_object["instructor_id"] = instructor_id
-          tmp_object["instructor"] = if instructor_id
-                                       User.find(instructor_id).name
-                                     end
-          tmp_object["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role.ta? &&
-              Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
-          if node_type == "Assignments"
-            tmp_object["course_id"] = node.get_course_id
-            tmp_object["max_team_size"] = node.get_max_team_size
-            tmp_object["is_intelligent"] = node.get_is_intelligent
-            tmp_object["require_quiz"] = node.get_require_quiz
-            tmp_object["allow_suggestions"] = node.get_allow_suggestions
-            tmp_object["has_topic"] = SignUpTopic.where(['assignment_id = ?', node.node_object_id]).first ? true : false
-          end
+          courses_assignments_obj(tmp_object, node)
         end
         res[node_type] << tmp_object
       end
@@ -187,7 +209,6 @@ class TreeDisplayController < ApplicationController
       # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
     end
 
-
     respond_to do |format|
       format.html { render json: res }
     end
@@ -208,51 +229,51 @@ class TreeDisplayController < ApplicationController
     false
   end
 
+  def available_condition2(instructor_id, child)
+    # instructor created the course, current user is the ta of this course.
+    session[:user].role_id == 6 and
+        Ta.get_my_instructors(session[:user].id).include?(instructor_id) and ta_for_current_course?(child)
+  end
+
+  def available_condition3(instructor_id)
+    # ta created the course, current user is the instructor of this ta.
+    instructor_ids = []
+    TaMapping.where(ta_id: instructor_id).each {|mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }
+    session[:user].role_id == 2 and instructor_ids.include? session[:user].id
+  end
+
+  def update_is_available_2(res2, instructor_id, child)
+    # current user is the instructor (role can be admin/instructor/ta) of this course. is_available_condition1
+    res2["is_available"] = is_available(session[:user], instructor_id) ||
+        available_condition2(instructor_id, child) ||
+        available_condition3(instructor_id)
+  end
+
+  def coursenode_assignmentnode(res2, child)
+    res2["directory"] = child.get_directory
+    instructor_id = child.get_instructor_id
+    update_instructor(res2, instructor_id)
+    update_is_available_2(res2, instructor_id, child)
+    assignments_func(child, res2) if node_type == "AssignmentNode"
+  end
+
   def res_node_for_child_2(tmp_res)
     res = []
 
     if tmp_res
       tmp_res.each do |child|
         node_type = child.type
-        res2 = {}
-        res2["nodeinfo"] = child
-        res2["name"] = child.get_name
-        res2["key"] = params[:reactParams2][:key]
-        res2["type"] = node_type
-
-        res2["private"] = child.get_private
-        res2["creation_date"] = child.get_creation_date
-        res2["updated_date"] = child.get_modified_date
+        res2 = {
+          "nodeinfo" => child,
+          "name" => child.get_name,
+          "key" => params[:reactParams2][:key],
+          "type" => node_type,
+          "private" => child.get_private,
+          "creation_date" => child.get_creation_date,
+          "updated_date" => child.get_modified_date
+        }
         if node_type == 'CourseNode' || node_type == "AssignmentNode"
-          res2["directory"] = child.get_directory
-          instructor_id = child.get_instructor_id
-          res2["instructor_id"] = instructor_id
-          res2["instructor"] = if instructor_id
-                                 User.find(instructor_id).name
-                               end
-
-          # current user is the instructor (role can be admin/instructor/ta) of this course.
-          available_condition_1 = is_available(session[:user], instructor_id)
-
-          # instructor created the course, current user is the ta of this course.
-          available_condition_2 = session[:user].role_id == 6 and
-              Ta.get_my_instructors(session[:user].id).include?(instructor_id) and ta_for_current_course?(child)
-
-          # ta created the course, current user is the instructor of this ta.
-          instructor_ids = []
-          TaMapping.where(ta_id: instructor_id).each { |mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }
-          available_condition_3 = session[:user].role_id == 2 and instructor_ids.include? session[:user].id
-
-          res2["is_available"] = available_condition_1 || available_condition_2 || available_condition_3
-
-          if node_type == "AssignmentNode"
-            res2["course_id"] = child.get_course_id
-            res2["max_team_size"] = child.get_max_team_size
-            res2["is_intelligent"] = child.get_is_intelligent
-            res2["require_quiz"] = child.get_require_quiz
-            res2["allow_suggestions"] = child.get_allow_suggestions
-            res2["has_topic"] = SignUpTopic.where(['assignment_id = ?', child.node_object_id]).first ? true : false
-          end
+          coursenode_assignmentnode(res2, child)
         end
         res << res2
       end
@@ -308,7 +329,7 @@ class TreeDisplayController < ApplicationController
     if assignment
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment.id)
       if assignment_questionnaires
-        assignment_questionnaires.each { |q| qid << "#{q.questionnaire_id}+" }
+        assignment_questionnaires.each {|q| qid << "#{q.questionnaire_id}+" }
         session[:root] = 1
       end
     end

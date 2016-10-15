@@ -69,8 +69,8 @@ class LotteryController < ApplicationController
     end
     # Getting signuptopics with max_choosers > 0
     sign_up_topics = SignUpTopic.where("assignment_id = ? and max_choosers > 0", params[:id]) 
-    unassignedTeams = AssignmentTeam.where(parent_id: params[:id]).reject {|t| !SignedUpTeam.where(team_id: t.id).empty?}
-    unassignedTeams.sort! {|t1, t2| TeamsUser.where(team_id: t2.id).size <=> TeamsUser.where(team_id: t1.id).size}
+    unassignedTeams = AssignmentTeam.where(parent_id: params[:id]).reject { |t| !SignedUpTeam.where(team_id: t.id).empty? }
+    unassignedTeams.sort! { |t1, t2| TeamsUser.where(team_id: t2.id).size <=> TeamsUser.where(team_id: t1.id).size }
     team_bids = []
     unassignedTeams.each do |team|
       topic_bids = []
@@ -84,10 +84,10 @@ class LotteryController < ApplicationController
         end
         # takes the most frequent priority as the team priority
         freq = student_bids.inject(Hash.new(0)) {|h,v| h[v] += 1; h}
-        topic_bids << {topic_id: topic.id, priority: student_bids.max_by {|v| freq[v] }} unless freq.empty?
+        topic_bids << { topic_id: topic.id, priority: student_bids.max_by {|v| freq[v]} } unless freq.empty?
       end
-      topic_bids.sort! {|b| b[:priority]}
-      team_bids << {team_id: team.id, bids: topic_bids}
+      topic_bids.sort! {|b| b[:priority] }
+      team_bids << { team_id: team.id, bids: topic_bids }
     end
 
     team_bids.each do |tb|

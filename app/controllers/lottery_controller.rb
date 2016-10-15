@@ -62,11 +62,11 @@ class LotteryController < ApplicationController
   # This method is called for assignments which have their is_intelligent property set to 1. It runs a stable match algorithm and assigns topics
   # to strongest contenders (team strength, priority of bids)
   def run_intelligent_bid
-     unless Assignment.find_by_id(params[:id]).is_intelligent # if the assignment is intelligent then redirect to the tree display list
+    unless Assignment.find_by_id(params[:id]).is_intelligent # if the assignment is intelligent then redirect to the tree display list
        flash[:error] = "This action not allowed. The assignment " + Assignment.find_by_id(params[:id]).name + " does not enabled intelligent assignments."
        redirect_to controller: 'tree_display', action: 'list'
        return
-     end
+    end
     # Getting signuptopics with max_choosers > 0
     sign_up_topics = SignUpTopic.where("assignment_id = ? and max_choosers > 0", params[:id])
     unassignedTeams = AssignmentTeam.where(parent_id: params[:id]).reject {|t| !SignedUpTeam.where(team_id: t.id).empty? }

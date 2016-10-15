@@ -1,5 +1,4 @@
 class LotteryController < ApplicationController
-
   require 'json'
   require 'rest_client'
 

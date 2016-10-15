@@ -154,10 +154,10 @@ class TreeDisplayController < ApplicationController
 
         if node_type == 'Courses' || node_type == "Assignments"
           tmp_object.merge!(
-                "directory" => node.get_directory,
-              "creation_date" => node.get_creation_date,
-              "updated_date" => node.get_modified_date,
-              "private" => node.get_instructor_id == session[:user].id ? true : false
+            "directory" => node.get_directory,
+            "creation_date" => node.get_creation_date,
+            "updated_date" => node.get_modified_date,
+            "private" => node.get_instructor_id == session[:user].id ? true : false
           )
           # tmpObject["private"] = node.get_private     NOTE: already present
           instructor_id = node.get_instructor_id

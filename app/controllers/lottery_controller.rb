@@ -69,10 +69,10 @@ class LotteryController < ApplicationController
     end
     # Getting signuptopics with max_choosers > 0
     sign_up_topics = SignUpTopic.where("assignment_id = ? and max_choosers > 0", params[:id])
-    unassignedTeams = AssignmentTeam.where(parent_id: params[:id]).reject {|t| !SignedUpTeam.where(team_id: t.id).empty? }
-    unassignedTeams.sort! {|t1, t2| TeamsUser.where(team_id: t2.id).size <=> TeamsUser.where(team_id: t1.id).size }
+    unassigned_teams = AssignmentTeam.where(parent_id: params[:id]).reject {|t| !SignedUpTeam.where(team_id: t.id).empty? }
+    unassigned_teams.sort! {|t1, t2| TeamsUser.where(team_id: t2.id).size <=> TeamsUser.where(team_id: t1.id).size }
     team_bids = []
-    unassignedTeams.each do |team|
+    unassigned_teams.each do |team|
       topic_bids = []
       sign_up_topics.each do |topic|
         student_bids = []

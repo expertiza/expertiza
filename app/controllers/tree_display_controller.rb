@@ -318,10 +318,6 @@ class TreeDisplayController < ApplicationController
       format.html { render json: res }
     end
   end
-
-
-
-
   
   def bridge_to_is_available
     user = session[:user]

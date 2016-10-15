@@ -15,7 +15,7 @@ class LotteryController < ApplicationController
     topic_ids = SignUpTopic.where(assignment_id: params[:id]).map(&:id)
     user_ids = Participant.where(parent_id: params[:id]).map(&:user_id)
     user_ids.each do |user_id|
-      #grab student id and list of bids
+      # grab student id and list of bids
       bids = []
       topic_ids.each do |topic_id|
         bid_record = Bid.where(user_id: user_id, topic_id: topic_id).first rescue nil

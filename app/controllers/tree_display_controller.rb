@@ -122,7 +122,7 @@ class TreeDisplayController < ApplicationController
     end
   end
 
-  def assignments_func(node_type, node, tmp_object)
+  def assignments_func(node, tmp_object)
     tmp_object.merge!(
       "course_id" => node.get_course_id,
       "max_team_size" => node.get_max_team_size,
@@ -168,9 +168,7 @@ class TreeDisplayController < ApplicationController
     update_in_ta_course_listing(instructor_id, node, tmp_object)
     update_instructor(tmp_object, instructor_id)
     update_is_available(tmp_object, instructor_id, node)
-    if node_type == "Assignments"
-      assignments_func(node_type, node, tmp_object)
-    end
+    assignments_func(node, tmp_object) if node_type == "Assignments"
   end
 
   def res_node_for_child(tmp_res)
@@ -252,23 +250,21 @@ class TreeDisplayController < ApplicationController
     if tmp_res
       tmp_res.each do |child|
         node_type = child.type
-        res2 = {}
-        res2["nodeinfo"] = child
-        res2["name"] = child.get_name
-        res2["key"] = params[:reactParams2][:key]
-        res2["type"] = node_type
-
-        res2["private"] = child.get_private
-        res2["creation_date"] = child.get_creation_date
-        res2["updated_date"] = child.get_modified_date
+        res2 = {
+            "nodeinfo" => child,
+            "name" => child.get_name,
+            "key" => params[:reactParams2][:key],
+            "type" => node_type,
+            "private" => child.get_private,
+            "creation_date" => child.get_creation_date,
+            "updated_date" => child.get_modified_date
+        }
         if node_type == 'CourseNode' || node_type == "AssignmentNode"
           res2["directory"] = child.get_directory
           instructor_id = child.get_instructor_id
           update_instructor(res2, instructor_id)
           update_is_available_2(res2, instructor_id, child)
-          if node_type == "AssignmentNode"
-            assignments_func(node_type, child, res2)
-          end
+          assignments_func(child, res2) if node_type == "AssignmentNode"
         end
         res << res2
       end

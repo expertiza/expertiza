@@ -29,7 +29,7 @@ class LotteryController < ApplicationController
         priority_info << {pid: user_id, ranks: bids}
       end
     end
-    assignment = Assignment.find_by_id(params[:id])
+    assignment = Assignment.find_by(id: params[:id])
     data = {users: priority_info, max_team_size: assignment.max_team_size}
     url = WEBSERVICE_CONFIG["topic_bidding_webservice_url"]
     begin

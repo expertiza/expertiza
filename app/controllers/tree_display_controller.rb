@@ -209,7 +209,7 @@ class TreeDisplayController < ApplicationController
     child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
     tmp_res = {}
     child_nodes.each do |node|
-      fnode = Object.const_get(params[:reactParams][:nodeType]).new
+      fnode = Object.public_send(params[:reactParams][:nodeType]).new
       init_fnode_update_children(fnode, node, tmp_res)
 
       # res = res_node_for_child(tmp_res)
@@ -302,16 +302,18 @@ class TreeDisplayController < ApplicationController
     end
   end
 
+  def get_tmp_res(fnode, child_nodes)
+    init_fnode_2(fnode, child_nodes)
+    ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
+    tmp_res = ch_nodes
+    res_node_for_child_2(tmp_res)
+  end
+
   # for child nodes
   def children_node_2_ng
     child_nodes = child_nodes_from_params(params[:reactParams2][:child_nodes])
-
-    fnode = Object.const_get(params[:reactParams2][:nodeType]).new
-    init_fnode_2(fnode, child_nodes)
-
-    ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
-    tmp_res = ch_nodes
-    res = res_node_for_child_2(tmp_res)
+    fnode = Object.public_send(params[:reactParams2][:nodeType]).new
+    res = get_tmp_res(fnode, child_nodes)
     respond_to do |format|
       format.html { render json: res }
     end

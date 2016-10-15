@@ -6,8 +6,8 @@ class TreeDisplayController < ApplicationController
   end
 
   def goto_controller(name_parameter)
-    node_object = TreeFolder.find_by_name(name_parameter)
-    session[:root] = FolderNode.find_by_node_object_id(node_object.id).id
+    node_object = TreeFolder.find_by(name: name_parameter)
+    session[:root] = FolderNode.find_by(node_object_id: node_object.id).id
     redirect_to controller: 'tree_display', action: 'list'
   end
 
@@ -190,6 +190,11 @@ class TreeDisplayController < ApplicationController
     res
   end
 
+  def update_fnode_get_name(fnode, tmp_res)
+    ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
+    tmp_res[fnode.get_name] = ch_nodes
+  end
+
   # for folder nodes
   def children_node_ng
     child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
@@ -203,8 +208,7 @@ class TreeDisplayController < ApplicationController
 
       # fnode is the parent node
       # ch_nodes are childrens
-      ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
-      tmp_res[fnode.get_name] = ch_nodes
+      update_fnode_get_name(fnode, tmp_res)
       res = res_node_for_child(tmp_res)
       # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
     end
@@ -325,7 +329,7 @@ class TreeDisplayController < ApplicationController
   end
 
   def filter_qan(search, qid)
-    assignment = Assignment.find_by_name(search)
+    assignment = Assignment.find_by(name: search)
     if assignment
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment.id)
       if assignment_questionnaires

@@ -83,7 +83,10 @@ class LotteryController < ApplicationController
           end
         end
         # takes the most frequent priority as the team priority
-        freq = student_bids.inject(Hash.new(0)) {|h, v| h[v] += 1; h }
+        freq = student_bids.inject(Hash.new(0)) {|h, v|
+          h[v] += 1
+          h 
+         }
         topic_bids << {topic_id: topic.id, priority: student_bids.max_by {|v| freq[v] }} unless freq.empty?
       end
       topic_bids.sort! {|b| b[:priority] }

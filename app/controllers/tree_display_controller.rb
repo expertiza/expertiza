@@ -140,18 +140,27 @@ class TreeDisplayController < ApplicationController
     # end
   end
 
+
+  def temp(tmp_object, node, instructor_id)
+    tmp_object["instructor_id"] = instructor_id
+    tmp_object["instructor"] = if instructor_id
+                                 User.find(instructor_id).name
+                               end
+    tmp_object["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role.ta? &&
+        Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
+  end
+
+
   def res_node_for_child(tmp_res)
     res = {}
     tmp_res.keys.each do |node_type|
       res[node_type] = []
-
       tmp_res[node_type].each do |node|
         tmp_object = {
           "nodeinfo" => node,
           "name" => node.get_name,
           "type" => node.type
         }
-
         if node_type == 'Courses' || node_type == "Assignments"
           tmp_object.merge!(
             "directory" => node.get_directory,
@@ -159,18 +168,11 @@ class TreeDisplayController < ApplicationController
             "updated_date" => node.get_modified_date,
             "private" => node.get_instructor_id == session[:user].id ? true : false
           )
-          # tmpObject["private"] = node.get_private     NOTE: already present
+          # tmpObject["private"] = node.get_private
           instructor_id = node.get_instructor_id
           ## if current user's role is TA for a course, then that course will be listed under his course listing.
           update_in_ta_course_listing(instructor_id, node, tmp_object)
-
-          tmp_object["instructor_id"] = instructor_id
-          tmp_object["instructor"] = if instructor_id
-                                       User.find(instructor_id).name
-                                     end
-          tmp_object["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role.ta? &&
-              Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
-
+          temp(tmp_object, node, instructor_id)
           assignments_func(node_type, node, tmp_object)
         end
         res[node_type] << tmp_object

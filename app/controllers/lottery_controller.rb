@@ -109,17 +109,17 @@ class LotteryController < ApplicationController
   end
 
   # This method is called to automerge smaller teams to teams which were assigned topics through intelligent assignment
-  def auto_merge_teams(unassigned_teams, _finalTeamTopics)
+  def auto_merge_teams(unassigned_teams, _final_team_topics)
     assignment = Assignment.find(params[:id])
     # Sort unassigned
     unassigned_teams = Team.where(id: unassigned_teams).sort_by {|t| !t.users.size }
     unassigned_teams.each do |team|
-      sortedBids = Bid.where(user_id: team.id).sort_by(&:priority) # Get priority for each unassignmed team
-      sortedBids.each do |b|
+      sorted_bids = Bid.where(user_id: team.id).sort_by(&:priority) # Get priority for each unassignmed team
+      sorted_bids.each do |b|
         # SignedUpTeam.where(:topic=>b.topic_id).first.team_id
-        winningTeam = SignedUpTeam.where(topic: b.topic_id).first.team_id
-        next unless TeamsUser.where(team_id: winningTeam).size + team.users.size <= assignment.max_team_size # If the team can be merged to a bigger team
-        TeamsUser.where(team_id: team.id).update_all(team_id: winningTeam)
+        winning_team = SignedUpTeam.where(topic: b.topic_id).first.team_id
+        next unless TeamsUser.where(team_id: winning_team).size + team.users.size <= assignment.max_team_size # If the team can be merged to a bigger team
+        TeamsUser.where(team_id: team.id).update_all(team_id: winning_team)
         Bid.delete_all(user_id: team.id)
         Team.delete(team.id)
         break

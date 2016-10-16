@@ -160,7 +160,7 @@ class TreeDisplayController < ApplicationController
     )
   end
 
-  def courses_assignments_obj(tmp_object, node)
+  def courses_assignments_obj(node_type, tmp_object, node)
     update_tmp_obj(tmp_object, node)
     # tmpObject["private"] = node.get_private
     instructor_id = node.get_instructor_id
@@ -182,7 +182,7 @@ class TreeDisplayController < ApplicationController
           "type" => node.type
         }
         if node_type == 'Courses' || node_type == "Assignments"
-          courses_assignments_obj(tmp_object, node)
+          courses_assignments_obj(node_type, tmp_object, node)
         end
         res[node_type] << tmp_object
       end
@@ -318,7 +318,7 @@ class TreeDisplayController < ApplicationController
       format.html { render json: res }
     end
   end
-  
+
   def bridge_to_is_available
     user = session[:user]
     owner_id = params[:owner_id]

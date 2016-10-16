@@ -198,7 +198,7 @@ class TreeDisplayController < ApplicationController
   end
 
   def init_fnode_update_children(params, node, tmp_res)
-    fnode = Object.public_send(params[:reactParams][:nodeType]).new
+    fnode = (params[:reactParams][:nodeType]).constantize.new
     node.each do |a|
       fnode[a[0]] = a[1]
     end

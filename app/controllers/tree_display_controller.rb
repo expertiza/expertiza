@@ -303,7 +303,7 @@ class TreeDisplayController < ApplicationController
   end
 
   def get_tmp_res(params, child_nodes)
-    fnode = Object.public_send(params[:reactParams2][:nodeType]).new
+    fnode = (params[:reactParams][:nodeType]).constantize.new
     init_fnode_2(fnode, child_nodes)
     ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
     tmp_res = ch_nodes

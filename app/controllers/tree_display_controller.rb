@@ -198,7 +198,7 @@ class TreeDisplayController < ApplicationController
   end
 
   def init_fnode_update_children(params, node, tmp_res)
-    fnode = Object.public_send(params[:reactParams][:nodeType]).new
+    fnode = eval(params[:reactParams][:nodeType]).new
     node.each do |a|
       fnode[a[0]] = a[1]
     end
@@ -318,7 +318,7 @@ class TreeDisplayController < ApplicationController
       format.html { render json: res }
     end
   end
-  
+
   def bridge_to_is_available
     user = session[:user]
     owner_id = params[:owner_id]

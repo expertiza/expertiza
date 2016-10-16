@@ -160,7 +160,7 @@ class TreeDisplayController < ApplicationController
     )
   end
 
-  def courses_assignments_obj(tmp_object, node)
+  def courses_assignments_obj(node_type, tmp_object, node)
     update_tmp_obj(tmp_object, node)
     # tmpObject["private"] = node.get_private
     instructor_id = node.get_instructor_id
@@ -182,7 +182,7 @@ class TreeDisplayController < ApplicationController
           "type" => node.type
         }
         if node_type == 'Courses' || node_type == "Assignments"
-          courses_assignments_obj(tmp_object, node)
+          courses_assignments_obj(node_type, tmp_object, node)
         end
         res[node_type] << tmp_object
       end
@@ -198,7 +198,7 @@ class TreeDisplayController < ApplicationController
   end
 
   def init_fnode_update_children(params, node, tmp_res)
-    fnode = eval(params[:reactParams][:nodeType]).new
+    fnode = Object.public_send(params[:reactParams][:nodeType]).new
     node.each do |a|
       fnode[a[0]] = a[1]
     end

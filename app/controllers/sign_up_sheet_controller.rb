@@ -162,7 +162,7 @@ class SignUpSheetController < ApplicationController
   def list
     @assignment_id = params[:assignment_id].to_i
     #@sign_up_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: nil)
-    @sign_up_topics = SignUpTopic.includes(:bids).where(assignment_id: @assignment_id, private_to: nil).order('bids.priority')
+    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: nil)
     @num_of_topics = @sign_up_topics.size
     @slots_filled = SignUpTopic.find_slots_filled(params[:assignment_id])
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:assignment_id])
@@ -241,7 +241,12 @@ class SignUpSheetController < ApplicationController
       print "\n"
 
       @user_id = session[:user].id
-      Bid.where("topic_id LIKE ? AND user_id LIKE ?",topic_id, @user_id ).update_all({priority: index + 1})
+      check = Bid.where(user_id: @user_id, topic_id: topic_id)
+      if check.empty?
+        Bid.create(topic_id: topic_id, user_id: @user_id, priority: index + 1)
+      else
+        Bid.where("topic_id LIKE ? AND user_id LIKE ?",topic_id, @user_id ).update_all({priority: index + 1})
+      end
     end
 
    # @user_id = session[:user].id

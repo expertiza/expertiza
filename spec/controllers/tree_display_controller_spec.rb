@@ -59,18 +59,18 @@ describe TreeDisplayController do
       @foldernode.node_object_id = 1
       @foldernode.save
 
-      get :folder_node_ng
+      get :folder_node_ng_getter
       expect(response.body).to match [@foldernode].to_json
     end
     it "populates an empty list when there is no match" do
       @foldernode.node_object_id = 2
       @foldernode.save
 
-      get :folder_node_ng
+      get :folder_node_ng_getter
       expect(response.body).to eq "[]"
     end
   end
-  it { is_expected.to respond_to(:folder_node_ng) }
+  it { is_expected.to respond_to(:folder_node_ng_getter) }
   it { is_expected.to respond_to(:children_node_ng) }
   it { is_expected.to respond_to(:children_node_2_ng) }
 

@@ -5,6 +5,7 @@ class TreeDisplayController < ApplicationController
     true
   end
 
+#refactored method to provide direct access to parameters
   def goto_controller(name_parameter)
     node_object = TreeFolder.find_by(name: name_parameter)
     session[:root] = FolderNode.find_by(node_object_id: node_object.id).id
@@ -108,7 +109,7 @@ class TreeDisplayController < ApplicationController
     # @reactjsParams[:child_nodes] = child_nodes
   end
 
-  def folder_node_ng
+  def folder_node_ng_getter
     respond_to do |format|
       format.html { render json: FolderNode.get }
     end

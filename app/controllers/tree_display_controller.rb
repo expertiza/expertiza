@@ -194,11 +194,12 @@ class TreeDisplayController < ApplicationController
   def update_fnode_children(fnode, tmp_res)
     # fnode is the parent node
     # ch_nodes are childrens
+    # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
     ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
     tmp_res[fnode.get_name] = ch_nodes
   end
 
-  def init_fnode_update_children(params, node, tmp_res)
+  def initialize_fnode_update_children(params, node, tmp_res)
     fnode = (params[:reactParams][:nodeType]).constantize.new
     node.each do |a|
       fnode[a[0]] = a[1]
@@ -211,11 +212,9 @@ class TreeDisplayController < ApplicationController
     child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
     tmp_res = {}
     child_nodes.each do |node|
-      init_fnode_update_children(params, node, tmp_res)
-
-      # res = res_node_for_child(tmp_res)
-      # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
+      initialize_fnode_update_children(params, node, tmp_res)
     end
+    # res = res_node_for_child(tmp_res)
     res = res_node_for_child(tmp_res)
     respond_to do |format|
       format.html { render json: res }

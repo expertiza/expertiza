@@ -221,12 +221,14 @@ class TreeDisplayController < ApplicationController
     end
   end
 
+  #check if nodetype is coursenode
   def is_type_coursenode?(ta_mappings, node)
     ta_mappings.each do |ta_mapping|
       return true if ta_mapping.course_id == node.node_object_id
     end
   end
 
+  #check if nodetype is assignmentnode
   def is_type_assignmentnode?(ta_mappings, node)
     course_id = Assignment.find(node.node_object_id).course_id
     ta_mappings.each do |ta_mapping|
@@ -234,6 +236,7 @@ class TreeDisplayController < ApplicationController
     end
   end
 
+  #check if user is ta for current course
   def ta_for_current_course?(node)
     ta_mappings = TaMapping.where(ta_id: session[:user].id)
     if node.type == "CourseNode"
@@ -244,13 +247,13 @@ class TreeDisplayController < ApplicationController
     false
   end
 
-  def available_condition2?(instructor_id, child)
+  def is_current_user_ta?(instructor_id, child)
     # instructor created the course, current user is the ta of this course.
     session[:user].role_id == 6 and
         Ta.get_my_instructors(session[:user].id).include?(instructor_id) and ta_for_current_course?(child)
   end
 
-  def available_condition3?(instructor_id)
+  def is_current_user_instructor?(instructor_id)
     # ta created the course, current user is the instructor of this ta.
     instructor_ids = []
     TaMapping.where(ta_id: instructor_id).each {|mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }
@@ -260,8 +263,8 @@ class TreeDisplayController < ApplicationController
   def update_is_available_2(res2, instructor_id, child)
     # current user is the instructor (role can be admin/instructor/ta) of this course. is_available_condition1
     res2["is_available"] = is_available(session[:user], instructor_id) ||
-        available_condition2?(instructor_id, child) ||
-        available_condition3?(instructor_id)
+        is_current_user_ta?(instructor_id, child) ||
+        is_current_user_instructor?(instructor_id)
   end
 
   def coursenode_assignmentnode(res2, child)

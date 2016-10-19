@@ -5,6 +5,7 @@ class TreeDisplayController < ApplicationController
     true
   end
 
+#refactored method to provide direct access to parameters
   def goto_controller(name_parameter)
     node_object = TreeFolder.find_by(name: name_parameter)
     session[:root] = FolderNode.find_by(node_object_id: node_object.id).id
@@ -108,7 +109,7 @@ class TreeDisplayController < ApplicationController
     # @reactjsParams[:child_nodes] = child_nodes
   end
 
-  def folder_node_ng
+  def folder_node_ng_getter
     respond_to do |format|
       format.html { render json: FolderNode.get }
     end
@@ -122,7 +123,7 @@ class TreeDisplayController < ApplicationController
     end
   end
 
-  def assignments_func(node, tmp_object)
+  def assignments_method(node, tmp_object)
     tmp_object.merge!(
       "course_id" => node.get_course_id,
       "max_team_size" => node.get_max_team_size,
@@ -168,7 +169,7 @@ class TreeDisplayController < ApplicationController
     update_in_ta_course_listing(instructor_id, node, tmp_object)
     update_instructor(tmp_object, instructor_id)
     update_is_available(tmp_object, instructor_id, node)
-    assignments_func(node, tmp_object) if node_type == "Assignments"
+    assignments_method(node, tmp_object) if node_type == "Assignments"
   end
 
   def res_node_for_child(tmp_res)
@@ -193,11 +194,12 @@ class TreeDisplayController < ApplicationController
   def update_fnode_children(fnode, tmp_res)
     # fnode is the parent node
     # ch_nodes are childrens
+    # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
     ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
     tmp_res[fnode.get_name] = ch_nodes
   end
 
-  def init_fnode_update_children(params, node, tmp_res)
+  def initialize_fnode_update_children(params, node, tmp_res)
     fnode = (params[:reactParams][:nodeType]).constantize.new
     node.each do |a|
       fnode[a[0]] = a[1]
@@ -210,47 +212,48 @@ class TreeDisplayController < ApplicationController
     child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
     tmp_res = {}
     child_nodes.each do |node|
-      init_fnode_update_children(params, node, tmp_res)
-
-      # res = res_node_for_child(tmp_res)
-      # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
+      initialize_fnode_update_children(params, node, tmp_res)
     end
+    # res = res_node_for_child(tmp_res)
     res = res_node_for_child(tmp_res)
     respond_to do |format|
       format.html { render json: res }
     end
   end
 
-  def coursenode?(ta_mappings, node)
+  #check if nodetype is coursenode
+  def is_type_coursenode?(ta_mappings, node)
     ta_mappings.each do |ta_mapping|
       return true if ta_mapping.course_id == node.node_object_id
     end
   end
 
-  def assignmentnode?(ta_mappings, node)
+  #check if nodetype is assignmentnode
+  def is_type_assignmentnode?(ta_mappings, node)
     course_id = Assignment.find(node.node_object_id).course_id
     ta_mappings.each do |ta_mapping|
       return true if ta_mapping.course_id == course_id
     end
   end
 
+  #check if user is ta for current course
   def ta_for_current_course?(node)
     ta_mappings = TaMapping.where(ta_id: session[:user].id)
     if node.type == "CourseNode"
-      return true if coursenode?(ta_mappings, node)
+      return true if is_type_coursenode?(ta_mappings, node)
     elsif node.type == "AssignmentNode"
-      return true if assignmentnode?(ta_mappings, node)
+      return true if is_type_assignmentnode?(ta_mappings, node)
     end
     false
   end
 
-  def available_condition2?(instructor_id, child)
+  def is_current_user_ta?(instructor_id, child)
     # instructor created the course, current user is the ta of this course.
     session[:user].role_id == 6 and
         Ta.get_my_instructors(session[:user].id).include?(instructor_id) and ta_for_current_course?(child)
   end
 
-  def available_condition3?(instructor_id)
+  def is_current_user_instructor?(instructor_id)
     # ta created the course, current user is the instructor of this ta.
     instructor_ids = []
     TaMapping.where(ta_id: instructor_id).each {|mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }
@@ -260,8 +263,8 @@ class TreeDisplayController < ApplicationController
   def update_is_available_2(res2, instructor_id, child)
     # current user is the instructor (role can be admin/instructor/ta) of this course. is_available_condition1
     res2["is_available"] = is_available(session[:user], instructor_id) ||
-        available_condition2?(instructor_id, child) ||
-        available_condition3?(instructor_id)
+        is_current_user_ta?(instructor_id, child) ||
+        is_current_user_instructor?(instructor_id)
   end
 
   def coursenode_assignmentnode(res2, child)
@@ -269,7 +272,7 @@ class TreeDisplayController < ApplicationController
     instructor_id = child.get_instructor_id
     update_instructor(res2, instructor_id)
     update_is_available_2(res2, instructor_id, child)
-    assignments_func(child, res2) if node_type == "AssignmentNode"
+    assignments_method(child, res2) if node_type == "AssignmentNode"
   end
 
   def res_node_for_child_2(tmp_res)
@@ -296,7 +299,7 @@ class TreeDisplayController < ApplicationController
     res2
   end
 
-  def init_fnode_2(fnode, child_nodes)
+  def initialize_fnode_2(fnode, child_nodes)
     child_nodes.each do |key, value|
       fnode[key] = value
     end
@@ -304,7 +307,7 @@ class TreeDisplayController < ApplicationController
 
   def get_tmp_res(params, child_nodes)
     fnode = (params[:reactParams][:nodeType]).constantize.new
-    init_fnode_2(fnode, child_nodes)
+    initialize_fnode_2(fnode, child_nodes)
     ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
     tmp_res = ch_nodes
     res_node_for_child_2(tmp_res)
@@ -345,7 +348,7 @@ class TreeDisplayController < ApplicationController
     redirect_to controller: 'tree_display', action: 'list'
   end
 
-  def filter_qan(search, qid)
+  def filter_node_is_qan(search, qid)
     assignment = Assignment.find_by(name: search)
     if assignment
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment.id)
@@ -362,7 +365,7 @@ class TreeDisplayController < ApplicationController
     search = params[:filter_string]
     filter_node = params[:filternode]
     if filter_node == 'QAN'
-      qid = filter_qan(search, qid)
+      qid = filter_node_is_qan(search, qid)
     elsif filter_node == 'ACN'
       session[:root] = 2
       qid << search

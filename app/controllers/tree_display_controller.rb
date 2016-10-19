@@ -221,13 +221,13 @@ class TreeDisplayController < ApplicationController
     end
   end
 
-  def coursenode?(ta_mappings, node)
+  def is_type_coursenode?(ta_mappings, node)
     ta_mappings.each do |ta_mapping|
       return true if ta_mapping.course_id == node.node_object_id
     end
   end
 
-  def assignmentnode?(ta_mappings, node)
+  def is_type_assignmentnode?(ta_mappings, node)
     course_id = Assignment.find(node.node_object_id).course_id
     ta_mappings.each do |ta_mapping|
       return true if ta_mapping.course_id == course_id
@@ -237,9 +237,9 @@ class TreeDisplayController < ApplicationController
   def ta_for_current_course?(node)
     ta_mappings = TaMapping.where(ta_id: session[:user].id)
     if node.type == "CourseNode"
-      return true if coursenode?(ta_mappings, node)
+      return true if is_type_coursenode?(ta_mappings, node)
     elsif node.type == "AssignmentNode"
-      return true if assignmentnode?(ta_mappings, node)
+      return true if is_type_assignmentnode?(ta_mappings, node)
     end
     false
   end

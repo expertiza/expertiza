@@ -15,7 +15,7 @@ module OnTheFlyCalc
     # if this assignment uses vary rubric by rounds feature, load @questions for each round
     if self.varying_rubrics_by_round? # [reviewer_id][round][reviewee_id] = score
       rounds = self.rounds_of_reviews
-      for round in 1..rounds
+      rounds.each do |round|
         @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
         review_questionnaire_id = review_questionnaire_id(round)
 
@@ -77,7 +77,7 @@ module OnTheFlyCalc
     contributors = self.contributors # assignment_teams
     if self.varying_rubrics_by_round?
       rounds = self.rounds_of_reviews
-      for round in 1..rounds
+      rounds.each do |round|
         review_questionnaire_id = review_questionnaire_id(round)
         questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
         contributors.each do |contributor|
@@ -119,7 +119,7 @@ module OnTheFlyCalc
 
         total_score = 0
         total_num_of_assessments = 0 # calculate grades for each rounds
-        for i in 1..self.num_review_rounds
+        self.num_review_rounds.each do |i|
           assessments = ReviewResponseMap.get_assessments_round_for(team, i)
           round_sym = ("review" + i.to_s).to_sym
           grades_by_rounds[round_sym] = Answer.compute_scores(assessments, questions[round_sym])
@@ -132,7 +132,7 @@ module OnTheFlyCalc
         scores[:teams][index.to_s.to_sym][:scores][:max] = -999_999_999
         scores[:teams][index.to_s.to_sym][:scores][:min] = 999_999_999
         scores[:teams][index.to_s.to_sym][:scores][:avg] = 0
-        for i in 1..self.num_review_rounds
+        self.num_review_rounds.each do |i|
           round_sym = ("review" + i.to_s).to_sym
           if !grades_by_rounds[round_sym][:max].nil? && scores[:teams][index.to_s.to_sym][:scores][:max] < grades_by_rounds[round_sym][:max]
             scores[:teams][index.to_s.to_sym][:scores][:max] = grades_by_rounds[round_sym][:max]
@@ -140,7 +140,7 @@ module OnTheFlyCalc
           scores[:teams][index.to_s.to_sym][:scores][:min] = grades_by_rounds[round_sym][:min] if !grades_by_rounds[round_sym][:min].nil? && scores[:teams][index.to_s.to_sym][:scores][:min] > grades_by_rounds[round_sym][:min]
         end
 
-        if total_num_of_assessments != 0
+        if total_num_of_assessments.nonzero?
           scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score / total_num_of_assessments
         else
           scores[:teams][index.to_s.to_sym][:scores][:avg] = nil

@@ -123,7 +123,7 @@ class TreeDisplayController < ApplicationController
     end
   end
 
-  def assignments_func(node, tmp_object)
+  def assignments_method(node, tmp_object)
     tmp_object.merge!(
       "course_id" => node.get_course_id,
       "max_team_size" => node.get_max_team_size,
@@ -169,7 +169,7 @@ class TreeDisplayController < ApplicationController
     update_in_ta_course_listing(instructor_id, node, tmp_object)
     update_instructor(tmp_object, instructor_id)
     update_is_available(tmp_object, instructor_id, node)
-    assignments_func(node, tmp_object) if node_type == "Assignments"
+    assignments_method(node, tmp_object) if node_type == "Assignments"
   end
 
   def res_node_for_child(tmp_res)
@@ -272,7 +272,7 @@ class TreeDisplayController < ApplicationController
     instructor_id = child.get_instructor_id
     update_instructor(res2, instructor_id)
     update_is_available_2(res2, instructor_id, child)
-    assignments_func(child, res2) if node_type == "AssignmentNode"
+    assignments_method(child, res2) if node_type == "AssignmentNode"
   end
 
   def res_node_for_child_2(tmp_res)
@@ -299,7 +299,7 @@ class TreeDisplayController < ApplicationController
     res2
   end
 
-  def init_fnode_2(fnode, child_nodes)
+  def initialize_fnode_2(fnode, child_nodes)
     child_nodes.each do |key, value|
       fnode[key] = value
     end
@@ -307,7 +307,7 @@ class TreeDisplayController < ApplicationController
 
   def get_tmp_res(params, child_nodes)
     fnode = (params[:reactParams][:nodeType]).constantize.new
-    init_fnode_2(fnode, child_nodes)
+    initialize_fnode_2(fnode, child_nodes)
     ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
     tmp_res = ch_nodes
     res_node_for_child_2(tmp_res)
@@ -348,7 +348,7 @@ class TreeDisplayController < ApplicationController
     redirect_to controller: 'tree_display', action: 'list'
   end
 
-  def filter_qan(search, qid)
+  def filter_node_is_qan(search, qid)
     assignment = Assignment.find_by(name: search)
     if assignment
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment.id)
@@ -365,7 +365,7 @@ class TreeDisplayController < ApplicationController
     search = params[:filter_string]
     filter_node = params[:filternode]
     if filter_node == 'QAN'
-      qid = filter_qan(search, qid)
+      qid = filter_node_is_qan(search, qid)
     elsif filter_node == 'ACN'
       session[:root] = 2
       qid << search

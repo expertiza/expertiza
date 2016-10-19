@@ -476,6 +476,7 @@ DEPENDENCIES
   pry-remote
   quiet_assets
   rails (~> 4.2.6)
+  rails-deprecated_sanitizer
   rails4-autocomplete
   rake
   rb-readline
@@ -502,3 +503,6 @@ DEPENDENCIES
   uglifier
   will_paginate
   zip-zip
+
+BUNDLED WITH
+   1.13.5

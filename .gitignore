@@ -197,3 +197,6 @@ pg_data
 .ruby-version
 mysql2psql.yml
 *.pem
+
+node_modules
+vendor

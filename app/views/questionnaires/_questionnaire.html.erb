@@ -81,7 +81,9 @@
     <input type="submit" name="import" value="Import questions"/>
     <br />
     <input type="submit" name="export" value="Export questions to CSV"%>
+
   <% end %>
+    <%= link_to 'Excel', :controller => 'questionnaires', :action => 'edit', :format => 'csv' %>
 <% end %>
 
 <BR/>

@@ -92,4 +92,34 @@ class Questionnaire < ActiveRecord::Base
     results = Questionnaire.where(["id <> ? and name = ? and instructor_id = ?", id, name, instructor_id])
     errors.add(:name, "Questionnaire names must be unique.") if !results.nil? and !results.empty?
   end
+
+  def to_csvs(abc)
+  #  CSV.generate do |csv|
+   #   csv << column_names
+    #  all.each do |q|
+     #   csv << q.questions.attributes.values_at(*column_names)
+    #  end
+    # end
+        questions = abc
+        csv_data = CSV.generate do |csv|
+          row = ['seq','text','type','weight','size','max_label','min_label']
+          csv << row
+          for question in questions
+            # Each row is formatted as follows
+            # Question, question advice (from high score to low), type, weight
+            row = []
+            row << question.seq
+            row << question.txt
+            row << question.type
+            row << question.weight
+            row << question.size || ''
+            row << question.max_label
+            row << question.min_label
+
+            csv << row
+
+      end
+    end
+    end
+
 end

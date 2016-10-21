@@ -112,6 +112,13 @@ class QuestionnairesController < ApplicationController
   # Edit a questionnaire
   def edit
     @questionnaire = Questionnaire.find(params[:id])
+    questionnaire_id = params[:id] unless params[:id].nil?
+    questions = Question.where("questionnaire_id = " + questionnaire_id.to_s).sort { |a,b| a.seq <=> b.seq }
+    respond_to do |format|
+      format.html
+      format.csv { send_data @questionnaire.to_csvs(questions) }
+      format.xls
+        end
     redirect_to Questionnaire if @questionnaire.nil?
   end
 
@@ -230,15 +237,15 @@ class QuestionnairesController < ApplicationController
         end
         begin
           @question.save
-          flash[:success] = 'All questions has been successfully saved!'
+          flash[:success] = 'All questions have been successfully saved!'
         rescue
           flash[:error] = $ERROR_INFO
         end
       end
     end
 
-    export if params['export']
-    import if params['import']
+     export if params['export']
+     import if params['import']
 
     if params['view_advice']
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]

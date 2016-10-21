@@ -15,7 +15,7 @@ class SignUpSheetController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
+    when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic', 'sort'
       ['Instructor',
        'Teaching Assistant',
        'Administrator',
@@ -161,6 +161,7 @@ class SignUpSheetController < ApplicationController
 
   def list
     @assignment_id = params[:assignment_id].to_i
+    #@sign_up_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: nil)
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: nil)
     @num_of_topics = @sign_up_topics.size
     @slots_filled = SignUpTopic.find_slots_filled(params[:assignment_id])
@@ -231,27 +232,35 @@ class SignUpSheetController < ApplicationController
   end
 
   def set_priority
-    @user_id = session[:user].id
-    # users_team = SignedUpTeam.find_team_users(params[:assignment_id].to_s, @user_id)
-    # check = SignedUpTeam.find_by_sql(["SELECT su.* FROM signed_up_teams su , sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.team_id = ? AND su.preference_priority_number = ?", params[:assignment_id].to_s, users_team[0].t_id, params[:priority].to_s])
-    # if check.empty?
-    #   signUp = SignedUpTeam.where(topic_id: params[:id], team_id: users_team[0].t_id).first
-    #   # signUp.preference_priority_number = params[:priority].to_s
-    #   if params[:priority].to_s.to_f > 0
-    #     signUp.update_attribute('preference_priority_number', params[:priority].to_s)
-    #   else
-    #     flash[:error] = "That is an invalid priority."
-    #   end
-    # end
-    check = Bid.where(user_id: @user_id, topic_id: params[:id])
-    if !Bid.where(user_id: @user_id, priority: params[:priority]).empty?
-      flash[:error] = "You have already selected this priority"
-    elsif check.empty?
-      Bid.create(topic_id: params[:id], user_id: @user_id, priority: params[:priority])
-    else
-      check.first.update(priority: params[:priority])
+    print '*'*50
+    params[:topic].each_with_index do |topic_id,index |
+      print "\n topic_id : \n"
+      print topic_id
+      print "index :"
+      print index
+      print "\n"
+
+      @user_id = session[:user].id
+      check = Bid.where(user_id: @user_id, topic_id: topic_id)
+      if check.empty?
+        Bid.create(topic_id: topic_id, user_id: @user_id, priority: index + 1)
+      else
+        Bid.where("topic_id LIKE ? AND user_id LIKE ?",topic_id, @user_id ).update_all({priority: index + 1})
+      end
     end
-    redirect_to action: 'list', assignment_id: params[:assignment_id]
+
+   # @user_id = session[:user].id
+
+   # check = Bid.where(user_id: @user_id, topic_id: params[:id])
+   # if !Bid.where(user_id: @user_id, priority: params[:priority]).empty?
+   #   flash[:error] = "You have already selected this priority"
+   # elsif check.empty?
+   #   Bid.create(topic_id: params[:id], user_id: @user_id, priority: params[:priority])
+   # else
+   #   check.first.update(priority: params[:priority])
+   # end
+   # redirect_to action: 'list', assignment_id: params[:assignment_id]
+    render nothing: true
   end
 
   # If the instructor needs to explicitly change the start/due dates of the topics

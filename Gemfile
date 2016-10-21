@@ -3,8 +3,9 @@ source 'http://rubygems.org'
 gem 'rails', '~> 4.2.6'
 
 ## Gems in Alphabetical Order
-
 gem 'activerecord-session_store'
+#gem 'bootstrap-sass', '~> 2.3.1.1'
+#gem 'bootstrap-sass', '~>3.3.6'
 gem 'airbrake'
 gem 'awesome_nested_set'
 gem 'bind-it'
@@ -15,6 +16,7 @@ gem 'coveralls', require: false
 gem 'delayed_job_active_record'
 gem 'dynamic_form'
 gem 'edavis10-ruby-web-search'
+gem 'coffee-script'
 gem 'engtagger'
 gem 'expertiza-authlogic', github: 'expertiza/authlogic', require: 'authlogic'
 gem 'fastercsv'
@@ -46,7 +48,8 @@ gem 'rjb'
 gem 'rubyzip'
 gem 'rwordnet', '0.1.3'
 gem 'scrypt'
-gem 'sass-rails', '5.0.3'
+#gem 'sass-rails', '5.0.3'
+gem 'sass-rails', '>= 3.2'
 gem 'seer'
 gem 'sprockets'
 gem 'stanford-core-nlp'
@@ -58,6 +61,9 @@ gem 'will_paginate'
 gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
 gem 'jquery-tablesorter'
+gem 'bootstrap-sass'
+#gem 'bootstrap-sass', '~> 3.3.6' 
+
 
 group :development do
   gem 'daemons'

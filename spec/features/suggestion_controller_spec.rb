@@ -190,7 +190,83 @@ RSpec.feature "list suggestions"  do
 		expect(page).to have_content "Approved"
 		expect(page).to have_content "student2064"
 
+	end
+
+	scenario "allow instructor to log in, view suggestions and reject it for Assignment 1" do	
 		
+		# ------------------------------------------ Student creates suggestion --------------------------------- #
+    	# Select and log in student2064
+		user = User.find_by_name('student2064')
+    	stub_current_user(user, user.role.name, user.role)
+      	
+      	# Check Assignment 1 present in task list
+      	visit '/student_task/list'
+      	
+      	# Click on Assignment 1
+      	find_link('Assignment 1').click
+		
+		# Click on suggest topic
+		find_link('Suggest a topic').click
+		
+		# Create new suggestion (Computer Vision)
+		fill_in 'suggestion_title', with: 'Computer Vision'
+		fill_in 'suggestion_description', with: 'This is a Computer Vision suggestion'
+		select "Y", :from => "suggestion_signup_preference"
+		click_button 'Submit'
+      
+		# View the suggestion
+		find_link('View').click
+		
+		# Add comment
+		fill_in 'suggestion_comment_comments', with: 'Student2064 commenting on Computer Vision'
+		click_button 'Submit comment'
+		
+		# ---------------------------------------------Instructor test------------------------------------------ #
+    	
+		user = User.find_by_name('instructor6')
+        stub_current_user(user, user.role.name, user.role)
+		
+		visit '/suggestion/list?id=1&type=Assignment'
+		
+		# Check suggestion has been added for Assignment 1
+		expect(page).to have_content "Suggested topics for Assignment 1"
+		expect(page).to have_content "Computer Vision"
+		expect(page).to have_content "Initiated"
+		expect(page).to have_content "student2064"
+
+		# View the suggestion
+		find_link('View').click
+		expect(page).to have_content "Suggestion"
+		expect(page).to have_content "Computer Vision"
+		expect(page).to have_content "Student2064 commenting on Computer Vision"
+		expect(page).to have_content "student2064"
+		expect(page).to have_content "Yes"
+		expect(page).to have_content "Initiated"
+		expect(page).to have_content "This is a Computer Vision suggestion"
+						
+		click_button 'Reject suggestion'
+		expect(page).to have_content "The suggestion has been successfully rejected."
+
+		# ------------------------------------------ Student checks suggestion --------------------------------- #
+    	# Select and log in student2064
+		user = User.find_by_name('student2064')
+    	stub_current_user(user, user.role.name, user.role)
+      	
+      	# Check Assignment 1 present in task list
+      	visit '/student_task/list'
+      	
+      	# Click on Assignment 1
+      	find_link('Assignment 1').click
+		
+		# Click on suggest topic
+		find_link('Suggest a topic').click
+		
+		# Check suggestion has been approved for Assignment 1
+		expect(page).to have_content "Suggested topics for Assignment 1"
+		expect(page).to have_content "Computer Vision"
+		expect(page).to have_content "Rejected"
+		expect(page).to have_content "student2064"
+
 	end
 
 end

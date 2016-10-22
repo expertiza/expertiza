@@ -93,7 +93,7 @@ RSpec.feature "list suggestions"  do
 		# Try adding blank comment
 		click_button 'Submit comment'
 		expect(page).to have_content "There was an error adding your comment."
-		
+
 		# Go Back
 		find_link('Back').click
 		
@@ -118,7 +118,57 @@ RSpec.feature "list suggestions"  do
 		
     end
 
-    
+    scenario "allow instructor to log in and view suggestions for Assignment 1" do	
+		
+		# ------------------------------------------ Student creates suggestion --------------------------------- #
+    	# Select and log in student2064
+		user = User.find_by_name('student2064')
+    	stub_current_user(user, user.role.name, user.role)
+      	
+      	# Check Assignment 1 present in task list
+      	visit '/student_task/list'
+      	expect(page).to have_content "Assignment 1"
+
+      	# Click on Assignment 1
+      	find_link('Assignment 1').click
+		
+		# Click on suggest topic
+		find_link('Suggest a topic').click
+		expect(page).to have_content "New suggestion"
+
+		# Create new suggestion (Computer Vision)
+		fill_in 'suggestion_title', with: 'Computer Vision'
+		fill_in 'suggestion_description', with: 'This is a Computer Vision suggestion'
+		select "N", :from => "suggestion_signup_preference"
+		click_button 'Submit'
+      	expect(page).to have_content "Thank you for your suggestion!"
+      	expect(page).to have_content "Suggested topics for Assignment 1"	
+		expect(page).to have_content "Computer Vision"	
+		expect(page).to have_content "Initiated"	
+		
+		# View the suggestion
+		find_link('View').click
+		expect(page).to have_content "View Suggested topic Computer Vision"
+
+		# Add comment
+		fill_in 'suggestion_comment_comments', with: 'Student2064 commenting on Computer Vision'
+		click_button 'Submit comment'
+		expect(page).to have_content "Your comment has been successfully added."
+		expect(page).to have_content "Student2064 commenting on Computer Vision"
+
+		# ---------------------------------------------Instructor test------------------------------------------ #
+    	
+		user = User.find_by_name('instructor6')
+        stub_current_user(user, user.role.name, user.role)
+		
+		visit '/suggestion/list?id=1&type=Assignment'
+		
+		expect(page).to have_content "Suggested topics for Assignment 1"
+		expect(page).to have_content "Computer Vision"
+		expect(page).to have_content "Initiated"
+		expect(page).to have_content "student2064"
+		
+	end
 
 end
 

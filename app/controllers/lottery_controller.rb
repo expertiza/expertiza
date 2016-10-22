@@ -79,8 +79,8 @@ class LotteryController < ApplicationController
           end
         end
         # takes the most frequent priority as the team priority
-        freq = student_bids.each_with_object(Hash.new(0)) do |v,h|
-        h[v] += 1
+        freq = student_bids.each_with_object(Hash.new(0)) do |v, h|
+          h[v] += 1
         end
         topic_bids << {topic_id: topic.id, priority: student_bids.max_by {|v| freq[v] }} unless freq.empty?
       end

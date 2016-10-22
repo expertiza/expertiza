@@ -108,9 +108,6 @@ class LotteryController < ApplicationController
 
   # This method is called to automerge smaller teams to teams which were assigned topics through intelligent assignment
   before_action :fetch_assignment, only: [:auto_merge_teams]
-  def fetch_assignment
-    assignment = Assignment.find(params[:id])
-  end
   def auto_merge_teams(unassigned_teams, _final_team_topics)  
     # Sort unassigned
     unassigned_teams = Team.where(id: unassigned_teams).sort_by {|t| !t.users.size }
@@ -127,4 +124,7 @@ class LotteryController < ApplicationController
       end
     end
   end
+  def fetch_assignment
+    assignment = Assignment.find(params[:id])
+  end  
 end

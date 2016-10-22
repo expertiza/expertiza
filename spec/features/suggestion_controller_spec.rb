@@ -53,45 +53,69 @@ RSpec.feature "list suggestions"  do
 		
 	end
 
-	scenario "allow student to log in, add suggestion, add comment, in Assignment 1" do	
+	scenario "allow student to log in, add suggestion, add comment, edit suggestion in Assignment 1" do	
 		
+		# Select and log in student2064
 		user = User.find_by_name('student2064')
     	stub_current_user(user, user.role.name, user.role)
       	
+      	# Check Assignment 1 present in task list
       	visit '/student_task/list'
       	expect(page).to have_content "Assignment 1"
 
+      	# Click on Assignment 1
       	find_link('Assignment 1').click
 		
+		# Click on suggest topic
 		find_link('Suggest a topic').click
 		expect(page).to have_content "New suggestion"
 
+		# Create new suggestion (Computer Vision)
 		fill_in 'suggestion_title', with: 'Computer Vision'
 		fill_in 'suggestion_description', with: 'This is a Computer Vision suggestion'
-		select "Y", :from => "suggestion_signup_preference"
-		select "Y", :from => "suggestion_signup_preference"
+		select "N", :from => "suggestion_signup_preference"
 		click_button 'Submit'
       	expect(page).to have_content "Thank you for your suggestion!"
       	expect(page).to have_content "Suggested topics for Assignment 1"	
 		expect(page).to have_content "Computer Vision"	
 		expect(page).to have_content "Initiated"	
 		
+		# View the suggestion
 		find_link('View').click
 		expect(page).to have_content "View Suggested topic Computer Vision"
 
+		# Add comment
 		fill_in 'suggestion_comment_comments', with: 'Student2064 commenting on Computer Vision'
 		click_button 'Submit comment'
 		expect(page).to have_content "Your comment has been successfully added."
 		expect(page).to have_content "Student2064 commenting on Computer Vision"
 
+		# Try adding blank comment
+		click_button 'Submit comment'
+		expect(page).to have_content "There was an error adding your comment."
+		
+		# Go Back
 		find_link('Back').click
-		expect(page).to have_content "Suggested topics for Assignment 1"
-				
-
+		
+		# Edit title and description
 		find_link('Edit').click
-		expect(page).to have_content "Edit Suggested topic Assignment 1"
-
-
+		expect(page).to have_content "Edit Suggested topic Computer Vision"
+		fill_in 'suggestion_title', with: 'Computer Vision 2'
+		fill_in 'suggestion_description', with: 'This is a Computer Vision suggestion 2'
+		select "Y", :from => "suggestion_signup_preference"
+		click_button 'Submit'
+		expect(page).to have_content "Suggested topics for Assignment 1"
+		expect(page).to have_content "Computer Vision 2"	
+		
+		# Check view to make sure changes are persistent
+		find_link('View').click
+		expect(page).to have_content "View Suggested topic Computer Vision 2"
+		expect(page).to have_content "This is a Computer Vision suggestion 2"	
+		
+		# Succesfully logout
+		find_link('Logout').click
+		expect(page).to have_content "Welcome!"	
+		
     end
 
     

@@ -166,7 +166,8 @@ RSpec.feature "list suggestions"  do
 		expect(page).to have_content "Yes"
 		expect(page).to have_content "Initiated"
 		expect(page).to have_content "This is a Computer Vision suggestion"
-						
+		
+		# Approve suggestion				
 		click_button 'Approve suggestion'
 		expect(page).to have_content "The suggestion was successfully approved."
 
@@ -243,7 +244,8 @@ RSpec.feature "list suggestions"  do
 		expect(page).to have_content "Yes"
 		expect(page).to have_content "Initiated"
 		expect(page).to have_content "This is a Computer Vision suggestion"
-						
+		
+		# Reject suggestion				
 		click_button 'Reject suggestion'
 		expect(page).to have_content "The suggestion has been successfully rejected."
 
@@ -268,6 +270,85 @@ RSpec.feature "list suggestions"  do
 		expect(page).to have_content "student2064"
 
 	end
+
+	scenario "allow instructor to log in, view suggestions and add comment and vote for Assignment 1" do	
+		
+		# ------------------------------------------ Student creates suggestion --------------------------------- #
+    	# Select and log in student2064
+		user = User.find_by_name('student2064')
+    	stub_current_user(user, user.role.name, user.role)
+      	
+      	# Check Assignment 1 present in task list
+      	visit '/student_task/list'
+      	
+      	# Click on Assignment 1
+      	find_link('Assignment 1').click
+		
+		# Click on suggest topic
+		find_link('Suggest a topic').click
+		
+		# Create new suggestion (Computer Vision)
+		fill_in 'suggestion_title', with: 'Computer Vision'
+		fill_in 'suggestion_description', with: 'This is a Computer Vision suggestion'
+		select "Y", :from => "suggestion_signup_preference"
+		click_button 'Submit'
+      
+		# View the suggestion
+		find_link('View').click
+		
+		# Add comment
+		fill_in 'suggestion_comment_comments', with: 'Student2064 commenting on Computer Vision'
+		click_button 'Submit comment'
+		
+		# ---------------------------------------------Instructor test------------------------------------------ #
+    	
+		user = User.find_by_name('instructor6')
+        stub_current_user(user, user.role.name, user.role)
+		
+		visit '/suggestion/list?id=1&type=Assignment'
+		
+		# View the suggestion
+		find_link('View').click
+		
+		# Add Comment
+		fill_in 'suggestion_comment_comments', with: 'Instructor6 commenting on Computer Vision'
+		select "Y", :from => "suggestion_comment_vote"
+		click_button 'Submit vote'
+		
+		fill_in 'suggestion_comment_comments', with: 'Instructor6 commenting on Computer Vision'
+		select "N", :from => "suggestion_comment_vote"
+		click_button 'Submit vote'
+		
+		fill_in 'suggestion_comment_comments', with: 'Instructor6 commenting on Computer Vision'
+		select "R", :from => "suggestion_comment_vote"
+		click_button 'Submit vote'
+		
+		# ------------------------------------------ Student checks suggestion --------------------------------- #
+    	# Select and log in student2064
+		user = User.find_by_name('student2064')
+    	stub_current_user(user, user.role.name, user.role)
+      	
+      	# Check Assignment 1 present in task list
+      	visit '/student_task/list'
+      	
+      	# Click on Assignment 1
+      	find_link('Assignment 1').click
+		
+		# Click on suggest topic
+		find_link('Suggest a topic').click
+		
+		# Click on view
+		find_link('View').click
+		
+		# Check suggestion has been approved for Assignment 1
+		expect(page).to have_content "Computer Vision"
+		expect(page).to have_content "Yes"
+		expect(page).to have_content "No"
+		expect(page).to have_content "Revise"
+		expect(page).to have_content "Instructor6 commenting on Computer Vision"
+		
+	end
+
 
 end
 

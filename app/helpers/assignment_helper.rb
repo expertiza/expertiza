@@ -1,4 +1,8 @@
 module AssignmentHelper
+
+  def current_user
+    current_user=session[:user]
+  end
   def course_options(instructor)
     if session[:user].role.name == 'Teaching Assistant'
       courses = []
@@ -46,6 +50,8 @@ module AssignmentHelper
     end
     review_strategy_options
   end
+
+ 
 
   # retrive or create a due_date
   # use in views/assignment/edit.html.erb

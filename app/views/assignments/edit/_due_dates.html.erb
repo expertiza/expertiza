@@ -5,7 +5,8 @@
         event.preventDefault(); // Prevent link from following its href
     });
     });
-
+	
+	var timezonepref = "<%= current_user.timezonepref %>";
     function addDueDateTableElement(addnameurl,deadline_type, round_no, due_date) {
 //round_no = 0 for submission and review is not possible
 //round_no = 0 is used for other deadlines
@@ -77,6 +78,7 @@
         }
         html += '</td>';
         var due_at = due_date.due_at;
+	
         if (due_at == null) {
             due_at = '';
         }
@@ -92,11 +94,13 @@
         if (due_name == null){
             due_name = '';
         }
-        html += '<td align="center" class="due_date_due_at" width="25%">' +
+        html += '<td align="center" class="due_date_due_at" width="15%">' +
+        '<input id="timezonepicker_' + 'style="width: 200px" type="text" value="' +
+	timezonepref+ '">' + '</td>';
+        html += '<td align="center" class="due_date_due_at" width="15%">' +
         '<input id="datetimepicker_' + element_id +
-        '" name="assignment_form[due_date][][due_at]" style="width: 200px" type="text" value="' +
-        due_at + '">' + '</td>';
-        
+        '" name="assignment_form[due_date][][due_at]" style="width: 130px" type="text" value="' +
+        due_at.substr(0,16) + '">' + '</td>';
         html += '<td align="center" class="due_date_due_at" width="10%">';
         // if(deadline_type == 'team_formation'){
         //     html += '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]" disabled>'
@@ -359,7 +363,7 @@
 
             <%@team_formation_allowed_checkbox=true%>
 
-        }
+        }datetime
 </script>
 
 <div style='padding: 5px' id='review_round'>
@@ -400,7 +404,8 @@
 
 <tr id='due_date_heading'>
 <th width=15% style="text-align:left;">Deadline type</th>
-<th width=20% style="text-align:center;">Date & time</th>
+<th width=7% style="text-align:center;">Timezone</th>
+<th width=13% style="text-align:center;">Date & time</th>
 <th width=10% style="text-align:center;">Submission allowed</th>
 <th width=8% style="text-align:center;">Review allowed</th>
 <th width=8% style="text-align:center;">Teammate review allowed</th>

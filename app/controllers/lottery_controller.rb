@@ -19,7 +19,7 @@ class LotteryController < ApplicationController
       bids = []
       topic_ids.each do |topic_id|
         bid_record = Bid.where(user_id: user_id, topic_id: topic_id).first rescue nil
-        bid_record.nil? ? bids << 0 : bids << bid_record.priority ||= 0
+        bids << bid_record.nil? ? 0 : bid_record.priority ||= 0
       end
       if bids.uniq != [0] and ![6864, 6865, 6866, 6855].include? user_id
         priority_info << {pid: user_id, ranks: bids}

@@ -33,7 +33,7 @@ class LotteryController < ApplicationController
     data = {users: priority_info, max_team_size: assignment.max_team_size}
     url = WEBSERVICE_CONFIG["topic_bidding_webservice_url"]
     begin
-      response = RestClient.post url, data.to_json, :content_type => :json, :accept => :json
+      response = RestClient.post url, data.to_json, content_type: :json, accept: :json
       # store each summary in a hashmap and use the question as the key
       teams = JSON.parse(response)["teams"]
     rescue => err

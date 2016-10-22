@@ -74,7 +74,8 @@ class LotteryController < ApplicationController
         student_bids = []
         TeamsUser.where(team_id: team.id).each do |s|
           student_bid = Bid.where(user_id: s.user_id, topic_id: topic.id).first rescue nil
-          if !student_bid.nil? and !student_bid.priority.nil?
+          if !student_bid.nil? 
+            if !student_bid.priority.nil?
             student_bids << student_bid.priority
           end
         end

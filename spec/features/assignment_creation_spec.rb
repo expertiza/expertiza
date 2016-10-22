@@ -238,8 +238,9 @@ describe "assignment function" do
     # First row of rubric
     describe "Edit review rubric" do
       it "updates review questionnaire" do
-        find_link('Rubrics').click
-        within("tr#questionnaire_table_ReviewQuestionnaire") do
+        #find_link('Rubrics').click
+        #within(:css, "tr#questionnaire_table_ReviewQuestionnaire") do
+        within_table('question_actions_table') do
           select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           uncheck('dropdown')
           select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
@@ -256,8 +257,9 @@ describe "assignment function" do
       end
 
       it "should update scored question dropdown" do
-        find_link('Rubrics').click
-        within("tr#questionnaire_table_ReviewQuestionnaire") do
+        #find_link('Rubrics').click
+        #within("tr#questionnaire_table_ReviewQuestionnaire") do
+        within_table('question_actions_table') do
           select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
         end
@@ -269,8 +271,9 @@ describe "assignment function" do
 
       # Second row of rubric
       it "updates author feedback questionnaire" do
-        find_link('Rubrics').click
-        within("tr#questionnaire_table_AuthorFeedbackQuestionnaire") do
+       # find_link('Rubrics').click
+        #within(:css, "tr#questionnaire_table_AuthorFeedbackQuestionnaire") do
+        within_table('question_actions_table') do
           select "AuthorFeedbackQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           uncheck('dropdown')
           select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
@@ -286,8 +289,9 @@ describe "assignment function" do
       end
 
       it "should update scored question dropdown" do
-        find_link('Rubrics').click
-        within("tr#questionnaire_table_AuthorFeedbackQuestionnaire") do
+        #find_link('Rubrics').click
+        #within("tr#questionnaire_table_AuthorFeedbackQuestionnaire") do
+        within_table('question_actions_table') do
           select "AuthorFeedbackQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
         end
@@ -299,8 +303,9 @@ describe "assignment function" do
 
       # Third row of rubric
       it "updates teammate review questionnaire" do
-        find_link('Rubrics').click
-        within("tr#questionnaire_table_TeammateReviewQuestionnaire") do
+        #find_link('Rubrics').click
+        #within("tr#questionnaire_table_TeammateReviewQuestionnaire") do
+        within_table('question_actions_table') do
           select "TeammateReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           uncheck('dropdown')
           select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
@@ -316,8 +321,9 @@ describe "assignment function" do
       end
 
       it "should update scored question dropdown" do
-        find_link('Rubrics').click
-        within("tr#questionnaire_table_TeammateReviewQuestionnaire") do
+        #find_link('Rubrics').click
+        #within("tr#questionnaire_table_TeammateReviewQuestionnaire") do
+        within_table('question_actions_table') do
           select "TeammateReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
         end

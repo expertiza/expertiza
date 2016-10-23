@@ -8,7 +8,19 @@ def questionnaire_options(assignment, type, _round = 0)
   end
   options
 end
-
+def test1
+  it "should update scored question dropdown" do
+    find_link('Rubrics').click
+    within("tr#questionnaire_table_ReviewQuestionnaire") do
+      select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+      select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
+    end
+    click_button 'Save'
+    questionnaire = Questionnaire.where(name: "ReviewQuestionnaire2").first
+    assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
+    expect(assignment_questionnaire.dropdown).to eq(false)
+  end
+end
 def get_questionnaire(finder_var = nil)
   if finder_var.nil?
     AssignmentQuestionnaire.find_by(assignment_id: @assignment[:id])
@@ -230,18 +242,7 @@ describe "assignment function" do
           notification_limit: 50
         )
       end
-      it "should update scored question dropdown" do
-        find_link('Rubrics').click
-        within("tr#questionnaire_table_ReviewQuestionnaire") do
-          select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-          select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-        end
-        click_button 'Save'
-        questionnaire = Questionnaire.where(name: "ReviewQuestionnaire2").first
-        assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
-        expect(assignment_questionnaire.dropdown).to eq(false)
-      end
-
+      
       # Second row of rubric
       it "updates author feedback questionnaire" do
         find_link('Rubrics').click
@@ -256,18 +257,7 @@ describe "assignment function" do
         questionnaire = get_questionnaire("AuthorFeedbackQuestionnaire2").first
         expect(questionnaire).to have_attributes(questionnaire_weight: 50, notification_limit: 50)
       end
-      it "should update scored question dropdown" do
-        find_link('Rubrics').click
-        within("tr#questionnaire_table_ReviewQuestionnaire") do
-          select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-          select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-        end
-        click_button 'Save'
-        questionnaire = Questionnaire.where(name: "ReviewQuestionnaire2").first
-        assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
-        expect(assignment_questionnaire.dropdown).to eq(false)
-      end
-
+      test1
       # Third row of rubric
       it "updates teammate review questionnaire" do
         find_link('Rubrics').click
@@ -286,17 +276,7 @@ describe "assignment function" do
         )
       end
 
-      it "should update scored question dropdown" do
-        find_link('Rubrics').click
-        within("tr#questionnaire_table_TeammateReviewQuestionnaire") do
-          select "TeammateReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-          select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-        end
-        click_button 'Save'
-        questionnaire = Questionnaire.where(name: "TeammateReviewQuestionnaire2").first
-        assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
-        expect(assignment_questionnaire.dropdown).to eq(false)
-      end
+      test1
     end
   end
 

@@ -32,6 +32,7 @@ def create_quiz
   # Save quiz
   click_on 'Create Quiz'
 end
+
 def functioncall
   before(:each) do
     # Create an instructor
@@ -70,6 +71,7 @@ def functioncall
     create :review_response_map, assignment: @assignment, reviewee: @team
   end
 end
+
 describe 'Student can create quizzes and edit them', js: true do
   functioncall
   it 'should be able to create quiz' do

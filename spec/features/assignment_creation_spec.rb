@@ -241,7 +241,7 @@ describe "assignment function" do
     end
 
     describe "Load rubric questionnaire" do
-      it "is able to edit assignment" do
+      xit "is able to edit assignment" do
         find_link('Rubrics').click
         # might find a better acceptance criteria here
         expect(page).to have_content("Review rubric varies by round")

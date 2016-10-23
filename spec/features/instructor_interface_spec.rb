@@ -102,4 +102,4 @@ require 'rails_helper'
       expect(page).to have_content('Summary report')
     end
   end
-end
+

@@ -1,6 +1,7 @@
+
 class Questionnaire < ActiveRecord::Base
   validate :validate_questionnaire
-
+  require 'csv'
   def get_weighted_score(assignment, scores)
     # create symbol for "varying rubrics" feature -Yang
     round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(assignment.id, self.id).used_in_round
@@ -122,4 +123,56 @@ class Questionnaire < ActiveRecord::Base
     end
     end
 
-end
+
+  def self.import(file)
+
+        CSV.parse(file, headers: true) do |row|
+        #  row.each do |cell|
+        product_hash = row.to_hash # exclude the price field
+        product = Question.where(seq: row['seq'])
+
+        if product.count == 1
+          product.first.update_attributes(product_hash)
+        else
+          Question.create!(product_hash)
+        end # end if !product.nil?
+      end # end CSV.foreach
+    end # end self.import(file)
+#    CSV::Reader.parse(file) do |row|
+
+=begin
+    CSV.foreach(file.path) do |row|
+
+      product_hash = row.to_hash # exclude the price field
+      product = Question.where(seq: product_hash["seq"])
+
+      if product.count == 1
+        product.first.update_attributes(product_hash)
+      else
+        Question.create!(product_hash)
+      end # end if !product.nil?
+=end
+=begin
+    spreadsheet = open_spreadsheet(file)
+    header = spreadsheet.row(1)
+    (2..spreadsheet.last_row).each do |i|
+      row = Hash[[header, spreadsheet.row(i)].transpose]
+      product = find_by_id(row["id"]) || new
+      product.attributes = row.to_hash.slice(*accessible_attributes)
+      product.save!
+    end
+=end
+    end
+
+
+=begin
+  def self.open_spreadsheet(file)
+    case File.extname(file.original_filename)
+      when ".csv" then CSV.new(file.path, :ignore)
+      else raise "Unknown file type: #{file.original_filename}"
+    end
+  end
+=end
+
+
+

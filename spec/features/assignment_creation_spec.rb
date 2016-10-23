@@ -26,7 +26,28 @@ def get_selected_id(finder_var)
     TeammateReviewQuestionnaire.find_by_name(finder_var)[:id]
   end
 end
+def test()
+      it "is able to create with teams" do
+      login_as("instructor6")
+      visit '/assignments/new?private=1'
 
+      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
+      select('Course 2', from: 'assignment_form_assignment_course_id')
+      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      check("team_assignment")
+      check("assignment_form_assignment_show_teammate_reviews")
+      fill_in 'assignment_form_assignment_max_team_size', with: 3
+
+      click_button 'Create'
+
+      assignment = Assignment.where(name: 'private assignment for test').first
+      expect(assignment).to have_attributes(
+        max_team_size: 3,
+        show_teammate_reviews: true
+      )
+    end
+
+end
 describe "assignment function" do
   before(:each) do
     create(:deadline_type, name: "submission")
@@ -96,45 +117,27 @@ describe "assignment function" do
         spec_location: 'testLocation'
       )
     end
-    it "is able to create with teams" do
-      login_as("instructor6")
-      visit '/assignments/new?private=1'
+    test()
+    #it "is able to create with teams" do
+     # login_as("instructor6")
+      #visit '/assignments/new?private=1'
 
-      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
-      check("team_assignment")
-      check("assignment_form_assignment_show_teammate_reviews")
-      fill_in 'assignment_form_assignment_max_team_size', with: 3
+      #fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
+      #select('Course 2', from: 'assignment_form_assignment_course_id')
+      #fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      #check("team_assignment")
+      #check("assignment_form_assignment_show_teammate_reviews")
+      #fill_in 'assignment_form_assignment_max_team_size', with: 3
 
-      click_button 'Create'
+      #click_button 'Create'
 
-      assignment = Assignment.where(name: 'private assignment for test').first
-      expect(assignment).to have_attributes(
-        max_team_size: 3,
-        show_teammate_reviews: true
-      )
-    end
-    it "is able to create with teams" do
-      login_as("instructor6")
-      visit '/assignments/new?private=1'
-
-      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
-      check("team_assignment")
-      check("assignment_form_assignment_show_teammate_reviews")
-      fill_in 'assignment_form_assignment_max_team_size', with: 3
-
-      click_button 'Create'
-
-      assignment = Assignment.where(name: 'private assignment for test').first
-      expect(assignment).to have_attributes(
-        max_team_size: 3,
-        show_teammate_reviews: true
-      )
-    end
-
+      #assignment = Assignment.where(name: 'private assignment for test').first
+      #expect(assignment).to have_attributes(
+       # max_team_size: 3,
+        #show_teammate_reviews: true
+      #)
+    #end
+    test()
     it "is able to create with staggered deadline" do
       skip('skip test on staggered deadline temporarily')
       login_as("instructor6")

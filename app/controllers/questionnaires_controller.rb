@@ -1,3 +1,5 @@
+require 'csv'
+require 'open-uri'
 class QuestionnairesController < ApplicationController
   # Controller for Questionnaire objects
   # A Questionnaire can be of several types (QuestionnaireType)
@@ -242,15 +244,45 @@ class QuestionnairesController < ApplicationController
           flash[:error] = $ERROR_INFO
         end
       end
+      redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
     end
 
-     export if params['export']
-     import if params['import']
+
+     if params['import']
+      begin
+        #@questionnaire = Questionnaire.find(params[:id])
+        file_data = File.read(params[:csv])
+        #Questionnaire.import(file_data)
+        CSV.parse(file_data, headers: true) do |row|
+          #  row.each do |cell|
+          product_hash = row.to_hash # exclude the price field
+          product = Question.new(product_hash)
+          product.questionnaire_id=params[:id]
+          product.save
+#          if product.count == 1
+ #           product.update_attributes(product_hash)
+  #        else
+   #         Question.create!(product_hash)
+    #      end # end if !product.nil?
+        end # end CSV.foreach
+=begin
+        if file_data.respond_to?(:read)
+          csv_text = file_data.read
+        elsif file_data.respond_to?(:path)
+          csv_text = File.read(file_data.path)
+          end
+=end
+       flash[:success] = 'All questions have been successfully imported!'
+       redirect_to edit_questionnaire_path(questionnaire_id.to_sym), notice: "Products imported."
+      rescue
+        redirect_to edit_questionnaire_path(questionnaire_id.to_sym), notice: $ERROR_INFO
+      end
+
+     end
 
     if params['view_advice']
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
-    else
-      redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+
     end
   end
 
@@ -588,11 +620,15 @@ class QuestionnairesController < ApplicationController
   end
 
   def import
-    @questionnaire = Questionnaire.find(params[:id])
+   # @questionnaire = Questionnaire.find(params[:id])
 
-    file = params['csv']
+    #file = params['csv']
 
-    @questionnaire.questions << QuestionnaireHelper.get_questions_from_csv(@questionnaire, file)
+    #@questionnaire.questions << QuestionnaireHelper.get_questions_from_csv(@questionnaire, file)
+
+    QuestionnaireHelper.get_questions_from_csv(@questionnaire, file)
+
+
   end
 
   # clones the contents of a questionnaire, including the questions and associated advice

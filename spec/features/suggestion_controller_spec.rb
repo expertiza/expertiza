@@ -1,6 +1,7 @@
 # Test suite developed by Anubhab Majumdar (amajumd@ncsu.edu)
 
 require 'rails_helper'
+# require 'selenium-webdriver'
 include LogInHelper
 
 def log_in(name, password)
@@ -391,8 +392,60 @@ RSpec.feature "list suggestions"  do
 		find_link('View').click
 		
 		# Approve suggestion				
-		click_button 'Approve suggestion'	# Checks send mail feature is working correctly
+		click_button 'Approve suggestion'	# Also checks send mail feature is working correctly
 		expect(page).to have_content "The suggestion was successfully approved."
+	end
+
+
+	scenario "Form teams and approve topic" do	
+		
+		# user = User.find_by_name('instructor6')
+  #       stub_current_user(user, user.role.name, user.role)
+		
+		# visit '/teams/list?id=1&type=Assignment'
+
+		# find_link('Create Team').click
+
+		# fill_in 'team_name', with: 'Team 1'
+		# all('input[type="submit"]').first.click
+		# page.find('Save').trigger('click')
+		# expect(page).to have_content "blah"
+		# click_button 'Create Teams'
+
+		# ------------------------------------------ Student creates suggestion --------------------------------- #
+    	# Select and log in student2064
+		user = User.find_by_name('student2064')
+    	stub_current_user(user, user.role.name, user.role)
+      	
+      	# Check Assignment 1 present in task list
+      	visit '/student_task/list'
+      	
+      	# Click on Assignment 1
+      	find_link('Assignment 1').click
+		
+		# Click on suggest topic
+		find_link('Suggest a topic').click
+		
+		# Create new suggestion (Computer Vision)
+		fill_in 'suggestion_title', with: 'Computer Vision'
+		fill_in 'suggestion_description', with: 'This is a Computer Vision suggestion'
+		select "Y", :from => "suggestion_signup_preference"
+		click_button 'Submit'
+
+		
+		# user = User.find_by_name('student2064')
+  #   	stub_current_user(user, user.role.name, user.role)
+      	
+  #     	# Check Assignment 1 present in task list
+  #     	visit '/student_task/list'
+      	
+  #     	# Click on Assignment 1
+  #     	find_link('Assignment 1').click
+		
+		# find_link('Your team').click
+		
+		# expect(page).to have_content 'Invite people'
+
 	end
 
 end

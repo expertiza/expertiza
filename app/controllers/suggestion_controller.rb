@@ -116,12 +116,12 @@ class SuggestionController < ApplicationController
     Mailer.suggested_topic_approved_message(
       to: proposer.email,
         cc: cc_mail_list,
-        subject: "Suggested topic '#{@suggestion.title}' has been approved",
+        subject: "Suggested topic '#{@suggestion.title}' has been approved by Srikar",
         body: {
           approved_topic_name: @suggestion.title,
             proposer: proposer.name
         }
-    ).deliver_now
+    ).deliver_now!
   end
 
   def notification

@@ -129,7 +129,8 @@ describe "assignment function" do
       fill_in 'assignment_form_assignment_days_between_submissions', with: 7
       click_button 'submit_btn'
       assignment = Assignment.where(name: 'private assignment for test').first
-      pending(%(not sure what's broken here but the error is: #ActionController::RoutingError: No route matches [GET] "/assets/staggered_deadline_assignment_graph/graph_1.jpg"))
+      pending(%(not sure what's broken here but the error is: #ActionController::RoutingError: 
+      No route matches [GET] "/assets/staggered_deadline_assignment_graph/graph_1.jpg"))
       expect(assignment).to have_attributes(
         staggered_deadline: true
       )

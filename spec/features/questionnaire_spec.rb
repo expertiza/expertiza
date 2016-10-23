@@ -15,7 +15,7 @@ describe "Questionnaire tests for instructor interface" do
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
     create(:assignment_due_date)
-    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now + (100 * 24 * 60 * 60))
+    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.current + (100 * 24 * 60 * 60))
   end
 
   describe "Instructor login" do
@@ -34,6 +34,7 @@ describe "Questionnaire tests for instructor interface" do
     end
   end
 
+ def createPublicReview
   describe "Create a public review questionnaire", type: :controller do
     it "is able to create a public review questionnaire" do
       login_as("instructor6")
@@ -53,27 +54,9 @@ describe "Questionnaire tests for instructor interface" do
       expect(Questionnaire.where(name: "Review 1")).to exist
     end
   end
+ end
 
-  describe "Create a private review questionnaire", type: :controller do
-    it "is able to create a private review questionnaire" do
-      login_as("instructor6")
-
-      visit '/questionnaires/new?model=ReviewQuestionnaire&private=1'
-
-      fill_in('questionnaire_name', with: 'Review 1')
-
-      fill_in('questionnaire_min_question_score', with: '0')
-
-      fill_in('questionnaire_max_question_score', with: '5')
-
-      select('yes', from: 'questionnaire_private')
-
-      click_button "Create"
-
-      expect(Questionnaire.where(name: "Review 1")).to exist
-    end
-  end
-
+  createPublicReview
   def load_questionnaire
     login_as("instructor6")
     visit '/questionnaires/new?model=ReviewQuestionnaire&private=0'

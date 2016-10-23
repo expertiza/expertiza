@@ -11,7 +11,7 @@ end
 
 def get_questionnaire(finder_var = nil)
   if finder_var.nil?
-    AssignmentQuestionnaire.find_by_assignment_id(@assignment[:id])
+    AssignmentQuestionnaire.find_by(assignment_id: @assignment[:id])
   else
     AssignmentQuestionnaire.where(assignment_id: @assignment[:id]).where(questionnaire_id: get_selected_id(finder_var))
   end

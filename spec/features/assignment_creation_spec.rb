@@ -269,7 +269,7 @@ No route matches [GET] "/assets/staggered_deadline_assignment_graph/graph_1.jpg"
         find_link('Rubrics').click
         within("tr#questionnaire_table_TeammateReviewQuestionnaire") do
           select "TeammateReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-          test2  
+          test2
         end
         click_button 'Save'
         questionnaire = get_questionnaire("TeammateReviewQuestionnaire2").first

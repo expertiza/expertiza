@@ -66,12 +66,12 @@ end
 
 def test3(value)
   if value.eql? "updates author feedback questionnaire"
-    value1="tr#questionnaire_table_AuthorFeedbackQuestionnaire"
-    value2="AuthorFeedbackQuestionnaire2"
+    value1 = "tr#questionnaire_table_AuthorFeedbackQuestionnaire"
+    value2 = "AuthorFeedbackQuestionnaire2"
   end
   if value.eql? "updates teammate review questionnaire"
-    value1="tr#questionnaire_table_TeammateReviewQuestionnaire"
-    value2="TeammateReviewQuestionnaire2"
+    value1 = "tr#questionnaire_table_TeammateReviewQuestionnaire"
+    value2 = "TeammateReviewQuestionnaire2"
   end
   it value do
     find_link('Rubrics').click

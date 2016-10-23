@@ -85,4 +85,3 @@ describe "View assignment scores" do
     expect(page).to have_content('Summary report')
   end
 end
-

@@ -56,12 +56,14 @@ def test1
     expect(assignment_questionnaire.dropdown).to eq(false)
   end
 end
+
 def test2
   uncheck('dropdown')
   select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
   fill_in 'assignment_form[assignment_questionnaire][][questionnaire_weight]', with: '50'
   fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', with: '50'
 end
+
 describe "assignment function" do
   before(:each) do
     create(:deadline_type, name: "submission")
@@ -150,7 +152,7 @@ describe "assignment function" do
       fill_in 'assignment_form_assignment_days_between_submissions', with: 7
       click_button 'submit_btn'
       assignment = Assignment.where(name: 'private assignment for test').first
-      pending(%(not sure what's broken here but the error is: #ActionController::RoutingError: 
+      pending(%(not sure what's broken here but the error is: #ActionController::RoutingError:
 No route matches [GET] "/assets/staggered_deadline_assignment_graph/graph_1.jpg"))
       expect(assignment).to have_attributes(
         staggered_deadline: true
@@ -271,7 +273,7 @@ No route matches [GET] "/assets/staggered_deadline_assignment_graph/graph_1.jpg"
         end
         click_button 'Save'
         questionnaire = get_questionnaire("TeammateReviewQuestionnaire2").first
-        expect(questionnaire).to have_attributes(questionnaire_weight: 50,notification_limit: 50)
+        expect(questionnaire).to have_attributes(questionnaire_weight: 50, notification_limit: 50)
       end
       test1
     end

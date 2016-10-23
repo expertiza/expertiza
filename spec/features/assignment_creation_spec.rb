@@ -146,7 +146,7 @@ describe "assignment function" do
       click_button 'submit_btn'
       assignment = Assignment.where(name: 'private assignment for test').first
       pending(%(not sure what's broken here but the error is: #ActionController::RoutingError: 
-      No route matches [GET] "/assets/staggered_deadline_assignment_graph/graph_1.jpg"))
+No route matches [GET] "/assets/staggered_deadline_assignment_graph/graph_1.jpg"))
       expect(assignment).to have_attributes(
         staggered_deadline: true
       )
@@ -245,7 +245,6 @@ describe "assignment function" do
           notification_limit: 50
         )
       end
-      
       # Second row of rubric
       it "updates author feedback questionnaire" do
         find_link('Rubrics').click

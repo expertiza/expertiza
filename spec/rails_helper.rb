@@ -53,7 +53,8 @@ RSpec.configure do |config|
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
   config.infer_spec_type_from_file_location!
-
+  def common
+    describe "Integration tests for instructor interface" do
   def login_as(user_name)
     user = User.find_by_name(user_name)
     msg = user.to_yaml

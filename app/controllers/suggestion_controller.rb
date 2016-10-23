@@ -79,7 +79,7 @@ class SuggestionController < ApplicationController
 
     if @suggestion.save
       flash[:success] = 'Thank you for your suggestion!' if @suggestion.unityID != ''
-      flash[:success] = 'You have already submit an anonymous suggestion. It will not show in the suggested topic table below.' if @suggestion.unityID == ''
+      flash[:success] = 'You have submitted an anonymous suggestion. It will not show in the suggested topic table below.' if @suggestion.unityID == ''
     end
     redirect_to action: 'new', id: @suggestion.assignment_id
   end
@@ -116,7 +116,7 @@ class SuggestionController < ApplicationController
     Mailer.suggested_topic_approved_message(
       to: proposer.email,
         cc: cc_mail_list,
-        subject: "Suggested topic '#{@suggestion.title}' has already been approved",
+        subject: "Suggested topic '#{@suggestion.title}' has been approved",
         body: {
           approved_topic_name: @suggestion.title,
             proposer: proposer.name

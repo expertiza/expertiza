@@ -8,19 +8,7 @@ def questionnaire_options(assignment, type, _round = 0)
   end
   options
 end
-def test1
-  it "should update scored question dropdown" do
-    find_link('Rubrics').click
-    within("tr#questionnaire_table_ReviewQuestionnaire") do
-      select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-      select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-    end
-    click_button 'Save'
-    questionnaire = Questionnaire.where(name: "ReviewQuestionnaire2").first
-    assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
-    expect(assignment_questionnaire.dropdown).to eq(false)
-  end
-end
+
 def get_questionnaire(finder_var = nil)
   if finder_var.nil?
     AssignmentQuestionnaire.find_by(assignment_id: @assignment[:id])
@@ -54,6 +42,21 @@ def test
     expect(assignment).to have_attributes(max_team_size: 3, show_teammate_reviews: true)
   end
 end
+
+def test1
+  it "should update scored question dropdown" do
+    find_link('Rubrics').click
+    within("tr#questionnaire_table_ReviewQuestionnaire") do
+      select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+      select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
+    end
+    click_button 'Save'
+    questionnaire = Questionnaire.where(name: "ReviewQuestionnaire2").first
+    assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
+    expect(assignment_questionnaire.dropdown).to eq(false)
+  end
+end
+
 describe "assignment function" do
   before(:each) do
     create(:deadline_type, name: "submission")

@@ -1,19 +1,19 @@
 require 'rails_helper'
 common
 instructorlogin
-  describe "Create a course", type: :controller do
-    it "is able to create a public course or a private course" do
-      login_as("instructor6")
-      visit '/course/new?private=0'
-      fill_in "Course Name", with: 'public course for test'
-      click_button "Create"
-      expect(Course.where(name: "public course for test")).to exist
-      visit '/course/new?private=1'
-      fill_in "Course Name", with: 'private course for test'
-      click_button "Create"
-      expect(Course.where(name: "private course for test")).to exist
-    end
+describe "Create a course", type: :controller do
+  it "is able to create a public course or a private course" do
+    login_as("instructor6")
+    visit '/course/new?private=0'
+    fill_in "Course Name", with: 'public course for test'
+    click_button "Create"
+    expect(Course.where(name: "public course for test")).to exist
+    visit '/course/new?private=1'
+    fill_in "Course Name", with: 'private course for test'
+    click_button "Create"
+    expect(Course.where(name: "private course for test")).to exist
   end
+end
 
   describe "View Publishing Rights" do
     it 'should display teams for assignment without topic' do

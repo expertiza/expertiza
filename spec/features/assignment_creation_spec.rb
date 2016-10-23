@@ -64,6 +64,28 @@ def test2
   fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', with: '50'
 end
 
+def test3(value)
+  if value.eql? "updates author feedback questionnaire"
+    value1="tr#questionnaire_table_AuthorFeedbackQuestionnaire"
+    value2="AuthorFeedbackQuestionnaire2"
+  end
+  if value.eql? "updates teammate review questionnaire"
+    value1="tr#questionnaire_table_TeammateReviewQuestionnaire"
+    value2="TeammateReviewQuestionnaire2"
+  end
+  it value do
+    find_link('Rubrics').click
+    within(value1) do
+      select value2, from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+      test2
+    end
+    click_button 'Save'
+    questionnaire = get_questionnaire(value2).first
+    expect(questionnaire).to have_attributes(questionnaire_weight: 50, notification_limit: 50)
+  end
+  test1
+end
+
 describe "assignment function" do
   before(:each) do
     create(:deadline_type, name: "submission")
@@ -253,29 +275,9 @@ No route matches [GET] "/assets/staggered_deadline_assignment_graph/graph_1.jpg"
         )
       end
       # Second row of rubric
-      it "updates author feedback questionnaire" do
-        find_link('Rubrics').click
-        within("tr#questionnaire_table_AuthorFeedbackQuestionnaire") do
-          select "AuthorFeedbackQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-          test2
-        end
-        click_button 'Save'
-        questionnaire = get_questionnaire("AuthorFeedbackQuestionnaire2").first
-        expect(questionnaire).to have_attributes(questionnaire_weight: 50, notification_limit: 50)
-      end
-      test1
+      test3("updates author feedback questionnaire")
       # Third row of rubric
-      it "updates teammate review questionnaire" do
-        find_link('Rubrics').click
-        within("tr#questionnaire_table_TeammateReviewQuestionnaire") do
-          select "TeammateReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-          test2
-        end
-        click_button 'Save'
-        questionnaire = get_questionnaire("TeammateReviewQuestionnaire2").first
-        expect(questionnaire).to have_attributes(questionnaire_weight: 50, notification_limit: 50)
-      end
-      test1
+      test3("updates teammate review questionnaire")
     end
   end
 

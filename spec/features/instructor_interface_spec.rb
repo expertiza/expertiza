@@ -24,47 +24,37 @@ describe "View Publishing Rights" do
     expect(page).not_to have_content('Topic #')
   end
 end
+def checkvalidorinvalidfilewith3columns(a,b,c,d)
+  it a do
+    login_as("instructor6")
+    visit '/assignments/1/edit'
+    click_link "Topics"
+    click_link "Import topics"
+    file_path = Rails.root + b
+    attach_file('file', file_path)
+    click_button "Import"
+    click_link "Topics"
+    expect(page).to have_content(c)
+    expect(page).to have_content(d)
+  end
+  
 
 describe "Import tests for assignment topics" do
-  it 'should be valid file with 3 columns' do
-    login_as("instructor6")
-    visit '/assignments/1/edit'
-    click_link "Topics"
-    click_link "Import topics"
-    file_path = Rails.root + "spec/features/assignment_topic_csvs/3-col-valid_topics_import.csv"
-    attach_file('file', file_path)
-    click_button "Import"
-    click_link "Topics"
-    expect(page).to have_content('expertiza')
-    expect(page).to have_content('mozilla')
-  end
-
-  it 'should be a valid file with 3 or more columns' do
-    login_as("instructor6")
-    visit '/assignments/1/edit'
-    click_link "Topics"
-    click_link "Import topics"
-    file_path = Rails.root + "spec/features/assignment_topic_csvs/3or4-col-valid_topics_import.csv"
-    attach_file('file', file_path)
-    click_button "Import"
-    click_link "Topics"
-    expect(page).to have_content('capybara')
-    expect(page).to have_content('cucumber')
-  end
-
-  it 'should be a invalid csv file' do
-    login_as("instructor6")
-    visit '/assignments/1/edit'
-    click_link "Topics"
-    click_link "Import topics"
-    file_path = Rails.root + "spec/features/assignment_topic_csvs/invalid_topics_import.csv"
-    attach_file('file', file_path)
-    click_button "Import"
-    click_link "Topics"
-    expect(page).not_to have_content('airtable')
-    expect(page).not_to have_content('devise')
-  end
-
+  a1='should be valid file with 3 columns'
+  a2="spec/features/assignment_topic_csvs/3-col-valid_topics_import.csv"
+  a3='expertiza'
+  a4='mozilla'
+  checkvalidorinvalidfilewith3columns(a1,a2,a3,a4)
+  b1='should be a valid file with 3 or more columns'
+  b2="spec/features/assignment_topic_csvs/3or4-col-valid_topics_import.csv"
+  b3='capybara'
+  b4='cucumber'
+  checkvalidorinvalidfilewith3columns(b1,b2,b3,b4)
+  c1='should be a invalid csv file'
+  c2="spec/features/assignment_topic_csvs/invalid_topics_import.csv"
+  c3='airtable'
+  c4='devise'
+  checkvalidorinvalidfilewith3coulmns(c1,c2,c3,c4)
   it 'should be an random text file' do
     login_as("instructor6")
     visit '/assignments/1/edit'

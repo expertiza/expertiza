@@ -1,7 +1,7 @@
 require 'rails_helper'
 
-common
-instructorlogin
+  common
+  instructorlogin
 
   describe "Create a course", type: :controller do
     it "is able to create a public course or a private course" do
@@ -10,7 +10,6 @@ instructorlogin
       fill_in "Course Name", with: 'public course for test'
       click_button "Create"
       expect(Course.where(name: "public course for test")).to exist
-
       visit '/course/new?private=1'
       fill_in "Course Name", with: 'private course for test'
       click_button "Create"

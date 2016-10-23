@@ -44,8 +44,9 @@ module QuestionnaireHelper
 end
 
   def self.get_questions_from_csv(questionnaire, file)
+=begin
     questions = []
-    custom_rubric = questionnaire.section == "Custom"
+   #  custom_rubric = questionnaire.section == "Custom"
 
     CSV::Reader.parse(file) do |row|
       unless row.empty?
@@ -94,6 +95,10 @@ end
     end
 
     questions
+=end
+
+
+
   end
 
   def self.adjust_advice_size(questionnaire, question)

@@ -229,7 +229,7 @@ describe "assignment function" do
           notification_limit: 50
         )
       end
-       it "should update scored question dropdown" do
+      it "should update scored question dropdown" do
         find_link('Rubrics').click
         within("tr#questionnaire_table_ReviewQuestionnaire") do
           select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'

@@ -26,6 +26,7 @@ def get_selected_id(finder_var)
     TeammateReviewQuestionnaire.find_by(name: finder_var)[:id]
   end
 end
+
 def test
   it "is able to create with teams" do
     login_as("instructor6")
@@ -38,7 +39,7 @@ def test
     fill_in 'assignment_form_assignment_max_team_size', with: 3
     click_button 'Create'
     assignment = Assignment.where(name: 'private assignment for test').first
-    expect(assignment).to have_attributes(max_team_size: 3,show_teammate_reviews: true)
+    expect(assignment).to have_attributes(max_team_size: 3, show_teammate_reviews: true)
   end
 end
 describe "assignment function" do

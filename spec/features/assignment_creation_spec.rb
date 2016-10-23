@@ -19,11 +19,11 @@ end
 
 def get_selected_id(finder_var)
   if finder_var == "ReviewQuestionnaire2"
-    ReviewQuestionnaire.find_by_name(finder_var)[:id]
+    ReviewQuestionnaire.find_by(name: finder_var)[:id]
   elsif finder_var == "AuthorFeedbackQuestionnaire2"
-    AuthorFeedbackQuestionnaire.find_by_name(finder_var)[:id]
+    AuthorFeedbackQuestionnaire.find_by(name: finder_var)[:id]
   elsif finder_var == "TeammateReviewQuestionnaire2"
-    TeammateReviewQuestionnaire.find_by_name(finder_var)[:id]
+    TeammateReviewQuestionnaire.find_by(name: finder_var)[:id]
   end
 end
 def test
@@ -79,7 +79,7 @@ describe "assignment function" do
       assignment = Assignment.where(name: 'public assignment for test').first
       expect(assignment).to have_attributes(
         name: 'public assignment for test',
-        course_id: Course.find_by_name('Course 2')[:id],
+        course_id: Course.find_by(name: 'Course 2')[:id],
         directory_path: 'testDirectory',
         spec_location: 'testLocation',
         microtask: true,
@@ -105,7 +105,7 @@ describe "assignment function" do
       assignment = Assignment.where(name: 'private assignment for test').first
       expect(assignment).to have_attributes(
         name: 'private assignment for test',
-        course_id: Course.find_by_name('Course 2')[:id],
+        course_id: Course.find_by(name: 'Course 2')[:id],
         directory_path: 'testDirectory',
         spec_location: 'testLocation'
       )
@@ -116,7 +116,6 @@ describe "assignment function" do
       skip('skip test on staggered deadline temporarily')
       login_as("instructor6")
       visit '/assignments/new?private=1'
-
       fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
       select('Course 2', from: 'assignment_form_assignment_course_id')
       fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
@@ -129,7 +128,6 @@ describe "assignment function" do
       click_button 'Create'
       fill_in 'assignment_form_assignment_days_between_submissions', with: 7
       click_button 'submit_btn'
-
       assignment = Assignment.where(name: 'private assignment for test').first
       pending(%(not sure what's broken here but the error is: #ActionController::RoutingError: No route matches [GET] "/assets/staggered_deadline_assignment_graph/graph_1.jpg"))
       expect(assignment).to have_attributes(

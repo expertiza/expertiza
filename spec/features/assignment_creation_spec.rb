@@ -235,7 +235,7 @@ describe "assignment function" do
         within("tr#questionnaire_table_ReviewQuestionnaire") do
           select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-      end
+        end
         click_button 'Save'
         questionnaire = Questionnaire.where(name: "ReviewQuestionnaire2").first
         assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
@@ -254,17 +254,14 @@ describe "assignment function" do
         end
         click_button 'Save'
         questionnaire = get_questionnaire("AuthorFeedbackQuestionnaire2").first
-        expect(questionnaire).to have_attributes(
-          questionnaire_weight: 50,
-          notification_limit: 50
-        )
+        expect(questionnaire).to have_attributes(questionnaire_weight: 50, notification_limit: 50)
       end
       it "should update scored question dropdown" do
         find_link('Rubrics').click
         within("tr#questionnaire_table_ReviewQuestionnaire") do
           select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-       end
+        end
         click_button 'Save'
         questionnaire = Questionnaire.where(name: "ReviewQuestionnaire2").first
         assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first

@@ -64,119 +64,41 @@ describe "Questionnaire tests for instructor interface" do
 
     click_button "Create"
   end
-
+  
   describe "Create a review question", type: :controller do
-    it "is able to create a Criterion question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('Criterion', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a Scale question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('Scale', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a Dropdown question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('Dropdown', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a Checkbox question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('Checkbox', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a TextArea question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('TextArea', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a TextField question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('TextField', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a UploadFile question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('UploadFile', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a SectionHeader question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('SectionHeader', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a TableHeader question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('TableHeader', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a ColumnHeader question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('ColumnHeader', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
+    def QuestionType(value)
+      if value.eql? "is able to create a Criterion question"
+        value1 = "Criterion"
+      if value.eql? "is able to create a Scale question"
+        value1 = "Scale"
+      if value.eql? "is able to create a Dropdown question"
+        value1 = "Dropdown"
+      if value.eql? "is able to create a Checkbox question"
+        value1 = "Checkbox"
+      if value.eql? "is able to create a TextArea question"
+        value1 = "TextArea"
+      if value.eql? "is able to create a TextField question"
+        value1 = "TextField"
+      if value.eql? "is able to create a UploadFile question"
+        value1 = "UploadFile"
+      if value.eql? "is able to create a SectionHeader question"
+        value1 = "SectionHeader"
+      if value.eql? "is able to create a TableHeader question"
+        value1 = "TableHeader"
+      if value.eql? "is able to create a ColumnHeader question"
+        value1 = "ColumnHeader"
+      it value do
+        load_questionnaire
+        fill_in('question_total_num', with: '1')
+        select(value1, from: 'question_type')
+        click_button "Add"
+        expect(page).to have_content('Remove')
+        click_button "Save review questionnaire"
+        expect(page).to have_content('All questions has been successfully saved!')
+      end
     end
   end
-
+      
   def load_question question_type
     load_questionnaire
     fill_in('question_total_num', with: '1')

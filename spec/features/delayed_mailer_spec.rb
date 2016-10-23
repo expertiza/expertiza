@@ -27,17 +27,15 @@ def test5(val)
   end
   describe val do
     it val1 do
-      id = 2
       @name = "user"
       due_at = DateTime.now.getlocal.advance(minutes: +2)
       due_at1 = Time.parse.getlocal(due_at.to_s(:db))
       curr_time = DateTime.now.getlocal.to_s(:db)
       curr_time = Time.parse.getlocal(curr_time)
-      time_in_min = ((due_at1 - curr_time).to_i / 60) * 60
       Delayed::Job.delete_all
       expect(Delayed::Job.count).to eq(0)
       expect(Delayed::Job.count).to eq(1)
-      expect(Delayed::Job.last.handler).to include("deadline_type: "+ val2)
+      expect(Delayed::Job.last.handler).to include("deadline_type: " + val2)
     end
   end
 end

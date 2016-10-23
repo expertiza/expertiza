@@ -214,6 +214,19 @@ describe "assignment function" do
     before(:each) do
       @assignment = create(:assignment)
       create_list(:participant, 3)
+      # Create an assignment due date
+      create :assignment_due_date, due_at: (DateTime.now - 1)
+      @review_deadline_type = create(:deadline_type, name: "review")
+      create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+      create(:deadline_type, name: "submission")
+      create(:deadline_type, name: "review")
+      create(:deadline_type, name: "metareview")
+      create(:deadline_type, name: "drop_topic")
+      create(:deadline_type, name: "signup")
+      create(:deadline_type, name: "team_formation")
+      create(:deadline_right)
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
       create(:assignment_node)
       create(:question)
       create(:questionnaire)

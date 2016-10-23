@@ -32,8 +32,7 @@ def create_quiz
   # Save quiz
   click_on 'Create Quiz'
 end
-
-describe 'Student can create quizzes and edit them', js: true do
+def functioncall
   before(:each) do
     # Create an instructor
     @instructor = create(:instructor)
@@ -42,7 +41,7 @@ describe 'Student can create quizzes and edit them', js: true do
     @student = create(:student)
 
     # Create an assignment with quiz
-    @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 1
+    @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 3
 
     # Create an assignment due date
     create(:deadline_type, name: "submission")
@@ -70,7 +69,9 @@ describe 'Student can create quizzes and edit them', js: true do
     create :team_user, team: @team, user: @student
     create :review_response_map, assignment: @assignment, reviewee: @team
   end
-
+end
+describe 'Student can create quizzes and edit them', js: true do
+  functioncall
   it 'should be able to create quiz' do
     # Create a quiz
     create_quiz
@@ -227,43 +228,7 @@ describe 'Student can create quizzes and edit them', js: true do
 end
 
 describe 'multiple quiz question test', js: true do
-  before(:each) do
-    # Create an instructor
-    @instructor = create(:instructor)
-
-    # Create a student
-    @student = create(:student)
-
-    # Create an assignment with quiz
-    @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 3
-
-    # Create an assignment due date
-    create(:deadline_type, name: "submission")
-    create(:deadline_type, name: "review")
-    create(:deadline_type, name: "metareview")
-    create(:deadline_type, name: "drop_topic")
-    create(:deadline_type, name: "signup")
-    create(:deadline_type, name: "team_formation")
-    create(:deadline_right)
-    create(:deadline_right, name: 'Late')
-    create(:deadline_right, name: 'OK')
-    create :assignment_due_date, due_at: (DateTime.now + 1)
-
-    @review_deadline_type = create(:deadline_type, name: "review")
-    create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
-
-    # Create a team linked to the calibrated assignment
-    @team = create :assignment_team, assignment: @assignment
-
-    # Create an assignment participant linked to the assignment
-    @participant = create :participant, assignment: @assignment, user: @student
-
-    # Create a mapping between the assignment team and the
-    # participant object's user (the submitter).
-    create :team_user, team: @team, user: @student
-    create :review_response_map, assignment: @assignment, reviewee: @team
-  end
-
+  functioncall
   it 'number of questions set matches number of quiz questions avaliable' do
     # [S2] - When an assignment has a quiz there is an input field that accepts the number of questions that will be on each quiz. Setting this number appropriately changes the number of quiz questions.
     # Create a quiz

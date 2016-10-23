@@ -28,18 +28,16 @@ class InvitationController < ApplicationController
         # check if invited user is already in the team
         if !team_member.empty?
           flash[:note] = "The user \"#{user.name}\" is already a member of the team."
-        else
           # check if the invited user is already invited (i.e. awaiting reply)
-          if Invitation.is_invited?(student.user_id, user.id, student.parent_id)
+        elsif Invitation.is_invited?(student.user_id, user.id, student.parent_id)
             @invitation = Invitation.new
             @invitation.to_id = user.id
             @invitation.from_id = student.user_id
             @invitation.assignment_id = student.parent_id
             @invitation.reply_status = 'W'
             @invitation.save
-          else
+        else
             flash[:note] = "You have already sent an invitation to \"#{user.name}\"."
-          end
         end
       end
     end
@@ -79,12 +77,10 @@ class InvitationController < ApplicationController
     inviter_assignment_team = AssignmentTeam.team(inviter_participant)
     if inviter_assignment_team.nil?
       flash[:error] = "The team that invited you does not exist anymore."
-    else
-      if inviter_assignment_team.full?
+    elsif inviter_assignment_team.full?
         flash[:error] = "The team that invited you is full now."
-      else
+    else
         ready_to_join = true
-      end
     end
 
     if ready_to_join

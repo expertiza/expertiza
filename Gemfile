@@ -78,6 +78,7 @@ group :test do
   gem 'launchy'
   gem 'rspec-rails'
   gem 'shoulda'
+  gem 'capybara'
   gem 'test-unit'
 end
 
@@ -86,6 +87,5 @@ group :assets do
 end
 
 group :development, :test do
-  gem 'capybara'
   gem 'simplecov', require: false
 end

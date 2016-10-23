@@ -1,5 +1,5 @@
 class InvitationController < ApplicationController
-	#
+	# decide if the controller is accessisable to the user
   def action_allowed?
     ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator', 'Student'].include? current_role_name
   end
@@ -30,6 +30,9 @@ class InvitationController < ApplicationController
         if !team_member.empty?
           flash[:note] = "The user \"#{user.name}\" is already a member of the team."
           # check if the invited user is already invited (i.e. awaiting reply)
+	  # reply_status is the current replying status , W means there's a invitation reply waiting to be sent
+	  # 						  A means the invitation is accepted
+	  # 						  D means the invitaion is declined
         elsif Invitation.is_invited?(student.user_id, user.id, student.parent_id)
             @invitation = Invitation.new
             @invitation.to_id = user.id
@@ -48,6 +51,7 @@ class InvitationController < ApplicationController
     redirect_to view_student_teams_path student_id: student.id
   end
 
+  # update the request to join team 
   def update_join_team_request(user, student)
     # update the status in the join_team_request to A
     if user && student
@@ -59,11 +63,13 @@ class InvitationController < ApplicationController
     end
   end
 
+  #auto complete user name
   def auto_complete_for_user_name
     search = params[:user][:name].to_s
     @users = User.where("LOWER(name) LIKE ?", "%#{search}%") unless search.blank?
   end
 
+  # accept invitation
   def accept
     @inv = Invitation.find(params[:inv_id])
 
@@ -95,23 +101,25 @@ class InvitationController < ApplicationController
       add_successful = Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, student.parent_id)
 
       unless add_successful
-        flash[:error] = "The system failed to add you to the team that invited you."
+	      flash[:error] = "The system failed to add you to the team that invited you."
       end
     end
 
     redirect_to view_student_teams_path student_id: params[:student_id]
   end
 
+  # decline invitation
   def decline
-    @inv = Invitation.find(params[:inv_id])
-    @inv.reply_status = 'D'
-    @inv.save
-    student = Participant.find(params[:student_id])
-    redirect_to view_student_teams_path student_id: student.id
+	  @inv = Invitation.find(params[:inv_id])
+	  @inv.reply_status = 'D'
+	  @inv.save
+	  student = Participant.find(params[:student_id])
+	  redirect_to view_student_teams_path student_id: student.id
   end
 
+  # cancel invitation
   def cancel
-    Invitation.find(params[:inv_id]).destroy
-    redirect_to view_student_teams_path student_id: params[:student_id]
+	  Invitation.find(params[:inv_id]).destroy
+	  redirect_to view_student_teams_path student_id: params[:student_id]
   end
 end

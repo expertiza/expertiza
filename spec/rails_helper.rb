@@ -69,6 +69,10 @@ RSpec.configure do |config|
        create(:deadline_right, name: 'Late')
        create(:deadline_right, name: 'OK')
        create(:assignment_due_date)
+       Do not use `Time.now` without zone. Use one of `Time.zone.now`, `Time.current`, `Time.now.in_time_zone`, `Time.now.utc`, `Time.now.getlocal`, `Time.now.iso8601`, `Time.now.jisx0301`, `Time.now.rfc3339`, `Time.now.to_i`, `Time.now.to_f` instead.  …
+       create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now + (100 * 24 * 60 * 60))
+    end
+  end    
   def login_as(user_name)
     user = User.find_by_name(user_name)
     msg = user.to_yaml

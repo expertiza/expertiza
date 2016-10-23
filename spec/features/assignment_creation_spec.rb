@@ -256,7 +256,6 @@ describe "assignment function" do
           notification_limit: 50
         )
       end
-def methodA
        it "should update scored question dropdown" do
         find_link('Rubrics').click
         within("tr#questionnaire_table_ReviewQuestionnaire") do
@@ -268,8 +267,7 @@ def methodA
         assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
         expect(assignment_questionnaire.dropdown).to eq(false)
       end
-end
-      methodA()
+
       # Second row of rubric
       it "updates author feedback questionnaire" do
         find_link('Rubrics').click
@@ -287,7 +285,18 @@ end
           notification_limit: 50
         )
       end
-      methodA()
+      it "should update scored question dropdown" do
+        find_link('Rubrics').click
+        within("tr#questionnaire_table_ReviewQuestionnaire") do
+          select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+          select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
+       end
+        click_button 'Save'
+        questionnaire = Questionnaire.where(name: "ReviewQuestionnaire2").first
+        assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
+        expect(assignment_questionnaire.dropdown).to eq(false)
+      end
+
       # Third row of rubric
       it "updates teammate review questionnaire" do
         find_link('Rubrics').click

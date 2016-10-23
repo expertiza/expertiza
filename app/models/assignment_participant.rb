@@ -266,6 +266,9 @@ class AssignmentParticipant < Participant
     if user.nil?
       raise ArgumentError, "The record containing #{row[0]} does not have enough items." if row.length < 4
       attributes = ImportFileHelper.define_attributes(row)
+      if attributes.nil?
+        raise ArgumentError, "Khali hai"
+      end
       user = ImportFileHelper.create_new_user(attributes, session)
     end
     raise ImportError, "The assignment with id \"" + id.to_s + "\" was not found." if Assignment.find(id).nil?

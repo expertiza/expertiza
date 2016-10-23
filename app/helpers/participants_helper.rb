@@ -42,6 +42,10 @@ module ParticipantsHelper
     user.update_attributes attrs
     user.parent_id = (session[:user]).id
     user.save
+    password = @user.reset_password
+    prepared_mail = MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password)
+    prepared_mail.deliver
+    flash[:success] = "A new password has been sent to new user's e-mail address."
     user
   end
 

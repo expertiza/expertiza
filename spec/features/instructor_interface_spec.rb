@@ -1,8 +1,6 @@
 require 'rails_helper'
-
-  common
-  instructorlogin
-
+common
+instructorlogin
   describe "Create a course", type: :controller do
     it "is able to create a public course or a private course" do
       login_as("instructor6")

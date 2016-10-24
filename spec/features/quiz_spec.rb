@@ -130,8 +130,8 @@ describe 'Student can create quizzes and edit them', js: true do
     # Verify that the edit choice has been saved
     expect(page).to have_content('Test Quiz 1 Edit')
   end
-  def checkfunc(a,b,c,d)
-    it a do
+def checkfunc(a, b, c,  d)
+  it a do
     login_as @student.name
 
     # Click on the assignment link, and navigate to work view
@@ -163,8 +163,8 @@ end
   b2='Quiz for test'
   a3='Please specify quiz name (please do not use your name or id).'
   b3='Please make sure all questions have text'
-  checkfunc(a,a1,a2,a3)
-  checkfunc(b,b1,b2,b3)
+  checkfunc(a, a1, a2, a3)
+  checkfunc(b, b1, b2, b3)
   it 'should have error message if the choices are missing for one or more questions' do
     login_as @student.name
 

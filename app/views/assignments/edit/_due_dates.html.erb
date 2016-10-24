@@ -397,8 +397,8 @@
 <%= check_box_tag('metareviewAllowed', 'true', @metareview_allowed,:onclick=>"removeOrAddMetareview()" ) %>
 <%= label_tag('metareivewAllowed', 'Use metareview deadline') %><br/>
 
-<input id="timezonepicker_' + 'style="width: 200px" type="text" value="' +
-	timezonepref+ '">
+<input id="timezonepicker_' + 'style="width: 200px" type="text" value=
+	<%= current_user.timezonepref %> > 
 
 <table class='exp' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden;'>
 

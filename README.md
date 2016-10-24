@@ -58,3 +58,16 @@ When editing existing files:
 
 Please do no go crazy changing old code to match these guidelines; it will just create lots of potential merge conflicts.
 Applying style guidelines to code you add and modify is good enough. :-)
+
+Two New Files are Added:
+spec/models/due_date_spec.rb (11 new test cases created)
+spec/helpers/deadline_helper_spec.rb (5 new test cases created)
+
+We have implemented the changes as suggested by code climate in:
+app/models/due_date.rb
+app/helpers/deadline_helper.rb
+
+To run the test cases created in the two rspec file, go to the home directory
+and type the following:
+rspec spec/models/due_date_spec.rb
+rspec spec/models/deadline_helper_spec.rb

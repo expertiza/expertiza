@@ -79,30 +79,20 @@ class InvitationController < ApplicationController
     inviter_user_id = @inv.from_id
     inviter_participant = AssignmentParticipant.find_by_user_id_and_assignment_id(inviter_user_id, assignment_id)
 
-    ready_to_join = false
-    # check if the inviter's team is still existing, and have available slot to add the invitee
-    inviter_assignment_team = AssignmentTeam.team(inviter_participant)
-    if inviter_assignment_team.nil?
-      flash[:error] = "The team that invited you does not exist anymore."
-    elsif inviter_assignment_team.full?
-        flash[:error] = "The team that invited you is full now."
-    else
-        ready_to_join = true
-    end
+    
+    if ready_to_join?
+	    @inv.reply_status = 'A'
+	    @inv.save
 
-    if ready_to_join
-      @inv.reply_status = 'A'
-      @inv.save
+	    # Remove the users previous team since they are accepting an invite for possibly a new team.
+	    TeamsUser.remove_team(student.user_id, params[:team_id])
 
-      # Remove the users previous team since they are accepting an invite for possibly a new team.
-      TeamsUser.remove_team(student.user_id, params[:team_id])
+	    # Accept the invite and return boolean on whether the add was successful
+	    add_successful = Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, student.parent_id)
 
-      # Accept the invite and return boolean on whether the add was successful
-      add_successful = Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, student.parent_id)
-
-      unless add_successful
-	      flash[:error] = "The system failed to add you to the team that invited you."
-      end
+	    unless add_successful
+		    flash[:error] = "The system failed to add you to the team that invited you."
+	    end
     end
 
     redirect_to view_student_teams_path student_id: params[:student_id]
@@ -121,5 +111,21 @@ class InvitationController < ApplicationController
   def cancel
 	  Invitation.find(params[:inv_id]).destroy
 	  redirect_to view_student_teams_path student_id: params[:student_id]
+  end
+  private 
+  def ready_to_join?
+	  ready_to_join = false
+	  # check if the inviter's team is still existing, and have available slot to add the invitee
+	  inviter_assignment_team = AssignmentTeam.team(inviter_participant)
+	  if inviter_assignment_team.nil?
+		  flash[:error] = "The team that invited you does not exist anymore."
+	  elsif inviter_assignment_team.full?
+		  flash[:error] = "The team that invited you is full now."
+	  else
+		  ready_to_join = true
+	  end
+	  return ready_to_join
+
+
   end
 end

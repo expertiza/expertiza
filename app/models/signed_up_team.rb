@@ -48,6 +48,7 @@ class SignedUpTeam < ActiveRecord::Base
     TeamsUser.find_by_sql(["SELECT t.id as t_id FROM teams_users u, teams t WHERE u.team_id = t.id and t.parent_id = ? and user_id = ?", assignment_id, user_id])
   end
 
+
   def self.find_user_signup_topics(assignment_id, team_id)
     # SignedUpTeam.find_by_sql("SELECT t.id as topic_id, t.topic_name as topic_name, u.is_waitlisted as is_waitlisted FROM sign_up_topics t, signed_up_teams u WHERE t.id = u.topic_id and t.assignment_id = " + assignment_id.to_s + " and u.team_id =" + team_id.to_s)
     SignedUpTeam.find_by_sql(["SELECT t.id as topic_id, t.topic_name as topic_name, u.is_waitlisted as is_waitlisted, u.preference_priority_number as preference_priority_number FROM sign_up_topics t, signed_up_teams u WHERE t.id = u.topic_id and t.assignment_id = ? and u.team_id = ?", assignment_id.to_s, team_id.to_s])

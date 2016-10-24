@@ -28,9 +28,9 @@ def test5(val)
   describe val do
     it val1 do
       @name = "user"
-      due_at = DateTime.now.getlocal.advance(minutes: +2)
+      # due_at = DateTime.now.getlocal.advance(minutes: +2)
       # due_at1 = Time.parse.getlocal(due_at.to_s(:db))
-      curr_time = DateTime.now.getlocal.to_s(:db)
+      # curr_time = DateTime.now.getlocal.to_s(:db)
       # curr_time = Time.parse.getlocal(curr_time)
       Delayed::Job.delete_all
       expect(Delayed::Job.count).to eq(0)

@@ -319,11 +319,13 @@ class AssignmentParticipant < Participant
         end
       end
     elsif options["participant_type"] == "unsigned"
+      where(parent_id: parent_id).find_each do |part|
+        user_part = part.user
       Team.where(:parent_id=> parent_id).find_each do |team|
         TeamsUser.where(:team_id=> team.id).find_each do |team_user|
           user = User.find(team_user.user_id)
-          if SignedUpTeam.where( :team_id => team.id).empty?
-            csv << [
+            if SignedUpTeam.where( :team_id => team.id).empty? or TeamsUser.where(:user_id=>user_part).empty?
+              csv << [
                 user.name,
                 user.fullname,
                 user.email,
@@ -334,7 +336,8 @@ class AssignmentParticipant < Participant
                 user.email_on_review_of_review,
                 team.id,
                 "handle"
-            ]
+              ]
+            end
           end
         end
       end

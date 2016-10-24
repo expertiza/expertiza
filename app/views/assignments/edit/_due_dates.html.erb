@@ -95,9 +95,6 @@
             due_name = '';
         }
         html += '<td align="center" class="due_date_due_at" width="15%">' +
-        '<input id="timezonepicker_' + 'style="width: 200px" type="text" value="' +
-	timezonepref+ '">' + '</td>';
-        html += '<td align="center" class="due_date_due_at" width="15%">' +
         '<input id="datetimepicker_' + element_id +
         '" name="assignment_form[due_date][][due_at]" style="width: 130px" type="text" value="' +
         due_at.substr(0,16) + '">' + '</td>';

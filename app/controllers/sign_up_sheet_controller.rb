@@ -181,23 +181,6 @@ class SignUpSheetController < ApplicationController
       @bids = signed_up_topics
     end
 
-    #if assignment.is_intelligent
-    #  @sign_up_topics = []
-      #@sign_up_topics = Bid.where(user_id: session[:user].id).joins("INNER JOIN sign_up_topics ON bids.topic_id = sign_up_topics.id").order(:priority)
-    #  bids = Bid.where(user_id: session[:user].id).order(:priority)
-    #  bids.each do |bid|
-    #    sign_up_topic = SignUpTopic.where(id: bid.topic_id)
-    #    unless sign_up_topic.empty?
-    #      @sign_up_topics << sign_up_topic.first
-    #    end
-    #  end
-      #If the bid table is empty, select signup topics from sign_up_topics table
-    #  if @sign_up_topics.empty?
-    #    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: nil)
-    #  end
-    #else
-    #  @sign_up_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: nil)
-    #end
     @num_of_topics = @sign_up_topics.size
     @signup_topic_deadline = assignment.due_dates.find_by_deadline_type_id(7)
     @drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)

@@ -15,7 +15,7 @@
   <br/><br/>
 
   <% i=1 %>
-  <tbody id="tablelist" data-update-url="/sign_up_sheet/set_priority">
+  <tbody id="tablelist">
     <% for topic in @sign_up_topics %>
       <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
         <% for selected_topic in @selected_topics %>

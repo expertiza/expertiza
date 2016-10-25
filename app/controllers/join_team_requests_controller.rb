@@ -39,9 +39,10 @@ class JoinTeamRequestsController < ApplicationController
     team = Team.find(params[:team_id])
     if team.full?
       flash[:note] = "This team is full."
-    elsif !team_member.empty?
-        flash[:note] = "You are already a member of this team."
     else
+      if !team_member.empty?
+        flash[:note] = "You are already a member of this team."
+      else
 
         @join_team_request = JoinTeamRequest.new
         @join_team_request.comments = params[:comments]
@@ -59,38 +60,39 @@ class JoinTeamRequestsController < ApplicationController
             format.xml  { render xml: @join_team_request.errors, status: :unprocessable_entity }
           end
         end
+      end
     end
   end
 
   # update join team request entry for join_team_request table and add it to the table
   def update
-    @join_team_request = JoinTeamRequest.find(params[:id])
-    respond_to do |format|
-      if @join_team_request.update_attribute(:comments, params[:join_team_request][:comments])
-        format.html { redirect_to(@join_team_request, notice: 'JoinTeamRequest was successfully updated.') }
-        format.xml  { head :ok }
-      else
-        format.html { render action: "edit" }
-        format.xml  { render xml: @join_team_request.errors, status: :unprocessable_entity }
-      end
-    end
+	  @join_team_request = JoinTeamRequest.find(params[:id])
+	  respond_to do |format|
+		  if @join_team_request.update_attribute(:comments, params[:join_team_request][:comments])
+			  format.html { redirect_to(@join_team_request, notice: 'JoinTeamRequest was successfully updated.') }
+			  format.xml  { head :ok }
+		  else
+			  format.html { render action: "edit" }
+			  format.xml  { render xml: @join_team_request.errors, status: :unprocessable_entity }
+		  end
+	  end
   end
 
   def destroy
-    @join_team_request = JoinTeamRequest.find(params[:id])
-    @join_team_request.destroy
+	  @join_team_request = JoinTeamRequest.find(params[:id])
+	  @join_team_request.destroy
 
-    respond_to do |format|
-      format.html { redirect_to(join_team_requests_url) }
-      format.xml  { head :ok }
-    end
+	  respond_to do |format|
+		  format.html { redirect_to(join_team_requests_url) }
+		  format.xml  { head :ok }
+	  end
   end
 
   # decline request to join the team...
   def decline
-    @join_team_request = JoinTeamRequest.find(params[:id])
-    @join_team_request.status = 'D'
-    @join_team_request.save
-    redirect_to view_student_teams_path student_id: params[:teams_user_id]
+	  @join_team_request = JoinTeamRequest.find(params[:id])
+	  @join_team_request.status = 'D'
+	  @join_team_request.save
+	  redirect_to view_student_teams_path student_id: params[:teams_user_id]
   end
 end

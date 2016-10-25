@@ -176,6 +176,8 @@ class Participant < ActiveRecord::Base
     participants.each do |participant|
       user = User.find(participant.user_id)
       user.name = sanitize(user.name)
+      puts "In sort Method"
+      puts user.name
       users << user
     end
     users.sort! {|a, b| a.name.downcase <=> b.name.downcase } # Sort the users based on the name
@@ -195,9 +197,13 @@ class Participant < ActiveRecord::Base
       first, *last = name.split(/ /)
       if last.size().equal? 1
         result = last[0] + ", " + first
+	puts "Mogambo"
+	puts result
         return result
       else
         result = last[1] + ", " + first + " " + last[0]
+	puts "Mogambo"
+	puts result
         return result
       end
   end

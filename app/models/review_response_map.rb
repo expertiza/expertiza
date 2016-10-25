@@ -49,24 +49,26 @@ class ReviewResponseMap < ResponseMap
 
     assignment = Assignment.find(id)
     if assignment.nil?
-      raise ImportError, "The assignment with id \"#{id}\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
+      raise ImportError, "The assignment with id \"#{id}\" was not found.
+      <a href='/assignment/new'>Create</a> this assignment?"
     end
     index = 1
     while index < row.length
       user = User.find_by_name(row[index].to_s.strip)
       if user.nil?
-        raise ImportError, "The user account for the reviewer \"#{row[index]}\" was not found. <a href='/users/new'>Create</a> this user?"
+        raise ImportError, "The user account for the reviewer \"#{row[index]}\" was not found.
+        <a href='/users/new'>Create</a> this user?"
       end
       reviewer = AssignmentParticipant.where(user_id: user.id, parent_id:  assignment.id).first
       if reviewer.nil?
         raise ImportError, "The reviewer \"#{row[index]}\" is not a participant in this assignment. <a href='/users/new'>Register</a> this user as a participant?"
       end
       if assignment.team_assignment
-        reviewee = AssignmentTeam.where(name: row[0].to_s.strip, parent_id:  assignment.id).first
+        reviewee = AssignmentTeam.find_by name: row[0].to_s.strip, parent_id:  assignment.id
         if reviewee.nil?
           raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"
         end
-        existing = ReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
+        existing = ReviewResponseMap.find_by reviewee_id: reviewee.id, reviewer_id:  reviewer.id
         if existing.nil?
           ReviewResponseMap.create(reviewer_id: reviewer.id, reviewee_id: reviewee.id, reviewed_object_id: assignment.id)
         end
@@ -75,12 +77,12 @@ class ReviewResponseMap < ResponseMap
         if user.nil?
           raise ImportError, "The user account for the reviewee \"#{row[0]}\" was not found. <a href='/users/new'>Create</a> this user?"
         end
-        reviewee = AssignmentParticipant.where(user_id: puser.id, parent_id:  assignment.id).first
+        reviewee = AssignmentParticipant.find_by user_id: puser.id, parent_id:  assignment.id
         if reviewee.nil?
           raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"
         end
         team_id = TeamsUser.team_id(reviewee.parent_id, reviewee.user_id)
-        existing = ReviewResponseMap.where(reviewee_id: team_id, reviewer_id:  reviewer.id).first
+        existing = ReviewResponseMap.find_by reviewee_id: team_id, reviewer_id:  reviewer.id
         if existing.nil?
           ReviewResponseMap.create(reviewee_id: team_id, reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
         end

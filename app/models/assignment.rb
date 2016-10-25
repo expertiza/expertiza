@@ -174,10 +174,12 @@ class Assignment < ActiveRecord::Base
         scores[:teams][index.to_s.to_sym][:scores][:avg] = 0
         for i in 1..self.num_review_rounds
           round_sym = ("review" + i.to_s).to_sym
-          if !grades_by_rounds[round_sym][:max].nil? && scores[:teams][index.to_s.to_sym][:scores][:max] < grades_by_rounds[round_sym][:max]
+          if !grades_by_rounds[round_sym][:max].nil? && scores[:teams][index.to_s.to_sym][:scores][:max] <
+              grades_by_rounds[round_sym][:max]
             scores[:teams][index.to_s.to_sym][:scores][:max] = grades_by_rounds[round_sym][:max]
           end
-          if !grades_by_rounds[round_sym][:min].nil? && scores[:teams][index.to_s.to_sym][:scores][:min] > grades_by_rounds[round_sym][:min]
+          if !grades_by_rounds[round_sym][:min].nil? && scores[:teams][index.to_s.to_sym][:scores][:min] >
+              grades_by_rounds[round_sym][:min]
             scores[:teams][index.to_s.to_sym][:scores][:min] = grades_by_rounds[round_sym][:min]
           end
         end

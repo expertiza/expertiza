@@ -1,7 +1,8 @@
 <td><%= topic.topic_identifier %></td>
 <td><%= render :partial => '/sign_up_sheet/topic_names', :locals => {:i => i, :topic=>topic} %></td>
 
-<% unless @assignment.is_intelligent %>
+<% if not @assignment.is_intelligent or ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].
+  include? current_user_role?.name %>
   <% if @assignment.is_microtask? %>
       <td align="center"><%= topic.micropayment %></td>
   <% end %>
@@ -11,7 +12,6 @@
 
   <%= render :partial => '/sign_up_sheet/num_waiting', :locals => {:topic=>topic} %>
   <td align="center"><%= render :partial => '/sign_up_sheet/actions', :locals => {:i=>i,:topic=>topic, :is_suggested_topic=>is_suggested_topic ||= false} %></td>
-
   <td align="center">
     <% if SignUpSheet.has_teammate_ads?(topic.id) %>
         <%# link_to :controller => 'sign_up_sheet', :action => 'show_team', :assignment_id=>params[:id], :id=>topic.id do %>

@@ -161,14 +161,44 @@ class SignUpSheetController < ApplicationController
 
   def list
     @assignment_id = params[:assignment_id].to_i
-    #@sign_up_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: nil)
-    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: nil)
-    @num_of_topics = @sign_up_topics.size
     @slots_filled = SignUpTopic.find_slots_filled(params[:assignment_id])
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:assignment_id])
     @show_actions = true
     @priority = 0
     assignment = Assignment.find(@assignment_id)
+    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: nil)
+
+    if assignment.is_intelligent
+      @bids = Bid.where(user_id: session[:user].id).order(:priority)
+      signed_up_topics = []
+      @bids.each do |bid|
+        sign_up_topic = SignUpTopic.where(id: bid.topic_id)
+        unless sign_up_topic.empty?
+          signed_up_topics << sign_up_topic.first
+        end
+      end
+      @sign_up_topics = @sign_up_topics - signed_up_topics
+      @bids = signed_up_topics
+    end
+
+    #if assignment.is_intelligent
+    #  @sign_up_topics = []
+      #@sign_up_topics = Bid.where(user_id: session[:user].id).joins("INNER JOIN sign_up_topics ON bids.topic_id = sign_up_topics.id").order(:priority)
+    #  bids = Bid.where(user_id: session[:user].id).order(:priority)
+    #  bids.each do |bid|
+    #    sign_up_topic = SignUpTopic.where(id: bid.topic_id)
+    #    unless sign_up_topic.empty?
+    #      @sign_up_topics << sign_up_topic.first
+    #    end
+    #  end
+      #If the bid table is empty, select signup topics from sign_up_topics table
+    #  if @sign_up_topics.empty?
+    #    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: nil)
+    #  end
+    #else
+    #  @sign_up_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: nil)
+    #end
+    @num_of_topics = @sign_up_topics.size
     @signup_topic_deadline = assignment.due_dates.find_by_deadline_type_id(7)
     @drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
     @student_bids = Bid.where(user_id: session[:user].id)
@@ -190,6 +220,9 @@ class SignUpSheetController < ApplicationController
                            SignedUpTeam.find_user_signup_topics(@assignment_id, users_team[0].t_id)
                          end
 
+    end
+    if assignment.is_intelligent
+      render 'sign_up_sheet/intelligent_topic_selection' and return
     end
   end
 
@@ -232,35 +265,32 @@ class SignUpSheetController < ApplicationController
   end
 
   def set_priority
-    print '*'*50
-    params[:topic].each_with_index do |topic_id,index |
-      print "\n topic_id : \n"
-      print topic_id
-      print "index :"
-      print index
-      print "\n"
+    @user_id = session[:user].id
+    unless params[:topic].nil?
+      @bids = Bid.where("user_id LIKE ?", @user_id )
+      signed_up_topics = @bids.map {|bid| bid.topic_id}
 
-      @user_id = session[:user].id
-      check = Bid.where(user_id: @user_id, topic_id: topic_id)
-      if check.empty?
-        Bid.create(topic_id: topic_id, user_id: @user_id, priority: index + 1)
-      else
-        Bid.where("topic_id LIKE ? AND user_id LIKE ?",topic_id, @user_id ).update_all({priority: index + 1})
+      #Remove topics from bids table if the student moves data from Selection HTML table to Topics HTML table
+      #This step is necessary to avoid duplicate priorities in Bids table
+      signed_up_topics = signed_up_topics - params[:topic].map {|topic_id| topic_id.to_i}
+      signed_up_topics.each do |topic|
+        Bid.where(topic_id: topic, user_id: @user_id).destroy_all
       end
+
+      params[:topic].each_with_index do |topic_id,index |
+        check = @bids.where(topic_id: topic_id)
+        if check.empty?
+          Bid.create(topic_id: topic_id, user_id: @user_id, priority: index + 1)
+        else
+          Bid.where("topic_id LIKE ? AND user_id LIKE ?",topic_id, @user_id ).update_all({priority: index + 1})
+        end
+      end
+    else
+      #All topics are deselected by user
+      Bid.where(user_id: @user_id).destroy_all
     end
 
-   # @user_id = session[:user].id
-
-   # check = Bid.where(user_id: @user_id, topic_id: params[:id])
-   # if !Bid.where(user_id: @user_id, priority: params[:priority]).empty?
-   #   flash[:error] = "You have already selected this priority"
-   # elsif check.empty?
-   #   Bid.create(topic_id: params[:id], user_id: @user_id, priority: params[:priority])
-   # else
-   #   check.first.update(priority: params[:priority])
-   # end
-   # redirect_to action: 'list', assignment_id: params[:assignment_id]
-    render nothing: true
+    redirect_to action: 'list', assignment_id: params[:assignment_id]
   end
 
   # If the instructor needs to explicitly change the start/due dates of the topics

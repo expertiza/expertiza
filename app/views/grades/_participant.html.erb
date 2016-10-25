@@ -95,7 +95,9 @@ participant = pscore[:participant]
                     <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_teammate_reviewsLink" name="<%=prefix%>_teammate_reviewsLink" onClick="toggleElement('<%=prefix%>_teammate_reviews','teammate reviews');return false;">show teammate reviews</a> (<%= pscore[:teammate][:assessments].size %>)</FONT>
                 </TD>
                 <TD ALIGN="CENTER" VALIGN="TOP">
-                <% range =  @rscore_teammate.my_min.is_a?(Float)?sprintf("%.0f",@rscore_teammate.my_min):@rscore_teammate.my_min + '%' + ' - ' + @rscore_teammate.my_max.is_a?(Float)?sprintf("%.0f",@rscore_teammate.my_max):@rscore_teammate.my_max + '%' %>
+                <% range =  @rscore_teammate.my_min.is_a?(Float) ? sprintf("%.0f",@rscore_teammate.my_min) : @rscore_teammate.my_min.to_s + '%' + ' - ' %>
+                <% range += @rscore_teammate.my_max.is_a?(Float) ? sprintf("%.0f",@rscore_teammate.my_max) : @rscore_teammate.my_max.to_s + '%' %>
+
                 <%if @assignment %>
                     <%= range %>
                 <% end %>

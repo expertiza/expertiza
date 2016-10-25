@@ -4,15 +4,9 @@ module ReviewMappingHelper
                     <table width='100% cellspacing='0' cellpadding='2' border='0'>\
                     <tr bgcolor='#CCCCCC'>"
     headers.each do |header, percentage|
-      if percentage
-        table_header += "<th width = #{percentage}>\
-                        #{header.humanize}\
-                        </th>"
-      else
-        table_header += "<th>\
-                        #{header.humanize}\
-                        </th>"
-      end
+      table_header += "<th width = #{percentage}>\
+                      #{header.humanize}\
+                      </th>"
     end
     table_header += "</tr>"
     table_header.html_safe

@@ -106,10 +106,54 @@ class SignUpSheetController < ApplicationController
       end
     # changing the redirection url to topics tab in edit assignment view.
     redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
-    end
+  end
+
+  def assign_topic
+    puts "i AM HERE"
+    @topic = SignUpTopic.find(params[:id])
+    @assignment = Assignment.find(params[:assignment_id])
+    #redirect_to "http://www.google.com"
+
+
+
+  end
+
+  def update_team
+     #puts params
+     @topic = SignUpTopic.find(params[:id])
+     @assignment = Assignment.find(params[:assignment_id])
+     @user = User.find_by name: params[:user][:name]
+     puts @user.name
+     @team = TeamsUser.find_by_sql("select T1.team_id from teams_users T1, teams T2 where user_id = "+ @user.id.to_s+" AND T1.team_id = T2.id AND T2.parent_id = "+ @assignment.id.to_s)
+     puts @team[0].team_id
+     @isTopicTaken = SignedUpTeam.find_by_sql("select * from signed_up_teams where topic_id = "+ @topic.id.to_s)
+
+     puts "I am here"
+     if(@isTopicTaken.any?)
+        #flash
+       puts "A team already has this topic"
+     else
+       @sign_up = SignedUpTeam.new
+       #@team.each{|x| sign_up.team_id = x.id}
+       @sign_up.topic_id = @topic.id
+       @sign_up.team_id = @team[0].team_id
+       @sign_up.is_waitlisted = false
+       @sign_up.preference_priority_number =1
+       puts @sign_up.topic_id
+       if @sign_up.save
+         puts "Yes!"
+       else
+         puts "No!"
+       end
+     end
+
+     #"select * from assignments where id not in (select assignment_id from assignment_signups where signup_id = " + @params[:id].to_s + ")")
+
+
+  end
 
   # This displays a page that lists all the available topics for an assignment.
-  # Contains links that let an admin or Instructor edit, delete, view enrolled/waitlisted members for each topic
+  # Contains links that let an admin or Instr@topic = SignUpTopic.find(params[:id])uctor edit, delete, view enrolled/waitlisted members for each topic
   # Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics can have different deadlines.
   def add_signup_topics
     load_add_signup_topics(params[:id])

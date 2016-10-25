@@ -58,6 +58,7 @@ gem 'will_paginate'
 gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
 gem 'jquery-tablesorter'
+gem 'bootstrap-sass', '~> 3.3.6'
 
 group :development do
   gem 'daemons'

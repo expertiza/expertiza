@@ -1,5 +1,5 @@
 <h2>Reviews for "<%= @assignment.name %>"</h2>
-<% if check_reviewable_topics(@assignment) or @assignment.get_current_stage(@topic_id) == "Finished" %>
+<% if @assignment.can_review(@topic_id) or @assignment.get_current_stage(@topic_id) == "Finished" %>
     <%= render :partial => 'responses', :locals => {:mappings => @review_mappings, :title => 'Review'} %>
     <% if @assignment.dynamic_reviewer_assignment? %>
       <%# if @num_reviews_in_progress == 0 %>

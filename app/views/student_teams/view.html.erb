@@ -120,7 +120,7 @@
          <%= text_field 'team', 'name' %>
          <%= submit_tag "Name team" %>
        <% end %>
-     <% elsif !@student.team.full?%>
+     <% elsif !@student.team.full? && @student.assignment.has_topics? && @student.team.topic%>
        <b>Invite people</b>
        <%= form_tag :controller => 'invitation', :action => 'create' do %>
          <%= hidden_field_tag 'team_id', @student.team.id %>

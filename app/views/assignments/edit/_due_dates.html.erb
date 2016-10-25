@@ -402,7 +402,7 @@ var timezonepref = "<%= current_user.timezonepref %>";
 <%= label_tag('metareivewAllowed', 'Use metareview deadline') %><br/>
 
  <%= label_tag('timezone', 'Timezone') %>
-<input id="timezonepicker_' + 'style="width: 200px" type="text" value="'+ <%= current_user.timezonepref %>  +'"> > 
+<input id="timezonepicker_' + 'style="width: 200px" type="text" value="<%= current_user.timezonepref %>" > 
 
 <table class='exp' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden;'>
 

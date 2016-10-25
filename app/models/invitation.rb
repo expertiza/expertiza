@@ -73,4 +73,12 @@ class Invitation < ActiveRecord::Base
     return true if sent_invitation.empty?
     false
   end
+
+  def self.remove_pending_invitations(student_id, assignment_id)
+    pendingInvites = Invitation.where(to_id: student_id,assignment_id: assignment_id,reply_status:'W' ).destroy_all
+    #debugger
+    #pendingInvites.each do |invite|
+    #  invite.destroy
+    #end
+  end
 end

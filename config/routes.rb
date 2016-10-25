@@ -1,5 +1,6 @@
 Expertiza::Application.routes.draw do
 
+  resources :submission_records
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
 
@@ -30,6 +31,8 @@ Expertiza::Application.routes.draw do
       post ':id', action: :update
     end
   end
+
+
 
   resources :advice do
     collection do
@@ -409,6 +412,16 @@ Expertiza::Application.routes.draw do
       get :auto_complete_for_user_name
     end
   end
+
+  # resources :submissionrecord do
+  #   collection do
+  #     get :list
+  #     get :show
+  #     get :neq
+  #     post :create
+  #     post ':id', action: :update
+  #   end
+  # end
 
   resources :submitted_content do
     collection do

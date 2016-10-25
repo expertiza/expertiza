@@ -1,5 +1,5 @@
 <h1>Submissions for <%= @assignment.name %></h1>
-
+<%= link_to "Show Submissions", submission_records_path %>
 <% headers = {} %>
 <% headers["Topic_name"] = "16%" if @assignment.has_topics? %>
 <% if @assignment.max_team_size > 1 %>
@@ -13,6 +13,8 @@
   
     <% @l = -1 %>
     <% @teams.each do |team| %>
+
+
     	<% @l = @l+1 %>
     	<tr>
         <% bgcolor = @l.even? ? "#ffffff" : "#DDDDBB" %>

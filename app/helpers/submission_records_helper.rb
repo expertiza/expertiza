@@ -1,0 +1,2 @@
+module SubmissionRecordsHelper
+end

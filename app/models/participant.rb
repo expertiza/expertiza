@@ -175,6 +175,7 @@ class Participant < ActiveRecord::Base
     users = []
     participants.each do |participant|
       user = User.find(participant.user_id)
+      user.name = sanitize(user.name)
       users << user
     end
     users.sort! {|a, b| a.name.downcase <=> b.name.downcase } # Sort the users based on the name
@@ -183,5 +184,21 @@ class Participant < ActiveRecord::Base
     sorted_participants = participants.sort_by {|x| sorted_user_ids.index x.user_id }
 
     sorted_participants
+  end
+
+  def self.sanitize(name)
+    if name.include? "," or (!name.include? "," and !name.include? " ")
+      return name
+    end
+    else
+      result = ""
+      first, *last = name.split(/ /)
+      if last.size().equal? 1
+        result = last[0] + ", " + first
+        return result
+      else
+        result = last[1] + ", " + first + " " + last[0]
+        return result
+      end
   end
 end

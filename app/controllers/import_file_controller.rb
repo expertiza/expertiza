@@ -11,6 +11,7 @@ class ImportFileController < ApplicationController
     @expected_fields = params[:expected_fields]
     @model = params[:model]
     @title = params[:title]
+    @array_expected_values = parse_line(@expected_fields,',')
   end
 
   def import
@@ -90,6 +91,9 @@ class ImportFileController < ApplicationController
     row
   end
 
+  def reorder_row()
+
+  end
   # def undo_link
   #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => Object.const_get(params[:model]).last.versions.last.id)}>undo</a>"
   # end

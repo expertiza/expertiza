@@ -31,7 +31,11 @@
 
 
 * The import process expects the following columns:<br/>
-&nbsp;&nbsp;&nbsp;<%= @expected_fields %>
+        &nbsp;&nbsp;&nbsp;<%= @expected_fields %><br/><br/>
+    * If the order of columns is different from above please choose the order here:<br/>
+    <%@array_expected_values.each{|field|%>
+    <%=select_tag 'import_field_[field]', options_for_select(@array_expected_values.collect.with_index.to_a), {include_blank: 'None'}%><br/>
+    <%}%>
  <br/><br/>
  <input type='submit' value='Import' onclick='if (checkIfFileExists(file)) {import_form.submit();} else {alert("Please select a file before clicking Next.");}'/>
  <% end %>

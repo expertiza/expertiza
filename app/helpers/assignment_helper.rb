@@ -1,8 +1,6 @@
 module AssignmentHelper
+  
 
-  def current_user
-    current_user=session[:user]
-  end
   def course_options(instructor)
     if session[:user].role.name == 'Teaching Assistant'
       courses = []
@@ -150,4 +148,10 @@ module AssignmentHelper
     end 
     [topic_name, users_for_curr_team, participants]
   end
+
+  #added by E1654
+  def current_user
+    current_user=session[:user]
+  end
+  # E1654 end
 end

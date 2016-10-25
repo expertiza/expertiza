@@ -59,6 +59,7 @@ ActiveRecord::Schema.define(version: 20161008030832) do
     t.string   "review_assignment_strategy", limit: 255
     t.integer  "max_reviews_per_submission", limit: 4
     t.integer  "num_reviews_required",       limit: 4,     default: 3
+    t.integer  "num_reviews_allowed",        limit: 4,     default: 3
     t.integer  "review_topic_threshold",     limit: 4,     default: 0
     t.boolean  "copy_flag",                                default: false
     t.integer  "rounds_of_reviews",          limit: 4,     default: 1

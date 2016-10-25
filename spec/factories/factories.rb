@@ -324,4 +324,23 @@ FactoryGirl.define do
     round nil
     is_submitted false
   end
+	
+	factory :response_record, class: Response do
+    response_map { ResponseMap.first || association(:response_map) }
+    additional_comment nil
+    version_num nil
+    round nil
+    is_submitted false
+  end
+	
+	factory :response_map, class: ResponseMap do
+		reviewer { Participant.first || association(:participant) }
+	end
+
+	factory :answer_record, class: Answer do
+    question{ Question.first || association(:question) }
+		answer { 10 || assocaiton(:answer) }
+		comments "hi"
+		response { Response.first || association(:response_record) }
+  end
 end

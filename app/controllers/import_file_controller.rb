@@ -88,24 +88,33 @@ class ImportFileController < ApplicationController
               line.split(delimiter)
             end
     row = []
-    reorder_row(row,params)
     items.each {|value| row << value.sub("\"", "").sub("\"", "").strip }
+    reorder_row(row,params)
     row
   end
 
   def reorder_row(row,params)
-    @expected_fields_variable = ['Team Name - optional', 'Team Member1','Team Member2', '...' , 'Team Member3']
-    @custom_order=[]
+    @expected_fields_variable = ['Team Name - optional', 'Team Member1','Team Member2', 'Team Member3']
+    @custom_order={}
+    logger.debug "the values in row"
+    logger.debug row.inspect
+    return_row=[]
     @expected_fields_variable.each_with_index { |field, index|
       import_param_name= "import_field_#{index}"
       @local_variable=params[import_param_name]
-      @custom_order[index]=@local_variable
-      logger.debug "the value of params passed 0: #{@custom_order[index]}  and param_name#{import_param_name}"
+      @custom_order[@local_variable]=row[index]
+      logger.debug "the value of params passed 0: #{@custom_order[@local_variable]}  and param_name#{import_param_name}"
     }
-
-
+    logger.debug "the values in custom order"
+    logger.debug @custom_order.inspect
+    @expected_fields_variable.each_with_index { |field, index|
+      return_row[index]=@custom_order[field]
+    }
+    logger.debug "the values in params"
     logger.debug params.inspect
-    row
+    logger.debug "the values in return row"
+    logger.debug return_row.inspect
+    return_row
   end
   # def undo_link
   #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => Object.const_get(params[:model]).last.versions.last.id)}>undo</a>"

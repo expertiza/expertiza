@@ -97,8 +97,10 @@
 	//E1654. Improve date-picker and deadlines Code changed started
         html += '<td align="center" class="due_date_due_at" width="20%">' +
         '<input id="datetimepicker_' + element_id +
-        '" name="assignment_form[due_date][][due_at]" style="width: 200px" type="text" value="' +
+        '" name="assignment_form[due_date][][due_at]" style="width: 180px" type="text" value="' +
         due_at.substr(0,16) + '">' + '</td>';
+
+	html += '<td align="center" class="due_date_due_at" width="20%">' + '<input type="checkbox" name="edit" style="width: 20px" value="false">'+ '</td>';;
 	//E1654. Improve date-picker and deadlines Code changed end
         html += '<td align="center" class="due_date_due_at" width="10%">';
         // if(deadline_type == 'team_formation'){

@@ -1,9 +1,9 @@
 source 'http://rubygems.org'
 
 gem 'rails', '~> 4.2.6'
-
+gem "iconv", "~> 1.0.3"
 ## Gems in Alphabetical Order
-gem 'pry-byebug'
+gem 'roo'
 gem 'activerecord-session_store'
 gem 'airbrake'
 gem 'awesome_nested_set'

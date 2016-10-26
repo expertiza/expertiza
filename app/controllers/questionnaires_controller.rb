@@ -1,3 +1,5 @@
+require 'csv'
+require 'open-uri'
 class QuestionnairesController < ApplicationController
   # Controller for Questionnaire objects
   # A Questionnaire can be of several types (QuestionnaireType)
@@ -128,7 +130,7 @@ class QuestionnairesController < ApplicationController
   # Edit a questionnaire
   def edit
     @questionnaire = Questionnaire.find(params[:id])
-    redirect_to Questionnaire if @questionnaire.nil?
+ 
   end
 
   def update
@@ -246,20 +248,21 @@ class QuestionnairesController < ApplicationController
         end
         begin
           @question.save
-          flash[:success] = 'All questions has been successfully saved!'
+          flash[:success] = 'All questions have been successfully saved!'
         rescue
           flash[:error] = $ERROR_INFO
         end
       end
+      redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
     end
 
-    export if params['export']
-    import if params['import']
+     export if params['export']
+     import if params['import']
+
 
     if params['view_advice']
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
-    else
-      redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+
     end
   end
 
@@ -588,20 +591,55 @@ class QuestionnairesController < ApplicationController
 
   def export
     @questionnaire = Questionnaire.find(params[:id])
+    questionnaire_id = params[:id] unless params[:id].nil?
+    questions = Question.where("questionnaire_id = " + questionnaire_id.to_s).sort { |a,b| a.seq <=> b.seq }
+    respond_to do |format|
+      format.csv { send_data @questionnaire.to_csv(questions) }
+    end
+    redirect_to Questionnaire if @questionnaire.nil?
 
+=begin
     csv_data = QuestionnaireHelper.create_questionnaire_csv @questionnaire, session[:user].name
 
     send_data csv_data,
               type: 'text/csv; charset=iso-8859-1; header=present',
               disposition: "attachment; filename=questionnaires.csv"
+=end
   end
 
   def import
-    @questionnaire = Questionnaire.find(params[:id])
 
-    file = params['csv']
+    questionnaire_id = (params[:id])
+    begin
+      #@questionnaire = Questionnaire.find(params[:id])
+      file_data = File.read(params[:csv])
+      QuestionnaireHelper.get_questions_from_csv(file_data,params[:id])
+      #Questionnaire.import(file_data)
 
-    @questionnaire.questions << QuestionnaireHelper.get_questions_from_csv(@questionnaire, file)
+=begin
+        if file_data.respond_to?(:read)
+          csv_text = file_data.read
+        elsif file_data.respond_to?(:path)
+          csv_text = File.read(file_data.path)
+          end
+=end
+
+      redirect_to edit_questionnaire_path(questionnaire_id.to_sym), notice: "All questions have been successfully imported!"
+    rescue
+      redirect_to edit_questionnaire_path(questionnaire_id.to_sym), notice: $ERROR_INFO
+    end
+
+=begin
+   # @questionnaire = Questionnaire.find(params[:id])
+
+    #file = params['csv']
+
+    #@questionnaire.questions << QuestionnaireHelper.get_questions_from_csv(@questionnaire, file)
+
+    QuestionnaireHelper.get_questions_from_csv(@questionnaire, file)
+=end
+
+
   end
 
   # clones the contents of a questionnaire, including the questions and associated advice

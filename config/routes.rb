@@ -57,7 +57,11 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :author_feedback_questionnaires, controller: 'questionnaires'
+  resources :author_feedback_questionnaires, controller: 'questionnaires' do
+    collection do
+      post '/author_feedback_questionnaires/:id/edit.csv', action: :edit
+    end
+  end
 
 
   resources :content_pages do
@@ -118,6 +122,7 @@ Expertiza::Application.routes.draw do
       get :view_my_scores_new
       get :instructor_review
       post :remove_hyperlink
+      post :save_grade_and_comment_for_submission
     end
   end
 

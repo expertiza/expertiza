@@ -69,7 +69,6 @@ RSpec.configure do |config|
        create(:deadline_right, name: 'Late')
        create(:deadline_right, name: 'OK')
        create(:assignment_due_date)
-       Do not use `Time.now` without zone. Use one of `Time.zone.now`, `Time.current`, `Time.now.in_time_zone`, `Time.now.utc`, `Time.now.getlocal`, `Time.now.iso8601`, `Time.now.jisx0301`, `Time.now.rfc3339`, `Time.now.to_i`, `Time.now.to_f` instead.  …
        create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now + (100 * 24 * 60 * 60))
     end
   end    
@@ -84,13 +83,22 @@ RSpec.configure do |config|
     click_button 'SIGN IN'
     stub_current_user(user, user.role.name, user.role)
   end
+  def questionnaire_options(assignment, type, _round = 0)
+    questionnaires = Questionnaire.where(['private = 0 or instructor_id = ?', assignment.instructor_id]).order('name')
+    options = []
+    questionnaires.select {|x| x.type == type }.each do |questionnaire|
+      options << [questionnaire.name, questionnaire.id]
+    end
+    options
+  end
+
   def instructorlogin
-     describe "Instructor login" do
-    it "with valid username and password" do
+    describe "Instructor login" do
+      it "with valid username and password" do
       login_as("instructor6")
       visit '/tree_display/list'
       expect(page).to have_content("Manage content")
-    end
+  end
 
     it "with invalid username and password" do
       visit root_path

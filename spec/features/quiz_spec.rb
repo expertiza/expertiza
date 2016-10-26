@@ -54,10 +54,10 @@ def functioncall
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create :assignment_due_date, due_at: (DateTime.now + 1)
+    create :assignment_due_date, due_at: (DateTime.now.getlocal + 1)
 
     @review_deadline_type = create(:deadline_type, name: "review")
-    create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+    create :assignment_due_date, due_at: (DateTime.now.getlocal + 1), deadline_type: @review_deadline_type
 
     # Create a team linked to the calibrated assignment
     @team = create :assignment_team, assignment: @assignment
@@ -130,41 +130,44 @@ describe 'Student can create quizzes and edit them', js: true do
     # Verify that the edit choice has been saved
     expect(page).to have_content('Test Quiz 1 Edit')
   end
-def checkfunc(a, b, c, d)
-  it a do
-    login_as @student.name
+  def tocheckiferrormessageispresent(itconditionstring, fillinstring, conditionstring, tohavecontentstring)
+    it itconditionstring do
+      login_as @student.name
 
     # Click on the assignment link, and navigate to work view
-    click_link @assignment.name
-    click_link 'Your work'
+      click_link @assignment.name
+      click_link 'Your work'
 
     # Create a quiz for the assignment without quiz name
     click_link 'Create a quiz'
 
-    # Without fill in quiz name
-    fill_in b, with: c
-    page.choose('question_type_1_type_multiplechoiceradio')
-    fill_in 'new_choices_1_MultipleChoiceRadio_1_txt', with: 'Test Quiz 1'
-    fill_in 'new_choices_1_MultipleChoiceRadio_2_txt', with: 'Test Quiz 2'
-    fill_in 'new_choices_1_MultipleChoiceRadio_3_txt', with: 'Test Quiz 3'
-    fill_in 'new_choices_1_MultipleChoiceRadio_4_txt', with: 'Test Quiz 4'
-    page.choose('new_choices_1_MultipleChoiceRadio_1_iscorrect_1')
-    click_on 'Create Quiz'
+      # Without fill in quiz name
+      fill_in fillinstring, with: conditionstring
+      page.choose('question_type_1_type_multiplechoiceradio')
+      fill_in 'new_choices_1_MultipleChoiceRadio_1_txt', with: 'Test Quiz 1'
+      fill_in 'new_choices_1_MultipleChoiceRadio_2_txt', with: 'Test Quiz 2'
+      fill_in 'new_choices_1_MultipleChoiceRadio_3_txt', with: 'Test Quiz 3'
+      fill_in 'new_choices_1_MultipleChoiceRadio_4_txt', with: 'Test Quiz 4'
+      page.choose('new_choices_1_MultipleChoiceRadio_1_iscorrect_1')
+      click_on 'Create Quiz'
 
     # Should have the error message Please specify quiz name (please do not use your name or id on the page
-    expect(page).to have_content d
+      expect(page).to have_content tohavecontentstring
+    end
   end
-end
-  a = 'should have error message if the name of the quiz is missing'
-  b = 'should have error message if The question text is missing for one or more questions'
-  a1 = 'text_area'
-  a2 = 'Test Question 1'
-  b1 = 'questionnaire_name'
-  b2 = 'Quiz for test'
-  a3 = 'Please specify quiz name (please do not use your name or id).'
-  b3 = 'Please make sure all questions have text'
-  checkfunc(a, a1, a2, a3)
-  checkfunc(b, b1, b2, b3)
+  itconditionstring = 'should have error message if the name of the quiz is missing'
+  fillinstring = 'text_area'
+  conditionstring = 'Test Question 1'
+  tohavecontentstring = 'Please specify quiz name (please do not use your name or id).'
+  tocheckiferrormessageispresent((itconditionstring, fillinstring, conditionstring, tohavecontentstring)
+  itconditionstring = 'should have error message if The question text is missing for one or more questions'
+  fillinstring = 'questionnaire_name'
+  conditionstring = 'Quiz for test'
+  tohavecontentstring = 'Please make sure all questions have text'
+  tocheckiferrormessageispresent(itconditionstring, fillinstring, conditionstring, tohavecontentstring)
+  
+  
+  
   it 'should have error message if the choices are missing for one or more questions' do
     login_as @student.name
 

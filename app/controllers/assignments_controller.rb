@@ -26,9 +26,9 @@ class AssignmentsController < ApplicationController
     assignment.save
     redirect_to list_tree_display_index_path
   end
- def updater_selected
+  def updater_selected
    selected = false
-    if(checkbox='true')
+    if checkbox='true'
       selected=true      
   end
   def new

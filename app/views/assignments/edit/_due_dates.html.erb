@@ -406,7 +406,12 @@ var timezonepref = "<%= current_user.timezonepref %>";
 <%= label_tag('metareivewAllowed', 'Use metareview deadline') %><br/>
 
  <%= label_tag('timezone', 'Timezone') %>
- <%= time_zone_select("user", "timezonepref", ActiveSupport::TimeZone.us_zones) %><br />
+ <%= time_zone_select("user", "timezonepref", ActiveSupport::TimeZone.us_zones) %>
+	<%= select_tag(:time_zone, options_for_select(ActiveSupport::TimeZone.all.inject([]) do |result, tz|
+ utc_offset = tz.utc_offset/3600 
+result << ["(UTC #{'%.2d:00' % utc_offset}): #{tz.name}",  "#{'%.2d:00' % utc_offset}"]
+ end)) %>
+<br />
 
 <table class='exp' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden;'>
 

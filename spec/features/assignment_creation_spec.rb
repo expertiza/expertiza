@@ -18,7 +18,7 @@ def get_selected_id(finder_var)
   end
 end
 
-def test
+def function_to_test_create_with_teams
   it "is able to create with teams" do
     login_as("instructor6")
     visit '/assignments/new?private=1'
@@ -146,8 +146,8 @@ describe "assignment function" do
         spec_location: 'testLocation'
       )
     end
-    test
-    test
+    function_to_test_create_with_teams
+    function_to_test_create_with_teams
     it "is able to create with staggered deadline" do
       skip('skip test on staggered deadline temporarily')
       login_as("instructor6")

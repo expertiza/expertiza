@@ -1,32 +1,32 @@
 require 'rails_helper'
 
-def test5(val)
-  if val.eql? 'Submission deadline reminder email'
-    val1 = 'is able to send reminder email for submission deadline to signed-up users '
-    val2 = "submission"
+def expect_deadline_check(deadline_condition)
+  if deadline_condition.eql? 'Submission deadline reminder email'
+    send_reminder_condition = 'is able to send reminder email for submission deadline to signed-up users '
+    display_condition = "submission"
   end
-  if val.eql? 'Review deadline reminder email'
-    val1 = 'is able to send reminder email for review deadline to reviewers '
-    val2 = "review"
+  if deadline_condition.eql? 'Review deadline reminder email'
+    send_reminder_condition = 'is able to send reminder email for review deadline to reviewers '
+    display_condition = "review"
   end
-  if val.eql? 'Metareview deadline reminder email'
-    val1 = 'is able to send reminder email for Metareview deadline to reviewers '
-    val2 = "metareview"
+  if deadline_condition.eql? 'Metareview deadline reminder email'
+    send_reminder_condition = 'is able to send reminder email for Metareview deadline to reviewers '
+    display_condition = "metareview"
   end
-  if val.eql? 'Drop Topic deadline reminder email'
-    val1 = 'is able to send reminder email for drop topic deadline to reviewers '
-    val2 = "drop_topic"
+  if deadline_condition.eql? 'Drop Topic deadline reminder email'
+    send_reminder_condition = 'is able to send reminder email for drop topic deadline to reviewers '
+    display_condition = "drop_topic"
   end
-  if val.eql? 'Signup deadline reminder email'
-    val1 = 'is able to send reminder email for signup deadline to reviewers '
-    val2 = "signup"
+  if deadline_condition.eql? 'Signup deadline reminder email'
+    send_reminder_condition = 'is able to send reminder email for signup deadline to reviewers '
+    display_condition = "signup"
   end
-  if val.eql? 'Team formation deadline reminder email'
-    val1 = 'is able to send reminder email for team formation deadline to reviewers '
-    val2 = "team_formation"
+  if deadline_condition.eql? 'Team formation deadline reminder email'
+    send_reminder_condition = 'is able to send reminder email for team formation deadline to reviewers '
+    display_condition = "team_formation"
   end
-  describe val do
-    it val1 do
+  describe deadline_condition do
+    it send_reminder_condition do
       @name = "user"
       # due_at = DateTime.now.getlocal.advance(minutes: +2)
       # due_at1 = Time.parse.getlocal(due_at.to_s(:db))
@@ -35,13 +35,13 @@ def test5(val)
       Delayed::Job.delete_all
       expect(Delayed::Job.count).to eq(0)
       expect(Delayed::Job.count).to eq(1)
-      expect(Delayed::Job.last.handler).to include("deadline_type: " + val2)
+      expect(Delayed::Job.last.handler).to include("deadline_type: " + display_condition)
     end
   end
 end
-test5('Submission deadline reminder email')
-test5('Review deadline reminder email')
-test5('Metareview deadline reminder email')
-test5('Drop Topic deadline reminder email')
-test5('Signup deadline reminder email')
-test5('Team formation deadline reminder email')
+expect_deadline_check('Submission deadline reminder email')
+expect_deadline_check('Review deadline reminder email')
+expect_deadline_check('Metareview deadline reminder email')
+expect_deadline_check('Drop Topic deadline reminder email')
+expect_deadline_check('Signup deadline reminder email')
+expect_deadline_check('Team formation deadline reminder email')

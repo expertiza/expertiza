@@ -46,5 +46,26 @@ describe Answer do
 
 	describe "#test" do
 	
+		it "returns nil if list of assessments is empty" do
+			assessments=[]
+			#Answer.instance_variable_set(:@invalid,1)
+			Answer.stub(:get_total_score).and_return(100.0)
+			scores=Answer.compute_scores(assessments, [:question1])
+			expect(scores[:max]).to be nil
+			expect(scores[:min]).to be nil
+			expect(scores[:avg]).to be nil
+		end
+
+		it "returns scores when a single valid assessment of total score 100 is give" do
+			response1 = double("respons1")
+			assessments=[response1]
+			Answer.instance_variable_set(:@invalid,0)
+			total_score=100.0
+			Answer.stub(:get_total_score).and_return(total_score)
+			scores=Answer.compute_scores(assessments, [:question1])
+			expect(scores[:max]).to be total_score
+			expect(scores[:min]).to be total_score
+			expect(scores[:avg]).to be total_score
+		end
 	end
 end

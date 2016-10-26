@@ -2,32 +2,32 @@
   "name": "expertiza",
   "homepage": "https://github.com/expertiza/expertiza",
   "authors": [
-        "Zhewei Hu <zhu6@ncsu.edu>"
-          ],
+    "Zhewei Hu <zhu6@ncsu.edu>"
+  ],
   "description": "A web application supported by NSF written by Ruby on Rails framework where students can submit and peer-review learning objects.",
   "main": "",
   "keywords": [
-        "Ruby on Rails",
-      "peer-review"
-          ],
+    "Ruby on Rails",
+    "peer-review"
+  ],
   "license": "MIT",
   "ignore": [
-        "**/.*",
-      "node_modules",
-          "bower_components",
-              "vendor/assets/components",
-                  "test",
-                      "tests"
-                          ],
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "vendor/assets/components",
+    "test",
+    "tests"
+  ],
   "dependencies": {
-      "bootstrap": "~3.3.7",
-      "bootstrap-sass": "~3.3.7",
-      "jquery": "~1.9.1",
-      "react": "~0.13.3",
-      "react-simpletabs": "~0.6.0",
-      "react-bootstrap-treeview": "0.1.0",
-      "sisyphus": "1.1.3",
-      "prototypejs": "1.7.1",
-      "highcharts": "4.2.7"
-    }
+    "bootstrap": "~3.3.7",
+    "bootstrap-sass": "~3.3.7",
+    "jquery": "~1.9.1",
+    "react": "~0.13.3",
+    "react-simpletabs": "^0.7.0",
+    "react-bootstrap-treeview": "0.1.0",
+    "sisyphus": "1.1.3",
+    "prototypejs": "1.7.1",
+    "highcharts": "4.2.7"
+  }
 }

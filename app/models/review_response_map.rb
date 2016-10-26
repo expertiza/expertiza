@@ -143,6 +143,28 @@ class ReviewResponseMap < ResponseMap
     review_final_versions = prepare_final_review_versions(assignment, maps)
   end
 
+
+
+  def self.review_response_report(id, assignment, type, review_user)
+    if review_user.nil?
+      # This is not a search, so find all reviewers for this assignment
+      response_maps_with_distinct_participant_id = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ? and calibrate_to = ?", id, type, 0])
+      @reviewers = []
+      response_maps_with_distinct_participant_id.each do |reviewer_id_from_response_map|
+        @reviewers << AssignmentParticipant.find(reviewer_id_from_response_map.reviewer_id)
+      end
+      @reviewers = Participant.sort_by_name(@reviewers)
+    else
+      # This is a search, so find reviewers by user's full name
+      user = User.select("DISTINCT id").where(["fullname LIKE ?", '%' + review_user[:fullname] + '%'])
+      @reviewers = AssignmentParticipant.where(["user_id IN (?) and parent_id = ?", user, assignment.id])
+    end
+    #  @review_scores[reveiwer_id][reviewee_id] = score for assignments not using vary_rubric_by_rounds feature
+    # @review_scores[reviewer_id][round][reviewee_id] = score for assignments using vary_rubric_by_rounds feature
+  end
+
+  private
+
   def self.prepare_final_review_versions(assignment, maps)
     review_final_versions = {}
 
@@ -180,23 +202,5 @@ class ReviewResponseMap < ResponseMap
       response_ids << responses.last.id unless responses.empty?
     end
     review_final_versions[symbol][:response_ids] = response_ids
-  end
-
-  def self.review_response_report(id, assignment, type, review_user)
-    if review_user.nil?
-      # This is not a search, so find all reviewers for this assignment
-      response_maps_with_distinct_participant_id = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ? and calibrate_to = ?", id, type, 0])
-      @reviewers = []
-      response_maps_with_distinct_participant_id.each do |reviewer_id_from_response_map|
-        @reviewers << AssignmentParticipant.find(reviewer_id_from_response_map.reviewer_id)
-      end
-      @reviewers = Participant.sort_by_name(@reviewers)
-    else
-      # This is a search, so find reviewers by user's full name
-      user = User.select("DISTINCT id").where(["fullname LIKE ?", '%' + review_user[:fullname] + '%'])
-      @reviewers = AssignmentParticipant.where(["user_id IN (?) and parent_id = ?", user, assignment.id])
-    end
-    #  @review_scores[reveiwer_id][reviewee_id] = score for assignments not using vary_rubric_by_rounds feature
-    # @review_scores[reviewer_id][round][reviewee_id] = score for assignments using vary_rubric_by_rounds feature
   end
 end

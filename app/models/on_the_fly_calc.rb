@@ -114,8 +114,6 @@ module OnTheFlyCalc
       score_team[:team] = team
 
       if self.varying_rubrics_by_round?
-        total_score = 0
-        total_num_of_assessments = 0 # calculate grades for each rounds
         assess
         calculate_score
         calculate_assessment
@@ -133,23 +131,23 @@ end
 
 private
 
-def round_grade
+def condition
   grades_by_rounds = {}
   round = grades_by_rounds[round_sym]
-end
-
-def condition
-  round_grade
   !round[:max].nil? && score[:max] < round[:max]
 end
 
 def condition1
-  round_grade
+  grades_by_rounds = {}
+  round = grades_by_rounds[round_sym]
   !round[:min].nil? && score[:min] > round[:min]
 end
 
 def assess
-  round_grade
+  total_score = 0
+  total_num_of_assessments = 0 # calculate grades for each rounds
+  grades_by_rounds = {}
+  round = grades_by_rounds[round_sym]
   self.num_review_rounds.each do |i|
     assessments = ReviewResponseMap.get_assessments_round_for(team, i)
     round_sym = ("review" + i.to_s).to_sym
@@ -164,7 +162,8 @@ def calculate_score
   score[:max] = -999_999_999
   score[:min] = 999_999_999
   score[:avg] = 0
-  round_grade
+  grades_by_rounds = {}
+  round = grades_by_rounds[round_sym]
   self.num_review_rounds.each do |i|
     round_sym = ("review" + i.to_s).to_sym
     score[:max] = round[:max] if condition

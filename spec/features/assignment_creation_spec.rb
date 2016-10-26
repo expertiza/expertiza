@@ -87,6 +87,7 @@ describe "assignment function" do
         create(:course, name: "Course #{i}")
       end
     end
+  end  
 
     # Might as well test small flags for creation here
     it "is able to create a public assignment" do

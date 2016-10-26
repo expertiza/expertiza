@@ -67,5 +67,19 @@ describe Answer do
 			expect(scores[:min]).to be total_score
 			expect(scores[:avg]).to be total_score
 		end
+
+		it "returns scores when two valid assessments of total scores 80 and 100 are given" do
+			response1 = double("respons1")
+			response2 = double("respons2")
+			assessments=[response1,response2]
+			Answer.instance_variable_set(:@invalid,0)
+			total_score1=100.0
+			total_score2=80.0
+			Answer.stub(:get_total_score).and_return(total_score1,total_score2)
+			scores=Answer.compute_scores(assessments, [:question1])
+			expect(scores[:max]).to be total_score1
+			expect(scores[:min]).to be total_score2
+			expect(scores[:avg]).to be (total_score1+total_score2)/2
+		end
 	end
 end

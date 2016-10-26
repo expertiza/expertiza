@@ -1,14 +1,5 @@
 require 'rails_helper'
 
-def questionnaire_options(assignment, type, _round = 0)
-  questionnaires = Questionnaire.where(['private = 0 or instructor_id = ?', assignment.instructor_id]).order('name')
-  options = []
-  questionnaires.select {|x| x.type == type }.each do |questionnaire|
-    options << [questionnaire.name, questionnaire.id]
-  end
-  options
-end
-
 def get_questionnaire(finder_var = nil)
   if finder_var.nil?
     AssignmentQuestionnaire.find_by(assignment_id: @assignment[:id])

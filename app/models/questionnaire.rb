@@ -116,8 +116,12 @@ class Questionnaire < ActiveRecord::Base
     end
     end
 
+  def self.ques(i)
+    # code here
+  end
 
-    end
+
+end
 
 
 

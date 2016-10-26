@@ -113,9 +113,6 @@ class SignUpSheetController < ApplicationController
     @topic = SignUpTopic.find(params[:id])
     @assignment = Assignment.find(params[:assignment_id])
     #redirect_to "http://www.google.com"
-
-
-
   end
 
   def update_team
@@ -123,29 +120,43 @@ class SignUpSheetController < ApplicationController
      @topic = SignUpTopic.find(params[:id])
      @assignment = Assignment.find(params[:assignment_id])
      @user = User.find_by name: params[:user][:name]
-     puts @user.name
      @team = TeamsUser.find_by_sql("select T1.team_id from teams_users T1, teams T2 where user_id = "+ @user.id.to_s+" AND T1.team_id = T2.id AND T2.parent_id = "+ @assignment.id.to_s)
      puts @team[0].team_id
      @isTopicTaken = SignedUpTeam.find_by_sql("select * from signed_up_teams where topic_id = "+ @topic.id.to_s)
 
-     puts "I am here"
-     if(@isTopicTaken.any?)
-        #flash
-       puts "A team already has this topic"
-     else
-       @sign_up = SignedUpTeam.new
-       #@team.each{|x| sign_up.team_id = x.id}
-       @sign_up.topic_id = @topic.id
-       @sign_up.team_id = @team[0].team_id
-       @sign_up.is_waitlisted = false
-       @sign_up.preference_priority_number =1
-       puts @sign_up.topic_id
-       if @sign_up.save
-         puts "Yes!"
-       else
-         puts "No!"
+     if(@team.any?)
+           if(@isTopicTaken.any?)
+              #flash
+             #puts "A team already has this topic"
+             #puts "It is taken by " + (@isTopicTaken[0].team_id).to_s
+             if (@isTopicTaken.size == @topic.max_choosers)
+               #puts "Max Number of choosers reached"
+               @userTeam = SignedUpTeam.find_by_sql("select * from signed_up_teams where team_id = "+ @team[0].team_id.to_s)
+               puts (@userTeam[0].team_id).to_s
+               @userTeam[0].topic_id = @topic.id
+               @userTeam[0].is_waitlisted = 1
+               if @userTeam[0].save
+                 puts "Yes!"
+               else
+                 puts "No!"
+               end
+             end
+
+           else
+             @sign_up = SignedUpTeam.new
+             #@team.each{|x| sign_up.team_id = x.id}
+             @sign_up.topic_id = @topic.id
+             @sign_up.team_id = @team[0].team_id
+             @sign_up.is_waitlisted = false
+             @sign_up.preference_priority_number =1
+             puts @sign_up.topic_id
+             if @sign_up.save
+               puts "Yes!"
+             else
+               puts "No!"
+             end
+             end
        end
-     end
 
      #"select * from assignments where id not in (select assignment_id from assignment_signups where signup_id = " + @params[:id].to_s + ")")
 

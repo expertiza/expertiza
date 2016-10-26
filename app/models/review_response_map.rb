@@ -109,8 +109,14 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
-  def rereview_response_maps
+  def metareview_response_maps
     responses = Response.where(map_id: self.id)
+    metareview_list = []
+    responses.each do |response|
+      metareview_response_maps = MetareviewResponseMap.find_by reviewed_object_id: response.id
+        metareview_list << metareview_response_map
+    end
+    metareview_list
   end
 
   # return  the responses for specified round, for varying rubric feature -Yang

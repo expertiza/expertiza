@@ -26,7 +26,7 @@ class AssignmentsController < ApplicationController
     assignment.save
     redirect_to list_tree_display_index_path
   end
-  
+
   def new
     @assignment_form = AssignmentForm.new
     @assignment_form.assignment.instructor ||= current_user

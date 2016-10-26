@@ -98,7 +98,7 @@ end
 =end
     CSV.parse(file_data, headers: true) do |row|
       #  row.each do |cell|
-      questions_hash = row.to_hash # exclude the price field
+      questions_hash = row.to_hash
       ques = Question.new(questions_hash)
       ques.questionnaire_id=id
       ques.save

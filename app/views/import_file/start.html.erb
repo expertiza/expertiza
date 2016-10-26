@@ -30,11 +30,11 @@
 <%= hidden_field_tag('id', @id) %>
 
 
-<!--* The import process expects the following columns:<br/>
-        &nbsp;&nbsp;&nbsp;<%= @expected_fields %><br/><br/>-->
+* The import process expects the following columns:<br/>
+        &nbsp;&nbsp;&nbsp;<%= @expected_fields %><br/><br/>
     *Please choose the order of the columns here:<br/>
-    <%@array_expected_values.each{|field|%>
-    <%=select_tag 'import_field_[field]', options_for_select(@array_expected_values.collect.with_index.to_a,field)%><br/>
+    <%@array_expected_values.each_with_index{|field, index|%>
+    <%=select_tag "import_field_#{index}" , options_for_select(@array_expected_values, @array_expected_values[index])%><br/>
     <%}%>
  <br/><br/>
  <input type='submit' value='Import' onclick='if (checkIfFileExists(file)) {import_form.submit();} else {alert("Please select a file before clicking Next.");}'/>

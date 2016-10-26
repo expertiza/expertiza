@@ -11,7 +11,7 @@ class ImportFileController < ApplicationController
     @expected_fields = params[:expected_fields]
     @model = params[:model]
     @title = params[:title]
-    @array_expected_values = parse_line(@expected_fields,',')
+    @array_expected_values = parse_line(@expected_fields,',',params)
   end
 
   def import
@@ -32,13 +32,14 @@ class ImportFileController < ApplicationController
     delimiter = get_delimiter(params)
     file = params['file'].tempfile
 
+    logger.debug "the value of file is passed: #{file}"
     errors = []
     first_row_read = false
     row_header = {}
     file.each_line do |line|
       line.chomp!
       if first_row_read == false
-        row_header = parse_line(line.downcase, delimiter)
+        row_header = parse_line(line.downcase, delimiter,params)
         first_row_read = true
         if row_header.include?("email")
           # skip if first row contains header. In case of user information, it will contain name of user (mandatory
@@ -48,7 +49,7 @@ class ImportFileController < ApplicationController
         end
       end
       next if line.empty?
-      row = parse_line(line, delimiter)
+      row = parse_line(line, delimiter,params)
       begin
         if params[:model] == 'AssignmentTeam' or params[:model] == 'CourseTeam'
           Object.const_get(params[:model]).import(row, params[:id], params[:options])
@@ -80,19 +81,31 @@ class ImportFileController < ApplicationController
     delimiter
   end
 
-  def parse_line(line, delimiter)
+  def parse_line(line, delimiter,params)
     items = if delimiter == ","
               line.split(/,(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))/)
             else
               line.split(delimiter)
             end
     row = []
+    reorder_row(row,params)
     items.each {|value| row << value.sub("\"", "").sub("\"", "").strip }
     row
   end
 
-  def reorder_row()
+  def reorder_row(row,params)
+    @expected_fields_variable = ['Team Name - optional', 'Team Member1','Team Member2', '...' , 'Team Member3']
+    @custom_order=[]
+    @expected_fields_variable.each_with_index { |field, index|
+      import_param_name= "import_field_#{index}"
+      @local_variable=params[import_param_name]
+      @custom_order[index]=@local_variable
+      logger.debug "the value of params passed 0: #{@custom_order[index]}  and param_name#{import_param_name}"
+    }
 
+
+    logger.debug params.inspect
+    row
   end
   # def undo_link
   #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => Object.const_get(params[:model]).last.versions.last.id)}>undo</a>"

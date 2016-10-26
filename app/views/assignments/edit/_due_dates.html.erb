@@ -94,10 +94,12 @@
         if (due_name == null){
             due_name = '';
         }
+	//E1654. Improve date-picker and deadlines Code changed started
         html += '<td align="center" class="due_date_due_at" width="20%">' +
         '<input id="datetimepicker_' + element_id +
         '" name="assignment_form[due_date][][due_at]" style="width: 200px" type="text" value="' +
         due_at.substr(0,16) + '">' + '</td>';
+	//E1654. Improve date-picker and deadlines Code changed end
         html += '<td align="center" class="due_date_due_at" width="10%">';
         // if(deadline_type == 'team_formation'){
         //     html += '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]" disabled>'
@@ -402,7 +404,7 @@ var timezonepref = "<%= current_user.timezonepref %>";
 <%= label_tag('metareivewAllowed', 'Use metareview deadline') %><br/>
 
  <%= label_tag('timezone', 'Timezone') %>
- <%= time_zone_select("user", "timezonepref", ActiveSupport::TimeZone.all) %><br />
+ <%= time_zone_select("user", "timezonepref", ActiveSupport::TimeZone.us_zones) %><br />
 
 <table class='exp' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden;'>
 

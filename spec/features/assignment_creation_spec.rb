@@ -18,7 +18,7 @@ def get_selected_id(finder_var)
   end
 end
 
-def function_to_test_create_with_teams
+def function_to__create_with_teams
   it "is able to create with teams" do
     login_as("instructor6")
     visit '/assignments/new?private=1'
@@ -34,27 +34,6 @@ def function_to_test_create_with_teams
   end
 end
 
-def test1
-  it "should update scored question dropdown" do
-    find_link('Rubrics').click
-    within("tr#questionnaire_table_ReviewQuestionnaire") do
-      select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-      select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-    end
-    click_button 'Save'
-    questionnaire = Questionnaire.where(name: "ReviewQuestionnaire2").first
-    assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
-    expect(assignment_questionnaire.dropdown).to eq(false)
-  end
-end
-
-def test2
-  uncheck('dropdown')
-  select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-  fill_in 'assignment_form[assignment_questionnaire][][questionnaire_weight]', with: '50'
-  fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', with: '50'
-end
-
 def test3(value)
   if value.eql? "updates author feedback questionnaire"
     value1 = "tr#questionnaire_table_AuthorFeedbackQuestionnaire"
@@ -68,13 +47,26 @@ def test3(value)
     find_link('Rubrics').click
     within(value1) do
       select value2, from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-      test2
+      uncheck('dropdown')
+      select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
+      fill_in 'assignment_form[assignment_questionnaire][][questionnaire_weight]', with: '50'
+      fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', with: '50'
     end
     click_button 'Save'
     questionnaire = get_questionnaire(value2).first
     expect(questionnaire).to have_attributes(questionnaire_weight: 50, notification_limit: 50)
   end
-  test1
+  it "should update scored question dropdown" do
+    find_link('Rubrics').click
+    within("tr#questionnaire_table_ReviewQuestionnaire") do
+      select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+      select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
+    end
+    click_button 'Save'
+    questionnaire = Questionnaire.where(name: "ReviewQuestionnaire2").first
+    assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
+    expect(assignment_questionnaire.dropdown).to eq(false)
+  end
 end
 
 describe "assignment function" do

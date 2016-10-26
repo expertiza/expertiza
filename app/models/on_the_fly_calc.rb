@@ -74,27 +74,17 @@ module OnTheFlyCalc
   # calculate the avg score and score range for each reviewee(team), only for peer-review
   def compute_avg_and_ranges_hash
     scores = {}
+    contributor_score = scores[contributor.id]
     contributors = self.contributors # assignment_teams
     if self.varying_rubrics_by_round?
-      rounds = self.rounds_of_reviews
-      rounds.each do |round|
-        review_questionnaire_id = review_questionnaire_id(round)
-        questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
-        contributors.each do |contributor|
-          assessments = ReviewResponseMap.get_assessments_for(contributor)
-          assessments = assessments.reject {|assessment| assessment.round != round }
-          scores[contributor.id] = {} if round == 1
-          scores[contributor.id][round] = {}
-          scores[contributor.id][round] = Answer.compute_scores(assessments, questions)
-        end
-      end
+      calc_contri_score
     else
       review_questionnaire_id = review_questionnaire_id()
       questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
       contributors.each do |contributor|
         assessments = ReviewResponseMap.get_assessments_for(contributor)
-        scores[contributor.id] = {}
-        scores[contributor.id] = Answer.compute_scores(assessments, questions)
+        contributor_score = {}
+        contributor_score = Answer.compute_scores(assessments, questions)
       end
     end
     scores
@@ -184,5 +174,19 @@ def calculate_assessment
     score[:avg] = nil
     score[:max] = 0
     score[:min] = 0
+  end
+end
+
+def calc_contri_score
+  self.rounds_of_reviews.each do |round|
+    review_questionnaire_id = review_questionnaire_id(round)
+    questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
+    contributors.each do |contributor|
+      assessments = ReviewResponseMap.get_assessments_for(contributor)
+      assessments = assessments.reject {|assessment| assessment.round != round }
+      contributor_score = {} if round == 1
+      contributor_score[round] = {}
+      contributor_score[round] = Answer.compute_scores(assessments, questions)
+    end
   end
 end

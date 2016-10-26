@@ -100,7 +100,7 @@
         '" name="assignment_form[due_date][][due_at]" style="width: 180px" type="text" value="' +
         due_at.substr(0,16) + '">' + '</td>';
 
-	html += '<td align="center" class="due_date_due_at" width="20%">' + '<input type="checkbox" name="edit" style="width: 20px" value="false">'+ '</td>';;
+	html += '<td align="center" class="due_date_due_at" width="5%">' + '<input type="checkbox" name="edit" style="width: 20px" value="false">'+ '</td>';;
 	//E1654. Improve date-picker and deadlines Code changed end
         html += '<td align="center" class="due_date_due_at" width="10%">';
         // if(deadline_type == 'team_formation'){
@@ -413,7 +413,7 @@ var timezonepref = "<%= current_user.timezonepref %>";
 <tr id='due_date_heading'>
 <th width=15% style="text-align:left;">Deadline type</th>
 <th width=15% style="text-align:center;">Date & time</th>
-<th width=5% style="text-align:center;">Use Updater</th>
+<th width=5% style="text-align:center;">Use Date Updater</th>
 <th width=10% style="text-align:center;">Submission allowed</th>
 <th width=8% style="text-align:center;">Review allowed</th>
 <th width=8% style="text-align:center;">Teammate review allowed</th>

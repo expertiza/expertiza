@@ -44,6 +44,7 @@ describe QuizResponseMap do
   describe '#delete' do
 	it "deletes the map" do
 	#	expect{QuizResponseMap.delete(quizresponsemap.id)}.to change{QuizResponseMap.count}.by(-1)
+	expect(QuizResponseMap.count).to eq(0)
 	end
   end
 
@@ -58,7 +59,6 @@ describe QuizResponseMap do
 		expect(quizresponsemap.quiz_score).to eq('N/A')		#because no quiz has been taken
 	end
   end
-
 
   describe "#get_title" do
   #test the title to be stored correctly

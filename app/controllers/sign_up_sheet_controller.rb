@@ -129,17 +129,18 @@ class SignUpSheetController < ApplicationController
               #flash
              #puts "A team already has this topic"
              #puts "It is taken by " + (@isTopicTaken[0].team_id).to_s
+             @userTeam = SignedUpTeam.find_by_sql("select * from signed_up_teams where team_id = "+ @team[0].team_id.to_s)
+             @userTeam[0].topic_id = @topic.id
              if (@isTopicTaken.size == @topic.max_choosers)
                #puts "Max Number of choosers reached"
-               @userTeam = SignedUpTeam.find_by_sql("select * from signed_up_teams where team_id = "+ @team[0].team_id.to_s)
-               puts (@userTeam[0].team_id).to_s
-               @userTeam[0].topic_id = @topic.id
                @userTeam[0].is_waitlisted = 1
-               if @userTeam[0].save
-                 puts "Yes!"
-               else
-                 puts "No!"
-               end
+             else
+               @userTeam[0].is_waitlisted = 0
+             end
+             if @userTeam[0].save
+               redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
+             else
+               flash[:error] = "The topic could not be assigned."
              end
 
            else
@@ -151,9 +152,9 @@ class SignUpSheetController < ApplicationController
              @sign_up.preference_priority_number =1
              puts @sign_up.topic_id
              if @sign_up.save
-               puts "Yes!"
+               redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
              else
-               puts "No!"
+               flash[:error] = "The topic could not be assigned."
              end
              end
        end

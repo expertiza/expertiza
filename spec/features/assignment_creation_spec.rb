@@ -287,7 +287,7 @@ end
     end
 
     # instructor assign reviews will happen only one time, so the data will not be store in DB.
-    xit "sets number of reviews by each student" do
+    it "sets number of reviews by each student" do
       pending('review section not yet completed')
       login_as("instructor6")
       visit '/assignments/1/edit'
@@ -297,4 +297,3 @@ end
       fill_in 'num_reviews_per_student', with: 5
     end
   end
-end

@@ -100,9 +100,9 @@ class Assignment < ActiveRecord::Base
     raise 'You have already metareviewed all reviews for this assignment.' if response_map_set.empty?
 
     # Reduce to the response maps with the least number of metareviews received
-    response_map_set.sort! {|a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count }
-    min_metareviews = response_map_set.first.metareview_response_maps.count
-    response_map_set.reject! {|response_map| response_map.metareview_response_maps.count > min_metareviews }
+    response_map_set.sort! {|a, b| a.rereview_response_maps.count <=> b.rereview_response_maps.count }
+    min_metareviews = response_map_set.first.rereview_response_maps.count
+    response_map_set.reject! {|response_map| response_map.rereview_response_maps.count > min_metareviews }
 
     # Reduce the response maps to the reviewers with the least number of metareviews received
     reviewers = {} # <reviewer, number of metareviews>
@@ -116,9 +116,9 @@ class Assignment < ActiveRecord::Base
     response_map_set.reject! {|response_map| reviewers.member?(response_map.reviewer) }
 
     # Pick the response map whose most recent meta_reviewer was assigned longest ago
-    response_map_set.sort! {|a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count }
-    min_metareviews = response_map_set.first.metareview_response_maps.count
-    response_map_set.sort! {|a, b| a.metareview_response_maps.last.id <=> b.metareview_response_maps.last.id } if min_metareviews > 0
+    response_map_set.sort! {|a, b| a.rereview_response_maps.count <=> b.rereview_response_maps.count }
+    min_metareviews = response_map_set.first.rereview_response_maps.count
+    response_map_set.sort! {|a, b| a.rereview_response_maps.last.id <=> b.rereview_response_maps.last.id } if min_metareviews > 0
     # The first review_map is the best candidate to metareview
     response_map_set.first
   end

@@ -109,7 +109,7 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
-  def metareview_response_maps
+  def rereview_response_maps
     responses = Response.where(map_id: self.id)
     metareview_list = []
     responses.each do |response|

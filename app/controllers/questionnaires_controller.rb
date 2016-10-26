@@ -130,7 +130,7 @@ class QuestionnairesController < ApplicationController
   # Edit a questionnaire
   def edit
     @questionnaire = Questionnaire.find(params[:id])
- 
+
   end
 
   def update

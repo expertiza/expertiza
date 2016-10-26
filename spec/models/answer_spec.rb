@@ -37,5 +37,46 @@ describe Answer do
 
 			
 	end
+
+
+
+
+
+
+
+	describe "submission valid?" do
+		let!(:rm){create(:response_record)}
+
+
+		it "Checking for when valid due date objects are passed back to @sorted_deadlines" do
+			rm.id = 1
+			rm.additional_comment = "Test"
+			due_date1 = AssignmentDueDate.new
+			due_date2 = AssignmentDueDate.new
+			due_date1.due_at = Time.new-24
+			due_date2.due_at = Time.new-24
+			due_date1.deadline_type_id = 4
+			due_date2.deadline_type_id = 2
+			ResubmissionTime1, ResubmissionTime2 = Time.new-24, Time.new-48
+			AssignmentDueDate.stub_chain(:where, :order).and_return(due_date1, due_date2)
+			ResubmissionTime.stub_chain(:where, :order).and_return(ResubmissionTime1, ResubmissionTime2)
+			expect(Answer.submission_valid?(rm)).to be nil
+		end
+
+
+		it "Checking when no due date objects are passed back to @sorted_deadlines" do
+			rm.id = 1
+			rm.additional_comment = "Test"
+			AssignmentDueDate.stub_chain(:where, :order).and_return(nil)
+			expect{Answer.submission_valid?(rm)}.to raise_error
+		end
+
+
+
+	end
+
+
+
+
 	
 end

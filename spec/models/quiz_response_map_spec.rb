@@ -8,13 +8,9 @@ describe QuizResponseMap do
     it "Validate response instance creation with valid parameters" do
       expect(quizresponsemap.class).to be(QuizResponseMap)
     end
-  end
-  describe "#new" do
     it "Validate response instance creation with valid parameters" do
       expect(response.class).to be(Response)
     end
-  end
-  describe "#new" do
     it "Validate response instance creation with valid parameters" do
       expect(participant.class).to be(Participant)
     end

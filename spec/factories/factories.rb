@@ -319,9 +319,15 @@ FactoryGirl.define do
 
   factory :response, class: Response do
     review_response_map { ReviewResponseMap.first || association(:review_response_map) }
+    response_map { ResponseMap.first || association(:response_map) }
     additional_comment nil
     version_num nil
     round nil
     is_submitted false
+  end
+  factory :response_map, class: ResponseMap do |f|
+    f.map_id { 100 }
+    f.reviewer_id { 200 }
+    f.Participant {'participant'}
   end
 end

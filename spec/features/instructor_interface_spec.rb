@@ -24,37 +24,38 @@ describe "View Publishing Rights" do
     expect(page).not_to have_content('Topic #')
   end
 end
-def checkvalidorinvalidfilewith3columns(a,b,c,d)
-  it a do
+def checkvalidorinvalidfilewith3columns(itconditionstring, filepathstring, havecontentstring1, havecontentstring2)
+  it itconditionstring do
     login_as("instructor6")
     visit '/assignments/1/edit'
     click_link "Topics"
     click_link "Import topics"
-    file_path = Rails.root + b
+    file_path = Rails.root + filepathstring
     attach_file('file', file_path)
     click_button "Import"
     click_link "Topics"
-    expect(page).to have_content(c)
-    expect(page).to have_content(d)
+    expect(page).to have_content(havecontentstring1)
+    expect(page).to have_content(havecontentstring2)
   end
   
 
 describe "Import tests for assignment topics" do
-  a1='should be valid file with 3 columns'
-  a2="spec/features/assignment_topic_csvs/3-col-valid_topics_import.csv"
-  a3='expertiza'
-  a4='mozilla'
-  checkvalidorinvalidfilewith3columns(a1,a2,a3,a4)
-  b1='should be a valid file with 3 or more columns'
-  b2="spec/features/assignment_topic_csvs/3or4-col-valid_topics_import.csv"
-  b3='capybara'
-  b4='cucumber'
-  checkvalidorinvalidfilewith3columns(b1,b2,b3,b4)
-  c1='should be a invalid csv file'
-  c2="spec/features/assignment_topic_csvs/invalid_topics_import.csv"
-  c3='airtable'
-  c4='devise'
-  checkvalidorinvalidfilewith3coulmns(c1,c2,c3,c4)
+  (itconditionstring, filepathstring, havecontentstring1, havecontentstring2)
+  itconditionstring = 'should be valid file with 3 columns'
+  filepathstring = "spec/features/assignment_topic_csvs/3-col-valid_topics_import.csv"
+  havecontentstring1 = 'expertiza'
+  havecontentstring2 = 'mozilla'
+  checkvalidorinvalidfilewith3columns(itconditionstring, filepathstring, havecontentstring1, havecontentstring2)
+  itconditionstring = 'should be a valid file with 3 or more columns'
+  filepathstring = "spec/features/assignment_topic_csvs/3or4-col-valid_topics_import.csv"
+  havecontentstring1 = 'capybara'
+  havecontentstring2 = 'cucumber'
+  checkvalidorinvalidfilewith3columns((itconditionstring, filepathstring, havecontentstring1, havecontentstring2)
+  itconditionstring = 'should be a invalid csv file'
+  filepathstring = "spec/features/assignment_topic_csvs/invalid_topics_import.csv"
+  havecontentstring1 = 'airtable'
+  havecontentstring2 = 'devise'
+  checkvalidorinvalidfilewith3coulmns(itconditionstring, filepathstring, havecontentstring1, havecontentstring2)
   it 'should be an random text file' do
     login_as("instructor6")
     visit '/assignments/1/edit'

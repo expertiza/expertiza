@@ -6,8 +6,9 @@
     });
 	jQuery("#addDays_btn").click(function () {
 		//alert('addDays_btn') // Prevent link from following its href
-		//var due_dates_table_element_list = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)');
-		//console.log(due_dates_table_element_list);
+		var due_dates_table_element_list = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)');
+		console.log(due_dates_table_element_list);
+		alert(due_dates_table_element_list);
 
 
     });
@@ -103,7 +104,6 @@
         }
         else{
             var tzone = time_zone.value;
-//due_at.substr(23,6);
             if(tzone=='Z'){
                 tzone = '+00:00';
             }

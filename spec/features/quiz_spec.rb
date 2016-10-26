@@ -158,7 +158,7 @@ describe 'Student can create quizzes and edit them', js: true do
   itconditionstring = 'should have error message if the name of the quiz is missing'
   fillinstring = 'text_area'
   conditionstring = 'Test Question 1'
-  tohavecontentstring = 'Please specify quiz name (please do not use your name or id).'
+  tohavecontentstring = 'Please specify quiz name (please do not use your name or id)'
   tocheckiferrormessageispresent((itconditionstring, fillinstring, conditionstring, tohavecontentstring)
   itconditionstring = 'should have error message if The question text is missing for one or more questions'
   fillinstring = 'questionnaire_name'

@@ -33,7 +33,7 @@ def create_quiz
   click_on 'Create Quiz'
 end
 
-def functioncall
+def assignment_creation
   before(:each) do
     # Create an instructor
     @instructor = create(:instructor)
@@ -73,7 +73,7 @@ def functioncall
 end
 
 describe 'Student can create quizzes and edit them', js: true do
-  functioncall
+  assignment_creation
   it 'should be able to create quiz' do
     # Create a quiz
     create_quiz
@@ -130,8 +130,8 @@ describe 'Student can create quizzes and edit them', js: true do
     # Verify that the edit choice has been saved
     expect(page).to have_content('Test Quiz 1 Edit')
   end
-  def tocheckiferrormessageispresent(itconditionstring, fillinstring, conditionstring, tohavecontentstring)
-    it itconditionstring do
+  def to_check_if_error_message_is_present(it_condition_string, fill_in_string, condition_string, to_have_content_string)
+    it it_condition_string do
       login_as @student.name
 
     # Click on the assignment link, and navigate to work view
@@ -142,7 +142,7 @@ describe 'Student can create quizzes and edit them', js: true do
     click_link 'Create a quiz'
 
       # Without fill in quiz name
-      fill_in fillinstring, with: conditionstring
+      fill_in fill_in_string, with: condition_string
       page.choose('question_type_1_type_multiplechoiceradio')
       fill_in 'new_choices_1_MultipleChoiceRadio_1_txt', with: 'Test Quiz 1'
       fill_in 'new_choices_1_MultipleChoiceRadio_2_txt', with: 'Test Quiz 2'
@@ -152,19 +152,19 @@ describe 'Student can create quizzes and edit them', js: true do
       click_on 'Create Quiz'
 
     # Should have the error message Please specify quiz name (please do not use your name or id on the page
-      expect(page).to have_content tohavecontentstring
+      expect(page).to have_content to_have_content_string
     end
   end
-  itconditionstring = 'should have error message if the name of the quiz is missing'
-  fillinstring = 'text_area'
-  conditionstring = 'Test Question 1'
-  tohavecontentstring = 'Please specify quiz name (please do not use your name or id)'
-  tocheckiferrormessageispresent((itconditionstring, fillinstring, conditionstring, tohavecontentstring)
-  itconditionstring = 'should have error message if The question text is missing for one or more questions'
-  fillinstring = 'questionnaire_name'
-  conditionstring = 'Quiz for test'
-  tohavecontentstring = 'Please make sure all questions have text'
-  tocheckiferrormessageispresent(itconditionstring, fillinstring, conditionstring, tohavecontentstring)
+  it_condition_string = 'should have error message if the name of the quiz is missing'
+  fill_in_string = 'text_area'
+  condition_string = 'Test Question 1'
+  to_have_content_string = 'Please specify quiz name (please do not use your name or id)'
+  to_check_if_error_message_is_present((it_condition_string, fill_in_string, condition_string, to_have_content_string)
+  it_condition_string = 'should have error message if The question text is missing for one or more questions'
+  fill_in_string = 'questionnaire_name'
+  condition_string = 'Quiz for test'
+  to_have_content_string = 'Please make sure all questions have text'
+   to_check_if_error_message_is_present((it_condition_string, fill_in_string, condition_string, to_have_content_string)
   
   
   

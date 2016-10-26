@@ -7,13 +7,12 @@ module OnTheFlyCalc
     total
   end
 
-  # Returns hash of review_scores[reviewer_id][reviewee_id] = score
   def compute_reviews_hash
     @review_scores = {}
+    reviewer = @review_scores[response_map.reviewer_id]
     @response_type = 'ReviewResponseMap'
 
-    # if this assignment uses vary rubric by rounds feature, load @questions for each round
-    if self.varying_rubrics_by_round? # [reviewer_id][round][reviewee_id] = score
+    if self.varying_rubrics_by_round? 
       rounds = self.rounds_of_reviews
       rounds.each do |round|
         @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
@@ -23,25 +22,14 @@ module OnTheFlyCalc
 
         @response_maps.each do |response_map|
           @corresponding_response = Response.where(['map_id = ?', response_map.id])
-          unless @corresponding_response.empty?
-            @corresponding_response = @corresponding_response.reject {|response| response.round != round }
-          end
+          @corresponding_response = @corresponding_response.reject {|response| response.round != round } unless @corresponding_response.empty?
           @respective_scores = {}
-          @respective_scores = @review_scores[response_map.reviewer_id][round] if !@review_scores[response_map.reviewer_id].nil? && !@review_scores[response_map.reviewer_id][round].nil?
-
-          if !@corresponding_response.empty?
-            @this_review_score_raw = Answer.get_total_score(response: @corresponding_response, questions: @questions)
-            if @this_review_score_raw
-              @this_review_score = ((@this_review_score_raw * 100) / 100.0).round if @this_review_score_raw >= 0.0
-            end
-          else
-            @this_review_score = -1.0
-          end
-
+          @respective_scores = reviewer[round] if !reviewer.nil? && !reviewer[round].nil?
+          calc_review_score
           @respective_scores[response_map.reviewee_id] = @this_review_score
-          @review_scores[response_map.reviewer_id] = {} if @review_scores[response_map.reviewer_id].nil?
-          @review_scores[response_map.reviewer_id][round] = {} if @review_scores[response_map.reviewer_id][round].nil?
-          @review_scores[response_map.reviewer_id][round] = @respective_scores
+          reviewer = {} if reviewer.nil?
+          reviewer[round] = {} if reviewer[round].nil?
+          reviewer[round] = @respective_scores
         end
       end
     else
@@ -53,18 +41,10 @@ module OnTheFlyCalc
       @response_maps.each do |response_map|
         @corresponding_response = Response.where(['map_id = ?', response_map.id])
         @respective_scores = {}
-        @respective_scores = @review_scores[response_map.reviewer_id] unless @review_scores[response_map.reviewer_id].nil?
-
-        if !@corresponding_response.empty?
-          @this_review_score_raw = Answer.get_total_score(response: @corresponding_response, questions: @questions)
-          if @this_review_score_raw
-            @this_review_score = ((@this_review_score_raw * 100) / 100.0).round if @this_review_score_raw >= 0.0
-          end
-        else
-          @this_review_score = -1.0
-        end
+        @respective_scores = reviewer unless reviewer.nil?
+        calc_review_score
         @respective_scores[response_map.reviewee_id] = @this_review_score
-        @review_scores[response_map.reviewer_id] = @respective_scores
+        reviewer = @respective_scores
       end
 
     end
@@ -188,5 +168,16 @@ def calc_contri_score
       contributor_score[round] = {}
       contributor_score[round] = Answer.compute_scores(assessments, questions)
     end
+  end
+end
+
+def calc_review_score
+  if !@corresponding_response.empty?
+    @this_review_score_raw = Answer.get_total_score(response: @corresponding_response, questions: @questions)
+    if @this_review_score_raw
+      @this_review_score = ((@this_review_score_raw * 100) / 100.0).round if @this_review_score_raw >= 0.0
+    end
+  else
+    @this_review_score = -1.0
   end
 end

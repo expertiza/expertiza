@@ -6,6 +6,10 @@
     });
 	jQuery("#addDays_btn").click(function () {
 		//alert('addDays_btn') // Prevent link from following its href
+		var due_dates_table_element_list = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)');
+		console.log(due_dates_table_element_list);
+		alert(due_dates_table_element_list);
+
 
     });
 	jQuery("#addMonth_btn").click(function () {
@@ -118,8 +122,10 @@
         '" name="assignment_form[due_date][][due_at]" style="width: 180px" type="text" value="' +
         due_at.substr(0,16) + '">' + '</td>';
 
-	html += '<td align="center" class="due_date_due_at" width="5%">' + '<input type="checkbox" name="edit" style="width: 20px" value="false">'+ '</td>';;
-	//E1654. Improve date-picker and deadlines Code changed ends
+
+	html += '<td align="center" class="due_date_due_at" width="5%">' + '<input type="checkbox" name="updatorCheck_"' + element_id + 'style="width: 20px" value="false">'+ '</td>';;
+	//E1654. Improve date-picker and deadlines Code changed endS
+
         html += '<td align="center" class="due_date_due_at" width="10%">';
         // if(deadline_type == 'team_formation'){
         //     html += '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]" disabled>'
@@ -428,7 +434,7 @@ var timezonepref = "<%= current_user.timezonepref %>";
 	<%= select_tag(:time_zone, options_for_select(ActiveSupport::TimeZone.all.inject([]) do |result, tz|
  utc_offset = tz.utc_offset/3600 
 result << ["(UTC #{'%.2d:00' % utc_offset}): #{tz.name}",  "#{'%.2d:00' % utc_offset}"]
- end)) %>
+ end), selected:"-05:00") %>
 
 	<%= button_tag "+", :id => 'addDays_btn' %> 
 	<%= label_tag('Days') %>

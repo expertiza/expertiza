@@ -4,6 +4,22 @@
         changeReviewRounds();
         event.preventDefault(); // Prevent link from following its href
     });
+	jQuery("#addDays_btn").click(function () {
+		//alert('addDays_btn') // Prevent link from following its href
+
+    });
+	jQuery("#addMonth_btn").click(function () {
+		//alert('addMonth_btn') // Prevent link from following its href
+    });
+
+	jQuery("#subMonth_btn").click(function () {
+	//alert('subMonth_btn') // Prevent link from following its href
+    });
+
+	jQuery("#subDays_btn").click(function () {
+		//alert('subDays_btn') // Prevent link from following its href
+    });
+
     });
 	
 	
@@ -369,6 +385,7 @@
 
 <script>
 var timezonepref = "<%= current_user.timezonepref %>";
+//<%= time_zone_select("user", "timezonepref", ActiveSupport::TimeZone.us_zones) %>
 </script>
 
 <div style='padding: 5px' id='review_round'>
@@ -406,11 +423,20 @@ var timezonepref = "<%= current_user.timezonepref %>";
 <%= label_tag('metareivewAllowed', 'Use metareview deadline') %><br/>
 
  <%= label_tag('timezone', 'Timezone') %>
- <%= time_zone_select("user", "timezonepref", ActiveSupport::TimeZone.us_zones) %>
 	<%= select_tag(:time_zone, options_for_select(ActiveSupport::TimeZone.all.inject([]) do |result, tz|
  utc_offset = tz.utc_offset/3600 
 result << ["(UTC #{'%.2d:00' % utc_offset}): #{tz.name}",  "#{'%.2d:00' % utc_offset}"]
  end)) %>
+
+	<%= button_tag "+", :id => 'addDays_btn' %> 
+	<%= label_tag('Days') %>
+	<%= number_field_tag 'days', 0, min: 1, max: 100 %>
+	<%= button_tag "-", :id => 'subDays_btn' %>
+	<%= button_tag "+", :id => 'addMonth_btn' %>
+	<%= label_tag('Months') %>
+	<%= number_field_tag 'months', 0, min: 1, max: 12 %>
+	<%= button_tag "-", :id => 'subMonth_btn' %>
+
 <br />
 
 <table class='exp' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden;'>

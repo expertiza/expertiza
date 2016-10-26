@@ -34,7 +34,7 @@ def function_to__create_with_teams
   end
 end
 
-def test3(value)
+def feedback_review_questionaire_check(value)
   if value.eql? "updates author feedback questionnaire"
     value1 = "tr#questionnaire_table_AuthorFeedbackQuestionnaire"
     value2 = "AuthorFeedbackQuestionnaire2"
@@ -258,9 +258,9 @@ No route matches [GET] "/assets/staggered_deadline_assignment_graph/graph_1.jpg"
         )
       end
       # Second row of rubric
-      test3("updates author feedback questionnaire")
+      feedback_review_questionaire_check("updates author feedback questionnaire")
       # Third row of rubric
-      test3("updates teammate review questionnaire")
+      feedback_review_questionaire_check("updates teammate review questionnaire")
     end
   end
 

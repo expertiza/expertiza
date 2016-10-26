@@ -1,3 +1,4 @@
+<h3>You are required to do <%= @assignment.num_reviews_required %> reviews</h3>
 <h2>Reviews for "<%= @assignment.name %>"</h2>
 <% if check_reviewable_topics(@assignment) or @assignment.get_current_stage(@topic_id) == "Finished" %>
     <%= render :partial => 'responses', :locals => {:mappings => @review_mappings, :title => 'Review'} %>

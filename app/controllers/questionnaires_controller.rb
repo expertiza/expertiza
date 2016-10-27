@@ -9,28 +9,39 @@ class QuestionnairesController < ApplicationController
   before_action :authorize
 
   def action_allowed?
+=begin
     ['Super-Administrator',
     'Administrator',
     'Instructor',
     'Teaching Assistant', 'Student'].include? current_role_name
+=end
 
+    case params[:action]
+      when 'edit', 'update', 'delete'
+        #Modifications can only be done by papertrail
+        q= Questionnaire.find_by(id:params[:id])
+        owner_inst_id = q.instructor_id
+        if(current_user.role_id==6)
+          current_ta = current_user;
+        end
+        b= (current_user.id == owner_inst_id)
+        if(!current_ta.nil?)
+          b = b or (current_ta.parent_id == owner_inst_id)
+        end
+        return b
+
+      else
+        #Allow all others
+        ['Super-Administrator',
+         'Administrator',
+         'Instructor',
+         'Teaching Assistant',
+         'Student'].include? current_role_name
+    end
 
     # q1 = Questionnaire.find_by(instructor_id: current_user.id )
     #q2 = Questionnaire.find_by(instructor_id: current_user.parent_id)
   end
-
- def owner_or_ta?
-   q= Questionnaire.find_by(id:params[:id])
-   owner_inst_id = q.instructor_id
-   if(current_user.role_id==6)
-     current_ta = current_user;
-   end
-   b= (current_user.id == owner_inst_id)
-   if(!current_ta.nil?)
-     b = b or (current_ta.parent_id == owner_inst_id)
-   end
-   b
- end
 
 
   # Create a clone of the given questionnaire, copying all associated
@@ -131,13 +142,7 @@ class QuestionnairesController < ApplicationController
 
   # Edit a questionnaire
   def edit
-    questionnaire_id = params[:id] unless params[:id].nil?
     @questionnaire = Questionnaire.find(params[:id])
-    unless owner_or_ta?
-      flash[:error] = "You're not allowed to perform this action since you're not the owner or TA of this questionnaire"
-      redirect_to action: 'view', controller: 'questionnaires', id: params[:id]
-    end
-
   end
 
   def update
@@ -154,11 +159,7 @@ class QuestionnairesController < ApplicationController
   # Remove a given questionnaire
   def delete
     @questionnaire = Questionnaire.find(params[:id])
-    questionnaire_id = params[:id] unless params[:id].nil?
-    unless owner_or_ta?
-      flash[:error] = "You're not allowed to perform this action since you're not the owner or TA of this questionnaire"
-      redirect_to action: 'view', controller: 'questionnaires', id: params[:id] and return
-      end
+
     if @questionnaire
       begin
         name = @questionnaire.name

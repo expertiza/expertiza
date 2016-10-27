@@ -51,16 +51,37 @@ describe "HeatMapTest", type: :feature do
 
   xit "Toggles question list" do
     load_questionnaire
+    # 1. click on the button of "Toggles question list"
+    # 2. expect to have content of the list of questions
   end
 
 
   xit "Sorts by total review score" do
     load_questionnaire
+    # 1. click on the button of "Sorts by total review score"
+    # 2. calculate or load the total score for each review
+    # 3. check if the total score is sorted and toggled between low-to-high and high-to-low
   end
 
 
   xit "Sorts by Avg" do
     load_questionnaire
+    # 1. click on the button on "Avg" colon title
+    # 2. load the value of Average in each row
+    # 3. check if the average score is sorted and toggled between low-to-high and high-to-low
+  end
+
+  xit "Sorts by Criterion" do
+    load_questionnaire
+    # 1. click on the button on "Criterion" colon title
+    # 2. check if the criterion is sorted and toggled between low-to-high and high-to-low
+  end
+
+  xit "Click on reviews" do
+    load_review
+    # 1. click each row of different criterion
+    # 2. expect to have different content based on the criterion
+    # 3. expect to have a specified table for each criterion with comments
   end
 
 end

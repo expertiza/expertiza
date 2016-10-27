@@ -233,7 +233,7 @@ class QuestionnairesController < ApplicationController
         end
         begin
           @question.save
-          flash[:success] = 'All questions has been successfully saved!'
+          #flash[:success] = 'All questions has been successfully saved!'
         rescue
           flash[:error] = $ERROR_INFO
         end
@@ -248,7 +248,7 @@ class QuestionnairesController < ApplicationController
     else
       respond_to do |format|
         #format.html {redirect_to edit_questionnaire_path(questionnaire_id.to_sym)}
-        format.js
+        format.js {render :action => "edit"}
       end
     end
   end

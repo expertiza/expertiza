@@ -27,7 +27,7 @@
 //= require_tree .
 //= require jquery.datetimepicker
 //= require jquery-tablesorter
-
+//= require jquery.remotipart
 
 // Eliminate the “element.dispatchEvent is not a function” error
 jQuery.noConflict();

@@ -1,9 +1,10 @@
 <%= javascript_include_tag "application" %>
+<%= csrf_meta_tag %>
 <h1>Edit <%= @questionnaire.display_type %></h1>
 
 <div id="ajax_method"></div>
 <% if @questionnaire.type == "QuizQuestionnaire" %>
-  <%= form_tag({:action=>'update_quiz', :id=>@questionnaire.id, :pid => params[:pid], :format => 'js'}, :multipart => true) do %>
+  <%= form_tag({:action=>'update_quiz', :id=>@questionnaire.id, :pid => params[:pid]}, :multipart => true) do %>
     <% $disp_flag=0 %>
     <%= render :partial => 'quiz_questionnaire' %>
     <% $disp_flag=0 %>

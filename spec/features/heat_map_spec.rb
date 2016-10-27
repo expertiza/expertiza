@@ -27,7 +27,6 @@ describe "HeatMapTest", type: :feature do
     create(:question)
     create(:review_response_map, reviewer_id: User.where(role_id: 2).third.id)
     create(:review_response_map, reviewer_id: User.where(role_id: 2).second.id, reviewee: AssignmentTeam.second)
-    sleep(10000)
   end
 
   def load_questionnaire
@@ -48,7 +47,7 @@ describe "HeatMapTest", type: :feature do
     # Load questionnaire with generic setup
     load_questionnaire
 
-    expect(page).to have_conten
+    expect(page).to have_content "Summary Report for assignment"
   end
 
 

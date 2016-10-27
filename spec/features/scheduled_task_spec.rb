@@ -13,8 +13,7 @@ def expect_deadline_check(deadline_condition)
     send_reminder_condition = 'is able to send reminder email for Metareview deadline to reviewers '
     display_condition = "metareview"
   end
-
-
+  
 describe 'Metareview deadline reminder email' do
   it 'is able to send reminder email for Metareview deadline to reviewers ' do
     id = 2

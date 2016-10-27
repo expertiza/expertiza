@@ -1,5 +1,5 @@
 <% if @child_nodes.length > 0 %>
-<%= @root_node %>
+<%= @root_node.belongs_to_course? %>
   <BR/>
   <BR/>
   <TABLE WIDTH="80%" CELLPADDING="5" ID="theTable">

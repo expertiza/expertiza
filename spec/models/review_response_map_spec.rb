@@ -52,9 +52,29 @@ describe ReviewResponseMap do
       expect(reviewresponsemap.get_title).not_to eq('Feedback Review')
     end
   end
-  describe "export_field" do
+  describe "#export_field" do
     it "should be xx" do
-    #expect(reviewresponsemap.export_fields()).eq(0)
+	expect(ReviewResponseMap.export_fields(6)).to eq(["contributor", "reviewed by"])
     end
   end
+  describe "#show_feedback" do
+    let(:reviewresponsemap) {ReviewResponseMap.new(:response => [Response.new(:id => 4)])}
+#    let(:response) {Response.new(:id => 4)}
+    it "should do something" do
+    #  expect(reviewresponsemap.show_feedback(reviewresponsemap.response)).to eq(200)
+    end
+  end
+  describe '#delete' do
+    let(:reviewresponsemap) {ReviewResponseMap.new(:id => 8, :reviewee_id => 1, :reviewer_id => 2, :reviewed_object_id => 8, :response => [Response.new(:id => 8)])}
+    let(:response) {Response.new(:id => 1, :map_id => 1)}
+    let(:feedbackresponsemap) {FeedbackResponseMap.new(:id => 2, :reviewed_object_id => 8)}
+    let(:metareviewresponsemap) {MetaReviewResponseMap.new(:id => 8, :reviewed_object_id => 8)}
+	it "deletes the map" do
+		expect(ReviewResponseMap.count).to eq(0)
+#		expect{ReviewResponseMap.delete(reviewresponsemap)}.to change{ReviewResponseMap.count}.by(-1)
+	end
+  end
+
+
+
 end

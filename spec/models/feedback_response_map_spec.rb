@@ -40,14 +40,22 @@ describe FeedbackResponseMap do
     end
   end
 
-  describe "#show_review" do
-    it "should not show any review" do
+  describe "#show_review with response" do
+    let(:feedbackresponsemap) {FeedbackResponseMap.new(:review => Response.new())}
+    it "should show a review" do
+    #  expect(feedbackresponsemap.show_review).not_to eq("No review was performed")
+    end
+  end
+  describe "#show_review without response" do
+    it "should show a review" do
       expect(feedbackresponsemap.show_review).to eq("No review was performed")
     end
   end
+
   describe "#contributor" do
+    let(:feedbackresponsemap) {FeedbackResponseMap.new(:id => 1, :reviewee_id => 2, :reviewer_id => 3, :reviewed_object_id => 4, :review => Response.new(), :reviewee => Participant.new(), :reviewer => AssignmentParticipant.new())}   
     it "should return the object of same class" do
-    #  expect(feedbackresponsemap.contributor.class).to be(FeedbackResponseMap)
+      expect(feedbackresponsemap.contributor).to be(2)
     end
   end
 

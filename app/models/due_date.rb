@@ -35,7 +35,7 @@ class DueDate < ActiveRecord::Base
   end
 
   def self.deadline_sort(due_dates)
-    due_dates.sort {|m1, m2|
+    due_dates.sort do |m1, m2|
       if m1.due_at and m2.due_at
         m1.due_at <=> m2.due_at
       elsif m1.due_at
@@ -43,7 +43,7 @@ class DueDate < ActiveRecord::Base
       else
         1
       end
-    }
+    end
   end
 
   def self.done_in_assignment_round(assignment_id, response)

@@ -18,7 +18,7 @@ module OnTheFlyCalc
       calc_varying_rubrics
     else
       @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
-      calc_scores_static_rubric
+      calc_non_varying_rubric
     end
     @review_scores
   end
@@ -46,7 +46,7 @@ module OnTheFlyCalc
   end
 
 
-  def calc_scores_non_varying_rubric
+  def calc_non_varying_rubric
     review_questionnaire_id = review_questionnaire_id()
     @questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
 

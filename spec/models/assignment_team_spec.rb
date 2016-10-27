@@ -51,4 +51,16 @@ describe 'AssignmentTeam' do
       expect(assign_team.submitted_hyperlinks.split("\n").include?(@assign_team)).to be false
     end
   end
+
+  describe "copy assignment team to course team" do
+    it "should allow assignment team to be copied to course team" do
+      course_team = build(:course_team)
+      assign_team = build(:assignment_team)
+
+      assign_team.copy(course_team.id)
+      expect(CourseTeam.create_team_node
+      
+
+    end
+  end
 end

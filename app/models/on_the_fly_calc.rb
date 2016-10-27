@@ -26,20 +26,22 @@ module OnTheFlyCalc
   def calc_scores_varying_rubrics
     rounds.each do |round|
       review_questionnaire_id = review_questionnaire_id(round)
-
       @questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
+      scores_each_response
+    end
+  end
 
-      @response_maps.each do |response_map|
-        @corresponding_response = Response.where(['map_id = ?', response_map.id])
-        @corresponding_response = @corresponding_response.reject {|response| response.round != round } unless @corresponding_response.empty?
-        @respective_scores = {}
-        @respective_scores = reviewer[round] if !reviewer.nil? && !reviewer[round].nil?
-        calc_review_score
-        @respective_scores[response_map.reviewee_id] = @this_review_score
-        reviewer = {} if reviewer.nil?
-        reviewer[round] = {} if reviewer[round].nil?
-        reviewer[round] = @respective_scores
-      end
+  def scores_each_response
+    @response_maps.each do |response_map|
+      @corresponding_response = Response.where(['map_id = ?', response_map.id])
+      @corresponding_response = @corresponding_response.reject {|response| response.round != round } unless @corresponding_response.empty?
+      @respective_scores = {}
+      @respective_scores = reviewer[round] if !reviewer.nil? && !reviewer[round].nil?
+      calc_review_score
+      @respective_scores[response_map.reviewee_id] = @this_review_score
+      reviewer = {} if reviewer.nil?
+      reviewer[round] = {} if reviewer[round].nil?
+      reviewer[round] = @respective_scores
     end
   end
 

@@ -24,9 +24,12 @@ describe "due_date_functions" do
     expect(@assignment_due_date.flag).to be true
   end
 
+
   it "due at is valid datetime" do
     expect(@assignment_due_date.due_at_is_valid_datetime).to be nil
+
   end
+
 
   it "copy due dates to new assignment" do
     new_assignment_id = build(:assignment, id: 999).id
@@ -34,6 +37,8 @@ describe "due_date_functions" do
     DueDate.copy(old_assignment_id, new_assignment_id)
     expect(DueDate.where(parent_id: new_assignment_id).count).to eql DueDate.where(parent_id: old_assignment_id).count
   end
+
+
 
   it "create new duedate record with values" do
     DueDate.set_duedate({id: 999}, @assignment_due_date.deadline_type_id,
@@ -43,6 +48,7 @@ describe "due_date_functions" do
     expect(new_due_date.deadline_type_id).to eql @assignment_due_date.deadline_type_id
     expect(new_due_date.parent_id).to eql @assignment_due_date.parent_id
     expect(new_due_date.round).to eql @assignment_due_date.round
+
   end
 
   it "sort duedate records" do

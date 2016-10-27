@@ -53,5 +53,24 @@ describe "DeadlineHelper" do
     end
   end
 
+  describe "#get_next_due_date" do
+
+
+    it "nil value throws exception" do
+      expect { DueDate.get_next_due_date(nil) }.to raise_exception(ActiveRecord::RecordNotFound)
+    end
+
+    it "get next due date" do
+      due_date = create(:assignment_due_date, due_at: Time.zone.now + 5000)
+      expect(DueDate.get_next_due_date(due_date.parent_id)).to be_valid
+    end
+
+    it "get due date for staggered deadline" do
+      assignment_id = create(:assignment, staggered_deadline: true, name: "testassignment").id
+      due_date = create(:assignment_due_date, due_at: Time.zone.now + 5000, parent_id: assignment_id)
+      expect(DueDate.get_next_due_date(assignment_id)).to be_valid
+    end
+  end
+
 end
 

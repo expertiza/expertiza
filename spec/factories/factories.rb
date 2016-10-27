@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :role_of_administrator, class: Role do
+  factory :roundle_of_administrator, class: Role do
     name 'Administrator'
     parent_id nil
     description ''

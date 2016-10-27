@@ -90,8 +90,8 @@ class AssignmentNode < Node
     @assign_node.course_id
   end
 
+  # Returns true if the assignment is inside a course
   def belongs_to_course?
-    # byebug
     !get_course_id.nil?
   end
 

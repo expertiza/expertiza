@@ -1,11 +1,22 @@
 require 'rails_helper'
 describe TeammateReviewResponseMap do
   let(:teammatereviewresponsemap) {TeammateReviewResponseMap.new id: 6, reviewee_id: 1, reviewer_id: 2, reviewed_object_id: 8}
+  #let(:reviewer) {Response.new id: 2, map_id: 4}
+  #let(:reviewee) { Participant.new id: 1}
+
+
   describe "#new" do
     it "Validate response instance creation with valid parameters" do
       expect(teammatereviewresponsemap.class).to be(TeammateReviewResponseMap)
     end
+    #it "Validate response instance creation with valid parameters" do
+    #  expect(response.class).to be(Response)
+    #end
+    #it "Validate response instance creation with valid parameters" do
+    #  expect(reviewee.class).to be(Participant)
+    #end
   end
+
   describe "id" do
   #test all the id are stored correctly
   	it "should be our exact teammatereviewresponsemap's id" do
@@ -26,7 +37,14 @@ describe TeammateReviewResponseMap do
     it "should not be any other reviewee's id" do
       expect(teammatereviewresponsemap.reviewee_id).not_to eq(2)
     end
+    #it "should be the response map_id" do
+    #  expect(response.map_id).to eq(4)
+    #end
+    #it "should not be any other response map_id" do
+    #  expect(response.map_id).not_to eq(2)
+    #end
   end
+
   describe "title" do
   #test the title to be stored correctly
     it "should be Teammate Review" do

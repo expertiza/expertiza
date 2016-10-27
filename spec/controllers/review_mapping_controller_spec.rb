@@ -8,7 +8,7 @@ RSpec.describe ReviewMappingController, type: :controller do
       it "returns http success" do
         allow(Response).to receive(:find)
         get :new_feedback
-        expect(response).to redirect_to (request.env['HTTP_REFERER'] ? :back : :root)
+        expect(response).to redirect_to request.env['HTTP_REFERER'] ? :back : :root
       end
     end
   end
@@ -20,7 +20,7 @@ RSpec.describe ReviewMappingController, type: :controller do
     let(:responsemap) { ResponseMap.new }
     before(:each) do
       student.save
-      @user = User.find_by_name('student')
+      @user = User.find_by(name: 'student')
       @role = double('role', super_admin?: false)
       stub_current_user(@user, 'Student', @role)
     end

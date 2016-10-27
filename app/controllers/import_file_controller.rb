@@ -12,6 +12,23 @@ class ImportFileController < ApplicationController
     @model = params[:model]
     @title = params[:title]
     @array_expected_values = parse_line(@expected_fields,',',params)
+    b = ['...','MetareviewerN','ReviewerN','Team MemberN']
+    @array_expected_values.delete_if { |x| b.include?(x) }
+
+    if(@array_expected_values.include?("Team Member1"))
+    (3..4).each do |i|
+      @array_expected_values.push("Team Member#{i}")
+    end
+    elsif(@array_expected_values.include?("Reviewer1"))
+    (3..15).each do |i|
+      @array_expected_values.push("Reviewer#{i}")
+    end
+    elsif(@array_expected_values.include?("Metaeviewer1"))
+    (3..15).each do |i|
+      @array_expected_values.push("Metareviewer#{i}")
+    end
+    else
+    end
   end
 
   def import
@@ -98,11 +115,24 @@ class ImportFileController < ApplicationController
     end
   end
   def reorder_row(row,params)
-    @expected_fields_variable = ['Team Name - optional', 'Team Member1','Team Member2', 'Team Member3']
+    case params[:model]
+      when "AssignmentTeam"
+        @expected_fields_variable_default = ['Team Name - optional', 'Team Member1','Team Member2', 'Team Member3', 'Team Member4']
+      when "User"
+        @expected_fields_variable_default = [ 'username', 'full name (first[ middle] last)', 'e-mail address']
+      else
+        @expected_fields_variable_default = ['Team Name - optional', 'Team Member1','Team Member2', 'Team Member3', 'Team Member4']
+    end
+
+    @expected_fields_variable=[]
     @custom_order={}
+    logger.debug "model is #{params[:model]}"
     logger.debug "the values in row"
     logger.debug row.inspect
     return_row=[]
+    @expected_fields_variable=@expected_fields_variable_default.reject.with_index { |x,i| i > row.length-1 }
+    logger.debug "the values in reduced expected value"
+    logger.debug @expected_fields_variable.inspect
     @expected_fields_variable.each_with_index { |field, index|
       import_param_name= "import_field_#{index}"
       @local_variable=params[import_param_name]

@@ -5,10 +5,10 @@
     <thead>
     <tr bgcolor='#CCCCCC'>
       <th width = "16%" class="sorter-true">Reviewer <span></span></th>
-      <th width = "14%" class="sorter-false">reviews done per round<span></span></th>
+      <th width = "14%" class="sorter-false">Reviews done per round<span></span></th>
       <th width = "20%" class="sorter-false">Team reviewed <span></span></th>
       <th width = "14%" class="sorter-false">Score awarded / Avg. score <span></span></th>
-      <th width = "10%" class="sorter-false">Metrics <span></span></th>
+      <th width = "10%" class="sorter-true">Metrics <span></span></th>
       <th width = "36%" class="sorter-false">Assign grade and write comments <span></span></th>
     </tr>
     </thead>
@@ -96,15 +96,43 @@
     background-repeat: no-repeat;
     background-position: center right;
     padding-right: 15px;
+
   }
+
 </style>
 <script>
+
+
   $(function () {
     $("[data-toggle='tooltip']").tooltip();
-    $("#myTable").tablesorter();
+    $("#myTable").tablesorter({
+      sortList: [[0,0],[4,4]],
+      headers: {
+        4: {
+        sorter: 'customParser'
+      }
+    }
+    });
   });
 
-  var lesser = false;
+
+
+  $.tablesorter.addParser({
+    id: "customParser",
+    is: function (stringValue) {
+      return false;
+    },
+    format: function (stringValue) {
+      var stringValueParts = stringValue.split(" ");
+      var numericPartOfStringValue = parseInt(stringValueParts[2],10);
+      console.log(numericPartOfStringValue);
+      return numericPartOfStringValue ;
+    },
+    type: 'numeric'
+  });
+
+  
+ var lesser = false;
   // Function to sort the columns based on the total review score
   function col_sort(m) {
 
@@ -189,7 +217,6 @@
       return a > b
     }
   }
-
 
 
 </script>

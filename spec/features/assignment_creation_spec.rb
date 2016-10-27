@@ -185,6 +185,8 @@ describe "assignment function" do
                                 spec_location: 'testLocation'
                             )
     end
+
+
   end
 end
 
@@ -407,4 +409,37 @@ end
       fill_in 'num_reviews_per_student', with: 5
     end
   end
+
+
+  ## adding test for general tab
+
+  describe "general  tab", js: true do
+    before(:each) do
+      @assignment = create(:assignment, name: 'public assignment for test')
+    end
+
+    it "should edit assignment available to students" do
+      login_as("instructor6")
+      visit '/assignments/1/edit'
+      find_link('General').click
+      fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
+      select('Course 2', from: 'assignment_form_assignment_course_id')
+      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'
+      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
+      check("assignment_form_assignment_microtask")
+      check("assignment_form_assignment_is_calibrated")
+      click_button 'Save'
+      expect(assignment).to have_attributes(
+                                name: 'edit assignment for test',
+                                course_id: Course.find_by_name('Course 2')[:id],
+                                directory_path: 'testDirectory1',
+                                spec_location: 'testLocation1',
+                                microtask: true,
+                                is_calibrated: true,
+                            )
+    end
+  end
+
+
+
 

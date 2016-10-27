@@ -16,6 +16,10 @@ class AssignmentTeam < Team
     "Assignment"
   end
 
+  def self.parent_model_for_id (id)
+    Assignment.find(id) 
+  end
+
   # Get the name of the class
   def fullname
     self.name
@@ -136,19 +140,10 @@ class AssignmentTeam < Team
 
   # Copy the current Assignment team to the CourseTeam
   def copy(course_id)
-    new_team = CourseTeam.create_team_and_node(course_id, CourseTeam.name)
+    new_team = CourseTeam.create_team_and_node(course_id)
     new_team.name = name
     new_team.save
     copy_members(new_team)
-    return nil if handle_duplicates == "ignore" # ignore: do not create the new team
-    return self.generate_team_name(Assignment.find(assignment_id).name) if handle_duplicates == "rename" # rename: rename new team
-
-    if handle_duplicates == "replace" # replace: delete old team
-      team.delete
-      return name
-    else # handle_duplicates = "insert"
-      return nil
-    end
   end
 
   # Add Participants to the current Assignment Team

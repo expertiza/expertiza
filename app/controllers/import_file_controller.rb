@@ -117,37 +117,21 @@ class ImportFileController < ApplicationController
   def reorder_row(row,params)
     case params[:model]
       when "AssignmentTeam"
-        @expected_fields_variable_default = ['Team Name - optional', 'Team Member1','Team Member2', 'Team Member3', 'Team Member4']
+        expected_fields_variable_default = ['Team Name - optional', 'Team Member1','Team Member2', 'Team Member3', 'Team Member4']
       when "User"
-        @expected_fields_variable_default = [ 'username', 'full name (first[ middle] last)', 'e-mail address']
+        expected_fields_variable_default = [ 'username', 'full name (first[ middle] last)', 'e-mail address']
       else
-        @expected_fields_variable_default = ['Team Name - optional', 'Team Member1','Team Member2', 'Team Member3', 'Team Member4']
+        expected_fields_variable_default = ['Team Name - optional', 'Team Member1','Team Member2', 'Team Member3', 'Team Member4']
     end
 
-    @expected_fields_variable=[]
-    @custom_order={}
-    logger.debug "model is #{params[:model]}"
-    logger.debug "the values in row"
-    logger.debug row.inspect
+    expected_fields_variable=[]
+    custom_order={}
     return_row=[]
-    @expected_fields_variable=@expected_fields_variable_default.reject.with_index { |x,i| i > row.length-1 }
-    logger.debug "the values in reduced expected value"
-    logger.debug @expected_fields_variable.inspect
-    @expected_fields_variable.each_with_index { |field, index|
-      import_param_name= "import_field_#{index}"
-      @local_variable=params[import_param_name]
-      @custom_order[@local_variable]=row[index]
-      logger.debug "the value of params passed 0: #{@custom_order[@local_variable]}  and param_name#{import_param_name}"
+    expected_fields_variable=expected_fields_variable_default.reject.with_index { |x,i| i > row.length-1 }
+    expected_fields_variable.each_with_index { |field, index|
+      custom_order[params["import_field_#{index}"]]=row[index]
     }
-    logger.debug "the values in custom order"
-    logger.debug @custom_order.inspect
-    @expected_fields_variable.each_with_index { |field, index|
-      return_row[index]=@custom_order[field]
-    }
-    logger.debug "the values in params"
-    logger.debug params.inspect
-    logger.debug "the values in return row"
-    logger.debug return_row.inspect
+    expected_fields_variable.each_with_index { |field, index| return_row[index]=custom_order[field]}
     return_row
   end
   # def undo_link

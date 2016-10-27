@@ -223,11 +223,19 @@ end
       (1..3).each do |i|
         create(:course, name: "Course #{i}")
       end
-      @assignment = create(:assignment, name: 'public assignment for test')
+      create(:deadline_type)
+      create(:deadline_type, name: 'team_formation')
+      create(:deadline_type, name: 'review')
+      create(:deadline_type, name: 'metareview')
+      create(:deadline_type, name: 'drop_topic')
+      create(:deadline_type, name: 'signup')
+      create(:deadline_type, name: 'quiz')
+      create(:assignment, name: 'public assignment for test')
 
+      assignment = Assignment.where(name: 'public assignment for test').first
       login_as("instructor6")
-      visit "/assignments/#{@assignment[:id]}/edit"
-      find_link('Topics').click
+      visit "/assignments/#{assignment[:id]}/edit"
+      click_link 'Topics'
     end
 
     it "can edit topics properties" do

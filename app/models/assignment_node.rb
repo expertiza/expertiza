@@ -90,6 +90,10 @@ class AssignmentNode < Node
     @assign_node.course_id
   end
 
+  def belongs_to_course?
+    self.get_course_id > 0
+  end
+
   # Gets the instructor_id from the associated object
   def get_instructor_id
     # Assignment.find(self.node_object_id).course_id

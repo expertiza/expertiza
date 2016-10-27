@@ -89,10 +89,14 @@ class ImportFileController < ApplicationController
             end
     row = []
     items.each {|value| row << value.sub("\"", "").sub("\"", "").strip }
-    reorder_row(row,params)
-    row
+    reordered_row=[]
+    reordered_row=reorder_row(row,params)
+    if (reordered_row[0].nil?)
+      row
+    else
+      reordered_row
+    end
   end
-
   def reorder_row(row,params)
     @expected_fields_variable = ['Team Name - optional', 'Team Member1','Team Member2', 'Team Member3']
     @custom_order={}

@@ -276,7 +276,72 @@ class AssignmentParticipant < Participant
   end
 
   # provide export functionality for Assignment Participants
-  def self.export(csv, parent_id, _options)
+  def self.export(csv, parent_id, options)
+    if options["participant_type"] == "signed"
+        Team.where(:parent_id=> parent_id).find_each do |team|
+          TeamsUser.where(:team_id=> team.id).find_each do |team_user|
+            user = User.find(team_user.user_id)
+            if SignedUpTeam.where( :team_id => team.id).where(:is_waitlisted => [false, nil," ", ""]).present?
+            csv << [
+              user.name,
+              user.fullname,
+              user.email,
+              user.role.name,
+              user.parent.name,
+              user.email_on_submission,
+              user.email_on_review,
+              user.email_on_review_of_review,
+              team.id,
+              "handle"
+            ]
+            end
+          end
+        end
+    elsif options["participant_type"] == "wait_listed"
+      Team.where(:parent_id=> parent_id).find_each do |team|
+        TeamsUser.where(:team_id=> team.id).find_each do |team_user|
+          user = User.find(team_user.user_id)
+          if SignedUpTeam.where( :team_id => team.id).where(:is_waitlisted => [true]).present?
+            csv << [
+                user.name,
+                user.fullname,
+                user.email,
+                user.role.name,
+                user.parent.name,
+                user.email_on_submission,
+                user.email_on_review,
+                user.email_on_review_of_review,
+                team.id,
+                "handle"
+
+            ]
+          end
+        end
+      end
+    elsif options["participant_type"] == "unsigned"
+      where(parent_id: parent_id).find_each do |part|
+        user_part = part.user
+      Team.where(:parent_id=> parent_id).find_each do |team|
+        TeamsUser.where(:team_id=> team.id).find_each do |team_user|
+          user = User.find(team_user.user_id)
+            if SignedUpTeam.where( :team_id => team.id).empty? or TeamsUser.where(:user_id=>user_part).empty?
+              csv << [
+                user.name,
+                user.fullname,
+                user.email,
+                user.role.name,
+                user.parent.name,
+                user.email_on_submission,
+                user.email_on_review,
+                user.email_on_review_of_review,
+                team.id,
+                "handle"
+              ]
+            end
+          end
+        end
+      end
+    elsif options["participant_type"] == "all"
     where(parent_id: parent_id).find_each do |part|
       user = part.user
       csv << [
@@ -288,13 +353,15 @@ class AssignmentParticipant < Participant
         user.email_on_submission,
         user.email_on_review,
         user.email_on_review_of_review,
+        "All Participants",
         part.handle
       ]
+      end
     end
   end
 
-  def self.export_fields(_options)
-    ["name", "full name", "email", "role", "parent", "email on submission", "email on review", "email on metareview", "handle"]
+  def self.export_fields(options)
+    ["name", "full name", "email", "role", "parent", "email on submission", "email on review", "email on metareview", "team id", "handle" ]
   end
 
   # grant publishing rights to one or more assignments. Using the supplied private key,

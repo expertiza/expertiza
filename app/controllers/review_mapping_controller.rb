@@ -12,7 +12,7 @@ class ReviewMappingController < ApplicationController
   # start_self_review is a method that is invoked by a student user so it should be allowed accordingly
   def action_allowed?
     case params[:action]
-    when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'assign_quiz_dynamically', 'start_self_review'
+    when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'assign_quiz_dynamically', 'start_self_review' , 'new_feedback'
       true
     else
       ['Instructor',
@@ -544,6 +544,24 @@ class ReviewMappingController < ApplicationController
       redirect_to controller: 'submitted_content', action: 'edit', id: params[:reviewer_id]
     rescue
       redirect_to controller: 'submitted_content', action: 'edit', id: params[:reviewer_id], msg: $ERROR_INFO
+    end
+  end
+
+  # E1639 - this method was moved from response_controller.rb to this controller since it is managing FeedbackResponseMap
+  # Response controller should only manage Response type of object and not ResponseMap type of object
+  # note: tests for this method were also moved from old spec to new spec - review_mapping_controller_spec.rb
+  def new_feedback
+    review = Response.find(params[:id])
+    if review
+      reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id:  review.map.assignment.id).first
+      map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id:  reviewer.id).first
+      if map.nil?
+        # if no feedback exists by dat user den only create for dat particular response/review
+        map = FeedbackResponseMap.create(reviewed_object_id: review.id, reviewer_id: reviewer.id, reviewee_id: review.map.reviewer.id)
+      end
+      redirect_to controller: 'response', action: 'new', id: map.id, return: "feedback"
+    else
+      redirect_to request.referer || root_path
     end
   end
 

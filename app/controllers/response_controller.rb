@@ -146,20 +146,8 @@ class ResponseController < ApplicationController
     render action: 'response'
   end
 
-  def new_feedback
-    review = Response.find(params[:id])
-    if review
-      reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id:  review.map.assignment.id).first
-      map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id:  reviewer.id).first
-      if map.nil?
-        # if no feedback exists by dat user den only create for dat particular response/review
-        map = FeedbackResponseMap.create(reviewed_object_id: review.id, reviewer_id: reviewer.id, reviewee_id: review.map.reviewer.id)
-      end
-      redirect_to action: 'new', id: map.id, return: "feedback"
-    else
-      redirect_to :back
-    end
-  end
+  # E1639 - new_feedback method was moved from here to review_mapping_controller
+  # this method was managing a FeedbackResponseMap object and not a Response object and hence should not be here
 
   # view response
   def view

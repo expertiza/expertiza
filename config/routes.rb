@@ -281,7 +281,6 @@ Expertiza::Application.routes.draw do
 
   resources :response do
     collection do
-      get :new_feedback
       get :view
       post :delete
       get :remove_hyperlink
@@ -322,7 +321,9 @@ Expertiza::Application.routes.draw do
       post :automatic_review_mapping_staggered
       #E1600
       post :start_self_review
-      post :save_grade_and_comment_for_reviewer 
+      post :save_grade_and_comment_for_reviewer
+      #E1639
+      get :new_feedback
     end
   end
 

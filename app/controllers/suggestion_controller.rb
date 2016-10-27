@@ -75,7 +75,7 @@ class SuggestionController < ApplicationController
       session[:user].name
     else
       ""
-                          end
+    end
 
     if @suggestion.save
       flash[:success] = 'Thank you for your suggestion!' if @suggestion.unityID != ''
@@ -106,6 +106,8 @@ class SuggestionController < ApplicationController
     TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
   end
 
+  # If the user submits a suggestion and gets it approved -> Send email
+  # If user submits a suggestion anonymously and it gets approved -> DOES NOT get an email
   def send_email
     proposer = User.find(@user_id)
     teams_users = TeamsUser.where(team_id: @team_id)
@@ -184,6 +186,7 @@ class SuggestionController < ApplicationController
 
   def approve
     @suggestion = Suggestion.find(params[:id])
+    @suggestion.unityID
     @user_id = User.where(name: @suggestion.unityID).first.id
     @team_id = TeamsUser.team_id(@suggestion.assignment_id, @user_id)
     @topic_id = SignedUpTeam.topic_id(@suggestion.assignment_id, @user_id)

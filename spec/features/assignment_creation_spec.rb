@@ -182,12 +182,66 @@ describe "assignment function" do
                                 name: 'private assignment for test',
                                 course_id: Course.find_by_name('Course 2')[:id],
                                 directory_path: 'testDirectory',
-                                spec_location: 'testLocation'
-                            )
+                                spec_location: 'testLocation')
+    end
+
+    it "is able to create public micro-task assignment" do
+      login_as("instructor6")
+      visit '/assignments/new?private=0'
+
+      fill_in 'assignment_form_assignment_name', with: 'public assignment for test'
+      select('Course 2', from: 'assignment_form_assignment_course_id')
+      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      check('assignment_form_assignment_microtask')
+      click_button 'Create'
+
+      assignment = Assignment.where(name: 'public assignment for test').first
+      expect(assignment).to have_attributes(
+                                microtask: true)
+    end
+    it "is able to create calibrated public assignment" do
+      login_as("instructor6")
+      visit '/assignments/new?private=0'
+
+      fill_in 'assignment_form_assignment_name', with: 'public assignment for test'
+      select('Course 2', from: 'assignment_form_assignment_course_id')
+      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      check("assignment_form_assignment_is_calibrated")
+      click_button 'Create'
+
+      assignment = Assignment.where(name: 'public assignment for test').first
+      expect(assignment).to have_attributes(
+                                is_calibrated: true)
     end
   end
 end
 
+describe "general tab", js: true do
+  before(:each) do
+    @assignment = create(:assignment, name: 'public assignment for test')
+  end
+
+  it "should edit assignment available to students" do
+    login_as("instructor6")
+    visit "/assignments/#{@assignment.id}/edit"
+    find_link('General').click
+    fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
+    select('Course 2', from: 'assignment_form_assignment_course_id')
+    fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'
+    fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
+    check("assignment_form_assignment_microtask")
+    check("assignment_form_assignment_is_calibrated")
+    click_button 'Save'
+    expect(assignment).to have_attributes(
+                              name: 'edit assignment for test',
+                              course_id: Course.find_by_name('Course 2')[:id],
+                              directory_path: 'testDirectory1',
+                              spec_location: 'testLocation1',
+                              microtask: true,
+                              is_calibrated: true,
+                          )
+  end
+end
   describe "topics tab", js: true do
     before(:each) do
       (1..3).each do |i|

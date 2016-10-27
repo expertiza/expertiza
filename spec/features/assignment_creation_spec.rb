@@ -40,7 +40,7 @@ describe "assignment function" do
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
   end
-
+end
 
   describe "creation page", js: true do
     before(:each) do
@@ -49,6 +49,20 @@ describe "assignment function" do
       end
     end
 
+    it "is able to create Review Questionnaire" do
+      login_as("instructor6")
+      visit "/questionnaires/new?model=ReviewQuestionnaire&private=0"
+      fill_in 'questionnaire_name', with: 'new public review questionnaire'
+      fill_in 'questionnaire_min_question_score', with: '0'
+      fill_in 'questionnaire_max_question_score', with: '5'
+      expect(page).to have_select("questionnaire[private]", options: ['no', 'yes'])
+      click_button 'Create'
+      questionnaire = Questionnaire.where(name: 'new public review questionnaire').first
+      expect(questionnaire).to have_attributes(
+        name: 'new public review questionnaire',
+        max_question_score: 5,
+        min_question_score: 0)
+    end
     # Might as well test small flags for creation here
     it "is able to create a public assignment" do
       login_as("instructor6")
@@ -213,9 +227,6 @@ describe "assignment function" do
       expect(assignment).to have_attributes(
                                 is_calibrated: true)
     end
-
-
-  end
 end
 
   describe "topics tab", js: true do
@@ -467,7 +478,6 @@ end
                             )
     end
   end
-
 
 
 

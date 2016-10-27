@@ -41,8 +41,7 @@ describe Answer do
       ScoreView.stub(:find_by_sql).and_return([double("scoreview",weighted_score: nil,sum_of_weights: 5,q1_max_question_score: 5)])
       Answer.stub(:where).and_return([double("row1",question_id: 1,answer: nil)])
       expect(Answer).to receive(:submission_valid?)			
-      Answer.get_total_score(response: [response_record], questions: [question1])
-			
+      Answer.get_total_score(response: [response_record], questions: [question1])			
     end
   end
 
@@ -135,4 +134,31 @@ describe Answer do
       expect(Answer.answers_by_question_for_reviewee_in_round(assignment_id,reviewee_id,q_id,round)).not_to be_empty
     end
   end
+
+  # A bug was reported to TAs regarding submission_valid? function. The line 106 in answers.rb enters if sorted deadline is nil but if that is the case, line 113 	will throw an error. So the following test cases will make no sense once the bug is fixed. These have to changed.
+  describe "submission valid?" do
+    it "Checking for when valid due date objects are passed back to @sorted_deadlines" do
+      response_record.id = 1
+      response_record.additional_comment = "Test"
+      due_date1 = AssignmentDueDate.new
+      due_date2 = AssignmentDueDate.new
+      due_date1.due_at = Time.new-24
+      due_date2.due_at = Time.new-24
+      due_date1.deadline_type_id = 4
+      due_date2.deadline_type_id = 2
+      ResubmissionTime1, ResubmissionTime2 = Time.new-24, Time.new-48
+      AssignmentDueDate.stub_chain(:where, :order).and_return(due_date1, due_date2)
+      ResubmissionTime.stub_chain(:where, :order).and_return(ResubmissionTime1, ResubmissionTime2)
+      expect(Answer.submission_valid?(response_record)).to be nil
+    end
+
+
+    it "Checking when no due date objects are passed back to @sorted_deadlines" do
+      response_record.id = 1
+      response_record.additional_comment = "Test"
+      AssignmentDueDate.stub_chain(:where, :order).and_return(nil)
+      expect{Answer.submission_valid?(response_record)}.to raise_error
+    end
+  end
 end
+

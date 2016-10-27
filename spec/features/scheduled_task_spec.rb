@@ -54,10 +54,10 @@ describe 'Metareview deadline reminder email' do
   it 'is able to send reminder email for Metareview deadline to reviewers ' do
     id = 2
     @name = "user"
-    due_at = DateTime.now.advance(minutes: +2)
+    due_at = Time.zone.now.advance(minutes: +2)
 
-    due_at1 = Time.parse(due_at.to_s(:db))
-    curr_time = DateTime.now.to_s(:db)
+    due_at1 = Time.zone.parse(due_at.to_s(:db))
+    curr_time = Time.zone.now.to_s(:db)
     curr_time = Time.parse(curr_time)
     time_in_min = ((due_at1 - curr_time).to_i / 60) * 60
     Delayed::Job.delete_all

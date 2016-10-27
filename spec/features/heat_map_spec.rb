@@ -40,61 +40,27 @@ describe "HeatMapTest", type: :feature do
 
     click_link "Alternate View"
 
-    #click_link "Begin"
   end
 
-  it "fills in a single textbox and saves" do
-    # Load questionnaire with generic setup
+  it "Loads Heat Map page" do
+    # Load data
     load_questionnaire
 
     expect(page).to have_content "Summary Report for assignment"
   end
 
-
-
-  '''
-  it "fills in a single comment with multi word text and saves" do
-    # Load questionnaire with generic setup
+  xit "Toggles question list" do
     load_questionnaire
-    # Fill in a textbox with a multi word comment
-    fill_in "responses[0][comment]", with: "Excellent Work"
-    click_button "Submit Review"
-    expect(page).to have_content "Your response was successfully saved."
   end
 
-  it "fills in a single comment with single word and saves" do
-    # Load questionnaire with generic setup
+
+  xit "Sorts by total review score" do
     load_questionnaire
-    # Fill in a textbox with a single word comment
-    fill_in "responses[0][comment]", with: "Excellent"
-    click_button "Submit Review"
-    expect(page).to have_content "Your response was successfully saved."
   end
 
-  it "fills in only points and saves" do
-    # Load questionnaire with generic setup
+
+  xit "Sorts by Avg" do
     load_questionnaire
-    # Fill in a dropdown with some points
-    select 5, from: "responses[0][score]"
-    click_button "Submit Review"
-    expect(page).to have_content "Your response was successfully saved."
   end
 
-  it "saves an empty review without any points and comments" do
-    # Load questionnaire with generic setup
-    load_questionnaire
-    click_button "Submit Review"
-    expect(page).to have_content "Your response was successfully saved."
-  end
-
-  it "saves a review with only additional comments" do
-    # Load questionnaire with generic setup
-    load_questionnaire
-
-    # Filling in Additional Comments only
-    fill_in "review[comments]", with: "Excellent work done!"
-    click_button "Submit Review"
-    expect(page).to have_content "Your response was successfully saved."
-  end
-'''
 end

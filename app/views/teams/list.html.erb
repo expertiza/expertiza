@@ -13,6 +13,16 @@
 <% else %>
   <% modelType = 'CourseTeam' %>
 <% end %>
+
+<% if modelType == 'AssignmentTeam' %>
+|<%= link_to 'Inherit Team',
+             :controller=>'teams',
+             :action=>'inherit',
+             :method => 'post',
+             :model=> modelType,
+             :id=>@root_node.node_object_id %>
+<% end %>
+
 | <%= link_to 'Import Teams',
   :controller=>'import_file',
   :action=>'start',

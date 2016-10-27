@@ -115,7 +115,9 @@ class SubmittedContentController < ApplicationController
 
     # send message to reviewers when submission has been updated
     Response.email(participant.id) rescue nil # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
-    stage = assignment.get_current_stage(SignedUpTeam.topic_id(participant.parent_id, participant.user_id))
+    
+    assignment = participant.assignment
+    stage = assignment.current_stage_name(SignedUpTeam.topic_id(assignment.id,participant.user_id))
 
     if stage == ('review') then
      prepared_mail = MailerHelper.send_mail_to_reviewer(User.find(participant.user_id), "A new submission is available", "file_submission", "file submission", Assignment.find(participant.parent_id).name)

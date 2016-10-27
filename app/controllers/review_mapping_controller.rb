@@ -79,54 +79,6 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment.id, msg: msg
   end
 
-  # Assign self to a submission
-  def add_self_reviewer
-    assignment = Assignment.find(params[:assignment_id])
-    topic_id = params[:topic_id]
-    reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
-    submission = AssignmentParticipant.find(params[:submission_id], assignment.id)
-
-    if submission.nil?
-      flash[:error] = "Could not find a submission to review for the specified topic, please choose another topic to continue."
-      redirect_to controller: 'student_review', action: 'list', id: reviewer.id
-    else
-
-      begin
-        # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-        # to treat all assignments as team assignments
-        contributor = get_team_from_submission(submission)
-        if ReviewResponseMap.where(['reviewee_id = ? and reviewer_id = ?', contributor.id, reviewer.id]).first.nil?
-          ReviewResponseMap.create(reviewee_id: contributor.id,
-                                   reviewer_id: reviewer.id,
-                                   reviewed_object_id: assignment.id)
-        else
-          raise "The reviewer, \"" + reviewer.name + "\", is already assigned to this contributor."
-        end
-        redirect_to controller: 'student_review', action: 'list', id: reviewer.id
-      rescue
-        redirect_to controller: 'student_review', action: 'list', id: reviewer.id, msg: $ERROR_INFO
-      end
-
-    end
-  end
-
-  #  Looks up the team from the submission.
-  def get_team_from_submission(submission)
-    # Get the list of teams for this assignment.
-    teams = AssignmentTeam.where(parent_id: submission.parent_id)
-
-    teams.each do |team|
-      team.teams_users.each do |team_member|
-        if team_member.user_id == submission.user_id
-          # Found the team, return it!
-          return team
-        end
-      end
-    end
-
-    # No team found
-    nil
-  end
 
   # 7/12/2015 -zhewei
   # This method is used for assign submissions to students for peer review.

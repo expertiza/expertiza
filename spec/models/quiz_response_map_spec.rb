@@ -18,10 +18,10 @@ describe QuizResponseMap do
 
   describe "id" do
   #test all the id are stored correctly
-    it "should be our exact teammatereviewresponsemap's id" do
+    it "should be our exact quiz's id" do
       expect(quizresponsemap.id).to eq(5)
     end
-    it "should not be any other teammatereviewresponsemap's id" do
+    it "should not be any other quiz's id" do
       expect(quizresponsemap.id).not_to eq(7)
     end
     it "should be our exact reviewer's id" do

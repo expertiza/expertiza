@@ -87,9 +87,9 @@ describe "assignment function" do
         create(:course, name: "Course #{i}")
       end
     end
-  end  
+  end
 
-    # Might as well test small flags for creation here
+  # Might as well test small flags for creation here
   it "is able to create a public assignment" do
     login_as("instructor6")
     visit '/assignments/new?private=0'
@@ -117,7 +117,7 @@ describe "assignment function" do
   it "is able to create a private assignment" do
     login_as("instructor6")
     visit '/assignments/new?private=1'
-     fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
+    fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
     select('Course 2', from: 'assignment_form_assignment_course_id')
     fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
     fill_in 'assignment_form_assignment_spec_location', with: 'testLocation'

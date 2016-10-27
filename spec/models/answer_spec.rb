@@ -1,13 +1,15 @@
 require 'rails_helper'
 
 describe Answer do
+  let!(:questionnaire) {create(:questionnaire)}
+  let!(:question1) {create(:question,:questionnaire => questionnaire,:weight=>1,:id =>1)}
+  let!(:question2) {create(:question,:questionnaire => questionnaire,:weight=>2,:id =>2)}
+  let!(:response_map) {create(:review_response_map,:id=>1,:reviewed_object_id => 1)}
+  let!(:response_record) {create(:response_record,:id => 1,:response_map => response_map)}
+  let!(:answer) { create(:answer,:question => question1,:response_id => 1)}
 
   describe "#test get total score" do
-    let!(:questionnaire) {create(:questionnaire)}
-    let!(:question1) {create(:question,:questionnaire => questionnaire,:weight=>1)}
-    let!(:question2) {create(:question,:questionnaire => questionnaire,:weight=>2)}
-    let!(:response_record) {create(:response_record,:id => 1)}
-			
+   				
     it "returns total score when required conditions are met" do
       # stub for ScoreView.find_by_sql to revent prevent unit testing sql db queries
       ScoreView.stub(:find_by_sql).and_return([double("scoreview",weighted_score: 20,sum_of_weights: 5,q1_max_question_score: 4)])
@@ -46,12 +48,12 @@ describe Answer do
 
   describe "#test compute scores" do
     let(:response1) {double("respons1")}
-    let!(:response2) {double("respons2")}
+    let(:response2) {double("respons2")}
 
     it "returns nil if list of assessments is empty" do
       assessments=[]
       Answer.stub(:get_total_score).and_return(100.0)
-      scores=Answer.compute_scores(assessments, [:question1])
+      scores=Answer.compute_scores(assessments, [question1])
       expect(scores[:max]).to be nil
       expect(scores[:min]).to be nil
       expect(scores[:avg]).to be nil
@@ -62,7 +64,7 @@ describe Answer do
       Answer.instance_variable_set(:@invalid,0)
       total_score=100.0
       Answer.stub(:get_total_score).and_return(total_score)
-      scores=Answer.compute_scores(assessments, [:question1])
+      scores=Answer.compute_scores(assessments, [question1])
       expect(scores[:max]).to be total_score
       expect(scores[:min]).to be total_score
       expect(scores[:avg]).to be total_score
@@ -74,7 +76,7 @@ describe Answer do
       total_score1=100.0
       total_score2=80.0
       Answer.stub(:get_total_score).and_return(total_score1,total_score2)
-      scores=Answer.compute_scores(assessments, [:question1])
+      scores=Answer.compute_scores(assessments, [question1])
       expect(scores[:max]).to be total_score1
       expect(scores[:min]).to be total_score2
       expect(scores[:avg]).to be (total_score1+total_score2)/2
@@ -85,7 +87,7 @@ describe Answer do
       Answer.instance_variable_set(:@invalid,1)
       total_score=100.0
       Answer.stub(:get_total_score).and_return(total_score)
-      scores=Answer.compute_scores(assessments, [:question1])
+      scores=Answer.compute_scores(assessments, [question1])
       expect(scores[:max]).to be total_score
       expect(scores[:min]).to be total_score
       expect(scores[:avg]).to be 0
@@ -96,11 +98,26 @@ describe Answer do
       Answer.instance_variable_set(:@invalid,nil)
       total_score=100.0
       Answer.stub(:get_total_score).and_return(total_score)
-      scores=Answer.compute_scores(assessments, [:question1])
+      scores=Answer.compute_scores(assessments, [question1])
       expect(scores[:max]).to be total_score
       expect(scores[:min]).to be total_score
       expect(scores[:avg]).to be total_score
     end  
-end
 
+    it "checks if get_total_score function is called" do
+      assessments=[response1]
+      total_score=100.0
+      expect(Answer).to receive(:get_total_score).with(:response => assessments,:questions =>[question1]).and_return(total_score)
+      scores=Answer.compute_scores(assessments, [question1])
+    end
+  end
+
+  describe "#test sql queries" do
+
+    it "returns answer by question record from db which is not empty" do
+	assignment_id = 1
+	q_id = 1
+	expect(Answer.answers_by_question(assignment_id,q_id)).not_to be_empty
+    end	
+  end
 end

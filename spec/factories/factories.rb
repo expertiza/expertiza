@@ -325,22 +325,13 @@ FactoryGirl.define do
     is_submitted false
   end
 	
-	factory :response_record, class: Response do
-    response_map { ResponseMap.first || association(:response_map) }
+  #above response factory is giving error. I don't think repsonse class takes review_response_map. Creating a temp response
+  #this is currently being used in line 8 of answer_spec. If any changes are made in this factory, please make the same over there.
+  factory :response_record, class: Response do
+    response_map { ReviewResponseMap.first || association(:review_response_map) }
     additional_comment nil
     version_num nil
     round nil
     is_submitted false
-  end
-	
-	factory :response_map, class: ResponseMap do
-		reviewer { Participant.first || association(:participant) }
-	end
-
-	factory :answer_record, class: Answer do
-    question{ Question.first || association(:question) }
-		answer { 10 || assocaiton(:answer) }
-		comments "hi"
-		response { Response.first || association(:response_record) }
   end
 end

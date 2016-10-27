@@ -175,7 +175,7 @@ class ReviewResponseMap < ResponseMap
       # vary rubric by round
       rounds_num = assignment.rounds_of_reviews
 
-      for round in 1..rounds_num
+      rounds_num.each do |round|
         prepare_review_response(assignment, maps, review_final_versions, round)
       end
 

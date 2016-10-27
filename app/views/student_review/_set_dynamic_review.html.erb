@@ -22,8 +22,10 @@
     <table cellpadding="0" id="topic_list">
       <% #candidate_topics_to_review = assignment.candidate_topics_to_review(session[:user]).to_a %>
       <% candidate_topics_to_review = assignment.candidate_topics_to_review(participant).to_a %>
-      <%# candidate_topics_to_review.sort! { |a, b| a.id <=> b.id } %>
+      <% candidate_topics_to_review.sort! { |a, b| a.id <=> b.id } %>
       <!-- The topics are populated according to the least no of reviews obtained -->
+      <!--the assignments are sorted according to the num of reviews -->
+      <%# candidate_topics_to_review.sort_by{candidate_topics_to_review.}>
       
       <% non_reviewable_topics = assignment.sign_up_topics - candidate_topics_to_review %>
       <% non_reviewable_topics.sort! { |a, b| a.id <=> b.id } %>

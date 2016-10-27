@@ -45,6 +45,7 @@
                 <% if @assignment.get_current_stage(@topic_id) != 'Finished' %>
                     <!--show the link as edit when latest review is done in current deadline-->
                     <!--show link as update when latest review is done in different deadline than current phase-->
+                    <!-- E1639 Added return parameter value = 'selfreview' to be used to in redirection method -->
                     <% if (last_response_round == current_round) %>
                         <td>
                           <% if (!@latest_response.is_submitted) %>

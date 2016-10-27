@@ -204,12 +204,11 @@ class ResponseController < ApplicationController
     redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
   end
 
-  # E1600
-  # Added paramps[:return] value for 'SelfReviewResponseMap' to ensure that this method is invoked from self-review operation
-  # this looks dirty to me. If other map type do not do this, there is no reason that we handle SelfReviewResponseMap here. There should be a elegant way.. --Yang
+  # E1639
+  #removed the assignment params[:return]="selfreview" for selfReviewResponseMap
+
   def saving
     @map = ResponseMap.find(params[:id])
-    params[:return] = "selfreview" if @map.type == "SelfReviewResponseMap"
     @return = params[:return]
     @map.save
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]

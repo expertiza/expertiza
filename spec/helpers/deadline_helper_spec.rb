@@ -10,17 +10,8 @@ describe "DeadlineHelper" do
   end
 
   before(:each) do
-    create(:deadline_type)
+    #create(:deadline_type)
     @topic_due_date = create(:topic_due_date)
-    @due_dates = []
-    10.times.each do |n|
-      if n==1 || n==9
-        date = nil
-      else
-        date = Time.zone.now - 60*n
-      end
-      @due_dates << build(:assignment_due_date, due_at:date)
-    end
   end
 
   it "check due date flag should be set" do

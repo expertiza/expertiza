@@ -114,14 +114,9 @@ class CourseController < ApplicationController
     #  | map |
     #  map.destroy
     # }
-    #@course.destroy
-    #undo_link("The course \"#{@course.name}\" has been successfully deleted.")
-    #redirect_to controller: 'tree_display', action: 'list'
-    respond_to do |format|
-      format.html { redirect_to tree_display_url}
-      format.json { head :no_content }
-      format.js   { render :layout => false }
-    end
+    @course.destroy
+    undo_link("The course \"#{@course.name}\" has been successfully deleted.")
+    redirect_to controller: 'tree_display', action: 'list'
 
   end
 
@@ -168,10 +163,16 @@ class CourseController < ApplicationController
     @ta.save
     @ta_mapping.destroy
 
-    @course = @ta_mapping
-    undo_link("The TA \"#{@ta.name}\" has been successfully removed.")
+    #@course = @ta_mapping
+    #undo_link("The TA \"#{@ta.name}\" has been successfully removed.")
 
-    redirect_to action: 'view_teaching_assistants', id: @ta_mapping.course
+    #redirect_to action: 'view_teaching_assistants', id: @ta_mapping.course
+
+    respond_to do |format|
+      format.html { redirect_to view_teaching_assistants, id: @ta_mapping.course}
+      format.json { head :no_content }
+      format.js   { render :layout => false }
+    end
   end
 
   # generate the undo link

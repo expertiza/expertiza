@@ -40,7 +40,6 @@ describe "assignment function" do
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
   end
-end
 
   describe "creation page", js: true do
     before(:each) do
@@ -234,13 +233,6 @@ end
       (1..3).each do |i|
         create(:course, name: "Course #{i}")
       end
-      create(:deadline_type)
-      create(:deadline_type, name: 'team_formation')
-      create(:deadline_type, name: 'review')
-      create(:deadline_type, name: 'metareview')
-      create(:deadline_type, name: 'drop_topic')
-      create(:deadline_type, name: 'signup')
-      create(:deadline_type, name: 'quiz')
       create(:assignment, name: 'public assignment for test')
 
       assignment = Assignment.where(name: 'public assignment for test').first
@@ -486,6 +478,6 @@ end
                             )
     end
   end
-
+end
 
 

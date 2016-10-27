@@ -52,7 +52,7 @@ describe "assignment function" do
     # Might as well test small flags for creation here
     it "is able to create a public assignment" do
       login_as("instructor6")
-      visit new_assignment_path
+      visit "/assignments/new?private=0"
 
       fill_in 'assignment_form_assignment_name', with: 'public assignment for test'
       select('Course 2', from: 'assignment_form_assignment_course_id')
@@ -99,26 +99,6 @@ describe "assignment function" do
         directory_path: 'testDirectory',
         spec_location: 'testLocation'
       )
-    end
-
-    #### newly added test ####
-    it "is not able to create private assignment" do
-      login_as("abc")
-      visit '/assignments/new?private=1'
-
-      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
-      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation'
-      check("assignment_form_assignment_microtask")
-      check("assignment_form_assignment_reviews_visible_to_all")
-      check("assignment_form_assignment_is_calibrated")
-      uncheck("assignment_form_assignment_availability_flag")
-      expect(page).to have_select("assignment_form[assignment][reputation_algorithm]", options: ['--', 'Hamer', 'Lauw'])
-
-      click_button 'Create'
-      assignment = Assignment.where(name: 'private assignment for test').first
-      expect(assignment).to raise_error LoginExecption
     end
 
     it "is able to create with teams" do
@@ -192,10 +172,11 @@ describe "assignment function" do
       fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
       select('Course 2', from: 'assignment_form_assignment_course_id')
       fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation'
       check('assignment_form_assignment_reviews_visible_to_all')
       click_button 'Create'
       expect(page).to have_select("assignment_form[assignment][reputation_algorithm]", options: ['--', 'Hamer', 'Lauw'])
-      click_button 'Create'
+      #click_button 'Create'
       assignment = Assignment.where(name: 'private assignment for test').first
       expect(assignment).to have_attributes(
                                 name: 'private assignment for test',

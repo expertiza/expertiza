@@ -13,8 +13,8 @@ class Leaderboard < ActiveRecord::Base
 
   ### This methodreturns unaffiliiated assignments - assignments not affiliated to any course
   def self.get_independant_assignments(user_id)
-    assignment_iDs = assignment_participant.where(user_id: user_id).pluck(:parent_id)
-    no_course_assignments = Assignment.where(id: assignment_iDs, course_id: nil)
+    assignment_ids = assignment_participant.where(user_id: user_id).pluck(:parent_id)
+    no_course_assignments = Assignment.where(id: assignment_ids, course_id: nil)
   end
 
   def self.get_assignments_in_courses(course_array)

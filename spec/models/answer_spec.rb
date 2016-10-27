@@ -1,10 +1,10 @@
 require 'rails_helper'
 
 describe Answer do
-  let!(:questionnaire) {create(:questionnaire)}
-  let!(:question1) {create(:question,:questionnaire => questionnaire,:weight=>1,:id =>1)}
-  let!(:question2) {create(:question,:questionnaire => questionnaire,:weight=>2,:id =>2)}
-  let!(:response_map) {create(:review_response_map,:id=>1,:reviewed_object_id => 1)}
+  let(:questionnaire) {create(:questionnaire)}
+  let(:question1) {create(:question,:questionnaire => questionnaire,:weight=>1,:id =>1)}
+  let(:question2) {create(:question,:questionnaire => questionnaire,:weight=>2,:id =>2)}
+  let(:response_map) {create(:review_response_map,:id=>1,:reviewed_object_id => 1)}
   let!(:response_record) {create(:response_record,:id => 1,:response_map => response_map)}
   let!(:answer) { create(:answer,:question => question1,:response_id => 1)}
 

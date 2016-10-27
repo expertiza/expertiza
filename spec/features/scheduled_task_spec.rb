@@ -21,6 +21,10 @@ def expect_deadline_check(deadline_condition)
     send_reminder_condition = 'is able to send reminder email for signup deadline to reviewers '
     display_condition = "signup"
   end
+  if deadline_condition.eql? 'Team formation deadline reminder email'
+    send_reminder_condition = 'is able to send reminder email for team formation deadline to reviewers '
+    display_condition = "team_formation"
+  end
  
 describe 'Team formation deadline reminder email' do
   it 'is able to send reminder email for team formation deadline to reviewers ' do

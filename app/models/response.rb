@@ -189,67 +189,10 @@ class Response < ActiveRecord::Base
     participant = Participant.find(reviewer_participant_id)
     assignment = Assignment.find(participant.parent_id)
 
-    if response_map.type == "ReviewResponseMap"
-
-    end
-
     defn[:subject] = "A new submission is available for " + assignment.name
-    if response_map.type == "ReviewResponseMap"
-      defn[:body][:type] = "Author Feedback"
-      AssignmentTeam.find(response_map.reviewee_id).users.each do |user|
-        defn[:body][:obj_name] = if assignment.has_topics?
-                                   SignUpTopic.find(SignedUpTeam.topic_id(assignment.id, user.id)).topic_name
-                                 else
-                                   assignment.name
-                                 end
-        defn[:body][:first_name] = User.find(user.id).fullname
-        defn[:to] = User.find(user.id).email
-        Mailer.sync_message(defn).deliver_now
-      end
-    end
-    if response_map.type == "MetareviewResponseMap"
-      defn[:body][:type] = "Metareview"
-      reviewee_user = Participant.find(response_map.reviewee_id)
-      signup_topic_id = SignedUpTeam.topic_id(assignment.id, response_map.contributor.teams_users.first.user_id)
 
-      defn[:body][:obj_name] = SignUpTopic.find(signup_topic_id).topic_name
-      defn[:body][:first_name] = User.find(reviewee_user.user_id).fullname
-      defn[:to] = User.find(reviewee_user.user_id).email
-      Mailer.sync_message(defn).deliver
-    end
-    if response_map.type == "FeedbackResponseMap" # This is authors' feedback from UI
-      defn[:body][:type] = "Review Feedback"
-      # reviewee is a response, reviewer is a participant
-      # we need to track back to find the original reviewer on whose work the author comments
-      response_id_for_original_feedback = response_map.reviewed_object_id
-      response_for_original_feedback = Response.find response_id_for_original_feedback
-      response_map_for_original_feedback = ResponseMap.find response_for_original_feedback.map_id
-      original_reviewer_participant_id = response_map_for_original_feedback.reviewer_id
+    response_map.email(defn,participant,assignment)
 
-      participant = AssignmentParticipant.find(original_reviewer_participant_id)
-      topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
-      defn[:body][:obj_name] = if topic_id.nil?
-                                 assignment.name
-                               else
-                                 SignUpTopic.find(topic_id).topic_name
-                               end
-
-      user = User.find(participant.user_id)
-
-      defn[:to] = user.email
-      defn[:body][:first_name] = user.fullname
-      Mailer.sync_message(defn).deliver
-    end
-    if response_map.type == "TeammateReviewResponseMap"
-      defn[:body][:type] = "Teammate Review"
-      participant = AssignmentParticipant.find(response_map.reviewee_id)
-      topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
-      defn[:body][:obj_name] = SignUpTopic.find(topic_id).topic_name rescue nil
-      user = User.find(participant.user_id)
-      defn[:body][:first_name] = user.fullname
-      defn[:to] = user.email
-      Mailer.sync_message(defn).deliver
-    end
   end
 
   def questionnaire_by_answer(answer)

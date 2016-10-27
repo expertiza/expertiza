@@ -65,6 +65,12 @@ describe "DeadlineHelper" do
       expect(DueDate.get_next_due_date(due_date.parent_id)).to be_valid
     end
 
+    it "get due date for staggered deadline" do
+      assignment_id = create(:assignment, staggered_deadline: true, name: "testassignment").id
+      due_date = create(:assignment_due_date, due_at: Time.zone.now + 5000, parent_id: assignment_id)
+      expect(DueDate.get_next_due_date(assignment_id)).to be_valid
+    end
+
   end
 
 end

@@ -210,7 +210,6 @@ class ResponseController < ApplicationController
   def saving
     @map = ResponseMap.find(params[:id])
     params[:return] = "selfreview" if @map.type == "SelfReviewResponseMap"
-
     @return = params[:return]
     @map.save
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]

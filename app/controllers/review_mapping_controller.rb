@@ -457,7 +457,7 @@ class ReviewMappingController < ApplicationController
     # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     @type = params.key?(:report) ? params[:report][:type] : "ReviewResponseMap"
-    summary_ws_url = Rails.application.config.summary_ws_url
+    summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
 
     case @type
       # this summarizes the reviews of each reviewee by each rubric criterion
@@ -515,8 +515,8 @@ class ReviewMappingController < ApplicationController
 
   def save_grade_and_comment_for_reviewer
     participant = Participant.find(params[:participant_id])
-    participant.grade_for_reviewer = params[:grade_for_reviewer] unless params[:grade_for_reviewer].nil?
-    participant.comment_for_reviewer = params[:comment_for_reviewer] unless params[:comment_for_reviewer].nil?
+    participant.grade_for_reviewer = params[:grade_for_reviewer] if params[:grade_for_reviewer]
+    participant.comment_for_reviewer = params[:comment_for_reviewer] if params[:comment_for_reviewer]
     begin
       participant.save
     rescue

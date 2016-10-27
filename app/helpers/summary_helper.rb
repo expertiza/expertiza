@@ -182,7 +182,7 @@ module SummaryHelper
           sentences.map!(&:strip)
         end
         # add the comment to an array to be converted as a json request
-        comments.concat(sentences)
+        comments.concat(sentences) if !sentences.nil?
       end
       comments
     end

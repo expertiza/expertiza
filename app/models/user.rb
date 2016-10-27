@@ -9,6 +9,7 @@ class User < ActiveRecord::Base
   has_many :participants, class_name: 'Participant', foreign_key: 'user_id', dependent: :destroy
   has_many :assignment_participants, class_name: 'AssignmentParticipant', foreign_key: 'user_id', dependent: :destroy
   has_many :assignments, through: :participants
+  has_many :bids, dependent: :destroy
 
   has_many :teams_users, dependent: :destroy
   has_many :teams, through: :teams_users

@@ -52,34 +52,36 @@ class Response < ActiveRecord::Base
     count = 0
     answers = Answer.where(response_id: self.response_id)
 
-    questionnaire = self.questionnaire_by_answer(answers.first)
+    unless answers.empty?
+      questionnaire = self.questionnaire_by_answer(answers.first)
 
-    questionnaire_max = questionnaire.max_question_score
-    questions = questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
-    # loop through questions so the the questions are displayed in order based on seq (sequence number)
-    questions.each do |question|
-      count += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
-      answer = answers.find {|a| a.question_id == question.id }
-      row_class = count.even? ? "info" : "warning"
-      row_class = "" if question.is_a? QuestionnaireHeader
+      questionnaire_max = questionnaire.max_question_score
+      questions = questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
+      # loop through questions so the the questions are displayed in order based on seq (sequence number)
+      questions.each do |question|
+        count += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
+        answer = answers.find {|a| a.question_id == question.id }
+        row_class = count.even? ? "info" : "warning"
+        row_class = "" if question.is_a? QuestionnaireHeader
 
-      code += '<tr class="' + row_class + '"><td>'
-      if !answer.nil? or question.is_a? QuestionnaireHeader
-        code += if question.instance_of? Criterion or question.instance_of? Scale
-                  question.view_completed_question(count, answer, questionnaire_max)
-                else
-                  question.view_completed_question(count, answer)
-                end
+        code += '<tr class="' + row_class + '"><td>'
+        if !answer.nil? or question.is_a? QuestionnaireHeader
+          code += if question.instance_of? Criterion or question.instance_of? Scale
+                    question.view_completed_question(count, answer, questionnaire_max)
+                  else
+                    question.view_completed_question(count, answer)
+                  end
+        end
+        code += '</td></tr>'
       end
-      code += '</td></tr>'
-    end
 
-    comment = if !self.additional_comment.nil?
-                self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
-              else
-                ''
-              end
-    code += "<tr><td><B>Additional Comment: </B>" + comment + '</td></tr>'
+      comment = if !self.additional_comment.nil?
+                  self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
+                else
+                  ''
+                end
+      code += "<tr><td><B>Additional Comment: </B>" + comment + '</td></tr>'
+    end
     code += "</table>"
     code.html_safe
   end
@@ -280,7 +282,7 @@ class Response < ActiveRecord::Base
         unless last_response_in_current_round.nil?
           last_response_in_current_round.scores.each do |answer| 
             comments += answer.comments if question_ids.include? answer.question_id
-            instance_variable_set('@comments_in_round_' + round.to_s, instance_variable_get('@comments_in_round_' + round.to_s) + answer.comments)
+            instance_variable_set('@comments_in_round_' + round.to_s, instance_variable_get('@comments_in_round_' + round.to_s) + answer.comments ||= '')
           end
           additional_comment = last_response_in_current_round.additional_comment
           comments += additional_comment

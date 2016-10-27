@@ -214,7 +214,10 @@ class QuestionnairesController < ApplicationController
         flash[:error] = $ERROR_INFO
       end
     end
-    redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+    respond_to do |format|
+      format.html {redirect_to edit_questionnaire_path(questionnaire_id.to_sym)}
+      format.js
+    end
   end
 
   # Zhewei: This method is used to save all questions in current questionnaire.

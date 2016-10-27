@@ -13,6 +13,10 @@ def expect_deadline_check(deadline_condition)
     send_reminder_condition = 'is able to send reminder email for Metareview deadline to reviewers '
     display_condition = "metareview"
   end
+  if deadline_condition.eql? 'Drop Topic deadline reminder email'
+    send_reminder_condition = 'is able to send reminder email for drop topic deadline to reviewers '
+    display_condition = "drop_topic"
+  end
   
 describe 'Drop Topic deadline reminder email' do
   it 'is able to send reminder email for drop topic deadline to reviewers ' do

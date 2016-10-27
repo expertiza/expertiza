@@ -90,32 +90,14 @@ class ResponseController < ApplicationController
     begin
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
-      @questionnaire = if @map.type == "ReviewResponseMap" && @response.round
-                         @map.questionnaire(@response.round)
-                       elsif @map.type == "ReviewResponseMap"
-                         @map.questionnaire(nil)
-                       elsif @map.type == "SelfReviewResponseMap" && @response.round
-                         @map.questionnaire(@response.round)
-                       elsif @map.type == "SelfReviewResponseMap"
-                         @map.questionnaire(nil)
-                       else
-                         @map.questionnaire
-                       end
-      questions = @questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
 
+      #E1639 : Removed earlier code of finding questionnaire by calling set_questionnaire
+      @questionnaire = set_questionnaire
       questions = sort_questions(@questionnaire.questions)
-      create_answers(params, questions)
-      questions = @questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
 
-      unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
-        params[:responses].each_pair do |k, v|
-          score = Answer.where(response_id: @response.id, question_id:  questions[k.to_i].id).first
-          unless score
-            score = Answer.create(response_id: @response.id, question_id: questions[k.to_i].id, answer: v[:score], comments: v[:comment])
-          end
-          score.update_attribute('answer', v[:score])
-          score.update_attribute('comments', v[:comment])
-        end
+      # E1639 Removed redundant code by calling function create_answers
+      if params[:responses]
+        create_answers(params, questions)
       end
 
       if (params['isSubmit'] && (params['isSubmit'].eql?'Yes'))

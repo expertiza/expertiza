@@ -6,9 +6,9 @@
     });
 	jQuery("#addDays_btn").click(function () {
 		//alert('addDays_btn') // Prevent link from following its href
-		var due_dates_table_element_list = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)');
-		console.log(due_dates_table_element_list);
-		alert(due_dates_table_element_list);
+		//var due_dates_table_element_list = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)');
+		//console.log(due_dates_table_element_list[1].use_updator_review_round_1.value);
+		alert(jQuery("#use_updator_review_round_1".val());
 
 
     });
@@ -123,7 +123,8 @@
         due_at.substr(0,16) + '">' + '</td>';
 
 
-	html += '<td align="center" class="due_date_due_at" width="5%">' + '<input type="checkbox" name="updatorCheck_"' + element_id + 'style="width: 20px" value="false">'+ '</td>';;
+	html += '<td align="center" class="due_date_due_at" width="5%">' + '<input id="use_updator_' + element_id +
+        '" type="checkbox" name="updatorCheck" style="width: 20px" value="false">'+ '</td>';;
 	//E1654. Improve date-picker and deadlines Code changed endS
 
         html += '<td align="center" class="due_date_due_at" width="10%">';

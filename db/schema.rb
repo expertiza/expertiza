@@ -286,7 +286,7 @@ ActiveRecord::Schema.define(version: 20160912034350) do
   add_index "menu_items", ["controller_action_id"], name: "fk_menu_item_controller_action_id", using: :btree
   add_index "menu_items", ["parent_id"], name: "fk_menu_item_parent_id", using: :btree
 
-  create_table "nodes", force: :cascade do |t|
+  create_table "nodes", force: :cascade do |t|1
     t.integer "parent_id",      limit: 4
     t.integer "node_object_id", limit: 4
     t.string  "type",           limit: 255

@@ -323,4 +323,44 @@ FactoryGirl.define do
     round nil
     is_submitted false
   end
+
+  #Edited by kapil vatwani
+  factory :assignment_participant, class: AssignmentParticipant do
+    can_submit true
+    can_review true
+    assignment { Assignment.first || association(:assignment) }
+    association :user, factory: :student
+    submitted_at nil
+    permission_granted nil
+    penalty_accumulated 0
+    grade nil
+    type "AssignmentParticipant"
+    handle "handle"
+    time_stamp nil
+    digital_signature nil
+    duty nil
+    can_take_quiz true
+  end
+
+  #Edited by kapil vatwani
+  factory :course_participant, class: CourseParticipant do
+    course { Course.first || association(:course) }
+    can_submit true
+    can_review true
+    assignment { Assignment.first || association(:assignment) }
+    association :user, factory: :student
+    submitted_at nil
+    permission_granted nil
+    penalty_accumulated 0
+    grade nil
+    type "AssignmentParticipant"
+    handle "handle"
+    time_stamp nil
+    digital_signature nil
+    duty nil
+    can_take_quiz true
+  end
+
+
+
 end

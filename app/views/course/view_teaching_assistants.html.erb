@@ -12,7 +12,7 @@
         <td><%= User.find(ta.ta_id).name %></td>
         <td><%= link_to "Edit", {:action => 'show', :controller =>'users', :id => ta.ta_id} %></td>
         <td>
-          <%= link_to "Delete", ta, { :action => 'remove_ta', :controller =>'course', :id => ta.id, :course_id => ta.course_id },  data: { confirm: 'Are you sure?' }, :remote => true, :class => 'delete_function' %>
+          <%= link_to "Delete", { :action => 'remove_ta', :controller =>'course', :id => ta.id, :course_id => ta.course_id },  data: { confirm: 'Are you sure?' }, :remote => true, :class => 'delete_function' %>
         </td>
       </tr>
     <%end%>

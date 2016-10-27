@@ -13,7 +13,7 @@ describe Answer do
       ScoreView.stub(:find_by_sql).and_return([double("scoreview",weighted_score: 20,sum_of_weights: 5,q1_max_question_score: 4)])
       Answer.stub(:where).and_return([double("row1",question_id: 1,answer: "1")])
       expect(Answer.get_total_score(response: [response_record], questions: [question1])).to be 100.0
-      #calculation = (weighted_score / (sum_of_weights * max_question_score)) * 100
+      #output calculation is (weighted_score / (sum_of_weights * max_question_score)) * 100
       # 4.0
     end
 
@@ -44,11 +44,12 @@ describe Answer do
     end
   end
 
-  describe "#test" do
-	
+  describe "#test compute scores" do
+    let(:response1) {double("respons1")}
+    let!(:response2) {double("respons2")}
+
     it "returns nil if list of assessments is empty" do
       assessments=[]
-      #Answer.instance_variable_set(:@invalid,1)
       Answer.stub(:get_total_score).and_return(100.0)
       scores=Answer.compute_scores(assessments, [:question1])
       expect(scores[:max]).to be nil
@@ -57,7 +58,6 @@ describe Answer do
     end
 
     it "returns scores when a single valid assessment of total score 100 is give" do
-      response1 = double("respons1")
       assessments=[response1]
       Answer.instance_variable_set(:@invalid,0)
       total_score=100.0
@@ -69,8 +69,6 @@ describe Answer do
     end
 
     it "returns scores when two valid assessments of total scores 80 and 100 are given" do
-      response1 = double("respons1")
-      response2 = double("respons2")
       assessments=[response1,response2]
       Answer.instance_variable_set(:@invalid,0)
       total_score1=100.0
@@ -83,7 +81,6 @@ describe Answer do
     end
 		
     it "returns scores when an invalid assessments is given" do
-      response1 = double("respons1")
       assessments=[response1]
       Answer.instance_variable_set(:@invalid,1)
       total_score=100.0
@@ -93,5 +90,17 @@ describe Answer do
       expect(scores[:min]).to be total_score
       expect(scores[:avg]).to be 0
     end
-  end
+
+    it "returns scores when invalid flag is nil" do
+      assessments=[response1]
+      Answer.instance_variable_set(:@invalid,nil)
+      total_score=100.0
+      Answer.stub(:get_total_score).and_return(total_score)
+      scores=Answer.compute_scores(assessments, [:question1])
+      expect(scores[:max]).to be total_score
+      expect(scores[:min]).to be total_score
+      expect(scores[:avg]).to be total_score
+    end  
+end
+
 end

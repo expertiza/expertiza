@@ -140,40 +140,10 @@ class ReviewResponseMap < ResponseMap
   def self.final_versions_from_reviewer(reviewer_id)
     maps = ReviewResponseMap.where(reviewer_id: reviewer_id)
     assignment = Assignment.find(Participant.find(reviewer_id).parent_id)
-    review_final_versions = {}
-
-    if !assignment.varying_rubrics_by_round?
-      # same review rubric used in multiple rounds
-      review_final_versions[:review] = {}
-      review_final_versions[:review][:questionnaire_id] = assignment.review_questionnaire_id
-      response_ids = []
-
-      maps.each do |map|
-        responses = Response.where(map_id: map.id)
-        response_ids << responses.last.id unless responses.empty?
-      end
-      review_final_versions[:review][:response_ids] = response_ids
-
-    else
-      # vary rubric by round
-      rounds_num = assignment.rounds_of_reviews
-
-      for round in 1..rounds_num
-        symbol = ("review round" + round.to_s).to_sym
-        review_final_versions[symbol] = {}
-        review_final_versions[symbol][:questionnaire_id] = assignment.review_questionnaire_id(round)
-        response_ids = []
-
-        maps.each do |map|
-          responses = Response.where(map_id: map.id, round: round)
-          response_ids << responses.last.id unless responses.empty?
-        end
-        review_final_versions[symbol][:response_ids] = response_ids
-      end
-
-    end
-    review_final_versions
+    review_final_versions = prepare_final_review_versions(assignment, maps)
   end
+
+
 
   def self.review_response_report(id, assignment, type, review_user)
     if review_user.nil?
@@ -191,5 +161,46 @@ class ReviewResponseMap < ResponseMap
     end
     #  @review_scores[reveiwer_id][reviewee_id] = score for assignments not using vary_rubric_by_rounds feature
     # @review_scores[reviewer_id][round][reviewee_id] = score for assignments using vary_rubric_by_rounds feature
+  end
+
+  private
+
+  def self.prepare_final_review_versions(assignment, maps)
+    review_final_versions = {}
+
+    if !assignment.varying_rubrics_by_round?
+      prepare_review_response(assignment, maps, review_final_versions, nil)
+
+    else
+      # vary rubric by round
+      rounds_num = assignment.rounds_of_reviews
+
+      rounds_num.each do |round|
+        prepare_review_response(assignment, maps, review_final_versions, round)
+      end
+
+    end
+    review_final_versions
+  end
+
+  def self.prepare_review_response(assignment, maps, review_final_versions, round)
+    if round.nil?
+      symbol= :review
+    else
+      symbol = ("review round" + round.to_s).to_sym
+    end
+    review_final_versions[symbol] = {}
+    review_final_versions[symbol][:questionnaire_id] = assignment.review_questionnaire_id(round)
+    response_ids = []
+
+    maps.each do |map|
+      where_map={map_id: map.id}
+      if !round.nil?
+        where_map[:round]=round
+      end
+      responses = Response.where(where_map)
+      response_ids << responses.last.id unless responses.empty?
+    end
+    review_final_versions[symbol][:response_ids] = response_ids
   end
 end

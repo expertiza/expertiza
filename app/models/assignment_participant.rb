@@ -282,6 +282,8 @@ class AssignmentParticipant < Participant
           TeamsUser.where(:team_id=> team.id).find_each do |team_user|
             user = User.find(team_user.user_id)
             if SignedUpTeam.where( :team_id => team.id).where(:is_waitlisted => [false, nil," ", ""]).present?
+              assignemnt_team = SignedUpTeam.where( :team_id => team.id).where(:is_waitlisted => [false, nil," ", ""]).first
+              topic = SignUpTopic.find(assignemnt_team.topic_id)
             csv << [
               user.name,
               user.fullname,
@@ -292,6 +294,7 @@ class AssignmentParticipant < Participant
               user.email_on_review,
               user.email_on_review_of_review,
               team.id,
+              topic.topic_name,
               "handle"
             ]
             end
@@ -301,7 +304,9 @@ class AssignmentParticipant < Participant
       Team.where(:parent_id=> parent_id).find_each do |team|
         TeamsUser.where(:team_id=> team.id).find_each do |team_user|
           user = User.find(team_user.user_id)
-          if SignedUpTeam.where( :team_id => team.id).where(:is_waitlisted => [true]).present?
+          if SignedUpTeam.where( :team_id => team.id).where(:is_waitlisted => true).present?
+            assignemnt_team = SignedUpTeam.where( :team_id => team.id).where(:is_waitlisted => true).first
+            topic = SignUpTopic.find(assignemnt_team.topic_id)
             csv << [
                 user.name,
                 user.fullname,
@@ -312,6 +317,7 @@ class AssignmentParticipant < Participant
                 user.email_on_review,
                 user.email_on_review_of_review,
                 team.id,
+                topic.topic_name,
                 "handle"
 
             ]
@@ -335,6 +341,7 @@ class AssignmentParticipant < Participant
                 user.email_on_review,
                 user.email_on_review_of_review,
                 team.id,
+                "no topic chosen",
                 "handle"
               ]
             end
@@ -354,6 +361,7 @@ class AssignmentParticipant < Participant
         user.email_on_review,
         user.email_on_review_of_review,
         "All Participants",
+        "no topic chosen",
         part.handle
       ]
       end
@@ -361,7 +369,7 @@ class AssignmentParticipant < Participant
   end
 
   def self.export_fields(options)
-    ["name", "full name", "email", "role", "parent", "email on submission", "email on review", "email on metareview", "team id", "handle" ]
+    ["name", "full name", "email", "role", "parent", "email on submission", "email on review", "email on metareview", "team id", "topic", "handle" ]
   end
 
   # grant publishing rights to one or more assignments. Using the supplied private key,

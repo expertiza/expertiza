@@ -38,7 +38,7 @@ describe "HeatMapTest", type: :feature do
     expect(page).to have_content "Submit or Review work for TestAssignment"
     expect(page).to have_content "Others' work"
 
-    click_link " Alternate View"
+    click_link "Alternate View"
 
     #click_link "Begin"
   end

@@ -91,7 +91,7 @@ class AssignmentNode < Node
   end
 
   def belongs_to_course?
-    self.get_course_id > 0
+    get_course_id > 0
   end
 
   # Gets the instructor_id from the associated object

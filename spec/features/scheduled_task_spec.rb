@@ -9,13 +9,13 @@ describe 'Submission deadline reminder email' do
     # due_at = DateTime.now + 120
     # seconds_until_due = due_at - Time.now
     # minutes_until_due = seconds_until_due / 60
-    due_at = DateTime.now.advance(minutes: +2)
+    due_at = Time.zone.now.advance(minutes: +2)
 
     # puts DateTime.now
     # puts due_at
-    due_at1 = Time.parse(due_at.to_s(:db))
-    curr_time = DateTime.now.to_s(:db)
-    curr_time = Time.parse(curr_time)
+    due_at1 = Time.zone.parse(due_at.to_s(:db))
+    curr_time = Time.zone.now.to_s(:db)
+    curr_time = Time.zone.parse(curr_time)
     time_in_min = ((due_at1 - curr_time).to_i / 60) * 60
     Delayed::Job.delete_all
     expect(Delayed::Job.count).to eq(0)
@@ -32,11 +32,11 @@ describe 'Review deadline reminder email' do
   it 'is able to send reminder email for review deadline to reviewers ' do
     id = 2
     @name = "user"
-    due_at = DateTime.now.advance(minutes: +2)
+    due_at = Time.zone.now.advance(minutes: +2)
 
-    due_at1 = Time.parse(due_at.to_s(:db))
-    curr_time = DateTime.now.to_s(:db)
-    curr_time = Time.parse(curr_time)
+    due_at1 = Time.zone.parse(due_at.to_s(:db))
+    curr_time = Time.zone.now.to_s(:db)
+    curr_time = Time.zone.parse(curr_time)
     time_in_min = ((due_at1 - curr_time).to_i / 60) * 60
     Delayed::Job.delete_all
     expect(Delayed::Job.count).to eq(0)

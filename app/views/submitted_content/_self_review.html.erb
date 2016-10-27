@@ -48,11 +48,11 @@
                     <% if (last_response_round == current_round) %>
                         <td>
                           <% if (!@latest_response.is_submitted) %>
-                              <%= link_to 'Edit', {:controller => 'response', :action => 'edit', :id => @latest_response.id} %>
+                              <%= link_to 'Edit', {:controller => 'response', :action => 'edit', :return=>'selfreview' ,:id => @latest_response.id} %>
                           <% end %>
                         </td>
                     <% else %>
-                        <td><%= link_to 'Update', {:controller => 'response', :action => 'new', :id => @review_mappings[0].map_id} %></td>
+                        <td><%= link_to 'Update', {:controller => 'response', :action => 'new', :return=> 'selfreview',:id => @review_mappings[0].map_id} %></td>
                     <% end %>
                 <% end %>
             <% end %>

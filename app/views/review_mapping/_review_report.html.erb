@@ -33,6 +33,9 @@
                 <td id = <%= team_name_color%> bgcolor=<%= @bgcolor %> align = 'left' colspan=1>
                   <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
                   <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>
+                  <!--Hard-coded Dr.Kidd's question in order to display link.-->
+                  <!--later we can create a hyperlink question type to deal with this situation.-->
+                  <%= list_hyperlink_submission(r.id, ri.id, 5386) if @id.to_i == 806 %>
                 </td>
                 <%= render partial: 'team_score',  locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: r.id} %>
                 <% if index == 0 %>

@@ -71,7 +71,7 @@
         <% i += 1 %>
       <% end %>
     </table>
-    <%= submit_tag "Save #{@questionnaire.display_type.downcase} questionnaire", :name=>"save" %>
+    <%= submit_tag "Save #{@questionnaire.display_type.downcase} questionnaire", :name=>"save", :format => "js" %>
     <input style="margin-left:36em" type="submit" name="view_advice" value="Edit/View advice"/>
     
     <hr/>

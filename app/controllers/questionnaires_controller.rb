@@ -246,7 +246,10 @@ class QuestionnairesController < ApplicationController
     if params['view_advice']
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     else
-      redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+      respond_to do |format|
+        #format.html {redirect_to edit_questionnaire_path(questionnaire_id.to_sym)}
+        format.js
+      end
     end
   end
 

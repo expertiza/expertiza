@@ -23,7 +23,7 @@ describe "DeadlineHelper" do
     end
   end
 
-  it "due date flag is set" do
+  it "check due date flag should be set" do
     expect(@topic_due_date.flag).to be false
     @topic_due_date.set_flag
     expect(@topic_due_date.flag).to be true
@@ -35,43 +35,22 @@ describe "DeadlineHelper" do
     #create(:topic_due_date).should be_valid
   end
 
-  it "due date is a valid datetime" do
+  it "check valid datetime for due date" do
     expect(@topic_due_date.due_at_is_valid_datetime).to be nil
   end
  
   describe "#done_in_assignment_round" do
-    it "return 0 when no response map" do
+    it "Not assignment in due date object return 0" do
       response = ReviewResponseMap.create
       response.type = "ResponseMap"
       response.save
       expect(DueDate.done_in_assignment_round(1, response)).to eql 0
     end
 
-    it "return round 1 for single round" do
+    it "Assignment done return round 1" do
       response = ReviewResponseMap.create
       expect(DueDate.done_in_assignment_round(@topic_due_date.parent_id, response)).to eql 1
     end
   end
 
-  describe "#get_next_due_date" do
-
-
-    it "nil value throws exception" do
-      expect { DueDate.get_next_due_date(nil) }.to raise_exception(ActiveRecord::RecordNotFound)
-    end
-
-    it "get next due date" do
-      due_date = create(:assignment_due_date, due_at: Time.zone.now + 5000)
-      expect(DueDate.get_next_due_date(due_date.parent_id)).to be_valid
-    end
-
-    it "get due date for staggered deadline" do
-      assignment_id = create(:assignment, staggered_deadline: true, name: "testassignment").id
-      due_date = create(:assignment_due_date, due_at: Time.zone.now + 5000, parent_id: assignment_id)
-      expect(DueDate.get_next_due_date(assignment_id)).to be_valid
-    end
-
-  end
-
 end
-

@@ -224,6 +224,109 @@ ActiveRecord::Schema.define(version: 20161008030832) do
   add_index "due_dates", ["review_of_review_allowed_id"], name: "fk_due_date_review_of_review_allowed", using: :btree
   add_index "due_dates", ["submission_allowed_id"], name: "fk_due_date_submission_allowed", using: :btree
 
+  create_table "goldberg_content_pages", force: :cascade do |t|
+    t.string   "title",           limit: 255
+    t.string   "name",            limit: 255,   default: "", null: false
+    t.integer  "markup_style_id", limit: 4
+    t.text     "content",         limit: 65535
+    t.integer  "permission_id",   limit: 4,     default: 0,  null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.text     "content_cache",   limit: 65535
+    t.string   "markup_style",    limit: 255
+  end
+
+  add_index "goldberg_content_pages", ["markup_style_id"], name: "fk_content_page_markup_style_id", using: :btree
+  add_index "goldberg_content_pages", ["permission_id"], name: "fk_content_page_permission_id", using: :btree
+
+  create_table "goldberg_controller_actions", force: :cascade do |t|
+    t.integer "site_controller_id", limit: 4,   default: 0,  null: false
+    t.string  "name",               limit: 255, default: "", null: false
+    t.integer "permission_id",      limit: 4
+    t.string  "url_to_use",         limit: 255
+  end
+
+  add_index "goldberg_controller_actions", ["permission_id"], name: "fk_controller_action_permission_id", using: :btree
+  add_index "goldberg_controller_actions", ["site_controller_id"], name: "fk_controller_action_site_controller_id", using: :btree
+
+  create_table "goldberg_markup_styles", force: :cascade do |t|
+    t.string "name", limit: 255, default: "", null: false
+  end
+
+  create_table "goldberg_menu_items", force: :cascade do |t|
+    t.integer "parent_id",            limit: 4
+    t.string  "name",                 limit: 255, default: "", null: false
+    t.string  "label",                limit: 255, default: "", null: false
+    t.integer "seq",                  limit: 4
+    t.integer "controller_action_id", limit: 4
+    t.integer "content_page_id",      limit: 4
+  end
+
+  add_index "goldberg_menu_items", ["content_page_id"], name: "fk_menu_item_content_page_id", using: :btree
+  add_index "goldberg_menu_items", ["controller_action_id"], name: "fk_menu_item_controller_action_id", using: :btree
+  add_index "goldberg_menu_items", ["parent_id"], name: "fk_menu_item_parent_id", using: :btree
+
+  create_table "goldberg_permissions", force: :cascade do |t|
+    t.string "name", limit: 255, default: "", null: false
+  end
+
+  create_table "goldberg_roles", force: :cascade do |t|
+    t.string   "name",            limit: 255,   default: "", null: false
+    t.integer  "parent_id",       limit: 4
+    t.string   "description",     limit: 255,   default: "", null: false
+    t.integer  "default_page_id", limit: 4
+    t.text     "cache",           limit: 65535
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "start_path",      limit: 255
+  end
+
+  add_index "goldberg_roles", ["default_page_id"], name: "fk_role_default_page_id", using: :btree
+  add_index "goldberg_roles", ["parent_id"], name: "fk_role_parent_id", using: :btree
+
+  create_table "goldberg_roles_permissions", force: :cascade do |t|
+    t.integer "role_id",       limit: 4, default: 0, null: false
+    t.integer "permission_id", limit: 4, default: 0, null: false
+  end
+
+  add_index "goldberg_roles_permissions", ["permission_id"], name: "fk_roles_permission_permission_id", using: :btree
+  add_index "goldberg_roles_permissions", ["role_id"], name: "fk_roles_permission_role_id", using: :btree
+
+  create_table "goldberg_site_controllers", force: :cascade do |t|
+    t.string  "name",          limit: 255, default: "", null: false
+    t.integer "permission_id", limit: 4,   default: 0,  null: false
+    t.integer "builtin",       limit: 4,   default: 0
+  end
+
+  add_index "goldberg_site_controllers", ["permission_id"], name: "fk_site_controller_permission_id", using: :btree
+
+  create_table "goldberg_system_settings", force: :cascade do |t|
+    t.string  "site_name",                           limit: 255, default: "", null: false
+    t.string  "site_subtitle",                       limit: 255
+    t.string  "footer_message",                      limit: 255, default: ""
+    t.integer "public_role_id",                      limit: 4,   default: 0,  null: false
+    t.integer "session_timeout",                     limit: 4,   default: 0,  null: false
+    t.integer "default_markup_style_id",             limit: 4,   default: 0
+    t.integer "site_default_page_id",                limit: 4,   default: 0,  null: false
+    t.integer "not_found_page_id",                   limit: 4,   default: 0,  null: false
+    t.integer "permission_denied_page_id",           limit: 4,   default: 0,  null: false
+    t.integer "session_expired_page_id",             limit: 4,   default: 0,  null: false
+    t.integer "menu_depth",                          limit: 4,   default: 0,  null: false
+    t.string  "start_path",                          limit: 255
+    t.string  "site_url_prefix",                     limit: 255
+    t.boolean "self_reg_enabled"
+    t.integer "self_reg_role_id",                    limit: 4
+    t.boolean "self_reg_confirmation_required"
+    t.integer "self_reg_confirmation_error_page_id", limit: 4
+    t.boolean "self_reg_send_confirmation_email"
+  end
+
+  add_index "goldberg_system_settings", ["not_found_page_id"], name: "fk_system_settings_not_found_page_id", using: :btree
+  add_index "goldberg_system_settings", ["permission_denied_page_id"], name: "fk_system_settings_permission_denied_page_id", using: :btree
+  add_index "goldberg_system_settings", ["public_role_id"], name: "fk_system_settings_public_role_id", using: :btree
+  add_index "goldberg_system_settings", ["session_expired_page_id"], name: "fk_system_settings_session_expired_page_id", using: :btree
+  add_index "goldberg_system_settings", ["site_default_page_id"], name: "fk_system_settings_site_default_page_id", using: :btree
+
   create_table "institutions", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
   end

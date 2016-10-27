@@ -114,7 +114,11 @@ class SubmittedContentController < ApplicationController
     participant.update_resubmit_times
 
     # send message to reviewers when submission has been updated
-    participant.assignment.email(participant.id) rescue nil # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
+    Response.email(participant.id) rescue nil # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
+
+    prepared_mail = MailerHelper.send_mail_to_reviewer(User.find(participant.user_id), "A new submission is available", "file_submission", "file submission", Assignment.find(participant.parent_id).name)
+    prepared_mail.deliver
+
     if params[:origin] == 'review'
       redirect_to :back
     else

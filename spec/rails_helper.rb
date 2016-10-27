@@ -71,4 +71,13 @@ RSpec.configure do |config|
     allow_any_instance_of(ApplicationController).to receive(:current_role_name).and_return(current_role_name)
     allow_any_instance_of(ApplicationController).to receive(:current_role).and_return(current_role)
   end
+
+  def in_browser(name)
+    old_session = Capybara.session_name
+
+    Capybara.session_name = name
+    yield
+
+    Capybara.session_name = old_session
+  end
 end

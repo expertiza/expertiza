@@ -48,7 +48,7 @@ describe "HeatMapTest", type: :feature do
     # Load questionnaire with generic setup
     load_questionnaire
 
-    expect(page).to have_content 'Summary Report for assignment'
+    expect(page).to have_conten
   end
 
 

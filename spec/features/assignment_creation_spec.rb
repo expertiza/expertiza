@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+
 def questionnaire_options(assignment, type, _round = 0)
   questionnaires = Questionnaire.where(['private = 0 or instructor_id = ?', assignment.instructor_id]).order('name')
   options = []
@@ -26,9 +27,9 @@ def get_selected_id(finder_var)
     TeammateReviewQuestionnaire.find_by_name(finder_var)[:id]
   end
 end
-
 describe "assignment function" do
   before(:each) do
+    #app.default_url_options = { :locale => :es }
     create(:deadline_type, name: "submission")
     create(:deadline_type, name: "review")
     create(:deadline_type, name: "metareview")
@@ -39,14 +40,14 @@ describe "assignment function" do
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
   end
+
+
   describe "creation page", js: true do
     before(:each) do
       (1..3).each do |i|
         create(:course, name: "Course #{i}")
       end
     end
-
-
 
     # Might as well test small flags for creation here
     it "is able to create a public assignment" do
@@ -78,7 +79,7 @@ describe "assignment function" do
 
     it "is able to create a private assignment" do
       login_as("instructor6")
-      visit '/assignments/new?private=1'
+      visit "/assignments/new?private=1"
 
       fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
       select('Course 2', from: 'assignment_form_assignment_course_id')
@@ -118,7 +119,6 @@ describe "assignment function" do
       click_button 'Create'
       assignment = Assignment.where(name: 'private assignment for test').first
       expect(assignment).to raise_error LoginExecption
-
     end
 
     it "is able to create with teams" do
@@ -183,6 +183,26 @@ describe "assignment function" do
       expect(assignment).to have_attributes(
         staggered_deadline: true
       )
+    end
+
+    ## should be able to create with review visible to all reviewres
+    it "is able to create with review visible to all reviewers" do
+      login_as("instructor6")
+      visit '/assignments/new?private=1'
+      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
+      select('Course 2', from: 'assignment_form_assignment_course_id')
+      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      check('assignment_form_assignment_reviews_visible_to_all')
+      click_button 'Create'
+      expect(page).to have_select("assignment_form[assignment][reputation_algorithm]", options: ['--', 'Hamer', 'Lauw'])
+      click_button 'Create'
+      assignment = Assignment.where(name: 'private assignment for test').first
+      expect(assignment).to have_attributes(
+                                name: 'private assignment for test',
+                                course_id: Course.find_by_name('Course 2')[:id],
+                                directory_path: 'testDirectory',
+                                spec_location: 'testLocation'
+                            )
     end
   end
 end
@@ -360,7 +380,7 @@ end
     end
   end
 
-  # Begin review strategy tab
+  #Begin review strategy tab
   describe "review strategy tab", js: true do
     before(:each) do
       @assignment = create(:assignment, name: 'public assignment for test')

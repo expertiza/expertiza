@@ -32,6 +32,16 @@
                       </div>
                   <% end %>
               <% end %>
+              <% if current_user.role.name == "Instructor" or current_user.role.name == "Administrator"%>
+                  <%= form_for :impersonate, url: '/impersonate/impersonate', html: {id: 'impersonate-form'} do |f| %>
+                      <div class="input-group">
+                        <%= f.text_field :name, {id: 'inputImpersonateBox', class: 'form-control', placeholder: "User ID..."} %>
+                        <span class="input-group-btn">
+                        <button type="button" class="btn btn-primary" id="impersonate-button">Student View</button>
+                        </span>
+                      </div>
+                  <% end %>
+              <% end %>
             </li>
             <li class="divider-vertical"></li>
             <li class="right-most logout-box">

@@ -12,7 +12,7 @@ class ReviewMappingController < ApplicationController
   # start_self_review is a method that is invoked by a student user so it should be allowed accordingly
   def action_allowed?
     case params[:action]
-    when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'assign_quiz_dynamically', 'start_self_review' , 'new_feedback'
+    when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'assign_quiz_dynamically', 'start_self_review', 'new_feedback'
       true
     else
       ['Instructor',
@@ -162,7 +162,7 @@ class ReviewMappingController < ApplicationController
         end
 
       end
-      end
+    end
     # rescue Exception => e
     #   flash[:error] = (e.nil?) ? $! : e
     # end
@@ -553,8 +553,8 @@ class ReviewMappingController < ApplicationController
   def new_feedback
     review = Response.find(params[:id])
     if review
-      reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id:  review.map.assignment.id).first
-      map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id:  reviewer.id).first
+      reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id: review.map.assignment.id).first
+      map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: reviewer.id).first
       if map.nil?
         # if no feedback exists by dat user den only create for dat particular response/review
         map = FeedbackResponseMap.create(reviewed_object_id: review.id, reviewer_id: reviewer.id, reviewee_id: review.map.reviewer.id)

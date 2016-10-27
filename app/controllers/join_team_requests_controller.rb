@@ -31,10 +31,9 @@ class JoinTeamRequestsController < ApplicationController
     team = Team.find(params[:team_id])
     if team.full?
       flash[:note] = "This team is full."
-    else
-      if !team_member.empty?
+    elsif !team_member.empty?
         flash[:note] = "You are already a member of this team."
-      else
+    else
 
         @join_team_request = JoinTeamRequest.new
         @join_team_request.comments = params[:comments]
@@ -52,7 +51,6 @@ class JoinTeamRequestsController < ApplicationController
             format.xml  { render xml: @join_team_request.errors, status: :unprocessable_entity }
           end
         end
-      end
     end
   end
 

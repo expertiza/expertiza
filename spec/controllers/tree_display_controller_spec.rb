@@ -44,7 +44,7 @@ describe TreeDisplayController do
     end
   end
 
-  describe "GET #folder_node_ng" do
+  describe "GET #folder_node_ng_getter" do
     before(:each) do
       @treefolder = TreeFolder.new
       @treefolder.parent_id = nil
@@ -74,7 +74,7 @@ describe TreeDisplayController do
   it { is_expected.to respond_to(:children_node_ng) }
   it { is_expected.to respond_to(:children_node_2_ng) }
 
-  describe "GET #get_session_last_open_tab" do
+  describe "GET #session_last_open_tab" do
     it "returns HTTP status 200" do
       get :session_last_open_tab
       expect(response).to have_http_status(200)

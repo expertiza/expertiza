@@ -217,6 +217,15 @@ class Team < ActiveRecord::Base
         return self.generate_team_name(Assignment.find(id).name)
       end
     end
+    if handle_dups == "renameOldTeam" # rename: rename new team
+      if teamtype.is_a?(CourseTeam)
+        CourseTeam.update(team.id, :name => self.generate_team_name(Course.find(id).name))
+        return name
+      elsif teamtype.is_a?(AssignmentTeam)
+        AssignmentTeam.update(team.id, :name => self.generate_team_name(Assignment.find(id).name))
+        return name
+      end
+    end
     if handle_dups == "replace" # replace: delete old team
       team.delete
       return name
@@ -248,12 +257,12 @@ class Team < ActiveRecord::Base
 
   # Create the team with corresponding tree node
   def self.create_team_and_node(id, teamtype = 'AssignmentTeam')
-    if teamtype == 'CourseTeam'
+    if teamtype.is_a?(CourseTeam)
       curr_course = Course.find(id)
       team_name = Team.generate_team_name(curr_course.name)
       team = CourseTeam.create(name: team_name, parent_id: id)
       TeamNode.create(parent_id: id, node_object_id: team.id)
-    elsif teamtype == 'AssignmentTeam'
+    elsif teamtype.is_a?(AssignmentTeam)
       curr_assignment = Assignment.find(id)
       team_name = Team.generate_team_name(curr_assignment.name)
       team = AssignmentTeam.create(name: team_name, parent_id: id)

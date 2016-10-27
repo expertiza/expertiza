@@ -1,0 +1,14 @@
+<br/>
+<table>
+  <tr>
+    <td valign='Top'>Assignment Teams:</td>
+    <td>
+      <%= radio_button('options', 'participant_type', 'signed') %> Signed Up Teams<br/>
+      <%= radio_button( 'options', 'participant_type', 'wait_listed') %> Wait Listed Teams<br/>
+      <%= radio_button('options', 'participant_type', 'unsigned') %> Unsigned Participants<br/>
+      <%= radio_button('options', 'participant_type', 'all',{checked: true})%> All Participants<br/>
+      <br/>
+    </td>
+  </tr>
+</table>
+<br/>

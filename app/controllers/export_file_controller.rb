@@ -12,6 +12,8 @@ class ExportFileController < ApplicationController
       @title = 'Grades'
     elsif @model == 'CourseParticipant'
       @title = 'Course Participants'
+    elsif @model == 'AssignmentParticipant'
+      @title = 'Assignment Participants'
     elsif @model == 'AssignmentTeam'
       @title = 'Teams'
     elsif @model == 'CourseTeam'

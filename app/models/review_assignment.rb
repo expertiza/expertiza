@@ -113,6 +113,8 @@ module ReviewAssignment
   private
 
   def reject_by_least_reviewed(contributor_set)
+  #The function populates the topics according to the least no of reviews obtianed
+  #The functionality we are adding is that if the reviewer already completed minimum no of reviews then he should be able to review the next least reviewed submission.
     contributor = contributor_set.min_by {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count }
     min_reviews = contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count rescue 0
     contributor_set.reject! {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count > min_reviews + review_topic_threshold }

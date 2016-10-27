@@ -91,7 +91,8 @@ class AssignmentNode < Node
   end
 
   def belongs_to_course?
-    get_course_id > 0
+    # byebug
+    !get_course_id.nil?
   end
 
   # Gets the instructor_id from the associated object

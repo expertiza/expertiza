@@ -11,12 +11,7 @@ module MailerHelper
       }
     })
   end
-<<<<<<< HEAD
 
-
-=======
-  
->>>>>>> 3d3ab441869ad9f5ce76546e615aec0f20db4918
   def self.send_mail_to_reviewer(user, subject, partial_name, type, obj_name)
     Mailer.sync_message ({
       to: user.email,

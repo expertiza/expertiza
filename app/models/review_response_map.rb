@@ -44,6 +44,8 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
+
+=begin
   def self.import(row, _session, id)
     raise ArgumentError, "Not enough items." if row.length < 2
 
@@ -88,6 +90,8 @@ class ReviewResponseMap < ResponseMap
       index += 1
     end
   end
+=end
+
 
   def show_feedback(response)
     if !self.response.empty? && response
@@ -120,11 +124,12 @@ class ReviewResponseMap < ResponseMap
   end
 
   # return  the responses for specified round, for varying rubric feature -Yang
-  def self.get_assessments_round_for(team, round)
-    team_id = team.id
+  def self.get_responses_for_team_round(team, round)
+    #team_id = team.id
+  #  @x=team.parent_id
     responses = []
-    if team_id
-      maps = ResponseMap.where(reviewee_id: team_id, type: "ReviewResponseMap")
+    if team.id
+      maps = ResponseMap.where(reviewee_id: team.id, type: "ReviewResponseMap")
       maps.each do |map|
         if !map.response.empty? && !map.response.reject {|r| (r.round != round || !r.is_submitted) }.empty?
           responses << map.response.reject {|r| (r.round != round || !r.is_submitted) }.last

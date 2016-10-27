@@ -1,5 +1,18 @@
 require 'rails_helper'
 
+def expect_deadline_check(deadline_condition)
+  if deadline_condition.eql? 'Submission deadline reminder email'
+    send_reminder_condition = 'is able to send reminder email for submission deadline to signed-up users '
+    display_condition = "submission"
+  end
+  if deadline_condition.eql? 'Review deadline reminder email'
+    send_reminder_condition = 'is able to send reminder email for review deadline to reviewers '
+    display_condition = "review"
+  end
+  if deadline_condition.eql? 'Metareview deadline reminder email'
+    send_reminder_condition = 'is able to send reminder email for Metareview deadline to reviewers '
+    display_condition = "metareview"
+  end
 describe 'Submission deadline reminder email' do
   it 'is able to send reminder email for submission deadline to signed-up users ' do
     # Delayed::Worker.delay_jobs = false

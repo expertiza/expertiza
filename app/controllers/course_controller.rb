@@ -114,9 +114,15 @@ class CourseController < ApplicationController
     #  | map |
     #  map.destroy
     # }
-    @course.destroy
-    undo_link("The course \"#{@course.name}\" has been successfully deleted.")
-    redirect_to controller: 'tree_display', action: 'list'
+    #@course.destroy
+    #undo_link("The course \"#{@course.name}\" has been successfully deleted.")
+    #redirect_to controller: 'tree_display', action: 'list'
+    respond_to do |format|
+      format.html { redirect_to tree_display_url}
+      format.json { head :no_content }
+      format.js   { render :layout => false }
+    end
+
   end
 
   def toggle_access

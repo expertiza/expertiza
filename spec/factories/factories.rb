@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :roundle_of_administrator, class: Role do
+  factory :role_of_administrator, class: Role do
     name 'Administrator'
     parent_id nil
     description ''
@@ -191,9 +191,9 @@ FactoryGirl.define do
     due_at "2015-12-30 23:30:12"
     deadline_type { DeadlineType.first || association(:deadline_type) }
     assignment { Assignment.first || association(:assignment) }
-    submission_allowed_id {DeadlineRight.first || association(:deadline_right)}
-    review_allowed_id {DeadlineRight.first || association(:deadline_right)}
-    review_of_review_allowed_id {DeadlineRight.first || association(:deadline_right)}
+    submission_allowed_id 3
+    review_allowed_id 3
+    review_of_review_allowed_id 3
     round 1
     flag false
     threshold 1
@@ -209,9 +209,9 @@ FactoryGirl.define do
     due_at "2015-12-30 23:30:12"
     deadline_type { DeadlineType.first || association(:deadline_type) }
     topic { SignUpTopic.first || association(:topic) }
-    submission_allowed_id {DeadlineRight.first || association(:deadline_right)}
-    review_allowed_id {DeadlineRight.first || association(:deadline_right)}
-    review_of_review_allowed_id {DeadlineRight.first || association(:deadline_right)}
+    submission_allowed_id 3
+    review_allowed_id 3
+    review_of_review_allowed_id 3
     round 1
     flag false
     threshold 1
@@ -318,7 +318,7 @@ FactoryGirl.define do
   end
 
   factory :response, class: Response do
-    map_id { ReviewResponseMap.first || association(:review_response_map) }
+    review_response_map { ReviewResponseMap.first || association(:review_response_map) }
     additional_comment nil
     version_num nil
     round nil

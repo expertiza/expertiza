@@ -10,8 +10,11 @@ describe "DeadlineHelper" do
   end
 
   before(:each) do
-    #create(:deadline_type)
-    @topic_due_date = create(:topic_due_date)
+    @deadline_type = create(:deadline_type)
+    @deadline_right = create(:deadline_right)
+    @topic_due_date = create(:topic_due_date, deadline_type: @deadline_type,
+      submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
+      review_of_review_allowed_id: @deadline_right.id)
   end
 
   it "check due date flag should be set" do

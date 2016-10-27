@@ -331,7 +331,7 @@ FactoryGirl.define do
     response_map { ReviewResponseMap.first || association(:review_response_map) }
     additional_comment nil
     version_num nil
-    round nil
+    round 1
     is_submitted false
   end
 end

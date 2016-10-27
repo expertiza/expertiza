@@ -112,12 +112,27 @@ describe Answer do
     end
   end
 
-  describe "#test sql queries" do
+  describe "#test sql queries in answer.rb" do
 
     it "returns answer by question record from db which is not empty" do
-	assignment_id = 1
-	q_id = 1
-	expect(Answer.answers_by_question(assignment_id,q_id)).not_to be_empty
-    end	
+      assignment_id = 1
+      q_id = 1
+      expect(Answer.answers_by_question(assignment_id,q_id)).not_to be_empty
+    end
+
+    it "returns answers by question for reviewee from the db which is not empty" do
+      assignment_id = 1
+      reviewee_id = 1
+      q_id = 1	
+      expect(Answer.answers_by_question_for_reviewee(assignment_id,reviewee_id,q_id)).not_to be_empty
+    end
+
+    it "returns answers by question for reviewee in round from db which is not empty" do
+      assignment_id = 1
+      reviewee_id = 1
+      q_id = 1
+      round = 1
+      expect(Answer.answers_by_question_for_reviewee_in_round(assignment_id,reviewee_id,q_id,round)).not_to be_empty
+    end
   end
 end

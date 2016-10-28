@@ -240,6 +240,7 @@ describe "assignment function" do
       visit "/assignments/#{assignment[:id]}/edit"
       click_link 'General'
     end
+
     it "should edit assignment available to students" do
       fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
       select('Course 2', from: 'assignment_form_assignment_course_id')
@@ -299,12 +300,23 @@ describe "assignment function" do
                             )
     end
 
-
+    ##### test reviews visible to all other reviewers ######
+    it "should edit review visible to all other reviewers" do
+      fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
+      select('Course 2', from: 'assignment_form_assignment_course_id')
+      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'
+      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
+      check ("assignment_form_assignment_reviews_visible_to_all")
+      click_button 'Save'
+      assignment = Assignment.where(name: 'edit assignment for test').first
+      expect(assignment).to have_attributes(
+                                name: 'edit assignment for test',
+                                course_id: Course.find_by_name('Course 2')[:id],
+                                directory_path: 'testDirectory1',
+                                spec_location: 'testLocation1'
+                            )
+    end
   end
-
-
-
-
 
   describe "topics tab", js: true do
     before(:each) do
@@ -460,6 +472,8 @@ describe "assignment function" do
         expect(assignment_questionnaire.dropdown).to eq(false)
       end
 
+
+      ##
       # Third row of rubric
       xit "updates teammate review questionnaire" do
         #find_link('Rubrics').click

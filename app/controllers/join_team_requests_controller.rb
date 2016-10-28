@@ -6,18 +6,18 @@ class JoinTeamRequestsController < ApplicationController
 
 	def index
 		@join_team_requests = JoinTeamRequest.all
-		render
+		rendermethod
 
 	end
 
 	def show
 		@join_team_request = JoinTeamRequest.find(params[:id])
-		render
+		rendermethod
 	end
 
 	def new
 		@join_team_request = JoinTeamRequest.new
-		render
+		rendermethod
 	end
 
 	def edit
@@ -86,7 +86,7 @@ class JoinTeamRequestsController < ApplicationController
 		redirect_to view_student_teams_path student_id: params[:teams_user_id]
 	end
 	private
-	def render
+	def rendermethod
 
 		respond_to do |format|
 			format.html # index.html.erb

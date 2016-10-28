@@ -64,7 +64,7 @@ Applying style guidelines to code you add and modify is good enough. :-)
 Two New Files are Added:
 
 1. spec/models/due_date_spec.rb (11 new test cases created)
-2. spec/helpers/deadline_helper_spec.rb (3 new test cases created)
+2. spec/helpers/deadline_helper_spec.rb (7 new test cases created)
 
 We have implemented the changes as suggested by code climate in:
 

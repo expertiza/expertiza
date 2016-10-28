@@ -19,7 +19,7 @@
                     <%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id => topic.id, :assignment_id => params[:assignment_id] %>
                     <% if @assignment.is_intelligent %>
                         <%= form_tag({:controller=>"sign_up_sheet", :action=>"set_priority",:id => topic.id,:assignment_id => params[:assignment_id]}, method: :post) do %>
-                            <%= number_field_tag :priority, selected_topic.preference_priority_number, min: 1, max: @num_of_topics, place_holder: 0  %>
+                            <%= number_field_tag :priority, selected_topic.preference_priority_number %>
                             <%= submit_tag  'Set priority', name: nil  %>
                         <% end %>
                     <% end %>
@@ -31,29 +31,18 @@
       <% if action_symbol_added == false %>
           <!--#if there is a signup topic deadline in current assignment, after the signup topic deadline, student will not see the choice of signing up topics any more. -->
           <% if @assignment.is_intelligent %>
-          <td>
-          <% if @student_bids.empty? %>
-          <%= form_tag({:controller=>"sign_up_sheet", :action=>"set_priority",:id => topic.id,:assignment_id => params[:assignment_id]}, method: :post, remote: true) do %>
-            <%= number_field_tag :priority, nil, min: 1, max: @num_of_topics, place_holder: 0 %>
-            <%= submit_tag  'Set priority', name: nil %>
+            <td><%= form_tag({:controller=>"sign_up_sheet", :action=>"set_priority",:id => topic.id,:assignment_id => params[:assignment_id]}, method: :post) do %>
+            <% if @student_bids.all? {|sb| sb.topic_id != topic.id} %>
+              <%= number_field_tag :priority, nil, min: 1, max: @num_of_topics, place_holder: 0 %>
             <% end %>
-          <% end %>
-
             <% @student_bids.each do |sb| %>
               <% if sb.topic_id == topic.id %>
-                <%= form_tag({:controller=>"sign_up_sheet", :action=>"set_priority",:id => topic.id,:assignment_id => params[:assignment_id]}, method: :post, remote: true) do %>
                 <%= number_field_tag :priority, sb.priority, min: 1, max: @num_of_topics, place_holder: 0 %>
-                <%= submit_tag  'Set priority', name: nil %>
-                <% end %>
                 <% break %>
-              <% elsif @student_bids[-1] == sb %>
-                <%= form_tag({:controller=>"sign_up_sheet", :action=>"set_priority",:id => topic.id,:assignment_id => params[:assignment_id]}, method: :post, remote: true) do %>
-                <%= number_field_tag :priority, nil, min: 1, max: @num_of_topics, place_holder: 0  %>
-                <%= submit_tag  'Set priority', name: nil %>
-              <% end %>
               <% end %>
             <% end %>
-            </td>
+            <%= submit_tag  'Set priority', name: nil  %>
+            <% end %></td>
           <% else @signup_topic_deadline.nil? or (!@signup_topic_deadline.nil? and Time.now < @signup_topic_deadline.due_at) %>
               <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'sign_up', :id => topic.id, :assignment_id => params[:assignment_id] %></td>
           <% end %>
@@ -62,22 +51,18 @@
 <% else %>
   <td align="center">
     <% if @assignment.is_intelligent %>
-      <td>
-        <% @student_bids.each do |sb| %>
-          <% if sb.topic_id == topic.id %>
-            <%= form_tag({:controller=>"sign_up_sheet", :action=>"set_priority",:id => topic.id,:assignment_id => params[:assignment_id]}, method: :post, remote: true) do %>
-              <%= number_field_tag :priority, sb.priority, min: 1, max: @num_of_topics, place_holder: 0 %>
-              <%= submit_tag  'Set priority', name: nil %>
-            <% end %>
-            <% break %>
-          <% elsif @student_bids[-1] == sb %>
-            <%= form_tag({:controller=>"sign_up_sheet", :action=>"set_priority",:id => topic.id,:assignment_id => params[:assignment_id]}, method: :post, remote: true) do %>
-            <%= number_field_tag :priority , nil, min: 1, max: @num_of_topics, place_holder: 0 %>
-            <%= submit_tag  'Set priority', name: nil %>
-          <% end %>
-          <% end %>
+      <td><%= form_tag({:controller=>"sign_up_sheet", :action=>"set_priority",:id => topic.id,:assignment_id => params[:assignment_id]}, method: :post) do %>
+      <% if @student_bids.all? {|sb| sb.topic_id != topic.id} %>
+        <%= number_field_tag :priority, nil, min: 1, max: @num_of_topics, place_holder: 0 %>
+      <% end %>
+      <% @student_bids.each do |sb| %>
+        <% if sb.topic_id == topic.id %>
+          <%= number_field_tag :priority, sb.priority, min: 1, max: @num_of_topics, place_holder: 0 %>
+          <% break %>
         <% end %>
-        </td>
+      <% end %>
+      <%= submit_tag  'Set priority', name: nil  %>
+      <% end %></td>
     <% else %>
       <%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Switch Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'switch_original_topic_to_approved_suggested_topic', :id => topic.id, :assignment_id => params[:assignment_id] %>
       <%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Publish Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'publish_approved_suggested_topic', :id => topic.id, :assignment_id => params[:assignment_id] %>

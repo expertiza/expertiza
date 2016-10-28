@@ -170,7 +170,7 @@ class SignUpSheetController < ApplicationController
     assignment = Assignment.find(@assignment_id)
     @signup_topic_deadline = assignment.due_dates.find_by_deadline_type_id(7)
     @drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
-    @student_bids = Bid.where(team_id: session[:user].id)
+    @student_bids = Bid.where(user_id: session[:user].id)
 
     unless assignment.due_dates.find_by_deadline_type_id(1).nil?
       if !assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
@@ -243,11 +243,11 @@ class SignUpSheetController < ApplicationController
     #     flash[:error] = "That is an invalid priority."
     #   end
     # end
-    check = Bid.where(team_id: @user_id, topic_id: params[:id])
-    if !Bid.where(team_id: @user_id, priority: params[:priority]).empty?
+    check = Bid.where(user_id: @user_id, topic_id: params[:id])
+    if !Bid.where(user_id: @user_id, priority: params[:priority]).empty?
       flash[:error] = "You have already selected this priority"
     elsif check.empty?
-      Bid.create(topic_id: params[:id], team_id: @user_id, priority: params[:priority])
+      Bid.create(topic_id: params[:id], user_id: @user_id, priority: params[:priority])
     else
       check.first.update(priority: params[:priority])
     end

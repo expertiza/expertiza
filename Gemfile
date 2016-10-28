@@ -65,7 +65,6 @@ group :development do
   gem 'pry-remote'
   gem 'pry-nav'
   gem 'rubocop'
-  gem 'sqlite3-ruby'
   gem 'selenium-webdriver'
   gem 'quiet_assets'
   gem "factory_girl_rails", "~> 4.0"

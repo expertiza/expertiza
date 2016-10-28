@@ -81,7 +81,7 @@ class GradesController < ApplicationController
     calculate_all_penalties(@assignment.id)
 
     # prepare feedback summaries
-    summary_ws_url = Rails.application.config.summary_ws_url
+    summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
     sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewee(@questions, @assignment, @team_id, summary_ws_url)
 
     @summary = sum.summary
@@ -211,6 +211,19 @@ class GradesController < ApplicationController
     end
     flash[:note] = message
     redirect_to action: 'edit', id: params[:id]
+  end
+
+  def save_grade_and_comment_for_submission
+    participant = AssignmentParticipant.find(params[:participant_id])
+    @team = participant.team
+    @team.grade_for_submission = params[:grade_for_submission]
+    @team.comment_for_submission = params[:comment_for_submission]
+    begin
+      @team.save
+    rescue
+      flash[:error] = $ERROR_INFO
+    end
+    redirect_to controller: 'grades', action: 'view_team', id: params[:participant_id]
   end
 
   private

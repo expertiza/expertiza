@@ -1,0 +1,18 @@
+<% if Chart.include_header? then%>
+  <script src='/highcharts/highcharts.js'></script>
+  <script>
+    <%= render 'static' %>
+jQuery(document).ready( function(){
+  var charts = jQuery("div._chart_container");
+    var i;
+    for (i = 0; i < charts.length; i++) {
+      var chart = charts[i];
+        var data = eval("(" + chart.innerHTML + ")");
+        jQuery('#'+chart.id).highcharts(data);
+    }
+    jQuery("tspan:contains('Highcharts.com')").remove();
+} );
+</script>
+<%
+    Chart.set_header
+    end %>

@@ -183,6 +183,10 @@ class AssignmentTeam < Team
   #             If it is an invalid URL
 
   def submit_hyperlink(hyperlink)
+
+    #should crate submission_record
+
+
     hyperlink.strip!
     raise "The hyperlink cannot be empty!" if hyperlink.empty?
     url = URI.parse(hyperlink)

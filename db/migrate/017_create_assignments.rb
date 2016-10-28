@@ -23,8 +23,8 @@ class CreateAssignments < ActiveRecord::Migration
     t.column "require_signup", :boolean
     t.column "num_reviewers", :integer, limit: 8, :default => 0, :null => false
     t.column "spec_location", :text
-    t.column "num_reviews_required", :integer, :default => 3, :null => false
-    t.column "num_reviews_allowed", :integer, :default => 3, :null => false
+    t.column "num_reviews_required", :integer, :default => 3
+    t.column "num_reviews_allowed", :integer, :default => 3
 
   end
 

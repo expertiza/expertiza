@@ -494,9 +494,6 @@ function removeOrAddTeamFormation() {
                                                                     <button type="button" id="addMonth_btn">+</button>
                                                                     <%= number_field_tag 'months', 0, min: 0, max: 12 ,:id=>'months' %>
                                                                         <button type="button" id="subMonth_btn">-</button>
-                                                                        </br>
-                                                                        <%= label_tag('timezone', 'Timezone') %>
-                                                                            <%= time_zone_select("user", "timezonepref", ActiveSupport::TimeZone.us_zones) %>
                                                     </div>
                                                 </div>
                                                 <table class='exp' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden;'>

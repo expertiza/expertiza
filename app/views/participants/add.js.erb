@@ -1,1 +1,1 @@
-$('.exp').append("<%= escape_javascript (render partial: 'user_list', locals: participant: @participants}) %>");
+$('.exp').append("<%= escape_javascript (render partial: 'user_list', locals: {participant: @participants}) %>");

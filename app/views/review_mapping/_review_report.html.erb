@@ -106,7 +106,7 @@
   $(function () {
     $("[data-toggle='tooltip']").tooltip();
     $("#myTable").tablesorter({
-      sortList: [[0,0],[4,4]],
+      sortList: [[0,0]],
       headers: {
         4: {
         sorter: 'customParser'
@@ -123,10 +123,9 @@
       return false;
     },
     format: function (stringValue) {
-      var stringValueParts = stringValue.split(" ");
-      var numericPartOfStringValue = parseInt(stringValueParts[2],10);
-      console.log(numericPartOfStringValue);
-      return numericPartOfStringValue ;
+      var stringNumericPart = stringValue.split(" ");
+      var numericValue = parseInt(stringNumericPart[2],10);
+      return numericValue ;
     },
     type: 'numeric'
   });

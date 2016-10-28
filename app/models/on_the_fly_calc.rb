@@ -36,7 +36,9 @@ module OnTheFlyCalc
       @corresponding_response = Response.where(['map_id = ?', response_map.id])
       @corresponding_response = @corresponding_response.reject {|response| response.round != round } unless @corresponding_response.empty?
       @respective_scores = {}
-      @respective_scores = reviewer[round] if !reviewer.nil? && !reviewer[round].nil?
+      if !reviewer.nil? && !reviewer[round].nil?
+        @respective_scores = reviewer[round]
+      end
       calc_review_score
       @respective_scores[response_map.reviewee_id] = @this_review_score
       reviewer = {} if reviewer.nil?
@@ -110,17 +112,7 @@ end
 
 private
 
-def condition
-  grades_by_rounds = {}
-  round = grades_by_rounds[round_sym]
-  !round[:max].nil? && score[:max] < round[:max]
-end
 
-def condition1
-  grades_by_rounds = {}
-  round = grades_by_rounds[round_sym]
-  !round[:min].nil? && score[:min] > round[:min]
-end
 
 def assess
   total_score = 0
@@ -148,6 +140,18 @@ def calculate_score
     score[:max] = round[:max] if condition
     score[:min] = round[:min] if condition1
   end
+end
+
+def condition
+  grades_by_rounds = {}
+  round = grades_by_rounds[round_sym]
+  !round[:max].nil? && score[:max] < round[:max]
+end
+
+def condition1
+  grades_by_rounds = {}
+  round = grades_by_rounds[round_sym]
+  !round[:min].nil? && score[:min] > round[:min]
 end
 
 def participant_score

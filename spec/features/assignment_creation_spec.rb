@@ -445,7 +445,6 @@ describe "assignment function" do
 
     describe "Load rubric questionnaire" do
       it "is able to edit assignment" do
-        #find_link('Rubrics').click
         # might find a better acceptance criteria here
         expect(page).to have_content("Review rubric varies by round")
       end
@@ -454,8 +453,6 @@ describe "assignment function" do
     # First row of rubric
     describe "Edit review rubric" do
       it "updates review questionnaire" do
-        #find_link('Rubrics').click
-        #within_table('question_actions_table') do
           within(:css, "tr#questionnaire_table_ReviewQuestionnaire") do
           select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           uncheck('dropdown')
@@ -473,8 +470,6 @@ describe "assignment function" do
       end
 
       it "should update scored question dropdown" do
-        #find_link('Rubrics').click
-        #within_table('question_actions_table') do
         within("tr#questionnaire_table_ReviewQuestionnaire") do
           select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
@@ -487,8 +482,6 @@ describe "assignment function" do
 
       # Second row of rubric
       it "updates author feedback questionnaire" do
-       # find_link('Rubrics').click
-       #within_table('assignment_questionnaire_table') do
         within(:css, "tr#questionnaire_table_AuthorFeedbackQuestionnaire") do
           select "AuthorFeedbackQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           uncheck('dropdown')
@@ -505,8 +498,6 @@ describe "assignment function" do
       end
 
       it "should update scored question dropdown" do
-        #find_link('Rubrics').click
-        #within_table('question_actions_table') do
         within("tr#questionnaire_table_AuthorFeedbackQuestionnaire") do
           select "AuthorFeedbackQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
@@ -521,8 +512,6 @@ describe "assignment function" do
       ##
       # Third row of rubric
       xit "updates teammate review questionnaire" do
-        #find_link('Rubrics').click
-        #within_table('question_actions_table') do
         within("tr#questionnaire_table_TeammateReviewQuestionnaire") do
           select "TeammateReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           uncheck('dropdown')
@@ -539,8 +528,6 @@ describe "assignment function" do
       end
 
       xit "should update scored question dropdown" do
-        #find_link('Rubrics').click
-        #within_table('question_actions_table') do
         within("tr#questionnaire_table_TeammateReviewQuestionnaire") do
           select "TeammateReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
@@ -629,6 +616,44 @@ describe "assignment function" do
       }.to change {Participant.count}.by 1
     end
   end
+  #Begin Due Date tab
+  describe "Due dates tab", js: true do
+    before(:each) do
+      @assignment = create(:assignment, name: 'public assignment for test')
+      login_as("instructor6")
+      visit "/assignments/#{@assignment.id}/edit"
+      click_link 'Due date'
+    end
+    it "it loads the due dates page" do
+      expect(page).to have_content("Number of review rounds")
+    end
+    xit "Able to create a new penalty policy" do #This case doesn't work in expertiza yet, i.e. not able to create new late policy.
+      find_link('New late policy').click
+      fill_in 'late_policy_policy_name', with: 'testlatepolicy'
+      fill_in 'policy_penalty_per_unit', with: 'testlatepolicypenalty'
+      fill_in 'late_policy_max_penalty', with: 2
+      click_button 'Create'
+    end
+
+    # able to set deadlines for a single round of reviews
+    it "set the deadline for an assignment review" do
+      fill_in 'assignment_form_assignment_rounds_of_reviews', with: '1'
+      #find_link('set').click # the link doesn't work yet
+      #check 'changenameurl'
+      #check 'metareviewAllowed'
+      #click_link 'Save'
+      #click_link 'Due date'
+      fill_in 'datetimepicker_submission_round_1', with:'2016/10/01 12:00'
+      fill_in 'datetimepicker_review_round_1', with:'2016/10/10 12:00'
+      click_button 'submit_btn'
+      assignment = Assignment.where(name: 'public assignment for test').first
+      expect(assignment).to have_attributes(
+                                review_assignment_strategy: 'Auto-Selected',
+                                review_topic_threshold: 3,
+                                max_reviews_per_submission: 10
+                            )
+    end
+  end
 
   it "check to find if the assignment can be added to a course", js: true  do
     create(:assignment, course: nil, name: 'Test Assignment')
@@ -650,7 +675,4 @@ describe "assignment function" do
     )
 
   end
-
 end
-
-

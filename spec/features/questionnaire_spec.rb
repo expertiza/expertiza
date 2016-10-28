@@ -33,26 +33,28 @@ describe "Questionnaire tests for instructor interface" do
       expect(page).to have_content('Your username or password is incorrect.')
     end
   end
+  create_public_review
+    describe "Create a public review questionnaire", type: :controller do
+      it "is able to create a public review questionnaire" do
+        login_as("instructor6")
 
-  describe "Create a public review questionnaire", type: :controller do
-    it "is able to create a public review questionnaire" do
-      login_as("instructor6")
+        visit '/questionnaires/new?model=ReviewQuestionnaire&private=0'
 
-      visit '/questionnaires/new?model=ReviewQuestionnaire&private=0'
+        fill_in('questionnaire_name', with: 'Review 1')
 
-      fill_in('questionnaire_name', with: 'Review 1')
+        fill_in('questionnaire_min_question_score', with: '0')
 
-      fill_in('questionnaire_min_question_score', with: '0')
+        fill_in('questionnaire_max_question_score', with: '5')
 
-      fill_in('questionnaire_max_question_score', with: '5')
+        select('no', from: 'questionnaire_private')
 
-      select('no', from: 'questionnaire_private')
+        click_button "Create"
 
-      click_button "Create"
-
-      expect(Questionnaire.where(name: "Review 1")).to exist
+        expect(Questionnaire.where(name: "Review 1")).to exist
+      end
     end
   end
+  create_public_review
 
   describe "Create a private review questionnaire", type: :controller do
     it "is able to create a private review questionnaire" do
@@ -87,7 +89,7 @@ describe "Questionnaire tests for instructor interface" do
     select('no', from: 'questionnaire_private')
 
     click_button "Create"
-  end
+  end 
 
   describe "Create a review question", type: :controller do
     it "is able to create a Criterion question" do

@@ -167,6 +167,7 @@ class SignUpSheetController < ApplicationController
     @priority = 0
     assignment = Assignment.find(@assignment_id)
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: nil)
+    @max_team_size = assignment.max_team_size
 
     if assignment.is_intelligent
       @bids = Bid.where(user_id: session[:user].id).order(:priority)
@@ -303,7 +304,7 @@ class SignUpSheetController < ApplicationController
               parent_id:                   topic.id,
               submission_allowed_id:       instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].submission_allowed_id,
               review_allowed_id:           instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_allowed_id,
-              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id, 
+              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id,
               round:                       i,
               flag:                        instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].flag,
               threshold:                   instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].threshold,
@@ -319,7 +320,7 @@ class SignUpSheetController < ApplicationController
               due_at:                      instance_variable_get('@topic_' + deadline_type + '_due_date'),
               submission_allowed_id:       instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].submission_allowed_id,
               review_allowed_id:           instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_allowed_id,
-              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id, 
+              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id,
               quiz_allowed_id:             instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].quiz_allowed_id,
               teammate_review_allowed_id:  instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].teammate_review_allowed_id
             )

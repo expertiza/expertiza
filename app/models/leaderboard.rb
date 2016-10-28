@@ -30,7 +30,7 @@ class Leaderboard < ActiveRecord::Base
     independant_assignments = get_independant_assignments(user_id)
     assignment_list.concat(independant_assignments)
 
-    # questionnaireHash = get_participants_score(assignment_list)
+    # questionnaireHash = get_par_score(assignment_list)
   end
 
   # This method gets all tuples in the Participants table associated
@@ -43,7 +43,7 @@ class Leaderboard < ActiveRecord::Base
 
   # This method returns the participants score grouped by course, grouped by questionnaire type.
   # End result is a hash (q_type => (course => (user => score)))
-  def self.get_participants_score(assignment_list)
+  def self.get_par_score(assignment_list)
     q_type_hash = {}
     questionnaire_response_type_hash = {"ReviewResponseMap" => "ReviewQuestionnaire",
                                      "MetareviewResponseMap" => "MetareviewQuestionnaire",
@@ -201,7 +201,7 @@ class Leaderboard < ActiveRecord::Base
 
   # Returns string for Top N Leaderboard Heading or accomplishments entry
   def self.leaderboard_Heading(q_type_id)
-    lt_entry = Leaderboard.find_by_q_type(q_type_id)
+    lt_entry = Leaderboard.find_by q_type(q_type_id)
     if lt_entry
       lt_entry.name
     else

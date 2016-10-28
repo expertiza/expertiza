@@ -8,7 +8,8 @@
       <th></th>
     </tr>
     <% for ta in @course.ta_mappings %>
-      <% render :partial => 'ta_list' %>
+      <% render :partial => 'ta_list',
+          :locals => {:ta => ta} %>
     <%end%>
 
   </table>

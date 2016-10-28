@@ -19,7 +19,7 @@ end
 
 def get_selected_id(finder_var)
   if finder_var == "ReviewQuestionnaire2"
-    ReviewQuestionnaire.find_by_name(finder_var)[:id]
+    ReviewQuestionnaire.find_by(name: finder_var)[:id]
   elsif finder_var == "AuthorFeedbackQuestionnaire2"
     AuthorFeedbackQuestionnaire.find_by_name(finder_var)[:id]
   elsif finder_var == "TeammateReviewQuestionnaire2"

@@ -354,7 +354,7 @@ describe "assignment function" do
       click_link 'Topics'
     end
 
-    it "can edit topics properties" do
+    it "can edit topics properties - Check" do
       check("assignment_form_assignment_allow_suggestions")
       check("assignment_form_assignment_is_intelligent")
       check("assignment_form_assignment_can_review_same_topic")
@@ -371,7 +371,7 @@ describe "assignment function" do
       )
     end
 
-    it "can edit topics properties" do
+    it "can edit topics properties - unCheck" do
       uncheck("assignment_form_assignment_allow_suggestions")
       uncheck("assignment_form_assignment_is_intelligent")
       uncheck("assignment_form_assignment_can_review_same_topic")
@@ -637,21 +637,26 @@ describe "assignment function" do
 
     # able to set deadlines for a single round of reviews
     it "set the deadline for an assignment review" do
+
       fill_in 'assignment_form_assignment_rounds_of_reviews', with: '1'
-      #find_link('set').click # the link doesn't work yet
-      #check 'changenameurl'
-      #check 'metareviewAllowed'
-      #click_link 'Save'
-      #click_link 'Due date'
-      fill_in 'datetimepicker_submission_round_1', with:'2016/10/01 12:00'
-      fill_in 'datetimepicker_review_round_1', with:'2016/10/10 12:00'
+      fill_in 'datetimepicker_submission_round_1', with: '2017/10/01 12:00'
+      fill_in 'datetimepicker_review_round_1', with: '2017/10/10 12:00'
       click_button 'submit_btn'
-      assignment = Assignment.where(name: 'public assignment for test').first
-      expect(assignment).to have_attributes(
-                                review_assignment_strategy: 'Auto-Selected',
-                                review_topic_threshold: 3,
-                                max_reviews_per_submission: 10
-                            )
+
+      submission_type_id = DeadlineType.where(name: 'submission')[0].id
+      review_type_id = DeadlineType.where(name: 'review')[0].id
+
+      submission_due_date = DueDate.find(1)
+      review_due_date = DueDate.find(2)
+      expect(submission_due_date).to have_attributes(
+        deadline_type_id: submission_type_id,
+        type: 'AssignmentDueDate'
+      )
+
+      expect(review_due_date).to have_attributes(
+        deadline_type_id: review_type_id,
+        type: 'AssignmentDueDate'
+      )
     end
   end
 

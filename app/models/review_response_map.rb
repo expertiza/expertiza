@@ -16,7 +16,7 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
-  def get_title
+  def title
     "Review"
   end
 

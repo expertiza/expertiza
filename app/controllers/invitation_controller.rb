@@ -70,12 +70,13 @@ class InvitationController < ApplicationController
 
   def accept
     @inv = Invitation.find(params[:inv_id])
-
+    
     student = Participant.find(params[:student_id])
 
     assignment_id = @inv.assignment_id
     inviter_user_id = @inv.from_id
     inviter_participant = AssignmentParticipant.find_by_user_id_and_assignment_id(inviter_user_id, assignment_id)
+    user = User.find(inviter_user_id)
 
     ready_to_join = false
     # check if the inviter's team is still existing, and have available slot to add the invitee
@@ -99,6 +100,12 @@ class InvitationController < ApplicationController
 
       # Accept the invite and return boolean on whether the add was successful
       add_successful = Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, student.parent_id)
+
+      # send mail to inviter on successfull acceptence of mail
+      if add_successful
+	prepared_mail = MailerHelper.send_mail_for_invitation(user, "Invitation to join team", "team_accept_invite", "invitation to join", student.name)
+    	prepared_mail.deliver
+      end
 
       unless add_successful
         flash[:error] = "The system failed to add you to the team that invited you."

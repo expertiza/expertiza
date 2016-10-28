@@ -317,6 +317,19 @@ describe "assignment function" do
                             )
     end
 
+    it "should create teammate review row in rubrics" do
+      fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
+      select('Course 2', from: 'assignment_form_assignment_course_id')
+      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'
+      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
+      check("team_assignment")
+      check("assignment_form_assignment_show_teammate_reviews")
+      fill_in 'assignment_form_assignment_max_team_size', with: 5
+      click_button 'Save'
+      click_link 'Rubrics'
+      expect page.should have_css("table#assignment_questionnaire_table tr", :count=>4)
+    end
+
     it "check if checking calibration shows the tab" do
       uncheck 'assignment_form_assignment_is_calibrated'
       click_button 'Save'

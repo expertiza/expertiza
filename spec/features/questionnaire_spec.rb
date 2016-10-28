@@ -40,32 +40,32 @@ def create_private_review
 end
 
 def load_questionnaire
-    login_as("instructor6")
-    visit '/questionnaires/new?model=ReviewQuestionnaire&private=0'
+  login_as("instructor6")
+  visit '/questionnaires/new?model=ReviewQuestionnaire&private=0'
 
-    fill_in('questionnaire_name', with: 'Review n')
+  fill_in('questionnaire_name', with: 'Review n')
 
-    fill_in('questionnaire_min_question_score', with: '0')
+  fill_in('questionnaire_min_question_score', with: '0')
 
-    fill_in('questionnaire_max_question_score', with: '5')
+  fill_in('questionnaire_max_question_score', with: '5')
 
-    select('no', from: 'questionnaire_private')
+  select('no', from: 'questionnaire_private')
 
-    click_button "Create"
-  end 
+  click_button "Create"
+end 
 
 def create_review_question(type_qn_condition, type)
-    it type_qn_condition do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select(type, from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
+  it type_qn_condition do
+    load_questionnaire
+    fill_in('question_total_num', with: '1')
+    select(type, from: 'question_type')
+    click_button "Add"
+    expect(page).to have_content('Remove')
 
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-  end
+    click_button "Save review questionnaire"
+    expect(page).to have_content('All questions has been successfully saved!')
+   end
+end
 
 describe "Questionnaire tests for instructor interface" do
   before(:each) do

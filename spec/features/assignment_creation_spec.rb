@@ -577,15 +577,17 @@ describe "assignment function" do
 
   #Begin participant testing
   describe "participants", js: true do
+    before(:each) do
+      create(:course)
+      create(:assignment, name: 'participants Assignment')
+      create(:assignment_node)
+    end
 
     it "check to see if participants can be added" do
-      create(:course)
       student = create(:student)
-      create(:assignment, name: 'Test Assignment')
-      create(:assignment_node)
       login_as('instructor6')
 
-      assignment_id = Assignment.where(name: 'Test Assignment')[0].id
+      assignment_id = Assignment.where(name: 'participants Assignment')[0].id
       visit "/participants/list?id=#{assignment_id}&model=Assignment"
 
       fill_in 'user_name', with: student.name
@@ -598,13 +600,43 @@ describe "assignment function" do
     end
 
     it "should display newly created assignment" do
-      create(:assignment, name: 'participants assignment')
       participant = create(:participant)
       login_as(participant.name)
       expect(page).to have_content("participants assignment")
     end
+
+    xit "check if we can remove participant" do
+      create(:participant)
+      login_as('instructor6')
+      assignment_id = Assignment.where(name: 'participants Assignment')[0].id
+      visit "/participants/list?id=#{assignment_id}&model=Assignment"
+
+      expect {
+        click_link 'Remove'
+      }.to change {Participant.count}.by 1
+    end
   end
 
+  it "check to find if the assignment can be added to a course", js: true  do
+    create(:assignment, course: nil, name: 'Test Assignment')
+    create(:course, name: 'Test Course')
+
+    course_id = Course.where(name: 'test Course')[0].id
+
+    assignment_id = Assignment.where(name: 'Test Assignment')[0].id
+
+    login_as('instructor6')
+    visit "/assignments/associate_assignment_with_course?id=#{assignment_id}"
+
+    choose "course_id_#{course_id}"
+    click_button 'Save'
+
+    assignment_row = Assignment.where(name: 'Test Assignment')[0]
+    expect(assignment_row).to have_attributes(
+      course_id: course_id
+    )
+
+  end
 
 end
 

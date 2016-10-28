@@ -1,24 +1,24 @@
 require 'rails_helper'
 def create_public_review
-    it "is able to create a public review questionnaire" do
-      login_as("instructor6")
+  it "is able to create a public review questionnaire" do
+    login_as("instructor6")
 
-      visit '/questionnaires/new?model=ReviewQuestionnaire&private=0'
+    visit '/questionnaires/new?model=ReviewQuestionnaire&private=0'
 
-      fill_in('questionnaire_name', with: 'Review 1')
+    fill_in('questionnaire_name', with: 'Review 1')
 
-      fill_in('questionnaire_min_question_score', with: '0')
+    fill_in('questionnaire_min_question_score', with: '0')
 
-      fill_in('questionnaire_max_question_score', with: '5')
+    fill_in('questionnaire_max_question_score', with: '5')
 
-      select('no', from: 'questionnaire_private')
+    select('no', from: 'questionnaire_private')
 
-      click_button "Create"
+    click_button "Create"
 
-      expect(Questionnaire.where(name: "Review 1")).to exist
-    end
+    expect(Questionnaire.where(name: "Review 1")).to exist
   end
 end
+
 describe "Questionnaire tests for instructor interface" do
   before(:each) do
     create(:assignment)

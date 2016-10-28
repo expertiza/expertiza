@@ -156,7 +156,7 @@ FactoryGirl.define do
 
   factory :course_team, class: CourseTeam do
     sequence(:name) {|n| "team#{n}" }
-    course { Course.first || association(:assignment) }
+    course { Course.first || association(:course) }
     type 'CourseTeam'
     comments_for_advertisement nil
     advertise_for_partner nil

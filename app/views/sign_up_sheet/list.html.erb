@@ -1,6 +1,5 @@
 <% @assignment = Assignment.find(params[:assignment_id]) %>
 <h1>Signup sheet for <%= @assignment.name %> assignment</h1>
-
 <table class="general">
   <tr><%= render :partial => 'table_header' %></tr>
   <% if !@selected_topics.nil? && @selected_topics.size != 0 %>

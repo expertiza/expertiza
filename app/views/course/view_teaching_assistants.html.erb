@@ -23,7 +23,7 @@
   render :partial => 'add_individual',
     :locals => {:form_action => "add_ta",
                 :obj_type => "course_id",
-                :obj_id => @course.id},
+                :obj_id => @course.id}
                 %>
             <%
                 session[:return_to] = request.url

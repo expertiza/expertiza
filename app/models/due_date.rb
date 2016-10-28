@@ -69,10 +69,12 @@ class DueDate < ActiveRecord::Base
       if next_due_date.nil?
         topic_due_date_size = TopicDueDate.where(parent_id: topic_id).size
         following_assignment_due_dates = AssignmentDueDate.where(parent_id: assignment_id)[topic_due_date_size..-1]
-        following_assignment_due_dates.each do |assignment_due_date|
-          if assignment_due_date.due_at >= Time.now
-            next_due_date = assignment_due_date 
-            break
+        unless following_assignment_due_dates.nil? 
+          following_assignment_due_dates.each do |assignment_due_date|
+            if assignment_due_date.due_at >= Time.now
+              next_due_date = assignment_due_date 
+              break
+            end
           end
         end
       end

@@ -30,7 +30,7 @@ class Leaderboard < ActiveRecord::Base
     independant_assignments = get_independant_assignments(user_id)
     assignment_list.concat(independant_assignments)
 
-    # questionnaireHash = get_par_score(assignment_list)
+    # questionnaireHash = get_participants_score(assignment_list)
   end
 
   # This method gets all tuples in the Participants table associated
@@ -43,13 +43,13 @@ class Leaderboard < ActiveRecord::Base
 
   # This method returns the participants score grouped by course, grouped by questionnaire type.
   # End result is a hash (q_type => (course => (user => score)))
-  def self.get_par_score(assignment_list)
+  def self.get_participants_score(assignment_list)
     q_type_hash = {}
     questionnaire_response_type_hash = {"ReviewResponseMap" => "ReviewQuestionnaire",
-                                     "MetareviewResponseMap" => "MetareviewQuestionnaire",
-                                     "FeedbackResponseMap" => "AuthorFeedbackQuestionnaire",
-                                     "TeammateReviewResponseMap" => "TeammateReviewQuestionnaire",
-                                     "BookmarkRatingResponseMap" => "BookmarkRatingQuestionnaire"}
+                                        "MetareviewResponseMap" => "MetareviewQuestionnaire",
+                                        "FeedbackResponseMap" => "AuthorFeedbackQuestionnaire",
+                                        "TeammateReviewResponseMap" => "TeammateReviewQuestionnaire",
+                                        "BookmarkRatingResponseMap" => "BookmarkRatingQuestionnaire"}
 
     # Get all participants of the assignment list
     participant_list = assignment_participant.where(parent_id: assignment_list.pluck(:id)).uniq

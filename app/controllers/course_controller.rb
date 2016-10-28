@@ -145,7 +145,6 @@ class CourseController < ApplicationController
       #redirect_to action: 'view_teaching_assistants', id: @course.id
       respond_to do |format|
       format.html { redirect_to action: 'view_teaching_assistants', id: @course.id }
-      format.json { head :no_content }
       format.js   { render :layout => false }
    end
     else
@@ -156,7 +155,6 @@ class CourseController < ApplicationController
       #redirect_to action: 'view_teaching_assistants', id: @course.id
       respond_to do |format|
       format.html { redirect_to action: 'view_teaching_assistants', id: @course.id }
-      format.json { head :no_content }
       format.js   { render :layout => false }
    end
 

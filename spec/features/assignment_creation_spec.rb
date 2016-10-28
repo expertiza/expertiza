@@ -240,6 +240,22 @@ describe "assignment function" do
       visit "/assignments/#{assignment[:id]}/edit"
       click_link 'General'
     end
+    ##### test reviews visible to all other reviewers ######
+    it "should edit review visible to all other reviewers" do
+      fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
+      select('Course 2', from: 'assignment_form_assignment_course_id')
+      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'
+      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
+      check ("assignment_form_assignment_reviews_visible_to_all")
+      click_button 'Save'
+      assignment = Assignment.where(name: 'edit assignment for test').first
+      expect(assignment).to have_attributes(
+                                name: 'edit assignment for test',
+                                course_id: Course.find_by_name('Course 2')[:id],
+                                directory_path: 'testDirectory1',
+                                spec_location: 'testLocation1'
+                            )
+    end
     it "should edit assignment available to students" do
       fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
       select('Course 2', from: 'assignment_form_assignment_course_id')
@@ -256,6 +272,45 @@ describe "assignment function" do
                                 spec_location: 'testLocation1',
                                 microtask: true,
                                 is_calibrated: true,
+                            )
+    end
+    it "should edit quiz number available to students" do
+      fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
+      select('Course 2', from: 'assignment_form_assignment_course_id')
+      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'
+      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
+      check("assignment_form_assignment_require_quiz")
+      click_button 'Save'
+      fill_in 'assignment_form_assignment_num_quiz_questions', with: 5
+      click_button 'Save'
+      assignment = Assignment.where(name: 'edit assignment for test').first
+      expect(assignment).to have_attributes(
+                                name: 'edit assignment for test',
+                                course_id: Course.find_by_name('Course 2')[:id],
+                                directory_path: 'testDirectory1',
+                                spec_location: 'testLocation1',
+                                num_quiz_questions: 5,
+                                require_quiz: true
+                            )
+
+    end
+
+    it "should edit number of members per team " do
+      fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
+      select('Course 2', from: 'assignment_form_assignment_course_id')
+      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'
+      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
+      check("assignment_form_assignment_show_teammate_reviews")
+      fill_in 'assignment_form_assignment_max_team_size', with: 5
+      click_button 'Save'
+      assignment = Assignment.where(name: 'edit assignment for test').first
+      expect(assignment).to have_attributes(
+                                name: 'edit assignment for test',
+                                course_id: Course.find_by_name('Course 2')[:id],
+                                directory_path: 'testDirectory1',
+                                spec_location: 'testLocation1',
+                                max_team_size: 5,
+                                show_teammate_reviews: true
                             )
     end
   end
@@ -341,7 +396,6 @@ describe "assignment function" do
 
     describe "Load rubric questionnaire" do
       it "is able to edit assignment" do
-        #find_link('Rubrics').click
         # might find a better acceptance criteria here
         expect(page).to have_content("Review rubric varies by round")
       end
@@ -350,8 +404,6 @@ describe "assignment function" do
     # First row of rubric
     describe "Edit review rubric" do
       it "updates review questionnaire" do
-        #find_link('Rubrics').click
-        #within_table('question_actions_table') do
           within(:css, "tr#questionnaire_table_ReviewQuestionnaire") do
           select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           uncheck('dropdown')
@@ -369,8 +421,6 @@ describe "assignment function" do
       end
 
       it "should update scored question dropdown" do
-        #find_link('Rubrics').click
-        #within_table('question_actions_table') do
         within("tr#questionnaire_table_ReviewQuestionnaire") do
           select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
@@ -383,8 +433,6 @@ describe "assignment function" do
 
       # Second row of rubric
       it "updates author feedback questionnaire" do
-       # find_link('Rubrics').click
-       #within_table('assignment_questionnaire_table') do
         within(:css, "tr#questionnaire_table_AuthorFeedbackQuestionnaire") do
           select "AuthorFeedbackQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           uncheck('dropdown')
@@ -401,8 +449,6 @@ describe "assignment function" do
       end
 
       it "should update scored question dropdown" do
-        #find_link('Rubrics').click
-        #within_table('question_actions_table') do
         within("tr#questionnaire_table_AuthorFeedbackQuestionnaire") do
           select "AuthorFeedbackQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
@@ -415,8 +461,6 @@ describe "assignment function" do
 
       # Third row of rubric
       xit "updates teammate review questionnaire" do
-        #find_link('Rubrics').click
-        #within_table('question_actions_table') do
         within("tr#questionnaire_table_TeammateReviewQuestionnaire") do
           select "TeammateReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           uncheck('dropdown')
@@ -433,8 +477,6 @@ describe "assignment function" do
       end
 
       xit "should update scored question dropdown" do
-        #find_link('Rubrics').click
-        #within_table('question_actions_table') do
         within("tr#questionnaire_table_TeammateReviewQuestionnaire") do
           select "TeammateReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
@@ -480,6 +522,64 @@ describe "assignment function" do
       fill_in 'num_reviews_per_student', with: 5
     end
   end
+
+  #Begin Due Date tab
+  describe "Due dates tab", js: true do
+    before(:each) do
+      @assignment = create(:assignment, name: 'public assignment for test')
+      login_as("instructor6")
+      visit "/assignments/#{@assignment.id}/edit"
+      click_link 'Due date'
+    end
+    it "it loads the due dates page" do
+      expect(page).to have_content("Number of review rounds")
+    end
+    xit "Able to create a new penalty policy" do #This case doesn't work in expertiza yet, i.e. not able to create new late policy.
+      find_link('New late policy').click
+      fill_in 'late_policy_policy_name', with: 'testlatepolicy'
+      fill_in 'policy_penalty_per_unit', with: 'testlatepolicypenalty'
+      fill_in 'late_policy_max_penalty', with: 2
+      click_button 'Create'
+    end
+
+    # able to set deadlines for a single round of reviews
+    it "set the deadline for an assignment review" do
+      fill_in 'assignment_form_assignment_rounds_of_reviews', with: '1'
+      #find_link('set').click # the link doesn't work yet
+      #check 'changenameurl'
+      #check 'metareviewAllowed'
+      #click_link 'Save'
+      #click_link 'Due date'
+      fill_in 'datetimepicker_submission_round_1', with:'2016/10/01 12:00'
+      fill_in 'datetimepicker_review_round_1', with:'2016/10/10 12:00'
+      click_button 'submit_btn'
+      assignment = Assignment.where(name: 'public assignment for test').first
+      expect(assignment).to have_attributes(
+                                review_assignment_strategy: 'Auto-Selected',
+                                review_topic_threshold: 3,
+                                max_reviews_per_submission: 10
+                            )
+    end
+ end
+
+  #### logging in as participants
+  #### this test is not complte
+  ##### will work tomorrow on this
+  describe "participants function", js: true do
+    before(:each) do
+      @student1 = create(:student)
+      @assignment = create(:assignment, name: 'participants assignment')
+      login_as(@student1.name)
+    end
+
+    it "should display newly created assignment" do
+      #within_table('table.table') do
+        #find_link('participants assignment')
+      expect(page).to have_content("participants assignment")
+      end
   end
+
+
+ end
 
 

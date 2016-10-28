@@ -208,6 +208,7 @@ th.sorter-true.tablesorter-headerUnSorted{
                   <!-- actual cells with scores and colored background. -->
                   <% row.score_row.each do |score| %>
                       <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%=score.comment%>">
+                        <!-- included Checkbox -->
                         <% if row.question_max_score==1 %>
                         <% if score.score_value==1 %>
                                  <span> &#10003;</span>

@@ -25,7 +25,7 @@ def expect_deadline_check(deadline_condition,send_reminder_condition,display_con
   
       expect(Delayed::Job.count).to eq(1)
   
-      expect(Delayed::Job.last.handler).to include(display_condition)
+      expect(Delayed::Job.last.handler).to include("deadline_type: submission")
     end
   end
 end

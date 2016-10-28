@@ -51,7 +51,7 @@ class ImportFileController < ApplicationController
       begin
         if params[:model] == 'AssignmentTeam' or params[:model] == 'CourseTeam'
           Object.const_get(params[:model]).import(row, params[:id], params[:options])
-        elsif params[:model] == 'SignUpTopic'
+        elsif params[:model] == 'SignUpTopic' or params[:model] == 'ReviewResponseMap' or params[:model] == 'MetareviewResponseMap' or params[:model] == 'SignUpSheet'
           session[:assignment_id] = params[:id]
           Object.const_get(params[:model]).import(row, session, params[:id])
         else

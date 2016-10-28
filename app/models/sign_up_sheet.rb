@@ -83,6 +83,32 @@ class SignUpSheet < ActiveRecord::Base
     [team_id, topic_id]
   end
 
+
+    def self.import(columns, session, _id)
+      if columns.length < 2
+        raise ArgumentError, "The CSV File expects the format: Topic identifier, User1, User2, ..."
+      end
+
+      topic = SignUpTopic.where(topic_identifier: columns[0], assignment_id: session[:assignment_id]).first
+      if topic.nil?
+        raise ImportError, "The topic was not found"
+      end
+
+      index = 1
+      while index < columns.length
+        user = User.find_by_name(columns[index].to_s.strip)
+        if user.nil?
+          raise ImportError, "The user \"#{columns[index]}\" does not exist"
+        end
+        participant = AssignmentParticipant.where(parent_id: session[:assignment_id], user_id:  user.id).first
+        if participant.nil?
+          raise ImportError, "The user \"#{columns[index]}\" is not in this assignment"
+        end
+        signup_team(session[:assignment_id], user.id, topic.id)
+        index += 1
+      end
+    end
+
   def self.otherConfirmedTopicforUser(assignment_id, team_id)
     user_signup = SignedUpTeam.find_user_signup_topics(assignment_id, team_id)
     user_signup

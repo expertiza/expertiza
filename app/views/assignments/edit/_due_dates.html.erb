@@ -271,7 +271,7 @@ function addDaysOrMonth(mul, type) {
             if (type == "days") {//checks if type is date then sets dates
                 curDate.setDate(curDate.getDate() + (days * mul));//sets the date
             } else {
-                curDate.setMonth(curDate.getMonth() + (months * mul));
+                curDate.setMonth(curDate.getMonth() + (months * mul));//sets the months
             }
             $("#datetimepicker_review_round_" + i).val(curDate.getFullYear() + "/" + (curDate.getMonth() + 1) + "/" + curDate.getDate() + " " + date[2].split(" ")[1]);
         }

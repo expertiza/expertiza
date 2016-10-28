@@ -16,12 +16,17 @@ jQuery(document).ready(function() {
 
         $("#date_updater_inner").toggle();
     });
+	//The functions below update the required parameter for the assignments that have their check-boxes marked for updation.
+
+	//This function adds days to the date
     jQuery("#addDays_btn").click(function() {
 
         addDaysOrMonth(1, "days");
         event.preventDefault();
 
     });
+
+	//This function removes 
     jQuery("#subDays_btn").click(function() {
 
         addDaysOrMonth(-1, "days");

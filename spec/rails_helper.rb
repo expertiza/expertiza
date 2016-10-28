@@ -99,6 +99,13 @@ RSpec.configure do |config|
       end
     end
   end  
+  def get_questionnaire(finder_var = nil)
+    if finder_var.nil?
+      AssignmentQuestionnaire.where(assignment_id: @assignment[:id])
+    else
+      AssignmentQuestionnaire.where(assignment_id: @assignment[:id]).where(questionnaire_id: get_selected_id(finder_var))
+    end
+  end
   def expect_deadline_check(deadline_condition, send_reminder_condition, display_condition, dj_condition)
     describe deadline_condition do
       it send_reminder_condition do

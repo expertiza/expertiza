@@ -370,15 +370,7 @@
         //jQuery.get("/assignment/update");
         //jQuery('#assignment_form').submit();
     }
-    function updateDateNewTable(deadline_type, round_no) {
-      var element_id;
-      if (round_no == 0) {
-        element_id = '#' + deadline_type;
-      } else {
-        element_id = '#' + deadline_type + '_round_' + round_no;
-      }
-      jQuery(element_id).remove();
-    }
+  
     function handleChangenameurl(checkvalue,due_date_name_column,due_date_url_column){
         var state = checkvalue;
         var round_count = <%= @assignment_form.assignment.rounds_of_reviews%>;
@@ -424,6 +416,15 @@
         else{
             return;
         }
+    }
+	  function updateDateTable(deadline_type, round_no) {
+      var element_id;
+      if (round_no == 0) {
+        element_id = '#' + deadline_type;
+      } else {
+        element_id = '#' + deadline_type + '_round_' + round_no;
+      }
+      jQuery(element_id).remove();
     }
         function removeOrAddMetareview(){
             if(document.getElementById("metareview")) {

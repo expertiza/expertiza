@@ -1,5 +1,5 @@
 require 'rails_helper'
-def check_valid_or_invalid_file_with_3_columns(itcondition_string, filepath_string, havecontent_string1, havecontent_string2)
+def check_valid_or_invalid_file_with_3columns(itcondition_string, filepath_string, havecontent_string1, havecontent_string2)
   it itcondition_string do
     login_as("instructor6")
     visit '/assignments/1/edit'

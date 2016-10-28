@@ -97,7 +97,6 @@ class TeamsController < ApplicationController
   # The team and team members are all copied.
   def inherit
     assignment = Assignment.find(params[:id])
-    puts "Inside #{assignment.id}"
     if assignment.course_id >= 0
       course = Course.find(assignment.course_id)
       teams = course.get_teams

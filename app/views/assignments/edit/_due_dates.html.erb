@@ -26,19 +26,23 @@ jQuery(document).ready(function() {
 
     });
 
-	//This function removes 
+	//This function removes days from the date
     jQuery("#subDays_btn").click(function() {
 
         addDaysOrMonth(-1, "days");
         event.preventDefault();
 
     });
+	
+	//This function adds months to the date 
     jQuery("#addMonth_btn").click(function() {
 
         addDaysOrMonth(1, "months");
         event.preventDefault();
 
     });
+
+
     jQuery("#subMonth_btn").click(function() {
 
         addDaysOrMonth(-1, "months");

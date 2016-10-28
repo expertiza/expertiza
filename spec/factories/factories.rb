@@ -325,17 +325,20 @@ FactoryGirl.define do
     is_submitted false
   end
   factory :response_1, class: Response do
-    response_map { ResponseMap.first || association(:response_map) }
+    response_map { ResponseMap.first || association(:response_map_review) }
     additional_comment nil
     version_num nil
     round 1
     is_submitted true
   end
-  factory :response_map, class: ResponseMap do
-    #assignment { Assignment.first || association(:assignment) }
+  factory :response_map_review, class: ResponseMap do
     reviewee_id 1
     reviewer_id 1
     type 'ReviewResponseMap'
+  end
+
+  factory :response_map_metareview, class: ResponseMap do
+    type 'MetareviewResponseMap'
 
   end
 

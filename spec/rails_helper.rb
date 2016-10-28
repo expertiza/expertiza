@@ -53,26 +53,7 @@ RSpec.configure do |config|
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
   config.infer_spec_type_from_file_location!
-  def integration_tests_for_instructor_interface 
-    describe "Integration tests for instructor interface" do
-      before(:each) do
-        create(:assignment)
-        create_list(:participant, 3)
-        create(:assignment_node)
-        create(:deadline_type, name: "submission")
-        create(:deadline_type, name: "review")
-        create(:deadline_type, name: "metareview")
-        create(:deadline_type, name: "drop_topic")
-        create(:deadline_type, name: "signup")
-        create(:deadline_type, name: "team_formation")
-        create(:deadline_right)
-        create(:deadline_right, name: 'Late')
-        create(:deadline_right, name: 'OK')
-        create(:assignment_due_date)
-        create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now + (100 * 24 * 60 * 60))
-      end
-    end
-  end  
+ 
   def login_as(user_name)
     user = User.find_by_name(user_name)
     msg = user.to_yaml

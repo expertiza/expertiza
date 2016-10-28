@@ -186,22 +186,7 @@ describe "assignment function" do
     end
 
     edit_topics_properties
-    it "can edit topics properties" do
-      uncheck("assignment_form_assignment_allow_suggestions")
-      uncheck("assignment_form_assignment_is_intelligent")
-      uncheck("assignment_form_assignment_can_review_same_topic")
-      uncheck("assignment_form_assignment_can_choose_topic_to_review")
-      uncheck("assignment_form_assignment_use_bookmark")
-      click_button 'submit_btn'
-      assignment = Assignment.where(name: 'public assignment for test').first
-      expect(assignment).to have_attributes(
-        allow_suggestions: false,
-        is_intelligent: false,
-        can_review_same_topic: false,
-        can_choose_topic_to_review: false,
-        use_bookmark: false
-      )
-    end
+    edit_topics_properties
   end
 
   # Begin rubric tab

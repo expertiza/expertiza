@@ -12,14 +12,14 @@ class Leaderboard < ActiveRecord::Base
   # with a specific course.
 
   ### This methodreturns unaffiliiated assignments - assignments not affiliated to any course
-  def self.get_independant_assignments(user_id)
+  # def self.get_independant_assignments(user_id)
     # assignment_ids = assignment_participant.where(user_id: user_id).pluck(:parent_id)
     # no_course_assignments = Assignment.where(id: assignment_ids, course_id: nil)
-  end
-
-  def self.get_assignments_in_courses(course_array)
+    # end
+    
+    # def self.get_assignments_in_courses(course_array)
     # assignment_list = Assignment.where(course_id: course_array)
-  end
+    # end
 
   # This method gets all tuples in the Participants table associated
   # hierarchy (q_type => course => user => score)
@@ -63,14 +63,15 @@ class Leaderboard < ActiveRecord::Base
     assignment_map = get_assignment_mapping(assignment_list, participant_list, team_list)
 
     # Aggregate total reviewee list
-    reviewee_list = []
+    # reviewee_list = []
     reviewee_list = participant_list.pluck(:id)
     reviewee_list.concat(team_list.pluck(:id)).uniq!
 
     # Get scores from ScoreCache for computed reviewee list.
     scores = ScoreCache.where("reviewee_id IN (?) and object_type IN (?)", reviewee_list, questionnaire_response_type_hash.keys)
 
-    for score_entry in scores
+    # for score_entry in scores
+    scores.each do |score_entry|
       reviewee_user_id_list = []
       if assignment_map["team"].key?(score_entry.reviewee_id)
         # Reviewee is a team. Actual Reviewee will be users of the team.

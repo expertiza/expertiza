@@ -12,11 +12,10 @@ class Leaderboard < ActiveRecord::Base
   # with a specific course.
 
   ### This methodreturns unaffiliiated assignments - assignments not affiliated to any course
-  # def self.get_independant_assignments(user_id)
+    # def self.get_independant_assignments(user_id)
     # assignment_ids = assignment_participant.where(user_id: user_id).pluck(:parent_id)
     # no_course_assignments = Assignment.where(id: assignment_ids, course_id: nil)
     # end
-    
     # def self.get_assignments_in_courses(course_array)
     # assignment_list = Assignment.where(course_id: course_array)
     # end
@@ -97,7 +96,7 @@ class Leaderboard < ActiveRecord::Base
   def self.add_score_to_resultant_hash(q_type_hash, questionnaire_type, course_id, reviewee_user_id_list, score_entry_score)
     if reviewee_user_id_list
       # Loop over all the reviewee_user_id.
-      #for reviewee_user_id in reviewee_user_id_list
+      # for reviewee_user_id in reviewee_user_id_list
       reviewee_user_id_list.each do |reviewee_user_id|
         if q_type_hash.fetch(questionnaire_type, {}).fetch(course_id, {}).fetch(reviewee_user_id, nil).nil?
           user_hash = {}
@@ -189,20 +188,20 @@ class Leaderboard < ActiveRecord::Base
     course_id_list.each do |course_id|
         # for accomplishment in accomplishment_map.keys
         accomplishment_map.keys.each do |accomplishment|
-        # Get score for current questionnaire_type/accomplishment, course_id and user_id from cs_hash
-        score = cs_hash.fetch(accomplishment, {}).fetch(course_id, {}).fetch(user_id, nil)
-        next unless score
-        if course_accomplishment_hash[course_id].nil?
-          course_accomplishment_hash[course_id] = []
+            # Get score for current questionnaire_type/accomplishment, course_id and user_id from cs_hash
+            score = cs_hash.fetch(accomplishment, {}).fetch(course_id, {}).fetch(user_id, nil)
+            next unless score
+            if course_accomplishment_hash[course_id].nil?
+                course_accomplishment_hash[course_id] = []
+            end
+            # Calculate rank of current user
+            rank = 1 + cs_sorted_hash[accomplishment][course_id].index([user_id, score])
+            total = cs_sorted_hash[accomplishment][course_id].length
+            
+            course_accomplishment_hash[course_id] << {accomp: accomplishment_map[accomplishment],
+                                                    score: score[0],
+                                                    rankStr: "#{rank} of #{total}"}
         end
-        # Calculate rank of current user
-        rank = 1 + cs_sorted_hash[accomplishment][course_id].index([user_id, score])
-        total = cs_sorted_hash[accomplishment][course_id].length
-
-        course_accomplishment_hash[course_id] << {accomp: accomplishment_map[accomplishment],
-                                                  score: score[0],
-                                                  rankStr: "#{rank} of #{total}"}
-      end
     end
     course_accomplishment_hash
   end

@@ -1,20 +1,4 @@
 require 'rails_helper'
-  def instructor_login
-    describe "Instructor login" do
-      it "with valid username and password" do
-      login_as("instructor6")
-      visit '/tree_display/list'
-      expect(page).to have_content("Manage content")
-  end
-
-    it "with invalid username and password" do
-      visit root_path
-      fill_in 'login_name', with: 'instructor6'
-      fill_in 'login_password', with: 'something'
-      click_button 'SIGN IN'
-      expect(page).to have_content('Your username or password is incorrect.')
-    end
-  end
 
 
 

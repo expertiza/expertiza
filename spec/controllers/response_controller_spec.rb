@@ -60,5 +60,24 @@ RSpec.describe ResponseController, type: :controller do
         expect(response).to have_http_status(302)
       end
     end
+
+    describe "#update" do
+        let!(:first_review) { Response.create(map_id: 1, additional_comment: 'hello', round: 1) }
+          before {
+            allow(Response).to receive(:find).and_return(first_review)
+            allow(first_review).to receive_message_chain(:map, :reviewer, :user_id).and_return(1)
+            allow_any_instance_of(ApplicationController).to receive(:current_user_id?).and_return(true)
+            allow(first_review).to receive(:map).and_return(map)
+            allow(map).to receive(:reviewer).and_return(@user)
+            allow(@user).to receive(:user_id).and_return(1)
+            allow(map).to receive(:map_id).and_return(1)
+            put :update, :review => {:additional_comment => "Update Title", :map_id => "2", :round => '1'},:id => first_review.id
+         }
+
+          it "located the requested response" do
+            expect(assigns(:response)).to eq(first_review)
+          end
+
   end
-end
+  end
+  end

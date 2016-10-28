@@ -51,8 +51,11 @@ class JoinTeamRequestsController < ApplicationController
 
         participant = Participant.where(user_id: session[:user][:id], parent_id: params[:assignment_id]).first
         @join_team_request.participant_id = participant.id
+        user = User.find(participant.user_id)
         respond_to do |format|
           if @join_team_request.save
+	    prepared_mail = MailerHelper.send_mail_for_advertisement_response(user, "Response for Team Advertisement", "response_to_advertisement", "request to join team", participant.name)
+	    prepared_mail.deliver
             format.html { redirect_to(@join_team_request, notice: 'JoinTeamRequest was successfully created.') }
             format.xml  { render xml: @join_team_request, status: :created, location: @join_team_request }
           else

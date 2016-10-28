@@ -54,13 +54,12 @@ describe 'AssignmentTeam' do
 
   describe "copy assignment team to course team" do
     it "should allow assignment team to be copied to course team" do
-      course_team = build(:course_team)
+      course_team = CourseTeam.new()
+      course_team.save!
       assign_team = build(:assignment_team)
-
       assign_team.copy(course_team.id)
-      expect(CourseTeam.create_team_node
-      
-
+      expect(CourseTeam.create_team_and_node(course_team.id))
+      expect(course_team.copy_members(course_team.id))
     end
   end
 end

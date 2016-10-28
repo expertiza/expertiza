@@ -79,7 +79,7 @@ describe "Questionnaire tests for instructor interface" do
     
 
   describe "Create a private review questionnaire", type: :controller do
-    create_private_review 
+    create_private_review
   end
 
   def load_questionnaire
@@ -96,18 +96,25 @@ describe "Questionnaire tests for instructor interface" do
 
     click_button "Create"
   end 
-
-  describe "Create a review question", type: :controller do
-    it "is able to create a Criterion question" do
+  
+  def create_review_question(type_qn_condition,type)
+    it type_qn_condition do
       load_questionnaire
       fill_in('question_total_num', with: '1')
-      select('Criterion', from: 'question_type')
+      select(type, from: 'question_type')
       click_button "Add"
       expect(page).to have_content('Remove')
 
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
     end
+  end
+
+
+  describe "Create a review question", type: :controller do
+    type_qn_condition = "is able to create a Criterion question"
+    type = 'Criterion'
+    create_review_question(type_qn_condition,type) 
 
     it "is able to create a Scale question" do
       load_questionnaire

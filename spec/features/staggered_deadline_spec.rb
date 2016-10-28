@@ -40,6 +40,28 @@ describe "Staggered deadline test" do
     create(:topic_due_date, due_at: DateTime.now + 30, deadline_type: DeadlineType.where(name: 'submission').first, topic: SignUpTopic.where(id: 2).first, round: 2)
     create(:topic_due_date, due_at: DateTime.now + 40, deadline_type: DeadlineType.where(name: 'review').first, topic: SignUpTopic.where(id: 2).first, round: 2)
   end
+
+  it "instructor can create an assignment with varying rubric by round feature" do
+     login_as("instructor6")
+     visit '/tree_display/list'
+     visit '/assignments/new?private=0'
+     
+     fill_in 'assignment_form_assignment_name', with: 'test assignment creation'
+     fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+     click_button 'Create'
+     find_link('Rubrics').click
+     check("assignment_questionnaire_used_in_round")
+     find_link('Topics').click
+     find_link('New topic').click
+     expect(page).to have_content 'New topic'
+     fill_in 'topic_topic_identifier', with:'1'
+     fill_in 'topic_topic_name', with:'Topic_1'
+     fill_in 'topic_category', with: 'Test'
+     fill_in 'topic_max_choosers', with: '1'
+     click_button 'Create'
+     
+  end 
+ 
  
   #impersonate student to submit work
   def submit_topic  
@@ -94,8 +116,26 @@ describe "Staggered deadline test" do
     expect(page).to have_content "https://ncsu.edu" 
   end
   
-  it "test" do
+  it "test1: in round 1, student2064 in review stage, student2065 in submission stage" do
+    #impersonate each participant submit their topics
     submit_topic  
+    #change deadlines of topic2 
+    topic_due_1 = TopicDueDate.where(parent_id: 2, deadline_type_id: 1, round: 1, type: "TopicDueDate").first
+    topic_due_1.due_at = DateTime.now + 10
+    topic_due_1.save
+    topic_due_2 = TopicDueDate.where(parent_id: 2, deadline_type_id: 2, round: 1, type: "TopicDueDate").first
+    topic_due_2.due_at = DateTime.now + 11
+    topic_due_2.save
+    topic_due_3 = TopicDueDate.where(parent_id: 2, deadline_type_id: 1, round: 2, type: "TopicDueDate").first
+    topic_due_3.due_at = DateTime.now + 12
+    topic_due_3.save
+    topic_due_4 = TopicDueDate.where(parent_id: 2, deadline_type_id: 2, round: 2, type: "TopicDueDate").first
+    topic_due_4.due_at = DateTime.now + 13
+    topic_due_4.save
+    topic_due = TopicDueDate.where(parent_id: 1, deadline_type_id: 1, round: 1, type: "TopicDueDate").first
+    topic_due.due_at = DateTime.now - 10
+    topic_due.save
+
   end
 
 =begin

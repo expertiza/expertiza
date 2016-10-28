@@ -37,6 +37,9 @@ class InvitationController < ApplicationController
             @invitation.assignment_id = student.parent_id
             @invitation.reply_status = 'W'
             @invitation.save
+	    # To send mail request to invitees to join team
+	    prepared_mail = MailerHelper.send_mail_for_invitation(user, "Invitation to join team", "team_join_invite", "invitation to join", student.name)
+            prepared_mail.deliver
           else
             flash[:note] = "You have already sent an invitation to \"#{user.name}\"."
           end

@@ -30,7 +30,7 @@ def expect_deadline_check(deadline_condition)
   end
 end
 
-test1('Submission deadline reminder email')
+expect_deadline_check('Submission deadline reminder email')
 
 describe 'Review deadline reminder email' do
   it 'is able to send reminder email for review deadline to reviewers ' do

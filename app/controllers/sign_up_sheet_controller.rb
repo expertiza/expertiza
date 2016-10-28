@@ -251,22 +251,30 @@ class SignUpSheetController < ApplicationController
   def set_priority
     @user_id = session[:user].id
     unless params[:topic].nil?
-      @bids = Bid.where("user_id LIKE ?", @user_id )
-      signed_up_topics = @bids.map {|bid| bid.topic_id}
-
-      #Remove topics from bids table if the student moves data from Selection HTML table to Topics HTML table
-      #This step is necessary to avoid duplicate priorities in Bids table
-      signed_up_topics = signed_up_topics - params[:topic].map {|topic_id| topic_id.to_i}
-      signed_up_topics.each do |topic|
-        Bid.where(topic_id: topic, user_id: @user_id).destroy_all
+      team_user = TeamsUser.where(user_id: @user_id)
+      users = User.find(@user_id)
+      if !team_user.nil)
+        users = TeamsUser.where(team_id: team_user.first.team_id)
       end
+      users.each do |user|
+        @bids = Bid.where("user_id LIKE ?", user.id )
+        signed_up_topics = @bids.map {|bid| bid.topic_id}
 
-      params[:topic].each_with_index do |topic_id,index |
-        check = @bids.where(topic_id: topic_id)
-        if check.empty?
-          Bid.create(topic_id: topic_id, user_id: @user_id, priority: index + 1)
-        else
-          Bid.where("topic_id LIKE ? AND user_id LIKE ?",topic_id, @user_id ).update_all({priority: index + 1})
+        #Remove topics from bids table if the student moves data from Selection HTML table to Topics HTML table
+        #This step is necessary to avoid duplicate priorities in Bids table
+        signed_up_topics = signed_up_topics - params[:topic].map {|topic_id| topic_id.to_i}
+        signed_up_topics.each do |topic|
+          Bid.where(topic_id: topic, user_id: user.id).destroy_all
+        end
+
+        params[:topic].each_with_index do |topic_id,index |
+          check = @bids.where(topic_id: topic_id)
+          if check.empty?
+            Bid.create(topic_id: topic_id, user_id: user.id, priority: index + 1)
+          else
+            Bid.where("topic_id LIKE ? AND user_id LIKE ?",topic_id, user.id).update_all({priority: index + 1})
+          end
+        end
         end
       end
     else

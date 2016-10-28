@@ -586,12 +586,14 @@ var timezonepref = "<%= current_user.timezonepref %>";
 result << ["(UTC #{'%.2d:00' % utc_offset}): #{tz.name}",  "#{'%.2d:00' % utc_offset}"]
  end), selected:"-05:00") %>
 
+	<%= label_tag('Days') %>	
 	<%= button_tag "+", :id => 'addDays_btn' %> 
-	<%= label_tag('Days') %>
+	
 	<%= number_field_tag 'days', 0, min: 0, max: 100 ,:id=>'days' %>
 	<%= button_tag "-", :id => 'subDays_btn' %>
-	<%= button_tag "+", :id => 'addMonth_btn' %>
 	<%= label_tag('Months') %>
+	<%= button_tag "+", :id => 'addMonth_btn' %>
+	
 	<%= number_field_tag 'months', 0, min: 0, max: 12 ,:id=>'months' %>
 	<%= button_tag "-", :id => 'subMonth_btn' %>
 

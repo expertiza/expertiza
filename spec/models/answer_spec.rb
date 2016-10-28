@@ -17,7 +17,7 @@ describe Answer do
       # stub for ScoreView.find_by_sql to revent prevent unit testing sql db queries
       ScoreView.stub(:find_by_sql).and_return([double("scoreview",weighted_score: 20,sum_of_weights: 5,q1_max_question_score: 4)])
       Answer.stub(:where).and_return([double("row1",question_id: 1,answer: "1")])
-      expect(Answer.get_total_score(response: [response_record], questions: [question1])).to be 100.0
+      expect(Answer.get_total_score(response: [response_record], questions: [question1])).to eq 100.0
       #output calculation is (weighted_score / (sum_of_weights * max_question_score)) * 100
       # 4.0
     end
@@ -31,13 +31,13 @@ describe Answer do
     it "returns -1 when answer is nil for scored question which makes sum of weights = 0" do
       ScoreView.stub(:find_by_sql).and_return([double("scoreview",weighted_score: 20,sum_of_weights: 1,q1_max_question_score: 5)])
       Answer.stub(:where).and_return([double("row1",question_id: 1,answer: nil)])
-      expect(Answer.get_total_score(response: [response_record], questions: [question1])).to be -1.0
+      expect(Answer.get_total_score(response: [response_record], questions: [question1])).to eq -1.0
     end
 
     it "returns -1 when weighted_score of questionnaireData is nil" do
       ScoreView.stub(:find_by_sql).and_return([double("scoreview",weighted_score: nil,sum_of_weights: 5,q1_max_question_score: 5)])
       Answer.stub(:where).and_return([double("row1",question_id: 1,answer: nil)])
-      expect(Answer.get_total_score(response: [response_record], questions: [question1])).to be -1.0
+      expect(Answer.get_total_score(response: [response_record], questions: [question1])).to eq -1.0
     end
 
     it "checks if submission_valid? is called" do
@@ -56,9 +56,9 @@ describe Answer do
       assessments=[]
       Answer.stub(:get_total_score).and_return(100.0)
       scores=Answer.compute_scores(assessments, [question1])
-      expect(scores[:max]).to be nil
-      expect(scores[:min]).to be nil
-      expect(scores[:avg]).to be nil
+      expect(scores[:max]).to eq nil
+      expect(scores[:min]).to eq nil
+      expect(scores[:avg]).to eq nil
     end
 
     it "returns scores when a single valid assessment of total score 100 is give" do
@@ -67,9 +67,9 @@ describe Answer do
       total_score=100.0
       Answer.stub(:get_total_score).and_return(total_score)
       scores=Answer.compute_scores(assessments, [question1])
-      expect(scores[:max]).to be total_score
-      expect(scores[:min]).to be total_score
-      expect(scores[:avg]).to be total_score
+      expect(scores[:max]).to eq total_score
+      expect(scores[:min]).to eq total_score
+      expect(scores[:avg]).to eq total_score
     end
 
     it "returns scores when two valid assessments of total scores 80 and 100 are given" do
@@ -79,9 +79,9 @@ describe Answer do
       total_score2=80.0
       Answer.stub(:get_total_score).and_return(total_score1,total_score2)
       scores=Answer.compute_scores(assessments, [question1])
-      expect(scores[:max]).to be total_score1
-      expect(scores[:min]).to be total_score2
-      expect(scores[:avg]).to be (total_score1+total_score2)/2
+      expect(scores[:max]).to eq total_score1
+      expect(scores[:min]).to eq total_score2
+      expect(scores[:avg]).to eq (total_score1+total_score2)/2
     end
 		
     it "returns scores when an invalid assessments is given" do
@@ -90,9 +90,9 @@ describe Answer do
       total_score=100.0
       Answer.stub(:get_total_score).and_return(total_score)
       scores=Answer.compute_scores(assessments, [question1])
-      expect(scores[:max]).to be total_score
-      expect(scores[:min]).to be total_score
-      expect(scores[:avg]).to be 0
+      expect(scores[:max]).to eq total_score
+      expect(scores[:min]).to eq total_score
+      expect(scores[:avg]).to eq 0
     end
 
     it "returns scores when invalid flag is nil" do
@@ -101,9 +101,9 @@ describe Answer do
       total_score=100.0
       Answer.stub(:get_total_score).and_return(total_score)
       scores=Answer.compute_scores(assessments, [question1])
-      expect(scores[:max]).to be total_score
-      expect(scores[:min]).to be total_score
-      expect(scores[:avg]).to be total_score
+      expect(scores[:max]).to eq total_score
+      expect(scores[:min]).to eq total_score
+      expect(scores[:avg]).to eq total_score
     end  
 
     it "checks if get_total_score function is called" do
@@ -152,7 +152,7 @@ describe Answer do
       ResubmissionTime1, ResubmissionTime2 = Time.new-24, Time.new-48
       AssignmentDueDate.stub_chain(:where, :order).and_return(due_date1, due_date2)
       ResubmissionTime.stub_chain(:where, :order).and_return(ResubmissionTime1, ResubmissionTime2)
-      expect(Answer.submission_valid?(response_record)).to be nil
+      expect(Answer.submission_valid?(response_record)).to eq nil
     end
 
 

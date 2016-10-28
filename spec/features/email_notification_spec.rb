@@ -69,5 +69,31 @@ feature 'New submission mailer' do
 
   scenario 'testing for content' do
     expect(current_email).to have_content 'assignment has just been entered'
+
+    feature 'update assignment email notification' do
+  background do
+    student = FactoryGirl.create :student
+    assignment = FactoryGirl.create :assignment
+    # will clear the message queue
+    clear_emails
+
+    Mailer.sync_message(
+        recipients: 'expertiza.development@gmail.com',
+        subject: "One of the assignment#{assignment.name} is updated, you can review it now",
+        body: {
+            home_page: '123',
+            first_name: ApplicationHelper.get_user_first_name(student),
+            name: student.name,
+            password: student.password,
+            partial_name: "update"
+        }
+    ).deliver_now
+
+    open_email('expertiza.development@gmail.com')
+  end
+  scenario 'testing for content' do
+    expect(current_email).to have_content 'One of the'
+    expect(current_email).to have_content 'assignment has just been entered or revised.'
+    expect(current_email).to have_content 'You may log into Expertiza and review the work now'
   end
 end

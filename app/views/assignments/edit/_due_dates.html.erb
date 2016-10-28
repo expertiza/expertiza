@@ -5,29 +5,45 @@
         event.preventDefault(); // Prevent link from following its href
     });
 	jQuery("#addDays_btn").click(function () {
-		//alert('addDays_btn') // Prevent link from following its href
-		//var due_dates_table_element_list = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)');
-		//console.log(due_dates_table_element_list[1].use_updator_review_round_1.value);
-		//alert($('#use_updator_review_round_1').is(':checked'));
-		//alert($('#datetimepicker_review_round_2').val().split("/"));
-		var date=$('#datetimepicker_review_round_2').val().split("/");
+		
+		for (var i=1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').length/2; i++)
+		{
+			if($('#use_updator_review_round_'+i).is(':checked'))
+				{
+					var date=$('#datetimepicker_review_round_'+i).val().split("/");
 		
 		var d = parseInt(date[2].split(" ")[0], 10),
         	m = parseInt(date[1], 10),
         	y = parseInt(date[0], 10);
 		var curDate=new Date(y, m-1, d);
-		
-		
-		//alert(curDate+" , "+y+" , "+m+" , "+d);
-		
 		var days = parseInt($('#days').val(), 10);
 		//alert(days);
         	curDate.setDate(curDate.getDate() + days);
-		//alert(curDate.getDate());
-		//alert(curDate.getMonth());
-		//alert(curDate.getFullYear());
-  $("#datetimepicker_review_round_2").val(curDate.getFullYear()+"/"+(curDate.getMonth()+1)+"/"+curDate.getDate()+" "+ date[2].split(" ")[1]);
-		//alert($('#datetimepicker_review_round_2').val());
+
+  		$("#datetimepicker_review_round_"+i).val(curDate.getFullYear()+"/"+(curDate.getMonth()+1)+"/"+curDate.getDate()+" "+ date[2].split(" ")[1]);
+
+				}
+		}
+		
+		for (var i=1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').length/2;i++)
+		{
+			if($('#use_updator_submission_round_'+i).is(':checked'))
+				{
+					var date=$('#datetimepicker_submission_round_'+i).val().split("/");
+		
+		var d = parseInt(date[2].split(" ")[0], 10),
+        	m = parseInt(date[1], 10),
+        	y = parseInt(date[0], 10);
+		var curDate=new Date(y, m-1, d);
+		var days = parseInt($('#days').val(), 10);
+		//alert(days);
+        	curDate.setDate(curDate.getDate() + days);
+
+  		$("#datetimepicker_submission_round_"+i).val(curDate.getFullYear()+"/"+(curDate.getMonth()+1)+"/"+curDate.getDate()+" "+ date[2].split(" ")[1]);
+
+				}
+		}
+		
        		 
     });
 	jQuery("#addMonth_btn").click(function () {

@@ -396,17 +396,17 @@ RSpec.feature "list suggestions"  do
 		expect(page).to have_content "The suggestion was successfully approved."
 	end
 
-	scenario "Form team and approve topic" do	
+	# scenario "Form team and approve topic" do	
 		
-		user = User.find_by_name('instructor6')
-        stub_current_user(user, user.role.name, user.role)
+	# 	user = User.find_by_name('instructor6')
+ #        stub_current_user(user, user.role.name, user.role)
 		
-		visit '/teams/list?id=1&type=Assignment'
+	# 	visit '/teams/list?id=1&type=Assignment'
 		
-		find_link("Create Team").click
+	# 	find_link("Create Team").click
 
-		fill_in 'Team Name:', with: 'Team1'
-		click_button "Save"
+	# 	fill_in 'Team Name:', with: 'Team1'
+	# 	click_button "Save"
 		
 
 		# ------------------------------------------ Student creates suggestion --------------------------------- #
@@ -425,7 +425,7 @@ RSpec.feature "list suggestions"  do
 		# expect(page).to have_content "Team Information for Assignment 1"
 		# expect(page).to have_content "Invite people"
 		
-	end	
+	# end	
 	
 
 

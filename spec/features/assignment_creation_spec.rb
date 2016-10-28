@@ -9,6 +9,25 @@ def questionnaire_options(assignment, type, _round = 0)
   options
 end
 
+def edit_topics_properties
+  it "can edit topics properties" do
+    check("assignment_form_assignment_allow_suggestions")
+    check("assignment_form_assignment_is_intelligent")
+    check("assignment_form_assignment_can_review_same_topic")
+    check("assignment_form_assignment_can_choose_topic_to_review")
+    check("assignment_form_assignment_use_bookmark")
+    click_button 'submit_btn'
+    assignment = Assignment.where(name: 'public assignment for test').first
+    expect(assignment).to have_attributes(
+      allow_suggestions: true,
+      is_intelligent: true,
+      can_review_same_topic: true,
+      can_choose_topic_to_review: true,
+      use_bookmark: true
+    )
+  end
+end
+
 def get_selected_id(finder_var)
   if finder_var == "ReviewQuestionnaire2"
     ReviewQuestionnaire.find_by(name: finder_var)[:id]
@@ -166,23 +185,7 @@ describe "assignment function" do
       find_link('Topics').click
     end
 
-    it "can edit topics properties" do
-      check("assignment_form_assignment_allow_suggestions")
-      check("assignment_form_assignment_is_intelligent")
-      check("assignment_form_assignment_can_review_same_topic")
-      check("assignment_form_assignment_can_choose_topic_to_review")
-      check("assignment_form_assignment_use_bookmark")
-      click_button 'submit_btn'
-      assignment = Assignment.where(name: 'public assignment for test').first
-      expect(assignment).to have_attributes(
-        allow_suggestions: true,
-        is_intelligent: true,
-        can_review_same_topic: true,
-        can_choose_topic_to_review: true,
-        use_bookmark: true
-      )
-    end
-
+    edit_topics_properties
     it "can edit topics properties" do
       uncheck("assignment_form_assignment_allow_suggestions")
       uncheck("assignment_form_assignment_is_intelligent")

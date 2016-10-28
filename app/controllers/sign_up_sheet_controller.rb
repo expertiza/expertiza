@@ -154,15 +154,27 @@ class SignUpSheetController < ApplicationController
      @assignment = Assignment.find(params[:assignment_id])
 
      #begin
-     # User.find_by!(name: params[:user][:name])
-     #rescue ActiveRecord::RecordNotFound
-     #   flash[:error] = "User doesnot exist"
+      #User.find_by!(name: params[:user][:name])
+     # rescue ActiveRecord::RecordNotFound
+     #   flash[:error] = "User does not exist"
      #   redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
      #end
 
+     #@user = User.find_by_sql("select * from users where name = '"+ params[:user][:name].to_s+"'")
+     #if(@user.any?)
+
+       #redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
+     #end
+
+      @user = User.find_by name: params[:user][:name]
+
+      if @user.blank?
+        flash[:error] = "User does not exist"
+        redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
+      else
 
        @team = TeamsUser.find_by_sql("select T1.team_id from teams_users T1, teams T2 where T1.user_id = "+ @user.id.to_s+" AND T1.team_id = T2.id AND T2.parent_id = "+ @assignment.id.to_s)
-       puts @team[0].team_id
+
        @isTopicTaken = SignedUpTeam.find_by_sql("select * from signed_up_teams where topic_id = "+ @topic.id.to_s)
        @disp_flag = 0
 
@@ -174,7 +186,7 @@ class SignUpSheetController < ApplicationController
           if(@isTopicTaken.any?)
 
              if(@userTeam.any?)
-               @oldTopic = @userTeam.topic_id;
+               @oldTopic = @userTeam[0].topic_id;
                 @isTopicTaken.each do |f|
                    if f.team_id == @team[0].team_id
                       @disp_flag = 1
@@ -193,7 +205,7 @@ class SignUpSheetController < ApplicationController
                       flash[:success] = "The topic has been assigned to the team"
                    end
 
-                   @oldTopicTeams = SignedUpTeam.find_by_sql("select * from signed_up_teams where topic_id= "+ @oldTopic+" and is_waitlisted=1")
+                   @oldTopicTeams = SignedUpTeam.find_by_sql("select * from signed_up_teams where topic_id= "+ @oldTopic.to_s+" and is_waitlisted=1")
                    if(@oldTopicTeams.any?)
                      @oldTopicTeams[0].update(is_waitlisted: 0)
                    end
@@ -217,13 +229,13 @@ class SignUpSheetController < ApplicationController
 
              else #isTopicTaken
                 if @userTeam.any?
-                   @oldTopic = @userTeam.topic_id;
+                   @oldTopic = @userTeam[0].topic_id;
 
                    puts "Topic is getting assigned"
                    @userTeam[0].update(topic_id: @topic.id)
                    @userTeam[0].update(is_waitlisted: 0)
 
-                   @oldTopicTeams = SignedUpTeam.find_by_sql("select * from signed_up_teams where topic_id= "+ @oldTopic+" and is_waitlisted=1")
+                   @oldTopicTeams = SignedUpTeam.find_by_sql("select * from signed_up_teams where topic_id= "+ @oldTopic.to_s+" and is_waitlisted=1")
                    if(@oldTopicTeams.any?)
                      @oldTopicTeams[0].update(is_waitlisted: 0)
                    end
@@ -247,7 +259,8 @@ class SignUpSheetController < ApplicationController
           flash[:error] = "This user does not have a team"
           redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
        end
-       end
+      end
+     end
 
 
      #"select * from assignments where id not in (select assignment_id from assignment_signups where signup_id = " + @params[:id].to_s + ")")

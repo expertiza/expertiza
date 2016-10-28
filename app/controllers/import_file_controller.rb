@@ -120,6 +120,16 @@ class ImportFileController < ApplicationController
         expected_fields_variable_default = ['Team Name - optional', 'Team Member1','Team Member2', 'Team Member3', 'Team Member4']
       when "User"
         expected_fields_variable_default = [ 'username', 'full name (first[ middle] last)', 'e-mail address']
+      when "ReviewResponseMap"
+        expected_fields_variable_default = [ 'Contributor', 'Reviewer1', 'Reviewer2']
+        (3..15).each do |i|
+          expected_fields_variable_default.push("Reviewer#{i}")
+        end
+      when "MetaeviewResponseMap"
+        expected_fields_variable_default = [ 'Contributor', 'Reviewer', 'Metareviewer1','Metareviewer2']
+        (3..15).each do |i|
+          expected_fields_variable_default.push("Metareviewer#{i}")
+        end
       else
         expected_fields_variable_default = ['Team Name - optional', 'Team Member1','Team Member2', 'Team Member3', 'Team Member4']
     end

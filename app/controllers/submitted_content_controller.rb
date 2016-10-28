@@ -59,7 +59,7 @@ class SubmittedContentController < ApplicationController
         @participant.update_resubmit_times
 
         #create a submission record
-        @submission_record = SubmissionRecord.new(team_id: team, user: @participant.name, assignment_id: params[:id], operation: "Submit Hyperlink")
+        @submission_record = SubmissionRecord.new(team_id: team.id, content: params['submission'], user: @participant.name, assignment_id: params[:id], operation: "Submit Hyperlink")
         @submission_record.save
       rescue
         flash[:error] = "The URL or URI is not valid. Reason: #{$ERROR_INFO}"
@@ -86,7 +86,7 @@ class SubmittedContentController < ApplicationController
     assignment = Assignment.find(@participant.parent_id)
 
     #create a submission record
-    @submission_record = SubmissionRecord.new(team_id: team.id, user:@participant.name , assignment_id: assignment.id, operation: "Remove Hyperlink")
+    @submission_record = SubmissionRecord.new(team_id: team.id, content: hyperlink_to_delete, user:@participant.name , assignment_id: assignment.id, operation: "Remove Hyperlink")
     @submission_record.save
 
 
@@ -131,7 +131,7 @@ class SubmittedContentController < ApplicationController
     #create a submission record
     assignment = Assignment.find(participant.parent_id)
     team = participant.team
-    @submission_record = SubmissionRecord.new(team_id: team.id, user: participant.name , assignment_id: assignment.id, operation: "Submit File")
+    @submission_record = SubmissionRecord.new(team_id: team.id, content: full_filename, user: participant.name , assignment_id: assignment.id, operation: "Submit File")
     @submission_record.save
 
    # params = ActionController::Parameters.new(a: "123", b: "456")
@@ -222,13 +222,15 @@ class SubmittedContentController < ApplicationController
   end
 
   def delete_selected_files
+
+    filename = params[:directories][params[:chk_files]] + "/" + params[:filenames][params[:chk_files]]
+    FileUtils.rm_r(filename)
+
     #create a submission record
     assignment = Assignment.find(participant.parent_id)
     team = participant.team
-    @submission_record = SubmissionRecord.new(team_id: team.id, user: participant.name , assignment_id: assignment.id, operation: "Submit File")
+    @submission_record = SubmissionRecord.new(team_id: team.id, content: full_filename, user: participant.name , assignment_id: assignment.id, operation: "Remove File")
     @submission_record.save
-    filename = params[:directories][params[:chk_files]] + "/" + params[:filenames][params[:chk_files]]
-    FileUtils.rm_r(filename)
   end
 
   def copy_selected_file

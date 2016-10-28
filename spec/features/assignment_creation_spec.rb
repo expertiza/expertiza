@@ -564,6 +564,35 @@ describe "assignment function" do
       fill_in 'num_reviews_per_student', with: 5
     end
   end
+
+  #Begin participant testing
+  describe "participants", js: true do
+    before(:each) do
+      create(:instructor)
+      (1..3).each do |i|
+        create(:course, name: "Course #{i}")
+      end
+    end
+
+    it "check to see if participants can be added" do
+
+      student = create(:student)
+      create(:assignment, name: 'Test Assignment')
+      create(:assignment_node)
+      login_as('instructor6')
+
+      assignment_id = Assignment.where(name: 'Test Assignment')[0].id
+      visit "/participants/list?id=#{assignment_id}&model=Assignment"
+
+      fill_in 'user_name', with: student.name
+      choose 'user_role_participant'
+
+      expect {
+        click_button 'Add'
+      }.to change {Participant.count}.by 1
+
+    end
   end
+end
 
 

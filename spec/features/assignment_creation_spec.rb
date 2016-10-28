@@ -379,7 +379,7 @@ describe "assignment function" do
         topic_name: 'Test',
         assignment_id: 1,
         max_choosers: 2,
-        topic_identifier: 1,
+        topic_identifier: '1',
         category: 'Test Category'
       )
     end

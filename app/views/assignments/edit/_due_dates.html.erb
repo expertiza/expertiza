@@ -441,7 +441,7 @@ function removeOrAddTeamFormation() {
         <%= text_field_tag('assignment_form[assignment][rounds_of_reviews]', @assignment_form.assignment.rounds_of_reviews, :style => 'width:50px') %>
             <button type="button" id="set_rounds">Set</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp
-&nbsp;&nbsp;<label style='text-align:right;'>Timezone : <%= current_user.timezonepref %></label>
+&nbsp;&nbsp;<label style='padding-left: 80px; text-align:right;'>Timezone : <%= current_user.timezonepref %></label>
 </div>
 <% if @assignment_form.assignment.rounds_of_reviews > 1 %>
     <!--Add a change name or url checkbox. By: Xiaoqiang Shao-->

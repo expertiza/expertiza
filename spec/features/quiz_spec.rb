@@ -126,54 +126,41 @@ describe 'Student can create quizzes and edit them', js: true do
     # Verify that the edit choice has been saved
     expect(page).to have_content('Test Quiz 1 Edit')
   end
-
-  it 'should have error message if the name of the quiz is missing' do
-    login_as @student.name
+ def to_check_if_error_message_is_present(it_condition_string, fill_in_string, condition_string, to_have_content_string)
+    it it_condition_string do
+      login_as @student.name
 
     # Click on the assignment link, and navigate to work view
-    click_link @assignment.name
-    click_link 'Your work'
+      click_link @assignment.name
+      click_link 'Your work'
 
     # Create a quiz for the assignment without quiz name
-    click_link 'Create a quiz'
+      click_link 'Create a quiz'
 
-    # Without fill in quiz name
-    fill_in 'text_area', with: 'Test Question 1'
-    page.choose('question_type_1_type_multiplechoiceradio')
-    fill_in 'new_choices_1_MultipleChoiceRadio_1_txt', with: 'Test Quiz 1'
-    fill_in 'new_choices_1_MultipleChoiceRadio_2_txt', with: 'Test Quiz 2'
-    fill_in 'new_choices_1_MultipleChoiceRadio_3_txt', with: 'Test Quiz 3'
-    fill_in 'new_choices_1_MultipleChoiceRadio_4_txt', with: 'Test Quiz 4'
-    page.choose('new_choices_1_MultipleChoiceRadio_1_iscorrect_1')
-    click_on 'Create Quiz'
+      # Without fill in quiz name
+      fill_in fill_in_string, with: condition_string
+      page.choose('question_type_1_type_multiplechoiceradio')
+      fill_in 'new_choices_1_MultipleChoiceRadio_1_txt', with: 'Test Quiz 1'
+      fill_in 'new_choices_1_MultipleChoiceRadio_2_txt', with: 'Test Quiz 2'
+      fill_in 'new_choices_1_MultipleChoiceRadio_3_txt', with: 'Test Quiz 3'
+      fill_in 'new_choices_1_MultipleChoiceRadio_4_txt', with: 'Test Quiz 4'
+      page.choose('new_choices_1_MultipleChoiceRadio_1_iscorrect_1')
+      click_on 'Create Quiz'
 
     # Should have the error message Please specify quiz name (please do not use your name or id on the page
-    expect(page).to have_content 'Please specify quiz name (please do not use your name or id).'
+      expect(page).to have_content to_have_content_string
+    end
   end
-
-  it 'should have error message if The question text is missing for one or more questions' do
-    login_as @student.name
-
-    # Click on the assignment link, and navigate to work view
-    click_link @assignment.name
-    click_link 'Your work'
-
-    # Create a quiz for the assignment without fill in question text
-    click_link 'Create a quiz'
-    fill_in 'questionnaire_name', with: 'Quiz for test'
-
-    # Withnot fill in the question text
-    page.choose('question_type_1_type_multiplechoiceradio')
-    fill_in 'new_choices_1_MultipleChoiceRadio_1_txt', with: 'Test Quiz 1'
-    fill_in 'new_choices_1_MultipleChoiceRadio_2_txt', with: 'Test Quiz 2'
-    fill_in 'new_choices_1_MultipleChoiceRadio_3_txt', with: 'Test Quiz 3'
-    fill_in 'new_choices_1_MultipleChoiceRadio_4_txt', with: 'Test Quiz 4'
-    page.choose('new_choices_1_MultipleChoiceRadio_1_iscorrect_1')
-    click_on 'Create Quiz'
-
-    # Should have the error message Please make sure all questions have text
-    expect(page).to have_content 'Please make sure all questions have text'
-  end
+  it_condition_string = 'should have error message if the name of the quiz is missing'
+  fill_in_string = 'text_area'
+  condition_string = 'Test Question 1'
+  to_have_content_string = 'Please specify quiz name (please do not use your name or id)'
+  to_check_if_error_message_is_present(it_condition_string, fill_in_string, condition_string, to_have_content_string)
+  it_condition_string = 'should have error message if The question text is missing for one or more questions'
+  fill_in_string = 'questionnaire_name'
+  condition_string = 'Quiz for test'
+  to_have_content_string = 'Please make sure all questions have text'
+  to_check_if_error_message_is_present(it_condition_string, fill_in_string, condition_string, to_have_content_string) 
 
   it 'should have error message if the choices are missing for one or more questions' do
     login_as @student.name

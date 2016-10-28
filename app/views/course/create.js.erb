@@ -1,1 +1,1 @@
-$('.listingRow').html("<%= j (render @course.ta_mappings) %>");
+$('.listing').append('<%= j render partial: “view_teaching_assistants”, locals: {ta: @course.ta_mappings} %>');

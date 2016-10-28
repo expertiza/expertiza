@@ -13,6 +13,11 @@ nohup.out
 pg_data/*
 
 #################
+## npm & bower
+#################
+node_modules
+
+#################
 ## Eclipse
 #################
 
@@ -197,6 +202,3 @@ pg_data
 .ruby-version
 mysql2psql.yml
 *.pem
-
-node_modules
-vendor

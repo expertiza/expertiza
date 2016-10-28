@@ -167,6 +167,7 @@ class SignUpSheetController < ApplicationController
     @priority = 0
     assignment = Assignment.find(@assignment_id)
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: nil)
+    @max_team_size = assignment.max_team_size
 
     if assignment.is_intelligent
       @bids = Bid.where(user_id: session[:user].id).order(:priority)
@@ -250,22 +251,30 @@ class SignUpSheetController < ApplicationController
   def set_priority
     @user_id = session[:user].id
     unless params[:topic].nil?
-      @bids = Bid.where("user_id LIKE ?", @user_id )
-      signed_up_topics = @bids.map {|bid| bid.topic_id}
-
-      #Remove topics from bids table if the student moves data from Selection HTML table to Topics HTML table
-      #This step is necessary to avoid duplicate priorities in Bids table
-      signed_up_topics = signed_up_topics - params[:topic].map {|topic_id| topic_id.to_i}
-      signed_up_topics.each do |topic|
-        Bid.where(topic_id: topic, user_id: @user_id).destroy_all
+      team_user = TeamsUser.where(user_id: @user_id)
+      users = User.find(@user_id)
+      if !team_user.nil)
+        users = TeamsUser.where(team_id: team_user.first.team_id)
       end
+      users.each do |user|
+        @bids = Bid.where("user_id LIKE ?", user.id )
+        signed_up_topics = @bids.map {|bid| bid.topic_id}
 
-      params[:topic].each_with_index do |topic_id,index |
-        check = @bids.where(topic_id: topic_id)
-        if check.empty?
-          Bid.create(topic_id: topic_id, user_id: @user_id, priority: index + 1)
-        else
-          Bid.where("topic_id LIKE ? AND user_id LIKE ?",topic_id, @user_id ).update_all({priority: index + 1})
+        #Remove topics from bids table if the student moves data from Selection HTML table to Topics HTML table
+        #This step is necessary to avoid duplicate priorities in Bids table
+        signed_up_topics = signed_up_topics - params[:topic].map {|topic_id| topic_id.to_i}
+        signed_up_topics.each do |topic|
+          Bid.where(topic_id: topic, user_id: user.id).destroy_all
+        end
+
+        params[:topic].each_with_index do |topic_id,index |
+          check = @bids.where(topic_id: topic_id)
+          if check.empty?
+            Bid.create(topic_id: topic_id, user_id: user.id, priority: index + 1)
+          else
+            Bid.where("topic_id LIKE ? AND user_id LIKE ?",topic_id, user.id).update_all({priority: index + 1})
+          end
+        end
         end
       end
     else
@@ -303,7 +312,7 @@ class SignUpSheetController < ApplicationController
               parent_id:                   topic.id,
               submission_allowed_id:       instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].submission_allowed_id,
               review_allowed_id:           instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_allowed_id,
-              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id, 
+              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id,
               round:                       i,
               flag:                        instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].flag,
               threshold:                   instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].threshold,
@@ -319,7 +328,7 @@ class SignUpSheetController < ApplicationController
               due_at:                      instance_variable_get('@topic_' + deadline_type + '_due_date'),
               submission_allowed_id:       instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].submission_allowed_id,
               review_allowed_id:           instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_allowed_id,
-              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id, 
+              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id,
               quiz_allowed_id:             instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].quiz_allowed_id,
               teammate_review_allowed_id:  instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].teammate_review_allowed_id
             )

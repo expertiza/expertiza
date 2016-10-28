@@ -37,7 +37,9 @@
                   <% end %>
               <% end %>
           <% else %>
-              <tr id="topic_<%= topic.id %>">
+          <tr style= <%= "background-color:rgb("+
+            (400*(1-(Math.tanh(2*[@max_team_size.to_f/Bid.where(topic_id:topic.id).count,1].min-1)+1)/2)).to_i.to_s+","+
+            (400*(Math.tanh(2*[@max_team_size.to_f/Bid.where(topic_id:topic.id).count,1].min-1)+1)/2).to_i.to_s+",0)" %> id="topic_<%= topic.id %>">
           <% end %>
           <% is_suggested_topic = false %>
           <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
@@ -53,7 +55,10 @@
       <tbody id="selections" data-update-url="/sign_up_sheet/set_priority" class="connectedSortable">
         <tr class="sort-disabled"><td></td><td></td></tr>
         <% for topic in @bids %>
-           <tr id="topic_<%= topic.id %>">
+        <tr style= <%= "background-color:rgb("+
+            (400*(1-(Math.tanh(2*[@max_team_size.to_f/Bid.where(topic_id:topic.id).count,1].min-1)+1)/2)).to_i.to_s+","+
+            (400*(Math.tanh(2*[@max_team_size.to_f/Bid.where(topic_id:topic.id).count,1].min-1)+1)/2).to_i.to_s+",0)" %>
+             id="topic_<%= topic.id %>">
              <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
            </tr>
           <% i=i+1 %>

@@ -9,7 +9,9 @@ jQuery(document).ready(function() {
         event.preventDefault(); // Prevent link from following its href
     });
     //E1654. Improve date-picker and deadlines Code change starts
+	//Hide date updater
     $("#date_updater_inner").hide();
+	//This on-click function toggles date updater div
     jQuery("#show_date_updater").click(function() {
 
         $("#date_updater_inner").toggle();

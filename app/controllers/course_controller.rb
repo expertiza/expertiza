@@ -157,7 +157,7 @@ class CourseController < ApplicationController
       #redirect_to action: 'view_teaching_assistants', id: @course.id
       respond_to do |format|
       format.html { redirect_to action: 'view_teaching_assistants', id: @course.id }
-      format.js   {:ta @ta_mapping}
+      format.js 
    end
 
       @course = @ta_mapping

@@ -38,5 +38,20 @@ module MailerHelper
         partial_name: partial_name
       }
     })
-  end 
+  end
+
+def self.send_mail_for_advertisement_response(user, subject, partial_name, type, obj_name)
+    Mailer.sync_message ({
+      to: user.email,
+      subject: subject,
+      body: {
+        type: type,
+        obj_name: obj_name,
+        user: user,
+        first_name: ApplicationHelper.get_user_first_name(user),
+        partial_name: partial_name
+      }
+    })
+  end
+ 
 end

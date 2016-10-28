@@ -15,7 +15,7 @@ describe "Questionnaire tests for instructor interface" do
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
     create(:assignment_due_date)
-    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.current + (100 * 24 * 60 * 60))
+    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now + (100 * 24 * 60 * 60))
   end
 
   describe "Instructor login" do
@@ -34,22 +34,46 @@ describe "Questionnaire tests for instructor interface" do
     end
   end
 
-  def create_public_review
-    describe "Create a public review questionnaire", type: :controller do
-      it "is able to create a public review questionnaire" do
-        login_as("instructor6")
-        visit '/questionnaires/new?model=ReviewQuestionnaire&private=0'
-        fill_in('questionnaire_name', with: 'Review 1')
-        fill_in('questionnaire_min_question_score', with: '0')
-        fill_in('questionnaire_max_question_score', with: '5')
-        select('no', from: 'questionnaire_private')
-        click_button "Create"
-        expect(Questionnaire.where(name: "Review 1")).to exist
-      end
+  describe "Create a public review questionnaire", type: :controller do
+    it "is able to create a public review questionnaire" do
+      login_as("instructor6")
+
+      visit '/questionnaires/new?model=ReviewQuestionnaire&private=0'
+
+      fill_in('questionnaire_name', with: 'Review 1')
+
+      fill_in('questionnaire_min_question_score', with: '0')
+
+      fill_in('questionnaire_max_question_score', with: '5')
+
+      select('no', from: 'questionnaire_private')
+
+      click_button "Create"
+
+      expect(Questionnaire.where(name: "Review 1")).to exist
     end
   end
 
-  create_public_review
+  describe "Create a private review questionnaire", type: :controller do
+    it "is able to create a private review questionnaire" do
+      login_as("instructor6")
+
+      visit '/questionnaires/new?model=ReviewQuestionnaire&private=1'
+
+      fill_in('questionnaire_name', with: 'Review 1')
+
+      fill_in('questionnaire_min_question_score', with: '0')
+
+      fill_in('questionnaire_max_question_score', with: '5')
+
+      select('yes', from: 'questionnaire_private')
+
+      click_button "Create"
+
+      expect(Questionnaire.where(name: "Review 1")).to exist
+    end
+  end
+
   def load_questionnaire
     login_as("instructor6")
     visit '/questionnaires/new?model=ReviewQuestionnaire&private=0'
@@ -64,41 +88,119 @@ describe "Questionnaire tests for instructor interface" do
 
     click_button "Create"
   end
-  
+
   describe "Create a review question", type: :controller do
-    def QuestionType(value)
-      if value.eql? "is able to create a Criterion question"
-        value1 = "Criterion"
-      if value.eql? "is able to create a Scale question"
-        value1 = "Scale"
-      if value.eql? "is able to create a Dropdown question"
-        value1 = "Dropdown"
-      if value.eql? "is able to create a Checkbox question"
-        value1 = "Checkbox"
-      if value.eql? "is able to create a TextArea question"
-        value1 = "TextArea"
-      if value.eql? "is able to create a TextField question"
-        value1 = "TextField"
-      if value.eql? "is able to create a UploadFile question"
-        value1 = "UploadFile"
-      if value.eql? "is able to create a SectionHeader question"
-        value1 = "SectionHeader"
-      if value.eql? "is able to create a TableHeader question"
-        value1 = "TableHeader"
-      if value.eql? "is able to create a ColumnHeader question"
-        value1 = "ColumnHeader"
-      it value do
-        load_questionnaire
-        fill_in('question_total_num', with: '1')
-        select(value1, from: 'question_type')
-        click_button "Add"
-        expect(page).to have_content('Remove')
-        click_button "Save review questionnaire"
-        expect(page).to have_content('All questions has been successfully saved!')
-      end
+    it "is able to create a Criterion question" do
+      load_questionnaire
+      fill_in('question_total_num', with: '1')
+      select('Criterion', from: 'question_type')
+      click_button "Add"
+      expect(page).to have_content('Remove')
+
+      click_button "Save review questionnaire"
+      expect(page).to have_content('All questions has been successfully saved!')
+    end
+
+    it "is able to create a Scale question" do
+      load_questionnaire
+      fill_in('question_total_num', with: '1')
+      select('Scale', from: 'question_type')
+      click_button "Add"
+      expect(page).to have_content('Remove')
+
+      click_button "Save review questionnaire"
+      expect(page).to have_content('All questions has been successfully saved!')
+    end
+
+    it "is able to create a Dropdown question" do
+      load_questionnaire
+      fill_in('question_total_num', with: '1')
+      select('Dropdown', from: 'question_type')
+      click_button "Add"
+      expect(page).to have_content('Remove')
+
+      click_button "Save review questionnaire"
+      expect(page).to have_content('All questions has been successfully saved!')
+    end
+
+    it "is able to create a Checkbox question" do
+      load_questionnaire
+      fill_in('question_total_num', with: '1')
+      select('Checkbox', from: 'question_type')
+      click_button "Add"
+      expect(page).to have_content('Remove')
+
+      click_button "Save review questionnaire"
+      expect(page).to have_content('All questions has been successfully saved!')
+    end
+
+    it "is able to create a TextArea question" do
+      load_questionnaire
+      fill_in('question_total_num', with: '1')
+      select('TextArea', from: 'question_type')
+      click_button "Add"
+      expect(page).to have_content('Remove')
+
+      click_button "Save review questionnaire"
+      expect(page).to have_content('All questions has been successfully saved!')
+    end
+
+    it "is able to create a TextField question" do
+      load_questionnaire
+      fill_in('question_total_num', with: '1')
+      select('TextField', from: 'question_type')
+      click_button "Add"
+      expect(page).to have_content('Remove')
+
+      click_button "Save review questionnaire"
+      expect(page).to have_content('All questions has been successfully saved!')
+    end
+
+    it "is able to create a UploadFile question" do
+      load_questionnaire
+      fill_in('question_total_num', with: '1')
+      select('UploadFile', from: 'question_type')
+      click_button "Add"
+      expect(page).to have_content('Remove')
+
+      click_button "Save review questionnaire"
+      expect(page).to have_content('All questions has been successfully saved!')
+    end
+
+    it "is able to create a SectionHeader question" do
+      load_questionnaire
+      fill_in('question_total_num', with: '1')
+      select('SectionHeader', from: 'question_type')
+      click_button "Add"
+      expect(page).to have_content('Remove')
+
+      click_button "Save review questionnaire"
+      expect(page).to have_content('All questions has been successfully saved!')
+    end
+
+    it "is able to create a TableHeader question" do
+      load_questionnaire
+      fill_in('question_total_num', with: '1')
+      select('TableHeader', from: 'question_type')
+      click_button "Add"
+      expect(page).to have_content('Remove')
+
+      click_button "Save review questionnaire"
+      expect(page).to have_content('All questions has been successfully saved!')
+    end
+
+    it "is able to create a ColumnHeader question" do
+      load_questionnaire
+      fill_in('question_total_num', with: '1')
+      select('ColumnHeader', from: 'question_type')
+      click_button "Add"
+      expect(page).to have_content('Remove')
+
+      click_button "Save review questionnaire"
+      expect(page).to have_content('All questions has been successfully saved!')
     end
   end
-      
+
   def load_question question_type
     load_questionnaire
     fill_in('question_total_num', with: '1')

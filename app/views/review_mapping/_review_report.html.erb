@@ -1,5 +1,5 @@
       <%@l = -1 %>
-
+      <!-- the table creation is changed top accomodate functionality of tablesorter, which requires thead and tbody seperately. Previously, headers were in tbody only -->
       <div class = 'reviewreport'>
   <!-- Added headers for tablesorter -->
   <table id="myTable" class="tbl_heat tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
@@ -75,6 +75,18 @@
 
   <p> **Text in <i style = "color:#DD3300">red</i> indicates that the review is not yet completed; text in <i style = "color:gray">gray</i> indicates that the review is done in previous round(s).</p>
 </div>
+
+<style>
+  /*TableSorter CSS styles */
+  th.tablesorter-headerAsc{
+    /* Style for Up Arrow */
+    background-image: url(<%= asset_path("up-arrow.png") %>);
+    background-size: 15px 15px;
+    background-repeat: no-repeat;
+    background-position: center right;
+    padding-right: 15px;
+  }
+</style>
 
 <script>
 $(function () {

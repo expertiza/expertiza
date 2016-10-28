@@ -102,14 +102,15 @@ class Leaderboard < ActiveRecord::Base
           user_hash = {}
           user_hash[reviewee_user_id] = [score_entry_score, 1]
 
-          if q_type_hash.fetch(questionnaire_type, {}).fetch(course_id, nil).nil?
-            if q_type_hash.fetch(questionnaire_type, nil).nil?
+          if q_type_hash.fetch(questionnaire_type, {}).fetch(course_id, nil).nil? && q_type_hash.fetch(questionnaire_type, nil).nil?
+              # if q_type_hash.fetch(questionnaire_type, nil).nil?
               course_hash = {}
               course_hash[course_id] = user_hash
 
               q_type_hash[questionnaire_type] = course_hash
+              q_type_hash[questionnaire_type][course_id] = user_hash
             end
-
+          else if q_type_hash.fetch(questionnaire_type, {}).fetch(course_id, nil).nil? && !q_type_hash.fetch(questionnaire_type, nil).nil?
             q_type_hash[questionnaire_type][course_id] = user_hash
           end
 

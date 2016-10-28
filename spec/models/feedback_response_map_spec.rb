@@ -52,12 +52,7 @@ describe FeedbackResponseMap do
     end
   end
 
-  describe "#contributor" do
-    let(:feedbackresponsemap) {FeedbackResponseMap.new(:id => 1, :reviewee_id => 2, :reviewer_id => 3, :reviewed_object_id => 4, :review => Response.new(), :reviewee => Participant.new(), :reviewer => AssignmentParticipant.new())}   
-    it "should return the object of same class" do
-      expect(feedbackresponsemap.contributor).to be(2)
-    end
-  end
+
 
   describe "#get_title" do
   #test the title to be stored correctly

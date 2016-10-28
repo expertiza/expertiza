@@ -33,8 +33,8 @@ describe "Questionnaire tests for instructor interface" do
       expect(page).to have_content('Your username or password is incorrect.')
     end
   end
-  def create_public_review
-    describe "Create a public review questionnaire", type: :controller do
+  describe "Create a public review questionnaire", type: :controller do
+    def create_public_review
       it "is able to create a public review questionnaire" do
         login_as("instructor6")
 

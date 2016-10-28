@@ -47,6 +47,7 @@ module PenaltyHelper
     resubmission_times = @participant.resubmission_times
     if resubmission_times.any?
       last_submission_time = resubmission_times.at(resubmission_times.size - 1).resubmitted_at
+
       if last_submission_time > submission_due_date
         if @penalty_unit == 'Minute'
           penalty_minutes = ((last_submission_time - submission_due_date)) / 60
@@ -56,11 +57,7 @@ module PenaltyHelper
           penalty_minutes = ((last_submission_time - submission_due_date)) / 86_400
         end
         penalty_for_submission = penalty_minutes * @penalty_per_unit
-        penalty = if penalty_for_submission > @max_penalty_for_no_submission
-                    @max_penalty_for_no_submission
-                  else
-                    penalty_for_submission
-                  end
+        penalty = [penalty_for_submission, @max_penalty_for_no_submission].min
       end
     else
       penalty = @max_penalty_for_no_submission
@@ -72,10 +69,8 @@ module PenaltyHelper
     penalty = 0
     num_of_reviews_required = @assignment.num_reviews
     if num_of_reviews_required > 0
-
       # reviews
       review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
-
       review_due_date = AssignmentDueDate.where(deadline_type_id: @review_deadline_type_id, parent_id: @assignment.id).first
 
       unless review_due_date.nil?
@@ -91,7 +86,6 @@ module PenaltyHelper
     if num_of_meta_reviews_required > 0
 
       meta_review_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
-
       meta_review_due_date = AssignmentDueDate.where(deadline_type_id: @meta_review_deadline_type_id, parent_id: @assignment.id).first
 
       unless meta_review_due_date.nil?
@@ -176,7 +170,8 @@ module PenaltyHelper
             penalty += penalty_for_this_review
           end
         end
-      elsif penalty = @max_penalty_for_no_submission
+      elsif
+        penalty = @max_penalty_for_no_submission
       end
     end
     penalty

@@ -67,11 +67,33 @@ class LatePoliciesController < ApplicationController
     @penalty_policy = LatePolicy.find(params[:id])
   end
 
+
+  def validate_penalty_unit(params)
+    is_number = false
+    if params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i
+      flash[:error] = "The maximum penalty cannot be less than penalty per unit."
+      is_number = true
+    end
+    is_number
+  end
+
+  def validate_duplicate_policy(params)
+    is_number = false
+    @late_policy = LatePolicy.where(policy_name: params[:late_policy][:policy_name])
+    if !@late_policy.nil? && !@late_policy.empty?
+      @late_policy.each do |p|
+        next unless p.instructor_id == instructor_id
+        flash[:error] = "A policy with the same name already exists."
+        is_number = true
+        break
+      end
+    end
+    is_number
+  end
+
   # POST /late_policies
   # POST /late_policies.xml
   def create
-    is_number = true
-
     # if(!is_numeric?(params[:late_policy][:penalty_per_unit]))
     #  flash[:error] = "The penalty points per unit should be a numeric value"
     #  is_number = false
@@ -82,25 +104,9 @@ class LatePoliciesController < ApplicationController
     #    flash[:error] = "The maximum penalty points should be a numeric value"
     #    is_number = false
     # end
+    is_number = validate_penalty_unit(params) && validate_duplicate_policy(params)
 
-    if params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i
-      flash[:error] = "The maximum penalty cannot be less than penalty per unit."
-      is_number = false
-    end
-
-    @late_policy = LatePolicy.where(policy_name: params[:late_policy][:policy_name])
-    if !@late_policy.nil? && !@late_policy.empty?
-      @late_policy.each do |p|
-        next unless p.instructor_id == instructor_id
-        flash[:error] = "A policy with the same name already exists."
-        is_number = false
-        break
-      end
-    end
     if is_number
-      @late_policy = LatePolicy.new(late_policy_params)
-      @late_policy.instructor_id = instructor_id
-
       begin
         @late_policy.save!
         flash[:notice] = "The penalty policy was successfully created."
@@ -118,26 +124,17 @@ class LatePoliciesController < ApplicationController
   # PUT /late_policies/1.xml
   def update
     @penalty_policy = LatePolicy.find(params[:id])
-    issue_number = false
-    if params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i
-      flash[:error] = "The maximum penalty cannot be less than penalty per unit."
-      issue_number = true
-    end
+
+    issue_number = validate_penalty_unit(params)
     issue_name = false
+
     # if name has changed then only check for this
     if params[:late_policy][:policy_name] != @penalty_policy.policy_name
-      @policy = LatePolicy.where(policy_name: params[:late_policy][:policy_name])
-      if !@policy.nil? && !@policy.empty?
-        @policy.each do |p|
-          next unless p.instructor_id == instructor_id
-          flash[:error] = "The policy could not be updated because a policy with the same name already exists."
-          issue_name = true
-          break
-        end
-      end
+      issue_name = validate_duplicate_policy(params)
     end
+e
     if issue_name == false && issue_number == false
-      @penalty_policy.update_attributes(params[:late_policy])
+      @penalty_policy.update_attributes(params.require(:late_policy).permit(:late_policy))
       @penalty_policy.save!
       @penaltyObjs = CalculatedPenalty.all
       @penaltyObjs.each do |pen|

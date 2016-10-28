@@ -87,4 +87,4 @@ class SignedUpTeam < ActiveRecord::Base
       signed_up_teams.first.topic_id
     end
   end
-  end
+end

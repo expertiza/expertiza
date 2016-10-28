@@ -260,6 +260,7 @@ function removeDueDateTableElement(deadline_type, round_no) {
     jQuery(element_id).remove();
 }
 //E1654. Improve date-picker and deadlines Code change starts
+//This is a generic funtion to add and substract days and months
 function addDaysOrMonth(mul, type) {
     var days = parseInt($('#days').val(), 10);
     var months = parseInt($('#months').val(), 10);

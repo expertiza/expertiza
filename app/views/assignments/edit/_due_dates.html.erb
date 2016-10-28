@@ -43,15 +43,91 @@
 
 				}
 		}
-		
+		event.preventDefault();
        		 
     });
 	jQuery("#addMonth_btn").click(function () {
-		//alert('addMonth_btn') // Prevent link from following its href
+
+for (var i=1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').length/2; i++)
+		{
+			if($('#use_updator_review_round_'+i).is(':checked'))
+				{
+					var date=$('#datetimepicker_review_round_'+i).val().split("/");
+		
+		var d = parseInt(date[2].split(" ")[0], 10),
+        	m = parseInt(date[1], 10),
+        	y = parseInt(date[0], 10);
+		var curDate=new Date(y, m-1, d);
+		var months = parseInt($('#months').val(), 10);
+		//alert(days);
+        	curDate.setMonth(curDate.getMonth() + months);
+
+  		$("#datetimepicker_review_round_"+i).val(curDate.getFullYear()+"/"+(curDate.getMonth()+1)+"/"+curDate.getDate()+" "+ date[2].split(" ")[1]);
+
+				}
+		}
+		
+		for (var i=1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').length/2;i++)
+		{
+			if($('#use_updator_submission_round_'+i).is(':checked'))
+				{
+					var date=$('#datetimepicker_submission_round_'+i).val().split("/");
+		
+		var d = parseInt(date[2].split(" ")[0], 10),
+        	m = parseInt(date[1], 10),
+        	y = parseInt(date[0], 10);
+		var curDate=new Date(y, m-1, d);
+		var months = parseInt($('#months').val(), 10);
+		//alert(days);
+        	curDate.setMonth(curDate.getMonth() + months);
+
+  		$("#datetimepicker_submission_round_"+i).val(curDate.getFullYear()+"/"+(curDate.getMonth()+1)+"/"+curDate.getDate()+" "+ date[2].split(" ")[1]);
+
+				}
+		}
+		event.preventDefault();
     });
 
 	jQuery("#subMonth_btn").click(function () {
-	//alert('subMonth_btn') // Prevent link from following its href
+
+for (var i=1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').length/2; i++)
+		{
+			if($('#use_updator_review_round_'+i).is(':checked'))
+				{
+					var date=$('#datetimepicker_review_round_'+i).val().split("/");
+		
+		var d = parseInt(date[2].split(" ")[0], 10),
+        	m = parseInt(date[1], 10),
+        	y = parseInt(date[0], 10);
+		var curDate=new Date(y, m-1, d);
+		var months = parseInt($('#months').val(), 10);
+		//alert(days);
+        	curDate.setDate(curDate.getMonth() - months);
+
+  		$("#datetimepicker_review_round_"+i).val(curDate.getFullYear()+"/"+(curDate.getMonth()+1)+"/"+curDate.getDate()+" "+ date[2].split(" ")[1]);
+
+				}
+		}
+		
+		for (var i=1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').length/2;i++)
+		{
+			if($('#use_updator_submission_round_'+i).is(':checked'))
+				{
+					var date=$('#datetimepicker_submission_round_'+i).val().split("/");
+		
+		var d = parseInt(date[2].split(" ")[0], 10),
+        	m = parseInt(date[1], 10),
+        	y = parseInt(date[0], 10);
+		var curDate=new Date(y, m-1, d);
+		var months = parseInt($('#months').val(), 10);
+		//alert(days);
+        	curDate.setDate(curDate.getMonth() - months);
+
+  		$("#datetimepicker_submission_round_"+i).val(curDate.getFullYear()+"/"+(curDate.getMonth()+1)+"/"+curDate.getDate()+" "+ date[2].split(" ")[1]);
+
+				}
+		}
+		event.preventDefault();
     });
 
 	jQuery("#subDays_btn").click(function () {
@@ -93,6 +169,7 @@ for (var i=1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').len
 
 				}
 		}
+event.preventDefault();
     });
 
     });

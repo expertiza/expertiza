@@ -29,7 +29,7 @@ def expect_deadline_check(deadline_condition)
   
       expect(Delayed::Job.count).to eq(1)
   
-      expect(Delayed::Job.last.handler).to include("deadline_type: "+display_condition)
+      expect(Delayed::Job.last.handler).to include("deadline_type: submission")
     end
   end
 end

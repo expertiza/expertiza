@@ -153,6 +153,18 @@ FactoryGirl.define do
     user { User.where(role_id: 2).first || association(:student) }
   end
 
+
+  factory :course_team, class: CourseTeam do
+    sequence(:name) {|n| "team#{n}" }
+    course { Course.first || association(:assignment) }
+    type 'CourseTeam'
+    comments_for_advertisement nil
+    advertise_for_partner nil
+    submitted_hyperlinks "---
+- https://www.expertiza.ncsu.edu"
+    directory_num 0
+  end
+
   factory :topic, class: SignUpTopic do
     topic_name "Hello world!"
     assignment { Assignment.first || association(:assignment) }

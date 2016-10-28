@@ -4,6 +4,7 @@
   <table id="myTable" class="tbl_heat tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
     <thead>
     <tr bgcolor='#CCCCCC'>
+	<!-- class value decides whether the column should be sortable or not  -->
       <th width = "16%" class="sorter-true">Reviewer <span></span></th>
       <th width = "14%" class="sorter-false">Reviews done per round<span></span></th>
       <th width = "20%" class="sorter-false">Team reviewed <span></span></th>
@@ -74,6 +75,8 @@
 
   <p> **Text in <i style = "color:#DD3300">red</i> indicates that the review is not yet completed; text in <i style = "color:gray">gray</i> indicates that the review is done in previous round(s).</p>
 </div>
+
+
 <style>
   /*TableSorter CSS styles */
   th.tablesorter-headerAsc{
@@ -95,6 +98,7 @@
   }
 
   th.sorter-true.tablesorter-headerUnSorted{
+    /* Style for default view  */
     background-image: url(<%= asset_path("sort.png") %>);
     background-size: 15px 7px;
     background-repeat: no-repeat;

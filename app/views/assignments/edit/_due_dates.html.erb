@@ -19,9 +19,7 @@
 		var days = parseInt($('#days').val(), 10);
 		//alert(days);
         	curDate.setDate(curDate.getDate() + days);
-
   		$("#datetimepicker_review_round_"+i).val(curDate.getFullYear()+"/"+(curDate.getMonth()+1)+"/"+curDate.getDate()+" "+ date[2].split(" ")[1]);
-
 				}
 		}
 		
@@ -38,16 +36,13 @@
 		var days = parseInt($('#days').val(), 10);
 		//alert(days);
         	curDate.setDate(curDate.getDate() + days);
-
   		$("#datetimepicker_submission_round_"+i).val(curDate.getFullYear()+"/"+(curDate.getMonth()+1)+"/"+curDate.getDate()+" "+ date[2].split(" ")[1]);
-
 				}
 		}
 		event.preventDefault();
        		 
     });
 	jQuery("#addMonth_btn").click(function () {
-
 for (var i=1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').length/2; i++)
 		{
 			if($('#use_updator_review_round_'+i).is(':checked'))
@@ -61,9 +56,7 @@ for (var i=1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').len
 		var months = parseInt($('#months').val(), 10);
 		//alert(days);
         	curDate.setMonth(curDate.getMonth() + months);
-
   		$("#datetimepicker_review_round_"+i).val(curDate.getFullYear()+"/"+(curDate.getMonth()+1)+"/"+curDate.getDate()+" "+ date[2].split(" ")[1]);
-
 				}
 		}
 		
@@ -80,16 +73,12 @@ for (var i=1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').len
 		var months = parseInt($('#months').val(), 10);
 		//alert(days);
         	curDate.setMonth(curDate.getMonth() + months);
-
   		$("#datetimepicker_submission_round_"+i).val(curDate.getFullYear()+"/"+(curDate.getMonth()+1)+"/"+curDate.getDate()+" "+ date[2].split(" ")[1]);
-
 				}
 		}
 		event.preventDefault();
     });
-
 	jQuery("#subMonth_btn").click(function () {
-
 for (var i=1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').length/2; i++)
 		{
 			if($('#use_updator_review_round_'+i).is(':checked'))
@@ -103,9 +92,7 @@ for (var i=1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').len
 		var months = parseInt($('#months').val(), 10);
 		//alert(days);
         	curDate.setDate(curDate.getMonth() - months);
-
   		$("#datetimepicker_review_round_"+i).val(curDate.getFullYear()+"/"+(curDate.getMonth()+1)+"/"+curDate.getDate()+" "+ date[2].split(" ")[1]);
-
 				}
 		}
 		
@@ -122,14 +109,11 @@ for (var i=1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').len
 		var months = parseInt($('#months').val(), 10);
 		//alert(days);
         	curDate.setDate(curDate.getMonth() - months);
-
   		$("#datetimepicker_submission_round_"+i).val(curDate.getFullYear()+"/"+(curDate.getMonth()+1)+"/"+curDate.getDate()+" "+ date[2].split(" ")[1]);
-
 				}
 		}
 		event.preventDefault();
     });
-
 	jQuery("#subDays_btn").click(function () {
 		//alert('subDays_btn') // Prevent link from following its href
 for (var i=1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').length/2; i++)
@@ -145,9 +129,7 @@ for (var i=1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').len
 		var days = parseInt($('#days').val(), 10);
 		//alert(days);
         	curDate.setDate(curDate.getDate() - days);
-
   		$("#datetimepicker_review_round_"+i).val(curDate.getFullYear()+"/"+(curDate.getMonth()+1)+"/"+curDate.getDate()+" "+ date[2].split(" ")[1]);
-
 				}
 		}
 		
@@ -164,14 +146,11 @@ for (var i=1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').len
 		var days = parseInt($('#days').val(), 10);
 		//alert(days);
         	curDate.setDate(curDate.getDate() - days);
-
   		$("#datetimepicker_submission_round_"+i).val(curDate.getFullYear()+"/"+(curDate.getMonth()+1)+"/"+curDate.getDate()+" "+ date[2].split(" ")[1]);
-
 				}
 		}
 event.preventDefault();
     });
-
     });
 	
 	
@@ -224,20 +203,16 @@ event.preventDefault();
         if (previous_element.length == 0) {
             return
         }
-
         var html = '<tr id=' + element_id + '>';
-
         var id = due_date.id
         if(id == null){
             id='';
         }
         html +=
                 '<input name="assignment_form[due_date][][id]" type="hidden" value="' + id +'">';
-
         html += '<input class="due_date_assignment_id" name="assignment_form[due_date][][parent_id]" type="hidden" value="' + <%= @assignment_form.assignment.id %> + '">' +
         '<input class="due_date_round" name="assignment_form[due_date][][round]" type="hidden" value="' + round_no + '">' +
         '<input class="due_date_deadline_type_id" name="assignment_form[due_date][][deadline_type_id]" type="hidden" value="' + due_date.deadline_type_id + '">';
-
         html += '<td class="due_date_name" width="15%">';
         if (round_no != 0) {
             html += 'Round ' + round_no + ': ' + capitalize(deadline_type);
@@ -270,12 +245,9 @@ event.preventDefault();
         '<input id="datetimepicker_' + element_id +
         '" name="assignment_form[due_date][][due_at]" style="width: 180px" type="text" value="' +
         due_at.substr(0,16) + '">' + '</td>';
-
-
 	html += '<td align="center" class="due_date_due_at" width="5%">' + '<input id="use_updator_' + element_id +
         '" type="checkbox" name="updatorCheck" style="width: 20px">'+ '</td>';;
 	//E1654. Improve date-picker and deadlines Code changed endS
-
         html += '<td align="center" class="due_date_due_at" width="10%">';
         // if(deadline_type == 'team_formation'){
         //     html += '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]" disabled>'
@@ -288,7 +260,6 @@ event.preventDefault();
         '<option value="2">Late</option>' +
         '<option value="3">Yes</option>' +
         '</select></td>';
-
         html += '<td align="center" class="due_date_review_allowed_id" width="10%">';
         // if(deadline_type == 'team_formation'){
         //     html += '<select id="due_date_review_allowed_id" name="assignment_form[due_date][][review_allowed_id]" disabled>'
@@ -301,7 +272,6 @@ event.preventDefault();
         '<option value="2">Late</option>' +
         '<option value="3">Yes</option>' +
         '</select></td>';
-
         html += '<td align="center" class="due_date_teammate_review_allowed_id" width="10%">';
         html += '<select id="due_date_teammate_review_allowed_id" name="assignment_form[due_date][][teammate_review_allowed_id]">'
          html +=
@@ -309,7 +279,6 @@ event.preventDefault();
         '<option value="2">Late</option>' +
         '<option value="3">Yes</option>' +
         '</select></td>';
-
         html += '<td align="center" class="due_date_review_of_review_allowed_id" width="10%">';
         // if(deadline_type == 'team_formation'){
         //     html += '<select id="due_date_review_of_review_allowed_id" name="assignment_form[due_date][][review_of_review_allowed_id]" disabled>'
@@ -322,7 +291,6 @@ event.preventDefault();
         '<option value="2">Late</option>' +
         '<option value="3">Yes</option>' +
         '</select></td>';
-
         if (<%=@assignment_form.assignment.require_quiz%>)
         {
             html += '<td align="center" class="due_date_quiz_allowed_id" width="10%">' +
@@ -335,7 +303,6 @@ event.preventDefault();
         else
         {
         }
-
         html += '<td align="center" class="due_date_threshold" width="10%">' +
         '<select id="due_date_threshold" name="assignment_form[due_date][][threshold]">' +
         '<option value="">No</option>' +
@@ -354,7 +321,6 @@ event.preventDefault();
         '<option value="96">96</option>' +
         '</select></td>';
         var html2 = html;
-
         html += '<td  align="center" id="specialname" class="due_date_name" width="10%">';
         html += '<input id="due_date_name" type="text" name="assignment_form[due_date][][deadline_name]" value="'+due_date.deadline_name+'">'+'</td>';
         html += '<td align="center" id="due_date_url_col" class="due_date_description_url" width="10%">';
@@ -365,7 +331,6 @@ event.preventDefault();
         else{
             previous_element.after(html);
         }
-
         jQuery('#due_date_submission_allowed_id').val(due_date.submission_allowed_id).attr('id', '');
         jQuery('#due_date_review_allowed_id').val(due_date.review_allowed_id).attr('id', '');
         jQuery('#due_date_review_of_review_allowed_id').val(due_date.review_of_review_allowed_id).attr('id', '');
@@ -374,7 +339,6 @@ event.preventDefault();
         jQuery('#due_date_threshold').val(due_date.threshold).attr('id', '');
         jQuery('#due_date_name').val(due_date.deadline_name).attr('id', '');
         jQuery('#due_date_description_url').val(due_date.description_url).attr('id', '');
-
         jQuery('#datetimepicker_' + element_id).datetimepicker({
             dateFormat: 'yy/mm/dd',
             timeFormat: 'HH:mm:ss z',
@@ -388,7 +352,6 @@ event.preventDefault();
             ]
         });
     }
-
      function removeDueDateTableElement(deadline_type, round_no) {
       var element_id;
       if (round_no == 0) {
@@ -398,14 +361,12 @@ event.preventDefault();
       }
       jQuery(element_id).remove();
     }
-
     function changeReviewRounds() {
         var new_round_count = parseInt(jQuery('#assignment_form_assignment_rounds_of_reviews').val());
         if (new_round_count <= 0) {
             alert('ERROR: number of rounds of review should be greater than 0');
             return
         }
-
         var i;
         var due_dates_table_element_list = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)');
         var current_round_count = 0;
@@ -445,7 +406,15 @@ event.preventDefault();
         //jQuery.get("/assignment/update");
         //jQuery('#assignment_form').submit();
     }
-
+    function updateDateNewTable(deadline_type, round_no) {
+      var element_id;
+      if (round_no == 0) {
+        element_id = '#' + deadline_type;
+      } else {
+        element_id = '#' + deadline_type + '_round_' + round_no;
+      }
+      jQuery(element_id).remove();
+    }
     function handleChangenameurl(checkvalue,due_date_name_column,due_date_url_column){
         var state = checkvalue;
         var round_count = <%= @assignment_form.assignment.rounds_of_reviews%>;
@@ -492,7 +461,6 @@ event.preventDefault();
             return;
         }
     }
-
         function removeOrAddMetareview(){
             if(document.getElementById("metareview")) {
                 removeDueDateTableElement('metareview', 0);
@@ -508,36 +476,28 @@ event.preventDefault();
                         <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
                 );
             }
-
             <%@metareview_allowed_checkbox=true%>
-
         }
         function removeOrAddSignup(){
             if(document.getElementById("signup"))
                 removeDueDateTableElement('signup', 0);
              else
                 addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>, 'signup', 0, <%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
-
             <%@signup_allowed_checkbox=true%>
-
         }
         function removeOrAddDropTopic(){
             if(document.getElementById("drop_topic"))
                 removeDueDateTableElement('drop_topic', 0);
              else
                 addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>, 'drop_topic', 0, <%= due_date(@assignment_form.assignment, 'drop_topic').to_json.html_safe %>);
-
             <%@drop_topic_allowed_checkbox=true%>
-
         }
         function removeOrAddTeamFormation(){
             if(document.getElementById("team_formation"))
                 removeDueDateTableElement('team_formation', 0);
              else
                 addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>, 'team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
-
             <%@team_formation_allowed_checkbox=true%>
-
         }datetime
 </script>
 
@@ -579,7 +539,7 @@ var timezonepref = "<%= current_user.timezonepref %>";
 <input name="metareivewAllowed" type="hidden" value="false" />
 <%= check_box_tag('metareviewAllowed', 'true', @metareview_allowed,:onclick=>"removeOrAddMetareview()" ) %>
 <%= label_tag('metareivewAllowed', 'Use metareview deadline') %><br/>
-
+<div>
  <%= label_tag('timezone', 'Timezone') %>
 	<%= select_tag(:time_zone, options_for_select(ActiveSupport::TimeZone.all.inject([]) do |result, tz|
  utc_offset = tz.utc_offset/3600 
@@ -587,17 +547,14 @@ result << ["(UTC #{'%.2d:00' % utc_offset}): #{tz.name}",  "#{'%.2d:00' % utc_of
  end), selected:"-05:00") %>
 
 	<%= label_tag('Days') %>	
-	<%= button_tag "+", :id => 'addDays_btn' %> 
-	
+	<button type="button" id="addDays_btn">+</button>
 	<%= number_field_tag 'days', 0, min: 0, max: 100 ,:id=>'days' %>
-	<%= button_tag "-", :id => 'subDays_btn' %>
+	<button type="button" id="subDays_btn">-</button>
 	<%= label_tag('Months') %>
-	<%= button_tag "+", :id => 'addMonth_btn' %>
-	
+	<button type="button" id="addMonth_btn">+</button>
 	<%= number_field_tag 'months', 0, min: 0, max: 12 ,:id=>'months' %>
-	<%= button_tag "-", :id => 'subMonth_btn' %>
-
-<br />
+	<button type="button" id="subMonth_btn">-</button>
+</div>
 
 <table class='exp' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden;'>
 
@@ -638,7 +595,6 @@ result << ["(UTC #{'%.2d:00' % utc_offset}): #{tz.name}",  "#{'%.2d:00' % utc_of
         <% if @metareview_allowed %>
         addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
         <%end %>
-
         //after webpage refreshes, hide or display name and url according to whether names and urls are empty in DB
         var due_date_name_column=document.getElementById("due_date_name_column");
         var due_date_url_column=document.getElementById("due_date_url_column");
@@ -646,9 +602,7 @@ result << ["(UTC #{'%.2d:00' % utc_offset}): #{tz.name}",  "#{'%.2d:00' % utc_of
         due_date_name_column.style.display="none";
         due_date_url_column.style.display="none";
       <% end %>
-
     }());
   </script>
 </table>
-
 <%= render :partial => 'assignments/edit/late_policy' %>

@@ -27,7 +27,14 @@ th.sorter-true.tablesorter-headerUnSorted{
   $(function () {
     $("[data-toggle='tooltip']").tooltip();
     $(".tablesorter").tablesorter();
+      $('.tablesorterDiv').hide();
+      $('#scoresTableDiv1').show();
   });
+
+    function toggleScore(tableNum){
+      $('.tablesorterDiv').hide();
+      $('#scoresTableDiv'+tableNum).show();
+    }
 
   var lesser = false;
   // Function to sort the columns based on the total review score
@@ -122,6 +129,13 @@ th.sorter-true.tablesorter-headerUnSorted{
 <h1>Summary Report for assignment: <%= @assignment.name %></h1>
 <h4>Team: <%= @team.name %></h4>
 
+<p class="rounds-tab">
+      <% for v1 in 1..@vmlist[0].rounds %>
+        <a href="#" onclick="toggleScore(<%= v1 %>)"> Round <%= v1 %></a>
+      <% end %>
+
+</p>
+
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
 <% table_count = 0 %>
 <% @vmlist.each do |vm| %>
@@ -149,9 +163,9 @@ th.sorter-true.tablesorter-headerUnSorted{
             </table>
           </div>
 
-           <p>Testing vm lis of reviews : <%=vm.list_of_reviews.size%></p>
-           <p>Testing vm rounds : <%=vm.rounds.to_s%></p>
+
             <% for i1 in 1..vm.rounds %>
+                <div class="tablesorterDiv" id="scoresTableDiv<%=i1 %>">
           <!-- display the table title and tooltips -->
           <span style="width:100%;">
               <h4 style="font-weight:bold;display:inline-block;"><%= vm.questionnaire_display_type %>
@@ -164,8 +178,7 @@ th.sorter-true.tablesorter-headerUnSorted{
             <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Click a row to see the comments for the respective question. Click 'Review Total' row to see Add'l Comments. Useful tip: decreasing your browser's zoom to 75% or 90% many improve your experience.">interaction legend</span>
 
           </span>
-
-          <table id="scoresTable" class="tbl_heat tablesorter">
+          <table id="scoresTable<%=i1%>" class="tbl_heat tablesorter">
             <!-- display the header row of the heatgrid table. this involves iterating through reviewers.-->
             <thead>
             <tr>
@@ -174,6 +187,7 @@ th.sorter-true.tablesorter-headerUnSorted{
 
               <% i = 1 %>
               <% vm.list_of_reviews.each do |review| %>
+
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                   <% if ['Student'].include? @current_role_name %>
                       <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a>  </th>
@@ -195,7 +209,6 @@ th.sorter-true.tablesorter-headerUnSorted{
 
             </tr>
             </thead>
-
 
             <% score_row_count = vm.list_of_rows.first.score_row.count %>
             <% j = 1 %>
@@ -291,6 +304,7 @@ th.sorter-true.tablesorter-headerUnSorted{
             </tr>
 
           </table>
+                </div>
                 <%end%>
           <!-- Display the list of team members, for Peer Reviews. -->
           <div style="margin-top:5px"></div>

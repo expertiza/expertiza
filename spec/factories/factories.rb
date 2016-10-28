@@ -231,6 +231,13 @@ FactoryGirl.define do
     name  "No"
   end
 
+  factory :sign_up_topic, class: SignUpTopic do
+    topic_name "Test Topic"
+    max_choosers 2
+    category "Test Category"
+    topic_identifier 1
+  end
+
   factory :assignment_node, class: AssignmentNode do
     assignment { Assignment.first || association(:assignment) }
     node_object_id 1

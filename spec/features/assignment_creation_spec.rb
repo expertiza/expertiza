@@ -240,22 +240,7 @@ describe "assignment function" do
       visit "/assignments/#{assignment[:id]}/edit"
       click_link 'General'
     end
-    ##### test reviews visible to all other reviewers ######
-    it "should edit review visible to all other reviewers" do
-      fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'
-      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
-      check ("assignment_form_assignment_reviews_visible_to_all")
-      click_button 'Save'
-      assignment = Assignment.where(name: 'edit assignment for test').first
-      expect(assignment).to have_attributes(
-                                name: 'edit assignment for test',
-                                course_id: Course.find_by_name('Course 2')[:id],
-                                directory_path: 'testDirectory1',
-                                spec_location: 'testLocation1'
-                            )
-    end
+
     it "should edit assignment available to students" do
       fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
       select('Course 2', from: 'assignment_form_assignment_course_id')
@@ -274,6 +259,7 @@ describe "assignment function" do
                                 is_calibrated: true,
                             )
     end
+
     it "should edit quiz number available to students" do
       fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
       select('Course 2', from: 'assignment_form_assignment_course_id')
@@ -313,7 +299,48 @@ describe "assignment function" do
                                 show_teammate_reviews: true
                             )
     end
+
+    ##### test reviews visible to all other reviewers ######
+    it "should edit review visible to all other reviewers" do
+      fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
+      select('Course 2', from: 'assignment_form_assignment_course_id')
+      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'
+      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
+      check ("assignment_form_assignment_reviews_visible_to_all")
+      click_button 'Save'
+      assignment = Assignment.where(name: 'edit assignment for test').first
+      expect(assignment).to have_attributes(
+                                name: 'edit assignment for test',
+                                course_id: Course.find_by_name('Course 2')[:id],
+                                directory_path: 'testDirectory1',
+                                spec_location: 'testLocation1'
+                            )
+    end
+
+    it "should create teammate review row in rubrics" do
+      fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
+      select('Course 2', from: 'assignment_form_assignment_course_id')
+      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'
+      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
+      check("team_assignment")
+      check("assignment_form_assignment_show_teammate_reviews")
+      fill_in 'assignment_form_assignment_max_team_size', with: 5
+      click_button 'Save'
+      click_link 'Rubrics'
+      expect page.should have_css("table#assignment_questionnaire_table tr", :count=>4)
+    end
+
+    it "check if checking calibration shows the tab" do
+      uncheck 'assignment_form_assignment_is_calibrated'
+      click_button 'Save'
+
+      check 'assignment_form_assignment_is_calibrated'
+      click_button 'Save'
+
+      expect(page).to have_selector('#Calibration')
+    end
   end
+
   describe "topics tab", js: true do
     before(:each) do
       (1..3).each do |i|
@@ -321,9 +348,9 @@ describe "assignment function" do
       end
       create(:assignment, name: 'public assignment for test')
 
-      assignment = Assignment.where(name: 'public assignment for test').first
+      @assignment = Assignment.where(name: 'public assignment for test').first
       login_as("instructor6")
-      visit "/assignments/#{assignment[:id]}/edit"
+      visit "/assignments/#{@assignment[:id]}/edit"
       click_link 'Topics'
     end
 
@@ -360,6 +387,37 @@ describe "assignment function" do
         use_bookmark: false
       )
     end
+
+    it "Add new topic" do
+      click_link 'New topic'
+      click_button 'OK'
+      fill_in 'topic_topic_identifier', with: '1'
+      fill_in 'topic_topic_name', with: 'Test'
+      fill_in 'topic_category', with: 'Test Category'
+      fill_in 'topic_max_choosers', with: 2
+      click_button 'Create'
+
+      sign_up_topics = SignUpTopic.where(topic_name: 'Test').first
+      expect(sign_up_topics).to have_attributes(
+        topic_name: 'Test',
+        assignment_id: 1,
+        max_choosers: 2,
+        topic_identifier: '1',
+        category: 'Test Category'
+      )
+    end
+
+    it "Delete existing topic" do
+      create(:sign_up_topic, assignment_id: @assignment[:id])
+      visit "/assignments/#{@assignment[:id]}/edit"
+      click_link 'Topics'
+      all(:xpath, '//img[@title="Delete Topic"]')[0].click
+      click_button 'OK'
+
+      topics_exist = SignUpTopic.count(:all, assignment_id: @assignment[:id])
+      expect(topics_exist).to be_eql 0
+    end
+
   end
 
   # Begin rubric tab
@@ -371,15 +429,6 @@ describe "assignment function" do
       create :assignment_due_date, due_at: (DateTime.now - 1)
       @review_deadline_type = create(:deadline_type, name: "review")
       create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
-      create(:deadline_type, name: "submission")
-      create(:deadline_type, name: "review")
-      create(:deadline_type, name: "metareview")
-      create(:deadline_type, name: "drop_topic")
-      create(:deadline_type, name: "signup")
-      create(:deadline_type, name: "team_formation")
-      create(:deadline_right)
-      create(:deadline_right, name: 'Late')
-      create(:deadline_right, name: 'OK')
       create(:assignment_node)
       create(:question)
       create(:questionnaire)
@@ -459,6 +508,8 @@ describe "assignment function" do
         expect(assignment_questionnaire.dropdown).to eq(false)
       end
 
+
+      ##
       # Third row of rubric
       xit "updates teammate review questionnaire" do
         within("tr#questionnaire_table_TeammateReviewQuestionnaire") do
@@ -492,12 +543,13 @@ describe "assignment function" do
   #Begin review strategy tab
   describe "review strategy tab", js: true do
     before(:each) do
-      @assignment = create(:assignment, name: 'public assignment for test')
+      create(:assignment, name: 'public assignment for test')
+      @assignment_id = Assignment.where(name: 'public assignment for test').first.id
     end
 
     it "auto selects" do
       login_as("instructor6")
-      visit '/assignments/1/edit'
+      visit "/assignments/#{@assignment_id}/edit"
       find_link('ReviewStrategy').click
       select "Auto-Selected", from: 'assignment_form_assignment_review_assignment_strategy'
       fill_in 'assignment_form_assignment_review_topic_threshold', with: 3
@@ -523,6 +575,35 @@ describe "assignment function" do
     end
   end
 
+  #Begin participant testing
+  describe "participants", js: true do
+
+    it "check to see if participants can be added" do
+      create(:course)
+      student = create(:student)
+      create(:assignment, name: 'Test Assignment')
+      create(:assignment_node)
+      login_as('instructor6')
+
+      assignment_id = Assignment.where(name: 'Test Assignment')[0].id
+      visit "/participants/list?id=#{assignment_id}&model=Assignment"
+
+      fill_in 'user_name', with: student.name
+      choose 'user_role_participant'
+
+      expect {
+        click_button 'Add'
+      }.to change {Participant.count}.by 1
+
+    end
+
+    it "should display newly created assignment" do
+      create(:assignment, name: 'participants assignment')
+      participant = create(:participant)
+      login_as(participant.name)
+      expect(page).to have_content("participants assignment")
+    end
+  end
   #Begin Due Date tab
   describe "Due dates tab", js: true do
     before(:each) do
@@ -560,25 +641,7 @@ describe "assignment function" do
                                 max_reviews_per_submission: 10
                             )
     end
- end
-
-  #### logging in as participants
-  #### this test is not complte
-  ##### will work tomorrow on this
-  describe "participants function", js: true do
-    before(:each) do
-      @student1 = create(:student)
-      @assignment = create(:assignment, name: 'participants assignment')
-      login_as(@student1.name)
-    end
-
-    it "should display newly created assignment" do
-      #within_table('table.table') do
-        #find_link('participants assignment')
-      expect(page).to have_content("participants assignment")
-      end
   end
-
 
  end
 

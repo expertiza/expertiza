@@ -9,14 +9,6 @@ def questionnaire_options(assignment, type, _round = 0)
   options
 end
 
-def get_questionnaire(finder_var = nil)
-  if finder_var.nil?
-    AssignmentQuestionnaire.where(assignment_id: @assignment[:id])
-  else
-    AssignmentQuestionnaire.where(assignment_id: @assignment[:id]).where(questionnaire_id: get_selected_id(finder_var))
-  end
-end
-
 def get_selected_id(finder_var)
   if finder_var == "ReviewQuestionnaire2"
     ReviewQuestionnaire.find_by(name: finder_var)[:id]

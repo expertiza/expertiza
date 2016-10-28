@@ -65,6 +65,35 @@ RSpec.configure do |config|
     click_button 'SIGN IN'
     stub_current_user(user, user.role.name, user.role)
   end
+  def expect_deadline_check(deadline_condition, send_reminder_condition, display_condition, dj_condition)
+    describe deadline_condition do
+      it send_reminder_condition do
+        # Delayed::Worker.delay_jobs = false
+        id = 2
+        @name = "user"
+
+        # due_at = DateTime.now + 120
+        # seconds_until_due = due_at - Time.now
+        # minutes_until_due = seconds_until_due / 60
+        due_at = DateTime.now.advance(minutes: +2)
+  
+        # puts DateTime.now
+        # puts due_at
+        due_at1 = Time.parse(due_at.to_s(:db))
+        curr_time = DateTime.now.to_s(:db)
+        curr_time = Time.parse(curr_time)
+        time_in_min = ((due_at1 - curr_time).to_i / 60) * 60
+        Delayed::Job.delete_all
+        expect(Delayed::Job.count).to eq(0)
+  
+        dj = Delayed::Job.enqueue(payload_object: DelayedMailer.new(id, dj_condition, due_at), priority: 1, run_at: time_in_min)
+  
+        expect(Delayed::Job.count).to eq(1)
+  
+        expect(Delayed::Job.last.handler).to include(display_condition)
+      end
+    end
+  end
 
   def stub_current_user(current_user, current_role_name = 'Student', current_role)
     allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(current_user)

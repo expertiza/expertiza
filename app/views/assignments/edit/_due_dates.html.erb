@@ -393,20 +393,6 @@ function updateDateTable(deadline_type, round_no) {
     }
     jQuery(element_id).remove();
 }
-//This function removes days from the date
-    jQuery("#subDays_btn_2").click(function() {
-
-        addDaysOrMonth(-1, "days");
-        event.preventDefault();
-
-    });
-function removeOrAddSignup() {
-    if (document.getElementById("signup"))
-        removeDueDateTableElement('signup', 0);
-    else
-        addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>, 'signup', 0, <%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
-    <%@signup_allowed_checkbox=true%>
-}
 function removeOrAddMetareview() {
     if (document.getElementById("metareview")) {
         removeDueDateTableElement('metareview', 0);

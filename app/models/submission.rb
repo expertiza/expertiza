@@ -49,4 +49,29 @@ def mail_non_sign_up_topic_users
   end
   emails
 end
+
+def getTeamMembersMail
+  teamMembersMailList = []
+  assignment = Assignment.find(self.assignment_id)
+  teams = Team.where(['parent_id = ?', self.assignment_id])
+  for team in teams
+    team_participants = TeamsUser.where(['team_id = ?', team.id])
+    for team_participant in team_participants
+      user = User.find(team_participant.user_id)
+      teamMembersMailList << user.email
+    end
+  end
+  teamMembersMailList
+end
+def mail_assignment_participants
+  emails = []
+  assignment = Assignment.find(self.assignment_id)
+  for participant in assignment.participants
+    uid = participant.user_id
+    user = User.find(uid)
+    emails << user.email
+  end
+  #email_reminder(emails, self.deadline_type)
+  emails
+end
 end

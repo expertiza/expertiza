@@ -568,14 +568,10 @@ describe "assignment function" do
   #Begin participant testing
   describe "participants", js: true do
     before(:each) do
-      create(:instructor)
-      (1..3).each do |i|
-        create(:course, name: "Course #{i}")
-      end
+      create(:course)
     end
 
     it "check to see if participants can be added" do
-
       student = create(:student)
       create(:assignment, name: 'Test Assignment')
       create(:assignment_node)

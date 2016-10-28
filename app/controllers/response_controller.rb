@@ -259,7 +259,7 @@ class ResponseController < ApplicationController
   # e.g. student click "Edit" or "View"
   def set_content(new_response = false)
     # handy reference to response title for view
-    @title = @map.title
+    @title = @map.get_title
 
     # handy reference to response assignment for ???
     @assignment = @map.assignment

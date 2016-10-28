@@ -21,18 +21,24 @@ describe "due_date_functions" do
     end
   end
 
+  it "due date factory created successfully" do
+    expect(@assignment_due_date).to be_valid
+  end
+
+  it "due dates created correctly" do
+    expect(@due_dates.length).to be == 10
+  end
+
   it "due date flag is set" do
     expect(@assignment_due_date.flag).to be false
     @assignment_due_date.set_flag
     expect(@assignment_due_date.flag).to be true
   end
 
-
   it "due at is valid datetime" do
     expect(@assignment_due_date.due_at_is_valid_datetime).to be nil
 
   end
-
 
   it "copy due dates to new assignment" do
     new_assignment_id = build(:assignment, id: 999).id
@@ -40,8 +46,6 @@ describe "due_date_functions" do
     DueDate.copy(old_assignment_id, new_assignment_id)
     expect(DueDate.where(parent_id: new_assignment_id).count).to eql DueDate.where(parent_id: old_assignment_id).count
   end
-
-
 
   it "create new duedate record with values" do
     DueDate.set_duedate({id: 999}, @assignment_due_date.deadline_type_id,
@@ -125,4 +129,11 @@ describe "due_date_functions" do
     end
   end
 
+  it "metareview review_of_review_allowed default permission OK" do
+    expect(DueDate.default_permission('metareview', 'review_of_review_allowed')).to be == DeadlineRight::OK
+  end
+
+  it "review submission_allowed default permission NO" do
+    expect(DueDate.default_permission('review', 'submission_allowed')).to be == DeadlineRight::NO
+  end
 end

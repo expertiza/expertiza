@@ -1,7 +1,8 @@
 require 'rails_helper'
+require 'spec_helper'
 describe TeammateReviewResponseMap do
   let(:teammatereviewresponsemap) {TeammateReviewResponseMap.new id: 6, reviewee_id: 1, reviewer_id: 2, reviewed_object_id: 8}
- 
+  #teammatereviewresponsemap = create(:teammatereviewresponsemap)
 
 
   describe "#new" do

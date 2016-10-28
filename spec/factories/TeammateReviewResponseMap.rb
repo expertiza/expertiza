@@ -1,7 +1,8 @@
 FactoryGirl.define do
-  factory :TeammateReviewResponseMap do |f|
-    f.reviewed_object_id { 100 }
-    f.reviewer_id { 200 }
+  factory :teammatereviewresponsemap do |f|
+    f.id { 6 }
+    f.reviewer_id { 2 }
     f.reviewee_id { 1 }
+    f.reviewed_object_id { 8 }
   end
 end

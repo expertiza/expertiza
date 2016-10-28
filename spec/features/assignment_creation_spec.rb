@@ -258,7 +258,54 @@ describe "assignment function" do
                                 is_calibrated: true,
                             )
     end
+
+    it "should edit quiz number available to students" do
+      fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
+      select('Course 2', from: 'assignment_form_assignment_course_id')
+      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'
+      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
+      check("assignment_form_assignment_require_quiz")
+      click_button 'Save'
+      fill_in 'assignment_form_assignment_num_quiz_questions', with: 5
+      click_button 'Save'
+      assignment = Assignment.where(name: 'edit assignment for test').first
+      expect(assignment).to have_attributes(
+                                name: 'edit assignment for test',
+                                course_id: Course.find_by_name('Course 2')[:id],
+                                directory_path: 'testDirectory1',
+                                spec_location: 'testLocation1',
+                                num_quiz_questions: 5,
+                                require_quiz: true
+                            )
+
+    end
+
+    it "should edit number of members per team " do
+      fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
+      select('Course 2', from: 'assignment_form_assignment_course_id')
+      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'
+      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
+      check("assignment_form_assignment_show_teammate_reviews")
+      fill_in 'assignment_form_assignment_max_team_size', with: 5
+      click_button 'Save'
+      assignment = Assignment.where(name: 'edit assignment for test').first
+      expect(assignment).to have_attributes(
+                                name: 'edit assignment for test',
+                                course_id: Course.find_by_name('Course 2')[:id],
+                                directory_path: 'testDirectory1',
+                                spec_location: 'testLocation1',
+                                max_team_size: 5,
+                                show_teammate_reviews: true
+                            )
+    end
+
+
   end
+
+
+
+
+
   describe "topics tab", js: true do
     before(:each) do
       (1..3).each do |i|

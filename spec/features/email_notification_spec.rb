@@ -52,3 +52,22 @@ feature 'Welcome mailer' do
     expect(current_email).to have_content 'New password'
   end
 end
+
+feature 'New submission mailer' do
+  background do
+
+    # using the method called same as response.rb => email
+    defn = {}
+    defn[:body] = {}
+    defn[:body][:partial_name] = 'new_submission'
+    # will clear the message queue
+    clear_emails
+    Mailer.sync_message(defn).deliver_now
+    # Will find an email sent to expertiza.development@gmail.com and set `current_email`
+    open_email('expertiza.development@gmail.com')
+  end
+
+  scenario 'testing for content' do
+    expect(current_email).to have_content 'assignment has just been entered'
+  end
+end

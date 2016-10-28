@@ -52,17 +52,31 @@ describe "Integration tests for instructor interface" do
     havecontent_string1 = 'expertiza'
     havecontent_string2 = 'mozilla'
     check_valid_or_invalid_file_with_3_columns(itcondition_string, filepath_string, havecontent_string1, havecontent_string2)
-    itcondition_string = 'should be a valid file with 3 or more columns'
-    filepath_string = "spec/features/assignment_topic_csvs/3or4-col-valid_topics_import.csv"
-    havecontent_string1 = 'capybara'
-    havecontent_string2 = 'cucumber'
-    check_valid_or_invalid_file_with_3_columns(itcondition_string, filepath_string, havecontent_string1, havecontent_string2)
-    itcondition_string = 'should be a invalid csv file'
-    filepath_string = "spec/features/assignment_topic_csvs/invalid_topics_import.csv"
-    havecontent_string1 = 'airtable'
-    havecontent_string2 = 'devise'
-    check_valid_or_invalid_file_with_3_columns(itcondition_string, filepath_string, havecontent_string1, havecontent_string2)
+    it 'should be a valid file with 3 or more columns' do
+      login_as("instructor6")
+      visit '/assignments/1/edit'
+      click_link "Topics"
+      click_link "Import topics"
+      file_path = Rails.root + "spec/features/assignment_topic_csvs/3or4-col-valid_topics_import.csv"
+      attach_file('file', file_path)
+      click_button "Import"
+      click_link "Topics"
+      expect(page).to have_content('capybara')
+      expect(page).to have_content('cucumber')
+    end
 
+    it 'should be a invalid csv file' do
+      login_as("instructor6")
+      visit '/assignments/1/edit'
+      click_link "Topics"
+      click_link "Import topics"
+      file_path = Rails.root + "spec/features/assignment_topic_csvs/invalid_topics_import.csv"
+      attach_file('file', file_path)
+      click_button "Import"
+      click_link "Topics"
+      expect(page).not_to have_content('airtable')
+      expect(page).not_to have_content('devise')
+    end
     it 'should be an random text file' do
       login_as("instructor6")
       visit '/assignments/1/edit'

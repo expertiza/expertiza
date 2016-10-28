@@ -14,7 +14,7 @@ class Leaderboard < ActiveRecord::Base
   ### This methodreturns unaffiliiated assignments - assignments not affiliated to any course
   def self.get_independant_assignments(user_id)
     assignment_ids = assignment_participant.where(user_id: user_id).pluck(:parent_id)
-    no_course_assignments = Assignment.where(id: assignment_ids, course_id: nil)
+    # no_course_assignments = Assignment.where(id: assignment_ids, course_id: nil)
   end
 
   def self.get_assignments_in_courses(course_array)
@@ -146,7 +146,7 @@ class Leaderboard < ActiveRecord::Base
     end
 
     result_hash
- end
+  end
 
   # This method does a destructive sort on the computed scores hash so
   # that it can be mined for personal achievement information
@@ -166,20 +166,20 @@ class Leaderboard < ActiveRecord::Base
 
   # This method takes the sorted computed score hash structure and mines
   # it for personal achievement information.
-  def self.extract_personal_achievements(cs_hash, course_id_List, user_id)
+  def self.extract_personal_achievements(cs_hash, course_id_list, user_id)
     # Get all the possible accomplishments from Leaderboard table
     leaderboard_records = Leaderboard.all
     course_accomplishment_hash = {}
     accomplishment_map = {}
 
     # Create map of accomplishment with its name
-    for leaderboard_Record in leaderboard_records
-      accomplishment_map[leaderboard_Record.q_type] = leaderboard_Record.name
+    for leaderboard_record in leaderboard_records
+      accomplishment_map[leaderboard_record.q_type] = leaderboard_record.name
     end
 
     cs_sorted_hash = Leaderboard.sort_hash(cs_hash)
 
-    for course_id in course_id_List
+    for course_id in course_id_list
       for accomplishment in accomplishment_map.keys
         # Get score for current questionnaire_type/accomplishment, course_id and user_id from cs_hash
         score = cs_hash.fetch(accomplishment, {}).fetch(course_id, {}).fetch(user_id, nil)
@@ -192,15 +192,15 @@ class Leaderboard < ActiveRecord::Base
         total = cs_sorted_hash[accomplishment][course_id].length
 
         course_accomplishment_hash[course_id] << {accomp: accomplishment_map[accomplishment],
-                                               score: score[0],
-                                               rankStr: "#{rank} of #{total}"}
+                                                  score: score[0],
+                                                  rankStr: "#{rank} of #{total}"}
       end
     end
     course_accomplishment_hash
   end
 
   # Returns string for Top N Leaderboard Heading or accomplishments entry
-  def self.leaderboard_Heading(q_type_id)
+  def self.leaderboard_heading(q_type_id)
     lt_entry = Leaderboard.find_by q_type(q_type_id)
     if lt_entry
       lt_entry.name

@@ -108,10 +108,16 @@ class SignUpSheetController < ApplicationController
     redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
   end
 
+  # -------------------------------------------------------------------------------------------
+  # The methods 'assign_topic','remove_topic','remove_team','update_team' are used to provide
+  # the functionality of an admin being able to add or drop user teams from a topic
+  # without having to impersonate the user
+
   def assign_topic # renders a view for a team to be added
     @topic = SignUpTopic.find(params[:id])
     @assignment = Assignment.find(params[:assignment_id])
   end
+
 
   def remove_topic # renders a view for the team to be removed
     @topic = SignUpTopic.find(params[:id])
@@ -123,7 +129,7 @@ class SignUpSheetController < ApplicationController
     @assignment = Assignment.find(params[:assignment_id]) # Find all the details about the assignment
     @user = User.find_by name: params[:user][:name] # Find user
 
-    if @user.blank?
+    if @user.blank? #Check if the user exists
       flash[:error] = "User does not exist"
       redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
     else
@@ -159,7 +165,7 @@ class SignUpSheetController < ApplicationController
     @assignment = Assignment.find(params[:assignment_id]) # Find all the details about the assignment
     @user = User.find_by name: params[:user][:name] # Find user
 
-    if @user.blank?
+    if @user.blank?   #If the user does not exist
       flash[:error] = "User does not exist"
       redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
     else
@@ -167,9 +173,10 @@ class SignUpSheetController < ApplicationController
       @isTopicTaken = SignedUpTeam.find_by_sql("select * from signed_up_teams where topic_id = "+ @topic.id.to_s)
       @disp_flag = 0
 
-      if(@team.any?)
+      if(@team.any?)  #Check if a team exists for the given user within the given assignment
         @userTeam = SignedUpTeam.find_by_sql("select * from signed_up_teams where team_id = "+ @team[0].team_id.to_s)
-        if(@isTopicTaken.any?)
+
+        if(@isTopicTaken.any?)    #Check if the topic already has teams assigned to it
           if(@userTeam.any?)
             @oldTopic = @userTeam[0].topic_id;
             @isTopicTaken.each do |f|
@@ -182,13 +189,15 @@ class SignUpSheetController < ApplicationController
             if @disp_flag != 1
               @userTeam[0].update(topic_id: @topic.id)
               puts @topic.max_choosers
-              if (@isTopicTaken.size >= @topic.max_choosers)
+              if (@isTopicTaken.size >= @topic.max_choosers)      #Check to see if max number of teams have already been assigned the topic
                 @userTeam[0].update(is_waitlisted: 1)
                 flash[:success] = "Team is in the waitlist now"
               else
                 @userTeam[0].update(is_waitlisted: 0)
                 flash[:success] = "The topic has been assigned to the team"
               end
+
+              #Once the user's team has been reassigned to the new topic, the waitlist must be edited for the user's old topic
               @oldTopicTeams = SignedUpTeam.find_by_sql("select * from signed_up_teams where topic_id= "+ @oldTopic.to_s+" and is_waitlisted=1")
               if(@oldTopicTeams.any?)
                 @oldTopicTeams[0].update(is_waitlisted: 0)
@@ -220,7 +229,7 @@ class SignUpSheetController < ApplicationController
             @userTeam[0].update(topic_id: @topic.id)
             @userTeam[0].update(is_waitlisted: 0)
             @oldTopicTeams = SignedUpTeam.find_by_sql("select * from signed_up_teams where topic_id= "+ @oldTopic.to_s+" and is_waitlisted=1")
-            if(@oldTopicTeams.any?)
+            if(@oldTopicTeams.any?)   #Check if the user's old topic had waitlisted teams
               @oldTopicTeams[0].update(is_waitlisted: 0)
             end
             redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"

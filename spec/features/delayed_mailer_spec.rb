@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-def expect_deadline_check(deadline_condition)
+def expect_deadline_check(deadline_condition,send_reminder_condition,display_condition)
   if deadline_condition.eql? 'Submission deadline reminder email'
     send_reminder_condition = 'is able to send reminder email for submission deadline to signed-up users '
     display_condition = "submission"
@@ -29,12 +29,12 @@ def expect_deadline_check(deadline_condition)
   
       expect(Delayed::Job.count).to eq(1)
   
-      expect(Delayed::Job.last.handler).to include("deadline_type: submission")
+      expect(Delayed::Job.last.handler).to include(display_condition)
     end
   end
 end
 
-test1('Submission deadline reminder email')
+test1('Submission deadline reminder email','is able to send reminder email for submission deadline to signed-up users ',"deadline_type: submission")
 describe 'Review deadline reminder email' do
   it 'is able to send reminder email for review deadline to reviewers ' do
     id = 2

@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'pp'
 require 'spec_helper'
 require 'factory_girl_rails'
 

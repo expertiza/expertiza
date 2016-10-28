@@ -263,7 +263,7 @@ function removeDueDateTableElement(deadline_type, round_no) {
 //This is a generic funtion to add and substract days and months
 function addDaysOrMonth(mul, type) {
     var days = parseInt($('#days').val(), 10); // days variable stores the number of days to change the deadline
-    var months = parseInt($('#months').val(), 10);
+    var months = parseInt($('#months').val(), 10);  // days variable stores the number of days to change the deadline
     for (var i = 1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').length / 2; i++) {
         if ($('#use_updator_review_round_' + i).is(':checked')) {
             var date = $('#datetimepicker_review_round_' + i).val().split("/");

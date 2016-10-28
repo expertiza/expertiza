@@ -13,12 +13,12 @@ class Leaderboard < ActiveRecord::Base
 
   ### This methodreturns unaffiliiated assignments - assignments not affiliated to any course
   def self.get_independant_assignments(user_id)
-    assignment_ids = assignment_participant.where(user_id: user_id).pluck(:parent_id)
+    # assignment_ids = assignment_participant.where(user_id: user_id).pluck(:parent_id)
     # no_course_assignments = Assignment.where(id: assignment_ids, course_id: nil)
   end
 
   def self.get_assignments_in_courses(course_array)
-    assignment_list = Assignment.where(course_id: course_array)
+    # assignment_list = Assignment.where(course_id: course_array)
   end
 
   # This method gets all tuples in the Participants table associated
@@ -38,7 +38,7 @@ class Leaderboard < ActiveRecord::Base
   def self.get_participant_entries_in_assignment(assignment_id)
     assignment_list = []
     assignment_list << Assignment.find(assignment_id)
-#questionnaireHash = get_participant_entries_in_assignment_list(assignment_list)
+    # questionnaireHash = get_participant_entries_in_assignment_list(assignment_list)
   end
 
   # This method returns the participants score grouped by course, grouped by questionnaire type.

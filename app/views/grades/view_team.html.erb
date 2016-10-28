@@ -151,8 +151,6 @@ th.sorter-true.tablesorter-headerUnSorted{
 
           <!-- display the table title and tooltips -->
           <span style="width:100%;">
-            <p>Testing round number : <%=vm.round.to_s%> </p>
-            <p>Testing total number of rounds: <%=vm.rounds.to_s %></p>
               <h4 style="font-weight:bold;display:inline-block;"><%= vm.questionnaire_display_type %>
                 <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
                     (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)
@@ -210,7 +208,15 @@ th.sorter-true.tablesorter-headerUnSorted{
                   <!-- actual cells with scores and colored background. -->
                   <% row.score_row.each do |score| %>
                       <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%=score.comment%>">
+                        <% if row.question_max_score==1 %>
+                        <% if score.score_value==1 %>
+                                 <span> &#10003;</span>
+                            <% else %>
+                            <span> &#x2717;</span>
+                            <% end %>
+                        <%else %>
                         <%= score.score_value.to_s %>
+                        <% end %>
                       </td>
                   <% end %>
 

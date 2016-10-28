@@ -54,7 +54,7 @@ describe ReviewResponseMap do
   end
   describe "#export_field" do
     it "should be xx" do
-	expect(ReviewResponseMap.export_fields(6)).to eq(["contributor", "reviewed by"])
+	    expect(ReviewResponseMap.export_fields(6)).to eq(["contributor", "reviewed by"])
     end
   end
   describe "#show_feedback" do
@@ -69,12 +69,16 @@ describe ReviewResponseMap do
     let(:response) {Response.new(:id => 1, :map_id => 1)}
     let(:feedbackresponsemap) {FeedbackResponseMap.new(:id => 2, :reviewed_object_id => 8)}
     let(:metareviewresponsemap) {MetaReviewResponseMap.new(:id => 8, :reviewed_object_id => 8)}
-	it "deletes the map" do
-		expect(ReviewResponseMap.count).to eq(0)
+	  it "deletes the map" do
+		  expect(ReviewResponseMap.count).to eq(0)
 #		expect{ReviewResponseMap.delete(reviewresponsemap)}.to change{ReviewResponseMap.count}.by(-1)
-	end
+  	end
   end
-
+  describe "#add_reviewer" do
+    it "should add reviewer" do
+      #expect(ReviewResponseMap.add_reviewer(11,12,13)).to eq(something)
+    end
+  end
 
 
 end

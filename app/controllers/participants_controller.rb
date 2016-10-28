@@ -48,6 +48,7 @@ class ParticipantsController < ApplicationController
       curr_object.add_participant(params[:user][:name], can_submit, can_review, can_take_quiz)
       user = User.find_by_name(params[:user][:name])
       @participant = curr_object.participants.find_by_user_id(user.id)
+      puts "participant"
       undo_link("The user \"#{params[:user][:name]}\" has successfully been added.")
     rescue
       url_new_user = url_for controller: 'users', action: 'new'

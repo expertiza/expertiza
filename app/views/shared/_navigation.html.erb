@@ -21,11 +21,11 @@
       <ul class="nav navbar-nav navbar-right">
         <% if current_user %>
             <li class="impersonate-box">
-              <span id="impersonate-user-info">User: <%= current_user.name %></span>
+              <span id="impersonate-user-info">User: <%= session[:super_user] %></span>
               <% if session[:super_user] %>
                   <%= form_for :impersonate, url: '/impersonate/impersonate', html: {id: 'impersonate-form'} do |f| %>
                       <div class="input-group">
-                        <%= f.text_field :name, {id: 'inputImpersonateBox', class: 'form-control', placeholder: "impersonate..."} %>
+                        <%= f.hidden_field :name, {id: 'inputImpersonateBox', class: 'form-control', placeholder: "impersonate..."} %>
                         <span class="input-group-btn">
                         <button type="button" class="btn btn-primary" id="impersonate-button">Revert</button>
                         </span>

@@ -6,10 +6,7 @@ describe 'ReviewResponseMap' do
     @participant=create(:participant)
     @assignment_questionnaire= create(:assignment_questionnaire)
     @review_response=create(:review_response_map)
-
-
   end
-
   describe "#validity" do
     it "should have a valid reviewee_id" do
       expect(@review_response.reviewee_id).to be_instance_of(Fixnum)
@@ -32,4 +29,31 @@ describe 'ReviewResponseMap' do
       expect(export_fields.length).to be(2)
     end
   end
+
+  describe "#Test for the get_responses_for_team_round method" do
+
+    it "should return correct number of reponses per round for a team" do
+
+      @review1 = create(:response_1)
+      @review2 = create(:response_1)
+      @responsemap2= create(:response_map)
+      @review2.update(response_map: @responsemap2 )
+      @team = build(:assignment_team)
+      @team.id=1
+      expect(ReviewResponseMap.get_responses_for_team_round(@team,1).size).to eq(2)
+    end
+
+    it "should return only those reponses which are related to a particular round" do
+
+      @review1 = create(:response_1)
+      @review2 = create(:response_1)
+      @responsemap2= create(:response_map)
+      @review2.update(response_map: @responsemap2 )
+      @review2.update(round: 2)
+      @team = build(:assignment_team)
+      @team.id=1
+      expect(ReviewResponseMap.get_responses_for_team_round(@team,1).size).to eq(1)
+    end
+  end
+
 end

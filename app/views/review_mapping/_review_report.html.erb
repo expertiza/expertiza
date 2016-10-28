@@ -1,4 +1,3 @@
-
 <%@l = -1 %>
 <div class = 'reviewreport'>
   <table id="myTable" class="tbl_heat tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
@@ -29,6 +28,7 @@
                 <% (1..@assignment.num_review_rounds).each do |round| %>
                     <%= instance_variable_get("@review_in_round_" + round.to_s) %>/<%= @rspan %>
                     <%= ', ' unless round == @assignment.num_review_rounds %>
+
                 <% end %>
                 <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id %>
               </td>

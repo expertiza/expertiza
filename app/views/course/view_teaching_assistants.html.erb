@@ -8,14 +8,10 @@
       <th></th>
     </tr>
     <% for ta in @course.ta_mappings %>
-      <tr class="listingRow">
-        <td><%= User.find(ta.ta_id).name %></td>
-        <td><%= link_to "Edit", {:action => 'show', :controller =>'users', :id => ta.ta_id} %></td>
-        <td>
-          <%= link_to "Delete", { :action => 'remove_ta', :controller =>'course', :id => ta.id, :course_id => ta.course_id }, method: :post, :confirm=> "Do you want delete" %>
-        </td>
-      </tr>
+      <%= render :partial => 'ta_list',
+          :locals => {:ta => ta} %>
     <%end%>
+
   </table>
 <%end%>
 <%=
@@ -23,7 +19,7 @@
     :locals => {:form_action => "add_ta",
                 :obj_type => "course_id",
                 :obj_id => @course.id}
-              %>
+                %>
             <%
                 session[:return_to] = request.url
             session[:expected_fields] = 'username, full name (first[ middle] last), e-mail address, password'

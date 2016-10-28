@@ -316,6 +316,16 @@ describe "assignment function" do
                                 spec_location: 'testLocation1'
                             )
     end
+
+    it "check if checking calibration shows the tab" do
+      uncheck 'assignment_form_assignment_is_calibrated'
+      click_button 'Save'
+
+      check 'assignment_form_assignment_is_calibrated'
+      click_button 'Save'
+
+      expect(page).to have_selector('#Calibration')
+    end
   end
 
   describe "topics tab", js: true do

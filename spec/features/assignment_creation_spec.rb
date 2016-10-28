@@ -352,6 +352,24 @@ describe "assignment function" do
         use_bookmark: false
       )
     end
+
+    it "Add new topic" do
+      click_link 'New topic'
+      click_button 'OK'
+      fill_in 'topic_topic_identifier', with: '1'
+      fill_in 'topic_topic_name', with: 'Test'
+      fill_in 'topic_category', with: 'Test Category'
+      fill_in 'topic_max_choosers', with: 2
+      click_button 'Create'
+
+      sign_up_topics = SignUpTopic.where(topic_name: 'Test').first
+      expect(sign_up_topics).to have_attributes(
+        topic_name: 'Test',
+        assignment_id: 1,
+        max_choosers: 2,
+        category: 'Test Category'
+      )
+    end
   end
 
   # Begin rubric tab
@@ -363,15 +381,6 @@ describe "assignment function" do
       create :assignment_due_date, due_at: (DateTime.now - 1)
       @review_deadline_type = create(:deadline_type, name: "review")
       create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
-      create(:deadline_type, name: "submission")
-      create(:deadline_type, name: "review")
-      create(:deadline_type, name: "metareview")
-      create(:deadline_type, name: "drop_topic")
-      create(:deadline_type, name: "signup")
-      create(:deadline_type, name: "team_formation")
-      create(:deadline_right)
-      create(:deadline_right, name: 'Late')
-      create(:deadline_right, name: 'OK')
       create(:assignment_node)
       create(:question)
       create(:questionnaire)
@@ -497,12 +506,13 @@ describe "assignment function" do
   #Begin review strategy tab
   describe "review strategy tab", js: true do
     before(:each) do
-      @assignment = create(:assignment, name: 'public assignment for test')
+      create(:assignment, name: 'public assignment for test')
+      @assignment_id = Assignment.where(name: 'public assignment for test').first.id
     end
 
     it "auto selects" do
       login_as("instructor6")
-      visit '/assignments/1/edit'
+      visit "/assignments/#{@assignment_id}/edit"
       find_link('ReviewStrategy').click
       select "Auto-Selected", from: 'assignment_form_assignment_review_assignment_strategy'
       fill_in 'assignment_form_assignment_review_topic_threshold', with: 3

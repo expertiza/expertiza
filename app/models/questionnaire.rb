@@ -1,7 +1,7 @@
 
 class Questionnaire < ActiveRecord::Base
   validate :validate_questionnaire
-  require 'csv'
+
   def get_weighted_score(assignment, scores)
     # create symbol for "varying rubrics" feature -Yang
     round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(assignment.id, self.id).used_in_round
@@ -94,27 +94,7 @@ class Questionnaire < ActiveRecord::Base
     errors.add(:name, "Questionnaire names must be unique.") if !results.nil? and !results.empty?
   end
 
-  def to_csv(ques)
-        questions = ques
-        csv_data = CSV.generate do |csv|
-          row = ['seq','txt','type','weight','size','max_label','min_label','alternatives']
-          csv << row
-          for question in questions
-            row = []
-            row << question.seq
-            row << question.txt
-            row << question.type
-            row << question.weight
-            row << question.size || ''
-            row << question.max_label
-            row << question.min_label
-            row << question.alternatives
 
-            csv << row
-
-      end
-    end
-    end
 
   def self.ques(i)
     # code here

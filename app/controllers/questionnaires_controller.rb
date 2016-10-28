@@ -5,17 +5,10 @@ class QuestionnairesController < ApplicationController
   # A Questionnaire can be of several types (QuestionnaireType)
   # Each Questionnaire contains zero or more questions (Question)
   # Generally a questionnaire is associated with an assignment (Assignment)
- require 'pry'
+
   before_action :authorize
 
   def action_allowed?
-=begin
-    ['Super-Administrator',
-    'Administrator',
-    'Instructor',
-    'Teaching Assistant', 'Student'].include? current_role_name
-=end
-
     case params[:action]
       when 'edit', 'update', 'delete'
         #Modifications can only be done by papertrail
@@ -143,6 +136,7 @@ class QuestionnairesController < ApplicationController
   # Edit a questionnaire
   def edit
     @questionnaire = Questionnaire.find(params[:id])
+    redirect_to Questionnaire if @questionnaire.nil?
   end
 
   def update
@@ -273,14 +267,15 @@ class QuestionnairesController < ApplicationController
       redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
     end
 
-     export if params['export']
-     import if params['import']
+
+    import if params['import']
+    export if params['export']
 
 
     if params['view_advice']
-      redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
-
+      redirect_to controller: 'advice', action: 'edit_advice', id: params[:id] and return
     end
+
   end
 
   #=========================================================================================================
@@ -613,15 +608,7 @@ class QuestionnairesController < ApplicationController
     respond_to do |format|
       format.csv { send_data @questionnaire.to_csv(questions) }
     end
-    redirect_to Questionnaire if @questionnaire.nil?
-
-=begin
-    csv_data = QuestionnaireHelper.create_questionnaire_csv @questionnaire, session[:user].name
-
-    send_data csv_data,
-              type: 'text/csv; charset=iso-8859-1; header=present',
-              disposition: "attachment; filename=questionnaires.csv"
-=end
+    redirect_to Questionnaire and return if @questionnaire.nil?
   end
 
   def import
@@ -633,28 +620,11 @@ class QuestionnairesController < ApplicationController
       QuestionnaireHelper.get_questions_from_csv(file_data,params[:id])
       #Questionnaire.import(file_data)
 
-=begin
-        if file_data.respond_to?(:read)
-          csv_text = file_data.read
-        elsif file_data.respond_to?(:path)
-          csv_text = File.read(file_data.path)
-          end
-=end
-
       redirect_to edit_questionnaire_path(questionnaire_id.to_sym), notice: "All questions have been successfully imported!"
     rescue
       redirect_to edit_questionnaire_path(questionnaire_id.to_sym), notice: $ERROR_INFO
     end
 
-=begin
-   # @questionnaire = Questionnaire.find(params[:id])
-
-    #file = params['csv']
-
-    #@questionnaire.questions << QuestionnaireHelper.get_questions_from_csv(@questionnaire, file)
-
-    QuestionnaireHelper.get_questions_from_csv(@questionnaire, file)
-=end
 
 
   end

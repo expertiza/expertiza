@@ -28,6 +28,20 @@ def edit_topics_properties
   end
 end
 
+def update_scored_question(tr_variable,select_variable)
+  it "should update scored question dropdown" do
+    find_link('Rubrics').click
+    within(tr_variable) do
+      select select_variable, from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+      select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
+    end
+    click_button 'Save'
+    questionnaire = Questionnaire.where(name: select_variable).first
+    assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
+    expect(assignment_questionnaire.dropdown).to eq(false)
+  end
+end
+
 def get_selected_id(finder_var)
   if finder_var == "ReviewQuestionnaire2"
     ReviewQuestionnaire.find_by(name: finder_var)[:id]
@@ -248,18 +262,7 @@ describe "assignment function" do
         )
       end
 
-      it "should update scored question dropdown" do
-        find_link('Rubrics').click
-        within("tr#questionnaire_table_ReviewQuestionnaire") do
-          select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-          select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-        end
-        click_button 'Save'
-        questionnaire = Questionnaire.where(name: "ReviewQuestionnaire2").first
-        assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
-        expect(assignment_questionnaire.dropdown).to eq(false)
-      end
-
+      update_scored_question("tr#questionnaire_table_ReviewQuestionnaire","ReviewQuestionnaire2")
       # Second row of rubric
       it "updates author feedback questionnaire" do
         find_link('Rubrics').click

@@ -197,6 +197,8 @@ class SignUpSheetController < ApplicationController
 
                 if @disp_flag != 1
                    @userTeam[0].update(topic_id: @topic.id)
+                   puts "SNEHA CHANGED ME"
+                   puts @topic.max_choosers
                    if (@isTopicTaken.size >= @topic.max_choosers)
                       @userTeam[0].update(is_waitlisted: 1)
                       flash[:success] = "Team is in the waitlist now"
@@ -213,11 +215,15 @@ class SignUpSheetController < ApplicationController
                    redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
                 end
 
-                else #@userTeam.any
+             else #@userTeam.any
                    @sign_up = SignedUpTeam.new
                    @sign_up.topic_id = @topic.id
                    @sign_up.team_id = @team[0].team_id
-                   @sign_up.is_waitlisted = false
+                   if (@isTopicTaken.size >= @topic.max_choosers)
+                      @sign_up.is_waitlisted = 1
+                   else
+                      @sign_up.is_waitlisted = 0
+                   end
                    @sign_up.preference_priority_number =0
                    if @sign_up.save
                       flash[:success] = "The topic has been assigned to the team"
@@ -245,7 +251,7 @@ class SignUpSheetController < ApplicationController
                    @sign_up = SignedUpTeam.new
                    @sign_up.topic_id = @topic.id
                    @sign_up.team_id = @team[0].team_id
-                   @sign_up.is_waitlisted = false
+                   @sign_up.is_waitlisted = 0
                    @sign_up.preference_priority_number =0
                    if @sign_up.save
                      flash[:success] = "The topic has been assigned to the team"

@@ -74,31 +74,42 @@ describe "HeatMapTest", type: :feature do
   end
 
 
-  it "See reviews" do
+  it "Create reviews" do
     createReviews
     #expect(page).to have_content "Review 1"
     expect(page).to have_content "Your response was successfully saved."
-    # 1. click on the button of "Toggles question list"
-    # 2. expect to have content of the list of questions
+
   end
 
   xit "Loads Heat Map page" do
-    # Load data
     load_questionnaire
 
     expect(page).to have_content "Summary Report for assignment"
   end
 
-  it "Sorts by total review score" do
+  it "See submitted review in the page" do
     createReviews
-    click_link "Logout"
-    load_questionnaire
+
+
+    user = User.find_by_name("student2064")
+    stub_current_user(user, user.role.name, user.role)
+
+    #click_link "Logout"
+    #expect(page).to have_content 'Welcome'
+    #login_as('student2064')
+
+    visit '/student_task/list'
+    expect(page).to have_content "User: student2064"
+    expect(page).to have_content "TestAssignment"
+
+    click_link "TestAssignment"
+    expect(page).to have_content "Submit or Review work for TestAssignment"
+    expect(page).to have_content "Others' work"
+
+    click_link "Alternate View"
 
     expect(page).to have_content "Review 1"
 
-    # 1. click on the button of "Sorts by total review score"
-    # 2. calculate or load the total score for each review
-    # 3. check if the total score is sorted and toggled between low-to-high and high-to-low
   end
 
 

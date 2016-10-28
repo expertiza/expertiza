@@ -11,8 +11,7 @@ module OnTheFlyCalc
     @review_scores = {}
     reviewer = @review_scores[response_map.reviewer_id]
     @response_type = 'ReviewResponseMap'
-
-    if self.varying_rubrics_by_round? 
+    if self.varying_rubrics_by_round?
       rounds = self.rounds_of_reviews
       @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
       calc_varying_rubrics
@@ -46,7 +45,6 @@ module OnTheFlyCalc
       reviewer[round] = @respective_scores
     end
   end
-
 
   def calc_non_varying_rubric
     review_questionnaire_id = review_questionnaire_id()
@@ -111,8 +109,6 @@ module OnTheFlyCalc
 end
 
 private
-
-
 
 def assess
   total_score = 0

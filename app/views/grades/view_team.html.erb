@@ -151,6 +151,8 @@ th.sorter-true.tablesorter-headerUnSorted{
 
           <!-- display the table title and tooltips -->
           <span style="width:100%;">
+            <p>Testing round number : <%=vm.round.to_s%> </p>
+            <p>Testing total number of rounds: <%=vm.rounds.to_s %></p>
               <h4 style="font-weight:bold;display:inline-block;"><%= vm.questionnaire_display_type %>
                 <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
                     (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)

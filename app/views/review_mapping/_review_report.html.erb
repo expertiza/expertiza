@@ -75,3 +75,16 @@
 
   <p> **Text in <i style = "color:#DD3300">red</i> indicates that the review is not yet completed; text in <i style = "color:gray">gray</i> indicates that the review is done in previous round(s).</p>
 </div>
+
+<script>
+$(function () {
+		 $("#myTable").tablesorter({
+		sortList: [[0,0]], //sort First Column by default
+		headers: {
+     		   4: {
+      			  sorter: 'customParser' //custom Parser to parse Metrics data
+     		      }
+   		 }
+		});
+	});
+</script>

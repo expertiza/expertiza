@@ -214,9 +214,17 @@ class QuestionnairesController < ApplicationController
         flash[:error] = $ERROR_INFO
       end
     end
+    @questionnaire_id=questionnaire_id
+    @params_action=params[:action]
+    @questionnaire = Questionnaire.find(questionnaire_id)
     respond_to do |format|
-      format.html {redirect_to edit_questionnaire_path(questionnaire_id.to_sym)}
-      format.js
+      #format.html {redirect_to edit_questionnaire_path(questionnaire_id.to_sym)}
+      puts "Printing html??"
+      puts @questionnaire
+      #puts render_to_string edit_questionnaire_path(questionnaire_id.to_sym)
+      #format.js {render :action => "add_new_questions", :locals => {questionnaire_id => @questionnaire_id}}
+      #format.json {render :json => @question}
+      format.js {render :action => "add_new_questions"}
     end
   end
 

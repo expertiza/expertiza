@@ -32,10 +32,11 @@
 <!--Question part-->
 <hr/>
 <% if !params[:id].nil? and params[:action] == 'edit' %>
+    <div id="questionnaire-partial">
   <table id="question_actions_table">
     <tr>
       <td>
-        <%= form_tag :action => 'add_new_questions', :id => params[:id], :questionnaire_type => params[:model], :private => params[:private] do %>
+        <%= form_tag url_for(:action => 'add_new_questions', :id => params[:id], :questionnaire_type => params[:model], :private => params[:private]), :remote => true do %>
           <%= submit_tag 'Add' %>
           <%= text_field 'question', 'total_num', :size => 1, :value => "1" %> more 
           <%= select "question", "type", 
@@ -55,7 +56,7 @@
     </tr>
   </table>
   
-  <%= form_tag url_for(:action => 'save_all_questions', :id => params[:id], :questionnaire_type => params[:model], :private => params[:private]), :remote => true, :format => [:js] do %>
+  <%= form_tag url_for(:action => 'save_all_questions', :id => params[:id], :questionnaire_type => params[:model], :private => params[:private]), :remote => true do %>
     <table id="questions_table">
       <tr>
         <th class="head" align="center" width="30">Action</td>
@@ -82,6 +83,7 @@
     <br />
     <input type="submit" name="export" value="Export questions to CSV"%>
   <% end %>
+    </div>
 <% end %>
 
 <BR/>

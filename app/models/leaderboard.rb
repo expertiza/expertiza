@@ -12,39 +12,39 @@ class Leaderboard < ActiveRecord::Base
   # with a specific course.
 
   ### This methodreturns unaffiliiated assignments - assignments not affiliated to any course
-    # def self.get_independant_assignments(user_id)
-    # assignment_ids = assignment_participant.where(user_id: user_id).pluck(:parent_id)
-    # no_course_assignments = Assignment.where(id: assignment_ids, course_id: nil)
-    # end
-    # def self.get_assignments_in_courses(course_array)
-    # assignment_list = Assignment.where(course_id: course_array)
-    # end
+  def self.get_independant_assignments(user_id)
+     assignment_ids = AssignmentParticipant.where(user_id: user_id).pluck(:parent_id)
+     Assignment.where(id: assignment_ids, course_id: nil)
+  end
+  def self.get_assignments_in_courses(course_array)
+     Assignment.where(course_id: course_array)
+  end
 
   # This method gets all tuples in the Participants table associated
   # hierarchy (q_type => course => user => score)
 
-  def self.get_participant_entries_in_courses(course_array, user_id)
+  def self.get_part_entries_in_courses(course_array, user_id)
     # assignment_list = []
     assignment_list = get_assignments_in_courses(course_array)
     independant_assignments = get_independant_assignments(user_id)
     assignment_list.concat(independant_assignments)
 
-    # questionnaireHash = get_participants_score(assignment_list)
+    get_participants_score(assignment_list)
   end
 
   # This method gets all tuples in the Participants table associated
   # hierarchy (q_type => course => user => score).
-  def self.get_participant_entries_in_assignment(assignment_id)
+  def self.get_part_entries_in_assignment(assignment_id)
     assignment_list = []
     assignment_list << Assignment.find(assignment_id)
-    # questionnaireHash = get_participant_entries_in_assignment_list(assignment_list)
+    get_participant_entries_in_assignment_list(assignment_list)
   end
 
   # This method returns the participants score grouped by course, grouped by questionnaire type.
   # End result is a hash (q_type => (course => (user => score)))
   def self.get_participants_score(assignment_list)
     q_type_hash = {}
-    questionnaire_response_type_hash = {"ReviewResponseMap" => "ReviewQuestionnaire",
+    quest_response_type_hash = {"ReviewResponseMap" => "ReviewQuestionnaire",
                                         "MetareviewResponseMap" => "MetareviewQuestionnaire",
                                         "FeedbackResponseMap" => "AuthorFeedbackQuestionnaire",
                                         "TeammateReviewResponseMap" => "TeammateReviewQuestionnaire",
@@ -67,7 +67,7 @@ class Leaderboard < ActiveRecord::Base
     reviewee_list.concat(team_list.pluck(:id)).uniq!
 
     # Get scores from ScoreCache for computed reviewee list.
-    scores = ScoreCache.where("reviewee_id IN (?) and object_type IN (?)", reviewee_list, questionnaire_response_type_hash.keys)
+    scores = ScoreCache.where("reviewee_id IN (?) and object_type IN (?)", reviewee_list, quest_response_type_hash.keys)
 
     # for score_entry in scores
     scores.each do |score_entry|
@@ -83,7 +83,7 @@ class Leaderboard < ActiveRecord::Base
         course_id = assignment_map["participant"][score_entry.reviewee_id]["assignment"].try(:course_id).to_i
       end
 
-      questionnaire_type = questionnaire_response_type_hash[score_entry.object_type]
+      questionnaire_type = quest_response_type_hash[score_entry.object_type]
 
       add_score_to_resultant_hash(q_type_hash, questionnaire_type, course_id, reviewee_user_id_list, score_entry.score)
     end
@@ -96,7 +96,7 @@ class Leaderboard < ActiveRecord::Base
   def self.add_score_to_resultant_hash(q_type_hash, questionnaire_type, course_id, reviewee_user_id_list, score_entry_score)
     if reviewee_user_id_list
       # Loop over all the reviewee_user_id.
-      # for reviewee_user_id in reviewee_user_id_list
+      #for reviewee_user_id in reviewee_user_id_list
       reviewee_user_id_list.each do |reviewee_user_id|
         if q_type_hash.fetch(questionnaire_type, {}).fetch(course_id, {}).fetch(reviewee_user_id, nil).nil?
           user_hash = {}
@@ -109,8 +109,7 @@ class Leaderboard < ActiveRecord::Base
 
               q_type_hash[questionnaire_type] = course_hash
               q_type_hash[questionnaire_type][course_id] = user_hash
-            end
-          else if q_type_hash.fetch(questionnaire_type, {}).fetch(course_id, nil).nil? && !q_type_hash.fetch(questionnaire_type, nil).nil?
+          elseif q_type_hash.fetch(questionnaire_type, {}).fetch(course_id, nil).nil? && !q_type_hash.fetch(questionnaire_type, nil).nil?
             q_type_hash[questionnaire_type][course_id] = user_hash
           end
 
@@ -209,7 +208,7 @@ class Leaderboard < ActiveRecord::Base
 
   # Returns string for Top N Leaderboard Heading or accomplishments entry
   def self.leaderboard_heading(q_type_id)
-    lt_entry = Leaderboard.find_by q_type(q_type_id)
+    lt_entry = Leaderboard.find_by_qtype(q_type_id)
     if lt_entry
       lt_entry.name
     else

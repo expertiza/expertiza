@@ -3,15 +3,18 @@ require 'rails_helper'
 describe Leaderboard do
   #let(:leaderboard) { Leaderboard.new questionnaire_type_id: 1, name: "test", qtype: "qtype" }
   before(:each) do
-    @student = create(:student)
+    @student1 = create(:student, name: "Student1", fullname: "Student1 Test", email: "student1@mail.com" )
+    @student2 = create(:student, name: "Student2", fullname: "Student2 Test", email: "student2@mail.com" )
     @instructor = create(:instructor)
     @course = create(:course)
-    @assignment = create(:assignment, course: nil)
-    @assignment2 = create(:assignment)
-    @participant = create(:participant)
+    @assignment = create(:assignment, name: "Assign1", course: nil)
+    @assignment2 = create(:assignment, name: "Assign2")
+    @participant = create(:participant, parent_id: @assignment.id, user_id: @student1.id)
+    @participant2 = create(:participant, parent_id: @assignment2.id, user_id: @student2.id)
     @questionnaire=create(:questionnaire)
-    @assignment_questionnaire =create(:assignment_questionnaire, user_id: @student.id, assignment: @assignment)
-    @leaderboard = Leaderboard.new questionnaire_type_id: 1, name: "test", qtype: "qtype"
+    @assignment_questionnaire1 =create(:assignment_questionnaire, user_id: @student1.id, assignment: @assignment)
+    @assignment_questionnaire2 =create(:assignment_questionnaire, user_id: @student2.id, assignment: @assignment2)
+    @assignment_team = create(:assignment_team)
   end
   #let(:student){create(:student)}
   #let(:instructor){create(:instructor)}
@@ -23,93 +26,89 @@ describe Leaderboard do
 
 
   it "getIndependantAssignment should return no assignments" do
-    expect(Leaderboard.getIndependantAssignments(1)).to have(0).items
+    expect(Leaderboard.get_independant_assignments(@student2.id)).to have(0).items
 
   end
 
   it "getIndependantAssignment should return an assignments" do
-    #student = build(:student)
-    #instructor = build(:instructor)
-    #course = build(:course)
-    #assignment = build(:assignment, course: nil)
-    #participant = build(:participant)
-    #questionnaire=build(:questionnaire)
-    #assignment_questionnaire =build(:assignment_questionnaire)
-        expect(Leaderboard.getIndependantAssignments(@student.id)).to have(1).items
+    #puts Assignment.where(course_id: nil).inspect
+    puts AssignmentParticipant.where(user_id: @student1.id).inspect
+    expect(Leaderboard.get_independant_assignments(@student1.id)).to have(1).items
+    #expect(Assignment.where(course_id: nil)).to have(1).items
+
 
   end
 
   it "getAssignmentsInCourses should return an assignment" do
 
 
-    expect(Leaderboard.getAssignmentsInCourses(1)).to have(1).items
+    expect(Leaderboard.get_assignments_in_courses(1)).to have(1).items
 
   end
 
-  it "leaderboardHeading should return No Entry" do
+  it "leaderboard_heading should return No Entry with invalid input" do
     leaderboard = Leaderboard.new questionnaire_type_id: 1, name: "test", qtype: "qtype"
-    expect(Leaderboard.leaderboardHeading("test")).to eq("No Entry")
+    expect(Leaderboard.leaderboard_heading("test")).to eq("No Entry")
 
   end
-  it "leaderboardHeading should return name" do
-    #@leaderboard = Leaderboard.new questionnaire_type_id: 1, name: "test", qtype: "qtype"
-    expect(Leaderboard.leaderboardHeading(@leaderboard.qtype)).to eq("test")
+  it "leaderboard_heading should return name" do
+    expect(Leaderboard.leaderboard_heading(@questionnaire.id)).to eq("test")
   end
 
-  it "Leaderboard responds to getIndependantAssignment" do
+  it "Leaderboard responds to get_independant_assignments" do
 
-    expect(Leaderboard).to respond_to(:getIndependantAssignments).with(1).argument
-
-  end
-
-  it "Leaderboard responds to getAssignmentsInCourses" do
-
-    expect(Leaderboard).to respond_to(:getAssignmentsInCourses).with(1).argument
-
-  end
-  it "Leaderboard responds to getParticipantEntriesInCourses" do
-
-    expect(Leaderboard).to respond_to(:getParticipantEntriesInCourses).with(2).argument
+    expect(Leaderboard).to respond_to(:get_independant_assignments).with(1).argument
 
   end
 
-  it "Leaderboard responds to getParticipantEntriesInAssignment" do
+  it "Leaderboard responds to get_assignments_in_courses" do
 
-    expect(Leaderboard).to respond_to(:getParticipantEntriesInAssignment).with(1).argument
+    expect(Leaderboard).to respond_to(:get_assignments_in_courses).with(1).argument
+
+  end
+  it "Leaderboard responds to get_part_entries_in_courses" do
+
+    expect(Leaderboard).to respond_to(:get_part_entries_in_courses).with(2).argument
 
   end
 
-  it "Leaderboard responds to getParticipantsScore" do
+  it "Leaderboard responds to get_part_entries_in_assignment" do
 
-    expect(Leaderboard).to respond_to(:getParticipantsScore).with(1).argument
-
-  end
-
-  it "Leaderboard responds to addScoreToResultantHash" do
-
-    expect(Leaderboard).to respond_to(:addScoreToResultantHash).with(5).argument
-
-  end
-  it "Leaderboard responds to getAssignmentMapping" do
-
-    expect(Leaderboard).to respond_to(:getAssignmentMapping).with(3).argument
+    expect(Leaderboard).to respond_to(:get_part_entries_in_assignment).with(1).argument
 
   end
 
-  it "Leaderboard responds to sortHash" do
+  it "Leaderboard responds to get_participants_score" do
 
-    expect(Leaderboard).to respond_to(:sortHash).with(1).argument
-
-  end
-  it "Leaderboard responds to extractPersonalAchievements" do
-
-    expect(Leaderboard).to respond_to(:extractPersonalAchievements).with(3).argument
+    expect(Leaderboard).to respond_to(:get_participants_score).with(1).argument
 
   end
 
-  it "Leaderboard responds to leaderboardHeading" do
+  it "Leaderboard responds to add_score_to_resultant_hash" do
 
-    expect(Leaderboard).to respond_to(:leaderboardHeading).with(1).argument
+    expect(Leaderboard).to respond_to(:add_score_to_resultant_hash).with(5).argument
+
+  end
+  it "Leaderboard responds to get_assignment_mapping" do
+
+    expect(Leaderboard).to respond_to(:get_assignment_mapping).with(3).argument
+
+  end
+
+  it "Leaderboard responds to sort_hash" do
+
+    expect(Leaderboard).to respond_to(:sort_hash).with(1).argument
+
+  end
+  it "Leaderboard responds to extract_personal_achievements" do
+
+    expect(Leaderboard).to respond_to(:extract_personal_achievements).with(3).argument
+
+  end
+
+  it "Leaderboard responds to leaderboard_heading" do
+
+    expect(Leaderboard).to respond_to(:leaderboard_heading).with(1).argument
 
   end
 

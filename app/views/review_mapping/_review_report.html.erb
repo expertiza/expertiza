@@ -87,4 +87,18 @@ $(function () {
    		 }
 		});
 	});
+
+$.tablesorter.addParser({
+  id: "customParser",                                       //customParser for sorting by volume
+  is: function (stringValue) {
+    return false;
+  },
+  format: function (stringValue) {
+    var stringNumericPart = stringValue.split(" ");         //split the data by spaces
+    var numericValue = parseInt(stringNumericPart[1],10);   
+    return numericValue ;
+  },
+  type: 'numeric'
+});
+
 </script>

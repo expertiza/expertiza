@@ -1,1 +1,1 @@
-$('.listing').append("<%= j render partial: 'ta_list', locals: {ta: @ta_mapping} %>").html();
+$('.listing').append("<%= escape_javascript (render partial: 'ta_list', locals: {ta: @ta_mapping}) %>").html();

@@ -9,10 +9,8 @@ module OnTheFlyCalc
 
   def compute_reviews_hash
     @review_scores = {}
-    reviewer = @review_scores[response_map.reviewer_id]
     @response_type = 'ReviewResponseMap'
     if self.varying_rubrics_by_round?
-      rounds = self.rounds_of_reviews
       @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
       calc_varying_rubrics
     else
@@ -20,44 +18,6 @@ module OnTheFlyCalc
       calc_non_varying_rubric
     end
     @review_scores
-  end
-
-  def calc_scores_varying_rubrics
-    rounds.each do |round|
-      review_questionnaire_id = review_questionnaire_id(round)
-      @questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
-      scores_each_response
-    end
-  end
-
-  def scores_each_response
-    @response_maps.each do |response_map|
-      @corresponding_response = Response.where(['map_id = ?', response_map.id])
-      @corresponding_response = @corresponding_response.reject {|response| response.round != round } unless @corresponding_response.empty?
-      @respective_scores = {}
-      if !reviewer.nil? && !reviewer[round].nil?
-        @respective_scores = reviewer[round]
-      end
-      calc_review_score
-      @respective_scores[response_map.reviewee_id] = @this_review_score
-      reviewer = {} if reviewer.nil?
-      reviewer[round] = {} if reviewer[round].nil?
-      reviewer[round] = @respective_scores
-    end
-  end
-
-  def calc_non_varying_rubric
-    review_questionnaire_id = review_questionnaire_id()
-    @questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
-
-    @response_maps.each do |response_map|
-      @corresponding_response = Response.where(['map_id = ?', response_map.id])
-      @respective_scores = {}
-      @respective_scores = reviewer unless reviewer.nil?
-      calc_review_score
-      @respective_scores[response_map.reviewee_id] = @this_review_score
-      reviewer = @respective_scores
-    end
   end
 
   # calculate the avg score and score range for each reviewee(team), only for peer-review
@@ -85,23 +45,19 @@ module OnTheFlyCalc
     score = score_team[:scores]
     scores[:participants] = {}
     participant_score
-
     scores[:teams] = {}
     index = 0
     self.teams.each do |team|
       score_team = {}
       score_team[:team] = team
-
       if self.varying_rubrics_by_round?
         assess
         calculate_score
         calculate_assessment
-
       else
         assessments = ReviewResponseMap.get_assessments_for(team)
         score = Answer.compute_scores(assessments, questions[:review])
       end
-
       index += 1
     end
     scores
@@ -133,20 +89,18 @@ def calculate_score
   round = grades_by_rounds[round_sym]
   self.num_review_rounds.each do |i|
     round_sym = ("review" + i.to_s).to_sym
-    score[:max] = round[:max] if condition
-    score[:min] = round[:min] if condition1
+    grades_by_rounds = {}
+    round = grades_by_rounds[round_sym]
+    score[:max] = round[:max] if max_condition
+    score[:min] = round[:min] if min_condition
   end
 end
 
-def condition
-  grades_by_rounds = {}
-  round = grades_by_rounds[round_sym]
+def max_condition
   !round[:max].nil? && score[:max] < round[:max]
 end
 
-def condition1
-  grades_by_rounds = {}
-  round = grades_by_rounds[round_sym]
+def min_condition
   !round[:min].nil? && score[:min] > round[:min]
 end
 
@@ -188,5 +142,45 @@ def calc_review_score
     end
   else
     @this_review_score = -1.0
+  end
+end
+
+def calc_scores_varying_rubrics
+  rounds = self.rounds_of_reviews
+  rounds.each do |round|
+    review_questionnaire_id = review_questionnaire_id(round)
+    @questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
+    scores_each_response
+  end
+end
+
+def scores_each_response
+  @response_maps.each do |response_map|
+    reviewer = @review_scores[response_map.reviewer_id]
+    @corresponding_response = Response.where(['map_id = ?', response_map.id])
+    @corresponding_response = @corresponding_response.reject {|response| response.round != round } unless @corresponding_response.empty?
+    @respective_scores = {}
+    if !reviewer.nil? && !reviewer[round].nil?
+      @respective_scores = reviewer[round]
+    end
+    calc_review_score
+    @respective_scores[response_map.reviewee_id] = @this_review_score
+    reviewer = {} if reviewer.nil?
+    reviewer[round] = {} if reviewer[round].nil?
+    reviewer[round] = @respective_scores
+  end
+end
+
+def calc_non_varying_rubric
+  review_questionnaire_id = review_questionnaire_id()
+  @questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
+  @response_maps.each do |response_map|
+    reviewer = @review_scores[response_map.reviewer_id]
+    @corresponding_response = Response.where(['map_id = ?', response_map.id])
+    @respective_scores = {}
+    @respective_scores = reviewer unless reviewer.nil?
+    calc_review_score
+    @respective_scores[response_map.reviewee_id] = @this_review_score
+    reviewer = @respective_scores
   end
 end

@@ -1,4 +1,4 @@
 Hi <%= @first_name %>,</br>
-<p> A new <%=@type%> for the <%= @obj_name %> assignment has just been entered.
+<p> A new <%=@type%> for the <%= @obj_name.partition(",").first %> assignment for round <%= @obj_name.partition(",").last %> has just been entered.
  You may log into Expertiza and view it now.
 </p>

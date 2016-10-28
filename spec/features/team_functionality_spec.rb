@@ -878,7 +878,7 @@ describe "team functionality testing case 5", type: :feature do
 end
 
 
-#case 6 2 student selet the same topic should be in different teams
+#case 6 2 student select the same topic should be in different teams
 describe "team functionality testing case 6", type: :feature do
   before(:each) do
     create(:assignment, name: "TestTeam", directory_path: 'test_team')
@@ -1000,6 +1000,18 @@ describe "team functionality testing case 6", type: :feature do
 
 
       expect(page).to have_content "1"
+
+      click_link "Assignments"
+
+      click_link "TestTeam"
+
+      expect(page).to have_content "Your team"
+
+      click_link "Your team"
+      expect(page).to have_content "Team Name"
+      expect(page).to have_content "student2065"
+      expect(page).to have_no_content "student2064"
+
 
 
 

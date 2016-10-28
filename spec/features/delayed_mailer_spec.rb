@@ -1,8 +1,8 @@
 require 'rails_helper'
 
-def expect_deadline_check(deadline_condition,send_reminder_condition,display_condition)
+def expect_deadline_check(deadline_condition)
   describe deadline_condition do
-    it send_reminder_condition do
+    it 'is able to send reminder email for submission deadline to signed-up users ' do
       # Delayed::Worker.delay_jobs = false
       id = 2
       @name = "user"
@@ -30,7 +30,7 @@ def expect_deadline_check(deadline_condition,send_reminder_condition,display_con
   end
 end
 
-test1('Submission deadline reminder email','is able to send reminder email for submission deadline to signed-up users ',"deadline_type: submission")
+test1('Submission deadline reminder email')
 
 describe 'Review deadline reminder email' do
   it 'is able to send reminder email for review deadline to reviewers ' do

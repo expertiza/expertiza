@@ -64,6 +64,44 @@ class ScheduledTask
     end
   end
 
+  def mail_sign_up_topic_users
+    sign_up_topics = SignUpTopic.where(['assignment_id = ?', self.assignment_id])
+    assignment = Assignment.find(self.assignment_id)
+    emails =[]
+    for topic in sign_up_topics
+      signedUpTeams = SignedUpTeam.where(['topic_id = ?', topic.id])
+      unless assignment.team_assignment?
+        for signedUser in signedUpTeams
+          uid  = signedUser.team_id
+          user = User.find(uid)
+          emails << user.email
+        end
+      else
+        for signedUser in signedUpTeams
+          teamid = signedUser.team_id
+          team_members = TeamsUser.where(team_id: teamid)
+          for team_member in team_members
+            user = User.find(team_member.user_id)
+            emails << user.email
+          end
+        end
+      end
+    end
+    emails
+  end
+
+  def mail_non_sign_up_topic_users
+    emails = []
+    assignment = Assignment.find(self.assignment_id)
+
+    if assignment.team_assignment?
+      emails = getTeamMembersMail
+    else
+      emails = mail_assignment_participants
+    end
+    emails
+  end
+
   def mail_signed_up_users
     emails = []
     assignment = Assignment.find(self.assignment_id)
@@ -71,37 +109,11 @@ class ScheduledTask
 
     # If there are sign_up topics for an assignement then send a mail toonly signed_up_teams else send a mail to all participants
     if (sign_up_topics.nil? || sign_up_topics.count == 0)
-      if assignment.team_assignment?
-        teamMails = getTeamMembersMail
-        for mail in teamMails
-          emails << mail
-          email_reminder(emails, self.deadline_type)
-        end
-      else
-        mail_assignment_participants
-      end
+      emails = mail_non_sign_up_topic_users
     else
-      for topic in sign_up_topics
-        signedUpTeams = SignedUpTeam.where(['topic_id = ?', topic.id])
-        unless assignment.team_assignment?
-          for signedUser in signedUpTeams
-            uid  = signedUser.team_id
-            user = User.find(uid)
-            emails << user.email
-          end
-        else
-          for signedUser in signedUpTeams
-            teamid = signedUser.team_id
-            team_members = TeamsUser.where(team_id: teamid)
-            for team_member in team_members
-              user = User.find(team_member.user_id)
-              emails << user.email
-            end
-          end
-        end
-      end
-      email_reminder(emails, self.deadline_type) if emails.size > 0
+      emails = mail_sign_up_topic_users
     end
+    email_reminder(emails, self.deadline_type) if emails.size > 0
   end
 
   def getTeamMembersMail
@@ -144,7 +156,8 @@ class ScheduledTask
         emails << user.email
       end
     end
-    email_reminder(emails, self.deadline_type) if emails.size > 0
+    emails
+    #email_reminder(emails, self.deadline_type) if emails.size > 0
   end
 
   def mail_reviewers
@@ -156,7 +169,8 @@ class ScheduledTask
       user = User.find(uid)
       emails << user.email
     end
-    email_reminder(emails, self.deadline_type) if emails.size > 0
+    emails
+    #email_reminder(emails, self.deadline_type) if emails.size > 0
   end
 
   def mail_assignment_participants
@@ -167,7 +181,8 @@ class ScheduledTask
       user = User.find(uid)
       emails << user.email
     end
-    email_reminder(emails, self.deadline_type)
+    #email_reminder(emails, self.deadline_type)
+    emails
   end
 
   def email_reminder(emails, deadlineType)

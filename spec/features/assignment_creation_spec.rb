@@ -508,7 +508,6 @@ describe "assignment function" do
         expect(assignment_questionnaire.dropdown).to eq(false)
       end
 
-
       ##
       # Third row of rubric
       xit "updates teammate review questionnaire" do
@@ -525,17 +524,6 @@ describe "assignment function" do
           questionnaire_weight: 50,
           notification_limit: 50
         )
-      end
-
-      xit "should update scored question dropdown" do
-        within("tr#questionnaire_table_TeammateReviewQuestionnaire") do
-          select "TeammateReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-          select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-        end
-        click_button 'Save'
-        questionnaire = Questionnaire.where(name: "TeammateReviewQuestionnaire2").first
-        assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
-        expect(assignment_questionnaire.dropdown).to eq(false)
       end
     end
   end

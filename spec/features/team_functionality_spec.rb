@@ -1,5 +1,7 @@
 require 'rails_helper'
 
+#case1 team leader can invite a student to join team, and a student can accept the invitation
+
 describe "team functionality testing case 1", type: :feature do
   before(:each) do
     create(:assignment, name: "TestTeam", directory_path: 'test_team')
@@ -161,8 +163,10 @@ describe "team functionality testing case 1", type: :feature do
 
 
   end
-    #case2 team leader can invite a student to join team, and a student can decline the invitaion
+
 end
+
+#case2 team leader can invite a student to join team, and a student can decline the invitation
 
 describe "team functionality testing case 2", type: :feature do
   before(:each) do
@@ -323,7 +327,7 @@ describe "team functionality testing case 2", type: :feature do
   end
 
 
-
+#case3 team member can invite another student to join team, and a student can accept the invitation
 describe "team functionality testing case 3", type: :feature do
   before(:each) do
     create(:assignment, name: "TestTeam", directory_path: 'test_team')
@@ -344,7 +348,7 @@ describe "team functionality testing case 3", type: :feature do
   end
 
 
-    #case3 team member can invite another team member to join team
+
   it "case3" do
 
     in_browser(:one) do
@@ -559,7 +563,7 @@ describe "team functionality testing case 3", type: :feature do
 end
 
 
-
+#case4 team member can leave team
 describe "team functionality testing case 4", type: :feature do
   before(:each) do
     create(:assignment, name: "TestTeam", directory_path: 'test_team')
@@ -581,7 +585,7 @@ describe "team functionality testing case 4", type: :feature do
 
 
 
-  #case4 team member can leave team
+
 
   it "case4" do
 
@@ -873,6 +877,8 @@ describe "team functionality testing case 5", type: :feature do
 
 end
 
+
+#case 6 2 student selet the same topic should be in different teams
 describe "team functionality testing case 6", type: :feature do
   before(:each) do
     create(:assignment, name: "TestTeam", directory_path: 'test_team')
@@ -892,7 +898,7 @@ describe "team functionality testing case 6", type: :feature do
     create(:topic, topic_name: "work1")
   end
 
-  #case 6 When two user choose 1 topic, they should appear in the same team
+
 
   it "case6" do
 
@@ -993,14 +999,7 @@ describe "team functionality testing case 6", type: :feature do
       my_link.click
 
 
-      click_link "Assignments"
-
-      click_link "TestTeam"
-
-      click_link "Your team"
-      expect(page).to have_content "Team Name"
-      expect(page).to have_content "student2065"
-      expect(page).to have_content "student2064"
+      expect(page).to have_content "1"
 
 
 
@@ -1021,8 +1020,5 @@ describe "team functionality testing case 6", type: :feature do
 
 
 end
-
-
-
 
 

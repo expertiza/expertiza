@@ -32,7 +32,8 @@ def create_quiz
   # Save quiz
   click_on 'Create Quiz'
 end
-def assignment_creation
+
+describe 'Student can create quizzes and edit them', js: true do
   before(:each) do
     # Create an instructor
     @instructor = create(:instructor)
@@ -68,10 +69,7 @@ def assignment_creation
     # participant object's user (the submitter).
     create :team_user, team: @team, user: @student
     create :review_response_map, assignment: @assignment, reviewee: @team
-  end
-end
-describe 'Student can create quizzes and edit them', js: true do
-  assignment_creation 
+  end 
   it 'should be able to create quiz' do
     # Create a quiz
     create_quiz

@@ -19,5 +19,10 @@ describe 'ReviewResponseMap' do
       expect(map).to be_truthy
       expect(map[:review][:questionnaire_id]).to be(1)
     end
+    it "should return the valid questionnaire" do
+      review_questionnaire=@review_response.questionnaire 1
+      expect(review_questionnaire).to be_instance_of(ReviewQuestionnaire)
+      expect(review_questionnaire.id).to be(1)
+    end
   end
 end

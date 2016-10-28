@@ -98,16 +98,20 @@ describe SignUpSheetController do
     expect(response).to redirect_to edit_assignment_path(@assignment.id) + "#tabs-5"
   end
 
-  xdescribe "is able to add team to topic" do
-    it "redirects to assign topic page" do
+
+    it "is able to add team to topic" do
       get :assign_topic, id: @topic1.id, assignment_id: @assignment.id
-      expect(response).to render_template("sign_up_sheet/assign_topic")
+      expect(response).to redirect_to "sign_up_sheet/assign_topic.html.erb"
     end
 
 
-  end
+    it "is able to remove team from topic" do
+      get :remove_topic, id: @topic1.id, assignment_id: @assignment.id
+      expect(response).to redirect_to 'sign_up_sheet/remove_topic.html.erb'
+    end
 
-  xdescribe "Save topic deadlines" do
+
+  describe "Save topic deadlines" do
     it "redirects to edit assignment page" do
       session[:duedates] = [@topic1, @topic2]
       assignment = double(Assignment)

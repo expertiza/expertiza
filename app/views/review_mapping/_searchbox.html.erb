@@ -44,7 +44,7 @@
             <table>
               <tr>
                 <th>Reviewer's Name</th>
-                <td><%= n.text_field:fullname %></td>
+                <td><%= n.text_field :fullname %></td>
                 <td align = "right"><%= submit_tag "Search"%></td>
               </tr>
 
@@ -52,6 +52,7 @@
         <%end%>
 
       </div>
+      <br>
     </div>
 
 <% elsif @type == "FeedbackResponseMap" %>

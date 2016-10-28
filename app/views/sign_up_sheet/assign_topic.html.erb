@@ -1,0 +1,10 @@
+<h1>Add Team</h1>
+
+<%= form_tag :action => 'update_team' , method: "post" do %>
+    <%= hidden_field_tag 'id', params[:id] %>
+    <%= hidden_field_tag 'assignment_id', params[:assignment_id] %>
+    Enter user login: &nbsp;<%= text_field_with_auto_complete :user, :name, {:size => 41} %>
+    <input type='submit' value='Add'/>
+<% end %>
+
+<%= link_to 'Back', edit_assignment_path(@topic.assignment_id, anchor: 'tabs-2') %>

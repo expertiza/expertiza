@@ -73,7 +73,7 @@
           if (bookmark_checkbox.is(':checked')) {
             addQuestionnaireTableRow(
                     'BookmarkRatingQuestionnaire',
-                    null,
+                null,
                     <%= questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>,
                     <%= assignment_questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>,
                     <%= questionnaire_options(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>

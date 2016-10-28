@@ -213,19 +213,6 @@ class GradesController < ApplicationController
     redirect_to action: 'edit', id: params[:id]
   end
 
-  def save_grade_and_comment_for_submission
-    participant = AssignmentParticipant.find(params[:participant_id])
-    @team = participant.team
-    @team.grade_for_submission = params[:grade_for_submission]
-    @team.comment_for_submission = params[:comment_for_submission]
-    begin
-      @team.save
-    rescue
-      flash[:error] = $ERROR_INFO
-    end
-    redirect_to controller: 'grades', action: 'view_team', id: params[:participant_id]
-  end
-
   private
 
   def redirect_when_disallowed

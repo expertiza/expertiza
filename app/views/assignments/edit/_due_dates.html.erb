@@ -312,6 +312,7 @@ function changeReviewRounds() {
     if (new_round_count == current_round_count) {
         return
     }
+	
     if (new_round_count >= original_round_count && current_round_count < original_round_count) {
         //make sure all the rounds are already displayed
         <% for i in 1..@assignment_form.assignment.rounds_of_reviews %>
@@ -392,7 +393,13 @@ function updateDateTable(deadline_type, round_no) {
     }
     jQuery(element_id).remove();
 }
+//This function removes days from the date
+    jQuery("#subDays_btn_2").click(function() {
 
+        addDaysOrMonth(-1, "days");
+        event.preventDefault();
+
+    });
 function removeOrAddMetareview() {
     if (document.getElementById("metareview")) {
         removeDueDateTableElement('metareview', 0);

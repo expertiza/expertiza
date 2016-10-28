@@ -82,7 +82,9 @@ class SignUpSheet < ActiveRecord::Base
     end
     [team_id, topic_id]
   end
-  
+ 
+# import method for sign up sheet
+ 
   def self.import(columns, session, _id)
     if columns.length < 2
       raise ArgumentError, "The CSV File expects the format: Topic identifier, User1, User2, ..."

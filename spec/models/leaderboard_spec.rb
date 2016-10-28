@@ -35,7 +35,7 @@ describe Leaderboard do
     #puts Assignment.where(course_id: nil).inspect
     #puts AssignmentParticipant.where(user_id: @student1.id).inspect
     expect(Leaderboard.get_independant_assignments(@student1.id)).to have(1).items
-    #expect(Assignment.where(course_id: nil)).to have(1).items
+
 
 
   end

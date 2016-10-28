@@ -11,7 +11,7 @@ end
 
 def get_questionnaire(finder_var = nil)
   if finder_var.nil?
-    AssignmentQuestionnaire.find_by_assignment_id(@assignment[:id])
+    AssignmentQuestionnaire.where(assignment_id: @assignment[:id])
   else
     AssignmentQuestionnaire.where(assignment_id: @assignment[:id]).where(questionnaire_id: get_selected_id(finder_var))
   end
@@ -21,9 +21,9 @@ def get_selected_id(finder_var)
   if finder_var == "ReviewQuestionnaire2"
     ReviewQuestionnaire.find_by(name: finder_var)[:id]
   elsif finder_var == "AuthorFeedbackQuestionnaire2"
-    AuthorFeedbackQuestionnaire.find_by_name(finder_var)[:id]
+    AuthorFeedbackQuestionnaire.find_by(name: finder_var)[:id]
   elsif finder_var == "TeammateReviewQuestionnaire2"
-    TeammateReviewQuestionnaire.find_by_name(finder_var)[:id]
+    TeammateReviewQuestionnaire.find_by(name: finder_var)[:id]
   end
 end
 
@@ -65,7 +65,7 @@ describe "assignment function" do
       assignment = Assignment.where(name: 'public assignment for test').first
       expect(assignment).to have_attributes(
         name: 'public assignment for test',
-        course_id: Course.find_by_name('Course 2')[:id],
+        course_id: Course.find_by(name: 'Course 2')[:id],
         directory_path: 'testDirectory',
         spec_location: 'testLocation',
         microtask: true,
@@ -91,7 +91,7 @@ describe "assignment function" do
       assignment = Assignment.where(name: 'private assignment for test').first
       expect(assignment).to have_attributes(
         name: 'private assignment for test',
-        course_id: Course.find_by_name('Course 2')[:id],
+        course_id: Course.find_by(name: 'Course 2')[:id],
         directory_path: 'testDirectory',
         spec_location: 'testLocation'
       )

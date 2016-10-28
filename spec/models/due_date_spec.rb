@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'pp'
 
 describe "due_date_functions" do
 

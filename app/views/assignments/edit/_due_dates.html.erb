@@ -7,43 +7,57 @@ jQuery(document).ready(function() {
         event.preventDefault(); // Prevent link from following its href
     });
     //E1654. Improve date-picker and deadlines Code change starts
+	//Hide date updater
     $("#date_updater_inner").hide();
+	//This on-click function toggles date updater div
     jQuery("#show_date_updater").click(function() {
 
         $("#date_updater_inner").toggle();
     });
+	//The functions below update the required parameter for the assignments that have their check-boxes marked for updation.
+
+	//This function adds days to the date
     jQuery("#addDays_btn").click(function() {
 
         addDaysOrMonth(1, "days");
         event.preventDefault();
 
     });
+
+	//This function removes days from the date
     jQuery("#subDays_btn").click(function() {
 
         addDaysOrMonth(-1, "days");
         event.preventDefault();
 
     });
+	
+	//This function adds months to the date 
     jQuery("#addMonth_btn").click(function() {
 
         addDaysOrMonth(1, "months");
         event.preventDefault();
 
     });
+
+	//This function removes months from the date 
     jQuery("#subMonth_btn").click(function() {
 
         addDaysOrMonth(-1, "months");
         event.preventDefault();
 
     });
+
     //E1654. Improve date-picker and deadlines Code change starts
 
 });
 
 
 function addDueDateTableElement(addnameurl, deadline_type, round_no, due_date) {
+
     //round_no = 0 for submission and review is not possible
     //round_no = 0 is used for other deadlines
+
     var previous_element;
     if (round_no == 0) {
         if (deadline_type == 'team_formation') {
@@ -84,6 +98,7 @@ function addDueDateTableElement(addnameurl, deadline_type, round_no, due_date) {
             return
         }
     }
+
     if (previous_element.length == 0) {
         return
     }
@@ -98,6 +113,7 @@ function addDueDateTableElement(addnameurl, deadline_type, round_no, due_date) {
         '<input class="due_date_round" name="assignment_form[due_date][][round]" type="hidden" value="' + round_no + '">' +
         '<input class="due_date_deadline_type_id" name="assignment_form[due_date][][deadline_type_id]" type="hidden" value="' + due_date.deadline_type_id + '">';
     html += '<td class="due_date_name" width="15%">';
+
     if (round_no != 0) {
         html += 'Round ' + round_no + ': ' + capitalize(deadline_type);
     } else {
@@ -112,6 +128,7 @@ function addDueDateTableElement(addnameurl, deadline_type, round_no, due_date) {
         //E1654. Improve date-picker and deadlines Code change starts
         var tzone = due_at.substr(23, 6);
         //E1654. Improve date-picker and deadlines Code changed ends
+
         if (tzone == 'Z') {
             tzone = '+00:00';
         }
@@ -119,6 +136,7 @@ function addDueDateTableElement(addnameurl, deadline_type, round_no, due_date) {
         due_at = due_at.substr(0, 4) + '/' + due_at.substr(5, 2) + '/' + due_at.substr(8, 2) + ' ' + due_at.substr(11, 2) + ':' + due_at.substr(14, 2) + ' ' + timezone;
     }
     var due_name = due_date.deadline_name;
+
     if (due_name == null) {
         due_name = '';
     }
@@ -132,6 +150,7 @@ function addDueDateTableElement(addnameurl, deadline_type, round_no, due_date) {
         '" type="checkbox" name="updatorCheck" style="width: 20px">' + '</td>';;
     //E1654. Improve date-picker and deadlines Code changed endS
     html += '<td align="center" class="due_date_due_at" width="10%">';
+
     // if(deadline_type == 'team_formation'){
     //     html += '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]" disabled>'
     // }
@@ -147,6 +166,7 @@ function addDueDateTableElement(addnameurl, deadline_type, round_no, due_date) {
     // if(deadline_type == 'team_formation'){
     //     html += '<select id="due_date_review_allowed_id" name="assignment_form[due_date][][review_allowed_id]" disabled>'
     // }
+
     // else{
     html += '<select id="due_date_review_allowed_id" name="assignment_form[due_date][][review_allowed_id]">'
         // }
@@ -163,6 +183,7 @@ function addDueDateTableElement(addnameurl, deadline_type, round_no, due_date) {
         '<option value="3">Yes</option>' +
         '</select></td>';
     html += '<td align="center" class="due_date_review_of_review_allowed_id" width="10%">';
+
     // if(deadline_type == 'team_formation'){
     //     html += '<select id="due_date_review_of_review_allowed_id" name="assignment_form[due_date][][review_of_review_allowed_id]" disabled>'
     // }
@@ -174,6 +195,7 @@ function addDueDateTableElement(addnameurl, deadline_type, round_no, due_date) {
         '<option value="2">Late</option>' +
         '<option value="3">Yes</option>' +
         '</select></td>';
+
     if (<%=@assignment_form.assignment.require_quiz%>) {
         html += '<td align="center" class="due_date_quiz_allowed_id" width="10%">' +
             '<select id="due_date_quiz_allowed_id" name="assignment_form[due_date][][quiz_allowed_id]">' +
@@ -199,11 +221,13 @@ function addDueDateTableElement(addnameurl, deadline_type, round_no, due_date) {
         '<option value="88">88</option>' +
         '<option value="96">96</option>' +
         '</select></td>';
+
     var html2 = html;
     html += '<td  align="center" id="specialname" class="due_date_name" width="10%">';
     html += '<input id="due_date_name" type="text" name="assignment_form[due_date][][deadline_name]" value="' + due_date.deadline_name + '">' + '</td>';
     html += '<td align="center" id="due_date_url_col" class="due_date_description_url" width="10%">';
     html += '<input id="due_date_description_url" type="text" name="assignment_form[due_date][][description_url]" value="' + due_date.description_url + '">' + '</td>';
+
     if (addnameurl == false) {
         previous_element.after(html2);
     } else {
@@ -322,8 +346,9 @@ function changeReviewRounds() {
             addDueDateTableElement(false, 'review', i, <%= due_date(@assignment_form.assignment,'review', -1).to_json.html_safe%>);
         }
     }
-    //jQuery.get("/assignment/update");
-    //jQuery('#assignment_form').submit();
+   
+	 //jQuery.get("/assignment/update");
+    	//jQuery('#assignment_form').submit();
 }
 
 function handleChangenameurl(checkvalue, due_date_name_column, due_date_url_column) {
@@ -513,7 +538,9 @@ jQuery(document).ready(function() {
     <% if @metareview_allowed %>
     addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>, 'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
     <%end %>
-    //after webpage refreshes, hide or display name and url according to whether names and urls are empty in DB
+    
+
+	//after webpage refreshes, hide or display name and url according to whether names and urls are empty in DB
     var due_date_name_column = document.getElementById("due_date_name_column");
     var due_date_url_column = document.getElementById("due_date_url_column");
     <% if @due_date_nameurl_notempty.nil? or @due_date_nameurl_notempty.eql? false %>

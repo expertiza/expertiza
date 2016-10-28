@@ -53,7 +53,9 @@ class ImpersonateController < ApplicationController
               redirect_back
               return
             end
-
+            if !params[:impersonate][:goto_date].empty?
+              User.goto_date=params[:impersonate][:goto_date]
+            end
             AuthController.clear_user_info(session, nil)
             session[:user] = user
           else
@@ -64,6 +66,7 @@ class ImpersonateController < ApplicationController
           # Revert to original account
         else
           if !session[:super_user].nil?
+            User.goto_date=nil
             AuthController.clear_user_info(session, nil)
             session[:user] = session[:super_user]
             user = session[:user]

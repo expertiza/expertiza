@@ -1,4 +1,5 @@
 class User < ActiveRecord::Base
+  attr_accessible :goto_date
   acts_as_authentic do |config|
     config.validates_uniqueness_of_email_field_options = {if: -> { false }} # Don't validate email uniqueness
     config.crypto_provider = Authlogic::CryptoProviders::Sha1
@@ -331,5 +332,12 @@ class User < ActiveRecord::Base
       users = User.order('name').where("(role_id in (?) or id = ?) and name like ?", role.get_available_roles, user_id, search_filter)
     end
     users
+  end
+
+  def self.goto_date=(val)
+    @goto_date=val
+  end
+  def self.goto_date
+    @goto_date
   end
 end

@@ -55,8 +55,9 @@ class DueDate < ActiveRecord::Base
   end
 
   def self.get_next_due_date(assignment_id, topic_id = nil)
+    (User.goto_date.nil?)? goto_date = Time.now : goto_date = (User.goto_date)
     if Assignment.find(assignment_id).staggered_deadline?
-      next_due_date = TopicDueDate.where(['parent_id = ? and due_at >= ?', topic_id, Time.now]).first
+      next_due_date = TopicDueDate.where(['parent_id = ? and due_at >= ?', topic_id, goto_date]).first
       # if certion TopicDueDate is not exist, we should query next corresponding AssignmentDueDate.
       # eg. Time.now is 08/28/2016
       # One topic uses following deadlines:
@@ -70,14 +71,14 @@ class DueDate < ActiveRecord::Base
         topic_due_date_size = TopicDueDate.where(parent_id: topic_id).size
         following_assignment_due_dates = AssignmentDueDate.where(parent_id: assignment_id)[topic_due_date_size..-1]
         following_assignment_due_dates.each do |assignment_due_date|
-          if assignment_due_date.due_at >= Time.now
+          if assignment_due_date.due_at >= goto_date
             next_due_date = assignment_due_date 
             break
           end
         end
       end
     else
-      next_due_date = AssignmentDueDate.where(['parent_id = ? && due_at >= ?', assignment_id, Time.now]).first
+      next_due_date = AssignmentDueDate.where(['parent_id = ? && due_at >= ?', assignment_id, goto_date]).first
     end
     next_due_date
   end

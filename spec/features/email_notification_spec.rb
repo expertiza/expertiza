@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature 'Reset password mailer' do
+feature 'Reset password notification' do
   background do
     FactoryGirl.create :student
     # will clear the message queue
@@ -23,7 +23,7 @@ feature 'Reset password mailer' do
   end
 end
 
-feature 'Welcome mailer' do
+feature 'Welcome notification' do
   background do
     create(:assignment)
 
@@ -53,13 +53,15 @@ feature 'Welcome mailer' do
   end
 end
 
-feature 'New submission mailer' do
+feature 'New submission notification' do
   background do
 
     # using the method called same as response.rb => email
+    student = FactoryGirl.create :student
     defn = {}
     defn[:body] = {}
     defn[:body][:partial_name] = 'new_submission'
+    defn[:body][:first_name] = student.name
     # will clear the message queue
     clear_emails
     Mailer.sync_message(defn).deliver_now
@@ -73,7 +75,7 @@ feature 'New submission mailer' do
 end
 
 
-feature 'update assignment email notification' do
+feature 'Update assignment email notification' do
   background do
     student = FactoryGirl.create :student
     assignment = FactoryGirl.create :assignment
@@ -84,7 +86,7 @@ feature 'update assignment email notification' do
         recipients: 'expertiza.development@gmail.com',
         subject: "One of the assignment#{assignment.name} is updated, you can review it now",
         body: {
-            home_page: '123',
+            home_page: 'http://expertiza.ncsu.edu',
             first_name: ApplicationHelper.get_user_first_name(student),
             name: student.name,
             password: student.password,
@@ -95,8 +97,26 @@ feature 'update assignment email notification' do
     open_email('expertiza.development@gmail.com')
   end
   scenario 'testing for content' do
-    expect(current_email).to have_content 'One of the'
     expect(current_email).to have_content 'assignment has just been entered or revised.'
     expect(current_email).to have_content 'You may log into Expertiza and review the work now'
   end
+end
+
+
+feature 'Register notification' do
+  background do
+    defn = {}
+    defn[:body] = {}
+    defn[:body][:partial_name] = 'register'
+    # will clear the message queue
+    clear_emails
+    Mailer.sync_message(defn).deliver_now
+    # Will find an email sent to expertiza.development@gmail.com and set `current_email`
+    open_email('expertiza.development@gmail.com')
+  end
+
+  scenario 'testing for content' do
+    expect(current_email).to have_content "You have been registered to use the Expertiza system."
+  end
+
 end

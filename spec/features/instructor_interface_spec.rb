@@ -62,6 +62,7 @@ describe "Integration tests for instructor interface" do
     havecontent_string1 = 'airtable'
     havecontent_string2 = 'devise'
     check_valid_or_invalid_file_with_3_columns(itcondition_string, filepath_string, havecontent_string1, havecontent_string2)
+    
     it 'should be an random text file' do
       login_as("instructor6")
       visit '/assignments/1/edit'

@@ -12,10 +12,10 @@ module OnTheFlyCalc
     @response_type = 'ReviewResponseMap'
     if self.varying_rubrics_by_round?
       @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
-      calc_varying_rubrics
+      scores_varying_rubrics
     else
       @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
-      calc_non_varying_rubric
+      scores_non_varying_rubrics
     end
     @review_scores
   end
@@ -67,11 +67,11 @@ end
 private
 
 def assess
-  total_score = 0
-  total_num_of_assessments = 0 # calculate grades for each rounds
-  grades_by_rounds = {}
-  round = grades_by_rounds[round_sym]
   self.num_review_rounds.each do |i|
+    total_score = 0
+    total_num_of_assessments = 0 # calculate grades for each rounds
+    grades_by_rounds = {}
+    round = grades_by_rounds[round_sym]
     assessments = ReviewResponseMap.get_assessments_round_for(team, i)
     round_sym = ("review" + i.to_s).to_sym
     round = Answer.compute_scores(assessments, questions[round_sym])
@@ -145,16 +145,16 @@ def calc_review_score
   end
 end
 
-def calc_scores_varying_rubrics
+def scores_varying_rubrics
   rounds = self.rounds_of_reviews
   rounds.each do |round|
     review_questionnaire_id = review_questionnaire_id(round)
     @questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
-    scores_each_response
+    each_response
   end
 end
 
-def scores_each_response
+def each_response
   @response_maps.each do |response_map|
     reviewer = @review_scores[response_map.reviewer_id]
     @corresponding_response = Response.where(['map_id = ?', response_map.id])
@@ -171,7 +171,7 @@ def scores_each_response
   end
 end
 
-def calc_non_varying_rubric
+def scores_non_varying_rubrics
   review_questionnaire_id = review_questionnaire_id()
   @questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
   @response_maps.each do |response_map|
@@ -181,6 +181,6 @@ def calc_non_varying_rubric
     @respective_scores = reviewer unless reviewer.nil?
     calc_review_score
     @respective_scores[response_map.reviewee_id] = @this_review_score
-    reviewer = @respective_scores
+    @review_scores[response_map.reviewer_id] = @respective_scores
   end
 end

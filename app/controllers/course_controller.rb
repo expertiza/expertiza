@@ -145,7 +145,7 @@ class CourseController < ApplicationController
       puts "user nill"
       #redirect_to action: 'view_teaching_assistants', id: @course.id
       respond_to do |format|
-      format.html { redirect_to action: 'view_teaching_assistants', id: @course.id }
+      format.html { redirect_to action: 'view_teaching_assistants', id: @course.id, notice: 'The user does not exist'}
       format.js
    end
     else

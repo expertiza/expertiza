@@ -7,6 +7,8 @@
 <%= text_field 'course', 'directory_path'  %></p>
 <p><label for="course_info">Course Information</label><br/>
 <%= text_field 'course', 'info'  %></p>
-
+<p><label for="course_institutions_id">Institution Name</label><br/>
+  <%= select_tag :'institutions_id', options_from_collection_for_select(Institution.where.not(:name=>nil), 'id', 'name'), :include_blank => "Please select...",:required=>true %>
+</p>
 <!--[eoform:user]-->
 <br/>

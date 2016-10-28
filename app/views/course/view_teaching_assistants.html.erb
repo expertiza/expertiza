@@ -24,8 +24,7 @@
     :locals => {:form_action => "add_ta",
                 :obj_type => "course_id",
                 :obj_id => @course.id},
-                :remote => true
-              %>
+                %>
             <%
                 session[:return_to] = request.url
             session[:expected_fields] = 'username, full name (first[ middle] last), e-mail address, password'

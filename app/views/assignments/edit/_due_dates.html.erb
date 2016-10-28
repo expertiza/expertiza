@@ -475,7 +475,7 @@ function removeOrAddTeamFormation() {
 
                                                         <%= label_tag('Days') %>
                                                             <button type="button" id="addDays_btn">+</button>
-                                                            <%= number_field_tag 'days', 0,:id=>'days', :size=>'5' %>
+								<input id="days" type="number" name="quantity" min="0" value="0" style="width:50px">
                                                                 <button type="button" id="subDays_btn">-</button>
 
                                                 </div>

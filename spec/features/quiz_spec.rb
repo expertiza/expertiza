@@ -32,8 +32,7 @@ def create_quiz
   # Save quiz
   click_on 'Create Quiz'
 end
-
-describe 'Student can create quizzes and edit them', js: true do
+def assignment_creation
   before(:each) do
     # Create an instructor
     @instructor = create(:instructor)
@@ -42,7 +41,7 @@ describe 'Student can create quizzes and edit them', js: true do
     @student = create(:student)
 
     # Create an assignment with quiz
-    @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 1
+    @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 3
 
     # Create an assignment due date
     create(:deadline_type, name: "submission")
@@ -54,10 +53,10 @@ describe 'Student can create quizzes and edit them', js: true do
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create :assignment_due_date, due_at: (DateTime.now + 1)
+    create :assignment_due_date, due_at: (DateTime.now.getlocal + 1)
 
     @review_deadline_type = create(:deadline_type, name: "review")
-    create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+    create :assignment_due_date, due_at: (DateTime.now.getlocal + 1), deadline_type: @review_deadline_type
 
     # Create a team linked to the calibrated assignment
     @team = create :assignment_team, assignment: @assignment
@@ -70,7 +69,9 @@ describe 'Student can create quizzes and edit them', js: true do
     create :team_user, team: @team, user: @student
     create :review_response_map, assignment: @assignment, reviewee: @team
   end
-
+end
+describe 'Student can create quizzes and edit them', js: true do
+  assignment_creation 
   it 'should be able to create quiz' do
     # Create a quiz
     create_quiz

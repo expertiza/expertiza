@@ -1,9 +1,16 @@
 <script type="text/javascript">
     jQuery(document).ready(function() {
+    $("#date_updater_inner").hide();
+	
     jQuery("#set_rounds").click(function () {
         changeReviewRounds();
         event.preventDefault(); // Prevent link from following its href
     });
+show_date_updater
+jQuery("#show_date_updater").click(function () {
+
+$("#date_updater_inner").toggle();
+});
 	jQuery("#addDays_btn").click(function () {
 		
 		for (var i=1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').length/2; i++)
@@ -227,7 +234,7 @@ event.preventDefault();
         }
         else{
 	//E1654. Improve date-picker and deadlines Code change starts
-            var tzone = time_zone.value;
+            var tzone = due_at.substr(23,6);
 	//E1654. Improve date-picker and deadlines Code changed ends
             if(tzone=='Z'){
                 tzone = '+00:00';
@@ -539,12 +546,9 @@ var timezonepref = "<%= current_user.timezonepref %>";
 <input name="metareivewAllowed" type="hidden" value="false" />
 <%= check_box_tag('metareviewAllowed', 'true', @metareview_allowed,:onclick=>"removeOrAddMetareview()" ) %>
 <%= label_tag('metareivewAllowed', 'Use metareview deadline') %><br/>
-<div>
- <%= label_tag('timezone', 'Timezone') %>
-	<%= select_tag(:time_zone, options_for_select(ActiveSupport::TimeZone.all.inject([]) do |result, tz|
- utc_offset = tz.utc_offset/3600 
-result << ["(UTC #{'%.2d:00' % utc_offset}): #{tz.name}",  "#{'%.2d:00' % utc_offset}"]
- end), selected:"-05:00") %>
+<div id="date_updater_div">
+<button type="button" id="show_date_updater">Show/Hide Date Updater</button>
+ <div id="date_updater_inner">
 
 	<%= label_tag('Days') %>	
 	<button type="button" id="addDays_btn">+</button>
@@ -554,8 +558,11 @@ result << ["(UTC #{'%.2d:00' % utc_offset}): #{tz.name}",  "#{'%.2d:00' % utc_of
 	<button type="button" id="addMonth_btn">+</button>
 	<%= number_field_tag 'months', 0, min: 0, max: 12 ,:id=>'months' %>
 	<button type="button" id="subMonth_btn">-</button>
+</br>
+<%= label_tag('timezone', 'Timezone') %>
+<%= time_zone_select("user", "timezonepref", ActiveSupport::TimeZone.us_zones) %>
 </div>
-
+</div>
 <table class='exp' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden;'>
 
 <tr id='due_date_heading'>

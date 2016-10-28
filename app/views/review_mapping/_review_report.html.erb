@@ -1,10 +1,21 @@
-<%= create_report_table_header("Reviewer" => "16%",
-                               "# reviews done per round" => "14%",
-                               "Team reviewed" => "20%",
-                               "Score awarded / Avg. score" => "14%",
-                               "Metrics" => "10%",
-                               "Assign grade and write comments" => "36%") %>
       <%@l = -1 %>
+
+      <div class = 'reviewreport'>
+  <!-- Added headers for tablesorter -->
+  <table id="myTable" class="tbl_heat tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
+    <thead>
+    <tr bgcolor='#CCCCCC'>
+  <!-- class value decides whether the column should be sortable or not  -->
+      <th width = "16%" class="sorter-true">Reviewer <span></span></th>
+      <th width = "14%" class="sorter-false">Reviews done per round<span></span></th>
+      <th width = "20%" class="sorter-false">Team reviewed <span></span></th>
+      <th width = "14%" class="sorter-false">Score awarded / Avg. score <span></span></th>
+      <th width = "10%" class="sorter-true">Metrics <span></span></th>
+      <th width = "36%" class="sorter-false">Assign grade and write comments <span></span></th>
+    </tr>
+    </thead>
+<tbody>
+
       <% sort_reviewer_by_review_volume_desc.each do |r| %>
         <% @response_maps, @bgcolor, @rspan, @l = get_data_for_review_report(@id, r.id, @type, @l) %>
         <tr>

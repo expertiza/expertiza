@@ -178,6 +178,7 @@ class SignUpSheetController < ApplicationController
           signed_up_topics << sign_up_topic.first
         end
       end
+      signed_up_topics = signed_up_topics & @sign_up_topics
       @sign_up_topics = @sign_up_topics - signed_up_topics
       @bids = signed_up_topics
     end
@@ -229,12 +230,12 @@ class SignUpSheetController < ApplicationController
     end
     redirect_to action: 'list', assignment_id: params[:assignment_id]
   end
-
+  
   def delete_signup_for_topic(assignment_id, topic_id)
     @user_id = session[:user].id
     SignUpTopic.reassign_topic(@user_id, assignment_id, topic_id)
   end
-
+  
   def sign_up
     # find the assignment to which user is signing up
     @assignment = Assignment.find(params[:assignment_id])
@@ -247,32 +248,34 @@ class SignUpSheetController < ApplicationController
     end
     redirect_to action: 'list', assignment_id: params[:assignment_id]
   end
-
+  
   def set_priority
     @user_id = session[:user].id
     unless params[:topic].nil?
-      team_user = TeamsUser.where(user_id: @user_id)
-      users = User.find(@user_id)
-      if !team_user.nil
-        users = TeamsUser.where(team_id: team_user.first.team_id)
+      team_ids = AssignmentTeam.where(parent_id: params[:assignment_id]).map(&:id)
+      team_user = TeamsUser.where("user_id = ? AND team_id IN (?)", @user_id, team_ids)
+      user_ids = []
+      user_ids << @user_id
+      unless team_user.empty?
+        user_ids << TeamsUser.where(team_id: team_user.first.try(:team_id)).map(&:user_id)
       end
-      users.each do |user|
-        @bids = Bid.where("user_id LIKE ?", user.id )
+      user_ids = user_ids.uniq
+      user_ids.each do |user_id|
+        @bids = Bid.where("user_id = ?", user_id )
         signed_up_topics = @bids.map {|bid| bid.topic_id}
         
         #Remove topics from bids table if the student moves data from Selection HTML table to Topics HTML table
         #This step is necessary to avoid duplicate priorities in Bids table
         signed_up_topics = signed_up_topics - params[:topic].map {|topic_id| topic_id.to_i}
         signed_up_topics.each do |topic|
-          Bid.where(topic_id: topic, user_id: user.id).destroy_all
+          Bid.where(topic_id: topic, user_id: user_id).destroy_all
         end
-        
-        params[:topic].each_with_index do |topic_id,index |
+        params[:topic].each_with_index do |topic_id,index|
           check = @bids.where(topic_id: topic_id)
           if check.empty?
-            Bid.create(topic_id: topic_id, user_id: user.id, priority: index + 1)
+            Bid.create(topic_id: topic_id, user_id: user_id, priority: index + 1)
           else
-            Bid.where("topic_id LIKE ? AND user_id LIKE ?",topic_id, user.id).update_all({priority: index + 1})
+            Bid.where("topic_id = ? AND user_id = ?",topic_id, user_id).update_all({priority: index + 1})
           end
         end
       end

@@ -588,9 +588,9 @@ describe "assignment function" do
     end
 
     it "should display newly created assignment" do
-      @assignment = create(:assignment, name: 'participants assignment')
-      @participant = create(:participant)
-      login_as(@participant.name)
+      create(:assignment, name: 'participants assignment')
+      participant = create(:participant)
+      login_as(participant.name)
       expect(page).to have_content("participants assignment")
     end
   end

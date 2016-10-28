@@ -446,6 +446,7 @@ DEPENDENCIES
   edavis10-ruby-web-search
   engtagger
   expertiza-authlogic!
+  factory_girl
   factory_girl_rails (~> 4.0)
   fastercsv
   ffi-aspell

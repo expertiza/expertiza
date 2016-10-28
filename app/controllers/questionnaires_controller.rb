@@ -1,3 +1,5 @@
+require 'csv'
+require 'open-uri'
 class QuestionnairesController < ApplicationController
   # Controller for Questionnaire objects
   # A Questionnaire can be of several types (QuestionnaireType)
@@ -7,11 +9,33 @@ class QuestionnairesController < ApplicationController
   before_action :authorize
 
   def action_allowed?
-    ['Super-Administrator',
-     'Administrator',
-     'Instructor',
-     'Teaching Assistant', 'Student'].include? current_role_name
+    case params[:action]
+      when 'edit', 'update', 'delete', 'toggle_access'
+        #Modifications can only be done by papertrail
+        q= Questionnaire.find_by(id:params[:id])
+        owner_inst_id = q.instructor_id
+        if(current_user.role_id==6)
+          current_ta = current_user;
+        end
+        b= (current_user.id == owner_inst_id)
+        if(!current_ta.nil?)
+          b = b or (current_ta.parent_id == owner_inst_id)
+        end
+        return b
+
+      else
+        #Allow all others
+        ['Super-Administrator',
+         'Administrator',
+         'Instructor',
+         'Teaching Assistant',
+         'Student'].include? current_role_name
+    end
+
+    # q1 = Questionnaire.find_by(instructor_id: current_user.id )
+    #q2 = Questionnaire.find_by(instructor_id: current_user.parent_id)
   end
+
 
   # Create a clone of the given questionnaire, copying all associated
   # questions. The name and creator are updated.
@@ -185,6 +209,7 @@ class QuestionnairesController < ApplicationController
 
   # Toggle the access permission for this assignment from public to private, or vice versa
   def toggle_access
+    questionnaire_id = params[:id] unless params[:id].nil?
     @questionnaire = Questionnaire.find(params[:id])
     @questionnaire.private = !@questionnaire.private
     @questionnaire.save
@@ -230,21 +255,23 @@ class QuestionnairesController < ApplicationController
         end
         begin
           @question.save
-          flash[:success] = 'All questions has been successfully saved!'
+          flash[:success] = 'All questions have been successfully saved!'
         rescue
           flash[:error] = $ERROR_INFO
         end
       end
-    end
-
-    export if params['export']
-    import if params['import']
-
-    if params['view_advice']
-      redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
-    else
       redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
     end
+
+
+    import if params['import']
+    export if params['export']
+
+
+    if params['view_advice']
+      redirect_to controller: 'advice', action: 'edit_advice', id: params[:id] and return
+    end
+
   end
 
   #=========================================================================================================
@@ -572,20 +599,29 @@ class QuestionnairesController < ApplicationController
 
   def export
     @questionnaire = Questionnaire.find(params[:id])
-
-    csv_data = QuestionnaireHelper.create_questionnaire_csv @questionnaire, session[:user].name
-
-    send_data csv_data,
-              type: 'text/csv; charset=iso-8859-1; header=present',
-              disposition: "attachment; filename=questionnaires.csv"
+    questionnaire_id = params[:id] unless params[:id].nil?
+    questions = Question.where("questionnaire_id = " + questionnaire_id.to_s).sort { |a,b| a.seq <=> b.seq }
+    respond_to do |format|
+      format.csv { send_data @questionnaire.to_csv(questions) }
+    end
+    redirect_to Questionnaire and return if @questionnaire.nil?
   end
 
   def import
-    @questionnaire = Questionnaire.find(params[:id])
 
-    file = params['csv']
+    questionnaire_id = (params[:id])
+    begin
+      file_data = File.read(params[:csv])
+      QuestionnaireHelper.get_questions_from_csv(file_data,params[:id])
+      #Questionnaire.import(file_data)
 
-    @questionnaire.questions << QuestionnaireHelper.get_questions_from_csv(@questionnaire, file)
+      redirect_to edit_questionnaire_path(questionnaire_id.to_sym), notice: "All questions have been successfully imported!"
+    rescue
+      redirect_to edit_questionnaire_path(questionnaire_id.to_sym), notice: $ERROR_INFO
+    end
+
+
+
   end
 
   # clones the contents of a questionnaire, including the questions and associated advice

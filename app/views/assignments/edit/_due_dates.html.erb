@@ -111,9 +111,9 @@ function addDueDateTableElement(addnameurl, deadline_type, round_no, due_date) {
     if (due_at == null) {
         due_at = '';
     } else {
-        //E1654. Improve date-picker and deadlines Code change starts
-        var tzone = due_at.substr(23, 6);
-        //E1654. Improve date-picker and deadlines Code changed ends
+
+        var tzone = due_at.substr(23, 6); // 
+        
 
         if (tzone == 'Z') {
             tzone = '+00:00';

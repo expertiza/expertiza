@@ -41,7 +41,7 @@ class ParticipantsController < ApplicationController
   def add
     curr_object = Object.const_get(params[:model]).find(params[:id]) if Participant::PARTICIPANT_TYPES.include? params[:model]
     begin
-      permissions = Participant.get_permissions(params[:authorization])
+      permissions = Participant.get_permissions(params[:role])
       can_submit = permissions[:can_submit]
       can_review = permissions[:can_review]
       can_take_quiz = permissions[:can_take_quiz]

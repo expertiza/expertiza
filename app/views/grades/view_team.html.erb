@@ -289,15 +289,7 @@ th.sorter-true.tablesorter-headerUnSorted{
         <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
             <div class="flash_error">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>
         <% end %>
-        <br/>  
+        <br/>   <br/>
     <% end %>
-<% end %>
-
-<h4 style="font-weight:bold;display:inline-block;">Assign grade and comment for submission</h4>
-<%= form_tag 'save_grade_and_comment_for_submission', remote: true do %>
-  <%= hidden_field_tag :participant_id, params[:id] %>
-  <%= number_field_tag 'grade_for_submission', @team.try(:grade_for_submission) ,min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade' %><br/>
-  <%= text_area_tag 'comment_for_submission', @team.try(:comment_for_submission), placeholder: 'Comment' %>
-  <%= submit_tag 'Save' %>
 <% end %>
 <!-- termination of the main outer loop. -->

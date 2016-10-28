@@ -118,7 +118,6 @@ Expertiza::Application.routes.draw do
       get :view_my_scores_new
       get :instructor_review
       post :remove_hyperlink
-      post :save_grade_and_comment_for_submission
     end
   end
 
@@ -357,8 +356,13 @@ Expertiza::Application.routes.draw do
       get :intelligent_save
       post :set_priority
       post :save_topic_deadlines
+      get :assign_topic
+      get :remove_topic
+      post :update_team
+      post :remove_team
     end
   end
+  #post 'assign_topic_path' => 'sign_up_sheet#assign_topic'
 
   resources :site_controllers do
     collection do

@@ -1,54 +1,76 @@
 <h1>Submissions for <%= @assignment.name %></h1>
 
-<% headers = {} %>
-<% headers["Topic_name"] = "16%" if @assignment.has_topics? %>
-<% if @assignment.max_team_size > 1 %>
-  <% headers["Team name"] = "14%" %>
-  <% headers["Team member(s)"] = "18%" %>
-<% else %>
-  <% headers["Participant name"] = "18%" %>
-<% end %>                              
-<% headers["Submitted item(s)"] = nil %>
-<%= create_report_table_header(headers) %>
-  
+<div>
+  <table width="100%" cellspacing="0" cellpadding="2" border="0">
+  	<tr bgcolor="#CCCCCC">
+  		<% if @assignment.max_team_size > 1 %>
+	  	  <th width = "20%">
+	        Team name
+	      </th>
+	      <th width = "18%">
+	        Team member(s)
+	      </th>
+	      <th>
+	        Submitted item(s)
+	      </th>
+	    <% else %>
+	      <th width = "38%">
+	        Participant name
+	      </th>
+	      <th>
+	        Submitted item(s)
+	      </th>
+	    <% end %>
+    </tr>
+
     <% @l = -1 %>
     <% @teams.each do |team| %>
-    	<% @l = @l+1 %>
+    	<%@l = @l+1 %>
     	<tr>
-        <% bgcolor = @l.even? ? "#ffffff" : "#DDDDBB" %>
-        <% topic_name, users_for_curr_team, participants = get_data_for_list_submissions(team) %>
+    	<% if (@l%2) == 0 %>
+    		<% bgcolor = "#ffffff" %>
+    	<% else %>
+    		<% bgcolor = "#DDDDBB" %>
+    	<% end %>
 
-        <!--Topic name-->
-        <% if @assignment.has_topics? %>
-          <td bgcolor= <%= bgcolor %>><%= topic_name %></td>
-        <% end %>
+  		<% if @assignment.max_team_size > 1 %>
+	    	<td bgcolor= <%= bgcolor %>>
+	    		<%= team.name %>
+	    	</td>
+    	<% end %>
+    	<% teams_users = TeamsUser.where(team_id: team.id) %>
+    	<% users_for_curr_team = "" %>
+    	<% submissions = "" %>
+    	<% teams_users.each do |teams_user| %>
+    		<% user = User.find(teams_user.user_id) %>
+    		<% users_for_curr_team += user.name + ' (' + user.fullname + ')' + '<br/>' %>
+    		<% @participants = Array.new %>
+    		<% @participants << Participant.where(["parent_id = ? AND user_id = ?", @assignment.id, user.id]).first %>
+    	<% end %>
+    	<td bgcolor= <%= bgcolor %>>
+    		<%= users_for_curr_team.html_safe %>
+    	</td>
+    	<td bgcolor= <%= bgcolor %>>
+    		<!--Display submitted hyperlinks-->
+ 			
+ 			<% participant = @participants.first %>
+    		<% if !participant.nil? and !participant.team.hyperlinks.empty? %>
+              <%= "Hyperlinks:<br/>".html_safe %>
+              <% participant.team.hyperlinks.each do |link| %>
+	    		<a href="<%= link %>" target="_blank"><%= link %></a><br/>
+              <% end %>
+	    	<% end %>
 
-        <!--Team name-->
-    		<% if @assignment.max_team_size > 1 %>
-  	    	<td bgcolor= <%= bgcolor %>><%= team.name %></td>
-      	<% end %>
+    		<!--Display submitted files-->
+ 			<% if !participant.nil? and !participant.team.submitted_files.empty? %>
+              <% files = participant.team.submitted_files%>
+    		  <%= "Files:".html_safe %>
+    		  <% if files and files.length > 0 %>
+			    <%= display_directory_tree(participant, files, true).html_safe %>
+              <% end %>
+			<% end %>
 
-        <!--Team member(s) / Participant name-->
-      	<td bgcolor= <%= bgcolor %>><%= users_for_curr_team.html_safe %></td>
-
-        <!--Submitted item(s)-->
-      	<td bgcolor= <%= bgcolor %>>
-      	<!--Display submitted hyperlinks-->
-   			  <% participant = participants.compact.first %>
-      	  <% if participant and !team.hyperlinks.empty? %>
-            Hyperlinks: <br/>
-            <% team.hyperlinks.each do |link| %>
-  	    		  <a href="<%= link %>" target="_blank"><%= link %></a><br/>
-            <% end %>
-  	    	<% end %>
-
-      		<!--Display submitted files-->
-   			  <% if participant and !team.submitted_files.empty? %>
-            <% files = team.submitted_files %>
-      		  Files: <%= display_directory_tree(participant, files, true).html_safe if files and files.length > 0 %>
-    			<% end %>
-      	</td>
-      </tr>
+    	</td>
     <% end %>
   </table>
 </div>

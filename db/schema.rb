@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161008030832) do
+ActiveRecord::Schema.define(version: 20160929155706) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -564,8 +564,6 @@ ActiveRecord::Schema.define(version: 20161008030832) do
     t.boolean "advertise_for_partner"
     t.text    "submitted_hyperlinks",       limit: 65535
     t.integer "directory_num",              limit: 4
-    t.integer "grade_for_submission",       limit: 4
-    t.text    "comment_for_submission",     limit: 65535
   end
 
   create_table "teams_users", force: :cascade do |t|

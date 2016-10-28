@@ -515,8 +515,8 @@ class ReviewMappingController < ApplicationController
 
   def save_grade_and_comment_for_reviewer
     participant = Participant.find(params[:participant_id])
-    participant.grade_for_reviewer = params[:grade_for_reviewer] if params[:grade_for_reviewer]
-    participant.comment_for_reviewer = params[:comment_for_reviewer] if params[:comment_for_reviewer]
+    participant.grade_for_reviewer = params[:grade_for_reviewer] unless params[:grade_for_reviewer].nil?
+    participant.comment_for_reviewer = params[:comment_for_reviewer] unless params[:comment_for_reviewer].nil?
     begin
       participant.save
     rescue

@@ -114,6 +114,11 @@ jQuery(document).ready(function() {
                 <a title="View aggregated teammate & meta reviews" href={"/assessment360/all_students_all_reviews?course_id="+(parseInt(this.props.id)/2).toString()}>
                   <span style={{"fontSize": "22px", "top": "8px"}} className="glyphicon glyphicon-list-alt"></span>
                 </a>
+                <a title="Assign Topic" href={"/teams/list?id="+(parseInt(this.props.id)/2).toString()+"&type=Course"}>
+                  <img src="/assets/tree_view/assign-survey-96.png" width = '20'height ='20'/>
+                </a>
+
+
               </span>
             )
           }

@@ -7,7 +7,10 @@ describe Answer do
   let(:response_map) {create(:review_response_map,:id=>1,:reviewed_object_id => 1)}
   let!(:response_record) {create(:response_record,:id => 1,:response_map => response_map)}
   let!(:answer) { create(:answer,:question => question1,:response_id => 1)}
-
+  
+  describe "# test dependancy between question.rb and answer.rb" 
+    it { should belong_to(:question) }
+  
   describe "#test get total score" do
    				
     it "returns total score when required conditions are met" do

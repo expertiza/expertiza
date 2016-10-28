@@ -96,7 +96,16 @@
     padding-right: 15px;
   }
 
-  /* Stylet to be implemented for no sort*/
+  /* Style for no-sort*/
+  th.sorter-true.tablesorter-headerUnSorted{
+    /* Style for default view  */
+    background-image: url(<%= asset_path("sort.png") %>);
+    background-size: 15px 7px;
+    background-repeat: no-repeat;
+    background-position: center right;
+    padding-right: 15px;
+
+  }
 </style>
 
 <script>

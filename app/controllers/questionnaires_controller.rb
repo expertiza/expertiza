@@ -10,7 +10,7 @@ class QuestionnairesController < ApplicationController
 
   def action_allowed?
     case params[:action]
-      when 'edit', 'update', 'delete'
+      when 'edit', 'update', 'delete', 'toggle_access'
         #Modifications can only be done by papertrail
         q= Questionnaire.find_by(id:params[:id])
         owner_inst_id = q.instructor_id
@@ -210,10 +210,6 @@ class QuestionnairesController < ApplicationController
   # Toggle the access permission for this assignment from public to private, or vice versa
   def toggle_access
     questionnaire_id = params[:id] unless params[:id].nil?
-    unless owner_or_ta?
-      flash[:error] = "You're not allowed to perform this action since you're not the owner or TA of this questionnaire"
-      redirect_to action: 'view', controller: 'questionnaires', id: params[:id] and return
-    end
     @questionnaire = Questionnaire.find(params[:id])
     @questionnaire.private = !@questionnaire.private
     @questionnaire.save
@@ -615,7 +611,6 @@ class QuestionnairesController < ApplicationController
 
     questionnaire_id = (params[:id])
     begin
-      #@questionnaire = Questionnaire.find(params[:id])
       file_data = File.read(params[:csv])
       QuestionnaireHelper.get_questions_from_csv(file_data,params[:id])
       #Questionnaire.import(file_data)

@@ -57,11 +57,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :author_feedback_questionnaires, controller: 'questionnaires' do
-    collection do
-      post '/author_feedback_questionnaires/:id/edit.csv', action: :edit
-    end
-  end
+  resources :author_feedback_questionnaires, controller: 'questionnaires'
 
 
   resources :content_pages do

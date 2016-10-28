@@ -9,27 +9,7 @@ module QuestionnaireHelper
   CSV_PARAM = 2
   CSV_WEIGHT = 3
 
-  def to_csv(ques)
-    questions = ques
-    csv_data = CSV.generate do |csv|
-      row = ['seq','txt','type','weight','size','max_label','min_label','alternatives']
-      csv << row
-      for question in questions
-        row = []
-        row << question.seq
-        row << question.txt
-        row << question.type
-        row << question.weight
-        row << question.size || ''
-        row << question.max_label
-        row << question.min_label
-        row << question.alternatives
 
-        csv << row
-
-      end
-    end
-    end
 
   def self.get_questions_from_csv(file_data,id)
     CSV.parse(file_data, headers: true) do |row|

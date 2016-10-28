@@ -55,7 +55,7 @@ class ParticipantsController < ApplicationController
     end
     respond_to do |format|
       format.html { redirect_to action: 'list', id: curr_object.id, model: params[:model], authorization: params[:authorization] }
-      format.js   { render :layout => false }
+      format.js
    end
     #redirect_to action: 'list', id: curr_object.id, model: params[:model], authorization: params[:authorization]
   end

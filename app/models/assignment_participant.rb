@@ -319,7 +319,7 @@ class AssignmentParticipant < Participant
     self.handle = if self.user.handle.nil? or self.user.handle == ""
                     self.user.name
                   elsif !AssignmentParticipant.where(parent_id: self.assignment.id, handle: self.user.handle).empty?
-                    self.user.name
+                   self.user.name
                   else
                     self.user.handle
                   end

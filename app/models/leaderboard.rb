@@ -97,7 +97,8 @@ class Leaderboard < ActiveRecord::Base
   def self.add_score_to_resultant_hash(q_type_hash, questionnaire_type, course_id, reviewee_user_id_list, score_entry_score)
     if reviewee_user_id_list
       # Loop over all the reviewee_user_id.
-      for reviewee_user_id in reviewee_user_id_list
+      #for reviewee_user_id in reviewee_user_id_list
+      reviewee_user_id_list.each do |reviewee_user_id|
         if q_type_hash.fetch(questionnaire_type, {}).fetch(course_id, {}).fetch(reviewee_user_id, nil).nil?
           user_hash = {}
           user_hash[reviewee_user_id] = [score_entry_score, 1]
@@ -132,17 +133,20 @@ class Leaderboard < ActiveRecord::Base
     result_hash = {"participant" => {}, "team" => {}}
     assignment_hash = {}
     # Hash all the assignments for later fetching them by assignment.id
-    for assignment in assignment_list
+    # for assignment in assignment_list
+    assignment_list.each do |assignment|
       assignment_hash[Assignment.id] = Assignment
     end
     # Loop over all the participants to get corresponding assignment by parent_id
-    for participant in participant_list
+    # for participant in participant_list
+    participant_list.each do |participant|
       result_hash["participant"][participant.id] = {}
       result_hash["participant"][participant.id]["self"] = participant
       result_hash["participant"][participant.id]["assignment"] = assignment_hash[participant.parent_id]
     end
     # Loop over all the teams to get corresponding assignment by parent_id
-    for team in team_list
+    # for team in team_list
+    team_list.each do |team|
       result_hash["team"][team.id] = assignment_hash[team.parent_id]
     end
 
@@ -174,14 +178,17 @@ class Leaderboard < ActiveRecord::Base
     accomplishment_map = {}
 
     # Create map of accomplishment with its name
-    for leaderboard_record in leaderboard_records
+    # for leaderboard_record in leaderboard_records
+    leaderboard_records.each do |leaderboard_record|
       accomplishment_map[leaderboard_record.q_type] = leaderboard_record.name
     end
 
     cs_sorted_hash = Leaderboard.sort_hash(cs_hash)
 
-    for course_id in course_id_list
-      for accomplishment in accomplishment_map.keys
+    # for course_id in course_id_list
+    course_id_list.each do |course_id|
+        # for accomplishment in accomplishment_map.keys
+        accomplishment_map.keys.each do |accomplishment|
         # Get score for current questionnaire_type/accomplishment, course_id and user_id from cs_hash
         score = cs_hash.fetch(accomplishment, {}).fetch(course_id, {}).fetch(user_id, nil)
         next unless score

@@ -325,9 +325,9 @@ describe "assignment function" do
       end
       create(:assignment, name: 'public assignment for test')
 
-      assignment = Assignment.where(name: 'public assignment for test').first
+      @assignment = Assignment.where(name: 'public assignment for test').first
       login_as("instructor6")
-      visit "/assignments/#{assignment[:id]}/edit"
+      visit "/assignments/#{@assignment[:id]}/edit"
       click_link 'Topics'
     end
 
@@ -379,9 +379,22 @@ describe "assignment function" do
         topic_name: 'Test',
         assignment_id: 1,
         max_choosers: 2,
+        topic_identifier: 1,
         category: 'Test Category'
       )
     end
+
+    it "Delete existing topic" do
+      create(:sign_up_topic, assignment_id: @assignment[:id])
+      visit "/assignments/#{@assignment[:id]}/edit"
+      click_link 'Topics'
+      all(:xpath, '//img[@title="Delete Topic"]')[0].click
+      click_button 'OK'
+
+      topics_exist = SignUpTopic.count(:all, assignment_id: @assignment[:id])
+      expect(topics_exist).to be_eql 0
+    end
+
   end
 
   # Begin rubric tab

@@ -111,9 +111,9 @@ function addDueDateTableElement(addnameurl, deadline_type, round_no, due_date) {
     if (due_at == null) {
         due_at = '';
     } else {
-        //E1654. Improve date-picker and deadlines Code change starts
-        var tzone = due_at.substr(23, 6);
-        //E1654. Improve date-picker and deadlines Code changed ends
+
+        var tzone = due_at.substr(23, 6); // 
+        
 
         if (tzone == 'Z') {
             tzone = '+00:00';
@@ -127,7 +127,7 @@ function addDueDateTableElement(addnameurl, deadline_type, round_no, due_date) {
         due_name = '';
     }
     //E1654. Improve date-picker and deadlines Code changed starts
-    // Fixed the datepicker Bug.
+    // Fixed the Datepicker Bug.
     html += '<td align="center" class="due_date_due_at">' +
         '<input id="datetimepicker_' + element_id +
         '" name="assignment_form[due_date][][due_at]"  type="text" style="width: 140px;text-align:center;" value="' +
@@ -260,17 +260,19 @@ function removeDueDateTableElement(deadline_type, round_no) {
     jQuery(element_id).remove();
 }
 //E1654. Improve date-picker and deadlines Code change starts
+//This is a generic funtion to add and substract days and months
 function addDaysOrMonth(mul, type) {
-    var days = parseInt($('#days').val(), 10);
-    var months = parseInt($('#months').val(), 10);
+    var days = parseInt($('#days').val(), 10); // days variable stores the number of days to change the deadline
+    var months = parseInt($('#months').val(), 10);  // days variable stores the number of days to change the deadline
     for (var i = 1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').length / 2; i++) {
         if ($('#use_updator_review_round_' + i).is(':checked')) {
             var date = $('#datetimepicker_review_round_' + i).val().split("/");
+		// curDate reads the date currently in the field
             var curDate = new Date(parseInt(date[0], 10), parseInt(date[1], 10) - 1, parseInt(date[2].split(" ")[0], 10));
-            if (type == "days") {
-                curDate.setDate(curDate.getDate() + (days * mul));
+            if (type == "days") {//checks if type is date then sets dates
+                curDate.setDate(curDate.getDate() + (days * mul));//sets the date
             } else {
-                curDate.setMonth(curDate.getMonth() + (months * mul));
+                curDate.setMonth(curDate.getMonth() + (months * mul));//sets the months
             }
             $("#datetimepicker_review_round_" + i).val(curDate.getFullYear() + "/" + (curDate.getMonth() + 1) + "/" + curDate.getDate() + " " + date[2].split(" ")[1]);
         }
@@ -439,9 +441,7 @@ function removeOrAddTeamFormation() {
 <div style='padding: 5px' id='review_round'>
     <%= label_tag('assignment_form[assignment][rounds_of_reviews]', 'Number of review rounds:') %>
         <%= text_field_tag('assignment_form[assignment][rounds_of_reviews]', @assignment_form.assignment.rounds_of_reviews, :style => 'width:50px') %>
-            <button type="button" id="set_rounds">Set</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp
-&nbsp;&nbsp;<label style='padding-left: 80px; text-align:right;'>Timezone : <%= current_user.timezonepref %></label>
+<button type="button" id="set_rounds">Set</button><label style='padding-left: 300px; text-align:right;'>Timezone : <%= current_user.timezonepref %></label>
 </div>
 <% if @assignment_form.assignment.rounds_of_reviews > 1 %>
     <!--Add a change name or url checkbox. By: Xiaoqiang Shao-->

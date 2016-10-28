@@ -24,7 +24,7 @@ participant = pscore[:participant]
 <TR <% if team %> id="<%= prefix %>" style="display:none; background-color: white;" <% end %>>
     <TD><%= participant.fullname %><BR/>
         <% if (controller.action_name != "view_my_scores" and index == team_size - 1) or controller.action_name == "view_my_scores" %>
-            <FONT SIZE="-1"><a href="#" id="<%=prefix%>_filesLink" name="<%=prefix%>_filesLink" onClick="toggleElement('<%=prefix%>_files','submission');return false;">show submission</a>
+            <FONT SIZE="-1"><a href="#" id="<%=prefix%>_filesLink" name="<%=prefix%>_filesLink" onClick="toggleElement('<%=prefix%>_files','submission');return false;">Show Submission</a>
             <% if @topic_id %> (<%= SignUpTopic.find(@topic_id).topic_identifier %>)<% end %>
             </FONT>
         <% end %>
@@ -34,7 +34,7 @@ participant = pscore[:participant]
         <% if (controller.action_name != "view_my_scores" and index == 0) or controller.action_name == "view_my_scores" %>
             <TD id=<%="rowspanTd1#{participant_id}"%> ALIGN="CENTER" rowspan=<%=team_size.to_s%>>
                 <%= @rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",@rscore_review.my_avg): @rscore_review.my_avg %>%<BR/>
-                <FONT SIZE="-1"><a href="#" id="<%=prefix%>_reviewsLink" name="<%=prefix%>_reviewsLink" onClick="var td=document.getElementById('<%="rowspanTd1#{participant_id}"%>'); var td2=document.getElementById('<%="rowspanTd2#{participant_id}"%>'); if(td.rowSpan=='1'){td.rowSpan=<%=team_size.to_s%>;td2.rowSpan=<%=team_size.to_s%>;}else{td.rowSpan='1'; td2.rowSpan='1';};toggleElement('<%=prefix%>_reviews','reviews');return false;">show reviews</a> (<%= pscore[:review][:assessments].size %>)</FONT>
+                <FONT SIZE="-1"><a href="#" id="<%=prefix%>_reviewsLink" name="<%=prefix%>_reviewsLink" onClick="var td=document.getElementById('<%="rowspanTd1#{participant_id}"%>'); var td2=document.getElementById('<%="rowspanTd2#{participant_id}"%>'); if(td.rowSpan=='1'){td.rowSpan=<%=team_size.to_s%>;td2.rowSpan=<%=team_size.to_s%>;}else{td.rowSpan='1'; td2.rowSpan='1';};toggleElement('<%=prefix%>_reviews','reviews');return false;">Show Reviews</a> (<%= pscore[:review][:assessments].size %>)</FONT>
             </TD> 
         
            
@@ -43,7 +43,7 @@ participant = pscore[:participant]
                 <% if controller.action_name != "view_my_scores" %>
                 <!-- add a fake link to the auto summarization table, and only show it to the reviewee-->
                 <% else %>
-                    <div align="center" data-toggle="collapse" data-target="#summary_review_table" class="fake-link">show review summary</div>
+                    <div align="center" data-toggle="collapse" data-target="#summary_review_table" class="fake-link">Show Review Summary</div>
                 <!-- end fake link -->
                 <% end %>
             </TD>
@@ -58,7 +58,7 @@ participant = pscore[:participant]
             <TD ALIGN="CENTER" VALIGN="TOP"><%= @rscore_metareview.my_avg.is_a?(Float)? sprintf("%.2f",@rscore_metareview.my_avg):@rscore_metareview.my_avg %>%
                 <BR/>
                 <FONT SIZE="-1">
-                    <a href="#" id="<%=prefix%>_mreviewsLink" name="<%=prefix%>_mreviewsLink" onClick="toggleElement('<%=prefix%>_mreviews','metareviews');return false;">show metareviews</a> (<%= pscore[:metareview][:assessments].size %>)
+                    <a href="#" id="<%=prefix%>_mreviewsLink" name="<%=prefix%>_mreviewsLink" onClick="toggleElement('<%=prefix%>_mreviews','metareviews');return false;">Show Metareviews</a> (<%= pscore[:metareview][:assessments].size %>)
                 </FONT>
             </TD>
             <TD ALIGN="CENTER" VALIGN="TOP"><%= @rscore_metareview.my_min.is_a?(Float)? sprintf("%.0f",@rscore_metareview.my_min):@rscore_metareview.my_min %>% - <%= @rscore_metareview.my_max.is_a?(Float)?sprintf("%.0f",@rscore_metareview.my_max):@rscore_metareview.my_max %>%
@@ -73,7 +73,7 @@ participant = pscore[:participant]
         <TD ALIGN="CENTER" VALIGN="TOP"><%= @rscore_feedback.my_avg.is_a?(Float)? sprintf("%.2f",@rscore_feedback.my_avg): @rscore_feedback.my_avg %>%
             <BR/>
             <FONT SIZE="-1">
-                <a href="#" id="<%=prefix%>_feedbackLink" name="<%=prefix%>_feedbackLink" onClick="toggleElement('<%=prefix%>_feedback','author feedbacks');return false;">show author feedback</a> (<%= pscore[:feedback][:assessments].size %>)
+                <a href="#" id="<%=prefix%>_feedbackLink" name="<%=prefix%>_feedbackLink" onClick="toggleElement('<%=prefix%>_feedback','author feedbacks');return false;">Show Author Feedback</a> (<%= pscore[:feedback][:assessments].size %>)
             </FONT>
         </TD>
         <TD ALIGN="CENTER" VALIGN="TOP"><%= @rscore_feedback.my_min.is_a?(Float)? sprintf("%.0f",@rscore_feedback.my_min): @rscore_feedback.my_min %>% - <%= @rscore_feedback.my_max.is_a?(Float)? sprintf("%.0f",@rscore_feedback.my_max):@rscore_feedback.my_max %>%
@@ -92,7 +92,7 @@ participant = pscore[:participant]
                     <%if @assignment%>
                         <%= avg_score %>
                     <%end%>
-                    <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_teammate_reviewsLink" name="<%=prefix%>_teammate_reviewsLink" onClick="toggleElement('<%=prefix%>_teammate_reviews','teammate reviews');return false;">show teammate reviews</a> (<%= pscore[:teammate][:assessments].size %>)</FONT>
+                    <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_teammate_reviewsLink" name="<%=prefix%>_teammate_reviewsLink" onClick="toggleElement('<%=prefix%>_teammate_reviews','teammate reviews');return false;">Show Teammate Reviews</a> (<%= pscore[:teammate][:assessments].size %>)</FONT>
                 </TD>
                 <TD ALIGN="CENTER" VALIGN="TOP">
                 <% range =  @rscore_teammate.my_min.is_a?(Float) ? sprintf("%.0f",@rscore_teammate.my_min) : @rscore_teammate.my_min.to_s + '%' + ' - ' %>

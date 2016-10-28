@@ -97,7 +97,7 @@ describe "Questionnaire tests for instructor interface" do
     click_button "Create"
   end 
   
-  def create_review_question(type_qn_condition,type)
+  def create_review_question(type_qn_condition, type)
     it type_qn_condition do
       load_questionnaire
       fill_in('question_total_num', with: '1')
@@ -114,7 +114,7 @@ describe "Questionnaire tests for instructor interface" do
   describe "Create a review question", type: :controller do
     type_qn_condition = "is able to create a Criterion question"
     type = 'Criterion'
-    create_review_question(type_qn_condition,type) 
+    create_review_question(type_qn_condition, type) 
 
     it "is able to create a Scale question" do
       load_questionnaire

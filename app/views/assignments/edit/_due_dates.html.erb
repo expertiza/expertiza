@@ -16,79 +16,27 @@
         });
         jQuery("#addDays_btn").click(function() {
 
-            changeDays(1);
+            addDaysOrMonth(1,"days");
             event.preventDefault();
 
         });
 	jQuery("#subDays_btn").click(function() {
 
-            changeDays(-1);
+            addDaysOrMonth(-1,"days");
             event.preventDefault();
 
         });
         jQuery("#addMonth_btn").click(function() {
-            for (var i = 1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').length / 2; i++) {
-                if ($('#use_updator_review_round_' + i).is(':checked')) {
-                    var date = $('#datetimepicker_review_round_' + i).val().split("/");
 
-                    var d = parseInt(date[2].split(" ")[0], 10),
-                        m = parseInt(date[1], 10),
-                        y = parseInt(date[0], 10);
-                    var curDate = new Date(y, m - 1, d);
-                    var months = parseInt($('#months').val(), 10);
-                    //alert(days);
-                    curDate.setMonth(curDate.getMonth() + months);
-                    $("#datetimepicker_review_round_" + i).val(curDate.getFullYear() + "/" + (curDate.getMonth() + 1) + "/" + curDate.getDate() + " " + date[2].split(" ")[1]);
-                }
-            }
-
-            for (var i = 1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').length / 2; i++) {
-                if ($('#use_updator_submission_round_' + i).is(':checked')) {
-                    var date = $('#datetimepicker_submission_round_' + i).val().split("/");
-
-                    var d = parseInt(date[2].split(" ")[0], 10),
-                        m = parseInt(date[1], 10),
-                        y = parseInt(date[0], 10);
-                    var curDate = new Date(y, m - 1, d);
-                    var months = parseInt($('#months').val(), 10);
-                    //alert(days);
-                    curDate.setMonth(curDate.getMonth() + months);
-                    $("#datetimepicker_submission_round_" + i).val(curDate.getFullYear() + "/" + (curDate.getMonth() + 1) + "/" + curDate.getDate() + " " + date[2].split(" ")[1]);
-                }
-            }
+            addDaysOrMonth(1,"months");
             event.preventDefault();
+
         });
         jQuery("#subMonth_btn").click(function() {
-            for (var i = 1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').length / 2; i++) {
-                if ($('#use_updator_review_round_' + i).is(':checked')) {
-                    var date = $('#datetimepicker_review_round_' + i).val().split("/");
 
-                    var d = parseInt(date[2].split(" ")[0], 10),
-                        m = parseInt(date[1], 10),
-                        y = parseInt(date[0], 10);
-                    var curDate = new Date(y, m - 1, d);
-                    var months = parseInt($('#months').val(), 10);
-                    //alert(days);
-                    curDate.setDate(curDate.getMonth() - months);
-                    $("#datetimepicker_review_round_" + i).val(curDate.getFullYear() + "/" + (curDate.getMonth() + 1) + "/" + curDate.getDate() + " " + date[2].split(" ")[1]);
-                }
-            }
-
-            for (var i = 1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').length / 2; i++) {
-                if ($('#use_updator_submission_round_' + i).is(':checked')) {
-                    var date = $('#datetimepicker_submission_round_' + i).val().split("/");
-
-                    var d = parseInt(date[2].split(" ")[0], 10),
-                        m = parseInt(date[1], 10),
-                        y = parseInt(date[0], 10);
-                    var curDate = new Date(y, m - 1, d);
-                    var months = parseInt($('#months').val(), 10);
-                    //alert(days);
-                    curDate.setDate(curDate.getMonth() - months);
-                    $("#datetimepicker_submission_round_" + i).val(curDate.getFullYear() + "/" + (curDate.getMonth() + 1) + "/" + curDate.getDate() + " " + date[2].split(" ")[1]);
-                }
-            }
+            addDaysOrMonth(-1,"months");
             event.preventDefault();
+
         });
         
     });
@@ -301,30 +249,37 @@
       }
       jQuery(element_id).remove();
     }
-    function changeDays(mul) {
-	var days = parseInt($('#days').val(), 10);
-            for (var i = 1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').length / 2; i++) {
-                if ($('#use_updator_review_round_' + i).is(':checked')) {
-                    var date = $('#datetimepicker_review_round_' + i).val().split("/");
-                    var curDate = new Date(parseInt(date[0], 10), parseInt(date[1], 10) - 1, parseInt(date[2].split(" ")[0], 10));
-                    curDate.setDate(curDate.getDate() + days);
-                    $("#datetimepicker_review_round_" + i).val(curDate.getFullYear() + "/" + (curDate.getMonth() + 1) + "/" + curDate.getDate() + " " + date[2].split(" ")[1]);
-                }
-                if ($('#use_updator_submission_round_' + i).is(':checked')) {
-                    var date = $('#datetimepicker_submission_round_' + i).val().split("/");
-                    var curDate = new Date(parseInt(date[0], 10), parseInt(date[1], 10) - 1, parseInt(date[2].split(" ")[0], 10));
-                    curDate.setDate(curDate.getDate() + (days*mul));
-                    $("#datetimepicker_submission_round_" + i).val(curDate.getFullYear() + "/" + (curDate.getMonth() + 1) + "/" + curDate.getDate() + " " + date[2].split(" ")[1]);
-                }
+//E1654. Improve date-picker and deadlines Code change starts
+    function addDaysOrMonth(mul, type) {
+    var days = parseInt($('#days').val(), 10);
+    var months = parseInt($('#months').val(), 10);
+    for (var i = 1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').length / 2; i++) {
+        if ($('#use_updator_review_round_' + i).is(':checked')) {
+            var date = $('#datetimepicker_review_round_' + i).val().split("/");
+            var curDate = new Date(parseInt(date[0], 10), parseInt(date[1], 10) - 1, parseInt(date[2].split(" ")[0], 10));
+            if (type == "days") {
+                curDate.setDate(curDate.getDate() + (days * mul));
+            } else {
+                curDate.setMonth(curDate.getMonth() + (months * mul));
             }
+            $("#datetimepicker_review_round_" + i).val(curDate.getFullYear() + "/" + (curDate.getMonth() + 1) + "/" + curDate.getDate() + " " + date[2].split(" ")[1]);
+        }
+        if ($('#use_updator_submission_round_' + i).is(':checked')) {
+            var date = $('#datetimepicker_submission_round_' + i).val().split("/");
+            var curDate = new Date(parseInt(date[0], 10), parseInt(date[1], 10) - 1, parseInt(date[2].split(" ")[0], 10));
+            if (type == "days") {
+                curDate.setDate(curDate.getDate() + (days * mul));
+            } else {
+                curDate.setMonth(curDate.getMonth() + (months * mul));
+            }
+            $("#datetimepicker_submission_round_" + i).val(curDate.getFullYear() + "/" + (curDate.getMonth() + 1) + "/" + curDate.getDate() + " " + date[2].split(" ")[1]);
+        }
+    }
 
 
-	}
-    function changeMonths(months) {
+}
+//E1654. Improve date-picker and deadlines Code change ends
 
-
-
-	}
     function changeReviewRounds() {
         var new_round_count = parseInt(jQuery('#assignment_form_assignment_rounds_of_reviews').val());
         if (new_round_count <= 0) {

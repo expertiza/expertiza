@@ -15,7 +15,7 @@ describe "Integration tests for instructor interface" do
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
     create(:assignment_due_date)
-    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now + (100 * 24 * 60 * 60))
+    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now.getlocal + (100 * 24 * 60 * 60))
   end
 
   describe "Instructor login" do

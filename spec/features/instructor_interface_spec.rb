@@ -1,6 +1,18 @@
 require 'rails_helper'
-  
-
+def check_valid_or_invalid_file_with_3_columns(itcondition_string, filepath_string, havecontent_string1, havecontent_string2)
+  it itcondition_string do
+    login_as("instructor6")
+    visit '/assignments/1/edit'
+    click_link "Topics"
+    click_link "Import topics"
+    file_path = Rails.root + filepath_string
+    attach_file('file', file_path)
+    click_button "Import"
+    click_link "Topics"
+    expect(page).to have_content(havecontent_string1)
+    expect(page).to have_content(havecontent_string2)
+  end
+end
   
 describe "Integration tests for instructor interface" do
   integration_test_instructor_interface
@@ -33,20 +45,7 @@ describe "Integration tests for instructor interface" do
       expect(page).not_to have_content('Topic #')
     end
   end
-  def check_valid_or_invalid_file_with_3_columns(itcondition_string, filepath_string, havecontent_string1, havecontent_string2)
-    it itcondition_string do
-      login_as("instructor6")
-      visit '/assignments/1/edit'
-      click_link "Topics"
-      click_link "Import topics"
-      file_path = Rails.root + filepath_string
-      attach_file('file', file_path)
-      click_button "Import"
-      click_link "Topics"
-      expect(page).to have_content(havecontent_string1)
-      expect(page).to have_content(havecontent_string2)
-    end
-  end
+ 
   describe "Import tests for assignment topics" do
     itcondition_string = 'should be valid file with 3 columns'
     filepath_string = "spec/features/assignment_topic_csvs/3-col-valid_topics_import.csv"

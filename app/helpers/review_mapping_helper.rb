@@ -82,7 +82,6 @@ module ReviewMappingHelper
       r.avg_vol_in_round_2,
       r.avg_vol_in_round_3 = Response.get_volume_of_review_comments(@assignment.id, r.id)
     end
-    @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
 
   def display_volume_metric(overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3)

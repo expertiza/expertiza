@@ -250,6 +250,7 @@ class SignUpSheetController < ApplicationController
 
   def set_priority
     @user_id = session[:user].id
+<<<<<<< HEAD
     unless params[:topic].nil?
       team_user = TeamsUser.where(user_id: @user_id)
       users = User.find(@user_id)
@@ -277,6 +278,24 @@ class SignUpSheetController < ApplicationController
         end
         end
       end
+=======
+    # users_team = SignedUpTeam.find_team_users(params[:assignment_id].to_s, @user_id)
+    # check = SignedUpTeam.find_by_sql(["SELECT su.* FROM signed_up_teams su , sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.team_id = ? AND su.preference_priority_number = ?", params[:assignment_id].to_s, users_team[0].t_id, params[:priority].to_s])
+    # if check.empty?
+    #   signUp = SignedUpTeam.where(topic_id: params[:id], team_id: users_team[0].t_id).first
+    #   # signUp.preference_priority_number = params[:priority].to_s
+    #   if params[:priority].to_s.to_f > 0
+    #     signUp.update_attribute('preference_priority_number', params[:priority].to_s)
+    #   else
+    #     flash[:error] = "That is an invalid priority."
+    #   end
+    # end
+    check = Bid.where(user_id: @user_id, topic_id: params[:id])
+    if !Bid.where(user_id: @user_id, priority: params[:priority]).empty?
+      flash[:error] = "You have already selected this priority"
+    elsif check.empty?
+      Bid.create(topic_id: params[:id], user_id: @user_id, priority: params[:priority])
+>>>>>>> upstream/master
     else
       #All topics are deselected by user
       Bid.where(user_id: @user_id).destroy_all

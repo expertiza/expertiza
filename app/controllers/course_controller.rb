@@ -142,6 +142,7 @@ class CourseController < ApplicationController
     @user = User.find_by_name(params[:user][:name])
     if @user.nil?
       flash[:error] = "The user inputted \"" + params[:user][:name] + "\" does not exist."
+      puts "user nill"
       #redirect_to action: 'view_teaching_assistants', id: @course.id
       respond_to do |format|
       format.html { redirect_to action: 'view_teaching_assistants', id: @course.id }
@@ -151,6 +152,7 @@ class CourseController < ApplicationController
       @ta_mapping = TaMapping.create(ta_id: @user.id, course_id: @course.id)
       @user.role = Role.find_by_name 'Teaching Assistant'
       @user.save
+      puts "user saved"
 
       #redirect_to action: 'view_teaching_assistants', id: @course.id
       respond_to do |format|

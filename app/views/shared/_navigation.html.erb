@@ -36,6 +36,16 @@
                       </div>
                   <% end %>
               <% end %>
+              <% if current_user.role.name == "Instructor" or current_user.role.name == "Administrator"%>
+                  <%= form_for :user, url: '/impersonate/impersonate' do |f| %>
+                      <TABLE>
+                        <TR>
+                          <TD><%= f.text_field :name, {:size => 10, :autocomplete => "off",placeholder: "User ID"} %></TD>
+                          <TD><%= f.submit 'Student View' %></TD>
+                        </TR>
+                      </TABLE>
+                  <% end %>
+              <% end %>
             </li>
             <li class="divider-vertical"></li>
             <li class="right-most logout-box">

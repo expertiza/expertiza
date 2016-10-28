@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161008030832) do
+ActiveRecord::Schema.define(version: 20161028204045) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -78,8 +78,8 @@ ActiveRecord::Schema.define(version: 20161008030832) do
     t.boolean  "is_calibrated",                            default: false
     t.boolean  "is_selfreview_enabled"
     t.string   "reputation_algorithm",       limit: 255,   default: "Lauw"
-    t.integer  "num_reviews_required",       limit: 4,     default: 3
-    t.integer  "num_reviews_allowed",        limit: 4,     default: 3
+    t.integer  "num_reviews_required",       limit: 4
+    t.integer  "num_reviews_allowed",        limit: 4
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree

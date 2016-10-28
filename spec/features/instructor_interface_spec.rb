@@ -51,7 +51,7 @@ describe "Integration tests for instructor interface" do
     filepath_string = "spec/features/assignment_topic_csvs/3-col-valid_topics_import.csv"
     havecontent_string1 = 'expertiza'
     havecontent_string2 = 'mozilla'
-    check_valid_or_invalid_file_with_3_columns(itcondition_string, filepath_string, havecontent_string1, havecontent_string2)
+    check_valid_or_invalid_file_with_3columns(itcondition_string, filepath_string, havecontent_string1, havecontent_string2)
     it 'should be a valid file with 3 or more columns' do
        login_as("instructor6")
        visit '/assignments/1/edit'

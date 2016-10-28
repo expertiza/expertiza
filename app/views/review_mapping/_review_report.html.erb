@@ -95,7 +95,7 @@ $.tablesorter.addParser({
   },
   format: function (stringValue) {
     var stringNumericPart = stringValue.split(" ");         //split the data by spaces
-    var numericValue = parseInt(stringNumericPart[1],10);   
+    var numericValue = parseInt(stringNumericPart[1],10);
     return numericValue ;
   },
   type: 'numeric'

@@ -1,4 +1,5 @@
 module PenaltyHelper
+
   def calculate_penalty(participant_id)
     @submission_deadline_type_id = 1
     @review_deadline_type_id = 2
@@ -30,7 +31,6 @@ module PenaltyHelper
       penalties[:review] = 0
       penalties[:meta_review] = 0
     end
-
     penalties
   end
 
@@ -42,7 +42,7 @@ module PenaltyHelper
   def calculate_submission_penalty
     penalty = 0
     # penalty_unit = @late_policy.penalty_unit
-    submission_due_date = AssignmentDueDate.where(deadline_type_id: @submission_deadline_type_id, parent_id:  @assignment.id).first.due_at
+    submission_due_date = AssignmentDueDate.where(deadline_type_id: @submission_deadline_type_id, parent_id: @assignment.id).first.due_at
 
     resubmission_times = @participant.resubmission_times
     if resubmission_times.any?
@@ -65,6 +65,7 @@ module PenaltyHelper
     else
       penalty = @max_penalty_for_no_submission
     end
+    penalty
   end
 
   def calculate_review_penalty
@@ -75,7 +76,7 @@ module PenaltyHelper
       # reviews
       review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
 
-      review_due_date = AssignmentDueDate.where(deadline_type_id: @review_deadline_type_id, parent_id:  @assignment.id).first
+      review_due_date = AssignmentDueDate.where(deadline_type_id: @review_deadline_type_id, parent_id: @assignment.id).first
 
       unless review_due_date.nil?
         penalty = compute_penalty_on_reviews(review_mappings, review_due_date.due_at, num_of_reviews_required)
@@ -91,7 +92,7 @@ module PenaltyHelper
 
       meta_review_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
 
-      meta_review_due_date = AssignmentDueDate.where(deadline_type_id: @meta_review_deadline_type_id, parent_id:  @assignment.id).first
+      meta_review_due_date = AssignmentDueDate.where(deadline_type_id: @meta_review_deadline_type_id, parent_id: @assignment.id).first
 
       unless meta_review_due_date.nil?
         penalty = compute_penalty_on_reviews(meta_review_mappings, meta_review_due_date.due_at, num_of_meta_reviews_required)
@@ -175,8 +176,7 @@ module PenaltyHelper
             penalty += penalty_for_this_review
           end
         end
-      elsif
-        penalty = @max_penalty_for_no_submission
+      elsif penalty = @max_penalty_for_no_submission
       end
     end
     penalty

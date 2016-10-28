@@ -4,25 +4,25 @@ class LatePoliciesController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'new', 'create', 'index'
-      ['Super-Administrator',
-       'Administrator',
-       'Instructor',
-       'Teaching Assistant'].include? current_role_name
-    when 'edit', 'update', 'destroy'
-      [
-        'Super-Administrator',
-        'Administrator',
-        'Instructor',
-        'Teaching Assistant'
-      ].include?(current_role_name) &&
-      current_user.instructor_id == instructor_id
+      when 'new', 'create', 'index'
+        ['Super-Administrator',
+         'Administrator',
+         'Instructor',
+         'Teaching Assistant'].include? current_role_name
+      when 'edit', 'update', 'destroy'
+        [
+            'Super-Administrator',
+            'Administrator',
+            'Instructor',
+            'Teaching Assistant'
+        ].include?(current_role_name) &&
+            current_user.instructor_id == instructor_id
     end
   end
 
   private def instructor_id
     late_policy.try(:instructor_id) ||
-    current_user.instructor_id
+        current_user.instructor_id
   end
 
   private def late_policy
@@ -36,7 +36,7 @@ class LatePoliciesController < ApplicationController
 
     respond_to do |format|
       format.html # index.html.erb
-      format.xml  { render xml: @penalty_policies }
+      format.xml { render xml: @penalty_policies }
     end
   end
 
@@ -47,7 +47,7 @@ class LatePoliciesController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
-      format.xml  { render xml: @penalty_policy }
+      format.xml { render xml: @penalty_policy }
     end
   end
 
@@ -58,7 +58,7 @@ class LatePoliciesController < ApplicationController
 
     respond_to do |format|
       format.html # new.html.erb
-      format.xml  { render xml: @late_policy }
+      format.xml { render xml: @late_policy }
     end
   end
 
@@ -98,7 +98,7 @@ class LatePoliciesController < ApplicationController
       end
     end
     if is_number
-      @late_policy = LatePolicy.new(params[:late_policy])
+      @late_policy = LatePolicy.new(late_policy_params)
       @late_policy.instructor_id = instructor_id
 
       begin
@@ -112,7 +112,7 @@ class LatePoliciesController < ApplicationController
     else
       redirect_to action: 'new'
     end
-end
+  end
 
   # PUT /late_policies/1
   # PUT /late_policies/1.xml
@@ -184,4 +184,9 @@ end
   def is_numeric?(obj)
     obj.to_s.match(/\A[+-]?\d*?(\.\d+)?\Z/).nil? ? false : true
   end
+
+  def late_policy_params
+    params.require(:late_policy).permit(:policy_name, :penalty_per_unit, :max_penalty, :penalty_unit, :instructor_id)
+  end
+
 end

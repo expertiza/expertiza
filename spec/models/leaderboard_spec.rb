@@ -14,7 +14,8 @@ describe Leaderboard do
     @questionnaire=create(:questionnaire)
     @assignment_questionnaire1 =create(:assignment_questionnaire, user_id: @student1.id, assignment: @assignment)
     @assignment_questionnaire2 =create(:assignment_questionnaire, user_id: @student2.id, assignment: @assignment2)
-    @assignment_team = create(:assignment_team)
+    @assignment_team = create(:assignment_team, name: "TestTeam", parent_id: @assignment2.id)
+    @team_user = create(:team_user, team_id: @assignment_team.id, user_id: @student2.id)
   end
   #let(:student){create(:student)}
   #let(:instructor){create(:instructor)}
@@ -32,7 +33,7 @@ describe Leaderboard do
 
   it "getIndependantAssignment should return an assignments" do
     #puts Assignment.where(course_id: nil).inspect
-    puts AssignmentParticipant.where(user_id: @student1.id).inspect
+    #puts AssignmentParticipant.where(user_id: @student1.id).inspect
     expect(Leaderboard.get_independant_assignments(@student1.id)).to have(1).items
     #expect(Assignment.where(course_id: nil)).to have(1).items
 
@@ -40,17 +41,26 @@ describe Leaderboard do
   end
 
   it "getAssignmentsInCourses should return an assignment" do
-
-
     expect(Leaderboard.get_assignments_in_courses(1)).to have(1).items
+  end
+
+  # This method currently fails because there is no ScoreCache define anywhere in the program
+  # This is called in get_participants_score method
+  it "get_part_entries_in_courses should return two entries" do
+    expect(Leaderboard.get_part_entries_in_courses(1,@student1.id)).to have(2).items
+
+  end
+
+  #This method currently fails because there is no get_participant_entries_in_assignment_list.
+  it "get_part_entries_in_assignment should return one entries" do
+    expect(Leaderboard.get_part_entries_in_assignment(@assignment.id)).to have(1).items
 
   end
 
   it "leaderboard_heading should return No Entry with invalid input" do
-    leaderboard = Leaderboard.new questionnaire_type_id: 1, name: "test", qtype: "qtype"
-    expect(Leaderboard.leaderboard_heading("test")).to eq("No Entry")
-
+    expect(Leaderboard.leaderboard_heading("Invalid")).to eq("No Entry")
   end
+  # This method currently fails because there is no method find_by_qtype defined so lt_entry with always be nil.
   it "leaderboard_heading should return name" do
     expect(Leaderboard.leaderboard_heading(@questionnaire.id)).to eq("test")
   end
@@ -111,5 +121,6 @@ describe Leaderboard do
     expect(Leaderboard).to respond_to(:leaderboard_heading).with(1).argument
 
   end
+
 
 end

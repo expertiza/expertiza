@@ -48,7 +48,7 @@ class Leaderboard < ActiveRecord::Base
     quest_response_type_hash = {"ReviewResponseMap" => "ReviewQuestionnaire", "MetareviewResponseMap" => "MetareviewQuestionnaire", "FeedbackResponseMap" => "AuthorFeedbackQuestionnaire", "TeammateReviewResponseMap" => "TeammateReviewQuestionnaire", "BookmarkRatingResponseMap" => "BookmarkRatingQuestionnaire"}
 
     # Get all participants of the assignment list
-    participant_list = assignment_participant.where(parent_id: assignment_list.pluck(:id)).uniq
+    participant_list = AssignmentParticipant.where(parent_id: assignment_list.pluck(:id)).uniq
 
     # Get all teams participated in the given assignment list.
     team_list = Team.where("parent_id IN (?) AND type = ?", assignment_list.pluck(:id), 'assignmentTeam').uniq
@@ -103,13 +103,11 @@ class Leaderboard < ActiveRecord::Base
             # if q_type_hash.fetch(questionnaire_type, nil).nil?
             course_hash = {}
             course_hash[course_id] = user_hash
-
             q_type_hash[questionnaire_type] = course_hash
             q_type_hash[questionnaire_type][course_id] = user_hash
           elseif q_type_hash.fetch(questionnaire_type, {}).fetch(course_id, nil).nil? && !q_type_hash.fetch(questionnaire_type, nil).nil?
             q_type_hash[questionnaire_type][course_id] = user_hash
           end
-
           q_type_hash[questionnaire_type][course_id][reviewee_user_id] = [score_entry_score, 1]
         else
           # reviewee_user_id exist in q_type_hash. Update score.
@@ -195,14 +193,14 @@ class Leaderboard < ActiveRecord::Base
         rank = 1 + cs_sorted_hash[accomplishment][course_id].index([user_id, score])
         total = cs_sorted_hash[accomplishment][course_id].length
         course_accomplishment_hash[course_id] << {accomp: accomplishment_map[accomplishment], score: score[0], rankStr: "#{rank} of #{total}"}
-        end
+      end
     end
     course_accomplishment_hash
   end
 
   # Returns string for Top N Leaderboard Heading or accomplishments entry
   def self.leaderboard_heading(q_type_id)
-    lt_entry = Leaderboard.find_by(q_type_id)
+    lt_entry = Leaderboard.find_by_qtype(q_type_id)
     if lt_entry
       lt_entry.name
     else

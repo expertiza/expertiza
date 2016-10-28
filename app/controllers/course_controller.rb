@@ -146,7 +146,7 @@ class CourseController < ApplicationController
       #redirect_to action: 'view_teaching_assistants', id: @course.id
       respond_to do |format|
       format.html { redirect_to action: 'view_teaching_assistants', id: @course.id }
-      format.js   { render :layout => false }
+      format.js
    end
     else
       @ta_mapping = TaMapping.create(ta_id: @user.id, course_id: @course.id)
@@ -157,7 +157,7 @@ class CourseController < ApplicationController
       #redirect_to action: 'view_teaching_assistants', id: @course.id
       respond_to do |format|
       format.html { redirect_to action: 'view_teaching_assistants', id: @course.id }
-      format.js   { render :layout => false, :ta => @ta_mapping}
+      format.js   {:ta => @ta_mapping}
    end
 
       @course = @ta_mapping

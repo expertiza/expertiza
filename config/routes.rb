@@ -357,7 +357,9 @@ Expertiza::Application.routes.draw do
       post :set_priority
       post :save_topic_deadlines
       get :assign_topic
+      get :remove_topic
       post :update_team
+      post :remove_team
     end
   end
   #post 'assign_topic_path' => 'sign_up_sheet#assign_topic'

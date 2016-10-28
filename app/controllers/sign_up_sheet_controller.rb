@@ -109,60 +109,149 @@ class SignUpSheetController < ApplicationController
   end
 
   def assign_topic
-    puts "i AM HERE"
     @topic = SignUpTopic.find(params[:id])
     @assignment = Assignment.find(params[:assignment_id])
     #redirect_to "http://www.google.com"
+  end
+
+  def remove_topic
+    @topic = SignUpTopic.find(params[:id])
+    @assignment = Assignment.find(params[:assignment_id])
+    #redirect_to "http://www.google.com"
+  end
+
+  def remove_team
+    @topic = SignUpTopic.find(params[:id])
+    @assignment = Assignment.find(params[:assignment_id])
+    @user = User.find_by name: params[:user][:name]
+    @team = TeamsUser.find_by_sql("select T1.team_id from teams_users T1, teams T2 where T1.user_id = "+ @user.id.to_s+" AND T1.team_id = T2.id AND T2.parent_id = "+ @assignment.id.to_s)
+    @isTopicTaken = SignedUpTeam.find_by_sql("select * from signed_up_teams where topic_id = "+ @topic.id.to_s)
+    if(@isTopicTaken.any?)
+      if(@team.any?)
+        @userTeam = SignedUpTeam.find_by_sql("select * from signed_up_teams where team_id = "+ @team[0].team_id.to_s)
+        if(@userTeam.any? and @userTeam[0].topic_id == @topic.id)
+          @userTeam[0].destroy
+          @isTopicTakenNow = SignedUpTeam.find_by_sql("select * from signed_up_teams where topic_id = "+ @topic.id.to_s + " AND is_waitlisted = 1")
+          if(@isTopicTakenNow.any?)
+            @isTopicTakenNow[0].update(is_waitlisted: 0)
+          end
+          flash[:success] = "The team has been successfully removed"
+        else
+          flash[:error] = "This team does not have this topic."
+        end
+      else
+        flash[:error] = "User does not have a team for this assignment."
+      end
+    else
+      flash[:error] = "This topic has not been assigned."
+    end
+    redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
   end
 
   def update_team
      #puts params
      @topic = SignUpTopic.find(params[:id])
      @assignment = Assignment.find(params[:assignment_id])
-     @user = User.find_by name: params[:user][:name]
-     @team = TeamsUser.find_by_sql("select T1.team_id from teams_users T1, teams T2 where user_id = "+ @user.id.to_s+" AND T1.team_id = T2.id AND T2.parent_id = "+ @assignment.id.to_s)
-     puts @team[0].team_id
-     @isTopicTaken = SignedUpTeam.find_by_sql("select * from signed_up_teams where topic_id = "+ @topic.id.to_s)
 
-     if(@team.any?)
-           if(@isTopicTaken.any?)
-              #flash
-             #puts "A team already has this topic"
-             #puts "It is taken by " + (@isTopicTaken[0].team_id).to_s
-             @userTeam = SignedUpTeam.find_by_sql("select * from signed_up_teams where team_id = "+ @team[0].team_id.to_s)
-             @userTeam[0].topic_id = @topic.id
-             if (@isTopicTaken.size == @topic.max_choosers)
-               #puts "Max Number of choosers reached"
-               @userTeam[0].is_waitlisted = 1
-             else
-               @userTeam[0].is_waitlisted = 0
-             end
-             if @userTeam[0].save
-               redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
-             else
-               flash[:error] = "The topic could not be assigned."
+     #begin
+     # User.find_by!(name: params[:user][:name])
+     #rescue ActiveRecord::RecordNotFound
+     #   flash[:error] = "User doesnot exist"
+     #   redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
+     #end
+
+
+       @team = TeamsUser.find_by_sql("select T1.team_id from teams_users T1, teams T2 where T1.user_id = "+ @user.id.to_s+" AND T1.team_id = T2.id AND T2.parent_id = "+ @assignment.id.to_s)
+       puts @team[0].team_id
+       @isTopicTaken = SignedUpTeam.find_by_sql("select * from signed_up_teams where topic_id = "+ @topic.id.to_s)
+       @disp_flag = 0
+
+       if(@team.any?)
+
+         @userTeam = SignedUpTeam.find_by_sql("select * from signed_up_teams where team_id = "+ @team[0].team_id.to_s)
+
+
+          if(@isTopicTaken.any?)
+
+             if(@userTeam.any?)
+               @oldTopic = @userTeam.topic_id;
+                @isTopicTaken.each do |f|
+                   if f.team_id == @team[0].team_id
+                      @disp_flag = 1
+                      flash[:error] = "The topic is already assigned to the same team."
+                      redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
+                   end
+                end
+
+                if @disp_flag != 1
+                   @userTeam[0].update(topic_id: @topic.id)
+                   if (@isTopicTaken.size >= @topic.max_choosers)
+                      @userTeam[0].update(is_waitlisted: 1)
+                      flash[:success] = "Team is in the waitlist now"
+                   else
+                      @userTeam[0].update(is_waitlisted: 0)
+                      flash[:success] = "The topic has been assigned to the team"
+                   end
+
+                   @oldTopicTeams = SignedUpTeam.find_by_sql("select * from signed_up_teams where topic_id= "+ @oldTopic+" and is_waitlisted=1")
+                   if(@oldTopicTeams.any?)
+                     @oldTopicTeams[0].update(is_waitlisted: 0)
+                   end
+
+                   redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
+                end
+
+                else #@userTeam.any
+                   @sign_up = SignedUpTeam.new
+                   @sign_up.topic_id = @topic.id
+                   @sign_up.team_id = @team[0].team_id
+                   @sign_up.is_waitlisted = false
+                   @sign_up.preference_priority_number =0
+                   if @sign_up.save
+                      flash[:success] = "The topic has been assigned to the team"
+                   else
+                      flash[:error] = "The topic could not be assigned."
+                   end
+                   redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
              end
 
-           else
-             @sign_up = SignedUpTeam.new
-             #@team.each{|x| sign_up.team_id = x.id}
-             @sign_up.topic_id = @topic.id
-             @sign_up.team_id = @team[0].team_id
-             @sign_up.is_waitlisted = false
-             @sign_up.preference_priority_number =1
-             puts @sign_up.topic_id
-             if @sign_up.save
-               redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
-             else
-               flash[:error] = "The topic could not be assigned."
+             else #isTopicTaken
+                if @userTeam.any?
+                   @oldTopic = @userTeam.topic_id;
+
+                   puts "Topic is getting assigned"
+                   @userTeam[0].update(topic_id: @topic.id)
+                   @userTeam[0].update(is_waitlisted: 0)
+
+                   @oldTopicTeams = SignedUpTeam.find_by_sql("select * from signed_up_teams where topic_id= "+ @oldTopic+" and is_waitlisted=1")
+                   if(@oldTopicTeams.any?)
+                     @oldTopicTeams[0].update(is_waitlisted: 0)
+                   end
+
+                   redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
+                else
+                   @sign_up = SignedUpTeam.new
+                   @sign_up.topic_id = @topic.id
+                   @sign_up.team_id = @team[0].team_id
+                   @sign_up.is_waitlisted = false
+                   @sign_up.preference_priority_number =0
+                   if @sign_up.save
+                     flash[:success] = "The topic has been assigned to the team"
+                   else
+                     flash[:error] = "The topic could not be assigned."
+                   end
+                   redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
+                 end
              end
-             end
+          else
+          flash[:error] = "This user does not have a team"
+          redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
        end
+       end
+
 
      #"select * from assignments where id not in (select assignment_id from assignment_signups where signup_id = " + @params[:id].to_s + ")")
 
-
-  end
 
   # This displays a page that lists all the available topics for an assignment.
   # Contains links that let an admin or Instr@topic = SignUpTopic.find(params[:id])uctor edit, delete, view enrolled/waitlisted members for each topic

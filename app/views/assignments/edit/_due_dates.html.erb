@@ -31,22 +31,8 @@ jQuery(document).ready(function() {
         event.preventDefault();
 
     });
+
 	
-	//This function adds months to the date 
-    jQuery("#addMonth_btn").click(function() {
-
-        addDaysOrMonth(1, "months");
-        event.preventDefault();
-
-    });
-
-	//This function removes months from the date 
-    jQuery("#subMonth_btn").click(function() {
-
-        addDaysOrMonth(-1, "months");
-        event.preventDefault();
-
-    });
 
     //E1654. Improve date-picker and deadlines Code change starts
 
@@ -490,11 +476,7 @@ function removeOrAddTeamFormation() {
                                                             <button type="button" id="addDays_btn">+</button>
                                                             <%= number_field_tag 'days', 0, min: 0, max: 100 ,:id=>'days' %>
                                                                 <button type="button" id="subDays_btn">-</button>
-                                                                <%= label_tag('Months') %>
-                                                                    <button type="button" id="addMonth_btn">+</button>
-                                                                    <%= number_field_tag 'months', 0, min: 0, max: 12 ,:id=>'months' %>
-                                                                        <button type="button" id="subMonth_btn">-</button>
-                                                    </div>
+
                                                 </div>
                                                 <table class='exp' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden;'>
 

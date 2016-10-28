@@ -69,8 +69,11 @@ feature 'New submission mailer' do
 
   scenario 'testing for content' do
     expect(current_email).to have_content 'assignment has just been entered'
+  end
+end
 
-    feature 'update assignment email notification' do
+
+feature 'update assignment email notification' do
   background do
     student = FactoryGirl.create :student
     assignment = FactoryGirl.create :assignment

@@ -280,18 +280,7 @@ describe "assignment function" do
           notification_limit: 50
         )
       end
-
-      it "should update scored question dropdown" do
-        find_link('Rubrics').click
-        within("tr#questionnaire_table_AuthorFeedbackQuestionnaire") do
-          select "AuthorFeedbackQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-          select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-        end
-        click_button 'Save'
-        questionnaire = Questionnaire.where(name: "AuthorFeedbackQuestionnaire2").first
-        assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
-        expect(assignment_questionnaire.dropdown).to eq(false)
-      end
+      update_scored_question("tr#questionnaire_table_AuthorFeedbackQuestionnaire","AuthorFeedbackQuestionnaire2")
 
       # Third row of rubric
       it "updates teammate review questionnaire" do

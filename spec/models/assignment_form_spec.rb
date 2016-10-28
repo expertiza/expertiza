@@ -89,7 +89,9 @@ describe AssignmentForm do
       expect(assignment).to receive(:rounds_of_reviews=)
       expect(assignment).to receive(:directory_path)
       expect(assignment).to receive(:rounds_of_reviews)
+      expect(assignment).to receive(:num_reviews_required)
       expect(assignment).to receive(:num_reviews_required=)
+      expect(assignment).to receive(:num_reviews_allowed)
       expect(assignment).to receive(:num_reviews_allowed=)
       assignment_form.set_up_assignment_review
     end

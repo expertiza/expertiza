@@ -1,2 +1,1 @@
-console.log("Add questions action needs to go here");
-$("#questionnaire-partial").html("<%= escape_javascript render(:partial => 'renderedajax', :locals => {:questionnaire => @questionnaire}) %>");
+$("#questionnaire-partial").html("<%= escape_javascript render(:partial => 'ajax_partial', :locals => {:questionnaire => @questionnaire}) %>");

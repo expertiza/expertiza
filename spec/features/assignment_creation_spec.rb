@@ -567,11 +567,9 @@ describe "assignment function" do
 
   #Begin participant testing
   describe "participants", js: true do
-    before(:each) do
-      create(:course)
-    end
 
     it "check to see if participants can be added" do
+      create(:course)
       student = create(:student)
       create(:assignment, name: 'Test Assignment')
       create(:assignment_node)
@@ -588,7 +586,16 @@ describe "assignment function" do
       }.to change {Participant.count}.by 1
 
     end
+
+    it "should display newly created assignment" do
+      @assignment = create(:assignment, name: 'participants assignment')
+      @participant = create(:participant)
+      login_as(@participant.name)
+      expect(page).to have_content("participants assignment")
+    end
   end
+
+
 end
 
 

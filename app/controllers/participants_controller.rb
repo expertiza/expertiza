@@ -45,10 +45,11 @@ class ParticipantsController < ApplicationController
       can_submit = permissions[:can_submit]
       can_review = permissions[:can_review]
       can_take_quiz = permissions[:can_take_quiz]
-      @curr_object.add_participant(params[:user][:name], can_submit, can_review, can_take_quiz)
+      @curr_object.add_participant(params[:user][:name])
       user = User.find_by_name(params[:user][:name])
       @participant = @curr_object.participants.find_by_user_id(user.id)
-      puts "participant"
+	@participants = @curr_object.participants
+puts "herere"
       undo_link("The user \"#{params[:user][:name]}\" has successfully been added.")
     rescue
       url_new_user = url_for controller: 'users', action: 'new'

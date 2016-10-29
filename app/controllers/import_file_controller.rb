@@ -16,17 +16,21 @@ class ImportFileController < ApplicationController
     @array_expected_values.delete_if { |x| b.include?(x) }
 
     if(@array_expected_values.include?("Team Member1"))
-    (3..4).each do |i|
-      @array_expected_values.push("Team Member#{i}")
-    end
+      (3..4).each do |i|
+        @array_expected_values.push("Team Member#{i}")
+      end
     elsif(@array_expected_values.include?("Reviewer1"))
-    (3..15).each do |i|
-      @array_expected_values.push("Reviewer#{i}")
-    end
+      (3..15).each do |i|
+        @array_expected_values.push("Reviewer#{i}")
+      end
     elsif(@array_expected_values.include?("Metaeviewer1"))
-    (3..15).each do |i|
-      @array_expected_values.push("Metareviewer#{i}")
-    end
+      (3..15).each do |i|
+        @array_expected_values.push("Metareviewer#{i}")
+      end
+    elsif(@array_expected_values.include?("user1"))
+      (3..15).each do |i|
+        @array_expected_values.push("user#{i}")
+      end
     else
     end
   end
@@ -132,6 +136,11 @@ class ImportFileController < ApplicationController
         end
       when "SignUpTopic"
         expected_fields_variable_default = [ 'Topic identifier', 'Topic name', 'Max choosers', 'Topic Category']
+      when "SignUpSheet"
+        expected_fields_variable_default = [ 'Topic identifier', 'user1', 'user2']
+        (3..15).each do |i|
+          expected_fields_variable_default.push("user#{i}")
+        end
       else
         expected_fields_variable_default = ['Team Name - optional', 'Team Member1','Team Member2', 'Team Member3', 'Team Member4']
     end

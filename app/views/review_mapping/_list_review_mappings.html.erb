@@ -98,9 +98,9 @@
         <tr style="background-color:<%=bgcolor2%>">
           <td width="50%" style="vertical-align:top;"><%= map.reviewer.name %> (<%= map.reviewer.fullname %>)
             <div style="text-align:right">
-              <%= link_to 'delete', :action => 'delete_reviewer', :id => map.map_id %><br/>
+              <%= link_to 'delete', :action => 'delete_reviewer', :id => map.map_id, :object => 'reviewer' %><br/>
               <%= link_to 'add metareviewer', :action => 'select_metareviewer', :id => map.map_id %><br/>
-              <%= link_to 'delete all metareviewers', :action => 'delete_all_metareviewers', :id => map.map_id %>
+              <%= link_to 'delete all metareviewers', :action => 'delete_reviewer', :id => map.map_id, :object => 'all_metareviewer' %>
             </div>
           </td>
 
@@ -121,7 +121,7 @@
               <tr style="background-color:<%=bgcolor3%>">
                 <td><%= rmap.reviewer.name %> (<%= rmap.reviewer.fullname %>)
                   <div style="text-align:right">
-                    <%= link_to 'delete', :action => 'delete_metareviewer', :id => rmap.map_id %><br/>
+                    <%= link_to 'delete', :action => 'delete_reviewer', :id => rmap.map_id, :object => 'metareviewer' %><br/>
                   </div>
                 </td>
               </tr>
@@ -177,4 +177,3 @@
   :id=>assignment.id
 %>
 |
-

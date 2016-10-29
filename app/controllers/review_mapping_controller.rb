@@ -34,9 +34,9 @@ class ReviewMappingController < ApplicationController
   end
 
   def select_reviewer
-    assignment = Assignment.find(params[:id])
-    @contributor = AssignmentTeam.find(params[:contributor_id])
-    session[:contributor] = @contributor
+      assignment = Assignment.find(params[:id])
+      @contributor = AssignmentTeam.find(params[:contributor_id])
+      session[:contributor] = @contributor
   end
 
   def select_metareviewer
@@ -152,22 +152,9 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment.id
   end
 
-  def delete_all_metareviewers
-    mapping = ResponseMap.find(params[:id])
-    mmappings = MetareviewResponseMap.where(reviewed_object_id: mapping.map_id)
-
-    failedCount = ResponseMap.delete_mappings(mmappings, params[:force])
-    if failedCount > 0
-      url_yes = url_for action: 'delete_all_metareviewers', id: mapping.map_id, force: 1
-      url_no = url_for action: 'delete_all_metareviewers', id: mapping.map_id
-      flash[:error] = "A delete action failed:<br/>#{failedCount} metareviews exist for these mappings. Delete these mappings anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
-    else
-      flash[:note] = "All metareview mappings for contributor \"" + mapping.reviewee.name + "\" and reviewer \"" + mapping.reviewer.name + "\" have been deleted."
-    end
-    redirect_to action: 'list_mappings', id: mapping.assignment.id
-  end
-
   def delete_reviewer
+    case params[:object]
+    when "reviewer"
     review_response_map = ReviewResponseMap.find(params[:id])
     assignment_id = review_response_map.assignment.id
     if !Response.exists?(map_id: review_response_map.id)
@@ -177,20 +164,11 @@ class ReviewMappingController < ApplicationController
       flash[:error] = "This review has already been done. It cannot been deleted."
     end
     redirect_to action: 'list_mappings', id: assignment_id
-  end
-
-  def delete_metareviewer
-    mapping = MetareviewResponseMap.find(params[:id])
-    assignment_id = mapping.assignment.id
-    flash[:note] = "The metareview mapping for " + mapping.reviewee.name + " and " + mapping.reviewer.name + " has been deleted."
-
-    begin
-      mapping.delete
-    rescue
-      flash[:error] = "A delete action failed:<br/>" + $ERROR_INFO + "<a href='/review_mapping/delete_metareview/" + mapping.map_id.to_s + "'>Delete this mapping anyway>?"
+    when "metareviewer"
+      delete_metareviewer
+    when "all_metareviewer"
+      delete_all_metareviewers
     end
-
-    redirect_to action: 'list_mappings', id: assignment_id
   end
 
   def delete_metareview
@@ -605,4 +583,33 @@ def add_metareviewer
     msg = $ERROR_INFO
   end
   redirect_to action: 'list_mappings', id: mapping.assignment.id, msg: msg
+end
+
+def delete_metareviewer
+  mapping = MetareviewResponseMap.find(params[:id])
+  assignment_id = mapping.assignment.id
+  flash[:note] = "The metareview mapping for " + mapping.reviewee.name + " and " + mapping.reviewer.name + " has been deleted."
+
+  begin
+    mapping.delete
+  rescue
+    flash[:error] = "A delete action failed:<br/>" + $ERROR_INFO + "<a href='/review_mapping/delete_metareview/" + mapping.map_id.to_s + "'>Delete this mapping anyway>?"
+  end
+
+  redirect_to action: 'list_mappings', id: assignment_id
+end
+
+def delete_all_metareviewers
+  mapping = ResponseMap.find(params[:id])
+  mmappings = MetareviewResponseMap.where(reviewed_object_id: mapping.map_id)
+
+  failedCount = ResponseMap.delete_mappings(mmappings, params[:force])
+  if failedCount > 0
+    url_yes = url_for action: 'delete_all_metareviewers', id: mapping.map_id, force: 1
+    url_no = url_for action: 'delete_all_metareviewers', id: mapping.map_id
+    flash[:error] = "A delete action failed:<br/>#{failedCount} metareviews exist for these mappings. Delete these mappings anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
+  else
+    flash[:note] = "All metareview mappings for contributor \"" + mapping.reviewee.name + "\" and reviewer \"" + mapping.reviewer.name + "\" have been deleted."
+  end
+  redirect_to action: 'list_mappings', id: mapping.assignment.id
 end

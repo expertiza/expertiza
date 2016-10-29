@@ -1,2 +1,2 @@
 <% user = User.find(@participant.user_id) %>
-$('.exp').append("<%= escape_javascript (render :partial => '/shared_scripts/user_list',:locals => {:controller => 'participants', :participant => @participant, :user => user}) %>");
+$('#user-list').append("<%= escape_javascript (render :partial => '/shared_scripts/user_list',:locals => {:controller => 'participants', :participant => @participant, :user => user}) %>");

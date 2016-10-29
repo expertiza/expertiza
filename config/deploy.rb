@@ -1,6 +1,7 @@
 
 # CapistranoDbTasks (https://github.com/sgruhier/capistrano-db-tasks)
 require 'capistrano-db-tasks'
+set :default_environment, 'JAVA_HOME' => "/usr/lib/jvm/java-6-openjdk-amd64"
 
 # if you haven't already specified
 set :rails_env, "production"

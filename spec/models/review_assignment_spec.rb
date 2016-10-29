@@ -9,6 +9,6 @@ describe ReviewAssignment do
 	@review = AssignmentParticipant.new
 end
 	it "give the list of contributors" do
-	 expect(@test.candidate_assignment_teams_to_review(@review)).should be_kind_of "Array"
+	 expect(@assign.candidate_assignment_teams_to_review(@review)).should be_kind_of "Array"
 	end 
 end

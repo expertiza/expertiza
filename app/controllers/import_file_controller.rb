@@ -130,6 +130,8 @@ class ImportFileController < ApplicationController
         (3..15).each do |i|
           expected_fields_variable_default.push("Metareviewer#{i}")
         end
+      when "SignUpTopic"
+        expected_fields_variable_default = [ 'Topic identifier', 'Topic name', 'Max choosers', 'Topic Category']
       else
         expected_fields_variable_default = ['Team Name - optional', 'Team Member1','Team Member2', 'Team Member3', 'Team Member4']
     end

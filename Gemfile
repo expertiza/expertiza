@@ -9,7 +9,7 @@ gem 'airbrake'
 gem 'awesome_nested_set'
 gem 'bind-it'
 gem 'capistrano'
-gem "capistrano-db-tasks", require: false
+gem 'capistrano-db-tasks', require: false
 gem 'capistrano-rails'
 gem 'coveralls', require: false
 gem 'delayed_job_active_record'
@@ -21,7 +21,7 @@ gem 'fastercsv'
 gem 'ffi-aspell'
 gem 'font-awesome-rails'
 gem 'gchartrb', require: 'google_chart'
-gem "googlecharts", require: "gchart"
+gem 'googlecharts', require: 'gchart'
 gem 'gdata', require: false
 gem 'haml-rails'
 gem 'jquery-rails'
@@ -70,7 +70,7 @@ group :development do
   gem 'rubocop'
   gem 'selenium-webdriver'
   gem 'quiet_assets'
-  gem "factory_girl_rails", "~> 4.0"
+  gem 'factory_girl_rails', '~> 4.0'
 end
 
 group :test do

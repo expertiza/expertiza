@@ -29,12 +29,9 @@ class JoinTeamRequestsController < ApplicationController
 		# check if the advertisement is from a team member and if so disallow requesting invitations
 		team_member = TeamsUser.where(['team_id =? and user_id =?', params[:team_id], session[:user][:id]])
 		team = Team.find(params[:team_id])
-		if team.full?
-			flash[:note] = "This team is full."
-		elsif !team_member.empty?
-			flash[:note] = "You are already a member of this team."
-		else
+		checkteam_flash(team, team_member)
 
+		if(!team.full? && team_member.empty?)
 			@join_team_request = JoinTeamRequest.new
 			@join_team_request.comments = params[:comments]
 			@join_team_request.status = 'P'
@@ -42,17 +39,30 @@ class JoinTeamRequestsController < ApplicationController
 
 			participant = Participant.where(user_id: session[:user][:id], parent_id: params[:assignment_id]).first
 			@join_team_request.participant_id = participant.id
-			respond_to do |format|
-				if @join_team_request.save
-					format.html { redirect_to(@join_team_request, notice: 'JoinTeamRequest was successfully created.') }
-					format.xml  { render xml: @join_team_request, status: :created, location: @join_team_request }
-				else
-					format.html { render action: "new" }
-					format.xml  { render xml: @join_team_request.errors, status: :unprocessable_entity }
-				end
+			react_for_format
+		end
+	end
+
+	def react_for_format
+		respond_to do |format|
+			if @join_team_request.save
+				format.html { redirect_to(@join_team_request, notice: 'JoinTeamRequest was successfully created.') }
+				format.xml { render xml: @join_team_request, status: :created, location: @join_team_request }
+			else
+				format.html { render action: "new" }
+				format.xml { render xml: @join_team_request.errors, status: :unprocessable_entity }
 			end
 		end
 	end
+
+	def checkteam_flash(team, team_member)
+		if team.full?
+			flash[:note] = "This team is full."
+		elsif !team_member.empty?
+			flash[:note] = "You are already a member of this team."
+		end
+	end
+
 
 	# update join team request entry for join_team_request table and add it to the table
 	def update

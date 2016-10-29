@@ -31,7 +31,7 @@ describe "AssignmentParticipant" do
       course_part = assignment_participant.copy(0)
       expect(course_part).to be_an_instance_of(CourseParticipant)
     end
-  end
+  end 
 
   describe "#import" do
     it "raise error if record is empty" do

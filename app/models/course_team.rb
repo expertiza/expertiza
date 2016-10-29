@@ -45,7 +45,7 @@ class CourseTeam < Team
   # Import from csv
   def self.import(row, course_id, options)
     raise ImportError, "The course with the id \"" + id.to_s + "\" was not found. <a href='/course/new'>Create</a> this course?" if Course.find(course_id).nil?
-    @course_team = prototype
+    @course_team = "CourseTeam"
     Team.import(row, course_id, options, @course_team)
   end
 

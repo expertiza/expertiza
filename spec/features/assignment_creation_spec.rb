@@ -39,6 +39,7 @@ describe "assignment function" do
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
   end
+
   describe "creation page", js: true do
     before(:each) do
       (1..3).each do |i|

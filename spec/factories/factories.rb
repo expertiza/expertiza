@@ -47,7 +47,7 @@ FactoryGirl.define do
 
   factory :student, class: User do
     # Zhewei: In order to keep students the same names (2064, 2065, 2066) before each example.
-    sequence(:name) {|n| n = n % 3; "student206#{n + 4}" }
+    sequence(:name) {|n| n = n % 10; "student206#{n + 4}" }
     role { Role.where(name: 'Student').first || association(:role_of_student) }
     password "password"
     password_confirmation "password"

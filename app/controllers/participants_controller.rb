@@ -39,15 +39,15 @@ class ParticipantsController < ApplicationController
   end
 
   def add
-    curr_object = Object.const_get(params[:model]).find(params[:id]) if Participant::PARTICIPANT_TYPES.include? params[:model]
+    @curr_object = Object.const_get(params[:model]).find(params[:id]) if Participant::PARTICIPANT_TYPES.include? params[:model]
     begin
       permissions = Participant.get_permissions(params[:user][:role])
       can_submit = permissions[:can_submit]
       can_review = permissions[:can_review]
       can_take_quiz = permissions[:can_take_quiz]
-      curr_object.add_participant(params[:user][:name], can_submit, can_review, can_take_quiz)
+      @curr_object.add_participant(params[:user][:name], can_submit, can_review, can_take_quiz)
       user = User.find_by_name(params[:user][:name])
-      @participant = curr_object.participants.find_by_user_id(user.id)
+      @participant = @curr_object.participants.find_by_user_id(user.id)
       puts "participant"
       undo_link("The user \"#{params[:user][:name]}\" has successfully been added.")
     rescue
@@ -55,7 +55,7 @@ class ParticipantsController < ApplicationController
       flash[:error] = "The user #{params[:user][:name]} does not exist or has already been added.</a>"
     end
     respond_to do |format|
-      format.html { redirect_to action: 'list', id: curr_object.id, model: params[:model], authorization: params[:authorization] }
+      format.html { redirect_to action: 'list', id: @curr_object.id, model: params[:model], authorization: params[:authorization] }
       format.js
    end
     #redirect_to action: 'list', id: curr_object.id, model: params[:model], authorization: params[:authorization]

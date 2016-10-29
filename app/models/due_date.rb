@@ -81,7 +81,7 @@ class DueDate < ActiveRecord::Base
     else
       next_due_date = AssignmentDueDate.where(['parent_id = ?', assignment_id]).first
 	if next_due_date.due_at < Time.now
-            next_due_date.deadline_type_id = 12 
+            next_due_date = nil
           end
     end
     next_due_date

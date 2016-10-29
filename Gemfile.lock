@@ -63,6 +63,7 @@ GEM
       babel-source (>= 4.0, < 6)
       execjs (~> 2.0)
     bind-it (0.2.7)
+      rjb (~> 1.4.3)
     builder (3.2.2)
     capistrano (3.4.0)
       i18n
@@ -481,6 +482,7 @@ DEPENDENCIES
   react-rails (~> 1.0)
   rest-client (~> 1.8)
   rgl
+  rjb
   rspec-rails
   rubocop
   rubyzip

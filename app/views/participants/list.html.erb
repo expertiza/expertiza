@@ -2,7 +2,7 @@
 
 <br/>
 <div class = "exp">
-<%if @curr_object.participants.length > 0%>
+<%if @participants.length > 0%>
 <table>
   <tr>
     <th colspan=5></th>
@@ -26,13 +26,13 @@
   </tr>
 
 <% @user_id = [] %>
-<% for participant in @curr_object.participants 
+<% for participant in @participants
    user = User.find(participant.user_id) %>
    <% @user_id << participant.user_id %>
 <%= render :partial => '/shared_scripts/user_list',
            :locals => {:controller => 'participants', 
                        :participant => participant,
-                       :user => user} %>
+			:user => user} %>
 <% end -%>
 </table>
 <% end -%>

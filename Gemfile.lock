@@ -485,6 +485,7 @@ DEPENDENCIES
   rest-client (~> 1.8)
   rgl
   rjb
+  rspec
   rspec-rails
   rubocop
   rubyzip

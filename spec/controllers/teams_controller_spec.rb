@@ -29,6 +29,14 @@ describe TeamsController do
       end
     end
 
+    context "with a course team " do
+      it "deletes a course team" do
+        @course = create(:course)
+        @c_team = create(:course_team)
+
+        expect{ @c_team.delete }.to change(Team, :count).by(-1)
+      end
+    end
     
 
   end

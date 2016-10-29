@@ -10,7 +10,7 @@ gem 'airbrake'
 gem 'awesome_nested_set'
 gem 'bind-it'
 gem 'capistrano'
-gem "capistrano-db-tasks", require: falser
+gem "capistrano-db-tasks", require: false
 gem 'capistrano-rails'
 gem 'coveralls', require: false
 gem 'delayed_job_active_record'

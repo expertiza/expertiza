@@ -44,39 +44,12 @@ class ReviewMappingController < ApplicationController
   end
 
   def add_reviewer
-    assignment = Assignment.find(params[:id])
-    topic_id = params[:topic_id]
-    user_id = User.where(name: params[:user][:name]).first.id
-    # If instructor want to assign one student to review his/her own artifact,
-    # it should be counted as “self-review” and we need to make /app/views/submitted_content/_selfreview.html.erb work.
-    if TeamsUser.exists?(team_id: params[:contributor_id], user_id: user_id)
-      flash[:error] = "You cannot assign this student to review his/her own artifact."
-    else
-      # Team lazy initialization
-      SignUpSheet.signup_team(assignment.id, user_id, topic_id)
-      msg = ''
-      begin
-        user = User.from_params(params)
-        # contributor_id is team_id
-        regurl = url_for action: 'add_user_to_assignment',
-                         id: assignment.id,
-                         user_id: user.id,
-                         contributor_id: params[:contributor_id]
-
-        # Get the assignment's participant corresponding to the user
-        reviewer = get_reviewer(user, assignment, regurl)
-        # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-        # to treat all assignments as team assignments
-        if  ReviewResponseMap.where(reviewee_id: params[:contributor_id],reviewer_id: reviewer.id).first.nil?
-          ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
-        else
-          raise "The reviewer, \"" + reviewer.name + "\", is already assigned to this contributor."
-        end
-      rescue
-        msg = $ERROR_INFO
-      end
+    case params[:object]
+    when "reviewer"
+      add_project_reviewer
+    when "metareviewer"
+      add_metareviewer
     end
-    redirect_to action: 'list_mappings', id: assignment.id, msg: msg
   end
 
 
@@ -141,26 +114,6 @@ class ReviewMappingController < ApplicationController
       flash[:alert] = e.nil? ? $ERROR_INFO : e
     end
     redirect_to student_quizzes_path(id: reviewer.id)
-  end
-
-  def add_metareviewer
-    mapping = ResponseMap.find(params[:id])
-    msg = ''
-    begin
-      user = User.from_params(params)
-
-      regurl = url_for action: 'add_user_to_assignment', id: mapping.map_id, user_id: user.id
-      reviewer = get_reviewer(user, mapping.assignment, regurl)
-      if MetareviewResponseMap.where(reviewed_object_id:mapping.map_id,reviewer_id:reviewer.id).first != nil
-        raise "The metareviewer \"" + reviewer.user.name + "\" is already assigned to this reviewer."
-      end
-      MetareviewResponseMap.create(reviewed_object_id: mapping.map_id,
-                                   reviewer_id: reviewer.id,
-                                   reviewee_id: mapping.reviewer.id)
-    rescue
-      msg = $ERROR_INFO
-    end
-    redirect_to action: 'list_mappings', id: mapping.assignment.id, msg: msg
   end
 
   def assign_metareviewer_dynamically
@@ -594,4 +547,62 @@ private
       iterator += 1
     end
   end
+end
+
+
+def add_project_reviewer
+  assignment = Assignment.find(params[:id])
+  topic_id = params[:topic_id]
+  user_id = User.where(name: params[:user][:name]).first.id
+  # If instructor want to assign one student to review his/her own artifact,
+  # it should be counted as “self-review” and we need to make /app/views/submitted_content/_selfreview.html.erb work.
+  if TeamsUser.exists?(team_id: params[:contributor_id], user_id: user_id)
+    flash[:error] = "You cannot assign this student to review his/her own artifact."
+  else
+    # Team lazy initialization
+    SignUpSheet.signup_team(assignment.id, user_id, topic_id)
+    msg = ''
+    begin
+      user = User.from_params(params)
+      # contributor_id is team_id
+      regurl = url_for action: 'add_user_to_assignment',
+                       id: assignment.id,
+                       user_id: user.id,
+                       contributor_id: params[:contributor_id]
+
+      # Get the assignment's participant corresponding to the user
+      reviewer = get_reviewer(user, assignment, regurl)
+      # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+      # to treat all assignments as team assignments
+      if  ReviewResponseMap.where(reviewee_id: params[:contributor_id],reviewer_id: reviewer.id).first.nil?
+        ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
+      else
+        raise "The reviewer, \"" + reviewer.name + "\", is already assigned to this contributor."
+      end
+    rescue
+      msg = $ERROR_INFO
+    end
+  end
+  redirect_to action: 'list_mappings', id: assignment.id, msg: msg
+end
+
+
+def add_metareviewer
+  mapping = ResponseMap.find(params[:id])
+  msg = ''
+  begin
+    user = User.from_params(params)
+
+    regurl = url_for action: 'add_user_to_assignment', id: mapping.map_id, user_id: user.id
+    reviewer = get_reviewer(user, mapping.assignment, regurl)
+    if MetareviewResponseMap.where(reviewed_object_id:mapping.map_id,reviewer_id:reviewer.id).first != nil
+      raise "The metareviewer \"" + reviewer.user.name + "\" is already assigned to this reviewer."
+    end
+    MetareviewResponseMap.create(reviewed_object_id: mapping.map_id,
+                                 reviewer_id: reviewer.id,
+                                 reviewee_id: mapping.reviewer.id)
+  rescue
+    msg = $ERROR_INFO
+  end
+  redirect_to action: 'list_mappings', id: mapping.assignment.id, msg: msg
 end

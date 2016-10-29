@@ -24,4 +24,15 @@ describe 'should not view inherit teams' do
     expect(page).to have_no_content('Inherit Teams From Course')
   end
 
+   it 'should not display inherit teams while creating team for an assignment without a course' do
+    create(:assignment_without_course)
+    create(:assignment_without_course_node)
+    create(:assignment_without_course_team)
+
+    login_as("instructor6")    
+    visit '/teams/list?id=1&type=Assignment'
+    click_link 'Create Team'
+    expect(page).to have_no_content('Inherit Teams From Course')
+  end
+  
 end

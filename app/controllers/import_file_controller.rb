@@ -11,7 +11,28 @@ class ImportFileController < ApplicationController
     @expected_fields = params[:expected_fields]
     @model = params[:model]
     @title = params[:title]
-    @array_expected_values = parse_line(@expected_fields,',',params)
+
+    if @expected_fields.nil?
+      case params[:model]
+        when "AssignmentTeam"
+          @array_expected_values = parse_line("Team Name - optional, Team Member1,Team Member2, ..., Team MemberN",',',params)
+        when "User"
+          @array_expected_values = parse_line("username, full name (first[ middle] last),e-mail address",',',params)
+        when "ReviewResponseMap"
+          @array_expected_values = parse_line("Contributor, Reviewer1, Reviewer2,...,ReviewerN",',',params)
+        when "MetaeviewResponseMap"
+          @array_expected_values = parse_line("Contributor, Reviewer, Metareviewer1,Metareviewer2,...,MetareviewerN",',',params)
+        when "SignUpTopic"
+          @array_expected_values = parse_line("Topic identifier, Topic name, Max choosers, Topic Category",',',params)
+        when "SignUpSheet"
+          @array_expected_values = parse_line("Topic identifier, user1, user2,...",',',params)
+        else
+          @array_expected_values = parse_line("Team Name - optional, Team Member1,Team Member2, ... ,Team MemberN",',',params)
+      end
+    else
+      @array_expected_values = parse_line(@expected_fields,',',params)
+    end
+
     b = ['...','MetareviewerN','ReviewerN','Team MemberN']
     @array_expected_values.delete_if { |x| b.include?(x) }
 

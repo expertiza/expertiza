@@ -53,7 +53,6 @@ describe "HeatMapTest", type: :feature do
     click_button('Upload link')
 
 
-
     user = User.find_by_name("student2065")
     stub_current_user(user, user.role.name, user.role)
 

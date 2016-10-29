@@ -65,7 +65,7 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
-  def rereview_response_maps
+  def metareview_response_maps
     responses = Response.where(map_id: self.id)
     metareview_list = []
     responses.each do |response|
@@ -77,8 +77,7 @@ class ReviewResponseMap < ResponseMap
 
   # return  the responses for specified round, for varying rubric feature -Yang
   def self.get_responses_for_team_round(team, round)
-    #team_id = team.id
-  #  @x=team.parent_id
+
     responses = []
     if team.id
       maps = ResponseMap.where(reviewee_id: team.id, type: "ReviewResponseMap")

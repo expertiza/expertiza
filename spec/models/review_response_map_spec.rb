@@ -23,7 +23,7 @@ describe 'ReviewResponseMap' do
       expect(review_questionnaire.id).to be(1)
     end
     it "should return title" do
-      expect(@review_response.title).to eql "Review"
+      expect(@review_response.get_title).to eql "Review"
     end
     it "should return export_fields" do
       export_fields=ReviewResponseMap.export_fields nil
@@ -59,7 +59,7 @@ describe 'ReviewResponseMap' do
     end
   end
 
-  describe "#Test for the rereview_response_maps method" do
+  describe "#Test for the metareview_response_maps method" do
 # There is 1 metareview each for the reviews given by a particular reviewer in round 1 and round 2
     it "should return correct number of metareviews for a particular reviewer" do
       @review1 = create(:response_1)
@@ -70,7 +70,7 @@ describe 'ReviewResponseMap' do
       @metareview2=create(:response_map_metareview)
       @metareview2.update(reviewed_object_id: @review2.id)
       @response_map=@review1.response_map
-      expect(@response_map.rereview_response_maps.size).to eq(2)
+      expect(@response_map.metareview_response_maps.size).to eq(2)
     end
 
   end

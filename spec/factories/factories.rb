@@ -314,6 +314,7 @@ FactoryGirl.define do
     reviewee { AssignmentTeam.first || association(:assignment_team) }
     reviewer_id 1
     type 'ReviewResponseMap'
+    calibrate_to 0
   end
 
   factory :response, class: Response do

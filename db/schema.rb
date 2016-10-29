@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160929155706) do
+ActiveRecord::Schema.define(version: 20161028204045) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -78,6 +78,8 @@ ActiveRecord::Schema.define(version: 20160929155706) do
     t.boolean  "is_calibrated",                            default: false
     t.boolean  "is_selfreview_enabled"
     t.string   "reputation_algorithm",       limit: 255,   default: "Lauw"
+    t.integer  "num_reviews_required",       limit: 4
+    t.integer  "num_reviews_allowed",        limit: 4
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -667,6 +669,8 @@ ActiveRecord::Schema.define(version: 20160929155706) do
     t.boolean "advertise_for_partner"
     t.text    "submitted_hyperlinks",       limit: 65535
     t.integer "directory_num",              limit: 4
+    t.integer "grade_for_submission",       limit: 4
+    t.text    "comment_for_submission",     limit: 65535
   end
 
   create_table "teams_users", force: :cascade do |t|

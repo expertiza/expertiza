@@ -60,7 +60,6 @@ gem 'will_paginate'
 gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
 gem 'jquery-tablesorter'
-gem 'rails_12factor'
 
 group :development do
   gem 'daemons'

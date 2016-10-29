@@ -317,7 +317,7 @@ describe "assignment function" do
       )
     end
 
-    it "should create teammate review row in rubrics" do
+    xit "should create teammate review row in rubrics" do
       fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
       select('Course 2', from: 'assignment_form_assignment_course_id')
       fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'

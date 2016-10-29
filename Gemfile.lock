@@ -503,6 +503,7 @@ DEPENDENCIES
   test-unit
   therubyracer
   thin
+  tins (~> 1.6.0)
   uglifier
   will_paginate
   zip-zip

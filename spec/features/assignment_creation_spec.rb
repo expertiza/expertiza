@@ -192,10 +192,10 @@ describe "assignment function" do
       #click_button 'Create'
       assignment = Assignment.where(name: 'private assignment for test').first
       expect(assignment).to have_attributes(
-                                name: 'private assignment for test',
-                                course_id: Course.find_by_name('Course 2')[:id],
-                                directory_path: 'testDirectory',
-                                spec_location: 'testLocation')
+        name: 'private assignment for test',
+        course_id: Course.find_by_name('Course 2')[:id],
+        directory_path: 'testDirectory',
+        spec_location: 'testLocation')
     end
 
     it "is able to create public micro-task assignment" do

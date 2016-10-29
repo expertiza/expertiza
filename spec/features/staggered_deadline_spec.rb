@@ -39,6 +39,28 @@ describe "Staggered deadline test" do
     create(:topic_due_date, due_at: DateTime.now + 30, deadline_type: DeadlineType.where(name: 'submission').first, topic: SignUpTopic.where(id: 2).first, round: 2)
     create(:topic_due_date, due_at: DateTime.now + 40, deadline_type: DeadlineType.where(name: 'review').first, topic: SignUpTopic.where(id: 2).first, round: 2)
   end
+
+  it "instructor can create an assignment with varying rubric by round feature" do
+     login_as("instructor6")
+     visit '/tree_display/list'
+     visit '/assignments/new?private=0'
+     
+     fill_in 'assignment_form_assignment_name', with: 'test assignment creation'
+     fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+     click_button 'Create'
+     find_link('Rubrics').click
+     check("assignment_questionnaire_used_in_round")
+     find_link('Topics').click
+     find_link('New topic').click
+     expect(page).to have_content 'New topic'
+     fill_in 'topic_topic_identifier', with:'1'
+     fill_in 'topic_topic_name', with:'Topic_1'
+     fill_in 'topic_category', with: 'Test'
+     fill_in 'topic_max_choosers', with: '1'
+     click_button 'Create'
+     
+  end 
+ 
  
   #impersonate student to submit work
   def submit_topic  

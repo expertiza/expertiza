@@ -218,13 +218,8 @@ class QuestionnairesController < ApplicationController
     @params_action=params[:action]
     @questionnaire = Questionnaire.find(questionnaire_id)
     respond_to do |format|
-      #format.html {redirect_to edit_questionnaire_path(questionnaire_id.to_sym)}
-      puts "Printing html??"
-      puts @questionnaire
-      #puts render_to_string edit_questionnaire_path(questionnaire_id.to_sym)
-      #format.js {render :action => "add_new_questions", :locals => {questionnaire_id => @questionnaire_id}}
-      #format.json {render :json => @question}
-      format.js {render :action => "add_new_questions"}
+      format.html {redirect_to edit_questionnaire_path(questionnaire_id.to_sym)}
+      format.js {render :action => 'add_new_questions'} #Added a handler for a JS request from a browser
     end
   end
 
@@ -241,6 +236,7 @@ class QuestionnairesController < ApplicationController
         end
         begin
           @question.save
+          #removed message here as JS now takes care of it
           #flash[:success] = 'All questions has been successfully saved!'
         rescue
           flash[:error] = $ERROR_INFO
@@ -255,8 +251,8 @@ class QuestionnairesController < ApplicationController
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     else
       respond_to do |format|
-        #format.html {redirect_to edit_questionnaire_path(questionnaire_id.to_sym)}
-        format.js {render :action => "edit"}
+        format.html {redirect_to edit_questionnaire_path(questionnaire_id.to_sym)}
+        format.js {render :action => 'edit'} #Added a handler for a JS request from a browser
       end
     end
   end

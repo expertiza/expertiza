@@ -12,5 +12,16 @@ describe 'should not view inherit teams' do
     click_link 'Create Team'
     expect(page).to have_content('Inherit Teams From Course')
   end
+  
+   it 'should not display inherit teams while creating a course team' do
+    create(:course)
+    create(:course_node)
+    create(:course_team)
+
+    login_as("instructor6")
+    visit '/teams/list?id=1&type=Course'
+    click_link 'Create Team'
+    expect(page).to have_no_content('Inherit Teams From Course')
+  end
 
 end

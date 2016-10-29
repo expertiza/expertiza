@@ -3,7 +3,7 @@ require 'rails_helper'
 describe 'ReviewResponseMap' do
 
   before(:each) do
-    @participant=create(:participant)
+    create(:participant)
     @assignment_questionnaire= create(:assignment_questionnaire)
     @review_response=create(:review_response_map)
   end

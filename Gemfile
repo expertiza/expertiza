@@ -42,7 +42,7 @@ gem 'rb-readline'
 gem 'rest-client', '~> 1.8'
 gem 'RedCloth'
 gem 'rgl', require: 'rgl/adjacency'
-gem 'rjb'
+
 gem 'rubyzip'
 gem 'rwordnet', '0.1.3'
 gem 'scrypt'

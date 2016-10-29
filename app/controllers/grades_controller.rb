@@ -6,13 +6,13 @@ class GradesController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'view_my_scores'
+      when 'view_my_scores'
         ['Instructor',
          'Teaching Assistant',
          'Administrator',
          'Super-Administrator',
          'Student'].include? current_role_name and are_needed_authorizations_present?
-    when 'view_team'
+      when 'view_team'
         if ['Student'].include? current_role_name # students can only see the head map for their own team
           participant = AssignmentParticipant.find(params[:id])
           session[:user].id == participant.user_id
@@ -56,9 +56,9 @@ class GradesController < ApplicationController
     questionnaires.each do |questionnaire|
       round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first.used_in_round
       questionnaire_symbol = if (!round.nil?)
-        (questionnaire.symbol.to_s+round.to_s).to_sym
-      else
-        questionnaire.symbol
+                               (questionnaire.symbol.to_s+round.to_s).to_sym
+                             else
+                               questionnaire.symbol
                              end
       @questions[questionnaire_symbol] = questionnaire.questions
     end
@@ -103,9 +103,9 @@ class GradesController < ApplicationController
     # to render the html tables.
     questionnaires.each do |questionnaire|
       @round = if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
-        AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
-      else
-        nil
+                 AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
+               else
+                 nil
                end
 
       vm = VmQuestionResponse.new(questionnaire, @round, @assignment.rounds_of_reviews)
@@ -174,13 +174,13 @@ class GradesController < ApplicationController
     body_text["##[assignment_name]"] = assignment.name
 
     Mailer.sync_message(
-      recipients: email_form[:recipients],
-       subject: email_form[:subject],
-       from: email_form[:from],
-       body: {
-         body_text: body_text,
-           partial_name: "grading_conflict"
-       }
+        recipients: email_form[:recipients],
+        subject: email_form[:subject],
+        from: email_form[:from],
+        body: {
+            body_text: body_text,
+            partial_name: "grading_conflict"
+        }
     ).deliver
 
     flash[:notice] = "Your email to " + email_form[:recipients] + " has been sent. If you would like to send an email to another student please do so now, otherwise, click Back"
@@ -204,9 +204,9 @@ class GradesController < ApplicationController
     if sprintf("%.2f", total_score) != params[:participant][:grade]
       participant.update_attribute(:grade, params[:participant][:grade])
       message = if participant.grade.nil?
-        "The computed score will be used for "+participant.user.name+"."
-      else
-        "A score of "+params[:participant][:grade]+"% has been saved for "+participant.user.name+"."
+                  "The computed score will be used for "+participant.user.name+"."
+                else
+                  "A score of "+params[:participant][:grade]+"% has been saved for "+participant.user.name+"."
                 end
     end
     flash[:note] = message
@@ -265,28 +265,35 @@ class GradesController < ApplicationController
   def calculate_all_penalties(assignment_id)
     @all_penalties = {}
     @assignment = Assignment.find(assignment_id)
-    calculate_for_participants = true unless @assignment.is_penalty_calculated
+    calculate_for_participants = @assignment.is_penalty_calculated == false ? true : false
     Participant.where(parent_id: assignment_id).each do |participant|
-      penalties = calculate_penalty(participant.id)
+
       @total_penalty = 0
 
-      unless (penalties[:submission].zero? || penalties[:review].zero? || penalties[:meta_review].zero?)
+      penalties = calculate_penalty(participant.id)
+
+
+
+      unless (penalties[:submission].zero? && penalties[:review].zero? && penalties[:meta_review].zero?)
 
         @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
         l_policy = LatePolicy.find(@assignment.late_policy_id)
         if (@total_penalty > l_policy.max_penalty)
           @total_penalty = l_policy.max_penalty
         end
-        calculate_penatly_attributes(@participant) if calculate_for_participants
+
+        calculate_penatly_attributes(@participant, penalties) if calculate_for_participants
+
       end
       assign_all_penalties(participant, penalties)
     end
+
     unless @assignment.is_penalty_calculated
       @assignment.update_attribute(:is_penalty_calculated, true)
     end
   end
 
-  def calculate_penatly_attributes(_participant)
+  def calculate_penatly_attributes(_participant, penalties)
     penalty_attr1 = {deadline_type_id: 1, participant_id: @participant.id, penalty_points: penalties[:submission]}
     CalculatedPenalty.create(penalty_attr1)
 
@@ -298,11 +305,14 @@ class GradesController < ApplicationController
   end
 
   def assign_all_penalties(participant, penalties)
-    @all_penalties[participant.id] = {}
-    @all_penalties[participant.id][:submission] = penalties[:submission]
-    @all_penalties[participant.id][:review] = penalties[:review]
-    @all_penalties[participant.id][:meta_review] = penalties[:meta_review]
-    @all_penalties[participant.id][:total_penalty] = @total_penalty
+
+    @all_penalties[@participant.id] = {}
+
+    @all_penalties[@participant.id][:submission] = penalties[:submission]
+    @all_penalties[@participant.id][:review] = penalties[:review]
+    @all_penalties[@participant.id][:meta_review] = penalties[:meta_review]
+    @all_penalties[@participant.id][:total_penalty] = @total_penalty
+
   end
 
   def make_chart
@@ -316,8 +326,8 @@ class GradesController < ApplicationController
           scores -= [-1.0]
         end
         @grades_bar_charts[:review] = bar_chart(scores)
-      else
         scores = get_scores_for_chart @pscore[:review][:assessments], 'review'
+      else
         scores -= [-1.0]
         @grades_bar_charts[:review] = bar_chart(scores)
       end

@@ -27,7 +27,37 @@ describe TeamsController do
 
             # puts "assignment #{assignment.id}"
             post :inherit, id: assignment.id
-            expect(response).to have_http_status(200)
+            expect(response).to have_http_status(302)
+            # assignment_teams = AssignmentTeam.all
+            # puts assignment_teams.count
+        end
+
+        it "test for bequeath" do
+            assignment = build(Assignment)
+            course = Course.new
+            course.name = "newCourse"
+            course.save
+            assignment.course_id = course.id
+            assignment.save
+
+            assignment_team = AssignmentTeam.new
+            assignment_team.name = "assignment_team_1"
+            assignment_team.parent_id = assignment.id
+            assignment_team.save!
+
+            assignment_team = AssignmentTeam.new
+            assignment_team.name = "assignment_team_2"
+            assignment_team.parent_id = assignment.id
+            assignment_team.save!
+
+            assignment_team = AssignmentTeam.new
+            assignment_team.name = "assignment_team_3"
+            assignment_team.parent_id = assignment.id
+            assignment_team.save!
+
+            # puts "assignment #{assignment.id}"
+            post :bequeath, id: assignment.id
+            expect(response).to have_http_status(302)
             # assignment_teams = AssignmentTeam.all
             # puts assignment_teams.count
         end

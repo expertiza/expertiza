@@ -78,6 +78,7 @@ RSpec.describe ResponseController, type: :controller do
       end
     end
 
+
     describe "GET #redirection" do
       it "returns http success" do
         allow(Response).to receive(:find_by_map_id).and_return(review)

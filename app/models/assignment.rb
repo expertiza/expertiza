@@ -119,7 +119,7 @@ class Assignment < ActiveRecord::Base
     response_map_set.sort! {|a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count }
     min_metareviews = response_map_set.first.metareview_response_maps.count
     response_map_set.sort! {|a, b| a.metareview_response_maps.last.id <=> b.metareview_response_maps.last.id } if min_metareviews > 0
-    # The first review_map is the best candidate to metareview
+    # The first review_map is the best to metareview
     response_map_set.first
   end
 

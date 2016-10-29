@@ -468,6 +468,7 @@ Expertiza::Application.routes.draw do
       #post ':id', action: :create_teams
       post :create_teams
       post :inherit
+      get :inherit
     end
   end
 

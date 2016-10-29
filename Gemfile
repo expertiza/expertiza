@@ -8,6 +8,7 @@ gem 'activerecord-session_store'
 gem 'airbrake'
 gem 'awesome_nested_set'
 gem 'bind-it'
+gem 'bootstrap-sass', '~> 3.3', '>= 3.3.6'
 gem 'capistrano'
 gem "capistrano-db-tasks", require: false
 gem 'capistrano-rails'

@@ -466,6 +466,7 @@ DEPENDENCIES
   launchy
   lingua
   mysql2
+  net-ssh (~> 2.9.2)
   nokogiri (~> 1.6.8)
   omniauth-google-oauth2 (~> 0.2.6)
   open-uri-cached

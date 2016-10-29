@@ -122,7 +122,7 @@ class AssignmentTeam < Team
   # Import csv file to form teams directly
   def self.import(row, assignment_id, options)
     raise ImportError, "The assignment with the id \"" + id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?" if Assignment.find(assignment_id).nil?
-    @assignment_team = prototype
+    @assignment_team = "AssignmentTeam"
     Team.import(row, assignment_id, options, @assignment_team)
   end
 

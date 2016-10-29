@@ -5,7 +5,7 @@ require 'rails_helper'
 describe Participant do
 
   before(:each) do
-    @student = create(:student, name: "Student", fullname: "Student Test", email: "student1@gmail.com" )
+    @student = create(:student, name: "Student", fullname: "Student Test", email: "student1@gmail.com" , password: "123456", password_confirmation: "123456")
     @assignment = create(:assignment, name: "Assignment1", course: nil)
     @participant = create(:participant, parent_id: @assignment.id, user_id: @student.id)
     @assignment_questionnaire1 =create(:assignment_questionnaire, user_id: @student.id, assignment: @assignment)
@@ -29,14 +29,21 @@ describe Participant do
  it "is type of assignment participant" do
    expect(@participant.type).to eql "AssignmentParticipant"
  end
- it "has topic name" do
+  describe "#topicname" do
+ it "returns the topic name" do
    expect(@participant.topic_name).to eql "<center>&#8212;</center>"
  end
-  it "has a name" do
-    expect(@participant.name).to eql "Student"
+ end
+
+  describe "#name" do
+    it "returns the name of the user" do
+      expect(@participant.name).to eql "Student"
+    end
   end
-  it "has a full name" do
+  describe "#fullname" do
+  it "returns the full name of the user" do
     expect(@participant.fullname).to eql "Student Test"
+  end
   end
 
 end

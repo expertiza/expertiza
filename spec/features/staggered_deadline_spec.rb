@@ -1,5 +1,4 @@
 require 'rails_helper'
-#require 'selenium-webdriver'
 
 describe "Staggered deadline test" do
   before(:each) do
@@ -93,18 +92,15 @@ describe "Staggered deadline test" do
     click_on 'Upload link'
     expect(page).to have_content "https://ncsu.edu" 
   end
-  
-  it "test" do
-    submit_topic  
-  end
 
-=begin
   it "test1: in round 1, student2064 in review stage, student2065 in submission stage" do
      #impersonate each participant submit their topics
      submit_topic
      #change deadline
-     #
-     #
+     topic_due = TopicDueDate.where(parent_id: 1, deadline_type_id: 1, round: 1, type: "TopicDueDate").first
+     topic_due.due_at = DateTime.now - 10
+     topic_due.save
+
      #impersonate each participant and check their topic's current stage
      user = User.find_by_name('student2064')
      stub_current_user(user, user.role.name, user.role)
@@ -119,6 +115,7 @@ describe "Staggered deadline test" do
      choose "topic_id_2"
      click_button 'Request a new submission to review'
      expect(page).to have_content "Review 1."
+=begin
      click_link "Begin"
      expect(page).to have_content "You are reviewing topic2"
      
@@ -129,9 +126,10 @@ describe "Staggered deadline test" do
      check "responses_0_checkbox"
      click_button "Save Review"
      expect(page).to have_content "View"   #???need check
-     
+=end
   end
 
+=begin
   it "test2: in round 2, student2064 in review stage, student2065 in review stage" do
 
   end

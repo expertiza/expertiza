@@ -55,8 +55,9 @@ describe TeamsController do
             assignment_team.save!
 
             # puts "assignment #{assignment.id}"
-            post :bequeath, id: assignment.id
+            post :bequeath, id: assignment_team.id
             expect(response).to have_http_status(302)
+            expect(response).to redirect_to list_teams_url(id: assignment.id)
             # assignment_teams = AssignmentTeam.all
             # puts assignment_teams.count
         end

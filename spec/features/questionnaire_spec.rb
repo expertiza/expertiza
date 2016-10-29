@@ -400,10 +400,11 @@ describe "Questionnaire tests for instructor interface" do
 
     it 'should not be an empty file', js: true do
       login_as("instructor6")
-  #    sleep(1000)
       visit '/questionnaires/1/edit'
+      file_path=Rails.root+"spec/features/import_export_csv_oss/navjot.csv"
+      attach_file('csv',file_path)
       click_button "Import from CSV"
-      expect(page).to have_content('No such file')
+      expect(page).not_to have_content('No such file')
     end
 
 

@@ -10,8 +10,8 @@ describe "Staggered deadline test" do
     #rubric
     create(:questionnaire, name: "TestQuestionnaire1")
     create(:questionnaire, name: "TestQuestionnaire2")
-    create(:question, txt: "Question1", questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first, type: "Checkbox")
-    create(:question, txt: "Question2", questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first, type: "Checkbox")
+    create(:question, txt: "Question1", questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first, type: "Criterion")
+    create(:question, txt: "Question2", questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first, type: "Criterion")
     create(:assignment_questionnaire, questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first, used_in_round: 1)
     create(:assignment_questionnaire, questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first, used_in_round: 2)
     #deadline type
@@ -93,7 +93,7 @@ describe "Staggered deadline test" do
     expect(page).to have_content "https://ncsu.edu" 
   end
 
-  it "test1: in round 1, student2064 in review stage, student2065 in submission stage" do
+  it "test1: in round 1, student2064 should be in review stage, student2065 in submission stage" do
      #impersonate each participant submit their topics
      submit_topic
      #change deadline
@@ -115,22 +115,25 @@ describe "Staggered deadline test" do
      choose "topic_id_2"
      click_button 'Request a new submission to review'
      expect(page).to have_content "Review 1."
-=begin
      click_link "Begin"
-     expect(page).to have_content "You are reviewing topic2"
+     expect(page).to have_content "You are reviewing Topic_2"
      
      #check it is the right rubric for this round
      expect(page).to have_content "Question1"
 
      #Check fill in rubrics and save, submit the review
-     check "responses_0_checkbox"
+     select 5, from: "responses_0_score"
+     fill_in "responses_0_comments", with: "test fill"
      click_button "Save Review"
-     expect(page).to have_content "View"   #???need check
-=end
+     expect(page).to have_content "View"
+
+     #check the review is submitted successfully
+     #review = ScoreView.where(q1_id: 1).first
+     #expect(review.s_comments).to be == "test fill"
   end
 
 =begin
-  it "test2: in round 2, student2064 in review stage, student2065 in review stage" do
+  it "test2: in round 2, student2064 should be in review stage, student2065 in review stage" do
 
   end
 =end

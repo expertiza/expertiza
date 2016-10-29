@@ -44,6 +44,27 @@ def function_to_create_with_teams
   end
 end
 
+def function_to_create_with_quiz
+  it "is able to create with quiz" do
+      login_as("instructor6")
+      visit '/assignments/new?private=1'
+
+      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
+      select('Course 2', from: 'assignment_form_assignment_course_id')
+      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      check("assignment_form_assignment_require_quiz")
+      click_button 'Create'
+      fill_in 'assignment_form_assignment_num_quiz_questions', with: 3
+      click_button 'submit_btn'
+
+      assignment = Assignment.where(name: 'private assignment for test').first
+      expect(assignment).to have_attributes(
+        num_quiz_questions: 3,
+        require_quiz: true
+      )
+    end
+end
+
 def update_scored_question(tr_variable,select_variable)
   it "should update scored question dropdown" do
     find_link('Rubrics').click
@@ -139,26 +160,8 @@ describe "assignment function" do
     end
 
     function_to_create_with_teams
-
-    it "is able to create with quiz" do
-      login_as("instructor6")
-      visit '/assignments/new?private=1'
-
-      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
-      check("assignment_form_assignment_require_quiz")
-      click_button 'Create'
-      fill_in 'assignment_form_assignment_num_quiz_questions', with: 3
-      click_button 'submit_btn'
-
-      assignment = Assignment.where(name: 'private assignment for test').first
-      expect(assignment).to have_attributes(
-        num_quiz_questions: 3,
-        require_quiz: true
-      )
-    end
-
+    function_to_create_with_quiz
+   
     it "is able to create with staggered deadline" do
       skip('skip test on staggered deadline temporarily')
       login_as("instructor6")

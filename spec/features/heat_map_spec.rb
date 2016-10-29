@@ -30,12 +30,61 @@ describe "HeatMapTest", type: :feature do
     #create(:review_response_map, reviewer_id: User.where(role_id: 2).second.id, reviewee: AssignmentTeam.second)
     #create(:response, additional_comment:'Round 1 - Good job', round:1)
     #create(:response, additional_comment:'Round 2 - not so good job', round:2)
+    #sleep(100)
   end
 
 
   def createReviews
-    login_as('student2065')
+
+    user = User.find_by_name("student2066")
+    stub_current_user(user, user.role.name, user.role)
+
+    visit '/student_task/list'
+    expect(page).to have_content "User: student2066"
+    expect(page).to have_content "TestAssignment"
+    click_link "TestAssignment"
+    expect(page).to have_content "Submit or Review work for TestAssignment"
+
+    click_link('Your work')
+    expect(page).to have_content "Submit work"
+
+    fill_in "submission", with: "https://www.idonothing.com"
+    expect(page).to have_content "Submit work"
+    click_button('Upload link')
+
+
+
+    user = User.find_by_name("student2065")
+    stub_current_user(user, user.role.name, user.role)
+
+    visit '/student_task/list'
     expect(page).to have_content "User: student2065"
+    expect(page).to have_content "TestAssignment"
+
+    click_link "TestAssignment"
+    expect(page).to have_content "Submit or Review work for TestAssignment"
+    expect(page).to have_content "Others' work"
+
+    click_link "Others' work"
+    expect(page).to have_content 'Reviews for "TestAssignment"'
+
+    choose "topic_id"
+    click_button "Request a new submission to review"
+
+    click_link "Begin"
+
+    fill_in "responses[0][comment]", with: "HelloWorld"
+    select 5, from: "responses[0][score]"
+    fill_in "review[comments]", with: "Excellent work done!"
+    click_button "Submit Review"
+    expect(page).to have_content 'Your response was successfully saved.'
+
+
+    user = User.find_by_name("student2064")
+    stub_current_user(user, user.role.name, user.role)
+
+    visit '/student_task/list'
+    expect(page).to have_content "User: student2064"
     expect(page).to have_content "TestAssignment"
 
     click_link "TestAssignment"
@@ -61,8 +110,8 @@ describe "HeatMapTest", type: :feature do
 
   def load_questionnaire
 
-    login_as('student2064')
-    expect(page).to have_content "User: student2064"
+    login_as('student2066')
+    expect(page).to have_content "User: student2066"
     expect(page).to have_content "TestAssignment"
 
     click_link "TestAssignment"
@@ -73,13 +122,6 @@ describe "HeatMapTest", type: :feature do
 
   end
 
-
-  it "Create reviews" do
-    createReviews
-    #expect(page).to have_content "Review 1"
-    expect(page).to have_content "Your response was successfully saved."
-
-  end
 
   xit "Loads Heat Map page" do
     load_questionnaire
@@ -90,24 +132,7 @@ describe "HeatMapTest", type: :feature do
   it "See submitted review in the page" do
     createReviews
 
-
-    user = User.find_by_name("student2064")
-    stub_current_user(user, user.role.name, user.role)
-
-    #click_link "Logout"
-    #expect(page).to have_content 'Welcome'
-    #login_as('student2064')
-
-    visit '/student_task/list'
-    expect(page).to have_content "User: student2064"
-    expect(page).to have_content "TestAssignment"
-
-    click_link "TestAssignment"
-    expect(page).to have_content "Submit or Review work for TestAssignment"
-    expect(page).to have_content "Others' work"
-
-    click_link "Alternate View"
-
+    load_questionnaire
     expect(page).to have_content "Review 1"
 
   end

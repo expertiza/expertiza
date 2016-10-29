@@ -1,7 +1,8 @@
 source 'http://rubygems.org'
 
 gem 'rails', '~> 4.2.6'
-
+java_home = '/usr/lib/jvm/java-7-openjdk-amd64/jre/'
+ENV['JAVA_HOME'] = java_home if Dir.exist?(java_home)
 ## Gems in Alphabetical Order
 
 gem 'activerecord-session_store'

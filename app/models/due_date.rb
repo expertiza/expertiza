@@ -77,8 +77,18 @@ class DueDate < ActiveRecord::Base
         end
       end
     else
-      next_due_date = AssignmentDueDate.where(['parent_id = ? && due_at >= ?', assignment_id, Time.now]).first
+      next_due_date = AssignmentDueDate.where(['parent_id = ?', assignment_id]).first
+	if next_due_date.due_at < Time.now
+            next_due_date.deadline_type_id = 0 
+          end
     end
     next_due_date
+  end
+  def self.get_past_due_date(assignment_id, topic_id = nil)
+    past_due_date = AssignmentDueDate.where(['parent_id = ?', assignment_id]).first
+	if past_due_date.due_at < Time.now
+	    past_due_date.deadline_type_id = 0 
+	  end
+    return past_due_date
   end
 end

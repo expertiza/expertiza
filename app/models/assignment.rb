@@ -376,8 +376,7 @@ class Assignment < ActiveRecord::Base
 
   def find_current_stage(topic_id = nil)
     next_due_date = DueDate.get_next_due_date(self.id, topic_id)
-    return 'Finished' if next_due_date.nil?
-    next_due_date
+    next_due_date.nil? ? DueDate.get_past_due_date(self.id, topic_id) : next_due_date
   end
 
   def get_current_stage(topic_id=nil)

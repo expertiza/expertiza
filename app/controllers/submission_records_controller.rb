@@ -19,10 +19,6 @@ class SubmissionRecordsController < ApplicationController
 
   # GET /submission_records
   def index
-    #@submission_records = SubmissionRecord.all
-    #@submission_records = SubmissionRecord.where("team_id = ? AND (assignment_id = ?",params[:team_id],params[:assignment_id])
-
-
     @submission_records = SubmissionRecord.where(team_id: params[:team_id])
   end
 

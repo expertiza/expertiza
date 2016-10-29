@@ -17,14 +17,30 @@ feature 'Instructor edits advice' do
     create(:deadline_right, name: 'OK')
     create(:assignment_due_date)
     create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now + (100 * 24 * 60 * 60))
-
+    login_as("instructor6")
   end
 
   scenario 'clicks on edit advice' do
 
-    login_as("instructor6")
+    #login_as("instructor6")
     visit '/advice/edit_advice/1'
 
     expect(page).to have_content("Edit an existing questionnaire's advice")
   end
+
+  scenario 'saves the edited advice' do
+
+    #login_as("instructor6")
+    visit '/advice/edit_advice/1'
+    click_on 'Save and redisplay advice'
+    #expect(page).to have_content("The advice was successfully saved")
+    expect(page).to have_content("Edit an existing questionnaire's advice")
+
+    #expect(flash[:notice]).to be_present
+  end
+
+  scenario 'saves the changes' do
+
+  end
+
 end

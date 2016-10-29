@@ -9,30 +9,58 @@ describe 'ReviewResponseMap' do
   end
 
   describe "#validity" do
-    it "should have a valid reviewee_id" do
+    it "should have a reviewee_id, reviewed_object_id" do
       expect(@review_response.reviewee_id).to be_instance_of(Fixnum)
+      expect(@review_response.reviewed_object_id).to be_instance_of(Fixnum)
     end
-    it "should return review_map with questionnaire id" do
-      map=ReviewResponseMap.final_versions_from_reviewer(1)
-      expect(map).to be_truthy
-      expect(map[:review][:questionnaire_id]).to be(1)
-    end
-    it "should return the valid questionnaire" do
+
+    it "should return the questionnaire" do
       review_questionnaire=@review_response.questionnaire 1
       expect(review_questionnaire).to be_instance_of(ReviewQuestionnaire)
       expect(review_questionnaire.id).to be(1)
     end
+
     it "should return title" do
       expect(@review_response.get_title).to eql "Review"
     end
+
     it "should return export_fields" do
       export_fields=ReviewResponseMap.export_fields nil
       expect(export_fields.length).to be(2)
     end
   end
 
+  describe "#final_versions_from_reviewer method" do
 
-  describe "#Test for the get_responses_for_team_round method" do
+    #reviewer giver three reviews, result must have final review
+    it "should return final version of review  when assignment has non varying rubric" do
+      create(:response_1)
+      create(:response_1)
+      create(:response_1)
+      map=ReviewResponseMap.final_versions_from_reviewer(1)
+      expect(map).to be_truthy
+      expect(map[:review][:questionnaire_id]).to be(1)
+      expect(map[:review][:response_ids].length).to be(1)
+      expect(map[:review][:response_ids][0]).to be(3)
+    end
+    #reviewer giver two reviews, result must have final review
+    it "should return final version of review when assignment has varying rubric" do
+      @assignment_questionnaire2= create(:assignment_questionnaire)
+      @assignment_questionnaire.update(used_in_round:1)
+      @assignment_questionnaire2.update(used_in_round:2)
+      create(:response_1)
+      create(:response_1)
+      map=ReviewResponseMap.final_versions_from_reviewer(1)
+      expect(map).to be_truthy
+      expect(map["review round1".to_sym][:questionnaire_id]).to be(1)
+      expect(map["review round1".to_sym][:response_ids].length).to be(1)
+      expect(map["review round1".to_sym][:response_ids][0]).to be(2)
+    end
+
+  end
+
+
+  describe "#get_responses_for_team_round method" do
 
 #There are 2 reviewers for a team and both have given their reviews for round 1
     it "should return correct number of reponses per round for a team" do

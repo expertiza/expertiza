@@ -353,7 +353,7 @@ FactoryGirl.define do
     permission_granted nil
     penalty_accumulated 0
     grade nil
-    type "AssignmentParticipant"
+    type "CourseParticipant"
     handle "handle"
     time_stamp nil
     digital_signature nil
@@ -364,3 +364,4 @@ FactoryGirl.define do
 
 
 end
+

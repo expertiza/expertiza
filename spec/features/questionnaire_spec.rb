@@ -117,104 +117,41 @@ describe "Questionnaire tests for instructor interface" do
     type = 'Criterion'
     create_review_question(type_qn_condition, type) 
 
-    it "is able to create a Scale question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('Scale', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
+    type_qn_condition = "is able to create a Scale question"
+    type = 'Scale'
+    create_review_question(type_qn_condition, type) 
+    
+    type_qn_condition = "is able to create a Dropdown question"
+    type = 'Dropdown'
+    create_review_question(type_qn_condition, type)
+    
+    type_qn_condition = "is able to create a Checkbox question"
+    type = 'Checkbox'
+    create_review_question(type_qn_condition, type)
+    
+    type_qn_condition = "is able to create a TextArea question"
+    type = 'TextArea'
+    create_review_question(type_qn_condition, type)
 
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a Dropdown question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('Dropdown', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a Checkbox question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('Checkbox', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a TextArea question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('TextArea', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a TextField question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('TextField', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a UploadFile question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('UploadFile', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a SectionHeader question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('SectionHeader', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a TableHeader question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('TableHeader', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a ColumnHeader question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('ColumnHeader', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
+    type_qn_condition = "is able to create a TextField question"
+    type = 'TextField'
+    create_review_question(type_qn_condition, type)
+    
+    type_qn_condition = "is able to create a UploadFile question"
+    type = 'UploadFile'
+    create_review_question(type_qn_condition, type)
+    
+    type_qn_condition = "is able to create a SectionHeader question"
+    type = 'SectionHeader'
+    create_review_question(type_qn_condition, type)
+    
+    type_qn_condition = "is able to create a TableHeader question"
+    type = 'TableHeader'
+    create_review_question(type_qn_condition, type)
+    
+    type_qn_condition = "is able to create a ColumnHeader question"
+    type = 'ColumnHeader'
+    create_review_question(type_qn_condition, type)
   end
 
   def load_question question_type

@@ -482,7 +482,6 @@ DEPENDENCIES
   react-rails (~> 1.0)
   rest-client (~> 1.8)
   rgl
-  rjb
   rspec-rails
   rubocop
   rubyzip

@@ -31,8 +31,8 @@
    <% @user_id << participant.user_id %>
 <%= render :partial => '/shared_scripts/user_list',
            :locals => {:controller => 'participants', 
-                       :participant => participant
-                      } %>
+                       :participant => participant,
+                       :user => user} %>
 <% end -%>
 </table>
 <% end -%>

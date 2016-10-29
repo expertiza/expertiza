@@ -109,7 +109,10 @@ describe "HeatMapTest", type: :feature do
 
   def load_questionnaire
 
-    login_as('student2066')
+    user = User.find_by_name("student2066")
+    stub_current_user(user, user.role.name, user.role)
+
+    visit '/student_task/list'
     expect(page).to have_content "User: student2066"
     expect(page).to have_content "TestAssignment"
 
@@ -137,24 +140,6 @@ describe "HeatMapTest", type: :feature do
   end
 
 
-  xit "Sorts by Avg" do
-    load_questionnaire
-    # 1. click on the button on "Avg" colon title
-    # 2. load the value of Average in each row
-    # 3. check if the average score is sorted and toggled between low-to-high and high-to-low
-  end
 
-  xit "Sorts by Criterion" do
-    load_questionnaire
-    # 1. click on the button on "Criterion" colon title
-    # 2. check if the criterion is sorted and toggled between low-to-high and high-to-low
-  end
-
-  xit "Click on reviews" do
-    load_review
-    # 1. click each row of different criterion
-    # 2. expect to have different content based on the criterion
-    # 3. expect to have a specified table for each criterion with comments
-  end
 
 end

@@ -604,24 +604,19 @@ class QuestionnairesController < ApplicationController
     respond_to do |format|
       format.csv { send_data @questionnaire.to_csv(questions) }
     end
-    redirect_to Questionnaire and return if @questionnaire.nil?
+    redirect_to Questionnaire,notice: $ERROR_INFO and return if @questionnaire.nil?
   end
 
   def import
 
     questionnaire_id = (params[:id])
     begin
-      file_data = File.read(params[:csv])
-      QuestionnaireHelper.get_questions_from_csv(file_data,params[:id])
-      #Questionnaire.import(file_data)
-
-      redirect_to edit_questionnaire_path(questionnaire_id.to_sym), notice: "All questions have been successfully imported!"
-    rescue
+        file_data = File.read(params[:csv])
+        a = QuestionnaireHelper.get_questions_from_csv(file_data,params[:id])
+        redirect_to edit_questionnaire_path(questionnaire_id.to_sym), notice: "All questions have been successfully imported!"
+       rescue
       redirect_to edit_questionnaire_path(questionnaire_id.to_sym), notice: $ERROR_INFO
     end
-
-
-
   end
 
   # clones the contents of a questionnaire, including the questions and associated advice

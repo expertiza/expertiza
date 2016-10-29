@@ -13,11 +13,11 @@ module QuestionnaireHelper
 
   def self.get_questions_from_csv(file_data,id)
     CSV.parse(file_data, headers: true) do |row|
-      #  row.each do |cell|
       questions_hash = row.to_hash
       ques = Question.new(questions_hash)
       ques.questionnaire_id=id
       ques.save
+
     end # end CSV.parse
   end
 

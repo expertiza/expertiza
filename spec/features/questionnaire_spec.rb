@@ -1,9 +1,11 @@
 require 'rails_helper'
 
+
 describe "Questionnaire tests for instructor interface" do
   before(:each) do
     create(:assignment)
     create_list(:participant, 3)
+    create(:questionnaire)
     create(:assignment_node)
     create(:deadline_type, name: "submission")
     create(:deadline_type, name: "review")
@@ -393,4 +395,40 @@ describe "Questionnaire tests for instructor interface" do
       expect(page).to have_content('Advice edit')
     end
   end
+
+  describe 'Import questions from CSV' do
+
+    it 'should not be an empty file', js: true do
+      login_as("instructor6")
+  #    sleep(1000)
+      visit '/questionnaires/1/edit'
+      click_button "Import from CSV"
+      expect(page).to have_content('No such file')
+    end
+
+
+
+  it 'should be a valid CSV file', js: true do
+    login_as("instructor6")
+    visit '/questionnaires/1/edit'
+    file_path=Rails.root+"spec/features/import_export_csv_oss/navjot.csv"
+    attach_file('csv',file_path)
+    click_button "Import from CSV"
+    expect(page).to have_content('All questions have been successfully imported!')
+
+end
+
+
+    it 'should have valid column names', js: true do
+      login_as("instructor6")
+      visit '/questionnaires/1/edit'
+      file_path=Rails.root+"spec/features/import_export_csv_oss/navjot (propername).csv"
+      attach_file('csv',file_path)
+      click_button "Import from CSV"
+      expect(page).to have_content('unknown attribute')
+    end
+
+  end
+
+
 end

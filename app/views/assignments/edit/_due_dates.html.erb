@@ -411,6 +411,39 @@ function removeOrAddMetareview() {
     }
     <%@metareview_allowed_checkbox=true%>
 }
+//E1654. Improve date-picker and deadlines Code change starts
+//This is a generic funtion to add and substract days and months
+function addDaysOrMonth(mul, type) {
+    var days = parseInt($('#days').val(), 10); // days variable stores the number of days to change the deadline
+    var months = parseInt($('#months').val(), 10);  // days variable stores the number of days to change the deadline
+    for (var i = 1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').length / 2; i++) {
+        if ($('#use_updator_review_round_' + i).is(':checked')) {
+            var date = $('#datetimepicker_review_round_' + i).val().split("/");
+		// curDate reads the date currently in the field
+            var curDate = new Date(parseInt(date[0], 10), parseInt(date[1], 10) - 1, parseInt(date[2].split(" ")[0], 10));
+            if (type == "days") {//checks if type is date then sets dates
+                curDate.setDate(curDate.getDate() + (days * mul));//sets the date
+            } else {
+                curDate.setMonth(curDate.getMonth() + (months * mul));//sets the months
+            }
+            $("#datetimepicker_review_round_" + i).val(curDate.getFullYear() + "/" + (curDate.getMonth() + 1) + "/" + curDate.getDate() + " " + date[2].split(" ")[1]);
+        }
+        if ($('#use_updator_submission_round_' + i).is(':checked')) {
+            var date = $('#datetimepicker_submission_round_' + i).val().split("/");
+            var curDate = new Date(parseInt(date[0], 10), parseInt(date[1], 10) - 1, parseInt(date[2].split(" ")[0], 10));
+            if (type == "days") {
+                curDate.setDate(curDate.getDate() + (days * mul));
+            } else {
+                curDate.setMonth(curDate.getMonth() + (months * mul));
+            }
+            $("#datetimepicker_submission_round_" + i).val(curDate.getFullYear() + "/" + (curDate.getMonth() + 1) + "/" + curDate.getDate() + " " + date[2].split(" ")[1]);
+        }
+    }
+
+
+}
+//E1654. Improve date-picker and deadlines Code change ends
+
 </script>
 
 <div style='padding: 5px' id='review_round'>

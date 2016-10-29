@@ -1,3 +1,3 @@
 class AddFinishedDeadlineType < ActiveRecord::Migration
-  execute "INSERT INTO `deadline_types` VALUES (0,'Finished');"
+  execute "INSERT INTO `deadline_types` VALUES (12,'Finished');"
 end

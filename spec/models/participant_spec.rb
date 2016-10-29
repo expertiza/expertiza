@@ -12,11 +12,12 @@ describe Participant do
   it "is valid" do
     expect(@participant).to be_valid
   end
-  it "can submit" do
-    expect(@participant.can_submit).to be true
-  end
+
   it "can review" do
     expect(@participant.able_to_review).to be true
+  end
+  it "can submit" do
+    expect(@participant.can_submit).to be true
   end
   it "can take quiz" do
     expect(@participant.can_take_quiz).to be true

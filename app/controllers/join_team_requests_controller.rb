@@ -4,19 +4,15 @@ class JoinTeamRequestsController < ApplicationController
     current_role_name.eql?("Student")
   end
 
-<<<<<<< HEAD
 	def index
 		@join_team_requests = JoinTeamRequest.all
 		rendermethod
-=======
   def index
     @join_team_requests = JoinTeamRequest.all
     render
->>>>>>> parent of 41e6126... refactor more
 
   end
 
-<<<<<<< HEAD
 	def show
 		@join_team_request = JoinTeamRequest.find(params[:id])
 		rendermethod
@@ -26,7 +22,6 @@ class JoinTeamRequestsController < ApplicationController
 		@join_team_request = JoinTeamRequest.new
 		rendermethod
 	end
-=======
   def show
     @join_team_request = JoinTeamRequest.find(params[:id])
     render
@@ -36,13 +31,11 @@ class JoinTeamRequestsController < ApplicationController
     @join_team_request = JoinTeamRequest.new
     render
   end
->>>>>>> parent of 41e6126... refactor more
 
   def edit
     @join_team_request = JoinTeamRequest.find(params[:id])
   end
 
-<<<<<<< HEAD
 	# create a new join team request entry for join_team_request table and add it to the table
 	def create
 		# check if the advertisement is from a team member and if so disallow requesting invitations
@@ -96,7 +89,6 @@ class JoinTeamRequestsController < ApplicationController
 			end
 		end
 	end
-=======
   # create a new join team request entry for join_team_request table and add it to the table
   def create
     # check if the advertisement is from a team member and if so disallow requesting invitations
@@ -140,7 +132,6 @@ class JoinTeamRequestsController < ApplicationController
 		  end
 	  end
   end
->>>>>>> parent of 41e6126... refactor more
 
   def destroy
 	  @join_team_request = JoinTeamRequest.find(params[:id])
@@ -152,7 +143,6 @@ class JoinTeamRequestsController < ApplicationController
 	  end
   end
 
-<<<<<<< HEAD
 	# decline request to join the team...
 	def decline
 		@join_team_request = JoinTeamRequest.find(params[:id])
@@ -162,7 +152,6 @@ class JoinTeamRequestsController < ApplicationController
 	end
 	private
 	def rendermethod
-=======
   # decline request to join the team...
   def decline
 	  @join_team_request = JoinTeamRequest.find(params[:id])
@@ -172,7 +161,6 @@ class JoinTeamRequestsController < ApplicationController
   end
   private
   def render
->>>>>>> parent of 41e6126... refactor more
 
 	  respond_to do |format|
 		  format.html # index.html.erb

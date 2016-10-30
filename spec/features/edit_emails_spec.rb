@@ -101,30 +101,5 @@ describe 'should edit profile email options' do
       end
     end
 
-    context 'Send me copies of emails sent for assignments' do
-      it "should check 'Send me copies of emails sent for assignments' option" do
-        login_as("instructor6")
-        visit('/profile/edit')
-        expect(page).to have_current_path('/profile/edit')
-        expect(page).to have_content("E-mail address")
-        expect(page).to have_content("E-mail options")
-
-        find("#user_copy_of_emails").set(true)
-
-        review_box = find('#user_copy_of_emails')
-        expect(review_box).to be_checked
-      end
-
-      it "should uncheck 'Send me copies of emails sent for assignments' option" do
-        login_as "instructor6"
-        visit '/profile/edit'
-        expect(page).to have_current_path('/profile/edit')
-
-        find(:css, "#user_copy_of_emails").set(true)
-
-        review_box = find(:css, "#user_copy_of_emails")
-        expect(review_box).not_to be_checked
-      end
-    end
   end
 end

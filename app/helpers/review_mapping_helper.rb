@@ -4,9 +4,15 @@ module ReviewMappingHelper
                     <table width='100% cellspacing='0' cellpadding='2' border='0'>\
                     <tr bgcolor='#CCCCCC'>"
     headers.each do |header, percentage|
-      table_header += "<th width = #{percentage}>\
-                      #{header.humanize}\
-                      </th>"
+      if percentage
+        table_header += "<th width = #{percentage}>\
+                        #{header.humanize}\
+                        </th>"
+      else
+        table_header += "<th>\
+                        #{header.humanize}\
+                        </th>"
+      end
     end
     table_header += "</tr>"
     table_header.html_safe
@@ -99,6 +105,24 @@ module ReviewMappingHelper
         html += display_review_files_directory_tree(participant, files) 
       end 
     end 
+    html.html_safe
+  end
+
+  # Zhewei - 2016-10-20
+  # This is for Dr.Kidd's assignment (806)
+  # She wanted to quickly see if students pasted in a link (in the text field at the end of the rubric) without opening each review
+  # Since we do not have hyperlink question type, we hacked this requirement
+  # Maybe later we can create a hyperlink question type to deal with this situation.
+  def list_hyperlink_submission(participant_id, response_map_id, question_id)
+    assignment = Assignment.find(@id)
+    curr_round = assignment.try(:num_review_rounds)
+    curr_response = Response.where(map_id: response_map_id, round: curr_round).first
+    answer_with_link = Answer.where(response_id: curr_response.id, question_id: question_id).first if curr_response
+    comments = answer_with_link.try(:comments)
+    html = ''
+    if comments and !comments.empty? and comments.start_with?('http')
+      html += display_hyperlink_in_peer_review_question(comments) 
+    end
     html.html_safe
   end
   #

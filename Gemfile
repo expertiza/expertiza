@@ -92,4 +92,4 @@ group :development, :test do
   gem 'capybara'
   gem 'simplecov', require: false
 end
-ruby "2.3.1"
+#ruby "2.3.1"

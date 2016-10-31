@@ -59,6 +59,7 @@ gem 'react-rails', '~> 1.0'
 gem 'jquery-tablesorter'
 gem 'bootstrap-sass', '~> 3.3.6'
 gem 'net-ssh', '~>2.9.2'
+gem 'autoprefixer-rails', '~>6.5.0.2'
 group :development do
   gem 'daemons'
   gem 'pry'

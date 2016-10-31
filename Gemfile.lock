@@ -61,7 +61,7 @@ GEM
       sshkit (>= 1.6.1, != 1.7.0)
     arel (6.0.3)
     ast (2.3.0)
-    autoprefixer-rails (6.5.1.1)
+    autoprefixer-rails (6.5.0.2)
       execjs
     awesome_nested_set (3.1.1)
       activerecord (>= 4.0.0, < 5.1)
@@ -443,6 +443,7 @@ DEPENDENCIES
   RedCloth
   activerecord-session_store
   airbrake
+  autoprefixer-rails (~> 6.5.0.2)
   awesome_nested_set
   bind-it
   bootstrap-sass (~> 3.3.6)

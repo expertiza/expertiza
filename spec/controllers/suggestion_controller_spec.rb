@@ -7,7 +7,7 @@ describe SuggestionController do
     post 'add_comment'
     @suggestioncomment = SuggestionComment.new
     #@suggestioncomment.parent_id = nil
-    (@suggestioncomment.save).expect == true
+    expect(@suggestioncomment.save).to be false
     #expect(response).to receive(:get_questions_from_csv
     #true.should == false
   end

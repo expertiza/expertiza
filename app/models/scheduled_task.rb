@@ -17,9 +17,9 @@ class ScheduledTask
     emails = []
     if !assignment.nil? && !assignment.id.nil?
 
-      DeadlineTypeClass = self.deadline_type.split("_").map { |n| n.capitalize}.join("")
-      deadlineObj = DeadlineTypeClass.new
-      emails = deadlineObj.email_list
+      DeadlineTypeClass = self.deadline_type.split("_").map { |n| n.capitalize}.join("").to_s
+      deadlineObj =  Object.const_get(DeadlineTypeClass).new
+      emails = deadlineObj.email_list(self.assignment_id)
 
       email_reminder(emails, self.deadline_type) if emails.size > 0
     end

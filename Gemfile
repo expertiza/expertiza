@@ -1,11 +1,9 @@
-
 source 'http://rubygems.org'
-java_home = '/usr/lib/jvm/java-7-openjdk'
-ENV['JAVA_HOME'] = java_home if Dir.exist?(java_home)
+#java_home = '/usr/lib/jvm/java-7-openjdk'
+#ENV['JAVA_HOME'] = java_home if Dir.exist?(java_home)
 gem 'rails', '~> 4.2.6'
 
 ## Gems in Alphabetical Order
-#gem 'rjb', '~> 1.4.9'
 gem 'activerecord-session_store'
 gem 'airbrake'
 gem 'awesome_nested_set'

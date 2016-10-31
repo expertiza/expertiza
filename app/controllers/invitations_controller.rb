@@ -15,35 +15,38 @@ class InvitationController < ApplicationController
     return unless current_user_id?(student.user_id)
 
     # check if the invited user is valid
-    if !user
-      flash[:note] = "The user \"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
-    else
-      participant = AssignmentParticipant.where('user_id =? and parent_id =?', user.id, student.parent_id).first
+    if user
       # check if the user is a participant of the assignment
-      if !participant
-        flash[:note] = "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment."
-      elsif team.full?
-        flash[:error] = "Your team already has the maximum number members."
-      else
+      participant = AssignmentParticipant.where('user_id =? and parent_id =?', user.id, student.parent_id).first
+      if participant && !team.full
         team_member = TeamsUser.where(['team_id =? and user_id =?', team.id, user.id])
         # check if invited user is already in the team
-        if !team_member.empty?
-          flash[:note] = "The user \"#{user.name}\" is already a member of the team."
+        if team_member.empty? && Invitation.is_invited?(student.user_id, user.id, student.parent_id)
           # check if the invited user is already invited (i.e. awaiting reply)
-	  # reply_status is the current replying status , W means there's a invitation reply waiting to be sent
-	  # 						  A means the invitation is accepted
-	  # 						  D means the invitaion is declined
-        elsif Invitation.is_invited?(student.user_id, user.id, student.parent_id)
-            @invitation = Invitation.new
-            @invitation.to_id = user.id
-            @invitation.from_id = student.user_id
-            @invitation.assignment_id = student.parent_id
-            @invitation.reply_status = 'W'
-            @invitation.save
-        else
-            flash[:note] = "You have already sent an invitation to \"#{user.name}\"."
+          # reply_status is the current replying status
+          # W means there's a invitation reply waiting to be sent
+          # A means the invitation is accepted
+          # D means the invitaion is declined
+          @invitation = Invitation.new
+          @invitation.to_id = user.id
+          @invitation.from_id = student.user_id
+          @invitation.assignment_id = student.parent_id
+          @invitation.reply_status = 'W'
+          @invitation.save
         end
       end
+    end
+    if !user
+      flash[:note] = "The user \"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
+    elsif !participant
+      flash[:note] = "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment."
+    elsif team.full?
+      flash[:error] = "Your team already has the maximum number members."
+    elsif !team_member.empty?
+      flash[:note] = "The user \"#{user.name}\" is already a member of the team."
+    elsif Invitation.is_invited?(student.user_id, user.id, student.parent_id)
+    else
+      flash[:note] = "You have already sent an invitation to \"#{user.name}\"."
     end
 
     update_join_team_request user, student

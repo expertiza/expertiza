@@ -3,7 +3,6 @@ source 'http://rubygems.org'
 gem 'rails', '~> 4.2.6'
 
 ## Gems in Alphabetical Order
-require 'byebug'
 gem 'activerecord-session_store'
 gem 'airbrake'
 gem 'awesome_nested_set'
@@ -58,7 +57,7 @@ gem 'will_paginate'
 gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
 gem 'jquery-tablesorter'
-
+gem 'bootstrap-sass', '~> 3.3.6'
 group :development do
   gem 'daemons'
   gem 'pry'

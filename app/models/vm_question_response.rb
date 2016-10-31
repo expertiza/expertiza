@@ -158,6 +158,7 @@ class VmQuestionResponse
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
         @list_of_rows.each do |row|
+        binding.pry if answer.comments.nil?
           if row.question_id == answer.question_id && answer.comments.split.size > 10
             row.countofcomments = row.countofcomments + 1
           end

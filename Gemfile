@@ -3,7 +3,6 @@ source 'http://rubygems.org'
 gem 'rails', '~> 4.2.6'
 
 ## Gems in Alphabetical Order
-require 'byebug'
 gem 'activerecord-session_store'
 gem 'airbrake'
 gem 'awesome_nested_set'

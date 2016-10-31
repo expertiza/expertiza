@@ -103,10 +103,10 @@ class SignUpSheetController < ApplicationController
       undo_link("The topic: \"#{@topic.topic_name}\" has been successfully updated. ")
     else
       flash[:error] = "The topic could not be updated."
-      end
+    end
     # changing the redirection url to topics tab in edit assignment view.
     redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
-    end
+  end
 
   # This displays a page that lists all the available topics for an assignment.
   # Contains links that let an admin or Instructor edit, delete, view enrolled/waitlisted members for each topic
@@ -230,12 +230,12 @@ class SignUpSheetController < ApplicationController
     end
     redirect_to action: 'list', assignment_id: params[:assignment_id]
   end
-
+  
   def delete_signup_for_topic(assignment_id, topic_id)
     @user_id = session[:user].id
     SignUpTopic.reassign_topic(@user_id, assignment_id, topic_id)
   end
-
+  
   def sign_up
     # find the assignment to which user is signing up
     @assignment = Assignment.find(params[:assignment_id])
@@ -248,8 +248,8 @@ class SignUpSheetController < ApplicationController
     end
     redirect_to action: 'list', assignment_id: params[:assignment_id]
   end
-
-def set_priority
+  
+  def set_priority
     @user_id = session[:user].id
     unless params[:topic].nil?
       team_ids = AssignmentTeam.where(parent_id: params[:assignment_id]).map(&:id)
@@ -263,14 +263,13 @@ def set_priority
       user_ids.each do |user_id|
         @bids = Bid.where("user_id = ?", user_id )
         signed_up_topics = @bids.map {|bid| bid.topic_id}
-
+        
         #Remove topics from bids table if the student moves data from Selection HTML table to Topics HTML table
         #This step is necessary to avoid duplicate priorities in Bids table
         signed_up_topics = signed_up_topics - params[:topic].map {|topic_id| topic_id.to_i}
         signed_up_topics.each do |topic|
           Bid.where(topic_id: topic, user_id: user_id).destroy_all
         end
-
         params[:topic].each_with_index do |topic_id,index|
           check = @bids.where(topic_id: topic_id)
           if check.empty?
@@ -284,7 +283,7 @@ def set_priority
       #All topics are deselected by user
       Bid.where(user_id: @user_id).destroy_all
     end
-
+    
     redirect_to action: 'list', assignment_id: params[:assignment_id]
   end
 

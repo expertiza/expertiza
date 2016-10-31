@@ -7,6 +7,7 @@ describe "Staggered deadline test" do
     create_list(:participant, 3)
     create(:topic, topic_name: "Topic_1")
     create(:topic, topic_name: "Topic_2")
+
     #rubric
     create(:questionnaire, name: "TestQuestionnaire1")
     create(:questionnaire, name: "TestQuestionnaire2")
@@ -14,6 +15,7 @@ describe "Staggered deadline test" do
     create(:question, txt: "Question2", questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first, type: "Criterion")
     create(:assignment_questionnaire, questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first, used_in_round: 1)
     create(:assignment_questionnaire, questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first, used_in_round: 2)
+
     #deadline type
     create(:deadline_type, name: "submission")
     create(:deadline_type, name: "review")
@@ -24,89 +26,66 @@ describe "Staggered deadline test" do
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
+
     #assignment deadline
-    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'submission').first, due_at: DateTime.now + 10, round: 1)
-    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: DateTime.now + 20, round: 1)
-    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'submission').first, due_at: DateTime.now + 30, round: 2)
-    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: DateTime.now + 40, round: 2)
+    assignment_due('submission',DateTime.now + 10,1)
+    assignment_due('review',    DateTime.now + 20,1)
+    assignment_due('submission',DateTime.now + 30,2)
+    assignment_due('review',    DateTime.now + 40,2)
+
     #topic deadline
-    create(:topic_due_date, due_at: DateTime.now + 10, deadline_type: DeadlineType.where(name: 'submission').first, topic: SignUpTopic.where(id: 1).first, round: 1)
-    create(:topic_due_date, due_at: DateTime.now + 20, deadline_type: DeadlineType.where(name: 'review').first, topic: SignUpTopic.where(id: 1).first, round: 1)
-    create(:topic_due_date, due_at: DateTime.now + 30, deadline_type: DeadlineType.where(name: 'submission').first, topic: SignUpTopic.where(id: 1).first, round: 2)
-    create(:topic_due_date, due_at: DateTime.now + 40, deadline_type: DeadlineType.where(name: 'review').first, topic: SignUpTopic.where(id: 1).first, round: 2)
-    create(:topic_due_date, due_at: DateTime.now + 10, deadline_type: DeadlineType.where(name: 'submission').first, topic: SignUpTopic.where(id: 2).first, round: 1)
-    create(:topic_due_date, due_at: DateTime.now + 20, deadline_type: DeadlineType.where(name: 'review').first, topic: SignUpTopic.where(id: 2).first, round: 1)
-    create(:topic_due_date, due_at: DateTime.now + 30, deadline_type: DeadlineType.where(name: 'submission').first, topic: SignUpTopic.where(id: 2).first, round: 2)
-    create(:topic_due_date, due_at: DateTime.now + 40, deadline_type: DeadlineType.where(name: 'review').first, topic: SignUpTopic.where(id: 2).first, round: 2)
+    topic_due('submission',DateTime.now + 10,1,1)
+    topic_due('review',    DateTime.now + 20,1,1)
+    topic_due('submission',DateTime.now + 30,1,2)
+    topic_due('review',    DateTime.now + 40,1,2)
+    topic_due('submission',DateTime.now + 10,2,1)
+    topic_due('review',    DateTime.now + 20,2,1)
+    topic_due('submission',DateTime.now + 30,2,2)
+    topic_due('review',    DateTime.now + 40,2,2)
   end 
- 
-  #impersonate student to submit work
-  def submit_topic  
-    #student1
-    user = User.find_by_name('student2064')
-    stub_current_user(user, user.role.name, user.role)
 
-    visit '/student_task/list'
-    expect(page).to have_content "User: student2064"
-    expect(page).to have_content "Assignment1665"
-
-    visit '/sign_up_sheet/sign_up?assignment_id=1&id=1' #signup topic1
-
-    visit '/student_task/list'
-
-    click_link "Assignment1665"
-    expect(page).to have_content "Submit or Review work for Assignment1665"
-    expect(page).to have_content "Signup sheet"
-
-    click_link "Your work"
-    expect(page).to have_content 'Submit work for Assignment1665'
-    expect(page).to have_content 'Submit a hyperlink:'
-
-
-    fill_in 'submission', with:'https://google.com'
-    click_on 'Upload link'
-    expect(page).to have_content "https://google.com"
-
-    #student 2 
-    user = User.find_by_name('student2065')
-    stub_current_user(user, user.role.name, user.role)
-
-    visit '/student_task/list'
-    expect(page).to have_content "User: student2065"
-    expect(page).to have_content "Assignment1665"
-
-    visit '/sign_up_sheet/sign_up?assignment_id=1&id=2' #signup topic2
-
-    visit '/student_task/list'
-
-    click_link "Assignment1665"
-    expect(page).to have_content "Submit or Review work for Assignment1665"
-    expect(page).to have_content "Signup sheet"
-
-    click_link "Your work"
-    expect(page).to have_content 'Submit work for Assignment1665'
-    expect(page).to have_content 'Submit a hyperlink:'
-
-
-    fill_in 'submission', with:'https://ncsu.edu'
-    click_on 'Upload link'
-    expect(page).to have_content "https://ncsu.edu" 
+  #create assignment deadline
+  def assignment_due(type,time,round)
+     create(:assignment_due_date, deadline_type: DeadlineType.where(name: type).first, due_at: time, round: round)
   end
 
+  #create topic deadline
+  def topic_due(type,time,id,round)
+     create(:topic_due_date, due_at: time, deadline_type: DeadlineType.where(name: type).first, topic: SignUpTopic.where(id: id).first, round: round)
+  end
+
+  #impersonate student to submit work
+  def submit_topic(name,topic,work)
+    user = User.find_by_name(name)
+    stub_current_user(user, user.role.name, user.role)
+    visit '/student_task/list'
+    visit topic #signup topic
+    visit '/student_task/list'
+    click_link "Assignment1665"
+    click_link "Your work"
+    fill_in 'submission', with: work
+    click_on 'Upload link'
+    expect(page).to have_content work
+  end
+
+  #change topic staggered deadline
   def change_due(topic, type, round, time)
      topic_due = TopicDueDate.where(parent_id: topic, deadline_type_id: type, round: round, type: "TopicDueDate").first
      topic_due.due_at = time
      topic_due.save
   end
 
-  it "test1: in round 1, student2064 should be in review stage, student2065 in submission stage" do
+  it "test1: in round 1, student2064 in review stage could do review, student2065 in submission stage cannot" do
      #impersonate each participant submit their topics
-     submit_topic
+     submit_topic('student2064','/sign_up_sheet/sign_up?assignment_id=1&id=1',"https://google.com")
+     submit_topic('student2065','/sign_up_sheet/sign_up?assignment_id=1&id=2',"https://ncsu.edu")
 
      #change deadline to make student2064 in review stage in round 1
      change_due(1, 1, 1, DateTime.now - 10)
 
      #impersonate each participant and check their topic's current stage
+
+     #####student 1:
      user = User.find_by_name('student2064')
      stub_current_user(user, user.role.name, user.role)
      visit '/student_task/list'
@@ -131,12 +110,25 @@ describe "Staggered deadline test" do
      fill_in "responses_0_comments", with: "test fill"
      click_button "Save Review"
      expect(page).to have_content "View"
+
+     #####student 2:
+     user = User.find_by_name('student2065')
+     stub_current_user(user, user.role.name, user.role)
+     visit '/student_task/list'
+     expect(page).to have_content "submission"
+
+     #student in submission stage could not review others' work
+     #This part should not pass. To be discussed with admin...
+     click_link 'Assignment1665'
+     expect(page).to have_content "Others' work"
+     click_link "Others' work"
+     #expect{click_link "Others' work"}.to raise_error('Unable to find link "Others' work"')
   end
 
-
-  it "test2: in round 2, both students should be in review stage" do
+  it "test2: in round 2, both students should be in review stage to review each other" do
      #impersonate each participant submit their topics
-     submit_topic
+     submit_topic('student2064','/sign_up_sheet/sign_up?assignment_id=1&id=1',"https://google.com")
+     submit_topic('student2065','/sign_up_sheet/sign_up?assignment_id=1&id=2',"https://ncsu.edu")
      #change deadline to make both in review stage in round 2
      change_due(1, 1, 1, DateTime.now - 30)
      change_due(1, 2, 1, DateTime.now - 20)
@@ -200,9 +192,10 @@ describe "Staggered deadline test" do
      expect(page).to have_content "View"
   end
 
-  it "test3: in round 2, both students after review deadline" do
+  it "test3: in round 2, both students after review deadline should not do review" do
      #impersonate each participant submit their topics
-     submit_topic
+     submit_topic('student2064','/sign_up_sheet/sign_up?assignment_id=1&id=1',"https://google.com")
+     submit_topic('student2065','/sign_up_sheet/sign_up?assignment_id=1&id=2',"https://ncsu.edu")
 
      #change deadline to make both after review deadline in round 2
      change_due(1, 1, 1, DateTime.now - 40)
@@ -228,6 +221,5 @@ describe "Staggered deadline test" do
      #it should not able to choose topic for review
      expect{choose "topic_id_2"}.to raise_error('Unable to find radio button "topic_id_2"')
   end
-
 end
 

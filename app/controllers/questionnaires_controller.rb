@@ -611,7 +611,7 @@ class QuestionnairesController < ApplicationController
 
     questionnaire_id = (params[:id])
     begin
-        file_data = File.read(params[:csv])
+        file_data = File.read(Rails.root.join('spec/features/import_export_csv_oss/'+params[:csv]))
         a = QuestionnaireHelper.get_questions_from_csv(file_data,params[:id])
         redirect_to edit_questionnaire_path(questionnaire_id.to_sym), notice: "All questions have been successfully imported!"
        rescue

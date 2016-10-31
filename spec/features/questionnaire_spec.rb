@@ -399,24 +399,24 @@ describe "Questionnaire tests for instructor interface" do
 
   describe 'Import questions from CSV' do
 
-    it 'should not be an empty file'  do
+    it 'should not be an empty file', js: true  do
       login_as("instructor6")
       visit '/questionnaires/1/edit'
       file_path= Rails.root+"spec/features/import_export_csv_oss/test.csv"
       attach_file('csv',file_path)
       click_button "Import from CSV"
-    #  expect(page).not_to have_content('No such file')
+      expect(page).not_to have_content('No such file')
     end
 
 
 
-  it 'should be a valid CSV file' do
+  it 'should be a valid CSV file', js: true do
     login_as("instructor6")
     visit '/questionnaires/1/edit'
     file_path= Rails.root+"spec/features/import_export_csv_oss/test.csv"
     attach_file('csv',file_path)
     click_button "Import from CSV"
-   # expect(page).to have_content('All questions have been successfully imported!')
+    expect(page).to have_content('All questions have been successfully imported!')
 
 end
 
@@ -427,7 +427,7 @@ end
       file_path=Rails.root+"spec/features/import_export_csv_oss/test (impropername).csv"
       attach_file('csv',file_path)
       click_button "Import from CSV"
-   #   expect(page).to have_content('unknown attribute')
+      expect(page).to have_content('unknown attribute')
     end
 
   end

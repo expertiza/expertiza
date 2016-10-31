@@ -9,7 +9,8 @@ describe "Questionnaire tests for instructor interface" do
     create(:assignment_node)
     create(:deadline_type, name: "submission")
     create(:deadline_type, name: "review")
-    create(:deadline_type, name: "metareview")
+    @create = create(:deadline_type, name: "metareview")
+    @create
     create(:deadline_type, name: "drop_topic")
     create(:deadline_type, name: "signup")
     create(:deadline_type, name: "team_formation")
@@ -100,7 +101,7 @@ describe "Questionnaire tests for instructor interface" do
       expect(page).to have_content('Remove')
 
       click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
+      expect(page).to have_content('All questions have been successfully saved!')
     end
 
     it "is able to create a Scale question" do
@@ -111,7 +112,7 @@ describe "Questionnaire tests for instructor interface" do
       expect(page).to have_content('Remove')
 
       click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
+      expect(page).to have_content('All questions have been successfully saved!')
     end
 
     it "is able to create a Dropdown question" do
@@ -122,7 +123,7 @@ describe "Questionnaire tests for instructor interface" do
       expect(page).to have_content('Remove')
 
       click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
+      expect(page).to have_content('All questions have been successfully saved!')
     end
 
     it "is able to create a Checkbox question" do
@@ -133,7 +134,7 @@ describe "Questionnaire tests for instructor interface" do
       expect(page).to have_content('Remove')
 
       click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
+      expect(page).to have_content('All questions have been successfully saved!')
     end
 
     it "is able to create a TextArea question" do
@@ -144,7 +145,7 @@ describe "Questionnaire tests for instructor interface" do
       expect(page).to have_content('Remove')
 
       click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
+      expect(page).to have_content('All questions have been successfully saved!')
     end
 
     it "is able to create a TextField question" do
@@ -155,7 +156,7 @@ describe "Questionnaire tests for instructor interface" do
       expect(page).to have_content('Remove')
 
       click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
+      expect(page).to have_content('All questions have been successfully saved!')
     end
 
     it "is able to create a UploadFile question" do
@@ -166,7 +167,7 @@ describe "Questionnaire tests for instructor interface" do
       expect(page).to have_content('Remove')
 
       click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
+      expect(page).to have_content('All questions have been successfully saved!')
     end
 
     it "is able to create a SectionHeader question" do
@@ -177,7 +178,7 @@ describe "Questionnaire tests for instructor interface" do
       expect(page).to have_content('Remove')
 
       click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
+      expect(page).to have_content('All questions have been successfully saved!')
     end
 
     it "is able to create a TableHeader question" do
@@ -188,7 +189,7 @@ describe "Questionnaire tests for instructor interface" do
       expect(page).to have_content('Remove')
 
       click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
+      expect(page).to have_content('All questions have been successfully saved!')
     end
 
     it "is able to create a ColumnHeader question" do
@@ -199,7 +200,7 @@ describe "Questionnaire tests for instructor interface" do
       expect(page).to have_content('Remove')
 
       click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
+      expect(page).to have_content('All questions have been successfully saved!')
     end
   end
 
@@ -216,7 +217,7 @@ describe "Questionnaire tests for instructor interface" do
       load_question 'Criterion'
       first("textarea[placeholder='Edit question content here']").set "Question edit"
       click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
+      expect(page).to have_content('All questions have been successfully saved!')
       expect(page).to have_content('Question edit')
     end
 
@@ -224,7 +225,7 @@ describe "Questionnaire tests for instructor interface" do
       load_question 'Scale'
       first("textarea[placeholder='Edit question content here']").set "Question edit"
       click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
+      expect(page).to have_content('All questions have been successfully saved!')
       expect(page).to have_content('Question edit')
     end
 
@@ -232,7 +233,7 @@ describe "Questionnaire tests for instructor interface" do
       load_question 'Dropdown'
       first("textarea[placeholder='Edit question content here']").set "Question edit"
       click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
+      expect(page).to have_content('All questions have been successfully saved!')
       expect(page).to have_content('Question edit')
     end
 
@@ -240,7 +241,7 @@ describe "Questionnaire tests for instructor interface" do
       load_question 'Checkbox'
       first("textarea[placeholder='Edit question content here']").set "Question edit"
       click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
+      expect(page).to have_content('All questions have been successfully saved!')
       expect(page).to have_content('Question edit')
     end
 
@@ -248,7 +249,7 @@ describe "Questionnaire tests for instructor interface" do
       load_question 'TextArea'
       first("textarea[placeholder='Edit question content here']").set "Question edit"
       click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
+      expect(page).to have_content('All questions have been successfully saved!')
       expect(page).to have_content('Question edit')
     end
 
@@ -256,7 +257,7 @@ describe "Questionnaire tests for instructor interface" do
       load_question 'TextField'
       first("textarea[placeholder='Edit question content here']").set "Question edit"
       click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
+      expect(page).to have_content('All questions have been successfully saved!')
       expect(page).to have_content('Question edit')
     end
 
@@ -264,7 +265,7 @@ describe "Questionnaire tests for instructor interface" do
       load_question 'UploadFile'
       first("textarea[placeholder='Edit question content here']").set "Question edit"
       click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
+      expect(page).to have_content('All questions have been successfully saved!')
       expect(page).to have_content('Question edit')
     end
 
@@ -272,7 +273,7 @@ describe "Questionnaire tests for instructor interface" do
       load_question 'SectionHeader'
       first("textarea[placeholder='Edit question content here']").set "Question edit"
       click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
+      expect(page).to have_content('All questions have been successfully saved!')
       expect(page).to have_content('Question edit')
     end
 
@@ -280,7 +281,7 @@ describe "Questionnaire tests for instructor interface" do
       load_question 'TableHeader'
       first("textarea[placeholder='Edit question content here']").set "Question edit"
       click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
+      expect(page).to have_content('All questions have been successfully saved!')
       expect(page).to have_content('Question edit')
     end
 
@@ -288,7 +289,7 @@ describe "Questionnaire tests for instructor interface" do
       load_question 'ColumnHeader'
       first("textarea[placeholder='Edit question content here']").set "Question edit"
       click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
+      expect(page).to have_content('All questions have been successfully saved!')
       expect(page).to have_content('Question edit')
     end
   end

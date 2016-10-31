@@ -1,4 +1,4 @@
-class signup  < DeadlineType
+class Signup  < DeadlineType
 
   def email_list(assignment_id)
     emails =[]

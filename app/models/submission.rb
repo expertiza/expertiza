@@ -1,4 +1,4 @@
-class submission < DeadlineType
+class Submission < DeadlineType
 def email_list(assignment_id)
   emails = []
   assignment = Assignment.find(self.assignment_id)

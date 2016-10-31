@@ -1,4 +1,4 @@
-class review < DeadlineType
+class Review < DeadlineType
   def email_list(assignment_id)
     emails = []
     reviewer_tuples = ResponseMap.where(['reviewed_object_id = ? AND type = "ReviewResponseMap"', assignment_id])

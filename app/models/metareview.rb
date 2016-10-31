@@ -1,4 +1,4 @@
-class metareview  < DeadlineType
+class Metareview  < DeadlineType
 
   def email_list(assignment_id)
     emails =[]

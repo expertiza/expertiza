@@ -1,4 +1,4 @@
-class team_formation < DeadlineType
+class TeamFormation < DeadlineType
   def email_list(assignment_id)
     assignment = Assignment.find(self.assignment_id)
     if (assignment.team_assignment?)

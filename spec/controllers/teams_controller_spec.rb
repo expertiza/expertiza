@@ -8,8 +8,7 @@ describe TeamsController do
         expect{create :assignment_team, assignment: @assignment}.to change(Team,:count).by(1)
       end
 
-      it "redirects to the list page" do
-      end
+      
     end
     
     context "with a course team" do

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe 'should not view inherit teams' do
+describe 'In team creation' do
 
   it 'should display inherit teams while creating an assignment team' do
     create(:assignment)

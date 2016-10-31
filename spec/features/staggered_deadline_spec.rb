@@ -93,13 +93,18 @@ describe "Staggered deadline test" do
     expect(page).to have_content "https://ncsu.edu" 
   end
 
+  def change_due(topic, type, round, time)
+     topic_due = TopicDueDate.where(parent_id: topic, deadline_type_id: type, round: round, type: "TopicDueDate").first
+     topic_due.due_at = time
+     topic_due.save
+  end
+
   it "test1: in round 1, student2064 should be in review stage, student2065 in submission stage" do
      #impersonate each participant submit their topics
      submit_topic
-     #change deadline
-     topic_due = TopicDueDate.where(parent_id: 1, deadline_type_id: 1, round: 1, type: "TopicDueDate").first
-     topic_due.due_at = DateTime.now - 10
-     topic_due.save
+
+     #change deadline to make student2064 in review stage in round 1
+     change_due(1, 1, 1, DateTime.now - 10)
 
      #impersonate each participant and check their topic's current stage
      user = User.find_by_name('student2064')
@@ -126,16 +131,74 @@ describe "Staggered deadline test" do
      fill_in "responses_0_comments", with: "test fill"
      click_button "Save Review"
      expect(page).to have_content "View"
-
-     #check the review is submitted successfully
-     #review = ScoreView.where(q1_id: 1).first
-     #expect(review.s_comments).to be == "test fill"
   end
 
-=begin
-  it "test2: in round 2, student2064 should be in review stage, student2065 in review stage" do
 
+  it "test2: in round 2, both students should be in review stage" do
+     #impersonate each participant submit their topics
+     submit_topic
+     #change deadline to make both in review stage in round 2
+     change_due(1, 1, 1, DateTime.now - 30)
+     change_due(1, 2, 1, DateTime.now - 20)
+     change_due(1, 1, 2, DateTime.now - 10)
+     change_due(2, 1, 1, DateTime.now - 30)
+     change_due(2, 2, 1, DateTime.now - 20)
+     change_due(2, 1, 2, DateTime.now - 10)
+
+     #impersonate each participant and check their topic's current stage
+
+     ###first student:
+     user = User.find_by_name('student2064')
+     stub_current_user(user, user.role.name, user.role)
+     visit '/student_task/list'
+     expect(page).to have_content "review"
+
+     #student in review stage could review others' work
+     click_link 'Assignment1665'
+     expect(page).to have_content "Others' work"
+     click_link "Others' work"
+     expect(page).to have_content 'Reviews for "Assignment1665"'
+     choose "topic_id_2"
+     click_button 'Request a new submission to review'
+     expect(page).to have_content "Review 1."
+     click_link "Begin"
+     expect(page).to have_content "You are reviewing Topic_2"
+     
+     #check it is the right rubric for this round
+     expect(page).to have_content "Question2"
+
+     #Check fill in rubrics and save, submit the review
+     select 5, from: "responses_0_score"
+     fill_in "responses_0_comments", with: "test fill"
+     click_button "Save Review"
+     expect(page).to have_content "View"
+
+     ###second student
+     user = User.find_by_name('student2065')
+     stub_current_user(user, user.role.name, user.role)
+     visit '/student_task/list'
+     expect(page).to have_content "review"
+
+     #student in review stage could review others' work
+     click_link 'Assignment1665'
+     expect(page).to have_content "Others' work"
+     click_link "Others' work"
+     expect(page).to have_content 'Reviews for "Assignment1665"'
+     choose "topic_id_1"
+     click_button 'Request a new submission to review'
+     expect(page).to have_content "Review 1."
+     click_link "Begin"
+     expect(page).to have_content "You are reviewing Topic_1"
+     
+     #check it is the right rubric for this round
+     expect(page).to have_content "Question2"
+
+     #Check fill in rubrics and save, submit the review
+     select 5, from: "responses_0_score"
+     fill_in "responses_0_comments", with: "test fill"
+     click_button "Save Review"
+     expect(page).to have_content "View"
   end
-=end
+
 end
 

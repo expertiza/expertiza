@@ -200,5 +200,34 @@ describe "Staggered deadline test" do
      expect(page).to have_content "View"
   end
 
+  it "test3: in round 2, both students after review deadline" do
+     #impersonate each participant submit their topics
+     submit_topic
+
+     #change deadline to make both after review deadline in round 2
+     change_due(1, 1, 1, DateTime.now - 40)
+     change_due(1, 2, 1, DateTime.now - 30)
+     change_due(1, 1, 2, DateTime.now - 20)
+     change_due(1, 2, 2, DateTime.now - 10)
+     change_due(2, 1, 1, DateTime.now - 40)
+     change_due(2, 2, 1, DateTime.now - 30)
+     change_due(2, 1, 2, DateTime.now - 20)
+     change_due(2, 2, 2, DateTime.now - 10)
+
+     #impersonate each participant and check their topic's current stage
+     user = User.find_by_name('student2064')
+     stub_current_user(user, user.role.name, user.role)
+     visit '/student_task/list'
+     expect(page).to have_content "Finished"
+
+     #student in finish stage can not review others' work
+     click_link 'Assignment1665'
+     expect(page).to have_content "Others' work"
+     click_link "Others' work"
+     expect(page).to have_content 'Reviews for "Assignment1665"'
+     #it should not able to choose topic for review
+     expect{choose "topic_id_2"}.to raise_error('Unable to find radio button "topic_id_2"')
+  end
+
 end
 

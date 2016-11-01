@@ -5,7 +5,6 @@ describe SelfReviewResponseMap do
       before(:each) do
         @selfreviewresponsemap = build(:selfreviewresponsemap)
       end
-   
       it "selfreviewresponsemap is valid" do
         expect(@selfreviewresponsemap).to be_valid
       end
@@ -19,6 +18,7 @@ describe SelfReviewResponseMap do
         expect(@selfreviewresponsemap.type).not_to eq('Feedback Review')
       end
   end
+
 
   describe "id" do
   #test all the id are stored correctly

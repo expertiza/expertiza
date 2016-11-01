@@ -29,7 +29,7 @@ describe ReviewResponseMap do
     end
     it "should be our exact reviewer's id" do
       reviewresponsemap = build(:review_response_map)
-      expect(reviewresponsemap.reviewer_id).to eq(2)
+      expect(reviewresponsemap.reviewer_id).to eq(22)
     end
     it "should not be any other reviewer's id" do
       reviewresponsemap = build(:review_response_map)
@@ -76,7 +76,7 @@ describe ReviewResponseMap do
     end
   end
   describe '#delete' do
-    let(:reviewresponsemap) {ReviewResponseMap.new(:id => 8, :reviewee_id => 1, :reviewer_id => 2, :reviewed_object_id => 8, :response => [Response.new(:id => 8)])}
+    let(:reviewresponsemap) {ReviewResponseMap.new(:id => 8, :reviewee_id => 1, :reviewer_id => 22, :reviewed_object_id => 8, :response => [Response.new(:id => 8)])}
     let(:response) {Response.new(:id => 1, :map_id => 1)}
     let(:feedbackresponsemap) {FeedbackResponseMap.new(:id => 2, :reviewed_object_id => 8)}
     let(:metareviewresponsemap) {MetaReviewResponseMap.new(:id => 8, :reviewed_object_id => 8)}
@@ -124,6 +124,6 @@ describe ReviewResponseMap do
       #expect {ReviewResponseMap.import(row,nil,2)}.to raise_error("The author \"reviewee_name\" was not found. <a href='/users/new'>Create</a> this user?")
     end
   end
-  
+
 
 end

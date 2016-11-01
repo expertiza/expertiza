@@ -34,9 +34,9 @@ class ReviewMappingController < ApplicationController
   end
 
   def select_reviewer
-      assignment = Assignment.find(params[:id])
-      @contributor = AssignmentTeam.find(params[:contributor_id])
-      session[:contributor] = @contributor
+    assignment = Assignment.find(params[:id])
+    @contributor = AssignmentTeam.find(params[:contributor_id])
+    session[:contributor] = @contributor
   end
 
   def select_metareviewer
@@ -44,12 +44,29 @@ class ReviewMappingController < ApplicationController
   end
 
   def add_reviewer
+    msg = ''
     case params[:object]
-    when "reviewer"
-      add_project_reviewer
-    when "metareviewer"
-      add_metareviewer
+    when 'reviewer'
+      topic_id = params[:topic_id]
+      user_id = User.where(name: params[:user][:name]).first.id
+      # If instructor want to assign one student to review his/her own artifact,
+      # it should be counted as “self-review” and we need to make /app/views/submitted_content/_selfreview.html.erb work.
+      if TeamsUser.exists?(team_id: params[:contributor_id], user_id: user_id)
+        flash[:error] = "You cannot assign this student to review his/her own artifact."
+      else
+        # Team lazy initialization
+        assignment = Assignment.find(params[:id])
+        assignment_id = assignment.id
+        SignUpSheet.signup_team(assignment.id, user_id, topic_id)
+
+        create_reviewer(assignment)
+      end
+    when 'metareviewer'
+      mapping = ResponseMap.find(params[:id])
+      assignment_id = mapping.assignment.id
+      create_reviewer(mapping)
     end
+    redirect_to action: 'list_mappings', id: assignment_id, msg: msg
   end
 
 
@@ -152,23 +169,59 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment.id
   end
 
+  def delete_all_metareviewers
+    mapping = ResponseMap.find(params[:id])
+    mmappings = MetareviewResponseMap.where(reviewed_object_id: mapping.map_id)
+
+    failedCount = ResponseMap.delete_mappings(mmappings, params[:force])
+    if failedCount > 0
+      url_yes = url_for action: 'delete_all_metareviewers', id: mapping.map_id, force: 1
+      url_no = url_for action: 'delete_all_metareviewers', id: mapping.map_id
+      flash[:error] = "A delete action failed:<br/>#{failedCount} metareviews exist for these mappings. Delete these mappings anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
+    else
+      flash[:note] = "All metareview mappings for contributor \"" + mapping.reviewee.name + "\" and reviewer \"" + mapping.reviewer.name + "\" have been deleted."
+    end
+    redirect_to action: 'list_mappings', id: mapping.assignment.id
+  end
+
   def delete_reviewer
     case params[:object]
-    when "reviewer"
-    review_response_map = ReviewResponseMap.find(params[:id])
-    assignment_id = review_response_map.assignment.id
-    if !Response.exists?(map_id: review_response_map.id)
-      review_response_map.destroy
-      flash[:success] = "The review mapping for \"" + review_response_map.reviewee.name + "\" and \"" + review_response_map.reviewer.name + "\" has been deleted."
-    else
-      flash[:error] = "This review has already been done. It cannot been deleted."
+    when 'reviewer'
+      response_map = ReviewResponseMap
+    when 'metareviewer'
+      response_map = MetareviewResponseMap
+    end
+    # duplicate code
+    mapping = response_map.find(params[:id])
+    assignment_id = mapping.assignment.id
+    case params[:object]
+    when 'reviewer'
+      if !Response.exists?(map_id: mapping.id)
+        mapping.destroy
+        flash[:success] = "The review mapping for \"" + mapping.reviewee.name + "\" and \"" + mapping.reviewer.name + "\" has been deleted."
+      else
+        flash[:error] = "This review has already been done. It cannot been deleted."
+      end
+    when 'metareviewer'
+      flash[:note] = "The metareview mapping for " + mapping.reviewee.name + " and " + mapping.reviewer.name + " has been deleted."
+      begin
+        mapping.delete
+      rescue
+        flash[:error] = "A delete action failed:<br/>"
+        + $ERROR_INFO + "<a href='/review_mapping/delete_metareview/"
+        + mapping.map_id.to_s + "'>Delete this mapping anyway>?"
+      end
     end
     redirect_to action: 'list_mappings', id: assignment_id
-    when "metareviewer"
-      delete_metareviewer
-    when "all_metareviewer"
-      delete_all_metareviewers
-    end
+  end
+
+  def delete_metareview
+    mapping = MetareviewResponseMap.find(params[:id])
+    assignment_id = mapping.assignment.id
+    # metareview = mapping.response
+    # metareview.delete
+    mapping.delete
+    redirect_to action: 'list_mappings', id: assignment_id
   end
 
   def list
@@ -518,89 +571,50 @@ private
   end
 end
 
-
-def add_project_reviewer
-  assignment = Assignment.find(params[:id])
-  topic_id = params[:topic_id]
-  user_id = User.where(name: params[:user][:name]).first.id
-  # If instructor want to assign one student to review his/her own artifact,
-  # it should be counted as “self-review” and we need to make /app/views/submitted_content/_selfreview.html.erb work.
-  if TeamsUser.exists?(team_id: params[:contributor_id], user_id: user_id)
-    flash[:error] = "You cannot assign this student to review his/her own artifact."
-  else
-    # Team lazy initialization
-    SignUpSheet.signup_team(assignment.id, user_id, topic_id)
-    msg = ''
-    begin
-      user = User.from_params(params)
-      # contributor_id is team_id
+def create_reviewer(object)
+  begin
+    user = User.from_params(params)
+    # contributor_id is team_id
+    case params[:object]
+    when 'reviewer'
+      assignment = object # assignment
+      reviewee_id = params[:contributor_id]
+      reviewed_object_id = assignment.id
+      response_map = ReviewResponseMap
+      id_symbol = :reviewee_id
+      id = reviewee_id
+      assignment = assignment
       regurl = url_for action: 'add_user_to_assignment',
                        id: assignment.id,
                        user_id: user.id,
                        contributor_id: params[:contributor_id]
-
-      # Get the assignment's participant corresponding to the user
-      reviewer = get_reviewer(user, assignment, regurl)
-      # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-      # to treat all assignments as team assignments
-      if  ReviewResponseMap.where(reviewee_id: params[:contributor_id],reviewer_id: reviewer.id).first.nil?
-        ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
-      else
+    when 'metareviewer'
+      mapping = object # mapping
+      reviewee_id = mapping.reviewer.id
+      reviewed_object_id = mapping.map_id
+      response_map = MetareviewResponseMap
+      id_symbol = :reviewed_object_id
+      id = reviewed_object_id
+      assignment = mapping.assignment
+      regurl = url_for action: 'add_user_to_assignment',
+                       id: mapping.map_id,
+                       user_id: user.id
+    end
+    # Get the assignment's participant corresponding to the user
+    reviewer = get_reviewer(user, assignment, regurl)
+    # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+    # to treat all assignments as team assignments
+    if  response_map.where(id_symbol => id,reviewer_id: reviewer.id).first.nil?
+      response_map.create(reviewee_id: reviewee_id, reviewer_id: reviewer.id, reviewed_object_id: reviewed_object_id)
+    else
+      case params[:object]
+      when 'reviewer'
         raise "The reviewer, \"" + reviewer.name + "\", is already assigned to this contributor."
+      when 'metareviewer'
+        raise "The metareviewer \"" + reviewer.user.name + "\" is already assigned to this reviewer."
       end
-    rescue
-      msg = $ERROR_INFO
     end
-  end
-  redirect_to action: 'list_mappings', id: assignment.id, msg: msg
-end
-
-
-def add_metareviewer
-  mapping = ResponseMap.find(params[:id])
-  msg = ''
-  begin
-    user = User.from_params(params)
-
-    regurl = url_for action: 'add_user_to_assignment', id: mapping.map_id, user_id: user.id
-    reviewer = get_reviewer(user, mapping.assignment, regurl)
-    if MetareviewResponseMap.where(reviewed_object_id:mapping.map_id,reviewer_id:reviewer.id).first != nil
-      raise "The metareviewer \"" + reviewer.user.name + "\" is already assigned to this reviewer."
-    end
-    MetareviewResponseMap.create(reviewed_object_id: mapping.map_id,
-                                 reviewer_id: reviewer.id,
-                                 reviewee_id: mapping.reviewer.id)
   rescue
     msg = $ERROR_INFO
   end
-  redirect_to action: 'list_mappings', id: mapping.assignment.id, msg: msg
-end
-
-def delete_metareviewer
-  mapping = MetareviewResponseMap.find(params[:id])
-  assignment_id = mapping.assignment.id
-  flash[:note] = "The metareview mapping for " + mapping.reviewee.name + " and " + mapping.reviewer.name + " has been deleted."
-
-  begin
-    mapping.delete
-  rescue
-    flash[:error] = "A delete action failed:<br/>" + $ERROR_INFO + "<a href='/review_mapping/delete_metareview/" + mapping.map_id.to_s + "'>Delete this mapping anyway>?"
-  end
-
-  redirect_to action: 'list_mappings', id: assignment_id
-end
-
-def delete_all_metareviewers
-  mapping = ResponseMap.find(params[:id])
-  mmappings = MetareviewResponseMap.where(reviewed_object_id: mapping.map_id)
-
-  failedCount = ResponseMap.delete_mappings(mmappings, params[:force])
-  if failedCount > 0
-    url_yes = url_for action: 'delete_all_metareviewers', id: mapping.map_id, force: 1
-    url_no = url_for action: 'delete_all_metareviewers', id: mapping.map_id
-    flash[:error] = "A delete action failed:<br/>#{failedCount} metareviews exist for these mappings. Delete these mappings anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
-  else
-    flash[:note] = "All metareview mappings for contributor \"" + mapping.reviewee.name + "\" and reviewer \"" + mapping.reviewer.name + "\" have been deleted."
-  end
-  redirect_to action: 'list_mappings', id: mapping.assignment.id
 end

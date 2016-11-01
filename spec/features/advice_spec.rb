@@ -28,7 +28,7 @@ feature 'Instructor edits advice' do
     expect(page).to have_content("Edit an existing questionnaire's advice")
   end
 
-  scenario 'saves the edited advice' do
+  scenario 'reloads page successfully' do
 
     #login_as("instructor6")
     visit '/advice/edit_advice/1'
@@ -36,11 +36,23 @@ feature 'Instructor edits advice' do
     #expect(page).to have_content("The advice was successfully saved")
     expect(page).to have_content("Edit an existing questionnaire's advice")
 
-    #expect(flash[:notice]).to be_present
+    #expect(flash[:notice]).to match "The advice was successfully saved"
   end
 
-  scenario 'saves the changes' do
-
+  scenario 'redirects from questionnaire to advice' do
+    visit '/questionnaires/1/edit'
+    click_on 'Edit/View advice'
+    expect(page).to have_content("Edit an existing questionnaire's advice")
+    #expect(AdviceController.save_advice).to be(true)
   end
+
+=begin
+  scenario 'saves content' do
+    visit '/advice/edit_advice/1'
+    fill_in "advice[1][advice]" , with: "Example"
+    click_on 'Save and redisplay advice'
+    expect(page).to have_content("Example")
+  end
+=end
 
 end

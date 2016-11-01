@@ -39,12 +39,3 @@ describe 'Aribrake-1805332790232222219' do
 		expect{rc.send(:set_dropdown_or_scale)}.not_to raise_error(NoMethodError)
 	end
 end
-
-describe 'Airbrake-1804043391875943089' do
-	let(params) {{id: 1}}
-	it 'will set the default team parent as Assignment' do
-		tc = TeamsController.new
-		assignment = create(:assignment)
-		expect(tc.new).to eq(assignment)
-	end
-end

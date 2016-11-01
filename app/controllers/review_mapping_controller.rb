@@ -169,14 +169,20 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment.id
   end
 
-  def delete_all_metareviewers
+  def delete_all_reviewers
     mapping = ResponseMap.find(params[:id])
-    mmappings = MetareviewResponseMap.where(reviewed_object_id: mapping.map_id)
+    case params[:object]
+    when 'all_metareviewers'
+      response_map = MetareviewResponseMap
+      id_symbol = :reviewed_object_id
+      id = mapping.map_id
+    end
+    mmappings = response_map.where(id_symbol => id)
 
     failedCount = ResponseMap.delete_mappings(mmappings, params[:force])
     if failedCount > 0
-      url_yes = url_for action: 'delete_all_metareviewers', id: mapping.map_id, force: 1
-      url_no = url_for action: 'delete_all_metareviewers', id: mapping.map_id
+      url_yes = url_for action: 'delete_all_reviewers', id: mapping.map_id, force: 1
+      url_no = url_for action: 'delete_all_reviewers', id: mapping.map_id
       flash[:error] = "A delete action failed:<br/>#{failedCount} metareviews exist for these mappings. Delete these mappings anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
     else
       flash[:note] = "All metareview mappings for contributor \"" + mapping.reviewee.name + "\" and reviewer \"" + mapping.reviewer.name + "\" have been deleted."
@@ -602,10 +608,13 @@ def create_reviewer(object)
     end
     # Get the assignment's participant corresponding to the user
     reviewer = get_reviewer(user, assignment, regurl)
-    # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+    # ACS Removed the if condition(and corressponding else) which differentiate
+    # assignments as team and individual assignments
     # to treat all assignments as team assignments
     if  response_map.where(id_symbol => id,reviewer_id: reviewer.id).first.nil?
-      response_map.create(reviewee_id: reviewee_id, reviewer_id: reviewer.id, reviewed_object_id: reviewed_object_id)
+      response_map.create(reviewee_id: reviewee_id,
+                          reviewer_id: reviewer.id,
+                          reviewed_object_id: reviewed_object_id)
     else
       case params[:object]
       when 'reviewer'

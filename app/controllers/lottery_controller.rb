@@ -26,7 +26,7 @@ class LotteryController < ApplicationController
           bids << bid_record.priority ||= 0
         end
       end
-      if bids.uniq != [0] and ![6864, 6865, 6866, 6855].include? user_id
+      if bids.uniq != [0]
         priority_info << {pid: user_id, ranks: bids}
       end
     end
@@ -40,6 +40,14 @@ class LotteryController < ApplicationController
     rescue => err
       flash[:error] = err.message
     end
+    teams =  [
+ [6817, 6812, 6830, 6876],
+ [6878, 6861, 6413, 6856],
+ [6871, 6818, 6899, 6912],
+ [6853, 6895, 6913, 6814],
+ [6845, 6900, 6909],
+ [6810, 6891, 6905],
+ [6815, 6825, 6916, 6923]]
     create_new_teams_for_bidding_response(teams, assignment)
     run_intelligent_bid
 

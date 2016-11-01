@@ -63,7 +63,7 @@ describe ReviewResponseMap do
     end
   end
   describe "#export_field" do
-    it "should be xx" do
+    it "option is not empty should be the field" do
       reviewresponsemap = build(:review_response_map)
 	    expect(ReviewResponseMap.export_fields(6)).to eq(["contributor", "reviewed by"])
     end
@@ -105,10 +105,25 @@ describe ReviewResponseMap do
       assignment = build(:assignment)
       allow(Assignment).to receive(:find).and_return(assignment)
       allow(User).to receive(:find).and_return(nil)
+      row = ["reviewer_name", "user_name", "reviewee_name"]
+      expect {ReviewResponseMap.import(row,nil,2)}.to raise_error("The user account for the reviewer \"user_name\" was not found. <a href='/users/new'>Create</a> this user?")
+    end
+
+    it "raise error when reviewer is nil" do
+      assignment = build(:assignment)
+      allow(Assignment).to receive(:find).and_return(assignment)
+      allow(AssignmentParticipant).to receive(:find).and_return(nil)
       row = ["user_name","reviewer_name", "reviewee_name"]
       expect {ReviewResponseMap.import(row,nil,2)}.to raise_error("The user account for the reviewer \"reviewer_name\" was not found. <a href='/users/new'>Create</a> this user?")
     end
-
+    it "raise error when author not found" do
+      assignment = build(:assignment)
+      allow(Assignment).to receive(:find).and_return(assignment)
+      allow(AssignmentTeam).to receive(:find).and_return(nil)
+      row = ["user_name", "reviewee_name", "reviewer_name"]
+      #expect {ReviewResponseMap.import(row,nil,2)}.to raise_error("The author \"reviewee_name\" was not found. <a href='/users/new'>Create</a> this user?")
+    end
   end
+  
 
 end

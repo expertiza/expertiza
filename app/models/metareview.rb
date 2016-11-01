@@ -1,10 +1,11 @@
 class Metareview  < DeadlineType
 
   def email_list(assignment_id)
-    emails =[]
-    mail_metareviewers
+    assignment = Assignment.find(assignment_id)
     if assignment.team_assignment?
-      emails = getTeamMembersMail
+      emails = getTeamMembersMail(assignment_id)
+    else
+       emails =mail_metareviewers(assignment_id)  
     end
     emails
   end

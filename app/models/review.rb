@@ -1,5 +1,11 @@
 class Review < DeadlineType
+
   def email_list(assignment_id)
+    emails = mail_reviewers(assignment_id)
+    emails
+  end
+
+  def mail_reviewers(assignment_id)
     emails = []
     reviewer_tuples = ResponseMap.where(['reviewed_object_id = ? AND type = "ReviewResponseMap"', assignment_id])
     for reviewer in reviewer_tuples
@@ -9,5 +15,6 @@ class Review < DeadlineType
       emails << user.email
     end
     emails
-  end
+   end
+  
 end

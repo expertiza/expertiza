@@ -1,7 +1,7 @@
 class DropTopic  < DeadlineType
 
    def email_list(assignment_id)
-         emails = mail_sign_up_topic_users
+         emails = mail_sign_up_topic_users(assignment_id)
          emails
    end
 

@@ -1,7 +1,6 @@
 class Signup  < DeadlineType
 
   def email_list(assignment_id)
-    emails =[]
     sign_up_topics = SignUpTopic.where(['assignment_id = ?', assignment_id])
     if (!sign_up_topics.nil? && sign_up_topics.count != 0)
       emails= mail_assignment_participants(assignment_id) # reminder to all participants

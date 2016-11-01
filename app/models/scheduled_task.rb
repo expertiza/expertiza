@@ -14,7 +14,7 @@ class ScheduledTask
 
   def perform
     assignment = Assignment.find(self.assignment_id)
-    emails = []
+    
     if !assignment.nil? && !assignment.id.nil?
 
       DeadlineTypeClass = self.deadline_type.split("_").map { |n| n.capitalize}.join("").to_s

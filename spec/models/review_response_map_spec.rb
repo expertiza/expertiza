@@ -1,6 +1,6 @@
 require 'rails_helper'
 describe ReviewResponseMap do
-  #let(:reviewresponsemap) {ReviewResponseMap.new id: 6, reviewee_id: 1, reviewer_id: 2, reviewed_object_id: 8}
+  #let(:reviewresponsemap) {ReviewResponseMap.new id: 66, reviewee_id: 1, reviewer_id: 22, reviewed_object_id: 8}
   let(:response) {Response.new id: 4, map_id: 4}
   let(:participant) {Participant.new id: 1}
 
@@ -21,7 +21,7 @@ describe ReviewResponseMap do
     #test all the id are stored correctly
     it "should be our exact reviewresponsemap's id" do
       reviewresponsemap = build(:review_response_map)
-      expect(reviewresponsemap.id).to eq(6)
+      expect(reviewresponsemap.id).to eq(66)
     end
     it "should not be any other reviewresponsemap's id" do
       reviewresponsemap = build(:review_response_map)

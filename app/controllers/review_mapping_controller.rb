@@ -134,7 +134,7 @@ class ReviewMappingController < ApplicationController
         @map.reviewee_id = Questionnaire.find(params[:questionnaire_id]).instructor_id
         @map.reviewer_id = params[:participant_id]
         @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
-        @map.savessignment
+        @map.save
       end
 
     rescue Exception => e

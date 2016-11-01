@@ -1,75 +1,109 @@
 require 'rails_helper'
 describe QuizResponseMap do
-  let(:quizresponsemap) {QuizResponseMap.new id: 5, reviewee_id: 1, reviewer_id: 2, reviewed_object_id: 3}
-  let(:response) {Response.new id: 4, map_id: 4}
-  let(:participant) {Participant.new id: 1}
+  #let(:quizresponsemap) {QuizResponseMap.new id: 5, reviewee_id: 1, reviewer_id: 2, reviewed_object_id: 3}
+  #let(:response) {Response.new id: 4, map_id: 4}
+  #let(:participant) {Participant.new id: 1}
 
-  describe "#new" do
-    it "Validate response instance creation with valid parameters" do
-      expect(quizresponsemap.class).to be(QuizResponseMap)
+  describe "validations" do
+      before(:each) do
+        @quizresponsemap = build(:quizresponsemap)
+      end
+   
+      it "quizresponsemap is valid" do
+        expect(@quizresponsemap).to be_valid
+      end
+  end
+
+  describe "#type" do
+      it "checks if type is quizresponsemap" do
+        @quizresponsemap = build(:quizresponsemap)
+        expect(@quizresponsemap.type).to eq("QuizResponseMap")
+        expect(@quizresponsemap.type).not_to eq('Review')
+        expect(@quizresponsemap.type).not_to eq('Feedback Review')
+      end
+      #it "checks if type is response" do
+      #  @response = build(:response)
+      #  expect(@response.type).to eq("Response")
+      #  expect(@response.type).not_to eq('Review')
+      #  expect(@response.type).not_to eq('Feedback Review')
+      #end
+      it "checks if type is quizresponsemap" do
+        @participant = build(:participant)
+        expect(@participant.type).to eq("AssignmentParticipant")
+        expect(@participant.type).not_to eq('Review')
+        expect(@participant.type).not_to eq('Participant')
+      end
+  end
+
+  describe "title" do
+    #test the title to be stored correctly
+    it "should be Bookmark Review" do
+      @quizresponsemap = build(:quizresponsemap)
+      expect(@quizresponsemap.get_title).to eq('Quiz')
     end
-    it "Validate response instance creation with valid parameters" do
-      expect(response.class).to be(Response)
+    it "should not be teamReview" do
+      @quizresponsemap = build(:quizresponsemap)
+      expect(@quizresponsemap.get_title).not_to eq('Team Review')
     end
-    it "Validate response instance creation with valid parameters" do
-      expect(participant.class).to be(Participant)
+    it "should be feedbackReview" do
+      @quizresponsemap = build(:quizresponsemap)
+      expect(@quizresponsemap.get_title).not_to eq('Feedback Review')
     end
   end
+  
 
   describe "id" do
   #test all the id are stored correctly
-    it "should be our exact quiz's id" do
-      expect(quizresponsemap.id).to eq(5)
+    it "should be our exact quizresponsemap's id" do
+      @quizresponsemap = build(:quizresponsemap)
+      expect(@quizresponsemap.id).to eq(6)
     end
-    it "should not be any other quiz's id" do
-      expect(quizresponsemap.id).not_to eq(7)
-    end
-    it "should be our exact reviewer's id" do
-      expect(quizresponsemap.reviewer_id).to eq(2)
-    end
-    it "should not be any other reviewer's id" do
-      expect(quizresponsemap.reviewer_id).not_to eq(3)
+    it "should not be any other quizresponsemap's id" do
+      @quizresponsemap = build(:quizresponsemap)
+      expect(@quizresponsemap.id).not_to eq(7)
     end
     it "should be our exact reviewee's id" do
-      expect(quizresponsemap.reviewee_id).to eq(1)
+      @quizresponsemap = build(:quizresponsemap)
+      expect(@quizresponsemap.reviewee_id).to eq(1)
     end
     it "should not be any other reviewee's id" do
-      expect(quizresponsemap.reviewee_id).not_to eq(2)
+      @quizresponsemap = build(:quizresponsemap)
+      expect(@quizresponsemap.reviewee_id).not_to eq(2)
     end
-    it "should be the response map_id" do
-      expect(response.map_id).to eq(4)
+    it "should be our exact reviewed_object_id" do
+      @quizresponsemap = build(:quizresponsemap)
+      expect(@quizresponsemap.reviewed_object_id).to eq(8)
+    end
+    it "should not be any other reviewed_object_id" do
+      @quizresponsemap = build(:quizresponsemap)
+      expect(@quizresponsemap.reviewed_object_id).not_to eq(2)
     end
   end
 
+
+
   describe '#delete' do
-	it "deletes the map" do
-	#	expect{QuizResponseMap.delete(quizresponsemap.id)}.to change{QuizResponseMap.count}.by(-1)
-	expect(QuizResponseMap.count).to eq(0)
-	end
+  	it "deletes the map" do
+      @quizresponsemap = build(:quizresponsemap)
+  		QuizResponseMap.delete(@quizresponsemap.id)
+  	  expect(QuizResponseMap.count).to eq(0)
+  	end
   end
 
   describe '#get_mappings_for_reviewer' do
-	it "gives out the relation of reviewer and participant" do
-		expect(QuizResponseMap.get_mappings_for_reviewer(participant.id).class).to eq(QuizResponseMap::ActiveRecord_Relation)
-	end
+	  it "gives out the relation of reviewer and participant" do
+      @quizresponsemap = build(:quizresponsemap)
+      @participant = build(:participant)
+	 	  expect(QuizResponseMap.get_mappings_for_reviewer(@participant.id).class).to eq(QuizResponseMap::ActiveRecord_Relation)
+	  end
   end
 
   describe '#quiz_score' do
-	it "gives out the relation of reviewer and participant" do
-		expect(quizresponsemap.quiz_score).to eq('N/A')		#because no quiz has been taken
-	end
+  	it "gives out the relation of reviewer and participant" do
+      @quizresponsemap = build(:quizresponsemap)
+  		expect(@quizresponsemap.quiz_score).to eq('N/A')		#because no quiz has been taken
+  	end
   end
 
-  describe "#get_title" do
-  #test the title to be stored correctly
-    it "should be Teammate Review" do
-      expect(quizresponsemap.get_title).to eq('Quiz')
-    end
-    it "should not be Review" do
-      expect(quizresponsemap.get_title).not_to eq('Review')
-    end
-    it "should not be Quiz Review" do
-      expect(quizresponsemap.get_title).not_to eq('Quiz Review')
-    end
-  end
+  
 end

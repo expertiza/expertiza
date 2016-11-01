@@ -366,4 +366,10 @@ FactoryGirl.define do
     reviewed_object_id 8
   end
 
+  factory :teammatereviewresponsemap, class: TeammateReviewResponseMap do
+    id 6
+    reviewee_id 1
+    reviewer_id 2
+    reviewed_object_id 8
+  end
 end

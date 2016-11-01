@@ -171,15 +171,6 @@ class ReviewMappingController < ApplicationController
     end
   end
 
-  def delete_metareview
-    mapping = MetareviewResponseMap.find(params[:id])
-    assignment_id = mapping.assignment.id
-    # metareview = mapping.response
-    # metareview.delete
-    mapping.delete
-    redirect_to action: 'list_mappings', id: assignment_id
-  end
-
   def list
     all_assignments = Assignment.order('name').where(["instructor_id = ?", session[:user].id])
 

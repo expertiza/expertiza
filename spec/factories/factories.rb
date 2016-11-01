@@ -312,9 +312,9 @@ FactoryGirl.define do
   factory :review_response_map, class: ReviewResponseMap do
     assignment { Assignment.first || association(:assignment) }
     reviewee { AssignmentTeam.first || association(:assignment_team) }
-    id 6
+    id 66
     reviewee_id 1
-    reviewer_id 2
+    reviewer_id 22
     reviewed_object_id 8
     type 'ReviewResponseMap'
     calibrate_to 0
@@ -346,10 +346,13 @@ FactoryGirl.define do
     reviewed_object_id 8
   end
 
+<<<<<<< HEAD
   factory :bookmarkratingresponsemap, class: BookmarkRatingResponseMap do
     id 6
     reviewee_id 1
     reviewer_id 2
     reviewed_object_id 8
   end
+=======
+>>>>>>> 94321f37f77a6a89cb8751e22164ec0b8fc1180f
 end

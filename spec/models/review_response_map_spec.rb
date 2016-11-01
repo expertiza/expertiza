@@ -1,6 +1,6 @@
 require 'rails_helper'
 describe ReviewResponseMap do
-  #let(:reviewresponsemap) {ReviewResponseMap.new id: 6, reviewee_id: 1, reviewer_id: 2, reviewed_object_id: 8}
+  #let(:reviewresponsemap) {ReviewResponseMap.new id: 66, reviewee_id: 1, reviewer_id: 22, reviewed_object_id: 8}
   let(:response) {Response.new id: 4, map_id: 4}
   let(:participant) {Participant.new id: 1}
 
@@ -21,7 +21,7 @@ describe ReviewResponseMap do
     #test all the id are stored correctly
     it "should be our exact reviewresponsemap's id" do
       reviewresponsemap = build(:review_response_map)
-      expect(reviewresponsemap.id).to eq(6)
+      expect(reviewresponsemap.id).to eq(66)
     end
     it "should not be any other reviewresponsemap's id" do
       reviewresponsemap = build(:review_response_map)
@@ -29,7 +29,7 @@ describe ReviewResponseMap do
     end
     it "should be our exact reviewer's id" do
       reviewresponsemap = build(:review_response_map)
-      expect(reviewresponsemap.reviewer_id).to eq(2)
+      expect(reviewresponsemap.reviewer_id).to eq(22)
     end
     it "should not be any other reviewer's id" do
       reviewresponsemap = build(:review_response_map)
@@ -63,7 +63,7 @@ describe ReviewResponseMap do
     end
   end
   describe "#export_field" do
-    it "should be xx" do
+    it "option is not empty should be the field" do
       reviewresponsemap = build(:review_response_map)
 	    expect(ReviewResponseMap.export_fields(6)).to eq(["contributor", "reviewed by"])
     end
@@ -76,7 +76,7 @@ describe ReviewResponseMap do
     end
   end
   describe '#delete' do
-    let(:reviewresponsemap) {ReviewResponseMap.new(:id => 8, :reviewee_id => 1, :reviewer_id => 2, :reviewed_object_id => 8, :response => [Response.new(:id => 8)])}
+    let(:reviewresponsemap) {ReviewResponseMap.new(:id => 8, :reviewee_id => 1, :reviewer_id => 22, :reviewed_object_id => 8, :response => [Response.new(:id => 8)])}
     let(:response) {Response.new(:id => 1, :map_id => 1)}
     let(:feedbackresponsemap) {FeedbackResponseMap.new(:id => 2, :reviewed_object_id => 8)}
     let(:metareviewresponsemap) {MetaReviewResponseMap.new(:id => 8, :reviewed_object_id => 8)}
@@ -105,10 +105,25 @@ describe ReviewResponseMap do
       assignment = build(:assignment)
       allow(Assignment).to receive(:find).and_return(assignment)
       allow(User).to receive(:find).and_return(nil)
+      row = ["reviewer_name", "user_name", "reviewee_name"]
+      expect {ReviewResponseMap.import(row,nil,2)}.to raise_error("The user account for the reviewer \"user_name\" was not found. <a href='/users/new'>Create</a> this user?")
+    end
+
+    it "raise error when reviewer is nil" do
+      assignment = build(:assignment)
+      allow(Assignment).to receive(:find).and_return(assignment)
+      allow(AssignmentParticipant).to receive(:find).and_return(nil)
       row = ["user_name","reviewer_name", "reviewee_name"]
       expect {ReviewResponseMap.import(row,nil,2)}.to raise_error("The user account for the reviewer \"reviewer_name\" was not found. <a href='/users/new'>Create</a> this user?")
     end
-
+    it "raise error when author not found" do
+      assignment = build(:assignment)
+      allow(Assignment).to receive(:find).and_return(assignment)
+      allow(AssignmentTeam).to receive(:find).and_return(nil)
+      row = ["user_name", "reviewee_name", "reviewer_name"]
+      #expect {ReviewResponseMap.import(row,nil,2)}.to raise_error("The author \"reviewee_name\" was not found. <a href='/users/new'>Create</a> this user?")
+    end
   end
+
 
 end

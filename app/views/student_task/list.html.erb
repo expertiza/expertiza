@@ -30,8 +30,6 @@
             # there is a signup sheet and user/team hasn't signed up yet, produce a link to do so
             controller = "sign_up_sheet"
             action = "list"
-            id = participant.parent_id
-            stage = "signup"
             end
           end
        elsif stage == "review" or stage == "metareview"

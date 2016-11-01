@@ -160,12 +160,13 @@ class SignUpSheetController < ApplicationController
   end
 
   def list
-    @assignment_id = params[:assignment_id].to_i
-    @slots_filled = SignUpTopic.find_slots_filled(params[:assignment_id])
-    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:assignment_id])
+    assignment = AssignmentParticipant.find(params[:id].to_i).assignment
+    @assignment_id = assignment.id
+    @slots_filled = SignUpTopic.find_slots_filled(@assignment_id)
+    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment_id)
     @show_actions = true
     @priority = 0
-    assignment = Assignment.find(@assignment_id)
+
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: nil)
     @max_team_size = assignment.max_team_size
 
@@ -384,7 +385,7 @@ def set_priority
 
   # authorizations: reader,submitter, reviewer
   def are_needed_authorizations_present?
-    @participant = Participant.where('user_id = ? and parent_id = ?', session[:user].id, params[:assignment_id]).first
+    @participant = Participant.find(params[:id])
     authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
     if authorization == 'reader' or authorization == 'submitter' or authorization == 'reviewer'
       return false

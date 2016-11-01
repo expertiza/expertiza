@@ -346,13 +346,10 @@ FactoryGirl.define do
     reviewed_object_id 8
   end
 
-<<<<<<< HEAD
   factory :bookmarkratingresponsemap, class: BookmarkRatingResponseMap do
     id 6
     reviewee_id 1
     reviewer_id 2
     reviewed_object_id 8
   end
-=======
->>>>>>> 94321f37f77a6a89cb8751e22164ec0b8fc1180f
 end

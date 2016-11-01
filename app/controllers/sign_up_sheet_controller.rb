@@ -15,7 +15,7 @@ class SignUpSheetController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
+    when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic', 'sort'
       ['Instructor',
        'Teaching Assistant',
        'Administrator',
@@ -161,13 +161,29 @@ class SignUpSheetController < ApplicationController
 
   def list
     @assignment_id = params[:assignment_id].to_i
-    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: nil)
-    @num_of_topics = @sign_up_topics.size
     @slots_filled = SignUpTopic.find_slots_filled(params[:assignment_id])
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:assignment_id])
     @show_actions = true
     @priority = 0
     assignment = Assignment.find(@assignment_id)
+    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: nil)
+    @max_team_size = assignment.max_team_size
+
+    if assignment.is_intelligent
+      @bids = Bid.where(user_id: session[:user].id).order(:priority)
+      signed_up_topics = []
+      @bids.each do |bid|
+        sign_up_topic = SignUpTopic.where(id: bid.topic_id)
+        unless sign_up_topic.empty?
+          signed_up_topics << sign_up_topic.first
+        end
+      end
+      signed_up_topics = signed_up_topics & @sign_up_topics
+      @sign_up_topics = @sign_up_topics - signed_up_topics
+      @bids = signed_up_topics
+    end
+
+    @num_of_topics = @sign_up_topics.size
     @signup_topic_deadline = assignment.due_dates.find_by_deadline_type_id(7)
     @drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
     @student_bids = Bid.where(user_id: session[:user].id)
@@ -189,6 +205,9 @@ class SignUpSheetController < ApplicationController
                            SignedUpTeam.find_user_signup_topics(@assignment_id, users_team[0].t_id)
                          end
 
+    end
+    if assignment.is_intelligent
+      render 'sign_up_sheet/intelligent_topic_selection' and return
     end
   end
 
@@ -230,27 +249,42 @@ class SignUpSheetController < ApplicationController
     redirect_to action: 'list', assignment_id: params[:assignment_id]
   end
 
-  def set_priority
+def set_priority
     @user_id = session[:user].id
-    # users_team = SignedUpTeam.find_team_users(params[:assignment_id].to_s, @user_id)
-    # check = SignedUpTeam.find_by_sql(["SELECT su.* FROM signed_up_teams su , sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.team_id = ? AND su.preference_priority_number = ?", params[:assignment_id].to_s, users_team[0].t_id, params[:priority].to_s])
-    # if check.empty?
-    #   signUp = SignedUpTeam.where(topic_id: params[:id], team_id: users_team[0].t_id).first
-    #   # signUp.preference_priority_number = params[:priority].to_s
-    #   if params[:priority].to_s.to_f > 0
-    #     signUp.update_attribute('preference_priority_number', params[:priority].to_s)
-    #   else
-    #     flash[:error] = "That is an invalid priority."
-    #   end
-    # end
-    check = Bid.where(user_id: @user_id, topic_id: params[:id])
-    if !Bid.where(user_id: @user_id, priority: params[:priority]).empty?
-      flash[:error] = "You have already selected this priority"
-    elsif check.empty?
-      Bid.create(topic_id: params[:id], user_id: @user_id, priority: params[:priority])
+    unless params[:topic].nil?
+      team_ids = AssignmentTeam.where(parent_id: params[:assignment_id]).map(&:id)
+      team_user = TeamsUser.where("user_id = ? AND team_id IN (?)", @user_id, team_ids)
+      user_ids = []
+      user_ids << @user_id
+      unless team_user.empty?
+        user_ids << TeamsUser.where(team_id: team_user.first.try(:team_id)).map(&:user_id)
+      end
+      user_ids = user_ids.uniq
+      user_ids.each do |user_id|
+        @bids = Bid.where("user_id = ?", user_id )
+        signed_up_topics = @bids.map {|bid| bid.topic_id}
+
+        #Remove topics from bids table if the student moves data from Selection HTML table to Topics HTML table
+        #This step is necessary to avoid duplicate priorities in Bids table
+        signed_up_topics = signed_up_topics - params[:topic].map {|topic_id| topic_id.to_i}
+        signed_up_topics.each do |topic|
+          Bid.where(topic_id: topic, user_id: user_id).destroy_all
+        end
+
+        params[:topic].each_with_index do |topic_id,index|
+          check = @bids.where(topic_id: topic_id)
+          if check.empty?
+            Bid.create(topic_id: topic_id, user_id: user_id, priority: index + 1)
+          else
+            Bid.where("topic_id = ? AND user_id = ?",topic_id, user_id).update_all({priority: index + 1})
+          end
+        end
+      end
     else
-      check.first.update(priority: params[:priority])
+      #All topics are deselected by user
+      Bid.where(user_id: @user_id).destroy_all
     end
+
     redirect_to action: 'list', assignment_id: params[:assignment_id]
   end
 
@@ -281,7 +315,7 @@ class SignUpSheetController < ApplicationController
               parent_id:                   topic.id,
               submission_allowed_id:       instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].submission_allowed_id,
               review_allowed_id:           instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_allowed_id,
-              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id, 
+              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id,
               round:                       i,
               flag:                        instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].flag,
               threshold:                   instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].threshold,
@@ -297,7 +331,7 @@ class SignUpSheetController < ApplicationController
               due_at:                      instance_variable_get('@topic_' + deadline_type + '_due_date'),
               submission_allowed_id:       instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].submission_allowed_id,
               review_allowed_id:           instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_allowed_id,
-              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id, 
+              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id,
               quiz_allowed_id:             instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].quiz_allowed_id,
               teammate_review_allowed_id:  instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].teammate_review_allowed_id
             )

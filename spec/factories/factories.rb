@@ -333,4 +333,13 @@ FactoryGirl.define do
     f.reviewer_id { 200 }
     f.Participant {'participant'}
   end
+
+  factory :metareviewresponsemap, class: MetareviewResponseMap do
+    id 6
+    reviewee_id 1
+    reviewed_object_id 8
+  end
+
+
+
 end

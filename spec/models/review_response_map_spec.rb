@@ -19,17 +19,13 @@ describe ReviewResponseMap do
 
   describe "id" do
     #test all the id are stored correctly
-    it "should be our exact reviewresponsemap's id" do
-      reviewresponsemap = build(:review_response_map)
-      expect(reviewresponsemap.id).to eq(66)
-    end
     it "should not be any other reviewresponsemap's id" do
       reviewresponsemap = build(:review_response_map)
       expect(reviewresponsemap.id).not_to eq(7)
     end
     it "should be our exact reviewer's id" do
       reviewresponsemap = build(:review_response_map)
-      expect(reviewresponsemap.reviewer_id).to eq(22)
+      expect(reviewresponsemap.reviewer_id).to eq(2)
     end
     it "should not be any other reviewer's id" do
       reviewresponsemap = build(:review_response_map)
@@ -76,7 +72,7 @@ describe ReviewResponseMap do
     end
   end
   describe '#delete' do
-    let(:reviewresponsemap) {ReviewResponseMap.new(:id => 8, :reviewee_id => 1, :reviewer_id => 22, :reviewed_object_id => 8, :response => [Response.new(:id => 8)])}
+    let(:reviewresponsemap) {ReviewResponseMap.new(:id => 8, :reviewee_id => 1, :reviewer_id => 2, :reviewed_object_id => 8, :response => [Response.new(:id => 8)])}
     let(:response) {Response.new(:id => 1, :map_id => 1)}
     let(:feedbackresponsemap) {FeedbackResponseMap.new(:id => 2, :reviewed_object_id => 8)}
     let(:metareviewresponsemap) {MetaReviewResponseMap.new(:id => 8, :reviewed_object_id => 8)}

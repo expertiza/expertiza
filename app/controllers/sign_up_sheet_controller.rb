@@ -15,7 +15,7 @@ class SignUpSheetController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic', 'sort'
+    when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
       ['Instructor',
        'Teaching Assistant',
        'Administrator',
@@ -160,7 +160,8 @@ class SignUpSheetController < ApplicationController
   end
 
   def list
-    assignment = AssignmentParticipant.find(params[:id].to_i).assignment
+    @participant = AssignmentParticipant.find(params[:id].to_i)
+    assignment = @participant.assignment
     @assignment_id = assignment.id
     @slots_filled = SignUpTopic.find_slots_filled(@assignment_id)
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment_id)
@@ -214,8 +215,8 @@ class SignUpSheetController < ApplicationController
 
   # this function is used to delete a previous signup
   def delete_signup
-    assignment = Assignment.find(params[:assignment_id])
-    participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', session[:user].id, params[:assignment_id]).first
+    participant = AssignmentParticipant.find(params[:id])
+    assignment = participant.assignment
     drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
     # A student who has already submitted work should not be allowed to drop his/her topic!
     # (A student/team has submitted if participant directory_num is non-null or submitted_hyperlinks is non-null.)
@@ -226,28 +227,23 @@ class SignUpSheetController < ApplicationController
     elsif !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
       flash[:error] = "You cannot drop your topic after drop topic deadline!"
     else
-      delete_signup_for_topic(params[:assignment_id], params[:id])
+      delete_signup_for_topic(assignment.id, params[:topic_id])
       flash[:success] = "You have successfully dropped your topic!"
     end
-    redirect_to action: 'list', assignment_id: params[:assignment_id]
-  end
-
-  def delete_signup_for_topic(assignment_id, topic_id)
-    @user_id = session[:user].id
-    SignUpTopic.reassign_topic(@user_id, assignment_id, topic_id)
+    redirect_to action: 'list', id: params[:id]
   end
 
   def sign_up
     # find the assignment to which user is signing up
-    @assignment = Assignment.find(params[:assignment_id])
+    @assignment = AssignmentParticipant.find(params[:id]).assignment
     @user_id = session[:user].id
     # Always use team_id ACS
     # s = Signupsheet.new
     # Team lazy initialization: check whether the user already has a team for this assignment
-    unless SignUpSheet.signup_team(@assignment.id, @user_id, params[:id])
+    unless SignUpSheet.signup_team(@assignment.id, @user_id, params[:topic_id])
       flash[:error] = "You've already signed up for a topic!"
     end
-    redirect_to action: 'list', assignment_id: params[:assignment_id]
+    redirect_to action: 'list', id: params[:id]
   end
 
 def set_priority
@@ -363,22 +359,23 @@ def set_priority
   end
 
   def switch_original_topic_to_approved_suggested_topic
-    team_id = TeamsUser.team_id(params[:assignment_id].to_i, session[:user].id)
-    original_topic_id = SignedUpTeam.topic_id(params[:assignment_id].to_i, session[:user].id)
-    SignUpTopic.find(params[:id]).update_attribute('private_to', nil) if SignUpTopic.exists?(params[:id])
-    SignedUpTeam.where(team_id: team_id, is_waitlisted: 0).first.update_attribute('topic_id', params[:id].to_i) if SignedUpTeam.exists?(team_id: team_id, is_waitlisted: 0)
+    assignment = AssignmentParticipant.find(params[:id]).assignment
+    team_id = TeamsUser.team_id(assignment.id, session[:user].id)
+    original_topic_id = SignedUpTeam.topic_id(assignment.id.to_i, session[:user].id)
+    SignUpTopic.find(params[:topic_id]).update_attribute('private_to', nil) if SignUpTopic.exists?(params[:topic_id])
+    SignedUpTeam.where(team_id: team_id, is_waitlisted: 0).first.update_attribute('topic_id', params[:topic_id].to_i) if SignedUpTeam.exists?(team_id: team_id, is_waitlisted: 0)
     # check the waitlist of original topic. Let the first waitlisted team hold the topic, if exists.
     waitlisted_teams = SignedUpTeam.where(topic_id: original_topic_id, is_waitlisted: 1)
     unless waitlisted_teams.blank?
       waitlisted_first_team_first_user_id = TeamsUser.where(team_id: waitlisted_teams.first.team_id).first.user_id
-      SignUpSheet.signup_team(params[:assignment_id].to_i, waitlisted_first_team_first_user_id, original_topic_id)
+      SignUpSheet.signup_team(assignment.id, waitlisted_first_team_first_user_id, original_topic_id)
     end
-    redirect_to action: 'list', assignment_id: params[:assignment_id]
+    redirect_to action: 'list', id: params[:id]
   end
 
   def publish_approved_suggested_topic
-    SignUpTopic.find(params[:id]).update_attribute('private_to', nil) if SignUpTopic.exists?(params[:id])
-    redirect_to action: 'list', assignment_id: params[:assignment_id]
+    SignUpTopic.find(params[:topic_id]).update_attribute('private_to', nil) if SignUpTopic.exists?(params[:topic_id])
+    redirect_to action: 'list', id: params[:id]
   end
 
   private
@@ -465,5 +462,10 @@ def set_priority
       @result_list.append(resultMap)
     end
     @result_list
+  end
+
+  def delete_signup_for_topic(assignment_id, topic_id)
+    @user_id = session[:user].id
+    SignUpTopic.reassign_topic(@user_id, assignment_id, topic_id)
   end
 end

@@ -358,5 +358,12 @@ FactoryGirl.define do
     reviewer_id 2
     reviewed_object_id 8
   end
-  
+
+  factory :feedbackresponsemap, class: FeedbackResponseMap do
+    id 6
+    reviewee_id 1
+    reviewer_id 2
+    reviewed_object_id 8
+  end
+
 end

@@ -339,7 +339,11 @@ FactoryGirl.define do
     reviewee_id 1
     reviewed_object_id 8
   end
-
+  factory :selfreviewresponsemap, class: SelfReviewResponseMap do
+    id 6
+    reviewee_id 1
+    reviewed_object_id 8
+  end
 
 
 end

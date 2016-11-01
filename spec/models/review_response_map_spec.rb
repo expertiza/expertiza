@@ -95,7 +95,20 @@ describe ReviewResponseMap do
       row = []
       expect {ReviewResponseMap.import(row,nil,nil)}.to raise_error("Not enough items.")
     end
-    
+    it "raise error when assignment is nil" do
+      assignment = build(:assignment)
+      allow(Assignment).to receive(:find).and_return(nil)
+      row = ["user_name","reviewer_name", "reviewee_name"]
+      expect {ReviewResponseMap.import(row,nil,2)}.to raise_error("The assignment with id \"2\" was not found. <a href='/assignment/new'>Create</a> this assignment?")
+    end
+    it "raise error when user is nil" do
+      assignment = build(:assignment)
+      allow(Assignment).to receive(:find).and_return(assignment)
+      allow(User).to receive(:find).and_return(nil)
+      row = ["user_name","reviewer_name", "reviewee_name"]
+      expect {ReviewResponseMap.import(row,nil,2)}.to raise_error("The user account for the reviewer \"reviewer_name\" was not found. <a href='/users/new'>Create</a> this user?")
+    end
+
   end
 
 end

@@ -1,11 +1,12 @@
 require 'rails_helper'
 describe ReviewResponseMap do
-  let(:reviewresponsemap) {ReviewResponseMap.new id: 6, reviewee_id: 1, reviewer_id: 2, reviewed_object_id: 8}
+  #let(:reviewresponsemap) {ReviewResponseMap.new id: 6, reviewee_id: 1, reviewer_id: 2, reviewed_object_id: 8}
   let(:response) {Response.new id: 4, map_id: 4}
   let(:participant) {Participant.new id: 1}
 
   describe "#new" do
     it "Validate response instance creation with valid parameters" do
+      reviewresponsemap = build(:review_response_map)
       expect(reviewresponsemap.class).to be(ReviewResponseMap)
     end
     it "Validate response instance creation with valid parameters" do
@@ -19,21 +20,27 @@ describe ReviewResponseMap do
   describe "id" do
     #test all the id are stored correctly
     it "should be our exact reviewresponsemap's id" do
+      reviewresponsemap = build(:review_response_map)
       expect(reviewresponsemap.id).to eq(6)
     end
     it "should not be any other reviewresponsemap's id" do
+      reviewresponsemap = build(:review_response_map)
       expect(reviewresponsemap.id).not_to eq(7)
     end
     it "should be our exact reviewer's id" do
+      reviewresponsemap = build(:review_response_map)
       expect(reviewresponsemap.reviewer_id).to eq(2)
     end
     it "should not be any other reviewer's id" do
+      reviewresponsemap = build(:review_response_map)
       expect(reviewresponsemap.reviewer_id).not_to eq(3)
     end
     it "should be our exact reviewee's id" do
+      reviewresponsemap = build(:review_response_map)
       expect(reviewresponsemap.reviewee_id).to eq(1)
     end
     it "should not be any other reviewee's id" do
+      reviewresponsemap = build(:review_response_map)
       expect(reviewresponsemap.reviewee_id).not_to eq(2)
     end
     it "should be the response map_id" do
@@ -43,17 +50,21 @@ describe ReviewResponseMap do
   describe "title" do
   #test the title to be stored correctly
     it "should be Review" do
+      reviewresponsemap = build(:review_response_map)
       expect(reviewresponsemap.get_title).to eq('Review')
     end
     it "should not be teamReview" do
+      reviewresponsemap = build(:review_response_map)
       expect(reviewresponsemap.get_title).not_to eq('Team Review')
     end
     it "should be feedbackReview" do
+      reviewresponsemap = build(:review_response_map)
       expect(reviewresponsemap.get_title).not_to eq('Feedback Review')
     end
   end
   describe "#export_field" do
     it "should be xx" do
+      reviewresponsemap = build(:review_response_map)
 	    expect(ReviewResponseMap.export_fields(6)).to eq(["contributor", "reviewed by"])
     end
   end
@@ -76,9 +87,15 @@ describe ReviewResponseMap do
   end
   describe "#add_reviewer" do
     it "should add reviewer" do
-      #expect(ReviewResponseMap.add_reviewer(11,12,13)).to eq(something)
+      #expect(ReviewResponseMap.add_reviewer(11,12,13)).to raise("The reviewer, \"" + "12" + "\", is already assigned to this contributor.")
     end
   end
-
+  describe "#import" do
+    it "raise error when not enough items" do
+      row = []
+      expect {ReviewResponseMap.import(row,nil,nil)}.to raise_error("Not enough items.")
+    end
+    
+  end
 
 end

@@ -1,3 +1,4 @@
+=begin
 require 'rails_helper'
 describe QuizResponseMap do
   #let(:quizresponsemap) {QuizResponseMap.new id: 5, reviewee_id: 1, reviewer_id: 2, reviewed_object_id: 3}
@@ -8,7 +9,7 @@ describe QuizResponseMap do
       before(:each) do
         @quizresponsemap = build(:quizresponsemap)
       end
-   
+
       it "quizresponsemap is valid" do
         expect(@quizresponsemap).to be_valid
       end
@@ -44,7 +45,7 @@ describe QuizResponseMap do
       expect(@quizresponsemap.get_title).not_to eq('Feedback Review')
     end
   end
-  
+
 
   describe "id" do
   #test all the id are stored correctly
@@ -97,5 +98,6 @@ describe QuizResponseMap do
   	end
   end
 
-  
+
 end
+=end

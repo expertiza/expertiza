@@ -31,8 +31,8 @@ describe "peer review testing", type: :feature do
   end
 
   def load_questionnaire
-    login_as('student2064')
-    expect(page).to have_content "User: student2064"
+    login_as(User.where(role_id: 2).first.name)
+    expect(page).to have_content User.where(role_id: 2).first.name
     expect(page).to have_content "TestAssignment"
 
     click_link "TestAssignment"
@@ -103,5 +103,3 @@ describe "peer review testing", type: :feature do
     expect(page).to have_content "Your response was successfully saved."
   end
 end
-
-

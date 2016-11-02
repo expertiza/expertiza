@@ -28,7 +28,7 @@ describe "Assignment Topic Suggestion Test" do
   describe "case 1" do
     it "Instructor set an assignment which allow student suggest topic and register student2065" do
       # login as student2065, Note by Xing Pan: modify spec/factories/factories.rb to generate student11 and call "create student" at beginning
-      user = User.find_by_name('student2064')
+      user = User.where(role_id: 2).first
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       expect(page).to have_content "Assignment_suggest_topic"
@@ -59,7 +59,7 @@ describe "Assignment Topic Suggestion Test" do
   describe "case 2" do
     it " student2064 hold suggest topic and suggest a new one and student2065 enroll on waitlist of suggested topic" do
       # login_as "student2064"
-      user = User.find_by_name('student2064')
+      user = User.where(role_id: 2).first
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       expect(page).to have_content "Assignment_suggest_topic"
@@ -88,7 +88,7 @@ describe "Assignment Topic Suggestion Test" do
       # case 2 student already have topic switch to new topic
       # need two students one to be on the waitlist of previous suggested topic,
       # the other one (student2065) is holding it and suggest another topic and wish to switch to the new one
-      user = User.find_by_name('student2065')
+      user = User.where(role_id: 2).second
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       find_link('Assignment_suggest_topic').click
@@ -96,7 +96,7 @@ describe "Assignment Topic Suggestion Test" do
       visit '/sign_up_sheet/sign_up?assignment_id=1&id=1'
 
       # log in student2064
-      user = User.find_by_name('student2064')
+      user = User.where(role_id: 2).first
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       find_link('Assignment_suggest_topic').click
@@ -124,7 +124,7 @@ describe "Assignment Topic Suggestion Test" do
       expect(page).to have_content "The suggestion was successfully approved."
 
       # lgoing as student 2064 to switch to new approved topic
-      user = User.find_by_name('student2064')
+      user = User.where(role_id: 2).first
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       find_link('Assignment_suggest_topic').click
@@ -141,7 +141,7 @@ describe "Assignment Topic Suggestion Test" do
       expect(page).to have_content "suggested_topic"
 
       # login as studnet 2065 to see if it's already shifted to the new suggested topic
-      user = User.find_by_name('student2064')
+      user = User.where(role_id: 2).first
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       expect(page).to have_content "suggested_topic2_will_switch"
@@ -156,7 +156,7 @@ describe "Assignment Topic Suggestion Test" do
   describe "case 3" do
     it "student2065 hold suggest topic and suggest a new one, but wish to stay in the old topic" do
       # login_as "student2065"
-      user = User.find_by_name('student2065')
+      user = User.where(role_id: 2).second
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       expect(page).to have_content "Assignment_suggest_topic"
@@ -186,7 +186,7 @@ describe "Assignment Topic Suggestion Test" do
       # One team is holding a topic. They sent a suggestion for new topic
       ######################################
       # login_as "student2065"
-      user = User.find_by_name('student2065')
+      user = User.where(role_id: 2).second
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       expect(page).to have_content "Assignment_suggest_topic"
@@ -217,7 +217,7 @@ describe "Assignment Topic Suggestion Test" do
       expect(page).to have_content "The suggestion was successfully approved."
 
       # login_as "student2065"
-      user = User.find_by_name('student2065')
+      user = User.where(role_id: 2).second
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       expect(page).to have_content "Assignment_suggest_topic"
@@ -232,7 +232,7 @@ describe "Assignment Topic Suggestion Test" do
       expect(page).to have_content "suggested_topic"
 
       # login_as "student2064"
-      user = User.find_by_name('student2064')
+      user = User.where(role_id: 2).first
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       expect(page).to have_content "Assignment_suggest_topic"

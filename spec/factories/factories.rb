@@ -333,10 +333,8 @@ FactoryGirl.define do
     is_submitted true
   end
   
-	factory :response_map, class: ResponseMap do |f|
-    f.map_id { 100 }
-    f.reviewer_id { 200 }
-    f.Participant {'participant'}
+	factory :response_map, class: ResponseMap do
+    id 200 
   end
 
 	factory :response_map_metareview, class: ResponseMap do
@@ -381,7 +379,12 @@ FactoryGirl.define do
     reviewer_id 2
     reviewed_object_id 8
   end
-
+  factory :feedbackresponsemap1, class: FeedbackResponseMap do
+    id 10
+    reviewee_id 1
+    reviewer_id 2
+    reviewed_object_id 8
+  end
   factory :teammatereviewresponsemap, class: TeammateReviewResponseMap do
     id 6
     reviewee_id 1

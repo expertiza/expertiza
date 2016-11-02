@@ -60,7 +60,7 @@ describe 'ReviewResponseMap' do
     end
 	end
 	describe "#final_versions_from_reviewer method" do
-	#reviewer giver three reviews, result must have final review
+	#three reviews are given by reviewer, result must have final review
 		it "should return final version of review when assignment has non varying rubric" do
 			create(:response_take)
 			create(:response_take)
@@ -71,7 +71,7 @@ describe 'ReviewResponseMap' do
 			expect(map[:review][:response_ids].length).to be(1)
 			expect(map[:review][:response_ids][0]).to be(3)
 		end
-	#reviewer giver two reviews, result must have final review
+	#two reviews are given reviewer, result must have final review
 		it "should return final version of review when assignment has varying rubric" do
 			@assignment_questionnaire2= create(:assignment_questionnaire)
 			@assignment_questionnaire.update(used_in_round:1)
@@ -86,7 +86,7 @@ describe 'ReviewResponseMap' do
 		end
 	end
 	describe "#get_assessments_round_for" do
-	#There are 2 reviewers for a team and both have given their reviews for round 1
+	#2 reviewers in a team and both have given their reviews for round 1
 		it "should return correct number of reponses per round for a team" do
 			@review1 = create(:response_take)
 			@review2 = create(:response_take)
@@ -96,7 +96,7 @@ describe 'ReviewResponseMap' do
 			@team.id=1
 			expect(ReviewResponseMap.get_assessments_round_for(@team,1).size).to eq(2)
 		end
-	#There are 2 reviewers for a team but one reviewer has given review for round1 and another one for round2
+	#2 reviewers for a team but one reviewer has given review for round1 and another one for round2
 		it "should return only those reponses which are related to a particular round" do
 			@review1 = create(:response_take)
 			@review2 = create(:response_take)
@@ -109,7 +109,7 @@ describe 'ReviewResponseMap' do
 		end
 	end
 	describe "#Test for the metareview_response_maps method" do
-	# There is 1 metareview each for the reviews given by a particular reviewer in round 1 and round 2
+	# 1 metareview each for the reviews given by a particular reviewer in round 1 and round 2
 		it "should return correct number of metareviews for a particular reviewer" do
 			@review1 = create(:response_take)
 			@metareview1=create(:response_map_metareview)
@@ -140,7 +140,6 @@ describe 'ReviewResponseMap' do
       row = ["reviewer_name", "user_name", "reviewee_name"]
       expect {ReviewResponseMap.import(row,nil,2)}.to raise_error("The user account for the reviewer \"user_name\" was not found. <a href='/users/new'>Create</a> this user?")
     end
-
     it "raise error when reviewer is nil" do
       assignment = build(:assignment)
       allow(Assignment).to receive(:find).and_return(assignment)

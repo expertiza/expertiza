@@ -123,6 +123,7 @@ describe "Integration tests for instructor interface" do
       click_button "Import"
       click_link "Topics"
       expect(page).to have_content('topic3')
+      expect(page).to have_content('topic4')
     end
   end
 

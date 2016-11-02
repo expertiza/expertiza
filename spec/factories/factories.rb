@@ -312,32 +312,48 @@ FactoryGirl.define do
   factory :review_response_map, class: ReviewResponseMap do
     assignment { Assignment.first || association(:assignment) }
     reviewee { AssignmentTeam.first || association(:assignment_team) }
-    reviewee_id 1
-    reviewer_id 2
-    reviewed_object_id 8
+    reviewer_id 1
     type 'ReviewResponseMap'
     calibrate_to 0
   end
 
   factory :response, class: Response do
     review_response_map { ReviewResponseMap.first || association(:review_response_map) }
-    response_map { ResponseMap.first || association(:response_map) }
     additional_comment nil
     version_num nil
     round nil
     is_submitted false
+	end
+
+  factory :response_take, class: Response do
+    response_map { ResponseMap.first || association(:response_map_review) }
+    additional_comment nil
+    version_num nil
+    round 1
+    is_submitted true
   end
-  factory :response_map, class: ResponseMap do |f|
+  
+	factory :response_map, class: ResponseMap do |f|
     f.map_id { 100 }
     f.reviewer_id { 200 }
     f.Participant {'participant'}
   end
 
-  factory :metareviewresponsemap, class: MetareviewResponseMap do
-    id 6
-    reviewee_id 1
-    reviewed_object_id 8
+	factory :response_map_metareview, class: ResponseMap do
+		type 'MetareviewResponseMap'
+	end
+
+	factory :metareviewresponsemap, class: MetareviewResponseMap do
+		id 6
+		reviewee_id 1
+		reviewed_object_id 8
   end
+
+	factory :response_map_review, class: ResponseMap do
+		reviewee_id 1
+		reviewer_id 1
+		type 'ReviewResponseMap'
+	end
 
   factory :selfreviewresponsemap, class: SelfReviewResponseMap do
     id 6

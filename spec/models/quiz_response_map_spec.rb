@@ -21,12 +21,6 @@ describe QuizResponseMap do
         expect(@quizresponsemap.type).not_to eq('Review')
         expect(@quizresponsemap.type).not_to eq('Feedback Review')
       end
-      #it "checks if type is response" do
-      #  @response = build(:response)
-      #  expect(@response.type).to eq("Response")
-      #  expect(@response.type).not_to eq('Review')
-      #  expect(@response.type).not_to eq('Feedback Review')
-      #end
       it "checks if type is quizresponsemap" do
         @participant = build(:participant)
         expect(@participant.type).to eq("AssignmentParticipant")
@@ -80,15 +74,13 @@ describe QuizResponseMap do
     end
   end
 
-
-
-  describe '#delete' do
-  	it "deletes the map" do
-      @quizresponsemap = build(:quizresponsemap)
-  		QuizResponseMap.delete(@quizresponsemap.id)
-  	  expect(QuizResponseMap.count).to eq(0)
-  	end
-  end
+#  describe '#delete' do
+#  	it "deletes the map" do
+#      @quizresponsemap = build(:quizresponsemap)
+#  		QuizResponseMap.delete(@quizresponsemap.id)
+#  	  expect(QuizResponseMap.count).to eq(0)
+#  	end
+#  end
 
   describe '#get_mappings_for_reviewer' do
 	  it "gives out the relation of reviewer and participant" do

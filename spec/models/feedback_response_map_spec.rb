@@ -86,18 +86,16 @@ describe FeedbackResponseMap do
   #describe "#show_review with response" do
   #  let(:feedbackresponsemap) {FeedbackResponseMap.new(:review => Response.new())}
   #  it "should show a review" do
-  #  @feedbackresponsemap = build(:feedbackresponsemap)
-  #  #  expect(feedbackresponsemap.show_review).not_to eq("No review was performed")
+	#		@feedbackresponsemap = build(:feedbackresponsemap)
+	#		expect(feedbackresponsemap.show_review).not_to eq("No review was performed")
   #  end
   #end
-  #describe "#show_review without response" do
-  #  it "should show a review" do
-  #    @feedbackresponsemap = build(:feedbackresponsemap)
-  #    expect(feedbackresponsemap.show_review).to eq("No review was performed")
-  #  end
-  #end
-
-
-
+  describe "#show_review without response" do
+    it "should show a review" do
+      feedbackresponsemap = build(:feedbackresponsemap)
+      expect(feedbackresponsemap.show_review).to eq("No review was performed")
+      expect(feedbackresponsemap.show_review).not_to eq("No review was performedd")
+    end
+  end
   
 end

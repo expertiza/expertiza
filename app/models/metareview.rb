@@ -29,17 +29,17 @@ class Metareview  < DeadlineType
   end
 
   def getTeamMembersMail(assignment_id)
-    teamMembersMailList = []
+    team_members_mail_list = []
     assignment = Assignment.find(assignment_id)
     teams = Team.where(['parent_id = ?', assignment_id])
     for team in teams
       team_participants = TeamsUser.where(['team_id = ?', team.id])
       for team_participant in team_participants
         user = User.find(team_participant.user_id)
-        teamMembersMailList << user.email
+        team_members_mail_list << user.email
       end
     end
-    teamMembersMailList
+    team_members_mail_list
   end
 
   end

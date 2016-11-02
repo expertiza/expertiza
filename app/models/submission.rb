@@ -17,17 +17,17 @@ def mail_sign_up_topic_users(assignment_id)
   assignment = Assignment.find(assignment_id)
   emails =[]
   for topic in sign_up_topics
-    signedUpTeams = SignedUpTeam.where(['topic_id = ?', topic.id])
+    signed_up_teams = SignedUpTeam.where(['topic_id = ?', topic.id])
     unless assignment.team_assignment?
-      for signedUser in signedUpTeams
+      for signedUser in signed_up_teams
         uid  = signedUser.team_id
         user = User.find(uid)
         emails << user.email
       end
     else
-      for signedUser in signedUpTeams
-        teamid = signedUser.team_id
-        team_members = TeamsUser.where(team_id: teamid)
+      for signedUser in signed_up_teams
+        team_id = signedUser.team_id
+        team_members = TeamsUser.where(team_id: team_id)
         for team_member in team_members
           user = User.find(team_member.user_id)
           emails << user.email
@@ -42,25 +42,25 @@ def mail_non_sign_up_topic_users(assignment_id)
   assignment = Assignment.find(assignment_id)
 
   if assignment.team_assignment?
-    emails = getTeamMembersMail(assignment_id)
+    emails = get_team_members_mail(assignment_id)
   else
     emails = mail_assignment_participants(assignment_id)
   end
   emails
 end
 
-def getTeamMembersMail(assignment_id)
-  teamMembersMailList = []
+def get_team_members_mail(assignment_id)
+  team_members_mail_list = []
   assignment = Assignment.find(assignment_id)
   teams = Team.where(['parent_id = ?', assignment_id])
   for team in teams
     team_participants = TeamsUser.where(['team_id = ?', team.id])
     for team_participant in team_participants
       user = User.find(team_participant.user_id)
-      teamMembersMailList << user.email
+      team_members_mail_list << user.email
     end
   end
-  teamMembersMailList
+  team_members_mail_list
 end
 
 def mail_assignment_participants(assignment_id)

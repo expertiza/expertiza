@@ -10,16 +10,16 @@ class DropTopic  < DeadlineType
        assignment = Assignment.find(self.assignment_id)
        emails =[]
        for topic in sign_up_topics
-         signedUpTeams = SignedUpTeam.where(['topic_id = ?', topic.id])
+         signed_up_teams = SignedUpTeam.where(['topic_id = ?', topic.id])
          unless assignment.team_assignment?
-           for signedUser in signedUpTeams
-             uid  = signedUser.team_id
+           for signed_user in signed_up_teams
+             uid  = signed_user.team_id
              user = User.find(uid)
              emails << user.email
            end
          else
-           for signedUser in signedUpTeams
-             teamid = signedUser.team_id
+           for signedUser in signed_up_teams
+             teamid = signed_user.team_id
              team_members = TeamsUser.where(team_id: teamid)
              for team_member in team_members
                user = User.find(team_member.user_id)

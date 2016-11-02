@@ -295,7 +295,6 @@ Expertiza::Application.routes.draw do
 
   resources :review_mapping do
     collection do
-      post :add_metareviewer
       get :add_reviewer
       post :add_reviewer
       post :add_self_reviewer
@@ -305,9 +304,7 @@ Expertiza::Application.routes.draw do
       get :assign_reviewer_dynamically
       post :assign_reviewer_dynamically
       get :auto_complete_for_user_name
-      get :delete_all_metareviewers
       get :delete_outstanding_reviewers
-      get :delete_metareviewer
       get :delete_reviewer
       get :distribution
       get :list_mappings
@@ -322,7 +319,7 @@ Expertiza::Application.routes.draw do
       post :automatic_review_mapping_staggered
       #E1600
       post :start_self_review
-      post :save_grade_and_comment_for_reviewer 
+      post :save_grade_and_comment_for_reviewer
     end
   end
 
@@ -430,7 +427,7 @@ Expertiza::Application.routes.draw do
       post :submit
       post :student_submit
       post :update_suggestion
-    end      
+    end
   end
 
   resources :survey do

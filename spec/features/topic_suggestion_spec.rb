@@ -21,8 +21,8 @@ describe "Assignment Topic Suggestion Test" do
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create(:assignment_due_date)
-    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now + (500 * 24 * 60 * 60))
+    create :assignment_due_date, due_at: (DateTime.now + 1)
+    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: (DateTime.now + 2))
   end
 
   describe "case 1" do
@@ -93,7 +93,8 @@ describe "Assignment Topic Suggestion Test" do
       visit '/student_task/list'
       find_link('Assignment_suggest_topic').click
       find_link('Signup sheet').click
-      visit '/sign_up_sheet/sign_up?assignment_id=1&id=1'
+      first("img[title='Signup']").click
+      expect(page).to have_content('(waitlisted)')
 
       # log in student2064
       user = User.find_by_name('student2064')
@@ -123,7 +124,7 @@ describe "Assignment Topic Suggestion Test" do
       click_button 'Approve suggestion'
       expect(page).to have_content "The suggestion was successfully approved."
 
-      # lgoing as student 2064 to switch to new approved topic
+      # login as student 2064 to switch to new approved topic
       user = User.find_by_name('student2064')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
@@ -132,15 +133,15 @@ describe "Assignment Topic Suggestion Test" do
       expect(page).to have_content "Your approved suggested topic"
       expect(page).to have_content "suggested_topic"
       expect(page).to have_content "suggested_topic2_will_switch"
-      visit '/sign_up_sheet/switch_original_topic_to_approved_suggested_topic/2?assignment_id=1'
+      first("img[title='Switch Topic']").click
 
-      # login as student 2064 to see if it's holding the topic rather than on the wait list
+      # login as student 2065 to see if it's holding the topic rather than on the wait list
       user = User.find_by_name('student2065')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       expect(page).to have_content "suggested_topic"
 
-      # login as studnet 2065 to see if it's already shifted to the new suggested topic
+      # login as studnet 2064 to see if it's already shifted to the new suggested topic
       user = User.find_by_name('student2064')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'

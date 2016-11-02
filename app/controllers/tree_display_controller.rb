@@ -275,11 +275,11 @@ class TreeDisplayController < ApplicationController
     assignments_method(child, res2) if node_type == "AssignmentNode"
   end
 
-  def res_node_for_child_2(tmp_res)
+  def res_node_for_child_2(ch_nodes)
     res = []
 
-    if tmp_res
-      tmp_res.each do |child|
+    if ch_nodes
+      ch_nodes.each do |child|
         node_type = child.type
         res2 = {
           "nodeinfo" => child,
@@ -296,7 +296,7 @@ class TreeDisplayController < ApplicationController
         res << res2
       end
     end
-    res2
+   res
   end
 
   def initialize_fnode_2(fnode, child_nodes)
@@ -306,11 +306,10 @@ class TreeDisplayController < ApplicationController
   end
 
   def get_tmp_res(params, child_nodes)
-    fnode = (params[:reactParams][:nodeType]).constantize.new
+    fnode = (params[:reactParams2][:nodeType]).constantize.new
     initialize_fnode_2(fnode, child_nodes)
     ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
-    tmp_res = ch_nodes
-    res_node_for_child_2(tmp_res)
+    res_node_for_child_2(ch_nodes)
   end
 
   # for child nodes

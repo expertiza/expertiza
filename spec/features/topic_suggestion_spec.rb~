@@ -139,13 +139,13 @@ describe "Assignment Topic Suggestion Test" do
       user = User.find_by_name('student2065')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
-      #expect(page).to have_content "suggested_topic"
+      expect(page).to have_content "suggested_topic"
 
       # login as studnet 2064 to see if it's already shifted to the new suggested topic
       user = User.find_by_name('student2064')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
-      #expect(page).to have_content "suggested_topic2_will_switch"
+      expect(page).to have_content "suggested_topic2_will_switch"
     end
   end
 

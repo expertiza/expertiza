@@ -296,6 +296,7 @@ class TreeDisplayController < ApplicationController
         res << res2
       end
     end
+   res
   end
 
   def initialize_fnode_2(fnode, child_nodes)

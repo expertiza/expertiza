@@ -46,13 +46,13 @@ feature 'Instructor edits advice' do
     #expect(AdviceController.save_advice).to be(true)
   end
 
-=begin
+begin
   scenario 'saves content' do
     visit '/advice/edit_advice/1'
-    fill_in "advice[1][advice]" , with: "Example"
+    fill_in "Definitions" , with: "Example"
     click_on 'Save and redisplay advice'
     expect(page).to have_content("Example")
   end
-=end
+end
 
 end

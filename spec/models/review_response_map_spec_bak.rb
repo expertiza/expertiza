@@ -113,6 +113,4 @@ describe ReviewResponseMap do
       #expect {ReviewResponseMap.import(row,nil,2)}.to raise_error("The author \"reviewee_name\" was not found. <a href='/users/new'>Create</a> this user?")
     end
   end
-
-
 end

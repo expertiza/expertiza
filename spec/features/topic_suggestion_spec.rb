@@ -10,7 +10,7 @@ describe "Assignment Topic Suggestion Test" do
   pubAssignment = nil
   before(:each) do
     create(:assignment, name: 'Assignment_suggest_topic', allow_suggestions: true)
-    create_list(:participant, 10)
+    create_list(:participant, 3)
     create(:assignment_node)
     create(:deadline_type, name: "submission")
     create(:deadline_type, name: "review")

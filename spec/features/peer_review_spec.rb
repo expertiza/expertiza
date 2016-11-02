@@ -31,8 +31,8 @@ describe "peer review testing", type: :feature do
   end
 
   def load_questionnaire
-    login_as(User.where(role_id: 2).first.name)
-    expect(page).to have_content User.where(role_id: 2).first.name
+    login_as('student2064')
+    expect(page).to have_content "User: student2064"
     expect(page).to have_content "TestAssignment"
 
     click_link "TestAssignment"

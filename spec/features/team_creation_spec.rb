@@ -3,7 +3,7 @@ require 'rails_helper'
 xdescribe "Team Creation" do
   before(:each) do
     create(:assignment)
-    create_list(:participant, 3)
+    create_list(:participant, 10)
     create(:assignment_node)
     create(:topic)
     create(:topic, topic_name: 'Great work!')

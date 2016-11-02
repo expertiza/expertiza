@@ -27,6 +27,13 @@ def get_selected_id(finder_var)
     TeammateReviewQuestionnaire.find_by_name(finder_var)[:id]
   end
 end
+
+def fill_assignment_form()
+  fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
+  select('Course 2', from: 'assignment_form_assignment_course_id')
+  fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'
+  fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
+end
 describe "assignment function" do
   before(:each) do
     #app.default_url_options = { :locale => :es }
@@ -242,10 +249,7 @@ describe "assignment function" do
     end
 
     it "should edit assignment available to students" do
-      fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'
-      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
+      fill_assignment_form()
       check("assignment_form_assignment_microtask")
       check("assignment_form_assignment_is_calibrated")
       click_button 'Save'
@@ -261,10 +265,7 @@ describe "assignment function" do
     end
 
     it "should edit quiz number available to students" do
-      fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'
-      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
+      fill_assignment_form()
       check("assignment_form_assignment_require_quiz")
       click_button 'Save'
       fill_in 'assignment_form_assignment_num_quiz_questions', with: 5
@@ -282,10 +283,7 @@ describe "assignment function" do
     end
 
     it "should edit number of members per team " do
-      fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'
-      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
+      fill_assignment_form()
       check("assignment_form_assignment_show_teammate_reviews")
       fill_in 'assignment_form_assignment_max_team_size', with: 5
       click_button 'Save'
@@ -302,10 +300,7 @@ describe "assignment function" do
 
     ##### test reviews visible to all other reviewers ######
     it "should edit review visible to all other reviewers" do
-      fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'
-      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
+      fill_assignment_form()
       check ("assignment_form_assignment_reviews_visible_to_all")
       click_button 'Save'
       assignment = Assignment.where(name: 'edit assignment for test').first
@@ -318,10 +313,7 @@ describe "assignment function" do
     end
 
     xit "should create teammate review row in rubrics" do
-      fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'
-      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
+      fill_assignment_form()
       check("team_assignment")
       check("assignment_form_assignment_show_teammate_reviews")
       fill_in 'assignment_form_assignment_max_team_size', with: 5

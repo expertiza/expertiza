@@ -74,7 +74,7 @@ class SuggestionController < ApplicationController
     @suggestion.unityID = if params[:suggestion_anonymous].nil?
       session[:user].name
     else
-      ""
+                        ""
     end
 
     if @suggestion.save

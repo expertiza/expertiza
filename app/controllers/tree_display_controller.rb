@@ -172,6 +172,7 @@ class TreeDisplayController < ApplicationController
     assignments_method(node, tmp_object) if node_type == "Assignments"
   end
 
+#getting result nodes for child
   def res_node_for_child(tmp_res)
     res = {}
     tmp_res.keys.each do |node_type|
@@ -247,13 +248,13 @@ class TreeDisplayController < ApplicationController
     false
   end
 
-  def is_current_user_ta?(instructor_id, child)
+  def is_user_ta?(instructor_id, child)
     # instructor created the course, current user is the ta of this course.
     session[:user].role_id == 6 and
         Ta.get_my_instructors(session[:user].id).include?(instructor_id) and ta_for_current_course?(child)
   end
 
-  def is_current_user_instructor?(instructor_id)
+  def is_user_instructor?(instructor_id)
     # ta created the course, current user is the instructor of this ta.
     instructor_ids = []
     TaMapping.where(ta_id: instructor_id).each {|mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }
@@ -263,10 +264,11 @@ class TreeDisplayController < ApplicationController
   def update_is_available_2(res2, instructor_id, child)
     # current user is the instructor (role can be admin/instructor/ta) of this course. is_available_condition1
     res2["is_available"] = is_available(session[:user], instructor_id) ||
-        is_current_user_ta?(instructor_id, child) ||
-        is_current_user_instructor?(instructor_id)
+        is_user_ta?(instructor_id, child) ||
+        is_user_instructor?(instructor_id)
   end
 
+  #attaches assignment nodes to course node of instructor
   def coursenode_assignmentnode(res2, child)
     res2["directory"] = child.get_directory
     instructor_id = child.get_instructor_id
@@ -275,6 +277,7 @@ class TreeDisplayController < ApplicationController
     assignments_method(child, res2) if node_type == "AssignmentNode"
   end
 
+  #getting result nodes for child2. res[] contains all the resultant nodes.
   def res_node_for_child_2(ch_nodes)
     res = []
 
@@ -299,6 +302,7 @@ class TreeDisplayController < ApplicationController
    res
   end
 
+  #inititalising folder node 2
   def initialize_fnode_2(fnode, child_nodes)
     child_nodes.each do |key, value|
       fnode[key] = value

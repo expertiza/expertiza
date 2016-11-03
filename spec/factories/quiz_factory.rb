@@ -58,11 +58,11 @@ FactoryGirl.define do
   # an Assignment Team, and a Participant. The reviewer is an
   # individual participant who is taking the quiz, the reviewee is
   # the team that created the quiz questionnaire.
-  #actory :quiz_response_map, class: QuizResponseMap do
-  #  quiz_questionnaire { QuizQuestionnaire.first || association(:quiz_questionnaire) }
-  #  reviewer { Participant.first || association(:participant) }
-  #  reviewee_id { Teams.first.id || association(:team).id }
-  #end
+  factory :quiz_response_map, class: QuizResponseMap do
+    quiz_questionnaire { QuizQuestionnaire.first || association(:quiz_questionnaire) }
+    reviewer { Participant.first || association(:participant) }
+    reviewee_id { Teams.first.id || association(:team).id }
+  end
 
   # Quiz Response represents a single response to a quiz
   # questionnaire. It foreign keys to a quiz response map.

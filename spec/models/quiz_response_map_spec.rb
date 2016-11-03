@@ -1,4 +1,3 @@
-=begin
 require 'rails_helper'
 describe QuizResponseMap do
   #let(:quizresponsemap) {QuizResponseMap.new id: 5, reviewee_id: 1, reviewer_id: 2, reviewed_object_id: 3}
@@ -100,4 +99,3 @@ describe QuizResponseMap do
 
 
 end
-=end

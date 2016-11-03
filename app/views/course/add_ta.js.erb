@@ -1,7 +1,2 @@
-if(confirm("Are you sure?")){
 $('.listing').append("<%= escape_javascript (render partial: 'ta_list', locals: {ta: @ta_mapping}) %>");
-return false;
-}
-else{
-	return false;
-}
+

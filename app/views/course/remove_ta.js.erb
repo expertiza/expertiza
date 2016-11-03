@@ -1,3 +1,6 @@
 $('.delete_ta').bind('ajax:success', function() {
+	if(confirm("Are you sure?")){
    $(this).closest('tr').fadeOut();
+}
+return false;
 });

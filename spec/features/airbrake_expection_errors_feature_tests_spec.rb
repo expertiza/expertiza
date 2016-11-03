@@ -36,6 +36,30 @@ describe "Airbrake expection errors" do
     	expect(page).to have_content('Hello world!')
     	expect(page).to have_content('TestReview')
 	end
+
+	# Airbrake-1780737855340413304
+	it "will redirect to submitted_content#view page if trying to save quiz but w/o questions", js: true do
+		assignment = Assignment.find(1)
+		assignment.require_quiz = true
+		assignment.save
+		login_as 'student2064'
+		user_id = User.find_by_name('student2064').id
+		participant_id = Participant.where(user_id: user_id).first.id
+		visit '/student_task/list'
+		click_link 'TestAssignment'
+		click_link 'Your work'
+		click_link 'Create a quiz'
+		expect(page).to have_content('New Quiz')
+		fill_in 'questionnaire_name', with: 'Test quiz'
+		click_button 'Create Quiz'
+		
+		expect(page).to have_content 'View quiz'
+		expect(page).to have_content 'Edit quiz'
+		click_link 'Edit quiz'
+		expect(page).to have_content('Edit Quiz')
+		click_button 'Save quiz'
+		expect(page).to have_current_path("/submitted_content/#{participant_id}/edit")
+	end
 end
 
 describe "airbrake-1517247902792549741" do

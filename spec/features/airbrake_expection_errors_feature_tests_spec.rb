@@ -28,11 +28,53 @@ describe "Airbrake expection errors" do
 	    create(:question)
 	end
 
-	it "Airbrake-1806782678925052472", js: true do
+	# Airbrake-1806782678925052472
+	it "can list sign_up_topics by using 'id' (participant_id) as parameter", js: true do
     	login_as 'student2066'    	
     	visit '/sign_up_sheet/list?id=1'
     	expect(page).to have_content('Signup sheet for')
     	expect(page).to have_content('Hello world!')
     	expect(page).to have_content('TestReview')
+	end
+end
+
+describe "airbrake-1517247902792549741" do
+	it "cannot access to '/tree_display/list' if not login" do 
+		visit '/tree_display/list'
+		expect(page).to have_current_path('/auth/failure')
+		expect(page).not_to have_content('Manage content')
+		expect(page).to have_content('Welcome!')
+		expect(page).to have_content('User Name')
+		expect(page).to have_content('Password')
+	end
+
+	it "can access to '/tree_display/list' after login as an admin/instructor/TA" do
+		create(:instructor)
+		login_as 'instructor6'
+		visit '/tree_display/list'
+		expect(page).to have_current_path('/tree_display/list')
+		expect(page).to have_content('Manage content')
+		expect(page).to have_content('Courses')
+		expect(page).to have_content('Assignments')
+		expect(page).to have_content('Questionnaires')
+		expect(page).not_to have_content('Welcome!')
+		expect(page).not_to have_content('User Name')
+		expect(page).not_to have_content('Password')
+	end
+
+	it "can access to '/student_task/list' after login as a student" do
+		stu = create(:student)
+		login_as stu.name
+		visit '/tree_display/list'
+		expect(page).to have_current_path('/student_task/list')
+		expect(page).to have_content('Assignments')
+		expect(page).to have_content('Tasks not yet started')
+		expect(page).to have_content('Students who have teamed with you')
+		expect(page).to have_content('Review Grade')
+		expect(page).to have_content('Publishing Rights')
+		expect(page).not_to have_content('Welcome!')
+		expect(page).not_to have_content('User Name')
+		expect(page).not_to have_content('Password')
+		expect(page).not_to have_content('SIGN IN')
 	end
 end

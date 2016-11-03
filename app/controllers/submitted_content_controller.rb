@@ -121,7 +121,7 @@ class SubmittedContentController < ApplicationController
     review_round = assignment.num_review_rounds 
 
     if stage == ('review') then
-     prepared_mail = MailerHelper.send_mail_to_reviewer(User.find(participant.user_id), "A new submission is available", "file_submission", "file submission", Assignment.find(participant.parent_id).name+","+review_round.to_s)
+     prepared_mail = MailerHelper.send_sync_message(User.find(participant.user_id), "A new submission is available", "file_submission", "file submission", Assignment.find(participant.parent_id).name+","+review_round.to_s)
      prepared_mail.deliver
     end    
     

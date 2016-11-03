@@ -38,7 +38,7 @@ class InvitationController < ApplicationController
             @invitation.reply_status = 'W'
             @invitation.save
 	    # To send mail request to invitees to join team
-	    prepared_mail = MailerHelper.send_mail_for_invitation(user, "Invitation to join team", "team_join_invite", "invitation to join", student.name)
+	    prepared_mail = MailerHelper.send_sync_message(user, "Invitation to join team", "team_join_invite", "invitation to join", student.name)
             prepared_mail.deliver
           else
             flash[:note] = "You have already sent an invitation to \"#{user.name}\"."
@@ -103,7 +103,7 @@ class InvitationController < ApplicationController
 
       # send mail to inviter on successfull acceptence of mail
       if add_successful
-	prepared_mail = MailerHelper.send_mail_for_invitation(user, "Invitation to join team", "team_accept_invite", "invitation to join", student.name)
+	prepared_mail = MailerHelper.send_sync_message(user, "Invitation to join team", "team_accept_invite", "invitation to join", student.name)
     	prepared_mail.deliver
       end
 

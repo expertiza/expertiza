@@ -23,7 +23,7 @@ end
   describe "review mapping", js: true do
     before(:each) do
       @assignment=create(:assignment, name: "automatic review mapping test",max_team_size: 4)
-      create_list(:participant, 10)
+      create_list(:participant, 3)
       create(:assignment_node)
       create(:deadline_type, name: "submission")
       create(:deadline_type, name: "review")
@@ -37,16 +37,9 @@ end
       @team1=create(:assignment_team,name:'teamone')
       @team2=create(:assignment_team,name:'teamtwo')
       @team3=create(:assignment_team,name:'teamthree')
-      @teamuser1=create(:team_user, user: User.where(role_id: 2).first,team: AssignmentTeam.where(name:'teamone').first)
-      @teamuser2=create(:team_user, user: User.where(role_id: 2).limit(2).last,team: AssignmentTeam.where(name:'teamone').first)
-      create(:team_user, user: User.where(role_id: 2).limit(3).last,team: AssignmentTeam.where(name:'teamone').first)
-      create(:team_user, user: User.where(role_id: 2).limit(4).last,team: AssignmentTeam.where(name:'teamtwo').first)
-      create(:team_user, user: User.where(role_id: 2).limit(5).last,team: AssignmentTeam.where(name:'teamtwo').first)
-      create(:team_user, user: User.where(role_id: 2).limit(6).last,team: AssignmentTeam.where(name:'teamtwo').first)
-      create(:team_user, user: User.where(role_id: 2).limit(7).last,team: AssignmentTeam.where(name:'teamthree').first)
-      create(:team_user, user: User.where(role_id: 2).limit(8).last,team: AssignmentTeam.where(name:'teamthree').first)
-      create(:team_user, user: User.where(role_id: 2).limit(9).last,team: AssignmentTeam.where(name:'teamthree').first)
-      @teamuser10=create(:team_user, user: User.where(role_id: 2).limit(10).last,team: AssignmentTeam.where(name:'teamthree').first)
+      @teamuser1=create(:team_user, user: User.where(role_id: 2).first,team: @team1)
+      @teamuser2=create(:team_user, user: User.where(role_id: 2).limit(2).last,team: @team2)
+      @teamuser10=create(:team_user, user: User.where(role_id: 2).limit(3).last,team:@team3)
       # create(:review_response_map, reviewer_id: User.where(role_id: 2).third.id)
       # create(:review_response_map, reviewer_id: User.where(role_id: 2).second.id, reviewee: AssignmentTeam.second)
       # sleep(10000)
@@ -77,20 +70,20 @@ end
 
     end
     it "calculate reviewmapping from given review number per student" do
-      login_and_assign_reviewer("instructor6",@assignment.id,2,0)
+      login_and_assign_reviewer("instructor6",@assignment.id,1,0)
 
       num = ReviewResponseMap.where(reviewee_id: 1, reviewed_object_id: 1).count
-      expect(num).to eq(7)
+      expect(num).to eq(1)
       #num2 = ReviewResponseMap.where(reviewee_id: @team3.id, reviewed_object_id: @assignment.id).count
       #expect(num2).to eq(6)
 
     end
 
     it "calculate reviewmapping from given review number per submission" do
-      login_and_assign_reviewer("instructor6",@assignment.id,0,7)
+      login_and_assign_reviewer("instructor6",@assignment.id,0,1)
 
       num = ReviewResponseMap.where(reviewer_id: 1, reviewed_object_id: 1).count
-      expect(num).to eq(2)
+      expect(num).to eq(1)
 
     end
 

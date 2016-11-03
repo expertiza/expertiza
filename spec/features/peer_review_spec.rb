@@ -3,7 +3,7 @@ require 'rails_helper'
 describe "peer review testing", type: :feature do
   before(:each) do
     create(:assignment, name: "TestAssignment", directory_path: 'test_assignment')
-    create_list(:participant, 10)
+    create_list(:participant, 3)
     create(:assignment_node)
     create(:deadline_type, name: "submission")
     create(:deadline_type, name: "review")
@@ -31,8 +31,8 @@ describe "peer review testing", type: :feature do
   end
 
   def load_questionnaire
-    login_as(User.where(role_id: 2).first.name)
-    expect(page).to have_content User.where(role_id: 2).first.name
+    login_as('student2064')
+    expect(page).to have_content "User: student2064"
     expect(page).to have_content "TestAssignment"
 
     click_link "TestAssignment"

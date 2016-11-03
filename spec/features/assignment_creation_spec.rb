@@ -213,7 +213,7 @@ describe "assignment function" do
   describe "rubrics tab", js: true do
     before(:each) do
       @assignment = create(:assignment)
-      create_list(:participant, 10)
+      create_list(:participant, 3)
       create(:assignment_node)
       create(:question)
       create(:questionnaire)

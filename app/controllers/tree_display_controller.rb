@@ -193,7 +193,7 @@ class TreeDisplayController < ApplicationController
   end
 
   def update_fnode_children(fnode, tmp_res)
-    # fnode is the parent node
+    # fnode is short for foldernode which is the parent node
     # ch_nodes are childrens
     # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
     ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
@@ -208,7 +208,7 @@ class TreeDisplayController < ApplicationController
     update_fnode_children(fnode, tmp_res)
   end
 
-  # for folder nodes
+  # for child nodes
   def children_node_ng
     child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
     tmp_res = {}
@@ -248,12 +248,14 @@ class TreeDisplayController < ApplicationController
     false
   end
 
+#check if current user is ta for instructor
   def is_user_ta?(instructor_id, child)
     # instructor created the course, current user is the ta of this course.
     session[:user].role_id == 6 and
         Ta.get_my_instructors(session[:user].id).include?(instructor_id) and ta_for_current_course?(child)
   end
 
+#check if current user is instructor
   def is_user_instructor?(instructor_id)
     # ta created the course, current user is the instructor of this ta.
     instructor_ids = []
@@ -302,7 +304,7 @@ class TreeDisplayController < ApplicationController
    res
   end
 
-  #inititalising folder node 2
+  #initialising folder node 2
   def initialize_fnode_2(fnode, child_nodes)
     child_nodes.each do |key, value|
       fnode[key] = value

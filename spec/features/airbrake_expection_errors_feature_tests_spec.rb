@@ -29,13 +29,7 @@ describe "Airbrake expection errors" do
 	end
 
 	it "Airbrake-1806782678925052472", js: true do
-    	login_as 'student2066'
-    	
-    	visit '/sign_up_sheet/list?assignment_id=1'
-    	expect(page).to have_content('Signup sheet for')
-    	expect(page).to have_content('Hello world!')
-    	expect(page).to have_content('TestReview')
-    	
+    	login_as 'student2066'    	
     	visit '/sign_up_sheet/list?id=1'
     	expect(page).to have_content('Signup sheet for')
     	expect(page).to have_content('Hello world!')

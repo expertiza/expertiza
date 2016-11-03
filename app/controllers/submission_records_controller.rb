@@ -29,6 +29,8 @@ class SubmissionRecordsController < ApplicationController
 
   end
 
+# This query will basically find the record using WHERE statement, it searches
+# for the partucular team, and then the corresponding assignment.
   def findRecords()
     @submission_records = SubmissionRecord.where("team_id = ? AND assignment_id = ?",params['team_id'],params['assignment_id'])
 

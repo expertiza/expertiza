@@ -48,7 +48,6 @@ class ResponseController < ApplicationController
 
   # Determining the current phase and check if a review is already existing for this stage.
   # If so, edit that version otherwise create a new version.
-
   # Prepare the parameters when student clicks "Edit"
   def edit
     @header = "Edit"
@@ -130,7 +129,6 @@ class ResponseController < ApplicationController
 
   # E1639 - new_feedback method was moved from here to review_mapping_controller
   # this method was managing a FeedbackResponseMap object and not a Response object and hence should not be here
-
   # view response
   def view
     @response = Response.find(params[:id])

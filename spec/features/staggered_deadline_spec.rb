@@ -75,11 +75,10 @@ describe "Staggered deadline test" do
      topic_due.save
   end
 
-  it "test1: in round 1, student2064 in review stage could do review, student2065 in submission stage cannot" do
+  it "test1: in round 1, student2064 in review stage could do review" do
      #impersonate each participant submit their topics
      submit_topic('student2064','/sign_up_sheet/sign_up?assignment_id=1&id=1',"https://google.com")
      submit_topic('student2065','/sign_up_sheet/sign_up?assignment_id=1&id=2',"https://ncsu.edu")
-
      #change deadline to make student2064 in review stage in round 1
      change_due(1, 1, 1, DateTime.now - 10)
 
@@ -110,19 +109,6 @@ describe "Staggered deadline test" do
      fill_in "responses_0_comments", with: "test fill"
      click_button "Save Review"
      expect(page).to have_content "View"
-
-     #####student 2:
-     user = User.find_by_name('student2065')
-     stub_current_user(user, user.role.name, user.role)
-     visit '/student_task/list'
-     expect(page).to have_content "submission"
-
-     #student in submission stage could not review others' work
-     #This part should not pass. To be discussed with admin...
-     click_link 'Assignment1665'
-     expect(page).to have_content "Others' work"
-     click_link "Others' work"
-     #expect{click_link "Others' work"}.to raise_error('Unable to find link "Others' work"')
   end
 
   it "test2: in round 2, both students should be in review stage to review each other" do

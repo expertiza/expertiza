@@ -82,11 +82,12 @@ describe BookmarkRatingResponseMap do
     end
   end
   
-  #describe "#contributor" do
-  #  it "should be nil" do
-  #    expect(@bookmarkratingresponsemap.contributor).to eq(nil)
-  #  end
-  #end
+  describe "#contributor" do
+    it "should be nil" do
+      bookmarkratingresponsemap = build(:bookmarkratingresponsemap)
+      expect(bookmarkratingresponsemap.contributor).to eq(nil)
+    end
+  end
   describe "#questionnaire" do
     it "should be correct type" do
       questionnaire = build(:questionnaire)

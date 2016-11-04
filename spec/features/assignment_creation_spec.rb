@@ -161,7 +161,7 @@ describe "assignment function" do
 
     function_to_create_with_teams
     function_to_create_with_quiz
-   
+    
     it "is able to create with staggered deadline" do
       skip('skip test on staggered deadline temporarily')
       login_as("instructor6")

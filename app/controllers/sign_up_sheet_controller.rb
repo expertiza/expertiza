@@ -160,14 +160,32 @@ class SignUpSheetController < ApplicationController
   end
 
   def list
-    @assignment_id = params[:assignment_id].to_i
-    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: nil)
-    @num_of_topics = @sign_up_topics.size
-    @slots_filled = SignUpTopic.find_slots_filled(params[:assignment_id])
-    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:assignment_id])
+    @participant = AssignmentParticipant.find(params[:id].to_i)
+    assignment = @participant.assignment
+    @assignment_id = assignment.id
+    @slots_filled = SignUpTopic.find_slots_filled(@assignment_id)
+    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment_id)
     @show_actions = true
     @priority = 0
-    assignment = Assignment.find(@assignment_id)
+
+    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: nil)
+    @max_team_size = assignment.max_team_size
+
+    if assignment.is_intelligent
+      @bids = Bid.where(user_id: session[:user].id).order(:priority)
+      signed_up_topics = []
+      @bids.each do |bid|
+        sign_up_topic = SignUpTopic.where(id: bid.topic_id)
+        unless sign_up_topic.empty?
+          signed_up_topics << sign_up_topic.first
+        end
+      end
+      signed_up_topics = signed_up_topics & @sign_up_topics
+      @sign_up_topics = @sign_up_topics - signed_up_topics
+      @bids = signed_up_topics
+    end
+
+    @num_of_topics = @sign_up_topics.size
     @signup_topic_deadline = assignment.due_dates.find_by_deadline_type_id(7)
     @drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
     @student_bids = Bid.where(user_id: session[:user].id)
@@ -190,12 +208,15 @@ class SignUpSheetController < ApplicationController
                          end
 
     end
+    if assignment.is_intelligent
+      render 'sign_up_sheet/intelligent_topic_selection' and return
+    end
   end
 
   # this function is used to delete a previous signup
   def delete_signup
-    assignment = Assignment.find(params[:assignment_id])
-    participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', session[:user].id, params[:assignment_id]).first
+    participant = AssignmentParticipant.find(params[:id])
+    assignment = participant.assignment
     drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
     # A student who has already submitted work should not be allowed to drop his/her topic!
     # (A student/team has submitted if participant directory_num is non-null or submitted_hyperlinks is non-null.)
@@ -206,51 +227,61 @@ class SignUpSheetController < ApplicationController
     elsif !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
       flash[:error] = "You cannot drop your topic after drop topic deadline!"
     else
-      delete_signup_for_topic(params[:assignment_id], params[:id])
+      delete_signup_for_topic(assignment.id, params[:topic_id])
       flash[:success] = "You have successfully dropped your topic!"
     end
-    redirect_to action: 'list', assignment_id: params[:assignment_id]
-  end
-
-  def delete_signup_for_topic(assignment_id, topic_id)
-    @user_id = session[:user].id
-    SignUpTopic.reassign_topic(@user_id, assignment_id, topic_id)
+    redirect_to action: 'list', id: params[:id]
   end
 
   def sign_up
     # find the assignment to which user is signing up
-    @assignment = Assignment.find(params[:assignment_id])
+    @assignment = AssignmentParticipant.find(params[:id]).assignment
     @user_id = session[:user].id
     # Always use team_id ACS
     # s = Signupsheet.new
     # Team lazy initialization: check whether the user already has a team for this assignment
-    unless SignUpSheet.signup_team(@assignment.id, @user_id, params[:id])
+    unless SignUpSheet.signup_team(@assignment.id, @user_id, params[:topic_id])
       flash[:error] = "You've already signed up for a topic!"
     end
-    redirect_to action: 'list', assignment_id: params[:assignment_id]
+    redirect_to action: 'list', id: params[:id]
   end
 
-  def set_priority
+def set_priority
     @user_id = session[:user].id
-    # users_team = SignedUpTeam.find_team_users(params[:assignment_id].to_s, @user_id)
-    # check = SignedUpTeam.find_by_sql(["SELECT su.* FROM signed_up_teams su , sign_up_topics st WHERE su.topic_id = st.id AND st.assignment_id = ? AND su.team_id = ? AND su.preference_priority_number = ?", params[:assignment_id].to_s, users_team[0].t_id, params[:priority].to_s])
-    # if check.empty?
-    #   signUp = SignedUpTeam.where(topic_id: params[:id], team_id: users_team[0].t_id).first
-    #   # signUp.preference_priority_number = params[:priority].to_s
-    #   if params[:priority].to_s.to_f > 0
-    #     signUp.update_attribute('preference_priority_number', params[:priority].to_s)
-    #   else
-    #     flash[:error] = "That is an invalid priority."
-    #   end
-    # end
-    check = Bid.where(user_id: @user_id, topic_id: params[:id])
-    if !Bid.where(user_id: @user_id, priority: params[:priority]).empty?
-      flash[:error] = "You have already selected this priority"
-    elsif check.empty?
-      Bid.create(topic_id: params[:id], user_id: @user_id, priority: params[:priority])
+    unless params[:topic].nil?
+      team_ids = AssignmentTeam.where(parent_id: params[:assignment_id]).map(&:id)
+      team_user = TeamsUser.where("user_id = ? AND team_id IN (?)", @user_id, team_ids)
+      user_ids = []
+      user_ids << @user_id
+      unless team_user.empty?
+        user_ids << TeamsUser.where(team_id: team_user.first.try(:team_id)).map(&:user_id)
+      end
+      user_ids = user_ids.uniq
+      user_ids.each do |user_id|
+        @bids = Bid.where("user_id = ?", user_id )
+        signed_up_topics = @bids.map {|bid| bid.topic_id}
+
+        #Remove topics from bids table if the student moves data from Selection HTML table to Topics HTML table
+        #This step is necessary to avoid duplicate priorities in Bids table
+        signed_up_topics = signed_up_topics - params[:topic].map {|topic_id| topic_id.to_i}
+        signed_up_topics.each do |topic|
+          Bid.where(topic_id: topic, user_id: user_id).destroy_all
+        end
+
+        params[:topic].each_with_index do |topic_id,index|
+          check = @bids.where(topic_id: topic_id)
+          if check.empty?
+            Bid.create(topic_id: topic_id, user_id: user_id, priority: index + 1)
+          else
+            Bid.where("topic_id = ? AND user_id = ?",topic_id, user_id).update_all({priority: index + 1})
+          end
+        end
+      end
     else
-      check.first.update(priority: params[:priority])
+      #All topics are deselected by user
+      Bid.where(user_id: @user_id).destroy_all
     end
+
     redirect_to action: 'list', assignment_id: params[:assignment_id]
   end
 
@@ -281,7 +312,7 @@ class SignUpSheetController < ApplicationController
               parent_id:                   topic.id,
               submission_allowed_id:       instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].submission_allowed_id,
               review_allowed_id:           instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_allowed_id,
-              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id, 
+              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id,
               round:                       i,
               flag:                        instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].flag,
               threshold:                   instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].threshold,
@@ -297,7 +328,7 @@ class SignUpSheetController < ApplicationController
               due_at:                      instance_variable_get('@topic_' + deadline_type + '_due_date'),
               submission_allowed_id:       instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].submission_allowed_id,
               review_allowed_id:           instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_allowed_id,
-              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id, 
+              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id,
               quiz_allowed_id:             instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].quiz_allowed_id,
               teammate_review_allowed_id:  instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].teammate_review_allowed_id
             )
@@ -328,29 +359,30 @@ class SignUpSheetController < ApplicationController
   end
 
   def switch_original_topic_to_approved_suggested_topic
-    team_id = TeamsUser.team_id(params[:assignment_id].to_i, session[:user].id)
-    original_topic_id = SignedUpTeam.topic_id(params[:assignment_id].to_i, session[:user].id)
-    SignUpTopic.find(params[:id]).update_attribute('private_to', nil) if SignUpTopic.exists?(params[:id])
-    SignedUpTeam.where(team_id: team_id, is_waitlisted: 0).first.update_attribute('topic_id', params[:id].to_i) if SignedUpTeam.exists?(team_id: team_id, is_waitlisted: 0)
+    assignment = AssignmentParticipant.find(params[:id]).assignment
+    team_id = TeamsUser.team_id(assignment.id, session[:user].id)
+    original_topic_id = SignedUpTeam.topic_id(assignment.id.to_i, session[:user].id)
+    SignUpTopic.find(params[:topic_id]).update_attribute('private_to', nil) if SignUpTopic.exists?(params[:topic_id])
+    SignedUpTeam.where(team_id: team_id, is_waitlisted: 0).first.update_attribute('topic_id', params[:topic_id].to_i) if SignedUpTeam.exists?(team_id: team_id, is_waitlisted: 0)
     # check the waitlist of original topic. Let the first waitlisted team hold the topic, if exists.
     waitlisted_teams = SignedUpTeam.where(topic_id: original_topic_id, is_waitlisted: 1)
     unless waitlisted_teams.blank?
       waitlisted_first_team_first_user_id = TeamsUser.where(team_id: waitlisted_teams.first.team_id).first.user_id
-      SignUpSheet.signup_team(params[:assignment_id].to_i, waitlisted_first_team_first_user_id, original_topic_id)
+      SignUpSheet.signup_team(assignment.id, waitlisted_first_team_first_user_id, original_topic_id)
     end
-    redirect_to action: 'list', assignment_id: params[:assignment_id]
+    redirect_to action: 'list', id: params[:id]
   end
 
   def publish_approved_suggested_topic
-    SignUpTopic.find(params[:id]).update_attribute('private_to', nil) if SignUpTopic.exists?(params[:id])
-    redirect_to action: 'list', assignment_id: params[:assignment_id]
+    SignUpTopic.find(params[:topic_id]).update_attribute('private_to', nil) if SignUpTopic.exists?(params[:topic_id])
+    redirect_to action: 'list', id: params[:id]
   end
 
   private
 
   # authorizations: reader,submitter, reviewer
   def are_needed_authorizations_present?
-    @participant = Participant.where('user_id = ? and parent_id = ?', session[:user].id, params[:assignment_id]).first
+    @participant = Participant.find(params[:id])
     authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
     if authorization == 'reader' or authorization == 'submitter' or authorization == 'reviewer'
       return false
@@ -430,5 +462,10 @@ class SignUpSheetController < ApplicationController
       @result_list.append(resultMap)
     end
     @result_list
+  end
+
+  def delete_signup_for_topic(assignment_id, topic_id)
+    @user_id = session[:user].id
+    SignUpTopic.reassign_topic(@user_id, assignment_id, topic_id)
   end
 end

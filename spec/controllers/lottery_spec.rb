@@ -11,5 +11,10 @@ describe LotteryController do
                 expect(result.code).to eq(200)
 
             end
+    
+    it "should return json response" do
+                result = RestClient.get 'https://www.google.com',  :content_type => :json, :accept => :json
+              expect(result.header['Content-Type']).should include 'application/json' rescue result
+            end
   end
 end

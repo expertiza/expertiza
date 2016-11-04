@@ -113,7 +113,7 @@ class Checkbox < UnscoredQuestion
   def complete_if_columnheader
     curr_question = Question.find(self.id)
     next_question = Question.where("seq > ?", curr_question.seq).order(:seq).first
-    githtml = if next_question.type == 'ColumnHeader'
+    html = if next_question.type == 'ColumnHeader'
              '</td></tr>'
            elsif next_question.type == 'SectionHeader' or next_question.type == 'TableHeader'
              '</td></tr></table><br/>'
@@ -141,6 +141,8 @@ class Checkbox < UnscoredQuestion
   end
 
   def view_completed_question_if_columnheader
+    curr_question = Question.find(self.id)
+    next_question = Question.where("seq > ?", curr_question.seq).order(:seq).first
     html = if next_question.type == 'ColumnHeader'
              '</td></tr>'
            elsif next_question.type == 'TableHeader'

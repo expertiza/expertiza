@@ -47,15 +47,15 @@ describe "Integration tests for instructor interface" do
   end
  
   describe "Import tests for assignment topics" do
-    itcondition_string = 'should be valid file with 3 columns'
-    filepath_string = "spec/features/assignment_topic_csvs/3-col-valid_topics_import.csv"
-    havecontent_string1 = 'expertiza'
-    havecontent_string2 = 'mozilla'
+    it_condition_string = 'should be valid file with 3 columns'
+    file_path_string = "spec/features/assignment_topic_csvs/3-col-valid_topics_import.csv"
+    have_content_string1 = 'expertiza'
+    have_content_string2 = 'mozilla'
     check_valid_or_invalid_file_with_3_columns(it_condition_string, file_path_string, have_content_string1, have_content_string2)
-    itcondition_string = 'should be a valid file with 3 or more columns'
-    filepath_string = "spec/features/assignment_topic_csvs/3or4-col-valid_topics_import.csv"
-    havecontent_string1 = 'capybara'
-    havecontent_string2 = 'cucumber'
+    it_condition_string = 'should be a valid file with 3 or more columns'
+    file_path_string = "spec/features/assignment_topic_csvs/3or4-col-valid_topics_import.csv"
+    have_content_string1 = 'capybara'
+    have_content_string2 = 'cucumber'
     check_valid_or_invalid_file_with_3_columns(it_condition_string, file_path_string, have_content_string1, have_content_string2)
     it 'should be a invalid csv file' do
       login_as("instructor6")

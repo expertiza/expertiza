@@ -62,7 +62,7 @@ def function_to_create_with_quiz
         num_quiz_questions: 3,
         require_quiz: true
       )
-    end
+   end
 end
 
 def update_scored_question(tr_variable,select_variable)

@@ -50,14 +50,18 @@ end
 
 describe MenuItemsController do
   describe 'Airbrake-1766139777878852159', type: :controller do
-    it 'can handle the situation when the session[:menu] is nil'do
-      controller.request.parameters = {name: "manage/courses"}
-      controller.params = ActionController::Parameters.new(
-        {name: "manage/courses"}
-      )
-      # allow(session[:menu]).to receive(:select).with('manage/courses').and_return(nil)
-      mic = MenuItemsController.new
-      expect(mic.link).to redirect_to('/')
+    it "can handle the situation (redirect_to '/') when the session[:menu] is nil"do
+      controller.params[:name] = "manage/courses"
+      controller.session[:menu] = nil
+      get :link
+      expect(response).to redirect_to('/')
+    end
+
+    it 'redirect to node.url when the session[:menu] is not nil'do
+      controller.params[:name] = "manage/courses"
+      allow(controller.session[:menu]).to receive(:try).with(any_args).and_return(double('node', url: '/tree_display/goto_courses'))
+      get :link
+      expect(response).to redirect_to('/tree_display/goto_courses')
     end
   end
 end

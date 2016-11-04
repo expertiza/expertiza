@@ -49,18 +49,26 @@ describe SignUpSheetController do
 end
 
 describe GradesController do
-  describe 'Airbrake-1784274870078015831' do
-    it 'will redirect when current user is not the reviewer' do
-      allow(@participant).to receive_message_chain(:assignment, :max_team_size).with(no_args).and_return(2)
-      allow(@participant).to receive_message_chain(:assignment, :id).with(no_args).and_return(1)
-      allow(@participant).to receive(:team).and_return(build(:assignment_team))
-      # @request.session['user'] = build(:student, id: 1)
-      current_user = build(:student, id: 1)
-      current_role = current_user.role
-      stub_current_user(current_user, 'Student', current_role)
-      allow(AssignmentParticipant).to receive_message_chain(:where, :first).with(1, 1).and_return(nil)
-      gc = GradesController.new
-      expect(gc.send(:redirect_when_disallowed)).to eq(true)
+  # Airbrake-1784274870078015831
+  describe '#redirect_when_disallowed' do
+    before(:each) do
+      controller.instance_variable_set(:@participant, double('Participant', 
+                                                              team: build(:assignment_team),
+                                                              assignment: double('Assignment', id: 1, max_team_size: 1)))
+      # allow(@participant).to receive(:assignment).with(no_args).and_return(build(:assignment, id: 1, max_team_size: 2))
+      # allow(@participant).to receive(:team).with(no_args).and_return(build(:assignment_team))
+      controller.session[:user] = double('User', id: 1)
+    end
+
+    it 'will return true when reviewer is nil' do
+      allow(AssignmentParticipant).to receive_message_chain(:where, :first).with(any_args).and_return(nil)
+      expect(controller.send(:redirect_when_disallowed)).to eq(true)
+    end
+
+    it 'will return false when reviewer is current_user' do
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(double('User', id: 1))
+      allow(AssignmentParticipant).to receive_message_chain(:where, :first).with(any_args).and_return(double('User', user_id: 1))
+      expect(controller.send(:redirect_when_disallowed)).to eq(false)
     end
   end
 end

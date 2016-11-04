@@ -21,6 +21,7 @@
     <option value="replace">replace the existing team with the new team
     <option value="insert">insert any new members into the existing team
     <option value="rename">rename the new team and import
+    <option value="renameOldTeam">rename the existing team and import
   </select>
   <br/>
 <% end %>
@@ -30,8 +31,10 @@
 <%= hidden_field_tag('id', @id) %>
 
 
-* The import process expects the following columns:<br/>
-&nbsp;&nbsp;&nbsp;<%= @expected_fields %>
+    *Please choose the order of the columns here:<br/>
+    <%@array_expected_values.each_with_index{|field, index|%>
+    <%=select_tag "import_field_#{index}" , options_for_select(@array_expected_values, @array_expected_values[index])%><br/>
+    <%}%>
  <br/><br/>
  <input type='submit' value='Import' onclick='if (checkIfFileExists(file)) {import_form.submit();} else {alert("Please select a file before clicking Next.");}'/>
  <% end %>

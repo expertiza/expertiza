@@ -24,6 +24,9 @@
   <% if @model == 'AssignmentTeam' %>
     <%= render :partial => 'assignment_teams' %>
   <% end %>
+  <% if @model == 'AssignmentParticipant' %>
+      <%= render :partial => 'assignment_participants' %>
+  <% end %>
   <% if @model == 'CourseTeam' %>
     <%= render :partial => 'course_teams' %>
   <% end %>

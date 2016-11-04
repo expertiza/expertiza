@@ -110,6 +110,21 @@ describe "Integration tests for instructor interface" do
       click_link "Topics"
       expect(page).not_to have_content('this is a random file which should fail')
     end
+
+    it 'should be a valid file with differently ordered columns' do
+      login_as("instructor6")
+      visit '/assignments/1/edit'
+      click_link "Topics"
+      click_link "Import topics"
+      file_path = Rails.root + "spec/features/assignment_topic_csvs/reordered_topics_import.csv"
+      attach_file('file', file_path)
+      select "Max choosers", from: 'import_field_1'
+      select "Topic name", from: 'import_field_2'
+      click_button "Import"
+      click_link "Topics"
+      expect(page).to have_content('topic3')
+      expect(page).to have_content('topic4')
+    end
   end
 
   describe "View assignment scores" do

@@ -200,6 +200,7 @@ class TreeDisplayController < ApplicationController
     tmp_res[fnode.get_name] = ch_nodes
   end
 
+#initialize parent node and update child nodes for it
   def initialize_fnode_update_children(params, node, tmp_res)
     fnode = (params[:reactParams][:nodeType]).constantize.new
     node.each do |a|

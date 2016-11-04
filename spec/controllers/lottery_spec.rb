@@ -17,4 +17,12 @@ describe LotteryController do
               expect(result.header['Content-Type']).should include 'application/json' rescue result
             end
   end
+  
+  describe "#run_intelligent_bid" do
+              it "should do intelligent assignment" do
+                assignment = double("Assignment")
+                allow(assignment).to receive(:is_intelligent) { 1 }
+                expect(assignment.is_intelligent).to eq(1)
+              end
+  end
 end

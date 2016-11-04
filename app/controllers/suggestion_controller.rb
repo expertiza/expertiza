@@ -24,7 +24,7 @@ class SuggestionController < ApplicationController
     if @suggestioncomment.save
       flash[:notice] = "Your comment has been successfully added."
     else
-      flash[:error] = "There was an error adding your comment."
+      flash[:error] = "There was an error in adding your comment."
     end
     if current_role_name.eql? 'Student'
       redirect_to action: "student_view", id: params[:id]
@@ -54,8 +54,9 @@ class SuggestionController < ApplicationController
   end
 
   def update_suggestion
-    Suggestion.find(params[:id]).update_attributes(title: params[:suggestion][:title], description: params[:suggestion][:description],
-                                                   signup_preference: params[:suggestion][:signup_preference])
+    Suggestion.find(params[:id]).update_attributes(title: params[:suggestion][:title], 
+                                description: params[:suggestion][:description],
+                                signup_preference: params[:suggestion][:signup_preference])
     redirect_to action: 'new', id: Suggestion.find(params[:id]).assignment_id
   end
 
@@ -82,10 +83,6 @@ class SuggestionController < ApplicationController
       flash[:success] = 'You have submitted an anonymous suggestion. It will not show in the suggested topic table below.' if @suggestion.unityID == ''
     end
     redirect_to action: 'new', id: @suggestion.assignment_id
-  end
-
-  def confirm_save
-    # Action to display successful creation of suggestion
   end
 
   def submit

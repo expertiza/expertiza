@@ -9,10 +9,9 @@ describe LotteryController do
                 rest=double("RestClient")
                 result = RestClient.get 'http://www.google.com',  :content_type => :json, :accept => :json
                 expect(result.code).to eq(200)
-
             end
     
-    it "should return json response" do
+             it "should return json response" do
                 result = RestClient.get 'https://www.google.com',  :content_type => :json, :accept => :json
               expect(result.header['Content-Type']).should include 'application/json' rescue result
             end
@@ -24,5 +23,12 @@ describe LotteryController do
                 allow(assignment).to receive(:is_intelligent) { 1 }
                 expect(assignment.is_intelligent).to eq(1)
               end
+    
+              it "should exit gracefully when assignment not intelligent" do
+               assignment = double("Assignment")
+               allow(assignment).to receive(:is_intelligent) { 0 }
+               expect(assignment.is_intelligent).to eq(0)
+               redirect_to(controller: 'tree_display')
+             end
   end
 end

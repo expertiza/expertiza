@@ -32,9 +32,8 @@ describe ImportFileController do
       session = {
         assignment_id: 1
       }
-      ifc = ImportFileController.new
-      expect{ifc.send(:importFile, session, controller.params)}.not_to raise_error
-      expect(ifc.send(:importFile, session, controller.params).inspect).to eq("[#<NoMethodError: undefined method `each_line' for nil:NilClass>]")
+      expect{controller.send(:importFile, session, controller.params)}.not_to raise_error
+      expect(controller.send(:importFile, session, controller.params).inspect).to eq("[#<NoMethodError: undefined method `each_line' for nil:NilClass>]")
     end
   end
 end
@@ -71,6 +70,31 @@ describe MenuItemsController do
       allow(controller.session[:menu]).to receive(:try).with(any_args).and_return(double('node', url: '/tree_display/goto_courses'))
       get :link
       expect(response).to redirect_to('/tree_display/goto_courses')
+    end
+  end
+end
+
+describe GradesController do
+  # Airbrake-1784274870078015831
+  describe '#redirect_when_disallowed' do
+    before(:each) do
+      controller.instance_variable_set(:@participant, double('Participant', 
+                                                              team: build(:assignment_team),
+                                                              assignment: double('Assignment', id: 1, max_team_size: 1)))
+      # allow(@participant).to receive(:assignment).with(no_args).and_return(build(:assignment, id: 1, max_team_size: 2))
+      # allow(@participant).to receive(:team).with(no_args).and_return(build(:assignment_team))
+      controller.session[:user] = double('User', id: 1)
+    end
+
+    it 'will return true when reviewer is nil' do
+      allow(AssignmentParticipant).to receive_message_chain(:where, :first).with(any_args).and_return(nil)
+      expect(controller.send(:redirect_when_disallowed)).to eq(true)
+    end
+
+    it 'will return false when reviewer is current_user' do
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(double('User', id: 1))
+      allow(AssignmentParticipant).to receive_message_chain(:where, :first).with(any_args).and_return(double('User', user_id: 1))
+      expect(controller.send(:redirect_when_disallowed)).to eq(false)
     end
   end
 end

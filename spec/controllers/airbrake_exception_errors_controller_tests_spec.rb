@@ -37,21 +37,21 @@ describe ImportFileController do
   end
 end
 
-describe SignUpSheetController do
-  before(:each) do
-    allow_any_instance_of(ApplicationController).to receive(:[]).with(:user).and_return(build(:student, id: 1))
-  end
-  describe 'Airbrake-1781398948366778395', type: :controller do
-    it 'can handle the situation when the @participant is nil' do
-      # session[:user] = build(:student, id: 1)
+# describe SignUpSheetController do 
+#   describe 'Airbrake-1781398948366778395', type: :controller do
+#     before(:each) do
+#       allow_any_instance_of(ApplicationController).to receive(:[]).with(:user).and_return(build(:student, id: 1))
+#     end
+#     it 'can handle the situation when the @participant is nil' do
+#       # session[:user] = build(:student, id: 1)
       
-      controller.params[:assignment_id] = 1
-      suc = SignUpSheetController.new
-      allow(Participant).to receive_message_chain(:where, :first).with(1, 1).and_return(nil)
-      expect(suc.send(:are_needed_authorizations_present?)).to eq(true)
-    end
-  end
-end
+#       controller.params[:assignment_id] = 1
+#       suc = SignUpSheetController.new
+#       allow(Participant).to receive_message_chain(:where, :first).with(1, 1).and_return(nil)
+#       expect(suc.send(:are_needed_authorizations_present?)).to eq(true)
+#     end
+#   end
+# end
 
 describe MenuItemsController do
   describe 'Airbrake-1766139777878852159', type: :controller do

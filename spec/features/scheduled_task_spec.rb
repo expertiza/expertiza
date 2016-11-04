@@ -1,6 +1,9 @@
 require 'rails_helper'
-
-expect_deadline_check('Submission deadline reminder email', 'is able to send reminder email for submission deadline to signed-up users ', "deadline_type: submission", "submission")
+deadline_reminder_email_type = 'Submission deadline reminder email'
+send_reminder_is_condition = 'is able to send reminder email for submission deadline to signed-up users '
+deadlne_type = "deadline_type: submission"
+display_deadline = "submission"
+expect_deadline_check(deadline_reminder_email_type, send_reminder_is_condition, deadlne_type, display_deadline)
 expect_deadline_check('Metareview deadline reminder email', 'is able to send reminder email for submission deadline to signed-up users ', "deadline_type: submission", "submission")
 
 describe 'Review deadline reminder email' do

@@ -28,7 +28,7 @@ def edit_topics_properties
   end
 end
 
-def function_to_create_with_teams
+def function_to_create_teams
   it "is able to create with teams" do
     login_as("instructor6")
     visit '/assignments/new?private=1'

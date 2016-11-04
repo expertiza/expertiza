@@ -110,8 +110,6 @@ describe "Questionnaire tests for instructor interface" do
     create_private_review
   end
 
-  
-  
   describe "Create a review question", type: :controller do
     type_qn_condition = "is able to create a Criterion question"
     type = 'Criterion'

@@ -140,7 +140,7 @@ class Scale < ScoredQuestion
     html
   end
 
-  def complete_jquery(_count)
+  def complete_jquery(count)
     html = '<script>jQuery("input[name=Radio_' + self.id.to_s + ']:radio").change(function() {'
     html += 'var response_score = jQuery("#responses_' + count.to_s + '_score");'
     html += 'var checked_value = jQuery("input[name=Radio_' + self.id.to_s + ']:checked").val();'

@@ -263,7 +263,7 @@ describe "assignment function" do
         )
       end
 
-      update_scored_question("tr#questionnaire_table_ReviewQuestionnaire","ReviewQuestionnaire2")
+      update_scored_question("tr#questionnaire_table_ReviewQuestionnaire", "ReviewQuestionnaire2")
       # Second row of rubric
       it "updates author feedback questionnaire" do
         find_link('Rubrics').click

@@ -32,6 +32,7 @@ class SuggestionController < ApplicationController
       redirect_to action: "show", id: params[:id]
     end
   end
+
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: [:destroy, :create, :update],
          redirect_to: {action: :list}
@@ -75,12 +76,14 @@ class SuggestionController < ApplicationController
     @suggestion.unityID = if params[:suggestion_anonymous].nil?
       session[:user].name
     else
-                        ""
+      ""
     end
 
     if @suggestion.save
       flash[:success] = 'Thank you for your suggestion!' if @suggestion.unityID != ''
-      flash[:success] = 'You have submitted an anonymous suggestion. It will not show in the suggested topic table below.' if @suggestion.unityID == ''
+      flash[:success] = 'You have submitted an anonymous suggestion. 
+                          It won\'t be seen in the suggested topic table.' 
+                          if @suggestion.unityID == ''
     end
     redirect_to action: 'new', id: @suggestion.assignment_id
   end

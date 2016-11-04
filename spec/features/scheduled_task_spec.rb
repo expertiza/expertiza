@@ -4,7 +4,13 @@ send_reminder_is_condition = 'is able to send reminder email for submission dead
 deadlne_type = "deadline_type: submission"
 display_deadline = "submission"
 expect_deadline_check(deadline_reminder_email_type, send_reminder_is_condition, deadlne_type, display_deadline)
-expect_deadline_check('Metareview deadline reminder email', 'is able to send reminder email for submission deadline to signed-up users ', "deadline_type: submission", "submission")
+
+deadline_reminder_email_type = 'Metareview deadline reminder email'
+send_reminder_is_condition = 'is able to send reminder email for submission deadline to signed-up users '
+deadlne_type = "deadline_type: submission"
+display_deadline = "submission"
+expect_deadline_check(deadline_reminder_email_type, send_reminder_is_condition, deadlne_type, display_deadline)
+
 
 describe 'Review deadline reminder email' do
   it 'is able to send reminder email for review deadline to reviewers ' do
@@ -27,9 +33,26 @@ describe 'Review deadline reminder email' do
     expect(Delayed::Job.last.handler).to include("deadline_type: drop_outstanding_reviews")
   end
 end
-expect_deadline_check('Metareview deadline reminder email', 'is able to send reminder email for Metareview deadline to reviewers ', "deadline_type: metareview", "metareview")
-expect_deadline_check('Drop Topic deadline reminder email', 'is able to send reminder email for drop topic deadline to reviewers ', "deadline_type: drop_topic", "drop_topic")
-expect_deadline_check('Signup deadline reminder email', 'is able to send reminder email for signup deadline to reviewers ', "deadline_type: signup", "signup")
+
+deadline_reminder_email_type = 'Metareview deadline reminder email'
+send_reminder_is_condition = 'is able to send reminder email for Metareview deadline to reviewers '
+deadlne_type = "deadline_type: metareview"
+display_deadline = "metareview"
+expect_deadline_check(deadline_reminder_email_type, send_reminder_is_condition, deadlne_type, display_deadline)
+
+deadline_reminder_email_type = 'Drop Topic deadline reminder email'
+send_reminder_is_condition = 'is able to send reminder email for drop topic deadline to reviewers '
+deadlne_type = "deadline_type: drop_topic"
+display_deadline = "drop_topic"
+expect_deadline_check(deadline_reminder_email_type, send_reminder_is_condition, deadlne_type, display_deadline)
+
+
+deadline_reminder_email_type = 'Signup deadline reminder email'
+send_reminder_is_condition = 'is able to send reminder email for signup deadline to reviewers '
+deadlne_type = "deadline_type: signup"
+display_deadline = "signup"
+expect_deadline_check(deadline_reminder_email_type, send_reminder_is_condition, deadlne_type, display_deadline)
+
 
 describe 'Team formation deadline reminder email' do
   it 'is able to send reminder email for team formation deadline to reviewers ' do

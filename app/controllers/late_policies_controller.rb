@@ -65,7 +65,7 @@ class LatePoliciesController < ApplicationController
     @penalty_policy = LatePolicy.find(params[:id])
   end
 
-  def validate_penalty_unit(params)
+  private def validate_penalty_unit(params)
     is_number = false
     if params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i
       flash[:error] = "The maximum penalty cannot be less than penalty per unit."
@@ -75,7 +75,7 @@ class LatePoliciesController < ApplicationController
     is_number
   end
 
-  def validate_duplicate_policy(params)
+  private def validate_duplicate_policy(params)
     is_number = false
     @late_policy = LatePolicy.where(policy_name: params[:late_policy][:policy_name])
     if !@late_policy.nil? && !@late_policy.empty?
@@ -90,7 +90,7 @@ class LatePoliciesController < ApplicationController
     is_number
   end
 
-  def values_update(params)
+  private def values_update(params)
     @penalty_policy.update(late_policy_params)
     #@penalty_policy.save!
     @penaltyObjs = CalculatedPenalty.all

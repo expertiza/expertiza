@@ -2,13 +2,13 @@ class Scale < ScoredQuestion
   include ActionView::Helpers
   # This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
   def edit(count)
-    html = edit_first_td(count) + edit_second_td(count)
-    html += edit_third_td(count) + edit_forth_td(count)
-    html += edit_sixth_td_max_label(count) + edit_sixth_td_min_label(count)
+    html = edit_remove_button(count) + edit_seq(count)
+    html += edit_question_type(count) + edit_weight(count)
+    html += edit_max_label(count) + edit_min_label(count)
     safe_join([raw("<tr>"), raw("</tr>")], raw(html))
   end
 
-  def edit_first_td(_count)
+  def edit_remove_button(_count)
     html = '<td align="center"><a rel="nofollow" data-method="delete" href="/questions/'
     html += self.id.to_s + '">Remove</a></td>'
     html += '<td><input size="6" value="' + self.seq.to_s + '" name="question['
@@ -16,34 +16,34 @@ class Scale < ScoredQuestion
     html
   end
 
-  def edit_second_td(_count)
+  def edit_seq(_count)
     html = self.id.to_s + '][seq]" id="question_' + self.id.to_s + '_seq" type="text"></td>'
     html += '<td><textarea cols="50" rows="1" name="question[' + self.id.to_s + '][txt]" id="question_'
 
     html
   end
 
-  def edit_third_td(_count)
+  def edit_question_type(_count)
     html = self.id.to_s + '_txt" placeholder="Edit question content here">' + self.txt + '</textarea></td>'
     html += '<td><input size="10" disabled="disabled" value="' + self.type + '" name="question['
     html
   end
 
-  def edit_forth_td(_count)
+  def edit_weight(_count)
     html = self.id.to_s + '][type]" id="question_' + self.id.to_s + '_type" type="text"></td>'
     html += '<td><input size="2" value="' + self.weight.to_s + '" name="question[' + self.id.to_s
     html += '][weight]" id="question_'
     html
   end
 
-  def edit_sixth_td_max_label(_count)
+  def edit_max_label(_count)
     html = self.id.to_s + '_weight" type="text"></td>'
     html += '<td> max_label <input size="10" value="' + self.max_label.to_s
     html += '" name="question[' + self.id.to_s + '][max_label]" id="question_' + self.id.to_s
     html
   end
 
-  def edit_sixth_td_min_label(_count)
+  def edit_min_label(_count)
     html = '_max_label" type="text">  min_label <input size="12" value="' + self.min_label.to_s
     html += '" name="question[' + self.id.to_s + '][min_label]" id="question_'
     html += self.id.to_s + '_min_label" type="text"></td>'

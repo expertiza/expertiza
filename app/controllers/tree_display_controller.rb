@@ -138,7 +138,6 @@ class TreeDisplayController < ApplicationController
     tmp_object["private"] = true if session[:user].role.ta? == 'Teaching Assistant' &&
         Ta.get_my_instructors(session[:user].id).include?(instructor_id) &&
         ta_for_current_course?(node)
-    # end
   end
 
   def update_is_available(tmp_object, instructor_id, node)
@@ -153,12 +152,13 @@ class TreeDisplayController < ApplicationController
   end
 
   def update_tmp_obj(tmp_object, node)
-    tmp_object.merge!(
+    tmp={
       "directory" => node.get_directory,
       "creation_date" => node.get_creation_date,
       "updated_date" => node.get_modified_date,
       "private" => node.get_instructor_id == session[:user].id ? true : false
-    )
+       }
+   tmp_object.merge!(tmp)
   end
 
   def courses_assignments_obj(node_type, tmp_object, node)
@@ -215,7 +215,6 @@ class TreeDisplayController < ApplicationController
     child_nodes.each do |node|
       initialize_fnode_update_children(params, node, tmp_res)
     end
-    # res = res_node_for_child(tmp_res)
     res = res_node_for_child(tmp_res)
     respond_to do |format|
       format.html { render json: res }
@@ -276,7 +275,7 @@ class TreeDisplayController < ApplicationController
     instructor_id = child.get_instructor_id
     update_instructor(res2, instructor_id)
     update_is_available_2(res2, instructor_id, child)
-    assignments_method(child, res2) if node_type == "AssignmentNode"
+    assignments_method(child, res2) if child.type == "AssignmentNode"
   end
 
   #getting result nodes for child2. res[] contains all the resultant nodes.
@@ -310,6 +309,7 @@ class TreeDisplayController < ApplicationController
       fnode[key] = value
     end
   end
+
 
   def get_tmp_res(params, child_nodes)
     fnode = (params[:reactParams2][:nodeType]).constantize.new

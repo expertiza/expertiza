@@ -281,7 +281,7 @@ describe "assignment function" do
           notification_limit: 50
         )
       end
-      update_scored_question("tr#questionnaire_table_AuthorFeedbackQuestionnaire","AuthorFeedbackQuestionnaire2")
+      update_scored_question("tr#questionnaire_table_AuthorFeedbackQuestionnaire", "AuthorFeedbackQuestionnaire2")
 
       # Third row of rubric
       it "updates teammate review questionnaire" do

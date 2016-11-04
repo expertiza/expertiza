@@ -17,7 +17,7 @@
   <%if @topics.size > 0 %>
     <% if @authorization == 'participant' %>
       <li> 
-        <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :assignment_id => @participant.parent_id%>
+        <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.id%>
         (Sign up for a topic)
       </li>
     <% end %>

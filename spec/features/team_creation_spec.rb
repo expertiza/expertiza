@@ -240,6 +240,14 @@ Hello world! ')
       expect(page).to have_content('team1')
     end
 
+    it 'Student should accept the invitation sent by other student who has a topic and no longer has any pending invitations' do
+      visit '/invitation/accept?inv_id=1&student_id=1&team_id=1'
+      visit '/student_teams/view?student_id=1'
+      expect(page).to have_content('team1')
+
+      expect(page).not_to have_content('pending')
+    end
+
     it "Student should reject the inviattion sent by the other student who has a topic" do
       visit '/invitation/decline?inv_id=1&student_id=1'
       visit '/student_teams/view?student_id=1'

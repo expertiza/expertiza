@@ -180,7 +180,8 @@ class SuggestionController < ApplicationController
   private
 
   def suggestion_params
-    params.require(:suggestion).permit(:assignment_id, :title, :description, :status, :unityID, :signup_preference)
+    params.require(:suggestion).permit(:assignment_id, :title, :description, 
+                                        :status, :unityID, :signup_preference)
   end
 
   def approve

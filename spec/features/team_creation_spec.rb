@@ -127,13 +127,7 @@ Hello world! ')
       expect(page).to have_content('Team Name: final2_Team1')
     end
 
-    it 'Student should accept the invitation sent by other student and both have topics and no longer has any pending invitations' do
-      visit '/invitation/accept?inv_id=1&student_id=1&team_id=2'
-      visit '/student_teams/view?student_id=1'
-      expect(page).to have_content('Team Name: final2_Team1')
 
-      expect(page).not_to have_content('pending')
-    end
 
     it 'student should reject the invitation sent by the other student and both gave topics' do
       visit '/invitation/decline?inv_id=1&student_id=1'

@@ -55,7 +55,7 @@
     </tr>
   </table>
   
-  <%= form_tag :action => 'save_all_questions', :id => params[:id], :questionnaire_type => params[:model], :private => params[:private], :format => 'csv' do %>
+  <%= form_tag({:action => 'save_all_questions', :id => params[:id], :questionnaire_type => params[:model], :private => params[:private], :format => 'csv'}, multipart: true) do %>
     <table id="questions_table">
       <tr>
         <th class="head" align="center" width="30">Action</td>
@@ -80,7 +80,7 @@
     <br />
     <input type="submit" name="import" value="Import from CSV"/>
           <br />
-    <input type="submit" name="export" value="Export questions to CSV" %>
+    <input type="submit" name="export" value="Export questions to CSV" >
   <% end %>
 <% end %>
 

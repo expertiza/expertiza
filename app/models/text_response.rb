@@ -3,8 +3,8 @@ class TextResponse < Question
     include ActionView::Helpers
     # This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
     def edit(_count)
-        html = edit_link + edit_question_lable
-        html += edit_question_textarea + edit_question_textarea_size
+        html = edit_link(_count) + edit_question_lable(_count)
+        html += edit_question_textarea(_count) + edit_question_textarea_size(_count)
         safe_join(["<tr>".html_safe, "</tr>".html_safe], html.html_safe)
     end
     

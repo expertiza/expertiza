@@ -26,7 +26,7 @@
               <% if session[:super_user] %>
                   <%= form_for :impersonate, url: '/impersonate/impersonate', html: {id: 'impersonate-form'} do |f| %>
                   <div class="field">
-                      <%= f.date_field :goto_date, :order => [:month,:day, :year],:value => Date.today %>
+                      <%= f.date_field :goto_date, :class => 'form-control input-sm', :order => [:month,:day, :year],:value => ((User.goto_date.nil?)? Date.today : User.goto_date) %>
                     </div>
                       <div class="input-group">
                         <%= f.text_field :name, {id: 'inputImpersonateBox', class: 'form-control', placeholder: "impersonate..."} %>
@@ -40,8 +40,8 @@
                   <%= form_for :user, url: '/impersonate/impersonate' do |f| %>
                       <TABLE>
                         <TR>
-                          <TD><%= f.text_field :name, {:size => 10, :autocomplete => "off",placeholder: "User ID"} %></TD>
-                          <TD><%= f.submit 'Student View' %></TD>
+                          <TD><%= f.text_field :name, {:size => 10,:class => 'form-control input-sm', :autocomplete => "off",placeholder: "User ID"} %></TD>
+                          <TD><%= f.submit 'Student View', :class=>"btn btn-primary input-sm"%></TD>
                         </TR>
                       </TABLE>
                   <% end %>

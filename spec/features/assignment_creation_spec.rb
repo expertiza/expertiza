@@ -159,7 +159,7 @@ describe "assignment function" do
       )
     end
 
-    function_to_create_with_teams
+    function_to_create_teams
     function_to_create_with_quiz
     
     it "is able to create with staggered deadline" do

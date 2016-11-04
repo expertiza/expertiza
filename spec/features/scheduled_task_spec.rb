@@ -7,7 +7,7 @@ describe 'Review deadline reminder email' do
   it 'is able to send reminder email for review deadline to reviewers ' do
     id = 2
     @name = "user"
-    due_at = DateTime.now.getlocal.advance(minutes: +2)
+    due_at = DateTime.now.advance(minutes: +2)
 
     due_at1 = Time.parse(due_at.to_s(:db))
     curr_time = DateTime.now.to_s(:db)

@@ -90,7 +90,7 @@ class Scale < ScoredQuestion
   end
 
   def complete(count, answer = nil, questionnaire_min, questionnaire_max)
-    html = complete_list_div(count) + complete_list_input(count,answer) + complete_input(count)
+    html = complete_list_div(count) + complete_list_input(count, answer) + complete_input(count)
     html += complete_table(questionnaire_min, questionnaire_max)
     html += complete_min_label(answer, questionnaire_min, questionnaire_max)
     html += complete_jquery(count) + complete_max_label
@@ -102,7 +102,7 @@ class Scale < ScoredQuestion
     html
   end
 
-  def complete_list_input(count,answer)
+  def complete_list_input(count, answer=nil)
     html = '<input id="responses_' + count.to_s
     html += '_score" name="responses[' + count.to_s + '][score]" type="hidden"'
     html += 'value="' + answer.answer.to_s + '"' unless answer.nil?
@@ -133,7 +133,7 @@ class Scale < ScoredQuestion
              '<td width="10%"></td>'
            end
     (questionnaire_min..questionnaire_max).each do |j|
-      html = '<td width="10%"><input type="radio" id="' + j.to_s + '" value="' + j.to_s + '" name="Radio_' + self.id.to_s + '"'
+      html += '<td width="10%"><input type="radio" id="' + j.to_s + '" value="' + j.to_s + '" name="Radio_' + self.id.to_s + '"'
       html += 'checked="checked"' if (!answer.nil? and answer.answer == j) or (answer.nil? and questionnaire_min == j)
       html += '></td>'
     end

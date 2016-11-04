@@ -11,7 +11,7 @@ end
 
 def combline(count, answer = nil)
     html = complete_helper_response_scores(count) + complete_helper_response_comments(count)
-    html += complete_helper_text(answer) + complete_helper_response_comments
+    html += complete_helper_text(answer)
     html += complete_helper_final_judge
     html
 end

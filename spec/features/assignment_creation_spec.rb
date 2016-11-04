@@ -65,7 +65,7 @@ def function_to_create_with_quiz
    end
 end
 
-def update_scored_question(tr_variable,select_variable)
+def update_scored_question(tr_variable, select_variable)
   it "should update scored question dropdown" do
     find_link('Rubrics').click
     within(tr_variable) do

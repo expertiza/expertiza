@@ -139,6 +139,7 @@ class AssignmentTeam < Team
   # REFACTOR END:: functionality of import, export handle_duplicate shifted to team.rb
 
   # Copy the current Assignment team to the CourseTeam
+  #10/25/2016 - Updated create_team_and_node method signature
   def copy(course_id)
     new_team = CourseTeam.create_team_and_node(course_id)
     new_team.name = name

@@ -2,7 +2,8 @@ require 'rails_helper'
 require 'pry'
 
 describe TeamsController do
-  describe 'Airbrake-1804043391875943089', type: :controller do
+  # Airbrake-1804043391875943089
+  describe '#new', type: :controller do
 
     it 'will set the default team parent as Assignment' do
       allow(Assignment).to receive(:find).with(1).and_return(instance_double('Assignment'))
@@ -19,7 +20,8 @@ describe TeamsController do
 end
 
 describe ImportFileController do
-  describe 'Airbrake-1774360945974838307', type: :controller do
+  # Airbrake-1774360945974838307
+  describe '#importFile', type: :controller do
     it 'will catch the error info if the tempfile cannot be obtained from params[:file]' do
       controller.params = {
         id: 1,
@@ -38,7 +40,8 @@ describe ImportFileController do
 end
 
 # describe SignUpSheetController do 
-#   describe 'Airbrake-1781398948366778395', type: :controller do
+#   # Airbrake-1781398948366778395
+#   describe '#list', type: :controller do
 #     before(:each) do
 #       allow_any_instance_of(ApplicationController).to receive(:[]).with(:user).and_return(build(:student, id: 1))
 #     end
@@ -54,7 +57,8 @@ end
 # end
 
 describe MenuItemsController do
-  describe 'Airbrake-1766139777878852159', type: :controller do
+  # Airbrake-1766139777878852159
+  describe '#link', type: :controller do
     it "can handle the situation (redirect_to '/') when the session[:menu] is nil"do
       controller.params[:name] = "manage/courses"
       controller.session[:menu] = nil

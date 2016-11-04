@@ -62,3 +62,27 @@ describe 'Aribrake-1805332790232222219' do
 		expect(rc.send(:set_dropdown_or_scale)).to eq('scale')
 	end
 end
+
+describe 'Airbrake-1766248124300920137' do
+	before(:each) do
+		allow(Assignment).to receive(:find){}
+		allow(Assignment).to receive(:find).with(1).and_return(build(:assignment))
+		allow(SignedUpTeam).to receive(:find_team_users){}
+		allow(SignedUpTeam).to receive(:find_team_users).with(1, 1).and_return([double("TeamsUser", t_id: 1)])
+		# users_team = [double("TeamsUser", t_id: 1)]
+		# allow(TeamsUser).to receive(:find_by_sql).and_return([double("TeamsUser", t_id: 1)])
+		# allow(users_team[0]).to receive(:t_id).and_return(1)
+	end
+
+	it 'can reassign topic successfully, if the signup record is not nil' do
+		allow(SignedUpTeam).to receive_message_chain(:where, :first){}
+		allow(SignedUpTeam).to receive_message_chain(:where, :first).with(1, 1).and_return([build(:signed_up_team)])
+		expect(SignUpTopic.reassign_topic(1, 1, 1)).to eq(nil)
+	end
+
+	it 'can reassign topic successfully, if the signup record is nil' do
+		allow(SignedUpTeam).to receive_message_chain(:where, :first){}
+		allow(SignedUpTeam).to receive_message_chain(:where, :first).with(1, 1).and_return(nil)
+		expect(SignUpTopic.reassign_topic(1, 1, 1)).to eq(nil)
+	end
+end

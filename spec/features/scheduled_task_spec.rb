@@ -9,7 +9,7 @@ describe 'Review deadline reminder email' do
     @name = "user"
     due_at = DateTime.now.advance(minutes: +2)
 
-    due_at1 = Time.now.parse(due_at.to_s(:db))
+    due_at1 = Time.parse(due_at.to_s(:db))
     curr_time = DateTime.now.to_s(:db)
     curr_time = Time.parse(curr_time)
     time_in_min = ((due_at1 - curr_time).to_i / 60) * 60

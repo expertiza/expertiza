@@ -2,12 +2,14 @@
 require 'rails_helper'
 include AssignmentHelper
 
-describe LotteryController do
-  describe "#run_intelligent_bid" do
-    it "the assignment is intelligent" do
-      assignment = double("Assignment")
-      allow(assignment).to receive(:is_intelligent) { 1 }
-      expect(assignment.is_intelligent).to eq(1)
-    end
+describe LotteryController do  
+  describe "#run_intelligent_assignmnent" do
+            it "webservice call should be successful" do
+                dat=double("data")
+                rest=double("RestClient")
+                result = RestClient.get 'http://www.google.com',  :content_type => :json, :accept => :json
+                expect(result.code).to eq(200)
+
+            end
   end
 end

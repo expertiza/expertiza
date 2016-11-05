@@ -41,4 +41,17 @@ describe LotteryController do
             end
    end
   
+     describe "#auto_merge_teams" do
+            it "sorts the unassigned teams" do
+              assignment = double("Assignment")
+              team = double("team")
+              unassignedteam =double("team")
+              sortedteam =double("team")
+              allow(team).to receive(:where).with(assignment).and_return(unassignedteam)
+              allow(unassignedteam).to receive(:sort_by).and_return(sortedteam)
+              expect (team.where(assignment)).should eq(unassignedteam)
+              expect unassignedteam.sort_by.should eq(sortedteam)
+            end
+      end
+  
 end

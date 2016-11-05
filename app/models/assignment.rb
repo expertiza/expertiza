@@ -382,7 +382,7 @@ class Assignment < ActiveRecord::Base
   def get_current_stage(topic_id=nil)
     return 'Unknown' if topic_id.nil? and self.staggered_deadline?
     due_date = find_current_stage(topic_id)
-    #(due_date == nil || due_date == 'Finished') ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
+	#Find the stage name if due_at is not past, otherwise return Finished.
     (due_date != nil && due_date.due_at >= Time.now) ? DeadlineType.find(due_date.deadline_type_id).name : 'Finished'
   end
 

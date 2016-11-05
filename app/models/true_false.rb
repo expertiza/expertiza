@@ -25,6 +25,22 @@ class TrueFalse < QuizQuestion
   end
 
   def complete(count, answer = nil)
+    @question = self
+    html = ""
+    html += label_tag("#{question.id}", question.txt) +""
+    quiz_question_choices = QuizQuestionChoice.where(question_id: @question.id)
+    quiz_question_choices.each do |choice|
+      if answer=="view"
+        html += check_box_tag ("#{question.id}[]", "#{choice.txt}", choice.iscorrect)
+        html += label_tag("#{choice.txt}", choice.txt) + ""
+      end
+      if answer=="take"
+        html += check_box_tag ("#{question.id}[]", "#{choice.txt}")
+        html += label_tag("#{choice.txt}", choice.txt) + ""
+      end
+
+      html.html_safe
+    end
   end
 
   def view_completed_question(count, answer)

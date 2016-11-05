@@ -52,6 +52,11 @@ describe Leaderboard do
 
   #This method currently fails because there is no get_participant_entries_in_assignment_list.
   it "get_part_entries_in_assignment should return one entries" do
+    assign_list = []
+    assign_list << Assignment.find(@assignment.id)
+    part_list = []
+    part_list << Participant.where(id: @participant.id)
+    allow(Leaderboard).to receive(:get_participant_entries_in_assignment_list).and_return(part_list).with(assign_list)
     expect(Leaderboard.get_part_entries_in_assignment(@assignment.id)).to have(1).items
 
   end
@@ -59,10 +64,9 @@ describe Leaderboard do
   it "leaderboard_heading should return No Entry with invalid input" do
     expect(Leaderboard.leaderboard_heading("test")).to eq("No Entry")
   end
-  # This method currently fails because there is no method find_by_qtype defined so lt_entry with always be nil.
+
   it "leaderboard_heading should return name" do
-    #puts Questionnaire.all.inspect
-    #Leaderboard.any_instance.stub(:find_by_qtype).and_return("test")
+    allow(Leaderboard).to receive(:find_by_qtype).and_return(@questionnaire).with(@questionnaire.id)
     expect(Leaderboard.leaderboard_heading(@questionnaire.id)).to eq("Test questionaire")
   end
 

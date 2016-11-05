@@ -52,7 +52,7 @@ class MultipleChoiceCheckbox < QuizQuestion
     html+= QuizQuestionChoice.where(question_id: @question.id,iscorrect: 1).first.txt
     html+= ""
     html+= "Your answer is: "
-    html+= answer.first.coments + ""
+    html+= answer.first.comments + ""
     if(answer.first.answer == 1)
       html+= "<img src=/assets/Check-icon.png/>"
     else

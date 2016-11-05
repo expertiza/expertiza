@@ -397,7 +397,7 @@ describe "Questionnaire tests for instructor interface" do
     end
   end
 
-  describe 'Import questions from CSV' do
+  describe 'Import/export questions from CSV' do
 
     it 'should not be an empty file', js: true  do
       login_as("instructor6")
@@ -429,6 +429,15 @@ end
       click_button "Import from CSV"
       expect(page).to have_content('unknown attribute')
     end
+
+
+
+  it 'should not display an error flash message while exporting', js: true  do
+    login_as("instructor6")
+    visit '/questionnaires/1/edit'
+    click_button "Export questions to CSV"
+    expect(page).not_to have_content('error')
+  end
 
   end
 

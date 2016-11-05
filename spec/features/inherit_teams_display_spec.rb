@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe 'In team creation' do
 
-  it 'should display inherit teams while creating an assignment team' do
+  it 'should display inherit teams option while creating an assignment team' do
     create(:assignment)
     create(:assignment_node)
     create(:assignment_team)
@@ -13,7 +13,7 @@ describe 'In team creation' do
     expect(page).to have_content('Inherit Teams From Course')
   end
   
-   it 'should not display inherit teams while creating a course team' do
+   it 'should not display inherit teams option while creating a course team' do
     create(:course)
     create(:course_node)
     create(:course_team)
@@ -24,7 +24,7 @@ describe 'In team creation' do
     expect(page).to have_no_content('Inherit Teams From Course')
   end
 
-   it 'should not display inherit teams while creating team for an assignment without a course' do
+   it 'should not display inherit teams option while creating team for an assignment without a course' do
     create(:assignment_without_course)
     create(:assignment_without_course_node)
     create(:assignment_without_course_team)

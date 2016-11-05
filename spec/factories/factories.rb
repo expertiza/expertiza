@@ -336,7 +336,7 @@ FactoryGirl.define do
     round nil
     is_submitted false
   end
-
+# factory for an assignment without course
     factory :assignment_without_course, class: Assignment do
     sequence(:name, 2) {|n| n = 2; "final#{n}" }
     directory_path "final_test"
@@ -372,7 +372,7 @@ FactoryGirl.define do
     can_review_same_topic true
     can_choose_topic_to_review true
   end
-
+# factory for an assignment without course team
   factory :assignment_without_course_team, class: AssignmentTeam do
     sequence(:name) {|n| "team#{n}" }
     assignment { Assignment.first || association(:assignment_without_course) }
@@ -383,7 +383,7 @@ FactoryGirl.define do
 - https://www.expertiza.ncsu.edu"
     directory_num 0
   end
-
+# factory for an assignment without course node
   factory :assignment_without_course_node, class: AssignmentNode do
     assignment { Assignment.first || association(:assignment_without_course) }
     node_object_id 1

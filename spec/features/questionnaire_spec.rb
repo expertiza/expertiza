@@ -9,8 +9,7 @@ describe "Questionnaire tests for instructor interface" do
     create(:assignment_node)
     create(:deadline_type, name: "submission")
     create(:deadline_type, name: "review")
-    @create = create(:deadline_type, name: "metareview")
-    @create
+    create(:deadline_type, name: "metareview")
     create(:deadline_type, name: "drop_topic")
     create(:deadline_type, name: "signup")
     create(:deadline_type, name: "team_formation")

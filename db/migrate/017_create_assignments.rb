@@ -23,6 +23,7 @@ class CreateAssignments < ActiveRecord::Migration
     t.column "require_signup", :boolean
     t.column "num_reviewers", :integer, limit: 8, :default => 0, :null => false
     t.column "spec_location", :text
+
   end
 
   add_index "assignments", ["review_questionnaire_id"], :name => "fk_assignments_review_questionnaires"

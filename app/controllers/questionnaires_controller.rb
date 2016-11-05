@@ -17,11 +17,12 @@ class QuestionnairesController < ApplicationController
         if(current_user.role_id==6)
           current_ta = current_user;
         end
-        b= (current_user.id == owner_inst_id)
+        owner_flag= (current_user.id == owner_inst_id)
+
         if(!current_ta.nil?)
-          b = b or (current_ta.parent_id == owner_inst_id)
+          owner_flag = (owner_flag or (current_ta.parent_id == owner_inst_id))
         end
-        return b
+        return owner_flag
 
       else
         #Allow all others
@@ -32,10 +33,7 @@ class QuestionnairesController < ApplicationController
          'Student'].include? current_role_name
     end
 
-    # q1 = Questionnaire.find_by(instructor_id: current_user.id )
-    #q2 = Questionnaire.find_by(instructor_id: current_user.parent_id)
   end
-
 
   # Create a clone of the given questionnaire, copying all associated
   # questions. The name and creator are updated.

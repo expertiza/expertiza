@@ -48,8 +48,10 @@ feature 'Instructor edits advice' do
     #expect(AdviceController.save_advice).to be(true)
   end
 
-scenario 'saves content' do
-    visit '/advice/edit_advice/1'
+scenario 'saves content', js: true do
+  visit '/questionnaires/1/edit'
+  click_on 'Add'
+  visit '/advice/edit_advice/1'
     fill_in "horizontal_1_advice" , with: "Example"
     click_on 'Save and redisplay advice'
     expect(QuestionAdvice.where(id: 1, advice:"Example")).not_to be_empty

@@ -84,7 +84,7 @@ class TreeDisplayController < ApplicationController
   # called when the display is requested
   # ajbudlon, July 3rd 2008
   def list
-    redirect_to controller: :student_task, action: :list if current_user.student? != nil
+    redirect_to controller: :student_task, action: :list if current_user.student? 
     # if params[:commit] == 'Search'
     #   search_node_root = {'Q' => 1, 'C' => 2, 'A' => 3}
 

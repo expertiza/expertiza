@@ -2,12 +2,12 @@ require 'rails_helper'
 
 describe TreeDisplayController do
   describe "#list" do
-=begin    it "should not redirect to student_task controller if current user is an instructor" do
+    it "should not redirect to student_task controller if current user is an instructor" do
       allow(session[:user]).to receive("student?").and_return(false)
       post "list"
       expect(response).not_to redirect_to(list_student_task_index_path)
     end
-=end
+    
     it "should redirect to student_task controller if current user is a student" do
       allow(session[:user]).to receive("student?").and_return(true)
       post "list"

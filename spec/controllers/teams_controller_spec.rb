@@ -7,8 +7,6 @@ describe TeamsController do
       it "increases count by 1" do	
         expect{create :assignment_team, assignment: @assignment}.to change(Team,:count).by(1)
       end
-
-      
     end
     
     context "with a course team" do

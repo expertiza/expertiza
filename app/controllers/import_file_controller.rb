@@ -29,26 +29,26 @@ class ImportFileController < ApplicationController
 
   def importFile(session, params)
     delimiter = get_delimiter(params)
-    file = params['file'].tempfile
+    file = params['file'].try(:tempfile)
 
     errors = []
     first_row_read = false
     row_header = {}
-    file.each_line do |line|
-      line.chomp!
-      if first_row_read == false
-        row_header = parse_line(line.downcase, delimiter)
-        first_row_read = true
-        if row_header.include?("email")
-          # skip if first row contains header. In case of user information, it will contain name of user (mandatory
-          next
-        else
-          row_header = {}
+    begin
+      file.each_line do |line|
+        line.chomp!
+        if first_row_read == false
+          row_header = parse_line(line.downcase, delimiter)
+          first_row_read = true
+          if row_header.include?("email")
+            # skip if first row contains header. In case of user information, it will contain name of user (mandatory
+            next
+          else
+            row_header = {}
+          end
         end
-      end
-      next if line.empty?
-      row = parse_line(line, delimiter)
-      begin
+        next if line.empty?
+        row = parse_line(line, delimiter)
         if params[:model] == 'AssignmentTeam' or params[:model] == 'CourseTeam'
           Object.const_get(params[:model]).import(row, params[:id], params[:options])
         elsif params[:model] == 'SignUpTopic'
@@ -61,9 +61,9 @@ class ImportFileController < ApplicationController
             Object.const_get(params[:model]).import(row, nil, session, params[:id])
           end
         end
-      rescue
-        errors << $ERROR_INFO
       end
+    rescue
+        errors << $ERROR_INFO
     end
     errors
   end

@@ -1,16 +1,25 @@
 require 'rails_helper'
 
 describe TreeDisplayController do
+  # Airbrake-1517247902792549741
   describe "#list" do
-    it "should not redirect to student_task controller if current user is an instructor" do
-      allow(session[:user]).to receive("student?").and_return(false)
-      post "list"
-      expect(response).not_to redirect_to(list_student_task_index_path)
+    it "should not redirect to tree_display#list if current user is an instructor" do
+      user = build(:instructor)
+      stub_current_user(user, user.role.name, user.role)
+      get "list"
+      expect(response).not_to redirect_to('/tree_display/list')
     end
-    it "should redirect to student_task controller if current user is a student" do
-      allow(session[:user]).to receive("student?").and_return(true)
-      post "list"
-      expect(response).to redirect_to(list_student_task_index_path)
+
+    it "should redirect to student_task#list if current user is a student" do
+      user = build(:student)
+      stub_current_user(user, user.role.name, user.role)
+      get "list"
+      expect(response).to redirect_to('/student_task/list')
+    end
+
+    it "should redirect to login page if current user is nil" do
+      get "list"
+      expect(response).to redirect_to('/auth/failure')
     end
   end
 

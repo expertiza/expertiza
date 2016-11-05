@@ -14,8 +14,8 @@ describe Leaderboard do
     @questionnaire=create(:questionnaire)
     @assignment_questionnaire1 =create(:assignment_questionnaire, user_id: @student1.id, assignment: @assignment)
     @assignment_questionnaire2 =create(:assignment_questionnaire, user_id: @student2.id, assignment: @assignment2)
-    @assignment_team = create(:assignment_team, name: "TestTeam", parent_id: @assignment2.id)
-    @team_user = create(:team_user, team_id: @assignment_team.id, user_id: @student2.id)
+    @assignment_team = create(:assignment_team, name: "TestTeam", parent_id: @assignment.id)
+    @team_user = create(:team_user, team_id: @assignment_team.id, user_id: @student1.id)
   end
   #let(:student){create(:student)}
   #let(:instructor){create(:instructor)}
@@ -55,9 +55,25 @@ describe Leaderboard do
     assign_list = []
     assign_list << Assignment.find(@assignment.id)
     part_list = []
-    part_list << Participant.where(id: @participant.id)
+    part_list << AssignmentParticipant.where(id: @participant.id)
     allow(Leaderboard).to receive(:get_participant_entries_in_assignment_list).and_return(part_list).with(assign_list)
     expect(Leaderboard.get_part_entries_in_assignment(@assignment.id)).to have(1).items
+
+  end
+
+  it "get_part_entries_in_assignment should return two entries" do
+    assign_list = []
+    assign_list << Assignment.find(@assignment.id)
+    part_list = []
+    part_list << AssignmentParticipant.where(id: @participant.id)
+    team_list = []
+    team_list << AssignmentTeam.where(id: 1)
+    allow(AssignmentParticipant).to receive(:id).and_return(1)
+    allow(AssignmentParticipant).to receive(:parent_id).and_return(1)
+    allow(AssignmentTeam).to receive(:id).and_return(1)
+    allow(AssignmentTeam).to receive(:parent_id).and_return(1)
+    #puts team_list.inspect
+    expect(Leaderboard.get_assignment_mapping(assign_list, part_list, team_list)).to have(2).items
 
   end
 

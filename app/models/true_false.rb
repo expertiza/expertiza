@@ -44,6 +44,19 @@ class TrueFalse < QuizQuestion
   end
 
   def view_completed_question(count, answer)
+    @question = self
+    html=""
+    html+= "Correct Answer is: "
+    html+= QuizQuestionChoice.where(question_id: @question.id,iscorrect: 1).first.txt
+    html+= ""
+    html+= "Your answer is: "
+    html+= answer.first.coments + ""
+    if(answer.first.answer == 1)
+      html+= "<img src=/assets/Check-icon.png/>"
+    else
+      html+= "<img src=/assets/delete_icon.png/>"
+    end
+    html+= ""
   end
 
   def view_question_text

@@ -38,6 +38,8 @@ class ParticipantsController < ApplicationController
     DelayedMailer.deliver_mail("recipient.address@example.com")
   end
 
+#OSS E1663 team from Fall 2016 batch modified on 1st Nov, 2016
+#Added a respond_to block to render to JS file instead of HTML file.
   def add
     @curr_object = Object.const_get(params[:model]).find(params[:id]) if Participant::PARTICIPANT_TYPES.include? params[:model]
     begin

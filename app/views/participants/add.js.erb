@@ -1,2 +1,6 @@
+/*
+OSS E1663 team from Fall 2016 batch added on 1st Nov, 2016
+Created new file to render the Row HTML of participants and sending some locals to the same.
+*/
 <% user = User.find(@participant.user_id) %>
 $('#user-list').append("<%= escape_javascript (render :partial => '/shared_scripts/user_list',:locals => {:controller => 'participants', :participant => @participant, :user => user}) %>");

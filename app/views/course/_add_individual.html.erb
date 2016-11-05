@@ -1,3 +1,7 @@
+<!--
+OSS E1663 team from Fall 2016 batch modified on 1st Nov, 2016
+:remote_true is added to the form tag to stop rails from refreshing the whole list and therefore, just add the new name to the list without refreshing the page.
+ -->
 <%= form_tag("/course/add_ta", :method => 'post', :remote => true) do %>
   Enter a user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
 <%= hidden_field_tag obj_type, obj_id %>

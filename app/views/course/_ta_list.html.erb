@@ -1,3 +1,7 @@
+<!--
+OSS E1663 team from Fall 2016 batch modified on 1st Nov, 2016
+Modified this file to add the new TA added using AJAX without refreshing the whole page.
+ -->
 <tr class="listingRow">
         <td><%= User.find(ta.ta_id).name %></td>
         <td><%= link_to "Edit", {:action => 'show', :controller =>'users', :id => ta.ta_id} %></td>

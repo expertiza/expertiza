@@ -31,4 +31,14 @@ describe LotteryController do
                redirect_to(controller: 'tree_display')
              end
   end
+  
+   describe "#create_new_teams_for_bidding_response" do
+            it "should create team and return teamid" do
+              assignment = double("Assignment")
+              team = double("team")
+              allow(team).to receive(:create_new_teams_for_bidding_response).with(assignment).and_return(:teamid)
+              expect (team.create_new_teams_for_bidding_response(assignment)).should eq(:teamid)
+            end
+   end
+  
 end

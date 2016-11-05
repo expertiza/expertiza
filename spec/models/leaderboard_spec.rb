@@ -48,7 +48,6 @@ describe Leaderboard do
   # This is called in get_participants_score method
   it "get_part_entries_in_courses should return two entries" do
     expect(Leaderboard.get_part_entries_in_courses(1,@student1.id)).to have(2).items
-
   end
 
   #This method currently fails because there is no get_participant_entries_in_assignment_list.
@@ -58,11 +57,13 @@ describe Leaderboard do
   end
 
   it "leaderboard_heading should return No Entry with invalid input" do
-    expect(Leaderboard.leaderboard_heading("Invalid")).to eq("No Entry")
+    expect(Leaderboard.leaderboard_heading("test")).to eq("No Entry")
   end
   # This method currently fails because there is no method find_by_qtype defined so lt_entry with always be nil.
   it "leaderboard_heading should return name" do
-    expect(Leaderboard.leaderboard_heading(@questionnaire.id)).to eq("test")
+    #puts Questionnaire.all.inspect
+    #Leaderboard.any_instance.stub(:find_by_qtype).and_return("test")
+    expect(Leaderboard.leaderboard_heading(@questionnaire.id)).to eq("Test questionaire")
   end
 
   it "Leaderboard responds to get_independant_assignments" do

@@ -81,7 +81,7 @@ module ReviewAssignment
   def candidate_assignment_teams_to_review(reviewer)
     # the contributors are AssignmentTeam objects
     contributor_set = Array.new(contributors)
-
+    
     # Reject contributors that have no submissions
     contributor_set.reject! {|contributor| !contributor.has_submissions? }
 
@@ -113,10 +113,12 @@ module ReviewAssignment
   private
 
   def reject_by_least_reviewed(contributor_set)
-    contributor = contributor_set.min_by {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count }
+  #The function populates the topics according to the least no of reviews obtianed
+  #The functionality we are adding is that if the reviewer already completed minimum no of reviews then he should be able to review the next least reviewed submission.
+    contributor = contributor_set.min_by{|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count }
     min_reviews = contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count rescue 0
     contributor_set.reject! {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count > min_reviews + review_topic_threshold }
-
+    
     contributor_set
   end
 
@@ -189,9 +191,10 @@ module ReviewAssignment
     raise "You have already reviewed all submissions for this #{work}." if contributor_set.empty?
 
     # Reduce to the contributors with the least number of reviews ("responses") received
+    # Reviewers should be able to review even if he completed all the min reviewed submissions.
     min_contributor = contributor_set.min_by {|a| a.responses.count }
     min_reviews = min_contributor.responses.count
-    contributor_set.reject! {|contributor| contributor.responses.count > min_reviews }
+    contributor_set.reject! {|contributor| contributor.responses.count > min_reviews + review_topic_threshold}
 
     # Pick the contributor whose most recent reviewer was assigned longest ago
     contributor_set.sort! {|a, b| a.review_mappings.last.id <=> b.review_mappings.last.id } if min_reviews > 0

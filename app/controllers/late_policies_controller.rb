@@ -90,7 +90,7 @@ class LatePoliciesController < ApplicationController
     is_number
   end
 
-  private def values_update(params)
+  private def update_penalty(params)
     @penalty_policy.update(late_policy_params)
     #@penalty_policy.save!
     @penaltyObjs = CalculatedPenalty.all
@@ -145,7 +145,7 @@ class LatePoliciesController < ApplicationController
       issue_name = validate_duplicate_policy(params)
     end
     if issue_name == true && issue_number == true
-      values_update(params)
+      update_penalty(params)
       flash[:notice] = "The late policy was successfully updated."
       redirect_to action: 'index'
     elsif issue_number == false

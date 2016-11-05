@@ -65,6 +65,7 @@ class StudentTask
     in_work_stage? && !started?
   end
 
+  #Find tasks that are in Finished stage but have not been started.
   def late_tasks?
     current_stage == 'Finished' && !started?
   end

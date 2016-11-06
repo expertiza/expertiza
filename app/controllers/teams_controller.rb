@@ -28,7 +28,7 @@ class TeamsController < ApplicationController
   end
 
   def new
-    @parent = Object.const_get(session[:team_type]).find(params[:id])
+    @parent = Object.const_get(session[:team_type] ||= 'Assignment').find(params[:id])
   end
 
   # called when a instructor tries to create an empty namually.

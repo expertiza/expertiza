@@ -18,7 +18,7 @@ class InvitationController < ApplicationController
     if user
       # check if the user is a participant of the assignment
       participant = AssignmentParticipant.where('user_id =? and parent_id =?', user.id, student.parent_id).first
-      if participant && !team.full
+      if participant && !team.full?
         team_member = TeamsUser.where(['team_id =? and user_id =?', team.id, user.id])
         # check if invited user is already in the team
         if team_member.empty? && Invitation.is_invited?(student.user_id, user.id, student.parent_id)
@@ -83,7 +83,7 @@ class InvitationController < ApplicationController
     inviter_participant = AssignmentParticipant.find_by_user_id_and_assignment_id(inviter_user_id, assignment_id)
 
     
-    if ready_to_join?
+    if ready_to_join?(inviter_participant)
 	    @inv.reply_status = 'A'
 	    @inv.save
 
@@ -115,11 +115,13 @@ class InvitationController < ApplicationController
 	  Invitation.find(params[:inv_id]).destroy
 	  redirect_to view_student_teams_path student_id: params[:student_id]
   end
+  
   private 
-  def ready_to_join?
+  def ready_to_join?(inviter_participant)
 	  ready_to_join = false
 	  # check if the inviter's team is still existing, and have available slot to add the invitee
-	  inviter_assignment_team = AssignmentTeam.team(inviter_participant)
+	  
+    inviter_assignment_team = AssignmentTeam.team(inviter_participant)
 	  if inviter_assignment_team.nil?
 		  flash[:error] = "The team that invited you does not exist anymore."
 	  elsif inviter_assignment_team.full?
@@ -128,7 +130,5 @@ class InvitationController < ApplicationController
 		  ready_to_join = true
 	  end
 	  return ready_to_join
-
-
   end
 end

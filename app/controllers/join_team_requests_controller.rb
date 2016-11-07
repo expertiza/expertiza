@@ -2,27 +2,26 @@ class JoinTeamRequestsController < ApplicationController
 	# decide if the controller is accessisable to the user
 	before_action :set_event, only => [ :show, :edit, :update, :destroy, :decline]
 
-  def action_allowed?
-    current_role_name.eql?("Student")
-  end
+	def action_allowed?
+	  current_role_name.eql?("Student")
+	end
 
-  def index
-    @join_team_requests = JoinTeamRequest.all
-    render
+	def index
+	  @join_team_requests = JoinTeamRequest.all
+	  render
+	end
 
-  end
+	def show
+	  render
+	end
 
-  def show
-    render
-  end
+	def new
+	  @join_team_request = JoinTeamRequest.new
+	  render
+	end
 
-  def new
-    @join_team_request = JoinTeamRequest.new
-    render
-  end
-
-  def edit
-  end
+	def edit
+	end
 
 	# create a new join team request entry for join_team_request table and add it to the table
 	def create

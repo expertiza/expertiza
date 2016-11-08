@@ -284,7 +284,7 @@ describe 'calibration' do
     click_on("Review strategy")
     # set review limit from 0 to 1
     fill_in 'assignment_form[assignment][review_topic_threshold]', with: '1'
-   
+
     click_on("Due dates")
     within('#review_round_1') do
       select 'Yes', from: "assignment_form[due_date][][submission_allowed_id]"

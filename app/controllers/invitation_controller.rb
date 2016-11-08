@@ -97,6 +97,14 @@ class InvitationController < ApplicationController
       # Accept the invite and return boolean on whether the add was successful
       add_successful = Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, student.parent_id)
 
+
+      if add_successful
+        #Remove pending invites
+        Invitation.remove_pending_invitations(student.user_id,student.parent_id)
+        #Remove pending join team requests
+        participant = Participant.where(user_id: session[:user][:id], parent_id: student.parent_id).first
+        JoinTeamRequest.remove_pending_join_team_requests(participant.id)
+      end
       unless add_successful
         flash[:error] = "The system failed to add you to the team that invited you."
       end

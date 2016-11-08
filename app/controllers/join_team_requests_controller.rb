@@ -51,13 +51,18 @@ class JoinTeamRequestsController < ApplicationController
 
         participant = Participant.where(user_id: session[:user][:id], parent_id: params[:assignment_id]).first
         @join_team_request.participant_id = participant.id
-        respond_to do |format|
-          if @join_team_request.save
-            format.html { redirect_to(@join_team_request, notice: 'JoinTeamRequest was successfully created.') }
-            format.xml  { render xml: @join_team_request, status: :created, location: @join_team_request }
-          else
-            format.html { render action: "new" }
-            format.xml  { render xml: @join_team_request.errors, status: :unprocessable_entity }
+        #need to check if this user has already sent a request
+        if !@join_team_request.firstRequest?
+          flash[:note] = "You have already responded to this advertisement."
+        else
+          respond_to do |format|
+            if @join_team_request.save
+              format.html { redirect_to(@join_team_request, notice: 'JoinTeamRequest was successfully created.') }
+              format.xml  { render xml: @join_team_request, status: :created, location: @join_team_request }
+            else
+              format.html { render action: "new" }
+              format.xml  { render xml: @join_team_request.errors, status: :unprocessable_entity }
+            end
           end
         end
       end

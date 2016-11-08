@@ -128,7 +128,9 @@ class StudentTeamsController < ApplicationController
     if TeamsUser.where(team_id: params[:team_id]).empty?
       old_team = AssignmentTeam.find params[:team_id]
       if old_team
-        old_team.destroy
+        if !ResponseMap.isReviewed?(params[:team_id],old_team.parent_id)
+          old_team.destroy
+        end
         # if assignment has signup sheet then the topic selected by the team has to go back to the pool
         # or to the first team in the waitlist
         sign_ups = SignedUpTeam.where team_id: params[:team_id]

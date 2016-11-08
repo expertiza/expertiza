@@ -88,4 +88,8 @@ class ResponseMap < ActiveRecord::Base
     end
     failedCount
   end
+
+  def self.isReviewed?(team_id,assignment_id)
+    review = ResponseMap.where(reviewee_id: team_id,reviewed_object_id: assignment_id).first
+  end
 end

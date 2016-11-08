@@ -249,6 +249,7 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment_id
   end
 
+  # I suspect this methos is not used anywhere --Yang
   def list
     all_assignments = Assignment.order('name').where(["instructor_id = ?", session[:user].id])
 

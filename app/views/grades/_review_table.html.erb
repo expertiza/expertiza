@@ -23,7 +23,7 @@
 
 	<tr class="head">
 	<td align="right"><b>Average score</b></td>
-
+        <!-- retrieving data for each review -->
 		<% for review in reviews %>
 		   <td align="center">
              <% score = Answer.get_total_score(:response => [review], :questions => @questions[symbol], :q_types => Array.new) %>

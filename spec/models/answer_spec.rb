@@ -23,8 +23,8 @@ describe Answer do
     end
 
     it "returns total score when one answer is nil for scored question and its weight gets removed from sum_of_weights" do
-      ScoreView.stub(:find_by_sql).and_return([double("scoreview",weighted_score: 20,sum_of_weights: 5,q1_max_question_score: 4)])
-      Answer.stub(:where).and_return([double("row1",question_id: 1,answer: nil)])
+      allow(ScoreView).to receive(:find_by_sql).and_return([double("scoreview",weighted_score: 20,sum_of_weights: 5,q1_max_question_score: 4)])
+      allow(Answer).to receive(:where).and_return([double("row1",question_id: 1,answer: nil)])
       expect(Answer.get_total_score(response: [response_record], questions: [question1])).to be_within(0.01).of(125.0)
     end			
 

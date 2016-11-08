@@ -151,6 +151,7 @@ th.sorter-true.tablesorter-headerUnSorted{
               <th>#</th>
               <th>Question</th>
               </thead>
+              <!-- initialize count to 0 -->
               <% count = 0 %>
               <% vm.list_of_rows.each do |row| %>
                   <% if row.score_row.count > 0  %>
@@ -199,7 +200,7 @@ th.sorter-true.tablesorter-headerUnSorted{
                       <% i += 1 %>
                   <% end %>
               <% end %>
-
+              <!-- sort by average -->
               <th class="sorter-true" align="right" >
                 Avg<span></span>
               </th>

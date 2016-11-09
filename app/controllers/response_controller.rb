@@ -306,9 +306,7 @@ class ResponseController < ApplicationController
   end
 
   def set_dropdown_or_scale
-    use_dropdown = AssignmentQuestionnaire.where(assignment_id: @assignment.try(:id), 
-                                                 questionnaire_id: @questionnaire.try(:id))
-                                          .first.try(:dropdown)
+    use_dropdown = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: @questionnaire.id).first.dropdown
     @dropdown_or_scale = use_dropdown == true ? 'dropdown' : 'scale'
   end
 

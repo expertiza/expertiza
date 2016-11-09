@@ -1,13 +1,15 @@
 source 'http://rubygems.org'
 
 gem 'rails', '~> 4.2.6'
-
+#java_home = '/usr/lib/jvm/java-7-openjdk-amd64'
+#ENV['JAVA_HOME'] = java_home if Dir.exist?(java_home)
 ## Gems in Alphabetical Order
 
 gem 'activerecord-session_store'
 gem 'airbrake'
 gem 'awesome_nested_set'
 gem 'bind-it'
+gem 'bootstrap-sass', '~> 3.3', '>= 3.3.6'
 gem 'capistrano'
 gem "capistrano-db-tasks", require: false
 gem 'capistrano-rails'
@@ -58,6 +60,7 @@ gem 'will_paginate'
 gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
 gem 'jquery-tablesorter'
+#gem 'rails_12factor', group: :production
 
 group :development do
   gem 'daemons'
@@ -89,3 +92,4 @@ group :development, :test do
   gem 'capybara'
   gem 'simplecov', require: false
 end
+#ruby "2.3.0"

@@ -319,7 +319,7 @@ class QuestionnairesController < ApplicationController
   def update_quiz
     @questionnaire = Questionnaire.find(params[:id])
     redirect_to controller: 'submitted_content', action: 'view', id: params[:pid] if @questionnaire.nil?
-    if params['save'] && params[:question].try(:keys)
+    if params['save']
       @questionnaire.update_attributes(questionnaire_params)
 
       for qid in params[:question].keys

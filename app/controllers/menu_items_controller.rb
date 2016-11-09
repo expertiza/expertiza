@@ -148,7 +148,7 @@ end
 
   def link
     str = params[:name]
-    node = session[:menu].try(:select, str)
+    node = session[:menu].select(str)
     if node
       redirect_to node.url
     else

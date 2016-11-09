@@ -36,7 +36,8 @@ describe SignUpSheetController do
     it "is able to update a topic for assignment that already has max choosers set" do
       sign_up_topic = SignUpTopic.new
       sign_up_topic.max_choosers = 2
-      allow(SignUpTopic).to receive_message_chain(:where, :first).with(any_args) { sign_up_topic }
+      allow(SignUpTopic).to receive(:where) { sign_up_topic }
+      allow(sign_up_topic).to receive(:first) { sign_up_topic }
 
       get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
       expect(response).to redirect_to(redirect_to(action: 'add_signup_topics', id: @assignment.id))
@@ -45,9 +46,11 @@ describe SignUpSheetController do
     it "is able to update a topic for assignment that needs the waitlisted users updated" do
       sign_up_topic = SignUpTopic.new
       sign_up_topic.max_choosers = 0
-      allow(SignUpTopic).to receive_message_chain(:where, :first).with(any_args) { sign_up_topic }
+      allow(SignUpTopic).to receive(:where) { sign_up_topic }
+      allow(sign_up_topic).to receive(:first) { sign_up_topic }
 
       allow(SignedUpTeam).to receive(:find_by_topic_id) { SignedUpTeam.new }
+
       get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
       expect(response).to redirect_to(redirect_to(action: 'add_signup_topics', id: @assignment.id))
     end
@@ -55,14 +58,15 @@ describe SignUpSheetController do
     it "is able to update a topic for assignment but warn when max_choosers is too much" do
       sign_up_topic = SignUpTopic.new
       sign_up_topic.max_choosers = 4
-      allow(SignUpTopic).to receive_message_chain(:where, :first).with(any_args) { sign_up_topic }
+      allow(SignUpTopic).to receive(:where) { sign_up_topic }
+      allow(sign_up_topic).to receive(:first) { sign_up_topic }
 
       allow(SignedUpTeam).to receive(:find_by_topic_id) { SignedUpTeam.new }
 
       get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
       expect(response).to redirect_to(redirect_to(action: 'add_signup_topics', id: @assignment.id))
       expect(flash[:error]).to eq('The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.')
-  end
+    end
 
     it "is able to update a topic with a microtask" do
       @assignment.microtask = true

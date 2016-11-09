@@ -613,7 +613,7 @@ class QuestionnairesController < ApplicationController
         file.write(uploaded_io.read)
       end
         file_data = File.read(Rails.root.join('spec/features/import_export_csv_oss/'+uploaded_io.original_filename))
-        a = QuestionnaireHelper.get_questions_from_csv(file_data,params[:id])
+        QuestionnaireHelper.get_questions_from_csv(file_data,params[:id])
         redirect_to edit_questionnaire_path(questionnaire_id.to_sym), notice: "All questions have been successfully imported!"
        rescue
       redirect_to edit_questionnaire_path(questionnaire_id.to_sym), notice: $ERROR_INFO

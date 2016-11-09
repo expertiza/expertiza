@@ -278,7 +278,151 @@ def set_priority
     end
 
     redirect_to action: 'list', assignment_id: params[:assignment_id]
+end
+
+
+  # This function works in conjunction with Add Team
+  def assign_topic # renders a view for a team to be added
+    @topic = SignUpTopic.find(params[:id]) # Identify the topic to which you want to add team
+    @assignment = Assignment.find(params[:assignment_id])
   end
+
+  # This function works in conjunction with Remove Team
+  def remove_topic # renders a view for the team to be removed
+    @topic = SignUpTopic.find(params[:id])
+    @assignment = Assignment.find(params[:assignment_id]) # Identify the assignment
+  end
+
+  def remove_team # method for removing the team assigned to the topic
+    @topic = SignUpTopic.find(params[:id]) #Find all the details about the topic
+    @assignment = Assignment.find(params[:assignment_id]) # Find all the details about the assignment
+    @user = User.find_by name: params[:user][:name] # Find user
+
+    if @user.blank? # Check if the user exists
+      flash[:error] = "User does not exist"
+      redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
+    else
+      @team = TeamsUser.find_by_sql("select T1.team_id from teams_users T1, teams T2 where T1.user_id = "+ @user.id.to_s+" AND T1.team_id = T2.id AND T2.parent_id = "+ @assignment.id.to_s) # find a team associated with this user having particular assignment and topic
+      @isTopicTaken = SignedUpTeam.find_by_sql("select * from signed_up_teams where topic_id = "+ @topic.id.to_s) # List of all teams having the same topic
+
+      if(@isTopicTaken.any?)
+        if(@team.any?)
+          @userTeam = SignedUpTeam.find_by_sql("select * from signed_up_teams where team_id = "+ @team[0].team_id.to_s) # Previously assigned topic
+          if(@userTeam.any? and @userTeam[0].topic_id == @topic.id)
+            @userTeam[0].destroy
+            @isTopicTakenNow = SignedUpTeam.find_by_sql("select * from signed_up_teams where topic_id = "+ @topic.id.to_s + " AND is_waitlisted = 1")
+            if(@isTopicTakenNow.any?)
+              @isTopicTakenNow[0].update(is_waitlisted: 0)
+            end
+            flash[:success] = "The team has been successfully removed"
+          else
+            flash[:error] = "This team does not have this topic."
+          end
+        else
+          flash[:error] = "User does not have a team for this assignment."
+        end
+      else
+        flash[:error] = "This topic has not been assigned."
+      end
+      redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
+    end
+  end
+
+
+  def update_team # method for add the topic to the team
+    @topic = SignUpTopic.find(params[:id]) #Find all the details about the topic
+    @assignment = Assignment.find(params[:assignment_id]) # Find all the details about the assignment
+    @user = User.find_by name: params[:user][:name] # Find user
+
+    if @user.blank?
+      flash[:error] = "User does not exist"
+      redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
+    else
+      @team = TeamsUser.find_by_sql("select T1.team_id from teams_users T1, teams T2 where T1.user_id = "+ @user.id.to_s+" AND T1.team_id = T2.id AND T2.parent_id = "+ @assignment.id.to_s)
+      @isTopicTaken = SignedUpTeam.find_by_sql("select * from signed_up_teams where topic_id = "+ @topic.id.to_s)
+      @disp_flag = 0 # Checks if user has the same topic
+
+      if(@team.any?)
+        @userTeam = SignedUpTeam.find_by_sql("select * from signed_up_teams where team_id = "+ @team[0].team_id.to_s)
+        if(@isTopicTaken.any?)
+          if(@userTeam.any?)
+            @oldTopic = @userTeam[0].topic_id;
+            @isTopicTaken.each do |f|
+              if f.team_id == @team[0].team_id
+                @disp_flag = 1
+                flash[:error] = "The topic is already assigned to the same team."
+                redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
+              end
+            end
+            if @disp_flag != 1
+              # Update the topic assigned to the team
+              @userTeam[0].update(topic_id: @topic.id)
+              puts @topic.max_choosers
+              if (@isTopicTaken.size >= @topic.max_choosers)
+                @userTeam[0].update(is_waitlisted: 1)
+                flash[:success] = "Team is in the waitlist now"
+              else
+                @userTeam[0].update(is_waitlisted: 0)
+                flash[:success] = "The topic has been assigned to the team"
+              end
+              @oldTopicTeams = SignedUpTeam.find_by_sql("select * from signed_up_teams where topic_id= "+ @oldTopic.to_s+" and is_waitlisted=1")
+              # Once the user's team has been reassigned to the new topic, the waitlist for the user's old topic must be updated
+              if(@oldTopicTeams.any?) #Check if the user's old topic had any waitlisted teams
+                @oldTopicTeams[0].update(is_waitlisted: 0)
+              end
+              redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
+            end
+
+          else #if the team does not have a topic, create a table enrty and assign a topic to the team
+            @sign_up = SignedUpTeam.new
+            @sign_up.topic_id = @topic.id
+            @sign_up.team_id = @team[0].team_id
+            if (@isTopicTaken.size >= @topic.max_choosers)
+              @sign_up.is_waitlisted = 1
+            else
+              @sign_up.is_waitlisted = 0
+            end
+            @sign_up.preference_priority_number =0
+            if @sign_up.save
+              flash[:success] = "The topic has been assigned to the team"
+            else
+              flash[:error] = "The topic could not be assigned."
+            end
+            redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
+          end
+
+        else # if this topic has not been assigned to any team
+          if @userTeam.any?
+            @oldTopic = @userTeam[0].topic_id;
+            @userTeam[0].update(topic_id: @topic.id)
+            @userTeam[0].update(is_waitlisted: 0)
+            @oldTopicTeams = SignedUpTeam.find_by_sql("select * from signed_up_teams where topic_id= "+ @oldTopic.to_s+" and is_waitlisted=1")
+            if(@oldTopicTeams.any?)
+              @oldTopicTeams[0].update(is_waitlisted: 0)
+            end
+            redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
+          else
+            @sign_up = SignedUpTeam.new
+            @sign_up.topic_id = @topic.id
+            @sign_up.team_id = @team[0].team_id
+            @sign_up.is_waitlisted = 0
+            @sign_up.preference_priority_number =0
+            if @sign_up.save
+              flash[:success] = "The topic has been assigned to the team"
+            else
+              flash[:error] = "The topic could not be assigned."
+            end
+            redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
+          end
+        end
+      else
+        flash[:error] = "This user does not have a team"
+        redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
+      end
+    end
+  end
+
+
 
   # If the instructor needs to explicitly change the start/due dates of the topics
   # This is true in case of a staggered deadline type assignment. Individual deadlines can

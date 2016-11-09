@@ -247,6 +247,10 @@ class AssignmentTeam < Team
     end
   end
 
+  def received_any_peer_review?
+    !ResponseMap.where(reviewee_id: self.id, reviewed_object_id: self.parent_id).empty?
+  end
+
   require File.dirname(__FILE__) + '/analytic/assignment_team_analytic'
   include AssignmentTeamAnalytic
 end

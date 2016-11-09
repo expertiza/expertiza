@@ -600,7 +600,7 @@ class QuestionnairesController < ApplicationController
     questionnaire_id = params[:id] unless params[:id].nil?
     questions = Question.where("questionnaire_id = " + questionnaire_id.to_s).sort { |a,b| a.seq <=> b.seq }
     respond_to do |format|
-      format.csv { send_data @questionnaire.to_csv(questions) }
+      format.csv { send_data @questionnaire.to_csv(questions), filename: " #{@questionnaire.name}.csv" }
     end
     redirect_to Questionnaire,notice: $ERROR_INFO and return if @questionnaire.nil?
   end

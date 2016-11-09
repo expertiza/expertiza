@@ -23,7 +23,7 @@ module AccessHelper
   end
 
   def all_actions_allowed?
-    if current_user && current_role.super_admin?
+    if current_user && (current_role.super_admin? || params[:action]=="view_team")
       true
     else
       action_allowed?

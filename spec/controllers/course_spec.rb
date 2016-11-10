@@ -15,7 +15,7 @@ describe CourseController do
     	ta = build(User)
       	ta.ta_id=nil
       	ta.save
-    	expect(ta.nil??).to be true
+    	expect(ta.nil?).to be true
   	end
 	end
 

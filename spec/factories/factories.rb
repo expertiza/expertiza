@@ -337,7 +337,7 @@ FactoryGirl.define do
     is_submitted false
   end
 	
-  #above response factory is giving error. I don't think repsonse class takes review_response_map. Creating a temp response
+  #above response factory is giving an error. I don't think repsonse class takes review_response_map. Creating a temp response
   #this is currently being used in line 8 of the answer_spec. If any changes are made in this factory, please make the same over there.
   factory :response_record, class: Response do
     response_map { ReviewResponseMap.first || association(:review_response_map) }

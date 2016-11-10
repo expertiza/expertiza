@@ -15,7 +15,7 @@
         action = "edit"
 
         # check if the assignment has a sign-up sheet
-        if SignUpTopic.find_by_assignment_id(participant.assignment.id)
+        if Assignment.find(participant.assignment.id).has_topics?
           selected_topics = nil
 
           #ACS Get the topics selected by all teams
@@ -30,18 +30,16 @@
             # there is a signup sheet and user/team hasn't signed up yet, produce a link to do so
             controller = "sign_up_sheet"
             action = "list"
-            id = participant.parent_id
-            stage = "signup"
             end
           end
-        elsif stage == "review" or stage == "metareview"
-          controller = "student_review"
-          action = "list"
-        end
-      %>
+       elsif stage == "review" or stage == "metareview"
+         controller = "student_review"
+         action = "list"
+       end
+     %>
 
     <span>&nbsp; &raquo;
-      <%= link_to student_task.assignment.name + " " + student_task.current_stage, :controller => controller, :action => action, :id => id %>
+      <%= link_to student_task.assignment.name + " " + student_task.current_stage, :controller => controller, :action => action, :id => participant.id %>
       (<%= student_task.relative_deadline %> left)
     </span><br/>
   <% end %>

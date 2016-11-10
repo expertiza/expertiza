@@ -244,7 +244,7 @@ class GradesController < ApplicationController
       end
     else
       reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id: @participant.assignment.id).first
-      return true unless current_user_id?(reviewer.user_id)
+      return true unless current_user_id?(reviewer.try(:user_id))
     end
     false
   end

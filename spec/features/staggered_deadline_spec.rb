@@ -28,30 +28,40 @@ describe "Staggered deadline test" do
     create(:deadline_right, name: 'OK')
 
     #assignment deadline
-    assignment_due('submission',DateTime.now + 10,1)
+    assignment_due('submission',DateTime.now + 10,1,1)
     assignment_due('review',    DateTime.now + 20,1)
     assignment_due('submission',DateTime.now + 30,2)
     assignment_due('review',    DateTime.now + 40,2)
 
     #topic deadline
-    topic_due('submission',DateTime.now + 10,1,1)
+    topic_due('submission',DateTime.now + 10,1,1,1)
     topic_due('review',    DateTime.now + 20,1,1)
-    topic_due('submission',DateTime.now + 30,1,2)
+    topic_due('submission',DateTime.now + 30,1,2,1)
     topic_due('review',    DateTime.now + 40,1,2)
-    topic_due('submission',DateTime.now + 10,2,1)
+    topic_due('submission',DateTime.now + 10,2,1,1)
     topic_due('review',    DateTime.now + 20,2,1)
-    topic_due('submission',DateTime.now + 30,2,2)
+    topic_due('submission',DateTime.now + 30,2,2,1)
     topic_due('review',    DateTime.now + 40,2,2)
   end 
 
   #create assignment deadline
-  def assignment_due(type,time,round)
-     create(:assignment_due_date, deadline_type: DeadlineType.where(name: type).first, due_at: time, round: round)
+  # by default the review_allow_id is 3 (OK), however, for submission the review_allowed_id should be 1 (No).
+  def assignment_due(type,time,round, review_allowed_id = 3)
+     create(:assignment_due_date, 
+            deadline_type: DeadlineType.where(name: type).first, 
+            due_at: time, 
+            round: round, 
+            review_allowed_id: review_allowed_id)
   end
 
   #create topic deadline
-  def topic_due(type,time,id,round)
-     create(:topic_due_date, due_at: time, deadline_type: DeadlineType.where(name: type).first, topic: SignUpTopic.where(id: id).first, round: round)
+  def topic_due(type,time,id,round, review_allowed_id = 3)
+     create(:topic_due_date, 
+            due_at: time, 
+            deadline_type: DeadlineType.where(name: type).first, 
+            topic: SignUpTopic.where(id: id).first, 
+            round: round,
+            review_allowed_id: review_allowed_id)
   end
 
   #impersonate student to submit work
@@ -93,24 +103,13 @@ describe "Staggered deadline test" do
      #student2064 in review stage could review others' work
      # however, student2065 is still in submission stage.
      # So actually, student2064 cannot review anything.
+     # the reason is that the review_allowed_id of default submission deadline is OK, should be NO.
      click_link 'Assignment1665'
      expect(page).to have_content "Others' work"
      click_link "Others' work"
      expect(page).to have_content 'Reviews for "Assignment1665"'
-     choose "topic_id_2"
      click_button 'Request a new submission to review'
-     expect(page).to have_content "Review 1."
-     click_link "Begin"
-     expect(page).to have_content "You are reviewing Topic_2"
-     
-     #check it is the right rubric for this round
-     expect(page).to have_content "Question1"
-
-     #Check fill in rubrics and save, submit the review
-     select 5, from: "responses_0_score"
-     fill_in "responses_0_comments", with: "test fill"
-     click_button "Save Review"
-     expect(page).to have_content "View"
+     expect(page).to have_content 'No topic is selected. Please go back and select a topic.'
 
      # Although student2065 is in submission stage, he or she can still review other's work.     
      user = User.find_by_name('student2065')
@@ -131,12 +130,6 @@ describe "Staggered deadline test" do
      fill_in "responses_0_comments", with: "test fill"
      click_button "Save Review"
      expect(page).to have_content "View"
-
-     user = User.find_by_name('instructor6')
-     stub_current_user(user, user.role.name, user.role)
-     assignment = Assignment.first
-     visit "/assignments/#{assignment.id}/edit"
-     sleep(10000)
   end
 
   it "test2: in round 2, both students should be in review stage to review each other", js: true do

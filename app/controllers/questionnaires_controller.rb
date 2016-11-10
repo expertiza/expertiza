@@ -14,7 +14,7 @@ class QuestionnairesController < ApplicationController
         #Modifications can only be done by papertrail
         q= Questionnaire.find_by(id:params[:id])
         owner_inst_id = q.instructor_id
-        if(current_user.role_id==6)
+        if(current_role_name.eql?("Teaching Assistant"))
           current_ta = current_user;
         end
         owner_flag= (current_user.id == owner_inst_id)

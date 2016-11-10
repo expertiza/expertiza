@@ -109,12 +109,14 @@ class TreeDisplayController < ApplicationController
     # @reactjsParams[:child_nodes] = child_nodes
   end
 
+  #renders FolderNode json
   def folder_node_ng_getter
     respond_to do |format|
       format.html { render json: FolderNode.get }
     end
   end
 
+  #finding out child_nodes from params
   def child_nodes_from_params(child_nodes)
     if child_nodes.is_a? String
       JSON.parse(child_nodes)
@@ -123,6 +125,7 @@ class TreeDisplayController < ApplicationController
     end
   end
 
+  #getting all attributes of assignment node
   def assignments_method(node, tmp_object)
     tmp_object.merge!(
       "course_id" => node.get_course_id,
@@ -334,6 +337,7 @@ class TreeDisplayController < ApplicationController
     is_available(user, owner_id)
   end
 
+  #gets and renders last open tab from session
   def session_last_open_tab
     res = session[:last_open_tab]
     respond_to do |format|
@@ -341,6 +345,7 @@ class TreeDisplayController < ApplicationController
     end
   end
 
+#sets the last open tab from params
   def set_session_last_open_tab
     session[:last_open_tab] = params[:tab]
     res = session[:last_open_tab]
@@ -354,7 +359,8 @@ class TreeDisplayController < ApplicationController
     redirect_to controller: 'tree_display', action: 'list'
   end
 
-  def filter_node_is_qan(search, qid)
+#if filter node is 'QAN', get the corresponding assignment questionnaires
+ def filter_node_is_qan(search, qid)
     assignment = Assignment.find_by(name: search)
     if assignment
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment.id)

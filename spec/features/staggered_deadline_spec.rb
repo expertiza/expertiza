@@ -90,7 +90,9 @@ describe "Staggered deadline test" do
      visit '/student_task/list'
      expect(page).to have_content "review"
 
-     #student in review stage could review others' work
+     #student2064 in review stage could review others' work
+     # however, student2065 is still in submission stage.
+     # So actually, student2064 cannot review anything.
      click_link 'Assignment1665'
      expect(page).to have_content "Others' work"
      click_link "Others' work"
@@ -109,6 +111,32 @@ describe "Staggered deadline test" do
      fill_in "responses_0_comments", with: "test fill"
      click_button "Save Review"
      expect(page).to have_content "View"
+
+     # Although student2065 is in submission stage, he or she can still review other's work.     
+     user = User.find_by_name('student2065')
+     stub_current_user(user, user.role.name, user.role)
+     visit '/student_task/list'
+     expect(page).to have_content "submission"
+     click_link 'Assignment1665'
+     expect(page).to have_content "Others' work"
+     click_link "Others' work"
+     expect(page).to have_content 'Reviews for "Assignment1665"'
+     choose "topic_id_1"
+     click_button 'Request a new submission to review'
+     expect(page).to have_content "Review 1."
+     click_link "Begin"
+     expect(page).to have_content "You are reviewing Topic_1"
+     expect(page).to have_content "Question1"
+     select 5, from: "responses_0_score"
+     fill_in "responses_0_comments", with: "test fill"
+     click_button "Save Review"
+     expect(page).to have_content "View"
+
+     user = User.find_by_name('instructor6')
+     stub_current_user(user, user.role.name, user.role)
+     assignment = Assignment.first
+     visit "/assignments/#{assignment.id}/edit"
+     sleep(10000)
   end
 
   it "test2: in round 2, both students should be in review stage to review each other", js: true do
@@ -205,6 +233,16 @@ describe "Staggered deadline test" do
      click_link "Others' work"
      expect(page).to have_content 'Reviews for "Assignment1665"'
      #it should not able to choose topic for review
+     expect{choose "topic_id_2"}.to raise_error('Unable to find radio button "topic_id_2"')
+
+     user = User.find_by_name('student2065')
+     stub_current_user(user, user.role.name, user.role)
+     visit '/student_task/list'
+     expect(page).to have_content "Finished"
+     click_link 'Assignment1665'
+     expect(page).to have_content "Others' work"
+     click_link "Others' work"
+     expect(page).to have_content 'Reviews for "Assignment1665"'
      expect{choose "topic_id_2"}.to raise_error('Unable to find radio button "topic_id_2"')
   end
 end

@@ -307,7 +307,6 @@ GEM
       rails (>= 3.2)
       tilt
     ref (2.0.0)
-    remotipart (1.3.1)
     request_store (1.2.0)
     rest-client (1.8.0)
       http-cookie (>= 1.0.2, < 2.0)
@@ -466,7 +465,6 @@ DEPENDENCIES
   launchy
   lingua
   mysql2
-  net-ssh (~> 2.9.2)
   nokogiri (~> 1.6.8)
   omniauth-google-oauth2 (~> 0.2.6)
   open-uri-cached
@@ -482,11 +480,9 @@ DEPENDENCIES
   rake
   rb-readline
   react-rails (~> 1.0)
-  remotipart (~> 1.0)
   rest-client (~> 1.8)
   rgl
   rjb
-  rspec
   rspec-rails
   rubocop
   rubyzip
@@ -506,6 +502,3 @@ DEPENDENCIES
   uglifier
   will_paginate
   zip-zip
-
-BUNDLED WITH
-   1.13.6

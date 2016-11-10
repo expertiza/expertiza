@@ -12,17 +12,7 @@ class QuestionnairesController < ApplicationController
     case params[:action]
       when 'edit', 'update', 'delete', 'toggle_access'
         #Modifications can only be done by papertrail
-        q= Questionnaire.find_by(id:params[:id])
-        owner_inst_id = q.instructor_id
-        if(current_role_name.eql?("Teaching Assistant"))
-          current_ta = current_user;
-        end
-        owner_flag= (current_user.id == owner_inst_id)
-
-        if(!current_ta.nil?)
-          owner_flag = (owner_flag or (current_ta.parent_id == owner_inst_id))
-        end
-        return owner_flag
+        return is_ownerinst_or_ta?
 
       else
         #Allow all others
@@ -33,6 +23,20 @@ class QuestionnairesController < ApplicationController
          'Student'].include? current_role_name
     end
 
+  end
+
+  def is_ownerinst_or_ta?
+    q= Questionnaire.find_by(id:params[:id])
+    owner_inst_id = q.instructor_id
+    if(current_role_name.eql?("Teaching Assistant"))
+      current_ta = current_user;
+    end
+    owner_flag= (current_user.id == owner_inst_id)
+
+    if(!current_ta.nil?)
+      owner_flag = (owner_flag or (current_ta.parent_id == owner_inst_id))
+    end
+    owner_flag
   end
 
   # Create a clone of the given questionnaire, copying all associated

@@ -127,7 +127,7 @@ class StudentTeamsController < ApplicationController
     # if your old team does not have any members, delete the entry for the team
     if TeamsUser.where(team_id: params[:team_id]).empty?
       old_team = AssignmentTeam.find params[:team_id]
-      if old_team
+      if old_team && !old_team.received_any_peer_review?
         old_team.destroy
         # if assignment has signup sheet then the topic selected by the team has to go back to the pool
         # or to the first team in the waitlist

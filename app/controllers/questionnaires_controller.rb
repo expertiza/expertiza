@@ -344,7 +344,7 @@ class QuestionnairesController < ApplicationController
   def update_quiz
     @questionnaire = Questionnaire.find(params[:id])
     redirect_to controller: 'submitted_content', action: 'view', id: params[:pid] if @questionnaire.nil?
-    if params['save']
+    if params['save'] && params[:question].try(:keys)
       @questionnaire.update_attributes(questionnaire_params)
 
       for qid in params[:question].keys
@@ -600,7 +600,7 @@ class QuestionnairesController < ApplicationController
     questionnaire_id = params[:id] unless params[:id].nil?
     questions = Question.where("questionnaire_id = " + questionnaire_id.to_s).sort { |a,b| a.seq <=> b.seq }
     respond_to do |format|
-      format.csv { send_data @questionnaire.to_csv(questions) }
+      format.csv { send_data @questionnaire.to_csv(questions), filename: " #{@questionnaire.name}.csv" }
     end
     redirect_to Questionnaire,notice: $ERROR_INFO and return if @questionnaire.nil?
   end
@@ -613,7 +613,7 @@ class QuestionnairesController < ApplicationController
         file.write(uploaded_io.read)
       end
         file_data = File.read(Rails.root.join('spec/features/import_export_csv_oss/'+uploaded_io.original_filename))
-        a = QuestionnaireHelper.get_questions_from_csv(file_data,params[:id])
+        QuestionnaireHelper.get_questions_from_csv(file_data,params[:id])
         redirect_to edit_questionnaire_path(questionnaire_id.to_sym), notice: "All questions have been successfully imported!"
        rescue
       redirect_to edit_questionnaire_path(questionnaire_id.to_sym), notice: $ERROR_INFO

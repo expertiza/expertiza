@@ -148,6 +148,7 @@ class TreeDisplayController < ApplicationController
         Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
   end
 
+#updating instructor value for tmp_object
   def update_instructor(tmp_object, instructor_id)
     tmp_object["instructor_id"] = instructor_id
     tmp_object["instructor"] = nil

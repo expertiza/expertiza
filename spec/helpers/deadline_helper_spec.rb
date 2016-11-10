@@ -1,11 +1,6 @@
 require 'rails_helper'
 
 describe "DeadlineHelper" do
-
-  RSpec.configure do |config|
-    config.include FactoryGirl::Syntax::Methods
-  end
-
   before(:each) do
     @deadline_type = create(:deadline_type)
     @deadline_right = create(:deadline_right)

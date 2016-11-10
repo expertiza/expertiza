@@ -1,3 +1,10 @@
+/*
+OSS E1663 team from Fall 2016 batch added on 1st Nov, 2016
+Created new file to remove the TA from the list on the page after confirmation from controller.
+*/
 $('.delete_ta').bind('ajax:success', function() {
+	if(confirm("Are you sure?")){
    $(this).closest('tr').fadeOut();
+}
+return false;
 });

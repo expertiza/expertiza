@@ -1,1 +1,7 @@
+/*
+OSS E1663 team from Fall 2016 batch added on 1st Nov, 2016
+Created new file to render the Row HTML of TA and sending some locals to the same.
+Based on the data received from controller, It renders the HTML and displays the TA on the page without refreshing it.
+*/
 $('.listing').append("<%= escape_javascript (render partial: 'ta_list', locals: {ta: @ta_mapping}) %>");
+

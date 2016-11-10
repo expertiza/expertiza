@@ -194,6 +194,8 @@ class QuestionnairesController < ApplicationController
   end
 
   # Zhewei: This method is used to add new questions when editing questionnaire.
+  #OSS E1663 team from Fall 2016 batch modified on 1st Nov, 2016
+  #Added a respond_to block to render to JS file instead of HTML file
   def add_new_questions
     questionnaire_id = params[:id] unless params[:id].nil?
     num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
@@ -224,6 +226,8 @@ class QuestionnairesController < ApplicationController
   end
 
   # Zhewei: This method is used to save all questions in current questionnaire.
+  #OSS E1663 team from Fall 2016 batch modified on 1st Nov, 2016
+  #Added a respond_to block to render to JS file instead of HTML file.
   def save_all_questions
     questionnaire_id = params[:id] unless params[:id].nil?
     if params['save']

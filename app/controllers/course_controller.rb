@@ -137,6 +137,8 @@ class CourseController < ApplicationController
     @ta_mappings = @course.ta_mappings
   end
 
+#OSS E1663 team from Fall 2016 batch modified on 1st Nov, 2016
+#Added a respond_to block to render to JS file instead of HTML file
   def add_ta
     @course = Course.find(params[:course_id])
     @user = User.find_by_name(params[:user][:name])
@@ -165,6 +167,8 @@ class CourseController < ApplicationController
     end
   end
 
+#OSS E1663 team from Fall 2016 batch modified on 1st Nov, 2016
+#Added a respond_to block to render to JS file instead of HTML file.
   def remove_ta
     @ta_mapping = TaMapping.find(params[:id])
     @ta = User.find(@ta_mapping.ta_id)

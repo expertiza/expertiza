@@ -1,3 +1,8 @@
+<!--
+OSS E1663 team from Fall 2016 batch modified on 1st Nov, 2016
+Contains the Row of each participants rather than whole table.
+When a new Row is added just the rendering this file, adds the participant to the list without refreshing the whole page.
+ -->
 <tr class= "exp">
     <td ><%= link_to user.name, :controller=> 'users', :action => 'show', :id => user.id %></td>
     <td ><%= user.fullname %></td>

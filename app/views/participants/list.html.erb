@@ -1,7 +1,7 @@
 <h1><%= @model %> Participants: <%= @parent.name %></h1>
 
 <br/>
-<div class = "exp">
+<div id="user-list" class = "exp">
 <%if @participants.length > 0%>
 <table>
   <tr>
@@ -24,7 +24,10 @@
     <th class="head">Handle</th>
     <th class="head">Action</th>
   </tr>
-
+<!--
+OSS E1663 team from Fall 2016 batch modified on 1st Nov, 2016
+Modified the code to such that each row is rendered using the user_list rather than putting whole table on the same file.
+ -->
 <% @user_id = [] %>
 <% for participant in @participants
    user = User.find(participant.user_id) %>

@@ -48,7 +48,7 @@ class Team < ActiveRecord::Base
 
  # Check if the current team is full?
  def full?
-  return false if self.parent_id == nil
+  return false if self.parent_id == nil #course team, does not max_team_size
   max_team_members = Assignment.find(self.parent_id).max_team_size
   curr_team_size = Team.size(self.id)
   (curr_team_size >= max_team_members)

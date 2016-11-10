@@ -1,17 +1,8 @@
 require 'rails_helper'
 
-def questionnaire_options(assignment, type, _round = 0)
-  questionnaires = Questionnaire.where(['private = 0 or instructor_id = ?', assignment.instructor_id]).order('name')
-  options = []
-  questionnaires.select {|x| x.type == type }.each do |questionnaire|
-    options << [questionnaire.name, questionnaire.id]
-  end
-  options
-end
-
 def get_questionnaire(finder_var = nil)
   if finder_var.nil?
-    AssignmentQuestionnaire.find_by_assignment_id(@assignment[:id])
+    AssignmentQuestionnaire.find_by(assignment_id: @assignment[:id])
   else
     AssignmentQuestionnaire.where(assignment_id: @assignment[:id]).where(questionnaire_id: get_selected_id(finder_var))
   end
@@ -19,11 +10,62 @@ end
 
 def get_selected_id(finder_var)
   if finder_var == "ReviewQuestionnaire2"
-    ReviewQuestionnaire.find_by_name(finder_var)[:id]
+    ReviewQuestionnaire.find_by(name: finder_var)[:id]
   elsif finder_var == "AuthorFeedbackQuestionnaire2"
-    AuthorFeedbackQuestionnaire.find_by_name(finder_var)[:id]
+    AuthorFeedbackQuestionnaire.find_by(name: finder_var)[:id]
   elsif finder_var == "TeammateReviewQuestionnaire2"
-    TeammateReviewQuestionnaire.find_by_name(finder_var)[:id]
+    TeammateReviewQuestionnaire.find_by(name: finder_var)[:id]
+  end
+end
+
+def function_to__create_with_teams
+  it "is able to create with teams" do
+    login_as("instructor6")
+    visit '/assignments/new?private=1'
+    fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
+    select('Course 2', from: 'assignment_form_assignment_course_id')
+    fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+    check("team_assignment")
+    check("assignment_form_assignment_show_teammate_reviews")
+    fill_in 'assignment_form_assignment_max_team_size', with: 3
+    click_button 'Create'
+    assignment = Assignment.where(name: 'private assignment for test').first
+    expect(assignment).to have_attributes(max_team_size: 3, show_teammate_reviews: true)
+  end
+end
+
+def feedback_review_questionaire_check(value)
+  if value.eql? "updates author feedback questionnaire"
+    value1 = "tr#questionnaire_table_AuthorFeedbackQuestionnaire"
+    value2 = "AuthorFeedbackQuestionnaire2"
+  end
+  if value.eql? "updates teammate review questionnaire"
+    value1 = "tr#questionnaire_table_TeammateReviewQuestionnaire"
+    value2 = "TeammateReviewQuestionnaire2"
+  end
+  it value do
+    find_link('Rubrics').click
+    within(value1) do
+      select value2, from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+      uncheck('dropdown')
+      select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
+      fill_in 'assignment_form[assignment_questionnaire][][questionnaire_weight]', with: '50'
+      fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', with: '50'
+    end
+    click_button 'Save'
+    questionnaire = get_questionnaire(value2).first
+    expect(questionnaire).to have_attributes(questionnaire_weight: 50, notification_limit: 50)
+  end
+  it "should update scored question dropdown" do
+    find_link('Rubrics').click
+    within("tr#questionnaire_table_ReviewQuestionnaire") do
+      select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+      select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
+    end
+    click_button 'Save'
+    questionnaire = Questionnaire.where(name: "ReviewQuestionnaire2").first
+    assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
+    expect(assignment_questionnaire.dropdown).to eq(false)
   end
 end
 
@@ -45,12 +87,12 @@ describe "assignment function" do
         create(:course, name: "Course #{i}")
       end
     end
+  
 
     # Might as well test small flags for creation here
     it "is able to create a public assignment" do
       login_as("instructor6")
       visit '/assignments/new?private=0'
-
       fill_in 'assignment_form_assignment_name', with: 'public assignment for test'
       select('Course 2', from: 'assignment_form_assignment_course_id')
       fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
@@ -60,12 +102,11 @@ describe "assignment function" do
       check("assignment_form_assignment_is_calibrated")
       uncheck("assignment_form_assignment_availability_flag")
       expect(page).to have_select("assignment_form[assignment][reputation_algorithm]", options: ['--', 'Hamer', 'Lauw'])
-
       click_button 'Create'
       assignment = Assignment.where(name: 'public assignment for test').first
       expect(assignment).to have_attributes(
         name: 'public assignment for test',
-        course_id: Course.find_by_name('Course 2')[:id],
+        course_id: Course.find_by(name: 'Course 2')[:id],
         directory_path: 'testDirectory',
         spec_location: 'testLocation',
         microtask: true,
@@ -76,7 +117,6 @@ describe "assignment function" do
     it "is able to create a private assignment" do
       login_as("instructor6")
       visit '/assignments/new?private=1'
-
       fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
       select('Course 2', from: 'assignment_form_assignment_course_id')
       fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
@@ -86,61 +126,21 @@ describe "assignment function" do
       check("assignment_form_assignment_is_calibrated")
       uncheck("assignment_form_assignment_availability_flag")
       expect(page).to have_select("assignment_form[assignment][reputation_algorithm]", options: ['--', 'Hamer', 'Lauw'])
-
       click_button 'Create'
       assignment = Assignment.where(name: 'private assignment for test').first
       expect(assignment).to have_attributes(
         name: 'private assignment for test',
-        course_id: Course.find_by_name('Course 2')[:id],
+        course_id: Course.find_by(name: 'Course 2')[:id],
         directory_path: 'testDirectory',
         spec_location: 'testLocation'
       )
     end
-
-    it "is able to create with teams" do
-      login_as("instructor6")
-      visit '/assignments/new?private=1'
-
-      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
-      check("team_assignment")
-      check("assignment_form_assignment_show_teammate_reviews")
-      fill_in 'assignment_form_assignment_max_team_size', with: 3
-
-      click_button 'Create'
-
-      assignment = Assignment.where(name: 'private assignment for test').first
-      expect(assignment).to have_attributes(
-        max_team_size: 3,
-        show_teammate_reviews: true
-      )
-    end
-
-    it "is able to create with quiz" do
-      login_as("instructor6")
-      visit '/assignments/new?private=1'
-
-      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
-      check("assignment_form_assignment_require_quiz")
-      click_button 'Create'
-      fill_in 'assignment_form_assignment_num_quiz_questions', with: 3
-      click_button 'submit_btn'
-
-      assignment = Assignment.where(name: 'private assignment for test').first
-      expect(assignment).to have_attributes(
-        num_quiz_questions: 3,
-        require_quiz: true
-      )
-    end
-
+    function_to_test_create_with_teams
+    function_to_test_create_with_teams
     it "is able to create with staggered deadline" do
       skip('skip test on staggered deadline temporarily')
       login_as("instructor6")
       visit '/assignments/new?private=1'
-
       fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
       select('Course 2', from: 'assignment_form_assignment_course_id')
       fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
@@ -153,9 +153,8 @@ describe "assignment function" do
       click_button 'Create'
       fill_in 'assignment_form_assignment_days_between_submissions', with: 7
       click_button 'submit_btn'
-
       assignment = Assignment.where(name: 'private assignment for test').first
-      pending(%(not sure what's broken here but the error is: #ActionController::RoutingError: No route matches [GET] "/assets/staggered_deadline_assignment_graph/graph_1.jpg"))
+      pending(%(not sure what's broken here but the error is: #ActionController::RoutingError:No route matches [GET] "/assets/staggered_deadline_assignment_graph/graph_1.jpg"))
       expect(assignment).to have_attributes(
         staggered_deadline: true
       )
@@ -168,12 +167,10 @@ describe "assignment function" do
         create(:course, name: "Course #{i}")
       end
       @assignment = create(:assignment, name: 'public assignment for test')
-
       login_as("instructor6")
       visit "/assignments/#{@assignment[:id]}/edit"
       find_link('Topics').click
     end
-
     it "can edit topics properties" do
       check("assignment_form_assignment_allow_suggestions")
       check("assignment_form_assignment_is_intelligent")
@@ -190,7 +187,7 @@ describe "assignment function" do
         use_bookmark: true
       )
     end
-
+ 
     it "can edit topics properties" do
       uncheck("assignment_form_assignment_allow_suggestions")
       uncheck("assignment_form_assignment_is_intelligent")
@@ -239,7 +236,6 @@ describe "assignment function" do
       login_as("instructor6")
       visit "/assignments/#{@assignment.id}/edit"
     end
-
     describe "Load rubric questionnaire" do
       xit "is able to edit assignment" do
         find_link('Rubrics').click
@@ -247,7 +243,6 @@ describe "assignment function" do
         expect(page).to have_content("Review rubric varies by round")
       end
     end
-
     # First row of rubric
     describe "Edit review rubric" do
       it "updates review questionnaire" do
@@ -267,78 +262,10 @@ describe "assignment function" do
           notification_limit: 50
         )
       end
-
-      it "should update scored question dropdown" do
-        find_link('Rubrics').click
-        within("tr#questionnaire_table_ReviewQuestionnaire") do
-          select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-          select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-        end
-        click_button 'Save'
-        questionnaire = Questionnaire.where(name: "ReviewQuestionnaire2").first
-        assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
-        expect(assignment_questionnaire.dropdown).to eq(false)
-      end
-
-      # Second row of rubric
-      it "updates author feedback questionnaire" do
-        find_link('Rubrics').click
-        within("tr#questionnaire_table_AuthorFeedbackQuestionnaire") do
-          select "AuthorFeedbackQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-          uncheck('dropdown')
-          select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-          fill_in 'assignment_form[assignment_questionnaire][][questionnaire_weight]', with: '50'
-          fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', with: '50'
-        end
-        click_button 'Save'
-        questionnaire = get_questionnaire("AuthorFeedbackQuestionnaire2").first
-        expect(questionnaire).to have_attributes(
-          questionnaire_weight: 50,
-          notification_limit: 50
-        )
-      end
-
-      it "should update scored question dropdown" do
-        find_link('Rubrics').click
-        within("tr#questionnaire_table_AuthorFeedbackQuestionnaire") do
-          select "AuthorFeedbackQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-          select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-        end
-        click_button 'Save'
-        questionnaire = Questionnaire.where(name: "AuthorFeedbackQuestionnaire2").first
-        assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
-        expect(assignment_questionnaire.dropdown).to eq(false)
-      end
-
-      # Third row of rubric
-      it "updates teammate review questionnaire" do
-        find_link('Rubrics').click
-        within("tr#questionnaire_table_TeammateReviewQuestionnaire") do
-          select "TeammateReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-          uncheck('dropdown')
-          select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-          fill_in 'assignment_form[assignment_questionnaire][][questionnaire_weight]', with: '50'
-          fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', with: '50'
-        end
-        click_button 'Save'
-        questionnaire = get_questionnaire("TeammateReviewQuestionnaire2").first
-        expect(questionnaire).to have_attributes(
-          questionnaire_weight: 50,
-          notification_limit: 50
-        )
-      end
-
-      it "should update scored question dropdown" do
-        find_link('Rubrics').click
-        within("tr#questionnaire_table_TeammateReviewQuestionnaire") do
-          select "TeammateReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-          select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-        end
-        click_button 'Save'
-        questionnaire = Questionnaire.where(name: "TeammateReviewQuestionnaire2").first
-        assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
-        expect(assignment_questionnaire.dropdown).to eq(false)
-      end
+    # Second row of rubric
+    feedback_review_questionaire_check("updates author feedback questionnaire")
+    # Third row of rubric
+    feedback_review_questionaire_check("updates teammate review questionnaire")
     end
   end
 
@@ -347,7 +274,6 @@ describe "assignment function" do
     before(:each) do
       @assignment = create(:assignment, name: 'public assignment for test')
     end
-
     it "auto selects" do
       login_as("instructor6")
       visit '/assignments/1/edit'
@@ -363,7 +289,6 @@ describe "assignment function" do
         max_reviews_per_submission: 10
       )
     end
-
     # instructor assign reviews will happen only one time, so the data will not be store in DB.
     xit "sets number of reviews by each student" do
       pending('review section not yet completed')

@@ -33,7 +33,7 @@ def create_quiz
   click_on 'Create Quiz'
 end
 
-describe 'Student can create quizzes and edit them', js: true do
+def assignment_creation
   before(:each) do
     # Create an instructor
     @instructor = create(:instructor)
@@ -42,7 +42,7 @@ describe 'Student can create quizzes and edit them', js: true do
     @student = create(:student)
 
     # Create an assignment with quiz
-    @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 1
+    @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 3
 
     # Create an assignment due date
     create(:deadline_type, name: "submission")
@@ -54,10 +54,10 @@ describe 'Student can create quizzes and edit them', js: true do
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create :assignment_due_date, due_at: (DateTime.now + 1)
+    create :assignment_due_date, due_at: (DateTime.now.getlocal + 1)
 
     @review_deadline_type = create(:deadline_type, name: "review")
-    create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+    create :assignment_due_date, due_at: (DateTime.now.getlocal + 1), deadline_type: @review_deadline_type
 
     # Create a team linked to the calibrated assignment
     @team = create :assignment_team, assignment: @assignment
@@ -70,7 +70,10 @@ describe 'Student can create quizzes and edit them', js: true do
     create :team_user, team: @team, user: @student
     create :review_response_map, assignment: @assignment, reviewee: @team
   end
+end
 
+describe 'Student can create quizzes and edit them', js: true do
+  assignment_creation
   it 'should be able to create quiz' do
     # Create a quiz
     create_quiz
@@ -127,55 +130,44 @@ describe 'Student can create quizzes and edit them', js: true do
     # Verify that the edit choice has been saved
     expect(page).to have_content('Test Quiz 1 Edit')
   end
-
-  it 'should have error message if the name of the quiz is missing' do
-    login_as @student.name
+  def to_check_if_error_message_is_present(it_condition_string, fill_in_string, condition_string, to_have_content_string)
+    it it_condition_string do
+      login_as @student.name
 
     # Click on the assignment link, and navigate to work view
-    click_link @assignment.name
-    click_link 'Your work'
+      click_link @assignment.name
+      click_link 'Your work'
 
     # Create a quiz for the assignment without quiz name
     click_link 'Create a quiz'
 
-    # Without fill in quiz name
-    fill_in 'text_area', with: 'Test Question 1'
-    page.choose('question_type_1_type_multiplechoiceradio')
-    fill_in 'new_choices_1_MultipleChoiceRadio_1_txt', with: 'Test Quiz 1'
-    fill_in 'new_choices_1_MultipleChoiceRadio_2_txt', with: 'Test Quiz 2'
-    fill_in 'new_choices_1_MultipleChoiceRadio_3_txt', with: 'Test Quiz 3'
-    fill_in 'new_choices_1_MultipleChoiceRadio_4_txt', with: 'Test Quiz 4'
-    page.choose('new_choices_1_MultipleChoiceRadio_1_iscorrect_1')
-    click_on 'Create Quiz'
+      # Without fill in quiz name
+      fill_in fill_in_string, with: condition_string
+      page.choose('question_type_1_type_multiplechoiceradio')
+      fill_in 'new_choices_1_MultipleChoiceRadio_1_txt', with: 'Test Quiz 1'
+      fill_in 'new_choices_1_MultipleChoiceRadio_2_txt', with: 'Test Quiz 2'
+      fill_in 'new_choices_1_MultipleChoiceRadio_3_txt', with: 'Test Quiz 3'
+      fill_in 'new_choices_1_MultipleChoiceRadio_4_txt', with: 'Test Quiz 4'
+      page.choose('new_choices_1_MultipleChoiceRadio_1_iscorrect_1')
+      click_on 'Create Quiz'
 
     # Should have the error message Please specify quiz name (please do not use your name or id on the page
-    expect(page).to have_content 'Please specify quiz name (please do not use your name or id).'
+      expect(page).to have_content to_have_content_string
+    end
   end
-
-  it 'should have error message if The question text is missing for one or more questions' do
-    login_as @student.name
-
-    # Click on the assignment link, and navigate to work view
-    click_link @assignment.name
-    click_link 'Your work'
-
-    # Create a quiz for the assignment without fill in question text
-    click_link 'Create a quiz'
-    fill_in 'questionnaire_name', with: 'Quiz for test'
-
-    # Withnot fill in the question text
-    page.choose('question_type_1_type_multiplechoiceradio')
-    fill_in 'new_choices_1_MultipleChoiceRadio_1_txt', with: 'Test Quiz 1'
-    fill_in 'new_choices_1_MultipleChoiceRadio_2_txt', with: 'Test Quiz 2'
-    fill_in 'new_choices_1_MultipleChoiceRadio_3_txt', with: 'Test Quiz 3'
-    fill_in 'new_choices_1_MultipleChoiceRadio_4_txt', with: 'Test Quiz 4'
-    page.choose('new_choices_1_MultipleChoiceRadio_1_iscorrect_1')
-    click_on 'Create Quiz'
-
-    # Should have the error message Please make sure all questions have text
-    expect(page).to have_content 'Please make sure all questions have text'
-  end
-
+  it_condition_string = 'should have error message if the name of the quiz is missing'
+  fill_in_string = 'text_area'
+  condition_string = 'Test Question 1'
+  to_have_content_string = 'Please specify quiz name (please do not use your name or id)'
+  to_check_if_error_message_is_present((it_condition_string, fill_in_string, condition_string, to_have_content_string)
+  it_condition_string = 'should have error message if The question text is missing for one or more questions'
+  fill_in_string = 'questionnaire_name'
+  condition_string = 'Quiz for test'
+  to_have_content_string = 'Please make sure all questions have text'
+   to_check_if_error_message_is_present((it_condition_string, fill_in_string, condition_string, to_have_content_string)
+  
+  
+  
   it 'should have error message if the choices are missing for one or more questions' do
     login_as @student.name
 
@@ -227,43 +219,7 @@ describe 'Student can create quizzes and edit them', js: true do
 end
 
 describe 'multiple quiz question test', js: true do
-  before(:each) do
-    # Create an instructor
-    @instructor = create(:instructor)
-
-    # Create a student
-    @student = create(:student)
-
-    # Create an assignment with quiz
-    @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 3
-
-    # Create an assignment due date
-    create(:deadline_type, name: "submission")
-    create(:deadline_type, name: "review")
-    create(:deadline_type, name: "metareview")
-    create(:deadline_type, name: "drop_topic")
-    create(:deadline_type, name: "signup")
-    create(:deadline_type, name: "team_formation")
-    create(:deadline_right)
-    create(:deadline_right, name: 'Late')
-    create(:deadline_right, name: 'OK')
-    create :assignment_due_date, due_at: (DateTime.now + 1)
-
-    @review_deadline_type = create(:deadline_type, name: "review")
-    create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
-
-    # Create a team linked to the calibrated assignment
-    @team = create :assignment_team, assignment: @assignment
-
-    # Create an assignment participant linked to the assignment
-    @participant = create :participant, assignment: @assignment, user: @student
-
-    # Create a mapping between the assignment team and the
-    # participant object's user (the submitter).
-    create :team_user, team: @team, user: @student
-    create :review_response_map, assignment: @assignment, reviewee: @team
-  end
-
+  functioncall
   it 'number of questions set matches number of quiz questions avaliable' do
     # [S2] - When an assignment has a quiz there is an input field that accepts the number of questions that will be on each quiz. Setting this number appropriately changes the number of quiz questions.
     # Create a quiz

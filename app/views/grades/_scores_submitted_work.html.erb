@@ -43,7 +43,7 @@
         %>
     review.feedback = '<%= link_to "view", :controller => "response", :action => "view", :id => feedback.id %> <%= link_to "edit", :controller => "response", :action => "edit", :id => feedback.id, :return => "feedback" %>'
     <% else %>
- review.feedback = '<%= link_to "new", :controller => "response", :action => "new_feedback", :id => review.id %>'
+ review.feedback = '<%= link_to "new", :controller => "review_mapping", :action => "new_feedback", :id => review.id %>'
     <% end %>
     submitted_work.reviews.push(review);
     <%

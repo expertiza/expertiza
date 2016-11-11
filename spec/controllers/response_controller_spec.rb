@@ -7,12 +7,6 @@ RSpec.describe ResponseController, type: :controller do
       Response.create(map_id: 1, additional_comment: 'hello', round: 1)
     end
     # user not logged in
-    describe "GET #new_feedback" do
-      it "returns http success" do
-        get :new_feedback
-        expect(response).to redirect_to(request.env['HTTP_REFERER'] ? :back : :root)
-      end
-    end
 
     describe "GET #saving" do
       it "returns http success" do
@@ -48,26 +42,6 @@ RSpec.describe ResponseController, type: :controller do
       stub_current_user(@user, 'Student', @role)
     end
 
-    describe "GET #new_feedback" do
-      it "redirects to new if review object is found" do
-        allow(Response).to receive(:find).and_return(review)
-        allow(session[:user]).to receive(:id).and_return(1)
-        allow(review).to receive_message_chain(:map, :assignment, :id).and_return(1)
-        allow(review).to receive_message_chain(:map, :reviewer, :id).and_return(1)
-        allow_any_instance_of(AssignmentParticipant).to receive_message_chain(:where, :first).and_return(assignment)
-        allow_any_instance_of(FeedbackResponseMap).to receive_message_chain(:where, :first).and_return(map)
-        allow_any_instance_of(FeedbackResponseMap).to receive(:create).and_return(map)
-
-        get :new_feedback
-
-        expect(response).to redirect_to action: :new, id: map.id, return: "feedback"
-      end
-      it "redirects to same page if no review is found" do
-        allow(Response).to receive(:find).and_return(false)
-        expect(response).to have_http_status(200)
-      end
-    end
-
     describe "GET #saving" do
       it "redirect to redirection" do
         allow(ResponseMap).to receive(:find).and_return(responsemap)
@@ -86,5 +60,24 @@ RSpec.describe ResponseController, type: :controller do
         expect(response).to have_http_status(302)
       end
     end
+
+    describe "#update" do
+        let!(:first_review) { Response.create(map_id: 1, additional_comment: 'hello', round: 1) }
+          before {
+            allow(Response).to receive(:find).and_return(first_review)
+            allow(first_review).to receive_message_chain(:map, :reviewer, :user_id).and_return(1)
+            allow_any_instance_of(ApplicationController).to receive(:current_user_id?).and_return(true)
+            allow(first_review).to receive(:map).and_return(map)
+            allow(map).to receive(:reviewer).and_return(@user)
+            allow(@user).to receive(:user_id).and_return(1)
+            allow(map).to receive(:map_id).and_return(1)
+            put :update, :review => {:additional_comment => "Update Title", :map_id => "2", :round => '1'},:id => first_review.id
+         }
+
+          it "located the requested response" do
+            expect(assigns(:response)).to eq(first_review)
+          end
+
   end
-end
+  end
+  end

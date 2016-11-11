@@ -1,0 +1,24 @@
+@import url("http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,200,300,700");
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+a { text-decoration: none; }
+
+body {
+  font-family: "Source Sans Pro", sans-serif;
+}
+
+.title {
+  padding: 50px;
+  padding-bottom: 100px;
+  margin: 0;
+  background: #f2f2f2;
+  font-size: 48px;
+  font-weight: 200;
+  color: #919191;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.9);
+}

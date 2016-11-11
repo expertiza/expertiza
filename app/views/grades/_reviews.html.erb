@@ -72,7 +72,7 @@
                     <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedbacks.first.id %> or
                     <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedbacks.first.id, :return => "feedback" %> feedback for Review <%= count %>
                 <% else %>
-                    <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
+                    <%= link_to "Give feedback", :controller => 'review_mapping', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
                 <% end %>
                 </td></tr>
             <% end %>

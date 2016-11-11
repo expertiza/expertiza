@@ -48,6 +48,7 @@ class ResponseController < ApplicationController
 
   # Determining the current phase and check if a review is already existing for this stage.
   # If so, edit that version otherwise create a new version.
+
   # Prepare the parameters when student clicks "Edit"
   def edit
     @header = "Edit"
@@ -89,14 +90,32 @@ class ResponseController < ApplicationController
     begin
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
+      @questionnaire = if @map.type == "ReviewResponseMap" && @response.round
+                         @map.questionnaire(@response.round)
+                       elsif @map.type == "ReviewResponseMap"
+                         @map.questionnaire(nil)
+                       elsif @map.type == "SelfReviewResponseMap" && @response.round
+                         @map.questionnaire(@response.round)
+                       elsif @map.type == "SelfReviewResponseMap"
+                         @map.questionnaire(nil)
+                       else
+                         @map.questionnaire
+                       end
+      questions = @questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
 
-      #E1639 : Removed earlier code of finding questionnaire by calling set_questionnaire
-      @questionnaire = set_questionnaire
       questions = sort_questions(@questionnaire.questions)
+      create_answers(params, questions)
+      questions = @questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
 
-      # E1639 Removed redundant code by calling function create_answers
-      if params[:responses]
-        create_answers(params, questions)
+      unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
+        params[:responses].each_pair do |k, v|
+          score = Answer.where(response_id: @response.id, question_id:  questions[k.to_i].id).first
+          unless score
+            score = Answer.create(response_id: @response.id, question_id: questions[k.to_i].id, answer: v[:score], comments: v[:comment])
+          end
+          score.update_attribute('answer', v[:score])
+          score.update_attribute('comments', v[:comment])
+        end
       end
 
       if (params['isSubmit'] && (params['isSubmit'].eql?'Yes'))
@@ -127,8 +146,21 @@ class ResponseController < ApplicationController
     render action: 'response'
   end
 
-  # E1639 - new_feedback method was moved from here to review_mapping_controller
-  # this method was managing a FeedbackResponseMap object and not a Response object and hence should not be here
+  def new_feedback
+    review = Response.find(params[:id])
+    if review
+      reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id:  review.map.assignment.id).first
+      map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id:  reviewer.id).first
+      if map.nil?
+        # if no feedback exists by dat user den only create for dat particular response/review
+        map = FeedbackResponseMap.create(reviewed_object_id: review.id, reviewer_id: reviewer.id, reviewee_id: review.map.reviewer.id)
+      end
+      redirect_to action: 'new', id: map.id, return: "feedback"
+    else
+      redirect_to :back
+    end
+  end
+
   # view response
   def view
     @response = Response.find(params[:id])
@@ -172,11 +204,13 @@ class ResponseController < ApplicationController
     redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
   end
 
-  # E1639
-  #removed the assignment params[:return]="selfreview" for selfReviewResponseMap
-
+  # E1600
+  # Added paramps[:return] value for 'SelfReviewResponseMap' to ensure that this method is invoked from self-review operation
+  # this looks dirty to me. If other map type do not do this, there is no reason that we handle SelfReviewResponseMap here. There should be a elegant way.. --Yang
   def saving
     @map = ResponseMap.find(params[:id])
+    params[:return] = "selfreview" if @map.type == "SelfReviewResponseMap"
+
     @return = params[:return]
     @map.save
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]

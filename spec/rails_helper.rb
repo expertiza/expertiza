@@ -53,7 +53,24 @@ RSpec.configure do |config|
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
   config.infer_spec_type_from_file_location!
-
+  def integration_test_instructor_interface
+    before(:each) do
+      create(:assignment)
+      create_list(:participant, 3)
+      create(:assignment_node)
+      create(:deadline_type, name: "submission")
+      create(:deadline_type, name: "review")
+      create(:deadline_type, name: "metareview")
+      create(:deadline_type, name: "drop_topic")
+      create(:deadline_type, name: "signup")
+      create(:deadline_type, name: "team_formation")
+      create(:deadline_right)
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+      create(:assignment_due_date)
+      create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now + (100 * 24 * 60 * 60))
+    end
+  end    
   def login_as(user_name)
     user = User.find_by_name(user_name)
     msg = user.to_yaml
@@ -65,6 +82,60 @@ RSpec.configure do |config|
     click_button 'SIGN IN'
     stub_current_user(user, user.role.name, user.role)
   end
+  def instructor_login
+    describe "Instructor login" do
+      it "with valid username and password" do
+        login_as("instructor6")
+        visit '/tree_display/list'
+        expect(page).to have_content("Manage content")
+      end
+
+      it "with invalid username and password" do
+        visit root_path
+        fill_in 'login_name', with: 'instructor6'
+        fill_in 'login_password', with: 'something'
+        click_button 'SIGN IN'
+        expect(page).to have_content('Your username or password is incorrect.')
+      end
+    end
+  end  
+  def get_questionnaire(finder_var = nil)
+    if finder_var.nil?
+      AssignmentQuestionnaire.where(assignment_id: @assignment[:id])
+    else
+      AssignmentQuestionnaire.where(assignment_id: @assignment[:id]).where(questionnaire_id: get_selected_id(finder_var))
+    end
+  end
+  def expect_deadline_check(deadline_condition, send_reminder_condition, display_condition, dj_condition)
+    describe deadline_condition do
+      it send_reminder_condition do
+        # Delayed::Worker.delay_jobs = false
+        id = 2
+        @name = "user"
+
+        # due_at = DateTime.now + 120
+        # seconds_until_due = due_at - Time.now
+        # minutes_until_due = seconds_until_due / 60
+        due_at = DateTime.now.advance(minutes: +2)
+  
+        # puts DateTime.now
+        # puts due_at
+        due_at1 = Time.parse(due_at.to_s(:db))
+        curr_time = DateTime.now.to_s(:db)
+        curr_time = Time.parse(curr_time)
+        time_in_min = ((due_at1 - curr_time).to_i / 60) * 60
+        Delayed::Job.delete_all
+        expect(Delayed::Job.count).to eq(0)
+  
+        dj = Delayed::Job.enqueue(payload_object: DelayedMailer.new(id, dj_condition, due_at), priority: 1, run_at: time_in_min)
+  
+        expect(Delayed::Job.count).to eq(1)
+  
+        expect(Delayed::Job.last.handler).to include(display_condition)
+      end
+    end
+  end
+
 
   def stub_current_user(current_user, current_role_name = 'Student', current_role)
     allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(current_user)

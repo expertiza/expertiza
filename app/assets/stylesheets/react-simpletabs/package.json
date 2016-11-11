@@ -1,0 +1,68 @@
+{
+  "name": "react-simpletabs",
+  "version": "0.7.0",
+  "description": "Just a simple tabs component built with React",
+  "author": {
+    "name": "Pedro Nauck",
+    "email": "pedronauck@gmail.com",
+    "url": "https://github.com/pedronauck"
+  },
+  "bugs": {
+    "url": "https://github.com/pedronauck/react-simpletabs/issues"
+  },
+  "homepage": "https://github.com/pedronauck/react-simpletabs",
+  "license": "MIT",
+  "main": "dist/react-simpletabs.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/pedronauck/react-simpletabs"
+  },
+  "keywords": [
+    "react",
+    "react-component",
+    "react-tabs",
+    "tabs",
+    "tab"
+  ],
+  "scripts": {
+    "pub": "npm publish && bower register react-simpletabs git@github.com:pedronauck/react-simpletabs.git",
+    "bundle": "gulp webpack && gulp webpack --production",
+    "start": "gulp",
+    "test": "jest"
+  },
+  "jest": {
+    "scriptPreprocessor": "./utils/jsx-preprocessor.js",
+    "unmockedModulePathPatterns": [
+      "./node_modules/react"
+    ],
+    "testFileExtensions": [
+      "js",
+      "jsx"
+    ],
+    "moduleFileExtensions": [
+      "js",
+      "jsx",
+      "json"
+    ]
+  },
+  "peerDependencies": {
+    "react": "0.12.x - 1.x || ^0.14.0-rc1"
+  },
+  "dependencies": {
+    "classnames": "^1.2.0"
+  },
+  "devDependencies": {
+    "browser-sync": "^1.5.2",
+    "css-loader": "^0.9.0",
+    "extract-text-webpack-plugin": "^0.3.1",
+    "gulp": "^3.8.6",
+    "gulp-util": "^3.0.1",
+    "jest-cli": "^0.1.18",
+    "jsx-loader": "^0.12.2",
+    "lodash": "^2.4.1",
+    "react": "0.12.x - 1.x",
+    "react-tools": "^0.12.2",
+    "style-loader": "^0.8.1",
+    "webpack": "^1.4.4"
+  }
+}

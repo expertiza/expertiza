@@ -194,7 +194,7 @@ class ReviewResponseMap < ResponseMap
   end
 
   def email(defn,participant,assignment)
-    defn[:body][:type] = "Author Feedback"
+    defn[:body][:type] = "Peer Review"
     AssignmentTeam.find(reviewee_id).users.each do |user|
       defn[:body][:obj_name] = if assignment.has_topics?
                                  SignUpTopic.find(SignedUpTeam.topic_id(assignment.id, user.id)).topic_name

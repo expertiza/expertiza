@@ -38,29 +38,24 @@ class Checkbox < UnscoredQuestion
 
   # This method returns what to display if an instructor (etc.) is viewing a questionnaire
   def view_question_text
-    html = view_question_text_tr
-    safe_join(["".html_safe, "".html_safe], html.html_safe)
-  end
-
-  def view_question_text_tr
     html = '<TR><TD align="left"> ' + self.txt + ' </TD>'
     html += '<TD align="left">' + self.type + '</TD>'
     html += '<td align="center">' + self.weight.to_s + '</TD>'
     html += '<TD align="center">Checked/Unchecked</TD>'
     html += '</TR>'
-    html
-  end
-
-  def complete(count, answer = nil)
-    html = complete_or_completed_question + complete_first_second_input(count)
-    html += complete_input_if(answer) + complete_third_input(count, answer)
-    html += '<label for="responses_' + count.to_s + '">&nbsp;&nbsp;' + self.txt + '</label>'
-    html += complete_script(count) + complete_script_if
-    html += complete_if_columnheader
     safe_join(["".html_safe, "".html_safe], html.html_safe)
   end
 
-  def complete_or_completed_question
+  def complete(count, answer = nil)
+    html = check_previous_question + complete_first_second_input(count, answer)
+    html += complete_third_input(count, answer)
+    html += '<label for="responses_' + count.to_s + '">&nbsp;&nbsp;' + self.txt + '</label>'
+    html += complete_script(count)
+    html += complete_if_column_header
+    safe_join(["".html_safe, "".html_safe], html.html_safe)
+  end
+
+  def check_previous_question
     curr_question = Question.find(self.id)
     prev_question = Question.where("seq < ?", curr_question.seq).order(:seq).last
     html = if prev_question.type == 'ColumnHeader'
@@ -71,18 +66,14 @@ class Checkbox < UnscoredQuestion
     html
   end
 
-  def complete_first_second_input(count)
+  def complete_first_second_input(count, answer = nil)
     html = '<input id="responses_' + count.to_s + '_comments" name="responses[' + count.to_s + '][comment]" type="hidden" value="">'
     html += '<input id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" type="hidden"'
-    html
-  end
-
-  def complete_input_if(answer = nil)
-    html = if !answer.nil? and answer.answer == 1
-             'value="1"'
-           else
-             'value="0"'
-           end
+    html += if !answer.nil? and answer.answer == 1
+              'value="1"'
+            else
+              'value="0"'
+            end
     html += '>'
     html
   end
@@ -99,18 +90,14 @@ class Checkbox < UnscoredQuestion
     html = '<script>function checkbox' + count.to_s + 'Changed() {'
     html += ' var checkbox = jQuery("#responses_' + count.to_s + '_checkbox");'
     html += ' var response_score = jQuery("#responses_' + count.to_s + '_score");'
-    html
-  end
-
-  def complete_script_if
-    html = 'if (checkbox.is(":checked")) {'
+    html += 'if (checkbox.is(":checked")) {'
     html += 'response_score.val("1");'
     html += '} else {'
     html += 'response_score.val("0");}}</script>'
     html
   end
 
-  def complete_if_columnheader
+  def complete_if_column_header
     curr_question = Question.find(self.id)
     next_question = Question.where("seq > ?", curr_question.seq).order(:seq).first
     html = if next_question.type == 'ColumnHeader'
@@ -125,9 +112,9 @@ class Checkbox < UnscoredQuestion
 
   # This method returns what to display if a student is viewing a filled-out questionnaire
   def view_completed_question(count, answer)
-    html = complete_or_completed_question
+    html = check_previous_question
     html += view_completed_question_answer(count, answer)
-    html += view_completed_question_if_columnheader
+    html += view_completed_question_if_column_header
     safe_join(["".html_safe, "".html_safe], html.html_safe)
   end
 
@@ -140,7 +127,7 @@ class Checkbox < UnscoredQuestion
     html
   end
 
-  def view_completed_question_if_columnheader
+  def view_completed_question_if_column_header
     curr_question = Question.find(self.id)
     next_question = Question.where("seq > ?", curr_question.seq).order(:seq).first
     html = if next_question.type == 'ColumnHeader'

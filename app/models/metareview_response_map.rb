@@ -97,7 +97,7 @@ class MetareviewResponseMap < ResponseMap
           end
   end
 
-      def email(defn,participant,assignment)
+      def email(defn, participant, assignment)
         defn[:body][:type] = "Metareview"
         reviewee_user = Participant.find(reviewee_id)
         defn[:body][:obj_name] = assignment.name

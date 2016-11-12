@@ -76,7 +76,7 @@ class FeedbackResponseMap < ResponseMap
 
   #Send emails for author feedback
   #Refactored from email method in response.rb
-  def email(defn,assignment,participant)
+  def email(defn, participant, assignment)
     defn[:body][:type] = "Author Feedback"
     # reviewee is a response, reviewer is a participant
     # we need to track back to find the original reviewer on whose work the author comments

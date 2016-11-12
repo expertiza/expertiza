@@ -40,7 +40,7 @@
                   <%= form_for :user, url: '/impersonate/impersonate' do |f| %>
                       <TABLE>
                         <TR>
-                          <TD><%= f.text_field :name, {:size => 10,:class => 'form-control input-sm', :autocomplete => "off",placeholder: "User ID"} %></TD>
+                          <TD><%= f.text_field :name, {:size => 30,:class => 'form-control input-sm', :autocomplete => "off",placeholder: "User ID or left empty for random select"} %></TD>
                           <TD><%= f.submit 'Student View', :class=>"btn btn-primary input-sm"%></TD>
                         </TR>
                       </TABLE>

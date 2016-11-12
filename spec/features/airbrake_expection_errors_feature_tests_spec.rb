@@ -78,6 +78,22 @@ describe "Airbrake expection errors" do
         expect(page).to have_content('TestReview')
         expect(page).not_to have_content('Hello world!')
     end
+
+    # Airbrake-1608029321738848168
+    it "will not show error when instructor did not login and try to access assignment editting page" do
+        assignment = Assignment.first
+        visit "/assignments/#{assignment.id}/edit"
+        expect(page).to have_current_path('/')
+        expect(page).to have_content('is not allowed to edit this/these assignments')
+        expect(page).to have_content('Welcome!')
+        expect(page).to have_content('User Name')
+        expect(page).to have_content('Password')
+
+        login_as 'instructor6'
+        visit "/assignments/#{assignment.id}/edit"
+        expect(page).to have_current_path("/assignments/#{assignment.id}/edit")
+        expect(page).to have_content('Editing Assignment: TestAssignment')
+    end
 end
 
 describe "airbrake-1517247902792549741" do

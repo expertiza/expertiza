@@ -97,12 +97,12 @@ class MetareviewResponseMap < ResponseMap
           end
   end
 
-      def email(defn, participant, assignment)
-        defn[:body][:type] = "Metareview"
-        reviewee_user = Participant.find(reviewee_id)
-        defn[:body][:obj_name] = assignment.name
-        defn[:body][:first_name] = User.find(reviewee_user.user_id).fullname
-        defn[:to] = User.find(reviewee_user.user_id).email
-        Mailer.sync_message(defn).deliver
-      end
+  def email(defn, participant, assignment)
+    defn[:body][:type] = "Metareview"
+    reviewee_user = Participant.find(reviewee_id)
+    defn[:body][:obj_name] = assignment.name
+    defn[:body][:first_name] = User.find(reviewee_user.user_id).fullname
+    defn[:to] = User.find(reviewee_user.user_id).email
+    Mailer.sync_message(defn).deliver
+  end
 end

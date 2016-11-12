@@ -29,8 +29,8 @@ class ImpersonateController < ApplicationController
       if params[:impersonate].nil?
         user = User.find_by_name(params[:user][:name])
 	if params[:user][:name]==""                     # if user id is not provided, assign an user id randomly
-	  users = User.all
-	  user = users[rand(users.length)] 
+	  students = User.all.where(role_id: Role.student)
+	  user = students[rand(students.length)] 
 	end
         if user
           unless original_user.can_impersonate? user

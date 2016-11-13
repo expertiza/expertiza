@@ -29,7 +29,7 @@ describe "Airbrake expection errors" do
 	end
 
 	# Airbrake-1806782678925052472
-	it "can list sign_up_topics by using 'id' (participant_id) as parameter", js: true do
+	it "can list sign_up_topics by using 'id' as parameter key", js: true do
 		login_as 'student2066'
 		visit '/sign_up_sheet/list?id=1'
 		expect(page).to have_content('Signup sheet for')

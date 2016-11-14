@@ -152,3 +152,16 @@ describe "airbrake-1517247902792549741" do
         expect(page).not_to have_content('SIGN IN')
     end
 end
+
+describe "airbrake-1804043391875943089" do
+    it "can access team creation page even if the session[:team_type] is nil" do
+        assignment = create(:assignment)
+        login_as 'instructor6'
+        visit "/teams/new?id=#{assignment.id}"
+        expect{page}.not_to raise_error
+        expect(page).to have_content("Create Teams for #{assignment.name}")
+        expect(page).to have_content('Automatically')
+        expect(page).to have_content('Manually')
+        expect(page).to have_content('Inherit Teams From Course')
+    end
+end

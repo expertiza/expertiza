@@ -17,6 +17,41 @@ describe TeamsController do
       expect{ Object.const_get(session[:team_type] ||= 'Assignment').find(params[:id]) }.not_to raise_error(TypeError)
     end
   end
+
+  describe '#delete', type: :controller do
+    before(:each) do
+      user = build(:instructor)
+      stub_current_user(user, user.role.name, user.role)
+      # to deal with redirect_to :back
+      request.env['HTTP_REFERER'] = 'www.google.com'
+    end
+
+    it 'will redirect to previous page if the team cannot be found by id' do
+      allow(Team).to receive(:find).with(any_args).and_return(nil)
+      allow(Team).to receive(:find_by).with(any_args).and_return(nil)
+      post :delete, id: 1
+      expect(response).to redirect_to 'www.google.com'
+    end
+
+    it 'will delete the team if current team did not involve in any other reviews' do
+      team = double('Team', id: 1, name: 'test team', parent_id: 1)
+      signed_up_teams = [double('SignedUpTeam', topic_id: 1, is_waitlisted: true)]
+      controller.session[:team_type] = 'Assignment'
+      controller.session[:user] = double('User', id: 1)
+    
+      allow(Team).to receive(:find).with(any_args).and_return(team)
+      allow(Team).to receive(:find_by).with(any_args).and_return(team)
+      allow(Assignment).to receive(:find).with(any_args).and_return(double('Course'))
+      allow(SignedUpTeam).to receive(:where).with(any_args).and_return(signed_up_teams)
+      allow(SignedUpTeam).to receive_message_chain(:where, :first).with(any_args).and_return(signed_up_teams.first)
+      allow(TeamsUser).to receive(:where).with(any_args).and_return(nil)
+      allow(signed_up_teams).to receive(:destroy_all).and_return(true)
+      allow(team).to receive(:destroy).and_return(true)
+
+      post :delete, id: 1
+      expect(response).to redirect_to 'www.google.com'
+    end
+  end
 end
 
 describe ImportFileController do
@@ -93,7 +128,6 @@ end
 
 describe GradesController do
   # Airbrake-1784274870078015831
-
   describe '#redirect_when_disallowed', type: :controller do
     before(:each) do
       controller.instance_variable_set(:@participant, double('Participant', 

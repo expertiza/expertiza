@@ -5,7 +5,8 @@ class ReviewResponseMap < ResponseMap
 
   # In if this assignment uses "varying rubrics" feature, the sls
   # "used_in_round" field should not be nil
-  # so find the round # based on current time and the due date times, and use that round # to find corresponding questionnaire_id from assignment_questionnaires table
+  # so find the round # based on current time and the due date times, and use that round # to find corresponding
+  # questionnaire_id from assignment_questionnaires table
   # otherwise this assignment does not use the "varying rubrics", so in assignment_questionnaires table there should
   # be only 1 questionnaire with type 'ReviewQuestionnaire'.    -Yang
   def questionnaire(round)
@@ -44,51 +45,6 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
-  def self.import(row, _session, id)
-    raise ArgumentError, "Not enough items." if row.length < 2
-
-    assignment = Assignment.find(id)
-    if assignment.nil?
-      raise ImportError, "The assignment with id \"#{id}\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
-    end
-    index = 1
-    while index < row.length
-      user = User.find_by_name(row[index].to_s.strip)
-      if user.nil?
-        raise ImportError, "The user account for the reviewer \"#{row[index]}\" was not found. <a href='/users/new'>Create</a> this user?"
-      end
-      reviewer = AssignmentParticipant.where(user_id: user.id, parent_id:  assignment.id).first
-      if reviewer.nil?
-        raise ImportError, "The reviewer \"#{row[index]}\" is not a participant in this assignment. <a href='/users/new'>Register</a> this user as a participant?"
-      end
-      if assignment.team_assignment
-        reviewee = AssignmentTeam.where(name: row[0].to_s.strip, parent_id:  assignment.id).first
-        if reviewee.nil?
-          raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"
-        end
-        existing = ReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
-        if existing.nil?
-          ReviewResponseMap.create(reviewer_id: reviewer.id, reviewee_id: reviewee.id, reviewed_object_id: assignment.id)
-        end
-      else
-        puser = User.find_by_name(row[0].to_s.strip)
-        if user.nil?
-          raise ImportError, "The user account for the reviewee \"#{row[0]}\" was not found. <a href='/users/new'>Create</a> this user?"
-        end
-        reviewee = AssignmentParticipant.where(user_id: puser.id, parent_id:  assignment.id).first
-        if reviewee.nil?
-          raise ImportError, "The author \"#{row[0].to_s.strip}\" was not found. <a href='/users/new'>Create</a> this user?"
-        end
-        team_id = TeamsUser.team_id(reviewee.parent_id, reviewee.user_id)
-        existing = ReviewResponseMap.where(reviewee_id: team_id, reviewer_id:  reviewer.id).first
-        if existing.nil?
-          ReviewResponseMap.create(reviewee_id: team_id, reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
-        end
-      end
-      index += 1
-    end
-  end
-
   def show_feedback(response)
     if !self.response.empty? && response
       map = FeedbackResponseMap.find_by_reviewed_object_id(response.id)
@@ -120,11 +76,10 @@ class ReviewResponseMap < ResponseMap
   end
 
   # return  the responses for specified round, for varying rubric feature -Yang
-  def self.get_assessments_round_for(team, round)
-    team_id = team.id
+  def self.get_responses_for_team_round(team, round)
     responses = []
-    if team_id
-      maps = ResponseMap.where(reviewee_id: team_id, type: "ReviewResponseMap")
+    if team.id
+      maps = ResponseMap.where(reviewee_id: team.id, type: "ReviewResponseMap")
       maps.each do |map|
         if !map.response.empty? && !map.response.reject {|r| (r.round != round || !r.is_submitted) }.empty?
           responses << map.response.reject {|r| (r.round != round || !r.is_submitted) }.last
@@ -178,7 +133,8 @@ class ReviewResponseMap < ResponseMap
   def self.review_response_report(id, assignment, type, review_user)
     if review_user.nil?
       # This is not a search, so find all reviewers for this assignment
-      response_maps_with_distinct_participant_id = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ? and calibrate_to = ?", id, type, 0])
+      response_maps_with_distinct_participant_id =
+          ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ? and calibrate_to = ?", id, type, 0])
       @reviewers = []
       response_maps_with_distinct_participant_id.each do |reviewer_id_from_response_map|
         @reviewers << AssignmentParticipant.find(reviewer_id_from_response_map.reviewer_id)
@@ -191,5 +147,15 @@ class ReviewResponseMap < ResponseMap
     end
     #  @review_scores[reveiwer_id][reviewee_id] = score for assignments not using vary_rubric_by_rounds feature
     # @review_scores[reviewer_id][round][reviewee_id] = score for assignments using vary_rubric_by_rounds feature
+  end
+
+  def email(defn, participant, assignment)
+    defn[:body][:type] = "Peer Review"
+    AssignmentTeam.find(reviewee_id).users.each do |user|
+      defn[:body][:obj_name] = assignment.name
+      defn[:body][:first_name] = User.find(user.id).fullname
+      defn[:to] = User.find(user.id).email
+      Mailer.sync_message(defn).deliver_now
+    end
   end
 end

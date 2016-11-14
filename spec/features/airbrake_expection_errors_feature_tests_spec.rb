@@ -93,6 +93,7 @@ describe "Airbrake expection errors" do
         visit "/assignments/#{assignment.id}/edit"
         expect(page).to have_current_path("/assignments/#{assignment.id}/edit")
         expect(page).to have_content('Editing Assignment: TestAssignment')
+    end
 
     # Airbrake-1817691804353957801
     it 'will not raise error when saving questionnaire w/o question', js: true do
@@ -163,5 +164,35 @@ describe "airbrake-1804043391875943089" do
         expect(page).to have_content('Automatically')
         expect(page).to have_content('Manually')
         expect(page).to have_content('Inherit Teams From Course')
+    end
+end
+
+describe 'airbrake-1776303046291622084' do
+    it 'can paginate user list by clicking alphabet characters' do
+        create(:instructor)
+        (1..25).each { |i| create(:student, name: "student#{i}") }
+        login_as 'instructor6'
+        visit '/users/list'
+        expect{page}.not_to raise_error
+        expect(page).to have_content('Manage users')
+        expect(page).to have_content('Users per page:')
+        expect(page).to have_content('New User | Import Users| Export Users')
+        expect(page).to have_content('instructor6')
+        (1..25).each { |i| expect(page).to have_content("student#{i}")}
+
+        # start paginating
+        first(:link, 'N').click
+        expect(page).to have_current_path('/users/list?from_letter=1&letter=N')
+        expect(page).to have_content('← Previous 1 2 Next →')
+        expect(page).to have_content('instructor6')
+        (1..24).each { |i| expect(page).to have_content("student#{i}")}
+        expect(page).not_to have_content('student25')
+
+        # goto 2nd page
+        first(:link, '2').click
+        expect(page).not_to have_content("student1")
+        # exclude content 'student2' because of 'student25'
+        (3..24).each { |i| expect(page).not_to have_content("student#{i}")}
+        expect(page).to have_content('student25')
     end
 end

@@ -93,6 +93,22 @@ describe "Airbrake expection errors" do
         visit "/assignments/#{assignment.id}/edit"
         expect(page).to have_current_path("/assignments/#{assignment.id}/edit")
         expect(page).to have_content('Editing Assignment: TestAssignment')
+
+    # Airbrake-1817691804353957801
+    it 'will not raise error when saving questionnaire w/o question', js: true do
+        login_as 'instructor6'
+        visit '/questionnaires/new?model=ReviewQuestionnaire&private=0'
+        fill_in('questionnaire_name', with: 'Review 1')
+        click_button 'Create'
+        questionnaire = Questionnaire.where(name: 'Review 1').first
+        expect(page).to have_current_path("/author_feedback_questionnaires/#{questionnaire.id}/edit")
+        expect(page).to have_content('Edit Review')
+        expect(page).to have_content('Import/Export (from/to CSV format)')
+
+        click_button('Save review questionnaire')
+        expect{page}.not_to raise_error
+        expect(page).to have_current_path("/questionnaires/#{questionnaire.id}/edit")
+        expect(page).to have_content("undefined method `each_pair' for nil:NilClass")
     end
 end
 

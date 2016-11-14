@@ -58,7 +58,7 @@ end
 describe MenuItemsController do
   # Airbrake-1766139777878852159
   describe '#link', type: :controller do
-    it "can handle the situation (redirect_to '/') when the session[:menu] is nil"do
+    it "can handle the situation (redirect_to '/') when the session[:menu] is nil" do
       controller.params[:name] = "manage/courses"
       controller.session[:menu] = nil
       get :link
@@ -76,7 +76,8 @@ end
 
 describe GradesController do
   # Airbrake-1784274870078015831
-  describe '#redirect_when_disallowed' do
+
+  describe '#redirect_when_disallowed', type: :controller do
     before(:each) do
       controller.instance_variable_set(:@participant, double('Participant', 
                                                               team: build(:assignment_team),

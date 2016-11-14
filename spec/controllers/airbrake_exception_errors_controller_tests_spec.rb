@@ -17,7 +17,8 @@ describe TeamsController do
       expect{ Object.const_get(session[:team_type] ||= 'Assignment').find(params[:id]) }.not_to raise_error(TypeError)
     end
   end
-
+ 
+  # Airbrake-1807465099223895248
   describe '#delete', type: :controller do
     before(:each) do
       user = build(:instructor)

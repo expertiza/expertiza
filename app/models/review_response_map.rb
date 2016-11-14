@@ -76,10 +76,9 @@ class ReviewResponseMap < ResponseMap
 
   # return  the responses for specified round, for varying rubric feature -Yang
   def self.get_responses_for_team_round(team, round)
-    team_id = team.id
     responses = []
-    if team_id
-      maps = ResponseMap.where(reviewee_id: team_id, type: "ReviewResponseMap")
+    if team.id
+      maps = ResponseMap.where(reviewee_id: team.id, type: "ReviewResponseMap")
       maps.each do |map|
         if !map.response.empty? && !map.response.reject {|r| (r.round != round || !r.is_submitted) }.empty?
           responses << map.response.reject {|r| (r.round != round || !r.is_submitted) }.last

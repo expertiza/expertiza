@@ -80,7 +80,7 @@ function microtaskChanged() {
       <% @assignment_form.assignment.max_team_size %>
       <%= label_tag('team_assignment', 'Has teams?') %>
 
-    <span style='padding:5px' id='assignment_team_count_field' <%= 'hidden' if @assignment_form.assignment.max_team_size == 1%>>
+      <span style='padding:5px' id='assignment_team_count_field' <%= 'hidden' if @assignment_form.assignment.max_team_size == 1%>>
 
       <!--Teammate reviews fields-->
       <input name="assignment_form[assignment][show_teammate_reviews]" type="hidden" value="false"/>
@@ -88,7 +88,7 @@ function microtaskChanged() {
       <%= text_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size, {:style => 'width:20px'}) %>
       </span>
     </td>
-      <td style='padding-left:50px' id='assignment_show_teammate_reviews'  <%= 'hidden' if @assignment_form.assignment.max_team_size < 2%>>
+    <td style='padding-left:50px' id='assignment_show_teammate_reviews'  <%= 'hidden' if @assignment_form.assignment.max_team_size < 2%>>
 
       <%= check_box_tag('assignment_form[assignment][show_teammate_reviews]', 'true', @assignment_form.assignment.show_teammate_reviews) %>
       <%= label_tag('assignment_form[assignment][show_teammate_reviews]', 'Show teammate reviews?') %>
@@ -225,6 +225,14 @@ function microtaskChanged() {
           jQuery('#assignment_review_topic_threshold_row').attr('hidden', true);
         }
    }
+
+    function dutyBasedStrategy() {
+      if (jQuery('#assignment_form[assignment][duty_based]').is(':checked')) {
+        jQuery('#assignment_duties').removeAttr('hidden');
+      } else {
+        jQuery('#assignment_duties').attr('hidden', true);
+      }
+    }
 
 
     function hasQuizChanged() {

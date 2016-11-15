@@ -78,8 +78,8 @@ ActiveRecord::Schema.define(version: 20161115023113) do
     t.boolean  "is_calibrated",                            default: false
     t.boolean  "is_selfreview_enabled"
     t.string   "reputation_algorithm",       limit: 255,   default: "Lauw"
-    t.integer  "duty_based",                 limit: 4
-    t.integer  "allow_duty_share",           limit: 4
+    t.boolean  "duty_based"
+    t.boolean  "allow_duty_share"
     t.string   "duty_names",                 limit: 255
   end
 

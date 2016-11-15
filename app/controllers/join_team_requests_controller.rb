@@ -101,6 +101,7 @@ class JoinTeamRequestsController < ApplicationController
     end
   end
   
+  #this method is used in the initial set up 
   def set_join_team_request
     @join_team_request = JoinTeamRequest.find(params[:id])
   end

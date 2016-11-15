@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161008030832) do
+ActiveRecord::Schema.define(version: 20161115023113) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -78,6 +78,9 @@ ActiveRecord::Schema.define(version: 20161008030832) do
     t.boolean  "is_calibrated",                            default: false
     t.boolean  "is_selfreview_enabled"
     t.string   "reputation_algorithm",       limit: 255,   default: "Lauw"
+    t.integer  "duty_based",                 limit: 4
+    t.integer  "allow_duty_share",           limit: 4
+    t.string   "duty_names",                 limit: 255
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -223,6 +226,13 @@ ActiveRecord::Schema.define(version: 20161008030832) do
   add_index "due_dates", ["review_allowed_id"], name: "fk_due_date_review_allowed", using: :btree
   add_index "due_dates", ["review_of_review_allowed_id"], name: "fk_due_date_review_of_review_allowed", using: :btree
   add_index "due_dates", ["submission_allowed_id"], name: "fk_due_date_submission_allowed", using: :btree
+
+  create_table "duties", force: :cascade do |t|
+    t.integer "team_id",          limit: 4
+    t.integer "student_id",       limit: 4
+    t.string  "duty",             limit: 255
+    t.integer "questionnaire_id", limit: 4
+  end
 
   create_table "institutions", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false

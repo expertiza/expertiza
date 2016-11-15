@@ -68,15 +68,20 @@
   </tr>
   <tr>
     <td style='padding:5px' id='assignment_is_duty_based'>
-      <input name="assignment_form[assignment][duty_based]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][duty_based]', 'true', @assignment_form.assignment.duty_based, {:onChange => 'dutyBasedStrategy()'}) %>
-      <%= label_tag('assignment_form[assignment][duty_based]', 'Duty based?') %>
+      <%= check_box_tag('duty_based', 'true', @assignment_form.assignment.duty_based, {:onChange => 'dutyBasedStrategy()'}) %>
+      <%= label_tag('duty_based', 'Duty based?') %>
     </td>
   </tr>
   <tr>
-    <td id='assignment_duties'>
-      <%= text_field_tag('duties', 'Develop,Test,Document', {:style => 'width:500px'}) %>
-      <%= submit_tag 'add duties', :id => 'duties_submit_tag' %>
+    <td style='padding:5px' id='assignment_duty_is_shared' <%= 'hidden' if !@assignment_form.assignment.duty_based %>>
+      <%= check_box_tag('allow_duty_share', 'true', @assignment_form.assignment.allow_duty_share) %>
+      <%= label_tag('allow_duty_share', 'Allow duty shared?') %>
+    </td>
+  </tr>
+  <tr>
+    <td style='padding:5px' id='assignment_duties' <%= 'hidden' if !@assignment_form.assignment.duty_based %>>
+      <%= label_tag('assignment_form[assignment][duty_names]', 'Duty names:') %>
+      <%= text_field_tag('assignment_form[assignment][duty_names]', @assignment_form.assignment.duty_names, {:style => 'width:800px'}) %>
     </td>
   </tr>
 

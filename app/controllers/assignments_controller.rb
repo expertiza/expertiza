@@ -141,6 +141,8 @@ class AssignmentsController < ApplicationController
       flash[:error] = "We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. For now we assume you are in " + parent_timezone
       current_user.timezonepref = parent_timezone
     end
+    @assignment_form.assignment.duty_based = params[:duty_based]
+    @assignment_form.assignment.allow_duty_share = params[:allow_duty_share]
     if @assignment_form.update_attributes(assignment_form_params, current_user)
       flash[:note] = 'The assignment was successfully saved.'
     else

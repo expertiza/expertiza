@@ -227,10 +227,13 @@ function microtaskChanged() {
    }
 
     function dutyBasedStrategy() {
-      if (jQuery('#assignment_form[assignment][duty_based]').is(':checked')) {
+      var checkbox = jQuery('#duty_based');
+      if (checkbox.is(':checked')) {
         jQuery('#assignment_duties').removeAttr('hidden');
+        jQuery('#assignment_duty_is_shared').removeAttr('hidden');
       } else {
         jQuery('#assignment_duties').attr('hidden', true);
+        jQuery('#assignment_duty_is_shared').attr('hidden', true);
       }
     }
 

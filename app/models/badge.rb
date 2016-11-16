@@ -3,25 +3,30 @@ class Badge
 
 	NUMBER_OF_BADGES = 5
 	GOOD_REVIEW_THRESHOLD = 95
-	
+
 	def self.get_badges(assignment_list)
 		
 		# create badge matrix
 		current_assignment_count = 0
-		badge_matrix_row = [false] * NUMBER_OF_BADGES
+		#badge_matrix_row = [false] * NUMBER_OF_BADGES
 		badge_matrix = []
 
 		assignment_list.each do |assignment|
 			participant = assignment.participant
 			
 			# insert a new row in badge matrix
-			badge_matrix.push(badge_matrix_row)
+			badge_matrix.push([false] * NUMBER_OF_BADGES)
 
 			# check for different badges
 
 			# Good reviewer badge
 			badge_matrix[current_assignment_count][2] = Badge.good_reviewer(participant)
+
+			current_assignment_count = current_assignment_count + 1
 		end
+
+		return badge_matrix
+	
 	end
 
 	private

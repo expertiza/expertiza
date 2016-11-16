@@ -145,8 +145,7 @@ def calc_review_score
 end
 
 def scores_varying_rubrics
-  rounds = self.rounds_of_reviews
-  rounds.each do |round|
+  self.rounds_of_reviews.each do |round|
     review_questionnaire_id = review_questionnaire_id(round)
     @questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
     each_response

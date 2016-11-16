@@ -110,7 +110,8 @@
             <b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b> <br>
             <% student_badge.each do |each_badge| %>
               <% if each_badge %>
-                <img id="good_reviewer_badge" src="/assets/badges/good_reviewer_badge.png" title = 'Good Reviewer'>
+                <!-- <img id="good_reviewer_badge" src="/assets/badges/good_reviewer_badge.png" title = 'Good Reviewer'> -->
+                <%= each_badge %>
               <% end %>
             <% end %>
           </td>

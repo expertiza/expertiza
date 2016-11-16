@@ -1,14 +1,15 @@
 class Badge
-	attr_accessor :user
-
+	
 	NUMBER_OF_BADGES = 5
+	
+	# CONSTANTS RELATED TO GOOD REVIEWER
 	GOOD_REVIEW_THRESHOLD = 95
+	GOOD_REVIEWER_BADGE_IMAGE = "<img id='good_reviewer_badge' src='/assets/badges/good_reviewer_badge.png' title = 'Good Reviewer'>"
 
 	def self.get_badges(assignment_list)
 		
 		# create badge matrix
 		current_assignment_count = 0
-		#badge_matrix_row = [false] * NUMBER_OF_BADGES
 		badge_matrix = []
 
 		assignment_list.each do |assignment|
@@ -39,7 +40,7 @@ class Badge
 		end
 
 		if info >= GOOD_REVIEW_THRESHOLD
-			return true
+			return GOOD_REVIEWER_BADGE_IMAGE.html_safe
 		else
 			return false
 		end

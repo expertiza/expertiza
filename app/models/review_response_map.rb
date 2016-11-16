@@ -67,10 +67,8 @@ class ReviewResponseMap < ResponseMap
     responses = Response.where(map_id: self.id)
     metareview_list = []
     responses.each do |response|
-      metareview_response_maps = MetareviewResponseMap.where(reviewed_object_id: response.id)
-      metareview_response_maps.each do |metareview_response_map|
+      metareview_response_map = MetareviewResponseMap.find_by reviewed_object_id: response.id
         metareview_list << metareview_response_map
-      end
     end
     metareview_list
   end
@@ -95,40 +93,10 @@ class ReviewResponseMap < ResponseMap
   def self.final_versions_from_reviewer(reviewer_id)
     maps = ReviewResponseMap.where(reviewer_id: reviewer_id)
     assignment = Assignment.find(Participant.find(reviewer_id).parent_id)
-    review_final_versions = {}
-
-    if !assignment.varying_rubrics_by_round?
-      # same review rubric used in multiple rounds
-      review_final_versions[:review] = {}
-      review_final_versions[:review][:questionnaire_id] = assignment.review_questionnaire_id
-      response_ids = []
-
-      maps.each do |map|
-        responses = Response.where(map_id: map.id)
-        response_ids << responses.last.id unless responses.empty?
-      end
-      review_final_versions[:review][:response_ids] = response_ids
-
-    else
-      # vary rubric by round
-      rounds_num = assignment.rounds_of_reviews
-
-      for round in 1..rounds_num
-        symbol = ("review round" + round.to_s).to_sym
-        review_final_versions[symbol] = {}
-        review_final_versions[symbol][:questionnaire_id] = assignment.review_questionnaire_id(round)
-        response_ids = []
-
-        maps.each do |map|
-          responses = Response.where(map_id: map.id, round: round)
-          response_ids << responses.last.id unless responses.empty?
-        end
-        review_final_versions[symbol][:response_ids] = response_ids
-      end
-
-    end
-    review_final_versions
+    review_final_versions = prepare_final_review_versions(assignment, maps)
   end
+
+
 
   def self.review_response_report(id, assignment, type, review_user)
     if review_user.nil?
@@ -157,5 +125,47 @@ class ReviewResponseMap < ResponseMap
       defn[:to] = User.find(user.id).email
       Mailer.sync_message(defn).deliver_now
     end
+  end
+
+  private
+
+  def self.prepare_final_review_versions(assignment, maps)
+    review_final_versions = {}
+
+    if !assignment.varying_rubrics_by_round?
+      prepare_review_response(assignment, maps, review_final_versions, nil)
+
+    else
+      # vary rubric by round
+      rounds_num = assignment.rounds_of_reviews
+
+      (1..rounds_num).each do |round|
+        prepare_review_response(assignment, maps, review_final_versions, round)
+      end
+
+    end
+    review_final_versions
+  end
+
+  def self.prepare_review_response(assignment, maps, review_final_versions, round)
+    if round.nil?
+      symbol= :review
+    else
+      symbol = ("review round" + round.to_s).to_sym
+    end
+    review_final_versions[symbol] = {}
+    review_final_versions[symbol][:questionnaire_id] = assignment.review_questionnaire_id(round)
+    response_ids = []
+
+    maps.each do |map|
+      where_map={map_id: map.id}
+      if !round.nil?
+        where_map[:round]=round
+      end
+      responses = Response.where(where_map)
+      response_ids << responses.last.id unless responses.empty?
+    end
+    review_final_versions[symbol][:response_ids] = response_ids
+
   end
 end

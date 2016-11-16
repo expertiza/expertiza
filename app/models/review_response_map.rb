@@ -67,8 +67,10 @@ class ReviewResponseMap < ResponseMap
     responses = Response.where(map_id: self.id)
     metareview_list = []
     responses.each do |response|
-      metareview_response_map = MetareviewResponseMap.find_by reviewed_object_id: response.id
+      metareview_response_maps = MetareviewResponseMap.where(reviewed_object_id: response.id)
+      metareview_response_maps.each do |metareview_response_map|
         metareview_list << metareview_response_map
+      end
     end
     metareview_list
   end
@@ -93,10 +95,8 @@ class ReviewResponseMap < ResponseMap
   def self.final_versions_from_reviewer(reviewer_id)
     maps = ReviewResponseMap.where(reviewer_id: reviewer_id)
     assignment = Assignment.find(Participant.find(reviewer_id).parent_id)
-    review_final_versions = prepare_final_review_versions(assignment, maps)
+    prepare_final_review_versions(assignment, maps)
   end
-
-
 
   def self.review_response_report(id, assignment, type, review_user)
     if review_user.nil?

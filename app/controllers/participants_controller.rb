@@ -38,22 +38,28 @@ class ParticipantsController < ApplicationController
     DelayedMailer.deliver_mail("recipient.address@example.com")
   end
 
+#OSS E1663 team from Fall 2016 batch modified on 1st Nov, 2016
+#Added a respond_to block to render to JS file instead of HTML file.
   def add
-    curr_object = Object.const_get(params[:model]).find(params[:id]) if Participant::PARTICIPANT_TYPES.include? params[:model]
+    @curr_object = Object.const_get(params[:model]).find(params[:id]) if Participant::PARTICIPANT_TYPES.include? params[:model]
     begin
-      permissions = Participant.get_permissions(params[:authorization])
+      permissions = Participant.get_permissions(params[:user][:role])
       can_submit = permissions[:can_submit]
       can_review = permissions[:can_review]
       can_take_quiz = permissions[:can_take_quiz]
-      curr_object.add_participant(params[:user][:name], can_submit, can_review, can_take_quiz)
+      @curr_object.add_participant(params[:user][:name])
       user = User.find_by_name(params[:user][:name])
-      @participant = curr_object.participants.find_by_user_id(user.id)
+      @participant = @curr_object.participants.find_by_user_id(user.id)
       undo_link("The user \"#{params[:user][:name]}\" has successfully been added.")
     rescue
       url_new_user = url_for controller: 'users', action: 'new'
       flash[:error] = "The user #{params[:user][:name]} does not exist or has already been added.</a>"
     end
-    redirect_to action: 'list', id: curr_object.id, model: params[:model], authorization: params[:authorization]
+    respond_to do |format|
+      format.html { redirect_to action: 'list', id: @curr_object.id, model: params[:model], authorization: params[:authorization] }
+      format.js
+   end
+    #redirect_to action: 'list', id: curr_object.id, model: params[:model], authorization: params[:authorization]
   end
 
   def update_authorizations

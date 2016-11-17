@@ -11,7 +11,7 @@ module Expertiza
 
     #This is a logger to capture internal server errors that do not show up when testing javascript. Look in log/diagnostic.txt when there is a 500 error.
     if Rails.env == 'test'
-      require File.expand_path("../diagnostic.rb", __FILE__)
+      require File.expand_path('../diagnostic.rb', __FILE__)
       config.middleware.use(MyApp::DiagnosticMiddleware)
     end
 
@@ -25,7 +25,7 @@ module Expertiza
     config.use_ssl = false
 
     # Configure the default encoding used in templates for Ruby 1.9.
-    config.encoding = "utf-8"
+    config.encoding = 'utf-8'
 
     #When you are ready, you can opt into the new behavior and remove the deprecation warning by adding following configuration to your config/application.rb
     config.active_record.raise_in_transactional_callbacks = true

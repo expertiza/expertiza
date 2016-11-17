@@ -194,6 +194,8 @@ class QuestionnairesController < ApplicationController
   end
 
   # Zhewei: This method is used to add new questions when editing questionnaire.
+  #OSS E1663 team from Fall 2016 batch modified on 1st Nov, 2016
+  #Added a respond_to block to render to JS file instead of HTML file
   def add_new_questions
     questionnaire_id = params[:id] unless params[:id].nil?
     num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
@@ -214,10 +216,18 @@ class QuestionnairesController < ApplicationController
         flash[:error] = $ERROR_INFO
       end
     end
-    redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+    @questionnaire_id=questionnaire_id
+    @params_action=params[:action]
+    @questionnaire = Questionnaire.find(questionnaire_id)
+    respond_to do |format|
+      format.html {redirect_to edit_questionnaire_path(questionnaire_id.to_sym)}
+      format.js {render :action => 'add_new_questions'} #Added a handler for a JS request from a browser
+    end
   end
 
   # Zhewei: This method is used to save all questions in current questionnaire.
+  #OSS E1663 team from Fall 2016 batch modified on 1st Nov, 2016
+  #Added a respond_to block to render to JS file instead of HTML file.
   def save_all_questions
     questionnaire_id = params[:id] unless params[:id].nil?
     if params['save']
@@ -230,7 +240,8 @@ class QuestionnairesController < ApplicationController
         end
         begin
           @question.save
-          flash[:success] = 'All questions has been successfully saved!'
+          #removed message here as JS now takes care of it
+          #flash[:success] = 'All questions has been successfully saved!'
         rescue
           flash[:error] = $ERROR_INFO
         end
@@ -243,7 +254,10 @@ class QuestionnairesController < ApplicationController
     if params['view_advice']
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     else
-      redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+      respond_to do |format|
+        format.html {redirect_to edit_questionnaire_path(questionnaire_id.to_sym)}
+        format.js {render :action => 'edit'} #Added a handler for a JS request from a browser
+      end
     end
   end
 

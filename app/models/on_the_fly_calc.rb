@@ -122,6 +122,23 @@ def calculate_assessment
   end
 end
 
+<<<<<<< HEAD
+=======
+def calc_contri_score
+  self.rounds_of_reviews.each do |round|
+    review_questionnaire_id = review_questionnaire_id(round)
+    questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
+    contributors.each do |contributor|
+      assessments = ReviewResponseMap.get_assessments_for(contributor)
+      assessments = assessments.reject {|assessment| assessment.round != round }
+      scores[contributor.id] = {} if round == 1
+      scores[contributor.id][round] = {}
+      scores[contributor.id][round] = Answer.compute_scores(assessments, questions)
+    end
+  end
+end
+
+>>>>>>> master
 def calc_review_score
   if !@corresponding_response.empty?
     @this_review_score_raw = Answer.get_total_score(response: @corresponding_response, questions: @questions)
@@ -134,8 +151,12 @@ def calc_review_score
 end
 
 def scores_varying_rubrics
+<<<<<<< HEAD
   rounds = self.rounds_of_reviews
   for round in 1..rounds
+=======
+  self.rounds_of_reviews.each do |round|
+>>>>>>> master
     review_questionnaire_id = review_questionnaire_id(round)
     @questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
     @response_maps.each do |response_map|

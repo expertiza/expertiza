@@ -10,6 +10,10 @@ class CourseTeam < Team
     "Course"
   end
 
+  def self.parent_model (id)
+    Course.find(id) 
+  end
+
   # Get team node type
   def get_node_type
     "TeamNode"
@@ -27,7 +31,7 @@ class CourseTeam < Team
 
   # Copy this course team to the assignment team
   def copy(assignment_id)
-    new_team = AssignmentTeam.create_team_and_node(assignment_id, AssignmentTeam.name)
+    new_team = AssignmentTeam.create_team_and_node(assignment_id)
     new_team.name = name
     new_team.save
     copy_members(new_team)
@@ -66,7 +70,7 @@ class CourseTeam < Team
   end
 
   # Add member to the course team
-  def add_member(user, _assignment_id)
+  def add_member(user)
     if has_user(user)
       raise "The user \"" + user.name + "\" is already a member of the team, \"" + self.name + "\""
     end

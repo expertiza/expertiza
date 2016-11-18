@@ -13,6 +13,8 @@
   
     <% @l = -1 %>
     <% @teams.each do |team| %>
+
+
     	<% @l = @l+1 %>
     	<tr>
         <% bgcolor = @l.even? ? "#ffffff" : "#DDDDBB" %>
@@ -35,6 +37,8 @@
       	<td bgcolor= <%= bgcolor %>>
       	<!--Display submitted hyperlinks-->
    			  <% participant = participants.compact.first %>
+          <%= link_to "Show Submission Records", submission_records_path(team_id: team.id) %>
+          <br></br>
       	  <% if participant and !team.hyperlinks.empty? %>
             Hyperlinks: <br/>
             <% team.hyperlinks.each do |link| %>

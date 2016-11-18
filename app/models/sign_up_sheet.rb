@@ -5,7 +5,6 @@ class SignUpSheet < ActiveRecord::Base
     if users_team.empty?
       # if team is not yet created, create new team.
       # create Team and TeamNode
-      #10/25/2016 - Updated create_team_and_node method signature
       team = AssignmentTeam.create_team_and_node(assignment_id)
       user = User.find(user_id)
       # create TeamsUser and TeamUserNode

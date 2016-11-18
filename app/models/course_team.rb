@@ -30,7 +30,6 @@ class CourseTeam < Team
   end
 
   # Copy this course team to the assignment team
-  #10/25/2016 - Updated create_team_and_node method signature
   def copy(assignment_id)
     new_team = AssignmentTeam.create_team_and_node(assignment_id)
     new_team.name = name

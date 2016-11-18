@@ -25,7 +25,18 @@ module OnTheFlyCalc
     scores = {}
     contributors = self.contributors # assignment_teams
     if self.varying_rubrics_by_round?
-      calc_contri_score
+      rounds = self.rounds_of_reviews
+      for round in 1..rounds
+        review_questionnaire_id = review_questionnaire_id(round)
+        questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
+        contributors.each do |contributor|
+          assessments = ReviewResponseMap.get_assessments_for(contributor)
+          assessments = assessments.reject {|assessment| assessment.round != round }
+          scores[contributor.id] = {} if round == 1
+          scores[contributor.id][round] = {}
+          scores[contributor.id][round] = Answer.compute_scores(assessments, questions)
+        end
+      end
     else
       review_questionnaire_id = review_questionnaire_id()
       questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
@@ -41,7 +52,6 @@ module OnTheFlyCalc
   def scores(questions)
     scores = {}
     score_team = scores[:teams][index.to_s.to_sym]
-    score = score_team[:scores]
     scores[:participants] = {}
     participant_score
     scores[:teams] = {}
@@ -50,12 +60,21 @@ module OnTheFlyCalc
       score_team = {}
       score_team[:team] = team
       if self.varying_rubrics_by_round?
-        assess
+        self.num_review_rounds.each do |i|
+          total_score = 0
+          total_num_of_assessments = 0 # calculate grades for each rounds
+          grades_by_rounds = {}
+          assessments = ReviewResponseMap.get_assessments_round_for(team, i)
+          round_sym = ("review" + i.to_s).to_sym
+          grades_by_rounds[round_sym] = Answer.compute_scores(assessments, questions[round_sym])
+          total_num_of_assessments += assessments.size
+          total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f unless grades_by_rounds[round_sym][:avg].nil?
+        end
         calculate_score
         calculate_assessment
       else
         assessments = ReviewResponseMap.get_assessments_for(team)
-        score = Answer.compute_scores(assessments, questions[:review])
+        score_team[:scores] = Answer.compute_scores(assessments, questions[:review])
       end
       index += 1
     end
@@ -65,33 +84,17 @@ end
 
 private
 
-def assess
-  self.num_review_rounds.each do |i|
-    total_score = 0
-    total_num_of_assessments = 0 # calculate grades for each rounds
-    grades_by_rounds = {}
-    round = grades_by_rounds[round_sym]
-    assessments = ReviewResponseMap.get_assessments_round_for(team, i)
-    round_sym = ("review" + i.to_s).to_sym
-    round = Answer.compute_scores(assessments, questions[round_sym])
-    total_num_of_assessments += assessments.size
-    total_score += round[:avg] * assessments.size.to_f unless round[:avg].nil?
-  end
-end
-
 def calculate_score
   score = {}
   score[:max] = -999_999_999
   score[:min] = 999_999_999
   score[:avg] = 0
   grades_by_rounds = {}
-  round = grades_by_rounds[round_sym]
   self.num_review_rounds.each do |i|
     round_sym = ("review" + i.to_s).to_sym
     grades_by_rounds = {}
-    round = grades_by_rounds[round_sym]
-    score[:max] = round[:max] if max_condition
-    score[:min] = round[:min] if min_condition
+    score[:max] = grades_by_rounds[round_sym][:max] if max_condition
+    score[:min] = grades_by_rounds[round_sym][:min] if min_condition
   end
 end
 
@@ -119,6 +122,8 @@ def calculate_assessment
   end
 end
 
+<<<<<<< HEAD
+=======
 def calc_contri_score
   self.rounds_of_reviews.each do |round|
     review_questionnaire_id = review_questionnaire_id(round)
@@ -133,6 +138,7 @@ def calc_contri_score
   end
 end
 
+>>>>>>> master
 def calc_review_score
   if !@corresponding_response.empty?
     @this_review_score_raw = Answer.get_total_score(response: @corresponding_response, questions: @questions)
@@ -145,27 +151,26 @@ def calc_review_score
 end
 
 def scores_varying_rubrics
+<<<<<<< HEAD
+  rounds = self.rounds_of_reviews
+  for round in 1..rounds
+=======
   self.rounds_of_reviews.each do |round|
+>>>>>>> master
     review_questionnaire_id = review_questionnaire_id(round)
     @questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
-    each_response
-  end
-end
-
-def each_response
-  @response_maps.each do |response_map|
-    reviewer = @review_scores[response_map.reviewer_id]
-    @corresponding_response = Response.where(['map_id = ?', response_map.id])
-    @corresponding_response = @corresponding_response.reject {|response| response.round != round } unless @corresponding_response.empty?
-    @respective_scores = {}
-    if !reviewer.nil? && !reviewer[round].nil?
-      @respective_scores = reviewer[round]
+    @response_maps.each do |response_map|
+      reviewer = @review_scores[response_map.reviewer_id]
+      @corresponding_response = Response.where(['map_id = ?', response_map.id])
+      @corresponding_response = @corresponding_response.reject {|response| response.round != round } unless @corresponding_response.empty?
+      @respective_scores = {}
+      @respective_scores = reviewer[round] if !reviewer.nil? && !reviewer[round].nil?
+      calc_review_score
+      @respective_scores[response_map.reviewee_id] = @this_review_score
+      reviewer = {} if reviewer.nil?
+      reviewer[round] = {} if reviewer[round].nil?
+      reviewer[round] = @respective_scores
     end
-    calc_review_score
-    @respective_scores[response_map.reviewee_id] = @this_review_score
-    reviewer = {} if reviewer.nil?
-    reviewer[round] = {} if reviewer[round].nil?
-    reviewer[round] = @respective_scores
   end
 end
 

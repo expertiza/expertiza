@@ -48,7 +48,7 @@ class Team < ActiveRecord::Base
 
  # Check if the current team is full?
  def full?
-  return false if self.parent_id == nil
+  return false if self.parent_id == nil #course team, does not max_team_size
   max_team_members = Assignment.find(self.parent_id).max_team_size
   curr_team_size = Team.size(self.id)
   (curr_team_size >= max_team_members)
@@ -135,7 +135,7 @@ class Team < ActiveRecord::Base
       num_of_teams = users.length.fdiv(min_team_size).ceil
       nextTeamMemberIndex = 0
       for i in (1..num_of_teams).to_a
-        team = Object.const_get(team_type + 'Team').create(name: "Team" + (rand(100) * rand(0.1)).round(0).to_s, parent_id: parent.id)
+        team = Object.const_get(team_type + 'Team').create(name: "Team" + i.to_s, parent_id: parent.id)
         TeamNode.create(parent_id: parent.id, node_object_id: team.id)
         min_team_size.times do
           break if nextTeamMemberIndex >= users.length

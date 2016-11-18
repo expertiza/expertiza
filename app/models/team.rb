@@ -194,11 +194,7 @@ class Team < ActiveRecord::Base
     end
 
     if name
-      if teamtype.is_a?(CourseTeam)
-        team = CourseTeam.create_team_and_node(id)
-      elsif teamtype.is_a?(AssignmentTeam)
-        team = AssignmentTeam.create_team_and_node(id)
-      end
+      team = Team.create_team_and_node(id)
       team.name = name
       team.save
     end

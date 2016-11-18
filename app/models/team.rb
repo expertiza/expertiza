@@ -194,7 +194,11 @@ class Team < ActiveRecord::Base
     end
 
     if name
-      team = Team.create_team_and_node(id, teamtype)
+      if teamtype.is_a?(CourseTeam)
+        team = CourseTeam.create_team_and_node(id)
+      elsif teamtype.is_a?(AssignmentTeam)
+        team = AssignmentTeam.create_team_and_node(id)
+      end
       team.name = name
       team.save
     end
@@ -247,18 +251,11 @@ class Team < ActiveRecord::Base
   end
 
   # Create the team with corresponding tree node
-  def self.create_team_and_node(id, teamtype = 'AssignmentTeam')
-    if teamtype == 'CourseTeam'
-      curr_course = Course.find(id)
-      team_name = Team.generate_team_name(curr_course.name)
-      team = CourseTeam.create(name: team_name, parent_id: id)
-      TeamNode.create(parent_id: id, node_object_id: team.id)
-    elsif teamtype == 'AssignmentTeam'
-      curr_assignment = Assignment.find(id)
-      team_name = Team.generate_team_name(curr_assignment.name)
-      team = AssignmentTeam.create(name: team_name, parent_id: id)
-      TeamNode.create(parent_id: id, node_object_id: team.id)
-    end
+  def self.create_team_and_node(id)
+    current_task = parent_model_for_id id
+    team_name = Team.generate_team_name(current_task.name)
+    team = self.create(name: team_name, parent_id: id)
+    TeamNode.create(parent_id: id, node_object_id: team.id)
     team
   end
 

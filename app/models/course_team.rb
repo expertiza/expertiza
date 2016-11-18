@@ -10,7 +10,7 @@ class CourseTeam < Team
     "Course"
   end
 
-  def self.parent_model_for_id (id)
+  def self.parent_model (id)
     Course.find(id) 
   end
 

@@ -252,7 +252,7 @@ class Team < ActiveRecord::Base
 
   # Create the team with corresponding tree node
   def self.create_team_and_node(id)
-    current_task = parent_model_for_id id
+    current_task = parent_model id
     team_name = Team.generate_team_name(current_task.name)
     team = self.create(name: team_name, parent_id: id)
     TeamNode.create(parent_id: id, node_object_id: team.id)

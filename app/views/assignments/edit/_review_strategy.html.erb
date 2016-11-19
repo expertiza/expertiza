@@ -67,4 +67,28 @@
     </td>
   </tr>
 
+  <tr>
+    <td style='padding:5px' id='isAnonymous'>
+      <input name="assignment_form[assignment][isAnonymous]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][isAnonymous]', 'true', @assignment_form.assignment.isAnonymous) %>
+      <%= label_tag('assignment_form[assignment][isAnonymous]', 'Anonymous Review?') %>
+    </td>
+  </tr>
+
+  <tr>
+    <td style='padding:5px' id='auto_generate_groups'>
+      <input name="assignment_form[assignment][auto_generate_groups]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][auto_generate_groups]', 'true', @assignment_form.assignment.auto_generate_groups) %>
+      <%= label_tag('assignment_form[assignment][auto_generate_groups]', 'Auto Generate Groups?') %>
+    </td>
+  </tr>
+
+  <tr id="group_size">
+    <td>
+      <%= label_tag('assignment_form[assignment][group_size]', 'Review Group Size:') %>
+      <%= text_field_tag('assignment_form[assignment][group_size]', @assignment_form.assignment.group_size ||= 5, size: 1) %>
+    </td>
+  </tr>
+
+
 </table>

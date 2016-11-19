@@ -1,0 +1,27 @@
+%h1 Listing join_group_requests
+
+%table
+  %thead
+    %tr
+      %th Participant
+      %th Group
+      %th Comments
+      %th Status
+      %th
+      %th
+      %th
+
+  %tbody
+    - @join_group_requests.each do |join_group_request|
+      %tr
+        %td= join_group_request.participant
+        %td= join_group_request.group
+        %td= join_group_request.comments
+        %td= join_group_request.status
+        %td= link_to 'Show', join_group_request
+        %td= link_to 'Edit', edit_join_group_request_path(join_group_request)
+        %td= link_to 'Destroy', join_group_request, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Join group request', new_join_group_request_path

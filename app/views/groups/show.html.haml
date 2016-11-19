@@ -1,0 +1,24 @@
+%p#notice= notice
+
+%p
+  %b Isanonymous:
+  = @group.isAnonymous
+%p
+  %b Name:
+  = @group.name
+%p
+  %b Parent:
+  = @group.parent_id
+%p
+  %b Type:
+  = @group.type
+%p
+  %b Comments for advertisement:
+  = @group.comments_for_advertisement
+%p
+  %b Advertise for partners:
+  = @group.advertise_for_partners
+
+= link_to 'Edit', edit_group_path(@group)
+\|
+= link_to 'Back', groups_path

@@ -1,5 +1,8 @@
 Expertiza::Application.routes.draw do
 
+  resources :join_group_requests
+  resources :groups_users
+  resources :groups
   resources :submission_records
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'

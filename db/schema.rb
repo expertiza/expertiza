@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161114210745) do
+ActiveRecord::Schema.define(version: 20161119183048) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -78,6 +78,9 @@ ActiveRecord::Schema.define(version: 20161114210745) do
     t.boolean  "is_calibrated",                            default: false
     t.boolean  "is_selfreview_enabled"
     t.string   "reputation_algorithm",       limit: 255,   default: "Lauw"
+    t.boolean  "isAnonymous"
+    t.integer  "group_size",                 limit: 4
+    t.boolean  "auto_generate_groups"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -224,6 +227,27 @@ ActiveRecord::Schema.define(version: 20161114210745) do
   add_index "due_dates", ["review_of_review_allowed_id"], name: "fk_due_date_review_of_review_allowed", using: :btree
   add_index "due_dates", ["submission_allowed_id"], name: "fk_due_date_submission_allowed", using: :btree
 
+  create_table "groups", force: :cascade do |t|
+    t.boolean  "isAnonymous"
+    t.string   "name",                       limit: 255
+    t.integer  "parent_id",                  limit: 4
+    t.string   "type",                       limit: 255
+    t.text     "comments_for_advertisement", limit: 65535
+    t.boolean  "advertise_for_partners"
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
+  end
+
+  create_table "groups_users", force: :cascade do |t|
+    t.integer  "group_id",   limit: 4
+    t.integer  "user_id",    limit: 4
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+  end
+
+  add_index "groups_users", ["group_id"], name: "index_groups_users_on_group_id", using: :btree
+  add_index "groups_users", ["user_id"], name: "index_groups_users_on_user_id", using: :btree
+
   create_table "institutions", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
   end
@@ -238,6 +262,18 @@ ActiveRecord::Schema.define(version: 20161114210745) do
   add_index "invitations", ["assignment_id"], name: "fk_invitation_assignments", using: :btree
   add_index "invitations", ["from_id"], name: "fk_invitationfrom_users", using: :btree
   add_index "invitations", ["to_id"], name: "fk_invitationto_users", using: :btree
+
+  create_table "join_group_requests", force: :cascade do |t|
+    t.integer  "participant_id", limit: 4
+    t.integer  "group_id",       limit: 4
+    t.text     "comments",       limit: 65535
+    t.string   "status",         limit: 255
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  add_index "join_group_requests", ["group_id"], name: "index_join_group_requests_on_group_id", using: :btree
+  add_index "join_group_requests", ["participant_id"], name: "index_join_group_requests_on_participant_id", using: :btree
 
   create_table "join_team_requests", force: :cascade do |t|
     t.integer  "participant_id", limit: 4
@@ -654,9 +690,13 @@ ActiveRecord::Schema.define(version: 20161114210745) do
   add_foreign_key "due_dates", "deadline_rights", column: "review_of_review_allowed_id", name: "fk_due_date_review_of_review_allowed"
   add_foreign_key "due_dates", "deadline_rights", column: "submission_allowed_id", name: "fk_due_date_submission_allowed"
   add_foreign_key "due_dates", "deadline_types", name: "fk_deadline_type_due_date"
+  add_foreign_key "groups_users", "groups"
+  add_foreign_key "groups_users", "users"
   add_foreign_key "invitations", "assignments", name: "fk_invitation_assignments"
   add_foreign_key "invitations", "users", column: "from_id", name: "fk_invitationfrom_users"
   add_foreign_key "invitations", "users", column: "to_id", name: "fk_invitationto_users"
+  add_foreign_key "join_group_requests", "groups"
+  add_foreign_key "join_group_requests", "participants"
   add_foreign_key "late_policies", "users", column: "instructor_id", name: "fk_instructor_id"
   add_foreign_key "participants", "users", name: "fk_participant_users"
   add_foreign_key "question_advices", "questions", name: "fk_question_question_advices"

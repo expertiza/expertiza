@@ -47,4 +47,11 @@ describe "assignment submisstion test" do
     click_on 'Upload link'
     expect(page).to have_content "https://bing.com"
   end
+
+  it "test3: submit unvalid link" do
+    signup_topic
+    fill_in 'submission', with: "wolfpack"
+    click_on 'Upload link'
+    expect(page).to have_content "The URL or URI is not valid"  
+  end
 end

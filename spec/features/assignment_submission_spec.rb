@@ -34,4 +34,17 @@ describe "assignment submisstion test" do
     click_on 'Upload link'
     expect(page).to have_content "https://google.com"
   end
+
+  it "test2: submit multiple link" do
+    signup_topic
+    fill_in 'submission', with: "https://google.com"
+    click_on 'Upload link'
+    fill_in 'submission', with: "https://baidu.com"
+    click_on 'Upload link'
+    fill_in 'submission', with: "https://bing.com"
+    click_on 'Upload link'
+    expect(page).to have_content "https://google.com"
+    expect(page).to have_content "https://baidu.com"
+    expect(page).to have_content "https://bing.com"
+  end
 end

@@ -271,7 +271,8 @@ class SubmittedContentController < ApplicationController
 
   # authorizations: reader,submitter, reviewer
   def are_needed_authorizations_present?
-    @participant = Participant.find(params[:id])
+    @participant = Participant.find_by(id: params[:id])
+    return false if @participant.nil?
     authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
     if authorization == 'reader' or authorization == 'reviewer'
       return false

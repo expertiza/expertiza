@@ -1,0 +1,23 @@
+<h1>Log Viewer<h1>
+
+<% sl =1 %>
+<table>
+    <tr >
+
+      <th>SL No.</th>
+      <th>Log Entry</th>
+    </tr>
+    <% @logArray.each do |entry| %>
+    <tr>
+
+      <td><%= sl %></td>
+
+
+      <td><%= entry %></td>
+     
+    </tr>
+    <% sl = sl+1 %>
+    <% end %>
+  </table>
+
+

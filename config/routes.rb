@@ -1,5 +1,7 @@
 Expertiza::Application.routes.draw do
 
+  get 'logger/view_logs'
+
   resources :submission_records
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'

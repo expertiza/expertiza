@@ -54,4 +54,41 @@ describe "assignment submisstion test" do
     click_on 'Upload link'
     expect(page).to have_content "The URL or URI is not valid"  
   end
+
+  it "test4: submit duplicated link" do
+    signup_topic
+    fill_in 'submission', with: "https://google.com"
+    click_on 'Upload link'
+    fill_in 'submission', with: "https://google.com"
+    click_on 'Upload link'
+    expect(page).to have_content "You or your teammate(s) have already submitted the same hyperlink."  
+  end
+
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

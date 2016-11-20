@@ -36,7 +36,6 @@ def fill_assignment_form()
 end
 describe "assignment function" do
   before(:each) do
-    #app.default_url_options = { :locale => :es }
     create(:deadline_type, name: "submission")
     create(:deadline_type, name: "review")
     create(:deadline_type, name: "metareview")
@@ -55,20 +54,6 @@ describe "assignment function" do
       end
     end
 
-    it "is able to create Review Questionnaire" do
-      login_as("instructor6")
-      visit "/questionnaires/new?model=ReviewQuestionnaire&private=0"
-      fill_in 'questionnaire_name', with: 'new public review questionnaire'
-      fill_in 'questionnaire_min_question_score', with: '0'
-      fill_in 'questionnaire_max_question_score', with: '5'
-      expect(page).to have_select("questionnaire[private]", options: ['no', 'yes'])
-      click_button 'Create'
-      questionnaire = Questionnaire.where(name: 'new public review questionnaire').first
-      expect(questionnaire).to have_attributes(
-        name: 'new public review questionnaire',
-        max_question_score: 5,
-        min_question_score: 0)
-    end
     # Might as well test small flags for creation here
     it "is able to create a public assignment" do
       login_as("instructor6")
@@ -312,16 +297,6 @@ describe "assignment function" do
       )
     end
 
-    xit "should create teammate review row in rubrics" do
-      fill_assignment_form()
-      check("team_assignment")
-      check("assignment_form_assignment_show_teammate_reviews")
-      fill_in 'assignment_form_assignment_max_team_size', with: 5
-      click_button 'Save'
-      click_link 'Rubrics'
-      expect page.should have_css("table#assignment_questionnaire_table tr", :count=>4)
-    end
-
     it "check if checking calibration shows the tab" do
       uncheck 'assignment_form_assignment_is_calibrated'
       click_button 'Save'
@@ -400,7 +375,7 @@ describe "assignment function" do
     end
 
     it "Delete existing topic" do
-      create(:sign_up_topic, assignment_id: @assignment[:id])
+      create(:topic, assignment_id: @assignment[:id])
       visit "/assignments/#{@assignment[:id]}/edit"
       click_link 'Topics'
       all(:xpath, '//img[@title="Delete Topic"]')[0].click
@@ -433,13 +408,6 @@ describe "assignment function" do
       login_as("instructor6")
       visit "/assignments/#{@assignment.id}/edit"
       click_link 'Rubrics'
-    end
-
-    describe "Load rubric questionnaire" do
-      xit "is able to edit assignment" do
-        # might find a better acceptance criteria here
-        expect(page).to have_content("Review rubric varies by round")
-      end
     end
 
     # First row of rubric
@@ -491,7 +459,7 @@ describe "assignment function" do
 
       ##
       # Third row of rubric
-      xit "updates teammate review questionnaire" do
+      it "updates teammate review questionnaire" do
         within("tr#questionnaire_table_TeammateReviewQuestionnaire") do
           select "TeammateReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           uncheck('dropdown')
@@ -533,7 +501,7 @@ describe "assignment function" do
     end
 
     # instructor assign reviews will happen only one time, so the data will not be store in DB.
-    xit "sets number of reviews by each student" do
+    it "sets number of reviews by each student" do
       pending('review section not yet completed')
       login_as("instructor6")
       visit '/assignments/1/edit'
@@ -572,17 +540,6 @@ describe "assignment function" do
       participant = create(:participant)
       login_as(participant.name)
       expect(page).to have_content("participants Assignment")
-    end
-
-    xit "check if we can remove participant" do
-      create(:participant)
-      login_as('instructor6')
-      assignment_id = Assignment.where(name: 'participants Assignment')[0].id
-      visit "/participants/list?id=#{assignment_id}&model=Assignment"
-
-      expect {
-        click_link 'Remove'
-      }.to change {Participant.count}.by 1
     end
   end
   #Begin Due Date tab

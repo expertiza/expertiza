@@ -1,0 +1,5 @@
+seq,txt,type,weight,size,max_label,min_label
+33,new navi,Criterion,2,"50, 3",Strongly agree,Strongly disagree
+34,test,Criterion,1,"50, 3",Strongly agree,Strongly disagree
+35,navi,Criterion,3,"50, 3",Strongly agree,Strongly disagree
+36,tessample,Scale,5,"50, 3",Strongly agree,Strongly disagree

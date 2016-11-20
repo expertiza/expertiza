@@ -1,3 +1,5 @@
+require 'csv'
+require 'open-uri'
 class QuestionnairesController < ApplicationController
   # Controller for Questionnaire objects
   # A Questionnaire can be of several types (QuestionnaireType)
@@ -7,10 +9,34 @@ class QuestionnairesController < ApplicationController
   before_action :authorize
 
   def action_allowed?
-    ['Super-Administrator',
-     'Administrator',
-     'Instructor',
-     'Teaching Assistant', 'Student'].include? current_role_name
+    case params[:action]
+      when 'edit', 'update', 'delete', 'toggle_access'
+        #Modifications can only be done by papertrail
+        return is_ownerinst_or_ta?
+
+      else
+        #Allow all others
+        ['Super-Administrator',
+         'Administrator',
+         'Instructor',
+         'Teaching Assistant',
+         'Student'].include? current_role_name
+    end
+
+  end
+
+  def is_ownerinst_or_ta?
+    q= Questionnaire.find_by(id:params[:id])
+    owner_inst_id = q.instructor_id
+    if(current_role_name.eql?("Teaching Assistant"))
+      current_ta = current_user;
+    end
+    owner_flag= (current_user.id == owner_inst_id)
+
+    if(!current_ta.nil?)
+      owner_flag = (owner_flag or (current_ta.parent_id == owner_inst_id))
+    end
+    owner_flag
   end
 
   # Create a clone of the given questionnaire, copying all associated
@@ -185,6 +211,7 @@ class QuestionnairesController < ApplicationController
 
   # Toggle the access permission for this assignment from public to private, or vice versa
   def toggle_access
+    questionnaire_id = params[:id] unless params[:id].nil?
     @questionnaire = Questionnaire.find(params[:id])
     @questionnaire.private = !@questionnaire.private
     @questionnaire.save
@@ -230,21 +257,23 @@ class QuestionnairesController < ApplicationController
         end
         begin
           @question.save
-          flash[:success] = 'All questions has been successfully saved!'
+          flash[:success] = 'All questions have been successfully saved!'
         rescue
           flash[:error] = $ERROR_INFO
         end
       end
-    end
-
-    export if params['export']
-    import if params['import']
-
-    if params['view_advice']
-      redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
-    else
       redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
     end
+
+
+    import if params['import']
+    export if params['export']
+
+
+    if params['view_advice']
+      redirect_to controller: 'advice', action: 'edit_advice', id: params[:id] and return
+    end
+
   end
 
   #=========================================================================================================
@@ -572,20 +601,27 @@ class QuestionnairesController < ApplicationController
 
   def export
     @questionnaire = Questionnaire.find(params[:id])
-
-    csv_data = QuestionnaireHelper.create_questionnaire_csv @questionnaire, session[:user].name
-
-    send_data csv_data,
-              type: 'text/csv; charset=iso-8859-1; header=present',
-              disposition: "attachment; filename=questionnaires.csv"
+    questionnaire_id = params[:id] unless params[:id].nil?
+    questions = Question.where("questionnaire_id = " + questionnaire_id.to_s).sort { |a,b| a.seq <=> b.seq }
+    respond_to do |format|
+      format.csv { send_data @questionnaire.to_csv(questions), filename: " #{@questionnaire.name}.csv" }
+    end
+    redirect_to Questionnaire,notice: $ERROR_INFO and return if @questionnaire.nil?
   end
 
   def import
-    @questionnaire = Questionnaire.find(params[:id])
-
-    file = params['csv']
-
-    @questionnaire.questions << QuestionnaireHelper.get_questions_from_csv(@questionnaire, file)
+    questionnaire_id = (params[:id])
+    begin
+      uploaded_io = params[:csv]
+      File.open(Rails.root.join('spec', 'features/import_export_csv_oss/', uploaded_io.original_filename), 'wb') do |file|
+        file.write(uploaded_io.read)
+      end
+        file_data = File.read(Rails.root.join('spec/features/import_export_csv_oss/'+uploaded_io.original_filename))
+        QuestionnaireHelper.get_questions_from_csv(file_data,params[:id])
+        redirect_to edit_questionnaire_path(questionnaire_id.to_sym), notice: "All questions have been successfully imported!"
+       rescue
+      redirect_to edit_questionnaire_path(questionnaire_id.to_sym), notice: $ERROR_INFO
+    end
   end
 
   # clones the contents of a questionnaire, including the questions and associated advice

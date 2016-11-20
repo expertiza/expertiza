@@ -39,8 +39,7 @@ class StudentTask
   end
 
   def content_submitted_in_current_stage?
-    (current_stage == "submission") &&
-      (!participant.resubmission_times.empty? || hyperlinks.present?)
+    current_stage == "submission" && hyperlinks.present?
   end
 
   delegate :course, to: :assignment

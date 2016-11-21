@@ -1,0 +1,10 @@
+= form_for @submission_history do |f|
+  - if @submission_history.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@submission_history.errors.count, "error")} prohibited this submission_history from being saved:"
+      %ul
+        - @submission_history.errors.full_messages.each do |msg|
+          %li= msg
+
+  .actions
+    = f.submit 'Save'

@@ -1,4 +1,10 @@
 class LoggerController < ApplicationController
+  
+  def action_allowed?
+    true
+  end
+
+
   def view_logs
 
   	@@event_logger.debug"Entered view action in log manager"

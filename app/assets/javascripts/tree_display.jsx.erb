@@ -1,6 +1,8 @@
 jQuery(document).ready(function() {
   // This preloadedImages function is refered from http://jsfiddle.net/slashingweapon/8jAeu/
   // Actually I am not using the values in preloadedImages, but image loading speed is indeed getting faster
+
+
   var preloadedImages = [];
 //= require rails
 //= require react-modal
@@ -584,108 +586,110 @@ jQuery(document).ready(function() {
 
      getInitialState: function() {
        return{
+         assignment_form:{
          assignment: {
-           assignment_form_assignment_name: '',
-           assignment_form_assignment_course_id: '0',
-           assignment_form_assignment__directory_path: '',
-           assignment_form_assignment_spec_location: '',
-           team_assignment: '',
-           assignment_form_assignment_require_quiz: '',
-           assignment_form_assignment_staggered_deadline: '',
-           assignment_form_assignment_microtask: '',
-           assignment_form_assignment_reviews_visible_to_all: '',
-           assignment_form_assignment_is_calibrated: '',
-           assignment_form_assignment_availability_flag: '',
-           assignment_form_assignment_reputation_algorithm: '',
-           assignment_form_assignment_max_team_size: '1',
-           assignment_form_assignment_instructor_id: '6'
-           //Max no of members per team, shpw teammate reviews_tag
-            //No of quiz qns (for has quiz)
-           //Staggered deadline - generate alert
-         }
+           name: '',
+           course_id: '0',
+           directory_path: '',
+           spec_location: '',
+           require_quiz: '',
+           staggered_deadline: '',
+           microtask: '',
+           reviews_visible_to_all: '',
+           is_calibrated: '',
+           availability_flag: '',
+           reputation_algorithm: '',
+           max_team_size: '1',
+           instructor_id: '6'
+         }},
+         team_assignment: '',
+         commit: 'Create'
        }
      },
 
       handleNameChange: function(e){
-          var newAssignment = this.state.assignment;
-          newAssignment.assignment_form_assignment_name = e.target.value;
+          var newAssignment = this.state.assignment_form;
+          newAssignment.assignment.name = e.target.value;
           this.setState({assignment: newAssignment});
       },
 
       handleCourseChange: function(e){
-        var newAssignment = this.state.assignment;
-        newAssignment.assignment_form_assignment_course_id = e.target.value;
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.course_id = e.target.value;
         this.setState({assignment: newAssignment});
       },
 
       handleSubChange: function(e){
-        var newAssignment = this.state.assignment;
-        newAssignment.assignment_form_assignment__directory_path = e.target.value;
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.directory_path = e.target.value;
         this.setState({assignment: newAssignment});
       },
 
       handleDescChange: function(e){
-        var newAssignment = this.state.assignment;
-        newAssignment.assignment_form_assignment_spec_location = e.target.value;
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.spec_location = e.target.value;
         this.setState({assignment: newAssignment});
       },
 
       handleTeamChange: function(e){
-        var newAssignment = this.state.assignment;
-        newAssignment.team_assignment = e.target.value;
-        this.setState({assignment: newAssignment});
+        var newAssignment = this.state.team_assignment;
+        newAssignment = e.target.value;
+        this.setState({team_assignment: newAssignment});
+
       },
 
       handleQuizChange: function(e){
-        var newAssignment = this.state.assignment;
-        newAssignment.assignment_form_assignment_require_quiz = e.target.value;
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.require_quiz = e.target.value;
         this.setState({assignment: newAssignment});
       },
 
       handleDeadlineChange: function(e){
-        var newAssignment = this.state.assignment;
-        newAssignment.assignment_form_assignment_staggered_deadline = e.target.value;
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.staggered_deadline = e.target.value;
         this.setState({assignment: newAssignment});
+        hello();
       },
 
       handleMicrotaskChange: function(e){
-        var newAssignment = this.state.assignment;
-        newAssignment.assignment_form_assignment_microtask = e.target.value;
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.microtask = e.target.value;
         this.setState({assignment: newAssignment});
       },
 
       handleReviewsChange: function(e){
-        var newAssignment = this.state.assignment;
-        newAssignment.assignment_form_assignment_reviews_visible_to_all = e.target.value;
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.reviews_visible_to_all = e.target.value;
         this.setState({assignment: newAssignment});
       },
 
       handleCalibrationChange: function(e){
-        var newAssignment = this.state.assignment;
-        newAssignment.assignment_form_assignment_is_calibrated = e.target.value;
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.is_calibrated = e.target.value;
         this.setState({assignment: newAssignment});
       },
 
       handleAvailabilityChange: function(e){
-        var newAssignment = this.state.assignment;
-        newAssignment.assignment_form_assignment_availability_flag = e.target.value;
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.availability_flag = e.target.value;
         this.setState({assignment: newAssignment});
       },
 
       handleReputationChange: function(e){
-        var newAssignment = this.state.assignment;
-        newAssignment.assignment_form_assignment_reputation_algorithm = e.target.value;
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.reputation_algorithm = e.target.value;
         this.setState({assignment: newAssignment});
       },
 
-      handleCreateAssignment: function() {
+      handleCreateAssignment: function(e) {
         var that = this;
+        console.log('assignment');
         $.ajax({
           method: 'POST',
           data: {
-            assignment: that.state.assignment,
+            assignment_form: that.state.assignment_form,
           },
-          url: 'assignments_controller/create'
+          url: '/assignments'
         })
       },
 
@@ -698,50 +702,61 @@ jQuery(document).ready(function() {
             marginTop: 10
         }
 
+
+
         return(
                 <div style={divStyle}>
                   <p>
-                     Assignment Name: <input type="text" id="assignment_form_assignment_name" onChange={this.handleNameChange}/>
+                     Assignment Name: <input type="text" id="name" onChange={this.handleNameChange}/>
                   </p>
                   <p>
-                     Course: <input type="text" id="assignment_form_assignment_course_id" onChange={this.handleCourseChange}/>
+                     Course: <input type="text" id="course_id" onChange={this.handleCourseChange}/>
                   </p>
                   <p>
-                    Submission Directory: <input type="text"  id="assignment_form_assignment_directory_path" onChange={this.handleSubChange}/>
+                    Submission Directory: <input type="text"  id="directory_path" onChange={this.handleSubChange}/>
                   </p>
                   <p>
-                    Description URL: <input type="text" id="assignment_form_assignment_spec_location" onChange={this.handleDescChange}/>
+                    Description URL: <input type="text" id="spec_location" onChange={this.handleDescChange}/>
                   </p>
                   <p>
                     <input type="checkbox" id="team_assignment" onChange={this.handleTeamChange}> Has Teams </input>
                   </p>
                   <p>
-                    <input type="checkbox" id="assignment_form_assignment_require_quiz" onChange={this.handleQuizChange}> Has Quiz </input>
+                    Max Team Size: <input type="number" id="max_team_size"></input>
                   </p>
                   <p>
-                    <input type="checkbox" id="assignment_form_assignment_staggered_deadline" onChange={this.handleDeadlineChange}> Staggered Deadline Assignment </input>
+                    <input type="checkbox" id="show_teammate_reviews"> Show Teammate Reviews</input>
                   </p>
                   <p>
-                    <input type="checkbox" id="assignment_form_assignment_microtask" onChange={this.handleMicrotaskChange}> Microtask Assignment </input>
+                    <input type="checkbox" id="require_quiz" onChange={this.handleQuizChange}> Has Quiz </input>
                   </p>
                   <p>
-                    <input type="checkbox" id="assignment_form_assignment_reviews_visible_to_all" onChange={this.handleReviewsChange}> Reviews Visible to all other Reviewers </input>
+                    Number of Quiz Questions: <input type="number" id="number_of_quiz_questions"></input>
+                    </p>
+                  <p>
+                    <input type="checkbox" id="staggered_deadline" onChange={this.handleDeadlineChange}> Staggered Deadline Assignment </input>
                   </p>
                   <p>
-                    <input type="checkbox" id="assignment_form_assignment_is_calibrated" onChange={this.handleCalibrationChange}> Calibration for Training </input>
+                    <input type="checkbox" id="microtask" onChange={this.handleMicrotaskChange}> Microtask Assignment </input>
                   </p>
                   <p>
-                    <input type="checkbox" id="assignment_form_assignment_availability_flag" onChange={this.handleAvailabilityChange}> Available to Students </input>
+                    <input type="checkbox" id="reviews_visible_to_all" onChange={this.handleReviewsChange}> Reviews Visible to all other Reviewers </input>
                   </p>
                   <p>
-                    Reputation Algorithm: &nbsp;<select id="assignment_form_assignment_reputation_algorithm" onChange={this.handleReputationChange}>
+                    <input type="checkbox" id="is_calibrated" onChange={this.handleCalibrationChange}> Calibration for Training </input>
+                  </p>
+                  <p>
+                    <input type="checkbox" id="availability_flag" onChange={this.handleAvailabilityChange}> Available to Students </input>
+                  </p>
+                  <p>
+                    Reputation Algorithm: &nbsp;<select id="reputation_algorithm" onChange={this.handleReputationChange}>
                     <option value="">--</option>
                       <option value="Hamer">Hamer</option>
                       <option value="Lauw">Simpson</option>
                     </select>
                   </p>
                   <p>
-                  <button onclick={this.handleCreateAssignment}>
+                  <button onClick={this.handleCreateAssignment}>
                   Create
                   </button>
                     </p>
@@ -750,6 +765,11 @@ jQuery(document).ready(function() {
             )
         }
     })
+
+  function hello()
+  {
+    window.alert('Ting ting!');
+  }
 
   var SortToggle = React.createClass({
     getInitialState: function() {

@@ -52,6 +52,15 @@
               <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "teammate"} %>
             </td>
           <% end %>
+                <% else %>
+            <% if @student.assignment.duty_based %>
+                    <td>Duties: <%= @student.assignment.duty_names %>
+                      <% for item in @student.assignment.duty_names.split(",") %>
+                          val: <%=item %>
+                      <% end %>
+                      <%= select_tag "start_time", options_for_select(@student.assignment.duty_names.split(",")) %>
+                    </td>
+                <% end %>
         <% end %>
       <% end %>
     </tr>

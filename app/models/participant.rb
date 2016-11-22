@@ -54,10 +54,6 @@ class Participant < ActiveRecord::Base
     end
 
   def force_delete(maps)
-    times = ResubmissionTime.where(participant_id: self.id)
-
-    times.each { |time| time.destroy } if times
-
     maps.each { |map| map.delete(true) } if maps
 
     if self.team

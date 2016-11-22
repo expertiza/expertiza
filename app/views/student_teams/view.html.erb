@@ -20,6 +20,9 @@
       <th class="head">Full name</th>
       <!--<th class="head">Team-member role (duty)</th>-->
       <th class="head">Email address</th>
+      <% if @student.assignment.duty_based %>
+          <th class="head">Duty</th>
+      <% end %>
       <% if @teammate_review_allowed %>
         <th class="head">Review action</th>
       <% end %>
@@ -31,7 +34,18 @@
         <td><%= member.user.name %></td>
         <td><%= member.user.fullname %></td>
         <td><%= member.user.email %></td>
-
+        <% if @student.assignment.duty_based %>
+            <% if member.user.id == session[:user].id %>
+                <td>Duties: <%= @student.assignment.duty_names %>
+                  <% for item in @student.assignment.duty_names.split(",") %>
+                      val: <%=item %>
+                  <% end %>
+                  <%= select_tag "start_time", options_for_select(@student.assignment.duty_names.split(",")) %>
+                </td>
+            <% else %>
+                <td>His Duties</td>
+            <% end %>
+        <% end %>
         <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
         <% if @teammate_review_allowed %>
           <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
@@ -45,22 +59,14 @@
             <td>
               <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :return => "teammate"} %>
             </td>
+            <% if @student.assignment.duty_based %>
+            <% end %>
           <% else %>
             <td>
               <%= link_to "View", {:controller => 'response', :action => 'view', :id => review.id} %>
-              &nbsp;&nbsp;
               <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "teammate"} %>
             </td>
           <% end %>
-                <% else %>
-            <% if @student.assignment.duty_based %>
-                    <td>Duties: <%= @student.assignment.duty_names %>
-                      <% for item in @student.assignment.duty_names.split(",") %>
-                          val: <%=item %>
-                      <% end %>
-                      <%= select_tag "start_time", options_for_select(@student.assignment.duty_names.split(",")) %>
-                    </td>
-                <% end %>
         <% end %>
       <% end %>
     </tr>

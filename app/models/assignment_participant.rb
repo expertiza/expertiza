@@ -338,11 +338,6 @@ class AssignmentParticipant < Participant
     self.assignment.path + "/" + participant.team.directory_num.to_s + "_review" + "/" + response_map_id.to_s
   end
 
-  def update_resubmit_times
-    new_submit = ResubmissionTime.new(resubmitted_at: Time.now.to_s)
-    self.resubmission_times << new_submit
-  end
-
   def current_stage
     topic_id = SignedUpTeam.topic_id(self.parent_id, self.user_id)
     assignment.try :get_current_stage, topic_id

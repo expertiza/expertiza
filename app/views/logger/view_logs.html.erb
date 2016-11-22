@@ -1,7 +1,19 @@
-<h1>Log Viewer<h1>
+<html>
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>
+</head>
+<body>
+<script>
+  $(document).ready(function() {
+$('#logger').DataTable();
+} );
+  </script>
+<h1>Log Viewer</h1>
 
 <% sl =1 %>
-<table>
+<table id="logger">
     <tr >
 
       <th>SL No.</th>
@@ -19,5 +31,7 @@
     <% sl = sl+1 %>
     <% end %>
   </table>
+</body>
+</html>
 
 

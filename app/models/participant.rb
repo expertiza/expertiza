@@ -5,7 +5,6 @@ class Participant < ActiveRecord::Base
   belongs_to :assignment, foreign_key: 'parent_id'
 
   has_many   :comments, dependent: :destroy
-  has_many   :resubmission_times, dependent: :destroy
   has_many   :reviews, class_name: 'ResponseMap', foreign_key: 'reviewer_id', dependent: :destroy
   has_many   :team_reviews, class_name: 'ReviewResponseMap', foreign_key: 'reviewer_id', dependent: :destroy
   has_many :response_maps, class_name: 'ResponseMap', foreign_key: 'reviewee_id', dependent: :destroy

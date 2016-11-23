@@ -473,9 +473,7 @@ Expertiza::Application.routes.draw do
   resources :teams_users do
     collection do
       post :create
-    end
-    member do
-      get :duty
+      get :edit
     end
   end
 

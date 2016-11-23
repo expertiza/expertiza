@@ -1,9 +1,0 @@
-<H1>Select Duty</H1>
-<%= form_for '/student_teams', method: :put do %>
-    <%= hidden_field_tag 'team_id', @team.id %>
-    <%= hidden_field_tag 'user_id', @student.id %>
-    <%= select_tag "duty", options_for_select(@student.assignment.duty_names.split(",")) %>
-    <input type='submit' value='Save'/>
-    <% end %>
-<br/>
-<a href="javascript:window.history.back()">Back</a>

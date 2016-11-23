@@ -13,6 +13,12 @@ class TeamsUsersController < ApplicationController
     render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
 
+  def edit
+    @teams_user = TeamsUser.find(params[:id])
+    @teams_user.duty = params[:duty]
+    @teams_user.save
+  end
+
   def list
     @team = Team.find(params[:id])
     @assignment = Assignment.find(@team.assignment_id)
@@ -70,12 +76,7 @@ class TeamsUsersController < ApplicationController
 
   end
 
-  def duty
-    @team = Team.find(params[:id])
-    print (params[:duty])
 
-
-  end
 
   def delete
     @teams_user = TeamsUser.find(params[:id])

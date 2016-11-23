@@ -63,6 +63,16 @@ class TeamsUsersController < ApplicationController
     redirect_to controller: 'teams', action: 'list', id: team.parent_id
   end
 
+
+  def duty
+    @team = Team.find(params[:id])
+    if team.is_a?(AssignmentTeam)
+
+    end
+
+
+  end
+
   def delete
     @teams_user = TeamsUser.find(params[:id])
     parent_id = Team.find(@teams_user.team_id).parent_id

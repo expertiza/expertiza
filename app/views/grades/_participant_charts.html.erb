@@ -45,7 +45,7 @@
 
 <% if has_team_and_metareview?[:has_team] %>		
   <th style="text-align:center;" COLSPAN="2" WIDTH="<%= colwidth*2 %>%">
-  <% if @assignment.show_teammate_reviews == true %>
+  <% if @assignment.show_teammate_score %>
   	<img src="<%= @grades_bar_charts[:teammate] %>" >
     <div class="circle" id="teammate-circle">
   <% else %>
@@ -67,7 +67,7 @@
 <script type="text/javascript">
   <% ['review', 'metareview', 'feedback', 'teammate'].each do |type| %>
   <% if @pscore[type.to_sym] && @pscore[type.to_sym][:scores][:avg]%>
-  <% if type == 'teammate' && @assignment.show_teammate_reviews == true %>
+  <% if type == 'teammate' && @assignment.show_teammate_score %>
   var myCircle = Circles.create({
     id:           '<%= "#{type}-circle" %>',
     radius:       25,
@@ -104,4 +104,3 @@
     font-size: 16px !important;    
   }
 </style>          
-

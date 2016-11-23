@@ -344,7 +344,13 @@ class AssignmentParticipant < Participant
 
   def stage_deadline
     topic_id = SignedUpTeam.topic_id(self.parent_id, self.user_id)
-    assignment.stage_deadline topic_id
+    stage = assignment.stage_deadline topic_id
+    if stage == 'Finished' and !assignment.staggered_deadline?
+      due_date = assignment.due_dates.last.due_at
+    elsif stage == 'Finished' and assignment.staggered_deadline?
+      due_date = TopicDueDate.try(patent_id: topic_id).try(:last).try(:due_at)
+    end
+    due_date.to_s
   end
 
   def review_response_maps

@@ -59,9 +59,17 @@ class TeamsUsersController < ApplicationController
         undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
       end
     end
-
     redirect_to controller: 'teams', action: 'list', id: team.parent_id
   end
+
+  def duty
+    @teams_user = TeamsUser.find(params[:team_id])
+    if team.is_a?(AssignmentTeam) and @teams_user.user_id = params[:user_id]
+      @teams_user.duty = params[:duty]
+    end
+
+    redirect_to controller: 'teams_users', action: 'duty'
+      end
 
   def delete
     @teams_user = TeamsUser.find(params[:id])

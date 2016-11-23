@@ -182,7 +182,7 @@ FactoryGirl.define do
     preference_priority_number nil
   end
 
-  factory :participant, class: Participant do
+  factory :participant, class: AssignmentParticipant do
     can_submit true
     can_review true
     assignment { Assignment.first || association(:assignment) }
@@ -192,6 +192,23 @@ FactoryGirl.define do
     penalty_accumulated 0
     grade nil
     type "AssignmentParticipant"
+    handle "handle"
+    time_stamp nil
+    digital_signature nil
+    duty nil
+    can_take_quiz true
+  end
+
+  factory :course_participant, class: CourseParticipant do
+    can_submit true
+    can_review true
+    course { Course.first || association(:course) }
+    association :user, factory: :student
+    submitted_at nil
+    permission_granted nil
+    penalty_accumulated 0
+    grade nil
+    type "CourseParticipant"
     handle "handle"
     time_stamp nil
     digital_signature nil
@@ -216,7 +233,6 @@ FactoryGirl.define do
     teammate_review_allowed_id 3
     type 'AssignmentDueDate'
   end
-
   factory :topic_due_date, class: TopicDueDate do
     due_at "2015-12-30 23:30:12"
     deadline_type { DeadlineType.first || association(:deadline_type) }

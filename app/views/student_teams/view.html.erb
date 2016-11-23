@@ -62,7 +62,7 @@
       <% end %>
         <td>
           <% if member.user.id == session[:user].id %>
-          <%= link_to "Select Duty", {:controller =>'teams_users', :action=> 'duty', :id=> @student.team.id} %>
+              <%= link_to "select duty", edit_teams_user_path(TeamsUser.where(["team_id = ? and user_id = ?", @student.team.id, session[:user].id]).pluck(:id)) %>
           <% else %>
           <%= @student.duty %>
           <% end %>

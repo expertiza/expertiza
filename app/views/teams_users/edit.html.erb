@@ -1,0 +1,7 @@
+<H1>Select Duty</H1>
+<%= form_for '/teams_users', method: :get do %>
+    <%= select_tag "duty", options_for_select([['1', "1"], ['2', "2"]], 2) %>
+    <input type='submit' value='Save'/>
+<% end %>
+<br/>
+<a href="javascript:window.history.back()">Back</a>

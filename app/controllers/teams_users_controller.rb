@@ -2,7 +2,9 @@ class TeamsUsersController < ApplicationController
   def action_allowed?
     ['Instructor',
      'Teaching Assistant',
-     'Administrator'].include? current_role_name
+     'Administrator',
+    'Student'].include? current_role_name
+
   end
 
   def auto_complete_for_user_name
@@ -64,11 +66,13 @@ class TeamsUsersController < ApplicationController
   end
 
 
+  def update
+
+  end
+
   def duty
     @team = Team.find(params[:id])
-    if team.is_a?(AssignmentTeam)
-
-    end
+    print (params[:duty])
 
 
   end

@@ -2,36 +2,26 @@ require 'rails_helper'
 
 describe "CourseParticipant" do
 
-  describe "validations" do
-    before(:each) do
-      @course_participant = build(:course_participant)
-    end
-  end
-
   describe "#copy" do
 
+    before(:each) do
+      @assignment = build(:assignment)
+      @course_participant = build(:course_participant)
+      @assignment_participant = build(:participant)
+    end
+
     it "create a copy of participant" do
-      assignment = build(:assignment)
-      course_participant = build(:course_participant)
-      assign_part = build(:assignment_participant)
-
-      allow(AssignmentParticipant).to receive(:create).and_return(assign_part)
-      allow(assign_part).to receive(:set_handle).and_return(true)
-
-      expect(course_participant.copy(assignment.id)).to be_an_instance_of(AssignmentParticipant)
-
+      allow(AssignmentParticipant).to receive(:create).and_return(@assignment_participant)
+      allow(@assignment_participant).to receive(:set_handle).and_return(true)
+      expect(@course_participant.copy(@assignment.id)).to be_an_instance_of(AssignmentParticipant)
     end
 
     it "returns nil if copy exist" do
-      assignment = build(:assignment)
-      course_participant = build(:course_participant)
-      assign_part = build(:assignment_participant)
-
       allow(AssignmentParticipant).to receive(:where).and_return(AssignmentParticipant)
-      allow(AssignmentParticipant).to receive(:first).and_return(assign_part)
-      allow(assign_part).to receive(:set_handle).and_return(true)
+      allow(AssignmentParticipant).to receive(:first).and_return(@assignment_participant)
+      allow(@assignment_participant).to receive(:set_handle).and_return(true)
 
-      expect(course_participant.copy(assignment.id)).to be_nil
+      expect(@course_participant.copy(@assignment.id)).to be_nil
     end
   end
 
@@ -77,7 +67,7 @@ describe "CourseParticipant" do
       course_participant = create(:course_participant)
       course_participant[:parent_id] = 2
       CSV.open("t.csv", "ab") do |csv|
-        CourseParticipant.export(csv,2,options)
+        CourseParticipant.export(csv, 2, options)
       end
     end
 
@@ -88,7 +78,6 @@ describe "CourseParticipant" do
     it "option is empty fields is empty" do
       fields = []
       options = {}
-      #fields = CourseParticipant.export_fields(options)
       expect(CourseParticipant.export_fields(options)).to be_empty
     end
 
@@ -98,6 +87,5 @@ describe "CourseParticipant" do
       fields = CourseParticipant.export_fields(options)
       expect(fields).not_to be_empty
     end
-
   end
 end

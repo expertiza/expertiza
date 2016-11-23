@@ -1,5 +1,3 @@
-require 'csv'
-require 'open-uri'
 class QuestionnairesController < ApplicationController
   # Controller for Questionnaire objects
   # A Questionnaire can be of several types (QuestionnaireType)
@@ -9,34 +7,10 @@ class QuestionnairesController < ApplicationController
   before_action :authorize
 
   def action_allowed?
-    case params[:action]
-      when 'edit', 'update', 'delete', 'toggle_access'
-        #Modifications can only be done by papertrail
-        return is_ownerinst_or_ta?
-
-      else
-        #Allow all others
-        ['Super-Administrator',
-         'Administrator',
-         'Instructor',
-         'Teaching Assistant',
-         'Student'].include? current_role_name
-    end
-
-  end
-
-  def is_ownerinst_or_ta?
-    q= Questionnaire.find_by(id:params[:id])
-    owner_inst_id = q.instructor_id
-    if(current_role_name.eql?("Teaching Assistant"))
-      current_ta = current_user;
-    end
-    owner_flag= (current_user.id == owner_inst_id)
-
-    if(!current_ta.nil?)
-      owner_flag = (owner_flag or (current_ta.parent_id == owner_inst_id))
-    end
-    owner_flag
+    ['Super-Administrator',
+     'Administrator',
+     'Instructor',
+     'Teaching Assistant', 'Student'].include? current_role_name
   end
 
   # Create a clone of the given questionnaire, copying all associated
@@ -80,14 +54,14 @@ class QuestionnairesController < ApplicationController
       # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
       # In the future, we need to write migration files to make them consistency.
       case display_type
-      when 'AuthorFeedback'
-        display_type = 'Author%Feedback'
-      when 'CourseEvaluation'
-        display_type = 'Course%Evaluation'
-      when 'TeammateReview'
-        display_type = 'Teammate%Review'
-      when 'GlobalSurvey'
-        display_type = 'Global%Survey'
+        when 'AuthorFeedback'
+          display_type = 'Author%Feedback'
+        when 'CourseEvaluation'
+          display_type = 'Course%Evaluation'
+        when 'TeammateReview'
+          display_type = 'Teammate%Review'
+        when 'GlobalSurvey'
+          display_type = 'Global%Survey'
       end
       @questionnaire.display_type = display_type
       @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
@@ -211,7 +185,6 @@ class QuestionnairesController < ApplicationController
 
   # Toggle the access permission for this assignment from public to private, or vice versa
   def toggle_access
-    questionnaire_id = params[:id] unless params[:id].nil?
     @questionnaire = Questionnaire.find(params[:id])
     @questionnaire.private = !@questionnaire.private
     @questionnaire.save
@@ -246,34 +219,33 @@ class QuestionnairesController < ApplicationController
 
   # Zhewei: This method is used to save all questions in current questionnaire.
   def save_all_questions
-    questionnaire_id = params[:id] unless params[:id].nil?
-    if params['save']
-      params[:question].each_pair do |k, v|
-        @question = Question.find(k)
-        # example of 'v' value
-        # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
-        v.each_pair do |key, value|
-          @question.send(key + '=', value) if @question.send(key) != value
-        end
-        begin
+    questionnaire_id = params[:id]
+    begin
+      if params[:save]
+        params[:question].each_pair do |k, v|
+          @question = Question.find(k)
+          # example of 'v' value
+          # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
+          v.each_pair do |key, value|
+            @question.send(key + '=', value) if @question.send(key) != value
+          end
+
           @question.save
-          flash[:success] = 'All questions have been successfully saved!'
-        rescue
-          flash[:error] = $ERROR_INFO
+          flash[:success] = 'All questions has been successfully saved!'
         end
       end
+    rescue
+      flash[:error] = $ERROR_INFO
+    end
+
+    export if params[:export]
+    import if params[:import]
+
+    if params[:view_advice]
+      redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
+    elsif !questionnaire_id.nil?
       redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
     end
-
-
-    import if params['import']
-    export if params['export']
-
-
-    if params['view_advice']
-      redirect_to controller: 'advice', action: 'edit_advice', id: params[:id] and return
-    end
-
   end
 
   #=========================================================================================================
@@ -534,7 +506,7 @@ class QuestionnairesController < ApplicationController
           unless question.update_attributes(params[:question][question_key])
             Rails.logger.info(question.errors.messages.inspect)
           end
-          end
+        end
 
       end
     end
@@ -601,27 +573,20 @@ class QuestionnairesController < ApplicationController
 
   def export
     @questionnaire = Questionnaire.find(params[:id])
-    questionnaire_id = params[:id] unless params[:id].nil?
-    questions = Question.where("questionnaire_id = " + questionnaire_id.to_s).sort { |a,b| a.seq <=> b.seq }
-    respond_to do |format|
-      format.csv { send_data @questionnaire.to_csv(questions), filename: " #{@questionnaire.name}.csv" }
-    end
-    redirect_to Questionnaire,notice: $ERROR_INFO and return if @questionnaire.nil?
+
+    csv_data = QuestionnaireHelper.create_questionnaire_csv @questionnaire, session[:user].name
+
+    send_data csv_data,
+              type: 'text/csv; charset=iso-8859-1; header=present',
+              disposition: "attachment; filename=questionnaires.csv"
   end
 
   def import
-    questionnaire_id = (params[:id])
-    begin
-      uploaded_io = params[:csv]
-      File.open(Rails.root.join('spec', 'features/import_export_csv_oss/', uploaded_io.original_filename), 'wb') do |file|
-        file.write(uploaded_io.read)
-      end
-        file_data = File.read(Rails.root.join('spec/features/import_export_csv_oss/'+uploaded_io.original_filename))
-        QuestionnaireHelper.get_questions_from_csv(file_data,params[:id])
-        redirect_to edit_questionnaire_path(questionnaire_id.to_sym), notice: "All questions have been successfully imported!"
-       rescue
-      redirect_to edit_questionnaire_path(questionnaire_id.to_sym), notice: $ERROR_INFO
-    end
+    @questionnaire = Questionnaire.find(params[:id])
+
+    file = params['csv']
+
+    @questionnaire.questions << QuestionnaireHelper.get_questions_from_csv(@questionnaire, file)
   end
 
   # clones the contents of a questionnaire, including the questions and associated advice
@@ -644,7 +609,7 @@ class QuestionnairesController < ApplicationController
           new_advice = advice.dup
           new_advice.question_id = new_question.id
           new_advice.save!
-          end
+        end
       end
 
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)

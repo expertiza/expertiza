@@ -6,6 +6,12 @@ class ApplicationController < ActionController::Base
     force_ssl
   end
 
+  #E1703 Change
+  @@event_logger = Logger.new("#{Rails.root}/log/events.log");
+
+  #End of E1703 Change
+
+
   helper_method :current_user_session, :current_user, :current_user_role?
   protect_from_forgery with: :exception
   before_action :set_time_zone

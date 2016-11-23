@@ -75,6 +75,7 @@ group :test do
   gem 'gherkin'
   gem 'guard-rails'
   gem 'guard-rspec'
+  gem 'factory_girl'
   gem 'launchy'
   gem 'rspec-rails'
   gem 'shoulda'

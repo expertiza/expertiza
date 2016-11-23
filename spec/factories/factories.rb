@@ -216,7 +216,6 @@ FactoryGirl.define do
     teammate_review_allowed_id 3
     type 'AssignmentDueDate'
   end
-
   factory :topic_due_date, class: TopicDueDate do
     due_at "2015-12-30 23:30:12"
     deadline_type { DeadlineType.first || association(:deadline_type) }
@@ -336,4 +335,45 @@ FactoryGirl.define do
     round nil
     is_submitted false
   end
+
+  #Edited by kapil vatwani
+  factory :assignment_participant, class: AssignmentParticipant do
+    can_submit true
+    can_review true
+    assignment { Assignment.first || association(:assignment) }
+    association :user, factory: :student
+    submitted_at nil
+    permission_granted nil
+    penalty_accumulated 0
+    grade nil
+    type "AssignmentParticipant"
+    handle "handle"
+    time_stamp nil
+    digital_signature nil
+    duty nil
+    can_take_quiz true
+  end
+
+  #Edited by kapil vatwani
+  factory :course_participant, class: CourseParticipant do
+    course { Course.first || association(:course) }
+    can_submit true
+    can_review true
+    assignment { Assignment.first || association(:assignment) }
+    association :user, factory: :student
+    submitted_at nil
+    permission_granted nil
+    penalty_accumulated 0
+    grade nil
+    type "CourseParticipant"
+    handle "handle"
+    time_stamp nil
+    digital_signature nil
+    duty nil
+    can_take_quiz true
+  end
+
+
+
 end
+

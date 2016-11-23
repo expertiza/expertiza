@@ -23,6 +23,10 @@
       <% if @teammate_review_allowed %>
         <th class="head">Review action</th>
       <% end %>
+      <% if @student.assignment.duty_based %>
+        <th class="head">Duty</th>
+      <% end %>
+
     </tr>
     <!--end member table header-->
 
@@ -52,8 +56,18 @@
               <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "teammate"} %>
             </td>
           <% end %>
+            <% else %>
+                <td> </td>
         <% end %>
       <% end %>
+        <td>
+          <% if member.user.id == session[:user].id %>
+          <%= link_to "Select Duty", {:controller =>'teams_users', :action=> 'duty', :id=> @student.team.id} %>
+          <% else %>
+          <%= @student.duty %>
+          <% end %>
+
+        </td>
     </tr>
   <% end %>   <!--end team member content-->
     <tr>

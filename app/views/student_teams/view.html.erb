@@ -26,9 +26,6 @@
       <% if @teammate_review_allowed %>
         <th class="head">Review action</th>
       <% end %>
-      <% if @student.assignment.duty_based %>
-        <th class="head">Duty</th>
-      <% end %>
 
     </tr>
     <!--end member table header-->
@@ -40,11 +37,8 @@
         <td><%= member.user.email %></td>
         <% if @student.assignment.duty_based %>
             <% if member.user.id == session[:user].id %>
-                <td>Duties: <%= @student.assignment.duty_names %>
-                  <% for item in @student.assignment.duty_names.split(",") %>
-                      val: <%=item %>
-                  <% end %>
-                  <%= select_tag "start_time", options_for_select(@student.assignment.duty_names.split(",")) %>
+                <td>
+                  <%= link_to "Select Duty", {:controller =>'teams_users', :action=> 'duty', :id=> @student.team.id} %>
                 </td>
             <% else %>
                 <td>His Duties</td>
@@ -75,14 +69,6 @@
                 <td> </td>
         <% end %>
       <% end %>
-        <td>
-          <% if member.user.id == session[:user].id %>
-          <%= link_to "Select Duty", {:controller =>'teams_users', :action=> 'duty', :id=> @student.team.id} %>
-          <% else %>
-          <%= @student.duty %>
-          <% end %>
-
-        </td>
     </tr>
   <% end %>   <!--end team member content-->
     <tr>

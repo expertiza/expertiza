@@ -38,6 +38,7 @@
         <% if @student.assignment.duty_based %>
             <% if member.user.id == session[:user].id %>
                 <td>
+
                   <%= link_to "select duty", edit_teams_user_path(TeamsUser.where(["team_id = ? and user_id = ?", @student.team.id, session[:user].id]).pluck(:id)) %>
                 </td>
             <% else %>

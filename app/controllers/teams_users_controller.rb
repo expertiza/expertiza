@@ -15,7 +15,8 @@ class TeamsUsersController < ApplicationController
 
   def edit
     @teams_user = TeamsUser.find(params[:id])
-    @teams_user.duty = params[:duty]
+    @teams_user.duty = params[:duty] if params[:duty].present?
+    @assignment_duties = @teams_user.team.assignment.duty_names.split(',')
     @teams_user.save
   end
 

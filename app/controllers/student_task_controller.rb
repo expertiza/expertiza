@@ -20,7 +20,6 @@ class StudentTaskController < ApplicationController
 
     ######## Badges ###################
     @student_badges = Badge.get_badges(@student_tasks)
-    #@d = @student_badges[0].class
     
   end
 

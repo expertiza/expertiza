@@ -64,11 +64,20 @@ class Badge
 	      end
 	    end
 
-	    # scores = assignment.scores(questions)
-	    averages = Badge.calculate_average_vector(assignment.scores(questions))
+	    scores = assignment.scores(questions)
+	    # averages = Badge.calculate_average_vector(assignment.scores(questions))
+	    averages = Badge.calculate_average_vector(scores)
+	    teams = Badge.get_teams(scores)
 	    # avg_of_avg = Badge.mean(averages)
 	    # return TOPPER_BADGE_IMAGE.html_safe
-	 	return averages.max
+	    max_average_index = averages.each_with_index.max[1]
+
+	    # return teams[max_average_index].get_author_names.include(student_task.participant.name)
+	 	if teams[max_average_index].participants.include?(student_task.participant)
+			return TOPPER_BADGE_IMAGE.html_safe
+	 	else
+	 		return false
+	 	end
 	end
 
 	def self.topper2(student_task)
@@ -112,6 +121,17 @@ class Badge
 
   def self.mean(array)
     array.inject(0) {|sum, x| sum += x } / array.size.to_f
+  end
+
+  def self.get_teams(hash)
+  	teams = []
+  	hash[:teams].reject! {|_k, v| v[:scores][:avg].nil? }
+  	keys = hash[:teams].collect {|key,value| key}
+  	keys.each do |key|
+  		teams.push((hash[:teams][key][:team])) 
+  	end
+  	# scores[:teams][index.to_s.to_sym][:team] = team
+  	return teams
   end
 
 end

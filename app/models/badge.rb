@@ -15,7 +15,6 @@ class Badge
 		badge_matrix = []
 
 		student_task_list.each do |student_task|
-			participant = student_task.participant
 			
 			# insert a new row in badge matrix
 			badge_matrix.push([false] * NUMBER_OF_BADGES)
@@ -26,7 +25,7 @@ class Badge
 			badge_matrix[current_assignment_count][0] = Badge.topper(student_task)
 
 			# Good reviewer badge
-			badge_matrix[current_assignment_count][2] = Badge.good_reviewer(participant)
+			badge_matrix[current_assignment_count][2] = Badge.good_reviewer(student_task)
 
 			current_assignment_count = current_assignment_count + 1
 		end
@@ -37,7 +36,10 @@ class Badge
 
 	private
 
-	def self.good_reviewer(participant)
+# -------------------------------------------- Good reviewer badge method(s)--------------------------------------------- #
+
+	def self.good_reviewer(student_task)
+		participant = student_task.participant
 		if participant.try(:grade_for_reviewer).nil? or participant.try(:comment_for_reviewer).nil?
 		      info = -1
 		else
@@ -50,6 +52,8 @@ class Badge
 			return false
 		end
 	end
+
+# -------------------------------------------- Top Score badge method(s)--------------------------------------------- #
 
 	def self.topper(student_task)
 		assignment = student_task.assignment
@@ -68,6 +72,7 @@ class Badge
 	    
 	    averages = Badge.calculate_average_vector(scores)
 	    teams = Badge.get_teams(scores)
+	    
 	    max_average_index = averages.each_with_index.max[1]
 
 	    if teams[max_average_index].participants.include?(student_task.participant)
@@ -103,8 +108,16 @@ class Badge
   	keys.each do |key|
   		teams.push((hash[:teams][key][:team])) 
   	end
-  	# scores[:teams][index.to_s.to_sym][:team] = team
   	return teams
   end
+
+# -------------------------------------------- Dream Team badge method(s)--------------------------------------------- #
+
+
+# -------------------------------------------- First Submission badge method(s)--------------------------------------------- #
+
+
+# -------------------------------------------- Consistency badge method(s)--------------------------------------------- #
+  
 
 end

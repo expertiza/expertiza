@@ -1,0 +1,30 @@
+<p>
+  <b>group:</b> <br>
+  <%=h group.find(@join_group_request.group_id).name %>
+</p>
+
+<p>
+  <b>Comments:</b>  <br>
+  <%=h @join_group_request.comments %>
+</p>
+
+<p>
+  <b>Status:</b>  <br>
+  <% if @join_group_request.status=="P" %>
+    Pending: A request has been made to join this group.
+    <% else if @join_group_request.status=="D"%>
+      Denied: The group has denied your request.
+      <% else if @join_group_request.status=="A"%>
+        Accepted: The group has accepted your request. <br>
+        You should receive an invitation in "Your group".ssss
+      <% else %>
+        <%=  @join_group_request.status %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+</p>
+
+<%= form_tag :action => 'edit' do %>
+    <%= submit_tag "Edit Comment" %>
+<% end %>

@@ -1,0 +1,57 @@
+<% @join_group_requests = JoingroupRequest.where(group_id: group_id) %>
+<% if !@join_group_requests.empty? %>
+<h2>Received Requests</h2>
+<table>
+  <tr>
+    <th>
+      Name
+    </th>
+    <th>
+      Comments
+    </th>
+    <th>Action</th>
+    <th>
+      Sent at
+    </th>
+  </tr>
+
+    <% @join_group_requests.each do |join_group_request| %>
+      <% if join_group_request.status=='P' %>
+        <tr>
+
+          <td>
+            <%= User.find(Participant.find(join_group_request.participant_id).user_id).name %>
+          </td>
+          <td>
+            <%= join_group_request.comments %>
+          </td>
+          <td>
+            <table>
+              <tr>
+                <td>
+                  <%= form_tag :controller => 'invitation', :action => 'create' do %>
+                    <%= hidden_field_tag 'group_id', group_id %>
+                    <%= hidden_field_tag 'student_id', groups_user_id %>
+                    <%= hidden_field_tag 'session[:dummy][:assignment_id]', Participant.find(join_group_request.participant_id).parent_id %>
+                    <%= hidden_field_tag 'user[name]', User.find(Participant.find(join_group_request.participant_id).user_id).name %>
+                    <%= hidden_field_tag 'participant_id', join_group_request.participant_id %>
+                    <input type='submit' value='Invite'/>
+                  <% end %>
+                </td>
+                <td>
+                  <%= button_to 'Decline', :controller => 'join_group_requests', :action => 'decline', :id=>join_group_request.id, :groups_user_id=>groups_user_id %>
+                </td>
+              </tr>
+            </table>
+
+          </td>
+          <td>
+            <%= join_group_request.created_at %>
+          </td>
+        </tr>
+      <% end %>
+
+    <% end %>
+
+  <% end %>
+</table>

@@ -1,6 +1,4 @@
 Expertiza::Application.routes.draw do
-
-  resources :join_group_requests
   resources :groups_users
   resources :groups
   resources :submission_records
@@ -14,6 +12,7 @@ Expertiza::Application.routes.draw do
   end
 
   resources :join_team_requests
+  resources :join_group_requests
 
   resources :admin do
     collection do
@@ -163,6 +162,13 @@ Expertiza::Application.routes.draw do
   end
 
   resources :join_team_requests do
+    collection do
+      get :decline
+      get :edit
+    end
+  end
+
+  resources :join_group_requests do
     collection do
       get :decline
       get :edit
@@ -406,6 +412,16 @@ Expertiza::Application.routes.draw do
 
 
   resources :student_teams do
+
+    collection do
+      get :view
+      get :edit
+      get :remove_participant
+      get :auto_complete_for_user_name
+    end
+  end
+
+  resources :student_groups do
 
     collection do
       get :view

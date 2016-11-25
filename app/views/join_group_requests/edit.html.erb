@@ -1,0 +1,19 @@
+<h1>Editing join_group_request</h1>
+
+<%= form_for(@join_group_request) do |f| %>
+  <%= f.error_messages %>
+
+  <%= f.hidden_field :participant_id %>
+  <%= f.hidden_field :group_id %>
+  <%= f.hidden_field :status %>
+  <p>
+    <%= f.text_area :comments %>
+  </p>
+
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @join_group_request %> |
+<%= link_to 'Back', join_group_requests_path %>

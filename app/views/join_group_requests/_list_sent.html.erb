@@ -1,0 +1,49 @@
+<% participant = Participant.where(user_id: session[:user].id, parent_id:  assignment_id).first
+   requests=JoingroupRequest.where(participant_id: participant.id) %>
+<% if !requests.empty? %>
+
+<h2>Sent Requests </h2>
+
+<table cellpadding="5">
+  <tr>
+    <th>
+      group
+    </th>
+    <th>
+      Comments
+    </th>
+    <th>Status</th>
+    <th>Sent at</th>
+  </tr>
+
+  <% requests.each do |request| %>
+
+    <tr>
+      <td>
+        <% if group.exists?(request.group_id)==false  %>
+          <font color="#FF0000">  This group no longer exists. </font>
+        <% else %>
+          <%= group.find(request.group_id).name %>
+        <% end %>
+      </td>
+      <td>
+        <%= request.comments %>
+      </td>
+      <td>
+        <% if request.status == 'P' %>
+          <%= "Pending" %>
+        <% elsif request.status == 'A' %>
+          <%= "Accepted" %>
+        <% else %>
+          <%= "Declined"  %>
+        <% end %>
+      </td>
+      <td>
+        <%= request.created_at %>
+      </td>
+    </tr>
+  <% end %>
+
+<% end %>
+  </table>
+

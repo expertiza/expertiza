@@ -97,6 +97,27 @@ function microtaskChanged() {
     </td>
   </tr>
 
+  <tr>
+    <td style='padding:5px' id='group_assignment_field'>
+      <% if(@assignment_form.assignment.group_size.nil? or @assignment_form.assignment.group_size == 1)%>
+          <%= check_box_tag('group_assignment', 'true', false, {:onChange => 'hasGroupsChanged()'}) %>
+      <% else %>
+          <%= check_box_tag('group_assignment', 'true',true, {:onChange => 'hasGroupsChanged()'}) %>
+      <% end %>
+      <% @assignment_form.assignment.group_size %>
+      <%= label_tag('group_assignment', 'Has groups?') %>
+
+      <span style='padding:5px' id='assignment_group_count_field' <%= 'hidden' if @assignment_form.assignment.group_size||1 == 1%>>
+
+      <!--Groupmate reviews fields-->
+            <%= label_tag('assignment_form[assignment][group_size]', 'Maximum number of members per group:') %>
+        <%= text_field_tag('assignment_form[assignment][group_size]', @assignment_form.assignment.group_size, {:style => 'width:20px'}) %>
+      </span>
+    </td>
+
+  </tr>
+
+
   <!--Quiz fields-->
   <tr>
     <td style='padding:5px' id='assignment_require_quiz_field'>
@@ -205,6 +226,36 @@ function microtaskChanged() {
             }
           } 
     }
+
+    function hasGroupsChanged() {
+        var msg = 'Warning! Unchecking this box will hide groups that already exist.';
+        var checkbox = jQuery('#group_assignment');
+        var group_count_field = jQuery('#assignment_group_count_field');
+        var groupmate_reviews_field = jQuery('#assignment_show_groupmate_reviews');
+        var group_formation_due_date_checkbox = jQuery('#group_formation_due_date_checkbox')
+
+       if (checkbox.is(':checked')) {
+            group_count_field.removeAttr('hidden');
+            group_formation_due_date_checkbox.removeAttr('hidden')
+            jQuery('#assignment_form_assignment_max_group_size').val('2');
+            groupmate_reviews_field.removeAttr('hidden');
+
+        } else {
+            if (confirm(msg)) {
+                group_count_field.attr('hidden', true);
+                group_formation_due_date_checkbox.attr('hidden', true)
+                groupmate_reviews_field.attr('hidden', true);
+                document.getElementById('assignment_form_assignment_max_group_size').value = '1';
+
+            } else {
+                checkbox.prop('checked', true);
+            }
+            if (<%= @assignment_form.assignment.group_size == 1%>){
+                group_count_field.attr('hidden', true);
+            }
+        }
+    }
+
 
     function staggeredDeadlineChanged() {
       var msg = 'Warning! Unchecking all topics for this assignment will now have the same deadline.'

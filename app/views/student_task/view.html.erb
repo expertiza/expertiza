@@ -32,6 +32,15 @@ to display the label "Your team" in the student assignment tasks-->
       </li>
     <% end %>
   <%end%>
+  <%if !@assignment.group_size.nil? and @assignment.group_size > 1 %>
+      <% if @authorization == 'participant' %>
+          <li>
+            <%= link_to 'Your team', view_student_groups_path(student_id: @participant.id) %>
+            (View and manage your team)
+          </li>
+      <% end %>
+  <%end%>
+
   <% if @authorization == 'participant' or @can_submit == true %>
     <li>
       <!--if one team do not hold a topic (still in waitlist), they cannot submit their work.-->

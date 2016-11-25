@@ -51,6 +51,11 @@ class Assignment < ActiveRecord::Base
     true
   end
   alias_method :team_assignment,:team_assignment?
+
+  def group_assignment?
+    true
+  end
+  alias_method :group_assignment,:group_assignment?
   
   def has_topics?
     @has_topics ||= !sign_up_topics.empty?

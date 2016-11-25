@@ -1,58 +1,98 @@
 class JoinGroupRequestsController < ApplicationController
   before_action :set_join_group_request, only: [:show, :edit, :update, :destroy]
-
-  # GET /join_group_requests
+  def action_allowed?
+    current_role_name.eql?("Student")
+  end
   def index
     @join_group_requests = JoinGroupRequest.all
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.xml  { render xml: @join_group_requests }
+    end
   end
 
-  # GET /join_group_requests/1
   def show
+    @join_group_request = JoinGroupRequest.find(params[:id])
+    respond_to do |format|
+      format.html # show.html.erb
+      format.xml  { render xml: @join_group_request }
+    end
   end
 
-  # GET /join_group_requests/new
   def new
     @join_group_request = JoinGroupRequest.new
+    respond_to do |format|
+      format.html # new.html.erb
+      format.xml  { render xml: @join_group_request }
+    end
   end
 
-  # GET /join_group_requests/1/edit
   def edit
+    @join_group_request = JoinGroupRequest.find(params[:id])
   end
 
-  # POST /join_group_requests
+  # create a new join group request entry for join_group_request table and add it to the table
   def create
-    @join_group_request = JoinGroupRequest.new(join_group_request_params)
-
-    if @join_group_request.save
-      redirect_to @join_group_request, notice: 'Join group request was successfully created.'
+    # check if the advertisement is from a group member and if so disallow requesting invitations
+    group_member = GroupsUser.where(['group_id =? and user_id =?', params[:group_id], session[:user][:id]])
+    group = Group.find(params[:group_id])
+    if group.full?
+      flash[:note] = "This group is full."
     else
-      render :new
+      if !group_member.empty?
+        flash[:note] = "You are already a member of this group."
+      else
+
+        @join_group_request = JoinGroupRequest.new
+        @join_group_request.comments = params[:comments]
+        @join_group_request.status = 'P'
+        @join_group_request.group_id = params[:group_id]
+
+        participant = Participant.where(user_id: session[:user][:id], parent_id: params[:assignment_id]).first
+        @join_group_request.participant_id = participant.id
+        respond_to do |format|
+          if @join_group_request.save
+            format.html { redirect_to(@join_group_request, notice: 'JoinGroupRequest was successfully created.') }
+            format.xml  { render xml: @join_group_request, status: :created, location: @join_group_request }
+          else
+            format.html { render action: "new" }
+            format.xml  { render xml: @join_group_request.errors, status: :unprocessable_entity }
+          end
+        end
+      end
     end
   end
 
-  # PATCH/PUT /join_group_requests/1
+  # update join group request entry for join_group_request table and add it to the table
   def update
-    if @join_group_request.update(join_group_request_params)
-      redirect_to @join_group_request, notice: 'Join group request was successfully updated.'
-    else
-      render :edit
+    @join_group_request = JoinGroupRequest.find(params[:id])
+    respond_to do |format|
+      if @join_group_request.update_attribute(:comments, params[:join_group_request][:comments])
+        format.html { redirect_to(@join_group_request, notice: 'JoinGroupRequest was successfully updated.') }
+        format.xml  { head :ok }
+      else
+        format.html { render action: "edit" }
+        format.xml  { render xml: @join_group_request.errors, status: :unprocessable_entity }
+      end
     end
   end
 
-  # DELETE /join_group_requests/1
   def destroy
+    @join_group_request = JoinGroupRequest.find(params[:id])
     @join_group_request.destroy
-    redirect_to join_group_requests_url, notice: 'Join group request was successfully destroyed.'
+
+    respond_to do |format|
+      format.html { redirect_to(join_group_requests_url) }
+      format.xml  { head :ok }
+    end
   end
 
-  private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_join_group_request
-      @join_group_request = JoinGroupRequest.find(params[:id])
-    end
-
-    # Only allow a trusted parameter "white list" through.
-    def join_group_request_params
-      params.require(:join_group_request).permit(:participant_id, :group_id, :comments, :status)
-    end
+  # decline request to join the group...
+  def decline
+    @join_group_request = JoinGroupRequest.find(params[:id])
+    @join_group_request.status = 'D'
+    @join_group_request.save
+    redirect_to view_student_groups_path student_id: params[:groups_user_id]
+  end
 end

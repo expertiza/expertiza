@@ -8,6 +8,10 @@ class UsersController < ApplicationController
 
   def action_allowed?
     case params[:action]
+    when 'request_new'
+      true
+    when 'request_user_create'
+      true
     when 'keys'
       current_role_name.eql? 'Student'
     else
@@ -109,6 +113,12 @@ class UsersController < ApplicationController
     foreign
   end
 
+  def request_new
+    @user = User.new
+    @rolename = Role.find_by_name(params[:role])
+    roles_for_request_sign_up
+  end
+
   def create
     # if the user name already exists, register the user by email address
     check = User.find_by_name(params[:user][:name])
@@ -144,6 +154,12 @@ class UsersController < ApplicationController
     end
   end
 
+  def request_user_create
+    check = User.find_by_name(params[:user][:name])
+    params[:user][:name] = params[:user][:email] unless check.nil?
+    #TODO: Save request user
+    redirect_to '/instructions/home'
+  end
   def edit
     @user = User.find(params[:id])
     get_role
@@ -199,6 +215,14 @@ class UsersController < ApplicationController
     role = Role.find(session[:user].role_id)
     @all_roles = Role.where(['id in (?) or id = ?', role.get_available_roles, role.id])
   end
+  
+  protected
+
+  def roles_for_request_sign_up
+    #TODO - restrict only few roles
+    #role = Role.find(session[:user].role_id)
+    @all_roles = Role.all
+  end
 
   private
 
@@ -207,6 +231,7 @@ class UsersController < ApplicationController
   end
 
   def get_role
+    abc
     if @user && @user.role_id
       @role = Role.find(@user.role_id)
     elsif @user

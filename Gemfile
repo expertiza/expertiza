@@ -77,6 +77,7 @@ group :test do
   gem 'rspec-rails'
   gem 'shoulda'
   gem 'test-unit'
+  gem 'selenium-webdriver'
 end
 
 group :assets do

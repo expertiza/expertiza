@@ -707,10 +707,11 @@ jQuery(document).ready(function() {
         $.ajax({
           method: 'POST',
           data: {
-            assignment_form: that.state.assignment_form,
+            assignment_form: that.state.assignment_form
           },
           url: '/assignments'
-        })
+        });
+        window.location.reload();
       },
 
     render: function(){
@@ -741,12 +742,16 @@ jQuery(document).ready(function() {
                   <p>
                     <input type="checkbox" id="team_assignment" onChange={this.handleTeamChange}> Has Teams </input>
                   </p>
+
+
                   <p>
                     Max Team Size: <input type="number" id="max_team_size"></input>
                   </p>
                   <p>
                     <input type="checkbox" id="show_teammate_reviews"> Show Teammate Reviews</input>
                   </p>
+
+
                   <p>
                     <input type="checkbox" id="require_quiz" onChange={this.handleQuizChange}> Has Quiz </input>
                   </p>

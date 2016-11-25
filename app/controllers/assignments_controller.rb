@@ -34,15 +34,18 @@ class AssignmentsController < ApplicationController
 
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
+      if @assignment_form.save
+        @assignment_form.create_assignment_node
+        flash[:success] = "Assignment Successfully created"
+        render 'tree_display/list'
 
-    if @assignment_form.save
-      @assignment_form.create_assignment_node
-
-      redirect_to edit_assignment_path @assignment_form.assignment.id
-      undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
-    else
-      render 'new'
-    end
+        #render :js => "window.location = #{edit_assignment_path @assignment_form.assignment.id}"
+        #redirect_to edit_assignment_path @assignment_form.assignment.id
+        #undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
+      else
+        flash[:error] = "Failed to Create Assignment"
+        render 'tree_display/list'
+      end
   end
 
   def edit

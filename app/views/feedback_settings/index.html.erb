@@ -1,0 +1,39 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Feedback Settings</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Support mail</th>
+      <th>Max attachments</th>
+      <th>Max attachment size</th>
+      <th>Wrong retries</th>
+      <th>Wait duration</th>
+      <th>Wait duration increment</th>
+      <th>Support team</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @feedback_settings.each do |feedback_setting| %>
+      <tr>
+        <td><%= feedback_setting.support_mail %></td>
+        <td><%= feedback_setting.max_attachments %></td>
+        <td><%= feedback_setting.max_attachment_size %></td>
+        <td><%= feedback_setting.wrong_retries %></td>
+        <td><%= feedback_setting.wait_duration %></td>
+        <td><%= feedback_setting.wait_duration_increment %></td>
+        <td><%= feedback_setting.support_team %></td>
+        <td><%= link_to 'Show', feedback_setting %></td>
+        <td><%= link_to 'Edit', edit_feedback_setting_path(feedback_setting) %></td>
+        <td><%= link_to 'Destroy', feedback_setting, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Feedback setting', new_feedback_setting_path %>

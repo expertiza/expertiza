@@ -333,6 +333,16 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :review_files do
+    collection do
+      get :show_all_submitted_files
+      get :show_code_file
+      get :show_code_file_diff
+      get :get_comments
+      get :submit_comment
+    end
+  end
+
   resources :roles do
     collection do
       get :list

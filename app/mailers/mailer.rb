@@ -58,6 +58,16 @@ class Mailer < ActionMailer::Base
     mail(subject: defn[:subject],
          to: defn[:to],
          bcc: defn[:cc])
-
   end
+
+  def new_feedback_generated_message(defn)
+    @body = defn[:body]
+    @email = defn[:body][:email]
+    @title = defn[:body][:title]
+    @description = defn[:body][:description]
+
+    mail(subject: defn[:subject],
+         to: defn[:to])
+  end
+
 end

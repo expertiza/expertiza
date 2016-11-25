@@ -1,0 +1,39 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Support mail:</strong>
+  <%= @feedback_setting.support_mail %>
+</p>
+
+<p>
+  <strong>Max attachments:</strong>
+  <%= @feedback_setting.max_attachments %>
+</p>
+
+<p>
+  <strong>Max attachment size:</strong>
+  <%= @feedback_setting.max_attachment_size %>
+</p>
+
+<p>
+  <strong>Wrong retries:</strong>
+  <%= @feedback_setting.wrong_retries %>
+</p>
+
+<p>
+  <strong>Wait duration:</strong>
+  <%= @feedback_setting.wait_duration %>
+</p>
+
+<p>
+  <strong>Wait duration increment:</strong>
+  <%= @feedback_setting.wait_duration_increment %>
+</p>
+
+<p>
+  <strong>Support team:</strong>
+  <%= @feedback_setting.support_team %>
+</p>
+
+<%= link_to 'Edit', edit_feedback_setting_path(@feedback_setting) %> |
+<%= link_to 'Back', feedback_settings_path %>

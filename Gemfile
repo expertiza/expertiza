@@ -56,6 +56,7 @@ gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
+gem 'recaptcha', :require => 'recaptcha/rails'
 
 group :development do
   gem 'daemons'
@@ -84,6 +85,7 @@ group :assets do
 end
 
 group :development, :test do
+  gem 'factory_girl_rails'
   gem 'capybara'
   gem 'simplecov', :require => false
 end

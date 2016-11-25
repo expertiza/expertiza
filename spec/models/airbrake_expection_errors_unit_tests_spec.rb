@@ -19,6 +19,9 @@ describe 'Airbrake-1781551925379466692' do
     allow(Answer).to receive(:where).with(any_args).
       and_return([double("Answer", question_id: 1, response_id: 1, comments: 'hehe')])
     expect { @qs.get_number_of_comments_greater_than_10_words }.not_to raise_error(NoMethodError)
+    @return_value = @qs.get_number_of_comments_greater_than_10_words
+    expect(@return_value).to be_an_instance_of(Array)
+    expect(@return_value[0]).to be_an_instance_of(RSpec::Mocks::InstanceVerifyingDouble)
   end
 
   it 'can deal with comment is nil' do
@@ -31,6 +34,9 @@ describe 'Airbrake-1781551925379466692' do
       and_return([double("Answer", question_id: 1, response_id: 1, comments: nil)])
 
     expect { @qs.get_number_of_comments_greater_than_10_words }.not_to raise_error(NoMethodError)
+    @return_value = @qs.get_number_of_comments_greater_than_10_words
+    expect(@return_value).to be_an_instance_of(Array)
+    expect(@return_value[0]).to be_an_instance_of(RSpec::Mocks::InstanceVerifyingDouble)
   end
 end
 

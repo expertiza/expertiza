@@ -65,39 +65,16 @@ class Badge
 	    end
 
 	    scores = assignment.scores(questions)
-	    # averages = Badge.calculate_average_vector(assignment.scores(questions))
+	    
 	    averages = Badge.calculate_average_vector(scores)
 	    teams = Badge.get_teams(scores)
-	    # avg_of_avg = Badge.mean(averages)
-	    # return TOPPER_BADGE_IMAGE.html_safe
 	    max_average_index = averages.each_with_index.max[1]
 
-	    # return teams[max_average_index].get_author_names.include(student_task.participant.name)
-	 	if teams[max_average_index].participants.include?(student_task.participant)
+	    if teams[max_average_index].participants.include?(student_task.participant)
 			return TOPPER_BADGE_IMAGE.html_safe
 	 	else
 	 		return false
 	 	end
-	end
-
-	def self.topper2(student_task)
-		assignment = student_task.assignment
-		assignment_participant = student_task.participant
-
-		questions = {}
-	    questionnaires = assignment.questionnaires
-
-	    if assignment.varying_rubrics_by_round?
-	      questions = Badge.retrieve_questions(questionnaires, assignment)
-	    else # if this assignment does not have "varying rubric by rounds" feature
-	      questionnaires.each do |questionnaire|
-	        questions[questionnaire.symbol] = questionnaire.questions
-	      end
-	    end
-
-	    scores = assignment_participant.scores(questions)
-
-		return scores
 	end
 
 	def self.retrieve_questions(questionnaires, assignment)
@@ -117,10 +94,6 @@ class Badge
   def self.calculate_average_vector(scores)
     scores[:teams].reject! {|_k, v| v[:scores][:avg].nil? }
     scores[:teams].map {|_k, v| v[:scores][:avg].to_i }
-  end
-
-  def self.mean(array)
-    array.inject(0) {|sum, x| sum += x } / array.size.to_f
   end
 
   def self.get_teams(hash)

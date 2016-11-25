@@ -155,10 +155,16 @@ class UsersController < ApplicationController
   end
 
   def request_user_create
-    check = User.find_by_name(params[:user][:name])
-    params[:user][:name] = params[:user][:email] unless check.nil?
-    #TODO: Save request user
-    redirect_to '/instructions/home'
+    #TODO: Do not allow duplicates
+    #TODO: All fields should be entered
+    @user = RequestedUser.new(user_params)
+    @user.institution_id = params[:user][:institution_id]
+    if @user.save
+      flash[:success] = "User signup for \"#{@user.name}\" has been successfully requested. "
+      redirect_to '/instructions/home'
+    else
+      flash[:success] = "Error requesting sign up "
+    end
   end
   def edit
     @user = User.find(params[:id])

@@ -112,12 +112,8 @@ class QuestionnairesController < ApplicationController
   # Edit a questionnaire
   # Project #1680 dssathe
   def edit
-    begin
       @questionnaire = Questionnaire.find(params[:id])
       redirect_to Questionnaire if @questionnaire.nil?
-    rescue
-      flash[:error] = $ERROR_INFO
-    end
   end
 
   def update

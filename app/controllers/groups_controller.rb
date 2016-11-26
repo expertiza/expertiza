@@ -8,10 +8,10 @@ class GroupsController < ApplicationController
   end
 
   # This function is used to create groups with random names.
-  # Instructors can call by clicking "Create temas" icon anc then click "Create groups" at the bottom.
+  # Instructors can call by clicking "Create groups" icon anc then click "Create groups" at the bottom.
   def create_groups
-    parent = Object.const_get(session[:group_type]).find(params[:id])
-    Group.randomize_all_by_parent(parent, session[:group_type], params[:group_size].to_i)
+    parent = Assignment.find(params[:id])
+    Group.randomize_all_by_parent(parent, params[:group_size].to_i)
     undo_link("Random groups have been successfully created.")
     redirect_to action: 'list', id: parent.id
   end

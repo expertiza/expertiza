@@ -76,7 +76,7 @@ class Group < ActiveRecord::Base
   # Algorithm
   # Start by adding single members to groups that are one member too small.
   # Add two-member groups to groups that two members too small. etc.
-  def self.randomize_all_by_parent(parent, group_type, min_group_size)
+  def self.randomize_all_by_parent(parent, min_group_size)
     participants = Participant.where(["parent_id = ?", parent.id + "Participant"])
     participants = participants.sort { rand(3) - 1 }
     users = participants.map {|p| User.find(p.user_id) }.to_a
@@ -115,7 +115,7 @@ class Group < ActiveRecord::Base
       num_of_groups = users.length.fdiv(min_group_size).ceil
       nextGroupMemberIndex = 0
       for i in (1..num_of_groups).to_a
-        group = Object.const_get(group_type + 'Group').create(name: "Group" + i.to_s, parent_id: parent.id)
+        group = Object.const_get('Group').create(name: "Group" + i.to_s, parent_id: parent.id)
         # GroupNode.create(parent_id: parent.id, node_object_id: group.id)
         min_group_size.times do
           break if nextGroupMemberIndex >= users.length

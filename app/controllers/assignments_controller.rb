@@ -135,6 +135,10 @@ class AssignmentsController < ApplicationController
       q[:questionnaire_id].empty?
     end
 
+    if params[:assignment_form][:assignment][:auto_generate_groups]
+
+    end
+
     if current_user.timezonepref.nil?
       parent_id = current_user.parent_id
       parent_timezone = User.find(parent_id).timezonepref

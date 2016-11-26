@@ -29,5 +29,12 @@ class CopyFromTeamToSubmissionHistory < ActiveRecord::Migration
   	# find submission histories for each team
   	# for each entry, if it is a hyperlink, add to the submitted hyperlinks column
   	# if it is a file, chill..
+    AssignmentTeam.for_each do |assignment_team|
+      SubmissionHistory.where(team = assignment_team).for_each do |submission_history|
+        if submission_history.type == "hyperlink"
+          assignment_team.submit_hyperlink(submission_history.submitted_detail)
+        end
+      end
+    end
   end
 end

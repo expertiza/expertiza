@@ -35,7 +35,6 @@ class Badge
 			# Consistency badge
 			consistency_flag = consistency_flag && Badge.consistency(student_task)
 			
-
 			end
 
 			current_assignment_count = current_assignment_count + 1
@@ -46,22 +45,6 @@ class Badge
 		if consistency_flag
 			badge_matrix[-1][4] = CONSISTENCY_BADGE_IMAGE.html_safe
 		end	
-
-
-		# consistant_flag = true 
-		# current_assignment_count = 0
-
-		# student_task_list.each do |student_task|
-		# 	if not badge_matrix[current_assignment_count][4]:
-		# 		consistant_flag = false
-		# 		break
-		# 	end
-		# 	current_assignment_count = current_assignment_count + 1
-		# end
-
-		# current_assignment_count = 0
-		# student_task_list.each do |student_task|
-		# 	badge_matrix[current_assignment_count][4] = false
 
 
 		return badge_matrix

@@ -213,7 +213,9 @@ Expertiza::Application.routes.draw do
   resources :password_retrieval do
     collection do
       get :forgotten
+      get :reset_password
       post :send_password
+      post :update_password
     end
   end
 

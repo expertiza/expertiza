@@ -36,13 +36,37 @@ class PasswordRetrievalController < ApplicationController
     if password_reset
       expired_url = false
 	if expired_url == false
-          @debug = "hi"
+ 	  redirect_to action: 'reset_password',email: password_reset.user_email
         else
           flash[:error] = "Link expired . Please request to reset password again"
 	end    
     else
     	flash[:error] = "Link either expired or wrong Token. Please request to reset password again"
      end
+  end
+
+  def reset_password
+    @email = params[:email]
+  end
+
+  def update_password
+    #method to be in user model
+    if params[:reset][:password] == params[:reset][:repassword]
+      user=User.find_by(:email => params[:reset][:email])
+      #hash value to be saved not actual password
+      user.password = params[:reset][:password]
+      user.password_confirmation = params[:reset][:repassword]
+      if user.save
+        flash[:success] = "reset password success"
+        redirect_to "/"
+      else
+        flash[:error] = "password cannot be updated. Please try again"
+  	redirect_to "/"
+      end
+    else
+     	flash[:error] = "password and re-password do not match. Try again"
+        redirect_to action: 'reset_password',email: params[:reset][:email]
+    end
   end
    
 end

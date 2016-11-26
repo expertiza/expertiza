@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161114210745) do
+ActiveRecord::Schema.define(version: 20161126230307) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -138,6 +138,14 @@ ActiveRecord::Schema.define(version: 20161114210745) do
     t.integer "deadline_type_id", limit: 4
     t.integer "penalty_points",   limit: 4
   end
+
+  create_table "chats", force: :cascade do |t|
+    t.integer  "response_map_id", limit: 4
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
+  add_index "chats", ["response_map_id"], name: "index_chats_on_response_map_id", using: :btree
 
   create_table "content_pages", force: :cascade do |t|
     t.string   "title",           limit: 255
@@ -649,6 +657,7 @@ ActiveRecord::Schema.define(version: 20161114210745) do
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
   add_foreign_key "assignments", "users", column: "instructor_id", name: "fk_assignments_instructors"
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"
+  add_foreign_key "chats", "response_maps"
   add_foreign_key "courses", "users", column: "instructor_id", name: "fk_course_users"
   add_foreign_key "due_dates", "deadline_rights", column: "review_allowed_id", name: "fk_due_date_review_allowed"
   add_foreign_key "due_dates", "deadline_rights", column: "review_of_review_allowed_id", name: "fk_due_date_review_of_review_allowed"

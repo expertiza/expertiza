@@ -65,7 +65,8 @@
     </tr>
   </table>
 <% end %>
-
+<br><input type="checkbox" name="team_auto" id="team_auto"> Do you wish to have new team members allocated for this project<br>
+<input type ="button" name="team_auto_submit" id="team_auto_submit" value="Save Preference"><br>
 <!--render partial for join team request-->
   <% if @student.team!=nil %>
     <%= render :partial => 'join_team_requests/list_received',

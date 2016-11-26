@@ -114,6 +114,7 @@ class QuestionnairesController < ApplicationController
   def edit
     if params[:id] != nil
       @questionnaire = Questionnaire.find(params[:id])
+    end
     redirect_to Questionnaire if @questionnaire.nil?
   end
 

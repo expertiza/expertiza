@@ -235,6 +235,9 @@ class QuestionnairesController < ApplicationController
           flash[:error] = $ERROR_INFO
         end
       end
+
+      redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+
     end
 
     export if params['export']
@@ -242,8 +245,8 @@ class QuestionnairesController < ApplicationController
 
     if params['view_advice']
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
-    else
-      redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+    # else
+    #  redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
     end
   end
 

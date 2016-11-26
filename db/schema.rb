@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161114210745) do
+ActiveRecord::Schema.define(version: 20161126175526) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -588,6 +588,7 @@ ActiveRecord::Schema.define(version: 20161114210745) do
     t.integer "directory_num",              limit: 4
     t.integer "grade_for_submission",       limit: 4
     t.text    "comment_for_submission",     limit: 65535
+    t.boolean "new_members",                              default: false
   end
 
   create_table "teams_users", force: :cascade do |t|

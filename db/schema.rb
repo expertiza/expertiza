@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161126230307) do
+ActiveRecord::Schema.define(version: 20161126233255) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -293,6 +293,17 @@ ActiveRecord::Schema.define(version: 20161126230307) do
   add_index "menu_items", ["content_page_id"], name: "fk_menu_item_content_page_id", using: :btree
   add_index "menu_items", ["controller_action_id"], name: "fk_menu_item_controller_action_id", using: :btree
   add_index "menu_items", ["parent_id"], name: "fk_menu_item_parent_id", using: :btree
+
+  create_table "messages", force: :cascade do |t|
+    t.text     "body",       limit: 65535
+    t.integer  "chat_id",    limit: 4
+    t.integer  "user_id",    limit: 4
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  add_index "messages", ["chat_id"], name: "index_messages_on_chat_id", using: :btree
+  add_index "messages", ["user_id"], name: "index_messages_on_user_id", using: :btree
 
   create_table "nodes", force: :cascade do |t|
     t.integer "parent_id",      limit: 4
@@ -667,6 +678,8 @@ ActiveRecord::Schema.define(version: 20161126230307) do
   add_foreign_key "invitations", "users", column: "from_id", name: "fk_invitationfrom_users"
   add_foreign_key "invitations", "users", column: "to_id", name: "fk_invitationto_users"
   add_foreign_key "late_policies", "users", column: "instructor_id", name: "fk_instructor_id"
+  add_foreign_key "messages", "chats"
+  add_foreign_key "messages", "users"
   add_foreign_key "participants", "users", name: "fk_participant_users"
   add_foreign_key "question_advices", "questions", name: "fk_question_question_advices"
   add_foreign_key "questions", "questionnaires", name: "fk_question_questionnaires"

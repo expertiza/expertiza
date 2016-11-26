@@ -8,17 +8,22 @@ class Badge
 
 	TOPPER_BADGE_IMAGE = "<img id='topper_badge' src='/assets/badges/topper_badge.png' title = 'Top Score'>"
 
+	CONSISTENCY_THRESHOLD = 90
+	CONSISTENCY_BADGE_IMAGE = "<img id='consistency_badge' src='/assets/badges/consistency_badge.png' title = 'Consistent'>"
+
+
 	def self.get_badges(student_task_list)
 		
 		# create badge matrix
 		current_assignment_count = 0
 		badge_matrix = []
+		consistency_flag = true
 
 		student_task_list.each do |student_task|
-			
 			# insert a new row in badge matrix
 			badge_matrix.push([false] * NUMBER_OF_BADGES)
 
+			if not student_task.assignment.is_calibrated
 			# check for different badges
 
 			# Topper badge
@@ -27,8 +32,37 @@ class Badge
 			# Good reviewer badge
 			badge_matrix[current_assignment_count][2] = Badge.good_reviewer(student_task)
 
+			# Consistency badge
+			consistency_flag = consistency_flag && Badge.consistency(student_task)
+			
+
+			end
+
 			current_assignment_count = current_assignment_count + 1
 		end
+
+		#--------------------------------- Decide on consistant badge ---------------------------------#
+
+		if consistency_flag
+			badge_matrix[-1][4] = CONSISTENCY_BADGE_IMAGE.html_safe
+		end	
+
+
+		# consistant_flag = true 
+		# current_assignment_count = 0
+
+		# student_task_list.each do |student_task|
+		# 	if not badge_matrix[current_assignment_count][4]:
+		# 		consistant_flag = false
+		# 		break
+		# 	end
+		# 	current_assignment_count = current_assignment_count + 1
+		# end
+
+		# current_assignment_count = 0
+		# student_task_list.each do |student_task|
+		# 	badge_matrix[current_assignment_count][4] = false
+
 
 		return badge_matrix
 	
@@ -118,6 +152,27 @@ class Badge
 
 
 # -------------------------------------------- Consistency badge method(s)--------------------------------------------- #
-  
+  def self.consistency(student_task)
+  	assignment = student_task.assignment
+	questions = {}
+    questionnaires = assignment.questionnaires
 
+    if assignment.varying_rubrics_by_round?
+      questions = Badge.retrieve_questions(questionnaires, assignment)
+    else # if this assignment does not have "varying rubric by rounds" feature
+      questionnaires.each do |questionnaire|
+        questions[questionnaire.symbol] = questionnaire.questions
+      end
+    end
+
+    participant = student_task.participant
+    scores = participant.scores(questions)
+    if scores[:review][:scores][:avg].to_i >= CONSISTENCY_THRESHOLD
+    	return true
+    else
+    	return false	
+  	end
+  end
+
+  
 end

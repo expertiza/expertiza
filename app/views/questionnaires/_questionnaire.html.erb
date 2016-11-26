@@ -4,7 +4,7 @@
   <table>
     <tr>
       <td valign="top"><label for="questionnaire_name">Name:</label>
-        <%= text_field  'questionnaire', 'name'  %>
+        <%= text_field  'questionnaire', 'name' :required => true%>
         <%= hidden_field 'questionnaire', 'id' %>
         <%= hidden_field 'questionnaire', 'type' %>
       </td>

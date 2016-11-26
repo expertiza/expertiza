@@ -113,7 +113,7 @@ class QuestionnairesController < ApplicationController
   # Project #1680 dssathe
   def edit
     if params[:name] == nil
-      flash[:error] =$ERROR_INFO
+      flash[:error] = "Please enter name of the Questionnaire"
     else
       @questionnaire = Questionnaire.find(params[:id])
       redirect_to Questionnaire if @questionnaire.nil?

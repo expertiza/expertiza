@@ -16,8 +16,16 @@ class PasswordRetrievalController < ApplicationController
 	token = SecureRandom.urlsafe_base64
 
 	#method to be in password reset, with Time.now to point to next day
-	PasswordReset.create(:user_email => user.email,:expiration_time => Time.now,:token => token)
-
+	#New Approach --rather than adding new rows, replace token if exists
+	password_reset = PasswordReset.find_by(:user_email => user.email)
+	if password_reset
+	  password_reset.token = token
+ 	  password_reset.expiration_time = Time.now+1.days
+	  password_reset.save!
+	else
+	  PasswordReset.create(:user_email => user.email,:expiration_time => Time.now+1.days,:token => token)
+	end
+	#---------------------------------------------------------------------
 	#generate url // To be in a new method
 	url = self.request.base_url+"/password_edit/check_reset_url?token="+token
 
@@ -34,14 +42,22 @@ class PasswordRetrievalController < ApplicationController
     @token = params[:token]
     password_reset=PasswordReset.find_by(:token => @token)
     if password_reset
-      expired_url = false
+      #method in password_reset model to determine if url expired or not
+      	if password_reset.expiration_time < Time.now
+	  expired_url = true
+	else
+	  expired_url = false
+        end
+	#---------------------------------------------------------------------
 	if expired_url == false
  	  redirect_to action: 'reset_password',email: password_reset.user_email
         else
           flash[:error] = "Link expired . Please request to reset password again"
+          redirect_to "/"
 	end    
     else
     	flash[:error] = "Link either expired or wrong Token. Please request to reset password again"
+        redirect_to "/"
      end
   end
 

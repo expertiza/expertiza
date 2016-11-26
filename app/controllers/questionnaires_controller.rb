@@ -112,10 +112,12 @@ class QuestionnairesController < ApplicationController
   # Edit a questionnaire
   # Project #1680 dssathe
   def edit
-    if params[:name] != nil
+    if params[:name] == nil
+      flash[:error] =$ERROR_INFO
+    else
       @questionnaire = Questionnaire.find(params[:id])
+      redirect_to Questionnaire if @questionnaire.nil?
     end
-    redirect_to Questionnaire if @questionnaire.nil?
   end
 
   def update

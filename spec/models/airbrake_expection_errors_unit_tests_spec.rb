@@ -7,36 +7,37 @@ describe 'Airbrake-1781551925379466692' do
     @qs = VmQuestionResponse.new(questionnaire, 1, 2)
     # @list_of_reviews = [Response.new(id: 1)]
     @qs.instance_variable_set(:@list_of_reviews, [instance_double('Response', response_id: 1)])
+    @qs.instance_variable_set(:@list_of_rows, [VmQuestionResponseRow.new('', 1, 1, 5, 0)])
   end
 
-  it 'can deal with comment is not nil' do
+  it 'can deal with comment is not nil, with one comments greater than 10' do
     # @list_of_rows = [VmQuestionResponseRow.new('', 1, 1, 5, 0)]
-    @qs.instance_variable_set(:@list_of_rows, [instance_double('VmQuestionResponseRow',
-                                                               questionText: '',
-                                                               question_id: 1,
-                                                               weight: 1,
-                                                               question_max_score: 5, seq: 0)])
     allow(Answer).to receive(:where).with(any_args).
-      and_return([double("Answer", question_id: 1, response_id: 1, comments: 'hehe')])
-    expect { @qs.get_number_of_comments_greater_than_10_words }.not_to raise_error(NoMethodError)
-    @return_value = @qs.get_number_of_comments_greater_than_10_words
+      and_return([double("Answer", question_id: 1, response_id: 1, comments: 'one two three four five six seven eight nine ten eleven'),
+                  double("Answer", question_id: 1, response_id: 1, comments: '233')])
+    expect { @return_value = @qs.get_number_of_comments_greater_than_10_words }.not_to raise_error(NoMethodError)
     expect(@return_value).to be_an_instance_of(Array)
     expect(@return_value[0]).to be_an_instance_of(RSpec::Mocks::InstanceVerifyingDouble)
+    expect(@qs.instance_variable_get(:@list_of_rows)[0].countofcomments).to eq(1)
+  end
+
+  it 'can deal with comment is not nil, with two comments greater than 10' do
+    allow(Answer).to receive(:where).with(any_args).
+      and_return([double("Answer", question_id: 1, response_id: 1, comments: 'one two three four five six seven eight nine ten eleven'),
+                  double("Answer", question_id: 1, response_id: 1, comments: 'one two three four five six seven eight nine ten eleven')])
+    expect { @return_value = @qs.get_number_of_comments_greater_than_10_words }.not_to raise_error(NoMethodError)
+    expect(@return_value).to be_an_instance_of(Array)
+    expect(@return_value[0]).to be_an_instance_of(RSpec::Mocks::InstanceVerifyingDouble)
+    expect(@qs.instance_variable_get(:@list_of_rows)[0].countofcomments).to eq(2)
   end
 
   it 'can deal with comment is nil' do
-    @qs.instance_variable_set(:@list_of_rows, [instance_double('VmQuestionResponseRow',
-                                                               questionText: '',
-                                                               question_id: 1,
-                                                               weight: 1,
-                                                               question_max_score: 5, seq: 0)])
     allow(Answer).to receive(:where).with(any_args).
       and_return([double("Answer", question_id: 1, response_id: 1, comments: nil)])
-
-    expect { @qs.get_number_of_comments_greater_than_10_words }.not_to raise_error(NoMethodError)
-    @return_value = @qs.get_number_of_comments_greater_than_10_words
+    expect { @return_value = @qs.get_number_of_comments_greater_than_10_words }.not_to raise_error(NoMethodError)
     expect(@return_value).to be_an_instance_of(Array)
     expect(@return_value[0]).to be_an_instance_of(RSpec::Mocks::InstanceVerifyingDouble)
+    expect(@qs.instance_variable_get(:@list_of_rows)[0].countofcomments).to eq(0)
   end
 end
 

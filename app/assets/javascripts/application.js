@@ -27,6 +27,8 @@
 //= require_tree .
 //= require jquery.datetimepicker
 //= require jquery-tablesorter
+//= require turbolinks 
+//= require sync
 
 // Eliminate the “element.dispatchEvent is not a function” error
 jQuery.noConflict();

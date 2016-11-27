@@ -24,15 +24,17 @@ class LotteryController < ApplicationController
       teamed_students[course_id] = [] if teamed_students[course_id].nil?
       history = teamed_students[course_id]
       current_team = StudentTask.teamed_students(User.find(user_id),course_id,false, nil, assignment.id)[course_id]
-      # Removing teammates from history so as to be paired with them again when using the swap members logic
-      # TODO to remove current teammates from history
+      current_team = [] if current_team.nil?
+
+      # Done to not swap out current team members from the teams
+      modified_history = remove_current_team_from_history(current_team, history)
 
       topic_ids.each do |topic_id|
         bid_record = Bid.where(user_id: user_id, topic_id: topic_id).first rescue nil
         bids << (bid_record.nil? ? 0 : bid_record.priority ||= 0)
       end
       if bids.uniq != [0]
-        priority_info << {pid: user_id, ranks: bids,  history: history}
+        priority_info << {pid: user_id, ranks: bids,  history: modified_history}
       end
     end
     data = {users: priority_info, max_team_size: assignment.max_team_size}
@@ -60,6 +62,11 @@ class LotteryController < ApplicationController
     run_intelligent_bid
 
     redirect_to controller: 'tree_display', action: 'list'
+  end
+
+  def remove_current_team_from_history(current_team, history)
+    temp = history - current_team
+    return temp
   end
 
   def swapping_team_members_with_history(data, max_team_size)

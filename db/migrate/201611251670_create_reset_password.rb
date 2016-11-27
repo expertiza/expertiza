@@ -3,7 +3,8 @@ class CreateResetPassword < ActiveRecord::Migration
     create_table :password_resets do |t|
       t.string :user_email
       t.string :token
-      t.datetime :expiration_time
+      t.datetime :updated_at
+
     end
   end
   def self.down

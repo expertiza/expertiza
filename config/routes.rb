@@ -449,7 +449,6 @@ Expertiza::Application.routes.draw do
   resources :survey do
     collection do
       get :assign
-      post :assign
     end
   end
 

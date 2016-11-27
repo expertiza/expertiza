@@ -1,5 +1,6 @@
 <h1>Surveys for Assignment: <%= @assignment.name %></h1>
 <%= form_tag(:action=>'assign') do %>
+  <%= hidden_field 'survey', 'assignment_id', :value => params[:id]%>
   <select name="subset" onchange="document.forms[0].submit()">
     <option value="assigned"
     <% if params[:subset] == "assigned" -%>
@@ -18,6 +19,7 @@
     >All public surveys</option>
   </select>
 <% end %>
+
 <% if @surveys.length != 0 -%>
   <%= form_tag(:action=>'assign')do %>
     <br />

@@ -1,0 +1,2 @@
+class LinkSubmissionHistory < SubmissionHistory
+end

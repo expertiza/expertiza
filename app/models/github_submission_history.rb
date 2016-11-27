@@ -1,0 +1,2 @@
+class GithubSubmissionHistory < LinkSubmissionHistory
+end

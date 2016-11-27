@@ -1,0 +1,2 @@
+class FileSubmissionHistory < SubmissionHistory
+end

@@ -12,41 +12,59 @@ class LotteryController < ApplicationController
   # This method is to send request to web service and use k-means and students' bidding data to build teams automatically.
   def run_intelligent_assignment
     priority_info = []
+    assignment = Assignment.find_by(id: params[:id])
+    course_id = assignment['course_id']
     topic_ids = SignUpTopic.where(assignment_id: params[:id]).map(&:id)
     user_ids = Participant.where(parent_id: params[:id]).map(&:user_id)
     user_ids.each do |user_id|
       # grab student id and list of bids
       bids = []
+      # getting each users history of users whom they had worked with
+      teamed_students = StudentTask.teamed_students(User.find(user_id),course_id,false, assignment.id)
+      teamed_students[course_id] = [] if teamed_students[course_id].nil?
+      history = teamed_students[course_id]
+      current_team = StudentTask.teamed_students(User.find(user_id),course_id,false, nil, assignment.id)[course_id]
+      # Removing teammates from history so as to be paired with them again when using the swap members logic
+      # TODO to remove current teammates from history
+
       topic_ids.each do |topic_id|
         bid_record = Bid.where(user_id: user_id, topic_id: topic_id).first rescue nil
-        bids << bid_record.nil? ? 0 : bid_record.priority ||= 0
+        bids << (bid_record.nil? ? 0 : bid_record.priority ||= 0)
       end
       if bids.uniq != [0]
-        priority_info << {pid: user_id, ranks: bids}
+        priority_info << {pid: user_id, ranks: bids,  history: history}
       end
     end
-    assignment = Assignment.find_by(id: params[:id])
     data = {users: priority_info, max_team_size: assignment.max_team_size}
     url = WEBSERVICE_CONFIG["topic_bidding_webservice_url"]
     begin
       response = RestClient.post url, data.to_json, content_type: :json, accept: :json
-      # store each summary in a hashmap and use the question as the key
-      teams = JSON.parse(response)["teams"]
     rescue => err
       flash[:error] = err.message
     end
-    teams =  [
- [6817, 6812, 6830, 6876],
- [6878, 6861, 6413, 6856],
- [6871, 6818, 6899, 6912],
- [6853, 6895, 6913, 6814],
- [6845, 6900, 6909],
- [6810, 6891, 6905],
- [6815, 6825, 6916, 6923]]
+
+    # TODO to only swap team members for teams that have the flag set in the database.
+    response = swapping_team_members_with_history(response, assignment.max_team_size)
+    # store each summary in a hashmap and use the question as the key
+    teams = JSON.parse(response)["teams"]
+
     create_new_teams_for_bidding_response(teams, assignment)
     run_intelligent_bid
 
     redirect_to controller: 'tree_display', action: 'list'
+  end
+
+  def swapping_team_members_with_history(data, max_team_size)
+    url = WEBSERVICE_CONFIG['member_swapping_webservice_url']
+    (max_team_size-1).times do
+      begin
+        data = RestClient.post url, data.to_json, content_type: :json, accept: :json
+      rescue => err
+        flash[:error] = err.message
+        break;
+      end
+    end
+    return data
   end
 
   def create_new_teams_for_bidding_response(teams, assignment)

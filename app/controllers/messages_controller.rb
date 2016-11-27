@@ -1,5 +1,5 @@
 class MessagesController < ApplicationController
-  respond_to :html, :js
+  
 
   def index
     @chat = Chat.find(params[:chat_id])

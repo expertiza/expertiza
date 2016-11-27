@@ -82,10 +82,10 @@ class Questionnaire < ActiveRecord::Base
 
   # validate the entries for this questionnaire
   def validate_questionnaire
-    if max_question_score < 1
+    if :max_question_score < 1
       errors.add(:max_question_score, "The maximum question score must be a positive integer.")
     end
-    if min_question_score >= max_question_score
+    if :min_question_score >= :max_question_score
       errors.add(:min_question_score, "The minimum question score must be less than the maximum")
     end
 

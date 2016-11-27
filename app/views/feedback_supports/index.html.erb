@@ -1,0 +1,25 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Feedback Supports</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @feedback_supports.each do |feedback_support| %>
+      <tr>
+        <td><%= link_to 'Show', feedback_support %></td>
+        <td><%= link_to 'Edit', edit_feedback_support_path(feedback_support) %></td>
+        <td><%= link_to 'Destroy', feedback_support, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Feedback support', new_feedback_support_path %>

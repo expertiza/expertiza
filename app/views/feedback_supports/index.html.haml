@@ -1,0 +1,19 @@
+%h1 Listing feedback_supports
+
+%table
+  %thead
+    %tr
+      %th
+      %th
+      %th
+
+  %tbody
+    - @feedback_supports.each do |feedback_support|
+      %tr
+        %td= link_to 'Show', feedback_support
+        %td= link_to 'Edit', edit_feedback_support_path(feedback_support)
+        %td= link_to 'Destroy', feedback_support, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Feedback support', new_feedback_support_path

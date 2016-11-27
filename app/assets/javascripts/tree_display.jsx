@@ -14,6 +14,142 @@ jQuery(document).ready(function() {
     jQuery( "#intelligent_assignment_dialog" ).dialog({ closeText: "hide", modal: true, resizable: false, width: 500 });
   }
 
+    var editImage;
+    var deleteImage;
+    var publicImage;
+    var copyImage;
+    var addTAImage;
+    var createAssignment;
+    var addParticipant;
+    var createTeam;
+    var dashboard;
+    var metareview;
+    var removeCourse;
+    var assignCourse;
+    var assignReviewer;
+    var assignSurvey;
+    var viewQuiz;
+    var viewSubmission;
+    var viewScores;
+    var viewReview;
+    var viewSurvey;
+    var intelligentAssignment;
+    var viewSuggestion;
+    var delayedJob;
+    var publishingRights;
+    var viewQuestion;
+
+    var Popup = React.createClass({
+        // Here, we keep track of all rendered popups in a static array
+        // This is so we can hide them all when an outside click occurs.
+        statics: {
+            popups: [],
+            hidePopups: function(event) {
+                _.map(Popup.popups, function(popup) {
+                    popup.hideContent(event);
+                });
+            }
+        },
+
+        propTypes: {
+            trigger: React.PropTypes.element.isRequired,
+            content: React.PropTypes.node.isRequired
+        },
+
+        getInitialState: function() {
+            return {
+                status: false
+            }
+        },
+
+        componentDidMount: function() {
+            Popup.popups.push(this);
+        },
+
+        componentWillUnmount: function() {
+            Popup.popups = _.without(Popup.popups, this);
+        },
+
+        hideContent: function(event) {
+            this.setState({
+                status: false
+            });
+        },
+
+        toggleContent: function(event) {
+            event.stopPropagation();
+            this.setState({
+                status: !this.state.status
+            })
+        },
+
+        render: function() {
+            var triggerChildren = [this.props.trigger.props.children];
+            if (this.state.status) {
+                triggerChildren = triggerChildren.concat([this.props.content]);
+            }
+            return React.cloneElement(
+                this.props.trigger,
+                {
+                    onClick: this.toggleContent
+                },
+                triggerChildren
+            );
+        }
+    })
+
+    var App = React.createClass({
+        render: function() {
+            return (
+        <div><button type="button" className="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+            Launch demo modal
+            </button>
+            <div className="modal fade" id="myModal" role="dialog" aria-laberlledby="myModalLabel" aria-hidden="true">
+            <div className="modal-dialog">
+            <div className="modal-content">
+            <div className="modal-header">
+            <button type="button" className="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span className="sr-only">Close</span></button>
+
+            <h4 className="modal-title" id="myModalLabel">Modal title</h4>
+            </div>
+            <div className="modal-body">
+            {editImage}
+            {deleteImage}
+            {publicImage}
+            {copyImage}
+            {addTAImage}
+            {createAssignment}
+            {addParticipant}
+            {createTeam}
+            {dashboard}
+            {metareview}
+            {removeCourse}
+            {assignCourse}
+            {assignReviewer}
+            {assignSurvey}
+            {viewQuiz}
+            {viewSubmission}
+            {viewScores}
+            {viewReview}
+            {viewSurvey}
+            {intelligentAssignment}
+            {viewSuggestion}
+            {delayedJob}
+            {publishingRights}
+            {viewQuestion}
+
+            </div>
+
+            <div className="modal-footer">
+            <button type="button" className="btn btn-default " data-dismiss="modal">
+            Close </button>
+                <button type="button" className="btn btn-primary">Save changes</button>
+</div></div></div></div></div>
+            );
+}
+})
+
+
   var RowAction = React.createClass({
     getInitialState: function() {
       return {
@@ -30,6 +166,7 @@ jQuery(document).ready(function() {
         }
       }
     },
+
     render: function() {
       var moreContent = []
       var moreButtonStyle = {
@@ -70,50 +207,83 @@ jQuery(document).ready(function() {
         )
       }
       if (this.state.showDetails) {
+
+          //reintialize all images
+          editImage = (<p></p>);
+          deleteImage= (<p></p>);
+          publicImage = (<p></p>);
+          copyImage = (<p></p>);
+          addTAImage = (<p></p>);
+          createAssignment = (<p></p>);
+          addParticipant = (<p></p>);
+          createTeam = (<p></p>);
+          dashboard = (<p></p>);
+          metareview = (<p></p>);
+          removeCourse = (<p></p>);
+          assignCourse = (<p></p>);
+          assignReviewer = (<p></p>);
+          assignSurvey = (<p></p>);
+          viewQuiz =(<p></p>);
+          viewSubmission = (<p></p>);
+          viewScores = (<p></p>);
+          viewReview = (<p></p>);
+          viewSurvey = (<p></p>);
+          intelligentAssignment = (<p></p>);
+          viewSuggestion = (<p></p>);
+          delayedJob = (<p></p>);
+          publishingRights = (<p></p>);
+          viewQuestion = (<p></p>);
+
         moreButtonStyle.display = "none"
         var newNodeType = this.props.nodeType
         if (this.props.nodeType === 'assignment' || this.props.nodeType === 'questionnaire') {
           newNodeType = this.props.nodeType + "s"
         }
         if (this.props.is_available || newNodeType == 'questionnaires') {
+
+            editImage = (<a title="Edit" href={"/"+newNodeType+"/"+(parseInt(this.props.id)/2).toString()+"/edit"} onClick= "popUp()" ><img src="/assets/tree_view/edit-icon-24.png" /></a>);
+            deleteImage = (<a title="Delete" href={"/"+newNodeType+"/delete?id="+(parseInt(this.props.id)/2).toString()}><img src="/assets/tree_view/delete-icon-24.png" /></a>);
+            publicImage = (<a title={this.props.private? "Make public" : "Make private"} href={"/"+newNodeType+"/toggle_access?id="+(parseInt(this.props.id)/2).toString()}><img src={"/assets/tree_view/lock-"+(this.props.private? "off-" : "")+"disabled-icon-24.png"} /></a>);
           moreContent.push(
-            <span>
-              <a title="Edit" href={"/"+newNodeType+"/"+(parseInt(this.props.id)/2).toString()+"/edit"}><img src="/assets/tree_view/edit-icon-24.png" /></a>
-              <a title="Delete" href={"/"+newNodeType+"/delete?id="+(parseInt(this.props.id)/2).toString()}><img src="/assets/tree_view/delete-icon-24.png" /></a>
-              <a title={this.props.private? "Make public" : "Make private"} href={"/"+newNodeType+"/toggle_access?id="+(parseInt(this.props.id)/2).toString()}><img src={"/assets/tree_view/lock-"+(this.props.private? "off-" : "")+"disabled-icon-24.png"} /></a>
-            </span>
+          <span> </span>
           )
         }
+        copyImage = (<a title="Copy" href={"/"+newNodeType+"/copy?assets=course&id="+(parseInt(this.props.id)/2).toString()}><img src="/assets/tree_view/Copy-icon-24.png" /></a>);
         moreContent.push(
-          <span>
-            <a title="Copy" href={"/"+newNodeType+"/copy?assets=course&id="+(parseInt(this.props.id)/2).toString()}><img src="/assets/tree_view/Copy-icon-24.png" /></a>
-          </span>
+          <span></span>
         )
         if (newNodeType === 'course') {
           moreContent.push(
             <br/>
           )
           if (this.props.is_available) {
+
+              addTAImage = (<a title="Add new TA" href={"/course/view_teaching_assistants?id="+(parseInt(this.props.id)/2).toString()+"&model=Course"}>
+              <img src="/assets/tree_view/add-ta-24.png" />
+              </a>);
+
+              createAssignment = (<a title="Create assignment" href={"/assignments/new?parent_id="+(parseInt(this.props.id)/2).toString()}>
+              <img src="/assets/tree_view/add-assignment-24.png" />
+              </a>);
+
+              addParticipant = (<a title="Add participants" href={"/participants/list?id="+(parseInt(this.props.id)/2).toString()+"&model=Course"}>
+              <img src="/assets/tree_view/add-participant-24.png" />
+              </a>);
+
+              createTeam = (<a title="Create teams" href={"/teams/list?id="+(parseInt(this.props.id)/2).toString()+"&type=Course"}>
+              <img src="/assets/tree_view/create-teams-24.png" />
+              </a>);
+
+              dashboard = (<a title="360 degree assessment dashboad" href={"/assessment360/one_course_all_assignments?course_id="+(parseInt(this.props.id)/2).toString()}>
+              <img src="/assets/tree_view/360-dashboard-24.png" />
+              </a>);
+
+              metareview = (<a title="View aggregated teammate & meta reviews" href={"/assessment360/all_students_all_reviews?course_id="+(parseInt(this.props.id)/2).toString()}>
+              <span style={{"fontSize": "22px", "top": "8px"}} className="glyphicon glyphicon-list-alt"></span>
+            </a>);
+
             moreContent.push(
-              <span>
-                <a title="Add TA" href={"/course/view_teaching_assistants?id="+(parseInt(this.props.id)/2).toString()+"&model=Course"}>
-                  <img src="/assets/tree_view/add-ta-24.png" />
-                </a>
-                <a title="Create assignment" href={"/assignments/new?parent_id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/add-assignment-24.png" />
-                </a>
-                <a title="Add participants" href={"/participants/list?id="+(parseInt(this.props.id)/2).toString()+"&model=Course"}>
-                  <img src="/assets/tree_view/add-participant-24.png" />
-                </a>
-                <a title="Create teams" href={"/teams/list?id="+(parseInt(this.props.id)/2).toString()+"&type=Course"}>
-                  <img src="/assets/tree_view/create-teams-24.png" />
-                </a>
-                <a title="360 degree assessment dashboad" href={"/assessment360/one_course_all_assignments?course_id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/360-dashboard-24.png" />
-                </a>
-                <a title="View aggregated teammate & meta reviews" href={"/assessment360/all_students_all_reviews?course_id="+(parseInt(this.props.id)/2).toString()}>
-                  <span style={{"fontSize": "22px", "top": "8px"}} className="glyphicon glyphicon-list-alt"></span>
-                </a>
+                <span>
               </span>
             )
           }
@@ -124,104 +294,107 @@ jQuery(document).ready(function() {
             <br/>
           )
           if (this.props.course_id) {
+              removeCourse = (<a title="Remove from course" href={"/assignments/remove_assignment_from_course?id="+(parseInt(this.props.id)/2).toString()}>
+              <img src="/assets/tree_view/remove-from-course-24.png" />
+              </a>);
             moreContent.push(
-              <span>
-                <a title="Remove from course" href={"/assignments/remove_assignment_from_course?id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/remove-from-course-24.png" />
-                </a>
-              </span>
+              <span></span>
             )
           } else {
+              assignCourse = (<a title="Assign to course" href={"/assignments/associate_assignment_with_course?id="+(parseInt(this.props.id)/2).toString()}>
+              <img src="/assets/tree_view/assign-course-blue-24.png" />
+              </a>);
             moreContent.push(
-              <span>
-                <a title="Assign to course" href={"/assignments/associate_assignment_with_course?id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/assign-course-blue-24.png" />
-                </a>
-              </span>
+              <span></span>
             )
           }
           if (this.props.is_available) {
+              addParticipant = (<a title="Add participants" href={"/participants/list?id="+(parseInt(this.props.id)/2).toString()+"&model=Assignment"}>
+              <img src="/assets/tree_view/add-participant-24.png" />
+              </a>);
             moreContent.push(
-              <span>
-                <a title="Add participants" href={"/participants/list?id="+(parseInt(this.props.id)/2).toString()+"&model=Assignment"}>
-                  <img src="/assets/tree_view/add-participant-24.png" />
-                </a>
-              </span>
+              <span></span>
             )
             if (parseInt(this.props.max_team_size) > 1) {
+                createTeam = (<a title="Create teams" href={"/teams/list?id="+(parseInt(this.props.id)/2).toString()+"&type=Assignment"}>
+                <img src="/assets/tree_view/create-teams-24.png" />
+                </a>);
               moreContent.push(
-                <span>
-                  <a title="Create teams" href={"/teams/list?id="+(parseInt(this.props.id)/2).toString()+"&type=Assignment"}>
-                    <img src="/assets/tree_view/create-teams-24.png" />
-                  </a>
-                </span>
+                <span></span>
               )
             }
             // if ends
+              assignReviewer = (<a title="Assign reviewers" href={"/review_mapping/list_mappings?id="+(parseInt(this.props.id)/2).toString()}>
+              <img src="/assets/tree_view/assign-reviewers-24.png" />
+              </a>);
+
+              assignSurvey = (<a title="Assign surveys" href={"/survey/assign?id="+(parseInt(this.props.id)/2).toString()}>
+              <img src="/assets/tree_view/assign-survey-24.png" />
+              </a>);
+
             moreContent.push(
-              <span>
-                <a title="Assign reviewers" href={"/review_mapping/list_mappings?id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/assign-reviewers-24.png" />
-                </a>
-                <a title="Assign surveys" href={"/survey/assign?id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/assign-survey-24.png" />
-                </a>
-              </span>
+              <span></span>
             )
             if (this.props.require_quiz) {
+                viewQuiz = (<a title="View quiz questions" href={"/student_quizzes/review_questions?id="+(parseInt(this.props.id)/2).toString()+"&type=Assignment"}>
+                <img src="/assets/tree_view/view-survey-24.png" />
+                </a>);
+
               moreContent.push(
-                <span>
-                  <a title="View quiz questions" href={"/student_quizzes/review_questions?id="+(parseInt(this.props.id)/2).toString()+"&type=Assignment"}>
-                    <img src="/assets/tree_view/view-survey-24.png" />
-                  </a>
-                </span>
+                <span></span>
               )
             }
             // if ends
             moreContent.push(
               <br/>
             )
+              viewSubmission = (<a title="View submissions" href={"/assignments/list_submissions?id="+(parseInt(this.props.id)/2).toString()}>
+              <img src="/assets/tree_view/List-submisstions-24.png" />
+              </a>);
+
+              viewScores = (<a title="View scores" href={"/grades/view?id="+(parseInt(this.props.id)/2).toString()}>
+              <img src="/assets/tree_view/view-scores-24.png" />
+              </a>);
+
+              viewReview = (<a title="View review report" href={"/review_mapping/response_report?id="+(parseInt(this.props.id)/2).toString()}>
+              <img src="/assets/tree_view/view-review-report-24.png" />
+              </a>);
+
+              viewSurvey = (<a title="View survey responses" href={"/survey_response/view_responses?id="+(parseInt(this.props.id)/2).toString()}>
+              <img src="/assets/tree_view/view-survey-24.png" />
+              </a>);
+
             moreContent.push(
               <span>
-                <a title="View submissions" href={"/assignments/list_submissions?id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/List-submisstions-24.png" />
-                </a>
-                <a title="View scores" href={"/grades/view?id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/view-scores-24.png" />
-                </a>
-                <a title="View review report" href={"/review_mapping/response_report?id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/view-review-report-24.png" />
-                </a>
-                <a title="View survey responses" href={"/survey_response/view_responses?id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/view-survey-24.png" />
-                </a>
               </span>
             )
 
             if(this.props.is_intelligent) {
+                intelligentAssignment = (<a title="Intelligent Assignment" href={"/lottery/run_intelligent_assignment/"+(parseInt(this.props.id)/2).toString()}>
+                <img src="/assets/tree_view/run-lottery.png" />
+                </a>);
               moreContent.push(
-                <a title="Intelligent Assignment" href={"/lottery/run_intelligent_assignment/"+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/run-lottery.png" />
-                </a>
+
               )
             }
 
             if (this.props.allow_suggestions) {
+                viewSuggestion = (<a title="View suggestions" href={"/suggestion/list?id="+(parseInt(this.props.id)/2).toString()+"&type=Assignment"}>
+                <img src="/assets/tree_view/view-suggestion-24.png" />
+                </a>);
+
               moreContent.push(
-                <span>
-                  <a title="View suggestions" href={"/suggestion/list?id="+(parseInt(this.props.id)/2).toString()+"&type=Assignment"}>
-                    <img src="/assets/tree_view/view-suggestion-24.png" />
-                  </a>
-                </span>
+                <span></span>
               )
             }
+
+              delayedJob = (<a title="View delayed jobs" href={"/assignments/scheduled_tasks?id="+(parseInt(this.props.id)/2).toString()}>
+              <img src="/assets/tree_view/view-scheduled-tasks.png" />
+              </a>);
+
             // if ends
             moreContent.push(
-              <span>
-                <a title="View delayed jobs" href={"/assignments/scheduled_tasks?id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/view-scheduled-tasks.png" />
-                </a>
-              </span>
+              <span></span>
             )
             if (this.props.has_topic) {
                 // Moved content out of this to the block outside this containing "if" statement
@@ -231,23 +404,27 @@ jQuery(document).ready(function() {
 
           // Moved it out of if (this.props.has_topic) and if(this.props.is_available),
           // Since view_publishing_rights should be visible for all the assignments
+            publishingRights = (<a title="View publishing rights" href={"/participants/view_publishing_rights?id="+(parseInt(this.props.id)/2).toString()}>
+    <img src="/assets/tree_view/view-publish-rights-24.png" />
+    </a>);
            moreContent.push(
-            <span>
-              <a title="View publishing rights" href={"/participants/view_publishing_rights?id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/view-publish-rights-24.png" />
-              </a>
-            </span>
+            <span></span>
           )
         } else if (newNodeType === 'questionnaires'){
+            viewQuestion = (<a title="View questionnaire" href={"/questionnaires/view?id="+(parseInt(this.props.id)/2).toString()}>
+    <img src="/assets/tree_view/view-survey-24.png" />
+    </a>);
           moreContent.push(
-            <span>
-              <a title="View questionnaire" href={"/questionnaires/view?id="+(parseInt(this.props.id)/2).toString()}>
-                <img src="/assets/tree_view/view-survey-24.png" />
-              </a>
-            </span>
+            <span></span>
           )
         }
+moreContent.push(
+<span>
+<App name="app"/>
+</span>
+)
         // if ends
+
       }
       return (
         <span onClick={this.handleButtonClick}>
@@ -389,6 +566,7 @@ jQuery(document).ready(function() {
       if (event.target.type != 'button') {
         this.setState({
           expanded: !this.state.expanded
+
         }, function() {
           this.props.rowClicked(this.props.id, this.state.expanded,this.props.newParams)
         })

@@ -56,6 +56,7 @@ gem 'thin'
 gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
+gem "recaptcha", :require => "recaptcha/rails"
 gem 'react-rails', '~> 1.0'
 gem 'jquery-tablesorter'
 

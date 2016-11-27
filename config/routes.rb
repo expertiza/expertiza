@@ -1,7 +1,8 @@
 Expertiza::Application.routes.draw do
 
+  resources :feedback_supports
   get 'auth/:provider/callback', to: 'auth#google_login'
-  get 'auth/failure', to: 'content_pages#view'
+  get 'auth/', to: 'content_pages#view'
 
   resources :bookmarks do
     collection do
@@ -59,6 +60,9 @@ Expertiza::Application.routes.draw do
 
   resources :author_feedback_questionnaires, controller: 'questionnaires'
 
+
+  resources :feedback_support
+  get 'auth/failure', to: 'content_pages#view'
 
   resources :content_pages do
     collection do

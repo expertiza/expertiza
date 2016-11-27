@@ -52,6 +52,10 @@
                        <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
                     </td>
 
+                    <td>
+                       <%= link_to "Chat", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
+                    </td>
+
                     <% if @assignment.get_current_stage(topic_id) != "Finished" %>
                       <%- # show the link as edit when latest review is done in current deadline   -%>
                       <%- # show link as update when latest review is done in different deadline than current phase   -%>

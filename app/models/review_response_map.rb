@@ -3,6 +3,7 @@ class ReviewResponseMap < ResponseMap
   belongs_to :reviewee, class_name: 'Team', foreign_key: 'reviewee_id'
   belongs_to :contributor, class_name: 'Team', foreign_key: 'reviewee_id'
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
+  after_create :create_chat
 
   # In if this assignment uses "varying rubrics" feature, the sls
   # "used_in_round" field should not be nil
@@ -168,5 +169,10 @@ class ReviewResponseMap < ResponseMap
     end
     review_final_versions[symbol][:response_ids] = response_ids
 
+  end
+
+  def create_chat
+  @chat=this.chat.build
+  @chat.save
   end
 end

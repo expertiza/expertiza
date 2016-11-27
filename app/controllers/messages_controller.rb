@@ -10,7 +10,7 @@ class MessagesController < ApplicationController
   def create
     @chat = Chat.find(params[:chat_id])
     @message = @chat.messages.build(message_params)
-    @message.user=current_user
+    @message.user=session[:user]
 
     if @message.save
       sync_new @message , scope: Message.by_chat(@chat)

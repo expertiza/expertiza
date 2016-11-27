@@ -294,6 +294,8 @@
                     </td>
 
                     <td>
+                      <% if map.type.to_s == "ReviewResponseMap"%>
+                      <% if (!map.chat.nil?) %>
                       <div id="messages" class="hidden">
                             <div id="<%= "#{title} #{review_no}." %>partial"  >
                               <%= sync partial: "message_row", collection: Message.by_chat(map.chat) %>
@@ -304,8 +306,9 @@
                                 <% end %>
                               </div>
                             </div>
-
-                      </div>
+                          </div>
+                          <% end %>
+                          <%end %>
 
                       <a href="javascript:register_popup('<%= "#{title} #{review_no}." %>', '<%= "#{title} #{review_no}." %>' );">
                         <span>chat</span>

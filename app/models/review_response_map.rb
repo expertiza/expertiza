@@ -129,6 +129,14 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
+  def create_chat
+  @chat=this.chat.build
+  @chat.save
+  end
+  def chat
+ Chat.find_by(response_map_id: self.id)
+end
+
   private
 
   def self.prepare_final_review_versions(assignment, maps)
@@ -171,8 +179,5 @@ class ReviewResponseMap < ResponseMap
 
   end
 
-  def create_chat
-  @chat=this.chat.build
-  @chat.save
-  end
+
 end

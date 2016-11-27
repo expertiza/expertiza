@@ -24,6 +24,7 @@ class LotteryController < ApplicationController
       teamed_students[course_id] = [] if teamed_students[course_id].nil?
       history = teamed_students[course_id]
       current_team = StudentTask.teamed_students(User.find(user_id),course_id,false, nil, assignment.id)[course_id]
+      current_team = [] if current_team.nil?
 
       # Done to not swap out current team members from the teams
       modified_history = remove_current_team_from_history(current_team, history)

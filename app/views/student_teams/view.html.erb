@@ -65,10 +65,16 @@
     </tr>
   </table>
 <% end %>
-<br><input type="checkbox" name="team_auto" id="team_auto"> Do you wish to have new team members allocated for this project<br>
-<input type ="button" name="team_auto_submit" id="team_auto_submit" value="Save Preference"><br>
-<!--render partial for join team request-->
   <% if @student.team!=nil %>
+    <%= form_tag('/student_teams/new_members', method: 'put', remote: true) do %>
+        <br/>
+        <input type="checkbox" name="team_auto" id="team_auto" <%=@new_members%>> Do you wish to have new team members allocated for this project<br/>
+        <input type="hidden" name="team_id" id="team_id" value="<%=@student.team.id%>"/>
+        <input type ="submit" name="team_auto_submit" id="team_auto_submit" value="Save Preference">
+        <br/>
+    <%end%>
+
+    <!--render partial for join team request-->
     <%= render :partial => 'join_team_requests/list_received',
     :locals =>{:team_id=>@student.team.id,
                :teams_user_id=>params[:student_id],

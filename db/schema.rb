@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161126233255) do
+ActiveRecord::Schema.define(version: 20161127045623) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -140,12 +140,10 @@ ActiveRecord::Schema.define(version: 20161126233255) do
   end
 
   create_table "chats", force: :cascade do |t|
-    t.integer  "response_map_id", limit: 4
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.integer  "review_response_map_id", limit: 4, null: false
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
   end
-
-  add_index "chats", ["response_map_id"], name: "index_chats_on_response_map_id", using: :btree
 
   create_table "content_pages", force: :cascade do |t|
     t.string   "title",           limit: 255
@@ -295,11 +293,9 @@ ActiveRecord::Schema.define(version: 20161126233255) do
   add_index "menu_items", ["parent_id"], name: "fk_menu_item_parent_id", using: :btree
 
   create_table "messages", force: :cascade do |t|
-    t.text     "body",       limit: 65535
-    t.integer  "chat_id",    limit: 4
-    t.integer  "user_id",    limit: 4
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.text    "body",    limit: 65535
+    t.integer "chat_id", limit: 4
+    t.integer "user_id", limit: 4
   end
 
   add_index "messages", ["chat_id"], name: "index_messages_on_chat_id", using: :btree
@@ -668,7 +664,6 @@ ActiveRecord::Schema.define(version: 20161126233255) do
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
   add_foreign_key "assignments", "users", column: "instructor_id", name: "fk_assignments_instructors"
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"
-  add_foreign_key "chats", "response_maps"
   add_foreign_key "courses", "users", column: "instructor_id", name: "fk_course_users"
   add_foreign_key "due_dates", "deadline_rights", column: "review_allowed_id", name: "fk_due_date_review_allowed"
   add_foreign_key "due_dates", "deadline_rights", column: "review_of_review_allowed_id", name: "fk_due_date_review_of_review_allowed"

@@ -130,12 +130,10 @@ class ReviewResponseMap < ResponseMap
   end
 
   def create_chat
-  @chat=this.chat.build
+  @chat=self.build_chat
   @chat.save
   end
-  def chat
- Chat.find_by(response_map_id: self.id)
-end
+  
 
   private
 

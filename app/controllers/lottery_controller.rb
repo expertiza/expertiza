@@ -44,6 +44,14 @@ class LotteryController < ApplicationController
     end
 
     # TODO to only swap team members for teams that have the flag set in the database.
+    teams = JSON.parse(response)["teams"]
+    teams.each do |user_ids|
+      user_ids.each do |user_id|
+        team_id = TeamsUser.find(user_id: user_id).first.team_id
+        new_members_option = Team.find(id: team_id).first.new_members
+
+     end
+    end
     response = swapping_team_members_with_history(response, assignment.max_team_size)
     # store each summary in a hashmap and use the question as the key
     teams = JSON.parse(response)["teams"]

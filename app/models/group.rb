@@ -58,6 +58,11 @@ class Group < ActiveRecord::Base
     can_add_member
   end
 
+  # Add Participants to the current Assignment Group
+  def add_participant(assignment_id, user)
+    AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted) if AssignmentParticipant.where(parent_id: assignment_id, user_id: user.id).first.nil?
+  end
+  
   # Define the size of the group
   def self.size(group_id)
     GroupsUser.where(["group_id = ?", group_id]).count

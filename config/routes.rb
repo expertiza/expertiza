@@ -1,6 +1,6 @@
 Expertiza::Application.routes.draw do
   resources :groups_users
-  resources :groups
+ # resources :groups
   resources :submission_records
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
@@ -501,6 +501,16 @@ Expertiza::Application.routes.draw do
       post :inherit
     end
   end
+
+  resources :groups do
+    collection do
+      get :list
+      #post ':id', action: :create_teams
+      post :create_groups
+      #post :inherit
+    end
+  end
+
 
   resources :teams_users do
     collection do

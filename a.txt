@@ -1,0 +1,39 @@
+function hasGroupsChanged() {
+      var msg = 'Warning! Unchecking this box will hide groups that already exist.';
+        var checkbox = jQuery('#group_assignment');
+        var group_count_field = jQuery('#assignment_group_count_field');
+        var groupmate_reviews_field = jQuery('#assignment_show_groupmate_reviews');
+        var group_formation_due_date_checkbox = jQuery('#group_formation_due_date_checkbox')
+
+        jQuery("#questionnaire_table_GroupmateReviewQuestionnaire").remove()
+        if (checkbox.is(':checked')) {
+          group_count_field.removeAttr('hidden');
+          group_formation_due_date_checkbox.removeAttr('hidden')
+          jQuery('#assignment_form_assignment_max_group_size').val('2');
+          groupmate_reviews_field.removeAttr('hidden');
+          addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'group_formation', 0,<%= due_date(@assignment_form.assignment, 'group_formation').to_json.html_safe %>);
+          addQuestionnaireTableRow(
+                  'GroupmateReviewQuestionnaire',
+                  null,
+                  <%= questionnaire(@assignment_form.assignment, 'GroupmateReviewQuestionnaire',nil).to_json.html_safe %>,
+                  <%= assignment_questionnaire(@assignment_form.assignment, 'GroupmateReviewQuestionnaire',nil).to_json.html_safe %>,
+                  <%= questionnaire_options(@assignment_form.assignment, 'GroupmateReviewQuestionnaire',nil).to_json.html_safe %>
+          );
+
+        } else {
+            if (confirm(msg)) {
+              group_count_field.attr('hidden', true);
+              group_formation_due_date_checkbox.attr('hidden', true)
+              groupmate_reviews_field.attr('hidden', true);
+              document.getElementById('assignment_form_assignment_max_group_size').value = '1';
+              removeDueDateTableElement('group_formation', 0);
+
+            } else {
+              checkbox.prop('checked', true);
+            }
+            if (<%= @assignment_form.assignment.max_group_size == 1%>){
+              group_count_field.attr('hidden', true);
+            }
+          } 
+    }
+

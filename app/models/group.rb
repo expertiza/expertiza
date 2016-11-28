@@ -1,5 +1,4 @@
 class Group < ActiveRecord::Base
-  before_action :set_group, only: [:show, :edit, :update, :destroy]
   has_many :groups_users, dependent: :destroy
   has_many :users, through: :groups_users
   has_many :join_group_requests
@@ -77,7 +76,7 @@ class Group < ActiveRecord::Base
   # Start by adding single members to groups that are one member too small.
   # Add two-member groups to groups that two members too small. etc.
   def self.randomize_all_by_parent(parent, min_group_size)
-    participants = Participant.where(["parent_id = ?", parent.id + "Participant"])
+    participants = Participant.where("parent_id = ?", parent.id)
     participants = participants.sort { rand(3) - 1 }
     users = participants.map {|p| User.find(p.user_id) }.to_a
     # find groups still need group members and users who are not in any group

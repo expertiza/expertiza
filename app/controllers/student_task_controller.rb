@@ -22,12 +22,12 @@ class StudentTaskController < ApplicationController
   def view
     StudentTask.from_participant_id params[:id]
     @participant = AssignmentParticipant.find(params[:id])
-    @mappings=@participant.review_mappings
     @can_submit = @participant.can_submit
     @can_review = @participant.can_review
     @can_take_quiz = @participant.can_take_quiz
     @authorization = Participant.get_authorization(@can_submit, @can_review, @can_take_quiz)
     @team = @participant.team
+    @mappings=@team.review_mappings
     denied unless current_user_id?(@participant.user_id)
     @assignment = @participant.assignment
     @can_provide_suggestions = @assignment.allow_suggestions

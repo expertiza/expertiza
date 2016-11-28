@@ -61,6 +61,7 @@ gem 'jquery-tablesorter'
 #for real time chat
 gem 'faye'
 gem 'sync'
+gem 'responders', '~> 2.0'
 
 group :development do
   gem 'daemons'

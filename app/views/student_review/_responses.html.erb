@@ -301,7 +301,7 @@
                               <%= sync partial: "message_row", collection: Message.by_chat(map.chat) %>
                               <%= sync_new partial: "message_row", resource: Message.new, scope: Message.by_chat(map.chat) %>
                               <div class="popup-bottom">
-                                <%= form_for([map.chat, map.chat.messages.build] , remote: true) do |f| %>
+                                <%= form_for([map.chat, map.chat.messages.build], remote: true) do |f| %>
                                     <%= f.text_field :body , :id => "body_input"%>
                                 <% end %>
                               </div>
@@ -339,7 +339,7 @@
                               <%= sync partial: "message_row", collection: Message.by_chat(map.chat) %>
                               <%= sync_new partial: "message_row", resource: Message.new, scope: Message.by_chat(map.chat) %>
                               <div class="popup-bottom">
-                                <%= form_for([map.chat, map.chat.messages.build] , remote: true) do |f| %>
+                                <%= form_for([map.chat, map.chat.messages.build], remote: true) do |f| %>
                                     <%= f.text_field :body , :id => "body_input"%>
                                 <% end %>
                               </div>

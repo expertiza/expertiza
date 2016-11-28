@@ -259,6 +259,7 @@
 <div id="messages" class="hidden">
   <% @mappings.each do |mapping| %>
       <% count = count+1 %>
+      <% unless mapping.chat.nil? %>
       <div id="partial<%= count %>"  >
         <%= sync partial: "message_row", collection: Message.by_chat(mapping.chat) %>
         <%= sync_new partial: "message_row", resource: Message.new, scope: Message.by_chat(mapping.chat) %>
@@ -273,6 +274,7 @@
           <!--input type="button" value="Clear" onclick="clear();"-->
         </div>
       </div>
+          <%end%>
   <%end%>
 </div>
 
@@ -383,6 +385,7 @@ to display the label "Your team" in the student assignment tasks-->
   <% mcount = 0 %>
   <% @mappings.each do |mappings| %>
       <% mcount = mcount+1 %>
+      <% unless mapping.chat.nil? %>
       <div class="sidebar-name">
 
 
@@ -392,6 +395,7 @@ to display the label "Your team" in the student assignment tasks-->
           <span>Review <%= mcount %></span>
         </a>
       </div>
+          <% end %>
   <% end %>
 </div>
   <a href="javascript:window.history.back()">Back</a>

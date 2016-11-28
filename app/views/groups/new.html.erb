@@ -1,0 +1,43 @@
+<H1>Create Groups for <%= @parent.name %></H1>
+
+<H2> Automatically </H2>
+
+<p> Uses, insofar as possible, the number of members specified when the
+  assignment was created.</p>
+
+<%= form_tag :action => 'create_groups' do %>
+    <!-- BUG FIX: Check if the parent is course, then set the max size as 4 otherwise the max group size of assignment group-->
+    <% if @parent.is_a?(Course)%>
+          Group Size:<%= select_tag 'group_size', options_for_select(2..4), size: 1 %>
+    <% else %>
+          Group Size:<%= select_tag 'group_size', options_for_select(2..@parent.max_group_size), size: 1 %>
+    <% end %>
+<%= hidden_field_tag 'id', @parent.id %>
+
+<%= submit_tag "Create Groups" %>
+<% end %>
+
+
+<BR/>
+
+<H2> Manually </H2>
+<p>Specify Group name, then add members to group, one by one. </p>
+<%= form_tag :action => 'create' do %>
+  <%= hidden_field_tag 'id', @parent.id %>
+  <%= render :partial => 'form' %>
+<% end %>
+
+<BR/>
+<% if not @parent.instance_of?(Course) and not @parent.course.nil? %>
+  <H2> Inherit Groups From Course </H2>
+  <p> Use the groups that are currently defined for the course.</p>
+  <%= form_tag :action => 'inherit' do %>
+    <%= hidden_field_tag 'id', @parent.id %>
+
+    <%= submit_tag "Inherit" %>
+  <% end %>
+<% end %>
+<BR/>
+<%= link_to 'Back', :controller => 'groups', :action => 'list', :id => @parent.id  %>
+
+

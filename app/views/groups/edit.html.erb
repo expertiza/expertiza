@@ -1,0 +1,8 @@
+<H1>Edit Group</H1>
+
+<%= form_tag :action => 'update', :id => @group  do %>
+  <%= hidden_field_tag 'id', @group.id %>
+  <%= render :partial => 'form'%>
+<% end %>
+<br/>
+<%= link_to 'Back', :controller => 'groups', :action => 'list', :id => @group.parent_id %>

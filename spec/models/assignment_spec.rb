@@ -95,3 +95,24 @@ describe "#candidate_topics_for_quiz" do
     expect(cand_topic).to be_nil
   end
 end
+
+describe "#check if the assignment belongs to a course" do
+  it "returns false if assignment does not have a course" do
+    assignment_node = AssignmentNode.new
+    assignment = build(:assignment)
+    assignment.course_id = nil
+    assignment.save
+    assignment_node.node_object_id = assignment.id
+    expect(assignment_node.belongs_to_course?).to be false
+  end
+
+  it "returns true if assignment does have a course" do
+    assignment_node = AssignmentNode.new
+    assignment = build(:assignment)
+    assignment.course_id = 1
+    assignment.save
+    assignment_node.node_object_id = assignment.id
+    expect(assignment_node.belongs_to_course?).to be true
+  end
+
+end

@@ -48,7 +48,7 @@ class Team < ActiveRecord::Base
 
  # Check if the current team is full?
  def full?
-  return false if self.parent_id == nil
+  return false if self.parent_id == nil #course team, does not max_team_size
   max_team_members = Assignment.find(self.parent_id).max_team_size
   curr_team_size = Team.size(self.id)
   (curr_team_size >= max_team_members)
@@ -135,7 +135,7 @@ class Team < ActiveRecord::Base
       num_of_teams = users.length.fdiv(min_team_size).ceil
       nextTeamMemberIndex = 0
       for i in (1..num_of_teams).to_a
-        team = Object.const_get(team_type + 'Team').create(name: "Team" + (rand(100) * rand(0.1)).round(0).to_s, parent_id: parent.id)
+        team = Object.const_get(team_type + 'Team').create(name: "Team" + i.to_s, parent_id: parent.id)
         TeamNode.create(parent_id: parent.id, node_object_id: team.id)
         min_team_size.times do
           break if nextTeamMemberIndex >= users.length
@@ -194,7 +194,7 @@ class Team < ActiveRecord::Base
     end
 
     if name
-      team = Team.create_team_and_node(id, teamtype)
+      team = Team.create_team_and_node(id)
       team.name = name
       team.save
     end
@@ -247,18 +247,12 @@ class Team < ActiveRecord::Base
   end
 
   # Create the team with corresponding tree node
-  def self.create_team_and_node(id, teamtype = 'AssignmentTeam')
-    if teamtype == 'CourseTeam'
-      curr_course = Course.find(id)
-      team_name = Team.generate_team_name(curr_course.name)
-      team = CourseTeam.create(name: team_name, parent_id: id)
-      TeamNode.create(parent_id: id, node_object_id: team.id)
-    elsif teamtype == 'AssignmentTeam'
-      curr_assignment = Assignment.find(id)
-      team_name = Team.generate_team_name(curr_assignment.name)
-      team = AssignmentTeam.create(name: team_name, parent_id: id)
-      TeamNode.create(parent_id: id, node_object_id: team.id)
-    end
+  def self.create_team_and_node(id)
+    current_task = parent_model id # current_task will be either a course object or an assignment object.
+    team_name = Team.generate_team_name(current_task.name)
+    team = self.create(name: team_name, parent_id: id)
+    # new teamnode will have current_task.id as parent_id and team_id as node_object_id.
+    TeamNode.create(parent_id: id, node_object_id: team.id)
     team
   end
 

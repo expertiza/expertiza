@@ -27,6 +27,10 @@
 //= require_tree .
 //= require jquery.datetimepicker
 //= require jquery-tablesorter
+//= require vendor.min
+//= require form-builder.min
+//= require form-render.min
+//= require demo
 
 // Eliminate the “element.dispatchEvent is not a function” error
 jQuery.noConflict();

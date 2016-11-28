@@ -13,7 +13,6 @@ class AssignmentParticipant < Participant
   has_many    :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewee_id'
   has_many    :quiz_mappings, class_name: 'QuizResponseMap', foreign_key: 'reviewee_id'
   has_many :response_maps, foreign_key: 'reviewee_id'
-  has_many :participant_review_response_maps, foreign_key: 'reviewee_id'
   has_many :quiz_response_maps, foreign_key: 'reviewee_id'
   has_many :quiz_responses, through: :quiz_response_maps, foreign_key: 'map_id'
   # has_many    :quiz_responses,  :class_name => 'Response', :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'QuizResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
@@ -125,7 +124,7 @@ class AssignmentParticipant < Participant
       scores[questionnaire_symbol][:assessments] = if round.nil?
                                                      questionnaire.get_assessments_for(self)
                                                    else
-                                                     questionnaire.get_assessments_round_for(self, round)
+                                                     questionnaire.get_responses_for_team_round(self, round)
                                                    end
       scores[questionnaire_symbol][:scores] = Answer.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
     end
@@ -319,7 +318,7 @@ class AssignmentParticipant < Participant
     self.handle = if self.user.handle.nil? or self.user.handle == ""
                     self.user.name
                   elsif !AssignmentParticipant.where(parent_id: self.assignment.id, handle: self.user.handle).empty?
-                    self.user.name
+                   self.user.name
                   else
                     self.user.handle
                   end
@@ -338,11 +337,6 @@ class AssignmentParticipant < Participant
     self.assignment.path + "/" + participant.team.directory_num.to_s + "_review" + "/" + response_map_id.to_s
   end
 
-  def update_resubmit_times
-    new_submit = ResubmissionTime.new(resubmitted_at: Time.now.to_s)
-    self.resubmission_times << new_submit
-  end
-
   def current_stage
     topic_id = SignedUpTeam.topic_id(self.parent_id, self.user_id)
     assignment.try :get_current_stage, topic_id
@@ -350,7 +344,13 @@ class AssignmentParticipant < Participant
 
   def stage_deadline
     topic_id = SignedUpTeam.topic_id(self.parent_id, self.user_id)
-    assignment.stage_deadline topic_id
+    stage = assignment.stage_deadline topic_id
+    if stage == 'Finished' and !assignment.staggered_deadline?
+      due_date = assignment.due_dates.last.due_at
+    elsif stage == 'Finished' and assignment.staggered_deadline?
+      due_date = TopicDueDate.try(patent_id: topic_id).try(:last).try(:due_at)
+    end
+    due_date.to_s
   end
 
   def review_response_maps

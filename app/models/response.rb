@@ -6,6 +6,7 @@ class Response < ActiveRecord::Base
   
   belongs_to :response_map, class_name: 'ResponseMap', foreign_key: 'map_id'
   has_many :scores, class_name: 'Answer', foreign_key: 'response_id', dependent: :destroy
+  # TODO: change metareview_response_map relationship to belongs_to
   has_many :metareview_response_maps, class_name: 'MetareviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy
 
   alias map response_map
@@ -27,9 +28,7 @@ class Response < ActiveRecord::Base
     # The following three lines print out the type of rubric before displaying
     # feedback.  Currently this is only done if the rubric is Author Feedback.
     # It doesn't seem necessary to print out the rubric type in the case of
-    # a ReviewResponseMap.  Also, I'm not sure if that would have to be
-    # TeamResponseMap for a team assignment.  Someone who understands the
-    # situation better could add to the code later.
+    # a ReviewResponseMap. 
     if self.map.type.to_s == 'FeedbackResponseMap'
       identifier += "<h3>Feedback from author</h3>"
     end
@@ -142,43 +141,6 @@ class Response < ActiveRecord::Base
     total_score
   end
 
-  # Function which considers a given assignment
-  # and checks if a given review is still valid for score calculation
-  # The basic rule is that
-  # "A review is INVALID if there was new submission for the assignment
-  #  before the most recent review deadline AND THE review happened before that
-  #  submission"
-  # response - the response whose validity is being checked
-  # resubmission_times - submission times of the assignment is descending order
-  # latest_review_phase_start_time
-  # The function returns true if a review is valid for score calculation
-  # and false otherwise
-  def is_valid_for_score_calculation?(resubmission_times, latest_review_phase_start_time)
-    is_valid = true
-
-    # if there was not submission then the response is valid
-    if resubmission_times.nil? || latest_review_phase_start_time.nil?
-      return is_valid
-    end
-
-    resubmission_times.each do |resubmission_time|
-      # if the response is after a resubmission that is
-      # before the latest_review_phase_start_time (check second condition below)
-      # then we are good - the response is valid and we can break
-      break if self.updated_at > resubmission_time.resubmitted_at
-
-      # this means there was a re-submission before the
-      # latest_review_phase_start_time and we dont have a response after that
-      # so the response is invalid
-      if resubmission_time.resubmitted_at < latest_review_phase_start_time
-        is_valid = false
-        break
-      end
-    end
-
-    is_valid
-  end
-
   # only two types of responses more should be added
   def email(partial = "new_submission")
     defn = {}
@@ -191,72 +153,17 @@ class Response < ActiveRecord::Base
     participant = Participant.find(reviewer_participant_id)
     assignment = Assignment.find(participant.parent_id)
 
-    if response_map.type == "ReviewResponseMap"
-
-    end
-
     defn[:subject] = "A new submission is available for " + assignment.name
-    if response_map.type == "ReviewResponseMap"
-      defn[:body][:type] = "Author Feedback"
-      AssignmentTeam.find(response_map.reviewee_id).users.each do |user|
-        defn[:body][:obj_name] = if assignment.has_topics?
-                                   SignUpTopic.find(SignedUpTeam.topic_id(assignment.id, user.id)).topic_name
-                                 else
-                                   assignment.name
-                                 end
-        defn[:body][:first_name] = User.find(user.id).fullname
-        defn[:to] = User.find(user.id).email
-        Mailer.sync_message(defn).deliver_now
-      end
-    end
-    if response_map.type == "MetareviewResponseMap"
-      defn[:body][:type] = "Metareview"
-      reviewee_user = Participant.find(response_map.reviewee_id)
-      signup_topic_id = SignedUpTeam.topic_id(assignment.id, response_map.contributor.teams_users.first.user_id)
 
-      defn[:body][:obj_name] = SignUpTopic.find(signup_topic_id).topic_name
-      defn[:body][:first_name] = User.find(reviewee_user.user_id).fullname
-      defn[:to] = User.find(reviewee_user.user_id).email
-      Mailer.sync_message(defn).deliver
-    end
-    if response_map.type == "FeedbackResponseMap" # This is authors' feedback from UI
-      defn[:body][:type] = "Review Feedback"
-      # reviewee is a response, reviewer is a participant
-      # we need to track back to find the original reviewer on whose work the author comments
-      response_id_for_original_feedback = response_map.reviewed_object_id
-      response_for_original_feedback = Response.find response_id_for_original_feedback
-      response_map_for_original_feedback = ResponseMap.find response_for_original_feedback.map_id
-      original_reviewer_participant_id = response_map_for_original_feedback.reviewer_id
+    response_map.email(defn,participant,assignment)
 
-      participant = AssignmentParticipant.find(original_reviewer_participant_id)
-      topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
-      defn[:body][:obj_name] = if topic_id.nil?
-                                 assignment.name
-                               else
-                                 SignUpTopic.find(topic_id).topic_name
-                               end
-
-      user = User.find(participant.user_id)
-
-      defn[:to] = user.email
-      defn[:body][:first_name] = user.fullname
-      Mailer.sync_message(defn).deliver
-    end
-    if response_map.type == "TeammateReviewResponseMap"
-      defn[:body][:type] = "Teammate Review"
-      participant = AssignmentParticipant.find(response_map.reviewee_id)
-      topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
-      defn[:body][:obj_name] = SignUpTopic.find(topic_id).topic_name rescue nil
-      user = User.find(participant.user_id)
-      defn[:body][:first_name] = user.fullname
-      defn[:to] = user.email
-      Mailer.sync_message(defn).deliver
-    end
   end
 
   def questionnaire_by_answer(answer)
     if !answer.nil? # for all the cases except the case that  file submission is the only question in the rubric.
       questionnaire = Question.find(answer.question_id).questionnaire
+      # I don't think this else is necessary. Checking the callers, it seems that answer cannot be nil should be a
+      # pre-condition of this method --Yang
     else
       # there is small possibility that the answers is empty: when the questionnaire only have 1 question and it is a upload file question
       # the reason is that for this question type, there is no answer record, and this question is handled by a different form

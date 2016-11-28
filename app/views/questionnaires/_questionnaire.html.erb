@@ -54,6 +54,15 @@
       </td>
     </tr>
   </table>
+
+<!--New content -->
+    <div class="content">
+      <div class="build-wrap"></div>
+      <div class="render-wrap"></div>
+      <button id="edit-form">Edit Form</button>
+      <button id="get-data">Get Data</button>
+    </div>
+ <!-- EO New content --> 
   
   <%= form_tag :action => 'save_all_questions', :id => params[:id], :questionnaire_type => params[:model], :private => params[:private] do %>
     <table id="questions_table">

@@ -2,11 +2,11 @@ class LinkSubmissionHistory < SubmissionHistory
 
   def self.create(link, team, action)
     # lets assume link of type http://docs.google.com  or   http://wiki.expertiza.ncsu.edu  or http://github.com/goeltanmay/
-    if link.include? "docs.google.com"
+    if link.includes? "docs.google.com"
       history_obj = GoogledocSubmissionHistory.create(link, team, action)
-    elsif link.include? "wiki.expertiza.ncsu.edu"
+    elsif link.includes? "wiki.expertiza.ncsu.edu"
       history_obj = WikipediaSubmissionHistory.create(link, team, action)
-    elsif link.include? "github.com"
+    elsif link.includes? "github.com"
       history_obj = GithubSubmissionHistory.create(link, team, action)
     else
       history_obj = LinkSubmissionHistory.new

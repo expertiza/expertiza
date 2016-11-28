@@ -40,6 +40,7 @@ gem 'rails4-autocomplete'
 gem 'rake'
 gem 'rb-readline'
 gem 'rest-client', '~> 1.8'
+gem "recaptcha", require: "recaptcha/rails"
 gem 'RedCloth'
 gem 'rgl', require: 'rgl/adjacency'
 gem 'rjb'

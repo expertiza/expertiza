@@ -16,7 +16,7 @@ class CopyFromTeamToSubmissionHistory < ActiveRecord::Migration
           submission_history.submitted_at = File.mtime(file)
           submission_history.save
         end
-      rescue RecordNotFound
+      rescue ActiveRecord::RecordNotFound
         # missing corresponding assignment.. skip this record.
       end
   	end

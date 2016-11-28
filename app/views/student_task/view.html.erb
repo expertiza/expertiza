@@ -1,3 +1,281 @@
+<style>
+  @media only screen and (max-width : 540px)
+  {
+    .chat-sidebar
+    {
+      display: none !important;
+    }
+
+    .chat-popup
+    {
+      display: none !important;
+    }
+  }
+
+  body
+  {
+    background-color: white;
+  }
+  .hidden {
+    display: none;
+  }
+
+  .chat-sidebar
+  {
+    width: 200px;
+    position: fixed;
+    height: 100%;
+    right: 0px;
+    top: 0px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: 1px solid rgba(29, 49, 91, .3);
+  }
+
+  .sidebar-name
+  {
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-bottom: 4px;
+    font-size: 15px;
+  }
+
+  .sidebar-name span
+  {
+    padding-left: 5px;
+  }
+
+  .sidebar-name a
+  {
+    display: block;
+    height: 100%;
+    text-decoration: none;
+    color: black;
+  }
+
+  .sidebar-name:hover
+  {
+    background-color: #A90201;
+  }
+
+  .sidebar-name img
+  {
+    background-image:url("http://placehold.it/40x40");
+    vertical-align:middle;
+  }
+
+  .popup-box
+  {
+    display: none;
+    position: fixed;
+    bottom: 0px;
+    right: 220px;
+    height: 285px;
+    background-color: #afaaaa;
+    width: 300px;
+    border: 1px solid rgba(29, 49, 91, .3);
+  }
+
+  #body_input
+  {
+    width: 290px;
+    height: 20px;
+
+  }
+
+  .popup-box .popup-head
+  {
+    background-color: #A90201;
+    padding: 5px;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    clear: both;
+  }
+
+  .popup-box .popup-head .popup-head-left
+  {
+    float: left;
+  }
+
+
+  .popup-box .popup-head .popup-head-right
+  {
+    float: right;
+    opacity: 0.5;
+  }
+
+  .popup-box .popup-head .popup-head-right a
+  {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .popup-box .popup-messages
+  {
+    height: 79%;
+    overflow-y: scroll;
+    border-style: solid;
+
+  }
+  .popup-box .popup-messages .popup-bottom{
+    position: absolute;
+    bottom: 0;
+  }
+
+
+</style>
+
+<script>
+  //this function can remove a array element.
+  Array.remove = function(array, from, to) {
+    var rest = array.slice((to || from) + 1 || array.length);
+    array.length = from < 0 ? array.length + from : from;
+    return array.push.apply(array, rest);
+  };
+
+
+  function clear(id)
+  {
+
+    document.getElementById(id).value = "";
+  }
+
+  //this variable represents the total number of popups can be displayed according to the viewport width
+  var total_popups = 0;
+
+  //arrays of popups ids
+  var popups = [];
+
+  //this is used to close a popup
+  function close_popup(id)
+  {
+    for(var iii = 0; iii < popups.length; iii++)
+    {
+      if(id == popups[iii])
+      {
+        Array.remove(popups, iii);
+
+        document.getElementById(id).style.display = "none";
+
+        calculate_popups();
+
+        return;
+      }
+    }
+  }
+
+  //displays the popups. Displays based on the maximum number of popups that can be displayed on the current viewport width
+  function display_popups()
+  {
+    var right = 220;
+
+    var iii = 0;
+    for(iii; iii < total_popups; iii++)
+    {
+      if(popups[iii] != undefined)
+      {
+        var element = document.getElementById(popups[iii]);
+        element.style.right = right + "px";
+        right = right + 320;
+        element.style.display = "block";
+      }
+    }
+
+    for(var jjj = iii; jjj < popups.length; jjj++)
+    {
+      var element = document.getElementById(popups[jjj]);
+      element.style.display = "none";
+    }
+  }
+
+  //creates markup for a new popup. Adds the id to popups array.
+  function register_popup(id, name)
+  {
+
+    for(var iii = 0; iii < popups.length; iii++)
+    {
+      //already registered. Bring it to front.
+      if(id == popups[iii])
+      {
+        Array.remove(popups, iii);
+
+        popups.unshift(id);
+
+        calculate_popups();
+
+
+        return;
+      }
+    }
+
+    var element = '<div class="popup-box chat-popup" id="'+ id +'">';
+    element = element + '<div class="popup-head">';
+    element = element + '<div class="popup-head-left">'+ name +'</div>';
+    element = element + '<div class="popup-head-right"><a href="javascript:close_popup(\''+ id +'\');">&#10005;</a></div>';
+    element = element + '<div style="clear: both"></div></div><div class="popup-messages" id="'+"messages"+id+'">'+ +'</div></div>';
+    $( "body" ).append( element);
+    document.getElementById("messages"+id).appendChild(document.getElementById("partial"+id))
+
+
+
+
+
+
+
+    popups.unshift(id);
+
+    calculate_popups();
+
+  }
+
+  //calculate the total number of popups suitable and then populate the toatal_popups variable.
+  function calculate_popups()
+  {
+    var width = window.innerWidth;
+    if(width < 540)
+    {
+      total_popups = 0;
+    }
+    else
+    {
+      width = width - 200;
+      //320 is width of a single popup box
+      total_popups = parseInt(width/320);
+    }
+
+    display_popups();
+
+  }
+
+
+
+  //recalculate when window is loaded and also when window is resized.
+  window.addEventListener("resize", calculate_popups);
+  window.addEventListener("load", calculate_popups);
+
+</script>
+<% count = 0 %>
+<div id="messages" class="hidden">
+  <% @mappings.each do |mapping| %>
+      <% count = count+1 %>
+      <div id="partial<%= count %>"  >
+        <%= sync partial: "message_row", collection: Message.by_chat(mapping.chat) %>
+        <%= sync_new partial: "message_row", resource: Message.new, scope: Message.by_chat(mapping.chat) %>
+        <div class="popup-bottom">
+          <%= form_for([mapping.chat, mapping.chat.messages.build] , remote: true) do |f| %>
+              <%= f.text_field :body , :id => "body_input"%>
+              <!--a href="javascript:clear('body_input');"> clear <a-->
+
+          <% end %>
+
+
+          <!--input type="button" value="Clear" onclick="clear();"-->
+        </div>
+      </div>
+  <%end%>
+</div>
+
 <h1>
   <% if @assignment.spec_location == nil|| @assignment.spec_location.length==0%>
       Submit or Review work for <%= @assignment.name %>
@@ -101,4 +379,19 @@ to display the label "Your team" in the student assignment tasks-->
     <li><%= link_to "Change your handle", {:controller => 'participants', :action => 'change_handle', :id => @participant.id} %> (Provide a different handle for this assignment)</li>
   </ul>
   <br>
+<div class="chat-sidebar">
+  <% mcount = 0 %>
+  <% @mappings.each do |mappings| %>
+      <% mcount = mcount+1 %>
+      <div class="sidebar-name">
+
+
+        <!-- Pass username and display name to register popup -->
+        <a href="javascript:register_popup('<%= mcount %>', '<%= mcount %>','' );">
+          <img width="40" height="40" src="http://placehold.it/40x40" />
+          <span>Review <%= mcount %></span>
+        </a>
+      </div>
+  <% end %>
+</div>
   <a href="javascript:window.history.back()">Back</a>

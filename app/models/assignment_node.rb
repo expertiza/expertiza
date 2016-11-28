@@ -137,4 +137,8 @@ class AssignmentNode < Node
   def get_teams
     TeamNode.get(self.node_object_id)
   end
+
+  def get_groups
+    Group.where(parent_id: self.node_object_id)
+  end
 end

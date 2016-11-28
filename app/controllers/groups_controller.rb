@@ -20,7 +20,7 @@ class GroupsController < ApplicationController
     allowed_types = ['Assignment', 'Course']
     session[:group_type] = params[:type] if params[:type] && allowed_types.include?(params[:type])
     begin
-      @root_node = Object.const_get(session[:group_type] + "Node").find_by_node_object_id(params[:id])
+      @root_node = Object.const_get("AssignmentNode").find_by_node_object_id(params[:id])
       @child_nodes = @root_node.get_groups
     rescue
       flash[:error] = $!

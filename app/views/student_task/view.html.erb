@@ -21,12 +21,15 @@
     {
       width: 200px;
       position: fixed;
-      height: 100%;
+      height: 55%;
       right: 0px;
-      top: 0px;
+      top: 45%;
       padding-top: 10px;
       padding-bottom: 10px;
       border: 1px solid rgba(29, 49, 91, .3);
+      background-color: gray;
+      display: none;
+      overflow: scroll;
     }
     .sidebar-name
     {
@@ -103,6 +106,8 @@
       position: absolute;
       bottom: 0;
     }
+  
+   
   </style>
 
 
@@ -192,7 +197,7 @@
 
     var element = '<div class="popup-box chat-popup" id="'+ id +'">';
     element = element + '<div class="popup-head">';
-    element = element + '<div class="popup-head-left"><a> &#9729;</a>'+ name +'</div>';
+    element = element + '<div class="popup-head-left"><a> &#9729;</a>Review'+ name +'</div>';
     element = element + '<div class="popup-head-right"><a href="javascript:close_popup(\''+ id +'\');">&#10005;</a></div>';
     element = element + '<div style="clear: both"></div></div><div class="popup-messages" id="'+"messages"+id+'">'+ +'</div></div>';
     $( "body" ).append( element);
@@ -234,6 +239,11 @@
   //recalculate when window is loaded and also when window is resized.
   window.addEventListener("resize", calculate_popups);
   window.addEventListener("load", calculate_popups);
+  $(document).ready(function(){
+    $("#chats").click(function(){
+        $(".chat-sidebar").toggle();
+    });
+});
 
 </script>
 <% count = 0 %>
@@ -360,7 +370,9 @@ to display the label "Your team" in the student assignment tasks-->
       <li><%= link_to "Take a survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id} %> (This will log you out)</li>
     <% end %>
     <li><%= link_to "Change your handle", {:controller => 'participants', :action => 'change_handle', :id => @participant.id} %> (Provide a different handle for this assignment)</li>
+  <li><a id="chats" href=javascript:void(0)>Your messages</a>(Answer queries on your work)</li>
   </ul>
+
   <br>
 <div class="chat-sidebar">
   <% mcount = 0 %>

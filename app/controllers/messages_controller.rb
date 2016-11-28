@@ -1,4 +1,14 @@
 class MessagesController < ApplicationController
+  respond_to :html, :js
+
+
+  def action_allowed?
+    ['Instructor',
+     'Teaching Assistant',
+     'Administrator',
+     'Super-Administrator',
+     'Student'].include? current_role_name and ((%w(list).include? action_name) ? are_needed_authorizations_present? : true)
+  end
   
 
   def index

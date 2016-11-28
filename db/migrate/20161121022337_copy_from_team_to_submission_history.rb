@@ -7,7 +7,7 @@ class CopyFromTeamToSubmissionHistory < ActiveRecord::Migration
   	AssignmentTeam.find_each do |assignment_team|
   		assignment_team.hyperlinks.each do |hyperlink|
   			submission_history = SubmissionHistory.create(assignment_team, hyperlink, "add")
-        submission_history.submitted_at = assignment_team.updated_at
+        submission_history.submitted_at = Time.current
         submission_history.save
   		end
       begin

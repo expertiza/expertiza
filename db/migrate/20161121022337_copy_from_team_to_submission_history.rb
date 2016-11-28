@@ -4,7 +4,7 @@ class CopyFromTeamToSubmissionHistory < ActiveRecord::Migration
   	# submitted hyperlinks read
   	# for each hyperlink, create a new entry in the submission histories table
   	# for each file, create a new entry in the submission histories table
-  	AssignmentTeam.each do |assignment_team|
+  	AssignmentTeam.find_each do |assignment_team|
   		assignment_team.hyperlinks.each do |hyperlink|
   			submission_history = SubmissionHistory.create(assignment_team, hyperlink, "add")
         submission_history.submitted_at = assignment_team.updated_at
@@ -23,7 +23,7 @@ class CopyFromTeamToSubmissionHistory < ActiveRecord::Migration
   	# find submission histories for each team
   	# for each entry, if it is a hyperlink, add to the submitted hyperlinks column
   	# if it is a file, chill..
-    AssignmentTeam.each do |assignment_team|
+    AssignmentTeam.find_each do |assignment_team|
       SubmissionHistory.where(team = assignment_team).each do |submission_history|
         if submission_history.is_a? LinkSubmissionHistory
           assignment_team.submit_hyperlink(submission_history.submitted_detail)

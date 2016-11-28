@@ -39,7 +39,11 @@ class Group < ActiveRecord::Base
   # Check if the current group is full?
   def full?
     return false if self.parent_id == nil #course group, does not group_size
-    max_group_members = Assignment.find(self.parent_id).group_size
+    if Assignment.find(self.parent_id).group_size.nil?
+      max_group_members = 5
+    else
+      max_group_members = Assignment.find(self.parent_id).group_size
+    end
     curr_group_size = Group.size(self.id)
     (curr_group_size >= max_group_members)
   end

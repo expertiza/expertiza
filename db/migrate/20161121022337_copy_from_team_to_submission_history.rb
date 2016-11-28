@@ -6,21 +6,15 @@ class CopyFromTeamToSubmissionHistory < ActiveRecord::Migration
   	# for each file, create a new entry in the submission histories table
   	AssignmentTeam.for_each do |assignment_team|
   		assignment_team.hyperlinks.for_each do |hyperlink|
-  			submission_history = SubmissionHistory.new()
-  			submission_history.team = assignment_team
-  			submission_history.submitted_detail = hyperlink
+  			submission_history = SubmissionHistory.create(assignment_team, hyperlink, "add")
         submission_history.submitted_at = assignment_team.updated_at
-        submission_history.type = getType()
-        submission_history.action = "add"
+        submission_history.save
   		end
 
-      assignment_team.files.for_each do |file|
-        submission_history = SubmissionHistory.new()
-  			submission_history.team = assignment_team
-        submission_history.submitted_detail = file
+      assignment_team.submitted_files.for_each do |file|
+        submission_history = SubmissionHistory.create(assignment_team, file, "add")
         submission_history.submitted_at = File.mtime(file)
-        submission_history.type = "File"
-        submission_history.action = "add"
+        submission_history.save
       end
   	end
 
@@ -31,19 +25,11 @@ class CopyFromTeamToSubmissionHistory < ActiveRecord::Migration
   	# if it is a file, chill..
     AssignmentTeam.for_each do |assignment_team|
       SubmissionHistory.where(team = assignment_team).for_each do |submission_history|
-        if submission_history.type == "hyperlink"
+        if submission_history.is_a? LinkSubmissionHistory
           assignment_team.submit_hyperlink(submission_history.submitted_detail)
+          assignment_team.save
         end
       end
     end
-  end
-  def up
-    Team.for_each do |t|
-      SubmissionHistory.create()
-      sh.team_id
-    end
-  end
-  def down
-
   end
 end

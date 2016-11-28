@@ -11,7 +11,7 @@ class LinkSubmissionHistory < SubmissionHistory
     else
       history_obj = LinkSubmissionHistory.new
       history_obj.team = team
-      history_obj.submission_detail = link
+      history_obj.submitted_detail = link
       history_obj.action = action
     end
     return history_obj

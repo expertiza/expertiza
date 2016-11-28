@@ -75,7 +75,7 @@
 <div class="chatboxmessagecontent">
       <p><%= message.body %></p>
   <time datetime="<%= message.created_at %>" title="<%= message.created_at.strftime("%d %b  %Y at %I:%M%p") %>">
-    <%= message.user.to_s %> • <%= message.created_at.strftime("%H:%M %p") %>
+    <%= reviewee_or_reviewer(message) %> • <%= message.created_at.strftime("%H:%M %p") %>
   </time>
 </div>
 </li>

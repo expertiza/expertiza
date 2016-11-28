@@ -42,6 +42,7 @@ class PasswordRetrievalController < ApplicationController
     password_reset=PasswordReset.find_by(:token => @token)
     if password_reset
       #method in password_reset model to determine if url expired or not
+      # URL expires after 1 day
       if password_reset.updated_at + 1.days < Time.now
         expired_url = true
       else

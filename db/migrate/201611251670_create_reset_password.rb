@@ -4,7 +4,6 @@ class CreateResetPassword < ActiveRecord::Migration
       t.string :user_email
       t.string :token
       t.datetime :updated_at
-
     end
   end
   def self.down

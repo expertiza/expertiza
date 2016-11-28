@@ -37,6 +37,7 @@ class GroupsController < ApplicationController
     begin
       Group.check_for_existing(parent, params[:group][:name], session[:group_type])
       @group = Object.const_get('Group').create(name: params[:group][:name], parent_id: parent.id)
+      GroupNode.create(parent_id: parent.id, node_object_id: @group.id)
       undo_link("The group \"#{@group.name}\" has been successfully created.")
       redirect_to action: 'list', id: parent.id
     rescue GroupExistsError

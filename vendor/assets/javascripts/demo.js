@@ -11,6 +11,10 @@ jQuery(document).ready(function($) {
     stickyControls: {
       enable: true
     },
+    disableFields: ['autocomplete', 'button', 'paragraph', 'number', 
+    'date', 'file', 'hidden'],
+    editOnAdd: true
+    //controlPosition: 'left'
     // editOnAdd: true
   };
   let formData = window.sessionStorage.getItem('formData');

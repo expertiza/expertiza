@@ -18,6 +18,7 @@ class CopyFromTeamToSubmissionHistory < ActiveRecord::Migration
         end
       rescue ActiveRecord::RecordNotFound
         # missing corresponding assignment.. skip this record.
+        print "in rescue"
       end
   	end
 

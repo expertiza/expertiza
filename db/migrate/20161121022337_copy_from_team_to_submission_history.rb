@@ -10,11 +10,14 @@ class CopyFromTeamToSubmissionHistory < ActiveRecord::Migration
         submission_history.submitted_at = assignment_team.updated_at
         submission_history.save
   		end
-
-      assignment_team.submitted_files.each do |file|
-        submission_history = SubmissionHistory.create(assignment_team, file.path, "add")
-        submission_history.submitted_at = File.mtime(file)
-        submission_history.save
+      begin
+        assignment_team.submitted_files.each do |file|
+          submission_history = SubmissionHistory.create(assignment_team, file.path, "add")
+          submission_history.submitted_at = File.mtime(file)
+          submission_history.save
+        end
+      rescue RecordNotFound
+        # missing corresponding assignment.. skip this record.
       end
   	end
 

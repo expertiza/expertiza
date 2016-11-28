@@ -12,7 +12,7 @@ class CopyFromTeamToSubmissionHistory < ActiveRecord::Migration
   		end
 
       assignment_team.submitted_files.for_each do |file|
-        submission_history = SubmissionHistory.create(assignment_team, file, "add")
+        submission_history = SubmissionHistory.create(assignment_team, file.path, "add")
         submission_history.submitted_at = File.mtime(file)
         submission_history.save
       end

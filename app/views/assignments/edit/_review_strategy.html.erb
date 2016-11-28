@@ -78,7 +78,7 @@
   <tr id="group_size">
     <td>
       <%= label_tag('assignment_form[assignment][group_size]', 'Review Group Size:') %>
-      <%= text_field_tag('assignment_form[assignment][group_size]', @assignment_form.assignment.group_size ||= 5, size: 1) %>
+      <%= label_tag('assignment_form[assignment][group_size]', @assignment_form.assignment.group_size ||= 5, size: 1, class: "amount_field") %>
     </td>
   </tr>
 
@@ -94,9 +94,11 @@
   <tr>
     <td style='padding:5px' id='createButton'>
       <input name="assignment_form[assignment][isAnonymous]" type="hidden" value="false"/>
-      <%= button_to( "Create Random Groups", :action => "create_groups", :controller => "groups", params: { 'id' => @assignment_form.assignment.id, 'group_size' => @assignment_form.assignment.group_size }) %>
+      <%= button_to( "Create Random Groups", :action => "create_groups", :controller => "groups", params: { 'id' => @assignment_form.assignment.id, 'group_size' => @assignment_form.assignment.group_size }, class: "do_it_link") %>
       <%= label_tag('assignment_form[assignment][isAnonymous]', 'Anonymous Review?') %>
     </td>
   </tr>
 
+
 </table>
+

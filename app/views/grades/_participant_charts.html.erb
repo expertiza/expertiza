@@ -13,17 +13,17 @@
 <% end %>
 
 <a href="#" name='score-chartLink' onClick="toggleElement('score-chart', 'stats');return false;">hide stats</a>
+<%= @grades_bar_charts[:feedback] %>
 
 <TR style ="background-color: white;" id='score-chart'>
 
 <th style="text-align:center;" WIDTH="<%= namecolwidth %>%">
 	Stats
 </th>
-
 <th style="text-align:center;" COLSPAN="2" WIDTH="<%= colwidth*2 %>%">
 	<img src="<%= @grades_bar_charts[:review] %>" >
 	<div class="circle" id="review-circle">
-					
+
 	</div>
 </th>
 
@@ -56,6 +56,13 @@
   </th>
 <% end %>
 
+  <th style="text-align:center;" COLSPAN="2" WIDTH="<%= colwidth*2 %>%">
+    <img src="http://chart.apis.google.com/chart?chs=100x100&cht=bvg&chco=990000&chxt=y&chxp=0,90,100.0&chxr=0,0,100.0&chd=e:3d..&chbh=23,1,1&chtt=+" >
+    <div class="circle" id="feedback-circle">
+
+    </div>
+  </th>
+
 <th style="text-align:center;" WIDTH="<%= colwidth %>%">&nbsp;
   <div class="circle" id="final-circle">
           
@@ -63,9 +70,8 @@
 </th>
   
 </TR>
-
 <script type="text/javascript">
-  <% ['review', 'metareview', 'feedback', 'teammate'].each do |type| %>
+  <% ['review', 'metareview', 'feedback', 'teammate', 'review'].each do |type| %>
   <% if @pscore[type.to_sym] && @pscore[type.to_sym][:scores][:avg]%>
   <% if type == 'teammate' && @assignment.show_teammate_reviews == true %>
   var myCircle = Circles.create({

@@ -1,0 +1,9 @@
+<TD WIDTH="15%" align = "center">
+  <%= link_to image_tag("plus.png", :border=>0,:alt => "Add Group Member", :title => "Add Group Member" ), :controller=>'groups_users', :action=>'new', :id => node.node_object_id %>
+  <%= link_to image_tag("delete_icon.png", :border=>0, :alt => "Delete Group", :title => "Delete Group"), :controller=>'groups', :action=>'delete', :id => node.node_object_id %>
+  <%= link_to image_tag("edit_icon.png", :border=>0, :alt => "Edit Group Name", :title => "Edit Group Name"), :controller=>'groups', :action=>'edit', :id => node.node_object_id %>
+
+  <% if session[:group_type] == 'Assignment' and @root_node.belongs_to_course? %>
+    <%= link_to image_tag("copy_icon.png", :border=>0, :alt => "Copy Group to Course", :title => "Copy Group to Course" ), :controller => 'groups', :action=>'bequeath', :id => node.node_object_id %>
+  <% end %>
+</TD>

@@ -139,6 +139,6 @@ class AssignmentNode < Node
   end
 
   def get_groups
-    Group.where(parent_id: self.node_object_id)
+    GroupNode.get(self.node_object_id)
   end
 end

@@ -1,0 +1,21 @@
+<h1><%= @title %> for <%= @assignment.name %> by Other Reviewers</h1>
+
+<% review_no = 1 %>
+  <% if !@other_response_maps.empty? %>
+      <% @other_response_maps.each do |response_map| %>
+          <% map = Response.where(:map_id => response_map.id,:round => @round).first %>
+          <% if !map.nil? and map.id.to_s != @user_response.id.to_s %>
+              <b><%= "#{review_no}." %></b>
+              <%= map.display_as_html() %>
+              <% review_no+=1 %>
+              <br/>
+              <hr/>
+          <% end %>
+      <% end %>
+  <% else%>
+  <br><br>
+  <span>Note: No Reviews for this work has been submitted by other Reviewers</span>
+<% end %>
+
+<br/>
+<a href="javascript:window.history.back()">Back</a>

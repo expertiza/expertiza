@@ -1,7 +1,7 @@
 class AuthController < ApplicationController
   helper :auth
 
-  @@attemps = 0
+  @@attempts = 0
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: [:login, :logout],
@@ -25,12 +25,12 @@ class AuthController < ApplicationController
         after_login(user)
       else
 
-        @@attemps = @@attemps + 1
+        @@attempts = @@attempts + 1
         logger.warn "Failed login attempt."
         flash[:error] = "Your username or password is incorrect."
-        if @@attemps >= 3
+        if @@attempts >= 3
             if verify_recaptcha(model: @user)
-              @@attemps = 0
+              @@attempts = 0
               redirect_to controller: 'password_retrieval', action: 'forgotten'
             end
 

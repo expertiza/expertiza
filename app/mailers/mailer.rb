@@ -15,7 +15,7 @@ class Mailer < ActionMailer::Base
     @assignment = defn[:body][:assignment]
 
     if Rails.env.development? || Rails.env.test?
-      defn[:to] = 'expertiza.development@gmail.com'
+      defn[:to] = 'shubham2892@gmail.com'
     end
     mail(subject: defn[:subject],
          to: defn[:to],
@@ -30,7 +30,7 @@ class Mailer < ActionMailer::Base
     @partial_name = defn[:body][:partial_name]
 
     if Rails.env.development? || Rails.env.test?
-      defn[:to] = 'expertiza.development@gmail.com'
+      defn[:to] = 'shubham2892@gmail.com'
     end
     mail(subject: defn[:subject],
          # content_type: "text/html",
@@ -51,7 +51,7 @@ class Mailer < ActionMailer::Base
     @proposer = defn[:body][:proposer]
 
     if Rails.env.development? || Rails.env.test?
-      defn[:to] = 'expertiza.development@gmail.com'
+      defn[:to] = 'shubham2892@gmail.com'
     end
     mail(subject: defn[:subject],
          to: defn[:to],

@@ -1,5 +1,5 @@
 <% participant = Participant.where(user_id: session[:user].id, parent_id:  assignment_id).first
-   requests=JoingroupRequest.where(participant_id: participant.id) %>
+   requests=JoinGroupRequest.where(participant_id: participant.id) %>
 <% if !requests.empty? %>
 
 <h2>Sent Requests </h2>

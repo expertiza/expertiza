@@ -58,7 +58,7 @@ class StudentGroupsController < ApplicationController
   end
 
   def create
-    existing_assignments = AssignmentGroup.where name: params[:group][:name], parent_id: student.parent_id
+    existing_assignments = AssignmentTeam.where name: params[:group][:name], parent_id: student.parent_id
     # check if the group name is in use
     if existing_assignments.empty?
       if params[:group][:name].nil? || params[:group][:name].empty?
@@ -66,7 +66,7 @@ class StudentGroupsController < ApplicationController
         redirect_to view_student_groups_path student_id: student.id
         return
       end
-      group = AssignmentGroup.new(name: params[:group][:name], parent_id: student.parent_id)
+      group = AssignmentTeam.new(name: params[:group][:name], parent_id: student.parent_id)
       group.save
       parent = AssignmentNode.find_by_node_object_id student.parent_id
       GroupNode.create parent_id: parent.id, node_object_id: group.id

@@ -109,7 +109,7 @@
 <br/>
 
 <!--send invitation-->
-<% if @student.group != nil && @student.assignment.max_group_size>1 %>
+<% if @student.assignment.group_size>1 %>
 
 
      <% if @student.group == nil %>

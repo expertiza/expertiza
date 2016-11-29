@@ -46,9 +46,24 @@ class LotteryController < ApplicationController
     end
 
     # TODO to only swap team members for teams that have the flag set in the database.
-    response = swapping_team_members_with_history(response, assignment.max_team_size)
-    # store each summary in a hashmap and use the question as the key
+    response_new = {}
+    response_new["users"] = JSON.parse(response)["users"]
     teams = JSON.parse(response)["teams"]
+    teams_swap_members = []
+    teams.each do |user_ids|
+      user_ids.each do |user_id|
+        team_ids = TeamsUser.where(user_id: user_id).select(:team_id)
+        team = Team.where(id: team_ids, parent_id: assignment.id)
+        new_members_option = team.first.new_members
+        if(new_members_option)
+          teams_swap_members << user_ids
+        end
+     end
+    end
+    teams_not_swap_members = teams - teams_swap_members
+    response_new["teams"] = teams_swap_members
+    response = swapping_team_members_with_history(response_new, assignment.max_team_size)
+    teams = teams_swap_members + teams_not_swap_members
 
     create_new_teams_for_bidding_response(teams, assignment)
     run_intelligent_bid

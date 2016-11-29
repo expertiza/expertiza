@@ -1,15 +1,15 @@
 <% if has_team_and_metareview?[:true_num] == 2 %>
 	<!--100 = 19 + 8 * 9 + 9-->
-	<% namecolwidth = 19 %>
+	<% namecolwidth = 16 %>
 	<% colwidth = 9 %>
 <% elsif has_team_and_metareview?[:true_num] == 1 %>
 	<!--100 = 16 + 6 * 12 + 12-->
 	<% namecolwidth = 16 %>
-	<% colwidth = 12 %>
+	<% colwidth = 9 %>
 <% else %>
 	<!--100 = 25 + 4 * 15 + 15-->
-	<% namecolwidth = 25 %>
-	<% colwidth = 15 %>
+	<% namecolwidth = 16 %>
+	<% colwidth = 9 %>
 <% end %>
 
 <TR <% if prefix %>id='<%= prefix %>_1' style="display:none; background-color: white;"<% end %>>
@@ -41,7 +41,7 @@
 	<th style="text-align:center;" WIDTH="<%= colwidth %>%">Average</th>
 	<th style="text-align:center;" WIDTH="<%= colwidth %>%">Range </th>
 <% end %>
-  <th style="text-align:center;" WIDTH="<%= colwidth %>%">Average</th>
+  <th style="text-align:center;" WIDTH="<%= colwidth %>%">Score</th>
   <th style="text-align:center;" WIDTH="<%= colwidth %>%">Range </th>
 
   <th style="text-align:center;" WIDTH="<%= colwidth %>%">Final Score</th></TR>

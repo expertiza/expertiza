@@ -34,6 +34,7 @@ class AssignmentsController < ApplicationController
 
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
+    @assignment_form.assignment.instructor_id = current_user.id
       if @assignment_form.save
         @assignment_form.create_assignment_node
         flash[:success] = "Assignment Successfully created"

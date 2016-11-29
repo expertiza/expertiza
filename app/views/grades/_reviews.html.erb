@@ -51,12 +51,13 @@
                 <!--change code in order to compat to multi-round review-->
 
 
+
                       <% if @assignment.varying_rubrics_by_round? and !review.round.nil? %>
                           <% review_symbol = 'review' + review.round.to_s %>
                       <% else %>
                           <% review_symbol = 'review' %>
                       <% end %>
- \
+          
 
                 <% @questions[review_symbol.to_sym].each do |question| %>
                     <% if question.instance_of? UploadFile %>

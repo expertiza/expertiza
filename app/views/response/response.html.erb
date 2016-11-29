@@ -79,13 +79,15 @@ jQuery(document).ready(function() {
         <% end %></textarea>
     </p>
 
-    <p>
-      <label for="review_instructor_visible">Comment visible only to instructor</label><BR/>
-      <textarea cols="70" rows="1" id="review_instructor_visible" name="review[instructor_visible]" style="overflow:hidden;">
-        <% if controller.action_name != 'new' and @response.instructor_visible_comment != nil %><%= @response.instructor_visible_comment.strip if !@response.nil?%>
-        <% end %>
-      </textarea>
-    </p>
+    <% if @map.type.to_s == "TeammateReviewResponseMap" and @assignment.show_teammate_reviews %>
+      <p>
+        <label for="review_instructor_visible">Comment visible only to instructor</label><BR/>
+        <textarea cols="70" rows="1" id="review_instructor_visible" name="review[instructor_visible]" style="overflow:hidden;">
+          <% if controller.action_name != 'new' and @response.instructor_visible_comment != nil %><%= @response.instructor_visible_comment.strip if !@response.nil?%>
+          <% end %>
+        </textarea>
+      </p>
+    <%end%>
     <%if @current_round%>
       <%= hidden_field_tag "review[round]", @current_round %>
     <%end%>

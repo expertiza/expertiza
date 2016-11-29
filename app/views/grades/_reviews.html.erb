@@ -50,16 +50,6 @@
                 <!--<%= review.display_as_html(nil, count) %><BR/>-->
                 <!--change code in order to compat to multi-round review-->
 
-                  <% reviewer = User.find(AssignmentParticipant.find(ResponseMap.find(review.map_id).reviewer_id).user_id) %>
-                  <% if reviewer != nil && (reviewer.role.instructor? || reviewer.role.ta? )%>
-
-                      <% if @assignment.varying_rubrics_by_round? and !review.round.nil? %>
-                          <% review_symbol = '(Expert)review' + review.round.to_s %>
-                      <% else %>
-                          <% review_symbol = 'review' %>
-                      <% end %>
-
-                  <% else %>
 
                       <% if @assignment.varying_rubrics_by_round? and !review.round.nil? %>
                           <% review_symbol = 'review' + review.round.to_s %>

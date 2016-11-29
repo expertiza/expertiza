@@ -26,8 +26,8 @@ class StudentTaskController < ApplicationController
     @can_review = @participant.can_review
     @can_take_quiz = @participant.can_take_quiz
     @authorization = Participant.get_authorization(@can_submit, @can_review, @can_take_quiz)
-    @team = @participant.team
-    @mappings=@team.review_mappings
+    @team = @participant.team 
+    @mappings=@team.review_mappings unless @participant.assignment.is_calibrated?
     denied unless current_user_id?(@participant.user_id)
     @assignment = @participant.assignment
     @can_provide_suggestions = @assignment.allow_suggestions

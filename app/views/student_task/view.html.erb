@@ -21,15 +21,17 @@
     {
       width: 200px;
       position: fixed;
-      height: 55%;
+      height: 50%;
       right: 0px;
       top: 45%;
+      bottom: 5%;
       padding-top: 10px;
       padding-bottom: 10px;
-      border: 1px solid rgba(29, 49, 91, .3);
-      background-color: gray;
+      border: 2px solid rgba(29, 49, 91, .3);
+      border-color: #A90201;
+      background-color: white;
       display: none;
-      overflow: scroll;
+      overflow-y:auto;
     }
     .sidebar-name
     {
@@ -37,6 +39,7 @@
       padding-right: 10px;
       margin-bottom: 4px;
       font-size: 15px;
+      background-color :#dbd7c7;
     }
     .sidebar-name span
     {
@@ -248,6 +251,7 @@
 </script>
 <% count = 0 %>
 <div id="messages" class="hidden">
+  <% unless @participant.assignment.is_calibrated?%>
   <% @mappings.each do |mapping| %>
       <% count = count+1 %>
       <% unless mapping.chat.nil? %>
@@ -266,6 +270,7 @@
         </div>
       </div>
           <%end%>
+  <%end%>
   <%end%>
 </div>
 
@@ -370,12 +375,15 @@ to display the label "Your team" in the student assignment tasks-->
       <li><%= link_to "Take a survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id} %> (This will log you out)</li>
     <% end %>
     <li><%= link_to "Change your handle", {:controller => 'participants', :action => 'change_handle', :id => @participant.id} %> (Provide a different handle for this assignment)</li>
+    <% if check_reviewable_topics(@assignment) %>
   <li><a id="chats" href=javascript:void(0)>Your messages</a>(Answer queries on your work)</li>
+  <%end%>
   </ul>
 
   <br>
 <div class="chat-sidebar">
   <% mcount = 0 %>
+  <% unless @participant.assignment.is_calibrated? %>
   <% @mappings.each do |mapping| %>
       <% mcount = mcount+1 %>
       <% unless mapping.chat.nil? %>
@@ -390,5 +398,6 @@ to display the label "Your team" in the student assignment tasks-->
       </div>
           <% end %>
   <% end %>
+<%end%>
 </div>
   <a href="javascript:window.history.back()">Back</a>

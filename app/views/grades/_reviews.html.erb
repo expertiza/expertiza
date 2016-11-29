@@ -64,7 +64,7 @@
                       <% if @assignment.varying_rubrics_by_round? and !review.round.nil? %>
                           <% review_symbol = 'review' + review.round.to_s %>
                       <% else %>
-                          <% review_symbol = '(Expert)review' %>
+                          <% review_symbol = 'review' %>
                       <% end %>
                   <% end %>
 

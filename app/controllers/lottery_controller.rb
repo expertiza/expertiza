@@ -62,16 +62,17 @@ class LotteryController < ApplicationController
   end
 
   def swapping_team_members_with_history(data, max_team_size)
+    temp = data
     url = WEBSERVICE_CONFIG['member_swapping_webservice_url']
     (max_team_size-1).times do
       begin
-        data = RestClient.post url, data.to_json, content_type: :json, accept: :json
+        temp = RestClient.post url, temp.to_json, content_type: :json, accept: :json
       rescue => err
         flash[:error] = err.message
         break;
       end
     end
-    return data
+    return temp
   end
 
   def create_new_teams_for_bidding_response(teams, assignment)

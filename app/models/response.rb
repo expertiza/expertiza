@@ -80,6 +80,14 @@ class Response < ActiveRecord::Base
                   ''
                 end
       code += "<tr><td><B>Additional Comment: </B>" + comment + '</td></tr>'
+      instructor_visible_comment = if !self.instructor_visible_comment.nil?
+                                     self.instructor_visible_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
+                                   else
+                                     ''
+                                   end
+      if prefix # has prefix means view_score page in instructor end
+         code += "<tr><td><B>Comment visible only to Instructor: </B>" + instructor_visible_comment + '</td></tr>'
+      end
     end
     code += "</table>"
     code.html_safe

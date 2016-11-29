@@ -90,6 +90,7 @@ class ResponseController < ApplicationController
     begin
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
+      @response.update_attribute('instructor_visible_comment', params[:review][:instructor_visible])
       @questionnaire = set_questionnaire
 
       questions = sort_questions(@questionnaire.questions)
@@ -167,7 +168,9 @@ class ResponseController < ApplicationController
     else
       is_submitted = false
     end
-    @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:round => @round, :is_submitted => is_submitted)#,:version_num=>@version)
+    @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],
+                                :instructor_visible_comment => params[:review][:instructor_visible], :round => @round,
+                                :is_submitted => is_submitted)#,:version_num=>@version)
 
     #Change the order for displaying questions for editing response views.
     questions=sort_questions(@questionnaire.questions)

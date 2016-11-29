@@ -23,7 +23,7 @@ class Response < ActiveRecord::Base
     reviewer.team.has_user user
   end
 
-  def display_as_html(prefix = nil, count = nil, _file_url = nil)
+  def display_as_html(prefix = nil, count = nil, _file_url = nil, display_score = true)
     identifier = ""
     # The following three lines print out the type of rubric before displaying
     # feedback.  Currently this is only done if the rubric is Author Feedback.
@@ -66,7 +66,7 @@ class Response < ActiveRecord::Base
         code += '<tr class="' + row_class + '"><td>'
         if !answer.nil? or question.is_a? QuestionnaireHeader
           code += if question.instance_of? Criterion or question.instance_of? Scale
-                    question.view_completed_question(count, answer, questionnaire_max)
+                    question.view_completed_question(count, answer, questionnaire_max, display_score)
                   else
                     question.view_completed_question(count, answer)
                   end

@@ -1,0 +1,29 @@
+%h1 Listing review_metrics
+
+%table
+  %thead
+    %tr
+      %th Response
+      %th Volume
+      %th Suggestion
+      %th Problem
+      %th Offensive term
+      %th
+      %th
+      %th
+
+  %tbody
+    - @review_metrics.each do |review_metric|
+      %tr
+        %td= review_metric.response_id
+        %td= review_metric.volume
+        %td= review_metric.suggestion
+        %td= review_metric.problem
+        %td= review_metric.offensive_term
+        %td= link_to 'Show', review_metric
+        %td= link_to 'Edit', edit_review_metric_path(review_metric)
+        %td= link_to 'Destroy', review_metric, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Review metric', new_review_metric_path

@@ -1,0 +1,25 @@
+= form_for @review_metric do |f|
+  - if @review_metric.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@review_metric.errors.count, "error")} prohibited this review_metric from being saved:"
+      %ul
+        - @review_metric.errors.full_messages.each do |msg|
+          %li= msg
+
+  .field
+    = f.label :response_id
+    = f.number_field :response_id
+  .field
+    = f.label :volume
+    = f.number_field :volume
+  .field
+    = f.label :suggestion
+    = f.check_box :suggestion
+  .field
+    = f.label :problem
+    = f.check_box :problem
+  .field
+    = f.label :offensive_term
+    = f.check_box :offensive_term
+  .actions
+    = f.submit 'Save'

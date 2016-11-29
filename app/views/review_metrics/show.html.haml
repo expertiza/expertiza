@@ -1,0 +1,21 @@
+%p#notice= notice
+
+%p
+  %b Response:
+  = @review_metric.response_id
+%p
+  %b Volume:
+  = @review_metric.volume
+%p
+  %b Suggestion:
+  = @review_metric.suggestion
+%p
+  %b Problem:
+  = @review_metric.problem
+%p
+  %b Offensive term:
+  = @review_metric.offensive_term
+
+= link_to 'Edit', edit_review_metric_path(@review_metric)
+\|
+= link_to 'Back', review_metrics_path

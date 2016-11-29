@@ -1,4 +1,4 @@
-class CreateRooms < ActiveRecord::Migration[5.0]
+class CreateSimicheckComparisons < ActiveRecord::Migration
   def change
     create_table :simicheck_comparisons do |t|
       t.string :comparison_key

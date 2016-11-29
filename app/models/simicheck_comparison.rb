@@ -18,8 +18,8 @@ class SimicheckComparison < ActiveRecord::Base
         return nil
     end
 
-    def self.send_file_to_simicheck(comparison_id, file, fileType)
-            url = "http://simicheck.com/api/files/" + comparison_id
+    def self.send_file_to_simicheck(comparison_key, file, fileType)
+            url = "http://simicheck.com/api/files/" + comparison_key
             key = "65f31df7af2c49e89a615a2602ce2faaa92380ab499e414fba6092adb0e71b3dd4674c86271f4b26b891f76c7709cbe574467477cfc84f2791e6f3f7827f3982"
 
             payload = {:file => file}

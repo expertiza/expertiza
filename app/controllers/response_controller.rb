@@ -149,6 +149,16 @@ class ResponseController < ApplicationController
     set_content
   end
 
+  # view response by other reviewers
+  def other_reviews
+    @other_response_maps = ReviewResponseMap.where(reviewee_id: params[:reviewee_id],type: 'ReviewResponseMap')
+    @user_response = Response.find(params[:user_reponse_id])
+    @round = @user_response.round
+    @map = @user_response.map
+    @title = @map.get_title
+    @assignment = @map.assignment
+  end
+
   def create
     @map = ResponseMap.find(params[:id]) # assignment/review/metareview id is in params id
 

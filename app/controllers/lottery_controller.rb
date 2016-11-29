@@ -63,11 +63,13 @@ class LotteryController < ApplicationController
     teams_not_swap_members = teams - teams_swap_members
     response_new["teams"] = teams_swap_members
     response = swapping_team_members_with_history(response_new, assignment.max_team_size)
-    teams = teams_swap_members + teams_not_swap_members
+    if response != false
+      teams_swap_members = response["teams"]
+      teams = teams_swap_members + teams_not_swap_members
 
-    create_new_teams_for_bidding_response(teams, assignment)
-    run_intelligent_bid
-
+      create_new_teams_for_bidding_response(teams, assignment)
+      run_intelligent_bid
+    end
     redirect_to controller: 'tree_display', action: 'list'
   end
 
@@ -82,9 +84,10 @@ class LotteryController < ApplicationController
     (max_team_size-1).times do
       begin
         temp = RestClient.post url, temp.to_json, content_type: :json, accept: :json
+        temp = JSON.parse(temp)
       rescue => err
         flash[:error] = err.message
-        break;
+        return false
       end
     end
     return temp

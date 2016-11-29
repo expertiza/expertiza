@@ -24,7 +24,7 @@
       background-color: #afaaaa;
       width: 275px;
     }
-    #body_input
+    .body_input
     {
       width: 265px;
       height: 40px;
@@ -146,7 +146,7 @@
 
     var element = '<div class="popup-box chat-popup" id="'+ id +'">';
     element = element + '<div class="popup-head">';
-    element = element + '<div class="popup-head-left"><a> &#9729;</a>'+ name +'</div>';
+    element = element + '<div class="popup-head-left">'+ name +'</div>';
     element = element + '<div class="popup-head-right"><a href="javascript:close_popup(\''+ id +'\');">&#10005;</a></div>';
     element = element + '<div style="clear: both"></div></div><div class="popup-messages" id="'+ id +"messages"+'">'+ +'</div></div>';
     $( "body" ).append( element);
@@ -251,7 +251,7 @@
                               <%= sync_new partial: "message_row", resource: Message.new, scope: Message.by_chat(map.chat) %>
                               <div class="popup-bottom">
                                 <%= form_for([map.chat, map.chat.messages.build], remote: true) do |f| %>
-                                    <%= f.text_field :body , :id => "body_input"%>
+                                    <%= f.text_field :body , :class => "body_input"%>
                                 <% end %>
                               </div>
                             </div>
@@ -289,7 +289,7 @@
                               <%= sync_new partial: "message_row", resource: Message.new, scope: Message.by_chat(map.chat) %>
                               <div class="popup-bottom">
                                 <%= form_for([map.chat, map.chat.messages.build], remote: true) do |f| %>
-                                    <%= f.text_field :body , :id => "body_input"%>
+                                    <%= f.text_field :body , :class => "body_input"%>
                                 <% end %>
                               </div>
                             </div>

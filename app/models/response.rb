@@ -41,6 +41,7 @@ class Response < ActiveRecord::Base
         identifier += '<B>Expert Review ' + count.to_s + '</B>'
       else
         identifier += '<B>Review ' + count.to_s + '</B>'
+      end
       str = self.id.to_s
     end
     code = identifier + '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + str + 'Link" onClick="toggleElement(' + "'review_" + str + "','review'" + ');return false;">show review</a><BR/>'

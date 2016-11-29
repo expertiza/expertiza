@@ -38,10 +38,6 @@ class AssignmentsController < ApplicationController
         @assignment_form.create_assignment_node
         flash[:success] = "Assignment Successfully created"
         render 'tree_display/list'
-
-        #render :js => "window.location = #{edit_assignment_path @assignment_form.assignment.id}"
-        #redirect_to edit_assignment_path @assignment_form.assignment.id
-        #undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
       else
         flash[:error] = "Failed to Create Assignment"
         render 'tree_display/list'

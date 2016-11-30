@@ -1,9 +1,10 @@
 <h1><%= @model %> Participants: <%= @parent.name %></h1>
 
 <br/>
-<%= render :partial => '/shared_scripts/user_list',
+<%= render :partial => '/shared_scripts/user_list_with_badges',
            :locals => {:controller => 'participants', 
-                       :user_list => @participants} %>
+                       :user_list => @participants, 
+                       :assignment => @assignment} %>
 <br/>
 <%= 
 	render :partial => '/shared_scripts/add_individual',

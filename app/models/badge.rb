@@ -12,7 +12,7 @@ class Badge
 	CONSISTENCY_BADGE_IMAGE = "<img id='consistency_badge' src='/assets/badges/consistency_badge.png' title = 'Consistent'>"
 
 
-	def self.get_badges(student_task_list)
+	def self.get_badges_student_view(student_task_list)
 		
 		# create badge matrix
 		current_assignment_count = 0
@@ -27,7 +27,7 @@ class Badge
 			# check for different badges
 
 			# Topper badge
-			badge_matrix[current_assignment_count][0] = Badge.topper(student_task)
+			# badge_matrix[current_assignment_count][0] = Badge.topper(student_task)
 
 			# Good reviewer badge
 			badge_matrix[current_assignment_count][2] = Badge.good_reviewer(student_task)
@@ -50,6 +50,19 @@ class Badge
 		return badge_matrix
 	
 	end
+
+	def self.get_badges_instructor_view(participants, assignment)
+		current_assignment_count = 0
+		badge_matrix = []
+		
+		participants.each do |participant|
+			badge_matrix.push([false] * NUMBER_OF_BADGES)
+
+		end
+
+		return badge_matrix
+	end
+
 
 	private
 

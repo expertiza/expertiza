@@ -23,6 +23,10 @@ class ParticipantsController < ApplicationController
     end
     begin
       @participants = @parent.participants
+      @assignment = Assignment.find(params[:id])
+      # @s = StudentTask.new
+      @student_badges = Badge.get_badges_instructor_view(@participants, @assignment)
+
       @model = params[:model]
       # E726 Fall2012 Changes Begin
       @authorization = params[:authorization]

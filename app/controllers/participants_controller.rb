@@ -201,6 +201,10 @@ class ParticipantsController < ApplicationController
     end
   end
 
+  def change_reviewsetting
+  end
+  
+
   def delete_assignment_participant
     contributor = AssignmentParticipant.find(params[:id])
     name = contributor.name

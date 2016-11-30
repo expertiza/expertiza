@@ -3,19 +3,82 @@ class Criterion < ScoredQuestion
 
   # This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
   def edit(_count)
-    html = '<tr>'
-    html += '<td align="center"><a rel="nofollow" data-method="delete" href="/questions/' + self.id.to_s + '">Remove</a></td>'
-    html += '<td><input size="6" value="' + self.seq.to_s + '" name="question[' + self.id.to_s + '][seq]" id="question_' + self.id.to_s + '_seq" type="text"></td>'
-    html += '<td><textarea cols="50" rows="1" name="question[' + self.id.to_s + '][txt]" id="question_' + self.id.to_s + '_txt" placeholder="Edit question content here">' + self.txt + '</textarea></td>'
-    html += '<td><input size="10" disabled="disabled" value="' + self.type + '" name="question[' + self.id.to_s + '][type]" id="question_' + self.id.to_s + '_type" type="text">''</td>'
-    html += '<td><input size="2" value="' + self.weight.to_s + '" name="question[' + self.id.to_s + '][weight]" id="question_' + self.id.to_s + '_weight" type="text">''</td>'
-    html += '<td>text area size <input size="3" value="' + self.size.to_s + '" name="question[' + self.id.to_s + '][size]" id="question_' + self.id.to_s + '_size" type="text"></td>'
-    html += '<td> max_label <input size="10" value="' + self.max_label.to_s + '" name="question[' + self.id.to_s + '][max_label]" id="question_' + self.id.to_s + '_max_label" type="text">  min_label <input size="12" value="' + self.min_label.to_s + '" name="question[' + self.id.to_s + '][min_label]" id="question_' + self.id.to_s + '_min_label" type="text"></td>'
-    html += '</tr>'
-
+    html = edit_1(_count) + edit_2(_count) + edit_3(_count) + edit_4(_count)
+    html += edit_5(_count) + edit_6(_count) + edit_7(_count) + edit_8(_count)
     html.html_safe
   end
 
+  def edit_1(_count)
+    html = '<tr>' + '<td align="center"><a rel="nofollow" data-method="delete" href="/questions/'
+    html += self.id.to_s + '">Remove</a></td>'
+    html += '<td><input size="6" value="'
+    html += self.seq.to_s
+    html += '" name="question[' + self.id.to_s
+    html
+  end
+
+  def edit_2(count)
+    html = '][seq]" id="question_' + self.id.to_s
+    html += '_seq" type="text"></td>'
+    html += '<td><textarea cols="50" rows="1" name="question['
+    html += self.id.to_s + '][txt]" id="question_'
+    html += self.id.to_s
+    html
+  end
+
+  def edit_3(_count)
+    html = '_txt" placeholder="Edit question content here">'
+    html += self.txt + '</textarea></td>'
+    html += '<td><input size="10" disabled="disabled" value="'
+    html += self.type + '" name="question[' + self.id.to_s
+    html += '][type]" id="question_' + self.id.to_s
+    html
+  end
+
+  def edit_4(_count)
+    html = '_type" type="text">''</td>'
+    html += '<td><input size="2" value="'
+    html += self.weight.to_s + '" name="question['
+    html += self.id.to_s + '][weight]" id="question_'
+    html += self.id.to_s + '_weight" type="text">''</td>'
+    html
+  end
+
+  def edit_5(_count)
+    html = '<td>text area size <input size="3" value="'
+    html += self.size.to_s + '" name="question['
+    html += self.id.to_s + '][size]" id="question_'
+    html += self.id.to_s + '_size" type="text"></td>'
+    html += '<td> max_label <input size="10" value="'
+    html
+
+  def edit_6(_count)
+    html += self.max_label.to_s + '" name="question['
+    html += self.id.to_s
+    html += '][max_label]" id="question_'
+    html += self.id.to_s
+    html += '][max_label]" id="question_'
+    html
+  end
+
+  def edit_7(_count)
+    html = self.id.to_s
+    html += '_max_label" type="text">  min_label <input size="12" value="'
+    html += self.min_label.to_s
+    html += '" name="question['
+    html += self.id.to_s
+    html
+  end
+
+  def edit_8(_count)
+    html = '][min_label]" id="question_'
+    html += self.id.to_s
+    html += '_min_label" type="text"></td>'
+    html += '</tr>'
+    html
+  end
+ 
+  
   # This method returns what to display if an instructor (etc.) is viewing a questionnaire
   def view_question_text
     html = '<TR><TD align="left"> ' + self.txt + ' </TD>'
@@ -93,7 +156,7 @@ class Criterion < ScoredQuestion
     if dropdown_or_scale == 'dropdown'
       html += '<div><select id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]">'
       html += '<option value=''>--</option>'
-      for j in questionnaire_min..questionnaire_max
+      (questionnaire_min..questionnaire_max).each do |j|
         html += if !answer.nil? and j == answer.answer
                   '<option value=' + j.to_s + ' selected="selected">'
                 else
@@ -122,9 +185,11 @@ class Criterion < ScoredQuestion
 
       html += '<table>'
       html += '<tr><td width="10%"></td>'
-      for j in questionnaire_min..questionnaire_max
+
+      (questionnaire_min..questionnaire_max).each do |j|
         html += '<td width="10%"><label>' + j.to_s + '</label></td>'
       end
+
       html += '<td width="10%"></td></tr><tr>'
 
       html += if !self.min_label.nil?
@@ -132,7 +197,8 @@ class Criterion < ScoredQuestion
               else
                 '<td width="10%"></td>'
               end
-      for j in questionnaire_min..questionnaire_max
+      (questionnaire_min..questionnaire_max).each do |j|
+
         html += '<td width="10%"><input type="radio" id="' + j.to_s + '" value="' + j.to_s + '" name="Radio_' + self.id.to_s + '"'
         html += 'checked="checked"' if (!answer.nil? and answer.answer == j) or (answer.nil? and questionnaire_min == j)
         html += '></td>'

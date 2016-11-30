@@ -22,6 +22,7 @@
       </li>
     <% end %>
   <%end%>
+
 <!--ACS Here we need to know the size of the team to decide whether or not
 to display the label "Your team" in the student assignment tasks-->
   <%if @assignment.max_team_size > 1 %>
@@ -44,6 +45,12 @@ to display the label "Your team" in the student assignment tasks-->
           <%= link_to 'Your work', :controller => 'submitted_content', :action => 'view', :id => @participant.id %> (Submit and view your work)
         <% end %>
       <% end %>
+    </li>
+  <% end %>
+
+    <% if @authorization == 'participant' or @can_submit == true %>
+    <li>
+      Change Review Score Settings
     </li>
   <% end %>
 

@@ -32,7 +32,7 @@
             <% assignment = Assignment.find(params[:id]) rescue nil %>
             <% instructor = Participant.where(parent_id: params[:id], user_id: assignment.instructor.id).first %>
             <% mappings = ReviewResponseMap.where(reviewer_id: instructor.id, calibrate_to: true) rescue nil %>
-            <%= render :partial => 'responses', :locals => {:mappings => mappings, :title => 'Review'} %>
+            <%= render :partial => 'student_review/responses', :locals => {:mappings => mappings, :title => 'Review'} %>
             <!--Only the instructor of this assignment can do the expert peer-review-->
             <!--Other teaching staff of this assignment can only view the expert peer-review-->
             <% if false %>

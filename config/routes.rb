@@ -304,6 +304,7 @@ Expertiza::Application.routes.draw do
     collection do
       post :add_metareviewer
       get :add_reviewer
+      get :drop_review
       post :add_reviewer
       post :add_self_reviewer
       get :add_self_reviewer

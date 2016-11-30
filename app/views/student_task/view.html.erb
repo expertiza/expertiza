@@ -48,11 +48,8 @@ to display the label "Your team" in the student assignment tasks-->
     </li>
   <% end %>
 
-    <% if @authorization == 'participant' or @can_submit == true %>
-    <li>
-      Change Review Score Settings
-    </li>
-  <% end %>
+    <li><%= link_to "Change review settings", {:controller => 'participants', :action => 'change_reviewsetting', :id => @participant.id} %> (Change the review score setting)</li>
+  
 
   <% if @authorization == 'participant' or @can_review == true %>
     <li>

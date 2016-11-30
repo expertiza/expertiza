@@ -196,6 +196,7 @@ Expertiza::Application.routes.draw do
       get :delete_assignment_participant
       get :list
       get :change_handle
+      get :change_reviewsetting
       get :inherit
       get :bequeath_all
       post :delete
@@ -204,11 +205,13 @@ Expertiza::Application.routes.draw do
       post :update_authorizations
       post :update_duties
       post :change_handle
+      post :change_reviewsetting
       get :view_publishing_rights
     end
   end
 
   get '/participants/change_handle', controller: :participants, action: :change_handle
+  get '/participants/change_reviewsetting', controller: :participants, action: :change_reviewsetting
 
   resources :password_retrieval do
     collection do

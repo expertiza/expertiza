@@ -30,21 +30,28 @@ describe "assignment submisstion test" do
 
   it "test1: submit single link" do
     signup_topic
-    fill_in 'submission', with: "https://google.com"
+    fill_in 'submission', with: "https://www.ncsu.edu"
     click_on 'Upload link'
-    expect(page).to have_content "https://google.com"
+    expect(page).to have_content "https://www.ncsu.edu"
+    #open the link and check content
+    click_on "https://www.ncsu.edu"
+    expect(page).to have_http_status(200)
+    #new_window = page.driver.browser.window_handles.last
+    #page.within_window new_window do
+      #expect(page).to have_content "NC STATE NEWS"
+    #end
   end
 
   it "test2: submit multiple link" do
     signup_topic
-    fill_in 'submission', with: "https://google.com"
+    fill_in 'submission', with: "https://www.ncsu.edu"
     click_on 'Upload link'
-    expect(page).to have_content "https://google.com"
-    fill_in 'submission', with: "https://baidu.com"
+    fill_in 'submission', with: "https://www.google.com"
     click_on 'Upload link'
-    expect(page).to have_content "https://baidu.com"
     fill_in 'submission', with: "https://bing.com"
     click_on 'Upload link'
+    expect(page).to have_content "https://www.ncsu.edu"
+    expect(page).to have_content "https://www.google.com"
     expect(page).to have_content "https://bing.com"
   end
 

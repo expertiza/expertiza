@@ -27,7 +27,7 @@ class Badge
 			# check for different badges
 
 			# Topper badge
-			# badge_matrix[current_assignment_count][0] = Badge.topper(student_task)
+			badge_matrix[current_assignment_count][0] = Badge.topper(student_task.assignment, student_task.participant)
 
 			# Good reviewer badge
 			# badge_matrix[current_assignment_count][2] = Badge.good_reviewer(student_task)
@@ -85,8 +85,6 @@ class Badge
 
 # -------------------------------------------- Good reviewer badge method(s)--------------------------------------------- #
 
-	# def self.good_reviewer(student_task)
-		# participant = student_task.participant
 	def self.good_reviewer(participant)
 		if participant.try(:grade_for_reviewer).nil? or participant.try(:comment_for_reviewer).nil?
 		      info = -1
@@ -103,8 +101,9 @@ class Badge
 
 # -------------------------------------------- Top Score badge method(s)--------------------------------------------- #
 
-	def self.topper(student_task)
-		assignment = student_task.assignment
+	# def self.topper(student_task)
+	def self.topper(assignment, participant)	
+		# assignment = student_task.assignment
 		questions = {}
 	    questionnaires = assignment.questionnaires
 
@@ -123,7 +122,7 @@ class Badge
 	    
 	    max_average_index = averages.each_with_index.max[1]
 
-	    if teams[max_average_index].participants.include?(student_task.participant)
+	    if teams[max_average_index].participants.include?(participant)
 			return TOPPER_BADGE_IMAGE.html_safe
 	 	else
 	 		return false

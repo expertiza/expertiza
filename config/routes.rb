@@ -287,6 +287,7 @@ Expertiza::Application.routes.draw do
     collection do
       get :new_feedback
       get :view
+      get :view_review
       post :delete
       get :remove_hyperlink
       get :saving

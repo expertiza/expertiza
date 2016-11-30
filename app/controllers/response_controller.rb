@@ -148,6 +148,12 @@ class ResponseController < ApplicationController
     set_content
   end
 
+  def view_review
+    @response = Response.find(params[:id])
+    @map = @response.map
+    set_content
+  end
+
   def create
     @map = ResponseMap.find(params[:id]) # assignment/review/metareview id is in params id
 

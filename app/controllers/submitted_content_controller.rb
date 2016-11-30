@@ -56,7 +56,6 @@ class SubmittedContentController < ApplicationController
     else
       begin
         team.submit_hyperlink(params['submission'])
-        @participant.update_resubmit_times
 
         #create a submission record
         @submission_record = SubmissionRecord.new(team_id: team.id, content: params['submission'], user: @participant.name, assignment_id: params[:id], operation: "Submit Hyperlink")
@@ -124,9 +123,6 @@ class SubmittedContentController < ApplicationController
     if params['unzip']
       SubmittedContentHelper.unzip_file(full_filename, curr_directory, true) if get_file_type(safe_filename) == "zip"
     end
-    participant.update_resubmit_times
-
-
 
     #create a submission record
     assignment = Assignment.find(participant.parent_id)
@@ -271,7 +267,8 @@ class SubmittedContentController < ApplicationController
 
   # authorizations: reader,submitter, reviewer
   def are_needed_authorizations_present?
-    @participant = Participant.find(params[:id])
+    @participant = Participant.find_by(id: params[:id])
+    return false if @participant.nil?
     authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
     if authorization == 'reader' or authorization == 'reviewer'
       return false

@@ -98,10 +98,10 @@
   var myCircle = Circles.create({
     id:           'final-circle',
     radius:       35,
-    value:        <%= @pscore[:total_score].to_i %>,
+    value:        <%= @pscore[:total_score].to_i * 0.9 + @self_review_score * 0.1 %>,
     maxValue:     100,
     width:        15,
-    text:         '<%=@pscore[:total_score].to_i==-1? "N/A":@pscore[:total_score].to_i%>',
+    text:         '<%=@pscore[:total_score].to_i==-1? "N/A":@pscore[:total_score].to_i * 0.9 + @self_review_score * 0.1 %>',
     colors:       ['#FFEB99', '#FFCC00'],
     duration:       700,
     textClass:      'circles-final'  

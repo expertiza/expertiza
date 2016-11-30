@@ -55,6 +55,7 @@ class Badge
 	def self.get_badges_instructor_view(participants, assignment)
 		current_assignment_count = 0
 		badge_matrix = []
+		scores = Badge.get_scores(assignment)
 		
 		participants.each do |participant|
 			badge_matrix.push([false] * NUMBER_OF_BADGES)
@@ -63,7 +64,7 @@ class Badge
 			# check for different badges
 
 			# Topper badge
-			# badge_matrix[current_assignment_count][0] = Badge.topper(assignment, participant)
+			badge_matrix[current_assignment_count][0] = Badge.is_toppper(scores, participant)
 
 			# Good reviewer badge
 			badge_matrix[current_assignment_count][2] = Badge.good_reviewer(participant)

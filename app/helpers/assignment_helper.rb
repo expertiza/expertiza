@@ -30,7 +30,7 @@ module AssignmentHelper
   end
 
   # round=0 added by E1450
-  def questionnaire_options(assignment, type, _round = 0)
+  def questionnaire_options(assignment, type, _round = 0, _duty="")
     questionnaires = Questionnaire.where(['private = 0 or instructor_id = ?', assignment.instructor_id]).order('name')
     options = []
     questionnaires.select {|x| x.type == type }.each do |questionnaire|
@@ -72,18 +72,25 @@ module AssignmentHelper
     end
   end
 
-  def questionnaire(assignment, type, round_number)
+  def questionnaire(assignment, type, round_number, duty)
     # E1450 changes
-    if round_number.nil?
+    if round_number.nil? && duty.nil?
       questionnaire = assignment.questionnaires.find_by_type(type)
-    else
+    elsif !round_number.nil? && duty.nil?
       ass_ques = assignment.assignment_questionnaires.find_by_used_in_round(round_number)
       # make sure the assignment_questionnaire record is not empty
       unless ass_ques.nil?
         temp_num = ass_ques.questionnaire_id
         questionnaire = assignment.questionnaires.find_by_id(temp_num)
       end
+    elsif !duty.nil?
+      ass_ques = assignment.assignment_questionnaires.find_by(duty_name: duty)
+      unless ass_ques.nil?
+        temp_num = ass_ques.questionnaire_id
+        questionnaire = assignment.questionnaires.find_by_id(temp_num)
+      end
     end
+
     # E1450 end
     questionnaire = Object.const_get(type).new if questionnaire.nil?
 
@@ -91,7 +98,7 @@ module AssignmentHelper
   end
 
   # number added by E1450
-  def assignment_questionnaire(assignment, type, number)
+  def assignment_questionnaire(assignment, type, number, duty)
     questionnaire = assignment.questionnaires.find_by_type(type)
 
     if questionnaire.nil?
@@ -116,15 +123,23 @@ module AssignmentHelper
       aq
     else
       # E1450 changes
-      if number.nil?
+      if number.nil? && duty.nil?
         assignment.assignment_questionnaires.find_by_questionnaire_id(questionnaire.id)
-      else
+      elsif !number.nil? && duty.nil?
         assignment_by_usedinround = assignment.assignment_questionnaires.find_by_used_in_round(number)
         # make sure the assignment found by used in round is not empty
         if assignment_by_usedinround.nil?
           assignment.assignment_questionnaires.find_by_questionnaire_id(questionnaire.id)
         else
           assignment_by_usedinround
+        end
+      elsif !duty.nil?
+        assignment_by_dutyname = assignment.assignment_questionnaires.find_by(duty_name: duty)
+        # make sure the assignment found by duty name is not empty
+        if assignment_by_dutyname.nil?
+          assignment.assignment_questionnaires.find_by_questionnaire_id(questionnaire.id)
+        else
+          assignment_by_dutyname
         end
       end
       # E1450 end

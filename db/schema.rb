@@ -81,7 +81,7 @@ ActiveRecord::Schema.define(version: 20161126202511) do
     t.string   "reputation_algorithm",       limit: 255,   default: "Lauw"
     t.boolean  "duty_based",                               default: false
     t.boolean  "allow_duty_share",                         default: false
-    t.string   "duty_names",                 limit: 255
+    t.string   "duty_names",                 limit: 255,   default: ""
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree

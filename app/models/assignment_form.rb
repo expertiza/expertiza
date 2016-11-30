@@ -70,6 +70,7 @@ class AssignmentForm
         end
       else
         aq = AssignmentQuestionnaire.find(assignment_questionnaire[:id])
+
         unless aq.update_attributes(assignment_questionnaire)
           @errors += @assignment.errors
           @has_errors = true

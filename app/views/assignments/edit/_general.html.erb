@@ -184,9 +184,9 @@ function microtaskChanged() {
           addQuestionnaireTableRow(
                   'TeammateReviewQuestionnaire',
                   null,
-                  <%= questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
-                  <%= assignment_questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
-                  <%= questionnaire_options(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>
+                  <%= questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil,nil).to_json.html_safe %>,
+                  <%= assignment_questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil,nil).to_json.html_safe %>,
+                  <%= questionnaire_options(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil,nil).to_json.html_safe %>
           );
 
         } else {

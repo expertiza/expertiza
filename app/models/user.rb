@@ -16,6 +16,7 @@ class User < ActiveRecord::Base
   has_many :sent_invitations, class_name: 'Invitation', foreign_key: 'from_id', dependent: :destroy
   has_many :received_invitations, class_name: 'Invitation', foreign_key: 'to_id', dependent: :destroy
 
+  has_many :messages
   has_many :children, class_name: 'User', foreign_key: 'parent_id'
   belongs_to :parent, class_name: 'User'
   belongs_to :role

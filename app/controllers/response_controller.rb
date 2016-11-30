@@ -153,7 +153,7 @@ class ResponseController < ApplicationController
   def other_reviews
     @other_response_maps = ReviewResponseMap.where(reviewee_id: params[:reviewee_id],type: 'ReviewResponseMap')
     @user_response = Response.find(params[:user_reponse_id])
-    @round = @user_response.round
+    @latest_response_round = @user_response.round
     @map = @user_response.map
     @title = @map.get_title
     @assignment = @map.assignment

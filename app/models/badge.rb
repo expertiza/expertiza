@@ -30,8 +30,9 @@ class Badge
 			# badge_matrix[current_assignment_count][0] = Badge.topper(student_task)
 
 			# Good reviewer badge
-			badge_matrix[current_assignment_count][2] = Badge.good_reviewer(student_task)
-
+			# badge_matrix[current_assignment_count][2] = Badge.good_reviewer(student_task)
+			badge_matrix[current_assignment_count][2] = Badge.good_reviewer(student_task.participant)
+	
 			# Consistency badge
 			consistency_flag = consistency_flag && Badge.consistency(student_task)
 			
@@ -57,6 +58,22 @@ class Badge
 		
 		participants.each do |participant|
 			badge_matrix.push([false] * NUMBER_OF_BADGES)
+			
+			if not assignment.is_calibrated
+			# check for different badges
+
+			# Topper badge
+			# badge_matrix[current_assignment_count][0] = Badge.topper(student_task)
+
+			# Good reviewer badge
+			badge_matrix[current_assignment_count][2] = Badge.good_reviewer(participant)
+
+			# Consistency badge
+			# consistency_flag = consistency_flag && Badge.consistency(student_task)
+			
+			end
+
+			current_assignment_count = current_assignment_count + 1			
 
 		end
 
@@ -68,8 +85,9 @@ class Badge
 
 # -------------------------------------------- Good reviewer badge method(s)--------------------------------------------- #
 
-	def self.good_reviewer(student_task)
-		participant = student_task.participant
+	# def self.good_reviewer(student_task)
+		# participant = student_task.participant
+	def self.good_reviewer(participant)
 		if participant.try(:grade_for_reviewer).nil? or participant.try(:comment_for_reviewer).nil?
 		      info = -1
 		else

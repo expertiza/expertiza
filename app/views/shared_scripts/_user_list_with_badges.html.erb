@@ -28,7 +28,7 @@
    <% @user_id << participant.user_id %>
   <tr class= "exp">
     <td >
-      <%= link_to user.name, :controller=> 'users', :action => 'show', :id => user.id %><br>
+      <%= link_to user.name, :controller=> 'users', :action => 'show', :id => user.id %> <br>
       <% student_badge.each do |each_badge| %>
               <% if each_badge %>
                 <%= each_badge %>

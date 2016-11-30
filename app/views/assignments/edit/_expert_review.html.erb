@@ -75,9 +75,11 @@
                   <% end %>
               <%end%>
           <% elsif @assignment.get_current_stage(topic_id) != "Complete" && @assignment.can_review(topic_id) %>
-              <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
+              <% if session[:user].id == assignment.instructor.id %>
+                  <%= link_to "Begin", {:controller => 'review_mapping', :action => 'add_calibration', :id => assignment.id, :team_id => team.id} %>
+              <% end %>
           <% else %>
-              <td> Work has not yet been submitted for this submission
+              <b>Work has not yet been submitted for this submission</b>
           <% end %>
 
             <% if false %>

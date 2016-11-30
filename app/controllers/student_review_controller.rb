@@ -7,6 +7,21 @@ class StudentReviewController < ApplicationController
      'Student'].include? current_role_name and ((%w(list).include? action_name) ? are_needed_authorizations_present? : true)
   end
 
+  def destroy
+    @participant = AssignmentParticipant.find(params[:id])
+    return unless current_user_id?(@participant.user_id)
+    @assignment = @participant.assignment
+    @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
+    @topic = SignUpTopic.find(@topic_id)
+    if @topic
+      @topic.destroy
+      undo_link("The review: \"#@topic.topic_name\" has been dropped")
+    else
+      flash[:error] = "The review could not be dropped"
+    end
+    @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id).destroy_all
+  end
+
   def list
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)

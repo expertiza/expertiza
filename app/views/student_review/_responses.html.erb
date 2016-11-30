@@ -63,6 +63,7 @@
                         </td>
                       <% else %>
                         <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
+                            <td><%= link_to "Drop", {:controller => 'student_review', :action => 'destroy', :id => participant.user_id} %></td>
                       <% end %>
                     <% end %>
                 <%end%>

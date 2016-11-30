@@ -1,0 +1,16 @@
+<div class="exp">
+  <table>
+    <tr><th class="head">Name</th><th class="head">Full Name</th><th class="head">Email Address</th><th class="head">Role</th><th class="head">Status</th><th class="head">Notes</th></tr>
+
+    <% for user in @users %>
+        <tr class="exp">
+          <td><%= link_to user.name, :action => 'show', :id => user.id %></td>
+          <td><%= user.fullname %></td>
+          <td><%= user.email %></td>
+          <td><%= user.role_id%></td>
+          <td><%= user.status %></td>
+          <td><%= user.reason %></td>
+        </tr>
+    <% end -%>
+  </table>
+</div>

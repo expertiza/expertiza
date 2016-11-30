@@ -25,5 +25,5 @@
 <BR/>
 
     <BR/>
-    <%= link_to 'Edit', :action => 'edit', :id => @questionnaire %> |
+    <%= link_to 'Edit', :controller => :questionnaires, :action => :edit_quiz, :id => @questionnaire.id, :pid => @participant.id %>|
     <%= link_to "Back", :controller => 'tree_display', :action => 'list' %>

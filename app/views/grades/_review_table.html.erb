@@ -4,7 +4,7 @@
   <%end%>
 	<tr><th style="text-align:center;">&nbsp;</th>
 		<% for i in 0...reviews.size%>
-      <% user = User.where(name: reviews[i].reviewer.name).first %>
+      <% user = User.find(AssignmentParticipant.find(ResponseMap.find(reviews[i].map_id).reviewer_id).user_id) %>
         <% if(user.role.instructor? || user.role.ta?) %>
             <th style="text-align:center;"><b> Review </b><%=i+1%>&nbsp;</th>
         <% else %>

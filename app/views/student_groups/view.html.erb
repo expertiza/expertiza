@@ -77,7 +77,7 @@
     <% if @send_invs && @send_invs.length > 0 %>
     <br/>
     <br/>
-    <b>Sent invitations</b>
+    <b>Sent group_invitationss</b>
     <br/>
     <br/>
       <!-- start invited people table -->
@@ -99,7 +99,7 @@
                   <td align = "center">Declined</td>
                 <% else %>
                   <td align = "center">Waiting for reply
-                  &nbsp;&nbsp;<%= link_to "Retract", {:controller => 'invitation', :action => 'cancel', :inv_id => inv.id, :student_id => @student.id} %></td>
+                  &nbsp;&nbsp;<%= link_to "Retract", {:controller => 'group_invitations', :action => 'cancel', :inv_id => inv.id, :student_id => @student.id} %></td>
                 <% end %>
              </tr>
           <% end %>
@@ -108,7 +108,7 @@
     <% end %>
 <br/>
 
-<!--send invitation-->
+<!--send group_invitations-->
 <% if @student.assignment.group_size>1 %>
 
 
@@ -122,7 +122,7 @@
        <% end %>
      <% elsif !@student.group.full?%>
        <b>Invite people</b>
-       <%= form_tag :controller => 'invitation', :action => 'create' do %>
+       <%= form_tag :controller => 'group_invitations', :action => 'create' do %>
          <%= hidden_field_tag 'group_id', @student.group.id %>
          <%= hidden_field_tag 'student_id', @student.id %>
          <%= hidden_field_tag 'session[:dummy][:assignment_id]', @student.parent_id %>
@@ -157,7 +157,7 @@
   <% end %>
 <% end %>
 
-<!--display a table of received invitation-->
+<!--display a table of received group_invitations-->
   <% if @received_invs && @received_invs.length > 0 %>
     <table>
       <h3>Received Invitations</h3>
@@ -186,12 +186,12 @@
                       @group_id = @student.group.id
                     end %>
                   <%= link_to "Accept",
-                              {:controller => 'invitation', :action => 'accept', :inv_id => inv.id, :student_id => @student.id, :group_id => @group_id},
-                              {:onClick => "javascript: return confirm('Your topic (or place on waiting lists) will be relinquished if you accept the invitation. Do you want to continue?');"}
+                              {:controller => 'group_invitations', :action => 'accept', :inv_id => inv.id, :student_id => @student.id, :group_id => @group_id},
+                              {:onClick => "javascript: return confirm('Your topic (or place on waiting lists) will be relinquished if you accept the group_invitations. Do you want to continue?');"}
                   %>
                   |
                   <%= link_to "Decline",
-                              {:controller => 'invitation', :action => 'decline', :inv_id => inv.id, :student_id => @student.id}
+                              {:controller => 'group_invitations', :action => 'decline', :inv_id => inv.id, :student_id => @student.id}
                   %>
                 </td>
               </tr>

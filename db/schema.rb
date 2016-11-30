@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161119183048) do
+ActiveRecord::Schema.define(version: 20161130173951) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -226,6 +226,17 @@ ActiveRecord::Schema.define(version: 20161119183048) do
   add_index "due_dates", ["review_allowed_id"], name: "fk_due_date_review_allowed", using: :btree
   add_index "due_dates", ["review_of_review_allowed_id"], name: "fk_due_date_review_of_review_allowed", using: :btree
   add_index "due_dates", ["submission_allowed_id"], name: "fk_due_date_submission_allowed", using: :btree
+
+  create_table "group_invitations", force: :cascade do |t|
+    t.integer  "assignment_id", limit: 4
+    t.integer  "from_id",       limit: 4
+    t.integer  "to_id",         limit: 4
+    t.string   "reply_status",  limit: 1
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
+  add_index "group_invitations", ["assignment_id"], name: "index_group_invitations_on_assignment_id", using: :btree
 
   create_table "groups", force: :cascade do |t|
     t.boolean  "isAnonymous"
@@ -690,6 +701,7 @@ ActiveRecord::Schema.define(version: 20161119183048) do
   add_foreign_key "due_dates", "deadline_rights", column: "review_of_review_allowed_id", name: "fk_due_date_review_of_review_allowed"
   add_foreign_key "due_dates", "deadline_rights", column: "submission_allowed_id", name: "fk_due_date_submission_allowed"
   add_foreign_key "due_dates", "deadline_types", name: "fk_deadline_type_due_date"
+  add_foreign_key "group_invitations", "assignments"
   add_foreign_key "groups_users", "groups"
   add_foreign_key "groups_users", "users"
   add_foreign_key "invitations", "assignments", name: "fk_invitation_assignments"

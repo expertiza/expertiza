@@ -170,5 +170,25 @@ class Group < ActiveRecord::Base
     end
   end
 
+  def self.remove_group_by_id(id)
+    old_group = Group.find(id)
+    old_group.destroy unless old_group.nil?
+  end
+
+  # return the group given the participant
+  def self.group(participant)
+    return nil if participant.nil?
+    group = nil
+    groups_users = GroupsUser.where(user_id: participant.user_id)
+    return nil unless groups_users
+    groups_users.each do |groups_user|
+      group = Group.find(groups_user.group_id)
+      return group if group.parent_id == participant.parent_id
+    end
+    nil
+  end
+
+
+
 
 end

@@ -1,4 +1,5 @@
 Expertiza::Application.routes.draw do
+  resources :group_invitations
   resources :groups_users
  # resources :groups
   resources :submission_records

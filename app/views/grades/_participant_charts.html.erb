@@ -13,7 +13,12 @@
 <% end %>
 
 <%
-   @self_review_score = 90
+   @raw_self_review_score = 70
+   if @pscore[:review]
+     @peer_review_score=Rscore.new(@pscore,:review)
+   end
+
+   @self_review_score = 100 - ((@raw_self_review_score - @peer_review_score.my_avg).abs)
 %>
 
 <a href="#" name='score-chartLink' onClick="toggleElement('score-chart', 'stats');return false;">hide stats</a>

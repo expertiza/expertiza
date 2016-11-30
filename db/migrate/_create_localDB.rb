@@ -5,7 +5,8 @@ class CreateLocalDB < ActiveRecord::Migration
       t.column :id, :integer  # the course to which this survey pertains.
       t.column :score, :integer # no. of students participating in the survey
       t.column :round, :integer # no. of students participating in the survey
-      t.column :type, :String# last reminder date
+      t.column :type, :string# last reminder date
+      t.column :reference_id, :integer # no. of students participating in the survey
   end
 
   def self.down

@@ -63,7 +63,7 @@ class Badge
 			# check for different badges
 
 			# Topper badge
-			# badge_matrix[current_assignment_count][0] = Badge.topper(student_task)
+			# badge_matrix[current_assignment_count][0] = Badge.topper(assignment, participant)
 
 			# Good reviewer badge
 			badge_matrix[current_assignment_count][2] = Badge.good_reviewer(participant)
@@ -103,7 +103,21 @@ class Badge
 
 	# def self.topper(student_task)
 	def self.topper(assignment, participant)	
-		# assignment = student_task.assignment
+		scores = Badge.get_scores(assignment)
+	    
+	    averages = Badge.calculate_average_vector(scores)
+	    teams = Badge.get_teams(scores)
+	    
+	    max_average_index = averages.each_with_index.max[1]
+
+	    if teams[max_average_index].participants.include?(participant)
+			return TOPPER_BADGE_IMAGE.html_safe
+	 	else
+	 		return false
+	 	end
+	end
+
+	def self.get_scores(assignment)
 		questions = {}
 	    questionnaires = assignment.questionnaires
 
@@ -116,17 +130,8 @@ class Badge
 	    end
 
 	    scores = assignment.scores(questions)
+	    return scores
 	    
-	    averages = Badge.calculate_average_vector(scores)
-	    teams = Badge.get_teams(scores)
-	    
-	    max_average_index = averages.each_with_index.max[1]
-
-	    if teams[max_average_index].participants.include?(participant)
-			return TOPPER_BADGE_IMAGE.html_safe
-	 	else
-	 		return false
-	 	end
 	end
 
 	def self.retrieve_questions(questionnaires, assignment)

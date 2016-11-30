@@ -145,7 +145,7 @@ participant = pscore[:participant]
           <% total_score = participant.grade %>
           <% title = "A score in blue indicates that the value was overwritten by the instructor or teaching assistant." %>
         <% else %>
-          <% total_score = pscore[:total_score] %>
+          <% total_score = @pscore[:total_score].to_i * 0.9 + @self_review_score * 0.1 %>
           <% title = nil %>
         <% end %>
 

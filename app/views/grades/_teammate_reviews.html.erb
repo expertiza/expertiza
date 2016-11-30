@@ -22,7 +22,7 @@
     <% if controller.action_name != "view_my_scores" %>
       <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a><%= review.display_as_html(prefix, count) %><BR/><BR/>
     <% else %>
-      <%= review.display_as_html(nil,count) %><BR/><BR/>
+      <%= review.display_as_html(nil,count, nil, @assignment.show_teammate_score) %><BR/><BR/>
     <% end %>    
   <% end %>
 <% else %>

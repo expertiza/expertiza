@@ -1,0 +1,27 @@
+<h1><%= @title %> for <%= @assignment.name %> by Other Reviewers</h1>
+
+<% unless @other_response_maps.empty? %>
+      <% (1..@latest_response_round).each do |round| #User is allowed to see current round review only after completion of current round review %>
+        <%displayed_round_number = false%>
+        <% review_no = 1 %>
+        <% @other_response_maps.each do |response_map| %>
+          <% map = response_map.response.where(round: round).first%>
+          <% if !map.nil? and map.id.to_s != @user_response.id.to_s %>
+              <%unless displayed_round_number%>
+                    <h3><%= "Round #{round}"%></h3>
+                    <%displayed_round_number = true%>
+              <%end%>
+              <%= map.display_as_html(nil, review_no, nil) %>
+              <% review_no+=1 %>
+              <br/>
+              <hr/>
+          <% end %>
+        <%end%>
+    <%end%>
+<% else%>
+  <br><br>
+  <%= "Note: No Reviews for this work has been submitted by other Reviewers" %>
+<% end %>
+
+<br/>
+<a href="javascript:window.history.back()">Back</a>

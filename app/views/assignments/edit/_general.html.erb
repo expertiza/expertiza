@@ -103,7 +103,16 @@ function microtaskChanged() {
       &nbsp;&nbsp;&nbsp;&nbsp;
     </td>
   </tr>
+  <tr>
+   <td style='padding:5px' id='assignment_show_other_reviews'  <%= 'hidden' if @assignment_form.assignment.max_team_size < 2%>>
+     <input name="assignment_form[assignment][show_other_reviews]" type="hidden" value="false"/>
+     <%= check_box_tag('assignment_form[assignment][show_other_reviews]', 'true', @assignment_form.assignment.show_other_reviews) %>
+     <%= label_tag('assignment_form[assignment][show_other_reviews]', 'Show reviewers other reviews of same work?') %>
+   &nbsp;&nbsp;
+   </td>
+  <tr>
 
+  </tr>
   <!--Quiz fields-->
   <tr>
     <td style='padding:5px' id='assignment_require_quiz_field'>

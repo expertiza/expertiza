@@ -1,0 +1,2298 @@
+Searching 3001 files for "display_volume_metric" (case sensitive)
+
+/Users/louie/expertiza/app/helpers/review_mapping_helper.rb:
+   86    end
+   87  
+   88:   def display_volume_metric(overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3)
+   89      metric = "Avg. Volume: #{overall_avg_vol.to_s} <br/> ("
+   90      metric += "1st: " + avg_vol_in_round_1.to_s if avg_vol_in_round_1 > 0
+
+/Users/louie/expertiza/app/views/review_mapping/_review_report.html.erb:
+   39                    <!--Metrics-->
+   40                    <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
+   41:                     <%= display_volume_metric(r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3) %>
+   42                    </td>
+   43                    <!--Assign grade and write comments-->
+
+2 matches across 2 files
+
+
+Searching 3014 files for "tinyint" (case sensitive)
+
+/Users/louie/expertiza/app/models/review_metric.rb:
+    2  	belongs_to :review_response_map, class_name: 'ReviewResponseMap', foreign_key: 'response_id'
+    3      attr_accessor :volume, :integer
+    4:     attr_accessor :suggestion, :tinyint
+    5:     attr_accessor :problem, :tinyint
+    6:     attr_accessor :offensive_term, :tinyint
+    7  
+    8  end
+
+3 matches in 1 file
+
+
+Searching 3014 files for ":integer" (case sensitive)
+
+/Users/louie/expertiza/app/models/review_metric.rb:
+    1  class ReviewMetric < ActiveRecord::Base
+    2  	belongs_to :review_response_map, class_name: 'ReviewResponseMap', foreign_key: 'response_id'
+    3:     attr_accessor :volume, :integer
+    4      attr_accessor :suggestion, :tinyint
+    5      attr_accessor :problem, :tinyint
+
+/Users/louie/expertiza/db/migrate/001_initialize_goldberg.rb:
+   13      t.column "title", :string
+   14      t.column "name", :string, :default => "", :null => false
+   15:     t.column "markup_style_id", :integer
+   16      t.column "content", :text
+   17:     t.column "permission_id", :integer, :default => 0, :null => false
+   18      t.column "created_at", :datetime
+   19      t.column "updated_at", :datetime
+   ..
+   37    create_table "goldberg_site_controllers", :force => true do |t|
+   38      t.column "name", :string, :default => "", :null => false
+   39:     t.column "permission_id", :integer, :default => 0, :null => false
+   40:     t.column "builtin", :integer, :default => 0
+   41    end
+   42     
+   ..
+   46   
+   47     create_table "goldberg_controller_actions", :force => true do |t|
+   48:     t.column "site_controller_id", :integer, :default => 0, :null => false
+   49      t.column "name", :string, :default => "", :null => false
+   50:     t.column "permission_id", :integer
+   51      t.column "url_to_use", :string
+   52    end
+   ..
+   58  
+   59    create_table "goldberg_menu_items", :force => true do |t|
+   60:     t.column "parent_id", :integer
+   61      t.column "name", :string, :default => "", :null => false
+   62      t.column "label", :string, :default => "", :null => false
+   63:     t.column "seq", :integer
+   64:     t.column "controller_action_id", :integer
+   65:     t.column "content_page_id", :integer
+   66    end
+   67  
+   ..
+   74    create_table "goldberg_roles", :force => true do |t|
+   75      t.column "name", :string, :default => "", :null => false
+   76:     t.column "parent_id", :integer
+   77      t.column "description", :string, :default => "", :null => false
+   78:     t.column "default_page_id", :integer
+   79      t.column "cache", :text
+   80      t.column "created_at", :datetime
+   ..
+   89  
+   90    create_table "goldberg_roles_permissions", :force => true do |t|
+   91:     t.column "role_id", :integer, :default => 0, :null => false
+   92:     t.column "permission_id", :integer, :default => 0, :null => false
+   93    end
+   94  
+   ..
+  102      t.column "site_subtitle", :string
+  103      t.column "footer_message", :string, :default => ""
+  104:     t.column "public_role_id", :integer, :default => 0, :null => false
+  105:     t.column "session_timeout", :integer, :default => 0, :null => false
+  106:     t.column "default_markup_style_id", :integer, :default => 0
+  107:     t.column "site_default_page_id", :integer, :default => 0, :null => false
+  108:     t.column "not_found_page_id", :integer, :default => 0, :null => false
+  109:     t.column "permission_denied_page_id", :integer, :default => 0, :null => false
+  110:     t.column "session_expired_page_id", :integer, :default => 0, :null => false
+  111:     t.column "menu_depth", :integer, :default => 0, :null => false
+  112      t.column "start_path", :string
+  113      t.column "site_url_prefix", :string
+  114      t.column "self_reg_enabled", :boolean
+  115:     t.column "self_reg_role_id", :integer
+  116      t.column "self_reg_confirmation_required", :boolean
+  117:     t.column "self_reg_confirmation_error_page_id", :integer
+  118      t.column "self_reg_send_confirmation_email", :boolean
+  119    end
+
+/Users/louie/expertiza/db/migrate/002_initialize_custom.rb:
+   21      t.column "title", :string
+   22      t.column "name", :string, :default => "", :null => false
+   23:     t.column "markup_style_id", :integer
+   24      t.column "content", :text
+   25:     t.column "permission_id", :integer, :default => 0, :null => false
+   26      t.column "created_at", :datetime
+   27      t.column "updated_at", :datetime
+   ..
+   43    create_table "site_controllers", :force => true do |t|
+   44      t.column "name", :string, :default => "", :null => false
+   45:     t.column "permission_id", :integer, :default => 0, :null => false
+   46:     t.column "builtin", :integer, :default => 0
+   47    end
+   48  
+   ..
+   80   
+   81    create_table "controller_actions", :force => true do |t|
+   82:     t.column "site_controller_id", :integer, :default => 0, :null => false
+   83      t.column "name", :string, :default => "", :null => false
+   84:     t.column "permission_id", :integer
+   85      t.column "url_to_use", :string
+   86    end
+   ..
+  140  
+  141    create_table "menu_items", :force => true do |t|
+  142:     t.column "parent_id", :integer
+  143      t.column "name", :string, :default => "", :null => false
+  144      t.column "label", :string, :default => "", :null => false
+  145:     t.column "seq", :integer
+  146:     t.column "controller_action_id", :integer
+  147:     t.column "content_page_id", :integer
+  148    end
+  149  
+  ...
+  156      create_table "roles", :force => true do |t|
+  157        t.column "name", :string, :default => "", :null => false
+  158:       t.column "parent_id", :integer
+  159        t.column "description", :string, :default => "", :null => false
+  160:       t.column "default_page_id", :integer
+  161        t.column "cache", :text
+  162        t.column "created_at", :datetime
+  ...
+  173       
+  174      create_table "roles_permissions", :force => true do |t|
+  175:       t.column "role_id", :integer, :default => 0, :null => false
+  176:       t.column "permission_id", :integer, :default => 0, :null => false
+  177      end
+  178  
+  ...
+  188      t.column "site_subtitle", :string
+  189      t.column "footer_message", :string, :default => ""
+  190:     t.column "public_role_id", :integer, :default => 0, :null => false
+  191:     t.column "session_timeout", :integer, :default => 0, :null => false
+  192:     t.column "default_markup_style_id", :integer, :default => 0
+  193:     t.column "site_default_page_id", :integer, :default => 0, :null => false
+  194:     t.column "not_found_page_id", :integer, :default => 0, :null => false
+  195:     t.column "permission_denied_page_id", :integer, :default => 0, :null => false
+  196:     t.column "session_expired_page_id", :integer, :default => 0, :null => false
+  197:     t.column "menu_depth", :integer, :default => 0, :null => false
+  198    end
+  199  
+  ...
+  208    create_table "plugin_schema_info", :id => false, :force => true do |t|
+  209      t.column "plugin_name", :string
+  210:     t.column "version", :integer
+  211    end
+  212    
+
+/Users/louie/expertiza/db/migrate/003_create_goldberg_users.rb:
+    5      t.column "name", :string, :default => "", :null => false
+    6      t.column "password", :string, :limit => 40, :default => "", :null => false
+    7:     t.column "role_id", :integer, :default => 0, :null => false
+    8      t.column "password_salt", :string
+    9      t.column "fullname", :string
+
+/Users/louie/expertiza/db/migrate/004_create_users.rb:
+    4        t.column "name", :string, :default => "", :null => false
+    5        t.column "password", :string, :limit => 40, :default => "", :null => false
+    6:       t.column "role_id", :integer, :default => 0, :null => false
+    7        t.column "password_salt", :string
+    8        t.column "fullname", :string
+    9        t.column "email", :string
+   10:       t.column "parent_id", :integer
+   11        t.column "private_by_default", :boolean, :default => false
+   12        t.column "mru_directory_path", :string, :limit => 128
+
+/Users/louie/expertiza/db/migrate/007_create_late_policies.rb:
+    2    def self.up
+    3    create_table "late_policies", :force => true do |t|
+    4:     t.column "penalty_period_in_minutes", :integer
+    5:     t.column "penalty_per_unit", :integer
+    6      t.column "expressed_as_percentage", :boolean
+    7:     t.column "max_penalty", :integer, :default => 0, :null => false
+    8    end
+    9  
+
+/Users/louie/expertiza/db/migrate/012_create_courses.rb:
+    3      create_table "courses", :force => true do |t|
+    4        t.column "title", :string
+    5:       t.column "instructor_id", :integer
+    6        t.column "directory_path", :string
+    7        t.column "info", :text
+
+/Users/louie/expertiza/db/migrate/013_create_courses_users.rb:
+    2    def self.up
+    3    create_table "courses_users", :force => true do |t|
+    4:     t.column "user_id", :integer
+    5:     t.column "course_id", :integer
+    6      t.column "active", :boolean
+    7    end
+
+/Users/louie/expertiza/db/migrate/014_create_questionnaires.rb:
+    3    create_table "questionnaires", :force => true do |t|
+    4      t.column "name", :string, :limit => 64 # the name of the questionnaire
+    5:     t.column "instructor_id", :integer, :default => 0, :null => false # the id of the instructor (as user) who created the questionnaire
+    6      t.column "private", :boolean, :default => false, :null => false # is the questionnaire private?
+    7:     t.column "min_question_score", :integer, :default => 0, :null => false # the lowest possible score on a question
+    8:     t.column "max_question_score", :integer # the greatest possible score on a question
+    9      t.column "created_at", :datetime # when the questionnaire was created - generated by Ruby
+   10      t.column "updated_at", :datetime, :null => false # when the questionnaire was last updated - generated by Ruby
+   11:     t.column "default_num_choices", :integer # default number of scoring increments
+   12:     t.column "type_id", :integer, :default => 1, :null => false # Questionnaire Type join
+   13    end
+   14  
+
+/Users/louie/expertiza/db/migrate/015_create_questions.rb:
+    4      t.column "txt", :text # the question content
+    5      t.column "true_false", :boolean # is this a true/false question?
+    6:     t.column "weight", :integer # the scoring weight
+    7:     t.column "questionnaire_id", :integer # the questionnaire to which this question belongs
+    8    end
+    9  
+
+/Users/louie/expertiza/db/migrate/016_create_question_advices.rb:
+    2    def self.up
+    3    create_table "question_advices", :force => true do |t|
+    4:     t.column "question_id", :integer # the question to which this advice belongs
+    5:     t.column "score", :integer # the score associated with this advice 
+    6      t.column "advice", :text # the advice to be given to the user
+    7    end
+
+/Users/louie/expertiza/db/migrate/017_create_assignments.rb:
+    6      t.column "name", :string
+    7      t.column "directory_path", :string
+    8:     t.column "submitter_count", :integer, limit: 8, :default => 0, :null => false
+    9:     t.column "course_id", :integer, :default => 0, :null => false
+   10:     t.column "instructor_id", :integer, :default => 0, :null => false
+   11      t.column "private", :boolean, :default => false, :null => false
+   12:     t.column "num_reviews", :integer, :default => 0, :null => false
+   13:     t.column "num_review_of_reviews", :integer, :default => 0, :null => false
+   14:     t.column "num_review_of_reviewers", :integer, :default => 0, :null => false
+   15:     t.column "review_strategy_id", :integer, :default => 0, :null => false
+   16:     t.column "mapping_strategy_id", :integer, :default => 0, :null => false
+   17:     t.column "review_questionnaire_id", :integer
+   18:     t.column "review_of_review_questionnaire_id", :integer
+   19      t.column "review_weight", :float
+   20      t.column "reviews_visible_to_all", :boolean
+   21      t.column "team_assignment", :boolean
+   22:     t.column "wiki_type_id", :integer
+   23      t.column "require_signup", :boolean
+   24:     t.column "num_reviewers", :integer, limit: 8, :default => 0, :null => false
+   25      t.column "spec_location", :text
+   26    end
+
+/Users/louie/expertiza/db/migrate/018_create_teams.rb:
+    3    create_table "teams", :force => true do |t|
+    4      t.column "name", :string
+    5:     t.column "assignment_id", :integer, :default => 0, :null => false
+    6    end
+    7  
+
+/Users/louie/expertiza/db/migrate/019_create_teams_users.rb:
+    2    def self.up
+    3    create_table "teams_users", :force => true do |t|
+    4:     t.column "team_id", :integer
+    5:     t.column "user_id", :integer
+    6    end
+    7  
+
+/Users/louie/expertiza/db/migrate/020_create_review_mappings.rb:
+    2    def self.up
+    3    create_table "review_mappings", :force => true do |t|
+    4:     t.column "author_id", :integer
+    5:     t.column "team_id", :integer
+    6:     t.column "reviewer_id", :integer
+    7:     t.column "assignment_id", :integer
+    8    end
+    9  
+
+/Users/louie/expertiza/db/migrate/021_create_reviews.rb:
+    2    def self.up
+    3    create_table "reviews", :force => true do |t|
+    4:     t.column "review_mapping_id", :integer
+    5:     t.column "review_num_for_author", :integer
+    6:     t.column "review_num_for_reviewer", :integer
+    7      t.column "ignore", :boolean, :default => 0
+    8      t.column "additional_comment", :text
+
+/Users/louie/expertiza/db/migrate/022_create_review_of_review_mappings.rb:
+    2    def self.up
+    3    create_table "review_of_review_mappings", :force => true do |t|
+    4:     t.column "review_mapping_id", :integer
+    5:     t.column "review_reviewer_id", :integer
+    6:     t.column "review_id", :integer
+    7:     t.column "assignment_id", :integer, limit: 8
+    8    end
+    9  
+
+/Users/louie/expertiza/db/migrate/023_create_survey_responses.rb:
+    2    def self.up
+    3      create_table "survey_responses", :force => true do |t|
+    4:       t.column "score", :integer, limit: 8
+    5        t.column "comments", :text
+    6:       t.column "assignment_id", :integer, limit: 8, :default => 0, :null => false
+    7:       t.column "question_id", :integer, limit: 8, :default => 0, :null => false
+    8:       t.column "survey_id", :integer, limit: 8, :default => 0, :null => false
+    9        t.column "email", :string
+   10      end
+
+/Users/louie/expertiza/db/migrate/024_create_review_feedbacks.rb:
+    2    def self.up
+    3    create_table "review_feedbacks", :force => true do |t|
+    4:     t.column "assignment_id", :integer
+    5:     t.column "review_id", :integer
+    6:     t.column "user_id", :integer
+    7      t.column "feedback_at", :datetime
+    8      t.column "txt", :text
+
+/Users/louie/expertiza/db/migrate/025_create_assignments_questionnaires.rb:
+    2    def self.up
+    3    create_table "assignments_questionnaires", :force => true do |t|
+    4:     t.column "questionnaire_id", :integer, :default => 0, :null => false
+    5:     t.column "assignment_id", :integer, :default => 0, :null => false
+    6    end
+    7  
+
+/Users/louie/expertiza/db/migrate/026_create_review_scores.rb:
+    2    def self.up
+    3    create_table "review_scores", :force => true do |t|
+    4:     t.column "review_id", :integer
+    5:     t.column "question_id", :integer
+    6:     t.column "score", :integer
+    7      t.column "comments", :text
+    8    end
+
+/Users/louie/expertiza/db/migrate/027_create_review_of_reviews.rb:
+    3    create_table "review_of_reviews", :force => true do |t|
+    4      t.column "reviewed_at", :datetime
+    5:     t.column "review_of_review_mapping_id", :integer
+    6:     t.column "review_num_for_author", :integer
+    7:     t.column "review_num_for_reviewer", :integer
+    8    end
+    9  
+
+/Users/louie/expertiza/db/migrate/028_create_review_of_review_scores.rb:
+    2    def self.up
+    3    create_table "review_of_review_scores", :force => true do |t|
+    4:     t.column "review_of_review_id", :integer
+    5:     t.column "question_id", :integer
+    6:     t.column "score", :integer
+    7      t.column "comments", :text
+    8    end
+
+/Users/louie/expertiza/db/migrate/029_create_participants.rb:
+    4      t.column "submit_allowed", :boolean, :default => true
+    5      t.column "review_allowed", :boolean, :default => true
+    6:     t.column "user_id", :integer
+    7:     t.column "assignment_id", :integer
+    8:     t.column "directory_num", :integer
+    9      t.column "submitted_at", :datetime
+   10      t.column "topic", :string
+   11      t.column "permission_granted", :boolean
+   12:     t.column "penalty_accumulated", :integer, limit: 8, :default => 0, :null => false
+   13      t.column "submitted_hyperlink", :string, limit: 100
+   14    end
+
+/Users/louie/expertiza/db/migrate/030_create_resubmission_times.rb:
+    2    def self.up
+    3    create_table "resubmission_times", :force => true do |t|
+    4:     t.column "participant_id", :integer
+    5      t.column "resubmitted_at", :datetime
+    6    end
+
+/Users/louie/expertiza/db/migrate/031_create_due_dates.rb:
+    3    create_table "due_dates", :force => true do |t|
+    4      t.column "due_at", :datetime
+    5:     t.column "deadline_type_id", :integer
+    6:     t.column "assignment_id", :integer
+    7:     t.column "late_policy_id", :integer
+    8:     t.column "submission_allowed_id", :integer
+    9:     t.column "review_allowed_id", :integer
+   10:     t.column "resubmission_allowed_id", :integer
+   11:     t.column "rereview_allowed_id", :integer
+   12:     t.column "review_of_review_allowed_id", :integer
+   13    end
+   14    
+
+/Users/louie/expertiza/db/migrate/032_author_feedback.rb:
+    1  class AuthorFeedback < ActiveRecord::Migration
+    2    def self.up
+    3:      add_column "assignments","author_feedback_questionnaire_id",:integer
+    4       
+    5       execute "ALTER TABLE assignments ADD CONSTRAINT `fk_assignments_author_feedback` FOREIGN KEY (author_feedback_questionnaire_id) REFERENCES questionnaire_types(id);"
+
+/Users/louie/expertiza/db/migrate/033_due_date_rounds.rb:
+    1  class DueDateRounds < ActiveRecord::Migration
+    2    def self.up
+    3:      add_column "due_dates","round",:integer
+    4    end
+    5  
+
+/Users/louie/expertiza/db/migrate/034_create_survey_deployments.rb:
+    3      create_table :survey_deployments do |t|
+    4        # Note: Table name pluralized by convention.
+    5:       t.column :course_evaluation_id, :integer  # the course to which this survey pertains.
+    6        t.column :start_date, :datetime  # the time when the survey was deployed
+    7        t.column :end_date, :datetime  # time that the survey ended
+    8:       t.column :num_of_students, :integer # no. of students participating in the survey
+    9        t.column :last_reminder, :datetime # last reminder date
+   10    end
+
+/Users/louie/expertiza/db/migrate/035_add_survey_deployment.rb:
+    1  class AddSurveyDeployment < ActiveRecord::Migration
+    2    def self.up
+    3:     add_column "survey_responses","survey_deployment_id",:integer
+    4      
+    5    end
+
+/Users/louie/expertiza/db/migrate/036_create_survey_participants.rb:
+    3      create_table :survey_participants do |t|
+    4        # Note: Table name pluralized by convention.
+    5:       t.column :user_id, :integer  # the user participating in the course evaluation.
+    6:       t.column :survey_deployment_id, :integer  # the survey deployment
+    7      end
+    8    end
+
+/Users/louie/expertiza/db/migrate/037_create_ta_mappings.rb:
+    2    def self.up
+    3      create_table :ta_mappings do |t|
+    4:       t.column :ta_id, :integer
+    5:       t.column :course_id, :integer
+    6      end
+    7      
+
+/Users/louie/expertiza/db/migrate/038_update_review_mappings.rb:
+    1  class UpdateReviewMappings < ActiveRecord::Migration
+    2      def self.up
+    3:     add_column "review_mappings","round",:integer
+    4      
+    5      execute "update review_mappings set round = -1"
+
+/Users/louie/expertiza/db/migrate/039_update_review_scores.rb:
+    1  class UpdateReviewScores < ActiveRecord::Migration
+    2    def self.up
+    3:     add_column "review_scores","questionnaire_type_id",:integer
+    4  
+    5      execute "ALTER TABLE review_scores 
+
+/Users/louie/expertiza/db/migrate/042_create_invitation_table.rb:
+    3      create_table :invitations do |t|
+    4        # Note: Table name pluralized by convention.
+    5:       t.column :assignment_id, :integer
+    6:       t.column :from_id, :integer
+    7:       t.column :to_id, :integer
+    8        t.column :reply_status, :char
+    9      end
+
+/Users/louie/expertiza/db/migrate/053_create_nodes.rb:
+    2    def self.up
+    3      create_table :nodes do |t|
+    4:       t.column :parent_id, :integer
+    5:       t.column :node_object_id, :integer
+    6        t.column :type, :string            
+    7      end           
+
+/Users/louie/expertiza/db/migrate/055_create_folder_nodes.rb:
+    2    def self.up
+    3      add_column :nodes, :name, :string
+    4:     add_column :nodes, :lft, :integer
+    5:     add_column :nodes, :rgt, :integer
+    6:     add_column :nodes, :depth, :integer
+    7  
+    8      TreeFolder.find_each do |folder|
+
+/Users/louie/expertiza/db/migrate/066_create_team_user_nodes.rb:
+   23      }
+   24      
+   25:     add_column :teams_users, :assignment_id, :integer
+   26    end
+   27  end
+
+/Users/louie/expertiza/db/migrate/067_update_participant_types.rb:
+   34    def self.down
+   35      create_table :courses_users do |t|
+   36:       t.column :user_id, :integer
+   37:       t.column :course_id, :integer
+   38        t.column :active, :boolean
+   39      end
+
+/Users/louie/expertiza/db/migrate/068_create_comments.rb:
+    2    def self.up
+    3      create_table :comments do |t|
+    4:       t.column :participant_id, :integer, :null => false
+    5        t.column :private, :boolean, :null => false
+    6        t.column :comment, :text, :null => false
+
+/Users/louie/expertiza/db/migrate/070_create_peer_reviews.rb:
+    3      create_table :peer_reviews do |t|
+    4        # Note: Table name pluralized by convention.
+    5:       t.column "reviewer_id", :integer
+    6:       t.column "reviewee_id", :integer
+    7:       t.column "assignment_id", :integer
+    8:       #t.column "team_id", :integer
+    9        t.column "additional_comment", :text
+   10      end
+   11      begin
+   12:       add_column :assignments, :peer_review_questionnaire_id, :integer
+   13      rescue
+   14      end
+
+/Users/louie/expertiza/db/migrate/071_create_peer_review_scores.rb:
+    3      create_table :peer_review_scores do |t|
+    4        # Note: Table name pluralized by convention.
+    5:       t.column "peer_review_id", :integer
+    6:       t.column "question_id", :integer
+    7:       t.column "score", :integer
+    8        t.column "comments", :text
+    9      end
+
+/Users/louie/expertiza/db/migrate/074_update_assignments_for_invitations.rb:
+    2    def self.up   
+    3      begin
+    4:       add_column :assignments, :team_count, :integer, :null => false, :default => 0
+    5      rescue
+    6      end
+
+/Users/louie/expertiza/db/migrate/079_rename_peer_reviews.rb:
+   50        
+   51      begin
+   52:        change_column :teammate_review_scores, :peer_review_id, :teammate_review_id, :integer, :null => true
+   53      rescue
+   54      end
+
+/Users/louie/expertiza/db/migrate/081_create_scores.rb:
+    2    def self.up
+    3      create_table :scores do |t|
+    4:       t.column :instance_id, :integer, :null => false
+    5:       t.column :question_id, :integer, :null => false
+    6:       t.column :questionnaire_type_id, :integer, :null => false
+    7:       t.column :score, :integer, :null => true
+    8        t.column :comments, :text      
+    9      end
+
+/Users/louie/expertiza/db/migrate/086_create_notifications.rb:
+    3          
+    4      create_table :notification_limits do |t|
+    5:       t.column :user_id, :integer, :null => false
+    6:       t.column :assignment_id, :integer, :null => true
+    7:       t.column :questionnaire_id, :integer, :null => true
+    8:       t.column :limit, :integer, :null => false, :default => 15          
+    9      end
+   10      
+
+/Users/louie/expertiza/db/migrate/087_create_questionnaire_weights.rb:
+    2    def self.up
+    3      create_table :questionnaire_weights do |t|
+    4:       t.column :assignment_id, :integer, :null => false
+    5:       t.column :questionnaire_id, :integer, :null => false
+    6        t.column :weight, :float, :null => false, :default => 0
+    7        t.column :type, :string
+
+/Users/louie/expertiza/db/migrate/093_add_reviewer_id_to_review_of_review_mappings.rb:
+    2    def self.up
+    3      begin
+    4:       add_column :review_of_review_mappings, :reviewer_id, :integer, :null => true
+    5      rescue
+    6      end
+
+/Users/louie/expertiza/db/migrate/096_create_teammate_review_mappings.rb:
+    2    def self.up
+    3      create_table :teammate_review_mappings do |t|
+    4:       t.column :reviewer_id, :integer, :null => false
+    5:       t.column :reviewee_id, :integer, :null => false
+    6:       t.column :reviewed_object_id, :integer, :null => false
+    7      end
+    8      
+    9:     add_column :teammate_reviews, :mapping_id, :integer, :null => false
+   10      records = ActiveRecord::Base.connection.select_all("select * from `teammate_reviews`")
+   11        
+   ..
+   60  
+   61    def self.down
+   62:     add_column :teammate_reviews, :reviewer_id, :integer, :null => false
+   63:     add_column :teammate_reviews, :reviewee_id, :integer, :null => false
+   64:     add_column :teammate_reviews, :assignment_id, :integer, :null => false
+   65      
+   66      TeammateReview.find_each{
+
+/Users/louie/expertiza/db/migrate/097_create_feedback_mappings.rb:
+    2    def self.up    
+    3      create_table :feedback_mappings do |t|
+    4:         t.column :reviewer_id, :integer, :null => false
+    5:         t.column :reviewee_id, :integer, :null => false
+    6:         t.column :reviewed_object_id, :integer, :null => false
+    7      end
+    8      
+    .
+   20               FOREIGN KEY (reviewee_id) references participants(id)"    
+   21      
+   22:     add_column :review_feedbacks, :mapping_id, :integer, :null => false     
+   23      records = ActiveRecord::Base.connection.select_all("select * from `review_feedbacks`")
+   24      
+   ..
+  101  
+  102    def self.down
+  103:     add_column :review_feedbacks, :review_id, :integer, :null => false
+  104:     add_column :review_feedbacks, :author_id, :integer, :null => false
+  105:     add_column :review_feedbacks, :team_id, :integer, :null => false
+  106:     add_column :review_feedbacks, :assignment_id, :integer, :null => false
+  107      
+  108      ReviewFeedback.find_each{
+
+/Users/louie/expertiza/db/migrate/099_standardize_review_of_review_mappings.rb:
+   15                           
+   16      
+   17:     add_column :review_of_review_mappings, :reviewee_id, :integer, :null => false
+   18      rename_column :review_of_review_mappings, :review_mapping_id, :reviewed_object_id
+   19  
+   ..
+   31      
+   32      remove_column :review_of_review_mappings, :review_reviewer_id           
+   33:     change_column :review_of_review_mappings, :reviewer_id, :integer, :null => false      
+   34:     change_column :review_of_review_mappings, :reviewed_object_id, :integer, :null => false
+   35      
+   36      execute "ALTER TABLE `review_of_review_mappings` 
+
+/Users/louie/expertiza/db/migrate/102_standardize_review_mappings.rb:
+   50       
+   51      rename_column :review_mappings, :reviewer_id, :old_reviewer_id
+   52:     add_column :review_mappings, :reviewer_id, :integer, :null => false
+   53:     add_column :review_mappings, :reviewee_id, :integer, :null => false
+   54      rename_column :review_mappings, :assignment_id, :reviewed_object_id
+   55      remove_column :review_mappings, :round
+
+/Users/louie/expertiza/db/migrate/108_create_questionnaire_folder_nodes.rb:
+    1  class CreateQuestionnaireFolderNodes < ActiveRecord::Migration
+    2    def self.up
+    3:     add_column :tree_folders, :parent_id, :integer, :null => true
+    4      
+    5      Node.where(['type in ("QuestionnaireTypeNode","QuestionnaireNode")']).find_each{
+
+/Users/louie/expertiza/db/migrate/109_cleanup_assignment_indices.rb:
+    2    # add/remove indices and foreign keys when appropriate
+    3    def self.up  
+    4:     change_column :assignments, :course_id, :integer, :null => true
+    5:     change_column :assignments, :instructor_id, :integer, :null => true
+    6:     change_column :assignments, :review_strategy_id, :integer, :null => true
+    7:     change_column :assignments, :mapping_strategy_id, :integer, :null => true
+    8      
+    9      Assignment.find_each{
+
+/Users/louie/expertiza/db/migrate/110_create_assignment_questionnaires.rb:
+    6      end
+    7      create_table :assignment_questionnaires do |t|
+    8:       t.column :assignment_id,        :integer, :null => true
+    9:       t.column :questionnaire_id,     :integer, :null => true
+   10:       t.column :user_id,              :integer, :null => true
+   11:       t.column :notification_limit,   :integer, :null => false, :default => 15
+   12:       t.column :questionnaire_weight, :integer, :null => false, :default => 0
+   13      end
+   14      
+
+/Users/louie/expertiza/db/migrate/112_create_response_maps.rb:
+    2    def self.up
+    3      create_table :response_maps do |t|
+    4:       t.column :reviewed_object_id, :integer, :null => false
+    5:       t.column :reviewer_id,        :integer, :null => false
+    6:       t.column :reviewee_id,        :integer, :null => false
+    7        t.column :type,               :string,  :null => false     
+    8      end     
+    .
+   16      
+   17      create_table :responses do |t|
+   18:       t.column :map_id, :integer, :null => false
+   19        t.column :additional_comment, :string, :null => true
+   20        t.column :created_at, :datetime, :null => true
+   ..
+   27               FOREIGN KEY (map_id) REFERENCES response_maps(id)'    
+   28      
+   29:     add_column :scores, :response_id, :integer, :null => true
+   30      
+   31      execute 'ALTER TABLE `scores`
+
+/Users/louie/expertiza/db/migrate/115_create_score_caches.rb:
+    2    def self.up
+    3      create_table :score_caches do |t|
+    4:           t.column "object_id", :integer, :default => 0, :null => false          
+    5:           t.column "assignment_id", :integer, :default => 0, :null => true
+    6:           t.column "course_id", :integer, :default => 0, :null => true
+    7            t.column "score", :float, :default => 0, :null => false
+    8            t.column "range", :string, :default => ""         
+
+/Users/louie/expertiza/db/migrate/116_create_sign_up_topics.rb:
+    3      create_table :sign_up_topics do |t|
+    4        t.column :topic_name, :text, :null => false
+    5:       t.column :assignment_id, :integer, :null => false
+    6:       t.column :max_choosers, :integer, :null => false
+    7        t.column :category, :text
+    8        t.column :topic_identifier, :string, :limit => 10
+
+/Users/louie/expertiza/db/migrate/117_create_signed_up_users.rb:
+    2    def self.up
+    3      create_table :signed_up_users do |t|
+    4:       t.column :topic_id, :integer, :null => false
+    5:       t.column :creator_id, :integer, :null => false
+    6        t.column :is_waitlisted, :boolean, :null => false
+    7:       t.column :preference_priority_number, :integer      
+    8      end
+    9  
+
+/Users/louie/expertiza/db/migrate/119_create_topic_dependencies.rb:
+    2    def self.up
+    3      create_table :topic_dependencies do |t|
+    4:       t.column :topic_id, :integer, :null => false
+    5        t.column :dependent_on, :string, :null => false        
+    6      end
+
+/Users/louie/expertiza/db/migrate/125_add_flag_thre_to_due_dates.rb:
+    2    def self.up
+    3      add_column :due_dates, :flag, :boolean, :default => false
+    4:     add_column :due_dates, :threshold, :integer, :default => 1   
+    5    end
+    6  
+
+/Users/louie/expertiza/db/migrate/126_update_cache.rb:
+    8  
+    9    def self.down
+   10:     add_column :score_caches, :assignemnt_id, :integer
+   11      rename_column :score_caches, :reviewee_id, :object_id
+   12:     add_column :score_caches, :course_id, :integer
+   13    end
+   14  end
+
+/Users/louie/expertiza/db/migrate/128_create_leaderboards.rb:
+    2     def self.up
+    3       create_table :leaderboards do |t|
+    4:        t.column :questionnaire_type_id, :integer
+    5         t.column :name, :string
+    6         t.column :qtype, :string
+
+/Users/louie/expertiza/db/migrate/131_rename_fields_in_assignments.rb:
+    5      rescue
+    6      end
+    7:     add_column :assignments, :days_between_submissions, :integer
+    8    end
+    9  
+
+/Users/louie/expertiza/db/migrate/133_add_topic_id_to_participants.rb:
+    1  class AddTopicIdToParticipants < ActiveRecord::Migration
+    2    def self.up
+    3:     add_column :participants, :topic_id, :integer, :null => true  
+    4    end
+    5  
+
+/Users/louie/expertiza/db/migrate/134_create_topic_deadlines.rb:
+    3      create_table :topic_deadlines do |t|
+    4        t.column "due_at", :datetime
+    5:       t.column "deadline_type_id", :integer
+    6:       t.column "topic_id", :integer
+    7:       t.column "late_policy_id", :integer
+    8:       t.column "submission_allowed_id", :integer
+    9:       t.column "review_allowed_id", :integer
+   10:       t.column "resubmission_allowed_id", :integer
+   11:       t.column "rereview_allowed_id", :integer
+   12:       t.column "review_of_review_allowed_id", :integer
+   13:       t.column "round", :integer
+   14      end
+   15  
+
+/Users/louie/expertiza/db/migrate/20101116184602_add_dynamic_review_fields_to_assignments.rb:
+    2    def self.up
+    3      add_column :assignments, :dynamic_reviewer_assignments_enabled, :boolean, :default => 0
+    4:     add_column :assignments, :dynamic_reviewer_response_time_limit_hours, :integer
+    5    end
+    6  
+
+/Users/louie/expertiza/db/migrate/20101205034327_add_self_selected_review_fields.rb:
+    2    def self.up
+    3      add_column :assignments, :user_selected_dynamic_reviewer_assignments_enabled, :boolean, :default => 0
+    4:     add_column :assignments, :max_dynamic_reviews_per_submission, :integer, :default => 3
+    5    end
+    6  
+
+/Users/louie/expertiza/db/migrate/20101214034327_update_review_fields.rb:
+    2    def self.up
+    3      add_column :assignments, :review_assignment_strategy, :string
+    4:     add_column :assignments, :max_reviews_per_submission, :integer
+    5      remove_column :assignments, :dynamic_reviewer_response_time_limit_hours
+    6      remove_column :response_maps, :potential_response_deadline
+    .
+   14      add_column :response_maps, :potential_response_deadline, :datetime, :null => true
+   15      add_column :assignments, :dynamic_reviewer_assignments_enabled, :boolean, :default => 0
+   16:     add_column :assignments, :dynamic_reviewer_response_time_limit_hours, :integer    
+   17      add_column :assignments, :user_selected_dynamic_reviewer_assignments_enabled, :boolean, :default => 0
+   18:     add_column :assignments, :max_dynamic_reviews_per_submission, :integer, :default => 3
+   19    end
+   20  end
+
+/Users/louie/expertiza/db/migrate/20110323134426_drop_review_and_mapping_strategies.rb:
+   20      end
+   21  
+   22:     add_column :assignments, :review_strategy_id, :integer
+   23:     add_column :assignments, :mapping_strategy_id, :integer
+   24  
+   25      execute "ALTER TABLE `assignments` 
+
+/Users/louie/expertiza/db/migrate/20110410232719_topic_review_threshold.rb:
+    1  class TopicReviewThreshold < ActiveRecord::Migration
+    2    def self.up
+    3:     add_column :assignments, :review_topic_threshold, :integer, :default => 0
+    4    end
+    5  
+
+/Users/louie/expertiza/db/migrate/20111101035638_update_assignment_add_rounds.rb:
+    1  class UpdateAssignmentAddRounds < ActiveRecord::Migration
+    2    def self.up
+    3:     add_column :assignments, :rounds_of_reviews, :integer, :default => 1
+    4    end
+    5  
+
+/Users/louie/expertiza/db/migrate/20111122004351_create_join_team_requests.rb:
+    2    def self.up
+    3      create_table :join_team_requests do |t|
+    4:       t.column :participant_id, :integer
+    5:       t.column :team_id, :integer
+    6        t.column :comments, :text
+    7        t.column :status, :char
+
+/Users/louie/expertiza/db/migrate/20111129204549_add_micropayment_to_sign_up_topic.rb:
+    1  class AddMicropaymentToSignUpTopic < ActiveRecord::Migration
+    2    def self.up
+    3:     add_column :sign_up_topics, :micropayment, :integer
+    4    end
+    5  
+
+/Users/louie/expertiza/db/migrate/20111129215405_create_question_types.rb:
+    4        t.column "q_type", :string, :null => false # the type of custom question
+    5        t.column "parameters", :string # parameters for a given question
+    6:       t.column "question_id", :integer, :default => 1, :null => false # Questionnaire Type join
+    7      end
+    8  
+
+/Users/louie/expertiza/db/migrate/20111202011414_update_micropayment_to_sign_up_topic.rb:
+    2    def self.up
+    3  
+    4:    change_column :sign_up_topics, :micropayment, :integer, :default => 0
+    5     #SignUpTopic.update_all ["micropayment", 0]
+    6    end
+
+/Users/louie/expertiza/db/migrate/20120829054506_add_delayed_job_id_to_duedates.rb:
+    1  class AddDelayedJobIdToDuedates < ActiveRecord::Migration
+    2    def self.up
+    3:     add_column :due_dates, :delayed_job_id, :integer
+    4    end
+    5  
+
+/Users/louie/expertiza/db/migrate/20121116074455_create_topics_bmappings.rb:
+    3      if(table_exists?(:bmappings_sign_up_topics)==false)
+    4      create_table :bmappings_sign_up_topics, :id=>false do |t|
+    5:     	t.column "sign_up_topic_id", :integer, :null=> false
+    6:     	t.column "bmapping_id", :integer, :null => false    	
+    7      end
+    8      end
+
+/Users/louie/expertiza/db/migrate/20121116153522_create_bookmarks.rb:
+    5  
+    6          t.column "url", :string, :null => false
+    7:         t.column "discoverer_user_id", :integer, :null=> false
+    8:         t.column "user_count", :integer, :null => false
+    9  
+   10        t.timestamps
+
+/Users/louie/expertiza/db/migrate/20121116154051_create_bmapping_ratings.rb:
+    3      if(table_exists?(:bmapping_ratings)==false)
+    4      create_table :bmapping_ratings do |t|
+    5:       t.column "bmapping_id", :integer, :null=> false
+    6:       t.column "user_id", :integer, :null => false
+    7:       t.column "rating", :integer, :null => false
+    8        t.timestamps
+    9      end
+
+/Users/louie/expertiza/db/migrate/20121116154318_create_bmappings.rb:
+    3      if(table_exists?(:bmappings)==false)
+    4      create_table :bmappings do |t|
+    5:       t.column "bookmark_id", :integer, :null =>false
+    6        t.column "title", :string
+    7:       t.column "user_id", :integer, :null => false
+    8        t.column "description", :string
+    9        t.column "date_created", :datetime, :null=>false
+
+/Users/louie/expertiza/db/migrate/20121116154625_create_bmapping_tags.rb:
+    3      if(table_exists?(:bmappings_tags)==false)
+    4      create_table :bmappings_tags do |t|
+    5:       t.column "tag_id", :integer, :null=> false
+    6:       t.column "bmapping_id", :integer, :null => false
+    7        t.timestamps
+    8      end
+
+/Users/louie/expertiza/db/migrate/20121116154802_create_bookmark_rating_rubrics.rb:
+    4      create_table :bookmark_rating_rubrics do |t|
+    5        t.column "display_text", :string, :null => false
+    6:       t.column "minimum_rating", :integer, :null=> false
+    7:       t.column "maximum_rating", :integer, :null => false
+    8        t.timestamps
+    9      end
+
+/Users/louie/expertiza/db/migrate/20121204121644_add_bookmark_rating_rubric_id_to_signup_topic.rb:
+    2    def self.up
+    3      #if(column_exists?(:sign_up_topics, :bookmark_rating_rubric_id)==false)
+    4:     add_column :sign_up_topics, :bookmark_rating_rubric_id, :integer, :default => nil
+    5      #end
+    6    end
+
+/Users/louie/expertiza/db/migrate/20131112015931_add_num_quiz_questions_to_assignments.rb:
+    1  class AddNumQuizQuestionsToAssignments < ActiveRecord::Migration
+    2    def self.up
+    3:     add_column :assignments, :num_quiz_questions, :integer, :default => 0, :null => false
+    4    end
+    5  
+
+/Users/louie/expertiza/db/migrate/20131112020213_add_quiz_allowed_id_to_due_dates.rb:
+    1  class AddQuizAllowedIdToDueDates < ActiveRecord::Migration
+    2    def self.up
+    3:     add_column :due_dates, :quiz_allowed_id, :integer
+    4    end
+    5  
+
+/Users/louie/expertiza/db/migrate/20131112020506_add_rating_of_difficulty_to_questions.rb:
+    2    def self.up
+    3      add_column :questions, :average_difficulty_rating, :float, :default => 0
+    4:     add_column :questions, :number_of_ratings, :integer, :default => 0
+    5    end
+    6  
+
+/Users/louie/expertiza/db/migrate/20131117022508_add_initial_and_final_line_number_to_review_comments.rb:
+    1  class AddInitialAndFinalLineNumberToReviewComments < ActiveRecord::Migration
+    2    def self.up
+    3:     add_column :review_comments, :initial_line_number, :integer
+    4:     add_column :review_comments, :last_line_number, :integer
+    5    end
+    6  
+
+/Users/louie/expertiza/db/migrate/20131124173258_alter_assignments.rb:
+    1  class AlterAssignments < ActiveRecord::Migration
+    2    def self.up
+    3:     add_column "assignments", "selfreview_questionnaire_id",:integer
+    4:     add_column "assignments", "managerreview_questionnaire_id", :integer
+    5:     add_column "assignments", "readerreview_questionnaire_id",:integer
+    6    end
+    7  
+
+/Users/louie/expertiza/db/migrate/20131201172300_assignments_add_columns.rb:
+    3    def self.up
+    4      add_column :assignments, :calculate_penalty, :boolean, :null => false, :default => FALSE
+    5:     add_column :assignments, :late_policy_id, :integer, :null => true
+    6      add_column :assignments, :is_penalty_calculated, :boolean, :null => false, :default => FALSE
+    7  
+
+/Users/louie/expertiza/db/migrate/20131201172400_late_policies_add_columns.rb:
+    5      change_column :late_policies, :penalty_per_unit, :float
+    6  
+    7:     add_column :late_policies, :times_used, :integer, :null => false, :default => 0
+    8:     add_column :late_policies, :instructor_id, :integer, :null => false
+    9      add_column :late_policies, :policy_name, :string, :null => false
+   10  
+   ..
+   28  
+   29      add_column :late_policies, :expressed_as_percentage, :boolean
+   30:     add_column :late_policies, :penalty_period_in_minutes, :integer
+   31  
+   32      add_index "late_policies", ["penalty_period_in_minutes"], :name => "penalty_period_length_unit"
+   ..
+   38      remove_column :late_policies, :policy_name
+   39  
+   40:     change_column :late_policies, :penalty_per_unit, :integer
+   41  
+   42    end
+
+/Users/louie/expertiza/db/migrate/20131201172600_create_calculated_penalties.rb:
+    2    def self.up
+    3      create_table "calculated_penalties", :force => true do |t|
+    4:       t.column "participant_id", :integer
+    5:       t.column "deadline_type_id", :integer
+    6:       t.column "penalty_points", :integer
+    7      end
+    8    end
+
+/Users/louie/expertiza/db/migrate/20131201172700_remove_late_policy_due_date.rb:
+    6  
+    7    def self.down
+    8:     add_column :due_dates, :late_policy_id, :integer
+    9      execute "ALTER TABLE due_dates ADD CONSTRAINT `fk_due_date_late_policies` FOREIGN KEY (late_policy_id) REFERENCES late_policies(id);"
+   10    end
+
+/Users/louie/expertiza/db/migrate/20131201175200_create_quiz_question_choices.rb:
+    2    def self.up
+    3      create_table "quiz_question_choices", :force => true do |t|
+    4:       t.column "question_id", :integer # the question to which this advice belongs
+    5        t.column "txt", :text # the choice to be given to the user
+    6        t.column "iscorrect", :boolean, :default => false # the correctness of this choice to be given to the user
+
+/Users/louie/expertiza/db/migrate/20131205154647_remove_average_difficulty_rating_and_number_of_ratings_from_questions.rb:
+    6  
+    7    def self.down
+    8:     add_column :questions, :number_of_ratings, :integer
+    9      add_column :questions, :average_difficulty_rating, :float
+   10    end
+
+/Users/louie/expertiza/db/migrate/20131205185858_add_participant_id_to_quiz_response.rb:
+    1  class AddParticipantIdToQuizResponse < ActiveRecord::Migration
+    2    def self.up
+    3:     add_column :quiz_responses, :participant_id, :integer
+    4    end
+    5  
+
+/Users/louie/expertiza/db/migrate/20140808212437_add_categories.rb:
+    2    def self.up
+    3      # add_column :nodes, :name, :string
+    4:     # add_column :nodes, :lft, :integer
+    5:     # add_column :nodes, :rgt, :integer
+    6:     # add_column :nodes, :depth, :integer
+    7    end
+    8  
+
+/Users/louie/expertiza/db/migrate/20141126144930_add_priority_to_bids.rb:
+    1  class AddPriorityToBids < ActiveRecord::Migration
+    2    def self.up
+    3:     add_column :bids, :priority, :integer
+    4    end
+    5  
+    6    def self.down
+    7:   	remove_column :bids, :priority, :integer
+    8    end
+    9  end
+
+/Users/louie/expertiza/db/migrate/20141203001749_add_max_bids_to_assigments.rb:
+    1  class AddMaxBidsToAssigments < ActiveRecord::Migration
+    2    def self.up
+    3:     add_column :assignments, :max_bids, :integer
+    4    end
+    5  
+    6    def self.down
+    7:   	remove_column :assignments, :max_bids, :integer
+    8    end
+    9  end
+
+/Users/louie/expertiza/db/migrate/20150105172921_add_used_in_round_to_assignment_questionnaires.rb:
+    1  class AddUsedInRoundToAssignmentQuestionnaires < ActiveRecord::Migration
+    2    def self.up
+    3:     add_column "assignment_questionnaires","used_in_round",:integer
+    4  
+    5    end
+
+/Users/louie/expertiza/db/migrate/20150106104625_add_round_to_response_maps.rb:
+    1  class AddRoundToResponseMaps < ActiveRecord::Migration
+    2    def self.up
+    3:     add_column "response_maps","round",:integer
+    4    end
+    5  
+    6    def self.down
+    7:     remove_column "response_maps","round", :integer
+    8    end
+    9  end
+
+/Users/louie/expertiza/db/migrate/20150702170648_add_private_to_to_sign_up_topics.rb:
+    1  class AddPrivateToToSignUpTopics < ActiveRecord::Migration
+    2    def self.up
+    3:     add_column "sign_up_topics","private_to",:integer, :default => nil
+    4    end
+    5  
+
+/Users/louie/expertiza/db/migrate/20150714012523_add_institution_id_to_courses.rb:
+    1  class AddInstitutionIdToCourses < ActiveRecord::Migration
+    2    def self.up
+    3:     add_column "courses","institutions_id",:integer, :default => nil
+    4    end
+    5  
+
+/Users/louie/expertiza/db/migrate/20150714162923_remove_require_signup_from_assignments.rb:
+    2    def change
+    3      remove_column "assignments","require_signup"
+    4:     add_column "assignments","availability_flag",:integer, :default => 1
+    5    end
+    6  end
+
+/Users/louie/expertiza/db/migrate/20150812190750_create_round_field_in_response.rb:
+    1  class CreateRoundFieldInResponse < ActiveRecord::Migration
+    2    def change
+    3:     add_column :responses, :round, :integer
+    4    end
+    5  end
+
+/Users/louie/expertiza/db/migrate/20150827170101_add_teammate_review_allowed_id_to_due_dates_table.rb:
+    1  class AddTeammateReviewAllowedIdToDueDatesTable < ActiveRecord::Migration
+    2    def self.up
+    3:   	add_column :due_dates, :teammate_review_allowed_id, :integer, default: 3
+    4    end
+    5  
+
+/Users/louie/expertiza/db/migrate/20151124114752_add_institution_to_users.rb:
+    1  class AddInstitutionToUsers < ActiveRecord::Migration
+    2    def change
+    3:     add_column :users, :institutions_id, :integer
+    4    end
+    5  end
+
+/Users/louie/expertiza/db/migrate/20151228191257_add_hyperlinks_and_dir_num_to_teams.rb:
+    2    def change
+    3      add_column :teams, :submitted_hyperlinks, :text
+    4:     add_column :teams, :directory_num, :integer
+    5  
+    6      teams=AssignmentTeam.all
+
+/Users/louie/expertiza/db/migrate/20160912034350_add_grade_for_reviewer_and_comment_for_reviewer_in_participants_table.rb:
+    1  class AddGradeForReviewerAndCommentForReviewerInParticipantsTable < ActiveRecord::Migration
+    2    def self.up
+    3:   	add_column :participants, :grade_for_reviewer, :integer, default: nil
+    4    	add_column :participants, :comment_for_reviewer, :string, default: ''
+    5    end
+
+/Users/louie/expertiza/db/migrate/20161008030832_add_grade_for_submission_and_comment_for_submission_in_teams_table.rb:
+    1  class AddGradeForSubmissionAndCommentForSubmissionInTeamsTable < ActiveRecord::Migration
+    2    def self.up
+    3:   	add_column :teams, :grade_for_submission, :integer, default: nil
+    4    	add_column :teams, :comment_for_submission, :text, default: nil
+    5    end
+
+/Users/louie/expertiza/db/migrate_save/001_initial_setup.rb:
+   14      create_table 'site_controllers', :force => false do |t|
+   15        t.column 'name', :string, :default => '', :null => false
+   16:       t.column 'permission_id', :integer, :default => 0, :null => false
+   17:       t.column 'builtin', :integer, :default => 0
+   18      end
+   19  
+   ..
+   24        t.column 'title', :string
+   25        t.column 'name', :string, :default => '', :null => false
+   26:       t.column 'markup_style_id', :integer
+   27        t.column 'content', :text
+   28:       t.column 'permission_id', :integer, :default => 0, :null => false
+   29        t.column 'created_at', :timestamp
+   30        t.column 'updated_at', :timestamp
+   ..
+   36  
+   37      create_table 'controller_actions', :force => false do |t|
+   38:       t.column 'site_controller_id', :integer, :default => 0, :null => false
+   39        t.column 'name', :string, :default => '', :null => false
+   40:       t.column 'permission_id', :integer
+   41      end
+   42  
+   ..
+   46  
+   47      create_table 'menu_items', :force => false do |t|
+   48:       t.column 'parent_id', :integer
+   49        t.column 'name', :string, :default => '', :null => false
+   50        t.column 'label', :string, :default => '', :null => false
+   51:       t.column 'seq', :integer
+   52:       t.column 'controller_action_id', :integer
+   53:       t.column 'content_page_id', :integer
+   54      end
+   55  
+   ..
+   61      create_table 'roles', :force => false do |t|
+   62        t.column 'name', :string, :default => '', :null => false
+   63:       t.column 'parent_id', :integer
+   64        t.column 'description', :string, :limit => 255, :default => '', :null => false
+   65:       t.column 'default_page_id', :integer
+   66        t.column 'cache', :text
+   67        t.column 'created_at', :timestamp
+   ..
+   74  
+   75      create_table 'roles_permissions', :force => false do |t|
+   76:       t.column 'role_id', :integer, :default => 0, :null => false
+   77:       t.column 'permission_id', :integer, :default => 0, :null => false
+   78      end
+   79  
+   ..
+   86        t.column 'site_subtitle', :string
+   87        t.column 'footer_message', :string, :default => ''
+   88:       t.column 'public_role_id', :integer, :default => 0, :null => false
+   89:       t.column 'session_timeout', :integer, :default => 0, :null => false
+   90:       t.column 'default_markup_style_id', :integer, :default => 0
+   91:       t.column 'site_default_page_id', :integer, :default => 0, :null => false
+   92:       t.column 'not_found_page_id', :integer, :default => 0, :null => false
+   93:       t.column 'permission_denied_page_id', :integer, :default => 0, :null => false
+   94:       t.column 'session_expired_page_id', :integer, :default => 0, :null => false
+   95:       t.column 'menu_depth', :integer, :default => 0, :null => false
+   96      end
+   97  
+   ..
+  106        t.column 'name', :string, :default => '', :null => false
+  107        t.column 'password', :string, :limit => 40, :default => '', :null => false
+  108:       t.column 'role_id', :integer, :default => 0, :null => false
+  109      end
+  110  
+
+/Users/louie/expertiza/db/migrate_save/004_create_users.rb:
+    5      # t.column :first_name, :string, :limit=>30  -- subsumed by "fullname" in Goldberg data model (we may want to add this in future
+    6      # t.column :last_name, :string, :limit=>30   -- subsumed by "fullname" in Goldberg data model   "  "
+    7:     # t.column :role_id, :integer -- already included in Goldberg table
+    8:     add_column :parent_id, :integer # for an instructor, the id in this table of the administrator who created the acct for the instructor; otherwise, empty
+    9      add_column :home_directory_path, :string # for an instructor, the home directory above which (s)he is not allowed access; otherwise empty
+   10      add_column :mru_directory_path, :string, :limit => 128 # for an instructor, the directory that (s)he was working in the previous time he used the system; this is the pathname relative to the home_directory_path; empty for a non-instructor
+
+/Users/louie/expertiza/db/migrate_save/005_modify_users.rb:
+    3      # t.column :username, :string, :limit=>32  --  called "name" in Goldberg
+    4      # t.column :password, :string -- already included in Goldberg table
+    5:     add_column :institution_id, :integer # reference to an entry in institutions table, referring to the institution at which this user is registered ... this tells format of record to be uploaded & prevents usernames from diff. insts. from clashing
+    6      # t.column :first_name, :string, :limit=>30  -- subsumed by "fullname" in Goldberg data model (we may want to add this in future
+    7      # t.column :last_name, :string, :limit=>30   -- subsumed by "fullname" in Goldberg data model   "  "
+    8:     # t.column :role_id, :integer -- already included in Goldberg table
+    9:     add_column :users, :parent_id, :integer # for an instructor, the id in this table of the administrator who created the acct for the instructor; otherwise, empty
+   10      add_column :users, :private_by_default, :boolean # whether assgts. & questionnaires created by this instructor should be private (i.e., not viewable by others).  Can be overridden when creating a new one.
+   11      # We used to have a home_directory_path column, but now we are just using the user name in place of the home_directory_path
+
+/Users/louie/expertiza/db/migrate_save/006_create_late_policies.rb:
+    3      create_table :late_policies do |t|
+    4        # t.column :name, :string
+    5:         t.column :penalty_period_in_minutes, :integer  # length of penalty period, expressed in minutes; e.g., if penalty is per hour, value here is 60
+    6: 	t.column :penalty_per_unit, :integer # how many points or how many percent deducted for each unit (above) late
+    7  	t.column :expressed_as_percentage, :boolean # if false, then penalty is expressed in (absolute) points
+    8:     t.column :max_penalty, :integer # the maximum penalty for not doing the work for this deadline; a value of 0 here means that the maximum penalty is a score of 0 on the assignment; a negative value means that the penalty is unlimited
+    9      end
+   10    end
+
+/Users/louie/expertiza/db/migrate_save/009_create_questionnaires.rb:
+    3      create_table :questionnaires do |t|
+    4        t.column :name, :string, :limit=>64
+    5:       t.column :instructor_id, :integer # id of instructor who created the questionnaire
+    6        t.column :private, :boolean  # whether questionnaire is visible to other instructors
+    7:       t.column :min_question_score, :integer # the minimum score that the reviewer can give for a question in this questionnaire
+    8:       t.column :max_question_score, :integer # the maximum score that the reviewer can give for a question in this questionnaire
+    9      end
+   10      execute "alter table questionnaires
+
+/Users/louie/expertiza/db/migrate_save/010_create_questions.rb:
+    4        t.column :txt, :text
+    5        t.column :true_false, :boolean  # either it's a true/false question, or it's a question that is to be given a numeric score
+    6:       t.column :weight, :integer
+    7:       t.column :questionnaire_id, :integer
+    8      end
+    9      execute "alter table questions
+
+/Users/louie/expertiza/db/migrate_save/011_create_assignments.rb:
+    4  	t.column :name, :string
+    5  	t.column :directory_path, :string
+    6: 	t.column :submitter_count, :integer, :default => 0 # number of people who have submitted to this assgt. so far; initialized to 0
+    7:     t.column :course_id, :integer # id of course (if any) that this assignment is associated with
+    8: 	t.column :instructor_id, :integer # id of instructor who created the assignment
+    9  	t.column :private, :boolean  # whether assignment is visible to other instructors
+   10:     t.column :num_reviewers, :integer # number of people who review each submission for this assgt.
+   11:     t.column :num_review_of_reviewers, :integer # number of people who review each review for this assgt.
+   12: 	t.column :review_questionnaire_id, :integer
+   13: 	t.column :review_of_review_questionnaire_id, :integer
+   14  	t.column :review_weight, :float # the percentage that reviews count for; the balance of grade depends on reviews of reviews
+   15  	t.column :reviews_visible_to_all, :boolean # if false, other reviewers can't see this reviewer's review
+
+/Users/louie/expertiza/db/migrate_save/012_create_due_dates.rb:
+    3      create_table :due_dates do |t|
+    4  	t.column :due_at, :datetime
+    5: 	t.column :deadline_type_id, :integer # whether a submission deadline, a review deadline, etc.
+    6: 	t.column :assignment_id, :integer # the assignment that this due date pertains to
+    7: 	t.column :late_policy_id, :integer # specifies how many points/percent taken off for a particular amt. of lateness
+    8: 	t.column :submission_allowed_id, :integer # this is "OK", "Late" or "No", depending on whether submission is allowed before this due date
+    9: 	t.column :review_allowed_id, :integer # this is "OK", "Late" or "No", depending on whether reviewing is allowed before this due date
+   10: 	t.column :resubmission_allowed_id, :integer
+   11: 	t.column :rereview_allowed_id, :integer # controls whether a version submitted since last review deadline may be reviewed now
+   12: 	t.column :review_of_review_allowed_id, :integer
+   13      end
+   14      execute "alter table due_dates
+
+/Users/louie/expertiza/db/migrate_save/013_create_participants.rb:
+    4        t.column :submit_allowed, :boolean  # true if user is allowed to submit to this assignment
+    5        t.column :review_allowed, :boolean
+    6:       t.column :user_id, :integer
+    7:       t.column :assignment_id, :integer
+    8:       t.column :directory_num, :integer  # number of user's submission directory for this assignment
+    9        t.column :submitted_at, :datetime # time that original version was submitted, i.e., time that the _last_ file was submitted to that version
+   10        # note that lateness of REsubmissions is tracked in the resubmission_times table.  The lateness of resubmissions is cumulative; e.g., if you're late by 2 days on the first resubmission and late by 1 day on the second, you're late by 3 days on resubmissions overall
+
+/Users/louie/expertiza/db/migrate_save/015_create_review_mappings.rb:
+    3    def self.up
+    4      create_table :review_mappings do |t|
+    5:       t.column :author_id, :integer # if an individual is being reviewed, this field is non-null, otherwise is null
+    6:       t.column :team_id, :integer   # if a team is being reviewed, this field is non-null, otherwise is null
+    7:       t.column :reviewer_id, :integer
+    8:       t.column :assignment_id, :integer  # assignment that is being reviewed
+    9      end
+   10      execute "alter table review_mappings 
+
+/Users/louie/expertiza/db/migrate_save/016_create_reviews.rb:
+    4      create_table :reviews do |t|
+    5        t.column :reviewed_at, :datetime  # time that the review was saved
+    6:       t.column :review_mapping_id, :integer  # the entry in the review_mappings table identifies reviewer and reviewee
+    7:       t.column :review_num_for_author, :integer  # on author's review page, the review is listed as having this number
+    8:       t.column :review_num_for_reviewer, :integer  # on reviewer's review page, the review is listed as having this number
+    9  	# Understand that, in dynamically mapped reviews, reviewer A may review authors B and C, and may be the first
+   10  	# person to review both B and C.  So (s)he will be B's reviewer number 1 and C's reviewer number 1.  However, B
+
+/Users/louie/expertiza/db/migrate_save/017_create_review_scores.rb:
+    2    def self.up
+    3      create_table :review_scores do |t|
+    4:       t.column :review_id, :integer
+    5:       t.column :question_id, :integer
+    6:       t.column :score, :integer
+    7        t.column :comments, :text
+    8      end
+
+/Users/louie/expertiza/db/migrate_save/018_create_courses_users.rb:
+    6      # would become inaccessible to PG.
+    7      create_table :courses_users do |t|
+    8:       t.column :user_id, :integer
+    9:       t.column :course_id, :integer
+   10        t.column :active, :boolean  # whether user is still actively enrolled in course
+   11      end
+
+/Users/louie/expertiza/db/migrate_save/020_teams_users.rb:
+    2    def self.up
+    3      create_table :teams_users do |t|  # maps users to teams; in rare cases, a single individual is on > 1 team for an assgt.
+    4:       t.column :team_id, :integer
+    5:       t.column :user_id, :integer
+    6      end
+    7      execute "alter table teams_users 
+
+/Users/louie/expertiza/db/migrate_save/021_create_resubmission_times.rb:
+    2    def self.up
+    3      create_table :resubmission_times do |t|
+    4:       t.column :participant_id, :integer
+    5        t.column :resubmitted_at, :datetime
+    6      end
+
+/Users/louie/expertiza/db/migrate_save/022_create_review_feedbacks.rb:
+    3      create_table :review_feedbacks do |t|
+    4        # Note: Table name pluralized by convention.  Do *NOT* refer to "feedbacks" in any documentation!
+    5:       t.column :assignment_id, :integer  # the assignment to which this feedback pertains.
+    6:       t.column :review_id, :integer  # the review to which this feedback pertains; if it is null, the feedback is general, for all reviewers.
+    7:       t.column :user_id, :integer # ID of the user making the feedback.  Typically this will be the author of the submission, but it may be, e.g., the instructor or TA.
+    8        t.column :feedback_at, :datetime  # time that the feedback was saved
+    9        t.column :txt, :text
+
+/Users/louie/expertiza/db/migrate_save/023_create_review_of_review_mappings.rb:
+    3    def self.up
+    4      create_table :review_of_review_mappings do |t|
+    5:       t.column :review_mapping_id, :integer # the review that is being reviewed.  Note that the review_mapping_id allows us to retrieve reviews done by a particular reviewer of *all* versions of an author's submission.
+    6:       t.column :reviewer_id, :integer  # the id of the user reviewing this review.
+    7:       t.column :review_id, :integer  # review that is being reviewed
+    8      end
+    9      execute "alter table review_of_review_mappings
+
+/Users/louie/expertiza/db/migrate_save/024_create_review_of_reviews.rb:
+    4      create_table :review_of_reviews do |t|
+    5        t.column :reviewed_at, :datetime  # time that the review of review was saved
+    6:       t.column :review_of_review_mapping_id, :integer  # the entry in the review_of_review_mappings table that identifies reviewer and review
+    7:       t.column :review_num_for_author, :integer  # on reviewee's review page, the review is listed as having this number
+    8:       t.column :review_num_for_reviewer, :integer  # on reviewer's review page, the review is listed as having this number
+    9  	# Understand that, in dynamically mapped reviews, reviewer A may review reviewees B and C, and may be the first
+   10  	# entity to review both B and C.  So (s)he will be B's reviewer number 1 and C's reviewer number 1.  However, B
+
+/Users/louie/expertiza/db/migrate_save/025_create_review_of_review_scores.rb:
+    2    def self.up
+    3      create_table :review_of_review_scores do |t|
+    4:       t.column :review_of_review_id, :integer
+    5:       t.column :question_id, :integer
+    6:       t.column :score, :integer
+    7        t.column :comments, :text
+    8      end
+
+/Users/louie/expertiza/db/migrate_save/026_create_question_advices.rb:
+    2    def self.up
+    3      create_table :question_advices do |t|
+    4:       t.column :question_id, :integer
+    5:       t.column :score, :integer # either an integer or true/false.  false should be assinged a score of 0, and true should be assigned a score of 1
+    6        t.column :advice, :text # the meaning of giving this score for this question
+    7      end
+
+/Users/louie/expertiza/vendor/plugins/dynamic_form/lib/action_view/helpers/dynamic_form.rb:
+  259              when :text
+  260                to_text_area_tag(options)
+  261:             when :integer, :float, :decimal
+  262                to_input_field_tag("text", options)
+  263              when :date
+
+378 matches across 131 files
+
+
+Searching 3014 files for "self_reg_role_id" (case sensitive)
+
+/Users/louie/expertiza/db/migrate/001_initialize_goldberg.rb:
+  113      t.column "site_url_prefix", :string
+  114      t.column "self_reg_enabled", :boolean
+  115:     t.column "self_reg_role_id", :integer
+  116      t.column "self_reg_confirmation_required", :boolean
+  117      t.column "self_reg_confirmation_error_page_id", :integer
+
+1 match in 1 file
+
+
+Searching 3094 files for "suggestion" (case sensitive)
+
+/Users/louie/expertiza/app/assets/javascripts/tree_display.jsx:
+  207              }
+  208  
+  209:             if (this.props.allow_suggestions) {
+  210                moreContent.push(
+  211                  <span>
+  212:                   <a title="View suggestions" href={"/suggestion/list?id="+(parseInt(this.props.id)/2).toString()+"&type=Assignment"}>
+  213:                     <img src="/assets/tree_view/view-suggestion-24.png" />
+  214                    </a>
+  215                  </span>
+  ...
+  300                    is_intelligent={this.props.is_intelligent}
+  301                    require_quiz={this.props.require_quiz}
+  302:                   allow_suggestions={this.props.allow_suggestions}
+  303                    has_topic={this.props.has_topic}
+  304                    id={id}
+  ...
+  341                        max_team_size={entry.max_team_size}
+  342                        is_intelligent={entry.is_intelligent}
+  343:                       allow_suggestions={entry.allow_suggestions}
+  344                        require_quiz={entry.require_quiz}
+  345                        has_topic={entry.has_topic}
+  ...
+  437                  is_intelligent={this.props.is_intelligent}
+  438                  require_quiz={this.props.require_quiz}
+  439:                 allow_suggestions={this.props.allow_suggestions}
+  440                  has_topic={this.props.has_topic}
+  441                  dataType={this.props.dataType}
+  ...
+  681                        //this is just a hack. All current users courses are marked as private during fetch for display purpose.
+  682                        private={entry.private}
+  683:                       allow_suggestions={entry.allow_suggestions}
+  684                        has_topic={entry.has_topic}
+  685                        rowClicked={_this.handleExpandClick}
+  ...
+  731                        dataType={_this.props.dataType}
+  732                        private={entry.private}
+  733:                       allow_suggestions={entry.allow_suggestions}
+  734                        has_topic={entry.has_topic}
+  735                        rowClicked={_this.handleExpandClick}
+  ...
+  929                      '/assets/tree_view/view-scores-24.png',
+  930                      '/assets/tree_view/view-review-report-24.png',
+  931:                     '/assets/tree_view/view-suggestion-24.png',
+  932                      '/assets/tree_view/view-scheduled-tasks.png',
+  933                      '/assets/tree_view/view-publish-rights-24.png'
+
+/Users/louie/expertiza/app/controllers/assignments_controller.rb:
+  235  
+  236    def scheduled_tasks
+  237:     @suggestions = Suggestion.where(assignment_id: params[:id])
+  238      @assignment = Assignment.find(params[:id])
+  239    end
+
+/Users/louie/expertiza/app/controllers/review_metrics_controller.rb:
+   54      # Only allow a trusted parameter "white list" through.
+   55      def review_metric_params
+   56:       params.require(:review_metric).permit(:response_id, :volume, :suggestion, :problem, :offensive_term)
+   57      end
+   58  end
+
+/Users/louie/expertiza/app/controllers/student_task_controller.rb:
+   30      denied unless current_user_id?(@participant.user_id)
+   31      @assignment = @participant.assignment
+   32:     @can_provide_suggestions = @assignment.allow_suggestions
+   33      @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
+   34      @topics = SignUpTopic.where(assignment_id: @assignment.id)
+
+/Users/louie/expertiza/app/controllers/suggestion_controller.rb:
+    2    def action_allowed?
+    3      case params[:action]
+    4:     when 'create', 'new', 'student_view', 'student_edit', 'update_suggestion'
+    5        current_role_name.eql? 'Student'
+    6      when 'submit'
+    .
+   19  
+   20    def add_comment
+   21:     @suggestioncomment = SuggestionComment.new(vote: params[:suggestion_comment][:vote], comments: params[:suggestion_comment][:comments])
+   22:     @suggestioncomment.suggestion_id = params[:id]
+   23:     @suggestioncomment.commenter = session[:user].name
+   24:     if @suggestioncomment.save
+   25        flash[:notice] = "Your comment has been successfully added."
+   26      else
+   ..
+   38  
+   39    def list
+   40:     @suggestions = Suggestion.where(assignment_id: params[:id])
+   41      @assignment = Assignment.find(params[:id])
+   42    end
+   43  
+   44    def student_view
+   45:     @suggestion = Suggestion.find(params[:id])
+   46    end
+   47  
+   48    def student_edit
+   49:     @suggestion = Suggestion.find(params[:id])
+   50    end
+   51  
+   52    def show
+   53:     @suggestion = Suggestion.find(params[:id])
+   54    end
+   55  
+   56:   def update_suggestion
+   57:     Suggestion.find(params[:id]).update_attributes(title: params[:suggestion][:title], description: params[:suggestion][:description],
+   58:                                                    signup_preference: params[:suggestion][:signup_preference])
+   59      redirect_to action: 'new', id: Suggestion.find(params[:id]).assignment_id
+   60    end
+   61  
+   62    def new
+   63:     @suggestion = Suggestion.new
+   64      session[:assignment_id] = params[:id]
+   65:     @suggestions = Suggestion.where(unityID: session[:user].name, assignment_id: params[:id])
+   66      @assignment = Assignment.find(params[:id])
+   67    end
+   68  
+   69    def create
+   70:     @suggestion = Suggestion.new(suggestion_params)
+   71:     @suggestion.assignment_id = session[:assignment_id]
+   72      @assignment = Assignment.find(session[:assignment_id])
+   73:     @suggestion.status = 'Initiated'
+   74:     @suggestion.unityID = if params[:suggestion_anonymous].nil?
+   75        session[:user].name
+   76      else
+   ..
+   78                            end
+   79  
+   80:     if @suggestion.save
+   81:       flash[:success] = 'Thank you for your suggestion!' if @suggestion.unityID != ''
+   82:       flash[:success] = 'You have already submit an anonymous suggestion. It will not show in the suggested topic table below.' if @suggestion.unityID == ''
+   83      end
+   84:     redirect_to action: 'new', id: @suggestion.assignment_id
+   85    end
+   86  
+   87    def confirm_save
+   88:     # Action to display successful creation of suggestion
+   89    end
+   90  
+   ..
+   92      if !params[:add_comment].nil?
+   93        add_comment
+   94:     elsif !params[:approve_suggestion].nil?
+   95:       approve_suggestion
+   96:     elsif !params[:reject_suggestion].nil?
+   97:       reject_suggestion
+   98      end
+   99    end
+  ...
+  117        to: proposer.email,
+  118          cc: cc_mail_list,
+  119:         subject: "Suggested topic '#{@suggestion.title}' has already been approved",
+  120          body: {
+  121:           approved_topic_name: @suggestion.title,
+  122              proposer: proposer.name
+  123          }
+  ...
+  138      # if proposer's signup_pref is yes, has a team and topic --> send email says that 'approved'
+  139      # if proposer's signup_pref is no --> send email says that 'approved'
+  140:     if @suggestion.signup_preference == 'Y'
+  141        # if this user do not have team in this assignment, create one for him/her and assign this topic to this team.
+  142        if @team_id.nil?
+  ...
+  160    end
+  161  
+  162:   def approve_suggestion
+  163      approve
+  164      notification
+  165:     redirect_to action: 'show', id: @suggestion
+  166    end
+  167  
+  168:   def reject_suggestion
+  169:     @suggestion = Suggestion.find(params[:id])
+  170  
+  171:     if @suggestion.update_attribute('status', 'Rejected')
+  172:       flash[:notice] = 'The suggestion has been successfully rejected.'
+  173      else
+  174:       flash[:error] = 'An error occurred when rejecting the suggestion.'
+  175      end
+  176:     redirect_to action: 'show', id: @suggestion
+  177    end
+  178  
+  179    private
+  180  
+  181:   def suggestion_params
+  182:     params.require(:suggestion).permit(:assignment_id, :title, :description, :status, :unityID, :signup_preference)
+  183    end
+  184  
+  185    def approve
+  186:     @suggestion = Suggestion.find(params[:id])
+  187:     @user_id = User.where(name: @suggestion.unityID).first.id
+  188:     @team_id = TeamsUser.team_id(@suggestion.assignment_id, @user_id)
+  189:     @topic_id = SignedUpTeam.topic_id(@suggestion.assignment_id, @user_id)
+  190      @signuptopic = SignUpTopic.new
+  191:     @signuptopic.topic_identifier = 'S' + Suggestion.where("assignment_id = ? and id <= ?", @suggestion.assignment_id, @suggestion.id).size.to_s
+  192:     @signuptopic.topic_name = @suggestion.title
+  193:     @signuptopic.assignment_id = @suggestion.assignment_id
+  194      @signuptopic.max_choosers = 1
+  195:     if @signuptopic.save && @suggestion.update_attribute('status', 'Approved')
+  196:       flash[:success] = 'The suggestion was successfully approved.'
+  197      else
+  198:       flash[:error] = 'An error occurred when approving the suggestion.'
+  199      end
+  200    end
+
+/Users/louie/expertiza/app/controllers/tree_display_controller.rb:
+  189              tmpObject["is_intelligent"] = node.get_is_intelligent
+  190              tmpObject["require_quiz"] = node.get_require_quiz
+  191:             tmpObject["allow_suggestions"] = node.get_allow_suggestions
+  192              tmpObject["has_topic"] = SignUpTopic.where(['assignment_id = ?', node.node_object_id]).first ? true : false
+  193            end
+  ...
+  273              res2["is_intelligent"] = child.get_is_intelligent
+  274              res2["require_quiz"] = child.get_require_quiz
+  275:             res2["allow_suggestions"] = child.get_allow_suggestions
+  276              res2["has_topic"] = SignUpTopic.where(['assignment_id = ?', child.node_object_id]).first ? true : false
+  277            end
+
+/Users/louie/expertiza/app/models/assignment_node.rb:
+  124  
+  125    # Gets the require_quiz from the associated object
+  126:   def get_allow_suggestions
+  127      @assign_node = Assignment.find(self.node_object_id) unless @assign_node
+  128:     @assign_node.allow_suggestions
+  129    end
+  130  
+
+/Users/louie/expertiza/app/models/course_team.rb:
+    4    # NOTE: inconsistency in naming of users that's in the team
+    5    #   currently they are being called: member, participant, user, etc...
+    6:   #   suggestion: refactor all to participant
+    7  
+    8    # Get parent course
+
+/Users/louie/expertiza/app/models/review_metric.rb:
+    2  	belongs_to :response_map, class_name: 'ResponseMap', foreign_key: 'response_id'
+    3      attr_accessor :volume, :integer
+    4:     attr_accessor :suggestion, :boolean
+    5      attr_accessor :problem, :boolean
+    6      attr_accessor :offensive_term, :boolean
+    7  
+    8:     def self.check_suggestion(reviewer_id,assignment_id,)
+    9      end
+   10  
+
+/Users/louie/expertiza/app/models/suggestion.rb:
+    1  class Suggestion < ActiveRecord::Base
+    2    validates_presence_of :title, :description
+    3:   has_many :suggestion_comments
+    4  end
+    5  
+
+/Users/louie/expertiza/app/models/suggestion_comment.rb:
+    1  class SuggestionComment < ActiveRecord::Base
+    2    validates_presence_of :comments
+    3:   belongs_to :suggestion
+    4  end
+    5  
+
+/Users/louie/expertiza/app/views/assignments/edit.html.erb:
+   19        <div id="tabs-2">
+   20          <h1>Topics for <%= @assignment_form.assignment.name %> assignment</h1>
+   21:             <input name="assignment_form[assignment][allow_suggestions]" type="hidden" value="false"/>
+   22:             <%= check_box_tag('assignment_form[assignment][allow_suggestions]', 'true', @assignment_form.assignment.allow_suggestions) %>
+   23:             <%= label_tag('assignment_form[assignment][allow_suggestions]', 'Allow topic suggestions from students?') %>
+   24              <br>
+   25              <input name="assignment_form[assignment][is_intelligent]" type="hidden" value="false"/>
+
+/Users/louie/expertiza/app/views/popup/automated_metareview_details_popup.html.erb:
+    9            The value is on a scale of [0 - 1], where <font color="#FF0000">0 indicates no traces of relevance</font> and <font color="#008000"> 1 indicates highest relevance.</font>
+   10          <% elsif params[:type] == "Content"%>
+   11:           <i>Content</i> identifies the extent to which your review contains praise, criticism, identifies problems or provides suggestions in the author's work. <br>
+   12            The value is on a scale of [0 - 1], where <font color="#FF0000"> 0 indicates no traces of the content type</font> and <font color="#008000"> 1 indicates maximum occurrence of the content type.</font>
+   13          <% elsif params[:type] == "Summative Content"%>
+   ..
+   16            <font color="#800080"> [Very useful to authors!]</font> The <i>problem content </i> metric identifies how much of your review identifies problems in the author's work.
+   17          <% elsif params[:type] == "Advisory Content"%>
+   18:           <font color="#800000"> [Highly recommended!] </font> The <i>advisory content </i> metric identifies how much of your review provides the author with suggestions for improvement.
+   19          <% elsif params[:type] == "Tone"%>
+   20            <i>Tone</i> identifies the extent to which your review contains a positive, negative or a neutral tone. <br>
+
+/Users/louie/expertiza/app/views/review_metrics/_form.html.haml:
+   14      = f.number_field :volume
+   15    .field
+   16:     = f.label :suggestion
+   17:     = f.check_box :suggestion
+   18    .field
+   19      = f.label :problem
+
+/Users/louie/expertiza/app/views/review_metrics/index.html.haml:
+   18          %td= review_metric.response_id
+   19          %td= review_metric.volume
+   20:         %td= review_metric.suggestion
+   21          %td= review_metric.problem
+   22          %td= review_metric.offensive_term
+
+/Users/louie/expertiza/app/views/review_metrics/show.html.haml:
+    9  %p
+   10    %b Suggestion:
+   11:   = @review_metric.suggestion
+   12  %p
+   13    %b Problem:
+
+/Users/louie/expertiza/app/views/student_task/view.html.erb:
+   86      </li>
+   87    <% end %> 
+   88:     <%if @can_provide_suggestions == true %>
+   89:       <li><%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %></li>
+   90      <% end %>
+   91  
+
+/Users/louie/expertiza/app/views/suggestion/_form.html.erb:
+    1: <%= error_messages_for 'suggestion' %>
+    2  
+    3  <table>
+    4    <tr>
+    5:     <td><label for="suggestion_topic">Title</label></td>
+    6:     <td><%= text_field 'suggestion', 'title' , :size => 15 %></td>
+    7    </tr>
+    8  
+    9    <tr>
+   10:     <td><label for="suggestion_topic">Description</label></td>
+   11:     <td><%= text_area 'suggestion', 'description',:rows => 10, :cols => 30, :value => 'N/A' %></td>
+   12    </tr>
+   13  
+   14    <tr>
+   15:     <td><label for="suggestion_anonymous">Submit suggestion anonymously</label></td>
+   16:     <td><input type=checkbox name="suggestion_anonymous" value=""></td>
+   17    </tr>
+   18  
+   19    <tr>
+   20:     <td><label for="suggestion_signup_preference">Do you wish to work on this topic?</label></td>
+   21:     <td><%= select "suggestion", "signup_preference", {"Yes" =>"Y","No"=>"N"} %> </td>
+   22    </tr>
+   23  </table>
+
+/Users/louie/expertiza/app/views/suggestion/edit.html.erb:
+    1: <h3>Editing a suggestion is prohibited !!!</h3>
+    2  
+    3: <%= link_to 'Show', :action => 'show', :id => @suggestion %> |
+    4  <%= link_to 'Back', :action => 'list' %>
+    5  
+
+/Users/louie/expertiza/app/views/suggestion/list.html.erb:
+    1  <h2>Suggested topics for <%=h @assignment.name %></h2>
+    2: <%if @suggestions.size > 0 %>
+    3    <div class="flash_note">
+    4:     Click View link to view the suggestion and to comment and/or approve
+    5    </div>
+    6  
+    .
+   13      </tr>
+   14  
+   15:     <% for suggestion in @suggestions %>
+   16        <tr class="listingRow">
+   17:         <td style="max-width: 200px"><%=h suggestion.title %></td>
+   18:         <td align="center"><%=h suggestion.status %></td>
+   19:         <td align="center"><%=h suggestion.unityID %></td>
+   20:         <td align="center"><%= link_to 'View', :action => 'show', :id => suggestion %></td>
+   21        </tr>
+   22      <% end %>
+   23    </table>
+   24  <%else%>
+   25:   <b>No suggestions yet.</b>
+   26  <%end%>
+   27  
+
+/Users/louie/expertiza/app/views/suggestion/new.html.erb:
+    1: <%unless @suggestions.empty? %>
+    2  <h2>Suggested topics for <%= @assignment.name %></h2>
+    3    <table class="general" cellpadding="5" width="50%" border="1">
+    .
+    8      </tr>
+    9  
+   10:     <% for suggestion in @suggestions %>
+   11        <tr class="listingRow">
+   12:         <td style="text-align:center; max-width: 200px;"><%=h suggestion.title %></td>
+   13:         <td align="center"><%=h suggestion.status %></td>
+   14:         <td align="center"><%= link_to 'View', :action => 'student_view', :id => suggestion %>
+   15:         <%= if suggestion.status == 'Initiated'
+   16:           link_to 'Edit', :action => 'student_edit', :id => suggestion 
+   17            end %></td>
+   18        </tr>
+   ..
+   21   <% end %>
+   22  
+   23: <h3>New suggestion</h3>
+   24  
+   25  <%= form_tag :action => 'create' do %>
+
+/Users/louie/expertiza/app/views/suggestion/show.html.erb:
+    1  <h2>Suggestion</h2>
+    2  
+    3: <!--displaying suggestion information-->
+    4  <table border=0 cellspacing=10>
+    5  <colgroup>
+    .
+    9  <tr>
+   10    <td><b>Title:</b></td>
+   11:   <td><%=h @suggestion.title %></td>
+   12  </tr>
+   13  <tr>
+   14    <td><b>Description:</b></td>
+   15:   <td><%=h @suggestion.description %></td>
+   16  </tr>
+   17  <tr>
+   18    <td><b>Submitter's ID:</b></td>
+   19    <td>
+   20:     <%if @suggestion.unityID != "" %>
+   21:       <%=h @suggestion.unityID %>
+   22      <%else%>
+   23        --
+   ..
+   28    <td><b>Submitter's sign-up preference:</b></td>
+   29    <td>
+   30:     <%if @suggestion.signup_preference == 'Y' %>
+   31        Yes
+   32:     <%elsif @suggestion.signup_preference == 'N' %>
+   33        No
+   34      <%else%>
+   ..
+   39  <tr>
+   40    <td><b>Suggestion's status:</b></td>
+   41:   <td><%=h @suggestion.status %></td>
+   42  </tr>
+   43  </table>
+   44  <p>
+   45:   <% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' && session[:user] != nil && (session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4) %>
+   46:     <%= form_tag :action => 'submit', :id => @suggestion do %>
+   47:       <%= submit_tag "Approve suggestion", :name => 'approve_suggestion' %>
+   48        &nbsp; &nbsp;
+   49:       <%= submit_tag "Reject suggestion", :name => 'reject_suggestion' %>
+   50      <% end %>
+   51    <% end %>
+   ..
+   55  <!--displaying comments-->
+   56  <h2>Comments</h2>
+   57: <%if @suggestion.suggestion_comments.size > 0 %>
+   58    <table class="general" cellpadding=5 border="1">
+   59      <colgroup>
+   ..
+   68      </tr>
+   69  
+   70:     <% for suggestion_comment in @suggestion.suggestion_comments %>
+   71        <tr class="listingRow">
+   72:         <td align="center"><%=suggestion_comment.commenter %></td>
+   73          <td align="center">
+   74:           <%if suggestion_comment.vote == 'Y' %>
+   75              Yes
+   76:           <%elsif suggestion_comment.vote == 'N'%>
+   77              No
+   78:           <%elsif suggestion_comment.vote == 'R'%>
+   79              Revise
+   80            <%else%>
+   ..
+   82            <%end%>
+   83          </td>
+   84:         <td><%= suggestion_comment.comments %></td>
+   85        </tr>
+   86      <% end %>
+   ..
+   89  <br>
+   90  <!--Add new comment and vote-->
+   91: <% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' %>
+   92    <b>Add new comment and vote</b> <br>
+   93:   <%= form_tag :action => 'submit', :id => @suggestion do %>
+   94:     <%= text_area "suggestion_comment", "comments", :rows => 5, :cols => 50 %>
+   95      <p>
+   96        <%= "Vote"%>
+   97:       <%= select("suggestion_comment","vote",{"Yes" =>"Y","No"=>"N","Revise"=>"R"}) %>
+   98      </p>
+   99  
+  ...
+  103  <% end %>
+  104  <p>
+  105:   <%= link_to 'Back', :action => 'list', :id => @suggestion.assignment_id %>
+  106  </p>
+  107  
+
+/Users/louie/expertiza/app/views/suggestion/student_edit.html.erb:
+    1: <h2>Edit Suggested topic <%= @suggestion.title %></h2>
+    2: <%= form_tag :action => 'update_suggestion', :id => @suggestion.id do %>
+    3  <table>
+    4    <tr>
+    5:     <td><label for="suggestion_title">Title</label></td>
+    6:     <td><%= text_field 'suggestion', 'title' , :size => 15, :value => @suggestion.title %></td>
+    7    </tr>
+    8  
+    9    <tr>
+   10:     <td><label for="suggestion_topic">Description</label></td>
+   11:     <td><%= text_area 'suggestion', 'description',:rows => 10, :cols => 30, :value => @suggestion.description %></td>
+   12    </tr>
+   13  
+   14    <tr>
+   15:     <td><label for="suggestion_signup_preference">Do you wish to work on this topic?</label></td>
+   16:     <td><%= select "suggestion", "signup_preference", {"Yes" =>"Y","No"=>"N"} %> </td>
+   17    </tr>
+   18  </table>
+   ..
+   25  <% end %>
+   26  
+   27: <%= link_to 'Back', :controller => 'suggestion', :action => 'new', :id => @suggestion.assignment_id %>
+
+/Users/louie/expertiza/app/views/suggestion/student_view.html.erb:
+    1: <h2>View Suggested topic <%= @suggestion.title %></h2>
+    2  <table border=0 cellspacing=10>
+    3  <colgroup>
+    .
+    7  <tr>
+    8    <td><b>Title:</b></td>
+    9:   <td><%=h @suggestion.title %></td>
+   10  </tr>
+   11  <tr>
+   12    <td><b>Description:</b></td>
+   13:   <td><%=h @suggestion.description %></td>
+   14  </tr>
+   15  <tr>
+   16    <td><b>Approval Status:</b></td>
+   17:   <td><%=h @suggestion.status %></td>
+   18  </tr>
+   19  
+   ..
+   29      <th>Comment</th>
+   30    </tr>
+   31:   <%if @suggestion.suggestion_comments.size > 0 %>
+   32:     <% for suggestion_comment in @suggestion.suggestion_comments %>
+   33        <tr class="listingRow">
+   34:         <td align="center"><%=suggestion_comment.commenter %></td>
+   35          <td align="center">
+   36:           <%if suggestion_comment.vote == 'Y' %>
+   37              Yes
+   38:           <%elsif suggestion_comment.vote == 'N'%>
+   39              No
+   40:           <%elsif suggestion_comment.vote == 'R'%>
+   41              Revise
+   42            <%else%>
+   ..
+   44            <%end%>
+   45          </td>
+   46:         <td><%= suggestion_comment.comments %></td>
+   47        </tr>
+   48      <% end %>
+   ..
+   52  <br>
+   53  
+   54: <% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' %>
+   55    <b>Add new comment</b> <br>
+   56:   <%= form_tag :action => 'submit', :id => @suggestion do %>
+   57:     <%= text_area "suggestion_comment", "comments", :rows => 5, :cols => 50 %>
+   58      <br>
+   59  
+   ..
+   65  <br>
+   66  
+   67: <%= link_to 'Back', :controller => 'suggestion', :action => 'new', :id => @suggestion.assignment_id %>
+
+/Users/louie/expertiza/app/views/tree_display/actions/_assignments_actions.html.erb:
+   41                  <%= link_to image_tag('/assets/tree_view/view-survey-24.png', :title => 'View quiz questions'), {:controller => 'student_quizzes', :action => 'review_questions', :id => node.node_object_id}, {:title => 'View quiz questions'} %>
+   42              <%end%>
+   43:             <% if @assignment.allow_suggestions %>
+   44:               <%= link_to image_tag('/assets/tree_view/view-suggestion-24.png', :title => 'View suggestions'), {:controller => 'suggestion', :action => 'list', :id => node.node_object_id}, {:title => 'View suggestions'} %>
+   45              <% end %>
+   46            </div>
+
+/Users/louie/expertiza/config/routes.rb:
+  427    end
+  428  
+  429:   resources :suggestion do
+  430      collection do
+  431        get :list
+  432        post :submit
+  433        post :student_submit
+  434:       post :update_suggestion
+  435      end      
+  436    end
+
+/Users/louie/expertiza/db/schema.rb:
+   55      t.integer  "max_team_size",              limit: 4,     default: 0,      null: false
+   56      t.boolean  "staggered_deadline"
+   57:     t.boolean  "allow_suggestions"
+   58      t.integer  "days_between_submissions",   limit: 4
+   59      t.string   "review_assignment_strategy", limit: 255
+   ..
+  488    add_index "site_controllers", ["permission_id"], name: "fk_site_controller_permission_id", using: :btree
+  489  
+  490:   create_table "suggestion_comments", force: :cascade do |t|
+  491      t.text     "comments",      limit: 65535
+  492      t.string   "commenter",     limit: 255
+  493      t.string   "vote",          limit: 255
+  494:     t.integer  "suggestion_id", limit: 4
+  495      t.datetime "created_at"
+  496    end
+  497  
+  498:   create_table "suggestions", force: :cascade do |t|
+  499      t.integer "assignment_id",     limit: 4
+  500      t.string  "title",             limit: 255
+
+/Users/louie/expertiza/db/migrate/121_create_suggestions.rb:
+    1  class CreateSuggestions < ActiveRecord::Migration
+    2    def self.up
+    3:     create_table :suggestions do |t|
+    4       t.column  :assignment_id,      :int
+    5       t.column  :title,              :string
+    .
+   12  
+   13    def self.down
+   14:     drop_table :suggestions
+   15    end
+   16  end
+
+/Users/louie/expertiza/db/migrate/122_create_suggestion_comments.rb:
+    1  class CreateSuggestionComments < ActiveRecord::Migration
+    2    def self.up
+    3:     create_table :suggestion_comments do |t|
+    4         t.column :comments,      :text
+    5         t.column :commenter,     :string
+    6         t.column :vote,          :string
+    7:        t.column :suggestion_id, :int
+    8         t.column :created_at,    :datetime
+    9      end
+   ..
+   11  
+   12    def self.down
+   13:     drop_table :suggestion_comments
+   14    end
+   15  end
+
+/Users/louie/expertiza/db/migrate/123_add_column_allow_suggestions_to_assignments.rb:
+    1  class AddColumnAllowSuggestionsToAssignments < ActiveRecord::Migration
+    2    def self.up
+    3:     add_column :assignments, :allow_suggestions, :boolean
+    4    end
+    5  
+    6    def self.down
+    7:     remove_column :assignments, :allow_suggestions
+    8    end
+    9  end
+
+/Users/louie/expertiza/db/migrate/124_set_permission_for_suggestion.rb:
+    2    def self.up
+    3      permission = Permission.find_by_name('administer assignments')
+    4:     controller = SiteController.find_or_create_by(name: 'suggestion')
+    5      controller.permission_id = permission.id
+    6      controller.save
+
+/Users/louie/expertiza/log/development.log:
+    <binary>
+
+/Users/louie/expertiza/spec/factories/factories.rb:
+    6  
+    7      # Load and cache the administrator credentials object
+    8:     cache YAML.load("---\n:credentials: !ruby/object:Credentials\nactions:\n  content_pages:\n    view_default: true\n    view: true\n    list: false\n  roles:\n    list: false\n  permissions:\n    list: false\n  auth:\n    login: true\n    logout: true\n    login_failed: true\n  menu_items:\n    link: true\n    list: false\n  site_controllers:\n    list: false\n  controller_actions:\n    list: false\n  system_settings:\n    list: false\n  users:\n    list: true\n    keys: true\n  admin:\n    list_instructors: false\n    list_administrators: false\n    list_super_administrators: false\n  course:\n    list_folders: true\n    add_ta: true\n    destroy_course: true\n    edit_course: true\n    new_course: true\n    new_folder: true\n    remove_ta: true\n    update_course: true\n    view_teaching_assistants: true\n    create_course: true\n    list: true\n  suggestion:\n    create: true\n    new: true\n  questionnaire:\n    list: true\n    create_questionnaire: true\n    edit_questionnaire: true\n    copy_questionnaire: true\n    save_questionnaire: true\n    new_quiz: true\n    create_quiz_questionnaire: true\n    update_quiz: true\n    edit_quiz: true\n    view_quiz: true\n  participants:\n    add_student: true\n    edit_team_members: true\n    list_students: true\n    list_courses: true\n    list_assignments: true\n    change_handle: true\n  assignment:\n    list: true\n  institution:\n    list: false\n  student_task:\n    list: true\n  profile:\n    edit: true\n  survey_response:\n    create: true\n    submit: true\n  team:\n    list: true\n    list_assignments: true\n  teams_users:\n    list: true\n  course_evaluation:\n    list: true\n  survey_deployment:\n    list: true\n  statistics:\n    list_surveys: true\n  impersonate:\n    start: true\n    impersonate: true\n  review_mapping:\n    list: true\n    assign_reviewer_dynamically: true\n    release_reservation: true\n    show_available_submissions: true\n    assign_metareviewer_dynamically: true\n    add_self_reviewer: true\n    assign_quiz_dynamically: true\n  tree_display:\n    list: true\n    drill: true\n    goto_questionnaires: true\n    goto_author_feedbacks: true\n    goto_review_rubrics: true\n    goto_global_survey: true\n    goto_surveys: true\n    goto_course_evaluations: true\n    goto_courses: true\n    goto_assignments: true\n    goto_teammate_reviews: true\n    goto_metareview_rubrics: true\n    goto_teammatereview_rubrics: true\n  grades:\n    view_my_scores: true\n  sign_up_sheet:\n    signup_topics: true\n    signup: true\n    delete_signup: true\n    team_details: true\n  leaderboard:\n    index: true\n  review_files:\n    show_code_file: true\n    show_code_file_diff: true\n    show_all_submitted_files: true\n    submit_comment: true\n    submit_review_file: true\n  popup:\n    automated_metareview_details_popup: true\n  advice:\n    edit_advice: true\n    save_advice: true\n  response:\n    delete: true\n  analytic:\n    assignment_list: true\n    course_list: true\n    get_graph_data_bundle: true\n    graph_data_type_list: true\n    index: true\n    init: true\n    render_sample: true\n    team_list: true\n  advertise_for_partner:\n    remove: true\n  versions:\n    revert: true\ncontrollers:\n  content_pages: false\n  controller_actions: false\n  auth: false\n  markup_styles: false\n  menu_items: false\n  permissions: false\n  roles: false\n  site_controllers: false\n  system_settings: false\n  users: true\n  roles_permissions: false\n  admin: false\n  course: true\n  assignment: true\n  questionnaire: true\n  participants: true\n  reports: true\n  institution: false\n  student_task: true\n  profile: true\n  survey_response: true\n  team: true\n  teams_users: true\n  import_file: true\n  course_evaluation: true\n  participant_choices: true\n  survey_deployment: true\n  statistics: true\n  impersonate: true\n  review_mapping: true\n  grades: true\n  tree_display: true\n  student_team: true\n  invitation: true\n  survey: true\n  password_retrieval: true\n  submitted_content: true\n  eula: true\n  student_review: true\n  publishing: true\n  export_file: true\n  response: true\n  popup: true\n  sign_up_sheet: true\n  suggestion: true\n  leaderboard: true\n  delete_object: true\n  assessment360: true\n  review_files: true\n  advertise_for_partners: true\n  join_team_requests: true\n  advertise_for_partner: true\n  automated_metareviews: true\n  advice: true\n  analytic: true\n  versions: true\n  student_quiz: true\npages:\n  home: true\n  expired: true\n  notfound: true\n  denied: true\n  contact_us: true\n  site_admin: false\n  adminpage: true\n  credits: true\n  wiki: true\npermission_ids:\n- 7\n- 7\n- 10\n- 8\n- 4\n- 3\nrole_id: 3\nrole_ids:\n- 3\n- 2\n- 6\n- 1\nupdated_at: 2015-06-11 15:23:44.000000000 Z\n")
+    9    end
+   10  
+   ..
+   13      parent_id  nil
+   14      description ""
+   15:     cache YAML.load("--- \n:credentials: !ruby/object:Credentials \n  actions: \n    content_pages: \n      view_default: true \n      view: true \n      list: false \n    roles: \n      list: false \n    permissions: \n      list: false \n    auth: \n      login: true \n      logout: true \n      login_failed: true \n    menu_items: \n      link: true \n      list: false \n    site_controllers: \n      list: false \n    controller_actions: \n      list: false \n    system_settings: \n      list: false \n    users: \n      list: false \n      keys: true \n    admin: \n      list_instructors: false \n      list_administrators: false \n      list_super_administrators: false \n    course: \n      list_folders: false \n      add_ta: false \n      destroy_course: false \n      edit_course: false \n      new_course: false \n      new_folder: false \n      remove_ta: false \n      update_course: false \n      view_teaching_assistants: false \n      create_course: false \n      list: false \n    suggestion: \n      create: true \n      new: true \n    questionnaire: \n      list: false \n      create_questionnaire: false \n      edit_questionnaire: false \n      copy_questionnaire: false \n      save_questionnaire: false \n      new_quiz: true \n      create_quiz_questionnaire: true \n      update_quiz: true \n      edit_quiz: true \n      view_quiz: true \n    participants: \n      add_student: false \n      edit_team_members: false \n      list_students: false \n      list_courses: false \n      list_assignments: false \n      change_handle: true \n    assignment: \n      list: false \n    institution: \n      list: false \n    student_task: \n      list: true \n    profile: \n      edit: true \n    survey_response: \n      create: true \n      submit: true \n    team: \n      list: false \n      list_assignments: false \n    teams_users: \n      list: false \n    course_evaluation: \n      list: true \n    survey_deployment: \n      list: false \n    statistics: \n      list_surveys: false \n    impersonate: \n      start: false \n      impersonate: true \n    review_mapping: \n      list: false \n      assign_reviewer_dynamically: true \n      release_reservation: true \n      show_available_submissions: true \n      assign_metareviewer_dynamically: true \n      add_self_reviewer: true \n      assign_quiz_dynamically: true \n    tree_display: \n      list: false \n      drill: false \n      goto_questionnaires: false \n      goto_author_feedbacks: false \n      goto_review_rubrics: false \n      goto_global_survey: false \n      goto_surveys: false \n      goto_course_evaluations: false \n      goto_courses: false \n      goto_assignments: false \n      goto_teammate_reviews: false \n      goto_metareview_rubrics: false \n      goto_teammatereview_rubrics: false \n    grades: \n      view_my_scores: true \n    sign_up_sheet: \n      signup_topics: true \n      signup: true \n      delete_signup: true \n      team_details: true \n    leaderboard: \n      index: true \n    review_files: \n      show_code_file: true \n      show_code_file_diff: true \n      show_all_submitted_files: true \n      submit_comment: true \n      submit_review_file: true \n    popup: \n      automated_metareview_details_popup: true \n    advice: \n      edit_advice: false \n      save_advice: false \n    response: \n      delete: false \n    analytic: \n      assignment_list: false \n      course_list: false \n      get_graph_data_bundle: false \n      graph_data_type_list: false \n      index: false \n      init: false \n      render_sample: false \n      team_list: false \n    advertise_for_partner: \n      remove: true \n    versions: \n      revert: true \n  controllers: \n    content_pages: false \n    controller_actions: false \n    auth: false \n    markup_styles: false \n    menu_items: false \n    permissions: false \n    roles: false \n    site_controllers: false \n    system_settings: false \n    users: true \n    roles_permissions: false \n    admin: false \n    course: false \n    assignment: false \n    questionnaire: false \n    participants: false \n    reports: true \n    institution: false \n    student_task: true \n    profile: true \n    survey_response: true \n    team: false \n    teams_users: false \n    import_file: false \n    course_evaluation: true \n    participant_choices: false \n    survey_deployment: false \n    statistics: false \n    impersonate: false \n    review_mapping: false \n    grades: false \n    tree_display: false \n    student_team: true \n    invitation: true \n    survey: false \n    password_retrieval: true \n    submitted_content: true \n    eula: true \n    student_review: true \n    publishing: true \n    export_file: false \n    response: true \n    popup: false \n    sign_up_sheet: false \n    suggestion: false \n    leaderboard: true \n    delete_object: false \n    assessment360: false \n    review_files: true \n    advertise_for_partners: true \n    join_team_requests: true \n    advertise_for_partner: true \n    automated_metareviews: true \n    advice: false \n    analytic: false \n    versions: true \n    student_quiz: true \n  pages: \n    home: true \n    expired: true \n    notfound: true \n    denied: true \n    contact_us: true \n    site_admin: false \n    adminpage: false \n    credits: true \n    wiki: true \n  permission_ids: \n  - 8 \n  - 4 \n  - 3 \n  role_id: 1 \n  role_ids: \n  - 1 \n  updated_at: 2015-06-11 15:23:43.000000000 Z \n:menu: !ruby/object:Menu \n  by_id: \n    1: &1 !ruby/object:Menu::Node \n      content_page_id: 1 \n      controller_action_id: \n      id: 1 \n      label: Home \n      name: home \n      parent: \n      parent_id: \n      site_controller_id: \n      url: '/home' \n      children: \n      - 50 \n    26: &2 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 33 \n      id: 26 \n      label: Assignments \n      name: student_task \n      parent: \n      parent_id: \n      site_controller_id: 23 \n      url: '/student_task/list' \n    30: &3 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 42 \n      id: 30 \n      label: Course Evaluation \n      name: Course Evaluation \n      parent: \n      parent_id: \n      site_controller_id: 31 \n      url: '/course_evaluation/list' \n    27: &4 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 36 \n      id: 27 \n      label: Profile \n      name: profile \n      parent: \n      parent_id: \n      site_controller_id: 26 \n      url: '/profile/edit' \n    2: &5 !ruby/object:Menu::Node \n      content_page_id: 6 \n      controller_action_id: \n      id: 2 \n      label: Contact Us \n      name: contact_us \n      parent: \n      parent_id: \n      site_controller_id: \n      url: '/contact_us' \n      children: \n      - 14 \n    50: &6 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 78 \n      id: 50 \n      label: Leaderboard \n      name: leaderboard \n      parent: \n      parent_id: 1 \n      site_controller_id: 54 \n      url: '/leaderboard/index' \n    14: &7 !ruby/object:Menu::Node \n      content_page_id: 10 \n      controller_action_id: \n      id: 14 \n      label: Credits &amp; Licence \n      name: credits \n      parent: \n      parent_id: 2 \n      site_controller_id: \n      url: '/credits' \n  by_name: \n    home: *1 \n    student_task: *2 \n    Course Evaluation: *3 \n    profile: *4 \n    contact_us: *5 \n    leaderboard: *6 \n    credits: *7 \n  crumbs: \n  - 1 \n  root: &8 !ruby/object:Menu::Node \n    parent: \n    children: \n    - 1 \n    - 26 \n    - 30 \n    - 27 \n    - 2 \n  selected: \n    1: *1 \n  vector: \n  - *8 \n  - *1")
+   16    end
+   17  
+   ..
+   20      parent_id nil
+   21      description ""
+   22:     cache YAML.load("--- \n:credentials: !ruby/object:Credentials \n  actions: \n    content_pages: \n      view_default: true \n      view: true \n      list: false \n    roles: \n      list: false \n    permissions: \n      list: false \n    auth: \n      login: true \n      logout: true \n      login_failed: true \n    menu_items: \n      link: true \n      list: false \n    site_controllers: \n      list: false \n    controller_actions: \n      list: false \n    system_settings: \n      list: false \n    users: \n      list: true \n      keys: true \n    admin: \n      list_instructors: false \n      list_administrators: false \n      list_super_administrators: false \n    course: \n      list_folders: true \n      add_ta: true \n      destroy_course: true \n      edit_course: true \n      new_course: true \n      new_folder: true \n      remove_ta: true \n      update_course: true \n      view_teaching_assistants: true \n      create_course: true \n      list: true \n    suggestion: \n      create: true \n      new: true \n    questionnaire: \n      list: true \n      create_questionnaire: true \n      edit_questionnaire: true \n      copy_questionnaire: true \n      save_questionnaire: true \n      new_quiz: true \n      create_quiz_questionnaire: true \n      update_quiz: true \n      edit_quiz: true \n      view_quiz: true \n    participants: \n      add_student: true \n      edit_team_members: true \n      list_students: true \n      list_courses: true \n      list_assignments: true \n      change_handle: true \n    assignment: \n      list: true \n    institution: \n      list: false \n    student_task: \n      list: true \n    profile: \n      edit: true \n    survey_response: \n      create: true \n      submit: true \n    team: \n      list: true \n      list_assignments: true \n    teams_users: \n      list: true \n    course_evaluation: \n      list: true \n    survey_deployment: \n      list: true \n    statistics: \n      list_surveys: true \n    impersonate: \n      start: true \n      impersonate: true \n    review_mapping: \n      list: true \n      assign_reviewer_dynamically: true \n      release_reservation: true \n      show_available_submissions: true \n      assign_metareviewer_dynamically: true \n      add_self_reviewer: true \n      assign_quiz_dynamically: true \n    tree_display: \n      list: true \n      drill: true \n      goto_questionnaires: true \n      goto_author_feedbacks: true \n      goto_review_rubrics: true \n      goto_global_survey: true \n      goto_surveys: true \n      goto_course_evaluations: true \n      goto_courses: true \n      goto_assignments: true \n      goto_teammate_reviews: true \n      goto_metareview_rubrics: true \n      goto_teammatereview_rubrics: true \n    grades: \n      view_my_scores: true \n    sign_up_sheet: \n      signup_topics: true \n      signup: true \n      delete_signup: true \n      team_details: true \n    leaderboard: \n      index: true \n    review_files: \n      show_code_file: true \n      show_code_file_diff: true \n      show_all_submitted_files: true \n      submit_comment: true \n      submit_review_file: true \n    popup: \n      automated_metareview_details_popup: true \n    advice: \n      edit_advice: true \n      save_advice: true \n    response: \n      delete: true \n    analytic: \n      assignment_list: true \n      course_list: true \n      get_graph_data_bundle: true \n      graph_data_type_list: true \n      index: true \n      init: true \n      render_sample: true \n      team_list: true \n    advertise_for_partner: \n      remove: true \n    versions: \n      revert: true \n  controllers: \n    content_pages: false \n    controller_actions: false \n    auth: false \n    markup_styles: false \n    menu_items: false \n    permissions: false \n    roles: false \n    site_controllers: false \n    system_settings: false \n    users: true \n    roles_permissions: false \n    admin: false \n    course: true \n    assignment: true \n    questionnaire: true \n    participants: true \n    reports: true \n    institution: false \n    student_task: true \n    profile: true \n    survey_response: true \n    team: true \n    teams_users: true \n    import_file: true \n    course_evaluation: true \n    participant_choices: true \n    survey_deployment: true \n    statistics: true \n    impersonate: true \n    review_mapping: true \n    grades: true \n    tree_display: true \n    student_team: true \n    invitation: true \n    survey: true \n    password_retrieval: true \n    submitted_content: true \n    eula: true \n    student_review: true \n    publishing: true \n    export_file: true \n    response: true \n    popup: true \n    sign_up_sheet: true \n    suggestion: true \n    leaderboard: true \n    delete_object: true \n    assessment360: true \n    review_files: true \n    advertise_for_partners: true \n    join_team_requests: true \n    advertise_for_partner: true \n    automated_metareviews: true \n    advice: true \n    analytic: true \n    versions: true \n    student_quiz: true \n  pages: \n    home: true \n    expired: true \n    notfound: true \n    denied: true \n    contact_us: true \n    site_admin: false \n    adminpage: true \n    credits: true \n    wiki: true \n  permission_ids: \n  - 7 \n  - 10 \n  - 8 \n  - 4 \n  - 3 \n  role_id: 2 \n  role_ids: \n  - 2 \n  - 6 \n  - 1 \n  updated_at: 2015-06-11 15:23:44.000000000 Z \n:menu: !ruby/object:Menu \n  by_id: \n    1: &1 !ruby/object:Menu::Node \n      content_page_id: 1 \n      controller_action_id: \n      id: 1 \n      label: Home \n      name: home \n      parent: \n      parent_id: \n      site_controller_id: \n      url: '/home' \n      children: \n      - 50 \n    37: &2 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 59 \n      id: 37 \n      label: Manage... \n      name: manage instructor content \n      parent: \n      parent_id: \n      site_controller_id: 38 \n      url: '/tree_display/drill' \n      children: \n      - 13 \n      - 38 \n      - 44 \n      - 45 \n      - 33 \n    35: &3 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 43 \n      id: 35 \n      label: Survey Deployments \n      name: Survey Deployments \n      parent: \n      parent_id: \n      site_controller_id: 33 \n      url: '/survey_deployment/list' \n      children: \n      - 36 \n    26: &4 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 33 \n      id: 26 \n      label: Assignments \n      name: student_task \n      parent: \n      parent_id: \n      site_controller_id: 23 \n      url: '/student_task/list' \n    30: &5 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 42 \n      id: 30 \n      label: Course Evaluation \n      name: Course Evaluation \n      parent: \n      parent_id: \n      site_controller_id: 31 \n      url: '/course_evaluation/list' \n    27: &6 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 36 \n      id: 27 \n      label: Profile \n      name: profile \n      parent: \n      parent_id: \n      site_controller_id: 26 \n      url: '/profile/edit' \n    2: &7 !ruby/object:Menu::Node \n      content_page_id: 6 \n      controller_action_id: \n      id: 2 \n      label: Contact Us \n      name: contact_us \n      parent: \n      parent_id: \n      site_controller_id: \n      url: '/contact_us' \n      children: \n      - 14 \n    50: &8 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 78 \n      id: 50 \n      label: Leaderboard \n      name: leaderboard \n      parent: \n      parent_id: 1 \n      site_controller_id: 54 \n      url: '/leaderboard/index' \n    14: &9 !ruby/object:Menu::Node \n      content_page_id: 10 \n      controller_action_id: \n      id: 14 \n      label: Credits &amp; Licence \n      name: credits \n      parent: \n      parent_id: 2 \n      site_controller_id: \n      url: '/credits' \n    46: &10 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 15 \n      id: 46 \n      label: Show... \n      name: show \n      parent: \n      parent_id: 3 \n      site_controller_id: 10 \n      url: '/users/list' \n    36: &11 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 44 \n      id: 36 \n      label: Statistical Test \n      name: Statistical Test \n      parent: \n      parent_id: 35 \n      site_controller_id: 34 \n      url: '/statistics/list_surveys' \n    13: &12 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 15 \n      id: 13 \n      label: Users \n      name: manage/users \n      parent: \n      parent_id: 37 \n      site_controller_id: 10 \n      url: '/users/list' \n    38: &13 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 60 \n      id: 38 \n      label: Questionnaires \n      name: manage/questionnaires \n      parent: \n      parent_id: 37 \n      site_controller_id: 38 \n      url: '/tree_display/goto_questionnaires' \n      children: \n      - 39 \n      - 48 \n      - 49 \n      - 40 \n      - 41 \n      - 42 \n      - 43 \n    44: &14 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 66 \n      id: 44 \n      label: Courses \n      name: manage/courses \n      parent: \n      parent_id: 37 \n      site_controller_id: 38 \n      url: '/tree_display/goto_courses' \n    45: &15 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 67 \n      id: 45 \n      label: Assignments \n      name: manage/assignments \n      parent: \n      parent_id: 37 \n      site_controller_id: 38 \n      url: '/tree_display/goto_assignments' \n    33: &16 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 45 \n      id: 33 \n      label: Impersonate User \n      name: impersonate \n      parent: \n      parent_id: 37 \n      site_controller_id: 35 \n      url: '/impersonate/start' \n    39: &17 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 62 \n      id: 39 \n      label: Review rubrics \n      name: manage/questionnaires/review rubrics \n      parent: \n      parent_id: 38 \n      site_controller_id: 38 \n      url: '/tree_display/goto_review_rubrics' \n    48: &18 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 72 \n      id: 48 \n      label: Metareview rubrics \n      name: manage/questionnaires/metareview rubrics \n      parent: \n      parent_id: 38 \n      site_controller_id: 38 \n      url: '/tree_display/goto_metareview_rubrics' \n    49: &19 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 73 \n      id: 49 \n      label: Teammate review rubrics \n      name: manage/questionnaires/teammate review rubrics \n      parent: \n      parent_id: 38 \n      site_controller_id: 38 \n      url: '/tree_display/goto_teammatereview_rubrics' \n    40: &20 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 61 \n      id: 40 \n      label: Author feedbacks \n      name: manage/questionnaires/author feedbacks \n      parent: \n      parent_id: 38 \n      site_controller_id: 38 \n      url: '/tree_display/goto_author_feedbacks' \n    41: &21 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 63 \n      id: 41 \n      label: Global survey \n      name: manage/questionnaires/global survey \n      parent: \n      parent_id: 38 \n      site_controller_id: 38 \n      url: '/tree_display/goto_global_survey' \n    42: &22 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 64 \n      id: 42 \n      label: Surveys \n      name: manage/questionnaires/surveys \n      parent: \n      parent_id: 38 \n      site_controller_id: 38 \n      url: '/tree_display/goto_surveys' \n    43: &23 !ruby/object:Menu::Node \n      content_page_id: \n      controller_action_id: 64 \n      id: 43 \n      label: Course evaluations \n      name: manage/questionnaires/course evaluations \n      parent: \n      parent_id: 38 \n      site_controller_id: 38 \n      url: '/tree_display/goto_surveys' \n  by_name: \n    home: *1 \n    manage instructor content: *2 \n    Survey Deployments: *3 \n    student_task: *4 \n    Course Evaluation: *5 \n    profile: *6 \n    contact_us: *7 \n    leaderboard: *8 \n    credits: *9 \n    show: *10 \n    Statistical Test: *11 \n    manage/users: *12 \n    manage/questionnaires: *13 \n    manage/courses: *14 \n    manage/assignments: *15 \n    impersonate: *16 \n    manage/questionnaires/review rubrics: *17 \n    manage/questionnaires/metareview rubrics: *18 \n    manage/questionnaires/teammate review rubrics: *19 \n    manage/questionnaires/author feedbacks: *20 \n    manage/questionnaires/global survey: *21 \n    manage/questionnaires/surveys: *22 \n    manage/questionnaires/course evaluations: *23 \n  crumbs: \n  - 1 \n  root: &24 !ruby/object:Menu::Node \n    parent: \n    children: \n    - 1 \n    - 37 \n    - 35 \n    - 26 \n    - 30 \n    - 27 \n    - 2 \n  selected: \n    1: *1 \n  vector: \n  - *24 \n  - *1")
+   23    end
+   24  
+   ..
+  117      max_team_size 3
+  118      staggered_deadline false
+  119:     allow_suggestions false
+  120      review_assignment_strategy "Auto-Selected"
+  121      max_reviews_per_submission 2
+
+/Users/louie/expertiza/spec/features/assignment_creation_spec.rb:
+  176  
+  177      it "can edit topics properties" do
+  178:       check("assignment_form_assignment_allow_suggestions")
+  179        check("assignment_form_assignment_is_intelligent")
+  180        check("assignment_form_assignment_can_review_same_topic")
+  ...
+  184        assignment = Assignment.where(name: 'public assignment for test').first
+  185        expect(assignment).to have_attributes(
+  186:         allow_suggestions: true,
+  187          is_intelligent: true,
+  188          can_review_same_topic: true,
+  ...
+  193  
+  194      it "can edit topics properties" do
+  195:       uncheck("assignment_form_assignment_allow_suggestions")
+  196        uncheck("assignment_form_assignment_is_intelligent")
+  197        uncheck("assignment_form_assignment_can_review_same_topic")
+  ...
+  201        assignment = Assignment.where(name: 'public assignment for test').first
+  202        expect(assignment).to have_attributes(
+  203:         allow_suggestions: false,
+  204          is_intelligent: false,
+  205          can_review_same_topic: false,
+
+/Users/louie/expertiza/spec/features/topic_suggestion_spec.rb:
+    3  ########################################
+    4  
+    5: #   Case 1: One team is on the waitlist. They sent a suggestion for new topic and they want to choose their suggested topic. After their suggested topic is approved, they should leave the waitlist and hold their suggested topic;
+    6  
+    7  ########################################
+    .
+   10    pubAssignment = nil
+   11    before(:each) do
+   12:     create(:assignment, name: 'Assignment_suggest_topic', allow_suggestions: true)
+   13      create_list(:participant, 3)
+   14      create(:assignment_node)
+   ..
+   38        expect(page).to have_content "Suggest a topic"
+   39        find_link('Suggest a topic').click
+   40:       fill_in 'suggestion_title', with: 'suggested_topic'
+   41:       fill_in 'suggestion_description', with: 'suggested_description'
+   42        click_button 'Submit'
+   43:       expect(page).to have_content "Thank you for your suggestion"
+   44  
+   45        user = User.find_by_name('instructor6')
+   46        stub_current_user(user, user.role.name, user.role)
+   47  
+   48:       # instructor approve the suggestion topic
+   49        # DUE date need to be added here
+   50:       visit '/suggestion/list?id=1&type=Assignment'
+   51        expect(page).to have_content "Assignment_suggest_topic"
+   52        find_link('View').click
+   53        expect(page).to have_content "suggested_description"
+   54:       click_button 'Approve suggestion'
+   55:       expect(page).to have_content "The suggestion was successfully approved."
+   56      end
+   57    end
+   ..
+   69        expect(page).to have_content "Suggest a topic"
+   70        find_link('Suggest a topic').click
+   71:       fill_in 'suggestion_title', with: 'suggested_topic'
+   72:       fill_in 'suggestion_description', with: 'suggested_description'
+   73        click_button 'Submit'
+   74:       expect(page).to have_content "Thank you for your suggestion"
+   75  
+   76        user = User.find_by_name('instructor6')
+   77        stub_current_user(user, user.role.name, user.role)
+   78  
+   79:       # instructor approve the suggestion topic
+   80:       visit '/suggestion/list?id=1&type=Assignment'
+   81        expect(page).to have_content "Suggested topics for Assignment_suggest_topic"
+   82        expect(page).to have_content "suggested_topic"
+   83        find_link('View').click
+   84        expect(page).to have_content "suggested_description"
+   85:       click_button 'Approve suggestion'
+   86:       expect(page).to have_content "The suggestion was successfully approved."
+   87  
+   88        # case 2 student already have topic switch to new topic
+   ..
+  103        expect(page).to have_content "Suggest a topic"
+  104        find_link('Suggest a topic').click
+  105:       fill_in 'suggestion_title', with: 'suggested_topic2_will_switch'
+  106:       fill_in 'suggestion_description', with: 'suggested_description_2'
+  107        click_button 'Submit'
+  108:       expect(page).to have_content "Thank you for your suggestion"
+  109  
+  110        # login_as instructor6 to approve the 2nd suggested topic
+  ...
+  112        stub_current_user(user, user.role.name, user.role)
+  113  
+  114:       # instructor approve the suggestion topic
+  115        visit '/tree_display/list'
+  116:       visit '/suggestion/list?id=1&type=Assignment'
+  117        expect(page).to have_content "Suggested topics for Assignment_suggest_topic"
+  118        expect(page).to have_content "suggested_topic2_will_switch"
+  119        # find link for new suggested view
+  120:       visit '/suggestion/2'
+  121        # find_link('View').click
+  122        expect(page).to have_content "suggested_description"
+  123:       click_button 'Approve suggestion'
+  124:       expect(page).to have_content "The suggestion was successfully approved."
+  125  
+  126        # lgoing as student 2064 to switch to new approved topic
+  ...
+  151    ########################################
+  152    # Case 3:
+  153:   # One team is holding a topic. They sent a suggestion for new topic, and keep themselves in old topic
+  154    ########################################
+  155  
+  ...
+  166        expect(page).to have_content "Suggest a topic"
+  167        find_link('Suggest a topic').click
+  168:       fill_in 'suggestion_title', with: 'suggested_topic'
+  169:       fill_in 'suggestion_description', with: 'suggested_description'
+  170        click_button 'Submit'
+  171:       expect(page).to have_content "Thank you for your suggestion"
+  172  
+  173        # login_as "instructor6"
+  ...
+  175        stub_current_user(user, user.role.name, user.role)
+  176  
+  177:       # instructor approve the suggestion topic
+  178        # DUE date need to be added here
+  179:       visit '/suggestion/list?id=1&type=Assignment'
+  180        find_link('View').click
+  181        expect(page).to have_content "suggested_description"
+  182:       click_button 'Approve suggestion'
+  183:       expect(page).to have_content "The suggestion was successfully approved."
+  184  
+  185        ######################################
+  186:       # One team is holding a topic. They sent a suggestion for new topic
+  187        ######################################
+  188        # login_as "student2065"
+  ...
+  196        expect(page).to have_content "Suggest a topic"
+  197        find_link('Suggest a topic').click
+  198:       fill_in 'suggestion_title', with: 'suggested_topic2_without_switch'
+  199:       fill_in 'suggestion_description', with: 'suggested_description2_without_switch'
+  200:       find('#suggestion_signup_preference').find(:xpath, 'option[2]').select_option
+  201        click_button 'Submit'
+  202:       expect(page).to have_content "Thank you for your suggestion"
+  203  
+  204        # login_as "instructor6"
+  ...
+  206        stub_current_user(user, user.role.name, user.role)
+  207  
+  208:       # instructor approve the suggestion topic
+  209        visit '/tree_display/list'
+  210:       visit '/suggestion/list?id=1&type=Assignment'
+  211        expect(page).to have_content "Suggested topics for Assignment_suggest_topic"
+  212        expect(page).to have_content "suggested_topic2_without_switch"
+  ...
+  214        # find_link('View').click
+  215        expect(page).to have_content "suggested_description2_without_switch"
+  216:       click_button 'Approve suggestion'
+  217:       expect(page).to have_content "The suggestion was successfully approved."
+  218  
+  219        # login_as "student2065"
+
+/Users/louie/expertiza/test/controllers/review_metrics_controller_test.rb:
+   19    test "should create review_metric" do
+   20      assert_difference('ReviewMetric.count') do
+   21:       post :create, review_metric: { offensive_term: @review_metric.offensive_term, problem: @review_metric.problem, response_id: @review_metric.response_id, suggestion: @review_metric.suggestion, volume: @review_metric.volume }
+   22      end
+   23  
+   ..
+   36  
+   37    test "should update review_metric" do
+   38:     patch :update, id: @review_metric, review_metric: { offensive_term: @review_metric.offensive_term, problem: @review_metric.problem, response_id: @review_metric.response_id, suggestion: @review_metric.suggestion, volume: @review_metric.volume }
+   39      assert_redirected_to review_metric_path(assigns(:review_metric))
+   40    end
+
+/Users/louie/expertiza/test/factories/review_metrics.rb:
+    3      response_id 1
+    4  volume 1
+    5: suggestion false
+    6  problem false
+    7  offensive_term false
+
+/Users/louie/expertiza/tmp/cache/assets/sprockets/v3.0/Aw/AwFG6qFvuZXLmS8Q8H15qA9lT5Le6Cr6nTEJK0rk_fE.cache:
+    <binary>
+
+/Users/louie/expertiza/tmp/cache/assets/sprockets/v3.0/AX/Ax7F2r-JM9HR3IP79UItYcPZXMQ_Zh0ZZwjUi_nU9Oo.cache:
+    <binary>
+
+/Users/louie/expertiza/tmp/cache/assets/sprockets/v3.0/eW/eWVftRxkSQ5twe4O_Rygw7Ro6lm8PcBGL7wNDEEUJC4.cache:
+    <binary>
+
+/Users/louie/expertiza/tmp/cache/assets/sprockets/v3.0/jn/jn9Qc2YebJyCgtk8KE1u_TgTXaFbTqrqiWiOMiLGBng.cache:
+    <binary>
+
+/Users/louie/expertiza/tmp/cache/assets/sprockets/v3.0/Q6/Q6jvrfEoJkSxDfNsCsVWk7I0gpf__lmsjkOODwTl1Z0.cache:
+    <binary>
+
+/Users/louie/expertiza/tmp/cache/assets/sprockets/v3.0/up/upZX9xT_b_31MifF77_QuuOlapXKhrxgnL-ZVD_pwaE.cache:
+    <binary>
+
+/Users/louie/expertiza/vendor/assets/components/jquery/speed/index.html:
+   63  	</div>
+   64  </div>
+   65: <div style="display:none;"><div id="page"><div id="masthead"><div id="mastheadhd"></div><div id="mastheadbd"><div class="mastheadbd"><div id="eyebrow"><ul id="ypromo"><li><a id="sethomepage" href=""><strong>Make Y! your home page</strong></a></li><li id="toolbar"><a id="dtba" href=""><span id="tba">Get</span> Yahoo! Toolbar</a></li></ul><div id="ffhpcx"></div><div id="headline"><span><a href="">How much home can you afford?</a></span></div></div><h1><img src="blank.gif" border=0 width=232 height=44 alt="Yahoo!" id="ylogo"></h1><div id="searchwrapper"><form name="sf1" id="search" action="r/sx/*-http://search.yahoo.com/search"><fieldset><legend>Yahoo! Search</legend><ul id="vsearchtabs"><li class="first on"><a href="">Web</a></li><li><a href="">Images</a></li><li><a href="">Video</a></li><li><a href="">Local</a></li><li><a href="">Shopping</a></li><li class="last ignore"><dl id="vsearchm"><dt><a id="vsearchmore" href="">More</a></dt><dd id="vslist"></dd></dl></li></ul><div id="sbox"><label id="searchlabel" for="p">Search:</label><div class="outer_search_container"><div id="search_container" class="search_container"><img src="blank.gif" id="searchother_e2e" alt=""><div id="searchIE"><div id="searchmw1" class="iemw"></div></div><div class="fixfloat searchbox_container"><div id="searchbox"><input class="plong inputtext" type="text" id="p" name="p" accesskey="s"></div><span id="searchbtn"><input type="submit" id="searchsubmit" class="btn-more-2" value="Web Search"></span></div></div><div id="e2eClass" class="e2e"><div class="e2eTween"></div><div id="e2e"><div id="e2econtent"><div id="e2e_intl"></div><div class="ac_container"><div id="e2einfo"></div><div id="ac_container"></div><div id="e2escroll"></div></div></div><a title="toggle search suggestions" id="e2etoggle" href="" onclick="return false;"><img src="blank.gif" id="searchtoggle_e2e" alt="toggle search suggestions"></a></div></div></div><input type="hidden" name="fr" value="yfp"><input type="hidden" name="toggle" value="1"><input type="hidden" name="cop" value="mss"><input type="hidden" name="ei" value="UTF-8"></div><div id="sboxfooter"></div></fieldset></form></div><div class="mh_footer"><div id="doors"><h3 class="a11y">Popular Yahoo! Properties</h3><ul id="doors-links" class="fixfloat"><li class="first"><strong>Yahoo! Home</strong></li><li class="middle"><a href=r/i1 title="Go to My Yahoo!">My Yahoo!</a></li><li class="last"></li></ul></div><div id="pagesettingscx"><span id="navbardate"><cite class="timestamp">&nbsp;</cite></span><a href="" id="editpage">Page Options</a><div id="pagesettings"><div class="bd"><span><div class="iemw"></div><div id="pscolors"><h4>Color:</h4><ol id="themes"><li><a href="" id="t1" class="on" title="Ocean">Ocean</a></li><li><a href="" id="t4"  title="Tangerine">Tangerine</a></li><li><a href="" id="t3"  title="Violet">Violet</a></li><li><a href="" id="t2"  title="Oyster">Oyster</a></li><li><a href="" id="t5"  title="Grass">Grass</a></li><li><a href="" id="t7"  title="Pink">Pink</a></li></ol></div><a id="sizetogglelink" href="">Switch to narrow layout</a><a id="myyahoolink" href="">Want more ways to customize <span>your home page?</span><span class="trymyyahoo">Try My Yahoo! &#187;</span></a></span></div></div></div></div></div></div><div id="mastheadft"></div></div><div id="colcx"><div id="left"><div id="trough" class="md"><div class="bd"><div id="trough-cols" class="fixfloat"><ul id="trough-1" class="col1"><li><a style="background-position:-400px -120px" href="">Answers</a></li><li><a style="background-position:-400px -440px" href="">Autos</a></li><li><a style="background-position:0 -761px" href="">Finance</a></li><li><a style="background-position:0 -1600px" href="">Games</a></li><li><a style="background-position:0 -1400px" href="">Groups</a></li><li><a style="background-position:0 -439px" href="">HotJobs</a></li><li><a style="background-position:0 -600px" href="">Maps</a></li><li><a style="background-position:0 -161px" href="">Mobile Web</a></li><li><a style="background-position:0 -561px;display:inline" href="">Movies</a> | <a class="trough_tv" href="">TV</a></li><li><a style="background-position:0 -1562px" href="">Music</a></li><li><a style="background-position:-400px -1119px" href="">OMG</a></li><li class="highlight"><a style="background-position:0 -40px" href="">Personals</a></li><li><a style="background-position:-400px -161px" href="">Real Estate<small class="updated"></small></a></li><li><a style="background-position:-400px -1321px" href="">Shine</a></li><li><a style="background-position:0 -1640px" href="">Shopping</a></li><li><a style="background-position:0 -800px" href="">Sports</a></li><li><a style="background-position:0 -79px" href="">Travel</a></li><li><a style="background-position:0 -121px" href="">Yellow Pages</a></li></ul></div><span id="allyservicescx"><a href="" id="allyservices" class="btn-more-2" title="View the complete list of Yahoo! Services">More Yahoo! Services</a></span></div></div><div class="md minimantle"><div id="smallbiz" class="md-sub"><div class="hd"><h2><a href="">Small Business</a></h2></div><ul id="smallbiz-links"><li><a href="">Get a Web Site</a></li><li><a href="">Domain Names</a></li><li><a href="">Sell Online</a></li><li><a href="">Search Ads</a></li></ul></div></div><div class="md minimantle"><div id="advertising" class="md-sub"><div class="hd"><h2><a href="">Featured Services</a></h2></div><ul id="advertising-links"><li><a href="">Downloads</a></li><li><a href="">Health</a></li><li><a href="">Kids</a></li><li><a href="">GeoCities</a></li><li><a href="">Mail Plus</a></li><li><a href="">Y! International</a></li></ul></div></div></div><div id="rightcx"><div id="middle"><div class="colpadding"><div id="today" class="md featured1"><div class="hd tabs"><h3 class="a11y">Featured Navigation</h3><ul id="todaytabs"><li class="on first"><em><a hidefocus="true" id="featured1" href="">Featured</a></em><span class="pipe"></span></li><li class="tab2"><em><a hidefocus="true" id="entertainment1" href="">Entertainment</a></em><span class="pipe"></span></li><li class="tab3"><em><a hidefocus="true" id="sports1" href="">Sports</a></em><span class="pipe"></span></li><li class="last"><em><a hidefocus="true" id="money1" href="">Video</a></em><span class="pipe"></span></li></ul></div><div id="todayvideo"></div><div id="todaybd" class="bd"><cite class="timestamp">&nbsp;</cite><span id="featured1ct" class="current"><div id="featured1main"><a href=s/1014544><img src="blank.gif" width="154" height="115" alt="Renee Zellweger (Steve Grantiz/WireImage)"></a><span><h3><a href=s/1014544>Worst dressed at the Globes</a></h3><p>Renee's look is a mess, and Miley's gown is a mistake. <a class=more href=s/1014544>&#187; See bad outfits</a></p><ul><li><a class=slideshow href=s/1014545>Best dressed</a></li><li><a class=slideshow href=s/1014546>Stunning couples</a></li><li><a class=video href=s/1014547>Watch Brangelina diss Ryan Seacrest</a></li><li><a class=bullet href=s/1014548>Outrageous moments</a></li><li><a class=bullet href=s/1014549>Big winners</a></li></ul></span></div></span><span id="featured2ct"></span><span id="featured3ct"></span><span id="featured4ct"></span><span id="entertainment1ct"></span><span id="entertainment2ct"></span><span id="entertainment3ct"></span><span id="entertainment4ct"></span><span id="sports1ct"></span><span id="sports2ct"></span><span id="sports3ct"></span><span id="sports4ct"></span><span id="money1ct"></span><span id="money2ct"></span><span id="money3ct"></span><span id="money4ct"></span></div><div id="todayft" class="ft"><span id="footer1" class="current"><ul id="todaystories1"><li id="featured1|106537" class="on"><a href=s/1014556><img src="blank.gif" alt="" width="29" height="21">See the worst-dressed stars at Golden Globes</a></li><li id="featured2|106533"><a href=s/1014475><img src="blank.gif" alt="" width="29" height="21">Obama: Dog search down to two breeds</a></li><li id="featured3|106522"><a href=s/1014275><img src="blank.gif" alt="" width="29" height="21">Eagles star gets penalty for 'phone call'</a></li><li id="featured4|106538"><a href=s/1014566><img src="blank.gif" alt="" width="29" height="21">Teen sends 14,528 texts in one month</a></li></ul><div id="more-featured" class="btn-more"><b>&#187;</b> More:<a class="first" href="">Featured</a><a class="last" href="">Buzz</a></div></span><span id="footer2"></span><span id="footer3"></span><span id="footer4"></span></div></div><div id="adwest" class="ad"></div><div id="news" class="md"><div class="hd tabs"><h3 class="a11y">News Navigation</h3><ul id="newstabs"><li class="on first"><em><a hidefocus="true" id="inthenews2" href="">News</a></em><span class="pipe"></span></li><li class="tab2"><em><a hidefocus="true" id="worldnews" href="">World</a></em><span class="pipe"></span></li><li class="tab3"><em><a hidefocus="true" id="localnews" href="">Local</a></em><span class="pipe"></span></li><li class="last"><em><a hidefocus="true" id="finsnews" href="">Finance</a></em><span class="pipe"></span></li></ul></div><div id="newsbd" class="bd"><span id="inthenews2ct" class="current"><h2 class="a11y">In the News</h2><div id="newstop"><cite class="timestamp">&nbsp;</cite>&#149;&nbsp;<a href=s/1014558>Obama advises Bush to request remaining $350B of bailout</a><br>&#149;&nbsp;<a href=s/1014502>Bush defends his presidency in final news conference</a><br>&#149;&nbsp;<a href=s/1014534>More than 900 Gazans dead as Israel continues attacks</a><br>&#149;&nbsp;<a href=s/1014517>Openly gay Episcopal bishop to say prayer at inaugural event</a><br>&#149;&nbsp;<a href=s/1014567>NYC judge allows Bernard Madoff to remain free on bail</a><br>&#149;&nbsp;<a href=s/1014516>British PM backing Prince Harry after racist remark</a><br>&#149;&nbsp;<a class=video style="background-position:-3px -48px;font:normal 100% arial;" href=s/1014537 onclick="window.open('s/1014537','playerWindow','width=793,height=608,scrollbars=no');return false;">Brothers separated at birth reunite after 80 years</a><br><ul id="more-news" class="btn-more"><li class="first"><b>&#187;</b> More:</li><li><a href=r/xn>News</a></li><li><a href=r/me>Popular</a></li><li class="last"><a href=r/z0>Politics</a></li></ul></div><div id="newsft"><div id="newsbottom"><div id="finance-data"><div id="markets"><h3><a href="">Markets:</a></h3><ul><li><strong><a href="">Dow: </a><span class="down">-1.0%</span></strong></li><li><strong><a href="">Nasdaq: </a><span class="down">-1.7%</span></strong></li></ul></div><div id="quotes"><form name="fq" id="fq" action="r/f4/*-http://finance.yahoo.com/q"><fieldset><legend>Yahoo! Finance</legend>     <a href="">Real-Time Quotes:</a><input accesskey="q" class="inputtext" type="text" id="s" name="s" size="5" title="Enter ticker symbol" /><input type="submit" class="submit" value="Go" /></fieldset></form></div></div><div id="news-sponsor"><a href=""><img src="blank.gif" border=0 width=165 height=15 title="Switch to Scottrade"></a></div></div></div></span><span id="worldnewsct"></span><span id="localnewsct"></span><span id="finsnewsct"></span></div></div><div id="marketplace" class="md"><div class="hd"><h2><a href="" name="marketplace">Marketplace</a></h2></div><div id="marketplacebd" class="bd"><table border=0 cellpadding=0 cellspacing=0 width="100%"><tr><td valign=top><a href=""><img src="blank.gif" width=70 height=50 border=0></a></td><td width=8>&nbsp;</td><td valign=top><font face=arial size=-1><a href="">Why online college is rocking:</a><br>1) Accredited Associates, Bachelor&#39;s, Master&#39;s, MBA degrees 2) Some jobs pay tuition <a href="">3) Top schools online.</a></font></td></tr></table><hr size=1 noshade><a href="">A bad credit score is 600 or below. Click here to see yours online in just 2 easy steps for $0. By Experian&reg;</a><hr size=1 noshade><a href="">GEICO Car Insurance -</a> You could save over $500 on car insurance. <a href="">Get a fast, free quote.</a><hr size=1 noshade><a href="">100+ credit cards from 9 of the top 10 issuers. Instant approvals. Choose the right card for you. LendingTree&reg;</a></div></div></div></div><div id="right"><div class="colpadding"><div id="pa" class="md"><div id="pabd"><div id="patop"><ul id="reg" class="so"><li class="mailstatus">Check your mail status: <a href="">Sign In</a></li><li id="signup">Free mail: <a href="">Sign Up</a></li></ul></div><div id="patabs"><ul id="tabs1" class="patabs first"><li id="mail" class="first"><div><h4><a id="pamail" accesskey="m" href=""><span class="icon">Mail</span></a></h4></div></li><li id="messenger"><div><h4><a id="pamsgr" href=""><span class="icon">Messenger</span></a></h4></div></li><li id="games" class="last"><div><h4><a id="pagames" href=""><span class="icon">Puzzles</span></a></h4></div></li></ul><div id="tabs1previewdiv" class="papreviewdiv"></div><ul id="tabs2" class="patabs last"><li id="weather" class="first"><div><h4><a id="paweather" href=""><span class="icon">Weather</span></a></h4></div></li><li id="events"><div><h4><a id="paevents" href=""><span class="icon">Events</span></a></h4></div></li><li id="horoscope" class="last"><div><h4><a id="pahoroscope" href=""><span class="icon">Horoscopes</span></a></h4></div></li></ul><div id="tabs2previewdiv" class="papreviewdiv"></div></div></div></div><div id="ad" class="ad"><table cellspacing=0 cellpadding=0 border=0 width=100%><tr><td align=center><a href="" target="_top"><img src="blank.gif" alt="" width=300 height=250 border=0></a></td></tr><tr><td align=center><br><font face="verdana" size="-2"><a href="" target="_blank">Ad Feedback</a></font></td></tr></table></div><div id="mantlecx"><div id="mantle"><div id="mantle2" class="md"><div class="hd"><h2><a href="">Inside Yahoo! HotJobs</a></h2>	</div><div class="bd"><a href=""><img src="blank.gif" height="68" width="92" alt="Yahoo! HotJobs" border="0"></a><h3><a href="">Great companies hiring now</a></h3><ul><li><a href="">Careers with bright futures</a></li><li><a href="">Low-stress jobs that pay</a></li><li><a href="">Super-easy career changes</a></li><li><a href="">How to find a job right for you</a></li></ul></div></div></div></div><div id="pulse" class="md"><div class="hd"><h2>Pulse - What Yahoos Are Into</h2></div><div id="pulsebd" class="bd"><h3>Star Searches: Most Popular Actors</h3><a href=s/1013525/*-http://movies.yahoo.com/movie/contributor/1800043966><img src="blank.gif" alt="Alyssa Milano (Steve Granitz, WireImage.com)" width="139" height="119"></a><ol><li class="tt1"><a href=s/1013525/*-http://movies.yahoo.com/movie/contributor/1800043966>Alyssa Milano</a></li><li class="tt2"><a href=s/1013526/*-http://movies.yahoo.com/movie/contributor/1800018965>Brad Pitt</a></li><li class="tt3"><a href=s/1013527/*-http://movies.yahoo.com/movie/contributor/1804705919>Anne Hathaway</a></li><li class="tt4"><a href=s/1013528/*-http://movies.yahoo.com/movie/contributor/1800424122>Ziyi Zhang</a></li><li class="tt5"><a href=s/1013529/*-http://movies.yahoo.com/movie/contributor/1800019484>Charlize Theron</a></li><li class="tt6"><a href=s/1013530/*-http://movies.yahoo.com/movie/contributor/1800019485>Johnny Depp</a></li></ol></div><a class=btn-more href=s/1013531/*-http://movies.yahoo.com>&#187; More Yahoo! Movies</a></div><div id="popsearch" class="md"><div class="hd"><h2>Today&#039;s Top Searches</h2></div><div id="popsearchbd" class="bd"><ol start=1><li><a href="">Odette Yustman</a></li><li><a href="">Kate Hudson</a></li><li><a href="">Ana Ortiz</a></li><li><a href="">Weight Loss Tips</a></li><li><a href="">Kimberley Locke</a></li></ol><ol start=6><li><a href="">Rod Blagojevich</a></li><li><a href="">2009 Jeep Commander</a></li><li><a href="">Attention Deficit...</a></li><li><a href="">Snoring</a></li><li><a href="">New Orleans Vacations</a></li></ol></div></div></div></div></div></div><div id="footer" class="md"><ul id="flist2"><li class="first"><a href="">Advertise with Us</a></li><li><a href="">Search Marketing</a></li><li><a href="">Privacy Policy</a></li><li><a href="">Terms of Service</a></li><li><a href=r/ad>Suggest a Site</a></li><li><a href="">Yahoo! en Espa&ntilde;ol</a></li><li><a href="">Send Feedback</a></li><li class="last"><a href="">Help</a></li></ul><ul id="copyright"><li class="first">Copyright &copy; 2009 Yahoo! Inc. All rights reserved.</li><li class="first"><a href="">Copyright/IP Policy</a></li><li><a href="">Company Info</a></li><li><a href="">Participate in Research</a></li><li><a href="">Jobs</a></li></ul></div></div> <div id="yblthm_sip" style="display:none"></div></div>
+   66  	<script type="text/javascript" charset="utf-8">
+   67  				jQuery.benchmarker = {libraries: ["$", "jQuery"]};
+
+422 matches across 44 files

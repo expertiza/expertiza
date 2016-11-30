@@ -105,16 +105,7 @@ class Badge
 	def self.topper(assignment, participant)	
 		scores = Badge.get_scores(assignment)
 	    
-	    averages = Badge.calculate_average_vector(scores)
-	    teams = Badge.get_teams(scores)
-	    
-	    max_average_index = averages.each_with_index.max[1]
-
-	    if teams[max_average_index].participants.include?(participant)
-			return TOPPER_BADGE_IMAGE.html_safe
-	 	else
-	 		return false
-	 	end
+	    return Badge.is_toppper(scores, participant)
 	end
 
 	def self.get_scores(assignment)
@@ -132,6 +123,19 @@ class Badge
 	    scores = assignment.scores(questions)
 	    return scores
 	    
+	end
+
+	def self.is_toppper(scores, participant)
+		averages = Badge.calculate_average_vector(scores)
+	    teams = Badge.get_teams(scores)
+	    
+	    max_average_index = averages.each_with_index.max[1]
+
+	    if teams[max_average_index].participants.include?(participant)
+			return TOPPER_BADGE_IMAGE.html_safe
+	 	else
+	 		return false
+	 	end
 	end
 
 	def self.retrieve_questions(questionnaires, assignment)

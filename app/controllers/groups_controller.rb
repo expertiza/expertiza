@@ -69,23 +69,11 @@ class GroupsController < ApplicationController
   def delete
     # delete records in group, groups_users, signed_up_groups table
     @group = Group.find(params[:id])
-    course = Object.const_get(session[:group_type]).find(@group.parent_id)
-
-    @sign_ups = SignedUpGroup.where(group_id: @group.id)
+    course = Assignment.find(@group.parent_id)
 
     @groups_users = GroupsUser.where(group_id: @group.id)
 
-    if @sign_ups.size == 1 and @sign_ups.first.is_waitlisted == false # this group hold a topic
-      # if there is another group in waitlist, make this group hold this topic
-      topic_id = @sign_ups.first.topic_id
-      next_wait_listed_group = SignedUpGroup.where(topic_id: topic_id, is_waitlisted: true).first
-      # if slot exist, then confirm the topic for this group and delete all waitlists for this group
-      if next_wait_listed_group
-        SignUpTopic.assign_to_first_waiting_group(next_wait_listed_group)
-      end
-    end
 
-    @sign_ups.destroy_all if @sign_ups
     @groups_users.destroy_all if @groups_users
     @group.destroy if @group
 

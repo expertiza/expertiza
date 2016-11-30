@@ -33,12 +33,24 @@ class QuestionnairesController < ApplicationController
 
   # Define a new questionnaire
   def new
+    debug "New a questionnaire"
+    debug params
+    
     if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model]
       @questionnaire = Object.const_get(params[:model].split.join).new
     end
   end
 
   def create
+    debug "Create a questionnaire"
+    debug params
+
+    if params[:questionnaire][:name].empty?
+      flash[:error] = "questionnaire name can not be empty"
+      redirect_to controller: 'questionnaires', action: 'new', model: params[:questionnaire][:type], private: params[:questionnaire][:private]
+      return
+    end
+    
     questionnaire_private = params[:questionnaire][:private] == "true" ? true : false
     display_type = params[:questionnaire][:type].split('Questionnaire')[0]
     if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
@@ -66,6 +78,9 @@ class QuestionnairesController < ApplicationController
       @questionnaire.display_type = display_type
       @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
       @questionnaire.save
+
+      debug @questionnaire.inspect
+      
       # Create node
       tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
       parent = FolderNode.find_by_node_object_id(tree_folder.id)
@@ -74,10 +89,19 @@ class QuestionnairesController < ApplicationController
     rescue
       flash[:error] = $ERROR_INFO
     end
+
     redirect_to controller: 'questionnaires', action: 'edit', id: @questionnaire.id
   end
 
+  def debug(s)
+    puts "======== Message ========"
+    puts s
+    puts "======== Message ========"
+  end
+  
   def create_questionnaire
+    debug "Create new questionnaire"
+    
     @questionnaire = Object.const_get(params[:questionnaire][:type]).new(questionnaire_params)
 
     # TODO: check for Quiz Questionnaire?
@@ -111,11 +135,17 @@ class QuestionnairesController < ApplicationController
 
   # Edit a questionnaire
   def edit
+    debug "Edit a questionnaire"
+    debug params
+    
     @questionnaire = Questionnaire.find(params[:id])
     redirect_to Questionnaire if @questionnaire.nil?
   end
 
   def update
+    debug "Update a questionnaire"
+    debug params
+    
     @questionnaire = Questionnaire.find(params[:id])
     begin
       @questionnaire.update_attributes(questionnaire_params)
@@ -195,6 +225,9 @@ class QuestionnairesController < ApplicationController
 
   # Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions
+    debug "add_new_questions"
+    debug params
+    
     questionnaire_id = params[:id] unless params[:id].nil?
     num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|

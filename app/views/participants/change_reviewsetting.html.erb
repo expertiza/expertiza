@@ -1,1 +1,7 @@
-<h1>Change review score setting</h1>
+<%= form_tag({:action => 'change_reviewsetting', :id =>  @participant}) do %>
+  <p>Change Review Score Setting <em>for current assignment</em>:
+    <%= text_field 'participant','reviewsetting' %>
+     
+    <%= submit_tag 'Save' %>
+  <% end %>
+  

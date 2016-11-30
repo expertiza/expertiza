@@ -2,7 +2,7 @@ class ParticipantsController < ApplicationController
   autocomplete :user, :name
 
   def action_allowed?
-    if params[:action] == 'change_handle' or params[:action] == 'update_duties'
+    if params[:action] == 'change_handle' or params[:action] == 'update_duties' or params[:action] == 'change_reviewsetting'
       ['Instructor',
        'Teaching Assistant',
        'Administrator',
@@ -191,7 +191,7 @@ class ParticipantsController < ApplicationController
     return unless current_user_id?(@participant.user_id)
 
     unless params[:participant].nil?
-      if !AssignmentParticipant.where(parent_id: @participant.parent_id, handle: params[:participant][:handle]).empty?
+      if !AssignmentParticipant.where(parent_id: @participant.parent_id, handle: params[:participant][:handle]).empty? 
         flash[:error] = "<b>The handle #{params[:participant][:handle]}</b> is already in use for this assignment. Please select a different one."
         redirect_to controller: 'participants', action: 'change_handle', id: @participant
       else
@@ -202,6 +202,13 @@ class ParticipantsController < ApplicationController
   end
 
   def change_reviewsetting
+    @participant = AssignmentParticipant.find(params[:id])
+    #return unless current_user_id?(@participant.user_id)
+
+    unless params[:participant].nil?
+      @participant.update_attributes(participant_params)
+      redirect_to controller: 'student_task', action: 'view', id: @participant
+    end
   end
   
 

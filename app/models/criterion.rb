@@ -121,8 +121,8 @@ class Criterion < ScoredQuestion
         html += "</option>"
       end
       html += "</select></div>"
-      html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments" \
-       name="responses[' + count.to_s + '][comment]" style="overflow:hidden;">'
+      html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments"' \
+       ' name="responses[' + count.to_s + '][comment]" style="overflow:hidden;">'
       html += answer.comments unless answer.nil?
       html += '</textarea></td></br><br/>'
     elsif dropdown_or_scale == 'scale'
@@ -159,8 +159,8 @@ class Criterion < ScoredQuestion
               end
 
       html += '<td width="10%"></td></tr></table>'
-      html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments" \
-        name="responses[' + count.to_s + '][comment]" style="overflow:hidden;">'
+      html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments"' \
+        ' name="responses[' + count.to_s + '][comment]" style="overflow:hidden;">'
       html += answer.comments unless answer.nil?
       html += '</textarea><br/><br/>'
 
@@ -193,8 +193,8 @@ class Criterion < ScoredQuestion
     html += '<table cellpadding="5">'
     html += '<tr>'
     html += '<td>'
-    html += '<div class="' + score_color + '" style="width:30px; height:30px; \
-      border-radius:50%; font-size:15px; color:black; line-height:30px; text-align:center;">'
+    html += '<div class="' + score_color + '" style="width:30px; height:30px;' \
+      ' border-radius:50%; font-size:15px; color:black; line-height:30px; text-align:center;">'
     html += score
     html += '</div>'
     html += '</td>'

@@ -141,43 +141,6 @@ class Response < ActiveRecord::Base
     total_score
   end
 
-  # Function which considers a given assignment
-  # and checks if a given review is still valid for score calculation
-  # The basic rule is that
-  # "A review is INVALID if there was new submission for the assignment
-  #  before the most recent review deadline AND THE review happened before that
-  #  submission"
-  # response - the response whose validity is being checked
-  # resubmission_times - submission times of the assignment is descending order
-  # latest_review_phase_start_time
-  # The function returns true if a review is valid for score calculation
-  # and false otherwise
-  def is_valid_for_score_calculation?(resubmission_times, latest_review_phase_start_time)
-    is_valid = true
-
-    # if there was not submission then the response is valid
-    if resubmission_times.nil? || latest_review_phase_start_time.nil?
-      return is_valid
-    end
-
-    resubmission_times.each do |resubmission_time|
-      # if the response is after a resubmission that is
-      # before the latest_review_phase_start_time (check second condition below)
-      # then we are good - the response is valid and we can break
-      break if self.updated_at > resubmission_time.resubmitted_at
-
-      # this means there was a re-submission before the
-      # latest_review_phase_start_time and we dont have a response after that
-      # so the response is invalid
-      if resubmission_time.resubmitted_at < latest_review_phase_start_time
-        is_valid = false
-        break
-      end
-    end
-
-    is_valid
-  end
-
   # only two types of responses more should be added
   def email(partial = "new_submission")
     defn = {}
@@ -199,6 +162,8 @@ class Response < ActiveRecord::Base
   def questionnaire_by_answer(answer)
     if !answer.nil? # for all the cases except the case that  file submission is the only question in the rubric.
       questionnaire = Question.find(answer.question_id).questionnaire
+      # I don't think this else is necessary. Checking the callers, it seems that answer cannot be nil should be a
+      # pre-condition of this method --Yang
     else
       # there is small possibility that the answers is empty: when the questionnaire only have 1 question and it is a upload file question
       # the reason is that for this question type, there is no answer record, and this question is handled by a different form

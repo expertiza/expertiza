@@ -1,4 +1,5 @@
 <%= form_for :hyperlinks, url: '/submitted_content/remove_hyperlink' do |f| %>
+
   <% if stage != "Finished" %>
     <% team_id = TeamsUser.team_id(participant.parent_id, participant.user_id) %>
     <% display_to_author = Team.exists?(team_id) && Team.find(team_id).has_user(@current_user)%>
@@ -15,7 +16,6 @@
   <% end %>
 
   <b>Hyperlinks</b>&nbsp;&nbsp;&nbsp;
-
   <a href="#" id="urlLink" name="urlLink" onClick="toggleElement('url','links');return false;">hide links</a><br/>
   <div id="url" style="">
     <ul>
@@ -29,10 +29,52 @@
             <input type="radio" id='chk_links' name='chk_links' value="<%= index %>"/>
           <% end %>
         <% end %>
-              <a href="<%= link %>" target="_blank"><%= link %></a>
+              <% if local_assigns[:response_check] %>
+                  <a href="<%= link %>" target="_blank" onClick="startTime(<%= map_id %>, <%= round %>,'<%= link%>');"><%= link %></a>
+              <% else %>
+                  <a href="<%= link %>" target="_blank"><%= link %></a>
+                  <% end %>
               <br/>
       <% end %>
+
       <% } %>
     </ul>
   </div>
 <% end %>
+<% if local_assigns[:response_check] %>
+    <script type="text/javascript">
+    function ISODateString(d){
+        function pad(n){return n<10 ? '0'+n : n}
+        return d.getUTCFullYear()+'-'
+                + pad(d.getUTCMonth()+1)+'-'
+                + pad(d.getUTCDate()) +' '
+                + pad(d.getUTCHours())+':'
+                + pad(d.getUTCMinutes())+':'
+                + pad(d.getUTCSeconds())
+    }
+    var myEvent = window.attachEvent || window.addEventListener;
+    var chkevent = window.attachEvent ? 'onbeforeunload' : 'beforeunload'; /// make IE7, IE8 compitable
+
+    myEvent(chkevent, function(e) { // For >=IE7, Chrome, Firefox
+        //var confirmationMessage = 'Are you sure to leave the page?';  // a space
+        //(e || window.event).returnValue = confirmationMessage;
+
+        var d = new Date();
+        $.ajax({
+            type:'POST',
+            url:'/responsetime/record_end_time',
+            data:$.param({ responsetime:{map_id: <%= map_id %>, round: <%= round %> , end: ISODateString(d)}})
+        })
+        //return confirmationMessage;
+    })
+    ;
+
+
+
+</script>
+<% end %>
+
+
+
+
+

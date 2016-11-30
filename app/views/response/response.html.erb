@@ -31,13 +31,13 @@ jQuery(document).ready(function() {
     <% if !topic_id.nil? %>
         <h2>You are reviewing <%= SignUpTopic.find(topic_id).topic_name %></h2>
     <% end %>
-
+    <% @response_check = true %>
     <%if @assignment.has_teams?%>
         <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
-        <%= render :partial => 'submitted_content/main', :locals => {:reviewee_participant => @contributor.participants.first,:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(topic_id)} %>
+        <%= render :partial => 'submitted_content/main', :locals => {:reviewee_participant => @contributor.participants.first,:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(topic_id), :map_id => @map.id, :round => @current_round, :response_check => @response_check} %>
     <%else%>
         <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
-        <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage => @assignment.get_current_stage(topic_id)} %>
+        <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage => @assignment.get_current_stage(topic_id), :map_id => @map.id, :round => @current_round, :response_check => @response_check} %>
     <%end%>
     <hr/>
 <% end %>

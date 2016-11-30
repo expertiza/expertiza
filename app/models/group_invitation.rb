@@ -39,7 +39,7 @@ class GroupInvitation < ActiveRecord::Base
     end
 
     # If you change your group, remove all your invitations that you send to other people
-    Invitation.remove_users_sent_invites_for_assignment(invited_user_id, assignment_id)
+    GroupInvitation.remove_users_sent_invites_for_assignment(invited_user_id, assignment_id)
 
     # Create a new group_user entry for the accepted invitation
     @group_user = GroupsUser.new

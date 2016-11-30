@@ -258,6 +258,10 @@ class AssignmentParticipant < Participant
     AssignmentTeam.team(self)
   end
 
+  def group
+    Group.group(self)
+  end
+
   # provide import functionality for Assignment Participants
   # if user does not exist, it will be created and added to this assignment
   def self.import(row, _row_header = nil, session, id)

@@ -2,7 +2,7 @@ class StudentGroupsController < ApplicationController
   autocomplete :user, :name
 
   def group
-    @group ||= AssignmentGroup.find params[:group_id]
+    @group ||= Group.find params[:group_id]
   end
 
   attr_writer :group
@@ -38,8 +38,8 @@ class StudentGroupsController < ApplicationController
     # only the owner should be able to see those.
     return unless current_user_id? student.user_id
 
-    @send_invs = Invitation.where from_id: student.user.id, assignment_id: student.assignment.id
-    @received_invs = Invitation.where to_id: student.user.id, assignment_id: student.assignment.id, reply_status: 'W'
+    @send_invs = GroupInvitation.where from_id: student.user.id, assignment_id: student.assignment.id
+    @received_invs = GroupInvitation.where to_id: student.user.id, assignment_id: student.assignment.id, reply_status: 'W'
     # Get the current due dates
     @student.assignment.due_dates.each do |due_date|
       if due_date.due_at > Time.now
@@ -58,7 +58,7 @@ class StudentGroupsController < ApplicationController
   end
 
   def create
-    existing_assignments = AssignmentTeam.where name: params[:group][:name], parent_id: student.parent_id
+    existing_assignments = Group.where name: params[:group][:name], parent_id: student.parent_id
     # check if the group name is in use
     if existing_assignments.empty?
       if params[:group][:name].nil? || params[:group][:name].empty?
@@ -66,7 +66,7 @@ class StudentGroupsController < ApplicationController
         redirect_to view_student_groups_path student_id: student.id
         return
       end
-      group = AssignmentTeam.new(name: params[:group][:name], parent_id: student.parent_id)
+      group = Group.new(name: params[:group][:name], parent_id: student.parent_id)
       group.save
       parent = AssignmentNode.find_by_node_object_id student.parent_id
       GroupNode.create parent_id: parent.id, node_object_id: group.id
@@ -85,7 +85,7 @@ class StudentGroupsController < ApplicationController
   end
 
   def update
-    matching_groups = AssignmentGroup.where name: params[:group][:name], parent_id: group.parent_id
+    matching_groups = Group.where name: params[:group][:name], parent_id: group.parent_id
     if matching_groups.length.zero?
       if group.update_attribute('name', params[:group][:name])
         group_created_successfully
@@ -126,7 +126,7 @@ class StudentGroupsController < ApplicationController
 
     # if your old group does not have any members, delete the entry for the group
     if GroupsUser.where(group_id: params[:group_id]).empty?
-      old_group = AssignmentGroup.find params[:group_id]
+      old_group = Group.find params[:group_id]
       if old_group && !old_group.received_any_peer_review?
         old_group.destroy
         # if assignment has signup sheet then the topic selected by the group has to go back to the pool
@@ -153,7 +153,7 @@ class StudentGroupsController < ApplicationController
     end
 
     # remove all the sent invitations
-    old_invites = Invitation.where from_id: student.user_id, assignment_id: student.parent_id
+    old_invites = GroupInvitation.where from_id: student.user_id, assignment_id: student.parent_id
 
     old_invites.each(&:destroy)
 

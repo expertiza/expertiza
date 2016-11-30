@@ -6,13 +6,23 @@ class Group < ActiveRecord::Base
 
   # Get the participants of the given group
   def participants
-    users.where(parent_id: parent_id || current_user_id).flat_map(&:participants)
+    users = self.users
+    participants = []
+    users.each do |user|
+      participant = AssignmentParticipant.where(user_id: user.id, parent_id: self.parent_id).first
+      participants << participant unless participant.nil?
+    end
+    participants
   end
-  alias get_participants participants
 
   # Get the response review map
   def responses
     participants.flat_map(&:responses)
+  end
+
+  # Return the parent Assignment
+  def assignment
+    Assignment.find(self.parent_id)
   end
 
   # Delete the given group

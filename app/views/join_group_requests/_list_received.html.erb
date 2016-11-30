@@ -1,4 +1,4 @@
-<% @join_group_requests = JoingroupRequest.where(group_id: group_id) %>
+<% @join_group_requests = JoinGroupRequest.where(group_id: group_id) %>
 <% if !@join_group_requests.empty? %>
 <h2>Received Requests</h2>
 <table>

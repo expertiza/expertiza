@@ -71,7 +71,7 @@
     <td style='padding:5px' id='isAnonymous'>
       <input name="assignment_form[assignment][isAnonymous]" type="hidden" value="false"/>
       <%= check_box_tag('assignment_form[assignment][isAnonymous]', 'true', @assignment_form.assignment.isAnonymous) %>
-      <%= label_tag('assignment_form[assignment][isAnonymous]', 'Anonymous Review?') %>
+      <%= label_tag('assignment_form[assignment][isAnonymous]', 'Is Anonymous Review?') %>
     </td>
   </tr>
 
@@ -95,7 +95,6 @@
     <td style='padding:5px' id='createButton'>
       <input name="assignment_form[assignment][isAnonymous]" type="hidden" value="false"/>
       <%= button_to( "Create Random Groups", :action => "create_groups", :controller => "groups", params: { 'id' => @assignment_form.assignment.id, 'group_size' => @assignment_form.assignment.group_size }, class: "do_it_link") %>
-      <%= label_tag('assignment_form[assignment][isAnonymous]', 'Anonymous Review?') %>
     </td>
   </tr>
 

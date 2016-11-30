@@ -1,5 +1,4 @@
 Expertiza::Application.routes.draw do
-  resources :group_invitations
   resources :groups_users
  # resources :groups
   resources :submission_records
@@ -155,6 +154,14 @@ Expertiza::Application.routes.draw do
   end
 
   resources :invitation do
+    collection do
+      get :cancel
+      get :accept
+      get :decline
+    end
+  end
+
+  resources :group_invitations do
     collection do
       get :cancel
       get :accept

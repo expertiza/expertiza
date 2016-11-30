@@ -12,6 +12,9 @@ class UsersController < ApplicationController
       true
     when 'request_user_create'
       true
+      #TODO: change review to only authorized users
+    when 'review'
+      true
     when 'keys'
       current_role_name.eql? 'Student'
     else
@@ -73,6 +76,12 @@ class UsersController < ApplicationController
     @users = paginate_list all_users
 
     @letters = ('A'..'Z').to_a
+  end
+
+  def review
+    #TODO: make status as enum or something
+    #@users = RequestedUser.where.not(status: 'approved');
+    @users = RequestedUser.all
   end
 
   def show_selection
@@ -237,7 +246,6 @@ class UsersController < ApplicationController
   end
 
   def get_role
-    abc
     if @user && @user.role_id
       @role = Role.find(@user.role_id)
     elsif @user

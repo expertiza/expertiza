@@ -1,0 +1,9 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  comparison_key: MyString
+  file_type: MyString
+
+two:
+  comparison_key: MyString
+  file_type: MyString

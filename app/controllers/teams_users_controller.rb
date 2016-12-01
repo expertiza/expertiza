@@ -2,13 +2,22 @@ class TeamsUsersController < ApplicationController
   def action_allowed?
     ['Instructor',
      'Teaching Assistant',
-     'Administrator'].include? current_role_name
+     'Administrator',
+    'Student'].include? current_role_name
+
   end
 
   def auto_complete_for_user_name
     team = Team.find(session[:team_id])
     @users = team.get_possible_team_members(params[:user][:name])
     render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
+  end
+
+  def edit
+    @teams_user = TeamsUser.find(params[:id])
+    @teams_user.duty = params[:duty] if params[:duty].present?
+    @assignment_duties = @teams_user.team.assignment.duty_names.split(',')
+    @teams_user.save
   end
 
   def list
@@ -59,17 +68,16 @@ class TeamsUsersController < ApplicationController
         undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
       end
     end
+
     redirect_to controller: 'teams', action: 'list', id: team.parent_id
   end
 
-  def duty
-    @teams_user = TeamsUser.find(params[:team_id])
-    if team.is_a?(AssignmentTeam) and @teams_user.user_id = params[:user_id]
-      @teams_user.duty = params[:duty]
-    end
 
-    redirect_to controller: 'teams_users', action: 'duty'
-      end
+  def update
+
+  end
+
+
 
   def delete
     @teams_user = TeamsUser.find(params[:id])

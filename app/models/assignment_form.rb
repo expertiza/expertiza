@@ -61,6 +61,30 @@ class AssignmentForm
     return false unless attributes
     existing_aqs = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
     existing_aqs.each(&:delete)
+    duty_drop_down=Array.new
+    duty_weight=Array.new
+    duty_notification_limit=Array.new
+
+    attributes.each do |assignment_questionnaire|
+      if assignment_questionnaire[:duty_name] != " " && !assignment_questionnaire[:duty_name].nil?
+        duty_drop_down<<assignment_questionnaire[:dropdown]
+        duty_weight<<assignment_questionnaire[:questionnaire_weight]
+        duty_notification_limit<<assignment_questionnaire[:notification_limit]
+      end
+    end
+
+    consistent=TRUE if duty_drop_down.uniq.size ==1 && duty_weight.uniq.size ==1 && duty_notification_limit.uniq.size ==1
+
+    if !consistent
+      attributes.each do |assignment_questionnaire|
+        if assignment_questionnaire[:duty_name] != " " && !assignment_questionnaire[:duty_name].nil?
+          assignment_questionnaire[:dropdown]= 1
+          assignment_questionnaire[:questionnaire_weight]= 100
+          assignment_questionnaire[:notification_limit]= 15
+        end
+      end
+    end
+
     attributes.each do |assignment_questionnaire|
       if assignment_questionnaire[:id].nil? or assignment_questionnaire[:id].blank?
         aq = AssignmentQuestionnaire.new(assignment_questionnaire)
@@ -70,12 +94,14 @@ class AssignmentForm
         end
       else
         aq = AssignmentQuestionnaire.find(assignment_questionnaire[:id])
+
         unless aq.update_attributes(assignment_questionnaire)
           @errors += @assignment.errors
           @has_errors = true
         end
       end
     end
+
   end
 
   # code to save due dates

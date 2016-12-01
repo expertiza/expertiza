@@ -28,7 +28,7 @@ describe "assignment submisstion test" do
     click_link "Your work"
   end
 
-  it "test1: submit single link" do
+  it "test1: submit single valid link" do
     signup_topic
     fill_in 'submission', with: "https://www.ncsu.edu"
     click_on 'Upload link'
@@ -55,17 +55,32 @@ describe "assignment submisstion test" do
     expect(page).to have_content "https://bing.com"
   end
 
-  it "test3: submit unvalid link" do
+  it "test3: submit invalid link" do
     signup_topic
+    #invalid format url1
     fill_in 'submission', with: "wolfpack"
     click_on 'Upload link'
-    expect(page).to have_content "The URL or URI is not valid"  
+    expect(page).to have_content "The URL or URI is not valid"
+
+    #invalid format url2
+    fill_in 'submission', with: "http://wrongurl"
+    click_on 'Upload link'
+    #expect(page).to have_content "The URL or URI is not valid"
+
+    #unconnectable url
+    fill_in 'submission', with: "http://www.notexisted.com"
+    click_on 'Upload link'
+    #expect(page).to have_content "The URL or URI is not valid"
+
+    #click_on "http://wrongurl"
+    #expect(page).to have_http_status(404)
   end
 
   it "test4: submit duplicated link" do
     signup_topic
     fill_in 'submission', with: "https://google.com"
     click_on 'Upload link'
+    expect(page).to have_content "https://google.com"
     fill_in 'submission', with: "https://google.com"
     click_on 'Upload link'
     expect(page).to have_content "You or your teammate(s) have already submitted the same hyperlink."  

@@ -3,10 +3,11 @@ class SimicheckComparison < ActiveRecord::Base
     validates :fileType, presence: true
     validates :assignment_id, :presence=>true
     validates :comparison_key, presence=> true
+    #simicheck account - expertiza@ncsu.edu password - expertiza123
 
     def self.create_simicheck_comparison(assignment_id,fileType)
         url = "http://simicheck.com/api/comparison"
-        key = "65f31df7af2c49e89a615a2602ce2faaa92380ab499e414fba6092adb0e71b3dd4674c86271f4b26b891f76c7709cbe574467477cfc84f2791e6f3f7827f3982"
+        key = "0a6a26fd61c943718a623b62fc457e1a3e110abe11df4535bb037478e04a9b6af60d8b9fb2e04356b5dda2594150e44642fad227b8e749c89359836c4420edd5"
         payload = ""
 
         response = RestClient.put(url, payload, {:simicheck_api_key=>key})
@@ -18,9 +19,9 @@ class SimicheckComparison < ActiveRecord::Base
         return nil
     end
 
-    def self.send_file_to_simicheck(comparison_key, file, fileType)
-            url = "http://simicheck.com/api/files/" + comparison_key
-            key = "65f31df7af2c49e89a615a2602ce2faaa92380ab499e414fba6092adb0e71b3dd4674c86271f4b26b891f76c7709cbe574467477cfc84f2791e6f3f7827f3982"
+    def send_file_to_simicheck(file)
+            url = "http://simicheck.com/api/files/" + self.comparison_key
+            key = "0a6a26fd61c943718a623b62fc457e1a3e110abe11df4535bb037478e04a9b6af60d8b9fb2e04356b5dda2594150e44642fad227b8e749c89359836c4420edd5"
 
             payload = {:file => file}
 
@@ -29,5 +30,27 @@ class SimicheckComparison < ActiveRecord::Base
                 return true
             end
             return false
+    end
+
+    def get_visualisation_url()
+        url = "http://simicheck.com/api/visualize_similarity/"
+        key = "0a6a26fd61c943718a623b62fc457e1a3e110abe11df4535bb037478e04a9b6af60d8b9fb2e04356b5dda2594150e44642fad227b8e749c89359836c4420edd5"
+        response = RestClient.get(url + c.comparison_key, {:simicheck_api_key=>key})
+        visualisation_url = nil
+        if(response.code == 200)
+            visualisation_url = response.body
+        end
+        return visualisation_url
+    end
+
+    def get_status()
+            url = "http://simicheck.com/api/similarity_status"
+            key = "0a6a26fd61c943718a623b62fc457e1a3e110abe11df4535bb037478e04a9b6af60d8b9fb2e04356b5dda2594150e44642fad227b8e749c89359836c4420edd5"
+            response = RestClient.get(url + c.comparison_key, {:simicheck_api_key=>key})
+            status = nil
+            if(response.code == 200)
+                status = JSON.parse(response.body).ready
+            end
+            return status
     end
 end

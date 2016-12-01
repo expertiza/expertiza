@@ -1,7 +1,7 @@
 <h1> Class Performance Rubric</h1>
 <h4> Select any number of rubric criterias from the following </h4>
 
-<%= form_for :class_performance , :url => { :controller => "class_performance", :action =>"show_class_performance",:id=>@assignment_id,  :result=>@results } do |f| %>
+<%= form_for :class_performance , :url => { :controller => "class_performance", :action =>"show_class_performance", :result=>@results, :id => params[:id] } do |f| %>
   <%= f.select :criterias, options_for_select(@results.map { |obj| obj['txt'] }), { :prompt => ""}, { :multiple => true, :size => 5 } %>
   <%= f.submit "Show Performance" %>
 <% end %>

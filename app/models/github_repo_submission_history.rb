@@ -1,0 +1,3 @@
+class GithubRepoSubmissionHistory < GithubSubmissionHistory
+
+end

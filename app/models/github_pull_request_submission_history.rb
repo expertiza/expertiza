@@ -1,0 +1,3 @@
+class GithubPullRequestSubmissionHistory < GithubSubmissionHistory
+
+end

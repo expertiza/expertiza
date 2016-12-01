@@ -14,7 +14,8 @@ class SurveyController < ApplicationController
     @first_row.name="Select a Global Survey";
     @first_row.id=0;
     @my_surveys=Questionnaire.where(["instructor_id=? and type = 'SurveyQuestionnaire'", session[:user].id]);
-    @global_surveys = @first_row + Questionnaire.where(["type = 'GlobalSurveyQuestionnaire'"]);
-    
+    @global_surveys = Questionnaire.where(["type = 'GlobalSurveyQuestionnaire'"]);
+    # Currently last row in the collection but should be selected by default.
+    @global_surveys<<@first_row
   end
 end

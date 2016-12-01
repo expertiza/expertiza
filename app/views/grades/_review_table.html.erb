@@ -4,12 +4,12 @@
   <%end%>
 	<tr><th style="text-align:center;">&nbsp;</th>
 		<% for i in 0...reviews.size%>
-      <!--<% user = User.find_by_id(AssignmentParticipant.find(ResponseMap.find(reviews[i].map_id).reviewer_id).user_id) %>
+      <% user = User.find_by_id(AssignmentParticipant.find(ResponseMap.find(reviews[i].map_id).reviewer_id).user_id) %>
         <% if(user.role.instructor? || user.role.ta?) %>
             <th style="text-align:center;"><b> Expert Review </b> <%=i+1%>&nbsp;</th>
-        <% else %> -->
+        <% else %>
 			      <th style="text-align:center;"><%= collabel %>&nbsp;<%=i+1%>&nbsp;</th>
-      <!--  <% end %> -->
+        <% end %>
 		<% end %>
 	</tr>
 	<% if controller.action_name != "view_my_scores" %>

@@ -3,4 +3,5 @@
 
 <%= form_for :class_performance do |f| %>
   <%= f.select :criterias, options_for_select(@results.map { |obj| [obj['txt'], obj['id']] }), { :prompt => "Please select"}, { :multiple => true, :size => 5 } %>
+  <%= f.submit "Show Performance">
 <% end %>

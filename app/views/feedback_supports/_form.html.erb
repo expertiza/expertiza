@@ -1,17 +1,11 @@
-<%= form_for(@feedback_setting) do |f| %>
-    <% if @feedback_setting.errors.any? %>
+<%= form_for(@feedback_supports) do |f| %>
+    <% if @feedback_supports.errors.any? %>
         <div id="error_explanation">
-          <h2><%= pluralize(@feedback_setting.errors.count, "error") %> prohibited this feedback_setting from being saved:</h2>
 
-          <ul>
-            <% @feedback_setting.errors.full_messages.each do |message| %>
-                <li><%= message %></li>
-            <% end %>
-          </ul>
         </div>
     <% end %>
     <br>
-    <p><label for="feedback_user_id">Email</label> (Mandatory field.)
+    <p><label for="feedback_supports_user_id">Email</label> (Mandatory field.)
       <img src="/assets/info.png" title='Enter Expertiza registered email id.'>
       <br/>
       <% if @user_email.nil? %>
@@ -20,17 +14,17 @@
           <%= text_field 'feedback', 'user_id', :maxlength=>"25" , :value => @user_email, :readonly=>true%></p>
       <% end %>
 
-      <p><label for="feedback_title">Title</label> (Mandatory field.)
+      <p><label for="feedback_supports_title">Title</label> (Mandatory field.)
         <img src="/assets/info.png" title='The max character limit is 160.'>
         <br/>
-        <%= text_field 'feedback', 'title', :maxlength=>"80" %></p>
+        <%= text_field 'feedback_support', 'title', :maxlength=>"80" %></p>
 
-      <p><label for="feedback_description">Description</label><br/>
-        <%= text_area 'feedback', 'description', :rows => 4, :cols => 78  %>
+      <p><label for="feedback_support_description">Description</label><br/>
+        <%= text_area 'feedback_support', 'description', :rows => 4, :cols => 78  %>
 
 
       <p><label>CAPTCHA</label>
-      <div class="g-recaptcha" data-sitekey="6LfY_RETAAAAAMH85s0nAZWZ15KVGYcZWRZExNJI"></div>
+      <div class="g-recaptcha" data-sitekey="6LdQig0UAAAAAHx0HjYG_QHY9hsGQMiA0if1UDnd"></div>
       <%= recaptcha_tags %>
       <br>
       <% if session[:extra].nil? %>

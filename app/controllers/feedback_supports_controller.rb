@@ -1,19 +1,37 @@
 
 class FeedbackSupportsController < ApplicationController
   before_action :set_feedback_support, only: [:show, :edit, :update, :destroy]
+  before_action :verify_captcha, only: [:create]
 
+  def verify_captcha
+    if !verify_captcha
+      redirect_to :back, notice: 'wrong captcha'
+    else
+      @settings = FeedbackSetting.find(1)
+    end
+  end
   # GET /feedback_supports
   def index
     @feedback_supports = FeedbackSupport.all
   end
 
+  def action_allowed?
+    return true
+  end
+
+  def set_feedback
+    @feedback = FeedbackSupport.find(params[:id])
+  end
   # GET /feedback_supports/1
   def show
   end
+def feedback_support_params
+  params.require(:feedback).permit(:user_id, :title, :description)
+end
 
   # GET /feedback_supports/new
   def new
-    @feedback_support = FeedbackSupport.new
+    @feedback_supports = FeedbackSupport.new
   end
 
   # GET /feedback_supports/1/edit

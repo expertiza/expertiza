@@ -92,7 +92,7 @@ class SubmittedContentController < ApplicationController
     # @submission_record = SubmissionRecord.new(team_id: team.id, content: hyperlink_to_delete, user:@participant.name , assignment_id: assignment.id, operation: "Remove Hyperlink")
     # @submission_record.save
 
-    submission_history = SubmissionHistory.delete_submission(team, params['submission'])
+    submission_history = SubmissionHistory.delete_submission(team, hyperlink_to_delete)
     submission_history.submitted_at = Time.current # taking the time of submission
     submission_history.save
 

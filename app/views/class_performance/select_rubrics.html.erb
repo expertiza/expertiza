@@ -1,13 +1,13 @@
-options_for_select([["Dollar", "$"], ["Kroner", "DKK"]])
-<h1> Hello There</h1>
-<select multiple  width=200px>
+<h1> Class Performance Rubric</h1>
+<h4> Select any number of rubric criterias from the following </h4>
+
+<center>
+<select multiple size = 10>
 <% @results.each do |result| %>
   <option value="value">  <%= result.txt %> </option>
 <% end %>
 </select>
+</center>
+
 <%= form_for :class_performance do |f| %>
-  <%= f.select :permission, [ ["Read Only", "read"], ["IP Voice Telephony", "ip_voice"], ["IP Video Telephony", "ip_video_telephony"], ["Enterprise Gateways", "enterprise_gateways"], ["Consumer ATAs", "consumer_atas"], ["IP PBX", "ip_pbx"], ["Master of All", "all"] ], {prompt: "Select Permission Level"},
-    {:multiple => true} %>
-
-
 <% end %>

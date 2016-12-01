@@ -61,6 +61,9 @@ class ScheduledTask
       if (self.deadline_type == "drop_outstanding_reviews")
         drop_outstanding_reviews
       end
+      if (self.deadline_type == "compare_files_with_simicheck")
+        compare_files_with_simicheck # to all reviewers
+      end
     end
   end
 
@@ -215,7 +218,17 @@ class ScheduledTask
 
   def compare_files_with_simicheck
     #teams = TeamsUser.all.group(:team_id).count(:team_id)
-    comparison = SimicheckComparison.create_simicheck_comparison(self.assignment_id,"pdf")
+    comparison_pdf = SimicheckComparison.create_simicheck_comparison(self.assignment_id,"pdf")
+    comparison_html = SimicheckComparison.create_simicheck_comparison(self.assignment_id,"html")
+    assignment = Assignment.find(self.assignment_id)
+    assignment_teams = AssignmentTeam.where(['parent_id = ?', self.assignment_id])
+    for assignment_team in assignment_teams.
+      if(assignment_team.has_submissions?)
+        hyperlinks = assignment_teams.hyperlinks
+        print hyperlinks
+      end
+    end
+
     #base = File.basename(file_name)
     #file_type =  base.split(".")[base.split(".").size - 1] if base.split(".").size > 1
     #SimicheckComparison.create_simicheck_comparison(self.assignment_id,file_type)

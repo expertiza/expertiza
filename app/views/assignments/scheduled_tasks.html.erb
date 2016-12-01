@@ -41,6 +41,9 @@
             <% if handler[5] == "drop_one_member_topics" %>
                 <td><%= "Drop one member team topics"%></td>
             <%end%>
+            <% if handler[5] == "compare_files_with_simicheck" %>
+                <td><%= "Run Simicheck"%></td>
+            <%end%>
             <td><%= link_to image_tag('delete_icon.png', :title => 'Delete'),
                             {:controller => 'assignments', :action => 'delete_scheduled_task',
                              :id => @assignment.id, :delayed_job_id => delayed_job.id}%></td>

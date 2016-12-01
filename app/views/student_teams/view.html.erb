@@ -42,7 +42,7 @@
                   <%= link_to "select duty", edit_teams_user_path(TeamsUser.where(["team_id = ? and user_id = ?", @student.team.id, session[:user].id]).pluck(:id)) %>
                 </td>
             <% else %>
-                <% sql = "select duty from teams_users where user_id = '#{member.user.id}'"
+                <% sql = "select duty from teams_users where user_id = '#{member.user.id}' and team_id = '#{@student.team.id}'"
                   m = TeamsUser.find_by_sql(sql)
                 %>
                 <td><%= m[0].duty %></td>

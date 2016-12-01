@@ -140,6 +140,28 @@ describe "assignment submisstion test" do
       expect(File.read(file_path)).to have_content "valid_assignment_file2: This is a .txt file to test assignment submission."
     end
 
+    it "is able to update already uploaded file" do
+      signup_topic
+      #upload file
+      file_path = Rails.root + "spec/features/assignment_submission_txts/valid_assignment_file3.txt"
+      file_write = File.open(file_path, 'w')
+      file_write.puts "This is the original file."
+      file_write.close
+      attach_file('uploaded_file', file_path)
+      click_on 'Upload file'
+      file_upload_path = Rails.root + "pg_data/instructor6/csc517/test/Assignment1684/0/valid_assignment_file3.txt"
+      expect(File).to exist(file_upload_path)
+      expect(File.read(file_upload_path)).to have_content "This is the original file."
+      #update file
+      file_write = File.open(file_path, 'w')
+      file_write.puts "This is the updated file."
+      file_write.close
+      attach_file('uploaded_file', file_path)
+      click_on 'Upload file'
+      expect(File).to exist(file_upload_path)
+      expect(File.read(file_upload_path)).to have_content "This is the updated file."
+    end
+
   end
 
 end

@@ -59,7 +59,10 @@
             review = map.response.last
             if review.nil? %>
             <td>
-              <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :return => "teammate"} %>
+              <% sql = "select duty from teams_users where user_id = '#{member.user.id}' and team_id = '#{@student.team.id}'"
+                 m = TeamsUser.find_by_sql(sql)
+              %>
+              <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :duty => m[0].duty, :return => "teammate"} %>
             </td>
           <% else %>
             <td>

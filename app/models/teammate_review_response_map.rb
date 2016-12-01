@@ -2,8 +2,20 @@ class TeammateReviewResponseMap < ResponseMap
   belongs_to :reviewee, class_name: 'Participant', foreign_key: 'reviewee_id'
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
 
-  def questionnaire
-    self.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire')
+  def questionnaire(duty = nil)
+    self.assignment.questionnaires.each do |questionnaire|
+      if questionnaire.type == 'TeammateReviewQuestionnaire'
+        assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: self.assignment.id ,questionnaire_id: questionnaire.id)
+        assignment_questionnaires.each do |assignment_questionnaire|
+          if assignment_questionnaire.duty_name == duty
+            @questionnaire = questionnaire
+            break
+          end
+        end
+
+      end
+    end
+    @questionnaire
   end
 
   def contributor

@@ -51,6 +51,7 @@ class Criterion < ScoredQuestion
     html += self.id.to_s + '_size" type="text"></td>'
     html += '<td> max_label <input size="10" value="'
     html
+  end
 
   def edit_6(_count)
     html += self.max_label.to_s + '" name="question['

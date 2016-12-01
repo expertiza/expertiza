@@ -571,7 +571,7 @@ jQuery(document).ready(function() {
                               <button className="btn btn-primary pull-right new-button" onClick ={this.onClick} >
                                   New {this.props.private ? "private" : "public"} {this.props.dataType}
                               </button>
-                          {this.state.showForm ? <NewAssignmentForm /> : null}
+                          {this.state.showForm ? <NewAssignmentForm private={this.props.private}/> : null}
                           </span>
                       )
                   }else{
@@ -607,6 +607,7 @@ jQuery(document).ready(function() {
        return{
          assignment_form:{
          assignment: {
+           private: this.props.private,
            name: '',
            course_id: '0',
            directory_path: '',
@@ -619,13 +620,15 @@ jQuery(document).ready(function() {
            availability_flag: '',
            reputation_algorithm: '',
            max_team_size: '1',
-           instructor_id: '6'
+           instructor_id: '0'
          }},
          team_assignment: '',
          commit: 'Create',
          listCourses:[] 
        }
+
      },
+
 
       handleNameChange: function(e){
           var newAssignment = this.state.assignment_form;
@@ -653,45 +656,45 @@ jQuery(document).ready(function() {
 
       handleTeamChange: function(e){
         var newAssignment = this.state.team_assignment;
-        newAssignment = e.target.value;
+        newAssignment = e.target.checked;
         this.setState({team_assignment: newAssignment});
 
       },
 
       handleQuizChange: function(e){
         var newAssignment = this.state.assignment_form;
-        newAssignment.assignment.require_quiz = e.target.value;
+        newAssignment.assignment.require_quiz = e.target.checked;
         this.setState({assignment: newAssignment});
       },
 
       handleDeadlineChange: function(e){
         var newAssignment = this.state.assignment_form;
-        newAssignment.assignment.staggered_deadline = e.target.value;
+        newAssignment.assignment.staggered_deadline = e.target.checked;
         this.setState({assignment: newAssignment});
-        hello();
+        StaggeredMessage();
       },
 
       handleMicrotaskChange: function(e){
         var newAssignment = this.state.assignment_form;
-        newAssignment.assignment.microtask = e.target.value;
+        newAssignment.assignment.microtask = e.target.checked;
         this.setState({assignment: newAssignment});
       },
 
       handleReviewsChange: function(e){
         var newAssignment = this.state.assignment_form;
-        newAssignment.assignment.reviews_visible_to_all = e.target.value;
+        newAssignment.assignment.reviews_visible_to_all = e.target.checked;
         this.setState({assignment: newAssignment});
       },
 
       handleCalibrationChange: function(e){
         var newAssignment = this.state.assignment_form;
-        newAssignment.assignment.is_calibrated = e.target.value;
+        newAssignment.assignment.is_calibrated = e.target.checked;
         this.setState({assignment: newAssignment});
       },
 
       handleAvailabilityChange: function(e){
         var newAssignment = this.state.assignment_form;
-        newAssignment.assignment.availability_flag = e.target.value;
+        newAssignment.assignment.availability_flag = e.target.checked;
         this.setState({assignment: newAssignment});
       },
 
@@ -702,10 +705,32 @@ jQuery(document).ready(function() {
 console.log("test2")
       },
 
+      directoryValidate: function(e){
+        var regex=/^[a-zA-Z0-9]*$/;
+        var regex_empty=/^(?=\s*\S).*$/;
+        if(regex.test(e) && regex_empty.test(e))
+          return true;
+        else {
+          alert('Submission Directory cannot have special characters or spaces. The field cannot be empty!');
+          return false;
+        }
+      },
+
+      nameValidate: function(e){
+        var regex=/^(?=\s*\S).*$/;
+        if(regex.test(e))
+          return true;
+        else{
+          alert('Name cannot be empty!!!');
+          return false;
+        }
+      },
+
+
       handleCreateAssignment: function(e) {
-console.log("onam test00")
         var that = this;
-        console.log('assignment');
+        if(this.directoryValidate(that.state.assignment_form.assignment.directory_path) && this.nameValidate(that.state.assignment_form.assignment.name) ){
+          console.log('It worked');
         $.ajax({
           method: 'POST',
           data: {
@@ -713,14 +738,12 @@ console.log("onam test00")
           },
           url: '/assignments'
         });
-        window.location.reload();
+        window.location.reload();}
       },
 
       handleGetCourses: function() {
-      console.log("test1")
         var source="/tree_display/get_courses_node_ng";
         this.serverRequest = $.get(source, function (response) {
-     console.log(response);
         var result = JSON.parse(response);
         var arrTen = [];
         for (var k = 0; k < result.length; k++) {
@@ -729,7 +752,6 @@ console.log("onam test00")
         this.setState({
           listCourses: arrTen
         });
-     console.log(arrTen);
         }.bind(this));
       },
 
@@ -742,12 +764,53 @@ console.log("onam test00")
             marginTop: 10
         }
 
+        const selectDivStyle = {
+          backgroundColor: '#aed6f1',
+          padding: 20
+        }
+
+        var partial_team;
+        if(this.state.team_assignment){
+          partial_team = (
+              <div style={selectDivStyle}>
+                <p>
+                  Max Team Size: <input type="number" id="max_team_size"></input>
+                </p>
+
+
+                <p>
+                  <input type="checkbox" id="show_teammate_reviews"> Show Teammate Reviews</input>
+                </p>
+              </div>
+          );
+        }
+        else{
+          partial_team = <p></p>
+        }
+
+        var partial_quiz;
+        if(this.state.assignment_form.assignment.require_quiz){
+          partial_quiz = (
+              <div style={selectDivStyle}>
+                <p>
+                  Number of Quiz Questions: <input type="number" id="number_of_quiz_questions"></input>
+                </p>
+              </div>
+          );
+        }
+        else{
+          partial_quiz = <p></p>
+        }
+
 
 
         return(
-                <div style={divStyle}>
+
+              <div style={divStyle}>
+                  <h2> Create {this.props.private ? "Private" : "Public"} Assignment </h2>
+
                   <p>
-                     Assignment Name: <input type="text" id="name" onChange={this.handleNameChange} />
+                     Assignment Name: <input type="text" id="name" onChange={this.handleNameChange} required={true}/>
                   </p>
                   <p>
                      Course: <select id="course_id" onChange={this.handleCourseChange} onClick={this.handleGetCourses}>
@@ -755,30 +818,26 @@ console.log("onam test00")
                      </select>
                   </p>
                   <p>
-                    Submission Directory: <input type="text"  id="directory_path" onChange={this.handleSubChange}/>
+                    Submission Directory: <input type="text"  id="directory_path" onChange={this.handleSubChange} required={true}
+                  errorMessage="Directory field cannot contain Special characters or spaces" emptyMessage="Directroy is required."/>
                   </p>
                   <p>
                     Description URL: <input type="text" id="spec_location" onChange={this.handleDescChange}/>
                   </p>
+
                   <p>
                     <input type="checkbox" id="team_assignment" onChange={this.handleTeamChange}> Has Teams </input>
                   </p>
 
 
-                  <p>
-                    Max Team Size: <input type="number" id="max_team_size"></input>
-                  </p>
-                  <p>
-                    <input type="checkbox" id="show_teammate_reviews"> Show Teammate Reviews</input>
-                  </p>
+                  {partial_team}
 
 
                   <p>
                     <input type="checkbox" id="require_quiz" onChange={this.handleQuizChange}> Has Quiz </input>
                   </p>
-                  <p>
-                    Number of Quiz Questions: <input type="number" id="number_of_quiz_questions"></input>
-                    </p>
+                  {partial_quiz}
+
                   <p>
                     <input type="checkbox" id="staggered_deadline" onChange={this.handleDeadlineChange}> Staggered Deadline Assignment </input>
                   </p>
@@ -808,15 +867,15 @@ console.log("onam test00")
                     </p>
                 </div>
 
+
             )
         }
 
     })
 
-
-  function hello()
+  function StaggeredMessage()
   {
-    window.alert('Ting ting!');
+    window.alert('Warning! Unchecking all topics for this assignment will now have the same deadline.');
   }
 
   var SortToggle = React.createClass({
@@ -1128,6 +1187,7 @@ console.log("onam test00")
             dataType={this.props.dataType}
             private={true}
           />
+
           <NewItemButton
             dataType={this.props.dataType}
             private={false}

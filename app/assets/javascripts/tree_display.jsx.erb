@@ -744,6 +744,7 @@ console.log("test2")
       handleGetCourses: function() {
         var source="/tree_display/get_courses_node_ng";
         this.serverRequest = $.get(source, function (response) {
+          console.log(response);
         var result = JSON.parse(response);
         var arrTen = [];
         for (var k = 0; k < result.length; k++) {
@@ -814,6 +815,7 @@ console.log("test2")
                   </p>
                   <p>
                      Course: <select id="course_id" onChange={this.handleCourseChange} onClick={this.handleGetCourses}>
+                       <option selected hidden>-----------</option>
                        {this.state.listCourses}
                      </select>
                   </p>

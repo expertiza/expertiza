@@ -16,9 +16,13 @@
     -moz-hyphens: auto;
     hyphens: auto;
   }
-  .chatboxmessagecontent time {
+  .chatboxmessagecontent .Reviewer {
     font-size: 9px;
-    color: #ccc;
+    color: #F03939;
+  }
+  .chatboxmessagecontent .Reviewee {
+    font-size: 9px;
+    color: #7c77f4;
   }
   li {
     padding: 0.5rem;
@@ -74,9 +78,9 @@
   </div>
 <div class="chatboxmessagecontent">
       <p><%= message.body %></p>
-  <time datetime="<%= message.created_at %>" title="<%= message.created_at.strftime("%d %b  %Y at %I:%M%p") %>">
+  <div class="<%=reviewee_or_reviewer(message) %>" datetime="<%= message.created_at %>" title="<%= message.created_at.strftime("%d %b  %Y at %I:%M%p") %>">
     <%= reviewee_or_reviewer(message) %> • <%= message.created_at.strftime("%H:%M %p") %>
-  </time>
+  </div>
 </div>
 </li>
 </body>

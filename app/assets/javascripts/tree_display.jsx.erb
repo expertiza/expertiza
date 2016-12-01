@@ -747,7 +747,7 @@ console.log("test2")
         var result = JSON.parse(response);
         var arrTen = [];
         for (var k = 0; k < result.length; k++) {
-          arrTen.push(<option key={result[k].id} value={result[k].name}> {result[k].name} </option>);
+          arrTen.push(<option key={result[k].id} value={result[k].id}> {result[k].name} </option>);
         }
         this.setState({
           listCourses: arrTen

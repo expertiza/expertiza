@@ -7,6 +7,7 @@ class SurveyController < ApplicationController
      'Administrator'].include? current_role_name
   end
   #E1680. Improve survey functionality commit by dssathe
+  @assignment
   def assign
     @assignment = Assignment.find(params[:id])
     #Dummy row created which will be selected by default

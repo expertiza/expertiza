@@ -15,7 +15,9 @@ class TeammateReviewResponseMap < ResponseMap
 
       end
     end
-    @questionnaire
+    if @questionnaire == nil
+      @questionnaire = self.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire')
+    end
   end
 
   def contributor

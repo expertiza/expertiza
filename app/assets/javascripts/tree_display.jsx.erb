@@ -711,7 +711,8 @@ console.log("test2")
         if(regex.test(e) && regex_empty.test(e))
           return true;
         else {
-          alert('Submission Directory cannot have special characters or spaces. The field cannot be empty!');
+          document.getElementById("directory_span").innerHTML = "    &#x2716 Submission Directory cannot have special characters or spaces. It cannot be empty!";
+          //alert('');
           return false;
         }
       },
@@ -721,7 +722,9 @@ console.log("test2")
         if(regex.test(e))
           return true;
         else{
-          alert('Name cannot be empty!!!');
+
+          document.getElementById("name_span").innerHTML = "    &#x2716 Name cannot be empty!";
+          //alert('Name cannot be empty!!!');
           return false;
         }
       },
@@ -770,6 +773,10 @@ console.log("test2")
           padding: 20
         }
 
+        const spanStyle = {
+          color: '#ff0000'
+        }
+
         var partial_team;
         if(this.state.team_assignment){
           partial_team = (
@@ -812,6 +819,7 @@ console.log("test2")
 
                   <p>
                      Assignment Name: <input type="text" id="name" onChange={this.handleNameChange} required={true}/>
+                    <span style={spanStyle} id="name_span"></span>
                   </p>
                   <p>
                      Course: <select id="course_id" onChange={this.handleCourseChange} onClick={this.handleGetCourses}>
@@ -822,6 +830,7 @@ console.log("test2")
                   <p>
                     Submission Directory: <input type="text"  id="directory_path" onChange={this.handleSubChange} required={true}
                   errorMessage="Directory field cannot contain Special characters or spaces" emptyMessage="Directroy is required."/>
+                    <span style={spanStyle} id="directory_span"></span>
                   </p>
                   <p>
                     Description URL: <input type="text" id="spec_location" onChange={this.handleDescChange}/>

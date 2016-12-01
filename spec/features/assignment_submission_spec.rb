@@ -111,9 +111,9 @@ describe "assignment submisstion test" do
       expect(File).to exist("#{Rails.root}/pg_data/instructor6/csc517/test/Assignment1684/0/valid_assignment_file.txt")
 
       #check content of the uploaded file
-      file_path = Rails.root + "pg_data/instructor6/csc517/test/Assignment1684/0/valid_assignment_file.txt"
-      expect(File).to exist(file_path)
-      expect(File.read(file_path)).to have_content "valid_assignment_file: This is a .txt file to test assignment submission."
+      file_upload_path = Rails.root + "pg_data/instructor6/csc517/test/Assignment1684/0/valid_assignment_file.txt"
+      expect(File).to exist(file_upload_path)
+      expect(File.read(file_upload_path)).to have_content "valid_assignment_file: This is a .txt file to test assignment submission."
     end
 
     it "is able to submit multiple valid files" do
@@ -129,15 +129,15 @@ describe "assignment submisstion test" do
       expect(page).to have_content "valid_assignment_file.txt"
       expect(page).to have_content "valid_assignment_file2.txt"
 
-      #check content of the uploaded file
+      #check content of the uploaded files
       #file1
-      file_path = Rails.root + "pg_data/instructor6/csc517/test/Assignment1684/0/valid_assignment_file.txt"
-      expect(File).to exist(file_path)
-      expect(File.read(file_path)).to have_content "valid_assignment_file: This is a .txt file to test assignment submission."
+      file_upload_path = Rails.root + "pg_data/instructor6/csc517/test/Assignment1684/0/valid_assignment_file.txt"
+      expect(File).to exist(file_upload_path)
+      expect(File.read(file_upload_path)).to have_content "valid_assignment_file: This is a .txt file to test assignment submission."
       #file2
-      file_path = Rails.root + "pg_data/instructor6/csc517/test/Assignment1684/0/valid_assignment_file2.txt"
-      expect(File).to exist(file_path)
-      expect(File.read(file_path)).to have_content "valid_assignment_file2: This is a .txt file to test assignment submission."
+      file_upload_path = Rails.root + "pg_data/instructor6/csc517/test/Assignment1684/0/valid_assignment_file2.txt"
+      expect(File).to exist(file_upload_path)
+      expect(File.read(file_upload_path)).to have_content "valid_assignment_file2: This is a .txt file to test assignment submission."
     end
 
     it "is able to update already uploaded file" do
@@ -152,6 +152,7 @@ describe "assignment submisstion test" do
       file_upload_path = Rails.root + "pg_data/instructor6/csc517/test/Assignment1684/0/valid_assignment_file3.txt"
       expect(File).to exist(file_upload_path)
       expect(File.read(file_upload_path)).to have_content "This is the original file."
+
       #update file
       file_write = File.open(file_path, 'w')
       file_write.puts "This is the updated file."

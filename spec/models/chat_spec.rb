@@ -19,5 +19,3 @@ describe "validations" do
   end
 
 end
-
-

@@ -1,5 +1,16 @@
 require 'rails_helper'
 
+def signup_topic
+  user = User.find_by_name("student2064")
+  stub_current_user(user, user.role.name, user.role)
+  visit '/student_task/list'
+  visit '/sign_up_sheet/sign_up?id=1&topic_id=1' #signup topic
+  visit '/student_task/list'
+  click_link "Assignment1684"
+  click_link "Your work"
+end
+
+
 describe "assignment submisstion test" do
   before(:each) do
     #create assignment and topic
@@ -18,82 +29,92 @@ describe "assignment submisstion test" do
     create(:assignment_due_date, deadline_type: DeadlineType.where(name: "submission").first, due_at: DateTime.now + 1)
   end
 
-  def signup_topic
-    user = User.find_by_name("student2064")
-    stub_current_user(user, user.role.name, user.role)
-    visit '/student_task/list'
-    visit '/sign_up_sheet/sign_up?id=1&topic_id=1' #signup topic
-    visit '/student_task/list'
-    click_link "Assignment1684"
-    click_link "Your work"
+  describe "submit hyperlink" do
+    it "is able to submit a single valid link" do
+      signup_topic
+      fill_in 'submission', with: "https://www.ncsu.edu"
+      click_on 'Upload link'
+      expect(page).to have_content "https://www.ncsu.edu"
+      #open the link and check content
+      click_on "https://www.ncsu.edu"
+      expect(page).to have_http_status(200)
+      #new_window = page.driver.browser.window_handles.last
+      #page.within_window new_window do
+        #expect(page).to have_content "NC STATE NEWS"
+      #end
+    end
+
+    it "should not submit invalid link" do
+      signup_topic
+      #invalid format url1
+      fill_in 'submission', with: "wolfpack"
+      click_on 'Upload link'
+      expect(page).to have_content "The URL or URI is not valid"
+
+      #invalid format url2
+      fill_in 'submission', with: "http://wrongurl"
+      click_on 'Upload link'
+      #expect(page).to have_content "The URL or URI is not valid"
+
+      #unconnectable url
+      fill_in 'submission', with: "http://www.notexisted.com"
+      click_on 'Upload link'
+      #expect(page).to have_content "The URL or URI is not valid"
+
+      #click_on "http://wrongurl"
+      #expect(page).to have_http_status(404)
+    end
+
+    it "is able to submit multiple links" do
+      signup_topic
+      fill_in 'submission', with: "https://www.ncsu.edu"
+      click_on 'Upload link'
+      fill_in 'submission', with: "https://www.google.com"
+      click_on 'Upload link'
+      fill_in 'submission', with: "https://bing.com"
+      click_on 'Upload link'
+      expect(page).to have_content "https://www.ncsu.edu"
+      expect(page).to have_content "https://www.google.com"
+      expect(page).to have_content "https://bing.com"
+    end
+
+    it "should not submit duplicated link" do
+      signup_topic
+      fill_in 'submission', with: "https://google.com"
+      click_on 'Upload link'
+      expect(page).to have_content "https://google.com"
+      fill_in 'submission', with: "https://google.com"
+      click_on 'Upload link'
+      expect(page).to have_content "You or your teammate(s) have already submitted the same hyperlink."
+    end
+
+    it "test5: submit empty link" do
+      signup_topic
+      #hyperlink is empty
+      fill_in 'submission', with: ""
+      click_on 'Upload link'
+      expect(page).to have_content "The URL or URI is not valid. Reason: The hyperlink cannot be empty!"
+      #hyperlink is "http://"
+      fill_in 'submission', with: "http://"
+      click_on 'Upload link'
+      expect(page).to have_content "The URL or URI is not valid. Reason: bad URI(absolute but no path): http://"
+    end
+
   end
+  describe "submit file" do
+    it "is able to submit multiple valid files" do
+      signup_topic
+      file_path = Rails.root + "spec/features/assignment_submission_txts/valid_assignment_file.txt"
+      attach_file('uploaded_file', file_path)
+      click_on 'Upload file'
 
-  it "test1: submit single valid link" do
-    signup_topic
-    fill_in 'submission', with: "https://www.ncsu.edu"
-    click_on 'Upload link'
-    expect(page).to have_content "https://www.ncsu.edu"
-    #open the link and check content
-    click_on "https://www.ncsu.edu"
-    expect(page).to have_http_status(200)
-    #new_window = page.driver.browser.window_handles.last
-    #page.within_window new_window do
-      #expect(page).to have_content "NC STATE NEWS"
-    #end
-  end
+      file_path = Rails.root + "spec/features/assignment_submission_txts/valid_assignment_file2.txt"
+      attach_file('uploaded_file', file_path)
+      click_on 'Upload file'
+      expect(page).to have_content "valid_assignment_file.txt"
+      expect(page).to have_content "valid_assignment_file2.txt"
+    end
 
-  it "test2: submit invalid link" do
-    signup_topic
-    #invalid format url1
-    fill_in 'submission', with: "wolfpack"
-    click_on 'Upload link'
-    expect(page).to have_content "The URL or URI is not valid"
-
-    #invalid format url2
-    fill_in 'submission', with: "http://wrongurl"
-    click_on 'Upload link'
-    #expect(page).to have_content "The URL or URI is not valid"
-
-    #unconnectable url
-    fill_in 'submission', with: "http://www.notexisted.com"
-    click_on 'Upload link'
-    #expect(page).to have_content "The URL or URI is not valid"
-
-    #click_on "http://wrongurl"
-    #expect(page).to have_http_status(404)
-  end
-
-  it "test3: submit multiple links" do
-    signup_topic
-    fill_in 'submission', with: "https://www.ncsu.edu"
-    click_on 'Upload link'
-    fill_in 'submission', with: "https://www.google.com"
-    click_on 'Upload link'
-    fill_in 'submission', with: "https://bing.com"
-    click_on 'Upload link'
-    expect(page).to have_content "https://www.ncsu.edu"
-    expect(page).to have_content "https://www.google.com"
-    expect(page).to have_content "https://bing.com"
-  end
-
-  it "test4: submit duplicated link" do
-    signup_topic
-    fill_in 'submission', with: "https://google.com"
-    click_on 'Upload link'
-    expect(page).to have_content "https://google.com"
-    fill_in 'submission', with: "https://google.com"
-    click_on 'Upload link'
-    expect(page).to have_content "You or your teammate(s) have already submitted the same hyperlink."  
-  end
-
-  it "test5: submit empty link" do
-    signup_topic
-    fill_in 'submission', with: ""
-    click_on 'Upload link'
-    expect(page).to have_content "The URL or URI is not valid. Reason: The hyperlink cannot be empty!"
-    fill_in 'submission', with: "http://"
-    click_on 'Upload link'
-    expect(page).to have_content "The URL or URI is not valid. Reason: bad URI(absolute but no path): http://"
   end
 
 end

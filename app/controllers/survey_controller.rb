@@ -18,4 +18,11 @@ class SurveyController < ApplicationController
     # Currently last row in the collection but should be selected by default.
     @global_surveys<<@first_row
   end
+  
+  def assign_survey
+    # get the survey id from select tag
+    selected_survey_id = params[:my_survey]
+    # get the questionnaire object from the id
+    @selected_survey_questionnaire = Questionnaire.find(selected_survey_id)
+  end
 end

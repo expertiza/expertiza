@@ -158,7 +158,7 @@ module ReviewMappingHelper
   end
 
   def get_time_spent_on_review_for_certain_team_for_each_round(map_id)
-      (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@time_spent_round_" + round.to_s, '-----') }
+      (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@time_spent_round_" + round.to_s,0) }
       (1..@assignment.num_review_rounds).each do |round|
         sum_time = 0
         @response_times = Responsetime.where(map_id: map_id, round: round)

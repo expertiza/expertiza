@@ -24,7 +24,8 @@ class ClassPerformanceController < ApplicationController
     @questions = []
     #@selections = []
     @results.each do |result|
-      @questions += result.txt
+      puts result.txt
+      
     #    @question_ids.push(result.id) unless @question_ids.include?(result.id)
     #    @selections[result.id] = "0"
     end

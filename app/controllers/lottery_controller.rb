@@ -14,6 +14,7 @@ class LotteryController < ApplicationController
     priority_info = []
     assignment = Assignment.find_by(id: params[:id])
     course_id = assignment['course_id']
+    users_in_teams = []
     topic_ids = SignUpTopic.where(assignment_id: params[:id]).map(&:id)
     user_ids = Participant.where(parent_id: params[:id]).map(&:user_id)
     user_ids.each do |user_id|
@@ -24,19 +25,19 @@ class LotteryController < ApplicationController
       teamed_students[course_id] = [] if teamed_students[course_id].nil?
       history = teamed_students[course_id]
       current_team = StudentTask.teamed_students(User.find(user_id),course_id,false, nil, assignment.id)[course_id]
-      current_team = [] if current_team.nil?
-
-      # Done to not swap out current team members from the teams
-      modified_history = remove_current_team_from_history(current_team, history)
+      if !current_team.nil? and current_team.size > 1
+        users_in_teams << current_team.dup
+      end
 
       topic_ids.each do |topic_id|
         bid_record = Bid.where(user_id: user_id, topic_id: topic_id).first rescue nil
         bids << (bid_record.nil? ? 0 : bid_record.priority ||= 0)
       end
       if bids.uniq != [0]
-        priority_info << {pid: user_id, ranks: bids,  history: modified_history}
+        priority_info << {pid: user_id, ranks: bids,  history: history}
       end
     end
+    users_in_teams.uniq!
     data = {users: priority_info, max_team_size: assignment.max_team_size}
     url = WEBSERVICE_CONFIG["topic_bidding_webservice_url"]
     begin
@@ -45,20 +46,30 @@ class LotteryController < ApplicationController
       flash[:error] = err.message
     end
 
-    # TODO to only swap team members for teams that have the flag set in the database.
+    # To only swap team members for teams that have the flag set in the database.
     response_new = {}
     response_new["users"] = JSON.parse(response)["users"]
     teams = JSON.parse(response)["teams"]
     teams_swap_members = []
     teams.each do |user_ids|
+      any_member_need_swap = false
       user_ids.each do |user_id|
         team_ids = TeamsUser.where(user_id: user_id).select(:team_id)
         team = Team.where(id: team_ids, parent_id: assignment.id)
         new_members_option = team.first.new_members
+        #If any one member in a team requires new teammates then we will include that team for swapping based on top trading cycle
         if(new_members_option)
-          teams_swap_members << user_ids
+          any_member_need_swap = true
         end
-     end
+        # If any member is in a pre-built team, we will skip that team when swapping
+        if(users_in_teams.include? user_id)
+          any_member_need_swap = false
+          break
+        end
+      end
+      if(any_member_need_swap)
+        teams_swap_members << user_ids
+      end
     end
     teams_not_swap_members = teams - teams_swap_members
     response_new["teams"] = teams_swap_members
@@ -73,13 +84,8 @@ class LotteryController < ApplicationController
     redirect_to controller: 'tree_display', action: 'list'
   end
 
-  def remove_current_team_from_history(current_team, history)
-    temp = history - current_team
-    return temp
-  end
-
   def swapping_team_members_with_history(data, max_team_size)
-    temp = data
+    temp = data.dup
     url = WEBSERVICE_CONFIG['member_swapping_webservice_url']
     (max_team_size-1).times do
       begin

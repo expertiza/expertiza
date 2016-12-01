@@ -56,6 +56,7 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @response = Response.find(params[:id])
 
+    @current_round = @response.round
     @map = @response.map
     @contributor = @map.contributor
     set_all_responses
@@ -144,6 +145,7 @@ class ResponseController < ApplicationController
   # view response
   def view
     @response = Response.find(params[:id])
+    @round = @response.round
     @map = @response.map
     set_content
   end

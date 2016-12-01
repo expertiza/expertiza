@@ -22,6 +22,76 @@
     </tr>
 
 
+
   </table>
 
 </div>
+
+<% def link_time(map_id, round, link) %>
+    <% sum_time = 0 %>
+    <% links = Responsetime.where(map_id: map_id, round: round, link: link) %>
+    <% links.each do |link_time| %>
+        <% individual_time = ((link_time.end - link_time.start)).to_i %>
+        <% sum_time = individual_time + sum_time %>
+    <% end %>
+    <% return sum_time %>
+<% end %>
+
+
+<div id="responsetime">
+  <% reviewee_list = Array.new %>
+  <% total_time_list = Array.new %>
+  <h3> Reviewer response time link wise details</h3>
+  <table width="100%">
+    <tr>
+      <th>Reviewee id </th>
+      <th>Round </th>
+      <th>Link</th>
+      <th>Time (mins)</th>
+    </tr>
+<% @reviewers = Participant.where(user_id: @user.id) %>
+<% @reviewers.each do |reviewer| %>
+  <% @response_maps = ResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: @id)  %>
+  <% @response_maps.each do |map| %>
+    <% map_total_time = 0 %>
+    <% @reviewed_object_id = map.reviewed_object_id %>
+    <% @reviewee_id = map.reviewee_id %>
+    <% @responsetime_match = Responsetime.where(map_id: map.id) %>
+    <% link_list = Array.new %>
+    <% @responsetime_match.each do |responsetime_entry| %>
+      <% if link_list.include?(responsetime_entry.link) %>
+      <% else %>
+        <% link_list.push(responsetime_entry.link) %>
+        <tr>
+        <td><%= @reviewee_id %></td>
+        <td><%= responsetime_entry.round %>
+        <td><%= responsetime_entry.link %></td>
+        <% individual_link_time = link_time(responsetime_entry.map_id,responsetime_entry.round,responsetime_entry.link) %>
+        <% map_total_time = map_total_time + individual_link_time %>
+        <td><%= individual_link_time %></td>
+        </tr>
+    <% end %>
+
+    <%end %>
+       <% reviewee_list << @reviewee_id %>
+       <% total_time_list << map_total_time %>
+
+  <% end %>
+<% end %>
+</table>
+
+<h3> Reviewer total details</h3>
+  <table width="100%">
+    <tr>
+      <th>Reviewee id </th>
+      <th>Total Time (mins)</th>
+    </tr>
+    <% reviewee_list.zip(total_time_list).each do |reviewee, time| %>
+      <tr>
+      <td><%= reviewee %></td>
+      <td><%= time %></td>
+      </tr>
+      <%end %>
+  </table>
+
+

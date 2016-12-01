@@ -12,8 +12,8 @@ class ResponsetimeController < ApplicationController
     @responsetime_match = Responsetime.where(map_id: params[:responsetime][:map_id], round: params[:responsetime][:round], link: params[:responsetime][:link])
     if @responsetime_match
       @responsetime_match.each do |responsetime_entry|
-      if responsetime_entry.end.nil?
-        responsetime_entry.update_attribute('end', params[:responsetime][:start])
+        if responsetime_entry.end.nil?
+          responsetime_entry.update_attribute('end', params[:responsetime][:start])
       end
       end
     end #start and end time is nil. Means fresh new link

@@ -10,6 +10,6 @@
 </center>
 
 <%= form_for :class_performance do |f| %>
-  <%= f.select "select criterias", options_for_select(@results.map { |obj| [obj['txt'], obj['id']] }), :prompt => 'Select Criterias', :multiple => true , :size =>5 %>
+  <%= f.select :criterias, options_for_select(@results.map { |obj| [obj['txt'], obj['id']] }), {:multiple => true, :size => 5} %>
   <%= f.select(:TYPE, [['Type A', 'Type A'], ['Type B', 'Type B']],{ :prompt => "Please select"},{ :multiple => true, :size => 5 }  ) %>])>
 <% end %>

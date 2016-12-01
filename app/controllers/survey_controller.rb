@@ -24,5 +24,7 @@ class SurveyController < ApplicationController
     selected_survey_id = params[:my_survey]
     # get the questionnaire object from the id
     @selected_survey_questionnaire = Questionnaire.find(selected_survey_id)
+    
+    redirect_to survey_assign
   end
 end

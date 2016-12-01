@@ -94,6 +94,18 @@ module ReviewMappingHelper
     metric.html_safe
   end
 
+  def display_avg_author_feedback_score(reviewer_id)
+    score = ""
+    if(!@author_feedback_score.nil?)
+      score += "1st: "+ sprintf('%.2f', @author_feedback_score[reviewer_id][1]).remove('.00')+"/"+@author_feedback_score[:max_score_round_1].to_s if !@author_feedback_score[reviewer_id][1].nil?
+      score += "<br>2nd: "+ sprintf('%.2f', @author_feedback_score[reviewer_id][2].to_s).remove('.00')+"/"+@author_feedback_score[:max_score_round_2].to_s if !@author_feedback_score[reviewer_id][2].nil?
+      score += "<br>3rd: "+ sprintf('%.2f', @author_feedback_score[reviewer_id][3].to_s).remove('.00')+"/"+@author_feedback_score[:max_score_round_3].to_s if !@author_feedback_score[reviewer_id][3].nil?
+
+    end
+
+    score.html_safe
+  end
+
   def list_review_submissions(participant_id, reviewee_team_id, response_map_id)
     participant = Participant.find(participant_id)
     team = AssignmentTeam.find(reviewee_team_id)
@@ -176,4 +188,124 @@ module ReviewMappingHelper
                 end
     css_class
   end
+
+  def get_author_feedback_score_hash(assignment, reviewers)
+    review_mapping_type = 'FeedbackResponseMap'
+
+    does_assignment_have_varying_rubrics = false
+
+    if assignment.varying_rubrics_by_round?
+
+      does_assignment_have_varying_rubrics = true
+
+      authors, all_review_response_ids_round_one, all_review_response_ids_round_two, all_review_response_ids_round_three = FeedbackResponseMap.feedback_response_report(assignment.id, review_mapping_type)
+
+    else
+
+      authors, all_review_response_ids = FeedbackResponseMap.feedback_response_report(assignment.id, review_mapping_type)
+
+    end
+
+    reviewer_ids = []
+
+    author_feedback_score = {}
+    author_feedback_score[:max_score_round_1] = {}
+    author_feedback_score[:max_score_round_2] = {}
+    author_feedback_score[:max_score_round_3] = {}
+
+    if(!reviewers.nil?)
+
+      reviewers.each do |r|
+
+        author_feedback_score[r.id] = {} if author_feedback_score[r.id].nil?
+
+        next if reviewer_ids.include? r.id
+
+        reviewer_ids << r.id
+
+        review_mappings = FeedbackResponseMap.where(:reviewee_id => r.id, :type => review_mapping_type)
+
+        if(!review_mappings.nil? && review_mappings.size > 0)
+
+          if does_assignment_have_varying_rubrics
+
+            total_score = {:round_1 => 0, :round_2 => 0, :round_3 => 0}
+
+            total_feedback = {:round_1 => 0, :round_2 => 0, :round_3 => 0}
+
+            review_mappings.each do |m|
+
+              response = Response.where(:map_id => m.id).first
+
+              next if response.nil?
+
+              if all_review_response_ids_round_one.include? m.reviewed_object_id
+
+                total_score[:round_1] += response.get_total_score
+                total_feedback[:round_1] += 1
+                author_feedback_score[:max_score_round_1] = response.get_maximum_score if author_feedback_score[:max_score_round_1].blank?
+
+              elsif all_review_response_ids_round_two.include? m.reviewed_object_id
+
+                total_score[:round_2] += response.get_total_score
+                total_feedback[:round_2] += 1
+                author_feedback_score[:max_score_round_2] = response.get_maximum_score if author_feedback_score[:max_score_round_2].blank?
+
+              else
+
+                total_score[:round_3] += response.get_total_score
+                total_feedback[:round_3] += 1
+                author_feedback_score[:max_score_round_3] = response.get_maximum_score if author_feedback_score[:max_score_round_3].blank?
+              end
+            end
+
+            if total_feedback[:round_1] > 0
+              author_feedback_score[r.id][1] = {} if author_feedback_score[r.id][1].nil?
+              author_feedback_score[r.id][1] = (total_score[:round_1]).to_f / total_feedback[:round_1]
+            end
+
+            if total_feedback[:round_2] > 0
+              author_feedback_score[r.id][2] = {} if author_feedback_score[r.id][1].nil?
+              author_feedback_score[r.id][2] = (total_score[:round_2]).to_f / total_feedback[:round_2]
+            end
+
+            if total_feedback[:round_3] > 0
+              author_feedback_score[r.id][3] = {} if author_feedback_score[r.id][1].nil?
+              author_feedback_score[r.id][3] = (total_score[:round_3]).to_f / total_feedback[:round_3]
+            end
+
+          else
+
+            total_score = 0
+
+            number_of_feedbacks = 0
+
+            review_mappings.each do |m|
+
+              response = Response.where(:map_id => m.id).first;
+
+              next if response.nil?
+
+              total_score +=  response.get_total_score
+
+              number_of_feedbacks += 1
+
+              author_feedback_score[:max_score_round_1] = response.get_maximum_score if author_feedback_score[:max_score_round_1].blank?
+
+            end
+
+
+            author_feedback_score[r.id][1] = {} if author_feedback_score[r.id][1].nil?
+            author_feedback_score[r.id][1] = total_score.to_f / number_of_feedbacks
+
+          end
+        end
+      end
+    end
+
+    author_feedback_score
+
+  end
 end
+
+

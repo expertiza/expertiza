@@ -1,4 +1,5 @@
 class ReviewMappingController < ApplicationController
+  include ReviewMappingHelper
   # include GC4R
   autocomplete :user, :name
   # use_google_charts
@@ -7,6 +8,8 @@ class ReviewMappingController < ApplicationController
   helper :submitted_content
 
   @@time_create_last_review_mapping_record = nil
+
+
 
   # E1600
   # start_self_review is a method that is invoked by a student user so it should be allowed accordingly
@@ -398,6 +401,7 @@ class ReviewMappingController < ApplicationController
       @reviewers = ReviewResponseMap.review_response_report(@id, @assignment, @type, @review_user)
       @review_scores = @assignment.compute_reviews_hash
       @avg_and_ranges = @assignment.compute_avg_and_ranges_hash
+      @author_feedback_score = get_author_feedback_score_hash(@assignment, @reviewers)
     when "FeedbackResponseMap"
       # If review report for feedback is required call feedback_response_report method in feedback_review_response_map model
       if @assignment.varying_rubrics_by_round?
@@ -594,4 +598,5 @@ private
       iterator += 1
     end
   end
+
 end

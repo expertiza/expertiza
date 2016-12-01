@@ -18,6 +18,9 @@ class SurveyController < ApplicationController
     @global_surveys = Questionnaire.where(["type = 'GlobalSurveyQuestionnaire'"]);
     # Currently last row in the collection but should be selected by default.
     @global_surveys<<@first_row
+    
+    # check whether the entry is added or not
+    @added = params[:added]
   end
   
   def assign_survey

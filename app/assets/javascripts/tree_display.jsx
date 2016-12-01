@@ -238,6 +238,14 @@ jQuery(document).ready(function() {
               </a>
             </span>
           )
+
+           moreContent.push(
+            <span>
+              <a title="View class performance" href={"/class_performance/select_rubrics?id="+(parseInt(this.props.id)/2).toString()}>
+                  <img src="/assets/tree_view/grade-essay-icon-24.png" />
+              </a>
+            </span>
+          )
         } else if (newNodeType === 'questionnaires'){
           moreContent.push(
             <span>

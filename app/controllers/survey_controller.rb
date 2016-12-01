@@ -32,7 +32,7 @@ class SurveyController < ApplicationController
     @new.save
     
     # redirect back to the same page with same assignment id
-    redirect_to action: "assign", id: assignment_id
+    redirect_to action: "assign", id: assignment_id, added: added
     
   end
 end

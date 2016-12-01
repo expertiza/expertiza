@@ -537,6 +537,7 @@ Expertiza::Application.routes.draw do
   get 'response/', :to => 'response#saving'
 
   get 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
+  post '/call_googledoc/make_doc', :to => 'call_googledoc#make_doc'
   get ':controller/service.wsdl', :action => 'wsdl'
 
   get ':controller(/:action(/:id))(.:format)'

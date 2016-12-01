@@ -206,5 +206,5 @@ class Group < ActiveRecord::Base
     end
     team_topic
   end
-  
+
 end

@@ -208,31 +208,6 @@
   <% end %>
 <br/>
 
-<!--display the advertisement-->
-
-  <% if @student.group && @student.assignment.has_topics? && @student.group.topic%>
-    <b>Advertisement for groupmates</b>
-    <br>
-    <table style="width:80%" align="center" >
-      <tr>
-        <td>
-        <% if @student.group && @student.group.advertise_for_partner%>
-            <%= @student.group.comments_for_advertisement%>
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            <%= link_to 'Edit', :controller => 'advertise_for_partner', :action => 'edit', :group_id=>@student.group.id %>
-            &nbsp;&nbsp;
-            <%= link_to 'Delete', :controller => 'advertise_for_partner', :action => 'remove', :group_id=>@student.group.id %>
-        <% else %>
-            <%= link_to 'Create', :controller => 'advertise_for_partner', :action => 'new', :group_id=>@student.group.id %>
-        <% end %>
-        </td>
-      </tr>
-    </table>
-  <% end %>
-
-
-
-<br/>
 
 <!--display a list of sent join-group requests-->
 <%= render :partial => 'join_group_requests/list_sent',

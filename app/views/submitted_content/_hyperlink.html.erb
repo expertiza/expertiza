@@ -42,7 +42,7 @@
   </div>
 <% end %>
 <% if local_assigns[:response_check] %>
-    <script type="text/javascript">
+  <script type="text/javascript">
     function ISODateString(d){
         function pad(n){return n<10 ? '0'+n : n}
         return d.getUTCFullYear()+'-'
@@ -65,11 +65,79 @@
             url:'/responsetime/record_end_time',
             data:$.param({ responsetime:{map_id: <%= map_id %>, round: <%= round %> , end: ISODateString(d)}})
         })
-        //return confirmationMessage;
-    })
-    ;
+    });
 
+  var globalTimer;
+  var linksToUpdate;
+  function endTime(callback){
+        var d = new Date();
+            $.ajax({
+              type:'POST',
+              dataType: "json",
+              async:false,
+              url:'/responsetime/record_end_time',
+              data:$.param({ responsetime:{map_id: <%= map_id %>, round: <%= round %> , end: ISODateString(d)}}),
+              success:function(json){ 
+                var la=JSON.parse(JSON.stringify(json));
+                callback(la);
+              }
+          })
 
+  }
+
+  function timeOut() {
+        stopLinkTimers();
+        if(confirm("Are you still reviewing your submissions ? Press OK to continue"))
+        {
+          resetGlobalTimer(); 
+          //start link timers for only those links that are clicked(opened) by the user
+          for(i=0;i<linksToUpdate.length;i++){
+            startTime(<%= map_id %>, <%= round %>,linksToUpdate[i])  
+          }
+          
+        }
+        else
+        {
+          clearGlobalTimer();
+          document.onmousemove = clearGlobalTimer;
+          document.onkeypress = clearGlobalTimer;
+          document.onload = clearGlobalTimer;
+          document.onmousedown = clearGlobalTimer; // touchscreen presses
+          document.ontouchstart = clearGlobalTimer;
+          document.onclick = clearGlobalTimer;     // touchpad clicks
+          document.onscroll = clearGlobalTimer;    // scrolling with arrow keys
+        }
+  }
+
+  function resetGlobalTimer() {
+        clearTimeout(globalTimer);
+        globalTimer = setTimeout(timeOut, 20000);
+  }
+
+  function clearGlobalTimer(){
+        clearTimeout(globalTimer);
+  }
+
+  function startGlobalTimer(){
+      resetGlobalTimer();
+      // DOM Events
+      document.onmousemove = resetGlobalTimer;
+      document.onkeypress = resetGlobalTimer;
+      document.onload = resetGlobalTimer;
+      document.onmousedown = resetGlobalTimer; // touchscreen presses
+      document.ontouchstart = resetGlobalTimer;
+      document.onclick = resetGlobalTimer;     // touchpad clicks
+      document.onscroll = resetGlobalTimer;    // scrolling with arrow keys
+    
+  }
+
+  function stopLinkTimers(){
+    //update the end times in the responsetime db and get the list of open links
+    endTime(function(d) {
+          linksToUpdate=d
+    });
+    console.log(linksToUpdate);
+  }
 
 </script>
 <% end %>

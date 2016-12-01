@@ -23,13 +23,20 @@ class ResponsetimeController < ApplicationController
 
   def record_end_time
     Rails.logger.debug "Hi DER in end time"
-    @responsetime_match = Responsetime.where(map_id: params[:responsetime][:map_id], round: params[:responsetime][:round])
+    @data= params.require(:responsetime)
+    @linkArray=Array.new
+    @responsetime_match = Responsetime.where(map_id: @data[:map_id], round: @data[:round])
     @responsetime_match.each do |responsetime_entry|
       if responsetime_entry.end.nil?
-        responsetime_entry.update_attribute('end', params[:responsetime][:end])
+        @linkArray.push(responsetime_entry.link)
+        responsetime_entry.update_attribute('end', @data[:end])
       end
+    end   
+    respond_to do|format|
+      format.json {render json: @linkArray}
     end
-  end
+end
+
 
  def responsetime_params
    params.require(:responsetime).permit(:map_id, :round, :link, :start)

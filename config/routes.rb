@@ -303,6 +303,7 @@ Expertiza::Application.routes.draw do
     collection do
       post :record_start_time
       post :record_end_time
+      get  :record_end_time
     end
     end
 

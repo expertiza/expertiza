@@ -198,7 +198,13 @@ class Group < ActiveRecord::Base
     nil
   end
 
-
-
-
+  def topic
+    team_topic = nil
+    participants.each do |participant|
+      team_topic = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
+      break if team_topic
+    end
+    team_topic
+  end
+  
 end

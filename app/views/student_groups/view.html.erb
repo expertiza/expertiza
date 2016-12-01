@@ -25,13 +25,13 @@
       <% end %>
     </tr>
     <!--end member table header-->
-
+    <%i = 0%>
     <% for member in @student.group.participants %> <!--start group member content-->
       <tr>
         <%i = i + 1%>
-        <% if @assignment.isAnonymous.nil?|| @assignment.isAnonymous == true%>
+        <% if @student.group.assignment.isAnonymous.nil?|| @student.group.assignment.isAnonymous == true%>
             <th style="text-align:center;"><%= "Member" %>&nbsp;<%=i%>&nbsp;</th>
-        <% elsif !@assignment.isAnonymous%>
+        <% elsif !@student.group.assignment.isAnonymous%>
             <th style="text-align:center;"><td><%= member.user.name %></td>
             <td><%= member.user.fullname %></td>
             <td><%= member.user.email %></td></th>
@@ -197,6 +197,7 @@
                   %>
                   |
                   <%= link_to "Decline",
+                              {:controller => 'group_invitations', :action => 'decline', :inv_id => inv.id, :student_id => @student.id}
                   %>
                 </td>
               </tr>

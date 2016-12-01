@@ -747,7 +747,6 @@ console.log("test2")
       handleGetCourses: function() {
         var source="/tree_display/get_courses_node_ng";
         this.serverRequest = $.get(source, function (response) {
-          console.log(response);
         var result = JSON.parse(response);
         var arrTen = [];
         for (var k = 0; k < result.length; k++) {

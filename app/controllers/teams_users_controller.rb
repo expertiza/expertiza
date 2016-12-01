@@ -14,9 +14,19 @@ class TeamsUsersController < ApplicationController
   end
 
   def edit
+
+    @assigned_duties_list = Array.new
     @teams_user = TeamsUser.find(params[:id])
     @teams_user.duty = params[:duty] if params[:duty].present?
-    @assignment_duties = @teams_user.team.assignment.duty_names.split(',')
+    if @teams_user.team.assignment.allow_duty_share
+      @assignment_duties = @teams_user.team.assignment.duty_names.split(',')
+    else
+      @selected_duties = TeamsUser.where(team_id: @teams_user.team_id)
+      @selected_duties.each do |duties|
+        @assigned_duties_list << duties.duty
+      end
+      @assignment_duties = @teams_user.team.assignment.duty_names.split(',') - @assigned_duties_list
+    end
     @teams_user.save
   end
 

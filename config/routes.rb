@@ -449,6 +449,8 @@ Expertiza::Application.routes.draw do
   resources :survey do
     collection do
       get :assign
+      # E1680
+      post :assign_survey
     end
   end
 

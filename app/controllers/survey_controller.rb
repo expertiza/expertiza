@@ -1,14 +1,15 @@
 class SurveyController < ApplicationController
-  def action_allowed?
-    ['Instructor',
-     'Teaching Assistant',
-     'Administrator'].include? current_role_name
-  end
+  
+def action_allowed?
+  ['Instructor',
+  'Teaching Assistant',
+  'Administrator'].include? current_role_name
+end
 
-  def assign
-    @assignment = Assignment.find(params[:id])
-    @assigned_surveys = SurveyHelper.get_assigned_surveys(@assignment.id)
-    @surveys = []
+def assign
+@assignment = Assignment.find(params[:id])
+@assigned_surveys = SurveyHelper.get_assigned_surveys(@assignment.id)
+@surveys = []
 
     @surveys = if params['subset'] == "mine"
                  Questionnaire.where(["type_id = 2 and instructor_id = ?", session[:user].id])

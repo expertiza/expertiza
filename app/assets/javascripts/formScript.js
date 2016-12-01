@@ -8,21 +8,17 @@ jQuery(document).ready(function($) {
       $('.render-wrap').formRender({formData});
       window.sessionStorage.setItem('formData', JSON.stringify(formData));
     },
-    stickyControls: {
-      enable: true
-    },
+    dataType: 'json', // use json as data format 
+    stickyControls: true, // allow the question selector to follow the scroll
+    sortableControls: false, // can not swap questions 
     disableFields: ['autocomplete', 'button', 'paragraph', 'number', 
-    'date', 'file', 'hidden'],
-    editOnAdd: true
-    //controlPosition: 'left'
-    // editOnAdd: true
+		    'date', 'file', 'hidden'], // disabled fileds
+    editOnAdd: true, // allow editing after adding to the stage
+    showActionButtons: false // get rid of 'save', 'clear', 'data' buttons
   };
+    
   let formData = window.sessionStorage.getItem('formData');
   let editing = true;
-
-  if (formData) {
-    fbOptions.formData = JSON.parse(formData);
-  }
 
   /**
    * Toggles the edit mode for the demo

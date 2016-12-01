@@ -56,6 +56,7 @@ class QuestionnairesController < ApplicationController
     if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
       @questionnaire = Object.const_get(params[:questionnaire][:type]).new
     end
+    
     begin
       @questionnaire.private = questionnaire_private
       @questionnaire.name = params[:questionnaire][:name]
@@ -65,6 +66,7 @@ class QuestionnairesController < ApplicationController
       @questionnaire.type = params[:questionnaire][:type]
       # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
       # In the future, we need to write migration files to make them consistency.
+      
       case display_type
       when 'AuthorFeedback'
         display_type = 'Author%Feedback'
@@ -75,6 +77,7 @@ class QuestionnairesController < ApplicationController
       when 'GlobalSurvey'
         display_type = 'Global%Survey'
       end
+      
       @questionnaire.display_type = display_type
       @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
       @questionnaire.save
@@ -232,6 +235,7 @@ class QuestionnairesController < ApplicationController
     num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
       question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
+      
       if question.is_a? ScoredQuestion
         question.weight = 1
         question.max_label = 'Strongly agree'
@@ -246,13 +250,18 @@ class QuestionnairesController < ApplicationController
       rescue
         flash[:error] = $ERROR_INFO
       end
+      debug question.inspect
     end
     redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
   end
 
   # Zhewei: This method is used to save all questions in current questionnaire.
   def save_all_questions
+    debug "save_new_questions"
+    debug params
+    
     questionnaire_id = params[:id]
+    x
     begin
       if params[:save]
         params[:question].each_pair do |k, v|

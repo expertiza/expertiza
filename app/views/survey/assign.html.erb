@@ -8,6 +8,7 @@
                 <label> Global Survey</label>
                  <%= select_tag "global_survey", options_from_collection_for_select(@global_surveys, "id", "name") %>
         </div>
+        <button name="button" type="submit">Submit</button>
 <% end %>
 
 <%= render :partial => '/shared_scripts/back' %>

@@ -21,11 +21,17 @@ class SurveyController < ApplicationController
   end
   
   def assign_survey
+     assignment_id = params[:assignment_id]
     # get the survey id from select tag
     selected_survey_id = params[:my_survey]
     # get the questionnaire object from the id
     @selected_survey_questionnaire = Questionnaire.find(selected_survey_id)
-    assignment_id = params[:assignment_id]
+    
+    #create an entry for the questionnaire in assignment queationnaire table
+    @new = AssignmentQuestionnaire.new(questionnaire_id: selected_survey_id, assignment_id: assignment_id)
+    @new.save
+    
+    # redirect back to the same page with same assignment id
     redirect_to action: "assign", id: assignment_id
     
   end

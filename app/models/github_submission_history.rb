@@ -1,9 +1,9 @@
 class GithubSubmissionHistory < LinkSubmissionHistory
   def self.create(link, team, action)
-    history_obj = GithubSubmissionHistory.new
-    history_obj.submitted_detail = link
-    history_obj.team = team
-    history_obj.action = action
+    if link.include? "pull"
+      history_obj = GithubPullRequestSubmissionHistory.create(link, team, action)
+    else
+      history_objGithubRepoSubmissionHistory.create(link, team, action)
     return history_obj
   end
 end

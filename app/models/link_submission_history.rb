@@ -9,6 +9,7 @@ class LinkSubmissionHistory < SubmissionHistory
     elsif link.include? "github.com"
       history_obj = GithubSubmissionHistory.create(link, team, action)
     else
+      # some random link has been given
       history_obj = LinkSubmissionHistory.new
       history_obj.team = team
       history_obj.submitted_detail = link

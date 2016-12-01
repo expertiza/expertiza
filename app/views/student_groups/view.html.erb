@@ -28,9 +28,15 @@
 
     <% for member in @student.group.participants %> <!--start group member content-->
       <tr>
-        <td><%= member.user.name %></td>
-        <td><%= member.user.fullname %></td>
-        <td><%= member.user.email %></td>
+        <%i = i + 1%>
+        <% if @assignment.isAnonymous.nil?|| @assignment.isAnonymous == true%>
+            <th style="text-align:center;"><%= "Member" %>&nbsp;<%=i%>&nbsp;</th>
+        <% elsif !@assignment.isAnonymous%>
+            <th style="text-align:center;"><td><%= member.user.name %></td>
+            <td><%= member.user.fullname %></td>
+            <td><%= member.user.email %></td></th>
+        <% end %>
+
 
         <!--if you can review a groupmate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
         <% if @groupmate_review_allowed %>
@@ -191,7 +197,6 @@
                   %>
                   |
                   <%= link_to "Decline",
-                              {:controller => 'group_invitations', :action => 'decline', :inv_id => inv.id, :student_id => @student.id}
                   %>
                 </td>
               </tr>

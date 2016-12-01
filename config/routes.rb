@@ -296,6 +296,7 @@ Expertiza::Application.routes.draw do
   resources :class_performance do
     collection do
       get :select_rubrics
+      get :show
     end
   end
 

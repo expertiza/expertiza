@@ -2,7 +2,23 @@ class TrueFalse < QuizQuestion
   def edit(count)
   end
 
-  def complete(count, answer = nil)
+  def complete
+    quiz_question_choices = QuizQuestionChoice.where(question_id: self.id)
+    html = ""
+    for i in 0..1
+      txt = quiz_question_choices[i].txt
+      html += "<input name = " + "\"#{self.id}\" "
+      html += "id = " + "\"#{self.id}" + "_" + "#{i + 1}\" "
+      html += "value = " + "\"#{quiz_question_choices[i].txt}\" "
+      html += "type=\"radio\"/>"
+      if i == 0
+        html += "True"
+      else
+        html += "False"
+      end
+      html += "</br>"
+    end
+    html
   end
 
   def view_completed_question(user_answer)

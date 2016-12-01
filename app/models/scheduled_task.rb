@@ -213,8 +213,17 @@ class ScheduledTask
     end
   end
 
+  def compare_files_with_simicheck
+    teams = TeamsUser.all.group(:team_id).count(:team_id)
+
+    #base = File.basename(file_name)
+    #file_type =  base.split(".")[base.split(".").size - 1] if base.split(".").size > 1
+    SimicheckComparison.create_simicheck_comparison(self.assignment_id,file_type)
+
+  end
+
   def drop_outstanding_reviews
-    reviews = ResponseMap.where(reviewed_object_id: self.assignment_id)
+    reviews = ResponseMap.where(reviewed_object_id: self.assignment_id )
     for review in reviews
       review_has_began = Response.where(map_id: review.id)
       if review_has_began.size.zero?

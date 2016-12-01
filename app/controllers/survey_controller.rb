@@ -25,7 +25,7 @@ class SurveyController < ApplicationController
     # get the questionnaire object from the id
     @selected_survey_questionnaire = Questionnaire.find(selected_survey_id)
     
-    redirect_to action: "assign", id: 772
+    redirect_to action: "assign", id: @assignment.id
     
   end
 end

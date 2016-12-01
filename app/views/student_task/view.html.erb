@@ -252,14 +252,14 @@
 <% count = 0 %>
 <div id="messages" class="hidden">
   <% unless @participant.assignment.is_calibrated?%>
-  <% @mappings.each do |mapping| %>
+  <% @chat_mappings.each do |map| %>
       <% count = count+1 %>
-      <% unless mapping.chat.nil? %>
+      <% unless map.chat.nil? %>
       <div id="partial<%= count %>"  >
-        <%= sync partial: "message_row", collection: Message.by_chat(mapping.chat) %>
-        <%= sync_new partial: "message_row", resource: Message.new, scope: Message.by_chat(mapping.chat) %>
+        <%= sync partial: "message_row", collection: Message.by_chat(map.chat) %>
+        <%= sync_new partial: "message_row", resource: Message.new, scope: Message.by_chat(map.chat) %>
         <div class="popup-bottom">
-          <%= form_for([mapping.chat, mapping.chat.messages.build] , remote: true) do |f| %>
+          <%= form_for([map.chat, map.chat.messages.build] , remote: true) do |f| %>
               <%= f.text_field :body , :class => "body_input",:placeholder => "Type a message..." %>
           <% end %>
         </div>
@@ -380,9 +380,9 @@ to display the label "Your team" in the student assignment tasks-->
   <% mcount = 0 %>
   <% b=true %>
   <% unless @participant.assignment.is_calibrated? %>
-  <% @mappings.each do |mapping| %>
+  <% @chat_mappings.each do |map| %>
       <% mcount = mcount+1 %>
-      <% unless mapping.chat.nil? %>
+      <% unless map.chat.nil? %>
       <div class="sidebar-name">
 
 

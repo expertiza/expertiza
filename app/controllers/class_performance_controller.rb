@@ -45,5 +45,6 @@ class ClassPerformanceController < ApplicationController
   end
 
   def show_class_performance
+    puts params[:class_performance][:criterias]
   end
 end

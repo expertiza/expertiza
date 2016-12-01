@@ -216,6 +216,7 @@ class ScheduledTask
   def compare_files_with_simicheck
     #teams = TeamsUser.all.group(:team_id).count(:team_id)
     comparison = SimicheckComparison.create_simicheck_comparison(self.assignment_id,"pdf")
+
     #base = File.basename(file_name)
     #file_type =  base.split(".")[base.split(".").size - 1] if base.split(".").size > 1
     #SimicheckComparison.create_simicheck_comparison(self.assignment_id,file_type)

@@ -328,6 +328,13 @@ FactoryGirl.define do
     min_label nil
   end
 
+  factory :chat, class: Chat do
+    review_response_map_id 1
+
+  end
+
+
+
   factory :assignment_questionnaire, class: AssignmentQuestionnaire do
     assignment { Assignment.first || association(:assignment) }
     questionnaire { ReviewQuestionnaire.first || association(:questionnaire) }

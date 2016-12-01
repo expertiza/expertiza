@@ -25,7 +25,9 @@ class SubmittedContentController < ApplicationController
 
     # @can_submit is the flag indicating if the user can submit or not in current stage
     @can_submit = true
-
+    #Get timeline entries from submission_histories table
+    @submission_history = SubmissionHistory.where(team: @participant.team).order(:submitted_at)
+    
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
   end
 

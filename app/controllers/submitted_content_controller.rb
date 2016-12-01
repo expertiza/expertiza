@@ -132,7 +132,18 @@ class SubmittedContentController < ApplicationController
 
    # params = ActionController::Parameters.new(a: "123", b: "456")
     # send message to reviewers when submission has been updated
-    participant.assignment.email(participant.id) rescue nil # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
+    Response.email(participant.id) rescue nil # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
+    
+    assignment = participant.assignment
+    stage = assignment.current_stage_name(SignedUpTeam.topic_id(assignment.id,participant.user_id))
+    review_round = assignment.num_review_rounds 
+
+    if stage == ('review') then
+     prepared_mail = MailerHelper.send_sync_message(User.find(participant.user_id), "A new submission is available", "file_submission", "file submission", Assignment.find(participant.parent_id).name+","+review_round.to_s)
+     prepared_mail.deliver
+    end    
+    
+  
     if params[:origin] == 'review'
       redirect_to :back
     else

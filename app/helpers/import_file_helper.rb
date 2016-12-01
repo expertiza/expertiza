@@ -18,6 +18,8 @@ module ImportFileHelper
     user.parent_id = (session[:user]).id
     user.timezonepref = User.find(user.parent_id).timezonepref
     user.save!
+    prepared_mail = MailerHelper.send_mail_to_user(user, "Your Expertiza account and password have been created.", "user_welcome", user.password)
+    prepared_mail.deliver
     user
-  end
+    end
 end

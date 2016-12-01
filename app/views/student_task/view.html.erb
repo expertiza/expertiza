@@ -102,7 +102,7 @@
     .popup-box .popup-messages
     {
       height: 79%;
-      overflow-y: scroll;
+      overflow-y: auto;
       border-style: solid;
     }
     .popup-box .popup-messages .popup-bottom{
@@ -261,15 +261,10 @@
         <div class="popup-bottom">
           <%= form_for([mapping.chat, mapping.chat.messages.build] , remote: true) do |f| %>
               <%= f.text_field :body , :class => "body_input",:placeholder => "Type a message..." %>
-              <!--a href="javascript:clear('body_input');"> clear <a-->
-
           <% end %>
-
-
-          <!--input type="button" value="Clear" onclick="clear();"-->
         </div>
       </div>
-          <%end%>
+   <%end%>
   <%end%>
   <%end%>
 </div>

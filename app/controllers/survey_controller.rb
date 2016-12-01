@@ -1,4 +1,5 @@
 class SurveyController < ApplicationController
+<<<<<<< HEAD
   
 def action_allowed?
   ['Instructor',
@@ -54,5 +55,16 @@ def assign
       end
     end
     @surveys.sort! {|a, b| a.name <=> b.name }
+=======
+  def action_allowed?
+    ['Instructor',
+     'Teaching Assistant',
+     'Administrator'].include? current_role_name
+  end
+  #E1680. Improve survey functionality commit by dssathe
+  def assign
+    @my_surveys=Questionnaire.where([instructor_id = ?", session[:user].id])
+    @global_surveys=Questionnaire.all;
+>>>>>>> 765406c14cb905183668988e4fb4d3163972ac7b
   end
 end

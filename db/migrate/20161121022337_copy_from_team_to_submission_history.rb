@@ -6,19 +6,19 @@ class CopyFromTeamToSubmissionHistory < ActiveRecord::Migration
   	# for each file, create a new entry in the submission histories table
   	AssignmentTeam.find_each do |assignment_team|
   		assignment_team.hyperlinks.each do |hyperlink|
-  			submission_history = SubmissionHistory.create(assignment_team, hyperlink, "add")
+  			submission_history = SubmissionHistory.create(assignment_team, hyperlink)
         submission_history.submitted_at = Time.current
         submission_history.save
   		end
       begin
         assignment_team.submitted_files.each do |file|
-          submission_history = SubmissionHistory.create(assignment_team, file.path, "add")
+          submission_history = SubmissionHistory.create(assignment_team, file.path)
           submission_history.submitted_at = File.mtime(file)
           submission_history.save
         end
       rescue ActiveRecord::RecordNotFound
         # missing corresponding assignment.. skip this record.
-        print "in rescue"
+        # print "in rescue"
       end
   	end
 

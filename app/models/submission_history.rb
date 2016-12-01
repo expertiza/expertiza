@@ -26,5 +26,13 @@ class SubmissionHistory < ActiveRecord::Base
       history_obj = FileSubmissionHistory.create(link, team, "delete")
     end
   end
-  
+
+  def get_submitted_at_time
+    return Time.current
+  end
+
+  def updated?
+    return false
+  end
+
 end

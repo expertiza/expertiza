@@ -21,9 +21,24 @@ class ClassPerformanceController < ApplicationController
         @results += questions
     end
 
+    @selections = []
     @results.each do |result|
         @question_ids.push(result.id) unless @question_ids.include?(result.id)
+        @selections[result.id] = "0"
     end
+  end
+
+  def toggle_selection
+    @assignment_id = params[:assignment_id]
+    @results = params[:results]
+    @selections = params[:selections]
+    selection = params[:selection]
+    result = params[:result]
+
+    @selections[result.id] = selection
+
+    render "select_rubrics"
+      
   end
 
   def show_class_performance

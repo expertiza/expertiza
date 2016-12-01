@@ -1,10 +1,30 @@
 <h1> Class Performance </h1>
 <h4> Select rubrics to view performance data on </h4>
 
-<!--
-<% @results.each do |result| %>
-<%= result.inspect %><br>
-<% end %>
--->
+<table>
+  <thead>
+    <tr>
+      <th colspan="5">Rubric</th>
+      <th>Select</th>
+    </tr>
+  </thead>
+  <tbody>
+  <% @results.each do |result| %>
+    <tr>
+      <td><%= result.txt %></td>
+      <% if @selections[result.id] == "1" %>
+        <td><%= link_to 'Unselect', {:controller => "class_performance", :action => "toggle_selection",
+              :assignment_id => @assignment_id, :selection => "0", :result => result, :results => @results, :selections => @selections },
+              :method => :post %>
+      <% else %>
+        <td><%= link_to 'Select', {:controller => "class_performance", :action => "toggle_selection",
+              :assignment_id => @assignment_id, :selection => "1", :result => result, :results => @results, :selections => @selections },
+              :method => :post %>
+      <% end %>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
 
-<%= render 'form' %>
+<%= link_to 'Show Class Performance', {:controller => "class_performance", :action => "show_class_performance",
+  :assignment_id => @assignment_id, :results => @results} %>

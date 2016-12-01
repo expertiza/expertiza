@@ -31,7 +31,7 @@ class SurveyController < ApplicationController
     @new = AssignmentQuestionnaire.new(questionnaire_id: selected_survey_id, assignment_id: assignment_id, user_id: session[:user].id)
     @new.save
     # flash success message
-    flash[:success] = 'All questions has been successfully saved!'
+    flash[:success] = 'Survey has been successfuly assigned'
     # redirect back to the same page with same assignment id
     redirect_to action: "assign", id: assignment_id
     

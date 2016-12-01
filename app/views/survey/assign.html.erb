@@ -8,7 +8,7 @@
                 <label> Global Survey</label>
                  <%= select_tag "global_survey", options_from_collection_for_select(@global_surveys, "id", "name", {selected: 0}) %>
         </div>
-        <input type="hidden" id="assignment_id" name="assignment_id" value="#{@assignment.id}" />
+        <%= hidden_field_tag :assignment_id, value: @assignment.id  %>
 
         <button name="button" type="submit">Submit</button>
 <% end %>

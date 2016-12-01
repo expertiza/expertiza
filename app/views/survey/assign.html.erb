@@ -2,11 +2,11 @@
 <%= form_tag(:action=>'assign') do |f| %>
         <div class="field">
           <%= f.label :My_Surveys" %>
-          <%= f.select :my_survey, options_for_select(@my_surveys) %>
+          <%= f.select :my_survey, options_for_select([[my_survey.name][my_survey.id]]) %>
         </div>
         <div class="field">
           <%= f.label = :Global_Surveys %>
-          <%= f.select :global_survey, options_for_select(@global_surveys) %>
+          <%= f.select :global_survey, options_for_select([[global_survey.name][global_survey.id]]) %>
         </div>
 <% end %>
 

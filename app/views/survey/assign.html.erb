@@ -2,7 +2,7 @@
 <%= form_tag(:action=>'assign_surveys') do %>
         <div class="field">
                 <label> My Surveys</label>
-                <%= select_tag "my_survey", options_from_collection_for_select(@my_surveys, "id", "name", { required: true }) %>
+                <%= select_tag "my_survey", options_from_collection_for_select(@my_surveys, "id", "name", {selected: "Select a Global Survey", required: true }) %>
         </div>
         <div class="field">
                 <label> Global Survey</label>

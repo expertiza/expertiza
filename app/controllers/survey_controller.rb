@@ -28,7 +28,7 @@ class SurveyController < ApplicationController
     @selected_survey_questionnaire = Questionnaire.find(selected_survey_id)
     
     #create an entry for the questionnaire in assignment queationnaire table
-    @new = AssignmentQuestionnaire.new(questionnaire_id: selected_survey_id, assignment_id: assignment_id)
+    @new = AssignmentQuestionnaire.new(questionnaire_id: selected_survey_id, assignment_id: assignment_id, user_id: session[:user].id)
     @new.save
     
     # redirect back to the same page with same assignment id

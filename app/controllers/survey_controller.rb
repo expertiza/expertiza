@@ -14,9 +14,7 @@ class SurveyController < ApplicationController
     @first_row.name="Select a Global Survey";
     @first_row.id=0;
     @my_surveys=Questionnaire.where(["instructor_id=? and type = 'SurveyQuestionnaire'", session[:user].id]);
-    @global_surveys = Questionnaire.where(["type = 'GlobalSurveyQuestionnaire'"]);
-    @global_surveys << @first_row
-    @global_surveys.sort
-   
+    @global_surveys = @first_row + Questionnaire.where(["type = 'GlobalSurveyQuestionnaire'"]);
+    
   end
 end

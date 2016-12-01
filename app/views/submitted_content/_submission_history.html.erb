@@ -6,89 +6,24 @@
             <h1>Submission History</h1>
           </div>
           <div style="display:inline-block;width:100%;overflow-y:auto;">
-          <ul class="timeline timeline-horizontal">
-            <li class="timeline-item">
-              <div class="timeline-badge primary"><i class="glyphicon glyphicon-check"></i></div>
-              <div class="timeline-panel">
-                <div class="timeline-heading">
-                  <h4 class="timeline-title">Type 1</h4>
-                  <p><small class="text-muted"><i class="glyphicon glyphicon-time"></i> Time stamp 1</small></p>
-                </div>
-                <div class="timeline-body">
-                  <p>Link one</p>
-                </div>
-              </div>
-            </li>
-            
-            <li class="timeline-item">
-              <div class="timeline-badge primary"><i class="glyphicon glyphicon-check"></i></div>
-              <div class="timeline-panel">
-                <div class="timeline-heading">
-                  <h4 class="timeline-title">Type 2</h4>
-                  <p><small class="text-muted"><i class="glyphicon glyphicon-time"></i> Time stamp 2</small></p>
-                </div>
-                <div class="timeline-body">
-                  <p>Link 2</p>
-                </div>
-              </div>
-            </li>
-            <li class="timeline-item">
-              <div class="timeline-badge primary"><i class="glyphicon glyphicon-check"></i></div>
-              <div class="timeline-panel">
-                <div class="timeline-heading">
-                  <h4 class="timeline-title">Type 3</h4>
-                  <p><small class="text-muted"><i class="glyphicon glyphicon-time"></i> Time stamp 3</small></p>
-                </div>
-                <div class="timeline-body">
-                  <p>Link three</p>
-                </div>
-              </div>
-            </li>
-            <li class="timeline-item">
-              <div class="timeline-badge primary"><i class="glyphicon glyphicon-check"></i></div>
-              <div class="timeline-panel">
-                <div class="timeline-heading">
-                  <h4 class="timeline-title">Type 4</h4>
-                  <p><small class="text-muted"><i class="glyphicon glyphicon-time"></i> Time stamp 4</small></p>
-                </div>
-                <div class="timeline-body">
-                  <p>Link four</p>
-                </div>
-              </div>
-            </li>
-            <li class="timeline-item">
-              <div class="timeline-badge primary"><i class="glyphicon glyphicon-check"></i></div>
-              <div class="timeline-panel">
-                <div class="timeline-heading">
-                  <h4 class="timeline-title">Type 5</h4>
-                  <p><small class="text-muted"><i class="glyphicon glyphicon-time"></i> Time stamp 5</small></p>
-                </div>
-                <div class="timeline-body">
-                  <p>Link five</p>
-                </div>
-              </div>
-            </li>
-            <li class="timeline-item">
-              <div class="timeline-badge primary"><i class="glyphicon glyphicon-check"></i></div>
-              <div class="timeline-panel">
-                <div class="timeline-heading">
-                  <h4 class="timeline-title">Type 6</h4>
-                  <p><small class="text-muted"><i class="glyphicon glyphicon-time"></i> Time stamp 6</small></p>
-                </div>
-                <div class="timeline-body">
-                  <p>Link sixx</p>
-                </div>
-              </div>
-            </li>
-          </ul>
-        </div>
+            <ul class="timeline timeline-horizontal">
+              <% @submission_history.each do |submission| %>
+              <%# Display timestamps from each submission! %>
+                <li class="timeline-item">
+                  <div class="timeline-badge primary"><i class="glyphicon glyphicon-check"></i></div>
+                  <div class="timeline-panel">
+                    <div class="timeline-heading">
+                      <h4 class="timeline-title"><%= submission.type %></h4>
+                      <p><small class="text-muted"><i class="glyphicon glyphicon-time"></i> <%= submission.submitted_at %></small></p>
+                    </div>
+                    <div class="timeline-body">
+                      <p><%= submission.submitted_detail %></p>
+                    </div>
+                  </div>
+                </li>
+              <% end %>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
-
-  <div id="submission_history" style="">
-      <%# @submission_history.each do |submission| %>
-      <%# Display timestamps from each submission! %>
-
-      <%# end %>
-     </div>

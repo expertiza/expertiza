@@ -25,9 +25,9 @@ describe 'displaying inherit teams section' do
   end
 
    it 'should not display inherit teams option while creating team for an assignment without a course' do
-    create(:assignment_without_course)
-    create(:assignment_without_course_node)
-    create(:assignment_without_course_team)
+    assignment = create(:assignment)
+    create(:assignment_node)
+    assignment.update_attributes(course_id: nil)
 
     login_as("instructor6")    
     visit '/teams/list?id=1&type=Assignment'

@@ -25,7 +25,9 @@ class SubmittedContentController < ApplicationController
 
     # @can_submit is the flag indicating if the user can submit or not in current stage
     @can_submit = true
-
+    #Get timeline entries from submission_histories table
+    @submission_history = SubmissionHistory.where(team: @participant.team).order(:submitted_at)
+    
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
   end
 
@@ -56,7 +58,6 @@ class SubmittedContentController < ApplicationController
     else
       begin
         team.submit_hyperlink(params['submission'])
-        @participant.update_resubmit_times
 
         # #create a submission record
         # @submission_record = SubmissionRecord.new(team_id: team.id, content: params['submission'], user: @participant.name, assignment_id: params[:id], operation: "Submit Hyperlink")
@@ -93,7 +94,7 @@ class SubmittedContentController < ApplicationController
     # @submission_record = SubmissionRecord.new(team_id: team.id, content: hyperlink_to_delete, user:@participant.name , assignment_id: assignment.id, operation: "Remove Hyperlink")
     # @submission_record.save
 
-    submission_history = SubmissionHistory.delete_submission(team, params['submission'])
+    submission_history = SubmissionHistory.delete_submission(team, hyperlink_to_delete)
     submission_history.submitted_at = Time.current # taking the time of submission
     submission_history.save
 
@@ -132,9 +133,6 @@ class SubmittedContentController < ApplicationController
     if params['unzip']
       SubmittedContentHelper.unzip_file(full_filename, curr_directory, true) if get_file_type(safe_filename) == "zip"
     end
-    participant.update_resubmit_times
-
-
 
     #create a submission record
     assignment = Assignment.find(participant.parent_id)

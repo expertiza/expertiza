@@ -130,6 +130,18 @@ class TreeDisplayController < ApplicationController
       format.html { render json: FolderNode.get }
     end
   end
+  def get_courses_node_ng
+    respond_to do |format|
+
+    if session[:user].role.name == 'Teaching Assistant' or session[:user].role.name == 'Instructor'
+      format.html { render json:Course.where(instructor_id: session[:user].id)}
+    elsif session[:user].role.name == 'Administrator' or session[:user].role.name == 'Super-Administrator'
+      format.html { render json:Course.all}
+    end
+
+
+    end
+  end
 
   # for folder nodes
   def get_children_node_ng

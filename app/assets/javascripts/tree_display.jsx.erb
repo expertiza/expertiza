@@ -601,7 +601,6 @@ jQuery(document).ready(function() {
 
   })
 
-
     var NewAssignmentForm = React.createClass({
 
      getInitialState: function() {
@@ -623,7 +622,8 @@ jQuery(document).ready(function() {
            instructor_id: '6'
          }},
          team_assignment: '',
-         commit: 'Create'
+         commit: 'Create',
+         listCourses:[] 
        }
      },
 
@@ -699,9 +699,11 @@ jQuery(document).ready(function() {
         var newAssignment = this.state.assignment_form;
         newAssignment.assignment.reputation_algorithm = e.target.value;
         this.setState({assignment: newAssignment});
+console.log("test2")
       },
 
       handleCreateAssignment: function(e) {
+console.log("onam test00")
         var that = this;
         console.log('assignment');
         $.ajax({
@@ -712,6 +714,23 @@ jQuery(document).ready(function() {
           url: '/assignments'
         });
         window.location.reload();
+      },
+
+      handleGetCourses: function() {
+      console.log("test1")
+        var source="/tree_display/get_courses_node_ng";
+        this.serverRequest = $.get(source, function (response) {
+     console.log(response);
+        var result = JSON.parse(response);
+        var arrTen = [];
+        for (var k = 0; k < result.length; k++) {
+          arrTen.push(<option key={result[k].id} value={result[k].name}> {result[k].name} </option>);
+        }
+        this.setState({
+          listCourses: arrTen
+        });
+     console.log(arrTen);
+        }.bind(this));
       },
 
     render: function(){
@@ -728,10 +747,12 @@ jQuery(document).ready(function() {
         return(
                 <div style={divStyle}>
                   <p>
-                     Assignment Name: <input type="text" id="name" onChange={this.handleNameChange}/>
+                     Assignment Name: <input type="text" id="name" onChange={this.handleNameChange} />
                   </p>
                   <p>
-                     Course: <input type="text" id="course_id" onChange={this.handleCourseChange}/>
+                     Course: <select id="course_id" onChange={this.handleCourseChange} onClick={this.handleGetCourses}>
+                       {this.state.listCourses}
+                     </select>
                   </p>
                   <p>
                     Submission Directory: <input type="text"  id="directory_path" onChange={this.handleSubChange}/>
@@ -789,7 +810,9 @@ jQuery(document).ready(function() {
 
             )
         }
+
     })
+
 
   function hello()
   {

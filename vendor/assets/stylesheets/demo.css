@@ -12,7 +12,7 @@ body {
 body > div {}
 
 #fb-template {
-  // display: none;
+    display: none;
 }
 
 .template-textarea-wrap {

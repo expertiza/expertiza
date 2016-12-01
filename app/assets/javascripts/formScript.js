@@ -1,95 +1,130 @@
 jQuery(document).ready(function($) {
-    // form-builder options
-    var fbOptions = {
-	subtypes: {
-	    text: ['datetime']
-	},
-	onSave: function(formData) {
-	    togglePreivew();
-	    $('.render-wrap').formRender({formData});
-	    window.sessionStorage.setItem('formData', JSON.stringify(formData));
-	},
-	dataType: 'json', // use json as data format 
-	stickyControls: true, // allow the question selector to follow the scroll
-	sortableControls: false, // can not swap questions 
-	disableFields: ['autocomplete', 'button', 'paragraph', 'number', 
-			'date', 'file', 'hidden'], // disabled fields
-	editOnAdd: true, // allow editing after adding to the stage
-	showActionButtons: true // get rid of 'save', 'clear', 'data' buttons
-    };
 
-    var debug = function(s){
-	alert(s);
-    }
-    
-    // form-builder contrutor
-    var formBuilder = $('.build-wrap')
-        .formBuilder(fbOptions)
-        .data('formBuilder');
+    var initActionButtons = function()
+    {
+	$('button[id$="-view-data"]').remove();
 
-    debug($('build[id$="-save"]').length);
-    // action buttons
-    $('button[id$="-save"]').each(function(index, elmt) {
-	debug("save");
-	$(elmt).html('preview');
-	$(elmt).click(function(){alert('save');});
-    });
+	$('button[id$="-clear-all"]').remove();
 
-    $('button[id$="-view-data"]').each(function(index, elmt) {
-	debug("save");
+	var previewing = true,
+	togglePreview = function() {
+	    document.body.classList.toggle('form-rendered', previewing);
+	    previewing = !previewing;
+	};
 
-	$(elmt).remove();
-    });
-
-    $('button[id$="-clear-all"]').each(function(index, elmt) {
-	debug("clear");
-
-	$(elmt).remove();
-    });
-
-    document.getElementById('edit-form').onclick = function() {
-	togglePreview();
-    };
-
-    // sortable fields
-    $('a[id$="-edit"]').each(function(index, elmt) {
-	$(elmt).click(function(e) {
-	    e.preventDefault();
-
-	    if (editing)
-	    {
-		alert('quit editing');
-		toggleEdit();
-	    }
-	    else
-	    {
-		alert('start editing');
-		toggleEdit();
-	    }
+	$('button[id="edit-form"]').click(function() {
+	    togglePreview();
 	});
-    });
-    
-    $('a[class$="close-field"]').each(function(index, elmt) {
-	$(elmt).remove();
-    });
-
-    document.getElementById('get-data').onclick = function() {
-	console.log(formBuilder.actions.getData());
+	
+	$('button[id$="-save"]').each(function(index, elmt) {
+	    $(elmt).html('preview');
+	    $(elmt).click(function() {
+		togglePreview();
+		$(renderWrap).formRender({
+		    dataType: 'json',
+		    formData: formBuilder.formData
+		});
+		window.sessionStorage.setItem('formData', JSON.stringify(formBuilder.formData));
+	    });
+	});
     };
 
-    /**
-     * Toggles the edit mode 
-     * @return {Boolean} editMode
-     */
-    let editing = false;
-    var toggleEdit = function() {
-	editing = !editing;
+    var disableFormEditorFields = function(fld)
+    {
+	$('a[id$="-copy"]', fld).remove();
+
+	$('a[class$="close-field"]', fld).remove();
+
+	var setEdit = function(elmt, val){
+	    $(elmt).data("editing", val);
+	};
+	
+	$('a[id$="-edit"]').each(function(idx, elmt) {
+	    
+	    $(elmt).data("editing", false);
+	    $(elmt).off('click').on('click', function(e) {
+		
+		e.preventDefault();
+		
+		console.log($(elmt).data("editing"));
+		if ($(elmt).data("editing") === true)
+		{
+		    alert('quit editing');
+		    setEdit(elmt, false);
+		    onUpdate(fld);  
+		}
+		else
+		{
+		    alert('start editing');
+		    setEdit(elmt, true);
+		}
+	    });
+	});
+	    
+	$('a[id^="del_"]').off('click').on('click', function(e) {
+
+	    e.preventDefault();
+	    alert('delete');
+	    onRemove(fld);
+	});
     };
+
+    // !!!
+    // fill the remove_question form
+    // remove from db and hidden form
+    var onRemove = function(fld) {};
     
-    let previewing = true;
-    function togglePreview() {
-	document.body.classList.toggle('form-rendered', previewing);
-	return previewing = !previewing;
-    }
-  
+    // !!!
+    // fill the save_all_questions form
+    // save to db and hidden form
+    var onSave = function() {};
+    
+    // !!!
+    // update question
+    var onUpdate = function(fld) { };
+ 
+    var onAddHandler = {
+	onadd: function(fld)
+	{
+	    disableFormEditorFields(fld);
+
+	    // !!!
+	    // get form to add to db
+	    // fill form
+	    // submit form
+
+	    // fill the hidden form
+    	}
+    };
+
+    var buildWrap = document.querySelector('.build-wrap'),
+	renderWrap = document.querySelector('.render-wrap'),
+	formData = window.sessionStorage.getItem('formData'),
+	fbOptions = {
+	    dataType: 'json',
+	    sortableControls: false,
+	    editOnAdd: false,
+	    stickyControls: true, 
+	    sortableControls: false, 
+	    disableFields: ['autocomplete', 'button',
+			    'paragraph', 'number', 
+			    'date', 'file', 'hidden'], 
+	    editOnAdd: false, 
+	    showActionButtons: true, 
+	    typeUserEvents: {
+		'checkbox': onAddHandler,
+		'checkbox-group': onAddHandler,
+		'header': onAddHandler,
+		'radio-group': onAddHandler,
+		'select': onAddHandler,
+		'text': onAddHandler,
+		'textarea': onAddHandler
+	    }
+	};
+
+    var formBuilder = $(buildWrap).formBuilder(fbOptions).data('formBuilder');
+
+    initActionButtons();
+    disableFormEditorFields(document);
+   
 });

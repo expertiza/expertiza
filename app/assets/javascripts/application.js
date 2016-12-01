@@ -27,6 +27,7 @@
 //= require jquery-tablesorter
 //= require_self
 //= require_tree .
+
 //= stub vendor.min
 //= stub form-builder.min
 //= stub form-render.min

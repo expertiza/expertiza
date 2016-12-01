@@ -261,7 +261,6 @@ class QuestionnairesController < ApplicationController
     debug params
     
     questionnaire_id = params[:id]
-    x
     begin
       if params[:save]
         params[:question].each_pair do |k, v|

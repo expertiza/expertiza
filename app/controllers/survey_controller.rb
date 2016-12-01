@@ -33,7 +33,7 @@ class SurveyController < ApplicationController
     # flash success message
     flash[:success] = 'All questions has been successfully saved!'
     # redirect back to the same page with same assignment id
-    redirect_to action: "assign", id: assignment_id,
+    redirect_to action: "assign", id: assignment_id
     
   end
 end

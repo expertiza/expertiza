@@ -2,7 +2,7 @@ Expertiza::Application.routes.draw do
 
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
-  get 'tree_display/list/select_rubrics', to: 'class_performance#select_rubrics'
+  get 'select_rubrics', to: 'class_performance#select_rubrics'
   
   resources :bookmarks do
     collection do

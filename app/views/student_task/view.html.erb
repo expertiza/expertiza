@@ -383,6 +383,7 @@ to display the label "Your team" in the student assignment tasks-->
   <br>
 <div class="chat-sidebar">
   <% mcount = 0 %>
+  <% b=true %>
   <% unless @participant.assignment.is_calibrated? %>
   <% @mappings.each do |mapping| %>
       <% mcount = mcount+1 %>
@@ -396,8 +397,12 @@ to display the label "Your team" in the student assignment tasks-->
           <span>Review <%= mcount %></span>
         </a>
       </div>
-          <% end %>
+      <% b=false %>
+    <% end %>
   <% end %>
 <%end%>
+<% if b%>
+<span>You dont have any messages at this moment</span>
+<% end %>
 </div>
   <a href="javascript:window.history.back()">Back</a>

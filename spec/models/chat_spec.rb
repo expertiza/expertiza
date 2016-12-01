@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe "validations" do
   before(:each) do
-    @chat = create(:chat)
+    @chat = build(:chat)
   end
 
 

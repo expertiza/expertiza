@@ -333,6 +333,13 @@ FactoryGirl.define do
 
   end
 
+  factory :message, class: Message do
+    body "abc"
+    chat { Chat.first || association(:chat) }
+    user { User.first || association(:student)}
+
+  end
+
 
 
   factory :assignment_questionnaire, class: AssignmentQuestionnaire do

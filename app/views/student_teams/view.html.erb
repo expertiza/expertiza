@@ -38,8 +38,15 @@
         <% if @student.assignment.duty_based %>
             <% if member.user.id == session[:user].id %>
                 <td>
-
-                  <%= link_to "select duty", edit_teams_user_path(TeamsUser.where(["team_id = ? and user_id = ?", @student.team.id, session[:user].id]).pluck(:id)) %>
+                  <% sql = "select duty from teams_users where user_id = '#{member.user.id}' and team_id = '#{@student.team.id}'"
+                     m = TeamsUser.find_by_sql(sql)
+                  %>
+                  <% if !m[0].duty %>
+                      <%= link_to "select duty", edit_teams_user_path(TeamsUser.where(["team_id = ? and user_id = ?", @student.team.id, session[:user].id]).pluck(:id)) %>
+                  <% else %>
+                      <%= m[0].duty %>
+                      <%= link_to "Update duty", edit_teams_user_path(TeamsUser.where(["team_id = ? and user_id = ?", @student.team.id, session[:user].id]).pluck(:id)) %>
+                  <% end %>
                 </td>
             <% else %>
                 <% sql = "select duty from teams_users where user_id = '#{member.user.id}' and team_id = '#{@student.team.id}'"

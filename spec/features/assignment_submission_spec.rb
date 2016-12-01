@@ -42,20 +42,7 @@ describe "assignment submisstion test" do
     #end
   end
 
-  it "test2: submit multiple link" do
-    signup_topic
-    fill_in 'submission', with: "https://www.ncsu.edu"
-    click_on 'Upload link'
-    fill_in 'submission', with: "https://www.google.com"
-    click_on 'Upload link'
-    fill_in 'submission', with: "https://bing.com"
-    click_on 'Upload link'
-    expect(page).to have_content "https://www.ncsu.edu"
-    expect(page).to have_content "https://www.google.com"
-    expect(page).to have_content "https://bing.com"
-  end
-
-  it "test3: submit invalid link" do
+  it "test2: submit invalid link" do
     signup_topic
     #invalid format url1
     fill_in 'submission', with: "wolfpack"
@@ -76,6 +63,19 @@ describe "assignment submisstion test" do
     #expect(page).to have_http_status(404)
   end
 
+  it "test3: submit multiple links" do
+    signup_topic
+    fill_in 'submission', with: "https://www.ncsu.edu"
+    click_on 'Upload link'
+    fill_in 'submission', with: "https://www.google.com"
+    click_on 'Upload link'
+    fill_in 'submission', with: "https://bing.com"
+    click_on 'Upload link'
+    expect(page).to have_content "https://www.ncsu.edu"
+    expect(page).to have_content "https://www.google.com"
+    expect(page).to have_content "https://bing.com"
+  end
+
   it "test4: submit duplicated link" do
     signup_topic
     fill_in 'submission', with: "https://google.com"
@@ -84,6 +84,16 @@ describe "assignment submisstion test" do
     fill_in 'submission', with: "https://google.com"
     click_on 'Upload link'
     expect(page).to have_content "You or your teammate(s) have already submitted the same hyperlink."  
+  end
+
+  it "test5: submit empty link" do
+    signup_topic
+    fill_in 'submission', with: ""
+    click_on 'Upload link'
+    expect(page).to have_content "The URL or URI is not valid. Reason: The hyperlink cannot be empty!"
+    fill_in 'submission', with: "http://"
+    click_on 'Upload link'
+    expect(page).to have_content "The URL or URI is not valid. Reason: bad URI(absolute but no path): http://"
   end
 
 end

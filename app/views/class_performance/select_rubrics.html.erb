@@ -10,6 +10,6 @@
 </center>
 
 <%= form_for :class_performance do |f| %>
-  <%= f.select :phone_type, @results.txt, :prompt => 'Select One' %>  
+  <%= f.select :phone_type, <% @results.each do |result| %> <%= result.txt %> <% end %>, :prompt => 'Select One' %>  
 
 <% end %>

@@ -20,11 +20,11 @@ class ClassPerformanceController < ApplicationController
         questions = Question.where(questionnaire_id: questionnaire).to_a
         @results += questions
     end
-
+  
+    @questions = []
     #@selections = []
     @results.each do |result|
-      puts result.id  
-      puts result.txt
+      @questions += result.txt
     #    @question_ids.push(result.id) unless @question_ids.include?(result.id)
     #    @selections[result.id] = "0"
     end

@@ -102,17 +102,39 @@ describe "assignment submisstion test" do
 
   end
   describe "submit file" do
-    it "is able to submit multiple valid files" do
+    it "is able to submit single valid file" do
       signup_topic
       file_path = Rails.root + "spec/features/assignment_submission_txts/valid_assignment_file.txt"
       attach_file('uploaded_file', file_path)
       click_on 'Upload file'
+      expect(page).to have_content "valid_assignment_file.txt"
 
+      #click on uploaded file
+      click_on "valid_assignment_file.txt"
+      expect(page).to have_http_status(200)
+      expect(page).to have_content "valid_assignment_file: This is a .txt file to test assignment submission."
+    end
+
+    it "is able to submit multiple valid files", :js => true do
+      signup_topic
+      #upload file1
+      file_path = Rails.root + "spec/features/assignment_submission_txts/valid_assignment_file.txt"
+      attach_file('uploaded_file', file_path)
+      click_on 'Upload file'
+      #upload file2
       file_path = Rails.root + "spec/features/assignment_submission_txts/valid_assignment_file2.txt"
       attach_file('uploaded_file', file_path)
       click_on 'Upload file'
       expect(page).to have_content "valid_assignment_file.txt"
       expect(page).to have_content "valid_assignment_file2.txt"
+      #click on uploaded files
+      click_on "valid_assignment_file.txt"
+      #expect(page).to have_http_status(200)
+      expect(page).to have_content "valid_assignment_file: This is a .txt file to test assignment submission."
+      page.evaluate_script('window.history.back()')
+      click_on "valid_assignment_file2.txt"
+      #expect(page).to have_http_status(200)
+      expect(page).to have_content "valid_assignment_file2: This is a .txt file to test assignment submission."
     end
 
   end

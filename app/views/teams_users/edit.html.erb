@@ -2,7 +2,6 @@
 <%= form_for '/teams_users', method: :get do %>
 
     <%= select_tag "duty", options_for_select(@assignment_duties) %>
-
     <input type='submit' value='Save'/>
 <% end %>
 <br/>

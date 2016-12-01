@@ -6,4 +6,6 @@ class GithubSubmissionHistory < LinkSubmissionHistory
       history_objGithubRepoSubmissionHistory.create(link, team, action)
     return history_obj
   end
+  end
 end
+

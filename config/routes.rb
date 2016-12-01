@@ -1,5 +1,6 @@
 Expertiza::Application.routes.draw do
 
+  resources :simicheck_comparisons
   resources :submission_records
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'

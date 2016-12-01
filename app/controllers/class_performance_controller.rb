@@ -1,4 +1,8 @@
 class ClassPerformanceController < ApplicationController
+  def action_allowed?
+    true
+  end
+
   def select_rubrics
   end
 

@@ -6,7 +6,7 @@
         </div>
         <div class="field">
                 <label> Global Survey</label>
-                 <%= select_tag "global_survey", options_from_collection_for_select(@global_surveys, "id", "name", {selected: @global_surveys.id=0}) %>
+                 <%= select_tag "global_survey", options_from_collection_for_select(@global_surveys, "id", "name", {selected: 0}) %>
         </div>
         <button name="button" type="submit">Submit</button>
 <% end %>

@@ -10,7 +10,6 @@
 </center>
 
 <%= form_for :class_performance do |f| %>
-  <%= f.select :phone_type, options_for_select([["Select Rubric Criterias", ""],  @results ]), :prompt => 'Select One' %>
-  <%= select_tag "select criterias", options_for_select(@results.map { |obj| [obj['txt'], obj['id']] }) %>
+  <%= f.select "select criterias", options_for_select(@results.map { |obj| [obj['txt'], obj['id']] }) %>
 
 <% end %>

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161114210745) do
+ActiveRecord::Schema.define(version: 20161125190913) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -364,6 +364,18 @@ ActiveRecord::Schema.define(version: 20161114210745) do
     t.integer "question_id", limit: 4
     t.text    "txt",         limit: 65535
     t.boolean "iscorrect",                 default: false
+  end
+
+  create_table "requested_users", force: :cascade do |t|
+    t.string   "name",           limit: 255
+    t.integer  "role_id",        limit: 4
+    t.string   "fullname",       limit: 255
+    t.string   "institution_id", limit: 255
+    t.string   "email",          limit: 255
+    t.string   "status",         limit: 255
+    t.string   "reason",         limit: 255
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
   end
 
   create_table "response_maps", force: :cascade do |t|

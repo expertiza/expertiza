@@ -81,7 +81,10 @@ class UsersController < ApplicationController
   def review
     #TODO: make status as enum or something
     #@users = RequestedUser.where.not(status: 'approved');
-    @users = RequestedUser.all
+    sql_query = "select * from requested_users where status <> 'Approved' or status is null"
+    @users = RequestedUser.find_by_sql(sql_query)
+    #@users=RequestedUser.all
+    @roles = Role.all
   end
 
   def show_selection
@@ -127,7 +130,6 @@ class UsersController < ApplicationController
     @rolename = Role.find_by_name(params[:role])
     roles_for_request_sign_up
   end
-
   def create
     # if the user name already exists, register the user by email address
     check = User.find_by_name(params[:user][:name])
@@ -162,12 +164,60 @@ class UsersController < ApplicationController
       render action: 'new'
     end
   end
+  def request_user_creation
+    @user = RequestedUser.find params[:id]
+    @user.status=params[:status]
+    @user.reason=params[:reason]
+    if @user.status.nil?
+      flash[:error] = "Please Approve or Reject before submitting"
+    elsif @user.update_attributes(params[:user])
+      flash[:success] = "The user \"#{@user.name}\" has been successfully updated."
+    end
+    if @user.status=="Approved"
+    check = User.find_by_name(@user.name)
+    #params[:user][:name] = params[:user][:email] unless check.nil?
+    @usernew = User.new()
+    @usernew.name = @user.name
+    @usernew.role_id = @user.role_id
+    @usernew.institution_id = @user.institution_id
+    @usernew.fullname = @user.fullname
+    @usernew.email = @user.email
+    #@user.institution_id = 
+    # record the person who created this new user
+    @usernew.parent_id = session[:user].id
+    # set the user's timezone to its parent's
+    @usernew.timezonepref = User.find(@usernew.parent_id).timezonepref
 
+    if @usernew.save
+      password = @usernew.reset_password # the password is reset
+
+      prepared_mail = MailerHelper.send_mail_to_user(@usernew, "Your Expertiza account and password have been created.", "user_welcome", password)
+      prepared_mail.deliver
+
+      flash[:success] = "A new password has been sent to new user's e-mail address."
+      # Instructor and Administrator users need to have a default set for their notifications
+      # the creation of an AssignmentQuestionnaire object with only the User ID field populated
+      # ensures that these users have a default value of 15% for notifications.
+      # TAs and Students do not need a default. TAs inherit the default from the instructor,
+      # Students do not have any checks for this information.
+      if @usernew.role.name == "Instructor" or @usernew.role.name == "Administrator"
+        AssignmentQuestionnaire.create(user_id: @user.id)
+      end
+      undo_link("The user \"#{@user.name}\" has been successfully created. ")
+      #redirect_to action: 'list'
+    else
+      foreign
+      #render action: 'new'
+    end
+  end
+    redirect_to action: 'review'
+  end
   def request_user_create
     #TODO: Do not allow duplicates
     #TODO: All fields should be entered
     @user = RequestedUser.new(user_params)
     @user.institution_id = params[:user][:institution_id]
+    @user.status = 'Under Review'
     if @user.save
       flash[:success] = "User signup for \"#{@user.name}\" has been successfully requested. "
       redirect_to '/instructions/home'

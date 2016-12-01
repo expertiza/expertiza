@@ -1,10 +1,12 @@
 <h1>Surveys for Assignment: <%= @assignment.name %></h1>
 <%= form_tag(:action=>'assign') do %>
         <div class="field">
+                <label> My Surveys</label>
                 <%= select_tag "my_survey", options_from_collection_for_select(@my_surveys, "id", "name") %>
         </div>
         <div class="field">
-                 <%= select_tag "my_survey", options_from_collection_for_select(@my_surveys, "id", "name") %>
+                <label> Global Survey</label>
+                 <%= select_tag "global_survey", options_from_collection_for_select(@global_surveys, "id", "name") %>
         </div>
 <% end %>
 

@@ -18,9 +18,6 @@ class SurveyController < ApplicationController
     @global_surveys = Questionnaire.where(["type = 'GlobalSurveyQuestionnaire'"]);
     # Currently last row in the collection but should be selected by default.
     @global_surveys<<@first_row
-    
-    # check whether the entry is added or not
-    @added = params[:added]
   end
   
   def assign_survey
@@ -33,9 +30,10 @@ class SurveyController < ApplicationController
     #create an entry for the questionnaire in assignment queationnaire table
     @new = AssignmentQuestionnaire.new(questionnaire_id: selected_survey_id, assignment_id: assignment_id, user_id: session[:user].id)
     @new.save
-    
+    # flash success message
+    flash[:success] = 'All questions has been successfully saved!'
     # redirect back to the same page with same assignment id
-    redirect_to action: "assign", id: assignment_id, added: added
+    redirect_to action: "assign", id: assignment_id,
     
   end
 end

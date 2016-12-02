@@ -27,7 +27,8 @@ class SubmittedContentController < ApplicationController
     @can_submit = true
     #Get timeline entries from submission_histories table
     @submission_history = SubmissionHistory.where(team: @participant.team).order(:submitted_at)
-    
+    @due_dates = DueDate.where(assignment_id: @assignment.id)
+
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
   end
 

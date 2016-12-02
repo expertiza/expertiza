@@ -32,9 +32,9 @@ class SubmittedContentController < ApplicationController
       @timeline[submission.submitted_at]={'title' => submission.type+' '+submission.action, 'description' => submission.submitted_detail}
     end
     @assignment.due_dates do |due_date|
-      @timeline[due_date.due_at]={'title' => ' Due Date ', 'description' => due_date.deadline_type.name+' Deadline'}
+      @timeline[due_date.due_at]={'head' => ' Due Date ', 'description' => due_date.deadline_type.name+' Deadline'}
     end
-     
+
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
   end
 

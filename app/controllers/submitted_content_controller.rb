@@ -32,9 +32,11 @@ class SubmittedContentController < ApplicationController
     #reviews and feedbacks
     
     @reviews = ResponseMap.where(reviewee_id: @participant.team.id)
-    if !@review.response.nil?
+    if !@reviews.nil?
       @reviews.each do |review|
-        @timeline[@review.response.updated_at]={:heading => review.type.chomp('ResponseMap') , :description => ' Additional Comment : '+@review.response.additional_comment}
+        if !@review.response.nil?
+          @timeline[@review.response.updated_at]={:heading => review.type.chomp('ResponseMap') , :description => ' Additional Comment : '+@review.response.additional_comment}
+        end
       end
     end
     @submission_history.each do |submission|

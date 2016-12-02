@@ -28,18 +28,19 @@ class SubmittedContentController < ApplicationController
     #create timeline for generalized map to just loop in the html
     @timeline = Hash.new()
     #Get timeline entries from submission_histories table
-    self_team = AssignmentTeam.team(participant)
-    @submission_history = SubmissionHistory.where(team: @self_team).order(:submitted_at)
+    @submission_history = SubmissionHistory.where(team: @participant.team).order(:submitted_at)
     #reviews and feedbacks
     
     @reviews = ResponseMap.where(reviewee_id: @participant.team.id)
     if !@reviews.nil?
       @reviews.each do |review|
-        if !@review.response.nil?
-          @timeline[@review.response.updated_at]={:heading => review.type.chomp('ResponseMap') , :description => ' Additional Comment : '+@review.response.additional_comment}
+        if !@review.nil?
+          if !@review.response.nil?
+            @timeline[@review.response.updated_at]={:heading => review.type.chomp('ResponseMap') , :description => ' Additional Comment : '+@review.response.additional_comment}
+          end
         end
       end
-    end
+
     @submission_history.each do |submission|
       @timeline[submission.submitted_at]={:heading => submission.type+' '+submission.action, :description => submission.submitted_detail}
     end

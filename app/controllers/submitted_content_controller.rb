@@ -25,9 +25,15 @@ class SubmittedContentController < ApplicationController
 
     # @can_submit is the flag indicating if the user can submit or not in current stage
     @can_submit = true
+    #create timeline for generalized map to just loop in the html
+    @timeline = Hash.new()
     #Get timeline entries from submission_histories table
     @submission_history = SubmissionHistory.where(team: @participant.team).order(:submitted_at)
-    @timeline = Hash.new()
+    #reviews and feedbacks
+    @reviews = ResponseMap.where(reviewee_id: @team.id)
+    @reviews.each do |review|
+      @timeline[@review.response.updated_at]={:heading => review.type.chomp('ResponseMap') , :description => ' Additional Comment : '+@review.response.additional_comment}
+    end
     @submission_history.each do |submission|
       @timeline[submission.submitted_at]={:heading => submission.type+' '+submission.action, :description => submission.submitted_detail}
     end
@@ -37,7 +43,7 @@ class SubmittedContentController < ApplicationController
 
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
   end
-
+/
   # view is called when @assignment.submission_allowed(topic_id) is false
   # so @can_submit should be false
   def view

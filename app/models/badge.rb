@@ -1,6 +1,6 @@
 class Badge
 	
-	NUMBER_OF_BADGES = 5
+	NUMBER_OF_BADGES = 4
 	
 	# CONSTANTS RELATED TO GOOD REVIEWER
 	GOOD_REVIEW_THRESHOLD = 95
@@ -32,11 +32,12 @@ class Badge
 			# Topper badge
 			badge_matrix[current_assignment_count][0] = Badge.topper(student_task.assignment, student_task.participant)
 
+			
 			# Good reviewer badge
-			badge_matrix[current_assignment_count][2] = Badge.good_reviewer(student_task.participant)
+			badge_matrix[current_assignment_count][1] = Badge.good_reviewer(student_task.participant)
 			
 			# Dream team
-			badge_matrix[current_assignment_count][3] = Badge.dream_team(student_task.assignment, student_task.participant)
+			badge_matrix[current_assignment_count][2] = Badge.dream_team(student_task.assignment, student_task.participant)
 
 
 			# Consistency badge
@@ -50,7 +51,7 @@ class Badge
 		#--------------------------------- Decide on consistant badge ---------------------------------#
 
 		if consistency_flag
-			badge_matrix[-1][4] = CONSISTENCY_BADGE_IMAGE.html_safe
+			badge_matrix[-1][3] = CONSISTENCY_BADGE_IMAGE.html_safe
 			
 		end	
 
@@ -75,15 +76,11 @@ class Badge
 			badge_matrix[current_assignment_count][0] = Badge.is_toppper(scores, participant)
 
 			# Good reviewer badge
-			badge_matrix[current_assignment_count][2] = Badge.good_reviewer(participant)
+			badge_matrix[current_assignment_count][1] = Badge.good_reviewer(participant)
 
 			# Dream team
-			badge_matrix[current_assignment_count][3] = Badge.dream_team(assignment, participant)
+			badge_matrix[current_assignment_count][2] = Badge.dream_team(assignment, participant)
 
-
-			# Consistency badge
-			# consistency_flag = consistency_flag && Badge.consistency(student_task)
-			
 			end
 
 			current_assignment_count = current_assignment_count + 1			

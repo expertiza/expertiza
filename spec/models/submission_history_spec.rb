@@ -45,5 +45,18 @@ describe SubmissionHistory do
       submission_history = SubmissionHistory.delete_submission(assignment_team, link)
       expect(submission_history.action).to eq("delete")
     end
+
+    it "should add a row to submission history table with action as edit" do
+      assignment_team = build(AssignmentTeam)
+      link = "/user/home/Expertiza_gemfile"
+      submission_history = SubmissionHistory.create(assignment_team, link)
+      submission_history.submitted_at = Time.current
+      submission_history.save
+
+      submission_history2 = SubmissionHistory.create(assignment_team, link)
+      submission_history2.submitted_at = Time.current
+      submission_history2.save
+      expect(submission_history2.action).to eq("edit")
+    end
   end
 end

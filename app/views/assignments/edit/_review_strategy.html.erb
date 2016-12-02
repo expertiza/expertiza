@@ -93,7 +93,6 @@
 
   <tr>
     <td style='padding:5px' id='createButton'>
-      <input name="assignment_form[assignment][isAnonymous]" type="hidden" value="false"/>
       <%= button_to( "Create Random Groups", :action => "create_groups", :controller => "groups", params: { 'id' => @assignment_form.assignment.id, 'group_size' => @assignment_form.assignment.group_size }, class: "do_it_link") %>
     </td>
   </tr>

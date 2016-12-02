@@ -4,6 +4,7 @@ class GithubRepoSubmissionHistory < GithubSubmissionHistory
     history_obj.submitted_detail = link
     history_obj.team = team
     history_obj.action = action
+    return history_obj
   end
 
   def get_submitted_at_time(link)
@@ -11,7 +12,7 @@ class GithubRepoSubmissionHistory < GithubSubmissionHistory
     link_path = uri.path
     git_user_details = link_path.split("/")
     github = Github.new
-    a = github.repos git_user_details[1], git_user_details[2]
+    a = github.repos.get git_user_details[1], git_user_details[2]
     return a.pushed_at
   end
 end

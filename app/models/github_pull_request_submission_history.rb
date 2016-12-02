@@ -4,6 +4,7 @@ class GithubPullRequestSubmissionHistory < GithubSubmissionHistory
     history_obj.submitted_detail = link
     history_obj.team = team
     history_obj.action = action
+    return history_obj
   end
 
   def get_submitted_at_time(link)

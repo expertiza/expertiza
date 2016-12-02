@@ -18,7 +18,7 @@ class LinkSubmissionHistory < SubmissionHistory
     return history_obj
   end
 
-  def add_submission(assignment_id)
+  def self.add_submission(assignment_id)
     @assignment = Assignment.find_by_id(assignment_id)
     teams = @assignment.teams
     teams.each do |team|

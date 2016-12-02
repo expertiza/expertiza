@@ -53,5 +53,21 @@ describe "chat feature test" do
     expect(page).to have_content "Hello"
   end
 
+  it "view messages from the reviewee side" do
+
+    login_as('student2064')
+    expect(page).to have_content "User: student2064"
+    expect(page).to have_content "TestAssignment"
+
+    click_link "TestAssignment"
+    expect(page).to have_content "Submit or Review work for TestAssignment"
+    expect(page).to have_content "Others' work"
+    expect(page).to have_content 'Your messages'
+
+
+
+
+  end
+
 end
 

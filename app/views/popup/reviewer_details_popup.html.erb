@@ -21,8 +21,6 @@
       <td> <%= @user.handle %></td>
     </tr>
 
-
-
   </table>
 
 </div>
@@ -41,57 +39,71 @@
 <div id="responsetime">
   <% reviewee_list = Array.new %>
   <% total_time_list = Array.new %>
-  <h3> Reviewer response time link wise details</h3>
+  <h3> Response time details</h3>
   <table width="100%">
     <tr>
-      <th>Reviewee id </th>
-      <th>Round </th>
-      <th>Link</th>
-      <th>Time (mins)</th>
+      <th align="right">Reviewee id </th>
+      <th align="right">Total Time (mins)</th>
+      <th align="right">Round </th>
+      <th align="right">Links</th>
+      <th align="right">Time per link (mins)</th>
     </tr>
 <% @reviewers = Participant.where(user_id: @user.id) %>
-<% @reviewers.each do |reviewer| %>
+<% @reviewers.each do |reviewer| %> <!-- for reviewer-->
   <% @response_maps = ResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: @id)  %>
-  <% @response_maps.each do |map| %>
+  <% @number_of_rounds = Assignment.find(@id).rounds_of_reviews %>
+  <% reviewee_count = 0 %>
+  <% @response_maps.each do |map| %>  <!-- for reviewee-->
     <% map_total_time = 0 %>
-    <% @reviewed_object_id = map.reviewed_object_id %>
-    <% @reviewee_id = map.reviewee_id %>
-    <% @responsetime_match = Responsetime.where(map_id: map.id) %>
-    <% link_list = Array.new %>
-    <% @responsetime_match.each do |responsetime_entry| %>
-      <% if link_list.include?(responsetime_entry.link) %>
-      <% else %>
-        <% link_list.push(responsetime_entry.link) %>
-        <tr>
-        <td><%= @reviewee_id %></td>
-        <td><%= responsetime_entry.round %>
-        <td><%= responsetime_entry.link %></td>
-        <% individual_link_time = link_time(responsetime_entry.map_id,responsetime_entry.round,responsetime_entry.link) %>
-        <% map_total_time = map_total_time + individual_link_time %>
-        <td><%= individual_link_time %></td>
-        </tr>
-    <% end %>
+    <% (1..@number_of_rounds).each do |each_round| %>  <!-- for rounds-->
+      <% @responsetime_match = Responsetime.where(map_id: map.id, round:each_round)%>
+      <% @reviewed_object_id = map.reviewed_object_id %>
+      <% @reviewee_id = map.reviewee_id %>
 
-    <%end %>
-       <% reviewee_list << @reviewee_id %>
-       <% total_time_list << map_total_time %>
-
+      <% link_list = Array.new %>
+      <% @count = 0 %>   <!--- To print revieweeId only once-->
+      <% @dummy = "      " %>    <!---Empty string as a placeholder-->
+      <% @responsetime_match.each do |responsetime_entry| %>
+        <% if link_list.include?(responsetime_entry.link) %><!-- pnly unique links per round-->
+        <% else %>
+            <% link_list.push(responsetime_entry.link) %>
+            <tr>
+            <% if @count == 0 %>  <!--- print revieweeId,time, round only for the first row-->
+              <td><%= @reviewee_id %></td>
+              <td id="<%=reviewee_count.to_s %>"></td>
+              <td><%= responsetime_entry.round %></td>
+            <% else %>        <!--- Else print dummy-->
+              <td><%= @dummy %></td>  
+              <td><%= @dummy %></td>
+              <td><%= " "%></td>
+            <%end%>
+            <td><%= responsetime_entry.link %></td>
+            <% individual_link_time = link_time(responsetime_entry.map_id,responsetime_entry.round,responsetime_entry.link) %>
+            <% map_total_time = map_total_time + individual_link_time %>
+            <td align="center"><%= individual_link_time %></td>
+            </tr>
+        <% end %>
+        <% @count=@count+1 %>
+      <%end %>
+      <% reviewee_list << @reviewee_id %>
+      <% total_time_list << map_total_time %>
+      <%reviewee_count=reviewee_count+1%>
+    <% end%>
   <% end %>
 <% end %>
 </table>
 
-<h3> Reviewer total details</h3>
-  <table width="100%">
-    <tr>
-      <th>Reviewee id </th>
-      <th>Total Time (mins)</th>
-    </tr>
-    <% reviewee_list.zip(total_time_list).each do |reviewee, time| %>
-      <tr>
-      <td><%= reviewee %></td>
-      <td><%= time %></td>
-      </tr>
-      <%end %>
-  </table>
+<!--- Script to update the total time column after the page load-->
+<script type="text/javascript">
+window.onload = function () { 
+        totalTimeList = <%= total_time_list%>
+        revieweeList = <%= reviewee_list%>
+        for(i=0;i<totalTimeList.length;i++){
+          var id=i.toString();  
+          document.getElementById(id).innerHTML=totalTimeList[i];  
+        }
+        
+}  
+</script>
 
 

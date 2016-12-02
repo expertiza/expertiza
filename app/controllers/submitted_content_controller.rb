@@ -71,7 +71,7 @@ class SubmittedContentController < ApplicationController
 
   	scheduler = Rufus::Scheduler.singleton
 
-  	scheduler.in("5s", :link => params[:submission]) do |job, time|
+  	scheduler.in("5s", "link"=>params[:submission]) do |job, time, arg|
   		puts "THE SUBMITTED LINK WAS " + job.opts['link']
       CUSTOM_LOGGER.info("THE SUBMITTED LINK WAS " + job.opts['link'])
   	end

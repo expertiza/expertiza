@@ -45,7 +45,7 @@ class Badge
 
 		if consistency_flag
 			badge_matrix[-1][4] = CONSISTENCY_BADGE_IMAGE.html_safe
-			#badge_matrix[-1][3] = CONSISTENCY_BADGE_IMAGE.html_safe
+			
 		end	
 
 
@@ -62,7 +62,7 @@ class Badge
 			badge_matrix.push([false] * NUMBER_OF_BADGES)
 			
 			if not assignment.is_calibrated
-			# check for different badges
+			# here we check for different badges
 
 			# Topper badge
 			badge_matrix[current_assignment_count][0] = Badge.is_toppper(scores, participant)

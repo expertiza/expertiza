@@ -306,6 +306,8 @@ GEM
       execjs
       rails (>= 3.2)
       tilt
+    recaptcha (4.0.0)
+      json
     ref (2.0.0)
     request_store (1.2.0)
     rest-client (1.8.0)
@@ -480,6 +482,7 @@ DEPENDENCIES
   rake
   rb-readline
   react-rails (~> 1.0)
+  recaptcha
   rest-client (~> 1.8)
   rgl
   rjb

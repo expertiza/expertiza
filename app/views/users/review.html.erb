@@ -6,7 +6,7 @@
     <% for user in @users %>
     <%= form_tag :action => 'request_user_creation',:id => user.id  do %>
         <tr class="exp">
-          <td><%= link_to user.name, :action => 'show', :id => user.id %></td>
+          <td><%=  user.name %></td>
           <td><%= user.fullname %></td>
           <td><%= user.email %></td>
           <% for role in @roles %>

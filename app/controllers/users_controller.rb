@@ -13,8 +13,8 @@ class UsersController < ApplicationController
     when 'request_user_create'
       true
       #TODO: change review to only authorized users
-    when 'review'
-      true
+    when 'review'  
+      current_role_name.eql? 'Super-Administrator'
     when 'keys'
       current_role_name.eql? 'Student'
     else
@@ -222,7 +222,8 @@ class UsersController < ApplicationController
       flash[:success] = "User signup for \"#{@user.name}\" has been successfully requested. "
       redirect_to '/instructions/home'
     else
-      flash[:success] = "Error requesting sign up "
+      flash[:error] = "Error requesting sign up "
+      redirect_to :controller => 'users', :action => 'request_new', :role=>"Student"   
     end
   end
   def edit

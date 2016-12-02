@@ -16,16 +16,13 @@ class SimicheckComparison < ActiveRecord::Base
       comparison = SimicheckComparison.create({ :assignment_id => assignment_id, :comparison_key => comparison_key, :file_type => fileType })
       return comparison
     end
-
     return nil
   end
 
   def send_file_to_simicheck(file)
     url = "http://simicheck.com/api/files/" + self.comparison_key
     key = "0a6a26fd61c943718a623b62fc457e1a3e110abe11df4535bb037478e04a9b6af60d8b9fb2e04356b5dda2594150e44642fad227b8e749c89359836c4420edd5"
-
     payload = {:file => file}
-
     response = RestClient.put(url, payload, {:simicheck_api_key=>key})
     if(response.code == 200)
       return true

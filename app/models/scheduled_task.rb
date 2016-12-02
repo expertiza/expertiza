@@ -215,24 +215,38 @@ class ScheduledTask
       end
     end
   end
-
+#method which runs after x hours of assignment submission which creates different simicheck comparisons and submits all files/links to that comparison
   def compare_files_with_simicheck
-    #teams = TeamsUser.all.group(:team_id).count(:team_id)
-    comparison_pdf = SimicheckComparison.create_simicheck_comparison(self.assignment_id,"pdf")
+    comparison_file = SimicheckComparison.create_simicheck_comparison(self.assignment_id,"file")
     comparison_html = SimicheckComparison.create_simicheck_comparison(self.assignment_id,"html")
     assignment = Assignment.find(self.assignment_id)
     assignment_teams = AssignmentTeam.where(['parent_id = ?', self.assignment_id])
-    for assignment_team in assignment_teams.
-      if(assignment_team.has_submissions?)
-        hyperlinks = assignment_teams.hyperlinks
-        print hyperlinks
+
+    for assignment_team in assignment_teams
+      if assignment_team.has_submissions?
+        hyperlinks = assignment_team.hyperlinks
+        for link in hyperlinks
+          response = RestClient.get(link)
+          if(response.code == 200)
+            page = response.body
+            f = File.open("/tmp/"+assignment_team.name+".html", "w+")
+            f.write(page)
+            f.close
+            f = File.open("/tmp/"+assignment_team.name+".html", "r")
+            comparison_html.send_file_to_simicheck(f)
+            #f.close
+          end
+        end
       end
-    end
-
-    #base = File.basename(file_name)
-    #file_type =  base.split(".")[base.split(".").size - 1] if base.split(".").size > 1
-    #SimicheckComparison.create_simicheck_comparison(self.assignment_id,file_type)
-
+      if assignment_team.directory_num
+        files = assignment_team.files(assignment_team.path)
+        for path in files
+            f = File.open(path, "r")
+            comparison_file.send_file_to_simicheck(f)
+            #f.close
+        end
+      end
+      end
   end
 
   def drop_outstanding_reviews

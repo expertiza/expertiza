@@ -1,5 +1,7 @@
 require 'rails_helper'
 
+
+
 describe "On message create" do
   before(:each) do
     @message= create(:message)
@@ -27,4 +29,16 @@ describe "On message create" do
     @message.save
     expect(@message).not_to be_valid
   end
+
+  it "returns true if message does have a chat" do
+    message = build(:message)
+    expect(message).to belong_to(:chat)
+  end
+
+  it "returns true if message does have a user/reviewer/reviewee" do
+    message = build(:message)
+    expect(message).to belong_to(:user)
+  end
+
+
 end

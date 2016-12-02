@@ -19,7 +19,8 @@ describe 'calibration' do
     create(:deadline_right, name: 'OK')
 #=end
   end
-#=begin
+
+=begin
   # Test Assignment Creation Functionality
   describe 'Create Assignment' do
 
@@ -33,9 +34,7 @@ describe 'calibration' do
         @instructor1 = User.find_by(name: 'instructor6')
         login_as @instructor1.name
 
-        if (Assignment.where(name:  'Calibration Test').first)
-          (Assignment.where(name:  'Calibration Test')).destroy_all
-        end
+
 
         # Create a new assignment
         visit new_assignment_path
@@ -51,6 +50,9 @@ describe 'calibration' do
         # Verify Assignment Page
         expect(find('.assignments.edit > h1',:visible => false)).to have_content('Editing Assignment: Calibration Test')
         expect(page).to have_link('Calibration')
+        if (Assignment.where(name:  'Calibration Test').first)
+          (Assignment.where(name:  'Calibration Test')).destroy_all
+        end
       end
     end
 
@@ -64,9 +66,7 @@ describe 'calibration' do
         @instructor1 = User.find_by(name: 'instructor6')
         login_as @instructor1.name
 
-        if (Assignment.where(name:  'Calibration Test').first)
-          (Assignment.where(name:  'Calibration Test')).destroy_all
-        end
+
         # Create a new assignment
         visit new_assignment_path
 
@@ -80,11 +80,14 @@ describe 'calibration' do
         # Verify Assignment Page
         expect(find('.assignments.edit > h1',:visible => false)).to have_content('Editing Assignment: Calibration Test')
         expect(page).to have_no_selector('#Calibration')
+          if (Assignment.where(name:  'Calibration Test').first)
+          (Assignment.where(name:  'Calibration Test')).destroy_all
+        end
       end
     end
   end
-#=end
-#=begin
+=end
+=begin
   # Test Assignment Edit Functionality
   describe 'Edit Assignment' do
     # Set up for testing
@@ -160,24 +163,25 @@ describe 'calibration' do
       expect(page).to have_link 'https://www.expertiza.ncsu.edu'
     end
   end
-#=end
-#=begin
+=end
+=begin
   # Test Submitter Functionality
   describe 'Submitter' do
     # Set up for testing
     #before :each do
     it 'create data' do
       # Create an instructor and student
+#=begin
       @student = create :student, name: 'student_calibration'
       @submitter1 = create :student,name: 'student_cali_sub1'
 
       # Create an assignment with calibration
       # Either course: nil is required or an AssignmentNode must also be created.
       # The page will not load if the assignment has a course but no mapping node.
-      @assignment = create :assignment,name: 'Calibration_Submit_Test2', is_calibrated: true, instructor: User.find_by(name: 'instructor6'), course: nil
+      @assignment = create :assignment,name: 'Calibration_Submit_Test2', is_calibrated: true, instructor: User.find_by(name:'instructor6'), course: nil
 
       # Create an assignment due date
-      create :assignment_due_date, due_at: (DateTime.now + 1)
+      create :assignment_due_date, due_at: (DateTime.now + 1), Assignment.find_by(name: 'Calibration_Submit_Test2')
 
       # Create a team linked to the calibrated assignment
       @team = create :assignment_team,name: 'Edit_Assignment_Calibration_team2', assignment: Assignment.find_by(name: 'Calibration_Submit_Test2')
@@ -188,11 +192,15 @@ describe 'calibration' do
       # Create a mapping between the assignment team and the
       # participant object's user (the submitter).
       create :team_user, team: Team.find_by(name:'Edit_Assignment_Calibration_team2' ), user: @submitter
+#=end
     end
 
     # Verify submitters can be added to the assignment
     it 'can be added to the assignment by login' do
       # Log in as the instructor
+      @student_sub = User.find_by(name: 'student_calibration')
+      Participant.where(handle: 'student_calibration').delete_all
+
       @instructor2 = User.find_by(name: 'instructor6')
       login_as @instructor2.name
 
@@ -201,7 +209,7 @@ describe 'calibration' do
       visit "/participants/list?id=#{@assignment_sub.id}&model=Assignment"
 
       # Student is not already a participant
-      @student_sub = User.find_by(name: 'student_calibration')
+
       expect(page).to have_no_link @student_sub.name
 
       # Add student as a submitter
@@ -232,62 +240,63 @@ describe 'calibration' do
       expect(page).to have_link 'https://www.google.com'
     end
   end
-#=end
+=end
 #=begin
   # test expert review function
   describe 'Add Expert Review' do
-    before :each do
-    #it 'create data' do
+    #before :each do
+    it 'create data' do
       # create instructor
-      @student = create(:student, name: 'Calibration_add_review_student')
+      @student = create(:student,name: 'Add_expert_cali_student')
 
-      @questionnaire = create(:questionnaire, name: 'Calibration_add_review_question')
+      @questionnaire = create(:questionnaire,name: 'Add_expert_cali_quesnair')
 
       # Create an assignment with calibration
-      @assignment = create :assignment, name: 'Calibration_add_review_ass',is_calibrated: true
-      @assignment_questionnaire = create :assignment_questionnaire, assignment: Assignment.find_by(name: 'Calibration_add_review_ass')
+      @assignment = create :assignment,name: 'Add_expert_cali_assignment', is_calibrated: true
+      @assignment_questionnaire = create :assignment_questionnaire, assignment: @assignment
 
       # Create a team linked to the calibrated assignment
-      @team = create :assignment_team, name: 'Calibration_add_review_team',assignment:  Assignment.find_by(name: 'Calibration_add_review_ass')
+      @team = create :assignment_team,name: 'Add_expert_cali_team', assignment: @assignment
 
       # Create an assignment participant linked to the assignment.
       # The factory for this implicitly loads or creates a student
       # (user) object that the participant is linked to.
-      @submitter2 = create :participant, assignment:  Assignment.find_by(name: 'Calibration_add_review_ass')
+      @submitter = create :participant, assignment: @assignment
       # Create a mapping between the assignment team and the
       # participant object's user (the student).
-      create :team_user, team: Team.find_by(name: 'Calibration_add_review_team'), user: @submitter2.user
-      create :review_response_map, assignment: Assignment.find_by(name: 'Calibration_add_review_ass'), reviewee: Team.find_by(name: 'Calibration_add_review_team')
+      create :team_user, team: @team, user: @submitter.user
+      create :review_response_map, assignment: @assignment, reviewee: @team
       # create :assignment_questionnaire, assignment: @assignment
     end
 
     it 'should be able to save an expert review without uploading', js: true do
       # Log in as the instructor.
-      @instructor3 = User.find_by(name: 'instructor6')
-      login_as @instructor3.name
+      @instructor_add=User.find_by(name: 'instructor6')
+      login_as @instructor_add.name
 
       # should be able to edit assignment to add a expert review
-      @assignment_re = Assignment.find_by(name: 'Calibration_add_review_ass')
-      @team_re = Team.find_by(name: 'Calibration_add_review_team')
-      visit "/review_mapping/add_calibration/#{@assignment_re.id}?team_id=#{@team_re.id}"
+      @assignment_add = Assignment.find_by(name: 'Add_expert_cali_assignment')
+      @team_add=Team.find_by(name: 'Add_expert_cali_team')
+      visit "/review_mapping/add_calibration/#{@assignment_add.id}?team_id=#{@team_add.id}"
       # submit expert review
       click_on 'Submit Review'
       page.driver.browser.switch_to.alert.accept
       # expect result
       # If the review was uploaded, there will be a edit link
-      expect(page).to have_content('Editing Assignment: final2')
+      expect(page).to have_content('Editing Assignment: Add_expert_cali_assignment')
+
     end
 
     # Student should not be able to submit an expert review
     it 'student should not be able to add an expert review', js: true do
       # login as student
-      @student_re = Student.find_by(name: 'Calibration_add_review_student')
-      login_as @student_re.name
+      @student_add = Student.find_by(name: 'Add_expert_cali_student')
+      login_as @student_add.name
 
       # Should not be able to visit expert review page
-      @assignment_re = Assignment.find_by(name: 'Calibration_add_review_ass')
-      @team_re = Team.find_by(name: 'Calibration_add_review_team')
-      visit "/review_mapping/add_calibration/#{@assignment_re.id}?team_id=#{@team_re.id}"
+      @assignment_add = Assignment.find_by(name: 'Add_expert_cali_assignment')
+      @team_add=Team.find_by(name: 'Add_expert_cali_team')
+      visit "/review_mapping/add_calibration/#{@assignment_add.id}?team_id=#{@team_add.id}"
       # Expect result
       expect(page).to have_content('A student is not allowed to add_calibration this/these review_mapping')
     end
@@ -295,8 +304,7 @@ describe 'calibration' do
 
   def create_fill_questionnaire
     # login as instructor
-    @instructor3 = User.find_by(name: 'instructor6')
-    login_as @instructor3.name
+    login_as @instructor.name
 
     # go to the questionnaire creation page
     visit "/questionnaires/new?model=ReviewQuestionnaire&private=0"
@@ -345,12 +353,12 @@ describe 'calibration' do
     page.driver.browser.switch_to.alert.accept
   end
 #=end
-#=begin
+=begin
   # test display calibration
   describe 'Display Calibration For Student' do
     #before :each do
       it 'create data' do
-#=begin
+=begin
       # create instructor
       @student2 = create(:student,name: 'Display_cali_stu2')
       @student = create(:student,name: 'Display_cali_stu')
@@ -362,10 +370,10 @@ describe 'calibration' do
       @assignment = create :assignment,name: 'Display_cali_ass', is_calibrated: true, instructor: User.find_by(name: 'instructor6'), course: nil
 
       # Create an assignment due date
-      create :assignment_due_date, due_at: (DateTime.now - 1)
+      create :assignment_due_date, due_at: (DateTime.now - 1),assignment:Assignment.find_by(name: 'Display_cali_ass')
 
       @review_deadline_type = create(:deadline_type, name: "review")
-      create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+      create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type,assignment:Assignment.find_by(name: 'Display_cali_ass')
 
       # Create a team linked to the calibrated assignment
       @team = create :assignment_team, name: 'Display_cali_team', assignment: Assignment.find_by(name: 'Display_cali_ass')
@@ -435,8 +443,8 @@ describe 'calibration' do
       expect(page).to have_content('4')
     end
   end
-#=end
-#=begin
+=end
+=begin
   describe 'Reviewer' do
     # Set up for testing
     #before :each do
@@ -473,8 +481,9 @@ describe 'calibration' do
       create :question, questionnaire: Questionnaire.find_by(name: 'Cali_Reviewer_quesnaire')
       create :assignment_questionnaire, assignment: Assignment.find_by(name: 'Cali_Reviewer_ass'), questionnaire: Questionnaire.find_by(name: 'Cali_Reviewer_quesnaire')
       create :review_response_map, assignment: Assignment.find_by(name: 'Cali_Reviewer_ass'), reviewee: Team.find_by(name: 'Cali_Reviewer_team')
+#=end
     end
-
+#=begin
     it'instructor should be able to assign artifact to reviewer', js: true do
       # Log in as an instructor
       @instructor4 = User.find_by(name: 'instructor6')
@@ -482,6 +491,8 @@ describe 'calibration' do
 
       # Edit assignment route
       @assignment_care= Assignment.find_by(name: 'Cali_Reviewer_ass')
+      ReviewResponseMap.where(reviewed_object_id: @assignment_care.id).delete_all
+      ReviewResponseMap.all.destroy_all
       visit edit_assignment_path @assignment_care
 
       click_on('Review strategy')
@@ -508,18 +519,20 @@ describe 'calibration' do
 
       # Verify the student has been assigned to the artifact
       expect(page).to have_content @student_care.name
+      ReviewResponseMap.all.destroy_all
+      @assignment_care.update_attributes(num_reviews: 0,num_review_of_reviews: 0,num_review_of_reviewers: 0)
     end
-
+#=end
     # Verify submitters can submit artifacts
     it 'can review artifacts', js: true do
       # Log in as student
       @student_care = Student.find_by(name: 'Cali_Reviewer_student')
       login_as @student_care.name
-
+      ReviewResponseMap.all.destroy_all
       # Click on the assignment link, and navigate to work view
       @assignment_care= Assignment.find_by(name: 'Cali_Reviewer_ass')
       click_link @assignment_care.name
-
+      @assignment_care.update_attributes(num_reviews: 0,num_review_of_reviews: 0,num_review_of_reviewers: 0)
       # Be able to review others' work
       click_link 'Others\' work'
 
@@ -533,11 +546,12 @@ describe 'calibration' do
       # Log in as a student who hasn't been assigned a artifact to review
       @nonreviewer_care =Student.find_by(name: 'Cali_Reviewer_nonstudent')
       login_as @nonreviewer_care.name
+      ReviewResponseMap.all.destroy_all
 
       # Click on the assignment link, and navigate to work view
       @assignment_care= Assignment.find_by(name: 'Cali_Reviewer_ass')
       click_link @assignment_care.name
-
+      @assignment_care.update_attributes(num_reviews: 0,num_review_of_reviews: 0,num_review_of_reviewers: 0)
       # Be able to review others' work
       click_link 'Others\' work'
 
@@ -548,5 +562,5 @@ describe 'calibration' do
       expect(page).to have_content("No artifact are available to review at this time. Please try later.")
     end
   end
-#=end
+=end
 end

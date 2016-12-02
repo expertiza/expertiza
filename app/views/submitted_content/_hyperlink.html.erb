@@ -63,7 +63,7 @@
         $.ajax({
             type:'POST',
             url:'/response_time/record_end_time',
-            data:$.param({ responsetime:{map_id: <%= map_id %>, round: <%= round %> , end: ISODateString(d)}})
+            data:$.param({ response_time:{map_id: <%= map_id %>, round: <%= round %> , end: ISODateString(d)}})
         })
     });
 
@@ -76,7 +76,7 @@
               dataType: "json",
               async:false,
               url:'/response_time/record_end_time',
-              data:$.param({ responsetime:{map_id: <%= map_id %>, round: <%= round %> , end: ISODateString(d)}}),
+              data:$.param({ response_time:{map_id: <%= map_id %>, round: <%= round %> , end: ISODateString(d)}}),
               success:function(json){ 
                 var la=JSON.parse(JSON.stringify(json));
                 callback(la);

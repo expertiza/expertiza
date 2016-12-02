@@ -6,7 +6,7 @@ describe SubmissionHistory do
       assignment_team = build(AssignmentTeam)
       link = "https://github.com/prerit2803/expertiza"
       submission_history = SubmissionHistory.create(assignment_team, link)
-      submission_history.should be_a(GithubRepoSubmissionHistory)
+      expect(submission_history).to be_a(GithubRepoSubmissionHistory)
     end
   end
 end

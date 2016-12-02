@@ -11,6 +11,7 @@ class ApplicationController < ActionController::Base
   before_action :set_time_zone
   before_action :authorize
 
+
   def self.verify(_args)
   end
 

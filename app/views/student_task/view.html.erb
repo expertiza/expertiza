@@ -39,9 +39,13 @@ to display the label "Your team" in the student assignment tasks-->
         <font color="gray">Your work</font> (You have to choose a topic first)
       <% else %>
         <% if @assignment.submission_allowed(@topic_id) %>
+              <%@assignment.is_selfreview_enabled=true %>
+
           <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> (Submit and view your work)
         <% else %>
-          <%= link_to 'Your work', :controller => 'submitted_content', :action => 'view', :id => @participant.id %> (Submit and view your work)
+              <%@assignment.is_selfreview_enabled=true %>
+
+              <%= link_to 'Your work', :controller => 'submitted_content', :action => 'view', :id => @participant.id %> (Submit and view your work)
         <% end %>
       <% end %>
     </li>
@@ -82,12 +86,12 @@ to display the label "Your team" in the student assignment tasks-->
   <% if @team && (@authorization == 'participant' or @can_submit == true) %>
     <li>
       <!--Only if the assignment supports self-review and students submitted self-review can he or she view scores.-->
-      <% if @assignment.is_selfreview_enabled and unsubmitted_self_review?(@participant.id) %>
+      <% #if @assignment.is_selfreview_enabled and unsubmitted_self_review?(@participant.id) %>
         <font color="gray">Your scores</font> (You have to submit self-review under 'Your work' before checking 'Your scores'.)
-      <% else %>
+      <% #else %>
         <%= link_to "Your scores", :controller => 'grades', :action => 'view_my_scores', :id => @participant.id %> 
         (View feedback on your work)  &nbsp;  <%= link_to "Alternate View", :controller => 'grades', :action => 'view_team', :id => @participant.id %>
-      <% end %>
+      <% #end %>
     </li>
   <% end %> 
     <%if @can_provide_suggestions == true %>

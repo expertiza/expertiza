@@ -28,7 +28,7 @@ class Response < ActiveRecord::Base
     # The following three lines print out the type of rubric before displaying
     # feedback.  Currently this is only done if the rubric is Author Feedback.
     # It doesn't seem necessary to print out the rubric type in the case of
-    # a ReviewResponseMap. 
+    # a ReviewResponseMap.
     if self.map.type.to_s == 'FeedbackResponseMap'
       identifier += "<h3>Feedback from author</h3>"
     end
@@ -41,6 +41,7 @@ class Response < ActiveRecord::Base
       str = self.id.to_s
     end
     code = identifier + '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + str + 'Link" onClick="toggleElement(' + "'review_" + str + "','review'" + ');return false;">show review</a><BR/>'
+
     code += "<B>Last reviewed: </B> "
     code += if self.updated_at.nil?
               "Not available"

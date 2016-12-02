@@ -12,7 +12,7 @@
 
 
 <%= render partial: 'submitted_content/submitted_files', locals: {participant: participant, stage: @stage, origin: ''} %>
- <%if !@timeline.nil?
+ <%if !@timeline.nil? %>
       <%= render partial: 'submitted_content/submission_history', locals: {timeline: @timeline, stage: @stage, origin: ''} %>
   <%end%>
    

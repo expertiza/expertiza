@@ -4,6 +4,7 @@
 ###
 ###
 class Assignment < ActiveRecord::Base
+  require 'rufus-scheduler'
   require 'analytic/assignment_analytic'
   include AssignmentAnalytic
   include ReviewAssignment
@@ -481,7 +482,17 @@ class Assignment < ActiveRecord::Base
 
   private
   def record_submission
-    
+    # whenever a new assignment is added, add a job on each of its deadlines, to update the
+    # timestamps of teams' submissions.
+    scheduler = Rufus::Scheduler.singleton
+
+    self.due_dates.each do |due_date|
+      if due_date.deadline_type.name == 'submission'
+        scheduler.at(due_date.due_at.to_s, "assignment"=>self) do |job, time, arg|
+          LinkSubmissionHistory.add_submission(job.opts['assignment'].id)
+        end
+      end
+    end
   end
 
 end

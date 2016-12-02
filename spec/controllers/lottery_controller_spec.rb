@@ -109,5 +109,70 @@ describe LotteryController do
 
           expect(studentA_team).not_to match_array(studentB_team)
         end
+
+        it "new members is not set, teams should be the same" do
+          student1 = create(:student, name:"A")
+          student2 = create(:student, name:"B")
+          student3 = create(:student, name:"C")
+          student4 = create(:student, name:"D")
+          
+
+          assignment = create(:assignment, name:"assignmentA", is_intelligent: true, max_team_size: 2)
+          assignment_old = create(:assignment, name:"assignmentB", is_intelligent: true, max_team_size: 2)
+
+          course_id = assignment.course_id
+
+          topicA = create(:topic, topic_name:"TopicA", assignment: assignment)
+          topicB = create(:topic, topic_name:"TopicB", assignment: assignment)
+          create(:bid, topic_id: topicA.id, user_id: student1.id, priority: 1)
+          create(:bid, topic_id: topicA.id, user_id: student2.id, priority: 1)
+          create(:bid, topic_id: topicA.id, user_id: student3.id, priority: 2)
+          create(:bid, topic_id: topicA.id, user_id: student4.id, priority: 2)
+          
+
+          create(:bid, topic_id: topicB.id, user_id: student1.id, priority: 2)
+          create(:bid, topic_id: topicB.id, user_id: student2.id, priority: 2)
+          create(:bid, topic_id: topicB.id, user_id: student3.id, priority: 1)
+          create(:bid, topic_id: topicB.id, user_id: student4.id, priority: 1)
+        
+
+          teamA = create(:assignment_team, new_members: 0, assignment: assignment)
+          teamB = create(:assignment_team, new_members: 0, assignment: assignment)
+          
+
+          teamA_old = create(:assignment_team, new_members: 0, assignment: assignment_old)
+          teamB_old = create(:assignment_team, new_members: 0, assignment: assignment_old)
+
+          create(:participant, user_id: student1.id, assignment: assignment)
+          create(:participant, user_id: student2.id, assignment: assignment)
+          create(:participant, user_id: student3.id, assignment: assignment)
+          create(:participant, user_id: student4.id, assignment: assignment)
+          
+
+          create(:participant, user_id: student1.id, assignment: assignment_old)
+          create(:participant, user_id: student2.id, assignment: assignment_old)
+          create(:participant, user_id: student3.id, assignment: assignment_old)
+          create(:participant, user_id: student4.id, assignment: assignment_old)
+
+          create(:team_user, team: teamA, user: student1)
+          create(:team_user, team: teamA, user: student2)
+          create(:team_user, team: teamB, user: student3)
+          create(:team_user, team: teamB, user: student4)
+                    
+
+          create(:team_user, team: teamA_old, user: student1)
+          create(:team_user, team: teamA_old, user: student2)
+          create(:team_user, team: teamB_old, user: student3)
+          create(:team_user, team: teamB_old, user: student4)
+          
+          controller.params = {id: assignment.id, test_run: true}
+          studentA_team = StudentTask.teamed_students(User.find(student1),course_id,false, nil, assignment.id)[course_id]
+          studentC_team = StudentTask.teamed_students(User.find(student1),course_id,false, nil, assignment.id)[course_id]
+          controller.run_intelligent_assignment
+          studentA_team_test = StudentTask.teamed_students(User.find(student1),course_id,false, nil, assignment.id)[course_id]
+          studentC_team_test = StudentTask.teamed_students(User.find(student1),course_id,false, nil, assignment.id)[course_id]
+          expect(studentA_team).to match_array(studentA_team_test)
+          expect(studentC_team).to match_array(studentC_team_test)
+        end
       end
 end

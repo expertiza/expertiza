@@ -46,3 +46,7 @@ body > div {}
 .form-rendered #edit-form {
   display: block;
 }
+
+.hidden-question-form {
+  display: none;
+}

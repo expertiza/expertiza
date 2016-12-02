@@ -69,7 +69,7 @@ class SubmittedContentController < ApplicationController
 
     require 'rufus-scheduler'
 
-  	scheduler = Rufus::Scheduler.new
+  	scheduler = Rufus::Scheduler.singleton
 
   	scheduler.in("5s", :link => params[:submission]) do |job, time|
   		puts "THE SUBMITTED LINK WAS " + job.opts['link']

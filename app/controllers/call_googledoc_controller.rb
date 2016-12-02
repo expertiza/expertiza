@@ -7,6 +7,7 @@ class CallGoogledocController < ApplicationController
 
   def make_doc
     g = GoogledocController.new()
-    g.insert_file('My file', 'File stuff', nil, 'text', "#{Rails.root}/config/test.txt")
+    doc = g.insert_file('My file_1', 'File stuff', nil, 'application/vnd.google-apps.document', "#{Rails.root}/config/test.txt")
+    #render :text => "webllink -->>>>> #{doc.webViewLink} ------"
   end
 end

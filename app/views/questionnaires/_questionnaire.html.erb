@@ -32,10 +32,10 @@
 <!--Question part-->
 <hr/>
 <% if !params[:id].nil? and params[:action] == 'edit' %>
-  <table id="question_actions_table">
+  <table class="hidden-question-form">
     <tr>
       <td>
-        <%= form_tag :action => 'add_new_questions', :id => params[:id], :questionnaire_type => params[:model], :private => params[:private] do %>
+          <%= form_tag :action => 'add_new_questions', :id => params[:id], :questionnaire_type => params[:model], :private => params[:private] do %>
           <%= submit_tag 'Add', :id=>"addQuestionBtn" %>
           <%= text_field 'question', 'total_num', :size => 1, :value => "1" %> more 
           <%= select "question", "type", 
@@ -60,13 +60,12 @@
       <div class="build-wrap"></div>
       <div class="render-wrap"></div>
       <button id="edit-form">Edit Form</button>
-      <button id="get-data">Get Data</button>
   </div>
   <%= javascript_include_tag "form-init" %>
   <!-- End of drag/drop container --> 
   
  <%= form_tag :action => 'save_all_questions', :id => params[:id], :questionnaire_type => params[:model], :private => params[:private] do %>
-     <table id="questions_table">
+     <table id="questions_table" class="hidden-question-form">
 	 <tr>
              <th class="head" align="center" width="30">Action</th>
              <th class="head" align="center" width="30">Seq</th>

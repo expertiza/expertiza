@@ -17,4 +17,22 @@ class LinkSubmissionHistory < SubmissionHistory
     end
     return history_obj
   end
+
+  def add_submission(assignment_id)
+    @assignment = Assignment.find_by_id(assignment_id)
+    teams = @assignment.teams
+    teams.each do |team|
+      submitted_links = team.hyperlinks
+      submitted_links.each do |link|
+        submission_history = SubmissionHistory.create(team, link)
+        timestamp = submission_history.get_submitted_at_time(link)
+        submission_history.submitted_at = timestamp
+        begin
+          submission_history.save
+        rescue
+          @error_message = "No new updates"
+        end
+      end
+    end
+  end
 end

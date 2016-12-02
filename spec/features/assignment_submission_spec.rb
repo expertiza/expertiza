@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 def signup_topic
-  user = User.find_by_name("student2064")
+  user = User.find_by_name("student2064") 
   stub_current_user(user, user.role.name, user.role)
   visit '/student_task/list'
   visit '/sign_up_sheet/sign_up?id=1&topic_id=1' #signup topic
@@ -54,18 +54,16 @@ describe "assignment submisstion test" do
       #invalid format url2
       fill_in 'submission', with: "http://wrongurl"
       click_on 'Upload link'
-      #expect(page).to have_content "The URL or URI is not valid"
+      expect(page).to have_content "The URL or URI is not valid"
 
-      #unconnectable url
+      #not existed url
       fill_in 'submission', with: "http://www.notexisted.com"
       click_on 'Upload link'
-      #expect(page).to have_content "The URL or URI is not valid"
+      expect(page).to have_content "The URL or URI is not valid"
 
-      #click_on "http://wrongurl"
-      #expect(page).to have_http_status(404)
     end
 
-    it "is able to submit multiple links" do
+    it "is able to submit multiple valid links" do
       signup_topic
       fill_in 'submission', with: "https://www.ncsu.edu"
       click_on 'Upload link'
@@ -88,7 +86,7 @@ describe "assignment submisstion test" do
       expect(page).to have_content "You or your teammate(s) have already submitted the same hyperlink."
     end
 
-    it "test5: submit empty link" do
+    it "submit empty link" do
       signup_topic
       #hyperlink is empty
       fill_in 'submission', with: ""
@@ -108,7 +106,6 @@ describe "assignment submisstion test" do
       attach_file('uploaded_file', file_path)
       click_on 'Upload file'
       expect(page).to have_content "valid_assignment_file.txt"
-      expect(File).to exist("#{Rails.root}/pg_data/instructor6/csc517/test/Assignment1684/0/valid_assignment_file.txt")
 
       #check content of the uploaded file
       file_upload_path = Rails.root + "pg_data/instructor6/csc517/test/Assignment1684/0/valid_assignment_file.txt"

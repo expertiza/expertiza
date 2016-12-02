@@ -6,9 +6,10 @@
     <thead>
     <tr bgcolor='#CCCCCC'>
   <!-- class value decides whether the column should be sortable or not  -->
-      <th width = "16%" class="sorter-true">Reviewer <span></span></th>
-      <th width = "14%" class="sorter-false">Reviews done per round<span></span></th>
-      <th width = "20%" class="sorter-false">Team reviewed <span></span></th>
+      <th width = "13%" class="sorter-true">Reviewer <span></span></th>
+      <th width = "13%" class="sorter-false">Reviews done per round<span></span></th>
+      <th width = "14%" class="sorter-false">Team reviewed <span></span></th>
+      <th width = "10%" class="sorter-false">Time per review in mins <span></span></th>
       <th width = "14%" class="sorter-false">Score awarded / Avg. score <span></span></th>
       <th width = "10%" class="sorter-true">Metrics <span></span></th>
       <th width = "36%" class="sorter-false">Assign grade and write comments <span></span></th>
@@ -48,6 +49,7 @@
                   <!--later we can create a hyperlink question type to deal with this situation.-->
                   <%= list_hyperlink_submission(r.id, ri.id, 5386) if @id.to_i == 806 %>
                 </td>
+                      <%= render partial: 'review_submissions_time_spent',  locals: {bgcolor: @bgcolor, map_id: ri.id} %>
                 <%= render partial: 'team_score',  locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: r.id} %>
                 <% if index == 0 %>
                   <!--Metrics-->

@@ -8,7 +8,6 @@ class ResponsetimeController < ApplicationController
   #2. start and end time is nil. Means fresh new link
   #3. start and end time is not nil. Means fresh new link
   def record_start_time
-    Rails.logger.debug "Hi DER"
     @responsetime_match = Responsetime.where(map_id: params[:responsetime][:map_id], round: params[:responsetime][:round], link: params[:responsetime][:link])
     if @responsetime_match
       @responsetime_match.each do |responsetime_entry|
@@ -19,10 +18,10 @@ class ResponsetimeController < ApplicationController
     end #start and end time is nil. Means fresh new link
     @responsetime = Responsetime.new(responsetime_params)
     @responsetime.save
+    render :nothing => true
   end
 
   def record_end_time
-    Rails.logger.debug "Hi DER in end time"
     @data= params.require(:responsetime)
     @linkArray=Array.new
     @responsetime_match = Responsetime.where(map_id: @data[:map_id], round: @data[:round])

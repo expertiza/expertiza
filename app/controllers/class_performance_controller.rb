@@ -33,24 +33,8 @@ class ClassPerformanceController < ApplicationController
     end
   end
 
-  def toggle_selection
-    @assignment_id = params[:assignment_id]
-    @results = params[:results]
-    @selections = params[:selections]
-    selection = params[:selection]
-    result = params[:result]
-
-    @selections[result.id] = selection
-
-    render "select_rubrics"
-      
-  end
-
   def show_class_performance
-    puts params[:class_performance][:criterias]
-    puts params[:result]
-    puts params[:id]
-
+    raise SystemError
     line_chart = Gruff::Bar.new()
     line_chart.labels = {0=>'Value (USD)'}
     line_chart.title = "My Guitar Collection"

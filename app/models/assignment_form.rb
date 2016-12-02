@@ -40,7 +40,10 @@ class AssignmentForm
     update_due_dates(attributes[:due_date], user)
     # delete the old queued items and recreate new ones if the assignment has late policy.
     #it will add a simicheck job in queue for this assignment
-    add_simicheck_to_delayed_queue
+    #function will be called only if the assignment has enabled the simicheck feature
+    if(Assignment.find(@assignment.id).simicheck)
+      add_simicheck_to_delayed_queue
+    end
     if attributes[:due_date] and !@has_errors and has_late_policy
       delete_from_delayed_queue
       add_to_delayed_queue
@@ -156,6 +159,8 @@ class AssignmentForm
       diff = 1
       mi = 2
       next unless diff > 0
+      #first check if the same task is already enqueued
+      #next if ScheduledTask.find(@assignment.id, "compare_files_with_simicheck", due_date.due_at.to_s(:db))
 
       # If the deadline type is submission, add a delayed job to create a simicheck comparison
       if deadline_type == "submission"

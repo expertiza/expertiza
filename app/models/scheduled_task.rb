@@ -62,6 +62,13 @@ class ScheduledTask
         drop_outstanding_reviews
       end
       if (self.deadline_type == "compare_files_with_simicheck")
+        #first check if there is another scheduled task with later deadline if yes then do not run this task
+
+
+          if SimicheckComparison.find(self.assignment_id)
+            return
+          end
+
         compare_files_with_simicheck # to all reviewers
       end
     end

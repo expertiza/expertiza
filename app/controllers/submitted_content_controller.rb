@@ -30,13 +30,11 @@ class SubmittedContentController < ApplicationController
     #Get timeline entries from submission_histories table
     @submission_history = SubmissionHistory.where(team: @participant.team.id).order(:submitted_at)
     #reviews and feedbacks
-    @reviews = ResponseMap.where(reviewee_id: @participant.team.id)
-    if !@reviews.nil?
-      @reviews.each do |review|
-        if !@review.nil?
-          if !@review.response.nil?
-            @timeline[@review.response.updated_at]={:heading => review.type.chomp('ResponseMap') , :description => ' Additional Comment : '+@review.response.additional_comment}
-          end
+    @maps = ResponseMap.where(reviewee_id: @participant.team.id)
+    if !@maps.nil?
+      @maps.each do |map|
+        if !@map.nil?
+            @timeline[@map.updated_at]={:heading => map.type.chomp('ResponseMap') , :description => ''}
         end
       end
     end

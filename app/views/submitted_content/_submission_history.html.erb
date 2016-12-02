@@ -22,17 +22,17 @@
                   </div>
                 </li>
               <% end %>
-              <% @assignment.due_dates.each do |deadline| %>
+              <% @assignment.due_dates.each do |due_date| %>
               <%# Display timestamps from each submission! %>
                 <li class="timeline-item">
                   <div class="timeline-badge primary"><i class="glyphicon glyphicon-check"></i></div>
                   <div class="timeline-panel">
                     <div class="timeline-heading">
-                      <h4 class="timeline-title"> <b>Deadline<b></h4>
-                      <p><small class="text-muted"><i class="glyphicon glyphicon-time"></i> <%= deadline.due_at %></small></p>
+                      <h4 class="timeline-title"> <b>Due Date<b></h4>
+                      <p><small class="text-muted"><i class="glyphicon glyphicon-time"></i> <%= due_date.due_at %></small></p>
                     </div>
                     <div class="timeline-body">
-                      <p> <%= deadline.deadline_type.name %> Deadline </p>
+                      <p> <%= due_date.deadline_type.name %> Deadline </p>
                     </div>
                   </div>
                 </li>

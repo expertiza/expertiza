@@ -31,7 +31,7 @@
 //= stub vendor.min
 //= stub form-builder.min
 //= stub form-render.min
-//= stub formScript
+//= stub form-init
 
 // Eliminate the “element.dispatchEvent is not a function” error
 jQuery.noConflict();

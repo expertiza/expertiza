@@ -1,3 +1,7 @@
+//= require vendor.min
+//= require form-builder.min
+//= require form-render.min
+
 jQuery(document).ready(function($) {
 
     var initActionButtons = function()

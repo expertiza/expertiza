@@ -242,3 +242,26 @@ dateFormat.i18n = {
 Date.prototype.format = function (mask, utc) {
   return dateFormat(this, mask, utc);
 };
+
+$('a[data-popup]').live('click', function(e) {
+    window.open( $(this).attr('href'), "Popup", "height=600, width=600" );
+    e.preventDefault();
+});
+function show_alert(alertMessage){
+    $("#dialog-message").html(alertMessage);
+    $("#dialog-message").dialog({
+        modal: true,
+        draggable: true,
+        resizable: true,
+        position: ['center', 'top'],
+        show: 'blind',
+        hide: 'blind',
+        width: 400,
+        dialogClass: 'ui-dialog-osx',
+        buttons: {
+            "Ok": function() {
+                $(this).dialog("close");
+            }
+        }
+    });
+}

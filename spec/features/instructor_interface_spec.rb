@@ -1,22 +1,22 @@
 require 'rails_helper'
 
 describe "Integration tests for instructor interface" do
-  before(:each) do
-    create(:assignment)
-    create_list(:participant, 3)
-    create(:assignment_node)
-    create(:deadline_type, name: "submission")
-    create(:deadline_type, name: "review")
-    create(:deadline_type, name: "metareview")
-    create(:deadline_type, name: "drop_topic")
-    create(:deadline_type, name: "signup")
-    create(:deadline_type, name: "team_formation")
-    create(:deadline_right)
-    create(:deadline_right, name: 'Late')
-    create(:deadline_right, name: 'OK')
-    create(:assignment_due_date)
-    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now + (100 * 24 * 60 * 60))
-  end
+   #it 'create date' do
+   # create(:assignment, name: "instructor_interface", directory_path: 'test_assignment')
+   # create_list(:participant, 3, assignment: Assignment.find_by(name:'instructor_interface'))
+   # create(:assignment_node, assignment:@assignment)
+   # create(:deadline_type, name: "submission")
+   # create(:deadline_type, name: "review")
+   # create(:deadline_type, name: "metareview")
+   # create(:deadline_type, name: "drop_topic")
+   # create(:deadline_type, name: "signup")
+   # create(:deadline_type, name: "team_formation")
+   # create(:deadline_right)
+   # create(:deadline_right, name: 'Late')
+   # create(:deadline_right, name: 'OK')
+   # create(:assignment_due_date)
+   # create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now + (100 * 24 * 60 * 60))
+   #end
 
   describe "Instructor login" do
     it "with valid username and password" do
@@ -46,13 +46,18 @@ describe "Integration tests for instructor interface" do
       fill_in "Course Name", with: 'private course for test'
       click_button "Create"
       expect(Course.where(name: "private course for test")).to exist
+      Course.where(name: "public course for test").destroy_all
+      Course.where(name: "private course for test").destroy_all
     end
   end
 
   describe "View Publishing Rights" do
     it 'should display teams for assignment without topic' do
       login_as("instructor6")
-      visit '/participants/view_publishing_rights?id=1'
+      @assignment=Assignment.find_by(name:'instructor_interface')
+      @student1=User.where(name:'student2065').first
+      @participant1=  Participant.where(parent_id:@assignment.id,user_id:@student1.id).first
+      visit "/participants/view_publishing_rights?id=#{@participant1.id}"
       expect(page).to have_content('Team name')
       expect(page).not_to have_content('Topic name(s)')
       expect(page).not_to have_content('Topic #')
@@ -62,7 +67,8 @@ describe "Integration tests for instructor interface" do
   describe "Import tests for assignment topics" do
     it 'should be valid file with 3 columns' do
       login_as("instructor6")
-      visit '/assignments/1/edit'
+      assignment=Assignment.find_by(name:'instructor_interface')
+      visit "/assignments/#{assignment.id}/edit"
       click_link "Topics"
       click_link "Import topics"
       file_path = Rails.root + "spec/features/assignment_topic_csvs/3-col-valid_topics_import.csv"
@@ -75,7 +81,8 @@ describe "Integration tests for instructor interface" do
 
     it 'should be a valid file with 3 or more columns' do
       login_as("instructor6")
-      visit '/assignments/1/edit'
+      assignment=Assignment.find_by(name:'instructor_interface')
+      visit "/assignments/#{assignment.id}/edit"
       click_link "Topics"
       click_link "Import topics"
       file_path = Rails.root + "spec/features/assignment_topic_csvs/3or4-col-valid_topics_import.csv"
@@ -88,7 +95,8 @@ describe "Integration tests for instructor interface" do
 
     it 'should be a invalid csv file' do
       login_as("instructor6")
-      visit '/assignments/1/edit'
+      assignment=Assignment.find_by(name:'instructor_interface')
+      visit "/assignments/#{assignment.id}/edit"
       click_link "Topics"
       click_link "Import topics"
       file_path = Rails.root + "spec/features/assignment_topic_csvs/invalid_topics_import.csv"
@@ -101,7 +109,8 @@ describe "Integration tests for instructor interface" do
 
     it 'should be an random text file' do
       login_as("instructor6")
-      visit '/assignments/1/edit'
+      assignment=Assignment.find_by(name:'instructor_interface')
+      visit "/assignments/#{assignment.id}/edit"
       click_link "Topics"
       click_link "Import topics"
       file_path = Rails.root + "spec/features/assignment_topic_csvs/random.txt"
@@ -115,7 +124,8 @@ describe "Integration tests for instructor interface" do
   describe "View assignment scores" do
     it 'is able to view scores' do
       login_as("instructor6")
-      visit '/grades/view?id=1'
+      assignment=Assignment.find_by(name:'instructor_interface')
+      visit "/grades/view?id=#{assignment.id}"
       expect(page).to have_content('Summary report')
     end
   end

@@ -37,4 +37,13 @@ describe SubmissionHistory do
       expect(submission_history).to be_a(FileSubmissionHistory)
     end
   end
+
+  describe "delete method" do
+    it "should add a row to submission history table with action as delete" do
+      assignment_team = build(AssignmentTeam)
+      link = "/user/home/Expertiza_gemfile"
+      submission_history = SubmissionHistory.delete_submission(assignment_team, link)
+      expect(submission_history.action).to eq("delete")
+    end
+  end
 end

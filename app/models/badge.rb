@@ -8,6 +8,9 @@ class Badge
 
 	TOPPER_BADGE_IMAGE = "<img id='topper_badge' src='/assets/badges/topper_badge.png' title = 'Top Score'>"
 
+	DREAM_TEAM_THRESHOLD = 0.95
+	DREAM_TEAM_BADGE_IMAGE = "<img id='dream_team_badge' src='/assets/badges/dream_team_badge.png' title = 'Dream Team'>"
+
 	CONSISTENCY_THRESHOLD = 90
 	CONSISTENCY_BADGE_IMAGE = "<img id='consistency_badge' src='/assets/badges/consistency_badge.png' title = 'Consistent'>"
 
@@ -27,12 +30,16 @@ class Badge
 			# check for different badges
 
 			# Topper badge
-			badge_matrix[current_assignment_count][0] = Badge.topper(student_task.assignment, student_task.participant)
+			# badge_matrix[current_assignment_count][0] = Badge.topper(student_task.assignment, student_task.participant)
 
 			# Good reviewer badge
 			# badge_matrix[current_assignment_count][2] = Badge.good_reviewer(student_task)
 			badge_matrix[current_assignment_count][2] = Badge.good_reviewer(student_task.participant)
-	
+			
+			# Dream team
+			badge_matrix[current_assignment_count][3] = Badge.dream_team(student_task.assignment, student_task.participant)
+
+
 			# Consistency badge
 			consistency_flag = consistency_flag && Badge.consistency(student_task)
 			
@@ -64,10 +71,14 @@ class Badge
 			# check for different badges
 
 			# Topper badge
-			badge_matrix[current_assignment_count][0] = Badge.is_toppper(scores, participant)
+			# badge_matrix[current_assignment_count][0] = Badge.is_toppper(scores, participant)
 
 			# Good reviewer badge
 			badge_matrix[current_assignment_count][2] = Badge.good_reviewer(participant)
+
+			# Dream team
+			# badge_matrix[current_assignment_count][3] = Badge.dream_team(assignment, participant)
+
 
 			# Consistency badge
 			# consistency_flag = consistency_flag && Badge.consistency(student_task)
@@ -170,6 +181,44 @@ class Badge
 
 # -------------------------------------------- Dream Team badge method(s)--------------------------------------------- #
 
+def self.dream_team(assignment, participant)
+	
+	user = User.find(participant.user_id)
+	team = participant.team
+ 	team_participants = team.participants
+ 	scores = {}
+
+ 	team_participants.each do |teammate|
+	 	teammate_reviews = teammate.teammate_reviews
+	 	teammate_reviews.each do |teammate_review|
+	 			key = teammate_review.reviewee.name
+	 			if scores.key?(key)
+	 				scores[key] = scores[key] + (teammate_review.get_total_score.to_f/teammate_review.get_maximum_score.to_f)
+	 			else
+	 				scores[key] = 0.0
+	 				scores[key] = scores[key] + (teammate_review.get_total_score.to_f/teammate_review.get_maximum_score.to_f)
+	 			end	
+	 		end
+ 	end
+
+ 	total_reviews_per_teammate = scores.length - 1
+ 	team_participants.each do |teammate|
+ 		key = teammate.name
+ 		scores[key] = scores[key]/total_reviews_per_teammate
+ 	end
+
+ 	badge = DREAM_TEAM_BADGE_IMAGE.html_safe
+
+ 	team_participants.each do |teammate|
+ 		key = teammate.name
+ 		if scores[key] < DREAM_TEAM_THRESHOLD
+			badge = false
+			break
+		end
+	end
+
+	return badge
+end
 
 # -------------------------------------------- First Submission badge method(s)--------------------------------------------- #
 

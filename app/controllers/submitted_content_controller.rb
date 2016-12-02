@@ -40,7 +40,7 @@ class SubmittedContentController < ApplicationController
           end
         end
       end
-
+    end
     @submission_history.each do |submission|
       @timeline[submission.submitted_at]={:heading => submission.type+' '+submission.action, :description => submission.submitted_detail}
     end

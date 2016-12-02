@@ -101,7 +101,6 @@ describe LotteryController do
           create(:team_user, team: teamB_old, user: student3)
           create(:team_user, team: teamB_old, user: student4)
 
-         # RestClient.get "/lottery/run_intelligent_assignment/#{assignment.id}",  :content_type => :json, :accept => :json
           controller.params = {id: assignment.id, test_run: true}
           controller.run_intelligent_assignment
 

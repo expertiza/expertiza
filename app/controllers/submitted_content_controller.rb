@@ -31,7 +31,7 @@ class SubmittedContentController < ApplicationController
     @submission_history.each do |submission|
       @timeline[submission.submitted_at]={:heading => submission.type+' '+submission.action, :description => submission.submitted_detail}
     end
-    @assignment.due_dates do |due_date|
+    @assignment.due_dates.each do |due_date|
       @timeline[due_date.due_at]={:heading => ' Due Date ', :description => due_date.deadline_type.name+' Deadline'}
     end
 

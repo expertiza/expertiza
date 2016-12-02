@@ -43,7 +43,7 @@ class SubmittedContentController < ApplicationController
 
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
   end
-/
+
   # view is called when @assignment.submission_allowed(topic_id) is false
   # so @can_submit should be false
   def view

@@ -215,15 +215,14 @@ class ReviewMappingController < ApplicationController
   end
 
   def delete_reviewer
-    review_response_map = ReviewResponseMap.find(params[:id])
-    assignment_id = review_response_map.assignment.id
-    if !Response.exists?(map_id: review_response_map.id)
+    review_response_map = ReviewResponseMap.find_by(id: params[:id])
+    if review_response_map and !Response.exists?(map_id: review_response_map.id)
       review_response_map.destroy
       flash[:success] = "The review mapping for \"" + review_response_map.reviewee.name + "\" and \"" + review_response_map.reviewer.name + "\" has been deleted."
     else
       flash[:error] = "This review has already been done. It cannot been deleted."
     end
-    redirect_to action: 'list_mappings', id: assignment_id
+    redirect_to :back
   end
 
   def delete_metareviewer
@@ -290,7 +289,7 @@ class ReviewMappingController < ApplicationController
       participants.each do |participant|
         user = participant.user
         next if TeamsUser.team_id(assignment_id, user.id)
-        team = AssignmentTeam.create_team_and_node(assignment_id, AssignmentTeam.name)
+        team = AssignmentTeam.create_team_and_node(assignment_id)
         ApplicationController.helpers.create_team_users(participant.user, team.id)
         teams << team
       end

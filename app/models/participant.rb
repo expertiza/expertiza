@@ -5,7 +5,6 @@ class Participant < ActiveRecord::Base
   belongs_to :assignment, foreign_key: 'parent_id'
 
   has_many   :comments, dependent: :destroy
-  has_many   :resubmission_times, dependent: :destroy
   has_many   :reviews, class_name: 'ResponseMap', foreign_key: 'reviewer_id', dependent: :destroy
   has_many   :team_reviews, class_name: 'ReviewResponseMap', foreign_key: 'reviewer_id', dependent: :destroy
   has_many :response_maps, class_name: 'ResponseMap', foreign_key: 'reviewee_id', dependent: :destroy
@@ -55,10 +54,6 @@ class Participant < ActiveRecord::Base
     end
 
   def force_delete(maps)
-    times = ResubmissionTime.where(participant_id: self.id)
-
-    times.each { |time| time.destroy } if times
-
     maps.each { |map| map.delete(true) } if maps
 
     if self.team

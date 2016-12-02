@@ -119,7 +119,7 @@ class Assignment < ActiveRecord::Base
     response_map_set.sort! {|a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count }
     min_metareviews = response_map_set.first.metareview_response_maps.count
     response_map_set.sort! {|a, b| a.metareview_response_maps.last.id <=> b.metareview_response_maps.last.id } if min_metareviews > 0
-    # The first review_map is the best candidate to metareview
+    # The first review_map is the best to metareview
     response_map_set.first
   end
 
@@ -158,7 +158,7 @@ class Assignment < ActiveRecord::Base
         total_score = 0
         total_num_of_assessments = 0 # calculate grades for each rounds
         for i in 1..self.num_review_rounds
-          assessments = ReviewResponseMap.get_assessments_round_for(team, i)
+          assessments = ReviewResponseMap.get_responses_for_team_round(team, i)
           round_sym = ("review" + i.to_s).to_sym
           grades_by_rounds[round_sym] = Answer.compute_scores(assessments, questions[round_sym])
           total_num_of_assessments += assessments.size

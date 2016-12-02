@@ -66,15 +66,6 @@ class SubmittedContentController < ApplicationController
       undo_link("The link has been successfully submitted.")
     end
     redirect_to action: 'edit', id: @participant.id
-
-    require 'rufus-scheduler'
-
-  	scheduler = Rufus::Scheduler.singleton
-
-  	scheduler.in("5s", "link"=>params[:submission]) do |job, time, arg|
-  		puts "THE SUBMITTED LINK WAS " + job.opts['link']
-      CUSTOM_LOGGER.info("THE SUBMITTED LINK WAS " + job.opts['link'])
-  	end
   end
 
   # Note: This is not used yet in the view until we all decide to do so

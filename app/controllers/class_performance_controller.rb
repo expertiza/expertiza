@@ -11,7 +11,6 @@ class ClassPerformanceController < ApplicationController
     # Get the assignment object for the above ID and set the @assignment_name object for the view
     @assignment = Assignment.find(@assignment_id)
     #@results = ActiveRecord::Base.connection.select_all('select a.txt from questions a , questionnaires b where a.questionnaire_id = b.id and a.questionnaire_id in ( select a.questionnaire_id from assignment_questionnaires a, questionnaires b, assignments c where a.assignment_id = c.id and a.questionnaire_id = b.id and b.type =\'ReviewQuestionnaire\' and c.id = #{assignment})')
-    #puts @results
     questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment_id).pluck(:questionnaire_id)
     questionnaires = questionnaires - Questionnaire.where.not(type: 'ReviewQuestionnaire').pluck(:id)
     questionnaires = questionnaires.uniq {|questionnaire| questionnaire}
@@ -24,26 +23,6 @@ class ClassPerformanceController < ApplicationController
     end
   
     @questions = []
-    #@selections = []
-    @results.each do |result|
-     # puts result.txt
-      
-    #    @question_ids.push(result.id) unless @question_ids.include?(result.id)
-    #    @selections[result.id] = "0"
-    end
-  end
-
-  def toggle_selection
-    @assignment_id = params[:assignment_id]
-    @results = params[:results]
-    @selections = params[:selections]
-    selection = params[:selection]
-    result = params[:result]
-
-    @selections[result.id] = selection
-
-    render "select_rubrics"
-      
   end
 
   def show_class_performance

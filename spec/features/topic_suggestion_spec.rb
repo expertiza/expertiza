@@ -9,9 +9,11 @@ require 'selenium-webdriver'
 describe "Assignment Topic Suggestion Test" do
   pubAssignment = nil
   before(:each) do
-    create(:assignment, name: 'Assignment_suggest_topic', allow_suggestions: true)
-    create_list(:participant, 3)
-    create(:assignment_node)
+=begin
+    create(:assignment, name: "Assignment_suggest_topic", allow_suggestions: true)
+    create_list(:participant, 3,assignment: Assignment.find_by(name:'Assignment_suggest_topic'))
+    @topic_as = Assignment.find_by(name: 'Assignment_suggest_topic')
+    create(:assignment_node,node_object_id: @topic_as.id)
     create(:deadline_type, name: "submission")
     create(:deadline_type, name: "review")
     create(:deadline_type, name: "metareview")
@@ -23,11 +25,30 @@ describe "Assignment Topic Suggestion Test" do
     create(:deadline_right, name: 'OK')
     create :assignment_due_date, due_at: (DateTime.now + 1)
     create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: (DateTime.now + 2))
+=end
   end
-
+#=begin
   describe "case 1" do
     it "Instructor set an assignment which allow student suggest topic and register student2065", js: true  do
       # login as student2065, Note by Xing Pan: modify spec/factories/factories.rb to generate student11 and call "create student" at beginning
+      if(Suggestion.where(title:  'suggested_topic').first)
+        Suggestion.where(title:  'suggested_topic').destroy_all
+      end
+      if(Suggestion.where(title:  'suggested_topic2_will_switch').first)
+        Suggestion.where(title:  'suggested_topic2_will_switch').destroy_all
+      end
+      if(Suggestion.where(title:  'suggested_topic2_without_switch').first)
+        Suggestion.where(title:  'suggested_topic2_without_switch').destroy_all
+      end
+      if(SignUpTopic.where(topic_name:  'suggested_topic').first)
+        SignUpTopic.where(topic_name:  'suggested_topic').destroy_all
+      end
+      if(SignUpTopic.where(topic_name:  'suggested_topic2_will_switch').first)
+        SignUpTopic.where(topic_name:  'suggested_topic2_will_switch').destroy_all
+      end
+      if(SignUpTopic.where(topic_name:  'suggested_topic2_without_switch').first)
+        SignUpTopic.where(topic_name:  'suggested_topic2_without_switch').destroy_all
+      end
       user = User.find_by_name('student2064')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
@@ -53,12 +74,33 @@ describe "Assignment Topic Suggestion Test" do
       expect(page).to have_content "suggested_description"
       click_button 'Approve suggestion'
       expect(page).to have_content "The suggestion was successfully approved."
+
     end
   end
 
+#=end
+#=begin
   describe "case 2" do
     it " student2064 hold suggest topic and suggest a new one and student2065 enroll on waitlist of suggested topic", js: true do
       # login_as "student2064"
+      if(Suggestion.where(title:  'suggested_topic').first)
+        Suggestion.where(title:  'suggested_topic').destroy_all
+      end
+      if(Suggestion.where(title:  'suggested_topic2_will_switch').first)
+        Suggestion.where(title:  'suggested_topic2_will_switch').destroy_all
+      end
+      if(Suggestion.where(title:  'suggested_topic2_without_switch').first)
+        Suggestion.where(title:  'suggested_topic2_without_switch').destroy_all
+      end
+      if(SignUpTopic.where(topic_name:  'suggested_topic').first)
+        SignUpTopic.where(topic_name:  'suggested_topic').destroy_all
+      end
+      if(SignUpTopic.where(topic_name:  'suggested_topic2_will_switch').first)
+        SignUpTopic.where(topic_name:  'suggested_topic2_will_switch').destroy_all
+      end
+      if(SignUpTopic.where(topic_name:  'suggested_topic2_without_switch').first)
+        SignUpTopic.where(topic_name:  'suggested_topic2_without_switch').destroy_all
+      end
       user = User.find_by_name('student2064')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
@@ -117,7 +159,8 @@ describe "Assignment Topic Suggestion Test" do
       expect(page).to have_content "Suggested topics for Assignment_suggest_topic"
       expect(page).to have_content "suggested_topic2_will_switch"
       # find link for new suggested view
-      visit '/suggestion/2'
+      @topic2 = Suggestion.find_by(title: 'suggested_topic2_will_switch')
+      visit "/suggestion/#{@topic2.id}"
       # click_link('View')
       expect(page).to have_content "suggested_description"
       click_button 'Approve suggestion'
@@ -145,17 +188,36 @@ describe "Assignment Topic Suggestion Test" do
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       expect(page).to have_content "suggested_topic2_will_switch"
+
     end
   end
-
+#=end
   ########################################
   # Case 3:
   # One team is holding a topic. They sent a suggestion for new topic, and keep themselves in old topic
   ########################################
-
+#=begin
   describe "case 3" do
     it "student2065 hold suggest topic and suggest a new one, but wish to stay in the old topic", js: true do
       # login_as "student2065"
+      if(Suggestion.where(title:  'suggested_topic').first)
+        Suggestion.where(title:  'suggested_topic').destroy_all
+      end
+      if(Suggestion.where(title:  'suggested_topic2_will_switch').first)
+        Suggestion.where(title:  'suggested_topic2_will_switch').destroy_all
+      end
+      if(Suggestion.where(title:  'suggested_topic2_without_switch').first)
+        Suggestion.where(title:  'suggested_topic2_without_switch').destroy_all
+      end
+      if(SignUpTopic.where(topic_name:  'suggested_topic').first)
+        SignUpTopic.where(topic_name:  'suggested_topic').destroy_all
+      end
+      if(SignUpTopic.where(topic_name:  'suggested_topic2_will_switch').first)
+        SignUpTopic.where(topic_name:  'suggested_topic2_will_switch').destroy_all
+      end
+      if(SignUpTopic.where(topic_name:  'suggested_topic2_without_switch').first)
+        SignUpTopic.where(topic_name:  'suggested_topic2_without_switch').destroy_all
+      end
       user = User.find_by_name('student2065')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
@@ -192,6 +254,7 @@ describe "Assignment Topic Suggestion Test" do
       expect(page).to have_content "Assignment_suggest_topic"
 
       # student2065 suggest topic
+
       click_link('Assignment_suggest_topic')
       expect(page).to have_content "Suggest a topic"
       click_link('Suggest a topic')
@@ -233,6 +296,7 @@ describe "Assignment Topic Suggestion Test" do
       expect(page).to have_content "suggested_topic"
 
       # login_as "student2064"
+
       user = User.find_by_name('student2064')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
@@ -244,6 +308,8 @@ describe "Assignment Topic Suggestion Test" do
       find(:xpath, "(//img[@title='Signup'])[2]").click
       visit '/student_task/list'
       expect(page).to have_content " suggested_topic2_without_switch"
+
     end
   end
+#=end
 end

@@ -22,6 +22,22 @@ class Mailer < ActionMailer::Base
          bcc: defn[:bcc])
   end
 
+
+  def request_user_message(defn)
+    @user = defn[:body][:user]
+    @first_name = defn[:body][:first_name]
+    @new_pct = defn[:body][:new_pct]
+    @avg_pct = defn[:body][:avg_pct]
+    @assignment = defn[:body][:assignment]
+
+    if Rails.env.development? || Rails.env.test?
+      defn[:to] = 'expertiza.development@gmail.com'
+    end
+    mail(subject: defn[:subject],
+         to: defn[:to],
+         bcc: defn[:bcc])
+  end
+
   def sync_message(defn)
     @body = defn[:body]
     @type = defn[:body][:type]

@@ -157,6 +157,21 @@ module ReviewMappingHelper
     @rspan = @review_responses.length
   end
 
+  def get_team_color(participant_id, response_map_id)
+    participant = Participant.find(participant_id)
+    if(!Response.exists?(map_id: response_map_id) )
+       return "red"
+    end
+    date_last_graded=participant.review_last_graded_date
+    review_updated_date = Response.where(map_id: response_map_id).order(updated_at: :desc).first
+    if date_last_graded < review_updated_date
+      return "blue"
+    end
+      return "green"
+
+
+  end
+
   #
   # for calibration report
   #

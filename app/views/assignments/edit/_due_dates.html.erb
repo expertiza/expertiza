@@ -4,38 +4,6 @@
         changeReviewRounds();
         event.preventDefault(); // Prevent link from following its href
     });
-
-
-    //E1654. Improve date-picker and deadlines Code change starts
-	//Hide date updater
-    $("#date_updater_inner").hide();
-	//This on-click function toggles date updater div
-    jQuery("#show_date_updater").click(function() {
-
-        $("#date_updater_inner").toggle();
-    });
-	//The functions below update the required parameter for the assignments that have their check-boxes marked for updation.
-
-	//This function adds days to the date
-    jQuery("#addDays_btn").click(function() {
-//calls the function addDaysOrMonth
-        addDaysOrMonth(1, "days"); 
-        event.preventDefault();
-
-    });
-
-	//This function removes days from the date
-    jQuery("#subDays_btn").click(function() {
-
-        addDaysOrMonth(-1, "days");
-        event.preventDefault();
-
-    });
-
-	
-
-    //E1654. Improve date-picker and deadlines Code change starts
-
     });
 
     function addDueDateTableElement(addnameurl,deadline_type, round_no, due_date) {
@@ -87,6 +55,8 @@
         if (previous_element.length == 0) {
             return
         }
+        var dropdownrel = "<select id = \"dp1\"><option value=\"0\">Chose other</option><option value=\"5\">5 Days from Initial Date</option><option value=\"10\">10 Days from Initial Date</option><option value=\"15\">15 Days from Initial Date</option>option value=\"20\">20 Days from Initial Date</option></select>";
+
 
         var html = '<tr id=' + element_id + '>';
 
@@ -124,12 +94,11 @@
         if (due_name == null){
             due_name = '';
         }
-        html += '<td align="center" class="due_date_due_at">' +
+        html += '<td align="center" class="due_date_due_at" width="25%">' +
         '<input id="datetimepicker_' + element_id +
-        '" name="assignment_form[due_date][][due_at]"  type="text" style="width: 140px;text-align:center;" value="' +
-        due_at.substr(0, 16) + '">' + '</td>';
-    html += '<td align="center" class="due_date_due_at" width="5%">' + '<input id="use_updator_' + element_id +
-        '" type="checkbox" name="updatorCheck" style="width: 20px">' + '</td>';
+        '" name="assignment_form[due_date][][due_at]" style="width: 200px" type="text" value="' +
+        due_at + '">' +"<select onchange=\"UpdateDeadlineForThisId(\'"+element_id+"\');\"id = \"dropdown_"+element_id+"\"><option value=0>Select deadline</option><option value=2>2 days from initial deadline</option><option value=5>5 days from initial deadline</option><option value=7>One week from initial deadline</option><option value=10>10 days from initial deadline</option><option value=12>Two weeks from initial deadline</option><option value=15>15 days from initial deadline</option><option value=20>20 days from initial deadline</option></select>"+ 
+        '</td>';
         
         html += '<td align="center" class="due_date_due_at" width="10%">';
         // if(deadline_type == 'team_formation'){
@@ -394,62 +363,12 @@
             <%@team_formation_allowed_checkbox=true%>
 
         }
-function removeOrAddMetareview() {
-    if (document.getElementById("metareview")) {
-        removeDueDateTableElement('metareview', 0);
-        jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()
-    } else {
-        addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>, 'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
-        jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()
-        addQuestionnaireTableRow(
-            'MetareviewQuestionnaire',
-            null,
-            <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
-            <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
-            <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
-        );
-    }
-    <%@metareview_allowed_checkbox=true%>
-}
-//E1654. Improve date-picker and deadlines Code change starts
-//This is a generic funtion to add and substract days and months
-function addDaysOrMonth(mul, type) {
-    var days = parseInt($('#days').val(), 10); // days variable stores the number of days to change the deadline
-    var months = parseInt($('#months').val(), 10);  // days variable stores the number of days to change the deadline
-    for (var i = 1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').length / 2; i++) {
-        if ($('#use_updator_review_round_' + i).is(':checked')) {
-            var date = $('#datetimepicker_review_round_' + i).val().split("/");
-		// curDate reads the date currently in the field
-            var curDate = new Date(parseInt(date[0], 10), parseInt(date[1], 10) - 1, parseInt(date[2].split(" ")[0], 10));
-            if (type == "days") {//checks if type is date then sets dates
-                curDate.setDate(curDate.getDate() + (days * mul));//sets the date
-            } else {
-                curDate.setMonth(curDate.getMonth() + (months * mul));//sets the months
-            }
-            $("#datetimepicker_review_round_" + i).val(curDate.getFullYear() + "/" + (curDate.getMonth() + 1) + "/" + curDate.getDate() + " " + date[2].split(" ")[1]);
-        }
-        if ($('#use_updator_submission_round_' + i).is(':checked')) {
-            var date = $('#datetimepicker_submission_round_' + i).val().split("/");
-            var curDate = new Date(parseInt(date[0], 10), parseInt(date[1], 10) - 1, parseInt(date[2].split(" ")[0], 10));
-            if (type == "days") {
-                curDate.setDate(curDate.getDate() + (days * mul));
-            } else {
-                curDate.setMonth(curDate.getMonth() + (months * mul));
-            }
-            $("#datetimepicker_submission_round_" + i).val(curDate.getFullYear() + "/" + (curDate.getMonth() + 1) + "/" + curDate.getDate() + " " + date[2].split(" ")[1]);
-        }
-    }
-
-
-}
-//E1654. Improve date-picker and deadlines Code change ends
-
 </script>
 
 <div style='padding: 5px' id='review_round'>
 <%= label_tag('assignment_form[assignment][rounds_of_reviews]', 'Number of review rounds:') %>
 <%= text_field_tag('assignment_form[assignment][rounds_of_reviews]', @assignment_form.assignment.rounds_of_reviews, :style => 'width:50px') %>
-  <button type="button" id="set_rounds">Set</button><label style='padding-left: 300px; text-align:right;'>Timezone : <%= current_user.timezonepref %></label>
+  <button type="button" id="set_rounds">Set</button>
 </div>
 
 <% if @assignment_form.assignment.rounds_of_reviews > 1 %>
@@ -479,23 +398,12 @@ function addDaysOrMonth(mul, type) {
 <input name="metareivewAllowed" type="hidden" value="false" />
 <%= check_box_tag('metareviewAllowed', 'true', @metareview_allowed,:onclick=>"removeOrAddMetareview()" ) %>
 <%= label_tag('metareivewAllowed', 'Use metareview deadline') %><br/>
-<div id="date_updater_div">
-                                                    <button type="button" id="show_date_updater">Show/Hide Date Updater</button>
-                                                    <div id="date_updater_inner">
 
-                                                        <%= label_tag('Days') %>
-                                                            <button type="button" id="addDays_btn">+</button>
-								<input id="days" type="number" name="quantity" min="0" value="0" style="width:50px">
-                                                                <button type="button" id="subDays_btn">-</button>
-
-                                                </div>
-												</div>
 <table class='exp' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden;'>
 
 <tr id='due_date_heading'>
-<th width=10% style="text-align:left;">Deadline type</th>
-<th width=10% style="text-align:center;">Date & time</th>
-<th width=5% style="text-align:center;">Use Date Updater</th>
+<th width=15% style="text-align:left;">Deadline type</th>
+<th width=20% style="text-align:center;">Date & time</th>
 <th width=10% style="text-align:center;">Submission allowed</th>
 <th width=8% style="text-align:center;">Review allowed</th>
 <th width=8% style="text-align:center;">Teammate review allowed</th>
@@ -541,5 +449,32 @@ function addDaysOrMonth(mul, type) {
     }());
   </script>
 </table>
+        <script>
+         //aler/t("Here!!");
+         function UpdateDeadlineForThisId(element_id)
+         {
+
+            var d = document.getElementById("datetimepicker_submission_round_1");
+           //if(d.value==0){return 0;/}
+            var TZ = d.value.substr(d.value.length - 12);
+            var someDate = new Date(d.value)
+            dropdownId  = "dropdown_"+element_id;
+            var numberOfDaysToAdd = document.getElementById(dropdownId).value
+            //aler/t(someDate);
+            //aler/t(numberOfDaysToAdd)
+            var newDate = new Date(someDate.setTime( someDate.getTime() + numberOfDaysToAdd * 86400000 ));
+            //aler/t(newDate);
+            var text = newDate.getFullYear()+"/"+("0"+(parseInt(newDate.getMonth(),10)+1).toString()).slice(-2)+"/"+("0"+(parseInt(newDate.getDate(),10)+1).toString()).slice(-2)+" "+newDate.getHours()+":"+newDate.getMinutes()+" "
+
+            document.getElementById("datetimepicker_"+element_id).value = text
+         }
+          
+
+
+           
+       
+        </script>
+</html>
+
 
 <%= render :partial => 'assignments/edit/late_policy' %>

@@ -32,7 +32,7 @@ class SubmittedContentController < ApplicationController
     #reviews and feedbacks
     @maps = ResponseMap.where(reviewee_id: @participant.team.id)
     @maps.each do |map|
-        @response = Response.find_one(map_id: map.id) 
+        @response = Response.find_by(map_id: map.id) 
         @timeline[@response.updated_at]={:heading => map.type.chomp('ResponseMap') , :description => ''}
     end
     @submission_history.each do |submission|

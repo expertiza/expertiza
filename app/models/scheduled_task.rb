@@ -239,16 +239,16 @@ class ScheduledTask
               commit_json = RestClient.get(commit_url)
               commit_hash = JSON.parse(commit_json)
               num_of_files = commit_hash["files"]
+              f = File.open("/tmp/"+assignment_team.name+"#{link_count}"+".txt", "a")
               0.upto(num_of_files -1).each { |j|
                 if (commit_hash["files"][j] != nil)
                    commited_patch = commit_hash["files"][j]["patch"]
-                   f = File.open("/tmp/"+assignment_team.name+"#{link_count}"+".txt", "a")
                    f.write(commited_patch)
-                   f.close
-                   f = File.open("/tmp/"+assignment_team.name+"#{link_count}"+".txt", "r")
-                   comparison_github.send_file_to_simicheck(f)
                 end
               }
+              f.close
+              f = File.open("/tmp/"+assignment_team.name+"#{link_count}"+".txt", "r")
+              comparison_github.send_file_to_simicheck(f)
             }
 
           else

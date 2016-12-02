@@ -32,10 +32,8 @@ class SubmittedContentController < ApplicationController
     #reviews and feedbacks
     @maps = ResponseMap.where(reviewee_id: @participant.team.id)
     @maps.each do |map|
-      if !@map.nil?
         @response = Response.where(map_id: map.id) 
         @timeline[@response.updated_at]={:heading => map.type.chomp('ResponseMap') , :description => ''}
-      end
     end
     @submission_history.each do |submission|
       @timeline[submission.submitted_at]={:heading => submission.type+' '+submission.action, :description => submission.submitted_detail}

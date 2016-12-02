@@ -30,21 +30,29 @@ class SimicheckComparison < ActiveRecord::Base
     return false
   end
 
-  def get_visualisation_url()
+  def get_visualisation_url
     url = "http://simicheck.com/api/visualize_similarity/"
     key = "0a6a26fd61c943718a623b62fc457e1a3e110abe11df4535bb037478e04a9b6af60d8b9fb2e04356b5dda2594150e44642fad227b8e749c89359836c4420edd5"
     response = RestClient.get(url + self.comparison_key, {:simicheck_api_key=>key})
+    file_type = self.file_type
+    if(self.file_type == "file")
+      file_type = "Uploaded Files"
+    end
+    if(self.file_type == "html")
+      file_type = "Uploaded Web Pages"
+    end
     visualisation_url = nil
     if(response.code == 200)
       visualisation_url = response.body
     end
-    return visualisation_url
+    return [file_type, "http://www.simicheck.com" + visualisation_url]
   end
 
-  def get_status()
-    url = "http://simicheck.com/api/similarity_status"
+  def get_status
+    url = "http://simicheck.com/api/similarity_status/"
     key = "0a6a26fd61c943718a623b62fc457e1a3e110abe11df4535bb037478e04a9b6af60d8b9fb2e04356b5dda2594150e44642fad227b8e749c89359836c4420edd5"
-    response = RestClient.get(url + self.comparison_key, {:simicheck_api_key=>key})
+    url += self.comparison_key
+    response = RestClient.get(url, {:simicheck_api_key=>key})
     status = nil
     if(response.code == 200)
       status = JSON.parse(response.body)['ready']

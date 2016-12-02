@@ -117,7 +117,7 @@ class LotteryController < ApplicationController
 
         #Deleting earlier made team
         old_team_id = existing_team_ids[user_id]
-        TeamsUser.destroy_all(team_id: old_team_id, user_id: user_id)
+        TeamsUser.destroy_all(team_id: old_team_id, user_id: user_id) unless old_team_id.nil?
       end
     end
   end

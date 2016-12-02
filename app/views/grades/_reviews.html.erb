@@ -70,9 +70,11 @@
                         <%= display_directory_tree(@participant, files, true).html_safe %>
                     <% end %>
                 <% end %>
-                
+                <% if participant.reviewsetting == 2%>
+                <%= review.display_as_html(prefix, index + 1, nil, false) %><br/>
+                <% else %>
                 <%= review.display_as_html(prefix, index + 1, nil) %><br/>
-                
+                <% end %>
                 <% map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: participant.id).first
                     review_feedbacks = map.try :response %>
                 <% if review_feedbacks && !review_feedbacks.empty? %>

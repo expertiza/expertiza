@@ -11,6 +11,7 @@ class SubmissionHistory < ActiveRecord::Base
     else
       action = "add"
     end
+    
     if link.start_with?("http")
       history_obj = LinkSubmissionHistory.create(link, team, action)
     else

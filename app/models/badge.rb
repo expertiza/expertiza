@@ -45,6 +45,7 @@ class Badge
 
 		if consistency_flag
 			badge_matrix[-1][4] = CONSISTENCY_BADGE_IMAGE.html_safe
+			#badge_matrix[-1][3] = CONSISTENCY_BADGE_IMAGE.html_safe
 		end	
 
 

@@ -24,12 +24,14 @@ class AssignmentsController < ApplicationController
     assignment = Assignment.find(params[:id])
     assignment.private = !assignment.private
     assignment.save
+    logger.warn "#{Assignment.find(params[:id])} Assignment saved by #{session[:user_id]}."
     redirect_to list_tree_display_index_path
   end
 
   def new
     @assignment_form = AssignmentForm.new
     @assignment_form.assignment.instructor ||= current_user
+    logger.warn "Assignment form created by #{session[:user_id]}."
   end
 
   def create
@@ -38,6 +40,7 @@ class AssignmentsController < ApplicationController
     if @assignment_form.save
       @assignment_form.create_assignment_node
 
+      logger.warn "Assignment created by #{session[:user_id]}."
       redirect_to edit_assignment_path @assignment_form.assignment.id
       undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
     else

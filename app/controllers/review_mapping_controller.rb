@@ -402,6 +402,10 @@ class ReviewMappingController < ApplicationController
       @review_scores = @assignment.compute_reviews_hash
       @avg_and_ranges = @assignment.compute_avg_and_ranges_hash
       @author_feedback_score = get_author_feedback_score_hash(@assignment, @reviewers)
+      puts params[:user]
+      @metric_filters = (!params[:user].nil? && !params[:user][:metricFilter].blank?) ? params[:user][:metricFilter].reject(&:empty?) : ["Average Volume"]
+        puts("Atit:"+@metric_filters.to_s)
+
     when "FeedbackResponseMap"
       # If review report for feedback is required call feedback_response_report method in feedback_review_response_map model
       if @assignment.varying_rubrics_by_round?

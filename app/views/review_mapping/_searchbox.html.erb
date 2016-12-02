@@ -44,14 +44,22 @@
             <table>
               <tr>
                 <th>Reviewer's Name</th>
-                <td><%= n.text_field :fullname %></td>
-                <td align = "right"><%= submit_tag "Search"%></td>
+                <td style = 'padding-left: 5px'><%= n.text_field :fullname %></td>
+                <th style = 'padding-left: 10px'>Select metric/s to be displayed</th>
+                <td style = 'padding-left: 5px'><%=  n.select :metricFilter, options_for_select(["Average Volume", "Average Author Feedback"],@metric_filters), {}, {:multiple => true, :include_blank => false, :size => 2} %></td>
+                </br>
+                <td align = "right" style = 'padding-left: 10px'><%= submit_tag "Search"%></td>
               </tr>
 
             </table>
         <%end%>
 
+
+
+        </div>
       </div>
+
+
       <br>
     </div>
 

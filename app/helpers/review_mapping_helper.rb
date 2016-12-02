@@ -86,25 +86,34 @@ module ReviewMappingHelper
   end
 
   def display_volume_metric(overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3)
-    metric = "Avg. Volume: #{overall_avg_vol.to_s} <br/> ("
+    metric = "Avg. Volume: #{overall_avg_vol.to_s} <br/>"
     metric += "1st: " + avg_vol_in_round_1.to_s if avg_vol_in_round_1 > 0
-    metric += ", 2nd: " + avg_vol_in_round_2.to_s if avg_vol_in_round_2 > 0
-    metric += ", 3rd: " + avg_vol_in_round_3.to_s if avg_vol_in_round_3 > 0
-    metric += ")"
+    metric += "</br>2nd: " + avg_vol_in_round_2.to_s if avg_vol_in_round_2 > 0
+    metric += "</br>3rd: " + avg_vol_in_round_3.to_s if avg_vol_in_round_3 > 0
     metric.html_safe
   end
 
   def display_avg_author_feedback_score(reviewer_id)
-    score = ""
-    if(!@author_feedback_score.nil?)
-      score += "1st: "+ sprintf('%.2f', @author_feedback_score[reviewer_id][1]).remove('.00')+"/"+@author_feedback_score[:max_score_round_1].to_s if !@author_feedback_score[reviewer_id][1].nil?
-      score += "<br>2nd: "+ sprintf('%.2f', @author_feedback_score[reviewer_id][2].to_s).remove('.00')+"/"+@author_feedback_score[:max_score_round_2].to_s if !@author_feedback_score[reviewer_id][2].nil?
-      score += "<br>3rd: "+ sprintf('%.2f', @author_feedback_score[reviewer_id][3].to_s).remove('.00')+"/"+@author_feedback_score[:max_score_round_3].to_s if !@author_feedback_score[reviewer_id][3].nil?
+    score = 'Avg. Author Feedback/s:</br>'
 
+    if  !@author_feedback_score[reviewer_id][1].nil?
+       score += '1st: '+ sprintf('%.2f', @author_feedback_score[reviewer_id][1]).remove('.00')+'/'+
+           @author_feedback_score[:max_score_round_1].to_s+' from '+@author_feedback_score[:no_of_feedbacks_round_1].to_s+' feedback/s'
     end
+
+     if  !@author_feedback_score[reviewer_id][2].nil?
+       score += '</br>2nd: '+ sprintf('%.2f', @author_feedback_score[reviewer_id][2].to_s).remove('.00')+'/'+
+           @author_feedback_score[:max_score_round_2].to_s+'/'+' from '+@author_feedback_score[:no_of_feedbacks_round_2].to_s+' feedback/s'
+     end
+
+      if  !@author_feedback_score[reviewer_id][3].nil?
+        score += '</br>3rd: '+ sprintf('%.2f', @author_feedback_score[reviewer_id][3].to_s).remove('.00')+'/'+
+           @author_feedback_score[:max_score_round_3].to_s+' from '+@author_feedback_score[:no_of_feedbacks_round_3].to_s+' feedback/s'
+      end
 
     score.html_safe
   end
+
 
   def list_review_submissions(participant_id, reviewee_team_id, response_map_id)
     participant = Participant.find(participant_id)
@@ -116,7 +125,7 @@ module ReviewMappingHelper
       if files and files.length > 0 
         html += display_review_files_directory_tree(participant, files) 
       end 
-    end 
+    end
     html.html_safe
   end
 
@@ -213,6 +222,10 @@ module ReviewMappingHelper
     author_feedback_score[:max_score_round_2] = {}
     author_feedback_score[:max_score_round_3] = {}
 
+    author_feedback_score[:no_of_feedbacks_round_1] = {}
+    author_feedback_score[:no_of_feedbacks_round_2] = {}
+    author_feedback_score[:no_of_feedbacks_round_3] = {}
+
     if(!reviewers.nil?)
 
       reviewers.each do |r|
@@ -262,16 +275,19 @@ module ReviewMappingHelper
             if total_feedback[:round_1] > 0
               author_feedback_score[r.id][1] = {} if author_feedback_score[r.id][1].nil?
               author_feedback_score[r.id][1] = (total_score[:round_1]).to_f / total_feedback[:round_1]
+              author_feedback_score[:no_of_feedbacks_round_1] = total_feedback[:round_1]
             end
 
             if total_feedback[:round_2] > 0
               author_feedback_score[r.id][2] = {} if author_feedback_score[r.id][1].nil?
               author_feedback_score[r.id][2] = (total_score[:round_2]).to_f / total_feedback[:round_2]
+              author_feedback_score[:no_of_feedbacks_round_2] = total_feedback[:round_2]
             end
 
             if total_feedback[:round_3] > 0
               author_feedback_score[r.id][3] = {} if author_feedback_score[r.id][1].nil?
               author_feedback_score[r.id][3] = (total_score[:round_3]).to_f / total_feedback[:round_3]
+              author_feedback_score[:no_of_feedbacks_round_3] = total_feedback[:round_3]
             end
 
           else
@@ -297,6 +313,7 @@ module ReviewMappingHelper
 
             author_feedback_score[r.id][1] = {} if author_feedback_score[r.id][1].nil?
             author_feedback_score[r.id][1] = total_score.to_f / number_of_feedbacks
+            author_feedback_score[:no_of_feedbacks_round_1] = number_of_feedbacks
 
           end
         end
@@ -304,8 +321,8 @@ module ReviewMappingHelper
     end
 
     author_feedback_score
-
   end
+
 end
 
 

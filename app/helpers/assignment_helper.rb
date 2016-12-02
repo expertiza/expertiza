@@ -144,4 +144,31 @@ module AssignmentHelper
     end 
     [topic_name, users_for_curr_team, participants]
   end
+
+  def is_simicheck_result_ready?
+    #id1 = SimicheckComparison.where(assignment_id:params[:id]).delete_all
+    #id2 = SimicheckComparison.where(assignment_id:params[:id]).where(comparison_key!="2365aac1e0e7405987d063fc4b4d1c8b4005dd3297bf4f6386a2e1231855a18e")
+    comparisons = SimicheckComparison.where(assignment_id:params[:id])
+
+    flag = true
+    for comparison in comparisons
+      flag = flag && comparison.get_status
+    end
+    if(flag)
+      @urls = get_simicheck_urls
+    end
+    return flag
+  end
+
+  def get_simicheck_urls
+    #id1 = SimicheckComparison.where(assignment_id:params[:id]).delete_all
+    #id2 = SimicheckComparison.where(assignment_id:params[:id]).where(comparison_key!="2365aac1e0e7405987d063fc4b4d1c8b4005dd3297bf4f6386a2e1231855a18e")
+    comparisons = SimicheckComparison.where(assignment_id:params[:id])
+
+    urls = []
+    for comparison in comparisons
+      urls.push(comparison.get_visualisation_url)
+    end
+    return urls
+  end
 end

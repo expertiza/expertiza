@@ -174,42 +174,53 @@ class UsersController < ApplicationController
       flash[:success] = "The user \"#{@user.name}\" has been successfully updated."
     end
     if @user.status=="Approved"
-    check = User.find_by_name(@user.name)
-    #params[:user][:name] = params[:user][:email] unless check.nil?
-    @usernew = User.new()
-    @usernew.name = @user.name
-    @usernew.role_id = @user.role_id
-    @usernew.institution_id = @user.institution_id
-    @usernew.fullname = @user.fullname
-    @usernew.email = @user.email
-    #@user.institution_id = 
-    # record the person who created this new user
-    @usernew.parent_id = session[:user].id
-    # set the user's timezone to its parent's
-    @usernew.timezonepref = User.find(@usernew.parent_id).timezonepref
+      check = User.find_by_name(@user.name)
+      #params[:user][:name] = params[:user][:email] unless check.nil?
+      @usernew = User.new()
+      @usernew.name = @user.name
+      @usernew.role_id = @user.role_id
+      @usernew.institution_id = @user.institution_id
+      @usernew.fullname = @user.fullname
+      @usernew.email = @user.email
+      #@user.institution_id = 
+      # record the person who created this new user
+      @usernew.parent_id = session[:user].id
+      # set the user's timezone to its parent's
+      @usernew.timezonepref = User.find(@usernew.parent_id).timezonepref
 
-    if @usernew.save
-      password = @usernew.reset_password # the password is reset
+      if @usernew.save
+        password = @usernew.reset_password # the password is reset
 
-      prepared_mail = MailerHelper.send_mail_to_user(@usernew, "Your Expertiza account and password have been created.", "user_welcome", password)
-      prepared_mail.deliver
+        prepared_mail = MailerHelper.send_mail_to_user(@usernew, "Your Expertiza account and password have been created.", "user_welcome", password)
+        prepared_mail.deliver
 
-      flash[:success] = "A new password has been sent to new user's e-mail address."
-      # Instructor and Administrator users need to have a default set for their notifications
-      # the creation of an AssignmentQuestionnaire object with only the User ID field populated
-      # ensures that these users have a default value of 15% for notifications.
-      # TAs and Students do not need a default. TAs inherit the default from the instructor,
-      # Students do not have any checks for this information.
-      if @usernew.role.name == "Instructor" or @usernew.role.name == "Administrator"
-        AssignmentQuestionnaire.create(user_id: @user.id)
+        flash[:success] = "A new password has been sent to new user's e-mail address."
+        # Instructor and Administrator users need to have a default set for their notifications
+        # the creation of an AssignmentQuestionnaire object with only the User ID field populated
+        # ensures that these users have a default value of 15% for notifications.
+        # TAs and Students do not need a default. TAs inherit the default from the instructor,
+        # Students do not have any checks for this information.
+        if @usernew.role.name == "Instructor" or @usernew.role.name == "Administrator"
+          AssignmentQuestionnaire.create(user_id: @user.id)
+        end
+        undo_link("The user \"#{@user.name}\" has been successfully created. ")
+        #redirect_to action: 'list'
+      else
+        foreign
+        #render action: 'new'
       end
-      undo_link("The user \"#{@user.name}\" has been successfully created. ")
-      #redirect_to action: 'list'
-    else
-      foreign
-      #render action: 'new'
+    else 
+      if @user.status=="Rejected" 
+        if @user.update_columns(reason: params[:reason], status: params[:status])
+          flash[:success] = "The user \"#{@user.name}\" has been Rejected."
+          redirect_to action: 'review'
+          return
+        else
+          flash[:error] = "Error processing request."
+        end
+      end
+
     end
-  end
     redirect_to action: 'review'
   end
   def request_user_create
@@ -219,6 +230,11 @@ class UsersController < ApplicationController
     @user.institution_id = params[:user][:institution_id]
     @user.status = 'Under Review'
     if @user.save
+      @super_users = User.joins(:role).where('roles.name' =>'Super-Administrator');
+      @super_users.each do |super_user|
+        prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, "New account Request")
+        prepared_mail.deliver
+      end
       flash[:success] = "User signup for \"#{@user.name}\" has been successfully requested. "
       redirect_to '/instructions/home'
     else

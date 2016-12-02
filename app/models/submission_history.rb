@@ -1,5 +1,6 @@
 class SubmissionHistory < ActiveRecord::Base
   belongs_to :team
+  validates_uniqueness_of :submitted_detail, scope: [:team_id, :submitted_at]
 
   def self.create(team, link)
     # for file, the link will be? - put this as default condition
@@ -27,7 +28,7 @@ class SubmissionHistory < ActiveRecord::Base
     end
   end
 
-  def get_submitted_at_time
+  def get_submitted_at_time(link)
     return Time.current
   end
 

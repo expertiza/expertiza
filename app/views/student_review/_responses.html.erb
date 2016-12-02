@@ -148,9 +148,9 @@
     element = element + '<div class="popup-head">';
     element = element + '<div class="popup-head-left"><a> &#9729;</a>'+ name +'</div>';
     element = element + '<div class="popup-head-right"><a href="javascript:close_popup(\''+ id +'\');">&#10005;</a></div>';
-    element = element + '<div style="clear: both"></div></div><div class="popup-messages" id="'+ id +"messages"+'">'+'</div></div>';
+    element = element + '<div style="clear: both"></div></div><div class="popup-messages" id="'+"messages"+ id+'">'+'</div></div>';
     $( "body" ).append( element);
-    document.getElementById(id+"messages").appendChild(document.getElementById(id+"partial"))
+    document.getElementById("messages"+id).appendChild(document.getElementById("partial"+id))
 
 
 
@@ -246,7 +246,7 @@
                       <% if map.type.to_s == "ReviewResponseMap"%>
                       <% if (!map.chat.nil?) %>
                       <div id="messages" class="hidden">
-                            <div id="<%= "#{title} #{review_no}" %>partial"  >
+                            <div id="partial<%= "#{review_no}" %>"  >
                               <%= sync partial: "message_row", collection: Message.by_chat(map.chat) %>
                               <%= sync_new partial: "message_row", resource: Message.new, scope: Message.by_chat(map.chat) %>
                               <div class="popup-bottom">
@@ -259,7 +259,7 @@
                           <% end %>
                           <%end %>
 
-                      <a href="javascript:register_popup('<%= "#{title} #{review_no}" %>', '<%= "#{title} #{review_no}" %>' );">
+                      <a href="javascript:register_popup('<%= "#{review_no}" %>', '<%= "#{review_no}" %>' );">
                         <span>Chat</span>
                       </a>
                     </td>
@@ -284,7 +284,7 @@
                       <% if map.type.to_s == "ReviewResponseMap"%>
                       <% if (!map.chat.nil?) %>
                       <div id="messages" class="hidden">
-                            <div id="<%= "#{title} #{review_no}" %>partial"  >
+                            <div id="partial<%= "#{review_no}" %>"  >
                               <%= sync partial: "message_row", collection: Message.by_chat(map.chat) %>
                               <%= sync_new partial: "message_row", resource: Message.new, scope: Message.by_chat(map.chat) %>
                               <div class="popup-bottom">
@@ -297,7 +297,7 @@
                           <% end %>
                           <%end %>
 
-                      <a href="javascript:register_popup('<%= "#{title} #{review_no}" %>', '<%= "#{title} #{review_no}" %>' );">
+                      <a href="javascript:register_popup('<%= "#{review_no}" %>', '<%= "#{review_no}" %>' );">
                         <span>Chat</span>
                       </a>
                     </td>

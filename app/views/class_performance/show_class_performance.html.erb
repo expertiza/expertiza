@@ -1,2 +1,17 @@
-<h1> Class Performance Chart <h1>
+<h1> Details for Assignment: <%= Assignment.find_by(id: params[:id]).name %> </h1>
 <%= image_tag("/assets/class_performance/chart.png", :alt => "Image missing") %>
+
+<table border="1">
+  <tr>
+    <td><b>Question ID</b></td>
+    <td><b>Question text</b></td>
+  </tr>
+  <% params[:class_performance][:criterias].each do |question| %>
+  <% if question.present? %>
+  <tr>
+    <td><%= question %></td>
+    <td><%= Question.find_by(id: question).txt %></td>
+  </tr>
+  <% end %>
+  <% end %>
+</table>

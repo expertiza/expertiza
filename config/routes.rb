@@ -408,6 +408,7 @@ Expertiza::Application.routes.draw do
   resources :student_review do
     collection do
       get :list
+      get :grouplist
     end
   end
 

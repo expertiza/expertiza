@@ -32,36 +32,25 @@
         <% if @student.group.assignment.isAnonymous.nil?|| @student.group.assignment.isAnonymous == true%>
             <th style="text-align:center;"><%= "Member" %>&nbsp;<%=i%>&nbsp;</th>
         <% elsif !@student.group.assignment.isAnonymous%>
-            <th style="text-align:center;"><td><%= member.user.name %></td>
+            <td><%= member.user.name %></td>
             <td><%= member.user.fullname %></td>
-            <td><%= member.user.email %></td></th>
+            <td><%= member.user.email %></td>
         <% end %>
 
 
         <!--if you can review a groupmate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
-        <% if @groupmate_review_allowed %>
-          <% if @student.assignment.questionnaires.find_by_type('GroupmateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
 
-            <% map = GroupmateReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', @student.id, member.id]).first
-            if map.nil?
-              map = GroupmateReviewResponseMap.create(:reviewer_id => @student.id, :reviewee_id => member.id, :reviewed_object_id => @student.assignment.id)
-            end
-            review = map.response.last
-            if review.nil? %>
+        <% if member.user.id != @participant.user_id  %>
             <td>
-              <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :return => "groupmate"} %>
+              <%= link_to "Review",{:controller => 'student_review', :action => 'grouplist', :id => @participant.id, :student_id => member.user.id} %>
             </td>
-          <% else %>
-            <td>
-              <%= link_to "View", {:controller => 'response', :action => 'view', :id => review.id} %>
-              &nbsp;&nbsp;
-              <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "groupmate"} %>
-            </td>
-          <% end %>
         <% end %>
+
+
+
       <% end %>
     </tr>
-  <% end %>   <!--end group member content-->
+  <!--end group member content-->
     <tr>
       <td colspan="3">
         <br/>

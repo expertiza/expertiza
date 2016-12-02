@@ -27,8 +27,14 @@ class SubmittedContentController < ApplicationController
     @can_submit = true
     #Get timeline entries from submission_histories table
     @submission_history = SubmissionHistory.where(team: @participant.team).order(:submitted_at)
-    @due_dates = DueDate.where(assignment_id: @assignment.id)
-
+    @timeline = Hash.new()
+    @submission_history.each do |submission|
+      @timeline[submission.submitted_at]={'title' => submission.type+' '+submission.action, 'description' => submission.submitted_detail}
+    end
+    @assignment.due_dates do |due_date|
+      @timeline[due_date.due_at]={'title' => ' Due Date ', 'description' => due_date.deadline_type.name+' Deadline'}
+    end
+     
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
   end
 

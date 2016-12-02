@@ -11,7 +11,7 @@
 <% end %>
 
 <%= render partial: 'submitted_content/submitted_files', locals: {participant: participant, stage: @stage, origin: ''} %>
-<%= render partial: 'submitted_content/submission_history', locals: {submission_history: @submission_history,assignment: @assignment, stage: @stage, origin: ''} %>
+<%= render partial: 'submitted_content/submission_history', locals: {timeline: @timeline, stage: @stage, origin: ''} %>
 
 <% if @assignment.require_quiz? %>
   <!-- Setting the t_id for team assignments. The t_id should be not be nil because when the user does not have team, "your work" is unclickable-->

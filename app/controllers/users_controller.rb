@@ -229,7 +229,7 @@ class UsersController < ApplicationController
     @user = RequestedUser.new(user_params)
     @user.institution_id = params[:user][:institution_id]
     @user.status = 'Under Review'
-    if @user.save
+    if verify_recaptcha(model: @user) && @user.save
       @super_users = User.joins(:role).where('roles.name' =>'Super-Administrator');
       @super_users.each do |super_user|
         prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, "New account Request")

@@ -11,7 +11,7 @@ class GithubRepoSubmissionHistory < GithubSubmissionHistory
     link_path = uri.path
     git_user_details = link_path.split("/")
     github = Github.new
-    a = github.repos git_user_details[1], git_user_details[2]
+    a = github.repos.get git_user_details[1], git_user_details[2]
     return a.pushed_at
   end
 end

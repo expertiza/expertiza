@@ -33,6 +33,7 @@ class Assignment < ActiveRecord::Base
   validates_presence_of :name
   validates_uniqueness_of :name, scope: :course_id
 
+  after_save :record_submission
   REVIEW_QUESTIONNAIRES = {author_feedback: 0, metareview: 1, review: 2, teammate_review: 3}.freeze
   #  Review Strategy information.
   RS_AUTO_SELECTED = 'Auto-Selected'.freeze
@@ -40,7 +41,6 @@ class Assignment < ActiveRecord::Base
   REVIEW_STRATEGIES = [RS_AUTO_SELECTED, RS_INSTRUCTOR_SELECTED].freeze
 
   DEFAULT_MAX_REVIEWERS = 3
-  after_save :record_submission
   DEFAULT_MAX_OUTSTANDING_REVIEWS = 2
 
   def self.max_outstanding_reviews

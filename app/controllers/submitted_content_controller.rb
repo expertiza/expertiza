@@ -28,9 +28,8 @@ class SubmittedContentController < ApplicationController
     #create timeline for generalized map to just loop in the html
     @timeline = Hash.new()
     #Get timeline entries from submission_histories table
-    @submission_history = SubmissionHistory.where(team: @participant.team).order(:submitted_at)
+    @submission_history = SubmissionHistory.where(team: @participant.team.id).order(:submitted_at)
     #reviews and feedbacks
-    
     @reviews = ResponseMap.where(reviewee_id: @participant.team.id)
     if !@reviews.nil?
       @reviews.each do |review|
@@ -45,7 +44,7 @@ class SubmittedContentController < ApplicationController
       @timeline[submission.submitted_at]={:heading => submission.type+' '+submission.action, :description => submission.submitted_detail}
     end
     @assignment.due_dates.each do |due_date|
-      @timeline[due_date.due_at]={:heading => ' Due Date ', :description => due_date.deadline_type.name+' Deadline'}
+      @timeline[due_date.due_at]={:heading => ' Due Date ', :description => due_date.deadline_type.name+' deadline'}
     end
 
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))

@@ -36,7 +36,7 @@
     <tr>
       <td>
         <%= form_tag :action => 'add_new_questions', :id => params[:id], :questionnaire_type => params[:model], :private => params[:private] do %>
-          <%= submit_tag 'Add' %>
+          <%= submit_tag 'Add', :id=>"addQuestionBtn" %>
           <%= text_field 'question', 'total_num', :size => 1, :value => "1" %> more 
           <%= select "question", "type", 
               {"Criterion" =>"Criterion",
@@ -76,7 +76,26 @@
 	 </tr>
 	 <% i = 1 %>
 	 <%questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }%>
-	 <%= questions.length %>
+
+    <% jsonData = Array.new %>
+    <% for @question in questions %>
+      <% jsonObj = Hash.new %>
+      <% jsonObj["type"] = @question.type %>
+      <% jsonObj["weight"] = @question.weight %>
+      <% jsonObj["size"] = @question.size %>
+      <% jsonObj["txt"] = @question.txt %>
+      <% jsonObj["questionnaire_id"] = @question.questionnaire_id %>
+      <% jsonObj["seq"] = @question.seq %>
+      <% jsonObj["alternatives"] = @question.alternatives %>
+      <% jsonObj["max_label"] = @question.max_label %>
+      <% jsonObj["min_label"] = @question.min_label %>
+      <% jsonObj["break_before"] = @question.break_before %>
+      <% jsonData.push(jsonObj) %>
+    <% end %>
+
+    <%= content_tag :div, class: "questions_class", data: {questions: jsonData} do %>
+    <% end %>
+
 	 <% for @question in questions %>
              <%=@question.edit(i)%>
              <% i += 1 %>

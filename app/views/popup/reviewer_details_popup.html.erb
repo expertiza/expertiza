@@ -29,7 +29,11 @@
     <% sum_time = 0 %>
     <% links = ResponseTime.where(map_id: map_id, round: round, link: link) %>
     <% links.each do |link_time| %>
-        <% individual_time = (link_time.end - link_time.start)/60 %>
+        <% if link_time.end.nil? %>
+            <% individual_time = 0 %>
+        <% else %>
+            <% individual_time = (link_time.end - link_time.start)/60 %>
+        <% end %>
         <% sum_time = individual_time + sum_time %>
     <% end %>
     <% return sum_time %>
@@ -80,15 +84,16 @@
             <td><%= responsetime_entry.link %></td>
             <% individual_link_time = link_time(responsetime_entry.map_id,responsetime_entry.round,responsetime_entry.link) %>
             <% map_total_time = map_total_time + individual_link_time %>
+
             <td align="center"><%= sprintf("%.2f",individual_link_time) %></td>
             </tr>
         <% end %>
         <% @count=@count+1 %>
       <%end %>
-      <% reviewee_list << @reviewee_id %>
-      <% total_time_list << map_total_time %>
-      <%reviewee_count=reviewee_count+1%>
     <% end%>
+    <% reviewee_list << @reviewee_id %>
+    <% total_time_list << map_total_time.round(2) %>
+    <% reviewee_count = reviewee_count+1%>
   <% end %>
 <% end %>
 </table>

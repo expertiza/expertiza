@@ -7,17 +7,17 @@
           </div>
           <div style="display:inline-block;width:100%;overflow-y:auto;">
             <ul class="timeline timeline-horizontal">
-              <% @timeline.each_pair do |timestamp, key| %>
+              <% @timeline.each_pair do |key, timestamp| %>
               <%# Display timestamps from timeline hash! %>
                 <li class="timeline-item">
                   <div class="timeline-badge primary"><i class="glyphicon glyphicon-check"></i></div>
                   <div class="timeline-panel">
                     <div class="timeline-heading">
-                      <h4 class="timeline-title"><%= timestamp.title %></h4>
+                      <h4 class="timeline-title"><%= timestamp[:title] %></h4>
                       <p><small class="text-muted"><i class="glyphicon glyphicon-time"></i> <%= key %></small></p>
                     </div>
                     <div class="timeline-body">
-                      <p><%= timestamp.description %></p>
+                      <p><%= timestamp[:description] %></p>
                     </div>
                   </div>
                 </li>

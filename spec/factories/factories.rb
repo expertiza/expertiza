@@ -352,4 +352,10 @@ FactoryGirl.define do
     round 1
     is_submitted false
   end
+
+  factory :simicheck_comparison, class: SimicheckComparison do
+    comparison_key nil
+    file_type nil
+    assignment_id nil
+  end
 end

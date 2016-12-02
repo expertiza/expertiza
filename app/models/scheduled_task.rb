@@ -227,17 +227,42 @@ class ScheduledTask
         hyperlinks = assignment_team.hyperlinks
         link_count = 1 #to keep track of the number of hyperlinks submitted
         for link in hyperlinks
-          response = RestClient.get(link)
-          if(response.code == 200)
-            page = response.body
-            f = File.open("/tmp/"+assignment_team.name+"#{link_count}"+".html", "w+")
+          if(link.include?('github.com'))
+            user = link.partition('.com/').last.split('/')[0]
+            repo = link.partition('.com/').last.split('/')[1]
+            client = Octokit::Client.new(:login=>'ssn0602',:password=>'a1b2c3d4')
+            path = user + '/' + repo
+            assignment_commits = client.commits_between(path,(assignment.due_dates-7).to_s,assignment.due_dates.to_s)
+            l = assignment_commits.length
+            commit_files = Array.new(l)
+            0.upto(l-1).each {  |i|
+              commit_json = RestClient.get(commit_url)
+              commit_hash = JSON.parse(commit_json)
+              num_of_files = commit_hash["files"]
+              0.upto(num_of_files -1).each { |j|
+                if (commit_hash["files"][j] != nil)
+                   commited_patch = commit_hash["files"][j]["patch"]
+                   f = File.open("/tmp/"+assignment_team.name+"#{link_count}"+".txt", "a")
+                   f.write(commited_patch)
+                   f.close
+                   f = File.open("/tmp/"+assignment_team.name+"#{link_count}"+".txt", "r")
+                   comparison_github.send_file_to_simicheck(f)
+                end
+              }
+            }
 
-            f.write(page)
-            f.close
-            f = File.open("/tmp/"+assignment_team.name+"#{link_count}"+".html", "r")
-            comparison_html.send_file_to_simicheck(f)
-            link_count += 1
-            #f.close
+          else
+            response = RestClient.get(link)
+            if(response.code == 200)
+              page = response.body
+              f = File.open("/tmp/"+assignment_team.name+"#{link_count}"+".html", "w+")
+              f.write(page)
+              f.close
+              f = File.open("/tmp/"+assignment_team.name+"#{link_count}"+".html", "r")
+              comparison_html.send_file_to_simicheck(f)
+              link_count += 1
+              #f.close
+            end
           end
         end
       end

@@ -62,13 +62,6 @@ class ScheduledTask
         drop_outstanding_reviews
       end
       if (self.deadline_type == "compare_files_with_simicheck")
-        #first check if there is another scheduled task with later deadline if yes then do not run this task
-
-
-          if SimicheckComparison.find(self.assignment_id)
-            return
-          end
-
         compare_files_with_simicheck # to all reviewers
       end
     end
@@ -232,15 +225,18 @@ class ScheduledTask
     for assignment_team in assignment_teams
       if assignment_team.has_submissions?
         hyperlinks = assignment_team.hyperlinks
+        link_count = 1 #to keep track of the number of hyperlinks submitted
         for link in hyperlinks
           response = RestClient.get(link)
           if(response.code == 200)
             page = response.body
-            f = File.open("/tmp/"+assignment_team.name+".html", "w+")
+            f = File.open("/tmp/"+assignment_team.name+"#{link_count}"+".html", "w+")
+
             f.write(page)
             f.close
-            f = File.open("/tmp/"+assignment_team.name+".html", "r")
+            f = File.open("/tmp/"+assignment_team.name+"#{link_count}"+".html", "r")
             comparison_html.send_file_to_simicheck(f)
+            link_count += 1
             #f.close
           end
         end

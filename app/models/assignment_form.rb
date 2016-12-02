@@ -41,7 +41,7 @@ class AssignmentForm
     # delete the old queued items and recreate new ones if the assignment has late policy.
     #it will add a simicheck job in queue for this assignment
     #function will be called only if the assignment has enabled the simicheck feature
-    if(Assignment.find(@assignment.id).simicheck)
+    if(@assignment.simicheck)
       add_simicheck_to_delayed_queue
     end
     if attributes[:due_date] and !@has_errors and has_late_policy
@@ -146,7 +146,7 @@ class AssignmentForm
 
 
   def add_simicheck_to_delayed_queue
-    #add_to_delayed_queue
+    delete_from_delayed_queue
     duedates = AssignmentDueDate.where(parent_id: @assignment.id)
     duedates.each do |due_date|
       deadline_type = DeadlineType.find(due_date.deadline_type_id).name

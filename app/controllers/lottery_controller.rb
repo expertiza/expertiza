@@ -25,7 +25,7 @@ class LotteryController < ApplicationController
       teamed_students[course_id] = [] if teamed_students[course_id].nil?
       history = teamed_students[course_id]
       current_team = StudentTask.teamed_students(User.find(user_id),course_id,false, nil, assignment.id)[course_id]
-      if !current_team.nil? and current_team.size > 1
+      if !current_team.nil? and current_team.size >= 1
         users_in_teams << current_team.dup
       end
 
@@ -81,7 +81,9 @@ class LotteryController < ApplicationController
       create_new_teams_for_bidding_response(teams, assignment)
       run_intelligent_bid
     end
-    redirect_to controller: 'tree_display', action: 'list'
+    if(params[:test_run].nil? || params[:test_run] == false)
+      redirect_to controller: 'tree_display', action: 'list'
+    end
   end
 
   def swapping_team_members_with_history(data, max_team_size)

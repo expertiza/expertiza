@@ -27,7 +27,7 @@
 
 <% def link_time(map_id, round, link) %>
     <% sum_time = 0 %>
-    <% links = Responsetime.where(map_id: map_id, round: round, link: link) %>
+    <% links = ResponseTime.where(map_id: map_id, round: round, link: link) %>
     <% links.each do |link_time| %>
         <% individual_time = ((link_time.end - link_time.start)).to_i %>
         <% sum_time = individual_time + sum_time %>
@@ -56,7 +56,7 @@
   <% @response_maps.each do |map| %>  <!-- for reviewee-->
     <% map_total_time = 0 %>
     <% (1..@number_of_rounds).each do |each_round| %>  <!-- for rounds-->
-      <% @responsetime_match = Responsetime.where(map_id: map.id, round:each_round)%>
+      <% @responsetime_match = ResponseTime.where(map_id: map.id, round:each_round)%>
       <% @reviewed_object_id = map.reviewed_object_id %>
       <% @reviewee_id = map.reviewee_id %>
 

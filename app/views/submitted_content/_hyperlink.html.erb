@@ -62,7 +62,7 @@
         var d = new Date();
         $.ajax({
             type:'POST',
-            url:'/responsetime/record_end_time',
+            url:'/response_time/record_end_time',
             data:$.param({ responsetime:{map_id: <%= map_id %>, round: <%= round %> , end: ISODateString(d)}})
         })
     });
@@ -75,7 +75,7 @@
               type:'POST',
               dataType: "json",
               async:false,
-              url:'/responsetime/record_end_time',
+              url:'/response_time/record_end_time',
               data:$.param({ responsetime:{map_id: <%= map_id %>, round: <%= round %> , end: ISODateString(d)}}),
               success:function(json){ 
                 var la=JSON.parse(JSON.stringify(json));
@@ -132,7 +132,7 @@
   }
 
   function stopLinkTimers(){
-    //update the end times in the responsetime db and get the list of open links
+    //update the end times in the response_time db and get the list of open links
     endTime(function(d) {
           linksToUpdate=d
     });

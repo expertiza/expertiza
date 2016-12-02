@@ -1,4 +1,4 @@
-class ResponsetimeController < ApplicationController
+class ResponseTimeController < ApplicationController
   def action_allowed?
     true
   end
@@ -8,23 +8,23 @@ class ResponsetimeController < ApplicationController
   #2. start and end time is nil. Means fresh new link
   #3. start and end time is not nil. Means fresh new link
   def record_start_time
-    @responsetime_match = Responsetime.where(map_id: params[:responsetime][:map_id], round: params[:responsetime][:round], link: params[:responsetime][:link])
+    @responsetime_match = ResponseTime.where(map_id: params[:response_time][:map_id], round: params[:response_time][:round], link: params[:response_time][:link])
     if @responsetime_match
       @responsetime_match.each do |responsetime_entry|
         if responsetime_entry.end.nil?
-          responsetime_entry.update_attribute('end', params[:responsetime][:start])
+          responsetime_entry.update_attribute('end', params[:response_time][:start])
       end
       end
     end #start and end time is nil. Means fresh new link
-    @responsetime = Responsetime.new(responsetime_params)
+    @responsetime = ResponseTime.new(responsetime_params)
     @responsetime.save
     render :nothing => true
   end
 
   def record_end_time
-    @data= params.require(:responsetime)
+    @data= params.require(:response_time)
     @linkArray=Array.new
-    @responsetime_match = Responsetime.where(map_id: @data[:map_id], round: @data[:round])
+    @responsetime_match = ResponseTime.where(map_id: @data[:map_id], round: @data[:round])
     @responsetime_match.each do |responsetime_entry|
       if responsetime_entry.end.nil?
         @linkArray.push(responsetime_entry.link)
@@ -38,6 +38,6 @@ end
 
 
  def responsetime_params
-   params.require(:responsetime).permit(:map_id, :round, :link, :start)
+   params.require(:response_time).permit(:map_id, :round, :link, :start)
  end
  end

@@ -259,7 +259,7 @@ function startTime(map_id, round, link){
     var timeoutCount=0;
     $.ajax({
         type:'POST',
-        url:'/responsetime/record_start_time',
+        url:'/response_time/record_start_time',
         data:$.param({ responsetime:{map_id: map_id, round: round, link: link , start: ISODateString(d)}})
 })
 }

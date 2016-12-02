@@ -1,7 +1,5 @@
 Expertiza::Application.routes.draw do
 
-  get 'responsetime/new'
-
   resources :submission_records
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
@@ -299,7 +297,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :responsetime do
+  resources :response_time do
     collection do
       post :record_start_time
       post :record_end_time

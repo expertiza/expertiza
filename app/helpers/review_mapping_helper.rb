@@ -161,7 +161,7 @@ module ReviewMappingHelper
       (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@time_spent_round_" + round.to_s,0) }
       (1..@assignment.num_review_rounds).each do |round|
         sum_time = 0
-        @response_times = Responsetime.where(map_id: map_id, round: round)
+        @response_times = ResponseTime.where(map_id: map_id, round: round)
         @response_times.each do |link_time|
           individual_time = (link_time.end - link_time.start)/60
           sum_time = individual_time + sum_time

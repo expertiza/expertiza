@@ -45,9 +45,7 @@ class ReviewMappingController < ApplicationController
 
   def drop_review
     map_id = params[:map_id]
-    unless Response.exists?(map_id: map_id)
-      ReviewResponseMap.find(map_id).destroy
-    end
+    ReviewResponseMap.find(map_id).destroy
     redirect_to controller: 'student_review', action: 'list', id: params[:id]
   end
 

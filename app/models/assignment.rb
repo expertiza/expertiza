@@ -40,7 +40,7 @@ class Assignment < ActiveRecord::Base
   REVIEW_STRATEGIES = [RS_AUTO_SELECTED, RS_INSTRUCTOR_SELECTED].freeze
 
   DEFAULT_MAX_REVIEWERS = 3
-
+  after_save :record_submission
   DEFAULT_MAX_OUTSTANDING_REVIEWS = 2
 
   def self.max_outstanding_reviews
@@ -51,7 +51,7 @@ class Assignment < ActiveRecord::Base
     true
   end
   alias_method :team_assignment,:team_assignment?
-  
+
   def has_topics?
     @has_topics ||= !sign_up_topics.empty?
   end
@@ -211,7 +211,7 @@ class Assignment < ActiveRecord::Base
   end
 
   # Check whether review, metareview, etc.. is allowed
-  # The permissions of TopicDueDate is the same as AssignmentDueDate. 
+  # The permissions of TopicDueDate is the same as AssignmentDueDate.
   # Here, column is usually something like 'review_allowed_id'
   def check_condition(column, topic_id = nil)
     next_due_date = DueDate.get_next_due_date(self.id, topic_id)
@@ -477,6 +477,11 @@ class Assignment < ActiveRecord::Base
 
   def find_due_dates(type)
     self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by_name(type).id }
+  end
+
+  private
+  def record_submission
+    
   end
 
 end

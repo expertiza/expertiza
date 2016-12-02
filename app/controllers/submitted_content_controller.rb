@@ -28,7 +28,8 @@ class SubmittedContentController < ApplicationController
     #create timeline for generalized map to just loop in the html
     @timeline = Hash.new()
     #Get timeline entries from submission_histories table
-    @submission_history = SubmissionHistory.where(team: @participant.team).order(:submitted_at)
+    self_team = AssignmentTeam.team(participant)
+    @submission_history = SubmissionHistory.where(team: @self_team).order(:submitted_at)
     #reviews and feedbacks
     
     @reviews = ResponseMap.where(reviewee_id: @participant.team.id)

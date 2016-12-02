@@ -1,10 +1,15 @@
+<% require 'json' %>
+<% a = topic.to_json %>
+
+
+
 <% if is_suggested_topic == false %>
   <% if ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include? current_user_role?.name and params[:controller] != 'sign_up_sheet' %>
   <!--These roles ('Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator') can act as normal students if they become participants of one assignment and the controller is ‘sign_up_sheet’ controller; otherwise, they act as normal roles.-->
       <td align="center">
-        <%= link_to image_tag('edit_icon.png', :border => 0, :title => 'Edit Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'edit', :id => topic.id %>
+        <%= image_tag('edit_icon.png', :border => 0, :title => 'Edit Topic', :align => 'middle', :onClick=>"handleEdit(#{a})" ) %>
         <%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Delete Topic', :align => 'middle'), sign_up_sheet_path(:id=>topic.id, :assignment_id => params[:id]), method: :delete, confirm: 'Are you sure?' %>
-  <%elsif @show_actions %>
+    <% elsif @show_actions %>
       <% action_symbol_added = false %>
       <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
           <% for selected_topic in @selected_topics %>
@@ -69,3 +74,7 @@
     <% end %>
   </td>
 <% end %>
+
+<script>
+  function handleEdit(a) { inPLaceEditTopic(a); }
+</script>

@@ -18,6 +18,7 @@
       <% for topic in @sign_up_topics %>
         <tr>
           <%= render :partial => '/sign_up_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
+          <div id="test" />
         </tr>
         <% i=i+1 %>
       <% end %>
@@ -27,7 +28,7 @@
     <div class="flash_note"><%= "Signup topics have not yet been created." %></div>
   <% end %>
 
-<% session[:return_to] = request.url %>
+<%# session[:return_to] = request.url %>
 <br/><br/>
 <%= render :partial => '/sign_up_sheet/add_topics' %>
 

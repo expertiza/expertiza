@@ -7,7 +7,7 @@
           </div>
           <div style="display:inline-block;width:100%;overflow-y:auto;">
             <ul class="timeline timeline-horizontal">
-              <% @timeline.each_pair do |key, timemark| %>
+              <% @timeline.sort.each_pair do |key, timemark| %>
               <%# Display timestamps from timeline hash! %>
                 <li class="timeline-item">
                   <div class="timeline-badge primary"><i class="glyphicon glyphicon-check"></i></div>

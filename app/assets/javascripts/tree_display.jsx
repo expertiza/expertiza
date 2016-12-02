@@ -777,36 +777,45 @@ moreContent.push(
   })
 
   var ContentTable = React.createClass({
+
     getInitialState: function() {
       return {
-        expandedRow: []
+          expandedRow: [],
+          hide: true
       }
     },
-    handleExpandClick: function(id, expanded,newParams) {
-      if (expanded) {
-        this.setState({ 
-          expandedRow: this.state.expandedRow.concat([id])
-        });
-        if(this.props.dataType!='assignment') {
-            _this = this;
-            jQuery.post('/tree_display/get_children_node_2_ng',
-                {
-                    reactParams2: newParams
-                },
-                function (data) {
-                    _this.props.data[id.split("_")[2]]['children'] = data;
-                    _this.forceUpdate();
-                }, 'json');
-        }
-      } else {
-        var index = this.state.expandedRow.indexOf(id)
-        if (index > -1) {
-          this.setState({
-            expandedRow: React.addons.update(this.state.expandedRow, {$splice: [[index, 1]]})
-          })
-        }
-      }
+
+    toggle: function(){
+        this.setState({hide: !this.state.hide});
     },
+
+    handleExpandClick: function(id, expanded,newParams){
+            if (expanded) {
+
+                this.setState({
+                    expandedRow: this.state.expandedRow.concat([id])
+                });
+                if (this.props.dataType != 'assignment') {
+                    _this = this;
+                    jQuery.post('/tree_display/get_children_node_2_ng',
+                        {
+                            reactParams2: newParams
+                        },
+                        function (data) {
+                            _this.props.data[id.split("_")[2]]['children'] = data;
+                            _this.forceUpdate();
+                        }, 'json');
+                }
+            } else {
+                var index = this.state.expandedRow.indexOf(id)
+                if (index > -1) {
+                    this.setState({
+                        expandedRow: React.addons.update(this.state.expandedRow, {$splice: [[index, 1]]})
+                    })
+                }
+            }
+    },
+
     handleSortingClick: function(colName, order) {
       this.props.onUserClick(colName, order)
     },

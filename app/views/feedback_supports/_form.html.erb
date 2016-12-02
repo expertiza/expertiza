@@ -14,7 +14,7 @@
           <%= text_field 'feedback', 'user_id', :maxlength=>"25" , :value => @user_email, :readonly=>true%></p>
       <% end %>
 
-      <p><label for="feedback_supports_title">Title</label> (Mandatory field.)
+      <p><label for="feedback_supports_title">Subject</label> (Mandatory field.)
         <img src="/assets/info.png" title='The max character limit is 160.'>
         <br/>
         <%= text_field 'feedback_support', 'title', :maxlength=>"80" %></p>
@@ -24,13 +24,14 @@
 
 
       <p><label>CAPTCHA</label>
+        <script src="https://www.google.com/recaptcha/api.js"></script>
       <div class="g-recaptcha" data-sitekey="6LdQig0UAAAAAHx0HjYG_QHY9hsGQMiA0if1UDnd"></div>
       <%= recaptcha_tags %>
       <br>
       <% if session[:extra].nil? %>
           <%= submit_tag "Submit" %>
       <% else %>
-          <%= submit_tag "Submit" %>
+          <%= submit_tag "Submit" , :disabled => session[:extra][:value] >5 && session[:extra][:expires]> Time.now %>
       <%end%>
       <div class="actions">
       </div>

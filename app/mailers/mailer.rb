@@ -23,7 +23,7 @@ class Mailer < ActionMailer::Base
   end
 
   def sync_message(defn)
-    @body = defn[:body]
+    @body = defn[:body][:body_text]
     @type = defn[:body][:type]
     @obj_name = defn[:body][:obj_name]
     @first_name = defn[:body][:first_name]

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161111210744) do
+ActiveRecord::Schema.define(version: 20161202220712) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -465,8 +465,8 @@ ActiveRecord::Schema.define(version: 20161111210744) do
     t.string  "topic_identifier", limit: 10
     t.integer "micropayment",     limit: 4,     default: 0
     t.integer "private_to",       limit: 4
-    t.string  "description",      limit: 255
-    t.string  "link",             limit: 255
+    t.text    "description",      limit: 65535
+    t.text    "link",             limit: 65535
   end
 
   add_index "sign_up_topics", ["assignment_id"], name: "fk_sign_up_categories_sign_up_topics", using: :btree

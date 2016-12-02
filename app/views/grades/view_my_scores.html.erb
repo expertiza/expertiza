@@ -1,5 +1,17 @@
 <H1>Score for <%= @assignment.name %></H1>
+<!--Search Functionality-->
 
+<!--<%= form_tag(grades_path, :method => "get", id: "search-form") do %>-->
+    <%= text_field_tag :search, params[:search], placeholder: "Search Content" %>
+    <%= submit_tag "Search" %>
+<!--<% end %>-->
+<% if @grades.present? %>
+    <%= render @grades %>
+<% else %>
+    <p>There is no content containing the term(s) <%= params[:search] %>.</p>
+<% end %>
+
+<!--Search Ends here-->
 
 <div id="tabs">
   <ul>

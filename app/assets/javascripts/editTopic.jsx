@@ -16,6 +16,12 @@ function inPLaceEditTopic(a) {
 
 var EditForm = React.createClass({
 
+    componentWillReceiveProps(nextProps){
+        var updatedTopic = this.state.topic;
+        updatedTopic.topic_identifier = nextProps.topicIdentifier;
+        this.setState({topic: updatedTopic});
+    },
+
     getInitialState: function(){
       return {
           topic:{
@@ -90,10 +96,10 @@ var EditForm = React.createClass({
         return(
 
             <div style={divStyle}>
-            <p>Topic Id: <input type="text" defaultValue={this.props.topicIdentifier} onChange={this.handleTopicChange}/>
-                &nbsp;&nbsp;Topic Name: <input type="text" defaultValue={this.props.name} onChange={this.handleNameChange} />
-                &nbsp;&nbsp; Topic Category: <input type="text" defaultValue={this.props.category} onChange={this.handleCategoryChange} />
-                &nbsp;&nbsp; Number of Slots: <input type="number" defaultValue={this.props.maxChoosers} onChange={this.handleChoosersChange}/></p>
+            <p>Topic Id: <input type="text" value={this.state.topic.topic_identifier} onChange={this.handleTopicChange}/>
+                &nbsp;&nbsp;Topic Name: <input type="text" value={this.state.topic.topic_name} onChange={this.handleNameChange} />
+                &nbsp;&nbsp; Topic Category: <input type="text" value={this.state.topic.category} onChange={this.handleCategoryChange} />
+                &nbsp;&nbsp; Number of Slots: <input type="number" value={this.state.topic.max_choosers} onChange={this.handleChoosersChange}/></p>
                 <p><button onClick={this.handleUpdateTopic}>Update</button></p>
             </div>
         );

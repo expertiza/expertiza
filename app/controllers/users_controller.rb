@@ -219,6 +219,9 @@ class UsersController < ApplicationController
     @user.institution_id = params[:user][:institution_id]
     @user.status = 'Under Review'
     if @user.save
+      @users = User.joins(:roles).where(roles.name => 'Super-Administrator');
+      prepared_mail = MailerHelper.send_mail_to_user(@users, "A User has requested a new account.", "New account Request")
+      prepared_mail.deliver
       flash[:success] = "User signup for \"#{@user.name}\" has been successfully requested. "
       redirect_to '/instructions/home'
     else

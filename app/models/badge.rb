@@ -51,6 +51,7 @@ class Badge
 
 		if consistency_flag
 			badge_matrix[-1][4] = CONSISTENCY_BADGE_IMAGE.html_safe
+			
 		end	
 
 
@@ -66,6 +67,7 @@ class Badge
 		participants.each do |participant|
 			badge_matrix.push([false] * NUMBER_OF_BADGES)
 			
+
 			if not assignment.is_calibrated and participant.user.role.name=="Student"
 			# check for different badges
 

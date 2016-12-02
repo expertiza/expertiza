@@ -59,6 +59,7 @@ gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
 gem 'jquery-tablesorter'
 gem 'github_api'
+gem 'rufus-scheduler'
 
 group :development do
   gem 'daemons'

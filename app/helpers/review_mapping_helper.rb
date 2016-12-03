@@ -208,7 +208,10 @@ module ReviewMappingHelper
                 end
     css_class
   end
-
+  #This method will compute author feedbacks for given list of reviewers
+  #It will return a hash with key as reviewer id and round number and value will consist of average author feedback for
+  #particular round
+  #We will also return number of feedbacks for each round.
   def get_author_feedback_score_hash(assignment, reviewers)
 
     review_mapping_type = 'FeedbackResponseMap'
@@ -219,6 +222,7 @@ module ReviewMappingHelper
 
       does_assignment_have_varying_rubrics = true
 
+      #We will store all the review response ids for the particular round.
       authors, all_review_response_ids_round_one, all_review_response_ids_round_two, all_review_response_ids_round_three = FeedbackResponseMap.feedback_response_report(assignment.id, review_mapping_type)
 
     else
@@ -249,6 +253,7 @@ module ReviewMappingHelper
 
         reviewer_ids << r.id
 
+        #Retrieving all the response map of feedback for this reviewer
         review_mappings = FeedbackResponseMap.where(:reviewee_id => r.id, :type => review_mapping_type)
 
         if(!review_mappings.nil? && review_mappings.size > 0)
@@ -265,6 +270,8 @@ module ReviewMappingHelper
 
               next if response.nil?
 
+              #The following code will compute the total feedback score for each round. It will later find average of that score
+              #and store it in hash author_feedback_score
               if all_review_response_ids_round_one.include? m.reviewed_object_id
 
                 total_score[:round_1] += response.get_total_score
@@ -278,7 +285,6 @@ module ReviewMappingHelper
                 author_feedback_score[:max_score_round_2] = response.get_maximum_score if author_feedback_score[:max_score_round_2].blank?
 
               else
-
                 total_score[:round_3] += response.get_total_score
                 total_feedback[:round_3] += 1
                 author_feedback_score[:max_score_round_3] = response.get_maximum_score if author_feedback_score[:max_score_round_3].blank?

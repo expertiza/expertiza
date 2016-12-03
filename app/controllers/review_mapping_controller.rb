@@ -406,6 +406,7 @@ class ReviewMappingController < ApplicationController
 
       @author_feedback_score = get_author_feedback_score_hash(@assignment, @reviewers)
 
+      #params[:user][:metricFilter] will have a blank value by default. We will need to remove it before passing it to further views.
       @selected_metric_filters = (!params[:user].nil? && !params[:user][:metricFilter].blank?) ? params[:user][:metricFilter].reject(&:empty?) : ["Average Review Length"]
 
 
@@ -608,6 +609,7 @@ private
 
   private
 
+  #Returns an array of metric to be used for filtering in review report page.
   def get_metric_filter_option
     return ["Average Review Length", "Average Author Feedback", "Reviewer Summary", "Submitted File"]
   end

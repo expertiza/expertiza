@@ -329,7 +329,7 @@ FactoryGirl.define do
   end
 
   factory :chat, class: Chat do
-    review_response_map_id 1
+    assignment_team_id 1
 
   end
 

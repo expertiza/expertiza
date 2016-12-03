@@ -1,9 +1,7 @@
 class ReviewResponseMap < ResponseMap
-  has_one :chat , dependent: :destroy
   belongs_to :reviewee, class_name: 'Team', foreign_key: 'reviewee_id'
   belongs_to :contributor, class_name: 'Team', foreign_key: 'reviewee_id'
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
-  after_create :create_chat
 
   # In if this assignment uses "varying rubrics" feature, the sls
   # "used_in_round" field should not be nil
@@ -129,10 +127,7 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
-  def create_chat
-  @chat=self.build_chat
-  @chat.save
-  end
+
   
 
   private

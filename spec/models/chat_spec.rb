@@ -11,10 +11,10 @@ describe "validations" do
     expect(@chat).to be_valid
   end
 
-  it "The review_response_map_id of a chat is unique" do
+  it "The assignment_team_id of a chat is unique" do
 
 
-    expect(@chat).to validate_uniqueness_of(:review_response_map_id)
+    expect(@chat).to validate_uniqueness_of(:assignment_id)
 
   end
 

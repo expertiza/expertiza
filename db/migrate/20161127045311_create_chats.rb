@@ -2,7 +2,7 @@ class CreateChats < ActiveRecord::Migration
   def change
     create_table :chats do |t|
 
-      t.integer :review_response_map_id, :null => false,:references=>[:response_maps, :id]
+      t.integer :assignment_team_id, :null => false,:references=>[:teams, :id]
 
       t.timestamps null: false
 

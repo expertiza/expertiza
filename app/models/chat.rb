@@ -1,5 +1,5 @@
 class Chat < ActiveRecord::Base
-  belongs_to :response_map
+  belongs_to :team
   has_many :messages , :dependent => :delete_all
-  validates :review_response_map_id, uniqueness: true
+  validates :assignment_team_id, uniqueness: true
 end

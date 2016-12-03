@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161129220644) do
+ActiveRecord::Schema.define(version: 20161127234744) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -140,7 +140,7 @@ ActiveRecord::Schema.define(version: 20161129220644) do
   end
 
   create_table "chats", force: :cascade do |t|
-    t.integer  "review_response_map_id", limit: 4, null: false
+    t.integer  "assignment_team_id", limit: 4, null: false
     t.datetime "created_at",                       null: false
     t.datetime "updated_at",                       null: false
   end

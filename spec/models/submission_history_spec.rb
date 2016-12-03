@@ -65,10 +65,12 @@ describe SubmissionHistory do
       assignment_team = build(AssignmentTeam)
       assignment_team.submit_hyperlink("https://github.com/prerit2803/expertiza")
       puts assignment_team.hyperlinks
+      puts assignment_team.parent_id
+      puts assignment_team.assignment.id
       expect(LinkSubmissionHistory).to receive(:add_submission)
       expect(GithubRepoSubmissionHistory).to receive(:create)
       expect_any_instance_of(GithubRepoSubmissionHistory).to receive(:get_submitted_at_time)
-      LinkSubmissionHistory.add_submission(assignment_team.assignment.id)
+      LinkSubmissionHistory.add_submission(assignment_team.parent_id)
     end
   end
 end

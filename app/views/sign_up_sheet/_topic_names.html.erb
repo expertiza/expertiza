@@ -8,7 +8,7 @@
     <span class="inline" id="<%= i %>_show"><%= topic.topic_name %> </span>
 <% end %>
 <br/><%= topic.description.to_s[0..30]+'...'%>
-<a style="cursor: pointer" onclick="show_alert('<%= topic.description%>')">more...</a>
+<a style="cursor: pointer" onclick="show_alert('<%= topic.description%>')">more</a>
 <!--if 'Has teams' is not checked, the UI should not show the team name on the topic list.-->
 
 <div id="<%= i %>_myDiv">

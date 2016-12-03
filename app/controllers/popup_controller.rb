@@ -119,4 +119,9 @@ class PopupController < ApplicationController
     @user = User.find(@userid)
     @id = params[:assignment_id]
   end
+  # this can be called from "response_report" by clicking on the View Metrics.
+  def review_metrics_popup
+    @reviewerid = params[:reviewer_id]
+    @assignment_id = params[:assignment_id]
+  end
 end

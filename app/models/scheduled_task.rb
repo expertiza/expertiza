@@ -219,6 +219,8 @@ class ScheduledTask
   def compare_files_with_simicheck
     comparison_file = SimicheckComparison.create_simicheck_comparison(self.assignment_id,"file")
     comparison_html = SimicheckComparison.create_simicheck_comparison(self.assignment_id,"html")
+    comparison_gdoc = SimicheckComparison.create_simicheck_comparison(self.assignment_id,"gdoc")
+    comparison_github = SimicheckComparison.create_simicheck_comparison(self.assignment_id,"github")
     assignment = Assignment.find(self.assignment_id)
     assignment_teams = AssignmentTeam.where(['parent_id = ?', self.assignment_id])
 
@@ -262,7 +264,7 @@ class ScheduledTask
               f.write(page)
               f.close
               f = File.open("/tmp/"+assignment_team.name+"#{link_count}"+".docx", "r")
-              comparison_html.send_file_to_simicheck(f)
+              comparison_gdoc.send_file_to_simicheck(f)
               link_count += 1
               #f.close
             end

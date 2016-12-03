@@ -209,6 +209,8 @@ class ResponseController < ApplicationController
       redirect_to controller: 'assignments', action: 'edit', id: @map.response_map.assignment.id
     elsif params[:return] == "selfreview"
       redirect_to controller: 'submitted_content', action: 'edit', id: @map.response_map.reviewer_id
+    elsif params[:return] == "groupreview"
+      redirect_to controller: 'student_review', action: 'grouplist', id: @map.reviewer.id, student_id: AssignmentParticipant.find_by_user_id_and_assignment_id(TeamsUser.find_by_team_id(@map.reviewee.id).user_id,@map.reviewer.parent_id).id
     else
       redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
 

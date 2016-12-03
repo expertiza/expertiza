@@ -53,7 +53,11 @@ class StudentReviewController < ApplicationController
     # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
 
-    @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
+    @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id).where(reviewee_id: @student.team.id)
+    if @review_mappings.empty?
+      review_mapping = ReviewResponseMap.create(reviewee_id: @student.team.id, reviewer_id: @participant.id, reviewed_object_id: @participant.assignment.id)
+      @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id).where(reviewee_id: @student.team.id)
+    end
     # if it is an calibrated assignment, change the response_map order in a certain way
     @review_mappings = @review_mappings.sort_by {|mapping| mapping.id % 5 } if @assignment.is_calibrated == true
     @metareview_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)

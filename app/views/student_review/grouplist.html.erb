@@ -1,6 +1,6 @@
 <h2>Reviews for "<%= @assignment.name %>"</h2>
 <% if check_reviewable_topics(@assignment) or @assignment.get_current_stage(@topic_id) == "Finished" %>
-    <%= render :partial => 'responses', :locals => {:mappings => @review_mappings, :title => 'Review'} %>
+    <%= render :partial => 'group_responses', :locals => {:mappings => @review_mappings, :title => 'Review'} %>
     <% if @assignment.dynamic_reviewer_assignment? %>
         <%# if @num_reviews_in_progress == 0 %>
         <% if @num_reviews_in_progress < Assignment.max_outstanding_reviews %>
@@ -20,7 +20,7 @@
 
 <% if @assignment.metareview_allowed(@topic_id) or @assignment.get_current_stage() == "Complete" %>
     <h2>Metareviews for "<%= @assignment.name %>"</h2>
-    <%= render :partial => 'responses', :locals => {:mappings => @metareview_mappings, :title => 'Metareview'} %>
+    <%= render :partial => 'group_responses', :locals => {:mappings => @metareview_mappings, :title => 'Metareview'} %>
     <br/>
     <% if @assignment.review_assignment_strategy == Assignment::RS_AUTO_SELECTED %>
         <% if @num_metareviews_in_progress == 0 %>

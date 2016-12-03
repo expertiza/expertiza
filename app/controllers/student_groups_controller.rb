@@ -54,7 +54,7 @@ class StudentGroupsController < ApplicationController
                                SignUpTopic.find(current_group.topic).users_on_waiting_list
                              end
 
-    @groupmate_review_allowed = true if @student.assignment.find_current_stage == 'Finished' || @current_due_date && (@current_due_date.groupmate_review_allowed_id == 3 || @current_due_date.groupmate_review_allowed_id == 2) # late(2) or yes(3)
+    @groupmate_review_allowed = false
   end
 
   def create

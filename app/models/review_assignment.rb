@@ -9,17 +9,20 @@ module ReviewAssignment
     return nil if sign_up_topics.empty? # This is not a topic assignment
 
     teams = Team.where(:parent_id => assignment.id)
-    contributor_set = Array.new(nil)
+    contributor_set = nil
     teams.each do |team|
-      if(student.id == TeamsUser.where(:team_id => team.id).user_id)
-        contributor_set = Array.new(team)
+      if(student.id == TeamsUser.find_by_team_id(team.id).user_id)
+        contributor_set = team
       end
     end
 
     candidate_topics = Set.new
-    contributor_set.each do |contributor|
-      candidate_topics.add(signed_up_topic(contributor))
+    if !contributor_set.nil?
+      candidate_topics.add(signed_up_topic(contributor_set))
     end
+    # contributor_set.each do |contributor|
+    #   candidate_topics.add(signed_up_topic(contributor))
+    # end
     candidate_topics
 
   end

@@ -42,7 +42,7 @@
 
         <% if member.user.id != @participant.user_id  %>
             <td>
-              <%= link_to "Review",{:controller => 'student_review', :action => 'grouplist', :id => @participant.id, :student_id => member.user.id} %>
+              <%= link_to "Review",{:controller => 'student_review', :action => 'grouplist', :id => @participant.id, :student_id => member.id} %>
             </td>
         <% end %>
 

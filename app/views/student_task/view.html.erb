@@ -121,7 +121,6 @@ to display the label "Your team" in the student assignment tasks-->
     <li><%= link_to "Change your handle", {:controller => 'participants', :action => 'change_handle', :id => @participant.id} %> (Provide a different handle for this assignment)</li>
     <% if check_reviewable_topics(@assignment) %>
   <li><a href="javascript:register_popup('messages', 'messages','' );">
-    <img width="40" height="40" src="http://placehold.it/40x40" />
     <span>Your Messages </span>
   </a>(Answer queries on your work)</li>
   <%end%>

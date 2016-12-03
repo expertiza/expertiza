@@ -10,8 +10,6 @@
   <% end %>
 <% end %>
 
-<%= button_to "Create Doc", { :controller => "call_googledoc", :action => "make_doc"} %>
-
 <%= render partial: 'submitted_content/submitted_files', locals: {participant: participant, stage: @stage, origin: ''} %>
 
 <% if @assignment.require_quiz? %>

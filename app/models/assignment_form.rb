@@ -208,6 +208,12 @@ class AssignmentForm
       end
   end
 
+  def allow_anonymous_commenting
+    if @assignment.allow_anonymous_commenting.nil?
+      @assignment.allow_anonymous_commenting = false
+    end
+  end
+
   def review_assignment_strategy
     if @assignment.review_assignment_strategy.nil?
       @assignment.review_assignment_strategy = ''

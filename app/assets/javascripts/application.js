@@ -253,7 +253,7 @@ function show_alert(alertMessage){
         modal: true,
         draggable: true,
         resizable: true,
-        position: ['center', 'top'],
+        position: ['center', 'center'],
         show: 'blind',
         hide: 'blind',
         width: 400,

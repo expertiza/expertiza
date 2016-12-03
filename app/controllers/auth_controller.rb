@@ -32,7 +32,7 @@ class AuthController < ApplicationController
   # function to handle common functionality for conventional user login and google login
   def after_login(user)
     session[:user] = user
-    logger.warn "user_id: #{session[:user_id]} logged in."
+    @@event_logger.warn "user_id: #{session[:user_id]} logged in."
     AuthController.set_current_role(user.role_id, session)
     
     redirect_to controller: AuthHelper.get_home_controller(session[:user]),

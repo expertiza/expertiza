@@ -170,6 +170,7 @@ class Criterion < ScoredQuestion
 
   # This method returns what to display if a student is viewing a filled-out questionnaire
   def view_completed_question(count, answer, questionnaire_max)
+    #removed max points
     html = '<b>' + count.to_s + ". " + self.txt + "]</b>"
     score = !answer.answer.nil? ? answer.answer.to_s : "-"
     score_percent = if score != "-"

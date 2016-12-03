@@ -17,7 +17,7 @@ describe LinkSubmissionHistory do
       expect(LinkSubmissionHistory).to receive(:add_submission)
       expect_any_instance_of(AssignmentTeam).to receive(:hyperlinks)
       expect(SubmissionHistory).to receive(:create)
-      expect(LinkSubmissionHistory).to receive(:create)
+      expect(FileSubmissionHistory).to receive(:create)
       expect(GithubSubmissionHistory).to receive(:create)
       expect(GithubRepoSubmissionHistory).to receive(:create)
       expect_any_instance_of(SubmissionHistory).to receive(:get_submitted_at_time)

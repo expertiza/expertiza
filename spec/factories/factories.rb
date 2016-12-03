@@ -354,8 +354,8 @@ FactoryGirl.define do
   end
 
   factory :simicheck_comparison, class: SimicheckComparison do
-    comparison_key nil
-    file_type nil
-    assignment_id nil
+    comparison_key 'e3b2606bce964e199cf44d5fcfc6d6347c012690cef841ecb71396e7c3ca7e7a'
+    file_type 'pdf'
+    assignment_id 1
   end
 end

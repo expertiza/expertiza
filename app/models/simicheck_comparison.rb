@@ -53,7 +53,7 @@ class SimicheckComparison < ActiveRecord::Base
     key = "0a6a26fd61c943718a623b62fc457e1a3e110abe11df4535bb037478e04a9b6af60d8b9fb2e04356b5dda2594150e44642fad227b8e749c89359836c4420edd5"
     url += self.comparison_key
     response = RestClient.get(url, {:simicheck_api_key=>key})
-    status = nil
+    status = false
     if(response.code == 200)
       status = JSON.parse(response.body)['ready']
     end

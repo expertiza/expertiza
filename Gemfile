@@ -3,7 +3,7 @@ source 'http://rubygems.org'
 gem 'rails', '~> 4.2.6'
 
 ## Gems in Alphabetical Order
-gem 'responders'
+
 gem 'activerecord-session_store'
 gem 'airbrake'
 gem 'awesome_nested_set'
@@ -39,6 +39,7 @@ gem 'protected_attributes'
 gem 'rails4-autocomplete'
 gem 'rake'
 gem 'rb-readline'
+gem 'responders'
 gem 'rest-client', '~> 1.8'
 gem 'RedCloth'
 gem 'rgl', require: 'rgl/adjacency'

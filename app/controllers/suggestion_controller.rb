@@ -24,7 +24,7 @@ class SuggestionController < ApplicationController
     if @suggestioncomment.save
       flash[:notice] = "Your comment has been successfully added."
     else
-      flash[:error] = "There was an error adding your comment."
+      flash[:error] = "There was an error in adding your comment."
     end
     if current_role_name.eql? 'Student'
       redirect_to action: "student_view", id: params[:id]
@@ -32,6 +32,7 @@ class SuggestionController < ApplicationController
       redirect_to action: "show", id: params[:id]
     end
   end
+
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: [:destroy, :create, :update],
          redirect_to: {action: :list}
@@ -54,8 +55,9 @@ class SuggestionController < ApplicationController
   end
 
   def update_suggestion
-    Suggestion.find(params[:id]).update_attributes(title: params[:suggestion][:title], description: params[:suggestion][:description],
-                                                   signup_preference: params[:suggestion][:signup_preference])
+    Suggestion.find(params[:id]).update_attributes(title: params[:suggestion][:title], 
+                                description: params[:suggestion][:description],
+                                signup_preference: params[:suggestion][:signup_preference])
     redirect_to action: 'new', id: Suggestion.find(params[:id]).assignment_id
   end
 
@@ -75,17 +77,13 @@ class SuggestionController < ApplicationController
       session[:user].name
     else
       ""
-                          end
+    end
 
     if @suggestion.save
       flash[:success] = 'Thank you for your suggestion!' if @suggestion.unityID != ''
-      flash[:success] = 'You have already submit an anonymous suggestion. It will not show in the suggested topic table below.' if @suggestion.unityID == ''
+      flash[:success] = 'You have submitted an anonymous suggestion. It will not show in the suggested topic table below.' if @suggestion.unityID == ''
     end
     redirect_to action: 'new', id: @suggestion.assignment_id
-  end
-
-  def confirm_save
-    # Action to display successful creation of suggestion
   end
 
   def submit
@@ -99,13 +97,16 @@ class SuggestionController < ApplicationController
   end
 
   def create_new_team
-    new_team = AssignmentTeam.create(name: 'Team' + @user_id.to_s + '_' + rand(1000).to_s, parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
+    new_team = AssignmentTeam.create(name: 'Team' + @user_id.to_s + '_' + rand(1000).to_s,
+               parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
     t_user = TeamsUser.create(team_id: new_team.id, user_id: @user_id)
     SignedUpTeam.create(topic_id: @signuptopic.id, team_id: new_team.id, is_waitlisted: 0)
     parent = TeamNode.create(parent_id: @signuptopic.assignment_id, node_object_id: new_team.id)
     TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
   end
 
+  # If the user submits a suggestion and gets it approved -> Send email
+  # If user submits a suggestion anonymously and it gets approved -> DOES NOT get an email
   def send_email
     proposer = User.find(@user_id)
     teams_users = TeamsUser.where(team_id: @team_id)
@@ -116,12 +117,12 @@ class SuggestionController < ApplicationController
     Mailer.suggested_topic_approved_message(
       to: proposer.email,
         cc: cc_mail_list,
-        subject: "Suggested topic '#{@suggestion.title}' has already been approved",
+        subject: "Suggested topic '#{@suggestion.title}' has been approved",
         body: {
           approved_topic_name: @suggestion.title,
             proposer: proposer.name
         }
-    ).deliver_now
+    ).deliver_now!
   end
 
   def notification
@@ -179,7 +180,8 @@ class SuggestionController < ApplicationController
   private
 
   def suggestion_params
-    params.require(:suggestion).permit(:assignment_id, :title, :description, :status, :unityID, :signup_preference)
+    params.require(:suggestion).permit(:assignment_id, :title, :description, 
+                                        :status, :unityID, :signup_preference)
   end
 
   def approve

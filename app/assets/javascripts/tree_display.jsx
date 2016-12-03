@@ -611,7 +611,7 @@ jQuery(document).ready(function() {
         });
         if(this.props.dataType!='assignment') {
             _this = this;
-            jQuery.post('/tree_display/get_children_node_2_ng',
+            jQuery.post('/tree_display/children_node_2_ng',
                 {
                     reactParams2: newParams
                 },
@@ -932,13 +932,13 @@ jQuery(document).ready(function() {
                     '/assets/tree_view/view-scheduled-tasks.png',
                     '/assets/tree_view/view-publish-rights-24.png'
                     )
-      jQuery.get("/tree_display/get_session_last_open_tab", function(data) {
+      jQuery.get("/tree_display/session_last_open_tab", function(data) {
         _this.setState({
           activeTab: data
         })
       })
-      jQuery.get("/tree_display/get_folder_node_ng", function(data) {
-        jQuery.post("/tree_display/get_children_node_ng",
+      jQuery.get("/tree_display/folder_node_ng_getter", function(data) {
+        jQuery.post("/tree_display/children_node_ng",
           {
             reactParams: {
               child_nodes: data,

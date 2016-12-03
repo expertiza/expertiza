@@ -1,5 +1,6 @@
 Expertiza::Application.routes.draw do
 
+  resources :submission_records
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
 
@@ -30,6 +31,8 @@ Expertiza::Application.routes.draw do
       post ':id', action: :update
     end
   end
+
+
 
   resources :advice do
     collection do
@@ -409,6 +412,16 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  # resources :submissionrecord do
+  #   collection do
+  #     get :list
+  #     get :show
+  #     get :neq
+  #     post :create
+  #     post ':id', action: :update
+  #   end
+  # end
+
   resources :submitted_content do
     collection do
       get :download
@@ -481,10 +494,10 @@ Expertiza::Application.routes.draw do
     collection do
       get ':action'
       post 'list'
-      post 'get_children_node_ng'
-      post 'get_children_node_2_ng'
+      post 'children_node_ng'
+      post 'children_node_2_ng'
       post 'bridge_to_is_available'
-      get 'get_session_last_open_tab'
+      get 'session_last_open_tab'
       get 'set_session_last_open_tab'
     end
   end

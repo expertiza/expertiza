@@ -76,8 +76,8 @@ class FeedbackResponseMap < ResponseMap
 
   #Send emails for author feedback
   #Refactored from email method in response.rb
-  def email(defn,assignment,participant)
-    defn[:body][:type] = "Review Feedback"
+  def email(defn, participant, assignment)
+    defn[:body][:type] = "Author Feedback"
     # reviewee is a response, reviewer is a participant
     # we need to track back to find the original reviewer on whose work the author comments
     response_id_for_original_feedback = reviewed_object_id
@@ -86,12 +86,8 @@ class FeedbackResponseMap < ResponseMap
     original_reviewer_participant_id = response_map_for_original_feedback.reviewer_id
 
     participant = AssignmentParticipant.find(original_reviewer_participant_id)
-    topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
-    defn[:body][:obj_name] = if topic_id.nil?
-                               assignment.name
-                             else
-                               SignUpTopic.find(topic_id).topic_name
-                             end
+
+    defn[:body][:obj_name] = assignment.name
 
     user = User.find(participant.user_id)
 

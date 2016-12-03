@@ -24,6 +24,7 @@ describe SignUpSheet do
       allow(SignUpTopic).to receive(:where) { [topic1] }
 
       assignment_due_date = double('AssignmentDueDate')
+
       allow(AssignmentDueDate).to receive(:where) { assignment_due_date }
       allow(AssignmentDueDate).to receive(:first) { nil }
 

@@ -11,7 +11,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161126202511) do
+
+ActiveRecord::Schema.define(version: 20161129220644) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -490,6 +491,17 @@ ActiveRecord::Schema.define(version: 20161126202511) do
   end
 
   add_index "site_controllers", ["permission_id"], name: "fk_site_controller_permission_id", using: :btree
+
+  create_table "submission_records", force: :cascade do |t|
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+    t.text     "type",          limit: 65535
+    t.string   "content",       limit: 255
+    t.string   "operation",     limit: 255
+    t.integer  "team_id",       limit: 4
+    t.string   "user",          limit: 255
+    t.integer  "assignment_id", limit: 4
+  end
 
   create_table "suggestion_comments", force: :cascade do |t|
     t.text     "comments",      limit: 65535

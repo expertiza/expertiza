@@ -13,7 +13,7 @@
       <th width = "16%" class="sorter-true">Metrics <span></span></th>
 
       <th width = "26%" class="sorter-false">Assign grade and write comments <span></span></th>
-    </tr0
+    </tr>
     </thead>
 <tbody>
 
@@ -32,7 +32,7 @@
                 <%= instance_variable_get("@review_in_round_" + round.to_s) %>/<%= @rspan %>
                 <%= ', ' unless round == @assignment.num_review_rounds %>
               <% end %>
-              <%= link_to "reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id %>
+
             </td>
 
           <% @response_maps.each_with_index do |ri, index| %>
@@ -44,7 +44,9 @@
                 <!--Team reviewed-->
                 <td id = <%= team_name_color%> bgcolor=<%= @bgcolor %> align = 'left' colspan=1>
                   <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
-                  <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>
+                  <% if @selected_metric_filters.include? "Submitted File"%>
+                    <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>
+                  <% end %>
                   <!--Hard-coded Dr.Kidd's question in order to display link.-->
                   <!--later we can create a hyperlink question type to deal with this situation.-->
                   <%= list_hyperlink_submission(r.id, ri.id, 5386) if @id.to_i == 806 %>
@@ -54,17 +56,24 @@
                   <!--Metrics-->
                   <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
 
-                    <% if @metric_filters.include? "Average Volume"%>
+                    <% if @selected_metric_filters.include? "Average Review Length"%>
 
                       <%= display_volume_metric(r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3) %>
                       </br>
 
                     <% end %>
 
-                    <% if @metric_filters.include? "Average Author Feedback"%>
+                    <% if @selected_metric_filters.include? "Average Author Feedback"%>
 
                       <%= display_avg_author_feedback_score(r.id)%>
                       </br>
+
+                    <% end%>
+
+                    <% if @selected_metric_filters.include? "Reviewer Summary"%>
+
+                        <%= link_to "Reviewer summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id %>
+                        </br>
 
                     <% end%>
                   </td>

@@ -86,7 +86,7 @@ module ReviewMappingHelper
   end
 
   def display_volume_metric(overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3)
-    metric = "Avg. Volume: #{overall_avg_vol.to_s} <br/>"
+    metric = "Avg. Length of Review (in chars): #{overall_avg_vol.to_s} <br/>"
     metric += "1st: " + avg_vol_in_round_1.to_s if avg_vol_in_round_1 > 0
     metric += "</br>2nd: " + avg_vol_in_round_2.to_s if avg_vol_in_round_2 > 0
     metric += "</br>3rd: " + avg_vol_in_round_3.to_s if avg_vol_in_round_3 > 0
@@ -94,22 +94,33 @@ module ReviewMappingHelper
   end
 
   def display_avg_author_feedback_score(reviewer_id)
-    score = 'Avg. Author Feedback/s:</br>'
+    score = 'Avg. Author Feedback Score:</br>'
+    no_feedback = true
 
     if  !@author_feedback_score[reviewer_id][1].nil?
        score += '1st: '+ sprintf('%.2f', @author_feedback_score[reviewer_id][1]).remove('.00')+'/'+
            @author_feedback_score[:max_score_round_1].to_s+' from '+@author_feedback_score[:no_of_feedbacks_round_1].to_s+' feedback/s'
+
+       no_feedback = false
     end
 
      if  !@author_feedback_score[reviewer_id][2].nil?
        score += '</br>2nd: '+ sprintf('%.2f', @author_feedback_score[reviewer_id][2].to_s).remove('.00')+'/'+
            @author_feedback_score[:max_score_round_2].to_s+'/'+' from '+@author_feedback_score[:no_of_feedbacks_round_2].to_s+' feedback/s'
+
+       no_feedback = false
      end
 
       if  !@author_feedback_score[reviewer_id][3].nil?
         score += '</br>3rd: '+ sprintf('%.2f', @author_feedback_score[reviewer_id][3].to_s).remove('.00')+'/'+
            @author_feedback_score[:max_score_round_3].to_s+' from '+@author_feedback_score[:no_of_feedbacks_round_3].to_s+' feedback/s'
+
+        no_feedback = false
       end
+
+    if no_feedback
+      score += "No feedbacks available"
+    end
 
     score.html_safe
   end
@@ -199,6 +210,7 @@ module ReviewMappingHelper
   end
 
   def get_author_feedback_score_hash(assignment, reviewers)
+
     review_mapping_type = 'FeedbackResponseMap'
 
     does_assignment_have_varying_rubrics = false
@@ -218,6 +230,7 @@ module ReviewMappingHelper
     reviewer_ids = []
 
     author_feedback_score = {}
+
     author_feedback_score[:max_score_round_1] = {}
     author_feedback_score[:max_score_round_2] = {}
     author_feedback_score[:max_score_round_3] = {}

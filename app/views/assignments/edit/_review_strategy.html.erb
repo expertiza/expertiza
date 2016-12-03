@@ -81,16 +81,7 @@
       <%= label_tag('assignment_form[assignment][group_size]', @assignment_form.assignment.group_size ||= 5, size: 1, class: "amount_field") %>
     </td>
   </tr>
-
-
-  <tr>
-    <td style='padding:5px' id='auto_generate_groups'>
-      <input name="assignment_form[assignment][auto_generate_groups]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][auto_generate_groups]', 'true', @assignment_form.assignment.auto_generate_groups) %>
-      <%= label_tag('assignment_form[assignment][auto_generate_groups]', 'Auto Generate Groups?') %>
-    </td>
-  </tr>
-
+  
   <tr>
     <td style='padding:5px' id='createButton'>
       <%= button_to( "Create Random Groups", :action => "create_groups", :controller => "groups", params: { 'id' => @assignment_form.assignment.id, 'group_size' => @assignment_form.assignment.group_size }, class: "do_it_link") %>

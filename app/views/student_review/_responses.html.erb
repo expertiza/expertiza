@@ -57,13 +57,13 @@
 
                     <td>
                       <% if participant.type.to_s == "AssignmentTeam"%>
-                      <% if (!participant.chat.nil?) %>
+                      <% if (!@team.chat.nil?) %>
                       <div id="messages" class="hidden">
                             <div id="partial<%= "#{review_no}" %>"  >
-                              <%= sync partial: "message_row", collection: Message.by_chat(participant.chat) %>
-                              <%= sync_new partial: "message_row", resource: Message.new, scope: Message.by_chat(participant.chat) %>
+                              <%= sync partial: "message_row", collection: Message.by_chat(@team.chat) %>
+                              <%= sync_new partial: "message_row", resource: Message.new, scope: Message.by_chat(@team.chat) %>
                               <div class="popup-bottom">
-                                <%= form_for([participant.chat, participant.chat.messages.build], remote: true) do |f| %>
+                                <%= form_for([@team.chat, @team.chat.messages.build], remote: true) do |f| %>
                                     <%= f.text_field :body , :class => "body_input",:placeholder => "Type a message..." %>
                                 <% end %>
                               </div>
@@ -95,13 +95,13 @@
                 <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
                  <td>
                       <% if participant.type.to_s == "AssignmentTeam"%>
-                      <% if (!participant.chat.nil?) %>
+                      <% if (!@team.chat.nil?) %>
                       <div id="messages" class="hidden">
                             <div id="partial<%= "#{review_no}" %>"  >
-                              <%= sync partial: "message_row", collection: Message.by_chat(participant.chat) %>
-                              <%= sync_new partial: "message_row", resource: Message.new, scope: Message.by_chat(participant.chat) %>
+                              <%= sync partial: "message_row", collection: Message.by_chat(@team.chat) %>
+                              <%= sync_new partial: "message_row", resource: Message.new, scope: Message.by_chat(@team.chat) %>
                               <div class="popup-bottom">
-                                <%= form_for([participant.chat, participant.chat.messages.build], remote: true) do |f| %>
+                                <%= form_for([@team.chat, @team.chat.messages.build], remote: true) do |f| %>
                                     <%= f.text_field :body , :class => "body_input",:placeholder => "Type a message..." %>
                                 <% end %>
                               </div>

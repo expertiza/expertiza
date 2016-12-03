@@ -14,12 +14,6 @@ describe LinkSubmissionHistory do
       puts assignment_team.hyperlinks
       puts assignment.teams[0].hyperlinks
       # puts assignment_team.assignment.id
-      expect(LinkSubmissionHistory).to receive(:add_submission)
-      expect_any_instance_of(AssignmentTeam).to receive(:hyperlinks)
-      expect(SubmissionHistory).to receive(:create)
-      expect(FileSubmissionHistory).to receive(:create)
-      expect(GithubSubmissionHistory).to receive(:create)
-      expect(GithubRepoSubmissionHistory).to receive(:create)
       expect_any_instance_of(SubmissionHistory).to receive(:get_submitted_at_time)
       LinkSubmissionHistory.add_submission(assignment.id)
       puts SubmissionHistory.all.size

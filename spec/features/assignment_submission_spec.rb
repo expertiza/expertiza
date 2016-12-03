@@ -41,26 +41,25 @@ describe "assignment submisstion test" do
       #expect(page).to have_content "NC STATE NEWS"
     #end
   end
-=begin
-    it "should not submit invalid link" do
-      signup_topic
-      #invalid format url1
-      fill_in 'submission', with: "wolfpack"
-      click_on 'Upload link'
-      expect(page).to have_content "The URL or URI is not valid"
 
-      #invalid format url2
-      fill_in 'submission', with: "http://wrongurl"
-      click_on 'Upload link'
-      expect(page).to have_content "The URL or URI is not valid"
+  it "should not submit invalid link" do
+    signup_topic
+    #invalid format url1
+    fill_in 'submission', with: "wolfpack"
+    click_on 'Upload link'
+    expect(page).to have_content "The URL or URI is not valid"
 
-      #not existed url
-      fill_in 'submission', with: "http://www.notexisted.com"
-      click_on 'Upload link'
-      expect(page).to have_content "The URL or URI is not valid"
+    #invalid format url2
+    fill_in 'submission', with: "http://wrongurl"
+    click_on 'Upload link'
+    expect(page).to have_content "The URL or URI is not valid"
 
-    end
-=end
+    #not existed url
+    fill_in 'submission', with: "http://www.notexisted.com"
+    click_on 'Upload link'
+    expect(page).to have_content "The URL or URI is not valid"
+  end
+
   it "is able to submit multiple valid links" do
     signup_topic
     fill_in 'submission', with: "https://www.ncsu.edu"

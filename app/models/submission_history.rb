@@ -6,7 +6,7 @@ class SubmissionHistory < ActiveRecord::Base
     # for file, the link will be? - put this as default condition
     # determine whether this is a file or a link
     existing_submission = SubmissionHistory.where(["team = ? and submitted_detail = ?", team, link])
-    if existing_submission
+    if existing_submission.size>0
       action = "edit"
     else
       action = "add"

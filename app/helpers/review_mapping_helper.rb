@@ -159,13 +159,17 @@ module ReviewMappingHelper
 
   def get_team_color(participant_id, response_map_id)
     participant = Participant.find(participant_id)
-    if(!Response.exists?(map_id: response_map_id) )
+    if !Response.exists?(map_id: response_map_id)
        return "red"
     end
-    date_last_graded=participant.review_last_graded_date
-    review_updated_date = Response.where(map_id: response_map_id).order(updated_at: :desc).first
-    if date_last_graded < review_updated_date
-      return "blue"
+    last_review = Response.where(map_id: response_map_id , is_submitted: 1 ).order(updated_at: :desc).first
+    review_updated_date= (last_review.nil?)? nil: last_review.updated_at
+    if participant.review_last_graded_date.nil? || review_updated_date.nil?
+      return "green"
+    end
+
+    if participant.review_last_graded_date < review_updated_date
+      return "black"
     end
       return "green"
 

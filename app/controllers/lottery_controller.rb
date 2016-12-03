@@ -12,6 +12,7 @@ class LotteryController < ApplicationController
   # This method is to send request to web service and use k-means and students' bidding data to build teams automatically.
   def run_intelligent_assignment
     priority_info = []
+    existing_team_ids = {}
     assignment = Assignment.find_by(id: params[:id])
     course_id = assignment['course_id']
     users_in_teams = []
@@ -57,6 +58,7 @@ class LotteryController < ApplicationController
         team_ids = TeamsUser.where(user_id: user_id).select(:team_id)
         team = Team.where(id: team_ids, parent_id: assignment.id)
         new_members_option = team.first.new_members
+        existing_team_ids[user_id] = team.first.id
         #If any one member in a team requires new teammates then we will include that team for swapping based on top trading cycle
         if(new_members_option)
           any_member_need_swap = true
@@ -78,8 +80,9 @@ class LotteryController < ApplicationController
       teams_swap_members = response["teams"]
       teams = teams_swap_members + teams_not_swap_members
 
-      create_new_teams_for_bidding_response(teams, assignment)
+      create_new_teams_for_bidding_response(teams, assignment, existing_team_ids)
       run_intelligent_bid
+
     end
     if(params[:test_run].nil? || params[:test_run] == false)
       redirect_to controller: 'tree_display', action: 'list'
@@ -101,7 +104,7 @@ class LotteryController < ApplicationController
     return temp
   end
 
-  def create_new_teams_for_bidding_response(teams, assignment)
+  def create_new_teams_for_bidding_response(teams, assignment, existing_team_ids)
     teams.each do |user_ids|
       new_team = AssignmentTeam.create(name: assignment.name + '_Team' + rand(1000).to_s,
                                        parent_id: assignment.id,
@@ -111,6 +114,10 @@ class LotteryController < ApplicationController
         team_user = TeamsUser.where(user_id: user_id, team_id: new_team.id).first rescue nil
         team_user = TeamsUser.create(user_id: user_id, team_id: new_team.id) if team_user.nil?
         TeamUserNode.create(parent_id: parent.id, node_object_id: team_user.id)
+
+        #Deleting earlier made team
+        old_team_id = existing_team_ids[user_id]
+        TeamsUser.destroy_all(team_id: old_team_id, user_id: user_id) unless old_team_id.nil?
       end
     end
   end

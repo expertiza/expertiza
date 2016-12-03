@@ -1,16 +1,5 @@
 require 'rails_helper'
 
-def signup_topic
-  user = User.find_by_name("student2064") 
-  stub_current_user(user, user.role.name, user.role)
-  visit '/student_task/list'
-  visit '/sign_up_sheet/sign_up?id=1&topic_id=1' #signup topic
-  visit '/student_task/list'
-  click_link "Assignment1684"
-  click_link "Your work"
-end
-
-
 describe "assignment submisstion test" do
   before(:each) do
     #create assignment and topic
@@ -29,7 +18,17 @@ describe "assignment submisstion test" do
     create(:assignment_due_date, deadline_type: DeadlineType.where(name: "submission").first, due_at: DateTime.now + 1)
   end
 
-  describe "submit hyperlink" do
+  def signup_topic
+    user = User.find_by_name("student2064") 
+    stub_current_user(user, user.role.name, user.role)
+    visit '/student_task/list'
+    visit '/sign_up_sheet/sign_up?id=1&topic_id=1' #signup topic
+    visit '/student_task/list'
+    click_link "Assignment1684"
+    click_link "Your work"
+  end
+
+#  describe "submit hyperlink" do
     it "is able to submit a single valid link" do
       signup_topic
       fill_in 'submission', with: "https://www.ncsu.edu"
@@ -62,7 +61,7 @@ describe "assignment submisstion test" do
       expect(page).to have_content "The URL or URI is not valid"
 
     end
-=end
+
     it "is able to submit multiple valid links" do
       signup_topic
       fill_in 'submission', with: "https://www.ncsu.edu"
@@ -99,7 +98,7 @@ describe "assignment submisstion test" do
     end
 
   end
-=begin
+
   describe "submit file" do
     it "is able to submit single valid file" do
       signup_topic
@@ -160,7 +159,7 @@ describe "assignment submisstion test" do
       expect(File).to exist(file_upload_path)
       expect(File.read(file_upload_path)).to have_content "This is the updated file."
     end
-
-  end
 =end
+#  end
+
 end

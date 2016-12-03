@@ -1,3 +1,4 @@
+require 'rails_helper'
 
 describe LinkSubmissionHistory do
   describe"add submission" do

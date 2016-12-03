@@ -53,6 +53,13 @@ describe SubmissionHistory do
       expect(submission_history.action).to eq("delete")
     end
 
+    it "should add a link submission history with action as delete" do
+      assignment_team = build(AssignmentTeam)
+      link = "https://docs.google.com/document/d/1fI5KbPXCJ8dSUyLynnqC__A3MtZ47enNfMcki3Vf3uk/edit"
+      submission_history = SubmissionHistory.delete_submission(assignment_team, link)
+      expect(submission_history.action).to eq("delete")
+    end
+
     it "should add a row to submission history table with action as edit" do
       assignment_team = build(AssignmentTeam)
       link = "/user/home/Expertiza_gemfile"

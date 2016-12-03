@@ -55,8 +55,6 @@
         if (previous_element.length == 0) {
             return
         }
-        var dropdownrel = "<select id = \"dp1\"><option value=\"0\">Chose other</option><option value=\"5\">5 Days from Initial Date</option><option value=\"10\">10 Days from Initial Date</option><option value=\"15\">15 Days from Initial Date</option>option value=\"20\">20 Days from Initial Date</option></select>";
-
 
         var html = '<tr id=' + element_id + '>';
 
@@ -97,7 +95,7 @@
         html += '<td align="center" class="due_date_due_at" width="25%">' +
         '<input id="datetimepicker_' + element_id +
         '" name="assignment_form[due_date][][due_at]" style="width: 200px" type="text" value="' +
-        due_at + '">' +"<select onchange=\"UpdateDeadlineForThisId(\'"+element_id+"\');\"id = \"dropdown_"+element_id+"\"><option value=0>Select deadline</option><option value=1>1 day</option><option value=2>2 days</option><option value=3>3 days</option><option value=4>4 days</option><option value=5>5 days</option><option value=6>6 days</option><option value=7>7 days</option><option value=8>8 day</option><option value=9>9 days</option><option value=10>10 days</option><option value=11>11 days</option><option value=12>12 days</option><option value=13>13 days</option><option value=14>14 days</option></selection>"+ 
+        due_at + '">' +"<td><select style=\"min-width: 200px; float: left;\" onchange=\"UpdateDeadlineForThisId(\'"+element_id+"\');\"id = \"dropdown_"+element_id+"\"><option value=0>Select deadline</option><option value=1>1 day</option><option value=2>2 days</option><option value=3>3 days</option><option value=4>4 days</option><option value=5>5 days</option><option value=6>6 days</option><option value=7>7 days</option><option value=8>8 day</option><option value=9>9 days</option><option value=10>10 days</option><option value=11>11 days</option><option value=12>12 days</option><option value=13>13 days</option><option value=14>14 days</option></select></td>"+ 
         '</td>';
         
         html += '<td align="center" class="due_date_due_at" width="10%">';
@@ -404,6 +402,7 @@
 <tr id='due_date_heading'>
 <th width=15% style="text-align:left;">Deadline type</th>
 <th width=20% style="text-align:center;">Date & time</th>
+<th></th>
 <th width=10% style="text-align:center;">Submission allowed</th>
 <th width=8% style="text-align:center;">Review allowed</th>
 <th width=8% style="text-align:center;">Teammate review allowed</th>

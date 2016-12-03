@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161202124659) do
+ActiveRecord::Schema.define(version: 20161129220644) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -293,25 +293,24 @@ ActiveRecord::Schema.define(version: 20161202124659) do
   end
 
   create_table "participants", force: :cascade do |t|
-    t.boolean  "can_submit",                            default: true
-    t.boolean  "can_review",                            default: true
-    t.integer  "user_id",                 limit: 4
-    t.integer  "parent_id",               limit: 4
+    t.boolean  "can_submit",                         default: true
+    t.boolean  "can_review",                         default: true
+    t.integer  "user_id",              limit: 4
+    t.integer  "parent_id",            limit: 4
     t.datetime "submitted_at"
     t.boolean  "permission_granted"
-    t.integer  "penalty_accumulated",     limit: 4,     default: 0,    null: false
-    t.float    "grade",                   limit: 24
-    t.string   "type",                    limit: 255
-    t.string   "handle",                  limit: 255
+    t.integer  "penalty_accumulated",  limit: 4,     default: 0,    null: false
+    t.float    "grade",                limit: 24
+    t.string   "type",                 limit: 255
+    t.string   "handle",               limit: 255
     t.datetime "time_stamp"
-    t.text     "digital_signature",       limit: 65535
-    t.string   "duty",                    limit: 255
-    t.boolean  "can_take_quiz",                         default: true
-    t.float    "Hamer",                   limit: 24,    default: 1.0
-    t.float    "Lauw",                    limit: 24,    default: 0.0
-    t.integer  "grade_for_reviewer",      limit: 4
-    t.text     "comment_for_reviewer",    limit: 65535
-    t.datetime "review_last_graded_date"
+    t.text     "digital_signature",    limit: 65535
+    t.string   "duty",                 limit: 255
+    t.boolean  "can_take_quiz",                      default: true
+    t.float    "Hamer",                limit: 24,    default: 1.0
+    t.float    "Lauw",                 limit: 24,    default: 0.0
+    t.integer  "grade_for_reviewer",   limit: 4
+    t.text     "comment_for_reviewer", limit: 65535
   end
 
   add_index "participants", ["user_id"], name: "fk_participant_users", using: :btree
@@ -497,17 +496,6 @@ ActiveRecord::Schema.define(version: 20161202124659) do
     t.integer  "team_id",       limit: 4
     t.string   "user",          limit: 255
     t.integer  "assignment_id", limit: 4
-  end
-
-  create_table "submissionrecords", force: :cascade do |t|
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
-    t.text     "type",       limit: 65535
-    t.string   "content",    limit: 255
-    t.datetime "createdat"
-    t.string   "operation",  limit: 255
-    t.integer  "team_id",    limit: 4
-    t.string   "user",       limit: 255
   end
 
   create_table "suggestion_comments", force: :cascade do |t|

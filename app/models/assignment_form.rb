@@ -157,7 +157,7 @@ class AssignmentForm
       diff = mi - due_date.threshold * 60
       #need to remove following 2 lines
       diff = 1
-      mi = 2
+      mi = 1
       next unless diff > 0
       #first check if the same task is already enqueued
       #next if ScheduledTask.find(@assignment.id, "compare_files_with_simicheck", due_date.due_at.to_s(:db))

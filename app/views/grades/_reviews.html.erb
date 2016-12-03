@@ -58,7 +58,7 @@
                   <% count = count + 1 %>
                   <% prefix = nil if controller.action_name == "view_my_scores" %>
 
-                  <!--<%= review.display_as_html(nil, count) %><BR/>-->
+                  <!--<%= review.display_as_html(nil, count,review.id.to_s) %><BR/>-->
                   <!--change code in order to compat to multi-round review-->
                   <% if @assignment.varying_rubrics_by_round? and !review.round.nil? %>
                       <% review_symbol = 'review' + review.round.to_s %>
@@ -75,7 +75,7 @@
                       <% end %>
                   <% end %>
 
-                  <%= review.display_as_html(prefix, index + 1, nil) %><br/>
+                  <%= review.display_as_html(prefix, index + 1, nil,review.id.to_s) %><br/>
 
                   <% map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: participant.id).first
                      review_feedbacks = map.try :response %>

@@ -22,6 +22,10 @@ describe "validations" do
   it "checks whether signed up topic is created or not" do
     expect(create(:topic)).to be_valid
   end
+
+  it "checks if simicheck option is false by default" do
+    expect(@assignment.simicheck).to be_falsey
+  end
 end
 
 describe "#team_assignment" do

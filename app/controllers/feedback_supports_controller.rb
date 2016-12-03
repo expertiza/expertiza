@@ -4,7 +4,7 @@ class FeedbackSupportsController < ApplicationController
  # before_action :verify_captcha, only: [:create]
 
   def verify_captcha
-    if !verify_captcha
+    if !verify_recaptcha
       redirect_to :back, notice: 'wrong captcha'
     end
   end
@@ -51,21 +51,6 @@ end
     else
       redirect_to :back, notice: 'Please enter your registered email to Expertiza'
     end
-=begin
-    @feedback_support = FeedbackSupport.new(feedback_support_params)
-    user = params[:feedback][:user_id]
-
-    puts "line 2"
-    puts user
-    if user.present?
-      @user_email = user.email
-    else
-      redirect_to :back, notice: 'Please enter your registered email to Expertiza'
-    end
-
-    if @user.present?
-     # prepared_mail = MailerHelper.send_mail_to_user()
-=end
       Mailer.sync_message(
           recipients: params[:feedback][:user_id],
           subject: params[:feedback_support][:title],
@@ -77,20 +62,6 @@ end
       ).deliver
 
       flash[:notice] = "Your feedback has been sent to Expertiza Support. We will try to help you as soon as possible"
-
-      #send email
-=begin
-    else
-      redirect_to :back, notice: 'Please enter your registered email to Expertiza'
-    end
-=end
-=begin
-    if @feedback_support.save
-      redirect_to @feedback_support, notice: 'Feedback support was successfully created.'
-    else
-      render :new
-    end
-=end
   end
 
   # PATCH/PUT /feedback_supports/1

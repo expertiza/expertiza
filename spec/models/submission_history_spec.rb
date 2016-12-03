@@ -16,6 +16,13 @@ describe SubmissionHistory do
       expect(submission_history).to be_a(GithubRepoSubmissionHistory)
     end
 
+    it "should create github link submission history" do
+      assignment_team = build(AssignmentTeam)
+      link = "https://github.com/prerit2803/expertiza/pull/1"
+      submission_history = SubmissionHistory.create(assignment_team, link)
+      expect(submission_history).to be_a(GithubPullRequestSubmissionHistory)
+    end
+
     it "should create wikipedia link submission history" do
       assignment_team = build(AssignmentTeam)
       link = "http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2016/oss_E1663"

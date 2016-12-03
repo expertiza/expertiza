@@ -43,7 +43,7 @@ describe "assignment submisstion test" do
         #expect(page).to have_content "NC STATE NEWS"
       #end
     end
-
+=begin
     it "should not submit invalid link" do
       signup_topic
       #invalid format url1
@@ -62,7 +62,7 @@ describe "assignment submisstion test" do
       expect(page).to have_content "The URL or URI is not valid"
 
     end
-
+=end
     it "is able to submit multiple valid links" do
       signup_topic
       fill_in 'submission', with: "https://www.ncsu.edu"

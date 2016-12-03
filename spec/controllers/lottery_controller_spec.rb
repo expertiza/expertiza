@@ -138,8 +138,6 @@ describe LotteryController do
 
           teamA = create(:assignment_team, new_members: 0, assignment: assignment)
           teamB = create(:assignment_team, new_members: 0, assignment: assignment)
-          
-
           teamA_old = create(:assignment_team, new_members: 0, assignment: assignment_old)
           teamB_old = create(:assignment_team, new_members: 0, assignment: assignment_old)
 

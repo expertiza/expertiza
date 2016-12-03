@@ -34,7 +34,7 @@ class SubmittedContentController < ApplicationController
     @review_maps.each do |map|
       if "ReviewResponseMap".eql?map.type
         @response = Response.find_by(map_id: map.id)
-        @timeline[@response.updated_at]={:heading => map.type.chomp('ResponseMap') , :description => ''}
+        @timeline[@response.updated_at]={:heading => map.type.chomp('ResponseMap') , :description => '', :color => 'green'}
       end
     end
     #feedbacks
@@ -42,14 +42,14 @@ class SubmittedContentController < ApplicationController
     @feedback_maps.each do |map|
       if "FeedbackResponseMap".eql?map.type
         @response = Response.find_by(map_id: map.id)
-        @timeline[@response.updated_at]={:heading => map.type.chomp('ResponseMap') , :description => ''}
+        @timeline[@response.updated_at]={:heading => map.type.chomp('ResponseMap') , :description => '', :color => 'info'}
       end
     end
     @submission_history.each do |submission|
       @timeline[submission.submitted_at]={:heading => submission.type+' '+submission.action, :description => submission.submitted_detail}
     end
     @assignment.due_dates.each do |due_date|
-      @timeline[due_date.due_at]={:heading => ' Due Date ', :description => due_date.deadline_type.name+' deadline'}
+      @timeline[due_date.due_at]={:heading => ' Due Date ', :description => due_date.deadline_type.name+' deadline', :color => 'danger'}
     end
 
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))

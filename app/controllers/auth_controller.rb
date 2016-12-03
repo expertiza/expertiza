@@ -22,7 +22,7 @@ class AuthController < ApplicationController
       if user and user.valid_password?(params[:login][:password])
         after_login(user)
       else
-        @@event_logger.warn "Failed login attempt by #{session[:user_id]}."
+        @@event_logger.warn "Failed login attempt by #{session[:user.user_id]}."
         flash[:error] = "Your username or password is incorrect."
         redirect_to controller: 'password_retrieval', action: 'forgotten'
       end

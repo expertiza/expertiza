@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe LinkSubmissionHistory do
-  describe"add submission" do
+  describe "add submission" do
     it "should add GithubRepoSubmissionHistory" do
       assignment = build(Assignment)
       assignment_team = build(AssignmentTeam)

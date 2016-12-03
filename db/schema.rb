@@ -10,7 +10,9 @@
 # you'll amass, the slower it'll run and the greater likelihood for issues).
 #
 # It's strongly recommended that you check this file into your version control system.
-ActiveRecord::Schema.define(version: 20161121015516) do
+
+ActiveRecord::Schema.define(version: 20161129220644) do
+
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
     t.integer "answer",      limit: 4
@@ -485,7 +487,7 @@ ActiveRecord::Schema.define(version: 20161121015516) do
 
   add_index "site_controllers", ["permission_id"], name: "fk_site_controller_permission_id", using: :btree
 
-   create_table "submission_records", force: :cascade do |t|
+  create_table "submission_records", force: :cascade do |t|
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
     t.text     "type",          limit: 65535

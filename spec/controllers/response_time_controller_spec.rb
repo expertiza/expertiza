@@ -28,12 +28,9 @@ context 'checking that the user creates valid post request' do
       allow(responsetime).to receive(:each).and_return(1)
       allow_any_instance_of(ResponseTime).to receive_message_chain(:new).and_return(1)
       allow(responsetime).to receive(:save).and_return(true)
-
       post "record_start_time", :response_time => {map_id: 1, round: 1, link: 'hello' , start: date3}
       expect(response).to have_http_status(200)
-
     end
-
 
   describe 'POST #record_end_time', js: true do
     it 'respond with an HTTP status of 200'  do
@@ -44,7 +41,6 @@ context 'checking that the user creates valid post request' do
 
     end
   end
-
 end
 end
 end

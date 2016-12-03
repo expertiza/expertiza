@@ -189,6 +189,7 @@ class UsersController < ApplicationController
 
       if @usernew.save
         password = @usernew.reset_password # the password is reset
+        # Mail is sent to the user with a new password
         prepared_mail = MailerHelper.send_mail_to_user(@usernew, "Your Expertiza account and password 
                                                             have been created.", "user_welcome", password)
         prepared_mail.deliver
@@ -197,13 +198,12 @@ class UsersController < ApplicationController
           AssignmentQuestionnaire.create(user_id: @user.id)
         end
         undo_link("The user \"#{@user.name}\" has been successfully created. ")
-        #redirect_to action: 'list'
       else
         foreign
-        #render action: 'new'
       end
     else 
-      if @user.status=="Rejected" 
+      if @user.status=="Rejected"    
+        #If the user request has been rejected, a flash message is shown and redirected to review page
         if @user.update_columns(reason: params[:reason], status: params[:status])
           flash[:success] = "The user \"#{@user.name}\" has been Rejected."
           redirect_to action: 'review'
@@ -216,12 +216,14 @@ class UsersController < ApplicationController
     end
     redirect_to action: 'review'
   end
+
   def request_user_create
     #TODO: Do not allow duplicates
     #TODO: All fields should be entered
     @user = RequestedUser.new(user_params)
     @user.institution_id = params[:user][:institution_id]
     @user.status = 'Under Review'
+    #The super admin receives a mail about a new user request with the user name
     if verify_recaptcha(model: @user) && @user.save
       @super_users = User.joins(:role).where('roles.name' =>'Super-Administrator');
       @super_users.each do |super_user|
@@ -235,6 +237,7 @@ class UsersController < ApplicationController
       redirect_to :controller => 'users', :action => 'request_new', :role=>"Student"   
     end
   end
+
   def edit
     @user = User.find(params[:id])
     get_role

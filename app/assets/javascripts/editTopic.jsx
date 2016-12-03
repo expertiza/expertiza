@@ -20,6 +20,7 @@ var EditForm = React.createClass({
         var updatedTopic = this.state.topic;
         updatedTopic.topic_identifier = nextProps.topicIdentifier;
         this.setState({topic: updatedTopic});
+        this.setState({showForm: true})
     },
 
     getInitialState: function(){
@@ -32,7 +33,8 @@ var EditForm = React.createClass({
           },
           id: this.props.topicId,
           assignment_id: this.props.assignmentId,
-          commit: 'Update'
+          commit: 'Update',
+          showForm: true
       }
     },
 
@@ -78,6 +80,10 @@ var EditForm = React.createClass({
         })
     },
 
+    handleClose: function(){
+        this.setState({showForm: false});
+    },
+
 
 
     render: function(){
@@ -90,18 +96,28 @@ var EditForm = React.createClass({
             marginBottom: 10
         }
 
-
-
+    var partial_form;
+    if(this.state.showForm){
+        partial_form = (
+            <div style={divStyle}>
+                <p>Topic Id: <input type="text" value={this.state.topic.topic_identifier} onChange={this.handleTopicChange}/>
+                    &nbsp;&nbsp;Topic Name: <input type="text" value={this.state.topic.topic_name} onChange={this.handleNameChange} />
+                    &nbsp;&nbsp; Topic Category: <input type="text" value={this.state.topic.category} onChange={this.handleCategoryChange} />
+                    &nbsp;&nbsp; Number of Slots: <input type="number" value={this.state.topic.max_choosers} onChange={this.handleChoosersChange}/></p>
+                <p><button onClick={this.handleUpdateTopic}>Update</button>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<a onClick={this.handleClose}>Close</a></p>
+            </div>
+        );
+    }
+    else{
+        partial_form = (<p>&nbsp;</p>);
+    }
 
         return(
+        <div>
+        {partial_form}
+        </div>
 
-            <div style={divStyle}>
-            <p>Topic Id: <input type="text" value={this.state.topic.topic_identifier} onChange={this.handleTopicChange}/>
-                &nbsp;&nbsp;Topic Name: <input type="text" value={this.state.topic.topic_name} onChange={this.handleNameChange} />
-                &nbsp;&nbsp; Topic Category: <input type="text" value={this.state.topic.category} onChange={this.handleCategoryChange} />
-                &nbsp;&nbsp; Number of Slots: <input type="number" value={this.state.topic.max_choosers} onChange={this.handleChoosersChange}/></p>
-                <p><button onClick={this.handleUpdateTopic}>Update</button></p>
-            </div>
         );
     }
     }

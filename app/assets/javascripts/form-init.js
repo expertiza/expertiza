@@ -86,111 +86,165 @@ function getFieldsForEdit(){
   return defaultFields;
 }
 
-var initActionButtons = function()
-{
+jQuery(document).ready(function($) {
+
+    var initActionButtons = function()
+    {
 	$('button[id$="-view-data"]').remove();
 	$('button[id$="-clear-all"]').remove();
 
 	var previewing = true,
 	togglePreview = function() {
-		document.body.classList.toggle('form-rendered', previewing);
-		previewing = !previewing;
+	    document.body.classList.toggle('form-rendered', previewing);
+	    previewing = !previewing;
 	};
 
 	$('button[id="edit-form"]').click(function() {
-		togglePreview();
+	    togglePreview();
 	});
 	
 	$('button[id$="-save"]').each(function(index, elmt) {
-		$(elmt).html('preview');
-		$(elmt).click(function() {
+	    $(elmt).html('preview');
+	    $(elmt).click(function() {
 		togglePreview();
-		/*$(renderWrap).formRender({
-			dataType: 'json',
-			formData: formBuilder.formData
-		});*/
-		//window.sessionStorage.setItem('formData', JSON.stringify(formBuilder.formData));
+		$(renderWrap).formRender({
+		    dataType: 'json',
+		    formData: formBuilder.formData
 		});
+		window.sessionStorage.setItem('formData', JSON.stringify(formBuilder.formData));
+	    });
 	});
-	// change field display names
-	console.log($('div.cb-wrap'));
-	$('div.cb-wrap').find('li.icon-radio-group').find('span').text('Scale');
-	$('div.cb-wrap').find('li.icon-select').find('span').text('Dropdown');
-};
+    };
 
-var disableFormEditorFields = function(fld)
-{
-	$('a[id$="-copy"]', fld).remove();
-	$('a[class$="close-field"]', fld).remove();
+    var disableFormEditorFields = function(fld)
+    {
+		$('a[id$="-copy"]', fld).remove();
+		$('a[class$="close-field"]', fld).remove();
 
-	var setEdit = function(elmt, val){
-		$(elmt).data("editing", val);
+		var setEdit = function(elmt, val){
+			$(elmt).data("editing", val);
+		};
+		
+		$('a[id$="-edit"]').each(function(idx, elmt) {
+			$(elmt).data("editing", false);
+			$(elmt).off('click').on('click', function(e) {
+			
+			e.preventDefault();
+			console.log($(elmt).data("editing"));
+			if ($(elmt).data("editing") === true)
+			{
+				//alert('quit editing');
+				setEdit(elmt, false);
+				onUpdate(elmt);  
+			}
+			else
+			{
+				//alert('start editing');
+				setEdit(elmt, true);
+			}
+			});
+		});
+			
+		$('a[id^="del_"]').off('click').on('click', function(e) {
+			onRemove($(this).parents('li'));
+		});
+
+		// remove unwanted input fields from form
+		removeUnwantedFields();
+		
+		// change labels
+		$('.label-wrap').find('label').text('Question');
+
+		// remove certain fields in the form depending on the field type
+    };
+
+	var fieldReverseMap = {"radio-group": "Scale", "select": "Dropdown", "checkbox": "Checkbox",
+							"textarea": "TextArea", "text": "TextField", "header": "SectionHeader",
+						    "criterion": "Criterion"};
+
+    // !!!
+    // fill the remove_question form
+    // remove from db and hidden form
+    var onRemove = function(fld) {
+		var order = $(fld).attr('id').split('-')[3];
+		var _tr = $('#questions_table').find('tr')[order];
+		var _td = $(_tr).find('td')[0];
+		
+		setTimeout(function() {
+			$('.button-wrap').find('button.yes').on('click', function(){
+				//console.log('yes..');
+				$(_td).find('a')[0].click();
+			});
+		}, 100);
+	};
+    
+    // save to db and hidden form
+    var onSave = function() {};
+    
+    // update question
+	var onUpdate = function(fld) { 
+		var _li = $(fld).parent('div').parent('li');
+		var order = $(_li).attr('id').split('-')[3];
+		var type = $(_li).attr('type');
+		var _tr = $('#questions_table').find('tr')[order];
+		// update tr fields with the data in _li
+		updateHiddenFields(_li, type, _tr);
+	};
+ 
+ 	var defaultFields = getFieldsForEdit();
+	console.log(defaultFields);
+
+	var onAddHandler = {
+		onadd: function(fld)
+		{
+			disableFormEditorFields(fld);
+			var userDrop = false;
+			if($(fld).attr('id').split('-')[3] > defaultFields.length){
+				// user drops
+				userDrop = true;
+			}
+
+			// user drags and drops the elements
+			if(userDrop){
+				$("#question_type").val(fieldReverseMap[$(fld).attr('type')]);
+				$("#addQuestionBtn").trigger('click');	
+			} else{
+				// don't do anything, loading the fields on edit
+			}
+		}
 	};
 	
-	$('a[id$="-edit"]').each(function(idx, elmt) {
-		$(elmt).data("editing", false);
-		$(elmt).off('click').on('click', function(e) {
-		
-		e.preventDefault();
-		console.log($(elmt).data("editing"));
-		if ($(elmt).data("editing") === true)
-		{
-			//alert('quit editing');
-			setEdit(elmt, false);
-			onUpdate(elmt);  
-		}
-		else
-		{
-			//alert('start editing');
-			setEdit(elmt, true);
-		}
-		});
-	});
-		
-	$('a[id^="del_"]').off('click').on('click', function(e) {
-		onRemove($(this).parents('li'));
-	});
+    var buildWrap = document.querySelector('.build-wrap'),
+	renderWrap = document.querySelector('.render-wrap'),
+	formData = window.sessionStorage.getItem('formData'),
+	fbOptions = {
+	    dataType: 'json',
+	    sortableControls: false,
+	    editOnAdd: false,
+	    stickyControls: true, 
+	    sortableControls: false, 
+	    disableFields: ['autocomplete', 'button',
+			    'paragraph', 'number', 'checkbox-group', 
+			    'date', 'file', 'hidden', 'header'], 
+	    editOnAdd: false, 
+	    showActionButtons: true, 
+		defaultFields: defaultFields, // edit will load the fields from db
+		fieldRemoveWarn: true,
+	    typeUserEvents: {
+			'checkbox': onAddHandler,
+			'header': onAddHandler,
+			'radio-group': onAddHandler,
+			'select': onAddHandler,
+			'text': onAddHandler,
+			'textarea': onAddHandler
+	    }
+	};
 
-	// remove unwanted input fields from form
-	$('.required-wrap').remove();
-	$('.description-wrap').remove();
-	$('.className-wrap').remove();
-	$('.name-wrap').remove();
-	$('.access-wrap').remove();
-	$('.other-wrap').remove();
-	$('.placeholder-wrap').remove();
-	$('.multiple-wrap').remove();
-	$('.value-wrap').remove();
-	$('.toggle-wrap').remove();
-	// change labels
-	$('.label-wrap').find('label').text('Question');
-
-	// remove certain fields in the form depending on the field type
-};
-
-var onRemove = function(fld) {
-	var order = $(fld).attr('id').split('-')[3];
-	var _tr = $('#questions_table').find('tr')[order];
-	var _td = $(_tr).find('td')[0];
-	
-	setTimeout(function() {
-		$('.button-wrap').find('button.yes').on('click', function(){
-			$(_td).find('a')[0].click();
-		});
-	}, 100);
-};
-
-var onSave = function() {};
-
-var onUpdate = function(fld) { 
-	var _li = $(fld).parent('div').parent('li');
-	var order = $(_li).attr('id').split('-')[3];
-	var type = $(_li).attr('type');
-	var _tr = $('#questions_table').find('tr')[order];
-	// update tr fields with the data in _li
-	updateHiddenFields(_li, type, _tr);
-};
-
+    var formBuilder = $(buildWrap).formBuilder(fbOptions).data('formBuilder');
+    initActionButtons();
+    disableFormEditorFields(document);
+   
+});
 
 function updateHiddenFields(li, type, tr){
 	console.log(li);
@@ -292,65 +346,61 @@ function updateHiddenFields(li, type, tr){
 	}
 }
 
-jQuery(document).ready(function($) {
- 	var defaultFields = getFieldsForEdit();
-	console.log(defaultFields);
-
-	var fieldReverseMap = {"radio-group": "Scale", 
-						"select": "Dropdown", 
-						"checkbox": "Checkbox",
-						"textarea": "TextArea", 
-						"text": "TextField", 
-						"header": "SectionHeader",
-						"criterion": "Criterion"};
-
-	var onAddHandler = {
-		onadd: function(fld)
-		{
-			disableFormEditorFields(fld);
-			var userDrop = false;
-			if($(fld).attr('id').split('-')[3] > defaultFields.length){
-				// user drops
-				userDrop = true;
-			}
-
-			// user drags and drops the elements
-			if(userDrop){
-				$("#question_type").val(fieldReverseMap[$(fld).attr('type')]);
-				$("#addQuestionBtn").trigger('click');	
-			} else{
-				// don't do anything, loading the fields on edit
-			}
+function removeUnwantedFields(){
+	switch(fld){
+			case "criterion": {
+			break;
 		}
-	};
-
-    var buildWrap = document.querySelector('.build-wrap'),
-	renderWrap = document.querySelector('.render-wrap'),
-	formData = window.sessionStorage.getItem('formData'),
-		fbOptions = {
-	    dataType: 'json',
-	    sortableControls: false,
-	    editOnAdd: false,
-	    stickyControls: true, 
-	    sortableControls: false, 
-	    disableFields: ['autocomplete', 'button',
-			    'paragraph', 'number', 'checkbox-group', 
-			    'date', 'file', 'hidden', 'header'], 
-	    editOnAdd: false, 
-	    showActionButtons: true, 
-		defaultFields: defaultFields, // edit will load the fields from db
-		fieldRemoveWarn: true,
-	    typeUserEvents: {
-			'checkbox': onAddHandler,
-			'header': onAddHandler,
-			'radio-group': onAddHandler,
-			'select': onAddHandler,
-			'text': onAddHandler,
-			'textarea': onAddHandler
-	    }
-	};
-
-    var formBuilder = $(buildWrap).formBuilder(fbOptions).data('formBuilder');
-    initActionButtons();
-    disableFormEditorFields(document);
-});
+		case "text":{
+			if ($('.required-wrap').length > 0) $('.required-wrap').remove();
+			if($('.description-wrap').length > 0) $('.description-wrap').remove();
+			if($('.className-wrap').length > 0) $('.className-wrap').remove();
+			if($('.name-wrap').length > 0) $('.name-wrap').remove();
+			if($('.access-wrap').length > 0) $('.access-wrap').remove();
+			if($('.placeholder-wrap').length > 0) $('.placeholder-wrap').remove();
+			if($('.value-wrap').length > 0) $('.value-wrap').remove();
+			break;
+		}
+		case "textarea":{
+			if ($('.required-wrap').length > 0) $('.required-wrap').remove();
+			if($('.description-wrap').length > 0) $('.description-wrap').remove();
+			if($('.className-wrap').length > 0) $('.className-wrap').remove();
+			if($('.name-wrap').length > 0) $('.name-wrap').remove();
+			if($('.access-wrap').length > 0) $('.access-wrap').remove();
+			if($('.placeholder-wrap').length > 0) $('.placeholder-wrap').remove();
+			if($('.value-wrap').length > 0) $('.value-wrap').remove();
+			break;
+		}
+		case "select":{
+			if ($('.required-wrap').length > 0) $('.required-wrap').remove();
+			if($('.description-wrap').length > 0) $('.description-wrap').remove();
+			if($('.className-wrap').length > 0) $('.className-wrap').remove();
+			if($('.name-wrap').length > 0) $('.name-wrap').remove();
+			if($('.access-wrap').length > 0) $('.access-wrap').remove();
+			if($('.placeholder-wrap').length > 0) $('.placeholder-wrap').remove();
+			if($('.value-wrap').length > 0) $('.value-wrap').remove();
+			break;
+		}
+		case "checkbox":{
+			if ($('.required-wrap').length > 0) $('.required-wrap').remove();
+			if($('.description-wrap').length > 0) $('.description-wrap').remove();
+			if($('.className-wrap').length > 0) $('.className-wrap').remove();
+			if($('.name-wrap').length > 0) $('.name-wrap').remove();
+			if($('.access-wrap').length > 0) $('.access-wrap').remove();
+			if($('.value-wrap').length > 0) $('.value-wrap').remove();
+			if($('.toggle-wrap').length > 0) $('.toggle-wrap').remove();
+			break;
+		}
+		case "radio-group":{
+			if ($('.required-wrap').length > 0) $('.required-wrap').remove();
+			if($('.description-wrap').length > 0) $('.description-wrap').remove();
+			if($('.className-wrap').length > 0) $('.className-wrap').remove();
+			if($('.name-wrap').length > 0) $('.name-wrap').remove();
+			if($('.access-wrap').length > 0) $('.access-wrap').remove();
+			if($('.placeholder-wrap').length > 0) $('.placeholder-wrap').remove();
+			if($('.multiple-wrap').length > 0) $('.multiple-wrap').remove();
+			break;
+		}
+		default: break;
+		}
+}

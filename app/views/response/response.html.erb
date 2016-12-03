@@ -29,7 +29,11 @@ jQuery(document).ready(function() {
         <% topic_id = SignedUpTeam.where(participant.parent_id, participant.user_id) %>
     <% end %>
     <% if !topic_id.nil? %>
-        <h2>You are reviewing <%= SignUpTopic.find(topic_id).topic_name %></h2>
+        <% topic = SignUpTopic.find(topic_id)%>
+        <h2>You are reviewing <%= topic.topic_name %></h2>
+        <br/><%= topic.description.to_s[0..30]+'...'%>
+        <a style="cursor: pointer" onclick="show_alert('<%= topic.description%>')">more...</a>
+
     <% end %>
 
     <%if @assignment.has_teams?%>
@@ -111,3 +115,4 @@ jQuery(document).ready(function() {
 <% end %>
 <%= @map.show_feedback(@response) %>
 <a href="javascript:window.history.back()">Back</a>
+<div id="dialog-message" style="word-wrap: normal"></div>

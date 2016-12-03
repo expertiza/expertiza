@@ -43,8 +43,8 @@
             <% str+='review_' +review.id.to_s + ',' %>
         <% end %>
 
-        <a href="#" name=<%= "roundshow_" + round.to_s + "Link" %> onClick="toggleAllElement('<%= str %>','show');return false;">show all reviews</a>
-        <a href="#" name=<%= "roundhide_" + round.to_s + "Link" %> onClick="toggleAllElement('<%= str %>','hide');return false;">hide all reviews</a>
+        <a href="#" name=<%="roundshow_" + round.to_s + "Link" %> onClick="toggleAllElement('<%= str %>','show');return false;">show all reviews</a>
+        <a href="#" name=<%="roundhide_" + round.to_s + "Link" %> onClick="toggleAllElement('<%= str %>','hide');return false;">hide all reviews</a>
 
 
         <% if controller.action_name != "view_my_scores" %> %>

@@ -19,7 +19,11 @@ var EditForm = React.createClass({
     componentWillReceiveProps(nextProps){
         var updatedTopic = this.state.topic;
         updatedTopic.topic_identifier = nextProps.topicIdentifier;
+        updatedTopic.topic_name = nextProps.name;
+        updatedTopic.category = nextProps.category;
+        updatedTopic.max_choosers = nextProps.maxChoosers;
         this.setState({topic: updatedTopic});
+        this.setState({id: nextProps.topicId});
         this.setState({showForm: true})
     },
 

@@ -62,7 +62,7 @@ describe "Integration tests for instructor interface" do
   describe "Import tests for assignment topics" do
     it 'should be valid file with 3 columns' do
       login_as("instructor6")
-      visit '/assignments/1/edit'
+      visit '/assignments/766/edit'
       click_link "Topics"
       click_link "Import topics"
       file_path = Rails.root + "spec/features/assignment_topic_csvs/3-col-valid_topics_import.csv"
@@ -75,7 +75,7 @@ describe "Integration tests for instructor interface" do
 
     it 'should be a valid file with 3 or more columns' do
       login_as("instructor6")
-      visit '/assignments/1/edit'
+      visit '/assignments/766/edit'
       click_link "Topics"
       click_link "Import topics"
       file_path = Rails.root + "spec/features/assignment_topic_csvs/3or4-col-valid_topics_import.csv"
@@ -88,7 +88,7 @@ describe "Integration tests for instructor interface" do
 
     it 'should be a invalid csv file' do
       login_as("instructor6")
-      visit '/assignments/1/edit'
+      visit '/assignments/766/edit'
       click_link "Topics"
       click_link "Import topics"
       file_path = Rails.root + "spec/features/assignment_topic_csvs/invalid_topics_import.csv"
@@ -101,7 +101,7 @@ describe "Integration tests for instructor interface" do
 
     it 'should be an random text file' do
       login_as("instructor6")
-      visit '/assignments/1/edit'
+      visit '/assignments/766/edit'
       click_link "Topics"
       click_link "Import topics"
       file_path = Rails.root + "spec/features/assignment_topic_csvs/random.txt"

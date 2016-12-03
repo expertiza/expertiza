@@ -63,6 +63,7 @@ class Response < ActiveRecord::Base
       questionnaire_max = questionnaire.max_question_score
       questions = questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
       # loop through questions so the the questions are displayed in order based on seq (sequence number)
+      #common max point text
       code+='</br> <p><b>Max points for each question: </b>'+ questionnaire.max_question_score.to_s + '  <BR/>'
       questions.each do |question|
         count += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true

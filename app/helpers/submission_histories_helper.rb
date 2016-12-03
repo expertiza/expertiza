@@ -1,2 +1,0 @@
-module SubmissionHistoriesHelper
-end

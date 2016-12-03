@@ -36,8 +36,8 @@ describe "assignment submisstion test" do
       click_on 'Upload link'
       expect(page).to have_content "https://www.ncsu.edu"
       #open the link and check content
-      click_on "https://www.ncsu.edu"
-      expect(page).to have_http_status(200)
+      ##click_on "https://www.ncsu.edu"
+      ##expect(page).to have_http_status(200)
       #new_window = page.driver.browser.window_handles.last
       #page.within_window new_window do
         #expect(page).to have_content "NC STATE NEWS"

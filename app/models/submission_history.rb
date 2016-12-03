@@ -11,7 +11,7 @@ class SubmissionHistory < ActiveRecord::Base
     else
       action = "add"
     end
-    
+
     if link.start_with?("http")
       history_obj = LinkSubmissionHistory.create(link, team, action)
     else
@@ -32,10 +32,6 @@ class SubmissionHistory < ActiveRecord::Base
 
   def get_submitted_at_time(link)
     return Time.current
-  end
-
-  def updated?
-    return false
   end
 
 end

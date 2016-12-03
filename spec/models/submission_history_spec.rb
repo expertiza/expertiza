@@ -69,7 +69,7 @@ describe SubmissionHistory do
       assignment_team.save
       puts assignment_team.hyperlinks
       puts assignment_team.parent_id
-      puts assignment_team.assignment.id
+      # puts assignment_team.assignment.id
       expect(LinkSubmissionHistory).to receive(:add_submission)
       expect(SubmissionHistory).to receive(:create)
       expect(LinkSubmissionHistory).to receive(:create)

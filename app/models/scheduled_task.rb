@@ -218,9 +218,9 @@ class ScheduledTask
 #method which runs after x hours of assignment submission which creates different simicheck comparisons and submits all files/links to that comparison
   def compare_files_with_simicheck
     comparison_file = SimicheckComparison.create_simicheck_comparison(self.assignment_id,"file")
-    comparison_html = comparison_file#SimicheckComparison.create_simicheck_comparison(self.assignment_id,"html")
-    comparison_gdoc = comparison_file#SimicheckComparison.create_simicheck_comparison(self.assignment_id,"gdoc")
-    comparison_github = comparison_file#SimicheckComparison.create_simicheck_comparison(self.assignment_id,"github")
+    comparison_html = SimicheckComparison.create_simicheck_comparison(self.assignment_id,"html")
+    comparison_gdoc = SimicheckComparison.create_simicheck_comparison(self.assignment_id,"gdoc")
+    comparison_github = SimicheckComparison.create_simicheck_comparison(self.assignment_id,"github")
     assignment = Assignment.find(self.assignment_id)
     assignment_teams = AssignmentTeam.where(['parent_id = ?', self.assignment_id])
 
@@ -232,7 +232,8 @@ class ScheduledTask
           if(link.include?('github.com'))
             user = link.partition('.com/').last.split('/')[0]
             repo = link.partition('.com/').last.split('/')[1]
-            client = Octokit::Client.new(:login=>'ssn0602',:password=>'a1b2c3d4')
+            #client = Octokit::Client.new(:login=>'ssn0602',:password=>'a1b2c3d4')
+            client = Octokit::Client.new(:login=>'expertizaSimicheck',:password=>'expertiza123')
             path = user + '/' + repo
             assignment_commits = client.commits_between(path,(DateTime.parse(self.due_at)-45.days).to_date.to_s,(DateTime.parse(self.due_at)).to_date.to_s)
             l = assignment_commits.length

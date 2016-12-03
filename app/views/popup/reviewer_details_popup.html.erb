@@ -43,72 +43,134 @@
 <div id="responsetime">
   <% reviewee_list = Array.new %>
   <% total_time_list = Array.new %>
+  <% timeHash = Hash.new %>
   <h3> Response time details</h3>
-  <table width="100%">
-    <tr>
-      <th align="right">Reviewee id </th>
-      <th align="right">Total Time (mins)</th>
-      <th align="right">Round </th>
-      <th align="right">Links</th>
-      <th align="right">Time per link (mins)</th>
-    </tr>
-<% @reviewers = Participant.where(user_id: @user.id) %>
-<% @reviewers.each do |reviewer| %> <!-- for reviewer-->
-  <% @response_maps = ResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: @id)  %>
-  <% @number_of_rounds = Assignment.find(@id).rounds_of_reviews %>
-  <% reviewee_count = 0 %>
-  <% @response_maps.each do |map| %>  <!-- for reviewee-->
-    <% map_total_time = 0 %>
-    <% (1..@number_of_rounds).each do |each_round| %>  <!-- for rounds-->
-      <% @responsetime_match = ResponseTime.where(map_id: map.id, round:each_round)%>
-      <% @reviewed_object_id = map.reviewed_object_id %>
-      <% @reviewee_id = map.reviewee_id %>
+  <a id = "details" class= "show" onclick="showDetails()">show details</a>
+  <div id="chartContainer" style="height: 200px; width: 100%; display: none; "></div>
+  <div>
+      <table width="100%">
+        <tr>
+          <th align="right">Reviewee id </th>
+          <th align="right">Total Time (mins)</th>  
+          <th align="right">Round </th>
+          <th align="right">Links</th>
+          <th align="right">Time per link (mins)</th>
+          <th></th>
+        </tr>
+    <% @reviewers = Participant.where(user_id: @user.id) %>
+    <% @reviewers.each do |reviewer| %> <!-- for reviewer-->
+      <% @response_maps = ResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: @id)  %>
+      <% @number_of_rounds = Assignment.find(@id).rounds_of_reviews %>
+      <% reviewee_count = 0 %>
+      <% @response_maps.each do |map| %>  <!-- for reviewee-->
+        <% map_total_time = 0 %>
+        <% (1..@number_of_rounds).each do |each_round| %>  <!-- for rounds-->
+          <% @per_round_time = Array.new %>
+          <% @responsetime_match = ResponseTime.where(map_id: map.id, round:each_round)%>
+          <% @reviewed_object_id = map.reviewed_object_id %>
+          <% @reviewee_id = map.reviewee_id %>
 
-      <% link_list = Array.new %>
-      <% @count = 0 %>   <!--- To print revieweeId only once-->
-      <% @dummy = "      " %>    <!---Empty string as a placeholder-->
-      <% @responsetime_match.each do |responsetime_entry| %>
-        <% if link_list.include?(responsetime_entry.link) %><!-- pnly unique links per round-->
-        <% else %>
-            <% link_list.push(responsetime_entry.link) %>
-            <tr>
-            <% if @count == 0 %>  <!--- print revieweeId,time, round only for the first row-->
-              <td><%= @reviewee_id %></td>
-              <td id="<%=reviewee_count.to_s %>"></td>
-              <td><%= responsetime_entry.round %></td>
-            <% else %>        <!--- Else print dummy-->
-              <td><%= @dummy %></td>  
-              <td><%= @dummy %></td>
-              <td><%= " "%></td>
-            <%end%>
-            <td><%= responsetime_entry.link %></td>
-            <% individual_link_time = link_time(responsetime_entry.map_id,responsetime_entry.round,responsetime_entry.link) %>
-            <% map_total_time = map_total_time + individual_link_time %>
-
-            <td align="center"><%= sprintf("%.2f",individual_link_time) %></td>
-            </tr>
-        <% end %>
-        <% @count=@count+1 %>
-      <%end %>
-    <% end%>
-    <% reviewee_list << @reviewee_id %>
-    <% total_time_list << map_total_time.round(2) %>
-    <% reviewee_count = reviewee_count+1%>
-  <% end %>
-<% end %>
-</table>
+          <% link_list = Array.new %>
+          <% @count = 0 %>   <!--- To print revieweeId only once-->
+          <% @dummy = "      " %>    <!---Empty string as a placeholder-->
+          <% @responsetime_match.each do |responsetime_entry| %>
+            <% if link_list.include?(responsetime_entry.link) %><!-- only unique links per round-->
+            <% else %>
+                <% link_list.push(responsetime_entry.link) %>
+                <tr>
+                <% if @count == 0 %>  <!--- print revieweeId,time, round only for the first row-->
+                  <td><%= @reviewee_id %></td>
+                  <td id="<%=reviewee_count.to_s %>"></td>
+                  <td><%= responsetime_entry.round %></td>
+                <% else %>        <!--- Else print dummy-->
+                  <td><%= @dummy %></td>  
+                  <td><%= @dummy %></td>
+                  <td><%= " "%></td>
+                <%end%>
+                <td><%= responsetime_entry.link %></td>
+                <% individual_link_time = link_time(responsetime_entry.map_id,responsetime_entry.round,responsetime_entry.link) %>
+                <% map_total_time = map_total_time + individual_link_time %>
+                 <% each_link_detail = Array.new %>
+                 <% each_link_detail << responsetime_entry.link %>
+                 <% each_link_detail << individual_link_time %>
+                 <% @per_round_time << each_link_detail %>
+                <td align="center"><%= sprintf("%.2f",individual_link_time) %></td>
+                <% if @count == 0 %>
+                <td><a onclick="drawChart(<%= @reviewee_id.to_s %>,<%= each_round.to_s %>)">Alternate view </a></td>
+                <% else %> 
+                <td><%= " "%></td>
+                <%end%>
+                </tr>
+            <% end %>
+            <% @count=@count+1 %>
+          <%end %>   <!-- end for link-->
+        <% timeHash[(@reviewee_id.to_s).concat(each_round.to_s)] = @per_round_time %>  
+        <% end%>    <!-- end for round-->
+        <% reviewee_list << @reviewee_id %>
+        <% total_time_list << map_total_time.round(2) %>
+        <% reviewee_count = reviewee_count+1%>
+      <% end %>  <!-- end for reviewee-->
+    <% end %>   <!-- end for reviewer-->
+    </table>
+</div>
 
 <!--- Script to update the total time column after the page load-->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/canvasjs/1.7.0/canvasjs.js"> </script>     <!-- Canvas JS CDN -->
 <script type="text/javascript">
+var timeReportHash;
+var showDetailsEnabled = false;
 window.onload = function () { 
+
+        timeReportHash = <%= timeHash.to_json.to_s.html_safe %>;
         totalTimeList = <%= total_time_list%>
-        revieweeList = <%= reviewee_list%>
-        for(i=0;i<totalTimeList.length;i++){
-          var id=i.toString();  
-          document.getElementById(id).innerHTML=totalTimeList[i];  
+        for(each=0;each<totalTimeList.length;each++){
+          var eachId=each.toString();  
+          document.getElementById(eachId).innerHTML=totalTimeList[each];  
         }
         
 }  
+function showDetails(){
+ if(showDetailsEnabled){
+    $( "#chartContainer" ).toggle();
+     if($("#details").text()=="show details"){
+        $("#details").text('hide details');  
+     }
+     else{
+      $("#details").text('show details');
+     }
+ } 
+}
+function drawChart(reviewee_id,round){
+      showDetailsEnabled=true;   //To enable the show details link
+      if($("#chartContainer").css("display")== 'none'){
+          $( "#chartContainer" ).toggle();
+          $("#details").text('hide details'); 
+      }
+        var allLinks = timeReportHash[(reviewee_id.toString()).concat(round.toString())];
+        var dataArray=[];  //Data to be passed to  chart
+        for(i=0;i<allLinks.length;i++){
+          var dataPoint={}
+          dataPoint["y"] = allLinks[i][1];
+          dataPoint["indexLabel"] = allLinks[i][0];
+          dataArray.push(dataPoint);
+        }
+      
+      var chart = new CanvasJS.Chart("chartContainer",
+      { 
+        data: [
+        {
+          type: "pie",
+          showInLegend: false,
+          legendText: "{indexLabel}",
+          dataPoints : dataArray
+        }
+        ]
+      });
+      chart.render();
+      $(".canvasjs-chart-credit").css("display","none");//To remove the water mark from the chart
+      
+      
+}
 </script>
 
 </div>

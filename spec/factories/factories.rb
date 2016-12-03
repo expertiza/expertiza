@@ -112,6 +112,9 @@ FactoryGirl.define do
     num_review_of_reviews 1
     num_review_of_reviewers 1
     reviews_visible_to_all false
+
+    allow_anonymous_commenting false
+
     num_reviewers 1
     spec_location "https://expertiza.ncsu.edu/"
     max_team_size 3

@@ -202,10 +202,16 @@ class AssignmentForm
     @assignment.microtask = false if @assignment.microtask.nil?
   end
 
+  def allow_anonymous_commenting
+    if @assignment.allow_anonymous_commenting.nil?
+      @assignment.allow_anonymous_commenting = false
+    end
+  end
+
   def reviews_visible_to_all
     if @assignment.reviews_visible_to_all.nil?
       @assignment.reviews_visible_to_all = false
-      end
+    end
   end
 
   def review_assignment_strategy

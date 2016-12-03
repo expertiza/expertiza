@@ -94,7 +94,6 @@
             <% elsif @assignment.get_current_stage(topic_id) != "Complete" && @assignment.can_review(topic_id) %>
                 <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
                  <td>
-                      <% if participant.type.to_s == "AssignmentTeam"%>
                       <% if (!@team.chat.nil?) %>
                       <div id="messages" class="hidden">
                             <div id="partial<%= "#{review_no}" %>"  >
@@ -108,7 +107,7 @@
                             </div>
                           </div>
                           <% end %>
-                          <%end %>
+
 
                       <a href="javascript:register_popup('<%= "#{review_no}" %>', '<%= "#{review_no}" %>' );">
                         <span>Chat</span>

@@ -164,7 +164,8 @@ class UsersController < ApplicationController
       render action: 'new'
     end
   end
-  def request_user_creation
+
+  def create_approved_user
     @user = RequestedUser.find params[:id]
     @user.status=params[:status]
     @user.reason=params[:reason]
@@ -175,14 +176,12 @@ class UsersController < ApplicationController
     end
     if @user.status=="Approved"
       check = User.find_by_name(@user.name)
-      #params[:user][:name] = params[:user][:email] unless check.nil?
       @usernew = User.new()
       @usernew.name = @user.name
       @usernew.role_id = @user.role_id
       @usernew.institution_id = @user.institution_id
       @usernew.fullname = @user.fullname
       @usernew.email = @user.email
-      #@user.institution_id = 
       # record the person who created this new user
       @usernew.parent_id = session[:user].id
       # set the user's timezone to its parent's
@@ -190,16 +189,10 @@ class UsersController < ApplicationController
 
       if @usernew.save
         password = @usernew.reset_password # the password is reset
-
-        prepared_mail = MailerHelper.send_mail_to_user(@usernew, "Your Expertiza account and password have been created.", "user_welcome", password)
+        prepared_mail = MailerHelper.send_mail_to_user(@usernew, "Your Expertiza account and password 
+                                                            have been created.", "user_welcome", password)
         prepared_mail.deliver
-
         flash[:success] = "A new password has been sent to new user's e-mail address."
-        # Instructor and Administrator users need to have a default set for their notifications
-        # the creation of an AssignmentQuestionnaire object with only the User ID field populated
-        # ensures that these users have a default value of 15% for notifications.
-        # TAs and Students do not need a default. TAs inherit the default from the instructor,
-        # Students do not have any checks for this information.
         if @usernew.role.name == "Instructor" or @usernew.role.name == "Administrator"
           AssignmentQuestionnaire.create(user_id: @user.id)
         end

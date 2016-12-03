@@ -236,9 +236,10 @@ class ScheduledTask
             l = assignment_commits.length
             commit_files = Array.new(l)
             0.upto(l-1).each {  |i|
+              commit_url = assignment_commits[i][:url]
               commit_json = RestClient.get(commit_url)
               commit_hash = JSON.parse(commit_json)
-              num_of_files = commit_hash["files"]
+              num_of_files = commit_hash["files"].length
               f = File.open("/tmp/"+assignment_team.name+"#{link_count}"+".txt", "a")
               0.upto(num_of_files -1).each { |j|
                 if (commit_hash["files"][j] != nil)
@@ -249,8 +250,22 @@ class ScheduledTask
               f.close
               f = File.open("/tmp/"+assignment_team.name+"#{link_count}"+".txt", "r")
               comparison_github.send_file_to_simicheck(f)
+              link_count += 1
             }
-
+          elsif(link.include?('docs.google.com'))
+            doc_id = link.partition('/d/').last.split('/')[0]
+            doc_url = "https://docs.google.com/document/d/"+doc_id+"/export?format=docx"
+            response = RestClient.get(doc_url)
+            if(response.code == 200)
+              page = response.body
+              f = File.open("/tmp/"+assignment_team.name+"#{link_count}"+".docx", "w+")
+              f.write(page)
+              f.close
+              f = File.open("/tmp/"+assignment_team.name+"#{link_count}"+".docx", "r")
+              comparison_html.send_file_to_simicheck(f)
+              link_count += 1
+              #f.close
+            end
           else
             response = RestClient.get(link)
             if(response.code == 200)

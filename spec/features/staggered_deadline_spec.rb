@@ -71,8 +71,10 @@ describe "Staggered deadline test" do
     visit '/student_task/list'
     visit topic #signup topic
     visit '/student_task/list'
+    sleep(10)
     click_link "Assignment1665"
     click_link "Your work"
+    sleep(10)
     fill_in 'submission', with: work
     click_on 'Upload link'
     expect(page).to have_content work
@@ -80,24 +82,22 @@ describe "Staggered deadline test" do
 
   #change topic staggered deadline
   def change_due(topic, type, round, time)
-    topic_due = TopicDueDate.where(parent_id: topic, deadline_type_id: type, round: round, type: "TopicDueDate").first
+    topic_due = DueDate.where(parent_id: topic, deadline_type_id: type, round: round, type: "TopicDueDate").first
     topic_due.due_at = time
     topic_due.save
   end
 
   it "test1: in round 1, student2064 in review stage could do review", js: true do
     #impersonate each participant submit their topics
-    @assignment=Assignment.find_by(name:'Assignment1665')
-    ReviewResponseMap.where(reviewed_object_id: @assignment.id).destroy_all
-
-    @topic1= SignUpTopic.find_by(topic_name:'Topic_1')
-    @topic2= SignUpTopic.find_by(topic_name:'Topic_2')
-    @sign_up1=SignupTeam.find_by(topic_id:@topic1.id)
-    @sign_up2=SignupTeam.find_by(topic_id:@topic2.id)
-    submit_topic('student2064',"/sign_up_sheet/sign_up?id=#{@assignment.id}&topic_id=#{@assignment.id}","https://google.com")
-    submit_topic('student2065',"/sign_up_sheet/sign_up?id=#{@assignment.id}&topic_id=#{@topic2.id}","https://ncsu.edu")
+    @id=Assignment.find_by(name: 'Assignment1665')
+    @topic1=SignUpTopic.find_by(topic_name:'Topic_1')
+    @topic2=SignUpTopic.find_by(topic_name:'Topic_2')
+    @team1=Team.find_by(name:"staggered_team1")
+    @team2=Team.find_by(name:"staggered_team2")
+    submit_topic("student2064","/sign_up_sheet/sign_up?id=4&topic_id=#{@topic1.id}","https://google.com")
+    submit_topic("student2065","/sign_up_sheet/sign_up?id=#{@id.id}&topic_id=#{@topic2.id}","https://ncsu.edu")
     #change deadline to make student2064 in review stage in round 1
-    change_due(1, 1, 1, DateTime.now - 10)
+    change_due(@topic1.id, 1, 1, DateTime.now - 1000)
 
     #impersonate each participant and check their topic's current stage
 
@@ -127,7 +127,7 @@ describe "Staggered deadline test" do
     expect(page).to have_content "Others' work"
     click_link "Others' work"
     expect(page).to have_content 'Reviews for "Assignment1665"'
-    choose "topic_id_1"
+    choose 'topic_id_'+@topic1.id.to_s
     click_button 'Request a new submission to review'
     expect(page).to have_content "Review 1."
     click_link "Begin"
@@ -139,30 +139,33 @@ describe "Staggered deadline test" do
     expect(page).to have_content "View"
     #SignUpTopic.all.destroy_all
     Answer.where(comments:"test fill").destroy_all
-    change_due(1, 1, 1, DateTime.now + 10)
+    ResponseMap.where(reviewed_object_id: @id.id).destroy_all
+    SubmissionRecord.where(team_id:@team1.id).destroy_all
+    SubmissionRecord.where(team_id:@team2.id).destroy_all
+    change_due(@topic1.id, 1, 1, DateTime.now + 1000)
     #SignUpTopic.all.destroy_all
     #SignUpTopic.new(topic_name: "Topic_1").save
 
     #create(:topic, topic_name: "Topic_1")
     #create(:topic, topic_name: "Topic_2")
   end
-
   it "test2: in round 2, both students should be in review stage to review each other", js: true do
-    #impersonate each participant submit their topics
-    @assignment=Assignment.find_by(name:'Assignment1665')
-    ReviewResponseMap.where(reviewed_object_id: @assignment.id).destroy_all
 
-    @topic1= SignUpTopic.find_by(topic_name:'Topic_1')
-    @topic2= SignUpTopic.find_by(topic_name:'Topic_2')
-    submit_topic('student2064',"/sign_up_sheet/sign_up?id=#{@assignment.id}&topic_id=#{@topic1.id}","https://google.com")
-    submit_topic('student2065',"/sign_up_sheet/sign_up?id=#{@assignment.id}&topic_id=#{@topic2.id}","https://ncsu.edu")
+    @id=Assignment.find_by(name: 'Assignment1665')
+    @topic1=SignUpTopic.find_by(topic_name:'Topic_1')
+    @topic2=SignUpTopic.find_by(topic_name:'Topic_2')
+    @team1=Team.find_by(name:"staggered_team1")
+    @team2=Team.find_by(name:"staggered_team2")
+    submit_topic("student2064","/sign_up_sheet/sign_up?id=#{@id.id}&topic_id=#{@topic1.id}","https://google.com")
+    #sleep(10000)
+    submit_topic("student2065","/sign_up_sheet/sign_up?id=#{@id.id}&topic_id=#{@topic2.id}","https://ncsu.edu")
     #change deadline to make both in review stage in round 2
-    change_due(1, 1, 1, DateTime.now - 30)
-    change_due(1, 2, 1, DateTime.now - 20)
-    change_due(1, 1, 2, DateTime.now - 10)
-    change_due(2, 1, 1, DateTime.now - 30)
-    change_due(2, 2, 1, DateTime.now - 20)
-    change_due(2, 1, 2, DateTime.now - 10)
+    change_due(@topic1.id, 1, 1, DateTime.now - 3000)
+    change_due(@topic1.id, 2, 1, DateTime.now - 2000)
+    change_due(@topic1.id, 1, 2, DateTime.now - 1000)
+    change_due(@topic2.id, 1, 1, DateTime.now - 3000)
+    change_due(@topic2.id, 2, 1, DateTime.now - 2000)
+    change_due(@topic2.id, 1, 2, DateTime.now - 1000)
 
     #impersonate each participant and check their topic's current stage
 
@@ -177,7 +180,7 @@ describe "Staggered deadline test" do
     expect(page).to have_content "Others' work"
     click_link "Others' work"
     expect(page).to have_content 'Reviews for "Assignment1665"'
-    choose "topic_id_2"
+    choose 'topic_id_'+@topic2.id.to_s
     click_button 'Request a new submission to review'
     expect(page).to have_content "Review 1."
     click_link "Begin"
@@ -203,7 +206,7 @@ describe "Staggered deadline test" do
     expect(page).to have_content "Others' work"
     click_link "Others' work"
     expect(page).to have_content 'Reviews for "Assignment1665"'
-    choose "topic_id_1"
+    choose 'topic_id_'+@topic1.id.to_s
     click_button 'Request a new submission to review'
     expect(page).to have_content "Review 1."
     click_link "Begin"
@@ -219,12 +222,15 @@ describe "Staggered deadline test" do
     expect(page).to have_content "View"
     #SignUpTopic.all.destroy_all
     Answer.where(comments:"test fill").destroy_all
-    change_due(1, 1, 1, DateTime.now + 30)
-    change_due(1, 2, 1, DateTime.now + 20)
-    change_due(1, 1, 2, DateTime.now + 10)
-    change_due(2, 1, 1, DateTime.now + 30)
-    change_due(2, 2, 1, DateTime.now + 20)
-    change_due(2, 1, 2, DateTime.now + 10)
+    ResponseMap.where(reviewed_object_id: @id.id).destroy_all
+    SubmissionRecord.where(team_id:@team1.id).destroy_all
+    SubmissionRecord.where(team_id:@team2.id).destroy_all
+    change_due(@topic1.id, 1, 1, DateTime.now + 3000)
+    change_due(@topic1.id, 2, 1, DateTime.now + 2000)
+    change_due(@topic1.id, 1, 2, DateTime.now + 1000)
+    change_due(@topic2.id, 1, 1, DateTime.now + 3000)
+    change_due(@topic2.id, 2, 1, DateTime.now + 2000)
+    change_due(@topic2.id, 1, 2, DateTime.now + 1000)
     #SignUpTopic.all.destroy_all
     #SignUpTopic.all.destroy_all
     #create(:topic, topic_name: "Topic_1")
@@ -232,23 +238,25 @@ describe "Staggered deadline test" do
   end
 
   it "test3: in round 2, both students after review deadline should not do review", js: true do
-    #impersonate each participant submit their topics
-    @assignment=Assignment.find_by(name:'Assignment1665')
-    ReviewResponseMap.where(reviewed_object_id: @assignment.id).destroy_all
 
-    @topic1= SignUpTopic.find_by(topic_name:'Topic_1')
-    @topic2= SignUpTopic.find_by(topic_name:'Topic_2')
-    submit_topic('student2064',"/sign_up_sheet/sign_up?id=#{@assignment.id}&topic_id=#{@topic1.id}","https://google.com")
-    submit_topic('student2065',"/sign_up_sheet/sign_up?id=#{@assignment.id}&topic_id=#{@topic2.id}","https://ncsu.edu")
+    @id=Assignment.find_by(name: 'Assignment1665')
+    @topic1=SignUpTopic.find_by(topic_name:'Topic_1')
+    @topic2=SignUpTopic.find_by(topic_name:'Topic_2')
+    @team1=Team.find_by(name:"staggered_team1")
+    @team2=Team.find_by(name:"staggered_team2")
+    submit_topic("student2064","/sign_up_sheet/sign_up?id=#{@id.id}&topic_id=#{@topic1.id}","https://google.com")
+    #sleep(10000)
+    submit_topic("student2065","/sign_up_sheet/sign_up?id=#{@id.id}&topic_id=#{@topic2.id}","https://ncsu.edu")
+
     #change deadline to make both after review deadline in round 2
-    change_due(1, 1, 1, DateTime.now - 40)
-    change_due(1, 2, 1, DateTime.now - 30)
-    change_due(1, 1, 2, DateTime.now - 20)
-    change_due(1, 2, 2, DateTime.now - 10)
-    change_due(2, 1, 1, DateTime.now - 40)
-    change_due(2, 2, 1, DateTime.now - 30)
-    change_due(2, 1, 2, DateTime.now - 20)
-    change_due(2, 2, 2, DateTime.now - 10)
+    change_due(@topic1.id, 1, 1, DateTime.now - 4000)
+    change_due(@topic1.id, 2, 1, DateTime.now - 3000)
+    change_due(@topic1.id, 1, 2, DateTime.now - 2000)
+    change_due(@topic1.id, 2, 2, DateTime.now - 1000)
+    change_due(@topic2.id, 1, 1, DateTime.now - 4000)
+    change_due(@topic2.id, 2, 1, DateTime.now - 3000)
+    change_due(@topic2.id, 1, 2, DateTime.now - 2000)
+    change_due(@topic2.id, 2, 2, DateTime.now - 1000)
 
     #impersonate each participant and check their topic's current stage
     user = User.find_by_name('student2064')
@@ -262,7 +270,7 @@ describe "Staggered deadline test" do
     click_link "Others' work"
     expect(page).to have_content 'Reviews for "Assignment1665"'
     #it should not able to choose topic for review
-    expect{choose "topic_id_2"}.to raise_error('Unable to find radio button "topic_id_2"')
+    expect{choose 'topic_id_'+@topic2.id.to_s}.to raise_error('Unable to find radio button "topic_id_4"')
 
     user = User.find_by_name('student2065')
     stub_current_user(user, user.role.name, user.role)
@@ -272,19 +280,23 @@ describe "Staggered deadline test" do
     expect(page).to have_content "Others' work"
     click_link "Others' work"
     expect(page).to have_content 'Reviews for "Assignment1665"'
-    expect{choose "topic_id_2"}.to raise_error('Unable to find radio button "topic_id_2"')
+    expect{choose 'topic_id_'+@topic2.id.to_s}.to raise_error('Unable to find radio button "topic_id_4"')
     #SignUpTopic.all.destroy_all
     Answer.where(comments:"test fill").destroy_all
-    change_due(1, 1, 1, DateTime.now + 40)
-    change_due(1, 2, 1, DateTime.now + 30)
-    change_due(1, 1, 2, DateTime.now + 20)
-    change_due(1, 2, 2, DateTime.now + 10)
-    change_due(2, 1, 1, DateTime.now + 40)
-    change_due(2, 2, 1, DateTime.now + 30)
-    change_due(2, 1, 2, DateTime.now + 20)
-    change_due(2, 2, 2, DateTime.now + 10)
+    ResponseMap.where(reviewed_object_id: @id.id).destroy_all
+    SubmissionRecord.where(team_id:@team1.id).destroy_all
+    SubmissionRecord.where(team_id:@team2.id).destroy_all
+    change_due(@topic1.id, 1, 1, DateTime.now + 4000)
+    change_due(@topic1.id, 2, 1, DateTime.now + 3000)
+    change_due(@topic1.id, 1, 2, DateTime.now + 2000)
+    change_due(@topic1.id, 2, 2, DateTime.now + 1000)
+    change_due(@topic2.id, 1, 1, DateTime.now + 4000)
+    change_due(@topic2.id, 2, 1, DateTime.now + 3000)
+    change_due(@topic2.id, 1, 2, DateTime.now + 2000)
+    change_due(@topic2.id, 2, 2, DateTime.now + 1000)
     #SignUpTopic.all.destroy_all
     #create(:topic, topic_name: "Topic_1")
     #create(:topic, topic_name: "Topic_2")
   end
 end
+

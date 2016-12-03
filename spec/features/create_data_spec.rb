@@ -216,39 +216,44 @@ describe "create data" do
 
     #staggered deadline test==============================================================================
     @assignment=create(:assignment, name: "Assignment1665", directory_path: "Assignment1665", rounds_of_reviews: 2, staggered_deadline: true)
-    (4..6). each {|i|create(:participant, assignment: Assignment.find_by(name:'Assignment1665'),user:User.find_by(name:'student206'+i.to_s))}
-    @topic1=create(:topic, topic_name: "Topic_1",assignment_id:@assignment.id)
-    @topic2=create(:topic, topic_name: "Topic_2",assignment_id:@assignment.id)
-
+    (4..6). each {|i|create(:participant, assignment: @assignment,user:User.find_by(name:'student206'+i.to_s))}
+    @topic1=create(:topic, topic_name: "Topic_1",assignment:@assignment)
+    @topic2=create(:topic, topic_name: "Topic_2",assignment:@assignment)
+    @team1=create(:assignment_team,name:'staggered_team1',assignment:@assignment)
+    @team2=create(:assignment_team,name:'staggered_team2',assignment:@assignment)
+    create(:signed_up_team,team_id:@team1.id,topic:@topic1)
+    create(:signed_up_team,team_id:@team2.id,topic:@topic2)
+    create(:team_user, user: User.where(name:'student2064').first,team: @team1)
+    create(:team_user, user: User.where(name:'student2065').first,team: @team2)
     #rubric
     create(:questionnaire, name: "TestQuestionnaire1")
     create(:questionnaire, name: "TestQuestionnaire2")
     create(:question, txt: "Question1", questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first, type: "Criterion")
     create(:question, txt: "Question2", questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first, type: "Criterion")
-    create(:assignment_questionnaire, questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first, used_in_round: 1,assignment:@assignment)
-    create(:assignment_questionnaire, questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first, used_in_round: 2,assignment:@assignment)
+    create(:assignment_questionnaire, assignment:@assignment,questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first, used_in_round: 1)
+    create(:assignment_questionnaire, assignment:@assignment,questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first, used_in_round: 2)
 
     #assignment deadline
-    assignment_due('submission',DateTime.now + 10,1,1)
-    assignment_due('review',    DateTime.now + 20,1)
-    assignment_due('submission',DateTime.now + 30,2)
-    assignment_due('review',    DateTime.now + 40,2)
+    assignment_due('submission',DateTime.now + 1000,1,1)
+    assignment_due('review',    DateTime.now + 2000,1)
+    assignment_due('submission',DateTime.now + 3000,2)
+    assignment_due('review',    DateTime.now + 4000,2)
 
     #topic deadline
-    topic_due('submission',DateTime.now + 10,@topic1.id,1,1)
-    topic_due('review',    DateTime.now + 20,@topic1.id,1)
-    topic_due('submission',DateTime.now + 30,@topic1.id,2,1)
-    topic_due('review',    DateTime.now + 40,@topic1.id,2)
-    topic_due('submission',DateTime.now + 10,@topic2.id,1,1)
-    topic_due('review',    DateTime.now + 20,@topic2.id,1)
-    topic_due('submission',DateTime.now + 30,@topic2.id,2,1)
-    topic_due('review',    DateTime.now + 40,@topic2.id,2)
+    topic_due('submission',DateTime.now + 1000,@topic1.id,1,1)
+    topic_due('review',    DateTime.now + 2000,@topic1.id,1)
+    topic_due('submission',DateTime.now + 3000,@topic1.id,2,1)
+    topic_due('review',    DateTime.now + 4000,@topic1.id,2)
+    topic_due('submission',DateTime.now + 1000,@topic2.id,1,1)
+    topic_due('review',    DateTime.now + 2000,@topic2.id,1)
+    topic_due('submission',DateTime.now + 3000,@topic2.id,2,1)
+    topic_due('review',    DateTime.now + 4000,@topic2.id,2)
   end
 
   def assignment_due(type,time,round, review_allowed_id = 3)
     create(:assignment_due_date,
            deadline_type: DeadlineType.where(name: type).first,
-           assignment:@assignment,
+           assignment:Assignment.find_by(name: "Assignment1665"),
            due_at: time,
            round: round,
            review_allowed_id: review_allowed_id)
@@ -263,13 +268,4 @@ describe "create data" do
            review_allowed_id: review_allowed_id)
   end
   #questionnaire======================================================
-
-  #sign_up_team=======================================================
-  @assignment=create(:assignment,name:"sign_up_team")
-  (1..3). each {|i|create(:participant, assignment: Assignment.find_by(name:'sign_up_team'),user:User.find_by(name:'student2'+i.to_s))}
-  create(:assignment_node,node_object_id: @assignment.id)
-  create :assignment_due_date, due_at: (DateTime.now + 100),assignment:@assignment
-  create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: (DateTime.now + 100),assignment:@assignment)
-  @topic=create(:topic, assignment: @assignment,topic_name: "sign_up_team_topic1")
-  @topic=create(:topic, assignment: @assignment,topic_name: "sign_up_team_topic2")
 end

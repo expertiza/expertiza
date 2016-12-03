@@ -49,7 +49,7 @@ class Response < ActiveRecord::Base
             end
     code += "<BR/><B>Latest review version: </B>"
     code += if self.version_num.nil?
-              "Not available"
+              "1"
             else
               self.version_num.to_s
             end

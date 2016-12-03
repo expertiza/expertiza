@@ -34,7 +34,7 @@ jQuery(document).ready(function() {
         <b>Description &nbsp;&nbsp;&nbsp;</b>
         <%= topic.description.to_s[0..30]+'...'%>
         <a style="cursor: pointer" onclick="show_alert('<%= topic.description%>')">more...</a>
-
+        <%= link_to image_tag('external-link-16.png', :border => 0, :align => 'middle'), topic.link, :target=>'_blank' %>
     <% end %>
 
     <%if @assignment.has_teams?%>

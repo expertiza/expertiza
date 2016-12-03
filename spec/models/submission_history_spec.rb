@@ -64,6 +64,7 @@ describe SubmissionHistory do
     it "should add GithubRepoSubmissionHistory" do
       assignment_team = build(AssignmentTeam)
       assignment_team.submit_hyperlink("https://github.com/prerit2803/expertiza")
+      assignment_team.save
       puts assignment_team.hyperlinks
       puts assignment_team.parent_id
       puts assignment_team.assignment.id

@@ -64,7 +64,7 @@ describe SubmissionHistory do
     it "should add GithubRepoSubmissionHistory" do
       assignment_team = build(AssignmentTeam)
       assignment_team.submit_hyperlink("https://github.com/prerit2803/expertiza")
-      SubmissionHistory.add_submission(assignment_team.assignment.id)
+      LinkSubmissionHistory.add_submission(assignment_team.assignment.id)
       expect(GithubRepoSubmissionHistory).to receive(:get_submitted_at_time)
     end
   end

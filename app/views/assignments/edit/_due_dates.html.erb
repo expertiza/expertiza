@@ -97,7 +97,7 @@
         html += '<td align="center" class="due_date_due_at" width="25%">' +
         '<input id="datetimepicker_' + element_id +
         '" name="assignment_form[due_date][][due_at]" style="width: 200px" type="text" value="' +
-        due_at + '">' +"<select onchange=\"UpdateDeadlineForThisId(\'"+element_id+"\');\"id = \"dropdown_"+element_id+"\"><option value=0>Select deadline</option><option value=2>2 days from initial deadline</option><option value=5>5 days from initial deadline</option><option value=7>One week from initial deadline</option><option value=10>10 days from initial deadline</option><option value=12>Two weeks from initial deadline</option><option value=15>15 days from initial deadline</option><option value=20>20 days from initial deadline</option></select>"+ 
+        due_at + '">' +"<select onchange=\"UpdateDeadlineForThisId(\'"+element_id+"\');\"id = \"dropdown_"+element_id+"\"><option value=0>Select deadline</option><option value=1>1 day</option><option value=2>2 days</option><option value=3>3 days</option><option value=4>4 days</option><option value=5>5 days</option><option value=6>6 days</option><option value=7>7 days</option><option value=8>8 day</option><option value=9>9 days</option><option value=10>10 days</option><option value=11>11 days</option><option value=12>12 days</option><option value=13>13 days</option><option value=14>14 days</option></selection>"+ 
         '</td>';
         
         html += '<td align="center" class="due_date_due_at" width="10%">';
@@ -451,6 +451,9 @@
 </table>
         <script>
          //aler/t("Here!!");
+         var first_drop_down = document.getElementById('dropdown_submission_round_1');
+         first_drop_down.outerHTML="";
+         first_drop_down.delete;
          function UpdateDeadlineForThisId(element_id)
          {
 
@@ -478,3 +481,4 @@
 
 
 <%= render :partial => 'assignments/edit/late_policy' %>
+

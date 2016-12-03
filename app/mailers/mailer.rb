@@ -25,6 +25,7 @@ class Mailer < ActionMailer::Base
 
   def request_user_message(defn)
     @user = defn[:body][:user]
+    @super_user = defn[:body][:super_user]
     @first_name = defn[:body][:first_name]
     @new_pct = defn[:body][:new_pct]
     @avg_pct = defn[:body][:avg_pct]

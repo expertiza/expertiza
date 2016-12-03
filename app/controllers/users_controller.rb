@@ -232,7 +232,7 @@ class UsersController < ApplicationController
     if verify_recaptcha(model: @user) && @user.save
       @super_users = User.joins(:role).where('roles.name' =>'Super-Administrator');
       @super_users.each do |super_user|
-        prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, "New account Request")
+        prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user,@user, "New account Request")
         prepared_mail.deliver
       end
       flash[:success] = "User signup for \"#{@user.name}\" has been successfully requested. "

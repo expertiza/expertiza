@@ -10,5 +10,4 @@ validates :email, presence: true, length: { maximum: 255 },
 
 validates :fullname, presence: true, length: { maximum: 100 }  
 
-
 end

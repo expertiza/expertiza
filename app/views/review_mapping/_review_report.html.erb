@@ -32,6 +32,7 @@
                 <!--Team reviewed-->
                 <td id = <%= team_name_color%> bgcolor=<%= @bgcolor %> align = 'left' colspan=1>
                   <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
+
                   <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>
                 </td>
                 <%= render partial: 'team_score',  locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: r.id} %>
@@ -39,7 +40,8 @@
                   <!--Metrics-->
                   <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
                     <%= display_volume_metric(r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3) %>
-                  </td>
+                   <%= ReviewMetric.check_problem(ri.reviewer_id, @assignment.id) %>             
+     </td>
                   <!--Assign grade and write comments-->
                   <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
                     <%= form_tag 'save_grade_and_comment_for_reviewer', remote: true do %>

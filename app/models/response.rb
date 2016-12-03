@@ -268,7 +268,7 @@ class Response < ActiveRecord::Base
     questionnaire
   end
   
-  def self.concatenate_all_review_comments(assignment_id, reviewer_id)
+  def self.concatenate_all_review_comments(assignment_id, reviewer_id,response_id=0)
     comments = ''
     counter = 0
     @comments_in_round_1, @comments_in_round_2, @comments_in_round_3 = '', '', ''

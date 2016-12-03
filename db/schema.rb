@@ -466,7 +466,7 @@ ActiveRecord::Schema.define(version: 20161202220712) do
     t.integer "micropayment",     limit: 4,     default: 0
     t.integer "private_to",       limit: 4
     t.text    "description",      limit: 65535
-    t.text    "link",             limit: 65535
+    t.string  "link",             limit: 255
   end
 
   add_index "sign_up_topics", ["assignment_id"], name: "fk_sign_up_categories_sign_up_topics", using: :btree

@@ -31,7 +31,8 @@ jQuery(document).ready(function() {
     <% if !topic_id.nil? %>
         <% topic = SignUpTopic.find(topic_id)%>
         <h2>You are reviewing <%= topic.topic_name %></h2>
-        <br/><%= topic.description.to_s[0..30]+'...'%>
+        <b>Description &nbsp;&nbsp;&nbsp;</b>
+        <%= topic.description.to_s[0..30]+'...'%>
         <a style="cursor: pointer" onclick="show_alert('<%= topic.description%>')">more...</a>
 
     <% end %>

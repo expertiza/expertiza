@@ -99,6 +99,7 @@ describe "assignment submisstion test" do
     end
 
   end
+=begin
   describe "submit file" do
     it "is able to submit single valid file" do
       signup_topic
@@ -161,5 +162,5 @@ describe "assignment submisstion test" do
     end
 
   end
-
+=end
 end

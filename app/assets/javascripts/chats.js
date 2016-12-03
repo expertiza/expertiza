@@ -79,10 +79,15 @@
         return;
       }
     }
+    var title
+    if(id=="innermessages")
+        title="You Messages";
+      else
+          title="Review"+ name;
 
     var element = '<div class="popup-box chat-popup" id="'+ id +'">';
     element = element + '<div class="popup-head">';
-    element = element + '<div class="popup-head-left"><a> &#9729;</a>Review'+ name +'</div>';
+    element = element + '<div class="popup-head-left"><a> &#9729;</a>+title+</div>';
     element = element + '<div class="popup-head-right"><a href="javascript:close_popup(\''+ id +'\');">&#10005;</a></div>';
     element = element + '<div style="clear: both"></div></div><div class="popup-messages" id="'+"messages"+id+'">'+ '</div></div>';
     $( "body" ).append( element);

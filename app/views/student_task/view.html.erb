@@ -120,7 +120,7 @@ to display the label "Your team" in the student assignment tasks-->
     <% end %>
     <li><%= link_to "Change your handle", {:controller => 'participants', :action => 'change_handle', :id => @participant.id} %> (Provide a different handle for this assignment)</li>
     <% if check_reviewable_topics(@assignment) %>
-  <li><a href="javascript:register_popup('innermessages', 'innermessages','' );">
+  <li><a href="javascript:register_popup('innermessages', 'innermessages' );">
     <span>Your Messages </span>
   </a>(Answer queries on your work)</li>
   <%end%>

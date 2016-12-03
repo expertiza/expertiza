@@ -57,6 +57,7 @@ class Response < ActiveRecord::Base
       questionnaire_max = questionnaire.max_question_score
       questions = questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
       # loop through questions so the the questions are displayed in order based on seq (sequence number)
+      code+='</br> <p><b>Max points for each question: </b>'+ questionnaire.max_question_score.to_s + '  <BR/>'
       questions.each do |question|
         count += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
         answer = answers.find {|a| a.question_id == question.id }
@@ -64,6 +65,7 @@ class Response < ActiveRecord::Base
         row_class = "" if question.is_a? QuestionnaireHeader
 
         code += '<tr class="' + row_class + '"><td>'
+        code+='<div id="questions"'
         if !answer.nil? or question.is_a? QuestionnaireHeader
           code += if question.instance_of? Criterion or question.instance_of? Scale
                     question.view_completed_question(count, answer, questionnaire_max)

@@ -17,7 +17,8 @@ describe LinkSubmissionHistory do
       # expect(GithubSubmissionHistory).to receive(:create)
       # expect(GithubRepoSubmissionHistory).to receive(:create)
       # expect_any_instance_of(SubmissionHistory).to receive(:get_submitted_at_time)
-      # LinkSubmissionHistory.add_submission(assignment.id)
+      LinkSubmissionHistory.add_submission(assignment.id)
+      puts SubmissionHistory.all.size
     end
   end
 end

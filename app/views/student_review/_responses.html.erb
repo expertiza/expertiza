@@ -56,7 +56,6 @@
                     </td>
 
                     <td>
-                      <% if participant.type.to_s == "AssignmentTeam"%>
                       <% if (!@team.chat.nil?) %>
                       <div id="messages" class="hidden">
                             <div id="partial<%= "#{review_no}" %>"  >
@@ -70,7 +69,6 @@
                             </div>
                           </div>
                           <% end %>
-                          <%end %>
 
                       <a href="javascript:register_popup('<%= "#{review_no}" %>', '<%= "#{review_no}" %>' );">
                         <span>Chat</span>

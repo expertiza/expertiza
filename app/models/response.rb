@@ -149,6 +149,7 @@ class Response < ActiveRecord::Base
     response_map = ResponseMap.find map_id
     assignment = nil
 
+    # Emails may not work with team reviewer
     reviewer_participant_id = response_map.reviewer_id
     participant = Participant.find(reviewer_participant_id)
     assignment = Assignment.find(participant.parent_id)

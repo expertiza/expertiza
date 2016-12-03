@@ -7,7 +7,7 @@ class Participant < ActiveRecord::Base
   has_many   :comments, dependent: :destroy
   has_many   :reviews, class_name: 'ResponseMap', foreign_key: 'reviewer_id', dependent: :destroy
   has_many   :team_reviews, class_name: 'ReviewResponseMap', foreign_key: 'reviewer_id', dependent: :destroy
-  has_many :response_maps, class_name: 'ResponseMap', foreign_key: 'reviewee_id', dependent: :destroy
+  has_many   :response_maps, class_name: 'ResponseMap', foreign_key: 'reviewee_id', dependent: :destroy
 
   PARTICIPANT_TYPES = ['Course', 'Assignment']
 
@@ -105,10 +105,10 @@ class Participant < ActiveRecord::Base
       self.assignment.questionnaires.each do |questionnaire|
         round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(self.assignment.id, questionnaire.id).used_in_round
         questionnaire_symbol = if (!round.nil?)
-          (questionnaire.symbol.to_s+round.to_s).to_sym
-        else
-          questionnaire.symbol
-                               end
+                                  (questionnaire.symbol.to_s+round.to_s).to_sym
+                              else
+                                  questionnaire.symbol
+                              end
         scores[questionnaire_symbol] = {}
         scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_for(self)
         scores[questionnaire_symbol][:scores] = Answer.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])

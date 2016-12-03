@@ -1,11 +1,9 @@
 language: ruby
 rvm:
-    - 1.9.3
+    - 2.1.5
 branches:
   only:
     - master
-    - production
-    - rails4
 before_install:
     - uname -a
     - lsb_release -a
@@ -19,7 +17,7 @@ before_install:
     - unset RAILS_ENV
     - rvm rubygems 1.8.23
     - gem update bundler
-    - gem install raspell -- --with-ruby-include=$rvm_path/src/ruby-1.9.3-head/
+    - gem install raspell -- --with-ruby-include=$rvm_path/src/ruby-2.1.5-head/
     - bundle config build.raspell --with-opt-dir=
     - npm install -g bower
     - bower install

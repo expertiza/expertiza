@@ -22,11 +22,11 @@ class TeammateReviewResponseMap < ResponseMap
 
   #Send Teammate Review Emails
   #Refactored from email method in response.rb
-  def email(defn,assignment,participant)
+  def email(defn, participant, assignment)
     defn[:body][:type] = "Teammate Review"
     participant = AssignmentParticipant.find(reviewee_id)
     topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
-    defn[:body][:obj_name] = SignUpTopic.find(topic_id).topic_name rescue nil
+    defn[:body][:obj_name] = assignment.name
     user = User.find(participant.user_id)
     defn[:body][:first_name] = user.fullname
     defn[:to] = user.email

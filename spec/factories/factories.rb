@@ -153,6 +153,18 @@ FactoryGirl.define do
     user { User.where(role_id: 2).first || association(:student) }
   end
 
+
+  factory :course_team, class: CourseTeam do
+    sequence(:name) {|n| "team#{n}" }
+    course { Course.first || association(:course) }
+    type 'CourseTeam'
+    comments_for_advertisement nil
+    advertise_for_partner nil
+    submitted_hyperlinks "---
+- https://www.expertiza.ncsu.edu"
+    directory_num 0
+  end
+
   factory :topic, class: SignUpTopic do
     topic_name "Hello world!"
     assignment { Assignment.first || association(:assignment) }
@@ -170,7 +182,7 @@ FactoryGirl.define do
     preference_priority_number nil
   end
 
-  factory :participant, class: Participant do
+  factory :participant, class: AssignmentParticipant do
     can_submit true
     can_review true
     assignment { Assignment.first || association(:assignment) }
@@ -180,6 +192,23 @@ FactoryGirl.define do
     penalty_accumulated 0
     grade nil
     type "AssignmentParticipant"
+    handle "handle"
+    time_stamp nil
+    digital_signature nil
+    duty nil
+    can_take_quiz true
+  end
+
+  factory :course_participant, class: CourseParticipant do
+    can_submit true
+    can_review true
+    course { Course.first || association(:course) }
+    association :user, factory: :student
+    submitted_at nil
+    permission_granted nil
+    penalty_accumulated 0
+    grade nil
+    type "CourseParticipant"
     handle "handle"
     time_stamp nil
     digital_signature nil
@@ -204,7 +233,6 @@ FactoryGirl.define do
     teammate_review_allowed_id 3
     type 'AssignmentDueDate'
   end
-
   factory :topic_due_date, class: TopicDueDate do
     due_at "2015-12-30 23:30:12"
     deadline_type { DeadlineType.first || association(:deadline_type) }
@@ -318,10 +346,10 @@ FactoryGirl.define do
   end
 
   factory :response, class: Response do
-    review_response_map { ReviewResponseMap.first || association(:review_response_map) }
+    response_map { ReviewResponseMap.first || association(:review_response_map) }
     additional_comment nil
     version_num nil
-    round nil
+    round 1
     is_submitted false
   end
 end

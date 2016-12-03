@@ -67,7 +67,6 @@ group :development do
   gem 'rubocop'
   gem 'selenium-webdriver'
   gem 'quiet_assets'
-  gem "factory_girl_rails", "~> 4.0"
 end
 
 group :test do
@@ -75,6 +74,7 @@ group :test do
   gem 'gherkin'
   gem 'guard-rails'
   gem 'guard-rspec'
+  gem "factory_girl_rails", "~> 4.0"
   gem 'launchy'
   gem 'rspec-rails'
   gem 'shoulda'

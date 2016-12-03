@@ -620,7 +620,8 @@ jQuery(document).ready(function() {
            availability_flag: '',
            reputation_algorithm: '',
            max_team_size: '1',
-           instructor_id: '0'
+           instructor_id: '0',
+           num_quiz_questions: '0'
          }},
          team_assignment: '',
          commit: 'Create',
@@ -702,7 +703,12 @@ jQuery(document).ready(function() {
         var newAssignment = this.state.assignment_form;
         newAssignment.assignment.reputation_algorithm = e.target.value;
         this.setState({assignment: newAssignment});
-console.log("test2")
+      },
+
+      handleNumQuizQuestions: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.num_quiz_questions = e.target.value;
+        this.setState({assignment: newAssignment});
       },
 
       directoryValidate: function(e){
@@ -800,7 +806,7 @@ console.log("test2")
           partial_quiz = (
               <div style={selectDivStyle}>
                 <p>
-                  Number of Quiz Questions: <input type="number" id="number_of_quiz_questions"></input>
+                  Number of Quiz Questions: <input type="number" id="num_quiz_questions"  onChange={this.handleNumQuizQuestions}></input>
                 </p>
               </div>
           );

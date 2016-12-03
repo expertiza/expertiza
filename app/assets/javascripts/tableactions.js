@@ -21,7 +21,7 @@ function alternate(id) {
 }
 
 function toggleElement(elementId, linkText, mode='') {
-    console.log("mode =" + mode);
+    //console.log("mode =" + mode);
     var obj = document.getElementById(elementId);
     if (obj == null) {
         return;

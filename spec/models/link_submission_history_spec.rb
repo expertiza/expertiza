@@ -6,11 +6,12 @@ describe LinkSubmissionHistory do
       assignment = build(Assignment)
       assignment.save
       assignment_team = build(AssignmentTeam)
-      assignment_team.assignment = assignment
+      assignment_team.parent_id = assignment.id
       assignment_team.submit_hyperlink("https://github.com/prerit2803/expertiza")
       assignment_team.save
-      puts assignment_team.hyperlinks
+      puts assignment.id
       puts assignment_team.parent_id
+      puts assignment_team.hyperlinks
       # puts assignment_team.assignment.id
       expect(LinkSubmissionHistory).to receive(:add_submission)
       expect_any_instance_of(AssignmentTeam).to receive(:hyperlinks)

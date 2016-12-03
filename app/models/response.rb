@@ -47,6 +47,12 @@ class Response < ActiveRecord::Base
             else
               self.updated_at.strftime('%A %B %d %Y, %I:%M%p')
             end
+    code += "<BR/><B>Latest review version: </B>"
+    code += if self.version_num.nil?
+              "Not available"
+            else
+              self.version_num.to_s
+            end
     code += '<table id="review_' + str + '" style="display: none;" class="table table-bordered">'
     count = 0
     answers = Answer.where(response_id: self.response_id)

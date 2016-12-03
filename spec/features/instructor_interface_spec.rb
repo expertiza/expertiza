@@ -57,7 +57,7 @@ describe "Integration tests for instructor interface" do
       @assignment=Assignment.find_by(name:'instructor_interface')
       @student1=User.where(name:'student2065').first
       @participant1=  Participant.where(parent_id:@assignment.id,user_id:@student1.id).first
-      visit "/participants/view_publishing_rights?id=#{@participant1.id}"
+      visit "/participants/view_publishing_rights?id=#{@student1.id}"
       expect(page).to have_content('Team name')
       expect(page).not_to have_content('Topic name(s)')
       expect(page).not_to have_content('Topic #')

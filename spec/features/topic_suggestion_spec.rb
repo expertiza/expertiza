@@ -65,10 +65,10 @@ describe "Assignment Topic Suggestion Test" do
 
       user = User.find_by_name('instructor6')
       stub_current_user(user, user.role.name, user.role)
-
+      assignment=Assignment.find_by(name:'Assignment_suggest_topic')
       # instructor approve the suggestion topic
       # DUE date need to be added here
-      visit '/suggestion/list?id=1&type=Assignment'
+      visit "/suggestion/list?id=#{assignment.id}&type=Assignment"
       expect(page).to have_content "Assignment_suggest_topic"
       click_link('View')
       expect(page).to have_content "suggested_description"
@@ -118,8 +118,10 @@ describe "Assignment Topic Suggestion Test" do
       user = User.find_by_name('instructor6')
       stub_current_user(user, user.role.name, user.role)
 
+      assignment=Assignment.find_by(name:'Assignment_suggest_topic')
       # instructor approve the suggestion topic
-      visit '/suggestion/list?id=1&type=Assignment'
+      # DUE date need to be added here
+      visit "/suggestion/list?id=#{assignment.id}&type=Assignment"
       expect(page).to have_content "Suggested topics for Assignment_suggest_topic"
       expect(page).to have_content "suggested_topic"
       click_link('View')
@@ -152,10 +154,10 @@ describe "Assignment Topic Suggestion Test" do
       # login_as instructor6 to approve the 2nd suggested topic
       user = User.find_by_name('instructor6')
       stub_current_user(user, user.role.name, user.role)
-
+      assignment=Assignment.find_by(name:'Assignment_suggest_topic')
       # instructor approve the suggestion topic
       visit '/tree_display/list'
-      visit '/suggestion/list?id=1&type=Assignment'
+      visit "/suggestion/list?id=#{assignment.id}&type=Assignment"
       expect(page).to have_content "Suggested topics for Assignment_suggest_topic"
       expect(page).to have_content "suggested_topic2_will_switch"
       # find link for new suggested view
@@ -170,7 +172,7 @@ describe "Assignment Topic Suggestion Test" do
       user = User.find_by_name('student2064')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
-      click_link('Assignment_suggest_topic')
+      click_link('Assignment_suggest_topic').first
       click_link('Signup sheet')
       expect(page).to have_content "Your approved suggested topic"
       expect(page).to have_content "suggested_topic"
@@ -235,10 +237,12 @@ describe "Assignment Topic Suggestion Test" do
       # login_as "instructor6"
       user = User.find_by_name('instructor6')
       stub_current_user(user, user.role.name, user.role)
+      assignment=Assignment.find_by(name:'Assignment_suggest_topic')
 
       # instructor approve the suggestion topic
       # DUE date need to be added here
-      visit '/suggestion/list?id=1&type=Assignment'
+
+      visit "/suggestion/list?id=#{assignment.id}&type=Assignment"
       click_link('View')
       expect(page).to have_content "suggested_description"
       click_button 'Approve suggestion'
@@ -270,7 +274,7 @@ describe "Assignment Topic Suggestion Test" do
 
       # instructor approve the suggestion topic
       visit '/tree_display/list'
-      visit '/suggestion/list?id=1&type=Assignment'
+      visit "/suggestion/list?id=#{assignment.id}&type=Assignment"
       expect(page).to have_content "Suggested topics for Assignment_suggest_topic"
       expect(page).to have_content "suggested_topic2_without_switch"
       find(:xpath, "//tr[contains(.,'suggested_topic2_without_switch')]/td/a", text: 'View').click
@@ -290,7 +294,7 @@ describe "Assignment Topic Suggestion Test" do
       click_link('Signup sheet')
       expect(page).to have_content "suggested_topic2_without_switch"
       # click_link('publish_approved_suggested_topic')
-      visit '/sign_up_sheet/publish_approved_suggested_topic/2?assignment_id=1'
+      visit "/sign_up_sheet/publish_approved_suggested_topic/2?assignment_id=#{assignment.id}"
       # find(:xpath, "//tr[contains(.,'suggested_topic2_without_switch')]/td/a", :figure=>"Publish Topic").click
       visit '/student_task/list'
       expect(page).to have_content "suggested_topic"

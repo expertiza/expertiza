@@ -171,7 +171,7 @@ class Criterion < ScoredQuestion
   # This method returns what to display if a student is viewing a filled-out questionnaire
   def view_completed_question(count, answer, questionnaire_max,reviewNumber='')
 
-    html = '<b id="'+reviewNumber.to_s+'_question_' + self.id.to_s + '" style="display: '';" >' + count.to_s + ". " + self.txt + ' [Max points: ' + questionnaire_max.to_s + "]</b>"
+    html = '<b id="'+reviewNumber.to_s+'_question_' + self.id.to_s + '" style="display: '';" >' + count.to_s + ". " + self.txt + "</b>"
     score = !answer.answer.nil? ? answer.answer.to_s : "-"
     score_percent = if score != "-"
                       answer.answer * 1.0 / questionnaire_max
@@ -193,7 +193,7 @@ class Criterion < ScoredQuestion
 
     html += '<table cellpadding="5">'
     html += '<tr>'
-    html += '<td  id="'+reviewNumber.to_s+'_score_' + self.id.to_s + '" style="display: '';" >'
+    html += '<td id="'+reviewNumber.to_s+'_score_' + self.id.to_s + '" style="display: '';" >'
     html += '<div class="' + score_color + '" style="width:30px; height:30px;' \
       ' border-radius:50%; font-size:15px; color:black; line-height:30px; text-align:center;">'
     html += score

@@ -4,6 +4,7 @@ class QuestionsController < ApplicationController
   # based on either a numeric value or a true/false
   # state.
 
+
   # Default action, same as list
   def index
     list

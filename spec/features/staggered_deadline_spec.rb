@@ -71,10 +71,8 @@ describe "Staggered deadline test" do
     visit '/student_task/list'
     visit topic #signup topic
     visit '/student_task/list'
-    sleep(10)
     click_link "Assignment1665"
     click_link "Your work"
-    sleep(10)
     fill_in 'submission', with: work
     click_on 'Upload link'
     expect(page).to have_content work

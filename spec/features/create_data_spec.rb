@@ -1,5 +1,5 @@
 require 'rails_helper'
-describe "create data" do
+xdescribe "create data" do
   it "create data" do
 
     create(:deadline_type, name: "submission")
@@ -248,6 +248,58 @@ describe "create data" do
     topic_due('review',    DateTime.now + 2000,@topic2.id,1)
     topic_due('submission',DateTime.now + 3000,@topic2.id,2,1)
     topic_due('review',    DateTime.now + 4000,@topic2.id,2)
+
+    #questionnaire======================================================
+    #quiz===============================================================part1
+    # Create an assignment with quiz
+    # Setup Student 1
+
+    # Create student
+    @student1 = User.find_by(name:'student4')
+    @student2 = User.find_by(name:'student5')
+    (1..3).each do |i|
+        @assignment = create :assignment, name:'quiz_test_assignment'+i.to_s,require_quiz: true,  course: nil, num_quiz_questions: 1,review_topic_threshold: 1
+        create :assignment_due_date, due_at: (DateTime.now + 100),assignment: @assignment
+        create :assignment_due_date, due_at: (DateTime.now + 100), assignment: @assignment,deadline_type:DeadlineType.where(name: 'review').first
+
+        @participant1=create :participant, assignment: @assignment, user: @student1
+        @team1 = create :assignment_team, assignment: @assignment,name:'quiz_team1_'+i.to_s
+        create :team_user, team: @team1, user: @student1
+        create :review_response_map, assignment: @assignment, reviewee: @team1,reviewer_id:@student1.id
+
+        @participant2=create :participant, assignment: @assignment, user: @student2
+        @team2 = create :assignment_team, assignment: @assignment,name:'quiz_team2_'+i.to_s
+        create :team_user, team: @team2, user: @student2
+    end
+
+    # Create a team quiz questionnaire
+    @questionnaire2 = create :quiz_questionnaire, instructor_id:Team.find_by(name:'quiz_team1_2').id,name:"quiz_test2"
+    @questionnaire3 = create :quiz_questionnaire, instructor_id: Team.find_by(name:'quiz_team1_3').id,name:"quiz_test3"
+
+    # Create the quiz question and answers
+    choices = [
+        create(:quiz_question_choice, question: @question, txt: 'Answer 1', iscorrect: 1),
+        create(:quiz_question_choice, question: @question, txt: 'Answer 2'),
+        create(:quiz_question_choice, question: @question, txt: 'Answer 3'),
+        create(:quiz_question_choice, question: @question, txt: 'Answer 4')
+    ]
+    choices2 = [
+        create(:quiz_question_choice, question: @question, txt: 'Answer 1', iscorrect: 1),
+        create(:quiz_question_choice, question: @question, txt: 'Answer 2'),
+        create(:quiz_question_choice, question: @question, txt: 'Answer 3'),
+        create(:quiz_question_choice, question: @question, txt: 'Answer 4')
+    ]
+    @question2 = create :quiz_question, questionnaire: @questionnaire2, txt: 'quiz_Question_2', quiz_question_choices: choices
+    @question3 = create :quiz_question, questionnaire: @questionnaire3, txt: 'quiz_Question_3', quiz_question_choices: choices2
+
+    # Create a response mapping
+    @response_map = create :quiz_response_map, quiz_questionnaire: @questionnaire3, reviewer_id: @participant2.id, reviewee_id: Team.find_by(name:'quiz_team1_3').id
+
+    # Create a question response
+    @response = create :quiz_response, response_map: @response_map
+
+    # Create an answer for the question
+    create :answer, question: @question3, response_id: @response.id, answer: 1
   end
 
   def assignment_due(type,time,round, review_allowed_id = 3)
@@ -267,5 +319,6 @@ describe "create data" do
            round: round,
            review_allowed_id: review_allowed_id)
   end
-  #questionnaire======================================================
+
+
 end

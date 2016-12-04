@@ -23,7 +23,7 @@ class Response < ActiveRecord::Base
     reviewer.team.has_user user
   end
 
-  def display_as_html(prefix = nil, count = nil, _file_url = nil)
+  def display_as_html(prefix = nil, count = nil, _file_url = nil,review_id=nil)
     identifier = ""
     # The following three lines print out the type of rubric before displaying
     # feedback.  Currently this is only done if the rubric is Author Feedback.
@@ -53,9 +53,35 @@ class Response < ActiveRecord::Base
             else
               self.version_num.to_s
             end
+
     code += '<table id="review_' + str + '" style="display: none;" class="table table-bordered">'
-    count = 0
+    #count = 0
     answers = Answer.where(response_id: self.response_id)
+
+    #calculation for question tag
+    str_ques=''
+    str_score=''
+    str_answer=''
+    unless answers.empty?
+      questionnaire = self.questionnaire_by_answer(answers.first)
+
+      questionnaire_max = questionnaire.max_question_score
+      questions = questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
+      # loop through questions so the the questions are displayed in order based on seq (sequence number)
+      questions.each do |question|
+        #ount += 1
+        str_ques+=count.to_s+'_question_'+question.id.to_s+','
+        str_score+=count.to_s+'_score_'+question.id.to_s+','
+        str_answer+=count.to_s+'_answer_'+question.id.to_s+','
+      end
+    end
+    reviewNumber=count
+    count = 0
+    code+='<tr class="info"><td>'
+    code+='<br><a href="#" name= "question_' + str + 'Link" onClick="toggleAllElement(' + "'" + str_ques + "','review'" + ');return false;">toggle questions</a>'
+    code+='&nbsp;&nbsp;&nbsp;<a href="#" name= "score_' + str + 'Link" onClick="toggleAllElement(' + "'" + str_score + "','review'" + ');return false;">toggle scores</a>'
+    code+='&nbsp;&nbsp;&nbsp;<a href="#" name= "answer_' + str + 'Link" onClick="toggleAllElement(' + "'" + str_answer + "','review'" + ');return false;">toggle answers</a>'
+    code+='</td></tr>'
 
     unless answers.empty?
       questionnaire = self.questionnaire_by_answer(answers.first)
@@ -75,7 +101,7 @@ class Response < ActiveRecord::Base
         code+='<div id="questions"'
         if !answer.nil? or question.is_a? QuestionnaireHeader
           code += if question.instance_of? Criterion or question.instance_of? Scale
-                    question.view_completed_question(count, answer, questionnaire_max)
+                    question.view_completed_question(count, answer, questionnaire_max,reviewNumber)
                   else
                     question.view_completed_question(count, answer)
                   end

@@ -43,7 +43,7 @@ function toggleElement(elementId, linkText, mode='') {
     }
 }
 
-function toggleAllElement(elementIdList, mode) {
+function toggleAllElement(elementIdList, mode='') {
     var res = elementIdList.split(",");
     var childText = 'review';
 

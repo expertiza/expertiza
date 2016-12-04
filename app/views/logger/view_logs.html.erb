@@ -13,11 +13,12 @@ $('#logger').DataTable();
 <h1>Log Viewer</h1>
 
 <% sl =1 %>
-<table id="logger">
+<table id="logger" class="">
     <tr >
 
       <th>SL Number</th>
       <th>Log Entry</th>
+      <th>Log level</th>
     </tr>
     <% @logArray.each do |entry| %>
     <tr>

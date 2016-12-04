@@ -642,8 +642,7 @@ begin
       click_on('Assign reviewers')
 
       # Add students to review one artifacts
-      click_on('add reviewer')
-
+      first(:link, 'add reviewer').click
       # Go to the page where instructor can add student to one artifact
       @team_care =Team.find_by(name: 'Cali_Reviewer_team')
       visit "/review_mapping/select_reviewer?contributor_id=#{@team_care.id}&id=#{@assignment_care.id}"

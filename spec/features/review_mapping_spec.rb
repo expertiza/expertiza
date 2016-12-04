@@ -51,12 +51,15 @@ describe "review mapping", js: true do
     @student=User.find_by(name:'student7')
     @student2=User.find_by(name:'student8')
     @team=Team.find_by(name:'review_mapping_team1')
+    @participant=Participant.find_by(user_id:@student.id,parent_id:@assignment.id)
   end
 
   it "can add reviewer then delete it" do
-
+    if(ResponseMap.where(reviewed_object_id: @assignment.id).first!=nil)
+      ResponseMap.where(reviewed_object_id: @assignment.id).delete_all
+    end
     login_and_assign_reviewer("instructor6", @assignment.id, 0, 0)
-
+    sleep(100)
     # add_reviewer
     first(:link, 'add reviewer').click
     add_reviewer(@student.name)
@@ -85,8 +88,8 @@ describe "review mapping", js: true do
     first(:link, 'delete outstanding reviewers').click
     expect(page).to have_content "All review mappings for \"#{@team.name}\" have been deleted"
 
-    ReviewResponseMap.where(reviewer_id: @student.id).destroy_all
-    ReviewResponseMap.where(reviewer_id: @student2.id).destroy_all
+    ResponseMap.where(reviewed_object_id: @assignment.id).delete_all
+
 
   end
 
@@ -101,16 +104,24 @@ describe "review mapping", js: true do
   end
 
   it "calculate review mapping from given review number per student" do
+    if(ResponseMap.where(reviewed_object_id: @assignment.id).first!=nil)
+      ResponseMap.where(reviewed_object_id: @assignment.id).delete_all
+    end
+    sleep(30)
     login_and_assign_reviewer("instructor6", @assignment.id, 2, 0)
-    num = ReviewResponseMap.where(reviewee_id: @team.id, reviewed_object_id: @assignment.id).count
+    sleep(100)
+    num = ResponseMap.where(reviewee_id: @team.id, reviewed_object_id: @assignment.id).count
     expect(num).to eq(7)
-    ReviewResponseMap.where(reviewed_object_id: @assignment.id).delete_all
+    ResponseMap.where(reviewed_object_id: @assignment.id).delete_all
   end
 
   it "calculate reviewmapping from given review number per submission" do
+    if(ResponseMap.where(reviewed_object_id: @assignment.id).first!=nil)
+      ResponseMap.where(reviewed_object_id: @assignment.id).delete_all
+    end
     login_and_assign_reviewer("instructor6", @assignment.id, 0, 7)
-    num = ReviewResponseMap.where(reviewer_id: @student.id, reviewed_object_id: @assignment.id).count
+    num = ResponseMap.where(reviewer_id: @participant.id, reviewed_object_id: @assignment.id).count
     expect(num).to eq(2)
-    ReviewResponseMap.where(reviewed_object_id: @assignment.id).delete_all
+    ResponseMap.where(reviewed_object_id: @assignment.id).delete_all
   end
 end

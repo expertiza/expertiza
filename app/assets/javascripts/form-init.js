@@ -13,7 +13,6 @@ function getFieldsForEdit(){
 
   var questionsData = $('.questions_class').data().questions;
   var length = questionsData.length;
-  //console.log(length);
   //console.log(questionsData);
 
   var defaultFields = [];
@@ -90,8 +89,8 @@ jQuery(document).ready(function($) {
 
     var initActionButtons = function()
     {
-	$('button[id$="-view-data"]').remove();
-	$('button[id$="-clear-all"]').remove();
+	$('button[id$="-view-data"]').hide();
+	$('button[id$="-clear-all"]').hide();
 
 	var previewing = true,
 	togglePreview = function() {
@@ -118,8 +117,8 @@ jQuery(document).ready(function($) {
 
     var disableFormEditorFields = function(fld)
     {
-		$('a[id$="-copy"]', fld).remove();
-		$('a[class$="close-field"]', fld).remove();
+		$('a[id$="-copy"]', fld).hide();
+		$('a[class$="close-field"]', fld).hide();
 
 		var setEdit = function(elmt, val){
 			$(elmt).data("editing", val);
@@ -130,16 +129,13 @@ jQuery(document).ready(function($) {
 			$(elmt).off('click').on('click', function(e) {
 			
 			e.preventDefault();
-			console.log($(elmt).data("editing"));
 			if ($(elmt).data("editing") === true)
 			{
-				//alert('quit editing');
 				setEdit(elmt, false);
 				onUpdate(elmt);  
 			}
 			else
 			{
-				//alert('start editing');
 				setEdit(elmt, true);
 			}
 			});
@@ -150,7 +146,7 @@ jQuery(document).ready(function($) {
 		});
 
 		// remove unwanted input fields from form
-		removeUnwantedFields();
+		removeUnwantedFields(fld);	
 		
 		// change labels
 		$('.label-wrap').find('label').text('Question');
@@ -219,15 +215,14 @@ jQuery(document).ready(function($) {
 	formData = window.sessionStorage.getItem('formData'),
 	fbOptions = {
 	    dataType: 'json',
-	    sortableControls: false,
+	    //sortableControls: false,
 	    editOnAdd: false,
-	    stickyControls: true, 
-	    sortableControls: false, 
+	    //stickyControls: true, 
 	    disableFields: ['autocomplete', 'button',
 			    'paragraph', 'number', 'checkbox-group', 
 			    'date', 'file', 'hidden', 'header'], 
 	    editOnAdd: false, 
-	    showActionButtons: true, 
+	    showActionButtons: false, 
 		defaultFields: defaultFields, // edit will load the fields from db
 		fieldRemoveWarn: true,
 	    typeUserEvents: {
@@ -346,59 +341,79 @@ function updateHiddenFields(li, type, tr){
 	}
 }
 
-function removeUnwantedFields(){
-	switch(fld){
+function removeUnwantedFields(fld){
+	var _form = $(fld).find('.frm-holder').find('.form-elements');
+	var field = $(fld).attr('type');
+	switch(field){
 			case "criterion": {
 			break;
 		}
 		case "text":{
-			if ($('.required-wrap').length > 0) $('.required-wrap').remove();
-			if($('.description-wrap').length > 0) $('.description-wrap').remove();
-			if($('.className-wrap').length > 0) $('.className-wrap').remove();
-			if($('.name-wrap').length > 0) $('.name-wrap').remove();
-			if($('.access-wrap').length > 0) $('.access-wrap').remove();
-			if($('.placeholder-wrap').length > 0) $('.placeholder-wrap').remove();
-			if($('.value-wrap').length > 0) $('.value-wrap').remove();
+			$(_form).find('.required-wrap').hide();
+			$(_form).find('.description-wrap').hide();
+			$(_form).find('.className-wrap').hide();
+			$(_form).find('.name-wrap').hide();
+			$(_form).find('.access-wrap').hide();
+			$(_form).find('.placeholder-wrap').hide();
+			$(_form).find('.value-wrap').hide();
+			$(_form).find('.subtype-wrap').hide();
 			break;
 		}
 		case "textarea":{
-			if ($('.required-wrap').length > 0) $('.required-wrap').remove();
-			if($('.description-wrap').length > 0) $('.description-wrap').remove();
-			if($('.className-wrap').length > 0) $('.className-wrap').remove();
-			if($('.name-wrap').length > 0) $('.name-wrap').remove();
-			if($('.access-wrap').length > 0) $('.access-wrap').remove();
-			if($('.placeholder-wrap').length > 0) $('.placeholder-wrap').remove();
-			if($('.value-wrap').length > 0) $('.value-wrap').remove();
+			$(_form).find('.required-wrap').hide();
+			$(_form).find('.description-wrap').hide();
+			$(_form).find('.className-wrap').hide();
+			$(_form).find('.name-wrap').hide();
+			$(_form).find('.access-wrap').hide();
+			$(_form).find('.placeholder-wrap').hide();
+			$(_form).find('.value-wrap').hide();
 			break;
 		}
-		case "select":{
-			if ($('.required-wrap').length > 0) $('.required-wrap').remove();
-			if($('.description-wrap').length > 0) $('.description-wrap').remove();
-			if($('.className-wrap').length > 0) $('.className-wrap').remove();
-			if($('.name-wrap').length > 0) $('.name-wrap').remove();
-			if($('.access-wrap').length > 0) $('.access-wrap').remove();
-			if($('.placeholder-wrap').length > 0) $('.placeholder-wrap').remove();
-			if($('.value-wrap').length > 0) $('.value-wrap').remove();
+		case "select":{	
+			$(_form).find('.required-wrap').hide();
+			$(_form).find('.description-wrap').hide();
+			$(_form).find('.placeholder-wrap').hide();
+			$(_form).find('.className-wrap').hide();
+			$(_form).find('.name-wrap').hide();
+			$(_form).find('.access-wrap').hide();
+			$(_form).find('.multiple-wrap').hide();
+
+			$(_form).find('.field-options').find('ol.sortable-options li').each(function(){
+					var _inp = $(this).find('input[type="text"]')[1];
+					$(_inp).hide();
+			});
 			break;
 		}
 		case "checkbox":{
-			if ($('.required-wrap').length > 0) $('.required-wrap').remove();
-			if($('.description-wrap').length > 0) $('.description-wrap').remove();
-			if($('.className-wrap').length > 0) $('.className-wrap').remove();
-			if($('.name-wrap').length > 0) $('.name-wrap').remove();
-			if($('.access-wrap').length > 0) $('.access-wrap').remove();
-			if($('.value-wrap').length > 0) $('.value-wrap').remove();
-			if($('.toggle-wrap').length > 0) $('.toggle-wrap').remove();
+			$(_form).find('.required-wrap').hide();
+			$(_form).find('.description-wrap').hide();
+			$(_form).find('.className-wrap').hide();
+			$(_form).find('.name-wrap').hide();
+			$(_form).find('.access-wrap').hide();
+			$(_form).find('.value-wrap').hide();
+			$(_form).find('.toggle-wrap').hide();
 			break;
 		}
 		case "radio-group":{
-			if ($('.required-wrap').length > 0) $('.required-wrap').remove();
-			if($('.description-wrap').length > 0) $('.description-wrap').remove();
-			if($('.className-wrap').length > 0) $('.className-wrap').remove();
-			if($('.name-wrap').length > 0) $('.name-wrap').remove();
-			if($('.access-wrap').length > 0) $('.access-wrap').remove();
-			if($('.placeholder-wrap').length > 0) $('.placeholder-wrap').remove();
-			if($('.multiple-wrap').length > 0) $('.multiple-wrap').remove();
+			$(_form).find('.required-wrap').hide();
+			$(_form).find('.description-wrap').hide();
+			$(_form).find('.className-wrap').hide();
+			$(_form).find('.name-wrap').hide();
+			$(_form).find('.access-wrap').hide();
+			$(_form).find('.other-wrap').hide();
+			$(_form).find('.option-actions').hide();
+
+			$(_form).find('.field-options').find('ol.sortable-options li').each(function(cnt){
+				if(cnt == 0 || cnt == 4){
+					var _inp = $(this).find('input[type="text"]')[1];
+					if(cnt == 4){
+						$(this).find('a.remove.btn').hide();
+					}
+					$(_inp).hide();
+				} else{
+					$(this).hide();
+				}
+			});
 			break;
 		}
 		default: break;

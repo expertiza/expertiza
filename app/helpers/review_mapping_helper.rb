@@ -168,7 +168,7 @@ module ReviewMappingHelper
       return "green"
     end
     if participant.review_last_graded_date < review_updated_date
-      return "red"
+      return "blue"
     end
       return "green"
   end

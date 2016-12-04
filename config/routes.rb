@@ -520,7 +520,7 @@ Expertiza::Application.routes.draw do
     end
   end
   post '/users/request_user_create', controller: :users, action: :request_user_create
-  post '/users/request_user_creation', controller: :users, action: :request_user_creation
+  post '/users/create_approved_user', controller: :users, action: :create_approved_user
   get 'instructions/home'
   get '/users/show_selection', controller: :users, action: :show_selection
   get '/users/list', controller: :users, action: :list

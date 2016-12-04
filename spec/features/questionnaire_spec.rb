@@ -2,20 +2,20 @@ require 'rails_helper'
 
 describe "Questionnaire tests for instructor interface" do
   before(:each) do
-    create(:assignment)
-    create_list(:participant, 3)
-    create(:assignment_node)
-    create(:deadline_type, name: "submission")
-    create(:deadline_type, name: "review")
-    create(:deadline_type, name: "metareview")
-    create(:deadline_type, name: "drop_topic")
-    create(:deadline_type, name: "signup")
-    create(:deadline_type, name: "team_formation")
-    create(:deadline_right)
-    create(:deadline_right, name: 'Late')
-    create(:deadline_right, name: 'OK')
-    create(:assignment_due_date)
-    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now + (100 * 24 * 60 * 60))
+    #create(:assignment)
+    #create_list(:participant, 3)
+    #create(:assignment_node)
+    #create(:deadline_type, name: "submission")
+    #create(:deadline_type, name: "review")
+    #create(:deadline_type, name: "metareview")
+    #create(:deadline_type, name: "drop_topic")
+    #create(:deadline_type, name: "signup")
+    #create(:deadline_type, name: "team_formation")
+    #create(:deadline_right)
+    #create(:deadline_right, name: 'Late')
+    #create(:deadline_right, name: 'OK')
+    #create(:assignment_due_date)
+    #create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now + (100 * 24 * 60 * 60))
   end
 
   describe "Instructor login" do
@@ -51,6 +51,7 @@ describe "Questionnaire tests for instructor interface" do
       click_button "Create"
 
       expect(Questionnaire.where(name: "Review 1")).to exist
+      Questionnaire.where(name: "Review 1").destroy_all
     end
   end
 
@@ -71,6 +72,7 @@ describe "Questionnaire tests for instructor interface" do
       click_button "Create"
 
       expect(Questionnaire.where(name: "Review 1")).to exist
+      Questionnaire.where(name: "Review 1").destroy_all
     end
   end
 
@@ -99,6 +101,7 @@ describe "Questionnaire tests for instructor interface" do
 
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
+      Questionnaire.where(name: "Review n").destroy_all
     end
 
     it "is able to create a Scale question" do
@@ -110,6 +113,7 @@ describe "Questionnaire tests for instructor interface" do
 
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
+      Questionnaire.where(name: "Review n").destroy_all
     end
 
     it "is able to create a Dropdown question" do
@@ -121,6 +125,7 @@ describe "Questionnaire tests for instructor interface" do
 
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
+      Questionnaire.where(name: "Review n").destroy_all
     end
 
     it "is able to create a Checkbox question" do
@@ -132,6 +137,7 @@ describe "Questionnaire tests for instructor interface" do
 
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
+      Questionnaire.where(name: "Review n").destroy_all
     end
 
     it "is able to create a TextArea question" do
@@ -143,6 +149,7 @@ describe "Questionnaire tests for instructor interface" do
 
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
+      Questionnaire.where(name: "Review n").destroy_all
     end
 
     it "is able to create a TextField question" do
@@ -154,6 +161,7 @@ describe "Questionnaire tests for instructor interface" do
 
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
+      Questionnaire.where(name: "Review n").destroy_all
     end
 
     it "is able to create a UploadFile question" do
@@ -165,6 +173,7 @@ describe "Questionnaire tests for instructor interface" do
 
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
+      Questionnaire.where(name: "Review n").destroy_all
     end
 
     it "is able to create a SectionHeader question" do
@@ -176,6 +185,7 @@ describe "Questionnaire tests for instructor interface" do
 
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
+      Questionnaire.where(name: "Review n").destroy_all
     end
 
     it "is able to create a TableHeader question" do
@@ -187,6 +197,7 @@ describe "Questionnaire tests for instructor interface" do
 
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
+      Questionnaire.where(name: "Review n").destroy_all
     end
 
     it "is able to create a ColumnHeader question" do
@@ -198,6 +209,7 @@ describe "Questionnaire tests for instructor interface" do
 
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
+      Questionnaire.where(name: "Review n").destroy_all
     end
   end
 
@@ -216,6 +228,8 @@ describe "Questionnaire tests for instructor interface" do
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
       expect(page).to have_content('Question edit')
+      #Qusetion.where(type: "Criterion").destroy_all
+      Questionnaire.where(name: "Review n").destroy_all
     end
 
     it "is able to edit Scale question" do
@@ -224,6 +238,8 @@ describe "Questionnaire tests for instructor interface" do
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
       expect(page).to have_content('Question edit')
+      #Qusetion.where(type: "Scale").destroy_all
+      Questionnaire.where(name: "Review n").destroy_all
     end
 
     it "is able to edit Dropdown question" do
@@ -232,6 +248,8 @@ describe "Questionnaire tests for instructor interface" do
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
       expect(page).to have_content('Question edit')
+      #Qusetion.where(type: "Dropdown").destroy_all
+      Questionnaire.where(name: "Review n").destroy_all
     end
 
     it "is able to edit Checkbox question" do
@@ -240,6 +258,8 @@ describe "Questionnaire tests for instructor interface" do
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
       expect(page).to have_content('Question edit')
+      #Qusetion.where(type: "Checkbox").destroy_all
+      Questionnaire.where(name: "Review n").destroy_all
     end
 
     it "is able to edit TextArea question" do
@@ -248,6 +268,8 @@ describe "Questionnaire tests for instructor interface" do
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
       expect(page).to have_content('Question edit')
+      #Qusetion.where(type: "TextArea").destroy_all
+      Questionnaire.where(name: "Review n").destroy_all
     end
 
     it "is able to edit TextField question" do
@@ -256,6 +278,8 @@ describe "Questionnaire tests for instructor interface" do
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
       expect(page).to have_content('Question edit')
+      #Qusetion.where(type: "TextField").destroy_all
+      Questionnaire.where(name: "Review n").destroy_all
     end
 
     it "is able to edit UploadFile question" do
@@ -264,6 +288,8 @@ describe "Questionnaire tests for instructor interface" do
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
       expect(page).to have_content('Question edit')
+      #Qusetion.where(type: "UploadFile").destroy_all
+      Questionnaire.where(name: "Review n").destroy_all
     end
 
     it "is able to edit SectionHeader question" do
@@ -272,6 +298,8 @@ describe "Questionnaire tests for instructor interface" do
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
       expect(page).to have_content('Question edit')
+      #Qusetion.where(type: "SectionHeader").destroy_all
+      Questionnaire.where(name: "Review n").destroy_all
     end
 
     it "is able to edit TableHeader question" do
@@ -280,6 +308,8 @@ describe "Questionnaire tests for instructor interface" do
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
       expect(page).to have_content('Question edit')
+      #Qusetion.where(type: "TableHeader").destroy_all
+      Questionnaire.where(name: "Review n").destroy_all
     end
 
     it "is able to edit ColumnHeader question" do
@@ -288,6 +318,8 @@ describe "Questionnaire tests for instructor interface" do
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
       expect(page).to have_content('Question edit')
+      #Qusetion.where(type: "ColumnHeader").destroy_all
+      Questionnaire.where(name: "Review n").destroy_all
     end
   end
 
@@ -373,6 +405,10 @@ describe "Questionnaire tests for instructor interface" do
       click_button "Save and redisplay advice"
       expect(page).to have_content('advice was successfully saved')
       expect(page).to have_content('Advice 1')
+      #sleep(10000)
+      #Qusetion.where(type: "Criterion").destroy_all
+      QuestionAdvice.all.destroy_all
+      Questionnaire.where(name: "Review n").destroy_all
     end
   end
 
@@ -391,6 +427,10 @@ describe "Questionnaire tests for instructor interface" do
       click_button "Save and redisplay advice"
       expect(page).to have_content('advice was successfully saved')
       expect(page).to have_content('Advice edit')
+      #sleep(10000)
+      #Qusetion.where(type: "Criterion").destroy_all
+      QuestionAdvice.all.destroy_all
+      Questionnaire.where(name: "Review n").destroy_all
     end
   end
 end

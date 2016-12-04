@@ -124,7 +124,7 @@ class AssignmentParticipant < Participant
       scores[questionnaire_symbol][:assessments] = if round.nil?
                                                      questionnaire.get_assessments_for(self)
                                                    else
-                                                     questionnaire.get_responses_for_team_round(self, round)
+                                                     questionnaire.get_assessments_round_for(self, round)
                                                    end
       scores[questionnaire_symbol][:scores] = Answer.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
     end

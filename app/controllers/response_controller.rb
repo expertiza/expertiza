@@ -118,6 +118,9 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @modified_object = @map.id
+    if (AssignmentTeam.find(@map.reviewee_id).hyperlinks.to_s).include?("docs.google") and @map.assignment.allow_anonymous_commenting
+      flash[:error] = "Anonymous commenting is enabled, please logout from all google accounts before opening the google doc link."
+    end
 
     # set more handy variables for the view
     set_content(true)

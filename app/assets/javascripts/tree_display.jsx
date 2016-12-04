@@ -621,7 +621,9 @@ jQuery(document).ready(function() {
            reputation_algorithm: '',
            max_team_size: '1',
            instructor_id: '0',
-           num_quiz_questions: '0'
+           num_quiz_questions: '0',
+           max_team_size: '0',
+           show_teammate_reviews: ''
          }},
          team_assignment: '',
          commit: 'Create',
@@ -711,6 +713,18 @@ jQuery(document).ready(function() {
         this.setState({assignment: newAssignment});
       },
 
+      handleMaxTeamSize: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.max_team_size = e.target.value;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleShowTeammateReviews: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.show_teammate_reviews = e.target.value;
+        this.setState({assignment: newAssignment});
+      },
+
       directoryValidate: function(e){
         var regex=/^[a-zA-Z0-9]*$/;
         var regex_empty=/^(?=\s*\S).*$/;
@@ -787,12 +801,12 @@ jQuery(document).ready(function() {
           partial_team = (
               <div style={selectDivStyle}>
                 <p>
-                  Max Team Size: <input type="number" id="max_team_size"></input>
+                  Max Team Size: <input type="number" id="max_team_size" onChange={this.handleMaxTeamSize}></input>
                 </p>
 
 
                 <p>
-                  <input type="checkbox" id="show_teammate_reviews"> Show Teammate Reviews</input>
+                  <input type="checkbox" id="show_teammate_reviews" onChange={this.handleShowTeammateReviews}> Show Teammate Reviews</input>
                 </p>
               </div>
           );

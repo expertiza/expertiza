@@ -29,10 +29,10 @@ describe 'calibration' do
         login_as @instructor.name
 
         # Create a new assignment
-        visit new_assignment_path
+        visit '/assignments/new?private=1'
 
         # Populate form fields
-        fill_in 'assignment_form_assignment_name', with: 'Calibration Test'
+        fill_in 'name', with: 'Calibration Test'
         fill_in 'assignment_form_assignment_directory_path', with: 'submission'
         check 'assignment_form_assignment_is_calibrated'
 
@@ -40,8 +40,10 @@ describe 'calibration' do
         click_button 'Create'
 
         # Verify Assignment Page
-        expect(find('.assignments.edit > h1')).to have_content('Editing Assignment: Calibration Test')
-        expect(page).to have_link('Calibration')
+        assignment = Assignment.where(name: 'Calibration Test').first
+        expect(assignment).to have_attributes(
+          is_calibrated: true
+        )
       end
     end
 
@@ -54,18 +56,20 @@ describe 'calibration' do
         login_as @instructor.name
 
         # Create a new assignment
-        visit new_assignment_path
+        visit '/assignments/new?private=1'
 
         # Populate form fields, leaving calibration unchecked
-        fill_in 'assignment_form_assignment_name', with: 'Calibration Test'
+        fill_in 'assignment_form_assignment_name', with: 'No Calibration Test'
         fill_in 'assignment_form_assignment_directory_path', with: 'submission'
 
         # Submit
         click_button 'Create'
 
         # Verify Assignment Page
-        expect(find('.assignments.edit > h1')).to have_content('Editing Assignment: Calibration Test')
-        expect(page).to have_no_selector('#Calibration')
+        assignment = Assignment.where(name: 'No Calibration Test').first
+          expect(assignment).to have_attributes(
+          is_calibrated: false
+        )
       end
     end
   end

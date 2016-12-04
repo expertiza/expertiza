@@ -65,6 +65,7 @@ GEM
     bind-it (0.2.7)
       rjb (~> 1.4.3)
     builder (3.2.2)
+    byebug (9.0.6)
     capistrano (3.4.0)
       i18n
       rake (>= 10.0.0)
@@ -433,6 +434,7 @@ DEPENDENCIES
   airbrake
   awesome_nested_set
   bind-it
+  byebug
   capistrano
   capistrano-db-tasks
   capistrano-rails

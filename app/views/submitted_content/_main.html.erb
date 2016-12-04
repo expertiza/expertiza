@@ -6,8 +6,9 @@
   <%= form_tag :action => 'submit_hyperlink', :id => participant.id do %>
     <b>Submit a hyperlink:</b><BR/>
     <input type="text" name="submission" size=40 value="http://">
-    <input type="submit" name="upload_link" value="Upload link"/>
-  <% end %>
+        <input type="submit" name="upload_link" value="Upload link" />
+
+    <% end %>
 <% end %>
 
 <%= render partial: 'submitted_content/submitted_files', locals: {participant: participant, stage: @stage, origin: ''} %>

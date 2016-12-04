@@ -105,7 +105,9 @@ class GradesController < ApplicationController
     end
 
     @response = Response.find(@latest_response.id)
+    $max_score=@response.get_maximum_score
     $raw_self_score=@response.get_total_score
+
 
   end
 

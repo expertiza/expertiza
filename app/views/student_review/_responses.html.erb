@@ -56,7 +56,7 @@
                     </td>
 
                     <td>
-                      <% if (!map.reviewee.chat.nil?) %>
+                      <%unless map.nil? and unless map.reviewee.nil? and unless map.reviewee.chat.nil? %>
                       <div id="messages" class="hidden">
                             <div id="partial<%= "#{review_no}" %>"  >
                               <%= sync partial: "message_row", collection: Message.by_chat(map.reviewee.chat) %>
@@ -92,7 +92,7 @@
             <% elsif @assignment.get_current_stage(topic_id) != "Complete" && @assignment.can_review(topic_id) %>
                 <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
                  <td>
-                      <% if (!map.reviewee.chat.nil?) %>
+                   <%unless map.nil? and unless map.reviewee.nil? and unless map.reviewee.chat.nil? %>
                       <div id="messages" class="hidden">
                             <div id="partial<%= "#{review_no}" %>"  >
                               <%= sync partial: "message_row", collection: Message.by_chat(map.reviewee.chat) %>

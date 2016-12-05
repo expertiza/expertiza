@@ -7,7 +7,7 @@ class LoggerController < ApplicationController
 
   def view_logs
 
-  	@@event_logger.debug"Entered view action in log manager"
+  	@@event_logger.debug @user_id+"Entered view action in log manager"
   	filePath = "#{Rails.root}/log/events.log"
   	@logArray = Array.new
 

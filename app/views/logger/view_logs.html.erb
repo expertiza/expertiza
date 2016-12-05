@@ -7,8 +7,14 @@
 <body>
 <script>
   $(document).ready(function() {
-$('#logger').DataTable();
-} );
+    $('#logger').DataTable({
+      "columns": [
+        { "data": "SL No." },
+        { "data": "Log Entry" },
+        { "data": "Log level" }
+      ]
+    });
+  } );
   </script>
 <h1>Log Viewer Page</h1>
 
@@ -28,6 +34,7 @@ $('#logger').DataTable();
 
 
       <td><%= entry %></td>
+      <td>120</td>
      
     </tr>
     <% sl = sl+1 %>

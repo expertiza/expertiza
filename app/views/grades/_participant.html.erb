@@ -119,7 +119,6 @@ participant = pscore[:participant]
       <% if (controller.action_name != "view_my_scores" and index == 0) or controller.action_name == "view_my_scores" %>
           <TD id=<%="rowspanTd1#{participant_id}"%> ALIGN="CENTER" rowspan=<%=team_size.to_s%>>
             <%= @rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",@self_review_score): @self_review_score %>%<BR/>
-            <FONT SIZE="-1"><a href="#" id="<%=prefix%>_reviewsLink" name="<%=prefix%>_reviewsLink" onClick="var td=document.getElementById('<%="rowspanTd1#{participant_id}"%>'); var td2=document.getElementById('<%="rowspanTd2#{participant_id}"%>'); if(td.rowSpan=='1'){td.rowSpan=<%=team_size.to_s%>;td2.rowSpan=<%=team_size.to_s%>;}else{td.rowSpan='1'; td2.rowSpan='1';};toggleElement('<%=prefix%>_reviews','reviews');return false;">show review</a> </FONT>
           </TD>
 
       <% end %>
@@ -172,7 +171,7 @@ participant = pscore[:participant]
 
 <% if (controller.action_name != "view_my_scores" and index == team_size - 1) or controller.action_name == "view_my_scores" %>
     <TR id="<%= prefix %>_files" style="display:none; background-color: white;">
-        <TD COLSPAN="10"><%= render :partial=>'grades/submissions', :locals => {:participant => participant} %></TD>
+      <TD COLSPAN="10"><%= render :partial=>'grades/submissions', :locals => {:participant => participant} %></TD>
     </TR>
 <% end %>
 

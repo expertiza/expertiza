@@ -157,16 +157,20 @@ module ReviewMappingHelper
     @rspan = @review_responses.length
   end
 
+
   def get_team_color(participant_id, response_map_id)
     participant = Participant.find(participant_id)
+    # If a review has been taken, but not yet started, then display it as red
     if !Response.exists?(map_id: response_map_id)
       return "red"
     end
     last_review = Response.where(map_id: response_map_id , is_submitted: 1 ).order(updated_at: :desc).first
     review_updated_date= (last_review.nil?)? nil: last_review.updated_at
+    # If the grader has not done any grading at all, or if the review is not yet submitted, show it in the normal color
     if participant.review_last_graded_date.nil? || review_updated_date.nil?
       return "green"
     end
+    # If a new review is entered after the grading is done, show it in blue color, else keep in the normal color
     if participant.review_last_graded_date < review_updated_date
       return "blue"
     end

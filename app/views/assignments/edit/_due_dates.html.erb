@@ -95,7 +95,7 @@
         html += '<td align="center" class="due_date_due_at" width="25%">' +
         '<input id="datetimepicker_' + element_id +
         '" name="assignment_form[due_date][][due_at]" style="width: 200px" type="text" value="' +
-        due_at + '">' +"<td><select style=\"min-width: 200px; float: left;\" onchange=\"UpdateDeadlineForThisId(\'"+element_id+"\');\"id = \"dropdown_"+element_id+"\"><option value=0>Select deadline</option><option value=1>1 day</option><option value=2>2 days</option><option value=3>3 days</option><option value=4>4 days</option><option value=5>5 days</option><option value=6>6 days</option><option value=7>7 days</option><option value=8>8 day</option><option value=9>9 days</option><option value=10>10 days</option><option value=11>11 days</option><option value=12>12 days</option><option value=13>13 days</option><option value=14>14 days</option></select></td>"+ 
+        due_at + '">' +"<td><select style=\"min-width: 200px; float: left;\" onchange=\"UpdateDeadlineForThisId(\'"+element_id+"\');\"id = \"dropdown_"+element_id+"\"><option value=0>Select deadline</option><option value=1>2 days</option><option value=2>3 days</option><option value=3>4 days</option><option value=4>5 days</option><option value=5>6 days</option><option value=6>7 days</option><option value=7>8 days</option><option value=8>9 day</option><option value=9>10 days</option><option value=10>11 days</option><option value=11>12 days</option><option value=12>13 days</option><option value=13>14 days</option><option value=14>15 days</option></select></td>"+ 
         '</td>';
         
         html += '<td align="center" class="due_date_due_at" width="10%">';

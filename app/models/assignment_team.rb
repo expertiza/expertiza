@@ -1,8 +1,10 @@
 class AssignmentTeam < Team
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'parent_id'
+  has_one :chat , dependent: :destroy
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewee_id'
   has_many :review_response_maps, foreign_key: :reviewee_id
   has_many :responses, through: :review_response_maps, foreign_key: :map_id
+  after_create :create_chat
 
   # START of contributor methods, shared with AssignmentParticipant
 
@@ -240,6 +242,11 @@ class AssignmentTeam < Team
       # ACS Get participants irrespective of the number of participants in the team
       # removed check to see if it is a team assignment
     end
+  end
+
+  def create_chat
+    @chat=self.build_chat
+    @chat.save
   end
 
   def received_any_peer_review?

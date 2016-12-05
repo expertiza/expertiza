@@ -1,3 +1,23 @@
+<link rel="stylesheet" type="text/css" href="/assets/chats.css">
+<script type="text/javascript" src="/assets/chats.js" ></script>
+
+
+<div id="messages" class="hidden">
+  <% unless @participant.assignment.is_calibrated?%>
+      <% unless @team.chat.nil? %>
+      <div id="partialinnermessages"  >
+        <%= sync partial: "message_row", collection: Message.by_chat(@team.chat) %>
+        <%= sync_new partial: "message_row", resource: Message.new, scope: Message.by_chat(@team.chat) %>
+        <div class="popup-bottom">
+          <%= form_for([@team.chat, @team.chat.messages.build] , remote: true) do |f| %>
+              <%= f.text_field :body , :class => "body_input",:placeholder => "Type a message..." %>
+          <% end %>
+        </div>
+      </div>
+   <%end%>
+  <%end%>
+  </div>
+
 <h1>
   <% if @assignment.spec_location == nil|| @assignment.spec_location.length==0%>
       Submit or Review work for <%= @assignment.name %>
@@ -99,6 +119,12 @@ to display the label "Your team" in the student assignment tasks-->
       <li><%= link_to "Take a survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id} %> (This will log you out)</li>
     <% end %>
     <li><%= link_to "Change your handle", {:controller => 'participants', :action => 'change_handle', :id => @participant.id} %> (Provide a different handle for this assignment)</li>
+    <% if check_reviewable_topics(@assignment) %>
+  <li><a href="javascript:register_popup('innermessages', 'innermessages' );">
+    <span>Your Messages </span>
+  </a>(Answer queries on your work)</li>
+  <%end%>
   </ul>
+
   <br>
   <a href="javascript:window.history.back()">Back</a>

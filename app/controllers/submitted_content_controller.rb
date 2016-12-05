@@ -59,7 +59,11 @@ class SubmittedContentController < ApplicationController
     else
       begin
         if submitted_link.include?("docs.google.com")
+<<<<<<< HEAD
           flash[:note] = "Please update the sharing settings of your Google doc as 'Anyone with the link can comment'."
+=======
+          flash.now[:error] = "Please update the sharing settings of your Google doc as 'Anyone with the link can comment'."
+>>>>>>> 269d58745bdf11d449394e7401c7b6f85424b3c6
         end
 
         team.submit_hyperlink(params['submission'])

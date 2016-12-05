@@ -23,12 +23,15 @@
 
 <table id="logger" class="table table-striped">
 
-    <tr >
+  <thead>
+  <tr >
       <th>SL No.</th>
       <th>Log Entry</th>
       <th>Log level</th>
     </tr>
+  </thead>
     <% @logArray.each do |entry| %>
+      <tbody>
     <tr>
 
       <td><%= sl %></td>
@@ -38,6 +41,7 @@
       <td>120</td>
      
     </tr>
+    </tbody>
     <% sl = sl+1 %>
     <% end %>
   </table>

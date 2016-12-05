@@ -30,8 +30,9 @@
       <th>Log level</th>
     </tr>
   </thead>
+  <tbody>
     <% @logArray.each do |entry| %>
-      <tbody>
+
     <tr>
 
       <td><%= sl %></td>
@@ -41,9 +42,10 @@
       <td>120</td>
      
     </tr>
-    </tbody>
+
     <% sl = sl+1 %>
     <% end %>
+  </tbody>
   </table>
 </body>
 </html>

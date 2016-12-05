@@ -62,7 +62,7 @@ describe "chat feature test" do
     click_link "TestAssignment"
     expect(page).to have_content "Submit or Review work for TestAssignment"
     expect(page).to have_content "Others' work"
-    expect(page).to have_content 'Your messages'
+    expect(page).to have_content 'Your Messages'
 
 
 

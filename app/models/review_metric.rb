@@ -142,7 +142,7 @@ class ReviewMetric < ActiveRecord::Base
 	    obj.update_attribute(:suggestion, is_suggestion)
             obj.update_attribute(:offensive_term, is_offensive_term)
             obj.update_attribute(:problem, is_problem)
-            obj.save
+            obj.save!
             # puts "Object-Suggestion: #{obj.suggestion}, Object-Offensive: #{obj.offensive_term}, Object-Problem: #{obj.problem}"
             offensive_percent = ((offensive_metric.fdiv(denom))*100).round(2)
             problem_percent = ((problem_metric.fdiv(denom))*100).round(2)

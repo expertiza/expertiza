@@ -103,14 +103,16 @@ class ReviewMetric < ActiveRecord::Base
         end
         denom = dict.length
         dict.each_pair do |key, value|
-            offensive_metric = 0
+        word_counter = 0   
+	 offensive_metric = 0
             suggestive_metric = 0
             problem_metric = 0
             is_offensive_term = false
             is_suggestion = false
             is_problem = false
             value.scan(/[\w']+/).each do |word|
-                if offensive_words.include? word
+                word_counter = word_counter + 1
+		if offensive_words.include? word
                     is_offensive_term = true
                 end
                 if suggestive_words.include? word
@@ -136,7 +138,8 @@ class ReviewMetric < ActiveRecord::Base
                 obj.response_id = key
             end
             # puts "Suggestion: #{is_suggestion}, Offensive: #{is_offensive_term}, Problem: #{is_problem}"
-            obj.update_attribute(:suggestion, is_suggestion)
+        	obj.update_attribute(:volume, word_counter)
+	    obj.update_attribute(:suggestion, is_suggestion)
             obj.update_attribute(:offensive_term, is_offensive_term)
             obj.update_attribute(:problem, is_problem)
             obj.save
@@ -144,7 +147,7 @@ class ReviewMetric < ActiveRecord::Base
             offensive_percent = ((offensive_metric.fdiv(denom))*100).round(2)
             problem_percent = ((problem_metric.fdiv(denom))*100).round(2)
             suggestion_percent = ((suggestive_metric.fdiv(denom))*100).round(2)
-            metrics << [key, suggestion_percent, problem_percent, offensive_percent]
+            metrics << [key, word_counter, suggestion_percent, problem_percent, offensive_percent]
         end
         metrics
     end

@@ -1,1 +1,21 @@
 <h2> Review Metrics </h2>
+<%keys = @metrics%>
+<%keys.each do |key|%>
+  <div>
+    <tr>
+      <td>
+        Response_Id: <%=key[0]%>
+      </td>
+      <td>
+        Suggestion Percent: <%=key[1]%>
+      </td>
+      <td>
+        Problem Percent: <%=key[2]%>
+      </td>
+      <td>
+        Offensive Percent: <%=key[3]%>
+      </td>
+    </tr>
+  </div>
+<% end #loop for keys%>
+

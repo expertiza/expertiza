@@ -310,4 +310,8 @@ class Response < ActiveRecord::Base
     avg_vol_in_round_3 = (Lingua::EN::Readability.new(comments_in_round_3).num_words / (counter_in_round_3.zero? ? 1 : counter_in_round_3)).round(0)
     [overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3]
   end
+
+  def self.get_response_comments(assignment_id,reviewer_id)
+    Response.joins("join response_maps on responses.map_id = response_maps.id where response_maps.reviewer_id = reviewer_id and response_maps.reviewed_object_id = assignment_id")
+  end 
 end

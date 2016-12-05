@@ -120,8 +120,9 @@ class PopupController < ApplicationController
     @id = params[:assignment_id]
   end
   # this can be called from "response_report" by clicking on the View Metrics.
-  def review_metrics_popup
+  def view_review_metrics_popup
     @reviewerid = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
+    @metrics = ReviewMetric.calculate_metrics(@assignment_id, @reviewerid)
   end
 end

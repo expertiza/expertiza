@@ -39,8 +39,8 @@
                 <% if index == 0 %>
                   <!--Metrics-->
                   <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
-                    <%= link_to "View Review Metrics", :controller => 'popup', :action => 'view_review_metrics_popup', :reviewer_id => r.id, :assignment_id=>@id %>
-                  <!--Assign grade and write comments-->
+                    <%= link_to "View Review Metrics", :controller => 'popup', :action => 'view_review_metrics_popup', :reviewer_id => r.id, :assignment_id=>@id %>                  
+                    <!--Assign grade and write comments-->
                   <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
                     <%= form_tag 'save_grade_and_comment_for_reviewer', remote: true do %>
                       <%= hidden_field_tag :participant_id, r.id %>

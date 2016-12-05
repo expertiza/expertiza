@@ -63,6 +63,13 @@ class ResponseMap < ActiveRecord::Base
   def show_feedback(_response)
     nil
   end
+  def self.get_all_reviewees_for_a_reviewer(reviewer_id, assignment_id)
+    ResponseMap.joins("join responses on response_maps.id = responses.map_id").where(reviewer_id: reviewer_id, reviewed_object_id: assignment_id, type: "ReviewResponseMap").pluck(:reviewee_id).uniq
+    #ResponseMap.joins("join responses on response_maps.id = responses.map_id where response_maps.reviewer_id = reviewer_id and response_maps.reviewed_object_id=assignment_id and response_maps.type='ReviewResponseMap'")
+  end
+
+
+ 
 
   # Evaluates whether this response_map was metareviewed by metareviewer
   # @param[in] metareviewer AssignmentParticipant object

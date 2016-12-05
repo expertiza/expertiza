@@ -28,7 +28,7 @@
     <div class="flash_note"><%= "Signup topics have not yet been created." %></div>
   <% end %>
 
-<%# session[:return_to] = request.url %>
+<% session[:return_to] = request.url %>
 <br/><br/>
 <%= render :partial => '/sign_up_sheet/add_topics' %>
 

@@ -62,7 +62,7 @@
                               <%= sync partial: "message_row", collection: Message.by_chat(map.reviewee.chat) %>
                               <%= sync_new partial: "message_row", resource: Message.new, scope: Message.by_chat(map.reviewee.chat) %>
                               <div class="popup-bottom">
-                                <%= form_for([map.reviewee.chat, map.reviewee.messages.build], remote: true) do |f| %>
+                                <%= form_for([map.reviewee.chat, map.reviewee.chat.messages.build], remote: true) do |f| %>
                                     <%= f.text_field :body , :class => "body_input",:placeholder => "Type a message..." %>
                                 <% end %>
                               </div>

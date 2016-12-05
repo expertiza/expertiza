@@ -1,6 +1,24 @@
 require 'rails_helper'
 require 'pry'
+describe 'Participant' do
+	before(:each) do
+		@participant=create(:participant)
+		@participant1=create(:participant)
+		@participant1.review_last_graded_date="2015-11-30 20:30:00"
+	end
 
+  describe "#new" do
+    it "Validate response instance creation with valid parameters" do
+			expect(@participant.class).to eq(AssignmentParticipant)
+    end
+    it "Validate existence of column" do
+			expect(@participant.review_last_graded_date).to eq("2015-12-30 23:59:00")
+    end
+		it "Validate existence of column" do
+			expect(@participant1.review_last_graded_date).to eq("2015-11-30 20:30:00")
+		end
+	end
+end
 describe Participant do
   before(:each) do
     @student = double('User', name: "Student", fullname: "Student Test")

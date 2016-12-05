@@ -197,6 +197,7 @@ FactoryGirl.define do
     digital_signature nil
     duty nil
     can_take_quiz true
+		review_last_graded_date "2015-12-30 23:59:00"
   end
 
   factory :course_participant, class: CourseParticipant do

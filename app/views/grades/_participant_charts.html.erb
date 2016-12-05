@@ -12,6 +12,7 @@
   <% colwidth = 18 %>
 <% end %>
 
+<!-- Compute Self-Review Score based on Peer-Review Score and Self-Granted Score -->
 <%
  @raw_self_review_score = $raw_self_score
    if @pscore[:review]
@@ -20,7 +21,6 @@
 
    @self_review_score = (100 - (($raw_self_score - @peer_review_score.my_avg).abs)).round(2)
 
-  #@self_review_score = (100 - (($raw_self_score - @peer_review_score.my_avg).abs)).round(2)
 %>
 
 <a href="#" name='score-chartLink' onClick="toggleElement('score-chart', 'stats');return false;">hide stats</a>
@@ -66,16 +66,6 @@
   </th>
 <% end %>
 
-  <!-- testing for self review using peer review score-->
-<%
-   @chart = "http://chart.apis.google.com/chart?chs=100x100&cht=bvg&chco=990000&chxt=y&chxp=0," + @self_review_score.to_s + ",100.0&chxr=0,0,100.0&chd=e:3d..&chbh=23,1,1&chtt=+"
-  %>
-  <!--<th style="text-align:center; WIDTH="<%= colwidth*2 %>%">
-    <img src=<%=@chart%>>
-    <div class="circle" id="feedback-circle">
-
-    </div>
-  </th>-->
 
   <th style="text-align:center;" WIDTH="<%= colwidth %>%">&nbsp;
     <div class="circle" id="self_review-circle">

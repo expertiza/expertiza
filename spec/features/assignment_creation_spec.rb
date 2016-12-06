@@ -251,9 +251,8 @@ describe "assignment function" do
     it "should edit quiz number available to students" do
       fill_assignment_form()
       check("assignment_form_assignment_require_quiz")
-      click_button 'Save'
 #      fill_in 'assignment_form_assignment_num_quiz_questions', with: 5
-#      click_button 'Save'
+      click_button 'Save'
       assignment = Assignment.where(name: 'edit assignment for test').first
       expect(assignment).to have_attributes(
           name: 'edit assignment for test',

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
       <%@l = -1 %>
       <div class = 'reviewreport'>
@@ -18,6 +19,29 @@
 
           %>
         <tr >
+=======
+      <%@l = -1 %>
+      <!-- the table creation is changed top accomodate functionality of tablesorter, which requires thead and tbody seperately. Previously, headers were in tbody only -->
+      <div class = 'reviewreport'>
+  <!-- Added headers for tablesorter -->
+  <table id="myTable" class="tbl_heat tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
+    <thead>
+    <tr bgcolor='#CCCCCC'>
+  <!-- class value decides whether the column should be sortable or not  -->
+      <th width = "16%" class="sorter-true">Reviewer <span></span></th>
+      <th width = "14%" class="sorter-false">Reviews done per round<span></span></th>
+      <th width = "20%" class="sorter-false">Team reviewed <span></span></th>
+      <th width = "14%" class="sorter-false">Score awarded / Avg. score <span></span></th>
+      <th width = "10%" class="sorter-true">Metrics <span></span></th>
+      <th width = "36%" class="sorter-false">Assign grade and write comments <span></span></th>
+    </tr>
+    </thead>
+<tbody>
+
+      <% sort_reviewer_by_review_volume_desc.each do |r| %>
+        <% @response_maps, @bgcolor, @rspan, @l = get_data_for_review_report(@id, r.id, @type, @l) %>
+        <tr>
+>>>>>>> upstream/master
         <%if r.id != -1 %>
           <% username = Participant.find(r.id).user.fullname %>
             <!--reviewer-->
@@ -65,7 +89,11 @@
                   </td> 
                   <td></td>
                 <% end %>
+<<<<<<< HEAD
                 </tr><tr class = "tablesorter-childRow" > 
+=======
+                </tr><tr class = "tablesorter-childRow">
+>>>>>>> upstream/master
               <%end%>
             <%end %>
           <%end %>
@@ -76,6 +104,7 @@
 
   <p> **Text in <i style = "color:#DD3300">red</i> indicates that the review is not yet completed; text in <i style = "color:gray">gray</i> indicates that the review is done in previous round(s).</p>
 </div>
+<<<<<<< HEAD
 <style>
 th.tablesorter-headerAsc{
   background-image: url(<%= asset_path("up-arrow.png") %>);
@@ -197,3 +226,65 @@ th.sorter-true.tablesorter-headerUnSorted{
 
 </script>
 
+=======
+
+<style>
+  /*TableSorter CSS styles */
+  th.tablesorter-headerAsc{
+    /* Style for Up Arrow */
+    background-image: url(<%= asset_path("up-arrow.png") %>);
+    background-size: 15px 15px;
+    background-repeat: no-repeat;
+    background-position: center right;
+    padding-right: 15px;
+  }
+
+  th.tablesorter-headerDesc{
+    /* Style for down arrow */
+    background-image: url(<%= asset_path("down-arrow.png") %>);
+    background-size: 15px 15px;
+    background-repeat: no-repeat;
+    background-position: center right;
+    padding-right: 15px;
+  }
+
+  /* Style for no-sort*/
+  th.sorter-true.tablesorter-headerUnSorted{
+    /* Style for default view  */
+    background-image: url(<%= asset_path("sort.png") %>);
+    background-size: 15px 7px;
+    background-repeat: no-repeat;
+    background-position: center right;
+    padding-right: 15px;
+
+  }
+</style>
+
+<script>
+$(function () {
+  /*Function for sorting the table */
+		 $("#myTable").tablesorter({
+		sortList: [[0,0]], //sort First Column by default when page loads
+		headers: {
+     		   4: {
+      			  sorter: 'customParser' //custom Parser to parse Metrics data for the custom parser
+     		      }
+   		 }
+		});
+	});
+
+$.tablesorter.addParser({
+  id: "customParser",                                       //customParser for sorting by volume
+  is: function (stringValue) {
+    return false;
+  },
+  format: function (stringValue) {
+    var stringNumericPart = stringValue.split(" ");         //split the data by spaces
+    var numericValue = parseInt(stringNumericPart[2],10);   //extract the numeric data
+    return numericValue ;
+  },
+  type: 'numeric'
+});
+
+</script>
+>>>>>>> upstream/master

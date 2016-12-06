@@ -15,12 +15,16 @@ describe "SignUpSheetHelper" do
     @assignment_due_date= build(:assignment_due_date)
     @assignment_due_date.due_at="2015-12-31 23:30:12"
   end
-  
+
    describe "#check_topic_due_date_value" do
-    it "should pass because topic 1 has a specific deadline" do
+    #In the first case, we topic 1 has a specific deadline different from the assignment deadline and so we expect the method
+     #to fetch that one
+     it "should pass because topic 1 has a specific deadline" do
       expect(check_topic_due_date_value([@assignment_due_date], 1,1,1)).to be == "2015-12-30 23:30"
-    end
-    it "should pass because topic 2 has a specific deadline" do
+     end
+
+     #Here topic 2 has no specific deadline in the table and so method should fetch the assignment deadline.
+    it "should pass because topic 2 doesnt have a specific deadline" do
       expect(check_topic_due_date_value([@assignment_due_date], 2,1,1)).to be == "2015-12-31 23:30"
     end
 

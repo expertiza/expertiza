@@ -5,6 +5,9 @@ RSpec.configure do |c|
   c.include SignUpSheetHelper
 end
 
+# For this rspec, we use the create method in place of the build method as the method being
+# tested directly hits the Database
+
 describe "SignUpSheetHelper" do
   before(:each) do
     @deadline_type = build(:deadline_type)

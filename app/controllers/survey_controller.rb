@@ -47,10 +47,6 @@ class SurveyController < ApplicationController
     @assignment[:global_survey_id] = selected_global_survey_id
     @assignment.update!(@assignment_params)
 
-    # create an entry for the questionnaire in assignment queationnaire table
-    # @new = AssignmentQuestionnaire.new(questionnaire_id: selected_survey_id, assignment_id: assignment_id, user_id: session[:user].id)
-    # @new.save
-    # flash success message
     flash[:success] = 'Survey has been successfuly assigned'
     # redirect back to the same page with same assignment id
     redirect_to action: "assign", id: assignment_id

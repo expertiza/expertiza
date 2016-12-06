@@ -77,7 +77,7 @@ class Response < ActiveRecord::Base
     end
     reviewNumber=count
     count = 0
-    code+='<tr class="info"><td>'
+    code+='<tr><td >'
     code+='<br><a href="#" name= "question_' + str + 'Link" onClick="toggleAllElement(' + "'" + str_ques + "','review'" + ');return false;">toggle questions</a>'
     code+='&nbsp;&nbsp;&nbsp;<a href="#" name= "score_' + str + 'Link" onClick="toggleAllElement(' + "'" + str_score + "','review'" + ');return false;">toggle scores</a>'
     code+='&nbsp;&nbsp;&nbsp;<a href="#" name= "answer_' + str + 'Link" onClick="toggleAllElement(' + "'" + str_answer + "','review'" + ');return false;">toggle answers</a>'
@@ -90,7 +90,7 @@ class Response < ActiveRecord::Base
       questions = questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
       # loop through questions so the the questions are displayed in order based on seq (sequence number)
       #common max point text
-      code+='</br> <p><b>Max points for each question: </b>'+ questionnaire.max_question_score.to_s + '  <BR/>'
+      code+='</br> <p><b>Max points for each question: </b>'+ questionnaire.max_question_score.to_s + '  '
       questions.each do |question|
         count += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
         answer = answers.find {|a| a.question_id == question.id }
@@ -98,7 +98,7 @@ class Response < ActiveRecord::Base
         row_class = "" if question.is_a? QuestionnaireHeader
 
         code += '<tr class="' + row_class + '"><td>'
-        code+='<div id="questions"'
+       # code+='<div id="questions"'
         if !answer.nil? or question.is_a? QuestionnaireHeader
           code += if question.instance_of? Criterion or question.instance_of? Scale
                     question.view_completed_question(count, answer, questionnaire_max,reviewNumber)

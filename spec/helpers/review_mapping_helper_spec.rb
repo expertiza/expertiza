@@ -22,6 +22,27 @@ describe "ReviewMappingHelper" do
        expect(graded_yet_color(1, 1)).to be == "blue"
      end
 
+     #This checks the color when a there is no update since the grading was last done
+     it "should return green as new review has been graded" do
+       @response.update_attribute(:is_submitted, true)
+       @participant.update_attribute(:review_graded_at, Time.now)
+       expect(graded_yet_color(1, 1)).to be == "green"
+     end
+
+     it "should return green as new review has been saved but not submitted" do
+       expect(graded_yet_color(1, 1)).to be == "green"
+     end
+
+     it "should return red as new review has been taken but not saved" do
+       expect(graded_yet_color(1, 2)).to be == "red"
+     end
+
+     it "should return green as no grading has been done yet" do
+       @response.update_attribute(:is_submitted, true)
+       @participant.update_attribute(:review_graded_at, nil)
+       expect(graded_yet_color(1, 1)).to be == "green"
+     end
+
 
    end
 

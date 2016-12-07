@@ -33,6 +33,8 @@ class CourseEvaluationController < ApplicationController
       
       @is_survey_submited = 0
       @is_global_survey_submitted = 0
+      @survey_response_id = nil
+      @global_survey_response_id = nil
       response_map = []
       response_map = ResponseMap.where(reviewed_object_id = sd.parent_id and reviewer_id = session[:user].id)
       if response_map.size > 0
@@ -41,9 +43,11 @@ class CourseEvaluationController < ApplicationController
           if !response.nil?
             if rm.type == 'SurveyResponseMap'
               @is_survey_submited = response.is_submitted
+              @survey_response_id = response.id
             end
             if rm.type == 'GlobalSurveyResponseMap'
               @is_global_survey_submited = response.is_submitted
+              @global_survey_response_id = response.id
             end  
           end  
         end
@@ -55,11 +59,11 @@ class CourseEvaluationController < ApplicationController
         
         # add survey assigned to the assignment in the respective survey list
         if !@assignment.survey_id.nil?
-           @assignment_surveys << [Questionnaire.find(@assignment.survey_id) , @assignment.id, @is_survey_submitted] 
+           @assignment_surveys << [Questionnaire.find(@assignment.survey_id) , @assignment.id, @is_survey_submitted, @survey_response_id] 
         end
         # add global survey assigned to the assignment in the respective survey list
         if !@assignment.global_survey_id.nil?
-           @global_surveys << [Questionnaire.find(@assignment.global_survey_id) , @assignment.id, @is_global_survey_submitted]
+           @global_surveys << [Questionnaire.find(@assignment.global_survey_id) , @assignment.id, @is_global_survey_submitted, @global_survey_response_id]
         end
       end
       
@@ -68,11 +72,11 @@ class CourseEvaluationController < ApplicationController
         @course = Course.find(sd.parent_id)
        
         if !@course.survey_id.nil?
-           @course_evaluation_surveys << [Questionnaire.find(@course.survey_id) , @course.id, @is_survey_submitted ]
+           @course_evaluation_surveys << [Questionnaire.find(@course.survey_id) , @course.id, @is_survey_submitted, @survey_response_id]
         end
         
         if !@course.global_survey_id.nil?
-           @global_surveys << [Questionnaire.find(@course.global_survey_id) , @course.id , @is_global_survey_submitted ]
+           @global_surveys << [Questionnaire.find(@course.global_survey_id) , @course.id , @is_global_survey_submitted, @global_survey_response_id]
         end
       end
       

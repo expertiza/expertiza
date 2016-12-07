@@ -24,9 +24,9 @@ class CourseEvaluationController < ApplicationController
     deployments = Participant.where(user_id: session[:user].id)
     # create lists of tuples which will contain survey_id and assignment_id
     # there will be seperate list for each of the survey type
-    @assignmentsurveys = []
-    @globalsurveys = []
-    @courseevaluationsurveys = [] 
+    @assignment_surveys = []
+    @global_surveys = []
+    @course_evaluation_surveys = [] 
     deployments.each do |sd|
       # for assignment participants, find the questionnaire assigned to that 
       # assignment and add the details to list according to 

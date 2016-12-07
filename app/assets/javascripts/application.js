@@ -28,6 +28,8 @@
 //= require jquery.datetimepicker
 //= require jquery-tablesorter
 
+//= require sync
+
 // Eliminate the “element.dispatchEvent is not a function” error
 jQuery.noConflict();
 

@@ -1,3 +1,26 @@
+<link rel="stylesheet" type="text/css" href="/assets/chats.css">
+<script type="text/javascript" src="/assets/chats.js" ></script>
+
+<% count = 0 %>
+<div id="messages" class="hidden">
+  <% unless @participant.assignment.is_calibrated?%>
+  <% @chat_mappings.each do |map| %>
+      <% count = count+1 %>
+      <% unless map.chat.nil? %>
+      <div id="partial<%= count %>"  >
+        <%= sync partial: "message_row", collection: Message.by_chat(map.chat) %>
+        <%= sync_new partial: "message_row", resource: Message.new, scope: Message.by_chat(map.chat) %>
+        <div class="popup-bottom">
+          <%= form_for([map.chat, map.chat.messages.build] , remote: true) do |f| %>
+              <%= f.text_field :body , :class => "body_input",:placeholder => "Type a message..." %>
+          <% end %>
+        </div>
+      </div>
+   <%end%>
+  <%end%>
+  <%end%>
+</div>
+
 <h1>
   <% if @assignment.spec_location == nil|| @assignment.spec_location.length==0%>
       Submit or Review work for <%= @assignment.name %>
@@ -99,6 +122,33 @@ to display the label "Your team" in the student assignment tasks-->
       <li><%= link_to "Take a survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id} %> (This will log you out)</li>
     <% end %>
     <li><%= link_to "Change your handle", {:controller => 'participants', :action => 'change_handle', :id => @participant.id} %> (Provide a different handle for this assignment)</li>
+    <% if check_reviewable_topics(@assignment) %>
+  <li><a id="chats" href=javascript:void(0)>Your messages</a>(Answer queries on your work)</li>
+  <%end%>
   </ul>
+
   <br>
+<div class="chat-sidebar">
+  <% mcount = 0 %>
+  <% b=true %>
+  <% unless @participant.assignment.is_calibrated? %>
+  <% @chat_mappings.each do |map| %>
+      <% mcount = mcount+1 %>
+      <% unless map.chat.nil? %>
+      <div class="sidebar-name">
+
+
+        <!-- Pass username and display name to register popup -->
+        <a href="javascript:register_popup('<%= mcount %>', '<%= mcount %>','' );">
+          <img width="40" height="40" src="http://placehold.it/40x40" />
+          <span>Review <%= mcount %></span>
+        </a>
+      </div>
+    <% end %>
+  <% end %>
+<%end%>
+<% if map.chat.nil?%>
+<span>You dont have any messages at this moment</span>
+<% end %>
+</div>
   <a href="javascript:window.history.back()">Back</a>

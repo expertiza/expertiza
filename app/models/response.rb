@@ -248,8 +248,8 @@ class Response < ActiveRecord::Base
              :performer => "reviewer",
              :assignment => mapping.assignment,
              :partial_name => 'limit_notify',
-             :conflicting_response_url => '0.0.0.0:3000/response/view?id='+response_id.to_s,  #'https://expertiza.ncsu.edu/response/view?id='
-             :summary_url => '0.0.0.0:3000/grades/view_team?id='+team_id.to_s #mapping.reviewee_id.to_s
+             :conflicting_response_url => 'https://expertiza.ncsu.edu/response/view?id='+response_id.to_s,  #'https://expertiza.ncsu.edu/response/view?id='
+             :summary_url => 'https://expertiza.ncsu.edu/grades/view_team?id='+team_id.to_s #mapping.reviewee_id.to_s
          }
         }
     ).deliver_now

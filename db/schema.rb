@@ -141,8 +141,8 @@ ActiveRecord::Schema.define(version: 20161127234744) do
 
   create_table "chats", force: :cascade do |t|
     t.integer  "assignment_team_id", limit: 4, null: false
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
   end
 
   create_table "content_pages", force: :cascade do |t|

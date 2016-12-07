@@ -4,7 +4,7 @@
 
 <div id="messages" class="hidden">
   <% unless @participant.assignment.is_calibrated?%>
-      <% unless @team.chat.nil? %>
+      <% unless (@team.nil? or @team.chat.nil?) %>
       <div id="partialinnermessages"  >
         <%= sync partial: "message_row", collection: Message.by_chat(@team.chat) %>
         <%= sync_new partial: "message_row", resource: Message.new, scope: Message.by_chat(@team.chat) %>

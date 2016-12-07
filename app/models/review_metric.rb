@@ -81,9 +81,10 @@ class ReviewMetric < ActiveRecord::Base
     end
 
     def self.calculate_metrics(assignment_id, reviewer_id)
+        type = "ReviewResponseMap"
         answers = Answer.joins("join responses on responses.id = answers.response_id")
                        .joins("join response_maps on responses.map_id = response_maps.id")
-                       .where("response_maps.reviewed_object_id = ? and response_maps.reviewer_id = ?", assignment_id, reviewer_id)
+                       .where("response_maps.reviewed_object_id = ? and response_maps.reviewer_id = ? and response_maps.type = ?",assignment_id, reviewer_id,type)
                        .select("answers.comments, answers.response_id").order("answers.response_id")
         suggestive_words = Set.new(["should", "recommend", "suggest", "advise", "try"])
         offensive_words = Set.new(["lame", "stupid", "dumb", "idiot"])

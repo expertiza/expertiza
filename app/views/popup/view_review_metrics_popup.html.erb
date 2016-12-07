@@ -1,25 +1,41 @@
 <h2> Review Metrics </h2>
+        <table border = "1">
+        <tr>
+        <th  align = 'left' > Serial Number </th>
+        <th align = 'left' > Round  </th>
+        <th align = 'left' > Volume </th>
+        <th align = 'left' > Suggestion Percent  </th>
+        <th align = 'left' > Problem Percent  </th>
+        <th align = 'left' > Offensive Percent </th>
+        </tr>
+
 <%keys = @metrics%>
 <%keys.each do |key|%>
-  <div>
+        <response_id = ReviewMetric.find(@metrics[key][:response_id])%>
+                
     <tr>
       <td>
-        Response_Id: <%=key[0]%>
+        <%=key[0]%>	
       </td>
       <td>
-        Volume: <%=key[1]%>
+       <%=%>
       </td>
- 
+
       <td>
-        Suggestion Percent: <%=key[2]%>
+        <%=key[1]%>
+      </td>
+
+      <td>
+        <%=key[2]%>
       </td>
       <td>
-        Problem Percent: <%=key[3]%>
+        <%=key[3]%>
       </td>
       <td>
-        Offensive Percent: <%=key[4]%>
+        <%=key[4]%>
       </td>
     </tr>
-  </div>
+
 <% end #loop for keys%>
+</table>
 

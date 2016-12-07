@@ -158,7 +158,6 @@ class PopupController < ApplicationController
     @response_id = params[:response_id]
     @answers = ReviewMetric.calculate_metrics_for_student(@response_id)
     
-    # puts @average_volume_per_round
   end
 
 

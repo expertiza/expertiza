@@ -1,24 +1,35 @@
 <h2> Review Metrics for Reviewer</h2>
+<table border = "1">
+        <tr>
+        <th align = 'left' > Volume  </th>
+        <th align = 'left' > Is Suggestion Given</th>
+        <th align = 'left' > Is Problem Highlighted </th>
+        <th align = 'left' > Is Offensive </th>
+        <th align = 'left' > Number of complete sentences </th>
+         <th align = 'left' > Number of unique words in comments </th>
+        </tr>
 <%=keys = @answers%>
-  <div>
     <tr>
       <td>
-        Volume:<%=keys[0]%>
+        <%=keys[0]%>
       </td>
       <td>
-         Suggestion : <%=keys[2]%>
+         <%=keys[2]%>
       </td>
       <td>
-         Problem: <%=keys[3]%>
+         <%=keys[3]%>
       </td>
       <td>
-         Offensive : <%=keys[1]%>
+         <%=keys[1]%>
       </td>
       <td>
-         Number of complete comments : <%=keys[4]%>
+        <%=keys[4]%>
+      </td>
+       <td>
+         <%=keys[5]%>
       </td>
 
     </tr>
-  </div>
+  </table>
 
         

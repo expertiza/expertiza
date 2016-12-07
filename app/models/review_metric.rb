@@ -1,85 +1,6 @@
 class ReviewMetric < ActiveRecord::Base
     belongs_to :response_maps, class_name: 'ResponseMap', foreign_key: 'response_id'
 
-    def self.check_suggestion(reviewer_id,assignment_id)
-    end
-
-    def self.check_offensive_term(reviewer_id,assignment_id)
-
-    end
-
-    def self.check_problem(reviewer_id,assignment_id)
-
-        problem_words = Set.new(["wrong","error","problem"])
-        comments = ''
-        counter = 0
-        @comments_in_round_1, @comments_in_round_2, @comments_in_round_3 = '', '', ''
-        @counter_in_round_1, @counter_in_round_2, @counter_in_round_3 = 0, 0, 0
-        problem_in_round_1 = 0
-        problem_in_round_2 = 0
-        problem_in_round_3 = 0
-
-        comments, counter,comments_in_round_1, counter_in_round_1,comments_in_round_2, counter_in_round_2,comments_in_round_3, counter_in_round_3 = Response.concatenate_all_review_comments(assignment_id, reviewer_id,response_id=0)
-
-        comments_in_round_1.split(' ').each do |word|
-            if problem_words.include? word
-                problem_in_round_1 = problem_in_round_1 + 1
-            end
-        end
-
-        comments_in_round_2.split(' ').each do |word|
-            if problem_words.include? word
-                problem_in_round_2 = problem_in_round_2 + 1
-            end
-        end
-
-        comments_in_round_3.split(' ').each do |word|
-            if problem_words.include? word
-                problem_in_round_3 = problem_in_round_3 + 1
-            end
-        end
-        problem_percentage = 1
-        problem = true
-        [problem_percentage, problem_in_round_1, problem_in_round_2, problem_in_round_3]
-    end
-
-
-    def self.get_review_summary(reviewer_id,assignment_id)
-    end
-
-    def self.get_word_count(reviewer_id,assignment_id)
-    end
-
-    def self.concatenate_all_review_comments(assignment_id, reviewer_id, response_id = 0)
-        comments = ''
-        counter = 0
-        @comments_in_round_1, @comments_in_round_2, @comments_in_round_3 = '', '', ''
-        @counter_in_round_1, @counter_in_round_2, @counter_in_round_3 = 0, 0, 0
-        assignment = Assignment.find(assignment_id)
-        question_ids = Question.get_all_questions_with_comments_available(assignment_id)
-
-        ReviewResponseMap.where(reviewed_object_id: assignment_id, reviewer_id: reviewer_id).each do |response_map|
-            (1..assignment.num_review_rounds).each do |round|
-                last_response_in_current_round = response_map.response.select{|r| r.round == round }.last
-                unless last_response_in_current_round.nil?
-                    last_response_in_current_round.scores.each do |answer|
-                        comments += answer.comments if question_ids.include? answer.question_id
-                        instance_variable_set('@comments_in_round_' + round.to_s, instance_variable_get('@comments_in_round_' + round.to_s) + answer.comments ||= '')
-                    end
-                    additional_comment = last_response_in_current_round.additional_comment
-                    comments += additional_comment
-                    counter += 1
-                    instance_variable_set('@comments_in_round_' + round.to_s, instance_variable_get('@comments_in_round_' + round.to_s) + additional_comment)
-                    instance_variable_set('@counter_in_round_' + round.to_s, instance_variable_get('@counter_in_round_' + round.to_s) + 1)
-                end
-            end
-        end
-        [comments, counter,
-         @comments_in_round_1, @counter_in_round_1,
-         @comments_in_round_2, @counter_in_round_2,
-         @comments_in_round_3, @counter_in_round_3]
-    end
-
     def self.calculate_metrics_for_instructor(assignment_id, reviewer_id)
         type = "ReviewResponseMap"
         answers = Answer.joins("join responses on responses.id = answers.response_id")
@@ -94,6 +15,8 @@ class ReviewMetric < ActiveRecord::Base
         metrics = Hash.new()
         metrics_per_reviewee = Hash.new()
         response_reviewee_map = Hash.new()
+        diff_word_count = Hash.new()
+        complete_sentences = Hash.new(0)
         answers.each do |ans|
             # puts ans.comments
             comment = ans.comments
@@ -126,6 +49,8 @@ class ReviewMetric < ActiveRecord::Base
                     is_problem = true
                 end
             end
+
+            #diff_word_count = response_level_comments[current_response_id].scan(/[\w']+/).uniq.count
             if ReviewMetric.exists?(response_id: key)
                 obj = ReviewMetric.find_by(response_id: key)
             else
@@ -139,12 +64,16 @@ class ReviewMetric < ActiveRecord::Base
             obj.update_attribute(:problem, is_problem)
             obj.save!
             # puts "Object-Suggestion: #{obj.suggestion}, Object-Offensive: #{obj.offensive_term}, Object-Problem: #{obj.problem}"
-            metrics[key] = [key, response_reviewee_map[key] , word_counter, is_suggestion, is_problem, is_offensive_term]
+            answers.each do |ans|
+             diff_word_count[ans.response_id] = response_level_comments[ans.response_id].scan(/[\w']+/).uniq.count   
+            end
+            metrics[key] = [key, response_reviewee_map[key] , word_counter, is_suggestion, is_problem, is_offensive_term,diff_word_count[key]]
         end
         metrics_per_round = Hash.new()
         temp_dict = Hash.new()
         answers.each do |ans|
-            puts "Reviewee Id: #{ans.reviewee_id} ---> Response Id: #{ans.response_id} --> Round: #{ans.round} --> Is Submitted: #{ans.is_submitted}"
+           
+         puts "Reviewee Id: #{ans.reviewee_id} ---> Response Id: #{ans.response_id} --> Round: #{ans.round} --> Is Submitted: #{ans.is_submitted}"
             if !temp_dict.has_key?(ans.response_id)
                 temp_dict[ans.response_id] = metrics[ans.response_id]
                 metrics_per_round[ans.round] = metrics_per_round.fetch(ans.round, []) + [temp_dict[ans.response_id]]
@@ -167,7 +96,7 @@ class ReviewMetric < ActiveRecord::Base
    is_problem = false
    volume = 0
    complete_sentences = 0
-
+   diff_word_count = 0
    answers.each do |ans|
     ans_word_count = 0
     comments = ans.comments
@@ -192,9 +121,12 @@ class ReviewMetric < ActiveRecord::Base
    if problem_words.include? word
     is_problem = true
    end
-
+   
    end #end of concatenate_comment 
-   [volume,is_offensive_term,is_suggestion,is_problem, complete_sentences]
+   
+   diff_word_count = concatenated_comment.scan(/[\w']+/).uniq.count
+
+   [volume,is_offensive_term,is_suggestion,is_problem, complete_sentences,diff_word_count]
 
    end
 

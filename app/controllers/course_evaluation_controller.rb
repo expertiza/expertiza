@@ -5,7 +5,8 @@ class CourseEvaluationController < ApplicationController
     
   # create a response map and redirect to response controller 
   def create_response_map
-    
+    @assignment = Assignment.find(params[:assignment_id])
+    @Questionnaire=Questionnaire.find(
     @res_map=ResponseMap.new(reviewed_object_id: params[:assignment_id], reviewee_id: params[:assignment_id], reviewer_id:session[:user].id, type: params[:type] )
     @res_map.save!
     redirect_to controller: "response" , action: "new" , id: @res_map.id, type: @res_map.type
@@ -36,11 +37,11 @@ class CourseEvaluationController < ApplicationController
         @course = Course.find(sd.parent_id)
        
         if !@course.survey_id.nil?
-           @surveys << [Questionnaire.find(@course.survey_id) , @assignment.id ]
+           @surveys << [Questionnaire.find(@course.survey_id) , @course.id ]
         end
         
         if !@course.global_survey_id.nil?
-           @surveys << [Questionnaire.find(@course.global_survey_id) , @assignment.id ]
+           @surveys << [Questionnaire.find(@course.global_survey_id) , @course.id ]
         end
       end
       

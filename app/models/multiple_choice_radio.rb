@@ -66,4 +66,25 @@ class MultipleChoiceRadio < QuizQuestion
     html.html_safe
 
   end
+
+  def isvalid(choice_info)
+    valid = "valid"
+    if(self.txt == '')
+      valid = "Please make sure all questions have text"
+    end
+    correct_count = 0
+    choice_info.each do |idx, value|
+      if value[:txt] == '' or value[:txt].length == 0 or value[:txt].nil?
+        valid = "Please make sure every question has text for all options"
+        break
+      end
+      if value[:iscorrect] == 1.to_s
+        correct_count+=1
+      end
+    end
+    if correct_count == 0
+      valid = "Please select a correct answer for all questions"
+    end
+    valid
+  end
 end

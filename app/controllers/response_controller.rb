@@ -181,7 +181,6 @@ class ResponseController < ApplicationController
     msg = "Your response was successfully saved."
     error_msg = ""
     @response.email
-    redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
     begin
       Response.compare_scores(@response, @questionnaire)
 
@@ -189,6 +188,8 @@ class ResponseController < ApplicationController
     rescue
       msg = "An error occurred while saving the response:198 #{$!}"
     end
+    redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
+
   end
 
   def saving

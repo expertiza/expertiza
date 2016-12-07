@@ -13,6 +13,11 @@ class Mailer < ActionMailer::Base
     @new_pct = defn[:body][:new_pct]
     @avg_pct = defn[:body][:avg_pct]
     @assignment = defn[:body][:assignment]
+    @limit = defn[:body][:limit]
+    @reviewee_name = defn[:body][:reviewee_name]
+    @reviewer_name = defn[:body][:reviewer_name]
+    @conflicting_response_url = defn[:body][:conflicting_response_url]
+    @summary_url = defn[:body][:summary_url]
 
     if Rails.env.development? || Rails.env.test?
       defn[:to] = 'expertiza.development@gmail.com'

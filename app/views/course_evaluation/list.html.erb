@@ -6,7 +6,6 @@
   <% i=0 %>
   <% @assignment_surveys.each do |s| %>
     <tr> <td> <%= s[0].name %> </td> 
-      <td> <%=s[2]%> </td>
     <% if (!s[2]) %>
      <td  ><%= link_to 'Take Survey' ,:controller=>'course_evaluation',:action=>'create_response_map',:parent_id => s[1], :type => s[0].type %>&nbsp &nbsp</td>
  
@@ -30,7 +29,14 @@
   <% i=0 %>
   <% @global_surveys.each do |s| %>
     
-    <tr><td align = left><%= link_to s[0].name ,:controller=>'course_evaluation',:action=>'create_response_map',:parent_id => s[1], :type => s[0].type %>&nbsp &nbsp</td>
+    <tr> <td> <%= s[0].name %> </td> 
+    <% if (!s[2]) %>
+     <td  ><%= link_to 'Take Survey' ,:controller=>'course_evaluation',:action=>'create_response_map',:parent_id => s[1], :type => s[0].type %>&nbsp &nbsp</td>
+ 
+    <% else %>
+    <td><%= link_to 'View Response' ,:controller=>'response',:action=>'view',:id => s[3] %>&nbsp &nbsp</td>
+    
+    <% end %>
     </tr>
   
   <% end %>
@@ -48,7 +54,14 @@
   <% i=0 %>
   <% @course_evaluation_surveys.each do |s| %>
     
-    <tr><td align = left><%= link_to s[0].name ,:controller=>'course_evaluation',:action=>'create_response_map',:parent_id => s[1], :type => s[0].type %>&nbsp &nbsp</td>
+    <tr> <td> <%= s[0].name %> </td> 
+    <% if (!s[2]) %>
+     <td  ><%= link_to 'Take Survey' ,:controller=>'course_evaluation',:action=>'create_response_map',:parent_id => s[1], :type => s[0].type %>&nbsp &nbsp</td>
+ 
+    <% else %>
+    <td><%= link_to 'View Response' ,:controller=>'response',:action=>'view',:id => s[3] %>&nbsp &nbsp</td>
+    
+    <% end %>
     </tr>
   
   <% end %>

@@ -40,14 +40,17 @@ class CourseEvaluationController < ApplicationController
       if response_map.size > 0
         response_map.each do |rm|
           @response = Response.where(["map_id = ?", rm.id])
-          if !@response.nil?
-            if rm.type == 'SurveyResponseMap'
-              @survey_response_id = @response.id
-              @is_survey_submitted = @response.is_submitted
-            end
-            if rm.type == 'GlobalSurveyResponseMap'
-              @is_global_survey_submitted = @response.is_submitted
-              @global_survey_response_id = @response.id
+          if @response.size > 0
+            @response.each do |r|
+              
+              if rm.type == 'SurveyResponseMap'
+                @survey_response_id = r.id
+                @is_survey_submitted = r.is_submitted
+              end
+              if rm.type == 'GlobalSurveyResponseMap'
+                @is_global_survey_submitted = r.is_submitted
+                @global_survey_response_id = r.id
+              end
             end  
           end  
         end

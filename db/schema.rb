@@ -400,11 +400,11 @@ ActiveRecord::Schema.define(version: 20161130024336) do
   create_table "review_metrics", force: :cascade do |t|
     t.integer  "response_id",    limit: 4
     t.integer  "volume",         limit: 4
-    t.boolean  "suggestion"
-    t.boolean  "problem"
-    t.boolean  "offensive_term"
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.boolean  "suggestion",               default: false, null: false
+    t.boolean  "problem",                  default: false, null: false
+    t.boolean  "offensive_term",           default: false, null: false
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
   end
 
   create_table "roles", force: :cascade do |t|

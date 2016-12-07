@@ -132,7 +132,7 @@ class PopupController < ApplicationController
       volume = 0
       count = 0
       s = 0
-      p = 0
+      pr = 0
       o = 0
       values.each do |v|
         volume += v[2]
@@ -140,7 +140,7 @@ class PopupController < ApplicationController
           s += 1
         end
         if v[4]
-          p += 1
+          pr += 1
         end
         if v[5]
           o += 1
@@ -149,7 +149,7 @@ class PopupController < ApplicationController
       end
       @average_volume_per_round[key] = (volume.fdiv(count)).round(2)
       @average_suggestion_per_round[key] = (s.fdiv(count)).round(2) * 100
-      @average_problem_per_round[key] = (p.fdiv(count)).round(2) * 100
+      @average_problem_per_round[key] = (pr.fdiv(count)).round(2) * 100
       @average_offensive_per_round[key] = (o.fdiv(count)).round(2) * 100
     end
     # puts @average_volume_per_round

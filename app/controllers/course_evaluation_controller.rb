@@ -8,7 +8,7 @@ class CourseEvaluationController < ApplicationController
     @type=params[:type].sub("Questionnaire","ResponseMap")
     @res_map=ResponseMap.new(reviewed_object_id: params[:parent_id], reviewee_id: params[:parent_id], reviewer_id:session[:user].id, type: @type )
     @res_map.save!
-    redirect_to controller: "response" , action: "new" , id: @res_map.id, type: @res_map.type
+    redirect_to controller: "response" , action: "new" , id: @res_map.id, return: @res_map.type
     
   end
 

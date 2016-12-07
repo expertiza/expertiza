@@ -42,8 +42,8 @@ class CourseEvaluationController < ApplicationController
           @response = Response.where(["map_id = ?", rm.id])
           if !@response.nil?
             if rm.type == 'SurveyResponseMap'
-              @is_survey_submitted = @response.is_submitted
               @survey_response_id = @response.id
+              @is_survey_submitted = @response.is_submitted
             end
             if rm.type == 'GlobalSurveyResponseMap'
               @is_global_survey_submitted = @response.is_submitted

@@ -5,7 +5,8 @@
   <tr><th align = left> Assignment Surveys </th>
   <% i=0 %>
   <% @assignment_surveys.each do |s| %>
-    <tr> <td> <% s[0].name %> </td> 
+    <tr> <td> <%= s[0].name %> </td> 
+      <td> <%=s[2]%> </td>
     <% if (s[2]) %>
      <td  ><%= link_to 'Take Survey' ,:controller=>'course_evaluation',:action=>'create_response_map',:parent_id => s[1], :type => s[0].type %>&nbsp &nbsp</td>
  

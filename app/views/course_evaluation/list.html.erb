@@ -1,10 +1,10 @@
 <h1> Pending Course Evaluations </h1>
 
 <table class=listing cellpadding=2 width=50%>
-<% if (@surveys.size > 0) %>
+<% if (@assignment_surveys.size > 0) %>
   <tr><th align = left> Assignment Surveys </th>
   <% i=0 %>
-  <% @surveys.each do |s| %>
+  <% @assignment_surveys.each do |s| %>
     
     <tr><td align = left><%= link_to s[0].name ,:controller=>'course_evaluation',:action=>'create_response_map',:parent_id => s[1], :type => s[0].type %>&nbsp &nbsp</td>
     </tr>
@@ -14,9 +14,44 @@
   <tr>
     <td>
       <div class="flash_note">
-        There exist no pending course evaluations.
+        There exist no pending assignment surveys.
+      </div>
+  </td> </tr>
+<%end%>
+  
+<% if (@global_surveys.size > 0) %>
+  <tr><th align = left> Global Surveys </th>
+  <% i=0 %>
+  <% @global_surveys.each do |s| %>
+    
+    <tr><td align = left><%= link_to s[0].name ,:controller=>'course_evaluation',:action=>'create_response_map',:parent_id => s[1], :type => s[0].type %>&nbsp &nbsp</td>
+    </tr>
+  
+  <% end %>
+<% else %>
+  <tr>
+    <td>
+      <div class="flash_note">
+        There exist no pending global Surveys.
       </div>
   </td> </tr>
 <%end%>
 
+<% if (@course_evaluation_surveys.size > 0) %>
+  <tr><th align = left> Course evaluation Surveys </th>
+  <% i=0 %>
+  <% @course_evaluation_surveys.each do |s| %>
+    
+    <tr><td align = left><%= link_to s[0].name ,:controller=>'course_evaluation',:action=>'create_response_map',:parent_id => s[1], :type => s[0].type %>&nbsp &nbsp</td>
+    </tr>
+  
+  <% end %>
+<% else %>
+  <tr>
+    <td>
+      <div class="flash_note">
+        There exist no pending Course evaluation Surveys.
+      </div>
+  </td> </tr>
+<%end%>
 </table>

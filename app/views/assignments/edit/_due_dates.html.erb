@@ -92,10 +92,10 @@
         if (due_name == null){
             due_name = '';
         }
-        html += '<td align="center" class="due_date_due_at" width="25%">' +
+        html += '<td align="right" class="due_date_due_at" width="25%">' +
         '<input id="datetimepicker_' + element_id +
         '" name="assignment_form[due_date][][due_at]" style="width: 200px" type="text" value="' +
-        due_at + '">' +"<td><select style=\"min-width: 200px; float: left;\" onchange=\"UpdateDeadlineForThisId(\'"+element_id+"\');\"id = \"dropdown_"+element_id+"\"><option value=0>Select deadline</option><option value=1>2 days</option><option value=2>3 days</option><option value=3>4 days</option><option value=4>5 days</option><option value=5>6 days</option><option value=6>7 days</option><option value=7>8 days</option><option value=8>9 day</option><option value=9>10 days</option><option value=10>11 days</option><option value=11>12 days</option><option value=12>13 days</option><option value=13>14 days</option><option value=14>15 days</option></select></td>"+ 
+        due_at + '">' +"<td ><select style=\" float: left;\" onchange=\"UpdateDeadlineForThisId(\'"+element_id+"\');\"id = \"dropdown_"+element_id+"\"><option value=0>Days</option><option value=1>2 days</option><option value=2>3 days</option><option value=3>4 days</option><option value=4>5 days</option><option value=5>6 days</option><option value=6>7 days</option><option value=7>8 days</option><option value=8>9 day</option><option value=9>10 days</option><option value=10>11 days</option><option value=11>12 days</option><option value=12>13 days</option><option value=13>14 days</option><option value=14>15 days</option></select></td>"+ 
         '</td>';
         
         html += '<td align="center" class="due_date_due_at" width="10%">';
@@ -401,7 +401,7 @@
 
 <tr id='due_date_heading'>
 <th width=15% style="text-align:left;">Deadline type</th>
-<th width=20% style="text-align:center;">Date & time</th>
+<th width=20% style="text-align:right;">Date & time</th>
 <th></th>
 <th width=10% style="text-align:center;">Submission allowed</th>
 <th width=8% style="text-align:center;">Review allowed</th>
@@ -449,7 +449,6 @@
   </script>
 </table>
         <script>
-         //aler/t("Here!!");
          var first_drop_down = document.getElementById('dropdown_submission_round_1');
          first_drop_down.outerHTML="";
          first_drop_down.delete;
@@ -457,15 +456,11 @@
          {
 
             var d = document.getElementById("datetimepicker_submission_round_1");
-           //if(d.value==0){return 0;/}
             var TZ = d.value.substr(d.value.length - 12);
             var someDate = new Date(d.value)
             dropdownId  = "dropdown_"+element_id;
             var numberOfDaysToAdd = document.getElementById(dropdownId).value
-            //aler/t(someDate);
-            //aler/t(numberOfDaysToAdd)
             var newDate = new Date(someDate.setTime( someDate.getTime() + numberOfDaysToAdd * 86400000 ));
-            //aler/t(newDate);
             var text = newDate.getFullYear()+"/"+("0"+(parseInt(newDate.getMonth(),10)+1).toString()).slice(-2)+"/"+("0"+(parseInt(newDate.getDate(),10)+1).toString()).slice(-2)+" "+newDate.getHours()+":"+newDate.getMinutes()+" "
 
             document.getElementById("datetimepicker_"+element_id).value = text

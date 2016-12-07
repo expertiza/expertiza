@@ -8,7 +8,7 @@ class CourseEvaluationController < ApplicationController
       redirect_to '/'
       return
     end
-    deployments = Participants.where(user_id: session[:user].id)
+    deployments = Participant.where(user_id: session[:user].id)
     @surveys = []
     deployments.each do |sd|
       if sd.type == 'AssignmentParticipant'

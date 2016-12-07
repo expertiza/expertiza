@@ -23,7 +23,7 @@ class CourseEvaluationController < ApplicationController
         end
       end
       
-      if sd.type == 'AssignmentParticipant'
+      if sd.type == 'CourseParticipant'
         @course = Course.find(sd.parent_id)
        
         if !@course.survey_id.nil?

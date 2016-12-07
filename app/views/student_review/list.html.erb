@@ -1,7 +1,7 @@
 <h2>Reviews for "<%= @assignment.name %>"</h2>
 
 <% if check_reviewable_topics(@assignment) or @assignment.get_current_stage(@topic_id) == "Finished" %>
- <%= link_to "View Review Metrics", :controller => 'popup', :action => 'view_student_review_metrics_popup', :assignment_id=>@id, :reviewer_id => @reviewer_id %>
+ 
     <%= render :partial => 'responses', :locals => {:mappings => @review_mappings, :title => 'Review'} %>
     <% if @assignment.dynamic_reviewer_assignment? %>
       <%# if @num_reviews_in_progress == 0 %>

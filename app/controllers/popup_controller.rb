@@ -155,37 +155,9 @@ class PopupController < ApplicationController
     # puts @average_volume_per_round
   end
   def view_student_review_metrics_popup
-    @reviewerid = params[:reviewer_id]
-    @assignment_id = params[:assignment_id]
-    @metrics = ReviewMetric.calculate_metrics_for_instructor(@assignment_id, @reviewerid)
-    @average_volume_per_round = Hash.new()
-    @average_suggestion_per_round = Hash.new()
-    @average_problem_per_round = Hash.new()
-    @average_offensive_per_round = Hash.new()
-    @metrics.each do |key, values|
-      volume = 0
-      count = 0
-      s = 0
-      p = 0
-      o = 0
-      values.each do |v|
-        volume += v[2]
-        if v[3]
-          s += 1
-        end
-        if v[4]
-          p += 1
-        end
-        if v[5]
-          o += 1
-        end
-        count += 1
-      end
-      @average_volume_per_round[key] = (volume.fdiv(count)).round(2)
-      @average_suggestion_per_round[key] = (s.fdiv(count)).round(2) * 100
-      @average_problem_per_round[key] = (p.fdiv(count)).round(2) * 100
-      @average_offensive_per_round[key] = (o.fdiv(count)).round(2) * 100
-    end
+    @response_id = params[:response_id]
+    @answers = ReviewMetric.calculate_metrics_for_student(@response_id)
+    
     # puts @average_volume_per_round
   end
 

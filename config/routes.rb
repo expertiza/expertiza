@@ -93,6 +93,7 @@ Expertiza::Application.routes.draw do
   resources :course_evaluation do
     collection do
       get :list
+      get :create_response_map
     end
   end
 

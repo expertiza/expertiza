@@ -428,7 +428,7 @@ class ReviewMappingController < ApplicationController
     participant.grade_for_reviewer = params[:grade_for_reviewer] if params[:grade_for_reviewer]
     participant.comment_for_reviewer = params[:comment_for_reviewer] if params[:comment_for_reviewer]
     # Save the current date-time along with the grades and comments.
-    participant.review_last_graded_date=Time.now
+    participant.review_graded_at=Time.now
 
     begin
       participant.save

@@ -84,28 +84,31 @@ class ReviewMetric < ActiveRecord::Base
         type = "ReviewResponseMap"
         answers = Answer.joins("join responses on responses.id = answers.response_id")
                        .joins("join response_maps on responses.map_id = response_maps.id")
-                       .where("response_maps.reviewed_object_id = ? and response_maps.reviewer_id = ? and response_maps.type = ?",assignment_id, reviewer_id,type)
-                       .select("answers.comments, answers.response_id").order("answers.response_id")
+                       .where("response_maps.reviewed_object_id = ? and response_maps.reviewer_id = ? and response_maps.type = ? and responses.is_submitted = 1",assignment_id, reviewer_id,type)
+                       .select("answers.comments, answers.response_id, responses.round, response_maps.reviewee_id, responses.is_submitted").order("answers.response_id")
         suggestive_words = Set.new(["should", "recommend", "suggest", "advise", "try"])
         offensive_words = Set.new(["lame", "stupid", "dumb", "idiot"])
         problem_words = Set.new(["wrong", "error", "problem", "issue"])
         current_response_id = nil
-        dict = Hash.new()
-        metrics = []
+        response_level_comments = Hash.new()
+        metrics = Hash.new()
+        metrics_per_reviewee = Hash.new()
+        response_reviewee_map = Hash.new()
         answers.each do |ans|
             # puts ans.comments
             comment = ans.comments
+            response_reviewee_map[ans.response_id] = ans.reviewee_id
             if current_response_id.nil? or current_response_id != ans.response_id
                 current_response_id = ans.response_id
-                dict[current_response_id] = comment
+                response_level_comments[current_response_id] = comment
             else
-                dict[current_response_id] = dict[current_response_id] + comment
+                response_level_comments[current_response_id] = response_level_comments[current_response_id] + comment
             end
         end
-        denom = dict.length
-        dict.each_pair do |key, value|
-        word_counter = 0   
-	 offensive_metric = 0
+        denom = response_level_comments.length
+        response_level_comments.each_pair do |key, value|
+            word_counter = 0   
+    	    offensive_metric = 0
             suggestive_metric = 0
             problem_metric = 0
             is_offensive_term = false
@@ -113,7 +116,7 @@ class ReviewMetric < ActiveRecord::Base
             is_problem = false
             value.scan(/[\w']+/).each do |word|
                 word_counter = word_counter + 1
-		if offensive_words.include? word
+    		    if offensive_words.include? word
                     is_offensive_term = true
                 end
                 if suggestive_words.include? word
@@ -123,15 +126,6 @@ class ReviewMetric < ActiveRecord::Base
                     is_problem = true
                 end
             end
-            if is_offensive_term
-                offensive_metric += 1
-            end
-            if is_problem
-                problem_metric += 1
-            end
-            if is_suggestion
-                suggestive_metric += 1
-            end
             if ReviewMetric.exists?(response_id: key)
                 obj = ReviewMetric.find_by(response_id: key)
             else
@@ -140,16 +134,24 @@ class ReviewMetric < ActiveRecord::Base
             end
             # puts "Suggestion: #{is_suggestion}, Offensive: #{is_offensive_term}, Problem: #{is_problem}"
         	obj.update_attribute(:volume, word_counter)
-	    obj.update_attribute(:suggestion, is_suggestion)
+	        obj.update_attribute(:suggestion, is_suggestion)
             obj.update_attribute(:offensive_term, is_offensive_term)
             obj.update_attribute(:problem, is_problem)
             obj.save!
             # puts "Object-Suggestion: #{obj.suggestion}, Object-Offensive: #{obj.offensive_term}, Object-Problem: #{obj.problem}"
-            offensive_percent = ((offensive_metric.fdiv(denom))*100).round(2)
-            problem_percent = ((problem_metric.fdiv(denom))*100).round(2)
-            suggestion_percent = ((suggestive_metric.fdiv(denom))*100).round(2)
-            metrics << [key, word_counter, suggestion_percent, problem_percent, offensive_percent]
+            metrics[key] = [key, response_reviewee_map[key] , word_counter, is_suggestion, is_problem, is_offensive_term]
         end
-        metrics
+        metrics_per_round = Hash.new()
+        temp_dict = Hash.new()
+        answers.each do |ans|
+            puts "Reviewee Id: #{ans.reviewee_id} ---> Response Id: #{ans.response_id} --> Round: #{ans.round} --> Is Submitted: #{ans.is_submitted}"
+            if !temp_dict.has_key?(ans.response_id)
+                temp_dict[ans.response_id] = metrics[ans.response_id]
+                metrics_per_round[ans.round] = metrics_per_round.fetch(ans.round, []) + [temp_dict[ans.response_id]]
+            end
+        end
+        # puts metrics_per_reviewee
+        # puts metrics_per_round
+        metrics_per_round
     end
 end

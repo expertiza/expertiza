@@ -3,39 +3,62 @@
         <tr>
         <th  align = 'left' > Serial Number </th>
         <th align = 'left' > Round  </th>
+        <th align = 'left' > Response Id </th>
+        <th align = 'left' > Reviewee Id </th>
         <th align = 'left' > Volume </th>
+        <th align = 'left' > Average Volume </th>
+        <th align = 'left' > Is Suggestion Given</th>
         <th align = 'left' > Suggestion Percent  </th>
+        <th align = 'left' > Is Problem Highlighted </th>
         <th align = 'left' > Problem Percent  </th>
+        <th align = 'left' > Is Offensive </th>
         <th align = 'left' > Offensive Percent </th>
         </tr>
 
 <%keys = @metrics%>
-<%keys.each do |key|%>
-        <response_id = ReviewMetric.find(@metrics[key][:response_id])%>
-                
-    <tr>
-      <td>
-        <%=key[0]%>	
+<%current_index = 0%>
+<%keys.each_with_index do |(key, value), i|%>
+  <tr>
+    <%value.each_with_index do |v, index|%>
+    <td>
+     <%current_index += 1%>
+     <%=current_index%>
+    </td>
+    <td>
+      <%=key%>
+    </td>
+    <td>
+        <%=v[0]%>
       </td>
       <td>
-       <%=%>
-      </td>
-
-      <td>
-        <%=key[1]%>
-      </td>
-
-      <td>
-        <%=key[2]%>
+        <%=v[1]%>
       </td>
       <td>
-        <%=key[3]%>
+        <%=v[2]%>
       </td>
       <td>
-        <%=key[4]%>
+        <%=@average_volume_per_round[key]%>
+      </td>
+      <td>
+        <%=v[3]%>
+      </td>
+      <td>
+      <%=@average_suggestion_per_round[key]%>
+      </td>
+      <td>
+        <%=v[4]%>
+      </td>
+      <td>
+      <%=@average_problem_per_round[key]%>
+      </td>
+      <td>
+        <%=v[5]%>
+      </td>
+      <td>
+        <%=@average_offensive_per_round[key]%>
       </td>
     </tr>
-
+<% end #loop for keys%>
 <% end #loop for keys%>
 </table>
 

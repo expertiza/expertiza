@@ -274,46 +274,42 @@ module ReviewMappingHelper
               #and store it in hash author_feedback_score
               if all_review_response_ids_round_one.include? m.reviewed_object_id
 
-                total_score[:round_1] += response.get_total_score
-                total_feedback[:round_1] += 1
-                author_feedback_score[:max_score_round_1] = response.get_maximum_score if author_feedback_score[:max_score_round_1].blank?
+                compute_feedback_score_per_round total_score, response, total_feedback, author_feedback_score, :max_score_round_1,:round_1
 
               elsif all_review_response_ids_round_two.include? m.reviewed_object_id
 
-                total_score[:round_2] += response.get_total_score
-                total_feedback[:round_2] += 1
-                author_feedback_score[:max_score_round_2] = response.get_maximum_score if author_feedback_score[:max_score_round_2].blank?
+                compute_feedback_score_per_round total_score, response, total_feedback, author_feedback_score, :max_score_round_2, :round_2
 
               else
-                total_score[:round_3] += response.get_total_score
-                total_feedback[:round_3] += 1
-                author_feedback_score[:max_score_round_3] = response.get_maximum_score if author_feedback_score[:max_score_round_3].blank?
+
+                compute_feedback_score_per_round total_score, response, total_feedback, author_feedback_score, :max_score_round_3, :round_3
+
               end
             end
 
             if total_feedback[:round_1] > 0
-              author_feedback_score[r.id][1] = {} if author_feedback_score[r.id][1].nil?
-              author_feedback_score[r.id][1] = (total_score[:round_1]).to_f / total_feedback[:round_1]
-              author_feedback_score[:no_of_feedbacks_round_1] = total_feedback[:round_1]
+
+              update_author_feedback_hash author_feedback_score, r.id, 1, :no_of_feedbacks_round_1, total_score[:round_1], total_feedback[:round_1]
+
             end
 
             if total_feedback[:round_2] > 0
-              author_feedback_score[r.id][2] = {} if author_feedback_score[r.id][1].nil?
-              author_feedback_score[r.id][2] = (total_score[:round_2]).to_f / total_feedback[:round_2]
-              author_feedback_score[:no_of_feedbacks_round_2] = total_feedback[:round_2]
+
+              update_author_feedback_hash author_feedback_score, r.id, 2, :no_of_feedbacks_round_2, total_score[:round_2], total_feedback[:round_2]
+
             end
 
             if total_feedback[:round_3] > 0
-              author_feedback_score[r.id][3] = {} if author_feedback_score[r.id][1].nil?
-              author_feedback_score[r.id][3] = (total_score[:round_3]).to_f / total_feedback[:round_3]
-              author_feedback_score[:no_of_feedbacks_round_3] = total_feedback[:round_3]
+
+              update_author_feedback_hash author_feedback_score, r.id, 3, :no_of_feedbacks_round_3, total_score[:round_3], total_feedback[:round_3]
+
             end
 
           else
 
-            total_score = 0
+            total_score = {:round_1 => 0}
 
-            number_of_feedbacks = 0
+            total_feedback = {:round_1 => 0}
 
             review_mappings.each do |m|
 
@@ -321,18 +317,11 @@ module ReviewMappingHelper
 
               next if response.nil?
 
-              total_score +=  response.get_total_score
-
-              number_of_feedbacks += 1
-
-              author_feedback_score[:max_score_round_1] = response.get_maximum_score if author_feedback_score[:max_score_round_1].blank?
+              compute_feedback_score_per_round total_score, response, total_feedback, author_feedback_score, :max_score_round_1, :round_1
 
             end
 
-
-            author_feedback_score[r.id][1] = {} if author_feedback_score[r.id][1].nil?
-            author_feedback_score[r.id][1] = total_score.to_f / number_of_feedbacks
-            author_feedback_score[:no_of_feedbacks_round_1] = number_of_feedbacks
+            update_author_feedback_hash author_feedback_score, r.id, 1, :no_of_feedbacks_round_1, total_score[:round_1], total_feedback[:round_1]
 
           end
         end
@@ -340,6 +329,22 @@ module ReviewMappingHelper
     end
 
     author_feedback_score
+  end
+
+  private
+
+  def update_author_feedback_hash(author_feedback_score, reviewer_id, round_no, number_of_feedback_key, total_score, number_of_feedbacks)
+    author_feedback_score[reviewer_id][round_no] = {} if author_feedback_score[reviewer_id][round_no].nil?
+    author_feedback_score[reviewer_id][round_no] = total_score.to_f / number_of_feedbacks
+    author_feedback_score[number_of_feedback_key] = number_of_feedbacks
+  end
+
+  def compute_feedback_score_per_round(total_score, response, total_feedback,author_feedback_score, max_feedback_score_key, round_no_key)
+
+    total_score[round_no_key] +=  response.get_total_score
+    total_feedback[round_no_key] += 1
+    author_feedback_score[max_feedback_score_key] = response.get_maximum_score if author_feedback_score[max_feedback_score_key].blank?
+
   end
 
 end

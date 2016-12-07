@@ -92,9 +92,9 @@ class GradesController < ApplicationController
 
 
 
-    @review_mappings = SelfReviewResponseMap.where(reviewer_id: params[:id])
+    @self_review_mappings = SelfReviewResponseMap.where(reviewer_id: params[:id])
     @sorted_responses = Array.new
-    @prev = Response.where(:map_id => @review_mappings[0].id)
+    @prev = Response.where(:map_id => @self_review_mappings[0].id)
     for element in @prev
     array_not_empty = 1
     @sorted_responses << element
@@ -105,8 +105,8 @@ class GradesController < ApplicationController
     end
 
     @response = Response.find(@latest_response.id)
-    $max_score=@response.get_maximum_score
-    $raw_self_score=@response.get_total_score*100/$max_score
+    @max_score=@response.get_maximum_score
+    @raw_self_score=@response.get_total_score*100/@max_score
 
 
   end

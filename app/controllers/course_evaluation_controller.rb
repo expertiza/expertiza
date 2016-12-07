@@ -39,7 +39,7 @@ class CourseEvaluationController < ApplicationController
       response_map = ResponseMap.where(["reviewed_object_id = ? and reviewer_id = ?" , sd.parent_id , session[:user].id])
       if response_map.size > 0
         response_map.each do |rm|
-          @response = Response.where(map_id = rm.id)
+          @response = Response.where("map_id = ?", rm.id)
           if !@response.nil?
             if rm.type == 'SurveyResponseMap'
               @is_survey_submitted = @response.is_submitted

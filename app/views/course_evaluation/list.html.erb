@@ -7,7 +7,7 @@
   <% i=0 %>
   <% @surveys.each do |s| %>
     
-    <tr><td align = left><%= link_to s[0].name ,:controller=>'course_evaluation',:action=>'create_response_map',:parent_id => s[1] %>&nbsp &nbsp</td>
+    <tr><td align = left><%= link_to s[0].name ,:controller=>'course_evaluation',:action=>'create_response_map',:parent_id => s[1], :type => s[0].type %>&nbsp &nbsp</td>
     </tr>
   
   <% end %>

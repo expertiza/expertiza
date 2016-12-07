@@ -455,12 +455,12 @@
          function UpdateDeadlineForThisId(element_id)
          {
 
-            var d = document.getElementById("datetimepicker_submission_round_1");
-            var TZ = d.value.substr(d.value.length - 12);
-            var someDate = new Date(d.value)
+            var initialDate = document.getElementById("datetimepicker_submission_round_1");
+            var TZ = d.value.substr(initialDate.value.length - 12);
+            var date = new Date(initialDate.value)
             dropdownId  = "dropdown_"+element_id;
             var numberOfDaysToAdd = document.getElementById(dropdownId).value
-            var newDate = new Date(someDate.setTime( someDate.getTime() + numberOfDaysToAdd * 86400000 ));
+            var newDate = new Date(date.setTime( date.getTime() + numberOfDaysToAdd * 86400000 ));
             var text = newDate.getFullYear()+"/"+("0"+(parseInt(newDate.getMonth(),10)+1).toString()).slice(-2)+"/"+("0"+(parseInt(newDate.getDate(),10)+1).toString()).slice(-2)+" "+newDate.getHours()+":"+newDate.getMinutes()+" "
 
             document.getElementById("datetimepicker_"+element_id).value = text

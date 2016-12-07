@@ -144,11 +144,10 @@ to display the label "Your team" in the student assignment tasks-->
           <span>Review <%= mcount %></span>
         </a>
       </div>
-      <% b=false %>
     <% end %>
   <% end %>
 <%end%>
-<% if b%>
+<% if map.chat.nil?%>
 <span>You dont have any messages at this moment</span>
 <% end %>
 </div>

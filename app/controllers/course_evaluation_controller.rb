@@ -35,11 +35,11 @@ class CourseEvaluationController < ApplicationController
         
         # add survey assigned to the assignment in the respective survey list
         if !@assignment.survey_id.nil?
-           @assignmentsurveys << [Questionnaire.find(@assignment.survey_id) , @assignment.id ] 
+           @assignment_surveys << [Questionnaire.find(@assignment.survey_id) , @assignment.id ] 
         end
         # add global survey assigned to the assignment in the respective survey list
         if !@assignment.global_survey_id.nil?
-           @globalsurveys << [Questionnaire.find(@assignment.global_survey_id) , @assignment.id ]
+           @global_surveys << [Questionnaire.find(@assignment.global_survey_id) , @assignment.id ]
         end
       end
       
@@ -48,11 +48,11 @@ class CourseEvaluationController < ApplicationController
         @course = Course.find(sd.parent_id)
        
         if !@course.survey_id.nil?
-           @courseevaluationsurveys << [Questionnaire.find(@course.survey_id) , @course.id ]
+           @course_evaluation_surveys << [Questionnaire.find(@course.survey_id) , @course.id ]
         end
         
         if !@course.global_survey_id.nil?
-           @globalsurveys << [Questionnaire.find(@course.global_survey_id) , @course.id ]
+           @global_surveys << [Questionnaire.find(@course.global_survey_id) , @course.id ]
         end
       end
       

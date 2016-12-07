@@ -31,8 +31,8 @@ class CourseEvaluationController < ApplicationController
       # for assignment participants, find the questionnaire assigned to that 
       # assignment and add the details to list according to 
       
-      @is_survey_submitted = 0
-      @is_global_survey_submitted = 0
+      @is_survey_submitted = false
+      @is_global_survey_submitted = false
       @survey_response_id = nil
       @global_survey_response_id = nil
       response_map = []

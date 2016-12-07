@@ -10,9 +10,7 @@ module SignUpSheetHelper
   # if the instructor does not specify the topic due date, it should be the same as assignment due date;
   # otherwise, it should return the topic due date.
   def get_topic_deadline(assignment_due_dates, topic_id,deadline_type_id,review_round)
-    topic_due_date = TopicDueDate.where(parent_id: topic_id,
-                                        deadline_type_id: deadline_type_id,
-                                        round: review_round).first rescue nil
+    topic_due_date = TopicDueDate.where(parent_id: topic_id, deadline_type_id: deadline_type_id, round: review_round).first rescue nil
     if !topic_due_date.nil?
       due_date = topic_due_date.due_at
     else

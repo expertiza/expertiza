@@ -1,6 +1,15 @@
-class CourseEvaluationController < ApplicationController
+  class CourseEvaluationController < ApplicationController
   def action_allowed?
     current_role_name.eql?("Student")
+  end
+    
+  # create a response map and redirect to response controller 
+  def create_response_map
+    
+    @res_map=ResponseMap.new(reviewed_object_id: params[:assignment_id], reviewee_id: params[:assignment_id], reviewer_id:session[:user].id, type: params[:type] )
+    @res_map.save!
+    redirect_to controller: "response" , action: "new" , id: @res_map.id, type: @res_map.type
+    
   end
 
   def list # list course evaluations for a user

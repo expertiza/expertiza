@@ -31,7 +31,7 @@ class CourseEvaluationController < ApplicationController
       # for assignment participants, find the questionnaire assigned to that 
       # assignment and add the details to list according to 
       
-      @is_survey_submited = 0
+      @is_survey_submitted = 0
       @is_global_survey_submitted = 0
       @survey_response_id = nil
       @global_survey_response_id = nil
@@ -39,15 +39,15 @@ class CourseEvaluationController < ApplicationController
       response_map = ResponseMap.where(["reviewed_object_id = ? and reviewer_id = ?" , sd.parent_id , session[:user].id])
       if response_map.size > 0
         response_map.each do |rm|
-          response = Response.where(map_id = rm.id)
-          if !response.nil?
+          @response = Response.where(map_id = rm.id)
+          if !@response.nil?
             if rm.type == 'SurveyResponseMap'
-              @is_survey_submited = response.is_submitted
-              @survey_response_id = response.id
+              @is_survey_submitted = @response.is_submitted
+              @survey_response_id = @response.id
             end
             if rm.type == 'GlobalSurveyResponseMap'
-              @is_global_survey_submited = response.is_submitted
-              @global_survey_response_id = response.id
+              @is_global_survey_submitted = @response.is_submitted
+              @global_survey_response_id = @response.id
             end  
           end  
         end

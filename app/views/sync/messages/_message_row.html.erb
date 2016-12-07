@@ -20,7 +20,7 @@
     font-size: 9px;
     color: #F03939;
   }
-  .chatboxmessagecontent .Reviewee {
+  .chatboxmessagecontent .Author {
     font-size: 9px;
     color: #7c77f4;
   }
@@ -45,7 +45,7 @@
     display: block;
     width: 100%;
   }
-  .Reviewee .avatar:after {
+  .Author .avatar:after {
     content: "";
     position: absolute;
     top: 0;
@@ -72,14 +72,14 @@
     box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
   }
 </style>
-<li class="<%= reviewee_or_reviewer(message) %>">
+<li class="<%= is_reviewer(message) %>">
   <div class="avatar">
     <img src="http://placehold.it/30x30" />
   </div>
 <div class="chatboxmessagecontent">
       <p><%= message.body %></p>
   <div class="<%=reviewee_or_reviewer(message) %>" datetime="<%= message.created_at %>" title="<%= message.created_at.strftime("%d %b  %Y at %I:%M%p") %>">
-    <%= reviewee_or_reviewer(message) %> • <%= message.created_at.strftime("%H:%M %p") %>
+    <%= is_reviewer(message) %> • <%= message.created_at.strftime("%H:%M %p") %>
   </div>
 </div>
 </li>

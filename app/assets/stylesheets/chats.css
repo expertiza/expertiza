@@ -1,9 +1,6 @@
 @media only screen and (max-width : 540px)
 {
-  .chat-sidebar
-  {
-	display: none !important;
-  }
+
   .chat-popup
   {
 	display: none !important;
@@ -16,50 +13,8 @@ body
 .hidden {
   display: none;
 }
-.chat-sidebar
-{
-  width: 200px;
-  position: fixed;
-  height: 50%;
-  right: 0px;
-  top: 45%;
-  bottom: 5%;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  border: 2px solid rgba(29, 49, 91, .3);
-  border-color: #A90201;
-  background-color: white;
-  display: none;
-  overflow-y:auto;
-}
-.sidebar-name
-{
-  padding-left: 10px;
-  padding-right: 10px;
-  margin-bottom: 4px;
-  font-size: 15px;
-  background-color :#dbd7c7;
-}
-.sidebar-name span
-{
-  padding-left: 5px;
-}
-.sidebar-name a
-{
-  display: block;
-  height: 100%;
-  text-decoration: none;
-  color: black;
-}
-.sidebar-name:hover
-{
-  background-color: #A90201;
-}
-.sidebar-name img
-{
-  background-image:url("http://placehold.it/40x40");
-  vertical-align:middle;
-}
+
+
 .popup-box
 {
   display: none;

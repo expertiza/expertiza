@@ -81,7 +81,7 @@
     }
     var title
     if(id=="innermessages")
-        title="You Messages";
+        title="Your Messages";
       else
           title="Review"+ name;
 
@@ -129,8 +129,4 @@
   //recalculate when window is loaded and also when window is resized.
   window.addEventListener("resize", calculate_popups);
   window.addEventListener("load", calculate_popups);
-  $(document).ready(function(){
-    $("#chats").click(function(){
-        $(".chat-sidebar").toggle();
-    });
-});
+

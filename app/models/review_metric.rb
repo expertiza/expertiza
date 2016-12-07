@@ -7,9 +7,9 @@ class ReviewMetric < ActiveRecord::Base
                        .joins("join response_maps on responses.map_id = response_maps.id")
                        .where("response_maps.reviewed_object_id = ? and response_maps.reviewer_id = ? and response_maps.type = ? and responses.is_submitted = 1",assignment_id, reviewer_id,type)
                        .select("answers.comments, answers.response_id, responses.round, response_maps.reviewee_id, responses.is_submitted").order("answers.response_id")
-        suggestive_words = Set.new(["should", "recommend", "suggest", "advise", "try"])
-        offensive_words = Set.new(["lame", "stupid", "dumb", "idiot"])
-        problem_words = Set.new(["wrong", "error", "problem", "issue"])
+        suggestive_words = Set.new(["should", "recommend", "suggest", "advise", "try","can", "maybe", "could", "may", "would", "should've","could've", "would've","plan"])
+        offensive_words = Set.new(["lame", "stupid", "dumb", "idiot", "horrendous","horrible","non-sense", "crap","piss","pissed","bullshit","bloody","hell","stupidity"])
+        problem_words = Set.new(["wrong", "error", "problem", "issue", "problems", "errors", "issues","problematic","fix","obstacle","dispute","not","none","didn't","cannot","can't","couldn't","shouldn't"])
         current_response_id = nil
         response_level_comments = Hash.new()
         metrics = Hash.new()
@@ -88,9 +88,10 @@ class ReviewMetric < ActiveRecord::Base
    type = "ReviewResponseMap"
    concatenated_comment = ''
    answers = Answer.where("answers.response_id = ? ", response_id).select("answers.comments") 
-   suggestive_words = Set.new(["should", "recommend", "suggest", "advise", "try"])
-   offensive_words = Set.new(["lame", "stupid", "dumb", "idiot"])
-   problem_words = Set.new(["wrong", "error", "problem", "issue"])
+   suggestive_words = Set.new(["should", "recommend", "suggest", "advise", "try","can", "maybe", "could", "may", "would", "should've","could've", "would've","plan"])
+   offensive_words = Set.new(["lame", "stupid", "dumb", "idiot", "horrendous","horrible","non-sense", "crap","piss","pissed","bullshit","bloody","hell","stupidity"])
+   problem_words = Set.new(["wrong", "error", "problem", "issue", "problems", "errors", "issues","problematic","fix","obstacle","dispute","not","none","didn't","cannot","can't","couldn't","shouldn't"])
+        current_response_id = nil
    is_offensive_term = false
    is_suggestion = false
    is_problem = false

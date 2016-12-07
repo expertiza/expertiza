@@ -1,8 +1,9 @@
 <h1> Pending Surveys </h1>
 
 <table class=listing cellpadding=2 width=50%>
+  <tr><th align = left> Assignment Surveys </th></tr>
 <% if (@assignment_surveys.size > 0) %>
-  <tr><th align = left> Assignment Surveys </th>
+  
   <% i=0 %>
   <% @assignment_surveys.each do |s| %>
     <tr> <td> <%= s[0].name %> </td> 
@@ -23,9 +24,9 @@
       </div>
   </td> </tr>
 <%end%>
-  
+  <tr><th align = left> Global Surveys </th></tr>  
 <% if (@global_surveys.size > 0) %>
-  <tr><th align = left> Global Surveys </th>
+  
   <% i=0 %>
   <% @global_surveys.each do |s| %>
     
@@ -49,8 +50,9 @@
   </td> </tr>
 <%end%>
 
+  <tr><th align = left> Course evaluation Surveys </th></tr>
 <% if (@course_evaluation_surveys.size > 0) %>
-  <tr><th align = left> Course evaluation Surveys </th>
+  
   <% i=0 %>
   <% @course_evaluation_surveys.each do |s| %>
     

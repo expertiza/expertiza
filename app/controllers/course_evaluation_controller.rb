@@ -36,7 +36,7 @@ class CourseEvaluationController < ApplicationController
       @survey_response_id = nil
       @global_survey_response_id = nil
       response_map = []
-      response_map = ResponseMap.where(["reviewed_object_id = ? and reviewer_id = ?" sd.parent_id , session[:user].id])
+      response_map = ResponseMap.where(["reviewed_object_id = ? and reviewer_id = ?" , sd.parent_id , session[:user].id])
       if response_map.size > 0
         response_map.each do |rm|
           response = Response.where(map_id = rm.id)

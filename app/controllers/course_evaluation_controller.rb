@@ -15,11 +15,11 @@ class CourseEvaluationController < ApplicationController
         @assignment = Assignment.find(sd.parent_id)
        
         if !@assignment.survey_id.nil?
-           @surveys << [Questionnaire.find(@assignment.survey_id)]
+           @surveys << Questionnaire.find(@assignment.survey_id)
         end
         
         if !@assignment.global_survey_id.nil?
-           @surveys << [Questionnaire.find(@assignment.global_survey_id)]
+           @surveys << Questionnaire.find(@assignment.global_survey_id)
         end
       end
       
@@ -27,11 +27,11 @@ class CourseEvaluationController < ApplicationController
         @course = Course.find(sd.parent_id)
        
         if !@course.survey_id.nil?
-           @surveys << [Questionnaire.find(@course.survey_id)]
+           @surveys << Questionnaire.find(@course.survey_id)
         end
         
         if !@course.global_survey_id.nil?
-           @surveys << [Questionnaire.find(@course.global_survey_id)]
+           @surveys << Questionnaire.find(@course.global_survey_id)
         end
       end
       

@@ -1,7 +1,7 @@
 class ResponseMap < ActiveRecord::Base
   has_many :response, foreign_key: 'map_id', dependent: :destroy
   belongs_to :reviewer, class_name: 'Participant', foreign_key: 'reviewer_id'
-
+  
   def map_id
     id
   end

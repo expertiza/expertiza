@@ -519,7 +519,11 @@ Expertiza::Application.routes.draw do
       delete '', action: :destroy_all
     end
   end
-
+  
+  resources :chats do
+    resources :messages
+  end
+  
   get '/users/show_selection', controller: :users, action: :show_selection
   get '/users/list', controller: :users, action: :list
   get '/menu/*name', controller: :menu_items, action: :link

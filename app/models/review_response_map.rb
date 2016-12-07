@@ -127,6 +127,9 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
+
+  
+
   private
 
   def self.prepare_final_review_versions(assignment, maps)
@@ -168,4 +171,6 @@ class ReviewResponseMap < ResponseMap
     review_final_versions[symbol][:response_ids] = response_ids
 
   end
+
+
 end

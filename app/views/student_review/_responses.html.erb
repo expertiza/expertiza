@@ -1,3 +1,6 @@
+<link rel="stylesheet" type="text/css" href="/assets/chats.css">
+<script type="text/javascript" src="/assets/chats.js" ></script>
+
 <table>
   <% review_no = 1 %>
   <% mappings.each do |map| %>
@@ -52,6 +55,26 @@
                        <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
                     </td>
 
+                    <td>
+                      <%unless (map.nil? or map.reviewee.nil? or map.reviewee.chat.nil?) %>
+                      <div id="messages" class="hidden">
+                            <div id="partial<%= "#{review_no}" %>"  >
+                              <%= sync partial: "message_row", collection: Message.by_chat(map.reviewee.chat) %>
+                              <%= sync_new partial: "message_row", resource: Message.new, scope: Message.by_chat(map.reviewee.chat) %>
+                              <div class="popup-bottom">
+                                <%= form_for([map.reviewee.chat, map.reviewee.chat.messages.build], remote: true) do |f| %>
+                                    <%= f.text_field :body , :class => "body_input",:placeholder => "Type a message..." %>
+                                <% end %>
+                              </div>
+                            </div>
+                          </div>
+                          <% end %>
+
+                      <a href="javascript:register_popup('<%= "#{review_no}" %>', '<%= "#{review_no}" %>' );">
+                        <span>Chat</span>
+                      </a>
+                    </td>
+
                     <% if @assignment.get_current_stage(topic_id) != "Finished" %>
                       <%- # show the link as edit when latest review is done in current deadline   -%>
                       <%- # show link as update when latest review is done in different deadline than current phase   -%>
@@ -68,6 +91,26 @@
                 <%end%>
             <% elsif @assignment.get_current_stage(topic_id) != "Complete" && @assignment.can_review(topic_id) %>
                 <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
+                 <td>
+                   <%unless (map.nil? or map.reviewee.nil? or map.reviewee.chat.nil?) %>
+                      <div id="messages" class="hidden">
+                            <div id="partial<%= "#{review_no}" %>"  >
+                              <%= sync partial: "message_row", collection: Message.by_chat(map.reviewee.chat) %>
+                              <%= sync_new partial: "message_row", resource: Message.new, scope: Message.by_chat(map.reviewee.chat) %>
+                              <div class="popup-bottom">
+                                <%= form_for([map.reviewee.chat, map.reviewee.chat.messages.build], remote: true) do |f| %>
+                                    <%= f.text_field :body , :class => "body_input",:placeholder => "Type a message..." %>
+                                <% end %>
+                              </div>
+                            </div>
+                          </div>
+                          <% end %>
+
+
+                      <a href="javascript:register_popup('<%= "#{review_no}" %>', '<%= "#{review_no}" %>' );">
+                        <span>Chat</span>
+                      </a>
+                    </td>
                 <td>&nbsp;&nbsp;</td>
             <% else %>
                 <td>Begin</td>

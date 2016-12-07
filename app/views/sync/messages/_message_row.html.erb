@@ -1,0 +1,86 @@
+<body>
+<style>
+  .chatboxmessagecontent {
+    background: white;
+    padding: 10px;
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+  .chatboxmessagecontent p {
+    font-size: 12px;
+    margin: 0 0 0.2rem 0;
+    -ms-word-break: break-all;
+    /* Non standard for webkit */
+    word-break: break-word;
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    hyphens: auto;
+  }
+  .chatboxmessagecontent .Reviewer {
+    font-size: 9px;
+    color: #F03939;
+  }
+  .chatboxmessagecontent .Author {
+    font-size: 9px;
+    color: #7c77f4;
+  }
+  li {
+    padding: 0.5rem;
+    overflow: hidden;
+    display: flex;
+  }
+  .Reviewer {
+    justify-content: flex-end;
+    align-items: flex-end;
+  }
+  .Reviewer .chatboxmessagecontent {
+    order: 1;
+    border-bottom-right-radius: 0;
+  }
+  .avatar {
+    width: 40px;
+    position: relative;
+  }
+  li .avatar img {
+    display: block;
+    width: 100%;
+  }
+  .Author .avatar:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border: 5px solid white;
+    border-left-color: transparent;
+    border-bottom-color: transparent;
+  }
+  .Reviewer .avatar {
+    order: 2;
+  }
+  .Reviewer .avatar:after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border: 5px solid white;
+    border-right-color: transparent;
+    border-top-color: transparent;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  }
+</style>
+<li class="<%= is_reviewer(message) %>">
+  <div class="avatar">
+    <img src="http://placehold.it/30x30" />
+  </div>
+<div class="chatboxmessagecontent">
+      <p><%= message.body %></p>
+  <div class="<%=reviewee_or_reviewer(message) %>" datetime="<%= message.created_at %>" title="<%= message.created_at.strftime("%d %b  %Y at %I:%M%p") %>">
+    <%= is_reviewer(message) %> • <%= message.created_at.strftime("%H:%M %p") %>
+  </div>
+</div>
+</li>
+</body>

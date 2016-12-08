@@ -46,6 +46,10 @@
     margin-left:auto;
     margin-right:auto;' %>
     </p>
+
   <% end %>
+      <p>
+    <%= link_to "REQUEST SIGN UP",{:controller => 'users',:role => "Student", :action => 'request_new'}, :class => 'btn btn-danger', :style => 'color:white;width:100%;margin-left:auto;margin-right:auto;' %>
+    </p>
   <br/>
 <% end %>

@@ -366,6 +366,18 @@ ActiveRecord::Schema.define(version: 20161129220644) do
     t.boolean "iscorrect",                 default: false
   end
 
+  create_table "requested_users", force: :cascade do |t|
+    t.string   "name",           limit: 255
+    t.integer  "role_id",        limit: 4
+    t.string   "fullname",       limit: 255
+    t.string   "institution_id", limit: 255
+    t.string   "email",          limit: 255
+    t.string   "status",         limit: 255
+    t.string   "reason",         limit: 255
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+  end
+
   create_table "response_maps", force: :cascade do |t|
     t.integer  "reviewed_object_id", limit: 4,   default: 0,     null: false
     t.integer  "reviewer_id",        limit: 4,   default: 0,     null: false

@@ -128,6 +128,7 @@ class UsersController < ApplicationController
     @rolename = Role.find_by_name(params[:role])
     roles_for_request_sign_up
   end
+
   def create
     # if the user name already exists, register the user by email address
     check = User.find_by_name(params[:user][:name])
@@ -295,9 +296,8 @@ class UsersController < ApplicationController
   protected
 
   def roles_for_request_sign_up
-    #TODO - restrict only few roles
-    #role = Role.find(session[:user].role_id)
-    @all_roles = Role.all
+    roles_can_be_requested_online = ["Instructor", "Student", "Teaching Assistant"]
+    @all_roles = Role.where(name: roles_can_be_requested_online)
   end
 
   private

@@ -78,9 +78,7 @@ class UsersController < ApplicationController
     @letters = ('A'..'Z').to_a
   end
 
-  def review
-    #TODO: make status as enum or something
-    #@users = RequestedUser.where.not(status: 'approved');
+  def list_pending_requested
     sql_query = "select * from requested_users where status <> 'Approved' or status is null"
     @users = RequestedUser.find_by_sql(sql_query)
     #@users=RequestedUser.all
@@ -206,7 +204,7 @@ class UsersController < ApplicationController
         #If the user request has been rejected, a flash message is shown and redirected to review page
         if @user.update_columns(reason: params[:reason], status: params[:status])
           flash[:success] = "The user \"#{@user.name}\" has been Rejected."
-          redirect_to action: 'review'
+          redirect_to action: 'list_pending_requested'
           return
         else
           flash[:error] = "Error processing request."
@@ -214,7 +212,7 @@ class UsersController < ApplicationController
       end
 
     end
-    redirect_to action: 'review'
+    redirect_to action: 'list_pending_requested'
   end
 
   def request_user_create

@@ -16,7 +16,6 @@
   <%= hidden_field_tag :assignment_id, "#{params[:assignment_id]}" %>
     <% questions = Question.where(questionnaire_id: @questionnaire.id) %><br><br>
     <% questions.each do |question| %>
-      <%= label_tag "#{question.id}", question.txt %> <br>
       <%= question.complete.html_safe %>
       <br>
     <% end %>

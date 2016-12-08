@@ -26,7 +26,7 @@ class TrueFalse < QuizQuestion
 
   def complete
     quiz_question_choices = QuizQuestionChoice.where(question_id: self.id)
-    html = ""
+    html = "<label for=\""+self.id.to_s+"\">"+self.txt+"</label><br>"
     for i in 0..1
       txt = quiz_question_choices[i].txt
       html += "<input name = " + "\"#{self.id}\" "

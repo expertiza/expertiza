@@ -82,6 +82,8 @@ class MultipleChoiceCheckbox < QuizQuestion
     end
     if correct_count == 0  
       valid = "Please select a correct answer for all questions"
+    elsif correct_count ==1
+      valid = "A multiple-choice checkbox question should have more than one correct answer."
     end
     valid
   end

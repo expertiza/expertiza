@@ -39,7 +39,9 @@ def search
             split_line = line.split('&');
             if(split_line[1]!=nil)
               split_details = split_line[1].split('|')
-               @logArray<<(LogEntry.new(split_details[3],date_str,split_details[4],split_details[2]))
+              le = LogEntry.new(split_details[3],date_str,split_details[4],split_details[2]);
+              puts "+ adding entry "+le.time+" "+le.userid
+               @logArray<<le
             end
           end
         end

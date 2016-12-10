@@ -53,11 +53,11 @@ def search
         # end
 
         #Filter the logs based on search criteria
-        if(params[:UType]!=''){
+        if(params[:UType]!='')
           logger.warn "Filtering based on user type#{params[:UType]}"
           @logArrayFiltered = @logArray.select{|entry| entry.time == params[:UType]}
           logger.warn "filtered array contains #{@logArrayFiltered.size}"
-        }
+        end
 
 
 

@@ -24,7 +24,7 @@
 <%= form_tag(:action => 'search') do %>
 <table>
   <tr>
-    <td><label>User Type</label></td><td><%= select_tag('UType', '<option value="All">All</option><option value="2">Student</option><option value="Instructor">Instructor</option>'.html_safe) %></td>
+    <td><label>User Type</label></td><td><%= select_tag('UType', '<option value="All">All</option><option value="2">Instructor</option><option value="Student">Student</option>'.html_safe) %></td>
     <td><label>User ID</label></td> <td><%= text_field_tag('UserID') %></td>
     
   </tr>
@@ -56,21 +56,21 @@
   <thead>
   <tr >
       <th>SL No.</th>
-      <th>Log Entry</th>
-      <th>Log level</th>
+      <th>Time</th>
+      <th>Event</th>
+      <th>User Type</th>
+      <th>User ID</th>
     </tr>
   </thead>
   <tbody>
     <% @logArray.each do |entry| %>
 
     <tr>
-
       <td><%= sl %></td>
-
-
-      <td><%= entry %></td>
-      <td>120</td>
-     
+      <td><%= entry.time %></td>
+      <td><%= entry.e_type %></td>
+      <td><%= entry.u_type %></td>
+      <td><%= entry.userid %></td>
     </tr>
 
     <% sl = sl+1 %>

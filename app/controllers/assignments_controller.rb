@@ -24,7 +24,7 @@ class AssignmentsController < ApplicationController
     assignment = Assignment.find(params[:id])
     assignment.private = !assignment.private
     assignment.save
-    @@event_logger.warn "&assignments_controller|save|#{session[:user].role_id}|#{session[:user].id}|save assignment |#{params[:id]}"
+    @@event_logger.warn "&assignments_controller|save|#{session[:user].role_id}|#{session[:user].id}|save assignment|#{params[:id]}"
     redirect_to list_tree_display_index_path
   end
 
@@ -39,11 +39,6 @@ class AssignmentsController < ApplicationController
 
     if @assignment_form.save
       @assignment_form.create_assignment_node
-      @@event_logger.warn ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-      @@event_logger.warn "to_s: "+assignment_form_params.to_s
-      @@event_logger.warn "inspect: "+assignment_form_params.inspect
-      #@@event_logger.warn "assignment name: "+assignment_form_params.name
-      @@event_logger.warn ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 
       @@event_logger.warn "&assignments_controller|create|#{session[:user].role_id}|#{session[:user].id}|create assignment|#{assignment_form_params[:assignment][:name]}"
       redirect_to edit_assignment_path @assignment_form.assignment.id

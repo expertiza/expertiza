@@ -20,8 +20,6 @@ class LoggerController < ApplicationController
 	puts "Array length is "+ @logArray.size.to_s
   end
 
-
-
 def search
         logger.warn ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>In search action"
 
@@ -40,19 +38,28 @@ def search
             if(split_line[1]!=nil)
               split_details = split_line[1].split('|')
               le = LogEntry.new(split_details[3],date_str,split_details[4],split_details[2]);
-              puts "+ adding entry "+le.time+" "+le.userid
                @logArray<<le
             end
           end
         end
+
         logger.warn "Array length is "+ @logArray.size.to_s
 
-        logger.warn "Printing object array:"
+        #DEBUGGING STATEMENTS
+        #logger.warn "Printing object array:"
+        # @logArray.each do |i|
+        #   logger.warn "inside loop..."
+        #   logger.warn ">>>>>time: "+i.time+" userid: "+i.userid+" usertype: "+i.user_type+" eventtype: "+i.event_type
+        # end
 
-        @logArray.each do |i|
-          logger.warn "inside loop..."
-          logger.warn ">>>>>time: "+i.time+" userid: "+i.userid+" usertype: "+i.user_type+" eventtype: "+i.event_type
-        end
+        #Filter the logs based on search criteria
+        if(params[:UType]!=''){
+          logger.warn "Filtering based on user type#{params[:UType]}"
+          @logArrayFiltered = @logArray.select{|entry| entry.time == params[:UType]}
+          logger.warn "filtered array contains #{@logArrayFiltered.size}"
+        }
+
+
 
         render('view_logs')
 end

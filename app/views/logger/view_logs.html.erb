@@ -24,14 +24,13 @@
 <%= form_tag(:action => 'search') do %>
 <table>
   <tr>
-    <td><label>User Type</label></td><td><%= select_tag('UType', '<option value="Student">Student</option>
-          <option value="Instructor">Instructor</option>'.html_safe) %></td>
+    <td><label>User Type</label></td><td><%= select_tag('UType', '<option value="All">All</option><option value="2">Student</option><option value="Instructor">Instructor</option>'.html_safe) %></td>
     <td><label>User ID</label></td> <td><%= text_field_tag('UserID') %></td>
     
   </tr>
 
  <tr>
-   <td><label>Event Type</label></td><td><%= select_tag('EType', '<option value="1">Login</option>
+   <td><label>Event Type</label></td><td><%= select_tag('EType', '<option value="All">All</option><option value="1">Login</option>
    <option value="2">Log Out</option>'.html_safe) %></td>
  </tr>
 

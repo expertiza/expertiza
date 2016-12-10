@@ -17,6 +17,40 @@
     });
   } );
   </script>
+
+
+<h2>Log Search Criteria</h2>
+
+<%= form_tag(:action => 'search') do %>
+<table>
+  <tr>
+    <td><label>User Type</label></td> <td><%= text_field_tag('UserType') %></td>  
+    <td><label>User ID</label></td> <td><%= text_field_tag('UserID') %></td>
+    
+  </tr>
+
+ <tr>
+   <td><label>Event Type</label></td><td><%= select_tag('EType', '<option value="1">Login</option>
+   <option value="2">Log Out</option>'.html_safe) %></td>
+ </tr>
+
+ <tr>
+   <td><label>From Date</label></td> <td><%= datetime_local_field(:time, :from) %></td>
+    <td><label>To Date</label></td> <td><%= datetime_local_field(:time, :to) %></td>
+ </tr>
+ 
+<tr>
+  <td> <%= submit_tag("Search") %></td>
+</tr>
+
+</table>
+
+
+<% end %>
+
+
+
+
 <h1>Log Viewer Page</h1>
 
 <% sl =1 %>

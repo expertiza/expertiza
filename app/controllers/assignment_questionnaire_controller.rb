@@ -4,6 +4,7 @@
 class AssignmentQuestionnaireController < ApplicationController
   # delete all AssignmentQuestionnaire entry that's associated with an assignment
   def delete_all
+    @@event_logger.warn "&assignment_questionnaire_controller|delete_all|#{session[:user].role_id}|#{session[:user].id}|Delete All AssignmentQuestionnaire entries"
     assignment = Assignment.find(params[:assignment_id])
     if assignment.nil?
       flash[:error] = "Assignment #" + assignment.id + "does not currently exist."
@@ -19,6 +20,7 @@ class AssignmentQuestionnaireController < ApplicationController
   end
 
   def create
+    @@event_logger.warn "&assignment_questionnaire_controller|Create|#{session[:user].role_id}|#{session[:user].id}|Create AssignmentQuestionnaire"
     if params[:assignment_id].nil?
       flash[:error] = "Missing assignment:" + params[:assignment_id]
       return

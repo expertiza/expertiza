@@ -42,6 +42,7 @@ class AssignmentsController < ApplicationController
       @@event_logger.warn ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
       @@event_logger.warn "to_s: "+assignment_form_params.to_s
       @@event_logger.warn "inspect: "+assignment_form_params.inspect
+      @@event_logger.warn "assignment name: "+assignment_form_params.name
       @@event_logger.warn ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 
       @@event_logger.warn "&assignments_controller|create|#{session[:user].role_id}|#{session[:user].id}|create assignment|#{assignment_form_params[:name]}"

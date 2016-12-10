@@ -35,13 +35,19 @@ def search
 
         File.open(filePath,'r') do |file|
             file.each_line do |line|
+            date_str = raw_string[4..22]
+            split_line = raw_string.split('&');
+            split_details = split_line[1].split('|')
 
 
-
-             @logArray<<line
+             @logArray<<(new LogEntry(split_details[3],date_str,split_details[4],split_details[2]))
           end
         end
         logger.warn "Array length is "+ @logArray.size.to_s
+
+        logger.warn "Printing object array:"
+
+        logArray.each{|i| puts ">>>>>time: "+i.time+" userid: "+i.userid+" usertype: "+i.user_type+" eventtype: "+i.event_type}
 
         render('view_logs')
 end

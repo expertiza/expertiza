@@ -8,11 +8,13 @@ class TeamsController < ApplicationController
   end
 
   # This function is used to create teams with random names.
-  # Instructors can call by clicking "Create temas" icon anc then click "Create teams" at the bottom.
+  # Instructors can call by clicking "Create temas" icon and then click "Create teams" at the bottom.
   def create_teams
     parent = Object.const_get(session[:team_type]).find(params[:id])
     Team.randomize_all_by_parent(parent, session[:team_type], params[:team_size].to_i)
     undo_link("Random teams have been successfully created.")
+    @@event_logger.warn "&teams_controller|create_teams|#{session[:user].role_id}|#{session[:user].id}|create random teams"
+
     redirect_to action: 'list', id: parent.id
   end
 
@@ -39,6 +41,8 @@ class TeamsController < ApplicationController
       @team = Object.const_get(session[:team_type] + 'Team').create(name: params[:team][:name], parent_id: parent.id)
       TeamNode.create(parent_id: parent.id, node_object_id: @team.id)
       undo_link("The team \"#{@team.name}\" has been successfully created.")
+      @@event_logger.warn "&teams_controller|create|#{session[:user].role_id}|#{session[:user].id}|create team|#{@team.name}"
+
       redirect_to action: 'list', id: parent.id
     rescue TeamExistsError
       flash[:error] = $ERROR_INFO

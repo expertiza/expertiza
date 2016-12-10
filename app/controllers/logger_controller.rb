@@ -79,13 +79,13 @@ def search
           logger.warn "filtered array contains #{@logArray.size}"
         end
 
-        logger.warn "FINAL LOG ARRAY..."
-
-        @logArray.each do |i|
-          logger.warn "inside LA..."
-          logger.warn ">>>>>time: "+i.time+" userid: "+i.userid+" usertype: "+i.user_type+" eventtype: "+i.event_type
+        #Filter the logs based on event type
+        if(params[:EType]!='All')
+          tempArr = Array.new(@logArray)
+          logger.warn "Filtering based on user ID #{params[:EType]}"
+          @logArray = tempArr.select{|entry| entry.event_type == params[:EType]}
+          logger.warn "filtered array contains #{@logArray.size}"
         end
-
 
 
         render('view_logs')

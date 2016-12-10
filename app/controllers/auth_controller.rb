@@ -57,9 +57,8 @@ class AuthController < ApplicationController
   end
 
   def logout
-    #E1703 Change
-    logger.warn "logout: from session"session[:user].role_id
-    #@@event_logger.warn "auth_controller|logout|#{@globaluser.role_id}|#{user.id}|Logout"
+    #E1703 Change  
+    @@event_logger.warn "auth_controller|logout|#{session[:user].role_id}|#{session[:user].id}|Logout"
     #E1703 Change ends
     AuthController.logout(session)
     

@@ -16,7 +16,28 @@ class LoggerController < ApplicationController
   		file.each_line do |line|
     	 @logArray<<line
   		end
-	end
+	  end
 	puts "Array length is "+ @logArray.size.to_s
   end
+
+
+
+def search
+        puts ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>In search action"
+
+        puts "Parameters Received:"
+        puts "User ID "+params[:UserID]
+        puts "User Type "+params[:UserType]
+        puts "Event Type "+params[:EType]
+        puts "From DT "+params[:time][:from]
+         puts "From DT "+params[:time][:to]
+
+
+
+        @logArray = Array.new
+        render('view')
+    end
+
+
+
 end

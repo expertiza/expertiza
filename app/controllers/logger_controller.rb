@@ -32,7 +32,7 @@ def search
         logger.warn "From DT "+params[:time][:from]
         logger.warn "From DT "+params[:time][:to]
         @logArray = Array.new
-
+        filePath = "#{Rails.root}/log/events.log"
         File.open(filePath,'r') do |file|
             file.each_line do |line|
             date_str = raw_string[4..22]

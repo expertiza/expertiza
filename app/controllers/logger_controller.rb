@@ -30,11 +30,19 @@ def search
         logger.warn "User Type "+params[:UType]
         logger.warn "Event Type "+params[:EType]
         logger.warn "From DT "+params[:time][:from]
-         logger.warn "From DT "+params[:time][:to]
-
-
-
+        logger.warn "From DT "+params[:time][:to]
         @logArray = Array.new
+
+        File.open(filePath,'r') do |file|
+            file.each_line do |line|
+
+
+
+             @logArray<<line
+          end
+        end
+        logger.warn "Array length is "+ @logArray.size.to_s
+
         render('view_logs')
 end
 

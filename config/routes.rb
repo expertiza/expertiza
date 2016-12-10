@@ -539,7 +539,7 @@ Expertiza::Application.routes.draw do
   get 'response/', :to => 'response#saving'
 
   get 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
-  #post 'logger/search', :controller => "logger_controller", :action => 'search'
+  post 'logger/search', :controller => "logger", :action => 'search'
 
  get ':controller/service.wsdl', :action => 'wsdl'
 

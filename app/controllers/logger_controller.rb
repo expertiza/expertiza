@@ -27,7 +27,7 @@ def search
 
         puts "Parameters Received:"
         puts "User ID "+params[:UserID]
-        puts "User Type "+params[:UserType]
+        puts "User Type "+params[:UType]
         puts "Event Type "+params[:EType]
         puts "From DT "+params[:time][:from]
          puts "From DT "+params[:time][:to]

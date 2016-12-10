@@ -579,6 +579,8 @@ class QuestionnairesController < ApplicationController
     send_data csv_data,
               type: 'text/csv; charset=iso-8859-1; header=present',
               disposition: "attachment; filename=questionnaires.csv"
+    @@event_logger.warn "&questionnaires_controller|export|#{session[:user].role_id}| #{session[:user].id}|export questionnaire |#{params[:id]}"
+
   end
 
   def import
@@ -587,6 +589,8 @@ class QuestionnairesController < ApplicationController
     file = params['csv']
 
     @questionnaire.questions << QuestionnaireHelper.get_questions_from_csv(@questionnaire, file)
+    @@event_logger.warn "&questionnaires_controller|import|#{session[:user].role_id}| #{session[:user].id}|import questionnaire |#{params[:id]}"
+
   end
 
   # clones the contents of a questionnaire, including the questions and associated advice

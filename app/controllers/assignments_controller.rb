@@ -2,7 +2,7 @@ class AssignmentsController < ApplicationController
   include AssignmentHelper
   autocomplete :user, :name
   before_action :authorize
-
+#test
   def action_allowed?
     if params[:action] == 'edit' || params[:action] == 'update'
       assignment = Assignment.find(params[:id])

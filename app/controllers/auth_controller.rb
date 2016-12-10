@@ -22,7 +22,6 @@ class AuthController < ApplicationController
       if user and user.valid_password?(params[:login][:password])
         after_login(user)
       else
-        @@event_logger.warn "auth_controller|login|#{user.role_id}|#{user.id}|FailedLogin"
         flash[:error] = "Your username or password is incorrect."
         redirect_to controller: 'password_retrieval', action: 'forgotten'
       end
@@ -32,7 +31,7 @@ class AuthController < ApplicationController
   # function to handle common functionality for conventional user login and google login
   def after_login(user)
     session[:user] = user
-    @@event_logger.warn "user_id: #{user.id} logged in."
+    @@event_logger.warn "auth_controller|after_login|#{user.role_id}|#{user.id}|Login"
     AuthController.set_current_role(user.role_id, session)
     
     redirect_to controller: AuthHelper.get_home_controller(session[:user]),
@@ -58,7 +57,7 @@ class AuthController < ApplicationController
   end
 
   def logout
-    @@event_logger.warn "Logout attempt by #{session[:user_id]}."
+    @@event_logger.warn "auth_controller|logout|#{user.role_id}|#{user.id}|Logout"
     AuthController.logout(session)
     
     redirect_to '/'

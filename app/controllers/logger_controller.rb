@@ -1,5 +1,5 @@
 class LoggerController < ApplicationController
-  
+
   def action_allowed?
     true
   end
@@ -86,6 +86,22 @@ def search
           tempArr = Array.new(@logArray)
           logger.warn "Filtering based on event type #{params[:EType]}"
           @logArray = tempArr.select{|entry| entry.event_type == params[:EType]}
+          logger.warn "filtered array contains #{@logArray.size}"
+        end
+
+        #Filter the logs based on from time
+        if(params[:time][:from]!='')
+          tempArr = Array.new(@logArray)
+          logger.warn "Filtering based on from time #{params[:time][:from]}"
+          @logArray = tempArr.select{|entry| entry.time >= params[:time][:from]}
+          logger.warn "filtered array contains #{@logArray.size}"
+        end
+
+        #Filter the logs based on to time
+        if(params[:time][:to]!='')
+          tempArr = Array.new(@logArray)
+          logger.warn "Filtering based on to time #{params[:time][:to]}"
+          @logArray = tempArr.select{|entry| entry.time <= params[:time][:to]}
           logger.warn "filtered array contains #{@logArray.size}"
         end
 

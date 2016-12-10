@@ -63,6 +63,7 @@ class AdminController < ApplicationController
   end
 
   def remove_administrator
+    @@event_logger.warn "&AdminController|remove_administrator|#{session[:user].role_id}|#{session[:user].id}|Remove Admin|#{User.find(params[:id])}"
     User.find(params[:id]).destroy
     redirect_to action: 'list_administrators'
   end

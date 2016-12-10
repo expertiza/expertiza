@@ -63,7 +63,7 @@ def search
         # end
 
         #Filter the logs based on userType
-        if(params[:UType]!='')
+        if(params[:UType]!='All')
           tempArr = Array.new(@logArray)
           logger.warn "Filtering based on user type #{params[:UType]}"
           @logArray = tempArr.select{|entry| entry.user_type == params[:UType]}

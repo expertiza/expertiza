@@ -23,14 +23,14 @@ class LoggerController < ApplicationController
 
 
 def search
-        puts ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>In search action"
+        logger.warn ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>In search action"
 
-        puts "Parameters Received:"
-        puts "User ID "+params[:UserID]
-        puts "User Type "+params[:UType]
-        puts "Event Type "+params[:EType]
-        puts "From DT "+params[:time][:from]
-         puts "From DT "+params[:time][:to]
+        logger.warn "Parameters Received:"
+        logger.warn "User ID "+params[:UserID]
+        logger.warn "User Type "+params[:UType]
+        logger.warn "Event Type "+params[:EType]
+        logger.warn "From DT "+params[:time][:from]
+         logger.warn "From DT "+params[:time][:to]
 
 
 

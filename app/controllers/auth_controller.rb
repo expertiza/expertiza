@@ -31,7 +31,7 @@ class AuthController < ApplicationController
   # function to handle common functionality for conventional user login and google login
   def after_login(user)
     session[:user] = user
-    @@event_logger.warn "auth_controller|after_login|#{user.role_id}|#{user.id}|Login"
+    @@event_logger.warn "&auth_controller|after_login|#{user.role_id}|#{user.id}|Login"
     AuthController.set_current_role(user.role_id, session)
     
     redirect_to controller: AuthHelper.get_home_controller(session[:user]),
@@ -58,7 +58,7 @@ class AuthController < ApplicationController
 
   def logout
     #E1703 Change  
-    @@event_logger.warn "auth_controller|logout|#{session[:user].role_id}|#{session[:user].id}|Logout"
+    @@event_logger.warn "&auth_controller|logout|#{session[:user].role_id}|#{session[:user].id}|Logout"
     #E1703 Change ends
     AuthController.logout(session)
     

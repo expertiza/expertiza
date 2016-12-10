@@ -38,6 +38,7 @@ def search
             if(split_line[1]!=nil)
               split_details = split_line[1].split('|')
               le = LogEntry.new(split_details[3],date_str,split_details[4],split_details[2]);
+              logger.warn "+ adding user id #{le.userid}"
                @logArray<<le
             end
           end
@@ -65,7 +66,7 @@ def search
         if(params[:UserID]!='')
           tempArr = Array.new(@logArray)
           logger.warn "Filtering based on user ID #{params[:UserID]}"
-          @logArray = tempArr.select{|entry| entry.userid == params[:UType]}
+          @logArray = tempArr.select{|entry| entry.userid == params[:UserID]}
           logger.warn "filtered array contains #{@logArray.size}"
         end
 

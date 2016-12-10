@@ -58,9 +58,8 @@ class AuthController < ApplicationController
 
   def logout
     #E1703 Change
-    g_email = env['omniauth.auth'].info.email
-    user = User.find_by_email(g_email)
-    @@event_logger.warn "auth_controller|logout|#{user.role_id}|#{user.id}|Logout"
+    logger.warn "logout: from session"session[:user].role_id
+    #@@event_logger.warn "auth_controller|logout|#{@globaluser.role_id}|#{user.id}|Logout"
     #E1703 Change ends
     AuthController.logout(session)
     

@@ -5,13 +5,6 @@
     return array.push.apply(array, rest);
   };
 
-
-  function clear(id)
-  {
-
-    document.getElementById(id).value = "";
-  }
-
   //this variable represents the total number of popups can be displayed according to the viewport width
   var total_popups = 0;
 
@@ -40,8 +33,8 @@
   function display_popups()
   {
     var right = 220;
-
     var iii = 0;
+    
     for(iii; iii < total_popups; iii++)
     {
       if(popups[iii] != undefined)
@@ -75,15 +68,14 @@
 
         calculate_popups();
 
-
         return;
       }
     }
     var title
     if(id=="innermessages")
-        title="Your Messages";
-      else
-          title="Review"+ name;
+      title="Your Messages";
+    else
+      title="Review "+ name;
 
     var element = '<div class="popup-box chat-popup" id="'+ id +'">';
     element = element + '<div class="popup-head">';
@@ -92,13 +84,7 @@
     element = element + '<div style="clear: both"></div></div><div class="popup-messages" id="'+"messages"+id+'">'+ '</div></div>';
     $( "body" ).append( element);
     document.getElementById("messages"+id).appendChild(document.getElementById("partial"+id))
-
-
-
-
-
-
-
+    
     popups.unshift(id);
 
     calculate_popups();
@@ -124,9 +110,7 @@
 
   }
 
-
-
-  //recalculate when window is loaded and also when window is resized.
+ //recalculate when window is loaded and also when window is resized.
   window.addEventListener("resize", calculate_popups);
   window.addEventListener("load", calculate_popups);
 

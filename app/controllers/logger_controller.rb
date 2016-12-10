@@ -54,10 +54,13 @@ def search
 
         #Filter the logs based on search criteria
         if(params[:UType]!='')
+          tempArr = Array.new(@logArray)
           logger.warn "Filtering based on user type #{params[:UType]}"
-          @logArrayFiltered = @logArray.select{|entry| entry.user_type == params[:UType]}
-          logger.warn "filtered array contains #{@logArrayFiltered.size}"
+          @logArray = tempArr.select{|entry| entry.user_type == params[:UType]}
+          logger.warn "filtered array contains #{@logArray.size}"
         end
+
+
 
 
 

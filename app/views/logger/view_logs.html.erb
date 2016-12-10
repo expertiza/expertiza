@@ -24,7 +24,8 @@
 <%= form_tag(:action => 'search') do %>
 <table>
   <tr>
-    <td><label>User Type</label></td> <td><%= text_field_tag('UserType') %></td>  
+    <td><label>User Type</label></td><td><%= select_tag('UType', '<option value="Student">Student</option>
+          <option value="Instructor">Instructor</option>'.html_safe) %></td>
     <td><label>User ID</label></td> <td><%= text_field_tag('UserID') %></td>
     
   </tr>

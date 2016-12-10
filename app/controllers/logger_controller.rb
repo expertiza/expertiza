@@ -52,7 +52,7 @@ def search
         #   logger.warn ">>>>>time: "+i.time+" userid: "+i.userid+" usertype: "+i.user_type+" eventtype: "+i.event_type
         # end
 
-        #Filter the logs based on search criteria
+        #Filter the logs based on userType
         if(params[:UType]!='')
           tempArr = Array.new(@logArray)
           logger.warn "Filtering based on user type #{params[:UType]}"
@@ -60,6 +60,14 @@ def search
           logger.warn "filtered array contains #{@logArray.size}"
         end
 
+
+        #Filter the logs based on userID
+        if(params[:UserID]!='')
+          tempArr = Array.new(@logArray)
+          logger.warn "Filtering based on user ID #{params[:UserID]}"
+          @logArray = tempArr.select{|entry| entry.userid == params[:UType]}
+          logger.warn "filtered array contains #{@logArray.size}"
+        end
 
 
 

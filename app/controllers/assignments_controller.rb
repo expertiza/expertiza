@@ -124,6 +124,8 @@ class AssignmentsController < ApplicationController
       @assignment.course_id = params[:course_id]
       if @assignment.save
         flash[:note] = 'The assignment was successfully saved.'
+        @@event_logger.warn "&assignments_controller|update|#{session[:user].role_id}|#{session[:user].id}|update assignment|#{params[:id]}"
+
         redirect_to list_tree_display_index_path
       else
         flash[:error] = "Failed to save the assignment: #{@assignment.errors.full_messages.join(' ')}"
@@ -218,7 +220,10 @@ class AssignmentsController < ApplicationController
       if id != @assignment_form.assignment.instructor_id
         raise "You are not authorized to delete this assignment."
       else
+        @@event_logger.warn "&assignments_controller|delete|#{session[:user].role_id}|#{session[:user].id}|delete assignment|#{params[:id]}"
+
         @assignment_form.delete(params[:force])
+
         flash[:success] = "The assignment was successfully deleted."
       end
     rescue

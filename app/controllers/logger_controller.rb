@@ -14,6 +14,7 @@ class LoggerController < ApplicationController
 
   	File.open(filePath,'r') do |file|
             file.each_line do |line|
+            line = line.chop
             date_str = line[4..22]
             split_line = line.split('&');
             if(split_line[1]!=nil)
@@ -42,6 +43,7 @@ def search
         filePath = "#{Rails.root}/log/events.log"
         File.open(filePath,'r') do |file|
             file.each_line do |line|
+            line = line.chop
             date_str = line[4..22]
             split_line = line.split('&');
             if(split_line[1]!=nil)

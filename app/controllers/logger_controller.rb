@@ -47,7 +47,10 @@ def search
 
         logger.warn "Printing object array:"
 
-        @logArray.each{|i| puts ">>>>>time: "+i.time+" userid: "+i.userid+" usertype: "+i.user_type+" eventtype: "+i.event_type}
+        @logArray.each do 
+          puts "inside loop..."
+          |i| puts ">>>>>time: "+i.time+" userid: "+i.userid+" usertype: "+i.user_type+" eventtype: "+i.event_type
+        end
 
         render('view_logs')
 end

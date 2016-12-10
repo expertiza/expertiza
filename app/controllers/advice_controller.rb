@@ -8,7 +8,7 @@ class AdviceController < ApplicationController
   # Modify the advice associated with a questionnaire
   def edit_advice
     @questionnaire = Questionnaire.find(params[:id])
-
+    @@event_logger.warn "&advice_controller|edit_advice|#{session[:user].role_id}|#{session[:user].id}|Modify the Advice"
     for question in @questionnaire.questions
       num_questions = if question.is_a?(ScoredQuestion)
                         @questionnaire.max_question_score - @questionnaire.min_question_score
@@ -30,7 +30,7 @@ class AdviceController < ApplicationController
   # save the advice for a questionnaire
   def save_advice
     @questionnaire = Questionnaire.find(params[:id])
-
+    @@event_logger.warn "&advice_controller|save_advice|#{session[:user].role_id}|#{session[:user].id}|Save the Advice"
     begin
       unless params[:advice].nil?
         for advice_key in params[:advice].keys

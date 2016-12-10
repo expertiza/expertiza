@@ -39,10 +39,10 @@ class AssignmentsController < ApplicationController
 
     if @assignment_form.save
       @assignment_form.create_assignment_node
-      logger.warn ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-      logger.warn "to_s: "+assignment_form_params.to_s
-      logger.warn "inspect: "+assignment_form_params.inspect
-      logger.warn ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+      @@event_logger.warn ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+      @@event_logger.warn "to_s: "+assignment_form_params.to_s
+      @@event_logger.warn "inspect: "+assignment_form_params.inspect
+      @@event_logger.warn ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 
       @@event_logger.warn "&assignments_controller|create|#{session[:user].role_id}|#{session[:user].id}|create assignment|#{params[:id]}"
       redirect_to edit_assignment_path @assignment_form.assignment.id

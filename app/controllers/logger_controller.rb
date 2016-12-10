@@ -47,7 +47,7 @@ def search
             if(split_line[1]!=nil)
               split_details = split_line[1].split('|')
               le = LogEntry.new(split_details[3],date_str,split_details[4],split_details[2]);
-              logger.warn "+ adding user id #{le.userid}"
+              logger.warn "+ adding event type #{le.event_type}"
                @logArray<<le
             end
           end
@@ -82,7 +82,7 @@ def search
         #Filter the logs based on event type
         if(params[:EType]!='All')
           tempArr = Array.new(@logArray)
-          logger.warn "Filtering based on user ID #{params[:EType]}"
+          logger.warn "Filtering based on event type #{params[:EType]}"
           @logArray = tempArr.select{|entry| entry.event_type == params[:EType]}
           logger.warn "filtered array contains #{@logArray.size}"
         end

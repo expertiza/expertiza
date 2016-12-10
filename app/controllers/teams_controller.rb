@@ -90,7 +90,10 @@ class TeamsController < ApplicationController
 
       @signUps.destroy_all if @signUps
       @teams_users.destroy_all if @teams_users
+      @@event_logger.warn "&teams_controller|delete|#{session[:user].role_id}|#{session[:user].id}|delete team|#{@team.name}"
+
       @team.destroy if @team
+
       undo_link("The team \"#{@team.name}\" has been successfully deleted.")
     end
     redirect_to :back

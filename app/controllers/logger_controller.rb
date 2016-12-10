@@ -70,6 +70,12 @@ def search
           logger.warn "filtered array contains #{@logArray.size}"
         end
 
+        logger.warn "FINAL LOG ARRAY..."
+
+        @logArray.each do |i|
+          logger.warn "inside LA..."
+          logger.warn ">>>>>time: "+i.time+" userid: "+i.userid+" usertype: "+i.user_type+" eventtype: "+i.event_type
+        end
 
 
 

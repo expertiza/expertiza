@@ -85,6 +85,7 @@ class CourseController < ApplicationController
     @course.instructor_id = session[:user].id
     begin
       @course.save!
+      @@event_logger.warn "&course_controller|create|#{session[:user].role_id}|#{session[:user].id}|Create Course|Course Name: #{params[:course][:name]} "
       parent_id = CourseNode.get_parent_id
       if parent_id
         CourseNode.create(node_object_id: @course.id, parent_id: parent_id)

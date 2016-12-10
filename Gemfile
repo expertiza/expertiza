@@ -59,6 +59,7 @@ gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
 gem 'jquery-tablesorter'
 
+
 group :development do
   gem 'daemons'
   gem 'pry'
@@ -79,6 +80,7 @@ group :test do
   gem 'rspec-rails'
   gem 'shoulda'
   gem 'test-unit'
+  gem 'capybara-email'
 end
 
 group :assets do

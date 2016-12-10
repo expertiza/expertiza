@@ -35,8 +35,8 @@ def search
         filePath = "#{Rails.root}/log/events.log"
         File.open(filePath,'r') do |file|
             file.each_line do |line|
-            date_str = raw_string[4..22]
-            split_line = raw_string.split('&');
+            date_str = line[4..22]
+            split_line = line.split('&');
             split_details = split_line[1].split('|')
 
 

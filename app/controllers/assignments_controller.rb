@@ -123,9 +123,10 @@ class AssignmentsController < ApplicationController
       @assignment = Assignment.find(params[:id])
       @assignment.course_id = params[:course_id]
       if @assignment.save
-        flash[:note] = 'The assignment was successfully saved.'
+        @@event_logger.warn "update test"
         @@event_logger.warn "&assignments_controller|update|#{session[:user].role_id}|#{session[:user].id}|update assignment|#{params[:id]}"
-
+        flash[:note] = 'The assignment was successfully saved.'
+        
         redirect_to list_tree_display_index_path
       else
         flash[:error] = "Failed to save the assignment: #{@assignment.errors.full_messages.join(' ')}"

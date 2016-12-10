@@ -35,8 +35,8 @@ def search
 
 
         @logArray = Array.new
-        render('view')
-    end
+        render('view_logs')
+end
 
 
 

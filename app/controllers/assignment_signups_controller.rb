@@ -38,6 +38,9 @@ class AssignmentSignupsController < ApplicationController
 
     if @assignment_signup.save
       @assignments = Assignment.find(params[:assignment_id])
+     #E1703 Change
+      @@event_logger.warn "&Assignment Signup|Create|#{session[:user].role_id}|#{session[:user].id}|Signup for Assignment|Assignment : #{@assignments.name}} "
+     #E1703 Change
       flash[:notice] = 'The assignment sign-up was successfully created for assignment ' + @assignments.name
       redirect_to controller: 'signup_sheets', action: 'list'
     else

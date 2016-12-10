@@ -13,10 +13,19 @@ class LoggerController < ApplicationController
   	@logArray = Array.new
 
   	File.open(filePath,'r') do |file|
-  		file.each_line do |line|
-    	 @logArray<<line
-  		end
-	  end
+            file.each_line do |line|
+            date_str = line[4..22]
+            split_line = line.split('&');
+            if(split_line[1]!=nil)
+              split_details = split_line[1].split('|')
+              le = LogEntry.new(split_details[3],date_str,split_details[4],split_details[2]);
+              logger.warn "+ adding user id #{le.userid}"
+               @logArray<<le
+            end
+          end
+        end
+
+        logger.warn "Array length is "+ @logArray.size.to_s
 	puts "Array length is "+ @logArray.size.to_s
   end
 

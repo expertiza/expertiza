@@ -71,7 +71,12 @@ class AssignmentSignupsController < ApplicationController
   end
 
   def destroy
+    #E1703 Change
+    @@event_logger.warn "&Assignment Signup|Delete|#{session[:user].role_id}|#{session[:user].id}|Delete Signup for Assignment|Assignment : #{AssignmentSignup.find(params[:id]).name}} "
+    #E1703 Change
+
     AssignmentSignup.find(params[:id]).destroy
+
     redirect_to action: 'list'
   end
 end

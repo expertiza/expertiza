@@ -44,6 +44,7 @@ def search
         File.open(filePath,'r') do |file|
             file.each_line do |line|
             line = line.chop
+            logger.warn ">>LINE "+line
             date_str = line[4..22]
             split_line = line.split('&');
             if(split_line[1]!=nil)
@@ -52,10 +53,12 @@ def search
               if(split_details[5]!= nil)
                 desc = split_details[5]
                 logger.warn ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DESC "+desc
+              else
+                logger.warn "no fifth field"
               end
 
               le = LogEntry.new(split_details[3],date_str,split_details[4],split_details[2],desc);
-              logger.warn "+ adding event type #{le.event_type}"
+              #logger.warn "+ adding event type #{le.event_type}"
                @logArray<<le
             end
           end

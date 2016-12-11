@@ -23,7 +23,7 @@ end
 
     it 'redirects to logger' do
       visit root_path
-      login_as("administrator12")
+      login_as("admin")
 
       click_on 'View Logs'
       expect(page).to have_content("Logs")

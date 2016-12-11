@@ -1,7 +1,7 @@
 <div class="main-page">
   <%#= @content_page.content_html %>
   <h1>Welcome!</h1>
-  <li><%= link_to("View Logs", :controller => 'logger', :action=>'view_logs') %></li>
+
   <div class="login-panel">
   <% if not session[:user] %>
     <%= render :partial => 'auth/login' %><br/>

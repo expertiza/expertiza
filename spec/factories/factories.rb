@@ -23,11 +23,11 @@ FactoryGirl.define do
   end
 
   factory :admin, class: User do
-    sequence(:name, 5) {|n| n=5; "admin#{n}" }
+    sequence(:name, 12) {|n| n=12; "admin#{n}" }
     role { Role.where(name: 'Administrator').first || association(:role_of_administrator) }
     password "password"
     password_confirmation "password"
-    sequence(:fullname) {|n| "#{n}, administrator" }
+    sequence(:fullname, 12) {|n| "#{n}, administrator" }
     email "expertiza@mailinator.com"
     parent_id 1
     private_by_default  false

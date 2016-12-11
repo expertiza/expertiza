@@ -8,7 +8,7 @@ class LoggerController < ApplicationController
 
 
   def view_logs
-    #"{if action_allowed?}"
+
       @@event_logger.debug "Entered view action in log manager"
 		  @@event_logger.debug "Entered view action + Filter Test"
   	  filePath = "#{Rails.root}/log/events.log"
@@ -33,11 +33,6 @@ class LoggerController < ApplicationController
 
         logger.warn "Array length is "+ @logArray.size.to_s
 	     puts "Array length is "+ @logArray.size.to_s
-    #end
-=begin
-  else
-    flash[:notice] = 'Not authorised to view logs'
-=end
   end
 
 def search

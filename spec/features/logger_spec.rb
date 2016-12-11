@@ -29,15 +29,15 @@ end
       expect(page).to have_content("Logs")
     end
 
-=begin
+
   it 'redirects to logger' do
     visit root_path
     login_as("instructor6")
 
     click_button 'View Logs'
-    expect(page).to have_content("Not authorised to view logs")
+    expect(page).to have_content("An instructor is not allowed to view_logs this/these logger")
   end
-=end
+
 
   it 'search based on user id' do
 

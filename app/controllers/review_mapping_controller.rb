@@ -440,7 +440,9 @@ class ReviewMappingController < ApplicationController
   def start_self_review
     assignment = Assignment.find(params[:assignment_id])
     team_id = TeamsUser.find_by_sql(["SELECT t.id as t_id FROM teams_users u, teams t WHERE u.team_id = t.id and t.parent_id = ? and user_id = ?", assignment.id, params[:reviewer_userid]])
-
+    #E1703
+    @@event_logger.warn "&Review_mapping_controller|Start Self Review|#{session[:user].role_id}|#{session[:user].id}|Start Self Review| #{@assignment.name}} "
+    #E1703
     begin
       # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments

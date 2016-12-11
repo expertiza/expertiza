@@ -38,6 +38,7 @@ class InvitationController < ApplicationController
             @invitation.assignment_id = student.parent_id
             @invitation.reply_status = 'W'
             @invitation.save
+            logger.warn ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>CTRL is here..."
             @@event_logger.warn "&invitation_controller|Invite|#{session[:user].role_id}|#{session[:user].id}|Invitation Createdd"
           else
             flash[:note] = "You have already sent an invitation to \"#{user.name}\"."

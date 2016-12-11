@@ -58,7 +58,7 @@ def search
               end
 
               le = LogEntry.new(split_details[3],date_str,split_details[4],split_details[2],desc);
-              logger.warn "*************+ adding event type #{le.desc}"
+              logger.warn "*************+ adding desc #{le.desc}"
                @logArray<<le
             end
           end
@@ -66,12 +66,7 @@ def search
 
         logger.warn "Array length is "+ @logArray.size.to_s
 
-        #DEBUGGING STATEMENTS
-        #logger.warn "Printing object array:"
-        # @logArray.each do |i|
-        #   logger.warn "inside loop..."
-        #   logger.warn ">>>>>time: "+i.time+" userid: "+i.userid+" usertype: "+i.user_type+" eventtype: "+i.event_type
-        # end
+        
 
         #Filter the logs based on userType
         if(params[:UType]!='All')
@@ -112,6 +107,13 @@ def search
           logger.warn "Filtering based on to time #{params[:time][:to]}"
           @logArray = tempArr.select{|entry| entry.time <= params[:time][:to]}
           logger.warn "filtered array contains #{@logArray.size}"
+        end
+
+        #DEBUGGING STATEMENTS
+        logger.warn "Printing object array:-------------------------------"
+        @logArray.each do |i|
+          logger.warn "inside loop..."
+          logger.warn ">>>>>time: "+i.time+" userid: "+i.userid+" usertype: "+i.user_type+" desc: "+i.desc
         end
 
 

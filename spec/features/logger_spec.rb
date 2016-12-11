@@ -4,6 +4,7 @@ describe 'logger' do
   before(:each) do
     create(:assignment)
     create_list(:participant, 3)
+    create_list(:participant, 2)
     create(:questionnaire)
     create(:assignment_node)
     create(:deadline_type, name: "submission")
@@ -27,6 +28,7 @@ end
 
       click_on 'View Logs'
       expect(page).to have_content("Logs")
+
     end
 
 
@@ -34,8 +36,9 @@ end
     visit root_path
     login_as("instructor6")
 
-    click_button 'View Logs'
+    click_on 'View Logs'
     expect(page).to have_content("An instructor is not allowed to view_logs this/these logger")
+
   end
 
 
@@ -47,6 +50,7 @@ end
     fill_in('UserID', with:6 )
     click_on 'Search'
     expect(page).to have_content("6")
+
   end
 
   it 'search based on user type' do
@@ -57,6 +61,7 @@ end
     select('Instructor', from: 'UType')
     click_on 'Search'
     expect(page).to have_content("2")
+
   end
 
   end

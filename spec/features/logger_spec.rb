@@ -21,15 +21,17 @@ describe 'logger' do
 
 
     it 'redirects to logger' do
-      login_as("administrator12")
       visit root_path
+      login_as("administrator12")
+
       click_button 'View Logs'
       expect(page).to have_content("Log Viewer Page")
     end
 
   it 'redirects to logger' do
-    login_as("instructor6")
     visit root_path
+    login_as("instructor6")
+
     click_button 'View Logs'
     expect(page).to have_content("Not aunthenticated to view logs")
   end

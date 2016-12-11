@@ -61,7 +61,7 @@ class AssignmentSignupsController < ApplicationController
     if @assignment_signup.update_attributes(params[:assignment_signup])
       flash[:notice] = 'The assignment sign-up was successfully updated.'
       #E1703 Change
-      @@event_logger.warn "&Assignment Signup|Create|#{session[:user].role_id}|#{session[:user].id}|Signup for Assignment|Assignment : #{@assignment_signup.name}} "
+      @@event_logger.warn "&Assignment Signup|Create|#{session[:user].role_id}|#{session[:user].id}|Signup for Assignment|Assignment : #{@assignment_signup.name} "
       #E1703 Change
       redirect_to action: 'show', id: @assignment_signup
     else

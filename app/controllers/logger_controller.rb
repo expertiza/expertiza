@@ -19,8 +19,11 @@ class LoggerController < ApplicationController
             split_line = line.split('&');
             if(split_line[1]!=nil)
               split_details = split_line[1].split('|')
-              le = LogEntry.new(split_details[3],date_str,split_details[4],split_details[2],'');
-              #logger.warn "+ adding user id #{le.userid}"
+              desc = ''
+              if(split_details[5]!= nil)
+                desc = split_details[5]
+              end
+              le = LogEntry.new(split_details[3],date_str,split_details[4],split_details[2],desc);
                @logArray<<le
             end
           end
@@ -32,7 +35,6 @@ class LoggerController < ApplicationController
 
 def search
         logger.warn ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>In search action"
-
         logger.warn "Parameters Received:"
         logger.warn "User ID "+params[:UserID]
         logger.warn "User Type "+params[:UType]
@@ -52,13 +54,8 @@ def search
               desc = ''
               if(split_details[5]!= nil)
                 desc = split_details[5]
-                logger.warn ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DESC "+desc
-              else
-                logger.warn "no fifth field"
               end
-
               le = LogEntry.new(split_details[3],date_str,split_details[4],split_details[2],desc);
-              logger.warn "*************+ adding desc #{le.desc}"
                @logArray<<le
             end
           end

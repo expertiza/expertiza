@@ -41,6 +41,7 @@ class ResponseController < ApplicationController
   def delete
     @response = Response.find(params[:id])
     # user cannot delete other people's responses. Needs to be authenticated.
+    @@event_logger.warn "&ResponseController|delete|#{session[:user].role_id}|#{session[:user].id}|Deleted response| Response: #{@response.name}"
     map_id = @response.map.id
     @response.delete
     redirect_to action: 'redirection', id: map_id, return: params[:return], msg: "The response was deleted."
@@ -55,6 +56,7 @@ class ResponseController < ApplicationController
     @next_action = "update"
     @return = params[:return]
     @response = Response.find(params[:id])
+    @@event_logger.warn "&ResponseController|Edit|#{session[:user].role_id}|#{session[:user].id}|Edit response| Response: #{@response.name}"
 
     @map = @response.map
     @contributor = @map.contributor

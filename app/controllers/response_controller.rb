@@ -136,6 +136,9 @@ class ResponseController < ApplicationController
   def new_feedback
     review = Response.find(params[:id])
     if review
+      #E1703 Change
+      @@event_logger.warn "&ResponseController|new_feedback|#{session[:user].role_id}|#{session[:user].id}|Entering new Feedback"
+      #E1703 Change
       reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id:  review.map.assignment.id).first
       map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id:  reviewer.id).first
       if map.nil?
@@ -146,6 +149,7 @@ class ResponseController < ApplicationController
     else
       redirect_to :back
     end
+
   end
 
   # view response

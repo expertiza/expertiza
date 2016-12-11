@@ -22,9 +22,10 @@
   </script>
 <% type_mapping = {1=>"Student",2=>"Instructor",3=>"Admin",4=>"Super Admin",5=>"NA",6=>"TA"} %>
 
+<div>
 
-<h2>Log Search Criteria</h2>
 <div id="leftSearch" style="alignment: left">
+  <h2>Log Search Criteria</h2>
 <%= form_tag(:action => 'search') do %>
 <table>
   <tr>
@@ -51,7 +52,7 @@
 </table>
 <% end %>
 </div>
-
+<div id ="dataTable" style = "alignment: right" >
 <h1>Log Viewer Page</h1>
 
 <% sl =1 %>
@@ -83,6 +84,8 @@
     <% end %>
   </tbody>
   </table>
+</div>
+</div>
 </body>
 </html>
 

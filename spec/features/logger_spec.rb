@@ -40,4 +40,10 @@ describe 'logger' do
   end
 =end
 
+  it 'search' do
+    fill_in('UserID', with:6 )
+    click_on 'Search'
+    expect(LogEntry where(User ID: "6")).to exist
+  end
+
   end

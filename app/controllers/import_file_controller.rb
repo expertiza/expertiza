@@ -28,6 +28,7 @@ class ImportFileController < ApplicationController
   protected
 
   def importFile(session, params)
+    @@event_logger.warn "&import_file_controller|Create|#{session[:user].role_id}|#{session[:user].id}|Import File Controller"
     delimiter = get_delimiter(params)
     file = params['file'].try(:tempfile)
 

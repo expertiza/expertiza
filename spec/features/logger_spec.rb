@@ -26,7 +26,7 @@ end
       #login_as("administrator12")
 
       click_on 'View Logs'
-      expect(page).to have_content("Log Viewer Page")
+      expect(page).to have_content("Logs")
     end
 
 =begin

@@ -19,8 +19,7 @@ describe 'logger' do
     create(:assignment_due_date)
     create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now + (100 * 24 * 60 * 60))
 =end
-  end
-
+end
 
     it 'redirects to logger' do
       visit root_path
@@ -41,9 +40,12 @@ describe 'logger' do
 =end
 
   it 'search' do
+
+    visit root_path
+    click_on 'View Logs'
     fill_in('UserID', with:6 )
     click_on 'Search'
-    expect(LogEntry where(User ID: "6")).to exist
+    expect(page).to have_content("Log Viewer Page")
   end
 
   end

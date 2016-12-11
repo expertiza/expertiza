@@ -8,6 +8,7 @@ class InvitationController < ApplicationController
   end
 
   def create
+
     user = User.find_by_name(params[:user][:name].strip)
     team = AssignmentTeam.find(params[:team_id])
     student = AssignmentParticipant.find(params[:student_id])
@@ -37,6 +38,7 @@ class InvitationController < ApplicationController
             @invitation.assignment_id = student.parent_id
             @invitation.reply_status = 'W'
             @invitation.save
+            @@event_logger.warn "&invitation_controller|Invite|#{session[:user].role_id}|#{session[:user].id}|Invitation Createdd"
           else
             flash[:note] = "You have already sent an invitation to \"#{user.name}\"."
           end

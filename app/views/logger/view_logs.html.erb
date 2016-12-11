@@ -22,10 +22,12 @@
   </script>
 
 <h2>Log Search Criteria</h2>
+<div id="leftSearch" style="alignment: left">
 <%= form_tag(:action => 'search') do %>
 <table>
   <tr>
-    <td><label>User Type</label></td><td><%= select_tag('UType', '<option value="All">All</option><option value="2">Instructor</option><option value="Student">Student</option>'.html_safe) %></td>
+    <td><label>User Type</label></td>
+    <td><%= select_tag('UType', '<option value="All">All</option><option value="2">Instructor</option><option value="Student">Student</option>'.html_safe) %></td>
     <td><label>User ID</label></td> <td><%= text_field_tag('UserID') %></td>
     
   </tr>
@@ -46,13 +48,13 @@
 
 </table>
 <% end %>
-
+</div>
 
 <h1>Log Viewer Page</h1>
 
 <% sl =1 %>
 
-<table id="logger" class="table table-striped">
+<table id="logger" class="table table-striped table-responsive">
 
   <thead>
   <tr >

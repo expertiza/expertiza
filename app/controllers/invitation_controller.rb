@@ -69,6 +69,7 @@ class InvitationController < ApplicationController
   end
 
   def accept
+    @@event_logger.warn "&invitation_controller|Accept|#{session[:user].role_id}|#{session[:user].id}|Invitation Accepted"
     @inv = Invitation.find(params[:inv_id])
 
     student = Participant.find(params[:student_id])

@@ -11,10 +11,8 @@
     $('#logger').DataTable({
       "columns": [
         { "data": "SL No." },
-        { "data": "Time" },
-        { "data": "Event" },
-        { "data": "User Type" },
-        { "data": "User ID"}
+        { "data": "Log Entry" },
+        { "data": "Log level" }
       ]
     });
   } );
@@ -60,6 +58,7 @@
       <th>SL No.</th>
       <th>Time</th>
       <th>Event</th>
+      <th>Description</th>
       <th>User Type</th>
       <th>User ID</th>
     </tr>
@@ -71,6 +70,7 @@
       <td><%= sl %></td>
       <td><%= entry.time %></td>
       <td><%= entry.event_type %></td>
+       <td><%= entry.desc %></td>
       <td><%= entry.user_type %></td>
       <td><%= entry.userid %></td>
     </tr>

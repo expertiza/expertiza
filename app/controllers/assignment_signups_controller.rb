@@ -38,6 +38,9 @@ class AssignmentSignupsController < ApplicationController
 
     if @assignment_signup.save
       @assignments = Assignment.find(params[:assignment_id])
+     #E1703 Change
+      @@event_logger.warn "&Assignment Signup|Create|#{session[:user].role_id}|#{session[:user].id}|Signup for Assignment|Assignment : #{@assignments.name}} "
+     #E1703 Change
       flash[:notice] = 'The assignment sign-up was successfully created for assignment ' + @assignments.name
       redirect_to controller: 'signup_sheets', action: 'list'
     else
@@ -57,6 +60,9 @@ class AssignmentSignupsController < ApplicationController
     @assignment_signup.assignment_id = params[:assignment_id]
     if @assignment_signup.update_attributes(params[:assignment_signup])
       flash[:notice] = 'The assignment sign-up was successfully updated.'
+      #E1703 Change
+      @@event_logger.warn "&Assignment Signup|Create|#{session[:user].role_id}|#{session[:user].id}|Signup for Assignment|Assignment : #{@assignment_signup.name}} "
+      #E1703 Change
       redirect_to action: 'show', id: @assignment_signup
     else
       @assignments = Assignment.all
@@ -65,7 +71,12 @@ class AssignmentSignupsController < ApplicationController
   end
 
   def destroy
+    #E1703 Change
+    @@event_logger.warn "&Assignment Signup|Delete|#{session[:user].role_id}|#{session[:user].id}|Delete Signup for Assignment|Assignment : #{AssignmentSignup.find(params[:id]).name}} "
+    #E1703 Change
+
     AssignmentSignup.find(params[:id]).destroy
+
     redirect_to action: 'list'
   end
 end

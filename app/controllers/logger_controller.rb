@@ -58,7 +58,7 @@ def search
               end
 
               le = LogEntry.new(split_details[3],date_str,split_details[4],split_details[2],desc);
-              #logger.warn "+ adding event type #{le.event_type}"
+              logger.warn "*************+ adding event type #{le.desc}"
                @logArray<<le
             end
           end

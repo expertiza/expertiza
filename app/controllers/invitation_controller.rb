@@ -110,6 +110,7 @@ class InvitationController < ApplicationController
   end
 
   def decline
+    @@event_logger.warn "&invitation_controller|Decline|#{session[:user].role_id}|#{session[:user].id}|Invitation Declined"
     @inv = Invitation.find(params[:inv_id])
     @inv.reply_status = 'D'
     @inv.save

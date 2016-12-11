@@ -21,9 +21,7 @@
   } );
   </script>
 
-
 <h2>Log Search Criteria</h2>
-
 <%= form_tag(:action => 'search') do %>
 <table>
   <tr>
@@ -68,12 +66,11 @@
   </thead>
   <tbody>
     <% @logArray.each do |entry| %>
-
     <tr>
       <td><%= sl %></td>
       <td><%= entry.time %></td>
       <td><%= entry.event_type %></td>
-       <td><%= entry.desc %></td>
+      <td><%= entry.desc %></td>
       <td><%= entry.user_type %></td>
       <td><%= entry.userid %></td>
     </tr>

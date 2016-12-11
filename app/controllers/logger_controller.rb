@@ -51,7 +51,9 @@ def search
               desc = ''
               if(split_details[5]!= nil)
                 desc = split_details[5]
+                logger.warn ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DESC "+desc
               end
+
               le = LogEntry.new(split_details[3],date_str,split_details[4],split_details[2],desc);
               logger.warn "+ adding event type #{le.event_type}"
                @logArray<<le

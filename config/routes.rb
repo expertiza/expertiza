@@ -521,7 +521,9 @@ Expertiza::Application.routes.draw do
       delete '', action: :destroy_all
     end
   end
-
+  post '/users/request_user_create', controller: :users, action: :request_user_create
+  post '/users/create_approved_user', controller: :users, action: :create_approved_user
+  get 'instructions/home'
   get '/users/show_selection', controller: :users, action: :show_selection
   get '/users/list', controller: :users, action: :list
   get '/menu/*name', controller: :menu_items, action: :link

@@ -2,9 +2,33 @@
 
 <% if @questionnaire.type == "QuizQuestionnaire" %>
   <%= form_tag({:action=>'update_quiz', :id=>@questionnaire.id, :pid => params[:pid]}, :multipart => true) do %>
-    <% $disp_flag=0 %>
-    <%= render :partial => 'quiz_questionnaire' %>
-    <% $disp_flag=0 %>
+
+    <table>
+        <tr>
+          <td valign="top"><label for="questionnaire_name">Name:</label>
+            <%= text_field 'questionnaire', 'name'  %>
+            <%= hidden_field 'questionnaire', 'id' %>
+            <%= hidden_field 'questionnaire', 'type' %>
+          </td>
+        </tr>
+    </table>
+    <br/>
+
+    <table id="questions_table">
+      <tr>
+        <td align=left width=300>Questions:</td>
+      </tr>
+
+      <% for @question in @questionnaire.questions %>
+
+        <%-# The following line call certain method of the object, which returns html string-%>
+        <%= @question.edit %>
+
+        <tr><td><br></tr></td>
+        
+      <% end %>
+    </table> 
+
     <%= submit_tag "Save #{@questionnaire.display_type.downcase}", :name=>"save" %>
     <br />
   <% end %>

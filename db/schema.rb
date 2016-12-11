@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161114210745) do
+ActiveRecord::Schema.define(version: 20161129220644) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -366,6 +366,18 @@ ActiveRecord::Schema.define(version: 20161114210745) do
     t.boolean "iscorrect",                 default: false
   end
 
+  create_table "requested_users", force: :cascade do |t|
+    t.string   "name",           limit: 255
+    t.integer  "role_id",        limit: 4
+    t.string   "fullname",       limit: 255
+    t.string   "institution_id", limit: 255
+    t.string   "email",          limit: 255
+    t.string   "status",         limit: 255
+    t.string   "reason",         limit: 255
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+  end
+
   create_table "response_maps", force: :cascade do |t|
     t.integer  "reviewed_object_id", limit: 4,   default: 0,     null: false
     t.integer  "reviewer_id",        limit: 4,   default: 0,     null: false
@@ -496,17 +508,6 @@ ActiveRecord::Schema.define(version: 20161114210745) do
     t.integer  "team_id",       limit: 4
     t.string   "user",          limit: 255
     t.integer  "assignment_id", limit: 4
-  end
-
-  create_table "submissionrecords", force: :cascade do |t|
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
-    t.text     "type",       limit: 65535
-    t.string   "content",    limit: 255
-    t.datetime "createdat"
-    t.string   "operation",  limit: 255
-    t.integer  "team_id",    limit: 4
-    t.string   "user",       limit: 255
   end
 
   create_table "suggestion_comments", force: :cascade do |t|

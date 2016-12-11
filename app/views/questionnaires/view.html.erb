@@ -25,5 +25,13 @@
 <BR/>
 
     <BR/>
-    <!--%= link_to 'Edit', :action => 'edit', :id => @questionnaire %-->
+
+    <% if @questionnaire.type == "QuizQuestionnaire" %>
+      <%= link_to 'Edit', :controller => :questionnaires, :action => :edit_quiz, :id => @questionnaire.id, :pid => @participant.id %>|
+    <% else %>
+      <!--The following line may have bugs when @questionnaire.type != "QuizQuestionnaire"-->
+      <!--The bug will be invoked when click Save button in edit page-->
+      <%= link_to 'Edit', :action => 'edit', :id => @questionnaire %> |
+    <% end %>
+
     <%= link_to "Back", :controller => 'tree_display', :action => 'list' %>

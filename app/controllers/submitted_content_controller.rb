@@ -56,7 +56,7 @@ class SubmittedContentController < ApplicationController
     else
       begin
         team.submit_hyperlink(params['submission'])
-        @participant.update_resubmit_times
+
         #E1703 Change
         @@event_logger.warn "&submitted_content_controller|submit_hyperlink|#{session[:user].role_id}|#{session[:user].id}|Submit|HyperLink Submitted"
         #End of Change
@@ -127,9 +127,6 @@ class SubmittedContentController < ApplicationController
     if params['unzip']
       SubmittedContentHelper.unzip_file(full_filename, curr_directory, true) if get_file_type(safe_filename) == "zip"
     end
-    participant.update_resubmit_times
-
-
 
     #create a submission record
     assignment = Assignment.find(participant.parent_id)

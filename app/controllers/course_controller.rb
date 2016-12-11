@@ -169,7 +169,7 @@ class CourseController < ApplicationController
 
     @course = @ta_mapping
     undo_link("The TA \"#{@ta.name}\" has been successfully removed.")
-    @@event_logger.warn "&course_controller|Remove TA|#{session[:user].role_id}|#{session[:user].id}|Remove TA|TA Name: #{@ta.name}} "
+    @@event_logger.warn "&course_controller|Remove TA|#{session[:user].role_id}|#{session[:user].id}|Remove TA|TA Name: #{@ta.name} "
 
     redirect_to action: 'view_teaching_assistants', id: @ta_mapping.course
   end

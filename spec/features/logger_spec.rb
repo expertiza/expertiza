@@ -43,7 +43,7 @@ describe 'logger' do
   it 'search' do
     fill_in('UserID', with:6 )
     click_on 'Search'
-    expect(LogEntry where(User ID: "6")).to exist
+    expect(LogEntry where(userid: "6")).to exist
   end
 
   end

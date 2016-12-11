@@ -1,18 +1,20 @@
 class LoggerController < ApplicationController
 
   def action_allowed?
-    true
+    #true
+    ['Super-Administrator',
+     'Administrator'].include? current_role_name
   end
 
 
   def view_logs
+    #"{if action_allowed?}"
+      @@event_logger.debug "Entered view action in log manager"
+		  @@event_logger.debug "Entered view action + Filter Test"
+  	  filePath = "#{Rails.root}/log/events.log"
+  	  @logArray = Array.new
 
-  	@@event_logger.debug "Entered view action in log manager"
-		@@event_logger.debug "Entered view action + Filter Test"
-  	filePath = "#{Rails.root}/log/events.log"
-  	@logArray = Array.new
-
-  	File.open(filePath,'r') do |file|
+  	  File.open(filePath,'r') do |file|
             file.each_line do |line|
             line = line.chop
             date_str = line[4..22]
@@ -30,7 +32,12 @@ class LoggerController < ApplicationController
         end
 
         logger.warn "Array length is "+ @logArray.size.to_s
-	puts "Array length is "+ @logArray.size.to_s
+	     puts "Array length is "+ @logArray.size.to_s
+    #end
+=begin
+  else
+    flash[:notice] = 'Not authorised to view logs'
+=end
   end
 
 def search

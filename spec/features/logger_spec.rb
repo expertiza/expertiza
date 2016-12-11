@@ -26,7 +26,7 @@ end
       #login_as("administrator12")
 
       click_on 'View Logs'
-      expect(page).to have_content("Log Viewer Page")
+      expect(page).to have_content("Logs")
     end
 
 =begin
@@ -35,17 +35,26 @@ end
     login_as("instructor6")
 
     click_button 'View Logs'
-    expect(page).to have_content("Not aunthenticated to view logs")
+    expect(page).to have_content("Not authorised to view logs")
   end
 =end
 
-  it 'search' do
+  it 'search based on user id' do
 
     visit root_path
     click_on 'View Logs'
     fill_in('UserID', with:6 )
     click_on 'Search'
-    expect(page).to have_content("Log Viewer Page")
+    expect(page).to have_content("6")
+  end
+
+  it 'search based on user type' do
+
+    visit root_path
+    click_on 'View Logs'
+    select('Instructor', from: 'UType')
+    click_on 'Search'
+    expect(page).to have_content("2")
   end
 
   end

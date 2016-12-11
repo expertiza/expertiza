@@ -4,7 +4,6 @@ describe 'logger' do
   before(:each) do
     create(:assignment)
     create_list(:participant, 3)
-    create_list(:participant, 2)
     create(:questionnaire)
     create(:assignment_node)
     create(:deadline_type, name: "submission")

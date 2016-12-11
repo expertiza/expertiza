@@ -57,6 +57,10 @@ class SubmittedContentController < ApplicationController
       begin
         team.submit_hyperlink(params['submission'])
         @participant.update_resubmit_times
+        #E1703 Change
+        @@event_logger.warn "&submitted_content_controller|submit_hyperlink|#{session[:user].role_id}|#{session[:user].id}|Submit|hyperlink: #{params['submission']} "
+        logger.warn" >>>>>>>>>>>>SUBMIT HYPERLINK "+params['submission'].to_s
+        #End of Change
 
         #create a submission record
         @submission_record = SubmissionRecord.new(team_id: team.id, content: params['submission'], user: @participant.name, assignment_id: params[:id], operation: "Submit Hyperlink")

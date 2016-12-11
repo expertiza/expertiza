@@ -23,9 +23,8 @@
 <% type_mapping = {1=>"Student",2=>"Instructor",3=>"Admin",4=>"Super Admin",5=>"NA",6=>"TA"} %>
 
 <div>
-
-<div id="leftSearch" style="alignment: left">
-  <h2>Log Search Criteria</h2>
+<div id="leftSearch">
+  <h2><span class="glyphicon glyphicon-align-left" aria-hidden="true"></span> Log</h2>
 <%= form_tag(:action => 'search') do %>
 <table>
   <tr>

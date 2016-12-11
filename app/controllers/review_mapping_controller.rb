@@ -34,16 +34,19 @@ class ReviewMappingController < ApplicationController
   end
 
   def select_reviewer
+    @@event_logger.warn "&review_mapping_controller|select_reviewer|#{session[:user].role_id}|#{session[:user].id}|Select a reviewer"
     assignment = Assignment.find(params[:id])
     @contributor = AssignmentTeam.find(params[:contributor_id])
     session[:contributor] = @contributor
   end
 
   def select_metareviewer
+    @@event_logger.warn "&review_mapping_controller|select_metareviewer|#{session[:user].role_id}|#{session[:user].id}|Select a metareviewer"
     @mapping = ResponseMap.find(params[:id])
   end
 
   def add_reviewer
+    @@event_logger.warn "&review_mapping_controller|add_reviewer|#{session[:user].role_id}|#{session[:user].id}|Add a reviewer"
     assignment = Assignment.find(params[:id])
     topic_id = params[:topic_id]
     user_id = User.where(name: params[:user][:name]).first.id
@@ -144,6 +147,7 @@ class ReviewMappingController < ApplicationController
   end
 
   def add_metareviewer
+    @@event_logger.warn "&review_mapping_controller|add_reviewer|#{session[:user].role_id}|#{session[:user].id}|Add a reviewer"
     mapping = ResponseMap.find(params[:id])
     msg = ''
     begin
@@ -200,6 +204,7 @@ class ReviewMappingController < ApplicationController
   end
 
   def delete_all_metareviewers
+    @@event_logger.warn "&review_mapping_controller|delete_all_metareviewers|#{session[:user].role_id}|#{session[:user].id}|Delete all metareviewers"
     mapping = ResponseMap.find(params[:id])
     mmappings = MetareviewResponseMap.where(reviewed_object_id: mapping.map_id)
 
@@ -226,6 +231,7 @@ class ReviewMappingController < ApplicationController
   end
 
   def delete_metareviewer
+    @@event_logger.warn "&review_mapping_controller|delete_metareviewer|#{session[:user].role_id}|#{session[:user].id}|Delete a metareviewer"
     mapping = MetareviewResponseMap.find(params[:id])
     assignment_id = mapping.assignment.id
     flash[:note] = "The metareview mapping for " + mapping.reviewee.name + " and " + mapping.reviewer.name + " has been deleted."
@@ -240,6 +246,7 @@ class ReviewMappingController < ApplicationController
   end
 
   def delete_metareview
+    @@event_logger.warn "&review_mapping_controller|delete_metareviewer|#{session[:user].role_id}|#{session[:user].id}|Delete a metareview"
     mapping = MetareviewResponseMap.find(params[:id])
     assignment_id = mapping.assignment.id
     # metareview = mapping.response

@@ -30,12 +30,14 @@
     <td><label>User Type</label></td>
     <td><%= select_tag('UType', '<option value="All">All</option><option value="2">Instructor</option><option value="Student">Student</option>'.html_safe) %></td>
     <td><label>User ID</label></td> <td><%= text_field_tag('UserID') %></td>
-    <td> </td>
+
     <td><label>Event Type</label></td><td><%= select_tag('EType', '<option value="All">All</option><option value="Login">Login</option>
    <option value="Logout">Log Out</option>'.html_safe) %></td>
     
   </tr>
-
+<tr>
+  <br>
+</tr>
  <tr>
    <td><label>From Date</label></td> <td><%= datetime_local_field(:time, :from) %></td>
     <td><label>To Date</label></td> <td><%= datetime_local_field(:time, :to) %></td>

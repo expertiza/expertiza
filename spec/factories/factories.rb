@@ -23,7 +23,7 @@ FactoryGirl.define do
   end
 
   factory :admin, class: User do
-    sequence(:name) {|n| "admin#{n}" }
+    sequence(:name, 5) {|n| n=5; "admin#{n}" }
     role { Role.where(name: 'Administrator').first || association(:role_of_administrator) }
     password "password"
     password_confirmation "password"

@@ -24,20 +24,17 @@
 
 <div>
 <div id="leftSearch">
-  <h2><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Log</h2>
+  <h2><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Logs</h2>
 <%= form_tag(:action => 'search') do %>
 <table>
   <tr>
     <td><label>User Type</label></td>
     <td><%= select_tag('UType', '<option value="All">All</option><option value="2">Instructor</option><option value="Student">Student</option>'.html_safe) %></td>
     <td><label>User ID</label></td> <td><%= text_field_tag('UserID') %></td>
+    <td><label>Event Type</label></td><td><%= select_tag('EType', '<option value="All">All</option><option value="Login">Login</option>
+   <option value="Logout">Log Out</option>'.html_safe) %></td>
     
   </tr>
-
- <tr>
-   <td><label>Event Type</label></td><td><%= select_tag('EType', '<option value="All">All</option><option value="Login">Login</option>
-   <option value="Logout">Log Out</option>'.html_safe) %></td>
- </tr>
 
  <tr>
    <td><label>From Date</label></td> <td><%= datetime_local_field(:time, :from) %></td>
@@ -52,7 +49,6 @@
 <% end %>
 </div>
 <div id ="dataTable" style = "alignment: right" >
-<h1>Log Viewer Page</h1>
 
 <% sl =1 %>
 

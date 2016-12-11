@@ -20,7 +20,6 @@
     });
   } );
   </script>
-<% type_mapping = {1=>"Student",2=>"Instructor",3=>"Admin",4=>"Super Admin",5=>"NA",6=>"TA"} %>
 
 <div>
 <div id="leftSearch">
@@ -50,7 +49,10 @@
 </div>
 <div id ="dataTable" style = "alignment: right" >
 
-<% sl =1 %>
+<% 
+sl =1 
+type_mapping = {1=>"Student",2=>"Instructor",3=>"Admin",4=>"Super Admin",5=>"NA",6=>"TA"}
+%>
 
 <table id="logger" class="table table-striped table-responsive">
 

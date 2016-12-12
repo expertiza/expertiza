@@ -17,7 +17,7 @@ describe "Questionnaire tests for instructor interface" do
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
     create(:assignment_due_date)
-    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now + (100 * 24 * 60 * 60))
+    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now.in_time_zone + 1.day)
   end
 
   describe "Instructor login" do
@@ -36,7 +36,7 @@ describe "Questionnaire tests for instructor interface" do
     end
   end
 
-  describe "Create a public review questionnaire", type: :controller do
+  describe "Create a public review questionnaire" do
     it "is able to create a public review questionnaire" do
       login_as("instructor6")
 
@@ -56,7 +56,7 @@ describe "Questionnaire tests for instructor interface" do
     end
   end
 
-  describe "Create a private review questionnaire", type: :controller do
+  describe "Create a private review questionnaire" do
     it "is able to create a private review questionnaire" do
       login_as("instructor6")
 
@@ -91,7 +91,7 @@ describe "Questionnaire tests for instructor interface" do
     click_button "Create"
   end
 
-  describe "Create a review question", type: :controller do
+  describe "Create a review question" do
     it "is able to create a Criterion question" do
       load_questionnaire
       fill_in('question_total_num', with: '1')
@@ -211,7 +211,7 @@ describe "Questionnaire tests for instructor interface" do
     click_button "Save review questionnaire"
   end
 
-  describe "Edit a question", type: :controller do
+  describe "Edit a question" do
     it "is able to edit Criterion question" do
       load_question 'Criterion'
       first("textarea[placeholder='Edit question content here']").set "Question edit"
@@ -293,7 +293,7 @@ describe "Questionnaire tests for instructor interface" do
     end
   end
 
-  describe "Delete a question", type: :controller do
+  describe "Delete a question" do
     it "is able to delete a Criterion question" do
       load_question 'Criterion'
 
@@ -365,7 +365,7 @@ describe "Questionnaire tests for instructor interface" do
     end
   end
 
-  describe "Create a review advice", type: :controller do
+  describe "Create a review advice" do
     it "is able to create a public review advice" do
       load_question 'Criterion'
       click_button "Edit/View advice"
@@ -378,7 +378,7 @@ describe "Questionnaire tests for instructor interface" do
     end
   end
 
-  describe "Edit a review advice", type: :controller do
+  describe "Edit a review advice" do
     it "is able to edit a public review advice" do
       load_question 'Criterion'
       click_button "Edit/View advice"

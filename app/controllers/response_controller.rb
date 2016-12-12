@@ -205,9 +205,7 @@ class ResponseController < ApplicationController
     @map.save
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
-
-  # E1600
-  # Added if - else for 'SelfReviewResponseMap' for proper redirection
+  
   def redirection
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?

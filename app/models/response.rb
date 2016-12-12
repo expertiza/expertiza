@@ -217,4 +217,83 @@ class Response < ActiveRecord::Base
     avg_vol_in_round_3 = (Lingua::EN::Readability.new(comments_in_round_3).num_words / (counter_in_round_3.zero? ? 1 : counter_in_round_3)).round(0)
     [overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3]
   end
+  def notify_on_difference(new_pct, avg_pct, limit,response_id)
+    mapping = self.map
+    instructor = mapping.assignment.instructor
+    team_id = mapping.reviewee_id
+    teams_users = TeamsUser.where(team_id: team_id)
+    user_id=nil
+    teams_users.each do |team_user|
+      user_id=team_user.user_id;
+    end
+    current_user = User.find_by(id: user_id)
+    @student_tasks = StudentTask.from_user current_user
+    @student_tasks.each do |student_task|
+      if student_task.assignment.id == mapping.assignment.id
+        team_id = student_task.participant.id
+      end
+    end
+    Mailer.generic_message(
+        {:to => instructor.email,
+         :subject => "Expertiza Notification: A review score is outside the acceptable range",
+         :body => {
+             :first_name => ApplicationHelper::get_user_first_name(instructor),
+             :reviewer_name => mapping.reviewer.fullname,
+             :type => "review",
+             :reviewee_name => mapping.reviewee.fullname,
+             :limit => limit,
+             :new_pct => new_pct,
+             :avg_pct => avg_pct,
+             :types => "reviews",
+             :performer => "reviewer",
+             :assignment => mapping.assignment,
+             :partial_name => 'limit_notify',
+             :conflicting_response_url => 'https://expertiza.ncsu.edu/response/view?id='+response_id.to_s,  #'https://expertiza.ncsu.edu/response/view?id='
+             :summary_url => 'https://expertiza.ncsu.edu/grades/view_team?id='+team_id.to_s #mapping.reviewee_id.to_s
+         }
+        }
+    ).deliver_now
+  end
+  def self.compare_scores(new_response, questionnaire)
+    map_class = new_response.map.class
+    existing_responses = map_class.get_assessments_for(new_response.map.reviewee)
+    total, count = get_total_scores_for_prev_reviews(existing_responses, new_response)
+    if count > 0
+      notify_instructor(new_response.map.assignment, new_response, questionnaire, total, count)
+    end
+
+  end
+  def self.get_total_scores_for_prev_reviews(item_list, curr_item)
+    total = 0
+    count = 0
+    item_list.each {
+        |item|
+      if item.id != curr_item.id
+        count += 1
+        total += item.get_total_score
+      end
+    }
+    return total, count
+  end
+
+  def self.notify_instructor(assignment, curr_item, questionnaire, total, count)
+    max_possible_score = curr_item.get_maximum_score
+    new_score = curr_item.get_total_score;
+    existing_score = (total.to_f/count).to_f
+
+    aq = AssignmentQuestionnaire.where(user_id: assignment.instructor_id, assignment_id: assignment.id, questionnaire_id: questionnaire.id).first
+
+    unless aq
+      aq = AssignmentQuestionnaire.where(user_id: assignment.instructor_id, assignment_id: nil, questionnaire_id: nil).first
+    end
+
+    if aq
+      allowed_difference = max_possible_score.to_f * aq.notification_limit / 100
+      if new_score < (existing_score - allowed_difference) or new_score > (existing_score + allowed_difference)
+        new_pct = new_score.to_f/max_possible_score
+        avg_pct = existing_score.to_f/max_possible_score
+        curr_item.notify_on_difference(new_pct, avg_pct, aq.notification_limit,curr_item.id)
+      end
+    end
+  end
 end

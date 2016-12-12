@@ -3,11 +3,11 @@ require 'rails_helper'
 describe "due_date_functions" do
 
   before(:each) do
-    @deadline_type = create(:deadline_type)
-    @deadline_right = create(:deadline_right)
-    @assignment_due_date = create(:assignment_due_date, deadline_type: @deadline_type,
+    @deadline_type = build(:deadline_type)
+    @deadline_right = build(:deadline_right)
+    @assignment_due_date = build(:assignment_due_date, deadline_type: @deadline_type,
       submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
-      review_of_review_allowed_id: @deadline_right.id)
+      review_of_review_allowed_id: @deadline_right.id, due_at: '2015-12-30 23:30:12')
 
     @due_dates = []
     10.times.each do |n|

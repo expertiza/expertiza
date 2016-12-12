@@ -217,4 +217,35 @@ class Response < ActiveRecord::Base
     avg_vol_in_round_3 = (Lingua::EN::Readability.new(comments_in_round_3).num_words / (counter_in_round_3.zero? ? 1 : counter_in_round_3)).round(0)
     [overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3]
   end
+
+  # compare the current response score with other scores on the same artifact, and test if the difference
+  # is significant enough to notify instructor.
+  def significant_difference?
+    map_class = self.map.class
+    existing_responses = map_class.get_assessments_for(new_response.map.reviewee)
+    average_score_on_same_artifact_from_others, count = avg_scores_and_count_for_prev_reviews(existing_responses, self)
+    return false if count == 0
+
+    score = get_total_score
+    assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: assignment.id, questionnaire_id: questionnaire.id).first
+    allowed_difference_percentage = assignment_questionnaire.notification_limit.to_f
+
+    if (average_score_on_same_artifact_from_others - score).abs > allowed_difference_percentage
+      true
+    else
+      false
+    end
+  end
+
+  def self.avg_scores_and_count_for_prev_reviews (existing_responses, current_response)
+    scores_assigned = []
+    count = 0
+    existing_responses.each do |existing_response|
+      if existing_response.id != current_response
+        count += 1
+        scores_assigned << existing_response.get_total_score
+      end
+    end
+    return scores_assigned.sum/scores_assigned.size.to_f, count
+  end
 end

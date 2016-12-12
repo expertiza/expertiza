@@ -97,12 +97,16 @@ class ResponseController < ApplicationController
       end
 
       if (params['isSubmit'] && (params['isSubmit'].eql?'Yes'))
-
         # Update the submission flag.
         @response.update_attribute('is_submitted', true)
       else
         @response.update_attribute('is_submitted', false)
       end
+
+      if @response.is_submitted && @response.significant_difference?
+        @response.notify_instructor_on_difference
+      end
+
     rescue
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
@@ -174,10 +178,13 @@ class ResponseController < ApplicationController
        create_answers(params, questions)
     end
 
-    #@map.save
-
     msg = "Your response was successfully saved."
     error_msg = ""
+
+    if @response.is_submitted && @response.significant_difference?
+      @response.notify_instructor_on_difference
+    end
+
     @response.email
     redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
   end

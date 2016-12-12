@@ -1,3 +1,5 @@
+
+
 <% @assignment = Assignment.find(params[:id]) %>
 <% if flash[:notice] %>
     <div class="flash_note"><%= flash_message :notice %></div>
@@ -10,13 +12,14 @@
 
 <a id="teamsAndMembers" onclick="showHideTeamAndMembers()">Hide all teams</a>
 <% if @sign_up_topics.size != 0 %>
-    <table class="general">
+    <table class="general" id="topicsTable">
       <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
 
       <% i=1 %>
       <% for topic in @sign_up_topics %>
           <tr>
             <%= render :partial => '/sign_up_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
+            <div id="test" />
           </tr>
           <% i=i+1 %>
       <% end %>
@@ -66,4 +69,7 @@ function toggleSingleTeamAndMember(i) {
       elem.style.display = 'none';
     }
   }
+
+
 </script>
+

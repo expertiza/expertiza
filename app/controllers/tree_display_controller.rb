@@ -79,6 +79,35 @@ class TreeDisplayController < ApplicationController
       format.html { render json: FolderNode.get }
     end
   end
+  def get_courses_node_ng
+    respond_to do |format|
+
+    courses = []
+
+    if session[:user].role.name == 'Teaching Assistant'
+      ta = Ta.find(session[:user].id)
+      ta.ta_mappings.each {|mapping| courses << Course.find(mapping.course_id) }
+      # If a TA created some courses before, s/he can still add new assignments to these courses.
+      courses << Course.where(instructor_id: session[:user].id)
+      courses.flatten!
+    # Administrator and Super-Administrator can see all courses
+    elsif session[:user].role.name == 'Administrator' or session[:user].role.name == 'Super-Administrator'
+      courses = Course.all
+    elsif session[:user].role.name == 'Instructor'
+      courses = Course.where(instructor_id: session[:user].id)
+      # instructor can see courses his/her TAs created
+      ta_ids = []
+      ta_ids << Instructor.get_my_tas(session[:user].id)
+      ta_ids.flatten!
+      ta_ids.each do |ta_id|
+        ta = Ta.find(ta_id)
+        ta.ta_mappings.each {|mapping| courses << Course.find(mapping.course_id) }
+      end
+    end
+      format.html { render json:courses}
+
+    end
+  end
 
   #finding out child_nodes from params
   def child_nodes_from_params(child_nodes)

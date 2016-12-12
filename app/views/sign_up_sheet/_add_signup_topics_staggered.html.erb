@@ -18,6 +18,7 @@
       <% for topic in @sign_up_topics %>
         <tr>
           <%= render :partial => '/sign_up_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
+          <div id="test" />
         </tr>
         <% i=i+1 %>
       <% end %>

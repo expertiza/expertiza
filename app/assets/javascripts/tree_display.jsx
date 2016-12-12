@@ -1,7 +1,11 @@
 jQuery(document).ready(function() {
   // This preloadedImages function is refered from http://jsfiddle.net/slashingweapon/8jAeu/
   // Actually I am not using the values in preloadedImages, but image loading speed is indeed getting faster
-  var preloadedImages = []
+
+
+  var preloadedImages = [];
+//= require rails
+//= require react-modal
   function preloadImages() {
     for (var idx = 0; idx < arguments.length; idx++) {
         var oneImage = new Image()
@@ -114,6 +118,11 @@ jQuery(document).ready(function() {
                 <a title="View aggregated teammate & meta reviews" href={"/assessment360/all_students_all_reviews?course_id="+(parseInt(this.props.id)/2).toString()}>
                   <span style={{"fontSize": "22px", "top": "8px"}} className="glyphicon glyphicon-list-alt"></span>
                 </a>
+                <a title="Assign Topic" href={"/teams/list?id="+(parseInt(this.props.id)/2).toString()+"&type=Course"}>
+                  <img src="/assets/tree_view/assign-survey-96.png" width = '20'height ='20'/>
+                </a>
+
+
               </span>
             )
           }
@@ -538,37 +547,366 @@ jQuery(document).ready(function() {
   })
 
   var NewItemButton = React.createClass({
-    render: function() {
-      var renderContent = []
-      var formStyle = {
-        margin: 0,
-        padding: 0,
-        display: 'inline'
-      }
-      if (this.props.dataType.length > 0) {
-        if (this.props.dataType != 'questionnaire') {
-          renderContent.push(
-            <form
-              style={formStyle}
-              action={"/"+(this.props.dataType === 'assignment' ? this.props.dataType+"s" : this.props.dataType)+"/new"}
-              method="GET"
-              key={this.props.dataType+"_new"+this.props.private.toString()}>
-              <input type="hidden" name="private" value={this.props.private ? 1 : 0} />
-              <button type="submit"
-                      className="btn btn-primary pull-right new-button">
-                      New {this.props.private ? "private" : "public"} {this.props.dataType}
-              </button>
-            </form>
+
+      getInitialState: function() {
+          return {showForm: false};
+      },
+
+      onClick: function(){
+        this.state.showForm ? this.setState({showForm: false}) : this.setState({showForm : true});
+      },
+
+      render: function() {
+          var renderContent = []
+          var formStyle = {
+              margin: 0,
+              padding: 0,
+              display: 'inline'
+          }
+          if (this.props.dataType.length > 0) {
+              if (this.props.dataType != 'questionnaire') {
+                  if (this.props.dataType === 'assignment') {
+                      renderContent.push(
+                          <span>
+                              <button className="btn btn-primary pull-right new-button" onClick ={this.onClick} >
+                                  New {this.props.private ? "private" : "public"} {this.props.dataType}
+                              </button>
+                          {this.state.showForm ? <NewAssignmentForm private={this.props.private}/> : null}
+                          </span>
+                      )
+                  }else{
+                      renderContent.push(
+                          <form
+                           style={formStyle}
+                           action={"/"+(this.props.dataType === 'assignment' ? this.props.dataType+"s" : this.props.dataType)+"/new"}
+                           method="GET"
+                           key={this.props.dataType+"_new"+this.props.private.toString()}>
+                           <input type="hidden" name="private" value={this.props.private ? 1 : 0} />
+                           <button type="submit"
+                               className="btn btn-primary pull-right new-button">
+                               New {this.props.private ? "private" : "public"} {this.props.dataType}
+                           </button>
+                          </form>
+                      )
+                  }
+
+              }
+          }
+          return (
+               <span>
+                   {renderContent}
+               </span>
           )
-        }
       }
-      return (
-        <span>
-          {renderContent}
-        </span>
-      )
-    }
+
   })
+
+    var NewAssignmentForm = React.createClass({
+
+     getInitialState: function() {
+       return{
+         assignment_form:{
+         assignment: {
+           private: this.props.private,
+           name: '',
+           course_id: '0',
+           directory_path: '',
+           spec_location: '',
+           require_quiz: '',
+           staggered_deadline: '',
+           microtask: '',
+           reviews_visible_to_all: '',
+           is_calibrated: '',
+           availability_flag: '',
+           reputation_algorithm: '',
+           max_team_size: '1',
+           instructor_id: '0',
+           num_quiz_questions: '0',
+           max_team_size: '0',
+           show_teammate_reviews: ''
+         }},
+         team_assignment: '',
+         commit: 'Create',
+         listCourses:[] 
+       }
+
+     },
+
+
+      handleNameChange: function(e){
+          var newAssignment = this.state.assignment_form;
+          newAssignment.assignment.name = e.target.value;
+          this.setState({assignment: newAssignment});
+      },
+
+      handleCourseChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.course_id = e.target.value;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleSubChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.directory_path = e.target.value;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleDescChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.spec_location = e.target.value;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleTeamChange: function(e){
+        var newAssignment = this.state.team_assignment;
+        newAssignment = e.target.checked;
+        this.setState({team_assignment: newAssignment});
+
+      },
+
+      handleQuizChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.require_quiz = e.target.checked;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleDeadlineChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.staggered_deadline = e.target.checked;
+        this.setState({assignment: newAssignment});
+        StaggeredMessage();
+      },
+
+      handleMicrotaskChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.microtask = e.target.checked;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleReviewsChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.reviews_visible_to_all = e.target.checked;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleCalibrationChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.is_calibrated = e.target.checked;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleAvailabilityChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.availability_flag = e.target.checked;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleReputationChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.reputation_algorithm = e.target.value;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleNumQuizQuestions: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.num_quiz_questions = e.target.value;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleMaxTeamSize: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.max_team_size = e.target.value;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleShowTeammateReviews: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.show_teammate_reviews = e.target.value;
+        this.setState({assignment: newAssignment});
+      },
+
+      directoryValidate: function(e){
+        var regex=/^[a-zA-Z0-9]*$/;
+        var regex_empty=/^(?=\s*\S).*$/;
+        if(regex.test(e) && regex_empty.test(e))
+          return true;
+        else {
+          document.getElementById("directory_span").innerHTML = "    &#x2716 Submission Directory cannot have special characters or spaces. It cannot be empty!";
+          //alert('');
+          return false;
+        }
+      },
+
+      nameValidate: function(e){
+        var regex=/^(?=\s*\S).*$/;
+        if(regex.test(e))
+          return true;
+        else{
+
+          document.getElementById("name_span").innerHTML = "    &#x2716 Name cannot be empty!";
+          //alert('Name cannot be empty!!!');
+          return false;
+        }
+      },
+
+
+      handleCreateAssignment: function(e) {
+        var that = this;
+        if(this.directoryValidate(that.state.assignment_form.assignment.directory_path) && this.nameValidate(that.state.assignment_form.assignment.name) ){
+          console.log('It worked');
+        $.ajax({
+          method: 'POST',
+          data: {
+            assignment_form: that.state.assignment_form
+          },
+          url: '/assignments'
+        });
+        window.location.reload();}
+      },
+
+      handleGetCourses: function() {
+        var source="/tree_display/get_courses_node_ng";
+        this.serverRequest = $.get(source, function (response) {
+        var result = JSON.parse(response);
+        var arrTen = [];
+        for (var k = 0; k < result.length; k++) {
+          arrTen.push(<option key={result[k].id} value={result[k].id}> {result[k].name} </option>);
+        }
+        this.setState({
+          listCourses: arrTen
+        });
+        }.bind(this));
+      },
+
+    render: function(){
+        const divStyle = {
+            backgroundColor: '#eaeded',
+            color: 'black',
+            padding: 10,
+            border: 'red',
+            marginTop: 10
+        }
+
+        const selectDivStyle = {
+          backgroundColor: '#aed6f1',
+          padding: 20
+        }
+
+        const spanStyle = {
+          color: '#ff0000'
+        }
+
+        var partial_team;
+        if(this.state.team_assignment){
+          partial_team = (
+              <div style={selectDivStyle}>
+                <p>
+                  Max Team Size: <input type="number" id="max_team_size" onChange={this.handleMaxTeamSize}></input>
+                </p>
+
+
+                <p>
+                  <input type="checkbox" id="show_teammate_reviews" onChange={this.handleShowTeammateReviews}> Show Teammate Reviews</input>
+                </p>
+              </div>
+          );
+        }
+        else{
+          partial_team = <p></p>
+        }
+
+        var partial_quiz;
+        if(this.state.assignment_form.assignment.require_quiz){
+          partial_quiz = (
+              <div style={selectDivStyle}>
+                <p>
+                  Number of Quiz Questions: <input type="number" id="num_quiz_questions"  onChange={this.handleNumQuizQuestions}></input>
+                </p>
+              </div>
+          );
+        }
+        else{
+          partial_quiz = <p></p>
+        }
+
+
+
+        return(
+
+              <div style={divStyle}>
+                  <h2> Create {this.props.private ? "Private" : "Public"} Assignment </h2>
+
+                  <p>
+                     Assignment Name: <input type="text" id="name" onChange={this.handleNameChange} required={true}/>
+                    <span style={spanStyle} id="name_span"></span>
+                  </p>
+                  <p>
+                     Course: <select id="course_id" onChange={this.handleCourseChange} onClick={this.handleGetCourses}>
+                       <option selected hidden>-----------</option>
+                       {this.state.listCourses}
+                     </select>
+                  </p>
+                  <p>
+                    Submission Directory: <input type="text"  id="directory_path" onChange={this.handleSubChange} required={true}
+                  errorMessage="Directory field cannot contain Special characters or spaces" emptyMessage="Directroy is required."/>
+                    <span style={spanStyle} id="directory_span"></span>
+                  </p>
+                  <p>
+                    Description URL: <input type="text" id="spec_location" onChange={this.handleDescChange}/>
+                  </p>
+
+                  <p>
+                    <input type="checkbox" id="team_assignment" onChange={this.handleTeamChange}> Has Teams </input>
+                  </p>
+
+
+                  {partial_team}
+
+
+                  <p>
+                    <input type="checkbox" id="require_quiz" onChange={this.handleQuizChange}> Has Quiz </input>
+                  </p>
+                  {partial_quiz}
+
+                  <p>
+                    <input type="checkbox" id="staggered_deadline" onChange={this.handleDeadlineChange}> Staggered Deadline Assignment </input>
+                  </p>
+                  <p>
+                    <input type="checkbox" id="microtask" onChange={this.handleMicrotaskChange}> Microtask Assignment </input>
+                  </p>
+                  <p>
+                    <input type="checkbox" id="reviews_visible_to_all" onChange={this.handleReviewsChange}> Reviews Visible to all other Reviewers </input>
+                  </p>
+                  <p>
+                    <input type="checkbox" id="is_calibrated" onChange={this.handleCalibrationChange}> Calibration for Training </input>
+                  </p>
+                  <p>
+                    <input type="checkbox" id="availability_flag" onChange={this.handleAvailabilityChange}> Available to Students </input>
+                  </p>
+                  <p>
+                    Reputation Algorithm: &nbsp;<select id="reputation_algorithm" onChange={this.handleReputationChange}>
+                    <option value="">--</option>
+                      <option value="Hamer">Hamer</option>
+                      <option value="Lauw">Simpson</option>
+                    </select>
+                  </p>
+                  <p>
+                  <button onClick={this.handleCreateAssignment}>
+                  Create
+                  </button>
+                    </p>
+                </div>
+
+
+            )
+        }
+
+    })
+
+  function StaggeredMessage()
+  {
+    window.alert('Warning! Unchecking all topics for this assignment will now have the same deadline.');
+  }
 
   var SortToggle = React.createClass({
     getInitialState: function() {
@@ -879,6 +1217,7 @@ jQuery(document).ready(function() {
             dataType={this.props.dataType}
             private={true}
           />
+
           <NewItemButton
             dataType={this.props.dataType}
             private={false}

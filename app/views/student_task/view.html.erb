@@ -39,9 +39,13 @@ to display the label "Your team" in the student assignment tasks-->
         <font color="gray">Your work</font> (You have to choose a topic first)
       <% else %>
         <% if @assignment.submission_allowed(@topic_id) %>
+              <%@assignment.is_selfreview_enabled=true %>
+
           <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> (Submit and view your work)
         <% else %>
-          <%= link_to 'Your work', :controller => 'submitted_content', :action => 'view', :id => @participant.id %> (Submit and view your work)
+              <%@assignment.is_selfreview_enabled=true %>
+
+              <%= link_to 'Your work', :controller => 'submitted_content', :action => 'view', :id => @participant.id %> (Submit and view your work)
         <% end %>
       <% end %>
     </li>
@@ -78,7 +82,6 @@ to display the label "Your team" in the student assignment tasks-->
       </li>
     <% end %> 
   <%end%>
-  
   <% if @team && (@authorization == 'participant' or @can_submit == true) %>
     <li>
       <!--Only if the assignment supports self-review and students submitted self-review can he or she view scores.-->

@@ -12,6 +12,21 @@
   <% colwidth = 18 %>
 <% end %>
 
+<!-- Compute Self-Review Score based on Peer-Review Score and Self-Granted Score -->
+<%
+   if @pscore[:review]
+     @peer_review_score=Rscore.new(@pscore,:review)
+   end
+
+   if @peer_review_score == 0
+     @peer_review_score = 0
+     else
+       @peer_review_score = @peer_review_score.my_avg
+       end
+   @self_review_score = (100 - ((@raw_self_score - @peer_review_score).abs)).round(2)
+
+%>
+
 <a href="#" name='score-chartLink' onClick="toggleElement('score-chart', 'stats');return false;">hide stats</a>
 
 <TR style ="background-color: white;" id='score-chart'>
@@ -19,11 +34,10 @@
 <th style="text-align:center;" WIDTH="<%= namecolwidth %>%">
 	Stats
 </th>
-
 <th style="text-align:center;" COLSPAN="2" WIDTH="<%= colwidth*2 %>%">
 	<img src="<%= @grades_bar_charts[:review] %>" >
 	<div class="circle" id="review-circle">
-					
+
 	</div>
 </th>
 
@@ -56,6 +70,13 @@
   </th>
 <% end %>
 
+
+  <th style="text-align:center;" WIDTH="<%= colwidth %>%">&nbsp;
+    <div class="circle" id="self_review-circle">
+
+    </div>
+  </th>
+
 <th style="text-align:center;" WIDTH="<%= colwidth %>%">&nbsp;
   <div class="circle" id="final-circle">
           
@@ -63,9 +84,8 @@
 </th>
   
 </TR>
-
 <script type="text/javascript">
-  <% ['review', 'metareview', 'feedback', 'teammate'].each do |type| %>
+  <% ['review', 'metareview', 'feedback', 'teammate', 'review'].each do |type| %>
   <% if @pscore[type.to_sym] && @pscore[type.to_sym][:scores][:avg]%>
   <% if type == 'teammate' && @assignment.show_teammate_reviews == true %>
   var myCircle = Circles.create({
@@ -85,13 +105,24 @@
   var myCircle = Circles.create({
     id:           'final-circle',
     radius:       35,
-    value:        <%= @pscore[:total_score].to_i %>,
+    value:        <%= @pscore[:total_score].to_i * 0.9 + @self_review_score * 0.1 %>,
     maxValue:     100,
     width:        15,
-    text:         '<%=@pscore[:total_score].to_i==-1? "N/A":@pscore[:total_score].to_i%>',
+    text:         '<%=@pscore[:total_score].to_i==-1? "N/A":@pscore[:total_score].to_i * 0.9 + @self_review_score * 0.1 %>',
     colors:       ['#FFEB99', '#FFCC00'],
     duration:       700,
     textClass:      'circles-final'  
+  });
+  var myCircle = Circles.create({
+      id:           'self_review-circle',
+      radius:       35,
+      value:        <%= @self_review_score %>,
+      maxValue:     100,
+      width:        15,
+      text:         '<%=@self_review_score  %>',
+      colors:       ['#FE3D3D', '#A90201'],
+      duration:       700,
+      textClass:      'circles-final'
   });
 
 </script> 

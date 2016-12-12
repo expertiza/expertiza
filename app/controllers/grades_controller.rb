@@ -88,6 +88,27 @@ class GradesController < ApplicationController
     @summary = sum.summary
     @avg_scores_by_round = sum.avg_scores_by_round
     @avg_scores_by_criterion = sum.avg_scores_by_criterion
+
+
+
+
+    @self_review_mappings = SelfReviewResponseMap.where(reviewer_id: params[:id])
+    @sorted_responses = Array.new
+    @prev = Response.where(:map_id => @self_review_mappings[0].id)
+    for element in @prev
+    array_not_empty = 1
+    @sorted_responses << element
+    end
+    if (array_not_empty == 1)
+      @sorted_responses = @sorted_responses.sort_by { |obj| obj.updated_at }
+      @latest_response = @sorted_responses.last
+    end
+
+    @response = Response.find(@latest_response.id)
+    @max_score=@response.get_maximum_score
+    @raw_self_score=@response.get_total_score*100/@max_score
+
+
   end
 
   def view_team

@@ -78,8 +78,6 @@ class ResponseController < ApplicationController
   end
 
   # Update the response and answers when student "edit" existing response
-  # E1600
-  # Added if - else condition for 'SelfReviewResponseMap'
   def update
     return unless action_allowed?
 
@@ -259,8 +257,6 @@ class ResponseController < ApplicationController
     @max = @questionnaire.max_question_score
   end
 
-  # E1600
-  # Added 'SelfReviewResponseMap' to when condition
   def set_questionnaire_for_new_response
     case @map.type
     when "ReviewResponseMap", "SelfReviewResponseMap"

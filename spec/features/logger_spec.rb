@@ -32,6 +32,7 @@ end
 
     end
 
+
 =end
   it 'redirects to logger' do
     visit root_path

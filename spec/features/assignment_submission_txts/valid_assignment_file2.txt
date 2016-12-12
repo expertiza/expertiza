@@ -1,0 +1,1 @@
+valid_assignment_file2: This is a .txt file to test assignment submission.

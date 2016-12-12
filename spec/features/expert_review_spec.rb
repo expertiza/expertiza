@@ -68,7 +68,7 @@ describe 'Expert Review' do
         expect(page).to have_no_selector('#Expert review')
       end
     end
-
+  end
   # Test Assignment Edit Functionality
   describe 'Edit Assignment' do
     # Set up for testing
@@ -225,7 +225,7 @@ describe 'Expert Review' do
       # creating the questionnaire and then linking it to the assignment.
       @questionnaire = create :questionnaire
       @assignment_questionnaire = create :assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire
-    end
+  end
 
     # creates a questionnaire, assigns it to the assignment, fills out the questionaire,
     # displays the questionaire response, checks to make sure the score is there
@@ -266,5 +266,4 @@ describe 'Expert Review' do
       expect(page).to have_content('4')
     end
   end
- end
 end

@@ -21,6 +21,8 @@ describe 'logger' do
 =end
 end
 
+=begin
+
     it 'redirects to logger' do
       visit root_path
       login_as("administrator12")
@@ -30,7 +32,7 @@ end
 
     end
 
-
+=end
   it 'redirects to logger' do
     visit root_path
     login_as("instructor6")
@@ -40,7 +42,7 @@ end
 
   end
 
-
+=begin
   it 'search based on user id' do
 
     visit root_path
@@ -62,5 +64,5 @@ end
     expect(page).to have_content("2")
 
   end
-
+=end
   end

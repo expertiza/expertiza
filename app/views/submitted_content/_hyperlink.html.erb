@@ -1,4 +1,5 @@
 <%= form_for :hyperlinks, url: '/submitted_content/remove_hyperlink' do |f| %>
+
   <% if stage != "Finished" %>
     <% team_id = TeamsUser.team_id(participant.parent_id, participant.user_id) %>
     <% display_to_author = Team.exists?(team_id) && Team.find(team_id).has_user(@current_user)%>
@@ -15,7 +16,6 @@
   <% end %>
 
   <b>Hyperlinks</b>&nbsp;&nbsp;&nbsp;
-
   <a href="#" id="urlLink" name="urlLink" onClick="toggleElement('url','links');return false;">hide links</a><br/>
   <div id="url" style="">
     <ul>
@@ -29,10 +29,119 @@
             <input type="radio" id='chk_links' name='chk_links' value="<%= index %>"/>
           <% end %>
         <% end %>
-              <a href="<%= link %>" target="_blank"><%= link %></a>
+              <% if local_assigns[:response_check] %>
+                  <a href="<%= link %>" target="_blank" onClick="startTime(<%= map_id %>, <%= round %>,'<%= link%>');"><%= link %></a>
+              <% else %>
+                  <a href="<%= link %>" target="_blank"><%= link %></a>
+                  <% end %>
               <br/>
       <% end %>
+
       <% } %>
     </ul>
   </div>
 <% end %>
+<% if local_assigns[:response_check] %>
+  <script type="text/javascript">
+    function ISODateString(d){
+        function pad(n){return n<10 ? '0'+n : n}
+        return d.getUTCFullYear()+'-'
+                + pad(d.getUTCMonth()+1)+'-'
+                + pad(d.getUTCDate()) +' '
+                + pad(d.getUTCHours())+':'
+                + pad(d.getUTCMinutes())+':'
+                + pad(d.getUTCSeconds())
+    }
+    var myEvent = window.attachEvent || window.addEventListener;
+    var chkevent = window.attachEvent ? 'onbeforeunload' : 'beforeunload'; /// make IE7, IE8 compitable
+
+    myEvent(chkevent, function(e) { // For >=IE7, Chrome, Firefox
+        //var confirmationMessage = 'Are you sure to leave the page?';  // a space
+        //(e || window.event).returnValue = confirmationMessage;
+
+        var d = new Date();
+        $.ajax({
+            type:'POST',
+            url:'/response_time/record_end_time',
+            data:$.param({ response_time:{map_id: <%= map_id %>, round: <%= round %> , end: ISODateString(d)}})
+        })
+    });
+
+  var globalTimer;
+  var linksToUpdate;
+  function endTime(callback){
+        var d = new Date();
+            $.ajax({
+              type:'POST',
+              dataType: "json",
+              async:false,
+              url:'/response_time/record_end_time',
+              data:$.param({ response_time:{map_id: <%= map_id %>, round: <%= round %> , end: ISODateString(d)}}),
+              success:function(json){ 
+                var la=JSON.parse(JSON.stringify(json));
+                callback(la);
+              }
+          })
+  }
+
+  function timeOut() {
+        stopLinkTimers();
+        if(confirm("Are you still reviewing your submissions ? Press OK to continue"))
+        {
+          resetGlobalTimer(); 
+          //start link timers for only those links that are clicked(opened) by the user
+          for(i=0;i<linksToUpdate.length;i++){
+            startTime(<%= map_id %>, <%= round %>,linksToUpdate[i])  
+          }
+          
+        }
+        else
+        {
+          clearGlobalTimer();
+          document.onmousemove = clearGlobalTimer;
+          document.onkeypress = clearGlobalTimer;
+          document.onload = clearGlobalTimer;
+          document.onmousedown = clearGlobalTimer; // touchscreen presses
+          document.ontouchstart = clearGlobalTimer;
+          document.onclick = clearGlobalTimer;     // touchpad clicks
+          document.onscroll = clearGlobalTimer;    // scrolling with arrow keys
+        }
+  }
+
+  function resetGlobalTimer() {
+        clearTimeout(globalTimer);
+        globalTimer = setTimeout(timeOut, 300000);
+  }
+
+  function clearGlobalTimer(){
+        clearTimeout(globalTimer);
+  }
+
+  function startGlobalTimer(){
+      resetGlobalTimer();
+      // DOM Events
+      document.onmousemove = resetGlobalTimer;
+      document.onkeypress = resetGlobalTimer;
+      document.onload = resetGlobalTimer;
+      document.onmousedown = resetGlobalTimer; // touchscreen presses
+      document.ontouchstart = resetGlobalTimer;
+      document.onclick = resetGlobalTimer;     // touchpad clicks
+      document.onscroll = resetGlobalTimer;    // scrolling with arrow keys
+    
+  }
+
+  function stopLinkTimers(){
+    //update the end times in the response_time db and get the list of open links
+    endTime(function(d) {
+          linksToUpdate=d
+    });
+    console.log(linksToUpdate);
+  }
+
+</script>
+<% end %>
+
+
+
+
+

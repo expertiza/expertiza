@@ -1,5 +1,9 @@
 <% if participant.team.hyperlinks.try(:length) %>
-  <%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant, stage: @stage} %>
+    <% if local_assigns[:response_check] %>
+  <%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant, stage: @stage, :map_id => map_id, :round => round, :response_check => response_check} %>
+    <% else %>
+        <%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant, stage: @stage } %>
+<% end %>
 <% end %>
 
 <% if stage != "Finished" and controller.controller_name == 'submitted_content' and @can_submit %>

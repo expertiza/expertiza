@@ -1,0 +1,2 @@
+module ResponseTimeHelper
+end

@@ -242,3 +242,30 @@ dateFormat.i18n = {
 Date.prototype.format = function (mask, utc) {
   return dateFormat(this, mask, utc);
 };
+
+function ISODateString(d){
+    function pad(n){return n<10 ? '0'+n : n}
+    return d.getUTCFullYear()+'-'
+        + pad(d.getUTCMonth()+1)+'-'
+        + pad(d.getUTCDate()) +' '
+        + pad(d.getUTCHours())+':'
+        + pad(d.getUTCMinutes())+':'
+        + pad(d.getUTCSeconds())
+}
+
+function startTime(map_id, round, link){
+    startGlobalTimer();
+    var d = new Date();
+    var timeoutCount=0;
+    $.ajax({
+        type:'POST',
+        url:'/response_time/record_start_time',
+        data:$.param({ response_time:{map_id: map_id, round: round, link: link , start: ISODateString(d)}})
+})
+}
+
+
+
+
+
+

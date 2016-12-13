@@ -293,8 +293,17 @@ Expertiza::Application.routes.draw do
       get :redirection
       get :show_calibration_results_for_student
       post :custom_create
+
     end
   end
+
+  resources :response_time do
+    collection do
+      post :record_start_time
+      post :record_end_time
+      get  :record_end_time
+    end
+    end
 
   resources :review_mapping do
     collection do
@@ -537,6 +546,7 @@ Expertiza::Application.routes.draw do
   get '/review_mapping/assign_reviewer_dynamically', :to => 'review_mapping#assign_reviewer_dynamically'
   get '/review_mapping/assign_metareviewer_dynamically', :to => 'review_mapping#assign_metareviewer_dynamically'
   get 'response/', :to => 'response#saving'
+
 
   get 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
   get ':controller/service.wsdl', :action => 'wsdl'

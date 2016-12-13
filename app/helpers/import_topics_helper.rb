@@ -7,13 +7,10 @@ module ImportTopicsHelper
     attributes["topic_name"] = columns[1].strip
     attributes["max_choosers"] = columns[2].strip
     attributes["category"] = columns[3].strip if columns.length > 3
-    if columns.length > 4
-    attributes["description"] = columns[4].strip
+    if(columns.length>5)
+      attributes["description"] = columns[4].strip
+      attributes["link"] = columns[5].strip
     end
-    if columns.length > 5
-    attributes["link"] = columns[5].strip
-    end
-    attributes
   end
 
   def self.create_new_sign_up_topic(attributes, session)

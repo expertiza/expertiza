@@ -36,7 +36,7 @@
 
           <% @response_maps.each_with_index do |ri, index| %>
             <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
-            <% team_name_color = Response.exists?(map_id: ri.id) ? "green" : "red" %>
+            <% team_name_color = graded_yet_color(r.id, ri.id) %>
             <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, ri.response, ri.reviewee_id) %>
               <% if Team.where(id: ri.reviewee_id).length > 0 %>
                 <%@team = Team.find(ri.reviewee_id) %>

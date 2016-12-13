@@ -427,6 +427,9 @@ class ReviewMappingController < ApplicationController
     participant = Participant.find(params[:participant_id])
     participant.grade_for_reviewer = params[:grade_for_reviewer] if params[:grade_for_reviewer]
     participant.comment_for_reviewer = params[:comment_for_reviewer] if params[:comment_for_reviewer]
+    # Save the current date-time along with the grades and comments.
+    participant.review_graded_at=Time.now
+
     begin
       participant.save
     rescue

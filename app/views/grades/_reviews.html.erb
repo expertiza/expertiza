@@ -1,4 +1,5 @@
 <% if rscore and rscore[:assessments].length > 0 %>
+<% if participant.reviewsetting == 0 || participant.reviewsetting == 1%>
     <BR/>
     <%flag_varying_rubrics=false%>
 
@@ -25,6 +26,12 @@
     <%end%>
     <BR/>
     <HR/>
+    <% end %>
+
+
+
+
+    <% if participant.reviewsetting == 0 || participant.reviewsetting == 2%>
     <% count = 0 %>
     <!--Zhewei: If this assignment supports varying rubrics by round, Expertiza will display all-round reviews. -->
     <!--And if one reviewer did not do first-round review and did second round directly, Expertiza will display only second round.-->
@@ -34,7 +41,7 @@
     <% rscore[:assessments].uniq{|response| response.round }.each do |response| %>
         <% rounds << response.round %>
     <% end %>
-
+    
     <% rounds.each do |round| %>
         <h3>Round <%= round %></h3>
         <% if controller.action_name != "view_my_scores"%> %>
@@ -63,9 +70,11 @@
                         <%= display_directory_tree(@participant, files, true).html_safe %>
                     <% end %>
                 <% end %>
-                
+                <% if participant.reviewsetting == 2%>
+                <%= review.display_as_html(prefix, index + 1, nil, false) %><br/>
+                <% else %>
                 <%= review.display_as_html(prefix, index + 1, nil) %><br/>
-                
+                <% end %>
                 <% map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: participant.id).first
                     review_feedbacks = map.try :response %>
                 <% if review_feedbacks && !review_feedbacks.empty? %>
@@ -77,6 +86,7 @@
                 </td></tr>
             <% end %>
         </table><hr>
+    <% end %>
     <% end %>
 <% else %>
     <i>No reviews have been completed for this user's submissions.</i>

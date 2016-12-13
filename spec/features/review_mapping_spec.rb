@@ -8,7 +8,7 @@ def login_and_assign_reviewer(user, assignment_id, student_num, submission_num)
   fill_in 'num_reviews_per_student', with: student_num
   choose 'num_reviews_submission'
   fill_in 'num_reviews_per_submission', with: submission_num
-  click_on('Assign reviewers')
+  click_on 'first_submit_tag'
 end
 
 def add_reviewer(student_name)

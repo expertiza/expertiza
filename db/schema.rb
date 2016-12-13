@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161129220644) do
+ActiveRecord::Schema.define(version: 20161202160230) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -78,6 +78,8 @@ ActiveRecord::Schema.define(version: 20161129220644) do
     t.boolean  "is_calibrated",                            default: false
     t.boolean  "is_selfreview_enabled"
     t.string   "reputation_algorithm",       limit: 255,   default: "Lauw"
+    t.boolean  "show_teammate_score",                      default: false
+    t.boolean  "show_other_reviews",                       default: false
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -311,6 +313,7 @@ ActiveRecord::Schema.define(version: 20161129220644) do
     t.float    "Lauw",                 limit: 24,    default: 0.0
     t.integer  "grade_for_reviewer",   limit: 4
     t.text     "comment_for_reviewer", limit: 65535
+    t.integer  "reviewsetting",        limit: 4,     default: 0
   end
 
   add_index "participants", ["user_id"], name: "fk_participant_users", using: :btree
@@ -391,13 +394,14 @@ ActiveRecord::Schema.define(version: 20161129220644) do
   add_index "response_maps", ["reviewer_id"], name: "fk_response_map_reviewer", using: :btree
 
   create_table "responses", force: :cascade do |t|
-    t.integer  "map_id",             limit: 4,     default: 0,     null: false
-    t.text     "additional_comment", limit: 65535
+    t.integer  "map_id",                     limit: 4,     default: 0,     null: false
+    t.text     "additional_comment",         limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version_num",        limit: 4
-    t.integer  "round",              limit: 4
-    t.boolean  "is_submitted",                     default: false
+    t.integer  "version_num",                limit: 4
+    t.integer  "round",                      limit: 4
+    t.boolean  "is_submitted",                             default: false
+    t.text     "instructor_visible_comment", limit: 65535
   end
 
   add_index "responses", ["map_id"], name: "fk_response_response_map", using: :btree

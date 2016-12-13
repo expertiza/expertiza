@@ -51,6 +51,11 @@
                     <td>
                        <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
                     </td>
+                    <% if @assignment.show_other_reviews and @latest_response.is_submitted %>
+                      <td>
+                        <%= link_to " Other_Reviews", {:controller => 'response', :action => 'other_reviews',:reviewee_id => map.reviewee_id, :user_reponse_id => @latest_response.id} %>
+                      </td>
+                    <%end%>
 
                     <% if @assignment.get_current_stage(topic_id) != "Finished" %>
                       <%- # show the link as edit when latest review is done in current deadline   -%>
@@ -59,6 +64,7 @@
                         <td>
                           <% if (!@latest_response.is_submitted) %>
                               <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id} %>
+                	      <%= link_to "Drop", {:controller => 'review_mapping', :action => 'drop_review', :id => @participant.id ,:map_id => map.id} %>
                           <%end%>
                         </td>
                       <% else %>
@@ -68,6 +74,7 @@
                 <%end%>
             <% elsif @assignment.get_current_stage(topic_id) != "Complete" && @assignment.can_review(topic_id) %>
                 <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
+                <td><%= link_to "Drop", {:controller => 'review_mapping', :action => 'drop_review', :id => @participant.id ,:map_id => map.id} %></td>
                 <td>&nbsp;&nbsp;</td>
             <% else %>
                 <td>Begin</td>

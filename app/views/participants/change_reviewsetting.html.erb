@@ -1,0 +1,15 @@
+<%= form_tag({:action => 'change_reviewsetting', :id =>  @participant}) do %>
+  <p>Change Review Score Setting <em>for current assignment</em>:<br>
+    
+    <%= radio_button 'participant','reviewsetting', 0 %>
+    <%= label 'both', 'Show both Scores and Feedback'%><br>
+    
+    <%= radio_button 'participant','reviewsetting', 1 %>
+    <%= label 'score', 'Show only Scores'%><br>
+    
+    <%= radio_button 'participant','reviewsetting', 2 %>
+    <%= label 'feedback', 'Show only Feedback'%>
+     
+    <%= submit_tag 'Save' %>
+  <% end %>
+  

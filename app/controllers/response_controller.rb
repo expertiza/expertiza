@@ -88,6 +88,7 @@ class ResponseController < ApplicationController
     begin
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
+      @response.update_attribute('instructor_visible_comment', params[:review][:instructor_visible])
       @questionnaire = set_questionnaire
 
       questions = sort_questions(@questionnaire.questions)
@@ -150,6 +151,16 @@ class ResponseController < ApplicationController
     set_content
   end
 
+  # view response by other reviewers
+  def other_reviews
+    @other_response_maps = ReviewResponseMap.where(reviewee_id: params[:reviewee_id],type: 'ReviewResponseMap')
+    @user_response = Response.find(params[:user_reponse_id])
+    @latest_response_round = @user_response.round
+    @map = @user_response.map
+    @title = @map.get_title
+    @assignment = @map.assignment
+  end
+
   def create
     @map = ResponseMap.find(params[:id]) # assignment/review/metareview id is in params id
 
@@ -169,7 +180,9 @@ class ResponseController < ApplicationController
     else
       is_submitted = false
     end
-    @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:round => @round, :is_submitted => is_submitted)#,:version_num=>@version)
+    @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],
+                                :instructor_visible_comment => params[:review][:instructor_visible], :round => @round,
+                                :is_submitted => is_submitted)#,:version_num=>@version)
 
     #Change the order for displaying questions for editing response views.
     questions=sort_questions(@questionnaire.questions)

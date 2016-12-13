@@ -12,7 +12,7 @@ class ReviewMappingController < ApplicationController
   # start_self_review is a method that is invoked by a student user so it should be allowed accordingly
   def action_allowed?
     case params[:action]
-    when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'assign_quiz_dynamically', 'start_self_review'
+    when 'list_mappings', 'drop_review' , 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'assign_quiz_dynamically', 'start_self_review'
       true
     else
       ['Instructor',
@@ -41,6 +41,12 @@ class ReviewMappingController < ApplicationController
 
   def select_metareviewer
     @mapping = ResponseMap.find(params[:id])
+  end
+
+  def drop_review
+    map_id = params[:map_id]
+    ReviewResponseMap.find(map_id).destroy
+    redirect_to controller: 'student_review', action: 'list', id: params[:id]
   end
 
   def add_reviewer

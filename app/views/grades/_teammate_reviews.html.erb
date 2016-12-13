@@ -1,7 +1,8 @@
-<!-- TeammateReviewS --> 
+<!-- TeammateReviewS -->
 <% if rscore and rscore[:assessments].length > 0 %>
   <BR/>
-  <%= render :partial => 'grades/review_table',
+  <%if @assignment.show_teammate_score || session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4 || session[:user].role_id == 6 %>
+     <%= render :partial => 'grades/review_table',
            :locals => {
            :ctrl => 'teammate_review',
            :caction => 'view',
@@ -12,7 +13,8 @@
            :collabel => "Feedback",
            :rowlabel => "Author"
            }%>
-  <BR/>         
+    <%end%>
+    <BR/>
   <HR/> 
   <% count = 0 %>
   <% for review in rscore[:assessments] %>
@@ -20,7 +22,7 @@
     <% if controller.action_name != "view_my_scores" %>
       <a name="<%=prefix+"_"+review.map.reviewer.name%>"></a><%= review.display_as_html(prefix, count) %><BR/><BR/>
     <% else %>
-      <%= review.display_as_html(nil,count) %><BR/><BR/>
+      <%= review.display_as_html(nil,count, nil, @assignment.show_teammate_score) %><BR/><BR/>
     <% end %>    
   <% end %>
 <% else %>

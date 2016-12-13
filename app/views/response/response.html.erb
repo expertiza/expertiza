@@ -31,10 +31,16 @@ jQuery(document).ready(function() {
     <% if !topic_id.nil? %>
         <% topic = SignUpTopic.find(topic_id)%>
         <h2>You are reviewing <%= topic.topic_name %></h2>
-        <b>Description &nbsp;&nbsp;&nbsp;</b>
-        <%= topic.description.to_s[0..30]+'...'%>
-        <a style="cursor: pointer" onclick="show_alert('<%= topic.description%>')">more...</a>
+        <% if !topic.description.nil? %>
+          <b>Description &nbsp;&nbsp;&nbsp;</b>
+          <% if topic.description.to_s.length>90 %>
+            <%= topic.description.to_s[0..90]+'...'%>
+            <a style="cursor: pointer" onclick="show_alert('<%= topic.description%>')">more...</a>
+          <% else %>
+            <%= topic.description.to_s%>
+          <% end %>
         <%= link_to image_tag('external-link-16.png', :border => 0, :align => 'middle'), topic.link, :target=>'_blank' %>
+        <% end %>
     <% end %>
 
     <%if @assignment.has_teams?%>

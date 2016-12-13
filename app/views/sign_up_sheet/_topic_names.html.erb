@@ -7,8 +7,15 @@
 <% else %>
     <span class="inline" id="<%= i %>_show"><%= topic.topic_name %> </span>
 <% end %>
-<br/><%= topic.description.to_s[0..30]+'...'%>
-<a style="cursor: pointer" onclick="show_alert('<%= topic.description%>')">more</a>
+<% if !topic.description.nil? %>
+    <br/>
+    <% if topic.description.to_s.length>90 %>
+        <%= topic.description.to_s[0..90]+'...'%>
+        <a style="cursor: pointer" onclick="show_alert('<%= topic.description%>')">more</a>
+    <% else %>
+        <%= topic.description.to_s%>
+    <% end %>
+<% end %>
 <!--if 'Has teams' is not checked, the UI should not show the team name on the topic list.-->
 
 <div id="<%= i %>_myDiv">

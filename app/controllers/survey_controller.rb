@@ -16,7 +16,7 @@ class SurveyController < ApplicationController
     # flash warning to the user that he/she is attempting 
     # to overwrite it
     if !@assignment.survey_id.nil?
-      flash[:error] = "You are attempting to overwrite existing assignment survey"
+      flash.now[:error] = "You are attempting to overwrite existing assignment survey"
     end
 
     @first_row=Questionnaire.new;

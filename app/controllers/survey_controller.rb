@@ -43,7 +43,7 @@ class SurveyController < ApplicationController
     @assignment[:survey_id] = selected_survey_id
     @assignment.update!(@assignment_params)
     
-    if selected_global_survey_id != 0
+    if selected_global_survey_id == 0
       #Update the Global Survey Id with the selected Global Survey Id
       @assignment[:global_survey_id] = selected_global_survey_id
       @assignment.update!(@assignment_params)

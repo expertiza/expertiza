@@ -5,7 +5,7 @@ class Participant < ActiveRecord::Base
   belongs_to :assignment, foreign_key: 'parent_id'
 
   has_many   :comments, dependent: :destroy
-  has_many   :reviews, class_name: 'ResponseMap', foreign_key: 'reviewer_id', dependent: :destroy
+  has_many   :reviews, class_name: 'ResponseMap', as: :reviewer, dependent: :destroy
   has_many   :team_reviews, class_name: 'ReviewResponseMap', foreign_key: 'reviewer_id', dependent: :destroy
   has_many   :response_maps, class_name: 'ResponseMap', foreign_key: 'reviewee_id', dependent: :destroy
 
@@ -51,7 +51,7 @@ class Participant < ActiveRecord::Base
     else
       raise "Associations exist for this participant."
     end
-    end
+  end
 
   def force_delete(maps)
     maps.each { |map| map.delete(true) } if maps

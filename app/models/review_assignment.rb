@@ -126,7 +126,12 @@ module ReviewAssignment
   end
 
   def reject_by_same_topic(contributor_set, reviewer)
-    reviewer_team = AssignmentTeam.team(reviewer)
+    if(self.reviewer_is_team)
+      reviewer_team = reviewer
+    else
+      reviewer_team = AssignmentTeam.team(reviewer)
+    end
+    
     # it is possible that this reviewer does not have a team, if so, do nothing
     if reviewer_team
       topic_id = reviewer_team.topic
@@ -145,7 +150,11 @@ module ReviewAssignment
   end
 
   def reject_own_submission(contributor_set, reviewer)
-    contributor_set.reject! {|contributor| contributor.has_user(User.find(reviewer.user_id)) }
+    if(self.reviewer_is_team)
+      contributor_set.reject {|contributor| contributor.id == reviewer.id }
+    else
+      contributor_set.reject {|contributor| contributor.has_user(User.find(reviewer.user_id)) }
+    end
     contributor_set
   end
 

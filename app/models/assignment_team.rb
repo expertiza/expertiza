@@ -3,6 +3,7 @@ class AssignmentTeam < Team
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewee_id'
   has_many :review_response_maps, foreign_key: :reviewee_id
   has_many :responses, through: :review_response_maps, foreign_key: :map_id
+  has_many :reviews, class_name: 'ResponseMap', as: :reviewer, dependent: :destroy
 
   # START of contributor methods, shared with AssignmentParticipant
 
@@ -39,27 +40,16 @@ class AssignmentTeam < Team
   def assign_reviewer(reviewer)
     assignment = Assignment.find(self.parent_id)
     raise "The assignment cannot be found." if assignment.nil?
-
-    if assignment.reviewer_is_team
-      ReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.team_id,
-                              reviewed_object_id: assignment.id, reviewer_is_team: true)
-    else
-      ReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.id,
-                              reviewed_object_id: assignment.id, reviewer_is_team: false)
-    end
+    ReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.id, reviewer_type: reviewer.class.name,
+                              reviewed_object_id: assignment.id, reviewer_is_team: assignment.reviewer_is_team)
   end
 
   # Evaluates whether any contribution by this team was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object
   def reviewed_by?(reviewer)
     # ReviewResponseMap.count(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id]) > 0
-
     assignment = Assignment.find(self.parent_id)
-    if assignment.assignment.reviewer_is_team
-      ReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', self.id, reviewer.team_id, assignment.id).count > 0
-    else
-      ReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', self.id, reviewer.id, assignment.id).count > 0
-    end
+    ReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewer_type = ? && reviewed_object_id = ?', self.id, reviewer.id, reviewer.class.name, assignment.id).count > 0
   end
 
   # Topic picked by the team for the assignment
@@ -210,6 +200,20 @@ class AssignmentTeam < Team
     self.save
   end
 
+  # return the team given the participant
+  def self.team(participant)
+    return nil if participant.nil?
+    team = nil
+    teams_users = TeamsUser.where(user_id: participant.user_id)
+    return nil unless teams_users
+    teams_users.each do |teams_user|
+      team = Team.find(teams_user.team_id)
+      return team if team.parent_id == participant.parent_id
+    end
+    nil
+  end
+
+  
   # return the team given the participant
   def self.team(participant)
     return nil if participant.nil?

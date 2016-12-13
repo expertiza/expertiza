@@ -82,15 +82,21 @@ class ReviewMappingController < ApplicationController
 
   # 7/12/2015 -zhewei
   # This method is used for assign submissions to students for peer review.
-  # This method is different from 'assignment_reviewer_automatically', which is in 'review_mapping_controller' and is used for instructor assigning reviewers in instructor-selected assignment.
+  # This method is different from 'assign_reviewer_automatically', which is in 'review_mapping_controller' and is used for instructor assigning reviewers in instructor-selected assignment.
   def assign_reviewer_dynamically
     assignment = Assignment.find(params[:assignment_id])
-    reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
+
+    participant = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
+
+    if(assignment.reviewer_is_team)
+      reviewer = participant.team
+    else
+      reviewer = participant
+    end  
 
     if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.has_topics? && assignment.can_choose_topic_to_review?
       flash[:error] = "No topic is selected.  Please go back and select a topic."
     else
-
       # begin
       if assignment.has_topics? # assignment with topics
         topic = if params[:topic_id]
@@ -119,14 +125,20 @@ class ReviewMappingController < ApplicationController
     #   flash[:error] = (e.nil?) ? $! : e
     # end
 
-    redirect_to controller: 'student_review', action: 'list', id: reviewer.id
+    redirect_to controller: 'student_review', action: 'list', id: participant.id, reviewer_id: reviewer.id, reviewer_is_team: assignment.reviewer_is_team
   end
 
   # assigns the quiz dynamically to the participant
   def assign_quiz_dynamically
     begin
       assignment = Assignment.find(params[:assignment_id])
-      reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
+
+      if(assignment.reviewer_is_team)
+        reviewer = AssignmentTeam.where(id: AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first.team.id, parent_id: assignment.id).first
+      else
+        reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
+      end
+
       if ResponseMap.where(reviewed_object_id: params[:questionnaire_id], reviewer_id: params[:participant_id]).first
         flash[:error] = "You have already taken that quiz."
       else

@@ -209,17 +209,21 @@ class Response < ActiveRecord::Base
 
   # compare the current response score with other scores on the same artifact, and test if the difference
   # is significant enough to notify instructor.
+  # Precondition: the response object is associated with a ReviewResponseMap
   def significant_difference?
     map_class = self.map.class
     existing_responses = map_class.get_assessments_for(self.map.reviewee)
     average_score_on_same_artifact_from_others, count = Response.avg_scores_and_count_for_prev_reviews(existing_responses, self)
+    # if this response is the first on this artifact, there's no grade conflict
     return false if count == 0
 
+    # This score has already skipped the unfilled scorable question(s)
     score = get_total_score.to_f / get_maximum_score
     questionnaire = questionnaire_by_answer(self.scores.first)
     assignment = self.map.assignment
 
     assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: assignment.id, questionnaire_id: questionnaire.id).first
+    # notification_limit can be specified on 'Rubrics' tab on assignment edit page.
     allowed_difference_percentage = assignment_questionnaire.notification_limit.to_f
 
     # the range of average_score_on_same_artifact_from_others and score is [0,1]
@@ -235,7 +239,7 @@ class Response < ActiveRecord::Base
     scores_assigned = []
     count = 0
     existing_responses.each do |existing_response|
-      if existing_response.id != current_response.id
+      if existing_response.id != current_response.id # the current_response is also in existing_responses array
         count += 1
         scores_assigned << existing_response.get_total_score.to_f/existing_response.get_maximum_score
       end
@@ -251,7 +255,7 @@ class Response < ActiveRecord::Base
     reviewer_name = User.find(reviewer_participanat.user_id).fullname
 
     reviewee_team = AssignmentTeam.find(response_map.reviewee_id)
-    reviewee_participant = reviewee_team.participants.first
+    reviewee_participant = reviewee_team.participants.first # for team assignment, use the first member's name.
     reviewee_name = User.find(reviewee_participant.user_id).fullname
 
     assignment = Assignment.find(reviewer_participanat.parent_id)

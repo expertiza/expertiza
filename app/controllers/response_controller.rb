@@ -134,7 +134,9 @@ class ResponseController < ApplicationController
     # type
     @type = @map.type
     
-    @questionnaire = @map.questionnaire
+    assignment_id = @map.reviewed_object_id
+    survey_id = Assignment.find(assignment_id).survey_id
+    @questionnaire = Questionnaire.find(survey_id)
     
     @questions = sort_questions(@questionnaire.questions)
     

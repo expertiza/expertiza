@@ -137,7 +137,6 @@ class Response < ActiveRecord::Base
     defn[:body] = {}
     defn[:body][:partial_name] = partial
     response_map = ResponseMap.find map_id
-    assignment = nil
 
     reviewer_participant_id = response_map.reviewer_id
     participant = Participant.find(reviewer_participant_id)

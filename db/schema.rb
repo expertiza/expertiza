@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161129220644) do
+ActiveRecord::Schema.define(version: 20161201182805) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -267,6 +267,15 @@ ActiveRecord::Schema.define(version: 20161129220644) do
     t.integer "questionnaire_type_id", limit: 4
     t.string  "name",                  limit: 255
     t.string  "qtype",                 limit: 255
+  end
+
+  create_table "local_db_scores", force: :cascade do |t|
+    t.string   "Type",         limit: 255
+    t.integer  "Round",        limit: 4
+    t.integer  "Score",        limit: 4
+    t.integer  "Reference_id", limit: 4
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
   end
 
   create_table "markup_styles", force: :cascade do |t|

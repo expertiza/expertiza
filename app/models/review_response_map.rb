@@ -123,7 +123,7 @@ class ReviewResponseMap < ResponseMap
       defn[:body][:obj_name] = assignment.name
       defn[:body][:first_name] = User.find(user.id).fullname
       defn[:to] = User.find(user.id).email
-      Mailer.sync_message(defn).deliver_now
+     # Mailer.sync_message(defn).deliver_now
     end
   end
 

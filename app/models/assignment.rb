@@ -479,4 +479,8 @@ class Assignment < ActiveRecord::Base
     self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by_name(type).id }
   end
 
+  def get_last_review_date(assignid)
+    @last_review_deadline= AssignmentDueDate.where(parent_id: assignid,deadline_type_id: 2).order("due_at desc").first.due_at
+    @last_review_deadline
+  end
 end

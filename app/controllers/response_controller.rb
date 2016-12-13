@@ -134,6 +134,10 @@ class ResponseController < ApplicationController
     # type
     @type = @map.type
     
+    @questionnaire = @map.questionnaire
+    
+    @questions = sort_questions(@questionnaire.questions)
+    
     # set more handy variables for the view
     set_content(true)
 

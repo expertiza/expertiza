@@ -79,7 +79,7 @@ class ResponseController < ApplicationController
 
   # Update the response and answers when student "edit" existing response
   # E1600
-  # Added if - else condition for 'SelfReviewResponseMap'
+   # Added if - else condition for 'SelfReviewResponseMap'
   def update
     return unless action_allowed?
 
@@ -120,7 +120,7 @@ class ResponseController < ApplicationController
     @modified_object = @map.id
 
     # set more handy variables for the view
-    set_content(true)
+    #set_content(true)
 
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
     render action: 'response'

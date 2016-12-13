@@ -270,7 +270,7 @@ class ResponseController < ApplicationController
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.number_of_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
-    when "MetareviewResponseMap", "TeammateReviewResponseMap", "FeedbackResponseMap"
+    when "MetareviewResponseMap", "TeammateReviewResponseMap", "FeedbackResponseMap", "SurveyResponseMap"
       @questionnaire = @map.questionnaire
     end
   end

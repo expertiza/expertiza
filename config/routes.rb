@@ -93,6 +93,7 @@ Expertiza::Application.routes.draw do
   resources :course_evaluation do
     collection do
       get :list
+      get :create_response_map
     end
   end
 
@@ -449,6 +450,8 @@ Expertiza::Application.routes.draw do
   resources :survey do
     collection do
       get :assign
+      # E1680
+      post :assign_survey
     end
   end
 

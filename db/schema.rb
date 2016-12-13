@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161129220644) do
+ActiveRecord::Schema.define(version: 20161206185054) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -78,6 +78,8 @@ ActiveRecord::Schema.define(version: 20161129220644) do
     t.boolean  "is_calibrated",                            default: false
     t.boolean  "is_selfreview_enabled"
     t.string   "reputation_algorithm",       limit: 255,   default: "Lauw"
+    t.integer  "survey_id",                  limit: 4
+    t.integer  "global_survey_id",           limit: 4
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -164,14 +166,16 @@ ActiveRecord::Schema.define(version: 20161129220644) do
   add_index "controller_actions", ["site_controller_id"], name: "fk_controller_action_site_controller_id", using: :btree
 
   create_table "courses", force: :cascade do |t|
-    t.string   "name",            limit: 255
-    t.integer  "instructor_id",   limit: 4
-    t.string   "directory_path",  limit: 255
-    t.text     "info",            limit: 65535
+    t.string   "name",             limit: 255
+    t.integer  "instructor_id",    limit: 4
+    t.string   "directory_path",   limit: 255
+    t.text     "info",             limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "private",                       default: false, null: false
-    t.integer  "institutions_id", limit: 4
+    t.boolean  "private",                        default: false, null: false
+    t.integer  "institutions_id",  limit: 4
+    t.integer  "survey_id",        limit: 4
+    t.integer  "global_survey_id", limit: 4
   end
 
   add_index "courses", ["instructor_id"], name: "fk_course_users", using: :btree
@@ -525,30 +529,6 @@ ActiveRecord::Schema.define(version: 20161129220644) do
     t.string  "status",            limit: 255
     t.string  "unityID",           limit: 255
     t.string  "signup_preference", limit: 255
-  end
-
-  create_table "survey_deployments", force: :cascade do |t|
-    t.integer  "course_evaluation_id", limit: 4
-    t.datetime "start_date"
-    t.datetime "end_date"
-    t.integer  "num_of_students",      limit: 4
-    t.datetime "last_reminder"
-    t.integer  "course_id",            limit: 4, default: 0, null: false
-  end
-
-  create_table "survey_participants", force: :cascade do |t|
-    t.integer "user_id",              limit: 4
-    t.integer "survey_deployment_id", limit: 4
-  end
-
-  create_table "survey_responses", force: :cascade do |t|
-    t.integer "score",                limit: 4
-    t.text    "comments",             limit: 65535
-    t.integer "assignment_id",        limit: 4,     default: 0, null: false
-    t.integer "question_id",          limit: 4,     default: 0, null: false
-    t.integer "survey_id",            limit: 4,     default: 0, null: false
-    t.string  "email",                limit: 255
-    t.integer "survey_deployment_id", limit: 4
   end
 
   create_table "system_settings", force: :cascade do |t|

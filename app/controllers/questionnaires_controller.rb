@@ -110,9 +110,10 @@ class QuestionnairesController < ApplicationController
   end
 
   # Edit a questionnaire
+  # Project #1680 dssathe
   def edit
-    @questionnaire = Questionnaire.find(params[:id])
-    redirect_to Questionnaire if @questionnaire.nil?
+      @questionnaire = Questionnaire.find(params[:id])
+      redirect_to Questionnaire if @questionnaire.nil?
   end
 
   def update
@@ -234,6 +235,8 @@ class QuestionnairesController < ApplicationController
           flash[:success] = 'All questions has been successfully saved!'
         end
       end
+
+      redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
     rescue
       flash[:error] = $ERROR_INFO
     end
@@ -241,10 +244,9 @@ class QuestionnairesController < ApplicationController
     export if params[:export]
     import if params[:import]
 
-    if params[:view_advice]
-      redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
-    elsif !questionnaire_id.nil?
-      redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+    if params['view_advice']
+      redirect_to controller: 'advice', action: 'edit_advice', id: params[:i]
+
     end
   end
 

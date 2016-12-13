@@ -1,20 +1,22 @@
 module ReviewMappingHelper
   def create_report_table_header(headers = {})
     table_header = "<div class = 'reviewreport'>\
-                    <table width='100% cellspacing='0' cellpadding='2' border='0'>\
+                    <table id='myTable' class='tbl_heat tablesorter' width='100% cellspacing='0' cellpadding='2' border='0'>\
+                    <thead>\
                     <tr bgcolor='#CCCCCC'>"
     headers.each do |header, percentage|
       if percentage
         table_header += "<th width = #{percentage}>\
-                        #{header.humanize}\
+                        #{header.humanize.to_s}\
                         </th>"
       else
         table_header += "<th>\
-                        #{header.humanize}\
+                        #{header.humanize.to_s}\
                         </th>"
       end
     end
-    table_header += "</tr>"
+    table_header += "</tr>\
+                      </thead>"
     table_header.html_safe
   end
 

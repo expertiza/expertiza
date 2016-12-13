@@ -222,15 +222,20 @@ class Response < ActiveRecord::Base
   # is significant enough to notify instructor.
   def significant_difference?
     map_class = self.map.class
-    existing_responses = map_class.get_assessments_for(new_response.map.reviewee)
-    average_score_on_same_artifact_from_others, count = avg_scores_and_count_for_prev_reviews(existing_responses, self)
+    existing_responses = map_class.get_assessments_for(self.map.reviewee)
+    average_score_on_same_artifact_from_others, count = Response.avg_scores_and_count_for_prev_reviews(existing_responses, self)
     return false if count == 0
 
-    score = get_total_score
+    score = get_total_score.to_f / get_maximum_score
+    questionnaire = questionnaire_by_answer(self.scores.first)
+    assignment = self.map.assignment
+
     assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: assignment.id, questionnaire_id: questionnaire.id).first
     allowed_difference_percentage = assignment_questionnaire.notification_limit.to_f
 
-    if (average_score_on_same_artifact_from_others - score).abs > allowed_difference_percentage
+    # the range of average_score_on_same_artifact_from_others and score is [0,1]
+    # the range of allowed_difference_percentage is [0, 100]
+    if (average_score_on_same_artifact_from_others - score).abs * 100 > allowed_difference_percentage
       true
     else
       false
@@ -241,11 +246,41 @@ class Response < ActiveRecord::Base
     scores_assigned = []
     count = 0
     existing_responses.each do |existing_response|
-      if existing_response.id != current_response
+      if existing_response.id != current_response.id
         count += 1
-        scores_assigned << existing_response.get_total_score
+        scores_assigned << existing_response.get_total_score.to_f/existing_response.get_maximum_score
       end
     end
+
     return scores_assigned.sum/scores_assigned.size.to_f, count
+  end
+
+  def notify_instructor_on_difference
+    response_map = self.map
+    reviewer_participant_id = response_map.reviewer_id
+    reviewer_participanat = AssignmentParticipant.find(reviewer_participant_id)
+    reviewer_name = User.find(reviewer_participanat.user_id).fullname
+
+    reviewee_team = AssignmentTeam.find(response_map.reviewee_id)
+    reviewee_participant = reviewee_team.participants.first
+    reviewee_name = User.find(reviewee_participant.user_id).fullname
+
+    assignment = Assignment.find(reviewer_participanat.parent_id)
+
+    Mailer.notify_grade_conflict_message(
+        {:to => assignment.instructor.email,
+         :subject => "Expertiza Notification: A review score is outside the acceptable range",
+         :body => {
+             :reviewer_name => reviewer_name,
+             :type => "review",
+             :reviewee_name => reviewee_name,
+             :new_score => get_total_score.to_f / get_maximum_score,
+             :assignment => assignment,
+             :conflicting_response_url => 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s,  #'https://expertiza.ncsu.edu/response/view?id='
+             :summary_url => 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
+             :assignment_edit_url => 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
+         }
+        }
+    ).deliver_now
   end
 end

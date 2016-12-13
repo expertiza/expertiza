@@ -103,7 +103,7 @@ class ResponseController < ApplicationController
         @response.update_attribute('is_submitted', false)
       end
 
-      if @response.is_submitted && @response.significant_difference?
+      if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
         @response.notify_instructor_on_difference
       end
 
@@ -181,7 +181,7 @@ class ResponseController < ApplicationController
     msg = "Your response was successfully saved."
     error_msg = ""
 
-    if @response.is_submitted && @response.significant_difference?
+    if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
       @response.notify_instructor_on_difference
     end
 

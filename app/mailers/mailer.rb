@@ -74,4 +74,23 @@ class Mailer < ActionMailer::Base
          to: defn[:to],
          bcc: defn[:cc])
   end
+
+  def notify_grade_conflict_message(defn)
+    @body = defn[:body]
+
+    @assignment = @body[:assignment]
+    @reviewer_name = @body[:reviewer_name ]
+    @type = @body[:type]
+    @reviewee_name = @body[:reviewee_name]
+    @new_score = @body[:new_score]
+    @conflicting_response_url = @body[:conflicting_response_url]
+    @summary_url = @body[:summary_url]
+    @assignment_edit_url = @body[:assignment_edit_url]
+
+    if Rails.env.development? || Rails.env.test?
+      defn[:to] = 'expertiza.development@gmail.com'
+    end
+    mail(subject: defn[:subject],
+         to: defn[:to])
+  end
 end

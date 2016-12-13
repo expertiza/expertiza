@@ -47,6 +47,7 @@ class SurveyController < ApplicationController
       #Update the Global Survey Id with the selected Global Survey Id
       @assignment[:global_survey_id] = selected_global_survey_id
       @assignment.update!(@assignment_params)
+      flash[:success] = selected_global_survey_id
     end 
     
     flash[:success] = 'Survey has been successfuly assigned'

@@ -39,11 +39,18 @@ class QuestionnairesController < ApplicationController
   end
 
   def create
+    if params[:questionnaire][:name].empty?
+      flash[:error] = "questionnaire name can not be empty"
+      redirect_to controller: 'questionnaires', action: 'new', model: params[:questionnaire][:type], private: params[:questionnaire][:private]
+      return
+    end
+    
     questionnaire_private = params[:questionnaire][:private] == "true" ? true : false
     display_type = params[:questionnaire][:type].split('Questionnaire')[0]
     if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
       @questionnaire = Object.const_get(params[:questionnaire][:type]).new
     end
+    
     begin
       @questionnaire.private = questionnaire_private
       @questionnaire.name = params[:questionnaire][:name]
@@ -53,6 +60,7 @@ class QuestionnairesController < ApplicationController
       @questionnaire.type = params[:questionnaire][:type]
       # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
       # In the future, we need to write migration files to make them consistency.
+      
       case display_type
       when 'AuthorFeedback'
         display_type = 'Author%Feedback'
@@ -63,9 +71,11 @@ class QuestionnairesController < ApplicationController
       when 'GlobalSurvey'
         display_type = 'Global%Survey'
       end
+      
       @questionnaire.display_type = display_type
       @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
       @questionnaire.save
+
       # Create node
       tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
       parent = FolderNode.find_by_node_object_id(tree_folder.id)
@@ -74,6 +84,7 @@ class QuestionnairesController < ApplicationController
     rescue
       flash[:error] = $ERROR_INFO
     end
+
     redirect_to controller: 'questionnaires', action: 'edit', id: @questionnaire.id
   end
 
@@ -199,6 +210,7 @@ class QuestionnairesController < ApplicationController
     num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
       question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
+      
       if question.is_a? ScoredQuestion
         question.weight = 1
         question.max_label = 'Strongly agree'

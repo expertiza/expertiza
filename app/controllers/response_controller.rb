@@ -120,6 +120,9 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @modified_object = @map.id
+    if (AssignmentTeam.find(@map.reviewee_id).hyperlinks.to_s).include?("docs.google") and @map.assignment.allow_anonymous_commenting
+      flash.now[:note] = "Anonymous commenting is enabled, please switch to incognito mode before opening the Google doc link."
+    end
 
     # set more handy variables for the view
     set_content(true)

@@ -48,13 +48,20 @@ class SubmittedContentController < ApplicationController
 
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
+    @assignment = @participant.assignment
 
     team = @participant.team
     team_hyperlinks = team.hyperlinks
+    submitted_link = params['submission']
+    submitted_link = submitted_link.to_s
     if team_hyperlinks.include?(params['submission'])
       flash[:error] = "You or your teammate(s) have already submitted the same hyperlink."
     else
       begin
+        if submitted_link.include?("docs.google.com")
+          flash[:note] = "Please update the sharing settings of your Google doc to 'Anyone with the link can comment'."
+        end
+
         team.submit_hyperlink(params['submission'])
 
         #create a submission record

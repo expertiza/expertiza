@@ -118,9 +118,24 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @modified_object = @map.id
+    
+     # handy reference to response title for view
+    @title = @map.get_title
 
+    # handy reference to response assignment for ???
+    @assignment = @map.assignment
+
+    # handy reference to the reviewer for ???
+    @participant = @map.reviewer
+
+    # handy reference to the contributor (should always be a Team)
+    @contributor = @map.contributor
+    
+    # type
+    @type = @map.type
+    
     # set more handy variables for the view
-    #set_content(true)
+    set_content(true)
 
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
     render action: 'response'

@@ -136,6 +136,13 @@ function microtaskChanged() {
     </td>
   </tr>
 
+  <tr>
+    <td style='padding:5px' id='assignment_allow_anonymous_commenting'>
+      <input name="assignment_form[assignment][allow_anonymous_commenting]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][allow_anonymous_commenting]', 'true', @assignment_form.assignment.allow_anonymous_commenting) %>
+      <%= label_tag('assignment_form[assignment][allow_anonymous_commenting]', 'Allow anonymous commenting on Google doc submissions?') %>
+    </td>
+  </tr>
 
   <tr>
     <td style='padding:5px' id='assignment_is_calibrated_field'>

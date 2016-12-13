@@ -130,6 +130,7 @@ FactoryGirl.define do
     calculate_penalty false
     late_policy_id nil
     is_penalty_calculated false
+    allow_anonymous_commenting false
     show_teammate_reviews true
     availability_flag true
     use_bookmark false

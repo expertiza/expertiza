@@ -1,4 +1,5 @@
 class StudentReviewController < ApplicationController
+
   def action_allowed?
     ['Instructor',
      'Teaching Assistant',
@@ -8,9 +9,16 @@ class StudentReviewController < ApplicationController
   end
 
   def list
-    @participant = AssignmentParticipant.find(params[:id])
-    return unless current_user_id?(@participant.user_id)
+    if(params[:reviewer_is_team] == "true")
+      @participant = AssignmentTeam.find(params[:id])
+      @participant.set_current_member_id(current_user.id)
+    else
+      @participant = AssignmentParticipant.find(params[:id])
+      return unless current_user_id?(@participant.user_id)
+    end
+    
     @assignment = @participant.assignment
+
     # Find the current phase that the assignment is in.
     @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
     @review_phase = @assignment.get_current_stage(@topic_id)
@@ -18,6 +26,8 @@ class StudentReviewController < ApplicationController
     # to treat all assignments as team assignments
 
     @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
+
+
     # if it is an calibrated assignment, change the response_map order in a certain way
     @review_mappings = @review_mappings.sort_by {|mapping| mapping.id % 5 } if @assignment.is_calibrated == true
     @metareview_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)

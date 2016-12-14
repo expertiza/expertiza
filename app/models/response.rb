@@ -138,6 +138,7 @@ class Response < ActiveRecord::Base
     defn[:body][:partial_name] = partial
     response_map = ResponseMap.find map_id
 
+    # Emails may not work with team reviewer
     reviewer_participant_id = response_map.reviewer_id
     participant = Participant.find(reviewer_participant_id)
     assignment = Assignment.find(participant.parent_id)

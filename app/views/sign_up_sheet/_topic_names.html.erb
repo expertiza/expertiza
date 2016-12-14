@@ -12,7 +12,6 @@
     <% if topic.description.to_s.length>90 %>
         <%= topic.description.to_s[0..90]+'...'%>
         <a style="cursor: pointer" onclick="show_alert('<%= topic.description%>')">more</a>
-        </td>
     <% else %>
         <%= topic.description.to_s%>
     <% end %>

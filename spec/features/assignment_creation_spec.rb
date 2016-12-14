@@ -531,6 +531,69 @@ describe "assignment function" do
       )
     end
 
+    ## selects duty
+    it "selects duty based option" do
+      login_as("instructor6")
+      visit "/assignments/#{@assignment_id}/edit"
+      find_link('ReviewStrategy').click
+      select "Auto-Selected", from: 'assignment_form_assignment_review_assignment_strategy'
+      fill_in 'assignment_form_assignment_review_topic_threshold', with: 3
+      fill_in 'assignment_form_assignment_max_reviews_per_submission', with: 10
+      check("duty_based")
+      click_button 'Save'
+      assignment = Assignment.where(name: 'public assignment for test').first
+      expect(assignment).to have_attributes(
+                                review_assignment_strategy: 'Auto-Selected',
+                                review_topic_threshold: 3,
+                                max_reviews_per_submission: 10,
+                                duty_based: true
+                            )
+    end
+
+    ## allow duty share
+    it "selects allow duty share option" do
+      login_as("instructor6")
+      visit "/assignments/#{@assignment_id}/edit"
+      find_link('ReviewStrategy').click
+      select "Auto-Selected", from: 'assignment_form_assignment_review_assignment_strategy'
+      fill_in 'assignment_form_assignment_review_topic_threshold', with: 3
+      fill_in 'assignment_form_assignment_max_reviews_per_submission', with: 10
+      check("duty_based")
+      check("allow_duty_share")
+      click_button 'Save'
+      assignment = Assignment.where(name: 'public assignment for test').first
+      expect(assignment).to have_attributes(
+                                review_assignment_strategy: 'Auto-Selected',
+                                review_topic_threshold: 3,
+                                max_reviews_per_submission: 10,
+                                duty_based: true,
+                                allow_duty_share: true
+                            )
+    end
+
+    ## sets duty names
+    it "sets  duty " do
+      login_as("instructor6")
+      visit "/assignments/#{@assignment_id}/edit"
+      find_link('ReviewStrategy').click
+      select "Auto-Selected", from: 'assignment_form_assignment_review_assignment_strategy'
+      fill_in 'assignment_form_assignment_review_topic_threshold', with: 3
+      fill_in 'assignment_form_assignment_max_reviews_per_submission', with: 10
+      check("duty_based")
+      check("allow_duty_share")
+      fill_in "assignment_form_assignment_duty_names", with: "developer, tester, analyst, writer, systest"
+      click_button 'Save'
+      assignment = Assignment.where(name: 'public assignment for test').first
+      expect(assignment).to have_attributes(
+                                review_assignment_strategy: 'Auto-Selected',
+                                review_topic_threshold: 3,
+                                max_reviews_per_submission: 10,
+                                duty_based: true,
+                                allow_duty_share: true,
+                                duty_names: "developer, tester, analyst, writer, systest"
+                            )
+    end
+
     # instructor assign reviews will happen only one time, so the data will not be store in DB.
     it "sets number of reviews by each student" do
       pending('review section not yet completed')

@@ -6,8 +6,8 @@ module ImportTopicsHelper
     attributes["topic_identifier"] = columns[0].strip
     attributes["topic_name"] = columns[1].strip
     attributes["max_choosers"] = columns[2].strip
-    attributes["category"] = columns[3].strip if columns.length > 3
-    if(columns.length>5)
+    if columns.length > 5
+      attributes["category"] = columns[3].strip
       attributes["description"] = columns[4].strip
       attributes["link"] = columns[5].strip
     end

@@ -277,7 +277,7 @@ class ResponseController < ApplicationController
 
     # set a handy reference to the response questionnaire's questions
     # sorted in a special way for the view
-    @questions = sort_questions(@questionnaire.questions)
+    #@questions = sort_questions(@questionnaire.questions)
 
     # set a handy refence to the min/max question  for the view
     @min = @questionnaire.min_question_score

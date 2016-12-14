@@ -78,8 +78,6 @@ class ResponseController < ApplicationController
   end
 
   # Update the response and answers when student "edit" existing response
-  # E1600
-  # Added if - else condition for 'SelfReviewResponseMap'
   def update
     return unless action_allowed?
 
@@ -99,12 +97,16 @@ class ResponseController < ApplicationController
       end
 
       if (params['isSubmit'] && (params['isSubmit'].eql?'Yes'))
-
         # Update the submission flag.
         @response.update_attribute('is_submitted', true)
       else
         @response.update_attribute('is_submitted', false)
       end
+
+      if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
+        @response.notify_instructor_on_difference
+      end
+
     rescue
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
@@ -177,10 +179,13 @@ class ResponseController < ApplicationController
        create_answers(params, questions)
     end
 
-    #@map.save
-
     msg = "Your response was successfully saved."
     error_msg = ""
+
+    if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
+      @response.notify_instructor_on_difference
+    end
+
     @response.email
     redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
   end
@@ -192,9 +197,7 @@ class ResponseController < ApplicationController
     @map.save
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
-
-  # E1600
-  # Added if - else for 'SelfReviewResponseMap' for proper redirection
+  
   def redirection
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
@@ -262,8 +265,6 @@ class ResponseController < ApplicationController
     @max = @questionnaire.max_question_score
   end
 
-  # E1600
-  # Added 'SelfReviewResponseMap' to when condition
   def set_questionnaire_for_new_response
     case @map.type
     when "ReviewResponseMap", "SelfReviewResponseMap"

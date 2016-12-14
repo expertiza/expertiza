@@ -217,7 +217,7 @@ FactoryGirl.define do
   end
 
   factory :assignment_due_date, class: AssignmentDueDate do
-    due_at "2015-12-30 23:30:12"
+    due_at DateTime.now.in_time_zone + 1.day
     deadline_type { DeadlineType.first || association(:deadline_type) }
     assignment { Assignment.first || association(:assignment) }
     submission_allowed_id 3
@@ -234,7 +234,7 @@ FactoryGirl.define do
     type 'AssignmentDueDate'
   end
   factory :topic_due_date, class: TopicDueDate do
-    due_at "2015-12-30 23:30:12"
+    due_at DateTime.now.in_time_zone + 1.day
     deadline_type { DeadlineType.first || association(:deadline_type) }
     topic { SignUpTopic.first || association(:topic) }
     submission_allowed_id 3

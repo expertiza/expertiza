@@ -19,7 +19,6 @@ describe 'calibration' do
 
   # Test Assignment Creation Functionality
   describe 'Create Assignment' do
-
     # Test creating an assignment with calibration
     describe 'With Calibration' do
       # An assignment created with calibration turned on
@@ -150,7 +149,7 @@ describe 'calibration' do
       @assignment = create :assignment, is_calibrated: true, instructor: @instructor, course: nil
 
       # Create an assignment due date
-      create :assignment_due_date, due_at: (DateTime.now + 1)
+      create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day)
 
       # Create a team linked to the calibrated assignment
       @team = create :assignment_team, assignment: @assignment
@@ -242,7 +241,7 @@ describe 'calibration' do
     end
 
     # Student should not be able to submit an expert review
-    it 'student should not be able to add an expert review', js: true do
+    it 'student should not be able to add an expert review' do
       # login as student
       login_as @student.name
 
@@ -284,7 +283,7 @@ describe 'calibration' do
     click_on("Review strategy")
     # set review limit from 0 to 1
     fill_in 'assignment_form[assignment][review_topic_threshold]', with: '1'
-   
+
     click_on("Due dates")
     within('#review_round_1') do
       select 'Yes', from: "assignment_form[due_date][][submission_allowed_id]"
@@ -318,10 +317,10 @@ describe 'calibration' do
       @assignment = create :assignment, is_calibrated: true, instructor: @instructor, course: nil
 
       # Create an assignment due date
-      create :assignment_due_date, due_at: (DateTime.now - 1)
+      create :assignment_due_date, due_at: (DateTime.now.in_time_zone - 1.day)
 
       @review_deadline_type = create(:deadline_type, name: "review")
-      create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+      create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day), deadline_type: @review_deadline_type
 
       # Create a team linked to the calibrated assignment
       @team = create :assignment_team, assignment: @assignment
@@ -352,7 +351,7 @@ describe 'calibration' do
 
     # creates a questionnaire, assigns it to the assignment, fills out the questionaire,
     # displays the questionaire response, checks to make sure the score is there
-    xit 'create a questionnaire, fill it out, display results', js: true do
+    xit 'create a questionnaire, fill it out, display results' do
       create_fill_questionnaire
       # REVIEW: should be submitted at this point. click on view to make sure you can see it
       # click_link "View"
@@ -364,7 +363,7 @@ describe 'calibration' do
       expect(page).to have_content('5')
 
       # login as student2066
-      user = User.find_by_name('student2066')
+      user = User.find_by(name: 'student2066')
       stub_current_user(user, user.role.name, user.role)
 
       # go to the assignment page and request a review
@@ -404,9 +403,9 @@ describe 'calibration' do
       @assignment = create :assignment, is_calibrated: true, instructor: @instructor, course: nil
 
       # Create an assignment due date
-      create :assignment_due_date, due_at: (DateTime.now - 1)
+      create :assignment_due_date, due_at: (DateTime.now.in_time_zone - 1.day)
       @review_deadline_type = create(:deadline_type, name: "review")
-      create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+      create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day), deadline_type: @review_deadline_type
       # Create a team linked to the calibrated assignment
       @team = create :assignment_team, assignment: @assignment
 
@@ -458,7 +457,7 @@ describe 'calibration' do
     end
 
     # Verify submitters can submit artifacts
-    it 'can review artifacts', js: true do
+    it 'can review artifacts' do
       # Log in as student
       login_as @student.name
 
@@ -474,7 +473,7 @@ describe 'calibration' do
       # Be able to start a review
       expect(page).to have_link 'Begin'
     end
-    it 'can not review artifacts if not a assigned a review', js: true do
+    it 'can not review artifacts if not a assigned a review' do
       # Log in as a student who hasn't been assigned a artifact to review
       login_as @nonreviewer.name
 

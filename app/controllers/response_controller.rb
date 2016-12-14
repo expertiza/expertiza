@@ -33,8 +33,6 @@ class ResponseController < ApplicationController
       else
         return current_user_id?(response.map.reviewer.user_id) 
       end
-    else
-      current_user
     end
   end
 
@@ -219,7 +217,7 @@ class ResponseController < ApplicationController
     elsif params[:return] == "selfreview"
       redirect_to controller: 'submitted_content', action: 'edit', id: @map.response_map.reviewer_id
     else
-      redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
+      redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id, reviewer_is_team: @map.map.reviewer_is_team
 
     end
   end

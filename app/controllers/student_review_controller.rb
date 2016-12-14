@@ -9,9 +9,9 @@ class StudentReviewController < ApplicationController
   end
 
   def list
-    if(params[:reviewer_is_team])
+    if(params[:reviewer_is_team] == "true")
       @participant = AssignmentTeam.find(params[:id])
-      @participant.set_current_member_id(@current_user_id)
+      @participant.set_current_member_id(current_user.id)
     else
       @participant = AssignmentParticipant.find(params[:id])
       return unless current_user_id?(@participant.user_id)

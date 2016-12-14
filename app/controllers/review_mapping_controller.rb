@@ -125,7 +125,7 @@ class ReviewMappingController < ApplicationController
     #   flash[:error] = (e.nil?) ? $! : e
     # end
 
-    redirect_to controller: 'student_review', action: 'list', id: participant.id, reviewer_id: reviewer.id, reviewer_is_team: assignment.reviewer_is_team
+    redirect_to controller: 'student_review', action: 'list', id: reviewer.id, reviewer_is_team: assignment.reviewer_is_team
   end
 
   # assigns the quiz dynamically to the participant

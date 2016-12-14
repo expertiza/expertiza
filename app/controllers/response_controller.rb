@@ -3,25 +3,35 @@ class ResponseController < ApplicationController
   helper :file
 
   def action_allowed?
+
+    if( params[:action] != 'edit' && params[:action] != 'delete' && params[:action] != 'view' && params[:action] != 'update')
+      return current_user
+    end
+
+    response = Response.find(params[:id])
+    reviewer = response.map.reviewer
+    if(response.map.reviewer_is_team)
+      if(reviewer.includes?(AssignmentParticipant.find_by_user_id_and_assignment_id(current_user.id, reviewer.parent_id)))
+          reviewer.set_current_member_id(current_user.id)
+      end
+    end
+
     case params[:action]
     when 'edit' # If response has been submitted, no further editing allowed
-      response = Response.find(params[:id])
       return false if response.is_submitted
-      return current_user_id?(response.map.reviewer.user_id)
+      return current_user_id?(reviewer.user_id)
       # Deny access to anyone except reviewer & author's team
     when 'delete', 'update'
-      response = Response.find(params[:id])
-      return current_user_id?(response.map.reviewer.user_id)
+      return current_user_id?(reviewer.user_id)
     when 'view'
-      response = Response.find(params[:id])
       map = response.map
-      assignment = response.map.reviewer.assignment
+      assignment = reviewer.assignment
       # if it is a review response map, all the members of reviewee team should be able to view the reponse (can be done from heat map)
       if map.is_a? ReviewResponseMap
         reviewee_team = AssignmentTeam.find(map.reviewee_id)
-        return current_user_id?(response.map.reviewer.user_id) || reviewee_team.has_user(current_user) || current_user.role.name == 'Administrator' || (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) || (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
+        return current_user_id?(reviewer.user_id) || reviewee_team.has_user(current_user) || current_user.role.name == 'Administrator' || (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) || (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
       else
-        return current_user_id?(response.map.reviewer.user_id)
+        return current_user_id?(response.map.reviewer.user_id) 
       end
     else
       current_user
@@ -121,7 +131,6 @@ class ResponseController < ApplicationController
 
     # set more handy variables for the view
     set_content(true)
-
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
     render action: 'response'
   end

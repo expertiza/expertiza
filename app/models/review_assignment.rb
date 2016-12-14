@@ -140,7 +140,6 @@ module ReviewAssignment
         contributor_set = contributor_set.reject {|contributor| contributor.topic == topic_id }
       end
     end
-
     contributor_set
   end
 

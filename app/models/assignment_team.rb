@@ -4,8 +4,15 @@ class AssignmentTeam < Team
   has_many :review_response_maps, foreign_key: :reviewee_id
   has_many :responses, through: :review_response_maps, foreign_key: :map_id
   has_many :reviews, class_name: 'ResponseMap', as: :reviewer, dependent: :destroy
-
   # START of contributor methods, shared with AssignmentParticipant
+
+  def user_id
+    @current_member_id
+  end
+
+  def set_current_member_id(id)
+    @current_member_id = id
+  end
 
   # Whether this team includes a given participant or not
   def includes?(participant)
@@ -213,7 +220,7 @@ class AssignmentTeam < Team
     nil
   end
 
-  
+
   # return the team given the participant
   def self.team(participant)
     return nil if participant.nil?
@@ -259,6 +266,26 @@ class AssignmentTeam < Team
 
   def received_any_peer_review?
     !ResponseMap.where(reviewee_id: self.id, reviewed_object_id: self.parent_id).empty?
+  end
+
+
+  def files(directory)
+    files_list = Dir[directory + "/*"]
+    files = []
+
+    files_list.each do |file|
+      if File.directory?(file)
+        dir_files = files(file)
+        dir_files.each {|f| files << f }
+      end
+      files << file
+    end
+    files
+  end
+
+  def review_file_path(response_map_id)
+    response_map = ResponseMap.find(response_map_id)
+    self.assignment.path + "/" + self.directory_num.to_s + "_review" + "/" + response_map_id.to_s
   end
 
   require File.dirname(__FILE__) + '/analytic/assignment_team_analytic'

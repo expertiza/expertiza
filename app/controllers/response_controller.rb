@@ -138,8 +138,9 @@ class ResponseController < ApplicationController
     @assignment = Assignment.find(assignment_id)
     survey_id = @assignment.survey_id
     @questionnaire = Questionnaire.find(survey_id)
+    @questions = Questions.where(questionnaire_id= @questionnaire.id)
     
-    @questions = sort_questions(@questionnaire.questions)
+    #@questions = sort_questions(@questionnaire.questions)
     
     # set more handy variables for the view
     set_content(true)

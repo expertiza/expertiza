@@ -12,9 +12,13 @@
     <% if topic.description.to_s.length>90 %>
         <%= topic.description.to_s[0..90]+'...'%>
         <a style="cursor: pointer" onclick="show_alert('<%= topic.description%>')">more</a>
+        </td>
     <% else %>
         <%= topic.description.to_s%>
     <% end %>
+    <% if topic.link != nil then %>
+        <%= link_to image_tag('external-link-16.png', :border => 0, :align => 'middle'), topic.link, :target=>'_blank' %>
+    <% end%>
 <% end %>
 <!--if 'Has teams' is not checked, the UI should not show the team name on the topic list.-->
 

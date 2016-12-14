@@ -39,7 +39,9 @@ jQuery(document).ready(function() {
           <% else %>
             <%= topic.description.to_s%>
           <% end %>
-        <%= link_to image_tag('external-link-16.png', :border => 0, :align => 'middle'), topic.link, :target=>'_blank' %>
+          <% if topic.link != nil then %>
+              <%= link_to image_tag('external-link-16.png', :border => 0, :align => 'middle'), topic.link, :target=>'_blank' %>
+          <% end%>
         <% end %>
     <% end %>
 

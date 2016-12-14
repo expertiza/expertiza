@@ -50,7 +50,7 @@ class Badge
 
 		#--------------------------------- Decide on consistant badge ---------------------------------#
 
-		if consistency_flag
+		if (not student_task_list.empty?) and consistency_flag
 			badge_matrix[-1][3] = CONSISTENCY_BADGE_IMAGE.html_safe
 			
 		end	
@@ -96,15 +96,19 @@ class Badge
 # -------------------------------------------- Good reviewer badge method(s)--------------------------------------------- #
 
 	def self.good_reviewer(participant)
-		if participant.try(:grade_for_reviewer).nil? or participant.try(:comment_for_reviewer).nil?
-		      info = -1
-		else
-		      info = participant.try(:grade_for_reviewer)
-		end
+		begin
+			if participant.try(:grade_for_reviewer).nil? or participant.try(:comment_for_reviewer).nil?
+			      info = -1
+			else
+			      info = participant.try(:grade_for_reviewer)
+			end
 
-		if info >= GOOD_REVIEW_THRESHOLD
-			return GOOD_REVIEWER_BADGE_IMAGE.html_safe
-		else
+			if info >= GOOD_REVIEW_THRESHOLD
+				return GOOD_REVIEWER_BADGE_IMAGE.html_safe
+			else
+				return false
+			end
+		rescue
 			return false
 		end
 	end
@@ -136,16 +140,21 @@ class Badge
 	end
 
 	def self.is_toppper(scores, participant)
-		averages = Badge.calculate_average_vector(scores)
-	    teams = Badge.get_teams(scores)
-	    
-	    max_average_index = averages.each_with_index.max[1]
+		begin	
+			averages = Badge.calculate_average_vector(scores)
+		    teams = Badge.get_teams(scores)
+		    
+		    max_average_index = averages.each_with_index.max[1]
 
-	    if teams[max_average_index].participants.include?(participant)
-			return TOPPER_BADGE_IMAGE.html_safe
-	 	else
-	 		return false
-	 	end
+		    if teams[max_average_index].participants.include?(participant)
+				return TOPPER_BADGE_IMAGE.html_safe
+		 	else
+		 		return false
+		 	end
+		 rescue
+		 	return false
+		 end
+
 	end
 
 	def self.retrieve_questions(questionnaires, assignment)
@@ -237,25 +246,30 @@ end
 
 # -------------------------------------------- Consistency badge method(s)--------------------------------------------- #
   def self.consistency(student_task)
-  	assignment = student_task.assignment
-	questions = {}
-    questionnaires = assignment.questionnaires
+  	begin
+	  	assignment = student_task.assignment
+		questions = {}
+	    questionnaires = assignment.questionnaires
 
-    if assignment.varying_rubrics_by_round?
-      questions = Badge.retrieve_questions(questionnaires, assignment)
-    else # if this assignment does not have "varying rubric by rounds" feature
-      questionnaires.each do |questionnaire|
-        questions[questionnaire.symbol] = questionnaire.questions
-      end
-    end
+	    if assignment.varying_rubrics_by_round?
+	      questions = Badge.retrieve_questions(questionnaires, assignment)
+	    else # if this assignment does not have "varying rubric by rounds" feature
+	      questionnaires.each do |questionnaire|
+	        questions[questionnaire.symbol] = questionnaire.questions
+	      end
+	    end
 
-    participant = student_task.participant
-    scores = participant.scores(questions)
-    if scores[:review][:scores][:avg].to_i >= CONSISTENCY_THRESHOLD
-    	return true
-    else
-    	return false	
-  	end
+	    participant = student_task.participant
+	    scores = participant.scores(questions)
+	    if scores[:review][:scores][:avg].to_i >= CONSISTENCY_THRESHOLD
+	    	return true
+	    else
+	    	return false	
+	  	end
+	rescue
+		return false
+	end
+
   end
 
   

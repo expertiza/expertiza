@@ -119,29 +119,6 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @modified_object = @map.id
     
-     # handy reference to response title for view
-    @title = @map.get_title
-
-    # handy reference to response assignment for ???
-    @assignment = @map.assignment
-
-    # handy reference to the reviewer for ???
-    @participant = @map.reviewer
-
-    # handy reference to the contributor (should always be a Team)
-    @contributor = @map.contributor
-    
-    # type
-    @type = @map.type
-    
-    assignment_id = @map.reviewed_object_id
-    @assignment = Assignment.find(assignment_id)
-    survey_id = @assignment.survey_id
-    @questionnaire = Questionnaire.find(survey_id)
-    @questions = Question.where(questionnaire_id= @questionnaire.id)
-    
-    #@questions = sort_questions(@questionnaire.questions)
-    
     # set more handy variables for the view
     set_content(true)
 
@@ -294,6 +271,23 @@ class ResponseController < ApplicationController
       @questionnaire = @map.questionnaire(@current_round)
     when "MetareviewResponseMap", "TeammateReviewResponseMap", "FeedbackResponseMap"
       @questionnaire = @map.questionnaire
+    when "SurveyResponseMap"
+      # handy reference to response title for view
+      @assignment = @map.assignment
+      
+      # handy reference to the reviewer for ???
+      @participant = @map.reviewer
+
+      # handy reference to the contributor (should always be a Team)
+      @contributor = @map.contributor
+    
+      # type
+      @type = @map.type
+    
+      assignment_id = @map.reviewed_object_id
+      @assignment = Assignment.find(assignment_id)
+      survey_id = @assignment.survey_id
+      @questionnaire = Questionnaire.find(survey_id)
     end
   end
 

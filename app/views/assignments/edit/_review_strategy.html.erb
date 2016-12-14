@@ -66,5 +66,23 @@
       <%= label_tag('assignment_form[assignment][is_selfreview_enabled]', 'Allow self reviews?') %>
     </td>
   </tr>
+  <tr>
+    <td style='padding:5px' id='assignment_is_duty_based'>
+      <%= check_box_tag('duty_based', 'true', @assignment_form.assignment.duty_based, {:onChange => 'dutyBasedStrategy()'}) %>
+      <%= label_tag('duty_based', 'Duty based?') %>
+    </td>
+  </tr>
+  <tr>
+    <td style='padding:5px' id='assignment_duty_is_shared' <%= 'hidden' if !@assignment_form.assignment.duty_based %>>
+      <%= check_box_tag('allow_duty_share', 'true', @assignment_form.assignment.allow_duty_share) %>
+      <%= label_tag('allow_duty_share', 'Allow duty shared?') %>
+    </td>
+  </tr>
+  <tr>
+    <td style='padding:5px' id='assignment_duties' <%= 'hidden' if !@assignment_form.assignment.duty_based %>>
+      <%= label_tag('assignment_form[assignment][duty_names]', 'Duty names:') %>
+      <%= text_field_tag('assignment_form[assignment][duty_names]', @assignment_form.assignment.duty_names, {:style => 'width:800px'}) %>
+    </td>
+  </tr>
 
 </table>

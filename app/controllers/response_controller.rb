@@ -118,6 +118,7 @@ class ResponseController < ApplicationController
     @next_action = "create"
     @feedback = params[:feedback]
     @map = ResponseMap.find(params[:id])
+    @duty = params[:duty]
     @return = params[:return]
     @modified_object = @map.id
 
@@ -271,7 +272,7 @@ class ResponseController < ApplicationController
       @current_round = @assignment.number_of_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
     when "MetareviewResponseMap", "TeammateReviewResponseMap", "FeedbackResponseMap"
-      @questionnaire = @map.questionnaire
+      @questionnaire = @map.questionnaire(@duty)
     end
   end
 

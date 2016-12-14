@@ -358,9 +358,9 @@
                 addQuestionnaireTableRow(
                         'MetareviewQuestionnaire',
                         null,
-                        <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
-                        <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
-                        <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
+                        <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil,nil).to_json.html_safe %>,
+                        <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil,nil).to_json.html_safe %>,
+                        <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil,nil).to_json.html_safe %>
                 );
             }
 
@@ -404,9 +404,9 @@ function removeOrAddMetareview() {
         addQuestionnaireTableRow(
             'MetareviewQuestionnaire',
             null,
-            <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
-            <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
-            <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
+            <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil, nil).to_json.html_safe %>,
+            <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil, nil).to_json.html_safe %>,
+            <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil, nil).to_json.html_safe %>
         );
     }
     <%@metareview_allowed_checkbox=true%>

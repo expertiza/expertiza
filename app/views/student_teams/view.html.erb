@@ -20,9 +20,13 @@
       <th class="head">Full name</th>
       <!--<th class="head">Team-member role (duty)</th>-->
       <th class="head">Email address</th>
+      <% if @student.assignment.duty_based %>
+          <th class="head">Duty</th>
+      <% end %>
       <% if @teammate_review_allowed %>
         <th class="head">Review action</th>
       <% end %>
+
     </tr>
     <!--end member table header-->
 
@@ -31,7 +35,26 @@
         <td><%= member.user.name %></td>
         <td><%= member.user.fullname %></td>
         <td><%= member.user.email %></td>
-
+        <% if @student.assignment.duty_based %>
+            <% if member.user.id == session[:user].id %>
+                <td>
+                  <% sql = "select duty from teams_users where user_id = '#{member.user.id}' and team_id = '#{@student.team.id}'"
+                     m = TeamsUser.find_by_sql(sql)
+                  %>
+                  <% if !m[0].duty %>
+                      <%= link_to "select duty", edit_teams_user_path(TeamsUser.where(["team_id = ? and user_id = ?", @student.team.id, session[:user].id]).pluck(:id)) %>
+                  <% else %>
+                      <%= m[0].duty %>
+                      <%= link_to "Update duty", edit_teams_user_path(TeamsUser.where(["team_id = ? and user_id = ?", @student.team.id, session[:user].id]).pluck(:id)) %>
+                  <% end %>
+                </td>
+            <% else %>
+                <% sql = "select duty from teams_users where user_id = '#{member.user.id}' and team_id = '#{@student.team.id}'"
+                  m = TeamsUser.find_by_sql(sql)
+                %>
+                <td><%= m[0].duty %></td>
+            <% end %>
+        <% end %>
         <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
         <% if @teammate_review_allowed %>
           <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
@@ -43,15 +66,19 @@
             review = map.response.last
             if review.nil? %>
             <td>
-              <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :return => "teammate"} %>
+              <% sql = "select duty from teams_users where user_id = '#{member.user.id}' and team_id = '#{@student.team.id}'"
+                 m = TeamsUser.find_by_sql(sql)
+              %>
+              <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :duty => m[0].duty, :return => "teammate"} %>
             </td>
           <% else %>
             <td>
               <%= link_to "View", {:controller => 'response', :action => 'view', :id => review.id} %>
-              &nbsp;&nbsp;
               <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "teammate"} %>
             </td>
           <% end %>
+            <% else %>
+                <td> </td>
         <% end %>
       <% end %>
     </tr>

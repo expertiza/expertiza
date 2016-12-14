@@ -2,13 +2,32 @@ class TeamsUsersController < ApplicationController
   def action_allowed?
     ['Instructor',
      'Teaching Assistant',
-     'Administrator'].include? current_role_name
+     'Administrator',
+    'Student'].include? current_role_name
+
   end
 
   def auto_complete_for_user_name
     team = Team.find(session[:team_id])
     @users = team.get_possible_team_members(params[:user][:name])
     render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
+  end
+
+  def edit
+
+    @assigned_duties_list = Array.new
+    @teams_user = TeamsUser.find(params[:id])
+    @teams_user.duty = params[:duty] if params[:duty].present?
+    if @teams_user.team.assignment.allow_duty_share
+      @assignment_duties = @teams_user.team.assignment.duty_names.split(',')
+    else
+      @selected_duties = TeamsUser.where(team_id: @teams_user.team_id)
+      @selected_duties.each do |duties|
+        @assigned_duties_list << duties.duty
+      end
+      @assignment_duties = @teams_user.team.assignment.duty_names.split(',') - @assigned_duties_list
+    end
+    @teams_user.save
   end
 
   def list
@@ -62,6 +81,13 @@ class TeamsUsersController < ApplicationController
 
     redirect_to controller: 'teams', action: 'list', id: team.parent_id
   end
+
+
+  def update
+
+  end
+
+
 
   def delete
     @teams_user = TeamsUser.find(params[:id])

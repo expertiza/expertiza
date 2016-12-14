@@ -359,6 +359,8 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+
+
   def stage_deadline(topic_id = nil)
     return 'Unknown' if topic_id.nil? and self.staggered_deadline?
     due_date = find_current_stage(topic_id)

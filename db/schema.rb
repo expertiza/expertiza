@@ -11,6 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+
 ActiveRecord::Schema.define(version: 20161129220644) do
 
   create_table "answers", force: :cascade do |t|
@@ -27,10 +28,11 @@ ActiveRecord::Schema.define(version: 20161129220644) do
     t.integer "assignment_id",        limit: 4
     t.integer "questionnaire_id",     limit: 4
     t.integer "user_id",              limit: 4
-    t.integer "notification_limit",   limit: 4, default: 15,   null: false
-    t.integer "questionnaire_weight", limit: 4, default: 0,    null: false
+    t.integer "notification_limit",   limit: 4,   default: 15,   null: false
+    t.integer "questionnaire_weight", limit: 4,   default: 0,    null: false
     t.integer "used_in_round",        limit: 4
-    t.boolean "dropdown",                       default: true
+    t.boolean "dropdown",                         default: true
+    t.string  "duty_name",            limit: 255
   end
 
   add_index "assignment_questionnaires", ["assignment_id"], name: "fk_aq_assignments_id", using: :btree
@@ -78,6 +80,9 @@ ActiveRecord::Schema.define(version: 20161129220644) do
     t.boolean  "is_calibrated",                            default: false
     t.boolean  "is_selfreview_enabled"
     t.string   "reputation_algorithm",       limit: 255,   default: "Lauw"
+    t.boolean  "duty_based",                               default: false
+    t.boolean  "allow_duty_share",                         default: false
+    t.string   "duty_names",                 limit: 255,   default: ""
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -594,6 +599,7 @@ ActiveRecord::Schema.define(version: 20161129220644) do
   create_table "teams_users", force: :cascade do |t|
     t.integer "team_id", limit: 4
     t.integer "user_id", limit: 4
+    t.string  "duty",    limit: 255
   end
 
   add_index "teams_users", ["team_id"], name: "fk_users_teams", using: :btree

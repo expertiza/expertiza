@@ -11,6 +11,10 @@ class StudentTeamsController < ApplicationController
     @student ||= AssignmentParticipant.find(params[:student_id])
   end
 
+  def duty_based
+    @duty_based = Assignment.find params[:assignment_id]
+  end
+
   attr_writer :student
 
   before_action :team, only: [:edit, :update]

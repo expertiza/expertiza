@@ -486,6 +486,7 @@ Expertiza::Application.routes.draw do
   resources :teams_users do
     collection do
       post :create
+      get :edit
     end
   end
 

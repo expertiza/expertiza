@@ -16,7 +16,6 @@ class TeammateReviewQuestionnaire < Questionnaire
     team = AssignmentTeam.team(participant)
     return nil unless team
 
-    team_id = team.id
     responses = []
     if participant
       maps = ResponseMap.where(reviewee_id: participant, type: "TeammateReviewResponseMap")

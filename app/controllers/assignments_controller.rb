@@ -101,16 +101,11 @@ class AssignmentsController < ApplicationController
         break
       end
     end
-	
-	@assignment_questionnaires.each do |aq|
-      puts aq.type
-        puts aq.used_in_round
-        puts "haha"
+
+    @assignment_questionnaires.each do |aq|
       if aq.type == 'TeammateReviewQuestionnaire' && aq.used_in_round?
-        puts aq.type
-        puts aq.used_in_round
         @teammatereviewvarycheck = 1
-      break
+        break
       end
     end
 	

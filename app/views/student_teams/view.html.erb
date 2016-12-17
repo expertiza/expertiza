@@ -35,7 +35,7 @@
         <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
         <% if @teammate_review_allowed %>
           <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
-
+          
             <% map = TeammateReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', @student.id, member.id]).first
             if map.nil?
               map = TeammateReviewResponseMap.create(:reviewer_id => @student.id, :reviewee_id => member.id, :reviewed_object_id => @student.assignment.id)
@@ -46,11 +46,35 @@
               <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :return => "teammate"} %>
             </td>
           <% else %>
-            <td>
-              <%= link_to "View", {:controller => 'response', :action => 'view', :id => review.id} %>
-              &nbsp;&nbsp;
-              <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "teammate"} %>
-            </td>
+
+                <% array_not_empty = 0 %>
+                <% @sorted_responses = Array.new %>
+                <% @prev = Response.where(:map_id => map.id) %>
+                <% for element in @prev %>
+                    <% array_not_empty = 1 %>
+                    <% @sorted_responses << element %>
+                <% end %>
+                <% @sorted_responses = @sorted_responses.sort_by {|obj| obj.updated_at} # the latest should be at the last%>
+                <% @latest_response = @sorted_responses.last %>
+
+                <%if @latest_response.round.nil?%>
+                  <% last_response_round = AssignmentDueDate.done_in_assignment_round(@student.assignment.id,@latest_response) %>
+                <%else%>
+                  <% last_response_round = @latest_response.round %>
+                <%end%>
+                <% topic_id = SignedUpTeam.topic_id(@student.assignment.id, session[:user].id) %>
+                <% current_round = @student.assignment.number_of_current_round(topic_id) %>
+                <!--TODO: Limit responses by deadline -->
+                <td><%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
+                <% if (last_response_round == current_round)%>
+                  <% if (!@latest_response.is_submitted) %>
+                    <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "teammate"} %>
+                   <%end%>
+                </td>
+                <% else %>
+                  <%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
+                <% end %>
+
           <% end %>
         <% end %>
       <% end %>

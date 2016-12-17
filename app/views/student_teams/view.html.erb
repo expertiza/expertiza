@@ -71,7 +71,7 @@
                    <%end%>
                 </td>
                 <% else %>
-                  <%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
+                  <%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id, :return => "teammate"} %></td>
                 <% end %>
 
           <% end %>

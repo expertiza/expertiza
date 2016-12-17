@@ -64,7 +64,6 @@
                 <%end%>
                 <% topic_id = SignedUpTeam.topic_id(@student.assignment.id, session[:user].id) %>
                 <% current_round = @student.assignment.number_of_current_round(topic_id) %>
-                <!--TODO: Limit responses by deadline -->
                 <td><%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
                 <% if (last_response_round == current_round)%>
                   <% if (!@latest_response.is_submitted) %>

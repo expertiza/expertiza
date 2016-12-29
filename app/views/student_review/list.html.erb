@@ -5,7 +5,7 @@
         <% if @num_reviews_in_progress >= Assignment.max_outstanding_reviews %>
             <br><br>
             <span>Note: You can't have more than 2 outstanding reviews. You must complete one of your outstanding reviews before selecting another.</span>
-        <% elsif @assignment.num_reviews && @num_reviews_total >= @assignment.num_reviews%>
+        <% elsif @assignment.num_reviews && @num_reviews_total > @assignment.num_reviews%>
             <br><br>
             <span>Note: You can't do more than <%=@assignment.num_reviews%> reviews according to assignment policy.</span>
         <%else%>

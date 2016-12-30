@@ -156,6 +156,14 @@ function microtaskChanged() {
   </tr>
 
   <tr>
+    <td style='padding:5px' id='assignment_simicheck_field'>
+      <input name="assignment_form[assignment][simicheck]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][simicheck]', 'true', @assignment_form.assignment.simicheck, {:onchange => 'simicheckChanged()'}) %>
+      <%= label_tag('assignment_form[assignment][simicheck]', 'Simicheck?') %>
+    </td>
+  </tr>
+
+  <tr>
     <td style='padding:5px' id='assignment_reputation_algorithm_field'>
       <!--<input name="assignment_form[assignment][reputation_algorithm]" type="hidden" value="false"/>-->
       <%= label_tag('assignment_form[assignment][reputation_algorithm]', 'Reputation Algorithm?') %>

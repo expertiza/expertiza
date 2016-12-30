@@ -78,6 +78,7 @@ ActiveRecord::Schema.define(version: 20161202220712) do
     t.boolean  "is_calibrated",                            default: false
     t.boolean  "is_selfreview_enabled"
     t.string   "reputation_algorithm",       limit: 255,   default: "Lauw"
+    t.boolean  "simicheck",                                default: false
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -493,6 +494,16 @@ ActiveRecord::Schema.define(version: 20161202220712) do
 
   add_index "signed_up_teams", ["topic_id"], name: "fk_signed_up_users_sign_up_topics", using: :btree
 
+  create_table "simicheck_comparisons", force: :cascade do |t|
+    t.string   "comparison_key", limit: 255
+    t.string   "file_type",      limit: 255
+    t.integer  "assignment_id",  limit: 4
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+  end
+
+  add_index "simicheck_comparisons", ["assignment_id"], name: "fk_rails_2e87b4a9ae", using: :btree
+
   create_table "site_controllers", force: :cascade do |t|
     t.string  "name",          limit: 255, default: "", null: false
     t.integer "permission_id", limit: 4,   default: 0,  null: false
@@ -667,6 +678,7 @@ ActiveRecord::Schema.define(version: 20161202220712) do
   add_foreign_key "resubmission_times", "participants", name: "fk_resubmission_times_participants"
   add_foreign_key "sign_up_topics", "assignments", name: "fk_sign_up_topics_assignments"
   add_foreign_key "signed_up_teams", "sign_up_topics", column: "topic_id", name: "fk_signed_up_users_sign_up_topics"
+  add_foreign_key "simicheck_comparisons", "assignments", on_delete: :cascade
   add_foreign_key "ta_mappings", "courses", name: "fk_ta_mappings_course_id"
   add_foreign_key "ta_mappings", "users", column: "ta_id", name: "fk_ta_mappings_ta_id"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"

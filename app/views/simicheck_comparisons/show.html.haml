@@ -1,0 +1,12 @@
+%p#notice= notice
+
+%p
+  %b Comparison key:
+  = @simicheck_comparison.comparison_key
+%p
+  %b File type:
+  = @simicheck_comparison.file_type
+
+= link_to 'Edit', edit_simicheck_comparison_path(@simicheck_comparison)
+\|
+= link_to 'Back', simicheck_comparisons_path

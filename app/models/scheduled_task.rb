@@ -61,6 +61,9 @@ class ScheduledTask
       if (self.deadline_type == "drop_outstanding_reviews")
         drop_outstanding_reviews
       end
+      if (self.deadline_type == "compare_files_with_simicheck")
+        compare_files_with_simicheck # to all reviewers
+      end
     end
   end
 
@@ -212,9 +215,87 @@ class ScheduledTask
       end
     end
   end
+#method which runs after x hours of assignment submission which creates different simicheck comparisons and submits all files/links to that comparison
+  def compare_files_with_simicheck
+    comparison_file = SimicheckComparison.create_simicheck_comparison(self.assignment_id,"file")
+    comparison_html = comparison_file#SimicheckComparison.create_simicheck_comparison(self.assignment_id,"html")
+    comparison_gdoc = comparison_file#SimicheckComparison.create_simicheck_comparison(self.assignment_id,"gdoc")
+    comparison_github = comparison_file#SimicheckComparison.create_simicheck_comparison(self.assignment_id,"github")
+    assignment = Assignment.find(self.assignment_id)
+    assignment_teams = AssignmentTeam.where(['parent_id = ?', self.assignment_id])
+
+    for assignment_team in assignment_teams
+      if assignment_team.has_submissions?
+        hyperlinks = assignment_team.hyperlinks
+        link_count = 1 #to keep track of the number of hyperlinks submitted
+        for link in hyperlinks
+          if(link.include?('github.com'))
+            user = link.partition('.com/').last.split('/')[0]
+            repo = link.partition('.com/').last.split('/')[1]
+            client = Octokit::Client.new(:login=>'ssn0602',:password=>'a1b2c3d4')
+            path = user + '/' + repo
+            assignment_commits = client.commits_between(path,(DateTime.parse(self.due_at)-45.days).to_date.to_s,(DateTime.parse(self.due_at)).to_date.to_s)
+            l = assignment_commits.length
+            commit_files = Array.new(l)
+            0.upto(l-1).each {  |i|
+              commit_url = assignment_commits[i][:url]
+              commit_json = RestClient.get(commit_url)
+              commit_hash = JSON.parse(commit_json)
+              num_of_files = commit_hash["files"].length
+              f = File.open("/tmp/"+assignment_team.name+"_#{link_count}"+".txt", "a")
+              0.upto(num_of_files -1).each { |j|
+                if (commit_hash["files"][j] != nil)
+                   commited_patch = commit_hash["files"][j]["patch"]
+                   f.write(commited_patch)
+                end
+              }
+              f.close
+            }
+            f = File.open("/tmp/"+assignment_team.name+"_#{link_count}"+".txt", "r")
+            comparison_github.send_file_to_simicheck(f)
+            link_count += 1
+          elsif(link.include?('docs.google.com'))
+            doc_id = link.partition('/d/').last.split('/')[0]
+            doc_url = "https://docs.google.com/document/d/"+doc_id+"/export?format=docx"
+            response = RestClient.get(doc_url)
+            if(response.code == 200)
+              page = response.body
+              f = File.open("/tmp/"+assignment_team.name+"_#{link_count}"+".docx", "wb+")
+              f.write(page)
+              f.close
+              f = File.open("/tmp/"+assignment_team.name+"_#{link_count}"+".docx", "r")
+              comparison_gdoc.send_file_to_simicheck(f)
+              link_count += 1
+              #f.close
+            end
+          else
+            response = RestClient.get(link)
+            if(response.code == 200)
+              page = response.body
+              f = File.open("/tmp/"+assignment_team.name+"_#{link_count}"+".html", "w+")
+              f.write(page)
+              f.close
+              f = File.open("/tmp/"+assignment_team.name+"_#{link_count}"+".html", "r")
+              comparison_html.send_file_to_simicheck(f)
+              link_count += 1
+              #f.close
+            end
+          end
+        end
+      end
+      if assignment_team.directory_num
+        files = assignment_team.files(assignment_team.path)
+        for path in files
+            f = File.open(path, "r")
+            comparison_file.send_file_to_simicheck(f)
+            #f.close
+        end
+      end
+      end
+  end
 
   def drop_outstanding_reviews
-    reviews = ResponseMap.where(reviewed_object_id: self.assignment_id)
+    reviews = ResponseMap.where(reviewed_object_id: self.assignment_id )
     for review in reviews
       review_has_began = Response.where(map_id: review.id)
       if review_has_began.size.zero?

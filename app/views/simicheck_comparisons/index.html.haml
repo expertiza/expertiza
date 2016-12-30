@@ -1,0 +1,23 @@
+%h1 Listing simicheck_comparisons
+
+%table
+  %thead
+    %tr
+      %th Comparison key
+      %th File type
+      %th
+      %th
+      %th
+
+  %tbody
+    - @simicheck_comparisons.each do |simicheck_comparison|
+      %tr
+        %td= simicheck_comparison.comparison_key
+        %td= simicheck_comparison.file_type
+        %td= link_to 'Show', simicheck_comparison
+        %td= link_to 'Edit', edit_simicheck_comparison_path(simicheck_comparison)
+        %td= link_to 'Destroy', simicheck_comparison, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Simicheck comparison', new_simicheck_comparison_path

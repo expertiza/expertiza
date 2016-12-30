@@ -1,0 +1,16 @@
+= form_for @simicheck_comparison do |f|
+  - if @simicheck_comparison.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@simicheck_comparison.errors.count, "error")} prohibited this simicheck_comparison from being saved:"
+      %ul
+        - @simicheck_comparison.errors.full_messages.each do |msg|
+          %li= msg
+
+  .field
+    = f.label :comparison_key
+    = f.text_field :comparison_key
+  .field
+    = f.label :file_type
+    = f.text_field :file_type
+  .actions
+    = f.submit 'Save'

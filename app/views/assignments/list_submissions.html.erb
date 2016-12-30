@@ -56,3 +56,23 @@
     <% end %>
   </table>
 </div>
+<br/>
+
+
+<% if @assignment.simicheck %>
+    <h1>Simicheck Results</h1>
+    <% if is_simicheck_result_ready? %>
+        <% @urls.each do |url| %>
+        <h3>All <%= url[0] %></h3>
+        <iframe src="<%= url[1] %>" width="500" height="500">
+          <p>error</p>
+        </iframe>
+
+        <p><a href="<%= url[1] %>"><%= url[1] %> </a></p>
+
+        <% end %>
+    <% else %>
+        <h3>simicheck is still working !</h3>
+    <% end %>
+    <p></p>
+<% end %>

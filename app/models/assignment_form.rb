@@ -39,6 +39,11 @@ class AssignmentForm
     update_assignment_questionnaires(attributes[:assignment_questionnaire])
     update_due_dates(attributes[:due_date], user)
     # delete the old queued items and recreate new ones if the assignment has late policy.
+    #it will add a simicheck job in queue for this assignment
+    #function will be called only if the assignment has enabled the simicheck feature
+    if(@assignment.simicheck)
+      add_simicheck_to_delayed_queue
+    end
     if attributes[:due_date] and !@has_errors and has_late_policy
       delete_from_delayed_queue
       add_to_delayed_queue
@@ -126,6 +131,7 @@ class AssignmentForm
 
       # If the deadline type is review, add a delayed job to drop outstanding review
       if deadline_type == "review"
+        puts 'Sucess!!'
         dj = DelayedJob.enqueue(ScheduledTask.new(@assignment.id, "drop_outstanding_reviews", due_date.due_at.to_s(:db)),
                                 1, mi.minutes.from_now)
         change_item_type(dj.id)
@@ -135,6 +141,34 @@ class AssignmentForm
       dj = DelayedJob.enqueue(ScheduledTask.new(@assignment.id, "drop_one_member_topics", due_date.due_at.to_s(:db)),
                               1, mi.minutes.from_now)
       change_item_type(dj.id)
+    end
+  end
+
+
+  def add_simicheck_to_delayed_queue
+    delete_from_delayed_queue
+    duedates = AssignmentDueDate.where(parent_id: @assignment.id)
+    duedates.each do |due_date|
+      deadline_type = DeadlineType.find(due_date.deadline_type_id).name
+      due_at = due_date.due_at.to_s(:db)
+      Time.parse(due_at)
+      due_at = Time.parse(due_at)
+      mi = find_min_from_now(due_at)
+      diff = mi - due_date.threshold * 60
+      #need to remove following 2 lines
+      diff = 1
+      mi = 1
+      next unless diff > 0
+      #first check if the same task is already enqueued
+      #next if ScheduledTask.find(@assignment.id, "compare_files_with_simicheck", due_date.due_at.to_s(:db))
+
+      # If the deadline type is submission, add a delayed job to create a simicheck comparison
+      if deadline_type == "submission"
+        dj = DelayedJob.enqueue(ScheduledTask.new(@assignment.id, "compare_files_with_simicheck", due_date.due_at.to_s(:db)),
+                                1, mi.minutes.from_now)
+        change_item_type(dj.id)
+      end
+
     end
   end
 

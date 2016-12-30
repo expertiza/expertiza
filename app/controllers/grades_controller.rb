@@ -88,6 +88,7 @@ class GradesController < ApplicationController
     @summary = sum.summary
     @avg_scores_by_round = sum.avg_scores_by_round
     @avg_scores_by_criterion = sum.avg_scores_by_criterion
+    view_team()
   end
 
   def view_team

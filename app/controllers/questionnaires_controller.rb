@@ -54,14 +54,14 @@ class QuestionnairesController < ApplicationController
       # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
       # In the future, we need to write migration files to make them consistency.
       case display_type
-      when 'AuthorFeedback'
-        display_type = 'Author%Feedback'
-      when 'CourseEvaluation'
-        display_type = 'Course%Evaluation'
-      when 'TeammateReview'
-        display_type = 'Teammate%Review'
-      when 'GlobalSurvey'
-        display_type = 'Global%Survey'
+        when 'AuthorFeedback'
+          display_type = 'Author%Feedback'
+        when 'CourseEvaluation'
+          display_type = 'Course%Evaluation'
+        when 'TeammateReview'
+          display_type = 'Teammate%Review'
+        when 'GlobalSurvey'
+          display_type = 'Global%Survey'
       end
       @questionnaire.display_type = display_type
       @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
@@ -229,7 +229,7 @@ class QuestionnairesController < ApplicationController
           v.each_pair do |key, value|
             @question.send(key + '=', value) if @question.send(key) != value
           end
-          
+
           @question.save
           flash[:success] = 'All questions has been successfully saved!'
         end
@@ -489,7 +489,7 @@ class QuestionnairesController < ApplicationController
           unless question.update_attributes(params[:question][question_key])
             Rails.logger.info(question.errors.messages.inspect)
           end
-          end
+        end
 
       end
     end
@@ -562,6 +562,8 @@ class QuestionnairesController < ApplicationController
     send_data csv_data,
               type: 'text/csv; charset=iso-8859-1; header=present',
               disposition: "attachment; filename=questionnaires.csv"
+    @@event_logger.warn "&questionnaires_controller|export|#{session[:user].role_id}| #{session[:user].id}|export questionnaire |#{params[:id]}"
+
   end
 
   def import
@@ -570,6 +572,8 @@ class QuestionnairesController < ApplicationController
     file = params['csv']
 
     @questionnaire.questions << QuestionnaireHelper.get_questions_from_csv(@questionnaire, file)
+    @@event_logger.warn "&questionnaires_controller|import|#{session[:user].role_id}| #{session[:user].id}|import questionnaire |#{params[:id]}"
+
   end
 
   # clones the contents of a questionnaire, including the questions and associated advice
@@ -592,7 +596,7 @@ class QuestionnairesController < ApplicationController
           new_advice = advice.dup
           new_advice.question_id = new_question.id
           new_advice.save!
-          end
+        end
       end
 
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)

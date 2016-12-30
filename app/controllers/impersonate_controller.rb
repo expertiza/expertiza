@@ -17,6 +17,7 @@ class ImpersonateController < ApplicationController
   end
 
   def impersonate
+    @@event_logger.warn "&impersonate_controller|impersonate|#{session[:user].role_id}|#{session[:user].id}|Impersonating "
     # default error message
     if params[:user] && params[:user][:name]
       message = "No user exists with the name '#{params[:user][:name]}'."

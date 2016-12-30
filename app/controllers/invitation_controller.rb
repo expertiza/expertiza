@@ -8,6 +8,7 @@ class InvitationController < ApplicationController
   end
 
   def create
+
     user = User.find_by_name(params[:user][:name].strip)
     team = AssignmentTeam.find(params[:team_id])
     student = AssignmentParticipant.find(params[:student_id])
@@ -37,6 +38,8 @@ class InvitationController < ApplicationController
             @invitation.assignment_id = student.parent_id
             @invitation.reply_status = 'W'
             @invitation.save
+
+            @@event_logger.warn "&invitation_controller|Invite|#{session[:user].role_id}|#{session[:user].id}|Invitation Created"
           else
             flash[:note] = "You have already sent an invitation to \"#{user.name}\"."
           end
@@ -66,6 +69,7 @@ class InvitationController < ApplicationController
   end
 
   def accept
+    @@event_logger.warn "&invitation_controller|Accept|#{session[:user].role_id}|#{session[:user].id}|Invitation Accepted"
     @inv = Invitation.find(params[:inv_id])
 
     student = Participant.find(params[:student_id])
@@ -106,6 +110,7 @@ class InvitationController < ApplicationController
   end
 
   def decline
+    @@event_logger.warn "&invitation_controller|Decline|#{session[:user].role_id}|#{session[:user].id}|Invitation Declined"
     @inv = Invitation.find(params[:inv_id])
     @inv.reply_status = 'D'
     @inv.save

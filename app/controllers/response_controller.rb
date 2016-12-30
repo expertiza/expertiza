@@ -41,6 +41,9 @@ class ResponseController < ApplicationController
   def delete
     @response = Response.find(params[:id])
     # user cannot delete other people's responses. Needs to be authenticated.
+    #E1703
+    @@event_logger.warn "&ResponseController|delete|#{session[:user].role_id}|#{session[:user].id}|Deleted response| Response: #{@response.name}"
+    #E1703
     map_id = @response.map.id
     @response.delete
     redirect_to action: 'redirection', id: map_id, return: params[:return], msg: "The response was deleted."
@@ -55,7 +58,9 @@ class ResponseController < ApplicationController
     @next_action = "update"
     @return = params[:return]
     @response = Response.find(params[:id])
-
+    #E1703
+    @@event_logger.warn "&ResponseController|Edit|#{session[:user].role_id}|#{session[:user].id}|Edit response"
+    #E1703
     @map = @response.map
     @contributor = @map.contributor
     set_all_responses
@@ -83,7 +88,9 @@ class ResponseController < ApplicationController
 
     # the response to be updated
     @response = Response.find(params[:id])
-
+    #E1703
+    @@event_logger.warn "&ResponseController|Update|#{session[:user].role_id}|#{session[:user].id}|Update response"
+    #E1703
     msg = ""
     begin
       @map = @response.map
@@ -131,6 +138,9 @@ class ResponseController < ApplicationController
   def new_feedback
     review = Response.find(params[:id])
     if review
+      #E1703 Change
+      @@event_logger.warn "&ResponseController|new_feedback|#{session[:user].role_id}|#{session[:user].id}|Entering new Feedback"
+      #E1703 Change
       reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id:  review.map.assignment.id).first
       map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id:  reviewer.id).first
       if map.nil?
@@ -141,6 +151,7 @@ class ResponseController < ApplicationController
     else
       redirect_to :back
     end
+
   end
 
   # view response
@@ -191,6 +202,9 @@ class ResponseController < ApplicationController
 
   def saving
     @map = ResponseMap.find(params[:id])
+    #E1703
+    @@event_logger.warn "&ResponseController|saving|#{session[:user].role_id}|#{session[:user].id}|Saving response"
+    #E1703
 
     @return = params[:return]
     @map.save

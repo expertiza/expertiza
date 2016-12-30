@@ -57,6 +57,10 @@ class SubmittedContentController < ApplicationController
       begin
         team.submit_hyperlink(params['submission'])
 
+        #E1703 Change
+        @@event_logger.warn "&submitted_content_controller|submit_hyperlink|#{session[:user].role_id}|#{session[:user].id}|Submit|HyperLink Submitted"
+        #End of Change
+
         #create a submission record
         @submission_record = SubmissionRecord.new(team_id: team.id, content: params['submission'], user: @participant.name, assignment_id: params[:id], operation: "Submit Hyperlink")
         @submission_record.save
@@ -129,6 +133,11 @@ class SubmittedContentController < ApplicationController
     team = participant.team
     @submission_record = SubmissionRecord.new(team_id: team.id, content: full_filename, user: participant.name , assignment_id: assignment.id, operation: "Submit File")
     @submission_record.save
+
+    #E1703 Change
+    @@event_logger.warn "&submitted_content_controller|submit_hyperlink|#{session[:user].role_id}|#{session[:user].id}|Submit|File Submitted"
+    #End of Change
+
 
    # params = ActionController::Parameters.new(a: "123", b: "456")
     # send message to reviewers when submission has been updated

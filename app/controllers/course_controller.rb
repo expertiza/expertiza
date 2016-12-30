@@ -29,6 +29,7 @@ class CourseController < ApplicationController
   # Modify an existing course
   def edit
     @course = Course.find(params[:id])
+
   end
 
   def update
@@ -85,6 +86,7 @@ class CourseController < ApplicationController
     @course.instructor_id = session[:user].id
     begin
       @course.save!
+      @@event_logger.warn "&course_controller|create|#{session[:user].role_id}|#{session[:user].id}|Create Course|Course Name: #{params[:course][:name]} "
       parent_id = CourseNode.get_parent_id
       if parent_id
         CourseNode.create(node_object_id: @course.id, parent_id: parent_id)
@@ -102,6 +104,7 @@ class CourseController < ApplicationController
 
   # delete the course
   def delete
+    @@event_logger.warn "&course_controller|Delete|#{session[:user].role_id}|#{session[:user].id}|Delete Course|Course Name: #{Course.find(params[:id]).name} "
     @course = Course.find(params[:id])
     begin
       FileHelper.delete_directory(@course)
@@ -140,6 +143,8 @@ class CourseController < ApplicationController
   def add_ta
     @course = Course.find(params[:course_id])
     @user = User.find_by_name(params[:user][:name])
+
+
     if @user.nil?
       flash[:error] = "The user inputted \"" + params[:user][:name] + "\" does not exist."
       redirect_to action: 'view_teaching_assistants', id: @course.id
@@ -147,7 +152,7 @@ class CourseController < ApplicationController
       @ta_mapping = TaMapping.create(ta_id: @user.id, course_id: @course.id)
       @user.role = Role.find_by_name 'Teaching Assistant'
       @user.save
-
+      @@event_logger.warn "&course_controller|Add TA|#{session[:user].role_id}|#{session[:user].id}|Add TA|TA Name: #{params[:user][:name]} "
       redirect_to action: 'view_teaching_assistants', id: @course.id
 
       @course = @ta_mapping
@@ -164,6 +169,7 @@ class CourseController < ApplicationController
 
     @course = @ta_mapping
     undo_link("The TA \"#{@ta.name}\" has been successfully removed.")
+    @@event_logger.warn "&course_controller|Remove TA|#{session[:user].role_id}|#{session[:user].id}|Remove TA|TA Name: #{@ta.name} "
 
     redirect_to action: 'view_teaching_assistants', id: @ta_mapping.course
   end

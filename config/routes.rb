@@ -1,5 +1,7 @@
 Expertiza::Application.routes.draw do
 
+  get 'logger/view_logs'
+
   resources :submission_records
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
@@ -539,7 +541,9 @@ Expertiza::Application.routes.draw do
   get 'response/', :to => 'response#saving'
 
   get 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
-  get ':controller/service.wsdl', :action => 'wsdl'
+  post 'logger/search', :controller => "logger", :action => 'search'
+
+ get ':controller/service.wsdl', :action => 'wsdl'
 
   get ':controller(/:action(/:id))(.:format)'
 

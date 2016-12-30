@@ -1,0 +1,102 @@
+<html>
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css"></script>
+</head>
+<body>
+<script>
+  $(document).ready(function() {
+    $('#logger').DataTable({
+      "columns": [
+        { "data": "SL No." },
+        { "data": "Time" },
+        { "data": "Event" },
+        { "data": "Description" },
+        { "data": "User Type" },
+        { "data": "User ID" }
+      ]
+    });
+  } );
+  </script>
+
+<div>
+<div id="leftSearch">
+  <h2><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Logs</h2>
+<%= form_tag(:action => 'search') do %>
+<table>
+  <tr>
+    <td><label>User Type</label></td>
+    <td><%= select_tag('UType', '<option value="All">All</option><option value="2">Instructor</option><option value="Student">Student</option>'.html_safe) %></td>
+    <td><label>User ID</label></td> <td><%= text_field_tag('UserID') %></td>
+
+    <td><label>Event Type</label></td><td><%= select_tag('EType', 
+      '<option value="All">All</option>
+      <option value="Login">Login</option>
+      <option value="Logout">Log Out</option>
+      <option value="create team">create team</option>
+      <option value="delete assignment">delete assignment</option>
+      <option value="Add TA">Add TA</option>
+      <option value="Remove TA">Remove TA</option>
+      <option value="Add TA">Add TA</option>
+      <option value="Invitation Created">Invitation Created</option>
+      <option value="Invitation Accepted">Invitation Accepted</option>
+      <option value="Impersonate a reviewer">Impersonate a reviewer</option>
+      <option value="create assignment">create assignment</option>'.html_safe) %></td>
+    
+  </tr>
+<tr>
+  <br>
+</tr>
+ <tr>
+   <td><label>From Date</label></td> <td><%= datetime_local_field(:time, :from) %></td>
+    <td><label>To Date</label></td> <td><%= datetime_local_field(:time, :to) %></td>
+ </tr>
+ 
+<tr>
+  <td> <%= submit_tag("Search") %></td>
+</tr>
+
+</table>
+<% end %>
+</div>
+<div id ="dataTable" style = "alignment: right" >
+
+<% 
+sl =1 
+%>
+
+<table id="logger" class="table table-striped table-responsive">
+
+  <thead>
+  <tr >
+      <th>SL No.</th>
+      <th>Time</th>
+      <th>Event</th>
+      <th>Description</th>
+      <th>User Type</th>
+      <th>User ID</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @logArray.each do |entry| %>
+    <tr>
+      <td><%= sl %></td>
+      <td><%= entry.time %></td>
+      <td><%= entry.event_type %></td>
+      <td><%= entry.desc %></td>
+      <td><%= entry.user_type %></td>
+      <td><%= entry.userid %></td>
+    </tr>
+
+    <% sl = sl+1 %>
+    <% end %>
+  </tbody>
+  </table>
+</div>
+</div>
+</body>
+</html>
+
+

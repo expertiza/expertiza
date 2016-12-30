@@ -2,7 +2,7 @@ class AssignmentsController < ApplicationController
   include AssignmentHelper
   autocomplete :user, :name
   before_action :authorize
-
+#test
   def action_allowed?
     if params[:action] == 'edit' || params[:action] == 'update'
       assignment = Assignment.find(params[:id])
@@ -24,12 +24,14 @@ class AssignmentsController < ApplicationController
     assignment = Assignment.find(params[:id])
     assignment.private = !assignment.private
     assignment.save
+    @@event_logger.warn "&assignments_controller|save|#{session[:user].role_id}|#{session[:user].id}|save assignment|#{params[:id]}"
     redirect_to list_tree_display_index_path
   end
 
   def new
     @assignment_form = AssignmentForm.new
     @assignment_form.assignment.instructor ||= current_user
+    logger.warn "Assignment form created by #{session[:user_id]}."
   end
 
   def create
@@ -38,6 +40,7 @@ class AssignmentsController < ApplicationController
     if @assignment_form.save
       @assignment_form.create_assignment_node
 
+      @@event_logger.warn "&assignments_controller|create|#{session[:user].role_id}|#{session[:user].id}|create assignment|#{assignment_form_params[:assignment][:name]}"
       redirect_to edit_assignment_path @assignment_form.assignment.id
       undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
     else
@@ -121,6 +124,7 @@ class AssignmentsController < ApplicationController
       @assignment.course_id = params[:course_id]
       if @assignment.save
         flash[:note] = 'The assignment was successfully saved.'
+
         redirect_to list_tree_display_index_path
       else
         flash[:error] = "Failed to save the assignment: #{@assignment.errors.full_messages.join(' ')}"
@@ -215,7 +219,10 @@ class AssignmentsController < ApplicationController
       if id != @assignment_form.assignment.instructor_id
         raise "You are not authorized to delete this assignment."
       else
+        @@event_logger.warn "&assignments_controller|delete|#{session[:user].role_id}|#{session[:user].id}|delete assignment|#{params[:id]}"
+
         @assignment_form.delete(params[:force])
+
         flash[:success] = "The assignment was successfully deleted."
       end
     rescue

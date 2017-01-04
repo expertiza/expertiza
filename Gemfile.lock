@@ -320,6 +320,8 @@ GEM
       rspec-core (~> 3.3.0)
       rspec-expectations (~> 3.3.0)
       rspec-mocks (~> 3.3.0)
+    rspec-collection_matchers (1.1.2)
+      rspec-expectations (>= 2.99.0.beta1)
     rspec-core (3.3.2)
       rspec-support (~> 3.3.0)
     rspec-expectations (3.3.1)
@@ -483,6 +485,7 @@ DEPENDENCIES
   rest-client (~> 1.8)
   rgl
   rjb
+  rspec-collection_matchers
   rspec-rails
   rubocop
   rubyzip

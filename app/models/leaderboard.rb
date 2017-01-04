@@ -1,3 +1,4 @@
+# second change
 # Currently this is a repository for a lot of static class methods.
 # Many of the methods were moved to leaderboard_helper.rb and more
 # probably should be moved.
@@ -11,153 +12,152 @@ class Leaderboard < ActiveRecord::Base
   # with a specific course.
 
   ### This methodreturns unaffiliiated assignments - assignments not affiliated to any course
-  def self.getIndependantAssignments(user_id)
-    assignmentIds = AssignmentParticipant.where(user_id: user_id).pluck(:parent_id)
-    noCourseAssignments = Assignment.where(id: assignmentIds, course_id: nil)
+  def self.get_independant_assignments(user_id)
+    assignment_ids = AssignmentParticipant.where(user_id: user_id).pluck(:parent_id)
+    Assignment.where(id: assignment_ids, course_id: nil)
   end
 
-  def self.getAssignmentsInCourses(courseArray)
-    assignmentList = Assignment.where(course_id: courseArray)
-  end
-
-  # This method gets all tuples in the Participants table associated
-  # hierarchy (qtype => course => user => score)
-
-  def self.getParticipantEntriesInCourses(courseArray, user_id)
-    assignmentList = []
-    assignmentList = getAssignmentsInCourses(courseArray)
-    independantAssignments = getIndependantAssignments(user_id)
-    assignmentList.concat(independantAssignments)
-
-    questionnaireHash = getParticipantsScore(assignmentList)
+  def self.get_assignments_in_courses(course_array)
+    Assignment.where(course_id: course_array)
   end
 
   # This method gets all tuples in the Participants table associated
-  # hierarchy (qtype => course => user => score).
-  def self.getParticipantEntriesInAssignment(assignmentID)
-    assignmentList = []
-    assignmentList << Assignment.find(assignmentID)
-    questionnaireHash = getParticipantEntriesInAssignmentList(assignmentList)
+  # hierarchy (q_type => course => user => score)
+
+  def self.get_part_entries_in_courses(course_array, user_id)
+    # assignment_list = []
+    assignment_list = get_assignments_in_courses(course_array)
+    independant_assignments = get_independant_assignments(user_id)
+    assignment_list.concat(independant_assignments)
+
+    get_participants_score(assignment_list)
+  end
+
+  # This method gets all tuples in the Participants table associated
+  # hierarchy (q_type => course => user => score).
+  def self.get_part_entries_in_assignment(assignment_id)
+    assignment_list = []
+    assignment_list << Assignment.find(assignment_id)
+    get_participant_entries_in_assignment_list(assignment_list)
   end
 
   # This method returns the participants score grouped by course, grouped by questionnaire type.
-  # End result is a hash (qType => (course => (user => score)))
-  def self.getParticipantsScore(assignmentList)
-    qTypeHash = {}
-    questionnaireResponseTypeHash = {"ReviewResponseMap" => "ReviewQuestionnaire",
-                                     "MetareviewResponseMap" => "MetareviewQuestionnaire",
-                                     "FeedbackResponseMap" => "AuthorFeedbackQuestionnaire",
-                                     "TeammateReviewResponseMap" => "TeammateReviewQuestionnaire",
-                                     "BookmarkRatingResponseMap" => "BookmarkRatingQuestionnaire"}
+  # End result is a hash (q_type => (course => (user => score)))
+  def self.get_participants_score(assignment_list)
+    q_type_hash = {}
+    quest_response_type_hash = {"ReviewResponseMap" => "ReviewQuestionnaire", "MetareviewResponseMap" => "MetareviewQuestionnaire", "FeedbackResponseMap" => "AuthorFeedbackQuestionnaire", "TeammateReviewResponseMap" => "TeammateReviewQuestionnaire", "BookmarkRatingResponseMap" => "BookmarkRatingQuestionnaire"}
 
     # Get all participants of the assignment list
-    participantList = AssignmentParticipant.where(parent_id: assignmentList.pluck(:id)).uniq
+    participant_list = AssignmentParticipant.where(parent_id: assignment_list.pluck(:id)).uniq
 
     # Get all teams participated in the given assignment list.
-    teamList = Team.where("parent_id IN (?) AND type = ?", assignmentList.pluck(:id), 'AssignmentTeam').uniq
+    team_list = Team.where("parent_id IN (?) AND type = ?", assignment_list.pluck(:id), 'assignmentTeam').uniq
 
     # Get mapping of participant and team with corresponding assignment.
-    # "participant" => {participantId => {"self" => <ParticipantRecord>, "assignment" => <AssignmentRecord>}}
-    # "team" => {teamId => <AssignmentRecord>}
-    assignmentMap = getAssignmentMapping(assignmentList, participantList, teamList)
+    # "participant" => {participantId => {"self" => <ParticipantRecord>, "assignment" => <assignmentRecord>}}
+    # "team" => {teamId => <assignmentRecord>}
+    assignment_map = get_assignment_mapping(assignment_list, participant_list, team_list)
 
     # Aggregate total reviewee list
-    revieweeList = []
-    revieweeList = participantList.pluck(:id)
-    revieweeList.concat(teamList.pluck(:id)).uniq!
+    # reviewee_list = []
+    reviewee_list = participant_list.pluck(:id)
+    reviewee_list.concat(team_list.pluck(:id)).uniq!
 
     # Get scores from ScoreCache for computed reviewee list.
-    scores = ScoreCache.where("reviewee_id IN (?) and object_type IN (?)", revieweeList, questionnaireResponseTypeHash.keys)
+    scores = ScoreCache.where("reviewee_id IN (?) and object_type IN (?)", reviewee_list, quest_response_type_hash.keys)
 
-    for scoreEntry in scores
-      revieweeUserIdList = []
-      if assignmentMap["team"].key?(scoreEntry.reviewee_id)
+    # for score_entry in scores
+    scores.each do |score_entry|
+      reviewee_user_id_list = []
+      if assignment_map["team"].key?(score_entry.reviewee_id)
         # Reviewee is a team. Actual Reviewee will be users of the team.
-        teamUserIds = TeamsUser.where(team_id: scoreEntry.reviewee_id).pluck(:user_id)
-        revieweeUserIdList.concat(teamUserIds)
-        courseId = assignmentMap["team"][scoreEntry.reviewee_id].try(:course_id).to_i
+        team_user_ids = teams_user.where(team_id: score_entry.reviewee_id).pluck(:user_id)
+        reviewee_user_id_list.concat(team_user_ids)
+        course_id = assignment_map["team"][score_entry.reviewee_id].try(:course_id).to_i
       else
         # Reviewee is an individual participant.
-        revieweeUserIdList << assignmentMap["participant"][scoreEntry.reviewee_id]["self"].try(:user_id)
-        courseId = assignmentMap["participant"][scoreEntry.reviewee_id]["assignment"].try(:course_id).to_i
+        reviewee_user_id_list << assignment_map["participant"][score_entry.reviewee_id]["self"].try(:user_id)
+        course_id = assignment_map["participant"][score_entry.reviewee_id]["assignment"].try(:course_id).to_i
       end
 
-      questionnaireType = questionnaireResponseTypeHash[scoreEntry.object_type]
+      questionnaire_type = quest_response_type_hash[score_entry.object_type]
 
-      addScoreToResultantHash(qTypeHash, questionnaireType, courseId, revieweeUserIdList, scoreEntry.score)
+      add_score_to_resultant_hash(q_type_hash, questionnaire_type, course_id, reviewee_user_id_list, score_entry.score)
     end
 
-    qTypeHash
+    q_type_hash
   end
 
-  # This method adds score to all the revieweeUser in qTypeHash.
-  # Later, qTypeHash will contain the final computer leaderboard.
-  def self.addScoreToResultantHash(qTypeHash, questionnaireType, courseId, revieweeUserIdList, scoreEntryScore)
-    if revieweeUserIdList
-      # Loop over all the revieweeUserId.
-      for revieweeUserId in revieweeUserIdList
-        if qTypeHash.fetch(questionnaireType, {}).fetch(courseId, {}).fetch(revieweeUserId, nil).nil?
-          userHash = {}
-          userHash[revieweeUserId] = [scoreEntryScore, 1]
+  # This method adds score to all the revieweeUser in q_type_hash.
+  # Later, q_type_hash will contain the final computer leaderboard.
+  def self.add_score_to_resultant_hash(q_type_hash, questionnaire_type, course_id, reviewee_user_id_list, score_entry_score)
+    if reviewee_user_id_list
+      # Loop over all the reviewee_user_id.
+      # for reviewee_user_id in reviewee_user_id_list
+      reviewee_user_id_list.each do |reviewee_user_id|
+        if q_type_hash.fetch(questionnaire_type, {}).fetch(course_id, {}).fetch(reviewee_user_id, nil).nil?
+          user_hash = {}
+          user_hash[reviewee_user_id] = [score_entry_score, 1]
 
-          if qTypeHash.fetch(questionnaireType, {}).fetch(courseId, nil).nil?
-            if qTypeHash.fetch(questionnaireType, nil).nil?
-              courseHash = {}
-              courseHash[courseId] = userHash
-
-              qTypeHash[questionnaireType] = courseHash
-            end
-
-            qTypeHash[questionnaireType][courseId] = userHash
+          if q_type_hash.fetch(questionnaire_type, {}).fetch(course_id, nil).nil? && q_type_hash.fetch(questionnaire_type, nil).nil?
+            # if q_type_hash.fetch(questionnaire_type, nil).nil?
+            course_hash = {}
+            course_hash[course_id] = user_hash
+            q_type_hash[questionnaire_type] = course_hash
+            q_type_hash[questionnaire_type][course_id] = user_hash
+          elseif q_type_hash.fetch(questionnaire_type, {}).fetch(course_id, nil).nil? && !q_type_hash.fetch(questionnaire_type, nil).nil?
+            q_type_hash[questionnaire_type][course_id] = user_hash
           end
-
-          qTypeHash[questionnaireType][courseId][revieweeUserId] = [scoreEntryScore, 1]
+          q_type_hash[questionnaire_type][course_id][reviewee_user_id] = [score_entry_score, 1]
         else
-          # RevieweeUserId exist in qTypeHash. Update score.
-          currentUserScore = qTypeHash[questionnaireType][courseId][revieweeUserId]
-          currentTotalScore = currentUserScore[0] * currentUserScore[1]
-          currentUserScore[1] += 1
-          currentUserScore[0] = (currentTotalScore + scoreEntryScore) / currentUserScore[1]
+          # reviewee_user_id exist in q_type_hash. Update score.
+          current_user_score = q_type_hash[questionnaire_type][course_id][reviewee_user_id]
+          current_total_score = current_user_score[0] * current_user_score[1]
+          current_user_score[1] += 1
+          current_user_score[0] = (current_total_score + score_entry_score) / current_user_score[1]
         end
       end
     end
   end
 
   # This method creates a mapping of participant and team with corresponding assignment.
-  # "participant" => {participantId => {"self" => <ParticipantRecord>, "assignment" => <AssignmentRecord>}}
-  # "team" => {teamId => <AssignmentRecord>}
-  def self.getAssignmentMapping(assignmentList, participantList, teamList)
-    resultHash = {"participant" => {}, "team" => {}}
-    assignmentHash = {}
+  # "participant" => {participantId => {"self" => <ParticipantRecord>, "assignment" => <assignmentRecord>}}
+  # "team" => {teamId => <assignmentRecord>}
+  def self.get_assignment_mapping(assignment_list, participant_list, team_list)
+    result_hash = {"participant" => {}, "team" => {}}
+    assignment_hash = {}
     # Hash all the assignments for later fetching them by assignment.id
-    for assignment in assignmentList
-      assignmentHash[assignment.id] = assignment
+    # for assignment in assignment_list
+    assignment_list.each do |assignment|
+      assignment_hash[assignment.id] = assignment
     end
     # Loop over all the participants to get corresponding assignment by parent_id
-    for participant in participantList
-      resultHash["participant"][participant.id] = {}
-      resultHash["participant"][participant.id]["self"] = participant
-      resultHash["participant"][participant.id]["assignment"] = assignmentHash[participant.parent_id]
+    # for participant in participant_list
+    participant_list.each do |participant|
+      result_hash["participant"][participant.id] = {}
+      result_hash["participant"][participant.id]["self"] = participant
+      result_hash["participant"][participant.id]["assignment"] = assignment_hash[participant.parent_id]
     end
     # Loop over all the teams to get corresponding assignment by parent_id
-    for team in teamList
-      resultHash["team"][team.id] = assignmentHash[team.parent_id]
+    # for team in team_list
+    team_list.each do |team|
+      result_hash["team"][team.id] = assignment_hash[team.parent_id]
     end
 
-    resultHash
- end
+    result_hash
+  end
 
   # This method does a destructive sort on the computed scores hash so
   # that it can be mined for personal achievement information
-  def self.sortHash(qTypeHash)
+  def self.sort_hash(q_type_hash)
     result = {}
     # Deep-copy of Hash
-    result = Marshal.load(Marshal.dump(qTypeHash))
+    result = Marshal.load(Marshal.dump(q_type_hash))
 
-    result.each do |qType, courseHash|
-      courseHash.each do |courseId, userScoreHash|
-        userScoreSortArray = userScoreHash.sort {|a, b| b[1][0] <=> a[1][0] }
-        result[qType][courseId] = userScoreSortArray
+    result.each do |q_type, course_hash|
+      course_hash.each do |course_id, user_score_hash|
+        user_score_sort_array = user_score_hash.sort {|a, b| b[1][0] <=> a[1][0] }
+        result[q_type][course_id] = user_score_sort_array
       end
     end
     result
@@ -165,44 +165,44 @@ class Leaderboard < ActiveRecord::Base
 
   # This method takes the sorted computed score hash structure and mines
   # it for personal achievement information.
-  def self.extractPersonalAchievements(csHash, courseIdList, userId)
+  def self.extract_personal_achievements(cs_hash, course_id_list, user_id)
     # Get all the possible accomplishments from Leaderboard table
-    leaderboardRecords = Leaderboard.all
-    courseAccomplishmentHash = {}
-    accomplishmentMap = {}
+    leaderboard_records = Leaderboard.all
+    course_accomplishment_hash = {}
+    accomplishment_map = {}
 
     # Create map of accomplishment with its name
-    for leaderboardRecord in leaderboardRecords
-      accomplishmentMap[leaderboardRecord.qtype] = leaderboardRecord.name
+    # for leaderboard_record in leaderboard_records
+    leaderboard_records.each do |leaderboard_record|
+      accomplishment_map[leaderboard_record.q_type] = leaderboard_record.name
     end
 
-    csSortedHash = Leaderboard.sortHash(csHash)
+    cs_sorted_hash = Leaderboard.sort_hash(cs_hash)
 
-    for courseId in courseIdList
-      for accomplishment in accomplishmentMap.keys
-        # Get score for current questionnaireType/accomplishment, courseId and userId from csHash
-        score = csHash.fetch(accomplishment, {}).fetch(courseId, {}).fetch(userId, nil)
+    # for course_id in course_id_list
+    course_id_list.each do |course_id|
+      # for accomplishment in accomplishment_map.keys
+      accomplishment_map.keys.each do |accomplishment|
+        # Get score for current questionnaire_type/accomplishment, course_id and user_id from cs_hash
+        score = cs_hash.fetch(accomplishment, {}).fetch(course_id, {}).fetch(user_id, nil)
         next unless score
-        if courseAccomplishmentHash[courseId].nil?
-          courseAccomplishmentHash[courseId] = []
+        if course_accomplishment_hash[course_id].nil?
+            course_accomplishment_hash[course_id] = []
         end
         # Calculate rank of current user
-        rank = 1 + csSortedHash[accomplishment][courseId].index([userId, score])
-        total = csSortedHash[accomplishment][courseId].length
-
-        courseAccomplishmentHash[courseId] << {accomp: accomplishmentMap[accomplishment],
-                                               score: score[0],
-                                               rankStr: "#{rank} of #{total}"}
+        rank = 1 + cs_sorted_hash[accomplishment][course_id].index([user_id, score])
+        total = cs_sorted_hash[accomplishment][course_id].length
+        course_accomplishment_hash[course_id] << {accomp: accomplishment_map[accomplishment], score: score[0], rankStr: "#{rank} of #{total}"}
       end
     end
-    courseAccomplishmentHash
+    course_accomplishment_hash
   end
 
   # Returns string for Top N Leaderboard Heading or accomplishments entry
-  def self.leaderboardHeading(qtypeid)
-    ltEntry = Leaderboard.find_by_qtype(qtypeid)
-    if ltEntry
-      ltEntry.name
+  def self.leaderboard_heading(q_type_id)
+    lt_entry = Leaderboard.find_by_qtype(q_type_id)
+    if lt_entry
+      lt_entry.name
     else
       "No Entry"
     end

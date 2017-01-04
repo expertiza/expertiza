@@ -242,3 +242,22 @@ dateFormat.i18n = {
 Date.prototype.format = function (mask, utc) {
   return dateFormat(this, mask, utc);
 };
+
+function show_alert(alertMessage){
+    $("#dialog-message").html(alertMessage);
+    $("#dialog-message").dialog({
+        modal: true,
+        draggable: true,
+        resizable: true,
+        position: ['center', 'center'],
+        show: 'blind',
+        hide: 'blind',
+        width: 400,
+        dialogClass: 'ui-dialog-osx',
+        buttons: {
+            "Ok": function() {
+                $(this).dialog("close");
+            }
+        }
+    });
+}

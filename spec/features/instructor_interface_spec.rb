@@ -15,7 +15,7 @@ describe "Integration tests for instructor interface" do
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
     create(:assignment_due_date)
-    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now + (100 * 24 * 60 * 60))
+    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now.in_time_zone + 1.day)
   end
 
   describe "Instructor login" do
@@ -34,7 +34,7 @@ describe "Integration tests for instructor interface" do
     end
   end
 
-  describe "Create a course", type: :controller do
+  describe "Create a course" do
     it "is able to create a public course or a private course" do
       login_as("instructor6")
       visit '/course/new?private=0'

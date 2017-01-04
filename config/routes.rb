@@ -1,5 +1,6 @@
 Expertiza::Application.routes.draw do
 
+  resources :submission_records
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
 
@@ -31,9 +32,20 @@ Expertiza::Application.routes.draw do
     end
   end
 
+
+
   resources :advice do
     collection do
       post :save_advice
+    end
+  end
+
+  resources :assessment360 do
+    collection do
+      get :one_course_all_assignments
+      get :all_students_all_reviews
+      get :one_student_all_reviews
+      get :one_assignment_all_students
     end
   end
 
@@ -409,6 +421,16 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  # resources :submissionrecord do
+  #   collection do
+  #     get :list
+  #     get :show
+  #     get :neq
+  #     post :create
+  #     post ':id', action: :update
+  #   end
+  # end
+
   resources :submitted_content do
     collection do
       get :download
@@ -480,10 +502,10 @@ Expertiza::Application.routes.draw do
     collection do
       get ':action'
       post 'list'
-      post 'get_children_node_ng'
-      post 'get_children_node_2_ng'
+      post 'children_node_ng'
+      post 'children_node_2_ng'
       post 'bridge_to_is_available'
-      get 'get_session_last_open_tab'
+      get 'session_last_open_tab'
       get 'set_session_last_open_tab'
     end
   end
@@ -506,7 +528,9 @@ Expertiza::Application.routes.draw do
       delete '', action: :destroy_all
     end
   end
-
+  post '/users/request_user_create', controller: :users, action: :request_user_create
+  post '/users/create_approved_user', controller: :users, action: :create_approved_user
+  get 'instructions/home'
   get '/users/show_selection', controller: :users, action: :show_selection
   get '/users/list', controller: :users, action: :list
   get '/menu/*name', controller: :menu_items, action: :link

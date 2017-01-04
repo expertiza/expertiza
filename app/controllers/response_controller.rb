@@ -78,8 +78,6 @@ class ResponseController < ApplicationController
   end
 
   # Update the response and answers when student "edit" existing response
-  # E1600
-  # Added if - else condition for 'SelfReviewResponseMap'
   def update
     return unless action_allowed?
 
@@ -90,41 +88,25 @@ class ResponseController < ApplicationController
     begin
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
-      @questionnaire = if @map.type == "ReviewResponseMap" && @response.round
-                         @map.questionnaire(@response.round)
-                       elsif @map.type == "ReviewResponseMap"
-                         @map.questionnaire(nil)
-                       elsif @map.type == "SelfReviewResponseMap" && @response.round
-                         @map.questionnaire(@response.round)
-                       elsif @map.type == "SelfReviewResponseMap"
-                         @map.questionnaire(nil)
-                       else
-                         @map.questionnaire
-                       end
-      questions = @questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
+      @questionnaire = set_questionnaire
 
       questions = sort_questions(@questionnaire.questions)
-      create_answers(params, questions)
-      questions = @questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
 
       unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
-        params[:responses].each_pair do |k, v|
-          score = Answer.where(response_id: @response.id, question_id:  questions[k.to_i].id).first
-          unless score
-            score = Answer.create(response_id: @response.id, question_id: questions[k.to_i].id, answer: v[:score], comments: v[:comment])
-          end
-          score.update_attribute('answer', v[:score])
-          score.update_attribute('comments', v[:comment])
-        end
+        create_answers(params, questions)
       end
 
       if (params['isSubmit'] && (params['isSubmit'].eql?'Yes'))
-
         # Update the submission flag.
         @response.update_attribute('is_submitted', true)
       else
         @response.update_attribute('is_submitted', false)
       end
+
+      if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
+        @response.notify_instructor_on_difference
+      end
+
     rescue
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
@@ -196,28 +178,25 @@ class ResponseController < ApplicationController
        create_answers(params, questions)
     end
 
-    #@map.save
-
     msg = "Your response was successfully saved."
     error_msg = ""
+
+    if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
+      @response.notify_instructor_on_difference
+    end
+
     @response.email
     redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
   end
 
-  # E1600
-  # Added paramps[:return] value for 'SelfReviewResponseMap' to ensure that this method is invoked from self-review operation
-  # this looks dirty to me. If other map type do not do this, there is no reason that we handle SelfReviewResponseMap here. There should be a elegant way.. --Yang
   def saving
     @map = ResponseMap.find(params[:id])
-    params[:return] = "selfreview" if @map.type == "SelfReviewResponseMap"
 
     @return = params[:return]
     @map.save
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
-
-  # E1600
-  # Added if - else for 'SelfReviewResponseMap' for proper redirection
+  
   def redirection
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
@@ -285,8 +264,6 @@ class ResponseController < ApplicationController
     @max = @questionnaire.max_question_score
   end
 
-  # E1600
-  # Added 'SelfReviewResponseMap' to when condition
   def set_questionnaire_for_new_response
     case @map.type
     when "ReviewResponseMap", "SelfReviewResponseMap"

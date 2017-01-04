@@ -182,7 +182,7 @@ FactoryGirl.define do
     preference_priority_number nil
   end
 
-  factory :participant, class: Participant do
+  factory :participant, class: AssignmentParticipant do
     can_submit true
     can_review true
     assignment { Assignment.first || association(:assignment) }
@@ -199,8 +199,25 @@ FactoryGirl.define do
     can_take_quiz true
   end
 
+  factory :course_participant, class: CourseParticipant do
+    can_submit true
+    can_review true
+    course { Course.first || association(:course) }
+    association :user, factory: :student
+    submitted_at nil
+    permission_granted nil
+    penalty_accumulated 0
+    grade nil
+    type "CourseParticipant"
+    handle "handle"
+    time_stamp nil
+    digital_signature nil
+    duty nil
+    can_take_quiz true
+  end
+
   factory :assignment_due_date, class: AssignmentDueDate do
-    due_at "2015-12-30 23:30:12"
+    due_at DateTime.now.in_time_zone + 1.day
     deadline_type { DeadlineType.first || association(:deadline_type) }
     assignment { Assignment.first || association(:assignment) }
     submission_allowed_id 3
@@ -216,9 +233,8 @@ FactoryGirl.define do
     teammate_review_allowed_id 3
     type 'AssignmentDueDate'
   end
-
   factory :topic_due_date, class: TopicDueDate do
-    due_at "2015-12-30 23:30:12"
+    due_at DateTime.now.in_time_zone + 1.day
     deadline_type { DeadlineType.first || association(:deadline_type) }
     topic { SignUpTopic.first || association(:topic) }
     submission_allowed_id 3
@@ -330,63 +346,10 @@ FactoryGirl.define do
   end
 
   factory :response, class: Response do
-    review_response_map { ReviewResponseMap.first || association(:review_response_map) }
+    response_map { ReviewResponseMap.first || association(:review_response_map) }
     additional_comment nil
     version_num nil
-    round nil
+    round 1
     is_submitted false
-  end
-# factory for an assignment without course
-    factory :assignment_without_course, class: Assignment do
-    sequence(:name, 2) {|n| n = 2; "final#{n}" }
-    directory_path "final_test"
-    submitter_count 0
-    course nil
-    instructor { User.first || association(:instructor) }
-    private false
-    num_reviews 1
-    num_review_of_reviews 1
-    num_review_of_reviewers 1
-    reviews_visible_to_all false
-    num_reviewers 1
-    spec_location "https://expertiza.ncsu.edu/"
-    max_team_size 3
-    staggered_deadline false
-    allow_suggestions false
-    review_assignment_strategy "Auto-Selected"
-    max_reviews_per_submission 2
-    review_topic_threshold 0
-    copy_flag false
-    rounds_of_reviews 1
-    microtask false
-    require_quiz false
-    num_quiz_questions 0
-    is_coding_assignment false
-    is_intelligent false
-    calculate_penalty false
-    late_policy_id nil
-    is_penalty_calculated false
-    show_teammate_reviews true
-    availability_flag true
-    use_bookmark false
-    can_review_same_topic true
-    can_choose_topic_to_review true
-  end
-# factory for an assignment without course team
-  factory :assignment_without_course_team, class: AssignmentTeam do
-    sequence(:name) {|n| "team#{n}" }
-    assignment { Assignment.first || association(:assignment_without_course) }
-    type 'AssignmentTeam'
-    comments_for_advertisement nil
-    advertise_for_partner nil
-    submitted_hyperlinks "---
-- https://www.expertiza.ncsu.edu"
-    directory_num 0
-  end
-# factory for an assignment without course node
-  factory :assignment_without_course_node, class: AssignmentNode do
-    assignment { Assignment.first || association(:assignment_without_course) }
-    node_object_id 1
-    type "AssignmentNode"
   end
 end

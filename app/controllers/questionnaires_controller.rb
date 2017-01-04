@@ -219,30 +219,31 @@ class QuestionnairesController < ApplicationController
 
   # Zhewei: This method is used to save all questions in current questionnaire.
   def save_all_questions
-    questionnaire_id = params[:id] unless params[:id].nil?
-    if params['save']
-      params[:question].each_pair do |k, v|
-        @question = Question.find(k)
-        # example of 'v' value
-        # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
-        v.each_pair do |key, value|
-          @question.send(key + '=', value) if @question.send(key) != value
-        end
-        begin
+    questionnaire_id = params[:id]
+    begin
+      if params[:save]
+        params[:question].each_pair do |k, v|
+          @question = Question.find(k)
+          # example of 'v' value
+          # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
+          v.each_pair do |key, value|
+            @question.send(key + '=', value) if @question.send(key) != value
+          end
+          
           @question.save
           flash[:success] = 'All questions has been successfully saved!'
-        rescue
-          flash[:error] = $ERROR_INFO
         end
       end
+    rescue
+      flash[:error] = $ERROR_INFO
     end
 
-    export if params['export']
-    import if params['import']
+    export if params[:export]
+    import if params[:import]
 
-    if params['view_advice']
+    if params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
-    else
+    elsif !questionnaire_id.nil?
       redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
     end
   end
@@ -372,48 +373,31 @@ class QuestionnairesController < ApplicationController
     valid = "valid"
 
     (1..num_quiz_questions).each do |i|
-      if params[:new_question][i.to_s] == ''
-        # One of the questions text is not filled out
-        valid = "Please make sure all questions have text"
+      
+      if params[:questionnaire][:name] == ""
+        # questionnaire name is not specified
+        valid = "Please specify quiz name (please do not use your name or id)."
         break
       elsif !params.key?(:question_type) || !params[:question_type].key?(i.to_s) || params[:question_type][i.to_s][:type].nil?
         # A type isnt selected for a question
         valid = "Please select a type for each question"
         break
-      elsif params[:questionnaire][:name] == ""
-        # questionnaire name is not specified
-        valid = "Please specify quiz name (please do not use your name or id)."
-        break
       else
+        @new_question = Object.const_get(params[:question_type][i.to_s][:type]).create(txt: '', type: params[:question_type][i.to_s][:type], break_before: true)
+        @new_question.update_attributes(txt: params[:new_question][i.to_s])
         type = params[:question_type][i.to_s][:type]
-        if type == 'MultipleChoiceCheckbox' or type == 'MultipleChoiceRadio'
-          correct_selected = false
-          (1..4).each do |x|
-            if params[:new_choices][i.to_s][type][x.to_s][:txt] == ''
-              # Text isnt provided for an option
-              valid = "Please make sure every question has text for all options"
-              break
-            elsif type == 'MultipleChoiceRadio' and !params[:new_choices][i.to_s][type][x.to_s][:iscorrect].nil?
-              correct_selected = true
-            elsif type == 'MultipleChoiceCheckbox' and params[:new_choices][i.to_s][type][x.to_s][:iscorrect] != 0.to_s
-              correct_selected = true
-            end
-          end
-          if valid == "valid" && !correct_selected
-            # A correct option isnt selected for a check box or radio question
-            valid = "Please select a correct answer for all questions"
-            break
-          end
-        elsif type == 'TF' # TF is not disabled. We need to test TF later.
-          if params[:new_choices][i.to_s]["TF"].nil?
-            # A correct option isnt selected for a true/false question
-            valid = "Please select a correct answer for all questions"
+        choice_info = params[:new_choices][i.to_s][type]    #choice info for one question of its type 
+        if choice_info == nil
+          valid = "Please select a correct answer for all questions"
+          break
+        else
+          valid = @new_question.isvalid(choice_info)
+          if(valid != "valid")
             break
           end
         end
       end
     end
-
     valid
   end
 

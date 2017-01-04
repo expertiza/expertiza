@@ -3,6 +3,7 @@ class GradesController < ApplicationController
   helper :submitted_content
   helper :penalty
   include PenaltyHelper
+  include StudentTaskHelper
 
   def action_allowed?
     case params[:action]
@@ -11,7 +12,7 @@ class GradesController < ApplicationController
          'Teaching Assistant',
          'Administrator',
          'Super-Administrator',
-         'Student'].include? current_role_name and are_needed_authorizations_present?
+         'Student'].include? current_role_name and are_needed_authorizations_present? and check_self_review_status
     when 'view_team'
         if ['Student'].include? current_role_name # students can only see the head map for their own team
           participant = AssignmentParticipant.find(params[:id])
@@ -160,33 +161,6 @@ class GradesController < ApplicationController
 
   def open
     send_file(params['fname'], disposition: 'inline')
-  end
-
-  # Formulate the Email content when there is a grading conflict
-  def send_grading_conflict_email
-    email_form = params[:mailer]
-    assignment = Assignment.find(email_form[:assignment])
-    recipient = User.where(["email = ?", email_form[:recipients]]).first
-
-    body_text = email_form[:body_text]
-    body_text["##[recipient_name]"] = recipient.fullname
-    body_text["##[recipients_grade]"] = email_form[recipient.fullname + "_grade"] + "%"
-    body_text["##[assignment_name]"] = assignment.name
-
-    Mailer.sync_message(
-      recipients: email_form[:recipients],
-       subject: email_form[:subject],
-       from: email_form[:from],
-       body: {
-         body_text: body_text,
-           partial_name: "grading_conflict"
-       }
-    ).deliver
-
-    flash[:notice] = "Your email to " + email_form[:recipients] + " has been sent. If you would like to send an email to another student please do so now, otherwise, click Back"
-    redirect_to action: 'conflict_email_form',
-                assignment: email_form[:assignment],
-                author: email_form[:author]
   end
 
   # This method is used from edit methods
@@ -376,6 +350,16 @@ class GradesController < ApplicationController
     @participant = Participant.find(params[:id])
     authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
     if authorization == 'reader' || authorization == 'reviewer'
+      return false
+    else
+      return true
+    end
+  end
+
+  def check_self_review_status
+    participant = Participant.find(params[:id])
+    assignment = participant.try(:assignment)
+    if assignment.try(:is_selfreview_enabled) and unsubmitted_self_review?(participant.try(:id))
       return false
     else
       return true

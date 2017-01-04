@@ -1,35 +1,47 @@
 class Criterion < ScoredQuestion
-  validates_presence_of :size
+  include ActionView::Helpers
+  validates :size, presence: true
 
   # This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
   def edit(_count)
-    html = '<tr>'
-    html += '<td align="center"><a rel="nofollow" data-method="delete" href="/questions/' + self.id.to_s + '">Remove</a></td>'
-    html += '<td><input size="6" value="' + self.seq.to_s + '" name="question[' + self.id.to_s + '][seq]" id="question_' + self.id.to_s + '_seq" type="text"></td>'
-    html += '<td><textarea cols="50" rows="1" name="question[' + self.id.to_s + '][txt]" id="question_' + self.id.to_s + '_txt" placeholder="Edit question content here">' + self.txt + '</textarea></td>'
-    html += '<td><input size="10" disabled="disabled" value="' + self.type + '" name="question[' + self.id.to_s + '][type]" id="question_' + self.id.to_s + '_type" type="text">''</td>'
-    html += '<td><input size="2" value="' + self.weight.to_s + '" name="question[' + self.id.to_s + '][weight]" id="question_' + self.id.to_s + '_weight" type="text">''</td>'
-    html += '<td>text area size <input size="3" value="' + self.size.to_s + '" name="question[' + self.id.to_s + '][size]" id="question_' + self.id.to_s + '_size" type="text"></td>'
-    html += '<td> max_label <input size="10" value="' + self.max_label.to_s + '" name="question[' + self.id.to_s + '][max_label]" id="question_' + self.id.to_s + '_max_label" type="text">  min_label <input size="12" value="' + self.min_label.to_s + '" name="question[' + self.id.to_s + '][min_label]" id="question_' + self.id.to_s + '_min_label" type="text"></td>'
-    html += '</tr>'
+    html = '<td align="center"><a rel="nofollow" data-method="delete" href="/questions/' + self.id.to_s + '">Remove</a></td>'
 
-    html.html_safe
+    html += '<td><input size="6" value="' + self.seq.to_s + '" name="question[' + self.id.to_s + '][seq]"'
+    html += ' id="question_' + self.id.to_s + '_seq" type="text"></td>'
+
+    html += '<td><textarea cols="50" rows="1" name="question[' + self.id.to_s + '][txt]"'
+    html += ' id="question_' + self.id.to_s + '_txt" placeholder="Edit question content here">' + self.txt + '</textarea></td>'
+
+    html += '<td><input size="10" disabled="disabled" value="' + self.type + '" name="question[' + self.id.to_s + '][type]"'
+    html += ' id="question_' + self.id.to_s + '_type" type="text"></td>'
+
+    html += '<td><input size="2" value="' + self.weight.to_s
+    html += '" name="question[' + self.id.to_s + '][weight]" id="question_' + self.id.to_s + '_weight" type="text"></td>'
+
+    html += '<td>text area size <input size="3" value="' + self.size.to_s
+    html += '" name="question[' + self.id.to_s + '][size]" id="question_' + self.id.to_s + '_size" type="text"></td>'
+
+    html += '<td> max_label <input size="10" value="' + self.max_label.to_s + '" name="question[' + self.id.to_s
+    html += '][max_label]" id="question_' + self.id.to_s + '_max_label" type="text">  min_label <input size="12" value="' + self.min_label.to_s
+    html += '" name="question[' + self.id.to_s + '][min_label]" id="question_' + self.id.to_s + '_min_label" type="text"></td>'
+
+    safe_join(["<tr>".html_safe, "</tr>".html_safe], html.html_safe)
   end
 
   # This method returns what to display if an instructor (etc.) is viewing a questionnaire
   def view_question_text
-    html = '<TR><TD align="left"> ' + self.txt + ' </TD>'
+    html = '<TD align="left"> ' + self.txt + ' </TD>'
     html += '<TD align="left">' + self.type + '</TD>'
     html += '<td align="center">' + self.weight.to_s + '</TD>'
     questionnaire = self.questionnaire
     if !self.max_label.nil? && !self.min_label.nil?
-      html += '<TD align="center"> (' + self.min_label + ') ' + questionnaire.min_question_score.to_s + ' to ' + questionnaire.max_question_score.to_s + ' (' + self.max_label + ')</TD>'
+      html += '<TD align="center"> (' + self.min_label + ') ' + questionnaire.min_question_score.to_s
+      html += ' to ' + questionnaire.max_question_score.to_s + ' (' + self.max_label + ')</TD>'
     else
       html += '<TD align="center">' + questionnaire.min_question_score.to_s + ' to ' + questionnaire.max_question_score.to_s + '</TD>'
     end
 
-    html += '</TR>'
-    html.html_safe
+    safe_join(["<TR>".html_safe, "</TR>".html_safe], html.html_safe)
   end
 
   def complete(count, answer = nil, questionnaire_min, questionnaire_max, dropdown_or_scale)
@@ -92,27 +104,25 @@ class Criterion < ScoredQuestion
 
     if dropdown_or_scale == 'dropdown'
       html += '<div><select id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]">'
-      html += '<option value=''>--</option>'
-      for j in questionnaire_min..questionnaire_max
+      html += "<option value = ''>--</option>"
+      (questionnaire_min..questionnaire_max).each do |j|
         html += if !answer.nil? and j == answer.answer
                   '<option value=' + j.to_s + ' selected="selected">'
                 else
                   '<option value=' + j.to_s + '>'
                 end
+
+        html += j.to_s
         if j == questionnaire_min
-          html += j.to_s
           html += "-" + self.min_label if self.min_label && !self.min_label.empty?
-          html += "</option>"
         elsif j == questionnaire_max
-          html += j.to_s
           html += "-" + self.max_label if self.max_label && !self.max_label.empty?
-          html += "</option>"
-        else
-          html += j.to_s + "</option>"
         end
+        html += "</option>"
       end
       html += "</select></div>"
-      html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments" name="responses[' + count.to_s + '][comment]" style="overflow:hidden;">'
+      html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments"' \
+       ' name="responses[' + count.to_s + '][comment]" style="overflow:hidden;">'
       html += answer.comments unless answer.nil?
       html += '</textarea></td></br><br/>'
     elsif dropdown_or_scale == 'scale'
@@ -122,7 +132,7 @@ class Criterion < ScoredQuestion
 
       html += '<table>'
       html += '<tr><td width="10%"></td>'
-      for j in questionnaire_min..questionnaire_max
+      (questionnaire_min..questionnaire_max).each do |j|
         html += '<td width="10%"><label>' + j.to_s + '</label></td>'
       end
       html += '<td width="10%"></td></tr><tr>'
@@ -132,7 +142,7 @@ class Criterion < ScoredQuestion
               else
                 '<td width="10%"></td>'
               end
-      for j in questionnaire_min..questionnaire_max
+      (questionnaire_min..questionnaire_max).each do |j|
         html += '<td width="10%"><input type="radio" id="' + j.to_s + '" value="' + j.to_s + '" name="Radio_' + self.id.to_s + '"'
         html += 'checked="checked"' if (!answer.nil? and answer.answer == j) or (answer.nil? and questionnaire_min == j)
         html += '></td>'
@@ -149,12 +159,13 @@ class Criterion < ScoredQuestion
               end
 
       html += '<td width="10%"></td></tr></table>'
-      html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments" name="responses[' + count.to_s + '][comment]" style="overflow:hidden;">'
+      html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments"' \
+        ' name="responses[' + count.to_s + '][comment]" style="overflow:hidden;">'
       html += answer.comments unless answer.nil?
       html += '</textarea><br/><br/>'
 
     end
-    html.html_safe
+    safe_join(["".html_safe, "".html_safe], html.html_safe)
   end
 
   # This method returns what to display if a student is viewing a filled-out questionnaire
@@ -182,7 +193,8 @@ class Criterion < ScoredQuestion
     html += '<table cellpadding="5">'
     html += '<tr>'
     html += '<td>'
-    html += '<div class="' + score_color + '" style="width:30px; height:30px; border-radius:50%; font-size:15px; color:black; line-height:30px; text-align:center;">'
+    html += '<div class="' + score_color + '" style="width:30px; height:30px;' \
+      ' border-radius:50%; font-size:15px; color:black; line-height:30px; text-align:center;">'
     html += score
     html += '</div>'
     html += '</td>'
@@ -192,6 +204,6 @@ class Criterion < ScoredQuestion
       html += '</td>'
     end
     html += '</tr></table>'
-    html.html_safe
+    safe_join(["".html_safe, "".html_safe], html.html_safe)
   end
 end

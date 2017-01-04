@@ -6,6 +6,7 @@ class Response < ActiveRecord::Base
   
   belongs_to :response_map, class_name: 'ResponseMap', foreign_key: 'map_id'
   has_many :scores, class_name: 'Answer', foreign_key: 'response_id', dependent: :destroy
+  # TODO: change metareview_response_map relationship to belongs_to
   has_many :metareview_response_maps, class_name: 'MetareviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy
 
   alias map response_map
@@ -27,9 +28,7 @@ class Response < ActiveRecord::Base
     # The following three lines print out the type of rubric before displaying
     # feedback.  Currently this is only done if the rubric is Author Feedback.
     # It doesn't seem necessary to print out the rubric type in the case of
-    # a ReviewResponseMap.  Also, I'm not sure if that would have to be
-    # TeamResponseMap for a team assignment.  Someone who understands the
-    # situation better could add to the code later.
+    # a ReviewResponseMap. 
     if self.map.type.to_s == 'FeedbackResponseMap'
       identifier += "<h3>Feedback from author</h3>"
     end
@@ -132,131 +131,28 @@ class Response < ActiveRecord::Base
     total_weight * questionnaire.max_question_score
   end
 
-  # Returns the total score from this response
-  def get_alternative_total_score
-    # TODO: The method get_total_score() above does not seem correct.  Replace with this method.
-    total_score = 0
-
-    self.scores.each {|score| total_score += score.score }
-
-    total_score
-  end
-
-  # Function which considers a given assignment
-  # and checks if a given review is still valid for score calculation
-  # The basic rule is that
-  # "A review is INVALID if there was new submission for the assignment
-  #  before the most recent review deadline AND THE review happened before that
-  #  submission"
-  # response - the response whose validity is being checked
-  # resubmission_times - submission times of the assignment is descending order
-  # latest_review_phase_start_time
-  # The function returns true if a review is valid for score calculation
-  # and false otherwise
-  def is_valid_for_score_calculation?(resubmission_times, latest_review_phase_start_time)
-    is_valid = true
-
-    # if there was not submission then the response is valid
-    if resubmission_times.nil? || latest_review_phase_start_time.nil?
-      return is_valid
-    end
-
-    resubmission_times.each do |resubmission_time|
-      # if the response is after a resubmission that is
-      # before the latest_review_phase_start_time (check second condition below)
-      # then we are good - the response is valid and we can break
-      break if self.updated_at > resubmission_time.resubmitted_at
-
-      # this means there was a re-submission before the
-      # latest_review_phase_start_time and we dont have a response after that
-      # so the response is invalid
-      if resubmission_time.resubmitted_at < latest_review_phase_start_time
-        is_valid = false
-        break
-      end
-    end
-
-    is_valid
-  end
-
   # only two types of responses more should be added
   def email(partial = "new_submission")
     defn = {}
     defn[:body] = {}
     defn[:body][:partial_name] = partial
     response_map = ResponseMap.find map_id
-    assignment = nil
 
     reviewer_participant_id = response_map.reviewer_id
     participant = Participant.find(reviewer_participant_id)
     assignment = Assignment.find(participant.parent_id)
 
-    if response_map.type == "ReviewResponseMap"
-
-    end
-
     defn[:subject] = "A new submission is available for " + assignment.name
-    if response_map.type == "ReviewResponseMap"
-      defn[:body][:type] = "Author Feedback"
-      AssignmentTeam.find(response_map.reviewee_id).users.each do |user|
-        defn[:body][:obj_name] = if assignment.has_topics?
-                                   SignUpTopic.find(SignedUpTeam.topic_id(assignment.id, user.id)).topic_name
-                                 else
-                                   assignment.name
-                                 end
-        defn[:body][:first_name] = User.find(user.id).fullname
-        defn[:to] = User.find(user.id).email
-        Mailer.sync_message(defn).deliver_now
-      end
-    end
-    if response_map.type == "MetareviewResponseMap"
-      defn[:body][:type] = "Metareview"
-      reviewee_user = Participant.find(response_map.reviewee_id)
-      signup_topic_id = SignedUpTeam.topic_id(assignment.id, response_map.contributor.teams_users.first.user_id)
 
-      defn[:body][:obj_name] = SignUpTopic.find(signup_topic_id).topic_name
-      defn[:body][:first_name] = User.find(reviewee_user.user_id).fullname
-      defn[:to] = User.find(reviewee_user.user_id).email
-      Mailer.sync_message(defn).deliver
-    end
-    if response_map.type == "FeedbackResponseMap" # This is authors' feedback from UI
-      defn[:body][:type] = "Review Feedback"
-      # reviewee is a response, reviewer is a participant
-      # we need to track back to find the original reviewer on whose work the author comments
-      response_id_for_original_feedback = response_map.reviewed_object_id
-      response_for_original_feedback = Response.find response_id_for_original_feedback
-      response_map_for_original_feedback = ResponseMap.find response_for_original_feedback.map_id
-      original_reviewer_participant_id = response_map_for_original_feedback.reviewer_id
+    response_map.email(defn,participant,assignment)
 
-      participant = AssignmentParticipant.find(original_reviewer_participant_id)
-      topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
-      defn[:body][:obj_name] = if topic_id.nil?
-                                 assignment.name
-                               else
-                                 SignUpTopic.find(topic_id).topic_name
-                               end
-
-      user = User.find(participant.user_id)
-
-      defn[:to] = user.email
-      defn[:body][:first_name] = user.fullname
-      Mailer.sync_message(defn).deliver
-    end
-    if response_map.type == "TeammateReviewResponseMap"
-      defn[:body][:type] = "Teammate Review"
-      participant = AssignmentParticipant.find(response_map.reviewee_id)
-      topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
-      defn[:body][:obj_name] = SignUpTopic.find(topic_id).topic_name rescue nil
-      user = User.find(participant.user_id)
-      defn[:body][:first_name] = user.fullname
-      defn[:to] = user.email
-      Mailer.sync_message(defn).deliver
-    end
   end
 
   def questionnaire_by_answer(answer)
     if !answer.nil? # for all the cases except the case that  file submission is the only question in the rubric.
       questionnaire = Question.find(answer.question_id).questionnaire
+      # I don't think this else is necessary. Checking the callers, it seems that answer cannot be nil should be a
+      # pre-condition of this method --Yang
     else
       # there is small possibility that the answers is empty: when the questionnaire only have 1 question and it is a upload file question
       # the reason is that for this question type, there is no answer record, and this question is handled by a different form
@@ -309,5 +205,75 @@ class Response < ActiveRecord::Base
     avg_vol_in_round_2 = (Lingua::EN::Readability.new(comments_in_round_2).num_words / (counter_in_round_2.zero? ? 1 : counter_in_round_2)).round(0)
     avg_vol_in_round_3 = (Lingua::EN::Readability.new(comments_in_round_3).num_words / (counter_in_round_3.zero? ? 1 : counter_in_round_3)).round(0)
     [overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3]
+  end
+
+  # compare the current response score with other scores on the same artifact, and test if the difference
+  # is significant enough to notify instructor.
+  # Precondition: the response object is associated with a ReviewResponseMap
+  def significant_difference?
+    map_class = self.map.class
+    existing_responses = map_class.get_assessments_for(self.map.reviewee)
+    average_score_on_same_artifact_from_others, count = Response.avg_scores_and_count_for_prev_reviews(existing_responses, self)
+    # if this response is the first on this artifact, there's no grade conflict
+    return false if count == 0
+
+    # This score has already skipped the unfilled scorable question(s)
+    score = get_total_score.to_f / get_maximum_score
+    questionnaire = questionnaire_by_answer(self.scores.first)
+    assignment = self.map.assignment
+
+    assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: assignment.id, questionnaire_id: questionnaire.id).first
+    # notification_limit can be specified on 'Rubrics' tab on assignment edit page.
+    allowed_difference_percentage = assignment_questionnaire.notification_limit.to_f
+
+    # the range of average_score_on_same_artifact_from_others and score is [0,1]
+    # the range of allowed_difference_percentage is [0, 100]
+    if (average_score_on_same_artifact_from_others - score).abs * 100 > allowed_difference_percentage
+      true
+    else
+      false
+    end
+  end
+
+  def self.avg_scores_and_count_for_prev_reviews (existing_responses, current_response)
+    scores_assigned = []
+    count = 0
+    existing_responses.each do |existing_response|
+      if existing_response.id != current_response.id # the current_response is also in existing_responses array
+        count += 1
+        scores_assigned << existing_response.get_total_score.to_f/existing_response.get_maximum_score
+      end
+    end
+
+    return scores_assigned.sum/scores_assigned.size.to_f, count
+  end
+
+  def notify_instructor_on_difference
+    response_map = self.map
+    reviewer_participant_id = response_map.reviewer_id
+    reviewer_participanat = AssignmentParticipant.find(reviewer_participant_id)
+    reviewer_name = User.find(reviewer_participanat.user_id).fullname
+
+    reviewee_team = AssignmentTeam.find(response_map.reviewee_id)
+    reviewee_participant = reviewee_team.participants.first # for team assignment, use the first member's name.
+    reviewee_name = User.find(reviewee_participant.user_id).fullname
+
+    assignment = Assignment.find(reviewer_participanat.parent_id)
+
+    Mailer.notify_grade_conflict_message(
+        {:to => assignment.instructor.email,
+         :subject => "Expertiza Notification: A review score is outside the acceptable range",
+         :body => {
+             :reviewer_name => reviewer_name,
+             :type => "review",
+             :reviewee_name => reviewee_name,
+             :new_score => get_total_score.to_f / get_maximum_score,
+             :assignment => assignment,
+             :conflicting_response_url => 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s,  #'https://expertiza.ncsu.edu/response/view?id='
+             :summary_url => 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
+             :assignment_edit_url => 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
+         }
+        }
+    ).deliver_now
   end
 end

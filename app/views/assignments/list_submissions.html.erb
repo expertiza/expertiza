@@ -18,11 +18,11 @@
     	<% @l = @l+1 %>
     	<tr>
         <% bgcolor = @l.even? ? "#ffffff" : "#DDDDBB" %>
-        <% topic_name, users_for_curr_team, participants = get_data_for_list_submissions(team) %>
+        <% topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(team) %>
 
         <!--Topic name-->
         <% if @assignment.has_topics? %>
-          <td bgcolor= <%= bgcolor %>><%= topic_name %></td>
+          <td bgcolor= <%= bgcolor %>><%= topic_identifier + '. ' + topic_name %></td>
         <% end %>
 
         <!--Team name-->

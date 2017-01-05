@@ -77,8 +77,9 @@ class AssignmentParticipant < Participant
                            type: "QuizResponseMap")
   end
 
+  # Find the assignment participant record with given user_id and assignment_id. May return nil.
   def self.find_by_user_id_and_assignment_id(user_id, assignment_id)
-    AssignmentParticipant.where(user_id: user_id, parent_id: assignment_id).first
+    AssignmentParticipant.find_by(user_id: user_id, parent_id: assignment_id)
   end
 
   # all the participants in this assignment who have reviewed this person

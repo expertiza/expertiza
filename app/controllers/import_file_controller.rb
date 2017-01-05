@@ -37,7 +37,7 @@ class ImportFileController < ApplicationController
     begin
       file.each_line do |line|
         line.chomp!
-        if first_row_read == false
+        if first_row_read == false # I don't like the logic here. The code in this if only need to run once. --Yang
           row_header = parse_line(line.downcase, delimiter)
           first_row_read = true
           if row_header.include?("email")

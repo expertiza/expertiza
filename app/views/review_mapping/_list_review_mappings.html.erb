@@ -143,7 +143,6 @@
     session[:return_to] = request.url
   %>
 
-<% if !assignment.dynamic_reviewer_assignment? %>
   <%= link_to 'Import reviewer mappings',
     :controller=>'import_file',
     :action=>'start',
@@ -160,7 +159,6 @@
     :expected_fields => 'Contributor, Reviewer, Metareviewer1, Metareviewer2, ... MetareviewerN',
     :id => assignment.id %>
   <BR/>
-<% end %>
 
 <%= link_to 'Export review mappings',
   :controller=>'export_file',

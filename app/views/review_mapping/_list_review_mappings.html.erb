@@ -144,16 +144,15 @@
   %>
 
 <% if !assignment.dynamic_reviewer_assignment? %>
-
-  <%= link_to 'Assign reviewers automatically', :controller => 'assignments', :action => :edit, :id => assignment.id, :tab => "tab3" %>
-  | <%= link_to 'Import reviewer mappings',
+  <%= link_to 'Import reviewer mappings',
     :controller=>'import_file',
     :action=>'start',
     :model => 'ReviewResponseMap',
     :title => 'Reviewer Mappings',
     :expected_fields =>  "Contributor, Reviewer1, Reviewer2, ... , ReviewerN",
     :id => assignment.id %>
-  | <%= link_to 'Import metareviewer mappings',
+  |
+  <%= link_to 'Import metareviewer mappings',
     :controller=>'import_file',
     :action=>'start',
     :model => 'MetareviewResponseMap',

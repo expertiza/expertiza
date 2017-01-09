@@ -177,14 +177,6 @@ Expertiza::Application.routes.draw do
 
   resources 'late_policies'
 
-  resources :leaderboard, constraints: {id: /\d+/} do
-    collection do
-      get :index
-    end
-  end
-
-  get 'leaderboard/index', controller: :leaderboard, action: :index
-
   resources :markup_styles
 
   resources :menu_items do
@@ -216,8 +208,6 @@ Expertiza::Application.routes.draw do
       get :view_publishing_rights
     end
   end
-
-  get '/participants/change_handle', controller: :participants, action: :change_handle
 
   resources :password_retrieval do
     collection do
@@ -420,16 +410,6 @@ Expertiza::Application.routes.draw do
       get :auto_complete_for_user_name
     end
   end
-
-  # resources :submissionrecord do
-  #   collection do
-  #     get :list
-  #     get :show
-  #     get :neq
-  #     post :create
-  #     post ':id', action: :update
-  #   end
-  # end
 
   resources :submitted_content do
     collection do

@@ -24,6 +24,10 @@
                       <%= " #{SignUpTopic.find(topic_id).topic_name}" %>
                   <% end %>
               <% end %>
+
+              <%if !@assignment.is_anonymous%>
+                &nbsp; (author: <%= participant.fullname%>)
+              <%end%>
             </td>
 
             <td>&nbsp;</td>

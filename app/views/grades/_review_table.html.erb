@@ -1,20 +1,22 @@
 <table class="grades">
   <%if ctrl=='review' && @assignment.varying_rubrics_by_round? %>
       <% reviews = reviews.select{|response| response.round == round}.reverse.uniq{|response| response.map_id}.sort_by{|response| response.map_id} %>
+  <%else%>
+      <% reviews = reviews.sort_by{|response| response.map_id} %>
   <%end%>
 	<tr><th style="text-align:center;">&nbsp;</th>
 		<% for i in 0...reviews.size%>
 			<th style="text-align:center;"><%= collabel %>&nbsp;<%=i+1%>&nbsp;</th>
 		<% end %>
 	</tr>
-	<% if controller.action_name != "view_my_scores" %>
+	<% if controller.action_name != "view_my_scores" || !@assignment.is_anonymous?%>
 	<tr class="head"><td align="right"><b><%= rowlabel %></b></td>	    	
 		<% for review in reviews %>
        <td align="center">
-       <% if prefix %>
-         <a href="#<%= prefix+"_"+review.map.reviewer.name %>"><%= review.map.reviewer.fullname %></a>&nbsp;<%=link_to image_tag("/assets/delete_icon.png", :border => 0), {:controller => 'response', :action => 'delete', :id => review.id, :return => 'instructor'} %>
+       <% if controller.action_name != "view_my_scores"%>
+         &nbsp;<%= review.map.reviewer.fullname %></a>&nbsp;<%=link_to image_tag("/assets/delete_icon.png", :border => 0), {:controller => 'response', :action => 'delete', :id => review.id, :return => 'instructor'} %>
 		   <% else %>
-		     <%= link_to review.map.reviewer.fullname, :controller=>ctrl, :action => caction, :id=> review.id%>
+         &nbsp;<%= review.map.reviewer.fullname%>&nbsp;
 		   <% end %>
 		   </td>	    
     <% end %>

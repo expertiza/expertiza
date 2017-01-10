@@ -303,7 +303,27 @@ class UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:name, :crypted_password, :role_id, :password_salt, :fullname, :email, :parent_id, :private_by_default, :mru_directory_path, :email_on_review, :email_on_submission, :email_on_review_of_review, :is_new_user, :master_permission_granted, :handle, :leaderboard_privacy, :digital_certificate, :persistence_token, :timezonepref, :public_key, :copy_of_emails, :institution_id)
+        params.require(:user).permit(:name, 
+                                     :crypted_password, 
+                                     :role_id, 
+                                     :password_salt, 
+                                     :fullname, 
+                                     :email, 
+                                     :parent_id, 
+                                     :private_by_default, 
+                                     :mru_directory_path, 
+                                     :email_on_review, 
+                                     :email_on_submission, 
+                                     :email_on_review_of_review, 
+                                     :is_new_user, 
+                                     :master_permission_granted, 
+                                     :handle, 
+                                     :digital_certificate, 
+                                     :persistence_token, 
+                                     :timezonepref, 
+                                     :public_key, 
+                                     :copy_of_emails,
+                                     :institution_id)
   end
 
   def get_role

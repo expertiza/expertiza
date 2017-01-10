@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170106005638) do
+ActiveRecord::Schema.define(version: 20170110193407) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -263,12 +263,6 @@ ActiveRecord::Schema.define(version: 20170106005638) do
   end
 
   add_index "late_policies", ["instructor_id"], name: "fk_instructor_id", using: :btree
-
-  create_table "leaderboards", force: :cascade do |t|
-    t.integer "questionnaire_type_id", limit: 4
-    t.string  "name",                  limit: 255
-    t.string  "qtype",                 limit: 255
-  end
 
   create_table "markup_styles", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
@@ -624,7 +618,6 @@ ActiveRecord::Schema.define(version: 20170106005638) do
     t.boolean "is_new_user",                             default: true,  null: false
     t.integer "master_permission_granted", limit: 1,     default: 0
     t.string  "handle",                    limit: 255
-    t.boolean "leaderboard_privacy",                     default: false
     t.text    "digital_certificate",       limit: 65535
     t.string  "persistence_token",         limit: 255
     t.string  "timezonepref",              limit: 255

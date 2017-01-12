@@ -165,21 +165,24 @@ class SubmittedContentController < ApplicationController
   end
 
   def download
-    # folder_name = FileHelper::sanitize_folder(@current_folder.name)
-    folder_name = params['current_folder']['name']
-    # -- This code removed on 4/10/09 ... was breaking downloads of files with hyphens in them ...file_name = FileHelper::sanitize_filename(params['download'])
-    file_name = params['download']
-
-    if folder_name.nil?
-      raise "Folder_name is nil."
-    elsif file_name.nil?
-      raise "File_name is nil."
-    elsif File.directory?(folder_name + "/" + file_name)
-      raise "Cannot send a whole folder."
-    elsif !File.exist?(folder_name + "/" + file_name)
-      rails "File does not exist."
-    else
-      send_file(folder_name + "/" + file_name, disposition: 'inline')
+    begin
+      # folder_name = FileHelper::sanitize_folder(@current_folder.name)
+      folder_name = params['current_folder']['name']
+      # -- This code removed on 4/10/09 ... was breaking downloads of files with hyphens in them ...file_name = FileHelper::sanitize_filename(params['download'])
+      file_name = params['download']
+      if folder_name.nil?
+        raise "Folder_name is nil."
+      elsif file_name.nil?
+        raise "File_name is nil."
+      elsif File.directory?(folder_name + "/" + file_name)
+        raise "Cannot send a whole folder."
+      elsif !File.exist?(folder_name + "/" + file_name)
+        rails "File does not exist."
+      else
+        send_file(folder_name + "/" + file_name, disposition: 'inline')
+      end
+    rescue => e
+      flash[:error] = e.message
     end
   end
 
@@ -198,8 +201,8 @@ class SubmittedContentController < ApplicationController
     begin
         FileHelper.move_file(old_filename, newloc)
         flash[:note] = "The file was successfully moved from \"/#{params[:filenames][params[:chk_files]]}\" to \"/#{params[:faction][:move]}\""
-      rescue
-        flash[:error] = "There was a problem moving the file: " + $ERROR_INFO
+      rescue => e
+        flash[:error] = "There was a problem moving the file: " + e.message
       end
   end
 
@@ -212,8 +215,8 @@ class SubmittedContentController < ApplicationController
       else
         raise "A file already exists in this directory with the name \"#{params[:faction][:rename]}\""
       end
-    rescue
-      flash[:error] = "There was a problem renaming the file: " + $ERROR_INFO
+    rescue => e
+      flash[:error] = "There was a problem renaming the file: " + e.message
     end
   end
 
@@ -242,8 +245,8 @@ class SubmittedContentController < ApplicationController
       else
         raise "The referenced file does not exist."
       end
-    rescue
-      flash[:error] = "There was a problem copying the file: " + $ERROR_INFO
+    rescue => e
+      flash[:error] = "There was a problem copying the file: " + e.message
     end
   end
 
@@ -254,8 +257,8 @@ class SubmittedContentController < ApplicationController
     begin
       FileHelper.create_directory_from_path(newloc)
       flash[:note] = "The directory #{params[:faction][:create]} was created."
-    rescue
-      flash[:error] = $ERROR_INFO
+    rescue => e
+      flash[:error] = e.message
     end
   end
 

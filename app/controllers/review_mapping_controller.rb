@@ -72,8 +72,8 @@ class ReviewMappingController < ApplicationController
         else
           raise "The reviewer, \"" + reviewer.name + "\", is already assigned to this contributor."
         end
-      rescue
-        msg = $ERROR_INFO
+      rescue => e
+        msg = e.message
       end
     end
     redirect_to action: 'list_mappings', id: assignment.id, msg: msg
@@ -157,8 +157,8 @@ class ReviewMappingController < ApplicationController
       MetareviewResponseMap.create(reviewed_object_id: mapping.map_id,
                                    reviewer_id: reviewer.id,
                                    reviewee_id: mapping.reviewer.id)
-    rescue
-      msg = $ERROR_INFO
+    rescue => e
+      msg = e.message
     end
     redirect_to action: 'list_mappings', id: mapping.assignment.id, msg: msg
   end
@@ -173,11 +173,15 @@ class ReviewMappingController < ApplicationController
   end
 
   def get_reviewer(user, assignment, reg_url)
-    reviewer = AssignmentParticipant.where(user_id: user.id, parent_id: assignment.id).first
-    if reviewer.nil?
-      raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue."
+    begin
+      reviewer = AssignmentParticipant.where(user_id: user.id, parent_id: assignment.id).first
+      if reviewer.nil?
+        raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue."
+      end
+      reviewer
+    rescue => e
+      flash[:error] = e.message
     end
-    reviewer
   end
 
   def delete_outstanding_reviewers
@@ -440,7 +444,6 @@ class ReviewMappingController < ApplicationController
   def start_self_review
     assignment = Assignment.find(params[:assignment_id])
     team_id = TeamsUser.find_by_sql(["SELECT t.id as t_id FROM teams_users u, teams t WHERE u.team_id = t.id and t.parent_id = ? and user_id = ?", assignment.id, params[:reviewer_userid]])
-
     begin
       # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
@@ -452,8 +455,8 @@ class ReviewMappingController < ApplicationController
         raise "Self review already assigned!"
       end
       redirect_to controller: 'submitted_content', action: 'edit', id: params[:reviewer_id]
-    rescue
-      redirect_to controller: 'submitted_content', action: 'edit', id: params[:reviewer_id], msg: $ERROR_INFO
+    rescue => e
+      redirect_to controller: 'submitted_content', action: 'edit', id: params[:reviewer_id], msg: e.message
     end
   end
 

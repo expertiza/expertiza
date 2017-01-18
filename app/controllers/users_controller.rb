@@ -222,8 +222,9 @@ class UsersController < ApplicationController
     @user = RequestedUser.new(user_params)
     @user.institution_id = params[:user][:institution_id]
     @user.status = 'Under Review'
+
     #The super admin receives a mail about a new user request with the user name
-    if @user.save
+    if User.find_by(name: @user.name).nil? && User.find_by(name: @user.email).nil? && @user.save
       @super_users = User.joins(:role).where('roles.name' =>'Super-Administrator');
       @super_users.each do |super_user|
         prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user,@user, "New account Request")
@@ -232,7 +233,7 @@ class UsersController < ApplicationController
       flash[:success] = "User signup for \"#{@user.name}\" has been successfully requested. "
       redirect_to '/instructions/home'
     else
-      flash[:error] = "Error requesting sign up "
+      flash[:error] = "The account you are requesting has already existed in Expertiza."
       redirect_to :controller => 'users', :action => 'request_new', :role=>"Student"   
     end
   end

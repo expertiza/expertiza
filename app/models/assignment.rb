@@ -4,6 +4,7 @@
 ###
 ###
 class Assignment < ActiveRecord::Base
+  require 'rufus-scheduler'
   require 'analytic/assignment_analytic'
   include AssignmentAnalytic
   include ReviewAssignment
@@ -33,6 +34,7 @@ class Assignment < ActiveRecord::Base
   validates_presence_of :name
   validates_uniqueness_of :name, scope: :course_id
 
+  after_save :record_submission
   REVIEW_QUESTIONNAIRES = {author_feedback: 0, metareview: 1, review: 2, teammate_review: 3}.freeze
   #  Review Strategy information.
   RS_AUTO_SELECTED = 'Auto-Selected'.freeze
@@ -40,7 +42,6 @@ class Assignment < ActiveRecord::Base
   REVIEW_STRATEGIES = [RS_AUTO_SELECTED, RS_INSTRUCTOR_SELECTED].freeze
 
   DEFAULT_MAX_REVIEWERS = 3
-
   DEFAULT_MAX_OUTSTANDING_REVIEWS = 2
 
   def self.max_outstanding_reviews
@@ -51,7 +52,7 @@ class Assignment < ActiveRecord::Base
     true
   end
   alias_method :team_assignment,:team_assignment?
-  
+
   def has_topics?
     @has_topics ||= !sign_up_topics.empty?
   end
@@ -211,7 +212,7 @@ class Assignment < ActiveRecord::Base
   end
 
   # Check whether review, metareview, etc.. is allowed
-  # The permissions of TopicDueDate is the same as AssignmentDueDate. 
+  # The permissions of TopicDueDate is the same as AssignmentDueDate.
   # Here, column is usually something like 'review_allowed_id'
   def check_condition(column, topic_id = nil)
     next_due_date = DueDate.get_next_due_date(self.id, topic_id)
@@ -477,6 +478,21 @@ class Assignment < ActiveRecord::Base
 
   def find_due_dates(type)
     self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by_name(type).id }
+  end
+
+  private
+  def record_submission
+    # whenever a new assignment is added, add a job on each of its deadlines, to update the
+    # timestamps of teams' submissions.
+    scheduler = Rufus::Scheduler.singleton
+
+    self.due_dates.each do |due_date|
+      if due_date.deadline_type.name == 'submission'
+        scheduler.at(due_date.due_at.to_s, "assignment"=>self) do |job, time, arg|
+          LinkSubmissionHistory.add_submission(job.opts['assignment'].id)
+        end
+      end
+    end
   end
 
 end

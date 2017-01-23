@@ -25,6 +25,32 @@ class SubmittedContentController < ApplicationController
 
     # @can_submit is the flag indicating if the user can submit or not in current stage
     @can_submit = true
+    #create timeline for generalized map to just loop in the html
+    @timeline = Hash.new()
+    #Get timeline entries from submission_histories table
+    @submission_history = SubmissionHistory.where(team: @participant.team.id).order(:submitted_at)
+    #reviews
+    @review_maps = ResponseMap.where(reviewee_id: @participant.team.id)
+    @review_maps.each do |map|
+      if "ReviewResponseMap".eql?map.type
+        @response = Response.find_by(map_id: map.id)
+        @timeline[@response.updated_at]={:heading => map.type.chomp('ResponseMap') , :description => '', :color => 'green'}
+      end
+    end
+    #feedbacks
+    @feedback_maps = ResponseMap.where(reviewer_id: @participant.id)
+    @feedback_maps.each do |map|
+      if "FeedbackResponseMap".eql?map.type
+        @response = Response.find_by(map_id: map.id)
+        @timeline[@response.updated_at]={:heading => map.type.chomp('ResponseMap') , :description => '', :color => 'info'}
+      end
+    end
+    @submission_history.each do |submission|
+      @timeline[submission.submitted_at]={:heading => submission.type+' '+submission.action, :description => submission.submitted_detail}
+    end
+    @assignment.due_dates.each do |due_date|
+      @timeline[due_date.due_at]={:heading => ' Due Date ', :description => due_date.deadline_type.name+' deadline', :color => 'danger'}
+    end
 
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
   end
@@ -57,9 +83,13 @@ class SubmittedContentController < ApplicationController
       begin
         team.submit_hyperlink(params['submission'])
 
-        #create a submission record
-        @submission_record = SubmissionRecord.new(team_id: team.id, content: params['submission'], user: @participant.name, assignment_id: params[:id], operation: "Submit Hyperlink")
-        @submission_record.save
+        # #create a submission record
+        # @submission_record = SubmissionRecord.new(team_id: team.id, content: params['submission'], user: @participant.name, assignment_id: params[:id], operation: "Submit Hyperlink")
+        # @submission_record.save
+
+        submission_history = SubmissionHistory.create(team, params['submission'])
+        submission_history.submitted_at = Time.current # taking the time of submission
+        submission_history.save
       rescue
         flash[:error] = "The URL or URI is not valid. Reason: #{$ERROR_INFO}"
       end
@@ -84,9 +114,13 @@ class SubmittedContentController < ApplicationController
     topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
     assignment = Assignment.find(@participant.parent_id)
 
-    #create a submission record
-    @submission_record = SubmissionRecord.new(team_id: team.id, content: hyperlink_to_delete, user:@participant.name , assignment_id: assignment.id, operation: "Remove Hyperlink")
-    @submission_record.save
+    # #create a submission record
+    # @submission_record = SubmissionRecord.new(team_id: team.id, content: hyperlink_to_delete, user:@participant.name , assignment_id: assignment.id, operation: "Remove Hyperlink")
+    # @submission_record.save
+
+    submission_history = SubmissionHistory.delete_submission(team, hyperlink_to_delete)
+    submission_history.submitted_at = Time.current # taking the time of submission
+    submission_history.save
 
 
     if assignment.submission_allowed(topic_id)
@@ -127,8 +161,12 @@ class SubmittedContentController < ApplicationController
     #create a submission record
     assignment = Assignment.find(participant.parent_id)
     team = participant.team
-    @submission_record = SubmissionRecord.new(team_id: team.id, content: full_filename, user: participant.name , assignment_id: assignment.id, operation: "Submit File")
-    @submission_record.save
+    # @submission_record = SubmissionRecord.new(team_id: team.id, content: full_filename, user: participant.name , assignment_id: assignment.id, operation: "Submit File")
+    # @submission_record.save
+
+    submission_history = SubmissionHistory.create(team, full_filename)
+    submission_history.submitted_at = Time.current # taking the time of submission
+    submission_history.save
 
    # params = ActionController::Parameters.new(a: "123", b: "456")
     # send message to reviewers when submission has been updated
@@ -228,8 +266,12 @@ class SubmittedContentController < ApplicationController
     #create a submission record
     assignment = Assignment.find(participant.parent_id)
     team = participant.team
-    @submission_record = SubmissionRecord.new(team_id: team.id, content: full_filename, user: participant.name , assignment_id: assignment.id, operation: "Remove File")
-    @submission_record.save
+    # @submission_record = SubmissionRecord.new(team_id: team.id, content: full_filename, user: participant.name , assignment_id: assignment.id, operation: "Remove File")
+    # @submission_record.save
+
+    submission_history = SubmissionHistory.delete_submission(team, full_filename)
+    submission_history.submitted_at = Time.current # taking the time of submission
+    submission_history.save
   end
 
   def copy_selected_file

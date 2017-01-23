@@ -49,33 +49,8 @@ class UsersController < ApplicationController
     # Deprecated
     # all_users = User.order('name').where( ['role_id in (?) or id = ?', role.get_available_roles, user.id])
 
-    letter = params[:letter]
-    session[:letter] = letter
-    if letter.nil?
-      letter = all_users.first.name[0, 1].downcase unless all_users.empty?
-    end
-    @letters = []
-
-    @per_page = 1
-
-    # Check if the "Show" button for pagination is clicked
-    # If yes, set @per_page to the value of the selection dropdown
-    # Else, if the request is from one of the letter links on the top
-    # set @per_page to 1 (25 names per page).
-    # Else, set @per_page to the :num_users param passed in from
-    # the will_paginate method from the 'pagination' partial.
-    @per_page = if params[:paginate_show]
-                  params[:num_users]
-                elsif params[:from_letter]
-                  1
-                else
-                  params[:num_users]
-                end
-
     # Get the users list to show on current page
-    @users = paginate_list all_users
-
-    @letters = ('A'..'Z').to_a
+    @users = all_users
   end
 
   def list_pending_requested

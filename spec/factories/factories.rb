@@ -348,5 +348,72 @@ FactoryGirl.define do
     version_num nil
     round 1
     is_submitted false
+	end
+
+  factory :response_take, class: Response do
+    response_map { ResponseMap.first || association(:response_map_review) }
+    additional_comment nil
+    version_num nil
+    round 1
+    is_submitted true
+  end
+  
+	factory :response_map, class: ResponseMap do
+    id 200 
+  end
+
+	factory :response_map_metareview, class: ResponseMap do
+		type 'MetareviewResponseMap'
+	end
+
+	factory :metareviewresponsemap, class: MetareviewResponseMap do
+		id 6
+		reviewee_id 1
+		reviewed_object_id 8
+  end
+
+	factory :response_map_review, class: ResponseMap do
+		reviewee_id 1
+		reviewer_id 1
+		type 'ReviewResponseMap'
+	end
+
+  factory :selfreviewresponsemap, class: SelfReviewResponseMap do
+    id 6
+    reviewee_id 1
+    reviewed_object_id 8
+  end
+
+  factory :bookmarkratingresponsemap, class: BookmarkRatingResponseMap do
+    id 6
+    reviewee_id 1
+    reviewer_id 2
+    reviewed_object_id 8
+  end
+
+  factory :quizresponsemap, class: QuizResponseMap do
+    id 6
+    reviewee_id 1
+    reviewer_id 2
+    reviewed_object_id 8
+  end
+
+  factory :feedbackresponsemap, class: FeedbackResponseMap do
+    id 6
+    reviewee_id 1
+    reviewer_id 2
+    reviewed_object_id 8
+  end
+  factory :feedbackresponsemap1, class: FeedbackResponseMap do
+    id 10
+    reviewee_id 1
+    reviewer_id 2
+    reviewed_object_id 8
+  end
+  factory :teammatereviewresponsemap, class: TeammateReviewResponseMap do
+    id 6
+    reviewee_id 1
+    reviewer_id 2
+    reviewed_object_id 8
   end
 end

@@ -11,4 +11,5 @@ class PasswordReset < ActiveRecord::Base
       PasswordReset.create(:user_email => user.email, :token => Digest::SHA1.hexdigest(token))
     end
   end
+
 end

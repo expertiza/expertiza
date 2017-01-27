@@ -43,7 +43,7 @@ describe PasswordRetrievalController do
 
       Timecop.freeze(Date.today + 2.days) do
         get :check_reset_url, {:token => local_token}
-        expect(response).to redirect_to "/"
+        expect(response).to render_template "password_retrieval/forgotten"
       end
     end
 
@@ -56,7 +56,7 @@ describe PasswordRetrievalController do
       @password_retrival.save!
 
       get :check_reset_url, {:token => local_token_sent_as_parameter}
-      expect(response).to redirect_to "/"
+      expect(response).to render_template "password_retrieval/forgotten"
     end
 
     it "checks if token is not expired" do
@@ -67,7 +67,7 @@ describe PasswordRetrievalController do
       @password_retrival.save!
       Timecop.freeze(Date.today + 2.hours) do
         get :check_reset_url, :token => local_token
-        expect(response).to redirect_to action: 'reset_password', email: "example@example.edu"
+        expect(response).to redirect_to render_template "password_retrieval/reset_password", email: "example@example.edu"
       end
     end
   end

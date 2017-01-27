@@ -1,7 +1,7 @@
 class AuthController < ApplicationController
   helper :auth
 
-  @@attempts = 0
+  @@attempts = Hash.new
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: [:login, :logout],
@@ -9,10 +9,10 @@ class AuthController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'login', 'logout', 'login_failed', 'google_login'
-      true
-    else
-      current_role_name.eql?("Super-Administrator")
+      when 'login', 'logout', 'login_failed', 'google_login'
+        true
+      else
+        current_role_name.eql?("Super-Administrator")
     end
   end
 
@@ -20,26 +20,38 @@ class AuthController < ApplicationController
     if request.get?
       AuthController.clear_session(session)
     else
-      user = User.find_by_login(params[:login][:name])
-      if user and user.valid_password?(params[:login][:password])
-        after_login(user)
+      #let users do captcha when they fail to login 1x
+      if @@attempts.key?(params[:login][:name]) and @@attempts[params[:login][:name]] >= 1 and not verify_recaptcha(model: @user)
+        flash[:error] = "Please do the reCaptcha before trying to login again [" + @@attempts[params[:login][:name]].to_s + " attempt(s)]."
+        render template: "auth/login"
       else
-
-        @@attempts = @@attempts + 1
-        logger.warn "Failed login attempt."
-        flash[:error] = "Your username or password is incorrect."
-        if @@attempts >= 3
-            if verify_recaptcha(model: @user)
-              @@attempts = 0
-              redirect_to controller: 'password_retrieval', action: 'forgotten'
-            end
-
+        user = User.find_by_login(params[:login][:name])
+        if user and user.valid_password?(params[:login][:password])
+          #remove this user from login attempt list after (s)he has succesfully login
+          if @@attempts.key?(params[:login][:name])
+            @@attempts.delete(params[:login][:name])
+          end
+          after_login(user)
         else
-          redirect_to root_path
-
+          if user.nil?
+            flash[:error] = "We can't find this username in our database, please try with other username"
+          else
+            #keep track of login attempts per valid username, and reset this when (s)he has succesfully login
+            if @@attempts.key?(params[:login][:name])
+              @@attempts[params[:login][:name]] = @@attempts[params[:login][:name]] + 1
+            else
+              @@attempts[params[:login][:name]] = 1
+            end
+            logger.warn "Failed login attempt."
+            flash[:error] = "Your password doesn't match with our data, please try again or click Forgot password? to reset your password. [" + @@attempts[params[:login][:name]].to_s + " attempt(s)]."
+            #force them to go to password retrieval after 5x (they can still try logging in when they press back button)
+            if @@attempts[params[:login][:name]] >= 5
+              redirect_to controller: 'password_retrieval', action: 'forgotten'
+            else
+              render template: "auth/login"
+            end
+          end
         end
-
-
       end
     end
   end # def login
@@ -81,7 +93,7 @@ class AuthController < ApplicationController
     check_controller = false
 
     if params[:controller] == 'content_pages' and
-      params[:action] == 'view'
+        params[:action] == 'view'
       if session[:credentials].pages.key?(params[:page_name].to_s)
         if session[:credentials].pages[params[:page_name].to_s] == true
           logger.info "Page: authorised"

@@ -29,14 +29,14 @@ class PasswordRetrievalController < ApplicationController
   def check_reset_url
     if params[:token].nil?
       flash[:error] = "Password reset page can only be accessed with a generated link, sent to your email"
-      redirect_to "/"
+      render template: "password_retrieval/forgotten"
     else
       @token = Digest::SHA1.hexdigest(params[:token])
       password_reset = PasswordReset.find_by(:token => @token)
       if password_reset
         # URL expires after 1 day
-        expired_url = password_reset.updated_at + 1.days < Time.now
-        if !expired_url
+        expired_url = password_reset.updated_at + 1.days
+        if Time.now < expired_url
           #redirect_to action: 'reset_password', email: password_reset.user_email
           @email = password_reset.user_email
           render template: "password_retrieval/reset_password"

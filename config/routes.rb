@@ -212,7 +212,9 @@ Expertiza::Application.routes.draw do
   resources :password_retrieval do
     collection do
       get :forgotten
+      get :reset_password
       post :send_password
+      post :update_password
     end
   end
 
@@ -531,6 +533,8 @@ Expertiza::Application.routes.draw do
   get ':controller/service.wsdl', :action => 'wsdl'
 
   get ':controller(/:action(/:id))(.:format)'
+  get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
+
 
  # get 'sign_up_sheet/intelligent_signup_sheet.html_erb' => 'sign_up_sheet#intelligentPage'
 end

@@ -310,6 +310,12 @@ ActiveRecord::Schema.define(version: 20170110193407) do
 
   add_index "participants", ["user_id"], name: "fk_participant_users", using: :btree
 
+  create_table "password_resets", force: :cascade do |t|
+    t.string   "user_email", limit: 255
+    t.string   "token",      limit: 255
+    t.datetime "updated_at"
+  end
+
   create_table "permissions", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
   end

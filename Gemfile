@@ -40,6 +40,7 @@ gem 'rails4-autocomplete'
 gem 'rake'
 gem 'rb-readline'
 gem 'rest-client', '~> 1.8'
+gem "recaptcha", require: "recaptcha/rails"
 gem 'RedCloth'
 gem 'rgl', require: 'rgl/adjacency'
 gem 'rjb'
@@ -58,6 +59,7 @@ gem 'will_paginate'
 gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
 gem 'jquery-tablesorter'
+gem 'timecop', '0.8.1'
 
 group :development do
   gem 'daemons'

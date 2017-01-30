@@ -24,7 +24,11 @@ class SubmittedContentController < ApplicationController
     end
 
     # @can_submit is the flag indicating if the user can submit or not in current stage
-    @can_submit = true
+    if params.has_key?(:view)
+      @can_submit = false
+    else
+      @can_submit = true
+    end
 
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
   end
@@ -41,7 +45,7 @@ class SubmittedContentController < ApplicationController
     @can_submit = false
 
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
-    redirect_to action: 'edit', id: params[:id]
+    redirect_to action: 'edit', id: params[:id], view: true
   end
 
   def submit_hyperlink

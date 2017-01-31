@@ -134,7 +134,8 @@ module AssignmentHelper
   def get_data_for_list_submissions(team)
     teams_users = TeamsUser.where(team_id: team.id) 
     topic = SignedUpTeam.where(team_id: team.id).first.try :topic
-    topic_name = topic.topic_name if topic
+    topic_identifier = topic.try :topic_identifier 
+    topic_name = topic.try :topic_name
     users_for_curr_team = "" 
     participants = []
     teams_users.each do |teams_user| 
@@ -142,6 +143,6 @@ module AssignmentHelper
       users_for_curr_team += user.name + ' (' + user.fullname + ')' + '<br/>' 
       participants << Participant.where(["parent_id = ? AND user_id = ?", @assignment.id, user.id]).first 
     end 
-    [topic_name, users_for_curr_team, participants]
+    [topic_identifier ||= "", topic_name ||= "", users_for_curr_team, participants]
   end
 end

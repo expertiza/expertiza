@@ -13,7 +13,7 @@ describe LotteryController do
     
              it "should return json response" do
                 result = RestClient.get 'https://www.google.com',  :content_type => :json, :accept => :json
-              expect(result.header['Content-Type']).should include 'application/json' rescue result
+              expect(result.header['Content-Type']).to include 'application/json' rescue result
             end
   end
   
@@ -37,7 +37,7 @@ describe LotteryController do
               assignment = double("Assignment")
               team = double("team")
               allow(team).to receive(:create_new_teams_for_bidding_response).with(assignment).and_return(:teamid)
-              expect (team.create_new_teams_for_bidding_response(assignment)).should eq(:teamid)
+              expect(team.create_new_teams_for_bidding_response(assignment)).to eq(:teamid)
             end
    end
   
@@ -49,8 +49,8 @@ describe LotteryController do
               sortedteam =double("team")
               allow(team).to receive(:where).with(assignment).and_return(unassignedteam)
               allow(unassignedteam).to receive(:sort_by).and_return(sortedteam)
-              expect (team.where(assignment)).should eq(unassignedteam)
-              expect unassignedteam.sort_by.should eq(sortedteam)
+              expect(team.where(assignment)).to eq(unassignedteam)
+              expect(unassignedteam.sort_by).to eq(sortedteam)
             end
       end
   

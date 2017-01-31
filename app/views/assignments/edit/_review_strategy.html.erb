@@ -24,6 +24,9 @@
     <br/>
       <%= label_tag('assignment_form[assignment][max_reviews_per_submission]', 'Maximum number of reviews per submission:') %>
       <%= text_field_tag('assignment_form[assignment][max_reviews_per_submission]', @assignment_form.assignment.max_reviews_per_submission ||= 10, size: 1) %>
+    <br/>
+      <%= label_tag('assignment_form[assignment][num_reviews]', 'Set max number of reviews done by each student') %>
+      <%= text_field_tag('assignment_form[assignment][num_reviews]', @assignment_form.assignment.num_reviews ||= 3, size: 1) %>
     </td>
   </tr>
   <tr id="instructor_selected_review_mapping_mechanism" hidden='hidden'>
@@ -54,6 +57,14 @@
           <%= submit_tag 'Assign both calibrated and uncalibrated artifacts', :id => 'third_submit_tag' %>
         </span><br/>
       <% end %>
+    </td>
+  </tr>
+
+  <tr>
+    <td style='padding:5px' id='is_anonymous'>
+      <input name="assignment_form[assignment][is_anonymous]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][is_anonymous]', 'true', @assignment_form.assignment.is_anonymous) %>
+      <%= label_tag('assignment_form[assignment][is_anonymous]', 'Is Anonymous Review?') %>
     </td>
   </tr>
 

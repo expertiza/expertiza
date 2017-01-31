@@ -163,33 +163,6 @@ class GradesController < ApplicationController
     send_file(params['fname'], disposition: 'inline')
   end
 
-  # Formulate the Email content when there is a grading conflict
-  def send_grading_conflict_email
-    email_form = params[:mailer]
-    assignment = Assignment.find(email_form[:assignment])
-    recipient = User.where(["email = ?", email_form[:recipients]]).first
-
-    body_text = email_form[:body_text]
-    body_text["##[recipient_name]"] = recipient.fullname
-    body_text["##[recipients_grade]"] = email_form[recipient.fullname + "_grade"] + "%"
-    body_text["##[assignment_name]"] = assignment.name
-
-    Mailer.sync_message(
-      recipients: email_form[:recipients],
-       subject: email_form[:subject],
-       from: email_form[:from],
-       body: {
-         body_text: body_text,
-           partial_name: "grading_conflict"
-       }
-    ).deliver
-
-    flash[:notice] = "Your email to " + email_form[:recipients] + " has been sent. If you would like to send an email to another student please do so now, otherwise, click Back"
-    redirect_to action: 'conflict_email_form',
-                assignment: email_form[:assignment],
-                author: email_form[:author]
-  end
-
   # This method is used from edit methods
   def list_questions(assignment)
     @questions = {}

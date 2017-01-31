@@ -26,7 +26,6 @@ module LogInHelper
                                                   "is_new_user" => false,
                                                   "master_permission_granted" => 0,
                                                   "handle" => "",
-                                                  "leaderboard_privacy" => false,
                                                   "digital_certificate" => nil,
                                                   "timezonepref" => "Eastern Time (US & Canada)",
                                                   "copy_of_emails" => false)
@@ -48,7 +47,6 @@ module LogInHelper
                                                      is_new_user: false,
                                                      master_permission_granted: 0,
                                                      handle: "",
-                                                     leaderboard_privacy: false,
                                                      digital_certificate: nil,
                                                      public_key: nil,
                                                      copy_of_emails: false)

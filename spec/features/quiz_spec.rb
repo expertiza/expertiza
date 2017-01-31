@@ -1,38 +1,6 @@
 require 'rails_helper'
 require 'selenium-webdriver'
 
-def create_quiz
-  login_as @student.name
-
-  # Click on the assignment link, and navigate to work view
-  click_link @assignment.name
-  click_link 'Your work'
-
-  # Click on create quiz link
-  click_link 'Create a quiz'
-
-  # Fill in the form for Name
-  fill_in 'questionnaire_name', with: 'Quiz for test'
-
-  # Fill in the form for Question 1
-  fill_in 'text_area', with: 'Test Question 1'
-
-  # Choose the quiz to be a single choice question
-  page.choose('question_type_1_type_multiplechoiceradio')
-
-  # Fill in for all 4 choices
-  fill_in 'new_choices_1_MultipleChoiceRadio_1_txt', with: 'Test Quiz 1'
-  fill_in 'new_choices_1_MultipleChoiceRadio_2_txt', with: 'Test Quiz 2'
-  fill_in 'new_choices_1_MultipleChoiceRadio_3_txt', with: 'Test Quiz 3'
-  fill_in 'new_choices_1_MultipleChoiceRadio_4_txt', with: 'Test Quiz 4'
-
-  # Choose the first one to be the correct answer
-  page.choose('new_choices_1_MultipleChoiceRadio_1_iscorrect_1')
-
-  # Save quiz
-  click_on 'Create Quiz'
-end
-
 describe 'Student can create quizzes and edit them', js: true do
   before(:each) do
     # Create an instructor
@@ -54,10 +22,10 @@ describe 'Student can create quizzes and edit them', js: true do
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create :assignment_due_date, due_at: (DateTime.now + 1)
+    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day)
 
     @review_deadline_type = create(:deadline_type, name: "review")
-    create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day), deadline_type: @review_deadline_type
 
     # Create a team linked to the calibrated assignment
     @team = create :assignment_team, assignment: @assignment
@@ -73,7 +41,35 @@ describe 'Student can create quizzes and edit them', js: true do
 
   it 'should be able to create quiz' do
     # Create a quiz
-    create_quiz
+    login_as @student.name
+
+    # Click on the assignment link, and navigate to work view
+    click_link @assignment.name
+    click_link 'Your work'
+
+    # Click on create quiz link
+    click_link 'Create a quiz'
+
+    # Fill in the form for Name
+    fill_in 'questionnaire_name', with: 'Quiz for test'
+
+    # Fill in the form for Question 1
+    fill_in 'text_area', with: 'Test Question 1'
+
+    # Choose the quiz to be a single choice question
+    page.choose('question_type_1_type_multiplechoiceradio')
+
+    # Fill in for all 4 choices
+    fill_in 'new_choices_1_MultipleChoiceRadio_1_txt', with: 'Test Quiz 1'
+    fill_in 'new_choices_1_MultipleChoiceRadio_2_txt', with: 'Test Quiz 2'
+    fill_in 'new_choices_1_MultipleChoiceRadio_3_txt', with: 'Test Quiz 3'
+    fill_in 'new_choices_1_MultipleChoiceRadio_4_txt', with: 'Test Quiz 4'
+
+    # Choose the first one to be the correct answer
+    page.choose('new_choices_1_MultipleChoiceRadio_1_iscorrect_1')
+
+    # Save quiz
+    click_on 'Create Quiz'
 
     # If the page have link View Quiz and Edit quiz, meaning the quiz has been created.
     expect(page).to have_link('View quiz')
@@ -82,7 +78,35 @@ describe 'Student can create quizzes and edit them', js: true do
 
   it 'should be able to view quiz after create one' do
     # Create a quiz
-    create_quiz
+    login_as @student.name
+
+    # Click on the assignment link, and navigate to work view
+    click_link @assignment.name
+    click_link 'Your work'
+
+    # Click on create quiz link
+    click_link 'Create a quiz'
+
+    # Fill in the form for Name
+    fill_in 'questionnaire_name', with: 'Quiz for test'
+
+    # Fill in the form for Question 1
+    fill_in 'text_area', with: 'Test Question 1'
+
+    # Choose the quiz to be a single choice question
+    page.choose('question_type_1_type_multiplechoiceradio')
+
+    # Fill in for all 4 choices
+    fill_in 'new_choices_1_MultipleChoiceRadio_1_txt', with: 'Test Quiz 1'
+    fill_in 'new_choices_1_MultipleChoiceRadio_2_txt', with: 'Test Quiz 2'
+    fill_in 'new_choices_1_MultipleChoiceRadio_3_txt', with: 'Test Quiz 3'
+    fill_in 'new_choices_1_MultipleChoiceRadio_4_txt', with: 'Test Quiz 4'
+
+    # Choose the first one to be the correct answer
+    page.choose('new_choices_1_MultipleChoiceRadio_1_iscorrect_1')
+
+    # Save quiz
+    click_on 'Create Quiz'
 
     # Be able to see the quiz
     click_on 'View quiz'
@@ -247,10 +271,10 @@ describe 'multiple quiz question test', js: true do
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create :assignment_due_date, due_at: (DateTime.now + 1)
+    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day)
 
     @review_deadline_type = create(:deadline_type, name: "review")
-    create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day), deadline_type: @review_deadline_type
 
     # Create a team linked to the calibrated assignment
     @team = create :assignment_team, assignment: @assignment
@@ -306,10 +330,10 @@ describe 'appropriate quiz taking times', js: true do
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create :assignment_due_date, due_at: (DateTime.now + 1)
+    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day)
 
     @review_deadline_type = create(:deadline_type, name: "review")
-    create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day), deadline_type: @review_deadline_type
 
     # Setup Student 1
 
@@ -416,10 +440,10 @@ describe 'Instructor', js: true do
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create :assignment_due_date, due_at: (DateTime.now + 1)
+    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day)
 
     @review_deadline_type = create(:deadline_type, name: "review")
-    create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day), deadline_type: @review_deadline_type
 
     # Setup Student 1
 
@@ -519,10 +543,10 @@ describe 'Student reviewers can not take the quizzes before request artifact', j
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create :assignment_due_date, due_at: (DateTime.now + 1)
+    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day)
 
     @review_deadline_type = create(:deadline_type, name: "review")
-    create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day), deadline_type: @review_deadline_type
 
     # Setup Student 1
 
@@ -593,10 +617,10 @@ describe 'Student reviewers can take the quizzes', js: true do
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create :assignment_due_date, due_at: (DateTime.now + 1)
+    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day)
 
     @review_deadline_type = create(:deadline_type, name: "review")
-    create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day), deadline_type: @review_deadline_type
 
     # Setup Student 1
 
@@ -684,10 +708,10 @@ describe 'Student reviewers can view the quizzes they take', js: true do
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create :assignment_due_date, due_at: (DateTime.now + 1)
+    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day)
 
     @review_deadline_type = create(:deadline_type, name: "review")
-    create :assignment_due_date, due_at: (DateTime.now + 1), deadline_type: @review_deadline_type
+    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day), deadline_type: @review_deadline_type
 
     # Setup Student 1
 

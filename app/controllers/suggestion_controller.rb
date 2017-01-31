@@ -96,6 +96,8 @@ class SuggestionController < ApplicationController
     end
   end
 
+  # this is a method for lazy team creation. Here may not be the right place for this method.
+  # should be refactored into a static method in AssignmentTeam class. --Yang
   def create_new_team
     new_team = AssignmentTeam.create(name: 'Team' + @user_id.to_s + '_' + rand(1000).to_s,
                parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')

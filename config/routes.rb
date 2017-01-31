@@ -40,6 +40,15 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :assessment360 do
+    collection do
+      get :one_course_all_assignments
+      get :all_students_all_reviews
+      get :one_student_all_reviews
+      get :one_assignment_all_students
+    end
+  end
+
   resources :assignments do
     collection do
       get :delete
@@ -168,14 +177,6 @@ Expertiza::Application.routes.draw do
 
   resources 'late_policies'
 
-  resources :leaderboard, constraints: {id: /\d+/} do
-    collection do
-      get :index
-    end
-  end
-
-  get 'leaderboard/index', controller: :leaderboard, action: :index
-
   resources :markup_styles
 
   resources :menu_items do
@@ -207,8 +208,6 @@ Expertiza::Application.routes.draw do
       get :view_publishing_rights
     end
   end
-
-  get '/participants/change_handle', controller: :participants, action: :change_handle
 
   resources :password_retrieval do
     collection do
@@ -414,16 +413,6 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  # resources :submissionrecord do
-  #   collection do
-  #     get :list
-  #     get :show
-  #     get :neq
-  #     post :create
-  #     post ':id', action: :update
-  #   end
-  # end
-
   resources :submitted_content do
     collection do
       get :download
@@ -521,7 +510,9 @@ Expertiza::Application.routes.draw do
       delete '', action: :destroy_all
     end
   end
-
+  post '/users/request_user_create', controller: :users, action: :request_user_create
+  post '/users/create_approved_user', controller: :users, action: :create_approved_user
+  get 'instructions/home'
   get '/users/show_selection', controller: :users, action: :show_selection
   get '/users/list', controller: :users, action: :list
   get '/menu/*name', controller: :menu_items, action: :link

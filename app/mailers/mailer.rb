@@ -23,6 +23,23 @@ class Mailer < ActionMailer::Base
          bcc: defn[:bcc])
   end
 
+
+  def request_user_message(defn)
+    @user = defn[:body][:user]
+    @super_user = defn[:body][:super_user]
+    @first_name = defn[:body][:first_name]
+    @new_pct = defn[:body][:new_pct]
+    @avg_pct = defn[:body][:avg_pct]
+    @assignment = defn[:body][:assignment]
+
+    if Rails.env.development? || Rails.env.test?
+      defn[:to] = 'expertiza.development@gmail.com'
+    end
+    mail(subject: defn[:subject],
+         to: defn[:to],
+         bcc: defn[:bcc])
+  end
+
   def sync_message(defn)
     @body = defn[:body]
     @type = defn[:body][:type]
@@ -57,5 +74,24 @@ class Mailer < ActionMailer::Base
     mail(subject: defn[:subject],
          to: defn[:to],
          bcc: defn[:cc])
+  end
+
+  def notify_grade_conflict_message(defn)
+    @body = defn[:body]
+
+    @assignment = @body[:assignment]
+    @reviewer_name = @body[:reviewer_name ]
+    @type = @body[:type]
+    @reviewee_name = @body[:reviewee_name]
+    @new_score = @body[:new_score]
+    @conflicting_response_url = @body[:conflicting_response_url]
+    @summary_url = @body[:summary_url]
+    @assignment_edit_url = @body[:assignment_edit_url]
+
+    if Rails.env.development? || Rails.env.test?
+      defn[:to] = 'expertiza.development@gmail.com'
+    end
+    mail(subject: defn[:subject],
+         to: defn[:to])
   end
 end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161114210745) do
+ActiveRecord::Schema.define(version: 20170110193407) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -78,6 +78,7 @@ ActiveRecord::Schema.define(version: 20161114210745) do
     t.boolean  "is_calibrated",                            default: false
     t.boolean  "is_selfreview_enabled"
     t.string   "reputation_algorithm",       limit: 255,   default: "Lauw"
+    t.boolean  "is_anonymous",                             default: true
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -263,12 +264,6 @@ ActiveRecord::Schema.define(version: 20161114210745) do
 
   add_index "late_policies", ["instructor_id"], name: "fk_instructor_id", using: :btree
 
-  create_table "leaderboards", force: :cascade do |t|
-    t.integer "questionnaire_type_id", limit: 4
-    t.string  "name",                  limit: 255
-    t.string  "qtype",                 limit: 255
-  end
-
   create_table "markup_styles", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
   end
@@ -372,6 +367,18 @@ ActiveRecord::Schema.define(version: 20161114210745) do
     t.boolean "iscorrect",                 default: false
   end
 
+  create_table "requested_users", force: :cascade do |t|
+    t.string   "name",           limit: 255
+    t.integer  "role_id",        limit: 4
+    t.string   "fullname",       limit: 255
+    t.string   "institution_id", limit: 255
+    t.string   "email",          limit: 255
+    t.string   "status",         limit: 255
+    t.string   "reason",         limit: 255
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+  end
+
   create_table "response_maps", force: :cascade do |t|
     t.integer  "reviewed_object_id", limit: 4,   default: 0,     null: false
     t.integer  "reviewer_id",        limit: 4,   default: 0,     null: false
@@ -471,6 +478,8 @@ ActiveRecord::Schema.define(version: 20161114210745) do
     t.string  "topic_identifier", limit: 10
     t.integer "micropayment",     limit: 4,     default: 0
     t.integer "private_to",       limit: 4
+    t.text    "description",      limit: 65535
+    t.string  "link",             limit: 255
   end
 
   add_index "sign_up_topics", ["assignment_id"], name: "fk_sign_up_categories_sign_up_topics", using: :btree
@@ -502,17 +511,6 @@ ActiveRecord::Schema.define(version: 20161114210745) do
     t.integer  "team_id",       limit: 4
     t.string   "user",          limit: 255
     t.integer  "assignment_id", limit: 4
-  end
-
-  create_table "submissionrecords", force: :cascade do |t|
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
-    t.text     "type",       limit: 65535
-    t.string   "content",    limit: 255
-    t.datetime "createdat"
-    t.string   "operation",  limit: 255
-    t.integer  "team_id",    limit: 4
-    t.string   "user",       limit: 255
   end
 
   create_table "suggestion_comments", force: :cascade do |t|
@@ -626,7 +624,6 @@ ActiveRecord::Schema.define(version: 20161114210745) do
     t.boolean "is_new_user",                             default: true,  null: false
     t.integer "master_permission_granted", limit: 1,     default: 0
     t.string  "handle",                    limit: 255
-    t.boolean "leaderboard_privacy",                     default: false
     t.text    "digital_certificate",       limit: 65535
     t.string  "persistence_token",         limit: 255
     t.string  "timezonepref",              limit: 255

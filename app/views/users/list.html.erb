@@ -12,11 +12,7 @@
 <%= submit_tag("Search") %>
 <% end %>
 
-<div>
-  <%= render :partial => 'shared_scripts/letters' %>
-</div>
 
-<%= render :partial => 'users/pagination' %>
 <div class="exp">
   <table>
     <tr><th colspan=5></th><th colspan=3 class="head">E-mail on ...</th></tr>
@@ -33,18 +29,15 @@
           <td><%= User.yesorno(user.email_on_review) %></td>
           <td><%= User.yesorno(user.email_on_submission) %></td>
           <td><%= User.yesorno(user.email_on_review_of_review) %></td>
-          <td><%= User.yesorno(user.leaderboard_privacy) %></td>
         </tr>
       <% end %>
     <% end -%>
   </table>
 </div>
 <hr/>
-<%= render :partial => 'users/pagination' %>
+
 <hr/>
 <%= render :partial => 'shared_scripts/pages' %>
-
-<%= render :partial => 'shared_scripts/letters' %>
 
 <p>
   <%

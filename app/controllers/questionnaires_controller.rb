@@ -129,25 +129,20 @@ class QuestionnairesController < ApplicationController
   # Remove a given questionnaire
   def delete
     @questionnaire = Questionnaire.find(params[:id])
-
     if @questionnaire
       begin
         name = @questionnaire.name
-
         # if this rubric is used by some assignment, flash error
-        @questionnaire.assignments.each do |assignment|
-          raise "The assignment #{assignment.name} uses this questionnaire. Are sure you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
+        if @questionnaire.assignments.length > 0
+          raise "The assignment <b>#{@questionnaire.assignments.first.try(:name)}</b> uses this questionnaire. Are sure you want to delete the assignment?"
         end
-
         questions = @questionnaire.questions
-
         # if this rubric had some answers, flash error
         questions.each do |question|
           unless question.answers.empty?
             raise "There are responses based on this rubric, we suggest you do not delete it."
           end
         end
-
         questions.each do |question|
           advices = question.question_advices
           advices.each(&:delete)
@@ -156,13 +151,11 @@ class QuestionnairesController < ApplicationController
         questionnaire_node = @questionnaire.questionnaire_node
         questionnaire_node.delete
         @questionnaire.delete
-
         undo_link("The questionnaire \"#{name}\" has been successfully deleted.")
-      rescue
-        flash[:error] = $ERROR_INFO
+      rescue => e
+        flash[:error] = e.message
       end
     end
-
     redirect_to action: 'list', controller: 'tree_display'
   end
 
@@ -373,48 +366,31 @@ class QuestionnairesController < ApplicationController
     valid = "valid"
 
     (1..num_quiz_questions).each do |i|
-      if params[:new_question][i.to_s] == ''
-        # One of the questions text is not filled out
-        valid = "Please make sure all questions have text"
+      
+      if params[:questionnaire][:name] == ""
+        # questionnaire name is not specified
+        valid = "Please specify quiz name (please do not use your name or id)."
         break
       elsif !params.key?(:question_type) || !params[:question_type].key?(i.to_s) || params[:question_type][i.to_s][:type].nil?
         # A type isnt selected for a question
         valid = "Please select a type for each question"
         break
-      elsif params[:questionnaire][:name] == ""
-        # questionnaire name is not specified
-        valid = "Please specify quiz name (please do not use your name or id)."
-        break
       else
+        @new_question = Object.const_get(params[:question_type][i.to_s][:type]).create(txt: '', type: params[:question_type][i.to_s][:type], break_before: true)
+        @new_question.update_attributes(txt: params[:new_question][i.to_s])
         type = params[:question_type][i.to_s][:type]
-        if type == 'MultipleChoiceCheckbox' or type == 'MultipleChoiceRadio'
-          correct_selected = false
-          (1..4).each do |x|
-            if params[:new_choices][i.to_s][type][x.to_s][:txt] == ''
-              # Text isnt provided for an option
-              valid = "Please make sure every question has text for all options"
-              break
-            elsif type == 'MultipleChoiceRadio' and !params[:new_choices][i.to_s][type][x.to_s][:iscorrect].nil?
-              correct_selected = true
-            elsif type == 'MultipleChoiceCheckbox' and params[:new_choices][i.to_s][type][x.to_s][:iscorrect] != 0.to_s
-              correct_selected = true
-            end
-          end
-          if valid == "valid" && !correct_selected
-            # A correct option isnt selected for a check box or radio question
-            valid = "Please select a correct answer for all questions"
-            break
-          end
-        elsif type == 'TF' # TF is not disabled. We need to test TF later.
-          if params[:new_choices][i.to_s]["TF"].nil?
-            # A correct option isnt selected for a true/false question
-            valid = "Please select a correct answer for all questions"
+        choice_info = params[:new_choices][i.to_s][type]    #choice info for one question of its type 
+        if choice_info == nil
+          valid = "Please select a correct answer for all questions"
+          break
+        else
+          valid = @new_question.isvalid(choice_info)
+          if(valid != "valid")
             break
           end
         end
       end
     end
-
     valid
   end
 

@@ -76,9 +76,8 @@ class Menu
     @crumbs = []
 
     items = nil
-
     if role
-      unless role.cache[:credentials].permission_ids.empty?
+      unless role.cache[:credentials].permission_ids.nil?
         items = MenuItem.items_for_permissions(role.cache[:credentials].permission_ids)
       end
     else # No role given: build menu of everything
@@ -169,7 +168,6 @@ class Menu
       item = get_item(crumb)
       crumbs << item
     end
-
     crumbs
   end
-  end
+end

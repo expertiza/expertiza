@@ -42,11 +42,15 @@
     <%= password_field 'login', 'password', :size => 12, :class => 'form-control' %></p>
     <p><%= link_to "Forgot password?", {:controller => 'password_retrieval', :action => 'forgotten'}, :class => 'pull-right', :style => 'margin-bottom: 20px' %></p>
     <p>
-
+    <% if defined?(@attempts) and @attempts[@username] %>
+          <div class="g-recaptcha" data-sitekey="6Lci0wwUAAAAAB69GEpUbEmkIu4frJ8dgqx90o7b"></div>
+          <br><br><br><br>
+    <% end %>
     <%= submit_tag "SIGN IN", :class => 'btn btn-danger', :style => 'width:100%;
     margin-left:auto;
     margin-right:auto;' %>
-    </p>
+    </br>
   <% end %>
   <br/>
+</div>
 <% end %>

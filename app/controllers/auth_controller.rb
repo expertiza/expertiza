@@ -20,9 +20,11 @@ class AuthController < ApplicationController
     if request.get?
       AuthController.clear_session(session)
     else
+      @attempts = @@attempts
       #let users do captcha when they fail to login 1x
+      @username = params[:login][:name]
       if @@attempts.key?(params[:login][:name]) and @@attempts[params[:login][:name]] >= 1 and not verify_recaptcha(model: @user)
-        flash[:error] = "Please do the reCaptcha before trying to login again [" + @@attempts[params[:login][:name]].to_s + " attempt(s)]."
+        flash[:error] = "Please do reCAPTCHA before trying to login again."
         render template: "auth/login"
       else
         user = User.find_by_login(params[:login][:name])
@@ -43,7 +45,7 @@ class AuthController < ApplicationController
               @@attempts[params[:login][:name]] = 1
             end
             logger.warn "Failed login attempt."
-            flash[:error] = "Your password doesn't match with our data, please try again or click Forgot password? to reset your password. [" + @@attempts[params[:login][:name]].to_s + " attempt(s)]."
+            flash[:error] = "Your password doesn't match with our data, please try again or click Forgot password? to reset your password [" + @@attempts[params[:login][:name]].to_s + " attempt(s)]."
             #force them to go to password retrieval after 5x (they can still try logging in when they press back button)
             if @@attempts[params[:login][:name]] >= 5
               redirect_to controller: 'password_retrieval', action: 'forgotten'

@@ -34,7 +34,7 @@ class PasswordRetrievalController < ApplicationController
       render template: "password_retrieval/forgotten"
     else
       @token = Digest::SHA1.hexdigest(params[:token])
-      password_reset = PasswordReset.find_by(:token => @token)
+      password_reset = PasswordReset.find_by(token: @token)
       if password_reset
         # URL expires after 1 day
         expired_url = password_reset.updated_at + 1.day
@@ -67,14 +67,14 @@ class PasswordRetrievalController < ApplicationController
       user.password_confirmation = params[:reset][:repassword]
       if user.save
         PasswordReset.delete_all(:user_email => user.email)
-        flash[:success] = "reset password success"
+        flash[:success] = "Reset password success"
         redirect_to "/"
       else
-        flash[:error] = "password cannot be updated. Please try again"
+        flash[:error] = "Password cannot be updated. Please try again"
         redirect_to "/"
       end
     else
-      flash[:error] = "password and confirm-password do not match. Try again"
+      flash[:error] = "Password and confirm-password do not match. Try again"
       redirect_to action: 'reset_password', email: params[:reset][:email]
     end
   end

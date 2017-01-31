@@ -37,7 +37,7 @@ class PasswordRetrievalController < ApplicationController
       password_reset = PasswordReset.find_by(:token => @token)
       if password_reset
         # URL expires after 1 day
-        expired_url = password_reset.updated_at + 1.days
+        expired_url = password_reset.updated_at + 1.day
         if Time.now < expired_url
           #redirect_to action: 'reset_password', email: password_reset.user_email
           @email = password_reset.user_email

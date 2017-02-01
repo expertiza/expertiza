@@ -57,7 +57,7 @@ describe "Airbrake expection errors" do
     click_link 'Edit quiz'
     expect(page).to have_content('Edit Quiz')
     click_button 'Save quiz'
-    expect(page).to have_current_path("/submitted_content/#{participant_id}/edit")
+    expect(page).to have_current_path("/submitted_content/#{participant_id}/edit?view=true")
   end
 
   # Airbrake-1800240536513675372

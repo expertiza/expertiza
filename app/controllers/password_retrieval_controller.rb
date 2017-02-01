@@ -75,7 +75,8 @@ class PasswordRetrievalController < ApplicationController
       end
     else
       flash[:error] = "Password and confirm-password do not match. Try again"
-      redirect_to action: 'reset_password', email: params[:reset][:email]
+      @email = params[:reset][:email]
+      render template: "password_retrieval/reset_password"
     end
   end
 

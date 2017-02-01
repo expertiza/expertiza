@@ -45,7 +45,7 @@ class AuthController < ApplicationController
               @@attempts[params[:login][:name]] = 1
             end
             logger.warn "Failed login attempt."
-            flash[:error] = "Incorrect username or password, please try again or click \'Forgot password?\' [" + @@attempts[params[:login][:name]].to_s + " attempt(s)]."
+            flash[:error] = "Incorrect password, please try again or click \'Forgot password?\' [" + @@attempts[params[:login][:name]].to_s + " attempt(s)]."
             # force them to go to password retrieval after 5x (they can still try logging in when they press back button)
             if @@attempts[params[:login][:name]] >= 5
               redirect_to controller: 'password_retrieval', action: 'forgotten'

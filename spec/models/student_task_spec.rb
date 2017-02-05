@@ -12,6 +12,37 @@ describe StudentTask do
     )
   end
 
+  def init
+      team = build(:assignment_team)
+      team.save!
+      user = User.new
+      user.email = "test@test.com"
+      user.name = "user1"
+      user.teams << team
+      user.parent_id = team.parent_id
+      user.save!
+      participant = AssignmentParticipant.new
+      participant.user_id = user.id
+      participant.parent_id = user.parent_id
+      participant.handle="testHandle"
+      participant.save!
+
+      new_user = Student.new
+      new_user.email = "newtest@test.com"
+      new_user.name = "user2"
+      new_user.fullname = "User2 FullName"
+      new_user.teams << team
+      new_user.parent_id = team.parent_id
+      new_user.save!
+
+      participant = AssignmentParticipant.new
+      participant.user_id = new_user.id
+      participant.parent_id = new_user.parent_id
+      participant.handle="testHandle"
+      participant.save!
+      return new_user,user
+  end
+
   describe ".from_participant" do
     it "creates a StudentTask from a participant" do
       expect(participant).to receive(:assignment)
@@ -65,6 +96,72 @@ describe StudentTask do
     it "delegates to assignment" do
       expect(assignment).to receive(:course)
       student_task.course
+    end
+  end
+
+  describe "Get teamed students" do
+    it "Tests if team history is empty if the user have not teamed up before" do
+      user = User.new
+      expect(StudentTask.teamed_students user).to eq ({})
+    end
+
+    it "Tests if the team history is empty if the user only has course team" do
+      team = CourseTeam.new
+      team.save!
+      user = User.new
+      user.email = "test@test.com"
+      user.name = "user1"
+      user.teams << team
+      user.save!
+      expect(StudentTask.teamed_students user).to eq ({})
+    end
+
+    it "Tests if the team history is empty if the user has assignment team
+        and no teammates" do
+      team = build(:assignment_team)
+      team.save!
+      user = User.new
+      user.email = "test@test.com"
+      user.name = "user1"
+      user.teams << team
+      user.parent_id = team.parent_id
+      user.save!
+      participant = AssignmentParticipant.new
+      participant.user_id = user.id
+      participant.parent_id = user.parent_id
+      participant.handle="testHandle"
+      participant.save!
+      expect(StudentTask.teamed_students user).to eq ({})
+    end
+
+    it "Tests if the team history is correct if the user has assignment team
+        and one team mate. The name is expected to be returned" do
+      new_user,user = init
+      returnVal = StudentTask.teamed_students user
+      expect(returnVal[1]).to eq ([new_user.fullname])
+    end
+
+    it "Tests if the team history is correct if the user has assignment team
+        and one team mate. The id is expected to be returned" do
+      new_user,user = init
+      returnVal = StudentTask.teamed_students user,nil,false
+      expect(returnVal[1]).to eq ([new_user.id])
+    end
+
+    it "Tests if the team history is empty if the user has assignment team
+        and one team mate but the assignment id is passed to be excluded" do
+      new_user,user = init
+      assignment = Assignment.find(user.parent_id)
+      returnVal = StudentTask.teamed_students user,nil,false,assignment.id
+      expect(returnVal).to eq ({})
+    end
+
+    it "Tests if the team history is empty if the user has assignment team
+        and one team mate and the assignment id is passed to be included" do
+      new_user,user = init
+      assignment = Assignment.find(user.parent_id)
+      returnVal = StudentTask.teamed_students user,nil,false,nil,assignment.id
+      expect(returnVal[1]).to eq ([new_user.id])
     end
   end
 end

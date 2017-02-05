@@ -143,6 +143,7 @@ FactoryGirl.define do
     submitted_hyperlinks "---
 - https://www.expertiza.ncsu.edu"
     directory_num 0
+    new_members 0
   end
 
   factory :team_user, class: TeamsUser do
@@ -348,5 +349,10 @@ FactoryGirl.define do
     version_num nil
     round 1
     is_submitted false
+  end
+  factory :bid, class: Bid do
+    topic_id { Topic.first || association(:topic)}
+    user_id {Student.first || association(:student)}
+    priority 1
   end
 end

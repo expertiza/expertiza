@@ -586,6 +586,7 @@ ActiveRecord::Schema.define(version: 20170110193407) do
     t.integer "directory_num",              limit: 4
     t.integer "grade_for_submission",       limit: 4
     t.text    "comment_for_submission",     limit: 65535
+    t.boolean "new_members",                              default: false
   end
 
   create_table "teams_users", force: :cascade do |t|

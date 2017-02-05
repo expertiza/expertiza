@@ -100,29 +100,37 @@ class StudentTask
 
   delegate :topic, to: :participant
 
-  def self.teamed_students(user)
+  def self.teamed_students(user, course_id = nil, name_required = true, exclude_assignment_id = nil, include_assignment_id = nil)
     @students_teamed = {} # {|h,k| h[k] = Hash.new(&h.default_proc)}
     @teammates = []
     @teams = user.teams
 
     @teams.each do |team|
       next unless team.is_a?(AssignmentTeam)
+      assignment = Assignment.find(team.parent_id)
       # Teammates in calibration assignment should not be counted in teaming requirement.
-      next unless Assignment.find(team.parent_id).is_calibrated == false
+      next unless assignment.is_calibrated == false
+      # If 'exclude_assignment_id' is given then exclude that assignment team members
+      next if assignment.id == exclude_assignment_id unless exclude_assignment_id.nil?
+      next unless assignment.id == include_assignment_id unless include_assignment_id.nil?
       @teammates = []
-      @course_id = Assignment.find(team.parent_id).course_id
+      @course_id = assignment.course_id
       @team_participants = Team.find(team.id).participants
       @team_participants = @team_participants.select {|participant| participant.name != user.name }
       @team_participants.each do |t|
         u = Student.find(t.user_id)
-        @teammates << u.fullname
+        if name_required
+          @teammates << u.fullname
+        else
+          @teammates << u.id
+        end
       end
       next if @teammates.empty?
-      if @students_teamed[@course_id].nil?
+      if @students_teamed[@course_id].nil? and (course_id.nil? or @course_id == course_id)
         @students_teamed[@course_id] = @teammates
-      else
+      elsif (course_id.nil? or @course_id == course_id)
         @teammates.each {|teammate| @students_teamed[@course_id] << teammate }
-        end
+      end
       @students_teamed[@course_id].uniq! if @students_teamed.key?(@course_id)
     end
     @students_teamed

@@ -65,9 +65,31 @@
     </tr>
   </table>
 <% end %>
-
-<!--render partial for join team request-->
   <% if @student.team!=nil %>
+    <%= form_tag('/student_teams/new_members', method: 'put', remote: true) do %>
+        <br/>
+        <script type="text/javascript">
+          function submit_clicked() {
+            var save_pref = document.getElementById("team_auto_submit");
+            var save_alert = document.getElementById("save_alert");
+            save_pref.disabled = true;
+            save_alert.innerHTML = "Saved!";
+          }
+          function pref_Change() {
+            var save_pref = document.getElementById("team_auto_submit");
+            var save_alert = document.getElementById("save_alert");
+            save_pref.disabled = false;
+            save_alert.innerHTML = "";
+          }
+        </script>
+        <input type="checkbox" name="team_auto" id="team_auto " onclick='pref_Change()' <%=@new_members%>> Do you wish to have new team members allocated for this project<br/>
+        <input type="hidden" name="team_id" id="team_id" value="<%=@student.team.id%>"/>
+        <input type ="submit" name="team_auto_submit" id="team_auto_submit" value="Save Preference" disabled onclick='submit_clicked()'>
+        <p style="color: darkred" id = 'save_alert'></p>
+        <br/>
+    <%end%>
+
+    <!--render partial for join team request-->
     <%= render :partial => 'join_team_requests/list_received',
     :locals =>{:team_id=>@student.team.id,
                :teams_user_id=>params[:student_id],

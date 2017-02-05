@@ -3,7 +3,7 @@ source 'http://rubygems.org'
 gem 'rails', '~> 4.2.6'
 
 ## Gems in Alphabetical Order
-
+gem 'scruffy'
 gem 'activerecord-session_store'
 gem 'airbrake'
 gem 'awesome_nested_set'
@@ -58,6 +58,7 @@ gem 'will_paginate'
 gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
 gem 'jquery-tablesorter'
+gem 'gruff'
 
 group :development do
   gem 'daemons'

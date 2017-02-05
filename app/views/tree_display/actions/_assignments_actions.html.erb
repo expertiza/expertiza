@@ -52,6 +52,7 @@
             <% if signup_topic %>
               <%= link_to image_tag('/assets/tree_view/view-publish-rights-24.png', :title => 'View publishing rights'), {:controller => 'participants', :action => 'view_publishing_rights', :id => node.node_object_id}, {:title => 'View publishing rights'} %>
             <% end %>
+            <%= link_to image_tag('/assets/tree_view/view-scores-24.png', :title => 'View class performance'), {:controller     => 'grades', :action => 'view', :id => node.node_object_id}, {:title => 'View class performance'} %>¬
           </div>
 
         <% end %>

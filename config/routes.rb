@@ -3,7 +3,7 @@ Expertiza::Application.routes.draw do
   resources :submission_records
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
-
+  
   resources :bookmarks do
     collection do
       post :save_bookmark_rating_score
@@ -292,6 +292,13 @@ Expertiza::Application.routes.draw do
       get :redirection
       get :show_calibration_results_for_student
       post :custom_create
+    end
+  end
+
+  resources :class_performance do
+    collection do
+      get :select_rubrics
+      post :show_class_performance
     end
   end
 

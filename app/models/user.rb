@@ -71,7 +71,6 @@ class User < ActiveRecord::Base
 
   def get_user_list
     user_list = []
-
     # If the user is a super admin, fetch all users
     if self.role.super_admin?
       User.all.find_each do |user|
@@ -121,7 +120,7 @@ class User < ActiveRecord::Base
       end
     end
 
-    user_list
+    user_list.uniq!
   end
 
   def first_name

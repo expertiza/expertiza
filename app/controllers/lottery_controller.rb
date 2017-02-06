@@ -12,44 +12,99 @@ class LotteryController < ApplicationController
   # This method is to send request to web service and use k-means and students' bidding data to build teams automatically.
   def run_intelligent_assignment
     priority_info = []
+    existing_team_ids = {}
+    assignment = Assignment.find_by(id: params[:id])
+    course_id = assignment['course_id']
+    users_in_teams = []
     topic_ids = SignUpTopic.where(assignment_id: params[:id]).map(&:id)
     user_ids = Participant.where(parent_id: params[:id]).map(&:user_id)
     user_ids.each do |user_id|
       # grab student id and list of bids
       bids = []
+      # getting each users history of users whom they had worked with
+      teamed_students = StudentTask.teamed_students(User.find(user_id),course_id,false, assignment.id)
+      teamed_students[course_id] = [] if teamed_students[course_id].nil?
+      history = teamed_students[course_id]
+      current_team = StudentTask.teamed_students(User.find(user_id),course_id,false, nil, assignment.id)[course_id]
+      if !current_team.nil? and current_team.size >= 1
+        users_in_teams << current_team.dup
+      end
+
       topic_ids.each do |topic_id|
         bid_record = Bid.where(user_id: user_id, topic_id: topic_id).first rescue nil
-        bids << bid_record.nil? ? 0 : bid_record.priority ||= 0
+        bids << (bid_record.nil? ? 0 : bid_record.priority ||= 0)
       end
       if bids.uniq != [0]
-        priority_info << {pid: user_id, ranks: bids}
+        priority_info << {pid: user_id, ranks: bids,  history: history}
       end
     end
-    assignment = Assignment.find_by(id: params[:id])
+    users_in_teams.uniq!
     data = {users: priority_info, max_team_size: assignment.max_team_size}
     url = WEBSERVICE_CONFIG["topic_bidding_webservice_url"]
     begin
       response = RestClient.post url, data.to_json, content_type: :json, accept: :json
-      # store each summary in a hashmap and use the question as the key
-      teams = JSON.parse(response)["teams"]
     rescue => err
       flash[:error] = err.message
     end
-    teams =  [
- [6817, 6812, 6830, 6876],
- [6878, 6861, 6413, 6856],
- [6871, 6818, 6899, 6912],
- [6853, 6895, 6913, 6814],
- [6845, 6900, 6909],
- [6810, 6891, 6905],
- [6815, 6825, 6916, 6923]]
-    create_new_teams_for_bidding_response(teams, assignment)
-    run_intelligent_bid
 
-    redirect_to controller: 'tree_display', action: 'list'
+    # To only swap team members for teams that have the flag set in the database.
+    response_new = {}
+    response_new["users"] = JSON.parse(response)["users"]
+    teams = JSON.parse(response)["teams"]
+    teams_swap_members = []
+    teams.each do |user_ids|
+      any_member_need_swap = false
+      user_ids.each do |user_id|
+        team_ids = TeamsUser.where(user_id: user_id).select(:team_id)
+        team = Team.where(id: team_ids, parent_id: assignment.id)
+        new_members_option = team.first.new_members
+        existing_team_ids[user_id] = team.first.id
+        #If any one member in a team requires new teammates then we will include that team for swapping based on top trading cycle
+        if(new_members_option)
+          any_member_need_swap = true
+        end
+        # If any member is in a pre-built team, we will skip that team when swapping
+        if(users_in_teams.include? user_id)
+          any_member_need_swap = false
+          break
+        end
+      end
+      if(any_member_need_swap)
+        teams_swap_members << user_ids
+      end
+    end
+    teams_not_swap_members = teams - teams_swap_members
+    response_new["teams"] = teams_swap_members
+    response = swapping_team_members_with_history(response_new, assignment.max_team_size)
+    if response != false
+      teams_swap_members = response["teams"]
+      teams = teams_swap_members + teams_not_swap_members
+
+      create_new_teams_for_bidding_response(teams, assignment, existing_team_ids)
+      run_intelligent_bid
+
+    end
+    if(params[:test_run].nil? || params[:test_run] == false)
+      redirect_to controller: 'tree_display', action: 'list'
+    end
   end
 
-  def create_new_teams_for_bidding_response(teams, assignment)
+  def swapping_team_members_with_history(data, max_team_size)
+    temp = data.dup
+    url = WEBSERVICE_CONFIG['member_swapping_webservice_url']
+    (max_team_size-1).times do
+      begin
+        temp = RestClient.post url, temp.to_json, content_type: :json, accept: :json
+        temp = JSON.parse(temp)
+      rescue => err
+        flash[:error] = err.message
+        return false
+      end
+    end
+    return temp
+  end
+
+  def create_new_teams_for_bidding_response(teams, assignment, existing_team_ids)
     teams.each do |user_ids|
       new_team = AssignmentTeam.create(name: assignment.name + '_Team' + rand(1000).to_s,
                                        parent_id: assignment.id,
@@ -59,6 +114,10 @@ class LotteryController < ApplicationController
         team_user = TeamsUser.where(user_id: user_id, team_id: new_team.id).first rescue nil
         team_user = TeamsUser.create(user_id: user_id, team_id: new_team.id) if team_user.nil?
         TeamUserNode.create(parent_id: parent.id, node_object_id: team_user.id)
+
+        #Deleting earlier made team
+        old_team_id = existing_team_ids[user_id]
+        TeamsUser.destroy_all(team_id: old_team_id, user_id: user_id) unless old_team_id.nil?
       end
     end
   end

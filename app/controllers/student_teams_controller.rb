@@ -33,6 +33,14 @@ class StudentTeamsController < ApplicationController
     end
   end
 
+  def new_members
+    val = params['team_auto'].nil? ? false : true
+    team_id = params['team_id']
+    Team.where('id=? AND new_members=?', team_id, !val).update_all(new_members: val)
+
+    render nothing: true
+  end
+
   def view
     # View will check if send_invs and recieved_invs are set before showing
     # only the owner should be able to see those.
@@ -49,6 +57,7 @@ class StudentTeamsController < ApplicationController
     end
 
     current_team = @student.team
+    @new_members = (current_team.new_members ? 'checked' : '') unless current_team.nil?
 
     @users_on_waiting_list = if @student.assignment.has_topics? && current_team && current_team.topic
                                SignUpTopic.find(current_team.topic).users_on_waiting_list

@@ -53,13 +53,13 @@ class PasswordRetrievalController < ApplicationController
     end
   end
 
-  #avoid users to access this page without a valid token
+  # avoid users to access this page without a valid token
   def reset_password
     flash[:error] = "Password reset page can only be accessed with a generated link, sent to your email"
     render template: "password_retrieval/forgotten"
   end
 
-  #called after entering password and repassword, checks for validation and updates the password of the email
+  # called after entering password and repassword, checks for validation and updates the password of the email
   def update_password
     if params[:reset][:password] == params[:reset][:repassword]
       user=User.find_by(:email => params[:reset][:email])

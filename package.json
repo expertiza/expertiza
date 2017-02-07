@@ -1,0 +1,28 @@
+{
+  "name": "expertiza",
+  "version": "1.0.0",
+  "description": "Expertiza =========",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "dependencies": {
+    "bower": "^1.8.0",
+    "react": "^15.4.1",
+    "react-dom": "^15.4.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shubham2892/expertiza.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shubham2892/expertiza/issues"
+  },
+  "homepage": "https://github.com/shubham2892/expertiza#readme"
+}

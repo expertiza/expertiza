@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170110193407) do
+ActiveRecord::Schema.define(version: 20170213155601) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -306,6 +306,7 @@ ActiveRecord::Schema.define(version: 20170110193407) do
     t.float    "Lauw",                 limit: 24,    default: 0.0
     t.integer  "grade_for_reviewer",   limit: 4
     t.text     "comment_for_reviewer", limit: 65535
+    t.datetime "review_graded_at"
   end
 
   add_index "participants", ["user_id"], name: "fk_participant_users", using: :btree
@@ -609,26 +610,26 @@ ActiveRecord::Schema.define(version: 20170110193407) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string  "name",                      limit: 255,   default: "",    null: false
-    t.string  "crypted_password",          limit: 40,    default: "",    null: false
-    t.integer "role_id",                   limit: 4,     default: 0,     null: false
+    t.string  "name",                      limit: 255,      default: "",    null: false
+    t.string  "crypted_password",          limit: 40,       default: "",    null: false
+    t.integer "role_id",                   limit: 4,        default: 0,     null: false
     t.string  "password_salt",             limit: 255
     t.string  "fullname",                  limit: 255
     t.string  "email",                     limit: 255
     t.integer "parent_id",                 limit: 4
-    t.boolean "private_by_default",                      default: false
+    t.boolean "private_by_default",                         default: false
     t.string  "mru_directory_path",        limit: 128
     t.boolean "email_on_review"
     t.boolean "email_on_submission"
     t.boolean "email_on_review_of_review"
-    t.boolean "is_new_user",                             default: true,  null: false
-    t.integer "master_permission_granted", limit: 1,     default: 0
+    t.boolean "is_new_user",                                default: true,  null: false
+    t.integer "master_permission_granted", limit: 1,        default: 0
     t.string  "handle",                    limit: 255
-    t.text    "digital_certificate",       limit: 65535
+    t.text    "digital_certificate",       limit: 16777215
     t.string  "persistence_token",         limit: 255
     t.string  "timezonepref",              limit: 255
-    t.text    "public_key",                limit: 65535
-    t.boolean "copy_of_emails",                          default: false
+    t.text    "public_key",                limit: 16777215
+    t.boolean "copy_of_emails",                             default: false
     t.integer "institution_id",            limit: 4
   end
 

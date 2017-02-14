@@ -99,6 +99,7 @@ class UsersController < ApplicationController
   end
 
   def request_new
+    flash[:error] = "If you are a student, please contact your teaching staff to get your Expertiza ID."
     @user = User.new
     @rolename = Role.find_by_name(params[:role])
     roles_for_request_sign_up
@@ -272,7 +273,7 @@ class UsersController < ApplicationController
   protected
 
   def roles_for_request_sign_up
-    roles_can_be_requested_online = ["Instructor", "Student", "Teaching Assistant"]
+    roles_can_be_requested_online = ["Instructor", "Teaching Assistant"]
     @all_roles = Role.where(name: roles_can_be_requested_online)
   end
 

@@ -38,6 +38,14 @@ module ReviewMappingHelper
     [response_maps, bgcolor, rspan, line_num]
   end
 
+  def get_team_name_color(response_map)
+    team_name_color = Response.exists?(map_id: response_map.id) ? "green" : "red"
+    review_graded_at = response_map.try(:reviewer).try(:review_graded_at)
+    response_last_updated_at = response_map.try(:response).try(:last).try(:updated_at)
+    team_name_color = "blue" if review_graded_at && response_last_updated_at && response_last_updated_at > review_graded_at
+    team_name_color
+  end
+
   def get_team_reviewed_link_name(max_team_size, response, reviewee_id)
     team_reviewed_link_name = if max_team_size == 1
                                 TeamsUser.where(team_id: reviewee_id).first.user.fullname

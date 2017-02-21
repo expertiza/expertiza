@@ -36,12 +36,12 @@
 
           <% @response_maps.each_with_index do |ri, index| %>
             <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
-            <% team_name_color = Response.exists?(map_id: ri.id) ? "green" : "red" %>
+            <% team_name_color = get_team_name_color(ri) %>
             <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, ri.response, ri.reviewee_id) %>
               <% if Team.where(id: ri.reviewee_id).length > 0 %>
                 <%@team = Team.find(ri.reviewee_id) %>
                 <!--Team reviewed-->
-                <td id = <%= team_name_color%> bgcolor=<%= @bgcolor %> align = 'left' colspan=1>
+                <td id = <%= team_name_color %> bgcolor=<%= @bgcolor %> align = 'left' colspan=1>
                   <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
                   <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>
                   <!--Hard-coded Dr.Kidd's question in order to display link.-->
@@ -73,7 +73,7 @@
       <%end %>
 </table>
 
-  <p> **Text in <i style = "color:#DD3300">red</i> indicates that the review is not yet completed; text in <i style = "color:gray">gray</i> indicates that the review is done in previous round(s).</p>
+  <p> **Text in <i style = "color:red">red</i> indicates that the review is not yet completed; text in <i style = "color:gray">gray</i> indicates that the review is done in previous round(s); text in <i style = "color:blue">blue</i> indicates that the review is updated after the review grade is assigned.</p>
 </div>
 
 <style>

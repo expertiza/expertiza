@@ -37,7 +37,7 @@ class MultipleChoiceCheckbox < QuizQuestion
       html += "id = " + "\"#{self.id}" + "_" + "#{i + 1}\" "
       html += "value = " + "\"#{quiz_question_choices[i].txt}\" "
       html += "type=\"checkbox\"/>"
-      html += "#{i + 1}"
+      html += "#{quiz_question_choices[i].txt}"
       html += "</br>"
     end
     html

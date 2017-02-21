@@ -29,18 +29,18 @@ class Dropdown < UnscoredQuestion
     safe_join(["<TR>".html_safe, "</TR>".html_safe], html.html_safe)
   end
 
-  def complete(count, _answer = nil)
+  def complete(count, answer = nil)
     html = '<label for="responses_' + count.to_s + '">' + self.txt + '&nbsp;&nbsp;</label>'
     html += '<input id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" type="hidden" value="">'
     html += '<select id="responses_' + count.to_s + '_comments" label=' + self.txt + ' name="responses[' + count.to_s + '][comment]">'
 
     alternatives = self.alternatives.split('|')
-    html += complete_for_alternatives(alternatives)
+    html += complete_for_alternatives(alternatives, answer)
     html += '</select>'
     safe_join(["<li>".html_safe, "</li>".html_safe], html.html_safe)
   end
 
-  def complete_for_alternatives(alternatives)
+  def complete_for_alternatives(alternatives, answer)
     html = ''
     alternatives.each do |alternative|
       html += '<option value="' + alternative.to_s + '"'

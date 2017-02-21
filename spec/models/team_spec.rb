@@ -7,7 +7,7 @@ describe 'Team' do
     course.save
     team = CourseTeam.create_team_and_node(course.id)
     expect(team).to be_kind_of(CourseTeam)
-    team.name.should start_with course.name
+    expect(team.name).to start_with(course.name)
   end
 
   it "verify create team and node for Assignment Team" do
@@ -16,6 +16,6 @@ describe 'Team' do
     assignment.save
     team = AssignmentTeam.create_team_and_node(assignment.id)
     expect(team).to be_kind_of(AssignmentTeam)
-    team.name.should start_with assignment.name
+    expect(team.name).to start_with(assignment.name)
   end
 end

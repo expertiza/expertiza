@@ -49,33 +49,8 @@ class UsersController < ApplicationController
     # Deprecated
     # all_users = User.order('name').where( ['role_id in (?) or id = ?', role.get_available_roles, user.id])
 
-    letter = params[:letter]
-    session[:letter] = letter
-    if letter.nil?
-      letter = all_users.first.name[0, 1].downcase unless all_users.empty?
-    end
-    @letters = []
-
-    @per_page = 1
-
-    # Check if the "Show" button for pagination is clicked
-    # If yes, set @per_page to the value of the selection dropdown
-    # Else, if the request is from one of the letter links on the top
-    # set @per_page to 1 (25 names per page).
-    # Else, set @per_page to the :num_users param passed in from
-    # the will_paginate method from the 'pagination' partial.
-    @per_page = if params[:paginate_show]
-                  params[:num_users]
-                elsif params[:from_letter]
-                  1
-                else
-                  params[:num_users]
-                end
-
     # Get the users list to show on current page
-    @users = paginate_list all_users
-
-    @letters = ('A'..'Z').to_a
+    @users = all_users
   end
 
   def list_pending_requested
@@ -124,6 +99,7 @@ class UsersController < ApplicationController
   end
 
   def request_new
+    flash[:error] = "If you are a student, please contact your teaching staff to get your Expertiza ID."
     @user = User.new
     @rolename = Role.find_by_name(params[:role])
     roles_for_request_sign_up
@@ -222,8 +198,9 @@ class UsersController < ApplicationController
     @user = RequestedUser.new(user_params)
     @user.institution_id = params[:user][:institution_id]
     @user.status = 'Under Review'
+
     #The super admin receives a mail about a new user request with the user name
-    if @user.save
+    if User.find_by(name: @user.name).nil? && User.find_by(name: @user.email).nil? && @user.save
       @super_users = User.joins(:role).where('roles.name' =>'Super-Administrator');
       @super_users.each do |super_user|
         prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user,@user, "New account Request")
@@ -232,7 +209,7 @@ class UsersController < ApplicationController
       flash[:success] = "User signup for \"#{@user.name}\" has been successfully requested. "
       redirect_to '/instructions/home'
     else
-      flash[:error] = "Error requesting sign up "
+      flash[:error] = "The account you are requesting has already existed in Expertiza."
       redirect_to :controller => 'users', :action => 'request_new', :role=>"Student"   
     end
   end
@@ -296,14 +273,34 @@ class UsersController < ApplicationController
   protected
 
   def roles_for_request_sign_up
-    roles_can_be_requested_online = ["Instructor", "Student", "Teaching Assistant"]
+    roles_can_be_requested_online = ["Instructor", "Teaching Assistant"]
     @all_roles = Role.where(name: roles_can_be_requested_online)
   end
 
   private
 
   def user_params
-    params.require(:user).permit(:name, :crypted_password, :role_id, :password_salt, :fullname, :email, :parent_id, :private_by_default, :mru_directory_path, :email_on_review, :email_on_submission, :email_on_review_of_review, :is_new_user, :master_permission_granted, :handle, :leaderboard_privacy, :digital_certificate, :persistence_token, :timezonepref, :public_key, :copy_of_emails, :institution_id)
+        params.require(:user).permit(:name, 
+                                     :crypted_password, 
+                                     :role_id, 
+                                     :password_salt, 
+                                     :fullname, 
+                                     :email, 
+                                     :parent_id, 
+                                     :private_by_default, 
+                                     :mru_directory_path, 
+                                     :email_on_review, 
+                                     :email_on_submission, 
+                                     :email_on_review_of_review, 
+                                     :is_new_user, 
+                                     :master_permission_granted, 
+                                     :handle, 
+                                     :digital_certificate, 
+                                     :persistence_token, 
+                                     :timezonepref, 
+                                     :public_key, 
+                                     :copy_of_emails,
+                                     :institution_id)
   end
 
   def get_role

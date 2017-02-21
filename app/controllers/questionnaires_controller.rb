@@ -129,25 +129,20 @@ class QuestionnairesController < ApplicationController
   # Remove a given questionnaire
   def delete
     @questionnaire = Questionnaire.find(params[:id])
-
     if @questionnaire
       begin
         name = @questionnaire.name
-
         # if this rubric is used by some assignment, flash error
-        @questionnaire.assignments.each do |assignment|
-          raise "The assignment #{assignment.name} uses this questionnaire. Are sure you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
+        if @questionnaire.assignments.length > 0
+          raise "The assignment <b>#{@questionnaire.assignments.first.try(:name)}</b> uses this questionnaire. Are sure you want to delete the assignment?"
         end
-
         questions = @questionnaire.questions
-
         # if this rubric had some answers, flash error
         questions.each do |question|
           unless question.answers.empty?
             raise "There are responses based on this rubric, we suggest you do not delete it."
           end
         end
-
         questions.each do |question|
           advices = question.question_advices
           advices.each(&:delete)
@@ -156,13 +151,11 @@ class QuestionnairesController < ApplicationController
         questionnaire_node = @questionnaire.questionnaire_node
         questionnaire_node.delete
         @questionnaire.delete
-
         undo_link("The questionnaire \"#{name}\" has been successfully deleted.")
-      rescue
-        flash[:error] = $ERROR_INFO
+      rescue => e
+        flash[:error] = e.message
       end
     end
-
     redirect_to action: 'list', controller: 'tree_display'
   end
 

@@ -23,15 +23,7 @@
               <td><label for="copy_of_emails">Send me copies of emails sent for assigments</label></td>
               <td><%= check_box 'user', 'copy_of_emails', {}, true, false %></td>
             </tr>
-          <% end%>
-          <tr></tr>
-          <tr>
-            <th align=left>Privacy</th>
-            <tr>
-              <tr>
-                <td><label for="user_leaderboard_privacy">Hide my name on the leaderboard</label></td>
-                <td><%= check_box 'user', 'leaderboard_privacy', {}, true, false %></td>
-              </tr>
-            </table>
-          </div>
+          <% end %>
+  </table>
+</div>
 <% end %>

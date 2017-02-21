@@ -105,7 +105,7 @@ class Criterion < ScoredQuestion
     if dropdown_or_scale == 'dropdown'
       html += '<div><select id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]">'
       html += "<option value = ''>--</option>"
-      (questionnaire_min..questionnaire_max).each do |j|
+      questionnaire_max.downto(questionnaire_min).each do |j|
         html += if !answer.nil? and j == answer.answer
                   '<option value=' + j.to_s + ' selected="selected">'
                 else

@@ -218,11 +218,8 @@ class AssignmentsController < ApplicationController
         @assignment_form.delete(params[:force])
         flash[:success] = "The assignment was successfully deleted."
       end
-    rescue
-      url_yes = url_for action: 'delete', id: params[:id], force: 1
-      url_no = url_for action: 'delete', id: params[:id]
-      error = $ERROR_INFO
-      flash[:error] = error.to_s + " Delete this assignment anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
+    rescue => e
+      flash[:error] = e.message
     end
     redirect_to list_tree_display_index_path
   end

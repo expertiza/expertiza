@@ -177,14 +177,6 @@ Expertiza::Application.routes.draw do
 
   resources 'late_policies'
 
-  resources :leaderboard, constraints: {id: /\d+/} do
-    collection do
-      get :index
-    end
-  end
-
-  get 'leaderboard/index', controller: :leaderboard, action: :index
-
   resources :markup_styles
 
   resources :menu_items do
@@ -217,12 +209,12 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  get '/participants/change_handle', controller: :participants, action: :change_handle
-
   resources :password_retrieval do
     collection do
       get :forgotten
+      get :reset_password
       post :send_password
+      post :update_password
     end
   end
 
@@ -421,16 +413,6 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  # resources :submissionrecord do
-  #   collection do
-  #     get :list
-  #     get :show
-  #     get :neq
-  #     post :create
-  #     post ':id', action: :update
-  #   end
-  # end
-
   resources :submitted_content do
     collection do
       get :download
@@ -551,6 +533,5 @@ Expertiza::Application.routes.draw do
   get ':controller/service.wsdl', :action => 'wsdl'
 
   get ':controller(/:action(/:id))(.:format)'
-
- # get 'sign_up_sheet/intelligent_signup_sheet.html_erb' => 'sign_up_sheet#intelligentPage'
+  get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
 end

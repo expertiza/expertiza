@@ -76,7 +76,7 @@ class TrueFalse < QuizQuestion
         valid = "Please make sure every question has text for all options"
         break
       end
-      if value[:iscorrect] == 1.to_s
+      if value.key?(:iscorrect)
         correct_count+=1
       end
     end

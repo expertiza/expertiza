@@ -48,10 +48,10 @@ class ParticipantsController < ApplicationController
       curr_object.add_participant(params[:user][:name], can_submit, can_review, can_take_quiz)
       user = User.find_by_name(params[:user][:name])
       @participant = curr_object.participants.find_by_user_id(user.id)
-      undo_link("The user \"#{params[:user][:name]}\" has successfully been added.")
+      undo_link("The user <b>#{params[:user][:name]}</b> has successfully been added.")
     rescue
       url_new_user = url_for controller: 'users', action: 'new'
-      flash[:error] = "The user #{params[:user][:name]} does not exist or has already been added.</a>"
+      flash[:error] = "The user <b>#{params[:user][:name]}</b> does not exist or has already been added."
     end
     redirect_to action: 'list', id: curr_object.id, model: params[:model], authorization: params[:authorization]
   end

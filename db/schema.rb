@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170222011516) do
+ActiveRecord::Schema.define(version: 20170222161826) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -408,6 +408,16 @@ ActiveRecord::Schema.define(version: 20170222011516) do
 
   add_index "resubmission_times", ["participant_id"], name: "fk_resubmission_times_participants", using: :btree
 
+  create_table "review_comment_paste_bins", force: :cascade do |t|
+    t.integer  "review_grade_id", limit: 4
+    t.string   "title",           limit: 255
+    t.text     "review_comment",  limit: 65535
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+  end
+
+  add_index "review_comment_paste_bins", ["review_grade_id"], name: "fk_rails_0a539bcc81", using: :btree
+
   create_table "review_grades", force: :cascade do |t|
     t.integer  "participant_id",       limit: 4
     t.integer  "grade_for_reviewer",   limit: 4
@@ -673,6 +683,7 @@ ActiveRecord::Schema.define(version: 20170222011516) do
   add_foreign_key "question_advices", "questions", name: "fk_question_question_advices"
   add_foreign_key "questions", "questionnaires", name: "fk_question_questionnaires"
   add_foreign_key "resubmission_times", "participants", name: "fk_resubmission_times_participants"
+  add_foreign_key "review_comment_paste_bins", "review_grades"
   add_foreign_key "review_grades", "participants"
   add_foreign_key "sign_up_topics", "assignments", name: "fk_sign_up_topics_assignments"
   add_foreign_key "signed_up_teams", "sign_up_topics", column: "topic_id", name: "fk_signed_up_users_sign_up_topics"

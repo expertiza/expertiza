@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170221210920) do
+ActiveRecord::Schema.define(version: 20170222011516) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -413,6 +413,7 @@ ActiveRecord::Schema.define(version: 20170221210920) do
     t.integer  "grade_for_reviewer",   limit: 4
     t.text     "comment_for_reviewer", limit: 65535
     t.datetime "review_graded_at"
+    t.integer  "reviewer_id",          limit: 4
   end
 
   add_index "review_grades", ["participant_id"], name: "fk_rails_29587cf6a9", using: :btree

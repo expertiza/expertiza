@@ -435,6 +435,7 @@ class ReviewMappingController < ApplicationController
     review_grade.grade_for_reviewer = params[:grade_for_reviewer] if params[:grade_for_reviewer]
     review_grade.comment_for_reviewer = params[:comment_for_reviewer] if params[:comment_for_reviewer]
     review_grade.review_graded_at = Time.now
+    review_grade.reviewer_id = session[:user].id
     begin
       review_grade.save
     rescue

@@ -84,16 +84,16 @@ class SignUpSheetController < ApplicationController
   # updates the database tables to reflect the new values for the assignment. Used in conjuntion with edit
   def update
     @topic = SignUpTopic.find(params[:id])
-
+    
     if @topic
       @topic.topic_identifier = params[:topic][:topic_identifier]
-
       update_max_choosers @topic
-
       # update tables
       @topic.category = params[:topic][:category]
       @topic.topic_name = params[:topic][:topic_name]
       @topic.micropayment = params[:topic][:micropayment]
+      @topic.description = params[:topic][:description]
+      @topic.link = params[:topic][:link]
       @topic.save
       undo_link("The topic: \"#{@topic.topic_name}\" has been successfully updated. ")
     else

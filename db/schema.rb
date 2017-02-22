@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170213155601) do
+ActiveRecord::Schema.define(version: 20170222011516) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -288,25 +288,22 @@ ActiveRecord::Schema.define(version: 20170213155601) do
   end
 
   create_table "participants", force: :cascade do |t|
-    t.boolean  "can_submit",                         default: true
-    t.boolean  "can_review",                         default: true
-    t.integer  "user_id",              limit: 4
-    t.integer  "parent_id",            limit: 4
+    t.boolean  "can_submit",                        default: true
+    t.boolean  "can_review",                        default: true
+    t.integer  "user_id",             limit: 4
+    t.integer  "parent_id",           limit: 4
     t.datetime "submitted_at"
     t.boolean  "permission_granted"
-    t.integer  "penalty_accumulated",  limit: 4,     default: 0,    null: false
-    t.float    "grade",                limit: 24
-    t.string   "type",                 limit: 255
-    t.string   "handle",               limit: 255
+    t.integer  "penalty_accumulated", limit: 4,     default: 0,    null: false
+    t.float    "grade",               limit: 24
+    t.string   "type",                limit: 255
+    t.string   "handle",              limit: 255
     t.datetime "time_stamp"
-    t.text     "digital_signature",    limit: 65535
-    t.string   "duty",                 limit: 255
-    t.boolean  "can_take_quiz",                      default: true
-    t.float    "Hamer",                limit: 24,    default: 1.0
-    t.float    "Lauw",                 limit: 24,    default: 0.0
-    t.integer  "grade_for_reviewer",   limit: 4
-    t.text     "comment_for_reviewer", limit: 65535
-    t.datetime "review_graded_at"
+    t.text     "digital_signature",   limit: 65535
+    t.string   "duty",                limit: 255
+    t.boolean  "can_take_quiz",                     default: true
+    t.float    "Hamer",               limit: 24,    default: 1.0
+    t.float    "Lauw",                limit: 24,    default: 0.0
   end
 
   add_index "participants", ["user_id"], name: "fk_participant_users", using: :btree
@@ -410,6 +407,16 @@ ActiveRecord::Schema.define(version: 20170213155601) do
   end
 
   add_index "resubmission_times", ["participant_id"], name: "fk_resubmission_times_participants", using: :btree
+
+  create_table "review_grades", force: :cascade do |t|
+    t.integer  "participant_id",       limit: 4
+    t.integer  "grade_for_reviewer",   limit: 4
+    t.text     "comment_for_reviewer", limit: 65535
+    t.datetime "review_graded_at"
+    t.integer  "reviewer_id",          limit: 4
+  end
+
+  add_index "review_grades", ["participant_id"], name: "fk_rails_29587cf6a9", using: :btree
 
   create_table "roles", force: :cascade do |t|
     t.string   "name",            limit: 255,   default: "", null: false
@@ -666,6 +673,7 @@ ActiveRecord::Schema.define(version: 20170213155601) do
   add_foreign_key "question_advices", "questions", name: "fk_question_question_advices"
   add_foreign_key "questions", "questionnaires", name: "fk_question_questionnaires"
   add_foreign_key "resubmission_times", "participants", name: "fk_resubmission_times_participants"
+  add_foreign_key "review_grades", "participants"
   add_foreign_key "sign_up_topics", "assignments", name: "fk_sign_up_topics_assignments"
   add_foreign_key "signed_up_teams", "sign_up_topics", column: "topic_id", name: "fk_signed_up_users_sign_up_topics"
   add_foreign_key "ta_mappings", "courses", name: "fk_ta_mappings_course_id"

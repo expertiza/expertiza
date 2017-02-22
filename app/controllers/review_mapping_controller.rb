@@ -428,12 +428,16 @@ class ReviewMappingController < ApplicationController
     end
 
   def save_grade_and_comment_for_reviewer
-    participant = Participant.find(params[:participant_id])
-    participant.grade_for_reviewer = params[:grade_for_reviewer] if params[:grade_for_reviewer]
-    participant.comment_for_reviewer = params[:comment_for_reviewer] if params[:comment_for_reviewer]
-    participant.review_graded_at = Time.now
+    review_grade = ReviewGrade.find_by(participant_id: params[:participant_id])
+    if review_grade.nil?
+      review_grade = ReviewGrade.create(participant_id: params[:participant_id])
+    end
+    review_grade.grade_for_reviewer = params[:grade_for_reviewer] if params[:grade_for_reviewer]
+    review_grade.comment_for_reviewer = params[:comment_for_reviewer] if params[:comment_for_reviewer]
+    review_grade.review_graded_at = Time.now
+    review_grade.reviewer_id = session[:user].id
     begin
-      participant.save
+      review_grade.save
     rescue
       flash[:error] = $ERROR_INFO
     end

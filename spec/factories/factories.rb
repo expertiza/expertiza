@@ -194,9 +194,6 @@ FactoryGirl.define do
     digital_signature nil
     duty nil
     can_take_quiz true
-    grade_for_reviewer 100
-    comment_for_reviewer "Good job!"
-    review_graded_at "2011-11-11 11:11:11"
   end
 
   factory :course_participant, class: CourseParticipant do
@@ -216,6 +213,12 @@ FactoryGirl.define do
     can_take_quiz true
   end
 
+  factory :review_grade, class: ReviewGrade do
+    grade_for_reviewer 100
+    comment_for_reviewer "Good job!"
+    review_graded_at "2011-11-11 11:11:11"
+  end
+
   factory :assignment_due_date, class: AssignmentDueDate do
     due_at DateTime.now.in_time_zone + 1.day
     deadline_type { DeadlineType.first || association(:deadline_type) }
@@ -233,6 +236,7 @@ FactoryGirl.define do
     teammate_review_allowed_id 3
     type 'AssignmentDueDate'
   end
+
   factory :topic_due_date, class: TopicDueDate do
     due_at DateTime.now.in_time_zone + 1.day
     deadline_type { DeadlineType.first || association(:deadline_type) }

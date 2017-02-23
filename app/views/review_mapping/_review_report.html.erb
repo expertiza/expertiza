@@ -59,8 +59,8 @@
                     <%= form_tag 'save_grade_and_comment_for_reviewer', remote: true do %>
                       <%= hidden_field_tag :participant_id, r.id %>
                       <%= hidden_field_tag :assignment_id, @id %>
-                      <%= number_field_tag 'grade_for_reviewer', r.review_grade.grade_for_reviewer ,min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade' %><br/>
-                      <%= text_area_tag 'comment_for_reviewer', r.review_grade.comment_for_reviewer, placeholder: 'Comment' %>
+                      <%= number_field_tag 'grade_for_reviewer', r.review_grade.try(:grade_for_reviewer) ,min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade' %><br/>
+                      <%= text_area_tag 'comment_for_reviewer', r.review_grade.try(:comment_for_reviewer), placeholder: 'Comment' %>
                       <%= submit_tag 'Save' %>
                     <% end %>
                   </td>

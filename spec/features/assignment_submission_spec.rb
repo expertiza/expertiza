@@ -78,7 +78,7 @@ describe "assignment submisstion test" do
     # hyperlink is "http://"
     fill_in 'submission', with: "http://"
     click_on 'Upload link'
-    expect(page).to have_content "The URL or URI is not valid. Reason: bad URI(absolute but no path): http://"
+    expect(page).to have_content "The URL or URI is not valid."
   end
 
   it "is able to submit single valid file" do

@@ -16,6 +16,7 @@ pg_data/*
 ## npm & bower
 #################
 node_modules
+package.json
 
 #################
 ## Eclipse

@@ -1,6 +1,13 @@
 class ApplicationController < ActionController::Base
   include AccessHelper
 
+  # You want to get exceptions in development, but not in production.
+  unless Rails.application.config.consider_all_requests_local
+    rescue_from ActionView::MissingTemplate do |exception|
+      redirect_to root_path
+    end
+  end
+
   if Rails.env.production?
     # forcing SSL only in the production mode
     force_ssl

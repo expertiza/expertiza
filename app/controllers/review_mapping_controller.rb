@@ -1,4 +1,5 @@
 class ReviewMappingController < ApplicationController
+  include ReviewMappingHelper
   # include GC4R
   autocomplete :user, :name
   # use_google_charts
@@ -7,6 +8,8 @@ class ReviewMappingController < ApplicationController
   helper :submitted_content
 
   @@time_create_last_review_mapping_record = nil
+
+
 
   # E1600
   # start_self_review is a method that is invoked by a student user so it should be allowed accordingly
@@ -397,11 +400,20 @@ class ReviewMappingController < ApplicationController
       @avg_scores_by_round = sum.avg_scores_by_round
       @avg_scores_by_criterion = sum.avg_scores_by_criterion
     when "ReviewResponseMap"
+      @all_metric_filters = get_metric_filter_option
+
       @review_user = params[:user]
       # If review response is required call review_response_report method in review_response_map model
       @reviewers = ReviewResponseMap.review_response_report(@id, @assignment, @type, @review_user)
       @review_scores = @assignment.compute_reviews_hash
       @avg_and_ranges = @assignment.compute_avg_and_ranges_hash
+
+      @author_feedback_score = get_author_feedback_score_hash(@assignment, @reviewers)
+
+      #params[:user][:metricFilter] will have a blank value by default. We will need to remove it before passing it to further views.
+      @selected_metric_filters = (!params[:user].nil? && !params[:user][:metricFilter].blank?) ? params[:user][:metricFilter].reject(&:empty?) : ["Average Review Length"]
+
+
     when "FeedbackResponseMap"
       # If review report for feedback is required call feedback_response_report method in feedback_review_response_map model
       if @assignment.varying_rubrics_by_round?
@@ -602,4 +614,12 @@ private
       iterator += 1
     end
   end
+
+  private
+
+  #Returns an array of metric to be used for filtering in review report page.
+  def get_metric_filter_option
+    return ["Average Review Length", "Average Author Feedback", "Reviewer Summary", "Submitted File"]
+  end
+
 end

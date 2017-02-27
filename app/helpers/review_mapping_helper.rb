@@ -94,13 +94,45 @@ module ReviewMappingHelper
   end
 
   def display_volume_metric(overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3)
-    metric = "Avg. Volume: #{overall_avg_vol.to_s} <br/> ("
+    metric = "Avg. Length of Review (in chars): #{overall_avg_vol.to_s} <br/>"
     metric += "1st: " + avg_vol_in_round_1.to_s if avg_vol_in_round_1 > 0
-    metric += ", 2nd: " + avg_vol_in_round_2.to_s if avg_vol_in_round_2 > 0
-    metric += ", 3rd: " + avg_vol_in_round_3.to_s if avg_vol_in_round_3 > 0
-    metric += ")"
+    metric += "</br>2nd: " + avg_vol_in_round_2.to_s if avg_vol_in_round_2 > 0
+    metric += "</br>3rd: " + avg_vol_in_round_3.to_s if avg_vol_in_round_3 > 0
     metric.html_safe
   end
+
+  def display_avg_author_feedback_score(reviewer_id)
+    score = 'Avg. Author Feedback Score:</br>'
+    no_feedback = true
+
+    if  !@author_feedback_score[reviewer_id][1].nil?
+       score += '1st: '+ sprintf('%.2f', @author_feedback_score[reviewer_id][1]).remove('.00')+'/'+
+           @author_feedback_score[:max_score_round_1].to_s+' from '+@author_feedback_score[:no_of_feedbacks_round_1].to_s+' feedback/s'
+
+       no_feedback = false
+    end
+
+     if  !@author_feedback_score[reviewer_id][2].nil?
+       score += '</br>2nd: '+ sprintf('%.2f', @author_feedback_score[reviewer_id][2].to_s).remove('.00')+'/'+
+           @author_feedback_score[:max_score_round_2].to_s+'/'+' from '+@author_feedback_score[:no_of_feedbacks_round_2].to_s+' feedback/s'
+
+       no_feedback = false
+     end
+
+      if  !@author_feedback_score[reviewer_id][3].nil?
+        score += '</br>3rd: '+ sprintf('%.2f', @author_feedback_score[reviewer_id][3].to_s).remove('.00')+'/'+
+           @author_feedback_score[:max_score_round_3].to_s+' from '+@author_feedback_score[:no_of_feedbacks_round_3].to_s+' feedback/s'
+
+        no_feedback = false
+      end
+
+    if no_feedback
+      score += "No feedbacks available"
+    end
+
+    score.html_safe
+  end
+
 
   def list_review_submissions(participant_id, reviewee_team_id, response_map_id)
     participant = Participant.find(participant_id)
@@ -112,7 +144,7 @@ module ReviewMappingHelper
       if files and files.length > 0 
         html += display_review_files_directory_tree(participant, files) 
       end 
-    end 
+    end
     html.html_safe
   end
 
@@ -184,4 +216,145 @@ module ReviewMappingHelper
                 end
     css_class
   end
+  #This method will compute author feedbacks for given list of reviewers
+  #It will return a hash with key as reviewer id and round number and value will consist of average author feedback for
+  #particular round
+  #We will also return number of feedbacks for each round.
+  def get_author_feedback_score_hash(assignment, reviewers)
+
+    review_mapping_type = 'FeedbackResponseMap'
+
+    does_assignment_have_varying_rubrics = false
+
+    if assignment.varying_rubrics_by_round?
+
+      does_assignment_have_varying_rubrics = true
+
+      #We will store all the review response ids for the particular round.
+      authors, all_review_response_ids_round_one, all_review_response_ids_round_two, all_review_response_ids_round_three = FeedbackResponseMap.feedback_response_report(assignment.id, review_mapping_type)
+
+    else
+
+      authors, all_review_response_ids = FeedbackResponseMap.feedback_response_report(assignment.id, review_mapping_type)
+
+    end
+
+    reviewer_ids = []
+
+    author_feedback_score = {}
+
+    author_feedback_score[:max_score_round_1] = {}
+    author_feedback_score[:max_score_round_2] = {}
+    author_feedback_score[:max_score_round_3] = {}
+
+    author_feedback_score[:no_of_feedbacks_round_1] = {}
+    author_feedback_score[:no_of_feedbacks_round_2] = {}
+    author_feedback_score[:no_of_feedbacks_round_3] = {}
+
+    if(!reviewers.nil?)
+
+      reviewers.each do |r|
+
+        author_feedback_score[r.id] = {} if author_feedback_score[r.id].nil?
+
+        next if reviewer_ids.include? r.id
+
+        reviewer_ids << r.id
+
+        #Retrieving all the response map of feedback for this reviewer
+        review_mappings = FeedbackResponseMap.where(:reviewee_id => r.id, :type => review_mapping_type)
+
+        if(!review_mappings.nil? && review_mappings.size > 0)
+
+          if does_assignment_have_varying_rubrics
+
+            total_score = {:round_1 => 0, :round_2 => 0, :round_3 => 0}
+
+            total_feedback = {:round_1 => 0, :round_2 => 0, :round_3 => 0}
+
+            review_mappings.each do |m|
+
+              response = Response.where(:map_id => m.id).first
+
+              next if response.nil?
+
+              #The following code will compute the total feedback score for each round. It will later find average of that score
+              #and store it in hash author_feedback_score
+              if all_review_response_ids_round_one.include? m.reviewed_object_id
+
+                compute_feedback_score_per_round total_score, response, total_feedback, author_feedback_score, :max_score_round_1,:round_1
+
+              elsif all_review_response_ids_round_two.include? m.reviewed_object_id
+
+                compute_feedback_score_per_round total_score, response, total_feedback, author_feedback_score, :max_score_round_2, :round_2
+
+              else
+
+                compute_feedback_score_per_round total_score, response, total_feedback, author_feedback_score, :max_score_round_3, :round_3
+
+              end
+            end
+
+            if total_feedback[:round_1] > 0
+
+              update_author_feedback_hash author_feedback_score, r.id, 1, :no_of_feedbacks_round_1, total_score[:round_1], total_feedback[:round_1]
+
+            end
+
+            if total_feedback[:round_2] > 0
+
+              update_author_feedback_hash author_feedback_score, r.id, 2, :no_of_feedbacks_round_2, total_score[:round_2], total_feedback[:round_2]
+
+            end
+
+            if total_feedback[:round_3] > 0
+
+              update_author_feedback_hash author_feedback_score, r.id, 3, :no_of_feedbacks_round_3, total_score[:round_3], total_feedback[:round_3]
+
+            end
+
+          else
+
+            total_score = {:round_1 => 0}
+
+            total_feedback = {:round_1 => 0}
+
+            review_mappings.each do |m|
+
+              response = Response.where(:map_id => m.id).first;
+
+              next if response.nil?
+
+              compute_feedback_score_per_round total_score, response, total_feedback, author_feedback_score, :max_score_round_1, :round_1
+
+            end
+
+            update_author_feedback_hash author_feedback_score, r.id, 1, :no_of_feedbacks_round_1, total_score[:round_1], total_feedback[:round_1]
+
+          end
+        end
+      end
+    end
+
+    author_feedback_score
+  end
+
+  private
+
+  def update_author_feedback_hash(author_feedback_score, reviewer_id, round_no, number_of_feedback_key, total_score, number_of_feedbacks)
+    author_feedback_score[reviewer_id][round_no] = {} if author_feedback_score[reviewer_id][round_no].nil?
+    author_feedback_score[reviewer_id][round_no] = total_score.to_f / number_of_feedbacks
+    author_feedback_score[number_of_feedback_key] = number_of_feedbacks
+  end
+
+  def compute_feedback_score_per_round(total_score, response, total_feedback,author_feedback_score, max_feedback_score_key, round_no_key)
+
+    total_score[round_no_key] +=  response.get_total_score
+    total_feedback[round_no_key] += 1
+    author_feedback_score[max_feedback_score_key] = response.get_maximum_score if author_feedback_score[max_feedback_score_key].blank?
+
+  end
+
 end
+
+

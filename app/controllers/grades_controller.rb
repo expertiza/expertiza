@@ -12,7 +12,9 @@ class GradesController < ApplicationController
          'Teaching Assistant',
          'Administrator',
          'Super-Administrator',
-         'Student'].include? current_role_name and are_needed_authorizations_present? and check_self_review_status
+         'Student'].include? current_role_name and 
+        are_needed_authorizations_present?(params[:id], "reader", "reviewer") and 
+        check_self_review_status
     when 'view_team'
         if ['Student'].include? current_role_name # students can only see the head map for their own team
           participant = AssignmentParticipant.find(params[:id])
@@ -343,17 +345,6 @@ class GradesController < ApplicationController
       link = bc.to_url
     end
     link
-  end
-
-  # authorizations: reader,submitter, reviewer
-  def are_needed_authorizations_present?
-    @participant = Participant.find(params[:id])
-    authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
-    if authorization == 'reader' || authorization == 'reviewer'
-      return false
-    else
-      return true
-    end
   end
 
   def check_self_review_status

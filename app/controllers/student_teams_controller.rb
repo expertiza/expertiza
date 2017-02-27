@@ -22,7 +22,8 @@ class StudentTeamsController < ApplicationController
         'Teaching Assistant',
         'Administrator',
         'Super-Administrator',
-        'Student'].include? current_role_name and ((%w(view).include? action_name) ? are_needed_authorizations_present? : true)
+        'Student'].include? current_role_name and 
+       ((%w(view).include? action_name) ? are_needed_authorizations_present?(params[:student_id], "reader", "reviewer", "submitter") : true)
       # make sure the student is the owner if they are trying to create it
       return current_user_id? student.user_id if %w(create).include? action_name
       # make sure the student belongs to the group before allowed them to try and edit or update
@@ -173,18 +174,5 @@ class StudentTeamsController < ApplicationController
   def review
     @assignment = Assignment.find params[:assignment_id]
     redirect_to view_questionnaires_path id: @assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire').id
-  end
-
-  private
-
-  # authorizations: reader,submitter, reviewer
-  def are_needed_authorizations_present?
-    @participant = Participant.find(params[:student_id])
-    authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
-    if authorization == 'reader' or authorization == 'reviewer' or authorization == 'submitter'
-      return false
-    else
-      return true
-    end
   end
 end

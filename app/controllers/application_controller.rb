@@ -40,6 +40,17 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def are_needed_authorizations_present?(id, *authorizations)
+    @participant = Participant.find_by(id: id)
+    return false if @participant.nil?
+    authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
+    if authorizations.include? authorization
+      return false
+    else
+      return true
+    end
+  end
+
   private
 
   def current_user
@@ -64,8 +75,6 @@ class ApplicationController < ActionController::Base
     Time.zone = current_user.timezonepref if current_user
   end
 
-  private
-
   def require_user
     invalid_login_status('in') unless current_user
   end
@@ -83,6 +92,10 @@ class ApplicationController < ActionController::Base
     user.id == owner_id ||
       user.admin? ||
       user.super_admin?
+  end
+
+  def record_not_found
+    redirect_to controller: :tree_display, action: :list
   end
 
   protected
@@ -106,11 +119,5 @@ class ApplicationController < ActionController::Base
     else
       redirect_to "/denied"
     end
-  end
-
-  private
-
-  def record_not_found
-    redirect_to controller: :tree_display, action: :list
   end
 end

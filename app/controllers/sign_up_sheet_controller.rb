@@ -20,7 +20,8 @@ class SignUpSheetController < ApplicationController
        'Teaching Assistant',
        'Administrator',
        'Super-Administrator',
-       'Student'].include? current_role_name and ((%w(list).include? action_name) ? are_needed_authorizations_present? : true)
+       'Student'].include? current_role_name and 
+      ((%w(list).include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer") : true)
     else
       ['Instructor',
        'Teaching Assistant',
@@ -71,7 +72,6 @@ class SignUpSheetController < ApplicationController
     else
       flash[:error] = "The topic could not be deleted."
     end
-
     # changing the redirection url to topics tab in edit assignment view.
     redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
   end
@@ -374,17 +374,6 @@ def set_priority
   end
 
   private
-
-  # authorizations: reader,submitter, reviewer
-  def are_needed_authorizations_present?
-    @participant = Participant.find(params[:id])
-    authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
-    if authorization == 'reader' or authorization == 'submitter' or authorization == 'reviewer'
-      return false
-    else
-      return true
-    end
-  end
 
   def setup_new_topic
     set_values_for_new_topic

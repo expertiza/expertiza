@@ -4,7 +4,8 @@ class StudentReviewController < ApplicationController
      'Teaching Assistant',
      'Administrator',
      'Super-Administrator',
-     'Student'].include? current_role_name and ((%w(list).include? action_name) ? are_needed_authorizations_present? : true)
+     'Student'].include? current_role_name and 
+    ((%w(list).include? action_name) ? are_needed_authorizations_present?(params[:id], "submitter") : true)
   end
 
   def list
@@ -39,18 +40,5 @@ class StudentReviewController < ApplicationController
     end
     @num_metareviews_in_progress = @num_metareviews_total - @num_metareviews_completed
     @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
-  end
-
-  private
-
-  # authorizations: reader,submitter, reviewer
-  def are_needed_authorizations_present?
-    @participant = Participant.find(params[:id])
-    authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
-    if authorization == 'submitter'
-      return false
-    else
-      return true
-    end
   end
 end

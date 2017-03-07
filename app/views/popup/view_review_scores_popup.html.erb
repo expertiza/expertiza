@@ -28,14 +28,24 @@
           <%if !answer.nil?%>
             <tr>
               <%team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id)%>
+              <% response_map = ReviewResponseMap.where(reviewed_object_id: @assignment_id, 
+                                                        reviewer_id: @reviewer_id,
+                                                        reviewee_id: team.id ).last %>
+              <% response_update_at = response_map.try(:response).try(:last).try(:updated_at) %>
+              <% review_graded_at = ReviewGrade.find_by(participant_id: @reviewer_id).try(:review_graded_at) %>
+              <% col_color = 'black' %>
+              <% col_color = 'blue' if review_graded_at && response_update_at && response_update_at > review_graded_at %>
+              <!--Reviewee-->
               <td>
-                <%=team.name%> <br>
+                <p style="color: <%= col_color%>"><%=team.name%> <br>
                 <%team.get_author_names.each do |name|%>
-                <%= name%> <br>
-                <%end%>
+                  <%= name%> <br>
+                <%end%></p>
               </td>
-              <td align = 'center'> <%= answer.answer%></td>
-              <td align = 'left'> <%= answer.comments %> </td>
+              <!--Score-->
+              <td align = 'center'><p style="color: <%= col_color%>"><%= answer.answer%></p></td>
+              <!--Comments-->
+              <td align = 'left'><p style="color: <%= col_color%>"><%= answer.comments %></p></td>
             </tr>
           <%else%>
                 <td>N/A</td>

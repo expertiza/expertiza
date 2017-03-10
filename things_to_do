@@ -13,4 +13,4 @@ Notify an instructor by e-mail when a student suggests a topic.
 Create an option (in the instructor’s profile) to get a copy of ‘e-mails being sent to students (this is so the instructor can verify correct functioning of the system).
 
 Classes involved: …
-Note that when you are testing mailers, you should not send mail to nonexistent e-mail addresses, or they will bounce and count against us as spam originating at NCSU.  This can make it more likely that ncsu.edu would be deemed a spammer and mail from us would be rejected by other sites.  Instead, send to <arbitrary username>@mailinator.com, which is a special domain that doesn’t deliver any mail sent to it.
+Note that when you are testing mailers,  you should not send mail to nonexistent e-mail addresses, or they will bounce and count against us as spam originating at NCSU.  This can make it more likely that ncsu.edu would be deemed a spammer and mail from us would be rejected by other sites.  Instead, send to <arbitrary username>@mailinator.com, which is a special domain that doesn’t deliver any mail sent to it.

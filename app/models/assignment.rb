@@ -393,8 +393,8 @@ class Assignment < ActiveRecord::Base
     # since one field can only store one integer
     # if rev_q_ids is empty, Expertiza will try to find questionnaire whose type is 'ReviewQuestionnaire'.
     if rev_q_ids.empty?
-      AssignmentQuestionnaire.where(assignment_id: self.id).each do |q|
-        rev_q_ids << q if Questionnaire.find_by(id: q.questionnaire_id).type == "ReviewQuestionnaire"
+      AssignmentQuestionnaire.where(assignment_id: self.id).find_each do |aq|
+        rev_q_ids << aq if aq.questionnaire.type == "ReviewQuestionnaire"
       end
     end
     review_questionnaire_id = nil

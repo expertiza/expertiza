@@ -1,0 +1,25 @@
+%h1 Listing tenants
+
+%table
+  %thead
+    %tr
+      %th Tenant key
+      %th Secret
+      %th Tenant name
+      %th
+      %th
+      %th
+
+  %tbody
+    - @tenants.each do |tenant|
+      %tr
+        %td= tenant.tenant_key
+        %td= tenant.secret
+        %td= tenant.tenant_name
+        %td= link_to 'Show', tenant
+        %td= link_to 'Edit', edit_tenant_path(tenant)
+        %td= link_to 'Destroy', tenant, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Tenant', new_tenant_path

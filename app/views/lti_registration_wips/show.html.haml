@@ -1,0 +1,30 @@
+%p#notice= notice
+
+%p
+  %b Tenant name:
+  = @registration.tenant_name
+%p
+  %b Tenant basename:
+  = @registration.tenant_basename
+%p
+  %b User:
+  = @registration.user_id
+%p
+  %b Reg key:
+  = @registration.reg_key
+%p
+  %b Reg secret:
+  = @registration.reg_password
+%p
+  %b Tc profile url:
+  = @registration.tc_profile_url
+%p
+  %b Launch presentation return url:
+  = @registration.launch_presentation_return_url
+%p
+  %b Status:
+  = @registration.status
+
+= link_to 'Edit', edit_deployment_proposal_path(@registration)
+\|
+= link_to 'Back', deployment_proposals_path

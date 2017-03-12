@@ -1,0 +1,19 @@
+= form_for @tenant do |f|
+  - if @tenant.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@tenant.errors.count, "error")} prohibited this tenant from being saved:"
+      %ul
+        - @tenant.errors.full_messages.each do |msg|
+          %li= msg
+
+  .field
+    = f.label :tenant_key
+    = f.text_field :tenant_key
+  .field
+    = f.label :secret
+    = f.text_area :secret
+  .field
+    = f.label :tenant_name
+    = f.text_field :tenant_name
+  .actions
+    = f.submit 'Save'

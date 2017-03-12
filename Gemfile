@@ -91,3 +91,11 @@ group :development, :test do
   gem 'capybara'
   gem 'simplecov', require: false
 end
+
+#lti start
+gem 'yaml_db', github: 'turgu1/yaml_db'
+gem 'uuid', '~> 2.3.7'
+gem 'lti2', :github => 'joshio1/LTI2-Reference'
+gem 'inherited_resources'
+gem 'formtastic'
+#lti end

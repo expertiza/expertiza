@@ -1,0 +1,28 @@
+
+#deployment
+  %h2 
+    %img#thumb{:src => "/assets/fabericious.png", :alt => "Fabericious"}
+    %br
+    Tool Consumer Registration
+
+  = semantic_form_for(@lti_registration_wip) do |f|
+    .label-column
+      &nbsp;
+      
+    .form-box
+      %ul
+        %li
+          = f.input :support_email, :label => "Support email", :input_html => { :size => 30, :readonly => true  }
+
+        %li
+          = f.input :product_name, :label => "Product name", :input_html => { :size => 30, :readonly => true }
+
+        %li
+          = f.input :tenant_name, :label => "Institution name", :input_html => { :size => 30 },
+                :wrapper_html => {:title => "A human-readable institution name"}
+
+             
+      .buttons
+        %ul
+          %br
+          = f.action :submit

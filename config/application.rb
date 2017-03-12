@@ -41,6 +41,12 @@ module Expertiza
 
     config.assets.paths << Rails.root.join('vendor', 'assets', 'components')
 
+    config.action_dispatch.default_headers = {
+        'X-Frame-Options' => 'ALLOWALL',
+        'X-XSS-Protection' => '1; mode=block',
+        'X-Content-Type-Options' => 'nosniff'
+    }
+
     # Bower asset paths
     root.join('vendor', 'assets', 'components').to_s.tap do |bower_path|
       config.sass.load_paths << bower_path

@@ -17,6 +17,10 @@ class StudentTaskController < ApplicationController
 
     ######## Students Teamed With###################
     @students_teamed_with = StudentTask.teamed_students current_user
+
+    ######## Badges ###################
+    @student_badges = Badge.get_badges_student_view(@student_tasks)
+    
   end
 
   def view

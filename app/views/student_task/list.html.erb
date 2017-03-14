@@ -100,13 +100,20 @@
       <th>Publishing Rights</th>
     </tr>
 
-    <% @student_tasks.each do |student_task| %>
+    <% @student_tasks.zip(@student_badges).each do |student_task, student_badge| %>
       <% participant = student_task.participant %>
       <% if student_task.assignment %>
         <tr class="listingRow">
           <td>&nbsp;</td>
           <!--assignment-->
-          <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></td>
+          <td>
+            <b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b> <br>
+            <% student_badge.each do |each_badge| %>
+              <% if each_badge %>
+                <%= each_badge %>
+              <% end %>
+            <% end %>
+          </td>
           <!--course-->
           <td><%= student_task.course.try :name %></td>
           <!--topic-->

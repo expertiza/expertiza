@@ -31,7 +31,7 @@ class TeamsController < ApplicationController
     @parent = Object.const_get(session[:team_type] ||= 'Assignment').find(params[:id])
   end
 
-  # called when a instructor tries to create an empty namually.
+  # called when a instructor tries to create an empty manually.
   def create
     parent = Object.const_get(session[:team_type]).find(params[:id])
     begin

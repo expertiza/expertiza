@@ -82,6 +82,7 @@ class SuggestionController < ApplicationController
     if @suggestion.save
       flash[:success] = 'Thank you for your suggestion!' if @suggestion.unityID != ''
       flash[:success] = 'You have submitted an anonymous suggestion. It will not show in the suggested topic table below.' if @suggestion.unityID == ''
+    # the instructor should be notified here regarding the suggestion through email I think
     end
     redirect_to action: 'new', id: @suggestion.assignment_id
   end

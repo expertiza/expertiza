@@ -21,6 +21,7 @@ gem 'fastercsv'
 gem 'ffi-aspell'
 gem 'font-awesome-rails'
 gem 'gchartrb', require: 'google_chart'
+
 gem "googlecharts", require: "gchart"
 gem 'gdata', require: false
 gem 'haml-rails'

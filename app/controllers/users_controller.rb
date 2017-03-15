@@ -95,7 +95,7 @@ class UsersController < ApplicationController
   def new
     @user = User.new
     @rolename = Role.find_by_name(params[:role])
-    ##here add a mailer to - created account
+    ##here add a mailer to - created
     foreign
   end
 

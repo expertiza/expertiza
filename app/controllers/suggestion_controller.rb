@@ -185,6 +185,8 @@ class SuggestionController < ApplicationController
   def suggestion_params
     params.require(:suggestion).permit(:assignment_id, :title, :description, 
                                         :status, :unityID, :signup_preference)
+    #the mail to the instructor can be sent here
+    #the view also has to be created
   end
 
   def approve

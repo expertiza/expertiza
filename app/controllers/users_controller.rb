@@ -96,6 +96,7 @@ class UsersController < ApplicationController
     @user = User.new
     @rolename = Role.find_by_name(params[:role])
     foreign
+    #write a mailer call here
   end
 
   def request_new

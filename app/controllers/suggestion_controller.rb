@@ -187,6 +187,7 @@ class SuggestionController < ApplicationController
                                         :status, :unityID, :signup_preference)
     #the mail to the instructor can be sent here
     #the view also has to be created
+    #instructor_mail = MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password)
   end
 
   def approve

@@ -20,7 +20,7 @@
       <th class="sorter-false">Assign grade and write comments <span></span></th>
     </tr>
     </thead>
-<tbody id="reviews" class="connectedSortable">
+<tbody id="reviews">
 
       <% sort_reviewer_by_review_volume_desc.each do |r| %>
         <% @response_maps, @bgcolor, @rspan, @l = get_data_for_review_report(@id, r.id, @type, @l) %>

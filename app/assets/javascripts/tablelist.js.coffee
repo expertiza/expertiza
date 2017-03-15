@@ -19,5 +19,4 @@ jQuery ->
     cursor: 'move',
     opacity: 0.65,
     tolerance: 'pointer'
-    connectWith: ".connectedSortable"
     items: ">*:not(.sort-disabled)"

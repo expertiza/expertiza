@@ -410,9 +410,6 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.exportDetailsTest(parent_id)
-    #@teams = self.teams
-    
-
     #will contain all the anwswer objecets for this assignment
     @answers = []
     @assignment = Assignment.find(parent_id)
@@ -434,7 +431,7 @@ class Assignment < ActiveRecord::Base
       end
     end
 
-    allRows = []
+    llRows = []
     idx = 0
     #for each anwswer, find the reviewee
     @answers.each do |answer|
@@ -458,10 +455,11 @@ class Assignment < ActiveRecord::Base
       puts row
 
       allRows[idx] = row
-      idx++
+      idx = idx + 1
       # puts a.reviewee_id
       # puts a.reviewer_id
     end
+
   end
 
   # def self.exportDetails(csv, parent_id)

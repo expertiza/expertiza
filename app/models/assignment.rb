@@ -439,7 +439,6 @@ class Assignment < ActiveRecord::Base
       a = ResponseMap.find_by_id(@response.map_id)
       puts a.reviewee_id
       puts a.reviewer_id
-      end
     end
 
   end

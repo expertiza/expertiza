@@ -441,21 +441,18 @@ class Assignment < ActiveRecord::Base
       a = ResponseMap.find_by_id(@response.map_id)
 
       type = a.type
-      puts a.reviewee_id
       reviewee = Team.find_by_id(a.reviewee_id)
-      if reviewee.nil?
-        puts a.reviewee_id
-      end
       reviewer = Participant.find_by_id(a.reviewer_id).user
 
-      row.push(reviewee.id)
-      row.push(reviewee.name)
-      row.push(reviewer.name)
-      row.push(answer.question.txt)
-      row.push(answer.question.id)
-      row.push(answer.comments)
-      row.push(answer.answer)
-
+      if !reviewee.nil?
+        row.push(reviewee.id)
+        row.push(reviewee.name)
+        row.push(reviewer.name)
+        row.push(answer.question.txt)
+        row.push(answer.question.id)
+        row.push(answer.comments)
+        row.push(answer.answer)
+      end
       puts '---------'
       puts row
       puts '---------'

@@ -82,7 +82,7 @@ class SuggestionController < ApplicationController
     if @suggestion.save
       flash[:success] = 'Thank you for your suggestion!' if @suggestion.unityID != ''
       flash[:success] = 'You have submitted an anonymous suggestion. It will not show in the suggested topic table below.' if @suggestion.unityID == ''
-    # the instructor should be notified here regarding the suggestion through email I think
+
     end
     redirect_to action: 'new', id: @suggestion.assignment_id
   end
@@ -182,9 +182,24 @@ class SuggestionController < ApplicationController
 
   private
 
+  def send_email_to_instructor
+    Mailer.suggested_topic(
+        to: @instructor,
+        #cc: cc_mail_list,
+        subject: "A new topic named '#{@suggestion.title}' has been suggested",
+        body: {
+            suggested_topic_name: @suggestion.title,
+            proposer: @user_id
+        }
+    ).deliver_now!
+  end
+
   def suggestion_params
     params.require(:suggestion).permit(:assignment_id, :title, :description, 
                                         :status, :unityID, :signup_preference)
+    #the mail to the instructor can be sent here
+    #the view also has to be created
+    send_email_to_instructor
   end
 
   def approve

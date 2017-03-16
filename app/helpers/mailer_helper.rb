@@ -23,4 +23,5 @@ module MailerHelper
       }
     })
   end
+
 end

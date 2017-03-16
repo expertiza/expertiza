@@ -416,6 +416,7 @@ class Assignment < ActiveRecord::Base
     #will contain all the anwswer objecets for this assignment
     @answers = []
     @assignment = Assignment.find(parent_id)
+
     puts @assignment.name
     @questionnaires = @assignment.questionnaires
     puts @questionnaires.size
@@ -433,12 +434,33 @@ class Assignment < ActiveRecord::Base
       end
     end
 
+    allRows = []
+    idx = 0
     #for each anwswer, find the reviewee
     @answers.each do |answer|
+      row = []
+
       @response = Response.find_by_id(answer.response_id)
       a = ResponseMap.find_by_id(@response.map_id)
-      puts a.reviewee_id
-      puts a.reviewer_id
+
+      type = a.type
+      reviewee = Team.find_by_id(a.reviewee_id)
+      reviewer = User.find_by_id(a.reviewer_id)
+
+      row.push(team.id)
+      row.push(team.name)
+      row.push(reviewer.name)
+      row.push(a.question.txt)
+      row.push(a.question.id)
+      row.push(answer.comment)
+      row.push(answer.answer)
+
+      puts row
+
+      allRows[idx] = row
+      idx++
+      # puts a.reviewee_id
+      # puts a.reviewer_id
     end
 
   end

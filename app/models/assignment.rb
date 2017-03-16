@@ -433,10 +433,12 @@ class Assignment < ActiveRecord::Base
     end
 
     #for each anwswer, find the reviewee
-    @answers.responses.each do |a|
-      a.maps.each do |m|
-        puts a.reviewee_id
-        puts a.reviewer_id
+    @answers.each do |b|
+      b.responses.each do |a|
+        a.maps.each do |m|
+          puts a.reviewee_id
+          puts a.reviewer_id
+        end
       end
     end
 

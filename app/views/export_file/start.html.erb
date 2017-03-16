@@ -31,29 +31,7 @@
   <%= hidden_field_tag('model', @model) %>
   <%= hidden_field_tag('id', @id) %>
   <input type='submit' value='Export' onclick='{export_form.submit();}'/>
-  <input type='submit' value='ExportDetails' onclick='{export_form.submit();}'/>
   <br/><br/>
-<% end %>
-
-<h2>Export Details</h2>
-<%= form_tag({:controller => 'export_file', :action => 'exportdetails'}, {:method => 'post', :multipart => true, :name => 'export_form'}) do %>
-    <table>
-      <tr>
-        <td valign='Top'>Delimiter:</td>
-        <td>
-          <%= radio_button_tag 'delim_type2', 'comma', true %> Comma<br/>
-          <%= radio_button_tag 'delim_type2', 'space' %> Space<br/>
-          <%= radio_button_tag 'delim_type2', 'tab' %> Tab<br/>
-          <%= radio_button_tag 'delim_type2', 'other' %> Other <%= text_field_tag 'other_char' %>
-          <br/>
-        </td>
-      </tr>
-    </table>
-    <br/>
-    <%= hidden_field_tag('id', @id) %>
-    <%= hidden_field_tag('model', @model) %>
-    <input type='submit' value='ExportDetails' onclick='{export_form.submit();}'/>
-    <br/><br/>
 <% end %>
 
 <a href="<%= session[:return_to] %>">Back</a>

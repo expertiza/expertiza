@@ -22,36 +22,6 @@ class ExportFileController < ApplicationController
     @id = params[:id]
   end
 
-  def exportdetails
-    @delim_type = params[:delim_type2]
-    if @delim_type == "comma"
-      filename = params[:model] + params[:id] + ".csv"
-      delimiter = ","
-    elsif @delim_type == "space"
-      filename = params[:model] + params[:id] + ".csv"
-      delimiter = " "
-    elsif @delim_type == "tab"
-      filename = params[:model] + params[:id] + ".csv"
-      delimiter = "\t"
-    elsif @delim_type == "other"
-      filename = params[:model] + params[:id] + ".csv"
-      delimiter = other_char
-    end
-    puts 'TEST'
-    puts @delim_type
-
-     #this will have to be updated to call a new methods in assignment.rb to choose the detailed csvs columns AND export
-    csv_data = CSV.generate(col_sep: delimiter) do |csv|
-        csv << Object.const_get(params[:model]).export_fields(params[:options])
-        Object.const_get(params[:model]).export(csv, params[:id], params[:options])
-    end
-
-    send_data csv_data,
-              type: 'text/csv; charset=iso-8859-1; header=present',
-        disposition: "attachment; filename=#{filename}"
-
-  end
-
   def export
     @delim_type = params[:delim_type]
     if @delim_type == "comma"
@@ -88,7 +58,4 @@ class ExportFileController < ApplicationController
               type: 'text/csv; charset=iso-8859-1; header=present',
               disposition: "attachment; filename=#{filename}"
   end
-
-
-
 end

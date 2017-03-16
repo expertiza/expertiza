@@ -410,18 +410,38 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.exportDetailsTest(parent_id)
+    @teams = self.teams
+    
+
+    #will contain all the anwswer objecets for this assignment
+    @answers = []
     @assignment = Assignment.find(parent_id)
     puts @assignment.name
     @questionnaires = @assignment.questionnaires
     puts @questionnaires.size
 
     @questionnaires.each do |questionnaire|
-      puts 'Questionnaire ID : ' + questionnaire.id.to_s
-      puts 'Questionnaire Name : ' + questionnaire.name
+      # puts 'Questionnaire ID : ' + questionnaire.id.to_s
+      # puts 'Questionnaire Name : ' + questionnaire.name
       questionnaire.questions.each do |q|
-        puts '-> Question Text: ' + q.txt
-        puts '-> Questions Questionnaire ID: ' + q.questionnaire_id.to_s
+        # puts '  -> Question Text: ' + q.txt
+        Answer.find_by_question_id(q.id).each do |a|
+          @answers.push(a)
+        end
       end
+    end
+
+    #for each anwswer, find the reviewee
+    @answers.responses.each do |a|
+      a.maps.each do |m|
+        puts a.reviewee_id
+        puts a.reviewer_id
+      end
+    end
+
+
+    @teams.each do ||
+
     end
 
   end

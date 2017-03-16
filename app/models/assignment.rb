@@ -447,8 +447,8 @@ class Assignment < ActiveRecord::Base
       row.push(reviewee.id)
       row.push(reviewee.name)
       row.push(reviewer.name)
-      row.push(a.question.txt)
-      row.push(a.question.id)
+      row.push(answer.question.txt)
+      row.push(answer.question.id)
       row.push(answer.comment)
       row.push(answer.answer)
 

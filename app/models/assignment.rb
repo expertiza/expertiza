@@ -425,7 +425,8 @@ class Assignment < ActiveRecord::Base
       # puts 'Questionnaire Name : ' + questionnaire.name
       questionnaire.questions.each do |q|
         # puts '  -> Question Text: ' + q.txt
-        Answer.find_by_question_id(q.id).each do |a|
+        @list = Answer.find_by_question_id(q.id)
+        @list.each do |a|
           @answers.push(a)
         end
       end

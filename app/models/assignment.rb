@@ -414,11 +414,11 @@ class Assignment < ActiveRecord::Base
     @questionnaires = @assignment.questionnaires
 
     @questionnaires.each do |questionnaire|
-      puts 'Questionnaire ID : ' questionnaire.id
-      puts 'Questionnaire Name : ' questionnaire.name
+      puts 'Questionnaire ID : ' + questionnaire.id
+      puts 'Questionnaire Name : ' + questionnaire.name
       questionnaire.questions.each do |q|
-        puts '-> Question Text: ' q.txt
-        puts '-> Questions Questionnaire ID: ' q.questionnaire_id
+        puts '-> Question Text: ' + q.txt
+        puts '-> Questions Questionnaire ID: ' + q.questionnaire_id
       end
     end
 

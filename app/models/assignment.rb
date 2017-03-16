@@ -411,8 +411,10 @@ class Assignment < ActiveRecord::Base
 
   def self.exportDetailsTest(parent_id)
     @assignment = Assignment.find(parent_id)
+    puts @assignment.name
     @questionnaires = @assignment.questionnaires
-
+    puts @questionnaires.size
+    
     @questionnaires.each do |questionnaire|
       puts 'Questionnaire ID : ' + questionnaire.id
       puts 'Questionnaire Name : ' + questionnaire.name

@@ -410,7 +410,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.exportDetailsTest(parent_id)
-    @teams = self.teams
+    #@teams = self.teams
     
 
     #will contain all the anwswer objecets for this assignment
@@ -437,11 +437,6 @@ class Assignment < ActiveRecord::Base
         puts a.reviewee_id
         puts a.reviewer_id
       end
-    end
-
-
-    @teams.each do ||
-
     end
 
   end

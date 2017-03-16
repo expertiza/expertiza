@@ -441,7 +441,11 @@ class Assignment < ActiveRecord::Base
       a = ResponseMap.find_by_id(@response.map_id)
 
       type = a.type
+      puts a.reviewee_id
       reviewee = Team.find_by_id(a.reviewee_id)
+      if reviewee.nil?
+        puts a.reviewee_id
+      end
       reviewer = Participant.find_by_id(a.reviewer_id).user
 
       row.push(reviewee.id)

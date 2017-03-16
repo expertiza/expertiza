@@ -200,6 +200,7 @@ class SuggestionController < ApplicationController
     #the mail to the instructor can be sent here
     #the view also has to be created
     send_email_to_instructor
+    #function is getting callled
   end
 
   def approve

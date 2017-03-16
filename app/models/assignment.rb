@@ -461,7 +461,6 @@ class Assignment < ActiveRecord::Base
       idx++
       # puts a.reviewee_id
       # puts a.reviewer_id
-    end
 
   end
 

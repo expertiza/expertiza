@@ -442,7 +442,7 @@ class Assignment < ActiveRecord::Base
 
       type = a.type
       reviewee = Team.find_by_id(a.reviewee_id)
-      reviewer = User.find_by_id(a.reviewer_id)
+      reviewer = Participant.find_by_id(a.reviewer_id).user
 
       row.push(reviewee.id)
       row.push(reviewee.name)

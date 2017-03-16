@@ -94,7 +94,11 @@ class UsersController < ApplicationController
 
   def new
     @user = User.new
+    ##add the next two lines~~~~~
+    prepared_mail = MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password)
+    prepared_mail.deliver
     @rolename = Role.find_by_name(params[:role])
+    ##here add a mailer to - created account
     foreign
   end
 

@@ -431,7 +431,7 @@ class Assignment < ActiveRecord::Base
       end
     end
 
-    llRows = []
+    allRows = []
     idx = 0
     #for each anwswer, find the reviewee
     @answers.each do |answer|

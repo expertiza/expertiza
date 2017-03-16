@@ -428,17 +428,17 @@ class Assignment < ActiveRecord::Base
         @list = Answer.find_by_sql(["SELECT * FROM answers WHERE question_id = #{q.id}"])
         @list.each do |a|
           @answers.push(a)
+          puts a.response_id
         end
       end
     end
 
     #for each anwswer, find the reviewee
-    @answers.each do |b|
-      b.responses.each do |a|
-        a.maps.each do |m|
-          puts a.reviewee_id
-          puts a.reviewer_id
-        end
+    @answers.each do |answer|
+      @response = Response.find_by_id(b.response_id)
+      a = ResponseMap.find_by_id(@response.map_id)
+      puts a.reviewee_id
+      puts a.reviewer_id
       end
     end
 

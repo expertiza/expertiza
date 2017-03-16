@@ -426,7 +426,7 @@ class Assignment < ActiveRecord::Base
       questionnaire.questions.each do |q|
         # puts '  -> Question Text: ' + q.txt
         @list = Answer.find_by_sql(["SELECT * FROM answers WHERE question_id = #{q.id}"])
-        @list.answer.each do |a|
+        @list.each do |a|
           @answers.push(a)
         end
       end

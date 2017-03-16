@@ -452,7 +452,9 @@ class Assignment < ActiveRecord::Base
       row.push(answer.comments)
       row.push(answer.answer)
 
+      puts '---------'
       puts row
+      puts '---------'
 
       allRows[idx] = row
       idx = idx + 1

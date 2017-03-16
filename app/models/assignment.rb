@@ -444,8 +444,8 @@ class Assignment < ActiveRecord::Base
       reviewee = Team.find_by_id(a.reviewee_id)
       reviewer = User.find_by_id(a.reviewer_id)
 
-      row.push(team.id)
-      row.push(team.name)
+      row.push(reviewee.id)
+      row.push(reviewee.name)
       row.push(reviewer.name)
       row.push(a.question.txt)
       row.push(a.question.id)

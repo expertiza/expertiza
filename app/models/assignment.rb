@@ -409,6 +409,91 @@ class Assignment < ActiveRecord::Base
     review_questionnaire_id
   end
 
+  def self.exportDetailsTest(parent_id)
+    @assignment = Assignment.find(parent_id)
+    @questionnaires = @assignment.questionnaires
+
+    @questionnaires.each do |questionnaire|
+      puts 'Questionnaire ID : ' questionnaire.id
+      puts 'Questionnaire Name : ' questionnaire.name
+      questionnaire.questions.each do |q|
+        puts '-> Question Text: ' q.txt
+        puts '-> Questions Questionnaire ID: ' q.questionnaire_id
+      end
+    end
+
+  end
+
+  # def self.exportDetails(csv, parent_id)
+  #   #We have the assignment, we want to get organize all the scores
+  #   @assignment = Assignment.find(parent_id)
+
+  #   #a hash of all the questions, where each key is questionnaire symbol and the value is the list of questions
+  #   @ALLquestions = {}
+
+  #   #gets all the questionnaires associated w/ this assignment
+  #   questionnaires = @assignment.questionnaires
+
+  #   #for all questionnaires, get all questions
+  #   questionnaires.each do |questionnaire|
+  #     @ALLquestions[questionnaire_symbol] = questionnaire.questions
+  #   end
+
+  #   @ALLquestions.each do |questionnaire_symbol, questions|
+
+  #   end
+  #   @ALLScoresByTeam = {}
+
+
+  #   #list of all the teams
+  #   @teams = self.teams
+  #   @teams.each do |team|
+
+  #   end
+
+  #   #for each team, will record score for each users
+  #   @teams.each do |team|
+  #     teamName = team.name
+  #     #for each user on the team
+  #     team.users.each do |user|
+  #       userName = user.name
+  #       #gets all reviewresponsemaps with this user as the reviewee
+  #       @reviewMapByReviewee = ReviewResponseMap.find_by_reviewee_id(user.id)
+
+
+  #       @reviewMapByReviewee.each do |responseMap|
+  #         #all the response objects with this map's id
+  #         @responsesByMap = Responses.find_by_map_id(responseMap.id)
+
+  #         @responsesByMap.each do |resp|
+  #           #all the answer objects with this responseID
+  #           @answersByResponseID = Answers.find_by_response_id(resp.id)
+
+
+  #         end
+          
+  #       end
+
+  #     end
+  #   end
+
+  # end
+
+  # def self.exportDetails_fields
+  #   fields = []
+  #   fields << 'Paper Author' #Also team name
+  #   fields << 'Team Member'
+  #   fields << 'Reviewer'
+  #   fields << 'Dimension Name' #Questions.txt
+  #   fields << 'Comment ID' #Questions.id
+  #   fields << 'Dimension'  #??
+  #   fields << 'Comment Content' #Answers.txt
+  #   fields << 'BackEval Comment'
+  #   fields << 'BackEval Score'
+  #   fields
+  # end
+
+
   # This method is used for export contents of grade#view.  -Zhewei
   def self.export(csv, parent_id, options)
     @assignment = Assignment.find(parent_id)

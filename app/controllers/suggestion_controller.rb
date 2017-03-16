@@ -182,12 +182,24 @@ class SuggestionController < ApplicationController
 
   private
 
+  def send_email_to_instructor
+    Mailer.suggested_topic(
+        to: @instructor,
+        #cc: cc_mail_list,
+        subject: "A new topic named '#{@suggestion.title}' has been suggested",
+        body: {
+            suggested_topic_name: @suggestion.title,
+            proposer: @user_id
+        }
+    ).deliver_now!
+  end
+
   def suggestion_params
     params.require(:suggestion).permit(:assignment_id, :title, :description, 
                                         :status, :unityID, :signup_preference)
     #the mail to the instructor can be sent here
     #the view also has to be created
-    #instructor_mail = MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password)
+    send_email_to_instructor
   end
 
   def approve

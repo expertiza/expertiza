@@ -41,7 +41,7 @@ class ExportFileController < ApplicationController
      puts @delim_type
 
      #Just a test to print all the Quesionairres and its questions
-     Object.const_get(params[:model]).exportDetailsTest(params[:options])
+     Object.const_get(params[:model]).exportDetailsTest(params[:id])
  
       #this will have to be updated to call a new methods in assignment.rb to choose the detailed csvs columns AND export
      # csv_data = CSV.generate(col_sep: delimiter) do |csv|

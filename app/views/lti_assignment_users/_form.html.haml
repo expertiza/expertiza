@@ -1,0 +1,28 @@
+= form_for @lti_assignment_user do |f|
+  - if @lti_assignment_user.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@lti_assignment_user.errors.count, "error")} prohibited this lti_assignment_user from being saved:"
+      %ul
+        - @lti_assignment_user.errors.full_messages.each do |msg|
+          %li= msg
+
+  .field
+    = f.label :user_id
+    = f.number_field :user_id
+  .field
+    = f.label :assignment_id
+    = f.number_field :assignment_id
+  .field
+    = f.label :participant_id
+    = f.number_field :participant_id
+  .field
+    = f.label :lis_result_source_did
+    = f.text_area :lis_result_source_did
+  .field
+    = f.label :tenant_id
+    = f.number_field :tenant_id
+  .field
+    = f.label :grade
+    = f.text_field :grade
+  .actions
+    = f.submit 'Save'

@@ -1,6 +1,7 @@
 Expertiza::Application.routes.draw do
 
 
+  resources :lti_assignment_users
   #lti start
   resources :tenants
   mount Lti2Tp::Engine, :at => '/lti2_tp'

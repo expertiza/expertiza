@@ -1,0 +1,24 @@
+%p#notice= notice
+
+%p
+  %b User:
+  = @lti_assignment_user.user_id
+%p
+  %b Assignment:
+  = @lti_assignment_user.assignment_id
+%p
+  %b Participant:
+  = @lti_assignment_user.participant_id
+%p
+  %b Lis result source did:
+  = @lti_assignment_user.lis_result_source_did
+%p
+  %b Tenant:
+  = @lti_assignment_user.tenant_id
+%p
+  %b Grade:
+  = @lti_assignment_user.grade
+
+= link_to 'Edit', edit_lti_assignment_user_path(@lti_assignment_user)
+\|
+= link_to 'Back', lti_assignment_users_path

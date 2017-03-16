@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170226024323) do
+ActiveRecord::Schema.define(version: 20170316023042) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -299,6 +299,17 @@ ActiveRecord::Schema.define(version: 20170226024323) do
   create_table "lti2_tp_tools", force: :cascade do |t|
     t.string   "tool_name",             limit: 255
     t.text     "tool_profile_template", limit: 65535
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
+  end
+
+  create_table "lti_assignment_users", force: :cascade do |t|
+    t.integer  "user_id",               limit: 4
+    t.integer  "assignment_id",         limit: 4
+    t.integer  "participant_id",        limit: 4
+    t.text     "lis_result_source_did", limit: 65535
+    t.integer  "tenant_id",             limit: 4
+    t.string   "grade",                 limit: 255
     t.datetime "created_at",                          null: false
     t.datetime "updated_at",                          null: false
   end
@@ -688,11 +699,12 @@ ActiveRecord::Schema.define(version: 20170226024323) do
   end
 
   create_table "tenants", force: :cascade do |t|
-    t.string   "tenant_key",  limit: 255
-    t.text     "secret",      limit: 65535
-    t.string   "tenant_name", limit: 255
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.string   "tenant_key",              limit: 255
+    t.text     "secret",                  limit: 65535
+    t.string   "tenant_name",             limit: 255
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+    t.text     "lis_outcome_service_url", limit: 65535
   end
 
   create_table "tree_folders", force: :cascade do |t|

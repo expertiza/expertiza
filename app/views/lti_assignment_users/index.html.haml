@@ -1,0 +1,31 @@
+%h1 Listing lti_assignment_users
+
+%table
+  %thead
+    %tr
+      %th User
+      %th Assignment
+      %th Participant
+      %th Lis result source did
+      %th Tenant
+      %th Grade
+      %th
+      %th
+      %th
+
+  %tbody
+    - @lti_assignment_users.each do |lti_assignment_user|
+      %tr
+        %td= lti_assignment_user.user_id
+        %td= lti_assignment_user.assignment_id
+        %td= lti_assignment_user.participant_id
+        %td= lti_assignment_user.lis_result_source_did
+        %td= lti_assignment_user.tenant_id
+        %td= lti_assignment_user.grade
+        %td= link_to 'Show', lti_assignment_user
+        %td= link_to 'Edit', edit_lti_assignment_user_path(lti_assignment_user)
+        %td= link_to 'Destroy', lti_assignment_user, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Lti assignment user', new_lti_assignment_user_path

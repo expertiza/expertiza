@@ -37,6 +37,8 @@ class InvitationController < ApplicationController
             @invitation.assignment_id = student.parent_id
             @invitation.reply_status = 'W'
             @invitation.save
+            accept_invitation
+            #Call the mailing function
           else
             flash[:note] = "You have already sent an invitation to \"#{user.name}\"."
           end
@@ -47,6 +49,16 @@ class InvitationController < ApplicationController
     update_join_team_request user, student
 
     redirect_to view_student_teams_path student_id: student.id
+  end
+  def accept_invitation
+    Mailer.accept_invitation(
+        to: @participant,
+        #cc: cc_mail_list,
+        subject: "You have a new team invitaion",
+        body: {
+
+        }
+    ).deliver_now!
   end
 
   def update_join_team_request(user, student)

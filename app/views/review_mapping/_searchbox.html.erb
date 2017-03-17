@@ -55,6 +55,21 @@
       <br>
     </div>
 
+    <div id="MetricsForm">
+      <%= form_tag :action => 'response_report', :id => @id do %>
+          <select name='MetricSelector' style="width: 15em">
+            <option value='AverageScore' selected>
+              Average Score
+            </option>
+            <option value='Sentiment' >
+              Sentiment
+            </option>
+          </select>
+          <%= submit_tag("Select") %>
+      <% end %>
+    </div>
+    <br>
+
 <% elsif @type == "FeedbackResponseMap" %>
   <h1> Author feedback report for <%= @assignment.name%> </h1>
 <% elsif @type == "TeammateReviewResponseMap" %>

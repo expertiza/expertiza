@@ -433,7 +433,7 @@ class Assignment < ActiveRecord::Base
 
     allRows = []
     idx = 0
-    #for each anwswer, find the reviewee
+    #for each anwswer, find the reviewee, question, question id, comment, and score!
     @answers.each do |answer|
       row = []
 
@@ -444,7 +444,7 @@ class Assignment < ActiveRecord::Base
       reviewee = Team.find_by_id(a.reviewee_id)
       reviewer = Participant.find_by_id(a.reviewer_id).user
 
-      if !reviewee.nil? and idx < 200
+      if !reviewee.nil?
         row.push(reviewee.id)
         row.push(reviewee.name)
         row.push(reviewer.name)
@@ -453,11 +453,11 @@ class Assignment < ActiveRecord::Base
         row.push(answer.comments)
         row.push(answer.answer)
 
-        puts '---------'
-        puts type
-        puts '----'
-        puts row
-        puts '---------'
+        # puts '---------'
+        # puts type
+        # puts '----'
+        # puts row
+        # puts '---------'
         allRows[idx] = row
         idx = idx + 1
       end

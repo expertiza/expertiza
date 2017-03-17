@@ -209,7 +209,7 @@ class SignUpSheetController < ApplicationController
   end
 
   # this function is used to delete a previous signup
-  def delete_signup(optional=true)
+  def delete_signup
     participant = AssignmentParticipant.find(params[:id])
     assignment = participant.assignment
     drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
@@ -222,11 +222,29 @@ class SignUpSheetController < ApplicationController
     elsif !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
       flash[:error] = "You cannot drop your topic after drop topic deadline!"
     else
-      if (optional)
-        delete_signup_for_topic(assignment.id, params[:topic_id], participant.user_id)
-      else
-        delete_signup_for_topic(assignment.id, params[:topic_id], session[:user].id)
-      end
+      delete_signup_for_topic(assignment.id, params[:topic_id], session[:user].id)
+      flash[:success] = "You have successfully dropped your topic!"
+    end
+    redirect_to action: 'list', id: params[:id]
+  end
+
+  def delete_signup_instructor
+    team = Team.find(params[:id])
+    assignment = Assignment.find(team.parent_id)
+    teamUsr = TeamsUser.find_by(team_id: team.id)
+    user = User.find(teamUsr.user_id)
+    participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
+    drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
+    # A student who has already submitted work should not be allowed to drop his/her topic!
+    # (A student/team has submitted if participant directory_num is non-null or submitted_hyperlinks is non-null.)
+    # If there is no drop topic deadline, student can drop topic at any time (if all the submissions are deleted)
+    # If there is a drop topic deadline, student cannot drop topic after this deadline.
+    if !participant.team.submitted_files.empty? or !participant.team.hyperlinks.empty?
+      flash[:error] = "You have already submitted your work, so you are not allowed to drop your topic."
+    elsif !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
+      flash[:error] = "You cannot drop your topic after drop topic deadline!"
+    else
+      delete_signup_for_topic(assignment.id, params[:topic_id], participant.user_id)
       flash[:success] = "You have successfully dropped your topic!"
     end
     redirect_to action: 'list', id: params[:id]

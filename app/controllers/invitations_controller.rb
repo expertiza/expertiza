@@ -8,7 +8,7 @@ class InvitationsController < ApplicationController
   end
 
   def create
-    user = User.find_by_name(params[:user][:name].strip)
+    user = User.find_by(name: params[:user][:name].strip)
     team = AssignmentTeam.find(params[:team_id])
     student = AssignmentParticipant.find(params[:student_id])
     return unless current_user_id?(student.user_id)
@@ -81,7 +81,7 @@ class InvitationsController < ApplicationController
       flash[:error] = "The team that invited you does not exist anymore."
     elsif inviter_assignment_team.full?
         flash[:error] = "The team that invited you is full now."
-      else
+    else
         ready_to_join = true
     end
 

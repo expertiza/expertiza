@@ -454,6 +454,8 @@ class Assignment < ActiveRecord::Base
         row.push(answer.answer)
       end
       puts '---------'
+      puts type
+      puts '----'
       puts row
       puts '---------'
 

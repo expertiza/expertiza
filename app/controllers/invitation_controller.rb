@@ -28,10 +28,10 @@ class InvitationController < ApplicationController
         @invitation.reply_status = 'W'
         @invitation.save
       else
-<<<<<<< HEAD
+        <<<<<<< HEAD
         flash[:note] = "You have already sent an invitation to \"#{user.name}\"."
-=======
-        team_member = TeamsUser.where(['team_id =? and user_id =?', team.id, user.id])
+        =======
+            team_member = TeamsUser.where(['team_id =? and user_id =?', team.id, user.id])
         # check if invited user is already in the team
         if !team_member.empty?
           flash[:note] = "The user \"#{user.name}\" is already a member of the team."
@@ -49,7 +49,7 @@ class InvitationController < ApplicationController
             flash[:note] = "You have already sent an invitation to \"#{user.name}\"."
           end
         end
->>>>>>> 296f1c4bfb6aca78577f2e52a66aa639993e9b6f
+        >>>>>>> 296f1c4bfb6aca78577f2e52a66aa639993e9b6f
       end
 
     end
@@ -91,9 +91,9 @@ class InvitationController < ApplicationController
     if inviter_assignment_team.nil?
       flash[:error] = "The team that invited you does not exist anymore."
     elsif inviter_assignment_team.full?
-        flash[:error] = "The team that invited you is full now."
+      flash[:error] = "The team that invited you is full now."
     else
-        ready_to_join = true
+      ready_to_join = true
     end
 
 

@@ -72,7 +72,8 @@ class InvitationController < ApplicationController
 
     assignment_id = @inv.assignment_id
     inviter_user_id = @inv.from_id
-    inviter_participant = AssignmentParticipant.find_by(id: assignment_id, user:id: inviter_user_id)
+    inviter_participant = AssignmentParticipant.find_by_user_id_and_assignment_id(inviter_user_id, assignment_id)
+
     ready_to_join = false
     # check if the inviter's team is still existing, and have available slot to add the invitee
     inviter_assignment_team = AssignmentTeam.team(inviter_participant)

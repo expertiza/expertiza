@@ -28,7 +28,28 @@ class InvitationController < ApplicationController
         @invitation.reply_status = 'W'
         @invitation.save
       else
+<<<<<<< HEAD
         flash[:note] = "You have already sent an invitation to \"#{user.name}\"."
+=======
+        team_member = TeamsUser.where(['team_id =? and user_id =?', team.id, user.id])
+        # check if invited user is already in the team
+        if !team_member.empty?
+          flash[:note] = "The user \"#{user.name}\" is already a member of the team."
+        else
+          # check if the invited user is already invited (i.e. awaiting reply)
+          if Invitation.is_invited?(student.user_id, user.id, student.parent_id)
+            @invitation = Invitation.new
+            @invitation.to_id = user.id
+            @invitation.from_id = student.user_id
+            @invitation.assignment_id = student.parent_id
+            #Status code W for waiting for reply
+            @invitation.reply_status = 'W'
+            @invitation.save
+          else
+            flash[:note] = "You have already sent an invitation to \"#{user.name}\"."
+          end
+        end
+>>>>>>> 296f1c4bfb6aca78577f2e52a66aa639993e9b6f
       end
 
     end
@@ -44,6 +65,7 @@ class InvitationController < ApplicationController
       participant = AssignmentParticipant.where(['user_id =? and parent_id =?', user.id, student.parent_id]).first
       if participant
         old_entry = JoinTeamRequest.where(['participant_id =? and team_id =?', participant.id, params[:team_id]]).first
+        #Status code A for accepted
         old_entry.update_attribute("status", 'A') if old_entry
       end
     end
@@ -76,6 +98,7 @@ class InvitationController < ApplicationController
 
 
     if ready_to_join
+      #Status code A for accepted
       @inv.reply_status = 'A'
       @inv.save
 
@@ -95,6 +118,7 @@ class InvitationController < ApplicationController
 
   def decline
     @inv = Invitation.find(params[:inv_id])
+    #Status code D for declined
     @inv.reply_status = 'D'
     @inv.save
     student = Participant.find(params[:student_id])

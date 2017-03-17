@@ -444,7 +444,7 @@ class Assignment < ActiveRecord::Base
       reviewee = Team.find_by_id(a.reviewee_id)
       reviewer = Participant.find_by_id(a.reviewer_id).user
 
-      if !reviewee.nil? and !reviewee.id.nil?
+      if !reviewee.nil? and idx < 200
         row.push(reviewee.id)
         row.push(reviewee.name)
         row.push(reviewer.name)
@@ -452,15 +452,15 @@ class Assignment < ActiveRecord::Base
         row.push(answer.question.id)
         row.push(answer.comments)
         row.push(answer.answer)
-      end
-      puts '---------'
-      puts type
-      puts '----'
-      puts row
-      puts '---------'
 
-      allRows[idx] = row
-      idx = idx + 1
+        puts '---------'
+        puts type
+        puts '----'
+        puts row
+        puts '---------'
+        allRows[idx] = row
+        idx = idx + 1
+      end
       # puts a.reviewee_id
       # puts a.reviewer_id
     end

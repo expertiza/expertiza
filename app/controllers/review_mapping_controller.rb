@@ -471,12 +471,32 @@ class ReviewMappingController < ApplicationController
 private
 
   def get_sentiment
-    response = HTTParty.post('http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',:body => {"reviews"=>[
-        {"id"=>"1","text"=>"bad"},
-        {"id"=>"2","text"=>"not bad"},
-        {"id"=>"3","text"=>"good"}
-    ]}.to_json, :headers => { 'Content-Type' => 'application/json' })
-    response["sentiments"].each do |element|
+    review = {}
+    response_list = []
+    sentiment_list = []
+    sentiment = {}
+    @reviewers.each do |r|
+      review_text = Response.concatenate_all_review_comments(@id, r).join(" ")
+      review["id"] = r.id.to_s
+      review["text"] = review_text
+      response = HTTParty.post('http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',:body => {"reviews"=>[review]}.to_json, :headers => { 'Content-Type' => 'application/json' })
+      response_list<<response
+      case response.code
+        when 200
+          sentiment["id"] = response.parsed_response["sentiments"][0]["id"]
+          sentiment["sentiment"] = response.parsed_response["sentiments"][0]["sentiment"]
+          sentiment_list<<sentiment
+        when 404
+          # Error in generating sentiment from the server
+          sentiment["id"] = review["id"]
+          sentiment["sentiment"]="-404"
+          sentiment_list<<sentiment
+        when 500...600
+          # Error in generating sentiment from the server
+          sentiment["id"] = review["id"]
+          sentiment["sentiment"]="-500"
+          sentiment_list<<sentiment
+      end
     end
   end
 

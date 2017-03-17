@@ -24,7 +24,7 @@ class ApplicationController < ActionController::Base
   def self.verify(_args)
   end
 
-  def self.set_cache_roles(id)
+  def self.get_cache_roles(id)
       @@cache_roles[id]
   end
 

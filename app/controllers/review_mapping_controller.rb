@@ -364,6 +364,7 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment.id
   end
 
+
   def response_report
     # Get the assignment id and set it in an instance variable which will be used in view
     @id = params[:id]
@@ -402,6 +403,8 @@ class ReviewMappingController < ApplicationController
       @reviewers = ReviewResponseMap.review_response_report(@id, @assignment, @type, @review_user)
       @review_scores = @assignment.compute_reviews_hash
       @avg_and_ranges = @assignment.compute_avg_and_ranges_hash
+      get_sentiment
+
     when "FeedbackResponseMap"
       # If review report for feedback is required call feedback_response_report method in feedback_review_response_map model
       if @assignment.varying_rubrics_by_round?
@@ -466,6 +469,18 @@ class ReviewMappingController < ApplicationController
   end
 
 private
+
+ def get_sentiment
+    response = HTTParty.post('http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',:body => {"reviews":[
+                {"id":"1","text":"bad"},
+                {"id":"2","text":"not bad"},
+                {"id":"3","text":"good"}
+              ]}.to_json, :headers => { 'Content-Type' => 'application/json' })
+    response["sentiments"].each do |element|
+        puts element["sentiment"]
+    end
+  end
+
 
   def assign_reviewers_for_team(assignment_id,student_review_num,participants_hash,
                                 exact_num_of_review_needed)

@@ -47,7 +47,6 @@ class JoinTeamRequestsController < ApplicationController
       if @join_team_request.save
         format.html { redirect_to(@join_team_request, notice: 'JoinTeamRequest was successfully created.') }
         format.xml  { render xml: @join_team_request, status: :created, location: @join_team_request }
-        flash[:note] = "Noob shit team, noob shit asshole!"
       else
         format.html { render action: "new" }
         format.xml  { render xml: @join_team_request.errors, status: :unprocessable_entity }

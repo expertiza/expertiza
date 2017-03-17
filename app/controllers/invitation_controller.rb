@@ -59,13 +59,16 @@ class InvitationController < ApplicationController
   def update_join_team_request(user, student)
     # update the status in the join_team_request to A
     if user && student
-      participant = AssignmentParticipant.where(['user_id =? and parent_id =?', user.id, student.parent_id]).first
-      if participant
-        old_entry = JoinTeamRequest.where(['participant_id =? and team_id =?', participant.id, params[:team_id]]).first
-        #Status code A for accepted
-        old_entry.update_attribute("status", 'A') if old_entry
-      end
+      return
     end
+
+    participant = AssignmentParticipant.where(['user_id =? and parent_id =?', user.id, student.parent_id]).first
+    if participant
+      old_entry = JoinTeamRequest.where(['participant_id =? and team_id =?', participant.id, params[:team_id]]).first
+      #Status code A for accepted
+      old_entry.update_attribute("status", 'A') if old_entry
+    end
+
   end
 
   def auto_complete_for_user_name

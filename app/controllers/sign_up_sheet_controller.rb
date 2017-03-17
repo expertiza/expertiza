@@ -209,7 +209,7 @@ class SignUpSheetController < ApplicationController
   end
 
   # this function is used to delete a previous signup
-  def delete_signup
+  def delete_signup(optional=true)
     participant = AssignmentParticipant.find(params[:id])
     assignment = participant.assignment
     drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
@@ -222,16 +222,24 @@ class SignUpSheetController < ApplicationController
     elsif !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
       flash[:error] = "You cannot drop your topic after drop topic deadline!"
     else
-      delete_signup_for_topic(assignment.id, params[:topic_id])
+      if (optional)
+        delete_signup_for_topic(assignment.id, params[:topic_id], participant.user_id)
+      else
+        delete_signup_for_topic(assignment.id, params[:topic_id], session[:user].id)
+      end
       flash[:success] = "You have successfully dropped your topic!"
     end
     redirect_to action: 'list', id: params[:id]
   end
 
-  def sign_up
+  def sign_up(optional=true)
     # find the assignment to which user is signing up
     @assignment = AssignmentParticipant.find(params[:id]).assignment
-    @user_id = session[:user].id
+    if (optional)
+      @user_id = 6623
+    else
+      @user_id = session[:user].id
+    end
     # Always use team_id ACS
     # s = Signupsheet.new
     # Team lazy initialization: check whether the user already has a team for this assignment
@@ -448,8 +456,7 @@ def set_priority
     @result_list
   end
 
-  def delete_signup_for_topic(assignment_id, topic_id)
-    @user_id = session[:user].id
-    SignUpTopic.reassign_topic(@user_id, assignment_id, topic_id)
+  def delete_signup_for_topic(assignment_id, topic_id, user_id)
+    SignUpTopic.reassign_topic(user_id, assignment_id, topic_id)
   end
 end

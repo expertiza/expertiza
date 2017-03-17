@@ -27,9 +27,10 @@
 
         <% if(@assignment.max_team_size > 1)%>
           <br/>
-          <b><%= participant.team_name_placeholder%><%= link_to image_tag("plus.png", :border=>0,:alt => "Add Team Member", :title => "Add Team Member" ), :controller=>'teams_users', :action=>'new', :id => participant.team %></b>
+          <b><%= participant.team_name_placeholder%><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'sign_up', :id=>6623,:topic_id => topic.id, :assignment_id => params[:assignment_id] %></b>
           <br/>
           <%= participant.user_name_placeholder%><%= link_to image_tag("delete_icon.png", :border=>0, :alt => "Delete Team", :title => "Delete Team"), :controller=>'teams', :action=>'delete', :id => participant.team %>
+                  <%= link_to "Remove Signup", :controller => "sign_up_sheet", :action => "delete_signup", :id => participant.id %>
         <% else %>
           <%= participant.user_name_placeholder%>
         <% end %>
@@ -40,7 +41,7 @@
       <% end %>
     <% end %>
     <% if chooser_present == false %>
-      No choosers.
+      No choosers.<%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'sign_up', :id=>31708,:topic_id => topic.id, :assignment_id => params[:assignment_id] %>
     <% end %>
     <br/>
   <% end %>

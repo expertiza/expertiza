@@ -1,5 +1,8 @@
 class ApplicationController < ActionController::Base
   include AccessHelper
+  @@cache_roles = { 1 => CACHED_STUDENT_MENU, 2 => CACHED_INSTRUCTOR_MENU,
+                    3 => CACHED_ADMIN_MENU, 4 => CACHED_SUPER_ADMIN_MENU,
+                    5 => CACHED_UNREG_USER_MENU, 6 => CACHED_TA_MENU}
 
   # You want to get exceptions in development, but not in production.
   unless Rails.application.config.consider_all_requests_local
@@ -19,6 +22,10 @@ class ApplicationController < ActionController::Base
   before_action :authorize
 
   def self.verify(_args)
+  end
+
+  def self.set_cache_roles(id)
+      @@cache_roles[id]
   end
 
   def current_user_role?

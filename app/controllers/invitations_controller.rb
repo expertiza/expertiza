@@ -79,13 +79,12 @@ class InvitationsController < ApplicationController
     inviter_assignment_team = AssignmentTeam.team(inviter_participant)
     if inviter_assignment_team.nil?
       flash[:error] = "The team that invited you does not exist anymore."
-    else
-      if inviter_assignment_team.full?
+    elsif inviter_assignment_team.full?
         flash[:error] = "The team that invited you is full now."
       else
         ready_to_join = true
-      end
     end
+
 
     if ready_to_join
       @inv.reply_status = 'A'

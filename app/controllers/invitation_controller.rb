@@ -35,6 +35,7 @@ class InvitationController < ApplicationController
             @invitation.to_id = user.id
             @invitation.from_id = student.user_id
             @invitation.assignment_id = student.parent_id
+            #Status code W for waiting for reply
             @invitation.reply_status = 'W'
             @invitation.save
           else
@@ -55,6 +56,7 @@ class InvitationController < ApplicationController
       participant = AssignmentParticipant.where(['user_id =? and parent_id =?', user.id, student.parent_id]).first
       if participant
         old_entry = JoinTeamRequest.where(['participant_id =? and team_id =?', participant.id, params[:team_id]]).first
+        #Status code A for accepted
         old_entry.update_attribute("status", 'A') if old_entry
       end
     end
@@ -87,6 +89,7 @@ class InvitationController < ApplicationController
 
 
     if ready_to_join
+      #Status code A for accepted
       @inv.reply_status = 'A'
       @inv.save
 
@@ -106,6 +109,7 @@ class InvitationController < ApplicationController
 
   def decline
     @inv = Invitation.find(params[:inv_id])
+    #Status code D for declined
     @inv.reply_status = 'D'
     @inv.save
     student = Participant.find(params[:student_id])

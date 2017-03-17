@@ -1,4 +1,4 @@
-class InvitationController < ApplicationController
+class InvitationsController < ApplicationController
   def action_allowed?
     ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator', 'Student'].include? current_role_name
   end

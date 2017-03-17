@@ -444,7 +444,7 @@ class Assignment < ActiveRecord::Base
       reviewee = Team.find_by_id(a.reviewee_id)
       reviewer = Participant.find_by_id(a.reviewer_id).user
 
-      if !reviewee.nil?
+      if !reviewee.nil? and !reviewee.id.nil?
         row.push(reviewee.id)
         row.push(reviewee.name)
         row.push(reviewer.name)
@@ -464,6 +464,8 @@ class Assignment < ActiveRecord::Base
       # puts a.reviewee_id
       # puts a.reviewer_id
     end
+
+
 
   end
 

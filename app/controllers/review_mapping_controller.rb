@@ -470,14 +470,13 @@ class ReviewMappingController < ApplicationController
 
 private
 
- def get_sentiment
-    response = HTTParty.post('http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',:body => {"reviews":[
-                {"id":"1","text":"bad"},
-                {"id":"2","text":"not bad"},
-                {"id":"3","text":"good"}
-              ]}.to_json, :headers => { 'Content-Type' => 'application/json' })
+  def get_sentiment
+    response = HTTParty.post('http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',:body => {"reviews"=>[
+        {"id"=>"1","text"=>"bad"},
+        {"id"=>"2","text"=>"not bad"},
+        {"id"=>"3","text"=>"good"}
+    ]}.to_json, :headers => { 'Content-Type' => 'application/json' })
     response["sentiments"].each do |element|
-        puts element["sentiment"]
     end
   end
 

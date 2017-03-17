@@ -1,4 +1,5 @@
 class InvitationController < ApplicationController
+  before_action :check_user, only: [:create]
   def action_allowed?
     ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator', 'Student'].include? current_role_name
   end
@@ -11,37 +12,25 @@ class InvitationController < ApplicationController
     user = User.find_by(name: params[:user][:name].strip)
     team = AssignmentTeam.find(params[:team_id])
     student = AssignmentParticipant.find(params[:student_id])
-    return unless current_user_id?(student.user_id)
+    participant = AssignmentParticipant.where('user_id =? and parent_id =?', user.id, student.parent_id).first
 
-    # check if the invited user is valid
-    if !user
-      flash[:note] = "The user \"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
+    team_member = TeamsUser.where(['team_id =? and user_id =?', team.id, user.id])
+    # check if invited user is already in the team
+    if !team_member.empty?
+      flash[:note] = "The user \"#{user.name}\" is already a member of the team."
     else
-      participant = AssignmentParticipant.where('user_id =? and parent_id =?', user.id, student.parent_id).first
-      # check if the user is a participant of the assignment
-      if !participant
-        flash[:note] = "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment."
-      elsif team.full?
-        flash[:error] = "Your team already has the maximum number members."
+      # check if the invited user is already invited (i.e. awaiting reply)
+      if Invitation.is_invited?(student.user_id, user.id, student.parent_id)
+        @invitation = Invitation.new
+        @invitation.to_id = user.id
+        @invitation.from_id = student.user_id
+        @invitation.assignment_id = student.parent_id
+        @invitation.reply_status = 'W'
+        @invitation.save
       else
-        team_member = TeamsUser.where(['team_id =? and user_id =?', team.id, user.id])
-        # check if invited user is already in the team
-        if !team_member.empty?
-          flash[:note] = "The user \"#{user.name}\" is already a member of the team."
-        else
-          # check if the invited user is already invited (i.e. awaiting reply)
-          if Invitation.is_invited?(student.user_id, user.id, student.parent_id)
-            @invitation = Invitation.new
-            @invitation.to_id = user.id
-            @invitation.from_id = student.user_id
-            @invitation.assignment_id = student.parent_id
-            @invitation.reply_status = 'W'
-            @invitation.save
-          else
-            flash[:note] = "You have already sent an invitation to \"#{user.name}\"."
-          end
-        end
+        flash[:note] = "You have already sent an invitation to \"#{user.name}\"."
       end
+
     end
 
     update_join_team_request user, student
@@ -115,5 +104,34 @@ class InvitationController < ApplicationController
   def cancel
     Invitation.find(params[:inv_id]).destroy
     redirect_to view_student_teams_path student_id: params[:student_id]
+  end
+  private
+  def check_user
+    user = User.find_by(name: params[:user][:name].strip)
+    team = AssignmentTeam.find(params[:team_id])
+    student = AssignmentParticipant.find(params[:student_id])
+
+    return unless current_user_id?(student.user_id)
+
+    # check if the invited user is valid
+    if !user
+      flash[:note] = "The user \"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
+      redirect_to view_student_teams_path student_id: student.id
+      return
+    end
+    participant = AssignmentParticipant.where('user_id =? and parent_id =?', user.id, student.parent_id).first
+    # check if the user is a participant of the assignment
+    if !participant
+      flash[:note] = "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment."
+      redirect_to view_student_teams_path student_id: student.id
+      return
+    end
+
+    if team.full?
+      flash[:error] = "Your team already has the maximum number members."
+      redirect_to view_student_teams_path student_id: student.id
+      return
+    end
+
   end
 end

@@ -29,7 +29,7 @@
           <br/>
           <b><%= participant.team_name_placeholder%><%= link_to image_tag("plus.png", :border=>0,:alt => "Add Team Member", :title => "Add Team Member" ), :controller=>'teams_users', :action=>'new', :id => participant.team %></b>
           <br/>
-          <%= participant.user_name_placeholder%>
+          <%= participant.user_name_placeholder%><%= link_to image_tag("delete_icon.png", :border=>0, :alt => "Delete Team", :title => "Delete Team"), :controller=>'teams', :action=>'delete', :id => participant.team %>
         <% else %>
           <%= participant.user_name_placeholder%>
         <% end %>

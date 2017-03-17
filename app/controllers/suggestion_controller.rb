@@ -203,5 +203,20 @@ class SuggestionController < ApplicationController
     #function is getting called
   end
 
-
+  def approve
+    @suggestion = Suggestion.find(params[:id])
+    @user_id = User.where(name: @suggestion.unityID).first.id
+    @team_id = TeamsUser.team_id(@suggestion.assignment_id, @user_id)
+    @topic_id = SignedUpTeam.topic_id(@suggestion.assignment_id, @user_id)
+    @signuptopic = SignUpTopic.new
+    @signuptopic.topic_identifier = 'S' + Suggestion.where("assignment_id = ? and id <= ?", @suggestion.assignment_id, @suggestion.id).size.to_s
+    @signuptopic.topic_name = @suggestion.title
+    @signuptopic.assignment_id = @suggestion.assignment_id
+    @signuptopic.max_choosers = 1
+    if @signuptopic.save && @suggestion.update_attribute('status', 'Approved')
+      flash[:success] = 'The suggestion was successfully approved.'
+    else
+      flash[:error] = 'An error occurred when approving the suggestion.'
+    end
+  end
 end

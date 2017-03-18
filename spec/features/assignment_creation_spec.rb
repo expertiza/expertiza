@@ -51,12 +51,21 @@ def self.set_assignment_review_deadline(submission_date, review_date, _round=1)
   end
 end
 
+def login_create_assignment_reroute(assignment, assignment_name, login_user, page_to_visit, link_to_click, submission_date, review_date, _round)
+  @assignment = create(assignment, name: assignment_name)
+  login_as(login_user)
+  visit page_to_visit
+  click_link link_to_click
+  set_assignment_review_deadline(submission_date,review_date, _round)
+end
+
 def fill_assignment_form
   fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
   select('Course 2', from: 'assignment_form_assignment_course_id')
   fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'
   fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
 end
+
 describe "assignment function" do
   before(:each) do
     create(:deadline_type, name: "submission")
@@ -249,11 +258,12 @@ describe "assignment function" do
   # instructor can set in which deadline can student reviewers take the quizzes
   describe "deadlines", js: true do
     before(:each) do
-      @assignment = create(:assignment, name: 'public assignment for test')
-      login_as("instructor6")
-      visit "/assignments/#{@assignment.id}/edit"
-      click_link 'Due date'
-      set_assignment_review_deadline('2017/11/01 12:00','2017/11/10 12:00')
+      login_create_assignment_reroute(:assignment, 'public assignment for test', "instructor6", "/assignments/#{@assignment.id}/edit", 'Due date', '2017/11/01 12:00','2017/11/10 12:00', 1)
+      #@assignment = create(:assignment, name: 'public assignment for test')
+      #login_as("instructor6")
+      #visit "/assignments/#{@assignment.id}/edit"
+      #click_link 'Due date'
+      #set_assignment_review_deadline('2017/11/01 12:00','2017/11/10 12:00')
     end
   end
   # adding test for general tab
@@ -579,11 +589,12 @@ describe "assignment function" do
   # Begin Due Date tab
   describe "Due dates tab", js: true do
     before(:each) do
-      @assignment = create(:assignment, name: 'public assignment for test')
-      login_as("instructor6")
-      visit "/assignments/#{@assignment.id}/edit"
-      click_link 'Due date'
-      set_assignment_review_deadline('2017/10/01 12:00','2017/10/10 12:00')
+      login_create_assignment_reroute(:assignment, 'public assignment for test', "instructor6", "/assignments/#{@assignment.id}/edit", 'Due date', '2017/10/01 12:00','2017/10/10 12:00', 1)
+      #@assignment = create(:assignment, name: 'public assignment for test')
+      #login_as("instructor6")
+      #visit "/assignments/#{@assignment.id}/edit"
+      #click_link 'Due date'
+      #set_assignment_review_deadline('2017/10/01 12:00','2017/10/10 12:00')
     end
 
     xit "Able to create a new penalty policy" do # This case doesn't work in expertiza yet, i.e. not able to create new late policy.

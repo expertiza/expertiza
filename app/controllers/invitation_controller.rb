@@ -79,7 +79,7 @@ class InvitationController < ApplicationController
 
   def accepted_invitation
     Mailer.accepted_invitation(
-        to: @team,  #I'm not sure about this, but lets see
+        to: @team,  #I'm not sure about this, but lets see.
         #cc: cc_mail_list,
         subject: "The invitation for the teammate has been accepted",
         body: {

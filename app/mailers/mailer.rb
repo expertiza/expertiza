@@ -97,6 +97,7 @@ class Mailer < ActionMailer::Base
     if Rails.env.development? || Rails.env.test?
       defn[:to] = 'expertiza.development@gmail.com'
     end
+
     mail(subject: defn[:subject],
          to: defn[:to],
          bcc: defn[:cc])

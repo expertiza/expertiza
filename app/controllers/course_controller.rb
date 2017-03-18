@@ -170,7 +170,8 @@ class CourseController < ApplicationController
     @course = @ta_mapping
     undo_link("The TA \"#{@ta.name}\" has been successfully removed.")
 
-    redirect_to action: 'view_teaching_assistants', id: @ta_mapping.course
+    #redirect_to action: 'view_teaching_assistants', id: @ta_mapping.course
+    render :action => 'remove_ta.js.erb'
   end
 
   # generate the undo link

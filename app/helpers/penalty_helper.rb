@@ -34,10 +34,10 @@ module PenaltyHelper
     penalties
   end
 
-  def set_penalty_policy
-    @late_policy = Assignment.find(@assignment_id).late_policy
-    @late_policy.max_penalty
-  end
+  #def set_penalty_policy
+  #  @late_policy = Assignment.find(@assignment_id).late_policy
+  #  @late_policy.max_penalty
+  #end
 
   def calculate_submission_penalty
     penalty = 0
@@ -100,15 +100,15 @@ module PenaltyHelper
     penalty
   end
 
-  def calculate_author_feedback_penalty
-    penalty = 0
-    penalty
-  end
+  #def calculate_author_feedback_penalty
+  #  penalty = 0
+  #  penalty
+  #end
 
-  def calculate_team_feedback_penalty
-    penalty = 0
-    penalty
-  end
+  #def calculate_team_feedback_penalty
+  #  penalty = 0
+  #  penalty
+  #end
 
   def compute_penalty_on_reviews(review_mappings, review_due_date, num_of_reviews_required)
     review_map_created_at_list = []

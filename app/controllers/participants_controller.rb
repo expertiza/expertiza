@@ -53,7 +53,10 @@ class ParticipantsController < ApplicationController
       url_new_user = url_for controller: 'users', action: 'new'
       flash[:error] = "The user <b>#{params[:user][:name]}</b> does not exist or has already been added."
     end
-    redirect_to action: 'list', id: curr_object.id, model: params[:model], authorization: params[:authorization]
+    respond_to do |format|
+      format.js
+    end
+    # redirect_to action: 'list', id: curr_object.id, model: params[:model], authorization: params[:authorization]
   end
 
   def update_authorizations

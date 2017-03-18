@@ -83,10 +83,10 @@
       <!-- start invited people table -->
       <table style="width:80%" align="center" >
         <tr style="border: 1px outset #000000; ">
-          <td class="head"><b>Username</b></td>
-          <td class="head"><b>Full name</b></td>
-          <td class="head"><b>Email address</b></td>
-          <td class="head" align="center"><b>Status</b></td>
+          <th class="head"><b>Username</b></th>
+          <th class="head"><b>Full name</b></th>
+          <th class="head"><b>Email address</b></th>
+          <th class="head" align="center"><b>Status</b></th>
         </tr>
           <% for inv in @send_invs %>
             <tr>
@@ -159,12 +159,12 @@
 
 <!--display a table of received invitation-->
   <% if @received_invs && @received_invs.length > 0 %>
-    <table>
+    <table style="width:80%" align="center" >
       <h3>Received Invitations</h3>
-      <tr>
-        <td><b>From &nbsp</b></td>
-        <td><b>Team Name &nbsp</b></td>
-        <td><b>Reply &nbsp</b></td>
+      <tr style="border: 1px outset #000000; padding: 10px 20px" >
+        <th class="head">From </th>
+        <th class="head">Team Name </th>
+        <th class="head">Reply </th>
       </tr>
       <% for inv in @received_invs %>
           <% if inv.reply_status == 'W' %>

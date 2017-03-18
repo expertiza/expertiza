@@ -9,11 +9,15 @@ class InvitationsController < ApplicationController
   end
 
   def create
+    #user is the student you are inviting to your team
     user = User.find_by(name: params[:user][:name].strip)
+    #team has information about the team
     team = AssignmentTeam.find(params[:team_id])
+    #student has information about the participant
     student = AssignmentParticipant.find(params[:student_id])
-    participant = AssignmentParticipant.where('user_id =? and parent_id =?', user.id, student.parent_id).first
 
+
+    #participant information about student you are trying to invite to the team
     team_member = TeamsUser.where(['team_id =? and user_id =?', team.id, user.id])
     # check if invited user is already in the team
     if !team_member.empty?
@@ -61,7 +65,7 @@ class InvitationsController < ApplicationController
     if user && student
       return
     end
-
+    #participant information of invitee and assignment
     participant = AssignmentParticipant.where(['user_id =? and parent_id =?', user.id, student.parent_id]).first
     if participant
       old_entry = JoinTeamRequest.where(['participant_id =? and team_id =?', participant.id, params[:team_id]]).first
@@ -131,8 +135,11 @@ class InvitationsController < ApplicationController
   end
   private
   def check_user
+    #user is the student you are inviting to your team
     user = User.find_by(name: params[:user][:name].strip)
+    #team has information about the team
     team = AssignmentTeam.find(params[:team_id])
+    #student has information about the participant
     student = AssignmentParticipant.find(params[:student_id])
 
     return unless current_user_id?(student.user_id)

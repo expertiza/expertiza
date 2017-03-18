@@ -77,6 +77,17 @@ class InvitationController < ApplicationController
     @users = User.where("LOWER(name) LIKE ?", "%#{search}%") unless search.blank?
   end
 
+  def accepted_invitation
+    Mailer.accepted_invitation(
+        to: @team,  #I'm not sure about this, but lets see
+        #cc: cc_mail_list,
+        subject: "The invitation for the teammate has been accepted",
+        body: {
+
+        }
+    ).deliver_now!
+  end
+
   def accept
     @inv = Invitation.find(params[:inv_id])
 
@@ -102,6 +113,8 @@ class InvitationController < ApplicationController
     if ready_to_join
       @inv.reply_status = 'A'
       @inv.save
+      accepted_invitation
+      #add the acceptance mailer call here
 
       # Remove the users previous team since they are accepting an invite for possibly a new team.
       TeamsUser.remove_team(student.user_id, params[:team_id])

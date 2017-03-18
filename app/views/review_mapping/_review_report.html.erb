@@ -21,7 +21,7 @@
     </tr>
     </thead>
 <tbody>
-
+      <% get_sentiment_list %>
       <% sort_reviewer_by_review_volume_desc.each do |r| %>
         <% @response_maps, @bgcolor, @rspan, @l = get_data_for_review_report(@id, r.id, @type, @l) %>
         <tr>
@@ -70,6 +70,7 @@
                   <!--Metrics-->
                   <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
                     <%= display_volume_metric(r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3) %>
+                    <!--<%= display_sentiment_metric(r.id) %>-->
                   </td>
                   <!--Assign grade and write comments-->
                   <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
@@ -145,10 +146,11 @@ $.tablesorter.addParser({
   },
   format: function (stringValue) {
     var stringNumericPart = stringValue.split(" ");         //split the data by spaces
-    var numericValue = parseInt(stringNumericPart[2],10);   //extract the numeric data
+    var numericValue = parseFloat(stringNumericPart[2]);   //extract the numeric data
     return numericValue ;
   },
   type: 'numeric'
 });
+
 
 </script>

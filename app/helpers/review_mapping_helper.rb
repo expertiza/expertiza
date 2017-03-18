@@ -18,6 +18,47 @@ module ReviewMappingHelper
     table_header.html_safe
   end
 
+def get_sentiment_list
+  
+    response_list = []
+    @sentiment_list = []
+    
+    @reviewers.each do |r|
+      sentiment = {}
+      review = {}
+  
+      review_text = Response.concatenate_all_review_comments(@id, r).join(" ")
+      review["id"] = r.id.to_s
+      review["text"] = review_text
+      response = HTTParty.post('http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',:body => {"reviews"=>[review]}.to_json, :headers => { 'Content-Type' => 'application/json' })
+      response_list<<response
+      case response.code
+        when 200
+          sentiment["id"] = response.parsed_response["sentiments"][0]["id"]
+          sentiment["sentiment"] = response.parsed_response["sentiments"][0]["sentiment"]
+          @sentiment_list<<sentiment
+        when 404
+          # Error in generating sentiment from the server
+          sentiment["id"] = review["id"]
+          sentiment["sentiment"]="-404"
+          @sentiment_list<<sentiment
+        when 500...600
+          # Error in generating sentiment from the server
+          sentiment["id"] = review["id"]
+          sentiment["sentiment"]="-500"
+          @sentiment_list<<sentiment
+      end
+    end
+    @sentiment_list
+  end
+
+  def display_sentiment_metric id
+    hashed_sentiment = @sentiment_list.select {|sentiment| sentiment["id"] == id.to_s}
+    value = hashed_sentiment[0]["sentiment"].to_f.round(2)
+    metric = "Avg. Sentiment: #{value}<br/>"
+    metric.html_safe
+  end
+
   #
   # for review report
   #

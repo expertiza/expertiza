@@ -9,7 +9,21 @@ class Role < ActiveRecord::Base
   validates_presence_of :name
   validates_uniqueness_of :name
 
+  attr_accessible :cache
   attr_reader :student, :ta, :instructor, :administrator, :superadministrator
+
+  def cache=(value)
+    @cache = value
+  end
+
+  def cache
+    @cache = Hash.new
+    if !self.nil?
+      @cache[:credentials] = ApplicationController.get_cache_roles(self.id)[:credentials]
+      @cache[:menu] = ApplicationController.get_cache_roles(self.id)[:menu]
+    end
+    @cache
+  end
 
   def self.find_or_create_by_name(params)
     Role.find_or_create_by(name: params)
@@ -68,7 +82,7 @@ class Role < ActiveRecord::Base
       #role.cache = nil
       #role.save # we have to do this to clear it
 
-      #role.cache = Hash.new
+      role.cache = Hash.new
       role.rebuild_credentials
       role.rebuild_menu
       #role.save

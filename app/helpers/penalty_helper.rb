@@ -182,6 +182,16 @@ module PenaltyHelper
     penalty
   end
 
+  #checking that penalty_per_unit is not exceeding max_penalty
+  def check_penalty_points_validity(max_penalty, penalty_per_unit)
+    if max_penalty < penalty_per_unit
+      flash[:error] = "The maximum penalty cannot be less than penalty per unit."
+      invalid_penalty_per_unit = true
+    else
+      invalid_penalty_per_unit = false
+    end
+  end
+
   #method to check whether the policy name given as a parameter already exists under the current instructor id
   #it return true if there's another policy with the same name under current instructor else false
   def check_policy_with_same_name(late_policy_name)

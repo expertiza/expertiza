@@ -70,26 +70,8 @@ class LatePoliciesController < ApplicationController
   # POST /late_policies
   # POST /late_policies.xml
   def create
-    #is_number = true
+    invalid_penalty_per_unit = check_penalty_points_validity(params[:late_policy][:max_penalty].to_i, params[:late_policy][:penalty_per_unit].to_i)
 
-    # if(!is_numeric?(params[:late_policy][:penalty_per_unit]))
-    #  flash[:error] = "The penalty points per unit should be a numeric value"
-    #  is_number = false
-    # elsif (params[:late_policy][:penalty_per_unit].to_i < 0)
-    #  flash[:error] = "The penalty points per unit cannot be negative"
-    #  is_number = false
-    # elsif(!is_numeric?(params[:late_policy][:max_penalty]))
-    #    flash[:error] = "The maximum penalty points should be a numeric value"
-    #    is_number = false
-    # end
-
-    invalid_penalty_per_unit = false
-    if params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i
-      flash[:error] = "The maximum penalty cannot be less than penalty per unit."
-      invalid_penalty_per_unit = true
-    end
-
-    same_policy_name = false
     if same_policy_name = check_policy_with_same_name(params[:late_policy][:policy_name])
       flash[:error] = "A policy with the same name already exists."
     end
@@ -97,7 +79,6 @@ class LatePoliciesController < ApplicationController
     if invalid_penalty_per_unit == false && same_policy_name == false
       @late_policy = LatePolicy.new(late_policy_params)
       @late_policy.instructor_id = instructor_id
-
       begin
         @late_policy.save!
         flash[:notice] = "The penalty policy was successfully created."
@@ -115,12 +96,8 @@ class LatePoliciesController < ApplicationController
   # PUT /late_policies/1.xml
   def update
     @penalty_policy = LatePolicy.find(params[:id])
-    invalid_penalty_per_unit = false
-    if params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i
-      flash[:error] = "The maximum penalty cannot be less than penalty per unit."
-      invalid_penalty_per_unit = true
-    end
-
+    
+    invalid_penalty_per_unit = check_penalty_points_validity(params[:late_policy][:max_penalty].to_i, params[:late_policy][:penalty_per_unit].to_i)
     same_policy_name = false
     # if name has changed then only check for this
     if params[:late_policy][:policy_name] != @penalty_policy.policy_name

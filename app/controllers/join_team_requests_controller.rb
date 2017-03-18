@@ -6,27 +6,17 @@ class JoinTeamRequestsController < ApplicationController
 
   def index
     @join_team_requests = JoinTeamRequest.all
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.xml  { render xml: @join_team_requests }
-    end
+    respond_after @join_team_requests
   end
 
   def show
     @join_team_request = JoinTeamRequest.find(params[:id])
-    respond_to do |format|
-      format.html # show.html.erb
-      format.xml  { render xml: @join_team_request }
-    end
+    respond_after @join_team_request
   end
 
   def new
     @join_team_request = JoinTeamRequest.new
-    respond_to do |format|
-      format.html # new.html.erb
-      format.xml  { render xml: @join_team_request }
-    end
+    respond_after @join_team_request
   end
 
   def edit
@@ -103,5 +93,12 @@ class JoinTeamRequestsController < ApplicationController
         return
       end
 
+    end
+
+    def respond_after(request)
+      respond_to do |format|
+        format.html
+        format.xml  { render xml: request }
+      end
     end
 end
